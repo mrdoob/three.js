@@ -1,30 +1,25 @@
+import {
+	Matrix3,
+	Vector3,
+	Color
+} from 'three';
+
 /**
- * @author Garrett Johnson / http://gkjohnson.github.io/
  * https://github.com/gkjohnson/ply-exporter-js
  *
  * Usage:
- *  var exporter = new PLYExporter();
+ *  const exporter = new PLYExporter();
  *
  *  // second argument is a list of options
- *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ] });
+ *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
  *
  * Format Definition:
  * http://paulbourke.net/dataformats/ply/
  */
 
-import {
-	BufferGeometry,
-	Matrix3,
-	Vector3
-} from "../../../build/three.module.js";
+class PLYExporter {
 
-var PLYExporter = function () {};
-
-PLYExporter.prototype = {
-
-	constructor: PLYExporter,
-
-	parse: function ( object, onDone, options ) {
+	parse( object, onDone, options ) {
 
 		if ( onDone && typeof onDone === 'object' ) {
 
@@ -41,22 +36,18 @@ PLYExporter.prototype = {
 
 				if ( child.isMesh === true ) {
 
-					var mesh = child;
-					var geometry = mesh.geometry;
+					const mesh = child;
+					const geometry = mesh.geometry;
 
-					if ( geometry.isGeometry === true ) {
+					if ( geometry.isBufferGeometry !== true ) {
 
-						geometry = geomToBufferGeom.get( geometry );
+						throw new Error( 'THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 					}
 
-					if ( geometry.isBufferGeometry === true ) {
+					if ( geometry.hasAttribute( 'position' ) === true ) {
 
-						if ( geometry.getAttribute( 'position' ) !== undefined ) {
-
-							cb( mesh, geometry );
-
-						}
+						cb( mesh, geometry );
 
 					}
 
@@ -67,68 +58,63 @@ PLYExporter.prototype = {
 		}
 
 		// Default options
-		var defaultOptions = {
+		const defaultOptions = {
 			binary: false,
-			excludeAttributes: [] // normal, uv, color, index
+			excludeAttributes: [], // normal, uv, color, index
+			littleEndian: false
 		};
 
 		options = Object.assign( defaultOptions, options );
 
-		var excludeAttributes = options.excludeAttributes;
-		var geomToBufferGeom = new WeakMap();
-		var includeNormals = false;
-		var includeColors = false;
-		var includeUVs = false;
+		const excludeAttributes = options.excludeAttributes;
+		let includeNormals = false;
+		let includeColors = false;
+		let includeUVs = false;
 
 		// count the vertices, check which properties are used,
 		// and cache the BufferGeometry
-		var vertexCount = 0;
-		var faceCount = 0;
+		let vertexCount = 0;
+		let faceCount = 0;
 		object.traverse( function ( child ) {
 
 			if ( child.isMesh === true ) {
 
-				var mesh = child;
-				var geometry = mesh.geometry;
+				const mesh = child;
+				const geometry = mesh.geometry;
 
-				if ( geometry.isGeometry === true ) {
+				if ( geometry.isBufferGeometry !== true ) {
 
-					var bufferGeometry = geomToBufferGeom.get( geometry ) || new BufferGeometry().setFromObject( mesh );
-					geomToBufferGeom.set( geometry, bufferGeometry );
-					geometry = bufferGeometry;
+					throw new Error( 'THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 				}
 
-				if ( geometry.isBufferGeometry === true ) {
+				const vertices = geometry.getAttribute( 'position' );
+				const normals = geometry.getAttribute( 'normal' );
+				const uvs = geometry.getAttribute( 'uv' );
+				const colors = geometry.getAttribute( 'color' );
+				const indices = geometry.getIndex();
 
-					var vertices = geometry.getAttribute( 'position' );
-					var normals = geometry.getAttribute( 'normal' );
-					var uvs = geometry.getAttribute( 'uv' );
-					var colors = geometry.getAttribute( 'color' );
-					var indices = geometry.getIndex();
+				if ( vertices === undefined ) {
 
-					if ( vertices === undefined ) {
-
-						return;
-
-					}
-
-					vertexCount += vertices.count;
-					faceCount += indices ? indices.count / 3 : vertices.count / 3;
-
-					if ( normals !== undefined ) includeNormals = true;
-
-					if ( uvs !== undefined ) includeUVs = true;
-
-					if ( colors !== undefined ) includeColors = true;
+					return;
 
 				}
+
+				vertexCount += vertices.count;
+				faceCount += indices ? indices.count / 3 : vertices.count / 3;
+
+				if ( normals !== undefined ) includeNormals = true;
+
+				if ( uvs !== undefined ) includeUVs = true;
+
+				if ( colors !== undefined ) includeColors = true;
 
 			}
 
 		} );
 
-		var includeIndices = excludeAttributes.indexOf( 'index' ) === - 1;
+		const tempColor = new Color();
+		const includeIndices = excludeAttributes.indexOf( 'index' ) === - 1;
 		includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
 		includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
 		includeUVs = includeUVs && excludeAttributes.indexOf( 'uv' ) === - 1;
@@ -150,26 +136,11 @@ PLYExporter.prototype = {
 
 		}
 
-		// get how many bytes will be needed to save out the faces
-		// so we can use a minimal amount of memory / data
-		var indexByteCount = 1;
+		const indexByteCount = 4;
 
-		if ( vertexCount > 256 ) { // 2^8 bits
-
-			indexByteCount = 2;
-
-		}
-
-		if ( vertexCount > 65536 ) { // 2^16 bits
-
-			indexByteCount = 4;
-
-		}
-
-
-		var header =
+		let header =
 			'ply\n' +
-			`format ${ options.binary ? 'binary_big_endian' : 'ascii' } 1.0\n` +
+			`format ${ options.binary ? ( options.littleEndian ? 'binary_little_endian' : 'binary_big_endian' ) : 'ascii' } 1.0\n` +
 			`element vertex ${vertexCount}\n` +
 
 			// position
@@ -211,7 +182,7 @@ PLYExporter.prototype = {
 			// faces
 			header +=
 				`element face ${faceCount}\n` +
-				`property list uchar uint${ indexByteCount * 8 } vertex_index\n`;
+				'property list uchar int vertex_index\n';
 
 		}
 
@@ -219,58 +190,56 @@ PLYExporter.prototype = {
 
 
 		// Generate attribute data
-		var vertex = new Vector3();
-		var normalMatrixWorld = new Matrix3();
-		var result = null;
+		const vertex = new Vector3();
+		const normalMatrixWorld = new Matrix3();
+		let result = null;
 
 		if ( options.binary === true ) {
 
 			// Binary File Generation
-			var headerBin = new TextEncoder().encode( header );
+			const headerBin = new TextEncoder().encode( header );
 
 			// 3 position values at 4 bytes
 			// 3 normal values at 4 bytes
 			// 3 color channels with 1 byte
 			// 2 uv values at 4 bytes
-			var vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
+			const vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
 
 			// 1 byte shape desciptor
 			// 3 vertex indices at ${indexByteCount} bytes
-			var faceListLength = includeIndices ? faceCount * ( indexByteCount * 3 + 1 ) : 0;
-			var output = new DataView( new ArrayBuffer( headerBin.length + vertexListLength + faceListLength ) );
+			const faceListLength = includeIndices ? faceCount * ( indexByteCount * 3 + 1 ) : 0;
+			const output = new DataView( new ArrayBuffer( headerBin.length + vertexListLength + faceListLength ) );
 			new Uint8Array( output.buffer ).set( headerBin, 0 );
 
 
-			var vOffset = headerBin.length;
-			var fOffset = headerBin.length + vertexListLength;
-			var writtenVertices = 0;
+			let vOffset = headerBin.length;
+			let fOffset = headerBin.length + vertexListLength;
+			let writtenVertices = 0;
 			traverseMeshes( function ( mesh, geometry ) {
 
-				var vertices = geometry.getAttribute( 'position' );
-				var normals = geometry.getAttribute( 'normal' );
-				var uvs = geometry.getAttribute( 'uv' );
-				var colors = geometry.getAttribute( 'color' );
-				var indices = geometry.getIndex();
+				const vertices = geometry.getAttribute( 'position' );
+				const normals = geometry.getAttribute( 'normal' );
+				const uvs = geometry.getAttribute( 'uv' );
+				const colors = geometry.getAttribute( 'color' );
+				const indices = geometry.getIndex();
 
 				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
+				for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-					vertex.x = vertices.getX( i );
-					vertex.y = vertices.getY( i );
-					vertex.z = vertices.getZ( i );
+					vertex.fromBufferAttribute( vertices, i );
 
 					vertex.applyMatrix4( mesh.matrixWorld );
 
 
 					// Position information
-					output.setFloat32( vOffset, vertex.x );
+					output.setFloat32( vOffset, vertex.x, options.littleEndian );
 					vOffset += 4;
 
-					output.setFloat32( vOffset, vertex.y );
+					output.setFloat32( vOffset, vertex.y, options.littleEndian );
 					vOffset += 4;
 
-					output.setFloat32( vOffset, vertex.z );
+					output.setFloat32( vOffset, vertex.z, options.littleEndian );
 					vOffset += 4;
 
 					// Normal information
@@ -278,30 +247,28 @@ PLYExporter.prototype = {
 
 						if ( normals != null ) {
 
-							vertex.x = normals.getX( i );
-							vertex.y = normals.getY( i );
-							vertex.z = normals.getZ( i );
+							vertex.fromBufferAttribute( normals, i );
 
-							vertex.applyMatrix3( normalMatrixWorld );
+							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
-							output.setFloat32( vOffset, vertex.x );
+							output.setFloat32( vOffset, vertex.x, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, vertex.y );
+							output.setFloat32( vOffset, vertex.y, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, vertex.z );
+							output.setFloat32( vOffset, vertex.z, options.littleEndian );
 							vOffset += 4;
 
 						} else {
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
 						}
@@ -313,18 +280,18 @@ PLYExporter.prototype = {
 
 						if ( uvs != null ) {
 
-							output.setFloat32( vOffset, uvs.getX( i ) );
+							output.setFloat32( vOffset, uvs.getX( i ), options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, uvs.getY( i ) );
+							output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
 							vOffset += 4;
 
-						} else if ( includeUVs !== false ) {
+						} else {
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
 						}
@@ -336,13 +303,17 @@ PLYExporter.prototype = {
 
 						if ( colors != null ) {
 
-							output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
+							tempColor
+								.fromBufferAttribute( colors, i )
+								.convertLinearToSRGB();
+
+							output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 							vOffset += 1;
 
-							output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
+							output.setUint8( vOffset, Math.floor( tempColor.g * 255 ) );
 							vOffset += 1;
 
-							output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
+							output.setUint8( vOffset, Math.floor( tempColor.b * 255 ) );
 							vOffset += 1;
 
 						} else {
@@ -365,39 +336,39 @@ PLYExporter.prototype = {
 				if ( includeIndices === true ) {
 
 					// Create the face list
-					var faceIndexFunc = `setUint${indexByteCount * 8}`;
+
 					if ( indices !== null ) {
 
-						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+						for ( let i = 0, l = indices.count; i < l; i += 3 ) {
 
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 0 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 0 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 1 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 1 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 2 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 2 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
 						}
 
 					} else {
 
-						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+						for ( let i = 0, l = vertices.count; i < l; i += 3 ) {
 
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i );
+							output.setUint32( fOffset, writtenVertices + i, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 1 );
+							output.setUint32( fOffset, writtenVertices + i + 1, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 2 );
+							output.setUint32( fOffset, writtenVertices + i + 2, options.littleEndian );
 							fOffset += indexByteCount;
 
 						}
@@ -419,32 +390,30 @@ PLYExporter.prototype = {
 
 			// Ascii File Generation
 			// count the number of vertices
-			var writtenVertices = 0;
-			var vertexList = '';
-			var faceList = '';
+			let writtenVertices = 0;
+			let vertexList = '';
+			let faceList = '';
 
 			traverseMeshes( function ( mesh, geometry ) {
 
-				var vertices = geometry.getAttribute( 'position' );
-				var normals = geometry.getAttribute( 'normal' );
-				var uvs = geometry.getAttribute( 'uv' );
-				var colors = geometry.getAttribute( 'color' );
-				var indices = geometry.getIndex();
+				const vertices = geometry.getAttribute( 'position' );
+				const normals = geometry.getAttribute( 'normal' );
+				const uvs = geometry.getAttribute( 'uv' );
+				const colors = geometry.getAttribute( 'color' );
+				const indices = geometry.getIndex();
 
 				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
 				// form each line
-				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
+				for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-					vertex.x = vertices.getX( i );
-					vertex.y = vertices.getY( i );
-					vertex.z = vertices.getZ( i );
+					vertex.fromBufferAttribute( vertices, i );
 
 					vertex.applyMatrix4( mesh.matrixWorld );
 
 
 					// Position information
-					var line =
+					let line =
 						vertex.x + ' ' +
 						vertex.y + ' ' +
 						vertex.z;
@@ -454,11 +423,9 @@ PLYExporter.prototype = {
 
 						if ( normals != null ) {
 
-							vertex.x = normals.getX( i );
-							vertex.y = normals.getY( i );
-							vertex.z = normals.getZ( i );
+							vertex.fromBufferAttribute( normals, i );
 
-							vertex.applyMatrix3( normalMatrixWorld );
+							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
 							line += ' ' +
 								vertex.x + ' ' +
@@ -482,7 +449,7 @@ PLYExporter.prototype = {
 								uvs.getX( i ) + ' ' +
 								uvs.getY( i );
 
-						} else if ( includeUVs !== false ) {
+						} else {
 
 							line += ' 0 0';
 
@@ -495,10 +462,14 @@ PLYExporter.prototype = {
 
 						if ( colors != null ) {
 
+							tempColor
+								.fromBufferAttribute( colors, i )
+								.convertLinearToSRGB();
+
 							line += ' ' +
-								Math.floor( colors.getX( i ) * 255 ) + ' ' +
-								Math.floor( colors.getY( i ) * 255 ) + ' ' +
-								Math.floor( colors.getZ( i ) * 255 );
+								Math.floor( tempColor.r * 255 ) + ' ' +
+								Math.floor( tempColor.g * 255 ) + ' ' +
+								Math.floor( tempColor.b * 255 );
 
 						} else {
 
@@ -517,7 +488,7 @@ PLYExporter.prototype = {
 
 					if ( indices !== null ) {
 
-						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+						for ( let i = 0, l = indices.count; i < l; i += 3 ) {
 
 							faceList += `3 ${ indices.getX( i + 0 ) + writtenVertices }`;
 							faceList += ` ${ indices.getX( i + 1 ) + writtenVertices }`;
@@ -527,7 +498,7 @@ PLYExporter.prototype = {
 
 					} else {
 
-						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+						for ( let i = 0, l = vertices.count; i < l; i += 3 ) {
 
 							faceList += `3 ${ writtenVertices + i } ${ writtenVertices + i + 1 } ${ writtenVertices + i + 2 }\n`;
 
@@ -543,15 +514,16 @@ PLYExporter.prototype = {
 
 			} );
 
-			result = `${ header }${vertexList}\n${ includeIndices ? `${faceList}\n` : '' }`;
+			result = `${ header }${vertexList}${ includeIndices ? `${faceList}\n` : '\n' }`;
 
 		}
 
 		if ( typeof onDone === 'function' ) requestAnimationFrame( () => onDone( result ) );
+
 		return result;
 
 	}
 
-};
+}
 
 export { PLYExporter };

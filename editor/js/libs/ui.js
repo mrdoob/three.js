@@ -1,30 +1,24 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+class UIElement {
 
-var UI = {};
+	constructor( dom ) {
 
-UI.Element = function ( dom ) {
+		this.dom = dom;
 
-	this.dom = dom;
+	}
 
-};
+	add() {
 
-UI.Element.prototype = {
+		for ( let i = 0; i < arguments.length; i ++ ) {
 
-	add: function () {
+			const argument = arguments[ i ];
 
-		for ( var i = 0; i < arguments.length; i ++ ) {
-
-			var argument = arguments[ i ];
-
-			if ( argument instanceof UI.Element ) {
+			if ( argument instanceof UIElement ) {
 
 				this.dom.appendChild( argument.dom );
 
 			} else {
 
-				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
+				console.error( 'UIElement:', argument, 'is not an instance of UIElement.' );
 
 			}
 
@@ -32,21 +26,21 @@ UI.Element.prototype = {
 
 		return this;
 
-	},
+	}
 
-	remove: function () {
+	remove() {
 
-		for ( var i = 0; i < arguments.length; i ++ ) {
+		for ( let i = 0; i < arguments.length; i ++ ) {
 
-			var argument = arguments[ i ];
+			const argument = arguments[ i ];
 
-			if ( argument instanceof UI.Element ) {
+			if ( argument instanceof UIElement ) {
 
 				this.dom.removeChild( argument.dom );
 
 			} else {
 
-				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
+				console.error( 'UIElement:', argument, 'is not an instance of UIElement.' );
 
 			}
 
@@ -54,9 +48,9 @@ UI.Element.prototype = {
 
 		return this;
 
-	},
+	}
 
-	clear: function () {
+	clear() {
 
 		while ( this.dom.children.length ) {
 
@@ -64,27 +58,49 @@ UI.Element.prototype = {
 
 		}
 
-	},
+	}
 
-	setId: function ( id ) {
+	setId( id ) {
 
 		this.dom.id = id;
 
 		return this;
 
-	},
+	}
 
-	setClass: function ( name ) {
+	getId() {
+
+		return this.dom.id;
+
+	}
+
+	setClass( name ) {
 
 		this.dom.className = name;
 
 		return this;
 
-	},
+	}
 
-	setStyle: function ( style, array ) {
+	addClass( name ) {
 
-		for ( var i = 0; i < array.length; i ++ ) {
+		this.dom.classList.add( name );
+
+		return this;
+
+	}
+
+	removeClass( name ) {
+
+		this.dom.classList.remove( name );
+
+		return this;
+
+	}
+
+	setStyle( style, array ) {
+
+		for ( let i = 0; i < array.length; i ++ ) {
 
 			this.dom.style[ style ] = array[ i ];
 
@@ -92,17 +108,17 @@ UI.Element.prototype = {
 
 		return this;
 
-	},
+	}
 
-	setDisabled: function ( value ) {
+	setDisabled( value ) {
 
 		this.dom.disabled = value;
 
 		return this;
 
-	},
+	}
 
-	setTextContent: function ( value ) {
+	setTextContent( value ) {
 
 		this.dom.textContent = value;
 
@@ -110,19 +126,34 @@ UI.Element.prototype = {
 
 	}
 
-};
+	setInnerHTML( value ) {
+
+		this.dom.innerHTML = value;
+
+	}
+
+	getIndexOfChild( element ) {
+
+		return Array.prototype.indexOf.call( this.dom.children, element.dom );
+
+	}
+
+}
 
 // properties
 
-var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-	'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-	'background', 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
+const properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height',
+	'display', 'verticalAlign', 'overflow', 'color', 'background', 'backgroundColor', 'opacity',
+	'border', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'borderColor',
+	'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom',
+	'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
+	'fontSize', 'fontWeight', 'textAlign', 'textDecoration', 'textTransform', 'cursor', 'zIndex' ];
 
 properties.forEach( function ( property ) {
 
-	var method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
+	const method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
 
-	UI.Element.prototype[ method ] = function () {
+	UIElement.prototype[ method ] = function () {
 
 		this.setStyle( property, arguments );
 
@@ -134,15 +165,15 @@ properties.forEach( function ( property ) {
 
 // events
 
-var events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change' ];
+const events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change', 'Input' ];
 
 events.forEach( function ( event ) {
 
-	var method = 'on' + event;
+	const method = 'on' + event;
 
-	UI.Element.prototype[ method ] = function ( callback ) {
+	UIElement.prototype[ method ] = function ( callback ) {
 
-		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
+		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ) );
 
 		return this;
 
@@ -150,855 +181,1115 @@ events.forEach( function ( event ) {
 
 } );
 
-// Span
+class UISpan extends UIElement {
 
-UI.Span = function () {
+	constructor() {
 
-	UI.Element.call( this );
+		super( document.createElement( 'span' ) );
 
-	this.dom = document.createElement( 'span' );
+	}
 
-	return this;
+}
 
-};
+class UIDiv extends UIElement {
 
-UI.Span.prototype = Object.create( UI.Element.prototype );
-UI.Span.prototype.constructor = UI.Span;
+	constructor() {
 
-// Div
+		super( document.createElement( 'div' ) );
 
-UI.Div = function () {
+	}
 
-	UI.Element.call( this );
+}
 
-	this.dom = document.createElement( 'div' );
+class UIUl extends UIElement {
 
-	return this;
+	constructor() {
 
-};
+		super( document.createElement( 'ul' ) );
 
-UI.Div.prototype = Object.create( UI.Element.prototype );
-UI.Div.prototype.constructor = UI.Div;
+	}
 
-// Row
+}
 
-UI.Row = function () {
+class UIRow extends UIDiv {
 
-	UI.Element.call( this );
+	constructor() {
 
-	var dom = document.createElement( 'div' );
-	dom.className = 'Row';
+		super();
 
-	this.dom = dom;
+		this.dom.className = 'Row';
 
-	return this;
+	}
 
-};
+}
 
-UI.Row.prototype = Object.create( UI.Element.prototype );
-UI.Row.prototype.constructor = UI.Row;
+class UIPanel extends UIDiv {
 
-// Panel
+	constructor() {
 
-UI.Panel = function () {
+		super();
 
-	UI.Element.call( this );
+		this.dom.className = 'Panel';
 
-	var dom = document.createElement( 'div' );
-	dom.className = 'Panel';
+	}
 
-	this.dom = dom;
+}
 
-	return this;
+class UIText extends UISpan {
 
-};
+	constructor( text ) {
 
-UI.Panel.prototype = Object.create( UI.Element.prototype );
-UI.Panel.prototype.constructor = UI.Panel;
+		super();
 
-// Text
+		this.dom.className = 'Text';
+		this.dom.style.cursor = 'default';
+		this.dom.style.display = 'inline-block';
 
-UI.Text = function ( text ) {
+		this.setValue( text );
 
-	UI.Element.call( this );
+	}
 
-	var dom = document.createElement( 'span' );
-	dom.className = 'Text';
-	dom.style.cursor = 'default';
-	dom.style.display = 'inline-block';
-	dom.style.verticalAlign = 'middle';
+	getValue() {
 
-	this.dom = dom;
-	this.setValue( text );
+		return this.dom.textContent;
 
-	return this;
+	}
 
-};
+	setValue( value ) {
 
-UI.Text.prototype = Object.create( UI.Element.prototype );
-UI.Text.prototype.constructor = UI.Text;
+		if ( value !== undefined ) {
 
-UI.Text.prototype.getValue = function () {
+			this.dom.textContent = value;
 
-	return this.dom.textContent;
+		}
 
-};
+		return this;
 
-UI.Text.prototype.setValue = function ( value ) {
+	}
 
-	if ( value !== undefined ) {
+}
 
+
+class UIInput extends UIElement {
+
+	constructor( text ) {
+
+		super( document.createElement( 'input' ) );
+
+		this.dom.className = 'Input';
+		this.dom.style.padding = '2px';
+		this.dom.style.border = '1px solid transparent';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
+
+		this.dom.addEventListener( 'keydown', function ( event ) {
+
+			event.stopPropagation();
+
+		} );
+
+		this.setValue( text );
+
+	}
+
+	getValue() {
+
+		return this.dom.value;
+
+	}
+
+	setValue( value ) {
+
+		this.dom.value = value;
+
+		return this;
+
+	}
+
+}
+
+class UITextArea extends UIElement {
+
+	constructor() {
+
+		super( document.createElement( 'textarea' ) );
+
+		this.dom.className = 'TextArea';
+		this.dom.style.padding = '2px';
+		this.dom.spellcheck = false;
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
+
+		this.dom.addEventListener( 'keydown', function ( event ) {
+
+			event.stopPropagation();
+
+			if ( event.keyCode === 9 ) {
+
+				event.preventDefault();
+
+				const cursor = this.selectionStart;
+
+				this.value = this.value.substring( 0, cursor ) + '\t' + this.value.substring( cursor );
+				this.selectionStart = cursor + 1;
+				this.selectionEnd = this.selectionStart;
+
+			}
+
+		} );
+
+	}
+
+	getValue() {
+
+		return this.dom.value;
+
+	}
+
+	setValue( value ) {
+
+		this.dom.value = value;
+
+		return this;
+
+	}
+
+}
+
+class UISelect extends UIElement {
+
+	constructor() {
+
+		super( document.createElement( 'select' ) );
+
+		this.dom.className = 'Select';
+		this.dom.style.padding = '2px';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
+
+	}
+
+	setMultiple( boolean ) {
+
+		this.dom.multiple = boolean;
+
+		return this;
+
+	}
+
+	setOptions( options ) {
+
+		const selected = this.dom.value;
+
+		while ( this.dom.children.length > 0 ) {
+
+			this.dom.removeChild( this.dom.firstChild );
+
+		}
+
+		for ( const key in options ) {
+
+			const option = document.createElement( 'option' );
+			option.value = key;
+			option.innerHTML = options[ key ];
+			this.dom.appendChild( option );
+
+		}
+
+		this.dom.value = selected;
+
+		return this;
+
+	}
+
+	getValue() {
+
+		return this.dom.value;
+
+	}
+
+	setValue( value ) {
+
+		value = String( value );
+
+		if ( this.dom.value !== value ) {
+
+			this.dom.value = value;
+
+		}
+
+		return this;
+
+	}
+
+}
+
+class UICheckbox extends UIElement {
+
+	constructor( boolean ) {
+
+		super( document.createElement( 'input' ) );
+
+		this.dom.className = 'Checkbox';
+		this.dom.type = 'checkbox';
+
+		this.setValue( boolean );
+
+	}
+
+	getValue() {
+
+		return this.dom.checked;
+
+	}
+
+	setValue( value ) {
+
+		if ( value !== undefined ) {
+
+			this.dom.checked = value;
+
+		}
+
+		return this;
+
+	}
+
+}
+
+
+class UIColor extends UIElement {
+
+	constructor() {
+
+		super( document.createElement( 'input' ) );
+
+		this.dom.className = 'Color';
+		this.dom.style.width = '32px';
+		this.dom.style.height = '16px';
+		this.dom.style.border = '0px';
+		this.dom.style.padding = '2px';
+		this.dom.style.backgroundColor = 'transparent';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
+
+		try {
+
+			this.dom.type = 'color';
+			this.dom.value = '#ffffff';
+
+		} catch ( exception ) {}
+
+	}
+
+	getValue() {
+
+		return this.dom.value;
+
+	}
+
+	getHexValue() {
+
+		return parseInt( this.dom.value.substr( 1 ), 16 );
+
+	}
+
+	setValue( value ) {
+
+		this.dom.value = value;
+
+		return this;
+
+	}
+
+	setHexValue( hex ) {
+
+		this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( - 6 );
+
+		return this;
+
+	}
+
+}
+
+class UINumber extends UIElement {
+
+	constructor( number ) {
+
+		super( document.createElement( 'input' ) );
+
+		this.dom.style.cursor = 'ns-resize';
+		this.dom.className = 'Number';
+		this.dom.value = '0.00';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
+
+		this.value = 0;
+
+		this.min = - Infinity;
+		this.max = Infinity;
+
+		this.precision = 2;
+		this.step = 1;
+		this.unit = '';
+		this.nudge = 0.01;
+
+		this.setValue( number );
+
+		const scope = this;
+
+		const changeEvent = document.createEvent( 'HTMLEvents' );
+		changeEvent.initEvent( 'change', true, true );
+
+		let distance = 0;
+		let onMouseDownValue = 0;
+
+		const pointer = { x: 0, y: 0 };
+		const prevPointer = { x: 0, y: 0 };
+
+		function onMouseDown( event ) {
+
+			event.preventDefault();
+
+			distance = 0;
+
+			onMouseDownValue = scope.value;
+
+			prevPointer.x = event.clientX;
+			prevPointer.y = event.clientY;
+
+			document.addEventListener( 'mousemove', onMouseMove );
+			document.addEventListener( 'mouseup', onMouseUp );
+
+		}
+
+		function onMouseMove( event ) {
+
+			const currentValue = scope.value;
+
+			pointer.x = event.clientX;
+			pointer.y = event.clientY;
+
+			distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
+
+			let value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+			value = Math.min( scope.max, Math.max( scope.min, value ) );
+
+			if ( currentValue !== value ) {
+
+				scope.setValue( value );
+				scope.dom.dispatchEvent( changeEvent );
+
+			}
+
+			prevPointer.x = event.clientX;
+			prevPointer.y = event.clientY;
+
+		}
+
+		function onMouseUp() {
+
+			document.removeEventListener( 'mousemove', onMouseMove );
+			document.removeEventListener( 'mouseup', onMouseUp );
+
+			if ( Math.abs( distance ) < 2 ) {
+
+				scope.dom.focus();
+				scope.dom.select();
+
+			}
+
+		}
+
+		function onTouchStart( event ) {
+
+			if ( event.touches.length === 1 ) {
+
+				distance = 0;
+
+				onMouseDownValue = scope.value;
+
+				prevPointer.x = event.touches[ 0 ].pageX;
+				prevPointer.y = event.touches[ 0 ].pageY;
+
+				document.addEventListener( 'touchmove', onTouchMove );
+				document.addEventListener( 'touchend', onTouchEnd );
+
+			}
+
+		}
+
+		function onTouchMove( event ) {
+
+			const currentValue = scope.value;
+
+			pointer.x = event.touches[ 0 ].pageX;
+			pointer.y = event.touches[ 0 ].pageY;
+
+			distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
+
+			let value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+			value = Math.min( scope.max, Math.max( scope.min, value ) );
+
+			if ( currentValue !== value ) {
+
+				scope.setValue( value );
+				scope.dom.dispatchEvent( changeEvent );
+
+			}
+
+			prevPointer.x = event.touches[ 0 ].pageX;
+			prevPointer.y = event.touches[ 0 ].pageY;
+
+		}
+
+		function onTouchEnd( event ) {
+
+			if ( event.touches.length === 0 ) {
+
+				document.removeEventListener( 'touchmove', onTouchMove );
+				document.removeEventListener( 'touchend', onTouchEnd );
+
+			}
+
+		}
+
+		function onChange() {
+
+			scope.setValue( scope.dom.value );
+
+		}
+
+		function onFocus() {
+
+			scope.dom.style.backgroundColor = '';
+			scope.dom.style.cursor = '';
+
+		}
+
+		function onBlur() {
+
+			scope.dom.style.backgroundColor = 'transparent';
+			scope.dom.style.cursor = 'ns-resize';
+
+		}
+
+		function onKeyDown( event ) {
+
+			event.stopPropagation();
+
+			switch ( event.keyCode ) {
+
+				case 13: // enter
+					scope.dom.blur();
+					break;
+
+				case 38: // up
+					event.preventDefault();
+					scope.setValue( scope.getValue() + scope.nudge );
+					scope.dom.dispatchEvent( changeEvent );
+					break;
+
+				case 40: // down
+					event.preventDefault();
+					scope.setValue( scope.getValue() - scope.nudge );
+					scope.dom.dispatchEvent( changeEvent );
+					break;
+
+			}
+
+		}
+
+		onBlur();
+
+		this.dom.addEventListener( 'keydown', onKeyDown );
+		this.dom.addEventListener( 'mousedown', onMouseDown );
+		this.dom.addEventListener( 'touchstart', onTouchStart );
+		this.dom.addEventListener( 'change', onChange );
+		this.dom.addEventListener( 'focus', onFocus );
+		this.dom.addEventListener( 'blur', onBlur );
+
+	}
+
+	getValue() {
+
+		return this.value;
+
+	}
+
+	setValue( value ) {
+
+		if ( value !== undefined ) {
+
+			value = parseFloat( value );
+
+			if ( value < this.min ) value = this.min;
+			if ( value > this.max ) value = this.max;
+
+			this.value = value;
+			this.dom.value = value.toFixed( this.precision );
+
+			if ( this.unit !== '' ) this.dom.value += ' ' + this.unit;
+
+		}
+
+		return this;
+
+	}
+
+	setPrecision( precision ) {
+
+		this.precision = precision;
+
+		return this;
+
+	}
+
+	setStep( step ) {
+
+		this.step = step;
+
+		return this;
+
+	}
+
+	setNudge( nudge ) {
+
+		this.nudge = nudge;
+
+		return this;
+
+	}
+
+	setRange( min, max ) {
+
+		this.min = min;
+		this.max = max;
+
+		return this;
+
+	}
+
+	setUnit( unit ) {
+
+		this.unit = unit;
+
+		return this;
+
+	}
+
+}
+
+class UIInteger extends UIElement {
+
+	constructor( number ) {
+
+		super( document.createElement( 'input' ) );
+
+		this.dom.style.cursor = 'ns-resize';
+		this.dom.className = 'Number';
+		this.dom.value = '0';
+
+		this.dom.setAttribute( 'autocomplete', 'off' );
+
+		this.value = 0;
+
+		this.min = - Infinity;
+		this.max = Infinity;
+
+		this.step = 1;
+		this.nudge = 1;
+
+		this.setValue( number );
+
+		const scope = this;
+
+		const changeEvent = document.createEvent( 'HTMLEvents' );
+		changeEvent.initEvent( 'change', true, true );
+
+		let distance = 0;
+		let onMouseDownValue = 0;
+
+		const pointer = { x: 0, y: 0 };
+		const prevPointer = { x: 0, y: 0 };
+
+		function onMouseDown( event ) {
+
+			event.preventDefault();
+
+			distance = 0;
+
+			onMouseDownValue = scope.value;
+
+			prevPointer.x = event.clientX;
+			prevPointer.y = event.clientY;
+
+			document.addEventListener( 'mousemove', onMouseMove );
+			document.addEventListener( 'mouseup', onMouseUp );
+
+		}
+
+		function onMouseMove( event ) {
+
+			const currentValue = scope.value;
+
+			pointer.x = event.clientX;
+			pointer.y = event.clientY;
+
+			distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
+
+			let value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+			value = Math.min( scope.max, Math.max( scope.min, value ) ) | 0;
+
+			if ( currentValue !== value ) {
+
+				scope.setValue( value );
+				scope.dom.dispatchEvent( changeEvent );
+
+			}
+
+			prevPointer.x = event.clientX;
+			prevPointer.y = event.clientY;
+
+		}
+
+		function onMouseUp() {
+
+			document.removeEventListener( 'mousemove', onMouseMove );
+			document.removeEventListener( 'mouseup', onMouseUp );
+
+			if ( Math.abs( distance ) < 2 ) {
+
+				scope.dom.focus();
+				scope.dom.select();
+
+			}
+
+		}
+
+		function onChange() {
+
+			scope.setValue( scope.dom.value );
+
+		}
+
+		function onFocus() {
+
+			scope.dom.style.backgroundColor = '';
+			scope.dom.style.cursor = '';
+
+		}
+
+		function onBlur() {
+
+			scope.dom.style.backgroundColor = 'transparent';
+			scope.dom.style.cursor = 'ns-resize';
+
+		}
+
+		function onKeyDown( event ) {
+
+			event.stopPropagation();
+
+			switch ( event.keyCode ) {
+
+				case 13: // enter
+					scope.dom.blur();
+					break;
+
+				case 38: // up
+					event.preventDefault();
+					scope.setValue( scope.getValue() + scope.nudge );
+					scope.dom.dispatchEvent( changeEvent );
+					break;
+
+				case 40: // down
+					event.preventDefault();
+					scope.setValue( scope.getValue() - scope.nudge );
+					scope.dom.dispatchEvent( changeEvent );
+					break;
+
+			}
+
+		}
+
+		onBlur();
+
+		this.dom.addEventListener( 'keydown', onKeyDown );
+		this.dom.addEventListener( 'mousedown', onMouseDown );
+		this.dom.addEventListener( 'change', onChange );
+		this.dom.addEventListener( 'focus', onFocus );
+		this.dom.addEventListener( 'blur', onBlur );
+
+	}
+
+	getValue() {
+
+		return this.value;
+
+	}
+
+	setValue( value ) {
+
+		if ( value !== undefined ) {
+
+			value = parseInt( value );
+
+			this.value = value;
+			this.dom.value = value;
+
+		}
+
+		return this;
+
+	}
+
+	setStep( step ) {
+
+		this.step = parseInt( step );
+
+		return this;
+
+	}
+
+	setNudge( nudge ) {
+
+		this.nudge = nudge;
+
+		return this;
+
+	}
+
+	setRange( min, max ) {
+
+		this.min = min;
+		this.max = max;
+
+		return this;
+
+	}
+
+}
+
+class UIBreak extends UIElement {
+
+	constructor() {
+
+		super( document.createElement( 'br' ) );
+
+		this.dom.className = 'Break';
+
+	}
+
+}
+
+class UIHorizontalRule extends UIElement {
+
+	constructor() {
+
+		super( document.createElement( 'hr' ) );
+
+		this.dom.className = 'HorizontalRule';
+
+	}
+
+}
+
+class UIButton extends UIElement {
+
+	constructor( value ) {
+
+		super( document.createElement( 'button' ) );
+
+		this.dom.className = 'Button';
 		this.dom.textContent = value;
 
 	}
 
-	return this;
+}
 
-};
+class UIProgress extends UIElement {
 
+	constructor( value ) {
 
-// Input
-
-UI.Input = function ( text ) {
-
-	UI.Element.call( this );
-
-	var scope = this;
-
-	var dom = document.createElement( 'input' );
-	dom.className = 'Input';
-	dom.style.padding = '2px';
-	dom.style.border = '1px solid transparent';
-
-	dom.addEventListener( 'keydown', function ( event ) {
-
-		event.stopPropagation();
-
-	}, false );
-
-	this.dom = dom;
-	this.setValue( text );
-
-	return this;
-
-};
-
-UI.Input.prototype = Object.create( UI.Element.prototype );
-UI.Input.prototype.constructor = UI.Input;
-
-UI.Input.prototype.getValue = function () {
-
-	return this.dom.value;
-
-};
-
-UI.Input.prototype.setValue = function ( value ) {
-
-	this.dom.value = value;
-
-	return this;
-
-};
-
-
-// TextArea
-
-UI.TextArea = function () {
-
-	UI.Element.call( this );
-
-	var scope = this;
-
-	var dom = document.createElement( 'textarea' );
-	dom.className = 'TextArea';
-	dom.style.padding = '2px';
-	dom.spellcheck = false;
-
-	dom.addEventListener( 'keydown', function ( event ) {
-
-		event.stopPropagation();
-
-		if ( event.keyCode === 9 ) {
-
-			event.preventDefault();
-
-			var cursor = dom.selectionStart;
-
-			dom.value = dom.value.substring( 0, cursor ) + '\t' + dom.value.substring( cursor );
-			dom.selectionStart = cursor + 1;
-			dom.selectionEnd = dom.selectionStart;
-
-		}
-
-	}, false );
-
-	this.dom = dom;
-
-	return this;
-
-};
-
-UI.TextArea.prototype = Object.create( UI.Element.prototype );
-UI.TextArea.prototype.constructor = UI.TextArea;
-
-UI.TextArea.prototype.getValue = function () {
-
-	return this.dom.value;
-
-};
-
-UI.TextArea.prototype.setValue = function ( value ) {
-
-	this.dom.value = value;
-
-	return this;
-
-};
-
-
-// Select
-
-UI.Select = function () {
-
-	UI.Element.call( this );
-
-	var scope = this;
-
-	var dom = document.createElement( 'select' );
-	dom.className = 'Select';
-	dom.style.padding = '2px';
-
-	this.dom = dom;
-
-	return this;
-
-};
-
-UI.Select.prototype = Object.create( UI.Element.prototype );
-UI.Select.prototype.constructor = UI.Select;
-
-UI.Select.prototype.setMultiple = function ( boolean ) {
-
-	this.dom.multiple = boolean;
-
-	return this;
-
-};
-
-UI.Select.prototype.setOptions = function ( options ) {
-
-	var selected = this.dom.value;
-
-	while ( this.dom.children.length > 0 ) {
-
-		this.dom.removeChild( this.dom.firstChild );
-
-	}
-
-	for ( var key in options ) {
-
-		var option = document.createElement( 'option' );
-		option.value = key;
-		option.innerHTML = options[ key ];
-		this.dom.appendChild( option );
-
-	}
-
-	this.dom.value = selected;
-
-	return this;
-
-};
-
-UI.Select.prototype.getValue = function () {
-
-	return this.dom.value;
-
-};
-
-UI.Select.prototype.setValue = function ( value ) {
-
-	value = String( value );
-
-	if ( this.dom.value !== value ) {
+		super( document.createElement( 'progress' ) );
 
 		this.dom.value = value;
 
 	}
 
-	return this;
+	setValue( value ) {
 
-};
-
-// Checkbox
-
-UI.Checkbox = function ( boolean ) {
-
-	UI.Element.call( this );
-
-	var scope = this;
-
-	var dom = document.createElement( 'input' );
-	dom.className = 'Checkbox';
-	dom.type = 'checkbox';
-
-	this.dom = dom;
-	this.setValue( boolean );
-
-	return this;
-
-};
-
-UI.Checkbox.prototype = Object.create( UI.Element.prototype );
-UI.Checkbox.prototype.constructor = UI.Checkbox;
-
-UI.Checkbox.prototype.getValue = function () {
-
-	return this.dom.checked;
-
-};
-
-UI.Checkbox.prototype.setValue = function ( value ) {
-
-	if ( value !== undefined ) {
-
-		this.dom.checked = value;
-
-	}
-
-	return this;
-
-};
-
-
-// Color
-
-UI.Color = function () {
-
-	UI.Element.call( this );
-
-	var scope = this;
-
-	var dom = document.createElement( 'input' );
-	dom.className = 'Color';
-	dom.style.width = '64px';
-	dom.style.height = '17px';
-	dom.style.border = '0px';
-	dom.style.padding = '2px';
-	dom.style.backgroundColor = 'transparent';
-
-	try {
-
-		dom.type = 'color';
-		dom.value = '#ffffff';
-
-	} catch ( exception ) {}
-
-	this.dom = dom;
-
-	return this;
-
-};
-
-UI.Color.prototype = Object.create( UI.Element.prototype );
-UI.Color.prototype.constructor = UI.Color;
-
-UI.Color.prototype.getValue = function () {
-
-	return this.dom.value;
-
-};
-
-UI.Color.prototype.getHexValue = function () {
-
-	return parseInt( this.dom.value.substr( 1 ), 16 );
-
-};
-
-UI.Color.prototype.setValue = function ( value ) {
-
-	this.dom.value = value;
-
-	return this;
-
-};
-
-UI.Color.prototype.setHexValue = function ( hex ) {
-
-	this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( - 6 );
-
-	return this;
-
-};
-
-
-// Number
-
-UI.Number = function ( number ) {
-
-	UI.Element.call( this );
-
-	var scope = this;
-
-	var dom = document.createElement( 'input' );
-	dom.className = 'Number';
-	dom.value = '0.00';
-
-	dom.addEventListener( 'keydown', function ( event ) {
-
-		event.stopPropagation();
-
-		if ( event.keyCode === 13 ) dom.blur();
-
-	}, false );
-
-	this.value = 0;
-
-	this.min = - Infinity;
-	this.max = Infinity;
-
-	this.precision = 2;
-	this.step = 1;
-	this.unit = '';
-
-	this.dom = dom;
-
-	this.setValue( number );
-
-	var changeEvent = document.createEvent( 'HTMLEvents' );
-	changeEvent.initEvent( 'change', true, true );
-
-	var distance = 0;
-	var onMouseDownValue = 0;
-
-	var pointer = [ 0, 0 ];
-	var prevPointer = [ 0, 0 ];
-
-	function onMouseDown( event ) {
-
-		event.preventDefault();
-
-		distance = 0;
-
-		onMouseDownValue = scope.value;
-
-		prevPointer = [ event.clientX, event.clientY ];
-
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
-
-	}
-
-	function onMouseMove( event ) {
-
-		var currentValue = scope.value;
-
-		pointer = [ event.clientX, event.clientY ];
-
-		distance += ( pointer[ 0 ] - prevPointer[ 0 ] ) - ( pointer[ 1 ] - prevPointer[ 1 ] );
-
-		var value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
-		value = Math.min( scope.max, Math.max( scope.min, value ) );
-
-		if ( currentValue !== value ) {
-
-			scope.setValue( value );
-			dom.dispatchEvent( changeEvent );
-
-		}
-
-		prevPointer = [ event.clientX, event.clientY ];
-
-	}
-
-	function onMouseUp( event ) {
-
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
-
-		if ( Math.abs( distance ) < 2 ) {
-
-			dom.focus();
-			dom.select();
-
-		}
-
-	}
-
-	function onChange( event ) {
-
-		scope.setValue( dom.value );
-
-	}
-
-	function onFocus( event ) {
-
-		dom.style.backgroundColor = '';
-		dom.style.cursor = '';
-
-	}
-
-	function onBlur( event ) {
-
-		dom.style.backgroundColor = 'transparent';
-		dom.style.cursor = 'col-resize';
-
-	}
-
-	onBlur();
-
-	dom.addEventListener( 'mousedown', onMouseDown, false );
-	dom.addEventListener( 'change', onChange, false );
-	dom.addEventListener( 'focus', onFocus, false );
-	dom.addEventListener( 'blur', onBlur, false );
-
-	return this;
-
-};
-
-UI.Number.prototype = Object.create( UI.Element.prototype );
-UI.Number.prototype.constructor = UI.Number;
-
-UI.Number.prototype.getValue = function () {
-
-	return this.value;
-
-};
-
-UI.Number.prototype.setValue = function ( value ) {
-
-	if ( value !== undefined ) {
-
-		value = parseFloat( value );
-
-		if ( value < this.min ) value = this.min;
-		if ( value > this.max ) value = this.max;
-
-		this.value = value;
-		this.dom.value = value.toFixed( this.precision );
-
-		if ( this.unit !== '' ) this.dom.value += ' ' + this.unit;
-
-	}
-
-	return this;
-
-};
-
-UI.Number.prototype.setPrecision = function ( precision ) {
-
-	this.precision = precision;
-
-	return this;
-
-};
-
-UI.Number.prototype.setStep = function ( step ) {
-
-	this.step = step;
-
-	return this;
-
-};
-
-UI.Number.prototype.setRange = function ( min, max ) {
-
-	this.min = min;
-	this.max = max;
-
-	return this;
-
-};
-
-UI.Number.prototype.setUnit = function ( unit ) {
-
-	this.unit = unit;
-
-	return this;
-
-};
-
-// Integer
-
-UI.Integer = function ( number ) {
-
-	UI.Element.call( this );
-
-	var scope = this;
-
-	var dom = document.createElement( 'input' );
-	dom.className = 'Number';
-	dom.value = '0';
-
-	dom.addEventListener( 'keydown', function ( event ) {
-
-		event.stopPropagation();
-
-	}, false );
-
-	this.value = 0;
-
-	this.min = - Infinity;
-	this.max = Infinity;
-
-	this.step = 1;
-
-	this.dom = dom;
-
-	this.setValue( number );
-
-	var changeEvent = document.createEvent( 'HTMLEvents' );
-	changeEvent.initEvent( 'change', true, true );
-
-	var distance = 0;
-	var onMouseDownValue = 0;
-
-	var pointer = [ 0, 0 ];
-	var prevPointer = [ 0, 0 ];
-
-	function onMouseDown( event ) {
-
-		event.preventDefault();
-
-		distance = 0;
-
-		onMouseDownValue = scope.value;
-
-		prevPointer = [ event.clientX, event.clientY ];
-
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
-
-	}
-
-	function onMouseMove( event ) {
-
-		var currentValue = scope.value;
-
-		pointer = [ event.clientX, event.clientY ];
-
-		distance += ( pointer[ 0 ] - prevPointer[ 0 ] ) - ( pointer[ 1 ] - prevPointer[ 1 ] );
-
-		var value = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
-		value = Math.min( scope.max, Math.max( scope.min, value ) ) | 0;
-
-		if ( currentValue !== value ) {
-
-			scope.setValue( value );
-			dom.dispatchEvent( changeEvent );
-
-		}
-
-		prevPointer = [ event.clientX, event.clientY ];
-
-	}
-
-	function onMouseUp( event ) {
-
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
-
-		if ( Math.abs( distance ) < 2 ) {
-
-			dom.focus();
-			dom.select();
-
-		}
-
-	}
-
-	function onChange( event ) {
-
-		scope.setValue( dom.value );
-
-	}
-
-	function onFocus( event ) {
-
-		dom.style.backgroundColor = '';
-		dom.style.cursor = '';
-
-	}
-
-	function onBlur( event ) {
-
-		dom.style.backgroundColor = 'transparent';
-		dom.style.cursor = 'col-resize';
-
-	}
-
-	onBlur();
-
-	dom.addEventListener( 'mousedown', onMouseDown, false );
-	dom.addEventListener( 'change', onChange, false );
-	dom.addEventListener( 'focus', onFocus, false );
-	dom.addEventListener( 'blur', onBlur, false );
-
-	return this;
-
-};
-
-UI.Integer.prototype = Object.create( UI.Element.prototype );
-UI.Integer.prototype.constructor = UI.Integer;
-
-UI.Integer.prototype.getValue = function () {
-
-	return this.value;
-
-};
-
-UI.Integer.prototype.setValue = function ( value ) {
-
-	if ( value !== undefined ) {
-
-		value = parseInt( value );
-
-		this.value = value;
 		this.dom.value = value;
 
 	}
 
-	return this;
+}
 
-};
+class UITabbedPanel extends UIDiv {
 
-UI.Integer.prototype.setStep = function ( step ) {
+	constructor() {
 
-	this.step = parseInt( step );
+		super();
 
-	return this;
+		this.dom.className = 'TabbedPanel';
 
-};
+		this.tabs = [];
+		this.panels = [];
 
-UI.Integer.prototype.setRange = function ( min, max ) {
+		this.tabsDiv = new UIDiv();
+		this.tabsDiv.setClass( 'Tabs' );
 
-	this.min = min;
-	this.max = max;
+		this.panelsDiv = new UIDiv();
+		this.panelsDiv.setClass( 'Panels' );
 
-	return this;
+		this.add( this.tabsDiv );
+		this.add( this.panelsDiv );
 
-};
+		this.selected = '';
 
+	}
 
-// Break
+	select( id ) {
 
-UI.Break = function () {
+		let tab;
+		let panel;
+		const scope = this;
 
-	UI.Element.call( this );
+		// Deselect current selection
+		if ( this.selected && this.selected.length ) {
 
-	var dom = document.createElement( 'br' );
-	dom.className = 'Break';
+			tab = this.tabs.find( function ( item ) {
 
-	this.dom = dom;
+				return item.dom.id === scope.selected;
 
-	return this;
+			} );
+			panel = this.panels.find( function ( item ) {
 
-};
+				return item.dom.id === scope.selected;
 
-UI.Break.prototype = Object.create( UI.Element.prototype );
-UI.Break.prototype.constructor = UI.Break;
+			} );
 
+			if ( tab ) {
 
-// HorizontalRule
+				tab.removeClass( 'selected' );
 
-UI.HorizontalRule = function () {
+			}
 
-	UI.Element.call( this );
+			if ( panel ) {
 
-	var dom = document.createElement( 'hr' );
-	dom.className = 'HorizontalRule';
+				panel.setDisplay( 'none' );
 
-	this.dom = dom;
+			}
 
-	return this;
+		}
 
-};
+		tab = this.tabs.find( function ( item ) {
 
-UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
-UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
+			return item.dom.id === id;
 
+		} );
+		panel = this.panels.find( function ( item ) {
 
-// Button
+			return item.dom.id === id;
 
-UI.Button = function ( value ) {
+		} );
 
-	UI.Element.call( this );
+		if ( tab ) {
 
-	var dom = document.createElement( 'button' );
-	dom.className = 'Button';
+			tab.addClass( 'selected' );
 
-	this.dom = dom;
-	this.dom.textContent = value;
+		}
 
-	return this;
+		if ( panel ) {
 
-};
+			panel.setDisplay( '' );
 
-UI.Button.prototype = Object.create( UI.Element.prototype );
-UI.Button.prototype.constructor = UI.Button;
+		}
 
-UI.Button.prototype.setLabel = function ( value ) {
+		this.selected = id;
 
-	this.dom.textContent = value;
+		return this;
 
-	return this;
+	}
 
-};
+	addTab( id, label, items ) {
 
+		const tab = new UITab( label, this );
+		tab.setId( id );
+		this.tabs.push( tab );
+		this.tabsDiv.add( tab );
 
-// Modal
+		const panel = new UIDiv();
+		panel.setId( id );
+		panel.add( items );
+		panel.setDisplay( 'none' );
+		this.panels.push( panel );
+		this.panelsDiv.add( panel );
 
-UI.Modal = function ( value ) {
+		this.select( id );
 
-	var scope = this;
+	}
 
-	var dom = document.createElement( 'div' );
+}
 
-	dom.style.position = 'absolute';
-	dom.style.width = '100%';
-	dom.style.height = '100%';
-	dom.style.backgroundColor = 'rgba(0,0,0,0.5)';
-	dom.style.display = 'none';
-	dom.style.alignItems = 'center';
-	dom.style.justifyContent = 'center';
-	dom.addEventListener( 'click', function ( event ) {
+class UITab extends UIText {
 
-		scope.hide();
+	constructor( text, parent ) {
 
-	} );
+		super( text );
 
-	this.dom = dom;
+		this.dom.className = 'Tab';
 
-	this.container = new UI.Panel();
-	this.container.dom.style.width = '200px';
-	this.container.dom.style.padding = '20px';
-	this.container.dom.style.backgroundColor = '#ffffff';
-	this.container.dom.style.boxShadow = '0px 5px 10px rgba(0,0,0,0.5)';
+		this.parent = parent;
 
-	this.add( this.container );
+		const scope = this;
 
-	return this;
+		this.dom.addEventListener( 'click', function () {
 
-};
+			scope.parent.select( scope.dom.id );
 
-UI.Modal.prototype = Object.create( UI.Element.prototype );
-UI.Modal.prototype.constructor = UI.Modal;
+		} );
 
-UI.Modal.prototype.show = function ( content ) {
+	}
 
-	this.container.clear();
-	this.container.add( content );
+}
 
-	this.dom.style.display = 'flex';
+class UIListbox extends UIDiv {
 
-	return this;
+	constructor() {
 
-};
+		super();
 
-UI.Modal.prototype.hide = function () {
+		this.dom.className = 'Listbox';
+		this.dom.tabIndex = 0;
 
-	this.dom.style.display = 'none';
+		this.items = [];
+		this.listitems = [];
+		this.selectedIndex = 0;
+		this.selectedValue = null;
 
-	return this;
+	}
 
-};
+	setItems( items ) {
+
+		if ( Array.isArray( items ) ) {
+
+			this.items = items;
+
+		}
+
+		this.render();
+
+	}
+
+	render( ) {
+
+		while ( this.listitems.length ) {
+
+			const item = this.listitems[ 0 ];
+
+			item.dom.remove();
+
+			this.listitems.splice( 0, 1 );
+
+		}
+
+		for ( let i = 0; i < this.items.length; i ++ ) {
+
+			const item = this.items[ i ];
+
+			const listitem = new UIListbox.ListboxItem( this );
+			listitem.setId( item.id || `Listbox-${i}` );
+			listitem.setTextContent( item.name || item.type );
+			this.add( listitem );
+
+		}
+
+	}
+
+	add() {
+
+		const items = Array.from( arguments );
+
+		this.listitems = this.listitems.concat( items );
+
+		UIElement.prototype.add.apply( this, items );
+
+	}
+
+	selectIndex( index ) {
+
+		if ( index >= 0 && index < this.items.length ) {
+
+			this.setValue( this.listitems[ index ].getId() );
+
+		}
+
+		this.selectedIndex = index;
+
+	}
+
+	getValue() {
+
+		return this.selectedValue;
+
+	}
+
+	setValue( value ) {
+
+		for ( let i = 0; i < this.listitems.length; i ++ ) {
+
+			const element = this.listitems[ i ];
+
+			if ( element.getId() === value ) {
+
+				element.addClass( 'active' );
+
+			} else {
+
+				element.removeClass( 'active' );
+
+			}
+
+		}
+
+		this.selectedValue = value;
+
+		const changeEvent = document.createEvent( 'HTMLEvents' );
+		changeEvent.initEvent( 'change', true, true );
+		this.dom.dispatchEvent( changeEvent );
+
+	}
+
+}
+
+class ListboxItem extends UIDiv {
+
+	constructor( parent ) {
+
+		super();
+
+		this.dom.className = 'ListboxItem';
+
+		this.parent = parent;
+
+		const scope = this;
+
+		function onClick() {
+
+			if ( scope.parent ) {
+
+				scope.parent.setValue( scope.getId( ) );
+
+			}
+
+		}
+
+		this.dom.addEventListener( 'click', onClick );
+
+	}
+
+}
+
+export { UIElement, UISpan, UIDiv, UIUl, UIRow, UIPanel, UIText, UIInput, UITextArea, UISelect, UICheckbox, UIColor, UINumber, UIInteger, UIBreak, UIHorizontalRule, UIButton, UIProgress, UITabbedPanel, UIListbox, ListboxItem };

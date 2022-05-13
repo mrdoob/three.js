@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - tilt loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - tilt loader<br/>
+			<a href="https://poly.google.com/view/ewUb8s99x_k" target="_blank" rel="noopener">TILTSPHERE</a> by <a href="https://poly.google.com/user/8CZPjCt8LvV" target="_blank" rel="noopener">Rosie Summers</a>
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TiltLoader } from './jsm/loaders/TiltLoader.js';
+
+			let camera, scene, renderer;
+
+			init();
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+
+				camera.position.y = 43;
+				camera.position.z = 100;
+
+				scene.add( camera );
+
+				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x555555 );
+				scene.add( grid );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				const loader = new TiltLoader();
+				loader.load( './models/tilt/BRUSH_DOME.tilt', function ( object ) {
+
+					// console.log( object.children.length );
+					scene.add( object );
+					render();
+
+				} );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.target.y = camera.position.y;
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

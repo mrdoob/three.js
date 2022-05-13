@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			카메라에 대한 추상 기본 클래스입니다. 이 클래스는 새 카메라를 만들때 항상 상속되어야 합니다.
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+			새 [name]를 만듭니다. 이 클래스는 직접 호출하도록 설계되지 않았습니다;
+			그 대신 [page:PerspectiveCamera] 혹은 [page:OrthographicCamera]를 사용해야 할 것입니다.
+		</p>
+
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:Object3D] 클래스를 참고하세요.</p>
+
+		<h3>[property:Boolean isCamera]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
+		<h3>[property:Layers layers]</h3>
+		<p>
+		카메라가 속해있는 [page:Layers layers]. 이는 [page:Object3D]에서 상속된 것입니다.<br /><br />
+
+		카메라 뷰포트를 렌더링할 때 볼 수 있도록 객체는 카메라와 하나 이상의 레이어를 공유해야 합니다.
+		</p>
+
+		<h3>[property:Matrix4 matrixWorldInverse]</h3>
+		<p>
+			matrixWorld의 역행렬입니다. MatrixWorld는 카메라의 월드 변형을 가진 매트릭스를 포함합니다.
+		</p>
+
+		<h3>[property:Matrix4 projectionMatrix]</h3>
+		<p>투영 매트릭스입니다.</p>
+
+		<h3>[property:Matrix4 projectionMatrixInverse]</h3>
+		<p>투영 매트릭스의 역행렬입니다.</p>
+
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:Object3D] 클래스를 참고하세요.</p>
+
+		<h3>[method:Camera clone]( )</h3>
+		<p>
+			이 카메라와 같은 프로퍼티를 가진 새 카메라를 리턴합니다.
+		</p>
+
+		<h3>[method:this copy]( [param:Camera source], [param:Boolean recursive] )</h3>
+		<p>
+		원본 카메라에서 이 카메라로 프로퍼티를 복사합니다.
+		</p>
+
+		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] — Vector3으로 결과가 복사될 것입니다. <br /><br />
+
+		카메라가 바라보고 있는 월드 공간 방향을 나타내는 [page:Vector3]를 리턴합니다.
+		(참고: 카메라가 자신의 바로 아래를 내려다보면, z축 좌표는 음수값입니다).<br /><br />
+		</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

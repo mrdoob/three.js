@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>效果合成器（[name]）</h1>
+
+		<p class="desc">
+			用于在three.js中实现后期处理效果。该类管理了产生最终视觉效果的后期处理过程链。
+			后期处理过程根据它们添加/插入的顺序来执行，最后一个过程会被自动渲染到屏幕上。
+		</p>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_postprocessing postprocessing]<br />
+			[example:webgl_postprocessing_advanced postprocessing advanced]<br />
+			[example:webgl_postprocessing_backgrounds postprocessing backgrounds]<br />
+			[example:webgl_postprocessing_crossfade postprocessing crossfade]<br />
+			[example:webgl_postprocessing_dof postprocessing depth-of-field]<br />
+			[example:webgl_postprocessing_dof2 postprocessing depth-of-field 2]<br />
+			[example:webgl_postprocessing_fxaa postprocessing fxaa]<br />
+			[example:webgl_postprocessing_glitch postprocessing glitch]<br />
+			[example:webgl_postprocessing_godrays postprocessing godrays]<br />
+			[example:webgl_postprocessing_masking postprocessing masking]<br />
+			[example:webgl_postprocessing_outline postprocessing outline]<br />
+			[example:webgl_postprocessing_pixel postprocessing pixelate]<br />
+			[example:webgl_postprocessing_procedural postprocessing procedural]<br />
+			[example:webgl_postprocessing_rgb_halftone postprocessing rgb halftone]<br />
+			[example:webgl_postprocessing_sao postprocessing sao]<br />
+			[example:webgl_postprocessing_smaa postprocessing smaa]<br />
+			[example:webgl_postprocessing_sobel postprocessing sobel]<br />
+			[example:webgl_postprocessing_ssaa postprocessing ssaa]<br />
+			[example:webgl_postprocessing_ssao postprocessing ssao]<br />
+			[example:webgl_postprocessing_taa postprocessing taa]<br />
+			[example:webgl_postprocessing_unreal_bloom postprocessing unreal bloom]<br />
+			[example:webgl_postprocessing_unreal_bloom_selective postprocessing unreal bloom selective]<br />
+		</p>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:WebGLRenderer renderer], [param:WebGLRenderTarget renderTarget] )</h3>
+		<p>
+		[page:WebGLRenderer renderer] -- 用于渲染场景的渲染器。<br />
+		[page:WebGLRenderTarget renderTarget] -- （可选）一个预先配置的渲染目标，内部由 [name] 使用。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Array passes]</h3>
+		<p>
+			一个用于表示后期处理过程链（包含顺序）的数组。
+		</p>
+
+		<h3>[property:WebGLRendererTarget readBuffer]</h3>
+		<p>
+			内部读缓冲区的引用。过程一般从该缓冲区读取先前的渲染结果。
+		</p>
+
+		<h3>[property:WebGLRenderer renderer]</h3>
+		<p>
+			内部渲染器的引用。
+		</p>
+
+		<h3>[property:Boolean renderToScreen]</h3>
+		<p>
+			最终过程是否被渲染到屏幕（默认帧缓冲区）。
+		</p>
+
+		<h3>[property:WebGLRendererTarget writeBuffer]</h3>
+		<p>
+			内部写缓冲区的引用。过程常将它们的渲染结果写入该缓冲区。
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:undefined addPass]( [param:Pass pass] )</h3>
+
+		<p>
+			pass -- 将被添加到过程链的过程<br /><br />
+
+			将传入的过程添加到过程链。
+		</p>
+
+		<h3>[method:undefined insertPass]( [param:Pass pass], [param:Integer index] )</h3>
+
+		<p>
+			pass -- 将被插入到过程链的过程。<br />
+			index -- 定义过程链中过程应插入的位置。<br /><br />
+
+			将传入的过程插入到过程链中所给定的索引处。
+		</p>
+
+		<h3>[method:Boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
+
+		<p>
+			passIndex -- 被用于检查的过程<br /><br />
+
+			如果给定索引的过程在过程链中是最后一个启用的过程，则返回true。
+			由[name]所使用，来决定哪一个过程应当被渲染到屏幕上。
+		</p>
+
+		<h3>[method:undefined removePass]( [param:Pass pass] )</h3>
+
+		<p>
+			pass -- The pass to remove from the pass chain.<br /><br />
+
+			Removes the given pass from the pass chain.
+		</p>
+
+		<h3>[method:undefined render]( [param:Float deltaTime] )</h3>
+
+		<p>
+			deltaTime -- The delta time value.<br /><br />
+
+			执行所有启用的后期处理过程，来产生最终的帧，
+		</p>
+
+		<h3>[method:undefined reset]( [param:WebGLRenderTarget renderTarget] )</h3>
+
+		<p>
+			[page:WebGLRenderTarget renderTarget] -- （可选）一个预先配置的渲染目标，内部由 [name] 使用。<br /><br />
+
+			重置所有[name]的内部状态。
+		</p>
+
+		<h3>[method:undefined setPixelRatio]( [param:Float pixelRatio] )</h3>
+
+		<p>
+			pixelRatio -- 设备像素比<br /><br />
+
+			设置设备的像素比。该值通常被用于HiDPI设备，以阻止模糊的输出。
+			因此，该方法语义类似于[page:WebGLRenderer.setPixelRatio]()。
+
+		</p>
+
+		<h3>[method:undefined setSize]( [param:Integer width], [param:Integer height] )</h3>
+
+		<p>
+			width -- [name]的宽度。<br />
+			height -- [name]的高度。<br /><br />
+
+			考虑设备像素比，重新设置内部渲染缓冲和过程的大小为(width, height)。
+			因此，该方法语义类似于[page:WebGLRenderer.setSize]()。
+
+		</p>
+
+		<h3>[method:undefined swapBuffers]()</h3>
+
+		<p>交换内部的读/写缓冲。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/EffectComposer.js examples/jsm/postprocessing/EffectComposer.js]
+		</p>
+	</body>
+</html>

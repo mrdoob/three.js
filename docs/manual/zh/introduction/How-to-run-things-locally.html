@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,7 +11,7 @@
 		<p>
             倘若你只是使用Three.js库中所提供的几何体，且不载入任何纹理贴图，则网页是可以从本地的文件系统中打开，并且是能够直接运行的，只需在文件管理器中双击HTML文件，它就可以在浏览器中进行显示。
             （此时你将在地址栏中看到类似这样的URL：<em>file:///yourFile.html</em>）
-			
+
 		</p>
 
 		<h2>从外部文件载入的内容</h2>
@@ -46,6 +45,22 @@
                 很多的编程语言都具有一个内置的简易HTTP服务器。它们的功能并不像能够被用于生产环境的服务器，例如[link:https://www.apache.org/ Apache] 或者 [link:https://nginx.org NGINX]那样完善，
                 但对于你来测试three.js应用程序来说，它们就已经足够了。
 			</p>
+
+			<h3>流行的代码编辑器插件</h3>
+			<div>
+				<p>一些代码编辑器具有插件，可以根据需要生成简单的服务器。</p>
+				<ul>
+					<li>Visual Studio Code [link:https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer Live Server] 插件。</li>
+					<li>Atom [link:https://atom.io/packages/atom-live-server Live Server] 插件。</li>
+				</ul>
+			</div>
+
+			<h3>Servez</h3>
+			<div>
+				<p>
+					[link:https://greggman.github.io/servez Servez] 一个具有界面的简单服务器。
+				</p>
+			</div>
 
 			<h3>Node.js server</h3>
 			<div>
@@ -115,6 +130,12 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 						使用浏览器打开http://localhost:3000/，然后服务器将可以从你所选择的目录中向你提供静态文件。
 					</li>
 				</ol>
+			</div>
+			<h3>IIS</h3>
+			<div>
+				<p>如果你正在使用Microsoft IIS来作为网站服务器，在服务器载入之前，请为.fbx扩展名增加MIME类型。</p>
+				<code>File name extension: fbx        MIME Type: text/plain</code>
+				<p>在默认情况下，IIS阻止 .fbx、 .obj 文件的下载，因此你必须对IIS进行配置，使得这些类型的文件可以被下载。</p>
 			</div>
 
 			<p>

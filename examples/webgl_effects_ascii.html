@@ -4,55 +4,36 @@
 		<title>three.js webgl - effects - ascii</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			a {
-				color: #ff0000;
-			}
-
-			#webglmessage a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - ascii</div>
-		<script src="../build/three.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/effects/AsciiEffect.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var camera, controls, scene, renderer, effect;
+		<script type="module">
 
-			var sphere, plane;
+			import * as THREE from 'three';
 
-			var start = Date.now();
+			import { AsciiEffect } from './jsm/effects/AsciiEffect.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+
+			let camera, controls, scene, renderer, effect;
+
+			let sphere, plane;
+
+			const start = Date.now();
 
 			init();
 			animate();
@@ -63,24 +44,23 @@
 				camera.position.y = 150;
 				camera.position.z = 500;
 
-				controls = new THREE.TrackballControls( camera );
-
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0, 0, 0 );
 
-				var light = new THREE.PointLight( 0xffffff );
-				light.position.set( 500, 500, 500 );
-				scene.add( light );
+				const pointLight1 = new THREE.PointLight( 0xffffff );
+				pointLight1.position.set( 500, 500, 500 );
+				scene.add( pointLight1 );
 
-				var light = new THREE.PointLight( 0xffffff, 0.25 );
-				light.position.set( - 500, - 500, - 500 );
-				scene.add( light );
+				const pointLight2 = new THREE.PointLight( 0xffffff, 0.25 );
+				pointLight2.position.set( - 500, - 500, - 500 );
+				scene.add( pointLight2 );
 
-				sphere = new THREE.Mesh( new THREE.SphereBufferGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true }) );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 200, 20, 10 ), new THREE.MeshPhongMaterial( { flatShading: true } ) );
 				scene.add( sphere );
 
 				// Plane
 
-				plane = new THREE.Mesh( new THREE.PlaneBufferGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 				plane.position.y = - 200;
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
@@ -88,7 +68,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
+				effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.domElement.style.color = 'white';
 				effect.domElement.style.backgroundColor = 'black';
@@ -98,9 +78,11 @@
 
 				document.body.appendChild( effect.domElement );
 
+				controls = new TrackballControls( camera, effect.domElement );
+
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -126,7 +108,7 @@
 
 			function render() {
 
-				var timer = Date.now() - start;
+				const timer = Date.now() - start;
 
 				sphere.position.y = Math.abs( Math.sin( timer * 0.002 ) ) * 150;
 				sphere.rotation.x = timer * 0.0003;

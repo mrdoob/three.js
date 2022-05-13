@@ -4,19 +4,11 @@
 		<title>three.js webgl - raymarching - reflect</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style type="text/css">
 			html, body {
 				height: 100%;
 			}
-
-			body {
-				background-color: black;
-				margin: 0;
-				padding: 0;
-			}
-
-			a { color: skyblue }
-
 			#container {
 				width: 100%;
 				height: 100%;
@@ -24,22 +16,12 @@
 				align-items: center;
 				justify-content: center;
 			}
-
-			#info {
-				position: absolute;
-				color: white;
-				font-size: 13px;
-				bottom: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-			}
 		</style>
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example<br/>
 			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article</a>)
 		</div>
 		<div id="container">
@@ -254,21 +236,34 @@
 
 		</script>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
-		<script>
+		<script type="module">
 
-			var dolly, camera, scene, renderer;
-			var geometry, material, mesh;
-			var stats;
+			import * as THREE from 'three';
 
-			var canvas = document.querySelector( '#canvas' );
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
-			var config = {
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			let dolly, camera, scene, renderer;
+			let geometry, material, mesh;
+			let stats, clock;
+
+			const canvas = document.querySelector( '#canvas' );
+
+			const config = {
 				saveImage: function () {
 
 					renderer.render( scene, camera );
@@ -289,22 +284,24 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				// Scene
+				// THREE.Scene
 				scene = new THREE.Scene();
 
 				dolly = new THREE.Group();
 				scene.add( dolly );
 
+				clock = new THREE.Clock();
+
 				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
 				camera.position.z = 4;
 				dolly.add( camera );
 
-				geometry = new THREE.PlaneBufferGeometry( 2.0, 2.0 );
+				geometry = new THREE.PlaneGeometry( 2.0, 2.0 );
 				material = new THREE.RawShaderMaterial( {
 					uniforms: {
 						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
 						cameraWorldMatrix: { value: camera.matrixWorld },
-						cameraProjectionMatrixInverse: { value: new THREE.Matrix4().getInverse( camera.projectionMatrix ) }
+						cameraProjectionMatrixInverse: { value: camera.projectionMatrixInverse.clone() }
 					},
 					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
@@ -314,10 +311,11 @@
 				scene.add( mesh );
 
 				// Controls
-				var controls = new THREE.OrbitControls( camera, canvas );
+				const controls = new OrbitControls( camera, canvas );
+				controls.enableZoom = false;
 
 				// GUI
-				var gui = new dat.GUI();
+				const gui = new GUI();
 				gui.add( config, 'saveImage' ).name( 'Save Image' );
 				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
 
@@ -342,15 +340,17 @@
 				camera.updateProjectionMatrix();
 
 				material.uniforms.resolution.value.set( canvas.width, canvas.height );
-				material.uniforms.cameraProjectionMatrixInverse.value.getInverse( camera.projectionMatrix );
+				material.uniforms.cameraProjectionMatrixInverse.value.copy( camera.projectionMatrixInverse );
 
 			}
 
-			function render( time ) {
+			function render() {
 
 				stats.begin();
 
-				dolly.position.z = - time / 1000;
+				const elapsedTime = clock.getElapsedTime();
+
+				dolly.position.z = - elapsedTime;
 
 				renderer.render( scene, camera );
 

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -35,16 +34,19 @@
 		There are other things a 4D vector can be used to represent, however these are the most common uses in three.js.
 		</p>
 
+		<p>
+		Iterating through a [name] instance will yield its components (x, y, z, w) in the corresponding order.
+		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
-var a = new THREE.Vector4( 0, 1, 0, 0 );
+		const a = new THREE.Vector4( 0, 1, 0, 0 );
 
-//no arguments; will be initialised to (0, 0, 0, 1)
-var b = new THREE.Vector4( );
+		//no arguments; will be initialised to (0, 0, 0, 1)
+		const b = new THREE.Vector4( );
 
-var d = a.dot( b );
+		const d = a.dot( b );
 		</code>
 
 
@@ -52,10 +54,10 @@ var d = a.dot( b );
 
 		<h3>[name]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>
-		[page:Float x] - the x value of the vector. Default is *0*.<br />
-		[page:Float y] -  the y value of the vector. Default is *0*.<br />
-		[page:Float z] - the z value of the vector. Default is *0*.<br />
-		[page:Float w] - the w value of the vector. Default is *1*.<br /><br />
+		[page:Float x] - the x value of this vector. Default is *0*.<br />
+		[page:Float y] -  the y value of this vector. Default is *0*.<br />
+		[page:Float z] - the z value of this vector. Default is *0*.<br />
+		[page:Float w] - the w value of this vector. Default is *1*.<br /><br />
 
 		Creates a new [name].
 		</p>
@@ -65,9 +67,7 @@ var d = a.dot( b );
 
 		<h3>[property:Boolean isVector4]</h3>
 		<p>
-			Used to check whether this or derived classes are Vector4s. Default is *true*.<br /><br />
-
-			You should not change this, as it is used internally for optimisation.
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Float x]</h3>
@@ -77,6 +77,12 @@ var d = a.dot( b );
 		<h3>[property:Float z]</h3>
 
 		<h3>[property:Float w]</h3>
+
+		<h3>[property:Float width]</h3>
+		<p>Alias for [page:.z z].</p>
+
+		<h3>[property:Float height]</h3>
+		<p>Alias for [page:.w w].</p>
 
 
 		<h2>Methods</h2>
@@ -100,7 +106,7 @@ var d = a.dot( b );
 
 		<h3>[method:this ceil]()</h3>
 		<p>
-		The [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of the vector are rounded up to the nearest integer value.
+		The [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of this vector are rounded up to the nearest integer value.
 		</p>
 
 		<h3>[method:this clamp]( [param:Vector4 min], [param:Vector4 max] )</h3>
@@ -143,8 +149,7 @@ var d = a.dot( b );
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-		Divides this vector by scalar [page:Float s].<br />
-		Sets vector to *( 0, 0, 0, 0 )* if *[page:Float s] = 0*.
+		Divides this vector by scalar [page:Float s].
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector4 v] )</h3>
@@ -154,10 +159,10 @@ var d = a.dot( b );
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Vector4 v] )</h3>
-		<p>Checks for strict equality of this vector and [page:Vector4 v].</p>
+		<p>Returns *true* if the components of this vector and [page:Vector4 v] are strictly equal; *false* otherwise.</p>
 
 		<h3>[method:this floor]()</h3>
-		<p>The components of the vector are rounded down to the nearest integer value.</p>
+		<p>The components of this vector are rounded down to the nearest integer value.</p>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
@@ -205,20 +210,20 @@ var d = a.dot( b );
 		<h3>[method:this lerp]( [param:Vector4 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector4 v] - [page:Vector4] to interpolate towards.<br />
-		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
 
 		Linearly interpolates between this vector and [page:Vector4 v], where alpha is the
-		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector4 v].
+		percent distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector4 v].
 		</p>
 
 		<h3>[method:this lerpVectors]( [param:Vector4 v1], [param:Vector4 v2], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector4 v1] - the starting [page:Vector4].<br />
 		[page:Vector4 v2] - [page:Vector4] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
 
 		Sets this vector to be the vector linearly interpolated between [page:Vector4 v1] and
-		[page:Vector4 v2] where alpha is the distance along the line connecting the two vectors
+		[page:Vector4 v2] where alpha is the percent distance along the line connecting the two vectors
 		- alpha = 0 will be [page:Vector4 v1], and alpha = 1 will be [page:Vector4 v2].
 		</p>
 
@@ -227,7 +232,7 @@ var d = a.dot( b );
 
 		<h3>[method:this normalize]()</h3>
 		<p>
-		Converts this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
+		Converts this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to a vector with the same direction
 		as this one, but [page:.length length] 1.
 		</p>
 
@@ -243,23 +248,26 @@ var d = a.dot( b );
 		that value with the corresponding min value.
 		</p>
 
+		<h3>[method:this multiply]( [param:Vector4 v] )</h3>
+		<p>Multiplies this vector by [page:Vector4 v].</p>
+
 		<h3>[method:this multiplyScalar]( [param:Float s] )</h3>
 		<p>Multiplies this vector by scalar [page:Float s].</p>
 
 		<h3>[method:this round]()</h3>
-		<p>The components of the vector are rounded to the nearest integer value.</p>
+		<p>The components of this vector are rounded to the nearest integer value.</p>
 
 		<h3>[method:this roundToZero]()</h3>
 		<p>
-		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
+		The components of this vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</p>
 
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>Sets the [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of this vector.</p>
 
-		<h3>[method:this setAxisAngleFromQuaternion]( [param:Quaterion q] )</h3>
+		<h3>[method:this setAxisAngleFromQuaternion]( [param:Quaternion q] )</h3>
 		<p>
-			[page:Quaterion q] - a normalized [page:Quaterion]<br /><br />
+			[page:Quaternion q] - a normalized [page:Quaternion]<br /><br />
 
 			Sets the [page:.x x], [page:.y y] and [page:.z z] components of this vector to the
 			quaternion's axis and [page:.w w] to the angle.
@@ -272,7 +280,7 @@ var d = a.dot( b );
 			Sets the [page:.x x], [page:.y y] and [page:.z z] to the axis of rotation and [page:.w w] to the angle.
 		</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0, 1 or 2.<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -286,7 +294,7 @@ var d = a.dot( b );
 
 		<h3>[method:this setLength]( [param:Float l] )</h3>
 		<p>
-		Sets this vector to the vector with the same direction as this one, but [page:.length length]
+		Sets this vector to a vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</p>
 
@@ -311,21 +319,28 @@ var d = a.dot( b );
 		<p>Subtracts [page:Vector4 v] from this vector.</p>
 
 		<h3>[method:this subScalar]( [param:Float s] )</h3>
-		<p>Subtracts [page:Float s]  from this vector's [page:.x x], [page:.y y], [page:.z z] and [page:.w w] compnents.</p>
+		<p>Subtracts [page:Float s]  from this vector's [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components.</p>
 
 		<h3>[method:this subVectors]( [param:Vector4 a], [param:Vector4 b] )</h3>
 		<p>Sets this vector to [page:Vector4 a] - [page:Vector4 b].</p>
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - (optional) array to store the vector to. If this is not provided, a new array will be created.<br />
+		[page:Array array] - (optional) array to store this vector to. If this is not provided, a new array will be created.<br />
 		[page:Integer offset] - (optional) optional offset into the array.<br /><br />
 
 		Returns an array [x, y, z, w], or copies x, y, z and w into the provided [page:Array array].
 		</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
+
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

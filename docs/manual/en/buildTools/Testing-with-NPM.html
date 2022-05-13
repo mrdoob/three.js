@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -25,7 +24,7 @@
 			</code>
 			and add
 		<code>
-			var THREE = require('three');
+			const THREE = require('three');
 		</code>
 			to your test.
 		</p>
@@ -136,7 +135,7 @@ $ npm install three --save-dev
  $ npm install three@0.84.0 --save
 							</code>
 							(0.84.0 in this example). --save makes this a dependency of this project, rather than
-							dev dependency. See the docs [link:https://www.npmjs.org/doc/json.html here] for more info.
+							dev dependency. See the docs [link:https://docs.npmjs.com/cli/v8/configuring-npm/package-json here] for more info.
 						</li>
 					</ul>
 				</li>
@@ -152,8 +151,8 @@ $ npm install three --save-dev
 					Finally we actually need a JS test to run. Let's add a simple test that will verify that
 					the three.js object is available and working. Create test/verify-three.js containing:
 <code>
-var THREE = require('three');
-var assert = require("assert");
+const THREE = require('three');
+const assert = require('assert');
 
 describe('The THREE object', function() {
   it('should have a defined BasicShadowMap constant', function() {
@@ -161,7 +160,7 @@ describe('The THREE object', function() {
   }),
 
   it('should be able to construct a Vector3 with default of x=0', function() {
-    var vec3 = new THREE.Vector3();
+    const vec3 = new THREE.Vector3();
     assert.equal(0, vec3.x);
   })
 })
@@ -248,8 +247,8 @@ if (typeof exports !== 'undefined')
 //=============================================================================
 if (typeof require === 'function') // test for nodejs environment
 {
-  var THREE = require('three');
-  var MY3 = require('./MY3.js');
+  const THREE = require('three');
+  const MY3 = require('./MY3.js');
 }
 			</code>
 		</div>

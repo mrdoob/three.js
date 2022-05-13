@@ -4,48 +4,31 @@
 		<title>three.js webgl - geometries</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #eee;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				padding: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #0080ff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometries</div>
 
-		<script src="../build/three.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var camera, scene, renderer, stats;
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			let camera, scene, renderer, stats;
 
 			init();
 			animate();
@@ -57,80 +40,80 @@
 
 				scene = new THREE.Scene();
 
-				var object;
+				let object;
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
-				var map = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				const map = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				var material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
+				const material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
 
 				//
 
-				object = new THREE.Mesh( new THREE.SphereBufferGeometry( 75, 20, 10 ), material );
+				object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
 				object.position.set( - 300, 0, 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 75, 1 ), material );
+				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 1 ), material );
 				object.position.set( - 100, 0, 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.OctahedronBufferGeometry( 75, 2 ), material );
+				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 2 ), material );
 				object.position.set( 100, 0, 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.TetrahedronBufferGeometry( 75, 0 ), material );
+				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
 				object.position.set( 300, 0, 200 );
 				scene.add( object );
 
 				//
 
-				object = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100, 4, 4 ), material );
+				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
 				object.position.set( - 300, 0, 0 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100, 4, 4, 4 ), material );
+				object = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 ), material );
 				object.position.set( - 100, 0, 0 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.CircleBufferGeometry( 50, 20, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
 				object.position.set( 100, 0, 0 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.RingBufferGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
+				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
 				object.position.set( 300, 0, 0 );
 				scene.add( object );
 
 				//
 
-				object = new THREE.Mesh( new THREE.CylinderBufferGeometry( 25, 75, 100, 40, 5 ), material );
+				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
 				object.position.set( - 300, 0, - 200 );
 				scene.add( object );
 
-				var points = [];
+				const points = [];
 
-				for ( var i = 0; i < 50; i ++ ) {
+				for ( let i = 0; i < 50; i ++ ) {
 
 					points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50, ( i - 5 ) * 2 ) );
 
 				}
 
-				object = new THREE.Mesh( new THREE.LatheBufferGeometry( points, 20 ), material );
+				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
 				object.position.set( - 100, 0, - 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.TorusBufferGeometry( 50, 20, 20, 20 ), material );
+				object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
 				object.position.set( 100, 0, - 200 );
 				scene.add( object );
 
-				object = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 50, 10, 50, 20 ), material );
+				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
 				object.position.set( 300, 0, - 200 );
 				scene.add( object );
 
@@ -146,7 +129,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -172,7 +155,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0001;
+				const timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 800;
 				camera.position.z = Math.sin( timer ) * 800;

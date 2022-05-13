@@ -1,36 +1,48 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIPanel, UIText, UIRow } from './libs/ui.js';
+import { UIBoolean } from './libs/ui.three.js';
 
-Sidebar.Settings.Viewport = function ( editor ) {
 
-	var signals = editor.signals;
-	var strings = editor.strings;
+function SidebarSettingsViewport( editor ) {
 
-	var container = new UI.Div();
-	container.add( new UI.Break() );
+	const signals = editor.signals;
+	const strings = editor.strings;
 
-	container.add( new UI.Text( strings.getKey( 'sidebar/settings/viewport/grid' ) ).setWidth( '90px' ) );
+	const container = new UIPanel();
 
-	var show = new UI.THREE.Boolean( true ).onChange( update );
-	container.add( show );
+	const headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport' ).toUpperCase() ) );
+	container.add( headerRow );
 
-	/*
-	var snapSize = new UI.Number( 25 ).setWidth( '40px' ).onChange( update );
-	container.add( snapSize );
+	// grid
 
-	var snap = new UI.THREE.Boolean( false, 'snap' ).onChange( update );
-	container.add( snap );
-	*/
+	const showGridRow = new UIRow();
 
-	function update() {
+	showGridRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport/grid' ) ).setWidth( '90px' ) );
 
-		signals.showGridChanged.dispatch( show.getValue() );
+	const showGrid = new UIBoolean( true ).onChange( function () {
 
-		// signals.snapChanged.dispatch( snap.getValue() === true ? snapSize.getValue() : null );
+		signals.showGridChanged.dispatch( showGrid.getValue() );
 
-	}
+	} );
+	showGridRow.add( showGrid );
+	container.add( showGridRow );
+
+	// helpers
+
+	const showHelpersRow = new UIRow();
+
+	showHelpersRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport/helpers' ) ).setWidth( '90px' ) );
+
+	const showHelpers = new UIBoolean( true ).onChange( function () {
+
+		signals.showHelpersChanged.dispatch( showHelpers.getValue() );
+
+	} );
+	showHelpersRow.add( showHelpers );
+	container.add( showHelpersRow );
 
 	return container;
 
-};
+}
+
+export { SidebarSettingsViewport };

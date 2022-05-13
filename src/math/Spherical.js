@@ -1,28 +1,25 @@
-import { _Math } from './Math.js';
-
 /**
- * @author bhouston / http://clara.io
- * @author WestLangley / http://github.com/WestLangley
- *
  * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
  *
  * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
- * The azimuthal angle (theta) is measured from the positive z-axiz.
+ * The azimuthal angle (theta) is measured from the positive z-axis.
  */
 
-function Spherical( radius, phi, theta ) {
+import * as MathUtils from './MathUtils.js';
 
-	this.radius = ( radius !== undefined ) ? radius : 1.0;
-	this.phi = ( phi !== undefined ) ? phi : 0; // polar angle
-	this.theta = ( theta !== undefined ) ? theta : 0; // azimuthal angle
+class Spherical {
 
-	return this;
+	constructor( radius = 1, phi = 0, theta = 0 ) {
 
-}
+		this.radius = radius;
+		this.phi = phi; // polar angle
+		this.theta = theta; // azimuthal angle
 
-Object.assign( Spherical.prototype, {
+		return this;
 
-	set: function ( radius, phi, theta ) {
+	}
+
+	set( radius, phi, theta ) {
 
 		this.radius = radius;
 		this.phi = phi;
@@ -30,15 +27,9 @@ Object.assign( Spherical.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
-
-		return new this.constructor().copy( this );
-
-	},
-
-	copy: function ( other ) {
+	copy( other ) {
 
 		this.radius = other.radius;
 		this.phi = other.phi;
@@ -46,25 +37,25 @@ Object.assign( Spherical.prototype, {
 
 		return this;
 
-	},
+	}
 
-	// restrict phi to be betwee EPS and PI-EPS
-	makeSafe: function () {
+	// restrict phi to be between EPS and PI-EPS
+	makeSafe() {
 
-		var EPS = 0.000001;
+		const EPS = 0.000001;
 		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
 
 		return this;
 
-	},
+	}
 
-	setFromVector3: function ( v ) {
+	setFromVector3( v ) {
 
 		return this.setFromCartesianCoords( v.x, v.y, v.z );
 
-	},
+	}
 
-	setFromCartesianCoords: function ( x, y, z ) {
+	setFromCartesianCoords( x, y, z ) {
 
 		this.radius = Math.sqrt( x * x + y * y + z * z );
 
@@ -76,7 +67,7 @@ Object.assign( Spherical.prototype, {
 		} else {
 
 			this.theta = Math.atan2( x, z );
-			this.phi = Math.acos( _Math.clamp( y / this.radius, - 1, 1 ) );
+			this.phi = Math.acos( MathUtils.clamp( y / this.radius, - 1, 1 ) );
 
 		}
 
@@ -84,7 +75,12 @@ Object.assign( Spherical.prototype, {
 
 	}
 
-} );
+	clone() {
 
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 export { Spherical };

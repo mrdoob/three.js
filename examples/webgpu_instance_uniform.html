@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Instance Uniform</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
+		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Instance Uniform
+		</div>
+
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
+			import { add, mul } from 'three-nodes/Nodes.js';
+
+			import WebGPU from './jsm/capabilities/WebGPU.js';
+			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			class InstanceUniformNode extends Nodes.Node {
+
+				constructor() {
+
+					super( 'vec3' );
+
+					this.updateType = Nodes.NodeUpdateType.Object;
+
+					this.uniformNode = new Nodes.UniformNode( new THREE.Color() );
+
+				}
+
+				update( frame ) {
+
+					const mesh = frame.object;
+
+					const meshColor = mesh.color;
+
+					this.uniformNode.value.copy( meshColor );
+
+				}
+
+				generate( builder, output ) {
+
+					return this.uniformNode.build( builder, output );
+
+				}
+
+			}
+
+			let stats;
+
+			let camera, scene, renderer;
+			let controls;
+
+			const objects = [];
+
+			init().then( animate ).catch( error );
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera.position.set( 0, 200, 1200 );
+
+				scene = new THREE.Scene();
+
+				// Grid
+
+				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
+				helper.material.colorNode = new Nodes.AttributeNode( 'color', 'vec3' );
+				helper.position.y = - 75;
+				scene.add( helper );
+
+				// CubeMap
+
+				const path = 'textures/cube/SwedishRoyalCastle/';
+				const format = '.jpg';
+				const urls = [
+					path + 'px' + format, path + 'nx' + format,
+					path + 'py' + format, path + 'ny' + format,
+					path + 'pz' + format, path + 'nz' + format
+				];
+
+				const cubeTexture = new THREE.CubeTextureLoader().load( urls );
+
+				// Materials
+
+				const instanceUniform = new InstanceUniformNode();
+				const cubeTextureNode = new Nodes.CubeTextureNode( cubeTexture );
+
+				const material = new THREE.MeshStandardMaterial();
+				material.colorNode = add( instanceUniform, cubeTextureNode );
+				material.emissiveNode = mul( instanceUniform, cubeTextureNode );
+
+				// Geometry
+
+				const geometry = new TeapotGeometry( 50, 18 );
+
+				for ( let i = 0, l = 12; i < l; i ++ ) {
+
+					addMesh( geometry, material );
+
+				}
+
+				//
+
+				renderer = new WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 400;
+				controls.maxDistance = 2000;
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				return renderer.init();
+
+			}
+
+			function addMesh( geometry, material ) {
+
+				const mesh = new THREE.Mesh( geometry, material );
+
+				mesh.color = new THREE.Color( Math.random() * 0xffffff );
+
+				mesh.position.x = ( objects.length % 4 ) * 200 - 300;
+				mesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+
+				mesh.rotation.x = Math.random() * 200 - 100;
+				mesh.rotation.y = Math.random() * 200 - 100;
+				mesh.rotation.z = Math.random() * 200 - 100;
+
+				objects.push( mesh );
+
+				scene.add( mesh );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				const timer = 0.0001 * Date.now();
+
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
+
+					const object = objects[ i ];
+
+					object.rotation.x += 0.01;
+					object.rotation.y += 0.005;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			function error( error ) {
+
+				console.error( error );
+
+			}
+
+		</script>
+
+	</body>
+</html>

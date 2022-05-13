@@ -1,143 +1,63 @@
-/**
- * @author rfm1201
- */
+import * as THREE from 'three';
 
-Sidebar.Geometry.LatheGeometry = function( editor, object ) {
+import { UIDiv, UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
+import { UIPoints2 } from './libs/ui.three.js';
 
-	var strings = editor.strings;
+import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-	var signals = editor.signals;
+function GeometryParametersPanel( editor, object ) {
 
-	var container = new UI.Row();
+	const strings = editor.strings;
 
-	var geometry = object.geometry;
-	var parameters = geometry.parameters;
+	const container = new UIDiv();
+
+	const geometry = object.geometry;
+	const parameters = geometry.parameters;
 
 	// segments
 
-	var segmentsRow = new UI.Row();
-	var segments = new UI.Integer( parameters.segments ).onChange( update );
+	const segmentsRow = new UIRow();
+	const segments = new UIInteger( parameters.segments ).onChange( update );
 
-	segmentsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/segments' ) ).setWidth( '90px' ) );
+	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/segments' ) ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
 
 	container.add( segmentsRow );
 
 	// phiStart
 
-	var phiStartRow = new UI.Row();
-	var phiStart = new UI.Number( parameters.phiStart * 180 / Math.PI ).onChange( update );
+	const phiStartRow = new UIRow();
+	const phiStart = new UINumber( parameters.phiStart * 180 / Math.PI ).onChange( update );
 
-	phiStartRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/phistart' ) ).setWidth( '90px' ) );
+	phiStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/phistart' ) ).setWidth( '90px' ) );
 	phiStartRow.add( phiStart );
 
 	container.add( phiStartRow );
 
 	// phiLength
 
-	var phiLengthRow = new UI.Row();
-	var phiLength = new UI.Number( parameters.phiLength * 180 / Math.PI ).onChange( update );
+	const phiLengthRow = new UIRow();
+	const phiLength = new UINumber( parameters.phiLength * 180 / Math.PI ).onChange( update );
 
-	phiLengthRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/philength' ) ).setWidth( '90px' ) );
+	phiLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/philength' ) ).setWidth( '90px' ) );
 	phiLengthRow.add( phiLength );
 
 	container.add( phiLengthRow );
 
 	// points
 
-	var lastPointIdx = 0;
-	var pointsUI = [];
+	const pointsRow = new UIRow();
+	pointsRow.add( new UIText( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setWidth( '90px' ) );
 
-	var pointsRow = new UI.Row();
-	pointsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/lathe_geometry/points' ) ).setWidth( '90px' ) );
-
-	var points = new UI.Span().setDisplay( 'inline-block' );
+	const points = new UIPoints2().setValue( parameters.points ).onChange( update );
 	pointsRow.add( points );
-
-	var pointsList = new UI.Div();
-	points.add( pointsList );
-
-	for ( var i = 0; i < parameters.points.length; i ++ ) {
-
-		var point = parameters.points[ i ];
-		pointsList.add( createPointRow( point.x, point.y ) );
-
-	}
-
-	var addPointButton = new UI.Button( '+' ).onClick( function() {
-
-		if( pointsUI.length === 0 ){
-
-			pointsList.add( createPointRow( 0, 0 ) );
-
-		} else {
-
-			var point = pointsUI[ pointsUI.length - 1 ];
-
-			pointsList.add( createPointRow( point.x.getValue(), point.y.getValue() ) );
-
-		}
-
-		update();
-
-	} );
-	points.add( addPointButton );
 
 	container.add( pointsRow );
 
-	//
-
-	function createPointRow( x, y ) {
-
-		var pointRow = new UI.Div();
-		var lbl = new UI.Text( lastPointIdx + 1 ).setWidth( '20px' );
-		var txtX = new UI.Number( x ).setRange( 0, Infinity ).setWidth( '40px' ).onChange( update );
-		var txtY = new UI.Number( y ).setWidth( '40px' ).onChange( update );
-		var idx = lastPointIdx;
-		var btn = new UI.Button( '-' ).onClick( function() {
-
-			deletePointRow( idx );
-
-		} );
-
-		pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
-		lastPointIdx ++;
-		pointRow.add( lbl, txtX, txtY, btn );
-
-		return pointRow;
-
-	}
-
-	function deletePointRow( idx ) {
-
-		if ( ! pointsUI[ idx ] ) return;
-
-		pointsList.remove( pointsUI[ idx ].row );
-		pointsUI[ idx ] = null;
-
-		update();
-
-	}
-
 	function update() {
 
-		var points = [];
-		var count = 0;
-
-		for ( var i = 0; i < pointsUI.length; i ++ ) {
-
-			var pointUI = pointsUI[ i ];
-
-			if ( ! pointUI ) continue;
-
-			points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
-			count ++;
-			pointUI.lbl.setValue( count );
-
-		}
-
-		editor.execute( new SetGeometryCommand( object, new THREE[ geometry.type ](
-			points,
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.LatheGeometry(
+			points.getValue(),
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,
 			phiLength.getValue() / 180 * Math.PI
@@ -147,6 +67,6 @@ Sidebar.Geometry.LatheGeometry = function( editor, object ) {
 
 	return container;
 
-};
+}
 
-Sidebar.Geometry.LatheBufferGeometry = Sidebar.Geometry.LatheGeometry;
+export { GeometryParametersPanel };

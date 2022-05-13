@@ -1,10 +1,7 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
-import { InstancedBufferGeometry } from '../../../../src/core/InstancedBufferGeometry';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
+import { InstancedBufferGeometry } from '../../../../src/core/InstancedBufferGeometry.js';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 
 export default QUnit.module( 'Core', () => {
 
@@ -25,21 +22,21 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.test( 'copy', ( assert ) => {
 
 			var instanceMock1 = {};
 			var instanceMock2 = {};
@@ -52,33 +49,33 @@ export default QUnit.module( 'Core', () => {
 			instance.addGroup( 0, 10, instanceMock1 );
 			instance.addGroup( 10, 5, instanceMock2 );
 			instance.setIndex( indexMock );
-			instance.addAttribute( 'defaultAttribute1', defaultAttribute1 );
-			instance.addAttribute( 'defaultAttribute2', defaultAttribute2 );
+			instance.setAttribute( 'defaultAttribute1', defaultAttribute1 );
+			instance.setAttribute( 'defaultAttribute2', defaultAttribute2 );
 
 			var copiedInstance = new InstancedBufferGeometry().copy( instance );
 
-			assert.ok( copiedInstance instanceof InstancedBufferGeometry, "the clone has the correct type" );
+			assert.ok( copiedInstance instanceof InstancedBufferGeometry, 'the clone has the correct type' );
 
-			assert.equal( copiedInstance.index, indexMock, "index was copied" );
-			assert.equal( copiedInstance.index.callCount, 1, "index.clone was called once" );
+			assert.equal( copiedInstance.index, indexMock, 'index was copied' );
+			assert.equal( copiedInstance.index.callCount, 1, 'index.clone was called once' );
 
-			assert.ok( copiedInstance.attributes[ 'defaultAttribute1' ] instanceof BufferAttribute, "attribute was created" );
-			assert.deepEqual( copiedInstance.attributes[ 'defaultAttribute1' ].array, defaultAttribute1.array, "attribute was copied" );
-			assert.deepEqual( copiedInstance.attributes[ 'defaultAttribute2' ].array, defaultAttribute2.array, "attribute was copied" );
+			assert.ok( copiedInstance.attributes[ 'defaultAttribute1' ] instanceof BufferAttribute, 'attribute was created' );
+			assert.deepEqual( copiedInstance.attributes[ 'defaultAttribute1' ].array, defaultAttribute1.array, 'attribute was copied' );
+			assert.deepEqual( copiedInstance.attributes[ 'defaultAttribute2' ].array, defaultAttribute2.array, 'attribute was copied' );
 
-			assert.equal( copiedInstance.groups[ 0 ].start, 0, "group was copied" );
-			assert.equal( copiedInstance.groups[ 0 ].count, 10, "group was copied" );
-			assert.equal( copiedInstance.groups[ 0 ].materialIndex, instanceMock1, "group was copied" );
+			assert.equal( copiedInstance.groups[ 0 ].start, 0, 'group was copied' );
+			assert.equal( copiedInstance.groups[ 0 ].count, 10, 'group was copied' );
+			assert.equal( copiedInstance.groups[ 0 ].materialIndex, instanceMock1, 'group was copied' );
 
-			assert.equal( copiedInstance.groups[ 1 ].start, 10, "group was copied" );
-			assert.equal( copiedInstance.groups[ 1 ].count, 5, "group was copied" );
-			assert.equal( copiedInstance.groups[ 1 ].materialIndex, instanceMock2, "group was copied" );
+			assert.equal( copiedInstance.groups[ 1 ].start, 10, 'group was copied' );
+			assert.equal( copiedInstance.groups[ 1 ].count, 5, 'group was copied' );
+			assert.equal( copiedInstance.groups[ 1 ].materialIndex, instanceMock2, 'group was copied' );
 
 		} );
 
-		QUnit.todo( "clone", ( assert ) => {
+		QUnit.todo( 'clone', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

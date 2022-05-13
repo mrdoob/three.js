@@ -4,19 +4,17 @@
 <head>
 	<meta charset="utf-8">
 	<base href="../../../" />
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css" />
 </head>
 
 <body>
 	<h1>[name]</h1>
-	<br />
 
 	<p>
 		3D models are available in hundreds of file formats, each with different
 		purposes, assorted features, and varying complexity. Although
-		<a href="https://github.com/mrdoob/three.js/tree/dev/examples/js/loaders" target="_blank" rel="noopener">
+		<a href="https://github.com/mrdoob/three.js/tree/dev/examples/jsm/loaders" target="_blank" rel="noopener">
 		three.js provides many loaders</a>, choosing the right format and
 		workflow will save time and frustration later on. Some formats are
 		difficult to work with, inefficient for realtime experiences, or simply not
@@ -55,16 +53,16 @@
 	</p>
 
 	<ul>
-		<li><a href="https://github.com/KhronosGroup/glTF-Blender-IO" target="_blank" rel="noopener">glTF-Blender-IO</a> by the Khronos Group</li>
-		<li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
-		<li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
-		<li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
+		<li><a href="https://www.blender.org/" target="_blank" rel="noopener">Blender</a> by the Blender Foundation</li>
 		<li><a href="https://www.allegorithmic.com/products/substance-painter" target="_blank" rel="noopener">Substance Painter</a> by Allegorithmic</li>
 		<li><a href="https://www.foundry.com/products/modo" target="_blank" rel="noopener">Modo</a> by Foundry</li>
 		<li><a href="https://www.marmoset.co/toolbag/" target="_blank" rel="noopener">Toolbag</a> by Marmoset</li>
 		<li><a href="https://www.sidefx.com/products/houdini/" target="_blank" rel="noopener">Houdini</a> by SideFX</li>
 		<li><a href="https://labs.maxon.net/?p=3360" target="_blank" rel="noopener">Cinema 4D</a> by MAXON</li>
-		<li>&hellip;and <a href="https://github.com/khronosgroup/gltf#gltf-tools" target="_blank" rel="noopener">many more</a></li>
+		<li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
+		<li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
+		<li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
+		<li>&hellip;and <a href="http://github.khronos.org/glTF-Project-Explorer/" target="_blank" rel="noopener">many more</a></li>
 	</ul>
 
 	<p>
@@ -82,33 +80,21 @@
 
 	<p>
 		Only a few loaders (e.g. [page:ObjectLoader]) are included by default with
-		three.js — others should be added to your page individually. Depending on your
-		preference and comfort with build tools, choose one of the following:
+		three.js — others should be added to your app individually.
 	</p>
 
 	<code>
-		// global script
-		&lt;script src="GLTFLoader.js"&gt;&lt;/script&gt;
-
-		// commonjs
-		var THREE = window.THREE = require('three');
-		require('three/examples/js/loaders/GLTFLoader');
+		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 	</code>
-
-	<p>
-		Currently three.js examples are not available as ES modules (import &hellip; from '&hellip;').
-		Several workarounds are discussed in
-		<a href="https://github.com/mrdoob/three.js/issues/9562" target="_blank" rel="noopener">#9562</a>.
-	</p>
 
 	<p>
 		Once you've imported a loader, you're ready to add a model to your scene. Syntax varies among
 		different loaders — when using another format, check the examples and documentation for that
-		loader. For glTF, basic usage would be:
+		loader. For glTF, usage with global scripts would be:
 	</p>
 
 	<code>
-		var loader = new THREE.GLTFLoader();
+		const loader = new GLTFLoader();
 
 		loader.load( 'path/to/model.glb', function ( gltf ) {
 
@@ -142,7 +128,7 @@
 			View the model in another application. For glTF, drag-and-drop viewers
 			are available for
 			<a href="https://gltf-viewer.donmccurdy.com/" target="_blank" rel="noopener">three.js</a> and
-			<a href="http://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>. If the model
+			<a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>. If the model
 			appears correctly in one or more applications,
 			<a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">file a bug against three.js</a>.
 			If the model cannot be shown in any application, we strongly encourage
@@ -152,6 +138,9 @@
 			Try scaling the model up or down by a factor of 1000. Many models are
 			scaled differently, and large models may not appear if the camera is
 			inside the model.
+		</li>
+		<li>
+			Try to add and position a light source. The model may be hidden in the dark.
 		</li>
 		<li>
 			Look for failed texture requests in the network tab, like

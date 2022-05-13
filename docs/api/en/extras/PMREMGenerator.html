@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This class generates a Prefiltered, Mipmapped Radiance Environment Map (PMREM) from a cubeMap environment texture.
+			This allows different levels of blur to be quickly accessed based on material roughness.
+			Unlike a traditional mipmap chain, it only goes down to the LOD_MIN level (above), and then creates extra even more
+			filtered 'mips' at the same LOD_MIN resolution, associated with higher roughness levels. In this way we maintain
+			resolution to smoothly interpolate diffuse lighting while limiting sampling computation.<br/><br/>
+
+			Note: The minimum [page:MeshStandardMaterial]'s roughness depends on the size of the provided texture.
+			If your render has small dimensions or the shiny parts have a lot of curvature, you may still be able to get away with
+			a smaller texture size.
+
+			<table>
+				<tr>
+					<th>texture size</td><th>minimum roughness</td>
+				</tr>
+				<tr>
+					<td>16</td><td>0.21</td>
+				</tr>
+				<tr>
+					<td>32</td><td>0.15</td>
+				</tr>
+				<tr>
+					<td>64</td><td>0.11</td>
+				</tr>
+				<tr>
+					<td>128</td><td>0.076</td>
+				</tr>
+				<tr>
+					<td>256</td><td>0.054</td>
+				</tr>
+				<tr>
+					<td>512</td><td>0.038</td>
+				</tr>
+				<tr>
+					<td>1024</td><td>0.027</td>
+				</tr>
+			</table>
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:WebGLRenderer renderer] )</h3>
+		<p>
+		This constructor creates a new [name].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:WebGLRenderTarget fromScene]( [param:Scene scene], [param:Number sigma], [param:Number near], [param:Number far] )</h3>
+		<p>
+			[page:Scene scene] - The given scene.<br>
+			[page:Number sigma] - (optional) Specifies a blur radius in radians to be applied to the scene before PMREM generation. Default is *0*.<br>
+			[page:Number near] - (optional) The near plane value. Default is *0.1*.<br>
+			[page:Number far] - (optional) The far plane value. Default is *100*.<br /><br />
+
+			Generates a PMREM from a supplied Scene, which can be faster than using an image if networking bandwidth is low.
+			Optional near and far planes ensure the scene is rendered in its entirety (the cubeCamera is placed at the origin).
+		</p>
+
+		<h3>[method:WebGLRenderTarget fromEquirectangular]( [param:Texture equirectangular] )</h3>
+		<p>
+			[page:Texture equirectangular] - The equirectangular texture.<br /><br />
+
+			Generates a PMREM from an equirectangular texture.
+		</p>
+
+		<h3>[method:WebGLRenderTarget fromCubemap]( [param:CubeTexture cubemap] )</h3>
+		<p>
+			[page:CubeTexture cubemap] - The cubemap texture.<br /><br />
+
+			Generates a PMREM from an cubemap texture.
+		</p>
+
+		<h3>[method:undefined compileCubemapShader]()</h3>
+		<p>
+			Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during your texture's network fetch for increased concurrency.
+		</p>
+
+		<h3>[method:undefined compileEquirectangularShader]()</h3>
+		<p>
+			Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during your texture's network fetch for increased concurrency.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Disposes of the PMREMGenerator's internal memory.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

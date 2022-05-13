@@ -4,141 +4,129 @@
 		<title>three.js webgl - panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<style>
-			html, body {
-				background-color: #000;
-				margin: 0px;
-				padding: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
-
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - cube panorama demo.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - cube panorama demo
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script>
-
-		var camera, controls;
-		var renderer;
-		var scene;
-
-		init();
-		animate();
-
-		function init() {
-
-			var container = document.getElementById( 'container' );
-
-			renderer = new THREE.WebGLRenderer();
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			container.appendChild( renderer.domElement );
-
-			scene = new THREE.Scene();
-
-			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
-			camera.position.z = 0.01;
-
-			controls = new THREE.OrbitControls( camera, renderer.domElement );
-			controls.enableZoom = false;
-			controls.enablePan = false;
-			controls.enableDamping = true;
-			controls.rotateSpeed = - 0.25;
-
-			var textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
-
-			var materials = [];
-
-			for ( var i = 0; i < 6; i ++ ) {
-
-				materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var skyBox = new THREE.Mesh( new THREE.BoxBufferGeometry( 1, 1, 1 ), materials );
-			skyBox.geometry.scale( 1, 1, - 1 );
-			scene.add( skyBox );
+		<script type="module">
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			import * as THREE from 'three';
 
-		}
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-		function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
+			let camera, controls;
+			let renderer;
+			let scene;
 
-			var textures = [];
+			init();
+			animate();
 
-			for ( var i = 0; i < tilesNum; i ++ ) {
+			function init() {
 
-				textures[ i ] = new THREE.Texture();
+				const container = document.getElementById( 'container' );
 
-			}
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
 
-			var imageObj = new Image();
+				scene = new THREE.Scene();
 
-			imageObj.onload = function () {
+				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 0.01;
 
-				var canvas, context;
-				var tileWidth = imageObj.height;
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
+				controls.enablePan = false;
+				controls.enableDamping = true;
+				controls.rotateSpeed = - 0.25;
 
-				for ( var i = 0; i < textures.length; i ++ ) {
+				const textures = getTexturesFromAtlasFile( 'textures/cube/sun_temple_stripe.jpg', 6 );
 
-					canvas = document.createElement( 'canvas' );
-					context = canvas.getContext( '2d' );
-					canvas.height = tileWidth;
-					canvas.width = tileWidth;
-					context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-					textures[ i ].image = canvas;
-					textures[ i ].needsUpdate = true;
+				const materials = [];
+
+				for ( let i = 0; i < 6; i ++ ) {
+
+					materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
 
 				}
 
-			};
+				const skyBox = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), materials );
+				skyBox.geometry.scale( 1, 1, - 1 );
+				scene.add( skyBox );
 
-			imageObj.src = atlasImgUrl;
+				window.addEventListener( 'resize', onWindowResize );
 
-			return textures;
+			}
 
-		}
+			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
 
-		function onWindowResize() {
+				const textures = [];
 
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
+				for ( let i = 0; i < tilesNum; i ++ ) {
 
-			renderer.setSize( window.innerWidth, window.innerHeight );
+					textures[ i ] = new THREE.Texture();
 
-		}
+				}
 
-		function animate() {
+				new THREE.ImageLoader()
+					.load( atlasImgUrl, ( image ) => {
 
-			requestAnimationFrame( animate );
+						let canvas, context;
+						const tileWidth = image.height;
 
-			controls.update(); // required when damping is enabled
+						for ( let i = 0; i < textures.length; i ++ ) {
 
-			renderer.render( scene, camera );
+							canvas = document.createElement( 'canvas' );
+							context = canvas.getContext( '2d' );
+							canvas.height = tileWidth;
+							canvas.width = tileWidth;
+							context.drawImage( image, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+							textures[ i ].image = canvas;
+							textures[ i ].needsUpdate = true;
 
-		}
+						}
+
+					} );
+
+				return textures;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update(); // required when damping is enabled
+
+				renderer.render( scene, camera );
+
+			}
 
 		</script>
 	</body>

@@ -4,116 +4,72 @@
 		<title>three.js webaudio - sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family: Monospace;
-			}
-
-			#info {
-				position: absolute;
-				z-index: 2;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#overlay {
-				position: absolute;
-				z-index: 1;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height:100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				opacity: 1;
-				background-color: #000000;
-				color: #ffffff;
-			}
-
-			#overlay > div {
-				text-align: center;
-			}
-
-			#overlay > div > button {
-				height: 20px;
-				width: 100px;
-				background: transparent;
-				color: #ffffff;
-				outline: 1px solid #ffffff;
-				border: 0px;
-				cursor: pointer;
-			}
-
-			#overlay > div > p {
-				color: #777777;
-				font-size: 12px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<audio id="song" preload="auto" style="display: none">
+			<source src="sounds/358232_j_s_song.ogg" type="audio/ogg">
+			<source src="sounds/358232_j_s_song.mp3" type="audio/mpeg">
+		</audio>
+		<audio id="skullbeatz" preload="auto" style="display: none">
+			<source src="sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg" type="audio/ogg">
+			<source src="sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3" type="audio/mpeg">
+		</audio>
+		<audio id="utopia" loop preload="auto" style="display: none">
+			<source src="sounds/Project_Utopia.ogg" type="audio/ogg">
+			<source src="sounds/Project_Utopia.mp3" type="audio/mpeg">
+		</audio>
 		<div id="overlay">
-			<div>
-				<button id="startButton">Click to Play</button>
-				<p>Automatic audio playback requires a user interaction.</p>
-			</div>
+			<button id="startButton">Play</button>
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox |
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webaudio - sandbox<br/>
 			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank" rel="noopener">larrylarrybb</a>,
 			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a> and
 			<a href="http://opengameart.org/content/project-utopia-seamless-loop" target="_blank" rel="noopener">congusbongus</a><br/><br/>
 			navigate with WASD / arrows / mouse
 		</div>
 
-		<script src="../build/three.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var camera, controls, scene, renderer, light;
+		<script type="module">
 
-			var material1, material2, material3;
+			import * as THREE from 'three';
 
-			var analyser1, analyser2, analyser3;
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
-			var clock = new THREE.Clock();
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
 
-			var startButton = document.getElementById( 'startButton' );
+			let camera, controls, scene, renderer, light;
+
+			let material1, material2, material3;
+
+			let analyser1, analyser2, analyser3;
+
+			const clock = new THREE.Clock();
+
+			const startButton = document.getElementById( 'startButton' );
 			startButton.addEventListener( 'click', init );
 
 			function init() {
 
-				var overlay = document.getElementById( 'overlay' );
+				const overlay = document.getElementById( 'overlay' );
 				overlay.remove();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 25, 0 );
 
-				var listener = new THREE.AudioListener();
+				const listener = new THREE.AudioListener();
 				camera.add( listener );
 
 				scene = new THREE.Scene();
@@ -123,7 +79,7 @@
 				light.position.set( 0, 0.5, 1 ).normalize();
 				scene.add( light );
 
-				var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
+				const sphere = new THREE.SphereGeometry( 20, 32, 16 );
 
 				material1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
 				material2 = new THREE.MeshPhongMaterial( { color: 0xff2200, flatShading: true, shininess: 0 } );
@@ -131,46 +87,38 @@
 
 				// sound spheres
 
-				var audioLoader = new THREE.AudioLoader();
-
-				var mesh1 = new THREE.Mesh( sphere, material1 );
+				const mesh1 = new THREE.Mesh( sphere, material1 );
 				mesh1.position.set( - 250, 30, 0 );
 				scene.add( mesh1 );
 
-				var sound1 = new THREE.PositionalAudio( listener );
-				audioLoader.load( 'sounds/358232_j_s_song.ogg', function ( buffer ) {
-
-					sound1.setBuffer( buffer );
-					sound1.setRefDistance( 20 );
-					sound1.play();
-
-				} );
+				const sound1 = new THREE.PositionalAudio( listener );
+				const songElement = document.getElementById( 'song' );
+				sound1.setMediaElementSource( songElement );
+				sound1.setRefDistance( 20 );
+				songElement.play();
 				mesh1.add( sound1 );
 
 				//
 
-				var mesh2 = new THREE.Mesh( sphere, material2 );
+				const mesh2 = new THREE.Mesh( sphere, material2 );
 				mesh2.position.set( 250, 30, 0 );
 				scene.add( mesh2 );
 
-				var sound2 = new THREE.PositionalAudio( listener );
-				audioLoader.load( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg', function ( buffer ) {
-
-					sound2.setBuffer( buffer );
-					sound2.setRefDistance( 20 );
-					sound2.play();
-
-				} );
+				const sound2 = new THREE.PositionalAudio( listener );
+				const skullbeatzElement = document.getElementById( 'skullbeatz' );
+				sound2.setMediaElementSource( skullbeatzElement );
+				sound2.setRefDistance( 20 );
+				skullbeatzElement.play();
 				mesh2.add( sound2 );
 
 				//
 
-				var mesh3 = new THREE.Mesh( sphere, material3 );
+				const mesh3 = new THREE.Mesh( sphere, material3 );
 				mesh3.position.set( 0, 30, - 250 );
 				scene.add( mesh3 );
 
-				var sound3 = new THREE.PositionalAudio( listener );
-				var oscillator = listener.context.createOscillator();
+				const sound3 = new THREE.PositionalAudio( listener );
+				const oscillator = listener.context.createOscillator();
 				oscillator.type = 'sine';
 				oscillator.frequency.setValueAtTime( 144, sound3.context.currentTime );
 				oscillator.start( 0 );
@@ -187,25 +135,21 @@
 
 				// global ambient audio
 
-				var sound4 = new THREE.Audio( listener );
-				audioLoader.load( 'sounds/Project_Utopia.ogg', function ( buffer ) {
-
-					sound4.setBuffer( buffer );
-					sound4.setLoop( true );
-					sound4.setVolume( 0.5 );
-					sound4.play();
-
-				} );
+				const sound4 = new THREE.Audio( listener );
+				const utopiaElement = document.getElementById( 'utopia' );
+				sound4.setMediaElementSource( utopiaElement );
+				sound4.setVolume( 0.5 );
+				utopiaElement.play();
 
 				// ground
 
-				var helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
+				const helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
 				helper.position.y = 0.1;
 				scene.add( helper );
 
 				//
 
-				var SoundControls = function () {
+				const SoundControls = function () {
 
 					this.master = listener.getMasterVolume();
 					this.firstSphere = sound1.getVolume();
@@ -215,18 +159,18 @@
 
 				};
 
-				var GeneratorControls = function () {
+				const GeneratorControls = function () {
 
 					this.frequency = oscillator.frequency.value;
 					this.wavetype = oscillator.type;
 
 				};
 
-				var gui = new dat.GUI();
-				var soundControls = new SoundControls();
-				var generatorControls = new GeneratorControls();
-				var volumeFolder = gui.addFolder( 'sound volume' );
-				var generatorFolder = gui.addFolder( 'sound generator' );
+				const gui = new GUI();
+				const soundControls = new SoundControls();
+				const generatorControls = new GeneratorControls();
+				const volumeFolder = gui.addFolder( 'sound volume' );
+				const generatorFolder = gui.addFolder( 'sound generator' );
 
 				volumeFolder.add( soundControls, 'master' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
 
@@ -277,7 +221,7 @@
 
 				//
 
-				controls = new THREE.FirstPersonControls( camera, renderer.domElement );
+				controls = new FirstPersonControls( camera, renderer.domElement );
 
 				controls.movementSpeed = 70;
 				controls.lookSpeed = 0.05;
@@ -286,7 +230,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				animate();
 
@@ -313,7 +257,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				controls.update( delta );
 

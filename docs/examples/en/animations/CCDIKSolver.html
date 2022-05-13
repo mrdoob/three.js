@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc"> A solver for IK with <a href="https://sites.google.com/site/auraliusproject/ccd-algorithm"><em>CCD Algorithm</em></a>. <br /><br />
+		[name] solves Inverse Kinematics Problem with CCD Algorithm.
+		[name] is designed to work with [page:SkinnedMesh] but also can be used with [page:MMDLoader] or [page:GLTFLoader] skeleton.
+		</p>
+
+		<iframe id="scene" src="scenes/ccdiksolver-browser.html"></iframe>
+
+		<h2>Code Example</h2>
+
+		<code>
+		let ikSolver;
+
+		//
+		// Bones hierarchy:
+		//
+		//   root
+		//     ├── bone0
+		//     │    └── bone1
+		//     │          └── bone2
+		//     │                └── bone3
+		//     └── target
+		//
+		// Positioned as follow on the cylinder:
+		//
+		//        o      <- target      (y =  20)
+		//        
+		//   +----o----+ <- bone3       (y =  12)
+		//   |         |
+		//   |    o    | <- bone2       (y =   4)
+		//   |         |
+		//   |    o    | <- bone1       (y =  -4)
+		//   |         |
+		//   +----oo---+ <- root, bone0 (y = -12)
+		//
+
+		let bones = []
+
+		// "root"
+		let rootBone = new Bone();
+		rootBone.position.y = -12;
+		bones.push( rootBone );
+
+		// "bone0"
+		let prevBone = new Bone();
+		prevBone.position.y = 0;
+		rootBone.add( prevBone );
+		bones.push( prevBone );
+
+		// "bone1", "bone2", "bone3"
+		for ( let i = 1; i <= 3; i ++ ) {
+			const bone = new Bone();
+			bone.position.y = 8;
+			bones.push( bone );
+			
+			prevBone.add( bone );
+			prevBone = bone;
+		}
+
+		// "target"
+		const targetBone = new Bone();
+		targetBone.position.y = 24 + 8
+		rootBone.add( targetBone );
+		bones.push( targetBone );
+
+		//
+		// skinned mesh
+		//
+
+		const mesh = new SkinnedMesh( geometry,	material );
+		const skeleton = new Skeleton( bones );
+
+		mesh.add( bones[ 0 ] ); // "root" bone
+		mesh.bind( skeleton );
+
+		//
+		// ikSolver
+		//
+
+		const iks = [
+			{
+				target: 5, // "target"
+				effector: 4, // "bone3"
+				links: [ { index: 3 }, { index: 2 }, { index: 1 } ] // "bone2", "bone1", "bone0"
+			}
+		];
+		ikSolver = new CCDIKSolver( mesh, iks );
+
+		function render() {
+			ikSolver?.update();
+			renderer.render( scene, camera );
+		}
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_loader_mmd]<br />
+			[example:webgl_loader_mmd_pose]<br />
+			[example:webgl_loader_mmd_audio]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:SkinnedMesh mesh], [param:Array iks] )</h3>
+		<p>
+		[page:SkinnedMesh mesh] — [page:SkinnedMesh] for which [name] solves IK problem.<br />
+		[page:Array iks] — An array of [page:Object] specifying IK parameter. target, effector, and link-index are index integers in .skeleton.bones.
+		The bones relation should be "links[ n ], links[ n - 1 ], ..., links[ 0 ], effector" in order from parent to child.<br />
+		<ul>
+			<li>[page:Integer target] — Target bone.</li>
+			<li>[page:Integer effector] — Effector bone.</li>
+			<li>[page:Array links] — An array of [page:Object] specifying link bones.
+			<ul>
+				<li>[page:Integer index] — Link bone.</li>
+				<li>[page:Vector3 limitation] — (optional) Rotation axis. Default is undefined.</li>
+				<li>[page:Vector3 rotationMin] — (optional) Rotation minimum limit. Default is undefined.</li>
+				<li>[page:Vector3 rotationMax] — (optional) Rotation maximum limit. Default is undefined.</li>
+				<li>[page:Boolean enabled] — (optional) Default is true.</li>
+			</ul>
+			</li>
+			<li>[page:Integer iteration] — (optional) Iteration number of calculation. Smaller is faster but less precise. Default is 1.</li>
+			<li>[page:Number minAngle] — (optional) Minimum rotation angle in a step. Default is undefined.</li>
+			<li>[page:Number maxAngle] — (optional) Maximum rotation angle in a step. Default is undefined.</li>
+		</ul>
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array iks]</h3>
+		<p>An array of IK parameter passed to the constructor.</p>
+
+		<h3>[property:SkinnedMesh mesh]</h3>
+		<p>[page:SkinnedMesh] passed to the constructor.</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:CCDIKHelper createHelper]()</h3>
+		<p>
+		Return [page:CCDIKHelper]. You can visualize IK bones by adding the helper to scene.
+		</p>
+
+		<h3>[method:this update]()</h3>
+		<p>
+		Update IK bones quaternion by solving CCD algorithm.
+		</p>
+
+		<h3>[method:this updateOne]( [param:Object ikParam] )</h3>
+		<p>
+		Update an IK bone quaternion by solving CCD algorithm.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/CCDIKSolver.js examples/jsm/animation/CCDIKSolver.js]
+		</p>
+	</body>
+</html>

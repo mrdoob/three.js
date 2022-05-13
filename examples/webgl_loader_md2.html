@@ -4,75 +4,58 @@
 		<title>three.js webgl - morphtargets - MD2</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-				color: #fff;
-			}
-
-			a { color: skyblue; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader -
-			Character by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=368">Brian Collins</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/controls/OrbitControls.js"></script>
-
-		<script src="js/loaders/MD2Loader.js"></script>
-		<script src="js/MD2Character.js"></script>
-
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight;
+		<script type="module">
 
-			var container, camera, scene, renderer;
+			import * as THREE from 'three';
 
-			var character;
+			import Stats from './jsm/libs/stats.module.js';
 
-			var gui, playbackConfig = {
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { MD2Character } from './jsm/misc/MD2Character.js';
+
+			let SCREEN_WIDTH = window.innerWidth;
+			let SCREEN_HEIGHT = window.innerHeight;
+
+			let container, camera, scene, renderer;
+
+			let character;
+
+			let gui;
+
+			const playbackConfig = {
 
 				speed: 1.0,
 				wireframe: false
 
 			};
 
-			var controls;
+			let controls;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			var stats;
+			let stats;
 
 			init();
 			animate();
@@ -97,40 +80,41 @@
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
-				light.position.set( 200, 250, 500 );
-				light.angle = 0.5;
-				light.penumbra = 0.5;
+				const light1 = new THREE.SpotLight( 0xffffff, 5, 1000 );
+				light1.position.set( 200, 250, 500 );
+				light1.angle = 0.5;
+				light1.penumbra = 0.5;
 
-				light.castShadow = true;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
+				light1.castShadow = true;
+				light1.shadow.mapSize.width = 1024;
+				light1.shadow.mapSize.height = 1024;
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
-				scene.add( light );
+				// scene.add( new THREE.CameraHelper( light1.shadow.camera ) );
+				scene.add( light1 );
 
-				var light = new THREE.SpotLight( 0xffffff, 5, 1000 );
-				light.position.set( - 100, 350, 350 );
-				light.angle = 0.5;
-				light.penumbra = 0.5;
+				const light2 = new THREE.SpotLight( 0xffffff, 5, 1000 );
+				light2.position.set( - 100, 350, 350 );
+				light2.angle = 0.5;
+				light2.penumbra = 0.5;
 
-				light.castShadow = true;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
+				light2.castShadow = true;
+				light2.shadow.mapSize.width = 1024;
+				light2.shadow.mapSize.height = 1024;
 
-				// scene.add( new THREE.CameraHelper( light.shadow.camera ) );
-				scene.add( light );
+				// scene.add( new THREE.CameraHelper( light2.shadow.camera ) );
+				scene.add( light2 );
 
 				//  GROUND
 
-				var gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
-				var gg = new THREE.PlaneBufferGeometry( 2000, 2000 );
-				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
+				const gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
+				const gg = new THREE.PlaneGeometry( 2000, 2000 );
+				const gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
-				var ground = new THREE.Mesh( gg, gm );
+				const ground = new THREE.Mesh( gg, gm );
 				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 8, 8 );
 				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
+				ground.material.map.encoding = THREE.sRGBEncoding;
 				ground.receiveShadow = true;
 
 				scene.add( ground );
@@ -144,8 +128,7 @@
 
 				//
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 
 				// STATS
@@ -155,17 +138,17 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				// CONTROLS
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 50, 0 );
 				controls.update();
 
 				// GUI
 
-				gui = new dat.GUI();
+				gui = new GUI();
 
 				gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function () {
 
@@ -181,7 +164,7 @@
 
 				// CHARACTER
 
-				var config = {
+				const config = {
 
 					baseUrl: "models/md2/ratamahatta/",
 
@@ -202,7 +185,7 @@
 
 				};
 
-				character = new THREE.MD2Character();
+				character = new MD2Character();
 				character.scale = 3;
 
 				character.onLoadComplete = function () {
@@ -239,7 +222,7 @@
 
 			function labelize( text ) {
 
-				var parts = text.split( "." );
+				const parts = text.split( "." );
 
 				if ( parts.length > 1 ) {
 
@@ -256,9 +239,9 @@
 
 			function setupWeaponsGUI( character ) {
 
-				var folder = gui.addFolder( "Weapons" );
+				const folder = gui.addFolder( "Weapons" );
 
-				var generateCallback = function ( index ) {
+				const generateCallback = function ( index ) {
 
 					return function () {
 
@@ -268,11 +251,11 @@
 
 				};
 
-				var guiItems = [];
+				const guiItems = [];
 
-				for ( var i = 0; i < character.weapons.length; i ++ ) {
+				for ( let i = 0; i < character.weapons.length; i ++ ) {
 
-					var name = character.weapons[ i ].name;
+					const name = character.weapons[ i ].name;
 
 					playbackConfig[ name ] = generateCallback( i );
 					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
@@ -285,9 +268,9 @@
 
 			function setupSkinsGUI( character ) {
 
-				var folder = gui.addFolder( "Skins" );
+				const folder = gui.addFolder( "Skins" );
 
-				var generateCallback = function ( index ) {
+				const generateCallback = function ( index ) {
 
 					return function () {
 
@@ -297,11 +280,11 @@
 
 				};
 
-				var guiItems = [];
+				const guiItems = [];
 
-				for ( var i = 0; i < character.skinsBody.length; i ++ ) {
+				for ( let i = 0; i < character.skinsBody.length; i ++ ) {
 
-					var name = character.skinsBody[ i ].name;
+					const name = character.skinsBody[ i ].name;
 
 					playbackConfig[ name ] = generateCallback( i );
 					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
@@ -314,9 +297,9 @@
 
 			function setupGUIAnimations( character ) {
 
-				var folder = gui.addFolder( "Animations" );
+				const folder = gui.addFolder( "Animations" );
 
-				var generateCallback = function ( animationClip ) {
+				const generateCallback = function ( animationClip ) {
 
 					return function () {
 
@@ -326,12 +309,12 @@
 
 				};
 
-				var i = 0, guiItems = [];
-				var animations = character.meshBody.geometry.animations;
+				const guiItems = [];
+				const animations = character.meshBody.geometry.animations;
 
-				for ( var i = 0; i < animations.length; i ++ ) {
+				for ( let i = 0; i < animations.length; i ++ ) {
 
-					var clip = animations[ i ];
+					const clip = animations[ i ];
 
 					playbackConfig[ clip.name ] = generateCallback( clip );
 					guiItems[ i ] = folder.add( playbackConfig, clip.name, clip.name );
@@ -355,7 +338,7 @@
 
 			function render() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				character.update( delta );
 

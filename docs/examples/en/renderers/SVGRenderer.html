@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+			<p>
+				[name] can be used to render geometric data using SVG. The produced vector graphics are particular useful in the following use cases:
+			</p>
+			<ul>
+				<li>Animated logos or icons</li>
+				<li>Interactive 2D/3D diagrams or graphs</li>
+				<li>Interactive maps</li>
+				<li>Complex or animated user interfaces</li>
+			</ul>
+			<p>
+				[name] has various advantages. It produces crystal-clear and sharp output which is independent of the actual viewport resolution.<br />
+				SVG elements can be styled via CSS. And they have good accessibility since it's possible to add metadata like title or description (useful for search engines or screen readers).
+			</p>
+			<p>
+				There are, however, some important limitations:
+			</p>
+			<ul>
+				<li>No advanced shading</li>
+				<li>No texture support</li>
+				<li>No shadow support</li>
+			</ul>
+		</div>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:svg_lines lines]<br />
+			[example:svg_sandbox sandbox]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Number overdraw]</h3>
+		<p>
+		Number of fractional pixels to enlarge polygons in order to prevent anti-aliasing gaps. Range is [0..1]. Default is *0.5*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:undefined clear]()</h3>
+		<p>
+			Tells the renderer to clear its drawing surface.
+		</p>
+
+		<h3>[method:Object getSize]()</h3>
+		<p>
+			Returns an object containing the width and height of the renderer.
+		</p>
+
+		<h3>[method:undefined render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<p>
+			Renders a [page:Scene scene] using a [page:Camera camera].
+		</p>
+
+		<h3>[method:undefined setClearColor]( [param:Color color], [param:number alpha] )</h3>
+		<p>
+			Sets the clearColor and the clearAlpha.
+		</p>
+
+		<h3>[method:undefined setPrecision]( [param:Number precision] )</h3>
+		<p>
+			Sets the precision of the data used to create a path.
+		</p>
+
+		<h3>[method:undefined setQuality]()</h3>
+		<p>
+			Sets the render quality. Possible values are *low* and *high* (default).
+		</p>
+
+		<h3>[method:undefined setSize]( [param:Number width], [param:Number height] )</h3>
+		<p>
+			Resizes the renderer to (width, height).
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/SVGRenderer.js examples/jsm/renderers/SVGRenderer.js]
+		</p>
+	</body>
+</html>

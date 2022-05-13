@@ -1,17 +1,11 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	CircleBufferGeometry
-} from '../../../../src/geometries/CircleGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { CircleGeometry, CircleBufferGeometry } from '../../../../src/geometries/CircleGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'CircleBufferGeometry', ( hooks ) => {
+	QUnit.module( 'CircleGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -24,26 +18,27 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
+				new CircleGeometry(),
+				new CircleGeometry( parameters.radius ),
+				new CircleGeometry( parameters.radius, parameters.segments ),
+				new CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
+				new CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
 				new CircleBufferGeometry(),
-				new CircleBufferGeometry( parameters.radius ),
-				new CircleBufferGeometry( parameters.radius, parameters.segments ),
-				new CircleBufferGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
-				new CircleBufferGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

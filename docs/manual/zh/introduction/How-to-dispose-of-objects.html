@@ -1,17 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
 	<meta charset="utf-8">
 	<base href="../../../" />
-	<script src="list.js"></script>
 	<script src="page.js"></script>
 	<link type="text/css" rel="stylesheet" href="page.css" />
 </head>
 
 <body>
 	<h1>如何废置对象（[name]）</h1>
-	<br />
 
 	<p>
 		为了提高性能，并避免应用程序中的内存泄露，一个重要的方面是废置未使用的类库实体。
@@ -44,6 +42,11 @@
 		对材质的废置不会对纹理造成影响。它们是分离的，因此一个纹理可以同时被多个材质所使用。
 		每当你创建一个[page:Texture]实例的时候，three.js在内部会创建一个[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture]实例。
 		和buffer相似，该对象只能通过调用[page:Texture.dispose]()来删除。
+	</p>
+
+	<p>
+		If you use an *ImageBitmap* as the texture's data source, you have to call [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]() at the application level to dispose of all CPU-side resources.
+		An automated call of *ImageBitmap.close()* in [page:Texture.dispose]() is not possible, since the image bitmap becomes unusable, and the engine has no way of knowing if the image bitmap is used elsewhere.
 	</p>
 
 	<h2>渲染目标</h2>
@@ -84,11 +87,6 @@
 		是的，可以评估[page:WebGLRenderer.info] —— 渲染器中的一个特殊属性，具有一系列关于显存和渲染过程的统计信息。
 		除此之外，它还告诉你有多少纹理、几何体和着色器程序在内部存储。
 		如果你在你的应用程序中注意到了性能问题，一个较好的方法便是调试该属性，以便轻松识别内存泄漏。
-	</p>
-
-	<p>
-		对于纹理的内部资源仅在图像完全被加载后才会分配。如果你在图像被加载之前废置纹理，什么都不会发生。
-		没有资源被分配，因此也没有必要进行清理。
 	</p>
 
 	<h3>当你在纹理还没有被加载时，在纹理上调用*dispose()*，会发生什么？</h3>

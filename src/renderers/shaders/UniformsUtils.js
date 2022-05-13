@@ -4,20 +4,20 @@
 
 export function cloneUniforms( src ) {
 
-	var dst = {};
+	const dst = {};
 
-	for ( var u in src ) {
+	for ( const u in src ) {
 
 		dst[ u ] = {};
 
-		for ( var p in src[ u ] ) {
+		for ( const p in src[ u ] ) {
 
-			var property = src[ u ][ p ];
+			const property = src[ u ][ p ];
 
 			if ( property && ( property.isColor ||
 				property.isMatrix3 || property.isMatrix4 ||
 				property.isVector2 || property.isVector3 || property.isVector4 ||
-				property.isTexture ) ) {
+				property.isTexture || property.isQuaternion ) ) {
 
 				dst[ u ][ p ] = property.clone();
 
@@ -41,13 +41,13 @@ export function cloneUniforms( src ) {
 
 export function mergeUniforms( uniforms ) {
 
-	var merged = {};
+	const merged = {};
 
-	for ( var u = 0; u < uniforms.length; u ++ ) {
+	for ( let u = 0; u < uniforms.length; u ++ ) {
 
-		var tmp = cloneUniforms( uniforms[ u ] );
+		const tmp = cloneUniforms( uniforms[ u ] );
 
-		for ( var p in tmp ) {
+		for ( const p in tmp ) {
 
 			merged[ p ] = tmp[ p ];
 
@@ -61,6 +61,6 @@ export function mergeUniforms( uniforms ) {
 
 // Legacy
 
-var UniformsUtils = { clone: cloneUniforms, merge: mergeUniforms };
+const UniformsUtils = { clone: cloneUniforms, merge: mergeUniforms };
 
 export { UniformsUtils };

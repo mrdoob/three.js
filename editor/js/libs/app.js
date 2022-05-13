@@ -1,17 +1,22 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
+import * as THREE from 'three';
+import { VRButton } from '../../../examples/jsm/webxr/VRButton.js';
 var APP = {
 
 	Player: function () {
 
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
+		renderer.outputEncoding = THREE.sRGBEncoding;
+
 		var loader = new THREE.ObjectLoader();
-		var camera, scene, renderer;
+		var camera, scene;
+
+		var vrButton = VRButton.createButton( renderer ); // eslint-disable-line no-undef
 
 		var events = {};
 
 		var dom = document.createElement( 'div' );
+		dom.appendChild( renderer.domElement );
 
 		this.dom = dom;
 
@@ -20,17 +25,14 @@ var APP = {
 
 		this.load = function ( json ) {
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.gammaOutput = true;
-			renderer.setClearColor( 0x000000 );
-			renderer.setPixelRatio( window.devicePixelRatio );
-
 			var project = json.project;
 
-			if ( project.shadows ) renderer.shadowMap.enabled = true;
-			if ( project.vr ) renderer.vr.enabled = true;
-
-			dom.appendChild( renderer.domElement );
+			if ( project.vr !== undefined ) renderer.xr.enabled = project.vr;
+			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
+			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
+			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
+			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
+			if ( project.physicallyCorrectLights !== undefined ) renderer.physicallyCorrectLights = project.physicallyCorrectLights;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -41,12 +43,9 @@ var APP = {
 				stop: [],
 				keydown: [],
 				keyup: [],
-				mousedown: [],
-				mouseup: [],
-				mousemove: [],
-				touchstart: [],
-				touchend: [],
-				touchmove: [],
+				pointerdown: [],
+				pointerup: [],
+				pointermove: [],
 				update: []
 			};
 
@@ -110,17 +109,17 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
-			if ( renderer.vr.enabled ) {
-
-				dom.appendChild( WEBVR.createButton( renderer ) );
-
-			}
-
 		};
 
 		this.setScene = function ( value ) {
 
 			scene = value;
+
+		};
+
+		this.setPixelRatio = function ( pixelRatio ) {
+
+			renderer.setPixelRatio( pixelRatio );
 
 		};
 
@@ -136,11 +135,7 @@ var APP = {
 
 			}
 
-			if ( renderer ) {
-
-				renderer.setSize( width, height );
-
-			}
+			renderer.setSize( width, height );
 
 		};
 
@@ -154,7 +149,7 @@ var APP = {
 
 		}
 
-		var time, prevTime;
+		var time, startTime, prevTime;
 
 		function animate() {
 
@@ -162,11 +157,11 @@ var APP = {
 
 			try {
 
-				dispatch( events.update, { time: time, delta: time - prevTime } );
+				dispatch( events.update, { time: time - startTime, delta: time - prevTime } );
 
 			} catch ( e ) {
 
-				console.error( ( e.message || e ), ( e.stack || "" ) );
+				console.error( ( e.message || e ), ( e.stack || '' ) );
 
 			}
 
@@ -178,16 +173,15 @@ var APP = {
 
 		this.play = function () {
 
-			prevTime = performance.now();
+			if ( renderer.xr.enabled ) dom.append( vrButton );
 
-			document.addEventListener( 'keydown', onDocumentKeyDown );
-			document.addEventListener( 'keyup', onDocumentKeyUp );
-			document.addEventListener( 'mousedown', onDocumentMouseDown );
-			document.addEventListener( 'mouseup', onDocumentMouseUp );
-			document.addEventListener( 'mousemove', onDocumentMouseMove );
-			document.addEventListener( 'touchstart', onDocumentTouchStart );
-			document.addEventListener( 'touchend', onDocumentTouchEnd );
-			document.addEventListener( 'touchmove', onDocumentTouchMove );
+			startTime = prevTime = performance.now();
+
+			document.addEventListener( 'keydown', onKeyDown );
+			document.addEventListener( 'keyup', onKeyUp );
+			document.addEventListener( 'pointerdown', onPointerDown );
+			document.addEventListener( 'pointerup', onPointerUp );
+			document.addEventListener( 'pointermove', onPointerMove );
 
 			dispatch( events.start, arguments );
 
@@ -197,14 +191,13 @@ var APP = {
 
 		this.stop = function () {
 
-			document.removeEventListener( 'keydown', onDocumentKeyDown );
-			document.removeEventListener( 'keyup', onDocumentKeyUp );
-			document.removeEventListener( 'mousedown', onDocumentMouseDown );
-			document.removeEventListener( 'mouseup', onDocumentMouseUp );
-			document.removeEventListener( 'mousemove', onDocumentMouseMove );
-			document.removeEventListener( 'touchstart', onDocumentTouchStart );
-			document.removeEventListener( 'touchend', onDocumentTouchEnd );
-			document.removeEventListener( 'touchmove', onDocumentTouchMove );
+			if ( renderer.xr.enabled ) vrButton.remove();
+
+			document.removeEventListener( 'keydown', onKeyDown );
+			document.removeEventListener( 'keyup', onKeyUp );
+			document.removeEventListener( 'pointerdown', onPointerDown );
+			document.removeEventListener( 'pointerup', onPointerUp );
+			document.removeEventListener( 'pointermove', onPointerMove );
 
 			dispatch( events.stop, arguments );
 
@@ -212,72 +205,57 @@ var APP = {
 
 		};
 
+		this.render = function ( time ) {
+
+			dispatch( events.update, { time: time * 1000, delta: 0 /* TODO */ } );
+
+			renderer.render( scene, camera );
+
+		};
+
 		this.dispose = function () {
-
-			while ( dom.children.length ) {
-
-				dom.removeChild( dom.firstChild );
-
-			}
 
 			renderer.dispose();
 
 			camera = undefined;
 			scene = undefined;
-			renderer = undefined;
 
 		};
 
 		//
 
-		function onDocumentKeyDown( event ) {
+		function onKeyDown( event ) {
 
 			dispatch( events.keydown, event );
 
 		}
 
-		function onDocumentKeyUp( event ) {
+		function onKeyUp( event ) {
 
 			dispatch( events.keyup, event );
 
 		}
 
-		function onDocumentMouseDown( event ) {
+		function onPointerDown( event ) {
 
-			dispatch( events.mousedown, event );
-
-		}
-
-		function onDocumentMouseUp( event ) {
-
-			dispatch( events.mouseup, event );
+			dispatch( events.pointerdown, event );
 
 		}
 
-		function onDocumentMouseMove( event ) {
+		function onPointerUp( event ) {
 
-			dispatch( events.mousemove, event );
-
-		}
-
-		function onDocumentTouchStart( event ) {
-
-			dispatch( events.touchstart, event );
+			dispatch( events.pointerup, event );
 
 		}
 
-		function onDocumentTouchEnd( event ) {
+		function onPointerMove( event ) {
 
-			dispatch( events.touchend, event );
-
-		}
-
-		function onDocumentTouchMove( event ) {
-
-			dispatch( events.touchmove, event );
+			dispatch( events.pointermove, event );
 
 		}
 
 	}
 
 };
+
+export { APP };

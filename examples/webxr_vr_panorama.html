@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - panorama</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { VRButton } from './jsm/webxr/VRButton.js';
+
+			let camera;
+			let renderer;
+			let scene;
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
+				document.body.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.layers.enable( 1 );
+
+				const geometry = new THREE.BoxGeometry( 100, 100, 100 );
+				geometry.scale( 1, 1, - 1 );
+
+				const textures = getTexturesFromAtlasFile( 'textures/cube/sun_temple_stripe_stereo.jpg', 12 );
+
+				const materials = [];
+
+				for ( let i = 0; i < 6; i ++ ) {
+
+					materials.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
+
+				}
+
+				const skyBox = new THREE.Mesh( geometry, materials );
+				skyBox.layers.set( 1 );
+				scene.add( skyBox );
+
+
+				const materialsR = [];
+
+				for ( let i = 6; i < 12; i ++ ) {
+
+					materialsR.push( new THREE.MeshBasicMaterial( { map: textures[ i ] } ) );
+
+				}
+
+				const skyBoxR = new THREE.Mesh( geometry, materialsR );
+				skyBoxR.layers.set( 2 );
+				scene.add( skyBoxR );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function getTexturesFromAtlasFile( atlasImgUrl, tilesNum ) {
+
+				const textures = [];
+
+				for ( let i = 0; i < tilesNum; i ++ ) {
+
+					textures[ i ] = new THREE.Texture();
+
+				}
+
+				const loader = new THREE.ImageLoader();
+				loader.load( atlasImgUrl, function ( imageObj ) {
+
+					let canvas, context;
+					const tileWidth = imageObj.height;
+
+					for ( let i = 0; i < textures.length; i ++ ) {
+
+						canvas = document.createElement( 'canvas' );
+						context = canvas.getContext( '2d' );
+						canvas.height = tileWidth;
+						canvas.width = tileWidth;
+						context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+						textures[ i ].image = canvas;
+						textures[ i ].needsUpdate = true;
+
+					}
+
+				} );
+
+				return textures;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

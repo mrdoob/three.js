@@ -1,126 +1,161 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
+( function () {
 
-THREE.PointerLockControls = function ( camera, domElement ) {
+	const _euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
 
-	var scope = this;
+	const _vector = new THREE.Vector3();
 
-	this.domElement = domElement || document.body;
-	this.isLocked = false;
+	const _changeEvent = {
+		type: 'change'
+	};
+	const _lockEvent = {
+		type: 'lock'
+	};
+	const _unlockEvent = {
+		type: 'unlock'
+	};
 
-	camera.rotation.set( 0, 0, 0 );
+	const _PI_2 = Math.PI / 2;
 
-	var pitchObject = new THREE.Object3D();
-	pitchObject.add( camera );
+	class PointerLockControls extends THREE.EventDispatcher {
 
-	var yawObject = new THREE.Object3D();
-	yawObject.position.y = 10;
-	yawObject.add( pitchObject );
+		constructor( camera, domElement ) {
 
-	var PI_2 = Math.PI / 2;
+			super();
 
-	function onMouseMove( event ) {
+			if ( domElement === undefined ) {
 
-		if ( scope.isLocked === false ) return;
+				console.warn( 'THREE.PointerLockControls: The second parameter "domElement" is now mandatory.' );
+				domElement = document.body;
 
-		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+			}
 
-		yawObject.rotation.y -= movementX * 0.002;
-		pitchObject.rotation.x -= movementY * 0.002;
+			this.domElement = domElement;
+			this.isLocked = false; // Set to constrain the pitch of the camera
+			// Range is 0 to Math.PI radians
 
-		pitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, pitchObject.rotation.x ) );
+			this.minPolarAngle = 0; // radians
 
-	}
+			this.maxPolarAngle = Math.PI; // radians
 
-	function onPointerlockChange() {
+			this.pointerSpeed = 1.0;
+			const scope = this;
 
-		if ( document.pointerLockElement === scope.domElement ) {
+			function onMouseMove( event ) {
 
-			scope.dispatchEvent( { type: 'lock' } );
+				if ( scope.isLocked === false ) return;
+				const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+				const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-			scope.isLocked = true;
+				_euler.setFromQuaternion( camera.quaternion );
 
-		} else {
+				_euler.y -= movementX * 0.002 * scope.pointerSpeed;
+				_euler.x -= movementY * 0.002 * scope.pointerSpeed;
+				_euler.x = Math.max( _PI_2 - scope.maxPolarAngle, Math.min( _PI_2 - scope.minPolarAngle, _euler.x ) );
+				camera.quaternion.setFromEuler( _euler );
+				scope.dispatchEvent( _changeEvent );
 
-			scope.dispatchEvent( { type: 'unlock' } );
+			}
 
-			scope.isLocked = false;
+			function onPointerlockChange() {
+
+				if ( scope.domElement.ownerDocument.pointerLockElement === scope.domElement ) {
+
+					scope.dispatchEvent( _lockEvent );
+					scope.isLocked = true;
+
+				} else {
+
+					scope.dispatchEvent( _unlockEvent );
+					scope.isLocked = false;
+
+				}
+
+			}
+
+			function onPointerlockError() {
+
+				console.error( 'THREE.PointerLockControls: Unable to use Pointer Lock API' );
+
+			}
+
+			this.connect = function () {
+
+				scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove );
+				scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange );
+				scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError );
+
+			};
+
+			this.disconnect = function () {
+
+				scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove );
+				scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange );
+				scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError );
+
+			};
+
+			this.dispose = function () {
+
+				this.disconnect();
+
+			};
+
+			this.getObject = function () {
+
+				// retaining this method for backward compatibility
+				return camera;
+
+			};
+
+			this.getDirection = function () {
+
+				const direction = new THREE.Vector3( 0, 0, - 1 );
+				return function ( v ) {
+
+					return v.copy( direction ).applyQuaternion( camera.quaternion );
+
+				};
+
+			}();
+
+			this.moveForward = function ( distance ) {
+
+				// move forward parallel to the xz-plane
+				// assumes camera.up is y-up
+				_vector.setFromMatrixColumn( camera.matrix, 0 );
+
+				_vector.crossVectors( camera.up, _vector );
+
+				camera.position.addScaledVector( _vector, distance );
+
+			};
+
+			this.moveRight = function ( distance ) {
+
+				_vector.setFromMatrixColumn( camera.matrix, 0 );
+
+				camera.position.addScaledVector( _vector, distance );
+
+			};
+
+			this.lock = function () {
+
+				this.domElement.requestPointerLock();
+
+			};
+
+			this.unlock = function () {
+
+				scope.domElement.ownerDocument.exitPointerLock();
+
+			};
+
+			this.connect();
 
 		}
 
 	}
 
-	function onPointerlockError() {
+	THREE.PointerLockControls = PointerLockControls;
 
-		console.error( 'THREE.PointerLockControls: Unable to use Pointer Lock API' );
-
-	}
-
-	this.connect = function () {
-
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.addEventListener( 'pointerlockerror', onPointerlockError, false );
-
-	};
-
-	this.disconnect = function () {
-
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.removeEventListener( 'pointerlockerror', onPointerlockError, false );
-
-	};
-
-	this.dispose = function () {
-
-		this.disconnect();
-
-	};
-
-	this.getObject = function () {
-
-		return yawObject;
-
-	};
-
-	this.getDirection = function () {
-
-		// assumes the camera itself is not rotated
-
-		var direction = new THREE.Vector3( 0, 0, - 1 );
-		var rotation = new THREE.Euler( 0, 0, 0, 'YXZ' );
-
-		return function ( v ) {
-
-			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
-
-			v.copy( direction ).applyEuler( rotation );
-
-			return v;
-
-		};
-
-	}();
-
-	this.lock = function () {
-
-		this.domElement.requestPointerLock();
-
-	};
-
-	this.unlock = function () {
-
-		document.exitPointerLock();
-
-	};
-
-	this.connect();
-
-};
-
-THREE.PointerLockControls.prototype = Object.create( THREE.EventDispatcher.prototype );
-THREE.PointerLockControls.prototype.constructor = THREE.PointerLockControls;
+} )();

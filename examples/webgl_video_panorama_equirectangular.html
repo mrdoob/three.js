@@ -4,79 +4,75 @@
 		<title>three.js webgl - equirectangular video panorama</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
+				touch-action: none;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a { color: #ffffff; }
 		</style>
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - video panorama
+		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
+			<source src="textures/pano.webm">
+			<source src="textures/pano.mp4">
+		</video>
 
-		<script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-			var camera, scene, renderer;
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
-			var isUserInteracting = false,
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			let camera, scene, renderer;
+
+			let isUserInteracting = false,
 				lon = 0, lat = 0,
 				phi = 0, theta = 0,
-				distance = 50,
 				onPointerDownPointerX = 0,
 				onPointerDownPointerY = 0,
 				onPointerDownLon = 0,
 				onPointerDownLat = 0;
+
+			const distance = 50;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container, mesh;
-
-				container = document.getElementById( 'container' );
+				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
-				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
+				const geometry = new THREE.SphereGeometry( 500, 60, 40 );
 				// invert the geometry on the x-axis so that all of the faces point inward
 				geometry.scale( - 1, 1, 1 );
 
-				var video = document.createElement( 'video' );
-				video.crossOrigin = 'anonymous';
-				video.width = 640;
-				video.height = 360;
-				video.loop = true;
-				video.muted = true;
-				video.src = 'textures/pano.webm';
-				video.setAttribute( 'webkit-playsinline', 'webkit-playsinline' );
+				const video = document.getElementById( 'video' );
 				video.play();
 
-				var texture = new THREE.VideoTexture( video );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const texture = new THREE.VideoTexture( video );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 
-				mesh = new THREE.Mesh( geometry, material );
-
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();
@@ -84,14 +80,13 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+				document.addEventListener( 'pointerdown', onPointerDown );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerup', onPointerUp );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -104,9 +99,7 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
-
-				event.preventDefault();
+			function onPointerDown( event ) {
 
 				isUserInteracting = true;
 
@@ -118,28 +111,20 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
 				if ( isUserInteracting === true ) {
 
 					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
-					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+					lat = ( onPointerDownPointerY - event.clientY ) * 0.1 + onPointerDownLat;
 
 				}
 
 			}
 
-			function onDocumentMouseUp() {
+			function onPointerUp() {
 
 				isUserInteracting = false;
-
-			}
-
-			function onDocumentMouseWheel( event ) {
-
-				distance += event.deltaY * 0.05;
-
-				distance = THREE.Math.clamp( distance, 1, 50 );
 
 			}
 
@@ -153,14 +138,14 @@
 			function update() {
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.Math.degToRad( 90 - lat );
-				theta = THREE.Math.degToRad( lon );
+				phi = THREE.MathUtils.degToRad( 90 - lat );
+				theta = THREE.MathUtils.degToRad( lon );
 
 				camera.position.x = distance * Math.sin( phi ) * Math.cos( theta );
 				camera.position.y = distance * Math.cos( phi );
 				camera.position.z = distance * Math.sin( phi ) * Math.sin( theta );
 
-				camera.lookAt( camera.target );
+				camera.lookAt( 0, 0, 0 );
 
 				renderer.render( scene, camera );
 

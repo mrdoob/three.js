@@ -4,71 +4,54 @@
 		<title>three.js webgl - geometry - minecraft</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				color: #61443e;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
 				background-color: #bfd1e5;
-				margin: 0px;
-				overflow: hidden;
+				color: #61443e;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
-
 				color: #a06851;
 			}
-
-			#webglmessage {
-				background:rgb(100,0,0) !important;
-				color:#fff !important;
-				margin-top:10em !important;
-			}
-			#webglmessage a { color:#fff }
-
 		</style>
 	</head>
 	<body>
 
-		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)</div>
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
-		<script src="../build/three.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/controls/FirstPersonControls.js"></script>
-
-		<script src="js/utils/BufferGeometryUtils.js"></script>
-		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-				document.getElementById( 'container' ).innerHTML = "";
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var container, stats;
+		<script type="module">
 
-			var camera, controls, scene, renderer;
+			import * as THREE from 'three';
 
-			var worldWidth = 128, worldDepth = 128;
-			var worldHalfWidth = worldWidth / 2;
-			var worldHalfDepth = worldDepth / 2;
-			var data = generateHeight( worldWidth, worldDepth );
+			import Stats from './jsm/libs/stats.module.js';
 
-			var clock = new THREE.Clock();
+			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
+			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
+
+			let container, stats;
+
+			let camera, controls, scene, renderer;
+
+			const worldWidth = 128, worldDepth = 128;
+			const worldHalfWidth = worldWidth / 2;
+			const worldHalfDepth = worldDepth / 2;
+			const data = generateHeight( worldWidth, worldDepth );
+
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -80,43 +63,37 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
 
-				controls = new THREE.FirstPersonControls( camera );
-
-				controls.movementSpeed = 1000;
-				controls.lookSpeed = 0.125;
-				controls.lookVertical = true;
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
 				// sides
 
-				var matrix = new THREE.Matrix4();
+				const matrix = new THREE.Matrix4();
 
-				var pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pxGeometry.rotateY( Math.PI / 2 );
 				pxGeometry.translate( 50, 0, 0 );
 
-				var nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const nxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nxGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nxGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nxGeometry.rotateY( - Math.PI / 2 );
 				nxGeometry.translate( - 50, 0, 0 );
 
-				var pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pyGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pyGeometry.attributes.uv.array[ 5 ] = 0.5;
 				pyGeometry.attributes.uv.array[ 7 ] = 0.5;
 				pyGeometry.rotateX( - Math.PI / 2 );
 				pyGeometry.translate( 0, 50, 0 );
 
-				var pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const pzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				pzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				pzGeometry.translate( 0, 0, 50 );
 
-				var nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+				const nzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nzGeometry.attributes.uv.array[ 1 ] = 0.5;
 				nzGeometry.attributes.uv.array[ 3 ] = 0.5;
 				nzGeometry.rotateY( Math.PI );
@@ -124,13 +101,13 @@
 
 				//
 
-				var geometries = [];
+				const geometries = [];
 
-				for ( var z = 0; z < worldDepth; z ++ ) {
+				for ( let z = 0; z < worldDepth; z ++ ) {
 
-					for ( var x = 0; x < worldWidth; x ++ ) {
+					for ( let x = 0; x < worldWidth; x ++ ) {
 
-						var h = getY( x, z );
+						const h = getY( x, z );
 
 						matrix.makeTranslation(
 							x * 100 - worldHalfWidth * 100,
@@ -138,34 +115,34 @@
 							z * 100 - worldHalfDepth * 100
 						);
 
-						var px = getY( x + 1, z );
-						var nx = getY( x - 1, z );
-						var pz = getY( x, z + 1 );
-						var nz = getY( x, z - 1 );
+						const px = getY( x + 1, z );
+						const nx = getY( x - 1, z );
+						const pz = getY( x, z + 1 );
+						const nz = getY( x, z - 1 );
 
-						geometries.push( pyGeometry.clone().applyMatrix( matrix ) );
+						geometries.push( pyGeometry.clone().applyMatrix4( matrix ) );
 
 						if ( ( px !== h && px !== h + 1 ) || x === 0 ) {
 
-							geometries.push( pxGeometry.clone().applyMatrix( matrix ) );
+							geometries.push( pxGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
 						if ( ( nx !== h && nx !== h + 1 ) || x === worldWidth - 1 ) {
 
-							geometries.push( nxGeometry.clone().applyMatrix( matrix ) );
+							geometries.push( nxGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
 						if ( ( pz !== h && pz !== h + 1 ) || z === worldDepth - 1 ) {
 
-							geometries.push( pzGeometry.clone().applyMatrix( matrix ) );
+							geometries.push( pzGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
 						if ( ( nz !== h && nz !== h + 1 ) || z === 0 ) {
 
-							geometries.push( nzGeometry.clone().applyMatrix( matrix ) );
+							geometries.push( nzGeometry.clone().applyMatrix4( matrix ) );
 
 						}
 
@@ -173,36 +150,39 @@
 
 				}
 
-				var geometry = THREE.BufferGeometryUtils.mergeBufferGeometries( geometries );
+				const geometry = BufferGeometryUtils.mergeBufferGeometries( geometries );
 				geometry.computeBoundingSphere();
 
-				var texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
+				const texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
 				texture.magFilter = THREE.NearestFilter;
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
+				const mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
 				scene.add( mesh );
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc );
 				scene.add( ambientLight );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.innerHTML = "";
-
 				container.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+
+				controls.movementSpeed = 1000;
+				controls.lookSpeed = 0.125;
+				controls.lookVertical = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -219,16 +199,18 @@
 
 			function generateHeight( width, height ) {
 
-				var data = [], perlin = new ImprovedNoise(),
-					size = width * height, quality = 2, z = Math.random() * 100;
+				const data = [], perlin = new ImprovedNoise(),
+					size = width * height, z = Math.random() * 100;
 
-				for ( var j = 0; j < 4; j ++ ) {
+				let quality = 2;
 
-					if ( j === 0 ) for ( var i = 0; i < size; i ++ ) data[ i ] = 0;
+				for ( let j = 0; j < 4; j ++ ) {
 
-					for ( var i = 0; i < size; i ++ ) {
+					if ( j === 0 ) for ( let i = 0; i < size; i ++ ) data[ i ] = 0;
 
-						var x = i % width, y = ( i / width ) | 0;
+					for ( let i = 0; i < size; i ++ ) {
+
+						const x = i % width, y = ( i / width ) | 0;
 						data[ i ] += perlin.noise( x / quality, y / quality, z ) * quality;
 
 
@@ -244,7 +226,7 @@
 
 			function getY( x, z ) {
 
-				return ( data[ x + z * worldWidth ] * 0.2 ) | 0;
+				return ( data[ x + z * worldWidth ] * 0.15 ) | 0;
 
 			}
 

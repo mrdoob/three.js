@@ -4,12 +4,16 @@
 		<title>three.js webgl - box selection</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #000;
+				touch-action: none;
+			}
+
+			a {
+				color: #08e;
 			}
 
 			.selectBox {
@@ -21,16 +25,33 @@
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection
+		</div>
 
-		<script src="js/interactive/SelectionBox.js"></script>
-		<script src="js/interactive/SelectionHelper.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
-			var container, stats;
-			var camera, scene, renderer;
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { SelectionBox } from './jsm/interactive/SelectionBox.js';
+			import { SelectionHelper } from './jsm/interactive/SelectionHelper.js';
+
+			let container, stats;
+			let camera, scene, renderer;
 
 			init();
 			animate();
@@ -48,7 +69,7 @@
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
-				var light = new THREE.SpotLight( 0xffffff, 1.5 );
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
 				light.position.set( 0, 500, 2000 );
 				light.angle = Math.PI / 9;
 
@@ -60,11 +81,11 @@
 
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
-				for ( var i = 0; i < 200; i ++ ) {
+				for ( let i = 0; i < 200; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 1600 - 800;
 					object.position.y = Math.random() * 900 - 450;
@@ -94,18 +115,10 @@
 
 				container.appendChild( renderer.domElement );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - box selection';
-				container.appendChild( info );
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -135,14 +148,14 @@
 
 			}
 
-			var selectionBox = new THREE.SelectionBox( camera, scene );
-			var helper = new THREE.SelectionHelper( selectionBox, renderer, 'selectBox' );
+			const selectionBox = new SelectionBox( camera, scene );
+			const helper = new SelectionHelper( selectionBox, renderer, 'selectBox' );
 
-			document.addEventListener( 'mousedown', function ( event ) {
+			document.addEventListener( 'pointerdown', function ( event ) {
 
-				for ( var item of selectionBox.collection ) {
+				for ( const item of selectionBox.collection ) {
 
-					item.material.emissive = new THREE.Color( 0x000000 );
+					item.material.emissive.set( 0x000000 );
 
 				}
 
@@ -153,13 +166,13 @@
 
 			} );
 
-			document.addEventListener( 'mousemove', function ( event ) {
+			document.addEventListener( 'pointermove', function ( event ) {
 
 				if ( helper.isDown ) {
 
-					for ( var i = 0; i < selectionBox.collection.length; i ++ ) {
+					for ( let i = 0; i < selectionBox.collection.length; i ++ ) {
 
-						selectionBox.collection[ i ].material.emissive = new THREE.Color( 0x000000 );
+						selectionBox.collection[ i ].material.emissive.set( 0x000000 );
 
 					}
 
@@ -168,11 +181,11 @@
 						- ( event.clientY / window.innerHeight ) * 2 + 1,
 						0.5 );
 
-					var allSelected = selectionBox.select();
+					const allSelected = selectionBox.select();
 
-					for ( var i = 0; i < allSelected.length; i ++ ) {
+					for ( let i = 0; i < allSelected.length; i ++ ) {
 
-						allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+						allSelected[ i ].material.emissive.set( 0xffffff );
 
 					}
 
@@ -180,18 +193,18 @@
 
 			} );
 
-			document.addEventListener( 'mouseup', function ( event ) {
+			document.addEventListener( 'pointerup', function ( event ) {
 
 				selectionBox.endPoint.set(
 					( event.clientX / window.innerWidth ) * 2 - 1,
 					- ( event.clientY / window.innerHeight ) * 2 + 1,
 					0.5 );
 
-				var allSelected = selectionBox.select();
+				const allSelected = selectionBox.select();
 
-				for ( var i = 0; i < allSelected.length; i ++ ) {
+				for ( let i = 0; i < allSelected.length; i ++ ) {
 
-					allSelected[ i ].material.emissive = new THREE.Color( 0x0000ff );
+					allSelected[ i ].material.emissive.set( 0xffffff );
 
 				}
 

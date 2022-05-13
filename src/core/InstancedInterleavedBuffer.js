@@ -1,26 +1,18 @@
 import { InterleavedBuffer } from './InterleavedBuffer.js';
 
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- */
+class InstancedInterleavedBuffer extends InterleavedBuffer {
 
-function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
+	constructor( array, stride, meshPerAttribute = 1 ) {
 
-	InterleavedBuffer.call( this, array, stride );
+		super( array, stride );
 
-	this.meshPerAttribute = meshPerAttribute || 1;
+		this.meshPerAttribute = meshPerAttribute;
 
-}
+	}
 
-InstancedInterleavedBuffer.prototype = Object.assign( Object.create( InterleavedBuffer.prototype ), {
+	copy( source ) {
 
-	constructor: InstancedInterleavedBuffer,
-
-	isInstancedInterleavedBuffer: true,
-
-	copy: function ( source ) {
-
-		InterleavedBuffer.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.meshPerAttribute = source.meshPerAttribute;
 
@@ -28,6 +20,29 @@ InstancedInterleavedBuffer.prototype = Object.assign( Object.create( Interleaved
 
 	}
 
-} );
+	clone( data ) {
+
+		const ib = super.clone( data );
+
+		ib.meshPerAttribute = this.meshPerAttribute;
+
+		return ib;
+
+	}
+
+	toJSON( data ) {
+
+		const json = super.toJSON( data );
+
+		json.isInstancedInterleavedBuffer = true;
+		json.meshPerAttribute = this.meshPerAttribute;
+
+		return json;
+
+	}
+
+}
+
+InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
 
 export { InstancedInterleavedBuffer };

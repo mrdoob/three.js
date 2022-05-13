@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,13 +21,13 @@
 
 		<h2>Why are there meta viewport tags in examples?</h2>
 		<div>
-			<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">meta</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>viewport<span class="pl-pds">"</span></span> <span class="pl-e">content</span>=<span class="pl-s"><span class="pl-pds">"</span>width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0<span class="pl-pds">"</span></span>&gt;</pre></div>
+				<code>&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</code>
 
 				<p>These tags control viewport size and scale for mobile browsers (where page content may be rendered at different size than visible viewport).</p>
 
 				<p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
 
-				<p>[link:https://developer.mozilla.org/en/Mobile/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
+				<p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
 		</div>
 
 		<h2>How can scene scale be preserved on resize?</h2>
@@ -49,7 +48,7 @@ visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_f
 
 		<h2>Why is part of my object invisible?</h2>
 		<p>
-			This could be because of face culling. Faces have an orientation that  decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
+			This could be because of face culling. Faces have an orientation that decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
 			<code>material.side = THREE.DoubleSide</code>
 		</p>
 	</body>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">用于加载 <em>.pcd</em> 资源的加载器。<br />
+		点云数据是 <a href="https://en.wikipedia.org/wiki/Point_Cloud_Library">点云库</a> 的文件格式。 <br />
+		加载器支持 ascii 和 (压缩) 二进制编码。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+
+		// instantiate a loader
+		const loader = new PCDLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'pointcloud.pcd',
+			// called when the resource is loaded
+			function ( mesh ) {
+
+				scene.add( mesh );
+
+			},
+			// called when loading is in progresses
+			function ( xhr ) {
+
+				console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+			},
+			// called when loading has errors
+			function ( error ) {
+
+				console.log( 'An error happened' );
+
+			}
+		);
+		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_loader_pcd]
+		</p>
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器使用的 [page:LoadingManager loadingManager] (加载管理器)，默认值是 [page:LoadingManager THREE.DefaultLoadingManager]。
+		</p>
+		<p>
+		创建一个新的 [name]。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类 [page:Loader]。</p>
+
+		<h3>[page:Boolean littleEndian]</h3>
+		<p>
+        在加载器内部调用 DataView.prototype.getFloat32() 时，表示这个32位浮点数是否以 小字节序(little-endian) 格式存储，默认值为 true。
+		</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参考其基类 [page:Loader]。</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 一个包含有 <em>.pcd</em> 文件的路径或URL的字符串。<br />
+		[page:Function onLoad] — (可选参数) 当加载过程成功完成后将被调用的函数。 其参数是一个 [page:Object3D] 实例。<br />
+		[page:Function onProgress] — (可选参数) 加载正在进行过程中会被调用的函数。 其参数是一个 XMLHttpRequest 实例，包含有总字节数 [page:Integer total] 和已加载的字节数 [page:Integer loaded]。<br />
+		[page:Function onError] — (可选参数) 若在加载过程中发生错误，将被调用的函数。 其参数是一个 error 实例。<br />
+		</p>
+		<p>
+		开始从路径或url加载，并使用解析过的响应内容调用回调函数。
+		</p>
+
+		<h3>[method:Object3D parse]( [param:Arraybuffer data],[param:String url] )</h3>
+		<p>
+		[page:Arraybuffer data] — 要分析的二进制数据结构
+		</p>
+		<p>
+		[page:String url] — 文件名或文件url。
+		</p>
+		<p>
+		分析 <em>pcd</em> 二进制结构并返回一个 [page:Object3D] 实例。<br />
+		该 Object3D 实例实际类型为 [page:Points]，由一个 [page:BufferGeometry] 实例和一个 [page:PointsMaterial] 实例作为参数构造而成。
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/PCDLoader.js examples/jsm/loaders/PCDLoader.js]
+		</p>
+	</body>
+</html>

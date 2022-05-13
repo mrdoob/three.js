@@ -1,14 +1,10 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import { BoxHelper } from '../../../../src/helpers/BoxHelper';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
-import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
-import { Mesh } from '../../../../src/objects/Mesh';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { BoxHelper } from '../../../../src/helpers/BoxHelper.js';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
+import { SphereGeometry } from '../../../../src/geometries/SphereGeometry.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
 
 export default QUnit.module( 'Helpers', () => {
 
@@ -17,23 +13,13 @@ export default QUnit.module( 'Helpers', () => {
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
-			const parameters = {
-				radius: 10,
-				widthSegments: 20,
-				heightSegments: 30,
-				phiStart: 0.5,
-				phiLength: 1.0,
-				thetaStart: 0.4,
-				thetaLength: 2.0,
-			};
-
 			// Test with a normal cube and a box helper
-			var boxGeometry = new BoxGeometry( parameters.diameter );
+			var boxGeometry = new BoxGeometry();
 			var box = new Mesh( boxGeometry );
 			var boxHelper = new BoxHelper( box );
 
 			// The same should happen with a comparable sphere
-			var sphereGeometry = new SphereGeometry( parameters.diameter / 2 );
+			var sphereGeometry = new SphereGeometry();
 			var sphere = new Mesh( sphereGeometry );
 			var sphereBoxHelper = new BoxHelper( sphere );
 
@@ -43,29 +29,29 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "update", ( assert ) => {
+		QUnit.todo( 'update', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "setFromObject", ( assert ) => {
+		QUnit.todo( 'setFromObject', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

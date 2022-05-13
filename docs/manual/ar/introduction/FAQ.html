@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>الأسئلة الشائعة ([name])</h1>
+
+		<h2>ما هو أفضل تنسيق النموذج ثلاثي الأبعاد الذي تدعمه المكتبة؟</h2>
+		<div>
+			<p>
+				التنسيق الموصى به لاستيراد المجسمات وتصديرها هو glTF (GL Transmission Format). نظرًا لأن glTF يركز على تسليم أصول وقت التشغيل ، فهو مضغوط للإرسال وسريع التحميل.
+			</p>
+			<p>
+				توفر three.js أدوات تحميل للعديد من التنسيقات الشائعة الأخرى مثل FBX أو Collada أو OBJ أيضًا. ومع ذلك ، يجب أن تحاول دائمًا إنشاء سير عمل قائم على glTF في مشاريعك. لمزيد من المعلومات ، انظر [link:#manual/introduction/Loading-3D-models loading 3D models].
+			</p>
+		</div>
+
+		<h2>لماذا توجد علامات meta viewport في الأمثلة؟</h2>
+		<div>
+				<code>&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</code>
+
+				<p>تتحكم هذه العلامات في حجم منفذ العرض ومقياسه لمتصفحات الجوال (حيث يمكن عرض محتوى الصفحة بحجم مختلف عن إطار العرض المرئي).</p>
+
+				<p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
+
+				<p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
+		</div>
+
+		<h2>كيف يمكن الحفاظ على مقياس المشهد عند تغيير الحجم؟</h2>
+		<p>
+			نريد أن تظهر جميع النماذج ، بغض النظر عن بعدها عن الكاميرا ، بالحجم نفسه ، حتى عندما يتم تغيير حجم النافذة.
+
+			المعادلة الأساسية لحل هذه المعادلة هي معادلة الارتفاع المرئي على مسافة معينة:
+
+			<code>
+visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+			</code>
+			إذا قمنا بزيادة ارتفاع النافذة بنسبة معينة ، فإن ما نريده هو زيادة الارتفاع المرئي في جميع المسافات بنفس النسبة المئوية.
+
+			لا يمكن القيام بذلك عن طريق تغيير موضع الكاميرا. بل ما يجب أن تفعله هو تغيير مجال رؤية الكاميرا.
+			[link:http://jsfiddle.net/Q4Jpu/ Example].
+		</p>
+
+		<h2>لماذا جزء من نموذجي غير مرئي؟</h2>
+		<p>
+			يمكن أن يكون هدا بسبب إعدام الوجه, فالأوجه التي تبني النموذج لها إتجاه معين من خلاله يتم تقرير ما يتم إضهار. و هده الظاهرة تقوم بإلغاء الوجه الخلفي في الحالات العادية.
+			لمعرفة ما إذا كانت هذه هي مشكلتك ، قم بتغيير جانب المادة إلى THREE.DoubleSide.
+
+			<code>material.side = THREE.DoubleSide</code>
+		</p>
+	</body>
+</html>

@@ -1,29 +1,22 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 import { Texture } from './Texture.js';
 import { NearestFilter } from '../constants.js';
 
-function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+class DataTexture extends Texture {
 
-	Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+	constructor( data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, encoding ) {
 
-	this.image = { data: data, width: width, height: height };
+		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
-	this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
-	this.minFilter = minFilter !== undefined ? minFilter : NearestFilter;
+		this.image = { data: data, width: width, height: height };
 
-	this.generateMipmaps = false;
-	this.flipY = false;
-	this.unpackAlignment = 1;
+		this.generateMipmaps = false;
+		this.flipY = false;
+		this.unpackAlignment = 1;
+
+	}
 
 }
 
-DataTexture.prototype = Object.create( Texture.prototype );
-DataTexture.prototype.constructor = DataTexture;
-
 DataTexture.prototype.isDataTexture = true;
-
 
 export { DataTexture };

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -43,22 +42,29 @@
 
 		</div>
 
+		
+		<h2>2. Use [page:CSS2DRenderer] or [page:CSS3DRenderer]</h2>
+		<div>
+			<p>
+				Use these renderers to draw high-quality text contained in DOM elements to your three.js scene.
+				This is similar to 1. except that with these renderers elements can be integrated more tightly and dynamically into the scene.
+			</p>
+		</div>
+		
 
-
-		<h2>2. Draw text to canvas and use as a [page:Texture]</h2>
+		<h2>3. Draw text to canvas and use as a [page:Texture]</h2>
 		<div>
 			<p>Use this method if you wish to draw text easily on a plane in your three.js scene.</p>
 		</div>
 
 
-		<h2>3. Create a model in your favourite 3D application and export to three.js</h2>
+		<h2>4. Create a model in your favourite 3D application and export to three.js</h2>
 		<div>
-			<p>Use this method if you prefer working with your 3d applications and importing the models to three.js</p>
+			<p>Use this method if you prefer working with your 3d applications and importing the models to three.js.</p>
 		</div>
 
 
-
-		<h2>4. Procedural Text Geometry</h2>
+		<h2>5. Procedural Text Geometry</h2>
 		<div>
 			<p>
 				If you prefer to work purely in THREE.js or to create procedural and dynamic 3D
@@ -76,26 +82,28 @@
 			</p>
 
 			<h3>Examples</h3>
-			[example:webgl_geometry_text WebGL / geometry / text]<br />
-			[example:webgl_shadowmap WebGL / shadowmap]
+
+			<p>
+				[example:webgl_geometry_text WebGL / geometry / text]<br />
+				[example:webgl_shadowmap WebGL / shadowmap]
+			</p>
 
 			<p>
 				If Typeface is down, or you want to use a font that is not there, there's a tutorial
 				with a python script for blender that allows you to export text to Three.js's JSON format:
 				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
-				</p>
+			</p>
 
 		</div>
 
 
-
-		<h2>5. Bitmap Fonts</h2>
+		<h2>6. Bitmap Fonts</h2>
 		<div>
 			<p>
 				BMFonts (bitmap fonts) allow batching glyphs into a single BufferGeometry. BMFont rendering
 				supports word-wrapping, letter spacing, kerning, signed distance fields with standard
 				derivatives, multi-channel signed distance fields, multi-texture fonts, and more.
-				See [link:https://github.com/Jam3/three-bmfont-text three-bmfont-text].
+				See [link:https://github.com/felixmariotto/three-mesh-ui three-mesh-ui] or [link:https://github.com/Jam3/three-bmfont-text three-bmfont-text].
 			</p>
 			<p>
 				Stock fonts are available in projects like
@@ -112,6 +120,22 @@
 			</ul>
 		</div>
 
+
+		<h2>7. Troika Text</h2>
+		<div>
+			<p>
+				The [link:https://www.npmjs.com/package/troika-three-text troika-three-text] package renders 
+				quality antialiased text using a similar technique as BMFonts, but works directly with any .TTF 
+				or .WOFF font file so you don't have to pregenerate a glyph texture offline. It also adds 
+				capabilities including:
+			</p>
+			<ul>
+				<li>Effects like strokes, drop shadows, and curvature</li>
+				<li>The ability to apply any three.js Material, even a custom ShaderMaterial</li>
+				<li>Support for font ligatures, scripts with joined letters, and right-to-left/bidirectional layout</li>
+				<li>Optimization for large amounts of dynamic text, performing most work off the main thread in a web worker</li>
+			</ul>
+		</div>
 
 
 	</body>

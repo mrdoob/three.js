@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { WebGLLights } from '../../../../../src/renderers/webgl/WebGLLights';
+// import { WebGLLights } from '../../../../../src/renderers/webgl/WebGLLights.js';
 
 export default QUnit.module( 'Renderers', () => {
 
@@ -12,22 +9,22 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'WebGLLights', () => {
 
 			// INSTANCING
-			QUnit.todo( "Instancing", ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.todo( "setup", ( assert ) => {
+			QUnit.todo( 'setup', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( "state", ( assert ) => {
+			QUnit.todo( 'state', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>如何使用后期处理（How to use post-processing）</h1>
+
+		<p>
+			很多three.js应用程序是直接将三维物体渲染到屏幕上的。
+			有时，你或许希望应用一个或多个图形效果，例如景深、发光、胶片微粒或是各种类型的抗锯齿。
+			后期处理是一种被广泛使用、用于来实现这些效果的方式。
+			首先，场景被渲染到一个渲染目标上，渲染目标表示的是一块在显存中的缓冲区。
+			接下来，在图像最终被渲染到屏幕之前，一个或多个后期处理过程将滤镜和效果应用到图像缓冲区。
+		</p>
+		<p>
+			three.js通过[page:EffectComposer]（效果合成器），提供了一个完整的后期处理解决方案来实现这样的工作流程。
+		</p>
+
+		<h2>工作流程</h2>
+
+		<p>
+			首先，我们要做的是从示例（examples）文件夹导入所有必需的文件。本指南假设你正在使用three.js官方npm包（[link:https://www.npmjs.com/package/three npm package]）。
+			在本指南的基础示例中，我们需要下列文件。
+		</p>
+
+		<code>
+		import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+		import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+		</code>
+
+		<p>
+			当这些文件被成功导入后，我们便可以通过传入一个[page:WebGLRenderer]的实例，来创建我们的合成器了。
+		</p>
+
+		<code>
+		const composer = new EffectComposer( renderer );
+		</code>
+
+		<p>
+			在使用合成器时，我们需要对应用程序的动画循环进行更改。
+			现在我们不再调用[page:WebGLRenderer]的render方法，而是使用[page:EffectComposer]中对应的render方法。
+		</p>
+
+		<code>
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			composer.render();
+
+		}
+		</code>
+
+		<p>
+			我们的合成器已经准备好了，现在我们就可以来配置后期处理过程链了。
+			这些过程负责创建应用程序的最终视觉输出，它们按照添加/插入的顺序来进行处理。
+			在我们的示例中，首先执行的是*RenderPass*实例，然后是*GlitchPass*。在链中的最后一个过程将自动被渲染到屏幕上。
+			这些过程的设置类似这样：
+		</p>
+
+		<code>
+		const renderPass = new RenderPass( scene, camera );
+		composer.addPass( renderPass );
+
+		const glitchPass = new GlitchPass();
+		composer.addPass( glitchPass );
+		</code>
+
+		<p>
+			*RenderPass*通常位于过程链的开始，以便将渲染好的场景作为输入来提供给下一个后期处理步骤。
+			在我们的示例中，*GlitchPass*将会使用这些图像数据，来应用一个疯狂的故障效果。参见这个示例：
+			[link:https://threejs.org/examples/webgl_postprocessing_glitch live example]来看一看它的实际效果。
+		</p>
+
+		<h2>内置过程</h2>
+
+		<p>
+			你可以使用由本引擎提供的各种预定义好的后期处理过程，
+			它们位于[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing]目录中。
+		</p>
+
+		<h2>自定义过程</h2>
+
+		<p>
+			有时你或许想要自己写一个自定义后期处理着色器，并将其包含到后期处理过程链中。
+			对于这个需求，你可以使用*ShaderPass*。在引入该文件以及你的自定义着色器后，可以使用下列代码来设置该过程：
+		</p>
+
+		<code>
+		import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+		import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
+
+		// later in your init routine
+
+		const luminosityPass = new ShaderPass( LuminosityShader );
+		composer.addPass( luminosityPass );
+		</code>
+
+		<p>
+			本仓库中提供了一个名为[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/CopyShader.js CopyShader]的文件，
+			这是你自定义自己的着色器的一个很好的起始代码。*CopyShader*仅仅是拷贝了读缓冲区中的图像内容到写缓冲区，不会应用任何效果。
+		</p>
+
+	</body>
+</html>

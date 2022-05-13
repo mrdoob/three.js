@@ -4,51 +4,42 @@
 	<title>three.js webgl - loaders - Draco loader</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-		body {
-			font-family: Monospace;
-			background-color: #000;
-			color: #fff;
-			margin: 0px;
-			overflow: hidden;
-		}
-		#info {
-			color: #fff;
-			position: absolute;
-			top: 10px;
-			width: 100%;
-			text-align: center;
-			z-index: 100;
-			display: block;
-		}
-		#info a,
-		.button {
-			color: #f00;
-			font-weight: bold;
-			text-decoration: underline;
-			cursor: pointer
-		}
-	</style>
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
 <body>
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		<a href="https://github.com/google/draco" target="_blank" rel="noopener">DRACO</a> loader
 	</div>
-	<script src="../build/three.js"></script>
-	<script src="js/loaders/DRACOLoader.js"></script>
-	<script>
 
-		var camera, scene, renderer;
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		var container = document.querySelector( '#container' );
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
+		}
+	</script>
+
+	<script type="module">
+		import * as THREE from 'three';
+
+		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+
+		let camera, scene, renderer;
+
+		const container = document.querySelector( '#container' );
 
 		// Configure and create Draco decoder.
-		THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/' );
-		THREE.DRACOLoader.setDecoderConfig( { type: 'js' } );
-		var dracoLoader = new THREE.DRACOLoader();
+		const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath( 'js/libs/draco/' );
+		dracoLoader.setDecoderConfig( { type: 'js' } );
+
 		init();
 		animate();
 
@@ -62,8 +53,8 @@
 			scene.fog = new THREE.Fog( 0x443333, 1, 4 );
 
 			// Ground
-			var plane = new THREE.Mesh(
-				new THREE.PlaneBufferGeometry( 8, 8 ),
+			const plane = new THREE.Mesh(
+				new THREE.PlaneGeometry( 8, 8 ),
 				new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 			);
 			plane.rotation.x = - Math.PI / 2;
@@ -72,28 +63,28 @@
 			scene.add( plane );
 
 			// Lights
-			var light = new THREE.HemisphereLight( 0x443333, 0x111122 );
-			scene.add( light );
+			const hemiLight = new THREE.HemisphereLight( 0x443333, 0x111122 );
+			scene.add( hemiLight );
 
-			var light = new THREE.SpotLight();
-			light.angle = Math.PI / 16;
-			light.penumbra = 0.5;
-			light.castShadow = true;
-			light.position.set( - 1, 1, 1 );
-			scene.add( light );
+			const spotLight = new THREE.SpotLight();
+			spotLight.angle = Math.PI / 16;
+			spotLight.penumbra = 0.5;
+			spotLight.castShadow = true;
+			spotLight.position.set( - 1, 1, 1 );
+			scene.add( spotLight );
 
 			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
 
 				geometry.computeVertexNormals();
 
-				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
-				var mesh = new THREE.Mesh( geometry, material );
+				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				const mesh = new THREE.Mesh( geometry, material );
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
 				// Release decoder resources.
-				THREE.DRACOLoader.releaseDecoderModule();
+				dracoLoader.dispose();
 
 			} );
 
@@ -101,12 +92,11 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.gammaInput = true;
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
@@ -128,7 +118,7 @@
 
 		function render() {
 
-			var timer = Date.now() * 0.0003;
+			const timer = Date.now() * 0.0003;
 
 			camera.position.x = Math.sin( timer ) * 0.5;
 			camera.position.z = Math.cos( timer ) * 0.5;

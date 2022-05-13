@@ -1,9 +1,7 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
-History = function ( editor ) {
+import * as Commands from './commands/Commands.js';
+
+function History( editor ) {
 
 	this.editor = editor;
 	this.undos = [];
@@ -14,13 +12,9 @@ History = function ( editor ) {
 	this.historyDisabled = false;
 	this.config = editor.config;
 
-	//Set editor-reference in Command
-
-	Command( editor );
-
 	// signals
 
-	var scope = this;
+	const scope = this;
 
 	this.editor.signals.startPlayer.add( function () {
 
@@ -34,16 +28,16 @@ History = function ( editor ) {
 
 	} );
 
-};
+}
 
 History.prototype = {
 
 	execute: function ( cmd, optionalName ) {
 
-		var lastCmd = this.undos[ this.undos.length - 1 ];
-		var timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
+		const lastCmd = this.undos[ this.undos.length - 1 ];
+		const timeDifference = new Date().getTime() - this.lastCmdTime.getTime();
 
-		var isUpdatableCmd = lastCmd &&
+		const isUpdatableCmd = lastCmd &&
 			lastCmd.updatable &&
 			cmd.updatable &&
 			lastCmd.object === cmd.object &&
@@ -51,7 +45,7 @@ History.prototype = {
 			lastCmd.script === cmd.script &&
 			lastCmd.attributeName === cmd.attributeName;
 
-		if ( isUpdatableCmd && cmd.type === "SetScriptValueCommand" ) {
+		if ( isUpdatableCmd && cmd.type === 'SetScriptValueCommand' ) {
 
 			// When the cmd.type is "SetScriptValueCommand" the timeDifference is ignored
 
@@ -71,6 +65,7 @@ History.prototype = {
 			cmd.id = ++ this.idCounter;
 
 		}
+
 		cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
 		cmd.execute();
 		cmd.inMemory = true;
@@ -80,6 +75,7 @@ History.prototype = {
 			cmd.json = cmd.toJSON();	// serialize the cmd immediately after execution and append the json to the cmd
 
 		}
+
 		this.lastCmdTime = new Date();
 
 		// clearing all the redo-commands
@@ -93,12 +89,12 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert( "Undo/Redo disabled while scene is playing." );
+			alert( 'Undo/Redo disabled while scene is playing.' );
 			return;
 
 		}
 
-		var cmd = undefined;
+		let cmd = undefined;
 
 		if ( this.undos.length > 0 ) {
 
@@ -128,12 +124,12 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert( "Undo/Redo disabled while scene is playing." );
+			alert( 'Undo/Redo disabled while scene is playing.' );
 			return;
 
 		}
 
-		var cmd = undefined;
+		let cmd = undefined;
 
 		if ( this.redos.length > 0 ) {
 
@@ -161,7 +157,7 @@ History.prototype = {
 
 	toJSON: function () {
 
-		var history = {};
+		const history = {};
 		history.undos = [];
 		history.redos = [];
 
@@ -173,9 +169,9 @@ History.prototype = {
 
 		// Append Undos to History
 
-		for ( var i = 0 ; i < this.undos.length; i ++ ) {
+		for ( let i = 0; i < this.undos.length; i ++ ) {
 
-			if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
+			if ( this.undos[ i ].hasOwnProperty( 'json' ) ) {
 
 				history.undos.push( this.undos[ i ].json );
 
@@ -185,9 +181,9 @@ History.prototype = {
 
 		// Append Redos to History
 
-		for ( var i = 0 ; i < this.redos.length; i ++ ) {
+		for ( let i = 0; i < this.redos.length; i ++ ) {
 
-			if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
+			if ( this.redos[ i ].hasOwnProperty( 'json' ) ) {
 
 				history.redos.push( this.redos[ i ].json );
 
@@ -203,10 +199,10 @@ History.prototype = {
 
 		if ( json === undefined ) return;
 
-		for ( var i = 0; i < json.undos.length; i ++ ) {
+		for ( let i = 0; i < json.undos.length; i ++ ) {
 
-			var cmdJSON = json.undos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			const cmdJSON = json.undos[ i ];
+			const cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -215,10 +211,10 @@ History.prototype = {
 
 		}
 
-		for ( var i = 0; i < json.redos.length; i ++ ) {
+		for ( let i = 0; i < json.redos.length; i ++ ) {
 
-			var cmdJSON = json.redos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			const cmdJSON = json.redos[ i ];
+			const cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -246,7 +242,7 @@ History.prototype = {
 
 		if ( this.historyDisabled ) {
 
-			alert( "Undo/Redo disabled while scene is playing." );
+			alert( 'Undo/Redo disabled while scene is playing.' );
 			return;
 
 		}
@@ -254,7 +250,7 @@ History.prototype = {
 		this.editor.signals.sceneGraphChanged.active = false;
 		this.editor.signals.historyChanged.active = false;
 
-		var cmd = this.undos.length > 0 ? this.undos[ this.undos.length - 1 ] : undefined;	// next cmd to pop
+		let cmd = this.undos.length > 0 ? this.undos[ this.undos.length - 1 ] : undefined;	// next cmd to pop
 
 		if ( cmd === undefined || id > cmd.id ) {
 
@@ -301,14 +297,15 @@ History.prototype = {
 		this.editor.signals.sceneGraphChanged.active = false;
 		this.editor.signals.historyChanged.active = false;
 
-		var cmd = this.redo();
+		let cmd = this.redo();
 		while ( cmd !== undefined ) {
 
-			if ( ! cmd.hasOwnProperty( "json" ) ) {
+			if ( ! cmd.hasOwnProperty( 'json' ) ) {
 
 				cmd.json = cmd.toJSON();
 
 			}
+
 			cmd = this.redo();
 
 		}
@@ -321,3 +318,5 @@ History.prototype = {
 	}
 
 };
+
+export { History };

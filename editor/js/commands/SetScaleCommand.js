@@ -1,67 +1,65 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+import { Command } from '../Command.js';
+import { Vector3 } from 'three';
 
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newScale THREE.Vector3
  * @param optionalOldScale THREE.Vector3
  * @constructor
  */
+class SetScaleCommand extends Command {
 
-var SetScaleCommand = function ( object, newScale, optionalOldScale ) {
+	constructor( editor, object, newScale, optionalOldScale ) {
 
-	Command.call( this );
+		super( editor );
 
-	this.type = 'SetScaleCommand';
-	this.name = 'Set Scale';
-	this.updatable = true;
+		this.type = 'SetScaleCommand';
+		this.name = 'Set Scale';
+		this.updatable = true;
 
-	this.object = object;
+		this.object = object;
 
-	if ( object !== undefined && newScale !== undefined ) {
+		if ( object !== undefined && newScale !== undefined ) {
 
-		this.oldScale = object.scale.clone();
-		this.newScale = newScale.clone();
+			this.oldScale = object.scale.clone();
+			this.newScale = newScale.clone();
+
+		}
+
+		if ( optionalOldScale !== undefined ) {
+
+			this.oldScale = optionalOldScale.clone();
+
+		}
 
 	}
 
-	if ( optionalOldScale !== undefined ) {
-
-		this.oldScale = optionalOldScale.clone();
-
-	}
-
-};
-
-SetScaleCommand.prototype = {
-
-	execute: function () {
+	execute() {
 
 		this.object.scale.copy( this.newScale );
 		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.object.scale.copy( this.oldScale );
 		this.object.updateMatrixWorld( true );
 		this.editor.signals.objectChanged.dispatch( this.object );
 
-	},
+	}
 
-	update: function ( command ) {
+	update( command ) {
 
 		this.newScale.copy( command.newScale );
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.oldScale = this.oldScale.toArray();
@@ -69,16 +67,18 @@ SetScaleCommand.prototype = {
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldScale = new THREE.Vector3().fromArray( json.oldScale );
-		this.newScale = new THREE.Vector3().fromArray( json.newScale );
+		this.oldScale = new Vector3().fromArray( json.oldScale );
+		this.newScale = new Vector3().fromArray( json.newScale );
 
 	}
 
-};
+}
+
+export { SetScaleCommand };

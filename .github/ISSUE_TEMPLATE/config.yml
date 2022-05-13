@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Help and Support
+    url: https://discourse.threejs.org/
+    about: Please use the forum if you have questions or need help.

@@ -1,16 +1,12 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Vector3 } from '../../../../src/math/Vector3';
-import { Euler } from '../../../../src/math/Euler';
-import { Quaternion } from '../../../../src/math/Quaternion';
-import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { _Math } from '../../../../src/math/Math';
-import { eps } from './Constants.tests';
+import { Matrix3 } from '../../../../src/math/Matrix3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Euler } from '../../../../src/math/Euler.js';
+import { Quaternion } from '../../../../src/math/Quaternion.js';
+import * as MathUtils from '../../../../src/math/MathUtils.js';
+import { eps } from './Constants.tests.js';
 
 
 function matrixEquals4( a, b, tolerance ) {
@@ -51,10 +47,10 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'Matrix4', () => {
 
 		// INSTANCING
-		QUnit.test( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
 			var a = new Matrix4();
-			assert.ok( a.determinant() == 1, "Passed!" );
+			assert.ok( a.determinant() == 1, 'Passed!' );
 
 			var b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -74,21 +70,25 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.elements[ 14 ] == 11 );
 			assert.ok( b.elements[ 15 ] == 15 );
 
-			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
+			assert.ok( ! matrixEquals4( a, b ), 'Passed!' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isMatrix4", ( assert ) => {
+		QUnit.test( 'isMatrix4', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			assert.ok( a.isMatrix4 === true, 'Passed!' );
+
+			var b = new Vector3();
+			assert.ok( ! b.isMatrix4, 'Passed!' );
 
 		} );
 
-		QUnit.test( "set", ( assert ) => {
+		QUnit.test( 'set', ( assert ) => {
 
 			var b = new Matrix4();
-			assert.ok( b.determinant() == 1, "Passed!" );
+			assert.ok( b.determinant() == 1, 'Passed!' );
 
 			b.set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -110,7 +110,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "identity", ( assert ) => {
+		QUnit.test( 'identity', ( assert ) => {
 
 			var b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -131,57 +131,76 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.elements[ 15 ] == 15 );
 
 			var a = new Matrix4();
-			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
+			assert.ok( ! matrixEquals4( a, b ), 'Passed!' );
 
 			b.identity();
-			assert.ok( matrixEquals4( a, b ), "Passed!" );
+			assert.ok( matrixEquals4( a, b ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
+		QUnit.test( 'clone', ( assert ) => {
 
 			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			var b = a.clone();
 
-			assert.ok( matrixEquals4( a, b ), "Passed!" );
+			assert.ok( matrixEquals4( a, b ), 'Passed!' );
 
 			// ensure that it is a true copy
 			a.elements[ 0 ] = 2;
-			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
+			assert.ok( ! matrixEquals4( a, b ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "copy", ( assert ) => {
+		QUnit.test( 'copy', ( assert ) => {
 
 			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			var b = new Matrix4().copy( a );
 
-			assert.ok( matrixEquals4( a, b ), "Passed!" );
+			assert.ok( matrixEquals4( a, b ), 'Passed!' );
 
 			// ensure that it is a true copy
 			a.elements[ 0 ] = 2;
-			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
+			assert.ok( ! matrixEquals4( a, b ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "copyPosition", ( assert ) => {
+		QUnit.test( 'setFromMatrix4', ( assert ) => {
+
+			var a = new Matrix3().set(
+				0, 1, 2,
+				3, 4, 5,
+				6, 7, 8
+			);
+			var b = new Matrix4();
+			var c = new Matrix4().set(
+				0, 1, 2, 0,
+				3, 4, 5, 0,
+				6, 7, 8, 0,
+				0, 0, 0, 1
+			);
+			b.setFromMatrix3( a );
+			assert.ok( b.equals( c ) );
+
+		} );
+
+		QUnit.test( 'copyPosition', ( assert ) => {
 
 			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var b = new Matrix4().set( 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 16 );
 
-			assert.notOk( matrixEquals4( a, b ), "a and b initially not equal" );
+			assert.notOk( matrixEquals4( a, b ), 'a and b initially not equal' );
 
 			b.copyPosition( a );
-			assert.ok( matrixEquals4( a, b ), "a and b equal after copyPosition()" );
+			assert.ok( matrixEquals4( a, b ), 'a and b equal after copyPosition()' );
 
 		} );
 
-		QUnit.test( "makeBasis/extractBasis", ( assert ) => {
+		QUnit.test( 'makeBasis/extractBasis', ( assert ) => {
 
 			var identityBasis = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
 			var a = new Matrix4().makeBasis( identityBasis[ 0 ], identityBasis[ 1 ], identityBasis[ 2 ] );
 			var identity = new Matrix4();
-			assert.ok( matrixEquals4( a, identity ), "Passed!" );
+			assert.ok( matrixEquals4( a, identity ), 'Passed!' );
 
 			var testBases = [[ new Vector3( 0, 1, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ) ]];
 			for ( var i = 0; i < testBases.length; i ++ ) {
@@ -193,7 +212,7 @@ export default QUnit.module( 'Maths', () => {
 				// check what goes in, is what comes out.
 				for ( var j = 0; j < outBasis.length; j ++ ) {
 
-					assert.ok( outBasis[ j ].equals( testBasis[ j ] ), "Passed!" );
+					assert.ok( outBasis[ j ].equals( testBasis[ j ] ), 'Passed!' );
 
 				}
 
@@ -204,10 +223,11 @@ export default QUnit.module( 'Maths', () => {
 					outBasis[ j ].applyMatrix4( b );
 
 				}
+
 				// did the multiply method of basis extraction work?
 				for ( var j = 0; j < outBasis.length; j ++ ) {
 
-					assert.ok( outBasis[ j ].equals( testBasis[ j ] ), "Passed!" );
+					assert.ok( outBasis[ j ].equals( testBasis[ j ] ), 'Passed!' );
 
 				}
 
@@ -215,20 +235,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "extractRotation", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.test( "makeRotationFromEuler/extractRotation", ( assert ) => {
+		QUnit.test( 'makeRotationFromEuler/extractRotation', ( assert ) => {
 
 			var testValues = [
-				new Euler( 0, 0, 0, "XYZ" ),
-				new Euler( 1, 0, 0, "XYZ" ),
-				new Euler( 0, 1, 0, "ZYX" ),
-				new Euler( 0, 0, 0.5, "YZX" ),
-				new Euler( 0, 0, - 0.5, "YZX" )
+				new Euler( 0, 0, 0, 'XYZ' ),
+				new Euler( 1, 0, 0, 'XYZ' ),
+				new Euler( 0, 1, 0, 'ZYX' ),
+				new Euler( 0, 0, 0.5, 'YZX' ),
+				new Euler( 0, 0, - 0.5, 'YZX' )
 			];
 
 			for ( var i = 0; i < testValues.length; i ++ ) {
@@ -240,20 +254,20 @@ export default QUnit.module( 'Maths', () => {
 				var v2 = new Euler().setFromRotationMatrix( m, v.order );
 				var m2 = new Matrix4().makeRotationFromEuler( v2 );
 
-				assert.ok( matrixEquals4( m, m2, eps ), "makeRotationFromEuler #" + i + ": original and Euler-derived matrices are equal" );
-				assert.ok( eulerEquals( v, v2, eps ), "makeRotationFromEuler #" + i + ": original and matrix-derived Eulers are equal" );
+				assert.ok( matrixEquals4( m, m2, eps ), 'makeRotationFromEuler #' + i + ': original and Euler-derived matrices are equal' );
+				assert.ok( eulerEquals( v, v2, eps ), 'makeRotationFromEuler #' + i + ': original and matrix-derived Eulers are equal' );
 
 				var m3 = new Matrix4().extractRotation( m2 );
 				var v3 = new Euler().setFromRotationMatrix( m3, v.order );
 
-				assert.ok( matrixEquals4( m, m3, eps ), "extractRotation #" + i + ": original and extracted matrices are equal" );
-				assert.ok( eulerEquals( v, v3, eps ), "extractRotation #" + i + ": original and extracted Eulers are equal" );
+				assert.ok( matrixEquals4( m, m3, eps ), 'extractRotation #' + i + ': original and extracted matrices are equal' );
+				assert.ok( eulerEquals( v, v3, eps ), 'extractRotation #' + i + ': original and extracted Eulers are equal' );
 
 			}
 
 		} );
 
-		QUnit.test( "lookAt", ( assert ) => {
+		QUnit.test( 'lookAt', ( assert ) => {
 
 			var a = new Matrix4();
 			var expected = new Matrix4().identity();
@@ -263,12 +277,12 @@ export default QUnit.module( 'Maths', () => {
 
 			a.lookAt( eye, target, up );
 			var rotation = new Euler().setFromRotationMatrix( a );
-			assert.numEqual( rotation.x * ( 180 / Math.PI ), 45, "Check the rotation" );
+			assert.numEqual( rotation.x * ( 180 / Math.PI ), 45, 'Check the rotation' );
 
 			// eye and target are in the same position
 			eye.copy( target );
 			a.lookAt( eye, target, up );
-			assert.ok( matrixEquals4( a, expected ), "Check the result for eye == target" );
+			assert.ok( matrixEquals4( a, expected ), 'Check the result for eye == target' );
 
 			// up and z are parallel
 			eye.set( 0, 1, 0 );
@@ -280,23 +294,64 @@ export default QUnit.module( 'Maths', () => {
 				0, - 1, 0.0001, 0,
 				0, 0, 0, 1
 			);
-			assert.ok( matrixEquals4( a, expected ), "Check the result for when up and z are parallel" );
+			assert.ok( matrixEquals4( a, expected ), 'Check the result for when up and z are parallel' );
 
 		} );
 
-		QUnit.todo( "multiply", ( assert ) => {
+		QUnit.test( 'multiply', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lhs = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+			var rhs = new Matrix4().set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
+
+			lhs.multiply( rhs );
+
+			assert.ok( lhs.elements[ 0 ] == 1585 );
+			assert.ok( lhs.elements[ 1 ] == 5318 );
+			assert.ok( lhs.elements[ 2 ] == 10514 );
+			assert.ok( lhs.elements[ 3 ] == 15894 );
+			assert.ok( lhs.elements[ 4 ] == 1655 );
+			assert.ok( lhs.elements[ 5 ] == 5562 );
+			assert.ok( lhs.elements[ 6 ] == 11006 );
+			assert.ok( lhs.elements[ 7 ] == 16634 );
+			assert.ok( lhs.elements[ 8 ] == 1787 );
+			assert.ok( lhs.elements[ 9 ] == 5980 );
+			assert.ok( lhs.elements[ 10 ] == 11840 );
+			assert.ok( lhs.elements[ 11 ] == 17888 );
+			assert.ok( lhs.elements[ 12 ] == 1861 );
+			assert.ok( lhs.elements[ 13 ] == 6246 );
+			assert.ok( lhs.elements[ 14 ] == 12378 );
+			assert.ok( lhs.elements[ 15 ] == 18710 );
 
 		} );
 
-		QUnit.todo( "premultiply", ( assert ) => {
+		QUnit.test( 'premultiply', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lhs = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+			var rhs = new Matrix4().set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
+
+			rhs.premultiply( lhs );
+
+			assert.ok( rhs.elements[ 0 ] == 1585 );
+			assert.ok( rhs.elements[ 1 ] == 5318 );
+			assert.ok( rhs.elements[ 2 ] == 10514 );
+			assert.ok( rhs.elements[ 3 ] == 15894 );
+			assert.ok( rhs.elements[ 4 ] == 1655 );
+			assert.ok( rhs.elements[ 5 ] == 5562 );
+			assert.ok( rhs.elements[ 6 ] == 11006 );
+			assert.ok( rhs.elements[ 7 ] == 16634 );
+			assert.ok( rhs.elements[ 8 ] == 1787 );
+			assert.ok( rhs.elements[ 9 ] == 5980 );
+			assert.ok( rhs.elements[ 10 ] == 11840 );
+			assert.ok( rhs.elements[ 11 ] == 17888 );
+			assert.ok( rhs.elements[ 12 ] == 1861 );
+			assert.ok( rhs.elements[ 13 ] == 6246 );
+			assert.ok( rhs.elements[ 14 ] == 12378 );
+			assert.ok( rhs.elements[ 15 ] == 18710 );
+
 
 		} );
 
-		QUnit.test( "multiplyMatrices", ( assert ) => {
+		QUnit.test( 'multiplyMatrices', ( assert ) => {
 
 			// Reference:
 			//
@@ -339,7 +394,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "multiplyScalar", ( assert ) => {
+		QUnit.test( 'multiplyScalar', ( assert ) => {
 
 			var b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			assert.ok( b.elements[ 0 ] == 0 );
@@ -379,88 +434,65 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyToBufferAttribute", ( assert ) => {
-
-			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
-			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
-			var expected = new Float32BufferAttribute( [
-				0.1666666716337204, 0.4444444477558136, 0.7222222089767456,
-				0.1599999964237213, 0.4399999976158142, 0.7200000286102295
-			], 3 );
-
-			var applied = a.applyToBufferAttribute( attr );
-
-			assert.strictEqual( expected.count, applied.count, "Applied buffer and expected buffer have the same number of entries" );
-
-			for ( var i = 0, l = expected.count; i < l; i ++ ) {
-
-				assert.ok( Math.abs( applied.getX( i ) - expected.getX( i ) ) <= eps, "Check x" );
-				assert.ok( Math.abs( applied.getY( i ) - expected.getY( i ) ) <= eps, "Check y" );
-				assert.ok( Math.abs( applied.getZ( i ) - expected.getZ( i ) ) <= eps, "Check z" );
-
-			}
-
-		} );
-
-		QUnit.test( "determinant", ( assert ) => {
+		QUnit.test( 'determinant', ( assert ) => {
 
 			var a = new Matrix4();
-			assert.ok( a.determinant() == 1, "Passed!" );
+			assert.ok( a.determinant() == 1, 'Passed!' );
 
 			a.elements[ 0 ] = 2;
-			assert.ok( a.determinant() == 2, "Passed!" );
+			assert.ok( a.determinant() == 2, 'Passed!' );
 
 			a.elements[ 0 ] = 0;
-			assert.ok( a.determinant() == 0, "Passed!" );
+			assert.ok( a.determinant() == 0, 'Passed!' );
 
 			// calculated via http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/fourD/index.htm
 			a.set( 2, 3, 4, 5, - 1, - 21, - 3, - 4, 6, 7, 8, 10, - 8, - 9, - 10, - 12 );
-			assert.ok( a.determinant() == 76, "Passed!" );
+			assert.ok( a.determinant() == 76, 'Passed!' );
 
 		} );
 
-		QUnit.test( "transpose", ( assert ) => {
+		QUnit.test( 'transpose', ( assert ) => {
 
 			var a = new Matrix4();
 			var b = a.clone().transpose();
-			assert.ok( matrixEquals4( a, b ), "Passed!" );
+			assert.ok( matrixEquals4( a, b ), 'Passed!' );
 
 			var b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			var c = b.clone().transpose();
-			assert.ok( ! matrixEquals4( b, c ), "Passed!" );
+			assert.ok( ! matrixEquals4( b, c ), 'Passed!' );
 			c.transpose();
-			assert.ok( matrixEquals4( b, c ), "Passed!" );
+			assert.ok( matrixEquals4( b, c ), 'Passed!' );
 
 		} );
 
-		QUnit.todo( "setPosition", ( assert ) => {
+		QUnit.test( 'setPosition', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			var b = new Vector3( - 1, - 2, - 3 );
+			var c = new Matrix4().set( 0, 1, 2, - 1, 4, 5, 6, - 2, 8, 9, 10, - 3, 12, 13, 14, 15 );
+
+			a.setPosition( b );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
+
+			var d = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			var e = new Matrix4().set( 0, 1, 2, - 1, 4, 5, 6, - 2, 8, 9, 10, - 3, 12, 13, 14, 15 );
+
+			d.setPosition( - 1, - 2, - 3 );
+			assert.ok( matrixEquals4( d, e ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "getInverse", ( assert ) => {
+		QUnit.test( 'invert', ( assert ) => {
 
+			var zero = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity = new Matrix4();
 
 			var a = new Matrix4();
 			var b = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-			var c = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
-			b.getInverse( a, false );
-			assert.ok( matrixEquals4( b, new Matrix4() ), "Passed!" );
+			a.copy( b ).invert();
+			assert.ok( matrixEquals4( a, zero ), 'Passed!' );
 
-			try {
-
-				b.getInverse( c, true );
-				assert.ok( false, "Passed!" ); // should never get here.
-
-			} catch ( err ) {
-
-				assert.ok( true, "Passed!" );
-
-			}
 
 			var testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
@@ -480,69 +512,96 @@ export default QUnit.module( 'Maths', () => {
 
 				var m = testMatrices[ i ];
 
-				var mInverse = new Matrix4().getInverse( m );
+				var mInverse = new Matrix4().copy( m ).invert();
 				var mSelfInverse = m.clone();
-				mSelfInverse.getInverse( mSelfInverse );
+				mSelfInverse.copy( mSelfInverse ).invert();
 
 				// self-inverse should the same as inverse
-				assert.ok( matrixEquals4( mSelfInverse, mInverse ), "Passed!" );
+				assert.ok( matrixEquals4( mSelfInverse, mInverse ), 'Passed!' );
 
 				// the determinant of the inverse should be the reciprocal
-				assert.ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, "Passed!" );
+				assert.ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, 'Passed!' );
 
 				var mProduct = new Matrix4().multiplyMatrices( m, mInverse );
 
 				// the determinant of the identity matrix is 1
-				assert.ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, "Passed!" );
-				assert.ok( matrixEquals4( mProduct, identity ), "Passed!" );
+				assert.ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, 'Passed!' );
+				assert.ok( matrixEquals4( mProduct, identity ), 'Passed!' );
 
 			}
 
 		} );
 
-		QUnit.todo( "scale", ( assert ) => {
+		QUnit.test( 'scale', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+			var b = new Vector3( 2, 3, 4 );
+			var c = new Matrix4().set( 2, 6, 12, 4, 10, 18, 28, 8, 18, 30, 44, 12, 26, 42, 60, 16 );
+
+			a.scale( b );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "getMaxScaleOnAxis", ( assert ) => {
+		QUnit.test( 'getMaxScaleOnAxis', ( assert ) => {
 
 			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var expected = Math.sqrt( 3 * 3 + 7 * 7 + 11 * 11 );
 
-			assert.ok( Math.abs( a.getMaxScaleOnAxis() - expected ) <= eps, "Check result" );
+			assert.ok( Math.abs( a.getMaxScaleOnAxis() - expected ) <= eps, 'Check result' );
 
 		} );
 
-		QUnit.todo( "makeTranslation", ( assert ) => {
+		QUnit.test( 'makeTranslation', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var b = new Vector3( 2, 3, 4 );
+			var c = new Matrix4().set( 1, 0, 0, 2, 0, 1, 0, 3, 0, 0, 1, 4, 0, 0, 0, 1 );
 
-		} );
-
-		QUnit.todo( "makeRotationX", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "makeRotationY", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			a.makeTranslation( b.x, b.y, b.z );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
 
 		} );
 
-		QUnit.todo( "makeRotationZ", ( assert ) => {
+		QUnit.test( 'makeRotationX', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var b = Math.sqrt( 3 ) / 2;
+			var c = new Matrix4().set( 1, 0, 0, 0, 0, b, - 0.5, 0, 0, 0.5, b, 0, 0, 0, 0, 1 );
+
+			a.makeRotationX( Math.PI / 6 );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "makeRotationAxis", ( assert ) => {
+		QUnit.test( 'makeRotationY', ( assert ) => {
+
+
+			var a = new Matrix4();
+			var b = Math.sqrt( 3 ) / 2;
+			var c = new Matrix4().set( b, 0, 0.5, 0, 0, 1, 0, 0, - 0.5, 0, b, 0, 0, 0, 0, 1 );
+
+			a.makeRotationY( Math.PI / 6 );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
+
+		} );
+
+		QUnit.test( 'makeRotationZ', ( assert ) => {
+
+
+			var a = new Matrix4();
+			var b = Math.sqrt( 3 ) / 2;
+			var c = new Matrix4().set( b, - 0.5, 0, 0, 0.5, b, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
+
+			a.makeRotationZ( Math.PI / 6 );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
+
+		} );
+
+		QUnit.test( 'makeRotationAxis', ( assert ) => {
 
 			var axis = new Vector3( 1.5, 0.0, 1.0 ).normalize();
-			var radians = _Math.degToRad( 45 );
+			var radians = MathUtils.degToRad( 45 );
 			var a = new Matrix4().makeRotationAxis( axis, radians );
 
 			var expected = new Matrix4().set(
@@ -552,23 +611,31 @@ export default QUnit.module( 'Maths', () => {
 				0, 0, 0, 1
 			);
 
-			assert.ok( matrixEquals4( a, expected ), "Check numeric result" );
+			assert.ok( matrixEquals4( a, expected ), 'Check numeric result' );
 
 		} );
 
-		QUnit.todo( "makeScale", ( assert ) => {
+		QUnit.test( 'makeScale', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var c = new Matrix4().set( 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1 );
 
-		} );
-
-		QUnit.todo( "makeShear", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			a.makeScale( 2, 3, 4 );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
 
 		} );
 
-		QUnit.test( "compose/decompose", ( assert ) => {
+		QUnit.test( 'makeShear', ( assert ) => {
+
+			var a = new Matrix4();
+			var c = new Matrix4().set( 1, 3, 5, 0, 1, 1, 6, 0, 2, 4, 1, 0, 0, 0, 0, 1 );
+
+			a.makeShear( 1, 2, 3, 4, 5, 6 );
+			assert.ok( matrixEquals4( a, c ), 'Passed!' );
+
+		} );
+
+		QUnit.test( 'compose/decompose', ( assert ) => {
 
 			var tValues = [
 				new Vector3(),
@@ -632,7 +699,7 @@ export default QUnit.module( 'Maths', () => {
 						}
 						*/
 
-						assert.ok( matrixEquals4( m, m2 ), "Passed!" );
+						assert.ok( matrixEquals4( m, m2 ), 'Passed!' );
 
 					}
 
@@ -642,13 +709,20 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "makePerspective", ( assert ) => {
+		QUnit.test( 'makePerspective', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4().makePerspective( - 1, 1, - 1, 1, 1, 100 );
+			var expected = new Matrix4().set(
+				1, 0, 0, 0,
+				0, - 1, 0, 0,
+				0, 0, - 101 / 99, - 200 / 99,
+				0, 0, - 1, 0
+			);
+			assert.ok( matrixEquals4( a, expected ), 'Check result' );
 
 		} );
 
-		QUnit.test( "makeOrthographic", ( assert ) => {
+		QUnit.test( 'makeOrthographic', ( assert ) => {
 
 			var a = new Matrix4().makeOrthographic( - 1, 1, - 1, 1, 1, 100 );
 			var expected = new Matrix4().set(
@@ -658,46 +732,50 @@ export default QUnit.module( 'Maths', () => {
 				0, 0, 0, 1
 			);
 
-			assert.ok( matrixEquals4( a, expected ), "Check result" );
+			assert.ok( matrixEquals4( a, expected ), 'Check result' );
 
 		} );
 
-		QUnit.test( "equals", ( assert ) => {
+		QUnit.test( 'equals', ( assert ) => {
 
 			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var b = new Matrix4().set( 0, - 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 
-			assert.notOk( a.equals( b ), "Check that a does not equal b" );
-			assert.notOk( b.equals( a ), "Check that b does not equal a" );
+			assert.notOk( a.equals( b ), 'Check that a does not equal b' );
+			assert.notOk( b.equals( a ), 'Check that b does not equal a' );
 
 			a.copy( b );
-			assert.ok( a.equals( b ), "Check that a equals b after copy()" );
-			assert.ok( b.equals( a ), "Check that b equals a after copy()" );
+			assert.ok( a.equals( b ), 'Check that a equals b after copy()' );
+			assert.ok( b.equals( a ), 'Check that b equals a after copy()' );
 
 		} );
 
-		QUnit.todo( "fromArray", ( assert ) => {
+		QUnit.test( 'fromArray', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var b = new Matrix4().set( 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 );
+
+			a.fromArray( [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ] );
+			assert.ok( a.equals( b ), 'Passed' );
 
 		} );
 
-		QUnit.test( "toArray", ( assert ) => {
+		QUnit.test( 'toArray', ( assert ) => {
 
 			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
 			var noOffset = [ 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 ];
 			var withOffset = [ undefined, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 ];
 
 			var array = a.toArray();
-			assert.deepEqual( array, noOffset, "No array, no offset" );
+			assert.deepEqual( array, noOffset, 'No array, no offset' );
 
 			var array = [];
 			a.toArray( array );
-			assert.deepEqual( array, noOffset, "With array, no offset" );
+			assert.deepEqual( array, noOffset, 'With array, no offset' );
 
 			var array = [];
 			a.toArray( array, 1 );
-			assert.deepEqual( array, withOffset, "With array, with offset" );
+			assert.deepEqual( array, withOffset, 'With array, with offset' );
 
 		} );
 

@@ -1,26 +1,30 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { Box3, Vector3 } from 'three';
 
-Menubar.Edit = function ( editor ) {
+import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
-	var strings = editor.strings;
+import { AddObjectCommand } from './commands/AddObjectCommand.js';
+import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
+import { SetPositionCommand } from './commands/SetPositionCommand.js';
 
-	var container = new UI.Panel();
+function MenubarEdit( editor ) {
+
+	const strings = editor.strings;
+
+	const container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new UI.Panel();
+	const title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/edit' ) );
 	container.add( title );
 
-	var options = new UI.Panel();
+	const options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// Undo
 
-	var undo = new UI.Row();
+	const undo = new UIRow();
 	undo.setClass( 'option' );
 	undo.setTextContent( strings.getKey( 'menubar/edit/undo' ) );
 	undo.onClick( function () {
@@ -32,7 +36,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Redo
 
-	var redo = new UI.Row();
+	const redo = new UIRow();
 	redo.setClass( 'option' );
 	redo.setTextContent( strings.getKey( 'menubar/edit/redo' ) );
 	redo.onClick( function () {
@@ -44,7 +48,7 @@ Menubar.Edit = function ( editor ) {
 
 	// Clear History
 
-	var option = new UI.Row();
+	let option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/clear_history' ) );
 	option.onClick( function () {
@@ -61,7 +65,7 @@ Menubar.Edit = function ( editor ) {
 
 	editor.signals.historyChanged.add( function () {
 
-		var history = editor.history;
+		const history = editor.history;
 
 		undo.setClass( 'option' );
 		redo.setClass( 'option' );
@@ -82,124 +86,135 @@ Menubar.Edit = function ( editor ) {
 
 	// ---
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new UIHorizontalRule() );
+
+	// Center
+
+	option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/edit/center' ) );
+	option.onClick( function () {
+
+		const object = editor.selected;
+
+		if ( object === null || object.parent === null ) return; // avoid centering the camera or scene
+
+		const aabb = new Box3().setFromObject( object );
+		const center = aabb.getCenter( new Vector3() );
+		const newPosition = new Vector3();
+
+		newPosition.x = object.position.x + ( object.position.x - center.x );
+		newPosition.y = object.position.y + ( object.position.y - center.y );
+		newPosition.z = object.position.z + ( object.position.z - center.z );
+
+		editor.execute( new SetPositionCommand( editor, object, newPosition ) );
+
+	} );
+	options.add( option );
 
 	// Clone
 
-	var option = new UI.Row();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/clone' ) );
 	option.onClick( function () {
 
-		var object = editor.selected;
+		let object = editor.selected;
 
-		if ( object.parent === null ) return; // avoid cloning the camera or scene
+		if ( object === null || object.parent === null ) return; // avoid cloning the camera or scene
 
 		object = object.clone();
 
-		editor.execute( new AddObjectCommand( object ) );
+		editor.execute( new AddObjectCommand( editor, object ) );
 
 	} );
 	options.add( option );
 
 	// Delete
 
-	var option = new UI.Row();
+	option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/delete' ) );
 	option.onClick( function () {
 
-		var object = editor.selected;
+		const object = editor.selected;
 
-		var parent = object.parent;
-		if ( parent === undefined ) return; // avoid deleting the camera or scene
+		if ( object !== null && object.parent !== null ) {
 
-		editor.execute( new RemoveObjectCommand( object ) );
+			editor.execute( new RemoveObjectCommand( editor, object ) );
+
+		}
 
 	} );
 	options.add( option );
 
-	// Minify shaders
+	//
 
-	var option = new UI.Row();
+	// options.add( new UIHorizontalRule() );
+
+	// Set textures to sRGB. See #15903
+
+	option = new UIRow();
 	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/edit/minify_shaders' ) );
-	option.onClick( function() {
+	option.setTextContent( strings.getKey( 'menubar/edit/fixcolormaps' ) );
+	option.onClick( function () {
 
-		var root = editor.selected || editor.scene;
+		editor.scene.traverse( fixColorMap );
 
-		var errors = [];
-		var nMaterialsChanged = 0;
+	} );
+	// options.add( option );
 
-		var path = [];
+	const colorMaps = [ 'map', 'envMap', 'emissiveMap' ];
 
-		function getPath ( object ) {
+	function fixColorMap( obj ) {
 
-			path.length = 0;
+		const material = obj.material;
 
-			var parent = object.parent;
-			if ( parent !== undefined ) getPath( parent );
+		if ( material !== undefined ) {
 
-			path.push( object.name || object.uuid );
+			if ( Array.isArray( material ) === true ) {
 
-			return path;
+				for ( let i = 0; i < material.length; i ++ ) {
 
-		}
-
-		var cmds = [];
-		root.traverse( function ( object ) {
-
-			var material = object.material;
-
-			if ( material.isShaderMaterial ) {
-
-				try {
-
-					var shader = glslprep.minifyGlsl( [
-							material.vertexShader, material.fragmentShader ] );
-
-					cmds.push( new SetMaterialValueCommand( object, 'vertexShader', shader[ 0 ] ) );
-					cmds.push( new SetMaterialValueCommand( object, 'fragmentShader', shader[ 1 ] ) );
-
-					++nMaterialsChanged;
-
-				} catch ( e ) {
-
-					var path = getPath( object ).join( "/" );
-
-					if ( e instanceof glslprep.SyntaxError )
-
-						errors.push( path + ":" +
-								e.line + ":" + e.column + ": " + e.message );
-
-					else {
-
-						errors.push( path +
-								": Unexpected error (see console for details)." );
-
-						console.error( e.stack || e );
-
-					}
+					fixMaterial( material[ i ] );
 
 				}
 
+			} else {
+
+				fixMaterial( material );
+
 			}
 
-		} );
-
-		if ( nMaterialsChanged > 0 ) {
-
-			editor.execute( new MultiCmdsCommand( cmds ), 'Minify Shaders' );
+			editor.signals.sceneGraphChanged.dispatch();
 
 		}
 
-		window.alert( nMaterialsChanged +
-				" material(s) were changed.\n" + errors.join( "\n" ) );
+	}
 
-	} );
-	options.add( option );
+	function fixMaterial( material ) {
 
+		let needsUpdate = material.needsUpdate;
+
+		for ( let i = 0; i < colorMaps.length; i ++ ) {
+
+			const map = material[ colorMaps[ i ] ];
+
+			if ( map ) {
+
+				map.encoding = THREE.sRGBEncoding;
+				needsUpdate = true;
+
+			}
+
+		}
+
+		material.needsUpdate = needsUpdate;
+
+	}
 
 	return container;
 
-};
+}
+
+export { MenubarEdit };

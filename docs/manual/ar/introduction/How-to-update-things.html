@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>كيفية تحديث الأشياء</h1>
+		<div>
+			<p>تقوم كل الكائنات بشكل ألي بتحديث حالتها تلقائيًا إذا تمت إضافتها إلى المشهد باستخدام</p>
+			<code>
+const object = new THREE.Object3D();
+scene.add( object );
+			</code>
+			<p>أو إذا كانوا أبناء كائن آخر تمت إضافته إلى المشهد:</p>
+			<code>
+const object1 = new THREE.Object3D();
+const object2 = new THREE.Object3D();
+
+object1.add( object2 );
+scene.add( object1 ); //object1 and object2 will automatically update their matrices
+			</code>
+		</div>
+
+		<p>ومع ذلك ، إذا كنت تعلم أن الكائن سيكون ثابتًا ، فيمكنك تعطيل هذا وتحديث وضيفة التحديث يدويًا عند الحاجة فقط.</p>
+
+		<code>
+object.matrixAutoUpdate = false;
+object.updateMatrix();
+		</code>
+
+		<h2>BufferGeometry</h2>
+		<div>
+			<p>
+				يخزن BufferGeometries المعلومات (مثل مواضع الرأس ومؤشرات الوجه والعلامات والألوان وUVs وأي سمات مخصصة) في [page:BufferAttribute buffers] - أي ،
+				[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays typed arrays].
+				هذا يجعلها بشكل عام أسرع من الهندسة الأساسية (standard geometry) ، بحساب تكلفة العمل بها إلى حد ما.
+			</p>
+			<p>
+				فيما يتعلق بتحديث BufferGeometries ، فإن أهم شيء يجب فهمه هو أنه لا يمكنك تغيير حجم المخازن المؤقتة (هذا مكلف للغاية ، ويعادل بشكل أساسي إنشاء هندسة جديدة). ومع ذلك يمكنك تحديث محتوى المخازن المؤقتة.
+			</p>
+			<p>
+				هذا يعني أنك إذا كنت تعرف أن إحدى سمات BufferGeometry ستنمو ، لنقل عدد الرؤوس ، فيجب عليك تخصيص مخزن مؤقت كبير بما يكفي لاحتواء أي رؤوس جديدة قد يتم إنشاؤها. بالطبع ، هذا يعني أيضًا أنه سيكون هناك حد أقصى لحجم BufferGeometry - لا توجد طريقة لإنشاء BufferGeometry يمكن تمديده حجم غير محدود.
+			</p>
+			<p>
+				سنستخدم مثال السطر الذي سيتم تمديده في وقت العرض. سنخصص مساحة في المخزن المؤقت لـ 500 رأس لكننا نرسم اثنين فقط في البداية ، باستخدام [page:BufferGeometry.drawRange].
+			</p>
+			<code>
+const MAX_POINTS = 500;
+
+// geometry
+const geometry = new THREE.BufferGeometry();
+
+// attributes
+const positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+
+// draw range
+const drawCount = 2; // draw the first 2 points, only
+geometry.setDrawRange( 0, drawCount );
+
+// material
+const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+
+// line
+const line = new THREE.Line( geometry, material );
+scene.add( line );
+			</code>
+		 	<p>
+				بعد ذلك سنضيف نقاطًا بشكل عشوائي إلى الخط باستخدام نمط مثل:
+			</p>
+			<code>
+const positions = line.geometry.attributes.position.array;
+
+let x, y, z, index;
+x = y = z = index = 0;
+
+for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+
+    positions[ index ++ ] = x;
+    positions[ index ++ ] = y;
+    positions[ index ++ ] = z;
+
+    x += ( Math.random() - 0.5 ) * 30;
+    y += ( Math.random() - 0.5 ) * 30;
+    z += ( Math.random() - 0.5 ) * 30;
+
+}
+			</code>
+			<p>
+				إذا كنت تريد تغيير <em>عدد النقاط</em> التي تم إظهارها بعد العرض الأول ، فقم بما يلي:
+			</p>
+			<code>
+line.geometry.setDrawRange( 0, newValue );
+			</code>
+			<p>
+				إذا كنت تريد تغيير قيم بيانات الموضع بعد العرض الأول ، فأنت بحاجة إلى تعيين علامة needsUpdate على النحو التالي:
+			</p>
+			<code>
+line.geometry.attributes.position.needsUpdate = true; // required after the first render
+			</code>
+
+			<p>
+				إذا قمت بتغيير قيم بيانات الموقع بعد التصيير الأولي ، فقد تحتاج إلى استدعاء `` .computeBoundingSphere () 'لإعادة حساب المجال المحيط للهندسة.
+			</p>
+			<code>
+line.geometry.computeBoundingSphere();
+			</code>
+
+			<p>
+				هنا مثال يعرض خطًا متحركًا يمكن تكييفه مع حالة الاستخدام الخاصة بك.
+				[link:https://jsfiddle.net/xvnctbL0/2/ Here is a fiddle]
+			</p>
+
+			<h3>أمثلة</h3>
+
+			<p>
+				[example:webgl_custom_attributes WebGL / custom / attributes]<br />
+				[example:webgl_buffergeometry_custom_attributes_particles WebGL / buffergeometry / custom / attributes / particles]
+			</p>
+
+		</div>
+
+		<h2>المواد (Materials)</h2>
+		<div>
+			<p>يمكن تغيير جميع قيم الزي الرسمي بحرية (على سبيل المثال ، الألوان ، والأنسجة ، والعتامة ، وما إلى ذلك) ، ويتم إرسال القيم إلى الشادر (shader) في كل إطار.</p>
+
+			<p>يمكن أيضًا تغيير المعلمات ذات الصلة بـ GLstate في أي وقت (depthTest, blending, polygonOffset, etc).</p>
+
+			<p>لا يمكن تغيير الخصائص التالية بسهولة في وقت التشغيل (بمجرد تقديم المادة مرة واحدة على الأقل):</p>
+			<ul>
+				<li>numbers and types of uniforms</li>
+				<li>presence or not of
+					<ul>
+						<li>texture</li>
+						<li>fog</li>
+						<li>vertex colors</li>
+						<li>morphing</li>
+						<li>shadow map</li>
+						<li>alpha test</li>
+						<li>transparent</li>
+					</ul>
+				</li>
+			</ul>
+
+			<p>تتطلب التغييرات في هذه بناء برنامج شادر (shader) جديد. سوف تحتاج إلى ضبط</p>
+			<code>material.needsUpdate = true</code>
+
+			<p>ضع في اعتبارك أن هذا قد يكون بطيئًا للغاية ويؤدي إلى اهتزاز في معدل الإطارات (خاصة على Windows ، حيث أن التحويل البرمجي للشادر (shader) يكون أبطأ في DirectX منه في OpenGL).</p>
+
+			<p>للحصول على تجربة أكثر سلاسة ، يمكنك محاكاة التغييرات في هذه الميزات إلى حد ما من خلال الحصول على قيم "وهمية" مثل الأضواء صفر الكثافة أو الزخارف البيضاء أو الضباب الصفري.</p>
+
+			<p>يمكنك تغيير المواد المستخدمة في القطع الهندسية بحرية ، ولكن لا يمكنك تغيير كيفية تقسيم الكائن إلى أجزاء (وفقًا لمواد الوجه). </p>
+
+			<h3>إذا كنت بحاجة إلى تكوينات مختلفة من المواد أثناء وقت التشغيل:</h3>
+			<p>إذا كان عدد المواد / القطع الصغيرًة ، فيمكنك تقسيم الجسم مسبقًا (مثل الشعر / الوجه / الجسم / الملابس العلوية / السراويل للإنسان ، أمامي / جوانب / الجزء العلوي / الزجاج / الإطار / الجزء الداخلي للسيارة). </p>
+
+			<p>إذا كان الرقم كبيرًا (على سبيل المثال ، من المحتمل أن يكون كل وجه مختلفًا) ، ففكر في حل مختلف ، مثل استخدام السمات / القوام للحصول على مظهر مختلف لكل وجه.</p>
+
+			<h3>أمثلة</h3>
+			<p>
+				[example:webgl_materials_car WebGL / materials / car]<br />
+				[example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
+			</p>
+		</div>
+
+
+		<h2>النسيج (Textures)</h2>
+		<div>
+			<p>يجب أن يتم تعيين العلامات التالية في الصورة ، canvas والفيديو والبيانات إذا تم تغييرها:</p>
+			<code>
+				texture.needsUpdate = true;
+			</code>
+			<p>العرض يستهدف التحديث تلقائيا.</p>
+
+			<h3>أمثلة</h3>
+			<p>
+				[example:webgl_materials_video WebGL / materials / video]<br />
+				[example:webgl_rtt WebGL / rtt]
+			</p>
+
+		</div>
+
+
+		<h2>الكاميرات (Cameras)</h2>
+		<div>
+			<p>يتم تحديث موضع الكاميرا وهدفها تلقائيًا. إذا كنت بحاجة إلى التغيير</p>
+			<ul>
+				<li>
+					fov
+				</li>
+				<li>
+					aspect
+				</li>
+				<li>
+					near
+				</li>
+				<li>
+					far
+				</li>
+			</ul>
+			<p>
+				ثم ستحتاج إلى إعادة حساب مصفوفة الإسقاط(the projection matrix):
+			</p>
+			<code>
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+			</code>
+		</div>
+	</body>
+</html>

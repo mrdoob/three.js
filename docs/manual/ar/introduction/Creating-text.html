@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>إنشاء نص ([name])</h1>
+		<div>
+			<p>
+				غالبًا ما تحتاج إلى استخدام نص في تطبيق three.js الخاص بك - إليك طريقتان يمكنك القيام بذلك.
+			</p>
+		</div>
+
+		<h2>1. DOM + CSS</h2>
+		<div>
+			<p>
+				يعد استخدام HTML بشكل عام أسهل وأسرع طريقة لإضافة نص. هذه هي الطريقة المستخدمة للتراكبات الوصفية في معظم الأمثلة الثلاثة.
+			</p>
+			<p>يمكنك إضافة محتوى إلى ملف</p>
+			<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
+
+			<p>
+				وإستخدم ترميز CSS لوضع موضع مطلق (position absolutely) في موضع فوق كل المواقع الأخرى باستخدام z-index بالأخاص إذا كنت تقوم بتشغيل على كامل الشاشة three.js.
+			</p>
+
+			<code>
+#info {
+	position: absolute;
+	top: 10px;
+	width: 100%;
+	text-align: center;
+	z-index: 100;
+	display:block;
+}
+			</code>
+
+		</div>
+
+
+
+		<h2>2. ارسم نصًا على (canvas) واستخدمه كـ [page:Texture]</h2>
+		<div>
+			<p>استخدم هذه الطريقة إذا كنت ترغب في رسم نص بسهولة على سطح في مشهد three.js.</p>
+		</div>
+
+
+		<h2>3. قم بإنشاء نموذج في التطبيق ثلاثي الأبعاد المفضل لديك وقم بتصديره إلى three.js</h2>
+		<div>
+			<p>إستخدم هذه الطريقة إذا كنت تفضل العمل مع تطبيقاتك ثلاثية الأبعاد وإستيراد النماذج إلى three.js</p>
+		</div>
+
+
+
+		<h2>4. هندسة النص الإجرائي (Procedural Text Geometry)</h2>
+		<div>
+			<p>
+				إذا كنت تفضل العمل فقط في THREE.js أو إنشاء أشكال هندسية إجرائية وديناميكية للنص ثلاثي الأبعاد ، فيمكنك إنشاء شبكة تعتبر هندستها مثيلًا لـ THREE.TextGeometry:
+			</p>
+			<p>
+				<code>new THREE.TextGeometry( text, parameters );</code>
+			</p>
+			<p>
+				لكي يعمل هذا، ستحتاج Text Geometry إلى نموذج من THREE.Font لتعيينه لجعله إعداد "الخط" الخاصة به.
+
+				راجع صفحة [page:TextGeometry] للحصول على مزيد من المعلومات حول كيفية القيام بذلك ، و وصف كل الخيارات المتاحة ، وقائمة بخطوط JSON التي تأتي مع توزيع THREE.js نفسه.
+			</p>
+
+			<h3>أمثلة</h3>
+
+			<p>
+				[example:webgl_geometry_text WebGL / geometry / text]<br />
+				[example:webgl_shadowmap WebGL / shadowmap]
+			</p>
+
+			<p>
+				إذا كان Typeface معطلاً ، أو كنت تريد استخدام خط غير موجود ، فهناك برنامج تعليمي مع برنامج نصي بايثون لـ bender يسمح لك بتصدير النص إلى Three.js بتنسيق JSON:
+				<br/>
+				[link:http://www.jaanga.com/2012/03/blender-to-threejs-create-3d-text-with.html]
+			</p>
+
+		</div>
+
+
+
+		<h2>5. خطوط نقطية (Bitmap Fonts)</h2>
+		<div>
+			<p>
+				تسمح BMFonts (الخطوط النقطية) بدمج الصور الرمزية في BufferGeometry واحد. يدعم عرض BMFont التفاف الكلمات ، وتباعد الأحرف ، وتقنين الأحرف ، وحقول المسافة الموقعة مع المشتقات القياسية ، وحقول المسافة الموقعة متعددة القنوات ، والخطوط متعددة الأنسجة ، والمزيد.
+				انظر [link:https://github.com/felixmariotto/three-mesh-ui three-mesh-ui] أو [link:https://github.com/Jam3/three-bmfont-text three-bmfont-text].
+			</p>
+			<p>
+				تتوفر الخطوط في مشاريع مثل [link:https://github.com/etiennepinchon/aframe-fonts A-Frame Fonts] ، أو يمكنك إنشاء خطوطك الخاصة من أي خط .TTF ، مع التحسين لتضمين الأحرف المطلوبة للمشروع.
+			</p>
+			<p>
+				بعض الأدوات المفيدة
+			</p>
+			<ul>
+				<li>[link:http://msdf-bmfont.donmccurdy.com/ msdf-bmfont-web] <i>(على شبكة الإنترنت)</i></li>
+				<li>[link:https://github.com/soimy/msdf-bmfont-xml msdf-bmfont-xml] <i>(سطر الأوامر)</i></li>
+				<li>[link:https://github.com/libgdx/libgdx/wiki/Hiero hiero] <i>(تطبيق سطح مكتب)</i></li>
+			</ul>
+		</div>
+
+
+
+	</body>
+</html>

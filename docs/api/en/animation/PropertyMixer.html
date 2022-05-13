@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -48,6 +47,11 @@
 			Default is *0*.
 		</p>
 
+		<h3>[property:Number cumulativeWeightAdditive]</h3>
+		<p>
+			Default is *0*.
+		</p>
+
 		<h3>[property:Number valueSize]</h3>
 		<p>
 
@@ -67,24 +71,32 @@
 		<h2>Methods</h2>
 
 
-		<h3>[method:null accumulate]( [param:Number accuIndex], [param:Number weight] )</h3>
+		<h3>[method:undefined accumulate]( [param:Number accuIndex], [param:Number weight] )</h3>
 		<p>
 			Accumulate data in [page:PropertyMixer.buffer buffer][accuIndex] 'incoming' region into 'accu[i]'.<br />
 
 			If weight is *0* this does nothing.
 		</p>
 
-		<h3>[method:null apply]( [param:Number accuIndex] )</h3>
+		<h3>[method:undefined accumulateAdditive]( [param:Number weight] )</h3>
+		<p>
+			Accumulate data in the 'incoming' region into 'add'.<br />
+
+			If weight is *0* this does nothing.
+		</p>
+
+
+		<h3>[method:undefined apply]( [param:Number accuIndex] )</h3>
 		<p>
 			Apply the state of [page:PropertyMixer.buffer buffer] 'accu[i]' to the binding when accus differ.
 		</p>
 
-		<h3>[method:null saveOriginalState]( )</h3>
+		<h3>[method:undefined saveOriginalState]( )</h3>
 		<p>
 			Remember the state of the bound property and copy it to both accus.
 		</p>
 
-		<h3>[method:null restoreOriginalState](  )</h3>
+		<h3>[method:undefined restoreOriginalState](  )</h3>
 		<p>
 			Apply the state previously taken via 'saveOriginalState' to the binding.
 		</p>
@@ -93,6 +105,8 @@
 		<h2>Source</h2>
 
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

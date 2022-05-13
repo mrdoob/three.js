@@ -4,41 +4,45 @@
 		<title>three.js webgl - postprocessing smaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - post-processing SMAA
+		</div>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/SMAAShader.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/SMAAPass.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script type="module">
 
+			import * as THREE from 'three';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, composer, pass, stats;
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { SMAAPass } from './jsm/postprocessing/SMAAPass.js';
+
+			let camera, scene, renderer, composer, stats;
 
 			init();
 			animate();
 
 			function init() {
 
-				var container = document.getElementById( "container" );
+				const container = document.getElementById( 'container' );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -55,49 +59,44 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.BoxBufferGeometry( 120, 120, 120 );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+				const geometry = new THREE.BoxGeometry( 120, 120, 120 );
+				const material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = - 100;
-				scene.add( mesh );
+				const mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.position.x = - 100;
+				scene.add( mesh1 );
 
-				var texture = new THREE.TextureLoader().load( "textures/brick_diffuse.jpg" );
+				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
 				texture.anisotropy = 4;
 
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = 100;
-				scene.add( mesh );
+				const mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.position.x = 100;
+				scene.add( mesh2 );
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				pass = new THREE.SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
-				pass.renderToScreen = true;
+				const pass = new SMAAPass( window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio() );
 				composer.addPass( pass );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function onWindowResize() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
+				const width = window.innerWidth;
+				const height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				var pixelRatio = renderer.getPixelRatio();
-				var newWidth = Math.floor( width * pixelRatio ) || 1;
-				var newHeight = Math.floor( height * pixelRatio ) || 1;
-				composer.setSize( newWidth, newHeight );
+				composer.setSize( width, height );
 
 			}
 
@@ -107,9 +106,9 @@
 
 				stats.begin();
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				for ( let i = 0; i < scene.children.length; i ++ ) {
 
-					var child = scene.children[ i ];
+					const child = scene.children[ i ];
 
 					child.rotation.x += 0.005;
 					child.rotation.y += 0.01;

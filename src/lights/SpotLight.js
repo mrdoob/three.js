@@ -2,56 +2,52 @@ import { Light } from './Light.js';
 import { SpotLightShadow } from './SpotLightShadow.js';
 import { Object3D } from '../core/Object3D.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
+class SpotLight extends Light {
 
-function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
+	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
 
-	Light.call( this, color, intensity );
+		super( color, intensity );
 
-	this.type = 'SpotLight';
+		this.type = 'SpotLight';
 
-	this.position.copy( Object3D.DefaultUp );
-	this.updateMatrix();
+		this.position.copy( Object3D.DefaultUp );
+		this.updateMatrix();
 
-	this.target = new Object3D();
+		this.target = new Object3D();
 
-	Object.defineProperty( this, 'power', {
-		get: function () {
+		this.distance = distance;
+		this.angle = angle;
+		this.penumbra = penumbra;
+		this.decay = decay; // for physically correct lights, should be 2.
 
-			// intensity = power per solid angle.
-			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-			return this.intensity * Math.PI;
+		this.shadow = new SpotLightShadow();
 
-		},
-		set: function ( power ) {
+	}
 
-			// intensity = power per solid angle.
-			// ref: equation (17) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-			this.intensity = power / Math.PI;
+	get power() {
 
-		}
-	} );
+		// compute the light's luminous power (in lumens) from its intensity (in candela)
+		// by convention for a spotlight, luminous power (lm) = π * luminous intensity (cd)
+		return this.intensity * Math.PI;
 
-	this.distance = ( distance !== undefined ) ? distance : 0;
-	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
-	this.penumbra = ( penumbra !== undefined ) ? penumbra : 0;
-	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
+	}
 
-	this.shadow = new SpotLightShadow();
+	set power( power ) {
 
-}
+		// set the light's intensity (in candela) from the desired luminous power (in lumens)
+		this.intensity = power / Math.PI;
 
-SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
+	}
 
-	constructor: SpotLight,
+	dispose() {
 
-	isSpotLight: true,
+		this.shadow.dispose();
 
-	copy: function ( source ) {
+	}
 
-		Light.prototype.copy.call( this, source );
+	copy( source ) {
+
+		super.copy( source );
 
 		this.distance = source.distance;
 		this.angle = source.angle;
@@ -66,7 +62,8 @@ SpotLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	}
 
-} );
+}
 
+SpotLight.prototype.isSpotLight = true;
 
 export { SpotLight };

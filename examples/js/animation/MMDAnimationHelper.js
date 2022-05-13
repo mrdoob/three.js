@@ -1,6 +1,6 @@
-/**
- * @author takahiro / https://github.com/takahirox
- *
+( function () {
+
+	/**
  * MMDAnimationHelper handles animation of MMD assets loaded by MMDLoader
  * with MMD special features as IK, Grant, and Physics.
  *
@@ -13,77 +13,65 @@
  *  - more precise grant skinning support.
  */
 
-THREE.MMDAnimationHelper = ( function () {
-
-	/**
-	 * @param {Object} params - (optional)
-	 * @param {boolean} params.sync - Whether animation durations of added objects are synched. Default is true.
-	 * @param {Number} params.afterglow - Default is 0.0.
-	 * @param {boolean} params resetPhysicsOnLoop - Default is true.
-	 */
-	function MMDAnimationHelper( params ) {
-
-		params = params || {};
-
-		this.meshes = [];
-
-		this.camera = null;
-		this.cameraTarget = new THREE.Object3D();
-		this.cameraTarget.name = 'target';
-
-		this.audio = null;
-		this.audioManager = null;
-
-		this.objects = new WeakMap();
-
-		this.configuration = {
-			sync: params.sync !== undefined
-				? params.sync : true,
-			afterglow: params.afterglow !== undefined
-				? params.afterglow : 0.0,
-			resetPhysicsOnLoop: params.resetPhysicsOnLoop !== undefined
-				? params.resetPhysicsOnLoop : true
-		};
-
-		this.enabled = {
-			animation: true,
-			ik: true,
-			grant: true,
-			physics: true,
-			cameraAnimation: true
-		};
-
-		this.onBeforePhysics = function ( mesh ) {};
-
-		// experimental
-		this.sharedPhysics = false;
-		this.masterPhysics = null;
-
-	}
-
-	MMDAnimationHelper.prototype = {
-
-		constructor: MMDAnimationHelper,
+	class MMDAnimationHelper {
 
 		/**
-		 * Adds an Three.js Object to helper and setups animation.
-		 * The anmation durations of added objects are synched
-		 * if this.configuration.sync is true.
-		 *
-		 * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
-		 * @param {Object} params - (optional)
-		 * @param {THREE.AnimationClip|Array<THREE.AnimationClip>} params.animation - Only for THREE.SkinnedMesh and THREE.Camera. Default is undefined.
-		 * @param {boolean} params.physics - Only for THREE.SkinnedMesh. Default is true.
-		 * @param {Integer} params.warmup - Only for THREE.SkinnedMesh and physics is true. Default is 60.
-		 * @param {Number} params.unitStep - Only for THREE.SkinnedMesh and physics is true. Default is 1 / 65.
-		 * @param {Integer} params.maxStepNum - Only for THREE.SkinnedMesh and physics is true. Default is 3.
-		 * @param {THREE.Vector3} params.gravity - Only for THREE.SkinnedMesh and physics is true. Default ( 0, - 9.8 * 10, 0 ).
-		 * @param {Number} params.delayTime - Only for THREE.Audio. Default is 0.0.
-		 * @return {THREE.MMDAnimationHelper}
-		 */
-		add: function ( object, params ) {
+   * @param {Object} params - (optional)
+   * @param {boolean} params.sync - Whether animation durations of added objects are synched. Default is true.
+   * @param {Number} params.afterglow - Default is 0.0.
+   * @param {boolean} params.resetPhysicsOnLoop - Default is true.
+   */
+		constructor( params = {} ) {
 
-			params = params || {};
+			this.meshes = [];
+			this.camera = null;
+			this.cameraTarget = new THREE.Object3D();
+			this.cameraTarget.name = 'target';
+			this.audio = null;
+			this.audioManager = null;
+			this.objects = new WeakMap();
+			this.configuration = {
+				sync: params.sync !== undefined ? params.sync : true,
+				afterglow: params.afterglow !== undefined ? params.afterglow : 0.0,
+				resetPhysicsOnLoop: params.resetPhysicsOnLoop !== undefined ? params.resetPhysicsOnLoop : true,
+				pmxAnimation: params.pmxAnimation !== undefined ? params.pmxAnimation : false
+			};
+			this.enabled = {
+				animation: true,
+				ik: true,
+				grant: true,
+				physics: true,
+				cameraAnimation: true
+			};
+
+			this.onBeforePhysics = function
+			/* mesh */
+			() {}; // experimental
+
+
+			this.sharedPhysics = false;
+			this.masterPhysics = null;
+
+		}
+		/**
+   * Adds an Three.js Object to helper and setups animation.
+   * The anmation durations of added objects are synched
+   * if this.configuration.sync is true.
+   *
+   * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
+   * @param {Object} params - (optional)
+   * @param {THREE.AnimationClip|Array<THREE.AnimationClip>} params.animation - Only for THREE.SkinnedMesh and THREE.Camera. Default is undefined.
+   * @param {boolean} params.physics - Only for THREE.SkinnedMesh. Default is true.
+   * @param {Integer} params.warmup - Only for THREE.SkinnedMesh and physics is true. Default is 60.
+   * @param {Number} params.unitStep - Only for THREE.SkinnedMesh and physics is true. Default is 1 / 65.
+   * @param {Integer} params.maxStepNum - Only for THREE.SkinnedMesh and physics is true. Default is 3.
+   * @param {Vector3} params.gravity - Only for THREE.SkinnedMesh and physics is true. Default ( 0, - 9.8 * 10, 0 ).
+   * @param {Number} params.delayTime - Only for THREE.Audio. Default is 0.0.
+   * @return {MMDAnimationHelper}
+   */
+
+
+		add( object, params = {} ) {
 
 			if ( object.isSkinnedMesh ) {
 
@@ -99,27 +87,23 @@ THREE.MMDAnimationHelper = ( function () {
 
 			} else {
 
-				throw new Error( 'THREE.MMDAnimationHelper.add: '
-					+ 'accepts only '
-					+ 'THREE.SkinnedMesh or '
-					+ 'THREE.Camera or '
-					+ 'THREE.Audio instance.' );
+				throw new Error( 'THREE.MMDAnimationHelper.add: ' + 'accepts only ' + 'THREE.SkinnedMesh or ' + 'THREE.Camera or ' + 'THREE.Audio instance.' );
 
 			}
 
 			if ( this.configuration.sync ) this._syncDuration();
-
 			return this;
 
-		},
-
+		}
 		/**
-		 * Removes an Three.js Object from helper.
-		 *
-		 * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
-		 * @return {THREE.MMDAnimationHelper}
-		 */
-		remove: function ( object ) {
+   * Removes an Three.js Object from helper.
+   *
+   * @param {THREE.SkinnedMesh|THREE.Camera|THREE.Audio} object
+   * @return {MMDAnimationHelper}
+   */
+
+
+		remove( object ) {
 
 			if ( object.isSkinnedMesh ) {
 
@@ -135,119 +119,121 @@ THREE.MMDAnimationHelper = ( function () {
 
 			} else {
 
-				throw new Error( 'THREE.MMDAnimationHelper.remove: '
-					+ 'accepts only '
-					+ 'THREE.SkinnedMesh or '
-					+ 'THREE.Camera or '
-					+ 'THREE.Audio instance.' );
+				throw new Error( 'THREE.MMDAnimationHelper.remove: ' + 'accepts only ' + 'THREE.SkinnedMesh or ' + 'THREE.Camera or ' + 'THREE.Audio instance.' );
 
 			}
 
 			if ( this.configuration.sync ) this._syncDuration();
-
 			return this;
 
-		},
-
+		}
 		/**
-		 * Updates the animation.
-		 *
-		 * @param {Number} delta
-		 * @return {THREE.MMDAnimationHelper}
-		 */
-		update: function ( delta ) {
+   * Updates the animation.
+   *
+   * @param {Number} delta
+   * @return {MMDAnimationHelper}
+   */
+
+
+		update( delta ) {
 
 			if ( this.audioManager !== null ) this.audioManager.control( delta );
 
-			for ( var i = 0; i < this.meshes.length; i ++ ) {
+			for ( let i = 0; i < this.meshes.length; i ++ ) {
 
 				this._animateMesh( this.meshes[ i ], delta );
 
 			}
 
 			if ( this.sharedPhysics ) this._updateSharedPhysics( delta );
-
 			if ( this.camera !== null ) this._animateCamera( this.camera, delta );
-
 			return this;
 
-		},
-
+		}
 		/**
-		 * Changes the pose of SkinnedMesh as VPD specifies.
-		 *
-		 * @param {THREE.SkinnedMesh} mesh
-		 * @param {Object} vpd - VPD content parsed MMDParser
-		 * @param {Object} params - (optional)
-		 * @param {boolean} params.resetPose - Default is true.
-		 * @param {boolean} params.ik - Default is true.
-		 * @param {boolean} params.grant - Default is true.
-		 * @return {THREE.MMDAnimationHelper}
-		 */
-		pose: function ( mesh, vpd, params ) {
+   * Changes the pose of SkinnedMesh as VPD specifies.
+   *
+   * @param {THREE.SkinnedMesh} mesh
+   * @param {Object} vpd - VPD content parsed MMDParser
+   * @param {Object} params - (optional)
+   * @param {boolean} params.resetPose - Default is true.
+   * @param {boolean} params.ik - Default is true.
+   * @param {boolean} params.grant - Default is true.
+   * @return {MMDAnimationHelper}
+   */
 
-			params = params || {};
+
+		pose( mesh, vpd, params = {} ) {
 
 			if ( params.resetPose !== false ) mesh.pose();
+			const bones = mesh.skeleton.bones;
+			const boneParams = vpd.bones;
+			const boneNameDictionary = {};
 
-			var bones = mesh.skeleton.bones;
-			var boneParams = vpd.bones;
-
-			var boneNameDictionary = {};
-
-			for ( var i = 0, il = bones.length; i < il; i ++ ) {
+			for ( let i = 0, il = bones.length; i < il; i ++ ) {
 
 				boneNameDictionary[ bones[ i ].name ] = i;
 
 			}
 
-			var vector = new THREE.Vector3();
-			var quaternion = new THREE.Quaternion();
+			const vector = new THREE.Vector3();
+			const quaternion = new THREE.Quaternion();
 
-			for ( var i = 0, il = boneParams.length; i < il; i ++ ) {
+			for ( let i = 0, il = boneParams.length; i < il; i ++ ) {
 
-				var boneParam = boneParams[ i ];
-				var boneIndex = boneNameDictionary[ boneParam.name ];
-
+				const boneParam = boneParams[ i ];
+				const boneIndex = boneNameDictionary[ boneParam.name ];
 				if ( boneIndex === undefined ) continue;
-
-				var bone = bones[ boneIndex ];
+				const bone = bones[ boneIndex ];
 				bone.position.add( vector.fromArray( boneParam.translation ) );
 				bone.quaternion.multiply( quaternion.fromArray( boneParam.quaternion ) );
 
 			}
 
-			mesh.updateMatrixWorld( true );
+			mesh.updateMatrixWorld( true ); // PMX animation system special path
 
-			if ( params.ik !== false ) {
+			if ( this.configuration.pmxAnimation && mesh.geometry.userData.MMD && mesh.geometry.userData.MMD.format === 'pmx' ) {
 
-				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK ); // this param is experimental
+				const sortedBonesData = this._sortBoneDataArray( mesh.geometry.userData.MMD.bones.slice() );
 
-			}
+				const ikSolver = params.ik !== false ? this._createCCDIKSolver( mesh ) : null;
+				const grantSolver = params.grant !== false ? this.createGrantSolver( mesh ) : null;
 
-			if ( params.grant !== false ) {
+				this._animatePMXMesh( mesh, sortedBonesData, ikSolver, grantSolver );
 
-				this.createGrantSolver( mesh ).update();
+			} else {
+
+				if ( params.ik !== false ) {
+
+					this._createCCDIKSolver( mesh ).update();
+
+				}
+
+				if ( params.grant !== false ) {
+
+					this.createGrantSolver( mesh ).update();
+
+				}
 
 			}
 
 			return this;
 
-		},
-
+		}
 		/**
-		 * Enabes/Disables an animation feature.
-		 *
-		 * @param {string} key
-		 * @param {boolean} enebled
-		 * @return {THREE.MMDAnimationHelper}
-		 */
-		enable: function ( key, enabled ) {
+   * Enabes/Disables an animation feature.
+   *
+   * @param {string} key
+   * @param {boolean} enabled
+   * @return {MMDAnimationHelper}
+   */
+
+
+		enable( key, enabled ) {
 
 			if ( this.enabled[ key ] === undefined ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper.enable: '
-					+ 'unknown key ' + key );
+				throw new Error( 'THREE.MMDAnimationHelper.enable: ' + 'unknown key ' + key );
 
 			}
 
@@ -255,7 +241,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( key === 'physics' ) {
 
-				for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+				for ( let i = 0, il = this.meshes.length; i < il; i ++ ) {
 
 					this._optimizeIK( this.meshes[ i ], enabled );
 
@@ -265,33 +251,34 @@ THREE.MMDAnimationHelper = ( function () {
 
 			return this;
 
-		},
-
+		}
 		/**
-		 * Creates an GrantSolver instance.
-		 *
-		 * @param {THREE.SkinnedMesh} mesh
-		 * @return {GrantSolver}
-		 */
-		createGrantSolver: function ( mesh ) {
+   * Creates an GrantSolver instance.
+   *
+   * @param {THREE.SkinnedMesh} mesh
+   * @return {GrantSolver}
+   */
+
+
+		createGrantSolver( mesh ) {
 
 			return new GrantSolver( mesh, mesh.geometry.userData.MMD.grants );
 
-		},
+		} // private methods
 
-		// private methods
 
-		_addMesh: function ( mesh, params ) {
+		_addMesh( mesh, params ) {
 
 			if ( this.meshes.indexOf( mesh ) >= 0 ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._addMesh: '
-					+ 'SkinnedMesh \'' + mesh.name + '\' has already been added.' );
+				throw new Error( 'THREE.MMDAnimationHelper._addMesh: ' + 'SkinnedMesh \'' + mesh.name + '\' has already been added.' );
 
 			}
 
 			this.meshes.push( mesh );
-			this.objects.set( mesh, { looped: false } );
+			this.objects.set( mesh, {
+				looped: false
+			} );
 
 			this._setupMeshAnimation( mesh, params.animation );
 
@@ -303,23 +290,19 @@ THREE.MMDAnimationHelper = ( function () {
 
 			return this;
 
-		},
+		}
 
-		_setupCamera: function ( camera, params ) {
+		_setupCamera( camera, params ) {
 
 			if ( this.camera === camera ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._setupCamera: '
-					+ 'Camera \'' + camera.name + '\' has already been set.' );
+				throw new Error( 'THREE.MMDAnimationHelper._setupCamera: ' + 'Camera \'' + camera.name + '\' has already been set.' );
 
 			}
 
 			if ( this.camera ) this.clearCamera( this.camera );
-
 			this.camera = camera;
-
 			camera.add( this.cameraTarget );
-
 			this.objects.set( camera, {} );
 
 			if ( params.animation !== undefined ) {
@@ -330,42 +313,37 @@ THREE.MMDAnimationHelper = ( function () {
 
 			return this;
 
-		},
+		}
 
-		_setupAudio: function ( audio, params ) {
+		_setupAudio( audio, params ) {
 
 			if ( this.audio === audio ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._setupAudio: '
-					+ 'Audio \'' + audio.name + '\' has already been set.' );
+				throw new Error( 'THREE.MMDAnimationHelper._setupAudio: ' + 'Audio \'' + audio.name + '\' has already been set.' );
 
 			}
 
 			if ( this.audio ) this.clearAudio( this.audio );
-
 			this.audio = audio;
 			this.audioManager = new AudioManager( audio, params );
-
 			this.objects.set( this.audioManager, {
 				duration: this.audioManager.duration
 			} );
-
 			return this;
 
-		},
+		}
 
-		_removeMesh: function ( mesh ) {
+		_removeMesh( mesh ) {
 
-			var found = false;
-			var writeIndex = 0;
+			let found = false;
+			let writeIndex = 0;
 
-			for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+			for ( let i = 0, il = this.meshes.length; i < il; i ++ ) {
 
 				if ( this.meshes[ i ] === mesh ) {
 
 					this.objects.delete( mesh );
 					found = true;
-
 					continue;
 
 				}
@@ -376,78 +354,65 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( ! found ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._removeMesh: '
-					+ 'SkinnedMesh \'' + mesh.name + '\' has not been added yet.' );
+				throw new Error( 'THREE.MMDAnimationHelper._removeMesh: ' + 'SkinnedMesh \'' + mesh.name + '\' has not been added yet.' );
 
 			}
 
 			this.meshes.length = writeIndex;
-
 			return this;
 
-		},
+		}
 
-		_clearCamera: function ( camera ) {
+		_clearCamera( camera ) {
 
 			if ( camera !== this.camera ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._clearCamera: '
-					+ 'Camera \'' + camera.name + '\' has not been set yet.' );
+				throw new Error( 'THREE.MMDAnimationHelper._clearCamera: ' + 'Camera \'' + camera.name + '\' has not been set yet.' );
 
 			}
 
 			this.camera.remove( this.cameraTarget );
-
 			this.objects.delete( this.camera );
 			this.camera = null;
-
 			return this;
 
-		},
+		}
 
-		_clearAudio: function ( audio ) {
+		_clearAudio( audio ) {
 
 			if ( audio !== this.audio ) {
 
-				throw new Error( 'THREE.MMDAnimationHelper._clearAudio: '
-					+ 'Audio \'' + audio.name + '\' has not been set yet.' );
+				throw new Error( 'THREE.MMDAnimationHelper._clearAudio: ' + 'Audio \'' + audio.name + '\' has not been set yet.' );
 
 			}
 
 			this.objects.delete( this.audioManager );
-
 			this.audio = null;
 			this.audioManager = null;
-
 			return this;
 
-		},
+		}
 
-		_setupMeshAnimation: function ( mesh, animation ) {
+		_setupMeshAnimation( mesh, animation ) {
 
-			var objects = this.objects.get( mesh );
+			const objects = this.objects.get( mesh );
 
 			if ( animation !== undefined ) {
 
-				var animations = Array.isArray( animation )
-					? animation : [ animation ];
-
+				const animations = Array.isArray( animation ) ? animation : [ animation ];
 				objects.mixer = new THREE.AnimationMixer( mesh );
 
-				for ( var i = 0, il = animations.length; i < il; i ++ ) {
+				for ( let i = 0, il = animations.length; i < il; i ++ ) {
 
 					objects.mixer.clipAction( animations[ i ] ).play();
 
-				}
+				} // TODO: find a workaround not to access ._clip looking like a private property
 
-				// TODO: find a workaround not to access ._clip looking like a private property
+
 				objects.mixer.addEventListener( 'loop', function ( event ) {
 
-					var tracks = event.action._clip.tracks;
-
-					if ( tracks.length > 0 &&
-					     tracks[ 0 ].name.slice( 0, 6 ) !== '.bones' ) return;
-
+					const tracks = event.action._clip.tracks;
+					if ( tracks.length > 0 && tracks[ 0 ].name.slice( 0, 6 ) !== '.bones' ) return;
 					objects.looped = true;
 
 				} );
@@ -456,39 +421,33 @@ THREE.MMDAnimationHelper = ( function () {
 
 			objects.ikSolver = this._createCCDIKSolver( mesh );
 			objects.grantSolver = this.createGrantSolver( mesh );
-
 			return this;
 
-		},
+		}
 
-		_setupCameraAnimation: function ( camera, animation ) {
+		_setupCameraAnimation( camera, animation ) {
 
-			var animations = Array.isArray( animation )
-				? animation : [ animation ];
-
-			var objects = this.objects.get( camera );
-
+			const animations = Array.isArray( animation ) ? animation : [ animation ];
+			const objects = this.objects.get( camera );
 			objects.mixer = new THREE.AnimationMixer( camera );
 
-			for ( var i = 0, il = animations.length; i < il; i ++ ) {
+			for ( let i = 0, il = animations.length; i < il; i ++ ) {
 
 				objects.mixer.clipAction( animations[ i ] ).play();
 
 			}
 
-		},
+		}
 
-		_setupMeshPhysics: function ( mesh, params ) {
+		_setupMeshPhysics( mesh, params ) {
 
-			var objects = this.objects.get( mesh );
-
-			// shared physics is experimental
+			const objects = this.objects.get( mesh ); // shared physics is experimental
 
 			if ( params.world === undefined && this.sharedPhysics ) {
 
-				var masterPhysics = this._getMasterPhysics();
+				const masterPhysics = this._getMasterPhysics();
 
-				if ( masterPhysics !== null ) world = masterPhysics.world;
+				if ( masterPhysics !== null ) world = masterPhysics.world; // eslint-disable-line no-undef
 
 			}
 
@@ -497,6 +456,7 @@ THREE.MMDAnimationHelper = ( function () {
 			if ( objects.mixer && params.animationWarmup !== false ) {
 
 				this._animateMesh( mesh, 0 );
+
 				objects.physics.reset();
 
 			}
@@ -505,40 +465,49 @@ THREE.MMDAnimationHelper = ( function () {
 
 			this._optimizeIK( mesh, true );
 
-		},
+		}
 
-		_animateMesh: function ( mesh, delta ) {
+		_animateMesh( mesh, delta ) {
 
-			var objects = this.objects.get( mesh );
-
-			var mixer = objects.mixer;
-			var ikSolver = objects.ikSolver;
-			var grantSolver = objects.grantSolver;
-			var physics = objects.physics;
-			var looped = objects.looped;
-
-			// alternate solution to save/restore bones but less performant?
-			//mesh.pose();
-			//this._updatePropertyMixersBuffer( mesh );
+			const objects = this.objects.get( mesh );
+			const mixer = objects.mixer;
+			const ikSolver = objects.ikSolver;
+			const grantSolver = objects.grantSolver;
+			const physics = objects.physics;
+			const looped = objects.looped;
 
 			if ( mixer && this.enabled.animation ) {
 
+				// alternate solution to save/restore bones but less performant?
+				//mesh.pose();
+				//this._updatePropertyMixersBuffer( mesh );
 				this._restoreBones( mesh );
 
 				mixer.update( delta );
 
-				this._saveBones( mesh );
+				this._saveBones( mesh ); // PMX animation system special path
 
-				if ( ikSolver && this.enabled.ik ) {
 
-					mesh.updateMatrixWorld( true );
-					ikSolver.update();
+				if ( this.configuration.pmxAnimation && mesh.geometry.userData.MMD && mesh.geometry.userData.MMD.format === 'pmx' ) {
 
-				}
+					if ( ! objects.sortedBonesData ) objects.sortedBonesData = this._sortBoneDataArray( mesh.geometry.userData.MMD.bones.slice() );
 
-				if ( grantSolver && this.enabled.grant ) {
+					this._animatePMXMesh( mesh, objects.sortedBonesData, ikSolver && this.enabled.ik ? ikSolver : null, grantSolver && this.enabled.grant ? grantSolver : null );
 
-					grantSolver.update();
+				} else {
+
+					if ( ikSolver && this.enabled.ik ) {
+
+						mesh.updateMatrixWorld( true );
+						ikSolver.update();
+
+					}
+
+					if ( grantSolver && this.enabled.grant ) {
+
+						grantSolver.update();
+
+					}
 
 				}
 
@@ -547,7 +516,6 @@ THREE.MMDAnimationHelper = ( function () {
 			if ( looped === true && this.enabled.physics ) {
 
 				if ( physics && this.configuration.resetPhysicsOnLoop ) physics.reset();
-
 				objects.looped = false;
 
 			}
@@ -559,39 +527,82 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-		},
+		} // Sort bones in order by 1. transformationClass and 2. bone index.
+		// In PMX animation system, bone transformations should be processed
+		// in this order.
 
-		_animateCamera: function ( camera, delta ) {
 
-			var mixer = this.objects.get( camera ).mixer;
+		_sortBoneDataArray( boneDataArray ) {
+
+			return boneDataArray.sort( function ( a, b ) {
+
+				if ( a.transformationClass !== b.transformationClass ) {
+
+					return a.transformationClass - b.transformationClass;
+
+				} else {
+
+					return a.index - b.index;
+
+				}
+
+			} );
+
+		} // PMX Animation system is a bit too complex and doesn't great match to
+		// Three.js Animation system. This method attempts to simulate it as much as
+		// possible but doesn't perfectly simulate.
+		// This method is more costly than the regular one so
+		// you are recommended to set constructor parameter "pmxAnimation: true"
+		// only if your PMX model animation doesn't work well.
+		// If you need better method you would be required to write your own.
+
+
+		_animatePMXMesh( mesh, sortedBonesData, ikSolver, grantSolver ) {
+
+			_quaternionIndex = 0;
+
+			_grantResultMap.clear();
+
+			for ( let i = 0, il = sortedBonesData.length; i < il; i ++ ) {
+
+				updateOne( mesh, sortedBonesData[ i ].index, ikSolver, grantSolver );
+
+			}
+
+			mesh.updateMatrixWorld( true );
+			return this;
+
+		}
+
+		_animateCamera( camera, delta ) {
+
+			const mixer = this.objects.get( camera ).mixer;
 
 			if ( mixer && this.enabled.cameraAnimation ) {
 
 				mixer.update( delta );
-
 				camera.updateProjectionMatrix();
-
 				camera.up.set( 0, 1, 0 );
 				camera.up.applyQuaternion( camera.quaternion );
 				camera.lookAt( this.cameraTarget.position );
 
 			}
 
-		},
+		}
 
-		_optimizeIK: function ( mesh, physicsEnabled ) {
+		_optimizeIK( mesh, physicsEnabled ) {
 
-			var iks = mesh.geometry.userData.MMD.iks;
-			var bones = mesh.geometry.userData.MMD.bones;
+			const iks = mesh.geometry.userData.MMD.iks;
+			const bones = mesh.geometry.userData.MMD.bones;
 
-			for ( var i = 0, il = iks.length; i < il; i ++ ) {
+			for ( let i = 0, il = iks.length; i < il; i ++ ) {
 
-				var ik = iks[ i ];
-				var links = ik.links;
+				const ik = iks[ i ];
+				const links = ik.links;
 
-				for ( var j = 0, jl = links.length; j < jl; j ++ ) {
+				for ( let j = 0, jl = links.length; j < jl; j ++ ) {
 
-					var link = links[ j ];
+					const link = links[ j ];
 
 					if ( physicsEnabled === true ) {
 
@@ -609,9 +620,9 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-		},
+		}
 
-		_createCCDIKSolver: function ( mesh ) {
+		_createCCDIKSolver( mesh ) {
 
 			if ( THREE.CCDIKSolver === undefined ) {
 
@@ -621,9 +632,9 @@ THREE.MMDAnimationHelper = ( function () {
 
 			return new THREE.CCDIKSolver( mesh, mesh.geometry.userData.MMD.iks );
 
-		},
+		}
 
-		_createMMDPhysics: function ( mesh, params ) {
+		_createMMDPhysics( mesh, params ) {
 
 			if ( THREE.MMDPhysics === undefined ) {
 
@@ -631,38 +642,31 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			return new THREE.MMDPhysics(
-				mesh,
-				mesh.geometry.userData.MMD.rigidBodies,
-				mesh.geometry.userData.MMD.constraints,
-				params );
+			return new THREE.MMDPhysics( mesh, mesh.geometry.userData.MMD.rigidBodies, mesh.geometry.userData.MMD.constraints, params );
 
-		},
-
+		}
 		/*
-		 * Detects the longest duration and then sets it to them to sync.
-		 * TODO: Not to access private properties ( ._actions and ._clip )
-		 */
-		_syncDuration: function () {
+   * Detects the longest duration and then sets it to them to sync.
+   * TODO: Not to access private properties ( ._actions and ._clip )
+   */
 
-			var max = 0.0;
 
-			var objects = this.objects;
-			var meshes = this.meshes;
-			var camera = this.camera;
-			var audioManager = this.audioManager;
+		_syncDuration() {
 
-			// get the longest duration
+			let max = 0.0;
+			const objects = this.objects;
+			const meshes = this.meshes;
+			const camera = this.camera;
+			const audioManager = this.audioManager; // get the longest duration
 
-			for ( var i = 0, il = meshes.length; i < il; i ++ ) {
+			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
-				var mixer = this.objects.get( meshes[ i ] ).mixer;
-
+				const mixer = this.objects.get( meshes[ i ] ).mixer;
 				if ( mixer === undefined ) continue;
 
-				for ( var j = 0; j < mixer._actions.length; j ++ ) {
+				for ( let j = 0; j < mixer._actions.length; j ++ ) {
 
-					var clip = mixer._actions[ j ]._clip;
+					const clip = mixer._actions[ j ]._clip;
 
 					if ( ! objects.has( clip ) ) {
 
@@ -680,13 +684,13 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( camera !== null ) {
 
-				var mixer = this.objects.get( camera ).mixer;
+				const mixer = this.objects.get( camera ).mixer;
 
 				if ( mixer !== undefined ) {
 
-					for ( var i = 0, il = mixer._actions.length; i < il; i ++ ) {
+					for ( let i = 0, il = mixer._actions.length; i < il; i ++ ) {
 
-						var clip = mixer._actions[ i ]._clip;
+						const clip = mixer._actions[ i ]._clip;
 
 						if ( ! objects.has( clip ) ) {
 
@@ -710,17 +714,14 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			max += this.configuration.afterglow;
+			max += this.configuration.afterglow; // update the duration
 
-			// update the duration
+			for ( let i = 0, il = this.meshes.length; i < il; i ++ ) {
 
-			for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
-
-				var mixer = this.objects.get( this.meshes[ i ] ).mixer;
-
+				const mixer = this.objects.get( this.meshes[ i ] ).mixer;
 				if ( mixer === undefined ) continue;
 
-				for ( var j = 0, jl = mixer._actions.length; j < jl; j ++ ) {
+				for ( let j = 0, jl = mixer._actions.length; j < jl; j ++ ) {
 
 					mixer._actions[ j ]._clip.duration = max;
 
@@ -730,11 +731,11 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( camera !== null ) {
 
-				var mixer = this.objects.get( camera ).mixer;
+				const mixer = this.objects.get( camera ).mixer;
 
 				if ( mixer !== undefined ) {
 
-					for ( var i = 0, il = mixer._actions.length; i < il; i ++ ) {
+					for ( let i = 0, il = mixer._actions.length; i < il; i ++ ) {
 
 						mixer._actions[ i ]._clip.duration = max;
 
@@ -750,46 +751,42 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-		},
+		} // workaround
 
-		// workaround
 
-		_updatePropertyMixersBuffer: function ( mesh ) {
+		_updatePropertyMixersBuffer( mesh ) {
 
-			var mixer = this.objects.get( mesh ).mixer;
+			const mixer = this.objects.get( mesh ).mixer;
+			const propertyMixers = mixer._bindings;
+			const accuIndex = mixer._accuIndex;
 
-			var propertyMixers = mixer._bindings;
-			var accuIndex = mixer._accuIndex;
+			for ( let i = 0, il = propertyMixers.length; i < il; i ++ ) {
 
-			for ( var i = 0, il = propertyMixers.length; i < il; i ++ ) {
-
-				var propertyMixer = propertyMixers[ i ];
-				var buffer = propertyMixer.buffer;
-				var stride = propertyMixer.valueSize;
-				var offset = ( accuIndex + 1 ) * stride;
-
+				const propertyMixer = propertyMixers[ i ];
+				const buffer = propertyMixer.buffer;
+				const stride = propertyMixer.valueSize;
+				const offset = ( accuIndex + 1 ) * stride;
 				propertyMixer.binding.getValue( buffer, offset );
 
 			}
 
-		},
-
+		}
 		/*
-		 * Avoiding these two issues by restore/save bones before/after mixer animation.
-		 *
-		 * 1. PropertyMixer used by AnimationMixer holds cache value in .buffer.
-		 *    Calculating IK, Grant, and Physics after mixer animation can break
-		 *    the cache coherency.
-		 *
-		 * 2. Applying Grant two or more times without reset the posing breaks model.
-		 */
-		_saveBones: function ( mesh ) {
+   * Avoiding these two issues by restore/save bones before/after mixer animation.
+   *
+   * 1. PropertyMixer used by THREE.AnimationMixer holds cache value in .buffer.
+   *    Calculating IK, Grant, and Physics after mixer animation can break
+   *    the cache coherency.
+   *
+   * 2. Applying Grant two or more times without reset the posing breaks model.
+   */
 
-			var objects = this.objects.get( mesh );
 
-			var bones = mesh.skeleton.bones;
+		_saveBones( mesh ) {
 
-			var backupBones = objects.backupBones;
+			const objects = this.objects.get( mesh );
+			const bones = mesh.skeleton.bones;
+			let backupBones = objects.backupBones;
 
 			if ( backupBones === undefined ) {
 
@@ -798,45 +795,41 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			for ( var i = 0, il = bones.length; i < il; i ++ ) {
+			for ( let i = 0, il = bones.length; i < il; i ++ ) {
 
-				var bone = bones[ i ];
+				const bone = bones[ i ];
 				bone.position.toArray( backupBones, i * 7 );
 				bone.quaternion.toArray( backupBones, i * 7 + 3 );
 
 			}
 
-		},
+		}
 
-		_restoreBones: function ( mesh ) {
+		_restoreBones( mesh ) {
 
-			var objects = this.objects.get( mesh );
-
-			var backupBones = objects.backupBones;
-
+			const objects = this.objects.get( mesh );
+			const backupBones = objects.backupBones;
 			if ( backupBones === undefined ) return;
+			const bones = mesh.skeleton.bones;
 
-			var bones = mesh.skeleton.bones;
+			for ( let i = 0, il = bones.length; i < il; i ++ ) {
 
-			for ( var i = 0, il = bones.length; i < il; i ++ ) {
-
-				var bone = bones[ i ];
+				const bone = bones[ i ];
 				bone.position.fromArray( backupBones, i * 7 );
 				bone.quaternion.fromArray( backupBones, i * 7 + 3 );
 
 			}
 
-		},
+		} // experimental
 
-		// experimental
 
-		_getMasterPhysics: function () {
+		_getMasterPhysics() {
 
 			if ( this.masterPhysics !== null ) return this.masterPhysics;
 
-			for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+			for ( let i = 0, il = this.meshes.length; i < il; i ++ ) {
 
-				var physics = this.meshes[ i ].physics;
+				const physics = this.meshes[ i ].physics;
 
 				if ( physics !== undefined && physics !== null ) {
 
@@ -849,19 +842,19 @@ THREE.MMDAnimationHelper = ( function () {
 
 			return null;
 
-		},
+		}
 
-		_updateSharedPhysics: function ( delta ) {
+		_updateSharedPhysics( delta ) {
 
 			if ( this.meshes.length === 0 || ! this.enabled.physics || ! this.sharedPhysics ) return;
 
-			var physics = this._getMasterPhysics();
+			const physics = this._getMasterPhysics();
 
 			if ( physics === null ) return;
 
-			for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+			for ( let i = 0, il = this.meshes.length; i < il; i ++ ) {
 
-				var p = this.meshes[ i ].physics;
+				const p = this.meshes[ i ].physics;
 
 				if ( p !== null && p !== undefined ) {
 
@@ -873,9 +866,9 @@ THREE.MMDAnimationHelper = ( function () {
 
 			physics.stepSimulation( delta );
 
-			for ( var i = 0, il = this.meshes.length; i < il; i ++ ) {
+			for ( let i = 0, il = this.meshes.length; i < il; i ++ ) {
 
-				var p = this.meshes[ i ].physics;
+				const p = this.meshes[ i ].physics;
 
 				if ( p !== null && p !== undefined ) {
 
@@ -887,54 +880,125 @@ THREE.MMDAnimationHelper = ( function () {
 
 		}
 
-	};
+	} // Keep working quaternions for less GC
 
-	//
 
-	/**
-	 * @param {THREE.Audio} audio
-	 * @param {Object} params - (optional)
-	 * @param {Nuumber} params.delayTime
-	 */
-	function AudioManager( audio, params ) {
+	const _quaternions = [];
+	let _quaternionIndex = 0;
 
-		params = params || {};
+	function getQuaternion() {
 
-		this.audio = audio;
+		if ( _quaternionIndex >= _quaternions.length ) {
 
-		this.elapsedTime = 0.0;
-		this.currentTime = 0.0;
-		this.delayTime = params.delayTime !== undefined
-			? params.delayTime : 0.0;
+			_quaternions.push( new THREE.Quaternion() );
 
-		this.audioDuration = this.audio.buffer.duration;
-		this.duration = this.audioDuration + this.delayTime;
+		}
 
-	}
+		return _quaternions[ _quaternionIndex ++ ];
 
-	AudioManager.prototype = {
+	} // Save rotation whose grant and IK are already applied
+	// used by grant children
 
-		constructor: AudioManager,
+
+	const _grantResultMap = new Map();
+
+	function updateOne( mesh, boneIndex, ikSolver, grantSolver ) {
+
+		const bones = mesh.skeleton.bones;
+		const bonesData = mesh.geometry.userData.MMD.bones;
+		const boneData = bonesData[ boneIndex ];
+		const bone = bones[ boneIndex ]; // Return if already updated by being referred as a grant parent.
+
+		if ( _grantResultMap.has( boneIndex ) ) return;
+		const quaternion = getQuaternion(); // Initialize grant result here to prevent infinite loop.
+		// If it's referred before updating with actual result later
+		// result without applyting IK or grant is gotten
+		// but better than composing of infinite loop.
+
+		_grantResultMap.set( boneIndex, quaternion.copy( bone.quaternion ) ); // @TODO: Support global grant and grant position
+
+
+		if ( grantSolver && boneData.grant && ! boneData.grant.isLocal && boneData.grant.affectRotation ) {
+
+			const parentIndex = boneData.grant.parentIndex;
+			const ratio = boneData.grant.ratio;
+
+			if ( ! _grantResultMap.has( parentIndex ) ) {
+
+				updateOne( mesh, parentIndex, ikSolver, grantSolver );
+
+			}
+
+			grantSolver.addGrantRotation( bone, _grantResultMap.get( parentIndex ), ratio );
+
+		}
+
+		if ( ikSolver && boneData.ik ) {
+
+			// @TODO: Updating world matrices every time solving an IK bone is
+			// costly. Optimize if possible.
+			mesh.updateMatrixWorld( true );
+			ikSolver.updateOne( boneData.ik ); // No confident, but it seems the grant results with ik links should be updated?
+
+			const links = boneData.ik.links;
+
+			for ( let i = 0, il = links.length; i < il; i ++ ) {
+
+				const link = links[ i ];
+				if ( link.enabled === false ) continue;
+				const linkIndex = link.index;
+
+				if ( _grantResultMap.has( linkIndex ) ) {
+
+					_grantResultMap.set( linkIndex, _grantResultMap.get( linkIndex ).copy( bones[ linkIndex ].quaternion ) );
+
+				}
+
+			}
+
+		} // Update with the actual result here
+
+
+		quaternion.copy( bone.quaternion );
+
+	} //
+
+
+	class AudioManager {
 
 		/**
-		 * @param {Number} delta
-		 * @return {AudioManager}
-		 */
-		control: function ( delta ) {
+   * @param {THREE.Audio} audio
+   * @param {Object} params - (optional)
+   * @param {Nuumber} params.delayTime
+   */
+		constructor( audio, params = {} ) {
+
+			this.audio = audio;
+			this.elapsedTime = 0.0;
+			this.currentTime = 0.0;
+			this.delayTime = params.delayTime !== undefined ? params.delayTime : 0.0;
+			this.audioDuration = this.audio.buffer.duration;
+			this.duration = this.audioDuration + this.delayTime;
+
+		}
+		/**
+   * @param {Number} delta
+   * @return {AudioManager}
+   */
+
+
+		control( delta ) {
 
 			this.elapsed += delta;
 			this.currentTime += delta;
-
 			if ( this._shouldStopAudio() ) this.audio.stop();
 			if ( this._shouldStartAudio() ) this.audio.play();
-
 			return this;
 
-		},
+		} // private methods
 
-		// private methods
 
-		_shouldStartAudio: function () {
+		_shouldStartAudio() {
 
 			if ( this.audio.isPlaying ) return false;
 
@@ -944,98 +1008,110 @@ THREE.MMDAnimationHelper = ( function () {
 
 			}
 
-			if ( this.currentTime < this.delayTime ) return false;
-			
-			// 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
-			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
+			if ( this.currentTime < this.delayTime ) return false; // 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
 
-			this.audio.startTime = this.currentTime - this.delayTime;
-
+			if ( this.currentTime - this.delayTime > this.audioDuration ) return false;
 			return true;
-
-		},
-
-		_shouldStopAudio: function () {
-
-			return this.audio.isPlaying &&
-				this.currentTime >= this.duration;
 
 		}
 
-	};
+		_shouldStopAudio() {
 
-	/**
-	 * @param {THREE.SkinnedMesh} mesh
-	 * @param {Array<Object>} grants
-	 */
-	function GrantSolver( mesh, grants ) {
+			return this.audio.isPlaying && this.currentTime >= this.duration;
 
-		this.mesh = mesh;
-		this.grants = grants || [];
+		}
 
 	}
 
-	GrantSolver.prototype = {
+	const _q = new THREE.Quaternion();
+	/**
+ * Solver for Grant (Fuyo in Japanese. I just google translated because
+ * Fuyo may be MMD specific term and may not be common word in 3D CG terms.)
+ * Grant propagates a bone's transform to other bones transforms even if
+ * they are not children.
+ * @param {THREE.SkinnedMesh} mesh
+ * @param {Array<Object>} grants
+ */
 
-		constructor: GrantSolver,
 
+	class GrantSolver {
+
+		constructor( mesh, grants = [] ) {
+
+			this.mesh = mesh;
+			this.grants = grants;
+
+		}
 		/**
-		 * @return {GrantSolver}
-		 */
-		update: function () {
+   * Solve all the grant bones
+   * @return {GrantSolver}
+   */
 
-			var quaternion = new THREE.Quaternion();
 
-			return function () {
+		update() {
 
-				var bones = this.mesh.skeleton.bones;
-				var grants = this.grants;
+			const grants = this.grants;
 
-				for ( var i = 0, il = grants.length; i < il; i ++ ) {
+			for ( let i = 0, il = grants.length; i < il; i ++ ) {
 
-					var grant = grants[ i ];
-					var bone = bones[ grant.index ];
-					var parentBone = bones[ grant.parentIndex ];
+				this.updateOne( grants[ i ] );
 
-					if ( grant.isLocal ) {
+			}
 
-						// TODO: implement
-						if ( grant.affectPosition ) {
+			return this;
 
-						}
+		}
+		/**
+   * Solve a grant bone
+   * @param {Object} grant - grant parameter
+   * @return {GrantSolver}
+   */
 
-						// TODO: implement
-						if ( grant.affectRotation ) {
 
-						}
+		updateOne( grant ) {
 
-					} else {
+			const bones = this.mesh.skeleton.bones;
+			const bone = bones[ grant.index ];
+			const parentBone = bones[ grant.parentIndex ];
 
-						// TODO: implement
-						if ( grant.affectPosition ) {
+			if ( grant.isLocal ) {
 
-						}
+				// TODO: implement
+				if ( grant.affectPosition ) {} // TODO: implement
 
-						if ( grant.affectRotation ) {
 
-							quaternion.set( 0, 0, 0, 1 );
-							quaternion.slerp( parentBone.quaternion, grant.ratio );
-							bone.quaternion.multiply( quaternion );
+				if ( grant.affectRotation ) {}
 
-						}
+			} else {
 
-					}
+				// TODO: implement
+				if ( grant.affectPosition ) {}
+
+				if ( grant.affectRotation ) {
+
+					this.addGrantRotation( bone, parentBone.quaternion, grant.ratio );
 
 				}
 
-				return this;
+			}
 
-			};
+			return this;
 
-		}()
+		}
 
-	};
+		addGrantRotation( bone, q, ratio ) {
 
-	return MMDAnimationHelper;
+			_q.set( 0, 0, 0, 1 );
+
+			_q.slerp( q, ratio );
+
+			bone.quaternion.multiply( _q );
+			return this;
+
+		}
+
+	}
+
+	THREE.MMDAnimationHelper = MMDAnimationHelper;
 
 } )();

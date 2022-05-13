@@ -4,68 +4,78 @@
 		<title>three.js webgl - loaders - MMD loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #fff;
-				color: #000;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
 			}
-			#info {
-				color: #000;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				display:block;
+			a {
+				color: #08f;
 			}
-			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
 		</style>
 	</head>
 
 	<body>
+		<div id="overlay">
+			<button id="startButton">Play</button>
+		</div>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
 		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
 		Copyright
-		<a href="http://www.geocities.jp/higuchuu4/index_e.htm" target="_blank" rel="noopener">Model Data</a>
+		<a href="https://sites.google.com/view/evpvp/" target="_blank" rel="noopener">Model Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm13147122" target="_blank" rel="noopener">Dance Data</a>
 		<a href="http://www.nicovideo.jp/watch/sm11938255" target="_blank" rel="noopener">Audio Data</a><br />
 		Camera is customized from <a href="http://www.nicovideo.jp/watch/sm19168559" target="_blank" rel="noopener">this Data</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script src="js/libs/ammo.wasm.js"></script>
 
-		<script src="js/libs/mmdparser.min.js"></script>
-		<script src="js/libs/ammo.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/loaders/TGALoader.js"></script>
-		<script src="js/loaders/MMDLoader.js"></script>
-		<script src="js/effects/OutlineEffect.js"></script>
-		<script src="js/animation/CCDIKSolver.js"></script>
-		<script src="js/animation/MMDPhysics.js"></script>
-		<script src="js/animation/MMDAnimationHelper.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from 'three';
 
-			var container;
+			import { OutlineEffect } from './jsm/effects/OutlineEffect.js';
+			import { MMDLoader } from './jsm/loaders/MMDLoader.js';
+			import { MMDAnimationHelper } from './jsm/animation/MMDAnimationHelper.js';
 
-			var mesh, camera, scene, renderer, effect;
-			var helper;
+			let mesh, camera, scene, renderer, effect;
+			let helper;
 
-			var ready = false;
+			let ready = false;
 
-			var clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-			init();
-			animate();
+			const startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
+
+				Ammo().then( function () {
+
+					init();
+					animate();
+
+				} );
+
+			} );
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const overlay = document.getElementById( 'overlay' );
+				overlay.remove();
+
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -77,10 +87,14 @@
 
 				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
 
-				var ambient = new THREE.AmbientLight( 0x666666 );
+				const listener = new THREE.AudioListener();
+				camera.add( listener );
+				scene.add( camera );
+
+				const ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0x887766 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
@@ -91,7 +105,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.OutlineEffect( renderer );
+				effect = new OutlineEffect( renderer );
 
 				// model
 
@@ -99,22 +113,22 @@
 
 					if ( xhr.lengthComputable ) {
 
-						var percentComplete = xhr.loaded / xhr.total * 100;
+						const percentComplete = xhr.loaded / xhr.total * 100;
 						console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
 
 					}
 
 				}
 
-				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
-				var cameraFiles = [ 'models/mmd/vmds/wavefile_camera.vmd' ];
-				var audioFile = 'models/mmd/audios/wavefile_short.mp3';
-				var audioParams = { delayTime: 160 * 1 / 30 };
+				const modelFile = 'models/mmd/miku/miku_v2.pmd';
+				const vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+				const cameraFiles = [ 'models/mmd/vmds/wavefile_camera.vmd' ];
+				const audioFile = 'models/mmd/audios/wavefile_short.mp3';
+				const audioParams = { delayTime: 160 * 1 / 30 };
 
-				helper = new THREE.MMDAnimationHelper();
+				helper = new MMDAnimationHelper();
 
-				var loader = new THREE.MMDLoader();
+				const loader = new MMDLoader();
 
 				loader.loadWithAnimation( modelFile, vmdFiles, function ( mmd ) {
 
@@ -133,15 +147,9 @@
 
 						new THREE.AudioLoader().load( audioFile, function ( buffer ) {
 
-							var listener = new THREE.AudioListener();
-							var audio = new THREE.Audio( listener ).setBuffer( buffer );
-
-							listener.position.z = 1;
+							const audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 							helper.add( audio, audioParams );
-
-							scene.add( audio );
-							scene.add( listener );
 							scene.add( mesh );
 
 							ready = true;
@@ -154,7 +162,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

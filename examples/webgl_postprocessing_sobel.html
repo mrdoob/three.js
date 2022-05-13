@@ -4,63 +4,47 @@
 		<title>three.js webgl - postprocessing - sobel (edge detection)</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/LuminosityShader.js"></script>
-		<script src="js/shaders/SobelOperatorShader.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - webgl - postprocessing - sobel (edge detection)
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - webgl - postprocessing<br/>
+			sobel (edge detection)
 		</div>
 
-		<script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var camera, scene, renderer, composer;
+		<script type="module">
 
-			var effectSobel;
+			import * as THREE from 'three';
 
-			var params = {
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+
+			import { LuminosityShader } from './jsm/shaders/LuminosityShader.js';
+			import { SobelOperatorShader } from './jsm/shaders/SobelOperatorShader.js';
+
+			let camera, scene, renderer, composer;
+
+			let effectSobel;
+
+			const params = {
 				enable: true
 			};
 
@@ -73,24 +57,24 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.set( 0, 10, 25 );
 				camera.lookAt( scene.position );
 
 				//
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 8, 3, 256, 32, 2, 3 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
+				const geometry = new THREE.TorusKnotGeometry( 8, 3, 256, 32, 2, 3 );
+				const material = new THREE.MeshPhongMaterial( { color: 0xffff00 } );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				//
 
-				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
 				scene.add( ambientLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
 				scene.add( camera );
 
@@ -103,13 +87,13 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				var renderPass = new THREE.RenderPass( scene, camera );
+				composer = new EffectComposer( renderer );
+				const renderPass = new RenderPass( scene, camera );
 				composer.addPass( renderPass );
 
 				// color to grayscale conversion
 
-				var effectGrayScale = new THREE.ShaderPass( THREE.LuminosityShader );
+				const effectGrayScale = new ShaderPass( LuminosityShader );
 				composer.addPass( effectGrayScale );
 
 				// you might want to use a gaussian blur filter before
@@ -117,24 +101,25 @@
 
 				// Sobel operator
 
-				effectSobel = new THREE.ShaderPass( THREE.SobelOperatorShader );
-				effectSobel.renderToScreen = true;
-				effectSobel.uniforms[ "resolution" ].value.x = window.innerWidth;
-				effectSobel.uniforms[ "resolution" ].value.y = window.innerHeight;
+				effectSobel = new ShaderPass( SobelOperatorShader );
+				effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
+				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
 				composer.addPass( effectSobel );
 
-				var controls = new THREE.OrbitControls( camera );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 10;
+				controls.maxDistance = 100;
 
 				//
 
-				var gui = new dat.GUI();
+				const gui = new GUI();
 
 				gui.add( params, 'enable' );
 				gui.open();
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -146,8 +131,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectSobel.uniforms[ "resolution" ].value.x = window.innerWidth;
-				effectSobel.uniforms[ "resolution" ].value.y = window.innerHeight;
+				effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
+				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
 
 			}
 

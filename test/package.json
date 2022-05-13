@@ -1,0 +1,19 @@
+{
+  "name": "test-deps-intaller",
+  "private": true,
+  "version": "1.0.0",
+  "description": "This package hiding test dependincies from main repo because puppeteer is pretty big.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "unit": "qunit -r failonlyreporter -f !-webonly unit/three.source.unit.js"
+  },
+  "devDependencies": {
+    "failonlyreporter": "^1.0.0",
+    "jimp": "^0.16.1",
+    "pixelmatch": "^5.2.1",
+    "puppeteer": "^13.1.2",
+    "qunit": "^2.18.0",
+    "serve-handler": "^6.1.3"
+  }
+}

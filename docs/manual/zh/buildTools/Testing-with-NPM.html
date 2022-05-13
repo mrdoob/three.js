@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -24,7 +23,7 @@
 			</code>
 			并将
 		<code>
-			var THREE = require('three');
+			const THREE = require('three');
 		</code>
 			添加到你的测试中。
 		</p>
@@ -131,7 +130,7 @@ $ npm install three --save-dev
  $ npm install three@0.84.0 --save
 							</code>
 							（例子中用的是0.84.0）。 --save 指令将此加入项目的dependency而不是dev dependency。
-							更多信息请参阅<a href="https://www.npmjs.org/doc/json.html">这份文档</a>。
+							更多信息请参阅<a href="https://docs.npmjs.com/cli/v8/configuring-npm/package-json">这份文档</a>。
 						</li>
 					</ul>
 				</li>
@@ -147,8 +146,8 @@ $ npm install three --save-dev
 					最后我们需要一份JS测试文件来运行。我们就添加一段简单的测试程序，这段程序会检验three.js对象是否能正常工作。
 					在 test/ 目录下创建verify-three.js包含以下代码：
 <code>
-var THREE = require('three');
-var assert = require("assert");
+const THREE = require('three');
+const assert = require("assert");
 
 describe('The THREE object', function() {
   it('should have a defined BasicShadowMap constant', function() {
@@ -156,7 +155,7 @@ describe('The THREE object', function() {
   }),
 
   it('should be able to construct a Vector3 with default of x=0', function() {
-    var vec3 = new THREE.Vector3();
+    const vec3 = new THREE.Vector3();
     assert.equal(0, vec3.x);
   })
 })
@@ -239,8 +238,8 @@ if (typeof exports !== 'undefined')
 //=============================================================================
 if (typeof require === 'function') // 检测nodejs环境
 {
-  var THREE = require('three');
-  var MY3 = require('./MY3.js');
+  const THREE = require('three');
+  const MY3 = require('./MY3.js');
 }
 			</code>
 		</div>

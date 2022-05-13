@@ -4,49 +4,34 @@
 		<title>three.js webgl - materials - compressed textures</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #050505;
-				color: #fff;
-				overflow: hidden;
-			}
-
-			a { color: #e00 }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - PVR compressed textures
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - PVR compressed textures
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/PVRLoader.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/WebGL.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var camera, scene, renderer;
-			var meshes = [];
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { PVRLoader } from './jsm/loaders/PVRLoader.js';
+
+			let camera, scene, renderer;
+			const meshes = [];
 
 			init();
 			animate();
@@ -58,11 +43,11 @@
 
 				scene = new THREE.Scene();
 
-				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
 				//
 
-				var onCube1Loaded = function ( texture ) {
+				const onCube1Loaded = function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
@@ -71,10 +56,10 @@
 
 				};
 
-				var onCube2Loaded = function ( texture ) {
+				const onCube2Loaded = function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
-					// texture.minFilter = THREE.LinearMipMapNearestFilter;
+					// texture.minFilter = LinearMipmapNearestFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
 					material8.needsUpdate = true;
@@ -83,16 +68,16 @@
 
 				//
 
-				var loader = new THREE.PVRLoader();
+				const loader = new PVRLoader();
 
-				var disturb_4bpp_rgb = loader.load( 'textures/compressed/disturb_4bpp_rgb.pvr' );
-				var disturb_4bpp_rgb_v3 = loader.load( 'textures/compressed/disturb_4bpp_rgb_v3.pvr' );
-				var disturb_4bpp_rgb_mips = loader.load( 'textures/compressed/disturb_4bpp_rgb_mips.pvr' );
-				var disturb_2bpp_rgb = loader.load( 'textures/compressed/disturb_2bpp_rgb.pvr' );
-				var flare_4bpp_rgba = loader.load( 'textures/compressed/flare_4bpp_rgba.pvr' );
-				var flare_2bpp_rgba = loader.load( 'textures/compressed/flare_2bpp_rgba.pvr' );
-				var park3_cube_nomip_4bpp_rgb = loader.load( 'textures/compressed/park3_cube_nomip_4bpp_rgb.pvr', onCube1Loaded );
-				var park3_cube_mip_2bpp_rgb_v3 = loader.load( 'textures/compressed/park3_cube_mip_2bpp_rgb_v3.pvr', onCube2Loaded );
+				const disturb_4bpp_rgb = loader.load( 'textures/compressed/disturb_4bpp_rgb.pvr' );
+				const disturb_4bpp_rgb_v3 = loader.load( 'textures/compressed/disturb_4bpp_rgb_v3.pvr' );
+				const disturb_4bpp_rgb_mips = loader.load( 'textures/compressed/disturb_4bpp_rgb_mips.pvr' );
+				const disturb_2bpp_rgb = loader.load( 'textures/compressed/disturb_2bpp_rgb.pvr' );
+				const flare_4bpp_rgba = loader.load( 'textures/compressed/flare_4bpp_rgba.pvr' );
+				const flare_2bpp_rgba = loader.load( 'textures/compressed/flare_2bpp_rgba.pvr' );
+				const park3_cube_nomip_4bpp_rgb = loader.load( 'textures/compressed/park3_cube_nomip_4bpp_rgb.pvr', onCube1Loaded );
+				const park3_cube_mip_2bpp_rgb_v3 = loader.load( 'textures/compressed/park3_cube_mip_2bpp_rgb_v3.pvr', onCube2Loaded );
 
 				disturb_2bpp_rgb.minFilter =
 				disturb_2bpp_rgb.magFilter =
@@ -105,19 +90,19 @@
 				flare_2bpp_rgba.minFilter =
 				flare_2bpp_rgba.magFilter = THREE.LinearFilter;
 
-				var material1 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb } );
-				var material2 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_mips } );
-				var material3 = new THREE.MeshBasicMaterial( { map: disturb_2bpp_rgb } );
-				var material4 = new THREE.MeshBasicMaterial( { map: flare_4bpp_rgba, side: THREE.DoubleSide, depthTest: false, transparent: true } );
-				var material5 = new THREE.MeshBasicMaterial( { map: flare_2bpp_rgba, side: THREE.DoubleSide, depthTest: false, transparent: true } );
-				var material6 = new THREE.MeshBasicMaterial( { envMap: park3_cube_nomip_4bpp_rgb } );
-				var material8 = new THREE.MeshBasicMaterial( { envMap: park3_cube_mip_2bpp_rgb_v3 } );
+				const material1 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb } );
+				const material2 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_mips } );
+				const material3 = new THREE.MeshBasicMaterial( { map: disturb_2bpp_rgb } );
+				const material4 = new THREE.MeshBasicMaterial( { map: flare_4bpp_rgba, side: THREE.DoubleSide, depthTest: false, transparent: true } );
+				const material5 = new THREE.MeshBasicMaterial( { map: flare_2bpp_rgba, side: THREE.DoubleSide, depthTest: false, transparent: true } );
+				const material6 = new THREE.MeshBasicMaterial( { envMap: park3_cube_nomip_4bpp_rgb } );
+				const material8 = new THREE.MeshBasicMaterial( { envMap: park3_cube_mip_2bpp_rgb_v3 } );
 
-				var material7 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_v3 } );
+				const material7 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_v3 } );
 
 				//
 
-				var mesh = new THREE.Mesh( geometry, material1 );
+				let mesh = new THREE.Mesh( geometry, material1 );
 				mesh.position.x = - 500;
 				mesh.position.y = 200;
 				scene.add( mesh );
@@ -153,7 +138,7 @@
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				var torus = new THREE.TorusBufferGeometry( 100, 50, 32, 24 );
+				const torus = new THREE.TorusGeometry( 100, 50, 32, 24 );
 
 				mesh = new THREE.Mesh( torus, material6 );
 				mesh.position.x = 166;
@@ -174,7 +159,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -191,11 +176,11 @@
 
 				requestAnimationFrame( animate );
 
-				var time = Date.now() * 0.001;
+				const time = Date.now() * 0.001;
 
-				for ( var i = 0; i < meshes.length; i ++ ) {
+				for ( let i = 0; i < meshes.length; i ++ ) {
 
-					var mesh = meshes[ i ];
+					const mesh = meshes[ i ];
 					mesh.rotation.x = time;
 					mesh.rotation.y = time;
 

@@ -4,175 +4,158 @@
 		<title>three.js white furnace test</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				min-width: 60%;
-				margin: 0 20%;
-				color: #ffffff;
-				padding: 15px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				background-color: black;
-				color: white;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
-
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
-		<script src="js/loaders/EquirectangularToCubeGenerator.js"></script>
-		<script src="js/pmrem/PMREMGenerator.js"></script>
-		<script src="js/pmrem/PMREMCubeUVPacker.js"></script>
-
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test.<br />
-				There are 11 fully metal spheres with full white specular color and increasing roughness values rendered here. A metal object, no matter how rough, fully reflects all energy. If uniformly lit, the spheres should be indistinguishable from the environment. If spheres are visible, then some energy has been lost or gained after reflection.<br />
-				<a href="https://jsantell.com/" target="_blank" rel="noopener">by Jordan Santell</a><br/><br/></div>
+				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a>
+				<br>Roughness increases left to right
+				<br>Metalness increases top to bottom
+			</div>
 		</div>
 
-		<script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-if ( WEBGL.isWebGLAvailable() === false ) {
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
-	document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+		<script type="module">
 
-}
+			import * as THREE from 'three';
 
-var scene, camera, renderer, envMap, radianceMap, gui;
-var right = 6;
-var config = {
-	preserveEnergy: true,
-};
+			let scene, camera, renderer, radianceMap;
 
-function init() {
+			const COLOR = 0xcccccc;
 
-	var width = window.innerWidth;
-	var height = window.innerHeight;
-	var aspect = width / height;
+			function init() {
 
-	// renderer
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+				const aspect = width / height;
 
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
-	renderer.setSize( width, height );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	document.body.appendChild( renderer.domElement );
+				// renderer
 
-	window.addEventListener( 'resize', onResize, false );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( width, height );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				document.body.appendChild( renderer.domElement );
 
-	// scene
+				//renderer.outputEncoding = THREE.sRGBEncoding; // optional
 
-	scene = new THREE.Scene();
+				window.addEventListener( 'resize', onWindowResize );
 
-	// camera
+				document.body.addEventListener( 'mouseover', function () {
 
-	camera = new THREE.OrthographicCamera( - right, right, right / aspect, - right / aspect, 1, 30 );
-	camera.position.set( 0, 0, 9 );
+					scene.traverse( function ( child ) {
 
-}
+						if ( child.isMesh ) child.material.color.setHex( 0xffffff );
 
-function createObjects() {
+					} );
 
-	var geo = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
-	var count = 10;
-	for ( var x = 0; x <= count; x ++ ) {
+					render();
 
-		var mesh = new THREE.Mesh( geo, new THREE.MeshPhysicalMaterial( {
-			roughness: x / count,
-			metalness: 1,
-			color: 0xffffff,
-			envMap: radianceMap,
-			envMapIntensity: 1,
-			reflectivity: 1,
-		} ) );
-		mesh.position.x = x - ( Math.floor( count / 2 ) );
-		scene.add( mesh );
+				} );
 
-	}
+				document.body.addEventListener( 'mouseout', function () {
 
-}
+					scene.traverse( function ( child ) {
 
-function createEnvironment() {
+						if ( child.isMesh ) child.material.color.setHex( 0xccccff ); // tinted for visibility
 
-	var color = new THREE.Color( 0xcccccc );
-	var sky = new THREE.Mesh( new THREE.SphereBufferGeometry( 1, 32, 32 ), new THREE.MeshBasicMaterial( {
-		color: color,
-		side: THREE.DoubleSide,
-	} ) );
-	sky.scale.setScalar( 100 );
+					} );
 
-	var envScene = new THREE.Scene();
-	envScene.add( sky );
-	envScene.background = color;
-	var cubeCamera = new THREE.CubeCamera( 1, 100, 256, 256 );
-	cubeCamera.update( renderer, envScene );
+					render();
 
-	envMap = cubeCamera.renderTarget.texture;
+				} );
 
-	scene.background = color;
+				// scene
 
-}
+				scene = new THREE.Scene();
 
-function getRadiance() {
+				// camera
+				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
+				camera.position.set( 0, 0, 18 );
 
-	return new Promise( function ( resolve, reject ) {
+			}
 
-		var pmremGenerator = new THREE.PMREMGenerator( envMap );
-		pmremGenerator.update( renderer );
-		var pmremCubeUVPacker = new THREE.PMREMCubeUVPacker( pmremGenerator.cubeLods );
-		pmremCubeUVPacker.update( renderer );
-		var cubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+			function createObjects() {
 
-		pmremGenerator.dispose();
-		pmremCubeUVPacker.dispose();
-		radianceMap = cubeRenderTarget.texture;
-		resolve();
+				const geometry = new THREE.SphereGeometry( 0.4, 32, 16 );
 
-	} );
+				for ( let x = 0; x <= 10; x ++ ) {
 
-}
+					for ( let y = 0; y <= 10; y ++ ) {
 
-function onResize() {
+						const material = new THREE.MeshPhysicalMaterial( {
+							roughness: x / 10,
+							metalness: y / 10,
+							color: 0xffffff,
+							envMap: radianceMap,
+							envMapIntensity: 1,
+							transmission: 0,
+							ior: 1.5
+						} );
 
-	var aspect = window.innerWidth / window.innerHeight;
-	camera.top = right / aspect;
-	camera.bottom = - camera.top;
-	camera.updateProjectionMatrix();
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	render();
+						const mesh = new THREE.Mesh( geometry, material );
+						mesh.position.x = x - 5;
+						mesh.position.y = 5 - y;
+						scene.add( mesh );
 
-}
+					}
 
-function render() {
+				}
 
-	renderer.render( scene, camera );
+			}
 
-}
+			function createEnvironment() {
 
-Promise.resolve()
-	.then( init )
-	.then( createEnvironment )
-	.then( getRadiance )
-	.then( createObjects )
-	.then( render );
+				const envScene = new THREE.Scene();
+				envScene.background = new THREE.Color( COLOR );
+				if ( renderer.outputEncoding === THREE.sRGBEncoding ) envScene.background.convertSRGBToLinear();
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				radianceMap = pmremGenerator.fromScene( envScene ).texture;
+				pmremGenerator.dispose();
+
+				scene.background = radianceMap;
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+			Promise.resolve()
+				.then( init )
+				.then( createEnvironment )
+				.then( createObjects )
+				.then( render );
 
 		</script>
 	</body>

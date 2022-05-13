@@ -4,61 +4,38 @@
 		<title>three.js webgl - PLY</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-
-			}
-
-			a { color: skyblue }
-			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
-			.highlight { background:orange; color:#fff; }
-
-			span {
-				display: inline-block;
-				width: 60px;
-				text-align: center;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			PLY loader test by <a href="https://github.com/menway" target="_blank" rel="noopener">Wei Meng</a>. Image from <a href="http://people.sc.fsu.edu/~jburkardt/data/ply/ply.html">John Burkardt</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			PLY loader test by <a href="https://github.com/menway" target="_blank" rel="noopener">Wei Meng</a>.<br/>
+			Image from <a href="http://people.sc.fsu.edu/~jburkardt/data/ply/ply.html">John Burkardt</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/loaders/PLYLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var container, stats;
+		<script type="module">
 
-			var camera, cameraTarget, scene, renderer;
+			import * as THREE from 'three';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
+
+			let container, stats;
+
+			let camera, cameraTarget, scene, renderer;
 
 			init();
 			animate();
@@ -80,8 +57,8 @@
 
 				// Ground
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
+				const plane = new THREE.Mesh(
+					new THREE.PlaneGeometry( 40, 40 ),
 					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
 				);
 				plane.rotation.x = - Math.PI / 2;
@@ -93,13 +70,13 @@
 
 				// PLY file
 
-				var loader = new THREE.PLYLoader();
+				const loader = new PLYLoader();
 				loader.load( './models/ply/ascii/dolphins.ply', function ( geometry ) {
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.y = - 0.2;
 					mesh.position.z = 0.3;
@@ -117,8 +94,8 @@
 
 					geometry.computeVertexNormals();
 
-					var material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
-					var mesh = new THREE.Mesh( geometry, material );
+					const material = new THREE.MeshStandardMaterial( { color: 0x0055ff, flatShading: true } );
+					const mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x = - 0.2;
 					mesh.position.y = - 0.02;
@@ -144,9 +121,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.shadowMap.enabled = true;
 
@@ -159,19 +134,19 @@
 
 				// resize
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
 			function addShadowedLight( x, y, z, color, intensity ) {
 
-				var directionalLight = new THREE.DirectionalLight( color, intensity );
+				const directionalLight = new THREE.DirectionalLight( color, intensity );
 				directionalLight.position.set( x, y, z );
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
 
-				var d = 1;
+				const d = 1;
 				directionalLight.shadow.camera.left = - d;
 				directionalLight.shadow.camera.right = d;
 				directionalLight.shadow.camera.top = d;
@@ -207,7 +182,7 @@
 
 			function render() {
 
-				var timer = Date.now() * 0.0005;
+				const timer = Date.now() * 0.0005;
 
 				camera.position.x = Math.sin( timer ) * 2.5;
 				camera.position.z = Math.cos( timer ) * 2.5;

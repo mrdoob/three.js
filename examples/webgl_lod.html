@@ -1,61 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - level-of-details</title>
+		<title>three.js webgl - level of detail</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				z-index:100;
-			}
-
-			a { color:red }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - level-of-details WebGL example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - level of detail
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/controls/FlyControls.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var container;
+		<script type="module">
 
-			var camera, scene, renderer;
+			import * as THREE from 'three';
 
-			var controls, clock = new THREE.Clock();
+			import { FlyControls } from './jsm/controls/FlyControls.js';
+
+			let container;
+
+			let camera, scene, renderer, controls;
+
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -68,43 +47,36 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 1000;
 
-				controls = new THREE.FlyControls( camera );
-				controls.movementSpeed = 1000;
-				controls.rollSpeed = Math.PI / 10;
-
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
-				scene.autoUpdate = false;
 
-				var light = new THREE.PointLight( 0xff2200 );
-				light.position.set( 0, 0, 0 );
-				scene.add( light );
+				const pointLight = new THREE.PointLight( 0xff2200 );
+				pointLight.position.set( 0, 0, 0 );
+				scene.add( pointLight );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 ).normalize();
-				scene.add( light );
+				const dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 0, 0, 1 ).normalize();
+				scene.add( dirLight );
 
-				var geometry = [
+				const geometry = [
 
-					[ new THREE.IcosahedronBufferGeometry( 100, 4 ), 50 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 3 ), 300 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 2 ), 1000 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 1 ), 2000 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 0 ), 8000 ]
+					[ new THREE.IcosahedronGeometry( 100, 16 ), 50 ],
+					[ new THREE.IcosahedronGeometry( 100, 8 ), 300 ],
+					[ new THREE.IcosahedronGeometry( 100, 4 ), 1000 ],
+					[ new THREE.IcosahedronGeometry( 100, 2 ), 2000 ],
+					[ new THREE.IcosahedronGeometry( 100, 1 ), 8000 ]
 
 				];
 
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
+				const material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
 
-				var i, j, mesh, lod;
+				for ( let j = 0; j < 1000; j ++ ) {
 
-				for ( j = 0; j < 1000; j ++ ) {
+					const lod = new THREE.LOD();
 
-					lod = new THREE.LOD();
+					for ( let i = 0; i < geometry.length; i ++ ) {
 
-					for ( i = 0; i < geometry.length; i ++ ) {
-
-						mesh = new THREE.Mesh( geometry[ i ][ 0 ], material );
+						const mesh = new THREE.Mesh( geometry[ i ][ 0 ], material );
 						mesh.scale.set( 1.5, 1.5, 1.5 );
 						mesh.updateMatrix();
 						mesh.matrixAutoUpdate = false;
@@ -129,7 +101,13 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				controls = new FlyControls( camera, renderer.domElement );
+				controls.movementSpeed = 1000;
+				controls.rollSpeed = Math.PI / 10;
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -152,17 +130,6 @@
 			function render() {
 
 				controls.update( clock.getDelta() );
-
-				scene.updateMatrixWorld();
-				scene.traverse( function ( object ) {
-
-					if ( object instanceof THREE.LOD ) {
-
-						object.update( camera );
-
-					}
-
-				} );
 
 				renderer.render( scene, camera );
 

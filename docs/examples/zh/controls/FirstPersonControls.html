@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>第一人称控制器（[name]）</h1>
+
+		<p class="desc">
+			该类是 [page:FlyControls] 的另一个实现。
+		</p>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_geometry_terrain webgl / geometry / terrain ]</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera object]: 被控制的摄像机。
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
+			</p>
+			<p>
+				创建一个新的 [name] 实例。
+			</p>
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Boolean activeLook]</h3>
+		<p>
+			是否能够环视四周。默认为*true*。
+		</p>
+
+		<h3>[property:Boolean autoForward]</h3>
+		<p>
+			摄像机是否自动向前移动。默认为*false*。
+		</p>
+
+		<h3>[property:Boolean constrainVertical]</h3>
+		<p>
+			垂直环视是否约束在[[page:.verticalMin], [page:.verticalMax]]之间。默认值为*false*。
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			该 HTMLDOMElement 用于监听鼠标/触摸事件，该属性必须在构造函数中传入。在此处改变它将不会设置新的事件监听。
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			是否启用控制器。默认为*true*。
+		</p>
+
+		<h3>[property:Number heightCoef]</h3>
+		<p>
+			Determines how much faster the camera moves when it's y-component is near [page:.heightMax]. Default is *1*.
+		</p>
+
+		<h3>[property:Number heightMax]</h3>
+		<p>
+			Upper camera height limit used for movement speed adjusment. Default is *1*.
+		</p>
+
+		<h3>[property:Number heightMin]</h3>
+		<p>
+			Lower camera height limit used for movement speed adjusment. Default is *0*.
+		</p>
+
+		<h3>[property:Boolean heightSpeed]</h3>
+		<p>
+			摄像机的高度是否影响向前移动的速度。默认值为*false*。
+			使用属性 [page:.heightCoef]、 [page:.heightMin] 和 [page:.heightMax] 来进行配置。
+		</p>
+
+		<h3>[property:Boolean lookVertical]</h3>
+		<p>
+			是否能够垂直环视。默认为*true*。
+		</p>
+
+		<h3>[property:Number lookSpeed]</h3>
+		<p>
+			环视速度。默认为*0.005*。
+		</p>
+
+		<h3>[property:Boolean mouseDragOn]</h3>
+		<p>
+			鼠标是否被按下。只读属性。
+		</p>
+
+		<h3>[property:Number movementSpeed]</h3>
+		<p>
+			移动速度。默认为*1*。
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			被控制的摄像机。
+		</p>
+
+		<h3>[property:Number verticalMax]</h3>
+		<p>
+			你能够垂直环视角度的上限。范围在 0 到 Math.PI 弧度之间。默认为*Math.PI*。
+		</p>
+
+		<h3>[property:Number verticalMin]</h3>
+		<p>
+			你能够垂直环视角度的下限。范围在 0 到 Math.PI 弧度之间。默认为*0*。
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:undefined dispose] ()</h3>
+		<p>
+			若不再需要该控制器，则应当调用此函数。
+		</p>
+
+		<h3>[method:undefined handleResize] ()</h3>
+		<p>
+			若应用程序窗口大小发生改变，则应当调用此函数。
+		</p>
+
+		<h3>[method:FirstPersonControls lookAt]( [param:Vector3 vector] )<br />
+		[method:FirstPersonControls lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			<p>
+				<p>
+					vector - 一个表示目标位置的向量。
+				</p>
+				<p>
+					或者，世界空间位置的x、y、z分量。
+				</p>
+			</p>
+			<p>
+				确保控制器将相机方向朝向到所传入的目标的位置。
+			</p>
+		</p>
+
+		<h3>[method:undefined update] ( [param:Number delta] )</h3>
+		<p>
+			<p>
+				[page:Number delta]: Time delta value.
+			</p>
+			<p>
+				更新控制器，常被用在动画循环中。
+			</p>
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/FirstPersonControls.js examples/jsm/controls/FirstPersonControls.js]
+		</p>
+	</body>
+</html>

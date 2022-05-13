@@ -1,21 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl-camera cinematic</title>
+		<title>three.js webgl - camera cinematic</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				background-color: #fff;
+				color: #000;
 			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
@@ -25,27 +21,40 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes
 		</div>
 
-		<script src="../build/three.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/shaders/BokehShader2.js"></script>
-		<script src="js/cameras/CinematicCamera.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
 
-		<script src="js/libs/stats.min.js"></script>
-		<script src='js/libs/dat.gui.min.js'></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from 'three';
 
-			var camera, scene, raycaster, renderer, stats;
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
-			var mouse = new THREE.Vector2(), INTERSECTED;
-			var radius = 100, theta = 0;
+			import { CinematicCamera } from './jsm/cameras/CinematicCamera.js';
+
+			let camera, scene, raycaster, renderer, stats;
+
+			const mouse = new THREE.Vector2();
+			let INTERSECTED;
+			const radius = 100;
+			let theta = 0;
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.CinematicCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new CinematicCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.setLens( 5 );
 				camera.position.set( 2, 1, 500 );
 
@@ -54,15 +63,15 @@
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 0.35 );
+				const light = new THREE.DirectionalLight( 0xffffff, 0.35 );
 				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
-				var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+				const geometry = new THREE.BoxGeometry( 20, 20, 20 );
 
-				for ( var i = 0; i < 1500; i ++ ) {
+				for ( let i = 0; i < 1500; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -82,11 +91,11 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
-				var effectController = {
+				const effectController = {
 
 					focalLength: 15,
 					// jsDepthCalculation: true,
@@ -114,9 +123,9 @@
 
 				};
 
-				var matChanger = function ( ) {
+				const matChanger = function ( ) {
 
-					for ( var e in effectController ) {
+					for ( const e in effectController ) {
 
 						if ( e in camera.postprocessing.bokeh_uniforms ) {
 
@@ -135,7 +144,7 @@
 
 				//
 
-				var gui = new dat.GUI();
+				const gui = new GUI();
 
 				gui.add( effectController, 'focalLength', 1, 135, 0.01 ).onChange( matChanger );
 				gui.add( effectController, 'fstop', 1.8, 22, 0.01 ).onChange( matChanger );
@@ -144,7 +153,7 @@
 
 				matChanger();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -180,9 +189,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();
@@ -191,11 +200,11 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObjects( scene.children );
+				const intersects = raycaster.intersectObjects( scene.children, false );
 
 				if ( intersects.length > 0 ) {
 
-					var targetDistance = intersects[ 0 ].distance;
+					const targetDistance = intersects[ 0 ].distance;
 
 					camera.focusAt( targetDistance ); // using Cinematic camera focusAt method
 

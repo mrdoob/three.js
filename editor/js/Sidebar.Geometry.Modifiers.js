@@ -1,31 +1,21 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIDiv, UIButton } from './libs/ui.js';
 
-Sidebar.Geometry.Modifiers = function ( editor, object ) {
+function SidebarGeometryModifiers( editor, object ) {
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
-	var container = new UI.Row().setPaddingLeft( '90px' );
+	const container = new UIDiv().setPaddingLeft( '90px' );
 
-	var geometry = object.geometry;
+	const geometry = object.geometry;
 
 	// Compute Vertex Normals
 
-	var button = new UI.Button( 'Compute Vertex Normals' );
+	const button = new UIButton( 'Compute Vertex Normals' );
 	button.onClick( function () {
 
 		geometry.computeVertexNormals();
 
-		if ( geometry.isBufferGeometry ) {
-
-			geometry.attributes.normal.needsUpdate = true;
-
-		} else {
-
-			geometry.normalsNeedUpdate = true;
-
-		}
+		geometry.attributes.normal.needsUpdate = true;
 
 		signals.geometryChanged.dispatch( object );
 
@@ -37,4 +27,6 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 
 	return container;
 
-};
+}
+
+export { SidebarGeometryModifiers };

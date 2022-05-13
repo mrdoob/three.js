@@ -1,61 +1,69 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIPanel, UIButton, UICheckbox } from './libs/ui.js';
 
-var Toolbar = function ( editor ) {
+import translateImg from '../images/translate.svg';
+import rotateImg from '../images/rotate.svg';
+import scaleImg from '../images/scale.svg';
 
-	var signals = editor.signals;
-	var strings = editor.strings;
+function Toolbar( editor ) {
 
-	var container = new UI.Panel();
+	const signals = editor.signals;
+	const strings = editor.strings;
+
+	const container = new UIPanel();
 	container.setId( 'toolbar' );
-	container.setDisplay( 'none' );
-
-	var buttons = new UI.Panel();
-	container.add( buttons );
 
 	// translate / rotate / scale
 
-	var translate = new UI.Button( strings.getKey( 'toolbar/translate' ) );
+	const translateIcon = document.createElement( 'img' );
+	translateIcon.title = strings.getKey( 'toolbar/translate' );
+	translateIcon.src = translateImg;
+
+	const translate = new UIButton();
 	translate.dom.className = 'Button selected';
+	translate.dom.appendChild( translateIcon );
 	translate.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'translate' );
 
 	} );
-	buttons.add( translate );
+	container.add( translate );
 
-	var rotate = new UI.Button( strings.getKey( 'toolbar/rotate' ) );
+	const rotateIcon = document.createElement( 'img' );
+	rotateIcon.title = strings.getKey( 'toolbar/rotate' );
+	rotateIcon.src = rotateImg;
+
+	const rotate = new UIButton();
+	rotate.dom.appendChild( rotateIcon );
 	rotate.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'rotate' );
 
 	} );
-	buttons.add( rotate );
+	container.add( rotate );
 
-	var scale = new UI.Button( strings.getKey( 'toolbar/scale' ) );
+	const scaleIcon = document.createElement( 'img' );
+	scaleIcon.title = strings.getKey( 'toolbar/scale' );
+	scaleIcon.src = scaleImg;
+
+	const scale = new UIButton();
+	scale.dom.appendChild( scaleIcon );
 	scale.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'scale' );
 
 	} );
-	buttons.add( scale );
+	container.add( scale );
 
-	var local = new UI.THREE.Boolean( false, strings.getKey( 'toolbar/local' ) );
+	const local = new UICheckbox( false );
+	local.dom.title = strings.getKey( 'toolbar/local' );
 	local.onChange( function () {
 
 		signals.spaceChanged.dispatch( this.getValue() === true ? 'local' : 'world' );
 
 	} );
-	buttons.add( local );
+	container.add( local );
 
 	//
-
-	signals.objectSelected.add( function ( object ) {
-
-		container.setDisplay( object === null ? 'none' : '' );
-
-	} );
 
 	signals.transformModeChanged.add( function ( mode ) {
 
@@ -75,4 +83,6 @@ var Toolbar = function ( editor ) {
 
 	return container;
 
-};
+}
+
+export { Toolbar };

@@ -1,22 +1,17 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry';
-import { Geometry } from '../../../../src/core/Geometry';
-import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { Vector3 } from '../../../../src/math/Vector3';
+import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry.js';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 
 // DEBUGGING
-import { Scene } from '../../../../src/scenes/Scene';
-import { Mesh } from '../../../../src/objects/Mesh';
-import { LineSegments } from '../../../../src/objects/LineSegments';
-import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial';
-import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer';
-import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera';
+import { Scene } from '../../../../src/scenes/Scene.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { LineSegments } from '../../../../src/objects/LineSegments.js';
+import { LineBasicMaterial } from '../../../../src/materials/LineBasicMaterial.js';
+import { WebGLRenderer } from '../../../../src/renderers/WebGLRenderer.js';
+import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 
 //
 // HELPERS
@@ -31,11 +26,11 @@ function testEdges( vertList, idxList, numAfter, assert ) {
 		var geom = geoms[ i ];
 
 		var numBefore = idxList.length;
-		assert.equal( countEdges( geom ), numBefore, "Edges before!" );
+		assert.equal( countEdges( geom ), numBefore, 'Edges before!' );
 
 		var egeom = new EdgesGeometry( geom );
 
-		assert.equal( countEdges( egeom ), numAfter, "Edges after!" );
+		assert.equal( countEdges( egeom ), numAfter, 'Edges after!' );
 		output( geom, egeom );
 
 	}
@@ -45,10 +40,8 @@ function testEdges( vertList, idxList, numAfter, assert ) {
 function createGeometries( vertList, idxList ) {
 
 	var geomIB = createIndexedBufferGeometry( vertList, idxList );
-	var geom = new Geometry().fromBufferGeometry( geomIB );
-	var geomB = new BufferGeometry().fromGeometry( geom );
 	var geomDC = addDrawCalls( geomIB.clone() );
-	return [ geom, geomB, geomIB, geomDC ];
+	return [ geomIB, geomDC ];
 
 }
 
@@ -90,9 +83,7 @@ function createIndexedBufferGeometry( vertList, idxList ) {
 	vertices = vertices.subarray( 0, 3 * numVerts );
 
 	geom.setIndex( new BufferAttribute( indices, 1 ) );
-	geom.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-
-	geom.computeFaceNormals();
+	geom.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 	return geom;
 
@@ -222,39 +213,39 @@ export default QUnit.module( 'Geometries', () => {
 		];
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( "singularity", ( assert ) => {
+		QUnit.test( 'singularity', ( assert ) => {
 
 			testEdges( vertList, [ 1, 1, 1 ], 0, assert );
 
 		} );
 
-		QUnit.test( "needle", ( assert ) => {
+		QUnit.test( 'needle', ( assert ) => {
 
 			testEdges( vertList, [ 0, 0, 1 ], 0, assert );
 
 		} );
 
-		QUnit.test( "single triangle", ( assert ) => {
+		QUnit.test( 'single triangle', ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2 ], 3, assert );
 
 		} );
 
-		QUnit.test( "two isolated triangles", ( assert ) => {
+		QUnit.test( 'two isolated triangles', ( assert ) => {
 
 			var vertList = [
 				new Vector3( 0, 0, 0 ),
@@ -269,37 +260,37 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.test( "two flat triangles", ( assert ) => {
+		QUnit.test( 'two flat triangles', ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 2, 3 ], 4, assert );
 
 		} );
 
-		QUnit.test( "two flat triangles, inverted", ( assert ) => {
+		QUnit.test( 'two flat triangles, inverted', ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 3, 2 ], 5, assert );
 
 		} );
 
-		QUnit.test( "two non-coplanar triangles", ( assert ) => {
+		QUnit.test( 'two non-coplanar triangles', ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 4, 2 ], 5, assert );
 
 		} );
 
-		QUnit.test( "three triangles, coplanar first", ( assert ) => {
+		QUnit.test( 'three triangles, coplanar first', ( assert ) => {
 
-			testEdges( vertList, [ 0, 1, 2, 0, 2, 3, 0, 4, 2 ], 7, assert );
+			testEdges( vertList, [ 0, 2, 3, 0, 1, 2, 0, 4, 2 ], 7, assert );
 
 		} );
 
-		QUnit.test( "three triangles, coplanar last", ( assert ) => {
+		QUnit.test( 'three triangles, coplanar last', ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 4, 2, 0, 2, 3 ], 6, assert ); // Should be 7
 
 		} );
 
-		QUnit.test( "tetrahedron", ( assert ) => {
+		QUnit.test( 'tetrahedron', ( assert ) => {
 
 			testEdges( vertList, [ 0, 1, 2, 0, 1, 4, 0, 4, 2, 1, 2, 4 ], 6, assert );
 

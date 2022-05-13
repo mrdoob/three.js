@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - 'build/**'
+      - 'docs/**'
+      - 'files/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  lint:
+    name: "Linting"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install packages
+        run: npm ci
+
+      - name: === Linting ===
+        run: npm run lint
+
+  unit:
+    name: "Unit testing"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install packages
+        run: |
+          npm ci
+          npm ci --prefix test
+      - name: Build
+        run: npm run build
+
+      - name: === Unit testing ===
+        run: npm run test-unit
+
+  e2e:
+    name: "E2E testing"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        CI: [ 0, 1, 2, 3, 4, 5, 6, 7 ]
+    env:
+      CI: ${{ matrix.CI }}
+      FORCE_COLOR: 1
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install packages
+        run: |
+          npm ci
+          npm ci --prefix test
+          sudo apt-get install xvfb
+      - name: Build
+        run: npm run build
+
+      - name: === E2E testing ===
+        run: xvfb-run --auto-servernum npm run test-e2e
+
+  e2e-cov:
+    name: "Ready for release"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'npm'
+      - name: Install packages
+        run: npm ci
+
+      - name: === Ready for release ===
+        run: npm run test-e2e-cov
+
+  publish:
+    name: "Publish package"
+    needs: [lint, unit, e2e, e2e-cov] 
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'dev'
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Checkout actions repository
+        uses: actions/checkout@v2
+        with:
+          repository: Exabyte-io/actions
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
+          path: actions
+
+      - name: Publish release
+        uses: ./actions/js/publish
+        with:
+          npm-token: ${{ secrets.NPM_TOKEN }}
+          github-token: ${{ secrets.BOT_GITHUB_TOKEN }}
+          verify-tests: false

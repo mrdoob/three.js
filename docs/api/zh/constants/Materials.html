@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -25,20 +24,6 @@
 		<p>
 			定义了哪一边的面将会被渲染 —— 正面，或是反面，还是两个面都渲染。
 			默认值是[page:Constant FrontSide]（只渲染正面）。
-		</p>
-
-
-		<h2>颜色</h2>
-		<code>
-		THREE.NoColors
-		THREE.FaceColors
-		THREE.VertexColors
-		</code>
-		<p>
-		[page:Constant NoColors] 是默认值，且会将材质的颜色应用到所有面。<br />
-		[page:Constant FaceColors] 根据每个[page:Face3 Face3]的[page:Color Color]值来对面进行着色。<br />
-		[page:Constant VertexColors] 根据每个 [page:Face3 Face3]的vertexColors（顶点颜色）值来对面进行着色。 这是一个包含有三个[page:Color Color]的数组，数组中每一项都对应着面中的每一个顶点。<br />
-		请查看示例：[example:webgl_geometry_colors geometry / colors]。
 		</p>
 
 		<h2>混合模式</h2>
@@ -94,9 +79,56 @@
 		[page:Constant MixOperation] 使用反射率来混和两种颜色。uses reflectivity to blend between the two colors.<br />
 		[page:Constant AddOperation] 用于对两种颜色进行相加。</p>
 
+		<h2>模板函数</h2>
+		<code>
+		THREE.NeverStencilFunc
+		THREE.LessStencilFunc
+		THREE.EqualStencilFunc
+		THREE.LessEqualStencilFunc
+		THREE.GreaterStencilFunc
+		THREE.NotEqualStencilFunc
+		THREE.GreaterEqualStencilFunc
+		THREE.AlwaysStencilFunc
+		</code>
+		<p>
+		材质使用的模板函数，用于决定是否执行一项模板操作.<br />
+		[page:Materials NeverStencilFunc] 一定会返回true.<br />
+		[page:Materials LessStencilFunc] 当模板基准值比当前模板值小的时候返回true.<br />
+		[page:Materials EqualStencilFunc] 当模板基准值和当前模板值一样的时候返回true.<br />
+		[page:Materials LessEqualStencilFunc] 当模板基准值小于等于当前模板值的时候返回true.<br />
+		[page:Materials GreaterStencilFunc] 当模板基准值比当前模板值大的时候返回true.<br />
+		[page:Materials NotEqualStencilFunc] 当模板基准值与当前模板值不相等的时候返回true.<br />
+		[page:Materials GreaterEqualStencilFunc] 当模板基准值比当前模板值大的时候返回true.<br />
+		[page:Materials AlwaysStencilFunc] 一定会返回true.<br />
+		</p>
+
+		<h2>模板操作</h2>
+		<code>
+		THREE.ZeroStencilOp
+		THREE.KeepStencilOp
+		THREE.ReplaceStencilOp
+		THREE.IncrementStencilOp
+		THREE.DecrementStencilOp
+		THREE.IncrementWrapStencilOp
+		THREE.DecrementWrapStencilOp
+		THREE.InvertStencilOp
+		</code>
+		<p>
+		当提供的模板函数通过的时候，材质会在模板缓冲像素上执行怎样的模板操作.<br />
+		[page:Materials ZeroStencilOp] 将模板值设置为0。<br />
+		[page:Materials KeepStencilOp] 不会对模板值进行任何操作。<br />
+		[page:Materials ReplaceStencilOp] 使用模板基准值覆盖模板值。<br />
+		[page:Materials IncrementStencilOp] 将当前模板值加1。<br />
+		[page:Materials DecrementStencilOp] 将当前模板值减1。<br />
+		[page:Materials IncrementWrapStencilOp] 将当前模板值加1，如果这个值超过了255则会设置为0。<br />
+		[page:Materials DecrementWrapStencilOp] 将当前模板值减1，如果这个值低于0则会设置为255<br />
+		[page:Materials InvertStencilOp] 将当前模板值按位反转.<br />
+		</p>
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
 	</body>
 </html>

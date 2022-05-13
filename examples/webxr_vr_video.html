@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - 360 stereo video</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - 360 stereo video<br />
+			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.
+		</div>
+
+		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
+			<source src="textures/MaryOculus.webm">
+			<source src="textures/MaryOculus.mp4">
+		</video>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { VRButton } from './jsm/webxr/VRButton.js';
+
+			let camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				const container = document.getElementById( 'container' );
+				container.addEventListener( 'click', function () {
+
+					video.play();
+
+				} );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.layers.enable( 1 ); // render left view when no stereo available
+
+				// video
+
+				const video = document.getElementById( 'video' );
+				video.play();
+
+				const texture = new THREE.VideoTexture( video );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x101010 );
+
+				// left
+
+				const geometry1 = new THREE.SphereGeometry( 500, 60, 40 );
+				// invert the geometry on the x-axis so that all of the faces point inward
+				geometry1.scale( - 1, 1, 1 );
+
+				const uvs1 = geometry1.attributes.uv.array;
+
+				for ( let i = 0; i < uvs1.length; i += 2 ) {
+
+					uvs1[ i ] *= 0.5;
+
+				}
+
+				const material1 = new THREE.MeshBasicMaterial( { map: texture } );
+
+				const mesh1 = new THREE.Mesh( geometry1, material1 );
+				mesh1.rotation.y = - Math.PI / 2;
+				mesh1.layers.set( 1 ); // display in left eye only
+				scene.add( mesh1 );
+
+				// right
+
+				const geometry2 = new THREE.SphereGeometry( 500, 60, 40 );
+				geometry2.scale( - 1, 1, 1 );
+
+				const uvs2 = geometry2.attributes.uv.array;
+
+				for ( let i = 0; i < uvs2.length; i += 2 ) {
+
+					uvs2[ i ] *= 0.5;
+					uvs2[ i ] += 0.5;
+
+				}
+
+				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
+
+				const mesh2 = new THREE.Mesh( geometry2, material2 );
+				mesh2.rotation.y = - Math.PI / 2;
+				mesh2.layers.set( 2 ); // display in right eye only
+				scene.add( mesh2 );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.xr.enabled = true;
+				renderer.xr.setReferenceSpaceType( 'local' );
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

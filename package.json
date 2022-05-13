@@ -1,23 +1,41 @@
 {
-  "name": "three",
-  "version": "0.102.1",
+  "name": "@exabyte-io/three",
+  "version": "0.140.0",
   "description": "JavaScript 3D library",
-  "main": "build/three.js",
-  "repository": "mrdoob/three.js",
-  "jsnext:main": "build/three.module.js",
-  "module": "build/three.module.js",
-  "types": "src/Three.d.ts",
+  "type": "module",
+  "main": "./build/three.js",
+  "module": "./build/three.module.js",
+  "exports": {
+    ".": {
+      "import": "./build/three.module.js",
+      "require": "./build/three.cjs"
+    },
+    "./editor/css/*": "./editor/css/*",
+    "./editor/js/*": "./editor/js/*",
+    "./examples/fonts/*": "./examples/fonts/*",
+    "./examples/jsm/*": "./examples/jsm/*",
+    "./src/*": "./src/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrdoob/three.js"
+  },
+  "sideEffects": false,
   "files": [
-    "package.json",
-    "LICENSE",
-    "README.md",
     "build/three.js",
+    "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
-    "src",
+    "editor/js",
+    "editor/css",
+    "editor/images",
     "examples/js",
     "examples/jsm",
-    "examples/fonts"
+    "examples/fonts",
+    "LICENSE",
+    "package.json",
+    "README.md",
+    "src"
   ],
   "directories": {
     "doc": "docs",
@@ -25,28 +43,97 @@
     "test": "test"
   },
   "eslintConfig": {
-    "extends": "mdcs",
+    "root": true,
+    "extends": [
+      "mdcs",
+      "plugin:compat/recommended"
+    ],
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+      "babelOptions": {
+        "configFile": "./utils/build/.babelrc.json"
+      }
+    },
     "plugins": [
-      "html"
-    ]
+      "html",
+      "import"
+    ],
+    "settings": {
+      "polyfills": [
+        "WebGL2RenderingContext"
+      ]
+    },
+    "globals": {
+      "__THREE_DEVTOOLS__": "readonly",
+      "WebGL2ComputeRenderingContext": "readonly",
+      "potpack": "readonly",
+      "fflate": "readonly",
+      "bodymovin": "readonly",
+      "OIMO": "readonly",
+      "Stats": "readonly",
+      "XRWebGLBinding": "readonly",
+      "XRWebGLLayer": "readonly",
+      "GPUShaderStage": "readonly",
+      "GPUBufferUsage": "readonly",
+      "GPUTextureUsage": "readonly",
+      "QUnit": "readonly"
+    },
+    "rules": {
+      "no-throw-literal": [
+        "error"
+      ],
+      "import/extensions": [
+        "error",
+        "always"
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "prefer-const": [
+        "error",
+        {
+          "destructuring": "any",
+          "ignoreReadBeforeAssign": false
+        }
+      ]
+    }
   },
+  "browserslist": [
+    "> 1%, not dead, not ie 11, not op_mini all"
+  ],
   "scripts": {
-    "build": "rollup -c",
-    "build-test": "rollup -c test/rollup.unit.config.js",
-    "build-closure": "rollup -c && java -jar node_modules/google-closure-compiler-java/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
-    "build-examples": "rollup -c rollup-examples.config.js",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"http-server -c-1 -p 8080\"",
-    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "start": "npm run dev",
-    "lint": "eslint src",
-    "test": "npm run build-test && qunit test/unit/three.source.unit.js",
-    "travis": "npm run lint && npm test"
+    "test": "npm run lint && npm run test-unit",
+    "build": "rollup -c utils/build/rollup.config.js",
+    "build-module": "ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
+    "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
+    "lint": "eslint src --ext js",
+    "lint-examples": "eslint examples/js examples/jsm --ext js --ignore-pattern libs --ignore-pattern ifc",
+    "lint-fix": "npm run lint -- --fix && npm run lint-examples -- --fix",
+    "lint-docs": "eslint docs --ext html",
+    "test-unit": "npm run unit --prefix test",
+    "test-e2e": "node test/e2e/puppeteer.js",
+    "test-e2e-cov": "node test/e2e/check-coverage.js",
+    "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
+    "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
     "three",
     "three.js",
+    "javascript",
     "3d",
-    "webgl"
+    "virtual-reality",
+    "augmented-reality",
+    "webgl",
+    "webgl2",
+    "webaudio",
+    "webgpu",
+    "webxr",
+    "canvas",
+    "svg",
+    "html5"
   ],
   "author": "mrdoob",
   "license": "MIT",
@@ -54,15 +141,33 @@
     "url": "https://github.com/mrdoob/three.js/issues"
   },
   "homepage": "https://threejs.org/",
+  "dependencies": {
+    "acorn": "1.0.1",
+    "codemirror": "5.65.2",
+    "esprima": "3.1.3",
+    "jsonlint": "1.6.3",
+    "signals": "1.0.0",
+    "ternjs": "0.22.0"
+  },
   "devDependencies": {
-    "concurrently": "^4.1.0",
-    "eslint": "^5.15.0",
-    "eslint-config-mdcs": "^4.2.3",
-    "eslint-plugin-html": "^5.0.3",
-    "google-closure-compiler": "20190215.0.2",
-    "http-server": "^0.11.1",
-    "qunit": "^2.9.2",
-    "rollup": "^1.4.0"
+    "@babel/core": "^7.17.9",
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/preset-env": "^7.16.11",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-node-resolve": "^13.2.0",
+    "chalk": "^5.0.1",
+    "concurrently": "^7.1.0",
+    "eslint": "^8.13.0",
+    "eslint-config-mdcs": "^5.0.0",
+    "eslint-plugin-compat": "^4.0.2",
+    "eslint-plugin-html": "^6.2.0",
+    "eslint-plugin-import": "^2.26.0",
+    "rollup": "^2.70.2",
+    "rollup-plugin-filesize": "^9.1.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-visualizer": "^5.6.0",
+    "servez": "^1.14.1"
   },
   "jspm": {
     "files": [

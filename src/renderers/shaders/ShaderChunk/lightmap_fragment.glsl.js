@@ -1,7 +1,10 @@
 export default /* glsl */`
 #ifdef USE_LIGHTMAP
 
-	reflectedLight.indirectDiffuse += PI * texture2D( lightMap, vUv2 ).xyz * lightMapIntensity; // factor of PI should not be present; included here to prevent breakage
+	vec4 lightMapTexel = texture2D( lightMap, vUv2 );
+	vec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;
+
+	reflectedLight.indirectDiffuse += lightMapIrradiance;
 
 #endif
 `;

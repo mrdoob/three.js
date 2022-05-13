@@ -1,12 +1,12 @@
-/**
- * @author TyLindberg / https://github.com/TyLindberg
- */
+import { UIPanel, UIText, UIRow, UIInput } from './libs/ui.js';
 
-Sidebar.Settings.Shortcuts = function ( editor ) {
+import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 
-	var strings = editor.strings;
+function SidebarSettingsShortcuts( editor ) {
 
-	var IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
+	const strings = editor.strings;
+
+	const IS_MAC = navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
 
 	function isValidKeyBinding( key ) {
 
@@ -14,24 +14,28 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 	}
 
-	var config = editor.config;
-	var signals = editor.signals;
+	const config = editor.config;
+	const signals = editor.signals;
 
-	var container = new UI.Div();
-	container.add( new UI.Break() );
+	const container = new UIPanel();
 
-	var shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
+	const headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts' ).toUpperCase() ) );
+	container.add( headerRow );
+
+	const shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
 
 	function createShortcutInput( name ) {
 
-		var configName = 'settings/shortcuts/' + name;
-		var shortcutRow = new UI.Row();
+		const configName = 'settings/shortcuts/' + name;
+		const shortcutRow = new UIRow();
 
-		var shortcutInput = new UI.Input().setWidth( '150px' ).setFontSize( '12px' );
+		const shortcutInput = new UIInput().setWidth( '15px' ).setFontSize( '12px' );
+		shortcutInput.setTextAlign( 'center' );
 		shortcutInput.setTextTransform( 'lowercase' );
 		shortcutInput.onChange( function () {
 
-			var value = shortcutInput.getValue().toLowerCase();
+			const value = shortcutInput.getValue().toLowerCase();
 
 			if ( isValidKeyBinding( value ) ) {
 
@@ -78,14 +82,14 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 		}
 
 		shortcutInput.dom.maxLength = 1;
-		shortcutRow.add( new UI.Text( strings.getKey( 'sidebar/settings/shortcuts/' + name ) ).setTextTransform( 'capitalize' ).setWidth( '90px' ) );
+		shortcutRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts/' + name ) ).setTextTransform( 'capitalize' ).setWidth( '90px' ) );
 		shortcutRow.add( shortcutInput );
 
 		container.add( shortcutRow );
 
 	}
 
-	for ( var i = 0; i < shortcuts.length; i ++ ) {
+	for ( let i = 0; i < shortcuts.length; i ++ ) {
 
 		createShortcutInput( shortcuts[ i ] );
 
@@ -103,12 +107,12 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 			case 'delete':
 
-				var object = editor.selected;
+				const object = editor.selected;
 
 				if ( object === null ) return;
 
-				var parent = object.parent;
-				if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
+				const parent = object.parent;
+				if ( parent !== null ) editor.execute( new RemoveObjectCommand( editor, object ) );
 
 				break;
 
@@ -162,8 +166,10 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 
 		}
 
-	}, false );
+	} );
 
 	return container;
 
-};
+}
+
+export { SidebarSettingsShortcuts };

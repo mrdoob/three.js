@@ -1,32 +1,19 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
+( function () {
 
-THREE.WireframeGeometry2 = function ( geometry ) {
+	class WireframeGeometry2 extends THREE.LineSegmentsGeometry {
 
-	THREE.LineSegmentsGeometry.call( this );
+		constructor( geometry ) {
 
-	this.type = 'WireframeGeometry2';
+			super();
+			this.type = 'WireframeGeometry2';
+			this.fromWireframeGeometry( new THREE.WireframeGeometry( geometry ) ); // set colors, maybe
 
-	this.fromWireframeGeometry( new THREE.WireframeGeometry( geometry ) );
-
-	// set colors, maybe
-
-};
-
-THREE.WireframeGeometry2.prototype = Object.assign( Object.create( THREE.LineSegmentsGeometry.prototype ), {
-
-	constructor: THREE.WireframeGeometry2,
-
-	isWireframeGeometry2: true,
-
-	copy: function ( source ) {
-
-		// todo
-
-		return this;
+		}
 
 	}
 
-} );
+	WireframeGeometry2.prototype.isWireframeGeometry2 = true;
+
+	THREE.WireframeGeometry2 = WireframeGeometry2;
+
+} )();

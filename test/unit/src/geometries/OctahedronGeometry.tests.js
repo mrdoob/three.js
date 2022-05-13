@@ -1,17 +1,11 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
-import {
-	OctahedronBufferGeometry
-} from '../../../../src/geometries/OctahedronGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { OctahedronGeometry, OctahedronBufferGeometry } from '../../../../src/geometries/OctahedronGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'OctahedronBufferGeometry', ( hooks ) => {
+	QUnit.module( 'OctahedronGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -22,24 +16,25 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new OctahedronBufferGeometry(),
-				new OctahedronBufferGeometry( parameters.radius ),
-				new OctahedronBufferGeometry( parameters.radius, parameters.detail ),
+				new OctahedronGeometry(),
+				new OctahedronGeometry( parameters.radius ),
+				new OctahedronGeometry( parameters.radius, parameters.detail ),
+				new OctahedronBufferGeometry()
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -1,52 +1,50 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIRow, UIText, UISpan, UIBreak } from './libs/ui.js';
 
-Sidebar.Geometry.BufferGeometry = function ( editor ) {
+function SidebarGeometryBufferGeometry( editor ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
-	var container = new UI.Row();
+	const container = new UIRow();
 
 	function update( object ) {
 
 		if ( object === null ) return; // objectSelected.dispatch( null )
 		if ( object === undefined ) return;
 
-		var geometry = object.geometry;
+		const geometry = object.geometry;
 
-		if ( geometry && geometry.isBufferGeometry ) {
+		if ( geometry && geometry.isBufferGeometry && object.type !== 'LineSegments' ) {
 
 			container.clear();
 			container.setDisplay( 'block' );
 
-			var text = new UI.Text( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setWidth( '90px' );
+			const text = new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/attributes' ) ).setWidth( '90px' );
 			container.add( text );
 
-			var container2 = new UI.Span().setDisplay( 'inline-block' ).setWidth( '160px' );
+			const container2 = new UISpan().setDisplay( 'inline-block' ).setVerticalAlign( 'middle' ).setWidth( '160px' );
 			container.add( container2 );
 
-			var index = geometry.index;
+			const index = geometry.index;
 
 			if ( index !== null ) {
 
-				container2.add( new UI.Text( strings.getKey( 'sidebar/geometry/buffer_geometry/index' ) ).setWidth( '80px' ) );
-				container2.add( new UI.Text( ( index.count ).format() ).setFontSize( '12px' ) );
-				container2.add( new UI.Break() );
+				container2.add( new UIText( strings.getKey( 'sidebar/geometry/buffer_geometry/index' ) ).setWidth( '80px' ) );
+				container2.add( new UIText( ( index.count ).format() ).setFontSize( '12px' ) );
+				container2.add( new UIBreak() );
 
 			}
 
-			var attributes = geometry.attributes;
+			const attributes = geometry.attributes;
 
-			for ( var name in attributes ) {
+			for ( const name in attributes ) {
 
-				var attribute = attributes[ name ];
+				const attribute = attributes[ name ];
 
-				container2.add( new UI.Text( name ).setWidth( '80px' ) );
-				container2.add( new UI.Text( ( attribute.count ).format() + ' (' + attribute.itemSize + ')' ).setFontSize( '12px' ) );
-				container2.add( new UI.Break() );
+				container2.add( new UIText( name ).setWidth( '80px' ) );
+				container2.add( new UIText( ( attribute.count ).format() + ' (' + attribute.itemSize + ')' ).setFontSize( '12px' ) );
+				container2.add( new UIBreak() );
 
 			}
 
@@ -63,4 +61,6 @@ Sidebar.Geometry.BufferGeometry = function ( editor ) {
 
 	return container;
 
-};
+}
+
+export { SidebarGeometryBufferGeometry };

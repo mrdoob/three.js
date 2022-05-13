@@ -4,54 +4,15 @@
 	<title>three.js webgl - instancing test (single triangle)</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
-
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
-
-		a {
-			color: #ffffff;
-		}
-
-		#webglmessage a {
-			color: #da0;
-		}
-
-		#notSupported {
-			width: 50%;
-			margin: auto;
-			border: 2px red solid;
-			margin-top: 20px;
-			padding: 10px;
-		}
-	</style>
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
 
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing demo (single triangle)
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing demo (single triangle)
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
-
-	<script src="js/libs/dat.gui.min.js"></script>
-	<script src="../build/three.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/WebGL.js"></script>
 
 	<script id="vertexShader" type="x-shader/x-vertex">
 		precision highp float;
@@ -105,17 +66,27 @@
 
 	</script>
 
-	<script>
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		if ( WEBGL.isWebGLAvailable() === false ) {
-
-			document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js"
+			}
 		}
+	</script>
 
-		var container, stats;
+	<script type="module">
+		import * as THREE from 'three';
 
-		var camera, scene, renderer;
+		import Stats from './jsm/libs/stats.module.js';
+		import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+		let container, stats;
+
+		let camera, scene, renderer;
 
 		init();
 		animate();
@@ -131,15 +102,15 @@
 
 			// geometry
 
-			var vector = new THREE.Vector4();
+			const vector = new THREE.Vector4();
 
-			var instances = 50000;
+			const instances = 50000;
 
-			var positions = [];
-			var offsets = [];
-			var colors = [];
-			var orientationsStart = [];
-			var orientationsEnd = [];
+			const positions = [];
+			const offsets = [];
+			const colors = [];
+			const orientationsStart = [];
+			const orientationsEnd = [];
 
 			positions.push( 0.025, - 0.025, 0 );
 			positions.push( - 0.025, 0.025, 0 );
@@ -147,7 +118,7 @@
 
 			// instanced attributes
 
-			for ( var i = 0; i < instances; i ++ ) {
+			for ( let i = 0; i < instances; i ++ ) {
 
 				// offsets
 
@@ -173,23 +144,23 @@
 
 			}
 
-			var geometry = new THREE.InstancedBufferGeometry();
-			geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
+			const geometry = new THREE.InstancedBufferGeometry();
+			geometry.instanceCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
 
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
-			geometry.addAttribute( 'offset', new THREE.InstancedBufferAttribute( new Float32Array( offsets ), 3 ) );
-			geometry.addAttribute( 'color', new THREE.InstancedBufferAttribute( new Float32Array( colors ), 4 ) );
-			geometry.addAttribute( 'orientationStart', new THREE.InstancedBufferAttribute( new Float32Array( orientationsStart ), 4 ) );
-			geometry.addAttribute( 'orientationEnd', new THREE.InstancedBufferAttribute( new Float32Array( orientationsEnd ), 4 ) );
+			geometry.setAttribute( 'offset', new THREE.InstancedBufferAttribute( new Float32Array( offsets ), 3 ) );
+			geometry.setAttribute( 'color', new THREE.InstancedBufferAttribute( new Float32Array( colors ), 4 ) );
+			geometry.setAttribute( 'orientationStart', new THREE.InstancedBufferAttribute( new Float32Array( orientationsStart ), 4 ) );
+			geometry.setAttribute( 'orientationEnd', new THREE.InstancedBufferAttribute( new Float32Array( orientationsEnd ), 4 ) );
 
 			// material
 
-			var material = new THREE.RawShaderMaterial( {
+			const material = new THREE.RawShaderMaterial( {
 
 				uniforms: {
-					"time": { value: 1.0 },
-					"sineTime": { value: 1.0 }
+					'time': { value: 1.0 },
+					'sineTime': { value: 1.0 }
 				},
 				vertexShader: document.getElementById( 'vertexShader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
@@ -200,7 +171,7 @@
 
 			//
 
-			var mesh = new THREE.Mesh( geometry, material );
+			const mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
 
 			//
@@ -210,7 +181,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'ANGLE_instanced_arrays' ) === false ) {
 
 				document.getElementById( 'notSupported' ).style.display = '';
 				return;
@@ -219,8 +190,8 @@
 
 			//
 
-			var gui = new dat.GUI( { width: 350 } );
-			gui.add( geometry, 'maxInstancedCount', 0, instances );
+			const gui = new GUI( { width: 350 } );
+			gui.add( geometry, 'instanceCount', 0, instances );
 
 			//
 
@@ -229,7 +200,7 @@
 
 			//
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
@@ -255,13 +226,13 @@
 
 		function render() {
 
-			var time = performance.now();
+			const time = performance.now();
 
-			var object = scene.children[ 0 ];
+			const object = scene.children[ 0 ];
 
 			object.rotation.y = time * 0.0005;
-			object.material.uniforms[ "time" ].value = time * 0.005;
-			object.material.uniforms[ "sineTime" ].value = Math.sin( object.material.uniforms[ "time" ].value * 0.05 );
+			object.material.uniforms[ 'time' ].value = time * 0.005;
+			object.material.uniforms[ 'sineTime' ].value = Math.sin( object.material.uniforms[ 'time' ].value * 0.05 );
 
 			renderer.render( scene, camera );
 

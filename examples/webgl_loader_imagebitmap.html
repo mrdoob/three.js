@@ -4,49 +4,31 @@
 		<title>three.js webgl - loader - ImageBitmap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/WebGL.js"></script>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Texture loader using ImageBitmap
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Texture loader using ImageBitmap
 		</div>
 
-		<script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var container;
+		<script type="module">
 
-			var camera, scene, renderer;
-			var group, cubes;
+			import * as THREE from 'three';
+
+			let camera, scene, renderer;
+			let group, cubes;
 
 			init();
 			animate();
@@ -57,8 +39,8 @@
 					.setOptions( { imageOrientation: 'none' } )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
-						var texture = new THREE.CanvasTexture( imageBitmap );
-						var material = new THREE.MeshBasicMaterial( { map: texture } );
+						const texture = new THREE.CanvasTexture( imageBitmap );
+						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 						/* ImageBitmap should be disposed when done with it
 						   Can't be done until it's actually uploaded to WebGLTexture */
@@ -85,19 +67,19 @@
 					.setCrossOrigin( '*' )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( image ) {
 
-						var texture = new THREE.CanvasTexture( image );
-						var material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
+						const texture = new THREE.CanvasTexture( image );
+						const material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
 						addCube( material );
 
 					} );
 
 			}
 
-			var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+			const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
 			function addCube( material ) {
 
-				var cube = new THREE.Mesh( geometry, material );
+				const cube = new THREE.Mesh( geometry, material );
 				cube.position.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
 				cube.rotation.set( Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI );
 				cubes.add( cube );
@@ -106,7 +88,7 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				// CAMERA
@@ -124,7 +106,7 @@
 				group = new THREE.Group();
 				scene.add( group );
 
-				group.add( new THREE.GridHelper( 4, 12 ) );
+				group.add( new THREE.GridHelper( 4, 12, 0x888888, 0x444444 ) );
 
 				cubes = new THREE.Group();
 				group.add( cubes );
@@ -147,7 +129,7 @@
 
 				// EVENTS
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

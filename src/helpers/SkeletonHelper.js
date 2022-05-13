@@ -1,115 +1,85 @@
-/**
- * @author Sean Griffin / http://twitter.com/sgrif
- * @author Michael Guerrero / http://realitymeltdown.com
- * @author mrdoob / http://mrdoob.com/
- * @author ikerr / http://verold.com
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { LineSegments } from '../objects/LineSegments.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { VertexColors } from '../constants.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Color } from '../math/Color.js';
 import { Vector3 } from '../math/Vector3.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Object3D } from '../core/Object3D.js';
 
-function getBoneList( object ) {
+const _vector = /*@__PURE__*/ new Vector3();
+const _boneMatrix = /*@__PURE__*/ new Matrix4();
+const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
-	var boneList = [];
 
-	if ( object && object.isBone ) {
+class SkeletonHelper extends LineSegments {
 
-		boneList.push( object );
+	constructor( object ) {
 
-	}
+		const bones = getBoneList( object );
 
-	for ( var i = 0; i < object.children.length; i ++ ) {
+		const geometry = new BufferGeometry();
 
-		boneList.push.apply( boneList, getBoneList( object.children[ i ] ) );
+		const vertices = [];
+		const colors = [];
 
-	}
+		const color1 = new Color( 0, 0, 1 );
+		const color2 = new Color( 0, 1, 0 );
 
-	return boneList;
+		for ( let i = 0; i < bones.length; i ++ ) {
 
-}
-
-function SkeletonHelper( object ) {
-
-	var bones = getBoneList( object );
-
-	var geometry = new BufferGeometry();
-
-	var vertices = [];
-	var colors = [];
-
-	var color1 = new Color( 0, 0, 1 );
-	var color2 = new Color( 0, 1, 0 );
-
-	for ( var i = 0; i < bones.length; i ++ ) {
-
-		var bone = bones[ i ];
-
-		if ( bone.parent && bone.parent.isBone ) {
-
-			vertices.push( 0, 0, 0 );
-			vertices.push( 0, 0, 0 );
-			colors.push( color1.r, color1.g, color1.b );
-			colors.push( color2.r, color2.g, color2.b );
-
-		}
-
-	}
-
-	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
-
-	var material = new LineBasicMaterial( { vertexColors: VertexColors, depthTest: false, depthWrite: false, transparent: true } );
-
-	LineSegments.call( this, geometry, material );
-
-	this.root = object;
-	this.bones = bones;
-
-	this.matrix = object.matrixWorld;
-	this.matrixAutoUpdate = false;
-
-}
-
-SkeletonHelper.prototype = Object.create( LineSegments.prototype );
-SkeletonHelper.prototype.constructor = SkeletonHelper;
-
-SkeletonHelper.prototype.updateMatrixWorld = function () {
-
-	var vector = new Vector3();
-
-	var boneMatrix = new Matrix4();
-	var matrixWorldInv = new Matrix4();
-
-	return function updateMatrixWorld( force ) {
-
-		var bones = this.bones;
-
-		var geometry = this.geometry;
-		var position = geometry.getAttribute( 'position' );
-
-		matrixWorldInv.getInverse( this.root.matrixWorld );
-
-		for ( var i = 0, j = 0; i < bones.length; i ++ ) {
-
-			var bone = bones[ i ];
+			const bone = bones[ i ];
 
 			if ( bone.parent && bone.parent.isBone ) {
 
-				boneMatrix.multiplyMatrices( matrixWorldInv, bone.matrixWorld );
-				vector.setFromMatrixPosition( boneMatrix );
-				position.setXYZ( j, vector.x, vector.y, vector.z );
+				vertices.push( 0, 0, 0 );
+				vertices.push( 0, 0, 0 );
+				colors.push( color1.r, color1.g, color1.b );
+				colors.push( color2.r, color2.g, color2.b );
 
-				boneMatrix.multiplyMatrices( matrixWorldInv, bone.parent.matrixWorld );
-				vector.setFromMatrixPosition( boneMatrix );
-				position.setXYZ( j + 1, vector.x, vector.y, vector.z );
+			}
+
+		}
+
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+		const material = new LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, toneMapped: false, transparent: true } );
+
+		super( geometry, material );
+
+		this.type = 'SkeletonHelper';
+		this.isSkeletonHelper = true;
+
+		this.root = object;
+		this.bones = bones;
+
+		this.matrix = object.matrixWorld;
+		this.matrixAutoUpdate = false;
+
+	}
+
+	updateMatrixWorld( force ) {
+
+		const bones = this.bones;
+
+		const geometry = this.geometry;
+		const position = geometry.getAttribute( 'position' );
+
+		_matrixWorldInv.copy( this.root.matrixWorld ).invert();
+
+		for ( let i = 0, j = 0; i < bones.length; i ++ ) {
+
+			const bone = bones[ i ];
+
+			if ( bone.parent && bone.parent.isBone ) {
+
+				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
+				_vector.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j, _vector.x, _vector.y, _vector.z );
+
+				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
+				_vector.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j + 1, _vector.x, _vector.y, _vector.z );
 
 				j += 2;
 
@@ -119,10 +89,32 @@ SkeletonHelper.prototype.updateMatrixWorld = function () {
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
 
-		Object3D.prototype.updateMatrixWorld.call( this, force );
+		super.updateMatrixWorld( force );
 
-	};
+	}
 
-}();
+}
+
+
+function getBoneList( object ) {
+
+	const boneList = [];
+
+	if ( object.isBone === true ) {
+
+		boneList.push( object );
+
+	}
+
+	for ( let i = 0; i < object.children.length; i ++ ) {
+
+		boneList.push.apply( boneList, getBoneList( object.children[ i ] ) );
+
+	}
+
+	return boneList;
+
+}
+
 
 export { SkeletonHelper };

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,8 +12,9 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.
-			The material must support skinning and have skinning enabled - see [page:MeshStandardMaterial.skinning].
+			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.<br /><br />
+
+			[name] can only be used with WebGL 2. With WebGL 1 *OES_texture_float* and vertex textures support is required.
 		</p>
 
 		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
@@ -25,7 +25,7 @@
 
 		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById( 'scene' );
+			const scene = document.getElementById( 'scene' );
 
 			scene.style.width = getComputedStyle( scene ).width;
 			scene.style.height = getComputedStyle( scene ).height;
@@ -35,47 +35,48 @@
 
 		</script>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
-		var geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 5, 15, 5, 30 );
+		const geometry = new THREE.CylinderGeometry( 5, 5, 5, 5, 15, 5, 30 );
 
-		// create the skin indices and skin weights
+		// create the skin indices and skin weights manually
+		// (typically a loader would read this data from a 3D model for you)
 
-		var position = geometry.attributes.position;
+		const position = geometry.attributes.position;
 
-		var vertex = new THREE.Vector3();
+		const vertex = new THREE.Vector3();
 
-		var skinIndices = [];
-		var skinWeights = [];
+		const skinIndices = [];
+		const skinWeights = [];
 
-		for ( var i = 0; i < position.count; i ++ ) {
+		for ( let i = 0; i < position.count; i ++ ) {
 
 			vertex.fromBufferAttribute( position, i );
 
 			// compute skinIndex and skinWeight based on some configuration data
 
-			var y = ( vertex.y + sizing.halfHeight );
+			const y = ( vertex.y + sizing.halfHeight );
 
-			var skinIndex = Math.floor( y / sizing.segmentHeight );
-			var skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+			const skinIndex = Math.floor( y / sizing.segmentHeight );
+			const skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
 
 			skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
 			skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
 
 		}
 
-		geometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
-		geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+		geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+		geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 
 		// create skinned mesh and skeleton
 
-		var mesh = new THREE.SkinnedMesh( geometry, material );
-		var skeleton = new THREE.Skeleton( bones );
+		const mesh = new THREE.SkinnedMesh( geometry, material );
+		const skeleton = new THREE.Skeleton( bones );
 
 		// see example from THREE.Skeleton
 
-		var rootBone = skeleton.bones[ 0 ];
+		const rootBone = skeleton.bones[ 0 ];
 		mesh.add( rootBone );
 
 		// bind the skeleton to the mesh
@@ -91,18 +92,14 @@
 		<h2>Constructor</h2>
 		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
 		<p>
-		[page:Geometry geometry] - an instance of [page:BufferGeometry].<br />
+		[page:BufferGeometry geometry] - an instance of [page:BufferGeometry].<br />
 		[page:Material material] - (optional) an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].
 		</p>
-
-
-
-
 
 		<h2>Properties</h2>
 		<p>See the base [page:Mesh] class for common properties.</p>
 
-		<h3>[property:string bindMode]</h3>
+		<h3>[property:String bindMode]</h3>
 		<p>
 		Either "attached" or "detached". "attached" uses the [page:SkinnedMesh.matrixWorld]
 		property for the base transform	matrix of the bones. "detached" uses the
@@ -121,9 +118,7 @@
 
 		<h3>[property:Boolean isSkinnedMesh]</h3>
 		<p>
-			Used to check whether this or derived classes are skinned meshes. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Skeleton skeleton]</h3>
@@ -136,7 +131,7 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Mesh] class for common methods.</p>
 
-		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
+		<h3>[method:undefined bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
 		<p>
 		[page:Skeleton skeleton] - [page:Skeleton] created from a [page:Bone Bones] tree.<br/>
 		[page:Matrix4 bindMatrix] - [page:Matrix4] that represents the base transform of the skeleton.<br /><br />
@@ -147,26 +142,34 @@
 
 		<h3>[method:SkinnedMesh clone]()</h3>
 		<p>
-		Returns a clone of this SkinnedMesh object and any descendants.
+		This method does currently not clone an instance of [name] correctly. Please use [page:SkeletonUtils.clone]() in the meanwhile.
 		</p>
 
-		<h3>[method:null normalizeSkinWeights]()</h3>
+		<h3>[method:undefined normalizeSkinWeights]()</h3>
 		<p>
 		Normalizes the skin weights.
 		</p>
 
-		<h3>[method:null pose]()</h3>
+		<h3>[method:undefined pose]()</h3>
 		<p>
 		This method sets the skinned mesh in the rest pose (resets the pose).
 		</p>
 
-		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
+		<h3>[method:Vector3 boneTransform]( [param:Integer index], [param:Vector3 target] )</h3>
 		<p>
-		Updates the [page:Matrix4 MatrixWorld].
+		Calculates the position of the vertex at the given index relative to the current bone transformations.
+		Target vector must be initialized with the vetrex coordinates prior to the transformation:
+		<code>
+const target = new THREE.Vector3();
+target.fromBufferAttribute( mesh.geometry.attributes.position, index );
+mesh.boneTransform( index, target );
+		</code>
 		</p>
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

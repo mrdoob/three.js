@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -13,30 +12,23 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			The [name] represents a virtual [link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener] of the all positional and non-positional audio effects in the scene.<br />
+			The [name] represents a virtual [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioListener listener] of the all positional and non-positional audio effects in the scene.<br />
 			A three.js application usually creates a single instance of [name]. It is a mandatory construtor parameter for audios entities like [page:Audio Audio] and [page:PositionalAudio PositionalAudio].<br />
 			In most cases, the listener object is a child of the camera. So the 3D transformation of the camera represents the 3D transformation of the listener.
 		</p>
 
-
-		<h2>Example</h2>
-
-		<p>
-			[example:webaudio_sandbox webaudio / sandbox ]<br />
-			[example:webaudio_timing webaudio / timing ]<br />
-			[example:webaudio_visualizer webaudio / visualizer ]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
 		// create an AudioListener and add it to the camera
-		var listener = new THREE.AudioListener();
+		const listener = new THREE.AudioListener();
 		camera.add( listener );
 
 		// create a global audio source
-		var sound = new THREE.Audio( listener );
+		const sound = new THREE.Audio( listener );
 
 		// load a sound and set it as the Audio object's buffer
-		var audioLoader = new THREE.AudioLoader();
+		const audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
 			sound.setLoop(true);
@@ -45,6 +37,13 @@
 		});
 		</code>
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_timing webaudio / timing ]<br />
+			[example:webaudio_visualizer webaudio / visualizer ]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -78,7 +77,7 @@
 		Return the [page:AudioListener.gain gainNode].
 		</p>
 
-		<h3>[method:AudioListener removeFilter]()</h3>
+		<h3>[method:this removeFilter]()</h3>
 		<p>
 		Set the [page:AudioListener.filter filter] property to *null*.
 		</p>
@@ -88,7 +87,7 @@
 		Returns the value of the [page:AudioListener.filter filter] property.
 		</p>
 
-		<h3>[method:AudioListener setFilter]( [param:AudioNode value] )</h3>
+		<h3>[method:this setFilter]( [param:AudioNode value] )</h3>
 		<p>
 		Set the [page:AudioListener.filter filter] property to *value*.
 		</p>
@@ -98,7 +97,7 @@
 		Return the volume.
 		</p>
 
-		<h3>[method:AudioListener setMasterVolume]( [param:Number value] )</h3>
+		<h3>[method:this setMasterVolume]( [param:Number value] )</h3>
 		<p>
 		Set the volume.
 		</p>
@@ -106,6 +105,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

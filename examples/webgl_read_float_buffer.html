@@ -4,39 +4,15 @@
 		<title>three.js webgl - read float pixels</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> read float pixels webgl example</div>
-
-		<script src="../build/three.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> read float pixels webgl example<br/>
+			<span id="values"></span>
+		</div>
 
 		<script id="fragment_shader_screen" type="x-shader/x-fragment">
 
@@ -82,28 +58,37 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var container, stats;
+		<script type="module">
 
-			var cameraRTT, sceneRTT, sceneScreen, renderer, zmesh1, zmesh2;
+			import * as THREE from 'three';
 
-			var mouseX = 0, mouseY = 0;
+			import Stats from './jsm/libs/stats.module.js';
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let container, stats;
 
-			var rtTexture, material, quad;
+			let cameraRTT, sceneRTT, sceneScreen, renderer, zmesh1, zmesh2;
 
-			var delta = 0.01;
-			var valueNode;
+			let mouseX = 0, mouseY = 0;
+
+			const windowHalfX = window.innerWidth / 2;
+			const windowHalfY = window.innerHeight / 2;
+
+			let rtTexture, material, quad;
+
+			let delta = 0.01;
+			let valueNode;
 
 			init();
 			animate();
@@ -120,7 +105,7 @@
 				sceneRTT = new THREE.Scene();
 				sceneScreen = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				let light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 ).normalize();
 				sceneRTT.add( light );
 
@@ -132,15 +117,15 @@
 
 				material = new THREE.ShaderMaterial( {
 
-					uniforms: { "time": { value: 0.0 } },
+					uniforms: { 'time': { value: 0.0 } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_pass_1' ).textContent
 
 				} );
 
-				var materialScreen = new THREE.ShaderMaterial( {
+				const materialScreen = new THREE.ShaderMaterial( {
 
-					uniforms: { "tDiffuse": { value: rtTexture.texture } },
+					uniforms: { 'tDiffuse': { value: rtTexture.texture } },
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
 
@@ -148,16 +133,16 @@
 
 				} );
 
-				var plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+				const plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = - 100;
 				sceneRTT.add( quad );
 
-				var geometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
+				const geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
 
-				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
-				var mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
+				const mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
+				const mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
 
 				zmesh1 = new THREE.Mesh( geometry, mat1 );
 				zmesh1.position.set( 0, 0, 100 );
@@ -183,19 +168,9 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var valueDiv = document.createElement( 'div' );
-				valueDiv.style.position = 'absolute';
-				valueDiv.style.top = '0px';
-				valueDiv.style.right = '0px';
-				valueDiv.style.width = '500px';
-				valueDiv.style.height = '300px';
-				valueDiv.style.fontSize = '60px';
-				container.appendChild( valueDiv );
-				valueNode = document.createTextNode( '' );
-				valueDiv.appendChild( valueNode );
+				valueNode = document.getElementById( 'values' );
 
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			}
 
@@ -219,7 +194,7 @@
 
 			function render() {
 
-				var time = Date.now() * 0.0015;
+				const time = Date.now() * 0.0015;
 
 				if ( zmesh1 && zmesh2 ) {
 
@@ -228,13 +203,13 @@
 
 				}
 
-				if ( material.uniforms[ "time" ].value > 1 || material.uniforms[ "time" ].value < 0 ) {
+				if ( material.uniforms[ 'time' ].value > 1 || material.uniforms[ 'time' ].value < 0 ) {
 
 					delta *= - 1;
 
 				}
 
-				material.uniforms[ "time" ].value += delta;
+				material.uniforms[ 'time' ].value += delta;
 
 				renderer.clear();
 
@@ -249,10 +224,10 @@
 				renderer.setRenderTarget( null );
 				renderer.render( sceneScreen, cameraRTT );
 
-				var read = new Float32Array( 4 );
+				const read = new Float32Array( 4 );
 				renderer.readRenderTargetPixels( rtTexture, windowHalfX + mouseX, windowHalfY - mouseY, 1, 1, read );
 
-				valueNode.nodeValue = 'r:' + read[ 0 ] + ' g:' + read[ 1 ] + ' b:' + read[ 2 ];
+				valueNode.innerHTML = 'r:' + read[ 0 ] + '<br/>g:' + read[ 1 ] + '<br/>b:' + read[ 2 ];
 
 			}
 

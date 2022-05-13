@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -14,9 +13,8 @@
 
 		<p class="desc">
 			Within the three.js animation system you can animate various properties of your models:
-			the bones of a [page:SkinnedMesh skinned and rigged model],
-			[page:Geometry.morphTargets morph targets], different material properties (colors,
-			opacity, booleans), visibility and transforms. The animated properties can be faded in,
+			the bones of a [page:SkinnedMesh skinned and rigged model], morph targets, different material properties
+			(colors, opacity, booleans), visibility and transforms. The animated properties can be faded in,
 			faded out, crossfaded and warped. The weight and time scales of different simultaneous
 			animations on the same object as well as on different objects can be changed
 			independently. Various animations on the same and on different objects can be
@@ -24,7 +22,7 @@
 
 			To achieve all this in one homogeneous system, the three.js animation system
 			[link:https://github.com/mrdoob/three.js/issues/6881 has completely changed in 2015]
-			(be aware of outdated information!), and it has now an architecture similar to
+			(beware of outdated information!), and it has now an architecture similar to
 			Unity/Unreal Engine 4. This page gives a short overview of the main components of the
 			system and how they work together.
 
@@ -36,7 +34,7 @@
 
 			If you have successfully imported an animated 3D object (it doesn't matter if it has
 			bones or morph targets or both) — for example exporting it from Blender with the
-			[link:https://github.com/KhronosGroup/glTF-Blender-Exporter glTF Blender exporter] and
+			[link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender exporter] and
 			loading it into a three.js scene using [page:GLTFLoader] — one of the response fields
 			should be an array named "animations", containing the [page:AnimationClip AnimationClips]
 			for this model (see a list of possible loaders below).<br /><br />
@@ -58,7 +56,7 @@
 			the track position, rotation or scaling of another bone, and so on. It should be clear,
 			that an AnimationClip can be composed of lots of such tracks.<br /><br />
 
-			Assuming the model has [page:Geometry.morphTargets morph targets] (for example one morph
+			Assuming the model has morph targets (for example one morph
 			target showing a friendly face and another showing an angry face), each track holds the
 			information as to how the [page:Mesh.morphTargetInfluences influence] of a certain morph
 			target changes during the performance of the clip.
@@ -113,7 +111,6 @@
 				<li>THREE.FBXLoader</li>
 				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
 				<li>THREE.MMDLoader</li>
-				<li>THREE.SEA3DLoader</li>
 			</ul>
 
 		<p class="desc">
@@ -124,11 +121,11 @@
 		<h2>Example</h2>
 
 		<code>
-		var mesh;
+		let mesh;
 
 		// Create an AnimationMixer, and get the list of AnimationClip instances
-		var mixer = new THREE.AnimationMixer( mesh );
-		var clips = mesh.animations;
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
 
 		// Update the mixer on each frame
 		function update () {
@@ -136,8 +133,8 @@
 		}
 
 		// Play a specific animation
-		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
-		var action = mixer.clipAction( clip );
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
 		action.play();
 
 		// Play all animations

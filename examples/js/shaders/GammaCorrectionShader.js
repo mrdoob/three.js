@@ -1,45 +1,44 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
+( function () {
+
+	/**
  * Gamma Correction Shader
  * http://en.wikipedia.org/wiki/gamma_correction
  */
+	const GammaCorrectionShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
 
-THREE.GammaCorrectionShader = {
+		varying vec2 vUv;
 
-	uniforms: {
+		void main() {
 
-		"tDiffuse": { value: null }
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-	},
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
 
-	vertexShader: [
+		uniform sampler2D tDiffuse;
 
-		"varying vec2 vUv;",
+		varying vec2 vUv;
 
-		"void main() {",
+		void main() {
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+			vec4 tex = texture2D( tDiffuse, vUv );
 
-		"}"
+			gl_FragColor = LinearTosRGB( tex );
 
-	].join( "\n" ),
+		}`
+	};
 
-	fragmentShader: [
+	THREE.GammaCorrectionShader = GammaCorrectionShader;
 
-		"uniform sampler2D tDiffuse;",
-
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-			"vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
-
-			"gl_FragColor = LinearToGamma( tex, float( GAMMA_FACTOR ) );",
-
-		"}"
-
-	].join( "\n" )
-
-};
+} )();

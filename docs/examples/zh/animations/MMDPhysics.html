@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc"> A Physics handler for <a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a> resources. <br /><br />
+		[name] calculates Physics for model loaded by [page:MMDLoader] with <a href="https://github.com/kripken/ammo.js/">ammo.js</a> (Bullet-based JavaScript Physics engine).
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		const physics;
+
+		// Load MMD resources and instantiate MMDPhysics
+		new MMDLoader().load(
+			'models/mmd/miku.pmd',
+			function ( mesh ) {
+
+				physics = new MMDPhysics( mesh )
+				scene.add( mesh );
+
+			}
+		);
+
+		function render() {
+
+			const delta = clock.getDelta();
+			animate( delta );  // update bones
+			if ( physics !== undefined ) physics.update( delta );
+			renderer.render( scene, camera );
+
+		}
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_mmd]<br />
+			[example:webgl_loader_mmd_audio]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:SkinnedMesh mesh], [param:Array rigidBodyParams], [param:Array constraintParams], [param:Object params] )</h3>
+		<p>
+		[page:SkinnedMesh mesh] — [page:SkinnedMesh] for which [name] calculates Physics.<br />
+		[page:Array rigidBodyParams] — An array of [page:Object] specifying Rigid Body parameters.<br />
+		[page:Array constraintParams] — (optional) An array of [page:Object] specifying Constraint parameters.<br />
+		[page:Object params] — (optional)<br />
+		<ul>
+			<li>[page:Number unitStep] - Default is 1 / 65.</li>
+			<li>[page:Integer maxStepNum] - Default is 3.</li>
+			<li>[page:Vector3 gravity] - Default is ( 0, - 9.8 * 10, 0 )</li>
+		</ul>
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array mesh]</h3>
+		<p>[page:SkinnedMesh] passed to the constructor.</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:MMDPhysicsHelper createHelper]()</h3>
+		<p>
+		Return [page:MMDPhysicsHelper]. You can visualize Rigid bodies by adding the helper to scene.
+		</p>
+
+		<h3>[method:this reset]()</h3>
+		<p>
+		Resets Rigid bodies transform to current bone's.
+		</p>
+
+		<h3>[method:this setGravity]( [param:Vector3 gravity] )</h3>
+		<p>
+		[page:Vector3 gravity] — Direction and volume of gravity.
+		</p>
+		<p>
+		Set gravity.
+		</p>
+
+		<h3>[method:this update]( [param:Number delta] )</h3>
+		<p>
+		[page:Number delta] — Time in second.
+		</p>
+		<p>
+		Advance Physics calculation and updates bones.
+		</p>
+
+		<h3>[method:this warmup]( [param:Integer cycles] )</h3>
+		<p>
+		[page:Number delta] — Time in second.
+		</p>
+		<p>
+		Warm up Rigid bodies. Calculates cycles steps.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDPhysics.js examples/jsm/animation/MMDPhysics.js]
+		</p>
+	</body>
+</html>

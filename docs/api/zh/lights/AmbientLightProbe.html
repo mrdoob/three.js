@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr; [page:LightProbe]
+
+		<h1>环境光探针（[name]）</h1>
+
+		<p class="desc">
+			光照探针是一种在3D场景中添加光源的另一种方法。 AmbientLightProbe 是场景中单个环境光的光照估算数据。
+			有关光照探针的更多信息，请转到 [page:LightProbe] 。
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Color color], [param:Float intensity] )</h3>
+		<p>
+		[page:Color color] - （可选）一个表示颜色的 Color 的实例、字符串或数字。<br />
+		[page:Float intensity] - （可选）光照探针强度的数值。默认值为1。<br /><br />
+
+		创建一个新的[name]。
+		</p>
+
+		<h2>属性</h2>
+		<p>
+				See the base [page:LightProbe LightProbe] class for common properties.
+		</p>
+
+		<h3>[property:Boolean isAmbientLightProbe]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
+		<h2>方法</h2>
+		<p>
+				See the base [page:LightProbe LightProbe] class for common methods.
+		</p>
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

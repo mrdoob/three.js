@@ -4,71 +4,46 @@
 		<title>three.js webgl - materials - cube refraction [Lucy]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family:georgia;
-				text-align:center;
-			}
-			a {	color: #ff0080;	text-decoration: none; }
-			a:hover { color: #0080ff; }
-
-			canvas { pointer-events:none; z-index:10; }
-
-			#d {
-				text-align:center;
-				margin:1em auto -9.5em;
-				z-index:200;
-				position:relative;
-				display:block;
-				background:rgba(0,0,0,0.5);
-				padding:0.5em; width:400px;
-				border-radius:15px;
-				-webkit-box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
-				box-shadow: 0px 0px 10px rgba(0,0,0,0.5)
-			}
-
-			#webglmessage { margin-top:15em !important }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<div id="d">
-			<p><a href="http://threejs.org">Three.js</a> cube map refraction demo
-
-			<p>Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository</a>
-			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
+		<div id="info">
+			<a href="https://threejs.org">Three.js</a> cube map refraction demo<br/>
+			Lucy model from <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3d scanning repository<br/>
+			Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
-		<script src="js/loaders/PLYLoader.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
 			}
+		</script>
 
-			var container, stats;
+		<script type="module">
 
-			var camera, scene, renderer;
+			import * as THREE from 'three';
 
-			var pointLight;
+			import Stats from './jsm/libs/stats.module.js';
 
-			var mouseX = 0, mouseY = 0;
+			import { PLYLoader } from './jsm/loaders/PLYLoader.js';
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			let container, stats;
+
+			let camera, scene, renderer;
+
+			let pointLight;
+
+			let mouseX = 0, mouseY = 0;
+
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -83,15 +58,15 @@
 
 				//
 
-				var r = "textures/cube/Park3Med/";
+				const r = 'textures/cube/Park3Med/';
 
-				var urls = [
-					r + "px.jpg", r + "nx.jpg",
-					r + "py.jpg", r + "ny.jpg",
-					r + "pz.jpg", r + "nz.jpg"
+				const urls = [
+					r + 'px.jpg', r + 'nx.jpg',
+					r + 'py.jpg', r + 'ny.jpg',
+					r + 'pz.jpg', r + 'nz.jpg'
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls );
+				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();
@@ -99,7 +74,7 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0xffffff );
+				const ambient = new THREE.AmbientLight( 0xffffff );
 				scene.add( ambient );
 
 				pointLight = new THREE.PointLight( 0xffffff, 2 );
@@ -107,17 +82,17 @@
 
 				// light representation
 
-				var sphere = new THREE.SphereBufferGeometry( 100, 16, 8 );
+				const sphere = new THREE.SphereGeometry( 100, 16, 8 );
 
-				var mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				const mesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				mesh.scale.set( 0.05, 0.05, 0.05 );
 				pointLight.add( mesh );
 
 				// material samples
 
-				var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
-				var cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
-				var cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
+				const cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: textureCube, refractionRatio: 0.98, reflectivity: 0.9 } );
+				const cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccfffd, envMap: textureCube, refractionRatio: 0.985 } );
+				const cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.98 } );
 
 				//
 
@@ -129,18 +104,18 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var loader = new THREE.PLYLoader();
+				const loader = new PLYLoader();
 				loader.load( 'models/ply/binary/Lucy100k.ply', function ( geometry ) {
 
 					createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 );
 
 				} );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -160,18 +135,18 @@
 
 				geometry.computeVertexNormals();
 
-				var s = 1.5;
+				const s = 1.5;
 
-				var mesh = new THREE.Mesh( geometry, m1 );
+				let mesh = new THREE.Mesh( geometry, m1 );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				var mesh = new THREE.Mesh( geometry, m2 );
+				mesh = new THREE.Mesh( geometry, m2 );
 				mesh.position.x = - 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				var mesh = new THREE.Mesh( geometry, m3 );
+				mesh = new THREE.Mesh( geometry, m3 );
 				mesh.position.x = 1500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
@@ -198,7 +173,7 @@
 
 			function render() {
 
-				var timer = - 0.0002 * Date.now();
+				const timer = - 0.0002 * Date.now();
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;

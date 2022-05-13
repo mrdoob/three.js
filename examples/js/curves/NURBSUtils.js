@@ -1,30 +1,28 @@
-/**
- * @author renej
+( function () {
+
+	/**
  * NURBS utils
  *
  * See NURBSCurve and NURBSSurface.
- *
  **/
 
-
-/**************************************************************
+	/**************************************************************
  *	NURBS Utils
  **************************************************************/
 
-THREE.NURBSUtils = {
-
 	/*
-	Finds knot vector span.
+Finds knot vector span.
 
-	p : degree
-	u : parametric value
-	U : knot vector
+p : degree
+u : parametric value
+U : knot vector
 
-	returns the span
-	*/
-	findSpan: function( p,  u,  U ) {
+returns the span
+*/
 
-		var n = U.length - p - 1;
+	function findSpan( p, u, U ) {
+
+		const n = U.length - p - 1;
 
 		if ( u >= U[ n ] ) {
 
@@ -38,9 +36,9 @@ THREE.NURBSUtils = {
 
 		}
 
-		var low = p;
-		var high = n;
-		var mid = Math.floor( ( low + high ) / 2 );
+		let low = p;
+		let high = n;
+		let mid = Math.floor( ( low + high ) / 2 );
 
 		while ( u < U[ mid ] || u >= U[ mid + 1 ] ) {
 
@@ -60,73 +58,72 @@ THREE.NURBSUtils = {
 
 		return mid;
 
-	},
-
-
+	}
 	/*
-	Calculate basis functions. See The NURBS Book, page 70, algorithm A2.2
+Calculate basis functions. See The NURBS Book, page 70, algorithm A2.2
 
-	span : span in which u lies
-	u    : parametric point
-	p    : degree
-	U    : knot vector
+span : span in which u lies
+u    : parametric point
+p    : degree
+U    : knot vector
 
-	returns array[p+1] with basis functions values.
-	*/
-	calcBasisFunctions: function( span, u, p, U ) {
+returns array[p+1] with basis functions values.
+*/
 
-		var N = [];
-		var left = [];
-		var right = [];
+
+	function calcBasisFunctions( span, u, p, U ) {
+
+		const N = [];
+		const left = [];
+		const right = [];
 		N[ 0 ] = 1.0;
 
-		for ( var j = 1; j <= p; ++ j ) {
+		for ( let j = 1; j <= p; ++ j ) {
 
 			left[ j ] = u - U[ span + 1 - j ];
 			right[ j ] = U[ span + j ] - u;
+			let saved = 0.0;
 
-			var saved = 0.0;
+			for ( let r = 0; r < j; ++ r ) {
 
-			for ( var r = 0; r < j; ++ r ) {
-
-				var rv = right[ r + 1 ];
-				var lv = left[ j - r ];
-				var temp = N[ r ] / ( rv + lv );
+				const rv = right[ r + 1 ];
+				const lv = left[ j - r ];
+				const temp = N[ r ] / ( rv + lv );
 				N[ r ] = saved + rv * temp;
 				saved = lv * temp;
 
-			 }
+			}
 
-			 N[ j ] = saved;
+			N[ j ] = saved;
 
-		 }
+		}
 
-		 return N;
+		return N;
 
-	},
-
-
+	}
 	/*
-	Calculate B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.
+Calculate B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.
 
-	p : degree of B-Spline
-	U : knot vector
-	P : control points (x, y, z, w)
-	u : parametric point
+p : degree of B-Spline
+U : knot vector
+P : control points (x, y, z, w)
+u : parametric point
 
-	returns point for given u
-	*/
-	calcBSplinePoint: function( p, U, P, u ) {
+returns point for given u
+*/
 
-		var span = this.findSpan( p, u, U );
-		var N = this.calcBasisFunctions( span, u, p, U );
-		var C = new THREE.Vector4( 0, 0, 0, 0 );
 
-		for ( var j = 0; j <= p; ++ j ) {
+	function calcBSplinePoint( p, U, P, u ) {
 
-			var point = P[ span - p + j ];
-			var Nj = N[ j ];
-			var wNj = point.w * Nj;
+		const span = findSpan( p, u, U );
+		const N = calcBasisFunctions( span, u, p, U );
+		const C = new THREE.Vector4( 0, 0, 0, 0 );
+
+		for ( let j = 0; j <= p; ++ j ) {
+
+			const point = P[ span - p + j ];
+			const Nj = N[ j ];
+			const wNj = point.w * Nj;
 			C.x += point.x * wNj;
 			C.y += point.y * wNj;
 			C.z += point.z * wNj;
@@ -136,53 +133,50 @@ THREE.NURBSUtils = {
 
 		return C;
 
-	},
-
-
+	}
 	/*
-	Calculate basis functions derivatives. See The NURBS Book, page 72, algorithm A2.3.
+Calculate basis functions derivatives. See The NURBS Book, page 72, algorithm A2.3.
 
-	span : span in which u lies
-	u    : parametric point
-	p    : degree
-	n    : number of derivatives to calculate
-	U    : knot vector
+span : span in which u lies
+u    : parametric point
+p    : degree
+n    : number of derivatives to calculate
+U    : knot vector
 
-	returns array[n+1][p+1] with basis functions derivatives
-	*/
-	calcBasisFunctionDerivatives: function( span,  u,  p,  n,  U ) {
+returns array[n+1][p+1] with basis functions derivatives
+*/
 
-		var zeroArr = [];
-		for ( var i = 0; i <= p; ++ i )
-			zeroArr[ i ] = 0.0;
 
-		var ders = [];
-		for ( var i = 0; i <= n; ++ i )
-			ders[ i ] = zeroArr.slice( 0 );
+	function calcBasisFunctionDerivatives( span, u, p, n, U ) {
 
-		var ndu = [];
-		for ( var i = 0; i <= p; ++ i )
-			ndu[ i ] = zeroArr.slice( 0 );
+		const zeroArr = [];
+
+		for ( let i = 0; i <= p; ++ i ) zeroArr[ i ] = 0.0;
+
+		const ders = [];
+
+		for ( let i = 0; i <= n; ++ i ) ders[ i ] = zeroArr.slice( 0 );
+
+		const ndu = [];
+
+		for ( let i = 0; i <= p; ++ i ) ndu[ i ] = zeroArr.slice( 0 );
 
 		ndu[ 0 ][ 0 ] = 1.0;
+		const left = zeroArr.slice( 0 );
+		const right = zeroArr.slice( 0 );
 
-		var left = zeroArr.slice( 0 );
-		var right = zeroArr.slice( 0 );
-
-		for ( var j = 1; j <= p; ++ j ) {
+		for ( let j = 1; j <= p; ++ j ) {
 
 			left[ j ] = u - U[ span + 1 - j ];
 			right[ j ] = U[ span + j ] - u;
+			let saved = 0.0;
 
-			var saved = 0.0;
+			for ( let r = 0; r < j; ++ r ) {
 
-			for ( var r = 0; r < j; ++ r ) {
-
-				var rv = right[ r + 1 ];
-				var lv = left[ j - r ];
+				const rv = right[ r + 1 ];
+				const lv = left[ j - r ];
 				ndu[ j ][ r ] = rv + lv;
-
-				var temp = ndu[ r ][ j - 1 ] / ndu[ j ][ r ];
+				const temp = ndu[ r ][ j - 1 ] / ndu[ j ][ r ];
 				ndu[ r ][ j ] = saved + rv * temp;
 				saved = lv * temp;
 
@@ -192,30 +186,31 @@ THREE.NURBSUtils = {
 
 		}
 
-		for ( var j = 0; j <= p; ++ j ) {
+		for ( let j = 0; j <= p; ++ j ) {
 
 			ders[ 0 ][ j ] = ndu[ j ][ p ];
 
 		}
 
-		for ( var r = 0; r <= p; ++ r ) {
+		for ( let r = 0; r <= p; ++ r ) {
 
-			var s1 = 0;
-			var s2 = 1;
+			let s1 = 0;
+			let s2 = 1;
+			const a = [];
 
-			var a = [];
-			for ( var i = 0; i <= p; ++ i ) {
+			for ( let i = 0; i <= p; ++ i ) {
 
 				a[ i ] = zeroArr.slice( 0 );
 
 			}
+
 			a[ 0 ][ 0 ] = 1.0;
 
-			for ( var k = 1; k <= n; ++ k ) {
+			for ( let k = 1; k <= n; ++ k ) {
 
-				var d = 0.0;
-				var rk = r - k;
-				var pk = p - k;
+				let d = 0.0;
+				const rk = r - k;
+				const pk = p - k;
 
 				if ( r >= k ) {
 
@@ -224,10 +219,10 @@ THREE.NURBSUtils = {
 
 				}
 
-				var j1 = ( rk >= - 1 ) ? 1 : - rk;
-				var j2 = ( r - 1 <= pk ) ? k - 1 :  p - r;
+				const j1 = rk >= - 1 ? 1 : - rk;
+				const j2 = r - 1 <= pk ? k - 1 : p - r;
 
-				for ( var j = j1; j <= j2; ++ j ) {
+				for ( let j = j1; j <= j2; ++ j ) {
 
 					a[ s2 ][ j ] = ( a[ s1 ][ j ] - a[ s1 ][ j - 1 ] ) / ndu[ pk + 1 ][ rk + j ];
 					d += a[ s2 ][ j ] * ndu[ rk + j ][ pk ];
@@ -242,8 +237,7 @@ THREE.NURBSUtils = {
 				}
 
 				ders[ k ][ r ] = d;
-
-				var j = s1;
+				const j = s1;
 				s1 = s2;
 				s2 = j;
 
@@ -251,60 +245,60 @@ THREE.NURBSUtils = {
 
 		}
 
-		var r = p;
+		let r = p;
 
-		for ( var k = 1; k <= n; ++ k ) {
+		for ( let k = 1; k <= n; ++ k ) {
 
-			for ( var j = 0; j <= p; ++ j ) {
+			for ( let j = 0; j <= p; ++ j ) {
 
 				ders[ k ][ j ] *= r;
 
 			}
+
 			r *= p - k;
 
 		}
 
 		return ders;
 
-	},
-
-
+	}
 	/*
-		Calculate derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
+	Calculate derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
 
-		p  : degree
-		U  : knot vector
-		P  : control points
-		u  : Parametric points
-		nd : number of derivatives
+	p  : degree
+	U  : knot vector
+	P  : control points
+	u  : Parametric points
+	nd : number of derivatives
 
-		returns array[d+1] with derivatives
-		*/
-	calcBSplineDerivatives: function( p,  U,  P,  u,  nd ) {
+	returns array[d+1] with derivatives
+	*/
 
-		var du = nd < p ? nd : p;
-		var CK = [];
-		var span = this.findSpan( p, u, U );
-		var nders = this.calcBasisFunctionDerivatives( span, u, p, du, U );
-		var Pw = [];
 
-		for ( var i = 0; i < P.length; ++ i ) {
+	function calcBSplineDerivatives( p, U, P, u, nd ) {
 
-			var point = P[ i ].clone();
-			var w = point.w;
+		const du = nd < p ? nd : p;
+		const CK = [];
+		const span = findSpan( p, u, U );
+		const nders = calcBasisFunctionDerivatives( span, u, p, du, U );
+		const Pw = [];
 
+		for ( let i = 0; i < P.length; ++ i ) {
+
+			const point = P[ i ].clone();
+			const w = point.w;
 			point.x *= w;
 			point.y *= w;
 			point.z *= w;
-
 			Pw[ i ] = point;
 
 		}
-		for ( var k = 0; k <= du; ++ k ) {
 
-			var point = Pw[ span - p ].clone().multiplyScalar( nders[ k ][ 0 ] );
+		for ( let k = 0; k <= du; ++ k ) {
 
-			for ( var j = 1; j <= p; ++ j ) {
+			const point = Pw[ span - p ].clone().multiplyScalar( nders[ k ][ 0 ] );
+
+			for ( let j = 1; j <= p; ++ j ) {
 
 				point.add( Pw[ span - p + j ].clone().multiplyScalar( nders[ k ][ j ] ) );
 
@@ -314,7 +308,7 @@ THREE.NURBSUtils = {
 
 		}
 
-		for ( var k = du + 1; k <= nd + 1; ++ k ) {
+		for ( let k = du + 1; k <= nd + 1; ++ k ) {
 
 			CK[ k ] = new THREE.Vector4( 0, 0, 0 );
 
@@ -322,33 +316,33 @@ THREE.NURBSUtils = {
 
 		return CK;
 
-	},
-
-
+	}
 	/*
-	Calculate "K over I"
+Calculate "K over I"
 
-	returns k!/(i!(k-i)!)
-	*/
-	calcKoverI: function( k, i ) {
+returns k!/(i!(k-i)!)
+*/
 
-		var nom = 1;
 
-		for ( var j = 2; j <= k; ++ j ) {
+	function calcKoverI( k, i ) {
+
+		let nom = 1;
+
+		for ( let j = 2; j <= k; ++ j ) {
 
 			nom *= j;
 
 		}
 
-		var denom = 1;
+		let denom = 1;
 
-		for ( var j = 2; j <= i; ++ j ) {
+		for ( let j = 2; j <= i; ++ j ) {
 
 			denom *= j;
 
 		}
 
-		for ( var j = 2; j <= k - i; ++ j ) {
+		for ( let j = 2; j <= k - i; ++ j ) {
 
 			denom *= j;
 
@@ -356,39 +350,39 @@ THREE.NURBSUtils = {
 
 		return nom / denom;
 
-	},
-
-
+	}
 	/*
-	Calculate derivatives (0-nd) of rational curve. See The NURBS Book, page 127, algorithm A4.2.
+Calculate derivatives (0-nd) of rational curve. See The NURBS Book, page 127, algorithm A4.2.
 
-	Pders : result of function calcBSplineDerivatives
+Pders : result of function calcBSplineDerivatives
 
-	returns array with derivatives for rational curve.
-	*/
-	calcRationalCurveDerivatives: function ( Pders ) {
+returns array with derivatives for rational curve.
+*/
 
-		var nd = Pders.length;
-		var Aders = [];
-		var wders = [];
 
-		for ( var i = 0; i < nd; ++ i ) {
+	function calcRationalCurveDerivatives( Pders ) {
 
-			var point = Pders[ i ];
+		const nd = Pders.length;
+		const Aders = [];
+		const wders = [];
+
+		for ( let i = 0; i < nd; ++ i ) {
+
+			const point = Pders[ i ];
 			Aders[ i ] = new THREE.Vector3( point.x, point.y, point.z );
 			wders[ i ] = point.w;
 
 		}
 
-		var CK = [];
+		const CK = [];
 
-		for ( var k = 0; k < nd; ++ k ) {
+		for ( let k = 0; k < nd; ++ k ) {
 
-			var v = Aders[ k ].clone();
+			const v = Aders[ k ].clone();
 
-			for ( var i = 1; i <= k; ++ i ) {
+			for ( let i = 1; i <= k; ++ i ) {
 
-				v.sub( CK[ k - i ].clone().multiplyScalar( this.calcKoverI( k, i ) * wders[ i ] ) );
+				v.sub( CK[ k - i ].clone().multiplyScalar( calcKoverI( k, i ) * wders[ i ] ) );
 
 			}
 
@@ -398,53 +392,54 @@ THREE.NURBSUtils = {
 
 		return CK;
 
-	},
-
-
+	}
 	/*
-	Calculate NURBS curve derivatives. See The NURBS Book, page 127, algorithm A4.2.
+Calculate NURBS curve derivatives. See The NURBS Book, page 127, algorithm A4.2.
 
-	p  : degree
-	U  : knot vector
-	P  : control points in homogeneous space
-	u  : parametric points
-	nd : number of derivatives
+p  : degree
+U  : knot vector
+P  : control points in homogeneous space
+u  : parametric points
+nd : number of derivatives
 
-	returns array with derivatives.
-	*/
-	calcNURBSDerivatives: function( p,  U,  P,  u,  nd ) {
-
-		var Pders = this.calcBSplineDerivatives( p, U, P, u, nd );
-		return this.calcRationalCurveDerivatives( Pders );
-
-	},
+returns array with derivatives.
+*/
 
 
+	function calcNURBSDerivatives( p, U, P, u, nd ) {
+
+		const Pders = calcBSplineDerivatives( p, U, P, u, nd );
+		return calcRationalCurveDerivatives( Pders );
+
+	}
 	/*
-	Calculate rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.
+Calculate rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.
 
-	p1, p2 : degrees of B-Spline surface
-	U1, U2 : knot vectors
-	P      : control points (x, y, z, w)
-	u, v   : parametric values
+p1, p2 : degrees of B-Spline surface
+U1, U2 : knot vectors
+P      : control points (x, y, z, w)
+u, v   : parametric values
 
-	returns point for given (u, v)
-	*/
-	calcSurfacePoint: function ( p, q, U, V, P, u, v, target ) {
+returns point for given (u, v)
+*/
 
-		var uspan = this.findSpan( p, u, U );
-		var vspan = this.findSpan( q, v, V );
-		var Nu = this.calcBasisFunctions( uspan, u, p, U );
-		var Nv = this.calcBasisFunctions( vspan, v, q, V );
-		var temp = [];
 
-		for ( var l = 0; l <= q; ++ l ) {
+	function calcSurfacePoint( p, q, U, V, P, u, v, target ) {
+
+		const uspan = findSpan( p, u, U );
+		const vspan = findSpan( q, v, V );
+		const Nu = calcBasisFunctions( uspan, u, p, U );
+		const Nv = calcBasisFunctions( vspan, v, q, V );
+		const temp = [];
+
+		for ( let l = 0; l <= q; ++ l ) {
 
 			temp[ l ] = new THREE.Vector4( 0, 0, 0, 0 );
-			for ( var k = 0; k <= p; ++ k ) {
 
-				var point = P[ uspan - p + k ][ vspan - q + l ].clone();
-				var w = point.w;
+			for ( let k = 0; k <= p; ++ k ) {
+
+				const point = P[ uspan - p + k ][ vspan - q + l ].clone();
+				const w = point.w;
 				point.x *= w;
 				point.y *= w;
 				point.z *= w;
@@ -454,8 +449,9 @@ THREE.NURBSUtils = {
 
 		}
 
-		var Sw = new THREE.Vector4( 0, 0, 0, 0 );
-		for ( var l = 0; l <= q; ++ l ) {
+		const Sw = new THREE.Vector4( 0, 0, 0, 0 );
+
+		for ( let l = 0; l <= q; ++ l ) {
 
 			Sw.add( temp[ l ].multiplyScalar( Nv[ l ] ) );
 
@@ -466,4 +462,15 @@ THREE.NURBSUtils = {
 
 	}
 
-};
+	THREE.NURBSUtils = {};
+	THREE.NURBSUtils.calcBSplineDerivatives = calcBSplineDerivatives;
+	THREE.NURBSUtils.calcBSplinePoint = calcBSplinePoint;
+	THREE.NURBSUtils.calcBasisFunctionDerivatives = calcBasisFunctionDerivatives;
+	THREE.NURBSUtils.calcBasisFunctions = calcBasisFunctions;
+	THREE.NURBSUtils.calcKoverI = calcKoverI;
+	THREE.NURBSUtils.calcNURBSDerivatives = calcNURBSDerivatives;
+	THREE.NURBSUtils.calcRationalCurveDerivatives = calcRationalCurveDerivatives;
+	THREE.NURBSUtils.calcSurfacePoint = calcSurfacePoint;
+	THREE.NURBSUtils.findSpan = findSpan;
+
+} )();
