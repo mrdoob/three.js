@@ -388,7 +388,7 @@ class UIOutliner extends UIDiv {
 
 		this.editor = editor;
 
-        this.contextMenu = new UIContextMenu();
+        	this.contextMenu = new UIContextMenu();
 
 		this.options = [];
 		this.selectedIndex = - 1;
@@ -435,7 +435,7 @@ class UIOutliner extends UIDiv {
 			e.preventDefault();
 
 			scope.contextMenu.setLeft( e.clientX + "px" );
-	        scope.contextMenu.setTop( e.clientY + "px" );
+	        	scope.contextMenu.setTop( e.clientY + "px" );
 
 			scope.add( scope.contextMenu );
 

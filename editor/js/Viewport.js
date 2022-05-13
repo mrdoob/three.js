@@ -55,6 +55,7 @@ function Viewport( editor ) {
 
 	grid.rotateX( Math.PI / 2 );
 
+    // additioanl axis lines for usability considerations
 	const length = 30;
 	const lineMaterial = new THREE.LineDashedMaterial( {
 		dashSize: 1,

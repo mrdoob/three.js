@@ -349,6 +349,7 @@ function SidebarScene( editor ) {
 
 				}
 
+                // Hide utility scene objects and labels from materials editor
             	if (
 					! [
 						'OrthographicCamera',
