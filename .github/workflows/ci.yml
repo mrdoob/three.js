@@ -98,6 +98,7 @@ jobs:
 
   publish:
     name: "Publish package"
+    needs: [lint, unit, e2e, e2e-cov] 
     runs-on: ubuntu-latest
     if: github.ref_name == 'dev'
 
