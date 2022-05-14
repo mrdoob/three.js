@@ -82,14 +82,10 @@
 				cube2Texture.generateMipmaps = true;
 				cube2Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
-				//scene.backgroundNode = texture;
 				scene.environmentNode = mix( new Nodes.CubeTextureNode( cube2Texture ), new Nodes.CubeTextureNode( cubeTexture ), oscSine( timerLocal( .1 ) ) );
 
 				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
-
-					//const light = new THREE.PointLight( 0xffffff );
-					//camera.add( light );
 
 					scene.add( gltf.scene );
 
@@ -98,14 +94,6 @@
 				} );
 
 				renderer = new WebGPURenderer();
-
-				/*// WebGLRenderer comparation test
-				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.toneMapping = THREE.LinearToneMapping;
-				renderer.toneMappingExposure = 1;
-				scene.environment = cubeTexture;
-				document.getElementById( 'info' ).innerText = 'WebGL';
-				/**/
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
