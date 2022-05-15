@@ -12,14 +12,15 @@
 }
 #material-table thead>td>a {
     text-orientation: upright;
-    writing-mode: vertical-lr;
+    /* writing-mode: vertical-lr; */
     text-decoration: none;
     display: block;
-    letter-spacing: -2px;
+    /* letter-spacing: -2px; */
 }
 #material-table table {
     border-collapse: collapse;
     background: #cde;
+    width: 100%;
 }
 #material-table td:nth-child(1) {
     text-align: right;
