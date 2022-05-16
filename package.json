@@ -32,7 +32,8 @@
     "LICENSE",
     "package.json",
     "README.md",
-    "src"
+    "src",
+    "index.d.ts"
   ],
   "directories": {
     "doc": "docs",
