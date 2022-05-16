@@ -13,6 +13,7 @@ const platform = {
 			cancelAnimationFrame: params.cancelAnimationFrame,
 
 		};
+		this.devicePixelRatio = params.devicePixelRatio;
 
 	}
 
@@ -30,7 +31,8 @@ if ( typeof window !== 'undefined' && typeof window.window !== 'undefined' ) {
 			window.Headers &&
 			document.createElementNS &&
 			window.requestAnimationFrame &&
-			window.cancelAnimationFrame ) {
+			window.cancelAnimationFrame &&
+			window.devicePixelRatio !== undefined ) {
 
 		platform.updateplatform( {
 
@@ -41,6 +43,11 @@ if ( typeof window !== 'undefined' && typeof window.window !== 'undefined' ) {
 			createElementNS: document.createElementNS.bind( document ),
 			requestAnimationFrame: window.requestAnimationFrame.bind( window ),
 			cancelAnimationFrame: window.cancelAnimationFrame.bind( window ),
+			devicePixelRatio: () => {
+
+				return window.devicePixelRatio;
+
+			},
 
 		} );
 
