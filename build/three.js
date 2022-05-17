@@ -1369,6 +1369,10 @@
 
 	class Color {
 		constructor(r, g, b) {
+			this.r = 1;
+			this.g = 1;
+			this.b = 1;
+
 			if (g === undefined && b === undefined) {
 				// r is THREE.Color, hex or string
 				return this.set(r);
@@ -1758,9 +1762,6 @@
 
 	Color.NAMES = _colorKeywords;
 	Color.prototype.isColor = true;
-	Color.prototype.r = 1;
-	Color.prototype.g = 1;
-	Color.prototype.b = 1;
 
 	let _canvas;
 
@@ -13785,35 +13786,44 @@
 	} // --- Uniform Classes ---
 
 
-	function SingleUniform(id, activeInfo, addr) {
-		this.id = id;
-		this.addr = addr;
-		this.cache = [];
-		this.setValue = getSingularSetter(activeInfo.type); // this.path = activeInfo.name; // DEBUG
-	}
-
-	function PureArrayUniform(id, activeInfo, addr) {
-		this.id = id;
-		this.addr = addr;
-		this.cache = [];
-		this.size = activeInfo.size;
-		this.setValue = getPureArraySetter(activeInfo.type); // this.path = activeInfo.name; // DEBUG
-	}
-
-	function StructuredUniform(id) {
-		this.id = id;
-		this.seq = [];
-		this.map = {};
-	}
-
-	StructuredUniform.prototype.setValue = function (gl, value, textures) {
-		const seq = this.seq;
-
-		for (let i = 0, n = seq.length; i !== n; ++i) {
-			const u = seq[i];
-			u.setValue(gl, value[u.id], textures);
+	class SingleUniform {
+		constructor(id, activeInfo, addr) {
+			this.id = id;
+			this.addr = addr;
+			this.cache = [];
+			this.setValue = getSingularSetter(activeInfo.type); // this.path = activeInfo.name; // DEBUG
 		}
-	}; // --- Top-level ---
+
+	}
+
+	class PureArrayUniform {
+		constructor(id, activeInfo, addr) {
+			this.id = id;
+			this.addr = addr;
+			this.cache = [];
+			this.size = activeInfo.size;
+			this.setValue = getPureArraySetter(activeInfo.type); // this.path = activeInfo.name; // DEBUG
+		}
+
+	}
+
+	class StructuredUniform {
+		constructor(id) {
+			this.id = id;
+			this.seq = [];
+			this.map = {};
+		}
+
+		setValue(gl, value, textures) {
+			const seq = this.seq;
+
+			for (let i = 0, n = seq.length; i !== n; ++i) {
+				const u = seq[i];
+				u.setValue(gl, value[u.id], textures);
+			}
+		}
+
+	} // --- Top-level ---
 	// Parser - builds up the property tree from the path strings
 
 
@@ -13865,51 +13875,53 @@
 	} // Root Container
 
 
-	function WebGLUniforms(gl, program) {
-		this.seq = [];
-		this.map = {};
-		const n = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+	class WebGLUniforms {
+		constructor(gl, program) {
+			this.seq = [];
+			this.map = {};
+			const n = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
 
-		for (let i = 0; i < n; ++i) {
-			const info = gl.getActiveUniform(program, i),
-						addr = gl.getUniformLocation(program, info.name);
-			parseUniform(info, addr, this);
-		}
-	}
-
-	WebGLUniforms.prototype.setValue = function (gl, name, value, textures) {
-		const u = this.map[name];
-		if (u !== undefined) u.setValue(gl, value, textures);
-	};
-
-	WebGLUniforms.prototype.setOptional = function (gl, object, name) {
-		const v = object[name];
-		if (v !== undefined) this.setValue(gl, name, v);
-	}; // Static interface
-
-
-	WebGLUniforms.upload = function (gl, seq, values, textures) {
-		for (let i = 0, n = seq.length; i !== n; ++i) {
-			const u = seq[i],
-						v = values[u.id];
-
-			if (v.needsUpdate !== false) {
-				// note: always updating when .needsUpdate is undefined
-				u.setValue(gl, v.value, textures);
+			for (let i = 0; i < n; ++i) {
+				const info = gl.getActiveUniform(program, i),
+							addr = gl.getUniformLocation(program, info.name);
+				parseUniform(info, addr, this);
 			}
 		}
-	};
 
-	WebGLUniforms.seqWithValue = function (seq, values) {
-		const r = [];
-
-		for (let i = 0, n = seq.length; i !== n; ++i) {
-			const u = seq[i];
-			if (u.id in values) r.push(u);
+		setValue(gl, name, value, textures) {
+			const u = this.map[name];
+			if (u !== undefined) u.setValue(gl, value, textures);
 		}
 
-		return r;
-	};
+		setOptional(gl, object, name) {
+			const v = object[name];
+			if (v !== undefined) this.setValue(gl, name, v);
+		}
+
+		static upload(gl, seq, values, textures) {
+			for (let i = 0, n = seq.length; i !== n; ++i) {
+				const u = seq[i],
+							v = values[u.id];
+
+				if (v.needsUpdate !== false) {
+					// note: always updating when .needsUpdate is undefined
+					u.setValue(gl, v.value, textures);
+				}
+			}
+		}
+
+		static seqWithValue(seq, values) {
+			const r = [];
+
+			for (let i = 0, n = seq.length; i !== n; ++i) {
+				const u = seq[i];
+				if (u.id in values) r.push(u);
+			}
+
+			return r;
+		}
+
+	}
 
 	function WebGLShader(gl, type, string) {
 		const shader = gl.createShader(type);
@@ -19230,10 +19242,9 @@
 		this.toneMapping = NoToneMapping;
 		this.toneMappingExposure = 1.0; //
 
-		Object.defineProperties(WebGLRenderer.prototype, {
+		Object.defineProperties(this, {
 			// @deprecated since r136, 0e21088102b4de7e0a0a33140620b7a3424b9e6d
 			gammaFactor: {
-				configurable: true,
 				get: function () {
 					console.warn('THREE.WebGLRenderer: .gammaFactor has been removed.');
 					return 2;
@@ -28830,7 +28841,7 @@
 		}
 
 		copy(source) {
-			Light.prototype.copy.call(this, source);
+			super.copy(source);
 			this.groundColor.copy(source.groundColor);
 			return this;
 		}
@@ -29921,7 +29932,7 @@
 				let hasImages = false;
 
 				for (const uuid in images) {
-					if (images[uuid] instanceof HTMLImageElement) {
+					if (images[uuid].data instanceof HTMLImageElement) {
 						hasImages = true;
 						break;
 					}
