@@ -62,7 +62,6 @@ class Color {
 		this.g = 1;
 		this.b = 1;
 
-
 		if ( g === undefined && b === undefined ) {
 
 			// r is THREE.Color, hex or string
