@@ -371,7 +371,7 @@
 
 				if ( RGBE_RETURN_FAILURE !== image_rgba_data ) {
 
-					let data, format, type;
+					let data, type;
 					let numElements;
 
 					switch ( this.type ) {
@@ -417,7 +417,6 @@
 						header: rgbe_header_info.string,
 						gamma: rgbe_header_info.gamma,
 						exposure: rgbe_header_info.exposure,
-						format: format,
 						type: type
 					};
 
@@ -443,13 +442,6 @@
 				switch ( texture.type ) {
 
 					case THREE.FloatType:
-						texture.encoding = THREE.LinearEncoding;
-						texture.minFilter = THREE.LinearFilter;
-						texture.magFilter = THREE.LinearFilter;
-						texture.generateMipmaps = false;
-						texture.flipY = true;
-						break;
-
 					case THREE.HalfFloatType:
 						texture.encoding = THREE.LinearEncoding;
 						texture.minFilter = THREE.LinearFilter;

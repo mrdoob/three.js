@@ -308,6 +308,7 @@
 	],
 	"webgpu": [
 		"webgpu_compute",
+		"webgpu_cubemap_mix",
 		"webgpu_depth_texture",
 		"webgpu_instance_mesh",
 		"webgpu_instance_uniform",

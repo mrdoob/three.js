@@ -21,7 +21,7 @@ class HemisphereLight extends Light {
 
 	copy( source ) {
 
-		Light.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.groundColor.copy( source.groundColor );
 
