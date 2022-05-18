@@ -2,6 +2,7 @@ import { Vector4 } from '../math/Vector4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
+import { createNormalizeTransform, createDenormalizeTransform } from '../math/MathUtils.js';
 import { StaticDrawUsage } from '../constants.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
@@ -22,7 +23,10 @@ class BufferAttribute {
 		this.array = array;
 		this.itemSize = itemSize;
 		this.count = array !== undefined ? array.length / itemSize : 0;
-		this.normalized = normalized === true;
+
+		this._normalized = normalized === true;
+		this._normalize = normalized ? createNormalizeTransform( array ) : ( value ) => value;
+		this._denormalize = normalized ? createDenormalizeTransform( array ) : ( value ) => value;
 
 		this.usage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };
@@ -36,6 +40,22 @@ class BufferAttribute {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	}
+
+	get normalized() {
+
+		return this._normalized;
+
+	}
+
+	set normalized( normalized ) {
+
+		const array = this.array;
+
+		this._normalized = normalized;
+		this._normalize = normalized ? createNormalizeTransform( array ) : ( value ) => value;
+		this._denormalize = normalized ? createDenormalizeTransform( array ) : ( value ) => value;
 
 	}
 
@@ -100,9 +120,9 @@ class BufferAttribute {
 
 			}
 
-			array[ offset ++ ] = color.r;
-			array[ offset ++ ] = color.g;
-			array[ offset ++ ] = color.b;
+			array[ offset ++ ] = this._normalize( color.r, array );
+			array[ offset ++ ] = this._normalize( color.g, array );
+			array[ offset ++ ] = this._normalize( color.b, array );
 
 		}
 
@@ -126,8 +146,8 @@ class BufferAttribute {
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
+			array[ offset ++ ] = this._normalize( vector.x, array );
+			array[ offset ++ ] = this._normalize( vector.y, array );
 
 		}
 
@@ -151,9 +171,9 @@ class BufferAttribute {
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
-			array[ offset ++ ] = vector.z;
+			array[ offset ++ ] = this._normalize( vector.x, array );
+			array[ offset ++ ] = this._normalize( vector.y, array );
+			array[ offset ++ ] = this._normalize( vector.z, array );
 
 		}
 
@@ -177,11 +197,10 @@ class BufferAttribute {
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
-			array[ offset ++ ] = vector.z;
-			array[ offset ++ ] = vector.w;
-
+			array[ offset ++ ] = this._normalize( vector.x, array );
+			array[ offset ++ ] = this._normalize( vector.y, array );
+			array[ offset ++ ] = this._normalize( vector.z, array );
+			array[ offset ++ ] = this._normalize( vector.w, array );
 		}
 
 		return this;
@@ -222,7 +241,9 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
 
 			_vector.applyMatrix4( m );
 
@@ -238,7 +259,9 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
 
 			_vector.applyNormalMatrix( m );
 
@@ -254,7 +277,9 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
 
 			_vector.transformDirection( m );
 
@@ -268,6 +293,8 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
+		if ( this.normalized ) value = normalize( value, this.array );
+
 		this.array.set( value, offset );
 
 		return this;
@@ -276,13 +303,13 @@ class BufferAttribute {
 
 	getX( index ) {
 
-		return this.array[ index * this.itemSize ];
+		return this._denormalize( this.array[ index * this.itemSize ] );
 
 	}
 
 	setX( index, x ) {
 
-		this.array[ index * this.itemSize ] = x;
+		this.array[ index * this.itemSize ] = this._normalize( x );
 
 		return this;
 
@@ -290,13 +317,13 @@ class BufferAttribute {
 
 	getY( index ) {
 
-		return this.array[ index * this.itemSize + 1 ];
+		return this._denormalize( this.array[ index * this.itemSize + 1 ] );
 
 	}
 
 	setY( index, y ) {
 
-		this.array[ index * this.itemSize + 1 ] = y;
+		this.array[ index * this.itemSize + 1 ] = this._normalize( y );
 
 		return this;
 
@@ -304,13 +331,13 @@ class BufferAttribute {
 
 	getZ( index ) {
 
-		return this.array[ index * this.itemSize + 2 ];
+		return this._denormalize( this.array[ index * this.itemSize + 2 ] );
 
 	}
 
 	setZ( index, z ) {
 
-		this.array[ index * this.itemSize + 2 ] = z;
+		this.array[ index * this.itemSize + 2 ] = this._normalize( z );
 
 		return this;
 
@@ -318,13 +345,13 @@ class BufferAttribute {
 
 	getW( index ) {
 
-		return this.array[ index * this.itemSize + 3 ];
+		return this._denormalize( this.array[ index * this.itemSize + 3 ] );
 
 	}
 
 	setW( index, w ) {
 
-		this.array[ index * this.itemSize + 3 ] = w;
+		this.array[ index * this.itemSize + 3 ] = this._normalize( w );
 
 		return this;
 
@@ -334,8 +361,8 @@ class BufferAttribute {
 
 		index *= this.itemSize;
 
-		this.array[ index + 0 ] = x;
-		this.array[ index + 1 ] = y;
+		this.array[ index + 0 ] = this._normalize( x );
+		this.array[ index + 1 ] = this._normalize( y );
 
 		return this;
 
@@ -345,9 +372,9 @@ class BufferAttribute {
 
 		index *= this.itemSize;
 
-		this.array[ index + 0 ] = x;
-		this.array[ index + 1 ] = y;
-		this.array[ index + 2 ] = z;
+		this.array[ index + 0 ] = this._normalize( x );
+		this.array[ index + 1 ] = this._normalize( y );
+		this.array[ index + 2 ] = this._normalize( z );
 
 		return this;
 
@@ -357,10 +384,10 @@ class BufferAttribute {
 
 		index *= this.itemSize;
 
-		this.array[ index + 0 ] = x;
-		this.array[ index + 1 ] = y;
-		this.array[ index + 2 ] = z;
-		this.array[ index + 3 ] = w;
+		this.array[ index + 0 ] = this._normalize( x );
+		this.array[ index + 1 ] = this._normalize( y );
+		this.array[ index + 2 ] = this._normalize( z );
+		this.array[ index + 3 ] = this._normalize( w );
 
 		return this;
 

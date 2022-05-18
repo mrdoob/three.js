@@ -233,29 +233,38 @@ function setQuaternionFromProperEuler( q, a, b, c, order ) {
 
 }
 
-function denormalize( value, array ) {
+function createNormalizeTransform( array ) {
 
 	switch ( array.constructor ) {
 
 		case Float32Array:
 
-			return value;
+			return ( value ) => value;
+
+		case Uint32Array:
+
+			return ( value ) => Math.round( value * 4294967295.0 );
 
 		case Uint16Array:
 
-			return value / 65535.0;
+			return ( value ) => Math.round( value * 65535.0 );
 
 		case Uint8Array:
+		case Uint8ClampedArray:
 
-			return value / 255.0;
+			return ( value ) => Math.round( value * 255.0 );
+
+		case Int32Array:
+
+			return ( value ) => Math.round( value * 2147483647.0 );
 
 		case Int16Array:
 
-			return Math.max( value / 32767.0, - 1.0 );
+			return ( value ) => Math.round( value * 32767.0 );
 
 		case Int8Array:
 
-			return Math.max( value / 127.0, - 1.0 );
+			return ( value ) => Math.round( value * 127.0 );
 
 		default:
 
@@ -265,29 +274,38 @@ function denormalize( value, array ) {
 
 }
 
-function normalize( value, array ) {
+function createDenormalizeTransform( array ) {
 
 	switch ( array.constructor ) {
 
 		case Float32Array:
 
-			return value;
+			return ( value ) => value;
+
+		case Uint32Array:
+
+			return ( value ) => value / 4294967295.0;
 
 		case Uint16Array:
 
-			return Math.round( value * 65535.0 );
+			return ( value ) => value / 65535.0;
 
 		case Uint8Array:
+		case Uint8ClampedArray:
 
-			return Math.round( value * 255.0 );
+			return ( value ) => value / 255.0;
+
+		case Int32Array:
+
+			return ( value ) => Math.max( value / 2147483647.0, -1.0 );
 
 		case Int16Array:
 
-			return Math.round( value * 32767.0 );
+			return ( value ) => Math.max( value / 32767.0, -1.0 );
 
 		case Int8Array:
 
-			return Math.round( value * 127.0 );
+			return ( value ) => Math.max( value / 127.0, -1.0 );
 
 		default:
 
@@ -296,8 +314,6 @@ function normalize( value, array ) {
 	}
 
 }
-
-
 
 export {
 	DEG2RAD,
@@ -322,6 +338,6 @@ export {
 	ceilPowerOfTwo,
 	floorPowerOfTwo,
 	setQuaternionFromProperEuler,
-	normalize,
-	denormalize,
+	createNormalizeTransform,
+	createDenormalizeTransform,
 };

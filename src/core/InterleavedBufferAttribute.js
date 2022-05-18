@@ -1,5 +1,6 @@
 import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from './BufferAttribute.js';
+import { createNormalizeTransform, createDenormalizeTransform } from '../math/MathUtils.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 
@@ -13,7 +14,27 @@ class InterleavedBufferAttribute {
 		this.itemSize = itemSize;
 		this.offset = offset;
 
-		this.normalized = normalized === true;
+		const array = this.data.array;
+
+		this._normalized = normalized === true;
+		this._normalize = normalized ? createNormalizeTransform( array ) : ( value ) => value;
+		this._denormalize = normalized ? createDenormalizeTransform( array ) : ( value ) => value;
+
+	}
+
+	get normalized() {
+
+		return this._normalized;
+
+	}
+
+	set normalized( normalized ) {
+
+		const array = this.data.array;
+
+		this._normalized = normalized;
+		this._normalize = normalized ? createNormalizeTransform( array ) : ( value ) => value;
+		this._denormalize = normalized ? createDenormalizeTransform( array ) : ( value ) => value;
 
 	}
 
@@ -39,7 +60,9 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
 
 			_vector.applyMatrix4( m );
 
@@ -55,7 +78,9 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
 
 			_vector.applyNormalMatrix( m );
 
@@ -71,7 +96,9 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.fromBufferAttribute( this, i );
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
 
 			_vector.transformDirection( m );
 
@@ -85,7 +112,7 @@ class InterleavedBufferAttribute {
 
 	setX( index, x ) {
 
-		this.data.array[ index * this.data.stride + this.offset ] = x;
+		this.data.array[ index * this.data.stride + this.offset ] = this._normalize( x );
 
 		return this;
 
@@ -93,7 +120,7 @@ class InterleavedBufferAttribute {
 
 	setY( index, y ) {
 
-		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
+		this.data.array[ index * this.data.stride + this.offset + 1 ] = this._normalize( y );
 
 		return this;
 
@@ -101,7 +128,7 @@ class InterleavedBufferAttribute {
 
 	setZ( index, z ) {
 
-		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
+		this.data.array[ index * this.data.stride + this.offset + 2 ] = this._normalize( z );
 
 		return this;
 
@@ -109,7 +136,7 @@ class InterleavedBufferAttribute {
 
 	setW( index, w ) {
 
-		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
+		this.data.array[ index * this.data.stride + this.offset + 3 ] = this._normalize( w );
 
 		return this;
 
@@ -117,25 +144,25 @@ class InterleavedBufferAttribute {
 
 	getX( index ) {
 
-		return this.data.array[ index * this.data.stride + this.offset ];
+		return this._denormalize( this.data.array[ index * this.data.stride + this.offset ] );
 
 	}
 
 	getY( index ) {
 
-		return this.data.array[ index * this.data.stride + this.offset + 1 ];
+		return this._denormalize( this.data.array[ index * this.data.stride + this.offset + 1 ] );
 
 	}
 
 	getZ( index ) {
 
-		return this.data.array[ index * this.data.stride + this.offset + 2 ];
+		return this._denormalize( this.data.array[ index * this.data.stride + this.offset + 2 ] );
 
 	}
 
 	getW( index ) {
 
-		return this.data.array[ index * this.data.stride + this.offset + 3 ];
+		return this._denormalize( this.data.array[ index * this.data.stride + this.offset + 3 ] );
 
 	}
 
@@ -143,8 +170,8 @@ class InterleavedBufferAttribute {
 
 		index = index * this.data.stride + this.offset;
 
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
+		this.data.array[ index + 0 ] = this._normalize( x );
+		this.data.array[ index + 1 ] = this._normalize( y );
 
 		return this;
 
@@ -154,9 +181,9 @@ class InterleavedBufferAttribute {
 
 		index = index * this.data.stride + this.offset;
 
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
+		this.data.array[ index + 0 ] = this._normalize( x );
+		this.data.array[ index + 1 ] = this._normalize( y );
+		this.data.array[ index + 2 ] = this._normalize( z );
 
 		return this;
 
@@ -166,10 +193,10 @@ class InterleavedBufferAttribute {
 
 		index = index * this.data.stride + this.offset;
 
-		this.data.array[ index + 0 ] = x;
-		this.data.array[ index + 1 ] = y;
-		this.data.array[ index + 2 ] = z;
-		this.data.array[ index + 3 ] = w;
+		this.data.array[ index + 0 ] = this._normalize( x );
+		this.data.array[ index + 1 ] = this._normalize( y );
+		this.data.array[ index + 2 ] = this._normalize( z );
+		this.data.array[ index + 3 ] = this._normalize( w );
 
 		return this;
 
