@@ -1267,7 +1267,7 @@ class GLTFWriter {
 		}
 
 		// pbrMetallicRoughness.baseColorFactor
-		const color = material.color.toArray().concat( [ material.opacity ] );
+		const color = material.color.toArray().concat( [ material.opacity || 0 ] );
 
 		if ( ! equalArray( color, [ 1, 1, 1, 1 ] ) ) {
 
