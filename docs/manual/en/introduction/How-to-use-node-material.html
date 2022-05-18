@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>How to use Node Material</h1>
+
+		<p>
+		`NodeMaterial API` allows the creation of `Shader Graph` as well as procedural materials compiled for different outputs such as `WebGPU` and `WebGL`.
+		</p>
+
+		<h2>How it works?</h2>
+
+		<p>
+		A `NodeMaterial` consists of `flows` which can have one or more `Nodes`, you can customize a `NodeMaterial` using existing `Nodes` and also create your own.
+		</p>
+
+		<p>
+		All `Nodes` can be connected to each other, and all must have automatic conversion according to the needs of their connections. Each Node and can vary between number of inputs and a single output with dynamic types.
+		`Nodes` can be values such as *Uniforms*, *Constants*, *Attributes of a Geometry* and *Mathematical Functions*.
+		</p>
+
+		<p>
+		`Node` is responsible for emitting an snippet that can vary depending on the input arguments and output expected by the parent `Node`.
+		These small code represents the final result of `flow` of each property of a `NodeMaterial`. This code is generated from the `Node.generate()` function and changes according with the `Context` and `NodeBuilder` used.
+		</p>
+
+		<h2>Creating a simple NodeMaterial</h2>
+
+		<h4>Example</h4>
+		<code>
+import { MeshStandardNodeMaterial, color } from 'three-nodes/Nodes.js';
+
+const material = new MeshStandardNodeMaterial();
+material.colorNode = color( 0xFFFFFF );
+		</code>
+
+		<h1>Node Frame</h1>
+		<p>
+		`NodeFrame` is responsible for updating all `Nodes` per `FRAME` or per `OBJECT`.
+		The main difference here is that some `Nodes` need to be updated throughout the rendering these are updated as `OBJECT`, while others can share input values with multiple `RenderTargets` and others objects, these are updated per `FRAME`.
+		</p>
+
+		<h4>Example</h4>
+		<code>
+import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+
+function animate() {
+
+	// updates the frame state
+	nodeFrame.update();
+
+	renderer.render( scene, camera );
+
+}
+		</code>
+
+		<h1>Shader Node</h1>
+		<p>
+		`NodeMaterial API` offers one own abstraction language so you don't have to rewrite `Shaders` for different outputs.
+		This also makes it easier to optimize the shaders themselves for the resources used in *three.js* since `NodeBuilder` can share the nodes.
+		</p>
+
+		<p>
+		The syntax is a combination of JS + GLSL, you can use JS to create the variables and flow while uses GLSL functions.
+		</p>
+
+		<h2>Constants and explicit conversions</h2>
+
+		<p>
+		Input functions can be used to create code constants and explicit conversions.
+		`NodeMaterial API` does all conversions automatically if the output and input are different.
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						[page:bool]( [param:Boolean value] )
+						<br>
+						[page:bool]( value )
+					</td>
+					<td>Returns a constant boolean value or convert a node to boolean.</td>
+				</tr>
+				<tr>
+					<td>
+						[page:color]( [param:Number value] )
+						<br>
+						[page:color]( [param:Number r], [param:Number g], [param:Number b] )
+					</td>
+					<td>Returns a constant color value.</td>
+				</tr>
+				<tr>
+					<td>
+						[page:float]( [param:Number value] )
+						<br>
+						[page:float]( value )
+					</td>
+					<td>Returns a constant float value or convert a node to float.</td>
+				</tr>
+				<tr>
+					<td>
+						[page:vec2]( [param:Number x], [param:Number y] )
+						<br>
+						[page:vec2]( value )
+						<br>
+						[page:vec2]( ...values )
+					</td>
+					<td>Returns a constant vec2 value or convert one or more nodes to vec2.</td>
+				</tr>
+				<tr>
+					<td>
+						[page:vec3]( [param:Number x], [param:Number y], [param:Number z] )
+						<br>
+						[page:vec3]( value )
+						<br>
+						[page:vec3]( ...values )
+					</td>
+					<td>returns a constant vec3 value or convert one or more nodes to vec3.</td>
+				</tr>
+				<tr>
+					<td>
+						[page:vec4]( [param:Number x], [param:Number y], [param:Number z], [param:Number w] )
+						<br>
+						[page:vec4]( value )
+						<br>
+						[page:vec4]( ...values )
+					</td>
+					<td>Returns a constant vec4 value or convert one or more nodes to vec4.</td>
+				</tr>
+				<tr>
+					<td>
+						[page:int]( [param:Number value] )
+						<br>
+						[page:int]( value )
+					</td>
+					<td>Returns a constant int value or convert a node to int.</td>
+				</tr>
+				<tr>
+					<td>
+						[page:uint]( [param:Number value] )
+						<br>
+						[page:uint]( value )
+					</td>
+					<td>Returns a constant uint value or convert a node to uint.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h2>Uniforms</h2>
+
+		<p>
+		Uniforms are used when you need to dynamically update values, such as object position and rotation. Otherwise, it would be necessary to recompile the code again.
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						[page:uniform]( [param:Boolean value] )
+						<br>
+						[page:uniform]( [param:Number value] )
+						<br>
+						[page:uniform]( [param:Color value] )
+						<br>
+						[page:uniform]( [param:Vector2 value] )
+						<br>
+						[page:uniform]( [param:Vector3 value] )
+						<br>
+						[page:uniform]( [param:Vector4 value] )
+						<br>
+						[page:uniform]( [param:Object value], [param:String type] )
+					</td>
+					<td>Dynamic values.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>Example</h4>
+		<code>
+const vector = new THREE.Vector3();
+
+const node = uniform( vector );
+console.log( node.value ); // set/get vector from .value property
+		</code>
+
+		<h2>Swizzle</h2>
+
+		<p>
+		You can get specific properties using combinations like *xyzw* or *rgba* in any sequence.
+		</p>
+
+		<h4>Example</h4>
+		<code>
+const node = vec4();
+const nodeXYZ = node.xyz; // you can use .rgb to the same result
+		</code>
+
+		<h2>Arrays</h2>
+
+		<p>
+		You can get the value of an Array using dynamic or static index.
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:element]( array, index )</td>
+					<td>Get element of a array using a node.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>Example</h4>
+		<code>
+const node = mat4();
+
+// using static index
+const nodeColumn0 = node[ 0 ]; // only primitive value
+		</code>
+
+		<h4>Example</h4>
+		<code>
+const node = mat4();
+const index = uint( 0 );
+
+const nodeColumn0 = element( node, index );
+// const nodeColumn0 = node[ index ]; // wrong usage
+		</code>
+
+		<h2>Operators</h2>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:add]( a, b, ...values )</td>
+					<td>Return the addition of two or more value.</td>
+				</tr>
+				<tr>
+					<td>[page:sub]( a, b, ...values )</td>
+					<td>Return the subraction of two or more value.</td>
+				</tr>
+				<tr>
+					<td>[page:mul]( a, b, ...values )</td>
+					<td>Return the multiplication of two or more value.</td>
+				</tr>
+				<tr>
+					<td>[page:div]( a, b, ...values )</td>
+					<td>Return the division of two or more value.</td>
+				</tr>
+				<tr>
+					<td>[page:assign]( a, b, ...values )</td>
+					<td>Assign one or more value to a and return the same.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>Example</h4>
+		<code>
+const v1 = float( 1 );
+const v2 = float( 2 );
+
+const result = add( v1, v2, 3 ); // output: 6
+		</code>
+
+		<h2>Math</h2>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:abs]( x )</td>
+					<td>Return the absolute value of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:acos]( x )</td>
+					<td>Return the arccosine of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:asin]( x )</td>
+					<td>Return the arcsine of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:atan]( x )</td>
+					<td>Return the arc-tangent of the parameters.</td>
+				</tr>
+				<tr>
+					<td>[page:ceil]( x )</td>
+					<td>Find the nearest integer that is greater than or equal to the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:clamp]( x, min, max )</td>
+					<td>Constrain a value to lie between two further values.</td>
+				</tr>
+				<tr>
+					<td>[page:cos]( x )</td>
+					<td>Constrain a value to lie between two further values.</td>
+				</tr>
+				<tr>
+					<td>[page:cross]( x, y )</td>
+					<td>Calculate the cross product of two vectors.</td>
+				</tr>
+				<tr>
+					<td>[page:degrees]( radians )</td>
+					<td>Convert a quantity in radians to degrees.</td>
+				</tr>
+				<tr>
+					<td>[page:distance]( x, y )</td>
+					<td>Calculate the distance between two points.</td>
+				</tr>
+				<tr>
+					<td>[page:dFdx]( p )</td>
+					<td>Return the partial derivative of an argument with respect to x.</td>
+				</tr>
+				<tr>
+					<td>[page:dFdy]( p )</td>
+					<td>Return the partial derivative of an argument with respect to y.</td>
+				</tr>
+				<tr>
+					<td>[page:dot]( x, y )</td>
+					<td>Calculate the dot product of two vectors.</td>
+				</tr>
+				<tr>
+					<td>[page:exp]( x )</td>
+					<td>Return the natural exponentiation of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:exp2]( x )</td>
+					<td>Return 2 raised to the power of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:faceforward]( N, I, Nref )</td>
+					<td>Return a vector pointing in the same direction as another.</td>
+				</tr>
+				<tr>
+					<td>[page:floor]( x )</td>
+					<td>Find the nearest integer less than or equal to the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:fract]( x )</td>
+					<td>Compute the fractional part of the argument.</td>
+				</tr>
+				<tr>
+					<td>[page:inversesqrt]( x )</td>
+					<td>Return the inverse of the square root of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:invert]( x )</td>
+					<td>Invert a alpha parameter ( 1. - x ).</td>
+				</tr>
+				<tr>
+					<td>[page:length]( x )</td>
+					<td>Calculate the length of a vector.</td>
+				</tr>
+				<tr>
+					<td>[page:log]( x )</td>
+					<td>Return the natural logarithm of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:log2]( x )</td>
+					<td>Return the base 2 logarithm of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:max]( x, y )</td>
+					<td>Return the greater of two values.</td>
+				</tr>
+				<tr>
+					<td>[page:min]( x, y )</td>
+					<td>Return the lesser of two values.</td>
+				</tr>
+				<tr>
+					<td>[page:mix]( x, y, a )</td>
+					<td>Linearly interpolate between two values.</td>
+				</tr>
+				<tr>
+					<td>[page:negate]( x )</td>
+					<td>Negate the value of the parameter ( -x ).</td>
+				</tr>
+				<tr>
+					<td>[page:normalize]( x )</td>
+					<td>Calculates the unit vector in the same direction as the original vector.</td>
+				</tr>
+				<tr>
+					<td>[page:pow]( x, y )</td>
+					<td>Return the value of the first parameter raised to the power of the second.</td>
+				</tr>
+				<tr>
+					<td>[page:radians]( degrees )</td>
+					<td>Convert a quantity in degrees to radians.</td>
+				</tr>
+				<tr>
+					<td>[page:refract]( I, N, eta )</td>
+					<td>Calculate the refraction direction for an incident vector.</td>
+				</tr>
+				<tr>
+					<td>[page:saturate]( x )</td>
+					<td>Constrain a value between 0 at 1.</td>
+				</tr>
+				<tr>
+					<td>[page:sign]( x )</td>
+					<td>Extract the sign of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:sin]( x )</td>
+					<td>Return the sine of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:smoothstep]( e0, e1, x )</td>
+					<td>Perform Hermite interpolation between two values.</td>
+				</tr>
+				<tr>
+					<td>[page:sqrt]( x )</td>
+					<td>Return the square root of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:step]( edge, x )</td>
+					<td>Generate a step function by comparing two values.</td>
+				</tr>
+				<tr>
+					<td>[page:reflect]( I, N )</td>
+					<td>Calculate the reflection direction for an incident vector.</td>
+				</tr>
+				<tr>
+					<td>[page:tan]( angle )</td>
+					<td>Return the tangent of the parameter.</td>
+				</tr>
+				<tr>
+					<td>[page:transformDirection]( dir, matrix )</td>
+					<td>Transforms the direction of vector by a matrix and then normalizes the result.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>Example</h4>
+		<code>
+const positiveValue = abs( -1 ); // output: 1 
+		</code>
+
+		<h2>Inputs</h2>
+
+		<h3>Geometry</h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+					<th>Output</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:uv]( [param:Number index] )</td>
+					<td>Return the uv by index.</td>
+					<td>vec2</td>
+				</tr>
+				<tr>
+					<td>[page:attribute]( [param:String name], [param:String type] )</td>
+					<td>Return a geometry attribute by name.</td>
+					<td>*</td>
+				</tr>
+				<tr>
+					<td>
+					[page:normalGeometry]
+					<br>
+					[page:normalLocal]
+					<br>
+					[page:normalWorld]
+					<br>
+					[page:normalView]
+					<br>
+					</td>
+					<td>Return the normal from the coordinate space chosen.</td>
+					<td>vec3</td>
+				</tr>
+				<tr>
+					<td>
+					[page:positionGeometry]
+					<br>
+					[page:positionLocal]
+					<br>
+					[page:positionWorld]
+					<br>
+					[page:positionView]
+					<br>
+					[page:positionViewDirection]
+					<br>
+					</td>
+					<td>Return the position from the coordinate space chosen.</td>
+					<td>vec3</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>Example</h4>
+		<code>
+// render vertex color
+material.colorNode = attribute( 'color', 'vec3' );
+		</code>
+
+		<h4>Example</h4>
+		<code>
+// render normal world color
+material.colorNode = normalWorld;
+		</code>
+
+		<h3>Camera</h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+					<th>Output</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:cameraPosition]</td>
+					<td>Returns a vector representing the position of the object in world space.</td>
+					<td>vec3</td>
+				</tr>
+				<tr>
+					<td>[page:cameraProjectionMatrix]</td>
+					<td>This is the matrix which contains the projection.</td>
+					<td>mat4</td>
+				</tr>
+				<tr>
+					<td>[page:matrixWorldInverse]</td>
+					<td>This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has the world transform of the Camera.</td>
+					<td>mat4</td>
+				</tr>
+				<tr>
+					<td>[page:cameraWorldMatrix]</td>
+					<td>Return the global transform of the camera.</td>
+					<td>mat4</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Model</h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+					<th>Output</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:modelNormalMatrix]</td>
+					<td>Return the transpose of the inverse of the upper left 3x3 sub-matrix of this model's modelViewMatrix.</td>
+					<td>mat3</td>
+				</tr>
+				<tr>
+					<td>[page:modelPosition]</td>
+					<td>Returns a vector representing the position of the model in world space.</td>
+					<td>vec3</td>
+				</tr>
+				<tr>
+					<td>[page:modelViewMatrix]</td>
+					<td>This is passed to the shader and used to calculate the position of the model.</td>
+					<td>mat4</td>
+				</tr>
+				<tr>
+					<td>[page:modelViewPosition]</td>
+					<td>Return a geometry attribute from name.</td>
+					<td>vec3</td>
+				</tr>
+				<tr>
+					<td>[page:modelWorldMatrix]</td>
+					<td>Return the global transform of the model.</td>
+					<td>mat4</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Material</h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+					<th>Output</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:materialAlphaTest]</td>
+					<td>Return the `alphaTest` value of the [page:Material].</td>
+					<td>float</td>
+				</tr>
+				<tr>
+					<td>[page:materialColor]</td>
+					<td>Return the `color * map` value of the [page:Material].</td>
+					<td>color</td>
+				</tr>
+				<tr>
+					<td>[page:materialEmissive]</td>
+					<td>Return the `emissive * emissiveMap` value of the [page:Material].</td>
+					<td>color</td>
+				</tr>
+				<tr>
+					<td>[page:materialOpacity]</td>
+					<td>Return the `opacity * alphaMap` value of the [page:Material].</td>
+					<td>float</td>
+				</tr>
+				<tr>
+					<td>[page:materialRoughness]</td>
+					<td>Return the `roughness * roughnessMap.g` value of the [page:Material].</td>
+					<td>float</td>
+				</tr>
+				<tr>
+					<td>[page:materialMetalness]</td>
+					<td>Return the `metalness * metalnessMap.b` value of the [page:Material].</td>
+					<td>float</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Texture</h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+					<th>Output</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:texture]( [param:Texture texture], uv, level )</td>
+					<td>Return the addition of two or more value.</td>
+					<td>vec4</td>
+				</tr>
+				<tr>
+					<td>[page:cubeTexture]( [param:CubeTexture texture], uv, level )</td>
+					<td>Return the addition of two or more value.</td>
+					<td>vec4</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Buffer</h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:buffer]( array, [param:String bufferType], [param:Number bufferCount] )</td>
+					<td>Return the buffer as node.</td>
+				</tr>
+				<tr>
+					<td>[page:storage]( array, [param:String bufferType], [param:Number bufferCount] )</td>
+					<td>Return the storage buffer as node.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>Example</h4>
+		<code>
+const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
+const velocity = element( velocityBufferNode, arrayIndex );
+
+assign( velocity.x, mul( velocity.x, .98 ) );
+		</code>
+
+		<h3>Timer</h3>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:timerLocal]( [param:Number timeScale] )</td>
+					<td>Return the time elapsed relative to the first use of this node in rendering.</td>
+				</tr>
+				<tr>
+					<td>[page:timerGlobal]( [param:Number timeScale] )</td>
+					<td>Return the global time elapsed.</td>
+				</tr>
+				<tr>
+					<td>[page:timerDelta]( [param:Number timeScale] )</td>
+					<td>Return the delta time between the current frame and last frame.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h2>Context</h2>
+
+		<p>
+		Context is used to create environments with variable and settings that other Nodes can use.
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:context]( node, [param:Object context] )</td>
+					<td>Return the value of the node parameter.</td>
+				</tr>
+			</tbody>
+		</table>
+
+<!--
+		<h2>Vertex</h2>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:skinning]( [param:SkinnedMesh skinnedMesh] )</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>[page:instance]( [param:InstancedMesh instancedMesh] )</td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+-->
+
+		<h2>Backend Language</h2>
+
+		<h3>Function Node</h3>
+		<p>
+		For more specific purposes you can also create custom functions using the default backend language, for example: `GLSL` for `WebGL` and `WGSL` for `WebGPU`.
+		</p>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Function</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>[page:func]( [param:String code] )</td>
+					<td>`GLSL` or `WGSL` function code. You need to use `.call( { paramName : value } )` to called the function.</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h4>Example</h4>
+		<code>const desaturateFunc = func( `fn desaturate( color:vec3<f32> ) -> vec3<f32> {
+
+	let lum = vec3<f32>( 0.299, 0.587, 0.114 );
+
+	return vec3<f32>( dot( lum, color ) );
+
+}` );
+
+const albedoNode = texture( albedoTexture );
+material.colorNode = func.call( { color : albedoNode } );
+		</code>
+
+	</body>
+</html>
