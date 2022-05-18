@@ -293,9 +293,7 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
-		if ( this.normalized ) value = normalize( value, this.array );
-
-		this.array.set( value, offset );
+		this.array.set( this._normalize( value ), offset );
 
 		return this;
 
