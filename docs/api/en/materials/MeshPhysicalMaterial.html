@@ -72,7 +72,7 @@
 		Any property of the material (including any property inherited from [page:Material] and [page:MeshStandardMaterial]) can be passed in here.<br /><br />
 
 		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-		string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+		string and is `0xffffff` (white) by default. [page:Color.set]( color ) is called internally.
 		</p>
 
 
@@ -81,39 +81,39 @@
 
 		<h3>[property:Color attenuationColor]</h3>
 		<p>
-		The color that white light turns into due to absorption when reaching the attenuation distance. Default is *white* (0xffffff).
+		The color that white light turns into due to absorption when reaching the attenuation distance. Default is `white` (0xffffff).
 		</p>
 
 		<h3>[property:Float attenuationDistance]</h3>
 		<p>
-		Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space. Default is *0*.
+		Density of the medium given as the average distance that light travels in the medium before interacting with a particle. The value is given in world space. Default is `0`.
 		</p>
 
 		<h3>[property:Float clearcoat]</h3>
 		<p>
-		Represents the intensity of the clear coat layer, from *0.0* to *1.0*. Use clear coat related properties to enable multilayer
-		materials that have a thin translucent layer over the base layer. Default is *0.0*.
+		Represents the intensity of the clear coat layer, from `0.0` to `1.0`. Use clear coat related properties to enable multilayer
+		materials that have a thin translucent layer over the base layer. Default is `0.0`.
 		</p>
 
 		<h3>[property:Texture clearcoatMap]</h3>
 		<p>
 		The red channel of this texture is multiplied against [page:.clearcoat], for per-pixel control
-		over a coating's intensity. Default is *null*.
+		over a coating's intensity. Default is `null`.
 		</p>
 
 		<h3>[property:Texture clearcoatNormalMap]</h3>
-		<p>Can be used to enable independent normals for the clear coat layer. Default is *null*.</p>
+		<p>Can be used to enable independent normals for the clear coat layer. Default is `null`.</p>
 
 		<h3>[property:Vector2 clearcoatNormalScale]</h3>
-		<p>How much [page:.clearcoatNormalMap] affects the clear coat layer, from *(0,0)* to *(1,1)*. Default is *(1,1)*.</p>
+		<p>How much [page:.clearcoatNormalMap] affects the clear coat layer, from `(0,0)` to `(1,1)`. Default is `(1,1)`.</p>
 
 		<h3>[property:Float clearcoatRoughness]</h3>
-		<p>Roughness of the clear coat layer, from *0.0* to *1.0*. Default is *0.0*.</p>
+		<p>Roughness of the clear coat layer, from `0.0` to `1.0`. Default is `0.0`.</p>
 
 		<h3>[property:Texture clearcoatRoughnessMap]</h3>
 		<p>
 		The green channel of this texture is multiplied against [page:.clearcoatRoughness], for per-pixel control
-		over a coating's roughness. Default is *null*.
+		over a coating's roughness. Default is `null`.
 		</p>
 
 		<h3>[property:Object defines]</h3>
@@ -132,89 +132,89 @@
 
 		<h3>[property:Float ior]</h3>
 		<p>
-			Index-of-refraction for non-metallic materials, from *1.0* to *2.333*. Default is *1.5*.<br />
+			Index-of-refraction for non-metallic materials, from `1.0` to `2.333`. Default is `1.5`.<br />
 		</p>
 
 		<h3>[property:Float reflectivity]</h3>
 		<p>
-			Degree of reflectivity, from *0.0* to *1.0*. Default is *0.5*, which corresponds to an index-of-refraction of 1.5.<br />
+			Degree of reflectivity, from `0.0` to `1.0`. Default is `0.5`, which corresponds to an index-of-refraction of 1.5.<br />
 
-			This models the reflectivity of non-metallic materials. It has no effect when [page:MeshStandardMaterial.metalness metalness] is *1.0*
+			This models the reflectivity of non-metallic materials. It has no effect when [page:MeshStandardMaterial.metalness metalness] is `1.0`
 		</p>
 
 		<h3>[property:Float sheen]</h3>
 		<p>
-			The intensity of the sheen layer, from *0.0* to *1.0*. Default is *0.0*.
+			The intensity of the sheen layer, from `0.0` to `1.0`. Default is `0.0`.
 		</p>
 
 		<h3>[property:Float sheenRoughness]</h3>
 		<p>
-			Roughness of the sheen layer, from *0.0* to *1.0*. Default is *1.0*.
+			Roughness of the sheen layer, from `0.0` to `1.0`. Default is `1.0`.
 		</p>
 
 		<h3>[property:Texture sheenRoughnessMap]</h3>
 		<p>
 			The alpha channel of this texture is multiplied against [page:.sheenRoughness], for per-pixel control
-			over sheen roughness. Default is *null*.
+			over sheen roughness. Default is `null`.
 		</p>
 
 		<h3>[property:Color sheenColor]</h3>
 		<p>
-			The sheen tint. Default is *0xffffff*, white.
+			The sheen tint. Default is `0xffffff`, white.
 		</p>
 
 		<h3>[property:Texture sheenColorMap]</h3>
 		<p>
 			The RGB channels of this texture are multiplied against [page:.sheenColor], for per-pixel control
-			over sheen tint. Default is *null*.
+			over sheen tint. Default is `null`.
 		</p>
 
 		<h3>[property:Float specularIntensity]</h3>
 		<p>
-			A float that scales the amount of specular reflection for non-metals only. When set to zero, the model is effectively Lambertian. From *0.0* to *1.0*. Default is *0.0*.
+			A float that scales the amount of specular reflection for non-metals only. When set to zero, the model is effectively Lambertian. From `0.0` to `1.0`. Default is `0.0`.
 		</p>
 
 		<h3>[property:Texture specularIntensityMap]</h3>
 		<p>
-			The alpha channel of this texture is multiplied against [page:.specularIntensity], for per-pixel control over specular intensity. Default is *null*.
+			The alpha channel of this texture is multiplied against [page:.specularIntensity], for per-pixel control over specular intensity. Default is `null`.
 		</p>
 
 		<h3>[property:Color specularColor]</h3>
 		<p>
 			A [page:Color] that tints the specular reflection at normal incidence for non-metals only.
-			Default is *0xffffff*, white.
+			Default is `0xffffff`, white.
 		</p>
 
 		<h3>[property:Texture specularColorMap]</h3>
 		<p>
-			The RGB channels of this texture are multiplied against [page:.specularColor], for per-pixel control over specular color. Default is *null*.
+			The RGB channels of this texture are multiplied against [page:.specularColor], for per-pixel control over specular color. Default is `null`.
 		</p>
 
 		<h3>[property:Float thickness]</h3>
 		<p>
-		The thickness of the volume beneath the surface. The value is given in the coordinate space of the mesh. If the value is 0 the material is thin-walled. Otherwise the material is a volume boundary. Default is *0*.
+		The thickness of the volume beneath the surface. The value is given in the coordinate space of the mesh. If the value is 0 the material is thin-walled. Otherwise the material is a volume boundary. Default is `0`.
 		</p>
 
 		<h3>[property:Texture thicknessMap]</h3>
 		<p>
-		A texture that defines the thickness, stored in the G channel. This will be multiplied by [page:.thickness]. Default is *null*.
+		A texture that defines the thickness, stored in the G channel. This will be multiplied by [page:.thickness]. Default is `null`.
 		</p>
 
 		<h3>[property:Float transmission]</h3>
 		<p>
-		Degree of transmission (or optical transparency), from *0.0* to *1.0*. Default is *0.0*.<br />
+		Degree of transmission (or optical transparency), from `0.0` to `1.0`. Default is `0.0`.<br />
 
 		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are fully transmissive.
 
 		The transmission property can be used to model these materials.<br />
 
-		When transmission is non-zero, [page:Material.opacity opacity] should be set to *1*.
+		When transmission is non-zero, [page:Material.opacity opacity] should be set to `0`.
 		</p>
 
 		<h3>[property:Texture transmissionMap]</h3>
 		<p>
 			The red channel of this texture is multiplied against [page:.transmission], for per-pixel control
-			over optical transparency. Default is *null*.
+			over optical transparency. Default is `null`.
 		</p>
 
 		<h2>Methods</h2>
