@@ -89,14 +89,18 @@ function animate() {
 						[page:bool]( [param:Boolean value] )
 						<br>
 						[page:bool]( value )
+						<br>
+						[page:bool]( node )
 					</td>
 					<td>Returns a constant `boolean` value or convert a node to `boolean`.</td>
 				</tr>
 				<tr>
 					<td>
-						[page:color]( [param:Number value] )
+						[page:color]( [param:Number hex] )
 						<br>
 						[page:color]( [param:Number r], [param:Number g], [param:Number b] )
+						<br>
+						[page:color]( ...nodes )
 					</td>
 					<td>Returns a constant `color` value.</td>
 				</tr>
@@ -104,7 +108,7 @@ function animate() {
 					<td>
 						[page:float]( [param:Number value] )
 						<br>
-						[page:float]( value )
+						[page:float]( node )
 					</td>
 					<td>Returns a constant `float` value or convert a node to `float`.</td>
 				</tr>
@@ -112,9 +116,11 @@ function animate() {
 					<td>
 						[page:vec2]( [param:Number x], [param:Number y] )
 						<br>
-						[page:vec2]( value )
+						[page:vec2]( [param:Number scalarValue] )
 						<br>
 						[page:vec2]( ...values )
+						<br>
+						[page:vec2]( ...nodes )
 					</td>
 					<td>Returns a constant `vector2` value or convert one or more nodes to `vector2`.</td>
 				</tr>
@@ -122,9 +128,11 @@ function animate() {
 					<td>
 						[page:vec3]( [param:Number x], [param:Number y], [param:Number z] )
 						<br>
-						[page:vec3]( value )
+						[page:vec3]( [param:Number scalarValue] )
 						<br>
 						[page:vec3]( ...values )
+						<br>
+						[page:vec3]( ...nodes )
 					</td>
 					<td>returns a constant `vector3` value or convert one or more nodes to `vector3`.</td>
 				</tr>
@@ -132,9 +140,11 @@ function animate() {
 					<td>
 						[page:vec4]( [param:Number x], [param:Number y], [param:Number z], [param:Number w] )
 						<br>
-						[page:vec4]( value )
+						[page:vec4]( [param:Number scalarValue] )
 						<br>
 						[page:vec4]( ...values )
+						<br>
+						[page:vec4]( ...nodes )
 					</td>
 					<td>Returns a constant `vector4` value or convert one or more nodes to `vector4`.</td>
 				</tr>
@@ -143,6 +153,8 @@ function animate() {
 						[page:int]( [param:Number value] )
 						<br>
 						[page:int]( value )
+						<br>
+						[page:int]( node )
 					</td>
 					<td>Returns a constant `integer` value or convert a node to `integer`.</td>
 				</tr>
@@ -151,6 +163,8 @@ function animate() {
 						[page:uint]( [param:Number value] )
 						<br>
 						[page:uint]( value )
+						<br>
+						[page:uint]( node )
 					</td>
 					<td>Returns a constant `unsigned integer` value or convert a node to `unsigned integer`.</td>
 				</tr>
