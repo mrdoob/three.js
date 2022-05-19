@@ -602,16 +602,27 @@ class GLTFWriter {
 	}
 
 	/**
-	 * Assign and return a temporal unique id for an object
-	 * especially which doesn't have .uuid
+	 * Returns ids for buffer attributes.
 	 * @param  {Object} object
 	 * @return {Integer}
 	 */
-	getUID( object ) {
+	getUID( attribute, morphTargets = null ) {
 
-		if ( ! this.uids.has( object ) ) this.uids.set( object, this.uid ++ );
+		if ( this.uids.has( attribute ) === false ) {
 
-		return this.uids.get( object );
+			const uids = new Map();
+
+			uids.set( true, this.uid ++ );
+			uids.set( false, this.uid ++ );
+
+			this.uids.set( attribute, uids );
+
+		}
+
+		const uids = this.uids.get( attribute );
+		const hasMorphTargets = Array.isArray( morphTargets ) && morphTargets.length > 0;
+
+		return uids.get( hasMorphTargets );
 
 	}
 
@@ -1440,6 +1451,8 @@ class GLTFWriter {
 		if ( cache.meshes.has( meshCacheKey ) ) return cache.meshes.get( meshCacheKey );
 
 		const geometry = mesh.geometry;
+		const morphAttributes = geometry.morphAttributes;
+
 		let mode;
 
 		// Use the correct mode
@@ -1514,9 +1527,9 @@ class GLTFWriter {
 
 			if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
 
-			if ( cache.attributes.has( this.getUID( attribute ) ) ) {
+			if ( cache.attributes.has( this.getUID( attribute, morphAttributes[ attributeName ] ) ) ) {
 
-				attributes[ attributeName ] = cache.attributes.get( this.getUID( attribute ) );
+				attributes[ attributeName ] = cache.attributes.get( this.getUID( attribute, morphAttributes[ attributeName ] ) );
 				continue;
 
 			}
@@ -1539,7 +1552,7 @@ class GLTFWriter {
 			if ( accessor !== null ) {
 
 				attributes[ attributeName ] = accessor;
-				cache.attributes.set( this.getUID( attribute ), accessor );
+				cache.attributes.set( this.getUID( attribute, morphAttributes[ attributeName ] ), accessor );
 
 			}
 
@@ -1600,9 +1613,9 @@ class GLTFWriter {
 
 					const baseAttribute = geometry.attributes[ attributeName ];
 
-					if ( cache.attributes.has( this.getUID( attribute ) ) ) {
+					if ( cache.attributes.has( this.getUID( attribute, morphAttributes[ attributeName ] ) ) ) {
 
-						target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute ) );
+						target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute, morphAttributes[ attributeName ] ) );
 						continue;
 
 					}
@@ -1626,7 +1639,7 @@ class GLTFWriter {
 					}
 
 					target[ gltfAttributeName ] = this.processAccessor( relativeAttribute, geometry );
-					cache.attributes.set( this.getUID( baseAttribute ), target[ gltfAttributeName ] );
+					cache.attributes.set( this.getUID( baseAttribute, morphAttributes[ attributeName ] ), target[ gltfAttributeName ] );
 
 				}
 
