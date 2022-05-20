@@ -13,7 +13,7 @@ import {
 	RGBAFormat,
 	sRGBEncoding,
 	UnsignedByteType,
-	UnsignedShortType,
+	UnsignedIntType,
 	UnsignedInt248Type,
 } from '../../constants.js';
 
@@ -292,7 +292,7 @@ class WebXRManager extends EventDispatcher {
 
 						glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
 						depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
-						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedShortType;
+						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedIntType;
 
 					}
 
