@@ -14,6 +14,14 @@ export {
 
 NodeMaterial.fromMaterial = function ( material ) {
 
+	const materialLib = {
+		NodeMaterial,
+		LineBasicNodeMaterial,
+		MeshBasicNodeMaterial,
+		MeshStandardNodeMaterial,
+		PointsNodeMaterial
+	};
+
 	const type = material.type.replace( 'Material', 'NodeMaterial' );
 
 	if ( materialLib[ type ] === undefined ) {
