@@ -1,5 +1,27 @@
 import { MaterialLoader } from 'three';
 
+const superFromTypeFunction = MaterialLoader.createMaterialFromType;
+
+MaterialLoader.createMaterialFromType = function ( type ) {
+
+	const materialLib = {
+		NodeMaterial,
+		LineBasicNodeMaterial,
+		MeshBasicNodeMaterial,
+		MeshStandardNodeMaterial,
+		PointsNodeMaterial
+	};
+
+	if ( materialLib[ type ] !== undefined ) {
+
+		return new materialLib[ type ]();
+
+	}
+
+	return superFromTypeFunction.call( this, type );
+
+};
+
 class NodeMaterialLoader extends MaterialLoader {
 
 	constructor( manager ) {

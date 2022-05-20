@@ -13,28 +13,6 @@ export {
 	PointsNodeMaterial
 };
 
-const materialLib = {
-	NodeMaterial,
-	LineBasicNodeMaterial,
-	MeshBasicNodeMaterial,
-	MeshStandardNodeMaterial,
-	PointsNodeMaterial
-};
-
-const fromTypeFunction = Material.fromType;
-
-Material.fromType = function ( type ) {
-
-	if ( materialLib[ type ] !== undefined ) {
-
-		return new materialLib[ type ]();
-
-	}
-
-	return fromTypeFunction.call( this, type );
-
-};
-
 NodeMaterial.fromMaterial = function ( material ) {
 
 	const type = material.type.replace( 'Material', 'NodeMaterial' );
