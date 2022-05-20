@@ -31,6 +31,12 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
+	customProgramCacheKey() {
+
+		return this.uuid + '-' + this.version;
+
+	}
+
 	generateMain( builder ) {
 
 		const object = builder.object;
