@@ -7,6 +7,8 @@ class TextureNode extends UniformNode {
 
 		super( value, 'vec4' );
 
+		this.isTextureNode = true;
+
 		this.uvNode = uvNode;
 		this.levelNode = levelNode;
 
@@ -94,7 +96,5 @@ class TextureNode extends UniformNode {
 	}
 
 }
-
-TextureNode.prototype.isTextureNode = true;
 
 export default TextureNode;

@@ -58,6 +58,8 @@ class LightningStorm extends Object3D {
 
 		super();
 
+		this.isLightningStorm = true;
+
 		// Parameters
 
 		this.stormParams = stormParams;
@@ -239,7 +241,5 @@ class LightningStorm extends Object3D {
 	}
 
 }
-
-LightningStorm.prototype.isLightningStorm = true;
 
 export { LightningStorm };

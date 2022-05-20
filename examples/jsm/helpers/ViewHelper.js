@@ -8,6 +8,8 @@ class ViewHelper extends THREE.Object3D {
 
 		super();
 
+		this.isViewHelper = true;
+
 		this.animating = false;
 		this.controls = null;
 
@@ -289,7 +291,5 @@ class ViewHelper extends THREE.Object3D {
 	}
 
 }
-
-ViewHelper.prototype.isViewHelper = true;
 
 export { ViewHelper };

@@ -18,6 +18,8 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		super();
 
+		this.isLineSegmentsGeometry = true;
+
 		this.type = 'LineSegmentsGeometry';
 
 		const positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
@@ -244,7 +246,5 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	}
 
 }
-
-LineSegmentsGeometry.prototype.isLineSegmentsGeometry = true;
 
 export { LineSegmentsGeometry };

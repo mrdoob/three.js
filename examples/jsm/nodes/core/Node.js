@@ -8,6 +8,8 @@ class Node {
 
 	constructor( nodeType = null ) {
 
+		this.isNode = true;
+
 		this.nodeType = nodeType;
 
 		this.updateType = NodeUpdateType.None;
@@ -245,7 +247,5 @@ class Node {
 	}
 
 }
-
-Node.prototype.isNode = true;
 
 export default Node;
