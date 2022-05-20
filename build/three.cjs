@@ -17088,7 +17088,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 					// (https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/)
 					if (texture.type !== UnsignedShortType && texture.type !== UnsignedIntType) {
 						console.warn('THREE.WebGLRenderer: Use UnsignedShortType or UnsignedIntType for DepthFormat DepthTexture.');
-						texture.type = UnsignedShortType;
+						texture.type = UnsignedIntType;
 						glType = utils.convert(texture.type);
 					}
 				}
@@ -18230,7 +18230,7 @@ class DepthTexture extends Texture {
 			throw new Error('DepthTexture format must be either THREE.DepthFormat or THREE.DepthStencilFormat');
 		}
 
-		if (type === undefined && format === DepthFormat) type = UnsignedShortType;
+		if (type === undefined && format === DepthFormat) type = UnsignedIntType;
 		if (type === undefined && format === DepthStencilFormat) type = UnsignedInt248Type;
 		super(null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy);
 		this.isDepthTexture = true;
@@ -18443,7 +18443,7 @@ class WebXRManager extends EventDispatcher {
 					if (attributes.depth) {
 						glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
 						depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
-						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedShortType;
+						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedIntType;
 					}
 
 					const projectionlayerInit = {
