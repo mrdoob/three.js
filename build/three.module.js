@@ -603,6 +603,8 @@ class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
+		this.isVector2 = true;
+
 		this.x = x;
 		this.y = y;
 
@@ -1080,11 +1082,11 @@ class Vector2 {
 
 }
 
-Vector2.prototype.isVector2 = true;
-
 class Matrix3 {
 
 	constructor() {
+
+		this.isMatrix3 = true;
 
 		this.elements = [
 
@@ -1418,8 +1420,6 @@ class Matrix3 {
 
 }
 
-Matrix3.prototype.isMatrix3 = true;
-
 function arrayNeedsUint32( array ) {
 
 	// assumes larger values usually on last
@@ -1584,6 +1584,8 @@ function toComponents( source, target ) {
 class Color {
 
 	constructor( r, g, b ) {
+
+		this.isColor = true;
 
 		this.r = 1;
 		this.g = 1;
@@ -2139,8 +2141,6 @@ class Color {
 
 Color.NAMES = _colorKeywords;
 
-Color.prototype.isColor = true;
-
 let _canvas;
 
 class ImageUtils {
@@ -2270,6 +2270,8 @@ class Source {
 
 	constructor( data = null ) {
 
+		this.isSource = true;
+
 		this.uuid = generateUUID();
 
 		this.data = data;
@@ -2383,8 +2385,6 @@ function serializeImage( image ) {
 
 }
 
-Source.prototype.isSource = true;
-
 let textureId = 0;
 
 class Texture extends EventDispatcher {
@@ -2392,6 +2392,8 @@ class Texture extends EventDispatcher {
 	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = 1, encoding = LinearEncoding ) {
 
 		super();
+
+		this.isTexture = true;
 
 		Object.defineProperty( this, 'id', { value: textureId ++ } );
 
@@ -2673,11 +2675,11 @@ class Texture extends EventDispatcher {
 Texture.DEFAULT_IMAGE = null;
 Texture.DEFAULT_MAPPING = UVMapping;
 
-Texture.prototype.isTexture = true;
-
 class Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
+
+		this.isVector4 = true;
 
 		this.x = x;
 		this.y = y;
@@ -3336,8 +3338,6 @@ class Vector4 {
 
 }
 
-Vector4.prototype.isVector4 = true;
-
 /*
  In options, we can specify:
  * Texture parameters for an auto-generated target texture
@@ -3348,6 +3348,8 @@ class WebGLRenderTarget extends EventDispatcher {
 	constructor( width, height, options = {} ) {
 
 		super();
+
+		this.isWebGLRenderTarget = true;
 
 		this.width = width;
 		this.height = height;
@@ -3439,13 +3441,13 @@ class WebGLRenderTarget extends EventDispatcher {
 
 }
 
-WebGLRenderTarget.prototype.isWebGLRenderTarget = true;
-
 class DataArrayTexture extends Texture {
 
 	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
 		super( null );
+
+		this.isDataArrayTexture = true;
 
 		this.image = { data, width, height, depth };
 
@@ -3462,13 +3464,13 @@ class DataArrayTexture extends Texture {
 
 }
 
-DataArrayTexture.prototype.isDataArrayTexture = true;
-
 class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
 	constructor( width, height, depth ) {
 
 		super( width, height );
+
+		this.isWebGLArrayRenderTarget = true;
 
 		this.depth = depth;
 
@@ -3479,8 +3481,6 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 	}
 
 }
-
-WebGLArrayRenderTarget.prototype.isWebGLArrayRenderTarget = true;
 
 class Data3DTexture extends Texture {
 
@@ -3496,6 +3496,8 @@ class Data3DTexture extends Texture {
 
 		super( null );
 
+		this.isData3DTexture = true;
+
 		this.image = { data, width, height, depth };
 
 		this.magFilter = NearestFilter;
@@ -3511,13 +3513,13 @@ class Data3DTexture extends Texture {
 
 }
 
-Data3DTexture.prototype.isData3DTexture = true;
-
 class WebGL3DRenderTarget extends WebGLRenderTarget {
 
 	constructor( width, height, depth ) {
 
 		super( width, height );
+
+		this.isWebGL3DRenderTarget = true;
 
 		this.depth = depth;
 
@@ -3529,13 +3531,13 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 
 }
 
-WebGL3DRenderTarget.prototype.isWebGL3DRenderTarget = true;
-
 class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 
 	constructor( width, height, count, options = {} ) {
 
 		super( width, height, options );
+
+		this.isWebGLMultipleRenderTargets = true;
 
 		const texture = this.texture;
 
@@ -3608,11 +3610,11 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 
 }
 
-WebGLMultipleRenderTargets.prototype.isWebGLMultipleRenderTargets = true;
-
 class Quaternion {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
+
+		this.isQuaternion = true;
 
 		this._x = x;
 		this._y = y;
@@ -4303,11 +4305,11 @@ class Quaternion {
 
 }
 
-Quaternion.prototype.isQuaternion = true;
-
 class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
+
+		this.isVector3 = true;
 
 		this.x = x;
 		this.y = y;
@@ -5051,14 +5053,14 @@ class Vector3 {
 
 }
 
-Vector3.prototype.isVector3 = true;
-
 const _vector$c = /*@__PURE__*/ new Vector3();
 const _quaternion$4 = /*@__PURE__*/ new Quaternion();
 
 class Box3 {
 
 	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
+
+		this.isBox3 = true;
 
 		this.min = min;
 		this.max = max;
@@ -5524,8 +5526,6 @@ class Box3 {
 	}
 
 }
-
-Box3.prototype.isBox3 = true;
 
 const _points = [
 	/*@__PURE__*/ new Vector3(),
@@ -6305,6 +6305,8 @@ class Ray {
 class Matrix4 {
 
 	constructor() {
+
+		this.isMatrix4 = true;
 
 		this.elements = [
 
@@ -7174,8 +7176,6 @@ class Matrix4 {
 
 }
 
-Matrix4.prototype.isMatrix4 = true;
-
 const _v1$5 = /*@__PURE__*/ new Vector3();
 const _m1$2 = /*@__PURE__*/ new Matrix4();
 const _zero = /*@__PURE__*/ new Vector3( 0, 0, 0 );
@@ -7190,6 +7190,8 @@ const _quaternion$3 = /*@__PURE__*/ new Quaternion();
 class Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
+
+		this.isEuler = true;
 
 		this._x = x;
 		this._y = y;
@@ -7498,8 +7500,6 @@ class Euler {
 
 }
 
-Euler.prototype.isEuler = true;
-
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
@@ -7584,6 +7584,8 @@ class Object3D extends EventDispatcher {
 	constructor() {
 
 		super();
+
+		this.isObject3D = true;
 
 		Object.defineProperty( this, 'id', { value: _object3DId ++ } );
 
@@ -8476,8 +8478,6 @@ class Object3D extends EventDispatcher {
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
-Object3D.prototype.isObject3D = true;
-
 const _v0$1 = /*@__PURE__*/ new Vector3();
 const _v1$3 = /*@__PURE__*/ new Vector3();
 const _v2$2 = /*@__PURE__*/ new Vector3();
@@ -8781,6 +8781,8 @@ class Material extends EventDispatcher {
 	constructor() {
 
 		super();
+
+		this.isMaterial = true;
 
 		Object.defineProperty( this, 'id', { value: materialId ++ } );
 
@@ -9268,8 +9270,6 @@ class Material extends EventDispatcher {
 
 }
 
-Material.prototype.isMaterial = true;
-
 Material.fromType = function ( /*type*/ ) {
 
 	// TODO: Behavior added in Materials.js
@@ -9283,6 +9283,8 @@ class MeshBasicMaterial extends Material {
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshBasicMaterial = true;
 
 		this.type = 'MeshBasicMaterial';
 
@@ -9352,8 +9354,6 @@ class MeshBasicMaterial extends Material {
 
 }
 
-MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
-
 const _vector$9 = /*@__PURE__*/ new Vector3();
 const _vector2$1 = /*@__PURE__*/ new Vector2();
 
@@ -9366,6 +9366,8 @@ class BufferAttribute {
 			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
 
 		}
+
+		this.isBufferAttribute = true;
 
 		this.name = '';
 
@@ -9749,8 +9751,6 @@ class BufferAttribute {
 
 }
 
-BufferAttribute.prototype.isBufferAttribute = true;
-
 //
 
 class Int8BufferAttribute extends BufferAttribute {
@@ -9829,11 +9829,12 @@ class Float16BufferAttribute extends BufferAttribute {
 
 		super( new Uint16Array( array ), itemSize, normalized );
 
+		this.isFloat16BufferAttribute = true;
+
 	}
 
 }
 
-Float16BufferAttribute.prototype.isFloat16BufferAttribute = true;
 
 class Float32BufferAttribute extends BufferAttribute {
 
@@ -9869,6 +9870,8 @@ class BufferGeometry extends EventDispatcher {
 	constructor() {
 
 		super();
+
+		this.isBufferGeometry = true;
 
 		Object.defineProperty( this, 'id', { value: _id$1 ++ } );
 
@@ -10970,8 +10973,6 @@ class BufferGeometry extends EventDispatcher {
 
 }
 
-BufferGeometry.prototype.isBufferGeometry = true;
-
 const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 const _ray$2 = /*@__PURE__*/ new Ray();
 const _sphere$3 = /*@__PURE__*/ new Sphere();
@@ -11000,6 +11001,8 @@ class Mesh extends Object3D {
 	constructor( geometry = new BufferGeometry(), material = new MeshBasicMaterial() ) {
 
 		super();
+
+		this.isMesh = true;
 
 		this.type = 'Mesh';
 
@@ -11248,8 +11251,6 @@ class Mesh extends Object3D {
 	}
 
 }
-
-Mesh.prototype.isMesh = true;
 
 function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 
@@ -11619,6 +11620,8 @@ class ShaderMaterial extends Material {
 
 		super();
 
+		this.isShaderMaterial = true;
+
 		this.type = 'ShaderMaterial';
 
 		this.defines = {};
@@ -11790,13 +11793,13 @@ class ShaderMaterial extends Material {
 
 }
 
-ShaderMaterial.prototype.isShaderMaterial = true;
-
 class Camera extends Object3D {
 
 	constructor() {
 
 		super();
+
+		this.isCamera = true;
 
 		this.type = 'Camera';
 
@@ -11854,13 +11857,13 @@ class Camera extends Object3D {
 
 }
 
-Camera.prototype.isCamera = true;
-
 class PerspectiveCamera extends Camera {
 
 	constructor( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
 
 		super();
+
+		this.isPerspectiveCamera = true;
 
 		this.type = 'PerspectiveCamera';
 
@@ -12083,8 +12086,6 @@ class PerspectiveCamera extends Camera {
 
 }
 
-PerspectiveCamera.prototype.isPerspectiveCamera = true;
-
 const fov = 90, aspect = 1;
 
 class CubeCamera extends Object3D {
@@ -12202,6 +12203,8 @@ class CubeTexture extends Texture {
 
 		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
+		this.isCubeTexture = true;
+
 		this.flipY = false;
 
 	}
@@ -12220,13 +12223,13 @@ class CubeTexture extends Texture {
 
 }
 
-CubeTexture.prototype.isCubeTexture = true;
-
 class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	constructor( size, options = {} ) {
 
 		super( size, size, options );
+
+		this.isWebGLCubeRenderTarget = true;
 
 		const image = { width: size, height: size, depth: 1 };
 		const images = [ image, image, image, image, image, image ];
@@ -12356,8 +12359,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 }
 
-WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
-
 const _vector1 = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector3();
 const _normalMatrix = /*@__PURE__*/ new Matrix3();
@@ -12365,6 +12366,8 @@ const _normalMatrix = /*@__PURE__*/ new Matrix3();
 class Plane {
 
 	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
+
+		this.isPlane = true;
 
 		// normal is assumed to be normalized
 
@@ -12556,8 +12559,6 @@ class Plane {
 	}
 
 }
-
-Plane.prototype.isPlane = true;
 
 const _sphere$2 = /*@__PURE__*/ new Sphere();
 const _vector$7 = /*@__PURE__*/ new Vector3();
@@ -15256,6 +15257,8 @@ class OrthographicCamera extends Camera {
 
 		super();
 
+		this.isOrthographicCamera = true;
+
 		this.type = 'OrthographicCamera';
 
 		this.zoom = 1;
@@ -15380,8 +15383,6 @@ class OrthographicCamera extends Camera {
 	}
 
 }
-
-OrthographicCamera.prototype.isOrthographicCamera = true;
 
 const LOD_MIN = 4;
 
@@ -20673,6 +20674,8 @@ class MeshDepthMaterial extends Material {
 
 		super();
 
+		this.isMeshDepthMaterial = true;
+
 		this.type = 'MeshDepthMaterial';
 
 		this.depthPacking = BasicDepthPacking;
@@ -20715,13 +20718,13 @@ class MeshDepthMaterial extends Material {
 
 }
 
-MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
-
 class MeshDistanceMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshDistanceMaterial = true;
 
 		this.type = 'MeshDistanceMaterial';
 
@@ -20762,8 +20765,6 @@ class MeshDistanceMaterial extends Material {
 	}
 
 }
-
-MeshDistanceMaterial.prototype.isMeshDistanceMaterial = true;
 
 const vertex = "void main() {\n\tgl_Position = vec4( position, 1.0 );\n}";
 
@@ -24455,13 +24456,13 @@ class ArrayCamera extends PerspectiveCamera {
 
 		super();
 
+		this.isArrayCamera = true;
+
 		this.cameras = array;
 
 	}
 
 }
-
-ArrayCamera.prototype.isArrayCamera = true;
 
 class Group extends Object3D {
 
@@ -24469,13 +24470,13 @@ class Group extends Object3D {
 
 		super();
 
+		this.isGroup = true;
+
 		this.type = 'Group';
 
 	}
 
 }
-
-Group.prototype.isGroup = true;
 
 const _moveEvent = { type: 'move' };
 
@@ -24788,6 +24789,8 @@ class DepthTexture extends Texture {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
+		this.isDepthTexture = true;
+
 		this.image = { width: width, height: height };
 
 		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
@@ -24800,8 +24803,6 @@ class DepthTexture extends Texture {
 
 
 }
-
-DepthTexture.prototype.isDepthTexture = true;
 
 class WebXRManager extends EventDispatcher {
 
@@ -24916,6 +24917,15 @@ class WebXRManager extends EventDispatcher {
 		}
 
 		function onSessionEnd() {
+
+			session.removeEventListener( 'select', onSessionEvent );
+			session.removeEventListener( 'selectstart', onSessionEvent );
+			session.removeEventListener( 'selectend', onSessionEvent );
+			session.removeEventListener( 'squeeze', onSessionEvent );
+			session.removeEventListener( 'squeezestart', onSessionEvent );
+			session.removeEventListener( 'squeezeend', onSessionEvent );
+			session.removeEventListener( 'end', onSessionEnd );
+			session.removeEventListener( 'inputsourceschange', onInputSourcesChange );
 
 			inputSourcesMap.forEach( function ( controller, inputSource ) {
 
@@ -25107,6 +25117,7 @@ class WebXRManager extends EventDispatcher {
 				// Set foveation to maximum.
 				this.setFoveation( 1.0 );
 
+				customReferenceSpace = null;
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
 				animation.setContext( session );
@@ -26125,6 +26136,8 @@ function createCanvasElement() {
 
 function WebGLRenderer( parameters = {} ) {
 
+	this.isWebGLRenderer = true;
+
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
@@ -26319,6 +26332,7 @@ function WebGLRenderer( parameters = {} ) {
 		// event listeners must be registered before WebGL context is created, see #12753
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
+		_canvas.addEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
 		if ( _gl === null ) {
 
@@ -26660,6 +26674,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
+		_canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
 		renderLists.dispose();
 		renderStates.dispose();
@@ -26717,6 +26732,12 @@ function WebGLRenderer( parameters = {} ) {
 		shadowMap.autoUpdate = shadowMapAutoUpdate;
 		shadowMap.needsUpdate = shadowMapNeedsUpdate;
 		shadowMap.type = shadowMapType;
+
+	}
+
+	function onContextCreationError( event ) {
+
+		console.error( 'THREE.WebGLRenderer: A WebGL context could not be created. Reason: ', event.statusMessage );
 
 	}
 
@@ -28260,8 +28281,6 @@ function WebGLRenderer( parameters = {} ) {
 
 }
 
-WebGLRenderer.prototype.isWebGLRenderer = true;
-
 class WebGL1Renderer extends WebGLRenderer {}
 
 WebGL1Renderer.prototype.isWebGL1Renderer = true;
@@ -28269,6 +28288,8 @@ WebGL1Renderer.prototype.isWebGL1Renderer = true;
 class FogExp2 {
 
 	constructor( color, density = 0.00025 ) {
+
+		this.isFogExp2 = true;
 
 		this.name = '';
 
@@ -28295,11 +28316,11 @@ class FogExp2 {
 
 }
 
-FogExp2.prototype.isFogExp2 = true;
-
 class Fog {
 
 	constructor( color, near = 1, far = 1000 ) {
+
+		this.isFog = true;
 
 		this.name = '';
 
@@ -28329,13 +28350,13 @@ class Fog {
 
 }
 
-Fog.prototype.isFog = true;
-
 class Scene extends Object3D {
 
 	constructor() {
 
 		super();
+
+		this.isScene = true;
 
 		this.type = 'Scene';
 
@@ -28384,11 +28405,11 @@ class Scene extends Object3D {
 
 }
 
-Scene.prototype.isScene = true;
-
 class InterleavedBuffer {
 
 	constructor( array, stride ) {
+
+		this.isInterleavedBuffer = true;
 
 		this.array = array;
 		this.stride = stride;
@@ -28525,13 +28546,13 @@ class InterleavedBuffer {
 
 }
 
-InterleavedBuffer.prototype.isInterleavedBuffer = true;
-
 const _vector$6 = /*@__PURE__*/ new Vector3();
 
 class InterleavedBufferAttribute {
 
 	constructor( interleavedBuffer, itemSize, offset, normalized = false ) {
+
+		this.isInterleavedBufferAttribute = true;
 
 		this.name = '';
 
@@ -28802,13 +28823,13 @@ class InterleavedBufferAttribute {
 
 }
 
-InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
-
 class SpriteMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isSpriteMaterial = true;
 
 		this.type = 'SpriteMaterial';
 
@@ -28852,8 +28873,6 @@ class SpriteMaterial extends Material {
 
 }
 
-SpriteMaterial.prototype.isSpriteMaterial = true;
-
 let _geometry;
 
 const _intersectPoint = /*@__PURE__*/ new Vector3();
@@ -28877,6 +28896,8 @@ class Sprite extends Object3D {
 	constructor( material ) {
 
 		super();
+
+		this.isSprite = true;
 
 		this.type = 'Sprite';
 
@@ -28994,8 +29015,6 @@ class Sprite extends Object3D {
 	}
 
 }
-
-Sprite.prototype.isSprite = true;
 
 function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
 
@@ -29228,6 +29247,8 @@ class SkinnedMesh extends Mesh {
 
 		super( geometry, material );
 
+		this.isSkinnedMesh = true;
+
 		this.type = 'SkinnedMesh';
 
 		this.bindMode = 'attached';
@@ -29357,13 +29378,13 @@ class SkinnedMesh extends Mesh {
 
 }
 
-SkinnedMesh.prototype.isSkinnedMesh = true;
-
 class Bone extends Object3D {
 
 	constructor() {
 
 		super();
+
+		this.isBone = true;
 
 		this.type = 'Bone';
 
@@ -29371,13 +29392,13 @@ class Bone extends Object3D {
 
 }
 
-Bone.prototype.isBone = true;
-
 class DataTexture extends Texture {
 
 	constructor( data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, encoding ) {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+
+		this.isDataTexture = true;
 
 		this.image = { data: data, width: width, height: height };
 
@@ -29388,8 +29409,6 @@ class DataTexture extends Texture {
 	}
 
 }
-
-DataTexture.prototype.isDataTexture = true;
 
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
@@ -29678,6 +29697,8 @@ class InstancedBufferAttribute extends BufferAttribute {
 
 		super( array, itemSize, normalized );
 
+		this.isInstancedBufferAttribute = true;
+
 		this.meshPerAttribute = meshPerAttribute;
 
 	}
@@ -29706,8 +29727,6 @@ class InstancedBufferAttribute extends BufferAttribute {
 
 }
 
-InstancedBufferAttribute.prototype.isInstancedBufferAttribute = true;
-
 const _instanceLocalMatrix = /*@__PURE__*/ new Matrix4();
 const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
 
@@ -29720,6 +29739,8 @@ class InstancedMesh extends Mesh {
 	constructor( geometry, material, count ) {
 
 		super( geometry, material );
+
+		this.isInstancedMesh = true;
 
 		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
 		this.instanceColor = null;
@@ -29827,13 +29848,13 @@ class InstancedMesh extends Mesh {
 
 }
 
-InstancedMesh.prototype.isInstancedMesh = true;
-
 class LineBasicMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isLineBasicMaterial = true;
 
 		this.type = 'LineBasicMaterial';
 
@@ -29868,8 +29889,6 @@ class LineBasicMaterial extends Material {
 
 }
 
-LineBasicMaterial.prototype.isLineBasicMaterial = true;
-
 const _start$1 = /*@__PURE__*/ new Vector3();
 const _end$1 = /*@__PURE__*/ new Vector3();
 const _inverseMatrix$1 = /*@__PURE__*/ new Matrix4();
@@ -29881,6 +29900,8 @@ class Line extends Object3D {
 	constructor( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
 
 		super();
+
+		this.isLine = true;
 
 		this.type = 'Line';
 
@@ -30110,8 +30131,6 @@ class Line extends Object3D {
 
 }
 
-Line.prototype.isLine = true;
-
 const _start = /*@__PURE__*/ new Vector3();
 const _end = /*@__PURE__*/ new Vector3();
 
@@ -30120,6 +30139,8 @@ class LineSegments extends Line {
 	constructor( geometry, material ) {
 
 		super( geometry, material );
+
+		this.isLineSegments = true;
 
 		this.type = 'LineSegments';
 
@@ -30168,13 +30189,13 @@ class LineSegments extends Line {
 
 }
 
-LineSegments.prototype.isLineSegments = true;
-
 class LineLoop extends Line {
 
 	constructor( geometry, material ) {
 
 		super( geometry, material );
+
+		this.isLineLoop = true;
 
 		this.type = 'LineLoop';
 
@@ -30182,13 +30203,13 @@ class LineLoop extends Line {
 
 }
 
-LineLoop.prototype.isLineLoop = true;
-
 class PointsMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isPointsMaterial = true;
 
 		this.type = 'PointsMaterial';
 
@@ -30228,8 +30249,6 @@ class PointsMaterial extends Material {
 
 }
 
-PointsMaterial.prototype.isPointsMaterial = true;
-
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
@@ -30240,6 +30259,8 @@ class Points extends Object3D {
 	constructor( geometry = new BufferGeometry(), material = new PointsMaterial() ) {
 
 		super();
+
+		this.isPoints = true;
 
 		this.type = 'Points';
 
@@ -30377,8 +30398,6 @@ class Points extends Object3D {
 
 }
 
-Points.prototype.isPoints = true;
-
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 
 	const rayPointDistanceSq = _ray.distanceSqToPoint( point );
@@ -30414,6 +30433,8 @@ class VideoTexture extends Texture {
 	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
 		super( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
+
+		this.isVideoTexture = true;
 
 		this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
 		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
@@ -30458,13 +30479,13 @@ class VideoTexture extends Texture {
 
 }
 
-VideoTexture.prototype.isVideoTexture = true;
-
 class FramebufferTexture extends Texture {
 
 	constructor( width, height, format ) {
 
 		super( { width, height } );
+
+		this.isFramebufferTexture = true;
 
 		this.format = format;
 
@@ -30479,13 +30500,13 @@ class FramebufferTexture extends Texture {
 
 }
 
-FramebufferTexture.prototype.isFramebufferTexture = true;
-
 class CompressedTexture extends Texture {
 
 	constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+
+		this.isCompressedTexture = true;
 
 		this.image = { width: width, height: height };
 		this.mipmaps = mipmaps;
@@ -30504,21 +30525,19 @@ class CompressedTexture extends Texture {
 
 }
 
-CompressedTexture.prototype.isCompressedTexture = true;
-
 class CanvasTexture extends Texture {
 
 	constructor( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
 		super( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
+		this.isCanvasTexture = true;
+
 		this.needsUpdate = true;
 
 	}
 
 }
-
-CanvasTexture.prototype.isCanvasTexture = true;
 
 /**
  * Extensible curve object.
@@ -30935,6 +30954,8 @@ class EllipseCurve extends Curve {
 
 		super();
 
+		this.isEllipseCurve = true;
+
 		this.type = 'EllipseCurve';
 
 		this.aX = aX;
@@ -31079,21 +31100,19 @@ class EllipseCurve extends Curve {
 
 }
 
-EllipseCurve.prototype.isEllipseCurve = true;
-
 class ArcCurve extends EllipseCurve {
 
 	constructor( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 		super( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
+		this.isArcCurve = true;
+
 		this.type = 'ArcCurve';
 
 	}
 
 }
-
-ArcCurve.prototype.isArcCurve = true;
 
 /**
  * Centripetal CatmullRom Curve - which is useful for avoiding
@@ -31180,6 +31199,8 @@ class CatmullRomCurve3 extends Curve {
 	constructor( points = [], closed = false, curveType = 'centripetal', tension = 0.5 ) {
 
 		super();
+
+		this.isCatmullRomCurve3 = true;
 
 		this.type = 'CatmullRomCurve3';
 
@@ -31342,8 +31363,6 @@ class CatmullRomCurve3 extends Curve {
 
 }
 
-CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
-
 /**
  * Bezier Curves formulas obtained from
  * https://en.wikipedia.org/wiki/B%C3%A9zier_curve
@@ -31428,6 +31447,8 @@ class CubicBezierCurve extends Curve {
 
 		super();
 
+		this.isCubicBezierCurve = true;
+
 		this.type = 'CubicBezierCurve';
 
 		this.v0 = v0;
@@ -31493,13 +31514,13 @@ class CubicBezierCurve extends Curve {
 
 }
 
-CubicBezierCurve.prototype.isCubicBezierCurve = true;
-
 class CubicBezierCurve3 extends Curve {
 
 	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3() ) {
 
 		super();
+
+		this.isCubicBezierCurve3 = true;
 
 		this.type = 'CubicBezierCurve3';
 
@@ -31567,13 +31588,13 @@ class CubicBezierCurve3 extends Curve {
 
 }
 
-CubicBezierCurve3.prototype.isCubicBezierCurve3 = true;
-
 class LineCurve extends Curve {
 
 	constructor( v1 = new Vector2(), v2 = new Vector2() ) {
 
 		super();
+
+		this.isLineCurve = true;
 
 		this.type = 'LineCurve';
 
@@ -31653,16 +31674,15 @@ class LineCurve extends Curve {
 
 }
 
-LineCurve.prototype.isLineCurve = true;
-
 class LineCurve3 extends Curve {
 
 	constructor( v1 = new Vector3(), v2 = new Vector3() ) {
 
 		super();
 
-		this.type = 'LineCurve3';
 		this.isLineCurve3 = true;
+
+		this.type = 'LineCurve3';
 
 		this.v1 = v1;
 		this.v2 = v2;
@@ -31731,6 +31751,8 @@ class QuadraticBezierCurve extends Curve {
 
 		super();
 
+		this.isQuadraticBezierCurve = true;
+
 		this.type = 'QuadraticBezierCurve';
 
 		this.v0 = v0;
@@ -31792,13 +31814,13 @@ class QuadraticBezierCurve extends Curve {
 
 }
 
-QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
-
 class QuadraticBezierCurve3 extends Curve {
 
 	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3() ) {
 
 		super();
+
+		this.isQuadraticBezierCurve3 = true;
 
 		this.type = 'QuadraticBezierCurve3';
 
@@ -31862,13 +31884,13 @@ class QuadraticBezierCurve3 extends Curve {
 
 }
 
-QuadraticBezierCurve3.prototype.isQuadraticBezierCurve3 = true;
-
 class SplineCurve extends Curve {
 
 	constructor( points = [] ) {
 
 		super();
+
+		this.isSplineCurve = true;
 
 		this.type = 'SplineCurve';
 
@@ -31953,8 +31975,6 @@ class SplineCurve extends Curve {
 	}
 
 }
-
-SplineCurve.prototype.isSplineCurve = true;
 
 var Curves = /*#__PURE__*/Object.freeze({
 	__proto__: null,
@@ -36389,6 +36409,8 @@ class ShadowMaterial extends Material {
 
 		super();
 
+		this.isShadowMaterial = true;
+
 		this.type = 'ShadowMaterial';
 
 		this.color = new Color( 0x000000 );
@@ -36414,13 +36436,13 @@ class ShadowMaterial extends Material {
 
 }
 
-ShadowMaterial.prototype.isShadowMaterial = true;
-
 class RawShaderMaterial extends ShaderMaterial {
 
 	constructor( parameters ) {
 
 		super( parameters );
+
+		this.isRawShaderMaterial = true;
 
 		this.type = 'RawShaderMaterial';
 
@@ -36428,13 +36450,13 @@ class RawShaderMaterial extends ShaderMaterial {
 
 }
 
-RawShaderMaterial.prototype.isRawShaderMaterial = true;
-
 class MeshStandardMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshStandardMaterial = true;
 
 		this.defines = { 'STANDARD': '' };
 
@@ -36546,13 +36568,13 @@ class MeshStandardMaterial extends Material {
 
 }
 
-MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
-
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshPhysicalMaterial = true;
 
 		this.defines = {
 
@@ -36708,13 +36730,13 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 }
 
-MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
-
 class MeshPhongMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshPhongMaterial = true;
 
 		this.type = 'MeshPhongMaterial';
 
@@ -36822,13 +36844,13 @@ class MeshPhongMaterial extends Material {
 
 }
 
-MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
-
 class MeshToonMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshToonMaterial = true;
 
 		this.defines = { 'TOON': '' };
 
@@ -36918,13 +36940,13 @@ class MeshToonMaterial extends Material {
 
 }
 
-MeshToonMaterial.prototype.isMeshToonMaterial = true;
-
 class MeshNormalMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshNormalMaterial = true;
 
 		this.type = 'MeshNormalMaterial';
 
@@ -36974,13 +36996,13 @@ class MeshNormalMaterial extends Material {
 
 }
 
-MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
-
 class MeshLambertMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshLambertMaterial = true;
 
 		this.type = 'MeshLambertMaterial';
 
@@ -37058,13 +37080,13 @@ class MeshLambertMaterial extends Material {
 
 }
 
-MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
-
 class MeshMatcapMaterial extends Material {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshMatcapMaterial = true;
 
 		this.defines = { 'MATCAP': '' };
 
@@ -37133,13 +37155,13 @@ class MeshMatcapMaterial extends Material {
 
 }
 
-MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
-
 class LineDashedMaterial extends LineBasicMaterial {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isLineDashedMaterial = true;
 
 		this.type = 'LineDashedMaterial';
 
@@ -37164,8 +37186,6 @@ class LineDashedMaterial extends LineBasicMaterial {
 	}
 
 }
-
-LineDashedMaterial.prototype.isLineDashedMaterial = true;
 
 const materialLib = {
 	ShadowMaterial,
@@ -37615,7 +37635,7 @@ class Interpolant {
 
 								i1 = pp.length;
 								this._cachedIndex = i1;
-								return this.afterEnd_( i1 - 1, t, t0 );
+								return this.copySampleValue_( i1 - 1 );
 
 							}
 
@@ -37663,7 +37683,7 @@ class Interpolant {
 								// before start
 
 								this._cachedIndex = 0;
-								return this.beforeStart_( 0, t, t1 );
+								return this.copySampleValue_( 0 );
 
 							}
 
@@ -37720,7 +37740,7 @@ class Interpolant {
 				if ( t0 === undefined ) {
 
 					this._cachedIndex = 0;
-					return this.beforeStart_( 0, t, t1 );
+					return this.copySampleValue_( 0 );
 
 				}
 
@@ -37728,7 +37748,7 @@ class Interpolant {
 
 					i1 = pp.length;
 					this._cachedIndex = i1;
-					return this.afterEnd_( i1 - 1, t0, t );
+					return this.copySampleValue_( i1 - 1 );
 
 				}
 
@@ -37785,11 +37805,6 @@ class Interpolant {
 	}
 
 }
-
-// ALIAS DEFINITIONS
-
-Interpolant.prototype.beforeStart_ = Interpolant.prototype.copySampleValue_;
-Interpolant.prototype.afterEnd_ = Interpolant.prototype.copySampleValue_;
 
 /**
  * Fast and simple cubic spline interpolant.
@@ -39983,6 +39998,8 @@ class Light extends Object3D {
 
 		super();
 
+		this.isLight = true;
+
 		this.type = 'Light';
 
 		this.color = new Color( color );
@@ -40029,13 +40046,13 @@ class Light extends Object3D {
 
 }
 
-Light.prototype.isLight = true;
-
 class HemisphereLight extends Light {
 
 	constructor( skyColor, groundColor, intensity ) {
 
 		super( skyColor, intensity );
+
+		this.isHemisphereLight = true;
 
 		this.type = 'HemisphereLight';
 
@@ -40057,8 +40074,6 @@ class HemisphereLight extends Light {
 	}
 
 }
-
-HemisphereLight.prototype.isHemisphereLight = true;
 
 const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld$1 = /*@__PURE__*/ new Vector3();
@@ -40207,6 +40222,8 @@ class SpotLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
+		this.isSpotLightShadow = true;
+
 		this.focus = 1;
 
 	}
@@ -40244,13 +40261,13 @@ class SpotLightShadow extends LightShadow {
 
 }
 
-SpotLightShadow.prototype.isSpotLightShadow = true;
-
 class SpotLight extends Light {
 
 	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
 
 		super( color, intensity );
+
+		this.isSpotLight = true;
 
 		this.type = 'SpotLight';
 
@@ -40308,8 +40325,6 @@ class SpotLight extends Light {
 
 }
 
-SpotLight.prototype.isSpotLight = true;
-
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
@@ -40319,6 +40334,8 @@ class PointLightShadow extends LightShadow {
 	constructor() {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
+
+		this.isPointLightShadow = true;
 
 		this._frameExtents = new Vector2( 4, 2 );
 
@@ -40396,13 +40413,13 @@ class PointLightShadow extends LightShadow {
 
 }
 
-PointLightShadow.prototype.isPointLightShadow = true;
-
 class PointLight extends Light {
 
 	constructor( color, intensity, distance = 0, decay = 1 ) {
 
 		super( color, intensity );
+
+		this.isPointLight = true;
 
 		this.type = 'PointLight';
 
@@ -40449,25 +40466,25 @@ class PointLight extends Light {
 
 }
 
-PointLight.prototype.isPointLight = true;
-
 class DirectionalLightShadow extends LightShadow {
 
 	constructor() {
 
 		super( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
+		this.isDirectionalLightShadow = true;
+
 	}
 
 }
-
-DirectionalLightShadow.prototype.isDirectionalLightShadow = true;
 
 class DirectionalLight extends Light {
 
 	constructor( color, intensity ) {
 
 		super( color, intensity );
+
+		this.isDirectionalLight = true;
 
 		this.type = 'DirectionalLight';
 
@@ -40499,13 +40516,13 @@ class DirectionalLight extends Light {
 
 }
 
-DirectionalLight.prototype.isDirectionalLight = true;
-
 class AmbientLight extends Light {
 
 	constructor( color, intensity ) {
 
 		super( color, intensity );
+
+		this.isAmbientLight = true;
 
 		this.type = 'AmbientLight';
 
@@ -40513,13 +40530,13 @@ class AmbientLight extends Light {
 
 }
 
-AmbientLight.prototype.isAmbientLight = true;
-
 class RectAreaLight extends Light {
 
 	constructor( color, intensity, width = 10, height = 10 ) {
 
 		super( color, intensity );
+
+		this.isRectAreaLight = true;
 
 		this.type = 'RectAreaLight';
 
@@ -40566,8 +40583,6 @@ class RectAreaLight extends Light {
 
 }
 
-RectAreaLight.prototype.isRectAreaLight = true;
-
 /**
  * Primary reference:
  *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
@@ -40581,6 +40596,8 @@ RectAreaLight.prototype.isRectAreaLight = true;
 class SphericalHarmonics3 {
 
 	constructor() {
+
+		this.isSphericalHarmonics3 = true;
 
 		this.coefficients = [];
 
@@ -40806,13 +40823,13 @@ class SphericalHarmonics3 {
 
 }
 
-SphericalHarmonics3.prototype.isSphericalHarmonics3 = true;
-
 class LightProbe extends Light {
 
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
 		super( undefined, intensity );
+
+		this.isLightProbe = true;
 
 		this.sh = sh;
 
@@ -40848,8 +40865,6 @@ class LightProbe extends Light {
 	}
 
 }
-
-LightProbe.prototype.isLightProbe = true;
 
 class MaterialLoader extends Loader {
 
@@ -41226,6 +41241,8 @@ class InstancedBufferGeometry extends BufferGeometry {
 
 		super();
 
+		this.isInstancedBufferGeometry = true;
+
 		this.type = 'InstancedBufferGeometry';
 		this.instanceCount = Infinity;
 
@@ -41260,8 +41277,6 @@ class InstancedBufferGeometry extends BufferGeometry {
 	}
 
 }
-
-InstancedBufferGeometry.prototype.isInstancedBufferGeometry = true;
 
 class BufferGeometryLoader extends Loader {
 
@@ -42540,6 +42555,8 @@ class ImageBitmapLoader extends Loader {
 
 		super( manager );
 
+		this.isImageBitmapLoader = true;
+
 		if ( typeof createImageBitmap === 'undefined' ) {
 
 			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
@@ -42627,8 +42644,6 @@ class ImageBitmapLoader extends Loader {
 
 }
 
-ImageBitmapLoader.prototype.isImageBitmapLoader = true;
-
 let _context;
 
 const AudioContext = {
@@ -42713,6 +42728,8 @@ class HemisphereLightProbe extends LightProbe {
 
 		super( undefined, intensity );
 
+		this.isHemisphereLightProbe = true;
+
 		const color1 = new Color().set( skyColor );
 		const color2 = new Color().set( groundColor );
 
@@ -42730,13 +42747,13 @@ class HemisphereLightProbe extends LightProbe {
 
 }
 
-HemisphereLightProbe.prototype.isHemisphereLightProbe = true;
-
 class AmbientLightProbe extends LightProbe {
 
 	constructor( color, intensity = 1 ) {
 
 		super( undefined, intensity );
+
+		this.isAmbientLightProbe = true;
 
 		const color1 = new Color().set( color );
 
@@ -42746,8 +42763,6 @@ class AmbientLightProbe extends LightProbe {
 	}
 
 }
-
-AmbientLightProbe.prototype.isAmbientLightProbe = true;
 
 const _eyeRight = /*@__PURE__*/ new Matrix4();
 const _eyeLeft = /*@__PURE__*/ new Matrix4();
@@ -44655,6 +44670,8 @@ class AnimationObjectGroup {
 
 	constructor() {
 
+		this.isAnimationObjectGroup = true;
+
 		this.uuid = generateUUID();
 
 		// cached objects followed by the active ones
@@ -45002,8 +45019,6 @@ class AnimationObjectGroup {
 	}
 
 }
-
-AnimationObjectGroup.prototype.isAnimationObjectGroup = true;
 
 class AnimationAction {
 
@@ -46488,6 +46503,8 @@ class InstancedInterleavedBuffer extends InterleavedBuffer {
 
 		super( array, stride );
 
+		this.isInstancedInterleavedBuffer = true;
+
 		this.meshPerAttribute = meshPerAttribute;
 
 	}
@@ -46525,11 +46542,11 @@ class InstancedInterleavedBuffer extends InterleavedBuffer {
 
 }
 
-InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
-
 class GLBufferAttribute {
 
 	constructor( buffer, type, itemSize, elementSize, count ) {
+
+		this.isGLBufferAttribute = true;
 
 		this.buffer = buffer;
 		this.type = type;
@@ -46581,8 +46598,6 @@ class GLBufferAttribute {
 	}
 
 }
-
-GLBufferAttribute.prototype.isGLBufferAttribute = true;
 
 class Raycaster {
 
@@ -46839,6 +46854,8 @@ class Box2 {
 
 	constructor( min = new Vector2( + Infinity, + Infinity ), max = new Vector2( - Infinity, - Infinity ) ) {
 
+		this.isBox2 = true;
+
 		this.min = min;
 		this.max = max;
 
@@ -47030,8 +47047,6 @@ class Box2 {
 	}
 
 }
-
-Box2.prototype.isBox2 = true;
 
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
@@ -47267,8 +47282,9 @@ class SkeletonHelper extends LineSegments {
 
 		super( geometry, material );
 
-		this.type = 'SkeletonHelper';
 		this.isSkeletonHelper = true;
+
+		this.type = 'SkeletonHelper';
 
 		this.root = object;
 		this.bones = bones;
