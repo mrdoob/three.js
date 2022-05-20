@@ -10,6 +10,8 @@ class ShaderMaterial extends Material {
 
 		super();
 
+		this.isShaderMaterial = true;
+
 		this.type = 'ShaderMaterial';
 
 		this.defines = {};
@@ -180,7 +182,5 @@ class ShaderMaterial extends Material {
 	}
 
 }
-
-ShaderMaterial.prototype.isShaderMaterial = true;
 
 export { ShaderMaterial };

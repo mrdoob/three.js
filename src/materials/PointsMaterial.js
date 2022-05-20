@@ -7,6 +7,8 @@ class PointsMaterial extends Material {
 
 		super();
 
+		this.isPointsMaterial = true;
+
 		this.type = 'PointsMaterial';
 
 		this.color = new Color( 0xffffff );
@@ -44,7 +46,5 @@ class PointsMaterial extends Material {
 	}
 
 }
-
-PointsMaterial.prototype.isPointsMaterial = true;
 
 export { PointsMaterial };

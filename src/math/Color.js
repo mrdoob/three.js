@@ -56,6 +56,8 @@ class Color {
 
 	constructor( r, g, b ) {
 
+		this.isColor = true;
+
 		this.r = 1;
 		this.g = 1;
 		this.b = 1;
@@ -609,7 +611,5 @@ class Color {
 }
 
 Color.NAMES = _colorKeywords;
-
-Color.prototype.isColor = true;
 
 export { Color, SRGBToLinear };

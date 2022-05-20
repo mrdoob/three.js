@@ -7,8 +7,9 @@ class LineCurve3 extends Curve {
 
 		super();
 
-		this.type = 'LineCurve3';
 		this.isLineCurve3 = true;
+
+		this.type = 'LineCurve3';
 
 		this.v1 = v1;
 		this.v2 = v2;

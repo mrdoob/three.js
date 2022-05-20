@@ -7,6 +7,8 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 
 		super( width, height );
 
+		this.isWebGL3DRenderTarget = true;
+
 		this.depth = depth;
 
 		this.texture = new Data3DTexture( null, width, height, depth );
@@ -16,7 +18,5 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 	}
 
 }
-
-WebGL3DRenderTarget.prototype.isWebGL3DRenderTarget = true;
 
 export { WebGL3DRenderTarget };

@@ -6,6 +6,8 @@ class InstancedInterleavedBuffer extends InterleavedBuffer {
 
 		super( array, stride );
 
+		this.isInstancedInterleavedBuffer = true;
+
 		this.meshPerAttribute = meshPerAttribute;
 
 	}
@@ -42,7 +44,5 @@ class InstancedInterleavedBuffer extends InterleavedBuffer {
 	}
 
 }
-
-InstancedInterleavedBuffer.prototype.isInstancedInterleavedBuffer = true;
 
 export { InstancedInterleavedBuffer };

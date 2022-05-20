@@ -25,6 +25,8 @@ class BufferGeometry extends EventDispatcher {
 
 		super();
 
+		this.isBufferGeometry = true;
+
 		Object.defineProperty( this, 'id', { value: _id ++ } );
 
 		this.uuid = MathUtils.generateUUID();
@@ -1124,7 +1126,5 @@ class BufferGeometry extends EventDispatcher {
 	}
 
 }
-
-BufferGeometry.prototype.isBufferGeometry = true;
 
 export { BufferGeometry };
