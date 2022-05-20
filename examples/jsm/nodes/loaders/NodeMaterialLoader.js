@@ -5,7 +5,7 @@ import {
 	MeshBasicNodeMaterial,
 	MeshStandardNodeMaterial,
 	PointsNodeMaterial
-} from '../materials/Materials';
+} from '../materials/Materials.js';
 
 const superFromTypeFunction = MaterialLoader.createMaterialFromType;
 
