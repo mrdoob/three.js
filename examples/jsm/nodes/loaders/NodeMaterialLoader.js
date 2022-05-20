@@ -1,4 +1,11 @@
 import { MaterialLoader } from 'three';
+import {
+	NodeMaterial,
+	LineBasicNodeMaterial,
+	MeshBasicNodeMaterial,
+	MeshStandardNodeMaterial,
+	PointsNodeMaterial
+} from '../materials/Materials';
 
 const superFromTypeFunction = MaterialLoader.createMaterialFromType;
 
