@@ -192,7 +192,7 @@ THREE.ColorManagement.legacyMode = false;
 	<blockquote>
 		<p>
 			⚠️ <i><b>WARNING:</b> [page:Scene.fog], [page:Scene.background], and [page:WebGLRenderer.setClearColor]
-			are exceptions to the rule. These properties are unaffected by [page:WebGLRenderer.outputEncoding]
+			are exceptions to the rule. These properties are unaffected by [page:WebGLRenderer.outputColorSpace]
 			and so must store RGB components in the renderer's <u>output</u> color space.</i>
 		</p>
 	</blockquote>
@@ -219,11 +219,11 @@ THREE.ColorManagement.legacyMode = false;
 	<p>
 		Output to a display device, image, or video may involve conversion from the open domain
 		Linear-sRGB working color space to another color space. This conversion may be performed in
-		the main render pass ([page:WebGLRenderer.outputEncoding]), or during post-processing.
+		the main render pass ([page:WebGLRenderer.outputColorSpace]), or during post-processing.
 	</p>
 
 	<code>
-renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
+renderer.outputColorSpace = THREE.sRGBEncoding; // optional with post-processing
 	</code>
 
 	<ul>

@@ -198,7 +198,7 @@ class ReflectorForSSRPass extends Mesh {
 
 			// Render
 
-			renderTarget.texture.encoding = renderer.outputEncoding;
+			renderTarget.texture.encoding = renderer.outputColorSpace;
 
 			// scope.visible = false;
 

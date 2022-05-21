@@ -91,7 +91,7 @@
 				projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
 				projectionMatrix.elements[ 14 ] = clipPlane.w; // Render
 
-				renderTarget.texture.encoding = renderer.outputEncoding;
+				renderTarget.texture.encoding = renderer.outputColorSpace;
 				scope.visible = false;
 				const currentRenderTarget = renderer.getRenderTarget();
 				const currentXrEnabled = renderer.xr.enabled;

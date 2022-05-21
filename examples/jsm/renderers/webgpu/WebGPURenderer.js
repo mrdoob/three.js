@@ -75,7 +75,7 @@ class WebGPURenderer {
 		this.autoClearDepth = true;
 		this.autoClearStencil = true;
 
-		this.outputEncoding = LinearEncoding;
+		this.outputColorSpace = LinearEncoding;
 
 		this.sortObjects = true;
 
@@ -483,7 +483,7 @@ class WebGPURenderer {
 	getCurrentEncoding() {
 
 		const renderTarget = this.getRenderTarget();
-		return ( renderTarget !== null ) ? renderTarget.texture.encoding : this.outputEncoding;
+		return ( renderTarget !== null ) ? renderTarget.texture.encoding : this.outputColorSpace;
 
 	}
 

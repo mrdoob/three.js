@@ -162,7 +162,7 @@
 			this.onBeforeRender = function ( renderer, scene, camera ) {
 
 				// Render
-				renderTarget.texture.encoding = renderer.outputEncoding; // ensure refractors are rendered only once per frame
+				renderTarget.texture.encoding = renderer.outputColorSpace; // ensure refractors are rendered only once per frame
 
 				if ( camera.userData.refractor === true ) return; // avoid rendering when the refractor is viewed from behind
 

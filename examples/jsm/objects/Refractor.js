@@ -221,7 +221,7 @@ class Refractor extends Mesh {
 
 			// Render
 
-			renderTarget.texture.encoding = renderer.outputEncoding;
+			renderTarget.texture.encoding = renderer.outputColorSpace;
 
 			// ensure refractors are rendered only once per frame
 

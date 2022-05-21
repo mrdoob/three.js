@@ -119,7 +119,7 @@
 				container.appendChild( renderer.domElement );
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.outputColorSpace = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

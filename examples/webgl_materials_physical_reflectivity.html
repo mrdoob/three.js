@@ -155,7 +155,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.outputColorSpace = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

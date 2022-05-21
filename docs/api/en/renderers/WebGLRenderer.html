@@ -98,7 +98,7 @@
 
 		<h3>[property:Object debug]</h3>
 		<p>
-		- [page:Boolean checkShaderErrors]: 
+		- [page:Boolean checkShaderErrors]:
 		  If it is true, defines whether material shader programs are checked
 			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
 			It is strongly recommended to keep these checks enabled during development.
@@ -155,7 +155,7 @@
 
 		<h3>[property:Object extensions]</h3>
 		<p>
-		- [page:Object get]( [param:String extensionName] ): 
+		- [page:Object get]( [param:String extensionName] ):
 		Used to check whether various extensions are supported and returns an object with details of the extension if available.
 		This method can check for the following extensions:<br />
 
@@ -168,8 +168,8 @@
 		</ul>
 		</p>
 
-		<h3>[property:number outputEncoding]</h3>
-		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<h3>[property:number outputColorSpace]</h3>
+		<p>Defines the output colorspace of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
 		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
 		<p>See the [page:Textures texture constants] page for details of other formats.</p>
 

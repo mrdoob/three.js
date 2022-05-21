@@ -50,7 +50,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
 
-				//renderer.outputEncoding = THREE.sRGBEncoding; // optional
+				//renderer.outputColorSpace = THREE.sRGBEncoding; // optional
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -121,7 +121,7 @@
 
 				const envScene = new THREE.Scene();
 				envScene.background = new THREE.Color( COLOR );
-				if ( renderer.outputEncoding === THREE.sRGBEncoding ) envScene.background.convertSRGBToLinear();
+				if ( renderer.outputColorSpace === THREE.sRGBEncoding ) envScene.background.convertSRGBToLinear();
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				radianceMap = pmremGenerator.fromScene( envScene ).texture;

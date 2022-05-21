@@ -109,7 +109,7 @@ function SidebarProjectRenderer( editor ) {
 	function createRenderer() {
 
 		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue() } );
-		currentRenderer.outputEncoding = THREE.sRGBEncoding;
+		currentRenderer.outputColorSpace = THREE.sRGBEncoding;
 		currentRenderer.physicallyCorrectLights = physicallyCorrectLightsBoolean.getValue();
 		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
 		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );

@@ -91,7 +91,7 @@
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			document.body.appendChild( renderer.domElement );
-			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.outputColorSpace = THREE.sRGBEncoding;
 			renderer.toneMapping = THREE.LinearToneMapping;
 			renderer.toneMappingExposure = 4000;
 			renderer.physicallyCorrectLights = true;

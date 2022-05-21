@@ -152,7 +152,7 @@
 				textureMatrix.multiply( virtualCamera.matrixWorldInverse );
 				textureMatrix.multiply( scope.matrixWorld ); // Render
 
-				renderTarget.texture.encoding = renderer.outputEncoding; // scope.visible = false;
+				renderTarget.texture.encoding = renderer.outputColorSpace; // scope.visible = false;
 
 				const currentRenderTarget = renderer.getRenderTarget();
 				const currentXrEnabled = renderer.xr.enabled;
