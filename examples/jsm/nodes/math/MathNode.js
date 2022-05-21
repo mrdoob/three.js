@@ -8,14 +8,14 @@ class MathNode extends TempNode {
 
 	// 1 input
 
-	static RAD = 'radians';
-	static DEG = 'degrees';
+	static RADIANS = 'radians';
+	static DEGREES = 'degrees';
 	static EXP = 'exp';
 	static EXP2 = 'exp2';
 	static LOG = 'log';
 	static LOG2 = 'log2';
 	static SQRT = 'sqrt';
-	static INV_SQRT = 'inversesqrt';
+	static INVERSE_SQRT = 'inversesqrt';
 	static FLOOR = 'floor';
 	static CEIL = 'ceil';
 	static NORMALIZE = 'normalize';

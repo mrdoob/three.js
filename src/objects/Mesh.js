@@ -38,6 +38,8 @@ class Mesh extends Object3D {
 
 		super();
 
+		this.isMesh = true;
+
 		this.type = 'Mesh';
 
 		this.geometry = geometry;
@@ -285,8 +287,6 @@ class Mesh extends Object3D {
 	}
 
 }
-
-Mesh.prototype.isMesh = true;
 
 function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 

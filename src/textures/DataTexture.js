@@ -7,6 +7,8 @@ class DataTexture extends Texture {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
+		this.isDataTexture = true;
+
 		this.image = { data: data, width: width, height: height };
 
 		this.generateMipmaps = false;
@@ -16,7 +18,5 @@ class DataTexture extends Texture {
 	}
 
 }
-
-DataTexture.prototype.isDataTexture = true;
 
 export { DataTexture };

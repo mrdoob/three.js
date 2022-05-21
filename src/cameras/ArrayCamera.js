@@ -6,13 +6,12 @@ class ArrayCamera extends PerspectiveCamera {
 
 		super();
 
+		this.isArrayCamera = true;
+
 		this.cameras = array;
 
 	}
 
 }
-
-ArrayCamera.prototype.isArrayCamera = true;
-
 
 export { ArrayCamera };

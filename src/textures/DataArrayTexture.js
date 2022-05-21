@@ -7,6 +7,8 @@ class DataArrayTexture extends Texture {
 
 		super( null );
 
+		this.isDataArrayTexture = true;
+
 		this.image = { data, width, height, depth };
 
 		this.magFilter = NearestFilter;
@@ -21,7 +23,5 @@ class DataArrayTexture extends Texture {
 	}
 
 }
-
-DataArrayTexture.prototype.isDataArrayTexture = true;
 
 export { DataArrayTexture };

@@ -7,6 +7,8 @@ class PointLight extends Light {
 
 		super( color, intensity );
 
+		this.isPointLight = true;
+
 		this.type = 'PointLight';
 
 		this.distance = distance;
@@ -51,7 +53,5 @@ class PointLight extends Light {
 	}
 
 }
-
-PointLight.prototype.isPointLight = true;
 
 export { PointLight };

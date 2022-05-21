@@ -49,6 +49,7 @@ import ComputeNode from './gpgpu/ComputeNode.js';
 
 // display
 import ColorSpaceNode from './display/ColorSpaceNode.js';
+import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
 import ToneMappingNode from './display/ToneMappingNode.js';
 
@@ -57,19 +58,25 @@ import MathNode from './math/MathNode.js';
 import OperatorNode from './math/OperatorNode.js';
 import CondNode from './math/CondNode.js';
 
-// lights
-import LightContextNode from './lights/LightContextNode.js';
-import LightNode from './lights/LightNode.js';
-import LightsNode from './lights/LightsNode.js';
+// lighting
+import PunctualLightNode from './lighting/PunctualLightNode.js';
+import LightsNode from './lighting/LightsNode.js';
+import LightingNode from './lighting/LightingNode.js';
+import LightingContextNode from './lighting/LightingContextNode.js';
+import HemisphereLightNode from './lighting/HemisphereLightNode.js';
+import EnvironmentLightNode from './lighting/EnvironmentLightNode.js';
+import AONode from './lighting/AONode.js';
+import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
+import MatcapUVNode from './utils/MatcapUVNode.js';
+import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
+import OscNode from './utils/OscNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
-import MatcapUVNode from './utils/MatcapUVNode.js';
-import OscNode from './utils/OscNode.js';
 import TimerNode from './utils/TimerNode.js';
 
 // loaders
@@ -145,6 +152,7 @@ const nodeLib = {
 
 	// display
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
 	ToneMappingNode,
 
@@ -153,19 +161,25 @@ const nodeLib = {
 	OperatorNode,
 	CondNode,
 
-	// lights
-	LightContextNode,
-	LightNode,
+	// lighting
+	PunctualLightNode,
 	LightsNode,
+	LightingNode,
+	LightingContextNode,
+	HemisphereLightNode,
+	EnvironmentLightNode,
+	AONode,
+	AnalyticLightNode,
 
 	// utils
 	ArrayElementNode,
 	ConvertNode,
 	JoinNode,
+	MatcapUVNode,
+	MaxMipLevelNode,
+	OscNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	MatcapUVNode,
-	OscNode,
 	TimerNode,
 
 	// procedural
@@ -240,6 +254,7 @@ export {
 
 	// display
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
 	ToneMappingNode,
 
@@ -248,19 +263,25 @@ export {
 	OperatorNode,
 	CondNode,
 
-	// lights
-	LightContextNode,
-	LightNode,
+	// lighting
+	PunctualLightNode,
 	LightsNode,
+	LightingNode,
+	LightingContextNode,
+	HemisphereLightNode,
+	EnvironmentLightNode,
+	AONode,
+	AnalyticLightNode,
 
 	// utils
 	ArrayElementNode,
 	ConvertNode,
 	JoinNode,
+	MatcapUVNode,
+	MaxMipLevelNode,
+	OscNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	MatcapUVNode,
-	OscNode,
 	TimerNode,
 
 	// procedural

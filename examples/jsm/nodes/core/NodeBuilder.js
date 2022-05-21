@@ -34,12 +34,17 @@ class NodeBuilder {
 
 		this.object = object;
 		this.material = object.material || null;
+		this.geometry = object.geometry || null;
 		this.renderer = renderer;
 		this.parser = parser;
 
 		this.nodes = [];
 		this.updateNodes = [];
 		this.hashNodes = {};
+
+		this.scene = null;
+		this.lightsNode = null;
+		this.fogNode = null;
 
 		this.vertexShader = null;
 		this.fragmentShader = null;
@@ -158,7 +163,13 @@ class NodeBuilder {
 
 	}
 
-	getInstanceIndex( /*shaderStage*/ ) {
+	getInstanceIndex() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getFrontFacing() {
 
 		console.warn( 'Abstract function.' );
 
@@ -170,7 +181,7 @@ class NodeBuilder {
 
 	}
 
-	getTextureBias( /* textureProperty, uvSnippet, biasSnippet */ ) {
+	getTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -182,7 +193,7 @@ class NodeBuilder {
 
 	}
 
-	getCubeTextureBias( /* textureProperty, uvSnippet, biasSnippet */ ) {
+	getCubeTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 

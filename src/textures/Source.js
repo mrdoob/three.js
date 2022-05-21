@@ -5,6 +5,8 @@ class Source {
 
 	constructor( data = null ) {
 
+		this.isSource = true;
+
 		this.uuid = MathUtils.generateUUID();
 
 		this.data = data;
@@ -117,7 +119,5 @@ function serializeImage( image ) {
 	}
 
 }
-
-Source.prototype.isSource = true;
 
 export { Source };

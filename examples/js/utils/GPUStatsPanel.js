@@ -88,7 +88,7 @@
 
 						this.activeQueries --;
 
-					} else {
+					} else if ( gl.isContextLost() === false ) {
 
 						// otherwise try again the next frame
 						requestAnimationFrame( checkQuery );

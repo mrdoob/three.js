@@ -7,6 +7,8 @@ class PointsMaterial extends Material {
 
 		super();
 
+		this.isPointsMaterial = true;
+
 		this.type = 'PointsMaterial';
 
 		this.color = new Color( 0xffffff );
@@ -17,6 +19,8 @@ class PointsMaterial extends Material {
 
 		this.size = 1;
 		this.sizeAttenuation = true;
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -35,12 +39,12 @@ class PointsMaterial extends Material {
 		this.size = source.size;
 		this.sizeAttenuation = source.sizeAttenuation;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-PointsMaterial.prototype.isPointsMaterial = true;
 
 export { PointsMaterial };

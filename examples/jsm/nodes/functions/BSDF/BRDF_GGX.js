@@ -1,11 +1,10 @@
 import F_Schlick from './F_Schlick.js';
 import V_GGX_SmithCorrelated from './V_GGX_SmithCorrelated.js';
 import D_GGX from './D_GGX.js';
-import ShaderNode from '../../shadernode/ShaderNode.js';
 import {
-	dotNV, add, mul, saturate, dot, pow2, normalize,
+	ShaderNode, dotNV, add, mul, saturate, dot, pow2, normalize,
 	transformedNormalView, positionViewDirection
-} from '../../shadernode/ShaderNodeElements.js';
+} from '../../shadernode/ShaderNodeBaseElements.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
 const BRDF_GGX = new ShaderNode( ( inputs ) => {

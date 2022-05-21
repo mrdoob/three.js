@@ -1,6 +1,5 @@
 import TempNode from '../core/Node.js';
-import ShaderNode from '../shadernode/ShaderNode.js';
-import { vec3, pow, mul, sub, mix, join, lessThanEqual } from '../shadernode/ShaderNodeElements.js';
+import { ShaderNode, vec3, pow, mul, sub, mix, vec4, lessThanEqual } from '../shadernode/ShaderNodeBaseElements.js';
 
 import { LinearEncoding, sRGBEncoding } from 'three';
 
@@ -22,7 +21,7 @@ export const LinearTosRGB = new ShaderNode( ( inputs ) => {
 
 	const rgbResult = mix( a, b, factor );
 
-	return join( rgbResult.r, rgbResult.g, rgbResult.b, value.a );
+	return vec4( rgbResult, value.a );
 
 } );
 

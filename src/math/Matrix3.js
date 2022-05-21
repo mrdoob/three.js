@@ -2,6 +2,8 @@ class Matrix3 {
 
 	constructor() {
 
+		this.isMatrix3 = true;
+
 		this.elements = [
 
 			1, 0, 0,
@@ -333,7 +335,5 @@ class Matrix3 {
 	}
 
 }
-
-Matrix3.prototype.isMatrix3 = true;
 
 export { Matrix3 };

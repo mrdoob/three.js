@@ -33,7 +33,7 @@
 		<p>Array with object's animation clips.</p>
 
 		<h3>[property:Boolean castShadow]</h3>
-		<p>Whether the object gets rendered into shadow map. Default is *false*.</p>
+		<p>Whether the object gets rendered into shadow map. Default is `false`.</p>
 
 		<h3>[property:Array children]</h3>
 		<p>Array with object's children. See [page:Group] for info on manually grouping objects.</p>
@@ -41,12 +41,12 @@
 		<h3>[property:Material customDepthMaterial]</h3>
 		<p>
 		Custom depth material to be used when rendering to the depth map. Can only be used in context of meshes.
-		When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are modifying vertex positions in the vertex shader you must specify a customDepthMaterial for proper shadows. Default is *undefined*.
+		When shadow-casting with a [page:DirectionalLight] or [page:SpotLight], if you are modifying vertex positions in the vertex shader you must specify a customDepthMaterial for proper shadows. Default is `undefined`.
 		</p>
 
 		<h3>[property:Material customDistanceMaterial]</h3>
 		<p>
-		Same as [page:.customDepthMaterial customDepthMaterial], but used with [page:PointLight]. Default is *undefined*.
+		Same as [page:.customDepthMaterial customDepthMaterial], but used with [page:PointLight]. Default is `undefined`.
 		</p>
 
 		<h3>[property:Boolean frustumCulled]</h3>
@@ -87,7 +87,7 @@
 		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
 		<p>
 		When this is set, it calculates the matrixWorld in that frame and resets this property
-		 to false. Default is *false*.
+		 to false. Default is `false`.
 		</p>
 
 		<h3>[property:Matrix4 modelViewMatrix]</h3>
@@ -112,7 +112,7 @@
 		material, group.
 		</p>
 		<p>
-		Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+		Please notice that this callback is only executed for `renderable` 3D objects. Meaning 3D objects which define their visual
 		appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
 		Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
 		</p>
@@ -124,7 +124,7 @@
 		material, group.
 		</p>
 		<p>
-		Please notice that this callback is only executed for *renderable* 3D objects. Meaning 3D objects which define their visual
+		Please notice that this callback is only executed for `renderable` 3D objects. Meaning 3D objects which define their visual
 		appearance with geometries and materials like instances of [page:Mesh], [page:Line], [page:Points] or [page:Sprite].
 		Instances of [page:Object3D], [page:Group] or [page:Bone] are not renderable and thus this callback is not executed for such objects.
 		</p>
@@ -134,20 +134,20 @@
 		one parent.</p>
 
 		<h3>[property:Vector3 position]</h3>
-		<p>A [page:Vector3] representing the object's local position. Default is (0, 0, 0).</p>
+		<p>A [page:Vector3] representing the object's local position. Default is `(0, 0, 0)`.</p>
 
 		<h3>[property:Quaternion quaternion]</h3>
 		<p>Object's local rotation as a [page:Quaternion Quaternion].</p>
 
 		<h3>[property:Boolean receiveShadow]</h3>
-		<p>Whether the material receives shadows. Default is *false*.</p>
+		<p>Whether the material receives shadows. Default is `false`.</p>
 
 		<h3>[property:Number renderOrder]</h3>
 		<p>
 		This value allows the default rendering order of [link:https://en.wikipedia.org/wiki/Scene_graph scene graph]
 		objects to be overridden although opaque and transparent objects remain sorted independently. When this property
 		is set for an instance of [page:Group Group], all descendants objects will be sorted and rendered together.
-		Sorting is from lowest to highest renderOrder. Default value is *0*.
+		Sorting is from lowest to highest renderOrder. Default value is `0`.
 		</p>
 
 		<h3>[property:Euler rotation]</h3>
@@ -163,7 +163,7 @@
 		<h3>[property:Vector3 up]</h3>
 		<p>
 		This is used by the [page:.lookAt lookAt] method, for example, to determine the orientation of the result.<br />
-		Default is [page:Object3D.DefaultUp] - that is, ( 0, 1, 0 ).
+		Default is [page:Object3D.DefaultUp] - that is, `( 0, 1, 0 )`.
 		</p>
 
 		<h3>[property:Object userData]</h3>
@@ -179,7 +179,7 @@
 		</p>
 
 		<h3>[property:Boolean visible]</h3>
-		<p>Object gets rendered if *true*. Default is *true*.</p>
+		<p>Object gets rendered if `true`. Default is `true`.</p>
 
 
 
@@ -189,7 +189,7 @@
 			Static properties and methods are defined per class rather than per instance of that class.
 			This means that changing [page:Object3D.DefaultUp] or [page:Object3D.DefaultMatrixAutoUpdate]
 			will change the values of [page:.up up] and [page:.matrixAutoUpdate matrixAutoUpdate] for
-			<em>every</em>	instance of Object3D (or derived classes)	created after the change has
+			`every`	instance of Object3D (or derived classes)	created after the change has
 			been made (already created Object3Ds will not be affected).
 		</p>
 
@@ -213,7 +213,7 @@
 
 		<h3>[method:this add]( [param:Object3D object], ... )</h3>
 		<p>
-		Adds *object* as child of this object. An arbitrary number of objects may be added. Any current parent on an
+		Adds `object` as child of this object. An arbitrary number of objects may be added. Any current parent on an
 		object passed in here will be removed, since an object can have at most one parent.<br /><br />
 
 		See [page:Group] for info on manually grouping objects.
@@ -226,7 +226,7 @@
 		<p>Applies the rotation represented by the quaternion to the object.</p>
 
 		<h3>[method:this attach]( [param:Object3D object] )</h3>
-		<p>Adds *object* as a child of this, while maintaining the object's world transform.<br/><br/>
+		<p>Adds `object` as a child of this, while maintaining the object's world transform.<br/><br/>
 		Note: This method does not support scene graphs having non-uniformly-scaled nodes(s).
 		</p>
 
@@ -327,7 +327,7 @@
 
 		<h3>[method:this remove]( [param:Object3D object], ... )</h3>
 		<p>
-		Removes *object* as child of this object. An arbitrary number of objects may be removed.
+		Removes `object` as child of this object. An arbitrary number of objects may be removed.
 		</p>
 
 		<h3>[method:this removeFromParent]()</h3>
@@ -427,13 +427,13 @@
 		</p>
 
 		<h3>[method:this translateX]( [param:Float distance] )</h3>
-		<p>Translates object along x axis in object space by *distance* units.</p>
+		<p>Translates object along x axis in object space by `distance` units.</p>
 
 		<h3>[method:this translateY]( [param:Float distance] )</h3>
-		<p>Translates object along y axis in object space by *distance* units.</p>
+		<p>Translates object along y axis in object space by `distance` units.</p>
 
 		<h3>[method:this translateZ]( [param:Float distance] )</h3>
-		<p>Translates object along z axis in object space by *distance* units.</p>
+		<p>Translates object along z axis in object space by `distance` units.</p>
 
 		<h3>[method:undefined traverse]( [param:Function callback] )</h3>
 		<p>

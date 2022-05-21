@@ -15,13 +15,13 @@ class MaxMipLevelNode extends UniformNode {
 
 	update() {
 
-		const { width, height } = this.texture.images ? this.texture.images[ 0 ] : this.texture.image;
+		const image = this.texture.images ? this.texture.images[ 0 ].image || this.texture.images[ 0 ] : this.texture.image;
 
-		this.value = Math.log( Math.max( width, height ) ) * Math.LOG2E;
+		if ( image?.width !== undefined ) {
 
-		if ( this.value > 0 ) {
+			const { width, height } = image;
 
-			this.updateType = NodeUpdateType.None;
+			this.value = Math.log2( Math.max( width, height ) );
 
 		}
 

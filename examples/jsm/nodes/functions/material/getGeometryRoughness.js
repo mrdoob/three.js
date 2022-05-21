@@ -1,5 +1,4 @@
-import ShaderNode from '../../shadernode/ShaderNode.js';
-import { max, abs, dFdx, dFdy, normalGeometry } from '../../shadernode/ShaderNodeElements.js';
+import { ShaderNode, max, abs, dFdx, dFdy, normalGeometry } from '../../shadernode/ShaderNodeBaseElements.js';
 
 const getGeometryRoughness = new ShaderNode( () => {
 

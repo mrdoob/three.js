@@ -97,15 +97,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		super( object, renderer, new WGSLNodeParser() );
 
-		this.lightNode = null;
-		this.fogNode = null;
-
 		this.bindings = { vertex: [], fragment: [], compute: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
 
 		this.uniformsGroup = {};
 
-		this.builtins = new Set();
+		this.builtins = {
+			vertex: new Map(),
+			fragment: new Map(),
+			compute: new Map(),
+			attribute: new Map()
+		};
 
 	}
 
@@ -157,11 +159,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
-			return `textureSampleBias( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
+			return `textureSampleLevel( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
 
 		} else {
 
@@ -181,9 +183,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
@@ -193,9 +195,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getCubeTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getCubeTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
@@ -364,11 +366,39 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getInstanceIndex( shaderStage = this.shaderStage ) {
+	getBuiltin( name, property, type, shaderStage = this.shaderStage ) {
 
-		this.builtins.add( 'instance_index' );
+		const map = this.builtins[ shaderStage ];
+
+		if ( map.has( name ) === false ) {
+
+			map.set( name, {
+				name,
+				property,
+				type
+			} );
+
+		}
+
+		return property;
+
+	}
+
+	getInstanceIndex() {
+
+		if ( this.shaderStage === 'vertex' ) {
+
+			return this.getBuiltin( 'instance_index', 'instanceIndex', 'u32', 'attribute' );
+
+		}
 
 		return 'instanceIndex';
+
+	}
+
+	getFrontFacing() {
+
+		return this.getBuiltin( 'front_facing', 'isFront', 'bool' );
 
 	}
 
@@ -380,11 +410,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			if ( shaderStage === 'compute' ) {
 
-				snippets.push( `@builtin( global_invocation_id ) id : vec3<u32>` );
+				this.getBuiltin( 'global_invocation_id', 'id', 'vec3<u32>', 'attribute' );
 
-			} else if ( this.builtins.has( 'instance_index' ) ) {
+			}
 
-				snippets.push( `@builtin( instance_index ) instanceIndex : u32` );
+			for ( const { name, property, type } of this.builtins.attribute.values() ) {
+
+				snippets.push( `@builtin( ${name} ) ${property} : ${type}` );
 
 			}
 
@@ -433,7 +465,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		if ( shaderStage === 'vertex' ) {
 
-			snippets.push( '@builtin( position ) Vertex: vec4<f32>' );
+			this.getBuiltin( 'position', 'Vertex', 'vec4<f32>', 'vertex' );
 
 			const varys = this.varys;
 
@@ -456,6 +488,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				snippets.push( `@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }` );
 
 			}
+
+		}
+
+		for ( const { name, property, type } of this.builtins[ shaderStage ].values() ) {
+
+			snippets.push( `@builtin( ${name} ) ${property} : ${type}` );
 
 		}
 
@@ -730,7 +768,7 @@ ${shaderData.codes}
 fn main( ${shaderData.attributes} ) {
 
 	// system
-	instanceIndex = id.x * 3u;
+	instanceIndex = id.x;
 
 	// vars
 	${shaderData.vars}

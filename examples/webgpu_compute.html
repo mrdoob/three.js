@@ -30,9 +30,9 @@
 
 			import {
 				ShaderNode, compute,
-				uniform, element, storage, temp,
-				assign, add, sub, cond, abs, negate, max, min, length, vec3, color,
-				greaterThanEqual, lessThanEqual, positionLocal, instanceIndex
+				uniform, element, storage, attribute,
+				temp, assign, add, sub, cond, abs, negate, max, min, length, vec3, color,
+				greaterThanEqual, lessThanEqual, instanceIndex
 			} from 'three-nodes/Nodes.js';
 
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
@@ -65,29 +65,29 @@
 
 				// initialize particles
 
-				const particleNum = 65000; // 16-bit limit
-				const particleSize = 3; // vec3
+				const particleNum = 300000;
+				const particleSize = 2; // vec2
 
 				const particleArray = new Float32Array( particleNum * particleSize );
 				const velocityArray = new Float32Array( particleNum * particleSize );
 
-				for ( let i = 0; i < particleArray.length; i += particleSize ) {
+				for ( let i = 0; i < particleNum; i ++ ) {
 
-					const r = Math.random() * 0.01 + 0.0005;
+					const r = Math.random() * 0.01 + 0.005;
 					const degree = Math.random() * 360;
 
-					velocityArray[ i + 0 ] = r * Math.sin( degree * Math.PI / 180 );
-					velocityArray[ i + 1 ] = r * Math.cos( degree * Math.PI / 180 );
+					velocityArray[ i * particleSize + 0 ] = r * Math.sin( degree * Math.PI / 180 ); // x
+					velocityArray[ i * particleSize + 1 ] = r * Math.cos( degree * Math.PI / 180 ); // y
 
 				}
 
 				// create buffers
 
-				const particleBuffer = new THREE.BufferAttribute( particleArray, particleSize );
-				const velocityBuffer = new THREE.BufferAttribute( velocityArray, particleSize );
+				const particleBuffer = new THREE.InstancedBufferAttribute( particleArray, 2 );
+				const velocityBuffer = new THREE.InstancedBufferAttribute( velocityArray, 2 );
 
-				const particleBufferNode = storage( particleBuffer, 'vec3' );
-				const velocityBufferNode = storage( velocityBuffer, 'vec3' );
+				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
+				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
 
 				// create function
 
@@ -99,8 +99,8 @@
 					const pointer = uniform( pointerVector );
 					const limit = uniform( scaleVector );
 
-					const position = temp( vec3() );
-					assign( position, add( particle, velocity ) ).build( builder ); // workaround
+					const position = temp( add( particle, velocity ), 'tempPos' ); // @TODO: this should work without 'tempPos' property name
+					position.build( builder );
 
 					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ) ).build( builder );
 					assign( velocity.y, cond( greaterThanEqual( abs( position.y ), limit.y ), negate( velocity.y ), velocity.y ) ).build( builder );
@@ -116,19 +116,24 @@
 
 				// compute
 
-				computeNode = compute( particleNum );
-
-				computeNode.computeNode = FnNode;
+				computeNode = compute( FnNode, particleNum );
 
 				// use a compute shader to animate the point cloud's vertex data.
 
+				const particleNode = attribute( 'particle', 'vec2' );
+
 				const pointsGeometry = new THREE.BufferGeometry();
-				pointsGeometry.setAttribute( 'position', particleBuffer );
+				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ), 3 ) ); // single vertex ( not triangle )
+				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
+				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
 
 				const pointsMaterial = new Nodes.PointsNodeMaterial();
-				pointsMaterial.colorNode = add( positionLocal, color( 0xFFFFFF ) );
+				pointsMaterial.colorNode = add( particleNode, color( 0xFFFFFF ) );
+				pointsMaterial.positionNode = particleNode;
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
+				mesh.isInstancedMesh = true;
+				mesh.count = particleNum;
 				scene.add( mesh );
 
 				renderer = new WebGPURenderer();

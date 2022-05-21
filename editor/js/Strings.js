@@ -144,6 +144,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributes',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': 'Radius',
 			'sidebar/geometry/capsule_geometry/length': 'Length',
@@ -286,6 +288,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': 'Depth Test',
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
+			'sidebar/material/userdata': 'User data',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'New',
@@ -478,6 +481,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributs',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': 'Radius',
 			'sidebar/geometry/capsule_geometry/length': 'Length',
@@ -620,6 +625,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': 'Depth Test',
 			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Fil de fer',
+			'sidebar/material/userdata': 'Données utilisateur',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'Nouveau',
@@ -812,6 +818,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': '属性',
 			'sidebar/geometry/buffer_geometry/index': '索引',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': '半径',
 			'sidebar/geometry/capsule_geometry/length': '长度',
@@ -954,6 +962,7 @@ function Strings( config ) {
 			'sidebar/material/depthtest': '深度测试',
 			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
+			'sidebar/material/userdata': '自定义数据',
 
 			'sidebar/script': '脚本',
 			'sidebar/script/new': '新建',

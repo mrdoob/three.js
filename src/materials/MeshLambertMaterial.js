@@ -8,6 +8,8 @@ class MeshLambertMaterial extends Material {
 
 		super();
 
+		this.isMeshLambertMaterial = true;
+
 		this.type = 'MeshLambertMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
@@ -37,6 +39,8 @@ class MeshLambertMaterial extends Material {
 		this.wireframeLinewidth = 1;
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -74,12 +78,12 @@ class MeshLambertMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
 export { MeshLambertMaterial };

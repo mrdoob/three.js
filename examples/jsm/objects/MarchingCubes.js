@@ -812,7 +812,7 @@ class MarchingCubes extends Mesh {
 
 		};
 
-		this.onBeforeRender = function () {
+		this.update = function () {
 
 			this.count = 0;
 
@@ -843,13 +843,9 @@ class MarchingCubes extends Mesh {
 
 			}
 
-			// reset unneeded data
+			// set the draw range to only the processed triangles
 
-			for ( let i = this.count * 3; i < this.positionArray.length; i ++ ) {
-
-				this.positionArray[ i ] = 0.0;
-
-			}
+			this.geometry.setDrawRange( 0, this.count );
 
 			// update geometry data
 

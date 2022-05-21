@@ -312,17 +312,17 @@ class WebGPURenderer {
 
 		}
 
-		// light node
+		// lights node
 
-		const lightNode = this._currentRenderState.getLightNode();
+		const lightsNode = this._currentRenderState.getLightsNode();
 
 		// process render lists
 
 		const opaqueObjects = this._currentRenderList.opaque;
 		const transparentObjects = this._currentRenderList.transparent;
 
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, scene, lightNode, passEncoder );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, scene, lightNode, passEncoder );
+		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, scene, lightsNode, passEncoder );
+		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, scene, lightsNode, passEncoder );
 
 		// finish render pass
 
@@ -634,7 +634,7 @@ class WebGPURenderer {
 			this._bindings.update( computeNode );
 			passEncoder.setBindGroup( 0, bindGroup );
 
-			passEncoder.dispatch( computeNode.dispatchCount );
+			passEncoder.dispatchWorkgroups( computeNode.dispatchCount );
 
 		}
 
@@ -755,7 +755,7 @@ class WebGPURenderer {
 
 	}
 
-	_renderObjects( renderList, camera, scene, lightNode, passEncoder ) {
+	_renderObjects( renderList, camera, scene, lightsNode, passEncoder ) {
 
 		// process renderable objects
 
@@ -777,8 +777,8 @@ class WebGPURenderer {
 
 			const objectProperties = this._properties.get( object );
 
-			objectProperties.lightNode = lightNode;
-			objectProperties.fogNode = scene.fogNode;
+			objectProperties.lightsNode = lightsNode;
+			objectProperties.scene = scene;
 
 			if ( camera.isArrayCamera ) {
 
