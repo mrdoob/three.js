@@ -151,6 +151,23 @@ function WebGLRenderer( parameters = {} ) {
 				console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
 
 			}
+		},
+
+		// @deprecated since TODO
+
+		outputEncoding: {
+			get: function () {
+
+				console.warn( 'THREE.WebGLRenderer: .outputEncoding has been renamed to .outputColorSpace.' );
+				return this.outputColorSpace;
+
+			},
+			set: function ( value ) {
+
+				console.warn( 'THREE.WebGLRenderer: .outputEncoding has been renamed to .outputColorSpace.' );
+				this.outputColorSpace = value;
+
+			}
 		}
 
 	} );
