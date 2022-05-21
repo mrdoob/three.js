@@ -17060,7 +17060,7 @@
 				let mipmap;
 				const mipmaps = texture.mipmaps;
 				const useTexStorage = isWebGL2 && texture.isVideoTexture !== true;
-				const allocateMemory = textureProperties.__version === undefined || forceUpload === true;
+				const allocateMemory = source.__currentVersion === undefined || forceUpload === true;
 				const levels = getMipLevels(texture, image, supportsMips);
 
 				if (texture.isDepthTexture) {
@@ -17290,7 +17290,7 @@
 							glType = utils.convert(texture.type),
 							glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
 				const useTexStorage = isWebGL2 && texture.isVideoTexture !== true;
-				const allocateMemory = textureProperties.__version === undefined;
+				const allocateMemory = source.__currentVersion === undefined || forceUpload === true;
 				let levels = getMipLevels(texture, image, supportsMips);
 				setTextureParameters(_gl.TEXTURE_CUBE_MAP, texture, supportsMips);
 				let mipmaps;
