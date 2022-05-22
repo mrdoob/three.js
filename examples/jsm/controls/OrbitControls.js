@@ -257,10 +257,11 @@ class OrbitControls extends EventDispatcher {
 
 				if ( scope.enableDamping === true ) {
 
-					sphericalDelta.theta *= ( 1 - scope.dampingFactor );
-					sphericalDelta.phi *= ( 1 - scope.dampingFactor );
+					const amp = Math.pow( 1 - scope.dampingFactor, deltaTime );
+					sphericalDelta.theta *= amp;
+					sphericalDelta.phi *= amp;
 
-					panOffset.multiplyScalar( 1 - scope.dampingFactor );
+					panOffset.multiplyScalar( amp );
 
 				} else {
 
