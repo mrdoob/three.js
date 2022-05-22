@@ -962,12 +962,7 @@ class WebGPURenderer {
 				device: device,
 				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT,
-				compositingAlphaMode: 'premultiplied',
-				size: {
-					width: Math.floor( this._width * this._pixelRatio ),
-					height: Math.floor( this._height * this._pixelRatio ),
-					depthOrArrayLayers: 1
-				},
+				compositingAlphaMode: 'premultiplied'
 			} );
 
 		}
