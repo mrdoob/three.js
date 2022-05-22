@@ -5,7 +5,7 @@ import {
 	ShaderNode,
 	vec3, mul, saturate, add, sub, dot, div, transformedNormalView,
 	pow, exp2, dotNV,
-	diffuseColor, specularColor, roughness, temp
+	baseColor, specularColor, roughness, temp
 } from '../shadernode/ShaderNodeElements.js';
 
 // Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
@@ -40,7 +40,7 @@ const RE_IndirectSpecular_Physical = new ShaderNode( ( inputs ) => {
 
 	computeMultiscattering( singleScattering, multiScattering );
 
-	const diffuse = mul( diffuseColor, sub( 1.0, add( singleScattering, multiScattering ) ) );
+	const diffuse = mul( baseColor, sub( 1.0, add( singleScattering, multiScattering ) ) );
 
 	reflectedLight.indirectSpecular.add( mul( radiance, singleScattering ) );
 	reflectedLight.indirectSpecular.add( mul( multiScattering, cosineWeightedIrradiance ) );
@@ -53,7 +53,7 @@ const RE_IndirectDiffuse_Physical = new ShaderNode( ( inputs ) => {
 
 	const { irradiance, reflectedLight } = inputs;
 
-	reflectedLight.indirectDiffuse.add( mul( irradiance, BRDF_Lambert.call( { diffuseColor } ) ) );
+	reflectedLight.indirectDiffuse.add( mul( irradiance, BRDF_Lambert.call( { baseColor } ) ) );
 
 } );
 
@@ -64,7 +64,7 @@ const RE_Direct_Physical = new ShaderNode( ( inputs ) => {
 	const dotNL = saturate( dot( transformedNormalView, lightDirection ) );
 	const irradiance = mul( dotNL, lightColor );
 
-	reflectedLight.directDiffuse.add( mul( irradiance, BRDF_Lambert.call( { diffuseColor: diffuseColor.rgb } ) ) );
+	reflectedLight.directDiffuse.add( mul( irradiance, BRDF_Lambert.call( { baseColor } ) ) );
 
 	reflectedLight.directSpecular.add( mul( irradiance, BRDF_GGX.call( { lightDirection, f0: specularColor, f90: 1, roughness } ) ) );
 

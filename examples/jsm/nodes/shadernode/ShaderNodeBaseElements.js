@@ -140,7 +140,7 @@ export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
 
-export const diffuseColor = nodeImmutable( PropertyNode, 'DiffuseColor', 'vec4' );
+export const baseColor = nodeImmutable( PropertyNode, 'BaseColor', 'vec4' );
 export const roughness = nodeImmutable( PropertyNode, 'Roughness', 'float' );
 export const metalness = nodeImmutable( PropertyNode, 'Metalness', 'float' );
 export const alphaTest = nodeImmutable( PropertyNode, 'AlphaTest', 'float' );

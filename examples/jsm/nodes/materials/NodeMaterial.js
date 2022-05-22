@@ -22,12 +22,14 @@ class NodeMaterial extends ShaderMaterial {
 
 	build( builder ) {
 
+		this.generateVertex( builder );
+
 		const { lightsNode } = this;
-		const { diffuseColorNode } = this.generateMain( builder );
+		const { baseColorNode } = this.generateBaseColor( builder );
 
-		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightsNode } );
+		const outgoingLightNode = this.generateLight( builder, { baseColorNode, lightsNode } );
 
-		this.generateOutput( builder, { diffuseColorNode, outgoingLightNode } );
+		this.generateOutput( builder, { baseColorNode, outgoingLightNode } );
 
 	}
 
@@ -37,7 +39,41 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	generateMain( builder ) {
+	generateBaseColor( builder ) {
+
+		// < FRAGMENT STAGE >
+
+		let colorNode = vec4( this.colorNode || materialColor );
+		let opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
+
+		// COLOR
+
+		colorNode = builder.addFlow( 'fragment', label( colorNode, 'Color' ) );
+		const baseColorNode = builder.addFlow( 'fragment', label( colorNode, 'BaseColor' ) );
+
+		// OPACITY
+
+		opacityNode = builder.addFlow( 'fragment', label( opacityNode, 'OPACITY' ) );
+		builder.addFlow( 'fragment', assign( baseColorNode.a, mul( baseColorNode.a, opacityNode ) ) );
+
+		// ALPHA TEST
+
+		if ( this.alphaTestNode || this.alphaTest > 0 ) {
+
+			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
+
+			builder.addFlow( 'fragment', label( alphaTestNode, 'AlphaTest' ) );
+
+			// @TODO: remove ExpressionNode here and then possibly remove it completely
+			builder.addFlow( 'fragment', new ExpressionNode( 'if ( BaseColor.a <= AlphaTest ) { discard; }' ) );
+
+		}
+
+		return { colorNode, baseColorNode };
+
+	}
+
+	generateVertex( builder ) {
 
 		const object = builder.object;
 
@@ -67,56 +103,26 @@ class NodeMaterial extends ShaderMaterial {
 
 		builder.addFlow( 'vertex', modelViewProjection() );
 
-		// < FRAGMENT STAGE >
-
-		let colorNode = vec4( this.colorNode || materialColor );
-		let opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
-
-		// COLOR
-
-		colorNode = builder.addFlow( 'fragment', label( colorNode, 'Color' ) );
-		const diffuseColorNode = builder.addFlow( 'fragment', label( colorNode, 'DiffuseColor' ) );
-
-		// OPACITY
-
-		opacityNode = builder.addFlow( 'fragment', label( opacityNode, 'OPACITY' ) );
-		builder.addFlow( 'fragment', assign( diffuseColorNode.a, mul( diffuseColorNode.a, opacityNode ) ) );
-
-		// ALPHA TEST
-
-		if ( this.alphaTestNode || this.alphaTest > 0 ) {
-
-			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
-
-			builder.addFlow( 'fragment', label( alphaTestNode, 'AlphaTest' ) );
-
-			// @TODO: remove ExpressionNode here and then possibly remove it completely
-			builder.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
-
-		}
-
-		return { colorNode, diffuseColorNode };
-
 	}
 
-	generateLight( builder, { diffuseColorNode, lightingModelNode, lightsNode = builder.lightsNode } ) {
+	generateLight( builder, { baseColorNode, lightingModelNode, lightsNode = builder.lightsNode } ) {
 
 		// < ANALYTIC LIGHTS >
 
 		// OUTGOING LIGHT
 
-		let outgoingLightNode = diffuseColorNode.xyz;
+		let outgoingLightNode = baseColorNode.xyz;
 		if ( lightsNode && lightsNode.hasLight !== false ) outgoingLightNode = builder.addFlow( 'fragment', label( lightingContext( lightsNode, lightingModelNode ), 'Light' ) );
 
 		return outgoingLightNode;
 
 	}
 
-	generateOutput( builder, { diffuseColorNode, outgoingLightNode } ) {
+	generateOutput( builder, { baseColorNode, outgoingLightNode } ) {
 
 		// OUTPUT
 
-		let outputNode = vec4( outgoingLightNode, diffuseColorNode.a );
+		let outputNode = vec4( outgoingLightNode, baseColorNode.a );
 
 		// ENCODING
 

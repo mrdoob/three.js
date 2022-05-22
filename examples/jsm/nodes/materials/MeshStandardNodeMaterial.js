@@ -50,10 +50,12 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	build( builder ) {
 
-		let { colorNode, diffuseColorNode } = this.generateMain( builder );
+		this.generateVertex( builder );
+
+		let { colorNode, baseColorNode } = this.generateBaseColor( builder );
 		const envNode = this.envNode || builder.scene.environmentNode;
 
-		diffuseColorNode = this.generateStandardMaterial( builder, { colorNode, diffuseColorNode } );
+		baseColorNode = this.generateStandardMaterial( builder, { colorNode, baseColorNode } );
 
 		if ( this.lightsNode ) builder.lightsNode = this.lightsNode;
 
@@ -77,13 +79,13 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		}
 
-		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightingModelNode: PhysicalLightingModel } );
+		const outgoingLightNode = this.generateLight( builder, { baseColorNode, lightingModelNode: PhysicalLightingModel } );
 
-		this.generateOutput( builder, { diffuseColorNode, outgoingLightNode } );
+		this.generateOutput( builder, { baseColorNode, outgoingLightNode } );
 
 	}
 
-	generateStandardMaterial( builder, { colorNode, diffuseColorNode } ) {
+	generateStandardMaterial( builder, { colorNode, baseColorNode } ) {
 
 		const { material } = builder;
 
@@ -92,7 +94,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 		let metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
 
 		metalnessNode = builder.addFlow( 'fragment', label( metalnessNode, 'Metalness' ) );
-		builder.addFlow( 'fragment', assign( diffuseColorNode, vec4( mul( diffuseColorNode.rgb, invert( metalnessNode ) ), diffuseColorNode.a ) ) );
+		builder.addFlow( 'fragment', assign( baseColorNode, vec4( mul( baseColorNode.rgb, invert( metalnessNode ) ), baseColorNode.a ) ) );
 
 		// ROUGHNESS
 
@@ -113,17 +115,17 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		builder.addFlow( 'fragment', label( normalNode, 'TransformedNormalView' ) );
 
-		return diffuseColorNode;
+		return baseColorNode;
 
 	}
 
-	generateLight( builder, { diffuseColorNode, lightingModelNode, lightsNode = builder.lightsNode } ) {
+	generateLight( builder, { baseColorNode, lightingModelNode, lightsNode = builder.lightsNode } ) {
 
 		const renderer = builder.renderer;
 
 		// OUTGOING LIGHT
 
-		let outgoingLightNode = super.generateLight( builder, { diffuseColorNode, lightingModelNode, lightsNode } );
+		let outgoingLightNode = super.generateLight( builder, { baseColorNode, lightingModelNode, lightsNode } );
 
 		// EMISSIVE
 
