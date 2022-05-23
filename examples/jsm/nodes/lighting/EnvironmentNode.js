@@ -15,12 +15,6 @@ const getSpecularMIPLevel = new ShaderNode( ( { texture, levelNode } ) => {
 
 } );
 
-const getMaxMIPLevel = new ShaderNode( ( { texture } ) => {
-
-	return new MaxMipLevelNode( texture );
-
-} );
-
 class EnvironmentLightNode extends LightingNode {
 
 	constructor( envNode = null ) {

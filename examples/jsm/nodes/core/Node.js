@@ -130,7 +130,7 @@ class Node {
 
 		const { outputNode } = builder.getNodeProperties( this );
 
-		if ( outputNode !== null ) {
+		if ( outputNode?.isNode === true ) {
 
 			const type = this.getNodeType( builder );
 
@@ -177,7 +177,7 @@ class Node {
 
 				nodeData.initied = true;
 
-				properties.outputNode =  this.construct( builder ) || null;
+				properties.outputNode =  this.construct( builder );
 
 				for ( const childNode of Object.values( properties ) ) {
 
