@@ -376,7 +376,7 @@ async function main() {
 
 		const list = failedScreenshots.join( ' ' );
 		console.red( 'List of failed screenshots: ' + list );
-		console.red( `If you sure that everything is right, try to run \`npm run make-screenshot ${ list }\`` );
+		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`` );
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endID - beginID } screenshots did not render correctly.` );
 
 	} else if ( ! isMakeScreenshot ) {
