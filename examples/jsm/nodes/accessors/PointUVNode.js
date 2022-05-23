@@ -6,6 +6,8 @@ class PointUVNode extends Node {
 
 		super( 'vec2' );
 
+		this.isPointUVNode = true;
+
 	}
 
 	generate( /*builder*/ ) {
@@ -15,7 +17,5 @@ class PointUVNode extends Node {
 	}
 
 }
-
-PointUVNode.prototype.isPointUVNode = true;
 
 export default PointUVNode;

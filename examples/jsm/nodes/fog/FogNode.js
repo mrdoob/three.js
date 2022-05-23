@@ -7,6 +7,8 @@ class FogNode extends Node {
 
 		super( 'float' );
 
+		this.isFogNode = true;
+
 		this.colorNode = colorNode;
 		this.factorNode = factorNode;
 
@@ -25,7 +27,5 @@ class FogNode extends Node {
 	}
 
 }
-
-FogNode.prototype.isFogNode = true;
 
 export default FogNode;

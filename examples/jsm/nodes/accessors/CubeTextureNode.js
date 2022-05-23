@@ -8,6 +8,8 @@ class CubeTextureNode extends TextureNode {
 
 		super( value, uvNode, levelNode );
 
+		this.isCubeTextureNode = true;
+
 	}
 
 	getInputType( /*builder*/ ) {
@@ -73,7 +75,5 @@ class CubeTextureNode extends TextureNode {
 	}
 
 }
-
-CubeTextureNode.prototype.isCubeTextureNode = true;
 
 export default CubeTextureNode;

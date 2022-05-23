@@ -18,13 +18,13 @@ class SVGObject extends Object3D {
 
 		super();
 
+		this.isSVGObject = true;
+
 		this.node = node;
 
 	}
 
 }
-
-SVGObject.prototype.isSVGObject = true;
 
 class SVGRenderer {
 

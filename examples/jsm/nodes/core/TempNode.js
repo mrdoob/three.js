@@ -6,6 +6,8 @@ class TempNode extends Node {
 
 		super( type );
 
+		this.isTempNode = true;
+
 	}
 
 	build( builder, output ) {
@@ -38,7 +40,5 @@ class TempNode extends Node {
 	}
 
 }
-
-TempNode.prototype.isTempNode = true;
 
 export default TempNode;

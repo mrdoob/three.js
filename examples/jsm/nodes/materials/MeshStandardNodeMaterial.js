@@ -21,6 +21,8 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		super();
 
+		this.isMeshStandardNodeMaterial = true;
+
 		this.colorNode = null;
 		this.opacityNode = null;
 
@@ -57,7 +59,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		if ( this.lightsNode ) builder.lightsNode = this.lightsNode;
 
-		let materialLightsNode = [];
+		const materialLightsNode = [];
 
 		if ( envNode ) {
 
@@ -165,5 +167,3 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-MeshStandardNodeMaterial.prototype.isMeshStandardNodeMaterial = true;

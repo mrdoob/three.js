@@ -6,6 +6,8 @@ class StorageBufferNode extends BufferNode {
 
 		super( value, bufferType, bufferCount );
 
+		this.isStorageBufferNode = true;
+
 	}
 
 	getInputType( /*builder*/ ) {
@@ -15,7 +17,5 @@ class StorageBufferNode extends BufferNode {
 	}
 
 }
-
-StorageBufferNode.prototype.isStorageBufferNode = true;
 
 export default StorageBufferNode;

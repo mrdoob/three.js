@@ -66,6 +66,8 @@ class WebGPURenderer {
 
 	constructor( parameters = {} ) {
 
+		this.isWebGPURenderer = true;
+
 		// public
 
 		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : this._createCanvasElement();
@@ -978,7 +980,5 @@ class WebGPURenderer {
 	}
 
 }
-
-WebGPURenderer.prototype.isWebGPURenderer = true;
 
 export default WebGPURenderer;

@@ -398,6 +398,8 @@ class Element extends Serializer {
 
 		super();
 
+		this.isElement = true;
+
 		const dom = document.createElement( 'f-element' );
 		dom.element = this;
 
@@ -1096,13 +1098,13 @@ class Element extends Serializer {
 
 }
 
-Element.prototype.isElement = true;
-
 class Input extends Serializer {
 
 	constructor( dom ) {
 
 		super();
+
+		this.isInput = true;
 
 		this.dom = dom;
 
@@ -1232,13 +1234,13 @@ class Input extends Serializer {
 
 }
 
-Input.prototype.isInput = true;
-
 class Node extends Serializer {
 
 	constructor() {
 
 		super();
+
+		this.isNode = true;
 
 		const dom = document.createElement( 'f-node' );
 
@@ -1511,8 +1513,6 @@ class Node extends Serializer {
 	}
 
 }
-
-Node.prototype.isNode = true;
 
 class DraggableElement extends Element {
 
