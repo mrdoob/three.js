@@ -54,7 +54,6 @@ const exceptionList = [
 	'webgpu_materials',
 	'webgpu_nodes_playground',
 	'webgpu_rtt',
-	'webgpu_sandbox',
 	'webgpu_skinning_instancing',
 	'webgpu_skinning_points',
 	'webgpu_skinning'
