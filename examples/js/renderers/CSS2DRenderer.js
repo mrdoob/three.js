@@ -5,6 +5,7 @@
 		constructor( element = document.createElement( 'div' ) ) {
 
 			super();
+			this.isCSS2DObject = true;
 			this.element = element;
 			this.element.style.position = 'absolute';
 			this.element.style.userSelect = 'none';
@@ -33,9 +34,8 @@
 
 		}
 
-	}
+	} //
 
-	CSS2DObject.prototype.isCSS2DObject = true; //
 
 	const _vector = new THREE.Vector3();
 

@@ -9,6 +9,7 @@
 		constructor() {
 
 			super();
+			this.isLineSegmentsGeometry = true;
 			this.type = 'LineSegmentsGeometry';
 			const positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
 			const uvs = [ - 1, 2, 1, 2, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 2, 1, - 2 ];
@@ -222,8 +223,6 @@
 		}
 
 	}
-
-	LineSegmentsGeometry.prototype.isLineSegmentsGeometry = true;
 
 	THREE.LineSegmentsGeometry = LineSegmentsGeometry;
 

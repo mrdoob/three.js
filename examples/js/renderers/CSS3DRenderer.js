@@ -15,6 +15,7 @@
 		constructor( element = document.createElement( 'div' ) ) {
 
 			super();
+			this.isCSS3DObject = true;
 			this.element = element;
 			this.element.style.position = 'absolute';
 			this.element.style.pointerEvents = 'auto';
@@ -46,13 +47,12 @@
 
 	}
 
-	CSS3DObject.prototype.isCSS3DObject = true;
-
 	class CSS3DSprite extends CSS3DObject {
 
 		constructor( element ) {
 
 			super( element );
+			this.isCSS3DSprite = true;
 			this.rotation2D = 0;
 
 		}
@@ -65,9 +65,8 @@
 
 		}
 
-	}
+	} //
 
-	CSS3DSprite.prototype.isCSS3DSprite = true; //
 
 	const _matrix = new THREE.Matrix4();
 

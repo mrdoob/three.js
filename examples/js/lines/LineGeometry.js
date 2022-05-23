@@ -5,6 +5,7 @@
 		constructor() {
 
 			super();
+			this.isLineGeometry = true;
 			this.type = 'LineGeometry';
 
 		}
@@ -74,8 +75,6 @@
 		}
 
 	}
-
-	LineGeometry.prototype.isLineGeometry = true;
 
 	THREE.LineGeometry = LineGeometry;
 
