@@ -18,13 +18,10 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // total failed pixels
 
-const networkTimeout = 600;
-const networkTax = 2000; // additional timeout for resources size
-const pageSizeMinTax = 1.0; // in mb, when networkTax = 0
-const pageSizeMaxTax = 5.0; // in mb, when networkTax = networkTax
-const renderTimeout = 1200;
-const maxAttemptId = 3; // progresseve attempts
-const progressFunc = n => 1 + n;
+const networkTimeout = 10000;
+const renderTimeout = 4000;
+
+const numAttempts = 3; // at least 3 attempts before failing
 
 const width = 400;
 const height = 250;
@@ -52,7 +49,7 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 	'webxr_ar_lighting', // webxr
 	
-	// TODO: fix those examples
+	// TODO: fix these examples
 	
 	'webgl_materials_standard_nodes', // puppeteer does not support import maps yet
 	'webgpu_compute', // webgpu
@@ -99,7 +96,16 @@ async function downloadLatestChromium() {
 	const revision = await ( await fetch( lastRevisionURL ) ).text();
 
 	const revisionInfo = browserFetcher.revisionInfo( revision );
-	return revisionInfo.local === true ? revisionInfo : await browserFetcher.download( revision );
+	if ( revisionInfo.local === true ) {
+
+		return revisionInfo;
+
+	} else {
+
+		console.log( 'Downloading latest Chromium...' );
+		return await browserFetcher.download( revision );
+
+	}
 
 }
 
@@ -156,23 +162,6 @@ async function main() {
 		}
 
 	} );
-	page.on( 'response', async ( response ) => {
-
-		try {
-
-			if ( response.status === 200 ) {
-
-				await response.buffer().then( buffer => pageSize += buffer.length );
-
-			}
-
-		} catch ( e ) {
-
-			console.null( `Warning. Wrong request. \n${ e }` );
-
-		}
-
-	} );
 
 	/* Find files */
 
@@ -190,45 +179,38 @@ async function main() {
 
 	/* Loop for each file, with CI parallelism */
 
-	let pageSize, file, attemptProgress;
 	const failedScreenshots = [];
 
-	let beginId = 0;
-	let endId = files.length;
+	let beginID = 0;
+	let endID = files.length;
 
 	if ( process.env.CI !== undefined ) {
 
 		const jobs = 8;
 
-		beginId = Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / jobs );
-		endId = Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / jobs );
+		beginID = Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / jobs );
+		endID = Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / jobs );
 
 	}
 
-	for ( let id = beginId; id < endId; ++ id ) {
+	for ( let fileID = beginID; fileID < endID; fileID ++ ) {
 
-		let attemptId = 0;
-
-		/* At least 3 attempts before fail */
-
-		while ( attemptId < maxAttemptId ) {
+		for ( let attemptID = 0; attemptID < numAttempts; attemptID ++ ) {
 
 			/* Load target page */
 
-			file = files[ id ];
-			attemptProgress = progressFunc( attemptId );
-			pageSize = 0;
+			const file = files[ fileID ];
 
 			try {
 
 				await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 					waitUntil: 'networkidle2',
-					timeout: networkTimeout * attemptProgress
+					timeout: networkTimeout
 				} );
 
 			} catch {
 
-				if ( ++ attemptId === maxAttemptId ) {
+				if ( attemptID === numAttempts - 1 ) {
 
 					console.red( `ERROR! Network timeout exceeded while loading file ${ file }` );
 					failedScreenshots.push( file );
@@ -249,12 +231,7 @@ async function main() {
 
 				await page.evaluate( cleanPage );
 
-				await page.evaluate( async ( pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress ) => {
-
-					/* Resource timeout */
-
-					const resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
-					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * attemptProgress ) );
+				await page.evaluate( async ( renderTimeout ) => {
 
 					/* Resolve render promise */
 
@@ -266,15 +243,15 @@ async function main() {
 
 						const waitingLoop = setInterval( function () {
 
-							const renderExceeded = ( performance._now() - renderStart > renderTimeout * attemptProgress );
+							const renderTimeoutExceeded = ( performance._now() - renderStart > renderTimeout );
 
-							if ( renderExceeded ) {
+							if ( renderTimeoutExceeded ) {
 
 								console.log( 'Warning. Render timeout exceeded...' );
 
 							}
 
-							if ( window._renderFinished || renderExceeded ) {
+							if ( window._renderFinished || renderTimeoutExceeded ) {
 
 								clearInterval( waitingLoop );
 								resolve();
@@ -285,11 +262,11 @@ async function main() {
 
 					} );
 
-				}, pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress );
+				}, renderTimeout );
 
-			} catch ( e ) {
+			} catch {
 
-				if ( ++ attemptId === maxAttemptId ) {
+				if ( attemptID === numAttempts - 1 ) {
 
 					console.red( `ERROR! Network timeout exceeded while loading file ${ file }` );
 					failedScreenshots.push( file );
@@ -349,12 +326,12 @@ async function main() {
 
 					if ( numFailedPixels < maxFailedPixels ) {
 
-						attemptId = maxAttemptId;
 						console.green( `diff: ${ numFailedPixels.toFixed( 3 ) }, file: ${ file }` );
+						break;
 
 					} else {
 
-						if ( ++ attemptId === maxAttemptId ) {
+						if ( attemptID === numAttempts - 1 ) {
 
 							console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
 							failedScreenshots.push( file );
@@ -385,21 +362,14 @@ async function main() {
 
 	if ( failedScreenshots.length ) {
 
-		if ( failedScreenshots.length > 1 ) {
-
-			console.red( 'List of failed screenshots: ' + failedScreenshots.join( ' ' ) );
-
-		} else {
-
-			console.red( `If you sure that everything is right, try to run \`npm run make-screenshot ${ failedScreenshots[ 0 ] }\`` );
-
-		}
-
-		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endId - beginId } screenshots not pass.` );
+		const list = failedScreenshots.join( ' ' );
+		console.red( 'List of failed screenshots: ' + list );
+		console.red( `If you sure that everything is right, try to run \`npm run make-screenshot ${ list }\`` );
+		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endID - beginID } screenshots did not render correctly.` );
 
 	} else if ( ! isMakeScreenshot ) {
 
-		console.green( `TEST PASSED! ${ endId - beginId } screenshots correctly rendered.` );
+		console.green( `TEST PASSED! ${ endID - beginID } screenshots rendered correctly.` );
 
 	}
 
