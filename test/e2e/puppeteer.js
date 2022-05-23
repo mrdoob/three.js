@@ -24,6 +24,8 @@ const jpgQuality = 95;
 
 const exceptionList = [
 
+	// TODO: retest these examples
+
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
@@ -31,7 +33,6 @@ const exceptionList = [
 	'webgl_loader_imagebitmap', // takes too long to load?
 	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
-	'webgl_materials_standard_nodes', // puppeteer does not support import maps yet
 	'webgl_morphtargets_face', // To investigate...
 	'webgl_postprocessing_crossfade', // fails for some misterious reason
 	'webgl_raymarching_reflect', // exception for Github Actions
@@ -40,53 +41,54 @@ const exceptionList = [
 	'webgl_video_kinect', // video tag not deterministic enough
 	'webgl_video_panorama_equirectangular', // video tag not deterministic enough?
 	'webgl_worker_offscreencanvas', // in a worker, not robust
-	// webxr
-	'webxr_ar_lighting',
-	// webgpu
-	'webgpu_compute',
-	'webgpu_cubemap_mix',
-	'webgpu_depth_texture',
-	'webgpu_instance_mesh',
-	'webgpu_instance_uniform',
-	'webgpu_lights_custom',
-	'webgpu_lights_selective',
-	'webgpu_loader_gltf',
-	'webgpu_materials',
-	'webgpu_nodes_playground',
-	'webgpu_rtt',
-	'webgpu_sandbox',
-	'webgpu_skinning_instancing',
-	'webgpu_skinning_points',
-	'webgpu_skinning'
-].concat( ( process.platform === 'win32' ) ? [
+	'webxr_ar_lighting', // webxr
+	
+	// TODO: fix those examples
+	
+	'webgl_materials_standard_nodes', // puppeteer does not support import maps yet
+	'webgpu_compute', // webgpu
+	'webgpu_cubemap_mix', // webgpu
+	'webgpu_depth_texture', // webgpu
+	'webgpu_instance_mesh', // webgpu
+	'webgpu_instance_uniform', // webgpu
+	'webgpu_lights_custom', // webgpu
+	'webgpu_lights_selective', // webgpu
+	'webgpu_loader_gltf', // webgpu
+	'webgpu_materials', // webgpu
+	'webgpu_nodes_playground', // webgpu
+	'webgpu_rtt', // webgpu
+	'webgpu_sandbox', // webgpu
+	'webgpu_skinning_instancing', // webgpu
+	'webgpu_skinning_points', // webgpu
+	'webgpu_skinning' // webgpu
 
-	'webgl_effects_ascii' // windows fonts not supported
-
-] : [] );
+];
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
 console.null = () => {};
 
-
 /* Launch server */
 
-const server = http.createServer( ( req, resp ) => handler( req, resp ) );
-server.listen( port, async () => await pup );
+const server = http.createServer( handler );
+server.listen( port, main );
 server.on( 'SIGINT', () => process.exit( 1 ) );
 
+async function main() {
 
-/* Launch browser */
+	/* Launch browser */
 
-const pup = puppeteer.launch( {
-	headless: ! process.env.VISIBLE,
-	args: [
-		'--use-gl=swiftshader',
-		'--no-sandbox',
-		'--enable-surface-synchronization'
-	]
-} ).then( async browser => {
+	const browser = await puppeteer.launch( {
+		headless: ! process.env.VISIBLE,
+		args: [
+			// TODO: test if these three flags are really needed
+			'--use-gl=swiftshader',
+			'--no-sandbox',
+			'--enable-surface-synchronization',
 
+			//'--enable-unsafe-webgpu'
+		]
+	} );
 
 	/* Prepare page */
 
@@ -98,10 +100,11 @@ const pup = puppeteer.launch( {
 	await page.evaluateOnNewDocument( injection );
 
 	const threeJsBuild = fs.readFileSync( 'build/three.module.js', 'utf8' )
-		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' ); // this is needed for properly generating UUIDs
+																					  // TODO: try to remove this
 	await page.setRequestInterception( true );
 
-	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
+	page.on( 'console', msg => ( msg.type() === 'warning' || msg.type() === 'error' ) ? console.null( msg.text() ) : null );
 	page.on( 'request', async ( request ) => {
 
 		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
@@ -136,11 +139,12 @@ const pup = puppeteer.launch( {
 
 	/* Find files */
 
-	const isMakeScreenshot = process.argv[ 2 ] == '--make';
-	const isExactList = process.argv.length > ( 2 + isMakeScreenshot );
+	const isMakeScreenshot = process.argv[ 2 ] === '--make';
 
 	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
 		.map( f => f.replace( '.html', '' ) );
+
+	const isExactList = exactList.length !== 0;
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
@@ -156,7 +160,7 @@ const pup = puppeteer.launch( {
 	let beginId = 0;
 	let endId = files.length;
 
-	if ( 'CI' in process.env ) {
+	if ( process.env.CI !== undefined ) {
 
 		const jobs = 8;
 
@@ -200,12 +204,10 @@ const pup = puppeteer.launch( {
 
 				await page.evaluate( async ( pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress ) => {
 
-
 					/* Resource timeout */
 
 					const resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
 					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * attemptProgress ) );
-
 
 					/* Resolve render promise */
 
@@ -213,20 +215,19 @@ const pup = puppeteer.launch( {
 
 					await new Promise( function ( resolve ) {
 
-						performance._now = performance._now || performance.now;
-
 						const renderStart = performance._now();
 
 						const waitingLoop = setInterval( function () {
 
-							const renderEcceded = ( performance._now() - renderStart > renderTimeout * attemptProgress );
-							if ( window._renderFinished || renderEcceded ) {
+							const renderExceeded = ( performance._now() - renderStart > renderTimeout * attemptProgress );
 
-								if ( renderEcceded ) {
+							if ( renderExceeded ) {
 
-									console.log( 'Warning. Render timeout exceeded...' );
+								console.log( 'Warning. Render timeout exceeded...' );
 
-								}
+							}
+
+							if ( window._renderFinished || renderExceeded ) {
 
 								clearInterval( waitingLoop );
 								resolve();
@@ -259,7 +260,6 @@ const pup = puppeteer.launch( {
 
 			if ( isMakeScreenshot ) {
 
-
 				/* Make screenshots */
 
 				attemptId = maxAttemptId;
@@ -272,18 +272,16 @@ const pup = puppeteer.launch( {
 
 			} else if ( fs.existsSync( `./examples/screenshots/${ file }.jpg` ) ) {
 
-
 				/* Diff screenshots */
 
 				const actual = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality ).bitmap;
 				const expected = ( await jimp.read( fs.readFileSync( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
-				const diff = actual;
 
 				let numFailedPixels;
 
 				try {
 
-					numFailedPixels = pixelmatch( expected.data, actual.data, diff.data, actual.width, actual.height, {
+					numFailedPixels = pixelmatch( expected.data, actual.data, null, actual.width, actual.height, {
 						threshold: pixelThreshold,
 						alpha: 0.2,
 						diffMask: process.env.FORCE_COLOR === '0',
@@ -367,4 +365,4 @@ const pup = puppeteer.launch( {
 
 	}, 300 );
 
-} );
+}
