@@ -65,26 +65,28 @@ class ColorSpaceNode extends TempNode {
 
 	}
 
-	generate( builder ) {
-
-		const type = this.getNodeType( builder );
+	construct() {
 
 		const method = this.method;
 		const node = this.node;
+
+		let outputNode = null;
 
 		if ( method !== ColorSpaceNode.LINEAR_TO_LINEAR ) {
 
 			const encodingFunctionNode = EncodingLib[ method ];
 
-			return encodingFunctionNode.call( {
+			outputNode = encodingFunctionNode.call( {
 				value: node
-			} ).build( builder, type );
+			} );
 
 		} else {
 
-			return node.build( builder, type );
+			outputNode = node;
 
 		}
+
+		return outputNode;
 
 	}
 
