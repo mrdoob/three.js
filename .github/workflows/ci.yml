@@ -43,9 +43,7 @@ jobs:
           node-version: 16
           cache: 'npm'
       - name: Install packages
-        run: |
-          npm ci
-          npm ci --prefix test
+        run: npm ci
       - name: Build
         run: npm run build
 
@@ -72,7 +70,6 @@ jobs:
       - name: Install packages
         run: |
           npm ci
-          npm ci --prefix test
           sudo apt-get install xvfb
       - name: Build
         run: npm run build
