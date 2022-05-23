@@ -209,18 +209,33 @@
 
 			const position = [];
 			const normal = [];
-			const color = []; // ascii
+			const color = [];
+
+			// ascii
 
 			if ( PCDheader.data === 'ascii' ) {
 
 				const offset = PCDheader.offset;
-				const pcdData = textData.slice( PCDheader.headerLen );
-				const lines = pcdData.split( '\n' );
+				const pointData = data.slice( PCDheader.headerLen );
+				const uint8Data = new Uint8Array( pointData );
+				let previous_idx = 0;
+				let lineStr = '';
+				for ( let i = 0, l = uint8Data.length; i < l; i ++ ) {
 
-				for ( let i = 0, l = lines.length; i < l; i ++ ) {
+					if ( uint8Data[ i ] === '\n'.charCodeAt( 0 ) ) {
 
-					if ( lines[ i ] === '' ) continue;
-					const line = lines[ i ].split( ' ' );
+						lineStr = LoaderUtils.decodeText( uint8Data.slice( previous_idx, i ) );
+						previous_idx = i;
+
+					} else {
+
+						continue;
+
+					}
+
+					if ( lineStr === '' ) continue;
+
+					const line = lineStr.split( ' ' );
 
 					if ( offset.x !== undefined ) {
 
