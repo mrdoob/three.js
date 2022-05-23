@@ -43,7 +43,12 @@
 
 		}
 
-		parse( data, url ) {
+		/**
+		 * Parse Point Cloud Data (PCD) from an ArrayBuffer
+		 * @param data {ArrayBuffer}
+		 * @returns {*}
+		 */
+		parse( data ) {
 
 			// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
 			function decompressLZF( inData, outLength ) {
@@ -104,6 +109,11 @@
 
 			}
 
+			/**
+			 * Parse the ASCII header of a PCD File.
+			 * @param data {string}
+			 * @returns {{}}
+			 */
 			function parseHeader( data ) {
 
 				const PCDheader = {};
@@ -188,7 +198,12 @@
 
 			}
 
-			const textData = THREE.LoaderUtils.decodeText( new Uint8Array( data ) ); // parse header (always ascii format)
+			// Grab at most 8000 bytes of the PCD file to ensure we aren't trying to create a string that's too
+			// big for the javascript heap. 8000 is an arbitrary number that seems like it should be bigger than
+			// any PCD header.
+
+			const slice = data.slice( 0, Math.min( 8000, data.byteLength ) );
+			const textData = THREE.LoaderUtils.decodeText( new Uint8Array( slice ) ); // parse header (always ascii format)
 
 			const PCDheader = parseHeader( textData ); // parse data
 
@@ -352,12 +367,7 @@
 			} // build point cloud
 
 
-			const mesh = new THREE.Points( geometry, material );
-			let name = url.split( '' ).reverse().join( '' );
-			name = /([^\/]*)/.exec( name );
-			name = name[ 1 ].split( '' ).reverse().join( '' );
-			mesh.name = name;
-			return mesh;
+			return new THREE.Points( geometry, material );
 
 		}
 

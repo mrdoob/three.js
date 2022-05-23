@@ -53,6 +53,11 @@ class PCDLoader extends Loader {
 
 	}
 
+	/**
+	 * Parse Point Cloud Data (PCD) from an ArrayBuffer
+	 * @param data {ArrayBuffer}
+	 * @returns {*}
+	 */
 	parse( data ) {
 
 		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
@@ -110,6 +115,11 @@ class PCDLoader extends Loader {
 
 		}
 
+		/**
+		 * Parse the ASCII header of a PCD File.
+		 * @param data {string}
+		 * @returns {{}}
+		 */
 		function parseHeader( data ) {
 
 			const PCDheader = {};
@@ -218,7 +228,12 @@ class PCDLoader extends Loader {
 
 		}
 
-		const textData = LoaderUtils.decodeText( new Uint8Array( data ) );
+		// Grab at most 8000 bytes of the PCD file to ensure we aren't trying to create a string that's too
+		// big for the javascript heap. 8000 is an arbitrary number that seems like it should be bigger than
+		// any PCD header.
+
+		const slice = data.slice( 0, Math.min( 8000, data.byteLength ) );
+		const textData = LoaderUtils.decodeText( new Uint8Array( slice ) );
 
 		// parse header (always ascii format)
 
