@@ -1,7 +1,6 @@
 import LightingNode from './LightingNode.js';
 import ContextNode from '../core/ContextNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
-//import ReflectNode from '../accessors/ReflectNode.js';
 import { ShaderNode, float, add, mul, div, log2, clamp, roughness, reflect, mix, vec3, positionViewDirection, negate, normalize, transformedNormalView, transformedNormalWorld, transformDirection, cameraViewMatrix } from '../shadernode/ShaderNodeElements.js';
 
 // taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
@@ -15,13 +14,13 @@ const getSpecularMIPLevel = new ShaderNode( ( { texture, levelNode } ) => {
 	return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
 
 } );
-/*
+
 const getMaxMIPLevel = new ShaderNode( ( { texture } ) => {
 
 	return new MaxMipLevelNode( texture );
 
 } );
-*/
+
 class EnvironmentLightNode extends LightingNode {
 
 	constructor( envNode = null ) {
@@ -32,7 +31,7 @@ class EnvironmentLightNode extends LightingNode {
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
 		const envNode = this.envNode;
 
@@ -42,8 +41,6 @@ class EnvironmentLightNode extends LightingNode {
 		reflectVec = normalize( mix( reflectVec, transformedNormalView, mul( roughness, roughness ) ) );
 		reflectVec = transformDirection( reflectVec, cameraViewMatrix );
 		reflectVec = vec3( negate( reflectVec.x ), reflectVec.yz );
-
-		//reflectVec = normalize( mix( new ReflectNode(), flipNormalWorld, mul( roughness, roughness ) ) );
 
 		const radianceContext = new ContextNode( envNode, {
 			tempRead: false,
@@ -58,6 +55,10 @@ class EnvironmentLightNode extends LightingNode {
 			levelNode: float( 1 ),
 			levelShaderNode: getSpecularMIPLevel
 		} );
+
+		// it's used to cache the construct only if necessary: See `CubeTextureNode.getConstructReference()`
+		radianceContext.context.environmentContext = radianceContext;
+		irradianceContext.context.environmentContext = irradianceContext;
 
 		builder.context.radiance.add( radianceContext );
 
