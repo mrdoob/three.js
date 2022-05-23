@@ -1,9 +1,18 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import handler from 'serve-handler';
 import http from 'http';
 import pixelmatch from 'pixelmatch';
 import jimp from 'jimp';
-import fs from 'fs';
+import * as fs from 'fs/promises';
+import fetch from 'node-fetch';
+
+const LAST_REVISION_URLS = {
+    linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
+    mac: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/LAST_CHANGE',
+    mac_arm: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac_Arm/LAST_CHANGE',
+    win32: 'https://storage.googleapis.com/chromium-browser-snapshots/Win/LAST_CHANGE',
+    win64: 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/LAST_CHANGE'
+};
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
@@ -68,17 +77,42 @@ console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
 console.null = () => {};
 
+let browser;
+
 /* Launch server */
 
 const server = http.createServer( handler );
 server.listen( port, main );
-server.on( 'SIGINT', () => process.exit( 1 ) );
+server.on( 'SIGINT', () => {
+
+	server.close();
+	if ( browser !== undefined ) browser.close();
+	process.exit( 1 );
+
+} );
+
+async function downloadLatestChromium() {
+
+	const browserFetcher = puppeteer.createBrowserFetcher();
+
+	const lastRevisionURL = LAST_REVISION_URLS[ browserFetcher.platform() ];
+	const revision = await ( await fetch( lastRevisionURL ) ).text();
+
+	const revisionInfo = browserFetcher.revisionInfo( revision );
+	return revisionInfo.local === true ? revisionInfo : await browserFetcher.download( revision );
+
+}
 
 async function main() {
 
+	/* Download browser */
+
+	const { executablePath } = await downloadLatestChromium();
+
 	/* Launch browser */
 
-	const browser = await puppeteer.launch( {
+	browser = await puppeteer.launch( {
+		executablePath,
 		headless: ! process.env.VISIBLE,
 		args: [
 			// TODO: test if these three flags are really needed
@@ -95,13 +129,12 @@ async function main() {
 	const page = ( await browser.pages() )[ 0 ];
 	await page.setViewport( { width: width * viewScale, height: height * viewScale } );
 
-	const cleanPage = fs.readFileSync( 'test/e2e/clean-page.js', 'utf8' );
-	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
+	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
+	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
-	const threeJsBuild = fs.readFileSync( 'build/three.module.js', 'utf8' )
-		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' ); // this is needed for properly generating UUIDs
-																					  // TODO: try to remove this
+	const threeJsBuild = ( await fs.readFile( 'build/three.module.js', 'utf8' ) )
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' ); // TODO: remove this (will require regenerating screenshots)
 	await page.setRequestInterception( true );
 
 	page.on( 'console', msg => ( msg.type() === 'warning' || msg.type() === 'error' ) ? console.null( msg.text() ) : null );
@@ -146,7 +179,7 @@ async function main() {
 
 	const isExactList = exactList.length !== 0;
 
-	const files = fs.readdirSync( './examples' )
+	const files = ( await fs.readdir( './examples' ) )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
 		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
@@ -269,64 +302,67 @@ async function main() {
 
 				console.green( `file: ${ file } generated` );
 
-
-			} else if ( fs.existsSync( `./examples/screenshots/${ file }.jpg` ) ) {
-
-				/* Diff screenshots */
-
-				const actual = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality ).bitmap;
-				const expected = ( await jimp.read( fs.readFileSync( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
-
-				let numFailedPixels;
+			} else {
 
 				try {
 
-					numFailedPixels = pixelmatch( expected.data, actual.data, null, actual.width, actual.height, {
-						threshold: pixelThreshold,
-						alpha: 0.2,
-						diffMask: process.env.FORCE_COLOR === '0',
-						diffColor: process.env.FORCE_COLOR === '0' ? [ 255, 255, 255 ] : [ 255, 0, 0 ]
-					} );
+					/* Diff screenshots */
+
+					const expected = ( await jimp.read( await fs.readFile( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
+					const actual = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality ).bitmap;
+
+					let numFailedPixels;
+
+					try {
+
+						numFailedPixels = pixelmatch( expected.data, actual.data, null, actual.width, actual.height, {
+							threshold: pixelThreshold,
+							alpha: 0.2,
+							diffMask: process.env.FORCE_COLOR === '0',
+							diffColor: process.env.FORCE_COLOR === '0' ? [ 255, 255, 255 ] : [ 255, 0, 0 ]
+						} );
+
+					} catch {
+
+						attemptId = maxAttemptId;
+						console.red( `Something completely wrong. Image sizes does not match in file: ${ file }` );
+						failedScreenshots.push( file );
+						continue;
+
+					}
+
+					numFailedPixels /= actual.width * actual.height;
+
+					/* Print results */
+
+					if ( numFailedPixels < maxFailedPixels ) {
+
+						attemptId = maxAttemptId;
+						console.green( `diff: ${ numFailedPixels.toFixed( 3 ) }, file: ${ file }` );
+
+					} else {
+
+						if ( ++ attemptId === maxAttemptId ) {
+
+							console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
+							failedScreenshots.push( file );
+							continue;
+
+						} else {
+
+							console.log( 'Another attempt...' );
+
+						}
+
+					}
 
 				} catch {
 
 					attemptId = maxAttemptId;
-					console.red( `Something completely wrong. Image sizes does not match in file: ${ file }` );
-					failedScreenshots.push( file );
+					console.log( `Warning! Screenshot not exists: ${ file }` );
 					continue;
 
 				}
-
-				numFailedPixels /= actual.width * actual.height;
-
-				/* Print results */
-
-				if ( numFailedPixels < maxFailedPixels ) {
-
-					attemptId = maxAttemptId;
-					console.green( `diff: ${ numFailedPixels.toFixed( 3 ) }, file: ${ file }` );
-
-				} else {
-
-					if ( ++ attemptId === maxAttemptId ) {
-
-						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
-						failedScreenshots.push( file );
-						continue;
-
-					} else {
-
-						console.log( 'Another attempt...' );
-
-					}
-
-				}
-
-			} else {
-
-				attemptId = maxAttemptId;
-				console.log( `Warning! Screenshot not exists: ${ file }` );
-				continue;
 
 			}
 
