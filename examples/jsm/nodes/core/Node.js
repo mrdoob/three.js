@@ -99,6 +99,9 @@ class Node {
 
 		}
 
+		// return a outputNode if exists
+		return null;
+
 	}
 
 	analyze( builder ) {
