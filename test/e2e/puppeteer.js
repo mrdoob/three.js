@@ -75,7 +75,7 @@ const exceptionList = [
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
-console.null = () => {};
+console.null = console.log; // () => {};
 
 let browser;
 
@@ -130,6 +130,7 @@ async function main() {
 	await page.setViewport( { width: width * viewScale, height: height * viewScale } );
 
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
+
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
@@ -139,7 +140,7 @@ async function main() {
 
 	page.on( 'console', msg => ( msg.type() === 'warning' || msg.type() === 'error' ) ? console.null( msg.text() ) : null );
 	page.on( 'request', async ( request ) => {
-
+		
 		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
 
 			await request.respond( {
@@ -159,7 +160,11 @@ async function main() {
 
 		try {
 
-			await response.buffer().then( buffer => pageSize += buffer.length );
+			if ( response.status === 200 ) {
+
+				await response.buffer().then( buffer => pageSize += buffer.length );
+
+			}
 
 		} catch ( e ) {
 
@@ -168,7 +173,6 @@ async function main() {
 		}
 
 	} );
-
 
 	/* Find files */
 
@@ -183,7 +187,6 @@ async function main() {
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
 		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
-
 
 	/* Loop for each file, with CI parallelism */
 
@@ -204,9 +207,9 @@ async function main() {
 
 	for ( let id = beginId; id < endId; ++ id ) {
 
-		/* At least 3 attempts before fail */
+		let attemptId = 0;
 
-		let attemptId = isMakeScreenshot ? 1.5 : 0;
+		/* At least 3 attempts before fail */
 
 		while ( attemptId < maxAttemptId ) {
 
@@ -225,7 +228,18 @@ async function main() {
 
 			} catch {
 
-				console.null( 'Warning. Network timeout exceeded...' );
+				if ( ++ attemptId === maxAttemptId ) {
+
+					console.red( `ERROR! Network timeout exceeded while loading file ${ file }` );
+					failedScreenshots.push( file );
+					break;
+
+				} else {
+
+					console.log( 'Another attempt...' );
+					continue;
+
+				}
 
 			}
 
@@ -277,30 +291,29 @@ async function main() {
 
 				if ( ++ attemptId === maxAttemptId ) {
 
-					console.red( `Something completely wrong. 'Network timeout' is small for your machine. file: ${ file } \n${ e }` );
+					console.red( `ERROR! Network timeout exceeded while loading file ${ file }` );
 					failedScreenshots.push( file );
-					continue;
+					break;
 
 				} else {
 
-					console.log( 'Another attempt..' );
-					await new Promise( resolve => setTimeout( resolve, networkTimeout * attemptProgress ) );
+					console.log( 'Another attempt...' );
+					continue;
 
 				}
 
 			}
 
-
 			if ( isMakeScreenshot ) {
 
 				/* Make screenshots */
 
-				attemptId = maxAttemptId;
 				( await jimp.read( await page.screenshot() ) )
 					.scale( 1 / viewScale ).quality( jpgQuality )
 					.write( `./examples/screenshots/${ file }.jpg` );
 
-				console.green( `file: ${ file } generated` );
+				console.green( `Screenshot generated for file ${ file }` );
+				break;
 
 			} else {
 
@@ -324,10 +337,9 @@ async function main() {
 
 					} catch {
 
-						attemptId = maxAttemptId;
-						console.red( `Something completely wrong. Image sizes does not match in file: ${ file }` );
+						console.red( `ERROR! Image sizes does not match in file: ${ file }` );
 						failedScreenshots.push( file );
-						continue;
+						break;
 
 					}
 
@@ -346,7 +358,7 @@ async function main() {
 
 							console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
 							failedScreenshots.push( file );
-							continue;
+							break;
 
 						} else {
 
@@ -358,9 +370,8 @@ async function main() {
 
 				} catch {
 
-					attemptId = maxAttemptId;
-					console.log( `Warning! Screenshot not exists: ${ file }` );
-					continue;
+					console.log( `Warning! Screenshot does not exist: ${ file }` );
+					break;
 
 				}
 
@@ -369,7 +380,6 @@ async function main() {
 		}
 
 	}
-
 
 	/* Finish */
 
@@ -381,7 +391,7 @@ async function main() {
 
 		} else {
 
-			console.red( `If you sure that all is right, try to run \`npm run make-screenshot ${ failedScreenshots[ 0 ] }\`` );
+			console.red( `If you sure that everything is right, try to run \`npm run make-screenshot ${ failedScreenshots[ 0 ] }\`` );
 
 		}
 
