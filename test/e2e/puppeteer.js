@@ -149,7 +149,7 @@ async function main() {
 
 		}
 
-		const text = msg.text():
+		const text = msg.text();
 
 		if ( text.includes( 'GPU stall due to ReadPixels' ) ) {
 
