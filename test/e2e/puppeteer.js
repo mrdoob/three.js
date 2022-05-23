@@ -18,10 +18,10 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // total failed pixels
 
-const networkTimeout = 10000;
-const renderTimeout = 4000;
+const networkTimeout = 10000; // set to 0 to disable
+const renderTimeout = 4000; // set to 0 to disable
 
-const numAttempts = 3; // at least 3 attempts before failing
+const numAttempts = 2; // perform 2 attempts before failing
 
 const width = 400;
 const height = 250;
@@ -49,30 +49,27 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 	'webxr_ar_lighting', // webxr
 	
-	// TODO: fix these examples
-	
-	'webgl_materials_standard_nodes', // puppeteer does not support import maps yet
-	'webgpu_compute', // webgpu
-	'webgpu_cubemap_mix', // webgpu
-	'webgpu_depth_texture', // webgpu
-	'webgpu_instance_mesh', // webgpu
-	'webgpu_instance_uniform', // webgpu
-	'webgpu_lights_custom', // webgpu
-	'webgpu_lights_selective', // webgpu
-	'webgpu_loader_gltf', // webgpu
-	'webgpu_materials', // webgpu
-	'webgpu_nodes_playground', // webgpu
-	'webgpu_rtt', // webgpu
-	'webgpu_sandbox', // webgpu
-	'webgpu_skinning_instancing', // webgpu
-	'webgpu_skinning_points', // webgpu
-	'webgpu_skinning' // webgpu
+	// webgpu - fails with "No available adapters" error
+	'webgpu_compute',
+	'webgpu_cubemap_mix',
+	'webgpu_depth_texture',
+	'webgpu_instance_mesh',
+	'webgpu_instance_uniform',
+	'webgpu_lights_custom',
+	'webgpu_lights_selective',
+	'webgpu_loader_gltf',
+	'webgpu_materials',
+	'webgpu_nodes_playground',
+	'webgpu_rtt',
+	'webgpu_sandbox',
+	'webgpu_skinning_instancing',
+	'webgpu_skinning_points',
+	'webgpu_skinning'
 
 ];
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
-console.null = console.log; // () => {};
 
 let browser;
 
@@ -124,9 +121,7 @@ async function main() {
 			// TODO: test if these three flags are really needed
 			'--use-gl=swiftshader',
 			'--no-sandbox',
-			'--enable-surface-synchronization',
-
-			//'--enable-unsafe-webgpu'
+			'--enable-surface-synchronization'
 		]
 	} );
 
@@ -144,7 +139,24 @@ async function main() {
 		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' ); // TODO: remove this (will require regenerating screenshots)
 	await page.setRequestInterception( true );
 
-	page.on( 'console', msg => ( msg.type() === 'warning' || msg.type() === 'error' ) ? console.null( msg.text() ) : null );
+	page.on( 'console', msg => {
+
+		if ( msg.type() !== 'warning' && msg.type() !== 'error' ) {
+
+			return;
+
+		}
+
+		if ( msg.text().includes( 'GPU stall due to ReadPixels' ) ) {
+
+			return;
+
+		}
+
+		console.log( msg.text() );
+
+	} );
+
 	page.on( 'request', async ( request ) => {
 		
 		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
@@ -243,7 +255,7 @@ async function main() {
 
 						const waitingLoop = setInterval( function () {
 
-							const renderTimeoutExceeded = ( performance._now() - renderStart > renderTimeout );
+							const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > renderTimeout );
 
 							if ( renderTimeoutExceeded ) {
 
