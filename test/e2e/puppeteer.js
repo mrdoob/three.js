@@ -48,8 +48,11 @@ const exceptionList = [
 	'webgl_video_panorama_equirectangular', // video tag not deterministic enough?
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 	'webxr_ar_lighting', // webxr
-	
-	// webgpu - fails with "No available adapters" error
+
+	// TODO: here are already retested examples 
+	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format."
+
+	// webgpu - "No available adapters."
 	'webgpu_compute',
 	'webgpu_cubemap_mix',
 	'webgpu_depth_texture',
@@ -64,7 +67,7 @@ const exceptionList = [
 	'webgpu_sandbox',
 	'webgpu_skinning_instancing',
 	'webgpu_skinning_points',
-	'webgpu_skinning'
+	'webgpu_skinning',
 
 ];
 
