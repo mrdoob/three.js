@@ -206,6 +206,14 @@ class ShapePath {
 		// only Holes? -> probably all Shapes with wrong orientation
 		if ( ! newShapes[ 0 ] )	return	toShapesNoHoles( subPaths );
 
+		if ( newShapeHoles.length > newShapes.length ) {
+
+			const restShapeHoles = newShapeHoles.pop();
+
+			Array.prototype.push.apply( newShapeHoles[ newShapeHoles.length - 1 ], restShapeHoles );
+
+		}
+
 
 		if ( newShapes.length > 1 ) {
 
