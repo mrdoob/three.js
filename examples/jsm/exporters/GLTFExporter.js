@@ -606,7 +606,7 @@ class GLTFWriter {
 	 * @param  {Object} object
 	 * @return {Integer}
 	 */
-	getUID( attribute, morphTargets = null ) {
+	getUID( attribute, isRelativeCopy = false ) {
 
 		if ( this.uids.has( attribute ) === false ) {
 
@@ -620,9 +620,8 @@ class GLTFWriter {
 		}
 
 		const uids = this.uids.get( attribute );
-		const hasMorphTargets = Array.isArray( morphTargets ) && morphTargets.length > 0;
 
-		return uids.get( hasMorphTargets );
+		return uids.get( isRelativeCopy );
 
 	}
 
@@ -1527,9 +1526,9 @@ class GLTFWriter {
 
 			if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
 
-			if ( cache.attributes.has( this.getUID( attribute, morphAttributes[ attributeName ] ) ) ) {
+			if ( cache.attributes.has( this.getUID( attribute ) ) ) {
 
-				attributes[ attributeName ] = cache.attributes.get( this.getUID( attribute, morphAttributes[ attributeName ] ) );
+				attributes[ attributeName ] = cache.attributes.get( this.getUID( attribute ) );
 				continue;
 
 			}
@@ -1552,7 +1551,7 @@ class GLTFWriter {
 			if ( accessor !== null ) {
 
 				attributes[ attributeName ] = accessor;
-				cache.attributes.set( this.getUID( attribute, morphAttributes[ attributeName ] ), accessor );
+				cache.attributes.set( this.getUID( attribute ), accessor );
 
 			}
 
@@ -1613,9 +1612,9 @@ class GLTFWriter {
 
 					const baseAttribute = geometry.attributes[ attributeName ];
 
-					if ( cache.attributes.has( this.getUID( attribute, morphAttributes[ attributeName ] ) ) ) {
+					if ( cache.attributes.has( this.getUID( attribute, true ) ) ) {
 
-						target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute, morphAttributes[ attributeName ] ) );
+						target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute, true ) );
 						continue;
 
 					}
