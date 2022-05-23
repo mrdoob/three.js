@@ -44,13 +44,18 @@ const exceptionList = [
 	'webxr_ar_lighting',
 	// webgpu
 	'webgpu_compute',
+	'webgpu_cubemap_mix',
+	'webgpu_depth_texture',
+	'webgpu_instance_mesh',
 	'webgpu_instance_uniform',
 	'webgpu_lights_custom',
 	'webgpu_lights_selective',
+	'webgpu_loader_gltf',
 	'webgpu_materials',
 	'webgpu_nodes_playground',
 	'webgpu_rtt',
 	'webgpu_sandbox',
+	'webgpu_skinning_instancing',
 	'webgpu_skinning_points',
 	'webgpu_skinning'
 ].concat( ( process.platform === 'win32' ) ? [
