@@ -1450,7 +1450,6 @@ class GLTFWriter {
 		if ( cache.meshes.has( meshCacheKey ) ) return cache.meshes.get( meshCacheKey );
 
 		const geometry = mesh.geometry;
-		const morphAttributes = geometry.morphAttributes;
 
 		let mode;
 
@@ -1638,7 +1637,7 @@ class GLTFWriter {
 					}
 
 					target[ gltfAttributeName ] = this.processAccessor( relativeAttribute, geometry );
-					cache.attributes.set( this.getUID( baseAttribute, morphAttributes[ attributeName ] ), target[ gltfAttributeName ] );
+					cache.attributes.set( this.getUID( baseAttribute, true ), target[ gltfAttributeName ] );
 
 				}
 
