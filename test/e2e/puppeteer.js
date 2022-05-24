@@ -219,7 +219,7 @@ async function main() {
 			try {
 
 				await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
-					waitUntil: 'networkidle0',
+					waitUntil: 'networkidle2',
 					timeout: networkTimeout * 1000
 				} );
 
