@@ -32,6 +32,7 @@ const jpgQuality = 95;
 
 const exceptionList = [
 
+	'webgl_buffergeometry_glbufferattribute', // investigate
 	'webgl_effects_ascii', // renders differently on different platforms, investigate
 	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format." investigate
 	'webgl_morphtargets_face', // does not work on GitHub? investigate
@@ -417,7 +418,7 @@ async function main() {
 
 		const list = failedScreenshots.join( ' ' );
 		console.red( 'List of failed screenshots: ' + list );
-		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`` );
+		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`. If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endID - beginID } screenshots have not rendered correctly.` );
 
 	} else {
