@@ -32,7 +32,6 @@ const exceptionList = [
 
 	// TODO: retest these examples
 
-	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 	'webgl_effects_ascii', // blink renders text differently in every platform
@@ -49,10 +48,10 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 	'webxr_ar_lighting', // webxr
 
-	// TODO: here are already retested examples 
+	// TODO: here are already retested examples
 	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format."
 
-	// webgpu - "No available adapters."
+	// webgpu - "No available adapters. JSHandle@error"
 	'webgpu_compute',
 	'webgpu_cubemap_mix',
 	'webgpu_depth_texture',
@@ -199,7 +198,7 @@ async function main() {
 	const isExactList = exactList.length !== 0;
 
 	const files = ( await fs.readdir( './examples' ) )
-		.filter( s => s.slice( - 5 ) === '.html' )
+		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
 		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
