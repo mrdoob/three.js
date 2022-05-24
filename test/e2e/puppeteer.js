@@ -18,7 +18,7 @@ const port = 1234;
 const pixelThreshold = 0.1 /* TODO: decrease to 0.005 */; // threshold error in one pixel
 const maxFailedPixels = 0.05; // total failed pixels
 
-const networkTimeout = 300; // 5 minutes - set to 0 to disable
+const networkTimeout = 120; // 2 minutes - set to 0 to disable
 const renderTimeout = 4; // 4 seconds - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
@@ -33,6 +33,7 @@ const exceptionList = [
 	'webgl_effects_ascii', // renders differently on different platforms, investigate
 	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format." investigate
 	'webgl_morphtargets_face', // does not work on GitHub? investigate
+	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
 
