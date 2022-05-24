@@ -82,7 +82,7 @@ async function downloadLatestChromium() {
 	const revisionInfo = browserFetcher.revisionInfo( revision );
 	if ( revisionInfo.local === true ) {
 
-		console.log( 'Latest Chromium is already downloaded.' );
+		console.log( 'Latest Chromium has been already downloaded.' );
 		return revisionInfo;
 
 	} else {
@@ -219,7 +219,7 @@ async function main() {
 			try {
 
 				await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
-					waitUntil: 'networkidle2',
+					waitUntil: 'load',
 					timeout: networkTimeout * 1000
 				} );
 
