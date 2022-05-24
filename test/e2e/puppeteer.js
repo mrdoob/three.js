@@ -15,7 +15,7 @@ const LAST_REVISION_URLS = {
 };
 
 const port = 1234;
-const pixelThreshold = 0.1; // threshold error in one pixel
+const pixelThreshold = 0.1 /* TODO: decrease to 0.005 */; // threshold error in one pixel
 const maxFailedPixels = 0.05; // total failed pixels
 
 const networkTimeout = 180; // 3 minutes - set to 0 to disable
@@ -25,7 +25,7 @@ const numAttempts = 2; // perform 2 attempts before failing
 
 const width = 400;
 const height = 250;
-const viewScale = 2;
+const viewScale = 2; // TODO: possibly increase?
 const jpgQuality = 95;
 
 const exceptionList = [
@@ -369,14 +369,22 @@ async function main() {
 
 	/* Finish */
 
-	if ( failedScreenshots.length ) {
+	if ( isMakeScreenshot && failedScreenshots.length ) {
+
+		console.red( `${ failedScreenshots.length } from ${ exactList.length } screenshots did not generated succesfully.` );
+
+	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
+
+		console.green( `${ exactList.length } screenshots succesfully generated.` );
+
+	} else if ( failedScreenshots.length ) {
 
 		const list = failedScreenshots.join( ' ' );
 		console.red( 'List of failed screenshots: ' + list );
 		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`` );
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endID - beginID } screenshots did not render correctly.` );
 
-	} else if ( ! isMakeScreenshot ) {
+	} else {
 
 		console.green( `TEST PASSED! ${ endID - beginID } screenshots rendered correctly.` );
 
