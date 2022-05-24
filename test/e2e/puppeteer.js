@@ -20,7 +20,7 @@ const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixe
 
 const networkTimeout = 180; // 2 minutes - set to 0 to disable
 const idleTime = 3; // 3 seconds - for how long there should be no network requests
-const parseTime = 1.5; // 1.5 seconds per megabyte
+const parseTime = 2; // 2 seconds per megabyte
 const renderTimeout = 4; // 4 seconds - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
