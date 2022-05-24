@@ -26,6 +26,7 @@ import PositionNode from '../accessors/PositionNode.js';
 import ReferenceNode from '../accessors/ReferenceNode.js';
 import StorageBufferNode from '../accessors/StorageBufferNode.js';
 import TextureNode from '../accessors/TextureNode.js';
+import UserDataNode from '../accessors/UserDataNode.js';
 import UVNode from '../accessors/UVNode.js';
 
 // display
@@ -148,6 +149,7 @@ export const specularColor = nodeImmutable( PropertyNode, 'SpecularColor', 'colo
 
 export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object ) );
 export const materialReference = ( name, nodeOrType, material ) => nodeObject( new MaterialReferenceNode( name, getConstNodeType( nodeOrType ), material ) );
+export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 
