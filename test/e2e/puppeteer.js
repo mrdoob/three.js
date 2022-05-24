@@ -18,8 +18,8 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // total failed pixels
 
-const networkTimeout = 60000; // set to 0 to disable
-const renderTimeout = 4000; // set to 0 to disable
+const networkTimeout = 180; // 3 minutes - set to 0 to disable
+const renderTimeout = 4; // 4 seconds - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
@@ -232,7 +232,7 @@ async function main() {
 
 				await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 					waitUntil: 'networkidle2',
-					timeout: networkTimeout
+					timeout: networkTimeout * 1000
 				} );
 
 			} catch {
@@ -270,7 +270,7 @@ async function main() {
 
 						const waitingLoop = setInterval( function () {
 
-							const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > renderTimeout );
+							const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
 
 							if ( renderTimeoutExceeded ) {
 
