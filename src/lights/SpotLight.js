@@ -47,9 +47,9 @@ class SpotLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.distance = source.distance;
 		this.angle = source.angle;

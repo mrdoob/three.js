@@ -49,9 +49,9 @@ class Mesh extends Object3D {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		if ( source.morphTargetInfluences !== undefined ) {
 

@@ -22,9 +22,9 @@ class Light extends Object3D {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.color.copy( source.color );
 		this.intensity = source.intensity;
