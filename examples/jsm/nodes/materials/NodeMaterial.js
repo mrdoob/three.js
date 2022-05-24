@@ -24,8 +24,10 @@ class NodeMaterial extends ShaderMaterial {
 
 	build( builder ) {
 
+		this.generatePosition( builder );
+
 		const { lightsNode } = this;
-		const { diffuseColorNode } = this.generateMain( builder );
+		const { diffuseColorNode } = this.generateDiffuseColor( builder );
 
 		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightsNode } );
 
@@ -39,7 +41,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	generateMain( builder ) {
+	generatePosition( builder ) {
 
 		const object = builder.object;
 
@@ -68,6 +70,10 @@ class NodeMaterial extends ShaderMaterial {
 		builder.context.vertex = vertex;
 
 		builder.addFlow( 'vertex', modelViewProjection() );
+
+	}
+
+	generateDiffuseColor( builder ) {
 
 		// < FRAGMENT STAGE >
 
