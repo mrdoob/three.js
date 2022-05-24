@@ -2,7 +2,7 @@ import { Material, ShaderMaterial } from 'three';
 import { getNodesKeys } from '../core/NodeUtils.js';
 import ExpressionNode from '../core/ExpressionNode.js';
 import {
-	float, vec4,
+	float, vec3, vec4,
 	assign, label, mul, bypass,
 	positionLocal, skinning, instance, modelViewProjection, lightingContext, colorSpace,
 	materialAlphaTest, materialColor, materialOpacity
@@ -132,7 +132,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// FOG
 
-		if ( builder.fogNode ) outputNode = builder.fogNode.mix( outputNode );
+		if ( builder.fogNode ) outputNode = vec4( vec3( builder.fogNode.mix( outputNode ) ), outputNode.w );
 
 		// RESULT
 
