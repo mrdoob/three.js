@@ -36,8 +36,13 @@ const exceptionList = [
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
+	
+	// video tag is not deterministic enough, investigate
+	'css3d_youtube',
+	'webgl_video_kinect',
+	'webgl_video_panorama_equirectangular',
 
-	// webgpu - "No available adapters. JSHandle@error"
+	// webgpu - "No available adapters. JSHandle@error", investigate
 	'webgpu_compute',
 	'webgpu_cubemap_mix',
 	'webgpu_depth_texture',
