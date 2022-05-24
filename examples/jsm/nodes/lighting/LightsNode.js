@@ -27,7 +27,7 @@ class LightsNode extends Node {
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
 		const lightNodes = this.lightNodes;
 
