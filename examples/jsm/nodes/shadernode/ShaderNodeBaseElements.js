@@ -140,6 +140,7 @@ export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY
 //export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
+export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
 
 export const diffuseColor = nodeImmutable( PropertyNode, 'DiffuseColor', 'vec4' );
 export const roughness = nodeImmutable( PropertyNode, 'Roughness', 'float' );
