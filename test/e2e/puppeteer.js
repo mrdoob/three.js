@@ -19,7 +19,8 @@ const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixels
 
 const networkTimeout = 180; // 2 minutes - set to 0 to disable
-const idleTime = 1; // 1 second - for how long there should be no network requests
+const idleTime = 3; // 3 seconds - for how long there should be no network requests
+const parseTime = 1.5; // 1.5 seconds per megabyte
 const renderTimeout = 4; // 4 seconds - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
@@ -138,7 +139,7 @@ async function main() {
 
 	const messages = [];
 	
-	let file;
+	let file, pageSize;
 
 	page.on( 'console', msg => {
 
@@ -185,6 +186,20 @@ async function main() {
 
 	} );
 
+	page.on( 'response', async ( response ) => {
+
+		try {
+
+			if ( response.status === 200 ) {
+
+				await response.buffer().then( buffer => pageSize += buffer.length );
+
+			}
+
+		} catch {}
+
+	} );
+
 	/* Find files */
 
 	const isMakeScreenshot = process.argv[ 2 ] === '--make';
@@ -222,6 +237,7 @@ async function main() {
 			/* Load target page */
 
 			file = files[ fileID ];
+			pageSize = 0;
 
 			try {
 
@@ -258,7 +274,9 @@ async function main() {
 					idleTime: idleTime * 1000
 				} );
 
-				await page.evaluate( async ( renderTimeout ) => {
+				await page.evaluate( async ( renderTimeout, parseTime ) => {
+
+					await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
 					/* Resolve render promise */
 
@@ -289,7 +307,7 @@ async function main() {
 
 					} );
 
-				}, renderTimeout );
+				}, renderTimeout, pageSize / 1024 / 1024 * parseTime * 1000 );
 
 			} catch ( e ) {
 
@@ -389,7 +407,7 @@ async function main() {
 
 	if ( isMakeScreenshot && failedScreenshots.length ) {
 
-		console.red( `${ failedScreenshots.length } from ${ exactList.length } screenshots have not generate succesfully.` );
+		console.red( `${ failedScreenshots.length } from ${ exactList.length } screenshots have not generated succesfully.` );
 
 	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
 
@@ -400,7 +418,7 @@ async function main() {
 		const list = failedScreenshots.join( ' ' );
 		console.red( 'List of failed screenshots: ' + list );
 		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`` );
-		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endID - beginID } screenshots have not render correctly.` );
+		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endID - beginID } screenshots have not rendered correctly.` );
 
 	} else {
 
