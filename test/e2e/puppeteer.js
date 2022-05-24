@@ -225,19 +225,16 @@ async function main() {
 
 	const failedScreenshots = [];
 
-	let beginID = 0;
-	let endID = files.length;
+	const CI = process.env.CI === undefined || isMakeScreenshot ? null : parseInt( process.env.CI );
+	const jobs = 8;
 
-	if ( process.env.CI !== undefined ) {
+	for ( let fileID = 0; fileID < files.length; fileID ++ ) {
 
-		const jobs = 8;
+		if ( CI !== null && fileID % jobs !== CI ) {
 
-		beginID = Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / jobs );
-		endID = Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / jobs );
+			continue;
 
-	}
-
-	for ( let fileID = beginID; fileID < endID; fileID ++ ) {
+		}
 
 		for ( let attemptID = 0; attemptID < numAttempts; attemptID ++ ) {
 
@@ -411,25 +408,27 @@ async function main() {
 	}
 
 	/* Finish */
+	
+	const numFiles = CI === null ? files.length : Math.floor( ( files.length - CI ) / jobs ) + 1;
 
 	if ( isMakeScreenshot && failedScreenshots.length ) {
 
-		console.red( `${ failedScreenshots.length } from ${ exactList.length } screenshots have not generated succesfully.` );
+		console.red( `${ failedScreenshots.length } from ${ numFiles } screenshots have not generated succesfully.` );
 
 	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
 
-		console.green( `${ exactList.length } screenshots succesfully generated.` );
+		console.green( `${ numFiles } screenshots succesfully generated.` );
 
 	} else if ( failedScreenshots.length ) {
 
 		const list = failedScreenshots.join( ' ' );
 		console.red( 'List of failed screenshots: ' + list );
 		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`. If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
-		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endID - beginID } screenshots have not rendered correctly.` );
+		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ numFiles } screenshots have not rendered correctly.` );
 
 	} else {
 
-		console.green( `TEST PASSED! ${ endID - beginID } screenshots rendered correctly.` );
+		console.green( `TEST PASSED! ${ numFiles } screenshots rendered correctly.` );
 
 	}
 
