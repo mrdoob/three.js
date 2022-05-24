@@ -702,7 +702,7 @@ class WebGPURenderPipeline {
 			const type = nodeAttribute.type;
 
 			const geometryAttribute = geometry.getAttribute( name );
-			const bytesPerElement = ( geometryAttribute !== undefined ) ? geometryAttribute.array.BYTES_PER_ELEMENT : 4;
+			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
 
 			const format = this._getVertexFormat( type, bytesPerElement );
 
