@@ -6,29 +6,10 @@ import jimp from 'jimp';
 import * as fs from 'fs/promises';
 import fetch from 'node-fetch';
 
-const LAST_REVISION_URLS = {
-    linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
-    mac: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/LAST_CHANGE',
-    mac_arm: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac_Arm/LAST_CHANGE',
-    win32: 'https://storage.googleapis.com/chromium-browser-snapshots/Win/LAST_CHANGE',
-    win64: 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/LAST_CHANGE'
-};
+/* CONFIG VARIABLES START */
 
-const port = 1234;
-const pixelThreshold = 0.1; // threshold error in one pixel
-const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixels
-
-const networkTimeout = 180; // 2 minutes - set to 0 to disable
 const idleTime = 3; // 3 seconds - for how long there should be no network requests
 const parseTime = 2; // 2 seconds per megabyte
-const renderTimeout = 4; // 4 seconds - set to 0 to disable
-
-const numAttempts = 2; // perform 2 attempts before failing
-
-const width = 400;
-const height = 250;
-const viewScale = 2; // TODO: possibly increase?
-const jpgQuality = 95;
 
 const exceptionList = [
 
@@ -63,6 +44,30 @@ const exceptionList = [
 	'webgpu_skinning'
 
 ];
+
+/* CONFIG VARIABLES END */
+
+const LAST_REVISION_URLS = {
+    linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
+    mac: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/LAST_CHANGE',
+    mac_arm: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac_Arm/LAST_CHANGE',
+    win32: 'https://storage.googleapis.com/chromium-browser-snapshots/Win/LAST_CHANGE',
+    win64: 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/LAST_CHANGE'
+};
+
+const port = 1234;
+const pixelThreshold = 0.1; // threshold error in one pixel
+const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixels
+
+const networkTimeout = 180; // 2 minutes - set to 0 to disable
+const renderTimeout = 1; // 1 second - set to 0 to disable
+
+const numAttempts = 2; // perform 2 attempts before failing
+
+const width = 400;
+const height = 250;
+const viewScale = 2; // TODO: possibly increase?
+const jpgQuality = 95;
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
