@@ -43,12 +43,7 @@
 
 		}
 
-		/**
-		 * Parse Point Cloud Data (PCD) from an ArrayBuffer
-		 * @param data {ArrayBuffer}
-		 * @returns {*}
-		 */
-		parse( data ) {
+		parse( data, url ) {
 
 			// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
 			function decompressLZF( inData, outLength ) {
@@ -109,11 +104,6 @@
 
 			}
 
-			/**
-			 * Parse the ASCII header of a PCD File.
-			 * @param data {string}
-			 * @returns {{}}
-			 */
 			function parseHeader( data ) {
 
 				const PCDheader = {};
@@ -198,44 +188,24 @@
 
 			}
 
-			// Grab at most 8000 bytes of the PCD file to ensure we aren't trying to create a string that's too
-			// big for the javascript heap. 8000 is an arbitrary number that seems like it should be bigger than
-			// any PCD header.
-
-			const slice = data.slice( 0, Math.min( 8000, data.byteLength ) );
-			const textData = THREE.LoaderUtils.decodeText( new Uint8Array( slice ) ); // parse header (always ascii format)
+			const textData = THREE.LoaderUtils.decodeText( new Uint8Array( data ) ); // parse header (always ascii format)
 
 			const PCDheader = parseHeader( textData ); // parse data
 
 			const position = [];
 			const normal = [];
-			const color = [];
-
-			// ascii
+			const color = []; // ascii
 
 			if ( PCDheader.data === 'ascii' ) {
 
 				const offset = PCDheader.offset;
-				const pointData = data.slice( PCDheader.headerLen );
-				const uint8Data = new Uint8Array( pointData );
-				let previous_idx = 0;
-				let lineStr = '';
-				for ( let i = 0, l = uint8Data.length; i < l; i ++ ) {
+				const pcdData = textData.slice( PCDheader.headerLen );
+				const lines = pcdData.split( '\n' );
 
-					if ( uint8Data[ i ] === '\n'.charCodeAt( 0 ) ) {
+				for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
-						lineStr = LoaderUtils.decodeText( uint8Data.slice( previous_idx, i ) );
-						previous_idx = i;
-
-					} else {
-
-						continue;
-
-					}
-
-					if ( lineStr === '' ) continue;
-
-					const line = lineStr.split( ' ' );
+					if ( lines[ i ] === '' ) continue;
+					const line = lines[ i ].split( ' ' );
 
 					if ( offset.x !== undefined ) {
 
@@ -382,7 +352,12 @@
 			} // build point cloud
 
 
-			return new THREE.Points( geometry, material );
+			const mesh = new THREE.Points( geometry, material );
+			let name = url.split( '' ).reverse().join( '' );
+			name = /([^\/]*)/.exec( name );
+			name = name[ 1 ].split( '' ).reverse().join( '' );
+			mesh.name = name;
+			return mesh;
 
 		}
 
