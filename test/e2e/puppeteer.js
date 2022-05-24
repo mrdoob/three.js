@@ -31,8 +31,8 @@ const jpgQuality = 95;
 const exceptionList = [
 
 	'webgl_effects_ascii', // renders differently on different platforms
-	'webgl_morphtargets_face', // does not work on GitHub?
 	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format."
+	'webgl_morphtargets_face', // does not work on GitHub?
 
 	// webgpu - "No available adapters. JSHandle@error"
 	'webgpu_compute',
