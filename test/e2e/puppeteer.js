@@ -30,9 +30,11 @@ const jpgQuality = 95;
 
 const exceptionList = [
 
-	'webgl_effects_ascii', // renders differently on different platforms
-	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format."
-	'webgl_morphtargets_face', // does not work on GitHub?
+	'webgl_effects_ascii', // renders differently on different platforms, investigate
+	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format." investigate
+	'webgl_morphtargets_face', // does not work on GitHub? investigate
+	'webgl_tiled_forward', // investigate
+	'webgl_worker_offscreencanvas', // investigate
 
 	// webgpu - "No available adapters. JSHandle@error"
 	'webgpu_compute',
@@ -49,7 +51,7 @@ const exceptionList = [
 	'webgpu_sandbox',
 	'webgpu_skinning_instancing',
 	'webgpu_skinning_points',
-	'webgpu_skinning',
+	'webgpu_skinning'
 
 ];
 
@@ -80,12 +82,15 @@ async function downloadLatestChromium() {
 	const revisionInfo = browserFetcher.revisionInfo( revision );
 	if ( revisionInfo.local === true ) {
 
+		console.log( 'Latest Chromium is already downloaded.' );
 		return revisionInfo;
 
 	} else {
 
 		console.log( 'Downloading latest Chromium...' );
-		return await browserFetcher.download( revision );
+		const revisionInfo = await browserFetcher.download( revision );
+		console.log( 'Downloaded.' );
+		return revisionInfo;
 
 	}
 
