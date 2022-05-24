@@ -135,7 +135,9 @@ async function main() {
 		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' ); // TODO: remove this (will require regenerating screenshots)
 	await page.setRequestInterception( true );
 
-	let messages;
+	const messages = [];
+	
+	let file;
 
 	page.on( 'console', msg => {
 
@@ -145,7 +147,7 @@ async function main() {
 
 		}
 
-		const text = msg.text();
+		const text = file + ': ' + msg.text();
 
 		if ( text.includes( 'GPU stall due to ReadPixels' ) || text.includes( 'GPUStatsPanel' ) ) {
 
@@ -214,13 +216,11 @@ async function main() {
 
 	for ( let fileID = beginID; fileID < endID; fileID ++ ) {
 
-		messages = [];
-
 		for ( let attemptID = 0; attemptID < numAttempts; attemptID ++ ) {
 
 			/* Load target page */
 
-			const file = files[ fileID ];
+			file = files[ fileID ];
 
 			try {
 
