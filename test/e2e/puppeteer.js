@@ -15,6 +15,7 @@ const exceptionList = [
 
 	'webgl_buffergeometry_glbufferattribute', // investigate
 	'webgl_effects_ascii', // renders differently on different platforms, investigate
+	'webgl_lines_sphere', // changes with every screenshot, investigate
 	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format." investigate
 	'webgl_morphtargets_face', // does not work on GitHub? investigate
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
