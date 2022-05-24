@@ -56,6 +56,8 @@ function createCanvasElement() {
 
 function WebGLRenderer( parameters = {} ) {
 
+	this.isWebGLRenderer = true;
+
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
 
@@ -130,6 +132,28 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.toneMapping = NoToneMapping;
 	this.toneMappingExposure = 1.0;
+
+	//
+
+	Object.defineProperties( this, {
+
+		// @deprecated since r136, 0e21088102b4de7e0a0a33140620b7a3424b9e6d
+
+		gammaFactor: {
+			get: function () {
+
+				console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
+				return 2;
+
+			},
+			set: function () {
+
+				console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
+
+			}
+		}
+
+	} );
 
 	// internal properties
 
@@ -228,6 +252,7 @@ function WebGLRenderer( parameters = {} ) {
 		// event listeners must be registered before WebGL context is created, see #12753
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
+		_canvas.addEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
 		if ( _gl === null ) {
 
@@ -569,6 +594,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
+		_canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
 		renderLists.dispose();
 		renderStates.dispose();
@@ -626,6 +652,12 @@ function WebGLRenderer( parameters = {} ) {
 		shadowMap.autoUpdate = shadowMapAutoUpdate;
 		shadowMap.needsUpdate = shadowMapNeedsUpdate;
 		shadowMap.type = shadowMapType;
+
+	}
+
+	function onContextCreationError( event ) {
+
+		console.error( 'THREE.WebGLRenderer: A WebGL context could not be created. Reason: ', event.statusMessage );
 
 	}
 
@@ -2007,13 +2039,6 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.copyFramebufferToTexture = function ( position, texture, level = 0 ) {
 
-		if ( texture.isFramebufferTexture !== true ) {
-
-			console.error( 'THREE.WebGLRenderer: copyFramebufferToTexture() can only be used with FramebufferTexture.' );
-			return;
-
-		}
-
 		const levelScale = Math.pow( 2, - level );
 		const width = Math.floor( texture.image.width * levelScale );
 		const height = Math.floor( texture.image.height * levelScale );
@@ -2175,7 +2200,5 @@ function WebGLRenderer( parameters = {} ) {
 	}
 
 }
-
-WebGLRenderer.prototype.isWebGLRenderer = true;
 
 export { WebGLRenderer };

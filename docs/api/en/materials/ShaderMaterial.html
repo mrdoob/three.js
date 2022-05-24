@@ -19,11 +19,11 @@
 			<li>implement an effect not included with any of the built-in [page:Material materials]</li>
 			<li>combine many objects into a single [page:BufferGeometry] in order to improve performance</li>
 		</ul>
-		There are the following notes to bear in mind when using a *ShaderMaterial*:
+		There are the following notes to bear in mind when using a `ShaderMaterial`:
 
 		<ul>
 			<li>
-				A *ShaderMaterial* will only be rendered properly by [page:WebGLRenderer],
+				A `ShaderMaterial` will only be rendered properly by [page:WebGLRenderer],
 				since the GLSL code in the [link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertexShader]
 				and [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragmentShader] properties must
 				be compiled and run on the GPU using WebGL.
@@ -43,7 +43,7 @@
 				[page:RawShaderMaterial] instead of this class.
 			</li>
 			<li>
-				You can use the directive #pragma unroll_loop_start and #pragma unroll_loop_end in order to unroll a *for* loop in GLSL by the shader preprocessor.
+				You can use the directive #pragma unroll_loop_start and #pragma unroll_loop_end in order to unroll a `for` loop in GLSL by the shader preprocessor.
 				The directive has to be placed right above the loop. The loop formatting has to correspond to a defined standard.
 				<ul>
 					<li>
@@ -53,7 +53,7 @@
 						The loop variable has to be *i*.
 					</li>
 					<li>
-						The value *UNROLLED_LOOP_INDEX* will be replaced with the explicitly value of *i* for the given iteration and can be used in preprocessor statements.
+						The value `UNROLLED_LOOP_INDEX` will be replaced with the explicitly value of *i* for the given iteration and can be used in preprocessor statements.
 					</li>
 				</ul>
 				<code>
@@ -120,8 +120,8 @@
 			<p>You can specify two different types of shaders for each material:</p>
 			<ul>
 				<li>
-					The vertex shader runs first; it receives *attributes*, calculates / manipulates
-					the position of each individual vertex, and passes additional data (*varying*s) to the fragment shader.
+					The vertex shader runs first; it receives `attributes`, calculates / manipulates
+					the position of each individual vertex, and passes additional data (`varying`s) to the fragment shader.
 				</li>
 				<li>
 					The fragment ( or pixel ) shader runs second; it sets the color of each individual "fragment"
@@ -131,22 +131,22 @@
 			<p>There are three types of variables in shaders: uniforms, attributes, and varyings:</p>
 			<ul>
 				<li>
-					*Uniforms* are variables that have the same value for all vertices - lighting, fog,
+					`Uniforms` are variables that have the same value for all vertices - lighting, fog,
 					and shadow maps are examples of data that would be stored in uniforms.
 					Uniforms can be accessed by both the vertex shader and the fragment shader.
 				</li>
 				<li>
-					*Attributes* are variables associated with each vertex---for instance, the vertex position,
+					`Attributes` are variables associated with each vertex---for instance, the vertex position,
 					face normal, and vertex color are all examples of data that would be stored in attributes.
-					Attributes can <em>only</em> be accessed within the vertex shader.
+					Attributes can `only` be accessed within the vertex shader.
 				</li>
 				<li>
-					*Varyings* are variables that are passed from the vertex shader to the fragment shader.
+					`Varyings` are variables that are passed from the vertex shader to the fragment shader.
 					For each fragment, the value of each varying will be smoothly interpolated from the values of adjacent vertices.
 				</li>
 			</ul>
 			<p>
-				Note that <em>within</em> the shader itself, uniforms and attributes act like constants;
+				Note that `within` the shader itself, uniforms and attributes act like constants;
 				you can only modify their values by passing different values to the buffers from your JavaScript code.
 			</p>
 		</div>
@@ -157,7 +157,7 @@
 	<div>
 			<p>
 			The [page:WebGLRenderer] provides many attributes and uniforms to shaders by default;
-			definitions of these variables are prepended to your *fragmentShader* and *vertexShader*
+			definitions of these variables are prepended to your `fragmentShader` and `vertexShader`
 			code by the [page:WebGLProgram] when the shader is compiled; you don't need to declare them yourself.
 			See [page:WebGLProgram] for details of these variables.
 			</p>
@@ -179,14 +179,14 @@
 		<div>
 			<p>
 				Both custom attributes and uniforms must be declared in your GLSL shader code
-				(within *vertexShader* and/or *fragmentShader*). Custom uniforms must be defined in <em>both</em>
-				the *uniforms* property of your *ShaderMaterial*, whereas any custom attributes must be
-				defined via [page:BufferAttribute] instances. Note that *varying*s only need to
+				(within `vertexShader` and/or `fragmentShader`). Custom uniforms must be defined in `both`
+				the `uniforms` property of your `ShaderMaterial`, whereas any custom attributes must be
+				defined via [page:BufferAttribute] instances. Note that `varying`s only need to
 				be declared within the shader code (not within the material).
 			</p>
 			<p>
 				To declare a custom attribute, please reference the [page:BufferGeometry] page for an overview,
-				and the [page:BufferAttribute] page for a detailed look at the *BufferAttribute* API.
+				and the [page:BufferAttribute] page for a detailed look at the `BufferAttribute` API.
 			</p>
 			<p>
 				When creating your attributes, each typed array that you create to hold your
@@ -235,13 +235,13 @@
 			</table>
 
 			<p>
-				Note that attribute buffers are <em>not</em> refreshed automatically when their values change. To update custom attributes,
-				set the *needsUpdate* flag to true on the [page:BufferAttribute] of the geometry (see [page:BufferGeometry]
+				Note that attribute buffers are `not` refreshed automatically when their values change. To update custom attributes,
+				set the `needsUpdate` flag to true on the [page:BufferAttribute] of the geometry (see [page:BufferGeometry]
 				for further details).
 			</p>
 
 			<p>
-			To declare a custom [page:Uniform], use the *uniforms* property:
+			To declare a custom [page:Uniform], use the `uniforms` property:
 			<code>
 			uniforms: {
 				time: { value: 1.0 },
@@ -293,7 +293,7 @@ this.defaultAttributeValues = {
 
 		<h3>[property:Object defines]</h3>
 		<p>
-		Defines custom constants using *#define* directives within the GLSL code for both the
+		Defines custom constants using `#define` directives within the GLSL code for both the
 		vertex shader and the fragment shader; each key/value pair yields another directive:
 		<code>
 		defines: {
@@ -333,14 +333,14 @@ this.extensions = {
 		<h3>[property:String fragmentShader]</h3>
 		<p>
 		Fragment shader GLSL code.  This is the actual code for the shader. In the example above,
-		the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed
+		the `vertexShader` and `fragmentShader` code is extracted from the DOM; it could be passed
 		as a string directly or loaded via AJAX instead.
 		</p>
 
 		<h3>[property:String glslVersion]</h3>
 		<p>
 		Defines the GLSL version of custom shader code. Only relevant for WebGL 2 in order to define whether to specify
-		GLSL 3.0 or not. Valid values are *THREE.GLSL1* or *THREE.GLSL3*. Default is *null*.
+		GLSL 3.0 or not. Valid values are `THREE.GLSL1` or `THREE.GLSL3`. Default is `null`.
 		</p>
 
 		<h3>[property:String index0AttributeName]</h3>
@@ -384,25 +384,25 @@ this.extensions = {
 		<code>
 		{ value: 1.0 }
 		</code>
-		where *value* is the value of the uniform. Names must match the name of the uniform,
+		where `value` is the value of the uniform. Names must match the name of the uniform,
 		as defined in the GLSL code. Note that uniforms are refreshed on every frame,
 		so updating the value of the uniform will immediately update the value available to the GLSL code.
 		</p>
 
 		<h3>[property:Boolean uniformsNeedUpdate]</h3>
 		<p>
-		Can be used to force a uniform update while changing uniforms in [page:Object3D.onBeforeRender](). Default is *false*.
+		Can be used to force a uniform update while changing uniforms in [page:Object3D.onBeforeRender](). Default is `false`.
 		</p>
 
 		<h3>[property:Boolean vertexColors]</h3>
 		<p>
-		Defines whether vertex coloring is used. Default is *false*.
+		Defines whether vertex coloring is used. Default is `false`.
 		</p>
 
 		<h3>[property:String vertexShader]</h3>
 		<p>
 		Vertex shader GLSL code.  This is the actual code for the shader. In the example above,
-		the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed
+		the `vertexShader` and `fragmentShader` code is extracted from the DOM; it could be passed
 		as a string directly or loaded via AJAX instead.
 		</p>
 
@@ -427,9 +427,9 @@ this.extensions = {
 		<h3>[method:ShaderMaterial clone]() [param:ShaderMaterial this]</h3>
 		<p>
 		Generates a shallow copy of this material. Note that the vertexShader and fragmentShader
-		are copied <em>by reference</em>, as are the definitions of the *attributes*; this means
+		are copied `by reference`, as are the definitions of the `attributes`; this means
 		that clones of the material will share the same compiled [page:WebGLProgram]. However, the
-		*uniforms* are copied <em>by value</em>, which allows you to have different sets of uniforms
+		`uniforms` are copied `by value`, which allows you to have different sets of uniforms
 		for different copies of the material.
 		</p>
 

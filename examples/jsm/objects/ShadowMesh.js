@@ -25,6 +25,8 @@ class ShadowMesh extends Mesh {
 
 		super( mesh.geometry, shadowMaterial );
 
+		this.isShadowMesh = true;
+
 		this.meshMatrix = mesh.matrixWorld;
 
 		this.frustumCulled = false;
@@ -68,7 +70,5 @@ class ShadowMesh extends Mesh {
 	}
 
 }
-
-ShadowMesh.prototype.isShadowMesh = true;
 
 export { ShadowMesh };

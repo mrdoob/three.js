@@ -707,7 +707,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const mipmaps = texture.mipmaps;
 
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
-			const allocateMemory = ( textureProperties.__version === undefined ) || ( forceUpload === true );
+			const allocateMemory = ( source.__currentVersion === undefined ) || ( forceUpload === true );
 			const levels = getMipLevels( texture, image, supportsMips );
 
 			if ( texture.isDepthTexture ) {
@@ -757,7 +757,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						console.warn( 'THREE.WebGLRenderer: Use UnsignedShortType or UnsignedIntType for DepthFormat DepthTexture.' );
 
-						texture.type = UnsignedShortType;
+						texture.type = UnsignedIntType;
 						glType = utils.convert( texture.type );
 
 					}
@@ -1078,7 +1078,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
-			const allocateMemory = ( textureProperties.__version === undefined );
+			const allocateMemory = ( source.__currentVersion === undefined ) || ( forceUpload === true );
 			let levels = getMipLevels( texture, image, supportsMips );
 
 			setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );

@@ -3,12 +3,14 @@ import UVNode from './UVNode.js';
 
 class TextureNode extends UniformNode {
 
-	constructor( value, uvNode = new UVNode(), biasNode = null ) {
+	constructor( value, uvNode = new UVNode(), levelNode = null ) {
 
 		super( value, 'vec4' );
 
+		this.isTextureNode = true;
+
 		this.uvNode = uvNode;
-		this.biasNode = biasNode;
+		this.levelNode = levelNode;
 
 	}
 
@@ -53,13 +55,13 @@ class TextureNode extends UniformNode {
 			if ( snippet === undefined ) {
 
 				const uvSnippet = this.uvNode.build( builder, 'vec2' );
-				const biasNode = this.biasNode;
+				const levelNode = this.levelNode;
 
-				if ( biasNode !== null ) {
+				if ( levelNode !== null ) {
 
-					const biasSnippet = biasNode.build( builder, 'float' );
+					const levelSnippet = levelNode.build( builder, 'float' );
 
-					snippet = builder.getTextureBias( textureProperty, uvSnippet, biasSnippet );
+					snippet = builder.getTextureLevel( textureProperty, uvSnippet, levelSnippet );
 
 				} else {
 
@@ -94,7 +96,5 @@ class TextureNode extends UniformNode {
 	}
 
 }
-
-TextureNode.prototype.isTextureNode = true;
 
 export default TextureNode;

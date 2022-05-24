@@ -2,6 +2,8 @@ export class DataFile {
 
 	constructor( value ) {
 
+		this.isDataFile = true;
+
 		this.value = value;
 		this.url = null;
 
@@ -55,5 +57,3 @@ export class DataFile {
 	}
 
 }
-
-DataFile.prototype.isDataFile = true;

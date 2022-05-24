@@ -16,6 +16,8 @@ class InstancedBufferAttribute extends BufferAttribute {
 
 		super( array, itemSize, normalized );
 
+		this.isInstancedBufferAttribute = true;
+
 		this.meshPerAttribute = meshPerAttribute;
 
 	}
@@ -43,7 +45,5 @@ class InstancedBufferAttribute extends BufferAttribute {
 	}
 
 }
-
-InstancedBufferAttribute.prototype.isInstancedBufferAttribute = true;
 
 export { InstancedBufferAttribute };

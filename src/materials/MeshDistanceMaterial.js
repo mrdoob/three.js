@@ -7,6 +7,8 @@ class MeshDistanceMaterial extends Material {
 
 		super();
 
+		this.isMeshDistanceMaterial = true;
+
 		this.type = 'MeshDistanceMaterial';
 
 		this.referencePosition = new Vector3();
@@ -46,7 +48,5 @@ class MeshDistanceMaterial extends Material {
 	}
 
 }
-
-MeshDistanceMaterial.prototype.isMeshDistanceMaterial = true;
 
 export { MeshDistanceMaterial };

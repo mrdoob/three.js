@@ -1,5 +1,7 @@
 import Node from '../core/Node.js';
-import LightNode from './LightNode.js';
+import LightingNode from './LightingNode.js';
+
+const references = new WeakMap();
 
 const sortLights = ( lights ) => {
 
@@ -25,7 +27,7 @@ class LightsNode extends Node {
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
 		const lightNodes = this.lightNodes;
 
@@ -35,26 +37,24 @@ class LightsNode extends Node {
 
 		}
 
-		return 'vec3( 0.0 )';
-
 	}
 
-	getHash( /*builder*/ ) {
+	getHash( builder ) {
 
 		if ( this._hash === null ) {
 
 			let hash = '';
-			
+
 			const lightNodes = this.lightNodes;
 
 			for ( const lightNode of lightNodes ) {
 
-				hash += lightNode.light.uuid + ' ';
+				hash += lightNode.getHash( builder ) + ' ';
 
 			}
-			
+
 			this._hash = hash;
-			
+
 		}
 
 		return this._hash;
@@ -91,7 +91,10 @@ class LightsNode extends Node {
 
 			if ( lightNode === null ) {
 
-				lightNode = new LightNode( light );
+				const lightClass = light.constructor;
+				const lightNodeClass = references.has( lightClass ) ? references.get( lightClass ) : LightingNode;
+
+				lightNode = new lightNodeClass( light );
 
 			}
 
@@ -103,6 +106,12 @@ class LightsNode extends Node {
 		this._hash = null;
 
 		return this;
+
+	}
+
+	static setReference( lightClass, lightNodeClass ) {
+
+		references.set( lightClass, lightNodeClass );
 
 	}
 

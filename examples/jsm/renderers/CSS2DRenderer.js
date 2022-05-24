@@ -10,6 +10,8 @@ class CSS2DObject extends Object3D {
 
 		super();
 
+		this.isCSS2DObject = true;
+
 		this.element = element;
 
 		this.element.style.position = 'absolute';
@@ -44,8 +46,6 @@ class CSS2DObject extends Object3D {
 	}
 
 }
-
-CSS2DObject.prototype.isCSS2DObject = true;
 
 //
 

@@ -19,6 +19,8 @@ class CSS3DObject extends Object3D {
 
 		super();
 
+		this.isCSS3DObject = true;
+
 		this.element = element;
 		this.element.style.position = 'absolute';
 		this.element.style.pointerEvents = 'auto';
@@ -54,13 +56,13 @@ class CSS3DObject extends Object3D {
 
 }
 
-CSS3DObject.prototype.isCSS3DObject = true;
-
 class CSS3DSprite extends CSS3DObject {
 
 	constructor( element ) {
 
 		super( element );
+
+		this.isCSS3DSprite = true;
 
 		this.rotation2D = 0;
 
@@ -77,8 +79,6 @@ class CSS3DSprite extends CSS3DObject {
 	}
 
 }
-
-CSS3DSprite.prototype.isCSS3DSprite = true;
 
 //
 

@@ -17,6 +17,8 @@ class Points extends Object3D {
 
 		super();
 
+		this.isPoints = true;
+
 		this.type = 'Points';
 
 		this.geometry = geometry;
@@ -152,8 +154,6 @@ class Points extends Object3D {
 	}
 
 }
-
-Points.prototype.isPoints = true;
 
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 

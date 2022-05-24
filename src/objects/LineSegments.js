@@ -11,6 +11,8 @@ class LineSegments extends Line {
 
 		super( geometry, material );
 
+		this.isLineSegments = true;
+
 		this.type = 'LineSegments';
 
 	}
@@ -57,7 +59,5 @@ class LineSegments extends Line {
 	}
 
 }
-
-LineSegments.prototype.isLineSegments = true;
 
 export { LineSegments };

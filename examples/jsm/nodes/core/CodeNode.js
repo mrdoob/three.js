@@ -6,6 +6,8 @@ class CodeNode extends Node {
 
 		super( nodeType );
 
+		this.isCodeNode = true;
+
 		this.code = code;
 
 		this._includes = [];
@@ -44,7 +46,5 @@ class CodeNode extends Node {
 	}
 
 }
-
-CodeNode.prototype.isCodeNode = true;
 
 export default CodeNode;

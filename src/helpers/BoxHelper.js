@@ -93,7 +93,7 @@ class BoxHelper extends LineSegments {
 
 	copy( source ) {
 
-		LineSegments.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.object = source.object;
 

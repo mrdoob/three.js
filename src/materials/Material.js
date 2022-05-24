@@ -10,6 +10,8 @@ class Material extends EventDispatcher {
 
 		super();
 
+		this.isMaterial = true;
+
 		Object.defineProperty( this, 'id', { value: materialId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
@@ -479,9 +481,22 @@ class Material extends EventDispatcher {
 
 	}
 
-}
+	// @deprecated since r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
 
-Material.prototype.isMaterial = true;
+	get vertexTangents() {
+
+		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
+		return false;
+
+	}
+
+	set vertexTangents( value ) {
+
+		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
+
+	}
+
+}
 
 Material.fromType = function ( /*type*/ ) {
 

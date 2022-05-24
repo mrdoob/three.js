@@ -116,7 +116,7 @@
 		<p>
 		The number of samples taken along the axis through the pixel that has the highest density of texels.
 		By default, this value is 1. A higher value gives a less blurry result than a basic mipmap,
-		at the cost of more texture samples being used. Use [page:WebGLRenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() to
+		at the cost of more texture samples being used. Use [page:WebGLRenderer.capabilities renderer.capabilities.getMaxAnisotropy]() to
 		find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.
 		</p>
 
@@ -149,10 +149,10 @@
 		<h3>[property:Vector2 offset]</h3>
 		<p>
 		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
-		Typical range is *0.0* to *1.0*.
+		Typical range is `0.0` to `1.0`.
 		</p>
 		<p>
-			The below texture types share the *first* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			The below texture types share the `first` uv channel in the engine. The offset (and repeat) setting is evaluated according to
 			the following priorities and then shared by those textures:
 			<ol>
 				<li>color map</li>
@@ -170,7 +170,7 @@
 			</ol>
 		</p>
 		<p>
-			The below texture types share the *second* uv channel in the engine. The offset (and repeat) setting is evaluated according to
+			The below texture types share the `second` uv channel in the engine. The offset (and repeat) setting is evaluated according to
 			the following priorities and then shared by those textures:
 			<ol>
 				<li>ao map</li>
@@ -188,7 +188,7 @@
 
 		<h3>[property:number rotation]</h3>
 		<p>
-		How much the texture is rotated around the center point, in radians. Positive values are counter-clockwise. Default is *0*.
+		How much the texture is rotated around the center point, in radians. Positive values are counter-clockwise. Default is `0`.
 		</p>
 
 		<h3>[property:Vector2 center]</h3>
@@ -219,7 +219,7 @@
 
 		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
-		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
+		If set to `true`, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is `false`.<br /><br />
 
 		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
@@ -227,7 +227,7 @@
 
 		<h3>[property:Boolean flipY]</h3>
 		<p>
-		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
+		If set to `true`, the texture is flipped along the vertical axis when uploaded to the GPU. Default is `true`.<br /><br />
 
 		Note that this property has no effect for [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
@@ -253,7 +253,7 @@
 
 		<h3>[property:Integer version]</h3>
 		<p>
-		This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
+		This starts at `0` and counts how many times [property:Boolean needsUpdate] is set to `true`.
 		</p>
 
 		<h3>[property:Function onUpdate]</h3>
@@ -264,7 +264,7 @@
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-		Set this to *true* to trigger an update next time the texture is used. Particularly important for setting the wrap mode.
+		Set this to `true` to trigger an update next time the texture is used. Particularly important for setting the wrap mode.
 		</p>
 
 		<h3>[property:Object userData]</h3>

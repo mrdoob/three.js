@@ -20,6 +20,8 @@ class ReflectorForSSRPass extends Mesh {
 
 		super( geometry );
 
+		this.isReflectorForSSRPass = true;
+
 		this.type = 'ReflectorForSSRPass';
 
 		const scope = this;
@@ -248,8 +250,6 @@ class ReflectorForSSRPass extends Mesh {
 	}
 
 }
-
-ReflectorForSSRPass.prototype.isReflectorForSSRPass = true;
 
 ReflectorForSSRPass.ReflectorShader = {
 

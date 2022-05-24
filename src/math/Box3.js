@@ -4,6 +4,8 @@ class Box3 {
 
 	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
 
+		this.isBox3 = true;
+
 		this.min = min;
 		this.max = max;
 
@@ -468,8 +470,6 @@ class Box3 {
 	}
 
 }
-
-Box3.prototype.isBox3 = true;
 
 const _points = [
 	/*@__PURE__*/ new Vector3(),

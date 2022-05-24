@@ -1862,10 +1862,6 @@ class GLTFCubicSplineInterpolant extends Interpolant {
 
 }
 
-GLTFCubicSplineInterpolant.prototype.beforeStart_ = GLTFCubicSplineInterpolant.prototype.copySampleValue_;
-
-GLTFCubicSplineInterpolant.prototype.afterEnd_ = GLTFCubicSplineInterpolant.prototype.copySampleValue_;
-
 GLTFCubicSplineInterpolant.prototype.interpolate_ = function ( i1, t0, t, t1 ) {
 
 	const result = this.resultBuffer;

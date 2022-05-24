@@ -4,9 +4,11 @@ import ReflectNode from './ReflectNode.js';
 
 class CubeTextureNode extends TextureNode {
 
-	constructor( value, uvNode = new ReflectNode(), biasNode = null ) {
+	constructor( value, uvNode = null, levelNode = null ) {
 
-		super( value, uvNode, biasNode );
+		super( value, uvNode, levelNode );
+
+		this.isCubeTextureNode = true;
 
 	}
 
@@ -16,7 +18,35 @@ class CubeTextureNode extends TextureNode {
 
 	}
 
+	getConstructHash( builder ) {
+
+		return `${ this.uuid }-${ builder.context.environmentContext?.uuid || '' }`;
+
+	}
+
+	construct( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		const uvNode = this.uvNode || builder.context.uvNode || new ReflectNode();
+		let levelNode = this.levelNode || builder.context.levelNode;
+
+		if ( levelNode?.isNode === true ) {
+
+			const texture = this.value;
+
+			levelNode = builder.context.levelShaderNode ? builder.context.levelShaderNode.call( { texture, levelNode }, builder ) : levelNode;
+
+		}
+
+		properties.uvNode = uvNode;
+		properties.levelNode = levelNode;
+
+	}
+
 	generate( builder, output ) {
+
+		const { uvNode, levelNode } = builder.getNodeProperties( this );
 
 		const texture = this.value;
 
@@ -42,16 +72,15 @@ class CubeTextureNode extends TextureNode {
 
 			let snippet = nodeData.snippet;
 
-			if ( snippet === undefined ) {
+			if ( builder.context.tempRead === false || snippet === undefined ) {
 
-				const uvSnippet = this.uvNode.build( builder, 'vec3' );
-				const biasNode = this.biasNode;
+				const uvSnippet = uvNode.build( builder, 'vec3' );
 
-				if ( biasNode !== null ) {
+				if ( levelNode ) {
 
-					const biasSnippet = biasNode.build( builder, 'float' );
+					const levelSnippet = levelNode.build( builder, 'float' );
 
-					snippet = builder.getCubeTextureBias( textureProperty, uvSnippet, biasSnippet );
+					snippet = builder.getCubeTextureLevel( textureProperty, uvSnippet, levelSnippet );
 
 				} else {
 
@@ -70,7 +99,5 @@ class CubeTextureNode extends TextureNode {
 	}
 
 }
-
-CubeTextureNode.prototype.isCubeTextureNode = true;
 
 export default CubeTextureNode;

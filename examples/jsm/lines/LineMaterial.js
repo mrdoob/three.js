@@ -451,6 +451,8 @@ class LineMaterial extends ShaderMaterial {
 
 		} );
 
+		this.isLineMaterial = true;
+
 		Object.defineProperties( this, {
 
 			color: {
@@ -696,7 +698,5 @@ class LineMaterial extends ShaderMaterial {
 	}
 
 }
-
-LineMaterial.prototype.isLineMaterial = true;
 
 export { LineMaterial };

@@ -2,13 +2,13 @@ class NodeVary {
 
 	constructor( name, type ) {
 
+		this.isNodeVary = true;
+
 		this.name = name;
 		this.type = type;
 
 	}
 
 }
-
-NodeVary.prototype.isNodeVary = true;
 
 export default NodeVary;

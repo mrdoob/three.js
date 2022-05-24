@@ -7,6 +7,7 @@
 		constructor( editorCamera, dom ) {
 
 			super();
+			this.isViewHelper = true;
 			this.animating = false;
 			this.controls = null;
 			const color1 = new THREE.Color( '#ff3653' );
@@ -259,8 +260,6 @@
 		}
 
 	}
-
-	ViewHelper.prototype.isViewHelper = true;
 
 	THREE.ViewHelper = ViewHelper;
 

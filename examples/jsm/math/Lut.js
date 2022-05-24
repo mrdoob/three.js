@@ -7,6 +7,8 @@ class Lut {
 
  	constructor( colormap, count = 32 ) {
 
+		this.isLut = true;
+
 		this.lut = [];
 		this.map = [];
 		this.n = 0;
@@ -188,8 +190,6 @@ class Lut {
 	}
 
 }
-
-Lut.prototype.isLut = true;
 
 const ColorMapKeywords = {
 

@@ -5,6 +5,9 @@ class LineGeometry extends LineSegmentsGeometry {
 	constructor() {
 
 		super();
+
+		this.isLineGeometry = true;
+
 		this.type = 'LineGeometry';
 
 	}
@@ -81,7 +84,5 @@ class LineGeometry extends LineSegmentsGeometry {
 	}
 
 }
-
-LineGeometry.prototype.isLineGeometry = true;
 
 export { LineGeometry };

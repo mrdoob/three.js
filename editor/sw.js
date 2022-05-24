@@ -45,6 +45,7 @@ const assets = [
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
+	'../examples/jsm/loaders/PCDLoader.js',
 	'../examples/jsm/loaders/PLYLoader.js',
 	'../examples/jsm/loaders/RGBELoader.js',
 	'../examples/jsm/loaders/STLLoader.js',

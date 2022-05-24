@@ -17,6 +17,8 @@ class SkinnedMesh extends Mesh {
 
 		super( geometry, material );
 
+		this.isSkinnedMesh = true;
+
 		this.type = 'SkinnedMesh';
 
 		this.bindMode = 'attached';
@@ -145,7 +147,5 @@ class SkinnedMesh extends Mesh {
 	}
 
 }
-
-SkinnedMesh.prototype.isSkinnedMesh = true;
 
 export { SkinnedMesh };

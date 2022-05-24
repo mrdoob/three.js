@@ -2,6 +2,14 @@ import InputNode from './InputNode.js';
 
 class ConstNode extends InputNode {
 
+	constructor( value, nodeType = null ) {
+
+		super( value, nodeType );
+
+		this.isConstNode = true;
+
+	}
+
 	generateConst( builder ) {
 
 		return builder.getConst( this.getNodeType( builder ), this.value );
@@ -17,7 +25,5 @@ class ConstNode extends InputNode {
 	}
 
 }
-
-ConstNode.prototype.isConstNode = true;
 
 export default ConstNode;

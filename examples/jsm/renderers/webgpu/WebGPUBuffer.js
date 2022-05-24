@@ -7,6 +7,8 @@ class WebGPUBuffer extends WebGPUBinding {
 
 		super( name );
 
+		this.isBuffer = true;
+
 		this.bytesPerElement = Float32Array.BYTES_PER_ELEMENT;
 		this.type = type;
 		this.visibility = GPUShaderStage.VERTEX;
@@ -37,7 +39,5 @@ class WebGPUBuffer extends WebGPUBinding {
 	}
 
 }
-
-WebGPUBuffer.prototype.isBuffer = true;
 
 export default WebGPUBuffer;

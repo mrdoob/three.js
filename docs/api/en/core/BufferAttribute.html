@@ -37,7 +37,7 @@
 
 		[page:Boolean normalized] -- (optional) Applies to integer data only. Indicates how the underlying data
 		in the buffer maps to the values in the GLSL code. For instance, if [page:TypedArray array] is an instance
-		of UInt16Array, and [page:Boolean normalized] is true, the values 0 - +65535 in the array
+		of UInt16Array, and [page:Boolean normalized] is true, the values `0 - +65535` in the array
 		 data will be mapped to 0.0f - +1.0f in the GLSL attribute. An Int16Array (signed) would map
 		 from -32768 - +32767 to -1.0f - +1.0f. If [page:Boolean normalized] is false, the values
 		 will be converted to floats unmodified, i.e. 32767 becomes 32767.0f.
@@ -92,8 +92,8 @@
 
 		<h3>[property:Object updateRange]</h3>
 		<p>Object containing:<br />
-			[page:Integer offset]: Default is *0*. Position at which to start update.<br />
-			[page:Integer count]: Default is *-1*, which means don't use update ranges. <br /><br />
+			[page:Integer offset]: Default is `0`. Position at which to start update.<br />
+			[page:Integer count]: Default is `-1`, which means don't use update ranges. <br /><br />
 
 			This can be used to only update some components of stored vectors (for example, just the component
 			related to color).
@@ -101,7 +101,7 @@
 
 		<h3>[property:Usage usage]</h3>
 		<p>
-			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
+			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the `usage` parameter of
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
 			Default is [page:BufferAttributeUsage StaticDrawUsage]. See usage [page:BufferAttributeUsage constants] for all possible values. <br /><br />
 			

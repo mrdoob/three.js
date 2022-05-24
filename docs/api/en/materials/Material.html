@@ -33,13 +33,13 @@
 		<p>
 		Sets the alpha value to be used when running an alpha test.
 		The material will not be rendered if the opacity is lower than this value.
-		Default is *0*.
+		Default is `0`.
 		</p>
 
 		<h3>[property:Float alphaToCoverage]</h3>
 		<p>
-		Enables alpha to coverage. Can only be used with MSAA-enabled contexts (meaning when the renderer was created with *antialias* parameter set to *true*).
-		Default is *false*.
+		Enables alpha to coverage. Can only be used with MSAA-enabled contexts (meaning when the renderer was created with `antialias` parameter set to `true`).
+		Default is `false`.
 		</p>
 
 		<h3>[property:Integer blendDst]</h3>
@@ -50,7 +50,7 @@
 		</p>
 
 		<h3>[property:Integer blendDstAlpha]</h3>
-		<p>The transparency of the [page:.blendDst]. Uses [page:.blendDst] value if null. Default is *null*.</p>
+		<p>The transparency of the [page:.blendDst]. Uses [page:.blendDst] value if null. Default is `null`.</p>
 
 		<h3>[property:Integer blendEquation]</h3>
 		<p>
@@ -60,7 +60,7 @@
 		</p>
 
 		<h3>[property:Integer blendEquationAlpha]</h3>
-		<p>The transparency of the [page:.blendEquation]. Uses [page:.blendEquation] value if null. Default is *null*.</p>
+		<p>The transparency of the [page:.blendEquation]. Uses [page:.blendEquation] value if null. Default is `null`.</p>
 
 		<h3>[property:Blending blending]</h3>
 		<p>
@@ -77,12 +77,12 @@
 		</p>
 
 		<h3>[property:Integer blendSrcAlpha]</h3>
-		<p>The transparency of the [page:.blendSrc]. Uses [page:.blendSrc] value if null. Default is *null*.</p>
+		<p>The transparency of the [page:.blendSrc]. Uses [page:.blendSrc] value if null. Default is `null`.</p>
 
 		<h3>[property:Boolean clipIntersection]</h3>
 		<p>
 		Changes the behavior of clipping planes so that only their intersection is clipped, rather than their union.
-		Default is *false*.
+		Default is `false`.
 		</p>
 
 		<h3>[property:Array clippingPlanes]</h3>
@@ -90,25 +90,25 @@
 		User-defined clipping planes specified as THREE.Plane objects in world space.
 		These planes apply to the objects this material is attached to.
 		Points in space whose signed distance to the plane is negative are clipped (not rendered).
-		This requires [page:WebGLRenderer.localClippingEnabled] to be *true*.
+		This requires [page:WebGLRenderer.localClippingEnabled] to be `true`.
 		See the [example:webgl_clipping_intersection WebGL / clipping /intersection] example.
-		Default is *null*.
+		Default is `null`.
 		</p>
 
 		<h3>[property:Boolean clipShadows]</h3>
 		<p>
-		Defines whether to clip shadows according to the clipping planes specified on this material. Default is *false*.
+		Defines whether to clip shadows according to the clipping planes specified on this material. Default is `false`.
 		</p>
 
 		<h3>[property:Boolean colorWrite]</h3>
 		<p>
 		Whether to render the material's color.
-		This can be used in conjunction with a mesh's [page:Integer renderOrder] property to create invisible objects that occlude other objects. Default is *true*.
+		This can be used in conjunction with a mesh's [page:Integer renderOrder] property to create invisible objects that occlude other objects. Default is `true`.
 		</p>
 
 		<h3>[property:Object defines]</h3>
 		<p>
-		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. The pairs are defined in both vertex and fragment shaders.  Default is *undefined*.
+		Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. `{ MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }`. The pairs are defined in both vertex and fragment shaders.  Default is `undefined`.
 		</p>
 
 		<h3>[property:Integer depthFunc]</h3>
@@ -118,12 +118,12 @@
 
 		<h3>[property:Boolean depthTest]</h3>
 		<p>
-		Whether to have depth test enabled when rendering this material. Default is *true*.
+		Whether to have depth test enabled when rendering this material. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean depthWrite]</h3>
 		<p>
-		Whether rendering this material has any effect on the depth buffer. Default is *true*.<br /><br />
+		Whether rendering this material has any effect on the depth buffer. Default is `true`.<br /><br />
 
 		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
 		</p>
@@ -135,12 +135,12 @@
 
 		<h3>[property:Boolean stencilWrite]</h3>
 		<p>
-		Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.
+		Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be `true`. Default is `false`.
 		</p>
 
 		<h3>[property:Integer stencilWriteMask]</h3>
 		<p>
-		The bit mask to use when writing to the stencil buffer. Default is *0xFF*.
+		The bit mask to use when writing to the stencil buffer. Default is `0xFF`.
 		</p>
 
 		<h3>[property:Integer stencilFunc]</h3>
@@ -150,12 +150,12 @@
 
 		<h3>[property:Integer stencilRef]</h3>
 		<p>
-		The value to use when performing stencil comparisons or stencil operations. Default is *0*.
+		The value to use when performing stencil comparisons or stencil operations. Default is `0`.
 		</p>
 
 		<h3>[property:Integer stencilFuncMask]</h3>
 		<p>
-		The bit mask to use when comparing against the stencil buffer. Default is *0xFF*.
+		The bit mask to use when comparing against the stencil buffer. Default is `0xFF`.
 		</p>
 
 		<h3>[property:Integer stencilFail]</h3>
@@ -186,48 +186,48 @@
 
 		<h3>[property:Float opacity]</h3>
 		<p>
-		Float in the range of *0.0* - *1.0* indicating how transparent the material is.
-		A value of *0.0* indicates fully transparent, *1.0* is fully opaque.<br />
-		If the material's [page:Boolean transparent] property is not set to *true*, the material will remain
+		Float in the range of `0.0` - `1.0` indicating how transparent the material is.
+		A value of `0.0` indicates fully transparent, `1.0` is fully opaque.<br />
+		If the material's [page:Boolean transparent] property is not set to `true`, the material will remain
 		fully opaque and this value will only affect its color. <br />
-		Default is *1.0*.
+		Default is `1.0`.
 		</p>
 
 		<h3>[property:Boolean polygonOffset]</h3>
 		<p>
-		Whether to use polygon offset. Default is *false*. This corresponds to the *GL_POLYGON_OFFSET_FILL* WebGL feature.
+		Whether to use polygon offset. Default is `false`. This corresponds to the `GL_POLYGON_OFFSET_FILL` WebGL feature.
 		</p>
 
 		<h3>[property:Integer polygonOffsetFactor]</h3>
-		<p>Sets the polygon offset factor. Default is *0*.</p>
+		<p>Sets the polygon offset factor. Default is `0`.</p>
 
 		<h3>[property:Integer polygonOffsetUnits]</h3>
-		<p>Sets the polygon offset units. Default is *0*.</p>
+		<p>Sets the polygon offset units. Default is `0`.</p>
 
 		<h3>[property:String precision]</h3>
 		<p>
-		Override the renderer's default precision for this material. Can be "*highp*", "*mediump*" or "*lowp*".
-		Default is *null*.
+		Override the renderer's default precision for this material. Can be `"highp"`, `"mediump"` or `"lowp"`.
+		Default is `null`.
 		</p>
 
 		<h3>[property:Boolean premultipliedAlpha]</h3>
 		<p>
 		Whether to premultiply the alpha (transparency) value.
 		See [Example:webgl_materials_physical_transmission WebGL / Materials / Physical / Transmission] for an example of the difference.
-		Default is *false*.
+		Default is `false`.
 		</p>
 
 		<h3>[property:Boolean dithering]</h3>
 		<p>
 		Whether to apply dithering to the color to remove the appearance of banding.
-		Default is *false*.
+		Default is `false`.
 		</p>
 
 		<h3>[property:Integer shadowSide]</h3>
 		<p>
 		Defines which side of faces cast shadows.
-		When set, can be [page:Materials THREE.FrontSide], [page:Materials THREE.BackSide], or [page:Materials THREE.DoubleSide]. Default is *null*. <br />
-		If *null*, the side casting shadows is determined as follows: <br />
+		When set, can be [page:Materials THREE.FrontSide], [page:Materials THREE.BackSide], or [page:Materials THREE.DoubleSide]. Default is `null`. <br />
+		If `null`, the side casting shadows is determined as follows: <br />
 
 		<table>
 			<thead>
@@ -265,7 +265,7 @@
 
 		<h3>[property:Boolean toneMapped]</h3>
 		<p>
-		Defines whether this material is tone mapped according to the renderer's [page:WebGLRenderer.toneMapping toneMapping] setting. Default is *true*.
+		Defines whether this material is tone mapped according to the renderer's [page:WebGLRenderer.toneMapping toneMapping] setting. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean transparent]</h3>
@@ -275,7 +275,7 @@
 		non-transparent objects. <br />
 		When set to true, the extent to which the material is transparent is
 		controlled by setting its [page:Float opacity] property. <br />
-		Default is *false*.
+		Default is `false`.
 		</p>
 
 		<h3>[property:String type]</h3>
@@ -292,17 +292,17 @@
 
 		<h3>[property:Integer version]</h3>
 		<p>
-		This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
+		This starts at `0` and counts how many times [property:Boolean needsUpdate] is set to `true`.
 		</p>
 
 		<h3>[property:Boolean vertexColors]</h3>
 		<p>
-		Defines whether vertex coloring is used. Default is *false*.
+		Defines whether vertex coloring is used. Default is `false`.
 		</p>
 
 		<h3>[property:Boolean visible]</h3>
 		<p>
-		Defines whether this material is visible. Default is *true*.
+		Defines whether this material is visible. Default is `true`.
 		</p>
 
 		<h3>[property:Object userData]</h3>
@@ -369,7 +369,7 @@
 		<h3>[method:undefined setValues]( [param:Object values] )</h3>
 		<p>
 		values -- a container with parameters.<br />
-		Sets the properties based on the *values*.
+		Sets the properties based on the `values`.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>

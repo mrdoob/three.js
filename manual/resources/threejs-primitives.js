@@ -707,6 +707,7 @@ const geometry = new THREE.WireframeGeometry(
 
   function addLink(parent, name, href) {
     const a = document.createElement('a');
+    a.setAttribute('target', '_blank');
     a.href = href || `https://threejs.org/docs/#api/geometries/${name}`;
     const code = document.createElement('code');
     code.textContent = name;

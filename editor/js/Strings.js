@@ -144,6 +144,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributes',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': 'Radius',
 			'sidebar/geometry/capsule_geometry/length': 'Length',
@@ -479,6 +481,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributs',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': 'Radius',
 			'sidebar/geometry/capsule_geometry/length': 'Length',
@@ -814,6 +818,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': '属性',
 			'sidebar/geometry/buffer_geometry/index': '索引',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': '半径',
 			'sidebar/geometry/capsule_geometry/length': '长度',
