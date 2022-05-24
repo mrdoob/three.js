@@ -44,9 +44,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	generate( builder ) {
-
-		const type = this.getNodeType( builder );
+	construct() {
 
 		const { normalMapType, scaleNode } = this;
 
@@ -60,26 +58,26 @@ class NormalMapNode extends TempNode {
 
 		}
 
+		let outputNode = null;
+
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
 			const vertexNormalNode = mul( new ModelNode( ModelNode.NORMAL_MATRIX ), normalMap );
 
-			const normal = normalize( vertexNormalNode );
-
-			return normal.build( builder, type );
+			outputNode = normalize( vertexNormalNode );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
-			const perturbNormal2ArbCall = perturbNormal2ArbNode.call( {
+			outputNode = perturbNormal2ArbNode.call( {
 				eye_pos: positionView,
 				surf_norm: normalView,
 				mapN: normalMap,
 				uv: uv()
 			} );
 
-			return perturbNormal2ArbCall.build( builder, type );
-
 		}
+
+		return outputNode;
 
 	}
 

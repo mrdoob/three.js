@@ -5,7 +5,7 @@ import {
 	materialRoughness, materialMetalness, materialEmissive
 } from '../shadernode/ShaderNodeElements.js';
 import LightsNode from '../lighting/LightsNode.js';
-import EnvironmentLightNode from '../lighting/EnvironmentLightNode.js';
+import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import AONode from '../lighting/AONode.js';
 import getRoughness from '../functions/material/getRoughness.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
@@ -65,7 +65,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		if ( envNode ) {
 
-			materialLightsNode.push( new EnvironmentLightNode( envNode ) );
+			materialLightsNode.push( new EnvironmentNode( envNode ) );
 
 		}
 

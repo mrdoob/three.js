@@ -602,16 +602,26 @@ class GLTFWriter {
 	}
 
 	/**
-	 * Assign and return a temporal unique id for an object
-	 * especially which doesn't have .uuid
+	 * Returns ids for buffer attributes.
 	 * @param  {Object} object
 	 * @return {Integer}
 	 */
-	getUID( object ) {
+	getUID( attribute, isRelativeCopy = false ) {
 
-		if ( ! this.uids.has( object ) ) this.uids.set( object, this.uid ++ );
+		if ( this.uids.has( attribute ) === false ) {
 
-		return this.uids.get( object );
+			const uids = new Map();
+
+			uids.set( true, this.uid ++ );
+			uids.set( false, this.uid ++ );
+
+			this.uids.set( attribute, uids );
+
+		}
+
+		const uids = this.uids.get( attribute );
+
+		return uids.get( isRelativeCopy );
 
 	}
 
@@ -1440,6 +1450,7 @@ class GLTFWriter {
 		if ( cache.meshes.has( meshCacheKey ) ) return cache.meshes.get( meshCacheKey );
 
 		const geometry = mesh.geometry;
+
 		let mode;
 
 		// Use the correct mode
@@ -1600,9 +1611,9 @@ class GLTFWriter {
 
 					const baseAttribute = geometry.attributes[ attributeName ];
 
-					if ( cache.attributes.has( this.getUID( attribute ) ) ) {
+					if ( cache.attributes.has( this.getUID( attribute, true ) ) ) {
 
-						target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute ) );
+						target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute, true ) );
 						continue;
 
 					}
@@ -1626,7 +1637,7 @@ class GLTFWriter {
 					}
 
 					target[ gltfAttributeName ] = this.processAccessor( relativeAttribute, geometry );
-					cache.attributes.set( this.getUID( baseAttribute ), target[ gltfAttributeName ] );
+					cache.attributes.set( this.getUID( baseAttribute, true ), target[ gltfAttributeName ] );
 
 				}
 

@@ -17,41 +17,54 @@ class LightingContextNode extends ContextNode {
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
-		const { context, lightingModelNode } = this;
+		const { lightingModelNode } = this;
 
-		if ( context.reflectedLight === undefined ) {
+		const context = this.context = {}; // reset context
+		const properties = builder.getNodeProperties( this );
 
-			const directDiffuse = temp( vec3() ),
-				directSpecular = temp( vec3() ),
-				indirectDiffuse = temp( vec3() ),
-				indirectSpecular = temp( vec3() );
+		const directDiffuse = temp( vec3() ),
+			directSpecular = temp( vec3() ),
+			indirectDiffuse = temp( vec3() ),
+			indirectSpecular = temp( vec3() ),
+			total = add( directDiffuse, directSpecular, indirectDiffuse, indirectSpecular );
 
-			context.reflectedLight = {
-				directDiffuse,
-				directSpecular,
-				indirectDiffuse,
-				indirectSpecular,
-				total: add( directDiffuse, directSpecular, indirectDiffuse, indirectSpecular )
-			};
+		const reflectedLight = {
+			directDiffuse,
+			directSpecular,
+			indirectDiffuse,
+			indirectSpecular,
+			total
+		};
 
-			context.radiance = temp( vec3() );
-			context.irradiance = temp( vec3() );
-			context.iblIrradiance = temp( vec3() );
-			context.ambientOcclusion = temp( float( 1 ) );
+		const lighting = {
+			radiance : temp( vec3() ),
+			irradiance : temp( vec3() ),
+			iblIrradiance : temp( vec3() ),
+			ambientOcclusion : temp( float( 1 ) )
+		};
 
-		}
+		Object.assign( properties, reflectedLight, lighting );
+		Object.assign( context, lighting );
 
+		context.reflectedLight = reflectedLight;
 		context.lightingModelNode = lightingModelNode || context.lightingModelNode;
-
-		const type = this.getNodeType( builder );
-
-		super.generate( builder, type );
 
 		if ( lightingModelNode?.indirectDiffuse ) lightingModelNode.indirectDiffuse.call( context );
 		if ( lightingModelNode?.indirectSpecular ) lightingModelNode.indirectSpecular.call( context );
 		if ( lightingModelNode?.ambientOcclusion ) lightingModelNode.ambientOcclusion.call( context );
+
+		return super.construct( builder );
+
+	}
+
+	generate( builder ) {
+
+		const { context } = this;
+		const type = this.getNodeType( builder );
+
+		super.generate( builder, type );
 
 		return context.reflectedLight.total.build( builder, type );
 

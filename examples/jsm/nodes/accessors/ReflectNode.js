@@ -23,25 +23,29 @@ class ReflectNode extends Node {
 
 	}
 
-	generate( builder ) {
+	construct() {
 
 		const scope = this.scope;
+
+		let outputNode = null;
 
 		if ( scope === ReflectNode.VECTOR ) {
 
 			const reflectView = reflect( negate( positionViewDirection ), transformedNormalView );
 			const reflectVec = transformDirection( reflectView, cameraViewMatrix );
 
-			return reflectVec.build( builder );
+			outputNode = reflectVec;
 
 		} else if ( scope === ReflectNode.CUBE ) {
 
 			const reflectVec = nodeObject( new ReflectNode( ReflectNode.VECTOR ) );
 			const cubeUV = vec3( negate( reflectVec.x ), reflectVec.yz );
 
-			return cubeUV.build( builder );
+			outputNode = cubeUV;
 
 		}
+
+		return outputNode;
 
 	}
 

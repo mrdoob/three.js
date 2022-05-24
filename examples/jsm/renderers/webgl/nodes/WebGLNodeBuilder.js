@@ -403,7 +403,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 			if ( node.name === name ) {
 
-				return this.getFlowData( shaderStage, node );
+				return this.getFlowData( node/*, shaderStage*/ );
 
 			}
 

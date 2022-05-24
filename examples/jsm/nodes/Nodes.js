@@ -65,7 +65,7 @@ import LightsNode from './lighting/LightsNode.js';
 import LightingNode from './lighting/LightingNode.js';
 import LightingContextNode from './lighting/LightingContextNode.js';
 import HemisphereLightNode from './lighting/HemisphereLightNode.js';
-import EnvironmentLightNode from './lighting/EnvironmentLightNode.js';
+import EnvironmentNode from './lighting/EnvironmentNode.js';
 import AONode from './lighting/AONode.js';
 import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 
@@ -169,7 +169,7 @@ const nodeLib = {
 	LightingNode,
 	LightingContextNode,
 	HemisphereLightNode,
-	EnvironmentLightNode,
+	EnvironmentNode,
 	AONode,
 	AnalyticLightNode,
 
@@ -272,7 +272,7 @@ export {
 	LightingNode,
 	LightingContextNode,
 	HemisphereLightNode,
-	EnvironmentLightNode,
+	EnvironmentNode,
 	AONode,
 	AnalyticLightNode,
 
