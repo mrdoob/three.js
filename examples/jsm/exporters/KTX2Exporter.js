@@ -39,7 +39,7 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
- } from 'three/examples/jsm/libs/ktx-parse.module.js';
+ } from '../libs/ktx-parse.module.js';
 
 const VK_FORMAT_MAP = {
 
