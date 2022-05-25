@@ -66,6 +66,8 @@ class WebGPURenderer {
 
 	constructor( parameters = {} ) {
 
+		this.isWebGPURenderer = true;
+
 		// public
 
 		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : this._createCanvasElement();
@@ -962,12 +964,7 @@ class WebGPURenderer {
 				device: device,
 				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT,
-				compositingAlphaMode: 'premultiplied',
-				size: {
-					width: Math.floor( this._width * this._pixelRatio ),
-					height: Math.floor( this._height * this._pixelRatio ),
-					depthOrArrayLayers: 1
-				},
+				compositingAlphaMode: 'premultiplied'
 			} );
 
 		}
@@ -983,7 +980,5 @@ class WebGPURenderer {
 	}
 
 }
-
-WebGPURenderer.prototype.isWebGPURenderer = true;
 
 export default WebGPURenderer;

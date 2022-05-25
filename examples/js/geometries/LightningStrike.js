@@ -106,6 +106,7 @@
 		constructor( rayParameters = {} ) {
 
 			super();
+			this.isLightningStrike = true;
 			this.type = 'LightningStrike'; // Set parameters, and set undefined parameters to default values
 
 			this.init( LightningStrike.copyParameters( rayParameters, rayParameters ) ); // Creates and populates the mesh
@@ -856,9 +857,8 @@
 
 		}
 
-	}
+	} // Ray states
 
-	LightningStrike.prototype.isLightningStrike = true; // Ray states
 
 	LightningStrike.RAY_INITIALIZED = 0;
 	LightningStrike.RAY_UNBORN = 1;

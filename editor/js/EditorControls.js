@@ -301,9 +301,9 @@ function EditorControls( object, domElement ) {
 
 			var closest = touches[ 0 ];
 
-			for ( var i in touches ) {
+			for ( var touch2 of touches ) {
 
-				if ( closest.distanceTo( touch ) > touches[ i ].distanceTo( touch ) ) closest = touches[ i ];
+				if ( closest.distanceTo( touch ) > touch2.distanceTo( touch ) ) closest = touch2;
 
 			}
 

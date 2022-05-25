@@ -65,7 +65,6 @@
 
 				const chunkSize = data.getUint32( i, true );
 				i += 4;
-				data.getUint32( i, true );
 				i += 4; // childChunks
 
 				if ( id === 'SIZE' ) {

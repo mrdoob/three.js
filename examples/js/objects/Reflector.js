@@ -5,6 +5,7 @@
 		constructor( geometry, options = {} ) {
 
 			super( geometry );
+			this.isReflector = true;
 			this.type = 'Reflector';
 			this.camera = new THREE.PerspectiveCamera();
 			const scope = this;
@@ -138,7 +139,6 @@
 
 	}
 
-	Reflector.prototype.isReflector = true;
 	Reflector.ReflectorShader = {
 		uniforms: {
 			'color': {

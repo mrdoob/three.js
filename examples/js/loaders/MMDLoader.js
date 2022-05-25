@@ -1823,6 +1823,7 @@
 		constructor( parameters ) {
 
 			super();
+			this.isMMDToonMaterial = true;
 			this._matcapCombine = THREE.AddOperation;
 			this.emissiveIntensity = 1.0;
 			this.normalMapType = THREE.TangentSpaceNormalMap;
@@ -1917,8 +1918,6 @@
 		}
 
 	}
-
-	MMDToonMaterial.prototype.isMMDToonMaterial = true;
 
 	THREE.MMDLoader = MMDLoader;
 

@@ -60,9 +60,9 @@ class MorphAnimMesh extends Mesh {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.mixer = new AnimationMixer( this );
 

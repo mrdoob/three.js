@@ -445,6 +445,7 @@
 				clipping: true // required for clipping support
 
 			} );
+			this.isLineMaterial = true;
 			Object.defineProperties( this, {
 				color: {
 					enumerable: true,
@@ -635,8 +636,6 @@
 		}
 
 	}
-
-	LineMaterial.prototype.isLineMaterial = true;
 
 	THREE.LineMaterial = LineMaterial;
 

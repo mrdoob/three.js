@@ -5,7 +5,7 @@ import {
 	materialRoughness, materialMetalness, materialEmissive
 } from '../shadernode/ShaderNodeElements.js';
 import LightsNode from '../lighting/LightsNode.js';
-import EnvironmentLightNode from '../lighting/EnvironmentLightNode.js';
+import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import AONode from '../lighting/AONode.js';
 import getRoughness from '../functions/material/getRoughness.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
@@ -20,6 +20,8 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshStandardNodeMaterial = true;
 
 		this.colorNode = null;
 		this.opacityNode = null;
@@ -57,11 +59,11 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		if ( this.lightsNode ) builder.lightsNode = this.lightsNode;
 
-		let materialLightsNode = [];
+		const materialLightsNode = [];
 
 		if ( envNode ) {
 
-			materialLightsNode.push( new EnvironmentLightNode( envNode ) );
+			materialLightsNode.push( new EnvironmentNode( envNode ) );
 
 		}
 
@@ -165,5 +167,3 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-MeshStandardNodeMaterial.prototype.isMeshStandardNodeMaterial = true;

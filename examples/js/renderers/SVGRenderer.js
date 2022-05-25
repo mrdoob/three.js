@@ -5,13 +5,12 @@
 		constructor( node ) {
 
 			super();
+			this.isSVGObject = true;
 			this.node = node;
 
 		}
 
 	}
-
-	SVGObject.prototype.isSVGObject = true;
 
 	class SVGRenderer {
 

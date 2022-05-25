@@ -57,6 +57,8 @@ class Font {
 
 	constructor( data ) {
 
+		this.isFont = true;
+
 		this.type = 'Font';
 
 		this.data = data;
@@ -190,7 +192,5 @@ function createPath( char, scale, offsetX, offsetY, data ) {
 	return { offsetX: glyph.ha * scale, path: path };
 
 }
-
-Font.prototype.isFont = true;
 
 export { FontLoader, Font };

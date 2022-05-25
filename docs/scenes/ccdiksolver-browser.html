@@ -50,7 +50,6 @@
 				Float32BufferAttribute,
 				MeshPhongMaterial,
 				PerspectiveCamera,
-				PointLight,
 				Scene,
 				SkinnedMesh,
 				Skeleton,
@@ -215,18 +214,18 @@
 				gui.add( mesh, 'pose' ).name( 'mesh.pose()' );
 
 				mesh.skeleton.bones
-					.filter((bone) => bone.name === "target")
-					.forEach(function (bone) {
+					.filter( ( bone ) => bone.name === "target" )
+					.forEach( function (bone) {
 						const folder = gui.addFolder( bone.name );
 
 						const delta = 20;
 						folder.add( bone.position, 'x', - delta + bone.position.x, delta + bone.position.x );
 						folder.add( bone.position, 'y', - bone.position.y, bone.position.y );
 						folder.add( bone.position, 'z', - delta + bone.position.z, delta + bone.position.z );
-					});
+					} );
 				
 				gui.add( ikSolver, 'update' ).name( 'ikSolver.update()' );
-				gui.add( state, 'ikSolverAutoUpdate' )
+				gui.add( state, 'ikSolverAutoUpdate' );
 
 			}
 
@@ -258,7 +257,7 @@
 					{
 						target: 5,
 						effector: 4,
-						links: [{ index: 3 }, { index: 2 }, { index: 1 }]
+						links: [ { index: 3 }, { index: 2 }, { index: 1 } ]
 					}
 				];
 				ikSolver = new CCDIKSolver( mesh, iks );
@@ -271,7 +270,9 @@
 				requestAnimationFrame( render );
 
 				if ( state.ikSolverAutoUpdate ) {
+
 					ikSolver?.update();
+
 				}
 
 				renderer.render( scene, camera );

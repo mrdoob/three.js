@@ -73,6 +73,29 @@ material.roughness = min( material.roughness, 1.0 );
 
 #endif
 
+#ifdef USE_IRIDESCENCE
+
+	material.iridescence = iridescence;
+	material.iridescenceIOR = iridescenceIOR;
+
+	#ifdef USE_IRIDESCENCEMAP
+
+		material.iridescence *= texture2D( iridescenceMap, vUv ).r;
+
+	#endif
+
+	#ifdef USE_IRIDESCENCE_THICKNESSMAP
+
+		material.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vUv ).g + iridescenceThicknessMinimum;
+
+	#else
+
+		material.iridescenceThickness = iridescenceThicknessMaximum;
+
+	#endif
+
+#endif
+
 #ifdef USE_SHEEN
 
 	material.sheenColor = sheenColor;

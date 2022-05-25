@@ -8,6 +8,8 @@ class CubeTextureNode extends TextureNode {
 
 		super( value, uvNode, levelNode );
 
+		this.isCubeTextureNode = true;
+
 	}
 
 	getInputType( /*builder*/ ) {
@@ -16,10 +18,37 @@ class CubeTextureNode extends TextureNode {
 
 	}
 
+	getConstructHash( builder ) {
+
+		return `${ this.uuid }-${ builder.context.environmentContext?.uuid || '' }`;
+
+	}
+
+	construct( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		const uvNode = this.uvNode || builder.context.uvNode || new ReflectNode();
+		let levelNode = this.levelNode || builder.context.levelNode;
+
+		if ( levelNode?.isNode === true ) {
+
+			const texture = this.value;
+
+			levelNode = builder.context.levelShaderNode ? builder.context.levelShaderNode.call( { texture, levelNode }, builder ) : levelNode;
+
+		}
+
+		properties.uvNode = uvNode;
+		properties.levelNode = levelNode;
+
+	}
+
 	generate( builder, output ) {
 
+		const { uvNode, levelNode } = builder.getNodeProperties( this );
+
 		const texture = this.value;
-		const uvNode = this.uvNode || builder.context.uvNode || new ReflectNode();
 
 		if ( ! texture || texture.isCubeTexture !== true ) {
 
@@ -46,13 +75,10 @@ class CubeTextureNode extends TextureNode {
 			if ( builder.context.tempRead === false || snippet === undefined ) {
 
 				const uvSnippet = uvNode.build( builder, 'vec3' );
-				const levelNode = this.levelNode || builder.context.levelNode;
 
-				if ( levelNode?.isNode === true ) {
+				if ( levelNode ) {
 
-					const levelOutNode = builder.context.levelShaderNode ? builder.context.levelShaderNode.call( { texture, levelNode }, builder ) : levelNode;
-
-					const levelSnippet = levelOutNode.build( builder, 'float' );
+					const levelSnippet = levelNode.build( builder, 'float' );
 
 					snippet = builder.getCubeTextureLevel( textureProperty, uvSnippet, levelSnippet );
 
@@ -73,7 +99,5 @@ class CubeTextureNode extends TextureNode {
 	}
 
 }
-
-CubeTextureNode.prototype.isCubeTextureNode = true;
 
 export default CubeTextureNode;

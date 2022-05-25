@@ -14,6 +14,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		super();
 
+		this.isNodeMaterial = true;
+
 		this.type = this.constructor.name;
 
 		this.lights = true;
@@ -28,6 +30,12 @@ class NodeMaterial extends ShaderMaterial {
 		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightsNode } );
 
 		this.generateOutput( builder, { diffuseColorNode, outgoingLightNode } );
+
+	}
+
+	customProgramCacheKey() {
+
+		return this.uuid + '-' + this.version;
 
 	}
 
@@ -211,7 +219,5 @@ class NodeMaterial extends ShaderMaterial {
 	static fromMaterial( /*material*/ ) { }
 
 }
-
-NodeMaterial.prototype.isNodeMaterial = true;
 
 export default NodeMaterial;

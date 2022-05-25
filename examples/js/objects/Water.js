@@ -12,6 +12,7 @@
 		constructor( geometry, options = {} ) {
 
 			super( geometry );
+			this.isWater = true;
 			const scope = this;
 			const textureWidth = options.textureWidth !== undefined ? options.textureWidth : 512;
 			const textureHeight = options.textureHeight !== undefined ? options.textureHeight : 512;
@@ -280,8 +281,6 @@
 		}
 
 	}
-
-	Water.prototype.isWater = true;
 
 	THREE.Water = Water;
 
