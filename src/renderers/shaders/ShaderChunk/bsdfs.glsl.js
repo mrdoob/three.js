@@ -19,6 +19,27 @@ vec3 F_Schlick( const in vec3 f0, const in float f90, const in float dotVH ) {
 
 } // validated
 
+float F_Schlick( const in float f0, const in float f90, const in float dotVH ) {
+
+	// Original approximation by Christophe Schlick '94
+	// float fresnel = pow( 1.0 - dotVH, 5.0 );
+
+	// Optimized variant (presented by Epic at SIGGRAPH '13)
+	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
+	float fresnel = exp2( ( - 5.55473 * dotVH - 6.98316 ) * dotVH );
+
+	return f0 * ( 1.0 - fresnel ) + ( f90 * fresnel );
+
+} // validated
+
+vec3 Schlick_to_F0( const in vec3 f, const in float f90, const in float dotVH ) {
+    float x = clamp( 1.0 - dotVH, 0.0, 1.0 );
+    float x2 = x * x;
+    float x5 = clamp( x * x2 * x2, 0.0, 0.9999 );
+
+    return ( f - vec3( f90 ) * x5 ) / ( 1.0 - x5 );
+}
+
 // Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
 // https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 float V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const in float dotNV ) {
@@ -66,6 +87,31 @@ vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 norm
 	return F * ( V * D );
 
 }
+
+#ifdef USE_IRIDESCENCE
+
+vec3 BRDF_GGX_Iridescence( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in float f90, const in float iridescence, const in vec3 iridescenceFresnel, const in float roughness ) {
+
+	float alpha = pow2( roughness ); // UE4's roughness
+
+	vec3 halfDir = normalize( lightDir + viewDir );
+
+	float dotNL = saturate( dot( normal, lightDir ) );
+	float dotNV = saturate( dot( normal, viewDir ) );
+	float dotNH = saturate( dot( normal, halfDir ) );
+	float dotVH = saturate( dot( viewDir, halfDir ) );
+
+	vec3 F = mix(F_Schlick( f0, f90, dotVH ), iridescenceFresnel, iridescence);
+
+	float V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+
+	float D = D_GGX( alpha, dotNH );
+
+	return F * ( V * D );
+
+}
+
+#endif
 
 // Rect Area Light
 
