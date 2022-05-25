@@ -35,6 +35,11 @@
 				return new GLTFMaterialsClearcoatExtension( writer );
 
 			} );
+			this.register( function ( writer ) {
+
+				return new GLTFMaterialsIridescenceExtension( writer );
+
+			} );
 
 		}
 
@@ -2209,6 +2214,61 @@
 				};
 				writer.applyTextureTransform( clearcoatNormalMapDef, material.clearcoatNormalMap );
 				extensionDef.clearcoatNormalTexture = clearcoatNormalMapDef;
+
+			}
+
+			materialDef.extensions = materialDef.extensions || {};
+			materialDef.extensions[ this.name ] = extensionDef;
+			extensionsUsed[ this.name ] = true;
+
+		}
+
+	}
+	/**
+ * Iridescence Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence
+ */
+
+
+	class GLTFMaterialsIridescenceExtension {
+
+		constructor( writer ) {
+
+			this.writer = writer;
+			this.name = 'KHR_materials_iridescence';
+
+		}
+
+		writeMaterial( material, materialDef ) {
+
+			if ( ! material.isMeshPhysicalMaterial ) return;
+			const writer = this.writer;
+			const extensionsUsed = writer.extensionsUsed;
+			const extensionDef = {};
+			extensionDef.iridescenceFactor = material.iridescence;
+
+			if ( material.iridescenceMap ) {
+
+				const iridescenceMapDef = {
+					index: writer.processTexture( material.iridescenceMap )
+				};
+				writer.applyTextureTransform( iridescenceMapDef, material.iridescenceMap );
+				extensionDef.iridescenceTexture = iridescenceMapDef;
+
+			}
+
+			extensionDef.iridescenceIor = material.iridescenceIOR;
+			extensionDef.iridescenceThicknessMinimum = material.iridescenceThicknessRange[ 0 ];
+			extensionDef.iridescenceThicknessMaximum = material.iridescenceThicknessRange[ 1 ];
+
+			if ( material.iridescenceThicknessMap ) {
+
+				const iridescenceThicknessMapDef = {
+					index: writer.processTexture( material.iridescenceThicknessMap )
+				};
+				writer.applyTextureTransform( iridescenceThicknessMapDef, material.iridescenceThicknessMap );
+				extensionDef.iridescenceThicknessTexture = iridescenceThicknessMapDef;
 
 			}
 
