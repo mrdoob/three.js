@@ -8362,8 +8362,8 @@
 			this.updateMorphTargets();
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 
 			if (source.morphTargetInfluences !== undefined) {
 				this.morphTargetInfluences = source.morphTargetInfluences.slice();
@@ -16795,7 +16795,13 @@
 
 				if (renderTargetProperties.__webglDepthbuffer) _gl.deleteRenderbuffer(renderTargetProperties.__webglDepthbuffer);
 				if (renderTargetProperties.__webglMultisampledFramebuffer) _gl.deleteFramebuffer(renderTargetProperties.__webglMultisampledFramebuffer);
-				if (renderTargetProperties.__webglColorRenderbuffer) _gl.deleteRenderbuffer(renderTargetProperties.__webglColorRenderbuffer);
+
+				if (renderTargetProperties.__webglColorRenderbuffer) {
+					for (let i = 0; i < renderTargetProperties.__webglColorRenderbuffer.length; i++) {
+						if (renderTargetProperties.__webglColorRenderbuffer[i]) _gl.deleteRenderbuffer(renderTargetProperties.__webglColorRenderbuffer[i]);
+					}
+				}
+
 				if (renderTargetProperties.__webglDepthRenderbuffer) _gl.deleteRenderbuffer(renderTargetProperties.__webglDepthRenderbuffer);
 			}
 
@@ -17456,19 +17462,22 @@
 
 				_gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer);
 			} else {
-				// Use the first texture for MRT so far
-				const texture = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture[0] : renderTarget.texture;
-				const glFormat = utils.convert(texture.format, texture.encoding);
-				const glType = utils.convert(texture.type);
-				const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
-				const samples = getRenderTargetSamples(renderTarget);
+				const textures = renderTarget.isWebGLMultipleRenderTargets === true ? renderTarget.texture : [renderTarget.texture];
 
-				if (isMultisample && useMultisampledRTT(renderTarget) === false) {
-					_gl.renderbufferStorageMultisample(_gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height);
-				} else if (useMultisampledRTT(renderTarget)) {
-					multisampledRTTExt.renderbufferStorageMultisampleEXT(_gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height);
-				} else {
-					_gl.renderbufferStorage(_gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height);
+				for (let i = 0; i < textures.length; i++) {
+					const texture = textures[i];
+					const glFormat = utils.convert(texture.format, texture.encoding);
+					const glType = utils.convert(texture.type);
+					const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
+					const samples = getRenderTargetSamples(renderTarget);
+
+					if (isMultisample && useMultisampledRTT(renderTarget) === false) {
+						_gl.renderbufferStorageMultisample(_gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height);
+					} else if (useMultisampledRTT(renderTarget)) {
+						multisampledRTTExt.renderbufferStorageMultisampleEXT(_gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height);
+					} else {
+						_gl.renderbufferStorage(_gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height);
+					}
 				}
 			}
 
@@ -17599,22 +17608,29 @@
 					} else {
 						console.warn('THREE.WebGLRenderer: WebGLMultipleRenderTargets can only be used with WebGL2 or WEBGL_draw_buffers extension.');
 					}
-				} else if (isWebGL2 && renderTarget.samples > 0 && useMultisampledRTT(renderTarget) === false) {
+				}
+
+				if (isWebGL2 && renderTarget.samples > 0 && useMultisampledRTT(renderTarget) === false) {
+					const textures = isMultipleRenderTargets ? texture : [texture];
 					renderTargetProperties.__webglMultisampledFramebuffer = _gl.createFramebuffer();
-					renderTargetProperties.__webglColorRenderbuffer = _gl.createRenderbuffer();
-
-					_gl.bindRenderbuffer(_gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer);
-
-					const glFormat = utils.convert(texture.format, texture.encoding);
-					const glType = utils.convert(texture.type);
-					const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
-					const samples = getRenderTargetSamples(renderTarget);
-
-					_gl.renderbufferStorageMultisample(_gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height);
-
+					renderTargetProperties.__webglColorRenderbuffer = [];
 					state.bindFramebuffer(_gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
 
-					_gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer);
+					for (let i = 0; i < textures.length; i++) {
+						const texture = textures[i];
+						renderTargetProperties.__webglColorRenderbuffer[i] = _gl.createRenderbuffer();
+
+						_gl.bindRenderbuffer(_gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[i]);
+
+						const glFormat = utils.convert(texture.format, texture.encoding);
+						const glType = utils.convert(texture.type);
+						const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
+						const samples = getRenderTargetSamples(renderTarget);
+
+						_gl.renderbufferStorageMultisample(_gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height);
+
+						_gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[i]);
+					}
 
 					_gl.bindRenderbuffer(_gl.RENDERBUFFER, null);
 
@@ -17706,40 +17722,84 @@
 
 		function updateMultisampleRenderTarget(renderTarget) {
 			if (isWebGL2 && renderTarget.samples > 0 && useMultisampledRTT(renderTarget) === false) {
+				const textures = renderTarget.isWebGLMultipleRenderTargets ? renderTarget.texture : [renderTarget.texture];
 				const width = renderTarget.width;
 				const height = renderTarget.height;
 				let mask = _gl.COLOR_BUFFER_BIT;
-				const invalidationArray = [_gl.COLOR_ATTACHMENT0];
+				const invalidationArray = [];
 				const depthStyle = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
-
-				if (renderTarget.depthBuffer) {
-					invalidationArray.push(depthStyle);
-				}
-
 				const renderTargetProperties = properties.get(renderTarget);
-				const ignoreDepthValues = renderTargetProperties.__ignoreDepthValues !== undefined ? renderTargetProperties.__ignoreDepthValues : false;
+				const isMultipleRenderTargets = renderTarget.isWebGLMultipleRenderTargets === true; // If MRT we need to remove FBO attachments
 
-				if (ignoreDepthValues === false) {
-					if (renderTarget.depthBuffer) mask |= _gl.DEPTH_BUFFER_BIT;
-					if (renderTarget.stencilBuffer) mask |= _gl.STENCIL_BUFFER_BIT;
+				if (isMultipleRenderTargets) {
+					for (let i = 0; i < textures.length; i++) {
+						state.bindFramebuffer(_gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
+
+						_gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, null);
+
+						state.bindFramebuffer(_gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer);
+
+						_gl.framebufferTexture2D(_gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, null, 0);
+					}
 				}
 
 				state.bindFramebuffer(_gl.READ_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
 				state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglFramebuffer);
 
-				if (ignoreDepthValues === true) {
-					_gl.invalidateFramebuffer(_gl.READ_FRAMEBUFFER, [depthStyle]);
+				for (let i = 0; i < textures.length; i++) {
+					invalidationArray.push(_gl.COLOR_ATTACHMENT0 + i);
 
-					_gl.invalidateFramebuffer(_gl.DRAW_FRAMEBUFFER, [depthStyle]);
-				}
+					if (renderTarget.depthBuffer) {
+						invalidationArray.push(depthStyle);
+					}
 
-				_gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST);
+					const ignoreDepthValues = renderTargetProperties.__ignoreDepthValues !== undefined ? renderTargetProperties.__ignoreDepthValues : false;
 
-				if (supportsInvalidateFramebuffer) {
-					_gl.invalidateFramebuffer(_gl.READ_FRAMEBUFFER, invalidationArray);
+					if (ignoreDepthValues === false) {
+						if (renderTarget.depthBuffer) mask |= _gl.DEPTH_BUFFER_BIT;
+						if (renderTarget.stencilBuffer) mask |= _gl.STENCIL_BUFFER_BIT;
+					}
+
+					if (isMultipleRenderTargets) {
+						_gl.framebufferRenderbuffer(_gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[i]);
+					}
+
+					if (ignoreDepthValues === true) {
+						_gl.invalidateFramebuffer(_gl.READ_FRAMEBUFFER, [depthStyle]);
+
+						_gl.invalidateFramebuffer(_gl.DRAW_FRAMEBUFFER, [depthStyle]);
+					}
+
+					if (isMultipleRenderTargets) {
+						const webglTexture = properties.get(textures[i]).__webglTexture;
+
+						_gl.framebufferTexture2D(_gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, webglTexture, 0);
+					}
+
+					_gl.blitFramebuffer(0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST);
+
+					if (supportsInvalidateFramebuffer) {
+						_gl.invalidateFramebuffer(_gl.READ_FRAMEBUFFER, invalidationArray);
+					}
 				}
 
 				state.bindFramebuffer(_gl.READ_FRAMEBUFFER, null);
+				state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, null); // If MRT since pre-blit we removed the FBO we need to reconstruct the attachments
+
+				if (isMultipleRenderTargets) {
+					for (let i = 0; i < textures.length; i++) {
+						state.bindFramebuffer(_gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
+
+						_gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[i]);
+
+						const webglTexture = properties.get(textures[i]).__webglTexture;
+
+						state.bindFramebuffer(_gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer);
+
+						_gl.framebufferTexture2D(_gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0 + i, _gl.TEXTURE_2D, webglTexture, 0);
+					}
+				}
+
 				state.bindFramebuffer(_gl.DRAW_FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer);
 			}
 		}
@@ -21174,8 +21234,8 @@
 			});
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			if (source.center !== undefined) this.center.copy(source.center);
 			this.material = source.material;
 			return this;
@@ -21356,8 +21416,8 @@
 			this.bindMatrixInverse = new Matrix4();
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.bindMode = source.bindMode;
 			this.bindMatrix.copy(source.bindMatrix);
 			this.bindMatrixInverse.copy(source.bindMatrixInverse);
@@ -21701,8 +21761,8 @@
 			this.frustumCulled = false;
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.instanceMatrix.copy(source.instanceMatrix);
 			if (source.instanceColor !== null) this.instanceColor = source.instanceColor.clone();
 			this.count = source.count;
@@ -21814,8 +21874,8 @@
 			this.updateMorphTargets();
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.material = source.material;
 			this.geometry = source.geometry;
 			return this;
@@ -22070,8 +22130,8 @@
 			this.updateMorphTargets();
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.material = source.material;
 			this.geometry = source.geometry;
 			return this;
@@ -28750,8 +28810,8 @@
 		dispose() {// Empty here in base class; some subclasses override.
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.color.copy(source.color);
 			this.intensity = source.intensity;
 			return this;
@@ -28782,8 +28842,8 @@
 			this.groundColor = new Color(groundColor);
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.groundColor.copy(source.groundColor);
 			return this;
 		}
@@ -28950,8 +29010,8 @@
 			this.shadow.dispose();
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.distance = source.distance;
 			this.angle = source.angle;
 			this.penumbra = source.penumbra;
@@ -29054,8 +29114,8 @@
 			this.shadow.dispose();
 		}
 
-		copy(source) {
-			super.copy(source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.distance = source.distance;
 			this.decay = source.decay;
 			this.shadow = source.shadow.clone();
@@ -34377,8 +34437,8 @@
 			return this;
 		}
 
-		copy(source) {
-			LineSegments.prototype.copy.call(this, source);
+		copy(source, recursive) {
+			super.copy(source, recursive);
 			this.object = source.object;
 			return this;
 		}
