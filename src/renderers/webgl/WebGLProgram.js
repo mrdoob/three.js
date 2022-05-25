@@ -15,7 +15,8 @@ function handleSource( string, errorLine ) {
 
 	for ( let i = from; i < to; i ++ ) {
 
-		lines2.push( ( i + 1 ) + ': ' + lines[ i ] );
+		const line = i + 1
+		lines2.push( `${line === errorLine ? '>' : ' '} ${line}: ${lines[ i ]}` );
 
 	}
 
