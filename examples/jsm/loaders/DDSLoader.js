@@ -146,7 +146,7 @@ class DDSLoader extends CompressedTextureLoader {
 
 		}
 
-		if ( ! ( header[ off_pfFlags ] & DDPF_FOURCC ) ) {
+		if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
 
 			console.error( 'THREE.DDSLoader.parse: Unsupported format, must contain a FourCC code.' );
 			return dds;
