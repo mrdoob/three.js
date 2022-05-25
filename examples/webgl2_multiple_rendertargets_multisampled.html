@@ -135,7 +135,7 @@
 			const gui = new GUI();
 
 			const effectController = {
-				msaa: true,
+				msaa: true
 			};
 
 			init();
@@ -173,18 +173,11 @@
 					window.innerHeight,
 					2,
 					{
-						samples: effectController.msaa ? 4 : 0
+						samples: effectController.msaa ? 4 : 0,
+						depthBuffer: true,
+						stencilBuffer: true,
 					}
 				);
-
-				// delay the switch of depth to make happy puppeeteer
-				setTimeout( () => {
-
-					// force depth in float to prevent aliasing
-					renderTarget.depthTexture = new THREE.DepthTexture();
-					renderTarget.depthTexture.type = THREE.FloatType;
-
-				} );
 
 				for ( let i = 0, il = renderTarget.texture.length; i < il; i ++ ) {
 
