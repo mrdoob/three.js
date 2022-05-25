@@ -539,17 +539,25 @@
 
 		}
 		/**
-   * Assign and return a temporal unique id for an object
-   * especially which doesn't have .uuid
+   * Returns ids for buffer attributes.
    * @param  {Object} object
    * @return {Integer}
    */
 
 
-		getUID( object ) {
+		getUID( attribute, isRelativeCopy = false ) {
 
-			if ( ! this.uids.has( object ) ) this.uids.set( object, this.uid ++ );
-			return this.uids.get( object );
+			if ( this.uids.has( attribute ) === false ) {
+
+				const uids = new Map();
+				uids.set( true, this.uid ++ );
+				uids.set( false, this.uid ++ );
+				this.uids.set( attribute, uids );
+
+			}
+
+			const uids = this.uids.get( attribute );
+			return uids.get( isRelativeCopy );
 
 		}
 		/**
@@ -1456,9 +1464,9 @@
 
 						const baseAttribute = geometry.attributes[ attributeName ];
 
-						if ( cache.attributes.has( this.getUID( attribute ) ) ) {
+						if ( cache.attributes.has( this.getUID( attribute, true ) ) ) {
 
-							target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute ) );
+							target[ gltfAttributeName ] = cache.attributes.get( this.getUID( attribute, true ) );
 							continue;
 
 						} // Clones attribute not to override
@@ -1477,7 +1485,7 @@
 						}
 
 						target[ gltfAttributeName ] = this.processAccessor( relativeAttribute, geometry );
-						cache.attributes.set( this.getUID( baseAttribute ), target[ gltfAttributeName ] );
+						cache.attributes.set( this.getUID( baseAttribute, true ), target[ gltfAttributeName ] );
 
 					}
 

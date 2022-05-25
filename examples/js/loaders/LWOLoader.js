@@ -277,6 +277,8 @@
 			params = Object.assign( maps, params );
 			params = Object.assign( params, attributes );
 			const materialType = this.getMaterialType( connections.attributes );
+			if ( materialType !== THREE.MeshPhongMaterial ) delete params.refractionRatio; // PBR materials do not support "refractionRatio"
+
 			return new materialType( params );
 
 		}
@@ -525,7 +527,6 @@
 			}
 
 			if ( attributes[ 'Bump Height' ] ) params.bumpScale = attributes[ 'Bump Height' ].value * 0.1;
-			if ( attributes[ 'Refraction Index' ] ) params.refractionRatio = 0.98 / attributes[ 'Refraction Index' ].value;
 			this.parsePhysicalAttributes( params, attributes, maps );
 			this.parseStandardAttributes( params, attributes, maps );
 			this.parsePhongAttributes( params, attributes, maps );
@@ -576,6 +577,7 @@
 
 		parsePhongAttributes( params, attributes, maps ) {
 
+			if ( attributes[ 'Refraction Index' ] ) params.refractionRatio = 0.98 / attributes[ 'Refraction Index' ].value;
 			if ( attributes.Diffuse ) params.color.multiplyScalar( attributes.Diffuse.value );
 
 			if ( attributes.Reflection ) {
