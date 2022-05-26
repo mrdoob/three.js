@@ -7,7 +7,6 @@ class Selector {
 		this.editor = editor;
 		this.config = editor.config;
 		this.signals = signals;
-		this.selected = null;
 
 		// signals
 
@@ -41,7 +40,7 @@ class Selector {
 
 	select( object ) {
 
-		if ( this.selected === object ) return;
+		if ( this.editor.selected === object ) return;
 
 		let uuid = null;
 
@@ -51,7 +50,7 @@ class Selector {
 
 		}
 
-		this.selected = object;
+		this.editor.selected = object;
 
 		this.config.setKey( 'selected', uuid );
 		this.signals.objectSelected.dispatch( object );
