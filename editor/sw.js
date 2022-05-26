@@ -246,6 +246,8 @@ self.addEventListener( 'install', async function () {
 
 self.addEventListener( 'fetch', async function ( event ) {
 
+	if ( event.request.url.startsWith( 'chrome-extension' ) ) return;
+
 	const request = event.request;
 	event.respondWith( networkFirst( request ) );
 
