@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - cubemap mix</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Mix Two CubeMaps<br />
+			Battle Damaged Sci-fi Helmet by
+			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three-nodes/": "./jsm/nodes/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import * as Nodes from 'three-nodes/Nodes.js';
+
+			import { mix, oscSine, timerLocal } from 'three-nodes/Nodes.js';
+
+			import WebGPU from './jsm/capabilities/WebGPU.js';
+			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+
+			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
+			let camera, scene, renderer;
+
+			init().then( render ).catch( error );
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
+
+				scene = new THREE.Scene();
+
+				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
+				const cubeTexture = new RGBMLoader()
+					.setMaxRange( 16 )
+					.setPath( './textures/cube/pisaRGBM16/' )
+					.loadCubemap( rgbmUrls );
+
+				cubeTexture.generateMipmaps = true;
+				cubeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+
+				const cube2Urls = [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ];
+				const cube2Texture = new THREE.CubeTextureLoader()
+					.setPath( './textures/cube/MilkyWay/' )
+					.load( cube2Urls );
+
+				cube2Texture.generateMipmaps = true;
+				cube2Texture.minFilter = THREE.LinearMipmapLinearFilter;
+
+				scene.environmentNode = mix( new Nodes.CubeTextureNode( cube2Texture ), new Nodes.CubeTextureNode( cubeTexture ), oscSine( timerLocal( .1 ) ) );
+
+				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+
+					scene.add( gltf.scene );
+
+					render();
+
+				} );
+
+				renderer = new WebGPURenderer();
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				container.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				if ( renderer.init ) return renderer.init();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function render() {
+
+				requestAnimationFrame( render );
+
+				renderer.render( scene, camera );
+
+			}
+
+			function error( error ) {
+
+				console.error( error );
+
+			}
+
+		</script>
+
+	</body>
+</html>

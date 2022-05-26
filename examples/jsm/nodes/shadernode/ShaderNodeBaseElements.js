@@ -20,12 +20,13 @@ import MaterialNode from '../accessors/MaterialNode.js';
 import MaterialReferenceNode from '../accessors/MaterialReferenceNode.js';
 import ModelViewProjectionNode from '../accessors/ModelViewProjectionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
-import Object3DNode from '../accessors/Object3DNode.js';
+import ModelNode from '../accessors/ModelNode.js';
 import PointUVNode from '../accessors/PointUVNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import ReferenceNode from '../accessors/ReferenceNode.js';
 import StorageBufferNode from '../accessors/StorageBufferNode.js';
 import TextureNode from '../accessors/TextureNode.js';
+import UserDataNode from '../accessors/UserDataNode.js';
 import UVNode from '../accessors/UVNode.js';
 
 // display
@@ -39,9 +40,6 @@ import MathNode from '../math/MathNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import CondNode from '../math/CondNode.js';
 
-// lights
-import ReflectedLightNode from '../lights/ReflectedLightNode.js';
-
 // utils
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
@@ -49,7 +47,7 @@ import ConvertNode from '../utils/ConvertNode.js';
 // shader node utils
 import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, getConstNodeType, cacheMaps } from './ShaderNode.js';
 
-// shader node utils
+// shader node base
 
 export { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable };
 
@@ -104,14 +102,14 @@ export const uniform = ( nodeOrType ) => {
 
 	const nodeType = getConstNodeType( nodeOrType );
 
-	// TODO: get ConstNode from .traverse() in the future
+	// @TODO: get ConstNode from .traverse() in the future
 	const value = nodeOrType.isNode === true ? nodeOrType.node?.value || nodeOrType.value : nodeOrType;
 
 	return nodeObject( new UniformNode( value, nodeType ) );
 
 };
 
-export const attribute = ( name, nodeOrType ) => nodeObject( new AttributeNode( name, getConstNodeType( nodeOrType ) ) );
+export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
 export const property = ( name, nodeOrType ) => nodeObject( new PropertyNode( name, getConstNodeType( nodeOrType ) ) );
 
 export const bypass = nodeProxy( BypassNode );
@@ -137,10 +135,12 @@ export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
 
 export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
+export const materialEmissive = nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
 export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
-export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
+//export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
+export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
 
 export const diffuseColor = nodeImmutable( PropertyNode, 'DiffuseColor', 'vec4' );
 export const roughness = nodeImmutable( PropertyNode, 'Roughness', 'float' );
@@ -150,6 +150,7 @@ export const specularColor = nodeImmutable( PropertyNode, 'SpecularColor', 'colo
 
 export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object ) );
 export const materialReference = ( name, nodeOrType, material ) => nodeObject( new MaterialReferenceNode( name, getConstNodeType( nodeOrType ), material ) );
+export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 
@@ -159,11 +160,11 @@ export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
 export const transformedNormalView = nodeImmutable( VarNode, normalView, 'TransformedNormalView' );
 
-export const viewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
-export const normalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
-export const worldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
-export const position = nodeProxy( Object3DNode, Object3DNode.POSITION );
-export const viewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
+export const modelViewMatrix = nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX );
+export const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
+export const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
+export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
+export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
 
 export const positionGeometry = nodeImmutable( PositionNode, PositionNode.GEOMETRY );
 export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );
@@ -260,9 +261,8 @@ export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 export const frontFacing = nodeImmutable( FrontFacingNode );
 export const faceDirection = sub( mul( float( frontFacing ), 2 ), 1 );
 
-// lights
+// lighting
 
-export const reflectedLight = nodeProxy( ReflectedLightNode );
 
 // utils
 
@@ -271,3 +271,4 @@ export const element = nodeProxy( ArrayElementNode );
 // miscellaneous
 
 export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
+export const transformedNormalWorld = normalize( transformDirection( transformedNormalView, cameraViewMatrix ) );

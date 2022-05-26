@@ -50,6 +50,7 @@
 
 		constructor( data ) {
 
+			this.isFont = true;
 			this.type = 'Font';
 			this.data = data;
 
@@ -174,8 +175,6 @@
 		};
 
 	}
-
-	Font.prototype.isFont = true;
 
 	THREE.Font = Font;
 	THREE.FontLoader = FontLoader;

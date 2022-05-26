@@ -7,6 +7,8 @@ class WebGPUStorageBuffer extends WebGPUBuffer {
 
 		super( name, GPUBindingType.StorageBuffer, attribute.array );
 
+		this.isStorageBuffer = true;
+
 		this.usage |= GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE;
 
 		this.attribute = attribute;
@@ -14,7 +16,5 @@ class WebGPUStorageBuffer extends WebGPUBuffer {
 	}
 
 }
-
-WebGPUStorageBuffer.prototype.isStorageBuffer = true;
 
 export default WebGPUStorageBuffer;

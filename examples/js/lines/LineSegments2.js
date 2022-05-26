@@ -228,6 +228,7 @@
 		} ) ) {
 
 			super( geometry, material );
+			this.isLineSegments2 = true;
 			this.type = 'LineSegments2';
 
 		} // for backwards-compatibility, but could be a method of THREE.LineSegmentsGeometry...
@@ -355,8 +356,6 @@
 		}
 
 	}
-
-	LineSegments2.prototype.isLineSegments2 = true;
 
 	THREE.LineSegments2 = LineSegments2;
 

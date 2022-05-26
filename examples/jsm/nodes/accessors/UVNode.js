@@ -6,6 +6,8 @@ class UVNode extends AttributeNode {
 
 		super( null, 'vec2' );
 
+		this.isUVNode = true;
+
 		this.index = index;
 
 	}
@@ -35,7 +37,5 @@ class UVNode extends AttributeNode {
 	}
 
 }
-
-UVNode.prototype.isUVNode = true;
 
 export default UVNode;

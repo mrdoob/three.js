@@ -5,6 +5,7 @@
 		constructor( geometry, options = {} ) {
 
 			super( geometry );
+			this.isRefractor = true;
 			this.type = 'Refractor';
 			this.camera = new THREE.PerspectiveCamera();
 			const scope = this;
@@ -192,7 +193,6 @@
 
 	}
 
-	Refractor.prototype.isRefractor = true;
 	Refractor.RefractorShader = {
 		uniforms: {
 			'color': {

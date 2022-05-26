@@ -4,10 +4,9 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
-		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
 	</head>
 	<body>
+
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute
 		</div>
@@ -29,7 +28,7 @@
 			import * as Nodes from 'three-nodes/Nodes.js';
 
 			import {
-				ShaderNode, compute, context,
+				ShaderNode, compute,
 				uniform, element, storage, attribute,
 				temp, assign, add, sub, cond, abs, negate, max, min, length, vec3, color,
 				greaterThanEqual, lessThanEqual, instanceIndex
@@ -83,8 +82,8 @@
 
 				// create buffers
 
-				const particleBuffer = new THREE.InstancedBufferAttribute( particleArray );
-				const velocityBuffer = new THREE.InstancedBufferAttribute( velocityArray );
+				const particleBuffer = new THREE.InstancedBufferAttribute( particleArray, 2 );
+				const velocityBuffer = new THREE.InstancedBufferAttribute( velocityArray, 2 );
 
 				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
 				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
@@ -99,7 +98,7 @@
 					const pointer = uniform( pointerVector );
 					const limit = uniform( scaleVector );
 
-					const position = temp( context( add( particle, velocity ), { temp: false } ) );
+					const position = temp( add( particle, velocity ), 'tempPos' ); // @TODO: this should work without 'tempPos' property name
 					position.build( builder );
 
 					assign( velocity.x, cond( greaterThanEqual( abs( position.x ), limit.x ), negate( velocity.x ), velocity.x ) ).build( builder );
@@ -123,7 +122,7 @@
 				const particleNode = attribute( 'particle', 'vec2' );
 
 				const pointsGeometry = new THREE.BufferGeometry();
-				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ) ) ); // single vertex ( not triangle )
+				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 ), 3 ) ); // single vertex ( not triangle )
 				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
 				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
 

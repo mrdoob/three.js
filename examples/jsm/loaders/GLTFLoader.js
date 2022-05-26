@@ -131,6 +131,12 @@ class GLTFLoader extends Loader {
 
 		this.register( function ( parser ) {
 
+			return new GLTFMaterialsIridescenceExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
 			return new GLTFLightsExtension( parser );
 
 		} );
@@ -454,6 +460,7 @@ const EXTENSIONS = {
 	KHR_MATERIALS_SHEEN: 'KHR_materials_sheen',
 	KHR_MATERIALS_SPECULAR: 'KHR_materials_specular',
 	KHR_MATERIALS_TRANSMISSION: 'KHR_materials_transmission',
+	KHR_MATERIALS_IRIDESCENCE: 'KHR_materials_iridescence',
 	KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 	KHR_MATERIALS_VOLUME: 'KHR_materials_volume',
 	KHR_TEXTURE_BASISU: 'KHR_texture_basisu',
@@ -759,6 +766,94 @@ class GLTFMaterialsClearcoatExtension {
 				materialParams.clearcoatNormalScale = new Vector2( scale, scale );
 
 			}
+
+		}
+
+		return Promise.all( pending );
+
+	}
+
+}
+
+/**
+ * Iridescence Materials Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence
+ */
+class GLTFMaterialsIridescenceExtension {
+
+	constructor( parser ) {
+
+		this.parser = parser;
+		this.name = EXTENSIONS.KHR_MATERIALS_IRIDESCENCE;
+
+	}
+
+	getMaterialType( materialIndex ) {
+
+		const parser = this.parser;
+		const materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
+
+		return MeshPhysicalMaterial;
+
+	}
+
+	extendMaterialParams( materialIndex, materialParams ) {
+
+		const parser = this.parser;
+		const materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
+
+			return Promise.resolve();
+
+		}
+
+		const pending = [];
+
+		const extension = materialDef.extensions[ this.name ];
+
+		if ( extension.iridescenceFactor !== undefined ) {
+
+			materialParams.iridescence = extension.iridescenceFactor;
+
+		}
+
+		if ( extension.iridescenceTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'iridescenceMap', extension.iridescenceTexture ) );
+
+		}
+
+		if ( extension.iridescenceIor !== undefined ) {
+
+			materialParams.iridescenceIOR = extension.iridescenceIor;
+
+		}
+
+		if ( materialParams.iridescenceThicknessRange === undefined ) {
+
+			materialParams.iridescenceThicknessRange = [ 100, 400 ];
+
+		}
+
+		if ( extension.iridescenceThicknessMinimum !== undefined ) {
+
+			materialParams.iridescenceThicknessRange[ 0 ] = extension.iridescenceThicknessMinimum;
+
+		}
+
+		if ( extension.iridescenceThicknessMaximum !== undefined ) {
+
+			materialParams.iridescenceThicknessRange[ 1 ] = extension.iridescenceThicknessMaximum;
+
+		}
+
+		if ( extension.iridescenceThicknessTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'iridescenceThicknessMap', extension.iridescenceThicknessTexture ) );
 
 		}
 
@@ -1861,10 +1956,6 @@ class GLTFCubicSplineInterpolant extends Interpolant {
 	}
 
 }
-
-GLTFCubicSplineInterpolant.prototype.beforeStart_ = GLTFCubicSplineInterpolant.prototype.copySampleValue_;
-
-GLTFCubicSplineInterpolant.prototype.afterEnd_ = GLTFCubicSplineInterpolant.prototype.copySampleValue_;
 
 GLTFCubicSplineInterpolant.prototype.interpolate_ = function ( i1, t0, t, t1 ) {
 

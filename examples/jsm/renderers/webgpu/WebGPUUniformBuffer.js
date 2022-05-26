@@ -7,12 +7,12 @@ class WebGPUUniformBuffer extends WebGPUBuffer {
 
 		super( name, GPUBindingType.UniformBuffer, buffer );
 
+		this.isUniformBuffer = true;
+
 		this.usage |= GPUBufferUsage.UNIFORM;
 
 	}
 
 }
-
-WebGPUUniformBuffer.prototype.isUniformBuffer = true;
 
 export default WebGPUUniformBuffer;

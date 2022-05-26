@@ -46,7 +46,7 @@ class WebGPURenderPipeline {
 
 			vertexBuffers.push( {
 				arrayStride: attribute.arrayStride,
-				attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ],
+				attributes: [ { shaderLocation: attribute.slot, offset: attribute.offset, format: attribute.format } ],
 				stepMode: stepMode
 			} );
 
@@ -114,21 +114,9 @@ class WebGPURenderPipeline {
 			},
 			multisample: {
 				count: this._sampleCount
-			}
+			},
+			layout: 'auto'
 		} );
-
-	}
-
-	_getArrayStride( type, bytesPerElement ) {
-
-		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
-
-		if ( type === 'float' || type === 'int' || type === 'uint' ) return bytesPerElement;
-		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return bytesPerElement * 2;
-		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return bytesPerElement * 3;
-		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return bytesPerElement * 4;
-
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
 	}
 
@@ -714,14 +702,26 @@ class WebGPURenderPipeline {
 			const type = nodeAttribute.type;
 
 			const geometryAttribute = geometry.getAttribute( name );
-			const bytesPerElement = ( geometryAttribute !== undefined ) ? geometryAttribute.array.BYTES_PER_ELEMENT : 4;
+			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
 
-			const arrayStride = this._getArrayStride( type, bytesPerElement );
 			const format = this._getVertexFormat( type, bytesPerElement );
+
+			let arrayStride = geometryAttribute.itemSize * bytesPerElement;
+			let offset = 0;
+
+			if ( geometryAttribute.isInterleavedBufferAttribute === true ) {
+
+				// @TODO: It can be optimized for "vertexBuffers" on RenderPipeline
+
+				arrayStride = geometryAttribute.data.stride * bytesPerElement;
+				offset = geometryAttribute.offset * bytesPerElement;
+
+			}
 
 			attributes.push( {
 				name,
 				arrayStride,
+				offset,
 				format,
 				slot
 			} );

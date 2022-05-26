@@ -211,7 +211,7 @@ class MMDPhysics {
 
 		let parent = mesh.parent;
 
-		if ( parent !== null ) parent = null;
+		if ( parent !== null ) mesh.parent = null;
 
 		const currentPosition = manager.allocThreeVector3();
 		const currentQuaternion = manager.allocThreeQuaternion();

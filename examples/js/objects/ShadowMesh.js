@@ -17,6 +17,7 @@
 				depthWrite: false
 			} );
 			super( mesh.geometry, shadowMaterial );
+			this.isShadowMesh = true;
 			this.meshMatrix = mesh.matrixWorld;
 			this.frustumCulled = false;
 			this.matrixAutoUpdate = false;
@@ -49,8 +50,6 @@
 		}
 
 	}
-
-	ShadowMesh.prototype.isShadowMesh = true;
 
 	THREE.ShadowMesh = ShadowMesh;
 

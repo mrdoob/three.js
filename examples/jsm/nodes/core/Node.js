@@ -8,6 +8,8 @@ class Node {
 
 	constructor( nodeType = null ) {
 
+		this.isNode = true;
+
 		this.nodeType = nodeType;
 
 		this.updateType = NodeUpdateType.None;
@@ -21,6 +23,38 @@ class Node {
 	get type() {
 
 		return this.constructor.name;
+
+	}
+
+	getChildren() {
+
+		const children = [];
+
+		for ( const property in this ) {
+
+			const object = this[ property ];
+
+			if ( Array.isArray( object ) === true ) {
+
+				for ( const child of object ) {
+
+					if ( child?.isNode === true ) {
+
+						children.push( child );
+
+					}
+
+				}
+
+			} else if ( object?.isNode === true ) {
+
+				children.push( object );
+
+			}
+
+		}
+
+		return children;
 
 	}
 
@@ -42,86 +76,162 @@ class Node {
 
 	}
 
+	getConstructHash( /*builder*/ ) {
+
+		return this.uuid;
+
+	}
+
+	getReference( builder ) {
+
+		const hash = this.getHash( builder );
+		const nodeFromHash = builder.getNodeFromHash( hash );
+
+		return nodeFromHash || this;
+
+	}
+
+	construct( builder ) {
+
+		const nodeProperties = builder.getNodeProperties( this );
+
+		for ( const childNode of this.getChildren() ) {
+
+			nodeProperties[ '_node' + childNode.id ] = childNode;
+
+		}
+
+		// return a outputNode if exists
+		return null;
+
+	}
+
+	analyze( builder ) {
+
+		const nodeData = builder.getDataFromNode( this );
+		nodeData.dependenciesCount = nodeData.dependenciesCount === undefined ? 1 : nodeData.dependenciesCount + 1;
+
+		if ( nodeData.dependenciesCount === 1 ) {
+
+			// node flow children
+
+			const nodeProperties = builder.getNodeProperties( this );
+
+			for ( const childNode of Object.values( nodeProperties ) ) {
+
+				if ( childNode?.isNode === true ) {
+
+					childNode.build( builder );
+
+				}
+
+			}
+
+		}
+
+	}
+
+	generate( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		if ( outputNode?.isNode === true ) {
+
+			const type = this.getNodeType( builder );
+
+			return outputNode.build( builder, type );
+
+		}
+
+	}
+
 	update( /*frame*/ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	generate( /*builder, output*/ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	analyze( builder ) {
-
-		const hash = this.getHash( builder );
-		const sharedNode = builder.getNodeFromHash( hash );
-
-		if ( sharedNode !== undefined && this !== sharedNode ) {
-
-			return sharedNode.analyze( builder );
-
-		}
-
-		const nodeData = builder.getDataFromNode( this );
-		nodeData.dependenciesCount = nodeData.dependenciesCount === undefined ? 1 : nodeData.dependenciesCount + 1;
-
-		const nodeKeys = getNodesKeys( this );
-
-		for ( const property of nodeKeys ) {
-
-			this[ property ].analyze( builder );
-
-		}
-
-	}
-
 	build( builder, output = null ) {
 
-		const hash = this.getHash( builder );
-		const sharedNode = builder.getNodeFromHash( hash );
+		const refNode = this.getReference( builder );
 
-		if ( sharedNode !== undefined && this !== sharedNode ) {
+		if ( this !== refNode ) {
 
-			return sharedNode.build( builder, output );
+			return refNode.build( builder, output );
 
 		}
 
 		builder.addNode( this );
 		builder.addStack( this );
 
-		const nodeData = builder.getDataFromNode( this );
-		const isGenerateOnce = this.generate.length === 1;
+		/* expected return:
+			- "construct"	-> Node
+			- "analyze"		-> null
+			- "generat"		-> String
+		*/
+		let result = null;
 
-		let snippet = null;
+		const buildStage = builder.getBuildStage();
 
-		if ( isGenerateOnce ) {
+		if ( buildStage === 'construct' ) {
 
-			const type = this.getNodeType( builder );
+			const properties = builder.getNodeProperties( this );
+			const nodeData = builder.getDataFromNode( this );
 
-			snippet = nodeData.snippet;
+			if ( properties.initied !== true ) {
 
-			if ( snippet === undefined ) {
+				nodeData.initied = true;
 
-				snippet = this.generate( builder ) || '';
+				properties.outputNode =  this.construct( builder );
 
-				nodeData.snippet = snippet;
+				for ( const childNode of Object.values( properties ) ) {
+
+					if ( childNode?.isNode === true ) {
+
+						childNode.build( builder );
+
+					}
+
+				}
 
 			}
 
-			snippet = builder.format( snippet, type, output );
+		} else if ( buildStage === 'analyze' ) {
 
-		} else {
+			this.analyze( builder );
 
-			snippet = this.generate( builder, output ) || '';
+		} else if ( buildStage === 'generate' ) {
+
+			const isGenerateOnce = this.generate.length === 1;
+
+			if ( isGenerateOnce ) {
+
+				const type = this.getNodeType( builder );
+				const nodeData = builder.getDataFromNode( this );
+
+				result = nodeData.snippet;
+
+				if ( result === undefined ) {
+
+					result = this.generate( builder ) || '';
+
+					nodeData.snippet = result;
+
+				}
+
+				result = builder.format( result, type, output );
+
+			} else {
+
+				result = this.generate( builder, output ) || '';
+
+			}
 
 		}
 
 		builder.removeStack( this );
 
-		return snippet;
+		return result;
 
 	}
 
@@ -238,7 +348,5 @@ class Node {
 	}
 
 }
-
-Node.prototype.isNode = true;
 
 export default Node;

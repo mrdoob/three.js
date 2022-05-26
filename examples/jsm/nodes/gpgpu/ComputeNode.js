@@ -7,6 +7,8 @@ class ComputeNode extends Node {
 
 		super( 'void' );
 
+		this.isComputeNode = true;
+
 		this.computeNode = computeNode;
 
 		this.count = count;
@@ -57,7 +59,5 @@ class ComputeNode extends Node {
 	}
 
 }
-
-ComputeNode.prototype.isComputeNode = true;
 
 export default ComputeNode;

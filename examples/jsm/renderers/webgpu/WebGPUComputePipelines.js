@@ -46,7 +46,8 @@ class WebGPUComputePipelines {
 			}
 
 			pipeline = device.createComputePipeline( {
-				compute: stageCompute.stage
+				compute: stageCompute.stage,
+				layout: 'auto'
 			} );
 
 			this.pipelines.set( computeNode, pipeline );

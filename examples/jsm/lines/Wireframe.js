@@ -16,6 +16,8 @@ class Wireframe extends Mesh {
 
 		super( geometry, material );
 
+		this.isWireframe = true;
+
 		this.type = 'Wireframe';
 
 	}
@@ -50,7 +52,5 @@ class Wireframe extends Mesh {
 	}
 
 }
-
-Wireframe.prototype.isWireframe = true;
 
 export { Wireframe };

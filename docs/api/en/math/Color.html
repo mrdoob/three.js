@@ -185,23 +185,23 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>[method:String getStyle]( [param:string colorSpace] = SRGBColorSpace )</h3>
-		<p>Returns the value of this color as a CSS style string. Example: 'rgb(255,0,0)'.</p>
+		<p>Returns the value of this color as a CSS style string. Example: `rgb(255,0,0)`.</p>
 
 		<h3>[method:this lerp]( [param:Color color], [param:Float alpha] ) </h3>
 		<p>
 		[page:Color color] - color to converge on.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor in the closed interval `[0, 1]`.<br /><br />
 
 		Linearly interpolates this color's RGB values toward the RGB values of the passed argument.
-		The alpha argument can be thought of as the ratio between the two colors, where 0.0 is
-		this color and 1.0 is the first argument.
+		The alpha argument can be thought of as the ratio between the two colors, where `0.0` is
+		this color and `1.0` is the first argument.
 		</p>
 
 		<h3>[method:this lerpColors]( [param:Color color1], [param:Color color2], [param:Float alpha] )</h3>
 		<p>
 		[page:Color color1] - the starting [page:Color].<br />
 		[page:Color color2] - [page:Color] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval `[0, 1]`.<br /><br />
 
 		Sets this color to be the color linearly interpolated between [page:Color color1] and
 		[page:Color color2] where alpha is the percent distance along the line connecting the two colors
@@ -211,7 +211,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		<h3>[method:this lerpHSL]( [param:Color color], [param:Float alpha] ) </h3>
 		<p>
 		[page:Color color] - color to converge on.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor in the closed interval `[0, 1]`.<br /><br />
 
 		Linearly interpolates this color's HSL values toward the HSL values of the passed argument.
 		It differs from the classic [page:.lerp] by not interpolating straight from one color to the other,

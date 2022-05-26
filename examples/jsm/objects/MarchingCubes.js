@@ -18,6 +18,8 @@ class MarchingCubes extends Mesh {
 
 		super( geometry, material );
 
+		this.isMarchingCubes = true;
+
 		const scope = this;
 
 		// temp buffers used in polygonize
@@ -866,8 +868,6 @@ class MarchingCubes extends Mesh {
 	}
 
 }
-
-MarchingCubes.prototype.isMarchingCubes = true;
 
 /////////////////////////////////////
 // Marching cubes lookup tables

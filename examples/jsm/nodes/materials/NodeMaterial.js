@@ -3,8 +3,8 @@ import { getNodesKeys } from '../core/NodeUtils.js';
 import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
-	assign, label, mul, add, bypass,
-	positionLocal, skinning, instance, modelViewProjection, lightContext, colorSpace,
+	assign, label, mul, bypass,
+	positionLocal, skinning, instance, modelViewProjection, lightingContext, colorSpace,
 	materialAlphaTest, materialColor, materialOpacity
 } from '../shadernode/ShaderNodeElements.js';
 
@@ -14,6 +14,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		super();
 
+		this.isNodeMaterial = true;
+
 		this.type = this.constructor.name;
 
 		this.lights = true;
@@ -22,16 +24,24 @@ class NodeMaterial extends ShaderMaterial {
 
 	build( builder ) {
 
-		const { lightNode } = this;
-		const { diffuseColorNode } = this.generateMain( builder );
+		this.generatePosition( builder );
 
-		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightNode } );
+		const { lightsNode } = this;
+		const { diffuseColorNode } = this.generateDiffuseColor( builder );
+
+		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightsNode } );
 
 		this.generateOutput( builder, { diffuseColorNode, outgoingLightNode } );
 
 	}
 
-	generateMain( builder ) {
+	customProgramCacheKey() {
+
+		return this.uuid + '-' + this.version;
+
+	}
+
+	generatePosition( builder ) {
 
 		const object = builder.object;
 
@@ -60,6 +70,10 @@ class NodeMaterial extends ShaderMaterial {
 		builder.context.vertex = vertex;
 
 		builder.addFlow( 'vertex', modelViewProjection() );
+
+	}
+
+	generateDiffuseColor( builder ) {
 
 		// < FRAGMENT STAGE >
 
@@ -93,18 +107,14 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	generateLight( builder, { diffuseColorNode, lightNode, lightingModelNode } ) {
+	generateLight( builder, { diffuseColorNode, lightingModelNode, lightsNode = builder.lightsNode } ) {
 
 		// < ANALYTIC LIGHTS >
 
 		// OUTGOING LIGHT
 
 		let outgoingLightNode = diffuseColorNode.xyz;
-		if ( lightNode && lightNode.hasLight !== false ) outgoingLightNode = builder.addFlow( 'fragment', label( lightContext( lightNode, lightingModelNode ), 'Light' ) );
-
-		// EMISSIVE
-
-		if ( this.emissiveNode ) outgoingLightNode = add( vec3( this.emissiveNode ), outgoingLightNode );
+		if ( lightsNode && lightsNode.hasLight !== false ) outgoingLightNode = builder.addFlow( 'fragment', label( lightingContext( lightsNode, lightingModelNode ), 'Light' ) );
 
 		return outgoingLightNode;
 
@@ -122,7 +132,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// FOG
 
-		if ( builder.fogNode ) outputNode = builder.fogNode.mix( outputNode );
+		if ( builder.fogNode ) outputNode = vec4( vec3( builder.fogNode.mix( outputNode ) ), outputNode.w );
 
 		// RESULT
 
@@ -215,7 +225,5 @@ class NodeMaterial extends ShaderMaterial {
 	static fromMaterial( /*material*/ ) { }
 
 }
-
-NodeMaterial.prototype.isNodeMaterial = true;
 
 export default NodeMaterial;

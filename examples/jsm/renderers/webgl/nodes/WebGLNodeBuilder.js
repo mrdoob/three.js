@@ -141,6 +141,24 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
+		if ( material.iridescenceNode && material.iridescenceNode.isNode ) {
+
+			this.addSlot( 'fragment', new SlotNode( material.iridescenceNode, 'IRIDESCENCE', 'float' ) );
+
+		}
+
+		if ( material.iridescenceIORNode && material.iridescenceIORNode.isNode ) {
+
+			this.addSlot( 'fragment', new SlotNode( material.iridescenceIORNode, 'IRIDESCENCE_IOR', 'float' ) );
+
+		}
+
+		if ( material.iridescenceThicknessNode && material.iridescenceThicknessNode.isNode ) {
+
+			this.addSlot( 'fragment', new SlotNode( material.iridescenceThicknessNode, 'IRIDESCENCE_THICKNESS', 'float' ) );
+
+		}
+
 		if ( material.envNode && material.envNode.isNode ) {
 
 			const envRadianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.RADIANCE, material.envNode );
@@ -403,7 +421,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 			if ( node.name === name ) {
 
-				return this.getFlowData( shaderStage, node );
+				return this.getFlowData( node/*, shaderStage*/ );
 
 			}
 
@@ -423,6 +441,9 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 		const metalnessNode = this.getSlot( 'fragment', 'METALNESS' );
 		const clearcoatNode = this.getSlot( 'fragment', 'CLEARCOAT' );
 		const clearcoatRoughnessNode = this.getSlot( 'fragment', 'CLEARCOAT_ROUGHNESS' );
+		const iridescenceNode = this.getSlot( 'fragment', 'IRIDESCENCE' );
+		const iridescenceIORNode = this.getSlot( 'fragment', 'IRIDESCENCE_IOR' );
+		const iridescenceThicknessNode = this.getSlot( 'fragment', 'IRIDESCENCE_THICKNESS' );
 
 		const positionNode = this.getSlot( 'vertex', 'POSITION' );
 		const sizeNode = this.getSlot( 'vertex', 'SIZE' );
@@ -503,6 +524,36 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 				'fragment',
 				'material.clearcoatRoughness = clearcoatRoughness;',
 				`${clearcoatRoughnessNode.code}\n\tmaterial.clearcoatRoughness = ${clearcoatRoughnessNode.result};`
+			);
+
+		}
+
+		if ( iridescenceNode !== undefined ) {
+
+			this.addCodeAfterSnippet(
+				'fragment',
+				'iridescence_fragment',
+				`${iridescenceNode.code}\n\tmaterial.iridescence = ${iridescenceNode.result};`
+			);
+
+		}
+
+		if ( iridescenceIORNode !== undefined ) {
+
+			this.addCodeAfterSnippet(
+				'fragment',
+				'iridescence_fragment',
+				`${iridescenceIORNode.code}\n\tmaterial.iridescenceIOR = ${iridescenceIORNode.result};`
+			);
+
+		}
+
+		if ( iridescenceThicknessNode !== undefined ) {
+
+			this.addCodeAfterSnippet(
+				'fragment',
+				'iridescence_fragment',
+				`${iridescenceThicknessNode.code}\n\tmaterial.iridescenceThickness = ${iridescenceThicknessNode.result};`
 			);
 
 		}

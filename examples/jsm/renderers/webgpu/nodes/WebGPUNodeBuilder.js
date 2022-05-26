@@ -97,9 +97,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		super( object, renderer, new WGSLNodeParser() );
 
-		this.lightNode = null;
-		this.fogNode = null;
-
 		this.bindings = { vertex: [], fragment: [], compute: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
 
@@ -162,11 +159,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
-			return `textureSampleBias( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
+			return `textureSampleLevel( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
 
 		} else {
 
@@ -186,9 +183,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
@@ -198,9 +195,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getCubeTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getCubeTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
@@ -447,9 +444,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		const snippets = [];
 		const vars = this.vars[ shaderStage ];
 
-		for ( let index = 0; index < vars.length; index ++ ) {
-
-			const variable = vars[ index ];
+		for (const variable of vars) {
 
 			const name = variable.name;
 			const type = this.getType( variable.type );
@@ -598,7 +593,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			for ( const node of flowNodes ) {
 
-				const flowSlotData = this.getFlowData( shaderStage, node );
+				const flowSlotData = this.getFlowData( node/*, shaderStage*/ );
 				const slotName = node.name;
 
 				if ( slotName ) {

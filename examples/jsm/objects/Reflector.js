@@ -17,6 +17,8 @@ class Reflector extends Mesh {
 
 		super( geometry );
 
+		this.isReflector = true;
+
 		this.type = 'Reflector';
 		this.camera = new PerspectiveCamera();
 
@@ -190,8 +192,6 @@ class Reflector extends Mesh {
 	}
 
 }
-
-Reflector.prototype.isReflector = true;
 
 Reflector.ReflectorShader = {
 

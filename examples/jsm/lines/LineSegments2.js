@@ -219,6 +219,8 @@ class LineSegments2 extends Mesh {
 
 		super( geometry, material );
 
+		this.isLineSegments2 = true;
+
 		this.type = 'LineSegments2';
 
 	}
@@ -349,7 +351,5 @@ class LineSegments2 extends Mesh {
 	}
 
 }
-
-LineSegments2.prototype.isLineSegments2 = true;
 
 export { LineSegments2 };

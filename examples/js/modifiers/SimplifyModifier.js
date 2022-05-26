@@ -15,13 +15,6 @@
 
 		modify( geometry, count ) {
 
-			if ( geometry.isGeometry === true ) {
-
-				console.error( 'THREE.SimplifyModifier no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-				return;
-
-			}
-
 			geometry = geometry.clone();
 			const attributes = geometry.attributes; // this modifier can only process indexed and non-indexed geomtries with a position attribute
 
