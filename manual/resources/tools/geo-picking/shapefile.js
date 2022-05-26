@@ -281,7 +281,7 @@ function ringContains(ring, point) {
     if (segmentContains(pi, pj, point)) {
       return 0;
     }
-    if (((yi > y) !== (yj > y)) && ((x < (xj - xi) * (y - yi) / (yj - yi) + xi))) {
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
       contains = -contains;
     }
   }

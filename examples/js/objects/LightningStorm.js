@@ -177,9 +177,9 @@
 
 		}
 
-		copy( source ) {
+		copy( source, recursive ) {
 
-			super.copy( source );
+			super.copy( source, recursive );
 			this.stormParams.size = source.stormParams.size;
 			this.stormParams.minHeight = source.stormParams.minHeight;
 			this.stormParams.maxHeight = source.stormParams.maxHeight;

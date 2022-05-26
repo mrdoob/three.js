@@ -85,6 +85,7 @@
 		"webgl_loader_gcode",
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_compressed",
+		"webgl_loader_gltf_iridescence",
 		"webgl_loader_gltf_sheen",
 		"webgl_loader_gltf_transmission",
 		"webgl_loader_gltf_variants",
@@ -321,7 +322,8 @@
 		"webgpu_sandbox",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
-		"webgpu_skinning_points"
+		"webgpu_skinning_points",
+		"webgpu_sprites"
 	],
 	"webaudio": [
 		"webaudio_orientation",

@@ -3284,6 +3284,9 @@
 
 					}
 
+					break;
+					// cannot happen but is required by the DeepScan
+
 				default:
 					throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );
 

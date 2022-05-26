@@ -13,6 +13,7 @@ export default /* glsl */`
 #define whiteComplement( a ) ( 1.0 - saturate( a ) )
 
 float pow2( const in float x ) { return x*x; }
+vec3 pow2( const in vec3 x ) { return x*x; }
 float pow3( const in float x ) { return x*x*x; }
 float pow4( const in float x ) { float x2 = x*x; return x2*x2; }
 float max3( const in vec3 v ) { return max( max( v.x, v.y ), v.z ); }

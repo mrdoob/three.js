@@ -57,18 +57,8 @@
 		fromLine( line ) {
 
 			const geometry = line.geometry;
-
-			if ( geometry.isGeometry ) {
-
-				console.error( 'THREE.LineGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-				return;
-
-			} else if ( geometry.isBufferGeometry ) {
-
-				this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
-
-			} // set colors, maybe
-
+			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
+			// set colors, maybe
 
 			return this;
 

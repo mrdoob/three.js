@@ -21,7 +21,7 @@
 
 				try {
 
-					onLoad( scope.parse( data, url ) );
+					onLoad( scope.parse( data ) );
 
 				} catch ( e ) {
 
@@ -43,7 +43,7 @@
 
 		}
 
-		parse( data, url ) {
+		parse( data ) {
 
 			// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
 			function decompressLZF( inData, outLength ) {
@@ -352,12 +352,7 @@
 			} // build point cloud
 
 
-			const mesh = new THREE.Points( geometry, material );
-			let name = url.split( '' ).reverse().join( '' );
-			name = /([^\/]*)/.exec( name );
-			name = name[ 1 ].split( '' ).reverse().join( '' );
-			mesh.name = name;
-			return mesh;
+			return new THREE.Points( geometry, material );
 
 		}
 

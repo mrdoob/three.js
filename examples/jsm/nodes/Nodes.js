@@ -43,6 +43,7 @@ import ReflectNode from './accessors/ReflectNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
+import UserDataNode from './accessors/UserDataNode.js';
 
 // gpgpu
 import ComputeNode from './gpgpu/ComputeNode.js';
@@ -64,7 +65,7 @@ import LightsNode from './lighting/LightsNode.js';
 import LightingNode from './lighting/LightingNode.js';
 import LightingContextNode from './lighting/LightingContextNode.js';
 import HemisphereLightNode from './lighting/HemisphereLightNode.js';
-import EnvironmentLightNode from './lighting/EnvironmentLightNode.js';
+import EnvironmentNode from './lighting/EnvironmentNode.js';
 import AONode from './lighting/AONode.js';
 import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 
@@ -149,6 +150,7 @@ const nodeLib = {
 	SkinningNode,
 	TextureNode,
 	UVNode,
+	UserDataNode,
 
 	// display
 	ColorSpaceNode,
@@ -167,7 +169,7 @@ const nodeLib = {
 	LightingNode,
 	LightingContextNode,
 	HemisphereLightNode,
-	EnvironmentLightNode,
+	EnvironmentNode,
 	AONode,
 	AnalyticLightNode,
 
@@ -251,6 +253,7 @@ export {
 	SkinningNode,
 	TextureNode,
 	UVNode,
+	UserDataNode,
 
 	// display
 	ColorSpaceNode,
@@ -269,7 +272,7 @@ export {
 	LightingNode,
 	LightingContextNode,
 	HemisphereLightNode,
-	EnvironmentLightNode,
+	EnvironmentNode,
 	AONode,
 	AnalyticLightNode,
 
