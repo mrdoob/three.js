@@ -207,28 +207,7 @@ function Viewport( editor ) {
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
 			const intersects = getIntersects( onUpPosition );
-
-			if ( intersects.length > 0 ) {
-
-				const object = intersects[ 0 ].object;
-
-				if ( object.userData.object !== undefined ) {
-
-					// helper
-
-					editor.select( object.userData.object );
-
-				} else {
-
-					editor.select( object );
-
-				}
-
-			} else {
-
-				editor.select( null );
-
-			}
+			signals.intersectionsDetected.dispatch( intersects );
 
 			render();
 
