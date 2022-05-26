@@ -13936,7 +13936,8 @@
 		const to = Math.min(errorLine + 6, lines.length);
 
 		for (let i = from; i < to; i++) {
-			lines2.push(i + 1 + ': ' + lines[i]);
+			const line = i + 1;
+			lines2.push(`${line === errorLine ? '>' : ' '} ${line}: ${lines[i]}`);
 		}
 
 		return lines2.join('\n');
@@ -13965,7 +13966,7 @@
 		if (errorMatches) {
 			// --enable-privileged-webgl-extension
 			// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
-			const errorLine = parseInt(errorMatches[0]);
+			const errorLine = parseInt(errorMatches[1]);
 			return type.toUpperCase() + '\n\n' + errors + '\n\n' + handleSource(gl.getShaderSource(shader), errorLine);
 		} else {
 			return errors;
@@ -18780,7 +18781,15 @@
 							}
 						}
 
-						const camera = cameras[i];
+						let camera = cameras[i];
+
+						if (camera === undefined) {
+							camera = new PerspectiveCamera();
+							camera.layers.enable(i);
+							camera.viewport = new Vector4();
+							cameras[i] = camera;
+						}
+
 						camera.matrix.fromArray(view.transform.matrix);
 						camera.projectionMatrix.fromArray(view.projectionMatrix);
 						camera.viewport.set(viewport.x, viewport.y, viewport.width, viewport.height);
