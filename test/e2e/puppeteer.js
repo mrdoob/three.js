@@ -57,7 +57,8 @@ const exceptionList = [
 	'webgpu_sandbox',
 	'webgpu_skinning_instancing',
 	'webgpu_skinning_points',
-	'webgpu_skinning'
+	'webgpu_skinning',
+	'webgpu_sprites'
 ].concat( ( process.platform === 'win32' ) ? [
 
 	'webgl_effects_ascii' // windows fonts not supported
