@@ -5,7 +5,7 @@ import { Loader } from './Loader.js';
 import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
-import { SelectionHelper } from './Viewport.SelectionHelper.js';
+import { Selector } from './Viewport.Selector.js';
 
 var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 _DEFAULT_CAMERA.name = 'Camera';
@@ -95,7 +95,7 @@ function Editor() {
 	this.history = new _History( this );
 	this.storage = new _Storage();
 	this.strings = new Strings( this.config );
-	this.selectionHelper = new SelectionHelper( this );
+	this.selector = new Selector( this );
 
 	this.loader = new Loader( this );
 
@@ -539,7 +539,7 @@ Editor.prototype = {
 
 	select: function ( object ) {
 
-		this.selectionHelper.select( object );
+		this.selector.select( object );
 
 	},
 
@@ -574,7 +574,7 @@ Editor.prototype = {
 
 	deselect: function () {
 
-		this.selectionHelper.deselect();
+		this.selector.deselect();
 
 	},
 

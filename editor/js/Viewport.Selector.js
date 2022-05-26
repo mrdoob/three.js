@@ -1,4 +1,4 @@
-class SelectionHelper {
+class Selector {
 
 	constructor( editor ) {
 
@@ -66,4 +66,4 @@ class SelectionHelper {
 
 }
 
-export { SelectionHelper };
+export { Selector };
