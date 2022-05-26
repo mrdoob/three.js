@@ -38,11 +38,11 @@ class Sky extends Mesh {
 
 		super( new BoxGeometry( 1, 1, 1 ), material );
 
+		this.isSky = true;
+
 	}
 
 }
-
-Sky.prototype.isSky = true;
 
 Sky.SkyShader = {
 

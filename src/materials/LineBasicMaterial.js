@@ -7,6 +7,8 @@ class LineBasicMaterial extends Material {
 
 		super();
 
+		this.isLineBasicMaterial = true;
+
 		this.type = 'LineBasicMaterial';
 
 		this.color = new Color( 0xffffff );
@@ -39,7 +41,5 @@ class LineBasicMaterial extends Material {
 	}
 
 }
-
-LineBasicMaterial.prototype.isLineBasicMaterial = true;
 
 export { LineBasicMaterial };

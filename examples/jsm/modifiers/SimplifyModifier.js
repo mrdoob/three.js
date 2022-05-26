@@ -19,13 +19,6 @@ class SimplifyModifier {
 
 	modify( geometry, count ) {
 
-		if ( geometry.isGeometry === true ) {
-
-			console.error( 'THREE.SimplifyModifier no longer supports Geometry. Use BufferGeometry instead.' );
-			return;
-
-		}
-
 		geometry = geometry.clone();
 		const attributes = geometry.attributes;
 

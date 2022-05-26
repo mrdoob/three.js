@@ -26,6 +26,31 @@ geometry.viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( vViewPositi
 
 #endif
 
+#ifdef USE_IRIDESCENCE
+
+float dotNVi = saturate( dot( normal, geometry.viewDir ) );
+
+if ( material.iridescenceThickness == 0.0 ) {
+
+	material.iridescence = 0.0;
+
+} else {
+
+	material.iridescence = saturate( material.iridescence );
+
+}
+
+if ( material.iridescence > 0.0 ) {
+
+	material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );
+
+	// Iridescence F0 approximation
+	material.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNVi );
+
+}
+
+#endif
+
 IncidentLight directLight;
 
 #if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )

@@ -1,4 +1,4 @@
-// r140
+// r141
 
 const cacheName = 'threejs-editor';
 
@@ -45,6 +45,7 @@ const assets = [
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
+	'../examples/jsm/loaders/PCDLoader.js',
 	'../examples/jsm/loaders/PLYLoader.js',
 	'../examples/jsm/loaders/RGBELoader.js',
 	'../examples/jsm/loaders/STLLoader.js',
@@ -189,6 +190,7 @@ const assets = [
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
+	'./js/Viewport.Selector.js',
 	'./js/Viewport.ViewHelper.js',
 	'./js/Viewport.VR.js',
 
@@ -243,6 +245,8 @@ self.addEventListener( 'install', async function () {
 } );
 
 self.addEventListener( 'fetch', async function ( event ) {
+
+	if ( event.request.url.startsWith( 'chrome-extension' ) ) return;
 
 	const request = event.request;
 	event.respondWith( networkFirst( request ) );

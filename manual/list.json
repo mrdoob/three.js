@@ -344,7 +344,7 @@
 			"Using Shadertoy shaders": "zh/shadertoy",
 			"对齐HTML元素和3D对象": "zh/align-html-elements-to-3d",
 			"Using Indexed Textures for Picking and Color": "zh/indexed-textures",
-			"Using A Canvas for Dynamic Textures": "zh/canvas-textures",
+			"使用Canvas生成动态纹理": "zh/canvas-textures",
 			"广告牌(Billboards)": "zh/billboards",
 			"释放资源": "zh/cleanup",
 			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
@@ -356,7 +356,7 @@
 			"VR - Point To Select": "zh/webxr-point-to-select"
 		},
 		"参考": {
-			"Material Table": "zh/material-table"
+			"材质特性表": "zh/material-table"
 		}
 	}
 }

@@ -5,6 +5,8 @@ class InterleavedBuffer {
 
 	constructor( array, stride ) {
 
+		this.isInterleavedBuffer = true;
+
 		this.array = array;
 		this.stride = stride;
 		this.count = array !== undefined ? array.length / stride : 0;
@@ -146,7 +148,5 @@ class InterleavedBuffer {
 	}
 
 }
-
-InterleavedBuffer.prototype.isInterleavedBuffer = true;
 
 export { InterleavedBuffer };

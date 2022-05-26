@@ -34,7 +34,7 @@ class CondNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		const context = { temp: false };
+		const context = { tempWrite: false };
 		const nodeProperty = new PropertyNode( null, type ).build( builder );
 
 		const nodeSnippet = new ContextNode( this.condNode/*, context*/ ).build( builder, 'bool' ),

@@ -6,6 +6,8 @@ class BypassNode extends Node {
 
 		super();
 
+		this.isBypassNode = true;
+
 		this.outputNode = returnNode;
 		this.callNode = callNode;
 
@@ -32,7 +34,5 @@ class BypassNode extends Node {
 	}
 
 }
-
-BypassNode.prototype.isBypassNode = true;
 
 export default BypassNode;

@@ -7,6 +7,8 @@ class SpriteMaterial extends Material {
 
 		super();
 
+		this.isSpriteMaterial = true;
+
 		this.type = 'SpriteMaterial';
 
 		this.color = new Color( 0xffffff );
@@ -48,7 +50,5 @@ class SpriteMaterial extends Material {
 	}
 
 }
-
-SpriteMaterial.prototype.isSpriteMaterial = true;
 
 export { SpriteMaterial };

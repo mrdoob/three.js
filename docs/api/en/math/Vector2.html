@@ -23,8 +23,8 @@
 			<li>
 				A direction and length across a plane. In three.js the length will always be the
 				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
-				(straight-line distance) from (0, 0) to (x, y) and the direction is also
-				measured from (0, 0) towards (x, y).
+				(straight-line distance) from `(0, 0)` to `(x, y)` and the direction is also
+				measured from `(0, 0)` towards `(x, y)`.
 			</li>
 			<li>
 				Any arbitrary ordered pair of numbers.
@@ -37,7 +37,7 @@
 		</p>
 
 		<p>
-			Iterating through a [name] instance will yield its components (x, y) in the corresponding order.
+			Iterating through a [name] instance will yield its components `(x, y)` in the corresponding order.
 		</p>
 
 		<h2>Code Example</h2>
@@ -56,8 +56,8 @@
 
 		<h3>[name]( [param:Float x], [param:Float y] )</h3>
 		<p>
-		[page:Float x] - the x value of this vector. Default is *0*.<br />
-		[page:Float y] -  the y value of this vector. Default is *0*.<br /><br />
+		[page:Float x] - the x value of this vector. Default is `0`.<br />
+		[page:Float y] -  the y value of this vector. Default is `0`.<br /><br />
 
 		Creates a new [name].
 		</p>
@@ -184,7 +184,7 @@
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Vector2 v] )</h3>
-		<p>Returns *true* if the components of this vector and [page:Vector2 v] are strictly equal; *false* otherwise.</p>
+		<p>Returns `true` if the components of this vector and [page:Vector2 v] are strictly equal; `false` otherwise.</p>
 
 		<h3>[method:this floor]()</h3>
 		<p>The components of this vector are rounded down to the nearest integer value.</p>
@@ -194,7 +194,7 @@
 		[page:Array array] - the source array.<br />
 		[page:Integer offset] - (optional) offset into the array. Default is 0.<br /><br />
 
-		Sets this vector's [page:.x x] value to be array[ offset ] and [page:.y y] value to be array[ offset + 1 ].
+		Sets this vector's [page:.x x] value to be `array[ offset ]` and [page:.y y] value to be `array[ offset + 1 ]`.
 		</p>
 
 		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
@@ -232,7 +232,7 @@
 		<h3>[method:this lerp]( [param:Vector2 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector2 v] - [page:Vector2] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval `[0, 1]`.<br /><br />
 
 		Linearly interpolates between this vector and [page:Vector2 v], where alpha is the
 		percent distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector2 v].
@@ -242,7 +242,7 @@
 		<p>
 		[page:Vector2 v1] - the starting [page:Vector2].<br />
 		[page:Vector2 v2] - [page:Vector2] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval `[0, 1]`.<br /><br />
 
 		Sets this vector to be the vector linearly interpolated between [page:Vector2 v1] and
 		[page:Vector2 v2] where alpha is the percent distance along the line connecting the two vectors

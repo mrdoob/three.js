@@ -26,8 +26,6 @@ function SidebarAnimation( editor ) {
 		const button = new UIButton( getButtonText( action  ) );
 		button.onClick( function () {
 
-			console.log( action );
-
 			action.isRunning() ? action.stop() : action.play();
 			button.setTextContent( getButtonText( action  ) );
 

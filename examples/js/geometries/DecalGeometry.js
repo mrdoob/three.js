@@ -45,13 +45,6 @@
 				const vertex = new THREE.Vector3();
 				const normal = new THREE.Vector3(); // handle different geometry types
 
-				if ( mesh.geometry.isGeometry === true ) {
-
-					console.error( 'THREE.DecalGeometry no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
-					return;
-
-				}
-
 				const geometry = mesh.geometry;
 				const positionAttribute = geometry.attributes.position;
 				const normalAttribute = geometry.attributes.normal; // first, create an array of 'DecalVertex' objects

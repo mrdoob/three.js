@@ -812,50 +812,62 @@ function getPureArraySetter( type ) {
 
 // --- Uniform Classes ---
 
-function SingleUniform( id, activeInfo, addr ) {
+class SingleUniform {
 
-	this.id = id;
-	this.addr = addr;
-	this.cache = [];
-	this.setValue = getSingularSetter( activeInfo.type );
+	constructor( id, activeInfo, addr ) {
 
-	// this.path = activeInfo.name; // DEBUG
+		this.id = id;
+		this.addr = addr;
+		this.cache = [];
+		this.setValue = getSingularSetter( activeInfo.type );
 
-}
-
-function PureArrayUniform( id, activeInfo, addr ) {
-
-	this.id = id;
-	this.addr = addr;
-	this.cache = [];
-	this.size = activeInfo.size;
-	this.setValue = getPureArraySetter( activeInfo.type );
-
-	// this.path = activeInfo.name; // DEBUG
-
-}
-
-function StructuredUniform( id ) {
-
-	this.id = id;
-
-	this.seq = [];
-	this.map = {};
-
-}
-
-StructuredUniform.prototype.setValue = function ( gl, value, textures ) {
-
-	const seq = this.seq;
-
-	for ( let i = 0, n = seq.length; i !== n; ++ i ) {
-
-		const u = seq[ i ];
-		u.setValue( gl, value[ u.id ], textures );
+		// this.path = activeInfo.name; // DEBUG
 
 	}
 
-};
+}
+
+class PureArrayUniform {
+
+	constructor( id, activeInfo, addr ) {
+
+		this.id = id;
+		this.addr = addr;
+		this.cache = [];
+		this.size = activeInfo.size;
+		this.setValue = getPureArraySetter( activeInfo.type );
+
+		// this.path = activeInfo.name; // DEBUG
+
+	}
+
+}
+
+class StructuredUniform {
+
+	constructor( id ) {
+
+		this.id = id;
+
+		this.seq = [];
+		this.map = {};
+
+	}
+
+	setValue( gl, value, textures ) {
+
+		const seq = this.seq;
+
+		for ( let i = 0, n = seq.length; i !== n; ++ i ) {
+
+			const u = seq[ i ];
+			u.setValue( gl, value[ u.id ], textures );
+
+		}
+
+	}
+
+}
 
 // --- Top-level ---
 
@@ -932,74 +944,75 @@ function parseUniform( activeInfo, addr, container ) {
 
 // Root Container
 
-function WebGLUniforms( gl, program ) {
+class WebGLUniforms {
 
-	this.seq = [];
-	this.map = {};
+	constructor( gl, program ) {
 
-	const n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
+		this.seq = [];
+		this.map = {};
 
-	for ( let i = 0; i < n; ++ i ) {
+		const n = gl.getProgramParameter( program, gl.ACTIVE_UNIFORMS );
 
-		const info = gl.getActiveUniform( program, i ),
-			addr = gl.getUniformLocation( program, info.name );
+		for ( let i = 0; i < n; ++ i ) {
 
-		parseUniform( info, addr, this );
+			const info = gl.getActiveUniform( program, i ),
+				addr = gl.getUniformLocation( program, info.name );
 
-	}
-
-}
-
-WebGLUniforms.prototype.setValue = function ( gl, name, value, textures ) {
-
-	const u = this.map[ name ];
-
-	if ( u !== undefined ) u.setValue( gl, value, textures );
-
-};
-
-WebGLUniforms.prototype.setOptional = function ( gl, object, name ) {
-
-	const v = object[ name ];
-
-	if ( v !== undefined ) this.setValue( gl, name, v );
-
-};
-
-
-// Static interface
-
-WebGLUniforms.upload = function ( gl, seq, values, textures ) {
-
-	for ( let i = 0, n = seq.length; i !== n; ++ i ) {
-
-		const u = seq[ i ],
-			v = values[ u.id ];
-
-		if ( v.needsUpdate !== false ) {
-
-			// note: always updating when .needsUpdate is undefined
-			u.setValue( gl, v.value, textures );
+			parseUniform( info, addr, this );
 
 		}
 
 	}
 
-};
+	setValue( gl, name, value, textures ) {
 
-WebGLUniforms.seqWithValue = function ( seq, values ) {
+		const u = this.map[ name ];
 
-	const r = [];
-
-	for ( let i = 0, n = seq.length; i !== n; ++ i ) {
-
-		const u = seq[ i ];
-		if ( u.id in values ) r.push( u );
+		if ( u !== undefined ) u.setValue( gl, value, textures );
 
 	}
 
-	return r;
+	setOptional( gl, object, name ) {
 
-};
+		const v = object[ name ];
+
+		if ( v !== undefined ) this.setValue( gl, name, v );
+
+	}
+
+	static upload( gl, seq, values, textures ) {
+
+		for ( let i = 0, n = seq.length; i !== n; ++ i ) {
+
+			const u = seq[ i ],
+				v = values[ u.id ];
+
+			if ( v.needsUpdate !== false ) {
+
+				// note: always updating when .needsUpdate is undefined
+				u.setValue( gl, v.value, textures );
+
+			}
+
+		}
+
+	}
+
+	static seqWithValue( seq, values ) {
+
+		const r = [];
+
+		for ( let i = 0, n = seq.length; i !== n; ++ i ) {
+
+			const u = seq[ i ];
+			if ( u.id in values ) r.push( u );
+
+		}
+
+		return r;
+
+	}
+
+}
 
 export { WebGLUniforms };

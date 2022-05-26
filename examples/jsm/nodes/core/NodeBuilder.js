@@ -34,6 +34,7 @@ class NodeBuilder {
 
 		this.object = object;
 		this.material = object.material || null;
+		this.geometry = object.geometry || null;
 		this.renderer = renderer;
 		this.parser = parser;
 
@@ -68,7 +69,13 @@ class NodeBuilder {
 		this.flowsData = new WeakMap();
 
 		this.shaderStage = null;
-		this.node = null;
+		this.buildStage = null;
+
+	}
+
+	get node() {
+
+		return this.stack[ this.stack.length - 1 ];
 
 	}
 
@@ -180,7 +187,7 @@ class NodeBuilder {
 
 	}
 
-	getTextureBias( /* textureProperty, uvSnippet, biasSnippet */ ) {
+	getTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -192,7 +199,7 @@ class NodeBuilder {
 
 	}
 
-	getCubeTextureBias( /* textureProperty, uvSnippet, biasSnippet */ ) {
+	getCubeTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -392,6 +399,18 @@ class NodeBuilder {
 
 	}
 
+	getNodeProperties( node, shaderStage = this.shaderStage ) {
+
+		const nodeData = this.getDataFromNode( this, shaderStage );
+		const constructHash = node.getConstructHash( this );
+
+		nodeData.properties = nodeData.properties || {};
+		nodeData.properties[ constructHash ] = nodeData.properties[ constructHash ] || { outputNode: null };
+
+		return nodeData.properties[ constructHash ];
+
+	}
+
 	getUniformFromNode( node, shaderStage, type ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
@@ -489,7 +508,7 @@ class NodeBuilder {
 
 	}
 
-	getFlowData( shaderStage, node ) {
+	getFlowData( node/*, shaderStage*/ ) {
 
 		return this.flowsData.get( node );
 
@@ -497,15 +516,11 @@ class NodeBuilder {
 
 	flowNode( node ) {
 
-		this.node = node;
-
 		const output = node.getNodeType( this );
 
 		const flowData = this.flowChildNode( node, output );
 
 		this.flowsData.set( node, flowData );
-
-		this.node = null;
 
 		return flowData;
 
@@ -569,9 +584,7 @@ class NodeBuilder {
 
 		const vars = this.vars[ shaderStage ];
 
-		for ( let index = 0; index < vars.length; index ++ ) {
-
-			const variable = vars[ index ];
+		for ( const variable of vars ) {
 
 			snippet += `${variable.type} ${variable.name}; `;
 
@@ -609,15 +622,27 @@ class NodeBuilder {
 
 	}
 
+	setShaderStage( shaderStage ) {
+
+		this.shaderStage = shaderStage;
+
+	}
+
 	getShaderStage() {
 
 		return this.shaderStage;
 
 	}
 
-	setShaderStage( shaderStage ) {
+	setBuildStage( buildStage ) {
 
-		this.shaderStage = shaderStage;
+		this.buildStage = buildStage;
+
+	}
+
+	getBuildStage() {
+
+		return this.buildStage;
 
 	}
 
@@ -629,7 +654,9 @@ class NodeBuilder {
 
 	build() {
 
-		// stage 1: analyze nodes to possible optimization and validation
+		// stage 1: generate shader node
+
+		this.setBuildStage( 'construct' );
 
 		for ( const shaderStage of shaderStages ) {
 
@@ -639,13 +666,33 @@ class NodeBuilder {
 
 			for ( const node of flowNodes ) {
 
-				node.analyze( this );
+				node.build( this );
 
 			}
 
 		}
 
-		// stage 2: pre-build vertex code used in fragment shader
+		// stage 2: analyze nodes to possible optimization and validation
+
+		this.setBuildStage( 'analyze' );
+
+		for ( const shaderStage of shaderStages ) {
+
+			this.setShaderStage( shaderStage );
+
+			const flowNodes = this.flowNodes[ shaderStage ];
+
+			for ( const node of flowNodes ) {
+
+				node.build( this );
+
+			}
+
+		}
+
+		// stage 3: pre-build vertex code used in fragment shader
+
+		this.setBuildStage( 'generate' );
 
 		if ( this.context.vertex && this.context.vertex.isNode ) {
 
@@ -653,7 +700,9 @@ class NodeBuilder {
 
 		}
 
-		// stage 3: generate shader
+		// stage 4: generate shader
+
+		this.setBuildStage( 'generate' );
 
 		for ( const shaderStage of shaderStages ) {
 
@@ -663,15 +712,16 @@ class NodeBuilder {
 
 			for ( const node of flowNodes ) {
 
-				this.flowNode( node, shaderStage );
+				this.flowNode( node );
 
 			}
 
 		}
 
+		this.setBuildStage( null );
 		this.setShaderStage( null );
 
-		// stage 4: build code for a specific output
+		// stage 5: build code for a specific output
 
 		this.buildCode();
 
@@ -701,7 +751,7 @@ class NodeBuilder {
 
 		}
 
-		if ( toTypeLength > 4 ) { // toType is matrix-like
+		if ( toTypeLength > 4 || toTypeLength === 0 ) { // toType is matrix-like or unknown
 
 			// @TODO: ignore for now
 

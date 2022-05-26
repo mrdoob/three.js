@@ -9,6 +9,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		super();
 
+		this.isMeshPhysicalMaterial = true;
+
 		this.defines = {
 
 			'STANDARD': '',
@@ -39,6 +41,11 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			}
 		} );
 
+		this.iridescenceMap = null;
+		this.iridescenceIOR = 1.3;
+		this.iridescenceThicknessRange = [ 100, 400 ];
+		this.iridescenceThicknessMap = null;
+
 		this.sheenColor = new Color( 0x000000 );
 		this.sheenColorMap = null;
 		this.sheenRoughness = 1.0;
@@ -58,6 +65,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this._sheen = 0.0;
 		this._clearcoat = 0;
+		this._iridescence = 0;
 		this._transmission = 0;
 
 		this.setValues( parameters );
@@ -100,6 +108,24 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	}
 
+	get iridescence() {
+
+		return this._iridescence;
+
+	}
+
+	set iridescence( value ) {
+
+		if ( this._iridescence > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._iridescence = value;
+
+	}
+
 	get transmission() {
 
 		return this._transmission;
@@ -138,6 +164,12 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.ior = source.ior;
 
+		this.iridescence = source.iridescence;
+		this.iridescenceMap = source.iridescenceMap;
+		this.iridescenceIOR = source.iridescenceIOR;
+		this.iridescenceThicknessRange = [ ...source.iridescenceThicknessRange ];
+		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
+
 		this.sheen = source.sheen;
 		this.sheenColor.copy( source.sheenColor );
 		this.sheenColorMap = source.sheenColorMap;
@@ -162,7 +194,5 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	}
 
 }
-
-MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
 export { MeshPhysicalMaterial };

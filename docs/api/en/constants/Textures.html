@@ -152,7 +152,7 @@
 		</code>
 		<p>
 		For use with a texture's [page:Texture.format format]	property, these define
-		how elements of a 2d texture, or *texels*, are read by shaders.<br /><br />
+		how elements of a 2d texture, or `texels`, are read by shaders.<br /><br />
 
 		[page:constant AlphaFormat] discards the red, green and blue components and reads just the alpha component.<br /><br />
 
@@ -186,7 +186,7 @@
 
 		[page:constant LuminanceAlphaFormat] reads each element as a luminance/alpha double.
 		The same process occurs as for the [page:constant LuminanceFormat], except that the
-		alpha channel may have values other than *1.0*.<br /><br />
+		alpha channel may have values other than `1.0`.<br /><br />
 
 		[page:constant DepthFormat] reads each element as a single depth value, converts it to floating point, and clamps to the range [0,1].
 		This is the default for [page:DepthTexture DepthTexture].<br /><br />
@@ -345,7 +345,7 @@
 		texture when using a WebGL 2 rendering context.<br /><br />
 
 		For use with a texture's [page:Texture.internalFormat internalFormat]	property,
-		these define how elements of a texture, or *texels*, are stored on the GPU.<br /><br />
+		these define how elements of a texture, or `texels`, are stored on the GPU.<br /><br />
 
 		[page:constant R8] stores the red component on 8 bits.<br /><br />
 
@@ -539,7 +539,7 @@
 		For use with a Texture's [page:Texture.encoding encoding]	property.<br /><br />
 
 		If the encoding type is changed after the texture has already been used by a material,
-		you will need to set [page:Material.needsUpdate Material.needsUpdate] to *true* to make the material recompile.<br /><br />
+		you will need to set [page:Material.needsUpdate Material.needsUpdate] to `true` to make the material recompile.<br /><br />
 
 		[page:constant LinearEncoding] is the default.
 		Values other than this are only valid for a material's map, envMap and emissiveMap.

@@ -10,6 +10,8 @@ class Material extends EventDispatcher {
 
 		super();
 
+		this.isMaterial = true;
+
 		Object.defineProperty( this, 'id', { value: materialId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
@@ -217,6 +219,22 @@ class Material extends EventDispatcher {
 
 			data.clearcoatNormalMap = this.clearcoatNormalMap.toJSON( meta ).uuid;
 			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
+
+		}
+
+		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
+		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
+		if ( this.iridescenceThicknessRange !== undefined ) data.iridescenceThicknessRange = this.iridescenceThicknessRange;
+
+		if ( this.iridescenceMap && this.iridescenceMap.isTexture ) {
+
+			data.iridescenceMap = this.iridescenceMap.toJSON( meta ).uuid;
+
+		}
+
+		if ( this.iridescenceThicknessMap && this.iridescenceThicknessMap.isTexture ) {
+
+			data.iridescenceThicknessMap = this.iridescenceThicknessMap.toJSON( meta ).uuid;
 
 		}
 
@@ -479,9 +497,22 @@ class Material extends EventDispatcher {
 
 	}
 
-}
+	// @deprecated since r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
 
-Material.prototype.isMaterial = true;
+	get vertexTangents() {
+
+		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
+		return false;
+
+	}
+
+	set vertexTangents( value ) {
+
+		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
+
+	}
+
+}
 
 Material.fromType = function ( /*type*/ ) {
 

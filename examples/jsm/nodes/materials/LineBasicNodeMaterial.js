@@ -9,6 +9,8 @@ class LineBasicNodeMaterial extends NodeMaterial {
 
 		super();
 
+		this.isLineBasicNodeMaterial = true;
+
 		this.colorNode = null;
 		this.opacityNode = null;
 
@@ -40,7 +42,5 @@ class LineBasicNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-LineBasicNodeMaterial.prototype.isLineBasicNodeMaterial = true;
 
 export default LineBasicNodeMaterial;

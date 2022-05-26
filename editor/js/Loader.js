@@ -509,6 +509,28 @@ function Loader( editor ) {
 
 			}
 
+			case 'pcd':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { PCDLoader } = await import( '../../examples/jsm/loaders/PCDLoader.js' );
+
+					const points = new PCDLoader().parse( contents );
+					points.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, points ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
+
 			case 'ply':
 
 			{

@@ -43,6 +43,7 @@ import ReflectNode from './accessors/ReflectNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
+import UserDataNode from './accessors/UserDataNode.js';
 
 // gpgpu
 import ComputeNode from './gpgpu/ComputeNode.js';
@@ -58,11 +59,15 @@ import MathNode from './math/MathNode.js';
 import OperatorNode from './math/OperatorNode.js';
 import CondNode from './math/CondNode.js';
 
-// lights
-import LightContextNode from './lights/LightContextNode.js';
-import LightNode from './lights/LightNode.js';
-import LightsNode from './lights/LightsNode.js';
-import ReflectedLightNode from './lights/ReflectedLightNode.js';
+// lighting
+import PunctualLightNode from './lighting/PunctualLightNode.js';
+import LightsNode from './lighting/LightsNode.js';
+import LightingNode from './lighting/LightingNode.js';
+import LightingContextNode from './lighting/LightingContextNode.js';
+import HemisphereLightNode from './lighting/HemisphereLightNode.js';
+import EnvironmentNode from './lighting/EnvironmentNode.js';
+import AONode from './lighting/AONode.js';
+import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
@@ -145,6 +150,7 @@ const nodeLib = {
 	SkinningNode,
 	TextureNode,
 	UVNode,
+	UserDataNode,
 
 	// display
 	ColorSpaceNode,
@@ -157,11 +163,15 @@ const nodeLib = {
 	OperatorNode,
 	CondNode,
 
-	// lights
-	LightContextNode,
-	LightNode,
+	// lighting
+	PunctualLightNode,
 	LightsNode,
-	ReflectedLightNode,
+	LightingNode,
+	LightingContextNode,
+	HemisphereLightNode,
+	EnvironmentNode,
+	AONode,
+	AnalyticLightNode,
 
 	// utils
 	ArrayElementNode,
@@ -243,6 +253,7 @@ export {
 	SkinningNode,
 	TextureNode,
 	UVNode,
+	UserDataNode,
 
 	// display
 	ColorSpaceNode,
@@ -255,11 +266,15 @@ export {
 	OperatorNode,
 	CondNode,
 
-	// lights
-	LightContextNode,
-	LightNode,
+	// lighting
+	PunctualLightNode,
 	LightsNode,
-	ReflectedLightNode,
+	LightingNode,
+	LightingContextNode,
+	HemisphereLightNode,
+	EnvironmentNode,
+	AONode,
+	AnalyticLightNode,
 
 	// utils
 	ArrayElementNode,

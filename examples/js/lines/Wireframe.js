@@ -11,6 +11,7 @@
 		} ) ) {
 
 			super( geometry, material );
+			this.isWireframe = true;
 			this.type = 'Wireframe';
 
 		} // for backwards-compatibility, but could be a method of THREE.LineSegmentsGeometry...
@@ -45,8 +46,6 @@
 		}
 
 	}
-
-	Wireframe.prototype.isWireframe = true;
 
 	THREE.Wireframe = Wireframe;
 

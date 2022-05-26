@@ -2,13 +2,13 @@ class NodeAttribute {
 
 	constructor( name, type ) {
 
+		this.isNodeAttribute = true;
+
 		this.name = name;
 		this.type = type;
 
 	}
 
 }
-
-NodeAttribute.prototype.isNodeAttribute = true;
 
 export default NodeAttribute;

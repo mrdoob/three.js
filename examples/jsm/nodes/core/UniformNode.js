@@ -2,6 +2,14 @@ import InputNode from './InputNode.js';
 
 class UniformNode extends InputNode {
 
+	constructor( value, nodeType = null ) {
+
+		super( value, nodeType );
+
+		this.isUniformNode = true;
+
+	}
+
 	getUniformHash( builder ) {
 
 		return this.getHash( builder );
@@ -34,7 +42,5 @@ class UniformNode extends InputNode {
 	}
 
 }
-
-UniformNode.prototype.isUniformNode = true;
 
 export default UniformNode;

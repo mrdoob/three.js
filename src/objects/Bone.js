@@ -6,12 +6,12 @@ class Bone extends Object3D {
 
 		super();
 
+		this.isBone = true;
+
 		this.type = 'Bone';
 
 	}
 
 }
-
-Bone.prototype.isBone = true;
 
 export { Bone };

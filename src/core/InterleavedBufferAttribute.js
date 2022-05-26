@@ -7,6 +7,8 @@ class InterleavedBufferAttribute {
 
 	constructor( interleavedBuffer, itemSize, offset, normalized = false ) {
 
+		this.isInterleavedBufferAttribute = true;
+
 		this.name = '';
 
 		this.data = interleavedBuffer;
@@ -275,8 +277,6 @@ class InterleavedBufferAttribute {
 	}
 
 }
-
-InterleavedBufferAttribute.prototype.isInterleavedBufferAttribute = true;
 
 
 export { InterleavedBufferAttribute };

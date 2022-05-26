@@ -1,8 +1,9 @@
 import { Vector3 } from './Vector3.js';
-
 class Matrix4 {
 
 	constructor() {
+
+		this.isMatrix4 = true;
 
 		this.elements = [
 
@@ -871,8 +872,6 @@ class Matrix4 {
 	}
 
 }
-
-Matrix4.prototype.isMatrix4 = true;
 
 const _v1 = /*@__PURE__*/ new Vector3();
 const _m1 = /*@__PURE__*/ new Matrix4();

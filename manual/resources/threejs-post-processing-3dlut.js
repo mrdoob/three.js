@@ -26,7 +26,7 @@
           '[id$=-Input]',
           '[id$=-Output]',
           '[id$=-Result]',
-        ].map((selector) => {
+        ].forEach((selector) => {
           [...svg.querySelectorAll('[id^=Effect]')].forEach((elem) => {
             // because affinity designer doesn't export blend modes (T_T)
             // and because I'd prefer not to have to manually fix things as I edit.
