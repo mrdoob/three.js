@@ -141,10 +141,6 @@ async function main() {
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
-	const threeJsBuild = ( await fs.readFile( 'build/three.module.js', 'utf8' ) )
-		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' ); // TODO: remove this (will require regenerating screenshots)
-	await page.setRequestInterception( true );
-
 	const messages = [];
 	
 	let file, pageSize;
@@ -173,24 +169,6 @@ async function main() {
 
 		messages.push( text );
 		console.log( text );
-
-	} );
-
-	page.on( 'request', async ( request ) => {
-		
-		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
-
-			await request.respond( {
-				status: 200,
-				contentType: 'application/javascript; charset=utf-8',
-				body: threeJsBuild
-			} );
-
-		} else {
-
-			await request.continue();
-
-		}
 
 	} );
 
