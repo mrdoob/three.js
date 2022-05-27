@@ -51,7 +51,9 @@ class OculusHandPointerModel extends THREE.Object3D {
 				this.visible = true;
 				this.xrInputSource = xrInputSource;
 
-				this.createPointer();
+				if (this.pointerObject === null) {
+					this.createPointer();
+				}
 
 			}
 
