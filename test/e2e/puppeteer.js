@@ -114,6 +114,34 @@ async function downloadLatestChromium() {
 
 async function main() {
 
+	/* Find files */
+
+	const isMakeScreenshot = process.argv[ 2 ] === '--make';
+
+	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
+		.map( f => f.replace( '.html', '' ) );
+
+	const isExactList = exactList.length !== 0;
+
+	const files = ( await fs.readdir( './examples' ) )
+		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
+		.map( s => s.slice( 0, s.length - 5 ) )
+		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
+
+	if ( isExactList ) {
+
+		for ( let file of exactList ) {
+
+			if ( ! files.includes( file ) ) {
+
+				console.log( `Warning! Unrecognised example name: ${ file }` );
+
+			}
+
+		}
+
+	}
+
 	/* Download browser */
 
 	const { executablePath } = await downloadLatestChromium();
@@ -185,20 +213,6 @@ async function main() {
 		} catch {}
 
 	} );
-
-	/* Find files */
-
-	const isMakeScreenshot = process.argv[ 2 ] === '--make';
-
-	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
-		.map( f => f.replace( '.html', '' ) );
-
-	const isExactList = exactList.length !== 0;
-
-	const files = ( await fs.readdir( './examples' ) )
-		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
-		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 	/* Loop for each file, with CI parallelism */
 
