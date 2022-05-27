@@ -1144,6 +1144,15 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'add empty array', ( assert ) => {
+
+			var obj = new Object3D();
+			obj.add(...[]);
+		
+			assert.numEqual( obj.children.length, 0, 'no children added' );
+		
+		} );
+
 	} );
 
 } );
