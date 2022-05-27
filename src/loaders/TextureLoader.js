@@ -29,7 +29,25 @@ class TextureLoader extends Loader {
 
 			}
 
-		}, onProgress, onError );
+			texture.dispatchEvent( { type: 'load' } );
+
+		}, function () {
+
+			// TODO unimplemented in ImageLoader, so this is never called.
+
+			// texture.dispatchEvent( { type: 'progress', percent: ___ } )
+
+		}, function ( event ) {
+
+			if ( onError !== undefined ) {
+
+				onError( event );
+
+			}
+
+			texture.dispatchEvent( { type: 'error', errorEvent: event } );
+
+		} );
 
 		return texture;
 
