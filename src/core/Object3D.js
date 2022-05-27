@@ -297,51 +297,38 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	add( object ) {
+	add( ...objects ) {
 
-		if ( arguments.length === 0 ) {
+		objects.forEach( object => {
 
-			return this;
+			if ( object === this ) {
 
-		}
+				console.error( 'THREE.Object3D.add: object can\'t be added as a child of itself.', object );
 
-		if ( arguments.length > 1 ) {
+			} else {
 
-			for ( let i = 0; i < arguments.length; i ++ ) {
+				if ( object && object.isObject3D ) {
 
-				this.add( arguments[ i ] );
+					if ( object.parent !== null ) {
 
-			}
+						object.parent.remove( object );
 
-			return this;
+					}
 
-		}
+					object.parent = this;
+					this.children.push( object );
 
-		if ( object === this ) {
+					object.dispatchEvent( _addedEvent );
 
-			console.error( 'THREE.Object3D.add: object can\'t be added as a child of itself.', object );
-			return this;
+				} else {
 
-		}
+					console.error( 'THREE.Object3D.add: object not an instance of THREE.Object3D.', object );
 
-		if ( object && object.isObject3D ) {
-
-			if ( object.parent !== null ) {
-
-				object.parent.remove( object );
+				}
 
 			}
 
-			object.parent = this;
-			this.children.push( object );
-
-			object.dispatchEvent( _addedEvent );
-
-		} else {
-
-			console.error( 'THREE.Object3D.add: object not an instance of THREE.Object3D.', object );
-
-		}
+		} );
 
 		return this;
 
