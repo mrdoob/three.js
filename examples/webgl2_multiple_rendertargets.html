@@ -245,13 +245,6 @@
 
 				renderTarget.samples = parameters.samples;
 
-				// safari prior 15.5 needs the renderer to be cleared()
-				// if ( parameters.samples > 0 ) {
-
-					// renderer.clear();
-
-				// }
-
 				scene.traverse( function ( child ) {
 
 					if ( child.material !== undefined ) {
