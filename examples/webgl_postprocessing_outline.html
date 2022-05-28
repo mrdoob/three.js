@@ -42,8 +42,6 @@
 			let camera, scene, renderer, controls;
 			let composer, effectFXAA, outlinePass;
 
-			let selectedObjects = [];
-
 			const raycaster = new THREE.Raycaster();
 			const mouse = new THREE.Vector2();
 
@@ -199,23 +197,66 @@
 
 				group.add( obj3d );
 
-				//
+				{
 
-				const geometry = new THREE.SphereGeometry( 3, 48, 24 );
+					/**
+					 * Regular spheres
+					 */
+					const geometry = new THREE.SphereGeometry( 3, 48, 24 );
 
-				for ( let i = 0; i < 20; i ++ ) {
+					for ( let i = 0; i < 15; i ++ ) {
 
-					const material = new THREE.MeshLambertMaterial();
-					material.color.setHSL( Math.random(), 1.0, 0.3 );
+						const material = new THREE.MeshLambertMaterial();
+						material.color.setHSL( Math.random(), 1.0, 0.3 );
 
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 4 - 2;
-					mesh.position.y = Math.random() * 4 - 2;
-					mesh.position.z = Math.random() * 4 - 2;
-					mesh.receiveShadow = true;
-					mesh.castShadow = true;
-					mesh.scale.multiplyScalar( Math.random() * 0.3 + 0.1 );
-					group.add( mesh );
+						const mesh = new THREE.Mesh( geometry, material );
+						mesh.position.x = Math.random() * 4 - 2;
+						mesh.position.y = Math.random() * 4 - 2;
+						mesh.position.z = Math.random() * 4 - 2;
+						mesh.receiveShadow = true;
+						mesh.castShadow = true;
+						mesh.scale.multiplyScalar( Math.random() * 0.3 + 0.1 );
+						group.add( mesh );
+
+					}
+
+				}
+
+				const meshesWithGroupedGeometry = [];
+				{
+
+					/**
+					 * Spheres with grouped BufferGeometry
+					 */
+					const geometry = new THREE.SphereBufferGeometry( 3, 48, 24 );
+					const triNumber = geometry.index.count / 3;
+					const triThird = Math.floor( triNumber / 3 );
+					geometry.addGroup( 0, triThird * 3, 0 );
+					geometry.addGroup( triThird * 3, triThird * 3, 1 );
+					geometry.addGroup( triThird * 3 * 2, triThird * 3, 2 );
+
+					for ( let i = 0; i < 5; i ++ ) {
+
+						const materialA = new THREE.MeshLambertMaterial();
+						materialA.color.setHSL( Math.random(), 1.0, 0.3 );
+
+						const materialB = new THREE.MeshLambertMaterial();
+						materialB.color.setHSL( Math.random(), 1.0, 0.3 );
+
+						const materialC = new THREE.MeshLambertMaterial();
+						materialC.color.setHSL( Math.random(), 1.0, 0.3 );
+
+						const mesh = new THREE.Mesh( geometry, [ materialA, materialB, materialC ] );
+						mesh.position.x = Math.random() * 4 - 2;
+						mesh.position.y = Math.random() * 4 - 2;
+						mesh.position.z = Math.random() * 4 - 2;
+						mesh.receiveShadow = true;
+						mesh.castShadow = true;
+						mesh.scale.multiplyScalar( Math.random() * 0.3 + 0.1 );
+						meshesWithGroupedGeometry.push( mesh );
+						group.add( mesh );
+
+					}
 
 				}
 
@@ -280,10 +321,11 @@
 
 				}
 
-				function addSelectedObject( object ) {
+				function emptySelectedObjects() {
 
-					selectedObjects = [];
-					selectedObjects.push( object );
+					while ( 0 < outlinePass.selectedObjects.length )
+						outlinePass.selectedObjects.pop();
+					outlinePass.selectedMaterialGroups.clear();
 
 				}
 
@@ -296,8 +338,23 @@
 					if ( intersects.length > 0 ) {
 
 						const selectedObject = intersects[ 0 ].object;
-						addSelectedObject( selectedObject );
-						outlinePass.selectedObjects = selectedObjects;
+						emptySelectedObjects();
+						if ( meshesWithGroupedGeometry.includes( selectedObject ) ) {
+
+							const offset = intersects[ 0 ].faceIndex * 3;
+							const groups = selectedObject.geometry.groups;
+							let idx = 0;
+							for ( const group of groups )
+								if ( group.start <= offset && offset < group.start + group.count )
+									idx = group.materialIndex;
+
+							outlinePass.selectedMaterialGroups.set( selectedObject, [ selectedObject.material[ idx ] ] );
+
+						} else {
+
+							outlinePass.selectedObjects.push( selectedObject );
+
+						}
 
 					} else {
 
@@ -345,7 +402,6 @@
 				stats.end();
 
 			}
-
 		</script>
 	</body>
 </html>

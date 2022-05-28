@@ -17,13 +17,14 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class OutlinePass extends Pass {
 
-	constructor( resolution, scene, camera, selectedObjects ) {
+	constructor( resolution, scene, camera, selectedObjects, selectedMaterialGroups ) {
 
 		super();
 
 		this.renderScene = scene;
 		this.renderCamera = camera;
 		this.selectedObjects = selectedObjects !== undefined ? selectedObjects : [];
+		this.selectedMaterialGroups = selectedMaterialGroups !== undefined ? selectedMaterialGroups : new Map();
 		this.visibleEdgeColor = new Color( 1, 1, 1 );
 		this.hiddenEdgeColor = new Color( 0.1, 0.04, 0.02 );
 		this.edgeGlow = 0.0;
@@ -170,7 +171,7 @@ class OutlinePass extends Pass {
 
 		function gatherSelectedMeshesCallBack( object ) {
 
-			if ( object.isMesh ) {
+			if ( object.isMesh || object.isMaterial ) {
 
 				if ( bVisible === true ) {
 
@@ -194,12 +195,24 @@ class OutlinePass extends Pass {
 
 		}
 
+		for ( const [ , materials ] of this.selectedMaterialGroups.entries() ) {
+
+			for ( const material of materials ) {
+
+				gatherSelectedMeshesCallBack( material );
+
+			}
+
+		}
+
 	}
 
 	changeVisibilityOfNonSelectedObjects( bVisible ) {
 
 		const cache = this._visibilityCache;
 		const selectedMeshes = [];
+		const selectedMaterials = [];
+		const groupedMeshes = [];
 
 		function gatherSelectedMeshesCallBack( object ) {
 
@@ -214,9 +227,21 @@ class OutlinePass extends Pass {
 
 		}
 
+		for ( const [ mesh, materials ] of this.selectedMaterialGroups ) {
+
+			groupedMeshes.push( mesh );
+			for ( const material of materials ) {
+
+				selectedMaterials.push( material );
+
+			}
+
+		}
+
 		function VisibilityChangeCallBack( object ) {
 
-			if ( object.isMesh || object.isSprite ) {
+			if ( ! object ) return;
+			if ( object.isMesh || object.isSprite || object.isMaterial ) {
 
 				// only meshes and sprites are supported by OutlinePass
 
@@ -224,9 +249,7 @@ class OutlinePass extends Pass {
 
 				for ( let i = 0; i < selectedMeshes.length; i ++ ) {
 
-					const selectedObjectId = selectedMeshes[ i ].id;
-
-					if ( selectedObjectId === object.id ) {
+					if ( selectedMeshes[ i ].uuid === object.uuid ) {
 
 						bFound = true;
 						break;
@@ -235,7 +258,39 @@ class OutlinePass extends Pass {
 
 				}
 
-				if ( bFound === false ) {
+				for ( let i = 0; i < selectedMaterials.length; i ++ ) {
+
+					if ( selectedMaterials[ i ].uuid === object.uuid ) {
+
+						bFound = true;
+						break;
+
+					}
+
+				}
+
+				let bGrouped = false;
+
+				for ( let i = 0; i < groupedMeshes.length; i ++ ) {
+
+					if ( groupedMeshes[ i ].uuid === object.uuid ) {
+
+						bGrouped = true;
+						break;
+
+					}
+
+				}
+
+				if ( bGrouped ) {
+
+					for ( const material of object.material ) {
+
+						VisibilityChangeCallBack( material );
+
+					}
+
+				} else if ( bFound === false ) {
 
 					const visibility = object.visible;
 
@@ -286,7 +341,7 @@ class OutlinePass extends Pass {
 
 	render( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
-		if ( this.selectedObjects.length > 0 ) {
+		if ( this.selectedObjects.length > 0 || this.selectedMaterialGroups.size > 0 ) {
 
 			renderer.getClearColor( this._oldClearColor );
 			this.oldClearAlpha = renderer.getClearAlpha();
