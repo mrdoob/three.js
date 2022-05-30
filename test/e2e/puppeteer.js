@@ -13,11 +13,14 @@ const parseTime = 2; // 2 seconds per megabyte
 
 const exceptionList = [
 
+	'css3d_periodictable', // investigate
 	'webgl_buffergeometry_glbufferattribute', // investigate
 	'webgl_effects_ascii', // renders differently on different platforms, investigate
+	'webgl_lights_spotlights', // investigate
 	'webgl_lines_sphere', // changes with every screenshot, investigate
 	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format." investigate
 	'webgl_morphtargets_face', // does not work on GitHub? investigate
+	'webgl_multiple_elements_text', // investigate
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
