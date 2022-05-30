@@ -1,4 +1,3 @@
-
 ( function () {
 
 	/* Deterministic random */
@@ -13,7 +12,6 @@
 
 	};
 
-
 	/* Deterministic timer */
 
 	window.performance._now = performance.now;
@@ -23,7 +21,6 @@
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
 	window.performance.now = now;
-
 
 	/* Deterministic RAF */
 
@@ -62,8 +59,8 @@
 
 	};
 
-
-	/* Semi-determitistic video */
+	/* Semi-determitistic video
+	   TODO: fix this */
 
 	const play = HTMLVideoElement.prototype.play;
 
@@ -84,7 +81,8 @@
 
 	};
 
-	/* Additional variable for ~5 examples */
+	/* Additional variable for ~5 examples
+	   TODO: remove this */
 
 	window.TESTING = true;
 
