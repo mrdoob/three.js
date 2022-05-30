@@ -22,6 +22,8 @@ class DirectionalLightHelper extends Object3D {
 
 		this.color = color;
 
+		this.type = 'DirectionalLightHelper';
+
 		if ( size === undefined ) size = 1;
 
 		let geometry = new BufferGeometry();
