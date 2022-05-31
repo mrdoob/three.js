@@ -30,7 +30,7 @@ const exceptionList = [
 	'css3d_youtube',
 	'*video*'
 
-].map( str => new RegExp( '^' + str.replace( '*', '.*' ) + '$' ) );
+].map( str => new RegExp( '^' + str.replaceAll( '*', '.*' ) + '$' ) );
 
 /* CONFIG VARIABLES END */
 
@@ -105,7 +105,7 @@ async function main() {
 
 	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
 		.map( f => f.replace( '.html', '' ) )
-		.map( str => new RegExp( '^' + str.replace( '*', '.*' ) + '$' ) );
+		.map( str => new RegExp( '^' + str.replaceAll( '*', '.*' ) + '$' ) );
 
 	const isExactList = exactList.length !== 0;
 
