@@ -30,7 +30,7 @@ const exceptionList = [
 	'css3d_youtube',
 	'*video*'
 
-].map( str => new RegExp( '^' + str + '$' ) );
+].map( str => new RegExp( '^' + str.replace( '*', '.*' ) + '$' ) );
 
 /* CONFIG VARIABLES END */
 
@@ -105,7 +105,7 @@ async function main() {
 
 	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
 		.map( f => f.replace( '.html', '' ) )
-		.map( str => new RegExp( '^' + str + '$' ) );
+		.map( str => new RegExp( '^' + str.replace( '*', '.*' ) + '$' ) );
 
 	const isExactList = exactList.length !== 0;
 
@@ -120,7 +120,7 @@ async function main() {
 
 			if ( ! files.some( f => regexp.test( f ) ) ) {
 
-				console.log( `Warning! Unrecognised example name: ${ regexp }` );
+				console.log( `Warning! Unrecognised example name: ${ regexp.source.slice( 1, -1 ).replace( '.*', '*' ) }` );
 
 			}
 
