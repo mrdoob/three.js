@@ -20588,7 +20588,7 @@ function WebGLRenderStates( extensions, capabilities ) {
 
 	let renderStates = new WeakMap();
 
-	function get( scene, renderCallDepth ) {
+	function get( scene, renderCallDepth = 0 ) {
 
 		let renderState;
 
