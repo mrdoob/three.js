@@ -384,7 +384,7 @@
 		"misc_exporter_usdz",
 		"misc_lookat"
 	],
-	"external libraries": [
+	"community plugins": [
 		"external_bvh_raycasting"
 	],
 	"css2d": [
