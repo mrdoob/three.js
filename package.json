@@ -26,7 +26,7 @@
     "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
-    "editor/js",
+    "build/editor/js",
     "editor/css",
     "editor/images",
     "examples/js",
