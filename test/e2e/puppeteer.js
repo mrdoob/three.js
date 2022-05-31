@@ -24,31 +24,13 @@ const exceptionList = [
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
+	'webgpu*', // "No available adapters. JSHandle@error", investigate
 	
 	// video tag is not deterministic enough, investigate
 	'css3d_youtube',
-	'webgl_video_kinect',
-	'webgl_video_panorama_equirectangular',
+	'*video*'
 
-	// webgpu - "No available adapters. JSHandle@error", investigate
-	'webgpu_compute',
-	'webgpu_cubemap_mix',
-	'webgpu_depth_texture',
-	'webgpu_instance_mesh',
-	'webgpu_instance_uniform',
-	'webgpu_lights_custom',
-	'webgpu_lights_selective',
-	'webgpu_loader_gltf',
-	'webgpu_materials',
-	'webgpu_nodes_playground',
-	'webgpu_rtt',
-	'webgpu_sandbox',
-	'webgpu_skinning_instancing',
-	'webgpu_skinning_points',
-	'webgpu_skinning',
-	'webgpu_sprites'
-
-];
+].map( str => new RegExp( '^' + str + '$' ) );
 
 /* CONFIG VARIABLES END */
 
@@ -122,22 +104,23 @@ async function main() {
 	const isMakeScreenshot = process.argv[ 2 ] === '--make';
 
 	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
-		.map( f => f.replace( '.html', '' ) );
+		.map( f => f.replace( '.html', '' ) )
+		.map( str => new RegExp( '^' + str + '$' ) );
 
 	const isExactList = exactList.length !== 0;
 
 	const files = ( await fs.readdir( './examples' ) )
 		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
+		.filter( f => isExactList ? exactList.some( r => r.test( f ) ) : ! exceptionList.some( r => r.test( f ) ) );
 
 	if ( isExactList ) {
 
-		for ( let file of exactList ) {
+		for ( let regexp of exactList ) {
 
-			if ( ! files.includes( file ) ) {
+			if ( ! files.some( f => regexp.test( f ) ) ) {
 
-				console.log( `Warning! Unrecognised example name: ${ file }` );
+				console.log( `Warning! Unrecognised example name: ${ regexp }` );
 
 			}
 
