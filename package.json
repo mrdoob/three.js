@@ -11,7 +11,7 @@
       "require": "./build/three.cjs"
     },
     "./editor/css/*": "./editor/css/*",
-    "./editor/js/*": "./editor/js/*",
+    "./editor/js/*": "./build/editor/js/*",
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
     "./src/*": "./src/*"
@@ -99,13 +99,17 @@
       ]
     }
   },
+  "eslintIgnore": [
+    "build"
+  ],
   "browserslist": [
     "> 1%, not dead, not ie 11, not op_mini all"
   ],
   "scripts": {
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
-    "build": "rollup -c utils/build/rollup.config.js",
+    "transpile-editor": "babel --config-file ./utils/build/.babelrc.json --out-dir build/editor editor",
+    "build": "rollup -c utils/build/rollup.config.js && npm run transpile-editor",
     "build-module": "ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
     "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
@@ -150,12 +154,14 @@
     "ternjs": "0.22.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.17.10",
     "@babel/core": "^7.17.9",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/preset-env": "^7.16.11",
     "@rollup/plugin-babel": "^5.3.1",
     "@rollup/plugin-node-resolve": "^13.2.0",
+    "babel-plugin-inline-import-data-uri": "^1.0.1",
     "chalk": "^5.0.1",
     "concurrently": "^7.1.0",
     "eslint": "^8.13.0",

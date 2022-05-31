@@ -16,6 +16,7 @@
       {
         "loose": true
       }
-    ]
+    ],
+    "inline-import-data-uri"
   ]
 }

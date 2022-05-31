@@ -15393,7 +15393,7 @@
 	function WebGLRenderStates(extensions, capabilities) {
 		let renderStates = new WeakMap();
 
-		function get(scene, renderCallDepth = 0) {
+		function get(scene, renderCallDepth) {
 			let renderState;
 
 			if (renderStates.has(scene) === false) {
