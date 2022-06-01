@@ -144,15 +144,14 @@ async function main() {
 
 	const { executablePath } = await downloadLatestChromium();
 
+	const flags = ( process.platform === 'darwin' || process.platform === 'win32' ) ? [ '--use-angle', '--enable-unsafe-webgpu' ] : [];
+
 	/* Launch browser */
 
 	browser = await puppeteer.launch( {
 		executablePath,
 		headless: ! process.env.VISIBLE,
-		args: [
-			'--use-angle',
-			'--enable-unsafe-webgpu'
-		]
+		args: flags
 	} );
 
 	/* Prepare page */
