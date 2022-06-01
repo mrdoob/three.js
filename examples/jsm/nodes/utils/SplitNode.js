@@ -57,7 +57,7 @@ class SplitNode extends Node {
 
 			const nodeSnippet = node.build( builder, type );
 
-			if ( this.components.length === nodeTypeLength && this.components === vectorComponents.substr( 0, this.components.length ) ) {
+			if ( this.components.length === nodeTypeLength && this.components === vectorComponents.slice( 0, this.components.length ) ) {
 
 				// unecessary swizzle
 
