@@ -36,7 +36,7 @@ const exceptionList = [
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
-	'webgpu*', // "No available adapters. JSHandle@error", investigate
+	'webgpu*', // plain black screen, investigate
 	
 	// video tag is not deterministic enough, investigate
 	'css3d_youtube',
@@ -150,10 +150,8 @@ async function main() {
 		executablePath,
 		headless: ! process.env.VISIBLE,
 		args: [
-			// TODO: test if these three flags are really needed
-			'--use-gl=swiftshader',
-			'--no-sandbox',
-			'--enable-surface-synchronization'
+			'--use-angle',
+			'--enable-unsafe-webgpu'
 		]
 	} );
 
