@@ -6,6 +6,18 @@ import jimp from 'jimp';
 import * as fs from 'fs/promises';
 import fetch from 'node-fetch';
 
+function regexify( str ) {
+
+	return new RegExp( '^' + str.replace( /\*/g, '.*' ) + '$' );
+
+}
+
+function unregexify( regexp ) {
+
+	return regexp.source.slice( 1, -1 ).replace( /\.\*/g, '*' );
+
+}
+
 /* CONFIG VARIABLES START */
 
 const idleTime = 3; // 3 seconds - for how long there should be no network requests
@@ -30,7 +42,7 @@ const exceptionList = [
 	'css3d_youtube',
 	'*video*'
 
-].map( str => new RegExp( '^' + str.replaceAll( '*', '.*' ) + '$' ) );
+].map( regexify );
 
 /* CONFIG VARIABLES END */
 
@@ -105,7 +117,7 @@ async function main() {
 
 	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
 		.map( f => f.replace( '.html', '' ) )
-		.map( str => new RegExp( '^' + str.replaceAll( '*', '.*' ) + '$' ) );
+		.map( regexify );
 
 	const isExactList = exactList.length !== 0;
 
@@ -120,7 +132,7 @@ async function main() {
 
 			if ( ! files.some( f => regexp.test( f ) ) ) {
 
-				console.log( `Warning! Unrecognised example name: ${ regexp.source.slice( 1, -1 ).replace( '.*', '*' ) }` );
+				console.log( `Warning! Unrecognised example name: ${ unregexify( regexp ) }` );
 
 			}
 
