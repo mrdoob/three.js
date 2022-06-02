@@ -46,13 +46,6 @@ import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { createElementNS } from '../utils.js';
 
-function clampRange( source, target ) {
-
-	source.start = Math.max( source.start, target.start );
-	source.end = Math.min( source.end, target.end );
-
-}
-
 function createCanvasElement() {
 
 	const canvas = createElementNS( 'canvas' );
@@ -737,41 +730,39 @@ function WebGLRenderer( parameters = {} ) {
 
 		//
 
-		const range = { start: 0, end: Infinity };
+		let drawStart = 0;
+		let drawEnd = Infinity;
 
 		const drawRange = geometry.drawRange;
 		const position = geometry.attributes.position;
 
 		if ( drawRange !== null ) {
 
-			clampRange( range, {
-				start: drawRange.start * rangeFactor,
-				end: ( drawRange.start + drawRange.count ) * rangeFactor,
-			} );
+			drawStart = Math.max( drawStart, drawRange.start * rangeFactor );
+			drawEnd = Math.min( drawEnd, ( drawRange.start + drawRange.count ) * rangeFactor );
 
 		}
 
 		if ( group !== null ) {
 
-			clampRange( range, {
-				start: group.start * rangeFactor,
-				end: ( group.start + group.count ) * rangeFactor,
-			} );
+			drawStart = Math.max( drawStart, group.start * rangeFactor );
+			drawEnd = Math.min( drawEnd, ( group.start + group.count ) * rangeFactor );
 
 		}
 
 		if ( index !== null ) {
 
-			clampRange( range, { start: 0, end: index.count } );
+			drawStart = Math.max( drawStart, 0 );
+			drawEnd = Math.min( drawEnd, index.count );
 
 		} else if ( position !== undefined && position !== null ) {
 
-			clampRange( range, { start: 0, end: position.count } );
+			drawStart = Math.max( drawStart, 0 );
+			drawEnd = Math.min( drawEnd, position.count );
 
 		}
 
-		const drawStart = range.start;
-		const drawCount = range.end - range.start;
+		const drawCount = drawEnd - drawStart;
 
 		if ( ! ( 0 <= drawCount && drawCount < Infinity ) ) return;
 
