@@ -26,6 +26,9 @@
 			}
 			*/
 			
+			const uint ieeeMantissa = 0x007FFFFFu;
+			const uint ieeeOne      = 0x3F800000u;
+
 			uint hash(uint x) {
 				x += ( x << 10u );
 				x ^= ( x >>  6u );
@@ -40,9 +43,6 @@
 			float hashNoise(vec2 xy) {
 				uint m = hash(floatBitsToUint(xy)); 
 				
-				const uint ieeeMantissa = 0x007FFFFFu;
-				const uint ieeeOne      = 0x3F800000u;
-
 				m &= ieeeMantissa;
 				m |= ieeeOne;
 				
@@ -65,7 +65,8 @@
 
 			void main()	{
 
-				vec3 position = pseudoRandomVec3(-1.0, +1.0, gl_VertexID);
+				const float scale = 1.0/64.0;
+				vec3 position = pseudoRandomVec3(-1.0, +1.0, gl_VertexID/3) + scale * pseudoRandomVec3(-1.0, +1.0, gl_VertexID);
 				vec3 color = pseudoRandomVec3(0.25, 1.0, gl_VertexID/3);
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0 );
 				vColor = color;
@@ -128,11 +129,12 @@
 
 				// geometry
 
-				const triangleCount = 20;
+				const triangleCount = 10000;
 				const vertexCountPerTriangle = 3;
+				const vertexCount = triangleCount*vertexCountPerTriangle;
 
 				const geometry = new THREE.BufferGeometry();				
-				geometry.setDrawRange(0, triangleCount*vertexCountPerTriangle);
+				geometry.setDrawRange(0, vertexCount);
 
 				// material
 
@@ -160,10 +162,13 @@
 
 			}
 
-			function animate() {
+			function animate(time) {
 
 				requestAnimationFrame( animate );
 
+				mesh.rotation.x = time/1000.0 * 0.25;
+				mesh.rotation.y = time/1000.0 * 0.50;
+				
 				renderer.render( scene, camera );
 
 			}
