@@ -18,17 +18,42 @@
 			
 			uniform float seed;
 			
+			/*
 			const float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio
 			
-			float gold_noise(in vec2 xy){
+			float goldNoise(vec2 xy){
 				return fract(tan(distance(xy*PHI, xy)*seed)*xy.x);
 			}
+			*/
 			
-			float pseudoRandom(in float lower, in float delta, in vec2 xy) {
-				return lower + delta*gold_noise(xy);
+			uint hash(uint x) {
+				x += ( x << 10u );
+				x ^= ( x >>  6u );
+				x += ( x <<  3u );
+				x ^= ( x >> 11u );
+				x += ( x << 15u );
+				return x;
 			}
 			
-			vec3 pseudoRandomVec3(in float lower, in float upper, in int index) {
+			uint hash(uvec2 v) { return hash( v.x ^ hash(v.y) ); }
+			
+			float hashNoise(vec2 xy) {
+				uint m = hash(floatBitsToUint(xy)); 
+				
+				const uint ieeeMantissa = 0x007FFFFFu;
+				const uint ieeeOne      = 0x3F800000u;
+
+				m &= ieeeMantissa;
+				m |= ieeeOne;
+				
+				return uintBitsToFloat( m ) - 1.0;
+			}
+			
+			float pseudoRandom(float lower, float delta, in vec2 xy) {
+				return lower + delta*hashNoise(xy);
+			}
+			
+			vec3 pseudoRandomVec3(float lower, float upper, int index) {
 				float delta = upper - lower;
 				float x = pseudoRandom(lower, delta, vec2(index, 0));
 				float y = pseudoRandom(lower, delta, vec2(index, 1));
@@ -103,9 +128,11 @@
 
 				// geometry
 
-				const geometry = new THREE.BufferGeometry();
-				
-				geometry.setDrawRange(0, 99);
+				const triangleCount = 20;
+				const vertexCountPerTriangle = 3;
+
+				const geometry = new THREE.BufferGeometry();				
+				geometry.setDrawRange(0, triangleCount*vertexCountPerTriangle);
 
 				// material
 
