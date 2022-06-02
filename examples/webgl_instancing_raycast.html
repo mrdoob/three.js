@@ -40,10 +40,38 @@
 			const white = new THREE.Color().setHex( 0xffffff );
 
 			const halfInstances = [];
-			const guiControls = { halfFace: false };
-			let halfFace = false;
+			const guiControls = { eighthFace: false };
+			let eighthFace = false;
 			init();
 			animate();
+
+			function ascSort( a, b ) {
+
+				return a.distance - b.distance;
+
+			}
+
+			function intersectInstancedMesh( raycaster, mesh, instances, intersects = [] ) {
+
+				if ( ! mesh.isInstancedMesh ) {
+
+					console.warn( 'Object must be instance mesh to use intersectInstancedMesh.' );
+					return intersects;
+
+				}
+
+				if ( mesh.layers.test( raycaster.layers ) ) {
+
+					mesh.raycastInstances( raycaster, instances, intersects );
+
+				}
+
+				intersects.sort( ascSort );
+
+				return intersects;
+
+			}
+
 			function reset() {
 
 				let i = 0;
@@ -106,7 +134,7 @@
 				//
 				const gui = new GUI();
 				gui.add( mesh, 'count', 0, count );
-				gui.add( guiControls, 'halfFace' );
+				gui.add( guiControls, 'eighthFace' );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -148,10 +176,10 @@
 
 				requestAnimationFrame( animate );
 
-				if ( halfFace !== guiControls.halfFace ) {
+				if ( eighthFace !== guiControls.eighthFace ) {
 
 					reset();
-					halfFace = guiControls.halfFace;
+					eighthFace = guiControls.eighthFace;
 
 				}
 
@@ -159,7 +187,7 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				const intersection = halfFace ? raycaster.intersectInstancedMesh( mesh, halfInstances ) : raycaster.intersectObject( mesh );
+				const intersection = eighthFace ? intersectInstancedMesh( raycaster, mesh, halfInstances ) : raycaster.intersectObject( mesh );
 
 				if ( intersection.length > 0 ) {
 

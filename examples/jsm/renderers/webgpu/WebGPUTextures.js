@@ -428,7 +428,7 @@ class WebGPUTextures {
 
 			if ( image.isDataTexture ) {
 
-				this._copyBufferToTexture( image.image, format, textureGPU, { z : i } );
+				this._copyBufferToTexture( image.image, format, textureGPU, { z: i } );
 
 				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i );
 
@@ -436,7 +436,7 @@ class WebGPUTextures {
 
 				this._getImageBitmap( image, texture ).then( imageBitmap => {
 
-					this._copyExternalImageToTexture( imageBitmap, textureGPU, { z : i } );
+					this._copyExternalImageToTexture( imageBitmap, textureGPU, { z: i } );
 
 					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i );
 

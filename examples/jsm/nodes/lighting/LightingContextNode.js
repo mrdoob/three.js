@@ -39,10 +39,10 @@ class LightingContextNode extends ContextNode {
 		};
 
 		const lighting = {
-			radiance : temp( vec3() ),
-			irradiance : temp( vec3() ),
-			iblIrradiance : temp( vec3() ),
-			ambientOcclusion : temp( float( 1 ) )
+			radiance: temp( vec3() ),
+			irradiance: temp( vec3() ),
+			iblIrradiance: temp( vec3() ),
+			ambientOcclusion: temp( float( 1 ) )
 		};
 
 		Object.assign( properties, reflectedLight, lighting );

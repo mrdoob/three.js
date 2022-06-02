@@ -15416,7 +15416,7 @@
 	function WebGLRenderStates(extensions, capabilities) {
 		let renderStates = new WeakMap();
 
-		function get(scene, renderCallDepth = 0) {
+		function get(scene, renderCallDepth) {
 			let renderState;
 
 			if (renderStates.has(scene) === false) {
@@ -21827,14 +21827,19 @@
 		}
 
 		raycast(raycaster, intersects) {
+			this.raycastInstances(raycaster, undefined, intersects);
+		}
+
+		raycastInstances(raycaster, instances, intersects) {
 			const matrixWorld = this.matrixWorld;
-			const raycastTimes = this.count;
+			const raycastTimes = instances !== undefined ? instances.length : this.count;
 			_mesh.geometry = this.geometry;
 			_mesh.material = this.material;
 			if (_mesh.material === undefined) return;
 
-			for (let instanceId = 0; instanceId < raycastTimes; instanceId++) {
-				// calculate the world matrix for each instance
+			for (let i = 0; i < raycastTimes; i++) {
+				const instanceId = instances !== undefined ? instances[i] : i; // calculate the world matrix for each instance
+
 				this.getMatrixAt(instanceId, _instanceLocalMatrix);
 
 				_instanceWorldMatrix.multiplyMatrices(matrixWorld, _instanceLocalMatrix); // the mesh represents this single instance
@@ -35457,3 +35462,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuanMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiIn0=
