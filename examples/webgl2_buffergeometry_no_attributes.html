@@ -40,7 +40,6 @@
 
 			void main()	{
 
-				//vec3 position = positions[indices[gl_VertexID]];
 				vec3 position = pseudoRandomVec3(-1.0, +1.0, gl_VertexID);
 				vec3 color = pseudoRandomVec3(0.25, 1.0, gl_VertexID/3);
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0 );
