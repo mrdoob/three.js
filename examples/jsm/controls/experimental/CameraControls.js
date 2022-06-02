@@ -15,6 +15,8 @@ class CameraControls extends EventDispatcher {
 		if ( domElement === undefined ) console.warn( 'THREE.CameraControls: The second parameter "domElement" is now mandatory.' );
 		if ( domElement === document ) console.error( 'THREE.CameraControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
+		super();
+
 		this.object = object;
 		this.domElement = domElement;
 
