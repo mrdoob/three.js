@@ -4,6 +4,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 	constructor( object, domElement ) {
 
+		super();
+
 		// API
 
 		this.enabled = true;
