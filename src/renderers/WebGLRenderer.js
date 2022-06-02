@@ -764,7 +764,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			clampRange( range, { start: 0, end: index.count } );
 
-		} else if ( position !== null ) {
+		} else if ( position !== undefined && position !== null ) {
 
 			clampRange( range, { start: 0, end: position.count } );
 

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js WebGL 2 - buffergeometry - no attributes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGL 2 - buffergeometry - no attributes</div>
+
+		<script id="vertexShader" type="x-shader/x-vertex">			
+			
+			uniform mat4 modelViewMatrix;
+			uniform mat4 projectionMatrix;
+			
+			uniform float seed;
+			
+			const float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio
+			
+			float gold_noise(in vec2 xy){
+				return fract(tan(distance(xy*PHI, xy)*seed)*xy.x);
+			}
+			
+			float pseudoRandom(in float lower, in float delta, in vec2 xy) {
+				return lower + delta*gold_noise(xy);
+			}
+			
+			vec3 pseudoRandomVec3(in float lower, in float upper, in int index) {
+				float delta = upper - lower;
+				float x = pseudoRandom(lower, delta, vec2(index, 0));
+				float y = pseudoRandom(lower, delta, vec2(index, 1));
+				float z = pseudoRandom(lower, delta, vec2(index, 2));
+				return vec3(x, y, z);
+			}
+			
+			out vec3 vColor;
+
+			void main()	{
+
+				//vec3 position = positions[indices[gl_VertexID]];
+				vec3 position = pseudoRandomVec3(-1.0, +1.0, gl_VertexID);
+				vec3 color = pseudoRandomVec3(0.25, 1.0, gl_VertexID/3);
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0 );
+				vColor = color;
+
+			}
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+					
+			precision mediump float;
+
+			in vec3 vColor;
+			
+			out vec4 fColor;
+
+			void main()	{
+
+				fColor = vec4(vColor, 1);
+
+			}
+		</script>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import WebGL from './jsm/capabilities/WebGL.js';
+
+			if ( WebGL.isWebGL2Available() === false ) {
+
+				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
+
+			}
+
+			let camera, scene, renderer, mesh;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera.position.z = 4;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+
+				// geometry
+
+				const geometry = new THREE.BufferGeometry();
+				
+				geometry.setDrawRange(0, 100);
+
+				// material
+
+				const material = new THREE.RawShaderMaterial( {
+					uniforms: {
+						seed: { value: 42 },
+					},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					side: THREE.DoubleSide,
+					glslVersion: THREE.GLSL3
+				} );
+
+				// mesh
+
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.frustumCulled = false;
+				scene.add( mesh );
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
