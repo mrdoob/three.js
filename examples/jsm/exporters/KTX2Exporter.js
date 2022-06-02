@@ -39,46 +39,46 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
- } from '../libs/ktx-parse.module.js';
+} from '../libs/ktx-parse.module.js';
 
 const VK_FORMAT_MAP = {
 
-	[RGBAFormat]: {
-		[FloatType]: {
-			[LinearEncoding]: VK_FORMAT_R32G32B32A32_SFLOAT,
+	[ RGBAFormat ]: {
+		[ FloatType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R32G32B32A32_SFLOAT,
 		},
-		[HalfFloatType]: {
-			[LinearEncoding]: VK_FORMAT_R16G16B16A16_SFLOAT,
+		[ HalfFloatType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R16G16B16A16_SFLOAT,
 		},
-		[UnsignedByteType]: {
-			[LinearEncoding]: VK_FORMAT_R8G8B8A8_UNORM,
-			[sRGBEncoding]: VK_FORMAT_R8G8B8A8_SRGB,
-		},
-	},
-
-	[RGFormat]: {
-		[FloatType]: {
-			[LinearEncoding]: VK_FORMAT_R32G32_SFLOAT,
-		},
-		[HalfFloatType]: {
-			[LinearEncoding]: VK_FORMAT_R16G16_SFLOAT,
-		},
-		[UnsignedByteType]: {
-			[LinearEncoding]: VK_FORMAT_R8G8_UNORM,
-			[sRGBEncoding]: VK_FORMAT_R8G8_SRGB,
+		[ UnsignedByteType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R8G8B8A8_UNORM,
+			[ sRGBEncoding ]: VK_FORMAT_R8G8B8A8_SRGB,
 		},
 	},
 
-	[RedFormat]: {
-		[FloatType]: {
-			[LinearEncoding]: VK_FORMAT_R32_SFLOAT,
+	[ RGFormat ]: {
+		[ FloatType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R32G32_SFLOAT,
 		},
-		[HalfFloatType]: {
-			[LinearEncoding]: VK_FORMAT_R16_SFLOAT,
+		[ HalfFloatType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R16G16_SFLOAT,
 		},
-		[UnsignedByteType]: {
-			[LinearEncoding]: VK_FORMAT_R8_SRGB,
-			[sRGBEncoding]: VK_FORMAT_R8_UNORM,
+		[ UnsignedByteType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R8G8_UNORM,
+			[ sRGBEncoding ]: VK_FORMAT_R8G8_SRGB,
+		},
+	},
+
+	[ RedFormat ]: {
+		[ FloatType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R32_SFLOAT,
+		},
+		[ HalfFloatType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R16_SFLOAT,
+		},
+		[ UnsignedByteType ]: {
+			[ LinearEncoding ]: VK_FORMAT_R8_SRGB,
+			[ sRGBEncoding ]: VK_FORMAT_R8_UNORM,
 		},
 	},
 
@@ -195,8 +195,8 @@ export class KTX2Exporter {
 				channelType: channelType,
 				bitOffset: i * array.BYTES_PER_ELEMENT,
 				bitLength: array.BYTES_PER_ELEMENT * 8 - 1,
-				samplePosition: [0, 0, 0, 0],
-				sampleLower: texture.type === UnsignedByteType ? 0 : -1,
+				samplePosition: [ 0, 0, 0, 0 ],
+				sampleLower: texture.type === UnsignedByteType ? 0 : - 1,
 				sampleUpper: texture.type === UnsignedByteType ? 255 : 1,
 
 			} );
@@ -214,7 +214,7 @@ export class KTX2Exporter {
 
 		//
 
-		container.keyValue['KTXwriter'] = `three.js ${ REVISION }`;
+		container.keyValue[ 'KTXwriter' ] = `three.js ${ REVISION }`;
 
 		//
 
@@ -250,7 +250,7 @@ function toDataTexture( renderer, rtt ) {
 
 	renderer.readRenderTargetPixels( rtt, 0, 0, rtt.width, rtt.height, view );
 
-	return new DataTexture( view, rtt.width, rt.height, rtt.texture.format, rtt.texture.type );
+	return new DataTexture( view, rtt.width, rtt.height, rtt.texture.format, rtt.texture.type );
 
 }
 

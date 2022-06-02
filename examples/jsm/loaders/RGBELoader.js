@@ -450,7 +450,7 @@ class RGBELoader extends DataTextureLoader {
 					texture.magFilter = LinearFilter;
 					texture.generateMipmaps = false;
 					texture.flipY = true;
-			
+
 					break;
 
 			}

@@ -1,14 +1,12 @@
-function LWO2Parser( IFFParser ) {
+class LWO2Parser {
 
-	this.IFF = IFFParser;
+	constructor( IFFParser ) {
 
-}
+		this.IFF = IFFParser;
 
-LWO2Parser.prototype = {
+	}
 
-	constructor: LWO2Parser,
-
-	parseBlock: function () {
+	parseBlock() {
 
 		this.IFF.debugger.offset = this.IFF.reader.offset;
 		this.IFF.debugger.closeForms();
@@ -411,6 +409,6 @@ LWO2Parser.prototype = {
 
 	}
 
-};
+}
 
 export { LWO2Parser };

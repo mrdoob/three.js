@@ -58,7 +58,7 @@
 				Uint16BufferAttribute,
 				WebGLRenderer
 			} from 'three';
-			import { CCDIKSolver, CCDIKHelper } from "../../examples/jsm/animation/CCDIKSolver.js";
+			import { CCDIKSolver, CCDIKHelper } from '../../examples/jsm/animation/CCDIKSolver.js';
 
 			import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
@@ -146,9 +146,9 @@
 				bones = [];
 
 				// "root bone"
-				let rootBone = new Bone();
-				rootBone.name = "root";
-				rootBone.position.y = -sizing.halfHeight;
+				const rootBone = new Bone();
+				rootBone.name = 'root';
+				rootBone.position.y = - sizing.halfHeight;
 				bones.push( rootBone );
 
 				//
@@ -158,7 +158,7 @@
 				// "bone0"
 				let prevBone = new Bone();
 				prevBone.position.y = 0;
-				rootBone.add(prevBone);
+				rootBone.add( prevBone );
 				bones.push( prevBone );
 
 				// "bone1", "bone2", "bone3"
@@ -175,7 +175,7 @@
 
 				// "target"
 				const targetBone = new Bone();
-				targetBone.name = "target";
+				targetBone.name = 'target';
 				targetBone.position.y = sizing.height + sizing.segmentHeight; // relative to parent: rootBone
 				rootBone.add( targetBone );
 				bones.push( targetBone );
@@ -214,16 +214,18 @@
 				gui.add( mesh, 'pose' ).name( 'mesh.pose()' );
 
 				mesh.skeleton.bones
-					.filter( ( bone ) => bone.name === "target" )
-					.forEach( function (bone) {
+					.filter( ( bone ) => bone.name === 'target' )
+					.forEach( function ( bone ) {
+
 						const folder = gui.addFolder( bone.name );
 
 						const delta = 20;
 						folder.add( bone.position, 'x', - delta + bone.position.x, delta + bone.position.x );
 						folder.add( bone.position, 'y', - bone.position.y, bone.position.y );
 						folder.add( bone.position, 'z', - delta + bone.position.z, delta + bone.position.z );
-					} );
-				
+			
+		} );
+			
 				gui.add( ikSolver, 'update' ).name( 'ikSolver.update()' );
 				gui.add( state, 'ikSolverAutoUpdate' );
 
