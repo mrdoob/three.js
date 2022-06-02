@@ -54,16 +54,23 @@ class InstancedMesh extends Mesh {
 
 	raycast( raycaster, intersects ) {
 
+		this.raycastInstances( raycaster, undefined, intersects );
+
+	}
+
+	raycastInstances( raycaster, instances, intersects ) {
+
 		const matrixWorld = this.matrixWorld;
-		const raycastTimes = this.count;
+		const raycastTimes = instances !== undefined ? instances.length : this.count;
 
 		_mesh.geometry = this.geometry;
 		_mesh.material = this.material;
 
 		if ( _mesh.material === undefined ) return;
 
-		for ( let instanceId = 0; instanceId < raycastTimes; instanceId ++ ) {
+		for ( let i = 0; i < raycastTimes; i ++ ) {
 
+			const instanceId = instances !== undefined ? instances[ i ] : i;
 			// calculate the world matrix for each instance
 
 			this.getMatrixAt( instanceId, _instanceLocalMatrix );

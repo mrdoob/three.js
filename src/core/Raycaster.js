@@ -76,6 +76,36 @@ class Raycaster {
 		return intersects;
 
 	}
+	intersectObject( object, recursive = true, intersects = [] ) {
+
+		intersectObject( object, this, intersects, recursive );
+
+		intersects.sort( ascSort );
+
+		return intersects;
+
+	}
+
+	intersectInstancedMesh( mesh, instances, intersects = [] ) {
+
+		if ( ! mesh.isInstancedMesh ) {
+
+			console.warn( 'Object must be instance mesh to use intersectInstancedMesh.' );
+			return intersects;
+
+		}
+
+		if ( mesh.layers.test( this.layers ) ) {
+
+			mesh.raycastInstances( this, instances, intersects );
+
+		}
+
+		intersects.sort( ascSort );
+
+		return intersects;
+
+	}
 
 }
 

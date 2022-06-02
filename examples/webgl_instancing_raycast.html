@@ -39,8 +39,48 @@
 			const color = new THREE.Color();
 			const white = new THREE.Color().setHex( 0xffffff );
 
+			const halfInstances = [];
+			const guiControls = { halfFace: false };
+			let halfFace = false;
 			init();
 			animate();
+			function reset() {
+
+				let i = 0;
+				const offset = ( amount - 1 ) / 2;
+
+				const matrix = new THREE.Matrix4();
+
+				halfInstances.length = 0;
+				for ( let x = 0; x < amount; x ++ ) {
+
+					for ( let y = 0; y < amount; y ++ ) {
+
+						for ( let z = 0; z < amount; z ++ ) {
+
+							if ( x < amount / 2 && y < amount / 2 && z < amount / 2 ) {
+
+								halfInstances.push( i );
+
+							}
+
+							matrix.setPosition( offset - x, offset - y, offset - z );
+
+							mesh.setMatrixAt( i, matrix );
+							mesh.setColorAt( i, white );
+
+							i ++;
+
+						}
+
+					}
+
+				}
+
+				mesh.instanceMatrix.needsUpdate = true;
+				mesh.instanceColor.needsUpdate = true;
+
+			}
 
 			function init() {
 
@@ -59,36 +99,14 @@
 
 				mesh = new THREE.InstancedMesh( geometry, material, count );
 
-				let i = 0;
-				const offset = ( amount - 1 ) / 2;
-
-				const matrix = new THREE.Matrix4();
-
-				for ( let x = 0; x < amount; x ++ ) {
-
-					for ( let y = 0; y < amount; y ++ ) {
-
-						for ( let z = 0; z < amount; z ++ ) {
-
-							matrix.setPosition( offset - x, offset - y, offset - z );
-
-							mesh.setMatrixAt( i, matrix );
-							mesh.setColorAt( i, color );
-
-							i ++;
-
-						}
-
-					}
-
-				}
+				reset();
 
 				scene.add( mesh );
 
 				//
-
 				const gui = new GUI();
 				gui.add( mesh, 'count', 0, count );
+				gui.add( guiControls, 'halfFace' );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -130,11 +148,18 @@
 
 				requestAnimationFrame( animate );
 
+				if ( halfFace !== guiControls.halfFace ) {
+
+					reset();
+					halfFace = guiControls.halfFace;
+
+				}
+
 				controls.update();
 
 				raycaster.setFromCamera( mouse, camera );
 
-				const intersection = raycaster.intersectObject( mesh );
+				const intersection = halfFace ? raycaster.intersectInstancedMesh( mesh, halfInstances ) : raycaster.intersectObject( mesh );
 
 				if ( intersection.length > 0 ) {
 

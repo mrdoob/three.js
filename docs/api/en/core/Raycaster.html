@@ -196,6 +196,16 @@
 		Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].
 		</p>
 
+		<h3>[method:Array intersectInstancedMesh]( [param:InstancedMesh mesh], [param:Array instances], [param:Array optionalTarget] )</h3>
+		<p>
+		[page:InstancedMesh mesh] — The instanced mesh to check for intersection with the ray.<br />
+		[page:Array instances] — The instance ids to check for. If undefined, check all instances. Default is undefined.<br />
+		[page:Array optionalTarget] — (optional) target to set the result. Otherwise a new [page:Array] is instantiated. If set, you must clear this array prior to each call (i.e., array.length = 0;).
+		</p>
+		<p>
+		Checks all intersection between the ray and the instanced mesh at a given set of instance ids. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject].
+		</p>
+
 
 		<h2>Source</h2>
 
