@@ -46,6 +46,13 @@ import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { createElementNS } from '../utils.js';
 
+function clampRange( source, target ) {
+
+	source.start = Math.max( source.start, target.start );
+	source.end = Math.min( source.end, target.end );
+
+}
+
 function createCanvasElement() {
 
 	const canvas = createElementNS( 'canvas' );
@@ -719,22 +726,6 @@ function WebGLRenderer( parameters = {} ) {
 		//
 
 		let index = geometry.index;
-		const position = geometry.attributes.position;
-
-		//
-
-		if ( index === null ) {
-
-			if ( position === undefined || position.count === 0 ) return;
-
-		} else if ( index.count === 0 ) {
-
-			return;
-
-		}
-
-		//
-
 		let rangeFactor = 1;
 
 		if ( material.wireframe === true ) {
@@ -743,6 +734,48 @@ function WebGLRenderer( parameters = {} ) {
 			rangeFactor = 2;
 
 		}
+
+		//
+
+		const range = { start: 0, end: Infinity };
+
+		const drawRange = geometry.drawRange;
+		const position = geometry.attributes.position;
+
+		if ( drawRange !== null ) {
+
+			clampRange( range, {
+				start: drawRange.start * rangeFactor,
+				end: ( drawRange.start + drawRange.count ) * rangeFactor,
+			} );
+
+		}
+
+		if ( group !== null ) {
+
+			clampRange( range, {
+				start: group.start * rangeFactor,
+				end: ( group.start + group.count ) * rangeFactor,
+			} );
+
+		}
+
+		if ( index !== null ) {
+
+			clampRange( range, { start: 0, end: index.count } );
+
+		} else if ( position !== null ) {
+
+			clampRange( range, { start: 0, end: position.count } );
+
+		}
+
+		const drawStart = range.start;
+		const drawCount = range.end - range.start;
+
+		if ( ! ( 0 <= drawCount && drawCount < Infinity ) ) return;
+
+		//
 
 		bindingStates.setup( object, material, program, geometry, index );
 
@@ -757,23 +790,6 @@ function WebGLRenderer( parameters = {} ) {
 			renderer.setIndex( attribute );
 
 		}
-
-		//
-
-		const dataCount = ( index !== null ) ? index.count : position.count;
-
-		const rangeStart = geometry.drawRange.start * rangeFactor;
-		const rangeCount = geometry.drawRange.count * rangeFactor;
-
-		const groupStart = group !== null ? group.start * rangeFactor : 0;
-		const groupCount = group !== null ? group.count * rangeFactor : Infinity;
-
-		const drawStart = Math.max( rangeStart, groupStart );
-		const drawEnd = Math.min( dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
-
-		const drawCount = Math.max( 0, drawEnd - drawStart + 1 );
-
-		if ( drawCount === 0 ) return;
 
 		//
 
