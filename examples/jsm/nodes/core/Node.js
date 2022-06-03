@@ -182,7 +182,7 @@ class Node {
 
 				nodeData.initied = true;
 
-				properties.outputNode =  this.construct( builder );
+				properties.outputNode = this.construct( builder );
 
 				for ( const childNode of Object.values( properties ) ) {
 

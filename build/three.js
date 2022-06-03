@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '141';
+	const REVISION = '142dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -7110,16 +7110,6 @@
 
 		set needsUpdate(value) {
 			if (value === true) this.version++;
-		} // @deprecated since r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
-
-
-		get vertexTangents() {
-			console.warn('THREE.' + this.type + ': .vertexTangents has been removed.');
-			return false;
-		}
-
-		set vertexTangents(value) {
-			console.warn('THREE.' + this.type + ': .vertexTangents has been removed.');
 		}
 
 	}

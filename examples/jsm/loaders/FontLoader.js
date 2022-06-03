@@ -72,7 +72,7 @@ class Font {
 
 		for ( let p = 0, pl = paths.length; p < pl; p ++ ) {
 
-			Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
+			shapes.push( ...paths[ p ].toShapes() );
 
 		}
 
