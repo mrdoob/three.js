@@ -764,7 +764,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		const drawCount = drawEnd - drawStart;
 
-		if ( ! ( 0 <= drawCount && drawCount < Infinity ) ) return;
+		if ( drawCount < 0 || drawCount === Infinity ) return;
 
 		//
 
