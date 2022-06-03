@@ -622,6 +622,12 @@ class Vector4 {
 
 	}
 
+	toJSON() {
+
+		return { x: this.x, y: this.y, z: this.z, w: this.w };
+
+	}
+
 	fromBufferAttribute( attribute, index, offset ) {
 
 		if ( offset !== undefined ) {
