@@ -38,7 +38,7 @@ class WebGPURenderStates {
 
 	}
 
-	get( scene, camera ) {
+	get( scene, /* camera */ ) {
 
 		const renderStates = this.renderStates;
 
