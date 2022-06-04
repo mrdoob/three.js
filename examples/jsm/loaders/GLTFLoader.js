@@ -6,6 +6,7 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
+	ColorKeyframeTrack,
 	DirectionalLight,
 	DoubleSide,
 	FileLoader,
@@ -2398,6 +2399,48 @@ function getNormalizedComponentScale( constructor ) {
 
 }
 
+function getArrayFromAccessor( accessor ) {
+
+	let outputArray = accessor.array;
+
+	if ( accessor.normalized ) {
+
+		const scale = getNormalizedComponentScale( outputArray.constructor );
+		const scaled = new Float32Array( outputArray.length );
+
+		for ( let j = 0, jl = outputArray.length; j < jl; j ++ ) {
+
+			scaled[ j ] = outputArray[ j ] * scale;
+
+		}
+
+		outputArray = scaled;
+
+	}
+
+	return outputArray;
+
+}
+
+function createCubicSplineTrackInterpolant( track ) {
+
+	track.createInterpolant = function InterpolantFactoryMethodGLTFCubicSpline( result ) {
+
+		// A CUBICSPLINE keyframe in glTF has three output values for each input value,
+		// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
+		// must be divided by three to get the interpolant's sampleSize argument.
+
+		const interpolantType = ( this instanceof QuaternionKeyframeTrack ) ? GLTFCubicSplineQuaternionInterpolant : GLTFCubicSplineInterpolant;
+
+		return new interpolantType( this.times, this.values, this.getValueSize() / 3, result );
+
+	};
+
+	// Mark as CUBICSPLINE. `track.getInterpolation()` doesn't support custom interpolants.
+	track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
+
+}
+
 function getImageURIMimeType( uri ) {
 
 	if ( uri.search( /\.jpe?g($|\?)/i ) > 0 || uri.search( /^data\:image\/jpeg/ ) === 0 ) return 'image/jpeg';
@@ -3857,6 +3900,7 @@ class GLTFParser {
 	loadAnimation( animationIndex ) {
 
 		const json = this.json;
+		const parser = this;
 
 		const animationDef = json.animations[ animationIndex ];
 		const animationName = animationDef.name ? animationDef.name : 'animation_' + animationIndex;
@@ -3872,13 +3916,16 @@ class GLTFParser {
 			const channel = animationDef.channels[ i ];
 			const sampler = animationDef.samplers[ channel.sampler ];
 			const target = channel.target;
-			const name = target.node;
 			const input = animationDef.parameters !== undefined ? animationDef.parameters[ sampler.input ] : sampler.input;
 			const output = animationDef.parameters !== undefined ? animationDef.parameters[ sampler.output ] : sampler.output;
 
-			if ( target.node === undefined ) continue;
+			const nodeDependency = parser._invokeOne( function ( ext ) {
 
-			pendingNodes.push( this.getDependency( 'node', name ) );
+				return ext.loadAnimationTargetFromChannel && ext.loadAnimationTargetFromChannel( channel );
+
+			} );
+
+			pendingNodes.push( nodeDependency );
 			pendingInputAccessors.push( this.getDependency( 'accessor', input ) );
 			pendingOutputAccessors.push( this.getDependency( 'accessor', output ) );
 			pendingSamplers.push( sampler );
@@ -3914,102 +3961,26 @@ class GLTFParser {
 
 				if ( node === undefined ) continue;
 
-				node.updateMatrix();
+				if ( node.updateMatrix ) {
 
-				let TypedKeyframeTrack;
-
-				switch ( PATH_PROPERTIES[ target.path ] ) {
-
-					case PATH_PROPERTIES.weights:
-
-						TypedKeyframeTrack = NumberKeyframeTrack;
-						break;
-
-					case PATH_PROPERTIES.rotation:
-
-						TypedKeyframeTrack = QuaternionKeyframeTrack;
-						break;
-
-					case PATH_PROPERTIES.position:
-					case PATH_PROPERTIES.scale:
-					default:
-
-						TypedKeyframeTrack = VectorKeyframeTrack;
-						break;
+					node.updateMatrix();
+					node.matrixAutoUpdate = true;
 
 				}
 
-				const targetName = node.name ? node.name : node.uuid;
+				const createdTracks = parser._invokeOne( function ( ext ) {
 
-				const interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : InterpolateLinear;
+					return ext.createAnimationTracks && ext.createAnimationTracks( node, inputAccessor, outputAccessor, sampler, target );
 
-				const targetNames = [];
+				} );
 
-				if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
+				if ( createdTracks ) {
 
-					node.traverse( function ( object ) {
+					for ( let k = 0; k < createdTracks.length; k ++ ) {
 
-						if ( object.morphTargetInfluences ) {
-
-							targetNames.push( object.name ? object.name : object.uuid );
-
-						}
-
-					} );
-
-				} else {
-
-					targetNames.push( targetName );
-
-				}
-
-				let outputArray = outputAccessor.array;
-
-				if ( outputAccessor.normalized ) {
-
-					const scale = getNormalizedComponentScale( outputArray.constructor );
-					const scaled = new Float32Array( outputArray.length );
-
-					for ( let j = 0, jl = outputArray.length; j < jl; j ++ ) {
-
-						scaled[ j ] = outputArray[ j ] * scale;
+						tracks.push( createdTracks[ k ] );
 
 					}
-
-					outputArray = scaled;
-
-				}
-
-				for ( let j = 0, jl = targetNames.length; j < jl; j ++ ) {
-
-					const track = new TypedKeyframeTrack(
-						targetNames[ j ] + '.' + PATH_PROPERTIES[ target.path ],
-						inputAccessor.array,
-						outputArray,
-						interpolation
-					);
-
-					// Override interpolation with custom factory method.
-					if ( sampler.interpolation === 'CUBICSPLINE' ) {
-
-						track.createInterpolant = function InterpolantFactoryMethodGLTFCubicSpline( result ) {
-
-							// A CUBICSPLINE keyframe in glTF has three output values for each input value,
-							// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
-							// must be divided by three to get the interpolant's sampleSize argument.
-
-							const interpolantType = ( this instanceof QuaternionKeyframeTrack ) ? GLTFCubicSplineQuaternionInterpolant : GLTFCubicSplineInterpolant;
-
-							return new interpolantType( this.times, this.values, this.getValueSize() / 3, result );
-
-						};
-
-						// Mark as CUBICSPLINE. `track.getInterpolation()` doesn't support custom interpolants.
-						track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
-
-					}
-
-					tracks.push( track );
 
 				}
 
@@ -4338,6 +4309,104 @@ class GLTFParser {
 			return scene;
 
 		} );
+
+	}
+
+	loadAnimationTargetFromChannel( animationChannel ) {
+
+		const target = animationChannel.target;
+		const name = target.node !== undefined ? target.node : target.id; // NOTE: target.id is deprecated.
+		return this.getDependency( 'node', name );
+
+	}
+
+	createAnimationTracks( node, inputAccessor, outputAccessor, sampler, target ) {
+
+		const tracks = [];
+
+		const targetName = node.name ? node.name : node.uuid;
+
+		const targetNames = [];
+
+		if ( PATH_PROPERTIES[ target.path ] === PATH_PROPERTIES.weights ) {
+
+			node.traverse( function ( object ) {
+
+				if ( object.morphTargetInfluences ) {
+
+					targetNames.push( object.name ? object.name : object.uuid );
+
+				}
+
+			} );
+
+		} else {
+
+			targetNames.push( targetName );
+
+		}
+
+		let TypedKeyframeTrack;
+
+		switch ( PATH_PROPERTIES[ target.path ] ) {
+
+			case PATH_PROPERTIES.weights:
+
+				TypedKeyframeTrack = NumberKeyframeTrack;
+				break;
+
+			case PATH_PROPERTIES.rotation:
+
+				TypedKeyframeTrack = QuaternionKeyframeTrack;
+				break;
+
+			case PATH_PROPERTIES.position:
+			case PATH_PROPERTIES.scale:
+			default:
+				switch ( outputAccessor.itemSize ) {
+
+					case 1:
+						TypedKeyframeTrack = NumberKeyframeTrack;
+						break;
+					case 2:
+					case 3:
+						TypedKeyframeTrack = VectorKeyframeTrack;
+						break;
+					case 4:
+						TypedKeyframeTrack = ColorKeyframeTrack;
+						break;
+
+				}
+
+				break;
+
+		}
+
+		const interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : InterpolateLinear;
+
+		const outputArray = getArrayFromAccessor( outputAccessor );
+
+		for ( let j = 0, jl = targetNames.length; j < jl; j ++ ) {
+
+			const track = new TypedKeyframeTrack(
+				targetNames[ j ] + '.' + PATH_PROPERTIES[ target.path ],
+				inputAccessor.array,
+				outputArray,
+				interpolation
+			);
+
+			// Override interpolation with custom factory method.
+			if ( interpolation === 'CUBICSPLINE' ) {
+
+				createCubicSplineTrackInterpolant( track );
+
+			}
+
+			tracks.push( track );
+
+		}
+
+		return tracks;
 
 	}
 
