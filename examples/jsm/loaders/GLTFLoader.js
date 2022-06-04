@@ -2750,6 +2750,14 @@ class GLTFParser {
 					dependency = this.loadCamera( index );
 					break;
 
+				case 'light':
+					dependency = this._invokeOne( function ( ext ) {
+
+						return ext._loadLight && ext._loadLight( index );
+
+					} );
+					break;
+
 				default:
 					throw new Error( 'Unknown type: ' + type );
 
