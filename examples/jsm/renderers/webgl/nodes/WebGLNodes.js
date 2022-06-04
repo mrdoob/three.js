@@ -37,7 +37,7 @@ Material.prototype.onBeforeRender = function ( renderer, scene, camera, geometry
 				nodeFrame.updateNode( node );
 
 			}
-			
+
 		}
 
 	}
