@@ -730,18 +730,11 @@ function WebGLRenderer( parameters = {} ) {
 
 		//
 
-		let drawStart = 0;
-		let drawEnd = Infinity;
-
 		const drawRange = geometry.drawRange;
 		const position = geometry.attributes.position;
 
-		if ( drawRange !== null ) {
-
-			drawStart = Math.max( drawStart, drawRange.start * rangeFactor );
-			drawEnd = Math.min( drawEnd, ( drawRange.start + drawRange.count ) * rangeFactor );
-
-		}
+		let drawStart = drawRange.start * rangeFactor;
+		let drawEnd = ( drawRange.start + drawRange.count ) * rangeFactor;
 
 		if ( group !== null ) {
 
