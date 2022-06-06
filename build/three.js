@@ -21076,7 +21076,7 @@
 
 		clone(data) {
 			if (data === undefined) {
-				console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will deinterleave buffer data.');
+				console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.');
 				const array = [];
 
 				for (let i = 0; i < this.count; i++) {
@@ -21103,7 +21103,7 @@
 
 		toJSON(data) {
 			if (data === undefined) {
-				console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will deinterleave buffer data.');
+				console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.');
 				const array = [];
 
 				for (let i = 0; i < this.count; i++) {
@@ -21122,7 +21122,7 @@
 					normalized: this.normalized
 				};
 			} else {
-				// save as true interleaved attribtue
+				// save as true interlaved attribtue
 				if (data.interleavedBuffers === undefined) {
 					data.interleavedBuffers = {};
 				}
