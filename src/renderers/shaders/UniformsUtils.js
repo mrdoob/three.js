@@ -14,10 +14,7 @@ export function cloneUniforms( src ) {
 
 			const property = src[ u ][ p ];
 
-			if ( property && ( property.isColor ||
-				property.isMatrix3 || property.isMatrix4 ||
-				property.isVector2 || property.isVector3 || property.isVector4 ||
-				property.isTexture || property.isQuaternion ) ) {
+			if ( property && property.clone !== undefined ) {
 
 				dst[ u ][ p ] = property.clone();
 
