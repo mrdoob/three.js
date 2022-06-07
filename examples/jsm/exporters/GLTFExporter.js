@@ -343,27 +343,15 @@ function getPaddedArrayBuffer( arrayBuffer, paddingByte = 0 ) {
 
 }
 
-let cachedCanvas = null;
-
 function getCanvas() {
-
-	if ( cachedCanvas ) {
-
-		return cachedCanvas;
-
-	}
 
 	if ( typeof document === 'undefined' && typeof OffscreenCanvas !== 'undefined' ) {
 
-		cachedCanvas = new OffscreenCanvas( 1, 1 );
-
-	} else {
-
-		cachedCanvas = document.createElement( 'canvas' );
+		return new OffscreenCanvas( 1, 1 );
 
 	}
 
-	return cachedCanvas;
+	return document.createElement( 'canvas' );
 
 }
 
