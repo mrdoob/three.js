@@ -18,7 +18,7 @@ export function cloneUniforms( src ) {
 
 				dst[ u ][ p ] = property.clone();
 
-			} else if ( Array.isArray( property ) ) {
+			} else if ( property && property.slice !== undefined ) {
 
 				dst[ u ][ p ] = property.slice();
 
