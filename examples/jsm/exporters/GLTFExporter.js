@@ -746,7 +746,7 @@ class GLTFWriter {
 
 			}
 
-			return function LineatToLinear( c ) {
+			return function LinearToLinear( c ) {
 
 				return c;
 
