@@ -64,7 +64,8 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	_parseObject() {
 
-		const material = this.material;
+		const { material, renderer } = this;
+
 		let type = material.type;
 
 		// shader lib
@@ -85,7 +86,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
-		if ( material.isMeshStandardNodeMaterial !== true ) {
+		if ( renderer.toneMappingNode?.isNode === true ) {
 
 			this.replaceCode( 'fragment', getIncludeSnippet( 'tonemapping_fragment' ), '' );
 
