@@ -175,9 +175,9 @@ class Node {
 
 			const properties = builder.getNodeProperties( this );
 
-			if ( properties.initied !== true || builder.context.tempRead === false ) {
+			if ( properties.initialized !== true || builder.context.tempRead === false ) {
 
-				properties.initied = true;
+				properties.initialized = true;
 				properties.outputNode = this.construct( builder );
 
 				for ( const childNode of Object.values( properties ) ) {
