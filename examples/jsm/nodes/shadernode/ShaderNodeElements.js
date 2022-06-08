@@ -5,6 +5,7 @@ import ReflectNode from '../accessors/ReflectNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
 
 // display
+import ColorAdjustmentNode from '../display/ColorAdjustmentNode.js';
 import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import NormalMapNode from '../display/NormalMapNode.js';
 import ToneMappingNode from '../display/ToneMappingNode.js';
@@ -67,6 +68,10 @@ export const reflectCube = nodeImmutable( ReflectNode, ReflectNode.CUBE );
 export const skinning = nodeProxy( SkinningNode );
 
 // display
+
+export const saturation = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.SATURATION );
+export const vibrance = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.VIBRANCE );
+export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 
 export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
 export const normalMap = nodeProxy( NormalMapNode );
