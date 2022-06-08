@@ -44,7 +44,7 @@ const exceptionList = [
 	'webxr_ar_lighting',
 	// webgpu
 	'webgpu_compute',
-	'webgpu_cubemap_adjusts',
+	'webgpu_cubemap_adjustments',
 	'webgpu_cubemap_mix',
 	'webgpu_depth_texture',
 	'webgpu_instance_mesh',
