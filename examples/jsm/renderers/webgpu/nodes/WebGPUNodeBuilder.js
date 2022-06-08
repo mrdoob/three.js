@@ -444,7 +444,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		const snippets = [];
 		const vars = this.vars[ shaderStage ];
 
-		for (const variable of vars) {
+		for ( const variable of vars ) {
 
 			const name = variable.name;
 			const type = this.getType( variable.type );

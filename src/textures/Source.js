@@ -103,7 +103,7 @@ function serializeImage( image ) {
 			// images of DataTexture
 
 			return {
-				data: Array.prototype.slice.call( image.data ),
+				data: Array.from( image.data ),
 				width: image.width,
 				height: image.height,
 				type: image.data.constructor.name

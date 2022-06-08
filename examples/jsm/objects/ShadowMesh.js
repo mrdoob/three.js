@@ -1,7 +1,9 @@
 import {
 	Matrix4,
 	Mesh,
-	MeshBasicMaterial
+	MeshBasicMaterial,
+	EqualStencilFunc,
+	IncrementStencilOp
 } from 'three';
 
 /**
@@ -19,7 +21,11 @@ class ShadowMesh extends Mesh {
 			color: 0x000000,
 			transparent: true,
 			opacity: 0.6,
-			depthWrite: false
+			depthWrite: false,
+			stencilWrite: true,
+            		stencilFunc: EqualStencilFunc,
+            		stencilRef: 0,
+            		stencilZPass: IncrementStencilOp
 
 		} );
 

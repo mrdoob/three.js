@@ -1761,21 +1761,11 @@ class EXRLoader extends DataTextureLoader {
 
 		const parseInt64 = function ( dataView, offset ) {
 
-			let int;
-
-			if ( 'getBigInt64' in DataView.prototype ) {
-
-				int = Number( dataView.getBigInt64( offset.value, true ) );
-
-			} else {
-
-				int = dataView.getUint32( offset.value + 4, true ) + Number( dataView.getUint32( offset.value, true ) << 32 );
-
-			}
+			const Int64 = Number( dataView.getBigInt64( offset.value, true ) );
 
 			offset.value += ULONG_SIZE;
 
-			return int;
+			return Int64;
 
 		};
 
@@ -2056,7 +2046,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			if ( ( spec & ~0x04 ) != 0 ) { // unsupported tiled, deep-image, multi-part
+			if ( ( spec & ~ 0x04 ) != 0 ) { // unsupported tiled, deep-image, multi-part
 
 				console.error( 'EXRHeader:', EXRHeader );
 				throw new Error( 'THREE.EXRLoader: provided file is currently unsupported.' );

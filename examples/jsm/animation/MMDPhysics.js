@@ -209,7 +209,7 @@ class MMDPhysics {
 		// mesh's default world transform as position(0, 0, 0),
 		// quaternion(0, 0, 0, 1) and scale(0, 0, 0)
 
-		let parent = mesh.parent;
+		const parent = mesh.parent;
 
 		if ( parent !== null ) mesh.parent = null;
 

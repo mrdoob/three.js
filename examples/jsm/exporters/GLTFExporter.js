@@ -4,6 +4,7 @@ import {
 	DoubleSide,
 	InterpolateDiscrete,
 	InterpolateLinear,
+	LinearEncoding,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
@@ -18,6 +19,7 @@ import {
 	RepeatWrapping,
 	Scene,
 	Source,
+	sRGBEncoding,
 	Vector3
 } from 'three';
 
@@ -343,27 +345,15 @@ function getPaddedArrayBuffer( arrayBuffer, paddingByte = 0 ) {
 
 }
 
-let cachedCanvas = null;
-
 function getCanvas() {
-
-	if ( cachedCanvas ) {
-
-		return cachedCanvas;
-
-	}
 
 	if ( typeof document === 'undefined' && typeof OffscreenCanvas !== 'undefined' ) {
 
-		cachedCanvas = new OffscreenCanvas( 1, 1 );
-
-	} else {
-
-		cachedCanvas = document.createElement( 'canvas' );
+		return new OffscreenCanvas( 1, 1 );
 
 	}
 
-	return cachedCanvas;
+	return document.createElement( 'canvas' );
 
 }
 
@@ -744,6 +734,26 @@ class GLTFWriter {
 
 		if ( metalnessMap === roughnessMap ) return metalnessMap;
 
+		function getEncodingConversion( map ) {
+
+			if ( map.encoding === sRGBEncoding ) {
+
+				return function SRGBToLinear( c ) {
+
+					return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+
+				}
+
+			}
+
+			return function LinearToLinear( c ) {
+
+				return c;
+
+			}
+
+		}
+
 		console.warn( 'THREE.GLTFExporter: Merged metalnessMap and roughnessMap textures.' );
 
 		const metalness = metalnessMap?.image;
@@ -766,11 +776,12 @@ class GLTFWriter {
 
 			context.drawImage( metalness, 0, 0, width, height );
 
+			const convert = getEncodingConversion( metalnessMap );
 			const data = context.getImageData( 0, 0, width, height ).data;
 
 			for ( let i = 2; i < data.length; i += 4 ) {
 
-				composite.data[ i ] = data[ i ];
+				composite.data[ i ] = convert( data[ i ] / 256 ) * 256;
 
 			}
 
@@ -780,11 +791,12 @@ class GLTFWriter {
 
 			context.drawImage( roughness, 0, 0, width, height );
 
+			const convert = getEncodingConversion( roughnessMap );
 			const data = context.getImageData( 0, 0, width, height ).data;
 
 			for ( let i = 1; i < data.length; i += 4 ) {
 
-				composite.data[ i ] = data[ i ];
+				composite.data[ i ] = convert( data[ i ] / 256 ) * 256;
 
 			}
 
@@ -799,6 +811,7 @@ class GLTFWriter {
 		const texture = reference.clone();
 
 		texture.source = new Source( canvas );
+		texture.encoding = LinearEncoding;
 
 		return texture;
 

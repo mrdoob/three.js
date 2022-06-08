@@ -7,6 +7,7 @@
 	const _material_use_pattern = /^usemtl /; // usemap map_name
 
 	const _map_use_pattern = /^usemap /;
+	const _face_vertex_data_separator_pattern = /\s+/;
 
 	const _vA = new THREE.Vector3();
 
@@ -438,26 +439,19 @@
 			}
 
 			const lines = text.split( '\n' );
-			let line = '',
-				lineFirstChar = '';
-			let lineLength = 0;
-			let result = []; // Faster to just trim left side of the line. Use if available.
-
-			const trimLeft = typeof ''.trimLeft === 'function';
+			let result = [];
 
 			for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
-				line = lines[ i ];
-				line = trimLeft ? line.trimLeft() : line.trim();
-				lineLength = line.length;
-				if ( lineLength === 0 ) continue;
-				lineFirstChar = line.charAt( 0 ); // @todo invoke passed in handler if any
+				const line = lines[ i ].trimStart();
+				if ( line.length === 0 ) continue;
+				const lineFirstChar = line.charAt( 0 ); // @todo invoke passed in handler if any
 
 				if ( lineFirstChar === '#' ) continue;
 
 				if ( lineFirstChar === 'v' ) {
 
-					const data = line.split( /\s+/ );
+					const data = line.split( _face_vertex_data_separator_pattern );
 
 					switch ( data[ 0 ] ) {
 
@@ -492,7 +486,7 @@
 				} else if ( lineFirstChar === 'f' ) {
 
 					const lineData = line.slice( 1 ).trim();
-					const vertexData = lineData.split( /\s+/ );
+					const vertexData = lineData.split( _face_vertex_data_separator_pattern );
 					const faceVertices = []; // Parse the face vertex data into an easy to work with format
 
 					for ( let j = 0, jl = vertexData.length; j < jl; j ++ ) {

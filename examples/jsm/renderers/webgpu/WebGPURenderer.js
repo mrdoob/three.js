@@ -174,7 +174,7 @@ class WebGPURenderer {
 		context.configure( {
 			device: device,
 			format: GPUTextureFormat.BGRA8Unorm, // this is the only valid context format right now (r121)
-			compositingAlphaMode: 'premultiplied'
+			alphaMode: 'premultiplied'
 		} );
 
 		this._adapter = adapter;
@@ -964,7 +964,7 @@ class WebGPURenderer {
 				device: device,
 				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT,
-				compositingAlphaMode: 'premultiplied'
+				alphaMode: 'premultiplied'
 			} );
 
 		}
