@@ -62,7 +62,7 @@ export const getValueType = ( value ) => {
 
 export const getValueFromType = ( type, ...params ) => {
 
-	const last4 = type?.slice( -4 );
+	const last4 = type?.slice( - 4 );
 
 	if ( type === 'color' ) {
 

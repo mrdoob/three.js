@@ -85,6 +85,7 @@
 		"webgl_loader_gcode",
 		"webgl_loader_gltf",
 		"webgl_loader_gltf_compressed",
+		"webgl_loader_gltf_iridescence",
 		"webgl_loader_gltf_sheen",
 		"webgl_loader_gltf_transmission",
 		"webgl_loader_gltf_variants",
@@ -300,7 +301,6 @@
 		"webgl2_materials_texture3d",
 		"webgl2_materials_texture3d_partialupdate",
 		"webgl2_multiple_rendertargets",
-		"webgl2_multiple_rendertargets_multisampled",
 		"webgl2_multisampled_renderbuffers",
 		"webgl2_rendertarget_texture2darray",
 		"webgl2_volume_cloud",
@@ -322,7 +322,8 @@
 		"webgpu_sandbox",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
-		"webgpu_skinning_points"
+		"webgpu_skinning_points",
+		"webgpu_sprites"
 	],
 	"webaudio": [
 		"webaudio_orientation",

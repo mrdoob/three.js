@@ -387,7 +387,7 @@ class BufferAttribute {
 		const data = {
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
-			array: Array.prototype.slice.call( this.array ),
+			array: Array.from( this.array ),
 			normalized: this.normalized
 		};
 

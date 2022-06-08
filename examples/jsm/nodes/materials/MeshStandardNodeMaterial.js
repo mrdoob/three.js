@@ -52,7 +52,12 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	build( builder ) {
 
-		let { colorNode, diffuseColorNode } = this.generateMain( builder );
+		this.generatePosition( builder );
+
+		const colorNodes = this.generateDiffuseColor( builder );
+		const { colorNode } = colorNodes;
+		let { diffuseColorNode } = colorNodes;
+
 		const envNode = this.envNode || builder.scene.environmentNode;
 
 		diffuseColorNode = this.generateStandardMaterial( builder, { colorNode, diffuseColorNode } );

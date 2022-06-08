@@ -26,6 +26,7 @@ import PositionNode from '../accessors/PositionNode.js';
 import ReferenceNode from '../accessors/ReferenceNode.js';
 import StorageBufferNode from '../accessors/StorageBufferNode.js';
 import TextureNode from '../accessors/TextureNode.js';
+import UserDataNode from '../accessors/UserDataNode.js';
 import UVNode from '../accessors/UVNode.js';
 
 // display
@@ -139,6 +140,7 @@ export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY
 //export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
+export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
 
 export const diffuseColor = nodeImmutable( PropertyNode, 'DiffuseColor', 'vec4' );
 export const roughness = nodeImmutable( PropertyNode, 'Roughness', 'float' );
@@ -148,6 +150,7 @@ export const specularColor = nodeImmutable( PropertyNode, 'SpecularColor', 'colo
 
 export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object ) );
 export const materialReference = ( name, nodeOrType, material ) => nodeObject( new MaterialReferenceNode( name, getConstNodeType( nodeOrType ), material ) );
+export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 

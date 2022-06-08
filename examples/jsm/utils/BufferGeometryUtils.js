@@ -2,6 +2,7 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Float32BufferAttribute,
+	InstancedBufferAttribute,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	MathUtils,
@@ -98,7 +99,7 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	if ( geometry !== _geometry ) {
 
-		geometry.copy( _geometry )
+		geometry.copy( _geometry );
 
 	}
 

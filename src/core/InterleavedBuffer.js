@@ -125,7 +125,7 @@ class InterleavedBuffer {
 
 		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
 
-			data.arrayBuffers[ this.array.buffer._uuid ] = Array.prototype.slice.call( new Uint32Array( this.array.buffer ) );
+			data.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
 
 		}
 

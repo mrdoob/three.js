@@ -159,7 +159,11 @@
 		<p>烘焙光的强度。默认值为1。</p>
 
 		<h3>[property:Texture map]</h3>
-		<p>颜色贴图。默认为null。纹理贴图颜色由漫反射颜色[page:.color]调节。</p>
+		<p>
+			颜色贴图。可以选择包括一个alpha通道，通常与[page:Material.transparent .transparent]
+			或[page:Material.alphaTest .alphaTest]。默认为null。
+			纹理贴图颜色由漫反射颜色[page:.color]调节。
+		</p>
 
 		<h3>[property:Float metalness]</h3>
 		<p> 材质与金属的相似度。非金属材质，如木材或石材，使用0.0，金属使用1.0，通常没有中间值。

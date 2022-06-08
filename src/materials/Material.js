@@ -497,21 +497,6 @@ class Material extends EventDispatcher {
 
 	}
 
-	// @deprecated since r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
-
-	get vertexTangents() {
-
-		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
-		return false;
-
-	}
-
-	set vertexTangents( value ) {
-
-		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
-
-	}
-
 }
 
 export { Material };

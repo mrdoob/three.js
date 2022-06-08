@@ -28,7 +28,7 @@ geometry.viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( vViewPositi
 
 #ifdef USE_IRIDESCENCE
 
-float dotNV = saturate( dot( normal, geometry.viewDir ) );
+float dotNVi = saturate( dot( normal, geometry.viewDir ) );
 
 if ( material.iridescenceThickness == 0.0 ) {
 
@@ -42,10 +42,10 @@ if ( material.iridescenceThickness == 0.0 ) {
 
 if ( material.iridescence > 0.0 ) {
 
-	material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNV, material.iridescenceThickness, material.specularColor );
+	material.iridescenceFresnel = evalIridescence( 1.0, material.iridescenceIOR, dotNVi, material.iridescenceThickness, material.specularColor );
 
 	// Iridescence F0 approximation
-	material.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNV );
+	material.iridescenceF0 = Schlick_to_F0( material.iridescenceFresnel, 1.0, dotNVi );
 
 }
 
