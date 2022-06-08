@@ -36,7 +36,6 @@ const exceptionList = [
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
-	'webgpu*', // plain black screen, investigate
 	
 	// video tag is not deterministic enough, investigate
 	'css3d_youtube',
@@ -144,13 +143,13 @@ async function main() {
 
 	const { executablePath } = await downloadLatestChromium();
 
-	const flags = ( process.platform === 'darwin' || process.platform === 'win32' ) ? [ '--use-angle', '--enable-unsafe-webgpu' ] : [];
+	const flags = [ '--enable-unsafe-webgpu' ];
 
 	/* Launch browser */
 
 	browser = await puppeteer.launch( {
 		executablePath,
-		headless: ! process.env.VISIBLE,
+		headless: false,
 		args: flags
 	} );
 
@@ -178,7 +177,7 @@ async function main() {
 
 		const text = file + ': ' + msg.text().replace( /\[\.WebGL-(.+?)\] /g, '' );
 
-		if ( text.includes( 'GPU stall due to ReadPixels' ) || text.includes( 'GPUStatsPanel' ) ) {
+		if ( text.includes( 'GPU stall due to ReadPixels' ) || text.includes( 'GPUStatsPanel' ) || text.includes( '404 (Not Found)' ) ) {
 
 			return;
 
@@ -318,7 +317,9 @@ async function main() {
 
 			}
 
-			const screenshot = await jimp.read( await page.screenshot() );
+			const b64 = await page.client().send( 'Page.captureScreenshot', { fromSurface: false } );
+
+			const screenshot = await jimp.read( Buffer.from( b64.data, 'base64' ) );
 			screenshot.scale( 1 / viewScale ).quality( jpgQuality );
 
 			if ( isMakeScreenshot ) {
