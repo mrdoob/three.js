@@ -38,6 +38,7 @@ class MathNode extends TempNode {
 
 	// 2 inputs
 
+	static ATAN2 = 'atan2';
 	static MIN = 'min';
 	static MAX = 'max';
 	static MOD = 'mod';
