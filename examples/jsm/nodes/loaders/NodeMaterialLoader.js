@@ -4,7 +4,8 @@ import {
 	LineBasicNodeMaterial,
 	MeshBasicNodeMaterial,
 	MeshStandardNodeMaterial,
-	PointsNodeMaterial
+	PointsNodeMaterial,
+	SpriteNodeMaterial
 } from '../materials/Materials.js';
 
 const superFromTypeFunction = MaterialLoader.createMaterialFromType;
@@ -16,7 +17,8 @@ MaterialLoader.createMaterialFromType = function ( type ) {
 		LineBasicNodeMaterial,
 		MeshBasicNodeMaterial,
 		MeshStandardNodeMaterial,
-		PointsNodeMaterial
+		PointsNodeMaterial,
+		SpriteNodeMaterial,
 	};
 
 	if ( materialLib[ type ] !== undefined ) {
