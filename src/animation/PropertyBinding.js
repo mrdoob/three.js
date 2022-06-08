@@ -10,18 +10,18 @@ const _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
 
 // Parent directories, delimited by '/' or ':'. Currently unused, but must
 // be matched to parse the rest of the track name.
-const _directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
+const _directoryRe = /*@__PURE__*/ /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
 
 // Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-const _nodeRe = /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
+const _nodeRe = /*@__PURE__*/ /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
 
 // Object on target node, and accessor. May not contain reserved
 // characters. Accessor may contain any character except closing bracket.
-const _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
+const _objectRe = /*@__PURE__*/ /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
 
 // Property and accessor. May not contain reserved characters. Accessor may
 // contain any non-bracket characters.
-const _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
+const _propertyRe = /*@__PURE__*/ /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
 
 const _trackRe = new RegExp( ''
 	+ '^'
