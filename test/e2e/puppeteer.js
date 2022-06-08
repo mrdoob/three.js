@@ -318,14 +318,14 @@ async function main() {
 
 			}
 
+			const screenshot = await jimp.read( await page.screenshot() );
+			screenshot.scale( 1 / viewScale ).quality( jpgQuality );
+
 			if ( isMakeScreenshot ) {
 
 				/* Make screenshots */
 
-				( await jimp.read( await page.screenshot() ) )
-					.scale( 1 / viewScale ).quality( jpgQuality )
-					.write( `./examples/screenshots/${ file }.jpg` );
-
+				screenshot.write( `./examples/screenshots/${ file }.jpg` );
 				console.green( `Screenshot generated for file ${ file }` );
 				break;
 
@@ -336,7 +336,7 @@ async function main() {
 					/* Diff screenshots */
 
 					const expected = ( await jimp.read( await fs.readFile( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
-					const actual = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality ).bitmap;
+					const actual = screenshot.bitmap;
 
 					let numFailedPixels;
 
