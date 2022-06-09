@@ -282,7 +282,7 @@ class WebGPURenderer {
 
 		//
 
-		this._background.update( scene );
+		this._background.update( this._currentRenderList, scene );
 
 		// start render pass
 
