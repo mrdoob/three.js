@@ -32,7 +32,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three-nodes/Nodes.js';
 
-			import { uniform, mix, cubeTexture, mul, reference, add, positionWorld, normalWorld, saturate, saturation, hue, reflectCube } from 'three-nodes/Nodes.js';
+			import { uniform, mix, cubeTexture, mul, reference, add, positionWorld, normalWorld, modelWorldMatrix, transformDirection, saturate, saturation, hue, reflectCube, context } from 'three-nodes/Nodes.js';
 
 			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
@@ -92,33 +92,41 @@
 				const adjustments = {
 					mix: 0,
 					procedural: 0,
-					brightness: 0,
-					contrast: 1,
+					intensity: 1,
 					hue: 0,
 					saturation: 1
 				};
 
 				const mixNode = reference( 'mix', 'float', adjustments );
 				const proceduralNode = reference( 'procedural', 'float', adjustments );
-				const brightnessNode = reference( 'brightness', 'float', adjustments );
-				const contrastNode = reference( 'contrast', 'float', adjustments );
+				const intensityNode = reference( 'intensity', 'float', adjustments );
 				const hueNode = reference( 'hue', 'float', adjustments );
 				const saturationNode = reference( 'saturation', 'float', adjustments );
 
 				const rotateY1Matrix = new THREE.Matrix4();
 				const rotateY2Matrix = new THREE.Matrix4();
 
-				const custom1UV = mul( reflectCube, uniform( rotateY1Matrix ) );
-				const custom2UV = mul( reflectCube, uniform( rotateY2Matrix ) );
+				const getEnvironmentNode = ( reflectNode ) => {
 
-				const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), saturate( add( positionWorld.y, mixNode ) ) );
-				const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
-				const brightnessFilter = add( proceduralEnv, brightnessNode );
-				const contrastFilter = mul( brightnessFilter, contrastNode );
-				const hueFilter = hue( contrastFilter, hueNode );
-				const saturationFilter = saturation( hueFilter, saturationNode );
+					const custom1UV = mul( reflectNode.xyz, uniform( rotateY1Matrix ) );
+					const custom2UV = mul( reflectNode.xyz, uniform( rotateY2Matrix ) );
 
-				scene.environmentNode = saturationFilter;
+					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), saturate( add( positionWorld.y, mixNode ) ) );
+					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
+					const intensityFilter = mul( proceduralEnv, intensityNode );
+					const hueFilter = hue( intensityFilter, hueNode );
+
+					return saturation( hueFilter, saturationNode );
+
+				}
+
+				const blurNode = uniform( 0 );
+
+				scene.environmentNode = getEnvironmentNode( reflectCube );
+
+				scene.backgroundNode = context( getEnvironmentNode( transformDirection( positionWorld, modelWorldMatrix ) ), {
+					levelNode : blurNode // @TODO: currently it uses mipmaps value, I think it should be replaced for [0,1]
+				} );
 
 				// scene objects
 
@@ -161,6 +169,11 @@
 
 				const gui = new GUI();
 
+				gui.add( { blurBackground: blurNode.value }, 'blurBackground', 0, 10, 0.01 ).onChange( value => {
+
+					blurNode.value = value;
+
+				} );
 				gui.add( { offsetCube1: 0 }, 'offsetCube1', 0, Math.PI * 2, 0.01 ).onChange( value => {
 
 					rotateY1Matrix.makeRotationY( value );
@@ -173,8 +186,7 @@
 				} );
 				gui.add( adjustments, 'mix', - 1, 2, 0.01 );
 				gui.add( adjustments, 'procedural', 0, 1, 0.01 );
-				gui.add( adjustments, 'brightness', 0, 1, 0.01 );
-				gui.add( adjustments, 'contrast', 0, 3, 0.01 );
+				gui.add( adjustments, 'intensity', 0, 5, 0.01 );
 				gui.add( adjustments, 'hue', 0, Math.PI * 2, 0.01 );
 				gui.add( adjustments, 'saturation', 0, 2, 0.01 );
 
