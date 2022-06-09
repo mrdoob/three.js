@@ -92,16 +92,14 @@
 				const adjustments = {
 					mix: 0,
 					procedural: 0,
-					brightness: 0,
-					contrast: 1,
+					intensity: 1,
 					hue: 0,
 					saturation: 1
 				};
 
 				const mixNode = reference( 'mix', 'float', adjustments );
 				const proceduralNode = reference( 'procedural', 'float', adjustments );
-				const brightnessNode = reference( 'brightness', 'float', adjustments );
-				const contrastNode = reference( 'contrast', 'float', adjustments );
+				const intensityNode = reference( 'intensity', 'float', adjustments );
 				const hueNode = reference( 'hue', 'float', adjustments );
 				const saturationNode = reference( 'saturation', 'float', adjustments );
 
@@ -115,9 +113,8 @@
 
 					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), saturate( add( positionWorld.y, mixNode ) ) );
 					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
-					const brightnessFilter = add( proceduralEnv, brightnessNode );
-					const contrastFilter = mul( brightnessFilter, contrastNode );
-					const hueFilter = hue( contrastFilter, hueNode );
+					const intensityFilter = mul( proceduralEnv, intensityNode );
+					const hueFilter = hue( intensityFilter, hueNode );
 
 					return saturation( hueFilter, saturationNode );
 
@@ -189,8 +186,7 @@
 				} );
 				gui.add( adjustments, 'mix', - 1, 2, 0.01 );
 				gui.add( adjustments, 'procedural', 0, 1, 0.01 );
-				gui.add( adjustments, 'brightness', 0, 1, 0.01 );
-				gui.add( adjustments, 'contrast', 0, 3, 0.01 );
+				gui.add( adjustments, 'intensity', 0, 5, 0.01 );
 				gui.add( adjustments, 'hue', 0, Math.PI * 2, 0.01 );
 				gui.add( adjustments, 'saturation', 0, 2, 0.01 );
 
