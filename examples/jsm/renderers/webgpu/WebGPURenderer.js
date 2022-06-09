@@ -768,7 +768,9 @@ class WebGPURenderer {
 			// @TODO: Add support for multiple materials per object. This will require to extract
 			// the material from the renderItem object and pass it with its group data to _renderObject().
 
-			const object = renderItem.object;
+			const { object, geometry, material, group } = renderItem;
+
+			object.onBeforeRender( this, scene, camera, geometry, material, group );
 
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
