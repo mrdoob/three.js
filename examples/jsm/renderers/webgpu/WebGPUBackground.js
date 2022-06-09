@@ -46,7 +46,7 @@ class WebGPUBackground {
 			_clearAlpha = 1;
 			forceClear = true;
 
-		} else if ( background?.isNode === true ) {
+		} else if ( background.isNode === true ) {
 
 			_clearColor.copy( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
