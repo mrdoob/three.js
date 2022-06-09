@@ -153,7 +153,11 @@ async function main() {
 		defaultViewport: viewport
 	} );
 
-	browser.on( 'targetdestroyed', () => close() );
+	browser.on( 'targetdestroyed', target => {
+
+		if ( target.type() === 'browser' ) close();
+
+	} );
 
 	/* Prepare page */
 
