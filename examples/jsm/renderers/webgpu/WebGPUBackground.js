@@ -50,13 +50,13 @@ class WebGPUBackground {
 
 			_clearColor.copy( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
-			
+
 			let boxMesh = this.boxMesh;
 
 			if ( boxMesh === null ) {
 
-				const colorNode = context( background, { 
-					uvNode : transformDirection( positionWorld, modelWorldMatrix )
+				const colorNode = context( background, {
+					uvNode: transformDirection( positionWorld, modelWorldMatrix )
 				} );
 
 				const nodeMaterial = new MeshBasicNodeMaterial();
@@ -75,7 +75,7 @@ class WebGPUBackground {
 				};
 
 			}
-			
+
 			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
 
 		} else {
