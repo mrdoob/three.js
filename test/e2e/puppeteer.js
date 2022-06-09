@@ -76,13 +76,7 @@ let browser;
 
 const server = http.createServer( handler );
 server.listen( port, main );
-server.on( 'SIGINT', () => {
-
-	server.close();
-	if ( browser !== undefined ) browser.close();
-	process.exit( 1 );
-
-} );
+server.on( 'SIGINT', () => close() );
 
 async function downloadLatestChromium() {
 
@@ -143,20 +137,26 @@ async function main() {
 
 	const { executablePath } = await downloadLatestChromium();
 
+	/* Launch browser */
+
 	const flags = [ '--enable-unsafe-webgpu' ];
 
-	/* Launch browser */
+	const temporaryWebGPUHack = true; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
+
+	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
 		executablePath,
-		headless: false,
-		args: flags
+		headless: ! temporaryWebGPUHack,
+		args: flags,
+		defaultViewport: viewport
 	} );
+
+	browser.on( 'targetdestroyed', () => close() );
 
 	/* Prepare page */
 
-	const page = ( await browser.pages() )[ 0 ];
-	await page.setViewport( { width: width * viewScale, height: height * viewScale } );
+	const page = await browser.newPage();
 
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 
@@ -207,6 +207,21 @@ async function main() {
 		} catch {}
 
 	} );
+
+	/* Prepare session if WebGPU hack is enabled */
+
+	let session;
+
+	if ( temporaryWebGPUHack ) {
+
+		session = page.client();
+
+		// TODO: remove this when https://github.com/puppeteer/puppeteer/issues/1910 will be fixed
+		const { width, height } = viewport;
+		const { windowId } = await session.send( 'Browser.getWindowForTarget' );
+		await session.send( 'Browser.setWindowBounds', { windowId, bounds: { width: width + 16, height: height + 133 } } );
+
+	}
 
 	/* Loop for each file, with CI parallelism */
 
@@ -317,9 +332,20 @@ async function main() {
 
 			}
 
-			const b64 = await page.client().send( 'Page.captureScreenshot', { fromSurface: false } );
+			let screenshotData;
 
-			const screenshot = await jimp.read( Buffer.from( b64.data, 'base64' ) );
+			if ( temporaryWebGPUHack ) {
+
+				const b64 = await session.send( 'Page.captureScreenshot', { fromSurface: false } );
+				screenshotData = Buffer.from( b64.data, 'base64' );
+
+			} else {
+
+				screenshotData = await page.screenshot();
+
+			}
+
+			const screenshot = await jimp.read( screenshotData );
 			screenshot.scale( 1 / viewScale ).quality( jpgQuality );
 
 			if ( isMakeScreenshot ) {
@@ -332,61 +358,64 @@ async function main() {
 
 			} else {
 
+				/* Diff screenshots */
+
+				let expected;
+
 				try {
 
-					/* Diff screenshots */
-
-					const expected = ( await jimp.read( await fs.readFile( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
-					const actual = screenshot.bitmap;
-
-					let numFailedPixels;
-
-					try {
-
-						numFailedPixels = pixelmatch( expected.data, actual.data, null, actual.width, actual.height, {
-							threshold: pixelThreshold,
-							alpha: 0.2,
-							diffMask: process.env.FORCE_COLOR === '0',
-							diffColor: process.env.FORCE_COLOR === '0' ? [ 255, 255, 255 ] : [ 255, 0, 0 ]
-						} );
-
-					} catch {
-
-						console.red( `ERROR! Image sizes does not match in file: ${ file }` );
-						failedScreenshots.push( file );
-						break;
-
-					}
-
-					numFailedPixels /= actual.width * actual.height;
-
-					/* Print results */
-
-					if ( numFailedPixels < maxFailedPixels ) {
-
-						console.green( `diff: ${ numFailedPixels.toFixed( 3 ) }, file: ${ file }` );
-						break;
-
-					} else {
-
-						if ( attemptID === numAttempts - 1 ) {
-
-							console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
-							failedScreenshots.push( file );
-							break;
-
-						} else {
-
-							console.log( 'Another attempt...' );
-
-						}
-
-					}
+					expected = ( await jimp.read( await fs.readFile( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
 
 				} catch {
 
 					console.log( `Warning! Screenshot does not exist: ${ file }` );
 					break;
+
+				}
+
+				const actual = screenshot.bitmap;
+
+				let numFailedPixels;
+
+				try {
+
+					numFailedPixels = pixelmatch( expected.data, actual.data, null, actual.width, actual.height, {
+						threshold: pixelThreshold,
+						alpha: 0.2,
+						diffMask: process.env.FORCE_COLOR === '0',
+						diffColor: process.env.FORCE_COLOR === '0' ? [ 255, 255, 255 ] : [ 255, 0, 0 ]
+					} );
+
+				} catch {
+
+					console.red( `ERROR! Image sizes does not match in file: ${ file }` );
+					failedScreenshots.push( file );
+					break;
+
+				}
+
+				numFailedPixels /= actual.width * actual.height;
+
+				/* Print results */
+
+				if ( numFailedPixels < maxFailedPixels ) {
+
+					console.green( `Diff ${ numFailedPixels.toFixed( 3 ) } in file: ${ file }` );
+					break;
+
+				} else {
+
+					if ( attemptID === numAttempts - 1 ) {
+
+						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
+						failedScreenshots.push( file );
+						break;
+
+					} else {
+
+						console.log( 'Another attempt...' );
+
+					}
 
 				}
 
@@ -421,12 +450,16 @@ async function main() {
 
 	}
 
-	setTimeout( () => {
+	setTimeout( close, 300, failedScreenshots.length );
 
-		server.close();
-		browser.close();
-		process.exit( failedScreenshots.length );
+}
 
-	}, 300 );
+function close( exitCode = 1 ) {
+
+	console.log( 'Closing...' );
+
+	if ( browser !== undefined ) browser.close();
+	server.close();
+	process.exit( exitCode );
 
 }
