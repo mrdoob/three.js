@@ -1904,7 +1904,7 @@ function serializeImage(image) {
 		if (image.data) {
 			// images of DataTexture
 			return {
-				data: Array.prototype.slice.call(image.data),
+				data: Array.from(image.data),
 				width: image.width,
 				height: image.height,
 				type: image.data.constructor.name
@@ -6486,7 +6486,7 @@ class Object3D extends EventDispatcher {
 
 }
 
-Object3D.DefaultUp = new Vector3(0, 1, 0);
+Object3D.DefaultUp = /*@__PURE__*/new Vector3(0, 1, 0);
 Object3D.DefaultMatrixAutoUpdate = true;
 
 const _v0$1 = /*@__PURE__*/new Vector3();
@@ -7446,7 +7446,7 @@ class BufferAttribute {
 		const data = {
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
-			array: Array.prototype.slice.call(this.array),
+			array: Array.from(this.array),
 			normalized: this.normalized
 		};
 		if (this.name !== '') data.name = this.name;
@@ -13140,10 +13140,10 @@ function WebGLObjects(gl, geometries, attributes, info) {
  * 		like .set for an optional property of the object
  *
  */
-const emptyTexture = new Texture();
-const emptyArrayTexture = new DataArrayTexture();
-const empty3dTexture = new Data3DTexture();
-const emptyCubeTexture = new CubeTexture(); // --- Utilities ---
+const emptyTexture = /*@__PURE__*/new Texture();
+const emptyArrayTexture = /*@__PURE__*/new DataArrayTexture();
+const empty3dTexture = /*@__PURE__*/new Data3DTexture();
+const emptyCubeTexture = /*@__PURE__*/new CubeTexture(); // --- Utilities ---
 // Array Caches (provide typed arrays for temporary by size)
 
 const arrayCacheF32 = [];
@@ -20938,7 +20938,7 @@ class InterleavedBuffer {
 		}
 
 		if (data.arrayBuffers[this.array.buffer._uuid] === undefined) {
-			data.arrayBuffers[this.array.buffer._uuid] = Array.prototype.slice.call(new Uint32Array(this.array.buffer));
+			data.arrayBuffers[this.array.buffer._uuid] = Array.from(new Uint32Array(this.array.buffer));
 		} //
 
 
@@ -21074,7 +21074,7 @@ class InterleavedBufferAttribute {
 
 	clone(data) {
 		if (data === undefined) {
-			console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.');
+			console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will deinterleave buffer data.');
 			const array = [];
 
 			for (let i = 0; i < this.count; i++) {
@@ -21101,7 +21101,7 @@ class InterleavedBufferAttribute {
 
 	toJSON(data) {
 		if (data === undefined) {
-			console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.');
+			console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will deinterleave buffer data.');
 			const array = [];
 
 			for (let i = 0; i < this.count; i++) {
@@ -21120,7 +21120,7 @@ class InterleavedBufferAttribute {
 				normalized: this.normalized
 			};
 		} else {
-			// save as true interlaved attribtue
+			// save as true interleaved attribtue
 			if (data.interleavedBuffers === undefined) {
 				data.interleavedBuffers = {};
 			}
@@ -22789,8 +22789,8 @@ function CubicPoly() {
 } //
 
 
-const tmp = new Vector3();
-const px = new CubicPoly(),
+const tmp = /*@__PURE__*/new Vector3();
+const px = /*@__PURE__*/new CubicPoly(),
 			py = new CubicPoly(),
 			pz = new CubicPoly();
 
@@ -24225,13 +24225,13 @@ class DodecahedronGeometry extends PolyhedronGeometry {
 
 }
 
-const _v0 = new Vector3();
+const _v0 = /*@__PURE__*/new Vector3();
 
-const _v1$1 = new Vector3();
+const _v1$1 = /*@__PURE__*/new Vector3();
 
-const _normal = new Vector3();
+const _normal = /*@__PURE__*/new Vector3();
 
-const _triangle = new Triangle();
+const _triangle = /*@__PURE__*/new Triangle();
 
 class EdgesGeometry extends BufferGeometry {
 	constructor(geometry = null, thresholdAngle = 1) {
@@ -31574,18 +31574,18 @@ const _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace('\\.', '') + ']'; // Pa
 // be matched to parse the rest of the track name.
 
 
-const _directoryRe = /((?:WC+[\/:])*)/.source.replace('WC', _wordChar); // Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
+const _directoryRe = /*@__PURE__*/ /((?:WC+[\/:])*)/.source.replace('WC', _wordChar); // Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
 
 
-const _nodeRe = /(WCOD+)?/.source.replace('WCOD', _wordCharOrDot); // Object on target node, and accessor. May not contain reserved
+const _nodeRe = /*@__PURE__*/ /(WCOD+)?/.source.replace('WCOD', _wordCharOrDot); // Object on target node, and accessor. May not contain reserved
 // characters. Accessor may contain any character except closing bracket.
 
 
-const _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace('WC', _wordChar); // Property and accessor. May not contain reserved characters. Accessor may
+const _objectRe = /*@__PURE__*/ /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace('WC', _wordChar); // Property and accessor. May not contain reserved characters. Accessor may
 // contain any non-bracket characters.
 
 
-const _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace('WC', _wordChar);
+const _propertyRe = /*@__PURE__*/ /\.(WC+)(?:\[(.+)\])?/.source.replace('WC', _wordChar);
 
 const _trackRe = new RegExp('' + '^' + _directoryRe + _nodeRe + _objectRe + _propertyRe + '$');
 
