@@ -264,7 +264,7 @@ async function networkFirst( request ) {
 
 		let response = await fetch( request );
 
-		if ( response.status !== 0 ) { // copied from coi-serviceworker
+		if ( request.url === './' || request.url === './index.html' ) { // copied from coi-serviceworker
 
 			const newHeaders = new Headers( response.headers );
 			newHeaders.set( "Cross-Origin-Embedder-Policy", "require-corp" );
