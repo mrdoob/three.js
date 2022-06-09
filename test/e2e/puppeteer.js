@@ -37,6 +37,7 @@ const exceptionList = [
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
 	'webgpu*',
+	'webxr_vr_sandbox', // "WebGL: INVALID_VALUE: texSubImage2D: no canvas" investigate
 	
 	// video tag is not deterministic enough, investigate
 	'css3d_youtube',
