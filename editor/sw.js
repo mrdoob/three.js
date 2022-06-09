@@ -264,11 +264,15 @@ async function networkFirst( request ) {
 
 		let response = await fetch( request );
 
-		const newHeaders = new Headers( response.headers ); // copied from coi-serviceworker
-		newHeaders.set( "Cross-Origin-Embedder-Policy", "require-corp" );
-		newHeaders.set( "Cross-Origin-Opener-Policy", "same-origin" );
+		if ( response.status !== 0 ) { // copied from coi-serviceworker
 
-		response = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
+			const newHeaders = new Headers( response.headers );
+			newHeaders.set( "Cross-Origin-Embedder-Policy", "require-corp" );
+			newHeaders.set( "Cross-Origin-Opener-Policy", "same-origin" );
+
+			response = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
+
+		}
 
 		const cache = await caches.open( cacheName );
 		cache.put( request, response.clone() );
