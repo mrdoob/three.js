@@ -232,13 +232,17 @@ self.addEventListener( 'install', async function () {
 
 	const cache = await caches.open( cacheName );
 
-	assets.forEach( function ( asset ) {
+	assets.forEach( async function ( asset ) {
 
-		cache.add( asset ).catch( function () {
+		try {
+
+			await cache.add( asset );
+
+		} catch {
 
 			console.warn( '[SW] Cound\'t cache:', asset );
 
-		} );
+		}
 
 	} );
 
@@ -246,37 +250,42 @@ self.addEventListener( 'install', async function () {
 
 self.addEventListener( 'fetch', async function ( event ) {
 
-	if ( event.request.url.startsWith( 'chrome-extension' ) ) return;
-
 	const request = event.request;
+
+	if ( request.url.startsWith( 'chrome-extension' ) ) return;
+
 	event.respondWith( networkFirst( request ) );
 
 } );
 
 async function networkFirst( request ) {
 
-	return fetch( request )
-		.then( async function ( response ) {
+	try {
 
-			const cache = await caches.open( cacheName );
+		const response = await fetch( request );
 
-			cache.put( request, response.clone() );
+		const newHeaders = new Headers( response.headers ); // copied from coi-serviceworker
+		newHeaders.set( "Cross-Origin-Embedder-Policy", "require-corp" );
+		newHeaders.set( "Cross-Origin-Opener-Policy", "same-origin" );
 
-			return response;
+		const responseClone = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
 
-		} )
-		.catch( async function () {
+		const cache = await caches.open( cacheName );
+		cache.put( request, responseClone );
+		return responseClone;
 
-			const cachedResponse = await caches.match( request );
+	} catch {
 
-			if ( cachedResponse === undefined ) {
+		const cachedResponse = await caches.match( request );
 
-				console.warn( '[SW] Not cached:', request.url );
+		if ( cachedResponse === undefined ) {
 
-			}
+			console.warn( '[SW] Not cached:', request.url );
 
-			return cachedResponse;
+		}
 
-		} );
+		return cachedResponse;
+
+	}
 
 }
