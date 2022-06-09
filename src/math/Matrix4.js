@@ -4,7 +4,7 @@ class Matrix4 {
 
 	constructor() {
 
-		this.isMatrix4 = true;
+		Matrix4.prototype.isMatrix4 = true;
 
 		this.elements = [
 

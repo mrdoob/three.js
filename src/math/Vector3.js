@@ -5,7 +5,7 @@ class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
 
-		this.isVector3 = true;
+		Vector3.prototype.isVector3 = true;
 
 		this.x = x;
 		this.y = y;
