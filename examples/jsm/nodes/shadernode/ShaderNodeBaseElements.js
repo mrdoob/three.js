@@ -236,6 +236,7 @@ export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
 export const saturate = nodeProxy( MathNode, MathNode.SATURATE );
 export const round = nodeProxy( MathNode, MathNode.ROUND );
 
+export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
 export const max = nodeProxy( MathNode, MathNode.MAX );
 export const mod = nodeProxy( MathNode, MathNode.MOD );

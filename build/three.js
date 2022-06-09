@@ -254,12 +254,7 @@
 
 	}
 
-	const _lut = [];
-
-	for (let i = 0; i < 256; i++) {
-		_lut[i] = (i < 16 ? '0' : '') + i.toString(16);
-	}
-
+	const _lut = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '0a', '0b', '0c', '0d', '0e', '0f', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '1a', '1b', '1c', '1d', '1e', '1f', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '2a', '2b', '2c', '2d', '2e', '2f', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '3a', '3b', '3c', '3d', '3e', '3f', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '4a', '4b', '4c', '4d', '4e', '4f', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '5a', '5b', '5c', '5d', '5e', '5f', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '6a', '6b', '6c', '6d', '6e', '6f', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '7a', '7b', '7c', '7d', '7e', '7f', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '8a', '8b', '8c', '8d', '8e', '8f', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '9a', '9b', '9c', '9d', '9e', '9f', 'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9', 'ba', 'bb', 'bc', 'bd', 'be', 'bf', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'ca', 'cb', 'cc', 'cd', 'ce', 'cf', 'd0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9', 'da', 'db', 'dc', 'dd', 'de', 'df', 'e0', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'ea', 'eb', 'ec', 'ed', 'ee', 'ef', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'fa', 'fb', 'fc', 'fd', 'fe', 'ff'];
 	let _seed = 1234567;
 	const DEG2RAD = Math.PI / 180;
 	const RAD2DEG = 180 / Math.PI; // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
@@ -1906,7 +1901,7 @@
 			if (image.data) {
 				// images of DataTexture
 				return {
-					data: Array.prototype.slice.call(image.data),
+					data: Array.from(image.data),
 					width: image.width,
 					height: image.height,
 					type: image.data.constructor.name
@@ -6488,7 +6483,7 @@
 
 	}
 
-	Object3D.DefaultUp = new Vector3(0, 1, 0);
+	Object3D.DefaultUp = /*@__PURE__*/new Vector3(0, 1, 0);
 	Object3D.DefaultMatrixAutoUpdate = true;
 
 	const _v0$1 = /*@__PURE__*/new Vector3();
@@ -7448,7 +7443,7 @@
 			const data = {
 				itemSize: this.itemSize,
 				type: this.array.constructor.name,
-				array: Array.prototype.slice.call(this.array),
+				array: Array.from(this.array),
 				normalized: this.normalized
 			};
 			if (this.name !== '') data.name = this.name;
@@ -13142,10 +13137,10 @@
 	 * 		like .set for an optional property of the object
 	 *
 	 */
-	const emptyTexture = new Texture();
-	const emptyArrayTexture = new DataArrayTexture();
-	const empty3dTexture = new Data3DTexture();
-	const emptyCubeTexture = new CubeTexture(); // --- Utilities ---
+	const emptyTexture = /*@__PURE__*/new Texture();
+	const emptyArrayTexture = /*@__PURE__*/new DataArrayTexture();
+	const empty3dTexture = /*@__PURE__*/new Data3DTexture();
+	const emptyCubeTexture = /*@__PURE__*/new CubeTexture(); // --- Utilities ---
 	// Array Caches (provide typed arrays for temporary by size)
 
 	const arrayCacheF32 = [];
@@ -20940,7 +20935,7 @@
 			}
 
 			if (data.arrayBuffers[this.array.buffer._uuid] === undefined) {
-				data.arrayBuffers[this.array.buffer._uuid] = Array.prototype.slice.call(new Uint32Array(this.array.buffer));
+				data.arrayBuffers[this.array.buffer._uuid] = Array.from(new Uint32Array(this.array.buffer));
 			} //
 
 
@@ -21076,7 +21071,7 @@
 
 		clone(data) {
 			if (data === undefined) {
-				console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.');
+				console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will deinterleave buffer data.');
 				const array = [];
 
 				for (let i = 0; i < this.count; i++) {
@@ -21103,7 +21098,7 @@
 
 		toJSON(data) {
 			if (data === undefined) {
-				console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.');
+				console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will deinterleave buffer data.');
 				const array = [];
 
 				for (let i = 0; i < this.count; i++) {
@@ -21122,7 +21117,7 @@
 					normalized: this.normalized
 				};
 			} else {
-				// save as true interlaved attribtue
+				// save as true interleaved attribtue
 				if (data.interleavedBuffers === undefined) {
 					data.interleavedBuffers = {};
 				}
@@ -22791,10 +22786,10 @@
 	} //
 
 
-	const tmp = new Vector3();
-	const px = new CubicPoly(),
-				py = new CubicPoly(),
-				pz = new CubicPoly();
+	const tmp = /*@__PURE__*/new Vector3();
+	const px = /*@__PURE__*/new CubicPoly();
+	const py = /*@__PURE__*/new CubicPoly();
+	const pz = /*@__PURE__*/new CubicPoly();
 
 	class CatmullRomCurve3 extends Curve {
 		constructor(points = [], closed = false, curveType = 'centripetal', tension = 0.5) {
@@ -24227,13 +24222,13 @@
 
 	}
 
-	const _v0 = new Vector3();
+	const _v0 = /*@__PURE__*/new Vector3();
 
-	const _v1$1 = new Vector3();
+	const _v1$1 = /*@__PURE__*/new Vector3();
 
-	const _normal = new Vector3();
+	const _normal = /*@__PURE__*/new Vector3();
 
-	const _triangle = new Triangle();
+	const _triangle = /*@__PURE__*/new Triangle();
 
 	class EdgesGeometry extends BufferGeometry {
 		constructor(geometry = null, thresholdAngle = 1) {
@@ -31576,18 +31571,18 @@
 	// be matched to parse the rest of the track name.
 
 
-	const _directoryRe = /((?:WC+[\/:])*)/.source.replace('WC', _wordChar); // Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
+	const _directoryRe = /*@__PURE__*/ /((?:WC+[\/:])*)/.source.replace('WC', _wordChar); // Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
 
 
-	const _nodeRe = /(WCOD+)?/.source.replace('WCOD', _wordCharOrDot); // Object on target node, and accessor. May not contain reserved
+	const _nodeRe = /*@__PURE__*/ /(WCOD+)?/.source.replace('WCOD', _wordCharOrDot); // Object on target node, and accessor. May not contain reserved
 	// characters. Accessor may contain any character except closing bracket.
 
 
-	const _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace('WC', _wordChar); // Property and accessor. May not contain reserved characters. Accessor may
+	const _objectRe = /*@__PURE__*/ /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace('WC', _wordChar); // Property and accessor. May not contain reserved characters. Accessor may
 	// contain any non-bracket characters.
 
 
-	const _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace('WC', _wordChar);
+	const _propertyRe = /*@__PURE__*/ /\.(WC+)(?:\[(.+)\])?/.source.replace('WC', _wordChar);
 
 	const _trackRe = new RegExp('' + '^' + _directoryRe + _nodeRe + _objectRe + _propertyRe + '$');
 

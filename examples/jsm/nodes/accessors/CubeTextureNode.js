@@ -20,7 +20,7 @@ class CubeTextureNode extends TextureNode {
 
 	getConstructHash( builder ) {
 
-		return `${ this.uuid }-${ builder.context.environmentContext?.uuid || '' }`;
+		return `${ this.uuid } / ${ builder.context.environmentContext?.uuid || '' }`;
 
 	}
 
@@ -72,7 +72,7 @@ class CubeTextureNode extends TextureNode {
 
 			let snippet = nodeData.snippet;
 
-			if ( builder.context.tempRead === false || snippet === undefined ) {
+			if ( snippet === undefined || builder.context.tempRead === false ) {
 
 				const uvSnippet = uvNode.build( builder, 'vec3' );
 

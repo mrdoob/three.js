@@ -49,6 +49,7 @@ import UserDataNode from './accessors/UserDataNode.js';
 import ComputeNode from './gpgpu/ComputeNode.js';
 
 // display
+import ColorAdjustmentNode from './display/ColorAdjustmentNode.js';
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
@@ -153,6 +154,7 @@ const nodeLib = {
 	UserDataNode,
 
 	// display
+	ColorAdjustmentNode,
 	ColorSpaceNode,
 	FrontFacingNode,
 	NormalMapNode,
@@ -256,6 +258,7 @@ export {
 	UserDataNode,
 
 	// display
+	ColorAdjustmentNode,
 	ColorSpaceNode,
 	FrontFacingNode,
 	NormalMapNode,

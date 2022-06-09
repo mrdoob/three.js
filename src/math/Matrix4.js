@@ -1,4 +1,5 @@
 import { Vector3 } from './Vector3.js';
+
 class Matrix4 {
 
 	constructor() {

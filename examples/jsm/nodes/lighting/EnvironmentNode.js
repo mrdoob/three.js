@@ -15,7 +15,7 @@ const getSpecularMIPLevel = new ShaderNode( ( { texture, levelNode } ) => {
 
 } );
 
-class EnvironmentLightNode extends LightingNode {
+class EnvironmentNode extends LightingNode {
 
 	constructor( envNode = null ) {
 
@@ -28,6 +28,7 @@ class EnvironmentLightNode extends LightingNode {
 	construct( builder ) {
 
 		const envNode = this.envNode;
+		const properties = builder.getNodeProperties( this );
 
 		const flipNormalWorld = vec3( negate( transformedNormalWorld.x ), transformedNormalWorld.yz );
 
@@ -58,8 +59,11 @@ class EnvironmentLightNode extends LightingNode {
 
 		builder.context.iblIrradiance.add( mul( Math.PI, irradianceContext ) );
 
+		properties.radianceContext = radianceContext;
+		properties.irradianceContext = irradianceContext;
+
 	}
 
 }
 
-export default EnvironmentLightNode;
+export default EnvironmentNode;
