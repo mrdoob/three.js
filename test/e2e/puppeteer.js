@@ -157,7 +157,8 @@ async function main() {
 
 	/* Prepare page */
 
-	const page = await browser.newPage();
+	const pages = await browser.pages();
+	const page = pages[ 0 ];
 
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 
