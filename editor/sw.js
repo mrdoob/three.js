@@ -262,17 +262,18 @@ async function networkFirst( request ) {
 
 	try {
 
-		const response = await fetch( request );
+		let response = await fetch( request );
+		response = response.clone();
 
 		const newHeaders = new Headers( response.headers ); // copied from coi-serviceworker
 		newHeaders.set( "Cross-Origin-Embedder-Policy", "require-corp" );
 		newHeaders.set( "Cross-Origin-Opener-Policy", "same-origin" );
 
-		const responseClone = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
+		response = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
 
 		const cache = await caches.open( cacheName );
-		cache.put( request, responseClone );
-		return responseClone;
+		cache.put( request, response );
+		return response;
 
 	} catch {
 
