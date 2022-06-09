@@ -36,6 +36,7 @@ const exceptionList = [
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
+	'webgpu*',
 	
 	// video tag is not deterministic enough, investigate
 	'css3d_youtube',
@@ -141,7 +142,7 @@ async function main() {
 
 	const flags = [ '--enable-unsafe-webgpu' ];
 
-	const temporaryWebGPUHack = true; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
+	const temporaryWebGPUHack = false; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
