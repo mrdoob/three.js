@@ -10,7 +10,7 @@ class ShaderLib {
 
 	static basic = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -26,7 +26,7 @@ class ShaderLib {
 
 	static lambert = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -36,7 +36,7 @@ class ShaderLib {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) }
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
 
@@ -47,7 +47,7 @@ class ShaderLib {
 
 	static phong = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -60,8 +60,8 @@ class ShaderLib {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) },
-				specular: { value: new Color( 0x111111 ) },
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
+				specular: { value: /*@__PURE__*/ new Color( 0x111111 ) },
 				shininess: { value: 30 }
 			}
 		] ),
@@ -73,7 +73,7 @@ class ShaderLib {
 
 	static standard = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.envmap,
 			UniformsLib.aomap,
@@ -87,7 +87,7 @@ class ShaderLib {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) },
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				roughness: { value: 1.0 },
 				metalness: { value: 0.0 },
 				envMapIntensity: { value: 1 } // temporary
@@ -101,14 +101,14 @@ class ShaderLib {
 
 	static physical = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			this.standard.uniforms,
 			{
 				clearcoat: { value: 0 },
 				clearcoatMap: { value: null },
 				clearcoatRoughness: { value: 0 },
 				clearcoatRoughnessMap: { value: null },
-				clearcoatNormalScale: { value: new Vector2( 1, 1 ) },
+				clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
 				clearcoatNormalMap: { value: null },
 				iridescence: { value: 0 },
 				iridescenceMap: { value: null },
@@ -117,21 +117,21 @@ class ShaderLib {
 				iridescenceThicknessMaximum: { value: 400 },
 				iridescenceThicknessMap: { value: null },
 				sheen: { value: 0 },
-				sheenColor: { value: new Color( 0x000000 ) },
+				sheenColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				sheenColorMap: { value: null },
 				sheenRoughness: { value: 1 },
 				sheenRoughnessMap: { value: null },
 				transmission: { value: 0 },
 				transmissionMap: { value: null },
-				transmissionSamplerSize: { value: new Vector2() },
+				transmissionSamplerSize: { value: /*@__PURE__*/ new Vector2() },
 				transmissionSamplerMap: { value: null },
 				thickness: { value: 0 },
 				thicknessMap: { value: null },
 				attenuationDistance: { value: 0 },
-				attenuationColor: { value: new Color( 0x000000 ) },
+				attenuationColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				specularIntensity: { value: 1 },
 				specularIntensityMap: { value: null },
-				specularColor: { value: new Color( 1, 1, 1 ) },
+				specularColor: { value: /*@__PURE__*/ new Color( 1, 1, 1 ) },
 				specularColorMap: { value: null },
 			}
 		] ),
@@ -143,7 +143,7 @@ class ShaderLib {
 
 	static toon = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
@@ -155,7 +155,7 @@ class ShaderLib {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) }
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
 
@@ -166,7 +166,7 @@ class ShaderLib {
 
 	static matcap = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
@@ -184,7 +184,7 @@ class ShaderLib {
 
 	static points = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.points,
 			UniformsLib.fog
 		] ),
@@ -196,7 +196,7 @@ class ShaderLib {
 
 	static dashed = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.fog,
 			{
@@ -213,7 +213,7 @@ class ShaderLib {
 
 	static depth = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.displacementmap
 		] ),
@@ -225,7 +225,7 @@ class ShaderLib {
 
 	static normal = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
@@ -242,7 +242,7 @@ class ShaderLib {
 
 	static sprite = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.sprite,
 			UniformsLib.fog
 		] ),
@@ -255,7 +255,7 @@ class ShaderLib {
 	static background = {
 
 		uniforms: {
-			uvTransform: { value: new Matrix3() },
+			uvTransform: { value: /*@__PURE__*/ new Matrix3() },
 			t2D: { value: null },
 		},
 
@@ -266,7 +266,7 @@ class ShaderLib {
 
 	static cube = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.envmap,
 			{
 				opacity: { value: 1.0 }
@@ -291,11 +291,11 @@ class ShaderLib {
 
 	static distanceRGBA = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.displacementmap,
 			{
-				referencePosition: { value: new Vector3() },
+				referencePosition: { value: /*@__PURE__*/ new Vector3() },
 				nearDistance: { value: 1 },
 				farDistance: { value: 1000 }
 			}
@@ -308,11 +308,11 @@ class ShaderLib {
 
 	static shadow = {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.lights,
 			UniformsLib.fog,
 			{
-				color: { value: new Color( 0x00000 ) },
+				color: { value: /*@__PURE__*/ new Color( 0x00000 ) },
 				opacity: { value: 1.0 }
 			},
 		] ),
