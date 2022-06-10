@@ -6,9 +6,9 @@ import { UniformsLib } from './UniformsLib.js';
 import { Color } from '../../math/Color.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 
-class ShaderLib {
+const ShaderLib = {
 
-	static basic = {
+	basic: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -22,9 +22,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.meshbasic_vert,
 		fragmentShader: ShaderChunk.meshbasic_frag
 
-	};
+	},
 
-	static lambert = {
+	lambert: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -43,9 +43,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.meshlambert_vert,
 		fragmentShader: ShaderChunk.meshlambert_frag
 
-	};
+	},
 
-	static phong = {
+	phong: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -69,9 +69,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.meshphong_vert,
 		fragmentShader: ShaderChunk.meshphong_frag
 
-	};
+	},
 
-	static standard = {
+	standard: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -97,51 +97,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.meshphysical_vert,
 		fragmentShader: ShaderChunk.meshphysical_frag
 
-	};
+	},
 
-	static physical = {
-
-		uniforms: /*@__PURE__*/ mergeUniforms( [
-			this.standard.uniforms,
-			{
-				clearcoat: { value: 0 },
-				clearcoatMap: { value: null },
-				clearcoatRoughness: { value: 0 },
-				clearcoatRoughnessMap: { value: null },
-				clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
-				clearcoatNormalMap: { value: null },
-				iridescence: { value: 0 },
-				iridescenceMap: { value: null },
-				iridescenceIOR: { value: 1.3 },
-				iridescenceThicknessMinimum: { value: 100 },
-				iridescenceThicknessMaximum: { value: 400 },
-				iridescenceThicknessMap: { value: null },
-				sheen: { value: 0 },
-				sheenColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
-				sheenColorMap: { value: null },
-				sheenRoughness: { value: 1 },
-				sheenRoughnessMap: { value: null },
-				transmission: { value: 0 },
-				transmissionMap: { value: null },
-				transmissionSamplerSize: { value: /*@__PURE__*/ new Vector2() },
-				transmissionSamplerMap: { value: null },
-				thickness: { value: 0 },
-				thicknessMap: { value: null },
-				attenuationDistance: { value: 0 },
-				attenuationColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
-				specularIntensity: { value: 1 },
-				specularIntensityMap: { value: null },
-				specularColor: { value: /*@__PURE__*/ new Color( 1, 1, 1 ) },
-				specularColorMap: { value: null },
-			}
-		] ),
-
-		vertexShader: ShaderChunk.meshphysical_vert,
-		fragmentShader: ShaderChunk.meshphysical_frag
-
-	};
-
-	static toon = {
+	toon: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -162,9 +120,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.meshtoon_vert,
 		fragmentShader: ShaderChunk.meshtoon_frag
 
-	};
+	},
 
-	static matcap = {
+	matcap: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -180,9 +138,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.meshmatcap_vert,
 		fragmentShader: ShaderChunk.meshmatcap_frag
 
-	};
+	},
 
-	static points = {
+	points: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.points,
@@ -192,9 +150,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.points_vert,
 		fragmentShader: ShaderChunk.points_frag
 
-	};
+	},
 
-	static dashed = {
+	dashed: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -209,9 +167,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.linedashed_vert,
 		fragmentShader: ShaderChunk.linedashed_frag
 
-	};
+	},
 
-	static depth = {
+	depth: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -221,9 +179,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.depth_vert,
 		fragmentShader: ShaderChunk.depth_frag
 
-	};
+	},
 
-	static normal = {
+	normal: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -238,9 +196,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.meshnormal_vert,
 		fragmentShader: ShaderChunk.meshnormal_frag
 
-	};
+	},
 
-	static sprite = {
+	sprite: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.sprite,
@@ -250,9 +208,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.sprite_vert,
 		fragmentShader: ShaderChunk.sprite_frag
 
-	};
+	},
 
-	static background = {
+	background: {
 
 		uniforms: {
 			uvTransform: { value: /*@__PURE__*/ new Matrix3() },
@@ -262,9 +220,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.background_vert,
 		fragmentShader: ShaderChunk.background_frag
 
-	};
+	},
 
-	static cube = {
+	cube: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.envmap,
@@ -276,9 +234,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.cube_vert,
 		fragmentShader: ShaderChunk.cube_frag
 
-	};
+	},
 
-	static equirect = {
+	equirect: {
 
 		uniforms: {
 			tEquirect: { value: null },
@@ -287,9 +245,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.equirect_vert,
 		fragmentShader: ShaderChunk.equirect_frag
 
-	};
+	},
 
-	static distanceRGBA = {
+	distanceRGBA: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -304,9 +262,9 @@ class ShaderLib {
 		vertexShader: ShaderChunk.distanceRGBA_vert,
 		fragmentShader: ShaderChunk.distanceRGBA_frag
 
-	};
+	},
 
-	static shadow = {
+	shadow: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.lights,
@@ -320,8 +278,51 @@ class ShaderLib {
 		vertexShader: ShaderChunk.shadow_vert,
 		fragmentShader: ShaderChunk.shadow_frag
 
-	};
+	}
 
-}
+};
+
+ShaderLib.physical = {
+
+	uniforms: /*@__PURE__*/ mergeUniforms( [
+		ShaderLib.standard.uniforms,
+		{
+			clearcoat: { value: 0 },
+			clearcoatMap: { value: null },
+			clearcoatRoughness: { value: 0 },
+			clearcoatRoughnessMap: { value: null },
+			clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
+			clearcoatNormalMap: { value: null },
+			iridescence: { value: 0 },
+			iridescenceMap: { value: null },
+			iridescenceIOR: { value: 1.3 },
+			iridescenceThicknessMinimum: { value: 100 },
+			iridescenceThicknessMaximum: { value: 400 },
+			iridescenceThicknessMap: { value: null },
+			sheen: { value: 0 },
+			sheenColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
+			sheenColorMap: { value: null },
+			sheenRoughness: { value: 1 },
+			sheenRoughnessMap: { value: null },
+			transmission: { value: 0 },
+			transmissionMap: { value: null },
+			transmissionSamplerSize: { value: /*@__PURE__*/ new Vector2() },
+			transmissionSamplerMap: { value: null },
+			thickness: { value: 0 },
+			thicknessMap: { value: null },
+			attenuationDistance: { value: 0 },
+			attenuationColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
+			specularIntensity: { value: 1 },
+			specularIntensityMap: { value: null },
+			specularColor: { value: /*@__PURE__*/ new Color( 1, 1, 1 ) },
+			specularColorMap: { value: null },
+		}
+	] ),
+
+	vertexShader: ShaderChunk.meshphysical_vert,
+	fragmentShader: ShaderChunk.meshphysical_frag
+
+};
+
 
 export { ShaderLib };

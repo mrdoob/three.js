@@ -6,9 +6,9 @@ import { Matrix3 } from '../../math/Matrix3.js';
  * Uniforms library for shared webgl shaders
  */
 
-class UniformsLib {
+const UniformsLib = {
 
-	static common = {
+	common: {
 
 		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
@@ -20,15 +20,15 @@ class UniformsLib {
 		alphaMap: { value: null },
 		alphaTest: { value: 0 }
 
-	};
+	},
 
-	static specularmap = {
+	specularmap: {
 
 		specularMap: { value: null },
 
-	};
+	},
 
-	static envmap = {
+	envmap: {
 
 		envMap: { value: null },
 		flipEnvMap: { value: - 1 },
@@ -36,78 +36,78 @@ class UniformsLib {
 		ior: { value: 1.5 }, // physical
 		refractionRatio: { value: 0.98 } // basic, lambert, phong
 
-	};
+	},
 
-	static aomap = {
+	aomap: {
 
 		aoMap: { value: null },
 		aoMapIntensity: { value: 1 }
 
-	};
+	},
 
-	static lightmap = {
+	lightmap: {
 
 		lightMap: { value: null },
 		lightMapIntensity: { value: 1 }
 
-	};
+	},
 
-	static emissivemap = {
+	emissivemap: {
 
 		emissiveMap: { value: null }
 
-	};
+	},
 
-	static bumpmap = {
+	bumpmap: {
 
 		bumpMap: { value: null },
 		bumpScale: { value: 1 }
 
-	};
+	},
 
-	static normalmap = {
+	normalmap: {
 
 		normalMap: { value: null },
 		normalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) }
 
-	};
+	},
 
-	static displacementmap = {
+	displacementmap: {
 
 		displacementMap: { value: null },
 		displacementScale: { value: 1 },
 		displacementBias: { value: 0 }
 
-	};
+	},
 
-	static roughnessmap = {
+	roughnessmap: {
 
 		roughnessMap: { value: null }
 
-	};
+	},
 
-	static metalnessmap = {
+	metalnessmap: {
 
 		metalnessMap: { value: null }
 
-	};
+	},
 
-	static gradientmap = {
+	gradientmap: {
 
 		gradientMap: { value: null }
 
-	};
+	},
 
-	static fog = {
+	fog: {
 
 		fogDensity: { value: 0.00025 },
 		fogNear: { value: 1 },
 		fogFar: { value: 2000 },
 		fogColor: { value: /*@__PURE__*/ new Color( 0xffffff ) }
 
-	};
+	},
 
-	static lights = {
+	lights: {
 
 		ambientLightColor: { value: [] },
 
@@ -184,9 +184,9 @@ class UniformsLib {
 		ltc_1: { value: null },
 		ltc_2: { value: null }
 
-	};
+	},
 
-	static points = {
+	points: {
 
 		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
@@ -197,9 +197,9 @@ class UniformsLib {
 		alphaTest: { value: 0 },
 		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
-	};
+	},
 
-	static sprite = {
+	sprite: {
 
 		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
@@ -210,8 +210,8 @@ class UniformsLib {
 		alphaTest: { value: 0 },
 		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
-	};
+	}
 
-}
+};
 
 export { UniformsLib };
