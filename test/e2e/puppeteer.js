@@ -163,7 +163,7 @@ async function main() {
 
 	browser.on( 'targetdestroyed', target => {
 
-		if ( target.type() === 'other' ) close();
+		if ( process.env.CI === undefined && target.type() === 'other' ) close();
 
 	} );
 
