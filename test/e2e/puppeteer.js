@@ -26,6 +26,7 @@ const parseTime = 2; // 2 seconds per megabyte
 const exceptionList = [
 
 	'css3d_periodictable', // investigate
+	'misc_uv_tests', // investigate
 	'webgl_buffergeometry_glbufferattribute', // investigate
 	'webgl_effects_ascii', // renders differently on different platforms, investigate
 	'webgl_lights_spotlights', // investigate
@@ -36,7 +37,6 @@ const exceptionList = [
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
-	'webgpu*',
 	'webxr_vr_sandbox', // "WebGL: INVALID_VALUE: texSubImage2D: no canvas" investigate
 	
 	// video tag is not deterministic enough, investigate
@@ -46,6 +46,8 @@ const exceptionList = [
 ].map( regexify );
 
 /* CONFIG VARIABLES END */
+
+const temporaryWebGPUHack = true; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 const LAST_REVISION_URLS = {
     linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
@@ -59,7 +61,7 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixels
 
-const networkTimeout = 180; // 2 minutes - set to 0 to disable
+const networkTimeout = 180; // 3 minutes - set to 0 to disable
 const renderTimeout = 1; // 1 second - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
@@ -150,8 +152,6 @@ async function main() {
 
 	const flags = [ '--enable-unsafe-webgpu' ];
 
-	const temporaryWebGPUHack = true; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
-
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
@@ -163,7 +163,7 @@ async function main() {
 
 	browser.on( 'targetdestroyed', target => {
 
-		if ( process.env.CI === undefined && target.type() === 'other' ) close();
+		if ( process.env.CI === undefined ) close();
 
 	} );
 
