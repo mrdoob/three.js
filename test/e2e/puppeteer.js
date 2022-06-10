@@ -104,6 +104,13 @@ async function downloadLatestChromium() {
 
 }
 
+async function fromSurface( session ) {
+
+	const b64 = await session.send( 'Page.captureScreenshot', { fromSurface: false } );
+	return Buffer.from( b64.data, 'base64' );
+
+}
+
 async function main() {
 
 	/* Find files */
@@ -143,7 +150,7 @@ async function main() {
 
 	const flags = [ '--enable-unsafe-webgpu' ];
 
-	const temporaryWebGPUHack = false; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
+	const temporaryWebGPUHack = true; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
@@ -156,7 +163,7 @@ async function main() {
 
 	browser.on( 'targetdestroyed', target => {
 
-		if ( target.type() === 'browser' ) close();
+		if ( target.type() === 'other' ) close();
 
 	} );
 
@@ -226,7 +233,9 @@ async function main() {
 		// TODO: remove this when https://github.com/puppeteer/puppeteer/issues/1910 will be fixed
 		const { width, height } = viewport;
 		const { windowId } = await session.send( 'Browser.getWindowForTarget' );
-		await session.send( 'Browser.setWindowBounds', { windowId, bounds: { width: width + 16, height: height + 133 } } );
+		await session.send( 'Browser.setWindowBounds', { windowId, bounds: { width, height } } );
+		const { width: clientWidth, height: clientHeight } = ( await jimp.read( await fromSurface( session ) ) ).bitmap;
+		await session.send( 'Browser.setWindowBounds', { windowId, bounds: { width: 2 * width - clientWidth, height: 2 * height - clientHeight } } );
 
 	}
 
@@ -339,20 +348,7 @@ async function main() {
 
 			}
 
-			let screenshotData;
-
-			if ( temporaryWebGPUHack ) {
-
-				const b64 = await session.send( 'Page.captureScreenshot', { fromSurface: false } );
-				screenshotData = Buffer.from( b64.data, 'base64' );
-
-			} else {
-
-				screenshotData = await page.screenshot();
-
-			}
-
-			const screenshot = await jimp.read( screenshotData );
+			const screenshot = await jimp.read( temporaryWebGPUHack ? await fromSurface( session ) : await page.screenshot() );
 			screenshot.scale( 1 / viewScale ).quality( jpgQuality );
 
 			if ( isMakeScreenshot ) {
