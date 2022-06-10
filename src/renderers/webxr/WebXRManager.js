@@ -11,7 +11,6 @@ import {
 	DepthFormat,
 	DepthStencilFormat,
 	RGBAFormat,
-	sRGBEncoding,
 	UnsignedByteType,
 	UnsignedIntType,
 	UnsignedInt248Type,
@@ -297,7 +296,7 @@ class WebXRManager extends EventDispatcher {
 					}
 
 					const projectionlayerInit = {
-						colorFormat: ( renderer.outputEncoding === sRGBEncoding ) ? gl.SRGB8_ALPHA8 : gl.RGBA8,
+						colorFormat: gl.RGBA8,
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
