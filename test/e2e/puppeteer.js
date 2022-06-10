@@ -150,7 +150,7 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--enable-unsafe-webgpu' ];
+	const flags = process.platform === 'linux' ? [ '--enable-unsafe-webgpu', '--enable-features=Vulkan' ] : [ '--enable-unsafe-webgpu' ];
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
