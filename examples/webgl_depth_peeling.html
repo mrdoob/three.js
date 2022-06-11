@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - cube</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { FullScreenQuad } from './jsm/postprocessing/Pass.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+			export class DepthPeeling {
+
+				globalUniforms;
+				underCompositeMaterial = new THREE.ShaderMaterial( {
+					vertexShader: `
+		varying vec2 vUv;
+		void main() {
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		}`,
+					fragmentShader: `
+        uniform sampler2D tDst;
+        uniform sampler2D tSrc;
+        varying vec2 vUv;
+        void main() {
+          vec4 d = texture2D(tDst, vUv);
+          vec4 s = texture2D(tSrc, vUv);
+          vec3 c = d.a * d.xyz + (1.-d.a)*s.a*s.xyz;
+          float a = s.a - s.a*d.a + d.a;
+          gl_FragColor = vec4(c, a);
+          // gl_FragColor = s;
+        }`,
+					uniforms: {
+						tDst: { value: null },
+						tSrc: { value: null },
+					},
+				} );
+				ping;
+				pong;
+				depth;
+				one = new THREE.DataTexture( new Uint8Array( [ 1, 1, 1, 1 ] ), 1, 1 );
+				quad = new FullScreenQuad( this.underCompositeMaterial );
+				screenSize = new THREE.Vector2();
+				originalClearColor = new THREE.Color();
+				ownScene = new THREE.Scene();
+				constructor( p ) {
+
+					this.globalUniforms = {
+						uPrevDepthTexture: { value: null },
+						uPrevColorTexture: { value: null },
+						uReciprocalScreenSize: { value: new THREE.Vector2( 1, 1 ) },
+					};
+
+					const makeRenderTargetTuple = () => [
+						new THREE.WebGLRenderTarget( p.width, p.height, {
+							depthTexture: new THREE.DepthTexture( p.width, p.height ),
+						} ),
+						new THREE.WebGLRenderTarget( p.width, p.height ),
+					];
+					this.ping = makeRenderTargetTuple();
+					this.pong = makeRenderTargetTuple();
+					this.depth = p.depth;
+
+				}
+
+				add( sceneGraph ) {
+
+					const clonedScene = sceneGraph.clone( true );
+					clonedScene.traverse( ( obj ) => {
+
+						if ( obj instanceof THREE.Mesh && obj.material instanceof THREE.Material ) {
+
+							const clonedMaterial = obj.material.clone();
+							clonedMaterial.blending = THREE.NoBlending;
+							clonedMaterial.onBeforeCompile = ( shader ) => {
+
+								shader.uniforms.uReciprocalScreenSize =
+									this.globalUniforms.uReciprocalScreenSize;
+								shader.uniforms.uPrevDepthTexture =
+									this.globalUniforms.uPrevDepthTexture;
+								shader.fragmentShader = `
+// --- DEPTH PEELING SHADER CHUNK (START) (uniform definition)
+uniform vec2 uReciprocalScreenSize;
+uniform sampler2D uPrevDepthTexture;
+// --- DEPTH PEELING SHADER CHUNK (END)
+					${shader.fragmentShader}
+				`;
+								//peel depth
+								shader.fragmentShader = shader.fragmentShader.replace(
+									/}$/gm,
+									`
+// --- DEPTH PEELING SHADER CHUNK (START) (peeling)
+  vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
+  float prevDepth = texture2D(uPrevDepthTexture,screenPos).x;
+  if( prevDepth + 0.00001 >= gl_FragCoord.z )
+      discard;
+// --- DEPTH PEELING SHADER CHUNK (END)
+}
+					`
+								);
+
+							};
+
+							obj.material = clonedMaterial;
+							obj.material.needsUpdate = true;
+
+						}
+
+					} );
+					this.ownScene.add( clonedScene );
+
+				}
+
+				render(
+					renderer,
+					camera,
+					renderTarget
+				) {
+
+					const originalRenderTarget = renderer.getRenderTarget();
+					renderer.getSize( this.screenSize );
+
+					if (
+						this.screenSize.width !== this.ping[ 0 ].width ||
+						this.screenSize.height !== this.ping[ 0 ].height
+					)
+						this.setScreenSize( this.screenSize.width, this.screenSize.height );
+					const width = this.screenSize.width;
+					const height = this.screenSize.height;
+					this.globalUniforms.uReciprocalScreenSize.value = new THREE.Vector2(
+						1 / width,
+						1 / height
+					);
+
+					const [ layerA, compositeA ] = this.ping;
+					const [ layerB, compositeB ] = this.pong;
+					renderer.getClearColor( this.originalClearColor );
+					renderer.setClearColor( 0x000000, 0 );
+					renderer.setRenderTarget( layerA );
+					renderer.clear();
+					renderer.setRenderTarget( compositeA );
+					renderer.clear();
+
+					const [ , finalComposite ] = new Array( this.depth ).fill( 0 ).reduce(
+						(
+							[ prevDepth, prevComposite ],
+							_,
+							idx
+						) => {
+
+							const otherLayer = prevDepth === layerA ? layerB : layerA;
+							const otherComposite =
+								prevComposite === compositeA ? compositeB : compositeA;
+							this.globalUniforms.uPrevDepthTexture.value =
+								idx === 0 ? this.one : prevDepth.depthTexture;
+							renderer.setRenderTarget( otherLayer );
+							renderer.clear();
+							renderer.render( this.ownScene, camera );
+
+							renderer.setRenderTarget(
+								idx < this.depth - 1
+									? otherComposite // If it's not the final step then proceed ping-ponging
+									: renderTarget // If it's the final step, and if renderTarget is given,
+										? renderTarget // ... then render to the given render Target
+										: renderTarget === undefined // if render targen is undefined,
+											? otherComposite // ... then keep ping-ponging
+											: null // or render to the main frame buffer
+							);
+							renderer.clear();
+							this.underCompositeMaterial.uniforms.tDst.value = prevComposite.texture;
+							this.underCompositeMaterial.uniforms.tSrc.value = otherLayer.texture;
+							this.underCompositeMaterial.uniformsNeedUpdate = true;
+							this.quad.render( renderer );
+							return [ otherLayer, otherComposite ];
+
+						},
+						[ layerA, compositeA ]
+					);
+
+					renderer.setRenderTarget( originalRenderTarget );
+
+					return finalComposite;
+
+				}
+				getDepth() {
+
+					return this.depth;
+
+				}
+				setDepth( depth ) {
+
+					this.depth = depth;
+
+				}
+				setScreenSize( width, height ) {
+
+					( this.globalUniforms.uReciprocalScreenSize.value ).set(
+						1 / width,
+						1 / height
+					);
+					[ this.ping, this.pong ].forEach( ( [ rtWithDepth, rtWithoutDepth ] ) => {
+
+						rtWithDepth.setSize( width, height );
+						rtWithoutDepth.setSize( width, height );
+						rtWithDepth.depthTexture.dispose();
+						rtWithDepth.depthTexture = new THREE.DepthTexture( width, height );
+
+					} );
+
+				}
+
+			}
+
+			const AppState = {
+				Enabled: true,
+				Depth: 3,
+			};
+			init();
+			function init() {
+
+				const renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				const scene = new THREE.Scene();
+				const width = window.innerWidth, height = window.innerHeight;
+				const camera = new THREE.PerspectiveCamera( 75, width / height, 0.1, 1000 );
+				camera.position.z = 5;
+
+				renderer.shadowMap.enabled = true;
+
+				const dirLight = new THREE.DirectionalLight();
+				dirLight.position.set( 0, 3, 0 );
+				dirLight.castShadow = true;
+				scene.add( dirLight );
+				scene.add( new THREE.AmbientLight( undefined, 0.5 ) );
+
+				const sphere = new THREE.Mesh(
+					new THREE.SphereBufferGeometry(),
+					new THREE.MeshStandardMaterial()
+				);
+				sphere.translateY( 3 ).translateX( 1.5 );
+				sphere.castShadow = true;
+				scene.add( sphere );
+
+				const knot = new THREE.Mesh(
+					new THREE.TorusKnotBufferGeometry( undefined, undefined, 128, 32 ),
+					new THREE.MeshStandardMaterial( {
+						transparent: true,
+						opacity: 0.7,
+						side: THREE.DoubleSide,
+					} )
+				);
+				knot.receiveShadow = true;
+				scene.add( knot );
+
+				scene.add(
+					new THREE.Mesh(
+						new THREE.BoxBufferGeometry(),
+						new THREE.MeshBasicMaterial( { color: 0xf0a000 } )
+					)
+				);
+
+				const texture = new THREE.TextureLoader().load(
+					'textures/sprite0.png'
+				);
+				const plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 3, 3 ),
+					new THREE.MeshStandardMaterial( { map: texture, side: THREE.DoubleSide } )
+				);
+				plane.translateX( - 1.6 );
+				plane.translateY( 1.5 );
+				scene.add( plane );
+
+				const plane2 = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 3, 3 ),
+					new THREE.MeshStandardMaterial( {
+						map: texture,
+						transparent: true,
+						side: THREE.DoubleSide,
+					} )
+				);
+				plane2
+					.translateX( - 1.2 )
+					.translateY( - 1.5 )
+					.translateZ( 0 )
+					.rotateY( - 2 * Math.PI * ( 1 / 10 ) );
+				scene.add( plane2 );
+
+				const dp = new DepthPeeling( { depth: AppState.Depth, width: window.innerWidth, height: window.innerHeight } );
+				dp.add( scene );
+				const animate = () =>
+					requestAnimationFrame( () =>
+						AppState.Enabled ? dp.render( renderer, camera, null ) : renderer.render( scene, camera )
+					 );
+
+
+				const orbit = new OrbitControls( camera, renderer.domElement );
+				orbit.update();
+				orbit.addEventListener( 'change', animate );
+
+
+				animate();
+
+				const gui = new GUI();
+				gui.add( AppState, 'Enabled' );
+				gui.add( AppState, 'Depth' ).min( 1 ).max( 5 ).step( 1 );
+
+			}
+
+	</script>
+	</body>
+</html>
