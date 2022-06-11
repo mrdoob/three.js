@@ -235,7 +235,7 @@ uniform sampler2D uPrevDepthTexture;
 				Depth: 3,
 			};
 			init();
-			function init() {
+			async function init() {
 
 				const renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -281,7 +281,7 @@ uniform sampler2D uPrevDepthTexture;
 					)
 				);
 
-				const texture = new THREE.TextureLoader().load(
+				const texture = await new THREE.TextureLoader().loadAsync(
 					'textures/sprite0.png'
 				);
 				const plane = new THREE.Mesh(
@@ -323,8 +323,13 @@ uniform sampler2D uPrevDepthTexture;
 				animate();
 
 				const gui = new GUI();
-				gui.add( AppState, 'Enabled' );
-				gui.add( AppState, 'Depth' ).min( 1 ).max( 5 ).step( 1 );
+				gui.add( AppState, 'Enabled' ).onChange( animate );
+				gui.add( AppState, 'Depth' ).min( 1 ).max( 5 ).step( 1 ).onChange( v => {
+
+					dp.setDepth( v );
+					animate();
+
+				} );
 
 			}
 
