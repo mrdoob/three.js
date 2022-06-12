@@ -548,42 +548,50 @@ class Matrix4 {
 	// base on https://lxjk.github.io/2017/09/03/Fast-4x4-Matrix-Inverse-with-SSE-SIMD-Explained.html
 	invertTransform() {
 
+		let te = this.elements, tmp,
+			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ],
+			n12 = te[ 4 ], n22 = te[ 5 ], n32 = te[ 6 ],
+			n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ],
+			n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ];
+
 		// invert rotation
-		const te = this.elements;
-		let tmp;
-		tmp = te[ 1 ]; te[ 1 ] = te[ 4 ]; te[ 4 ] = tmp;
-		tmp = te[ 2 ]; te[ 2 ] = te[ 8 ]; te[ 8 ] = tmp;
-		tmp = te[ 6 ]; te[ 6 ] = te[ 9 ]; te[ 9 ] = tmp;
+		tmp = n21; n21 = n12; n12 = tmp;
+		tmp = n31; n31 = n13; n13 = tmp;
+		tmp = n32; n32 = n23; n23 = tmp;
 
 		// invert scale
-		const squareSizeX = te[ 0 ] * te[ 0 ] + te[ 4 ] * te[ 4 ] + te[ 8 ] * te[ 8 ];
-		const squareSizeY = te[ 1 ] * te[ 1 ] + te[ 5 ] * te[ 5 ] + te[ 9 ] * te[ 9 ];
-		const squareSizeZ = te[ 2 ] * te[ 2 ] + te[ 6 ] * te[ 6 ] + te[ 10 ] * te[ 10 ];
+		const squareSizeX = n11 * n11 + n12 * n12 + n13 * n13;
+		const squareSizeY = n21 * n21 + n22 * n22 + n23 * n23;
+		const squareSizeZ = n31 * n31 + n32 * n32 + n33 * n33;
 
 		const rSquareSizeX = squareSizeX == 0 ? 1 : 1 / squareSizeX;
 		const rSquareSizeY = squareSizeY == 0 ? 1 : 1 / squareSizeY;
 		const rSquareSizeZ = squareSizeZ == 0 ? 1 : 1 / squareSizeZ;
 
-		te[ 0 ] *= rSquareSizeX;
-		te[ 1 ] *= rSquareSizeY;
-		te[ 2 ] *= rSquareSizeZ;
+		n11 *= rSquareSizeX;
+		n21 *= rSquareSizeY;
+		n31 *= rSquareSizeZ;
+		n12 *= rSquareSizeX;
+		n22 *= rSquareSizeY;
+		n32 *= rSquareSizeZ;
+		n13 *= rSquareSizeX;
+		n23 *= rSquareSizeY;
+		n33 *= rSquareSizeZ;
 
-		te[ 4 ] *= rSquareSizeX;
-		te[ 5 ] *= rSquareSizeY;
-		te[ 6 ] *= rSquareSizeZ;
-
-		te[ 8 ] *= rSquareSizeX;
-		te[ 9 ] *= rSquareSizeY;
-		te[ 10 ] *= rSquareSizeZ;
+		te[ 0 ] = n11;
+		te[ 1 ] = n21;
+		te[ 2 ] = n31;
+		te[ 4 ] = n12;
+		te[ 5 ] = n22;
+		te[ 6 ] = n32;
+		te[ 8 ] = n13;
+		te[ 9 ] = n23;
+		te[ 10 ] = n33;
 
 		// invert translate
-		const Tx = te[ 12 ];
-		const Ty = te[ 13 ];
-		const Tz = te[ 14 ];
-
-		te[ 12 ] = - ( te[ 0 ] * Tx + te[ 4 ] * Ty + te[ 8 ] * Tz );
-		te[ 13 ] = - ( te[ 1 ] * Tx + te[ 5 ] * Ty + te[ 9 ] * Tz );
-		te[ 14 ] = - ( te[ 2 ] * Tx + te[ 6 ] * Ty + te[ 10 ] * Tz );
+		te[ 12 ] = - ( n11 * n14 + n12 * n24 + n13 * n34 );
+		te[ 13 ] = - ( n21 * n14 + n22 * n24 + n23 * n34 );
+		te[ 14 ] = - ( n31 * n14 + n32 * n24 + n33 * n34 );
 
 		return this;
 
