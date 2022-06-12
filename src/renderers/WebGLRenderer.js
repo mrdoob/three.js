@@ -56,6 +56,28 @@ function createCanvasElement() {
 
 function WebGLRenderer( parameters = {} ) {
 
+	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
+			revision: REVISION,
+		} } ) );
+
+	}
+
+	if ( typeof window !== 'undefined' ) {
+
+		if ( window.__THREE__ ) {
+
+			console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
+
+		} else {
+
+			window.__THREE__ = REVISION;
+
+		}
+
+	}
+
 	this.isWebGLRenderer = true;
 
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),

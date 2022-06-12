@@ -1,5 +1,3 @@
-import { REVISION } from './constants.js';
-
 export { WebGLArrayRenderTarget } from './renderers/WebGLArrayRenderTarget.js';
 export { WebGL3DRenderTarget } from './renderers/WebGL3DRenderTarget.js';
 export { WebGLMultipleRenderTargets } from './renderers/WebGLMultipleRenderTargets.js';
@@ -155,25 +153,3 @@ export { PMREMGenerator } from './extras/PMREMGenerator.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
-
-if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
-
-	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
-		revision: REVISION,
-	} } ) );
-
-}
-
-if ( typeof window !== 'undefined' ) {
-
-	if ( window.__THREE__ ) {
-
-		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
-
-	} else {
-
-		window.__THREE__ = REVISION;
-
-	}
-
-}
