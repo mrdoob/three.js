@@ -532,6 +532,54 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'invertTransform', ( assert ) => {
+
+			var zero = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+			var identity = new Matrix4();
+
+			var a = new Matrix4();
+			var b = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+
+			a.copy( b ).invertTransform();
+			assert.ok( matrixEquals4( a, zero ), 'Passed!' );
+
+
+			var testMatrices = [
+				new Matrix4().makeRotationX( 0.3 ),
+				new Matrix4().makeRotationX( - 0.3 ),
+				new Matrix4().makeRotationY( 0.3 ),
+				new Matrix4().makeRotationY( - 0.3 ),
+				new Matrix4().makeRotationZ( 0.3 ),
+				new Matrix4().makeRotationZ( - 0.3 ),
+				new Matrix4().makeScale( 1, 2, 3 ),
+				new Matrix4().makeScale( 1 / 8, 1 / 2, 1 / 3 ),
+				new Matrix4().makeTranslation( 1, 2, 3 )
+			];
+
+			for ( var i = 0, il = testMatrices.length; i < il; i ++ ) {
+
+				var m = testMatrices[ i ];
+
+				var mInverse = new Matrix4().copy( m ).invertTransform();
+				var mSelfInverse = m.clone();
+				mSelfInverse.copy( mSelfInverse ).invertTransform();
+
+				// self-inverse should the same as inverse
+				assert.ok( matrixEquals4( mSelfInverse, mInverse ), 'Passed!' );
+
+				// the determinant of the inverse should be the reciprocal
+				assert.ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, 'Passed!' );
+
+				var mProduct = new Matrix4().multiplyMatrices( m, mInverse );
+
+				// the determinant of the identity matrix is 1
+				assert.ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, 'Passed!' );
+				assert.ok( matrixEquals4( mProduct, identity ), 'Passed!' );
+
+			}
+
+		} );
+
 		QUnit.test( 'scale', ( assert ) => {
 
 			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );

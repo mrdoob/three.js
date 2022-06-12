@@ -545,6 +545,50 @@ class Matrix4 {
 
 	}
 
+	// base on https://lxjk.github.io/2017/09/03/Fast-4x4-Matrix-Inverse-with-SSE-SIMD-Explained.html
+	invertTransform() {
+
+		// invert rotation
+		const te = this.elements;
+		let tmp;
+		tmp = te[ 1 ]; te[ 1 ] = te[ 4 ]; te[ 4 ] = tmp;
+		tmp = te[ 2 ]; te[ 2 ] = te[ 8 ]; te[ 8 ] = tmp;
+		tmp = te[ 6 ]; te[ 6 ] = te[ 9 ]; te[ 9 ] = tmp;
+
+		// invert scale
+		const squareSizeX = te[ 0 ] * te[ 0 ] + te[ 4 ] * te[ 4 ] + te[ 8 ] * te[ 8 ];
+		const squareSizeY = te[ 1 ] * te[ 1 ] + te[ 5 ] * te[ 5 ] + te[ 9 ] * te[ 9 ];
+		const squareSizeZ = te[ 2 ] * te[ 2 ] + te[ 6 ] * te[ 6 ] + te[ 10 ] * te[ 10 ];
+
+		const rSquareSizeX = squareSizeX == 0 ? 1 : 1 / squareSizeX;
+		const rSquareSizeY = squareSizeY == 0 ? 1 : 1 / squareSizeY;
+		const rSquareSizeZ = squareSizeZ == 0 ? 1 : 1 / squareSizeZ;
+
+		te[ 0 ] *= rSquareSizeX;
+		te[ 1 ] *= rSquareSizeY;
+		te[ 2 ] *= rSquareSizeZ;
+
+		te[ 4 ] *= rSquareSizeX;
+		te[ 5 ] *= rSquareSizeY;
+		te[ 6 ] *= rSquareSizeZ;
+
+		te[ 8 ] *= rSquareSizeX;
+		te[ 9 ] *= rSquareSizeY;
+		te[ 10 ] *= rSquareSizeZ;
+
+		// invert translate
+		const Tx = te[ 12 ];
+		const Ty = te[ 13 ];
+		const Tz = te[ 14 ];
+
+		te[ 12 ] = - ( te[ 0 ] * Tx + te[ 4 ] * Ty + te[ 8 ] * Tz );
+		te[ 13 ] = - ( te[ 1 ] * Tx + te[ 5 ] * Ty + te[ 9 ] * Tz );
+		te[ 14 ] = - ( te[ 2 ] * Tx + te[ 6 ] * Ty + te[ 10 ] * Tz );
+
+		return this;
+
+	}
+
 	scale( v ) {
 
 		const te = this.elements;
