@@ -548,11 +548,11 @@ class Matrix4 {
 	// base on https://lxjk.github.io/2017/09/03/Fast-4x4-Matrix-Inverse-with-SSE-SIMD-Explained.html
 	invertTransform() {
 
-		let te = this.elements, tmp,
+		const te = this.elements, n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ];
+		let tmp,
 			n11 = te[ 0 ], n21 = te[ 1 ], n31 = te[ 2 ],
 			n12 = te[ 4 ], n22 = te[ 5 ], n32 = te[ 6 ],
-			n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ],
-			n14 = te[ 12 ], n24 = te[ 13 ], n34 = te[ 14 ];
+			n13 = te[ 8 ], n23 = te[ 9 ], n33 = te[ 10 ];
 
 		// invert rotation
 		tmp = n21; n21 = n12; n12 = tmp;
