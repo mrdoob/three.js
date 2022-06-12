@@ -4,7 +4,7 @@ import babelrc from './.babelrc.json';
 
 export function glconstants() {
 
-	var constants = {
+	const constants = {
 		POINTS: 0, ZERO: 0, NONE: 0,
 		LINES: 1, ONE: 1,
 		LINE_LOOP: 2,
@@ -283,6 +283,29 @@ ${ code }`;
 
 }
 
+const outro = /* js */ `if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+	__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'register', { detail: {
+		revision: REVISION,
+	} } ) );
+
+}
+
+if ( typeof window !== 'undefined' ) {
+
+	if ( window.__THREE__ ) {
+
+		console.warn( 'WARNING: Multiple instances of Three.js being imported.' );
+
+	} else {
+
+		window.__THREE__ = REVISION;
+
+	}
+
+}
+`;
+
 let builds = [
 	{
 		input: 'src/Three.js',
@@ -295,7 +318,8 @@ let builds = [
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.module.js'
+				file: 'build/three.module.js',
+				outro: outro
 			}
 		]
 	},
@@ -318,12 +342,14 @@ let builds = [
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.js',
+				outro: outro,
 				indent: '\t'
 			},
 			{
 				format: 'cjs',
 				name: 'THREE',
 				file: 'build/three.cjs',
+				outro: outro,
 				indent: '\t'
 			}
 		]
@@ -347,7 +373,8 @@ let builds = [
 			{
 				format: 'umd',
 				name: 'THREE',
-				file: 'build/three.min.js'
+				file: 'build/three.min.js',
+				outro: outro
 			}
 		]
 	}
