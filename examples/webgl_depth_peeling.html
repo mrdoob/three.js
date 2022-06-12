@@ -28,9 +28,13 @@
 			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
-			class DepthPeeling {
+			export class DepthPeeling {
 
-				globalUniforms;
+				globalUniforms = {
+					uPrevDepthTexture: { value: null },
+					uReciprocalScreenSize: { value: new THREE.Vector2( 1, 1 ) },
+				};
+
 				layers = [];
 				depth = 3;
 				one = new THREE.DataTexture( new Uint8Array( [ 1, 1, 1, 1 ] ), 1, 1 );
@@ -43,17 +47,12 @@
 					} )
 				);
 				screenSize = new THREE.Vector2();
+				pixelRatio = 1;
 				originalClearColor = new THREE.Color();
 				ownScene = new THREE.Scene();
 				constructor( p ) {
 
-					this.globalUniforms = {
-						uPrevDepthTexture: { value: null },
-						uPrevColorTexture: { value: null },
-						uReciprocalScreenSize: { value: new THREE.Vector2( 1, 1 ) },
-					};
-
-					this.setScreenSize( p.width, p.height );
+					this.setScreenSize( p.width, p.height, p.pixelRatio );
 					this.setDepth( p.depth );
 
 	}
@@ -87,7 +86,7 @@ uniform sampler2D uPrevDepthTexture;
 // --- DEPTH PEELING SHADER CHUNK (START) (peeling)
   vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
   float prevDepth = texture2D(uPrevDepthTexture,screenPos).x;
-  if( prevDepth + 0.00001 >= gl_FragCoord.z )
+  if( prevDepth >= gl_FragCoord.z )
       discard;
 // --- DEPTH PEELING SHADER CHUNK (END)
 }
@@ -111,19 +110,6 @@ uniform sampler2D uPrevDepthTexture;
 					const originalRenderTarget = renderer.getRenderTarget();
 					const originalAutoClear = renderer.autoClear;
 					renderer.autoClear = false;
-					renderer.getSize( this.screenSize );
-
-					if (
-						this.screenSize.width !== this.layers[ 0 ].width ||
-						this.screenSize.height !== this.layers[ 0 ].height
-					)
-						this.setScreenSize( this.screenSize.width, this.screenSize.height );
-					const width = this.screenSize.width;
-					const height = this.screenSize.height;
-					this.globalUniforms.uReciprocalScreenSize.value = new THREE.Vector2(
-						1 / width,
-						1 / height
-					);
 
 					renderer.getClearColor( this.originalClearColor );
 					renderer.setClearColor( 0x000000 );
@@ -163,37 +149,42 @@ uniform sampler2D uPrevDepthTexture;
 
 					while ( depth < this.layers.length ) this.layers.pop()?.dispose();
 
+					const w = this.screenSize.width * this.pixelRatio;
+					const h = this.screenSize.height * this.pixelRatio;
 					while ( this.layers.length < depth )
 						this.layers.push(
-							new THREE.WebGLRenderTarget( this.screenSize.width, this.screenSize.height, {
-								depthTexture: new THREE.DepthTexture(
-									this.screenSize.width,
-									this.screenSize.height
-								),
+							new THREE.WebGLRenderTarget( w, h, {
+								depthTexture: new THREE.DepthTexture( w, h ),
+								// samples: 2,
 							} )
 						);
 
 					this.depth = depth;
 
 	}
-				setScreenSize( width, height ) {
+				setScreenSize( width, height, pixelRatio ) {
 
+					this.screenSize.set( width, height );
+					this.pixelRatio = pixelRatio;
+					const w = width * pixelRatio;
+					const h = height * pixelRatio;
 					this.globalUniforms.uReciprocalScreenSize.value.set(
-						1 / width,
-						1 / height
+						1 / w,
+						1 / h
 					);
 
 					this.layers.forEach( ( rt ) => {
 
-						rt.setSize( width, height );
+						rt.setSize( w, h );
 						rt.depthTexture.dispose();
-						rt.depthTexture = new THREE.DepthTexture( width, height );
+						rt.depthTexture = new THREE.DepthTexture( w, h );
 
 					} );
 
-				}
+	}
 
 			}
+
 
 
 			const AppState = {
@@ -204,7 +195,7 @@ uniform sampler2D uPrevDepthTexture;
 			async function init() {
 
 				const renderer = new THREE.WebGLRenderer();
-				// renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
@@ -273,7 +264,7 @@ uniform sampler2D uPrevDepthTexture;
 					.rotateY( - 2 * Math.PI * ( 1 / 10 ) );
 				scene.add( plane2 );
 
-				const dp = new DepthPeeling( { depth: AppState.Depth, width: window.innerWidth, height: window.innerHeight } );
+				const dp = new DepthPeeling( { depth: AppState.Depth, width: window.innerWidth, height: window.innerHeight, pixelRatio: renderer.getPixelRatio() } );
 				dp.add( scene );
 				const animate = () =>
 					requestAnimationFrame( () =>
