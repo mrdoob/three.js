@@ -597,7 +597,7 @@ class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
-		this.isVector2 = true;
+		Vector2.prototype.isVector2 = true;
 
 		this.x = x;
 		this.y = y;
@@ -1080,7 +1080,7 @@ class Matrix3 {
 
 	constructor() {
 
-		this.isMatrix3 = true;
+		Matrix3.prototype.isMatrix3 = true;
 
 		this.elements = [
 
@@ -2673,7 +2673,7 @@ class Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-		this.isVector4 = true;
+		Vector4.prototype.isVector4 = true;
 
 		this.x = x;
 		this.y = y;
@@ -4303,7 +4303,7 @@ class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
 
-		this.isVector3 = true;
+		Vector3.prototype.isVector3 = true;
 
 		this.x = x;
 		this.y = y;
@@ -6300,7 +6300,7 @@ class Matrix4 {
 
 	constructor() {
 
-		this.isMatrix4 = true;
+		Matrix4.prototype.isMatrix4 = true;
 
 		this.elements = [
 
@@ -13438,12 +13438,12 @@ const UniformsLib = {
 
 	common: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 
 		map: { value: null },
-		uvTransform: { value: new Matrix3() },
-		uv2Transform: { value: new Matrix3() },
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() },
+		uv2Transform: { value: /*@__PURE__*/ new Matrix3() },
 
 		alphaMap: { value: null },
 		alphaTest: { value: 0 }
@@ -13496,7 +13496,7 @@ const UniformsLib = {
 	normalmap: {
 
 		normalMap: { value: null },
-		normalScale: { value: new Vector2( 1, 1 ) }
+		normalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) }
 
 	},
 
@@ -13531,7 +13531,7 @@ const UniformsLib = {
 		fogDensity: { value: 0.00025 },
 		fogNear: { value: 1 },
 		fogFar: { value: 2000 },
-		fogColor: { value: new Color( 0xffffff ) }
+		fogColor: { value: /*@__PURE__*/ new Color( 0xffffff ) }
 
 	},
 
@@ -13616,27 +13616,27 @@ const UniformsLib = {
 
 	points: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
 		map: { value: null },
 		alphaMap: { value: null },
 		alphaTest: { value: 0 },
-		uvTransform: { value: new Matrix3() }
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 
 	sprite: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
-		center: { value: new Vector2( 0.5, 0.5 ) },
+		center: { value: /*@__PURE__*/ new Vector2( 0.5, 0.5 ) },
 		rotation: { value: 0.0 },
 		map: { value: null },
 		alphaMap: { value: null },
 		alphaTest: { value: 0 },
-		uvTransform: { value: new Matrix3() }
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	}
 
@@ -13646,7 +13646,7 @@ const ShaderLib = {
 
 	basic: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -13662,7 +13662,7 @@ const ShaderLib = {
 
 	lambert: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -13672,7 +13672,7 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) }
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
 
@@ -13683,7 +13683,7 @@ const ShaderLib = {
 
 	phong: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -13696,8 +13696,8 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) },
-				specular: { value: new Color( 0x111111 ) },
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
+				specular: { value: /*@__PURE__*/ new Color( 0x111111 ) },
 				shininess: { value: 30 }
 			}
 		] ),
@@ -13709,7 +13709,7 @@ const ShaderLib = {
 
 	standard: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.envmap,
 			UniformsLib.aomap,
@@ -13723,7 +13723,7 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) },
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				roughness: { value: 1.0 },
 				metalness: { value: 0.0 },
 				envMapIntensity: { value: 1 } // temporary
@@ -13737,7 +13737,7 @@ const ShaderLib = {
 
 	toon: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
@@ -13749,7 +13749,7 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) }
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
 
@@ -13760,7 +13760,7 @@ const ShaderLib = {
 
 	matcap: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
@@ -13778,7 +13778,7 @@ const ShaderLib = {
 
 	points: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.points,
 			UniformsLib.fog
 		] ),
@@ -13790,7 +13790,7 @@ const ShaderLib = {
 
 	dashed: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.fog,
 			{
@@ -13807,7 +13807,7 @@ const ShaderLib = {
 
 	depth: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.displacementmap
 		] ),
@@ -13819,7 +13819,7 @@ const ShaderLib = {
 
 	normal: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
@@ -13836,7 +13836,7 @@ const ShaderLib = {
 
 	sprite: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.sprite,
 			UniformsLib.fog
 		] ),
@@ -13849,7 +13849,7 @@ const ShaderLib = {
 	background: {
 
 		uniforms: {
-			uvTransform: { value: new Matrix3() },
+			uvTransform: { value: /*@__PURE__*/ new Matrix3() },
 			t2D: { value: null },
 		},
 
@@ -13857,13 +13857,10 @@ const ShaderLib = {
 		fragmentShader: ShaderChunk.background_frag
 
 	},
-	/* -------------------------------------------------------------------------
-	//	Cube map shader
-	 ------------------------------------------------------------------------- */
 
 	cube: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.envmap,
 			{
 				opacity: { value: 1.0 }
@@ -13888,11 +13885,11 @@ const ShaderLib = {
 
 	distanceRGBA: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.displacementmap,
 			{
-				referencePosition: { value: new Vector3() },
+				referencePosition: { value: /*@__PURE__*/ new Vector3() },
 				nearDistance: { value: 1 },
 				farDistance: { value: 1000 }
 			}
@@ -13905,11 +13902,11 @@ const ShaderLib = {
 
 	shadow: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.lights,
 			UniformsLib.fog,
 			{
-				color: { value: new Color( 0x00000 ) },
+				color: { value: /*@__PURE__*/ new Color( 0x00000 ) },
 				opacity: { value: 1.0 }
 			},
 		] ),
@@ -13923,14 +13920,14 @@ const ShaderLib = {
 
 ShaderLib.physical = {
 
-	uniforms: mergeUniforms( [
+	uniforms: /*@__PURE__*/ mergeUniforms( [
 		ShaderLib.standard.uniforms,
 		{
 			clearcoat: { value: 0 },
 			clearcoatMap: { value: null },
 			clearcoatRoughness: { value: 0 },
 			clearcoatRoughnessMap: { value: null },
-			clearcoatNormalScale: { value: new Vector2( 1, 1 ) },
+			clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
 			clearcoatNormalMap: { value: null },
 			iridescence: { value: 0 },
 			iridescenceMap: { value: null },
@@ -13939,21 +13936,21 @@ ShaderLib.physical = {
 			iridescenceThicknessMaximum: { value: 400 },
 			iridescenceThicknessMap: { value: null },
 			sheen: { value: 0 },
-			sheenColor: { value: new Color( 0x000000 ) },
+			sheenColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 			sheenColorMap: { value: null },
 			sheenRoughness: { value: 1 },
 			sheenRoughnessMap: { value: null },
 			transmission: { value: 0 },
 			transmissionMap: { value: null },
-			transmissionSamplerSize: { value: new Vector2() },
+			transmissionSamplerSize: { value: /*@__PURE__*/ new Vector2() },
 			transmissionSamplerMap: { value: null },
 			thickness: { value: 0 },
 			thicknessMap: { value: null },
 			attenuationDistance: { value: 0 },
-			attenuationColor: { value: new Color( 0x000000 ) },
+			attenuationColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 			specularIntensity: { value: 1 },
 			specularIntensityMap: { value: null },
-			specularColor: { value: new Color( 1, 1, 1 ) },
+			specularColor: { value: /*@__PURE__*/ new Color( 1, 1, 1 ) },
 			specularColorMap: { value: null },
 		}
 	] ),
@@ -20893,20 +20890,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			}
 
-			if ( shadow.map === null && ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
-
-				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
-				shadow.map.texture.name = light.name + '.shadowMap';
-
-				shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
-
-				shadow.camera.updateProjectionMatrix();
-
-			}
-
 			if ( shadow.map === null ) {
 
-				const pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
+				const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 				shadow.map.texture.name = light.name + '.shadowMap';
@@ -20943,7 +20929,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			// do blur pass for VSM
 
-			if ( ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
+			if ( shadow.isPointLightShadow !== true && this.type === VSMShadowMap ) {
 
 				VSMPass( shadow, camera );
 
@@ -20970,6 +20956,12 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			shadowMaterialVertical.needsUpdate = true;
 			shadowMaterialHorizontal.needsUpdate = true;
+
+		}
+
+		if ( shadow.mapPass === null ) {
+
+			shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
 
 		}
 
@@ -25172,7 +25164,7 @@ class WebXRManager extends EventDispatcher {
 					}
 
 					const projectionlayerInit = {
-						colorFormat: ( renderer.outputEncoding === sRGBEncoding ) ? 35907 : 32856,
+						colorFormat: 32856,
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
@@ -48637,154 +48629,181 @@ class ShapePath {
 
 // Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
 
-class DataUtils {
+const {
+	floatView: _floatView,
+	uint32View: _uint32View,
+	baseTable: _baseTable,
+	shiftTable: _shiftTable,
+	mantissaTable: _mantissaTable,
+	exponentTable: _exponentTable,
+	offsetTable: _offsetTable
+} = /*@__PURE__*/ _generateTables();
 
-	// float32 to float16
+function _generateTables() {
 
-	static toHalfFloat( val ) {
+	// float32 to float16 helpers
 
-		if ( Math.abs( val ) > 65504 ) console.warn( 'THREE.DataUtils.toHalfFloat(): Value out of range.' );
+	const buffer = new ArrayBuffer( 4 );
+	const floatView = new Float32Array( buffer );
+	const uint32View = new Uint32Array( buffer );
 
-		val = clamp( val, - 65504, 65504 );
+	const baseTable = new Uint32Array( 512 );
+	const shiftTable = new Uint32Array( 512 );
 
-		_floatView[ 0 ] = val;
-		const f = _uint32View[ 0 ];
-		const e = ( f >> 23 ) & 0x1ff;
-		return _baseTable[ e ] + ( ( f & 0x007fffff ) >> _shiftTable[ e ] );
+	for ( let i = 0; i < 256; ++ i ) {
 
-	}
+		const e = i - 127;
 
-	// float16 to float32
+		// very small number (0, -0)
 
-	static fromHalfFloat( val ) {
+		if ( e < - 27 ) {
 
-		const m = val >> 10;
-		_uint32View[ 0 ] = _mantissaTable[ _offsetTable[ m ] + ( val & 0x3ff ) ] + _exponentTable[ m ];
-		return _floatView[ 0 ];
+			baseTable[ i ] = 0x0000;
+			baseTable[ i | 0x100 ] = 0x8000;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
 
-	}
+			// small number (denorm)
 
-}
+		} else if ( e < - 14 ) {
 
-// float32 to float16 helpers
+			baseTable[ i ] = 0x0400 >> ( - e - 14 );
+			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
+			shiftTable[ i ] = - e - 1;
+			shiftTable[ i | 0x100 ] = - e - 1;
 
-const _buffer = new ArrayBuffer( 4 );
-const _floatView = new Float32Array( _buffer );
-const _uint32View = new Uint32Array( _buffer );
+			// normal number
 
-const _baseTable = new Uint32Array( 512 );
-const _shiftTable = new Uint32Array( 512 );
+		} else if ( e <= 15 ) {
 
-for ( let i = 0; i < 256; ++ i ) {
+			baseTable[ i ] = ( e + 15 ) << 10;
+			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
 
-	const e = i - 127;
+			// large number (Infinity, -Infinity)
 
-	// very small number (0, -0)
+		} else if ( e < 128 ) {
 
-	if ( e < - 27 ) {
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
 
-		_baseTable[ i ] = 0x0000;
-		_baseTable[ i | 0x100 ] = 0x8000;
-		_shiftTable[ i ] = 24;
-		_shiftTable[ i | 0x100 ] = 24;
+			// stay (NaN, Infinity, -Infinity)
 
-		// small number (denorm)
+		} else {
 
-	} else if ( e < - 14 ) {
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
 
-		_baseTable[ i ] = 0x0400 >> ( - e - 14 );
-		_baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
-		_shiftTable[ i ] = - e - 1;
-		_shiftTable[ i | 0x100 ] = - e - 1;
-
-		// normal number
-
-	} else if ( e <= 15 ) {
-
-		_baseTable[ i ] = ( e + 15 ) << 10;
-		_baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
-		_shiftTable[ i ] = 13;
-		_shiftTable[ i | 0x100 ] = 13;
-
-		// large number (Infinity, -Infinity)
-
-	} else if ( e < 128 ) {
-
-		_baseTable[ i ] = 0x7c00;
-		_baseTable[ i | 0x100 ] = 0xfc00;
-		_shiftTable[ i ] = 24;
-		_shiftTable[ i | 0x100 ] = 24;
-
-		// stay (NaN, Infinity, -Infinity)
-
-	} else {
-
-		_baseTable[ i ] = 0x7c00;
-		_baseTable[ i | 0x100 ] = 0xfc00;
-		_shiftTable[ i ] = 13;
-		_shiftTable[ i | 0x100 ] = 13;
+		}
 
 	}
 
-}
+	// float16 to float32 helpers
 
-// float16 to float32 helpers
+	const mantissaTable = new Uint32Array( 2048 );
+	const exponentTable = new Uint32Array( 64 );
+	const offsetTable = new Uint32Array( 64 );
 
-const _mantissaTable = new Uint32Array( 2048 );
-const _exponentTable = new Uint32Array( 64 );
-const _offsetTable = new Uint32Array( 64 );
+	for ( let i = 1; i < 1024; ++ i ) {
 
-for ( let i = 1; i < 1024; ++ i ) {
+		let m = i << 13; // zero pad mantissa bits
+		let e = 0; // zero exponent
 
-	let m = i << 13; // zero pad mantissa bits
-	let e = 0; // zero exponent
+		// normalized
+		while ( ( m & 0x00800000 ) === 0 ) {
 
-	// normalized
-	while ( ( m & 0x00800000 ) === 0 ) {
+			m <<= 1;
+			e -= 0x00800000; // decrement exponent
 
-		m <<= 1;
-		e -= 0x00800000; // decrement exponent
+		}
 
-	}
+		m &= ~ 0x00800000; // clear leading 1 bit
+		e += 0x38800000; // adjust bias
 
-	m &= ~ 0x00800000; // clear leading 1 bit
-	e += 0x38800000; // adjust bias
-
-	_mantissaTable[ i ] = m | e;
-
-}
-
-for ( let i = 1024; i < 2048; ++ i ) {
-
-	_mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
-
-}
-
-for ( let i = 1; i < 31; ++ i ) {
-
-	_exponentTable[ i ] = i << 23;
-
-}
-
-_exponentTable[ 31 ] = 0x47800000;
-_exponentTable[ 32 ] = 0x80000000;
-for ( let i = 33; i < 63; ++ i ) {
-
-	_exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
-
-}
-
-_exponentTable[ 63 ] = 0xc7800000;
-
-for ( let i = 1; i < 64; ++ i ) {
-
-	if ( i !== 32 ) {
-
-		_offsetTable[ i ] = 1024;
+		mantissaTable[ i ] = m | e;
 
 	}
 
+	for ( let i = 1024; i < 2048; ++ i ) {
+
+		mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
+
+	}
+
+	for ( let i = 1; i < 31; ++ i ) {
+
+		exponentTable[ i ] = i << 23;
+
+	}
+
+	exponentTable[ 31 ] = 0x47800000;
+	exponentTable[ 32 ] = 0x80000000;
+
+	for ( let i = 33; i < 63; ++ i ) {
+
+		exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
+
+	}
+
+	exponentTable[ 63 ] = 0xc7800000;
+
+	for ( let i = 1; i < 64; ++ i ) {
+
+		if ( i !== 32 ) {
+
+			offsetTable[ i ] = 1024;
+
+		}
+
+	}
+
+	return {
+		floatView: floatView,
+		uint32View: uint32View,
+		baseTable: baseTable,
+		shiftTable: shiftTable,
+		mantissaTable: mantissaTable,
+		exponentTable: exponentTable,
+		offsetTable: offsetTable,
+	};
+
 }
+
+// float32 to float16
+
+function toHalfFloat( val ) {
+
+	if ( Math.abs( val ) > 65504 ) console.warn( 'THREE.DataUtils.toHalfFloat(): Value out of range.' );
+
+	val = clamp( val, - 65504, 65504 );
+
+	_floatView[ 0 ] = val;
+	const f = _uint32View[ 0 ];
+	const e = ( f >> 23 ) & 0x1ff;
+	return _baseTable[ e ] + ( ( f & 0x007fffff ) >> _shiftTable[ e ] );
+
+}
+
+// float16 to float32
+
+function fromHalfFloat( val ) {
+
+	const m = val >> 10;
+	_uint32View[ 0 ] = _mantissaTable[ _offsetTable[ m ] + ( val & 0x3ff ) ] + _exponentTable[ m ];
+	return _floatView[ 0 ];
+
+}
+
+var DataUtils = /*#__PURE__*/Object.freeze({
+	__proto__: null,
+	toHalfFloat: toHalfFloat,
+	fromHalfFloat: fromHalfFloat
+});
 
 // r133, c5bb5434555a3c3ddd784944a0a124f996fc721b
 
