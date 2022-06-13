@@ -148,7 +148,7 @@ export { Path } from './extras/core/Path.js';
 export { ShapePath } from './extras/core/ShapePath.js';
 export { CurvePath } from './extras/core/CurvePath.js';
 export { Curve } from './extras/core/Curve.js';
-export { DataUtils } from './extras/DataUtils.js';
+export * as DataUtils from './extras/DataUtils.js';
 export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { PMREMGenerator } from './extras/PMREMGenerator.js';
