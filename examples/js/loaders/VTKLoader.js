@@ -855,7 +855,7 @@
 							// Depending on the number of DataArrays
 							let arr;
 
-							if ( Object.prototype.toString.call( section.DataArray ) === '[object Array]' ) {
+							if ( Array.isArray( section.DataArray ) ) {
 
 								arr = section.DataArray;
 

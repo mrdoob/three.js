@@ -14,7 +14,11 @@
 				color: 0x000000,
 				transparent: true,
 				opacity: 0.6,
-				depthWrite: false
+				depthWrite: false,
+				stencilWrite: true,
+				stencilFunc: THREE.EqualStencilFunc,
+				stencilRef: 0,
+				stencilZPass: THREE.IncrementStencilOp
 			} );
 			super( mesh.geometry, shadowMaterial );
 			this.isShadowMesh = true;
