@@ -251,7 +251,15 @@ class Object3D extends EventDispatcher {
 
 	worldToLocal( vector ) {
 
-		return vector.applyMatrix4( _m1.copy( this.matrixWorld ).invertTransform() );
+		if ( this.matrixAutoUpdate ) {
+
+			return vector.applyMatrix4( _m1.copy( this.matrixWorld ).invertTransform() );
+
+		} else {
+
+			return vector.applyMatrix4( _m1.copy( this.matrixWorld ).invert() );
+
+		}
 
 	}
 
@@ -411,7 +419,15 @@ class Object3D extends EventDispatcher {
 
 		this.updateWorldMatrix( true, false );
 
-		_m1.copy( this.matrixWorld ).invertTransform();
+		if ( this.matrixAutoUpdate ) {
+
+			_m1.copy( this.matrixWorld ).invertTransform();
+
+		} else {
+
+			_m1.copy( this.matrixWorld ).invert();
+
+		}
 
 		if ( object.parent !== null ) {
 
