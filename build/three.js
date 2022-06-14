@@ -15690,7 +15690,7 @@
 				result = light.isPointLight === true ? _distanceMaterial : _depthMaterial;
 			}
 
-			if (_renderer.localClippingEnabled && material.clipShadows === true && material.clippingPlanes.length !== 0 || material.displacementMap && material.displacementScale !== 0 || material.alphaMap && material.alphaTest > 0) {
+			if (_renderer.localClippingEnabled && material.clipShadows === true && Array.isArray(material.clippingPlanes) && material.clippingPlanes.length !== 0 || material.displacementMap && material.displacementScale !== 0 || material.alphaMap && material.alphaTest > 0) {
 				// in this case we need a unique material instance reflecting the
 				// appropriate state
 				const keyA = result.uuid,
