@@ -48,53 +48,53 @@ class CameraHelper extends LineSegments {
 		// far
 
         if (colorFarFrustum) {
-		addLine( 'f1', 'f2', colorFarFrustum );
-		addLine( 'f2', 'f4', colorFarFrustum );
-		addLine( 'f4', 'f3', colorFarFrustum );
-		addLine( 'f3', 'f1', colorFarFrustum );
+			addLine( 'f1', 'f2', colorFarFrustum );
+			addLine( 'f2', 'f4', colorFarFrustum );
+			addLine( 'f4', 'f3', colorFarFrustum );
+			addLine( 'f3', 'f1', colorFarFrustum );
         }
 
 		// sides
 
         if (colorSideFrustum) {
-		addLine( 'n1', 'f1', colorSideFrustum );
-		addLine( 'n2', 'f2', colorSideFrustum );
-		addLine( 'n3', 'f3', colorSideFrustum );
-		addLine( 'n4', 'f4', colorSideFrustum );
+			addLine( 'n1', 'f1', colorSideFrustum );
+			addLine( 'n2', 'f2', colorSideFrustum );
+			addLine( 'n3', 'f3', colorSideFrustum );
+			addLine( 'n4', 'f4', colorSideFrustum );
         }
 
 		// cone
 
         if (colorCone) {
-		addLine( 'p', 'n1', colorCone );
-		addLine( 'p', 'n2', colorCone );
-		addLine( 'p', 'n3', colorCone );
-		addLine( 'p', 'n4', colorCone );
+			addLine( 'p', 'n1', colorCone );
+			addLine( 'p', 'n2', colorCone );
+			addLine( 'p', 'n3', colorCone );
+			addLine( 'p', 'n4', colorCone );
         }
 
 		// up
 
         if (colorUp) {
-		addLine( 'u1', 'u2', colorUp );
-		addLine( 'u2', 'u3', colorUp );
-		addLine( 'u3', 'u1', colorUp );
+			addLine( 'u1', 'u2', colorUp );
+			addLine( 'u2', 'u3', colorUp );
+			addLine( 'u3', 'u1', colorUp );
         }
 
 		// target
 
 		if (colorTarget) {
-        addLine( 'c', 't', colorTarget );
-		addLine( 'p', 'c', colorTarget );
+        	addLine( 'c', 't', colorTarget );
+			addLine( 'p', 'c', colorTarget );
         }
 
 		// cross
 
         if (colorCross) {
-		addLine( 'cn1', 'cn2', colorCross );
-		addLine( 'cn3', 'cn4', colorCross );
+			addLine( 'cn1', 'cn2', colorCross );
+			addLine( 'cn3', 'cn4', colorCross );
 
-		addLine( 'cf1', 'cf2', colorCross );
-		addLine( 'cf3', 'cf4', colorCross );
+			addLine( 'cf1', 'cf2', colorCross );
+			addLine( 'cf3', 'cf4', colorCross );
         }
 
 		function addLine( a, b, color ) {
@@ -163,46 +163,46 @@ class CameraHelper extends LineSegments {
 		// center / target
 
         if (this.colorOptions.colorTarget) {
-		setPoint( 'c', pointMap, geometry, _camera, 0, 0, - 1 );
-		setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
+			setPoint( 'c', pointMap, geometry, _camera, 0, 0, - 1 );
+			setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
         }
 
 		// near
 
         if (this.colorOptions.colorNearFrustum) {
-		setPoint( 'n1', pointMap, geometry, _camera, - w, - h, - 1 );
-		setPoint( 'n2', pointMap, geometry, _camera, w, - h, - 1 );
-		setPoint( 'n3', pointMap, geometry, _camera, - w, h, - 1 );
-		setPoint( 'n4', pointMap, geometry, _camera, w, h, - 1 );
+			setPoint( 'n1', pointMap, geometry, _camera, - w, - h, - 1 );
+			setPoint( 'n2', pointMap, geometry, _camera, w, - h, - 1 );
+			setPoint( 'n3', pointMap, geometry, _camera, - w, h, - 1 );
+			setPoint( 'n4', pointMap, geometry, _camera, w, h, - 1 );
         }
 
 		// far
 
         if (this.colorOptions.colorFarFrustum) {
-		setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
-		setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
-		setPoint( 'f3', pointMap, geometry, _camera, - w, h, 1 );
-		setPoint( 'f4', pointMap, geometry, _camera, w, h, 1 );
+			setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
+			setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
+			setPoint( 'f3', pointMap, geometry, _camera, - w, h, 1 );
+			setPoint( 'f4', pointMap, geometry, _camera, w, h, 1 );
         }
 
 		// up
         if (this.colorOptions.colorUp) {
-		setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, - 1 );
+			setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, - 1 );
+			setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, - 1 );
+			setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, - 1 );
         }
 
 		// cross
         if (this.colorOptions.colorCross) {
-		setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, 1 );
-		setPoint( 'cf2', pointMap, geometry, _camera, w, 0, 1 );
-		setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
-		setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
+			setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, 1 );
+			setPoint( 'cf2', pointMap, geometry, _camera, w, 0, 1 );
+			setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
+			setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
 
-		setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, - 1 );
-		setPoint( 'cn2', pointMap, geometry, _camera, w, 0, - 1 );
-		setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, - 1 );
-		setPoint( 'cn4', pointMap, geometry, _camera, 0, h, - 1 );
+			setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, - 1 );
+			setPoint( 'cn2', pointMap, geometry, _camera, w, 0, - 1 );
+			setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, - 1 );
+			setPoint( 'cn4', pointMap, geometry, _camera, 0, h, - 1 );
         }
 
 		geometry.getAttribute( 'position' ).needsUpdate = true;
