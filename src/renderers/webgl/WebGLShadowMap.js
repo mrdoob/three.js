@@ -242,7 +242,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		}
 
-		if ( ( _renderer.localClippingEnabled && material.clipShadows === true && material.clippingPlanes.length !== 0 ) ||
+		if ( ( _renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
 			( material.displacementMap && material.displacementScale !== 0 ) ||
 			( material.alphaMap && material.alphaTest > 0 ) ) {
 
