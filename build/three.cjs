@@ -7107,13 +7107,6 @@ class Material extends EventDispatcher {
 
 }
 
-Material.fromType = function
-	/*type*/
-() {
-	// TODO: Behavior added in Materials.js
-	return null;
-};
-
 class MeshBasicMaterial extends Material {
 	constructor(parameters) {
 		super();
@@ -26865,31 +26858,6 @@ class LineDashedMaterial extends LineBasicMaterial {
 
 }
 
-const materialLib = {
-	ShadowMaterial,
-	SpriteMaterial,
-	RawShaderMaterial,
-	ShaderMaterial,
-	PointsMaterial,
-	MeshPhysicalMaterial,
-	MeshStandardMaterial,
-	MeshPhongMaterial,
-	MeshToonMaterial,
-	MeshNormalMaterial,
-	MeshLambertMaterial,
-	MeshDepthMaterial,
-	MeshDistanceMaterial,
-	MeshBasicMaterial,
-	MeshMatcapMaterial,
-	LineDashedMaterial,
-	LineBasicMaterial,
-	Material
-};
-
-Material.fromType = function (type) {
-	return new materialLib[type]();
-};
-
 const AnimationUtils = {
 	// same as Array.prototype.slice, but also works on typed arrays
 	arraySlice: function (array, from, to) {
@@ -29464,7 +29432,7 @@ class MaterialLoader extends Loader {
 			return textures[name];
 		}
 
-		const material = Material.fromType(json.type);
+		const material = MaterialLoader.createMaterialFromType(json.type);
 		if (json.uuid !== undefined) material.uuid = json.uuid;
 		if (json.name !== undefined) material.name = json.name;
 		if (json.color !== undefined && material.color !== undefined) material.color.setHex(json.color);
@@ -29649,6 +29617,30 @@ class MaterialLoader extends Loader {
 	}
 
 }
+
+MaterialLoader.createMaterialFromType = function (type) {
+	const materialLib = {
+		ShadowMaterial,
+		SpriteMaterial,
+		RawShaderMaterial,
+		ShaderMaterial,
+		PointsMaterial,
+		MeshPhysicalMaterial,
+		MeshStandardMaterial,
+		MeshPhongMaterial,
+		MeshToonMaterial,
+		MeshNormalMaterial,
+		MeshLambertMaterial,
+		MeshDepthMaterial,
+		MeshDistanceMaterial,
+		MeshBasicMaterial,
+		MeshMatcapMaterial,
+		LineDashedMaterial,
+		LineBasicMaterial,
+		Material
+	};
+	return new materialLib[type]();
+};
 
 class LoaderUtils {
 	static decodeText(array) {
@@ -34246,54 +34238,48 @@ class CameraHelper extends LineSegments {
 		});
 		const vertices = [];
 		const colors = [];
-		const pointMap = {}; // colors
+		const pointMap = {}; // near
 
-		const colorFrustum = new Color(0xffaa00);
-		const colorCone = new Color(0xff0000);
-		const colorUp = new Color(0x00aaff);
-		const colorTarget = new Color(0xffffff);
-		const colorCross = new Color(0x333333); // near
+		addLine('n1', 'n2');
+		addLine('n2', 'n4');
+		addLine('n4', 'n3');
+		addLine('n3', 'n1'); // far
 
-		addLine('n1', 'n2', colorFrustum);
-		addLine('n2', 'n4', colorFrustum);
-		addLine('n4', 'n3', colorFrustum);
-		addLine('n3', 'n1', colorFrustum); // far
+		addLine('f1', 'f2');
+		addLine('f2', 'f4');
+		addLine('f4', 'f3');
+		addLine('f3', 'f1'); // sides
 
-		addLine('f1', 'f2', colorFrustum);
-		addLine('f2', 'f4', colorFrustum);
-		addLine('f4', 'f3', colorFrustum);
-		addLine('f3', 'f1', colorFrustum); // sides
+		addLine('n1', 'f1');
+		addLine('n2', 'f2');
+		addLine('n3', 'f3');
+		addLine('n4', 'f4'); // cone
 
-		addLine('n1', 'f1', colorFrustum);
-		addLine('n2', 'f2', colorFrustum);
-		addLine('n3', 'f3', colorFrustum);
-		addLine('n4', 'f4', colorFrustum); // cone
+		addLine('p', 'n1');
+		addLine('p', 'n2');
+		addLine('p', 'n3');
+		addLine('p', 'n4'); // up
 
-		addLine('p', 'n1', colorCone);
-		addLine('p', 'n2', colorCone);
-		addLine('p', 'n3', colorCone);
-		addLine('p', 'n4', colorCone); // up
+		addLine('u1', 'u2');
+		addLine('u2', 'u3');
+		addLine('u3', 'u1'); // target
 
-		addLine('u1', 'u2', colorUp);
-		addLine('u2', 'u3', colorUp);
-		addLine('u3', 'u1', colorUp); // target
+		addLine('c', 't');
+		addLine('p', 'c'); // cross
 
-		addLine('c', 't', colorTarget);
-		addLine('p', 'c', colorCross); // cross
+		addLine('cn1', 'cn2');
+		addLine('cn3', 'cn4');
+		addLine('cf1', 'cf2');
+		addLine('cf3', 'cf4');
 
-		addLine('cn1', 'cn2', colorCross);
-		addLine('cn3', 'cn4', colorCross);
-		addLine('cf1', 'cf2', colorCross);
-		addLine('cf3', 'cf4', colorCross);
-
-		function addLine(a, b, color) {
-			addPoint(a, color);
-			addPoint(b, color);
+		function addLine(a, b) {
+			addPoint(a);
+			addPoint(b);
 		}
 
-		function addPoint(id, color) {
+		function addPoint(id) {
 			vertices.push(0, 0, 0);
-			colors.push(color.r, color.g, color.b);
+			colors.push(0, 0, 0);
 
 			if (pointMap[id] === undefined) {
 				pointMap[id] = [];
@@ -34311,7 +34297,102 @@ class CameraHelper extends LineSegments {
 		this.matrix = camera.matrixWorld;
 		this.matrixAutoUpdate = false;
 		this.pointMap = pointMap;
-		this.update();
+		this.update(); // colors
+
+		const colorFrustum = new Color(0xffaa00);
+		const colorCone = new Color(0xff0000);
+		const colorUp = new Color(0x00aaff);
+		const colorTarget = new Color(0xffffff);
+		const colorCross = new Color(0x333333);
+		this.setColors(colorFrustum, colorCone, colorUp, colorTarget, colorCross);
+	}
+
+	setColors(frustum, cone, up, target, cross) {
+		const geometry = this.geometry;
+		const colorAttribute = geometry.getAttribute('color'); // near
+
+		colorAttribute.setXYZ(0, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(1, frustum.r, frustum.g, frustum.b); // n1, n2
+
+		colorAttribute.setXYZ(2, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(3, frustum.r, frustum.g, frustum.b); // n2, n4
+
+		colorAttribute.setXYZ(4, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(5, frustum.r, frustum.g, frustum.b); // n4, n3
+
+		colorAttribute.setXYZ(6, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(7, frustum.r, frustum.g, frustum.b); // n3, n1
+		// far
+
+		colorAttribute.setXYZ(8, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(9, frustum.r, frustum.g, frustum.b); // f1, f2
+
+		colorAttribute.setXYZ(10, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(11, frustum.r, frustum.g, frustum.b); // f2, f4
+
+		colorAttribute.setXYZ(12, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(13, frustum.r, frustum.g, frustum.b); // f4, f3
+
+		colorAttribute.setXYZ(14, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(15, frustum.r, frustum.g, frustum.b); // f3, f1
+		// sides
+
+		colorAttribute.setXYZ(16, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(17, frustum.r, frustum.g, frustum.b); // n1, f1
+
+		colorAttribute.setXYZ(18, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(19, frustum.r, frustum.g, frustum.b); // n2, f2
+
+		colorAttribute.setXYZ(20, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(21, frustum.r, frustum.g, frustum.b); // n3, f3
+
+		colorAttribute.setXYZ(22, frustum.r, frustum.g, frustum.b);
+		colorAttribute.setXYZ(23, frustum.r, frustum.g, frustum.b); // n4, f4
+		// cone
+
+		colorAttribute.setXYZ(24, cone.r, cone.g, cone.b);
+		colorAttribute.setXYZ(25, cone.r, cone.g, cone.b); // p, n1
+
+		colorAttribute.setXYZ(26, cone.r, cone.g, cone.b);
+		colorAttribute.setXYZ(27, cone.r, cone.g, cone.b); // p, n2
+
+		colorAttribute.setXYZ(28, cone.r, cone.g, cone.b);
+		colorAttribute.setXYZ(29, cone.r, cone.g, cone.b); // p, n3
+
+		colorAttribute.setXYZ(30, cone.r, cone.g, cone.b);
+		colorAttribute.setXYZ(31, cone.r, cone.g, cone.b); // p, n4
+		// up
+
+		colorAttribute.setXYZ(32, up.r, up.g, up.b);
+		colorAttribute.setXYZ(33, up.r, up.g, up.b); // u1, u2
+
+		colorAttribute.setXYZ(34, up.r, up.g, up.b);
+		colorAttribute.setXYZ(35, up.r, up.g, up.b); // u2, u3
+
+		colorAttribute.setXYZ(36, up.r, up.g, up.b);
+		colorAttribute.setXYZ(37, up.r, up.g, up.b); // u3, u1
+		// target
+
+		colorAttribute.setXYZ(38, target.r, target.g, target.b);
+		colorAttribute.setXYZ(39, target.r, target.g, target.b); // c, t
+
+		colorAttribute.setXYZ(40, cross.r, cross.g, cross.b);
+		colorAttribute.setXYZ(41, cross.r, cross.g, cross.b); // p, c
+		// cross
+
+		colorAttribute.setXYZ(42, cross.r, cross.g, cross.b);
+		colorAttribute.setXYZ(43, cross.r, cross.g, cross.b); // cn1, cn2
+
+		colorAttribute.setXYZ(44, cross.r, cross.g, cross.b);
+		colorAttribute.setXYZ(45, cross.r, cross.g, cross.b); // cn3, cn4
+
+		colorAttribute.setXYZ(46, cross.r, cross.g, cross.b);
+		colorAttribute.setXYZ(47, cross.r, cross.g, cross.b); // cf1, cf2
+
+		colorAttribute.setXYZ(48, cross.r, cross.g, cross.b);
+		colorAttribute.setXYZ(49, cross.r, cross.g, cross.b); // cf3, cf4
+
+		colorAttribute.needsUpdate = true;
 	}
 
 	update() {
