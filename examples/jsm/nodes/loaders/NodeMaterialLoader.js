@@ -8,6 +8,29 @@ import {
 	SpriteNodeMaterial
 } from '../materials/Materials.js';
 
+const superFromTypeFunction = MaterialLoader.createMaterialFromType;
+
+MaterialLoader.createMaterialFromType = function ( type ) {
+
+	const materialLib = {
+		NodeMaterial,
+		LineBasicNodeMaterial,
+		MeshBasicNodeMaterial,
+		MeshStandardNodeMaterial,
+		PointsNodeMaterial,
+		SpriteNodeMaterial,
+	};
+
+	if ( materialLib[ type ] !== undefined ) {
+
+		return new materialLib[ type ]();
+
+	}
+
+	return superFromTypeFunction.call( this, type );
+
+};
+
 class NodeMaterialLoader extends MaterialLoader {
 
 	constructor( manager ) {
@@ -42,27 +65,6 @@ class NodeMaterialLoader extends MaterialLoader {
 		this.nodes = value;
 
 		return this;
-
-	}
-
-	static createMaterialFromType( type ) {
-
-		const materialLib = {
-			NodeMaterial,
-			LineBasicNodeMaterial,
-			MeshBasicNodeMaterial,
-			MeshStandardNodeMaterial,
-			PointsNodeMaterial,
-			SpriteNodeMaterial,
-		};
-
-		if ( materialLib[ type ] !== undefined ) {
-
-			return new materialLib[ type ]();
-
-		}
-
-		return MaterialLoader.createMaterialFromType( type );
 
 	}
 
