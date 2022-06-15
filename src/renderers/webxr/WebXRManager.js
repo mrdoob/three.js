@@ -152,7 +152,7 @@ class WebXRManager extends EventDispatcher {
 
 				const inputSource = controllerInputSources[ i ];
 
-				if ( ! inputSource ) continue;
+				if ( inputSource === null ) continue;
 
 				controllers[ i ].disconnect( inputSource );
 
@@ -376,7 +376,7 @@ class WebXRManager extends EventDispatcher {
 
 				let controllerIndex = controllerInputSources.indexOf( inputSource );
 
-				if ( controllerIndex < 0 ) {
+				if ( controllerIndex === - 1 ) {
 
 					// Assign input source a controller that currently has no input source
 
@@ -400,7 +400,7 @@ class WebXRManager extends EventDispatcher {
 
 					// If all controllers do currently receive input we ignore new ones
 
-					if ( controllerIndex < 0 ) break;
+					if ( controllerIndex === - 1 ) break;
 
 				}
 
