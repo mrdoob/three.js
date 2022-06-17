@@ -770,20 +770,6 @@ class WebGPURenderer {
 
 			const { object, geometry, material, group } = renderItem;
 
-			object.onBeforeRender( this, scene, camera, geometry, material, group );
-
-			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-			this._objects.update( object );
-
-			// send scene properties to object
-
-			const objectProperties = this._properties.get( object );
-
-			objectProperties.lightsNode = lightsNode;
-			objectProperties.scene = scene;
-
 			if ( camera.isArrayCamera ) {
 
 				const cameras = camera.cameras;
@@ -800,9 +786,7 @@ class WebGPURenderer {
 
 						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
 
-						this._nodes.update( object, camera2 );
-						this._bindings.update( object );
-						this._renderObject( object, passEncoder );
+						this._renderObject( object, scene, camera2, geometry, material, group, lightsNode, passEncoder );
 
 					}
 
@@ -810,9 +794,7 @@ class WebGPURenderer {
 
 			} else {
 
-				this._nodes.update( object, camera );
-				this._bindings.update( object );
-				this._renderObject( object, passEncoder );
+				this._renderObject( object, scene, camera, geometry, material, group, lightsNode, passEncoder );
 
 			}
 
@@ -820,9 +802,29 @@ class WebGPURenderer {
 
 	}
 
-	_renderObject( object, passEncoder ) {
+	_renderObject( object, scene, camera, geometry, material, group, lightsNode, passEncoder ) {
 
 		const info = this._info;
+
+		// send scene properties to object
+
+		const objectProperties = this._properties.get( object );
+
+		objectProperties.lightsNode = lightsNode;
+		objectProperties.scene = scene;
+
+		//
+
+		object.onBeforeRender( this, scene, camera, geometry, material, group );
+
+		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+		// updates
+
+		this._nodes.update( object, camera );
+		this._bindings.update( object );
+		this._objects.update( object );
 
 		// pipeline
 
@@ -836,7 +838,6 @@ class WebGPURenderer {
 
 		// index
 
-		const geometry = object.geometry;
 		const index = geometry.index;
 
 		const hasIndex = ( index !== null );

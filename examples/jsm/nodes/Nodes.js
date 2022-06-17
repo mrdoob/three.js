@@ -45,6 +45,9 @@ import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 import UserDataNode from './accessors/UserDataNode.js';
 
+// geometry
+import RangeNode from './geometry/RangeNode.js';
+
 // gpgpu
 import ComputeNode from './gpgpu/ComputeNode.js';
 
@@ -130,7 +133,10 @@ const nodeLib = {
 	VarNode,
 	VaryNode,
 
-	// compute
+	// geometry
+	RangeNode,
+
+	// gpgpu
 	ComputeNode,
 
 	// accessors
@@ -234,7 +240,10 @@ export {
 	VarNode,
 	VaryNode,
 
-	// compute
+	// geometry
+	RangeNode,
+
+	// gpgpu
 	ComputeNode,
 
 	// accessors
