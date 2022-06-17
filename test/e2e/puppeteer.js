@@ -151,7 +151,7 @@ async function main() {
 	/* Launch browser */
 
 	const flags = [ '--enable-unsafe-webgpu', '--hide-scrollbars' ];
-	if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
+	if ( process.platform === 'linux' ) flags.unshift( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
