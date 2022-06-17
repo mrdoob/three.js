@@ -409,7 +409,7 @@
 
 		if ( attribute.isInstancedInterleavedBufferAttribute ) {
 
-			newAttribute = new InstancedBufferAttribute( array, itemSize, normalized, attribute.meshPerAttribute );
+			newAttribute = new THREE.InstancedBufferAttribute( array, itemSize, normalized, attribute.meshPerAttribute );
 
 		} else {
 

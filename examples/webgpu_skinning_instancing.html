@@ -28,6 +28,8 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three-nodes/Nodes.js';
 
+			import { mix, range, color, oscSine, timerLocal } from 'three-nodes/Nodes.js';
+
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 			import WebGPU from './jsm/capabilities/WebGPU.js';
@@ -83,8 +85,16 @@
 
 						if ( child.isMesh ) {
 
+							// random colors between instances from 0x000000 to 0xFFFFFF
+							const randomColors = range( new THREE.Color( 0x000000 ), new THREE.Color( 0xFFFFFF ) );
+
+							// random [ 0, 1 ] values between instances
+							const randomMetalness = range( 0, 1 );
+
 							child.material = new Nodes.MeshStandardNodeMaterial();
 							child.material.roughness = .1;
+							child.material.metalnessNode = randomMetalness;
+							child.material.colorNode =  mix( color( 0xFFFFFF ), randomColors, oscSine( timerLocal( .1 ) ) );
 
 							child.isInstancedMesh = true;
 							child.instanceMatrix = new THREE.InstancedBufferAttribute( new Float32Array( instanceCount * 16 ), 16 );

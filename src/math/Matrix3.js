@@ -2,7 +2,7 @@ class Matrix3 {
 
 	constructor() {
 
-		this.isMatrix3 = true;
+		Matrix3.prototype.isMatrix3 = true;
 
 		this.elements = [
 

@@ -22,6 +22,9 @@ import OscNode from '../utils/OscNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
 
+// geometry
+import RangeNode from '../geometry/RangeNode.js';
+
 // procedural
 import CheckerNode from '../procedural/CheckerNode.js';
 
@@ -100,6 +103,10 @@ export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
 export const timerLocal = ( timeScale ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale ) );
 export const timerGlobal = ( timeScale ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale ) );
 export const timerDelta = ( timeScale ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale ) );
+
+// geometry
+
+export const range = ( min, max ) => nodeObject( new RangeNode( min, max ) );
 
 // procedural
 
