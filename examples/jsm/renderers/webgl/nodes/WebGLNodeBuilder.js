@@ -1,4 +1,4 @@
-import NodeBuilder, { shaderStages } from 'three-nodes/core/NodeBuilder.js';
+import NodeBuilder, { defaultShaderStages } from 'three-nodes/core/NodeBuilder.js';
 import NodeFrame from 'three-nodes/core/NodeFrame.js';
 import SlotNode from './SlotNode.js';
 import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
@@ -64,7 +64,8 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	_parseObject() {
 
-		const material = this.material;
+		const { material, renderer } = this;
+
 		let type = material.type;
 
 		// shader lib
@@ -82,6 +83,12 @@ class WebGLNodeBuilder extends NodeBuilder {
 			shader.vertexShader = shaderLib.vertexShader;
 			shader.fragmentShader = shaderLib.fragmentShader;
 			shader.uniforms = UniformsUtils.merge( [ shaderLib.uniforms, UniformsLib.lights ] );
+
+		}
+
+		if ( renderer.toneMappingNode?.isNode === true ) {
+
+			this.replaceCode( 'fragment', getIncludeSnippet( 'tonemapping_fragment' ), '' );
 
 		}
 
@@ -132,6 +139,24 @@ class WebGLNodeBuilder extends NodeBuilder {
 		if ( material.clearcoatRoughnessNode && material.clearcoatRoughnessNode.isNode ) {
 
 			this.addSlot( 'fragment', new SlotNode( material.clearcoatRoughnessNode, 'CLEARCOAT_ROUGHNESS', 'float' ) );
+
+		}
+
+		if ( material.iridescenceNode && material.iridescenceNode.isNode ) {
+
+			this.addSlot( 'fragment', new SlotNode( material.iridescenceNode, 'IRIDESCENCE', 'float' ) );
+
+		}
+
+		if ( material.iridescenceIORNode && material.iridescenceIORNode.isNode ) {
+
+			this.addSlot( 'fragment', new SlotNode( material.iridescenceIORNode, 'IRIDESCENCE_IOR', 'float' ) );
+
+		}
+
+		if ( material.iridescenceThicknessNode && material.iridescenceThicknessNode.isNode ) {
+
+			this.addSlot( 'fragment', new SlotNode( material.iridescenceThicknessNode, 'IRIDESCENCE_THICKNESS', 'float' ) );
 
 		}
 
@@ -325,11 +350,17 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getFrontFacing() {
+
+		return 'gl_FrontFacing';
+
+	}
+
 	buildCode() {
 
 		const shaderData = {};
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			const uniforms = this.getUniforms( shaderStage );
 			const attributes = this.getAttributes( shaderStage );
@@ -391,7 +422,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 			if ( node.name === name ) {
 
-				return this.getFlowData( shaderStage, node );
+				return this.getFlowData( node/*, shaderStage*/ );
 
 			}
 
@@ -411,6 +442,9 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 		const metalnessNode = this.getSlot( 'fragment', 'METALNESS' );
 		const clearcoatNode = this.getSlot( 'fragment', 'CLEARCOAT' );
 		const clearcoatRoughnessNode = this.getSlot( 'fragment', 'CLEARCOAT_ROUGHNESS' );
+		const iridescenceNode = this.getSlot( 'fragment', 'IRIDESCENCE' );
+		const iridescenceIORNode = this.getSlot( 'fragment', 'IRIDESCENCE_IOR' );
+		const iridescenceThicknessNode = this.getSlot( 'fragment', 'IRIDESCENCE_THICKNESS' );
 
 		const positionNode = this.getSlot( 'vertex', 'POSITION' );
 		const sizeNode = this.getSlot( 'vertex', 'SIZE' );
@@ -495,6 +529,36 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		}
 
+		if ( iridescenceNode !== undefined ) {
+
+			this.addCodeAfterSnippet(
+				'fragment',
+				'iridescence_fragment',
+				`${iridescenceNode.code}\n\tmaterial.iridescence = ${iridescenceNode.result};`
+			);
+
+		}
+
+		if ( iridescenceIORNode !== undefined ) {
+
+			this.addCodeAfterSnippet(
+				'fragment',
+				'iridescence_fragment',
+				`${iridescenceIORNode.code}\n\tmaterial.iridescenceIOR = ${iridescenceIORNode.result};`
+			);
+
+		}
+
+		if ( iridescenceThicknessNode !== undefined ) {
+
+			this.addCodeAfterSnippet(
+				'fragment',
+				'iridescence_fragment',
+				`${iridescenceThicknessNode.code}\n\tmaterial.iridescenceThickness = ${iridescenceThicknessNode.result};`
+			);
+
+		}
+
 		if ( positionNode !== undefined ) {
 
 			this.addCodeAfterInclude(
@@ -515,7 +579,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		}
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			this.addCodeAfterSnippet(
 				shaderStage,
@@ -529,7 +593,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	_addUniforms() {
 
-		for ( const shaderStage of shaderStages ) {
+		for ( const shaderStage of defaultShaderStages ) {
 
 			// uniforms
 

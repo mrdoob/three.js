@@ -65,14 +65,14 @@ class VarNode extends Node {
 	generate( builder ) {
 
 		const node = this.node;
+		const name = this.name;
 
-		if ( node.isTempNode === true ) {
+		if ( name === null && node.isTempNode === true ) {
 
 			return node.build( builder );
 
 		}
 
-		const name = this.name;
 		const type = builder.getVectorType( this.getNodeType( builder ) );
 
 		const snippet = node.build( builder, type );
@@ -93,7 +93,5 @@ class VarNode extends Node {
 	}
 
 }
-
-VarNode.prototype.isVarNode = true;
 
 export default VarNode;

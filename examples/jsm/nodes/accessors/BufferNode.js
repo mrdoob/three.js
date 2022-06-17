@@ -6,6 +6,8 @@ class BufferNode extends UniformNode {
 
 		super( value, bufferType );
 
+		this.isBufferNode = true;
+
 		this.bufferType = bufferType;
 		this.bufferCount = bufferCount;
 
@@ -18,7 +20,5 @@ class BufferNode extends UniformNode {
 	}
 
 }
-
-BufferNode.prototype.isBufferNode = true;
 
 export default BufferNode;

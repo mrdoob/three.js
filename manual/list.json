@@ -190,8 +190,8 @@
 			"개발 환경": "ko/setup"
 		},
 		"기본 구조": {
-			"원시 모델": "ko/primitives",
-			"씬 그래프": "ko/scenegraph",
+			"원시 모델(Primitives)": "ko/primitives",
+			"씬 그래프(Scenegraph)": "ko/scenegraph",
 			"재질(Materials)": "ko/materials",
 			"텍스처(Textures)": "ko/textures",
 			"조명(Lights)": "ko/lights",
@@ -334,7 +334,7 @@
 		},
 		"解决方案": {
 			"加载 .OBJ 文件": "zh/load-obj",
-			"Load a .GLTF file": "zh/load-gltf",
+			"加载 .GLTF 文件": "zh/load-gltf",
 			"添加背景或天空盒": "zh/backgrounds",
 			"如何绘制透明的物体": "zh/transparency",
 			"多个画布, 多个场景": "zh/multiple-scenes",
@@ -344,7 +344,7 @@
 			"Using Shadertoy shaders": "zh/shadertoy",
 			"对齐HTML元素和3D对象": "zh/align-html-elements-to-3d",
 			"Using Indexed Textures for Picking and Color": "zh/indexed-textures",
-			"Using A Canvas for Dynamic Textures": "zh/canvas-textures",
+			"使用Canvas生成动态纹理": "zh/canvas-textures",
 			"广告牌(Billboards)": "zh/billboards",
 			"释放资源": "zh/cleanup",
 			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
@@ -356,7 +356,7 @@
 			"VR - Point To Select": "zh/webxr-point-to-select"
 		},
 		"参考": {
-			"Material Table": "zh/material-table"
+			"材质特性表": "zh/material-table"
 		}
 	}
 }

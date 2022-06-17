@@ -8,6 +8,7 @@
 				opacity: 0,
 				transparent: true
 			} ) );
+			this.isLensflare = true;
 			this.type = 'Lensflare';
 			this.frustumCulled = false;
 			this.renderOrder = Infinity; //
@@ -232,9 +233,8 @@
 
 		}
 
-	}
+	} //
 
-	Lensflare.prototype.isLensflare = true; //
 
 	class LensflareElement {
 

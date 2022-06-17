@@ -5,6 +5,9 @@ class LineGeometry extends LineSegmentsGeometry {
 	constructor() {
 
 		super();
+
+		this.isLineGeometry = true;
+
 		this.type = 'LineGeometry';
 
 	}
@@ -63,16 +66,7 @@ class LineGeometry extends LineSegmentsGeometry {
 
 		const geometry = line.geometry;
 
-		if ( geometry.isGeometry ) {
-
-			console.error( 'THREE.LineGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-			return;
-
-		} else if ( geometry.isBufferGeometry ) {
-
-			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
-
-		}
+		this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
 
 		// set colors, maybe
 
@@ -81,7 +75,5 @@ class LineGeometry extends LineSegmentsGeometry {
 	}
 
 }
-
-LineGeometry.prototype.isLineGeometry = true;
 
 export { LineGeometry };

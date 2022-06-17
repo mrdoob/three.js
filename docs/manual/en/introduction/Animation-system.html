@@ -39,7 +39,7 @@
 			should be an array named "animations", containing the [page:AnimationClip AnimationClips]
 			for this model (see a list of possible loaders below).<br /><br />
 
-			Each *AnimationClip* usually holds the data for a certain activity of the object. If the
+			Each `AnimationClip` usually holds the data for a certain activity of the object. If the
 			mesh is a character, for example, there may be one AnimationClip for a walkcycle, a second
 			for a jump, a third for sidestepping and so on.
 
@@ -49,7 +49,7 @@
 
 		<p class="desc">
 
-			Inside of such an *AnimationClip* the data for each animated property are stored in a
+			Inside of such an `AnimationClip` the data for each animated property are stored in a
 			separate [page:KeyframeTrack]. Assuming a character object has a [page:Skeleton skeleton],
 			one keyframe track could store the data for the position changes of the lower arm bone
 			over time, a different track the data for the rotation changes of the same bone, a third
@@ -78,9 +78,9 @@
 
 		<p class="desc">
 
-			The *AnimationMixer* itself has only very few (general) properties and methods, because it
+			The `AnimationMixer` itself has only very few (general) properties and methods, because it
 			can be controlled by the [page:AnimationAction AnimationActions]. By configuring an
-			*AnimationAction* you can determine when a certain *AnimationClip* shall be played, paused
+			`AnimationAction` you can determine when a certain `AnimationClip` shall be played, paused
 			or stopped on one of the mixers, if and how often the clip has to be repeated, whether it
 			shall be performed with a fade or a time scaling, and some additional things, such crossfading
 			or synchronizing.

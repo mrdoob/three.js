@@ -7,6 +7,8 @@ class LineBasicMaterial extends Material {
 
 		super();
 
+		this.isLineBasicMaterial = true;
+
 		this.type = 'LineBasicMaterial';
 
 		this.color = new Color( 0xffffff );
@@ -14,6 +16,8 @@ class LineBasicMaterial extends Material {
 		this.linewidth = 1;
 		this.linecap = 'round';
 		this.linejoin = 'round';
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -30,12 +34,12 @@ class LineBasicMaterial extends Material {
 		this.linecap = source.linecap;
 		this.linejoin = source.linejoin;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-LineBasicMaterial.prototype.isLineBasicMaterial = true;
 
 export { LineBasicMaterial };

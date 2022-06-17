@@ -49,6 +49,8 @@ class TransformControls extends Object3D {
 
 		}
 
+		this.isTransformControls = true;
+
 		this.visible = false;
 		this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
@@ -203,7 +205,15 @@ class TransformControls extends Object3D {
 		this.camera.updateMatrixWorld();
 		this.camera.matrixWorld.decompose( this.cameraPosition, this.cameraQuaternion, this._cameraScale );
 
-		this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
+		if ( this.camera.isOrthographicCamera ) {
+
+			this.camera.getWorldDirection( this.eye );
+
+		} else {
+
+			this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
+
+		}
 
 		super.updateMatrixWorld( this );
 
@@ -641,8 +651,6 @@ class TransformControls extends Object3D {
 
 }
 
-TransformControls.prototype.isTransformControls = true;
-
 // mouse / touch event handlers
 
 function getPointer( event ) {
@@ -765,6 +773,8 @@ class TransformControlsGizmo extends Object3D {
 	constructor() {
 
 		super();
+
+		this.isTransformControlsGizmo = true;
 
 		this.type = 'TransformControlsGizmo';
 
@@ -1456,8 +1466,6 @@ class TransformControlsGizmo extends Object3D {
 
 }
 
-TransformControlsGizmo.prototype.isTransformControlsGizmo = true;
-
 //
 
 class TransformControlsPlane extends Mesh {
@@ -1468,6 +1476,8 @@ class TransformControlsPlane extends Mesh {
 			new PlaneGeometry( 100000, 100000, 2, 2 ),
 			new MeshBasicMaterial( { visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1, toneMapped: false } )
 		);
+
+		this.isTransformControlsPlane = true;
 
 		this.type = 'TransformControlsPlane';
 
@@ -1550,7 +1560,5 @@ class TransformControlsPlane extends Mesh {
 	}
 
 }
-
-TransformControlsPlane.prototype.isTransformControlsPlane = true;
 
 export { TransformControls, TransformControlsGizmo, TransformControlsPlane };

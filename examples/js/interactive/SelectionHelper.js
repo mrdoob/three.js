@@ -2,7 +2,7 @@
 
 	class SelectionHelper {
 
-		constructor( selectionBox, renderer, cssClassName ) {
+		constructor( renderer, cssClassName ) {
 
 			this.element = document.createElement( 'div' );
 			this.element.classList.add( cssClassName );

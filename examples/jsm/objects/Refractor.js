@@ -18,6 +18,8 @@ class Refractor extends Mesh {
 
 		super( geometry );
 
+		this.isRefractor = true;
+
 		this.type = 'Refractor';
 		this.camera = new PerspectiveCamera();
 
@@ -259,8 +261,6 @@ class Refractor extends Mesh {
 	}
 
 }
-
-Refractor.prototype.isRefractor = true;
 
 Refractor.RefractorShader = {
 

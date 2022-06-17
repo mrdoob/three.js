@@ -46,12 +46,17 @@ class OculusHandPointerModel extends THREE.Object3D {
 		hand.addEventListener( 'connected', ( event ) => {
 
 			const xrInputSource = event.data;
+
 			if ( xrInputSource.hand ) {
 
 				this.visible = true;
 				this.xrInputSource = xrInputSource;
 
-				this.createPointer();
+				if ( this.pointerObject === null ) {
+
+					this.createPointer();
+
+				}
 
 			}
 

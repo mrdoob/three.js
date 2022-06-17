@@ -380,6 +380,12 @@ ${array.join( '' )}
 
 		}
 
+		if ( material.side === THREE.DoubleSide ) {
+
+			console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
+
+		}
+
 		if ( material.map !== null ) {
 
 			inputs.push( `${pad}color3f inputs:diffuseColor.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:rgb>` );

@@ -6,6 +6,8 @@ class InstanceIndexNode extends Node {
 
 		super( 'uint' );
 
+		this.isInstanceIndexNode = true;
+
 	}
 
 	generate( builder ) {
@@ -15,7 +17,5 @@ class InstanceIndexNode extends Node {
 	}
 
 }
-
-InstanceIndexNode.prototype.isInstanceIndexNode = true;
 
 export default InstanceIndexNode;

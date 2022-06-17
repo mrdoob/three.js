@@ -1,12 +1,15 @@
 import NodeMaterial from './NodeMaterial.js';
 import {
-	float, vec3, vec4,
-	assign, label, mul, invert, mix,
-	normalView,
-	materialRoughness, materialMetalness
+	float, vec3, vec4, normalView, add, context,
+	assign, label, mul, invert, mix, texture, uniform,
+	materialRoughness, materialMetalness, materialEmissive
 } from '../shadernode/ShaderNodeElements.js';
+import LightsNode from '../lighting/LightsNode.js';
+import EnvironmentNode from '../lighting/EnvironmentNode.js';
+import AONode from '../lighting/AONode.js';
 import getRoughness from '../functions/material/getRoughness.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
+import NormalMapNode from '../display/NormalMapNode.js';
 
 import { MeshStandardMaterial } from 'three';
 
@@ -17,6 +20,8 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshStandardNodeMaterial = true;
 
 		this.colorNode = null;
 		this.opacityNode = null;
@@ -35,7 +40,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		this.envNode = null;
 
-		this.lightNode = null;
+		this.lightsNode = null;
 
 		this.positionNode = null;
 
@@ -47,29 +52,47 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	build( builder ) {
 
-		const lightNode = this.lightNode || builder.lightNode; // use scene lights
+		this.generatePosition( builder );
 
-		let { colorNode, diffuseColorNode } = this.generateMain( builder );
+		const colorNodes = this.generateDiffuseColor( builder );
+		const { colorNode } = colorNodes;
+		let { diffuseColorNode } = colorNodes;
+
+		const envNode = this.envNode || builder.scene.environmentNode;
 
 		diffuseColorNode = this.generateStandardMaterial( builder, { colorNode, diffuseColorNode } );
 
-		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightNode } );
+		if ( this.lightsNode ) builder.lightsNode = this.lightsNode;
+
+		const materialLightsNode = [];
+
+		if ( envNode ) {
+
+			materialLightsNode.push( new EnvironmentNode( envNode ) );
+
+		}
+
+		if ( builder.material.aoMap ) {
+
+			materialLightsNode.push( new AONode( texture( builder.material.aoMap ) ) );
+
+		}
+
+		if ( materialLightsNode.length > 0 ) {
+
+			builder.lightsNode = new LightsNode( [ ...builder.lightsNode.lightNodes, ...materialLightsNode ] );
+
+		}
+
+		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightingModelNode: PhysicalLightingModel } );
 
 		this.generateOutput( builder, { diffuseColorNode, outgoingLightNode } );
 
 	}
 
-	generateLight( builder, { diffuseColorNode, lightNode } ) {
-
-		const outgoingLightNode = super.generateLight( builder, { diffuseColorNode, lightNode, lightingModelNode: PhysicalLightingModel } );
-
-		// @TODO: add IBL code here
-
-		return outgoingLightNode;
-
-	}
-
 	generateStandardMaterial( builder, { colorNode, diffuseColorNode } ) {
+
+		const { material } = builder;
 
 		// METALNESS
 
@@ -93,11 +116,31 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// NORMAL VIEW
 
-		const normalNode = this.normalNode ? vec3( this.normalNode ) : normalView;
+		const normalNode = this.normalNode ? vec3( this.normalNode ) : ( material.normalMap ? new NormalMapNode( texture( material.normalMap ), uniform( material.normalScale ) ) : normalView );
 
 		builder.addFlow( 'fragment', label( normalNode, 'TransformedNormalView' ) );
 
 		return diffuseColorNode;
+
+	}
+
+	generateLight( builder, { diffuseColorNode, lightingModelNode, lightsNode = builder.lightsNode } ) {
+
+		const renderer = builder.renderer;
+
+		// OUTGOING LIGHT
+
+		let outgoingLightNode = super.generateLight( builder, { diffuseColorNode, lightingModelNode, lightsNode } );
+
+		// EMISSIVE
+
+		outgoingLightNode = add( vec3( this.emissiveNode || materialEmissive ), outgoingLightNode );
+
+		// TONE MAPPING
+
+		if ( renderer.toneMappingNode ) outgoingLightNode = context( renderer.toneMappingNode, { color: outgoingLightNode } );
+
+		return outgoingLightNode;
 
 	}
 
@@ -120,7 +163,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		this.envNode = source.envNode;
 
-		this.lightNode = source.lightNode;
+		this.lightsNode = source.lightsNode;
 
 		this.positionNode = source.positionNode;
 
@@ -129,5 +172,3 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-MeshStandardNodeMaterial.prototype.isMeshStandardNodeMaterial = true;

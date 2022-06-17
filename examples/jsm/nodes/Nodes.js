@@ -43,9 +43,18 @@ import ReflectNode from './accessors/ReflectNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
+import UserDataNode from './accessors/UserDataNode.js';
+
+// geometry
+import RangeNode from './geometry/RangeNode.js';
+
+// gpgpu
+import ComputeNode from './gpgpu/ComputeNode.js';
 
 // display
+import ColorAdjustmentNode from './display/ColorAdjustmentNode.js';
 import ColorSpaceNode from './display/ColorSpaceNode.js';
+import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
 import ToneMappingNode from './display/ToneMappingNode.js';
 
@@ -54,19 +63,25 @@ import MathNode from './math/MathNode.js';
 import OperatorNode from './math/OperatorNode.js';
 import CondNode from './math/CondNode.js';
 
-// lights
-import LightContextNode from './lights/LightContextNode.js';
-import LightNode from './lights/LightNode.js';
-import LightsNode from './lights/LightsNode.js';
+// lighting
+import PunctualLightNode from './lighting/PunctualLightNode.js';
+import LightsNode from './lighting/LightsNode.js';
+import LightingNode from './lighting/LightingNode.js';
+import LightingContextNode from './lighting/LightingContextNode.js';
+import HemisphereLightNode from './lighting/HemisphereLightNode.js';
+import EnvironmentNode from './lighting/EnvironmentNode.js';
+import AONode from './lighting/AONode.js';
+import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
 import JoinNode from './utils/JoinNode.js';
+import MatcapUVNode from './utils/MatcapUVNode.js';
+import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
+import OscNode from './utils/OscNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
-import MatcapUVNode from './utils/MatcapUVNode.js';
-import OscNode from './utils/OscNode.js';
 import TimerNode from './utils/TimerNode.js';
 
 // loaders
@@ -118,6 +133,12 @@ const nodeLib = {
 	VarNode,
 	VaryNode,
 
+	// geometry
+	RangeNode,
+
+	// gpgpu
+	ComputeNode,
+
 	// accessors
 	BufferNode,
 	CameraNode,
@@ -136,9 +157,12 @@ const nodeLib = {
 	SkinningNode,
 	TextureNode,
 	UVNode,
+	UserDataNode,
 
 	// display
+	ColorAdjustmentNode,
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
 	ToneMappingNode,
 
@@ -147,19 +171,25 @@ const nodeLib = {
 	OperatorNode,
 	CondNode,
 
-	// lights
-	LightContextNode,
-	LightNode,
+	// lighting
+	PunctualLightNode,
 	LightsNode,
+	LightingNode,
+	LightingContextNode,
+	HemisphereLightNode,
+	EnvironmentNode,
+	AONode,
+	AnalyticLightNode,
 
 	// utils
 	ArrayElementNode,
 	ConvertNode,
 	JoinNode,
+	MatcapUVNode,
+	MaxMipLevelNode,
+	OscNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	MatcapUVNode,
-	OscNode,
 	TimerNode,
 
 	// procedural
@@ -210,6 +240,12 @@ export {
 	VarNode,
 	VaryNode,
 
+	// geometry
+	RangeNode,
+
+	// gpgpu
+	ComputeNode,
+
 	// accessors
 	BufferNode,
 	CameraNode,
@@ -228,9 +264,12 @@ export {
 	SkinningNode,
 	TextureNode,
 	UVNode,
+	UserDataNode,
 
 	// display
+	ColorAdjustmentNode,
 	ColorSpaceNode,
+	FrontFacingNode,
 	NormalMapNode,
 	ToneMappingNode,
 
@@ -239,19 +278,25 @@ export {
 	OperatorNode,
 	CondNode,
 
-	// lights
-	LightContextNode,
-	LightNode,
+	// lighting
+	PunctualLightNode,
 	LightsNode,
+	LightingNode,
+	LightingContextNode,
+	HemisphereLightNode,
+	EnvironmentNode,
+	AONode,
+	AnalyticLightNode,
 
 	// utils
 	ArrayElementNode,
 	ConvertNode,
 	JoinNode,
+	MatcapUVNode,
+	MaxMipLevelNode,
+	OscNode,
 	SplitNode,
 	SpriteSheetUVNode,
-	MatcapUVNode,
-	OscNode,
 	TimerNode,
 
 	// procedural
@@ -265,5 +310,4 @@ export {
 	NodeLoader,
 	NodeObjectLoader,
 	NodeMaterialLoader
-
 };

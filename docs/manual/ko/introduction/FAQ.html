@@ -50,5 +50,10 @@ visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_f
 			이는 페이스 컬링 문제일 수 있습니다. 각 면들은 어느 방향이 어느 방향인지에 대한 정보를 가지고 있습니다. 그리고 컬링은 일반적으로 뒷편의 면을 제거해 버립니다. 이 문제가 의심된다면 재질의 면을 THREE.DoubleSide로 변경해 보세요.
 			<code>material.side = THREE.DoubleSide</code>
 		</p>
+
+		<h2>Why does three.js sometimes return strange results for invalid inputs?</h2>
+		<p>
+			For performance reasons, three.js doesn't validate inputs in most cases. It's your app's responsibility to make sure that all inputs are valid.
+		</p>
 	</body>
 </html>

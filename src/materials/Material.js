@@ -10,14 +10,14 @@ class Material extends EventDispatcher {
 
 		super();
 
+		this.isMaterial = true;
+
 		Object.defineProperty( this, 'id', { value: materialId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
 		this.type = 'Material';
-
-		this.fog = true;
 
 		this.blending = NormalBlending;
 		this.side = FrontSide;
@@ -222,6 +222,22 @@ class Material extends EventDispatcher {
 
 		}
 
+		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
+		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
+		if ( this.iridescenceThicknessRange !== undefined ) data.iridescenceThicknessRange = this.iridescenceThicknessRange;
+
+		if ( this.iridescenceMap && this.iridescenceMap.isTexture ) {
+
+			data.iridescenceMap = this.iridescenceMap.toJSON( meta ).uuid;
+
+		}
+
+		if ( this.iridescenceThicknessMap && this.iridescenceThicknessMap.isTexture ) {
+
+			data.iridescenceThicknessMap = this.iridescenceThicknessMap.toJSON( meta ).uuid;
+
+		}
+
 		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
 		if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
@@ -350,6 +366,8 @@ class Material extends EventDispatcher {
 
 		if ( this.toneMapped === false ) data.toneMapped = false;
 
+		if ( this.fog === false ) data.fog = false;
+
 		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
 
 		// TODO: Copied from Object3D.toJSON
@@ -393,8 +411,6 @@ class Material extends EventDispatcher {
 	copy( source ) {
 
 		this.name = source.name;
-
-		this.fog = source.fog;
 
 		this.blending = source.blending;
 		this.side = source.side;
@@ -482,15 +498,5 @@ class Material extends EventDispatcher {
 	}
 
 }
-
-Material.prototype.isMaterial = true;
-
-Material.fromType = function ( /*type*/ ) {
-
-	// TODO: Behavior added in Materials.js
-
-	return null;
-
-};
 
 export { Material };

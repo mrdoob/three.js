@@ -5,6 +5,7 @@
 		constructor( geometry, options = {} ) {
 
 			super( geometry );
+			this.isReflectorForSSRPass = true;
 			this.type = 'ReflectorForSSRPass';
 			const scope = this;
 			const color = options.color !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
@@ -193,7 +194,6 @@
 
 	}
 
-	ReflectorForSSRPass.prototype.isReflectorForSSRPass = true;
 	ReflectorForSSRPass.ReflectorShader = {
 		defines: {
 			DISTANCE_ATTENUATION: true,

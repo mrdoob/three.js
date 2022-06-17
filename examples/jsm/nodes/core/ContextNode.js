@@ -6,6 +6,8 @@ class ContextNode extends Node {
 
 		super();
 
+		this.isContextNode = true;
+
 		this.node = node;
 		this.context = context;
 
@@ -14,6 +16,20 @@ class ContextNode extends Node {
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );
+
+	}
+
+	construct( builder ) {
+
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.context } );
+
+		const node = this.node.build( builder );
+
+		builder.setContext( previousContext );
+
+		return node;
 
 	}
 
@@ -32,7 +48,5 @@ class ContextNode extends Node {
 	}
 
 }
-
-ContextNode.prototype.isContextNode = true;
 
 export default ContextNode;

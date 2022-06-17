@@ -7,6 +7,8 @@ class LightProbe extends Light {
 
 		super( undefined, intensity );
 
+		this.isLightProbe = true;
+
 		this.sh = sh;
 
 	}
@@ -41,7 +43,5 @@ class LightProbe extends Light {
 	}
 
 }
-
-LightProbe.prototype.isLightProbe = true;
 
 export { LightProbe };

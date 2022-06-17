@@ -17,22 +17,27 @@ class ConvertNode extends Node {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const convertTo = this.convertTo;
 		const node = this.node;
+		const type = this.getNodeType( builder );
+
+		let snippet = null;
 
 		if ( builder.isReference( convertTo ) === false ) {
 
 			const nodeSnippet = node.build( builder, convertTo );
 
-			return builder.format( nodeSnippet, this.getNodeType( builder ), convertTo );
+			snippet = builder.format( nodeSnippet, type, convertTo );
 
 		} else {
 
-			return node.build( builder, convertTo );
+			snippet = node.build( builder, convertTo );
 
 		}
+
+		return builder.format( snippet, type, output );
 
 	}
 

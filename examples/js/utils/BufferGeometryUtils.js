@@ -409,7 +409,7 @@
 
 		if ( attribute.isInstancedInterleavedBufferAttribute ) {
 
-			newAttribute = new InstancedBufferAttribute( array, itemSize, normalized, attribute.meshPerAttribute );
+			newAttribute = new THREE.InstancedBufferAttribute( array, itemSize, normalized, attribute.meshPerAttribute );
 
 		} else {
 
@@ -791,7 +791,7 @@
 
 		const _morphC = new THREE.Vector3();
 
-		function _calculateMorphedAttributeData( object, material, attribute, morphAttribute, morphTargetsRelative, a, b, c, modifiedAttributeArray ) {
+		function _calculateMorphedAttributeData( object, attribute, morphAttribute, morphTargetsRelative, a, b, c, modifiedAttributeArray ) {
 
 			_vA.fromBufferAttribute( attribute, a );
 
@@ -801,7 +801,7 @@
 
 			const morphInfluences = object.morphTargetInfluences;
 
-			if ( material.morphTargets && morphAttribute && morphInfluences ) {
+			if ( morphAttribute && morphInfluences ) {
 
 				_morphA.set( 0, 0, 0 );
 
@@ -881,7 +881,7 @@
 		const groups = geometry.groups;
 		const drawRange = geometry.drawRange;
 		let i, j, il, jl;
-		let group, groupMaterial;
+		let group;
 		let start, end;
 		const modifiedPosition = new Float32Array( positionAttribute.count * positionAttribute.itemSize );
 		const modifiedNormal = new Float32Array( normalAttribute.count * normalAttribute.itemSize );
@@ -894,7 +894,6 @@
 				for ( i = 0, il = groups.length; i < il; i ++ ) {
 
 					group = groups[ i ];
-					groupMaterial = material[ group.materialIndex ];
 					start = Math.max( group.start, drawRange.start );
 					end = Math.min( group.start + group.count, drawRange.start + drawRange.count );
 
@@ -904,9 +903,9 @@
 						b = index.getX( j + 1 );
 						c = index.getX( j + 2 );
 
-						_calculateMorphedAttributeData( object, groupMaterial, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
+						_calculateMorphedAttributeData( object, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
 
-						_calculateMorphedAttributeData( object, groupMaterial, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
+						_calculateMorphedAttributeData( object, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
 
 					}
 
@@ -923,9 +922,9 @@
 					b = index.getX( i + 1 );
 					c = index.getX( i + 2 );
 
-					_calculateMorphedAttributeData( object, material, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
+					_calculateMorphedAttributeData( object, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
 
-					_calculateMorphedAttributeData( object, material, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
+					_calculateMorphedAttributeData( object, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
 
 				}
 
@@ -939,7 +938,6 @@
 				for ( i = 0, il = groups.length; i < il; i ++ ) {
 
 					group = groups[ i ];
-					groupMaterial = material[ group.materialIndex ];
 					start = Math.max( group.start, drawRange.start );
 					end = Math.min( group.start + group.count, drawRange.start + drawRange.count );
 
@@ -949,9 +947,9 @@
 						b = j + 1;
 						c = j + 2;
 
-						_calculateMorphedAttributeData( object, groupMaterial, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
+						_calculateMorphedAttributeData( object, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
 
-						_calculateMorphedAttributeData( object, groupMaterial, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
+						_calculateMorphedAttributeData( object, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
 
 					}
 
@@ -968,9 +966,9 @@
 					b = i + 1;
 					c = i + 2;
 
-					_calculateMorphedAttributeData( object, material, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
+					_calculateMorphedAttributeData( object, positionAttribute, morphPosition, morphTargetsRelative, a, b, c, modifiedPosition );
 
-					_calculateMorphedAttributeData( object, material, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
+					_calculateMorphedAttributeData( object, normalAttribute, morphNormal, morphTargetsRelative, a, b, c, modifiedNormal );
 
 				}
 

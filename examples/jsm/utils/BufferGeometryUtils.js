@@ -2,6 +2,7 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Float32BufferAttribute,
+	InstancedBufferAttribute,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	MathUtils,
@@ -98,7 +99,7 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	if ( geometry !== _geometry ) {
 
-		geometry.copy( _geometry )
+		geometry.copy( _geometry );
 
 	}
 
@@ -839,7 +840,6 @@ function computeMorphedAttributes( object ) {
 
 	function _calculateMorphedAttributeData(
 		object,
-		material,
 		attribute,
 		morphAttribute,
 		morphTargetsRelative,
@@ -855,7 +855,7 @@ function computeMorphedAttributes( object ) {
 
 		const morphInfluences = object.morphTargetInfluences;
 
-		if ( material.morphTargets && morphAttribute && morphInfluences ) {
+		if ( morphAttribute && morphInfluences ) {
 
 			_morphA.set( 0, 0, 0 );
 			_morphB.set( 0, 0, 0 );
@@ -928,7 +928,7 @@ function computeMorphedAttributes( object ) {
 	const groups = geometry.groups;
 	const drawRange = geometry.drawRange;
 	let i, j, il, jl;
-	let group, groupMaterial;
+	let group;
 	let start, end;
 
 	const modifiedPosition = new Float32Array( positionAttribute.count * positionAttribute.itemSize );
@@ -943,7 +943,6 @@ function computeMorphedAttributes( object ) {
 			for ( i = 0, il = groups.length; i < il; i ++ ) {
 
 				group = groups[ i ];
-				groupMaterial = material[ group.materialIndex ];
 
 				start = Math.max( group.start, drawRange.start );
 				end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
@@ -956,7 +955,6 @@ function computeMorphedAttributes( object ) {
 
 					_calculateMorphedAttributeData(
 						object,
-						groupMaterial,
 						positionAttribute,
 						morphPosition,
 						morphTargetsRelative,
@@ -966,7 +964,6 @@ function computeMorphedAttributes( object ) {
 
 					_calculateMorphedAttributeData(
 						object,
-						groupMaterial,
 						normalAttribute,
 						morphNormal,
 						morphTargetsRelative,
@@ -991,7 +988,6 @@ function computeMorphedAttributes( object ) {
 
 				_calculateMorphedAttributeData(
 					object,
-					material,
 					positionAttribute,
 					morphPosition,
 					morphTargetsRelative,
@@ -1001,7 +997,6 @@ function computeMorphedAttributes( object ) {
 
 				_calculateMorphedAttributeData(
 					object,
-					material,
 					normalAttribute,
 					morphNormal,
 					morphTargetsRelative,
@@ -1022,7 +1017,6 @@ function computeMorphedAttributes( object ) {
 			for ( i = 0, il = groups.length; i < il; i ++ ) {
 
 				group = groups[ i ];
-				groupMaterial = material[ group.materialIndex ];
 
 				start = Math.max( group.start, drawRange.start );
 				end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
@@ -1035,7 +1029,6 @@ function computeMorphedAttributes( object ) {
 
 					_calculateMorphedAttributeData(
 						object,
-						groupMaterial,
 						positionAttribute,
 						morphPosition,
 						morphTargetsRelative,
@@ -1045,7 +1038,6 @@ function computeMorphedAttributes( object ) {
 
 					_calculateMorphedAttributeData(
 						object,
-						groupMaterial,
 						normalAttribute,
 						morphNormal,
 						morphTargetsRelative,
@@ -1070,7 +1062,6 @@ function computeMorphedAttributes( object ) {
 
 				_calculateMorphedAttributeData(
 					object,
-					material,
 					positionAttribute,
 					morphPosition,
 					morphTargetsRelative,
@@ -1080,7 +1071,6 @@ function computeMorphedAttributes( object ) {
 
 				_calculateMorphedAttributeData(
 					object,
-					material,
 					normalAttribute,
 					morphNormal,
 					morphTargetsRelative,

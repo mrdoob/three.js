@@ -17,6 +17,8 @@ class BufferAttribute {
 
 		}
 
+		this.isBufferAttribute = true;
+
 		this.name = '';
 
 		this.array = array;
@@ -385,7 +387,7 @@ class BufferAttribute {
 		const data = {
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
-			array: Array.prototype.slice.call( this.array ),
+			array: Array.from( this.array ),
 			normalized: this.normalized
 		};
 
@@ -398,8 +400,6 @@ class BufferAttribute {
 	}
 
 }
-
-BufferAttribute.prototype.isBufferAttribute = true;
 
 //
 
@@ -479,11 +479,12 @@ class Float16BufferAttribute extends BufferAttribute {
 
 		super( new Uint16Array( array ), itemSize, normalized );
 
+		this.isFloat16BufferAttribute = true;
+
 	}
 
 }
 
-Float16BufferAttribute.prototype.isFloat16BufferAttribute = true;
 
 class Float32BufferAttribute extends BufferAttribute {
 
