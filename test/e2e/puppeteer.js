@@ -225,7 +225,7 @@ async function main() {
 
 	if ( temporaryWebGPUHack ) {
 
-		session = page.client();
+		session = await page.target().createCDPSession();
 
 		// TODO: remove this when https://github.com/puppeteer/puppeteer/issues/1910 will be fixed
 		const { width, height } = viewport;
