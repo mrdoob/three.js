@@ -198,6 +198,7 @@
 		"webgl_portal",
 		"webgl_raycast_sprite",
 		"webgl_raycast_texture",
+		"webgl_raycasting_bvh",
 		"webgl_read_float_buffer",
 		"webgl_refraction",
 		"webgl_rtt",
@@ -389,9 +390,6 @@
 		"misc_exporter_stl",
 		"misc_exporter_usdz",
 		"misc_lookat"
-	],
-	"community plugins": [
-		"external_bvh_raycasting"
 	],
 	"css2d": [
 		"css2d_label"
