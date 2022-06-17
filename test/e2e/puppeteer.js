@@ -150,7 +150,8 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = process.platform === 'linux' ? [ '--enable-unsafe-webgpu', '--enable-features=Vulkan' ] : [ '--enable-unsafe-webgpu' ];
+	const flags = [ '--enable-unsafe-webgpu', '--hide-scrollbars' ];
+	if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan' );
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
@@ -161,11 +162,7 @@ async function main() {
 		defaultViewport: viewport
 	} );
 
-	browser.on( 'targetdestroyed', target => {
-
-		if ( process.env.CI === undefined ) close();
-
-	} );
+	if ( process.env.CI === undefined ) browser.on( 'targetdestroyed', () => close() );
 
 	/* Prepare page */
 
