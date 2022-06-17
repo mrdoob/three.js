@@ -151,7 +151,7 @@ async function main() {
 	/* Launch browser */
 
 	const flags = [ '--enable-unsafe-webgpu', '--hide-scrollbars' ];
-	if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan' );
+	if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer' );
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
