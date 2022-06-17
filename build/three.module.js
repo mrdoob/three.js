@@ -24901,7 +24901,7 @@ class WebXRManager extends EventDispatcher {
 		let newRenderTarget = null;
 
 		const controllers = [];
-		const inputSourcesMap = new Map();
+		const controllerInputSources = [];
 
 		//
 
@@ -24978,7 +24978,15 @@ class WebXRManager extends EventDispatcher {
 
 		function onSessionEvent( event ) {
 
-			const controller = inputSourcesMap.get( event.inputSource );
+			const controllerIndex = controllerInputSources.indexOf( event.inputSource );
+
+			if ( controllerIndex === - 1 ) {
+
+				return;
+
+			}
+
+			const controller = controllers[ controllerIndex ];
 
 			if ( controller !== undefined ) {
 
@@ -24999,17 +25007,15 @@ class WebXRManager extends EventDispatcher {
 			session.removeEventListener( 'end', onSessionEnd );
 			session.removeEventListener( 'inputsourceschange', onInputSourcesChange );
 
-			inputSourcesMap.forEach( function ( controller, inputSource ) {
+			for ( let i = 0; i < controllers.length; i ++ ) {
 
-				if ( controller !== undefined ) {
+				const inputSource = controllerInputSources[ i ];
 
-					controller.disconnect( inputSource );
+				if ( inputSource === null ) continue;
 
-				}
+				controllers[ i ].disconnect( inputSource );
 
-			} );
-
-			inputSourcesMap.clear();
+			}
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
@@ -25205,28 +25211,17 @@ class WebXRManager extends EventDispatcher {
 
 		function onInputSourcesChange( event ) {
 
-			const inputSources = session.inputSources;
-
-			// Assign controllers to available inputSources
-
-			for ( let i = 0; i < inputSources.length; i ++ ) {
-
-				const index = inputSources[ i ].handedness === 'right' ? 1 : 0;
-				inputSourcesMap.set( inputSources[ i ], controllers[ index ] );
-
-			}
-
 			// Notify disconnected
 
 			for ( let i = 0; i < event.removed.length; i ++ ) {
 
 				const inputSource = event.removed[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+				const index = controllerInputSources.indexOf( inputSource );
 
-				if ( controller ) {
+				if ( index >= 0 ) {
 
-					controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
-					inputSourcesMap.delete( inputSource );
+					controllerInputSources[ index ] = null;
+					controllers[ index ].dispatchEvent( { type: 'disconnected', data: inputSource } );
 
 				}
 
@@ -25237,7 +25232,38 @@ class WebXRManager extends EventDispatcher {
 			for ( let i = 0; i < event.added.length; i ++ ) {
 
 				const inputSource = event.added[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+
+				let controllerIndex = controllerInputSources.indexOf( inputSource );
+
+				if ( controllerIndex === - 1 ) {
+
+					// Assign input source a controller that currently has no input source
+
+					for ( let i = 0; i < controllers.length; i ++ ) {
+
+						if ( i >= controllerInputSources.length ) {
+
+							controllerInputSources.push( inputSource );
+							controllerIndex = i;
+							break;
+
+						} else if ( controllerInputSources[ i ] === null ) {
+
+							controllerInputSources[ i ] = inputSource;
+							controllerIndex = i;
+							break;
+
+						}
+
+					}
+
+					// If all controllers do currently receive input we ignore new ones
+
+					if ( controllerIndex === - 1 ) break;
+
+				}
+
+				const controller = controllers[ controllerIndex ];
 
 				if ( controller ) {
 
@@ -25527,14 +25553,12 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
-			const inputSources = session.inputSources;
-
 			for ( let i = 0; i < controllers.length; i ++ ) {
 
-				const inputSource = inputSources[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+				const inputSource = controllerInputSources[ i ];
+				const controller = controllers[ i ];
 
-				if ( controller !== undefined ) {
+				if ( inputSource !== null && controller !== undefined ) {
 
 					controller.update( inputSource, frame, customReferenceSpace || referenceSpace );
 
@@ -41223,34 +41247,34 @@ class MaterialLoader extends Loader {
 
 	}
 
+	static createMaterialFromType( type ) {
+
+		const materialLib = {
+			ShadowMaterial,
+			SpriteMaterial,
+			RawShaderMaterial,
+			ShaderMaterial,
+			PointsMaterial,
+			MeshPhysicalMaterial,
+			MeshStandardMaterial,
+			MeshPhongMaterial,
+			MeshToonMaterial,
+			MeshNormalMaterial,
+			MeshLambertMaterial,
+			MeshDepthMaterial,
+			MeshDistanceMaterial,
+			MeshBasicMaterial,
+			MeshMatcapMaterial,
+			LineDashedMaterial,
+			LineBasicMaterial,
+			Material
+		};
+
+		return new materialLib[ type ]();
+
+	}
+
 }
-
-MaterialLoader.createMaterialFromType = function ( type ) {
-
-	const materialLib = {
-		ShadowMaterial,
-		SpriteMaterial,
-		RawShaderMaterial,
-		ShaderMaterial,
-		PointsMaterial,
-		MeshPhysicalMaterial,
-		MeshStandardMaterial,
-		MeshPhongMaterial,
-		MeshToonMaterial,
-		MeshNormalMaterial,
-		MeshLambertMaterial,
-		MeshDepthMaterial,
-		MeshDistanceMaterial,
-		MeshBasicMaterial,
-		MeshMatcapMaterial,
-		LineDashedMaterial,
-		LineBasicMaterial,
-		Material
-	};
-
-	return new materialLib[ type ]();
-
-};
 
 class LoaderUtils {
 
