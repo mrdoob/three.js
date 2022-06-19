@@ -9,6 +9,12 @@ class WebGPUGeometries {
 
 	}
 
+	has( geometry ) {
+
+		return this.geometries.has( geometry );
+
+	}
+
 	update( geometry ) {
 
 		if ( this.geometries.has( geometry ) === false ) {
