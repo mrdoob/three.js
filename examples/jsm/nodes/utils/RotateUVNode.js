@@ -1,12 +1,12 @@
 import TempNode from '../core/TempNode.js';
-import { vec2, float, uv, add, sub, mul, cos, sin } from '../shadernode/ShaderNodeBaseElements.js';
+import { vec2, add, sub, mul, cos, sin } from '../shadernode/ShaderNodeBaseElements.js';
 
 class RotateUVNode extends TempNode {
 
 	constructor( uvNode, rotationNode, centerNode = vec2( .5 ) ) {
 
 		super( 'vec2' );
-		
+
 		this.uvNode = uvNode;
 		this.rotationNode = rotationNode;
 		this.centerNode = centerNode;
