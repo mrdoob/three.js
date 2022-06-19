@@ -93,7 +93,6 @@
 				smokeNodeMaterial.positionNode = mul( offsetRange, lifeTime );
 				smokeNodeMaterial.scaleNode = mul( scaleRange, max( .3, lifeTime ) );
 				smokeNodeMaterial.depthWrite = false;
-				smokeNodeMaterial.depthTest = true;
 				smokeNodeMaterial.transparent = true;
 
 				const smokeInstancedSprite = new THREE.Sprite( smokeNodeMaterial );
@@ -112,7 +111,6 @@
 				fireNodeMaterial.blending = THREE.AdditiveBlending;
 				fireNodeMaterial.transparent = true;
 				fireNodeMaterial.depthWrite = false;
-				fireNodeMaterial.depthTest = true;
 
 				const fireInstancedSprite = new THREE.Sprite( fireNodeMaterial );
 				fireInstancedSprite.scale.setScalar( 400 );
