@@ -100,9 +100,9 @@ export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
 export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
 
 // @TODO: add supports to use node in timeScale
-export const timerLocal = ( timeScale ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale ) );
-export const timerGlobal = ( timeScale ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale ) );
-export const timerDelta = ( timeScale ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale ) );
+export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
+export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
+export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
 
 // geometry
 
