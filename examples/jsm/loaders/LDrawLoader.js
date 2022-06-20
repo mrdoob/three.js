@@ -1969,7 +1969,7 @@ class LDrawLoader extends Loader {
 			.parseModel( text, this.materialLibrary )
 			.then( group => {
 
-				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );<<<<
+				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 				this.computeConstructionSteps( group );
 				group.userData.fileName = "";
 				onLoad( group );
