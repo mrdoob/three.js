@@ -12837,7 +12837,7 @@
 	function denormalize(morph, attribute) {
 		let denominator = 1;
 		const array = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
-		if (array instanceof Int8Array) denominator = 127;else if (array instanceof Int16Array) denominator = 32767;else if (array instanceof Int32Array) denominator = 2147483647;else console.error('THREE.WebGLMorphtargets: Unsupported morph attribute data type: ', array);
+		if (array instanceof Int8Array) denominator = 127;else if (array instanceof Uint8Array) denominator = 255;else if (array instanceof Uint16Array) denominator = 65535;else if (array instanceof Int16Array) denominator = 32767;else if (array instanceof Int32Array) denominator = 2147483647;else console.error('THREE.WebGLMorphtargets: Unsupported morph attribute data type: ', array);
 		morph.divideScalar(denominator);
 	}
 
@@ -20747,7 +20747,16 @@
 		};
 
 		this.initTexture = function (texture) {
-			textures.setTexture2D(texture, 0);
+			if (texture.isCubeTexture) {
+				textures.setTextureCube(texture, 0);
+			} else if (texture.isData3DTexture) {
+				textures.setTexture3D(texture, 0);
+			} else if (texture.isDataArrayTexture) {
+				textures.setTexture2DArray(texture, 0);
+			} else {
+				textures.setTexture2D(texture, 0);
+			}
+
 			state.unbindTexture();
 		};
 
