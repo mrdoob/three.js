@@ -137,6 +137,7 @@
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxDistance = 2700;
 				controls.target.set( 0, 500, 0 );
 				controls.update();
 
@@ -148,7 +149,7 @@
 
 				const gui = new GUI();
 
-				gui.add( timer, 'scale', 0, 1, 0.01 );
+				gui.add( timer, 'scale', 0, 1, 0.01 ).name( 'speed' );
 
 				return renderer.init();
 
