@@ -229,6 +229,8 @@ class PCDLoader extends Loader {
 		const position = [];
 		const normal = [];
 		const color = [];
+		const intensity = [];
+		const label = [];
 
 		// ascii
 
@@ -251,6 +253,13 @@ class PCDLoader extends Loader {
 					position.push( parseFloat( line[ offset.z ] ) );
 
 				}
+				if (offset.intensity !== undefined) {
+                    intensity.push(parseFloat(line[offset.intensity]));
+                }
+
+                if (offset.label !== undefined) {
+                    label.push(parseInt(line[offset.label], 10));
+                }
 
 				if ( offset.rgb !== undefined ) {
 
@@ -323,6 +332,19 @@ class PCDLoader extends Loader {
 
 				}
 
+				if (offset.intensity !== undefined) {
+                    intensity.push(
+                        dataview.getFloat32(
+                            PCDheader.points * offset.intensity + PCDheader.size[4] * i,
+                            this.littleEndian
+                        )
+                    );
+                }
+
+                if (offset.label !== undefined) {
+                    label.push(dataview.getUint8(PCDheader.points * offset.label + PCDheader.size[5]));
+                }
+
 				if ( offset.normal_x !== undefined ) {
 
 					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + PCDheader.size[ 4 ] * i, this.littleEndian ) );
@@ -360,6 +382,14 @@ class PCDLoader extends Loader {
 
 				}
 
+				if (offset.intensity !== undefined) {
+                    intensity.push(dataview.getUint8(row + offset.intensity, this.littleEndian));
+                }
+                
+                if (offset.label !== undefined) {
+                    label.push(dataview.getUint8(row + offset.label, this.littleEndian));
+                }
+
 				if ( offset.normal_x !== undefined ) {
 
 					normal.push( dataview.getFloat32( row + offset.normal_x, this.littleEndian ) );
@@ -379,6 +409,8 @@ class PCDLoader extends Loader {
 		if ( position.length > 0 ) geometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 		if ( normal.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal, 3 ) );
 		if ( color.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+		if ( intensity.length > 0 ) geometry.setAttribute( 'intensity', new Int16BufferAttribute( intensity, 1) );
+		if ( label.length > 0 ) geometry.setAttribute( 'label', new Int16BufferAttribute( label, 1) );
 
 		geometry.computeBoundingSphere();
 
