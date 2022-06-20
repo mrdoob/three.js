@@ -21,6 +21,8 @@ function denormalize( morph, attribute ) {
 	const array = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
 
 	if ( array instanceof Int8Array ) denominator = 127;
+	else if ( array instanceof Uint8Array ) denominator = 255;
+	else if ( array instanceof Uint16Array ) denominator = 65535;
 	else if ( array instanceof Int16Array ) denominator = 32767;
 	else if ( array instanceof Int32Array ) denominator = 2147483647;
 	else console.error( 'THREE.WebGLMorphtargets: Unsupported morph attribute data type: ', array );
