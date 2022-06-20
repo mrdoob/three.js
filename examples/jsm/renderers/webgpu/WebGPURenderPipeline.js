@@ -130,7 +130,6 @@ class WebGPURenderPipeline {
 		switch ( blending ) {
 
 			case NormalBlending:
-			/*case AdditiveBlending:*/
 
 				if ( premultipliedAlpha === false ) {
 
@@ -169,6 +168,7 @@ class WebGPURenderPipeline {
 				break;
 
 			case MultiplyBlending:
+
 				if ( premultipliedAlpha === true ) {
 
 					alphaBlend = {
