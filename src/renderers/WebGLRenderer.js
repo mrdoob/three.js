@@ -2180,25 +2180,17 @@ function WebGLRenderer( parameters = {} ) {
 
 			textures.setTextureCube( texture, 0 );
 
+		} else if ( texture.isData3DTexture ) {
+
+			textures.setTexture3D( texture, 0 );
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			textures.setTexture2DArray( texture, 0 );
+
 		} else {
 
-			if ( texture.isData3DTexture ) {
-
-				texture.setTexture3D( texture, 0 );
-
-			} else {
-
-				if ( texture.isDataArrayTexture ) {
-
-					texture.setTexture2DArray( texture, 0 );
-
-				} else {
-
-					textures.setTexture2D( texture, 0 );
-
-				}
-
-			}
+			textures.setTexture2D( texture, 0 );
 
 		}
 
