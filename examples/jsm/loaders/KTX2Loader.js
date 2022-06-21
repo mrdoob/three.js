@@ -57,7 +57,7 @@ const {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
-} = KTX;
+} = KTX; // eslint-disable-line no-undef
 
 const _taskCache = new WeakMap();
 
