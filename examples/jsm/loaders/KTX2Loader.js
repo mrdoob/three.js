@@ -38,8 +38,12 @@ import {
 	UnsignedByteType
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
-import {
+import * as KTX from '../libs/ktx-parse.module.js';
+
+const {
 	read,
+	KHR_DF_FLAG_ALPHA_PREMULTIPLIED,
+	KHR_DF_TRANSFER_SRGB,
 	VK_FORMAT_UNDEFINED,
 	VK_FORMAT_R16_SFLOAT,
 	VK_FORMAT_R16G16_SFLOAT,
@@ -53,10 +57,8 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
-} from '../libs/ktx-parse.module.js';
+} = KTX;
 
-const KTX2TransferSRGB = 2;
-const KTX2_ALPHA_PREMULTIPLIED = 1;
 const _taskCache = new WeakMap();
 
 let _activeLoaders = 0;
@@ -242,8 +244,8 @@ class KTX2Loader extends Loader {
 		texture.magFilter = LinearFilter;
 		texture.generateMipmaps = false;
 		texture.needsUpdate = true;
-		texture.encoding = dfdTransferFn === KTX2TransferSRGB ? sRGBEncoding : LinearEncoding;
-		texture.premultiplyAlpha = !! ( dfdFlags & KTX2_ALPHA_PREMULTIPLIED );
+		texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? sRGBEncoding : LinearEncoding;
+		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 
 		return texture;
 
