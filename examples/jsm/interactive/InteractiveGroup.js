@@ -59,13 +59,12 @@ class InteractiveGroup extends Group {
 		element.addEventListener( 'click', onPointerEvent );
 
 		// WebXR Controller Events
-		// TODO: Dispatch pointerevents too
 
 		const events = {
-			'move': 'mousemove',
-			'select': 'click',
-			'selectstart': 'mousedown',
-			'selectend': 'mouseup'
+			'move': ['mousemove','pointermove'],
+			'select': ['click'],
+			'selectstart': ['mousedown','pointerdown'],
+			'selectend': ['mouseup','pointerup']
 		};
 
 		function onXRControllerEvent( event ) {
@@ -85,11 +84,16 @@ class InteractiveGroup extends Group {
 
 				const object = intersection.object;
 				const uv = intersection.uv;
+				
+				for (let i = events[ event.type ].length - 1; i >= 0; i--) {
+					
+					_event.type = events[ event.type ][i];
+					_event.data.set( uv.x, 1 - uv.y );
 
-				_event.type = events[ event.type ];
-				_event.data.set( uv.x, 1 - uv.y );
-
-				object.dispatchEvent( _event );
+					object.dispatchEvent( _event );
+					
+				}
+			
 
 			}
 
