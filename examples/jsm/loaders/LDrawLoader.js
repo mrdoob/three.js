@@ -2106,7 +2106,7 @@ class LDrawLoader extends Loader {
 					console.warn( `LDrawLoader: Material properties for code ${ colorCode } not available.` );
 
 					// And return the 'missing color' material
-					material = loader.missingColorMaterial.clone();
+					material = loader.missingColorMaterial;
 					material.name = "Missing material for color code '" + colorCode + "'";
 					material.userData.code = colorCode;
 
@@ -2415,7 +2415,7 @@ class LDrawLoader extends Loader {
 
 			let lum;
 
-			if ( token.startsWith( "LUMINANCE" ) ) {
+			if ( token.startsWith( 'LUMINANCE' ) ) {
 
 				lum = parseInt( token.substring( 9 ) );
 
