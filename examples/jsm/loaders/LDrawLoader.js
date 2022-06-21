@@ -1900,8 +1900,11 @@ class LDrawLoader extends Loader {
 
 		// Material assigned to not available colors for meshes and edges
 		this.missingColorMaterial = new MeshStandardMaterial( { color: 0xFF00FF, roughness: 0.3, metalness: 0 } );
+		this.missingColorMaterial.name = 'Missing material";
 		this.missingEdgeColorMaterial = new LineBasicMaterial( { color: 0xFF00FF } );
+		this.missingEdgeColorMaterial.name = 'Missing material - Edge";
 		this.missingConditionalEdgeColorMaterial = new LDrawConditionalLineMaterial( { fog: true, color: 0xFF00FF } );
+		this.missingConditionalEdgeColorMaterial.name = 'Missing material - Conditional Edge";
 
 	}
 
@@ -1971,7 +1974,7 @@ class LDrawLoader extends Loader {
 
 				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 				this.computeConstructionSteps( group );
-				group.userData.fileName = "";
+				group.userData.fileName = '';
 				onLoad( group );
 
 			} );
@@ -2107,15 +2110,12 @@ class LDrawLoader extends Loader {
 
 					// And return the 'missing color' material
 					material = loader.missingColorMaterial;
-					material.name = "Missing material for color code '" + colorCode + "'";
 					material.userData.code = colorCode;
 
 					const edgeMat = loader.missingEdgeColorMaterial.clone();
-					edgeMat.name = "Missing material for color code '" + colorCode + "' - Edge";
 					edgeMat.userData.code = colorCode;
 
-					const condEdgeMat = loader.missingConditionalEdgeColorMaterial.clone();
-					condEdgeMat.name = "Missing material for color code '" + colorCode + "' - Edge";
+					const condEdgeMat = loader.missingConditionalEdgeColorMaterial;
 					condEdgeMat.userData.code = colorCode;
 
 					material.userData.edgeMaterial = edgeMat;
