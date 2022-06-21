@@ -1959,6 +1959,7 @@ class LDrawLoader extends Loader {
 
 					this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 					this.computeConstructionSteps( group );
+					group.userData.fileName = url;
 					onLoad( group );
 
 				} )
