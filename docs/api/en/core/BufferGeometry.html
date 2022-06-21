@@ -138,7 +138,8 @@
 
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
-			Hashmap of [page:BufferAttribute]s holding details of the geometry's morph targets.
+			Hashmap of [page:BufferAttribute]s holding details of the geometry's morph targets.<br />
+			Note: Once the geometry has been rendered, the morph attribute data cannot be changed. You will have to call [page:.dispose](), and create a new instance of [name].
 		</p>
 
 		<h3>[property:Boolean morphTargetsRelative]</h3>

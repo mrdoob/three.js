@@ -321,6 +321,12 @@ function main() {
       attribute.name = name;
       return attribute;
     });
+    baseGeometry.morphAttributes.color = geometries.map((geometry, ndx) => {
+      const attribute = geometry.getAttribute('color');
+      const name = `target${ndx}`;
+      attribute.name = name;
+      return attribute;
+    });
     const material = new THREE.MeshBasicMaterial({
       vertexColors: true,
     });
