@@ -2149,7 +2149,8 @@ class LDrawLoader extends Loader {
 
 	getMainEdgeMaterial() {
 
-		return this.getMaterial( MAIN_EDGE_COLOUR_CODE ).userData.edgeMaterial;
+		const mat = this.getMaterial( MAIN_EDGE_COLOUR_CODE );
+		return mat ? mat.userData.edgeMaterial : null;
 
 	}
 
