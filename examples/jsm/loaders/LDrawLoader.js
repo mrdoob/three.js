@@ -2119,7 +2119,7 @@ class LDrawLoader extends Loader {
 					condEdgeMat.userData.code = colorCode;
 
 					material.userData.edgeMaterial = edgeMat;
-					material.userData.edgeMaterial.userData.conditionalEdgeMaterial = condEdgeMat;
+					edgeMat.userData.conditionalEdgeMaterial = condEdgeMat;
 
 				}
 
