@@ -1,7 +1,7 @@
 import LightingNode from './LightingNode.js';
 import ContextNode from '../core/ContextNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
-import { ShaderNode, float, add, mul, div, log2, clamp, roughness, reflect, mix, vec3, positionViewDirection, negate, normalize, transformedNormalView, transformedNormalWorld, transformDirection, cameraViewMatrix } from '../shadernode/ShaderNodeElements.js';
+import { ShaderNode, float, add, mul, div, log2, clamp, roughness, reflect, mix, positionViewDirection, negate, normalize, transformedNormalView, transformedNormalWorld, transformDirection, cameraViewMatrix } from '../shadernode/ShaderNodeElements.js';
 
 // taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
 const getSpecularMIPLevel = new ShaderNode( ( { texture, levelNode } ) => {
