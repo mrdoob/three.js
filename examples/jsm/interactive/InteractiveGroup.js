@@ -53,13 +53,12 @@ class InteractiveGroup extends Group {
 		element.addEventListener( 'pointerdown', onPointerEvent );
 		element.addEventListener( 'pointerup', onPointerEvent );
 		element.addEventListener( 'pointermove', onPointerEvent );
-		element.addEventListener( 'click', onPointerEvent );
 
 		// WebXR Controller Events
 
 		const events = {
 			'move': 'pointermove',
-			'select': 'click',
+			'select': 'pointerup',
 			'selectstart': 'pointerdown',
 			'selectend': 'pointerup'
 		};
