@@ -39,7 +39,7 @@ import Object3DNode from './accessors/Object3DNode.js';
 import PointUVNode from './accessors/PointUVNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
-import ReflectNode from './accessors/ReflectNode.js';
+import ReflectVectorNode from './accessors/ReflectVectorNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
@@ -153,7 +153,7 @@ const nodeLib = {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
-	ReflectNode,
+	ReflectVectorNode,
 	SkinningNode,
 	TextureNode,
 	UVNode,
@@ -260,7 +260,7 @@ export {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
-	ReflectNode,
+	ReflectVectorNode,
 	SkinningNode,
 	TextureNode,
 	UVNode,
