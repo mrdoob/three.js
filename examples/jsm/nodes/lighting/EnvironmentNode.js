@@ -30,12 +30,9 @@ class EnvironmentNode extends LightingNode {
 		const envNode = this.envNode;
 		const properties = builder.getNodeProperties( this );
 
-		const flipNormalWorld = vec3( negate( transformedNormalWorld.x ), transformedNormalWorld.yz );
-
 		let reflectVec = reflect( negate( positionViewDirection ), transformedNormalView );
 		reflectVec = normalize( mix( reflectVec, transformedNormalView, mul( roughness, roughness ) ) );
 		reflectVec = transformDirection( reflectVec, cameraViewMatrix );
-		reflectVec = vec3( negate( reflectVec.x ), reflectVec.yz );
 
 		const radianceContext = new ContextNode( envNode, {
 			tempRead: false,
@@ -46,7 +43,7 @@ class EnvironmentNode extends LightingNode {
 
 		const irradianceContext = new ContextNode( envNode, {
 			tempRead: false,
-			uvNode: flipNormalWorld,
+			uvNode: transformedNormalWorld,
 			levelNode: float( 1 ),
 			levelShaderNode: getSpecularMIPLevel
 		} );
