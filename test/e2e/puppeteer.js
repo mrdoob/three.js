@@ -12,7 +12,6 @@ class PromiseQueue {
 
 		this.func = func.bind( this, ...args );
 		this.promises = [];
-		this.activePromises = 0;
 
 	}
 
@@ -20,14 +19,13 @@ class PromiseQueue {
 
 		const promise = this.func( ...args );
 		this.promises.push( promise );
-		this.activePromises ++;
-		promise.then( () => this.activePromises -- );
+		promise.then( () => this.promises.splice( this.promises.indexOf( promise ), 1 ) );
 
 	}
 
 	async waitForAll() {
 
-		while ( this.activePromises > 0 ) {
+		while ( this.promises.length > 0 ) {
 
 			await Promise.all( this.promises );
 
@@ -49,6 +47,9 @@ function unregexify( regexp ) {
 
 }
 
+const webgpuEnabled = false; // process.platform !== 'linux';
+const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
+
 /* CONFIG VARIABLES START */
 
 const idleTime = 3; // 3 seconds - for how long there should be no network requests
@@ -65,6 +66,7 @@ const exceptionList = [
 	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format." investigate
 	'webgl_morphtargets_face', // does not work on GitHub? investigate
 	'webgl_multiple_elements_text', // investigate
+	'webgl_shadowmap_progressive', // investigate
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
 	'webgl_worker_offscreencanvas', // investigate
@@ -74,11 +76,9 @@ const exceptionList = [
 	'css3d_youtube',
 	'*video*'
 
-].concat( process.platform === 'linux' ? [ 'webgpu*' ] : [] ).map( regexify );
+].concat( webgpuEnabled ? [] : [ 'webgpu*' ] ).map( regexify );
 
 /* CONFIG VARIABLES END */
-
-const temporaryWebGPUHack = process.platform !== 'linux'; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 const LAST_REVISION_URLS = {
     linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
@@ -95,7 +95,7 @@ const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixe
 const networkTimeout = 180; // 3 minutes - set to 0 to disable
 const renderTimeout = 1; // 1 second - set to 0 to disable
 
-const numAttempts = 3; // perform 3 attempts before failing
+const numAttempts = 5; // perform 5 attempts before failing
 
 const numPages = 16;
 
@@ -185,7 +185,8 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--enable-unsafe-webgpu', '--hide-scrollbars' ];
+	const flags = [ '--hide-scrollbars' ];
+	if ( webgpuEnabled ) flags.push( '--enable-unsafe-webgpu' );
 	if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
@@ -206,11 +207,12 @@ async function main() {
 
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
+	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) ).replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
 
 	/* Prepare pages */
 
 	const pages = await browser.pages();
-	while ( pages.length < numPages ) pages.push( await browser.newPage() );
+	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
 
 	const messages = [];
 
@@ -219,16 +221,27 @@ async function main() {
 		/* let page.pageSize, page.file, page.session */
 
 		await page.evaluateOnNewDocument( injection );
+		await page.setRequestInterception( true );
 
 		page.on( 'console', msg => {
 
-			if ( msg.type() !== 'warning' && msg.type() !== 'error' ) {
+			const type = msg.type();
+
+			if ( type !== 'warning' && type !== 'error' ) {
 
 				return;
 
 			}
 
-			const text = page.file + ': ' + msg.text().replace( /\[\.WebGL-(.+?)\] /g, '' ).trim();
+			const file = page.file;
+
+			if ( file === undefined ) {
+
+				return;
+
+			}
+
+			const text = file + ': ' + msg.text().replace( /\[\.WebGL-(.+?)\] /g, '' ).trim();
 
 			if ( text.includes( 'GPU stall due to ReadPixels' ) || text.includes( 'GPUStatsPanel' ) || text.includes( '404 (Not Found)' ) ) {
 
@@ -242,9 +255,51 @@ async function main() {
 
 			}
 
+			if ( text.includes( 'A wait operation has not completed in the specified time' ) ) {
+
+				page.error = `${ file }: Internal Vulkan error - a wait operation has not completed in the specified time`;
+				return;
+
+			}
+
+			if ( text.includes( 'context lost' ) ) {
+
+				page.error = `${ file }: WebGL context lost`;
+				return;
+
+			}
+
+			if ( text.includes( 'Error creating WebGL context' ) ) {
+
+				page.error = `${ file }: Error creating WebGL context`;
+				return;
+
+			}
+
+			if ( text.includes( 'JSHandle@error' ) ) {
+
+				page.error = `${ file }: Error happened`;
+				return;
+
+			}
+
+			if ( text.includes( 'A WebGL context could not be created' ) ) {
+
+				return;
+
+			}
+
 			messages.push( text );
 
-			console.yellow( text );
+			if ( type === 'warning' ) {
+
+				console.yellow( text );
+
+			} else {
+
+				page.error = text;
+
+			}
 
 		} );
 
@@ -259,6 +314,24 @@ async function main() {
 				}
 
 			} catch {}
+
+		} );
+
+		page.on( 'request', async ( request ) => {
+
+			if ( request.url() === `http://localhost:${ port }/build/three.module.js` ) {
+
+				await request.respond( {
+					status: 200,
+					contentType: 'application/javascript; charset=utf-8',
+					body: build
+				} );
+
+			} else {
+
+				await request.continue();
+
+			}
 
 		} );
 
@@ -305,6 +378,9 @@ async function main() {
 	
 	if ( isMakeScreenshot && failedScreenshots.length ) {
 
+		const list = failedScreenshots.join( ' ' );
+		console.red( 'List of failed screenshots: ' + list );
+		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`. If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
 		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated succesfully.` );
 
 	} else if ( isMakeScreenshot && ! failedScreenshots.length ) {
@@ -425,6 +501,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 		const screenshot = await jimp.read( temporaryWebGPUHack ? await fromSurface( page ) : await page.screenshot() );
 		screenshot.scale( 1 / viewScale ).quality( jpgQuality );
 
+		if ( page.error !== undefined ) throw new Error( page.error );
+
 		if ( isMakeScreenshot ) {
 
 			/* Make screenshot */
@@ -492,7 +570,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		} else {
 
-			// console.log( `Another attempt for file ${ file }...` );
+			// console.log( `${ e }, another attempt...` );
 			this.add( file, attemptID + 1 );
 
 		}
@@ -500,6 +578,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 	} finally {
 
 		page.file = undefined;
+		page.error = undefined;
 
 	}
 
