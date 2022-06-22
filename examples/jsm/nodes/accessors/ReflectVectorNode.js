@@ -4,7 +4,7 @@ import {
 	transformDirection, negate, reflect, cameraViewMatrix
 } from '../shadernode/ShaderNodeBaseElements.js';
 
-class ReflectNode extends Node {
+class ReflectVectorNode extends Node {
 
 	constructor() {
 
@@ -14,7 +14,7 @@ class ReflectNode extends Node {
 
 	getHash( /*builder*/ ) {
 
-		return `reflect-${this.scope}`;
+		return `reflectVector`;
 
 	}
 
@@ -28,4 +28,4 @@ class ReflectNode extends Node {
 
 }
 
-export default ReflectNode;
+export default ReflectVectorNode;

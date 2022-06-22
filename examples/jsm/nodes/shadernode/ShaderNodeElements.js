@@ -1,7 +1,7 @@
 // accessors
 import CubeTextureNode from '../accessors/CubeTextureNode.js';
 import InstanceNode from '../accessors/InstanceNode.js';
-import ReflectNode from '../accessors/ReflectNode.js';
+import ReflectVectorNode from '../accessors/ReflectVectorNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
 
 // display
@@ -65,7 +65,7 @@ export const cubeTexture = nodeProxy( CubeTextureNode );
 
 export const instance = nodeProxy( InstanceNode );
 
-export const reflectVector = nodeImmutable( ReflectNode );
+export const reflectVector = nodeImmutable( ReflectVectorNode );
 
 export const skinning = nodeProxy( SkinningNode );
 

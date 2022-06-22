@@ -1,6 +1,6 @@
 import TextureNode from './TextureNode.js';
 import UniformNode from '../core/UniformNode.js';
-import ReflectNode from './ReflectNode.js';
+import ReflectVectorNode from './ReflectVectorNode.js';
 
 import { negate, vec3, nodeObject } from '../shadernode/ShaderNodeBaseElements.js';
 
@@ -30,7 +30,7 @@ class CubeTextureNode extends TextureNode {
 
 		const properties = builder.getNodeProperties( this );
 
-		const uvNode = this.uvNode || builder.context.uvNode || new ReflectNode();
+		const uvNode = this.uvNode || builder.context.uvNode || new ReflectVectorNode();
 		let levelNode = this.levelNode || builder.context.levelNode;
 
 		if ( levelNode?.isNode === true ) {
