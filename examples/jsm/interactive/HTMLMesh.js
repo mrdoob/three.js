@@ -25,9 +25,6 @@ class HTMLMesh extends Mesh {
 
 		}
 
-		this.addEventListener( 'mousedown', onEvent );
-		this.addEventListener( 'mousemove', onEvent );
-		this.addEventListener( 'mouseup', onEvent );
 		this.addEventListener( 'pointerdown', onEvent );
 		this.addEventListener( 'pointermove', onEvent );
 		this.addEventListener( 'pointerup', onEvent );
@@ -40,9 +37,6 @@ class HTMLMesh extends Mesh {
 
 			material.map.dispose();
 
-			this.removeEventListener( 'mousedown', onEvent );
-			this.removeEventListener( 'mousemove', onEvent );
-			this.removeEventListener( 'mouseup', onEvent );
 			this.removeEventListener( 'pointerdown', onEvent );
 			this.removeEventListener( 'pointermove', onEvent );
 			this.removeEventListener( 'pointerup', onEvent );
