@@ -81,14 +81,11 @@ class InteractiveGroup extends Group {
 
 				const object = intersection.object;
 				const uv = intersection.uv;
-				
-					
+
 				_event.type = events[ event.type ];
 				_event.data.set( uv.x, 1 - uv.y );
 
-				object.dispatchEvent( _event );
-					
-			
+				object.dispatchEvent( _event );	
 
 			}
 
