@@ -53,7 +53,7 @@ const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be
 /* CONFIG VARIABLES START */
 
 const idleTime = 3; // 3 seconds - for how long there should be no network requests
-const parseTime = 2.5; // 2.5 seconds per megabyte
+const parseTime = 2; // 2 seconds per megabyte
 
 const exceptionList = [
 
@@ -63,9 +63,11 @@ const exceptionList = [
 	'webgl_effects_ascii', // renders differently on different platforms, investigate
 	'webgl_lights_spotlights', // investigate
 	'webgl_lines_sphere', // changes with every screenshot, investigate
+	'webgl_loader_mmd_audio', // does not load sufficiently quickly? investigate
 	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format." investigate
 	'webgl_morphtargets_face', // does not work on GitHub? investigate
 	'webgl_multiple_elements_text', // investigate
+	'webgl_postprocessing_dof2', // does not load sufficiently quickly? investigate
 	'webgl_shadowmap_progressive', // investigate
 	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
 	'webgl_tiled_forward', // investigate
