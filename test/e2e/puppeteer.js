@@ -60,6 +60,7 @@ const exceptionList = [
 	'css3d_periodictable', // investigate
 	'misc_uv_tests', // investigate
 	'webgl_buffergeometry_glbufferattribute', // investigate
+	'webgl_clipping_advanced', // investigate
 	'webgl_effects_ascii', // renders differently on different platforms, investigate
 	'webgl_lights_spotlights', // investigate
 	'webgl_lines_sphere', // changes with every screenshot, investigate
