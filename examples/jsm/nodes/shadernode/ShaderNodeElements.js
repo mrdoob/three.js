@@ -65,8 +65,7 @@ export const cubeTexture = nodeProxy( CubeTextureNode );
 
 export const instance = nodeProxy( InstanceNode );
 
-export const reflectVector = nodeImmutable( ReflectNode, ReflectNode.VECTOR );
-export const reflectCube = nodeImmutable( ReflectNode, ReflectNode.CUBE );
+export const reflectVector = nodeImmutable( ReflectNode );
 
 export const skinning = nodeProxy( SkinningNode );
 
