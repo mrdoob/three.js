@@ -495,7 +495,6 @@
 			}
 
 			this.dragging = false;
-			this.axis = null;
 
 		}
 

@@ -533,7 +533,6 @@ class TransformControls extends Object3D {
 		}
 
 		this.dragging = false;
-		this.axis = null;
 
 	}
 
