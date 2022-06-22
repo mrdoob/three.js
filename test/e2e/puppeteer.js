@@ -53,7 +53,7 @@ const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be
 /* CONFIG VARIABLES START */
 
 const idleTime = 3; // 3 seconds - for how long there should be no network requests
-const parseTime = 2; // 2 seconds per megabyte
+const parseTime = 2.5; // 2.5 seconds per megabyte
 
 const exceptionList = [
 
