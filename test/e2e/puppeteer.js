@@ -444,7 +444,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 				idleTime: idleTime * 1000
 			} );
 
-			await page.evaluate( async ( renderTimeout, parseTime ) => {
+			await page.evaluate( async ( parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
@@ -467,7 +467,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				} );
 
-			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
+			}, page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
 		} catch ( e ) {
 
