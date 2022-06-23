@@ -9,6 +9,12 @@ varying vec3 vViewPosition;
 
 #endif
 
+#ifdef USE_ALPHAHASH
+
+	varying vec3 vObjectPosition;
+
+#endif
+
 #include <common>
 #include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
@@ -51,6 +57,12 @@ void main() {
 #ifdef USE_TRANSMISSION
 
 	vWorldPosition = worldPosition.xyz;
+
+#endif
+
+#ifdef USE_ALPHAHASH
+
+	vObjectPosition = transformed.xyz;
 
 #endif
 }

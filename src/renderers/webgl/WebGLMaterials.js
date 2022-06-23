@@ -209,6 +209,12 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
+		if ( material.alphaHash ) {
+
+			uniforms.alphaHashScale.value = material.alphaHashScale;
+
+		}
+
 		const envMap = properties.get( material ).envMap;
 
 		if ( envMap ) {
@@ -299,6 +305,12 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
+		if ( material.alphaHash ) {
+
+			uniforms.alphaHashScale.value = material.alphaHashScale;
+
+		}
+
 	}
 
 	function refreshUniformsSprites( uniforms, material ) {
@@ -326,6 +338,12 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.alphaTest > 0 ) {
 
 			uniforms.alphaTest.value = material.alphaTest;
+
+		}
+
+		if ( material.alphaHash ) {
+
+			uniforms.alphaHashScale.value = material.alphaHashScale;
 
 		}
 
