@@ -444,7 +444,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 				idleTime: idleTime * 1000
 			} );
 
-			await page.evaluate( async ( renderTimeout, parseTime ) => {
+			const error = await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
@@ -452,7 +452,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				window._renderStarted = true;
 
-				await new Promise( function ( resolve, reject ) {
+				return await new Promise( function ( resolve, reject ) {
 
 					const renderStart = performance._now();
 
@@ -463,7 +463,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 						if ( renderTimeoutExceeded ) {
 
 							clearInterval( waitingLoop );
-							reject( new Error( 'Render timeout exceeded' ) );
+							resolve( 'Render timeout exceeded' );
 
 						} else if ( window._renderFinished ) {
 
@@ -477,10 +477,11 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 				} );
 
 			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
+			if ( error !== undefined ) console.log( error );
 
 		} catch ( e ) {
 
-			throw new Error( `Error happened while loading file ${ file }: ${ e }` );
+			throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
 		}
 
