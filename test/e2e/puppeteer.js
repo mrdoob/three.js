@@ -462,11 +462,10 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 						if ( renderTimeoutExceeded ) {
 
+							clearInterval( waitingLoop );
 							reject( new Error( 'Render timeout exceeded' ) );
 
-						}
-
-						if ( window._renderFinished || renderTimeoutExceeded ) {
+						} else if ( window._renderFinished ) {
 
 							clearInterval( waitingLoop );
 							resolve();
