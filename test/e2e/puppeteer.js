@@ -52,28 +52,13 @@ const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 3; // 3 seconds - for how long there should be no network requests
-const parseTime = 2; // 2 seconds per megabyte
+const idleTime = 5; // 5 seconds - for how long there should be no network requests
+const parseTime = 3; // 3 seconds per megabyte
 
 const exceptionList = [
 
-	'css3d_periodictable', // investigate
-	'misc_uv_tests', // investigate
-	'webgl_buffergeometry_glbufferattribute', // investigate
-	'webgl_clipping_advanced', // investigate
-	'webgl_effects_ascii', // renders differently on different platforms, investigate
-	'webgl_lights_spotlights', // investigate
-	'webgl_lines_sphere', // changes with every screenshot, investigate
-	'webgl_loader_mmd_audio', // does not load sufficiently quickly? investigate
-	'webgl_loader_texture_ktx', // "GL_INVALID_OPERATION: Invalid internal format." investigate
-	'webgl_morphtargets_face', // does not work on GitHub? investigate
-	'webgl_multiple_elements_text', // investigate
-	'webgl_postprocessing_dof2', // does not load sufficiently quickly? investigate
 	'webgl_shadowmap_progressive', // investigate
-	'webgl_test_memory2', // for some reason takes extremely long to load, investigate
-	'webgl_tiled_forward', // investigate
-	'webgl_worker_offscreencanvas', // investigate
-	'webxr_vr_sandbox', // "WebGL: INVALID_VALUE: texSubImage2D: no canvas" investigate
+	'webgl_test_memory2', // investigate
 	
 	// video tag is not deterministic enough, investigate
 	'css3d_youtube',
@@ -98,7 +83,7 @@ const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixe
 const networkTimeout = 180; // 3 minutes - set to 0 to disable
 const renderTimeout = 1; // 1 second - set to 0 to disable
 
-const numAttempts = 5; // perform 5 attempts before failing
+const numAttempts = 2; // perform 2 attempts before failing
 
 const numPages = 16;
 
@@ -376,12 +361,12 @@ async function main() {
 	await queue.waitForAll();
 
 	failedScreenshots.sort();
+	const list = failedScreenshots.join( ' ' );
 
 	/* Finish */
 	
 	if ( isMakeScreenshot && failedScreenshots.length ) {
 
-		const list = failedScreenshots.join( ' ' );
 		console.red( 'List of failed screenshots: ' + list );
 		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`. If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
 		console.red( `${ failedScreenshots.length } from ${ files.length } screenshots have not generated succesfully.` );
@@ -392,7 +377,6 @@ async function main() {
 
 	} else if ( failedScreenshots.length ) {
 
-		const list = failedScreenshots.join( ' ' );
 		console.red( 'List of failed screenshots: ' + list );
 		console.red( `If you sure that everything is correct, try to run \`npm run make-screenshot ${ list }\`. If this does not help, try increasing idleTime and parseTime variables in /test/e2e/puppeteer.js file. If this also does not help, add remaining screenshots to the exception list.` );
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ files.length } screenshots have not rendered correctly.` );
@@ -468,7 +452,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				window._renderStarted = true;
 
-				await new Promise( function ( resolve ) {
+				await new Promise( function ( resolve, reject ) {
 
 					const renderStart = performance._now();
 
@@ -478,7 +462,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 						if ( renderTimeoutExceeded ) {
 
-							console.log( 'Warning. Render timeout exceeded...' );
+							reject( new Error( 'Render timeout exceeded' ) );
 
 						}
 
