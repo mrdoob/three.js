@@ -57,6 +57,7 @@ const parseTime = 3; // 3 seconds per megabyte
 
 const exceptionList = [
 
+	'css3d_periodictable', // investigate
 	'webgl_shadowmap_progressive', // investigate
 	'webgl_test_memory2', // investigate
 	
@@ -81,7 +82,6 @@ const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixels
 
 const networkTimeout = 180; // 3 minutes - set to 0 to disable
-const renderTimeout = 1; // 1 second - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
@@ -444,7 +444,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 				idleTime: idleTime * 1000
 			} );
 
-			const error = await page.evaluate( async ( renderTimeout, parseTime ) => {
+			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
@@ -452,32 +452,22 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				window._renderStarted = true;
 
-				return await new Promise( function ( resolve, reject ) {
-
-					const renderStart = performance._now();
+				await new Promise( function ( resolve ) {
 
 					const waitingLoop = setInterval( function () {
 
-						const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
-
-						if ( renderTimeoutExceeded ) {
-
-							clearInterval( waitingLoop );
-							resolve( 'Render timeout exceeded' );
-
-						} else if ( window._renderFinished ) {
+						if ( window._renderFinished ) {
 
 							clearInterval( waitingLoop );
 							resolve();
 
 						}
 
-					}, 0 );
+					}, 10 );
 
 				} );
 
 			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
-			if ( error !== undefined ) console.log( error );
 
 		} catch ( e ) {
 
