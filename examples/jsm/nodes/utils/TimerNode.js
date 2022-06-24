@@ -7,9 +7,9 @@ class TimerNode extends UniformNode {
 	static GLOBAL = 'global';
 	static DELTA = 'delta';
 
-	constructor( scope = TimerNode.LOCAL, scale = 1 ) {
+	constructor( scope = TimerNode.LOCAL, scale = 1, value = 0 ) {
 
-		super( 0 );
+		super( value );
 
 		this.scope = scope;
 		this.scale = scale;
