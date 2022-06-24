@@ -144,7 +144,13 @@ class WebGPURenderPipeline {
 				break;
 
 			case AdditiveBlending:
-				// no alphaBlend settings
+
+				alphaBlend = {
+					srcFactor: GPUBlendFactor.Zero,
+					dstFactor: GPUBlendFactor.One,
+					operation: GPUBlendOperation.Add
+				};
+
 				break;
 
 			case SubtractiveBlending:
@@ -162,6 +168,7 @@ class WebGPURenderPipeline {
 				break;
 
 			case MultiplyBlending:
+
 				if ( premultipliedAlpha === true ) {
 
 					alphaBlend = {
@@ -318,7 +325,6 @@ class WebGPURenderPipeline {
 		switch ( blending ) {
 
 			case NormalBlending:
-
 				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
 				colorBlend.dstFactor = GPUBlendFactor.OneMinusSrcAlpha;
 				colorBlend.operation = GPUBlendOperation.Add;
@@ -326,6 +332,7 @@ class WebGPURenderPipeline {
 
 			case AdditiveBlending:
 				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
+				colorBlend.dstFactor = GPUBlendFactor.One;
 				colorBlend.operation = GPUBlendOperation.Add;
 				break;
 

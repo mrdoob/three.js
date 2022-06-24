@@ -2,8 +2,8 @@ import NodeMaterial from './NodeMaterial.js';
 import { SpriteMaterial } from 'three';
 import {
 	vec2, vec3, vec4,
-	assign, add, mul, sub,
-	positionLocal, bypass, length, cos, sin, uniform,
+	uniform, add, mul, sub,
+	positionLocal, length, cos, sin,
 	modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialRotation
 } from '../shadernode/ShaderNodeElements.js';
 
@@ -42,15 +42,9 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const { positionNode, rotationNode, scaleNode } = this;
 
-		let vertex = positionLocal;
+		const vertex = positionLocal;
 
-		if ( positionNode !== null ) {
-
-			vertex = bypass( vertex, assign( positionLocal, positionNode ) );
-
-		}
-
-		let mvPosition = mul( modelViewMatrix, vec4( 0, 0, 0, 1 ) );
+		let mvPosition = mul( modelViewMatrix, positionNode ? vec4( positionNode.xyz, 1 ) : vec4( 0, 0, 0, 1 ) );
 
 		let scale = vec2(
 			length( vec3( modelWorldMatrix[ 0 ].x, modelWorldMatrix[ 0 ].y, modelWorldMatrix[ 0 ].z ) ),

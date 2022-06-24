@@ -19,6 +19,7 @@ import LightingContextNode from '../lighting/LightingContextNode.js';
 import MatcapUVNode from '../utils/MatcapUVNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 import OscNode from '../utils/OscNode.js';
+import RotateUVNode from '../utils/RotateUVNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
 
@@ -96,12 +97,14 @@ export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
 export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
 export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
 
+export const rotateUV = nodeProxy( RotateUVNode );
+
 export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
 
 // @TODO: add supports to use node in timeScale
-export const timerLocal = ( timeScale ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale ) );
-export const timerGlobal = ( timeScale ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale ) );
-export const timerDelta = ( timeScale ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale ) );
+export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
+export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
+export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
 
 // geometry
 
