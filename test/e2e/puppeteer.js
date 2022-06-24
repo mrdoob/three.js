@@ -47,7 +47,7 @@ function unregexify( regexp ) {
 
 }
 
-const webgpuEnabled = process.platform === 'asdadadasdads'; // process.platform !== 'linux';
+const webgpuEnabled = process.platform !== 'linux';
 const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 /* CONFIG VARIABLES START */
@@ -64,7 +64,9 @@ const exceptionList = [
 
 	// renders differently on different platforms, investigate
 	'css3d_periodictable',
+	'webaudio_orientation',
 	'webgl_effects_ascii',
+	'webgl_postprocessing_dof2',
 
 	// timeouts? investigate
 	'webgl_shadowmap_progressive',
@@ -97,7 +99,7 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixels
 
-const networkTimeout = 180; // 3 minutes - set to 0 to disable
+const networkTimeout = 300; // 5 minutes - set to 0 to disable
 const renderTimeout = 1; // 1 second - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
@@ -581,7 +583,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		} else {
 
-			// console.log( `${ e }, another attempt...` );
+			console.yellow( `${ e }, another attempt...` );
 			this.add( file, attemptID + 1 );
 
 		}
