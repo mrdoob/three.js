@@ -47,7 +47,7 @@ function unregexify( regexp ) {
 
 }
 
-const webgpuEnabled = process.platform !== 'linux';
+const webgpuEnabled = process.platform === 'asdadadasdads'; // process.platform !== 'linux';
 const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 /* CONFIG VARIABLES START */
