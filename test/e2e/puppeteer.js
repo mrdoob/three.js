@@ -57,9 +57,19 @@ const parseTime = 3; // 3 seconds per megabyte
 
 const exceptionList = [
 
-	'css3d_periodictable', // renders differently on different platforms? investigate
-	'webgl_shadowmap_progressive', // timeouts? investigate
-	'webgl_test_memory2', // timeouts? investigate
+	// renders differently on different platforms, investigate
+	'css3d_periodictable',
+	'webgl_effects_ascii',
+
+	// timeouts, investigate
+	'webgl_shadowmap_progressive',
+
+	// non-deterministic setInterval
+	// TODO: fix this
+	'webgl_lights_spotlights',
+	'webgl_lines_sphere',
+	'webgl_loader_collada_kinematics',
+	'webgl_math_orientation_transform',
 	
 	// video tag is not deterministic enough, investigate
 	'css3d_youtube',

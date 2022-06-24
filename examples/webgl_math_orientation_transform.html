@@ -81,7 +81,7 @@
 
 				//
 
-				generateTarget();
+				setInterval( generateTarget, 2000 );
 
 			}
 
@@ -125,8 +125,6 @@
 
 				rotationMatrix.lookAt( target.position, mesh.position, mesh.up );
 				targetQuaternion.setFromRotationMatrix( rotationMatrix );
-
-				setTimeout( generateTarget, 2000 );
 
 			}
 

@@ -146,8 +146,6 @@
 				tween( spotLight2 );
 				tween( spotLight3 );
 
-				setTimeout( animate, 5000 );
-
 			}
 
 			function render() {
@@ -166,7 +164,7 @@
 
 			init();
 			render();
-			animate();
+			setInterval( animate, 5000 );
 
 		</script>
 	</body>
