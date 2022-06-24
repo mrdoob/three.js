@@ -1,5 +1,5 @@
 import { Camera } from './Camera.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { RAD2DEG, DEG2RAD } from '../math/MathUtils.js';
 
 class PerspectiveCamera extends Camera {
 
@@ -62,7 +62,7 @@ class PerspectiveCamera extends Camera {
 		/** see {@link http://www.bobatkins.com/photography/technical/field_of_view.html} */
 		const vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 
-		this.fov = MathUtils.RAD2DEG * 2 * Math.atan( vExtentSlope );
+		this.fov = RAD2DEG * 2 * Math.atan( vExtentSlope );
 		this.updateProjectionMatrix();
 
 	}
@@ -72,7 +72,7 @@ class PerspectiveCamera extends Camera {
 	 */
 	getFocalLength() {
 
-		const vExtentSlope = Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov );
+		const vExtentSlope = Math.tan( DEG2RAD * 0.5 * this.fov );
 
 		return 0.5 * this.getFilmHeight() / vExtentSlope;
 
@@ -80,8 +80,8 @@ class PerspectiveCamera extends Camera {
 
 	getEffectiveFOV() {
 
-		return MathUtils.RAD2DEG * 2 * Math.atan(
-			Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom );
+		return RAD2DEG * 2 * Math.atan(
+			Math.tan( DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
 	}
 
@@ -179,7 +179,7 @@ class PerspectiveCamera extends Camera {
 	updateProjectionMatrix() {
 
 		const near = this.near;
-		let top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
+		let top = near * Math.tan( DEG2RAD * 0.5 * this.fov ) / this.zoom;
 		let height = 2 * top;
 		let width = this.aspect * height;
 		let left = - 0.5 * width;

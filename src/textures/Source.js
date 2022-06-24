@@ -1,5 +1,5 @@
 import { ImageUtils } from '../extras/ImageUtils.js';
-import * as MathUtils from '../math/MathUtils.js';
+import { generateUUID } from '../math/MathUtils.js';
 
 class Source {
 
@@ -7,7 +7,7 @@ class Source {
 
 		this.isSource = true;
 
-		this.uuid = MathUtils.generateUUID();
+		this.uuid = generateUUID();
 
 		this.data = data;
 
