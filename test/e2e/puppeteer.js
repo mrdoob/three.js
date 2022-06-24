@@ -82,7 +82,7 @@ const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixels
 
 const networkTimeout = 180; // 3 minutes - set to 0 to disable
-const renderTimeout = 10; // 10 seconds - set to 0 to disable
+const renderTimeout = 60; // 1 minute - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
