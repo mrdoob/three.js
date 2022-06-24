@@ -57,9 +57,9 @@ const parseTime = 3; // 3 seconds per megabyte
 
 const exceptionList = [
 
-	'css3d_periodictable', // investigate
-	'webgl_shadowmap_progressive', // investigate
-	'webgl_test_memory2', // investigate
+	'css3d_periodictable', // renders differently on different platforms? investigate
+	'webgl_shadowmap_progressive', // timeouts? investigate
+	'webgl_test_memory2', // timeouts? investigate
 	
 	// video tag is not deterministic enough, investigate
 	'css3d_youtube',
@@ -82,6 +82,7 @@ const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.01 /* TODO: decrease to 0.005 */; // total failed pixels
 
 const networkTimeout = 180; // 3 minutes - set to 0 to disable
+const renderTimeout = 10; // 10 seconds - set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
@@ -444,7 +445,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 				idleTime: idleTime * 1000
 			} );
 
-			await page.evaluate( async ( parseTime ) => {
+			await page.evaluate( async ( renderTimeout, parseTime ) => {
 
 				await new Promise( resolve => setTimeout( resolve, parseTime ) );
 
@@ -452,11 +453,20 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				window._renderStarted = true;
 
-				await new Promise( function ( resolve ) {
+				await new Promise( function ( resolve, reject ) {
+
+					const renderStart = performance._now();
 
 					const waitingLoop = setInterval( function () {
 
-						if ( window._renderFinished ) {
+						const renderTimeoutExceeded = ( renderTimeout > 0 ) && ( performance._now() - renderStart > 1000 * renderTimeout );
+
+						if ( renderTimeoutExceeded ) {
+
+							clearInterval( waitingLoop );
+							reject( 'Render timeout exceeded' );
+
+						} else if ( window._renderFinished ) {
 
 							clearInterval( waitingLoop );
 							resolve();
@@ -467,7 +477,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				} );
 
-			}, page.pageSize / 1024 / 1024 * parseTime * 1000 );
+			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
 		} catch ( e ) {
 
