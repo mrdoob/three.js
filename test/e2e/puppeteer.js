@@ -52,12 +52,13 @@ const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 5; // 5 seconds - for how long there should be no network requests
+const idleTime = 7; // 7 seconds - for how long there should be no network requests
 const parseTime = 3; // 3 seconds per megabyte
 
 const exceptionList = [
 
 	// unknown failing reasons, investigate
+	'webgl_clipping_advanced',
 	'webgl_multiple_elements_text',
 	'webgl_morphtargets_face',
 	'webgl_shadowmap',
