@@ -44,6 +44,7 @@ class SSAARenderPass extends Pass {
 			uniforms: this.copyUniforms,
 			vertexShader: copyShader.vertexShader,
 			fragmentShader: copyShader.fragmentShader,
+			premultipliedAlpha: true,
 			transparent: true,
 			blending: AdditiveBlending,
 			depthTest: false,
