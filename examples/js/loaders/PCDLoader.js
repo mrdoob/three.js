@@ -268,25 +268,32 @@
 
 					if ( offset.x !== undefined ) {
 
-						position.push( dataview.getFloat32( PCDheader.points * offset.x + PCDheader.size[ 0 ] * i, this.littleEndian ) );
-						position.push( dataview.getFloat32( PCDheader.points * offset.y + PCDheader.size[ 1 ] * i, this.littleEndian ) );
-						position.push( dataview.getFloat32( PCDheader.points * offset.z + PCDheader.size[ 2 ] * i, this.littleEndian ) );
+						const xIndex = PCDheader.fields.indexOf( 'x' );
+						const yIndex = PCDheader.fields.indexOf( 'y' );
+						const zIndex = PCDheader.fields.indexOf( 'z' );
+						position.push( dataview.getFloat32( PCDheader.points * offset.x + PCDheader.size[ xIndex ] * i, this.littleEndian ) );
+						position.push( dataview.getFloat32( PCDheader.points * offset.y + PCDheader.size[ yIndex ] * i, this.littleEndian ) );
+						position.push( dataview.getFloat32( PCDheader.points * offset.z + PCDheader.size[ zIndex ] * i, this.littleEndian ) );
 
 					}
 
 					if ( offset.rgb !== undefined ) {
 
-						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
-						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
-						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
+						const rgbIndex = PCDheader.fields.indexOf( 'rgb' );
+						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ rgbIndex ] * i + 2 ) / 255.0 );
+						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ rgbIndex ] * i + 1 ) / 255.0 );
+						color.push( dataview.getUint8( PCDheader.points * offset.rgb + PCDheader.size[ rgbIndex ] * i + 0 ) / 255.0 );
 
 					}
 
 					if ( offset.normal_x !== undefined ) {
 
-						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_x + PCDheader.size[ 4 ] * i, this.littleEndian ) );
-						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_y + PCDheader.size[ 5 ] * i, this.littleEndian ) );
-						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_z + PCDheader.size[ 6 ] * i, this.littleEndian ) );
+						const xIndex = PCDheader.fields.indexOf( 'normal_x' );
+						const yIndex = PCDheader.fields.indexOf( 'normal_y' );
+						const zIndex = PCDheader.fields.indexOf( 'normal_z' );
+						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_x + PCDheader.size[ xIndex ] * i, this.littleEndian ) );
+						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_y + PCDheader.size[ yIndex ] * i, this.littleEndian ) );
+						normal.push( dataview.getFloat32( PCDheader.points * offset.normal_z + PCDheader.size[ zIndex ] * i, this.littleEndian ) );
 
 					}
 
