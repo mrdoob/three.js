@@ -25,6 +25,7 @@ class TexturePass extends Pass {
 			uniforms: this.uniforms,
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
+			premultipliedAlpha: true,
 			depthTest: false,
 			depthWrite: false
 

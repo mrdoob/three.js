@@ -52,7 +52,7 @@
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { CopyPass } from './jsm/postprocessing/CopyPass.js';
 			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
 
 			let camera, scene, renderer, clock, group, container;
@@ -128,8 +128,8 @@
 
 				fxaaPass = new ShaderPass( FXAAShader );
 
-				const copyPass = new ShaderPass( CopyShader );
-
+				const copyPass = new CopyPass();
+			
 				composer1 = new EffectComposer( renderer );
 				composer1.addPass( renderPass );
 				composer1.addPass( copyPass );

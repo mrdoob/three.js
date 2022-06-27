@@ -309,7 +309,7 @@ class SSRPass extends Pass {
 			blendSrcAlpha: SrcAlphaFactor,
 			blendDstAlpha: OneMinusSrcAlphaFactor,
 			blendEquationAlpha: AddEquation,
-			// premultipliedAlpha:true,
+			premultipliedAlpha: true
 		} );
 
 		this.fsQuad = new FullScreenQuad( null );

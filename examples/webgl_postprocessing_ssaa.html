@@ -35,9 +35,8 @@
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyPass } from './jsm/postprocessing/CopyPass.js';
 			import { SSAARenderPass } from './jsm/postprocessing/SSAARenderPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			let scene, renderer, composer, copyPass;
 			let cameraP, ssaaRenderPassP;
@@ -173,7 +172,7 @@
 				composer.addPass( ssaaRenderPassP );
 				ssaaRenderPassO = new SSAARenderPass( scene, cameraO );
 				composer.addPass( ssaaRenderPassO );
-				copyPass = new ShaderPass( CopyShader );
+				copyPass = new CopyPass();
 				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize );

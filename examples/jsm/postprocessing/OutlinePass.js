@@ -105,7 +105,8 @@ class OutlinePass extends Pass {
 			blending: NoBlending,
 			depthTest: false,
 			depthWrite: false,
-			transparent: true
+			transparent: true,
+			premultipliedAlpha: true
 		} );
 
 		this.enabled = true;

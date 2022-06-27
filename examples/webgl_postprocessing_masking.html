@@ -27,11 +27,10 @@
 			import * as THREE from 'three';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyPass } from './jsm/postprocessing/CopyPass.js';
 			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
 			import { ClearPass } from './jsm/postprocessing/ClearPass.js';
 			import { MaskPass, ClearMaskPass } from './jsm/postprocessing/MaskPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			let camera, composer, renderer;
 			let box, torus;
@@ -76,7 +75,7 @@
 				const texturePass1 = new TexturePass( texture1 );
 				const texturePass2 = new TexturePass( texture2 );
 
-				const outputPass = new ShaderPass( CopyShader );
+				const outputPass = new CopyPass();
 
 				const parameters = {
 					stencilBuffer: true

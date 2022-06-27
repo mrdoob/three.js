@@ -62,6 +62,7 @@ class EffectComposer {
 		}
 
 		this.copyPass = new ShaderPass( CopyShader );
+		this.copyPass.material.premultipliedAlpha = true;
 
 		this.clock = new Clock();
 

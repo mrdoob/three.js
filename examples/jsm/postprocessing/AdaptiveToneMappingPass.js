@@ -45,8 +45,8 @@ class AdaptiveToneMappingPass extends Pass {
 			vertexShader: copyShader.vertexShader,
 			fragmentShader: copyShader.fragmentShader,
 			blending: NoBlending,
-			depthTest: false
-
+			depthTest: false,
+			premultipliedAlpha: true
 		} );
 
 		if ( LuminosityShader === undefined )

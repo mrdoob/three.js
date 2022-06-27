@@ -41,9 +41,8 @@
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { CopyPass } from './jsm/postprocessing/CopyPass.js';
 
 			let container;
 
@@ -170,7 +169,7 @@
 
 				const renderModel = new RenderPass( scene, camera );
 				const effectBloom = new BloomPass( 1.3 );
-				const effectCopy = new ShaderPass( CopyShader );
+				const effectCopy = new CopyPass();
 
 				composer = new EffectComposer( renderer );
 

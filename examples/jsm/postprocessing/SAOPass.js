@@ -156,7 +156,8 @@ class SAOPass extends Pass {
 			uniforms: UniformsUtils.clone( CopyShader.uniforms ),
 			vertexShader: CopyShader.vertexShader,
 			fragmentShader: CopyShader.fragmentShader,
-			blending: NoBlending
+			blending: NoBlending,
+			premultipliedAlpha: true
 		} );
 		this.materialCopy.transparent = true;
 		this.materialCopy.depthTest = false;

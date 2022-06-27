@@ -151,7 +151,8 @@ class SSAOPass extends Pass {
 			blendEquation: AddEquation,
 			blendSrcAlpha: DstAlphaFactor,
 			blendDstAlpha: ZeroFactor,
-			blendEquationAlpha: AddEquation
+			blendEquationAlpha: AddEquation,
+			premultipliedAlpha: true
 		} );
 
 		this.fsQuad = new FullScreenQuad( null );

@@ -51,8 +51,7 @@
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { CopyPass } from './jsm/postprocessing/CopyPass.js';
 			import WebGL from './jsm/capabilities/WebGL.js';
 
 			let camera, renderer, clock, group, container;
@@ -130,7 +129,7 @@
 				const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 4 } );
 
 				const renderPass = new RenderPass( scene, camera );
-				const copyPass = new ShaderPass( CopyShader );
+				const copyPass = new CopyPass();
 
 				//
 

@@ -139,7 +139,8 @@ class UnrealBloomPass extends Pass {
 			blending: AdditiveBlending,
 			depthTest: false,
 			depthWrite: false,
-			transparent: true
+			transparent: true,
+			premultipliedAlpha: true
 		} );
 
 		this.enabled = true;

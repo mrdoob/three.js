@@ -37,9 +37,8 @@
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyPass } from './jsm/postprocessing/CopyPass.js';
 			import { TAARenderPass } from './jsm/postprocessing/TAARenderPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
 			let camera, scene, renderer, composer, copyPass, taaRenderPass, renderPass;
 			let gui, stats;
@@ -143,7 +142,7 @@
 				renderPass.enabled = false;
 				composer.addPass( renderPass );
 
-				copyPass = new ShaderPass( CopyShader );
+				copyPass = new CopyPass();
 				composer.addPass( copyPass );
 
 				window.addEventListener( 'resize', onWindowResize );

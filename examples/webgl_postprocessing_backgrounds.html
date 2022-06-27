@@ -37,9 +37,8 @@
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
 			import { CubeTexturePass } from './jsm/postprocessing/CubeTexturePass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { CopyPass } from './jsm/postprocessing/CopyPass.js';
 			import { ClearPass } from './jsm/postprocessing/ClearPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			let scene, renderer, composer;
@@ -185,7 +184,7 @@
 				renderPass.clear = false;
 				composer.addPass( renderPass );
 
-				const copyPass = new ShaderPass( CopyShader );
+				const copyPass = new CopyPass();
 				composer.addPass( copyPass );
 
 				const controls = new OrbitControls( cameraP, renderer.domElement );

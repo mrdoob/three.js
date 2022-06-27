@@ -24,7 +24,8 @@ class SavePass extends Pass {
 
 			uniforms: this.uniforms,
 			vertexShader: shader.vertexShader,
-			fragmentShader: shader.fragmentShader
+			fragmentShader: shader.fragmentShader,
+			premultipliedAlpha: true
 
 		} );
 
