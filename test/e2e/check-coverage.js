@@ -2,14 +2,14 @@ import fs from 'fs';
 
 // examples
 const E = fs.readdirSync( './examples' )
-	.filter( s => s.slice( - 5 ) === '.html' )
-	.map( s => s.slice( 0, s.length - 5 ) )
+	.filter( s => s.indexOf( '.' ) !== -1 )
+	.map( s => s.slice( 0, s.indexOf( '.' ) ) )
 	.filter( f => f !== 'index' );
 
 // screenshots
 const S = fs.readdirSync( './examples/screenshots' )
-	.filter( s => s.slice( - 4 ) === '.jpg' )
-	.map( s => s.slice( 0, s.length - 4 ) );
+	.filter( s => s.indexOf( '.' ) !== -1 )
+	.map( s => s.slice( 0, s.indexOf( '.' ) ) );
 
 // files.js
 const F = [];
