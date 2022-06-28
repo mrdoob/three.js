@@ -198,6 +198,7 @@
 		"webgl_portal",
 		"webgl_raycast_sprite",
 		"webgl_raycast_texture",
+		"webgl_raycasting_bvh",
 		"webgl_read_float_buffer",
 		"webgl_refraction",
 		"webgl_rtt",
