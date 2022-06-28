@@ -47,7 +47,7 @@ function unregexify( regexp ) {
 
 }
 
-const webgpuEnabled = true; // process.env.CI !== 'true' && process.env.CI !== true;
+const webgpuEnabled = process.platform === 'asdadadasdads'; // process.env.CI !== 'true' && process.env.CI !== true;
 const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 /* CONFIG VARIABLES START */
