@@ -90,7 +90,7 @@ class PLYLoader extends Loader {
 
 		function parseHeader( data ) {
 
-			const patternHeader = /^ply([\s\S]*)end_header\r?\n/;
+			const patternHeader = /^ply([\s\S]*)end_header(\r\n|\r|\n)/;
 			let headerText = '';
 			let headerLength = 0;
 			const result = patternHeader.exec( data );
@@ -109,7 +109,7 @@ class PLYLoader extends Loader {
 				objInfo: ''
 			};
 
-			const lines = headerText.split( '\n' );
+			const lines = headerText.split( /\r\n|\r|\n/ );
 			let currentElement;
 
 			function make_ply_element_property( propertValues, propertyNameMapping ) {
@@ -283,7 +283,7 @@ class PLYLoader extends Loader {
 
 			}
 
-			const lines = body.split( '\n' );
+			const lines = body.split( /\r\n|\r|\n/ );
 			let currentElement = 0;
 			let currentElementCount = 0;
 
