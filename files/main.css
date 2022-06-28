@@ -538,10 +538,11 @@ iframe#viewer {
 }
 
 .card .tag {
-	background-color: var(--color-blue);
-	color: var(--background-color);
+	background-color: var(--background-color);
+	color: var(--color-blue);
 	margin-left: 6px;
 	padding: 1px 6px 2px;
+	borcer: 1px solid var(--color-blue)
 	border-radius: 2px;
 	font-size: calc(var(--font-size) - 2px);
 	line-height: calc(var(--line-height) - 6px);
