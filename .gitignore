@@ -25,3 +25,5 @@ test/treeshake/stats.html
 
 
 **/node_modules
+
+examples/output-screenshots/

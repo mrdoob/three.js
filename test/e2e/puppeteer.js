@@ -47,7 +47,7 @@ function unregexify( regexp ) {
 
 }
 
-const webgpuEnabled = process.platform === 'asdadadasdads'; // process.platform !== 'linux';
+const webgpuEnabled = process.platform === 'asdadadasdads'; // process.env.CI !== 'true' && process.env.CI !== true;
 const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 /* CONFIG VARIABLES START */
@@ -58,6 +58,7 @@ const parseTime = 3; // 3 seconds per megabyte
 const exceptionList = [
 
 	// unknown failing reasons, investigate
+	'webaudio_visualizer', // for some reasons always produces one plot when make-screenshot is run and another when test-e2e
 	'webgl_clipping_advanced',
 	'webgl_multiple_elements_text',
 	'webgl_morphtargets_face',
@@ -110,7 +111,6 @@ const numPages = 16;
 const width = 400;
 const height = 250;
 const viewScale = 2; // TODO: possibly increase?
-const jpgQuality = 95;
 
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
 console.yellow = ( msg ) => console.log( `\x1b[33m${ msg }\x1b[37m` );
@@ -157,6 +157,12 @@ async function fromSurface( page ) {
 }
 
 async function main() {
+
+	/* Create output directories */
+
+	try { await fs.rm( './examples/output-screenshots', { recursive: true, force: true } ) } catch {}
+	try { await fs.mkdir( './examples/output-screenshots' ) } catch {}
+	try { await fs.mkdir( './examples/screenshots' ) } catch {}
 
 	/* Find files */
 
@@ -353,25 +359,6 @@ async function main() {
 
 	}
 
-	/* Prepare browser window's bounds if WebGPU hack is enabled */
-	// TODO: remove this when https://github.com/puppeteer/puppeteer/issues/1910 will be fixed
-
-	if ( temporaryWebGPUHack ) {
-
-		const page = pages[ 0 ];
-		const session = page.session;
-
-		const { width, height } = viewport;
-		const { windowId } = await session.send( 'Browser.getWindowForTarget' );
-		await session.send( 'Browser.setWindowBounds', { windowId, bounds: { width, height } } );
-		const { width: clientWidth, height: clientHeight } = ( await jimp.read( await fromSurface( page ) ) ).bitmap;
-		await session.send( 'Browser.setWindowBounds', { windowId, bounds: {
-			width: 2 * width - clientWidth,
-			height: 2 * height - clientHeight
-		} } );
-
-	}
-
 	/* Loop for each file */
 
 	const failedScreenshots = [];
@@ -447,6 +434,12 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 				timeout: networkTimeout * 1000
 			} );
 
+			if ( temporaryWebGPUHack ) {
+
+				await page.setViewport( { width: width * viewScale, height: height * viewScale } );
+
+			}
+
 		} catch ( e ) {
 
 			throw new Error( `Error happened while loading file ${ file }: ${ e }` );
@@ -513,7 +506,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 		}
 
 		const screenshot = await jimp.read( temporaryWebGPUHack ? await fromSurface( page ) : await page.screenshot() );
-		screenshot.scale( 1 / viewScale ).quality( jpgQuality );
+		screenshot.scale( 1 / viewScale );
 
 		if ( page.error !== undefined ) throw new Error( page.error );
 
@@ -521,7 +514,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			/* Make screenshot */
 
-			screenshot.write( `./examples/screenshots/${ file }.jpg` );
+			await screenshot.writeAsync( `./examples/screenshots/${ file }.png` );
 			console.green( `Screenshot generated for file ${ file }` );
 
 		} else {
@@ -532,21 +525,23 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			try {
 
-				expected = ( await jimp.read( await fs.readFile( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
+				expected = await jimp.read(`./examples/screenshots/${ file }.png`);
 
 			} catch {
 
+				await screenshot.writeAsync( `./examples/output-screenshots/${ file }-actual.png` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
 
 			const actual = screenshot.bitmap;
+			const diff = screenshot.clone();
 
 			let numFailedPixels;
 
 			try {
 
-				numFailedPixels = pixelmatch( expected.data, actual.data, null, actual.width, actual.height, {
+				numFailedPixels = pixelmatch( expected.bitmap.data, actual.data, diff.bitmap.data, actual.width, actual.height, {
 					threshold: pixelThreshold,
 					alpha: 0.2,
 					diffMask: process.env.FORCE_COLOR === '0',
@@ -555,6 +550,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
+				await screenshot.writeAsync( `./examples/output-screenshots/${ file }-actual.png` );
+				await expected.writeAsync( `./examples/output-screenshots/${ file }-expected.png` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -562,6 +559,14 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 			numFailedPixels /= actual.width * actual.height;
 
 			/* Print results */
+
+			if ( numFailedPixels >= 0.001 / 2 ) {
+
+				await screenshot.writeAsync( `./examples/output-screenshots/${ file }-actual.png` );
+				await expected.writeAsync( `./examples/output-screenshots/${ file }-expected.png` );
+				await diff.writeAsync( `./examples/output-screenshots/${ file }-diff.png` );
+
+			}
 
 			if ( numFailedPixels < maxFailedPixels ) {
 
