@@ -78,6 +78,7 @@ class SVGLoader extends Loader {
 			switch ( node.nodeName ) {
 
 				case 'svg':
+					style = parseStyle( node, style );
 					break;
 
 				case 'style':
