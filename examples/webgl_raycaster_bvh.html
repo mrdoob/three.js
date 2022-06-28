@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three-mesh-bvh - raycasting - bvh</title>
+		<title>three.js raycaster - bvh</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
+				background-color: #eeeeee;
 				color: #333;
 			}
 
@@ -19,7 +20,7 @@
 
 	<body>
 		<div id="info">
-			<a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a> accelerated raycasting demo<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> raycaster - <a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">three-mesh-bvh</a><br/>
 			See <a href="https://github.com/gkjohnson/three-mesh-bvh" target="_blank" rel="noopener">main project repository</a> for more information and examples on high performance spatial queries.
 		</div>
 
@@ -143,7 +144,7 @@
 					helper = new MeshBVHVisualizer( mesh );
 					helper.color.set( 0xE91E63 );
 					scene.add( helper );
-					
+
 				} );
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -158,7 +159,7 @@
 					mesh.geometry.boundsTree = v ? bvh : null;
 
 				} );
-				
+
 				const helperFolder = gui.addFolder( 'BVH Helper' );
 				helperFolder.add( params, 'displayHelper' );
 				helperFolder.add( params, 'helperDepth', 1, 20, 1 ).onChange( v => {
@@ -214,7 +215,7 @@
 						Math.sin( i * 1 + offset ),
 					).normalize();
 					_position.applyAxisAngle( _axis, 0.001 );
-					
+
 					// update the position
 					_scale.setScalar( 0.02 );
 					_matrix.compose( _position, _quaternion, _scale );
@@ -244,7 +245,7 @@
 						lineSegments.geometry.attributes.position.setXYZ( lineNum ++, 0, 0, 0 );
 
 					}
-					
+
 				}
 
 				sphereInstance.count = rayCount * 2;
