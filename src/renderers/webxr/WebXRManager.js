@@ -153,6 +153,8 @@ class WebXRManager extends EventDispatcher {
 
 				if ( inputSource === null ) continue;
 
+				controllerInputSources[ i ] = null;
+
 				controllers[ i ].disconnect( inputSource );
 
 			}
