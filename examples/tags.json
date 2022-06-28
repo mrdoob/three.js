@@ -88,6 +88,7 @@
 	"webgl_postprocessing_unreal_bloom_selective": [ "glow" ],
 	"webgl_postprocessing_3dlut": [ "color grading" ],
 	"webgl_materials_modified": [ "onBeforeCompile" ],
+	"webgl_raycaster_bvh": [ "three-mesh-bvh", "query", "bounds", "tree", "accelerate", "performance", "community", "extension", "plugin", "library" ],
 	"webgl_shadowmap_csm": [ "cascade" ],
 	"webgl_shadowmap_pcss": [ "soft" ],
 	"webgl_simple_gi": [ "global illumination" ],

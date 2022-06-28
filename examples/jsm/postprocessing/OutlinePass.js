@@ -555,12 +555,14 @@ class OutlinePass extends Pass {
 
 				void main() {
 					vec2 invSize = 1.0 / texSize;
-					float weightSum = gaussianPdf(0.0, kernelRadius);
+					float sigma = kernelRadius/2.0;
+					float weightSum = gaussianPdf(0.0, sigma);
 					vec4 diffuseSum = texture2D( colorTexture, vUv) * weightSum;
 					vec2 delta = direction * invSize * kernelRadius/float(MAX_RADIUS);
 					vec2 uvOffset = delta;
 					for( int i = 1; i <= MAX_RADIUS; i ++ ) {
-						float w = gaussianPdf(uvOffset.x, kernelRadius);
+						float x = kernelRadius * float(i) / float(MAX_RADIUS);
+						float w = gaussianPdf(x, sigma);
 						vec4 sample1 = texture2D( colorTexture, vUv + uvOffset);
 						vec4 sample2 = texture2D( colorTexture, vUv - uvOffset);
 						diffuseSum += ((sample1 + sample2) * w);
