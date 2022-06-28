@@ -47,7 +47,7 @@ function unregexify( regexp ) {
 
 }
 
-const webgpuEnabled = process.platform === 'asdadadasdads'; // process.env.CI !== 'true' && process.env.CI !== true;
+const webgpuEnabled = true; // process.env.CI !== 'true' && process.env.CI !== true;
 const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be possible to screenshot WebGPU with fromSurface: true
 
 /* CONFIG VARIABLES START */
@@ -160,9 +160,9 @@ async function main() {
 
 	/* Create output directories */
 
-	try { await fs.rm( './examples/output-screenshots', { recursive: true, force: true } ) } catch {}
-	try { await fs.mkdir( './examples/output-screenshots' ) } catch {}
-	try { await fs.mkdir( './examples/screenshots' ) } catch {}
+	try { await fs.rm( 'examples/output-screenshots', { recursive: true, force: true } ) } catch {}
+	try { await fs.mkdir( 'examples/output-screenshots' ) } catch {}
+	try { await fs.mkdir( 'examples/screenshots' ) } catch {}
 
 	/* Find files */
 
@@ -174,7 +174,7 @@ async function main() {
 
 	const isExactList = exactList.length !== 0;
 
-	const files = ( await fs.readdir( './examples' ) )
+	const files = ( await fs.readdir( 'examples' ) )
 		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
 		.filter( f => isExactList ? exactList.some( r => r.test( f ) ) : ! exceptionList.some( r => r.test( f ) ) );
@@ -201,7 +201,7 @@ async function main() {
 
 	const flags = [ '--hide-scrollbars' ];
 	if ( webgpuEnabled ) flags.push( '--enable-unsafe-webgpu' );
-	if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
+	if ( webgpuEnabled && process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
@@ -237,7 +237,7 @@ async function main() {
 		await page.evaluateOnNewDocument( injection );
 		await page.setRequestInterception( true );
 
-		page.on( 'console', msg => {
+		page.on( 'console', async msg => {
 
 			const type = msg.type();
 
@@ -255,7 +255,12 @@ async function main() {
 
 			}
 
-			const text = file + ': ' + msg.text().replace( /\[\.WebGL-(.+?)\] /g, '' ).trim();
+			let text = ( await Promise.all( msg.args().map( arg => arg.executionContext().evaluate( arg => arg instanceof Error ? arg.message : arg, arg ) ) ) ).join( ' ' ); // https://github.com/puppeteer/puppeteer/issues/3397#issuecomment-434970058
+
+			text = text.trim();
+			if ( text === '' ) return;
+
+			text = file + ': ' + text.replace( /\[\.WebGL-(.+?)\] /g, '' );
 
 			if ( text.includes( 'GPU stall due to ReadPixels' ) || text.includes( 'GPUStatsPanel' ) || text.includes( '404 (Not Found)' ) ) {
 
@@ -514,7 +519,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			/* Make screenshot */
 
-			await screenshot.writeAsync( `./examples/screenshots/${ file }.png` );
+			await screenshot.writeAsync( `examples/screenshots/${ file }.png` );
 			console.green( `Screenshot generated for file ${ file }` );
 
 		} else {
@@ -525,11 +530,11 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			try {
 
-				expected = await jimp.read(`./examples/screenshots/${ file }.png`);
+				expected = await jimp.read( `examples/screenshots/${ file }.png` );
 
 			} catch {
 
-				await screenshot.writeAsync( `./examples/output-screenshots/${ file }-actual.png` );
+				await screenshot.writeAsync( `examples/output-screenshots/${ file }-actual.png` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
@@ -550,8 +555,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `./examples/output-screenshots/${ file }-actual.png` );
-				await expected.writeAsync( `./examples/output-screenshots/${ file }-expected.png` );
+				await screenshot.writeAsync( `examples/output-screenshots/${ file }-actual.png` );
+				await expected.writeAsync( `examples/output-screenshots/${ file }-expected.png` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -562,9 +567,9 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			if ( numFailedPixels >= 0.001 / 2 ) {
 
-				await screenshot.writeAsync( `./examples/output-screenshots/${ file }-actual.png` );
-				await expected.writeAsync( `./examples/output-screenshots/${ file }-expected.png` );
-				await diff.writeAsync( `./examples/output-screenshots/${ file }-diff.png` );
+				await screenshot.writeAsync( `examples/output-screenshots/${ file }-actual.png` );
+				await expected.writeAsync( `examples/output-screenshots/${ file }-expected.png` );
+				await diff.writeAsync( `examples/output-screenshots/${ file }-diff.png` );
 
 			}
 

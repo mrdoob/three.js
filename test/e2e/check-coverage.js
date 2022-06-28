@@ -2,7 +2,7 @@ import fs from 'fs';
 
 // examples
 const E = fs.readdirSync( './examples' )
-	.filter( s => s.indexOf( '.' ) !== -1 )
+	.filter( s => s.endsWith( '.html' ) )
 	.map( s => s.slice( 0, s.indexOf( '.' ) ) )
 	.filter( f => f !== 'index' );
 
