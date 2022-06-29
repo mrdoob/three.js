@@ -320,6 +320,8 @@
 
 			function synchronizeCrossFade( startAction, endAction, duration ) {
 
+      	if ( startAction === endAction ) return;
+
 				mixer.addEventListener( 'loop', onLoopFinished );
 
 				function onLoopFinished( event ) {
