@@ -120,12 +120,13 @@ function MenubarEdit( editor ) {
 	option.onClick( function () {
 
 		let object = editor.selected;
+		const originalParent = editor.selected.parent;
 
 		if ( object === null || object.parent === null ) return; // avoid cloning the camera or scene
 
 		object = object.clone();
 
-		editor.execute( new AddObjectCommand( editor, object ) );
+		editor.execute( new AddObjectCommand( editor, object, originalParent ) );
 
 	} );
 	options.add( option );

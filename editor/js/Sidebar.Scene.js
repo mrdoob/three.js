@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UIOutliner, UITexture } from './libs/ui.three.js';
+import { AddObjectCommand, RemoveObjectCommand } from './commands/Commands.js';
 
 function SidebarScene( editor ) {
 
@@ -349,7 +350,7 @@ function SidebarScene( editor ) {
 
 				}
 
-                // Hide utility scene objects and labels from materials editor
+				// Hide utility scene objects and labels from materials editor
             	if (
 					! [
 						'OrthographicCamera',
@@ -391,15 +392,15 @@ function SidebarScene( editor ) {
 				} else if ( value === 'Cut' ) {
 
 					copiedObject = editor.selected;
-				   editor.execute( new RemoveObjectCommand( editor.selected ) );
+				   editor.execute( new RemoveObjectCommand( editor, editor.selected ) );
 
 				} else if ( value === 'Delete' ) {
 
-					editor.execute( new RemoveObjectCommand( editor.selected ) );
+					editor.execute( new RemoveObjectCommand( editor, editor.selected ) );
 
 				} else if ( value === 'Clone' ) {
 
-					editor.execute( new AddObjectCommand( editor.selected.clone() ) );
+					editor.execute( new AddObjectCommand( editor, editor.selected.clone(), editor.selected.parent ) );
 
 				} else if ( value === 'Paste' && copiedObject !== undefined ) {
 
@@ -409,7 +410,7 @@ function SidebarScene( editor ) {
 
 					}
 
-				   editor.execute( new AddObjectCommand( copiedObject, editor.selected ) );
+				   editor.execute( new AddObjectCommand( editor, copiedObject, editor.selected ) );
 
 				}
 
