@@ -13,9 +13,8 @@ on:
       - 'files/**'
 
 jobs:
-
   lint:
-    name: "Linting"
+    name: "Lint testing"
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
@@ -28,7 +27,7 @@ jobs:
       - name: Install packages
         run: npm ci
 
-      - name: === Linting ===
+      - name: === Lint testing ===
         run: npm run lint
 
   unit:
@@ -50,56 +49,13 @@ jobs:
       - name: === Unit testing ===
         run: npm run test-unit
 
-  e2e-windows:
-    name: "E2E testing (Windows)"
-    runs-on: windows-latest
+  e2e:
+    name: "E2E testing"
+    runs-on: ${{ matrix.os }}
     env:
       FORCE_COLOR: 1
       CI: true
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
-      - name: Install Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          cache: 'npm'
-      - name: Install packages
-        run: npm ci
-      - name: Build
-        run: npm run build
-
-      - name: === E2E testing ===
-        run: npm run test-e2e
-
-  e2e-linux:
-    name: "E2E testing (Linux)"
-    runs-on: ubuntu-latest
-    env:
-      FORCE_COLOR: 1
-      CI: true
-    steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
-      - name: Install Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          cache: 'npm'
-      - name: Install packages
-        run: npm ci
-      - name: Build
-        run: npm run build
-
-      - name: === E2E testing ===
-        run: npm run test-e2e
-
-  e2e-macos:
-    name: "E2E testing (MacOS)"
-    runs-on: macos-latest
-    env:
-      FORCE_COLOR: 1
-      CI: true
+      os: [windows-latest, ubuntu-latest, macos-latest]
     steps:
       - name: Git checkout
         uses: actions/checkout@v2

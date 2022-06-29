@@ -52,8 +52,8 @@ const temporaryWebGPUHack = webgpuEnabled; // TODO: remove this when it would be
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 7; // 7 seconds - for how long there should be no network requests
-const parseTime = 5; // 5 seconds per megabyte
+const idleTime = 5; // 5 seconds - for how long there should be no network requests
+const parseTime = 3; // 3 seconds per megabyte
 
 const exceptionList = [
 
@@ -69,6 +69,12 @@ const exceptionList = [
 	'webaudio_orientation',
 	'webgl_effects_ascii',
 	'webgl_postprocessing_dof2',
+
+	// sometimes work, sometimes do not - investigate
+	'webgl_lightningstrike',
+	'webgl_loader_imagebitmap', // sometimes swaps white and red cubes
+	'webgl_loader_mmd_audio', // sometimes loads, sometimes not
+	'webgl_loader_texture_lottie',
 
 	// timeouts? investigate
 	'webgl_shadowmap_progressive',
