@@ -52,11 +52,12 @@ jobs:
   e2e:
     name: "E2E testing"
     runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
     env:
       FORCE_COLOR: 1
       CI: true
-    matrix:
-      os: [windows-latest, ubuntu-latest, macos-latest]
     steps:
       - name: Git checkout
         uses: actions/checkout@v2
