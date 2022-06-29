@@ -55,6 +55,7 @@ jobs:
     env:
       FORCE_COLOR: 1
       CI: true
+    matrix:
       os: [windows-latest, ubuntu-latest, macos-latest]
     steps:
       - name: Git checkout
