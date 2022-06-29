@@ -181,7 +181,17 @@
 
 			this.camera.updateMatrixWorld();
 			this.camera.matrixWorld.decompose( this.cameraPosition, this.cameraQuaternion, this._cameraScale );
-			this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
+
+			if ( this.camera.isOrthographicCamera ) {
+
+				this.camera.getWorldDirection( this.eye );
+
+			} else {
+
+				this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
+
+			}
+
 			super.updateMatrixWorld( this );
 
 		}

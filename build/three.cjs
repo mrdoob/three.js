@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '142dev';
+const REVISION = '142';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -18411,6 +18411,7 @@ class WebXRManager extends EventDispatcher {
 			for (let i = 0; i < controllers.length; i++) {
 				const inputSource = controllerInputSources[i];
 				if (inputSource === null) continue;
+				controllerInputSources[i] = null;
 				controllers[i].disconnect(inputSource);
 			}
 

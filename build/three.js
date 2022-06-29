@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '142dev';
+	const REVISION = '142';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -18413,6 +18413,7 @@
 				for (let i = 0; i < controllers.length; i++) {
 					const inputSource = controllerInputSources[i];
 					if (inputSource === null) continue;
+					controllerInputSources[i] = null;
 					controllers[i].disconnect(inputSource);
 				}
 
