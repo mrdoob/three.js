@@ -71,10 +71,13 @@ const exceptionList = [
 	'webgl_postprocessing_dof2',
 
 	// sometimes work, sometimes do not - investigate
+	'webgl_animation_skinning_blending',
 	'webgl_lightningstrike',
 	'webgl_loader_imagebitmap', // sometimes swaps white and red cubes
 	'webgl_loader_mmd_audio', // sometimes loads, sometimes not
 	'webgl_loader_texture_lottie',
+	'webgl_nodes_playground',
+	'webgl_postprocessing_crossfade',
 
 	// timeouts? investigate
 	'webgl_shadowmap_progressive',
