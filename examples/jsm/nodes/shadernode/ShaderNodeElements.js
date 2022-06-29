@@ -1,10 +1,11 @@
 // accessors
 import CubeTextureNode from '../accessors/CubeTextureNode.js';
 import InstanceNode from '../accessors/InstanceNode.js';
-import ReflectNode from '../accessors/ReflectNode.js';
+import ReflectVectorNode from '../accessors/ReflectVectorNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
 
 // display
+import ColorAdjustmentNode from '../display/ColorAdjustmentNode.js';
 import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import NormalMapNode from '../display/NormalMapNode.js';
 import ToneMappingNode from '../display/ToneMappingNode.js';
@@ -18,8 +19,12 @@ import LightingContextNode from '../lighting/LightingContextNode.js';
 import MatcapUVNode from '../utils/MatcapUVNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 import OscNode from '../utils/OscNode.js';
+import RotateUVNode from '../utils/RotateUVNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
+
+// geometry
+import RangeNode from '../geometry/RangeNode.js';
 
 // procedural
 import CheckerNode from '../procedural/CheckerNode.js';
@@ -61,12 +66,15 @@ export const cubeTexture = nodeProxy( CubeTextureNode );
 
 export const instance = nodeProxy( InstanceNode );
 
-export const reflectVector = nodeImmutable( ReflectNode, ReflectNode.VECTOR );
-export const reflectCube = nodeImmutable( ReflectNode, ReflectNode.CUBE );
+export const reflectVector = nodeImmutable( ReflectVectorNode );
 
 export const skinning = nodeProxy( SkinningNode );
 
 // display
+
+export const saturation = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.SATURATION );
+export const vibrance = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.VIBRANCE );
+export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 
 export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
 export const normalMap = nodeProxy( NormalMapNode );
@@ -89,12 +97,18 @@ export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
 export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
 export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
 
+export const rotateUV = nodeProxy( RotateUVNode );
+
 export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
 
 // @TODO: add supports to use node in timeScale
-export const timerLocal = ( timeScale ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale ) );
-export const timerGlobal = ( timeScale ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale ) );
-export const timerDelta = ( timeScale ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale ) );
+export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
+export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
+export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
+
+// geometry
+
+export const range = ( min, max ) => nodeObject( new RangeNode( min, max ) );
 
 // procedural
 

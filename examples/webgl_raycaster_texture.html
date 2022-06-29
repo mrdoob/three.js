@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js raycast - texture</title>
+		<title>three.js raycaster - texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -14,52 +14,12 @@
 			a {
 				color: #08f;
 			}
-
-			#controls {
-				position: absolute;
-				text-align:left;
-				top: 60px;
-				left: 5px;
-				padding: 5px;
-			}
-
-			.control { margin-bottom: 3px; }
-
-			input { width: 50px; }
 		</style>
 	</head>
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - raycast texture<br>Left to right: buffer geometry - geometry - indexed buffer geometry
-			<fieldset id="controls">
-				<legend>Circle</legend>
-				<div class="control">
-					WrapS : <select id="setwrapS">
-						<option value="1001">ClampToEdgeWrapping</option>
-						<option value="1000" selected>RepeatWrapping</option>
-						<option value="1002">MirroredRepeatWrapping</option>
-					</select>
-				</div>
-				<div class="control">
-					WrapT : <select id="setwrapT">
-						<option value="1001">ClampToEdgeWrapping</option>
-						<option value="1000" selected>RepeatWrapping</option>
-						<option value="1002">MirroredRepeatWrapping</option>
-					</select>
-				</div>
-				<div class="control">
-					Offset : X <input id="setOffsetU" type="number" value="0" step="0.05" />
-					Y <input id="setOffsetV" type="number" value="0" step="0.05" /><br />
-				</div>
-				<div class="control">
-					Repeat : X <input id="setRepeatU" type="number" value="1" step="0.1" />
-					Y <input id="setRepeatV" type="number" value="1" step="0.1" />
-				</div>
-				<div class="control">
-					Rotation : <input id="setRotation" type="number" value="0" step="0.1" />
-				</div>
-			</fieldset>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> raycaster - texture
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -77,6 +37,25 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+			const WRAPPING = {
+				'RepeatWrapping': THREE.RepeatWrapping,
+				'ClampToEdgeWrapping': THREE.ClampToEdgeWrapping,
+				'MirroredRepeatWrapping': THREE.MirroredRepeatWrapping
+			};
+
+			const params = {
+				wrapS: THREE.RepeatWrapping,
+				wrapT: THREE.RepeatWrapping,
+				offsetX: 0,
+				offsetY: 0,
+				repeatX: 1,
+				repeatY: 1,
+				rotation: 0,
+			};
+
 
 			function CanvasTexture( parentTexture ) {
 
@@ -289,13 +268,19 @@
 				window.addEventListener( 'resize', onWindowResize );
 				container.addEventListener( 'mousemove', onMouseMove );
 
-				document.getElementById( 'setwrapS' ).addEventListener( 'change', setwrapS );
-				document.getElementById( 'setwrapT' ).addEventListener( 'change', setwrapT );
-				document.getElementById( 'setOffsetU' ).addEventListener( 'change', setOffsetU );
-				document.getElementById( 'setOffsetV' ).addEventListener( 'change', setOffsetV );
-				document.getElementById( 'setRepeatU' ).addEventListener( 'change', setRepeatU );
-				document.getElementById( 'setRepeatV' ).addEventListener( 'change', setRepeatV );
-				document.getElementById( 'setRotation' ).addEventListener( 'change', setRotation );
+				//
+
+				const gui = new GUI();
+				gui.title( 'Circle Texture Settings' );
+
+				gui.add( params, 'wrapS', WRAPPING ).onChange( setwrapS );
+				gui.add( params, 'wrapT', WRAPPING ).onChange( setwrapT );
+				gui.add( params, 'offsetX', 0, 5 );
+				gui.add( params, 'offsetY', 0, 5 );
+				gui.add( params, 'repeatX', 0, 5 );
+				gui.add( params, 'repeatY', 0, 5 );
+				gui.add( params, 'rotation', 0, 2 * Math.PI );
+				gui.open();
 
 			}
 
@@ -347,53 +332,35 @@
 			function render() {
 
 				requestAnimationFrame( render );
+
+				// update texture parameters
+
+				circleTexture.offset.x = params.offsetX;
+				circleTexture.offset.y = params.offsetY;
+				circleTexture.repeat.x = params.repeatX;
+				circleTexture.repeat.y = params.repeatY;
+				circleTexture.rotation = params.rotation;
+
+				//
+
 				renderer.render( scene, camera );
 
 			}
 
-			function setwrapS( event ) {
+			function setwrapS( value ) {
 
-				circleTexture.wrapS = parseFloat( event.target.value );
+				circleTexture.wrapS = value;
 				circleTexture.needsUpdate = true;
 
 			}
 
-			function setwrapT( event ) {
+			function setwrapT( value ) {
 
-				circleTexture.wrapT = parseFloat( event.target.value );
+				circleTexture.wrapT = value;
 				circleTexture.needsUpdate = true;
 
 			}
 
-			function setOffsetU( event ) {
-
-				circleTexture.offset.x = parseFloat( event.target.value );
-
-			}
-
-			function setOffsetV( event ) {
-
-				circleTexture.offset.y = parseFloat( event.target.value );
-
-			}
-
-			function setRepeatU( event ) {
-
-				circleTexture.repeat.x = parseFloat( event.target.value );
-
-			}
-
-			function setRepeatV( event ) {
-
-				circleTexture.repeat.y = parseFloat( event.target.value );
-
-			}
-
-			function setRotation( event ) {
-
-				circleTexture.rotation = parseFloat( event.target.value );
-
-			}
 
 		</script>
 	</body>

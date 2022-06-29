@@ -2,8 +2,8 @@ import NodeMaterial from './NodeMaterial.js';
 import { SpriteMaterial } from 'three';
 import {
 	vec2, vec3, vec4,
-	assign, add, mul, sub,
-	positionLocal, bypass, length, cos, sin,
+	uniform, add, mul, sub,
+	positionLocal, length, cos, sin,
 	modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialRotation
 } from '../shadernode/ShaderNodeElements.js';
 
@@ -22,13 +22,13 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.colorNode = null;
 		this.opacityNode = null;
 
-		this.rotationNode = null;
-
 		this.alphaTestNode = null;
 
 		this.lightNode = null;
 
 		this.positionNode = null;
+		this.rotationNode = null;
+		this.scaleNode = null;
 
 		this.setDefaultValues( defaultValues );
 
@@ -40,25 +40,36 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		// < VERTEX STAGE >
 
-		let vertex = positionLocal;
+		const { positionNode, rotationNode, scaleNode } = this;
 
-		if ( this.positionNode !== null ) {
+		const vertex = positionLocal;
 
-			vertex = bypass( vertex, assign( positionLocal, this.positionNode ) );
+		let mvPosition = mul( modelViewMatrix, positionNode ? vec4( positionNode.xyz, 1 ) : vec4( 0, 0, 0, 1 ) );
 
-		}
-
-		let mvPosition = mul( modelViewMatrix, vec4( 0, 0, 0, 1 ) );
-
-		const scale = vec2(
+		let scale = vec2(
 			length( vec3( modelWorldMatrix[ 0 ].x, modelWorldMatrix[ 0 ].y, modelWorldMatrix[ 0 ].z ) ),
 			length( vec3( modelWorldMatrix[ 1 ].x, modelWorldMatrix[ 1 ].y, modelWorldMatrix[ 1 ].z ) )
 		);
 
-		const alignedPosition = mul( positionLocal.xy, scale );
-		const rotation = this.rotationNode || materialRotation;
+		if ( scaleNode !== null ) {
 
-		let rotatedPosition = vec2(
+			scale = mul( scale, scaleNode );
+
+		}
+
+		let alignedPosition = vertex.xy;
+
+		if ( builder.object.center?.isVector2 === true ) {
+
+			alignedPosition = sub( alignedPosition, sub( uniform( builder.object.center ), vec2( 0.5 ) ) );
+
+		}
+
+		alignedPosition = mul( alignedPosition, scale );
+
+		const rotation = rotationNode || materialRotation;
+
+		const rotatedPosition = vec2(
 			sub( mul( cos( rotation ), alignedPosition.x ), mul( sin( rotation ), alignedPosition.y ) ),
 			add( mul( sin( rotation ), alignedPosition.x ), mul( cos( rotation ), alignedPosition.y ) )
 		);
@@ -78,13 +89,13 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.colorNode = source.colorNode;
 		this.opacityNode = source.opacityNode;
 
-		this.rotationNode = source.rotationNode;
-
 		this.alphaTestNode = source.alphaTestNode;
 
 		this.lightNode = source.lightNode;
 
 		this.positionNode = source.positionNode;
+		this.rotationNode = source.rotationNode;
+		this.scaleNode = source.scaleNode;
 
 		return super.copy( source );
 

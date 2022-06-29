@@ -1,6 +1,8 @@
 import TextureNode from './TextureNode.js';
 import UniformNode from '../core/UniformNode.js';
-import ReflectNode from './ReflectNode.js';
+import ReflectVectorNode from './ReflectVectorNode.js';
+
+import { negate, vec3, nodeObject } from '../shadernode/ShaderNodeBaseElements.js';
 
 class CubeTextureNode extends TextureNode {
 
@@ -20,7 +22,7 @@ class CubeTextureNode extends TextureNode {
 
 	getConstructHash( builder ) {
 
-		return `${ this.uuid }-${ builder.context.environmentContext?.uuid || '' }`;
+		return `${ this.uuid } / ${ builder.context.environmentContext?.uuid || '' }`;
 
 	}
 
@@ -28,7 +30,7 @@ class CubeTextureNode extends TextureNode {
 
 		const properties = builder.getNodeProperties( this );
 
-		const uvNode = this.uvNode || builder.context.uvNode || new ReflectNode();
+		const uvNode = this.uvNode || builder.context.uvNode || new ReflectVectorNode();
 		let levelNode = this.levelNode || builder.context.levelNode;
 
 		if ( levelNode?.isNode === true ) {
@@ -72,9 +74,11 @@ class CubeTextureNode extends TextureNode {
 
 			let snippet = nodeData.snippet;
 
-			if ( builder.context.tempRead === false || snippet === undefined ) {
+			if ( snippet === undefined || builder.context.tempRead === false ) {
 
-				const uvSnippet = uvNode.build( builder, 'vec3' );
+				const uvNodeObject = nodeObject( uvNode );
+				const cubeUV = vec3( negate( uvNodeObject.x ), uvNodeObject.yz );
+				const uvSnippet = cubeUV.build( builder, 'vec3' );
 
 				if ( levelNode ) {
 

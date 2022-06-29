@@ -48,10 +48,10 @@ Matrix4.prototype.makeOrthographic = function ( left, right, top, bottom, near, 
 	const y = ( top + bottom ) * h;
 	const z = near * p;
 
-	te[ 0 ] = 2 * w;	te[ 4 ] = 0;	te[ 8 ] = 0;	te[ 12 ] = - x;
-	te[ 1 ] = 0;	te[ 5 ] = 2 * h;	te[ 9 ] = 0;	te[ 13 ] = - y;
-	te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = - 1 * p;	te[ 14 ] = - z;
-	te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = 0;	te[ 15 ] = 1;
+	te[ 0 ] = 2 * w;	te[ 4 ] = 0;		te[ 8 ] = 0;		te[ 12 ] = - x;
+	te[ 1 ] = 0;		te[ 5 ] = 2 * h;	te[ 9 ] = 0;		te[ 13 ] = - y;
+	te[ 2 ] = 0;		te[ 6 ] = 0;		te[ 10 ] = - 1 * p;	te[ 14 ] = - z;
+	te[ 3 ] = 0;		te[ 7 ] = 0;		te[ 11 ] = 0;		te[ 15 ] = 1;
 
 	return this;
 
@@ -174,7 +174,7 @@ class WebGPURenderer {
 		context.configure( {
 			device: device,
 			format: GPUTextureFormat.BGRA8Unorm, // this is the only valid context format right now (r121)
-			compositingAlphaMode: 'premultiplied'
+			alphaMode: 'premultiplied'
 		} );
 
 		this._adapter = adapter;
@@ -282,7 +282,7 @@ class WebGPURenderer {
 
 		//
 
-		this._background.update( scene );
+		this._background.update( this._currentRenderList, scene );
 
 		// start render pass
 
@@ -768,19 +768,7 @@ class WebGPURenderer {
 			// @TODO: Add support for multiple materials per object. This will require to extract
 			// the material from the renderItem object and pass it with its group data to _renderObject().
 
-			const object = renderItem.object;
-
-			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-			this._objects.update( object );
-
-			// send scene properties to object
-
-			const objectProperties = this._properties.get( object );
-
-			objectProperties.lightsNode = lightsNode;
-			objectProperties.scene = scene;
+			const { object, geometry, material, group } = renderItem;
 
 			if ( camera.isArrayCamera ) {
 
@@ -798,9 +786,7 @@ class WebGPURenderer {
 
 						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
 
-						this._nodes.update( object, camera2 );
-						this._bindings.update( object );
-						this._renderObject( object, passEncoder );
+						this._renderObject( object, scene, camera2, geometry, material, group, lightsNode, passEncoder );
 
 					}
 
@@ -808,9 +794,7 @@ class WebGPURenderer {
 
 			} else {
 
-				this._nodes.update( object, camera );
-				this._bindings.update( object );
-				this._renderObject( object, passEncoder );
+				this._renderObject( object, scene, camera, geometry, material, group, lightsNode, passEncoder );
 
 			}
 
@@ -818,9 +802,29 @@ class WebGPURenderer {
 
 	}
 
-	_renderObject( object, passEncoder ) {
+	_renderObject( object, scene, camera, geometry, material, group, lightsNode, passEncoder ) {
 
 		const info = this._info;
+
+		// send scene properties to object
+
+		const objectProperties = this._properties.get( object );
+
+		objectProperties.lightsNode = lightsNode;
+		objectProperties.scene = scene;
+
+		//
+
+		object.onBeforeRender( this, scene, camera, geometry, material, group );
+
+		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+		// updates
+
+		this._nodes.update( object, camera );
+		this._bindings.update( object );
+		this._objects.update( object );
 
 		// pipeline
 
@@ -834,7 +838,6 @@ class WebGPURenderer {
 
 		// index
 
-		const geometry = object.geometry;
 		const index = geometry.index;
 
 		const hasIndex = ( index !== null );
@@ -964,7 +967,7 @@ class WebGPURenderer {
 				device: device,
 				format: GPUTextureFormat.BGRA8Unorm,
 				usage: GPUTextureUsage.RENDER_ATTACHMENT,
-				compositingAlphaMode: 'premultiplied'
+				alphaMode: 'premultiplied'
 			} );
 
 		}

@@ -342,7 +342,7 @@ function collapse( vertices, faces, u, v ) { // u and v are pointers to vertices
 	// delete triangles on edge uv:
 	for ( let i = u.faces.length - 1; i >= 0; i -- ) {
 
-		if ( u.faces[ i ].hasVertex( v ) ) {
+		if ( u.faces[ i ] && u.faces[ i ].hasVertex( v ) ) {
 
 			removeFace( u.faces[ i ], faces );
 

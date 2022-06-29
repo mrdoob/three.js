@@ -3,7 +3,7 @@
  * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '141';
+const REVISION = '142';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -272,13 +272,7 @@ class EventDispatcher {
 
 }
 
-const _lut = [];
-
-for ( let i = 0; i < 256; i ++ ) {
-
-	_lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );
-
-}
+const _lut = [ '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '0a', '0b', '0c', '0d', '0e', '0f', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '1a', '1b', '1c', '1d', '1e', '1f', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '2a', '2b', '2c', '2d', '2e', '2f', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '3a', '3b', '3c', '3d', '3e', '3f', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '4a', '4b', '4c', '4d', '4e', '4f', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '5a', '5b', '5c', '5d', '5e', '5f', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '6a', '6b', '6c', '6d', '6e', '6f', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '7a', '7b', '7c', '7d', '7e', '7f', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89', '8a', '8b', '8c', '8d', '8e', '8f', '90', '91', '92', '93', '94', '95', '96', '97', '98', '99', '9a', '9b', '9c', '9d', '9e', '9f', 'a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9', 'ba', 'bb', 'bc', 'bd', 'be', 'bf', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'ca', 'cb', 'cc', 'cd', 'ce', 'cf', 'd0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7', 'd8', 'd9', 'da', 'db', 'dc', 'dd', 'de', 'df', 'e0', 'e1', 'e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'ea', 'eb', 'ec', 'ed', 'ee', 'ef', 'f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'fa', 'fb', 'fc', 'fd', 'fe', 'ff' ];
 
 let _seed = 1234567;
 
@@ -603,7 +597,7 @@ class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
-		this.isVector2 = true;
+		Vector2.prototype.isVector2 = true;
 
 		this.x = x;
 		this.y = y;
@@ -1086,7 +1080,7 @@ class Matrix3 {
 
 	constructor() {
 
-		this.isMatrix3 = true;
+		Matrix3.prototype.isMatrix3 = true;
 
 		this.elements = [
 
@@ -2368,7 +2362,7 @@ function serializeImage( image ) {
 			// images of DataTexture
 
 			return {
-				data: Array.prototype.slice.call( image.data ),
+				data: Array.from( image.data ),
 				width: image.width,
 				height: image.height,
 				type: image.data.constructor.name
@@ -2679,7 +2673,7 @@ class Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-		this.isVector4 = true;
+		Vector4.prototype.isVector4 = true;
 
 		this.x = x;
 		this.y = y;
@@ -4309,7 +4303,7 @@ class Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
 
-		this.isVector3 = true;
+		Vector3.prototype.isVector3 = true;
 
 		this.x = x;
 		this.y = y;
@@ -6306,7 +6300,7 @@ class Matrix4 {
 
 	constructor() {
 
-		this.isMatrix4 = true;
+		Matrix4.prototype.isMatrix4 = true;
 
 		this.elements = [
 
@@ -8475,7 +8469,7 @@ class Object3D extends EventDispatcher {
 
 }
 
-Object3D.DefaultUp = new Vector3( 0, 1, 0 );
+Object3D.DefaultUp = /*@__PURE__*/ new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
 
 const _v0$1 = /*@__PURE__*/ new Vector3();
@@ -9269,30 +9263,7 @@ class Material extends EventDispatcher {
 
 	}
 
-	// @deprecated since r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
-
-	get vertexTangents() {
-
-		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
-		return false;
-
-	}
-
-	set vertexTangents( value ) {
-
-		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
-
-	}
-
 }
-
-Material.fromType = function ( /*type*/ ) {
-
-	// TODO: Behavior added in Materials.js
-
-	return null;
-
-};
 
 class MeshBasicMaterial extends Material {
 
@@ -9753,7 +9724,7 @@ class BufferAttribute {
 		const data = {
 			itemSize: this.itemSize,
 			type: this.array.constructor.name,
-			array: Array.prototype.slice.call( this.array ),
+			array: Array.from( this.array ),
 			normalized: this.normalized
 		};
 
@@ -13459,12 +13430,12 @@ const UniformsLib = {
 
 	common: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 
 		map: { value: null },
-		uvTransform: { value: new Matrix3() },
-		uv2Transform: { value: new Matrix3() },
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() },
+		uv2Transform: { value: /*@__PURE__*/ new Matrix3() },
 
 		alphaMap: { value: null },
 		alphaTest: { value: 0 }
@@ -13517,7 +13488,7 @@ const UniformsLib = {
 	normalmap: {
 
 		normalMap: { value: null },
-		normalScale: { value: new Vector2( 1, 1 ) }
+		normalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) }
 
 	},
 
@@ -13552,7 +13523,7 @@ const UniformsLib = {
 		fogDensity: { value: 0.00025 },
 		fogNear: { value: 1 },
 		fogFar: { value: 2000 },
-		fogColor: { value: new Color( 0xffffff ) }
+		fogColor: { value: /*@__PURE__*/ new Color( 0xffffff ) }
 
 	},
 
@@ -13637,27 +13608,27 @@ const UniformsLib = {
 
 	points: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
 		map: { value: null },
 		alphaMap: { value: null },
 		alphaTest: { value: 0 },
-		uvTransform: { value: new Matrix3() }
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 
 	sprite: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
-		center: { value: new Vector2( 0.5, 0.5 ) },
+		center: { value: /*@__PURE__*/ new Vector2( 0.5, 0.5 ) },
 		rotation: { value: 0.0 },
 		map: { value: null },
 		alphaMap: { value: null },
 		alphaTest: { value: 0 },
-		uvTransform: { value: new Matrix3() }
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	}
 
@@ -13667,7 +13638,7 @@ const ShaderLib = {
 
 	basic: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -13683,7 +13654,7 @@ const ShaderLib = {
 
 	lambert: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -13693,7 +13664,7 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) }
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
 
@@ -13704,7 +13675,7 @@ const ShaderLib = {
 
 	phong: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.specularmap,
 			UniformsLib.envmap,
@@ -13717,8 +13688,8 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) },
-				specular: { value: new Color( 0x111111 ) },
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
+				specular: { value: /*@__PURE__*/ new Color( 0x111111 ) },
 				shininess: { value: 30 }
 			}
 		] ),
@@ -13730,7 +13701,7 @@ const ShaderLib = {
 
 	standard: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.envmap,
 			UniformsLib.aomap,
@@ -13744,7 +13715,7 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) },
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				roughness: { value: 1.0 },
 				metalness: { value: 0.0 },
 				envMapIntensity: { value: 1 } // temporary
@@ -13758,7 +13729,7 @@ const ShaderLib = {
 
 	toon: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
@@ -13770,7 +13741,7 @@ const ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) }
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
 
@@ -13781,7 +13752,7 @@ const ShaderLib = {
 
 	matcap: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
@@ -13799,7 +13770,7 @@ const ShaderLib = {
 
 	points: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.points,
 			UniformsLib.fog
 		] ),
@@ -13811,7 +13782,7 @@ const ShaderLib = {
 
 	dashed: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.fog,
 			{
@@ -13828,7 +13799,7 @@ const ShaderLib = {
 
 	depth: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.displacementmap
 		] ),
@@ -13840,7 +13811,7 @@ const ShaderLib = {
 
 	normal: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.bumpmap,
 			UniformsLib.normalmap,
@@ -13857,7 +13828,7 @@ const ShaderLib = {
 
 	sprite: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.sprite,
 			UniformsLib.fog
 		] ),
@@ -13870,7 +13841,7 @@ const ShaderLib = {
 	background: {
 
 		uniforms: {
-			uvTransform: { value: new Matrix3() },
+			uvTransform: { value: /*@__PURE__*/ new Matrix3() },
 			t2D: { value: null },
 		},
 
@@ -13878,13 +13849,10 @@ const ShaderLib = {
 		fragmentShader: ShaderChunk.background_frag
 
 	},
-	/* -------------------------------------------------------------------------
-	//	Cube map shader
-	 ------------------------------------------------------------------------- */
 
 	cube: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.envmap,
 			{
 				opacity: { value: 1.0 }
@@ -13909,11 +13877,11 @@ const ShaderLib = {
 
 	distanceRGBA: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
 			UniformsLib.displacementmap,
 			{
-				referencePosition: { value: new Vector3() },
+				referencePosition: { value: /*@__PURE__*/ new Vector3() },
 				nearDistance: { value: 1 },
 				farDistance: { value: 1000 }
 			}
@@ -13926,11 +13894,11 @@ const ShaderLib = {
 
 	shadow: {
 
-		uniforms: mergeUniforms( [
+		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.lights,
 			UniformsLib.fog,
 			{
-				color: { value: new Color( 0x00000 ) },
+				color: { value: /*@__PURE__*/ new Color( 0x00000 ) },
 				opacity: { value: 1.0 }
 			},
 		] ),
@@ -13944,14 +13912,14 @@ const ShaderLib = {
 
 ShaderLib.physical = {
 
-	uniforms: mergeUniforms( [
+	uniforms: /*@__PURE__*/ mergeUniforms( [
 		ShaderLib.standard.uniforms,
 		{
 			clearcoat: { value: 0 },
 			clearcoatMap: { value: null },
 			clearcoatRoughness: { value: 0 },
 			clearcoatRoughnessMap: { value: null },
-			clearcoatNormalScale: { value: new Vector2( 1, 1 ) },
+			clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
 			clearcoatNormalMap: { value: null },
 			iridescence: { value: 0 },
 			iridescenceMap: { value: null },
@@ -13960,21 +13928,21 @@ ShaderLib.physical = {
 			iridescenceThicknessMaximum: { value: 400 },
 			iridescenceThicknessMap: { value: null },
 			sheen: { value: 0 },
-			sheenColor: { value: new Color( 0x000000 ) },
+			sheenColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 			sheenColorMap: { value: null },
 			sheenRoughness: { value: 1 },
 			sheenRoughnessMap: { value: null },
 			transmission: { value: 0 },
 			transmissionMap: { value: null },
-			transmissionSamplerSize: { value: new Vector2() },
+			transmissionSamplerSize: { value: /*@__PURE__*/ new Vector2() },
 			transmissionSamplerMap: { value: null },
 			thickness: { value: 0 },
 			thicknessMap: { value: null },
 			attenuationDistance: { value: 0 },
-			attenuationColor: { value: new Color( 0x000000 ) },
+			attenuationColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 			specularIntensity: { value: 1 },
 			specularIntensityMap: { value: null },
-			specularColor: { value: new Color( 1, 1, 1 ) },
+			specularColor: { value: /*@__PURE__*/ new Color( 1, 1, 1 ) },
 			specularColorMap: { value: null },
 		}
 	] ),
@@ -16831,6 +16799,8 @@ function denormalize( morph, attribute ) {
 	const array = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
 
 	if ( array instanceof Int8Array ) denominator = 127;
+	else if ( array instanceof Uint8Array ) denominator = 255;
+	else if ( array instanceof Uint16Array ) denominator = 65535;
 	else if ( array instanceof Int16Array ) denominator = 32767;
 	else if ( array instanceof Int32Array ) denominator = 2147483647;
 	else console.error( 'THREE.WebGLMorphtargets: Unsupported morph attribute data type: ', array );
@@ -17239,10 +17209,10 @@ function WebGLObjects( gl, geometries, attributes, info ) {
  *
  */
 
-const emptyTexture = new Texture();
-const emptyArrayTexture = new DataArrayTexture();
-const empty3dTexture = new Data3DTexture();
-const emptyCubeTexture = new CubeTexture();
+const emptyTexture = /*@__PURE__*/ new Texture();
+const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
+const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
+const emptyCubeTexture = /*@__PURE__*/ new CubeTexture();
 
 // --- Utilities ---
 
@@ -20914,20 +20884,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			}
 
-			if ( shadow.map === null && ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
-
-				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
-				shadow.map.texture.name = light.name + '.shadowMap';
-
-				shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
-
-				shadow.camera.updateProjectionMatrix();
-
-			}
-
 			if ( shadow.map === null ) {
 
-				const pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
+				const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 				shadow.map.texture.name = light.name + '.shadowMap';
@@ -20964,7 +20923,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			// do blur pass for VSM
 
-			if ( ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
+			if ( shadow.isPointLightShadow !== true && this.type === VSMShadowMap ) {
 
 				VSMPass( shadow, camera );
 
@@ -20991,6 +20950,12 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			shadowMaterialVertical.needsUpdate = true;
 			shadowMaterialHorizontal.needsUpdate = true;
+
+		}
+
+		if ( shadow.mapPass === null ) {
+
+			shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
 
 		}
 
@@ -21030,7 +20995,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		}
 
-		if ( ( _renderer.localClippingEnabled && material.clipShadows === true && material.clippingPlanes.length !== 0 ) ||
+		if ( ( _renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
 			( material.displacementMap && material.displacementScale !== 0 ) ||
 			( material.alphaMap && material.alphaTest > 0 ) ) {
 
@@ -24714,43 +24679,6 @@ class WebXRController {
 
 		if ( inputSource && frame.session.visibilityState !== 'visible-blurred' ) {
 
-			if ( targetRay !== null ) {
-
-				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-				if ( inputPose !== null ) {
-
-					targetRay.matrix.fromArray( inputPose.transform.matrix );
-					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
-
-					if ( inputPose.linearVelocity ) {
-
-						targetRay.hasLinearVelocity = true;
-						targetRay.linearVelocity.copy( inputPose.linearVelocity );
-
-					} else {
-
-						targetRay.hasLinearVelocity = false;
-
-					}
-
-					if ( inputPose.angularVelocity ) {
-
-						targetRay.hasAngularVelocity = true;
-						targetRay.angularVelocity.copy( inputPose.angularVelocity );
-
-					} else {
-
-						targetRay.hasAngularVelocity = false;
-
-					}
-
-					this.dispatchEvent( _moveEvent );
-
-				}
-
-			}
-
 			if ( hand && inputSource.hand ) {
 
 				handPose = true;
@@ -24855,6 +24783,51 @@ class WebXRController {
 
 			}
 
+			if ( targetRay !== null ) {
+
+				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+				// Some runtimes (namely Vive Cosmos with Vive OpenXR Runtime) have only grip space and ray space is equal to it
+				if ( inputPose === null && gripPose !== null ) {
+
+					inputPose = gripPose;
+
+				}
+
+				if ( inputPose !== null ) {
+
+					targetRay.matrix.fromArray( inputPose.transform.matrix );
+					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+					if ( inputPose.linearVelocity ) {
+
+						targetRay.hasLinearVelocity = true;
+						targetRay.linearVelocity.copy( inputPose.linearVelocity );
+
+					} else {
+
+						targetRay.hasLinearVelocity = false;
+
+					}
+
+					if ( inputPose.angularVelocity ) {
+
+						targetRay.hasAngularVelocity = true;
+						targetRay.angularVelocity.copy( inputPose.angularVelocity );
+
+					} else {
+
+						targetRay.hasAngularVelocity = false;
+
+					}
+
+					this.dispatchEvent( _moveEvent );
+
+				}
+
+			}
+
+
 		}
 
 		if ( targetRay !== null ) {
@@ -24938,7 +24911,7 @@ class WebXRManager extends EventDispatcher {
 		let newRenderTarget = null;
 
 		const controllers = [];
-		const inputSourcesMap = new Map();
+		const controllerInputSources = [];
 
 		//
 
@@ -25015,7 +24988,15 @@ class WebXRManager extends EventDispatcher {
 
 		function onSessionEvent( event ) {
 
-			const controller = inputSourcesMap.get( event.inputSource );
+			const controllerIndex = controllerInputSources.indexOf( event.inputSource );
+
+			if ( controllerIndex === - 1 ) {
+
+				return;
+
+			}
+
+			const controller = controllers[ controllerIndex ];
 
 			if ( controller !== undefined ) {
 
@@ -25036,17 +25017,17 @@ class WebXRManager extends EventDispatcher {
 			session.removeEventListener( 'end', onSessionEnd );
 			session.removeEventListener( 'inputsourceschange', onInputSourcesChange );
 
-			inputSourcesMap.forEach( function ( controller, inputSource ) {
+			for ( let i = 0; i < controllers.length; i ++ ) {
 
-				if ( controller !== undefined ) {
+				const inputSource = controllerInputSources[ i ];
 
-					controller.disconnect( inputSource );
+				if ( inputSource === null ) continue;
 
-				}
+				controllerInputSources[ i ] = null;
 
-			} );
+				controllers[ i ].disconnect( inputSource );
 
-			inputSourcesMap.clear();
+			}
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
@@ -25193,7 +25174,7 @@ class WebXRManager extends EventDispatcher {
 					}
 
 					const projectionlayerInit = {
-						colorFormat: ( renderer.outputEncoding === sRGBEncoding ) ? 35907 : 32856,
+						colorFormat: 32856,
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
@@ -25242,28 +25223,17 @@ class WebXRManager extends EventDispatcher {
 
 		function onInputSourcesChange( event ) {
 
-			const inputSources = session.inputSources;
-
-			// Assign controllers to available inputSources
-
-			for ( let i = 0; i < inputSources.length; i ++ ) {
-
-				const index = inputSources[ i ].handedness === 'right' ? 1 : 0;
-				inputSourcesMap.set( inputSources[ i ], controllers[ index ] );
-
-			}
-
 			// Notify disconnected
 
 			for ( let i = 0; i < event.removed.length; i ++ ) {
 
 				const inputSource = event.removed[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+				const index = controllerInputSources.indexOf( inputSource );
 
-				if ( controller ) {
+				if ( index >= 0 ) {
 
-					controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
-					inputSourcesMap.delete( inputSource );
+					controllerInputSources[ index ] = null;
+					controllers[ index ].dispatchEvent( { type: 'disconnected', data: inputSource } );
 
 				}
 
@@ -25274,7 +25244,38 @@ class WebXRManager extends EventDispatcher {
 			for ( let i = 0; i < event.added.length; i ++ ) {
 
 				const inputSource = event.added[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+
+				let controllerIndex = controllerInputSources.indexOf( inputSource );
+
+				if ( controllerIndex === - 1 ) {
+
+					// Assign input source a controller that currently has no input source
+
+					for ( let i = 0; i < controllers.length; i ++ ) {
+
+						if ( i >= controllerInputSources.length ) {
+
+							controllerInputSources.push( inputSource );
+							controllerIndex = i;
+							break;
+
+						} else if ( controllerInputSources[ i ] === null ) {
+
+							controllerInputSources[ i ] = inputSource;
+							controllerIndex = i;
+							break;
+
+						}
+
+					}
+
+					// If all controllers do currently receive input we ignore new ones
+
+					if ( controllerIndex === - 1 ) break;
+
+				}
+
+				const controller = controllers[ controllerIndex ];
 
 				if ( controller ) {
 
@@ -25564,14 +25565,12 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
-			const inputSources = session.inputSources;
-
 			for ( let i = 0; i < controllers.length; i ++ ) {
 
-				const inputSource = inputSources[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+				const inputSource = controllerInputSources[ i ];
+				const controller = controllers[ i ];
 
-				if ( controller !== undefined ) {
+				if ( inputSource !== null && controller !== undefined ) {
 
 					controller.update( inputSource, frame, customReferenceSpace || referenceSpace );
 
@@ -26550,7 +26549,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		state = new WebGLState( _gl, extensions, capabilities );
 
-		info = new WebGLInfo( _gl );
+		info = new WebGLInfo();
 		properties = new WebGLProperties();
 		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
 		cubemaps = new WebGLCubeMaps( _this );
@@ -28405,7 +28404,23 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.initTexture = function ( texture ) {
 
-		textures.setTexture2D( texture, 0 );
+		if ( texture.isCubeTexture ) {
+
+			textures.setTextureCube( texture, 0 );
+
+		} else if ( texture.isData3DTexture ) {
+
+			textures.setTexture3D( texture, 0 );
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			textures.setTexture2DArray( texture, 0 );
+
+		} else {
+
+			textures.setTexture2D( texture, 0 );
+
+		}
 
 		state.unbindTexture();
 
@@ -28678,7 +28693,7 @@ class InterleavedBuffer {
 
 		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
 
-			data.arrayBuffers[ this.array.buffer._uuid ] = Array.prototype.slice.call( new Uint32Array( this.array.buffer ) );
+			data.arrayBuffers[ this.array.buffer._uuid ] = Array.from( new Uint32Array( this.array.buffer ) );
 
 		}
 
@@ -28875,7 +28890,7 @@ class InterleavedBufferAttribute {
 
 		if ( data === undefined ) {
 
-			console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.' );
+			console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will deinterleave buffer data.' );
 
 			const array = [];
 
@@ -28917,7 +28932,7 @@ class InterleavedBufferAttribute {
 
 		if ( data === undefined ) {
 
-			console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.' );
+			console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will deinterleave buffer data.' );
 
 			const array = [];
 
@@ -28944,7 +28959,7 @@ class InterleavedBufferAttribute {
 
 		} else {
 
-			// save as true interlaved attribtue
+			// save as true interleaved attribtue
 
 			if ( data.interleavedBuffers === undefined ) {
 
@@ -31280,8 +31295,10 @@ function CubicPoly() {
 
 //
 
-const tmp = new Vector3();
-const px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
+const tmp = /*@__PURE__*/ new Vector3();
+const px = /*@__PURE__*/ new CubicPoly();
+const py = /*@__PURE__*/ new CubicPoly();
+const pz = /*@__PURE__*/ new CubicPoly();
 
 class CatmullRomCurve3 extends Curve {
 
@@ -32331,6 +32348,7 @@ class Path extends CurvePath {
 	constructor( points ) {
 
 		super();
+
 		this.type = 'Path';
 
 		this.currentPoint = new Vector2();
@@ -33456,10 +33474,10 @@ class DodecahedronGeometry extends PolyhedronGeometry {
 
 }
 
-const _v0 = new Vector3();
-const _v1$1 = new Vector3();
-const _normal = new Vector3();
-const _triangle = new Triangle();
+const _v0 = /*@__PURE__*/ new Vector3();
+const _v1$1 = /*@__PURE__*/ new Vector3();
+const _normal = /*@__PURE__*/ new Vector3();
+const _triangle = /*@__PURE__*/ new Triangle();
 
 class EdgesGeometry extends BufferGeometry {
 
@@ -37306,33 +37324,6 @@ class LineDashedMaterial extends LineBasicMaterial {
 
 }
 
-const materialLib = {
-	ShadowMaterial,
-	SpriteMaterial,
-	RawShaderMaterial,
-	ShaderMaterial,
-	PointsMaterial,
-	MeshPhysicalMaterial,
-	MeshStandardMaterial,
-	MeshPhongMaterial,
-	MeshToonMaterial,
-	MeshNormalMaterial,
-	MeshLambertMaterial,
-	MeshDepthMaterial,
-	MeshDistanceMaterial,
-	MeshBasicMaterial,
-	MeshMatcapMaterial,
-	LineDashedMaterial,
-	LineBasicMaterial,
-	Material
-};
-
-Material.fromType = function ( type ) {
-
-	return new materialLib[ type ]();
-
-};
-
 const AnimationUtils = {
 
 	// same as Array.prototype.slice, but also works on typed arrays
@@ -41044,7 +41035,7 @@ class MaterialLoader extends Loader {
 
 		}
 
-		const material = Material.fromType( json.type );
+		const material = MaterialLoader.createMaterialFromType( json.type );
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
@@ -41281,6 +41272,33 @@ class MaterialLoader extends Loader {
 
 		this.textures = value;
 		return this;
+
+	}
+
+	static createMaterialFromType( type ) {
+
+		const materialLib = {
+			ShadowMaterial,
+			SpriteMaterial,
+			RawShaderMaterial,
+			ShaderMaterial,
+			PointsMaterial,
+			MeshPhysicalMaterial,
+			MeshStandardMaterial,
+			MeshPhongMaterial,
+			MeshToonMaterial,
+			MeshNormalMaterial,
+			MeshLambertMaterial,
+			MeshDepthMaterial,
+			MeshDistanceMaterial,
+			MeshBasicMaterial,
+			MeshMatcapMaterial,
+			LineDashedMaterial,
+			LineBasicMaterial,
+			Material
+		};
+
+		return new materialLib[ type ]();
 
 	}
 
@@ -44073,18 +44091,18 @@ const _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
 
 // Parent directories, delimited by '/' or ':'. Currently unused, but must
 // be matched to parse the rest of the track name.
-const _directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
+const _directoryRe = /*@__PURE__*/ /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
 
 // Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-const _nodeRe = /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
+const _nodeRe = /*@__PURE__*/ /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
 
 // Object on target node, and accessor. May not contain reserved
 // characters. Accessor may contain any character except closing bracket.
-const _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
+const _objectRe = /*@__PURE__*/ /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
 
 // Property and accessor. May not contain reserved characters. Accessor may
 // contain any non-bracket characters.
-const _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
+const _propertyRe = /*@__PURE__*/ /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
 
 const _trackRe = new RegExp( ''
 	+ '^'
@@ -47845,72 +47863,64 @@ class CameraHelper extends LineSegments {
 
 		const pointMap = {};
 
-		// colors
-
-		const colorFrustum = new Color( 0xffaa00 );
-		const colorCone = new Color( 0xff0000 );
-		const colorUp = new Color( 0x00aaff );
-		const colorTarget = new Color( 0xffffff );
-		const colorCross = new Color( 0x333333 );
-
 		// near
 
-		addLine( 'n1', 'n2', colorFrustum );
-		addLine( 'n2', 'n4', colorFrustum );
-		addLine( 'n4', 'n3', colorFrustum );
-		addLine( 'n3', 'n1', colorFrustum );
+		addLine( 'n1', 'n2' );
+		addLine( 'n2', 'n4' );
+		addLine( 'n4', 'n3' );
+		addLine( 'n3', 'n1' );
 
 		// far
 
-		addLine( 'f1', 'f2', colorFrustum );
-		addLine( 'f2', 'f4', colorFrustum );
-		addLine( 'f4', 'f3', colorFrustum );
-		addLine( 'f3', 'f1', colorFrustum );
+		addLine( 'f1', 'f2' );
+		addLine( 'f2', 'f4' );
+		addLine( 'f4', 'f3' );
+		addLine( 'f3', 'f1' );
 
 		// sides
 
-		addLine( 'n1', 'f1', colorFrustum );
-		addLine( 'n2', 'f2', colorFrustum );
-		addLine( 'n3', 'f3', colorFrustum );
-		addLine( 'n4', 'f4', colorFrustum );
+		addLine( 'n1', 'f1' );
+		addLine( 'n2', 'f2' );
+		addLine( 'n3', 'f3' );
+		addLine( 'n4', 'f4' );
 
 		// cone
 
-		addLine( 'p', 'n1', colorCone );
-		addLine( 'p', 'n2', colorCone );
-		addLine( 'p', 'n3', colorCone );
-		addLine( 'p', 'n4', colorCone );
+		addLine( 'p', 'n1' );
+		addLine( 'p', 'n2' );
+		addLine( 'p', 'n3' );
+		addLine( 'p', 'n4' );
 
 		// up
 
-		addLine( 'u1', 'u2', colorUp );
-		addLine( 'u2', 'u3', colorUp );
-		addLine( 'u3', 'u1', colorUp );
+		addLine( 'u1', 'u2' );
+		addLine( 'u2', 'u3' );
+		addLine( 'u3', 'u1' );
 
 		// target
 
-		addLine( 'c', 't', colorTarget );
-		addLine( 'p', 'c', colorCross );
+		addLine( 'c', 't' );
+		addLine( 'p', 'c' );
 
 		// cross
 
-		addLine( 'cn1', 'cn2', colorCross );
-		addLine( 'cn3', 'cn4', colorCross );
+		addLine( 'cn1', 'cn2' );
+		addLine( 'cn3', 'cn4' );
 
-		addLine( 'cf1', 'cf2', colorCross );
-		addLine( 'cf3', 'cf4', colorCross );
+		addLine( 'cf1', 'cf2' );
+		addLine( 'cf3', 'cf4' );
 
-		function addLine( a, b, color ) {
+		function addLine( a, b ) {
 
-			addPoint( a, color );
-			addPoint( b, color );
+			addPoint( a );
+			addPoint( b );
 
 		}
 
-		function addPoint( id, color ) {
+		function addPoint( id ) {
 
 			vertices.push( 0, 0, 0 );
-			colors.push( color.r, color.g, color.b );
+			colors.push( 0, 0, 0 );
 
 			if ( pointMap[ id ] === undefined ) {
 
@@ -47938,6 +47948,73 @@ class CameraHelper extends LineSegments {
 		this.pointMap = pointMap;
 
 		this.update();
+
+		// colors
+
+		const colorFrustum = new Color( 0xffaa00 );
+		const colorCone = new Color( 0xff0000 );
+		const colorUp = new Color( 0x00aaff );
+		const colorTarget = new Color( 0xffffff );
+		const colorCross = new Color( 0x333333 );
+
+		this.setColors( colorFrustum, colorCone, colorUp, colorTarget, colorCross );
+
+	}
+
+	setColors( frustum, cone, up, target, cross ) {
+
+		const geometry = this.geometry;
+
+		const colorAttribute = geometry.getAttribute( 'color' );
+
+		// near
+
+		colorAttribute.setXYZ( 0, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 1, frustum.r, frustum.g, frustum.b ); // n1, n2
+		colorAttribute.setXYZ( 2, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 3, frustum.r, frustum.g, frustum.b ); // n2, n4
+		colorAttribute.setXYZ( 4, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 5, frustum.r, frustum.g, frustum.b ); // n4, n3
+		colorAttribute.setXYZ( 6, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 7, frustum.r, frustum.g, frustum.b ); // n3, n1
+
+		// far
+
+		colorAttribute.setXYZ( 8, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 9, frustum.r, frustum.g, frustum.b ); // f1, f2
+		colorAttribute.setXYZ( 10, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 11, frustum.r, frustum.g, frustum.b ); // f2, f4
+		colorAttribute.setXYZ( 12, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 13, frustum.r, frustum.g, frustum.b ); // f4, f3
+		colorAttribute.setXYZ( 14, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 15, frustum.r, frustum.g, frustum.b ); // f3, f1
+
+		// sides
+
+		colorAttribute.setXYZ( 16, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 17, frustum.r, frustum.g, frustum.b ); // n1, f1
+		colorAttribute.setXYZ( 18, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 19, frustum.r, frustum.g, frustum.b ); // n2, f2
+		colorAttribute.setXYZ( 20, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 21, frustum.r, frustum.g, frustum.b ); // n3, f3
+		colorAttribute.setXYZ( 22, frustum.r, frustum.g, frustum.b ); colorAttribute.setXYZ( 23, frustum.r, frustum.g, frustum.b ); // n4, f4
+
+		// cone
+
+		colorAttribute.setXYZ( 24, cone.r, cone.g, cone.b ); colorAttribute.setXYZ( 25, cone.r, cone.g, cone.b ); // p, n1
+		colorAttribute.setXYZ( 26, cone.r, cone.g, cone.b ); colorAttribute.setXYZ( 27, cone.r, cone.g, cone.b ); // p, n2
+		colorAttribute.setXYZ( 28, cone.r, cone.g, cone.b ); colorAttribute.setXYZ( 29, cone.r, cone.g, cone.b ); // p, n3
+		colorAttribute.setXYZ( 30, cone.r, cone.g, cone.b ); colorAttribute.setXYZ( 31, cone.r, cone.g, cone.b ); // p, n4
+
+		// up
+
+		colorAttribute.setXYZ( 32, up.r, up.g, up.b ); colorAttribute.setXYZ( 33, up.r, up.g, up.b ); // u1, u2
+		colorAttribute.setXYZ( 34, up.r, up.g, up.b ); colorAttribute.setXYZ( 35, up.r, up.g, up.b ); // u2, u3
+		colorAttribute.setXYZ( 36, up.r, up.g, up.b ); colorAttribute.setXYZ( 37, up.r, up.g, up.b ); // u3, u1
+
+		// target
+
+		colorAttribute.setXYZ( 38, target.r, target.g, target.b ); colorAttribute.setXYZ( 39, target.r, target.g, target.b ); // c, t
+		colorAttribute.setXYZ( 40, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 41, cross.r, cross.g, cross.b ); // p, c
+
+		// cross
+
+		colorAttribute.setXYZ( 42, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 43, cross.r, cross.g, cross.b ); // cn1, cn2
+		colorAttribute.setXYZ( 44, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 45, cross.r, cross.g, cross.b ); // cn3, cn4
+
+		colorAttribute.setXYZ( 46, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 47, cross.r, cross.g, cross.b ); // cf1, cf2
+		colorAttribute.setXYZ( 48, cross.r, cross.g, cross.b ); colorAttribute.setXYZ( 49, cross.r, cross.g, cross.b ); // cf3, cf4
+
+		colorAttribute.needsUpdate = true;
 
 	}
 
@@ -48655,154 +48732,181 @@ class ShapePath {
 
 // Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
 
-class DataUtils {
+const {
+	floatView: _floatView,
+	uint32View: _uint32View,
+	baseTable: _baseTable,
+	shiftTable: _shiftTable,
+	mantissaTable: _mantissaTable,
+	exponentTable: _exponentTable,
+	offsetTable: _offsetTable
+} = /*@__PURE__*/ _generateTables();
 
-	// float32 to float16
+function _generateTables() {
 
-	static toHalfFloat( val ) {
+	// float32 to float16 helpers
 
-		if ( Math.abs( val ) > 65504 ) console.warn( 'THREE.DataUtils.toHalfFloat(): Value out of range.' );
+	const buffer = new ArrayBuffer( 4 );
+	const floatView = new Float32Array( buffer );
+	const uint32View = new Uint32Array( buffer );
 
-		val = clamp( val, - 65504, 65504 );
+	const baseTable = new Uint32Array( 512 );
+	const shiftTable = new Uint32Array( 512 );
 
-		_floatView[ 0 ] = val;
-		const f = _uint32View[ 0 ];
-		const e = ( f >> 23 ) & 0x1ff;
-		return _baseTable[ e ] + ( ( f & 0x007fffff ) >> _shiftTable[ e ] );
+	for ( let i = 0; i < 256; ++ i ) {
 
-	}
+		const e = i - 127;
 
-	// float16 to float32
+		// very small number (0, -0)
 
-	static fromHalfFloat( val ) {
+		if ( e < - 27 ) {
 
-		const m = val >> 10;
-		_uint32View[ 0 ] = _mantissaTable[ _offsetTable[ m ] + ( val & 0x3ff ) ] + _exponentTable[ m ];
-		return _floatView[ 0 ];
+			baseTable[ i ] = 0x0000;
+			baseTable[ i | 0x100 ] = 0x8000;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
 
-	}
+			// small number (denorm)
 
-}
+		} else if ( e < - 14 ) {
 
-// float32 to float16 helpers
+			baseTable[ i ] = 0x0400 >> ( - e - 14 );
+			baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
+			shiftTable[ i ] = - e - 1;
+			shiftTable[ i | 0x100 ] = - e - 1;
 
-const _buffer = new ArrayBuffer( 4 );
-const _floatView = new Float32Array( _buffer );
-const _uint32View = new Uint32Array( _buffer );
+			// normal number
 
-const _baseTable = new Uint32Array( 512 );
-const _shiftTable = new Uint32Array( 512 );
+		} else if ( e <= 15 ) {
 
-for ( let i = 0; i < 256; ++ i ) {
+			baseTable[ i ] = ( e + 15 ) << 10;
+			baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
 
-	const e = i - 127;
+			// large number (Infinity, -Infinity)
 
-	// very small number (0, -0)
+		} else if ( e < 128 ) {
 
-	if ( e < - 27 ) {
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 24;
+			shiftTable[ i | 0x100 ] = 24;
 
-		_baseTable[ i ] = 0x0000;
-		_baseTable[ i | 0x100 ] = 0x8000;
-		_shiftTable[ i ] = 24;
-		_shiftTable[ i | 0x100 ] = 24;
+			// stay (NaN, Infinity, -Infinity)
 
-		// small number (denorm)
+		} else {
 
-	} else if ( e < - 14 ) {
+			baseTable[ i ] = 0x7c00;
+			baseTable[ i | 0x100 ] = 0xfc00;
+			shiftTable[ i ] = 13;
+			shiftTable[ i | 0x100 ] = 13;
 
-		_baseTable[ i ] = 0x0400 >> ( - e - 14 );
-		_baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
-		_shiftTable[ i ] = - e - 1;
-		_shiftTable[ i | 0x100 ] = - e - 1;
-
-		// normal number
-
-	} else if ( e <= 15 ) {
-
-		_baseTable[ i ] = ( e + 15 ) << 10;
-		_baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
-		_shiftTable[ i ] = 13;
-		_shiftTable[ i | 0x100 ] = 13;
-
-		// large number (Infinity, -Infinity)
-
-	} else if ( e < 128 ) {
-
-		_baseTable[ i ] = 0x7c00;
-		_baseTable[ i | 0x100 ] = 0xfc00;
-		_shiftTable[ i ] = 24;
-		_shiftTable[ i | 0x100 ] = 24;
-
-		// stay (NaN, Infinity, -Infinity)
-
-	} else {
-
-		_baseTable[ i ] = 0x7c00;
-		_baseTable[ i | 0x100 ] = 0xfc00;
-		_shiftTable[ i ] = 13;
-		_shiftTable[ i | 0x100 ] = 13;
+		}
 
 	}
 
-}
+	// float16 to float32 helpers
 
-// float16 to float32 helpers
+	const mantissaTable = new Uint32Array( 2048 );
+	const exponentTable = new Uint32Array( 64 );
+	const offsetTable = new Uint32Array( 64 );
 
-const _mantissaTable = new Uint32Array( 2048 );
-const _exponentTable = new Uint32Array( 64 );
-const _offsetTable = new Uint32Array( 64 );
+	for ( let i = 1; i < 1024; ++ i ) {
 
-for ( let i = 1; i < 1024; ++ i ) {
+		let m = i << 13; // zero pad mantissa bits
+		let e = 0; // zero exponent
 
-	let m = i << 13; // zero pad mantissa bits
-	let e = 0; // zero exponent
+		// normalized
+		while ( ( m & 0x00800000 ) === 0 ) {
 
-	// normalized
-	while ( ( m & 0x00800000 ) === 0 ) {
+			m <<= 1;
+			e -= 0x00800000; // decrement exponent
 
-		m <<= 1;
-		e -= 0x00800000; // decrement exponent
+		}
 
-	}
+		m &= ~ 0x00800000; // clear leading 1 bit
+		e += 0x38800000; // adjust bias
 
-	m &= ~ 0x00800000; // clear leading 1 bit
-	e += 0x38800000; // adjust bias
-
-	_mantissaTable[ i ] = m | e;
-
-}
-
-for ( let i = 1024; i < 2048; ++ i ) {
-
-	_mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
-
-}
-
-for ( let i = 1; i < 31; ++ i ) {
-
-	_exponentTable[ i ] = i << 23;
-
-}
-
-_exponentTable[ 31 ] = 0x47800000;
-_exponentTable[ 32 ] = 0x80000000;
-for ( let i = 33; i < 63; ++ i ) {
-
-	_exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
-
-}
-
-_exponentTable[ 63 ] = 0xc7800000;
-
-for ( let i = 1; i < 64; ++ i ) {
-
-	if ( i !== 32 ) {
-
-		_offsetTable[ i ] = 1024;
+		mantissaTable[ i ] = m | e;
 
 	}
 
+	for ( let i = 1024; i < 2048; ++ i ) {
+
+		mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
+
+	}
+
+	for ( let i = 1; i < 31; ++ i ) {
+
+		exponentTable[ i ] = i << 23;
+
+	}
+
+	exponentTable[ 31 ] = 0x47800000;
+	exponentTable[ 32 ] = 0x80000000;
+
+	for ( let i = 33; i < 63; ++ i ) {
+
+		exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
+
+	}
+
+	exponentTable[ 63 ] = 0xc7800000;
+
+	for ( let i = 1; i < 64; ++ i ) {
+
+		if ( i !== 32 ) {
+
+			offsetTable[ i ] = 1024;
+
+		}
+
+	}
+
+	return {
+		floatView: floatView,
+		uint32View: uint32View,
+		baseTable: baseTable,
+		shiftTable: shiftTable,
+		mantissaTable: mantissaTable,
+		exponentTable: exponentTable,
+		offsetTable: offsetTable,
+	};
+
 }
+
+// float32 to float16
+
+function toHalfFloat( val ) {
+
+	if ( Math.abs( val ) > 65504 ) console.warn( 'THREE.DataUtils.toHalfFloat(): Value out of range.' );
+
+	val = clamp( val, - 65504, 65504 );
+
+	_floatView[ 0 ] = val;
+	const f = _uint32View[ 0 ];
+	const e = ( f >> 23 ) & 0x1ff;
+	return _baseTable[ e ] + ( ( f & 0x007fffff ) >> _shiftTable[ e ] );
+
+}
+
+// float16 to float32
+
+function fromHalfFloat( val ) {
+
+	const m = val >> 10;
+	_uint32View[ 0 ] = _mantissaTable[ _offsetTable[ m ] + ( val & 0x3ff ) ] + _exponentTable[ m ];
+	return _floatView[ 0 ];
+
+}
+
+var DataUtils = /*#__PURE__*/Object.freeze({
+	__proto__: null,
+	toHalfFloat: toHalfFloat,
+	fromHalfFloat: fromHalfFloat
+});
 
 // r133, c5bb5434555a3c3ddd784944a0a124f996fc721b
 

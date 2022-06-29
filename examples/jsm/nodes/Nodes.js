@@ -39,16 +39,20 @@ import Object3DNode from './accessors/Object3DNode.js';
 import PointUVNode from './accessors/PointUVNode.js';
 import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
-import ReflectNode from './accessors/ReflectNode.js';
+import ReflectVectorNode from './accessors/ReflectVectorNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 import UserDataNode from './accessors/UserDataNode.js';
 
+// geometry
+import RangeNode from './geometry/RangeNode.js';
+
 // gpgpu
 import ComputeNode from './gpgpu/ComputeNode.js';
 
 // display
+import ColorAdjustmentNode from './display/ColorAdjustmentNode.js';
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
@@ -76,6 +80,7 @@ import JoinNode from './utils/JoinNode.js';
 import MatcapUVNode from './utils/MatcapUVNode.js';
 import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
 import OscNode from './utils/OscNode.js';
+import RotateUVNode from './utils/RotateUVNode.js'
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
 import TimerNode from './utils/TimerNode.js';
@@ -129,7 +134,10 @@ const nodeLib = {
 	VarNode,
 	VaryNode,
 
-	// compute
+	// geometry
+	RangeNode,
+
+	// gpgpu
 	ComputeNode,
 
 	// accessors
@@ -146,13 +154,14 @@ const nodeLib = {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
-	ReflectNode,
+	ReflectVectorNode,
 	SkinningNode,
 	TextureNode,
 	UVNode,
 	UserDataNode,
 
 	// display
+	ColorAdjustmentNode,
 	ColorSpaceNode,
 	FrontFacingNode,
 	NormalMapNode,
@@ -180,6 +189,7 @@ const nodeLib = {
 	MatcapUVNode,
 	MaxMipLevelNode,
 	OscNode,
+	RotateUVNode,
 	SplitNode,
 	SpriteSheetUVNode,
 	TimerNode,
@@ -232,7 +242,10 @@ export {
 	VarNode,
 	VaryNode,
 
-	// compute
+	// geometry
+	RangeNode,
+
+	// gpgpu
 	ComputeNode,
 
 	// accessors
@@ -249,13 +262,14 @@ export {
 	PointUVNode,
 	PositionNode,
 	ReferenceNode,
-	ReflectNode,
+	ReflectVectorNode,
 	SkinningNode,
 	TextureNode,
 	UVNode,
 	UserDataNode,
 
 	// display
+	ColorAdjustmentNode,
 	ColorSpaceNode,
 	FrontFacingNode,
 	NormalMapNode,
@@ -283,6 +297,7 @@ export {
 	MatcapUVNode,
 	MaxMipLevelNode,
 	OscNode,
+	RotateUVNode,
 	SplitNode,
 	SpriteSheetUVNode,
 	TimerNode,
