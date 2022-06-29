@@ -18411,6 +18411,7 @@ class WebXRManager extends EventDispatcher {
 			for (let i = 0; i < controllers.length; i++) {
 				const inputSource = controllerInputSources[i];
 				if (inputSource === null) continue;
+				controllerInputSources[i] = null;
 				controllers[i].disconnect(inputSource);
 			}
 
