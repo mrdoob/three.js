@@ -274,6 +274,8 @@
 
 			function prepareCrossFade( startAction, endAction, duration ) {
 
+				if ( startAction === endAction ) return;
+
 				// If the current action is 'idle', execute the crossfade immediately;
 				// else wait until the current action has finished its current loop
 
@@ -319,8 +321,6 @@
 			}
 
 			function synchronizeCrossFade( startAction, endAction, duration ) {
-
-				if ( startAction === endAction ) return;
 
 				mixer.addEventListener( 'loop', onLoopFinished );
 
