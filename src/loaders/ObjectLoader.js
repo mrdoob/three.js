@@ -1085,15 +1085,6 @@ class ObjectLoader extends Loader {
 
 	}
 
-	/* DEPRECATED */
-
-	setTexturePath( value ) {
-
-		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( value );
-
-	}
-
 }
 
 const TEXTURE_MAPPING = {
