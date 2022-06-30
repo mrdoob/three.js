@@ -157,14 +157,6 @@ async function downloadLatestChromium() {
 
 }
 
-async function fromSurface( page ) {
-
-	await page.session.send( 'Target.activateTarget', { targetId: page.target()._targetId } );
-	const b64 = await page.session.send( 'Page.captureScreenshot', { fromSurface: false } );
-	return Buffer.from( b64.data, 'base64' );
-
-}
-
 async function main() {
 
 	/* Create output directories */
@@ -241,7 +233,7 @@ async function main() {
 
 	for ( const page of pages ) {
 
-		/* let page.pageSize, page.file, page.session */
+		/* let page.pageSize, page.file */
 
 		await page.evaluateOnNewDocument( injection );
 		await page.setRequestInterception( true );
@@ -362,14 +354,6 @@ async function main() {
 			}
 
 		} );
-
-		/* Prepare session if WebGPU hack is enabled */
-
-		if ( temporaryWebGPUHack ) {
-
-			page.session = await page.target().createCDPSession();
-
-		}
 
 	}
 
@@ -519,7 +503,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-		const screenshot = await jimp.read( temporaryWebGPUHack ? await fromSurface( page ) : await page.screenshot() );
+		const screenshot = await jimp.read( await page.screenshot( { fromSurface: ! temporaryWebGPUHack } ) );
 		screenshot.scale( 1 / viewScale );
 
 		if ( page.error !== undefined ) throw new Error( page.error );
