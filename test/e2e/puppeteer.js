@@ -1,6 +1,7 @@
+import chalk from 'chalk';
 import puppeteer from 'puppeteer-core';
-import handler from 'serve-handler';
-import http from 'http';
+import express from 'express';
+import path from 'path';
 import pixelmatch from 'pixelmatch';
 import jimp from 'jimp';
 import * as fs from 'fs/promises';
@@ -121,17 +122,19 @@ const width = 400;
 const height = 250;
 const viewScale = 2; // TODO: possibly increase?
 
-console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
-console.yellow = ( msg ) => console.log( `\x1b[33m${ msg }\x1b[37m` );
-console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
+console.red = ( msg ) => console.log( chalk.red( msg ) );
+console.yellow = ( msg ) => console.log( chalk.yellow( msg ) );
+console.green = ( msg ) => console.log( chalk.green( msg ) );
 
 let browser;
 
 /* Launch server */
 
-const server = http.createServer( handler );
-server.listen( port, main );
-server.on( 'SIGINT', () => close() );
+const app = express();
+app.use( express.static( path.resolve() ) );
+const server = app.listen( port, main );
+
+process.on( 'SIGINT', () => close() );
 
 async function downloadLatestChromium() {
 
@@ -427,7 +430,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		try {
 
-			await page.goto( `http://localhost:${ port }/examples/${ file }`, {
+			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
 				timeout: networkTimeout * 1000
 			} );
