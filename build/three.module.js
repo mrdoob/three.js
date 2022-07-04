@@ -3,7 +3,7 @@
  * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '142';
+const REVISION = '143dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -3614,13 +3614,6 @@ class Quaternion {
 		this._y = y;
 		this._z = z;
 		this._w = w;
-
-	}
-
-	static slerp( qa, qb, qm, t ) {
-
-		console.warn( 'THREE.Quaternion: Static .slerp() has been deprecated. Use qm.slerpQuaternions( qa, qb, t ) instead.' );
-		return qm.slerpQuaternions( qa, qb, t );
 
 	}
 
@@ -34648,7 +34641,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 			const steps = options.steps !== undefined ? options.steps : 1;
-			let depth = options.depth !== undefined ? options.depth : 1;
+			const depth = options.depth !== undefined ? options.depth : 1;
 
 			let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
 			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
@@ -34659,15 +34652,6 @@ class ExtrudeGeometry extends BufferGeometry {
 			const extrudePath = options.extrudePath;
 
 			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
-
-			// deprecated options
-
-			if ( options.amount !== undefined ) {
-
-				console.warn( 'THREE.ExtrudeBufferGeometry: amount has been renamed to depth.' );
-				depth = options.amount;
-
-			}
 
 			//
 
@@ -42654,15 +42638,6 @@ class ObjectLoader extends Loader {
 			}
 
 		} );
-
-	}
-
-	/* DEPRECATED */
-
-	setTexturePath( value ) {
-
-		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( value );
 
 	}
 

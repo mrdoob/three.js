@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '142';
+	const REVISION = '143dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -2817,11 +2817,6 @@
 			this._y = y;
 			this._z = z;
 			this._w = w;
-		}
-
-		static slerp(qa, qb, qm, t) {
-			console.warn('THREE.Quaternion: Static .slerp() has been deprecated. Use qm.slerpQuaternions( qa, qb, t ) instead.');
-			return qm.slerpQuaternions(qa, qb, t);
 		}
 
 		static slerpFlat(dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t) {
@@ -25119,20 +25114,14 @@
 
 				const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 				const steps = options.steps !== undefined ? options.steps : 1;
-				let depth = options.depth !== undefined ? options.depth : 1;
+				const depth = options.depth !== undefined ? options.depth : 1;
 				let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
 				let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
 				let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 0.1;
 				let bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
 				let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 				const extrudePath = options.extrudePath;
-				const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator; // deprecated options
-
-				if (options.amount !== undefined) {
-					console.warn('THREE.ExtrudeBufferGeometry: amount has been renamed to depth.');
-					depth = options.amount;
-				} //
-
+				const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator; //
 
 				let extrudePts,
 						extrudeByPath = false;
@@ -30578,13 +30567,6 @@
 					}
 				}
 			});
-		}
-		/* DEPRECATED */
-
-
-		setTexturePath(value) {
-			console.warn('THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().');
-			return this.setResourcePath(value);
 		}
 
 	}
