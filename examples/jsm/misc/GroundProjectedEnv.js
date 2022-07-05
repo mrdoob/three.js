@@ -1,32 +1,24 @@
-import {
-	Texture,
-	Mesh,
-	IcosahedronGeometry,
-	ShaderMaterial,
-	DoubleSide,
-} from "three";
+import { Mesh, IcosahedronGeometry, ShaderMaterial, DoubleSide } from 'three';
 
 /**
  * Ground projected env map taken from @react-three/drei.
  * https://github.com/pmndrs/drei/blob/master/src/core/Environment.tsx
  */
 export class GroundProjectedEnv extends Mesh {
-	/**
-	 *
-	 * @param {Texture} texture
-	 */
-	constructor(texture, options) {
+
+	constructor( texture, options ) {
+
 		const isCubeMap = texture.isCubeTexture;
 		const w =
-			(isCubeMap ? texture.image[0]?.width : texture.image.width) ?? 1024;
+			( isCubeMap ? texture.image[ 0 ]?.width : texture.image.width ) ?? 1024;
 		const cubeSize = w / 4;
-		const _lodMax = Math.floor(Math.log2(cubeSize));
-		const _cubeSize = Math.pow(2, _lodMax);
-		const width = 3 * Math.max(_cubeSize, 16 * 7);
+		const _lodMax = Math.floor( Math.log2( cubeSize ) );
+		const _cubeSize = Math.pow( 2, _lodMax );
+		const width = 3 * Math.max( _cubeSize, 16 * 7 );
 		const height = 4 * _cubeSize;
 
 		const defines = [
-			isCubeMap ? `#define ENVMAP_TYPE_CUBE` : "",
+			isCubeMap ? '#define ENVMAP_TYPE_CUBE' : '',
 			`#define CUBEUV_TEXEL_WIDTH ${1.0 / width}`,
 			`#define CUBEUV_TEXEL_HEIGHT ${1.0 / height}`,
 			`#define CUBEUV_MAX_MIP ${_lodMax}.0`,
@@ -42,7 +34,7 @@ export class GroundProjectedEnv extends Mesh {
         }
         `;
 		const fragmentShader =
-			defines.join("\n") +
+			defines.join( '\n' ) +
 			/* glsl */ `
         #define ENVMAP_TYPE_CUBE_UV
 
@@ -122,39 +114,40 @@ export class GroundProjectedEnv extends Mesh {
 			radius: { value: options?.radius || 100 },
 		};
 
-		const geometry = new IcosahedronGeometry(1, 16);
-		const material = new ShaderMaterial({
+		const geometry = new IcosahedronGeometry( 1, 16 );
+		const material = new ShaderMaterial( {
 			uniforms,
 			fragmentShader,
 			vertexShader,
 			side: DoubleSide,
-		});
+		} );
 
-		super(geometry, material);
+		super( geometry, material );
+
 	}
 
-	/**
-	 * @param {Number} radius
-	 */
-	set radius(radius) {
+	set radius( radius ) {
+
 		this.material.uniforms.radius.value = radius;
+
 	}
-	/**
-	 * @returns {Number} radius
-	 */
+
 	get radius() {
+
 		return this.material.uniforms.radius.value;
+
 	}
-	/**
-	 * @returns {Number} height
-	 */
-	set height(height) {
+
+	set height( height ) {
+
 		this.material.uniforms.height.value = height;
+
 	}
-	/**
-	 * @returns {Number} height
-	 */
+
 	get height() {
+
 		return this.material.uniforms.height.value;
+
 	}
+
 }
