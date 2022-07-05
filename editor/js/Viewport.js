@@ -55,7 +55,7 @@ function Viewport( editor ) {
 
 	grid.rotateX( Math.PI / 2 );
 
-    // additioanl axis lines for usability considerations
+	// additioanl axis lines for usability considerations
 	const length = 30;
 	const lineMaterial = new THREE.LineDashedMaterial( {
 		dashSize: 1,
@@ -333,6 +333,8 @@ function Viewport( editor ) {
 	const controls = new EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
+		console.log( { camera } );
+
 		signals.cameraChanged.dispatch( camera );
 		signals.refreshSidebarObject3D.dispatch( camera );
 
@@ -345,6 +347,12 @@ function Viewport( editor ) {
 
 		controls.center.set( 0, 0, 0 );
 		render();
+
+	} );
+
+	signals.toggleMultipleSelection.add( function () {
+
+		console.log( 'toggle multiple selection' );
 
 	} );
 

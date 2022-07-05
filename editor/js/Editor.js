@@ -19,6 +19,9 @@ function Editor( providedDefaultCamera ) {
 	var signal = new Signal();
 
 	this.signals = {
+		// multipleSelection
+
+		toggleMultipleSelection: new Signal(),
 
 		// script
 

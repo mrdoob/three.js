@@ -23,7 +23,7 @@ function SidebarSettingsShortcuts( editor ) {
 	headerRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts' ).toUpperCase() ) );
 	container.add( headerRow );
 
-	const shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
+	const shortcuts = [ 'translate', 'rotate', 'scale', 'multiple-selection', 'undo', 'focus' ];
 
 	function createShortcutInput( name ) {
 
@@ -131,6 +131,12 @@ function SidebarSettingsShortcuts( editor ) {
 			case config.getKey( 'settings/shortcuts/scale' ):
 
 				signals.transformModeChanged.dispatch( 'scale' );
+
+				break;
+
+			case config.getKey( 'settings/shortcuts/multiple-selection' )	:
+
+				signals.toggleMultipleSelection.dispatch();
 
 				break;
 
