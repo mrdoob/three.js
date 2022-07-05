@@ -1,13 +1,19 @@
-import * as THREE from "three";
+import {
+	Texture,
+	Mesh,
+	IcosahedronGeometry,
+	ShaderMaterial,
+	DoubleSide,
+} from "three";
 
 /**
  * Ground projected env map taken from @react-three/drei.
  * https://github.com/pmndrs/drei/blob/master/src/core/Environment.tsx
  */
-export class GroundProjectedEnv extends THREE.Mesh {
+export class GroundProjectedEnv extends Mesh {
 	/**
 	 *
-	 * @param {THREE.Texture} texture
+	 * @param {Texture} texture
 	 */
 	constructor(texture, options) {
 		const isCubeMap = texture.isCubeTexture;
@@ -116,12 +122,12 @@ export class GroundProjectedEnv extends THREE.Mesh {
 			radius: { value: options?.radius || 100 },
 		};
 
-		const geometry = new THREE.IcosahedronGeometry(1, 16);
-		const material = new THREE.ShaderMaterial({
+		const geometry = new IcosahedronGeometry(1, 16);
+		const material = new ShaderMaterial({
 			uniforms,
 			fragmentShader,
 			vertexShader,
-			side: THREE.DoubleSide,
+			side: DoubleSide,
 		});
 
 		super(geometry, material);
