@@ -33,7 +33,6 @@
 			let container;
 			let camera, scene, renderer;
 			let controller1, controller2;
-			let controllerGrip1, controllerGrip2;
 
 			let raycaster;
 
@@ -56,6 +55,8 @@
 				camera.position.set( 0, 0, 3 );
 
 				controls = new OrbitControls( camera, container );
+				controls.target.set( 0, 0, 0 );
+				controls.update();
 
 				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 

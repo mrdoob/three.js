@@ -41,7 +41,8 @@
     "root": true,
     "extends": [
       "mdcs",
-      "plugin:compat/recommended"
+      "plugin:compat/recommended",
+      "plugin:json/recommended"
     ],
     "parser": "@babel/eslint-parser",
     "parserOptions": {
@@ -51,7 +52,8 @@
     },
     "plugins": [
       "html",
-      "import"
+      "import",
+      "json"
     ],
     "settings": {
       "polyfills": [
@@ -64,8 +66,11 @@
       "potpack": "readonly",
       "fflate": "readonly",
       "bodymovin": "readonly",
+      "Ammo": "readonly",
       "OIMO": "readonly",
       "Stats": "readonly",
+      "XRMediaBinding": "readonly",
+      "XRRigidTransform": "readonly",
       "XRWebGLBinding": "readonly",
       "XRWebGLLayer": "readonly",
       "GPUShaderStage": "readonly",
@@ -104,11 +109,12 @@
     "build-module": "ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
     "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
-    "lint-core": "eslint src --ext js",
-    "lint-examples": "eslint examples/js examples/jsm --ext js --ignore-pattern libs --ignore-pattern ifc",
-    "lint-docs": "eslint docs --ext html",
-    "lint": "npm run lint-core && npm run lint-examples && npm run lint-docs",
-    "lint-fix": "npm run lint-core -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix",
+    "lint-core": "eslint src --ext .js",
+    "lint-addons": "eslint examples/js examples/jsm --ext .js --ignore-pattern libs --ignore-pattern ifc",
+    "lint-examples": "eslint examples --ext .html,.json",
+    "lint-docs": "eslint docs --ext .html",
+    "lint": "npm run lint-core && npm run lint-addons && npm run lint-examples && npm run lint-docs",
+    "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix",
     "test-unit": "qunit -r failonlyreporter -f !-webonly test/unit/three.source.unit.js",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
@@ -151,6 +157,7 @@
     "eslint-plugin-compat": "^4.0.2",
     "eslint-plugin-html": "^6.2.0",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-json": "^3.1.0",
     "failonlyreporter": "^1.0.0",
     "jimp": "^0.16.1",
     "node-fetch": "^3.2.6",
@@ -175,4 +182,3 @@
     "directories": {}
   }
 }
-

@@ -67,6 +67,8 @@
 			camera.lookAt( scene.position );
 
 			controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 0, 0 );
+			controls.update();
 
 			// add sprites
 
