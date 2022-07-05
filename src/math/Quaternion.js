@@ -13,13 +13,6 @@ class Quaternion {
 
 	}
 
-	static slerp( qa, qb, qm, t ) {
-
-		console.warn( 'THREE.Quaternion: Static .slerp() has been deprecated. Use qm.slerpQuaternions( qa, qb, t ) instead.' );
-		return qm.slerpQuaternions( qa, qb, t );
-
-	}
-
 	static slerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
 		// fuzz-free, array-based Quaternion SLERP operation
@@ -497,14 +490,7 @@ class Quaternion {
 
 	}
 
-	multiply( q, p ) {
-
-		if ( p !== undefined ) {
-
-			console.warn( 'THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
-			return this.multiplyQuaternions( q, p );
-
-		}
+	multiply( q ) {
 
 		return this.multiplyQuaternions( this, q );
 

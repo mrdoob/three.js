@@ -146,7 +146,7 @@
     "@rollup/plugin-node-resolve": "^13.3.0",
     "chalk": "^5.0.1",
     "concurrently": "^7.2.2",
-    "eslint": "^8.17.0",
+    "eslint": "^8.18.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.0.2",
     "eslint-plugin-html": "^6.2.0",
@@ -157,7 +157,7 @@
     "pixelmatch": "^5.2.1",
     "puppeteer-core": "^15.3.0",
     "qunit": "^2.18.0",
-    "rollup": "^2.75.6",
+    "rollup": "^2.75.7",
     "rollup-plugin-filesize": "^9.1.2",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-visualizer": "^5.6.0",
@@ -175,3 +175,4 @@
     "directories": {}
   }
 }
+

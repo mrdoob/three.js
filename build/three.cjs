@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '142';
+const REVISION = '143dev';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -569,12 +569,7 @@ class Vector2 {
 		return this;
 	}
 
-	add(v, w) {
-		if (w !== undefined) {
-			console.warn('THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.');
-			return this.addVectors(v, w);
-		}
-
+	add(v) {
 		this.x += v.x;
 		this.y += v.y;
 		return this;
@@ -598,12 +593,7 @@ class Vector2 {
 		return this;
 	}
 
-	sub(v, w) {
-		if (w !== undefined) {
-			console.warn('THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.');
-			return this.subVectors(v, w);
-		}
-
+	sub(v) {
 		this.x -= v.x;
 		this.y -= v.y;
 		return this;
@@ -788,11 +778,7 @@ class Vector2 {
 		return array;
 	}
 
-	fromBufferAttribute(attribute, index, offset) {
-		if (offset !== undefined) {
-			console.warn('THREE.Vector2: offset has been removed from .fromBufferAttribute().');
-		}
-
+	fromBufferAttribute(attribute, index) {
 		this.x = attribute.getX(index);
 		this.y = attribute.getY(index);
 		return this;
@@ -825,10 +811,6 @@ class Matrix3 {
 	constructor() {
 		Matrix3.prototype.isMatrix3 = true;
 		this.elements = [1, 0, 0, 0, 1, 0, 0, 0, 1];
-
-		if (arguments.length > 0) {
-			console.error('THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.');
-		}
 	}
 
 	set(n11, n12, n13, n21, n22, n23, n31, n32, n33) {
@@ -2231,12 +2213,7 @@ class Vector4 {
 		return this;
 	}
 
-	add(v, w) {
-		if (w !== undefined) {
-			console.warn('THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.');
-			return this.addVectors(v, w);
-		}
-
+	add(v) {
 		this.x += v.x;
 		this.y += v.y;
 		this.z += v.z;
@@ -2268,12 +2245,7 @@ class Vector4 {
 		return this;
 	}
 
-	sub(v, w) {
-		if (w !== undefined) {
-			console.warn('THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.');
-			return this.subVectors(v, w);
-		}
-
+	sub(v) {
 		this.x -= v.x;
 		this.y -= v.y;
 		this.z -= v.z;
@@ -2578,11 +2550,7 @@ class Vector4 {
 		return array;
 	}
 
-	fromBufferAttribute(attribute, index, offset) {
-		if (offset !== undefined) {
-			console.warn('THREE.Vector4: offset has been removed from .fromBufferAttribute().');
-		}
-
+	fromBufferAttribute(attribute, index) {
 		this.x = attribute.getX(index);
 		this.y = attribute.getY(index);
 		this.z = attribute.getZ(index);
@@ -2815,11 +2783,6 @@ class Quaternion {
 		this._y = y;
 		this._z = z;
 		this._w = w;
-	}
-
-	static slerp(qa, qb, qm, t) {
-		console.warn('THREE.Quaternion: Static .slerp() has been deprecated. Use qm.slerpQuaternions( qa, qb, t ) instead.');
-		return qm.slerpQuaternions(qa, qb, t);
 	}
 
 	static slerpFlat(dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t) {
@@ -3192,12 +3155,7 @@ class Quaternion {
 		return this;
 	}
 
-	multiply(q, p) {
-		if (p !== undefined) {
-			console.warn('THREE.Quaternion: .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.');
-			return this.multiplyQuaternions(q, p);
-		}
-
+	multiply(q) {
 		return this.multiplyQuaternions(this, q);
 	}
 
@@ -3432,12 +3390,7 @@ class Vector3 {
 		return this;
 	}
 
-	add(v, w) {
-		if (w !== undefined) {
-			console.warn('THREE.Vector3: .add() now only accepts one argument. Use .addVectors( a, b ) instead.');
-			return this.addVectors(v, w);
-		}
-
+	add(v) {
 		this.x += v.x;
 		this.y += v.y;
 		this.z += v.z;
@@ -3465,12 +3418,7 @@ class Vector3 {
 		return this;
 	}
 
-	sub(v, w) {
-		if (w !== undefined) {
-			console.warn('THREE.Vector3: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.');
-			return this.subVectors(v, w);
-		}
-
+	sub(v) {
 		this.x -= v.x;
 		this.y -= v.y;
 		this.z -= v.z;
@@ -3491,12 +3439,7 @@ class Vector3 {
 		return this;
 	}
 
-	multiply(v, w) {
-		if (w !== undefined) {
-			console.warn('THREE.Vector3: .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.');
-			return this.multiplyVectors(v, w);
-		}
-
+	multiply(v) {
 		this.x *= v.x;
 		this.y *= v.y;
 		this.z *= v.z;
@@ -3518,10 +3461,6 @@ class Vector3 {
 	}
 
 	applyEuler(euler) {
-		if (!(euler && euler.isEuler)) {
-			console.error('THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.');
-		}
-
 		return this.applyQuaternion(_quaternion$4.setFromEuler(euler));
 	}
 
@@ -3716,12 +3655,7 @@ class Vector3 {
 		return this;
 	}
 
-	cross(v, w) {
-		if (w !== undefined) {
-			console.warn('THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.');
-			return this.crossVectors(v, w);
-		}
-
+	cross(v) {
 		return this.crossVectors(this, v);
 	}
 
@@ -3854,11 +3788,7 @@ class Vector3 {
 		return array;
 	}
 
-	fromBufferAttribute(attribute, index, offset) {
-		if (offset !== undefined) {
-			console.warn('THREE.Vector3: offset has been removed from .fromBufferAttribute().');
-		}
-
+	fromBufferAttribute(attribute, index) {
 		this.x = attribute.getX(index);
 		this.y = attribute.getY(index);
 		this.z = attribute.getZ(index);
@@ -4812,10 +4742,6 @@ class Matrix4 {
 	constructor() {
 		Matrix4.prototype.isMatrix4 = true;
 		this.elements = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
-
-		if (arguments.length > 0) {
-			console.error('THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.');
-		}
 	}
 
 	set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44) {
@@ -4928,10 +4854,6 @@ class Matrix4 {
 	}
 
 	makeRotationFromEuler(euler) {
-		if (!(euler && euler.isEuler)) {
-			console.error('THREE.Matrix4: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.');
-		}
-
 		const te = this.elements;
 		const x = euler.x,
 					y = euler.y,
@@ -5088,12 +5010,7 @@ class Matrix4 {
 		return this;
 	}
 
-	multiply(m, n) {
-		if (n !== undefined) {
-			console.warn('THREE.Matrix4: .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.');
-			return this.multiplyMatrices(m, n);
-		}
-
+	multiply(m) {
 		return this.multiplyMatrices(this, m);
 	}
 
@@ -5441,10 +5358,6 @@ class Matrix4 {
 	}
 
 	makePerspective(left, right, top, bottom, near, far) {
-		if (far === undefined) {
-			console.warn('THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.');
-		}
-
 		const te = this.elements;
 		const x = 2 * near / (right - left);
 		const y = 2 * near / (top - bottom);
@@ -25117,20 +25030,14 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 			const steps = options.steps !== undefined ? options.steps : 1;
-			let depth = options.depth !== undefined ? options.depth : 1;
+			const depth = options.depth !== undefined ? options.depth : 1;
 			let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
 			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
 			let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 0.1;
 			let bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
 			let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 			const extrudePath = options.extrudePath;
-			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator; // deprecated options
-
-			if (options.amount !== undefined) {
-				console.warn('THREE.ExtrudeBufferGeometry: amount has been renamed to depth.');
-				depth = options.amount;
-			} //
-
+			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator; //
 
 			let extrudePts,
 					extrudeByPath = false;
@@ -30576,13 +30483,6 @@ class ObjectLoader extends Loader {
 				}
 			}
 		});
-	}
-	/* DEPRECATED */
-
-
-	setTexturePath(value) {
-		console.warn('THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().');
-		return this.setResourcePath(value);
 	}
 
 }
