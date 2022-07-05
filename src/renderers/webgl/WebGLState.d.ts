@@ -126,4 +126,5 @@ export class WebGLState {
     scissor(scissor: Vector4): void;
     viewport(viewport: Vector4): void;
     reset(): void;
+    clearTextureBindingState(): void;
 }
