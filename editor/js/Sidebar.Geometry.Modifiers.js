@@ -12,7 +12,7 @@ function SidebarGeometryModifiers( editor, object ) {
 
 	// Compute Vertex Normals
 
-	const button = new UIButton( strings.getKey( 'sidebar/geometry/show_vertex_normals' ) );
+	const button = new UIButton( strings.getKey( 'sidebar/geometry/compute_vertex_normals' ) );
 	button.onClick( function () {
 
 		geometry.computeVertexNormals();
