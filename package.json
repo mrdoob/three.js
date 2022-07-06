@@ -12,7 +12,8 @@
     },
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
-    "./src/*": "./src/*"
+    "./src/*": "./src/*",
+    "./package.json": "./package.json" 
   },
   "repository": {
     "type": "git",
