@@ -92,8 +92,6 @@
 				dirLight.shadow.mapSize.height = 1024;
 				scene.add(dirLight);
 
-				// Geometry
-
 				const geometry = new THREE.PlaneGeometry(1, 1);
 				const material = new THREE.ShadowMaterial({ opacity: 0.3 });
 
@@ -265,7 +263,10 @@
 				// Mouse control
 				const controls = new OrbitControls(camera, renderer.domElement);
 				controls.target.set(0, 0, 0);
-				controls.maxPolarAngle = THREE.MathUtils.degToRad(89);
+				controls.maxPolarAngle = THREE.MathUtils.degToRad(80);
+				controls.maxDistance = 100;
+				controls.minDistance = 30;
+				controls.enablePan = false;
 				controls.update();
 
 				stats = new Stats();
