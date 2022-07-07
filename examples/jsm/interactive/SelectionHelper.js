@@ -1,6 +1,4 @@
-import {
-	Vector2
-} from 'three';
+import { Vector2 } from 'three';
 
 class SelectionHelper {
 
@@ -58,6 +56,8 @@ class SelectionHelper {
 
 	onSelectStart( event ) {
 
+		this.element.style.display = 'none';
+
 		this.renderer.domElement.parentElement.appendChild( this.element );
 
 		this.element.style.left = event.clientX + 'px';
@@ -71,6 +71,8 @@ class SelectionHelper {
 	}
 
 	onSelectMove( event ) {
+
+		this.element.style.display = 'block';
 
 		this.pointBottomRight.x = Math.max( this.startPoint.x, event.clientX );
 		this.pointBottomRight.y = Math.max( this.startPoint.y, event.clientY );
