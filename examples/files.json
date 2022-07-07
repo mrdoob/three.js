@@ -304,6 +304,7 @@
 		"webgl2_multiple_rendertargets",
 		"webgl2_multisampled_renderbuffers",
 		"webgl2_rendertarget_texture2darray",
+		"webgl2_ubo",
 		"webgl2_volume_cloud",
 		"webgl2_volume_instancing",
 		"webgl2_volume_perlin"

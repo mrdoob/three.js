@@ -314,6 +314,9 @@ function WebGLState( gl, extensions, capabilities ) {
 	const depthBuffer = new DepthBuffer();
 	const stencilBuffer = new StencilBuffer();
 
+	const uboBindings = new WeakMap();
+	const uboProgamMap = new WeakMap();
+
 	let enabledCapabilities = {};
 
 	let currentBoundFramebuffers = {};
@@ -1064,6 +1067,47 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function updateUBOMapping( uniformsGroup, program ) {
+
+		let mapping = uboProgamMap.get( program );
+
+		if ( mapping === undefined ) {
+
+			mapping = new WeakMap();
+
+			uboProgamMap.set( program, mapping );
+
+		}
+
+		let blockIndex = mapping.get( uniformsGroup );
+
+		if ( blockIndex === undefined ) {
+
+			blockIndex = gl.getUniformBlockIndex( program, uniformsGroup.name );
+
+			mapping.set( uniformsGroup, blockIndex );
+
+		}
+
+	}
+
+	function uniformBlockBinding( uniformsGroup, program ) {
+
+		const mapping = uboProgamMap.get( program );
+		const blockIndex = mapping.get( uniformsGroup );
+
+		if ( uboBindings.get( uniformsGroup ) !== blockIndex ) {
+
+			// bind shader specific block index to global block point
+
+			gl.uniformBlockBinding( program, blockIndex, uniformsGroup.__bindingPointIndex );
+
+			uboBindings.set( uniformsGroup, blockIndex );
+
+		}
+
+	}
+
 	//
 
 	function reset() {
@@ -1190,6 +1234,9 @@ function WebGLState( gl, extensions, capabilities ) {
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,
+
+		updateUBOMapping: updateUBOMapping,
+		uniformBlockBinding: uniformBlockBinding,
 
 		texStorage2D: texStorage2D,
 		texStorage3D: texStorage3D,
