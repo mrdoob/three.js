@@ -16,6 +16,7 @@ import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
 import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
+import { MultipleSelection } from './libs/multiple-selection/multiple-selection.js';
 
 function Viewport( editor ) {
 
@@ -89,6 +90,8 @@ function Viewport( editor ) {
 	selectionBox.material.transparent = true;
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
+
+	const multipleSelection = new MultipleSelection( editor.viewportCamera, scene );
 
 	let objectPositionOnDown = null;
 	let objectRotationOnDown = null;
@@ -333,8 +336,6 @@ function Viewport( editor ) {
 	const controls = new EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
-		console.log( { camera } );
-
 		signals.cameraChanged.dispatch( camera );
 		signals.refreshSidebarObject3D.dispatch( camera );
 
@@ -352,7 +353,8 @@ function Viewport( editor ) {
 
 	signals.toggleMultipleSelection.add( function () {
 
-		console.log( 'toggle multiple selection' );
+		multipleSelection.toggle();
+		controls.enabled = ! multipleSelection.enabled;
 
 	} );
 
@@ -406,6 +408,7 @@ function Viewport( editor ) {
 
 		renderer.setAnimationLoop( animate );
 		renderer.setClearColor( 0xaaaaaa );
+		multipleSelection.renderer = renderer;
 
 		if ( window.matchMedia ) {
 
