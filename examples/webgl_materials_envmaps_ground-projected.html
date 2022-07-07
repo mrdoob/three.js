@@ -15,10 +15,12 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> -
-			Ground projected environment mapping. Created by
+			Ground projected environment mapping. By
 			<a href="https://twitter.com/CantBeFaraz" target="_blank" rel="noopener"
 				>Faraz Shaikh</a
 			>.
+			<br> 
+			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -43,7 +45,7 @@
 
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GroundProjectedEnv } from './jsm/misc/GroundProjectedEnv.js';
+			import { GroundProjectedEnv } from './jsm/objects/GroundProjectedEnv.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 			import { FlakesTexture } from './jsm/textures/FlakesTexture.js';
@@ -51,9 +53,11 @@
 			const params = {
 				height: 34,
 				radius: 440,
+				angle: 0,
+				toneMappingExposure: 1
 			};
 
-			let camera, scene, renderer, stats, env;
+			let camera, scene, renderer, stats, env,dirLight;
 
 			init();
 			animate();
@@ -80,7 +84,7 @@
 
 				scene = new THREE.Scene();
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.2 );
+				dirLight = new THREE.DirectionalLight( 0xffffff, 0.2 );
 				dirLight.position.set( 10, 8, 10 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
@@ -272,7 +276,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				
 				// Mouse control
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 0, 0 );
@@ -288,6 +293,8 @@
 				const gui = new GUI();
 				gui.add( params, 'height', 20, 50, 0.1 );
 				gui.add( params, 'radius', 200, 600, 0.1 );
+				gui.add( params, 'angle', 0, 360, 0.1 );
+				gui.add( renderer, 'toneMappingExposure', 0, 2, 0.1 ).name( 'exposure' );
 
 			}
 
@@ -321,7 +328,8 @@
 
 				env.radius = params.radius;
 				env.height = params.height;
-
+				env.angle = THREE.MathUtils.degToRad( params.angle );
+				
 			}
 		</script>
 	</body>
