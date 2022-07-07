@@ -818,7 +818,7 @@ function Strings( config ) {
 			'sidebar/geometry/bounds': '界限',
 			'sidebar/geometry/show_vertex_normals': '显示顶点法线',
 			'sidebar/geometry/compute_vertex_normals': '计算顶点法线',
-			'sidebar/geometry/center': 'Center',
+			'sidebar/geometry/center': '居中',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
