@@ -9,6 +9,8 @@ class UniformsGroup extends EventDispatcher {
 
 		super();
 
+		this.isUniformsGroup = true;
+
 		Object.defineProperty( this, 'id', { value: id ++ } );
 
 		this.name = '';
@@ -86,8 +88,5 @@ class UniformsGroup extends EventDispatcher {
 	}
 
 }
-
-UniformsGroup.prototype.isUniformsGroup = true;
-
 
 export { UniformsGroup };
