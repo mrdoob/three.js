@@ -89,32 +89,6 @@ export class GroundProjectedEnv extends Mesh {
 
         }
 
-        
-        // From: https://gist.github.com/yiwenl/3f804e80d0930e34a0b33359259b556c
-        mat4 rotationMatrix( vec3 axis, float angle ) 
-        {
-            
-            axis = normalize( axis );
-            float s = sin( angle );
-            float c = cos( angle );
-            float oc = 1.0 - c;
-            
-            return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
-                        oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
-                        oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
-                        0.0,                                0.0,                                0.0,                                1.0);
-        
-        }
-
-        // From: https://gist.github.com/yiwenl/3f804e80d0930e34a0b33359259b556c
-        vec3 rotate( vec3 v, vec3 axis, float angle ) 
-        {
-            
-            mat4 m = rotationMatrix( axis, angle );
-            return ( m * vec4( v, 1.0 ) ).xyz;
-
-        }
-        
         vec3 project() 
         {
 
@@ -134,8 +108,6 @@ export class GroundProjectedEnv extends Mesh {
                 p = vec3( 0.0, 1.0, 0.0 );
 
             }
-            
-            p = rotate(p, vec3(0.0, 1.0, 0.0), angle);
 
             return p;
 
@@ -173,7 +145,6 @@ export class GroundProjectedEnv extends Mesh {
 			map: { value: texture },
 			height: { value: options?.height || 15 },
 			radius: { value: options?.radius || 100 },
-			angle: { value: options?.angle || 0 },
 		};
 
 		const geometry = new IcosahedronGeometry( 1, 16 );
@@ -209,18 +180,6 @@ export class GroundProjectedEnv extends Mesh {
 	get height() {
 
 		return this.material.uniforms.height.value;
-
-	}
-	
-    set angle( angle ) {
-
-		this.material.uniforms.angle.value = angle;
-
-	}
-
-	get angle() {
-
-		return this.material.uniforms.angle.value;
 
 	}
 

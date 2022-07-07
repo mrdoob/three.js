@@ -53,7 +53,6 @@
 			const params = {
 				height: 34,
 				radius: 440,
-				angle: 0,
 				toneMappingExposure: 1
 			};
 
@@ -293,7 +292,6 @@
 				const gui = new GUI();
 				gui.add( params, 'height', 20, 50, 0.1 );
 				gui.add( params, 'radius', 200, 600, 0.1 );
-				gui.add( params, 'angle', 0, 360, 0.1 );
 				gui.add( renderer, 'toneMappingExposure', 0, 2, 0.1 ).name( 'exposure' );
 
 			}
@@ -328,8 +326,7 @@
 
 				env.radius = params.radius;
 				env.height = params.height;
-				env.angle = THREE.MathUtils.degToRad( params.angle );
-				
+
 			}
 		</script>
 	</body>
