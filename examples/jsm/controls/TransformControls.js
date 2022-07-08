@@ -563,7 +563,7 @@ class TransformControls extends Object3D {
 
 	}
 
-	// Detatch from object
+	// Detach from object
 	detach() {
 
 		this.object = undefined;
