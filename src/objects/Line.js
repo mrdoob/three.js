@@ -100,7 +100,8 @@ class Line extends Object3D {
 
 		const index = geometry.index;
 		const attributes = geometry.attributes;
-		const positionAttribute = attributes.position;
+		const positionAttribute = attributes.position.clone();
+		positionAttribute.applyMatrix4( matrixWorld );
 
 		if ( index !== null ) {
 
@@ -112,8 +113,8 @@ class Line extends Object3D {
 				const a = index.getX( i );
 				const b = index.getX( i + 1 );
 
-				vStart.fromBufferAttribute( positionAttribute, a ).applyMatrix4(matrixWorld);
-				vEnd.fromBufferAttribute( positionAttribute, b ).applyMatrix4(matrixWorld);
+				vStart.fromBufferAttribute( positionAttribute, a );
+				vEnd.fromBufferAttribute( positionAttribute, b );
 
 				const distSq = raycaster.ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -145,8 +146,8 @@ class Line extends Object3D {
 
 			for ( let i = start, l = end - 1; i < l; i += step ) {
 
-				vStart.fromBufferAttribute( positionAttribute, i ).applyMatrix4(matrixWorld);
-				vEnd.fromBufferAttribute( positionAttribute, i + 1 ).applyMatrix4(matrixWorld);
+				vStart.fromBufferAttribute( positionAttribute, i );
+				vEnd.fromBufferAttribute( positionAttribute, i + 1 );
 
 				const distSq = raycaster.ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
