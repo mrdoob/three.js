@@ -92,6 +92,8 @@ class Line extends Object3D {
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
+		const thresholdSq = threshold * threshold;
+
 		const vStart = new Vector3();
 		const vEnd = new Vector3();
 		const interSegment = new Vector3();
@@ -118,7 +120,7 @@ class Line extends Object3D {
 
 				const distSq = raycaster.ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-				if ( distSq > threshold ) continue;
+				if ( distSq > thresholdSq ) continue;
 
 				const distance = raycaster.ray.origin.distanceTo( interRay );
 
@@ -151,7 +153,7 @@ class Line extends Object3D {
 
 				const distSq = raycaster.ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-				if ( distSq > threshold ) continue;
+				if ( distSq > thresholdSq ) continue;
 
 				const distance = raycaster.ray.origin.distanceTo( interRay );
 
