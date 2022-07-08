@@ -1,8 +1,5 @@
 import { Sphere } from '../math/Sphere.js';
-import { Ray } from '../math/Ray.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
-import { Quaternion } from '../math/Quaternion.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
@@ -10,8 +7,6 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 const _start = /*@__PURE__*/ new Vector3();
 const _end = /*@__PURE__*/ new Vector3();
-const _inverseMatrix = /*@__PURE__*/ new Matrix4();
-const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
 
 class Line extends Object3D {
@@ -102,8 +97,7 @@ class Line extends Object3D {
 
 		const index = geometry.index;
 		const attributes = geometry.attributes;
-		const positionAttribute = attributes.position.clone();
-		positionAttribute.applyMatrix4( matrixWorld );
+		const positionAttribute = attributes.position;
 
 		if ( index !== null ) {
 
@@ -115,8 +109,8 @@ class Line extends Object3D {
 				const a = index.getX( i );
 				const b = index.getX( i + 1 );
 
-				vStart.fromBufferAttribute( positionAttribute, a );
-				vEnd.fromBufferAttribute( positionAttribute, b );
+				vStart.fromBufferAttribute( positionAttribute, a ).applyMatrix4( matrixWorld );
+				vEnd.fromBufferAttribute( positionAttribute, b ).applyMatrix4( matrixWorld );
 
 				const distSq = raycaster.ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -148,8 +142,8 @@ class Line extends Object3D {
 
 			for ( let i = start, l = end - 1; i < l; i += step ) {
 
-				vStart.fromBufferAttribute( positionAttribute, i );
-				vEnd.fromBufferAttribute( positionAttribute, i + 1 );
+				vStart.fromBufferAttribute( positionAttribute, i ).applyMatrix4( matrixWorld );
+				vEnd.fromBufferAttribute( positionAttribute, i + 1 ).applyMatrix4( matrixWorld );
 
 				const distSq = raycaster.ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
