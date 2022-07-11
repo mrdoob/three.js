@@ -141,15 +141,11 @@
 		<h3>Node.js</h3>
 
 		<p>
-			在 [link:https://eloquentjavascript.net/20_node.html Node.js] 下使用 three.js 较为困难，原因有2条：
+			Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
 		</p>
 
 		<p>
-			首先， three.js 是为 web 而构建的，其依赖于浏览器，以及并不总是存在于 Node.js 中的 DOM API。其中的一些问题可使用类似 [link:https://github.com/stackgl/headless-gl headless-gl] 的 shim ，或使用定制的替代品来替换掉一些组件（例如 [page:TextureLoader] ）来进行解决。其他的 DOM API 或许和使用它们的代码紧密相连在一起，并且很难解决。我们欢迎简单且可维护的 pull request，以改善对 Node.js 的支持。但建议您首先提出一个 issue 来讨论您的改进。
-		</p>
-
-		<p>
-			第二，Node.js 对于 ES module 的支持可以说……很复杂。在 Node.js v12 中， three.js 的核心库可使用 <em>require('three')</em> 来作为 CommonJS module 进行导入。然而，大多数在 <em>examples/jsm</em> 中的示例组件并不能够这样。未来版本的 Node.js 或许可以解决这个问题，但同时你可能需要一些类似 [link:https://github.com/standard-things/esm esm] 的解决方案，来使得你的 Node.js 应用程序识别 ES module。
+			Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
 		</p>
 
 	</body>
