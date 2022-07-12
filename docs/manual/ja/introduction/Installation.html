@@ -144,17 +144,11 @@
     <h3>Node.js</h3>
 
     <p>
-        以下の2つの理由からnode.jsでthree.jsを使用するのは難しくなりがちです。
+        Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
     </p>
 
     <p>
-        まず、three.jsはWeb用に作られているので、Node.jsには必ずしも存在しないブラウザやDOM APIに依存します。これらの問題のいくつかは、[link:https://github.com/stackgl/headless-gl headless-gl] のような補正ツールを使用したり、[page:TextureLoader] のようなコンポーネントをカスタムの代替品で置き換えることで解決できます。他の DOM APIは、それらを使用するコードと深く絡み合っている可能性があり、回避するのが難しくなります。Node.js
-        のサポートを改善するためのシンプルで保守性の高いプルリクエストを歓迎しますが、まず問題を開いて改善点を議論することをお勧めします。
-    </p>
-
-    <p>
-        第二に、Node.jsによるESモジュールのサポートは...複雑です。Node.js v12の時点では、three.jsのコアライブラリは<em>require('three')</em>でCommonJSモジュールとしてインポートすることができます。しかし、<em>examples/jsm</em>にあるほとんどのサンプルコンポーネントはインポートできません。Node.jsの将来のバージョンで解決されるかもしれませんが、それまでの間は、[link:https://github.com/standard-things/esm
-        esm]のような回避策を使用して、Node.jsアプリケーションがESモジュールを認識できるようにする必要があるでしょう。
+        Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
     </p>
 
 </body>

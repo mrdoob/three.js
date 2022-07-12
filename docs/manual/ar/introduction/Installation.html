@@ -163,16 +163,11 @@
 		<h3>Node.js</h3>
 
 		<p>
-			قد يكون استخدام three.js في Node.js أمرًا صعبًا ، وذلك لسببين:
+			Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
 		</p>
 
 		<p>
-			أولاً ، نظرًا لأن three.js مصممة للويب ، فإنها تعتمد على المتصفح وواجهات برمجة تطبيقات DOM التي لا تتواجد دائمًا في Node.js. يمكن حل بعض هذه المشكلات باستخدام (shims) مثل [link:https://github.com/stackgl/headless-gl headless-gl]، أو عن طريق استبدال مكونات مثل [page:TextureLoader] ببدائل مخصصة. قد تتشابك واجهات برمجة تطبيقات DOM الأخرى بعمق مع الكود الذي يستخدمها ، وسيكون من الصعب حلها. نرحب بطلبات السحب البسيطة والقابلة للصيانة لتحسين دعم Node.js ، لكننا نوصي بفتح مشكلة لمناقشة التحسينات التي أجريتها أولاً.
-		</p>
-
-		<p>
-			ثانيًا ، دعم Node.js لوحدات ES ... معقد. بدءًا من الإصدار 12 من Node.js ، يمكن استيراد المكتبة الأساسية كوحدة نمطية CommonJS ، مع <em>require('three')</em>. ومع ذلك ، فإن معظم أمثلة المكونات في <em>examples/jsm</em> لا يمكنها ذلك.
-			قد تحل الإصدارات المستقبلية من Node.js هذه المشكلة ، ولكن في هذه الأثناء قد تحتاج إلى استخدام حلول بديلة مثل [link:https://github.com/standard-things/esm esm] لتمكين تطبيق Node.js الخاص بك من التعرف على وحدات ES.
+			Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
 		</p>
 
 	</body>
