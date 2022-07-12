@@ -13,6 +13,7 @@ class MultipleSelection {
 		this._selectionDrawer = null;
 		this._selectionBox = null;
 		this._selectedMeshes = [];
+		this._hiddenOriginalMeshes = [];
 		this._pointerUpCustomCallback = null;
 		this._pointerDownCustomCallback = null;
 		this._pointerMoveCustomCallback = null;
@@ -34,16 +35,16 @@ class MultipleSelection {
 			this._selectionBox = new SelectionBox( this._camera, this._scene );
 			this._selectionDrawer = new SelectionDrawer( this._renderer, 'selectBox' );
 
-			document.addEventListener( 'pointerdown', this._pointerDown );
-			document.addEventListener( 'pointerup', this._pointerUp );
+			this._renderer.domElement.parentElement.addEventListener( 'pointerdown', this._pointerDown );
+			this._renderer.domElement.parentElement.addEventListener( 'pointerup', this._pointerUp );
 
 		} else {
 
 			this._selectionBox = null;
 			this._selectionDrawer = null;
 
-			document.removeEventListener( 'pointerdown', this._pointerDown );
-			document.removeEventListener( 'pointerup', this._pointerUp );
+			this._renderer.domElement.parentElement.removeEventListener( 'pointerdown', this._pointerDown );
+			this._renderer.domElement.parentElement.removeEventListener( 'pointerup', this._pointerUp );
 
 		}
 
@@ -69,6 +70,42 @@ class MultipleSelection {
 
 	}
 
+	_displayOriginalMeshes() {
+
+		this._hiddenOriginalMeshes.forEach( mesh => {
+
+			mesh.visible = true;
+
+		} );
+
+		this._hiddenOriginalMeshes = [];
+
+	}
+
+	_hideOriginalMeshes( clonedMeshes ) {
+
+		clonedMeshes.forEach( mesh => {
+
+			mesh._original_mesh.visible = false;
+			this._hiddenOriginalMeshes.push( mesh._original_mesh );
+
+		} );
+
+	}
+
+	_cloneMeshes( meshes ) {
+
+		return meshes.map( mesh => {
+
+			const clone = mesh.clone();
+			clone._original_mesh = mesh;
+
+			return clone;
+
+		} );
+
+	}
+
 	_keepOnlyMeshes( sceneObjects ) {
 
 		return sceneObjects.filter( object => object instanceof Object3D && object.isMesh );
@@ -76,6 +113,8 @@ class MultipleSelection {
 	}
 
 	_pointerDown = ( event ) => {
+
+		this._displayOriginalMeshes();
 
 		this._selectionDrawer.onPointerDown( event );
 
@@ -90,7 +129,7 @@ class MultipleSelection {
 
 		}
 
-		document.addEventListener( 'pointermove', this._pointerMove );
+		this._renderer.domElement.parentElement.addEventListener( 'pointermove', this._pointerMove );
 
 	};
 
@@ -102,8 +141,6 @@ class MultipleSelection {
 			( event.clientX / window.innerWidth ) * 2 - 1,
 			- ( event.clientY / window.innerHeight ) * 2 + 1,
 			0.5 );
-
-		this._selectedMeshes = this._keepOnlyMeshes( this._selectionBox.select() );
 
 		if ( this._pointerMoveCustomCallback ) {
 
@@ -122,7 +159,9 @@ class MultipleSelection {
 			- ( event.clientY / window.innerHeight ) * 2 + 1,
 			0.5 );
 
-		this._selectedMeshes = this._keepOnlyMeshes( this._selectionBox.select() );
+		this._selectedMeshes = this._cloneMeshes( this._keepOnlyMeshes( this._selectionBox.select() ) );
+
+		this._hideOriginalMeshes( this._selectedMeshes );
 
 		if ( this._pointerUpCustomCallback ) {
 
@@ -130,7 +169,7 @@ class MultipleSelection {
 
 		}
 
-		document.removeEventListener( 'pointermove', this._pointerMove );
+		this._renderer.domElement.parentElement.removeEventListener( 'pointermove', this._pointerMove );
 
 	};
 
