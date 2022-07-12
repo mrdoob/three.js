@@ -85,7 +85,7 @@ export { BooleanKeyframeTrack } from './animation/tracks/BooleanKeyframeTrack.js
 export { PropertyMixer } from './animation/PropertyMixer.js';
 export { PropertyBinding } from './animation/PropertyBinding.js';
 export { KeyframeTrack } from './animation/KeyframeTrack.js';
-export { AnimationUtils } from './animation/AnimationUtils.js';
+export * as AnimationUtils from './animation/AnimationUtils.js';
 export { AnimationObjectGroup } from './animation/AnimationObjectGroup.js';
 export { AnimationMixer } from './animation/AnimationMixer.js';
 export { AnimationClip } from './animation/AnimationClip.js';
