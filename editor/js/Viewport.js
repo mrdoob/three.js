@@ -17,6 +17,7 @@ import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
 import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
 import { MultipleSelection } from './libs/multiple-selection/multiple-selection.js';
+import { AddObjectCommand } from './commands/AddObjectCommand.js';
 
 function Viewport( editor ) {
 
@@ -92,6 +93,17 @@ function Viewport( editor ) {
 	sceneHelpers.add( selectionBox );
 
 	const multipleSelection = new MultipleSelection( editor.viewportCamera, scene );
+	multipleSelection.addEventListener( 'pointerup', ( selectedMeshes ) => {
+
+		if ( ! selectedMeshes.length ) return;
+
+		const group = new THREE.Group();
+		group.name = 'Multiple Selection Group';
+		selectedMeshes.forEach( mesh => group.add( mesh ) );
+
+		editor.execute( new AddObjectCommand( editor, group ) );
+
+	} );
 
 	let objectPositionOnDown = null;
 	let objectRotationOnDown = null;
@@ -114,7 +126,7 @@ function Viewport( editor ) {
 
 			}
 
-			signals.refreshSidebarObject3D.dispatch( object );
+			signals.sceneGraphChanged.dispatch( );
 
 		}
 
