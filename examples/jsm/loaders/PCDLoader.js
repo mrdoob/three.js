@@ -397,10 +397,6 @@ class PCDLoader extends Loader {
 
 			material.vertexColors = true;
 
-		} else {
-
-			material.color.setHex( Math.random() * 0xffffff );
-
 		}
 
 		// build point cloud
