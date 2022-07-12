@@ -2,7 +2,8 @@ class Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-		Vector4.prototype.isVector4 = true;
+		// @deprecated
+		Object.defineProperty( this, 'isVector4', { value: true } );
 
 		this.x = x;
 		this.y = y;

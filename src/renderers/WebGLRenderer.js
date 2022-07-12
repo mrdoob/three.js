@@ -1,22 +1,17 @@
 import {
-	REVISION,
 	BackSide,
 	DoubleSide,
-	FrontSide,
-	RGBAFormat,
-	HalfFloatType,
 	FloatType,
-	UnsignedByteType,
+	FrontSide,
+	HalfFloatType,
 	LinearEncoding,
+	LinearMipmapLinearFilter,
 	NoToneMapping,
-	LinearMipmapLinearFilter
+	REVISION,
+	RGBAFormat,
+	UnsignedByteType
 } from '../constants.js';
-import { floorPowerOfTwo } from '../math/MathUtils.js';
-import { Frustum } from '../math/Frustum.js';
-import { Matrix4 } from '../math/Matrix4.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Vector4 } from '../math/Vector4.js';
+
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
 import { WebGLAttributes } from './webgl/WebGLAttributes.js';
 import { WebGLBackground } from './webgl/WebGLBackground.js';
@@ -45,6 +40,12 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Frustum } from '../math/Frustum.js';
+import { floorPowerOfTwo } from '../math/MathUtils.js';
 import { createElementNS } from '../utils.js';
 
 function createCanvasElement() {
@@ -474,7 +475,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		if ( x.isVector4 ) {
+		if ( x instanceof Vector4 ) {
 
 			_viewport.set( x.x, x.y, x.z, x.w );
 
@@ -496,7 +497,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		if ( x.isVector4 ) {
+		if ( x instanceof Vector4 ) {
 
 			_scissor.set( x.x, x.y, x.z, x.w );
 

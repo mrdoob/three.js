@@ -2,7 +2,8 @@ class Matrix3 {
 
 	constructor() {
 
-		Matrix3.prototype.isMatrix3 = true;
+		// @deprecated
+		Object.defineProperty( this, 'isMatrix3', { value: true } );
 
 		this.elements = [
 

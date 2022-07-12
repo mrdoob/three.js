@@ -38,7 +38,7 @@ class WebGPUBackground {
 			_clearColor.copy( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
 
-		} else if ( background.isColor === true ) {
+		} else if ( background instanceof Color ) {
 
 			// background is an opaque color
 

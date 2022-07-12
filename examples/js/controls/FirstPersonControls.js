@@ -204,7 +204,7 @@
 
 			this.lookAt = function ( x, y, z ) {
 
-				if ( x.isVector3 ) {
+				if ( x instanceof THREE.Vector3 ) {
 
 					_target.copy( x );
 

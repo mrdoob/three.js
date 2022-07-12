@@ -1,3 +1,10 @@
+import { Color } from '../../math/Color.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { Vector3 } from '../../math/Vector3.js';
+import { Vector4 } from '../../math/Vector4.js';
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Matrix4 } from '../../math/Matrix4.js';
+
 function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	let buffers = {};
@@ -112,7 +119,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				} else {
 
-					if ( uniform.value.isMatrix3 ) {
+					if ( uniform.value instanceof Matrix3 ) {
 
 						// manually converting 3x3 to 3x4
 
@@ -278,35 +285,35 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 			info.boundary = 4;
 			info.storage = 4;
 
-		} else if ( value.isVector2 ) {
+		} else if ( value instanceof Vector2 ) {
 
 			// vec2
 
 			info.boundary = 8;
 			info.storage = 8;
 
-		} else if ( value.isVector3 || value.isColor ) {
+		} else if ( value instanceof Vector3 || value instanceof Color ) {
 
 			// vec3
 
 			info.boundary = 16;
 			info.storage = 12; // evil: vec3 must start on a 16-byte boundary but it only consumes 12 bytes
 
-		} else if ( value.isVector4 ) {
+		} else if ( value instanceof Vector4 ) {
 
 			// vec4
 
 			info.boundary = 16;
 			info.storage = 16;
 
-		} else if ( value.isMatrix3 ) {
+		} else if ( value instanceof Matrix3 ) {
 
 			// mat3 (in STD140 a 3x3 matrix is represented as 3x4)
 
 			info.boundary = 48;
 			info.storage = 48;
 
-		} else if ( value.isMatrix4 ) {
+		} else if ( value instanceof Matrix4 ) {
 
 			// mat4
 

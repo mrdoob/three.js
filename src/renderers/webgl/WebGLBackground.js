@@ -1,11 +1,16 @@
-import { BackSide, FrontSide, CubeUVReflectionMapping } from '../../constants.js';
+import {
+	BackSide,
+	CubeUVReflectionMapping,
+	FrontSide
+} from '../../constants.js';
+
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
-import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms } from '../shaders/UniformsUtils.js';
+import { Color } from '../../math/Color.js';
 
 function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipliedAlpha ) {
 
@@ -46,7 +51,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipli
 
 			setClear( clearColor, clearAlpha );
 
-		} else if ( background && background.isColor ) {
+		} else if ( background instanceof Color ) {
 
 			setClear( background, 1 );
 			forceClear = true;

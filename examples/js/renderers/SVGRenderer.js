@@ -159,7 +159,7 @@
 
 				const background = scene.background;
 
-				if ( background && background.isColor ) {
+				if ( background instanceof THREE.Color ) {
 
 					removeChildNodes();
 					_svg.style.backgroundColor = background.getStyle();

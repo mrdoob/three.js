@@ -4,7 +4,8 @@ class Matrix4 {
 
 	constructor() {
 
-		Matrix4.prototype.isMatrix4 = true;
+		// @deprecated
+		Object.defineProperty( this, 'isMatrix4', { value: true } );
 
 		this.elements = [
 
@@ -463,7 +464,7 @@ class Matrix4 {
 
 		const te = this.elements;
 
-		if ( x.isVector3 ) {
+		if ( x instanceof Vector3 ) {
 
 			te[ 12 ] = x.x;
 			te[ 13 ] = x.y;

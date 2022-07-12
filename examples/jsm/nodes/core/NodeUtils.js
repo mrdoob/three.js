@@ -30,27 +30,27 @@ export const getValueType = ( value ) => {
 
 		return 'bool';
 
-	} else if ( value?.isVector2 === true ) {
+	} else if ( value instanceof Vector2 ) {
 
 		return 'vec2';
 
-	} else if ( value?.isVector3 === true ) {
+	} else if ( value instanceof Vector3 ) {
 
 		return 'vec3';
 
-	} else if ( value?.isVector4 === true ) {
+	} else if ( value instanceof Vector4 ) {
 
 		return 'vec4';
 
-	} else if ( value?.isMatrix3 === true ) {
+	} else if ( value instanceof Matrix3 ) {
 
 		return 'mat3';
 
-	} else if ( value?.isMatrix4 === true ) {
+	} else if ( value instanceof Matrix4 ) {
 
 		return 'mat4';
 
-	} else if ( value?.isColor === true ) {
+	} else if ( value instanceof Color ) {
 
 		return 'color';
 

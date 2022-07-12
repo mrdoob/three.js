@@ -1,5 +1,18 @@
+import {
+	AddEquation,
+	AlwaysStencilFunc,
+	FlatShading,
+	FrontSide,
+	KeepStencilOp,
+	LessEqualDepth,
+	NormalBlending,
+	OneMinusSrcAlphaFactor,
+	SrcAlphaFactor
+} from '../constants.js';
+
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
+import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
 import * as MathUtils from '../math/MathUtils.js';
 
 let materialId = 0;
@@ -140,11 +153,11 @@ class Material extends EventDispatcher {
 
 			}
 
-			if ( currentValue && currentValue.isColor ) {
+			if ( currentValue instanceof Color ) {
 
 				currentValue.set( newValue );
 
-			} else if ( ( currentValue && currentValue.isVector3 ) && ( newValue && newValue.isVector3 ) ) {
+			} else if ( ( currentValue instanceof Vector3 ) && ( newValue && newValue instanceof Vector3 ) ) {
 
 				currentValue.copy( newValue );
 
@@ -185,20 +198,20 @@ class Material extends EventDispatcher {
 
 		if ( this.name !== '' ) data.name = this.name;
 
-		if ( this.color && this.color.isColor ) data.color = this.color.getHex();
+		if ( this.color instanceof Color ) data.color = this.color.getHex();
 
 		if ( this.roughness !== undefined ) data.roughness = this.roughness;
 		if ( this.metalness !== undefined ) data.metalness = this.metalness;
 
 		if ( this.sheen !== undefined ) data.sheen = this.sheen;
-		if ( this.sheenColor && this.sheenColor.isColor ) data.sheenColor = this.sheenColor.getHex();
+		if ( this.sheenColor instanceof Color ) data.sheenColor = this.sheenColor.getHex();
 		if ( this.sheenRoughness !== undefined ) data.sheenRoughness = this.sheenRoughness;
-		if ( this.emissive && this.emissive.isColor ) data.emissive = this.emissive.getHex();
+		if ( this.emissive instanceof Color ) data.emissive = this.emissive.getHex();
 		if ( this.emissiveIntensity && this.emissiveIntensity !== 1 ) data.emissiveIntensity = this.emissiveIntensity;
 
-		if ( this.specular && this.specular.isColor ) data.specular = this.specular.getHex();
+		if ( this.specular instanceof Color ) data.specular = this.specular.getHex();
 		if ( this.specularIntensity !== undefined ) data.specularIntensity = this.specularIntensity;
-		if ( this.specularColor && this.specularColor.isColor ) data.specularColor = this.specularColor.getHex();
+		if ( this.specularColor instanceof Color ) data.specularColor = this.specularColor.getHex();
 		if ( this.shininess !== undefined ) data.shininess = this.shininess;
 		if ( this.clearcoat !== undefined ) data.clearcoat = this.clearcoat;
 		if ( this.clearcoatRoughness !== undefined ) data.clearcoatRoughness = this.clearcoatRoughness;

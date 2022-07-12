@@ -1,4 +1,10 @@
 import { Material } from './Material.js';
+import { Color } from '../math/Color.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { Vector4 } from '../math/Vector4.js';
+import { Matrix3 } from '../math/Matrix3.js';
+import { Matrix4 } from '../math/Matrix4.js';
 import { cloneUniforms, cloneUniformsGroups } from '../renderers/shaders/UniformsUtils.js';
 
 import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
@@ -110,42 +116,42 @@ class ShaderMaterial extends Material {
 					value: value.toJSON( meta ).uuid
 				};
 
-			} else if ( value && value.isColor ) {
+			} else if ( value instanceof Color ) {
 
 				data.uniforms[ name ] = {
 					type: 'c',
 					value: value.getHex()
 				};
 
-			} else if ( value && value.isVector2 ) {
+			} else if ( value instanceof Vector2 ) {
 
 				data.uniforms[ name ] = {
 					type: 'v2',
 					value: value.toArray()
 				};
 
-			} else if ( value && value.isVector3 ) {
+			} else if ( value instanceof Vector3 ) {
 
 				data.uniforms[ name ] = {
 					type: 'v3',
 					value: value.toArray()
 				};
 
-			} else if ( value && value.isVector4 ) {
+			} else if ( value instanceof Vector4 ) {
 
 				data.uniforms[ name ] = {
 					type: 'v4',
 					value: value.toArray()
 				};
 
-			} else if ( value && value.isMatrix3 ) {
+			} else if ( value instanceof Matrix3 ) {
 
 				data.uniforms[ name ] = {
 					type: 'm3',
 					value: value.toArray()
 				};
 
-			} else if ( value && value.isMatrix4 ) {
+			} else if ( value instanceof Matrix4 ) {
 
 				data.uniforms[ name ] = {
 					type: 'm4',

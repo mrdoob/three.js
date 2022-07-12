@@ -56,7 +56,8 @@ class Color {
 
 	constructor( r, g, b ) {
 
-		this.isColor = true;
+		// @deprecated
+		Object.defineProperty( this, 'isColor', { value: true } );
 
 		this.r = 1;
 		this.g = 1;
@@ -75,7 +76,7 @@ class Color {
 
 	set( value ) {
 
-		if ( value && value.isColor ) {
+		if ( value instanceof Color ) {
 
 			this.copy( value );
 

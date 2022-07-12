@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import { attribute, float } from '../shadernode/ShaderNodeBaseElements.js';
-import { MathUtils, InstancedBufferAttribute } from 'three';
+import { Color, Vector2, Vector3, Vector4, MathUtils, InstancedBufferAttribute } from 'three';
 
 class RangeNode extends Node {
 
@@ -19,10 +19,10 @@ class RangeNode extends Node {
 
 		let length = 1;
 
-		if ( min.isVector2 ) length = 2;
-		else if ( min.isVector3 ) length = 3;
-		else if ( min.isVector4 ) length = 4;
-		else if ( min.isColor ) length = 3;
+		if ( min instanceof Vector2 ) length = 2;
+		else if ( min instanceof Vector3 ) length = 3;
+		else if ( min instanceof Vector4 ) length = 4;
+		else if ( min instanceof Color ) length = 3;
 
 		return length;
 
@@ -61,7 +61,7 @@ class RangeNode extends Node {
 
 					}
 
-				} else if ( min.isColor ) {
+				} else if ( min instanceof Color ) {
 
 					for ( let i = 0; i < length; i += 3 ) {
 

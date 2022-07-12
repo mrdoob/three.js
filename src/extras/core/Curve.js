@@ -1,7 +1,7 @@
-import * as MathUtils from '../../math/MathUtils.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Matrix4 } from '../../math/Matrix4.js';
+import * as MathUtils from '../../math/MathUtils.js';
 
 /**
  * Extensible curve object.
@@ -242,7 +242,7 @@ class Curve {
 		const pt1 = this.getPoint( t1 );
 		const pt2 = this.getPoint( t2 );
 
-		const tangent = optionalTarget || ( ( pt1.isVector2 ) ? new Vector2() : new Vector3() );
+		const tangent = optionalTarget || ( ( pt1 instanceof Vector2 ) ? new Vector2() : new Vector3() );
 
 		tangent.copy( pt2 ).sub( pt1 ).normalize();
 

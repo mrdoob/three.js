@@ -1,13 +1,14 @@
 import {
+	BackSide,
 	CubeReflectionMapping,
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
+	HalfFloatType,
 	LinearEncoding,
 	LinearFilter,
-	NoToneMapping,
 	NoBlending,
-	RGBAFormat,
-	HalfFloatType
+	NoToneMapping,
+	RGBAFormat
 } from '../constants.js';
 
 import { BufferAttribute } from '../core/BufferAttribute.js';
@@ -16,12 +17,11 @@ import { Mesh } from '../objects/Mesh.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BoxGeometry } from '../geometries/BoxGeometry.js';
-import { BackSide } from '../constants.js';
+import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
 
 const LOD_MIN = 4;
 
@@ -319,7 +319,7 @@ class PMREMGenerator {
 
 		if ( background ) {
 
-			if ( background.isColor ) {
+			if ( background instanceof Color ) {
 
 				backgroundMaterial.color.copy( background );
 				scene.background = null;

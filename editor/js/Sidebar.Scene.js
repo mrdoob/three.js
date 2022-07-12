@@ -373,7 +373,7 @@ function SidebarScene( editor ) {
 
 		if ( scene.background ) {
 
-			if ( scene.background.isColor ) {
+			if ( scene.background instanceof THREE.Color ) {
 
 				backgroundType.setValue( 'Color' );
 				backgroundColor.setHexValue( scene.background.getHex() );

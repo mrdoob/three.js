@@ -1,10 +1,11 @@
-import { Quaternion } from '../math/Quaternion.js';
-import { Vector3 } from '../math/Vector3.js';
-import { Matrix4 } from '../math/Matrix4.js';
 import { EventDispatcher } from './EventDispatcher.js';
-import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
+import { Color } from '../math/Color.js';
+import { Vector3 } from '../math/Vector3.js';
 import { Matrix3 } from '../math/Matrix3.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { Quaternion } from '../math/Quaternion.js';
+import { Euler } from '../math/Euler.js';
 import * as MathUtils from '../math/MathUtils.js';
 
 let _object3DId = 0;
@@ -259,7 +260,7 @@ class Object3D extends EventDispatcher {
 
 		// This method does not support objects having non-uniformly-scaled parent(s)
 
-		if ( x.isVector3 ) {
+		if ( x instanceof Vector3 ) {
 
 			_target.copy( x );
 
@@ -709,7 +710,7 @@ class Object3D extends EventDispatcher {
 
 			if ( this.background ) {
 
-				if ( this.background.isColor ) {
+				if ( this.background instanceof Color ) {
 
 					object.background = this.background.toJSON();
 

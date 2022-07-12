@@ -1,5 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
-import { SpriteMaterial } from 'three';
+import { Vector2, SpriteMaterial } from 'three';
 import {
 	vec2, vec3, vec4,
 	uniform, add, mul, sub,
@@ -59,7 +59,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		let alignedPosition = vertex.xy;
 
-		if ( builder.object.center?.isVector2 === true ) {
+		if ( builder.object.center instanceof Vector2 ) {
 
 			alignedPosition = sub( alignedPosition, sub( uniform( builder.object.center ), vec2( 0.5 ) ) );
 
