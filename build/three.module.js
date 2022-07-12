@@ -11446,6 +11446,20 @@ function mergeUniforms( uniforms ) {
 
 }
 
+function cloneUniformsGroups( src ) {
+
+	const dst = [];
+
+	for ( let u = 0; u < src.length; u ++ ) {
+
+		dst.push( src[ u ].clone() );
+
+	}
+
+	return dst;
+
+}
+
 // Legacy
 
 const UniformsUtils = { clone: cloneUniforms, merge: mergeUniforms };
@@ -11466,6 +11480,7 @@ class ShaderMaterial extends Material {
 
 		this.defines = {};
 		this.uniforms = {};
+		this.uniformsGroups = [];
 
 		this.vertexShader = default_vertex;
 		this.fragmentShader = default_fragment;
@@ -11521,6 +11536,7 @@ class ShaderMaterial extends Material {
 		this.vertexShader = source.vertexShader;
 
 		this.uniforms = cloneUniforms( source.uniforms );
+		this.uniformsGroups = cloneUniformsGroups( source.uniformsGroups );
 
 		this.defines = Object.assign( {}, source.defines );
 
@@ -21311,6 +21327,9 @@ function WebGLState( gl, extensions, capabilities ) {
 	const depthBuffer = new DepthBuffer();
 	const stencilBuffer = new StencilBuffer();
 
+	const uboBindings = new WeakMap();
+	const uboProgamMap = new WeakMap();
+
 	let enabledCapabilities = {};
 
 	let currentBoundFramebuffers = {};
@@ -22061,6 +22080,47 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function updateUBOMapping( uniformsGroup, program ) {
+
+		let mapping = uboProgamMap.get( program );
+
+		if ( mapping === undefined ) {
+
+			mapping = new WeakMap();
+
+			uboProgamMap.set( program, mapping );
+
+		}
+
+		let blockIndex = mapping.get( uniformsGroup );
+
+		if ( blockIndex === undefined ) {
+
+			blockIndex = gl.getUniformBlockIndex( program, uniformsGroup.name );
+
+			mapping.set( uniformsGroup, blockIndex );
+
+		}
+
+	}
+
+	function uniformBlockBinding( uniformsGroup, program ) {
+
+		const mapping = uboProgamMap.get( program );
+		const blockIndex = mapping.get( uniformsGroup );
+
+		if ( uboBindings.get( uniformsGroup ) !== blockIndex ) {
+
+			// bind shader specific block index to global block point
+
+			gl.uniformBlockBinding( program, blockIndex, uniformsGroup.__bindingPointIndex );
+
+			uboBindings.set( uniformsGroup, blockIndex );
+
+		}
+
+	}
+
 	//
 
 	function reset() {
@@ -22187,6 +22247,9 @@ function WebGLState( gl, extensions, capabilities ) {
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,
+
+		updateUBOMapping: updateUBOMapping,
+		uniformBlockBinding: uniformBlockBinding,
 
 		texStorage2D: texStorage2D,
 		texStorage3D: texStorage3D,
@@ -26149,6 +26212,376 @@ function WebGLMaterials( renderer, properties ) {
 
 }
 
+function WebGLUniformsGroups( gl, info, capabilities, state ) {
+
+	let buffers = {};
+	let updateList = {};
+	let allocatedBindingPoints = [];
+
+	const maxBindingPoints = ( capabilities.isWebGL2 ) ? gl.getParameter( 35375 ) : 0; // binding points are global whereas block indices are per shader program
+
+	function bind( uniformsGroup, program ) {
+
+		const webglProgram = program.program;
+		state.uniformBlockBinding( uniformsGroup, webglProgram );
+
+	}
+
+	function update( uniformsGroup, program ) {
+
+		let buffer = buffers[ uniformsGroup.id ];
+
+		if ( buffer === undefined ) {
+
+			prepareUniformsGroup( uniformsGroup );
+
+			buffer = createBuffer( uniformsGroup );
+			buffers[ uniformsGroup.id ] = buffer;
+
+			uniformsGroup.addEventListener( 'dispose', onUniformsGroupsDispose );
+
+		}
+
+		// ensure to update the binding points/block indices mapping for this program
+
+		const webglProgram = program.program;
+		state.updateUBOMapping( uniformsGroup, webglProgram );
+
+		// update UBO once per frame
+
+		const frame = info.render.frame;
+
+		if ( updateList[ uniformsGroup.id ] !== frame ) {
+
+			updateBufferData( uniformsGroup );
+
+			updateList[ uniformsGroup.id ] = frame;
+
+		}
+
+	}
+
+	function createBuffer( uniformsGroup ) {
+
+		// the setup of an UBO is independent of a particular shader program but global
+
+		const bindingPointIndex = allocateBindingPointIndex();
+		uniformsGroup.__bindingPointIndex = bindingPointIndex;
+
+		const buffer = gl.createBuffer();
+		const size = uniformsGroup.__size;
+		const usage = uniformsGroup.usage;
+
+		gl.bindBuffer( 35345, buffer );
+		gl.bufferData( 35345, size, usage );
+		gl.bindBuffer( 35345, null );
+		gl.bindBufferBase( 35345, bindingPointIndex, buffer );
+
+		return buffer;
+
+	}
+
+	function allocateBindingPointIndex() {
+
+		for ( let i = 0; i < maxBindingPoints; i ++ ) {
+
+			if ( allocatedBindingPoints.indexOf( i ) === - 1 ) {
+
+				allocatedBindingPoints.push( i );
+				return i;
+
+			}
+
+		}
+
+		console.error( 'THREE.WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.' );
+
+		return 0;
+
+	}
+
+	function updateBufferData( uniformsGroup ) {
+
+		const buffer = buffers[ uniformsGroup.id ];
+		const uniforms = uniformsGroup.uniforms;
+		const cache = uniformsGroup.__cache;
+
+		gl.bindBuffer( 35345, buffer );
+
+		for ( let i = 0, il = uniforms.length; i < il; i ++ ) {
+
+			const uniform = uniforms[ i ];
+
+			// partly update the buffer if necessary
+
+			if ( hasUniformChanged( uniform, i, cache ) === true ) {
+
+				const value = uniform.value;
+				const offset = uniform.__offset;
+
+				if ( typeof value === 'number' ) {
+
+					uniform.__data[ 0 ] = value;
+					gl.bufferSubData( 35345, offset, uniform.__data );
+
+				} else {
+
+					if ( uniform.value.isMatrix3 ) {
+
+						// manually converting 3x3 to 3x4
+
+						uniform.__data[ 0 ] = uniform.value.elements[ 0 ];
+						uniform.__data[ 1 ] = uniform.value.elements[ 1 ];
+						uniform.__data[ 2 ] = uniform.value.elements[ 2 ];
+						uniform.__data[ 3 ] = uniform.value.elements[ 0 ];
+						uniform.__data[ 4 ] = uniform.value.elements[ 3 ];
+						uniform.__data[ 5 ] = uniform.value.elements[ 4 ];
+						uniform.__data[ 6 ] = uniform.value.elements[ 5 ];
+						uniform.__data[ 7 ] = uniform.value.elements[ 0 ];
+						uniform.__data[ 8 ] = uniform.value.elements[ 6 ];
+						uniform.__data[ 9 ] = uniform.value.elements[ 7 ];
+						uniform.__data[ 10 ] = uniform.value.elements[ 8 ];
+						uniform.__data[ 11 ] = uniform.value.elements[ 0 ];
+
+					} else {
+
+						value.toArray( uniform.__data );
+
+					}
+
+					gl.bufferSubData( 35345, offset, uniform.__data );
+
+				}
+
+			}
+
+		}
+
+		gl.bindBuffer( 35345, null );
+
+	}
+
+	function hasUniformChanged( uniform, index, cache ) {
+
+		const value = uniform.value;
+
+		if ( cache[ index ] === undefined ) {
+
+			// cache entry does not exist so far
+
+			if ( typeof value === 'number' ) {
+
+				cache[ index ] = value;
+
+			} else {
+
+				cache[ index ] = value.clone();
+
+			}
+
+			return true;
+
+		} else {
+
+			// compare current value with cached entry
+
+			if ( typeof value === 'number' ) {
+
+				if ( cache[ index ] !== value ) {
+
+					cache[ index ] = value;
+					return true;
+
+				}
+
+			} else {
+
+				const cachedObject = cache[ index ];
+
+				if ( cachedObject.equals( value ) === false ) {
+
+					cachedObject.copy( value );
+					return true;
+
+				}
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+	function prepareUniformsGroup( uniformsGroup ) {
+
+		// determine total buffer size according to the STD140 layout
+		// Hint: STD140 is the only supported layout in WebGL 2
+
+		const uniforms = uniformsGroup.uniforms;
+
+		let offset = 0; // global buffer offset in bytes
+		const chunkSize = 16; // size of a chunk in bytes
+		let chunkOffset = 0; // offset within a single chunk in bytes
+
+		for ( let i = 0, l = uniforms.length; i < l; i ++ ) {
+
+			const uniform = uniforms[ i ];
+			const info = getUniformSize( uniform );
+
+			// the following two properties will be used for partial buffer updates
+
+			uniform.__data = new Float32Array( info.storage / Float32Array.BYTES_PER_ELEMENT );
+			uniform.__offset = offset;
+
+			//
+
+			if ( i > 0 ) {
+
+				chunkOffset = offset % chunkSize;
+
+				const remainingSizeInChunk = chunkSize - chunkOffset;
+
+				// check for chunk overflow
+
+				if ( chunkOffset !== 0 && ( remainingSizeInChunk - info.boundary ) < 0 ) {
+
+					// add padding and adjust offset
+
+					offset += ( chunkSize - chunkOffset );
+					uniform.__offset = offset;
+
+				}
+
+			}
+
+			offset += info.storage;
+
+		}
+
+		// ensure correct final padding
+
+		chunkOffset = offset % chunkSize;
+
+		if ( chunkOffset > 0 ) offset += ( chunkSize - chunkOffset );
+
+		//
+
+		uniformsGroup.__size = offset;
+		uniformsGroup.__cache = {};
+
+		return this;
+
+	}
+
+	function getUniformSize( uniform ) {
+
+		const value = uniform.value;
+
+		const info = {
+			boundary: 0, // bytes
+			storage: 0 // bytes
+		};
+
+		// determine sizes according to STD140
+
+		if ( typeof value === 'number' ) {
+
+			// float/int
+
+			info.boundary = 4;
+			info.storage = 4;
+
+		} else if ( value.isVector2 ) {
+
+			// vec2
+
+			info.boundary = 8;
+			info.storage = 8;
+
+		} else if ( value.isVector3 || value.isColor ) {
+
+			// vec3
+
+			info.boundary = 16;
+			info.storage = 12; // evil: vec3 must start on a 16-byte boundary but it only consumes 12 bytes
+
+		} else if ( value.isVector4 ) {
+
+			// vec4
+
+			info.boundary = 16;
+			info.storage = 16;
+
+		} else if ( value.isMatrix3 ) {
+
+			// mat3 (in STD140 a 3x3 matrix is represented as 3x4)
+
+			info.boundary = 48;
+			info.storage = 48;
+
+		} else if ( value.isMatrix4 ) {
+
+			// mat4
+
+			info.boundary = 64;
+			info.storage = 64;
+
+		} else if ( value.isTexture ) {
+
+			console.warn( 'THREE.WebGLRenderer: Texture samplers can not be part of an uniforms group.' );
+
+		} else {
+
+			console.warn( 'THREE.WebGLRenderer: Unsupported uniform value type.', value );
+
+		}
+
+		return info;
+
+	}
+
+	function onUniformsGroupsDispose( event ) {
+
+		const uniformsGroup = event.target;
+
+		uniformsGroup.removeEventListener( 'dispose', onUniformsGroupsDispose );
+
+		const index = allocatedBindingPoints.indexOf( uniformsGroup.__bindingPointIndex );
+		allocatedBindingPoints.splice( index, 1 );
+
+		gl.deleteBuffer( buffers[ uniformsGroup.id ] );
+
+		delete buffers[ uniformsGroup.id ];
+		delete updateList[ uniformsGroup.id ];
+
+	}
+
+	function dispose() {
+
+		for ( const id in buffers ) {
+
+			gl.deleteBuffer( buffers[ id ] );
+
+		}
+
+		allocatedBindingPoints = [];
+		buffers = {};
+		updateList = {};
+
+	}
+
+	return {
+
+		bind: bind,
+		update: update,
+
+		dispose: dispose
+
+	};
+
+}
+
 function createCanvasElement() {
 
 	const canvas = createElementNS( 'canvas' );
@@ -26410,7 +26843,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	let background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
-	let utils, bindingStates;
+	let utils, bindingStates, uniformsGroups;
 
 	function initGLContext() {
 
@@ -26441,6 +26874,7 @@ function WebGLRenderer( parameters = {} ) {
 		renderStates = new WebGLRenderStates( extensions, capabilities );
 		background = new WebGLBackground( _this, cubemaps, state, objects, _alpha, _premultipliedAlpha );
 		shadowMap = new WebGLShadowMap( _this, objects, capabilities );
+		uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities, state );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
@@ -26706,6 +27140,7 @@ function WebGLRenderer( parameters = {} ) {
 		cubeuvmaps.dispose();
 		objects.dispose();
 		bindingStates.dispose();
+		uniformsGroups.dispose();
 		programCache.dispose();
 
 		xr.dispose();
@@ -27885,6 +28320,31 @@ function WebGLRenderer( parameters = {} ) {
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+
+		// UBOs
+
+		if ( material.isShaderMaterial || material.isRawShaderMaterial ) {
+
+			const groups = material.uniformsGroups;
+
+			for ( let i = 0, l = groups.length; i < l; i ++ ) {
+
+				if ( capabilities.isWebGL2 ) {
+
+					const group = groups[ i ];
+
+					uniformsGroups.update( group, program );
+					uniformsGroups.bind( group, program );
+
+				} else {
+
+					console.warn( 'THREE.WebGLRenderer: Uniform Buffer Objects can only be used with WebGL 2.' );
+
+				}
+
+			}
+
+		}
 
 		return program;
 
@@ -32406,7 +32866,7 @@ class Path extends CurvePath {
 
 class LatheGeometry extends BufferGeometry {
 
-	constructor( points = [ new Vector2( 0, 0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, - 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
+	constructor( points = [ new Vector2( 0, - 0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
 		super();
 
@@ -37190,357 +37650,365 @@ class LineDashedMaterial extends LineBasicMaterial {
 
 }
 
-const AnimationUtils = {
+// same as Array.prototype.slice, but also works on typed arrays
+function arraySlice( array, from, to ) {
 
-	// same as Array.prototype.slice, but also works on typed arrays
-	arraySlice: function ( array, from, to ) {
+	if ( isTypedArray( array ) ) {
 
-		if ( AnimationUtils.isTypedArray( array ) ) {
-
-			// in ios9 array.subarray(from, undefined) will return empty array
-			// but array.subarray(from) or array.subarray(from, len) is correct
-			return new array.constructor( array.subarray( from, to !== undefined ? to : array.length ) );
-
-		}
-
-		return array.slice( from, to );
-
-	},
-
-	// converts an array to a specific type
-	convertArray: function ( array, type, forceClone ) {
-
-		if ( ! array || // let 'undefined' and 'null' pass
-			! forceClone && array.constructor === type ) return array;
-
-		if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
-
-			return new type( array ); // create typed array
-
-		}
-
-		return Array.prototype.slice.call( array ); // create Array
-
-	},
-
-	isTypedArray: function ( object ) {
-
-		return ArrayBuffer.isView( object ) &&
-			! ( object instanceof DataView );
-
-	},
-
-	// returns an array by which times and values can be sorted
-	getKeyframeOrder: function ( times ) {
-
-		function compareTime( i, j ) {
-
-			return times[ i ] - times[ j ];
-
-		}
-
-		const n = times.length;
-		const result = new Array( n );
-		for ( let i = 0; i !== n; ++ i ) result[ i ] = i;
-
-		result.sort( compareTime );
-
-		return result;
-
-	},
-
-	// uses the array previously returned by 'getKeyframeOrder' to sort data
-	sortedArray: function ( values, stride, order ) {
-
-		const nValues = values.length;
-		const result = new values.constructor( nValues );
-
-		for ( let i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
-
-			const srcOffset = order[ i ] * stride;
-
-			for ( let j = 0; j !== stride; ++ j ) {
-
-				result[ dstOffset ++ ] = values[ srcOffset + j ];
-
-			}
-
-		}
-
-		return result;
-
-	},
-
-	// function for parsing AOS keyframe formats
-	flattenJSON: function ( jsonKeys, times, values, valuePropertyName ) {
-
-		let i = 1, key = jsonKeys[ 0 ];
-
-		while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
-
-			key = jsonKeys[ i ++ ];
-
-		}
-
-		if ( key === undefined ) return; // no data
-
-		let value = key[ valuePropertyName ];
-		if ( value === undefined ) return; // no data
-
-		if ( Array.isArray( value ) ) {
-
-			do {
-
-				value = key[ valuePropertyName ];
-
-				if ( value !== undefined ) {
-
-					times.push( key.time );
-					values.push.apply( values, value ); // push all elements
-
-				}
-
-				key = jsonKeys[ i ++ ];
-
-			} while ( key !== undefined );
-
-		} else if ( value.toArray !== undefined ) {
-
-			// ...assume THREE.Math-ish
-
-			do {
-
-				value = key[ valuePropertyName ];
-
-				if ( value !== undefined ) {
-
-					times.push( key.time );
-					value.toArray( values, values.length );
-
-				}
-
-				key = jsonKeys[ i ++ ];
-
-			} while ( key !== undefined );
-
-		} else {
-
-			// otherwise push as-is
-
-			do {
-
-				value = key[ valuePropertyName ];
-
-				if ( value !== undefined ) {
-
-					times.push( key.time );
-					values.push( value );
-
-				}
-
-				key = jsonKeys[ i ++ ];
-
-			} while ( key !== undefined );
-
-		}
-
-	},
-
-	subclip: function ( sourceClip, name, startFrame, endFrame, fps = 30 ) {
-
-		const clip = sourceClip.clone();
-
-		clip.name = name;
-
-		const tracks = [];
-
-		for ( let i = 0; i < clip.tracks.length; ++ i ) {
-
-			const track = clip.tracks[ i ];
-			const valueSize = track.getValueSize();
-
-			const times = [];
-			const values = [];
-
-			for ( let j = 0; j < track.times.length; ++ j ) {
-
-				const frame = track.times[ j ] * fps;
-
-				if ( frame < startFrame || frame >= endFrame ) continue;
-
-				times.push( track.times[ j ] );
-
-				for ( let k = 0; k < valueSize; ++ k ) {
-
-					values.push( track.values[ j * valueSize + k ] );
-
-				}
-
-			}
-
-			if ( times.length === 0 ) continue;
-
-			track.times = AnimationUtils.convertArray( times, track.times.constructor );
-			track.values = AnimationUtils.convertArray( values, track.values.constructor );
-
-			tracks.push( track );
-
-		}
-
-		clip.tracks = tracks;
-
-		// find minimum .times value across all tracks in the trimmed clip
-
-		let minStartTime = Infinity;
-
-		for ( let i = 0; i < clip.tracks.length; ++ i ) {
-
-			if ( minStartTime > clip.tracks[ i ].times[ 0 ] ) {
-
-				minStartTime = clip.tracks[ i ].times[ 0 ];
-
-			}
-
-		}
-
-		// shift all tracks such that clip begins at t=0
-
-		for ( let i = 0; i < clip.tracks.length; ++ i ) {
-
-			clip.tracks[ i ].shift( - 1 * minStartTime );
-
-		}
-
-		clip.resetDuration();
-
-		return clip;
-
-	},
-
-	makeClipAdditive: function ( targetClip, referenceFrame = 0, referenceClip = targetClip, fps = 30 ) {
-
-		if ( fps <= 0 ) fps = 30;
-
-		const numTracks = referenceClip.tracks.length;
-		const referenceTime = referenceFrame / fps;
-
-		// Make each track's values relative to the values at the reference frame
-		for ( let i = 0; i < numTracks; ++ i ) {
-
-			const referenceTrack = referenceClip.tracks[ i ];
-			const referenceTrackType = referenceTrack.ValueTypeName;
-
-			// Skip this track if it's non-numeric
-			if ( referenceTrackType === 'bool' || referenceTrackType === 'string' ) continue;
-
-			// Find the track in the target clip whose name and type matches the reference track
-			const targetTrack = targetClip.tracks.find( function ( track ) {
-
-				return track.name === referenceTrack.name
-					&& track.ValueTypeName === referenceTrackType;
-
-			} );
-
-			if ( targetTrack === undefined ) continue;
-
-			let referenceOffset = 0;
-			const referenceValueSize = referenceTrack.getValueSize();
-
-			if ( referenceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
-
-				referenceOffset = referenceValueSize / 3;
-
-			}
-
-			let targetOffset = 0;
-			const targetValueSize = targetTrack.getValueSize();
-
-			if ( targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
-
-				targetOffset = targetValueSize / 3;
-
-			}
-
-			const lastIndex = referenceTrack.times.length - 1;
-			let referenceValue;
-
-			// Find the value to subtract out of the track
-			if ( referenceTime <= referenceTrack.times[ 0 ] ) {
-
-				// Reference frame is earlier than the first keyframe, so just use the first keyframe
-				const startIndex = referenceOffset;
-				const endIndex = referenceValueSize - referenceOffset;
-				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex, endIndex );
-
-			} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
-
-				// Reference frame is after the last keyframe, so just use the last keyframe
-				const startIndex = lastIndex * referenceValueSize + referenceOffset;
-				const endIndex = startIndex + referenceValueSize - referenceOffset;
-				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex, endIndex );
-
-			} else {
-
-				// Interpolate to the reference value
-				const interpolant = referenceTrack.createInterpolant();
-				const startIndex = referenceOffset;
-				const endIndex = referenceValueSize - referenceOffset;
-				interpolant.evaluate( referenceTime );
-				referenceValue = AnimationUtils.arraySlice( interpolant.resultBuffer, startIndex, endIndex );
-
-			}
-
-			// Conjugate the quaternion
-			if ( referenceTrackType === 'quaternion' ) {
-
-				const referenceQuat = new Quaternion().fromArray( referenceValue ).normalize().conjugate();
-				referenceQuat.toArray( referenceValue );
-
-			}
-
-			// Subtract the reference value from all of the track values
-
-			const numTimes = targetTrack.times.length;
-			for ( let j = 0; j < numTimes; ++ j ) {
-
-				const valueStart = j * targetValueSize + targetOffset;
-
-				if ( referenceTrackType === 'quaternion' ) {
-
-					// Multiply the conjugate for quaternion track types
-					Quaternion.multiplyQuaternionsFlat(
-						targetTrack.values,
-						valueStart,
-						referenceValue,
-						0,
-						targetTrack.values,
-						valueStart
-					);
-
-				} else {
-
-					const valueEnd = targetValueSize - targetOffset * 2;
-
-					// Subtract each value for all other numeric track types
-					for ( let k = 0; k < valueEnd; ++ k ) {
-
-						targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
-
-					}
-
-				}
-
-			}
-
-		}
-
-		targetClip.blendMode = AdditiveAnimationBlendMode;
-
-		return targetClip;
+		// in ios9 array.subarray(from, undefined) will return empty array
+		// but array.subarray(from) or array.subarray(from, len) is correct
+		return new array.constructor( array.subarray( from, to !== undefined ? to : array.length ) );
 
 	}
 
-};
+	return array.slice( from, to );
+
+}
+
+// converts an array to a specific type
+function convertArray( array, type, forceClone ) {
+
+	if ( ! array || // let 'undefined' and 'null' pass
+		! forceClone && array.constructor === type ) return array;
+
+	if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
+
+		return new type( array ); // create typed array
+
+	}
+
+	return Array.prototype.slice.call( array ); // create Array
+
+}
+
+function isTypedArray( object ) {
+
+	return ArrayBuffer.isView( object ) &&
+		! ( object instanceof DataView );
+
+}
+
+// returns an array by which times and values can be sorted
+function getKeyframeOrder( times ) {
+
+	function compareTime( i, j ) {
+
+		return times[ i ] - times[ j ];
+
+	}
+
+	const n = times.length;
+	const result = new Array( n );
+	for ( let i = 0; i !== n; ++ i ) result[ i ] = i;
+
+	result.sort( compareTime );
+
+	return result;
+
+}
+
+// uses the array previously returned by 'getKeyframeOrder' to sort data
+function sortedArray( values, stride, order ) {
+
+	const nValues = values.length;
+	const result = new values.constructor( nValues );
+
+	for ( let i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
+
+		const srcOffset = order[ i ] * stride;
+
+		for ( let j = 0; j !== stride; ++ j ) {
+
+			result[ dstOffset ++ ] = values[ srcOffset + j ];
+
+		}
+
+	}
+
+	return result;
+
+}
+
+// function for parsing AOS keyframe formats
+function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
+
+	let i = 1, key = jsonKeys[ 0 ];
+
+	while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
+
+		key = jsonKeys[ i ++ ];
+
+	}
+
+	if ( key === undefined ) return; // no data
+
+	let value = key[ valuePropertyName ];
+	if ( value === undefined ) return; // no data
+
+	if ( Array.isArray( value ) ) {
+
+		do {
+
+			value = key[ valuePropertyName ];
+
+			if ( value !== undefined ) {
+
+				times.push( key.time );
+				values.push.apply( values, value ); // push all elements
+
+			}
+
+			key = jsonKeys[ i ++ ];
+
+		} while ( key !== undefined );
+
+	} else if ( value.toArray !== undefined ) {
+
+		// ...assume THREE.Math-ish
+
+		do {
+
+			value = key[ valuePropertyName ];
+
+			if ( value !== undefined ) {
+
+				times.push( key.time );
+				value.toArray( values, values.length );
+
+			}
+
+			key = jsonKeys[ i ++ ];
+
+		} while ( key !== undefined );
+
+	} else {
+
+		// otherwise push as-is
+
+		do {
+
+			value = key[ valuePropertyName ];
+
+			if ( value !== undefined ) {
+
+				times.push( key.time );
+				values.push( value );
+
+			}
+
+			key = jsonKeys[ i ++ ];
+
+		} while ( key !== undefined );
+
+	}
+
+}
+
+function subclip( sourceClip, name, startFrame, endFrame, fps = 30 ) {
+
+	const clip = sourceClip.clone();
+
+	clip.name = name;
+
+	const tracks = [];
+
+	for ( let i = 0; i < clip.tracks.length; ++ i ) {
+
+		const track = clip.tracks[ i ];
+		const valueSize = track.getValueSize();
+
+		const times = [];
+		const values = [];
+
+		for ( let j = 0; j < track.times.length; ++ j ) {
+
+			const frame = track.times[ j ] * fps;
+
+			if ( frame < startFrame || frame >= endFrame ) continue;
+
+			times.push( track.times[ j ] );
+
+			for ( let k = 0; k < valueSize; ++ k ) {
+
+				values.push( track.values[ j * valueSize + k ] );
+
+			}
+
+		}
+
+		if ( times.length === 0 ) continue;
+
+		track.times = convertArray( times, track.times.constructor );
+		track.values = convertArray( values, track.values.constructor );
+
+		tracks.push( track );
+
+	}
+
+	clip.tracks = tracks;
+
+	// find minimum .times value across all tracks in the trimmed clip
+
+	let minStartTime = Infinity;
+
+	for ( let i = 0; i < clip.tracks.length; ++ i ) {
+
+		if ( minStartTime > clip.tracks[ i ].times[ 0 ] ) {
+
+			minStartTime = clip.tracks[ i ].times[ 0 ];
+
+		}
+
+	}
+
+	// shift all tracks such that clip begins at t=0
+
+	for ( let i = 0; i < clip.tracks.length; ++ i ) {
+
+		clip.tracks[ i ].shift( - 1 * minStartTime );
+
+	}
+
+	clip.resetDuration();
+
+	return clip;
+
+}
+
+function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targetClip, fps = 30 ) {
+
+	if ( fps <= 0 ) fps = 30;
+
+	const numTracks = referenceClip.tracks.length;
+	const referenceTime = referenceFrame / fps;
+
+	// Make each track's values relative to the values at the reference frame
+	for ( let i = 0; i < numTracks; ++ i ) {
+
+		const referenceTrack = referenceClip.tracks[ i ];
+		const referenceTrackType = referenceTrack.ValueTypeName;
+
+		// Skip this track if it's non-numeric
+		if ( referenceTrackType === 'bool' || referenceTrackType === 'string' ) continue;
+
+		// Find the track in the target clip whose name and type matches the reference track
+		const targetTrack = targetClip.tracks.find( function ( track ) {
+
+			return track.name === referenceTrack.name
+				&& track.ValueTypeName === referenceTrackType;
+
+		} );
+
+		if ( targetTrack === undefined ) continue;
+
+		let referenceOffset = 0;
+		const referenceValueSize = referenceTrack.getValueSize();
+
+		if ( referenceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+
+			referenceOffset = referenceValueSize / 3;
+
+		}
+
+		let targetOffset = 0;
+		const targetValueSize = targetTrack.getValueSize();
+
+		if ( targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+
+			targetOffset = targetValueSize / 3;
+
+		}
+
+		const lastIndex = referenceTrack.times.length - 1;
+		let referenceValue;
+
+		// Find the value to subtract out of the track
+		if ( referenceTime <= referenceTrack.times[ 0 ] ) {
+
+			// Reference frame is earlier than the first keyframe, so just use the first keyframe
+			const startIndex = referenceOffset;
+			const endIndex = referenceValueSize - referenceOffset;
+			referenceValue = arraySlice( referenceTrack.values, startIndex, endIndex );
+
+		} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
+
+			// Reference frame is after the last keyframe, so just use the last keyframe
+			const startIndex = lastIndex * referenceValueSize + referenceOffset;
+			const endIndex = startIndex + referenceValueSize - referenceOffset;
+			referenceValue = arraySlice( referenceTrack.values, startIndex, endIndex );
+
+		} else {
+
+			// Interpolate to the reference value
+			const interpolant = referenceTrack.createInterpolant();
+			const startIndex = referenceOffset;
+			const endIndex = referenceValueSize - referenceOffset;
+			interpolant.evaluate( referenceTime );
+			referenceValue = arraySlice( interpolant.resultBuffer, startIndex, endIndex );
+
+		}
+
+		// Conjugate the quaternion
+		if ( referenceTrackType === 'quaternion' ) {
+
+			const referenceQuat = new Quaternion().fromArray( referenceValue ).normalize().conjugate();
+			referenceQuat.toArray( referenceValue );
+
+		}
+
+		// Subtract the reference value from all of the track values
+
+		const numTimes = targetTrack.times.length;
+		for ( let j = 0; j < numTimes; ++ j ) {
+
+			const valueStart = j * targetValueSize + targetOffset;
+
+			if ( referenceTrackType === 'quaternion' ) {
+
+				// Multiply the conjugate for quaternion track types
+				Quaternion.multiplyQuaternionsFlat(
+					targetTrack.values,
+					valueStart,
+					referenceValue,
+					0,
+					targetTrack.values,
+					valueStart
+				);
+
+			} else {
+
+				const valueEnd = targetValueSize - targetOffset * 2;
+
+				// Subtract each value for all other numeric track types
+				for ( let k = 0; k < valueEnd; ++ k ) {
+
+					targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
+
+				}
+
+			}
+
+		}
+
+	}
+
+	targetClip.blendMode = AdditiveAnimationBlendMode;
+
+	return targetClip;
+
+}
+
+var AnimationUtils = /*#__PURE__*/Object.freeze({
+	__proto__: null,
+	arraySlice: arraySlice,
+	convertArray: convertArray,
+	isTypedArray: isTypedArray,
+	getKeyframeOrder: getKeyframeOrder,
+	sortedArray: sortedArray,
+	flattenJSON: flattenJSON,
+	subclip: subclip,
+	makeClipAdditive: makeClipAdditive
+});
 
 /**
  * Abstract base class of interpolants over parametric samples.
@@ -37993,8 +38461,8 @@ class KeyframeTrack {
 
 		this.name = name;
 
-		this.times = AnimationUtils.convertArray( times, this.TimeBufferType );
-		this.values = AnimationUtils.convertArray( values, this.ValueBufferType );
+		this.times = convertArray( times, this.TimeBufferType );
+		this.values = convertArray( values, this.ValueBufferType );
 
 		this.setInterpolation( interpolation || this.DefaultInterpolation );
 
@@ -38020,8 +38488,8 @@ class KeyframeTrack {
 			json = {
 
 				'name': track.name,
-				'times': AnimationUtils.convertArray( track.times, Array ),
-				'values': AnimationUtils.convertArray( track.values, Array )
+				'times': convertArray( track.times, Array ),
+				'values': convertArray( track.values, Array )
 
 			};
 
@@ -38215,8 +38683,8 @@ class KeyframeTrack {
 			}
 
 			const stride = this.getValueSize();
-			this.times = AnimationUtils.arraySlice( times, from, to );
-			this.values = AnimationUtils.arraySlice( this.values, from * stride, to * stride );
+			this.times = arraySlice( times, from, to );
+			this.values = arraySlice( this.values, from * stride, to * stride );
 
 		}
 
@@ -38277,7 +38745,7 @@ class KeyframeTrack {
 
 		if ( values !== undefined ) {
 
-			if ( AnimationUtils.isTypedArray( values ) ) {
+			if ( isTypedArray( values ) ) {
 
 				for ( let i = 0, n = values.length; i !== n; ++ i ) {
 
@@ -38306,8 +38774,8 @@ class KeyframeTrack {
 	optimize() {
 
 		// times or values may be shared with other tracks, so overwriting is unsafe
-		const times = AnimationUtils.arraySlice( this.times ),
-			values = AnimationUtils.arraySlice( this.values ),
+		const times = arraySlice( this.times ),
+			values = arraySlice( this.values ),
 			stride = this.getValueSize(),
 
 			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
@@ -38400,8 +38868,8 @@ class KeyframeTrack {
 
 		if ( writeIndex !== times.length ) {
 
-			this.times = AnimationUtils.arraySlice( times, 0, writeIndex );
-			this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
+			this.times = arraySlice( times, 0, writeIndex );
+			this.values = arraySlice( values, 0, writeIndex * stride );
 
 		} else {
 
@@ -38416,8 +38884,8 @@ class KeyframeTrack {
 
 	clone() {
 
-		const times = AnimationUtils.arraySlice( this.times, 0 );
-		const values = AnimationUtils.arraySlice( this.values, 0 );
+		const times = arraySlice( this.times, 0 );
+		const values = arraySlice( this.values, 0 );
 
 		const TypedKeyframeTrack = this.constructor;
 		const track = new TypedKeyframeTrack( this.name, times, values );
@@ -38612,9 +39080,9 @@ class AnimationClip {
 
 			values.push( 0, 1, 0 );
 
-			const order = AnimationUtils.getKeyframeOrder( times );
-			times = AnimationUtils.sortedArray( times, 1, order );
-			values = AnimationUtils.sortedArray( values, 1, order );
+			const order = getKeyframeOrder( times );
+			times = sortedArray( times, 1, order );
+			values = sortedArray( values, 1, order );
 
 			// if there is a key at the first frame, duplicate it as the
 			// last frame as well for perfect loop.
@@ -38725,7 +39193,7 @@ class AnimationClip {
 				const times = [];
 				const values = [];
 
-				AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
+				flattenJSON( animationKeys, times, values, propertyName );
 
 				// empty keys are filtered out, so check again
 				if ( times.length !== 0 ) {
@@ -38970,7 +39438,7 @@ function parseKeyframeTrack( json ) {
 
 		const times = [], values = [];
 
-		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
+		flattenJSON( json.keys, times, values, 'value' );
 
 		json.times = times;
 		json.values = values;
@@ -46487,6 +46955,94 @@ class Uniform {
 
 }
 
+let id = 0;
+
+class UniformsGroup extends EventDispatcher {
+
+	constructor() {
+
+		super();
+
+		this.isUniformsGroup = true;
+
+		Object.defineProperty( this, 'id', { value: id ++ } );
+
+		this.name = '';
+
+		this.usage = StaticDrawUsage;
+		this.uniforms = [];
+
+	}
+
+	add( uniform ) {
+
+		this.uniforms.push( uniform );
+
+		return this;
+
+	}
+
+	remove( uniform ) {
+
+		const index = this.uniforms.indexOf( uniform );
+
+		if ( index !== - 1 ) this.uniforms.splice( index, 1 );
+
+		return this;
+
+	}
+
+	setName( name ) {
+
+		this.name = name;
+
+		return this;
+
+	}
+
+	setUsage( value ) {
+
+		this.usage = value;
+
+		return this;
+
+	}
+
+	dispose() {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+		return this;
+
+	}
+
+	copy( source ) {
+
+		this.name = source.name;
+		this.usage = source.usage;
+
+		const uniformsSource = source.uniforms;
+
+		this.uniforms.length = 0;
+
+		for ( let i = 0, l = uniformsSource.length; i < l; i ++ ) {
+
+			this.uniforms.push( uniformsSource[ i ].clone() );
+
+		}
+
+		return this;
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
+
+	}
+
+}
+
 class InstancedInterleavedBuffer extends InterleavedBuffer {
 
 	constructor( array, stride, meshPerAttribute = 1 ) {
@@ -48877,4 +49433,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry as BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry as CapsuleBufferGeometry, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry as CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, CompressedTexture, CompressedTextureLoader, ConeGeometry as ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry as CylinderBufferGeometry, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry as DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeGeometry as ExtrudeBufferGeometry, ExtrudeGeometry, FileLoader, FlatShading, Float16BufferAttribute, Float32BufferAttribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronGeometry as IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry as LatheBufferGeometry, LatheGeometry, Layers, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry as OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricGeometry, Path, PerspectiveCamera, Plane, PlaneGeometry as PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry as PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingGeometry as RingBufferGeometry, RingGeometry, SRGBColorSpace, Scene, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry as ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Source, Sphere, SphereGeometry as SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry as TetrahedronBufferGeometry, TetrahedronGeometry, TextGeometry, Texture, TextureLoader, TorusGeometry as TorusBufferGeometry, TorusGeometry, TorusKnotGeometry as TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry as TubeBufferGeometry, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoTexture, WebGL1Renderer, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderer, WebGLUtils, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry as BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleGeometry as CapsuleBufferGeometry, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry as CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, CompressedTexture, CompressedTextureLoader, ConeGeometry as ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry as CylinderBufferGeometry, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronGeometry as DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeGeometry as ExtrudeBufferGeometry, ExtrudeGeometry, FileLoader, FlatShading, Float16BufferAttribute, Float32BufferAttribute, Float64BufferAttribute, FloatType, Fog, FogExp2, Font, FontLoader, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronGeometry as IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry as LatheBufferGeometry, LatheGeometry, Layers, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry as OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, ParametricGeometry, Path, PerspectiveCamera, Plane, PlaneGeometry as PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronGeometry as PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingGeometry as RingBufferGeometry, RingGeometry, SRGBColorSpace, Scene, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeGeometry as ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SmoothShading, Source, Sphere, SphereGeometry as SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronGeometry as TetrahedronBufferGeometry, TetrahedronGeometry, TextGeometry, Texture, TextureLoader, TorusGeometry as TorusBufferGeometry, TorusGeometry, TorusKnotGeometry as TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeGeometry as TubeBufferGeometry, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoTexture, WebGL1Renderer, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderer, WebGLUtils, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };
