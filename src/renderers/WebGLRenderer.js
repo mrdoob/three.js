@@ -450,7 +450,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
 
-		console.warn( 'THREE.WebGLRenderer: .setDrawingBufferSize() has been deprecated. Please use a combination of .setPixelRatio() and .setSize().' );
+		console.warn( 'THREE.WebGLRenderer: .setDrawingBufferSize() has been deprecated. Use a combination of .setPixelRatio() and .setSize() instead.' );
 
 		this.setPixelRatio( pixelRatio );
 		this.setSize( width, height, false );
