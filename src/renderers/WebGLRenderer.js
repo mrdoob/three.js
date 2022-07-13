@@ -446,17 +446,14 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
+	// @deprecated since r143
+
 	this.setDrawingBufferSize = function ( width, height, pixelRatio ) {
 
-		_width = width;
-		_height = height;
+		console.warn( 'THREE.WebGLRenderer: .setDrawingBufferSize() has been deprecated. Please use a combination of .setPixelRatio() and .setSize().' );
 
-		_pixelRatio = pixelRatio;
-
-		_canvas.width = Math.floor( width * pixelRatio );
-		_canvas.height = Math.floor( height * pixelRatio );
-
-		this.setViewport( 0, 0, width, height );
+		this.setPixelRatio( pixelRatio );
+		this.setSize( width, height, false );
 
 	};
 
