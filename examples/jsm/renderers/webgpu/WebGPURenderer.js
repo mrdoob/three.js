@@ -365,22 +365,6 @@ class WebGPURenderer {
 
 	}
 
-	setDrawingBufferSize( width, height, pixelRatio ) {
-
-		this._width = width;
-		this._height = height;
-
-		this._pixelRatio = pixelRatio;
-
-		this.domElement.width = Math.floor( width * pixelRatio );
-		this.domElement.height = Math.floor( height * pixelRatio );
-
-		this._configureContext();
-		this._setupColorBuffer();
-		this._setupDepthBuffer();
-
-	}
-
 	setSize( width, height, updateStyle = true ) {
 
 		this._width = width;
