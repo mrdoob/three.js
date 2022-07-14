@@ -19,3 +19,5 @@ export { SetSceneCommand } from './SetSceneCommand.js';
 export { SetScriptValueCommand } from './SetScriptValueCommand.js';
 export { SetUuidCommand } from './SetUuidCommand.js';
 export { SetValueCommand } from './SetValueCommand.js';
+export { RemoveMultipleSelectionGroup } from './RemoveMultipleSelectionGroup.js';
+export { AddMultipleSelectionGroup } from './AddMultipleSelectionGroup.js';

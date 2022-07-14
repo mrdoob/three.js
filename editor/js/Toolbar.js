@@ -67,7 +67,7 @@ function Toolbar( editor ) {
 	multipleSelection.dom.appendChild( multipleSelectionIcon );
 	multipleSelection.onClick( function () {
 
-		signals.toggleMultipleSelection.dispatch( 'multiple-selection' );
+		signals.toggleMultipleSelection.dispatch();
 
 	} );
 	container.add( multipleSelection );
@@ -89,6 +89,8 @@ function Toolbar( editor ) {
 		rotate.dom.classList.remove( 'selected' );
 		scale.dom.classList.remove( 'selected' );
 		multipleSelection.dom.classList.remove( 'selected' );
+
+		signals.disableMultipleSelection.dispatch();
 
 		switch ( mode ) {
 
