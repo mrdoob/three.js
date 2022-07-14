@@ -112,16 +112,26 @@ class MultipleSelection {
 
 	}
 
+	_getCursorPosition( event ) {
+
+		const rect = event.target.getBoundingClientRect();
+
+		const x = ( ( event.clientX - rect.x ) / rect.width ) * 2 - 1;
+		const y = - ( ( event.clientY - rect.y ) / rect.height ) * 2 + 1;
+
+		return { x, y };
+
+	}
+
 	_pointerDown = ( event ) => {
 
 		this._displayOriginalMeshes();
 
 		this._selectionDrawer.onPointerDown( event );
 
-		this._selectionBox.startPoint.set(
-			( event.clientX / window.innerWidth ) * 2 - 1,
-			- ( event.clientY / window.innerHeight ) * 2 + 1,
-			0.5 );
+		const cursorPosition = this._getCursorPosition( event );
+
+		this._selectionBox.startPoint.set( cursorPosition.x, cursorPosition.y, 0.5 );
 
 		if ( this._pointerDownCustomCallback ) {
 
@@ -137,10 +147,9 @@ class MultipleSelection {
 
 		this._selectionDrawer.onPointerMove( event );
 
-		this._selectionBox.endPoint.set(
-			( event.clientX / window.innerWidth ) * 2 - 1,
-			- ( event.clientY / window.innerHeight ) * 2 + 1,
-			0.5 );
+		const cursorPosition = this._getCursorPosition( event );
+
+		this._selectionBox.endPoint.set( cursorPosition.x, cursorPosition.y, 0.5 );
 
 		if ( this._pointerMoveCustomCallback ) {
 
@@ -154,10 +163,9 @@ class MultipleSelection {
 
 		this._selectionDrawer.onPointerUp();
 
-		this._selectionBox.endPoint.set(
-			( event.clientX / window.innerWidth ) * 2 - 1,
-			- ( event.clientY / window.innerHeight ) * 2 + 1,
-			0.5 );
+		const cursorPosition = this._getCursorPosition( event );
+
+		this._selectionBox.endPoint.set( cursorPosition.x, cursorPosition.y, 0.5 );
 
 		this._selectedMeshes = this._cloneMeshes( this._keepOnlyMeshes( this._selectionBox.select() ) );
 
