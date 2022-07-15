@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { PlaneGeometry, PlaneBufferGeometry } from '../../../../src/geometries/PlaneGeometry.js';
+import { PlaneGeometry } from '../../../../src/geometries/PlaneGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -23,7 +23,6 @@ export default QUnit.module( 'Geometries', () => {
 				new PlaneGeometry( parameters.width, parameters.height ),
 				new PlaneGeometry( parameters.width, parameters.height, parameters.widthSegments ),
 				new PlaneGeometry( parameters.width, parameters.height, parameters.widthSegments, parameters.heightSegments ),
-				new PlaneBufferGeometry()
 			];
 
 		} );
