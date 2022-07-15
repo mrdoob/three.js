@@ -229,6 +229,7 @@ class PCDLoader extends Loader {
 		const position = [];
 		const normal = [];
 		const color = [];
+		const intensity = [];
 
 		// ascii
 
@@ -285,6 +286,12 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					intensity.push( parseFloat( line[ offset.intensity ] ) );
+
+				}
+
 			}
 
 		}
@@ -338,6 +345,14 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
+					intensity.push( dataview.getFloat32( ( PCDheader.points * offset.intensity ) + PCDheader.size[ intensityIndex ] * i, this.littleEndian ) );
+
+				}
+
+
 			}
 
 		}
@@ -375,6 +390,12 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					intensity.push( dataview.getFloat32( row + offset.intensity, this.littleEndian ) );
+
+				}
+
 			}
 
 		}
@@ -386,6 +407,7 @@ class PCDLoader extends Loader {
 		if ( position.length > 0 ) geometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 		if ( normal.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal, 3 ) );
 		if ( color.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+		if ( intensity.length > 0 ) geometry.setAttribute( 'intensity', new Float32BufferAttribute( intensity, 1 ) );
 
 		geometry.computeBoundingSphere();
 
