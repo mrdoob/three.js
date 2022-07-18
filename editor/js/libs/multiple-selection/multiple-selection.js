@@ -4,22 +4,19 @@ import { SelectionDrawer } from './selection-drawer.js';
 
 class MultipleSelection {
 
-	constructor( camera, scene, renderer ) {
+	constructor( editor, renderer ) {
 
 		this.enabled = false;
-		this._camera = camera;
-		this._scene = scene;
+		this._camera = editor.camera;
+		this._scene = editor.scene;
 		this._renderer = renderer;
 		this._selectionDrawer = null;
 		this._selectionBox = null;
-		this._selectedMeshes = [];
+		this.selectedMeshes = [];
 		this._hiddenOriginalMeshes = [];
 		this._pointerUpCustomCallback = null;
 		this._pointerDownCustomCallback = null;
 		this._pointerMoveCustomCallback = null;
-		this._cancelBtnClickCustomCallback = null;
-		this._submitBtn = null;
-		this._cancelBtn = null;
 
 	}
 
@@ -80,56 +77,8 @@ class MultipleSelection {
 			case 'pointermove':
 				this._pointerMoveCustomCallback = callback;
 				break;
-			case 'cancel-selection':
-				this._cancelBtnClickCustomCallback = callback;
-				break;
 			default:
 				break;
-
-		}
-
-	}
-
-	showControlButtons() {
-
-		this._submitBtn = document.createElement( 'button' );
-		this._submitBtn.innerHTML = 'Submit';
-		this._renderer.domElement.parentElement.appendChild( this._submitBtn );
-
-		this._submitBtn.style = 'position: absolute; top: 50px; right: 10px;';
-
-		this._cancelBtn = document.createElement( 'button' );
-		this._cancelBtn.innerHTML = 'Cancel';
-		this._renderer.domElement.parentElement.appendChild( this._cancelBtn );
-
-		this._cancelBtn.style = 'position: absolute; top: 50px; right: 75px;';
-
-		this._cancelBtn.addEventListener( 'click', this._cancelBtnClick );
-
-	}
-
-	hideControlButtons() {
-
-		if ( this._submitBtn ) {
-
-			this._submitBtn.remove();
-
-		}
-
-		if ( this._cancelBtn ) {
-
-			this._cancelBtn.removeEventListener( 'click', this._cancelBtnClick );
-			this._cancelBtn.remove();
-
-		}
-
-	}
-
-	_cancelBtnClick() {
-
-		if ( this._cancelBtnClickCustomCallback ) {
-
-			this._cancelBtnClickCustomCallback();
 
 		}
 
@@ -218,7 +167,7 @@ class MultipleSelection {
 
 		if ( this._pointerMoveCustomCallback ) {
 
-			this._pointerMoveCustomCallback( this._selectedMeshes );
+			this._pointerMoveCustomCallback( this.selectedMeshes );
 
 		}
 
@@ -232,13 +181,13 @@ class MultipleSelection {
 
 		this._selectionBox.endPoint.set( cursorPosition.x, cursorPosition.y, 0.5 );
 
-		this._selectedMeshes = this._cloneMeshes( this._keepOnlyMeshes( this._selectionBox.select() ) );
+		this.selectedMeshes = this._cloneMeshes( this._keepOnlyMeshes( this._selectionBox.select() ) );
 
-		this._hideOriginalMeshes( this._selectedMeshes );
+		this._hideOriginalMeshes( this.selectedMeshes );
 
 		if ( this._pointerUpCustomCallback ) {
 
-			this._pointerUpCustomCallback( this._selectedMeshes );
+			this._pointerUpCustomCallback( this.selectedMeshes );
 
 		}
 

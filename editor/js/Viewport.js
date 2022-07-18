@@ -17,7 +17,12 @@ import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
 import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
 import { MultipleSelection } from './libs/multiple-selection/multiple-selection.js';
-import { AddMultipleSelectionGroup, RemoveMultipleSelectionGroup } from './commands/Commands.js';
+import {
+	AddMultipleSelectionGroupCommand,
+	RemoveMultipleSelectionGroupCommand,
+	SubmitMultipleSelectionCommand,
+	CancelMultipleSelectionCommand
+} from './commands/Commands.js';
 
 function Viewport( editor ) {
 
@@ -92,13 +97,13 @@ function Viewport( editor ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	const multipleSelection = new MultipleSelection( editor.viewportCamera, scene );
+	const multipleSelection = new MultipleSelection( editor );
 
 	multipleSelection.addEventListener( 'pointerdown', () => {
 
-		editor.execute( new RemoveMultipleSelectionGroup( editor ) );
+		editor.execute( new RemoveMultipleSelectionGroupCommand( editor ) );
 
-		multipleSelection.hideControlButtons();
+		signals.hideMultipleSelectionControls.dispatch();
 
 	} );
 
@@ -106,23 +111,15 @@ function Viewport( editor ) {
 
 		if ( ! selectedMeshes.length ) {
 
-			editor.execute( new RemoveMultipleSelectionGroup( editor ) );
+			editor.execute( new RemoveMultipleSelectionGroupCommand( editor ) );
 
 			return;
 
 		}
 
-		editor.execute( new AddMultipleSelectionGroup( editor, selectedMeshes ) );
+		editor.execute( new AddMultipleSelectionGroupCommand( editor, selectedMeshes ) );
 
-		multipleSelection.showControlButtons();
-
-	} );
-
-	multipleSelection.addEventListener( 'cancel-selection', () => {
-
-		editor.execute( new RemoveMultipleSelectionGroup( editor ) );
-
-		multipleSelection.hideControlButtons();
+		signals.showMultipleSelectionControls.dispatch();
 
 	} );
 
@@ -403,6 +400,20 @@ function Viewport( editor ) {
 
 		multipleSelection.disable();
 		controls.enabled = true;
+
+	} );
+
+	signals.submitMultipleSelection.add( function () {
+
+		editor.execute( new SubmitMultipleSelectionCommand( editor, multipleSelection ) );
+		render();
+
+	} );
+
+	signals.cancelMultipleSelection.add( function () {
+
+		editor.execute( new CancelMultipleSelectionCommand( editor, multipleSelection ) );
+		render();
 
 	} );
 

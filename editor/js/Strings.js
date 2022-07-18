@@ -331,7 +331,9 @@ function Strings( config ) {
 			'toolbar/rotate': 'Rotate',
 			'toolbar/scale': 'Scale',
 			'toolbar/local': 'Local',
-			'toolbar/multiple-selection': 'Toggle multiple selection',
+			'toolbar/toggle-multiple-selection': 'Toggle multiple selection',
+			'toolbar/submit-multiple-selection': 'Submit multiple selection',
+			'toolbar/cancel-multiple-selection': 'Cancel multiple selection',
 
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
@@ -667,7 +669,9 @@ function Strings( config ) {
 			'toolbar/rotate': 'Rotation',
 			'toolbar/scale': 'Échelle',
 			'toolbar/local': 'Local',
-			'toolbar/multiple-selection': 'Basculer la sélection multiple',
+			'toolbar/toggle-multiple-selection': 'Basculer la sélection multiple',
+			'toolbar/submit-multiple-selection': 'Soumettre une sélection multiple',
+			'toolbar/cancel-multiple-selection': 'Annuler la sélection multiple',
 
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
@@ -1003,7 +1007,9 @@ function Strings( config ) {
 			'toolbar/rotate': '旋转',
 			'toolbar/scale': '缩放',
 			'toolbar/local': '本地',
-			'toolbar/multiple-selection': '切换多项选择',
+			'toolbar/toggle-multiple-selection': '切换多项选择',
+			'toolbar/submit-multiple-selection': '提交多项选择',
+			'toolbar/cancel-multiple-selection': '取消多项选择',
 
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',

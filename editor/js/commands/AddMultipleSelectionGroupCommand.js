@@ -2,13 +2,13 @@ import { Group } from 'three';
 import { Command } from '../Command.js';
 import { AddObjectCommand } from './AddObjectCommand.js';
 
-class AddMultipleSelectionGroup extends Command {
+class AddMultipleSelectionGroupCommand extends Command {
 
 	constructor( editor, meshes ) {
 
 		super( editor );
 
-		this.type = 'AddMultipleSelectionGroup';
+		this.type = 'AddMultipleSelectionGroupCommand';
 		this.meshes = meshes;
 
 	}
@@ -25,4 +25,4 @@ class AddMultipleSelectionGroup extends Command {
 
 }
 
-export { AddMultipleSelectionGroup };
+export { AddMultipleSelectionGroupCommand };

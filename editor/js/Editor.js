@@ -24,6 +24,10 @@ function Editor( providedDefaultCamera ) {
 		toggleMultipleSelection: new Signal(),
 		enableMultipleSelection: new Signal(),
 		disableMultipleSelection: new Signal(),
+		showMultipleSelectionControls: new Signal(),
+		hideMultipleSelectionControls: new Signal(),
+		cancelMultipleSelection: new Signal(),
+		submitMultipleSelection: new Signal(),
 
 		// script
 

@@ -1,13 +1,13 @@
 import { Command } from '../Command.js';
 import { RemoveObjectCommand } from './RemoveObjectCommand.js';
 
-class RemoveMultipleSelectionGroup extends Command {
+class RemoveMultipleSelectionGroupCommand extends Command {
 
 	constructor( editor ) {
 
 		super( editor );
 
-		this.type = 'RemoveMultipleSelectionGroup';
+		this.type = 'RemoveMultipleSelectionGroupCommand';
 
 	}
 
@@ -25,4 +25,4 @@ class RemoveMultipleSelectionGroup extends Command {
 
 }
 
-export { RemoveMultipleSelectionGroup };
+export { RemoveMultipleSelectionGroupCommand };
