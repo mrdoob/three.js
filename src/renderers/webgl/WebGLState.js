@@ -913,6 +913,37 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function bindTextureToSlot( webglSlot, webglType, webglTexture ) {
+
+		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+
+		let boundTexture = currentBoundTextures[ webglSlot ];
+
+		if ( boundTexture === undefined ) {
+
+			boundTexture = { type: undefined, texture: undefined };
+			currentBoundTextures[ webglSlot ] = boundTexture;
+
+		}
+
+		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
+
+			if ( currentTextureSlot !== webglSlot ) {
+
+				gl.activeTexture( webglSlot );
+				currentTextureSlot = webglSlot;
+
+			}
+
+			gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
+
+			boundTexture.type = webglType;
+			boundTexture.texture = webglTexture;
+
+		}
+
+	}
+
 	function unbindTexture() {
 
 		const boundTexture = currentBoundTextures[ currentTextureSlot ];
@@ -1186,6 +1217,7 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		activeTexture: activeTexture,
 		bindTexture: bindTexture,
+		bindTextureToSlot: bindTextureToSlot,
 		unbindTexture: unbindTexture,
 		compressedTexImage2D: compressedTexImage2D,
 		texImage2D: texImage2D,
