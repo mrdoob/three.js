@@ -141,7 +141,7 @@
 		"webgl_materials_displacementmap",
 		"webgl_materials_envmaps",
 		"webgl_materials_envmaps_exr",
-		"webgl_materials_envmaps_ground-projected",
+		"webgl_materials_envmaps_groundprojected",
 		"webgl_materials_envmaps_hdr",
 		"webgl_materials_lightmap",
 		"webgl_materials_matcap",
