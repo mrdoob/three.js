@@ -13,7 +13,7 @@ class RemoveMultipleSelectionGroupCommand extends Command {
 
 	execute() {
 
-		const group = this.editor.scene.getObjectByName( 'Multiple Selection Group' );
+		const group = this.editor.scene.getObjectByProperty( 'type', 'MultipleSelectionGroup' );
 
 		if ( group ) {
 
