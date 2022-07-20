@@ -48,13 +48,12 @@
 
 			const params = {
 				height: 34,
-				radius: 440,
-				toneMappingExposure: 1
+				radius: 440
 			};
 
-			let camera, scene, renderer, stats, env;
+			let camera, scene, renderer, env;
 
-			init().then( animate );
+			init().then( render );
 
 			async function init() {
 
@@ -129,6 +128,8 @@
 
 					scene.add( carModel );
 
+					render();
+
 				} );
 			
 				//
@@ -143,6 +144,7 @@
 				//
 			
 				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
 				controls.target.set( 0, 0, 0 );
 				controls.maxPolarAngle = THREE.MathUtils.degToRad( 80 );
 				controls.maxDistance = 100;
@@ -150,12 +152,9 @@
 				controls.enablePan = false;
 				controls.update();
 
-				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
 				const gui = new GUI();
-				gui.add( params, 'height', 20, 50, 0.1 );
-				gui.add( params, 'radius', 200, 600, 0.1 );
+				gui.add( params, 'height', 20, 50, 0.1 ).onChange( render );
+				gui.add( params, 'radius', 200, 600, 0.1 ).onChange( render );
 
 				//
 
@@ -170,15 +169,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-
-				stats.update();
 
 			}
 
