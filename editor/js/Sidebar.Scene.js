@@ -379,7 +379,15 @@ function SidebarScene( editor ) {
 
 		outliner.setOptions( options );
 
-       	outliner.setContextMenuOptions( [ 'Copy', 'Cut', 'Paste', 'Clone', 'Delete' ] );
+		if ( editor.selected && editor.selected.type === 'MultipleSelectionGroup' ) {
+
+			outliner.setContextMenuOptions( [ 'Cancel', 'Submit' ] );
+
+		} else {
+
+			outliner.setContextMenuOptions( [ 'Copy', 'Cut', 'Paste', 'Clone', 'Delete' ] );
+
+		}
 
 		outliner.onContextMenuChange( function ( value ) {
 
@@ -411,6 +419,14 @@ function SidebarScene( editor ) {
 					}
 
 				   editor.execute( new AddObjectCommand( editor, copiedObject, editor.selected ) );
+
+				} else if ( value === 'Submit' ) {
+
+					signals.submitMultipleSelection.dispatch();
+
+				} else if ( value === 'Cancel' ) {
+
+					signals.cancelMultipleSelection.dispatch();
 
 				}
 
