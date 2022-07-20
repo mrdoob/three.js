@@ -14,13 +14,9 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> -
-			Ground projected environment mapping. By
-			<a href="https://twitter.com/CantBeFaraz" target="_blank" rel="noopener"
-				>Faraz Shaikh</a
-			>.
-			<br> 
-			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Ground projected environment mapping. By <a href="https://twitter.com/CantBeFaraz" target="_blank" rel="noopener">Faraz Shaikh</a>.<br> 
+			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a><br>
+			<a href="https://polyhaven.com/a/blouberg_sunrise_2" target="_blank" rel="noopener">Blouberg Sunrise 2</a> by <a href="https://gregzaal.com/" target="_blank" rel="noopener">Greg Zaal</a>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -48,6 +44,7 @@
 			import { GroundProjectedEnv } from './jsm/objects/GroundProjectedEnv.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			const params = {
 				height: 34,
@@ -57,10 +54,9 @@
 
 			let camera, scene, renderer, stats, env;
 
-			init();
-			animate();
+			init().then( animate );
 
-			function init() {
+			async function init() {
 
 				camera = new THREE.PerspectiveCamera(
 					45,
@@ -72,24 +68,15 @@
 
 				scene = new THREE.Scene();
 
-				const cubeLoader = new THREE.CubeTextureLoader();
-				cubeLoader.setPath( 'textures/cube/lake/' );
+				const hdrLoader = new RGBELoader();
+				const envMap = await hdrLoader.loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' );
+				envMap.mapping = THREE.EquirectangularReflectionMapping;
 
-				const textureCube = cubeLoader.load( [
-					'px.png',
-					'nx.png',
-					'py.png',
-					'ny.png',
-					'pz.png',
-					'nz.png',
-				] );
-				textureCube.encoding = THREE.sRGBEncoding;
-
-				env = new GroundProjectedEnv( textureCube );
+				env = new GroundProjectedEnv( envMap );
 				env.scale.setScalar( 100 );
 				scene.add( env );
 
-				scene.environment = textureCube;
+				scene.environment = envMap;
 
 				const dracoLoader = new DRACOLoader();
 				dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
@@ -149,9 +136,9 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.85;
 			
 				//
 			
