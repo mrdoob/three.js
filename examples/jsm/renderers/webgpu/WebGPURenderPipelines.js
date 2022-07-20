@@ -153,7 +153,8 @@ class WebGPURenderPipelines {
 			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
 			this.sampleCount,
-			renderer.getCurrentEncoding(), renderer.getCurrentColorFormat(), renderer.getCurrentDepthStencilFormat()
+			renderer.getCurrentEncoding(), renderer.getCurrentColorFormat(), renderer.getCurrentDepthStencilFormat(),
+			renderer.getPrimitiveTopology( object )
 		];
 
 		return parameters.join();

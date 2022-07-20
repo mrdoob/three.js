@@ -1,4 +1,4 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
+import { GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
 import {
 	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
@@ -430,7 +430,7 @@ class WebGPURenderPipeline {
 
 		const descriptor = {};
 
-		descriptor.topology = this._getPrimitiveTopology( object );
+		descriptor.topology = this._renderer.getPrimitiveTopology( object );
 
 		if ( object.isLine === true && object.isLineSegments !== true ) {
 
@@ -464,15 +464,6 @@ class WebGPURenderPipeline {
 		}
 
 		return descriptor;
-
-	}
-
-	_getPrimitiveTopology( object ) {
-
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
