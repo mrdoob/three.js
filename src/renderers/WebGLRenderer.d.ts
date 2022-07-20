@@ -322,6 +322,7 @@ export class WebGLRenderer implements Renderer {
      * @deprecated Use {@link WebGLState#reset .state.reset()} instead.
      */
     resetGLState(): void;
+    getTextureEncodingFromMap(map: Texture): TextureEncoding;
     dispose(): void;
 
     renderBufferDirect(
