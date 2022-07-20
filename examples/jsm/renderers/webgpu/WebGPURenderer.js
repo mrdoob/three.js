@@ -1,4 +1,4 @@
-import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp } from './constants.js';
+import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp, GPUPrimitiveTopology } from './constants.js';
 import WebGPUObjects from './WebGPUObjects.js';
 import WebGPUAttributes from './WebGPUAttributes.js';
 import WebGPUGeometries from './WebGPUGeometries.js';
@@ -528,6 +528,15 @@ class WebGPURenderer {
 		}
 
 		return format;
+
+	}
+
+	getPrimitiveTopology( object ) {
+
+		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
+		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
+		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
+		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
