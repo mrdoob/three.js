@@ -11,7 +11,7 @@ import {
 
 class WebGPURenderPipeline {
 
-	constructor( device, renderer, sampleCount ) {
+	constructor( device, config ) {
 
 		this.cacheKey = null;
 		this.shaderAttributes = null;
@@ -20,8 +20,7 @@ class WebGPURenderPipeline {
 		this.usedTimes = 0;
 
 		this._device = device;
-		this._renderer = renderer;
-		this._sampleCount = sampleCount;
+		this._config = config;
 
 	}
 
@@ -89,8 +88,9 @@ class WebGPURenderPipeline {
 		const primitiveState = this._getPrimitiveState( object, material );
 		const colorWriteMask = this._getColorWriteMask( material );
 		const depthCompare = this._getDepthCompare( material );
-		const colorFormat = this._renderer.getCurrentColorFormat();
-		const depthStencilFormat = this._renderer.getCurrentDepthStencilFormat();
+		const colorFormat = this._config.getCurrentColorFormat();
+		const depthStencilFormat = this._config.getCurrentDepthStencilFormat();
+		const sampleCount = this._config.getSampleCount();
 
 		this.pipeline = this._device.createRenderPipeline( {
 			vertex: Object.assign( {}, stageVertex.stage, { buffers: vertexBuffers } ),
@@ -113,7 +113,7 @@ class WebGPURenderPipeline {
 				stencilWriteMask: material.stencilWriteMask
 			},
 			multisample: {
-				count: this._sampleCount
+				count: sampleCount
 			},
 			layout: 'auto'
 		} );
@@ -430,7 +430,7 @@ class WebGPURenderPipeline {
 
 		const descriptor = {};
 
-		descriptor.topology = this._renderer.getPrimitiveTopology( object );
+		descriptor.topology = this._config.getPrimitiveTopology( object );
 
 		if ( object.isLine === true && object.isLineSegments !== true ) {
 
