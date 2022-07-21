@@ -12,7 +12,7 @@ const _endEvent = { type: 'end' };
 
 class TrackballControls extends EventDispatcher {
 
-	constructor( object, domElement ) {
+	constructor( object, domElement, multiTouchRotate = false ) {
 
 		super();
 
@@ -21,6 +21,8 @@ class TrackballControls extends EventDispatcher {
 
 		const scope = this;
 		const STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
+
+		this.multiTouchRotate = multiTouchRotate;
 
 		this.object = object;
 		this.domElement = domElement;
@@ -159,7 +161,7 @@ class TrackballControls extends EventDispatcher {
 				moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
 				let angle = moveDirection.length();
 
-				if ( _state === STATE.TOUCH_ZOOM_PAN ) {
+				if ( this.multiTouchRotate && _state === STATE.TOUCH_ZOOM_PAN ) {
 
 					_touchRotationAngleDelta = _touchRotationAngleNew - _touchRotationAnglePrev;
 					_touchRotationAnglePrev = _touchRotationAngleNew;
