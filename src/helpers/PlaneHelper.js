@@ -12,7 +12,7 @@ class PlaneHelper extends Line {
 
 		const color = hex;
 
-		const positions = [ 1, - 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 ];
+		const positions = [ 1, - 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0, 1, 1, 0 ];
 
 		const geometry = new BufferGeometry();
 		geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
@@ -26,7 +26,7 @@ class PlaneHelper extends Line {
 
 		this.size = size;
 
-		const positions2 = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, - 1, 1, 1, - 1, 1 ];
+		const positions2 = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
 
 		const geometry2 = new BufferGeometry();
 		geometry2.setAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
@@ -38,15 +38,13 @@ class PlaneHelper extends Line {
 
 	updateMatrixWorld( force ) {
 
-		let scale = - this.plane.constant;
+		this.position.set( 0, 0, 0 );
 
-		if ( Math.abs( scale ) < 1e-8 ) scale = 1e-8; // sign does not matter
-
-		this.scale.set( 0.5 * this.size, 0.5 * this.size, scale );
-
-		this.children[ 0 ].material.side = ( scale < 0 ) ? BackSide : FrontSide; // renderer flips side when determinant < 0; flipping not wanted here
+		this.scale.set( 0.5 * this.size, 0.5 * this.size, 1 );
 
 		this.lookAt( this.plane.normal );
+
+		this.translateZ( - this.plane.constant );
 
 		super.updateMatrixWorld( force );
 
