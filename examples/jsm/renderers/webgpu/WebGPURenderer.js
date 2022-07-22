@@ -1,4 +1,4 @@
-import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp, GPUPrimitiveTopology } from './constants.js';
+import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp } from './constants.js';
 import WebGPUObjects from './WebGPUObjects.js';
 import WebGPUAttributes from './WebGPUAttributes.js';
 import WebGPUGeometries from './WebGPUGeometries.js';
@@ -12,6 +12,7 @@ import WebGPURenderStates from './WebGPURenderStates.js';
 import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
+import WebGPUUtils from './WebGPUUtils.js';
 
 import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
 
@@ -187,9 +188,10 @@ class WebGPURenderer {
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
+		this._utils = new WebGPUUtils( this );
 		this._nodes = new WebGPUNodes( this, this._properties );
 		this._computePipelines = new WebGPUComputePipelines( device, this._nodes );
-		this._renderPipelines = new WebGPURenderPipelines( this, device, parameters.sampleCount, this._nodes );
+		this._renderPipelines = new WebGPURenderPipelines( device, this._nodes, this._utils );
 		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
 		this._renderLists = new WebGPURenderLists();
 		this._renderStates = new WebGPURenderStates();
@@ -479,64 +481,6 @@ class WebGPURenderer {
 			};
 
 		}
-
-	}
-
-	getCurrentEncoding() {
-
-		const renderTarget = this.getRenderTarget();
-		return ( renderTarget !== null ) ? renderTarget.texture.encoding : this.outputEncoding;
-
-	}
-
-	getCurrentColorFormat() {
-
-		let format;
-
-		const renderTarget = this.getRenderTarget();
-
-		if ( renderTarget !== null ) {
-
-			const renderTargetProperties = this._properties.get( renderTarget );
-			format = renderTargetProperties.colorTextureFormat;
-
-		} else {
-
-			format = GPUTextureFormat.BGRA8Unorm; // default context format
-
-		}
-
-		return format;
-
-	}
-
-	getCurrentDepthStencilFormat() {
-
-		let format;
-
-		const renderTarget = this.getRenderTarget();
-
-		if ( renderTarget !== null ) {
-
-			const renderTargetProperties = this._properties.get( renderTarget );
-			format = renderTargetProperties.depthTextureFormat;
-
-		} else {
-
-			format = GPUTextureFormat.Depth24PlusStencil8;
-
-		}
-
-		return format;
-
-	}
-
-	getPrimitiveTopology( object ) {
-
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
