@@ -1,6 +1,6 @@
 import { GPUPrimitiveTopology, GPUTextureFormat } from './constants.js';
 
-class WebGPUConfig {
+class WebGPUUtils {
 
 	constructor( renderer ) {
 
@@ -78,4 +78,4 @@ class WebGPUConfig {
 
 }
 
-export default WebGPUConfig;
+export default WebGPUUtils;

@@ -3,11 +3,11 @@ import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
 
 class WebGPURenderPipelines {
 
-	constructor( device, nodes, config ) {
+	constructor( device, nodes, utils ) {
 
 		this.device = device;
 		this.nodes = nodes;
-		this.config = config;
+		this.utils = utils;
 
 		this.bindings = null;
 
@@ -125,7 +125,7 @@ class WebGPURenderPipelines {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = new WebGPURenderPipeline( this.device, this.config );
+			pipeline = new WebGPURenderPipeline( this.device, this.utils );
 			pipeline.init( cacheKey, stageVertex, stageFragment, object, nodeBuilder );
 
 			pipelines.push( pipeline );
@@ -139,7 +139,7 @@ class WebGPURenderPipelines {
 	_computeCacheKey( stageVertex, stageFragment, object ) {
 
 		const material = object.material;
-		const config = this.config;
+		const utils = this.utils;
 
 		const parameters = [
 			stageVertex.id, stageFragment.id,
@@ -152,9 +152,9 @@ class WebGPURenderPipelines {
 			material.stencilFail, material.stencilZFail, material.stencilZPass,
 			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
-			config.getSampleCount(),
-			config.getCurrentEncoding(), config.getCurrentColorFormat(), config.getCurrentDepthStencilFormat(),
-			config.getPrimitiveTopology( object )
+			utils.getSampleCount(),
+			utils.getCurrentEncoding(), utils.getCurrentColorFormat(), utils.getCurrentDepthStencilFormat(),
+			utils.getPrimitiveTopology( object )
 		];
 
 		return parameters.join();
@@ -268,12 +268,12 @@ class WebGPURenderPipelines {
 
 		// check renderer state
 
-		const config = this.config;
+		const utils = this.utils;
 
-		const sampleCount = config.getSampleCount();
-		const encoding = config.getCurrentEncoding();
-		const colorFormat = config.getCurrentColorFormat();
-		const depthStencilFormat = config.getCurrentDepthStencilFormat();
+		const sampleCount = utils.getSampleCount();
+		const encoding = utils.getCurrentEncoding();
+		const colorFormat = utils.getCurrentColorFormat();
+		const depthStencilFormat = utils.getCurrentDepthStencilFormat();
 
 		if ( cache.sampleCount !== sampleCount || cache.encoding !== encoding ||
 			cache.colorFormat !== colorFormat || cache.depthStencilFormat !== depthStencilFormat ) {

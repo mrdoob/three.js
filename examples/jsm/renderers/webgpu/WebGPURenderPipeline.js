@@ -11,7 +11,7 @@ import {
 
 class WebGPURenderPipeline {
 
-	constructor( device, config ) {
+	constructor( device, utils ) {
 
 		this.cacheKey = null;
 		this.shaderAttributes = null;
@@ -20,7 +20,7 @@ class WebGPURenderPipeline {
 		this.usedTimes = 0;
 
 		this._device = device;
-		this._config = config;
+		this._utils = utils;
 
 	}
 
@@ -88,9 +88,9 @@ class WebGPURenderPipeline {
 		const primitiveState = this._getPrimitiveState( object, material );
 		const colorWriteMask = this._getColorWriteMask( material );
 		const depthCompare = this._getDepthCompare( material );
-		const colorFormat = this._config.getCurrentColorFormat();
-		const depthStencilFormat = this._config.getCurrentDepthStencilFormat();
-		const sampleCount = this._config.getSampleCount();
+		const colorFormat = this._utils.getCurrentColorFormat();
+		const depthStencilFormat = this._utils.getCurrentDepthStencilFormat();
+		const sampleCount = this._utils.getSampleCount();
 
 		this.pipeline = this._device.createRenderPipeline( {
 			vertex: Object.assign( {}, stageVertex.stage, { buffers: vertexBuffers } ),
@@ -430,7 +430,7 @@ class WebGPURenderPipeline {
 
 		const descriptor = {};
 
-		descriptor.topology = this._config.getPrimitiveTopology( object );
+		descriptor.topology = this._utils.getPrimitiveTopology( object );
 
 		if ( object.isLine === true && object.isLineSegments !== true ) {
 

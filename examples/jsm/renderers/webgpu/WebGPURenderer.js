@@ -12,7 +12,7 @@ import WebGPURenderStates from './WebGPURenderStates.js';
 import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
-import WebGPUConfig from './WebGPUConfig.js';
+import WebGPUUtils from './WebGPUUtils.js';
 
 import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
 
@@ -188,10 +188,10 @@ class WebGPURenderer {
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
-		this._config = new WebGPUConfig( this );
+		this._utils = new WebGPUUtils( this );
 		this._nodes = new WebGPUNodes( this, this._properties );
 		this._computePipelines = new WebGPUComputePipelines( device, this._nodes );
-		this._renderPipelines = new WebGPURenderPipelines( device, this._nodes, this._config );
+		this._renderPipelines = new WebGPURenderPipelines( device, this._nodes, this._utils );
 		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
 		this._renderLists = new WebGPURenderLists();
 		this._renderStates = new WebGPURenderStates();
