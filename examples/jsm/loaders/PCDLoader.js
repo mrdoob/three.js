@@ -2,6 +2,7 @@ import {
 	BufferGeometry,
 	FileLoader,
 	Float32BufferAttribute,
+	Int32BufferAttribute,
 	Loader,
 	LoaderUtils,
 	Points,
@@ -230,6 +231,7 @@ class PCDLoader extends Loader {
 		const normal = [];
 		const color = [];
 		const intensity = [];
+		const label = [];
 
 		// ascii
 
@@ -289,6 +291,12 @@ class PCDLoader extends Loader {
 				if ( offset.intensity !== undefined ) {
 
 					intensity.push( parseFloat( line[ offset.intensity ] ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					label.push( parseInt( line[ offset.label ] ) );
 
 				}
 
@@ -352,6 +360,12 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.label !== undefined ) {
+
+					const labelIndex = PCDheader.fields.indexOf( 'label' );
+					label.push( dataview.getInt32( ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, this.littleEndian ) );
+
+				}
 
 			}
 
@@ -396,6 +410,12 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.label !== undefined ) {
+
+					label.push( dataview.getInt32( row + offset.label, this.littleEndian ) );
+
+				}
+
 			}
 
 		}
@@ -408,6 +428,7 @@ class PCDLoader extends Loader {
 		if ( normal.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal, 3 ) );
 		if ( color.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
 		if ( intensity.length > 0 ) geometry.setAttribute( 'intensity', new Float32BufferAttribute( intensity, 1 ) );
+		if ( label.length > 0 ) geometry.setAttribute( 'label', new Int32BufferAttribute( label, 1 ) );
 
 		geometry.computeBoundingSphere();
 
