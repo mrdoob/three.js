@@ -507,6 +507,12 @@ function WebGLMaterials( renderer, properties ) {
 		uniforms.roughness.value = material.roughness;
 		uniforms.metalness.value = material.metalness;
 
+		if ( material.occlusionMetalRoughnessMap ) {
+
+			uniforms.occlusionMetalRoughnessMap.value = material.occlusionMetalRoughnessMap;
+
+		}
+
 		if ( material.roughnessMap ) {
 
 			uniforms.roughnessMap.value = material.roughnessMap;
