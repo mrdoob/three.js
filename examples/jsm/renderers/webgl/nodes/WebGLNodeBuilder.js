@@ -14,7 +14,8 @@ const nodeShaderLib = {
 	LineBasicNodeMaterial: ShaderLib.basic,
 	MeshBasicNodeMaterial: ShaderLib.basic,
 	PointsNodeMaterial: ShaderLib.points,
-	MeshStandardNodeMaterial: ShaderLib.standard
+	MeshStandardNodeMaterial: ShaderLib.standard,
+	MeshPhysicalMaterial: ShaderLib.physical
 };
 
 function getIncludeSnippet( name ) {
@@ -70,7 +71,8 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		// shader lib
 
-		if ( material.isMeshStandardNodeMaterial ) type = 'MeshStandardNodeMaterial';
+		if ( material.isMeshPhysicalNodeMaterial ) type = 'MeshPhysicalMaterial';
+		else if ( material.isMeshStandardNodeMaterial ) type = 'MeshStandardNodeMaterial';
 		else if ( material.isMeshBasicNodeMaterial ) type = 'MeshBasicNodeMaterial';
 		else if ( material.isPointsNodeMaterial ) type = 'PointsNodeMaterial';
 		else if ( material.isLineBasicNodeMaterial ) type = 'LineBasicNodeMaterial';
@@ -130,15 +132,31 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
-		if ( material.clearcoatNode && material.clearcoatNode.isNode ) {
+		if ( material.isMeshPhysicalNodeMaterial ) {
 
-			this.addSlot( 'fragment', new SlotNode( material.clearcoatNode, 'CLEARCOAT', 'float' ) );
+			if ( material.clearcoatNode && material.clearcoatNode.isNode ) {
 
-		}
+				this.addSlot( 'fragment', new SlotNode( material.clearcoatNode, 'CLEARCOAT', 'float' ) );
 
-		if ( material.clearcoatRoughnessNode && material.clearcoatRoughnessNode.isNode ) {
+				if ( material.clearcoatRoughnessNode && material.clearcoatRoughnessNode.isNode ) {
 
-			this.addSlot( 'fragment', new SlotNode( material.clearcoatRoughnessNode, 'CLEARCOAT_ROUGHNESS', 'float' ) );
+					this.addSlot( 'fragment', new SlotNode( material.clearcoatRoughnessNode, 'CLEARCOAT_ROUGHNESS', 'float' ) );
+
+				}
+
+				if ( material.clearcoatNormalNode && material.clearcoatNormalNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( material.clearcoatNormalNode, 'CLEARCOAT_NORMAL', 'vec3' ) );
+
+				}
+
+				material.defines.USE_CLEARCOAT = '';
+
+			} else {
+
+				delete material.defines.USE_CLEARCOAT;
+
+			}
 
 		}
 
@@ -250,9 +268,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			const attributes = this.attributes;
 
-			for ( let index = 0; index < attributes.length; index ++ ) {
-
-				const attribute = attributes[ index ];
+			for ( const attribute of attributes ) {
 
 				// ignore common attributes to prevent redefinitions
 				if ( attribute.name === 'uv' || attribute.name === 'position' || attribute.name === 'normal' )
@@ -274,9 +290,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		const varys = this.varys;
 
-		for ( let index = 0; index < varys.length; index ++ ) {
-
-			const vary = varys[ index ];
+		for ( const vary of varys ) {
 
 			snippet += `varying ${vary.type} ${vary.name}; `;
 
@@ -319,7 +333,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		const shaderProperty = getShaderStageProperty( shaderStage );
 
-		this.shader[ shaderProperty ] = this.shader[ shaderProperty ].replaceAll( source, target );
+		this[ shaderProperty ] = this[ shaderProperty ].replaceAll( source, target );
 
 	}
 
@@ -433,6 +447,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 	_addSnippets() {
 
 		this.parseInclude( 'fragment', 'lights_physical_fragment' );
+		this.parseInclude( 'fragment', 'clearcoat_normal_fragment_begin' );
 
 		const colorSlot = this.getSlot( 'fragment', 'COLOR' );
 		const opacityNode = this.getSlot( 'fragment', 'OPACITY' );
@@ -442,6 +457,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 		const metalnessNode = this.getSlot( 'fragment', 'METALNESS' );
 		const clearcoatNode = this.getSlot( 'fragment', 'CLEARCOAT' );
 		const clearcoatRoughnessNode = this.getSlot( 'fragment', 'CLEARCOAT_ROUGHNESS' );
+		const clearcoatNormalNode = this.getSlot( 'fragment', 'CLEARCOAT_NORMAL' );
 		const iridescenceNode = this.getSlot( 'fragment', 'IRIDESCENCE' );
 		const iridescenceIORNode = this.getSlot( 'fragment', 'IRIDESCENCE_IOR' );
 		const iridescenceThicknessNode = this.getSlot( 'fragment', 'IRIDESCENCE_THICKNESS' );
@@ -513,7 +529,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 			this.addCodeAfterSnippet(
 				'fragment',
-				'material.clearcoatRoughness = clearcoatRoughness;',
+				'material.clearcoat = clearcoat;',
 				`${clearcoatNode.code}\n\tmaterial.clearcoat = ${clearcoatNode.result};`
 			);
 
@@ -529,9 +545,19 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		}
 
-		if ( iridescenceNode !== undefined ) {
+		if ( clearcoatNormalNode !== undefined ) {
 
 			this.addCodeAfterSnippet(
+				'fragment',
+				'vec3 clearcoatNormal = geometryNormal;',
+				`${clearcoatNormalNode.code}\n\tclearcoatNormal = ${clearcoatNormalNode.result};`
+			);
+
+		}
+
+		if ( iridescenceNode !== undefined ) {
+
+			this.addCodeAfterInclude(
 				'fragment',
 				'iridescence_fragment',
 				`${iridescenceNode.code}\n\tmaterial.iridescence = ${iridescenceNode.result};`
@@ -541,7 +567,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		if ( iridescenceIORNode !== undefined ) {
 
-			this.addCodeAfterSnippet(
+			this.addCodeAfterInclude(
 				'fragment',
 				'iridescence_fragment',
 				`${iridescenceIORNode.code}\n\tmaterial.iridescenceIOR = ${iridescenceIORNode.result};`
@@ -551,7 +577,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		if ( iridescenceThicknessNode !== undefined ) {
 
-			this.addCodeAfterSnippet(
+			this.addCodeAfterInclude(
 				'fragment',
 				'iridescence_fragment',
 				`${iridescenceThicknessNode.code}\n\tmaterial.iridescenceThickness = ${iridescenceThicknessNode.result};`

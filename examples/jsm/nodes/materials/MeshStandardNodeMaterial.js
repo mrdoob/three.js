@@ -35,9 +35,6 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 		this.metalnessNode = null;
 		this.roughnessNode = null;
 
-		this.clearcoatNode = null;
-		this.clearcoatRoughnessNode = null;
-
 		this.envNode = null;
 
 		this.lightsNode = null;
@@ -157,9 +154,6 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		this.metalnessNode = source.metalnessNode;
 		this.roughnessNode = source.roughnessNode;
-
-		this.clearcoatNode = source.clearcoatNode;
-		this.clearcoatRoughnessNode = source.clearcoatRoughnessNode;
 
 		this.envNode = source.envNode;
 
