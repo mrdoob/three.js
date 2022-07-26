@@ -229,6 +229,7 @@
 	],
 	"webgl / nodes": [
 		"webgl_materials_instance_uniform_nodes",
+		"webgl_materials_physical_clearcoat_nodes",
 		"webgl_materials_standard_nodes",
 		"webgl_nodes_playground",
 		"webgl_points_nodes"
