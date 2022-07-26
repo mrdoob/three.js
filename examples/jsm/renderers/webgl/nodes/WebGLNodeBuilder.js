@@ -268,9 +268,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			const attributes = this.attributes;
 
-			for ( let index = 0; index < attributes.length; index ++ ) {
-
-				const attribute = attributes[ index ];
+			for ( const attribute of attributes ) {
 
 				// ignore common attributes to prevent redefinitions
 				if ( attribute.name === 'uv' || attribute.name === 'position' || attribute.name === 'normal' )
@@ -292,9 +290,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		const varys = this.varys;
 
-		for ( let index = 0; index < varys.length; index ++ ) {
-
-			const vary = varys[ index ];
+		for ( const vary of varys ) {
 
 			snippet += `varying ${vary.type} ${vary.name}; `;
 
