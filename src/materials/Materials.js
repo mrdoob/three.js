@@ -6,6 +6,7 @@ export { PointsMaterial } from './PointsMaterial.js';
 export { MeshPhysicalMaterial } from './MeshPhysicalMaterial.js';
 export { MeshStandardMaterial } from './MeshStandardMaterial.js';
 export { MeshPhongMaterial } from './MeshPhongMaterial.js';
+export { MeshNoTonePhongMaterial } from './MeshNoTonePhongMaterial.js';
 export { MeshToonMaterial } from './MeshToonMaterial.js';
 export { MeshNormalMaterial } from './MeshNormalMaterial.js';
 export { MeshLambertMaterial } from './MeshLambertMaterial.js';

@@ -6,6 +6,7 @@ export * from './PointsMaterial';
 export * from './MeshPhysicalMaterial';
 export * from './MeshStandardMaterial';
 export * from './MeshPhongMaterial';
+export * from './MeshNoTonePhongMaterial';
 export * from './MeshToonMaterial';
 export * from './MeshNormalMaterial';
 export * from './MeshLambertMaterial';
