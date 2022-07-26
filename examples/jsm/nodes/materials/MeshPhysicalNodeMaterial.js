@@ -16,8 +16,10 @@ export default class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.clearcoatRoughnessNode = null;
 		this.clearcoatNormalNode = null;
 
+		this.sheen = 0;
 		this.clearcoat = 0;
 		this.iridescence = 0;
+		this.transmission = 0;
 
 		this.setDefaultValues( defaultValues );
 
