@@ -158,6 +158,24 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			}
 
+			if ( material.sheenNode && material.sheenNode.isNode ) {
+
+				this.addSlot( 'fragment', new SlotNode( material.sheenNode, 'SHEEN', 'vec3' ) );
+
+				if ( material.sheenRoughnessNode && material.sheenRoughnessNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( material.sheenRoughnessNode, 'SHEEN_ROUGHNESS', 'float' ) );
+
+				}
+
+				material.defines.USE_SHEEN = '';
+
+			} else {
+
+				delete material.defines.USE_SHEEN;
+
+			}
+
 		}
 
 		if ( material.iridescenceNode && material.iridescenceNode.isNode ) {
@@ -458,6 +476,8 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 		const clearcoatNode = this.getSlot( 'fragment', 'CLEARCOAT' );
 		const clearcoatRoughnessNode = this.getSlot( 'fragment', 'CLEARCOAT_ROUGHNESS' );
 		const clearcoatNormalNode = this.getSlot( 'fragment', 'CLEARCOAT_NORMAL' );
+		const sheenNode = this.getSlot( 'fragment', 'SHEEN' );
+		const sheenRoughnessNode = this.getSlot( 'fragment', 'SHEEN_ROUGHNESS' );
 		const iridescenceNode = this.getSlot( 'fragment', 'IRIDESCENCE' );
 		const iridescenceIORNode = this.getSlot( 'fragment', 'IRIDESCENCE_IOR' );
 		const iridescenceThicknessNode = this.getSlot( 'fragment', 'IRIDESCENCE_THICKNESS' );
@@ -533,25 +553,45 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 				`${clearcoatNode.code}\n\tmaterial.clearcoat = ${clearcoatNode.result};`
 			);
 
+			if ( clearcoatRoughnessNode !== undefined ) {
+
+				this.addCodeAfterSnippet(
+					'fragment',
+					'material.clearcoatRoughness = clearcoatRoughness;',
+					`${clearcoatRoughnessNode.code}\n\tmaterial.clearcoatRoughness = ${clearcoatRoughnessNode.result};`
+				);
+
+			}
+
+			if ( clearcoatNormalNode !== undefined ) {
+
+				this.addCodeAfterSnippet(
+					'fragment',
+					'vec3 clearcoatNormal = geometryNormal;',
+					`${clearcoatNormalNode.code}\n\tclearcoatNormal = ${clearcoatNormalNode.result};`
+				);
+
+			}
+
 		}
 
-		if ( clearcoatRoughnessNode !== undefined ) {
+		if ( sheenNode !== undefined ) {
 
 			this.addCodeAfterSnippet(
 				'fragment',
-				'material.clearcoatRoughness = clearcoatRoughness;',
-				`${clearcoatRoughnessNode.code}\n\tmaterial.clearcoatRoughness = ${clearcoatRoughnessNode.result};`
+				'material.sheenColor = sheenColor;',
+				`${sheenNode.code}\n\tmaterial.sheenColor = ${sheenNode.result};`
 			);
 
-		}
+			if ( sheenRoughnessNode !== undefined ) {
 
-		if ( clearcoatNormalNode !== undefined ) {
+				this.replaceCode(
+					'fragment',
+					'material.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );',
+					`${sheenRoughnessNode.code}\n\tmaterial.sheenRoughness = clamp( ${sheenRoughnessNode.result}, 0.07, 1.0 );`
+				);
 
-			this.addCodeAfterSnippet(
-				'fragment',
-				'vec3 clearcoatNormal = geometryNormal;',
-				`${clearcoatNormalNode.code}\n\tclearcoatNormal = ${clearcoatNormalNode.result};`
-			);
+			}
 
 		}
 
