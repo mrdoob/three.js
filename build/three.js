@@ -6260,7 +6260,7 @@
 					}
 				}
 
-				if (this.environment && this.environment.isTexture) {
+				if (this.environment && this.environment.isTexture && this.environment.isRenderTargetTexture !== true) {
 					object.environment = this.environment.toJSON(meta).uuid;
 				}
 			} else if (this.isMesh || this.isLine || this.isPoints) {
