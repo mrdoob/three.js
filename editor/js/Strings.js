@@ -332,9 +332,9 @@ function Strings( config ) {
 			'toolbar/rotate': 'Rotate',
 			'toolbar/scale': 'Scale',
 			'toolbar/local': 'Local',
-			'toolbar/toggle-multiple-selection': 'Toggle multiple selection',
-			'toolbar/submit-multiple-selection': 'Submit multiple selection',
-			'toolbar/cancel-multiple-selection': 'Cancel multiple selection',
+			'toolbar/toggle-multiple-selection': 'Toggle Multiple Selection',
+			'toolbar/submit-multiple-selection': 'Submit Multiple Selection',
+			'toolbar/cancel-multiple-selection': 'Cancel Multiple Selection',
 
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
