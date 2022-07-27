@@ -8,6 +8,7 @@ function MenubarFile( editor ) {
 
 	const config = editor.config;
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIPanel();
 	container.setClass( 'menu' );
@@ -480,6 +481,19 @@ function MenubarFile( editor ) {
 
 	} );
 	options.add( option );
+
+	// Exit
+	option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/exit' ) );
+	option.onClick( function () {
+
+		signals.editorClosed.dispatch();
+
+	} );
+
+	options.add( option );
+
 
 	//
 

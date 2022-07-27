@@ -23,6 +23,7 @@ function Strings( config ) {
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
 			'menubar/file/export/usdz': 'Export USDZ',
 			'menubar/file/publish': 'Publish',
+			'menubar/file/exit': 'Exit',
 
 			'menubar/edit': 'Edit',
 			'menubar/edit/undo': 'Undo (Ctrl+Z)',
@@ -361,6 +362,7 @@ function Strings( config ) {
 			'menubar/file/export/stl_binary': 'Exporter STL (Binaire)',
 			'menubar/file/export/usdz': 'Exporter USDZ',
 			'menubar/file/publish': 'Publier',
+			'menubar/file/exit': 'Quitter',
 
 			'menubar/edit': 'Edition',
 			'menubar/edit/undo': 'Annuler (Ctrl+Z)',
@@ -699,6 +701,7 @@ function Strings( config ) {
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
 			'menubar/file/export/usdz': '导出USDZ',
 			'menubar/file/publish': '发布',
+			'menubar/file/exit': '退出',
 
 			'menubar/edit': '编辑',
 			'menubar/edit/undo': '撤销 (Ctrl+Z)',

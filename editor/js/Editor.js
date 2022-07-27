@@ -46,6 +46,7 @@ function Editor( providedDefaultCamera ) {
 		// notifications
 
 		editorCleared: new Signal(),
+		editorClosed: new Signal(),
 
 		savingStarted: new Signal(),
 		savingFinished: new Signal(),
