@@ -28497,7 +28497,7 @@
 
 	}
 
-	const DefaultLoadingManager = new LoadingManager();
+	const DefaultLoadingManager = /*@__PURE__*/new LoadingManager();
 
 	class Loader {
 		constructor(manager) {
@@ -28548,6 +28548,14 @@
 	}
 
 	const loading = {};
+
+	class HttpError extends Error {
+		constructor(message, response) {
+			super(message);
+			this.response = response;
+		}
+
+	}
 
 	class FileLoader extends Loader {
 		constructor(manager) {
@@ -28650,7 +28658,7 @@
 					});
 					return new Response(stream);
 				} else {
-					throw Error(`fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`);
+					throw new HttpError(`fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`, response);
 				}
 			}).then(response => {
 				switch (responseType) {
@@ -33041,7 +33049,7 @@
 
 	}
 
-	const _controlInterpolantsResultBuffer = /*@__PURE__*/new Float32Array(1);
+	const _controlInterpolantsResultBuffer = new Float32Array(1);
 
 	class AnimationMixer extends EventDispatcher {
 		constructor(root) {
@@ -34887,7 +34895,7 @@
 	class PlaneHelper extends Line {
 		constructor(plane, size = 1, hex = 0xffff00) {
 			const color = hex;
-			const positions = [1, -1, 1, -1, 1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0];
+			const positions = [1, -1, 0, -1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0, 1, 1, 0];
 			const geometry = new BufferGeometry();
 			geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
 			geometry.computeBoundingSphere();
@@ -34898,7 +34906,7 @@
 			this.type = 'PlaneHelper';
 			this.plane = plane;
 			this.size = size;
-			const positions2 = [1, 1, 1, -1, 1, 1, -1, -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, 1];
+			const positions2 = [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, 1, 0, -1, -1, 0, 1, -1, 0];
 			const geometry2 = new BufferGeometry();
 			geometry2.setAttribute('position', new Float32BufferAttribute(positions2, 3));
 			geometry2.computeBoundingSphere();
@@ -34912,13 +34920,10 @@
 		}
 
 		updateMatrixWorld(force) {
-			let scale = -this.plane.constant;
-			if (Math.abs(scale) < 1e-8) scale = 1e-8; // sign does not matter
-
-			this.scale.set(0.5 * this.size, 0.5 * this.size, scale);
-			this.children[0].material.side = scale < 0 ? BackSide : FrontSide; // renderer flips side when determinant < 0; flipping not wanted here
-
+			this.position.set(0, 0, 0);
+			this.scale.set(0.5 * this.size, 0.5 * this.size, 1);
 			this.lookAt(this.plane.normal);
+			this.translateZ(-this.plane.constant);
 			super.updateMatrixWorld(force);
 		}
 
@@ -35242,15 +35247,7 @@
 
 	}
 
-	const {
-		floatView: _floatView,
-		uint32View: _uint32View,
-		baseTable: _baseTable,
-		shiftTable: _shiftTable,
-		mantissaTable: _mantissaTable,
-		exponentTable: _exponentTable,
-		offsetTable: _offsetTable
-	} = /*@__PURE__*/_generateTables();
+	const _tables = /*@__PURE__*/_generateTables();
 
 	function _generateTables() {
 		// float32 to float16 helpers
@@ -35352,17 +35349,17 @@
 	function toHalfFloat(val) {
 		if (Math.abs(val) > 65504) console.warn('THREE.DataUtils.toHalfFloat(): Value out of range.');
 		val = clamp(val, -65504, 65504);
-		_floatView[0] = val;
-		const f = _uint32View[0];
+		_tables.floatView[0] = val;
+		const f = _tables.uint32View[0];
 		const e = f >> 23 & 0x1ff;
-		return _baseTable[e] + ((f & 0x007fffff) >> _shiftTable[e]);
+		return _tables.baseTable[e] + ((f & 0x007fffff) >> _tables.shiftTable[e]);
 	} // float16 to float32
 
 
 	function fromHalfFloat(val) {
 		const m = val >> 10;
-		_uint32View[0] = _mantissaTable[_offsetTable[m] + (val & 0x3ff)] + _exponentTable[m];
-		return _floatView[0];
+		_tables.uint32View[0] = _tables.mantissaTable[_tables.offsetTable[m] + (val & 0x3ff)] + _tables.exponentTable[m];
+		return _tables.floatView[0];
 	}
 
 	var DataUtils = /*#__PURE__*/Object.freeze({

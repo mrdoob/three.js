@@ -12820,6 +12820,7 @@ class PlaneGeometry extends BufferGeometry {
 	constructor( width = 1, height = 1, widthSegments = 1, heightSegments = 1 ) {
 
 		super();
+
 		this.type = 'PlaneGeometry';
 
 		this.parameters = {
@@ -33153,6 +33154,7 @@ class CylinderGeometry extends BufferGeometry {
 	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
+
 		this.type = 'CylinderGeometry';
 
 		this.parameters = {
@@ -33819,6 +33821,7 @@ class EdgesGeometry extends BufferGeometry {
 	constructor( geometry = null, thresholdAngle = 1 ) {
 
 		super();
+
 		this.type = 'EdgesGeometry';
 
 		this.parameters = {
@@ -35899,6 +35902,7 @@ class ShapeGeometry extends BufferGeometry {
 	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
 
 		super();
+
 		this.type = 'ShapeGeometry';
 
 		this.parameters = {
@@ -36076,6 +36080,7 @@ class SphereGeometry extends BufferGeometry {
 	constructor( radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
 
 		super();
+
 		this.type = 'SphereGeometry';
 
 		this.parameters = {
@@ -36228,6 +36233,7 @@ class TorusGeometry extends BufferGeometry {
 	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
 
 		super();
+
 		this.type = 'TorusGeometry';
 
 		this.parameters = {
@@ -36332,6 +36338,7 @@ class TorusKnotGeometry extends BufferGeometry {
 	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
 		super();
+
 		this.type = 'TorusKnotGeometry';
 
 		this.parameters = {
@@ -36483,6 +36490,7 @@ class TubeGeometry extends BufferGeometry {
 	constructor( path = new QuadraticBezierCurve3( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
+
 		this.type = 'TubeGeometry';
 
 		this.parameters = {
@@ -36667,6 +36675,7 @@ class WireframeGeometry extends BufferGeometry {
 	constructor( geometry = null ) {
 
 		super();
+
 		this.type = 'WireframeGeometry';
 
 		this.parameters = {
@@ -39638,7 +39647,7 @@ class LoadingManager {
 
 }
 
-const DefaultLoadingManager = new LoadingManager();
+const DefaultLoadingManager = /*@__PURE__*/ new LoadingManager();
 
 class Loader {
 
@@ -39708,6 +39717,17 @@ class Loader {
 }
 
 const loading = {};
+
+class HttpError extends Error {
+
+	constructor( message, response ) {
+
+		super( message );
+		this.response = response;
+
+	}
+
+}
 
 class FileLoader extends Loader {
 
@@ -39852,7 +39872,7 @@ class FileLoader extends Loader {
 
 				} else {
 
-					throw Error( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}` );
+					throw new HttpError( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`, response );
 
 				}
 
@@ -46172,7 +46192,7 @@ class AnimationAction {
 
 }
 
-const _controlInterpolantsResultBuffer = /*@__PURE__*/ new Float32Array( 1 );
+const _controlInterpolantsResultBuffer = new Float32Array( 1 );
 
 
 class AnimationMixer extends EventDispatcher {
@@ -47712,6 +47732,7 @@ class SpotLightHelper extends Object3D {
 	constructor( light, color ) {
 
 		super();
+
 		this.light = light;
 		this.light.updateMatrixWorld();
 
@@ -47992,6 +48013,7 @@ class HemisphereLightHelper extends Object3D {
 	constructor( light, size, color ) {
 
 		super();
+
 		this.light = light;
 		this.light.updateMatrixWorld();
 
@@ -48184,6 +48206,7 @@ class DirectionalLightHelper extends Object3D {
 	constructor( light, size, color ) {
 
 		super();
+
 		this.light = light;
 		this.light.updateMatrixWorld();
 
@@ -48661,7 +48684,7 @@ class PlaneHelper extends Line {
 
 		const color = hex;
 
-		const positions = [ 1, - 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 ];
+		const positions = [ 1, - 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0, 1, 1, 0 ];
 
 		const geometry = new BufferGeometry();
 		geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
@@ -48675,7 +48698,7 @@ class PlaneHelper extends Line {
 
 		this.size = size;
 
-		const positions2 = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, - 1, 1, 1, - 1, 1 ];
+		const positions2 = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
 
 		const geometry2 = new BufferGeometry();
 		geometry2.setAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
@@ -48687,15 +48710,13 @@ class PlaneHelper extends Line {
 
 	updateMatrixWorld( force ) {
 
-		let scale = - this.plane.constant;
+		this.position.set( 0, 0, 0 );
 
-		if ( Math.abs( scale ) < 1e-8 ) scale = 1e-8; // sign does not matter
-
-		this.scale.set( 0.5 * this.size, 0.5 * this.size, scale );
-
-		this.children[ 0 ].material.side = ( scale < 0 ) ? BackSide : FrontSide; // renderer flips side when determinant < 0; flipping not wanted here
+		this.scale.set( 0.5 * this.size, 0.5 * this.size, 1 );
 
 		this.lookAt( this.plane.normal );
+
+		this.translateZ( - this.plane.constant );
 
 		super.updateMatrixWorld( force );
 
@@ -49145,15 +49166,7 @@ class ShapePath {
 
 // Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
 
-const {
-	floatView: _floatView,
-	uint32View: _uint32View,
-	baseTable: _baseTable,
-	shiftTable: _shiftTable,
-	mantissaTable: _mantissaTable,
-	exponentTable: _exponentTable,
-	offsetTable: _offsetTable
-} = /*@__PURE__*/ _generateTables();
+const _tables = /*@__PURE__*/ _generateTables();
 
 function _generateTables() {
 
@@ -49285,7 +49298,7 @@ function _generateTables() {
 		shiftTable: shiftTable,
 		mantissaTable: mantissaTable,
 		exponentTable: exponentTable,
-		offsetTable: offsetTable,
+		offsetTable: offsetTable
 	};
 
 }
@@ -49298,10 +49311,10 @@ function toHalfFloat( val ) {
 
 	val = clamp( val, - 65504, 65504 );
 
-	_floatView[ 0 ] = val;
-	const f = _uint32View[ 0 ];
+	_tables.floatView[ 0 ] = val;
+	const f = _tables.uint32View[ 0 ];
 	const e = ( f >> 23 ) & 0x1ff;
-	return _baseTable[ e ] + ( ( f & 0x007fffff ) >> _shiftTable[ e ] );
+	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
 
 }
 
@@ -49310,8 +49323,8 @@ function toHalfFloat( val ) {
 function fromHalfFloat( val ) {
 
 	const m = val >> 10;
-	_uint32View[ 0 ] = _mantissaTable[ _offsetTable[ m ] + ( val & 0x3ff ) ] + _exponentTable[ m ];
-	return _floatView[ 0 ];
+	_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
+	return _tables.floatView[ 0 ];
 
 }
 
