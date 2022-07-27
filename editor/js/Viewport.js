@@ -577,6 +577,7 @@ function Viewport( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
+		// we explicitly prevent manipulations of the camera when multiple selection is enabled
 		if ( multipleSelection.enabled ) return;
 
 		controls.enabled = true; // see #14180
