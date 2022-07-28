@@ -1,7 +1,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeUVReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, sRGBEncoding, LinearEncoding, GLSL3 } from '../../constants.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, CubeRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, sRGBEncoding, LinearEncoding, GLSL3 } from '../../constants.js';
 
 let programIdCount = 0;
 
@@ -309,6 +309,11 @@ function generateEnvMapTypeDefine( parameters ) {
 	if ( parameters.envMap ) {
 
 		switch ( parameters.envMapMode ) {
+
+			case CubeReflectionMapping:
+			case CubeRefractionMapping:
+				envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
+				break;
 
 			case CubeUVReflectionMapping:
 				envMapTypeDefine = 'ENVMAP_TYPE_CUBE_UV';
