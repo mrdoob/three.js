@@ -141,6 +141,7 @@
 		"webgl_materials_displacementmap",
 		"webgl_materials_envmaps",
 		"webgl_materials_envmaps_exr",
+		"webgl_materials_envmaps_groundprojected",
 		"webgl_materials_envmaps_hdr",
 		"webgl_materials_lightmap",
 		"webgl_materials_matcap",
@@ -227,10 +228,12 @@
 		"webgl_water_flowmap"
 	],
 	"webgl / nodes": [
-		"webgl_materials_instance_uniform_nodes",
-		"webgl_materials_standard_nodes",
+		"webgl_nodes_loader_gltf_sheen",
+		"webgl_nodes_materials_instance_uniform",
+		"webgl_nodes_materials_physical_clearcoat",
+		"webgl_nodes_materials_standard",
 		"webgl_nodes_playground",
-		"webgl_points_nodes"
+		"webgl_nodes_points"
 	],
 	"webgl / postprocessing": [
 		"webgl_postprocessing",
@@ -285,7 +288,6 @@
 		"webgl_gpgpu_birds_gltf",
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
-		"webgl_instancing_modified",
 		"webgl_lightningstrike",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
@@ -304,6 +306,7 @@
 		"webgl2_multiple_rendertargets",
 		"webgl2_multisampled_renderbuffers",
 		"webgl2_rendertarget_texture2darray",
+		"webgl2_ubo",
 		"webgl2_volume_cloud",
 		"webgl2_volume_instancing",
 		"webgl2_volume_perlin"

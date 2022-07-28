@@ -164,19 +164,11 @@
     <h3>Node.js</h3>
 
     <p>
-        three.js 를 [link:https://eloquentjavascript.net/20_node.html Node.js]에서 사용하는기에는 어려움이 있는데, 두 가지 이유가 있습니다.
+        Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
     </p>
 
     <p>
-        첫 번째로, three.js는 웹을 목적으로 만들어졌기때문에, Node.js에서 항상 활용 가능하다고 보증할 수 없는 브라우저와 DOM API에 의존하고 있는 까닭입니다.
-        이러한 문제들은 shims를 통해 [link:https://github.com/stackgl/headless-gl headless-gl]처럼 해결하거나, [page:TextureLoader] 같은 컴포넌트를 커스터마이징 해서 해결 가능합니다. 다른 DOM API는 관련된 코드가 더 복잡하게 연관되어 있어, 수정하기 더 까다롭습니다.
-        Node.js 지원을 향상시키기 위한 더 간단하고, 유지보수 가능한 pull 요청은 언제든지 환영이지만, 본인의 작업을 위한 issue 생성을 더 권장합니다.
-    </p>
-
-    <p>
-        둘째로, Node.js의 ES 모듈 지원은 ... 다소 복잡합니다. Node.js v12에서, 코어 라이브러리는 CommonJS 모듈로, <em>require('three')</em>와 같이 사용 가능합니다.
-        하지만, 대부분의 <em>examples/jsm</em> 안의 예제 컴포넌트들은 불가능합니다. Node.js 향후 버전에서는 이게 해결될 수도 있겠지만, 그 전까지는
-        [link:https://github.com/standard-things/esm esm]처럼 사용해 Node.js 앱이 ES 모듈을 인식할 수 있도록 해줘야 합니다.
+        Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
     </p>
 
 </body>

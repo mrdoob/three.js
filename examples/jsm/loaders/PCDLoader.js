@@ -2,6 +2,7 @@ import {
 	BufferGeometry,
 	FileLoader,
 	Float32BufferAttribute,
+	Int32BufferAttribute,
 	Loader,
 	LoaderUtils,
 	Points,
@@ -229,6 +230,8 @@ class PCDLoader extends Loader {
 		const position = [];
 		const normal = [];
 		const color = [];
+		const intensity = [];
+		const label = [];
 
 		// ascii
 
@@ -285,6 +288,18 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					intensity.push( parseFloat( line[ offset.intensity ] ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					label.push( parseInt( line[ offset.label ] ) );
+
+				}
+
 			}
 
 		}
@@ -338,6 +353,20 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
+					intensity.push( dataview.getFloat32( ( PCDheader.points * offset.intensity ) + PCDheader.size[ intensityIndex ] * i, this.littleEndian ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					const labelIndex = PCDheader.fields.indexOf( 'label' );
+					label.push( dataview.getInt32( ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, this.littleEndian ) );
+
+				}
+
 			}
 
 		}
@@ -375,6 +404,18 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					intensity.push( dataview.getFloat32( row + offset.intensity, this.littleEndian ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					label.push( dataview.getInt32( row + offset.label, this.littleEndian ) );
+
+				}
+
 			}
 
 		}
@@ -386,6 +427,8 @@ class PCDLoader extends Loader {
 		if ( position.length > 0 ) geometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 		if ( normal.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal, 3 ) );
 		if ( color.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+		if ( intensity.length > 0 ) geometry.setAttribute( 'intensity', new Float32BufferAttribute( intensity, 1 ) );
+		if ( label.length > 0 ) geometry.setAttribute( 'label', new Int32BufferAttribute( label, 1 ) );
 
 		geometry.computeBoundingSphere();
 
@@ -396,10 +439,6 @@ class PCDLoader extends Loader {
 		if ( color.length > 0 ) {
 
 			material.vertexColors = true;
-
-		} else {
-
-			material.color.setHex( Math.random() * 0xffffff );
 
 		}
 

@@ -2089,7 +2089,7 @@
 					tempV2_3.normalize();
 					const dot = Math.abs( normal1.dot( tempV2_3 ) ); // If path is straight, don't create join
 
-					if ( dot !== 0 ) {
+					if ( dot > Number.EPSILON ) {
 
 						// Compute inner and outer segment intersections
 						const miterSide = strokeWidth2 / dot;

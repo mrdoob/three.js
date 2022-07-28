@@ -203,11 +203,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
-		if ( node.isNodeVary === true ) {
+		if ( node.isNodeVarying === true ) {
 
 			if ( shaderStage === 'vertex' ) {
 
-				return `NodeVarys.${ node.name }`;
+				return `NodeVaryings.${ node.name }`;
 
 			}
 
@@ -457,7 +457,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarys( shaderStage ) {
+	getVaryings( shaderStage ) {
 
 		const snippets = [];
 
@@ -465,25 +465,25 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			this.getBuiltin( 'position', 'Vertex', 'vec4<f32>', 'vertex' );
 
-			const varys = this.varys;
+			const varyings = this.varyings;
 
-			for ( let index = 0; index < varys.length; index ++ ) {
+			for ( let index = 0; index < varyings.length; index ++ ) {
 
-				const vary = varys[ index ];
+				const varying = varyings[ index ];
 
-				snippets.push( `@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }` );
+				snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
 
 			}
 
 		} else if ( shaderStage === 'fragment' ) {
 
-			const varys = this.varys;
+			const varyings = this.varyings;
 
-			for ( let index = 0; index < varys.length; index ++ ) {
+			for ( let index = 0; index < varyings.length; index ++ ) {
 
-				const vary = varys[ index ];
+				const varying = varyings[ index ];
 
-				snippets.push( `@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }` );
+				snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
 
 			}
 
@@ -497,7 +497,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const code = snippets.join( ',\n\t' );
 
-		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVarysStruct', '\t' + code ) : code;
+		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVaryingsStruct', '\t' + code ) : code;
 
 	}
 
@@ -612,7 +612,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					if ( shaderStage === 'vertex' ) {
 
-						flow += 'NodeVarys.Vertex = ';
+						flow += 'NodeVaryings.Vertex = ';
 
 					} else if ( shaderStage === 'fragment' ) {
 
@@ -630,7 +630,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
-			stageData.varys = this.getVarys( shaderStage );
+			stageData.varyings = this.getVaryings( shaderStage );
 			stageData.vars = this.getVars( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.flow = flow;
@@ -701,17 +701,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 // uniforms
 ${shaderData.uniforms}
 
-// varys
-${shaderData.varys}
+// varyings
+${shaderData.varyings}
 
 // codes
 ${shaderData.codes}
 
 @vertex
-fn main( ${shaderData.attributes} ) -> NodeVarysStruct {
+fn main( ${shaderData.attributes} ) -> NodeVaryingsStruct {
 
 	// system
-	var NodeVarys: NodeVarysStruct;
+	var NodeVaryings: NodeVaryingsStruct;
 
 	// vars
 	${shaderData.vars}
@@ -719,7 +719,7 @@ fn main( ${shaderData.attributes} ) -> NodeVarysStruct {
 	// flow
 	${shaderData.flow}
 
-	return NodeVarys;
+	return NodeVaryings;
 
 }
 `;
@@ -737,7 +737,7 @@ ${shaderData.uniforms}
 ${shaderData.codes}
 
 @fragment
-fn main( ${shaderData.varys} ) -> @location( 0 ) vec4<f32> {
+fn main( ${shaderData.varyings} ) -> @location( 0 ) vec4<f32> {
 
 	// vars
 	${shaderData.vars}
