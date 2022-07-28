@@ -228,12 +228,12 @@
 		"webgl_water_flowmap"
 	],
 	"webgl / nodes": [
-		"webgl_loader_gltf_sheen_nodes",
-		"webgl_materials_instance_uniform_nodes",
-		"webgl_materials_physical_clearcoat_nodes",
-		"webgl_materials_standard_nodes",
+		"webgl_nodes_loader_gltf_sheen",
+		"webgl_nodes_materials_instance_uniform",
+		"webgl_nodes_materials_physical_clearcoat",
+		"webgl_nodes_materials_standard",
 		"webgl_nodes_playground",
-		"webgl_points_nodes"
+		"webgl_nodes_points"
 	],
 	"webgl / postprocessing": [
 		"webgl_postprocessing",
