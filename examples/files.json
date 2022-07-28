@@ -228,6 +228,7 @@
 		"webgl_water_flowmap"
 	],
 	"webgl / nodes": [
+		"webgl_loader_gltf_sheen_nodes",
 		"webgl_materials_instance_uniform_nodes",
 		"webgl_materials_physical_clearcoat_nodes",
 		"webgl_materials_standard_nodes",
