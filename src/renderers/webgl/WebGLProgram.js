@@ -310,11 +310,6 @@ function generateEnvMapTypeDefine( parameters ) {
 
 		switch ( parameters.envMapMode ) {
 
-			case CubeReflectionMapping:
-			case CubeRefractionMapping:
-				envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
-				break;
-
 			case CubeUVReflectionMapping:
 				envMapTypeDefine = 'ENVMAP_TYPE_CUBE_UV';
 				break;

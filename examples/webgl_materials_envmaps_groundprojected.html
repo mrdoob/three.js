@@ -14,7 +14,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Ground projected environment mapping. By <a href="https://twitter.com/CantBeFaraz" target="_blank" rel="noopener">Faraz Shaikh</a>.<br> 
+			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Ground projected environment mapping. By <a href="https://twitter.com/CantBeFaraz" target="_blank" rel="noopener">Faraz Shaikh</a>.<br>
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a><br>
 			<a href="https://polyhaven.com/a/blouberg_sunrise_2" target="_blank" rel="noopener">Blouberg Sunrise 2</a> by <a href="https://gregzaal.com/" target="_blank" rel="noopener">Greg Zaal</a>
 		</div>
@@ -47,7 +47,7 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			const params = {
-				height: 34,
+				height: 20,
 				radius: 440
 			};
 
@@ -58,12 +58,13 @@
 			async function init() {
 
 				camera = new THREE.PerspectiveCamera(
-					45,
+					40,
 					window.innerWidth / window.innerHeight,
 					1,
 					1000
 				);
-				camera.position.set( - 16, 4, 16 );
+				camera.position.set( - 20, 7, 20 );
+				camera.lookAt( 0, 4, 0 );
 
 				scene = new THREE.Scene();
 
@@ -83,14 +84,13 @@
 				const loader = new GLTFLoader();
 				loader.setDRACOLoader( dracoLoader );
 
-				const shadow = new THREE.TextureLoader().load(
-					'models/gltf/ferrari_ao.png'
-				);
+				const shadow = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
 
 				loader.load( 'models/gltf/ferrari.glb', function ( gltf ) {
 
 					const bodyMaterial = new THREE.MeshPhysicalMaterial( {
-						color: 0xff0000, metalness: 1.0, roughness: 0.5, clearcoat: 1.0, clearcoatRoughness: 0.03, sheen: 0.5
+						color: 0x000000, metalness: 1.0, roughness: 0.8,
+						clearcoat: 1.0, clearcoatRoughness: 0.2
 					} );
 
 					const detailsMaterial = new THREE.MeshStandardMaterial( {
@@ -131,7 +131,7 @@
 					render();
 
 				} );
-			
+
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -140,15 +140,15 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.85;
-			
+
 				//
-			
+
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
-				controls.target.set( 0, 0, 0 );
-				controls.maxPolarAngle = THREE.MathUtils.degToRad( 80 );
-				controls.maxDistance = 100;
-				controls.minDistance = 30;
+				controls.target.set( 0, 2, 0 );
+				controls.maxPolarAngle = THREE.MathUtils.degToRad( 90 );
+				controls.maxDistance = 80;
+				controls.minDistance = 20;
 				controls.enablePan = false;
 				controls.update();
 
@@ -160,7 +160,7 @@
 
 				document.body.appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize );
-			
+
 			}
 
 			function onWindowResize() {
