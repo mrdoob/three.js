@@ -284,15 +284,15 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarys( /* shaderStage */ ) {
+	getVaryings( /* shaderStage */ ) {
 
 		let snippet = '';
 
-		const varys = this.varys;
+		const varyings = this.varyings;
 
-		for ( const vary of varys ) {
+		for ( const varying of varyings ) {
 
-			snippet += `varying ${vary.type} ${vary.name}; `;
+			snippet += `varying ${varying.type} ${varying.name}; `;
 
 		}
 
@@ -378,7 +378,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			const uniforms = this.getUniforms( shaderStage );
 			const attributes = this.getAttributes( shaderStage );
-			const varys = this.getVarys( shaderStage );
+			const varyings = this.getVaryings( shaderStage );
 			const vars = this.getVars( shaderStage );
 			const codes = this.getCodes( shaderStage );
 
@@ -391,8 +391,8 @@ ${uniforms}
 // attributes
 ${attributes}
 
-// varys
-${varys}
+// varyings
+${varyings}
 
 // vars
 ${vars}

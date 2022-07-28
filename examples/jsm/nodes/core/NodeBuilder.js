@@ -1,6 +1,6 @@
 import NodeUniform from './NodeUniform.js';
 import NodeAttribute from './NodeAttribute.js';
-import NodeVary from './NodeVary.js';
+import NodeVarying from './NodeVarying.js';
 import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
@@ -55,7 +55,7 @@ class NodeBuilder {
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.codes = { vertex: [], fragment: [], compute: [] };
 		this.attributes = [];
-		this.varys = [];
+		this.varyings = [];
 		this.vars = { vertex: [], fragment: [], compute: [] };
 		this.flow = { code: '' };
 		this.stack = [];
@@ -456,26 +456,26 @@ class NodeBuilder {
 
 	}
 
-	getVaryFromNode( node, type ) {
+	getVaryingFromNode( node, type ) {
 
 		const nodeData = this.getDataFromNode( node, null );
 
-		let nodeVary = nodeData.vary;
+		let nodeVarying = nodeData.varying;
 
-		if ( nodeVary === undefined ) {
+		if ( nodeVarying === undefined ) {
 
-			const varys = this.varys;
-			const index = varys.length;
+			const varyings = this.varyings;
+			const index = varyings.length;
 
-			nodeVary = new NodeVary( 'nodeVary' + index, type );
+			nodeVarying = new NodeVarying( 'nodeVarying' + index, type );
 
-			varys.push( nodeVary );
+			varyings.push( nodeVarying );
 
-			nodeData.vary = nodeVary;
+			nodeData.varying = nodeVarying;
 
 		}
 
-		return nodeVary;
+		return nodeVarying;
 
 	}
 
@@ -572,7 +572,7 @@ class NodeBuilder {
 
 	}
 
-	getVarys( /*shaderStage*/ ) {
+	getVaryings( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 

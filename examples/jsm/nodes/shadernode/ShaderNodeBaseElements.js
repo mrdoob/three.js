@@ -11,7 +11,7 @@ import InstanceIndexNode from '../core/InstanceIndexNode.js';
 import PropertyNode from '../core/PropertyNode.js';
 import UniformNode from '../core/UniformNode.js';
 import VarNode from '../core/VarNode.js';
-import VaryNode from '../core/VaryNode.js';
+import VaryingNode from '../core/VaryingNode.js';
 
 // accessors
 import BufferNode from '../accessors/BufferNode.js';
@@ -120,7 +120,7 @@ export const call = nodeProxy( FunctionCallNode );
 export const instanceIndex = nodeImmutable( InstanceIndexNode );
 export const label = nodeProxy( VarNode );
 export const temp = label;
-export const vary = nodeProxy( VaryNode );
+export const varying = nodeProxy( VaryingNode );
 
 // accesors
 
