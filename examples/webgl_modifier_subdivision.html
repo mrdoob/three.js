@@ -21,7 +21,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-subdivide": "https://unpkg.com/three-subdivide/build/index.module.js"
+					"three-subdivide": "https://unpkg.com/three-subdivide@1.0.2/build/index.module.js"
 				}
 			}
 		</script>
@@ -45,7 +45,7 @@
 				uvSmooth: false,
 				flatOnly: false,
 				maxTriangles: 25000,
-				wireframe: false,
+				wireframe: false
 			};
 
 			init();
@@ -155,7 +155,7 @@
 						return new THREE.CircleGeometry( 0.6, 10 );
 
 					case 'cone':
-						return new THREE.ConeGeometry( 0.6, 1.5, 5, 5 );
+						return new THREE.ConeGeometry( 0.6, 1.5, 5, 3 );
 
 					case 'cylinder':
 						return new THREE.CylinderGeometry( 0.5, 0.5, 1, 5, 5 );
@@ -212,10 +212,9 @@
 
 			function updateMeshes() {
 
-				meshNormal.geometry = getGeometry();
-
-				meshSmooth.geometry = LoopSubdivision.modify(
-					getGeometry(),
+				const normalGeometry = getGeometry();
+				const smoothGeometry = LoopSubdivision.modify(
+					normalGeometry,
 					params.iterations,
 					params.split,
 					params.uvSmooth,
@@ -223,8 +222,15 @@
 					params.maxTriangles
 				);
 
-				wireNormal.geometry = meshNormal.geometry.clone();
-				wireSmooth.geometry = meshSmooth.geometry.clone();
+				meshNormal.geometry.dispose();
+				meshSmooth.geometry.dispose();
+				meshNormal.geometry = normalGeometry;
+				meshSmooth.geometry = smoothGeometry;
+
+				wireNormal.geometry.dispose();
+				wireSmooth.geometry.dispose();
+				wireNormal.geometry = normalGeometry.clone();
+				wireSmooth.geometry = smoothGeometry.clone();
 
 				wireNormal.visible = wireSmooth.visible = params.wireframe;
 
