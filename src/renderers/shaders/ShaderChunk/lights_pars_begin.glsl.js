@@ -85,6 +85,14 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 }
 
+float getPhotometricAttenuation( sampler2D iesProfile, float angleCosine ) {
+
+    float angle = acos( angleCosine ) * ( 1.0 / PI );
+
+    return texture2D( iesProfile, vec2( 0.0, angle ) ).r;
+
+}
+
 #if NUM_DIR_LIGHTS > 0
 
 	struct DirectionalLight {
@@ -144,9 +152,11 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 		float decay;
 		float coneCos;
 		float penumbraCos;
+		bool hasIESProfile;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
+	uniform sampler2D iesProfiles[ NUM_SPOT_LIGHTS ];
 
 	// light is an out parameter as having it as a return value caused compiler errors on some devices
 	void getSpotLightInfo( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight light ) {
@@ -158,6 +168,33 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 		float angleCos = dot( light.direction, spotLight.direction );
 
 		float spotAttenuation = getSpotAttenuation( spotLight.coneCos, spotLight.penumbraCos, angleCos );
+
+		if ( spotAttenuation > 0.0 ) {
+
+			float lightDistance = length( lVector );
+
+			light.color = spotLight.color * spotAttenuation;
+			light.color *= getDistanceAttenuation( lightDistance, spotLight.distance, spotLight.decay );
+			light.visible = ( light.color != vec3( 0.0 ) );
+
+		} else {
+
+			light.color = vec3( 0.0 );
+			light.visible = false;
+
+		}
+
+	}
+
+	void getIESSpotLightInfo( const in SpotLight spotLight, const in sampler2D iesProfile, const in GeometricContext geometry, out IncidentLight light ) {
+
+		vec3 lVector = spotLight.position - geometry.position;
+
+		light.direction = normalize( lVector );
+
+		float angleCos = dot( light.direction, spotLight.direction );
+
+		float spotAttenuation = getPhotometricAttenuation( iesProfile, angleCos );
 
 		if ( spotAttenuation > 0.0 ) {
 

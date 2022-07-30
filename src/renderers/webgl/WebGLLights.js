@@ -37,7 +37,8 @@ function UniformsCache() {
 						distance: 0,
 						coneCos: 0,
 						penumbraCos: 0,
-						decay: 0
+						decay: 0,
+						hasIESProfile: false
 					};
 					break;
 
@@ -178,6 +179,7 @@ function WebGLLights( extensions, capabilities ) {
 		directionalShadow: [],
 		directionalShadowMap: [],
 		directionalShadowMatrix: [],
+		iesProfiles: [],
 		spot: [],
 		spotShadow: [],
 		spotShadowMap: [],
@@ -285,6 +287,9 @@ function WebGLLights( extensions, capabilities ) {
 				uniforms.coneCos = Math.cos( light.angle );
 				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
 				uniforms.decay = light.decay;
+
+				uniforms.hasIESProfile = light.iesProfile ? true : false;
+				state.iesProfiles[ spotLength ] = light.iesProfile;
 
 				if ( light.castShadow ) {
 
@@ -430,6 +435,7 @@ function WebGLLights( extensions, capabilities ) {
 
 			state.directionalShadow.length = numDirectionalShadows;
 			state.directionalShadowMap.length = numDirectionalShadows;
+			state.iesProfiles.length = spotLength;
 			state.pointShadow.length = numPointShadows;
 			state.pointShadowMap.length = numPointShadows;
 			state.spotShadow.length = numSpotShadows;

@@ -4,7 +4,7 @@ import { Object3D } from '../core/Object3D.js';
 
 class SpotLight extends Light {
 
-	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
+	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1, iesProfile = null ) {
 
 		super( color, intensity );
 
@@ -23,6 +23,8 @@ class SpotLight extends Light {
 		this.decay = decay; // for physically correct lights, should be 2.
 
 		this.shadow = new SpotLightShadow();
+
+		this.iesProfile = iesProfile;
 
 	}
 
@@ -59,6 +61,8 @@ class SpotLight extends Light {
 		this.target = source.target.clone();
 
 		this.shadow = source.shadow.clone();
+
+		this.iesProfile = source.iesProfile;
 
 		return this;
 

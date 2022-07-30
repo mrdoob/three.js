@@ -64,12 +64,15 @@
 				const ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
 
-				spotLight = new THREE.SpotLight( 0xffffff, 1 );
+				const iesProfile = new THREE.IESLoader().load( 'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/02a7562c650498ebb301153dbbf59207.ies' )
+
+				spotLight = new THREE.SpotLight( 0xffffff, 2 );
 				spotLight.position.set( 15, 40, 35 );
 				spotLight.angle = Math.PI / 4;
 				spotLight.penumbra = 0.1;
 				spotLight.decay = 2;
 				spotLight.distance = 200;
+				spotLight.iesProfile = iesProfile;
 
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 512;

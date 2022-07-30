@@ -91,7 +91,15 @@ IncidentLight directLight;
 
 		spotLight = spotLights[ i ];
 
-		getSpotLightInfo( spotLight, geometry, directLight );
+		if ( spotLight.hasIESProfile ) {
+
+			getIESSpotLightInfo( spotLight, iesProfiles[ i ], geometry, directLight );
+
+		} else {
+
+			getSpotLightInfo( spotLight, geometry, directLight );
+
+		}
 
 		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
 		spotLightShadow = spotLightShadows[ i ];
