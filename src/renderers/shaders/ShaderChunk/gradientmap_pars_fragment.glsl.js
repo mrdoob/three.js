@@ -19,7 +19,7 @@ vec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {
 	#else
 
 		vec2 fw = fwidth( coord ) * 0.5;
-		return mix( vec3( 0.7 ), vec3( 1.0 ), smoothstep( 0.7 - fw.x, 0.7 + fw.x, coord.x));
+		return mix( vec3( 0.7 ), vec3( 1.0 ), smoothstep( 0.7 - fw.x, 0.7 + fw.x, coord.x ));
 
 	#endif
 
