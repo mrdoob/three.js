@@ -5,7 +5,8 @@ import {
 	Spherical,
 	TOUCH,
 	Vector2,
-	Vector3
+	Vector3,
+	Clock,
 } from 'three';
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
@@ -182,10 +183,13 @@ class OrbitControls extends EventDispatcher {
 
 				}
 
+				const deltaTime = clock.getDelta() / ( 1 / 60 );
+				const dampingFactorByTime = 1 - Math.pow( 1 - scope.dampingFactor, deltaTime );
+
 				if ( scope.enableDamping ) {
 
-					spherical.theta += sphericalDelta.theta * scope.dampingFactor;
-					spherical.phi += sphericalDelta.phi * scope.dampingFactor;
+					spherical.theta += sphericalDelta.theta * dampingFactorByTime;
+					spherical.phi += sphericalDelta.phi * dampingFactorByTime;
 
 				} else {
 
@@ -234,7 +238,7 @@ class OrbitControls extends EventDispatcher {
 
 				if ( scope.enableDamping === true ) {
 
-					scope.target.addScaledVector( panOffset, scope.dampingFactor );
+					scope.target.addScaledVector( panOffset, dampingFactorByTime );
 
 				} else {
 
@@ -253,10 +257,11 @@ class OrbitControls extends EventDispatcher {
 
 				if ( scope.enableDamping === true ) {
 
-					sphericalDelta.theta *= ( 1 - scope.dampingFactor );
-					sphericalDelta.phi *= ( 1 - scope.dampingFactor );
+					const amp = Math.pow( 1 - scope.dampingFactor, deltaTime );
+					sphericalDelta.theta *= amp;
+					sphericalDelta.phi *= amp;
 
-					panOffset.multiplyScalar( 1 - scope.dampingFactor );
+					panOffset.multiplyScalar( amp );
 
 				} else {
 
@@ -314,6 +319,16 @@ class OrbitControls extends EventDispatcher {
 
 		};
 
+		this.isAccelerating = function () {
+
+			return sphericalDelta.phi < - EPS || EPS < sphericalDelta.phi ||
+				sphericalDelta.theta < - EPS || EPS < sphericalDelta.theta ||
+				panOffset.x < - EPS || EPS < panOffset.x ||
+				panOffset.y < - EPS || EPS < panOffset.y ||
+				panOffset.z < - EPS || EPS < panOffset.z;
+
+		};
+
 		//
 		// internals
 		//
@@ -334,6 +349,8 @@ class OrbitControls extends EventDispatcher {
 		let state = STATE.NONE;
 
 		const EPS = 0.000001;
+
+		const clock = new Clock();
 
 		// current position in spherical coordinates
 		const spherical = new Spherical();
@@ -952,6 +969,7 @@ class OrbitControls extends EventDispatcher {
 
 			if ( state !== STATE.NONE ) {
 
+				clock.start();
 				scope.dispatchEvent( _startEvent );
 
 			}
@@ -1090,6 +1108,7 @@ class OrbitControls extends EventDispatcher {
 
 			if ( state !== STATE.NONE ) {
 
+				clock.start();
 				scope.dispatchEvent( _startEvent );
 
 			}

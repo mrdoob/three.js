@@ -20,6 +20,8 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls
+			<br/>
+			Accelerating - <span id="accelerating">false</span>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -129,6 +131,8 @@
 				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
 				render();
+
+				document.getElementById( 'accelerating' ).innerText = controls.isAccelerating() ? 'true' : 'false';
 
 			}
 
