@@ -17,7 +17,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -25,11 +25,11 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
 			import { GUI } from './jsm/libs/lil-gui.module.min.js';
 
-			import { range, texture, mix, uv, mul, mod, rotateUV, color, max, min, div, saturate, positionWorld, invert, timerLocal } from 'three-nodes/Nodes.js';
+			import { range, texture, mix, uv, mul, mod, rotateUV, color, max, min, div, saturate, positionWorld, invert, timerLocal } from 'three/nodes';
 
 			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';

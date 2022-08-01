@@ -1,4 +1,4 @@
-import LightsNode from 'three-nodes/lighting/LightsNode.js';
+import { LightsNode } from 'three/nodes';
 
 class WebGPURenderState {
 

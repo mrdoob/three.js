@@ -1,7 +1,4 @@
-import ContextNode from 'three-nodes/core/ContextNode.js';
-import NormalNode from 'three-nodes/accessors/NormalNode.js';
-import ExpressionNode from 'three-nodes/core/ExpressionNode.js';
-import ConstNode from 'three-nodes/core/ConstNode.js';
+import { ConstNode, ContextNode, NormalNode, ExpressionNode } from 'three/nodes';
 
 class WebGLPhysicalContextNode extends ContextNode {
 

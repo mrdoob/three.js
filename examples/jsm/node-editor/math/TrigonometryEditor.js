@@ -1,7 +1,7 @@
 import { SelectInput, Element, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { Vector3 } from 'three';
-import { MathNode, UniformNode } from 'three-nodes/Nodes.js';
+import { MathNode, UniformNode } from 'three/nodes';
 
 const DEFAULT_VALUE = new UniformNode( new Vector3() );
 

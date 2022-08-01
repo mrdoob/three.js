@@ -90,6 +90,10 @@ import NodeLoader from './loaders/NodeLoader.js';
 import NodeObjectLoader from './loaders/NodeObjectLoader.js';
 import NodeMaterialLoader from './loaders/NodeMaterialLoader.js';
 
+// parsers
+import WGSLNodeParser from './parsers/WGSLNodeParser.js';
+import GLSLNodeParser from './parsers/GLSLNodeParser.js';
+
 // procedural
 import CheckerNode from './procedural/CheckerNode.js';
 
@@ -105,6 +109,9 @@ export * from './materials/Materials.js';
 
 // shader node
 export * from './shadernode/ShaderNodeElements.js';
+
+// shader stages
+export { defaultShaderStages }  from './core/NodeBuilder.js';
 
 const nodeLib = {
 	// core
@@ -204,7 +211,11 @@ const nodeLib = {
 	// loaders
 	NodeLoader,
 	NodeObjectLoader,
-	NodeMaterialLoader
+	NodeMaterialLoader,
+
+	// parsers
+	WGSLNodeParser,
+	GLSLNodeParser,
 
 };
 
@@ -312,5 +323,9 @@ export {
 	// loaders
 	NodeLoader,
 	NodeObjectLoader,
-	NodeMaterialLoader
+	NodeMaterialLoader,
+
+	// parsers
+	WGSLNodeParser,
+	GLSLNodeParser,
 };

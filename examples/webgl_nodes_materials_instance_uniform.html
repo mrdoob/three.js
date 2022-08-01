@@ -19,7 +19,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -27,8 +27,8 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
-			import { add, mul } from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
+			import { add, mul } from 'three/nodes';
 
 			import Stats from './jsm/libs/stats.module.js';
 

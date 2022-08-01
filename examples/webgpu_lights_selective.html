@@ -19,7 +19,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
 			import Stats from './jsm/libs/stats.module.js';
 
@@ -39,7 +39,7 @@
 			import WebGPU from './jsm/capabilities/WebGPU.js';
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 
-			import { color, float } from 'three-nodes/Nodes.js';
+			import { color, float } from 'three/nodes';
 
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
