@@ -455,7 +455,6 @@ export default QUnit.module( 'Animation', () => {
 			animationAction.clampWhenFinished = true;
 			animationAction.play();
 			mixer.addEventListener('finished', () => {
-				console.log(mixer.time);
 				animationAction.timeScale*=-1;
 				animationAction.paused=false;
 				animationAction.startAt(mixer.time+2000).play();
