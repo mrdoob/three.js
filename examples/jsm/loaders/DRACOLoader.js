@@ -73,17 +73,21 @@ class DRACOLoader extends Loader {
 
 		loader.load( url, ( buffer ) => {
 
-			const taskConfig = {
-				attributeIDs: this.defaultAttributeIDs,
-				attributeTypes: this.defaultAttributeTypes,
-				useUniqueIDs: false
-			};
-
-			this.decodeGeometry( buffer, taskConfig )
-				.then( onLoad )
-				.catch( onError );
+			this.decodeDracoFile( buffer, onLoad ).catch( onError );
 
 		}, onProgress, onError );
+
+	}
+
+	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes ) {
+
+		const taskConfig = {
+			attributeIDs: attributeIDs || this.defaultAttributeIDs,
+			attributeTypes: attributeTypes || this.defaultAttributeTypes,
+			useUniqueIDs: !! attributeIDs
+		};
+
+		return this.decodeGeometry( buffer, taskConfig ).then( callback );
 
 	}
 
