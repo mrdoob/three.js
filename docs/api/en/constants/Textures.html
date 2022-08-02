@@ -143,6 +143,7 @@
 		THREE.RedIntegerFormat
 		THREE.RGFormat
 		THREE.RGIntegerFormat
+		THREE.RGBFormat
 		THREE.RGBAFormat
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat
@@ -170,6 +171,9 @@
 		[page:constant RGIntegerFormat] discards the alpha, and blue components and reads the red, and green components.
 		The texels are read as integers instead of floating point.
 		(can only be used with a WebGL 2 rendering context).
+		<br /><br />
+			
+		[page:constant RGFormat] discards the alpha and reads the red, green and blue components.
 		<br /><br />
 
 		[page:constant RGBAFormat] is the default and reads the red, green, blue and alpha components.<br /><br />
