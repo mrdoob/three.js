@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '143';
+const REVISION = '144dev';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -9813,7 +9813,7 @@ var fog_fragment = "#ifdef USE_FOG\n\t#ifdef FOG_EXP2\n\t\tfloat fogFactor = 1.0
 
 var fog_pars_fragment = "#ifdef USE_FOG\n\tuniform vec3 fogColor;\n\tvarying float vFogDepth;\n\t#ifdef FOG_EXP2\n\t\tuniform float fogDensity;\n\t#else\n\t\tuniform float fogNear;\n\t\tuniform float fogFar;\n\t#endif\n#endif";
 
-var gradientmap_pars_fragment = "#ifdef USE_GRADIENTMAP\n\tuniform sampler2D gradientMap;\n#endif\nvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\tfloat dotNL = dot( normal, lightDirection );\n\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t#ifdef USE_GRADIENTMAP\n\t\treturn vec3( texture2D( gradientMap, coord ).r );\n\t#else\n\t\treturn ( coord.x < 0.7 ) ? vec3( 0.7 ) : vec3( 1.0 );\n\t#endif\n}";
+var gradientmap_pars_fragment = "#ifdef USE_GRADIENTMAP\n\tuniform sampler2D gradientMap;\n#endif\nvec3 getGradientIrradiance( vec3 normal, vec3 lightDirection ) {\n\tfloat dotNL = dot( normal, lightDirection );\n\tvec2 coord = vec2( dotNL * 0.5 + 0.5, 0.0 );\n\t#ifdef USE_GRADIENTMAP\n\t\treturn vec3( texture2D( gradientMap, coord ).r );\n\t#else\n\t\tvec2 fw = fwidth( coord ) * 0.5;\n\t\treturn mix( vec3( 0.7 ), vec3( 1.0 ), smoothstep( 0.7 - fw.x, 0.7 + fw.x, coord.x ) );\n\t#endif\n}";
 
 var lightmap_fragment = "#ifdef USE_LIGHTMAP\n\tvec4 lightMapTexel = texture2D( lightMap, vUv2 );\n\tvec3 lightMapIrradiance = lightMapTexel.rgb * lightMapIntensity;\n\treflectedLight.indirectDiffuse += lightMapIrradiance;\n#endif";
 
@@ -35366,30 +35366,6 @@ var DataUtils = /*#__PURE__*/Object.freeze({
 	fromHalfFloat: fromHalfFloat
 });
 
-class ParametricGeometry extends BufferGeometry {
-	constructor() {
-		console.error('THREE.ParametricGeometry has been moved to /examples/jsm/geometries/ParametricGeometry.js');
-		super();
-	}
-
-} // r133, eb58ff153119090d3bbb24474ea0ffc40c70dc92
-
-class TextGeometry extends BufferGeometry {
-	constructor() {
-		console.error('THREE.TextGeometry has been moved to /examples/jsm/geometries/TextGeometry.js');
-		super();
-	}
-
-} // r133, eb58ff153119090d3bbb24474ea0ffc40c70dc92
-
-function FontLoader() {
-	console.error('THREE.FontLoader has been moved to /examples/jsm/loaders/FontLoader.js');
-} // r133, eb58ff153119090d3bbb24474ea0ffc40c70dc92
-
-function Font() {
-	console.error('THREE.Font has been moved to /examples/jsm/loaders/FontLoader.js');
-} // r134, d65e0af06644fe5a84a6fc0e372f4318f95a04c0
-
 function ImmediateRenderObject() {
 	console.error('THREE.ImmediateRenderObject has been removed.');
 } // r138, 48b05d3500acc084df50be9b4c90781ad9b8cb17
@@ -35555,8 +35531,6 @@ exports.Float64BufferAttribute = Float64BufferAttribute;
 exports.FloatType = FloatType;
 exports.Fog = Fog;
 exports.FogExp2 = FogExp2;
-exports.Font = Font;
-exports.FontLoader = FontLoader;
 exports.FramebufferTexture = FramebufferTexture;
 exports.FrontSide = FrontSide;
 exports.Frustum = Frustum;
@@ -35685,7 +35659,6 @@ exports.OrthographicCamera = OrthographicCamera;
 exports.PCFShadowMap = PCFShadowMap;
 exports.PCFSoftShadowMap = PCFSoftShadowMap;
 exports.PMREMGenerator = PMREMGenerator;
-exports.ParametricGeometry = ParametricGeometry;
 exports.Path = Path;
 exports.PerspectiveCamera = PerspectiveCamera;
 exports.Plane = Plane;
@@ -35796,7 +35769,6 @@ exports.TOUCH = TOUCH;
 exports.TangentSpaceNormalMap = TangentSpaceNormalMap;
 exports.TetrahedronBufferGeometry = TetrahedronGeometry;
 exports.TetrahedronGeometry = TetrahedronGeometry;
-exports.TextGeometry = TextGeometry;
 exports.Texture = Texture;
 exports.TextureLoader = TextureLoader;
 exports.TorusBufferGeometry = TorusGeometry;
