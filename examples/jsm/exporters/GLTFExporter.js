@@ -23,7 +23,6 @@ import {
 	Vector3
 } from 'three';
 
-
 class GLTFExporter {
 
 	constructor() {
@@ -106,14 +105,6 @@ class GLTFExporter {
 	 * @param  {Object} options options
 	 */
 	parse( input, onDone, onError, options ) {
-
-		if ( typeof onError === 'object' ) {
-
-			console.warn( 'THREE.GLTFExporter: parse() expects options as the fourth argument now.' );
-
-			options = onError;
-
-		}
 
 		const writer = new GLTFWriter();
 		const plugins = [];
