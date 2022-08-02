@@ -316,7 +316,9 @@ class ObjectLoader extends Loader {
 			const loader = new MaterialLoader();
 			loader.setTextures( textures );
 
-			for ( const data of json ) {
+			for ( let i = 0, l = json.length; i < l; i ++ ) {
+
+				const data = json[ i ];
 
 				if ( cache[ data.uuid ] === undefined ) {
 
