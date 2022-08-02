@@ -22,11 +22,12 @@ export default /* glsl */`
 	vec3 n = inverseTransformDirection( normal, viewMatrix );
 
 	vec4 transmission = getIBLVolumeRefraction(
-		n, v, roughnessFactor, material.diffuseColor, material.specularColor, material.specularF90,
+		n, v, material.roughness, material.diffuseColor, material.specularColor, material.specularF90,
 		pos, modelMatrix, viewMatrix, projectionMatrix, ior, thicknessFactor,
 		attenuationColor, attenuationDistance );
 
 	totalDiffuse = mix( totalDiffuse, transmission.rgb, transmissionFactor );
 	transmissionAlpha = mix( transmissionAlpha, transmission.a, transmissionFactor );
+
 #endif
 `;
