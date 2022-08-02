@@ -1,8 +1,8 @@
 export default /* glsl */`
 #ifdef USE_TRANSMISSION
 
-	material.transmissionAlpha = 1.0;
 	material.transmission = transmission;
+	material.transmissionAlpha = 1.0;
 	material.thickness = thickness;
 	material.attenuationDistance = attenuationDistance;
 	material.attenuationColor = attenuationColor;
