@@ -237,10 +237,6 @@ class MaterialLoader extends Loader {
 
 		}
 
-		// Deprecated
-
-		if ( json.shading !== undefined ) material.flatShading = json.shading === 1; // THREE.FlatShading
-
 		// for PointsMaterial
 
 		if ( json.size !== undefined ) material.size = json.size;
