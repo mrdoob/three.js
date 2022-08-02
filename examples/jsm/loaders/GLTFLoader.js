@@ -1487,7 +1487,7 @@ class GLTFDracoMeshCompressionExtension {
 				const accessorDef = json.accessors[ primitive.attributes[ attributeName ] ];
 				const componentType = WEBGL_COMPONENT_TYPES[ accessorDef.componentType ];
 
-				attributeTypeMap[ threeAttributeName ] = componentType;
+				attributeTypeMap[ threeAttributeName ] = componentType.name;
 				attributeNormalizedMap[ threeAttributeName ] = accessorDef.normalized === true;
 
 			}
