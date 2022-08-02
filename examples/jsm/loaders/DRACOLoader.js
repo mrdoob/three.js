@@ -87,37 +87,7 @@ class DRACOLoader extends Loader {
 
 	}
 
-	/** @deprecated Kept for backward-compatibility with previous DRACOLoader versions. */
-	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes ) {
-
-		const taskConfig = {
-			attributeIDs: attributeIDs || this.defaultAttributeIDs,
-			attributeTypes: attributeTypes || this.defaultAttributeTypes,
-			useUniqueIDs: !! attributeIDs
-		};
-
-		this.decodeGeometry( buffer, taskConfig ).then( callback );
-
-	}
-
 	decodeGeometry( buffer, taskConfig ) {
-
-		// TODO: For backward-compatibility, support 'attributeTypes' objects containing
-		// references (rather than names) to typed array constructors. These must be
-		// serialized before sending them to the worker.
-		for ( const attribute in taskConfig.attributeTypes ) {
-
-			const type = taskConfig.attributeTypes[ attribute ];
-
-			if ( type.BYTES_PER_ELEMENT !== undefined ) {
-
-				taskConfig.attributeTypes[ attribute ] = type.name;
-
-			}
-
-		}
-
-		//
 
 		const taskKey = JSON.stringify( taskConfig );
 
