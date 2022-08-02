@@ -176,23 +176,29 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			}
 
-		}
+			if ( material.iridescenceNode && material.iridescenceNode.isNode ) {
 
-		if ( material.iridescenceNode && material.iridescenceNode.isNode ) {
+				this.addSlot( 'fragment', new SlotNode( material.iridescenceNode, 'IRIDESCENCE', 'float' ) );
 
-			this.addSlot( 'fragment', new SlotNode( material.iridescenceNode, 'IRIDESCENCE', 'float' ) );
+				if ( material.iridescenceIORNode && material.iridescenceIORNode.isNode ) {
 
-		}
+					this.addSlot( 'fragment', new SlotNode( material.iridescenceIORNode, 'IRIDESCENCE_IOR', 'float' ) );
 
-		if ( material.iridescenceIORNode && material.iridescenceIORNode.isNode ) {
+				}
 
-			this.addSlot( 'fragment', new SlotNode( material.iridescenceIORNode, 'IRIDESCENCE_IOR', 'float' ) );
+				if ( material.iridescenceThicknessNode && material.iridescenceThicknessNode.isNode ) {
 
-		}
+					this.addSlot( 'fragment', new SlotNode( material.iridescenceThicknessNode, 'IRIDESCENCE_THICKNESS', 'float' ) );
 
-		if ( material.iridescenceThicknessNode && material.iridescenceThicknessNode.isNode ) {
+				}
 
-			this.addSlot( 'fragment', new SlotNode( material.iridescenceThicknessNode, 'IRIDESCENCE_THICKNESS', 'float' ) );
+				material.defines.USE_IRIDESCENCE = '';
+
+			} else {
+
+				delete material.defines.USE_IRIDESCENCE;
+
+			}
 
 		}
 
@@ -597,9 +603,9 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		if ( iridescenceNode !== undefined ) {
 
-			this.addCodeAfterInclude(
+			this.addCodeAfterSnippet(
 				'fragment',
-				'iridescence_fragment',
+				'material.iridescence = iridescence;',
 				`${iridescenceNode.code}\n\tmaterial.iridescence = ${iridescenceNode.result};`
 			);
 
@@ -607,9 +613,9 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		if ( iridescenceIORNode !== undefined ) {
 
-			this.addCodeAfterInclude(
+			this.addCodeAfterSnippet(
 				'fragment',
-				'iridescence_fragment',
+				'material.iridescenceIOR = iridescenceIOR;',
 				`${iridescenceIORNode.code}\n\tmaterial.iridescenceIOR = ${iridescenceIORNode.result};`
 			);
 
@@ -617,9 +623,9 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 		if ( iridescenceThicknessNode !== undefined ) {
 
-			this.addCodeAfterInclude(
+			this.addCodeAfterSnippet(
 				'fragment',
-				'iridescence_fragment',
+				'material.iridescenceThickness = iridescenceThicknessMaximum;',
 				`${iridescenceThicknessNode.code}\n\tmaterial.iridescenceThickness = ${iridescenceThicknessNode.result};`
 			);
 

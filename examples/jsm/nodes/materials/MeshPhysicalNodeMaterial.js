@@ -19,6 +19,10 @@ export default class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.sheenNode = null;
 		this.sheenRoughnessNode = null;
 
+		this.iridescenceNode = null;
+		this.iridescenceIORNode = null;
+		this.iridescenceThicknessNode = null;
+
 		this.sheen = 0;
 		this.clearcoat = 0;
 		this.iridescence = 0;
@@ -38,6 +42,10 @@ export default class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		this.sheenNode = source.sheenNode;
 		this.sheenRoughnessNode = source.sheenRoughnessNode;
+
+		this.iridescenceNode = source.iridescenceNode;
+		this.iridescenceIORNode = source.iridescenceIORNode;
+		this.iridescenceThicknessNode = source.iridescenceThicknessNode;
 
 		return super.copy( source );
 
