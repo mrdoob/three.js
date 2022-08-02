@@ -1486,12 +1486,6 @@ class GLTFWriter {
 
 		}
 
-		if ( geometry.isBufferGeometry !== true ) {
-
-			throw new Error( 'THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-		}
-
 		const meshDef = {};
 		const attributes = {};
 		const primitives = [];
