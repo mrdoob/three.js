@@ -1,5 +1,29 @@
 import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
 
+export const getCacheKey = ( object ) => {
+
+	let cacheKey = '{';
+
+	if ( object.isNode ) {
+
+		cacheKey += `uuid:"${ object.uuid }",`;
+
+	}
+
+	const nodeKeys = getNodesKeys( object );
+
+	for ( const property of nodeKeys ) {
+
+		cacheKey += `${ property }:${ object[ property ].getCacheKey() },`;
+
+	}
+
+	cacheKey += '}';
+
+	return cacheKey;
+
+};
+
 export const getNodesKeys = ( object ) => {
 
 	const props = [];
