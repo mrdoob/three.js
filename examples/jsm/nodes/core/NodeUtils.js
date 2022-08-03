@@ -4,15 +4,13 @@ export const getCacheKey = ( object ) => {
 
 	let cacheKey = '{';
 
-	if ( object.isNode ) {
+	if ( object.isNode === true ) {
 
 		cacheKey += `uuid:"${ object.uuid }",`;
 
 	}
 
-	const nodeKeys = getNodesKeys( object );
-
-	for ( const property of nodeKeys ) {
+	for ( const property of getNodesKeys( object ) ) {
 
 		cacheKey += `${ property }:${ object[ property ].getCacheKey() },`;
 
