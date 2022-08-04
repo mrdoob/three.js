@@ -26,6 +26,18 @@ struct PhysicalMaterial {
 		float sheenRoughness;
 	#endif
 
+	#ifdef IOR
+		float ior;
+	#endif
+
+	#ifdef USE_TRANSMISSION
+		float transmission;
+		float transmissionAlpha;
+		float thickness;
+		float attenuationDistance;
+		vec3 attenuationColor;
+	#endif
+
 };
 
 // temporary
@@ -35,7 +47,7 @@ vec3 sheenSpecular = vec3( 0.0 );
 // This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from 
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
 // in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
-float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness) {
+float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {
 
 	float dotNV = saturate( dot( normal, viewDir ) );
 
