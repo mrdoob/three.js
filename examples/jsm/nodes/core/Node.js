@@ -1,5 +1,5 @@
 import { NodeUpdateType } from './constants.js';
-import { getNodesKeys } from './NodeUtils.js';
+import { getNodesKeys, getCacheKey } from './NodeUtils.js';
 import { MathUtils } from 'three';
 
 let _nodeId = 0;
@@ -55,6 +55,12 @@ class Node {
 		}
 
 		return children;
+
+	}
+
+	getCacheKey() {
+
+		return getCacheKey( this );
 
 	}
 
