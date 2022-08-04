@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - cube</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { FullScreenQuad } from './jsm/postprocessing/Pass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+			const renderer = new THREE.WebGLRenderer();
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const globalUniforms = {
+				uPrevDepthTexture: { value: null },
+				uReciprocalScreenSize: { value: new THREE.Vector2( 1, 1 ) },
+			};
+			const layers = [];
+			const one = new THREE.DataTexture( new Uint8Array( [ 1, 1, 1, 1 ] ), 1, 1 );
+			const quad = new FullScreenQuad(
+				new THREE.ShaderMaterial( {
+					...CopyShader,
+					transparent: true,
+					depthTest: false,
+					depthWrite: false,
+				} )
+			);
+			let depthPeelingScene = new THREE.Scene();
+
+			const AppState = {
+				Enabled: true,
+				Depth: 3,
+			};
+
+			function resizeLayers( width, height, pixelRatio ) {
+
+				const w = width * pixelRatio;
+				const h = height * pixelRatio;
+				globalUniforms.uReciprocalScreenSize.value.set(
+					1 / w,
+					1 / h
+				);
+
+				layers.forEach( ( rt ) => {
+
+					rt.setSize( w, h );
+					rt.depthTexture.dispose();
+					rt.depthTexture = new THREE.DepthTexture( w, h );
+
+				} );
+
+			}
+
+			function resizeDepth( width, height, pixelRatio, depth ) {
+
+				while ( depth < layers.length ) layers.pop()?.dispose();
+
+				const w = width * pixelRatio;
+				const h = height * pixelRatio;
+				while ( layers.length < depth )
+					layers.push(
+						new THREE.WebGLRenderTarget( w, h, {
+							depthTexture: new THREE.DepthTexture( w, h ),
+						} )
+					);
+
+			}
+
+			function peelDepth( renderer, camera ) {
+
+				const originalRenderTarget = renderer.getRenderTarget();
+				const originalAutoClear = renderer.autoClear;
+				renderer.autoClear = false;
+
+				layers.reduceRight( ( prevDepth, layer ) => {
+
+					globalUniforms.uPrevDepthTexture.value = prevDepth;
+					renderer.setRenderTarget( layer );
+					renderer.clear();
+					renderer.render( depthPeelingScene, camera );
+					return layer.depthTexture;
+
+				}, one );
+
+				renderer.setRenderTarget( originalRenderTarget );
+				renderer.clear();
+
+				for ( const layer of layers ) {
+
+					quad.material.uniforms.tDiffuse.value =
+						layer.texture;
+					quad.material.needsUpdate = true;
+					quad.render( renderer );
+
+				}
+
+				renderer.autoClear = originalAutoClear;
+
+			}
+
+			init().then( animate );
+
+			async function init() {
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				camera.position.z = 5;
+
+				renderer.shadowMap.enabled = true;
+
+				const dirLight = new THREE.DirectionalLight();
+				dirLight.position.set( 0, 3, 0 );
+				dirLight.castShadow = true;
+				scene.add( dirLight );
+				scene.add( new THREE.AmbientLight( undefined, 0.5 ) );
+
+				const sphere = new THREE.Mesh(
+					new THREE.SphereBufferGeometry(),
+					new THREE.MeshStandardMaterial()
+				);
+				sphere.translateY( 3 ).translateX( 1.5 );
+				sphere.castShadow = true;
+				scene.add( sphere );
+
+				const knot = new THREE.Mesh(
+					new THREE.TorusKnotBufferGeometry( undefined, undefined, 128, 32 ),
+					new THREE.MeshStandardMaterial( {
+						transparent: true,
+						opacity: 0.7,
+						side: THREE.DoubleSide,
+					} )
+				);
+				knot.receiveShadow = true;
+				scene.add( knot );
+
+				scene.add(
+					new THREE.Mesh(
+						new THREE.BoxBufferGeometry(),
+						new THREE.MeshBasicMaterial( { color: 0xf0a000 } )
+					)
+				);
+
+				const texture = await new THREE.TextureLoader().loadAsync(
+					'textures/sprite0.png'
+				);
+				const plane = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 3, 3 ),
+					new THREE.MeshStandardMaterial( { map: texture, side: THREE.DoubleSide } )
+				);
+				plane.translateX( - 1.6 );
+				plane.translateY( 1.5 );
+				scene.add( plane );
+
+				const plane2 = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 3, 3 ),
+					new THREE.MeshStandardMaterial( {
+						map: texture,
+						transparent: true,
+						side: THREE.DoubleSide,
+					} )
+				);
+				plane2
+					.translateX( - 1.2 )
+					.translateY( - 1.5 )
+					.translateZ( 0 )
+					.rotateY( - 2 * Math.PI * ( 1 / 10 ) );
+				scene.add( plane2 );
+
+				depthPeelingScene = scene.clone( true );
+
+				resizeLayers( window.innerWidth, window.innerHeight, renderer.getPixelRatio() );
+				resizeDepth( window.innerWidth, window.innerHeight, renderer.getPixelRatio(), AppState.Depth );
+
+				depthPeelingScene.traverse( ( obj ) => {
+
+					if ( obj instanceof THREE.Mesh && obj.material instanceof THREE.Material ) {
+
+						const clonedMaterial = obj.material.clone();
+						clonedMaterial.blending = THREE.NoBlending;
+						clonedMaterial.onBeforeCompile = ( shader ) => {
+
+							shader.uniforms.uReciprocalScreenSize = globalUniforms.uReciprocalScreenSize;
+							shader.uniforms.uPrevDepthTexture = globalUniforms.uPrevDepthTexture;
+							shader.fragmentShader = `
+// --- DEPTH PEELING SHADER CHUNK (START) (uniform definition)
+uniform vec2 uReciprocalScreenSize;
+uniform sampler2D uPrevDepthTexture;
+// --- DEPTH PEELING SHADER CHUNK (END)
+					${shader.fragmentShader}
+				`;
+							//peel depth
+							shader.fragmentShader = shader.fragmentShader.replace(
+								/}$/gm,
+								`
+// --- DEPTH PEELING SHADER CHUNK (START) (peeling)
+  vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
+  float prevDepth = texture2D(uPrevDepthTexture,screenPos).x;
+  if( prevDepth >= gl_FragCoord.z )
+      discard;
+// --- DEPTH PEELING SHADER CHUNK (END)
+}
+					`
+							);
+
+						};
+
+						obj.material = clonedMaterial;
+						obj.material.needsUpdate = true;
+
+					}
+
+				} );
+
+				const orbit = new OrbitControls( camera, renderer.domElement );
+				orbit.update();
+				orbit.addEventListener( 'change', animate );
+
+				const gui = new GUI();
+				gui.add( AppState, 'Enabled' ).onChange( animate );
+				gui.add( AppState, 'Depth' ).min( 1 ).max( 5 ).step( 1 ).onChange( v => {
+
+					resizeDepth( window.innerWidth, window.innerHeight, renderer.getPixelRatio(), v );
+					animate();
+
+				} );
+
+				window.addEventListener( 'resize', () => {
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+					renderer.setSize( window.innerWidth, window.innerHeight );
+					resizeLayers( window.innerWidth, window.innerHeight, renderer.getPixelRatio() );
+					animate();
+
+				} );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( () =>
+					AppState.Enabled ? peelDepth( renderer, camera ) : renderer.render( scene, camera )
+				);
+
+			}
+	</script>
+	</body>
+</html>
