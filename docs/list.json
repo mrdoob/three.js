@@ -1126,7 +1126,7 @@
   
         "Prossimi passi": {
           "Come aggiornare le cose": "manual/it/introduction/How-to-update-things",
-          "Come eliminare gli oggetti": "manual/it/introduction/How-to-dispose-of-objects",
+          "Come liberare le risorse": "manual/it/introduction/How-to-dispose-of-objects",
           "Come creare contenuti VR": "manual/it/introduction/How-to-create-VR-content",
           "Come utilizzare il post-processing": "manual/it/introduction/How-to-use-post-processing",
           "Trasformazioni di matrici": "manual/it/introduction/Matrix-transformations",
