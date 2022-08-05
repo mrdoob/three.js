@@ -12,13 +12,6 @@ class FirstPersonControls {
 
 	constructor( object, domElement ) {
 
-		if ( domElement === undefined ) {
-
-			console.warn( 'THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.' );
-			domElement = document;
-
-		}
-
 		this.object = object;
 		this.domElement = domElement;
 
