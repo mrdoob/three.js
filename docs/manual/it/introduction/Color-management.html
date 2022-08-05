@@ -131,7 +131,7 @@
 			</li>
 			<li>
 				<b>Gamma di colori:</b> Quando i colori primari e il punto di bianco
-				sono stati scelti, questi rappresentao un volume all'iterno dello
+				sono stati scelti, questi rappresentano un volume all'interno dello
 				spettro visibile (un "gamut"). I colori che non rientrano in questo
 				volume ("fuori gamut") non possono essere espressi dai valori RGB del
 				dominio chiuso [0,1]. Nel dominio aperto [0,∞], il gamut è tecnicamente
@@ -234,7 +234,7 @@
 					><b>ATTENZIONE:</b> [page:Scene.fog], [page:Scene.background], e
 					[page:WebGLRenderer.setClearColor] sono eccezioni alla regola. Queste
 					proprietà non sono interessate da [page:WebGLRenderer.outputEncoding]
-					e e quindi devono memorizzare i componenti RGB nello spazio colore di
+					e quindi devono memorizzare i componenti RGB nello spazio colore di
 					<u>output</u> del renderer.</i
 				>
 			</p>
@@ -256,7 +256,7 @@
 			</p>
 		</blockquote>
 
-		<h3>Spazio di colore di lavoro</h3>
+		<h3>Spazio colore di lavoro</h3>
 
 		<p>
 			Rendering, interpolazione e molte altre operazioni devono essere eseguite
@@ -276,8 +276,7 @@
 		</p>
 
 		<code>
-			renderer.outputEncoding = THREE.sRGBEncoding; // optional with
-			post-processing
+			renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		</code>
 
 		<ul>
@@ -311,7 +310,7 @@
 			</p>
 		</blockquote>
 
-		<h2>Lavorare con le istanza di THREE.Color</h2>
+		<h2>Lavorare con le istanze di THREE.Color</h2>
 
 		<p>
 			I metodi di lettura o modifica delle istanze [page:Color] presuppongono
@@ -323,9 +322,14 @@
 		</p>
 
 		<code>
-			// RGB components (no change). color.r = color.g = color.b = 0.5;
-			console.log( color.r ); // → 0.5 // Manual conversion. color.r = 0.5;
-			color.convertSRGBToLinear(); console.log( color.r ); // → 0.214041140
+		// RGB components (no change).
+		color.r = color.g = color.b = 0.5;
+		console.log( color.r ); // → 0.5
+
+		// Manual conversion.
+		color.r = 0.5;
+		color.convertSRGBToLinear();
+		console.log( color.r ); // → 0.214041140
 		</code>
 
 		<p>
@@ -338,13 +342,20 @@
 		</p>
 
 		<code>
-			// Hexadecimal conversion. color.setHex( 0x808080 ); console.log( color.r
-			); // → 0.214041140 console.log( color.getHex() ); // → 0x808080 // CSS
-			conversion. color.setStyle( 'rgb( 0.5, 0.5, 0.5 )' ); console.log( color.r
-			); // → 0.214041140 // Override conversion with 'colorSpace' argument.
-			color.setHex( 0x808080, LinearSRGBColorSpace ); console.log( color.r ); //
-			→ 0.5 console.log( color.getHex( LinearSRGBColorSpace ) ); // → 0x808080
-			console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
+		// Hexadecimal conversion.
+		color.setHex( 0x808080 );
+		console.log( color.r ); // → 0.214041140
+		console.log( color.getHex() ); // → 0x808080
+
+		// CSS conversion.
+		color.setStyle( 'rgb( 0.5, 0.5, 0.5 )' );
+		console.log( color.r ); // → 0.214041140
+
+		// Override conversion with 'colorSpace' argument.
+		color.setHex( 0x808080, LinearSRGBColorSpace );
+		console.log( color.r ); // → 0.5
+		console.log( color.getHex( LinearSRGBColorSpace ) ); // → 0x808080
+		console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
 		</code>
 
 		<h2>Errori comuni</h2>
@@ -360,7 +371,7 @@
 		</p>
 
 		<p>
-      Un problema più sottile si verifica quanto <i>entrambi</i> lo spazio colore di
+      Un problema più sottile si verifica quando <i>entrambi</i> lo spazio colore di
       input e quello di output non sono corretti - i livelli di luminosità complessivi
       potrebbero andare bene, ma i colori potrebbero cambiare in modo imprevisto in 
       condizioni di illuminazione diversa o l'ombreggiatura potrebbe apparire più sbiadita 

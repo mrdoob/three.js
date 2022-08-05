@@ -10,7 +10,7 @@
 		<h1>Testare con NPM ([name])</h1>
 
 		<p class="desc">
-			Questo articolo mostar come inserire three.js in un ambiente
+			Questo articolo mostra come inserire three.js in un ambiente
 			[link:https://nodejs.org/en/ node.js] così che tu possa eseguire test
 			automatici. I test possono essere eseguiti da linea di comando o da
 			strumenti CI automatici come [link:https://travis-ci.org/ Travis].
@@ -19,7 +19,7 @@
 		<h2>Versione breve</h2>
 
 		<p>
-			Se sei a tuo agio con node e npm,
+			Se sei a tuo agio con node e npm, installa npm
 			<code> $ npm install three --save-dev </code>
 			e aggiungi
 			<code> const THREE = require('three'); </code>
@@ -28,8 +28,8 @@
 
 		<h2>Creare un progetto testabile da zero</h2>
 		<p>
-			Se non sei familiare con questi strumenti, ecco una guida rapida (per
-			linux, il processo di installazione sarà leggermente diverso usando
+			Se non sei familiare con questi strumenti, ecco una guida rapida per
+			linux (il processo di installazione sarà leggermente diverso usando
 			Windows, ma i comandi NPM saranno uguali).
 		</p>
 
@@ -62,7 +62,7 @@ $ npm config set registry http://registry.npmjs.org/
 				<li>
 					Prova ad avviare la funzione di test con:
 					<code> $ npm test </code>
-					Fallirà, come ci aspettiamo. Se controlli nel file package.json la
+					fallirà, come ci aspettiamo. Se controlli nel file package.json la
 					definizione dello script di test è:
 					<code> "test": "echo \"Error: no test specified\" && exit 1" </code>
 				</li>
@@ -80,7 +80,7 @@ $ npm config set registry http://registry.npmjs.org/
 					Si noti che è stata creata la cartella node_modules/ e le tue
 					dipendenze sono state installate al suo interno. Inoltre, si noti che
 					il file package.json è stato aggiornato: è stata aggiunta la proprietà
-					devDependencies e aggiornata dal comando --save-dev.
+					devDependencies, aggiornata dal comando --save-dev.
 				</li>
 				<br />
 
@@ -88,7 +88,7 @@ $ npm config set registry http://registry.npmjs.org/
 					Modificare il file package.json per usare mocha per i test. Quando
 					viene invocato il test, vogliamo eseguire mocha e specificare un
 					reporter dettagliato. Per impostazione predefinita questo eseguirà
-					qualsiasi cosa in test/ (non avendo una cartella test/ si può
+					qualsiasi cosa nella cartella test/ (non avendo una cartella test/ si può
 					incorrere in un npm ERR!, bisogna crearla con il comando mkdir test)
 					<code> "test": "mocha --reporter list" </code>
 				</li>
@@ -97,7 +97,7 @@ $ npm config set registry http://registry.npmjs.org/
 					Rilanciare il test con:
 					<code> $ npm test </code>
 
-					Adesso il test dovrebbe avere successo, riportando "0 passing (1ms) or
+					Adesso il test dovrebbe essere eseguito con successo, riportando "0 passing (1ms) or
 					similar".
 				</li>
 			</ol>
@@ -113,20 +113,19 @@ $ npm config set registry http://registry.npmjs.org/
 						<li>
 							Se hai bisogno di una versione di three.js diversa, usa
 							<code> $ npm show three versions </code>
-							per vedere quali sono disponibili. Per dire ad npm la versione
-							giusta, usa
+							per vedere quali sono le versioni disponibili. Per dire ad npm la versione
+							scelta, usa
 							<code> $ npm install three@0.84.0 --save </code>
 							(0.84.0 nell'esempio). --save fa sì che sia una dipendenza del
 							progetto piuttosto che una devDependecy. Per maggiori informazioni
 							consulta il documento
-							[link:https://docs.npmjs.com/cli/v8/configuring-npm/package-json
-							qui].
+							[link:https://docs.npmjs.com/cli/v8/configuring-npm/package-json qui].
 						</li>
 					</ul>
 				</li>
 
 				<li>
-					Mocha cercherà i test nella cartella test/, quindi andiamo
+					Mocha cercherà i test nella cartella test/, quindi creiamola
 					<code> $ mkdir test </code>
 				</li>
 
@@ -154,7 +153,7 @@ describe('The THREE object', function() {
 
 				<li>
           Adesso rieseguiamo il test con il comando $ npm test. Questo dovrebbe
-          eseguire i test sopra e terminare con successo, mostrando qualcosa del tipo:
+          eseguire i test sopra definiti e terminare con successo, mostrando qualcosa del tipo:
 					<code>
 The THREE object should have a defined BasicShadowMap constant: 0ms
 The THREE object should be able to construct a Vector3 with default of x=0: 0ms
@@ -176,13 +175,13 @@ The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 				</li>
 
 				<li>
-          Esporta il tuo codice funzionale in modo tale che nodejs possa vederlo
+          Esportare il tuo codice funzionale in modo tale che nodejs possa vederlo
           per usarlo insieme a require. Controlla
 					[link:https://github.com/air/encounter/blob/master/js/Physics.js qui].
 				</li>
 
 				<li>
-          Richiama il tuo codice nel file di test, allo stesso modo in cui
+          Richiamare il tuo codice nel file di test, allo stesso modo in cui
           abbiamo fatto per richiamare three nell'esempio sopra `require('three')`
 				</li>
 			</ol>
@@ -209,7 +208,7 @@ if (typeof exports !== 'undefined') { module.exports = Physics; }
 			<p>
         Tipicamente un progetto three.js verrà eseguito nel browser. Il caricamento
         del modulo viene quindi eseguito dal browser che esegue una serie di tag 
-        di script. I tuo singoli file non si deveno preoccupare per le dipendenze.
+        di script. I tuo singoli file non si devono preoccupare per le dipendenze.
         Tuttavia, in un contesto nodejs non è presente il file index.html che lega tutto
         insieme, quindi devi essere esplicito.
 			</p>
@@ -221,7 +220,7 @@ if (typeof exports !== 'undefined') { module.exports = Physics; }
 				<li>
           All'inizio del tuo  modulo, controlla se ti trovi in un ambiente nodejs.
 				</li>
-				<li>Se è csoì, diachiara esplicitamente le tue dipendenze.</li>
+				<li>Se è così, dichiara esplicitamente le tue dipendenze.</li>
 				<li>
           In caso contrario, probabilmente sei in un browser e quindi non devi fare
           nient'altro.

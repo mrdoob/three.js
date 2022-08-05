@@ -12,9 +12,9 @@
 	<h1>Come liberare le risorse ([name])</h1>
 
 	<p>
-    Un aspetto importante per migliorare le performace ed evitare perdite di memoria nella tua applicazione è l'eliminazione delle entità della libreria inutilizzate.
+    Un aspetto importante per migliorare le prestazioni ed evitare perdite di memoria nella tua applicazione è l'eliminazione delle entità della libreria non utilizzate.
     Ogni volta che viene creata un'istanza di un tipo *three.js*, viene allocata una certa quantità di memoria. Tuttavia, *three.js* crea per oggetti specifici
-    come le geometrie o i materiali entità correlate WebGL, come buffer o programmi shader, necessari per il rendering. È importante sottolineare che
+    come le geometrie o i materiali, entità correlate WebGL, come buffer o programmi shader, necessari per il rendering. È importante sottolineare che
     questi oggetti non vengono rilasciati automaticamente. Invece, l'applicazione utilizza una speciale API per liberare tali risorse. Questa guida fornisce
     una breve panoramica su come l'API viene utilizzata e quali oggetti sono rilevanti in questo contesto.
 	</p>
@@ -22,8 +22,8 @@
 	<h2>Geometrie</h2>
 
 	<p>
-    Una geomtria solitamente rappresenta le informazioni sui vertici definite come una collezione di attributi. *three.js* internamente crea un oggetto di tipo [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer]
-    per ogni attributo. Queste entità vengono cancellate solo se viene chiamato il metodo [page:BufferGeometry.dispose](). Se una geomtria, nella tua applicazione,
+    Una geometria solitamente rappresenta le informazioni sui vertici come una collezione di attributi. *three.js* internamente crea un oggetto di tipo [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer]
+    per ogni attributo. Queste entità vengono cancellate solo se viene chiamato il metodo [page:BufferGeometry.dispose](). Se una geometria, nella tua applicazione,
     diventa obsoleta, esegui questo metodo per liberare tutte le risorse correlate.
 	</p>
 
@@ -39,14 +39,14 @@
 	<h2>Texture</h2>
 
 	<p>
-    L'eliminazione di un materiale non ha effetti sulle texture. Queste vengono gestite separatamente, poiché una singola texture può essere usata ma più materiali contemporaneamente.
+    L'eliminazione di un materiale non ha effetti sulle texture. Queste vengono gestite separatamente, poiché una singola texture può essere usata da più materiali contemporaneamente.
     Ogni volta che crei un'istanza di [page:Texture], three.js internamente crea un'istanza di [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLTexture WebGLTexture].
     Come per i buffer, questo oggetto può essere eliminato  solo chiamando il metodo[page:Texture.dispose]().
 	</p>
 
 	<p>
     Se stai usando `ImageBitmap` come origine dati della texture, devi chiamare il metodo [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]() a livello applicativo per liberare le risorse lato CPU.
-    Una chiamata automatica di `ImageBitmap.close()`in [page:Texture.dispose]() non è possibile, poiché il bitmap dell'immagine diventa inutilizzabile, e l'engine non ha modo di sapere se la bitmap dell'immagine è utilizzata da altre parti.
+    Una chiamata automatica di `ImageBitmap.close()`in [page:Texture.dispose]() non è possibile, poiché il bitmap dell'immagine diventa inutilizzabile, e l'engine non ha modo di sapere se il bitmap dell'immagine è utilizzata da altre parti.
 	</p>
 
 	<h2>Render Target</h2>
@@ -61,7 +61,7 @@
 
 	<p>
     Ci sono altre classi nella cartella degli esempi come i control o passaggi di post-processing che forniscono metodi `dispose()` per rimuovere i listener di eventi interni o 
-    renderizzare i target. In generale, viene raccomandato di controllare le API o la documentazione della classe e controllare il metodo `dispose()`. Se presente dovresti utilizzarlo per linerare le risorse.
+    renderizzare i target. In generale, viene raccomandato di controllare le API o la documentazione della classe e controllare il metodo `dispose()`. Se presente dovresti utilizzarlo per liberare le risorse.
 	</p>
 
 	<h2>FAQ</h2>
@@ -108,7 +108,7 @@
 	<p>
     In generale non c'è una raccomandazione definitiva per questo. Dipende molto dal caso d'uso specifico. È importante sottolineare che non è sempre necessario 
     eliminare oggetti tutto il tempo. Un buon esempio esemplificativo è un gioco a più livelli. Un buon momento per eliminare gli oggetti è quando viene cambiato il livello.
-    L'applicazione può atrtaversare tutta la vecchia scena (livello) ed eliminare tutti i vecchi materiali, geometrie e texture. Come accennato nella sezione precedente,
+    L'applicazione può attraversare tutta la vecchia scena (livello) ed eliminare tutti i vecchi materiali, geometrie e texture. Come accennato nella sezione precedente,
     se viene cancellato un oggetto che è attualmente in uso non produce un errore a runtime. La cosa peggiore che può accadere è un calo delle prestazioni in un singolo frame. 
 	</p>
 

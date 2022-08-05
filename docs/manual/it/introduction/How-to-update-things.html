@@ -9,12 +9,12 @@
 	<body>
 		<h1>Come aggiornare le cose ([name])</h1>
 		<div>
-			<p>Tutti gli oggetti automaticamente di default aggiornano le loro matrici se vengono aggiunti alla scena seguendo il codice qui sotto</p>
+			<p>Tutti gli oggetti di default, automaticamente aggiornano le loro matrici se vengono aggiunti alla scena seguendo il codice qui sotto:</p>
 			<code>
 const object = new THREE.Object3D();
 scene.add( object );
 			</code>
-      o se sono i figli di un altro oggetto che è stato aggiunto alla scena:
+      o se sono figli di un altro oggetto che è stato aggiunto alla scena:
 			<code>
 const object1 = new THREE.Object3D();
 const object2 = new THREE.Object3D();
@@ -162,10 +162,10 @@ line.geometry.computeBoundingSphere();
 
 			<p>Per creare un'esperienza più fluida puoi emulare in una certa misura le modifiche a queste funzionalità avendo valori "fittizi" come luci ad intensità zero, texture bianche, o fog a zero densità.</p>
 
-			<p>È possibile cambiare liberamente il materiale utiliazzato per i blocchi di geometria, tuttavia non è possibile modificare il modo in cui un oggetto è diviso in blocchi (in base ai materiali della faccia).</p>
+			<p>È possibile cambiare liberamente il materiale utilizzato per i blocchi di geometria, tuttavia non è possibile modificare il modo in cui un oggetto è diviso in blocchi (in base ai materiali della faccia).</p>
 
 			<h3>Se è necessario disporre di diverse configurazioni dei materiali durante l'esecuzione:</h3>
-			<p>Se il numero di materiali / blocchi è piccolo, puoi dividere l'oggetto in anticipo (per esempio capelli / faccia / corpo / vestiti superiori / pantaloni per un umano / davanti / dietro / parte superiore / occhiali / pneumatico / interno di una macchina). </p>
+			<p>Se il numero di materiali / blocchi è piccolo, puoi dividere l'oggetto in anticipo (per esempio capelli / faccia / corpo / vestiti superiori / pantaloni per un umano / davanti / dietro / parte superiore / occhiali / pneumatico / interni di una macchina). </p>
 
 			<p>Se, invece, il numero è grande (per esempio, ogni faccia potrebbe essere potenzialmente diversa), considera una soluzione divera, come usare attributi / texture per ottenere un aspetto diverso per faccia.</p>
 
@@ -196,7 +196,7 @@ line.geometry.computeBoundingSphere();
 
 		<h2>Telecamere</h2>
 		<div>
-			<p>La posizione e il target di una camera vengono aggiornati autometicamente. Se hai bisogno di cambiare</p>
+			<p>La posizione e il target di una camera vengono aggiornati automaticamente. Se hai bisogno di cambiare</p>
 			<ul>
 				<li>
 					fov
