@@ -11,7 +11,6 @@ import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
 import { x, y, z } from '../math/Constants.tests.js';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 var DegToRad = Math.PI / 180;
 
