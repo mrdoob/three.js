@@ -12,13 +12,6 @@ class FlyControls extends EventDispatcher {
 
 		super();
 
-		if ( domElement === undefined ) {
-
-			console.warn( 'THREE.FlyControls: The second parameter "domElement" is now mandatory.' );
-			domElement = document;
-
-		}
-
 		this.object = object;
 		this.domElement = domElement;
 

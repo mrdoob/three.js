@@ -429,27 +429,6 @@ class OutlineEffect {
 
 		this.render = function ( scene, camera ) {
 
-			let renderTarget;
-			let forceClear = false;
-
-			if ( arguments[ 2 ] !== undefined ) {
-
-				console.warn( 'THREE.OutlineEffect.render(): the renderTarget argument has been removed. Use .setRenderTarget() instead.' );
-				renderTarget = arguments[ 2 ];
-
-			}
-
-			if ( arguments[ 3 ] !== undefined ) {
-
-				console.warn( 'THREE.OutlineEffect.render(): the forceClear argument has been removed. Use .clear() instead.' );
-				forceClear = arguments[ 3 ];
-
-			}
-
-			if ( renderTarget !== undefined ) renderer.setRenderTarget( renderTarget );
-
-			if ( forceClear ) renderer.clear();
-
 			if ( this.enabled === false ) {
 
 				renderer.render( scene, camera );

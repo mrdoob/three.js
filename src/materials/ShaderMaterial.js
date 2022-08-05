@@ -52,12 +52,6 @@ class ShaderMaterial extends Material {
 
 		if ( parameters !== undefined ) {
 
-			if ( parameters.attributes !== undefined ) {
-
-				console.error( 'THREE.ShaderMaterial: attributes should now be defined in THREE.BufferGeometry instead.' );
-
-			}
-
 			this.setValues( parameters );
 
 		}
