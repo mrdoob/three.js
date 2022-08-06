@@ -79,7 +79,7 @@ class WebGLShaderCache {
 		const cache = this.materialCache;
 		let set = cache.get( material );
 
-		if ( set == undefined ) {
+		if ( set === undefined ) {
 
 			set = new Set();
 			cache.set( material, set );
@@ -95,7 +95,7 @@ class WebGLShaderCache {
 		const cache = this.shaderCache;
 		let stage = cache.get( code );
 
-		if ( stage == undefined ) {
+		if ( stage === undefined ) {
 
 			stage = new WebGLShaderStage( code );
 			cache.set( code, stage );
