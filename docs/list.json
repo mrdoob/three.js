@@ -1105,6 +1105,40 @@
                 "NPMでテストを実行する": "manual/ja/buildTools/Testing-with-NPM"
             }
         }
+    },
+
+    "it": {
+
+      "Manuale": {
+  
+        "Per iniziare": {
+          "Creare una scena": "manual/it/introduction/Creating-a-scene",
+          "Installazione": "manual/it/introduction/Installation",
+          "Controllo compatibilità WebGL": "manual/it/introduction/WebGL-compatibility-check",
+          "Esecuzione in locale": "manual/it/introduction/How-to-run-things-locally",
+          "Disegnare linee": "manual/it/introduction/Drawing-lines",
+          "Creare testo": "manual/it/introduction/Creating-text",
+          "Caricare modelli 3D": "manual/it/introduction/Loading-3D-models",
+          "Librerie e Plugins": "manual/it/introduction/Libraries-and-Plugins",
+          "FAQ": "manual/it/introduction/FAQ",
+          "Link utili": "manual/it/introduction/Useful-links"
+        },
+  
+        "Prossimi passi": {
+          "Come aggiornare le cose": "manual/it/introduction/How-to-update-things",
+          "Come liberare le risorse": "manual/it/introduction/How-to-dispose-of-objects",
+          "Come creare contenuti VR": "manual/it/introduction/How-to-create-VR-content",
+          "Come utilizzare il post-processing": "manual/it/introduction/How-to-use-post-processing",
+          "Trasformazioni di matrici": "manual/it/introduction/Matrix-transformations",
+          "Sistema di animazione": "manual/it/introduction/Animation-system",
+          "Gestione del colore": "manual/it/introduction/Color-management"
+        },
+  
+        "Strumenti di build": {
+          "Testare con NPM": "manual/it/buildTools/Testing-with-NPM"
+        }
+  
+      }
     }
 
 }
