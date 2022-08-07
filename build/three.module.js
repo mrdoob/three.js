@@ -3756,12 +3756,6 @@ class Quaternion {
 
 	setFromEuler( euler, update ) {
 
-		if ( ! ( euler && euler.isEuler ) ) {
-
-			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
-
-		}
-
 		const x = euler._x, y = euler._y, z = euler._z, order = euler._order;
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
@@ -11505,12 +11499,6 @@ class ShaderMaterial extends Material {
 
 		if ( parameters !== undefined ) {
 
-			if ( parameters.attributes !== undefined ) {
-
-				console.error( 'THREE.ShaderMaterial: attributes should now be defined in THREE.BufferGeometry instead.' );
-
-			}
-
 			this.setValues( parameters );
 
 		}
@@ -11940,13 +11928,6 @@ class CubeCamera extends Object3D {
 		super();
 
 		this.type = 'CubeCamera';
-
-		if ( renderTarget.isWebGLCubeRenderTarget !== true ) {
-
-			console.error( 'THREE.CubeCamera: The constructor now expects an instance of WebGLCubeRenderTarget as third parameter.' );
-			return;
-
-		}
 
 		this.renderTarget = renderTarget;
 
@@ -18289,21 +18270,11 @@ function includeReplacer( match, include ) {
 
 // Unroll Loops
 
-const deprecatedUnrollLoopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
 const unrollLoopPattern = /#pragma unroll_loop_start\s+for\s*\(\s*int\s+i\s*=\s*(\d+)\s*;\s*i\s*<\s*(\d+)\s*;\s*i\s*\+\+\s*\)\s*{([\s\S]+?)}\s+#pragma unroll_loop_end/g;
 
 function unrollLoops( string ) {
 
-	return string
-		.replace( unrollLoopPattern, loopReplacer )
-		.replace( deprecatedUnrollLoopPattern, deprecatedLoopReplacer );
-
-}
-
-function deprecatedLoopReplacer( match, start, end, snippet ) {
-
-	console.warn( 'WebGLProgram: #pragma unroll_loop shader syntax is deprecated. Please use #pragma unroll_loop_start syntax instead.' );
-	return loopReplacer( match, start, end, snippet );
+	return string.replace( unrollLoopPattern, loopReplacer );
 
 }
 
@@ -19049,29 +19020,32 @@ class WebGLShaderCache {
 	_getShaderCacheForMaterial( material ) {
 
 		const cache = this.materialCache;
+		let set = cache.get( material );
 
-		if ( cache.has( material ) === false ) {
+		if ( set === undefined ) {
 
-			cache.set( material, new Set() );
+			set = new Set();
+			cache.set( material, set );
 
 		}
 
-		return cache.get( material );
+		return set;
 
 	}
 
 	_getShaderStage( code ) {
 
 		const cache = this.shaderCache;
+		let stage = cache.get( code );
 
-		if ( cache.has( code ) === false ) {
+		if ( stage === undefined ) {
 
-			const stage = new WebGLShaderStage( code );
+			stage = new WebGLShaderStage( code );
 			cache.set( code, stage );
 
 		}
 
-		return cache.get( code );
+		return stage;
 
 	}
 
@@ -30175,16 +30149,6 @@ class Skeleton {
 class InstancedBufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized, meshPerAttribute = 1 ) {
-
-		if ( typeof normalized === 'number' ) {
-
-			meshPerAttribute = normalized;
-
-			normalized = false;
-
-			console.error( 'THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.' );
-
-		}
 
 		super( array, itemSize, normalized );
 
@@ -42189,13 +42153,6 @@ class ObjectLoader extends Loader {
 					case 'InstancedBufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
-
-						break;
-
-					case 'Geometry':
-
-						console.error( 'THREE.ObjectLoader: The legacy Geometry type is no longer supported.' );
-
 						break;
 
 					default:
@@ -42241,39 +42198,13 @@ class ObjectLoader extends Loader {
 
 				const data = json[ i ];
 
-				if ( data.type === 'MultiMaterial' ) {
+				if ( cache[ data.uuid ] === undefined ) {
 
-					// Deprecated
-
-					const array = [];
-
-					for ( let j = 0; j < data.materials.length; j ++ ) {
-
-						const material = data.materials[ j ];
-
-						if ( cache[ material.uuid ] === undefined ) {
-
-							cache[ material.uuid ] = loader.parse( material );
-
-						}
-
-						array.push( cache[ material.uuid ] );
-
-					}
-
-					materials[ data.uuid ] = array;
-
-				} else {
-
-					if ( cache[ data.uuid ] === undefined ) {
-
-						cache[ data.uuid ] = loader.parse( data );
-
-					}
-
-					materials[ data.uuid ] = cache[ data.uuid ];
+					cache[ data.uuid ] = loader.parse( data );
 
 				}
+
+				materials[ data.uuid ] = cache[ data.uuid ];
 
 			}
 
@@ -45825,14 +45756,15 @@ class AnimationAction {
 			const timeRunning = ( time - startTime ) * timeDirection;
 			if ( timeRunning < 0 || timeDirection === 0 ) {
 
-				return; // yet to come / don't decide when delta = 0
+				deltaTime = 0;
+
+			} else {
+
+
+				this._startTime = null; // unschedule
+				deltaTime = timeDirection * timeRunning;
 
 			}
-
-			// start
-
-			this._startTime = null; // unschedule
-			deltaTime = timeDirection * timeRunning;
 
 		}
 
@@ -46943,13 +46875,6 @@ class AnimationMixer extends EventDispatcher {
 class Uniform {
 
 	constructor( value ) {
-
-		if ( typeof value === 'string' ) {
-
-			console.warn( 'THREE.Uniform: Type parameter is no longer needed.' );
-			value = arguments[ 1 ];
-
-		}
 
 		this.value = value;
 
