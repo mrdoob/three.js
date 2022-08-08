@@ -433,6 +433,17 @@ this.extensions = {
 		for different copies of the material.
 		</p>
 
+		<h2>Events</h2>
+
+
+		<p class="desc">
+			There are two events indicating when a shader text has changed. 
+		</p>
+		<code>
+		mixer.addEventListener( 'VertexShaderChanged', function() { …} ); // properties of e: type, action and loopDelta
+		mixer.addEventListener( 'FragmentShaderChanged', function() { …} ); // properties of e: type, action and direction
+		</code>
+
 		<h2>Source</h2>
 
 		<p>
