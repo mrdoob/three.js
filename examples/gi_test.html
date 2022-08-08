@@ -48,7 +48,7 @@
 
 			const SimpleGI = function ( renderer, scene ) {
 
-				const SIZE = 128, SIZE2 = SIZE * SIZE, BLOCKSIZE = SIZE2 * 4;
+				const SIZE = 96, SIZE2 = SIZE * SIZE, BLOCKSIZE = SIZE2 * 4;
 
 				const camera = new THREE.PerspectiveCamera( 90, 1, 0.01, 100 );
 
@@ -82,8 +82,6 @@
 
                 }
 
-                // console.error( attributes.color );
-
                 const normals = attributes.normal.array;
                 const colors = attributes.color.array;
 
@@ -95,7 +93,7 @@
 
 				function compute() {
 
-					if ( bounces === 3 ) return;
+					if ( bounces === 5 ) return;
 
                     if ( waiting.length > 0 ) {
 
@@ -148,7 +146,7 @@
                             renderer.render( clone, camera );
 
                             const options = {
-                                interval: 8,
+                                interval: 4,
                                 readback: false,
                                 glBuffer: state.glBuffer,
                                 sync: ( i == state.length - 1 ),
@@ -183,7 +181,7 @@
 
                     }
 
-                    setTimeout( compute, 3 )
+                    setTimeout( compute, debouncer )
 
                 }
 
@@ -193,7 +191,8 @@
 
 			//
 
-			let camera, scene, renderer, torus;
+            const debouncer = 0 // ms
+			let camera, controls, scene, renderer, torus;
 
 			init();
 			animate();
@@ -204,6 +203,7 @@
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
+                scene.background = new THREE.Color( '#030100' );
 
 				// torus knot
 
@@ -217,11 +217,29 @@
 
 				const materials = [];
 
-				for ( let i = 0; i < 8; i ++ ) {
+				for ( let i = 0; i < 6; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.BackSide } ) );
+					materials.push( new THREE.MeshBasicMaterial( { color: 0x0, side: THREE.BackSide } ) );
 
 				}
+
+				let p0, p1;
+
+				// (r-l)
+				p0 = Math.random(), p1 = Math.random();
+				materials[0].color.setHSL( p0, p1, p0 * 0.4 + 0.3 );
+				materials[1].color.setHSL( p1, p0, p1 * 0.4 + 0.3 );
+
+				// (u-d)
+				p0 = Math.random(), p1 = Math.random();
+				materials[2].color.setHSL( p0, p1, p0 * 0.80 );
+				materials[3].color.setHSL( p1, p0, p1 * 0.05 );
+
+				// (f-b)
+				p0 = Math.random(), p1 = Math.random();
+				materials[4].color.setHSL( p0, p1, p0 * 0.40 );
+				materials[5].color.setHSL( p1, p0, p1 * 0.20 )
+
 
 				const boxGeometry = new THREE.BoxGeometry( 3, 3, 3 );
 
@@ -230,14 +248,16 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				new SimpleGI( renderer, scene );
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = -4.5; 
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 
@@ -255,6 +275,8 @@
 			}
 
 			function animate() {
+
+                controls.update();
 
 				requestAnimationFrame( animate );
 
