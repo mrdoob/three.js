@@ -1138,6 +1138,29 @@
           "Testare con NPM": "manual/it/buildTools/Testing-with-NPM"
         }
   
+      },
+
+      "Riferimenti": {
+
+        "Animation": {
+          "AnimationAction": "api/it/animation/AnimationAction",
+          "AnimationClip": "api/it/animation/AnimationClip",
+          "AnimationMixer": "api/it/animation/AnimationMixer",
+          "AnimationObjectGroup": "api/it/animation/AnimationObjectGroup",
+          "AnimationUtils": "api/it/animation/AnimationUtils",
+          "KeyframeTrack": "api/it/animation/KeyframeTrack",
+          "PropertyBinding": "api/it/animation/PropertyBinding",
+          "PropertyMixer": "api/it/animation/PropertyMixer"
+        },
+  
+        "Animation / Tracks": {
+          "BooleanKeyframeTrack": "api/it/animation/tracks/BooleanKeyframeTrack",
+          "ColorKeyframeTrack": "api/it/animation/tracks/ColorKeyframeTrack",
+          "NumberKeyframeTrack": "api/it/animation/tracks/NumberKeyframeTrack",
+          "QuaternionKeyframeTrack": "api/it/animation/tracks/QuaternionKeyframeTrack",
+          "StringKeyframeTrack": "api/it/animation/tracks/StringKeyframeTrack",
+          "VectorKeyframeTrack": "api/it/animation/tracks/VectorKeyframeTrack"
+        }
       }
     }
 
