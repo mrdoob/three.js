@@ -98,6 +98,7 @@ function Viewport( editor ) {
 	sceneHelpers.add( selectionBox );
 
 	const multipleSelection = new MultipleSelection( editor );
+	editor.multipleSelection = multipleSelection;
 
 	multipleSelection.addEventListener( 'pointerdown', () => {
 
@@ -420,6 +421,7 @@ function Viewport( editor ) {
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );
+		render();
 
 	} );
 

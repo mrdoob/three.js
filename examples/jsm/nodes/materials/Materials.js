@@ -47,7 +47,7 @@ NodeMaterial.fromMaterial = function ( material ) {
 
 	const nodeMaterial = new materialLib[ type ]( material );
 
-	for ( let key in material ) {
+	for ( const key in material ) {
 
 		if ( nodeMaterial[ key ] === undefined ) {
 

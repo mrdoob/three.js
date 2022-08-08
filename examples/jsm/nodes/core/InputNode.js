@@ -51,7 +51,7 @@ class InputNode extends Node {
 
 	generate( /*builder, output*/ ) {
 
-		console.warn('Abstract function.');
+		console.warn( 'Abstract function.' );
 
 	}
 

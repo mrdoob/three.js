@@ -17,8 +17,9 @@ import {
 	Raycaster,
 	SphereGeometry,
 	TorusGeometry,
-	Vector3
+	Vector3,
 } from 'three';
+import { MultipleSelectionGroup } from '../../../editor/js/objects/MultipleSelectionGroup.js';
 
 const _raycaster = new Raycaster();
 
@@ -546,8 +547,19 @@ class TransformControls extends Object3D {
 	// Set current object
 	attach( object ) {
 
-		this.object = object;
-		this.visible = true;
+		if ( object instanceof MultipleSelectionGroup ) {
+
+			this.object = object.parent;
+			console.log(this.object, this.mode);
+			console.log( 'this mode', this.mode );
+
+		} else {
+
+			this.object = object;
+			this.visible = true;
+
+		}
+
 
 		return this;
 
@@ -598,7 +610,9 @@ class TransformControls extends Object3D {
 	}
 
 	setMode( mode ) {
-
+		if (!this.visible) {
+			this.visible = true;
+		}
 		this.mode = mode;
 
 	}
@@ -1130,7 +1144,6 @@ class TransformControlsGizmo extends Object3D {
 		this.add( this.helper[ 'scale' ] = setupGizmo( helperScale ) );
 
 		// Pickers should be hidden always
-
 		this.picker[ 'translate' ].visible = false;
 		this.picker[ 'rotate' ].visible = false;
 		this.picker[ 'scale' ].visible = false;
@@ -1146,7 +1159,7 @@ class TransformControlsGizmo extends Object3D {
 		const quaternion = ( space === 'local' ) ? this.worldQuaternion : _identityQuaternion;
 
 		// Show only gizmos for current transform mode
-
+		//TODO: why do we need this logic if below in cycle we do the same???
 		this.gizmo[ 'translate' ].visible = this.mode === 'translate';
 		this.gizmo[ 'rotate' ].visible = this.mode === 'rotate';
 		this.gizmo[ 'scale' ].visible = this.mode === 'scale';
@@ -1378,7 +1391,6 @@ class TransformControlsGizmo extends Object3D {
 			} else if ( this.mode === 'rotate' ) {
 
 				// Align handles to current local or world rotation
-
 				_tempQuaternion2.copy( quaternion );
 				_alignVector.copy( this.eye ).applyQuaternion( _tempQuaternion.copy( quaternion ).invert() );
 
@@ -1528,7 +1540,7 @@ class TransformControlsPlane extends Mesh {
 			case 'rotate':
 			default:
 				// special case for rotate
-				_dirVector.set( 0, 0, 0 );
+				// _dirVector.set( 0, 0, 0 );
 
 		}
 

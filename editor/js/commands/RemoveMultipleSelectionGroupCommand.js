@@ -14,6 +14,13 @@ class RemoveMultipleSelectionGroupCommand extends Command {
 	execute() {
 
 		const group = this.editor.scene.getObjectByProperty( 'type', 'MultipleSelectionGroup' );
+		const pivotGroup = this.editor.scene.getObjectByProperty( 'name', 'Pivot Group' );
+
+		if ( pivotGroup ) {
+
+			this.editor.execute( new RemoveObjectCommand( this.editor, pivotGroup ) );
+
+		}
 
 		if ( group ) {
 
