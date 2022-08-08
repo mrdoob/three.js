@@ -550,8 +550,6 @@ class TransformControls extends Object3D {
 		if ( object instanceof MultipleSelectionGroup ) {
 
 			this.object = object.parent;
-			console.log(this.object, this.mode);
-			console.log( 'this mode', this.mode );
 
 		} else {
 
@@ -610,9 +608,13 @@ class TransformControls extends Object3D {
 	}
 
 	setMode( mode ) {
-		if (!this.visible) {
+
+		if ( ! this.visible ) {
+
 			this.visible = true;
+
 		}
+
 		this.mode = mode;
 
 	}
