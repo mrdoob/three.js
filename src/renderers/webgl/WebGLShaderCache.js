@@ -2,54 +2,35 @@ let _id = 0;
 
 class WebGLShaderCache {
 
-	constructor() {
+	constructor( properties ) {
 
 		this.shaderCache = new Map();
-		this.materialCache = new Map();
+		this.properties = properties;
 
 	}
 
 	update( material ) {
 
-		const vertexShader = material.vertexShader;
-		const fragmentShader = material.fragmentShader;
-
-		const vertexShaderStage = this._getShaderStage( vertexShader );
-		const fragmentShaderStage = this._getShaderStage( fragmentShader );
-
-		const materialShaders = this._getShaderCacheForMaterial( material );
-
-		if ( materialShaders.has( vertexShaderStage ) === false ) {
-
-			materialShaders.add( vertexShaderStage );
-			vertexShaderStage.usedTimes ++;
-
-		}
-
-		if ( materialShaders.has( fragmentShaderStage ) === false ) {
-
-			materialShaders.add( fragmentShaderStage );
-			fragmentShaderStage.usedTimes ++;
-
-		}
-
+		this._updateVertexShaderStage( material );
+		this._updateFragmentShaderStage( material );
 		return this;
 
 	}
 
 	remove( material ) {
 
-		const materialShaders = this.materialCache.get( material );
+		const materialProperties = this.properties.get( material );
+		this.remove( materialProperties.vertexShaderStage );
+		this.remove( materialProperties.fragmentShaderStage );
 
-		for ( const shaderStage of materialShaders ) {
+		return this;
 
-			shaderStage.usedTimes --;
+	}
+	remove( shaderStage ) {
 
-			if ( shaderStage.usedTimes === 0 ) this.shaderCache.delete( shaderStage.code );
+		shaderStage.usedTimes --;
 
-		}
-
-		this.materialCache.delete( material );
+		if ( shaderStage.usedTimes === 0 ) this.shaderCache.delete( shaderStage.code );
 
 		return this;
 
@@ -57,36 +38,82 @@ class WebGLShaderCache {
 
 	getVertexShaderID( material ) {
 
-		return this._getShaderStage( material.vertexShader ).id;
+		return this.properties.get( material ).vertexShaderStage.id;
 
 	}
 
 	getFragmentShaderID( material ) {
 
-		return this._getShaderStage( material.fragmentShader ).id;
+		return this.properties.get( material ).fragmentShaderStage.id;
 
 	}
 
 	dispose() {
 
 		this.shaderCache.clear();
-		this.materialCache.clear();
 
 	}
 
-	_getShaderCacheForMaterial( material ) {
+	_updateVertexShaderStage( material ) {
 
-		const cache = this.materialCache;
-		let set = cache.get( material );
+		const materialProperties = this.properties.get( material );
+		if ( materialProperties.vertexShaderChanged === undefined ) {
 
-		if ( set === undefined ) {
-
-			set = new Set();
-			cache.set( material, set );
+			material.addEventListener( 'VertexShaderChanged', onVertexShaderChanged.bind( materialProperties ) );
+			materialProperties.vertexShaderChanged = true;
 
 		}
 
-		return set;
+		if ( materialProperties.vertexShaderChanged ) {
+
+			const newVertexShaderStage = this._getShaderStage( material.vertexShader );
+			newVertexShaderStage.usedTimes ++;
+			this._checkShaderStageRemoval( materialProperties.vertexShaderStage );
+			materialProperties.vertexShaderStage = newVertexShaderStage;
+			materialProperties.vertexShaderChanged = false;
+
+		}
+
+	}
+	_updateFragmentShaderStage( material ) {
+
+		const materialProperties = this.properties.get( material );
+
+		if ( materialProperties.fragmentShaderChanged === undefined ) {
+
+			material.addEventListener( 'FragmentShaderChanged', onFragmentShaderChanged.bind( materialProperties ) );
+			materialProperties.fragmentShaderChanged = true;
+
+		}
+
+		if ( materialProperties.fragmentShaderChanged ) {
+
+			const newfragmentShaderStage = this._getShaderStage( material.fragmentShader );
+			newfragmentShaderStage.usedTimes ++;
+			this._checkShaderStageRemoval( materialProperties.fragmentShaderStage );
+			materialProperties.fragmentShaderStage = newfragmentShaderStage;
+			materialProperties.fragmentShaderChanged = false;
+
+		}
+
+
+	}
+
+	_checkShaderStageRemoval( shaderstage ) {
+
+		if ( shaderstage !== undefined ) {
+
+			if ( shaderstage.usedTimes === 1 ) {
+
+				this.remove( shaderstage );
+
+			} else {
+
+				shaderstage.usedTimes --;
+
+			}
+
+		}
 
 	}
 
@@ -118,6 +145,18 @@ class WebGLShaderStage {
 		this.usedTimes = 0;
 
 	}
+
+}
+
+function onVertexShaderChanged( material ) {
+
+	this.vertexShaderChanged = true;
+
+}
+
+function onFragmentShaderChanged( material ) {
+
+	this.fragmentShaderChanged = true;
 
 }
 

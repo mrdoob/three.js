@@ -18,8 +18,8 @@ class ShaderMaterial extends Material {
 		this.uniforms = {};
 		this.uniformsGroups = [];
 
-		this.vertexShader = default_vertex;
-		this.fragmentShader = default_fragment;
+		this._vertexShader = default_vertex;
+		this._fragmentShader = default_fragment;
 
 		this.linewidth = 1;
 
@@ -53,6 +53,40 @@ class ShaderMaterial extends Material {
 		if ( parameters !== undefined ) {
 
 			this.setValues( parameters );
+
+		}
+
+	}
+
+	get vertexShader() {
+
+		return this._vertexShader;
+
+	}
+
+	set vertexShader( value ) {
+
+		if ( this._vertexShader !== value ) {
+
+			this._vertexShader = value;
+			this.dispatchEvent( { type: 'VertexShaderChanged' } );
+
+		}
+
+	}
+
+	get fragmentShader() {
+
+		return this._fragmentShader;
+
+	}
+
+	set fragmentShader( value ) {
+
+		if ( this._fragmentShader !== value ) {
+
+			this._fragmentShader = value;
+			this.dispatchEvent( { type: 'FragmentShaderChanged' } );
 
 		}
 

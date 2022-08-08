@@ -5,10 +5,10 @@ import { WebGLShaderCache } from './WebGLShaderCache.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
 
-function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
+function WebGLPrograms( renderer, properties, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
 
 	const _programLayers = new Layers();
-	const _customShaders = new WebGLShaderCache();
+	const _customShaders = new WebGLShaderCache( properties );
 	const programs = [];
 
 	const isWebGL2 = capabilities.isWebGL2;
