@@ -20,13 +20,13 @@ class WebGLShaderCache {
 	remove( material ) {
 
 		const materialProperties = this.properties.get( material );
-		this.remove( materialProperties.vertexShaderStage );
-		this.remove( materialProperties.fragmentShaderStage );
+		this.removeShaderStage( materialProperties.vertexShaderStage );
+		this.removeShaderStage( materialProperties.fragmentShaderStage );
 
 		return this;
 
 	}
-	remove( shaderStage ) {
+	removeShaderStage( shaderStage ) {
 
 		shaderStage.usedTimes --;
 
@@ -105,7 +105,7 @@ class WebGLShaderCache {
 
 			if ( shaderstage.usedTimes === 1 ) {
 
-				this.remove( shaderstage );
+				this.removeShaderStage( shaderstage );
 
 			} else {
 
@@ -148,13 +148,13 @@ class WebGLShaderStage {
 
 }
 
-function onVertexShaderChanged( material ) {
+function onVertexShaderChanged() {
 
 	this.vertexShaderChanged = true;
 
 }
 
-function onFragmentShaderChanged( material ) {
+function onFragmentShaderChanged() {
 
 	this.fragmentShaderChanged = true;
 
