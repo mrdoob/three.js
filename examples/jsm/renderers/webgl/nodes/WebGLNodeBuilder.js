@@ -6,6 +6,7 @@ import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
 	LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
+import MathNode from '../../../nodes/math/MathNode.js';
 
 const nodeFrame = new NodeFrame();
 nodeFrame.camera = new PerspectiveCamera();
@@ -16,6 +17,10 @@ const nodeShaderLib = {
 	PointsNodeMaterial: ShaderLib.points,
 	MeshStandardNodeMaterial: ShaderLib.standard,
 	MeshPhysicalMaterial: ShaderLib.physical
+};
+
+const glslMethods = {
+	[ MathNode.ATAN2 ]: 'atan'
 };
 
 function getIncludeSnippet( name ) {
@@ -40,6 +45,12 @@ class WebGLNodeBuilder extends NodeBuilder {
 		this.slots = { vertex: [], fragment: [] };
 
 		this._parseObject();
+
+	}
+
+	getMethod( method ) {
+
+		return glslMethods[ method ] || method;
 
 	}
 
