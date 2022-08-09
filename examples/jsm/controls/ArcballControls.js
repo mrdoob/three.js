@@ -2296,15 +2296,15 @@ class ArcballControls extends EventDispatcher {
 
 		//
 
-		this._gizmos.traverse( function( object ) {
+		this._gizmos.traverse( function ( object ) {
 
 			if ( object.isLine ) {
-		
+
 				object.geometry.dispose();
 				object.material.dispose();
-		
+
 			}
-		
+
 		} );
 
 		this._gizmos.clear();

@@ -33,14 +33,13 @@
 			let container;
 			let camera, scene, renderer;
 			let controller1, controller2;
-			let controllerGrip1, controllerGrip2;
 
 			let raycaster;
 
 			const intersected = [];
 			const tempMatrix = new THREE.Matrix4();
 
-			let controls, group;
+			let group;
 
 			init();
 			animate();
@@ -55,7 +54,7 @@
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 0, 3 );
 
-				controls = new OrbitControls( camera, container );
+				new OrbitControls( camera, container );
 
 				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
