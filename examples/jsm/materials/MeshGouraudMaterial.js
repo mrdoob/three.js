@@ -214,8 +214,6 @@ class MeshGouraudMaterial extends ShaderMaterial {
 		//this.reflectivity = 1;
 		//this.refractionRatio = 0.98;
 
-		//this.flipEnvMap = - 1; // if envMap is a CubeTexture and not a RenderTargetTexture, set to - 1, otherwise set to 1
-
 		this.fog = false; // set to use scene fog
 		this.lights = true; // set to use scene lights
 		this.clipping = false; // set to use user-defined clipping planes
@@ -230,7 +228,7 @@ class MeshGouraudMaterial extends ShaderMaterial {
 		const exposePropertyNames = [
 			'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity',
 			'emissive', 'emissiveIntensity', 'emissiveMap', 'specularMap', 'alphaMap',
-			'envMap', 'reflectivity', 'refractionRatio', 'opacity', 'diffuse', 'flipEnvMap'
+			'envMap', 'reflectivity', 'refractionRatio', 'opacity', 'diffuse'
 		];
 
 		for ( const propertyName of exposePropertyNames ) {
