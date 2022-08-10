@@ -147,7 +147,9 @@
 
 				} );
 
-				new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 75;
 
 				// set up gui
 				const gui = new GUI();
