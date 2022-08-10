@@ -55,7 +55,7 @@ import {
  * // How to set outline parameters for each material
  * material.userData.outlineParameters = {
  * 	thickness: 0.01,
- * 	color: [ 0, 0, 0 ]
+ * 	color: [ 0, 0, 0 ],
  * 	alpha: 0.8,
  * 	visible: true,
  * 	keepAlive: true
