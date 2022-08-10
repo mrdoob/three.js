@@ -43,8 +43,8 @@
       Se `clampWhenFinished` è impostato a true l'animazione verrà automaticamente messa in [page:.paused pausa]
       sull'ultimo frame.<br /><br />
 
-      Se `clampWhenFinished` è impostato a false, [page:.enabled enabled] passerà automaticamente a false
-      al termine dell'ultimo ciclo di animazione, in modo che questa azione non abbia ulteriore impatto.<br /><br />
+      Se `clampWhenFinished` è impostato a false, [page:.enabled enabled] verrà automaticamente impostato a false
+      al termine dell'ultimo ciclo di animazione, in modo che questa azione non abbia più alcun impatto.<br /><br />
 
       Il valore di default è false.<br /><br />
 
@@ -54,13 +54,13 @@
 
 		<h3>[property:Boolean enabled]</h3>
 		<p>
-      Impostare `enabled` a `false` disabilita questa azione, in modo che non abbia alcun impatto. Il valore di default è `true`. <br /><br />
+      Impostare `enabled` a `false` disabilita questa azione, in modo che non abbia più alcun impatto. Il valore di default è `true`. <br /><br />
 
       Quando l'azione viene riattivata (re-enabled), l'animazione continua dal [page:.time tempo] corrente 
       (impostare `enabled` a `false` non resetta l'azione). <br /><br />
 
       Nota: Impostare `enabled` a `true` non riavvia automaticamente l'azione. Impostare `enabled` a `true`
-      farà riavviare l'animazione immediatamente solo se la è soddisfatta seguente condizione:
+      farà riavviare l'animazione immediatamente solo se è soddisfatta la seguente condizione:
       [page:.paused paused] è `false`, l'azione non è stata disattivata nel frattempo 
       (eseguendo un comando di [page:.stop stop] o [page:.reset reset]) e né [page:.weight weight] né 
       [page:.timeScale timeScale] sono pari a `0`.
@@ -72,10 +72,10 @@
       [page:Animation THREE.LoopRepeat] (con un numero infinito di [page:.repetitions ripetizioni])<br /><br />
 
       Il valore deve essere una di queste costanti:<br /><br />
-      [page:Animation THREE.LoopOnce] - riproducendo il clip una volta,<br />
-			[page:Animation THREE.LoopRepeat] - riproducendo il clip con il numero di `ripetizioni` prescelto, 
+      [page:Animation THREE.LoopOnce] - riproduce il clip una volta,<br />
+			[page:Animation THREE.LoopRepeat] - riproduce il clip con il numero di `ripetizioni` prescelto, 
       ogni volta saltando dalla fine della clip direttamente al suo inizio,<br />
-			[page:Animation THREE.LoopPingPong] - riproducendo il clip con il numero di `ripetizioni` prescelto,
+			[page:Animation THREE.LoopPingPong] - riproduce il clip con il numero di `ripetizioni` prescelto,
       alternativamente in avanti e in indietro. 
 		</p>
 
@@ -86,7 +86,7 @@
 
 		<h3>[property:Number repetitions]</h3>
 		<p>
-      Il numero di ripetizioni dell'[page:AnimationClip] eseguita nel corso di questa azione.
+      Il numero di ripetizioni dell'[page:AnimationClip] eseguite nel corso di questa azione.
       Può essere settato tramite [page:.setLoop setLoop]. Il valore di default è `Infinity`.<br /><br />
       Se la modalità di [page:loop looping] è impostata a [page:Animation THREE.LoopOnce], impostare questo valore non ha effetti.
 		</p>
@@ -132,12 +132,12 @@
 
 		<h3>[property:Boolean zeroSlopeAtEnd]</h3>
 		<p>
-      Abilita l'interpolazione uniforme senza clip separati per inizio, il loop e la fine. Il valore di default è `true`.
+      Abilita l'interpolazione uniforme senza clip separati per inizio, loop e fine. Il valore di default è `true`.
 		</p>
 
 		<h3>[property:Boolean zeroSlopeAtStart]</h3>
 		<p>
-      Abilita l'interpolazione uniforme senza clip separati per inizio, il loop e la fine. Il valore di default è `true`.
+      Abilita l'interpolazione uniforme senza clip separati per inizio, loop e fine. Il valore di default è `true`.
 		</p>
 
 
@@ -157,7 +157,7 @@
 		<h3>[method:this crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<p>
       Provoca il [page:.fadeOut fade out] (la dissolvenza in uscita) di questa azione, e la dissolvenza in entrata di un'altra azione 
-      simultaneamente, entro l'intervallo passato.Questo metodo può essere concatenato.<br /><br />
+      simultaneamente, entro l'intervallo passato. Questo metodo può essere concatenato.<br /><br />
 
       Se warpBoolean è true, verranno applicati ulteriori [page:.warp warping] (modifiche graduali delle scale temporali).<br /><br />
 
@@ -247,7 +247,7 @@
       interno per l'avvio ritardato.<br /><br />
 
       Nota: .`reset` è sempre chiamato da [page:.stop stop], ma .`reset` non chiama .`stop`.
-      Questo significa: Se vuoi chiamare entrambi i metodi, non chiamare .`reset`, chiama invece .`stop`.
+      Questo significa che se vuoi chiamare entrambi i metodi, non chiamare .`reset`, chiama invece .`stop`.
 		</p>
 
 		<h3>[method:this setDuration]( [param:Number durationInSeconds] )</h3>
@@ -261,9 +261,9 @@
       Imposta il [page:.timeScale timeScale] e interrompe qualsiasi warping programmato. Questo metodo può essere concatenato.<br /><br />
 
       Se [page:.paused paused] è false, l'effettivo time scale (una proprietà interna) sarà impostato a questo valore, 
-      altrimenti il time scale effettivo (che influenza direttamente l'animazione in questo momento) verrà impostata a `0`.<br /><br />
+      altrimenti il time scale effettivo (che influenza direttamente l'animazione in questo momento) verrà impostato a `0`.<br /><br />
 
-      Nota: Se .`timeScale` è impostato `0` da questo metodo, .`paused` non passerà automaticamente a `true`.
+      Nota: Se .`timeScale` è impostato `0` da questo metodo, .`paused` non verrà impostato automaticamente a `true`.
 		</p>
 
 		<h3>[method:this setEffectiveWeight]( [param:Number weight] )</h3>
@@ -286,7 +286,7 @@
       Definisce il tempo per un avvio ritardato (solitamente passato come [page:AnimationMixer.time] +
 			deltaTimeInSeconds). Questo metodo può essere concatenato.<br /><br />
 
-      Nota: L'animazione inizierà solo all'ora indicata, se .`startAt` è concatenato con
+      Nota: L'animazione inizierà solo all'ora indicata se .`startAt` è concatenato con
 			[page:.play play], o se l'azione è già stata attivata nel mixer (da una precedente chiamata di .`play`, 
       senza che nel frattempo sia stata fermata o resettata).
 		</p>
@@ -313,7 +313,7 @@
 
 		<h3>[method:this syncWith]( [param:AnimationAction otherAction] )</h3>
 		<p>
-      Sincronizza questa azione con l'altra azione passata.Questo metodo può essere concatenato.<br /><br />
+      Sincronizza questa azione con l'altra azione passata. Questo metodo può essere concatenato.<br /><br />
 
       La sincronizzazione viene fatta impostando i valori [page:.time time] e [page:.timeScale timeScale]
       di questa azione ai corrispondenti valori dell'altra azione (interrompendo qualsiasi warping programmato).<br /><br />
@@ -332,7 +332,7 @@
 
 
 		<p class="desc">
-      Ci sono due eventi che indicano quando un singolo ciclo dell'azione o l'intera azione è terminata. Si può reagire ad essi con:
+      Ci sono due eventi che indicano quando un singolo ciclo dell'azione o l'intera azione è terminata. Si può rispondere ad essi con:
 		</p>
 		<code>
 		mixer.addEventListener( 'loop', function( e ) { …} ); // properties of e: type, action and loopDelta
