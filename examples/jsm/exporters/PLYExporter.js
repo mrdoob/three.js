@@ -26,7 +26,7 @@ class PLYExporter {
 
 			object.traverse( function ( child ) {
 
-				if ( child.isMesh === true ) {
+				if ( child.isMesh === true || child.isPoints ) {
 
 					const mesh = child;
 					const geometry = mesh.geometry;
@@ -53,6 +53,7 @@ class PLYExporter {
 		options = Object.assign( defaultOptions, options );
 
 		const excludeAttributes = options.excludeAttributes;
+		let includeIndices = true;
 		let includeNormals = false;
 		let includeColors = false;
 		let includeUVs = false;
@@ -61,6 +62,7 @@ class PLYExporter {
 		// and cache the BufferGeometry
 		let vertexCount = 0;
 		let faceCount = 0;
+
 		object.traverse( function ( child ) {
 
 			if ( child.isMesh === true ) {
@@ -89,12 +91,22 @@ class PLYExporter {
 
 				if ( colors !== undefined ) includeColors = true;
 
+			} else if ( child.isPoints ) {
+
+				const mesh = child;
+				const geometry = mesh.geometry;
+
+				const vertices = geometry.getAttribute( 'position' );
+				vertexCount += vertices.count;
+
+				includeIndices = false;
+
 			}
 
 		} );
 
 		const tempColor = new Color();
-		const includeIndices = excludeAttributes.indexOf( 'index' ) === - 1;
+		includeIndices = includeIndices && excludeAttributes.indexOf( 'index' ) === - 1;
 		includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
 		includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
 		includeUVs = includeUVs && excludeAttributes.indexOf( 'uv' ) === - 1;
