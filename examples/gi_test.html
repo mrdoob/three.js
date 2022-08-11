@@ -48,7 +48,7 @@
 
 			const SimpleGI = function ( renderer, scene ) {
 
-				const SIZE = 96, SIZE2 = SIZE * SIZE, BLOCKSIZE = SIZE2 * 4;
+				const SIZE = 48, SIZE2 = SIZE * SIZE, BLOCKSIZE = SIZE2 * 4;
 
 				const camera = new THREE.PerspectiveCamera( 90, 1, 0.01, 100 );
 
@@ -155,13 +155,7 @@
 
                             renderer.readRenderTargetPixelsAsync( rt, 0, 0, SIZE, SIZE, buffer, undefined, options )
                                 .then( ( result ) => { 
-
-                                    if ( result ) {
-
-                                        waiting.push( state );
-
-                                    }
-
+                                    if ( result ) waiting.push( state );
                             } );
 
                         };
@@ -191,7 +185,7 @@
 
 			//
 
-            const debouncer = 0 // ms
+            const debouncer = 4 // ms
 			let camera, controls, scene, renderer, torus;
 
 			init();
@@ -200,7 +194,8 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.z = 4;
+				camera.position.z = 5;
+				camera.position.y = 0.2;
 
 				scene = new THREE.Scene();
                 scene.background = new THREE.Color( '#030100' );
