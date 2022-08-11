@@ -64,7 +64,7 @@
 
 		<p>
 			The three.js library can be used without any build system, either by uploading files to your own web server or by using an existing CDN. Because the library relies on ES modules, any script that references it must use <em>type="module"</em> as shown below.
-			It is also require to define an Import Map which resolves the bare module specifier `three`.
+			It is also required to define an Import Map which resolves the bare module specifier `three`.
 		</p>
 
 		<code>
@@ -87,9 +87,6 @@
 		&lt;/script>
 		</code>
 
-		<p>
-			Not all features are accessed through the <em>three</em> entrypoint. Other popular parts of the library — such as controls, loaders, and post-processing effects — must be imported from the [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] subfolder. To learn more, see <em>Examples</em> below.
-		</p>
 		<p>
 			Since Import maps are not yet supported by all browsers, it is necessary to add the polyfill *es-module-shims.js*.
 		</p>

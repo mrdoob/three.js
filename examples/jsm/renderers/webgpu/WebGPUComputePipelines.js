@@ -14,6 +14,12 @@ class WebGPUComputePipelines {
 
 	}
 
+	has( computeNode ) {
+
+		return this.pipelines.get( computeNode ) !== undefined;
+
+	}
+
 	get( computeNode ) {
 
 		let pipeline = this.pipelines.get( computeNode );

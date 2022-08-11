@@ -3,13 +3,13 @@ import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
 
 class WebGPURenderPipelines {
 
-	constructor( renderer, device, sampleCount, nodes, bindings = null ) {
+	constructor( device, nodes, utils ) {
 
-		this.renderer = renderer;
 		this.device = device;
-		this.sampleCount = sampleCount;
 		this.nodes = nodes;
-		this.bindings = bindings;
+		this.utils = utils;
+
+		this.bindings = null;
 
 		this.pipelines = [];
 		this.objectCache = new WeakMap();
@@ -125,7 +125,7 @@ class WebGPURenderPipelines {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = new WebGPURenderPipeline( this.device, this.renderer, this.sampleCount );
+			pipeline = new WebGPURenderPipeline( this.device, this.utils );
 			pipeline.init( cacheKey, stageVertex, stageFragment, object, nodeBuilder );
 
 			pipelines.push( pipeline );
@@ -139,7 +139,7 @@ class WebGPURenderPipelines {
 	_computeCacheKey( stageVertex, stageFragment, object ) {
 
 		const material = object.material;
-		const renderer = this.renderer;
+		const utils = this.utils;
 
 		const parameters = [
 			stageVertex.id, stageFragment.id,
@@ -152,8 +152,9 @@ class WebGPURenderPipelines {
 			material.stencilFail, material.stencilZFail, material.stencilZPass,
 			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
-			this.sampleCount,
-			renderer.getCurrentEncoding(), renderer.getCurrentColorFormat(), renderer.getCurrentDepthStencilFormat()
+			utils.getSampleCount(),
+			utils.getCurrentEncoding(), utils.getCurrentColorFormat(), utils.getCurrentDepthStencilFormat(),
+			utils.getPrimitiveTopology( object )
 		];
 
 		return parameters.join();
@@ -267,16 +268,17 @@ class WebGPURenderPipelines {
 
 		// check renderer state
 
-		const renderer = this.renderer;
+		const utils = this.utils;
 
-		const encoding = renderer.getCurrentEncoding();
-		const colorFormat = renderer.getCurrentColorFormat();
-		const depthStencilFormat = renderer.getCurrentDepthStencilFormat();
+		const sampleCount = utils.getSampleCount();
+		const encoding = utils.getCurrentEncoding();
+		const colorFormat = utils.getCurrentColorFormat();
+		const depthStencilFormat = utils.getCurrentDepthStencilFormat();
 
-		if ( cache.sampleCount !== this.sampleCount || cache.encoding !== encoding ||
+		if ( cache.sampleCount !== sampleCount || cache.encoding !== encoding ||
 			cache.colorFormat !== colorFormat || cache.depthStencilFormat !== depthStencilFormat ) {
 
-			cache.sampleCount = this.sampleCount;
+			cache.sampleCount = sampleCount;
 			cache.encoding = encoding;
 			cache.colorFormat = colorFormat;
 			cache.depthStencilFormat = depthStencilFormat;

@@ -9,6 +9,7 @@ class ShapeGeometry extends BufferGeometry {
 	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
 
 		super();
+
 		this.type = 'ShapeGeometry';
 
 		this.parameters = {

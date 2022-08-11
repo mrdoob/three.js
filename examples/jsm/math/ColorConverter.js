@@ -1,6 +1,4 @@
-import {
-	MathUtils
-} from 'three';
+import { MathUtils } from 'three';
 
 const _hsl = {};
 
@@ -19,13 +17,6 @@ class ColorConverter {
 	}
 
 	static getHSV( color, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.ColorConverter: .getHSV() target is now required' );
-			target = { h: 0, s: 0, l: 0 };
-
-		}
 
 		color.getHSL( _hsl );
 
@@ -53,13 +44,6 @@ class ColorConverter {
 	}
 
 	static getCMYK( color, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.ColorConverter: .getCMYK() target is now required' );
-			target = { c: 0, m: 0, y: 0, k: 0 };
-
-		}
 
 		const r = color.r;
 		const g = color.g;

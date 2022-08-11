@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
-import VaryNode from '../core/VaryNode.js';
+import VaryingNode from '../core/VaryingNode.js';
 import ModelNode from '../accessors/ModelNode.js';
 import CameraNode from '../accessors/CameraNode.js';
 import OperatorNode from '../math/OperatorNode.js';
@@ -39,18 +39,18 @@ class NormalNode extends Node {
 
 		} else if ( scope === NormalNode.LOCAL ) {
 
-			outputNode = new VaryNode( new NormalNode( NormalNode.GEOMETRY ) );
+			outputNode = new VaryingNode( new NormalNode( NormalNode.GEOMETRY ) );
 
 		} else if ( scope === NormalNode.VIEW ) {
 
 			const vertexNormalNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), new NormalNode( NormalNode.LOCAL ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
+			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNormalNode ) );
 
 		} else if ( scope === NormalNode.WORLD ) {
 
 			// To use INVERSE_TRANSFORM_DIRECTION only inverse the param order like this: MathNode( ..., Vector, Matrix );
 			const vertexNormalNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new NormalNode( NormalNode.VIEW ), new CameraNode( CameraNode.VIEW_MATRIX ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexNormalNode ) );
+			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNormalNode ) );
 
 		}
 

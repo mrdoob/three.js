@@ -222,21 +222,11 @@ function includeReplacer( match, include ) {
 
 // Unroll Loops
 
-const deprecatedUnrollLoopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
 const unrollLoopPattern = /#pragma unroll_loop_start\s+for\s*\(\s*int\s+i\s*=\s*(\d+)\s*;\s*i\s*<\s*(\d+)\s*;\s*i\s*\+\+\s*\)\s*{([\s\S]+?)}\s+#pragma unroll_loop_end/g;
 
 function unrollLoops( string ) {
 
-	return string
-		.replace( unrollLoopPattern, loopReplacer )
-		.replace( deprecatedUnrollLoopPattern, deprecatedLoopReplacer );
-
-}
-
-function deprecatedLoopReplacer( match, start, end, snippet ) {
-
-	console.warn( 'WebGLProgram: #pragma unroll_loop shader syntax is deprecated. Please use #pragma unroll_loop_start syntax instead.' );
-	return loopReplacer( match, start, end, snippet );
+	return string.replace( unrollLoopPattern, loopReplacer );
 
 }
 

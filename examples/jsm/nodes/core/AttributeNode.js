@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import VaryNode from './VaryNode.js';
+import VaryingNode from './VaryingNode.js';
 
 class AttributeNode extends Node {
 
@@ -58,9 +58,9 @@ class AttributeNode extends Node {
 
 		} else {
 
-			const nodeVary = new VaryNode( this );
+			const nodeVarying = new VaryingNode( this );
 
-			return nodeVary.build( builder, attribute.type );
+			return nodeVarying.build( builder, attribute.type );
 
 		}
 

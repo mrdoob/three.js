@@ -69,11 +69,10 @@
 
 		<h3>[method:BufferGeometry toTrianglesDrawMode]( [param:BufferGeometry geometry], [param:TrianglesDrawMode drawMode] )</h3>
 		<p>
-		geometry -- [page:BufferGeometry BufferGeometry] 实例。<br />
-		drawMode -- 给定几何体的绘制模式。<br /><br />
+		geometry -- Instance of [page:BufferGeometry BufferGeometry].<br />
+		drawMode -- The draw mode of the given geometry. Valid inputs are `THREE.TriangleStripDrawMode` and `THREE.TriangleFanDrawMode`.<br /><br />
 
-		基于 [page:DrawModes THREE.TrianglesDrawMode] 绘制模式，返回一个新的有索引值的 [page:BufferGeometry BufferGeometry]。 此模式对应于 WebGL 的原始术语 *gl.TRIANGLES* 。
-
+		Returns a new indexed geometry based on `THREE.TrianglesDrawMode` draw mode. This mode corresponds to the `gl.TRIANGLES` WebGL primitive.
 		</p>
 
 		<h3>[method:Object computeMorphedAttributes]( [param:Mesh | Line | Points object] )</h3>

@@ -1,4 +1,3 @@
-import { BufferGeometry } from './core/BufferGeometry.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { DataArrayTexture } from './textures/DataArrayTexture.js';
 import { Data3DTexture } from './textures/Data3DTexture.js';
@@ -21,48 +20,6 @@ import { TetrahedronGeometry } from './geometries/TetrahedronGeometry.js';
 import { TorusGeometry } from './geometries/TorusGeometry.js';
 import { TorusKnotGeometry } from './geometries/TorusKnotGeometry.js';
 import { TubeGeometry } from './geometries/TubeGeometry.js';
-
-// r133, c5bb5434555a3c3ddd784944a0a124f996fc721b
-
-export class ParametricGeometry extends BufferGeometry {
-
-	constructor() {
-
-		console.error( 'THREE.ParametricGeometry has been moved to /examples/jsm/geometries/ParametricGeometry.js' );
-		super();
-
-	}
-
-}
-
-// r133, eb58ff153119090d3bbb24474ea0ffc40c70dc92
-
-export class TextGeometry extends BufferGeometry {
-
-	constructor() {
-
-		console.error( 'THREE.TextGeometry has been moved to /examples/jsm/geometries/TextGeometry.js' );
-		super();
-
-	}
-
-}
-
-// r133, eb58ff153119090d3bbb24474ea0ffc40c70dc92
-
-export function FontLoader() {
-
-	console.error( 'THREE.FontLoader has been moved to /examples/jsm/loaders/FontLoader.js' );
-
-}
-
-// r133, eb58ff153119090d3bbb24474ea0ffc40c70dc92
-
-export function Font() {
-
-	console.error( 'THREE.Font has been moved to /examples/jsm/loaders/FontLoader.js' );
-
-}
 
 // r134, d65e0af06644fe5a84a6fc0e372f4318f95a04c0
 

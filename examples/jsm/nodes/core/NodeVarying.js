@@ -1,8 +1,8 @@
-class NodeVary {
+class NodeVarying {
 
 	constructor( name, type ) {
 
-		this.isNodeVary = true;
+		this.isNodeVarying = true;
 
 		this.name = name;
 		this.type = type;
@@ -11,4 +11,4 @@ class NodeVary {
 
 }
 
-export default NodeVary;
+export default NodeVarying;

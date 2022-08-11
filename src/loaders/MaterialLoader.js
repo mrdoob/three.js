@@ -225,6 +225,7 @@ class MaterialLoader extends Loader {
 		if ( json.defines !== undefined ) material.defines = json.defines;
 		if ( json.vertexShader !== undefined ) material.vertexShader = json.vertexShader;
 		if ( json.fragmentShader !== undefined ) material.fragmentShader = json.fragmentShader;
+		if ( json.glslVersion !== undefined ) material.glslVersion = json.glslVersion;
 
 		if ( json.extensions !== undefined ) {
 
@@ -235,10 +236,6 @@ class MaterialLoader extends Loader {
 			}
 
 		}
-
-		// Deprecated
-
-		if ( json.shading !== undefined ) material.flatShading = json.shading === 1; // THREE.FlatShading
 
 		// for PointsMaterial
 

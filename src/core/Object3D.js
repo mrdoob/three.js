@@ -721,7 +721,7 @@ class Object3D extends EventDispatcher {
 
 			}
 
-			if ( this.environment && this.environment.isTexture ) {
+			if ( this.environment && this.environment.isTexture && this.environment.isRenderTargetTexture !== true ) {
 
 				object.environment = this.environment.toJSON( meta ).uuid;
 

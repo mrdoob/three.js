@@ -1,3 +1,7 @@
+import {
+	DoubleSide
+} from 'three';
+
 import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
@@ -408,7 +412,7 @@ function buildMaterial( material, textures ) {
 	}
 
 
-	if ( material.side === THREE.DoubleSide ) {
+	if ( material.side === DoubleSide ) {
 
 		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 
