@@ -189,7 +189,6 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			ShaderChunk.emissivemap_pars_fragment,
 			ShaderChunk.envmap_common_pars_fragment,
 			ShaderChunk.envmap_pars_fragment,
-			ShaderChunk.cube_uv_reflection_fragment,
 			ShaderChunk.fog_pars_fragment,
 			ShaderChunk.bsdfs,
 			ShaderChunk.lights_pars_begin,
