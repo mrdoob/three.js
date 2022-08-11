@@ -69,7 +69,7 @@ export class DataTexture3D extends Data3DTexture {
 
 }
 
-// r143
+// r144
 
 export class BoxBufferGeometry extends BoxGeometry {
 
@@ -83,7 +83,7 @@ export class BoxBufferGeometry extends BoxGeometry {
 
 }
 
-// r143
+// r144
 
 export class CapsuleBufferGeometry extends CapsuleGeometry {
 
@@ -96,7 +96,7 @@ export class CapsuleBufferGeometry extends CapsuleGeometry {
 
 }
 
-// r143
+// r144
 
 export class CircleBufferGeometry extends CircleGeometry {
 
@@ -109,7 +109,7 @@ export class CircleBufferGeometry extends CircleGeometry {
 
 }
 
-// r143
+// r144
 
 export class ConeBufferGeometry extends ConeGeometry {
 
@@ -122,7 +122,7 @@ export class ConeBufferGeometry extends ConeGeometry {
 
 }
 
-// r143
+// r144
 
 export class CylinderBufferGeometry extends CylinderGeometry {
 
@@ -135,7 +135,7 @@ export class CylinderBufferGeometry extends CylinderGeometry {
 
 }
 
-// r143
+// r144
 
 export class DodecahedronBufferGeometry extends DodecahedronGeometry {
 
@@ -148,7 +148,7 @@ export class DodecahedronBufferGeometry extends DodecahedronGeometry {
 
 }
 
-// r143
+// r144
 
 export class ExtrudeBufferGeometry extends ExtrudeGeometry {
 
@@ -161,7 +161,7 @@ export class ExtrudeBufferGeometry extends ExtrudeGeometry {
 
 }
 
-// r143
+// r144
 
 export class IcosahedronBufferGeometry extends IcosahedronGeometry {
 
@@ -174,7 +174,7 @@ export class IcosahedronBufferGeometry extends IcosahedronGeometry {
 
 }
 
-// r143
+// r144
 
 export class LatheBufferGeometry extends LatheGeometry {
 
@@ -187,7 +187,7 @@ export class LatheBufferGeometry extends LatheGeometry {
 
 }
 
-// r143
+// r144
 
 export class OctahedronBufferGeometry extends OctahedronGeometry {
 
@@ -200,7 +200,7 @@ export class OctahedronBufferGeometry extends OctahedronGeometry {
 
 }
 
-// r143
+// r144
 
 export class PlaneBufferGeometry extends PlaneGeometry {
 
@@ -213,7 +213,7 @@ export class PlaneBufferGeometry extends PlaneGeometry {
 
 }
 
-// r143
+// r144
 
 export class PolyhedronBufferGeometry extends PolyhedronGeometry {
 
@@ -226,7 +226,7 @@ export class PolyhedronBufferGeometry extends PolyhedronGeometry {
 
 }
 
-// r143
+// r144
 
 export class RingBufferGeometry extends RingGeometry {
 
@@ -239,7 +239,7 @@ export class RingBufferGeometry extends RingGeometry {
 
 }
 
-// r143
+// r144
 
 export class ShapeBufferGeometry extends ShapeGeometry {
 
@@ -252,7 +252,7 @@ export class ShapeBufferGeometry extends ShapeGeometry {
 
 }
 
-// r143
+// r144
 
 export class SphereBufferGeometry extends SphereGeometry {
 
@@ -265,7 +265,7 @@ export class SphereBufferGeometry extends SphereGeometry {
 
 }
 
-// r143
+// r144
 
 export class TetrahedronBufferGeometry extends TetrahedronGeometry {
 
@@ -278,7 +278,7 @@ export class TetrahedronBufferGeometry extends TetrahedronGeometry {
 
 }
 
-// r143
+// r144
 
 export class TorusBufferGeometry extends TorusGeometry {
 
@@ -291,7 +291,7 @@ export class TorusBufferGeometry extends TorusGeometry {
 
 }
 
-// r143
+// r144
 
 export class TorusKnotBufferGeometry extends TorusKnotGeometry {
 
@@ -304,7 +304,7 @@ export class TorusKnotBufferGeometry extends TorusKnotGeometry {
 
 }
 
-// r143
+// r144
 
 export class TubeBufferGeometry extends TubeGeometry {
 
