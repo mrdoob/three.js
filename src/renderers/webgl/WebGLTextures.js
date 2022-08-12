@@ -681,6 +681,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( source.version !== source.__currentVersion || forceUpload === true ) {
 
+			state.activeTexture( _gl.TEXTURE0 + slot );
+
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
@@ -1038,6 +1040,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		state.bindTextureToSlot( _gl.TEXTURE0 + slot, _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
 
 		if ( source.version !== source.__currentVersion || forceUpload === true ) {
+
+			state.activeTexture( _gl.TEXTURE0 + slot );
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
