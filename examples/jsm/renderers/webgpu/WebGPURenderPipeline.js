@@ -1,4 +1,4 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
+import { GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
 import {
 	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
@@ -11,7 +11,7 @@ import {
 
 class WebGPURenderPipeline {
 
-	constructor( device, renderer, sampleCount ) {
+	constructor( device, utils ) {
 
 		this.cacheKey = null;
 		this.shaderAttributes = null;
@@ -20,8 +20,7 @@ class WebGPURenderPipeline {
 		this.usedTimes = 0;
 
 		this._device = device;
-		this._renderer = renderer;
-		this._sampleCount = sampleCount;
+		this._utils = utils;
 
 	}
 
@@ -89,8 +88,9 @@ class WebGPURenderPipeline {
 		const primitiveState = this._getPrimitiveState( object, material );
 		const colorWriteMask = this._getColorWriteMask( material );
 		const depthCompare = this._getDepthCompare( material );
-		const colorFormat = this._renderer.getCurrentColorFormat();
-		const depthStencilFormat = this._renderer.getCurrentDepthStencilFormat();
+		const colorFormat = this._utils.getCurrentColorFormat();
+		const depthStencilFormat = this._utils.getCurrentDepthStencilFormat();
+		const sampleCount = this._utils.getSampleCount();
 
 		this.pipeline = this._device.createRenderPipeline( {
 			vertex: Object.assign( {}, stageVertex.stage, { buffers: vertexBuffers } ),
@@ -113,7 +113,7 @@ class WebGPURenderPipeline {
 				stencilWriteMask: material.stencilWriteMask
 			},
 			multisample: {
-				count: this._sampleCount
+				count: sampleCount
 			},
 			layout: 'auto'
 		} );
@@ -430,7 +430,7 @@ class WebGPURenderPipeline {
 
 		const descriptor = {};
 
-		descriptor.topology = this._getPrimitiveTopology( object );
+		descriptor.topology = this._utils.getPrimitiveTopology( object );
 
 		if ( object.isLine === true && object.isLineSegments !== true ) {
 
@@ -464,15 +464,6 @@ class WebGPURenderPipeline {
 		}
 
 		return descriptor;
-
-	}
-
-	_getPrimitiveTopology( object ) {
-
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 

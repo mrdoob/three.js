@@ -1,6 +1,5 @@
 import TempNode from '../core/TempNode.js';
 import ExpressionNode from '../core/ExpressionNode.js';
-import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import OperatorNode from './OperatorNode.js';
 
@@ -131,17 +130,7 @@ class MathNode extends TempNode {
 
 		const isWebGL = builder.renderer.isWebGLRenderer === true;
 
-		if ( isWebGL && ( method === MathNode.DFDX || method === MathNode.DFDY ) && output === 'vec3' ) {
-
-			// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
-
-			return new JoinNode( [
-				new MathNode( method, new SplitNode( a, 'x' ) ),
-				new MathNode( method, new SplitNode( a, 'y' ) ),
-				new MathNode( method, new SplitNode( a, 'z' ) )
-			] ).build( builder );
-
-		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
+		if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
 			// dir can be either a direction vector or a normal vector
 			// upper-left 3x3 of matrix is assumed to be orthogonal

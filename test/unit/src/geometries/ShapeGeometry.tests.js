@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { ShapeGeometry, ShapeBufferGeometry } from '../../../../src/geometries/ShapeGeometry.js';
+import { ShapeGeometry } from '../../../../src/geometries/ShapeGeometry.js';
 
 import { Shape } from '../../../../src/extras/core/Shape.js';
 
@@ -18,7 +18,6 @@ export default QUnit.module( 'Geometries', () => {
 
 			geometries = [
 				new ShapeGeometry( triangleShape ),
-				new ShapeBufferGeometry( triangleShape )
 			];
 
 		} );

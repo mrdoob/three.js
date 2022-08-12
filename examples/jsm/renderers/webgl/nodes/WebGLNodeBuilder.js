@@ -2,10 +2,10 @@ import NodeBuilder, { defaultShaderStages } from 'three-nodes/core/NodeBuilder.j
 import NodeFrame from 'three-nodes/core/NodeFrame.js';
 import SlotNode from './SlotNode.js';
 import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
-import WebGLPhysicalContextNode from './WebGLPhysicalContextNode.js';
 
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
 	LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
+import MathNode from '../../../nodes/math/MathNode.js';
 
 const nodeFrame = new NodeFrame();
 nodeFrame.camera = new PerspectiveCamera();
@@ -14,7 +14,12 @@ const nodeShaderLib = {
 	LineBasicNodeMaterial: ShaderLib.basic,
 	MeshBasicNodeMaterial: ShaderLib.basic,
 	PointsNodeMaterial: ShaderLib.points,
-	MeshStandardNodeMaterial: ShaderLib.standard
+	MeshStandardNodeMaterial: ShaderLib.standard,
+	MeshPhysicalNodeMaterial: ShaderLib.physical
+};
+
+const glslMethods = {
+	[ MathNode.ATAN2 ]: 'atan'
 };
 
 function getIncludeSnippet( name ) {
@@ -38,15 +43,23 @@ class WebGLNodeBuilder extends NodeBuilder {
 		this.shader = shader;
 		this.slots = { vertex: [], fragment: [] };
 
+		this._parseShaderLib();
+		this._parseInclude( 'fragment', 'lights_physical_fragment', 'clearcoat_normal_fragment_begin', 'transmission_fragment' );
 		this._parseObject();
+
+		this._sortSlotsToFlow();
+
+	}
+
+	getMethod( method ) {
+
+		return glslMethods[ method ] || method;
 
 	}
 
 	addSlot( shaderStage, slotNode ) {
 
 		this.slots[ shaderStage ].push( slotNode );
-
-		return this.addFlow( shaderStage, slotNode );
 
 	}
 
@@ -62,18 +75,11 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	_parseObject() {
+	_parseShaderLib() {
 
-		const { material, renderer } = this;
-
-		let type = material.type;
+		const type = this.material.type;
 
 		// shader lib
-
-		if ( material.isMeshStandardNodeMaterial ) type = 'MeshStandardNodeMaterial';
-		else if ( material.isMeshBasicNodeMaterial ) type = 'MeshBasicNodeMaterial';
-		else if ( material.isPointsNodeMaterial ) type = 'PointsNodeMaterial';
-		else if ( material.isLineBasicNodeMaterial ) type = 'LineBasicNodeMaterial';
 
 		if ( nodeShaderLib[ type ] !== undefined ) {
 
@@ -86,9 +92,20 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		}
 
+	}
+
+	_parseObject() {
+
+		const { material, renderer } = this;
+
 		if ( renderer.toneMappingNode?.isNode === true ) {
 
-			this.replaceCode( 'fragment', getIncludeSnippet( 'tonemapping_fragment' ), '' );
+			this.addSlot( 'fragment', new SlotNode( {
+				node: material.colorNode,
+				nodeType: 'vec4',
+				source: getIncludeSnippet( 'tonemapping_fragment' ),
+				target: ''
+			} ) );
 
 		}
 
@@ -96,89 +113,308 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		if ( material.colorNode && material.colorNode.isNode ) {
 
-			this.addSlot( 'fragment', new SlotNode( material.colorNode, 'COLOR', 'vec4' ) );
+			this.addSlot( 'fragment', new SlotNode( {
+				node: material.colorNode,
+				nodeType: 'vec4',
+				source: getIncludeSnippet( 'color_fragment' ),
+				target: 'diffuseColor = %RESULT%;',
+				inclusionType: 'append'
+			} ) );
 
 		}
 
 		if ( material.opacityNode && material.opacityNode.isNode ) {
 
-			this.addSlot( 'fragment', new SlotNode( material.opacityNode, 'OPACITY', 'float' ) );
+			this.addSlot( 'fragment', new SlotNode( {
+				node: material.opacityNode,
+				nodeType: 'float',
+				source: getIncludeSnippet( 'alphatest_fragment' ),
+				target: 'diffuseColor.a = %RESULT%;',
+				inclusionType: 'append'
+			} ) );
 
 		}
 
 		if ( material.normalNode && material.normalNode.isNode ) {
 
-			this.addSlot( 'fragment', new SlotNode( material.normalNode, 'NORMAL', 'vec3' ) );
+			this.addSlot( 'fragment', new SlotNode( {
+				node: material.normalNode,
+				nodeType: 'vec3',
+				source: getIncludeSnippet( 'normal_fragment_begin' ),
+				target: 'normal = %RESULT%;',
+				inclusionType: 'append'
+			} ) );
 
 		}
 
 		if ( material.emissiveNode && material.emissiveNode.isNode ) {
 
-			this.addSlot( 'fragment', new SlotNode( material.emissiveNode, 'EMISSIVE', 'vec3' ) );
+			this.addSlot( 'fragment', new SlotNode( {
+				node: material.emissiveNode,
+				nodeType: 'vec3',
+				source: getIncludeSnippet( 'emissivemap_fragment' ),
+				target: 'totalEmissiveRadiance = %RESULT%;',
+				inclusionType: 'append'
+			} ) );
 
 		}
 
-		if ( material.metalnessNode && material.metalnessNode.isNode ) {
+		if ( material.isMeshStandardNodeMaterial ) {
 
-			this.addSlot( 'fragment', new SlotNode( material.metalnessNode, 'METALNESS', 'float' ) );
+			if ( material.metalnessNode && material.metalnessNode.isNode ) {
+
+				this.addSlot( 'fragment', new SlotNode( {
+					node: material.metalnessNode,
+					nodeType: 'float',
+					source: getIncludeSnippet( 'metalnessmap_fragment' ),
+					target: 'metalnessFactor = %RESULT%;',
+					inclusionType: 'append'
+				} ) );
+
+			}
+
+			if ( material.roughnessNode && material.roughnessNode.isNode ) {
+
+				this.addSlot( 'fragment', new SlotNode( {
+					node: material.roughnessNode,
+					nodeType: 'float',
+					source: getIncludeSnippet( 'roughnessmap_fragment' ),
+					target: 'roughnessFactor = %RESULT%;',
+					inclusionType: 'append'
+				} ) );
+
+			}
+
+			if ( material.isMeshPhysicalNodeMaterial ) {
+
+				if ( material.clearcoatNode && material.clearcoatNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( {
+						node: material.clearcoatNode,
+						nodeType: 'float',
+						source: 'material.clearcoat = clearcoat;',
+						target: 'material.clearcoat = %RESULT%;'
+					} ) );
+
+					if ( material.clearcoatRoughnessNode && material.clearcoatRoughnessNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.clearcoatRoughnessNode,
+							nodeType: 'float',
+							source: 'material.clearcoatRoughness = clearcoatRoughness;',
+							target: 'material.clearcoatRoughness = %RESULT%;'
+						} ) );
+
+					}
+
+					if ( material.clearcoatNormalNode && material.clearcoatNormalNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.clearcoatNormalNode,
+							nodeType: 'vec3',
+							source: 'vec3 clearcoatNormal = geometryNormal;',
+							target: 'vec3 clearcoatNormal = %RESULT%;'
+						} ) );
+
+					}
+
+					material.defines.USE_CLEARCOAT = '';
+
+				} else {
+
+					delete material.defines.USE_CLEARCOAT;
+
+				}
+
+				if ( material.sheenNode && material.sheenNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( {
+						node: material.sheenNode,
+						nodeType: 'vec3',
+						source: 'material.sheenColor = sheenColor;',
+						target: 'material.sheenColor = %RESULT%;'
+					} ) );
+
+					if ( material.sheenRoughnessNode && material.sheenRoughnessNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.sheenRoughnessNode,
+							nodeType: 'float',
+							source: 'material.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );',
+							target: 'material.sheenRoughness = clamp( %RESULT%, 0.07, 1.0 );'
+						} ) );
+
+					}
+
+					material.defines.USE_SHEEN = '';
+
+				} else {
+
+					delete material.defines.USE_SHEEN;
+
+				}
+
+				if ( material.iridescenceNode && material.iridescenceNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( {
+						node: material.iridescenceNode,
+						nodeType: 'float',
+						source: 'material.iridescence = iridescence;',
+						target: 'material.iridescence = %RESULT%;'
+					} ) );
+
+					if ( material.iridescenceIORNode && material.iridescenceIORNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.iridescenceIORNode,
+							nodeType: 'float',
+							source: 'material.iridescenceIOR = iridescenceIOR;',
+							target: 'material.iridescenceIOR = %RESULT%;'
+						} ) );
+
+					}
+
+					if ( material.iridescenceThicknessNode && material.iridescenceThicknessNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.iridescenceThicknessNode,
+							nodeType: 'float',
+							source: 'material.iridescenceThickness = iridescenceThicknessMaximum;',
+							target: 'material.iridescenceThickness = %RESULT%;'
+						} ) );
+
+					}
+
+					material.defines.USE_IRIDESCENCE = '';
+
+				} else {
+
+					delete material.defines.USE_IRIDESCENCE;
+
+				}
+
+				if ( material.iorNode && material.iorNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( {
+						node: material.iorNode,
+						nodeType: 'float',
+						source: 'material.ior = ior;',
+						target: 'material.ior = %RESULT%;'
+					} ) );
+
+				}
+
+				if ( material.specularColorNode && material.specularColorNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( {
+						node: material.specularColorNode,
+						nodeType: 'vec3',
+						source: 'vec3 specularColorFactor = specularColor;',
+						target: 'vec3 specularColorFactor = %RESULT%;'
+					} ) );
+
+				}
+
+				if ( material.specularIntensityNode && material.specularIntensityNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( {
+						node: material.specularIntensityNode,
+						nodeType: 'float',
+						source: 'float specularIntensityFactor = specularIntensity;',
+						target: 'float specularIntensityFactor = %RESULT%;'
+					} ) );
+
+				}
+
+				if ( material.transmissionNode && material.transmissionNode.isNode ) {
+
+					this.addSlot( 'fragment', new SlotNode( {
+						node: material.transmissionNode,
+						nodeType: 'float',
+						source: 'material.transmission = transmission;',
+						target: 'material.transmission = %RESULT%;'
+					} ) );
+
+					if ( material.thicknessNode && material.thicknessNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.thicknessNode,
+							nodeType: 'float',
+							source: 'material.thickness = thickness;',
+							target: 'material.thickness = %RESULT%;'
+						} ) );
+
+					}
+
+					if ( material.thicknessNode && material.thicknessNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.thicknessNode,
+							nodeType: 'float',
+							source: 'material.thickness = thickness;',
+							target: 'material.thickness = %RESULT%;'
+						} ) );
+
+					}
+
+					if ( material.attenuationDistanceNode && material.attenuationDistanceNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.attenuationDistanceNode,
+							nodeType: 'float',
+							source: 'material.attenuationDistance = attenuationDistance;',
+							target: 'material.attenuationDistance = %RESULT%;'
+						} ) );
+
+					}
+
+					if ( material.attenuationColorNode && material.attenuationColorNode.isNode ) {
+
+						this.addSlot( 'fragment', new SlotNode( {
+							node: material.attenuationColorNode,
+							nodeType: 'vec3',
+							source: 'material.attenuationColor = attenuationColor;',
+							target: 'material.attenuationColor = %RESULT%;'
+						} ) );
+
+					}
+
+					material.transmission = 1;
+					material.defines.USE_TRANSMISSION = '';
+
+				} else {
+
+					material.transmission = 0;
+					delete material.defines.USE_TRANSMISSION;
+
+				}
+
+			}
 
 		}
 
-		if ( material.roughnessNode && material.roughnessNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.roughnessNode, 'ROUGHNESS', 'float' ) );
-
-		}
-
-		if ( material.clearcoatNode && material.clearcoatNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.clearcoatNode, 'CLEARCOAT', 'float' ) );
-
-		}
-
-		if ( material.clearcoatRoughnessNode && material.clearcoatRoughnessNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.clearcoatRoughnessNode, 'CLEARCOAT_ROUGHNESS', 'float' ) );
-
-		}
-
-		if ( material.iridescenceNode && material.iridescenceNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.iridescenceNode, 'IRIDESCENCE', 'float' ) );
-
-		}
-
-		if ( material.iridescenceIORNode && material.iridescenceIORNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.iridescenceIORNode, 'IRIDESCENCE_IOR', 'float' ) );
-
-		}
-
-		if ( material.iridescenceThicknessNode && material.iridescenceThicknessNode.isNode ) {
-
-			this.addSlot( 'fragment', new SlotNode( material.iridescenceThicknessNode, 'IRIDESCENCE_THICKNESS', 'float' ) );
-
-		}
-
-		if ( material.envNode && material.envNode.isNode ) {
-
-			const envRadianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.RADIANCE, material.envNode );
-			const envIrradianceNode = new WebGLPhysicalContextNode( WebGLPhysicalContextNode.IRRADIANCE, material.envNode );
-
-			this.addSlot( 'fragment', new SlotNode( envRadianceNode, 'RADIANCE', 'vec3' ) );
-			this.addSlot( 'fragment', new SlotNode( envIrradianceNode, 'IRRADIANCE', 'vec3' ) );
-
-		}
+		//
 
 		if ( material.positionNode && material.positionNode.isNode ) {
 
-			this.addSlot( 'vertex', new SlotNode( material.positionNode, 'POSITION', 'vec3' ) );
+			this.addSlot( 'vertex', new SlotNode( {
+				node: material.positionNode,
+				nodeType: 'vec3',
+				source: getIncludeSnippet( 'begin_vertex' ),
+				target: 'transformed = %RESULT%;',
+				inclusionType: 'append'
+			} ) );
 
 		}
 
 		if ( material.sizeNode && material.sizeNode.isNode ) {
 
-			this.addSlot( 'vertex', new SlotNode( material.sizeNode, 'SIZE', 'float' ) );
+			this.addSlot( 'vertex', new SlotNode( {
+				node: material.sizeNode,
+				nodeType: 'float',
+				source: 'gl_PointSize = size;',
+				target: 'gl_PointSize = %RESULT%;'
+			} ) );
 
 		}
 
@@ -250,9 +486,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			const attributes = this.attributes;
 
-			for ( let index = 0; index < attributes.length; index ++ ) {
-
-				const attribute = attributes[ index ];
+			for ( const attribute of attributes ) {
 
 				// ignore common attributes to prevent redefinitions
 				if ( attribute.name === 'uv' || attribute.name === 'position' || attribute.name === 'normal' )
@@ -268,17 +502,15 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarys( /* shaderStage */ ) {
+	getVaryings( /* shaderStage */ ) {
 
 		let snippet = '';
 
-		const varys = this.varys;
+		const varyings = this.varyings;
 
-		for ( let index = 0; index < varys.length; index ++ ) {
+		for ( const varying of varyings ) {
 
-			const vary = varys[ index ];
-
-			snippet += `varying ${vary.type} ${vary.name}; `;
+			snippet += `varying ${varying.type} ${varying.name}; `;
 
 		}
 
@@ -286,7 +518,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	addCodeAfterSnippet( shaderStage, snippet, code ) {
+	addCodeAfterCode( shaderStage, snippet, code ) {
 
 		const shaderProperty = getShaderStageProperty( shaderStage );
 
@@ -307,32 +539,11 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	addCodeAfterInclude( shaderStage, includeName, code ) {
-
-		const includeSnippet = getIncludeSnippet( includeName );
-
-		this.addCodeAfterSnippet( shaderStage, includeSnippet, code );
-
-	}
-
 	replaceCode( shaderStage, source, target ) {
 
 		const shaderProperty = getShaderStageProperty( shaderStage );
 
-		this.shader[ shaderProperty ] = this.shader[ shaderProperty ].replaceAll( source, target );
-
-	}
-
-	parseInclude( shaderStage, ...includes ) {
-
-		for ( const name of includes ) {
-
-			const includeSnippet = getIncludeSnippet( name );
-			const code = ShaderChunk[ name ];
-
-			this.replaceCode( shaderStage, includeSnippet, code );
-
-		}
+		this[ shaderProperty ] = this[ shaderProperty ].replaceAll( source, target );
 
 	}
 
@@ -364,7 +575,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			const uniforms = this.getUniforms( shaderStage );
 			const attributes = this.getAttributes( shaderStage );
-			const varys = this.getVarys( shaderStage );
+			const varyings = this.getVaryings( shaderStage );
 			const vars = this.getVars( shaderStage );
 			const codes = this.getCodes( shaderStage );
 
@@ -377,8 +588,8 @@ ${uniforms}
 // attributes
 ${attributes}
 
-// varys
-${varys}
+// varyings
+${varyings}
 
 // vars
 ${vars}
@@ -414,15 +625,41 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	}
 
-	getSlot( shaderStage, name ) {
+	_parseInclude( shaderStage, ...includes ) {
 
-		const slots = this.slots[ shaderStage ];
+		for ( const name of includes ) {
 
-		for ( const node of slots ) {
+			const includeSnippet = getIncludeSnippet( name );
+			const code = ShaderChunk[ name ];
 
-			if ( node.name === name ) {
+			const shaderProperty = getShaderStageProperty( shaderStage );
 
-				return this.getFlowData( node/*, shaderStage*/ );
+			this.shader[ shaderProperty ] = this.shader[ shaderProperty ].replaceAll( includeSnippet, code );
+
+		}
+
+	}
+
+	_sortSlotsToFlow() {
+
+		for ( const shaderStage of defaultShaderStages ) {
+
+			const sourceCode = this.shader[ getShaderStageProperty( shaderStage ) ];
+
+			const slots = this.slots[ shaderStage ].sort( ( slotA, slotB ) => {
+
+				if ( sourceCode.indexOf( slotA.source ) == - 1 ) {
+					//console.log( slotA, sourceCode.indexOf( slotA.source ), sourceCode.indexOf( slotB.source ) );
+					//console.log(sourceCode);
+				}
+
+				return sourceCode.indexOf( slotA.source ) > sourceCode.indexOf( slotB.source ) ? 1 : - 1;
+
+			} );
+
+			for ( const slotNode of slots ) {
+
+				this.addFlow( shaderStage, slotNode );
 
 			}
 
@@ -432,156 +669,33 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 	_addSnippets() {
 
-		this.parseInclude( 'fragment', 'lights_physical_fragment' );
-
-		const colorSlot = this.getSlot( 'fragment', 'COLOR' );
-		const opacityNode = this.getSlot( 'fragment', 'OPACITY' );
-		const normalSlot = this.getSlot( 'fragment', 'NORMAL' );
-		const emissiveNode = this.getSlot( 'fragment', 'EMISSIVE' );
-		const roughnessNode = this.getSlot( 'fragment', 'ROUGHNESS' );
-		const metalnessNode = this.getSlot( 'fragment', 'METALNESS' );
-		const clearcoatNode = this.getSlot( 'fragment', 'CLEARCOAT' );
-		const clearcoatRoughnessNode = this.getSlot( 'fragment', 'CLEARCOAT_ROUGHNESS' );
-		const iridescenceNode = this.getSlot( 'fragment', 'IRIDESCENCE' );
-		const iridescenceIORNode = this.getSlot( 'fragment', 'IRIDESCENCE_IOR' );
-		const iridescenceThicknessNode = this.getSlot( 'fragment', 'IRIDESCENCE_THICKNESS' );
-
-		const positionNode = this.getSlot( 'vertex', 'POSITION' );
-		const sizeNode = this.getSlot( 'vertex', 'SIZE' );
-
-		if ( colorSlot !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'color_fragment',
-				`${colorSlot.code}\n\tdiffuseColor = ${colorSlot.result};`
-			);
-
-		}
-
-		if ( opacityNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'alphatest_fragment',
-				`${opacityNode.code}\n\tdiffuseColor.a = ${opacityNode.result};`
-			);
-
-		}
-
-		if ( normalSlot !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'normal_fragment_begin',
-				`${normalSlot.code}\n\tnormal = ${normalSlot.result};`
-			);
-
-		}
-
-		if ( emissiveNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'emissivemap_fragment',
-				`${emissiveNode.code}\n\ttotalEmissiveRadiance = ${emissiveNode.result};`
-			);
-
-		}
-
-		if ( roughnessNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'roughnessmap_fragment',
-				`${roughnessNode.code}\n\troughnessFactor = ${roughnessNode.result};`
-			);
-
-		}
-
-		if ( metalnessNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'fragment',
-				'metalnessmap_fragment',
-				`${metalnessNode.code}\n\tmetalnessFactor = ${metalnessNode.result};`
-			);
-
-		}
-
-		if ( clearcoatNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'fragment',
-				'material.clearcoatRoughness = clearcoatRoughness;',
-				`${clearcoatNode.code}\n\tmaterial.clearcoat = ${clearcoatNode.result};`
-			);
-
-		}
-
-		if ( clearcoatRoughnessNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'fragment',
-				'material.clearcoatRoughness = clearcoatRoughness;',
-				`${clearcoatRoughnessNode.code}\n\tmaterial.clearcoatRoughness = ${clearcoatRoughnessNode.result};`
-			);
-
-		}
-
-		if ( iridescenceNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'fragment',
-				'iridescence_fragment',
-				`${iridescenceNode.code}\n\tmaterial.iridescence = ${iridescenceNode.result};`
-			);
-
-		}
-
-		if ( iridescenceIORNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'fragment',
-				'iridescence_fragment',
-				`${iridescenceIORNode.code}\n\tmaterial.iridescenceIOR = ${iridescenceIORNode.result};`
-			);
-
-		}
-
-		if ( iridescenceThicknessNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'fragment',
-				'iridescence_fragment',
-				`${iridescenceThicknessNode.code}\n\tmaterial.iridescenceThickness = ${iridescenceThicknessNode.result};`
-			);
-
-		}
-
-		if ( positionNode !== undefined ) {
-
-			this.addCodeAfterInclude(
-				'vertex',
-				'begin_vertex',
-				`${positionNode.code}\n\ttransformed = ${positionNode.result};`
-			);
-
-		}
-
-		if ( sizeNode !== undefined ) {
-
-			this.addCodeAfterSnippet(
-				'vertex',
-				'gl_PointSize = size;',
-				`${sizeNode.code}\n\tgl_PointSize = ${sizeNode.result};`
-			);
-
-		}
-
 		for ( const shaderStage of defaultShaderStages ) {
 
-			this.addCodeAfterSnippet(
+			for ( const slotNode of this.slots[ shaderStage ] ) {
+
+				const flowData = this.getFlowData( slotNode/*, shaderStage*/ );
+
+				const inclusionType = slotNode.inclusionType;
+				const source = slotNode.source;
+				const target = flowData.code + '\n\t' + slotNode.target.replace( '%RESULT%', flowData.result );
+
+				if ( inclusionType === 'append' ) {
+
+					this.addCodeAfterCode( shaderStage, source, target );
+
+				} else if ( inclusionType === 'replace' ) {
+
+					this.replaceCode( shaderStage, source, target );
+
+				} else {
+
+					console.warn( `Inclusion type "${ inclusionType }" not compatible.` );
+
+				}
+
+			}
+
+			this.addCodeAfterCode(
 				shaderStage,
 				'main() {',
 				this.flowCode[ shaderStage ]

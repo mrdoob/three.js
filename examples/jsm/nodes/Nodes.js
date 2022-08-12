@@ -18,12 +18,12 @@ import NodeFunctionInput from './core/NodeFunctionInput.js';
 import NodeKeywords from './core/NodeKeywords.js';
 import NodeUniform from './core/NodeUniform.js';
 import NodeVar from './core/NodeVar.js';
-import NodeVary from './core/NodeVary.js';
+import NodeVarying from './core/NodeVarying.js';
 import PropertyNode from './core/PropertyNode.js';
 import TempNode from './core/TempNode.js';
 import UniformNode from './core/UniformNode.js';
 import VarNode from './core/VarNode.js';
-import VaryNode from './core/VaryNode.js';
+import VaryingNode from './core/VaryingNode.js';
 
 // accessors
 import BufferNode from './accessors/BufferNode.js';
@@ -80,7 +80,7 @@ import JoinNode from './utils/JoinNode.js';
 import MatcapUVNode from './utils/MatcapUVNode.js';
 import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
 import OscNode from './utils/OscNode.js';
-import RotateUVNode from './utils/RotateUVNode.js'
+import RotateUVNode from './utils/RotateUVNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
 import TimerNode from './utils/TimerNode.js';
@@ -127,12 +127,12 @@ const nodeLib = {
 	NodeKeywords,
 	NodeUniform,
 	NodeVar,
-	NodeVary,
+	NodeVarying,
 	PropertyNode,
 	TempNode,
 	UniformNode,
 	VarNode,
-	VaryNode,
+	VaryingNode,
 
 	// geometry
 	RangeNode,
@@ -235,12 +235,12 @@ export {
 	NodeKeywords,
 	NodeUniform,
 	NodeVar,
-	NodeVary,
+	NodeVarying,
 	PropertyNode,
 	TempNode,
 	UniformNode,
 	VarNode,
-	VaryNode,
+	VaryingNode,
 
 	// geometry
 	RangeNode,

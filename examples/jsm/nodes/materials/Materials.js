@@ -2,6 +2,7 @@ import NodeMaterial from './NodeMaterial.js';
 import LineBasicNodeMaterial from './LineBasicNodeMaterial.js';
 import MeshBasicNodeMaterial from './MeshBasicNodeMaterial.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
+import MeshPhysicalNodeMaterial from './MeshPhysicalNodeMaterial.js';
 import PointsNodeMaterial from './PointsNodeMaterial.js';
 import SpriteNodeMaterial from './SpriteNodeMaterial.js';
 
@@ -10,6 +11,7 @@ export {
 	LineBasicNodeMaterial,
 	MeshBasicNodeMaterial,
 	MeshStandardNodeMaterial,
+	MeshPhysicalNodeMaterial,
 	PointsNodeMaterial,
 	SpriteNodeMaterial
 };
@@ -21,8 +23,9 @@ NodeMaterial.fromMaterial = function ( material ) {
 		LineBasicNodeMaterial,
 		MeshBasicNodeMaterial,
 		MeshStandardNodeMaterial,
+		MeshPhysicalNodeMaterial,
 		PointsNodeMaterial,
-		SpriteNodeMaterial,
+		SpriteNodeMaterial
 	};
 
 	const type = material.type.replace( 'Material', 'NodeMaterial' );

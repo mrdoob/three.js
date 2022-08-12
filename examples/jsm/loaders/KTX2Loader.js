@@ -38,12 +38,12 @@ import {
 	UnsignedByteType
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
-import * as KTX from '../libs/ktx-parse.module.js';
-
-const {
+import {
 	read,
 	KHR_DF_FLAG_ALPHA_PREMULTIPLIED,
 	KHR_DF_TRANSFER_SRGB,
+	KHR_SUPERCOMPRESSION_NONE,
+	KHR_SUPERCOMPRESSION_ZSTD,
 	VK_FORMAT_UNDEFINED,
 	VK_FORMAT_R16_SFLOAT,
 	VK_FORMAT_R16G16_SFLOAT,
@@ -57,11 +57,14 @@ const {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
-} = KTX; // eslint-disable-line no-undef
+} from '../libs/ktx-parse.module.js';
+import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
 const _taskCache = new WeakMap();
 
 let _activeLoaders = 0;
+
+let _zstd;
 
 class KTX2Loader extends Loader {
 
@@ -660,7 +663,7 @@ const ENCODING_MAP = {
 
 };
 
-function createDataTexture( container ) {
+async function createDataTexture( container ) {
 
 	const { vkFormat, pixelWidth, pixelHeight, pixelDepth } = container;
 
@@ -672,9 +675,36 @@ function createDataTexture( container ) {
 
 	//
 
+	const level = container.levels[ 0 ];
+
+	let levelData;
 	let view;
 
-	const levelData = container.levels[ 0 ].levelData;
+	if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE ) {
+
+		levelData = level.levelData;
+
+	} else if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD ) {
+
+		if ( ! _zstd ) {
+
+			_zstd = new Promise( async ( resolve ) => {
+
+				const zstd = new ZSTDDecoder();
+				await zstd.init();
+				resolve( zstd );
+
+			} );
+
+		}
+
+		levelData = ( await _zstd ).decode( level.levelData, level.uncompressedByteLength );
+
+	} else {
+
+		throw new Error( 'THREE.KTX2Loader: Unsupported supercompressionScheme.' );
+
+	}
 
 	if ( TYPE_MAP[ vkFormat ] === FloatType ) {
 

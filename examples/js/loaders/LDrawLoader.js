@@ -10,10 +10,10 @@
 	const FINISH_TYPE_METAL = 5; // State machine to search a subobject path.
 	// The LDraw standard establishes these various possible subfolders.
 
-	const FILE_LOCATION_AS_IS = 0;
-	const FILE_LOCATION_TRY_PARTS = 1;
-	const FILE_LOCATION_TRY_P = 2;
-	const FILE_LOCATION_TRY_MODELS = 3;
+	const FILE_LOCATION_TRY_PARTS = 0;
+	const FILE_LOCATION_TRY_P = 1;
+	const FILE_LOCATION_TRY_MODELS = 2;
+	const FILE_LOCATION_AS_IS = 3;
 	const FILE_LOCATION_TRY_RELATIVE = 4;
 	const FILE_LOCATION_TRY_ABSOLUTE = 5;
 	const FILE_LOCATION_NOT_FOUND = 6;
@@ -655,7 +655,9 @@
 			result.type = original.type;
 			result.category = original.category;
 			result.keywords = original.keywords;
+			result.author = original.author;
 			result.subobjects = original.subobjects;
+			result.fileName = original.fileName;
 			result.totalFaces = original.totalFaces;
 			result.startingConstructionStep = original.startingConstructionStep;
 			result.materials = original.materials;
@@ -667,7 +669,7 @@
 		async fetchData( fileName ) {
 
 			let triedLowerCase = false;
-			let locationState = FILE_LOCATION_AS_IS;
+			let locationState = FILE_LOCATION_TRY_PARTS;
 
 			while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
 
@@ -711,7 +713,7 @@
 							fileName = fileName.toLowerCase();
 							subobjectURL = fileName;
 							triedLowerCase = true;
-							locationState = FILE_LOCATION_AS_IS;
+							locationState = FILE_LOCATION_TRY_PARTS;
 
 						}
 
@@ -761,6 +763,7 @@
 			let type = 'Model';
 			let category = null;
 			let keywords = null;
+			let author = null;
 			let totalFaces = 0; // split into lines
 
 			if ( text.indexOf( '\r\n' ) !== - 1 ) {
@@ -934,6 +937,10 @@
 
 								case 'STEP':
 									startingConstructionStep = true;
+									break;
+
+								case 'Author:':
+									author = lp.getToken();
 									break;
 
 								default:
@@ -1141,6 +1148,7 @@
 				type,
 				category,
 				keywords,
+				author,
 				subobjects,
 				totalFaces,
 				startingConstructionStep,
@@ -1277,6 +1285,9 @@
 				const group = new THREE.Group();
 				group.userData.category = info.category;
 				group.userData.keywords = info.keywords;
+				group.userData.author = info.author;
+				group.userData.type = info.type;
+				group.userData.fileName = info.fileName;
 				info.group = group;
 				const subobjectInfos = await Promise.all( promises );
 
@@ -1300,6 +1311,7 @@
 						subobjectGroup.userData.startingConstructionStep = subobject.startingConstructionStep;
 						subobjectGroup.name = subobject.fileName;
 						loader.applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
+						subobjectGroup.userData.colorCode = subobject.colorCode;
 						group.add( subobjectGroup );
 						continue;
 
@@ -1388,6 +1400,7 @@
 				if ( subobject ) {
 
 					loader.applyMaterialsToMesh( group, subobject.colorCode, info.materials );
+					group.userData.colorCode = subobject.colorCode;
 
 				}
 
@@ -1790,7 +1803,25 @@
 
 			this.smoothNormals = true; // The path to load parts from the LDraw parts library from.
 
-			this.partsLibraryPath = '';
+			this.partsLibraryPath = ''; // Material assigned to not available colors for meshes and edges
+
+			this.missingColorMaterial = new THREE.MeshStandardMaterial( {
+				color: 0xFF00FF,
+				roughness: 0.3,
+				metalness: 0
+			} );
+			this.missingColorMaterial.name = 'Missing material';
+			this.missingEdgeColorMaterial = new THREE.LineBasicMaterial( {
+				color: 0xFF00FF
+			} );
+			this.missingEdgeColorMaterial.name = 'Missing material - Edge';
+			this.missingConditionalEdgeColorMaterial = new LDrawConditionalLineMaterial( {
+				fog: true,
+				color: 0xFF00FF
+			} );
+			this.missingConditionalEdgeColorMaterial.name = 'Missing material - Conditional Edge';
+			this.missingColorMaterial.userData.edgeMaterial = this.missingEdgeColorMaterial;
+			this.missingEdgeColorMaterial.userData.conditionalEdgeMaterial = this.missingConditionalEdgeColorMaterial;
 
 		}
 
@@ -1842,6 +1873,7 @@
 
 					this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 					this.computeConstructionSteps( group );
+					group.userData.fileName = url;
 					onLoad( group );
 
 				} ).catch( onError );
@@ -1854,7 +1886,9 @@
 
 			this.partsCache.parseModel( text, this.materialLibrary ).then( group => {
 
+				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 				this.computeConstructionSteps( group );
+				group.userData.fileName = '';
 				onLoad( group );
 
 			} );
@@ -1984,8 +2018,10 @@
 
 					if ( material === null ) {
 
-						// otherwise throw an error if this is final opportunity to set the material
-						throw new Error( `LDrawLoader: Material properties for code ${colorCode} not available.` );
+						// otherwise throw a warning if this is final opportunity to set the material
+						console.warn( `LDrawLoader: Material properties for code ${colorCode} not available.` ); // And return the 'missing color' material
+
+						material = loader.missingColorMaterial;
 
 					}
 
@@ -2021,8 +2057,8 @@
 
 		getMainEdgeMaterial() {
 
-			const mainMat = this.getMainMaterial();
-			return mainMat && mainMat.userData ? mainMat.userData.edgeMaterial : null;
+			const mat = this.getMaterial( MAIN_EDGE_COLOUR_CODE );
+			return mat ? mat.userData.edgeMaterial : null;
 
 		}
 
@@ -2061,110 +2097,111 @@
 
 				}
 
-				switch ( token.toUpperCase() ) {
+				if ( ! parseLuminance( token ) ) {
 
-					case 'CODE':
-						code = lineParser.getToken();
-						break;
+					switch ( token.toUpperCase() ) {
 
-					case 'VALUE':
-						color = lineParser.getToken();
+						case 'CODE':
+							code = lineParser.getToken();
+							break;
 
-						if ( color.startsWith( '0x' ) ) {
+						case 'VALUE':
+							color = lineParser.getToken();
 
-							color = '#' + color.substring( 2 );
+							if ( color.startsWith( '0x' ) ) {
 
-						} else if ( ! color.startsWith( '#' ) ) {
+								color = '#' + color.substring( 2 );
 
-							throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
+							} else if ( ! color.startsWith( '#' ) ) {
 
-						}
+								throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
 
-						break;
+							}
 
-					case 'EDGE':
-						edgeColor = lineParser.getToken();
+							break;
 
-						if ( edgeColor.startsWith( '0x' ) ) {
+						case 'EDGE':
+							edgeColor = lineParser.getToken();
 
-							edgeColor = '#' + edgeColor.substring( 2 );
+							if ( edgeColor.startsWith( '0x' ) ) {
 
-						} else if ( ! edgeColor.startsWith( '#' ) ) {
+								edgeColor = '#' + edgeColor.substring( 2 );
 
-							// Try to see if edge color is a color code
-							edgeMaterial = this.getMaterial( edgeColor );
+							} else if ( ! edgeColor.startsWith( '#' ) ) {
 
-							if ( ! edgeMaterial ) {
+								// Try to see if edge color is a color code
+								edgeMaterial = this.getMaterial( edgeColor );
 
-								throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
+								if ( ! edgeMaterial ) {
 
-							} // Get the edge material for this triangle material
+									throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
+
+								} // Get the edge material for this triangle material
 
 
-							edgeMaterial = edgeMaterial.userData.edgeMaterial;
+								edgeMaterial = edgeMaterial.userData.edgeMaterial;
 
-						}
+							}
 
-						break;
+							break;
 
-					case 'ALPHA':
-						alpha = parseInt( lineParser.getToken() );
+						case 'ALPHA':
+							alpha = parseInt( lineParser.getToken() );
 
-						if ( isNaN( alpha ) ) {
+							if ( isNaN( alpha ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
+								throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
 
-						}
+							}
 
-						alpha = Math.max( 0, Math.min( 1, alpha / 255 ) );
+							alpha = Math.max( 0, Math.min( 1, alpha / 255 ) );
 
-						if ( alpha < 1 ) {
+							if ( alpha < 1 ) {
 
-							isTransparent = true;
+								isTransparent = true;
 
-						}
+							}
 
-						break;
+							break;
 
-					case 'LUMINANCE':
-						luminance = parseInt( lineParser.getToken() );
+						case 'LUMINANCE':
+							if ( ! parseLuminance( lineParser.getToken() ) ) {
 
-						if ( isNaN( luminance ) ) {
+								throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
 
-							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
+							}
 
-						}
+							break;
 
-						luminance = Math.max( 0, Math.min( 1, luminance / 255 ) );
-						break;
+						case 'CHROME':
+							finishType = FINISH_TYPE_CHROME;
+							break;
 
-					case 'CHROME':
-						finishType = FINISH_TYPE_CHROME;
-						break;
+						case 'PEARLESCENT':
+							finishType = FINISH_TYPE_PEARLESCENT;
+							break;
 
-					case 'PEARLESCENT':
-						finishType = FINISH_TYPE_PEARLESCENT;
-						break;
+						case 'RUBBER':
+							finishType = FINISH_TYPE_RUBBER;
+							break;
 
-					case 'RUBBER':
-						finishType = FINISH_TYPE_RUBBER;
-						break;
+						case 'MATTE_METALLIC':
+							finishType = FINISH_TYPE_MATTE_METALLIC;
+							break;
 
-					case 'MATTE_METALLIC':
-						finishType = FINISH_TYPE_MATTE_METALLIC;
-						break;
+						case 'METAL':
+							finishType = FINISH_TYPE_METAL;
+							break;
 
-					case 'METAL':
-						finishType = FINISH_TYPE_METAL;
-						break;
+						case 'MATERIAL':
+							// Not implemented
+							lineParser.setToEnd();
+							break;
 
-					case 'MATERIAL':
-						// Not implemented
-						lineParser.setToEnd();
-						break;
+						default:
+							throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
 
-					default:
-						throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
+					}
 
 				}
 
@@ -2268,6 +2305,8 @@
 					opacity: alpha
 				} );
 				edgeMaterial.userData.conditionalEdgeMaterial.color.convertSRGBToLinear();
+				edgeMaterial.userData.conditionalEdgeMaterial.userData.code = code;
+				edgeMaterial.userData.conditionalEdgeMaterial.name = name + ' - Conditional Edge';
 
 			}
 
@@ -2276,6 +2315,32 @@
 			material.userData.edgeMaterial = edgeMaterial;
 			this.addMaterial( material );
 			return material;
+
+			function parseLuminance( token ) {
+
+				// Returns success
+				let lum;
+
+				if ( token.startsWith( 'LUMINANCE' ) ) {
+
+					lum = parseInt( token.substring( 9 ) );
+
+				} else {
+
+					lum = parseInt( token );
+
+				}
+
+				if ( isNaN( lum ) ) {
+
+					return false;
+
+				}
+
+				luminance = Math.max( 0, Math.min( 1, lum / 255 ) );
+				return true;
+
+			}
 
 		}
 

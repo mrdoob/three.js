@@ -1459,7 +1459,7 @@ class SVGLoader extends Loader {
 								if ( array.length >= 1 ) {
 
 									const tx = array[ 0 ];
-									let ty = tx;
+									let ty = 0;
 
 									if ( array.length >= 2 ) {
 
@@ -2107,7 +2107,7 @@ class SVGLoader extends Loader {
 		simplePaths = simplePaths.filter( sp => sp.points.length > 1 );
 
 		// check if path is solid or a hole
-		const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule ) );
+		const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData?.style.fillRule ) );
 
 
 		const shapesToReturn = [];
@@ -2313,7 +2313,7 @@ class SVGLoader extends Loader {
 				const dot = Math.abs( normal1.dot( tempV2_3 ) );
 
 				// If path is straight, don't create join
-				if ( dot !== 0 ) {
+				if ( dot > Number.EPSILON ) {
 
 					// Compute inner and outer segment intersections
 					const miterSide = strokeWidth2 / dot;

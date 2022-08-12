@@ -1,5 +1,5 @@
 import { Material, ShaderMaterial } from 'three';
-import { getNodesKeys } from '../core/NodeUtils.js';
+import { getNodesKeys, getCacheKey } from '../core/NodeUtils.js';
 import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
@@ -37,7 +37,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	customProgramCacheKey() {
 
-		return this.uuid + '-' + this.version;
+		return getCacheKey( this );
 
 	}
 

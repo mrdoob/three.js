@@ -16,17 +16,6 @@
 
 		static getHSV( color, target ) {
 
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.ColorConverter: .getHSV() target is now required' );
-				target = {
-					h: 0,
-					s: 0,
-					l: 0
-				};
-
-			}
-
 			color.getHSL( _hsl ); // based on https://gist.github.com/xpansive/1337890#file-index-js
 
 			_hsl.s *= _hsl.l < 0.5 ? _hsl.l : 1 - _hsl.l;
@@ -48,18 +37,6 @@
 		}
 
 		static getCMYK( color, target ) {
-
-			if ( target === undefined ) {
-
-				console.warn( 'THREE.ColorConverter: .getCMYK() target is now required' );
-				target = {
-					c: 0,
-					m: 0,
-					y: 0,
-					k: 0
-				};
-
-			}
 
 			const r = color.r;
 			const g = color.g;

@@ -12,12 +12,12 @@
  * - KTX: http://github.khronos.org/KTX-Specification/
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
  */
-	const KTX2TransferSRGB = 2;
-	const KTX2_ALPHA_PREMULTIPLIED = 1;
 
 	const _taskCache = new WeakMap();
 
 	let _activeLoaders = 0;
+
+	let _zstd;
 
 	class KTX2Loader extends THREE.Loader {
 
@@ -173,8 +173,8 @@
 			texture.magFilter = THREE.LinearFilter;
 			texture.generateMipmaps = false;
 			texture.needsUpdate = true;
-			texture.encoding = dfdTransferFn === KTX2TransferSRGB ? THREE.sRGBEncoding : THREE.LinearEncoding;
-			texture.premultiplyAlpha = !! ( dfdFlags & KTX2_ALPHA_PREMULTIPLIED );
+			texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? THREE.sRGBEncoding : THREE.LinearEncoding;
+			texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 			return texture;
 
 		}
@@ -590,7 +590,7 @@
 		[ VK_FORMAT_R8_SRGB ]: THREE.sRGBEncoding
 	};
 
-	function createDataTexture( container ) {
+	async function createDataTexture( container ) {
 
 		const {
 			vkFormat,
@@ -606,8 +606,35 @@
 		} //
 
 
+		const level = container.levels[ 0 ];
+		let levelData;
 		let view;
-		const levelData = container.levels[ 0 ].levelData;
+
+		if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE ) {
+
+			levelData = level.levelData;
+
+		} else if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD ) {
+
+			if ( ! _zstd ) {
+
+				_zstd = new Promise( async resolve => {
+
+					const zstd = new ZSTDDecoder();
+					await zstd.init();
+					resolve( zstd );
+
+				} );
+
+			}
+
+			levelData = ( await _zstd ).decode( level.levelData, level.uncompressedByteLength );
+
+		} else {
+
+			throw new Error( 'THREE.KTX2Loader: Unsupported supercompressionScheme.' );
+
+		}
 
 		if ( TYPE_MAP[ vkFormat ] === THREE.FloatType ) {
 

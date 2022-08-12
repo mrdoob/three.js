@@ -1,5 +1,3 @@
-// r141
-
 const cacheName = 'threejs-editor';
 
 const assets = [

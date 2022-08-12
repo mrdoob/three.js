@@ -33,6 +33,9 @@ const ShaderLib = {
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{

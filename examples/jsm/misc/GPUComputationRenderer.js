@@ -288,6 +288,32 @@ class GPUComputationRenderer {
 
 		};
 
+		this.dispose = function () {
+
+			mesh.geometry.dispose();
+			mesh.material.dispose();
+
+			const variables = this.variables;
+
+			for ( let i = 0; i < variables.length; i ++ ) {
+
+				const variable = variables[ i ];
+
+				variable.initialValueTexture?.dispose();
+
+				const renderTargets = variable.renderTargets;
+
+				for ( let j = 0; j < renderTargets.length; j ++ ) {
+
+					const renderTarget = renderTargets[ j ];
+					renderTarget.dispose();
+
+				}
+
+			}
+
+		};
+
 		function addResolutionDefine( materialShader ) {
 
 			materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + ' )';

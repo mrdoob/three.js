@@ -45,6 +45,8 @@ function WebGLUtils( gl, extensions, capabilities ) {
 		if ( p === DepthStencilFormat ) return gl.DEPTH_STENCIL;
 		if ( p === RedFormat ) return gl.RED;
 
+		// @deprecated since r137
+
 		if ( p === RGBFormat ) {
 
 			console.warn( 'THREE.WebGLRenderer: THREE.RGBFormat has been removed. Use THREE.RGBAFormat instead. https://github.com/mrdoob/three.js/pull/23228' );

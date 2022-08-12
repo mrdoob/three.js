@@ -2,15 +2,7 @@ import { clamp } from '../math/MathUtils.js';
 
 // Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
 
-const {
-	floatView: _floatView,
-	uint32View: _uint32View,
-	baseTable: _baseTable,
-	shiftTable: _shiftTable,
-	mantissaTable: _mantissaTable,
-	exponentTable: _exponentTable,
-	offsetTable: _offsetTable
-} = /*@__PURE__*/ _generateTables();
+const _tables = /*@__PURE__*/ _generateTables();
 
 function _generateTables() {
 
@@ -142,7 +134,7 @@ function _generateTables() {
 		shiftTable: shiftTable,
 		mantissaTable: mantissaTable,
 		exponentTable: exponentTable,
-		offsetTable: offsetTable,
+		offsetTable: offsetTable
 	};
 
 }
@@ -155,10 +147,10 @@ function toHalfFloat( val ) {
 
 	val = clamp( val, - 65504, 65504 );
 
-	_floatView[ 0 ] = val;
-	const f = _uint32View[ 0 ];
+	_tables.floatView[ 0 ] = val;
+	const f = _tables.uint32View[ 0 ];
 	const e = ( f >> 23 ) & 0x1ff;
-	return _baseTable[ e ] + ( ( f & 0x007fffff ) >> _shiftTable[ e ] );
+	return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
 
 }
 
@@ -167,12 +159,12 @@ function toHalfFloat( val ) {
 function fromHalfFloat( val ) {
 
 	const m = val >> 10;
-	_uint32View[ 0 ] = _mantissaTable[ _offsetTable[ m ] + ( val & 0x3ff ) ] + _exponentTable[ m ];
-	return _floatView[ 0 ];
+	_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
+	return _tables.floatView[ 0 ];
 
 }
 
 export {
 	toHalfFloat,
-	fromHalfFloat,
+	fromHalfFloat
 };

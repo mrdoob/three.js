@@ -144,7 +144,7 @@
 				const line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: 0x5555ff } ) );
 
 				const controllerModelFactory = new XRControllerModelFactory();
-				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+				const handModelFactory = new XRHandModelFactory().setPath( './models/fbx/' );
 
 				//
 
@@ -173,7 +173,7 @@
 				eyeCharts.position.z = snellenConfig.z;
 				scene.add( eyeCharts );
 
-				snellenTexture = new THREE.TextureLoader().load( "textures/snellen.png" );
+				snellenTexture = new THREE.TextureLoader().load( 'textures/snellen.png' );
 				snellenTexture.repeat.x = snellenConfig.cropX;
 				snellenTexture.repeat.y = snellenConfig.cropY;
 				snellenTexture.generateMipmaps = false;
@@ -185,7 +185,7 @@
 				snellenMeshPlain.position.y = snellenConfig.y - snellenConfig.heightMeters;
 				eyeCharts.add( snellenMeshPlain );
 
-				snellenTexture = new THREE.TextureLoader().load( "textures/snellen.png" );
+				snellenTexture = new THREE.TextureLoader().load( 'textures/snellen.png' );
 				snellenTexture.repeat.x = snellenConfig.cropX;
 				snellenTexture.repeat.y = snellenConfig.cropY;
 				const snellenMeshMipMap = new THREE.Mesh(
@@ -333,7 +333,7 @@
 							viewPixelHeight: snellenConfig.textureSizePx,
 							isStatic: true,
 							space: refSpace,
-							layout: "mono",
+							layout: 'mono',
 							transform: new XRRigidTransform( {
 								x: snellenConfig.x - snellenConfig.widthMeters,
 								y: snellenConfig.y + snellenConfig.heightMeters,
@@ -367,7 +367,7 @@
 							video,
 							{
 								space: refSpace,
-								layout: "stereo-left-right",
+								layout: 'stereo-left-right',
 								// Rotate by 45 deg to avoid stereo conflict with the 3D geometry.
 								transform: new XRRigidTransform(
 									{},
@@ -402,10 +402,10 @@
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
 					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					gl.texSubImage2D( gl.TEXTURE_2D, 0,
-									( snellenConfig.textureSizePx - snellenConfig.widthPx ) / 2,
-									( snellenConfig.textureSizePx - snellenConfig.heightPx ) / 2,
-									snellenConfig.widthPx, snellenConfig.heightPx,
-									gl.RGBA, gl.UNSIGNED_BYTE, snellenTexture.image );
+						( snellenConfig.textureSizePx - snellenConfig.widthPx ) / 2,
+						( snellenConfig.textureSizePx - snellenConfig.heightPx ) / 2,
+						snellenConfig.widthPx, snellenConfig.heightPx,
+						gl.RGBA, gl.UNSIGNED_BYTE, snellenTexture.image );
 
 				}
 
@@ -416,10 +416,10 @@
 					renderer.state.bindTexture( gl.TEXTURE_2D, glayer.colorTexture );
 					gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, true );
 					gl.texSubImage2D( gl.TEXTURE_2D, 0,
-									( snellenConfig.textureSizePx - snellenConfig.widthPx ) / 2,
-									( snellenConfig.textureSizePx - snellenConfig.heightPx ) / 2,
-									snellenConfig.widthPx, snellenConfig.heightPx,
-									gl.RGBA, gl.UNSIGNED_BYTE, snellenTexture.image );
+						( snellenConfig.textureSizePx - snellenConfig.widthPx ) / 2,
+						( snellenConfig.textureSizePx - snellenConfig.heightPx ) / 2,
+						snellenConfig.widthPx, snellenConfig.heightPx,
+						gl.RGBA, gl.UNSIGNED_BYTE, snellenTexture.image );
 					gl.generateMipmap( gl.TEXTURE_2D );
 
 				}

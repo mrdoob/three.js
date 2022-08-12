@@ -34,6 +34,8 @@ class ComputeNode extends Node {
 
 	}
 
+	onInit() { }
+
 	update( { renderer } ) {
 
 		renderer.compute( this );
