@@ -222,7 +222,7 @@
 					// dashed is implemented as a defines -- not as a uniform. this could be changed.
 					// ... or THREE.LineDashedMaterial could be implemented as a separate material
 					// temporary hack - renderer should do this eventually
-					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
+					if ( val ) matLine.defines.USE_DASH = ''; else delete matLine.defines.USE_DASH;
 					matLine.needsUpdate = true;
 
 					wireframe1.material = val ? matLineDashed : matLineBasic;

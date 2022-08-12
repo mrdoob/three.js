@@ -688,17 +688,17 @@ async function createDataTexture( container ) {
 
 		if ( ! _zstd ) {
 
-			_zstd = new Promise(async (resolve) => {
+			_zstd = new Promise( async ( resolve ) => {
 
 				const zstd = new ZSTDDecoder();
 				await zstd.init();
-				resolve(zstd);
+				resolve( zstd );
 
-			});
+			} );
 
 		}
 
-		levelData = (await _zstd).decode( level.levelData, level.uncompressedByteLength );
+		levelData = ( await _zstd ).decode( level.levelData, level.uncompressedByteLength );
 
 	} else {
 

@@ -58,7 +58,7 @@ Matrix4.prototype.makeOrthographic = function ( left, right, top, bottom, near, 
 
 };
 
-Frustum.prototype.setFromProjectionMatrix = function( m ) {
+Frustum.prototype.setFromProjectionMatrix = function ( m ) {
 
 	const planes = this.planes;
 	const me = m.elements;
