@@ -7,9 +7,9 @@
  *
  */
 	const GouraudShader = {
-		uniforms: /*@__PURE__*/UniformsUtils.merge( [ THREE.UniformsLib.common, THREE.UniformsLib.specularmap, THREE.UniformsLib.envmap, THREE.UniformsLib.aomap, THREE.UniformsLib.lightmap, THREE.UniformsLib.emissivemap, THREE.UniformsLib.fog, THREE.UniformsLib.lights, {
+		uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.common, THREE.UniformsLib.specularmap, THREE.UniformsLib.envmap, THREE.UniformsLib.aomap, THREE.UniformsLib.lightmap, THREE.UniformsLib.emissivemap, THREE.UniformsLib.fog, THREE.UniformsLib.lights, {
 			emissive: {
-				value: /*@__PURE__*/new THREE.Color( 0x000000 )
+				value: new THREE.Color( 0x000000 )
 			}
 		} ] ),
 		vertexShader:

@@ -9,7 +9,7 @@ import { UniformsUtils, UniformsLib, ShaderMaterial, Color, MultiplyOperation } 
 
 const GouraudShader = {
 
-	uniforms: /*@__PURE__*/ UniformsUtils.merge( [
+	uniforms: UniformsUtils.merge( [
 		UniformsLib.common,
 		UniformsLib.specularmap,
 		UniformsLib.envmap,
@@ -19,7 +19,7 @@ const GouraudShader = {
 		UniformsLib.fog,
 		UniformsLib.lights,
 		{
-			emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
+			emissive: { value: new Color( 0x000000 ) }
 		}
 	] ),
 
