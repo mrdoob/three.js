@@ -95,25 +95,9 @@
 
 	}
 
-	function detach( child, parent, scene ) {
-
-		console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
-		scene.attach( child );
-
-	}
-
-	function attach( child, scene, parent ) {
-
-		console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
-		parent.attach( child );
-
-	}
-
 	THREE.SceneUtils = {};
-	THREE.SceneUtils.attach = attach;
 	THREE.SceneUtils.createMeshesFromInstancedMesh = createMeshesFromInstancedMesh;
 	THREE.SceneUtils.createMeshesFromMultiMaterialMesh = createMeshesFromMultiMaterialMesh;
 	THREE.SceneUtils.createMultiMaterialObject = createMultiMaterialObject;
-	THREE.SceneUtils.detach = detach;
 
 } )();

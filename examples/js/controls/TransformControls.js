@@ -531,7 +531,7 @@
 			this.visible = true;
 			return this;
 
-		} // Detatch from object
+		} // Detach from object
 
 
 		detach() {
@@ -606,12 +606,6 @@
 		setSpace( space ) {
 
 			this.space = space;
-
-		}
-
-		update() {
-
-			console.warn( 'THREE.TransformControls: update function has no more functionality and therefore has been deprecated.' );
 
 		}
 
@@ -1119,12 +1113,12 @@
 				if ( this.mode === 'translate' || this.mode === 'scale' ) {
 
 					// Hide translate and scale axis facing the camera
-					const AXIS_HIDE_TRESHOLD = 0.99;
-					const PLANE_HIDE_TRESHOLD = 0.2;
+					const AXIS_HIDE_THRESHOLD = 0.99;
+					const PLANE_HIDE_THRESHOLD = 0.2;
 
 					if ( handle.name === 'X' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1135,7 +1129,7 @@
 
 					if ( handle.name === 'Y' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1146,7 +1140,7 @@
 
 					if ( handle.name === 'Z' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1157,7 +1151,7 @@
 
 					if ( handle.name === 'XY' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1168,7 +1162,7 @@
 
 					if ( handle.name === 'YZ' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1179,7 +1173,7 @@
 
 					if ( handle.name === 'XZ' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
