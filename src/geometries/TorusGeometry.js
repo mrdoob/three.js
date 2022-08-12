@@ -107,4 +107,4 @@ class TorusGeometry extends BufferGeometry {
 
 }
 
-export { TorusGeometry, TorusGeometry as TorusBufferGeometry };
+export { TorusGeometry };

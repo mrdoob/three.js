@@ -85,4 +85,4 @@ class PlaneGeometry extends BufferGeometry {
 
 }
 
-export { PlaneGeometry, PlaneGeometry as PlaneBufferGeometry };
+export { PlaneGeometry };

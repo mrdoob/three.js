@@ -124,4 +124,4 @@ class SphereGeometry extends BufferGeometry {
 
 }
 
-export { SphereGeometry, SphereGeometry as SphereBufferGeometry };
+export { SphereGeometry };
