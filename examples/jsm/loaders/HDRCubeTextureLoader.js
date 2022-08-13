@@ -23,19 +23,6 @@ class HDRCubeTextureLoader extends Loader {
 
 	load( urls, onLoad, onProgress, onError ) {
 
-		if ( ! Array.isArray( urls ) ) {
-
-			console.warn( 'THREE.HDRCubeTextureLoader signature has changed. Use .setDataType() instead.' );
-
-			this.setDataType( urls );
-
-			urls = onLoad;
-			onLoad = onProgress;
-			onProgress = onError;
-			onError = arguments[ 4 ];
-
-		}
-
 		const texture = new CubeTexture();
 
 		texture.type = this.type;

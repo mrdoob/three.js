@@ -1744,6 +1744,13 @@
 
 					materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.material )[ 0 ];
 
+					if ( materialIndex < 0 ) {
+
+						console.warn( 'THREE.FBXLoader: Invalid material index:', materialIndex );
+						materialIndex = 0;
+
+					}
+
 				}
 
 				if ( geoInfo.uv ) {

@@ -94,7 +94,7 @@
 							child.material = new Nodes.MeshStandardNodeMaterial();
 							child.material.roughness = .1;
 							child.material.metalnessNode = randomMetalness;
-							child.material.colorNode =  mix( color( 0xFFFFFF ), randomColors, oscSine( timerLocal( .1 ) ) );
+							child.material.colorNode = mix( color( 0xFFFFFF ), randomColors, oscSine( timerLocal( .1 ) ) );
 
 							child.isInstancedMesh = true;
 							child.instanceMatrix = new THREE.InstancedBufferAttribute( new Float32Array( instanceCount * 16 ), 16 );

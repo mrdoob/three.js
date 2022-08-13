@@ -643,12 +643,6 @@ class TransformControls extends Object3D {
 
 	}
 
-	update() {
-
-		console.warn( 'THREE.TransformControls: update function has no more functionality and therefore has been deprecated.' );
-
-	}
-
 }
 
 // mouse / touch event handlers

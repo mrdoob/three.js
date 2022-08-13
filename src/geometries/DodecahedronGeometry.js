@@ -63,4 +63,4 @@ class DodecahedronGeometry extends PolyhedronGeometry {
 }
 
 
-export { DodecahedronGeometry, DodecahedronGeometry as DodecahedronBufferGeometry };
+export { DodecahedronGeometry };

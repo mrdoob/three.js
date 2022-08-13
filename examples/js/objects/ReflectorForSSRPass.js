@@ -80,7 +80,8 @@
 			}
 
 			const parameters = {
-				depthTexture: useDepthTexture ? depthTexture : null
+				depthTexture: useDepthTexture ? depthTexture : null,
+				type: THREE.HalfFloatType
 			};
 			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
 			const material = new THREE.ShaderMaterial( {
@@ -151,9 +152,7 @@
 				textureMatrix.set( 0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0 );
 				textureMatrix.multiply( virtualCamera.projectionMatrix );
 				textureMatrix.multiply( virtualCamera.matrixWorldInverse );
-				textureMatrix.multiply( scope.matrixWorld ); // Render
-
-				renderTarget.texture.encoding = renderer.outputEncoding; // scope.visible = false;
+				textureMatrix.multiply( scope.matrixWorld ); // scope.visible = false;
 
 				const currentRenderTarget = renderer.getRenderTarget();
 				const currentXrEnabled = renderer.xr.enabled;

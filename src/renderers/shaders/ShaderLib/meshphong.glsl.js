@@ -72,7 +72,6 @@ uniform float opacity;
 #include <emissivemap_pars_fragment>
 #include <envmap_common_pars_fragment>
 #include <envmap_pars_fragment>
-#include <cube_uv_reflection_fragment>
 #include <fog_pars_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>

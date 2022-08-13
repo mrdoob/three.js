@@ -72,7 +72,7 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				document.getElementById( "container" ).appendChild( renderer.domElement );
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
 				window.addEventListener( 'resize', onWindowResize );
 
 				camera.position.set( 0, 2.5, 10 );
@@ -258,7 +258,7 @@
 					lightSphere.visible = false;
 					lightHolder.visible = false;
 
-					document.getElementById( 'lightButton' ).value = "Switch to PointLight";
+					document.getElementById( 'lightButton' ).value = 'Switch to PointLight';
 
 				} else {
 
@@ -284,7 +284,7 @@
 					lightSphere.visible = true;
 					lightHolder.visible = true;
 
-					document.getElementById( 'lightButton' ).value = "Switch to THREE.DirectionalLight";
+					document.getElementById( 'lightButton' ).value = 'Switch to THREE.DirectionalLight';
 
 				}
 

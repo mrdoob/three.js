@@ -1,7 +1,7 @@
 import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 
-class VaryNode extends Node {
+class VaryingNode extends Node {
 
 	constructor( node, name = null ) {
 
@@ -20,7 +20,7 @@ class VaryNode extends Node {
 
 	getNodeType( builder ) {
 
-		// VaryNode is auto type
+		// VaryingNode is auto type
 
 		return this.node.getNodeType( builder );
 
@@ -32,23 +32,23 @@ class VaryNode extends Node {
 		const node = this.node;
 		const name = this.name;
 
-		const nodeVary = builder.getVaryFromNode( this, type );
+		const nodeVarying = builder.getVaryingFromNode( this, type );
 
 		if ( name !== null ) {
 
-			nodeVary.name = name;
+			nodeVarying.name = name;
 
 		}
 
-		const propertyName = builder.getPropertyName( nodeVary, NodeShaderStage.Vertex );
+		const propertyName = builder.getPropertyName( nodeVarying, NodeShaderStage.Vertex );
 
 		// force node run in vertex stage
 		builder.flowNodeFromShaderStage( NodeShaderStage.Vertex, node, type, propertyName );
 
-		return builder.getPropertyName( nodeVary );
+		return builder.getPropertyName( nodeVarying );
 
 	}
 
 }
 
-export default VaryNode;
+export default VaryingNode;

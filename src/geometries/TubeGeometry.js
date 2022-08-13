@@ -190,4 +190,4 @@ class TubeGeometry extends BufferGeometry {
 }
 
 
-export { TubeGeometry, TubeGeometry as TubeBufferGeometry };
+export { TubeGeometry };

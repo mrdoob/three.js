@@ -1210,16 +1210,34 @@
 
 				}
 
-				return Promise.all( [ buffer, decoder.ready ] ).then( function ( res ) {
+				return buffer.then( function ( res ) {
 
 					const byteOffset = extensionDef.byteOffset || 0;
 					const byteLength = extensionDef.byteLength || 0;
 					const count = extensionDef.count;
 					const stride = extensionDef.byteStride;
-					const result = new ArrayBuffer( count * stride );
-					const source = new Uint8Array( res[ 0 ], byteOffset, byteLength );
-					decoder.decodeGltfBuffer( new Uint8Array( result ), count, stride, source, extensionDef.mode, extensionDef.filter );
-					return result;
+					const source = new Uint8Array( res, byteOffset, byteLength );
+
+					if ( decoder.decodeGltfBufferAsync ) {
+
+						return decoder.decodeGltfBufferAsync( count, stride, source, extensionDef.mode, extensionDef.filter ).then( function ( res ) {
+
+							return res.buffer;
+
+						} );
+
+					} else {
+
+						// Support for MeshoptDecoder 0.18 or earlier, without decodeGltfBufferAsync
+						return decoder.ready.then( function () {
+
+							const result = new ArrayBuffer( count * stride );
+							decoder.decodeGltfBuffer( new Uint8Array( result ), count, stride, source, extensionDef.mode, extensionDef.filter );
+							return result;
+
+						} );
+
+					}
 
 				} );
 
@@ -1352,7 +1370,7 @@
 
 					const accessorDef = json.accessors[ primitive.attributes[ attributeName ] ];
 					const componentType = WEBGL_COMPONENT_TYPES[ accessorDef.componentType ];
-					attributeTypeMap[ threeAttributeName ] = componentType;
+					attributeTypeMap[ threeAttributeName ] = componentType.name;
 					attributeNormalizedMap[ threeAttributeName ] = accessorDef.normalized === true;
 
 				}
@@ -3451,8 +3469,7 @@
 				const channel = animationDef.channels[ i ];
 				const sampler = animationDef.samplers[ channel.sampler ];
 				const target = channel.target;
-				const name = target.node !== undefined ? target.node : target.id; // NOTE: target.id is deprecated.
-
+				const name = target.node;
 				const input = animationDef.parameters !== undefined ? animationDef.parameters[ sampler.input ] : sampler.input;
 				const output = animationDef.parameters !== undefined ? animationDef.parameters[ sampler.output ] : sampler.output;
 				pendingNodes.push( this.getDependency( 'node', name ) );

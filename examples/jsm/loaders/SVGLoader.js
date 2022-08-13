@@ -1459,7 +1459,7 @@ class SVGLoader extends Loader {
 								if ( array.length >= 1 ) {
 
 									const tx = array[ 0 ];
-									let ty = tx;
+									let ty = 0;
 
 									if ( array.length >= 2 ) {
 

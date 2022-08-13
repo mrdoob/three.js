@@ -72,7 +72,6 @@
 	"webgl_shadowmap_viewer": [ "directional", "spot" ],
 	"webgl_skinning_simple": [ "animation" ],
 	"webgl_tonemapping": [ "gltf" ],
-	"webgl_loader_nodes": [ "caustics", "displace", "xray" ],
 	"webgl_postprocessing_afterimage": [ "trails" ],
 	"webgl_postprocessing_dof": [ "bokeh" ],
 	"webgl_postprocessing_dof2": [ "bokeh" ],

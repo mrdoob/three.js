@@ -200,12 +200,6 @@ class Quaternion {
 
 	setFromEuler( euler, update ) {
 
-		if ( ! ( euler && euler.isEuler ) ) {
-
-			throw new Error( 'THREE.Quaternion: .setFromEuler() now expects an Euler rotation rather than a Vector3 and order.' );
-
-		}
-
 		const x = euler._x, y = euler._y, z = euler._z, order = euler._order;
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/

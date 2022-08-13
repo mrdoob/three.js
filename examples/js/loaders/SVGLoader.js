@@ -1279,7 +1279,7 @@
 									if ( array.length >= 1 ) {
 
 										const tx = array[ 0 ];
-										let ty = tx;
+										let ty = 0;
 
 										if ( array.length >= 2 ) {
 
@@ -1908,7 +1908,7 @@
 			} );
 			simplePaths = simplePaths.filter( sp => sp.points.length > 1 ); // check if path is solid or a hole
 
-			const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData.style.fillRule ) );
+			const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData?.style.fillRule ) );
 			const shapesToReturn = [];
 			simplePaths.forEach( p => {
 

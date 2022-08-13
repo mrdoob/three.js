@@ -66,7 +66,7 @@
 
 				// Materials
 
-				let imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
+				let imgTexture = new THREE.TextureLoader().load( 'textures/planets/moon_1024.jpg' );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 				imgTexture.encoding = THREE.sRGBEncoding;
 				imgTexture.anisotropy = 16;
@@ -127,17 +127,17 @@
 
 				}
 
-				addLabel( "+hue", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "-hue", new THREE.Vector3( 350, 0, 0 ) );
+				addLabel( '+hue', new THREE.Vector3( - 350, 0, 0 ) );
+				addLabel( '-hue', new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-reflectivity", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "+reflectivity", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( '-reflectivity', new THREE.Vector3( 0, - 300, 0 ) );
+				addLabel( '+reflectivity', new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
-				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
+				addLabel( '-diffuse', new THREE.Vector3( 0, 0, - 300 ) );
+				addLabel( '+diffuse', new THREE.Vector3( 0, 0, 300 ) );
 
-				addLabel( "envMap", new THREE.Vector3( - 350, 300, 0 ) );
-				addLabel( "no envMap", new THREE.Vector3( 350, 300, 0 ) );
+				addLabel( 'envMap', new THREE.Vector3( - 350, 300, 0 ) );
+				addLabel( 'no envMap', new THREE.Vector3( 350, 300, 0 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );

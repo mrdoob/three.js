@@ -20,14 +20,7 @@
 				let nbNormals = 0;
 				let nbVertexUvs = 0;
 				const geometry = mesh.geometry;
-				const normalMatrixWorld = new THREE.Matrix3();
-
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				} // shortcuts
-
+				const normalMatrixWorld = new THREE.Matrix3(); // shortcuts
 
 				const vertices = geometry.getAttribute( 'position' );
 				const normals = geometry.getAttribute( 'normal' );
@@ -133,14 +126,7 @@
 
 				let nbVertex = 0;
 				const geometry = line.geometry;
-				const type = line.type;
-
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				} // shortcuts
-
+				const type = line.type; // shortcuts
 
 				const vertices = geometry.getAttribute( 'position' ); // name of the line object
 
@@ -193,13 +179,6 @@
 
 				let nbVertex = 0;
 				const geometry = points.geometry;
-
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				}
-
 				const vertices = geometry.getAttribute( 'position' );
 				const colors = geometry.getAttribute( 'color' );
 				output += 'o ' + points.name + '\n';
