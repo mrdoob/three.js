@@ -1166,10 +1166,16 @@
 				"QuaternionKeyframeTrack": "api/it/animation/tracks/QuaternionKeyframeTrack",
 				"StringKeyframeTrack": "api/it/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/it/animation/tracks/VectorKeyframeTrack"
-			}
+			},
 
-		}
-
+      "Audio": {
+        "Audio": "api/it/audio/Audio",
+        "AudioAnalyser": "api/it/audio/AudioAnalyser",
+        "AudioContext": "api/it/audio/AudioContext",
+        "AudioListener": "api/it/audio/AudioListener",
+        "PositionalAudio": "api/it/audio/PositionalAudio"
+		  }
+    }
 	},
 	"pt-br": {
 
