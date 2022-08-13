@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Compatibilidade WebGL</h1>
+		
+		<p>
+			Mesmo que isso esteja se tornando um problema cada vez menor, alguns dispositivos ou navegadores podem ainda não suportar WebGL. O método a seguir permite verificar se há suporte e exibe uma mensagem para o usuário se não existir.
+		</p>
+
+		<p>
+			Adicione [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js] ao seu JavaScript e execute o seguinte código antes de tentar renderizar qualquer coisa.
+		</p>
+
+		<code>
+		if ( WebGL.isWebGLAvailable() ) {
+
+			// Initiate function or other initializations here
+			animate();
+
+		} else {
+
+			const warning = WebGL.getWebGLErrorMessage();
+			document.getElementById( 'container' ).appendChild( warning );
+
+		}
+		</code>
+	</body>
+</html>
