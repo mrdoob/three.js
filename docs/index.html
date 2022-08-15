@@ -519,12 +519,13 @@
 					const beforeSubHash = splitHash[0].slice(0, subHash);
 					const afterSubHash = splitHash[0].slice(subHash);
 					src = `${beforeSubHash}.html${afterSubHash}${splitHash[ 1 ]}`;
+					subtitle = titles[ beforeSubHash ] + splitHash[ 1 ] + ' – ';
 				} else {
 					src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
+					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
 				}
 
 				iframe.src = src;  // lgtm[js/client-side-unvalidated-url-redirection]
-				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
 				iframe.style.display = 'unset';
 
 			} else {
