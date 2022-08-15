@@ -506,9 +506,24 @@
 			const oldIframe = iframe;
 			iframe = oldIframe.cloneNode();
 
-			if ( hash && titles[ splitHash[ 0 ] ] ) {
+			if ( hash ) {
 
-				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
+				// We can have 2 hashes. One for the main page, one for the page it's referencing
+				// In other words
+				//	 #manual/en/someSection/somePage#someSectionOfPage
+
+				const subHash = splitHash[0].indexOf('#');
+				let src;
+
+				if (subHash >= 0) {
+					const beforeSubHash = splitHash[0].slice(0, subHash);
+					const afterSubHash = splitHash[0].slice(subHash);
+					src = `${beforeSubHash}.html${afterSubHash}${splitHash[ 1 ]}`;
+				} else {
+					src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
+				}
+
+				iframe.src = src;  // lgtm[js/client-side-unvalidated-url-redirection]
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
 				iframe.style.display = 'unset';
 
