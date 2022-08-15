@@ -21,7 +21,7 @@
 			All methods of installing three.js depend on ES modules (see [link:https://eloquentjavascript.net/10_modules.html#h_hF2FmOVxw7 Eloquent JavaScript: ECMAScript Modules]), which allow you to include only the parts of the library needed in the final project.
 		</p>
 
-		<h2>Install from npm</h2>
+		<h2 id="install-from-npm">Install from npm</h2>
 
 		<p>
 			To install the [link:https://www.npmjs.com/package/three three] npm module, open a terminal window in your project folder and run:
@@ -60,7 +60,7 @@
 			Learn more about npm modules from [link:https://eloquentjavascript.net/20_node.html#h_J6hW/SmL/a Eloquent JavaScript: Installing with npm].
 		</p>
 
-		<h2>Install from CDN or static hosting</h2>
+		<h2 id="install-from-cdn-or-static-hosting">Install from CDN or static hosting</h2>
 
 		<p>
 			The three.js library can be used without any build system, either by uploading files to your own web server or by using an existing CDN. Because the library relies on ES modules, any script that references it must use <em>type="module"</em> as shown below.
@@ -91,7 +91,7 @@
 			Since Import maps are not yet supported by all browsers, it is necessary to add the polyfill *es-module-shims.js*.
 		</p>
 
-		<h2>Examples</h2>
+		<h2 id="examples">Examples</h2>
 
 		<p>
 			The core of three.js is focused on the most important components of a 3D engine. Many other useful components — such as controls, loaders, and post-processing effects — are part of the [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] directory. They are referred to as "examples," because while you can use them off the shelf, they're also meant to be remixed and customized. These components are always kept in sync with the core library, whereas similar third-party packages on npm are maintained by different people and may not be up to date.
@@ -126,15 +126,15 @@
 			It's important that all files use the same version. Do not import different examples from different versions, or use examples from a different version than the three.js library itself.
 		</p>
 
-		<h2>Compatibility</h2>
+		<h2 id="compatibility">Compatibility</h2>
 
-		<h3>CommonJS imports</h3>
+		<h3 id="commonjs-imports">CommonJS imports</h3>
 
 		<p>
 			While most modern JavaScript bundlers now support ES modules by default, some older build tools might not. In those cases you can likely configure the bundler to understand ES modules: [link:http://browserify.org/ Browserify] just needs the [link:https://github.com/babel/babelify babelify] plugin, for example.
 		</p>
 
-		<h3>Node.js</h3>
+		<h3 id="nodejs">Node.js</h3>
 
 		<p>
 			Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
