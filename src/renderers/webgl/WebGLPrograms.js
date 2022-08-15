@@ -438,7 +438,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		if ( parameters.opaque )
 			_programLayers.enable( 24 );
 		if ( parameters.occlusionMetalRoughnessMap )
-      _programLayers.enable( 25 );
+			_programLayers.enable( 25 );
 
 		array.push( _programLayers.mask );
 
