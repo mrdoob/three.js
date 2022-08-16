@@ -109,6 +109,8 @@ export const uniform = ( nodeOrType ) => {
 
 };
 
+export const fn = ( code, includes ) => func( code, includes ).call;
+
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
 export const property = ( name, nodeOrType ) => nodeObject( new PropertyNode( name, getConstNodeType( nodeOrType ) ) );
 
