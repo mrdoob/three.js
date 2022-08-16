@@ -235,6 +235,7 @@
 		"webgl_nodes_materials_instance_uniform",
 		"webgl_nodes_materials_physical_clearcoat",
 		"webgl_nodes_materials_standard",
+		"webgl_nodes_materialx_noise",
 		"webgl_nodes_playground",
 		"webgl_nodes_points"
 	],
