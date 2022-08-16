@@ -109,7 +109,7 @@
 							// right bottom
 
 							material = new MeshPhysicalNodeMaterial();
-							material.colorNode = saturate( mul( add( mx_fractal_noise_float( customUV, 7, 2, .7 ), 1 ), .5 ) );
+							material.colorNode = saturate( mul( add( mx_fractal_noise_float( mul( customUV, .2 ), 7, 2, .7 ), 1 ), .5 ) );
 
 							mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = 100;
