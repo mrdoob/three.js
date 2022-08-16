@@ -31,38 +31,6 @@ class ColorConverter {
 
 	}
 
-	// where c, m, y, k is between 0 and 1
-
-	static setCMYK( color, c, m, y, k ) {
-
-		const r = ( 1 - c ) * ( 1 - k );
-		const g = ( 1 - m ) * ( 1 - k );
-		const b = ( 1 - y ) * ( 1 - k );
-
-		return color.setRGB( r, g, b );
-
-	}
-
-	static getCMYK( color, target ) {
-
-		const r = color.r;
-		const g = color.g;
-		const b = color.b;
-
-		const k = 1 - Math.max( r, g, b );
-		const c = ( 1 - r - k ) / ( 1 - k );
-		const m = ( 1 - g - k ) / ( 1 - k );
-		const y = ( 1 - b - k ) / ( 1 - k );
-
-		target.c = c;
-		target.m = m;
-		target.y = y;
-		target.k = k;
-
-		return target;
-
-	}
-
 }
 
 export { ColorConverter };
