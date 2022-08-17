@@ -69,7 +69,7 @@
 				new HDRCubeTextureLoader()
 					.setPath( 'textures/cube/pisaHDR/' )
 					.load( [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ],
-						  function ( hdrTexture ) {
+						function ( hdrTexture ) {
 
 							const geometry = new THREE.SphereGeometry( 80, 64, 32 );
 
@@ -123,7 +123,7 @@
 
 						}
 
-						 );
+					);
 
 				// LIGHTS
 
