@@ -1,10 +1,12 @@
-import { DataTexture } from '../textures/DataTexture.js';
-import { FileLoader } from './FileLoader.js';
-import { FloatType } from '../constants.js';
-import { LinearFilter } from '../constants.js';
-import { RedFormat } from '../constants.js';
-import * as MathUtils from '../math/MathUtils.js';
-import { Loader } from './Loader.js';
+import {
+	DataTexture,
+	FileLoader,
+	FloatType,
+	LinearFilter,
+	RedFormat,
+	MathUtils,
+	Loader
+} from 'three';
 
 function IESLamp( text ) {
 

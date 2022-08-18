@@ -32,6 +32,8 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
+			import { IESLoader } from './jsm/loaders/IESLoader.js';
+
 			let renderer, scene, camera;
 
 			let spotLight, lightHelper, shadowCameraHelper;
@@ -64,7 +66,7 @@
 				const ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
 
-				const iesProfile = new THREE.IESLoader().load( 'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/02a7562c650498ebb301153dbbf59207.ies' )
+				const iesProfile = new IESLoader().load( 'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/02a7562c650498ebb301153dbbf59207.ies' )
 
 				spotLight = new THREE.SpotLight( 0xffffff, 2 );
 				spotLight.position.set( 15, 40, 35 );
