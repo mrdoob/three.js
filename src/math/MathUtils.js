@@ -227,7 +227,7 @@ function setQuaternionFromProperEuler( q, a, b, c, order ) {
 
 }
 
-function denormalize( value, array ) {
+function intToFloat( value, array ) {
 
 	switch ( array.constructor ) {
 
@@ -259,7 +259,7 @@ function denormalize( value, array ) {
 
 }
 
-function normalize( value, array ) {
+function floatToInt( value, array ) {
 
 	switch ( array.constructor ) {
 
@@ -291,7 +291,36 @@ function normalize( value, array ) {
 
 }
 
+let _didIntToFloatWarning = false;
+let _didFloatToIntWarning = false;
 
+function normalize( value, array ) {
+
+	if ( _didFloatToIntWarning === false ) {
+
+		console.warn( 'THREE.MathUtils: normalize() renamed floatToInt()' );
+
+		_didFloatToIntWarning = true;
+
+	}
+
+	return floatToInt( value, array );
+
+}
+
+function denormalize( value, array ) {
+
+	if ( _didIntToFloatWarning === false ) {
+
+		console.warn( 'THREE.MathUtils: denormalize() renamed intToFloat()' );
+
+		_didIntToFloatWarning = true;
+
+	}
+
+	return intToFloat( value, array );
+
+}
 
 export {
 	DEG2RAD,
@@ -318,4 +347,6 @@ export {
 	setQuaternionFromProperEuler,
 	normalize,
 	denormalize,
+	floatToInt,
+	intToFloat
 };

@@ -2,7 +2,7 @@ import { Vector4 } from '../math/Vector4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
-import { denormalize, normalize } from '../math/MathUtils.js';
+import { intToFloat, floatToInt } from '../math/MathUtils.js';
 import { StaticDrawUsage } from '../constants.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
@@ -105,9 +105,9 @@ class BufferAttribute {
 
 			if ( this.normalized ) {
 
-				array[ offset ++ ] = normalize( color.r, array );
-				array[ offset ++ ] = normalize( color.g, array );
-				array[ offset ++ ] = normalize( color.b, array );
+				array[ offset ++ ] = floatToInt( color.r, array );
+				array[ offset ++ ] = floatToInt( color.g, array );
+				array[ offset ++ ] = floatToInt( color.b, array );
 
 			} else {
 
@@ -141,8 +141,8 @@ class BufferAttribute {
 
 			if ( this.normalized ) {
 
-				array[ offset ++ ] = normalize( vector.x, array );
-				array[ offset ++ ] = normalize( vector.y, array );
+				array[ offset ++ ] = floatToInt( vector.x, array );
+				array[ offset ++ ] = floatToInt( vector.y, array );
 
 			} else {
 
@@ -175,9 +175,9 @@ class BufferAttribute {
 
 			if ( this.normalized ) {
 
-				array[ offset ++ ] = normalize( vector.x, array );
-				array[ offset ++ ] = normalize( vector.y, array );
-				array[ offset ++ ] = normalize( vector.z, array );
+				array[ offset ++ ] = floatToInt( vector.x, array );
+				array[ offset ++ ] = floatToInt( vector.y, array );
+				array[ offset ++ ] = floatToInt( vector.z, array );
 
 			} else {
 
@@ -211,10 +211,10 @@ class BufferAttribute {
 
 			if ( this.normalized ) {
 
-				array[ offset ++ ] = normalize( vector.x, array );
-				array[ offset ++ ] = normalize( vector.y, array );
-				array[ offset ++ ] = normalize( vector.z, array );
-				array[ offset ++ ] = normalize( vector.w, array );
+				array[ offset ++ ] = floatToInt( vector.x, array );
+				array[ offset ++ ] = floatToInt( vector.y, array );
+				array[ offset ++ ] = floatToInt( vector.z, array );
+				array[ offset ++ ] = floatToInt( vector.w, array );
 
 			} else {
 
@@ -311,7 +311,7 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
-		if ( this.normalized ) value = normalize( value, this.array );
+		if ( this.normalized ) value = floatToInt( value, this.array );
 
 		this.array.set( value, offset );
 
@@ -323,7 +323,7 @@ class BufferAttribute {
 
 		let x = this.array[ index * this.itemSize ];
 
-		if ( this.normalized ) x = denormalize( x, this.array );
+		if ( this.normalized ) x = intToFloat( x, this.array );
 
 		return x;
 
@@ -331,7 +331,7 @@ class BufferAttribute {
 
 	setX( index, x ) {
 
-		if ( this.normalized ) x = normalize( x, this.array );
+		if ( this.normalized ) x = floatToInt( x, this.array );
 
 		this.array[ index * this.itemSize ] = x;
 
@@ -343,7 +343,7 @@ class BufferAttribute {
 
 		let y = this.array[ index * this.itemSize + 1 ];
 
-		if ( this.normalized ) y = denormalize( y, this.array );
+		if ( this.normalized ) y = intToFloat( y, this.array );
 
 		return y;
 
@@ -351,7 +351,7 @@ class BufferAttribute {
 
 	setY( index, y ) {
 
-		if ( this.normalized ) y = normalize( y, this.array );
+		if ( this.normalized ) y = floatToInt( y, this.array );
 
 		this.array[ index * this.itemSize + 1 ] = y;
 
@@ -363,7 +363,7 @@ class BufferAttribute {
 
 		let z = this.array[ index * this.itemSize + 2 ];
 
-		if ( this.normalized ) z = denormalize( z, this.array );
+		if ( this.normalized ) z = intToFloat( z, this.array );
 
 		return z;
 
@@ -371,7 +371,7 @@ class BufferAttribute {
 
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = normalize( z, this.array );
+		if ( this.normalized ) z = floatToInt( z, this.array );
 
 		this.array[ index * this.itemSize + 2 ] = z;
 
@@ -383,7 +383,7 @@ class BufferAttribute {
 
 		let w = this.array[ index * this.itemSize + 3 ];
 
-		if ( this.normalized ) w = denormalize( w, this.array );
+		if ( this.normalized ) w = intToFloat( w, this.array );
 
 		return w;
 
@@ -391,7 +391,7 @@ class BufferAttribute {
 
 	setW( index, w ) {
 
-		if ( this.normalized ) w = normalize( w, this.array );
+		if ( this.normalized ) w = floatToInt( w, this.array );
 
 		this.array[ index * this.itemSize + 3 ] = w;
 
@@ -405,8 +405,8 @@ class BufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
+			x = floatToInt( x, this.array );
+			y = floatToInt( y, this.array );
 
 		}
 
@@ -423,9 +423,9 @@ class BufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
+			x = floatToInt( x, this.array );
+			y = floatToInt( y, this.array );
+			z = floatToInt( z, this.array );
 
 		}
 
@@ -443,10 +443,10 @@ class BufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = normalize( x, this.array );
-			y = normalize( y, this.array );
-			z = normalize( z, this.array );
-			w = normalize( w, this.array );
+			x = floatToInt( x, this.array );
+			y = floatToInt( y, this.array );
+			z = floatToInt( z, this.array );
+			w = floatToInt( w, this.array );
 
 		}
 

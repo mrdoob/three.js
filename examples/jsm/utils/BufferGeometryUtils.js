@@ -41,12 +41,12 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 			for ( let i = 0, j = 0; i < attribute.getCount(); i ++ ) {
 
-				dstArray[ j ++ ] = MathUtils.denormalize( attribute.getX( i ), srcArray );
-				dstArray[ j ++ ] = MathUtils.denormalize( attribute.getY( i ), srcArray );
+				dstArray[ j ++ ] = MathUtils.intToFloat( attribute.getX( i ), srcArray );
+				dstArray[ j ++ ] = MathUtils.intToFloat( attribute.getY( i ), srcArray );
 
 				if ( attribute.itemSize > 2 ) {
 
-					dstArray[ j ++ ] = MathUtils.denormalize( attribute.getZ( i ), srcArray );
+					dstArray[ j ++ ] = MathUtils.intToFloat( attribute.getZ( i ), srcArray );
 
 				}
 
