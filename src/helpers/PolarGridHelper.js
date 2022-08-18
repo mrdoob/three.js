@@ -16,7 +16,7 @@ class PolarGridHelper extends LineSegments {
 
 		// create the radials
 
-		for ( let i = 0; i <= radials; i ++ ) {
+		for ( let i = 0; i < radials; i ++ ) {
 
 			const v = ( i / radials ) * ( Math.PI * 2 );
 
@@ -35,7 +35,7 @@ class PolarGridHelper extends LineSegments {
 
 		// create the circles
 
-		for ( let i = 0; i <= circles; i ++ ) {
+		for ( let i = 0; i < circles; i ++ ) {
 
 			const color = ( i & 1 ) ? color1 : color2;
 
