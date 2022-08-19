@@ -219,9 +219,9 @@ class WebGPURenderer {
 
 		//
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		if ( camera.parent === null && camera.autoUpdate === true ) camera.updateMatrixWorld();
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( this._info.autoReset === true ) this._info.reset();
 
@@ -666,7 +666,7 @@ class WebGPURenderer {
 
 			} else if ( object.isLOD ) {
 
-				if ( object.autoUpdate === true ) object.update( camera );
+				if ( object.matrixWorldAutoUpdate === true ) object.update( camera );
 
 			} else if ( object.isLight ) {
 

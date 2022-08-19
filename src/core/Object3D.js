@@ -98,7 +98,7 @@ class Object3D extends EventDispatcher {
 		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
 		this.matrixWorldNeedsUpdate = false;
 
-		this.autoUpdate = Object3D.DefaultAutoUpdate; // checked by the renderer
+		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
 
 		this.layers = new Layers();
 		this.visible = true;
@@ -584,7 +584,7 @@ class Object3D extends EventDispatcher {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			if ( children[ i ].autoUpdate === true || force === true ) {
+			if ( children[ i ].matrixWorldAutoUpdate === true || force === true ) {
 
 				children[ i ].updateMatrixWorld( force );
 
@@ -598,7 +598,7 @@ class Object3D extends EventDispatcher {
 
 		const parent = this.parent;
 
-		if ( updateParents === true && parent !== null && parent.autoUpdate === true ) {
+		if ( updateParents === true && parent !== null && parent.matrixWorldAutoUpdate === true ) {
 
 			parent.updateWorldMatrix( true, false );
 
@@ -624,7 +624,7 @@ class Object3D extends EventDispatcher {
 
 			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-				if ( children[ i ].autoUpdate === true ) {
+				if ( children[ i ].matrixWorldAutoUpdate === true ) {
 
 					children[ i ].updateWorldMatrix( false, true );
 
@@ -901,7 +901,7 @@ class Object3D extends EventDispatcher {
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
-		this.autoUpdate = source.autoUpdate;
+		this.matrixWorldAutoUpdate = source.matrixWorldAutoUpdate;
 
 		this.layers.mask = source.layers.mask;
 		this.visible = source.visible;
@@ -933,7 +933,7 @@ class Object3D extends EventDispatcher {
 
 Object3D.DefaultUp = new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
-Object3D.DefaultAutoUpdate = true;
+Object3D.DefaultMatrixWorldAutoUpdate = true;
 
 Object3D.prototype.isObject3D = true;
 
