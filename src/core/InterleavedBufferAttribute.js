@@ -1,6 +1,5 @@
 import { Vector3 } from '../math/Vector3.js';
-import { BufferAttribute } from './BufferAttribute.js';
-import { intToFloat, floatToInt } from '../math/MathUtils.js';
+import { BufferAttribute, getArrayType, normalize, denormalize } from './BufferAttribute.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 
@@ -17,6 +16,8 @@ class InterleavedBufferAttribute {
 		this.offset = offset;
 
 		this.normalized = normalized === true;
+
+		this.type = getArrayType( this.array );
 
 	}
 
@@ -88,7 +89,7 @@ class InterleavedBufferAttribute {
 
 	setX( index, x ) {
 
-		if ( this.normalized ) x = floatToInt( x, this.array );
+		if ( this.normalized ) x = denormalize( x, this.type );
 
 		this.data.array[ index * this.data.stride + this.offset ] = x;
 
@@ -98,7 +99,7 @@ class InterleavedBufferAttribute {
 
 	setY( index, y ) {
 
-		if ( this.normalized ) y = floatToInt( y, this.array );
+		if ( this.normalized ) y = denormalize( y, this.type );
 
 		this.data.array[ index * this.data.stride + this.offset + 1 ] = y;
 
@@ -108,7 +109,7 @@ class InterleavedBufferAttribute {
 
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = floatToInt( z, this.array );
+		if ( this.normalized ) z = denormalize( z, this.type );
 
 		this.data.array[ index * this.data.stride + this.offset + 2 ] = z;
 
@@ -118,7 +119,7 @@ class InterleavedBufferAttribute {
 
 	setW( index, w ) {
 
-		if ( this.normalized ) w = floatToInt( w, this.array );
+		if ( this.normalized ) w = denormalize( w, this.type );
 
 		this.data.array[ index * this.data.stride + this.offset + 3 ] = w;
 
@@ -130,7 +131,7 @@ class InterleavedBufferAttribute {
 
 		let x = this.data.array[ index * this.data.stride + this.offset ];
 
-		if ( this.normalized ) x = intToFloat( x, this.array );
+		if ( this.normalized ) x = normalize( x, this.type );
 
 		return x;
 
@@ -140,7 +141,7 @@ class InterleavedBufferAttribute {
 
 		let y = this.data.array[ index * this.data.stride + this.offset + 1 ];
 
-		if ( this.normalized ) y = intToFloat( y, this.array );
+		if ( this.normalized ) y = normalize( y, this.type );
 
 		return y;
 
@@ -150,7 +151,7 @@ class InterleavedBufferAttribute {
 
 		let z = this.data.array[ index * this.data.stride + this.offset + 2 ];
 
-		if ( this.normalized ) z = intToFloat( z, this.array );
+		if ( this.normalized ) z = normalize( z, this.type );
 
 		return z;
 
@@ -160,7 +161,7 @@ class InterleavedBufferAttribute {
 
 		let w = this.data.array[ index * this.data.stride + this.offset + 3 ];
 
-		if ( this.normalized ) w = intToFloat( w, this.array );
+		if ( this.normalized ) w = normalize( w, this.type );
 
 		return w;
 
@@ -172,8 +173,8 @@ class InterleavedBufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = floatToInt( x, this.array );
-			y = floatToInt( y, this.array );
+			x = denormalize( x, this.type );
+			y = denormalize( y, this.type );
 
 		}
 
@@ -190,9 +191,9 @@ class InterleavedBufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = floatToInt( x, this.array );
-			y = floatToInt( y, this.array );
-			z = floatToInt( z, this.array );
+			x = denormalize( x, this.type );
+			y = denormalize( y, this.type );
+			z = denormalize( z, this.type );
 
 		}
 
@@ -210,10 +211,10 @@ class InterleavedBufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = floatToInt( x, this.array );
-			y = floatToInt( y, this.array );
-			z = floatToInt( z, this.array );
-			w = floatToInt( w, this.array );
+			x = denormalize( x, this.type );
+			y = denormalize( y, this.type );
+			z = denormalize( z, this.type );
+			w = denormalize( w, this.type );
 
 		}
 

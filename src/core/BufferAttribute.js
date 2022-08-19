@@ -2,8 +2,7 @@ import { Vector4 } from '../math/Vector4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
-import { intToFloat, floatToInt } from '../math/MathUtils.js';
-import { StaticDrawUsage } from '../constants.js';
+import { ByteType, FloatType, IntType, ShortType, StaticDrawUsage, UnsignedByteType, UnsignedIntType, UnsignedShortType } from '../constants.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector2();
@@ -26,6 +25,8 @@ class BufferAttribute {
 		this.itemSize = itemSize;
 		this.count = array !== undefined ? array.length / itemSize : 0;
 		this.normalized = normalized === true;
+
+		this.type = getArrayType( array );
 
 		this.usage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };
@@ -57,6 +58,8 @@ class BufferAttribute {
 		this.itemSize = source.itemSize;
 		this.count = source.count;
 		this.normalized = source.normalized;
+
+		this.type = source.type;
 
 		this.usage = source.usage;
 
@@ -105,9 +108,9 @@ class BufferAttribute {
 
 			if ( this.normalized ) {
 
-				array[ offset ++ ] = floatToInt( color.r, array );
-				array[ offset ++ ] = floatToInt( color.g, array );
-				array[ offset ++ ] = floatToInt( color.b, array );
+				array[ offset ++ ] = denormalize( color.r, this.type );
+				array[ offset ++ ] = denormalize( color.g, this.type );
+				array[ offset ++ ] = denormalize( color.b, this.type );
 
 			} else {
 
@@ -141,8 +144,8 @@ class BufferAttribute {
 
 			if ( this.normalized ) {
 
-				array[ offset ++ ] = floatToInt( vector.x, array );
-				array[ offset ++ ] = floatToInt( vector.y, array );
+				array[ offset ++ ] = denormalize( vector.x, this.type );
+				array[ offset ++ ] = denormalize( vector.y, this.type );
 
 			} else {
 
@@ -175,9 +178,9 @@ class BufferAttribute {
 
 			if ( this.normalized ) {
 
-				array[ offset ++ ] = floatToInt( vector.x, array );
-				array[ offset ++ ] = floatToInt( vector.y, array );
-				array[ offset ++ ] = floatToInt( vector.z, array );
+				array[ offset ++ ] = denormalize( vector.x, this.type );
+				array[ offset ++ ] = denormalize( vector.y, this.type );
+				array[ offset ++ ] = denormalize( vector.z, this.type );
 
 			} else {
 
@@ -211,10 +214,10 @@ class BufferAttribute {
 
 			if ( this.normalized ) {
 
-				array[ offset ++ ] = floatToInt( vector.x, array );
-				array[ offset ++ ] = floatToInt( vector.y, array );
-				array[ offset ++ ] = floatToInt( vector.z, array );
-				array[ offset ++ ] = floatToInt( vector.w, array );
+				array[ offset ++ ] = denormalize( vector.x, this.type );
+				array[ offset ++ ] = denormalize( vector.y, this.type );
+				array[ offset ++ ] = denormalize( vector.z, this.type );
+				array[ offset ++ ] = denormalize( vector.w, this.type );
 
 			} else {
 
@@ -311,7 +314,11 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
-		if ( this.normalized ) value = floatToInt( value, this.array );
+		if ( this.normalized && Array.isArray( value ) ) {
+
+			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
+
+		}
 
 		this.array.set( value, offset );
 
@@ -323,7 +330,7 @@ class BufferAttribute {
 
 		let x = this.array[ index * this.itemSize ];
 
-		if ( this.normalized ) x = intToFloat( x, this.array );
+		if ( this.normalized ) x = normalize( x, this.type );
 
 		return x;
 
@@ -331,7 +338,7 @@ class BufferAttribute {
 
 	setX( index, x ) {
 
-		if ( this.normalized ) x = floatToInt( x, this.array );
+		if ( this.normalized ) x = denormalize( x, this.type );
 
 		this.array[ index * this.itemSize ] = x;
 
@@ -343,7 +350,7 @@ class BufferAttribute {
 
 		let y = this.array[ index * this.itemSize + 1 ];
 
-		if ( this.normalized ) y = intToFloat( y, this.array );
+		if ( this.normalized ) y = normalize( y, this.type );
 
 		return y;
 
@@ -351,7 +358,7 @@ class BufferAttribute {
 
 	setY( index, y ) {
 
-		if ( this.normalized ) y = floatToInt( y, this.array );
+		if ( this.normalized ) y = denormalize( y, this.type );
 
 		this.array[ index * this.itemSize + 1 ] = y;
 
@@ -363,7 +370,7 @@ class BufferAttribute {
 
 		let z = this.array[ index * this.itemSize + 2 ];
 
-		if ( this.normalized ) z = intToFloat( z, this.array );
+		if ( this.normalized ) z = normalize( z, this.type );
 
 		return z;
 
@@ -371,7 +378,7 @@ class BufferAttribute {
 
 	setZ( index, z ) {
 
-		if ( this.normalized ) z = floatToInt( z, this.array );
+		if ( this.normalized ) z = denormalize( z, this.type );
 
 		this.array[ index * this.itemSize + 2 ] = z;
 
@@ -383,7 +390,7 @@ class BufferAttribute {
 
 		let w = this.array[ index * this.itemSize + 3 ];
 
-		if ( this.normalized ) w = intToFloat( w, this.array );
+		if ( this.normalized ) w = normalize( w, this.type );
 
 		return w;
 
@@ -391,7 +398,7 @@ class BufferAttribute {
 
 	setW( index, w ) {
 
-		if ( this.normalized ) w = floatToInt( w, this.array );
+		if ( this.normalized ) w = denormalize( w, this.type );
 
 		this.array[ index * this.itemSize + 3 ] = w;
 
@@ -405,8 +412,8 @@ class BufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = floatToInt( x, this.array );
-			y = floatToInt( y, this.array );
+			x = denormalize( x, this.type );
+			y = denormalize( y, this.type );
 
 		}
 
@@ -423,9 +430,9 @@ class BufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = floatToInt( x, this.array );
-			y = floatToInt( y, this.array );
-			z = floatToInt( z, this.array );
+			x = denormalize( x, this.type );
+			y = denormalize( y, this.type );
+			z = denormalize( z, this.type );
 
 		}
 
@@ -443,10 +450,10 @@ class BufferAttribute {
 
 		if ( this.normalized ) {
 
-			x = floatToInt( x, this.array );
-			y = floatToInt( y, this.array );
-			z = floatToInt( z, this.array );
-			w = floatToInt( w, this.array );
+			x = denormalize( x, this.type );
+			y = denormalize( y, this.type );
+			z = denormalize( z, this.type );
+			w = denormalize( w, this.type );
 
 		}
 
@@ -599,6 +606,114 @@ class Float64BufferAttribute extends BufferAttribute {
 
 //
 
+function getArrayType( array ) {
+
+	switch ( array.constructor ) {
+
+		case Uint32Array:
+
+			return UnsignedIntType;
+
+		case Uint16Array:
+
+			return UnsignedShortType;
+
+		case Uint8Array:
+		case Uint8ClampedArray:
+
+			return UnsignedByteType;
+
+		case Int32Array:
+
+			return IntType;
+
+		case Int16Array:
+
+			return ShortType;
+
+		case Int8Array:
+
+			return ByteType;
+
+		case Float32Array:
+		case Float64Array:
+
+			return FloatType;
+
+		default:
+
+			throw new Error( 'THREE.BufferAttribute: Invalid type.' );
+
+	}
+
+}
+
+function normalize( value, type ) {
+
+	switch ( type ) {
+
+		case FloatType:
+
+			return value;
+
+		case UnsignedShortType:
+
+			return value / 65535.0;
+
+		case UnsignedByteType:
+
+			return value / 255.0;
+
+		case ShortType:
+
+			return Math.max( value / 32767.0, - 1.0 );
+
+		case ByteType:
+
+			return Math.max( value / 127.0, - 1.0 );
+
+		default:
+
+			throw new Error( 'THREE.BufferAttribute: Invalid type.' );
+
+	}
+
+}
+
+function denormalize( value, type ) {
+
+	switch ( type ) {
+
+		case FloatType:
+
+			return value;
+
+		case UnsignedShortType:
+
+			return Math.round( value * 65535.0 );
+
+		case UnsignedByteType:
+
+			return Math.round( value * 255.0 );
+
+		case ShortType:
+
+			return Math.round( value * 32767.0 );
+
+		case ByteType:
+
+			return Math.round( value * 127.0 );
+
+		default:
+
+			throw new Error( 'THREE.BufferAttribute: Invalid type.' );
+
+	}
+
+}
+
+//
+
 export {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
@@ -610,5 +725,8 @@ export {
 	Uint8ClampedBufferAttribute,
 	Uint8BufferAttribute,
 	Int8BufferAttribute,
-	BufferAttribute
+	BufferAttribute,
+	normalize,
+	denormalize,
+	getArrayType
 };

@@ -227,101 +227,6 @@ function setQuaternionFromProperEuler( q, a, b, c, order ) {
 
 }
 
-function intToFloat( value, array ) {
-
-	switch ( array.constructor ) {
-
-		case Float32Array:
-
-			return value;
-
-		case Uint16Array:
-
-			return value / 65535.0;
-
-		case Uint8Array:
-
-			return value / 255.0;
-
-		case Int16Array:
-
-			return Math.max( value / 32767.0, - 1.0 );
-
-		case Int8Array:
-
-			return Math.max( value / 127.0, - 1.0 );
-
-		default:
-
-			throw new Error( 'Invalid component type.' );
-
-	}
-
-}
-
-function floatToInt( value, array ) {
-
-	switch ( array.constructor ) {
-
-		case Float32Array:
-
-			return value;
-
-		case Uint16Array:
-
-			return Math.round( value * 65535.0 );
-
-		case Uint8Array:
-
-			return Math.round( value * 255.0 );
-
-		case Int16Array:
-
-			return Math.round( value * 32767.0 );
-
-		case Int8Array:
-
-			return Math.round( value * 127.0 );
-
-		default:
-
-			throw new Error( 'Invalid component type.' );
-
-	}
-
-}
-
-let _didIntToFloatWarning = false;
-let _didFloatToIntWarning = false;
-
-function normalize( value, array ) {
-
-	if ( _didFloatToIntWarning === false ) {
-
-		console.warn( 'THREE.MathUtils: normalize() renamed floatToInt()' );
-
-		_didFloatToIntWarning = true;
-
-	}
-
-	return floatToInt( value, array );
-
-}
-
-function denormalize( value, array ) {
-
-	if ( _didIntToFloatWarning === false ) {
-
-		console.warn( 'THREE.MathUtils: denormalize() renamed intToFloat()' );
-
-		_didIntToFloatWarning = true;
-
-	}
-
-	return intToFloat( value, array );
-
-}
-
 export {
 	DEG2RAD,
 	RAD2DEG,
@@ -344,9 +249,5 @@ export {
 	isPowerOfTwo,
 	ceilPowerOfTwo,
 	floorPowerOfTwo,
-	setQuaternionFromProperEuler,
-	normalize,
-	denormalize,
-	floatToInt,
-	intToFloat
+	setQuaternionFromProperEuler
 };
