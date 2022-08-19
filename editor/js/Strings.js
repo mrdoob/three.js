@@ -134,6 +134,8 @@ function Strings( config ) {
 			'sidebar/geometry/name': 'Name',
 			'sidebar/geometry/bounds': 'Bounds',
 			'sidebar/geometry/show_vertex_normals': 'Show Vertex Normals',
+			'sidebar/geometry/compute_vertex_normals': 'Compute Vertex Normals',
+			'sidebar/geometry/center': 'Center',
 
 			'sidebar/geometry/box_geometry/width': 'Width',
 			'sidebar/geometry/box_geometry/height': 'Height',
@@ -144,6 +146,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributes',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': 'Radius',
 			'sidebar/geometry/capsule_geometry/length': 'Length',
@@ -255,6 +259,9 @@ function Strings( config ) {
 			'sidebar/material/shininess': 'Shininess',
 			'sidebar/material/clearcoat': 'Clearcoat',
 			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
+			'sidebar/material/iridescence': 'Iridescence',
+			'sidebar/material/iridescenceIOR': 'Thin-Film IOR',
+			'sidebar/material/iridescenceThicknessMax': 'Thin-Film Thickness',
 			'sidebar/material/transmission': 'Transmission',
 			'sidebar/material/attenuationDistance': 'Attenuation Distance',
 			'sidebar/material/attenuationColor': 'Attenuation Color',
@@ -270,6 +277,8 @@ function Strings( config ) {
 			'sidebar/material/roughnessmap': 'Rough. Map',
 			'sidebar/material/metalnessmap': 'Metal. Map',
 			'sidebar/material/specularmap': 'Specular Map',
+			'sidebar/material/iridescencemap': 'Irid. Map',
+			'sidebar/material/iridescencethicknessmap': 'Thin-Film Thickness Map',
 			'sidebar/material/envmap': 'Env Map',
 			'sidebar/material/lightmap': 'Light Map',
 			'sidebar/material/aomap': 'AO Map',
@@ -469,6 +478,8 @@ function Strings( config ) {
 			'sidebar/geometry/name': 'Nom',
 			'sidebar/geometry/bounds': 'Limites',
 			'sidebar/geometry/show_vertex_normals': 'Afficher normales',
+			'sidebar/geometry/compute_vertex_normals': 'Compute Vertex Normals',
+			'sidebar/geometry/center': 'Center',
 
 			'sidebar/geometry/box_geometry/width': 'Largeur',
 			'sidebar/geometry/box_geometry/height': 'Hauteur',
@@ -479,6 +490,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': 'Attributs',
 			'sidebar/geometry/buffer_geometry/index': 'index',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': 'Radius',
 			'sidebar/geometry/capsule_geometry/length': 'Length',
@@ -804,6 +817,8 @@ function Strings( config ) {
 			'sidebar/geometry/name': '名称',
 			'sidebar/geometry/bounds': '界限',
 			'sidebar/geometry/show_vertex_normals': '显示顶点法线',
+			'sidebar/geometry/compute_vertex_normals': '计算顶点法线',
+			'sidebar/geometry/center': '居中',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
@@ -814,6 +829,8 @@ function Strings( config ) {
 
 			'sidebar/geometry/buffer_geometry/attributes': '属性',
 			'sidebar/geometry/buffer_geometry/index': '索引',
+			'sidebar/geometry/buffer_geometry/morphAttributes': 'Morph Attributes',
+			'sidebar/geometry/buffer_geometry/morphRelative': 'Morph Relative',
 
 			'sidebar/geometry/capsule_geometry/radius': '半径',
 			'sidebar/geometry/capsule_geometry/length': '长度',

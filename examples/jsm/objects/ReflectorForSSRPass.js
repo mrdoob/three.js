@@ -11,7 +11,8 @@ import {
 	DepthTexture,
 	UnsignedShortType,
 	NearestFilter,
-	Plane
+	Plane,
+	HalfFloatType
 } from 'three';
 
 class ReflectorForSSRPass extends Mesh {
@@ -19,6 +20,8 @@ class ReflectorForSSRPass extends Mesh {
 	constructor( geometry, options = {} ) {
 
 		super( geometry );
+
+		this.isReflectorForSSRPass = true;
 
 		this.type = 'ReflectorForSSRPass';
 
@@ -102,6 +105,7 @@ class ReflectorForSSRPass extends Mesh {
 
 		const parameters = {
 			depthTexture: useDepthTexture ? depthTexture : null,
+			type: HalfFloatType
 		};
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -196,10 +200,6 @@ class ReflectorForSSRPass extends Mesh {
 			textureMatrix.multiply( virtualCamera.matrixWorldInverse );
 			textureMatrix.multiply( scope.matrixWorld );
 
-			// Render
-
-			renderTarget.texture.encoding = renderer.outputEncoding;
-
 			// scope.visible = false;
 
 			const currentRenderTarget = renderer.getRenderTarget();
@@ -248,8 +248,6 @@ class ReflectorForSSRPass extends Mesh {
 	}
 
 }
-
-ReflectorForSSRPass.prototype.isReflectorForSSRPass = true;
 
 ReflectorForSSRPass.ReflectorShader = {
 

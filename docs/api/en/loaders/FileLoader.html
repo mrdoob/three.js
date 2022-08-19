@@ -44,7 +44,7 @@
 		</code>
 
 		<p>
-			<em>Note:</em> The cache must be enabled using
+			*Note:* The cache must be enabled using
 			<code>THREE.Cache.enabled = true;</code>
 			This is a global property and only needs to be set once to be used by all loaders that use FileLoader internally.
 			[page:Cache Cache] is a cache module that holds the response from each request made through this loader, so each file is requested once.
@@ -65,11 +65,11 @@
 		<h3>[property:String mimeType]</h3>
 		<p>
 			The expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType].
-			See [page:.setMimeType]. Default is *undefined*.
+			See [page:.setMimeType]. Default is `undefined`.
 		</p>
 
 		<h3>[property:String responseType]</h3>
-		<p>The expected response type. See [page:.setResponseType]. Default is *undefined*.</p>
+		<p>The expected response type. See [page:.setResponseType]. Default is `undefined`.</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
@@ -88,7 +88,7 @@
 		<h3>[method:this setMimeType]( [param:String mimeType] )</h3>
 		<p>
 			Set the expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
-			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is *undefined*.
+			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is `undefined`.
 		</p>
 
 		<h3>[method:this setResponseType]( [param:String responseType] )</h3>

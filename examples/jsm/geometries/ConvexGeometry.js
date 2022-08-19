@@ -17,7 +17,7 @@ class ConvexGeometry extends BufferGeometry {
 
 		if ( ConvexHull === undefined ) {
 
-			console.error( 'THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on ConvexHull' );
+			console.error( 'THREE.ConvexGeometry: ConvexGeometry relies on ConvexHull' );
 
 		}
 

@@ -3793,6 +3793,7 @@
 
 			if ( asset.upAxis === 'Z_UP' ) {
 
+				console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
 				scene.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) );
 
 			}

@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { CircleGeometry, CircleBufferGeometry } from '../../../../src/geometries/CircleGeometry.js';
+import { CircleGeometry } from '../../../../src/geometries/CircleGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -23,7 +23,6 @@ export default QUnit.module( 'Geometries', () => {
 				new CircleGeometry( parameters.radius, parameters.segments ),
 				new CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart ),
 				new CircleGeometry( parameters.radius, parameters.segments, parameters.thetaStart, parameters.thetaLength ),
-				new CircleBufferGeometry(),
 			];
 
 		} );

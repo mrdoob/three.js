@@ -6,30 +6,38 @@ class TempNode extends Node {
 
 		super( type );
 
+		this.isTempNode = true;
+
 	}
 
 	build( builder, output ) {
 
-		const type = builder.getVectorType( this.getNodeType( builder, output ) );
-		const nodeData = builder.getDataFromNode( this );
+		const buildStage = builder.getBuildStage();
 
-		if ( nodeData.propertyName !== undefined ) {
+		if ( buildStage === 'generate' ) {
 
-			return builder.format( nodeData.propertyName, type, output );
+			const type = builder.getVectorType( this.getNodeType( builder, output ) );
+			const nodeData = builder.getDataFromNode( this );
 
-		} else if ( builder.context.temp !== false && type !== 'void ' && output !== 'void' && nodeData.dependenciesCount > 1 ) {
+			if ( builder.context.tempRead !== false && nodeData.propertyName !== undefined ) {
 
-			const snippet = super.build( builder, type );
+				return builder.format( nodeData.propertyName, type, output );
 
-			const nodeVar = builder.getVarFromNode( this, type );
-			const propertyName = builder.getPropertyName( nodeVar );
+			} else if ( builder.context.tempWrite !== false && type !== 'void ' && output !== 'void' && nodeData.dependenciesCount > 1 ) {
 
-			builder.addFlowCode( `${propertyName} = ${snippet}` );
+				const snippet = super.build( builder, type );
 
-			nodeData.snippet = snippet;
-			nodeData.propertyName = propertyName;
+				const nodeVar = builder.getVarFromNode( this, type );
+				const propertyName = builder.getPropertyName( nodeVar );
 
-			return builder.format( nodeData.propertyName, type, output );
+				builder.addFlowCode( `${propertyName} = ${snippet}` );
+
+				nodeData.snippet = snippet;
+				nodeData.propertyName = propertyName;
+
+				return builder.format( nodeData.propertyName, type, output );
+
+			}
 
 		}
 
@@ -38,7 +46,5 @@ class TempNode extends Node {
 	}
 
 }
-
-TempNode.prototype.isTempNode = true;
 
 export default TempNode;

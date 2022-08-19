@@ -1,5 +1,6 @@
+import { MultiplyOperation, TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
-import { MultiplyOperation } from '../constants.js';
+import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 
 class MeshLambertMaterial extends Material {
@@ -7,6 +8,8 @@ class MeshLambertMaterial extends Material {
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshLambertMaterial = true;
 
 		this.type = 'MeshLambertMaterial';
 
@@ -24,6 +27,17 @@ class MeshLambertMaterial extends Material {
 		this.emissiveIntensity = 1.0;
 		this.emissiveMap = null;
 
+		this.bumpMap = null;
+		this.bumpScale = 1;
+
+		this.normalMap = null;
+		this.normalMapType = TangentSpaceNormalMap;
+		this.normalScale = new Vector2( 1, 1 );
+
+		this.displacementMap = null;
+		this.displacementScale = 1;
+		this.displacementBias = 0;
+
 		this.specularMap = null;
 
 		this.alphaMap = null;
@@ -37,6 +51,8 @@ class MeshLambertMaterial extends Material {
 		this.wireframeLinewidth = 1;
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
+
+		this.flatShading = false;
 
 		this.fog = true;
 
@@ -62,6 +78,17 @@ class MeshLambertMaterial extends Material {
 		this.emissiveMap = source.emissiveMap;
 		this.emissiveIntensity = source.emissiveIntensity;
 
+		this.bumpMap = source.bumpMap;
+		this.bumpScale = source.bumpScale;
+
+		this.normalMap = source.normalMap;
+		this.normalMapType = source.normalMapType;
+		this.normalScale.copy( source.normalScale );
+
+		this.displacementMap = source.displacementMap;
+		this.displacementScale = source.displacementScale;
+		this.displacementBias = source.displacementBias;
+
 		this.specularMap = source.specularMap;
 
 		this.alphaMap = source.alphaMap;
@@ -76,6 +103,8 @@ class MeshLambertMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
+		this.flatShading = source.flatShading;
+
 		this.fog = source.fog;
 
 		return this;
@@ -83,7 +112,5 @@ class MeshLambertMaterial extends Material {
 	}
 
 }
-
-MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
 export { MeshLambertMaterial };

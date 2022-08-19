@@ -97,9 +97,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		super( object, renderer, new WGSLNodeParser() );
 
-		this.lightNode = null;
-		this.fogNode = null;
-
 		this.bindings = { vertex: [], fragment: [], compute: [] };
 		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
 
@@ -162,11 +159,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
 
-			return `textureSampleBias( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
+			return `textureSampleLevel( ${textureProperty}, ${textureProperty}_sampler, ${uvSnippet}, ${biasSnippet} )`;
 
 		} else {
 
@@ -186,9 +183,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
@@ -198,19 +195,19 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getCubeTextureBias( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getCubeTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerBias( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 
 	}
 
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
-		if ( node.isNodeVary === true ) {
+		if ( node.isNodeVarying === true ) {
 
 			if ( shaderStage === 'vertex' ) {
 
-				return `NodeVarys.${ node.name }`;
+				return `NodeVaryings.${ node.name }`;
 
 			}
 
@@ -447,9 +444,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		const snippets = [];
 		const vars = this.vars[ shaderStage ];
 
-		for ( let index = 0; index < vars.length; index ++ ) {
-
-			const variable = vars[ index ];
+		for ( const variable of vars ) {
 
 			const name = variable.name;
 			const type = this.getType( variable.type );
@@ -462,7 +457,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVarys( shaderStage ) {
+	getVaryings( shaderStage ) {
 
 		const snippets = [];
 
@@ -470,25 +465,25 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			this.getBuiltin( 'position', 'Vertex', 'vec4<f32>', 'vertex' );
 
-			const varys = this.varys;
+			const varyings = this.varyings;
 
-			for ( let index = 0; index < varys.length; index ++ ) {
+			for ( let index = 0; index < varyings.length; index ++ ) {
 
-				const vary = varys[ index ];
+				const varying = varyings[ index ];
 
-				snippets.push( `@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }` );
+				snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
 
 			}
 
 		} else if ( shaderStage === 'fragment' ) {
 
-			const varys = this.varys;
+			const varyings = this.varyings;
 
-			for ( let index = 0; index < varys.length; index ++ ) {
+			for ( let index = 0; index < varyings.length; index ++ ) {
 
-				const vary = varys[ index ];
+				const varying = varyings[ index ];
 
-				snippets.push( `@location( ${index} ) ${ vary.name } : ${ this.getType( vary.type ) }` );
+				snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
 
 			}
 
@@ -502,7 +497,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const code = snippets.join( ',\n\t' );
 
-		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVarysStruct', '\t' + code ) : code;
+		return shaderStage === 'vertex' ? this._getWGSLStruct( 'NodeVaryingsStruct', '\t' + code ) : code;
 
 	}
 
@@ -598,7 +593,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			for ( const node of flowNodes ) {
 
-				const flowSlotData = this.getFlowData( shaderStage, node );
+				const flowSlotData = this.getFlowData( node/*, shaderStage*/ );
 				const slotName = node.name;
 
 				if ( slotName ) {
@@ -617,7 +612,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					if ( shaderStage === 'vertex' ) {
 
-						flow += 'NodeVarys.Vertex = ';
+						flow += 'NodeVaryings.Vertex = ';
 
 					} else if ( shaderStage === 'fragment' ) {
 
@@ -635,7 +630,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
-			stageData.varys = this.getVarys( shaderStage );
+			stageData.varyings = this.getVaryings( shaderStage );
 			stageData.vars = this.getVars( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.flow = flow;
@@ -706,17 +701,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 // uniforms
 ${shaderData.uniforms}
 
-// varys
-${shaderData.varys}
+// varyings
+${shaderData.varyings}
 
 // codes
 ${shaderData.codes}
 
-@stage( vertex )
-fn main( ${shaderData.attributes} ) -> NodeVarysStruct {
+@vertex
+fn main( ${shaderData.attributes} ) -> NodeVaryingsStruct {
 
 	// system
-	var NodeVarys: NodeVarysStruct;
+	var NodeVaryings: NodeVaryingsStruct;
 
 	// vars
 	${shaderData.vars}
@@ -724,7 +719,7 @@ fn main( ${shaderData.attributes} ) -> NodeVarysStruct {
 	// flow
 	${shaderData.flow}
 
-	return NodeVarys;
+	return NodeVaryings;
 
 }
 `;
@@ -741,8 +736,8 @@ ${shaderData.uniforms}
 // codes
 ${shaderData.codes}
 
-@stage( fragment )
-fn main( ${shaderData.varys} ) -> @location( 0 ) vec4<f32> {
+@fragment
+fn main( ${shaderData.varyings} ) -> @location( 0 ) vec4<f32> {
 
 	// vars
 	${shaderData.vars}
@@ -767,7 +762,7 @@ ${shaderData.uniforms}
 // codes
 ${shaderData.codes}
 
-@stage( compute ) @workgroup_size( ${workgroupSize} )
+@compute @workgroup_size( ${workgroupSize} )
 fn main( ${shaderData.attributes} ) {
 
 	// system

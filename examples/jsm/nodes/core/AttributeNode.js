@@ -1,9 +1,9 @@
 import Node from './Node.js';
-import VaryNode from './VaryNode.js';
+import VaryingNode from './VaryingNode.js';
 
 class AttributeNode extends Node {
 
-	constructor( attributeName, nodeType ) {
+	constructor( attributeName, nodeType = null ) {
 
 		super( nodeType );
 
@@ -14,6 +14,23 @@ class AttributeNode extends Node {
 	getHash( builder ) {
 
 		return this.getAttributeName( builder );
+
+	}
+
+	getNodeType( builder ) {
+
+		let nodeType = super.getNodeType( builder );
+
+		if ( nodeType === null ) {
+
+			const attributeName = this.getAttributeName( builder );
+			const attribute = builder.geometry.getAttribute( attributeName );
+
+			nodeType = builder.getTypeFromLength( attribute.itemSize );
+
+		}
+
+		return nodeType;
 
 	}
 
@@ -41,9 +58,9 @@ class AttributeNode extends Node {
 
 		} else {
 
-			const nodeVary = new VaryNode( this );
+			const nodeVarying = new VaryingNode( this );
 
-			return nodeVary.build( builder, attribute.type );
+			return nodeVarying.build( builder, attribute.type );
 
 		}
 

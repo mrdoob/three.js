@@ -91,9 +91,9 @@ class BoxHelper extends LineSegments {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		LineSegments.prototype.copy.call( this, source );
+		super.copy( source, recursive );
 
 		this.object = source.object;
 

@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { SphereGeometry, SphereBufferGeometry } from '../../../../src/geometries/SphereGeometry.js';
+import { SphereGeometry } from '../../../../src/geometries/SphereGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -29,7 +29,6 @@ export default QUnit.module( 'Geometries', () => {
 				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
 				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
 				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
-				new SphereBufferGeometry()
 			];
 
 		} );

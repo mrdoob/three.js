@@ -5,8 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
-		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
 	</head>
 	<body>
 
@@ -29,6 +27,8 @@
 
 			import * as THREE from 'three';
 			import * as Nodes from 'three-nodes/Nodes.js';
+
+			import { mix, range, color, oscSine, timerLocal } from 'three-nodes/Nodes.js';
 
 			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
@@ -85,8 +85,16 @@
 
 						if ( child.isMesh ) {
 
+							// random colors between instances from 0x000000 to 0xFFFFFF
+							const randomColors = range( new THREE.Color( 0x000000 ), new THREE.Color( 0xFFFFFF ) );
+
+							// random [ 0, 1 ] values between instances
+							const randomMetalness = range( 0, 1 );
+
 							child.material = new Nodes.MeshStandardNodeMaterial();
 							child.material.roughness = .1;
+							child.material.metalnessNode = randomMetalness;
+							child.material.colorNode = mix( color( 0xFFFFFF ), randomColors, oscSine( timerLocal( .1 ) ) );
 
 							child.isInstancedMesh = true;
 							child.instanceMatrix = new THREE.InstancedBufferAttribute( new Float32Array( instanceCount * 16 ), 16 );

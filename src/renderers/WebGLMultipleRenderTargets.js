@@ -6,6 +6,8 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 
 		super( width, height, options );
 
+		this.isWebGLMultipleRenderTargets = true;
+
 		const texture = this.texture;
 
 		this.texture = [];
@@ -76,7 +78,5 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 	}
 
 }
-
-WebGLMultipleRenderTargets.prototype.isWebGLMultipleRenderTargets = true;
 
 export { WebGLMultipleRenderTargets };

@@ -15,6 +15,8 @@ class Data3DTexture extends Texture {
 
 		super( null );
 
+		this.isData3DTexture = true;
+
 		this.image = { data, width, height, depth };
 
 		this.magFilter = NearestFilter;
@@ -29,7 +31,5 @@ class Data3DTexture extends Texture {
 	}
 
 }
-
-Data3DTexture.prototype.isData3DTexture = true;
 
 export { Data3DTexture };

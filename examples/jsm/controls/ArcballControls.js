@@ -1040,7 +1040,7 @@ class ArcballControls extends EventDispatcher {
 
 							}
 
-							this._v3_1.setFromMatrixPosition(this._gizmoMatrixState);
+							this._v3_1.setFromMatrixPosition( this._gizmoMatrixState );
 
 							this.applyTransformMatrix( this.scale( size, this._v3_1 ) );
 
@@ -2279,7 +2279,7 @@ class ArcballControls extends EventDispatcher {
 		this._gizmoMatrixState0.identity().setPosition( tbCenter );
 		this._gizmoMatrixState.copy( this._gizmoMatrixState0 );
 
-		if ( this.camera.zoom != 1 ) {
+		if ( this.camera.zoom !== 1 ) {
 
 			//adapt gizmos size to camera zoom
 			const size = 1 / this.camera.zoom;
@@ -2294,7 +2294,22 @@ class ArcballControls extends EventDispatcher {
 
 		this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
+		//
+
+		this._gizmos.traverse( function ( object ) {
+
+			if ( object.isLine ) {
+
+				object.geometry.dispose();
+				object.material.dispose();
+
+			}
+
+		} );
+
 		this._gizmos.clear();
+
+		//
 
 		this._gizmos.add( gizmoX );
 		this._gizmos.add( gizmoY );

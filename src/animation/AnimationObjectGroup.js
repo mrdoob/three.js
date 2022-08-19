@@ -34,6 +34,8 @@ class AnimationObjectGroup {
 
 	constructor() {
 
+		this.isAnimationObjectGroup = true;
+
 		this.uuid = MathUtils.generateUUID();
 
 		// cached objects followed by the active ones
@@ -381,7 +383,5 @@ class AnimationObjectGroup {
 	}
 
 }
-
-AnimationObjectGroup.prototype.isAnimationObjectGroup = true;
 
 export { AnimationObjectGroup };

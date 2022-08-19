@@ -1,6 +1,4 @@
-import {
-	Vector3
-} from 'three';
+import { Vector3 } from 'three';
 
 
 /**
@@ -38,15 +36,12 @@ function hilbert2D( center = new Vector3( 0, 0, 0 ), size = 10, iterations = 1, 
 	// Recurse iterations
 	if ( 0 <= -- iterations ) {
 
-		const tmp = [];
-
-		Array.prototype.push.apply( tmp, hilbert2D( vec[ 0 ], half, iterations, v0, v3, v2, v1 ) );
-		Array.prototype.push.apply( tmp, hilbert2D( vec[ 1 ], half, iterations, v0, v1, v2, v3 ) );
-		Array.prototype.push.apply( tmp, hilbert2D( vec[ 2 ], half, iterations, v0, v1, v2, v3 ) );
-		Array.prototype.push.apply( tmp, hilbert2D( vec[ 3 ], half, iterations, v2, v1, v0, v3 ) );
-
-		// Return recursive call
-		return tmp;
+		return [
+			...hilbert2D( vec[ 0 ], half, iterations, v0, v3, v2, v1 ),
+			...hilbert2D( vec[ 1 ], half, iterations, v0, v1, v2, v3 ),
+			...hilbert2D( vec[ 2 ], half, iterations, v0, v1, v2, v3 ),
+			...hilbert2D( vec[ 3 ], half, iterations, v2, v1, v0, v3 )
+		];
 
 	}
 
@@ -103,19 +98,16 @@ function hilbert3D( center = new Vector3( 0, 0, 0 ), size = 10, iterations = 1, 
 	// Recurse iterations
 	if ( -- iterations >= 0 ) {
 
-		const tmp = [];
-
-		Array.prototype.push.apply( tmp, hilbert3D( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
-		Array.prototype.push.apply( tmp, hilbert3D( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-		Array.prototype.push.apply( tmp, hilbert3D( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-		Array.prototype.push.apply( tmp, hilbert3D( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-		Array.prototype.push.apply( tmp, hilbert3D( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-		Array.prototype.push.apply( tmp, hilbert3D( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
-		Array.prototype.push.apply( tmp, hilbert3D( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
-		Array.prototype.push.apply( tmp, hilbert3D( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 ) );
-
-		// Return recursive call
-		return tmp;
+		return [
+			...hilbert3D( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ),
+			...hilbert3D( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ),
+			...hilbert3D( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ),
+			...hilbert3D( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ),
+			...hilbert3D( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ),
+			...hilbert3D( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ),
+			...hilbert3D( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ),
+			...hilbert3D( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 )
+		];
 
 	}
 

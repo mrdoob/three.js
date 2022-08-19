@@ -1,15 +1,18 @@
 import Node from '../core/Node.js';
 import OperatorNode from '../math/OperatorNode.js';
 import MaterialReferenceNode from './MaterialReferenceNode.js';
+import TextureNode from './TextureNode.js';
+import SplitNode from '../utils/SplitNode.js';
 
 class MaterialNode extends Node {
 
 	static ALPHA_TEST = 'alphaTest';
 	static COLOR = 'color';
 	static OPACITY = 'opacity';
-	static SPECULAR = 'specular';
 	static ROUGHNESS = 'roughness';
 	static METALNESS = 'metalness';
+	static EMISSIVE = 'emissive';
+	static ROTATION = 'rotation';
 
 	constructor( scope = MaterialNode.COLOR ) {
 
@@ -28,11 +31,11 @@ class MaterialNode extends Node {
 
 			return material.map !== null ? 'vec4' : 'vec3';
 
-		} else if ( scope === MaterialNode.OPACITY ) {
+		} else if ( scope === MaterialNode.OPACITY || scope === MaterialNode.ROTATION ) {
 
 			return 'float';
 
-		} else if ( scope === MaterialNode.SPECULAR ) {
+		} else if ( scope === MaterialNode.EMISSIVE ) {
 
 			return 'vec3';
 
@@ -59,9 +62,12 @@ class MaterialNode extends Node {
 
 			const colorNode = new MaterialReferenceNode( 'color', 'color' );
 
-			if ( material.map !== null && material.map !== undefined && material.map.isTexture === true ) {
+			if ( material.map?.isTexture === true ) {
 
-				node = new OperatorNode( '*', colorNode, new MaterialReferenceNode( 'map', 'texture' ) );
+				//new MaterialReferenceNode( 'map', 'texture' )
+				const map = new TextureNode( material.map );
+
+				node = new OperatorNode( '*', colorNode, map );
 
 			} else {
 
@@ -73,7 +79,7 @@ class MaterialNode extends Node {
 
 			const opacityNode = new MaterialReferenceNode( 'opacity', 'float' );
 
-			if ( material.alphaMap !== null && material.alphaMap !== undefined && material.alphaMap.isTexture === true ) {
+			if ( material.alphaMap?.isTexture === true ) {
 
 				node = new OperatorNode( '*', opacityNode, new MaterialReferenceNode( 'alphaMap', 'texture' ) );
 
@@ -83,19 +89,51 @@ class MaterialNode extends Node {
 
 			}
 
-		} else if ( scope === MaterialNode.SPECULAR ) {
+		} else if ( scope === MaterialNode.ROUGHNESS ) {
 
-			const specularColorNode = new MaterialReferenceNode( 'specularColor', 'color' );
+			const roughnessNode = new MaterialReferenceNode( 'roughness', 'float' );
 
-			if ( material.specularColorMap !== null && material.specularColorMap !== undefined && material.specularColorMap.isTexture === true ) {
+			if ( material.roughnessMap?.isTexture === true ) {
 
-				node = new OperatorNode( '*', specularColorNode, new MaterialReferenceNode( 'specularColorMap', 'texture' ) );
+				node = new OperatorNode( '*', roughnessNode, new SplitNode( new TextureNode( material.roughnessMap ), 'g' ) );
 
 			} else {
 
-				node = specularColorNode;
+				node = roughnessNode;
 
 			}
+
+		} else if ( scope === MaterialNode.METALNESS ) {
+
+			const metalnessNode = new MaterialReferenceNode( 'metalness', 'float' );
+
+			if ( material.metalnessMap?.isTexture === true ) {
+
+				node = new OperatorNode( '*', metalnessNode, new SplitNode( new TextureNode( material.metalnessMap ), 'b' ) );
+
+			} else {
+
+				node = metalnessNode;
+
+			}
+
+		} else if ( scope === MaterialNode.EMISSIVE ) {
+
+			const emissiveNode = new MaterialReferenceNode( 'emissive', 'color' );
+
+			if ( material.emissiveMap?.isTexture === true ) {
+
+				node = new OperatorNode( '*', emissiveNode, new TextureNode( material.emissiveMap ) );
+
+			} else {
+
+				node = emissiveNode;
+
+			}
+
+		} else if ( scope === MaterialNode.ROTATION ) {
+
+			node = new MaterialReferenceNode( 'rotation', 'float' );
 
 		} else {
 

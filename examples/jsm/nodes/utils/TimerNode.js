@@ -7,12 +7,12 @@ class TimerNode extends UniformNode {
 	static GLOBAL = 'global';
 	static DELTA = 'delta';
 
-	constructor( scope = TimerNode.LOCAL ) {
+	constructor( scope = TimerNode.LOCAL, scale = 1, value = 0 ) {
 
-		super( 0 );
+		super( value );
 
 		this.scope = scope;
-		this.scale = 1;
+		this.scale = scale;
 
 		this.updateType = NodeUpdateType.Frame;
 

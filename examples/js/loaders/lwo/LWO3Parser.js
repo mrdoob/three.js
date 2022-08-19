@@ -1,14 +1,14 @@
 ( function () {
 
-	function LWO3Parser( IFFParser ) {
+	class LWO3Parser {
 
-		this.IFF = IFFParser;
+		constructor( IFFParser ) {
 
-	}
+			this.IFF = IFFParser;
 
-	LWO3Parser.prototype = {
-		constructor: LWO3Parser,
-		parseBlock: function () {
+		}
+
+		parseBlock() {
 
 			this.IFF.debugger.offset = this.IFF.reader.offset;
 			this.IFF.debugger.closeForms();
@@ -394,7 +394,8 @@
 			}
 
 		}
-	};
+
+	}
 
 	THREE.LWO3Parser = LWO3Parser;
 

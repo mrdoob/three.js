@@ -14,23 +14,10 @@
 			const loader = new THREE.FileLoader( this.manager );
 			loader.setPath( this.path );
 			loader.setRequestHeader( this.requestHeader );
-			loader.setWithCredentials( scope.withCredentials );
+			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( text ) {
 
-				let json;
-
-				try {
-
-					json = JSON.parse( text );
-
-				} catch ( e ) {
-
-					console.warn( 'THREE.FontLoader: typeface.js support is being deprecated. Use typeface.json instead.' );
-					json = JSON.parse( text.substring( 65, text.length - 2 ) );
-
-				}
-
-				const font = scope.parse( json );
+				const font = scope.parse( JSON.parse( text ) );
 				if ( onLoad ) onLoad( font );
 
 			}, onProgress, onError );
@@ -50,6 +37,7 @@
 
 		constructor( data ) {
 
+			this.isFont = true;
 			this.type = 'Font';
 			this.data = data;
 
@@ -62,7 +50,7 @@
 
 			for ( let p = 0, pl = paths.length; p < pl; p ++ ) {
 
-				Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
+				shapes.push( ...paths[ p ].toShapes() );
 
 			}
 
@@ -174,8 +162,6 @@
 		};
 
 	}
-
-	Font.prototype.isFont = true;
 
 	THREE.Font = Font;
 	THREE.FontLoader = FontLoader;

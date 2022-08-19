@@ -10,6 +10,8 @@ class CSS2DObject extends Object3D {
 
 		super();
 
+		this.isCSS2DObject = true;
+
 		this.element = element;
 
 		this.element.style.position = 'absolute';
@@ -44,8 +46,6 @@ class CSS2DObject extends Object3D {
 	}
 
 }
-
-CSS2DObject.prototype.isCSS2DObject = true;
 
 //
 
@@ -125,16 +125,7 @@ class CSS2DRenderer {
 
 					const element = object.element;
 
-					if ( /apple/i.test( navigator.vendor ) ) {
-
-						// https://github.com/mrdoob/three.js/issues/21415
-						element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
-
-					} else {
-
-						element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
-
-					}
+					element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
 
 					if ( element.parentNode !== domElement ) {
 

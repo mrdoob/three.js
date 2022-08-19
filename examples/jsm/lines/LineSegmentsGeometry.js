@@ -18,6 +18,8 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		super();
 
+		this.isLineSegmentsGeometry = true;
+
 		this.type = 'LineSegmentsGeometry';
 
 		const positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
@@ -142,16 +144,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		const geometry = lineSegments.geometry;
 
-		if ( geometry.isGeometry ) {
-
-			console.error( 'THREE.LineSegmentsGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-			return;
-
-		} else if ( geometry.isBufferGeometry ) {
-
-			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
-
-		}
+		this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
 
 		// set colors, maybe
 
@@ -244,7 +237,5 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	}
 
 }
-
-LineSegmentsGeometry.prototype.isLineSegmentsGeometry = true;
 
 export { LineSegmentsGeometry };

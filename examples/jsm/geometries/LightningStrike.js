@@ -115,6 +115,8 @@ class LightningStrike extends BufferGeometry {
 
 		super();
 
+		this.isLightningStrike = true;
+
 		this.type = 'LightningStrike';
 
 		// Set parameters, and set undefined parameters to default values
@@ -1000,8 +1002,6 @@ class LightningStrike extends BufferGeometry {
 	}
 
 }
-
-LightningStrike.prototype.isLightningStrike = true;
 
 // Ray states
 LightningStrike.RAY_INITIALIZED = 0;

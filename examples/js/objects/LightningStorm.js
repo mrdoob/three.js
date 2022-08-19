@@ -50,7 +50,8 @@
 
 		constructor( stormParams = {} ) {
 
-			super(); // Parameters
+			super();
+			this.isLightningStorm = true; // Parameters
 
 			this.stormParams = stormParams;
 			stormParams.size = stormParams.size !== undefined ? stormParams.size : 1000.0;
@@ -176,9 +177,9 @@
 
 		}
 
-		copy( source ) {
+		copy( source, recursive ) {
 
-			super.copy( source );
+			super.copy( source, recursive );
 			this.stormParams.size = source.stormParams.size;
 			this.stormParams.minHeight = source.stormParams.minHeight;
 			this.stormParams.maxHeight = source.stormParams.maxHeight;
@@ -202,8 +203,6 @@
 		}
 
 	}
-
-	LightningStorm.prototype.isLightningStorm = true;
 
 	THREE.LightningStorm = LightningStorm;
 

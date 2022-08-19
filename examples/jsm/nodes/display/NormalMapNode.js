@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import ModelNode from '../accessors/ModelNode.js';
-import { ShaderNode, positionView, normalView, uv, vec3, cond, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, equal, faceDirection } from '../shadernode/ShaderNodeBaseElements.js';
+import { ShaderNode, positionView, normalView, uv, vec3, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, faceDirection } from '../shadernode/ShaderNodeBaseElements.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
@@ -25,7 +25,7 @@ const perturbNormal2ArbNode = new ShaderNode( ( inputs ) => {
 	const B = add( mul( q1perp, st0.y ), mul( q0perp, st1.y ) );
 
 	const det = max( dot( T, T ), dot( B, B ) );
-	const scale = cond( equal( det, 0 ), 0, mul( faceDirection, inversesqrt( det ) ) );
+	const scale = mul( faceDirection, inversesqrt( det ) );
 
 	return normalize( add( mul( T, mul( mapN.x, scale ) ), mul( B, mul( mapN.y, scale ) ), mul( N, mapN.z ) ) );
 
@@ -44,9 +44,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	generate( builder ) {
-
-		const type = this.getNodeType( builder );
+	construct() {
 
 		const { normalMapType, scaleNode } = this;
 
@@ -60,26 +58,26 @@ class NormalMapNode extends TempNode {
 
 		}
 
+		let outputNode = null;
+
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
 			const vertexNormalNode = mul( new ModelNode( ModelNode.NORMAL_MATRIX ), normalMap );
 
-			const normal = normalize( vertexNormalNode );
-
-			return normal.build( builder, type );
+			outputNode = normalize( vertexNormalNode );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
-			const perturbNormal2ArbCall = perturbNormal2ArbNode.call( {
+			outputNode = perturbNormal2ArbNode.call( {
 				eye_pos: positionView,
 				surf_norm: normalView,
 				mapN: normalMap,
 				uv: uv()
 			} );
 
-			return perturbNormal2ArbCall.build( builder, type );
-
 		}
+
+		return outputNode;
 
 	}
 

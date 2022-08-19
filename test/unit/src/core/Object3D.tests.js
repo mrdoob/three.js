@@ -304,7 +304,7 @@ export default QUnit.module( 'Core', () => {
 			assert.propEqual( obj.position, {
 				x: 1,
 				y: 1.23,
-				z: - 4.56
+				z: - 4.56,
 			} );
 
 		} );
