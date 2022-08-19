@@ -75,8 +75,8 @@
 
 			this.render = function ( scene, camera ) {
 
-				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
-				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+				if ( camera.parent === null ) camera.updateMatrixWorld();
 
 				_viewMatrix.copy( camera.matrixWorldInverse );
 

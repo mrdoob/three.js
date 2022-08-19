@@ -471,11 +471,11 @@ class OutlineEffect {
 		this.renderOutline = function ( scene, camera ) {
 
 			const currentAutoClear = renderer.autoClear;
-			const currentSceneAutoUpdate = scene.autoUpdate;
+			const currentSceneAutoUpdate = scene.matrixWorldAutoUpdate;
 			const currentSceneBackground = scene.background;
 			const currentShadowMapEnabled = renderer.shadowMap.enabled;
 
-			scene.autoUpdate = false;
+			scene.matrixWorldAutoUpdate = false;
 			scene.background = null;
 			renderer.autoClear = false;
 			renderer.shadowMap.enabled = false;
@@ -488,7 +488,7 @@ class OutlineEffect {
 
 			cleanupCache();
 
-			scene.autoUpdate = currentSceneAutoUpdate;
+			scene.matrixWorldAutoUpdate = currentSceneAutoUpdate;
 			scene.background = currentSceneBackground;
 			renderer.autoClear = currentAutoClear;
 			renderer.shadowMap.enabled = currentShadowMapEnabled;

@@ -666,7 +666,7 @@ class WebGPURenderer {
 
 			} else if ( object.isLOD ) {
 
-				if ( object.matrixWorldAutoUpdate === true ) object.update( camera );
+				if ( object.autoUpdate === true ) object.update( camera );
 
 			} else if ( object.isLight ) {
 
