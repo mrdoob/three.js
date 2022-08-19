@@ -5,7 +5,6 @@ import {
 	InstancedBufferAttribute,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
-	MathUtils,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
@@ -36,17 +35,16 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 		if ( attribute.normalized || attribute.isInterleavedBufferAttribute ) {
 
-			const srcArray = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
 			const dstArray = new Float32Array( attribute.getCount() * attribute.itemSize );
 
 			for ( let i = 0, j = 0; i < attribute.getCount(); i ++ ) {
 
-				dstArray[ j ++ ] = MathUtils.intToFloat( attribute.getX( i ), srcArray );
-				dstArray[ j ++ ] = MathUtils.intToFloat( attribute.getY( i ), srcArray );
+				dstArray[ j ++ ] = attribute.getX( i );
+				dstArray[ j ++ ] = attribute.getY( i );
 
 				if ( attribute.itemSize > 2 ) {
 
-					dstArray[ j ++ ] = MathUtils.intToFloat( attribute.getZ( i ), srcArray );
+					dstArray[ j ++ ] = attribute.getZ( i );
 
 				}
 
