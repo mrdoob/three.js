@@ -1214,7 +1214,7 @@
 				"Installation": "manual/fr/introduction/Installation",
 				"Compatibilité WebGL": "manual/fr/introduction/WebGL-compatibility-check",
 				"Exécuter localement": "manual/fr/introduction/How-to-run-things-locally",
-				"Tracer des lignes": "manual/fr/introduction/Drawing-lines",
+				"Dessiner des lignes": "manual/fr/introduction/Drawing-lines",
 				"Créer un texte": "manual/fr/introduction/Creating-text",
 				"Importer des modèles 3D": "manual/fr/introduction/Loading-3D-models",
 				"Librairies et Plugins": "manual/fr/introduction/Libraries-and-Plugins",
@@ -1224,7 +1224,7 @@
 
 			"Étapes Suivantes": {
 				"Mettre les éléments à jour": "manual/fr/introduction/How-to-update-things",
-				"Retirer un objet": "manual/fr/introduction/How-to-dispose-of-objects",
+				"Supprimer un objet": "manual/fr/introduction/How-to-dispose-of-objects",
 				"Créer du contenu VR": "manual/fr/introduction/How-to-create-VR-content",
 				"Utiliser le post-processing": "manual/fr/introduction/How-to-use-post-processing",
 				"Matrices de transformation": "manual/fr/introduction/Matrix-transformations",
