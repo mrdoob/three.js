@@ -425,7 +425,7 @@ class Projector {
 
 		}
 
-		this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
+		this.projectScene = function ( scene, camera, sortObjects, sortElements, skipSceneAutoUpdateMatrixWorld ) {
 
 			_faceCount = 0;
 			_lineCount = 0;
@@ -433,7 +433,7 @@ class Projector {
 
 			_renderData.elements.length = 0;
 
-			if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+			if ( ! skipSceneAutoUpdateMatrixWorld && scene.autoUpdate === true ) scene.updateMatrixWorld();
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
 			_viewMatrix.copy( camera.matrixWorldInverse );

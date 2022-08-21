@@ -939,7 +939,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	// Rendering
 
-	this.render = function ( scene, camera ) {
+	this.render = function ( scene, camera, skipSceneAutoUpdateMatrixWorld ) {
 
 		if ( camera !== undefined && camera.isCamera !== true ) {
 
@@ -952,7 +952,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( ! skipSceneAutoUpdateMatrixWorld && scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 

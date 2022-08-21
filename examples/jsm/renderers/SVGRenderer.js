@@ -159,7 +159,7 @@ class SVGRenderer {
 
 		};
 
-		this.render = function ( scene, camera ) {
+		this.render = function ( scene, camera, skipSceneAutoUpdateMatrixWorld ) {
 
 			if ( camera instanceof Camera === false ) {
 
@@ -187,7 +187,7 @@ class SVGRenderer {
 			_viewMatrix.copy( camera.matrixWorldInverse );
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-			_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
+			_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements, skipSceneAutoUpdateMatrixWorld );
 			_elements = _renderData.elements;
 			_lights = _renderData.lights;
 

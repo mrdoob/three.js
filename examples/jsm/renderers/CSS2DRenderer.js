@@ -83,9 +83,9 @@ class CSS2DRenderer {
 
 		};
 
-		this.render = function ( scene, camera ) {
+		this.render = function ( scene, camera, skipSceneAutoUpdateMatrixWorld ) {
 
-			if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+			if ( ! skipSceneAutoUpdateMatrixWorld && scene.autoUpdate === true ) scene.updateMatrixWorld();
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 
 			_viewMatrix.copy( camera.matrixWorldInverse );
