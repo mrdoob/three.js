@@ -106,7 +106,7 @@
 
 			};
 
-			this.render = function ( scene, camera ) {
+			this.render = function ( scene, camera, skipSceneAutoUpdateMatrixWorld ) {
 
 				const fov = camera.projectionMatrix.elements[ 5 ] * _heightHalf;
 
@@ -117,7 +117,7 @@
 
 				}
 
-				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+				if ( ! skipSceneAutoUpdateMatrixWorld && scene.autoUpdate === true ) scene.updateMatrixWorld();
 				if ( camera.parent === null ) camera.updateMatrixWorld();
 				let tx, ty;
 
