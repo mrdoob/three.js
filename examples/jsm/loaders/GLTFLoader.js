@@ -12,6 +12,8 @@ import {
 	FrontSide,
 	Group,
 	ImageBitmapLoader,
+	InstancedBufferAttribute,
+	InstancedMesh,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	Interpolant,
@@ -144,6 +146,11 @@ class GLTFLoader extends Loader {
 		this.register( function ( parser ) {
 
 			return new GLTFMeshoptCompression( parser );
+
+		} );
+		this.register( function ( parser ) {
+
+			return new GLTFMeshGpuInstancing( parser );
 
 		} );
 
@@ -468,7 +475,8 @@ const EXTENSIONS = {
 	KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 	KHR_MATERIALS_EMISSIVE_STRENGTH: 'KHR_materials_emissive_strength',
 	EXT_TEXTURE_WEBP: 'EXT_texture_webp',
-	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression'
+	EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
+	EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing'
 };
 
 /**
@@ -1383,6 +1391,199 @@ class GLTFMeshoptCompression {
 	}
 
 }
+
+/**
+* Mesh GPU Instancing
+*
+* Specification: https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Vendor/EXT_mesh_gpu_instancing
+*/
+class GLTFMeshGpuInstancing {
+
+	constructor( parser ) {
+
+		this.name = EXTENSIONS.EXT_MESH_GPU_INSTANCING;
+		this.parser = parser;
+
+	}
+
+	loadNode ( index ) {
+
+		const json = this.parser.json;
+		const node = json.nodes[ index ];
+
+		if ( node.extensions && node.extensions[ this.name ] && node.mesh !== undefined ) {
+
+			const extension = node.extensions[ this.name ];
+			const translation = extension.attributes.TRANSLATION;
+			const rotation = extension.attributes.ROTATION;
+			const scale = extension.attributes.SCALE;
+
+			if ( translation === undefined && rotation === undefined && scale === undefined ) {
+
+				throw new Error( 'THREE.GLTFLoader: gpuInstancing : Illegal extension format.' );
+
+			}
+
+			const pending = [ this.parser.getDependency( 'mesh', node.mesh ) ];
+			pending.push( (translation !== undefined) ?  this.parser.getDependency( 'accessor', translation): Promise.resolve( null ) );
+			pending.push( (rotation !== undefined) ?  this.parser.getDependency( 'accessor', rotation): Promise.resolve( null ) );
+			pending.push( (scale !== undefined) ?  this.parser.getDependency( 'accessor', scale): Promise.resolve( null ) );
+
+			return Promise.all( pending ).then( function ( res ) {
+
+				const [ mesh, translationAccessor, rotationAccessor, scaleAccessor ] = res;
+
+				if ( translationAccessor !== null ) {
+
+					if ( !( translationAccessor.array instanceof Float32Array ) ) {
+
+						throw new Error( 'THREE.GLTFLoader: gpuInstancing : translation accessor must reference float32.' );
+
+					}
+
+				}
+
+				if ( rotationAccessor !== null ) {
+					if ( !( rotationAccessor.array instanceof Float32Array
+						|| rotationAccessor.array instanceof Int8Array
+						|| rotationAccessor.array instanceof Int16Array ) ) {
+
+						throw new Error( 'THREE.GLTFLoader: gpuInstancing : rotation accessor must reference float32, int8 or int16.' );
+					}
+				}
+
+				if ( scaleAccessor !== null ) {
+
+					if ( !( scaleAccessor.array instanceof Float32Array ) ) {
+
+						throw new Error( 'THREE.GLTFLoader: gpuInstancing : scale accessor must reference float32.' );
+
+					}
+
+				}
+
+				const translationCount = ( translationAccessor !== null ) ? translationAccessor.count : null;
+				const rotationCount = ( rotationAccessor !== null ) ? rotationAccessor.count : null;
+				const scaleCount = ( scaleAccessor !== null ) ? scaleAccessor.count : null;
+
+
+				if ( translationCount !== null && rotationCount !== null && translationCount !== rotationCount ) {
+
+					throw new Error( 'THREE.GLTFLoader: gpuInstancing : Instance count mismatch.' );
+
+				}
+
+				if ( translationCount !== null && scaleCount !== null && translationCount !== scaleCount ) {
+
+					throw new Error( 'THREE.GLTFLoader: gpuInstancing : Instance count mismatch.' );
+
+				}
+
+				if ( rotationCount !== null && scaleCount !== null && rotationCount !== scaleCount ) {
+
+					throw new Error( 'THREE.GLTFLoader: gpuInstancing : Instance count mismatch.' );
+
+				}
+
+				const count = ( translationCount !== null ) ? translationCount :
+						( rotationCount !== null ) ? rotationCount : scaleCount;
+				const instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 ); 
+
+				const translationVector = new Vector3();
+				const rotationQuaternion = new Quaternion();
+				const scaleVector = new Vector3( 1, 1, 1 );
+				for ( let i = 0; i < count; i ++ ) {
+
+					if ( translationAccessor !== null ) {
+
+						translationVector.fromArray( translationAccessor.array, i * 3 );
+
+					}
+
+					if ( rotationAccessor !== null ) {
+
+						rotationQuaternion.fromArray( rotationAccessor.array, i * 4 );
+
+					}
+
+					if ( scaleAccessor !== null ) {
+// 
+						scaleVector.fromArray( scaleAccessor.array, i * 3 );
+
+					}
+
+					const matrix = new Matrix4().compose( translationVector, rotationQuaternion, scaleVector );
+					instanceMatrix.set ( matrix.elements, i * 16 );
+
+				}
+
+				if ( ! ( mesh instanceof Group ) && ! ( mesh instanceof Mesh ) ) {
+
+					throw new Error( 'THREE.GLTFLoader: gpuInstancing : Illegal input mesh type.' );
+
+				}
+
+				// Special-case out when we are instancing a mesh and there are no transforms on it.
+				if ( mesh instanceof Mesh && node.translation === undefined && node.rotation === undefined && node.scale === undefined ) {
+
+					const instancedMesh = new InstancedMesh( mesh.geometry, mesh.material, count );
+					instancedMesh.instanceMatrix = instanceMatrix;
+					return instancedMesh;
+
+				} 
+
+				const instanceGroup = new Group();
+
+				if ( node.translation !== undefined ) {
+
+					instanceGroup.position.fromArray( node.translation );
+
+				}
+
+				if ( node.rotation !== undefined ) {
+
+					instanceGroup.quaternion.fromArray( node.rotation );
+
+				}
+
+				if ( node.scale !== undefined ) {
+
+					instanceGroup.scale.fromArray( node.scale );
+
+				}
+
+				if ( mesh instanceof Mesh ) {
+
+					const instancedMesh = new InstancedMesh( mesh.geometry, mesh.material, count );
+					instancedMesh.instanceMatrix.copy( instanceMatrix, true );
+					instanceGroup.add( instancedMesh );
+
+				}
+
+				
+				for ( let i = 0 ; i < mesh.children.length ; i++ ) {
+
+					const childMesh = mesh.children[i];
+					const instancedMesh = new InstancedMesh( childMesh.geometry, childMesh.material, count );
+					instancedMesh.instanceMatrix.copy( instanceMatrix, true );
+					instanceGroup.add( instancedMesh );
+
+				}
+
+				return instanceGroup;
+			} );
+
+
+		} else {
+
+			return null;
+
+		}
+
+	}
+}
+
+
 
 /* BINARY EXTENSION */
 const BINARY_EXTENSION_HEADER_MAGIC = 'glTF';
@@ -2691,7 +2892,11 @@ class GLTFParser {
 					break;
 
 				case 'node':
-					dependency = this.loadNode( index );
+					dependency = this._invokeOne( function ( ext ) {
+
+						return ext.loadNode && ext.loadNode( index );
+
+					} );
 					break;
 
 				case 'mesh':
