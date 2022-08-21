@@ -45,9 +45,10 @@
 			Returns an object containing the width and height of the renderer.
 		</p>
 
-		<h3>[method:undefined render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<h3>[method:undefined render]( [param:Scene scene], [param:Camera camera], [param:Boolean skipSceneAutoUpdateMatrixWorld]  )</h3>
 		<p>
 			Renders a [page:Scene scene] using a [page:Camera camera].<br />
+			[page:Boolean skipSceneAutoUpdateMatrixWorld] — if true, [page:Scene.autoUpdate] will be ignored. Useful when using multiple renders per render frame loop, avoid multiple calls to [page:Object3D.updateMatrixWorld] for all obeject tree. Default is false.
 		</p>
 
 		<h3>[method:undefined setSize]([param:Number width], [param:Number height])</h3>
