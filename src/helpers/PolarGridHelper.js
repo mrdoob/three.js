@@ -16,7 +16,8 @@ class PolarGridHelper extends LineSegments {
 
 		// create the sectors
 
-		if (sectors > 1) {
+		if ( sectors > 1 ) {
+
 			for ( let i = 0; i < sectors; i ++ ) {
 
 				const v = ( i / sectors ) * ( Math.PI * 2 );
@@ -33,6 +34,7 @@ class PolarGridHelper extends LineSegments {
 				colors.push( color.r, color.g, color.b );
 
 			}
+
 		}
 
 		// create the rings
