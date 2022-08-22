@@ -1183,6 +1183,16 @@
 				"OrthographicCamera": "api/it/cameras/OrthographicCamera",
 				"PerspectiveCamera": "api/it/cameras/PerspectiveCamera",
 				"StereoCamera": "api/it/cameras/StereoCamera"
+			},
+
+      "Costanti": {
+				"Animazione": "api/it/constants/Animation",
+				"Core": "api/it/constants/Core",
+				"CustomBlendingEquation": "api/it/constants/CustomBlendingEquations",
+				"BufferAttributeUsage": "api/it/constants/BufferAttributeUsage",
+				"Materiali": "api/it/constants/Materials",
+				"Renderer": "api/it/constants/Renderer",
+				"Texture": "api/it/constants/Textures"
 			}
     }
 	},
