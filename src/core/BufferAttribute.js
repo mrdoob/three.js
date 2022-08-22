@@ -311,12 +311,8 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
-		const array = this.array;
-		const normalized = this.normalized;
-
-		if ( normalized ) value = value.map( v => normalize( v, array ) );
-
-		array.set( value, offset );
+		// Matching BufferAttribute constructor, do not normalize the array.
+		this.array.set( value, offset );
 
 		return this;
 
