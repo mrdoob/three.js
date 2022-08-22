@@ -1204,6 +1204,41 @@
 
 		}
 
+	},
+	"fr": {
+
+		"Manuel": {
+
+			"Débuter": {
+				"Créer une scène": "manual/fr/introduction/Creating-a-scene",
+				"Installation": "manual/fr/introduction/Installation",
+				"Compatibilité WebGL": "manual/fr/introduction/WebGL-compatibility-check",
+				"Exécuter localement": "manual/fr/introduction/How-to-run-things-locally",
+				"Dessiner des lignes": "manual/fr/introduction/Drawing-lines",
+				"Créer un texte": "manual/fr/introduction/Creating-text",
+				"Importer des modèles 3D": "manual/fr/introduction/Loading-3D-models",
+				"Librairies et Plugins": "manual/fr/introduction/Libraries-and-Plugins",
+				"FAQ": "manual/fr/introduction/FAQ",
+				"Liens Utiles": "manual/fr/introduction/Useful-links"
+			},
+
+			"Étapes Suivantes": {
+				"Mettre les éléments à jour": "manual/fr/introduction/How-to-update-things",
+				"Supprimer un objet": "manual/fr/introduction/How-to-dispose-of-objects",
+				"Créer du contenu VR": "manual/fr/introduction/How-to-create-VR-content",
+				"Utiliser le post-processing": "manual/fr/introduction/How-to-use-post-processing",
+				"Matrices de transformation": "manual/fr/introduction/Matrix-transformations",
+				"Système d'animation": "manual/fr/introduction/Animation-system",
+				"Gestion des couleurs": "manual/fr/introduction/Color-management"
+			},
+
+			"Outils de build": {
+				"Tests avec NPM": "manual/fr/buildTools/Testing-with-NPM"
+			}
+
+		}
+
 	}
+	
 
 }
