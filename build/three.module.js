@@ -9495,9 +9495,12 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
-		if ( this.normalized ) value = normalize( value, this.array );
+		const array = this.array;
+		const normalized = this.normalized;
 
-		this.array.set( value, offset );
+		if ( normalized ) value = value.map( v => normalize( v, array ) );
+
+		array.set( value, offset );
 
 		return this;
 
