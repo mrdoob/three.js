@@ -5830,6 +5830,8 @@
 			this.matrixWorld = new Matrix4();
 			this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
 			this.matrixWorldNeedsUpdate = false;
+			this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
+
 			this.layers = new Layers();
 			this.visible = true;
 			this.castShadow = false;
@@ -6152,14 +6154,18 @@
 			const children = this.children;
 
 			for (let i = 0, l = children.length; i < l; i++) {
-				children[i].updateMatrixWorld(force);
+				const child = children[i];
+
+				if (child.matrixWorldAutoUpdate === true || force === true) {
+					child.updateMatrixWorld(force);
+				}
 			}
 		}
 
 		updateWorldMatrix(updateParents, updateChildren) {
 			const parent = this.parent;
 
-			if (updateParents === true && parent !== null) {
+			if (updateParents === true && parent !== null && parent.matrixWorldAutoUpdate === true) {
 				parent.updateWorldMatrix(true, false);
 			}
 
@@ -6176,7 +6182,11 @@
 				const children = this.children;
 
 				for (let i = 0, l = children.length; i < l; i++) {
-					children[i].updateWorldMatrix(false, true);
+					const child = children[i];
+
+					if (child.matrixWorldAutoUpdate === true) {
+						child.updateWorldMatrix(false, true);
+					}
 				}
 			}
 		}
@@ -6363,6 +6373,7 @@
 			this.matrixWorld.copy(source.matrixWorld);
 			this.matrixAutoUpdate = source.matrixAutoUpdate;
 			this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
+			this.matrixWorldAutoUpdate = source.matrixWorldAutoUpdate;
 			this.layers.mask = source.layers.mask;
 			this.visible = source.visible;
 			this.castShadow = source.castShadow;
@@ -6385,6 +6396,7 @@
 
 	Object3D.DefaultUp = /*@__PURE__*/new Vector3(0, 1, 0);
 	Object3D.DefaultMatrixAutoUpdate = true;
+	Object3D.DefaultMatrixWorldAutoUpdate = true;
 
 	const _v0$1 = /*@__PURE__*/new Vector3();
 
@@ -20095,9 +20107,9 @@
 
 			if (_isContextLost === true) return; // update scene graph
 
-			if (scene.autoUpdate === true) scene.updateMatrixWorld(); // update camera matrices and frustum
+			if (scene.matrixWorldAutoUpdate === true) scene.updateMatrixWorld(); // update camera matrices and frustum
 
-			if (camera.parent === null) camera.updateMatrixWorld();
+			if (camera.parent === null && camera.matrixWorldAutoUpdate === true) camera.updateMatrixWorld();
 
 			if (xr.enabled === true && xr.isPresenting === true) {
 				if (xr.cameraAutoUpdate === true) xr.updateCamera(camera);
@@ -21052,7 +21064,6 @@
 			this.environment = null;
 			this.fog = null;
 			this.overrideMaterial = null;
-			this.autoUpdate = true; // checked by the renderer
 
 			if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 				__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('observe', {
@@ -21067,7 +21078,6 @@
 			if (source.environment !== null) this.environment = source.environment.clone();
 			if (source.fog !== null) this.fog = source.fog.clone();
 			if (source.overrideMaterial !== null) this.overrideMaterial = source.overrideMaterial.clone();
-			this.autoUpdate = source.autoUpdate;
 			this.matrixAutoUpdate = source.matrixAutoUpdate;
 			return this;
 		}
@@ -35544,7 +35554,20 @@
 			super(path, tubularSegments, radius, radialSegments, closed);
 		}
 
-	}
+	} // r144
+
+	Object.defineProperty(Scene.prototype, 'autoUpdate', {
+		get() {
+			console.warn('THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.');
+			return this.matrixWorldAutoUpdate;
+		},
+
+		set(value) {
+			console.warn('THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.');
+			this.matrixWorldAutoUpdate = value;
+		}
+
+	});
 
 	if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 		__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('register', {
