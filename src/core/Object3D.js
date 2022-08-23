@@ -586,9 +586,11 @@ class Object3D extends EventDispatcher {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			if ( children[ i ].matrixWorldAutoUpdate === true || force === true ) {
+			const child = children[ i ];
 
-				children[ i ].updateMatrixWorld( force );
+			if ( child.matrixWorldAutoUpdate === true || force === true ) {
+
+				child.updateMatrixWorld( force );
 
 			}
 
@@ -626,9 +628,11 @@ class Object3D extends EventDispatcher {
 
 			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-				if ( children[ i ].matrixWorldAutoUpdate === true ) {
+				const child = children[ i ];
 
-					children[ i ].updateWorldMatrix( false, true );
+				if ( child.matrixWorldAutoUpdate === true ) {
+
+					child.updateWorldMatrix( false, true );
 
 				}
 
