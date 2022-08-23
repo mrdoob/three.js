@@ -32,12 +32,6 @@
 	<h3>[property:AnimationClip animations]</h3>
 	<p>Array with object's animation clips.</p>
 
-	<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
-	<p>
-	Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
-	When it isn't, then you have to maintain all matrices in the object and its children yourself.
-	</p>
-
 	<h3>[property:Boolean castShadow]</h3>
 	<p>对象是否被渲染到阴影贴图中。默认值为*false*。</p>
 
@@ -84,6 +78,12 @@
 	<h3>[property:Matrix4 matrixWorld]</h3>
 	<p>
 		物体的世界变换。若这个Object3D没有父级，则它将和local transform [page:.matrix]（局部变换矩阵）相同。
+	</p>
+
+	<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+	<p>
+	Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
+	When it isn't, then you have to maintain all matrices in the object and its children yourself.
 	</p>
 
 	<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>

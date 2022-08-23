@@ -32,12 +32,6 @@
 		<h3>[property:AnimationClip animations]</h3>
 		<p>Array with object's animation clips.</p>
 
-		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
-		<p>
-		Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
-		When it isn't, then you have to maintain all matrices in the object and its children yourself.
-		</p>
-
 		<h3>[property:Boolean castShadow]</h3>
 		<p>Whether the object gets rendered into shadow map. Default is `false`.</p>
 
@@ -88,6 +82,12 @@
 		<p>
 		The global transform of the object. If the Object3D has no parent, then it's identical to
 		the local transform [page:.matrix].
+		</p>
+
+		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+		<p>
+		Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
+		When it isn't, then you have to maintain all matrices in the object and its children yourself.
 		</p>
 
 		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
