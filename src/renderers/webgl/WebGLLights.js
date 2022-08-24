@@ -170,7 +170,7 @@ function WebGLLights( extensions, capabilities ) {
 			numDirectionalShadows: - 1,
 			numPointShadows: - 1,
 			numSpotShadows: - 1,
-			numSpotMaps: - 1,
+			numSpotMaps: - 1
 		},
 
 		ambient: [ 0, 0, 0 ],
