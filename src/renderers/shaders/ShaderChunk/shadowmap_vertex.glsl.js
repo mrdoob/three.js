@@ -1,7 +1,7 @@
 export default /* glsl */`
 #if defined( USE_SHADOWMAP ) ||  ( NUM_SPOT_LIGHT_COORDS > 0 )
 
-	#if NUM_DIR_LIGHT_SHADOWS > 0 || NUM_SPOT_LIGHT_COORDS  > 0 || NUM_POINT_LIGHT_SHADOWS > 0
+	#if NUM_DIR_LIGHT_SHADOWS > 0 || NUM_SPOT_LIGHT_COORDS > 0 || NUM_POINT_LIGHT_SHADOWS > 0
 
 		// Offsetting the position used for querying occlusion along the world normal can be used to reduce shadow acne.
 		vec3 shadowWorldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
