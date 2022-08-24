@@ -318,24 +318,4 @@ export class TubeBufferGeometry extends TubeGeometry {
 
 }
 
-// r144
-
-Object.defineProperty( Scene.prototype, 'autoUpdate', {
-
-	get() {
-
-		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
-		return this.matrixWorldAutoUpdate;
-
-	},
-
-	set( value ) {
-
-		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
-		this.matrixWorldAutoUpdate = value;
-
-	}
-
-} );
-
 
