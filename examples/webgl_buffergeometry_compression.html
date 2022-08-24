@@ -45,17 +45,17 @@
 
 			// options
 			const data = {
-				"model": "Icosahedron",
-				"wireframe": false,
-				"texture": false,
-				"detail": 4,
-				"rotationSpeed": 0.1,
+				'model': 'Icosahedron',
+				'wireframe': false,
+				'texture': false,
+				'detail': 4,
+				'rotationSpeed': 0.1,
 
-				"QuantizePosEncoding": false,
-				"NormEncodingMethods": "None", // for normal encodings
-				"DefaultUVEncoding": false,
+				'QuantizePosEncoding': false,
+				'NormEncodingMethods': 'None', // for normal encodings
+				'DefaultUVEncoding': false,
 
-				"totalGPUMemory": "0 bytes"
+				'totalGPUMemory': '0 bytes'
 			};
 			let memoryDisplay;
 
@@ -136,13 +136,13 @@
 
 					switch ( data.model ) {
 
-						case "Icosahedron":
+						case 'Icosahedron':
 							return new THREE.IcosahedronGeometry( radius, data.detail );
-						case "Cylinder":
+						case 'Cylinder':
 							return new THREE.CylinderGeometry( radius, radius, radius * 2, data.detail * 6 );
-						case "Teapot":
+						case 'Teapot':
 							return new TeapotGeometry( radius, data.detail * 3, true, true, true, true, true );
-						case "TorusKnot":
+						case 'TorusKnot':
 							return new THREE.TorusKnotGeometry( radius, 10, data.detail * 20, data.detail * 6, 3, 4 );
 
 		}
@@ -169,7 +169,7 @@
 				}
 
 				let folder = gui.addFolder( 'Scene' );
-				folder.add( data, 'model', [ "Icosahedron", "Cylinder", "TorusKnot", "Teapot" ] ).onChange( generateGeometry );
+				folder.add( data, 'model', [ 'Icosahedron', 'Cylinder', 'TorusKnot', 'Teapot' ] ).onChange( generateGeometry );
 				folder.add( data, 'wireframe', false ).onChange( updateLineSegments );
 				folder.add( data, 'texture', false ).onChange( generateGeometry );
 				folder.add( data, 'detail', 1, 8, 1 ).onChange( generateGeometry );
@@ -181,7 +181,7 @@
 				folder.open();
 
 				folder = gui.addFolder( 'Normal Compression' );
-				folder.add( data, 'NormEncodingMethods', [ "None", "DEFAULT", "OCT1Byte", "OCT2Byte", "ANGLES" ] ).onChange( generateGeometry );
+				folder.add( data, 'NormEncodingMethods', [ 'None', 'DEFAULT', 'OCT1Byte', 'OCT2Byte', 'ANGLES' ] ).onChange( generateGeometry );
 				folder.open();
 
 				folder = gui.addFolder( 'UV Compression' );
@@ -190,7 +190,7 @@
 
 				folder = gui.addFolder( 'Memory Info' );
 				folder.open();
-				memoryDisplay = folder.add( data, 'totalGPUMemory', "0 bytes" );
+				memoryDisplay = folder.add( data, 'totalGPUMemory', '0 bytes' );
 				computeGPUMemory( mesh );
 
 				//
@@ -258,19 +258,19 @@
 				mesh.material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111111 } );
 				mesh.material.map = data.texture ? texture : null;
 
-				if ( data[ "QuantizePosEncoding" ] ) {
+				if ( data[ 'QuantizePosEncoding' ] ) {
 
 					GeometryCompressionUtils.compressPositions( mesh );
 
 				}
 
-				if ( data[ "NormEncodingMethods" ] !== "None" ) {
+				if ( data[ 'NormEncodingMethods' ] !== 'None' ) {
 
-					GeometryCompressionUtils.compressNormals( mesh, data[ "NormEncodingMethods" ] );
+					GeometryCompressionUtils.compressNormals( mesh, data[ 'NormEncodingMethods' ] );
 
 				}
 
-				if ( data[ "DefaultUVEncoding" ] ) {
+				if ( data[ 'DefaultUVEncoding' ] ) {
 
 					GeometryCompressionUtils.compressUvs( mesh );
 
@@ -284,7 +284,7 @@
 			function computeGPUMemory( mesh ) {
 
 				// Use BufferGeometryUtils to do memory calculation
-				memoryDisplay.setValue( BufferGeometryUtils.estimateBytesUsed( mesh.geometry ) + " bytes" );
+				memoryDisplay.setValue( BufferGeometryUtils.estimateBytesUsed( mesh.geometry ) + ' bytes' );
 
 			}
 

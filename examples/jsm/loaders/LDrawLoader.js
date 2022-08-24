@@ -2413,8 +2413,7 @@ class LDrawLoader extends Loader {
 
 				lum = parseInt( token.substring( 9 ) );
 
-			}
-			else {
+			} else {
 
 				lum = parseInt( token );
 

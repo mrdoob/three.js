@@ -14,7 +14,7 @@ class ReflectVectorNode extends Node {
 
 	getHash( /*builder*/ ) {
 
-		return `reflectVector`;
+		return 'reflectVector';
 
 	}
 

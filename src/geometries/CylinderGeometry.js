@@ -273,4 +273,4 @@ class CylinderGeometry extends BufferGeometry {
 }
 
 
-export { CylinderGeometry, CylinderGeometry as CylinderBufferGeometry };
+export { CylinderGeometry };

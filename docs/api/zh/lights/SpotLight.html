@@ -19,10 +19,11 @@
 
 		<h2>代码示例</h2>
 		<code>
-		// white spotlight shining from the side, casting a shadow
+		// white spotlight shining from the side, modulated by a texture, casting a shadow
 
 		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 100, 1000, 100 );
+		spotLight.map = new THREE.TextureLoader().load( url );
 
 		spotLight.castShadow = true;
 
@@ -142,6 +143,14 @@ scene.add(targetObject);
 light.target = targetObject;
 			</code>
 			完成上述操作后，聚光灯现在就可以追踪到目标对像了。
+		</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			A [page:Texture] used to modulate the color of the light. The spot light color is mixed
+			with the RGB value of this texture, with a ratio corresponding to its
+			alpha value. The cookie-like masking effect is reproduced using pixel values (0, 0, 0, 1-cookie_value).
+			*Warning*: [param:SpotLight map] is disabled if [param:SpotLight castShadow] is *false*.
 		</p>
 
 

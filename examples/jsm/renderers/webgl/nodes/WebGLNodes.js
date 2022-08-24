@@ -8,7 +8,11 @@ export const nodeFrame = new NodeFrame();
 
 Material.prototype.onBuild = function ( object, parameters, renderer ) {
 
-	builders.set( this, new WebGLNodeBuilder( object, renderer, parameters ).build() );
+	if ( object.material.isNodeMaterial === true ) {
+
+		builders.set( this, new WebGLNodeBuilder( object, renderer, parameters ).build() );
+
+	}
 
 };
 

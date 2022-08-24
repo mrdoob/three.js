@@ -12,28 +12,12 @@
  * - KTX: http://github.khronos.org/KTX-Specification/
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
  */
-	const {
-		read,
-		KHR_DF_FLAG_ALPHA_PREMULTIPLIED,
-		KHR_DF_TRANSFER_SRGB,
-		VK_FORMAT_UNDEFINED,
-		VK_FORMAT_R16_SFLOAT,
-		VK_FORMAT_R16G16_SFLOAT,
-		VK_FORMAT_R16G16B16A16_SFLOAT,
-		VK_FORMAT_R32_SFLOAT,
-		VK_FORMAT_R32G32_SFLOAT,
-		VK_FORMAT_R32G32B32A32_SFLOAT,
-		VK_FORMAT_R8_SRGB,
-		VK_FORMAT_R8_UNORM,
-		VK_FORMAT_R8G8_SRGB,
-		VK_FORMAT_R8G8_UNORM,
-		VK_FORMAT_R8G8B8A8_SRGB,
-		VK_FORMAT_R8G8B8A8_UNORM
-	} = KTX; // eslint-disable-line no-undef
 
 	const _taskCache = new WeakMap();
 
 	let _activeLoaders = 0;
+
+	let _zstd;
 
 	class KTX2Loader extends THREE.Loader {
 
@@ -606,7 +590,7 @@
 		[ VK_FORMAT_R8_SRGB ]: THREE.sRGBEncoding
 	};
 
-	function createDataTexture( container ) {
+	async function createDataTexture( container ) {
 
 		const {
 			vkFormat,
@@ -622,8 +606,35 @@
 		} //
 
 
+		const level = container.levels[ 0 ];
+		let levelData;
 		let view;
-		const levelData = container.levels[ 0 ].levelData;
+
+		if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE ) {
+
+			levelData = level.levelData;
+
+		} else if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD ) {
+
+			if ( ! _zstd ) {
+
+				_zstd = new Promise( async resolve => {
+
+					const zstd = new ZSTDDecoder();
+					await zstd.init();
+					resolve( zstd );
+
+				} );
+
+			}
+
+			levelData = ( await _zstd ).decode( level.levelData, level.uncompressedByteLength );
+
+		} else {
+
+			throw new Error( 'THREE.KTX2Loader: Unsupported supercompressionScheme.' );
+
+		}
 
 		if ( TYPE_MAP[ vkFormat ] === THREE.FloatType ) {
 

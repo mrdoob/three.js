@@ -381,6 +381,7 @@
 						colors.push( r * 128, 0, b * 128 );
 
 					}
+
 					teapot.geometry.setAttribute( 'color', new THREE.Uint8BufferAttribute( colors, 3, true ) );
 					teapot.material.vertexColors = true;
 					teapot.material.needsUpdate = true;

@@ -11,7 +11,6 @@ import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
 import { x, y, z } from '../math/Constants.tests.js';
-import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 var DegToRad = Math.PI / 180;
 
@@ -446,33 +445,6 @@ export default QUnit.module( 'Core', () => {
 			a.setIndex( index );
 			a.computeVertexNormals();
 			assert.ok( bufferAttributeEquals( normal, a.getAttribute( 'normal' ) ), 'Indexed geometry: computed normals are correct' );
-
-		} );
-
-		QUnit.test( 'merge', ( assert ) => {
-
-			var geometry1 = new BufferGeometry();
-			geometry1.setAttribute( 'attrName', new BufferAttribute( new Float32Array( [ 1, 2, 3, 0, 0, 0 ] ), 3 ) );
-
-			var geometry2 = new BufferGeometry();
-			geometry2.setAttribute( 'attrName', new BufferAttribute( new Float32Array( [ 4, 5, 6 ] ), 3 ) );
-
-			var attr = geometry1.attributes.attrName.array;
-
-			geometry1.merge( geometry2, 1 );
-
-			// merged array should be 1, 2, 3, 4, 5, 6
-			for ( var i = 0; i < attr.length; i ++ ) {
-
-				assert.ok( attr[ i ] === i + 1, '' );
-
-			}
-
-			console.level = CONSOLE_LEVEL.ERROR;
-			geometry1.merge( geometry2 );
-			console.level = CONSOLE_LEVEL.DEFAULT;
-
-			assert.ok( attr[ 0 ] === 4 && attr[ 1 ] === 5 && attr[ 2 ] === 6, 'copied the 3 attributes without offset' );
 
 		} );
 

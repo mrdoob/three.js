@@ -182,4 +182,4 @@ function toJSON( shapes, data ) {
 
 }
 
-export { ShapeGeometry, ShapeGeometry as ShapeBufferGeometry };
+export { ShapeGeometry };

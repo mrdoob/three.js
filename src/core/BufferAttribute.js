@@ -2,6 +2,7 @@ import { Vector4 } from '../math/Vector4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
+import { denormalize, normalize } from '../math/MathUtils.js';
 import { StaticDrawUsage } from '../constants.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
@@ -102,9 +103,19 @@ class BufferAttribute {
 
 			}
 
-			array[ offset ++ ] = color.r;
-			array[ offset ++ ] = color.g;
-			array[ offset ++ ] = color.b;
+			if ( this.normalized ) {
+
+				array[ offset ++ ] = normalize( color.r, array );
+				array[ offset ++ ] = normalize( color.g, array );
+				array[ offset ++ ] = normalize( color.b, array );
+
+			} else {
+
+				array[ offset ++ ] = color.r;
+				array[ offset ++ ] = color.g;
+				array[ offset ++ ] = color.b;
+
+			}
 
 		}
 
@@ -128,8 +139,17 @@ class BufferAttribute {
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
+			if ( this.normalized ) {
+
+				array[ offset ++ ] = normalize( vector.x, array );
+				array[ offset ++ ] = normalize( vector.y, array );
+
+			} else {
+
+				array[ offset ++ ] = vector.x;
+				array[ offset ++ ] = vector.y;
+
+			}
 
 		}
 
@@ -153,9 +173,19 @@ class BufferAttribute {
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
-			array[ offset ++ ] = vector.z;
+			if ( this.normalized ) {
+
+				array[ offset ++ ] = normalize( vector.x, array );
+				array[ offset ++ ] = normalize( vector.y, array );
+				array[ offset ++ ] = normalize( vector.z, array );
+
+			} else {
+
+				array[ offset ++ ] = vector.x;
+				array[ offset ++ ] = vector.y;
+				array[ offset ++ ] = vector.z;
+
+			}
 
 		}
 
@@ -179,10 +209,21 @@ class BufferAttribute {
 
 			}
 
-			array[ offset ++ ] = vector.x;
-			array[ offset ++ ] = vector.y;
-			array[ offset ++ ] = vector.z;
-			array[ offset ++ ] = vector.w;
+			if ( this.normalized ) {
+
+				array[ offset ++ ] = normalize( vector.x, array );
+				array[ offset ++ ] = normalize( vector.y, array );
+				array[ offset ++ ] = normalize( vector.z, array );
+				array[ offset ++ ] = normalize( vector.w, array );
+
+			} else {
+
+				array[ offset ++ ] = vector.x;
+				array[ offset ++ ] = vector.y;
+				array[ offset ++ ] = vector.z;
+				array[ offset ++ ] = vector.w;
+
+			}
 
 		}
 
@@ -270,6 +311,7 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
+		// Matching BufferAttribute constructor, do not normalize the array.
 		this.array.set( value, offset );
 
 		return this;
@@ -278,11 +320,17 @@ class BufferAttribute {
 
 	getX( index ) {
 
-		return this.array[ index * this.itemSize ];
+		let x = this.array[ index * this.itemSize ];
+
+		if ( this.normalized ) x = denormalize( x, this.array );
+
+		return x;
 
 	}
 
 	setX( index, x ) {
+
+		if ( this.normalized ) x = normalize( x, this.array );
 
 		this.array[ index * this.itemSize ] = x;
 
@@ -292,11 +340,17 @@ class BufferAttribute {
 
 	getY( index ) {
 
-		return this.array[ index * this.itemSize + 1 ];
+		let y = this.array[ index * this.itemSize + 1 ];
+
+		if ( this.normalized ) y = denormalize( y, this.array );
+
+		return y;
 
 	}
 
 	setY( index, y ) {
+
+		if ( this.normalized ) y = normalize( y, this.array );
 
 		this.array[ index * this.itemSize + 1 ] = y;
 
@@ -306,11 +360,17 @@ class BufferAttribute {
 
 	getZ( index ) {
 
-		return this.array[ index * this.itemSize + 2 ];
+		let z = this.array[ index * this.itemSize + 2 ];
+
+		if ( this.normalized ) z = denormalize( z, this.array );
+
+		return z;
 
 	}
 
 	setZ( index, z ) {
+
+		if ( this.normalized ) z = normalize( z, this.array );
 
 		this.array[ index * this.itemSize + 2 ] = z;
 
@@ -320,11 +380,17 @@ class BufferAttribute {
 
 	getW( index ) {
 
-		return this.array[ index * this.itemSize + 3 ];
+		let w = this.array[ index * this.itemSize + 3 ];
+
+		if ( this.normalized ) w = denormalize( w, this.array );
+
+		return w;
 
 	}
 
 	setW( index, w ) {
+
+		if ( this.normalized ) w = normalize( w, this.array );
 
 		this.array[ index * this.itemSize + 3 ] = w;
 
@@ -335,6 +401,13 @@ class BufferAttribute {
 	setXY( index, x, y ) {
 
 		index *= this.itemSize;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+
+		}
 
 		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
@@ -347,6 +420,14 @@ class BufferAttribute {
 
 		index *= this.itemSize;
 
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+			z = normalize( z, this.array );
+
+		}
+
 		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;
 		this.array[ index + 2 ] = z;
@@ -358,6 +439,15 @@ class BufferAttribute {
 	setXYZW( index, x, y, z, w ) {
 
 		index *= this.itemSize;
+
+		if ( this.normalized ) {
+
+			x = normalize( x, this.array );
+			y = normalize( y, this.array );
+			z = normalize( z, this.array );
+			w = normalize( w, this.array );
+
+		}
 
 		this.array[ index + 0 ] = x;
 		this.array[ index + 1 ] = y;

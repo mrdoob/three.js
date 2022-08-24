@@ -61,7 +61,7 @@
 				camera.position.z = 70;
 
 				scene = new THREE.Scene();
-				scene.fogNode = new Nodes.FogRangeNode( color( 0xFF00FF ), float( 30 ), float( 300 )  );
+				scene.fogNode = new Nodes.FogRangeNode( color( 0xFF00FF ), float( 30 ), float( 300 ) );
 
 				const sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
 
@@ -197,7 +197,7 @@
 				light4.position.x = Math.sin( lightTime * 0.3 ) * 30;
 				light4.position.y = Math.cos( lightTime * 0.7 ) * 40;
 				light4.position.z = Math.sin( lightTime * 0.5 ) * 30;
-/*
+	/*
 				@TODO: Used to test scene light change ( currently unavailable )
 
 				if ( time > 2.0 && light1.parent === null ) scene.add( light1 );

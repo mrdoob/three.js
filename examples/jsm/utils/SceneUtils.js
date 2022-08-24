@@ -118,28 +118,8 @@ function createMultiMaterialObject( geometry, materials ) {
 
 }
 
-function detach( child, parent, scene ) {
-
-	console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
-
-	scene.attach( child );
-
-}
-
-function attach( child, scene, parent ) {
-
-	console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
-
-	parent.attach( child );
-
-}
-
-
-
 export {
 	createMeshesFromInstancedMesh,
 	createMeshesFromMultiMaterialMesh,
-	createMultiMaterialObject,
-	detach,
-	attach,
+	createMultiMaterialObject
 };

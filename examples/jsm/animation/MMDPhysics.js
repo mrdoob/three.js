@@ -1,8 +1,8 @@
 import {
 	Bone,
 	BoxGeometry,
+	CapsuleGeometry,
 	Color,
-	CylinderGeometry,
 	Euler,
 	Matrix4,
 	Mesh,
@@ -1358,31 +1358,12 @@ class MMDPhysicsHelper extends Object3D {
 					return new BoxGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8 );
 
 				case 2:
-					return new createCapsuleGeometry( param.width, param.height, 16, 8 );
+					return new CapsuleGeometry( param.width, param.height, 8, 16 );
 
 				default:
 					return null;
 
 			}
-
-		}
-
-		function createCapsuleGeometry( radius, cylinderHeight, segmentsRadius, segmentsHeight ) {
-
-			var geometry = new CylinderGeometry( radius, radius, cylinderHeight, segmentsRadius, segmentsHeight, true );
-			var upperSphere = new Mesh( new SphereGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, 0, Math.PI / 2 ) );
-			var lowerSphere = new Mesh( new SphereGeometry( radius, segmentsRadius, segmentsHeight, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2 ) );
-
-			upperSphere.position.set( 0, cylinderHeight / 2, 0 );
-			lowerSphere.position.set( 0, - cylinderHeight / 2, 0 );
-
-			upperSphere.updateMatrix();
-			lowerSphere.updateMatrix();
-
-			geometry.merge( upperSphere.geometry, upperSphere.matrix );
-			geometry.merge( lowerSphere.geometry, lowerSphere.matrix );
-
-			return geometry;
 
 		}
 

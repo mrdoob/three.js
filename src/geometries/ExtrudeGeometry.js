@@ -801,4 +801,4 @@ function toJSON( shapes, options, data ) {
 }
 
 
-export { ExtrudeGeometry, ExtrudeGeometry as ExtrudeBufferGeometry };
+export { ExtrudeGeometry };

@@ -1079,32 +1079,217 @@
 
 	},
 
-    "ja": {
-        "マニュアル": {
-            "はじめてみましょう": {
-                "シーンの作成": "manual/ja/introduction/Creating-a-scene",
-                "インストールの方法": "manual/ja/introduction/Installation",
-                "WebGLの互換性の確認": "manual/ja/introduction/WebGL-compatibility-check",
-                "localで実行する方法": "manual/ja/introduction/How-to-run-things-locally",
-                "線を引く": "manual/ja/introduction/Drawing-lines",
-                "テキストを作成する": "manual/ja/introduction/Creating-text",
-                "3Dモデルをロードする": "manual/ja/introduction/Loading-3D-models",
-                "ライブラリとプラグイン": "manual/ja/introduction/Libraries-and-Plugins",
-                "FAQ": "manual/ja/introduction/FAQ",
-                "役にたつリンク集": "manual/ja/introduction/Useful-links"
-            },
-            "次の段階": {
-                "更新の仕方": "manual/ja/introduction/How-to-update-things",
-                "オブジェクトを廃棄する方法": "manual/ja/introduction/How-to-dispose-of-objects",
-                "VRコンテンツの作り方": "manual/ja/introduction/How-to-create-VR-content",
-                "post-processingの使い方": "manual/ja/introduction/How-to-use-post-processing",
-                "行列の変換": "manual/ja/introduction/Matrix-transformations",
-                "アニメーションシステム": "manual/ja/introduction/Animation-system"
-            },
-            "ビルドツール": {
-                "NPMでテストを実行する": "manual/ja/buildTools/Testing-with-NPM"
-            }
-        }
-    }
+	"ja": {
+
+		"マニュアル": {
+
+			"はじめてみましょう": {
+				"シーンの作成": "manual/ja/introduction/Creating-a-scene",
+				"インストールの方法": "manual/ja/introduction/Installation",
+				"WebGLの互換性の確認": "manual/ja/introduction/WebGL-compatibility-check",
+				"localで実行する方法": "manual/ja/introduction/How-to-run-things-locally",
+				"線を引く": "manual/ja/introduction/Drawing-lines",
+				"テキストを作成する": "manual/ja/introduction/Creating-text",
+				"3Dモデルをロードする": "manual/ja/introduction/Loading-3D-models",
+				"ライブラリとプラグイン": "manual/ja/introduction/Libraries-and-Plugins",
+				"FAQ": "manual/ja/introduction/FAQ",
+				"役にたつリンク集": "manual/ja/introduction/Useful-links"
+			},
+
+			"次の段階": {
+				"更新の仕方": "manual/ja/introduction/How-to-update-things",
+				"オブジェクトを廃棄する方法": "manual/ja/introduction/How-to-dispose-of-objects",
+				"VRコンテンツの作り方": "manual/ja/introduction/How-to-create-VR-content",
+				"post-processingの使い方": "manual/ja/introduction/How-to-use-post-processing",
+				"行列の変換": "manual/ja/introduction/Matrix-transformations",
+				"アニメーションシステム": "manual/ja/introduction/Animation-system"
+			},
+
+			"ビルドツール": {
+				"NPMでテストを実行する": "manual/ja/buildTools/Testing-with-NPM"
+			}
+
+		}
+
+	},
+
+	"it": {
+
+		"Manuale": {
+
+			"Per iniziare": {
+				"Creare una scena": "manual/it/introduction/Creating-a-scene",
+				"Installazione": "manual/it/introduction/Installation",
+				"Controllo compatibilità WebGL": "manual/it/introduction/WebGL-compatibility-check",
+				"Esecuzione in locale": "manual/it/introduction/How-to-run-things-locally",
+				"Disegnare linee": "manual/it/introduction/Drawing-lines",
+				"Creare testo": "manual/it/introduction/Creating-text",
+				"Caricare modelli 3D": "manual/it/introduction/Loading-3D-models",
+				"Librerie e Plugins": "manual/it/introduction/Libraries-and-Plugins",
+				"FAQ": "manual/it/introduction/FAQ",
+				"Link utili": "manual/it/introduction/Useful-links"
+			},
+		
+			"Prossimi passi": {
+				"Come aggiornare le cose": "manual/it/introduction/How-to-update-things",
+				"Come liberare le risorse": "manual/it/introduction/How-to-dispose-of-objects",
+				"Come creare contenuti VR": "manual/it/introduction/How-to-create-VR-content",
+				"Come utilizzare il post-processing": "manual/it/introduction/How-to-use-post-processing",
+				"Trasformazioni di matrici": "manual/it/introduction/Matrix-transformations",
+				"Sistema di animazione": "manual/it/introduction/Animation-system",
+				"Gestione del colore": "manual/it/introduction/Color-management"
+			},
+		
+			"Strumenti di build": {
+				"Testare con NPM": "manual/it/buildTools/Testing-with-NPM"
+			}
+	
+		},
+
+		"Riferimenti": {
+
+			"Animation": {
+				"AnimationAction": "api/it/animation/AnimationAction",
+				"AnimationClip": "api/it/animation/AnimationClip",
+				"AnimationMixer": "api/it/animation/AnimationMixer",
+				"AnimationObjectGroup": "api/it/animation/AnimationObjectGroup",
+				"AnimationUtils": "api/it/animation/AnimationUtils",
+				"KeyframeTrack": "api/it/animation/KeyframeTrack",
+				"PropertyBinding": "api/it/animation/PropertyBinding",
+				"PropertyMixer": "api/it/animation/PropertyMixer"
+			},
+
+			"Animation / Tracks": {
+				"BooleanKeyframeTrack": "api/it/animation/tracks/BooleanKeyframeTrack",
+				"ColorKeyframeTrack": "api/it/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/it/animation/tracks/NumberKeyframeTrack",
+				"QuaternionKeyframeTrack": "api/it/animation/tracks/QuaternionKeyframeTrack",
+				"StringKeyframeTrack": "api/it/animation/tracks/StringKeyframeTrack",
+				"VectorKeyframeTrack": "api/it/animation/tracks/VectorKeyframeTrack"
+			}
+
+		}
+
+	},
+	"pt-br": {
+
+		"Manual": {
+
+			"Comece a usar": {
+				"Criando uma cena": "manual/pt-br/introduction/Creating-a-scene",
+				"Instalação": "manual/pt-br/introduction/Installation",
+				"Compatibilidade WebGL": "manual/pt-br/introduction/WebGL-compatibility-check",
+				"Como executar localmente": "manual/pt-br/introduction/How-to-run-things-locally",
+				"Desenhando linhas": "manual/pt-br/introduction/Drawing-lines",
+				"Criando texto": "manual/pt-br/introduction/Creating-text",
+				"Carregando modelos 3D": "manual/pt-br/introduction/Loading-3D-models",
+				"Bibliotecas e Plugins": "manual/pt-br/introduction/Libraries-and-Plugins",
+				"FAQ": "manual/pt-br/introduction/FAQ",
+				"Links úteis": "manual/pt-br/introduction/Useful-links"
+			},
+
+			"Próximos Passos": {
+				"Como atualizar as coisas": "manual/pt-br/introduction/How-to-update-things",
+				"Como descartar objetos": "manual/pt-br/introduction/How-to-dispose-of-objects",
+				"Como criar conteúdo de VR": "manual/pt-br/introduction/How-to-create-VR-content",
+				"Como usar o pós-processamento": "manual/pt-br/introduction/How-to-use-post-processing",
+				"Transformações de matriz": "manual/pt-br/introduction/Matrix-transformations",
+				"Sistema de animação": "manual/pt-br/introduction/Animation-system",
+				"Gerenciamento de cor": "manual/pt-br/introduction/Color-management"
+			},
+
+			"Ferramentas de Build": {
+				"Testando com NPM": "manual/pt-br/buildTools/Testing-with-NPM"
+			}
+
+		},
+
+		"Referência": {
+
+			"Animation": {
+				"AnimationAction": "api/pt-br/animation/AnimationAction",
+				"AnimationClip": "api/pt-br/animation/AnimationClip",
+				"AnimationMixer": "api/pt-br/animation/AnimationMixer",
+				"AnimationObjectGroup": "api/pt-br/animation/AnimationObjectGroup",
+				"AnimationUtils": "api/pt-br/animation/AnimationUtils",
+				"KeyframeTrack": "api/pt-br/animation/KeyframeTrack",
+				"PropertyBinding": "api/pt-br/animation/PropertyBinding",
+				"PropertyMixer": "api/pt-br/animation/PropertyMixer"
+			},
+
+			"Animation / Tracks": {
+				"BooleanKeyframeTrack": "api/pt-br/animation/tracks/BooleanKeyframeTrack",
+				"ColorKeyframeTrack": "api/pt-br/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/pt-br/animation/tracks/NumberKeyframeTrack",
+				"QuaternionKeyframeTrack": "api/pt-br/animation/tracks/QuaternionKeyframeTrack",
+				"StringKeyframeTrack": "api/pt-br/animation/tracks/StringKeyframeTrack",
+				"VectorKeyframeTrack": "api/pt-br/animation/tracks/VectorKeyframeTrack"
+			},
+
+			"Audio": {
+				"Audio": "api/pt-br/audio/Audio",
+				"AudioAnalyser": "api/pt-br/audio/AudioAnalyser",
+				"AudioContext": "api/pt-br/audio/AudioContext",
+				"AudioListener": "api/pt-br/audio/AudioListener",
+				"PositionalAudio": "api/pt-br/audio/PositionalAudio"
+			},
+
+			"Cameras": {
+				"ArrayCamera": "api/pt-br/cameras/ArrayCamera",
+				"Camera": "api/pt-br/cameras/Camera",
+				"CubeCamera": "api/pt-br/cameras/CubeCamera",
+				"OrthographicCamera": "api/pt-br/cameras/OrthographicCamera",
+				"PerspectiveCamera": "api/pt-br/cameras/PerspectiveCamera",
+				"StereoCamera": "api/pt-br/cameras/StereoCamera"
+			},
+
+			"Constantes": {
+				"Animation": "api/pt-br/constants/Animation",
+				"Core": "api/pt-br/constants/Core",
+				"CustomBlendingEquation": "api/pt-br/constants/CustomBlendingEquations",
+				"BufferAttributeUsage": "api/pt-br/constants/BufferAttributeUsage",
+				"Materials": "api/pt-br/constants/Materials",
+				"Renderer": "api/pt-br/constants/Renderer",
+				"Textures": "api/pt-br/constants/Textures"
+			}
+
+		}
+
+	},
+	"fr": {
+
+		"Manuel": {
+
+			"Débuter": {
+				"Créer une scène": "manual/fr/introduction/Creating-a-scene",
+				"Installation": "manual/fr/introduction/Installation",
+				"Compatibilité WebGL": "manual/fr/introduction/WebGL-compatibility-check",
+				"Exécuter localement": "manual/fr/introduction/How-to-run-things-locally",
+				"Dessiner des lignes": "manual/fr/introduction/Drawing-lines",
+				"Créer un texte": "manual/fr/introduction/Creating-text",
+				"Importer des modèles 3D": "manual/fr/introduction/Loading-3D-models",
+				"Librairies et Plugins": "manual/fr/introduction/Libraries-and-Plugins",
+				"FAQ": "manual/fr/introduction/FAQ",
+				"Liens Utiles": "manual/fr/introduction/Useful-links"
+			},
+
+			"Étapes Suivantes": {
+				"Mettre les éléments à jour": "manual/fr/introduction/How-to-update-things",
+				"Supprimer un objet": "manual/fr/introduction/How-to-dispose-of-objects",
+				"Créer du contenu VR": "manual/fr/introduction/How-to-create-VR-content",
+				"Utiliser le post-processing": "manual/fr/introduction/How-to-use-post-processing",
+				"Matrices de transformation": "manual/fr/introduction/Matrix-transformations",
+				"Système d'animation": "manual/fr/introduction/Animation-system",
+				"Gestion des couleurs": "manual/fr/introduction/Color-management"
+			},
+
+			"Outils de build": {
+				"Tests avec NPM": "manual/fr/buildTools/Testing-with-NPM"
+			}
+
+		}
+
+	}
+	
 
 }

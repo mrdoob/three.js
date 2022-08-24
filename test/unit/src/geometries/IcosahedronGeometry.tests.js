@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { IcosahedronGeometry, IcosahedronBufferGeometry } from '../../../../src/geometries/IcosahedronGeometry.js';
+import { IcosahedronGeometry } from '../../../../src/geometries/IcosahedronGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -19,7 +19,6 @@ export default QUnit.module( 'Geometries', () => {
 				new IcosahedronGeometry(),
 				new IcosahedronGeometry( parameters.radius ),
 				new IcosahedronGeometry( parameters.radius, parameters.detail ),
-				new IcosahedronBufferGeometry()
 			];
 
 		} );

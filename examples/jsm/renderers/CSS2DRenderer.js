@@ -85,8 +85,8 @@ class CSS2DRenderer {
 
 		this.render = function ( scene, camera ) {
 
-			if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-			if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 			_viewMatrix.copy( camera.matrixWorldInverse );
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );

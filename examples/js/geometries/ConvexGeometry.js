@@ -11,7 +11,7 @@
 
 			if ( THREE.ConvexHull === undefined ) {
 
-				console.error( 'THREE.ConvexBufferGeometry: ConvexBufferGeometry relies on THREE.ConvexHull' );
+				console.error( 'THREE.ConvexGeometry: ConvexGeometry relies on THREE.ConvexHull' );
 
 			}
 

@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { CylinderGeometry, CylinderBufferGeometry } from '../../../../src/geometries/CylinderGeometry.js';
+import { CylinderGeometry } from '../../../../src/geometries/CylinderGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -31,7 +31,6 @@ export default QUnit.module( 'Geometries', () => {
 				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded ),
 				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded, parameters.thetaStart ),
 				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded, parameters.thetaStart, parameters.thetaLength ),
-				new CylinderBufferGeometry()
 			];
 
 		} );
