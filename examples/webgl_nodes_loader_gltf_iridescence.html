@@ -22,7 +22,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -31,7 +31,7 @@
 
 			import * as THREE from 'three';
 
-			import { NodeMaterial, uv, add, mul, vec2, checker, float, timerLocal } from 'three-nodes/Nodes.js';
+			import { NodeMaterial, uv, add, mul, vec2, checker, float, timerLocal } from 'three/nodes';
 
 			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
 
