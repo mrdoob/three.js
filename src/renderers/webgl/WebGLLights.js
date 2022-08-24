@@ -146,9 +146,7 @@ let nextVersion = 0;
 
 function shadowCastingAndTexturingLightsFirst( lightA, lightB ) {
 
-	return ( lightB.castShadow ? 2 : 0 ) - ( lightA.castShadow ? 2 : 0 )
-	+ ( lightB.map ? 1 : 0 ) - ( lightA.map ? 1 : 0 )
-	;
+	return ( lightB.castShadow ? 2 : 0 ) - ( lightA.castShadow ? 2 : 0 ) + ( lightB.map ? 1 : 0 ) - ( lightA.map ? 1 : 0 );
 
 }
 
