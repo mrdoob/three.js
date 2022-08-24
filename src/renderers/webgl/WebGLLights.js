@@ -432,6 +432,7 @@ function WebGLLights( extensions, capabilities ) {
 		state.ambient[ 0 ] = r;
 		state.ambient[ 1 ] = g;
 		state.ambient[ 2 ] = b;
+
 		const hash = state.hash;
 
 		if ( hash.directionalLength !== directionalLength ||
