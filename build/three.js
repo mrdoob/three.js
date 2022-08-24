@@ -20069,6 +20069,20 @@
 
 
 		this.compile = function (scene, camera) {
+			function prepare(material, scene, object) {
+				if (material.transparent === true && material.side === DoubleSide) {
+					material.side = BackSide;
+					material.needsUpdate = true;
+					getProgram(material, scene, object);
+					material.side = FrontSide;
+					material.needsUpdate = true;
+					getProgram(material, scene, object);
+					material.side = DoubleSide;
+				} else {
+					getProgram(material, scene, object);
+				}
+			}
+
 			currentRenderState = renderStates.get(scene);
 			currentRenderState.init();
 			renderStateStack.push(currentRenderState);
@@ -20089,10 +20103,10 @@
 					if (Array.isArray(material)) {
 						for (let i = 0; i < material.length; i++) {
 							const material2 = material[i];
-							getProgram(material2, scene, object);
+							prepare(material2, scene, object);
 						}
 					} else {
-						getProgram(material, scene, object);
+						prepare(material, scene, object);
 					}
 				}
 			});
