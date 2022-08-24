@@ -20,7 +20,6 @@ import { TetrahedronGeometry } from './geometries/TetrahedronGeometry.js';
 import { TorusGeometry } from './geometries/TorusGeometry.js';
 import { TorusKnotGeometry } from './geometries/TorusKnotGeometry.js';
 import { TubeGeometry } from './geometries/TubeGeometry.js';
-import { Scene } from './scenes/Scene.js';
 
 // r134, d65e0af06644fe5a84a6fc0e372f4318f95a04c0
 
