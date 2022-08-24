@@ -786,8 +786,27 @@ export default QUnit.module( 'Core', () => {
 				0, 0, 0, 1
 			], 'No effect to child world matrix if parent local and world matrices and child local matrix are not updated' );
 
+			// -- matrixWorldAutoUpdate = false test
+
+			parent.position.set( 3, 2, 1 );
+			parent.updateMatrix();
+			parent.matrixWorldNeedsUpdate = false;
+
+			child.matrixWorldAutoUpdate = false;
+			parent.updateMatrixWorld();
+
+			assert.deepEqual( child.matrixWorld.elements, [
+				1, 0, 0, 0,
+				0, 1, 0, 0,
+				0, 0, 1, 0,
+				0, 0, 0, 1
+			], 'No effect to child world matrix when matrixWorldAutoUpdate is set to false' );
+
 			// -- Propagation to children world matrices test
 
+			child.position.set( 0, 0, 0 );
+			parent.position.set( 1, 2, 3 );
+			child.matrixWorldAutoUpdate = true;
 			parent.matrixAutoUpdate = true;
 			parent.updateMatrixWorld();
 
@@ -1012,6 +1031,24 @@ export default QUnit.module( 'Core', () => {
 			assert.deepEqual( object.matrixWorld.elements,
 				m.setPosition( parent.position ).elements,
 				'object\'s world matrix is updated even if matrixAutoUpdate is false' );
+
+			// object.matrixWorldAutoUpdate = false test
+
+			parent.matrixWorldAutoUpdate = false;
+			child.matrixWorldAutoUpdate = false;
+
+			child.matrixWorld.identity();
+			parent.matrixWorld.identity();
+
+			object.updateWorldMatrix( true, true );
+
+			assert.deepEqual( child.matrixWorld.elements,
+				m.identity().elements,
+				'No effect to child\'s world matrix if matrixWorldAutoUpdate is false' );
+
+			assert.deepEqual( parent.matrixWorld.elements,
+				m.identity().elements,
+				'No effect to parent\'s world matrix if matrixWorldAutoUpdate is false' );
 
 		} );
 

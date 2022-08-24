@@ -7505,6 +7505,8 @@ class Object3D extends EventDispatcher {
 		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
 		this.matrixWorldNeedsUpdate = false;
 
+		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
+
 		this.layers = new Layers();
 		this.visible = true;
 
@@ -7989,7 +7991,13 @@ class Object3D extends EventDispatcher {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			children[ i ].updateMatrixWorld( force );
+			const child = children[ i ];
+
+			if ( child.matrixWorldAutoUpdate === true || force === true ) {
+
+				child.updateMatrixWorld( force );
+
+			}
 
 		}
 
@@ -7999,7 +8007,7 @@ class Object3D extends EventDispatcher {
 
 		const parent = this.parent;
 
-		if ( updateParents === true && parent !== null ) {
+		if ( updateParents === true && parent !== null && parent.matrixWorldAutoUpdate === true ) {
 
 			parent.updateWorldMatrix( true, false );
 
@@ -8025,7 +8033,13 @@ class Object3D extends EventDispatcher {
 
 			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-				children[ i ].updateWorldMatrix( false, true );
+				const child = children[ i ];
+
+				if ( child.matrixWorldAutoUpdate === true ) {
+
+					child.updateWorldMatrix( false, true );
+
+				}
 
 			}
 
@@ -8298,6 +8312,8 @@ class Object3D extends EventDispatcher {
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
+		this.matrixWorldAutoUpdate = source.matrixWorldAutoUpdate;
+
 		this.layers.mask = source.layers.mask;
 		this.visible = source.visible;
 
@@ -8328,6 +8344,7 @@ class Object3D extends EventDispatcher {
 
 Object3D.DefaultUp = /*@__PURE__*/ new Vector3( 0, 1, 0 );
 Object3D.DefaultMatrixAutoUpdate = true;
+Object3D.DefaultMatrixWorldAutoUpdate = true;
 
 const _v0$1 = /*@__PURE__*/ new Vector3();
 const _v1$3 = /*@__PURE__*/ new Vector3();
@@ -9495,8 +9512,7 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
-		if ( this.normalized ) value = normalize( value, this.array );
-
+		// Matching BufferAttribute constructor, do not normalize the array.
 		this.array.set( value, offset );
 
 		return this;
@@ -27480,11 +27496,11 @@ function WebGLRenderer( parameters = {} ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( xr.enabled === true && xr.isPresenting === true ) {
 
@@ -28864,8 +28880,6 @@ class Scene extends Object3D {
 
 		this.overrideMaterial = null;
 
-		this.autoUpdate = true; // checked by the renderer
-
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
@@ -28884,7 +28898,6 @@ class Scene extends Object3D {
 
 		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-		this.autoUpdate = source.autoUpdate;
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
 		return this;
@@ -48123,7 +48136,7 @@ class GridHelper extends LineSegments {
 
 class PolarGridHelper extends LineSegments {
 
-	constructor( radius = 10, radials = 16, circles = 8, divisions = 64, color1 = 0x444444, color2 = 0x888888 ) {
+	constructor( radius = 10, sectors = 16, rings = 8, divisions = 64, color1 = 0x444444, color2 = 0x888888 ) {
 
 		color1 = new Color( color1 );
 		color2 = new Color( color2 );
@@ -48131,32 +48144,36 @@ class PolarGridHelper extends LineSegments {
 		const vertices = [];
 		const colors = [];
 
-		// create the radials
+		// create the sectors
 
-		for ( let i = 0; i <= radials; i ++ ) {
+		if ( sectors > 1 ) {
 
-			const v = ( i / radials ) * ( Math.PI * 2 );
+			for ( let i = 0; i < sectors; i ++ ) {
 
-			const x = Math.sin( v ) * radius;
-			const z = Math.cos( v ) * radius;
+				const v = ( i / sectors ) * ( Math.PI * 2 );
 
-			vertices.push( 0, 0, 0 );
-			vertices.push( x, 0, z );
+				const x = Math.sin( v ) * radius;
+				const z = Math.cos( v ) * radius;
 
-			const color = ( i & 1 ) ? color1 : color2;
+				vertices.push( 0, 0, 0 );
+				vertices.push( x, 0, z );
 
-			colors.push( color.r, color.g, color.b );
-			colors.push( color.r, color.g, color.b );
+				const color = ( i & 1 ) ? color1 : color2;
+
+				colors.push( color.r, color.g, color.b );
+				colors.push( color.r, color.g, color.b );
+
+			}
 
 		}
 
-		// create the circles
+		// create the rings
 
-		for ( let i = 0; i <= circles; i ++ ) {
+		for ( let i = 0; i < rings; i ++ ) {
 
 			const color = ( i & 1 ) ? color1 : color2;
 
-			const r = radius - ( radius / circles * i );
+			const r = radius - ( radius / rings * i );
 
 			for ( let j = 0; j < divisions; j ++ ) {
 
@@ -49630,6 +49647,26 @@ class TubeBufferGeometry extends TubeGeometry {
 	}
 
 }
+
+// r144
+
+Object.defineProperty( Scene.prototype, 'autoUpdate', {
+
+	get() {
+
+		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
+		return this.matrixWorldAutoUpdate;
+
+	},
+
+	set( value ) {
+
+		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
+		this.matrixWorldAutoUpdate = value;
+
+	}
+
+} );
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 

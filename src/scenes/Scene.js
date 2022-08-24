@@ -16,8 +16,6 @@ class Scene extends Object3D {
 
 		this.overrideMaterial = null;
 
-		this.autoUpdate = true; // checked by the renderer
-
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
@@ -36,7 +34,6 @@ class Scene extends Object3D {
 
 		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-		this.autoUpdate = source.autoUpdate;
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
 		return this;
