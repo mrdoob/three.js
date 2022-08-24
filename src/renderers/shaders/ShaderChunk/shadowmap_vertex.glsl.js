@@ -25,7 +25,7 @@ export default /* glsl */`
 	#if NUM_SPOT_LIGHT_COORDS > 0
 
 	#pragma unroll_loop_start
-	for ( int i = 0; i < NUM_SPOT_LIGHT_COORDS ; i ++ ) {
+	for ( int i = 0; i < NUM_SPOT_LIGHT_COORDS; i ++ ) {
 
 		shadowWorldPosition = worldPosition;
 		#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
