@@ -28,7 +28,7 @@ float getShadowMask() {
 	for ( int i = 0; i < NUM_SPOT_LIGHT_SHADOWS; i ++ ) {
 
 		spotLight = spotLightShadows[ i ];
-		shadow *= receiveShadow ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+		shadow *= receiveShadow ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotLightCoord[ i ] ) : 1.0;
 
 	}
 	#pragma unroll_loop_end
