@@ -84,6 +84,12 @@
 		the local transform [page:.matrix].
 		</p>
 
+		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+		<p>
+		Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
+		When it isn't, then you have to maintain all matrices in the object and its children yourself.
+		</p>
+
 		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
 		<p>
 		When this is set, it calculates the matrixWorld in that frame and resets this property

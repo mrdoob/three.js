@@ -311,8 +311,7 @@ class BufferAttribute {
 
 	set( value, offset = 0 ) {
 
-		if ( this.normalized ) value = normalize( value, this.array );
-
+		// Matching BufferAttribute constructor, do not normalize the array.
 		this.array.set( value, offset );
 
 		return this;
