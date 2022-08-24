@@ -21130,23 +21130,20 @@
 			const data = super.toJSON(meta);
 			if (this.fog !== null) data.object.fog = this.fog.toJSON();
 			return data;
+		} // Deprecated 
+
+
+		get autoUpdate() {
+			console.warn('THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.');
+			return this.matrixWorldAutoUpdate;
 		}
 
-	} // r144
-
-
-	Object.defineProperty(Scene.prototype, 'autoUpdate', {
-		get() {
-			console.warn('THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.');
-			return this.matrixWorldAutoUpdate;
-		},
-
-		set(value) {
-			console.warn('THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.');
+		set autoUpdate(value) {
+			console.warn('THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.');
 			this.matrixWorldAutoUpdate = value;
 		}
 
-	});
+	}
 
 	class InterleavedBuffer {
 		constructor(array, stride) {
