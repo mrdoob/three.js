@@ -23,7 +23,7 @@
 
 		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 100, 1000, 100 );
-		spotLight.map = new THREE.TextureLoader().load(textureUrl);
+		spotLight.map = new THREE.TextureLoader().load( url );
 
 		spotLight.castShadow = true;
 
