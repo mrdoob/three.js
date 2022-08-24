@@ -234,7 +234,6 @@ function WebGLLights( extensions, capabilities ) {
 			const intensity = light.intensity;
 			const distance = light.distance;
 
-			const lightMap = light.map || null;
 			const shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 			if ( light.isAmbientLight ) {
@@ -296,9 +295,10 @@ function WebGLLights( extensions, capabilities ) {
 				state.spot[ spotLength ] = uniforms;
 
 				const shadow = light.shadow;
-				if ( lightMap ) {
 
-					state.spotLightMap[ numSpotMaps ] = lightMap;
+				if ( light.map ) {
+
+					state.spotLightMap[ numSpotMaps ] = light.map;
 					numSpotMaps ++;
 
 					// make sure the lightMatrix is up to date
