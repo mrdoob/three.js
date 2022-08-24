@@ -21,7 +21,8 @@ class SpotLight extends Light {
 		this.angle = angle;
 		this.penumbra = penumbra;
 		this.decay = decay; // for physically correct lights, should be 2.
-		this.map = map;
+
+		this.map = null;
 
 		this.shadow = new SpotLightShadow();
 
