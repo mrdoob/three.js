@@ -147,9 +147,10 @@ light.target = targetObject;
 
 		<h3>[property:Texture map]</h3>
 		<p>
-			A [page:Texture] used to modulate the color of the light. The spot light color is mixed
-			with the RGB value of this texture, with a ratio corresponding to its
-			alpha value. The cookie-like masking effect is reproduced using pixel values (0, 0, 0, 1-cookie_value).
+			[page:Texture] used to modulate the color of the light. The spot light color is mixed
+			with the RGB value of this texture. The alpha pixel value controls the effect of the spot light cone:
+			no effect with alpha=0 and full modulation with cone and penumbra at alpha=1.
+			The cookie-like masking effect is reproduced using a black and white texture.
 			*Warning*: [param:SpotLight map] is disabled if [param:SpotLight castShadow] is *false*.
 		</p>
 

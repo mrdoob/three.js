@@ -82,7 +82,7 @@ IncidentLight directLight;
 #if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )
 
 	SpotLight spotLight;
-	vec4 spotColor;
+	vec4 spotLightMapColor;
 	vec3 spotLightCoord;
 	bool inSpotLightMap;
 
@@ -109,10 +109,9 @@ IncidentLight directLight;
 		#if ( SPOT_LIGHT_MAP_INDEX < NUM_SPOT_LIGHT_MAPS )
 			spotLightCoord = vSpotLightCoord[ i ].xyz / vSpotLightCoord[ i ].w;
 			inSpotLightMap = all( lessThan( abs( spotLightCoord * 2. - 1. ), vec3( 1.0 ) ) );
-			spotColor = texture2D( spotLightMap[ SPOT_LIGHT_MAP_INDEX ], spotLightCoord.xy );
-			inSpotLightMap = inSpotLightMap && ( spotColor.a > 0. );
-			directLight.visible = directLight.visible || inSpotLightMap;
-			directLight.color = inSpotLightMap ? mix( directLight.color, spotLight.color * spotColor.rgb, spotColor.a ) : directLight.color;
+			spotLightMapColor = texture2D( spotLightMap[ SPOT_LIGHT_MAP_INDEX ], spotLightCoord.xy );
+			directLight.color = inSpotLightMap ? mix( directLight.color, spotLight.color, spotLightMapColor.a ) * spotLightMapColor.rgb : vec3( 0. );
+			directLight.visible = ( directLight.color != vec3( 0.0 ) );
 		#endif
 
 		#undef SPOT_LIGHT_MAP_INDEX
