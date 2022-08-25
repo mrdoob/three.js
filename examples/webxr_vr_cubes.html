@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,9 +29,9 @@
 
 			import * as THREE from 'three';
 
-			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
-			import { VRButton } from './jsm/webxr/VRButton.js';
-			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
+			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
 			const clock = new THREE.Clock();
 

@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,7 +29,7 @@
 
 			import * as THREE from 'three';
 
-			import { AnaglyphEffect } from './jsm/effects/AnaglyphEffect.js';
+			import { AnaglyphEffect } from 'three/addons/effects/AnaglyphEffect.js';
 
 			let container, camera, scene, renderer, effect;
 

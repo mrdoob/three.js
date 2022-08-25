@@ -52,7 +52,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "../examples/jsm/"
 				}
 			}
 		</script>
@@ -69,7 +70,7 @@
 			import { Sidebar } from './js/Sidebar.js';
 			import { Menubar } from './js/Menubar.js';
 			import { Resizer } from './js/Resizer.js';
-			import { VRButton } from '../examples/jsm/webxr/VRButton.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;

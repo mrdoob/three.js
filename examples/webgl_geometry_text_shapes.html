@@ -27,7 +27,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -36,8 +37,8 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { FontLoader } from './jsm/loaders/FontLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 			let camera, scene, renderer;
 
