@@ -21130,7 +21130,7 @@
 			const data = super.toJSON(meta);
 			if (this.fog !== null) data.object.fog = this.fog.toJSON();
 			return data;
-		} // Deprecated 
+		} // Deprecated
 
 
 		get autoUpdate() {
