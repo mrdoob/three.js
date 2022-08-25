@@ -22,6 +22,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
 					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
@@ -34,15 +35,15 @@
 
 			import { uniform, mix, cubeTexture, mul, reference, add, positionWorld, normalWorld, modelWorldMatrix, transformDirection, saturate, saturation, hue, reflectVector, context } from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
+			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
 
