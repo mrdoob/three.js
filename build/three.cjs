@@ -31893,7 +31893,7 @@ const _propertyRe = /*@__PURE__*/ /\.(WC+)(?:\[(.+)\])?/.source.replace('WC', _w
 
 const _trackRe = new RegExp('' + '^' + _directoryRe + _nodeRe + _objectRe + _propertyRe + '$');
 
-const _supportedObjectNames = ['material', 'materials', 'bones'];
+const _supportedObjectNames = ['material', 'materials', 'bones', 'map'];
 
 class Composite {
 	constructor(targetGroup, path, optionalParsedPath) {
@@ -32218,6 +32218,20 @@ class PropertyBinding {
 						}
 					}
 
+					break;
+
+				case 'map':
+					if (!targetObject.material) {
+						console.error('THREE.PropertyBinding: Can not bind to material as node does not have a material.', this);
+						return;
+					}
+
+					if (!targetObject.material.map) {
+						console.error('THREE.PropertyBinding: Can not bind to material.map as node.material does not have a map.', this);
+						return;
+					}
+
+					targetObject = targetObject.material.map;
 					break;
 
 				default:
