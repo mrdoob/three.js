@@ -1,7 +1,6 @@
 import {
 	WebGLRenderTarget,
 	RGBAFormat,
-	RGBFormat,
 	MeshNormalMaterial,
 	ShaderMaterial,
 	Vector2,
@@ -30,7 +29,7 @@ class RenderPixelatedPass extends Pass {
 		this.depthEdgeStrength = options.depthEdgeStrength ?? .4;
 
 		this.rgbRenderTarget = pixelRenderTarget( this.renderResolution, RGBAFormat, true );
-		this.normalRenderTarget = pixelRenderTarget( this.renderResolution, RGBFormat, false );
+		this.normalRenderTarget = pixelRenderTarget( this.renderResolution, RGBAFormat, false );
 
 		this.normalMaterial = new MeshNormalMaterial();
 
@@ -228,7 +227,7 @@ function pixelRenderTarget( resolution, pixelFormat, useDepthTexture ) {
 
 	const renderTarget = new WebGLRenderTarget(
 		resolution.x, resolution.y,
-		! useDepthTexture ?
+		!useDepthTexture ?
 			undefined
 			: {
 				depthTexture: new DepthTexture(
