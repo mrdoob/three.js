@@ -1,6 +1,6 @@
 import { SelectInput, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { PositionNode } from 'three-nodes/Nodes.js';
+import { PositionNode } from 'three/nodes';
 
 export class PositionEditor extends BaseNode {
 

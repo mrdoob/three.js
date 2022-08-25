@@ -1,6 +1,6 @@
 import { LabelElement, ToggleInput, SelectInput } from '../../libs/flow.module.js';
 import { BaseNode, onNodeValidElement } from '../core/BaseNode.js';
-import { TextureNode, UVNode } from 'three-nodes/Nodes.js';
+import { TextureNode, UVNode } from 'three/nodes';
 import { Texture, TextureLoader, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from 'three';
 
 const fileTexture = new WeakMap();

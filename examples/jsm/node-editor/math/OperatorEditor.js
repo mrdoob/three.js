@@ -1,5 +1,5 @@
 import { Element, LabelElement, NumberInput, SelectInput } from '../../libs/flow.module.js';
-import { UniformNode, OperatorNode } from 'three-nodes/Nodes.js';
+import { UniformNode, OperatorNode } from 'three/nodes';
 import { BaseNode } from '../core/BaseNode.js';
 
 export class OperatorEditor extends BaseNode {
