@@ -49,6 +49,11 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean isBox3]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Vector3 min]</h3>
 		<p>
 			[page:Vector3] representing the lower (x, y, z) boundary of the box.<br />
@@ -154,7 +159,7 @@
 		Expands this box equilaterally by [page:Vector3 vector]. The width of this box will be
 		expanded by the x component of [page:Vector3 vector] in both directions. The height of
 		this box will be expanded by the y component of [page:Vector3 vector] in both directions.
-		The depth of this box will be expanded by the z component of *vector* in both directions.
+		The depth of this box will be expanded by the z component of `vector` in both directions.
 		</p>
 
 		<h3>[method:Sphere getBoundingSphere]( [param:Sphere target] )</h3>
@@ -246,7 +251,7 @@
 		<p>
 		array -- An array of position data that the resulting box will envelop.<br /><br />
 
-		Sets the upper and lower bounds of this box to include all of the data in *array*.
+		Sets the upper and lower bounds of this box to include all of the data in `array`.
 		</p>
 
 		<h3>[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] )</h3>

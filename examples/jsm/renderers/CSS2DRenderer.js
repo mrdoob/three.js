@@ -10,6 +10,8 @@ class CSS2DObject extends Object3D {
 
 		super();
 
+		this.isCSS2DObject = true;
+
 		this.element = element;
 
 		this.element.style.position = 'absolute';
@@ -44,8 +46,6 @@ class CSS2DObject extends Object3D {
 	}
 
 }
-
-CSS2DObject.prototype.isCSS2DObject = true;
 
 //
 
@@ -85,8 +85,8 @@ class CSS2DRenderer {
 
 		this.render = function ( scene, camera ) {
 
-			if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-			if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 			_viewMatrix.copy( camera.matrixWorldInverse );
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
@@ -113,28 +113,19 @@ class CSS2DRenderer {
 
 			if ( object.isCSS2DObject ) {
 
-				const visible = object.visible && _vector.z >= - 1 && _vector.z <= 1 && object.layers.test( camera.layers );
-				object.element.style.display = visible ? '' : 'none';
+				_vector.setFromMatrixPosition( object.matrixWorld );
+				_vector.applyMatrix4( _viewProjectionMatrix );
 
-				if ( visible ) {
+				const visible = ( object.visible === true ) && ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
+				object.element.style.display = ( visible === true ) ? '' : 'none';
+
+				if ( visible === true ) {
 
 					object.onBeforeRender( _this, scene, camera );
 
-					_vector.setFromMatrixPosition( object.matrixWorld );
-					_vector.applyMatrix4( _viewProjectionMatrix );
-
 					const element = object.element;
 
-					if ( /apple/i.test( navigator.vendor ) ) {
-
-						// https://github.com/mrdoob/three.js/issues/21415
-						element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
-
-					} else {
-
-						element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
-
-					}
+					element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
 
 					if ( element.parentNode !== domElement ) {
 
@@ -188,6 +179,12 @@ class CSS2DRenderer {
 		function zOrder( scene ) {
 
 			const sorted = filterAndFlatten( scene ).sort( function ( a, b ) {
+
+				if ( a.renderOrder !== b.renderOrder ) {
+
+					return b.renderOrder - a.renderOrder;
+
+				}
 
 				const distanceA = cache.objects.get( a ).distanceToCameraSquared;
 				const distanceB = cache.objects.get( b ).distanceToCameraSquared;

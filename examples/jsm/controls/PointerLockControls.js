@@ -19,13 +19,6 @@ class PointerLockControls extends EventDispatcher {
 
 		super();
 
-		if ( domElement === undefined ) {
-
-			console.warn( 'THREE.PointerLockControls: The second parameter "domElement" is now mandatory.' );
-			domElement = document.body;
-
-		}
-
 		this.domElement = domElement;
 		this.isLocked = false;
 
@@ -33,6 +26,8 @@ class PointerLockControls extends EventDispatcher {
 		// Range is 0 to Math.PI radians
 		this.minPolarAngle = 0; // radians
 		this.maxPolarAngle = Math.PI; // radians
+
+		this.pointerSpeed = 1.0;
 
 		const scope = this;
 
@@ -45,8 +40,8 @@ class PointerLockControls extends EventDispatcher {
 
 			_euler.setFromQuaternion( camera.quaternion );
 
-			_euler.y -= movementX * 0.002;
-			_euler.x -= movementY * 0.002;
+			_euler.y -= movementX * 0.002 * scope.pointerSpeed;
+			_euler.x -= movementY * 0.002 * scope.pointerSpeed;
 
 			_euler.x = Math.max( _PI_2 - scope.maxPolarAngle, Math.min( _PI_2 - scope.minPolarAngle, _euler.x ) );
 

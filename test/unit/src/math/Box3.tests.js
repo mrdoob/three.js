@@ -10,7 +10,7 @@ import { Mesh } from '../../../../src/objects/Mesh.js';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import {
-	SphereBufferGeometry,
+	SphereGeometry,
 } from '../../../../src/geometries/SphereGeometry.js';
 import {
 	negInf3,
@@ -171,8 +171,8 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'setFromObject/Precise', ( assert ) => {
 
 			var a = new Box3( zero3.clone(), one3.clone() );
-			var object = new Mesh( new SphereBufferGeometry( 1, 32, 32 ) );
-			var child = new Mesh( new SphereBufferGeometry( 2, 32, 32 ) );
+			var object = new Mesh( new SphereGeometry( 1, 32, 32 ) );
+			var child = new Mesh( new SphereGeometry( 2, 32, 32 ) );
 			object.add( child );
 
 			object.rotation.setFromVector3( new Vector3( 0, 0, Math.PI / 4.0 ) );

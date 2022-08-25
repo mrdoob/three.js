@@ -9,16 +9,6 @@
 
 	}
 
-	var inputVectors = [];
-	var outputVectors = [];
-
-	for ( var j = 0, jl = input.length / 3; j < jl; j ++ ) {
-
-		inputVectors.push( new THREE.Vector3( j * 3, j * 3 + 1, j * 3 + 2 ) );
-		outputVectors.push( new THREE.Vector3() );
-
-	}
-
 	var s = Bench.newSuite( 'Float 32 Arrays' );
 
 	s.add( 'Float32Array-Float32Array', function () {

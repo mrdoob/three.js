@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.137.5",
+  "version": "0.143.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.js",
@@ -40,7 +40,10 @@
   },
   "eslintConfig": {
     "root": true,
-    "extends": "mdcs",
+    "extends": [
+      "mdcs",
+      "plugin:compat/recommended"
+    ],
     "parser": "@babel/eslint-parser",
     "parserOptions": {
       "babelOptions": {
@@ -48,8 +51,14 @@
       }
     },
     "plugins": [
-      "html"
+      "html",
+      "import"
     ],
+    "settings": {
+      "polyfills": [
+        "WebGL2RenderingContext"
+      ]
+    },
     "globals": {
       "__THREE_DEVTOOLS__": "readonly",
       "WebGL2ComputeRenderingContext": "readonly",
@@ -63,11 +72,18 @@
       "GPUShaderStage": "readonly",
       "GPUBufferUsage": "readonly",
       "GPUTextureUsage": "readonly",
-      "QUnit": "readonly"
+      "QUnit": "readonly",
+      "Ammo":"readonly",
+      "XRRigidTransform":"readonly",
+      "XRMediaBinding":"readonly"
     },
     "rules": {
       "no-throw-literal": [
         "error"
+      ],
+      "import/extensions": [
+        "error",
+        "always"
       ],
       "quotes": [
         "error",
@@ -82,6 +98,9 @@
       ]
     }
   },
+  "browserslist": [
+    "> 1%, not dead, not ie 11, not op_mini all"
+  ],
   "scripts": {
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
@@ -90,9 +109,9 @@
     "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "lint": "eslint src --ext js",
-    "lint-examples": "eslint examples/js examples/jsm --ext js --ignore-pattern libs --ignore-pattern ifc",
-    "lint-fix": "npm run lint -- --fix && npm run lint-examples -- --fix",
+    "lint-examples": "eslint examples/js examples/jsm examples/*.html --ext js,html --ignore-pattern libs --ignore-pattern ifc",
     "lint-docs": "eslint docs --ext html",
+    "lint-fix": "npm run lint -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix",
     "test-unit": "npm run unit --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
@@ -122,22 +141,24 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@babel/core": "^7.15.5",
-    "@babel/eslint-parser": "^7.15.7",
-    "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/preset-env": "^7.15.6",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^13.0.5",
-    "chalk": "^4.1.2",
-    "concurrently": "^6.2.2",
-    "eslint": "^7.32.0",
+    "@babel/core": "^7.18.9",
+    "@babel/eslint-parser": "^7.18.9",
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+    "@babel/preset-env": "^7.18.9",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "chalk": "^5.0.1",
+    "concurrently": "^7.3.0",
+    "eslint": "^8.20.0",
     "eslint-config-mdcs": "^5.0.0",
-    "eslint-plugin-html": "^6.2.0",
-    "rollup": "^2.57.0",
-    "rollup-plugin-filesize": "^9.1.1",
+    "eslint-plugin-compat": "^4.0.2",
+    "eslint-plugin-html": "^7.1.0",
+    "eslint-plugin-import": "^2.26.0",
+    "rollup": "^2.77.2",
+    "rollup-plugin-filesize": "^9.1.2",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-visualizer": "^5.5.2",
-    "servez": "^1.12.0"
+    "rollup-plugin-visualizer": "^5.7.1",
+    "servez": "^1.14.1"
   },
   "jspm": {
     "files": [

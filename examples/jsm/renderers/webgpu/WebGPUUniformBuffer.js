@@ -1,45 +1,18 @@
-import WebGPUBinding from './WebGPUBinding.js';
-import { getFloatLength } from './WebGPUBufferUtils.js';
-
+import WebGPUBuffer from './WebGPUBuffer.js';
 import { GPUBindingType } from './constants.js';
 
-class WebGPUUniformBuffer extends WebGPUBinding {
+class WebGPUUniformBuffer extends WebGPUBuffer {
 
 	constructor( name, buffer = null ) {
 
-		super( name );
+		super( name, GPUBindingType.UniformBuffer, buffer );
 
-		this.bytesPerElement = Float32Array.BYTES_PER_ELEMENT;
-		this.type = GPUBindingType.UniformBuffer;
-		this.visibility = GPUShaderStage.VERTEX;
+		this.isUniformBuffer = true;
 
-		this.usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
-
-		this.buffer = buffer;
-		this.bufferGPU = null; // set by the renderer
-
-	}
-
-	getByteLength() {
-
-		return getFloatLength( this.buffer.byteLength );
-
-	}
-
-	getBuffer() {
-
-		return this.buffer;
-
-	}
-
-	update() {
-
-		return true;
+		this.usage |= GPUBufferUsage.UNIFORM;
 
 	}
 
 }
-
-WebGPUUniformBuffer.prototype.isUniformBuffer = true;
 
 export default WebGPUUniformBuffer;

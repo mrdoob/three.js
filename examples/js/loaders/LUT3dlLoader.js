@@ -110,7 +110,7 @@
 			texture.wrapT = THREE.ClampToEdgeWrapping;
 			texture.generateMipmaps = false;
 			texture.needsUpdate = true;
-			const texture3D = new THREE.DataTexture3D();
+			const texture3D = new THREE.Data3DTexture();
 			texture3D.image.data = data;
 			texture3D.image.width = size;
 			texture3D.image.height = size;

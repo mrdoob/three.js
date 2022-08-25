@@ -12,6 +12,7 @@
 		constructor( geometry, options = {} ) {
 
 			super( geometry );
+			this.isWater = true;
 			this.type = 'Water';
 			const scope = this;
 			const color = options.color !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0xFFFFFF );
@@ -157,7 +158,6 @@
 
 	}
 
-	Water.prototype.isWater = true;
 	Water.WaterShader = {
 		uniforms: {
 			'color': {

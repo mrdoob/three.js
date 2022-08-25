@@ -1,3 +1,7 @@
+import {
+	DoubleSide
+} from 'three';
+
 import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
@@ -402,13 +406,32 @@ function buildMaterial( material, textures ) {
             float outputs:g
             float outputs:b
             float3 outputs:rgb
+            ${ material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : '' }
         }`;
+
+	}
+
+
+	if ( material.side === DoubleSide ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 
 	}
 
 	if ( material.map !== null ) {
 
 		inputs.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:rgb>` );
+
+		if ( material.transparent ) {
+
+			inputs.push( `${ pad }float inputs:opacity.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:a>` );
+
+		} else if ( material.alphaTest > 0.0 ) {
+
+			inputs.push( `${ pad }float inputs:opacity.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:a>` );
+			inputs.push( `${ pad }float inputs:opacityThreshold = ${material.alphaTest}` );
+
+		}
 
 		samplers.push( buildTexture( material.map, 'diffuse', material.color ) );
 

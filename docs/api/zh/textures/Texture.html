@@ -33,6 +33,11 @@
 		只读 - 表示该纹理实例的唯一数字。
 		</p>
 
+		<h3>[property:Boolean isTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:String uuid]</h3>
 		<p>
 		该对象实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。
@@ -105,7 +110,7 @@
 		<p>
 		沿着轴，通过具有最高纹素密度的像素的样本数。
 		默认情况下，这个值为1。设置一个较高的值将会产生比基本的mipmap更清晰的效果，代价是需要使用更多纹理样本。
-		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。
+		使用[page:WebGLRenderer.capabilities renderer.capabilities.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。
 		</p>
 
 		<h3>[property:number format]</h3>
@@ -269,7 +274,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</h3>
+		<p>[page:EventDispatcher EventDispatcher]方法在这个类上可以使用。</p>
 
 		<h3>[method:undefined updateMatrix]()</h3>
 		<p>

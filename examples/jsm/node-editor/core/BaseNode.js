@@ -70,7 +70,7 @@ export class BaseNode extends ObjectNode {
 
 			return 'orange';
 
-		} else if ( value instanceof File ) {
+		} else if ( value.isDataFile === true ) {
 
 			return 'aqua';
 

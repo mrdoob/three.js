@@ -5,22 +5,28 @@
 		constructor( geometry, options = {} ) {
 
 			super( geometry );
+			this.isRefractor = true;
 			this.type = 'Refractor';
+			this.camera = new THREE.PerspectiveCamera();
 			const scope = this;
 			const color = options.color !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
 			const textureWidth = options.textureWidth || 512;
 			const textureHeight = options.textureHeight || 512;
 			const clipBias = options.clipBias || 0;
-			const shader = options.shader || Refractor.RefractorShader; //
+			const shader = options.shader || Refractor.RefractorShader;
+			const multisample = options.multisample !== undefined ? options.multisample : 4; //
 
-			const virtualCamera = new THREE.PerspectiveCamera();
+			const virtualCamera = this.camera;
 			virtualCamera.matrixAutoUpdate = false;
 			virtualCamera.userData.refractor = true; //
 
 			const refractorPlane = new THREE.Plane();
 			const textureMatrix = new THREE.Matrix4(); // render target
 
-			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight ); // material
+			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, {
+				samples: multisample,
+				type: THREE.HalfFloatType
+			} ); // material
 
 			this.material = new THREE.ShaderMaterial( {
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
@@ -131,15 +137,21 @@
 				const currentRenderTarget = renderer.getRenderTarget();
 				const currentXrEnabled = renderer.xr.enabled;
 				const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+				const currentOutputEncoding = renderer.outputEncoding;
+				const currentToneMapping = renderer.toneMapping;
 				renderer.xr.enabled = false; // avoid camera modification
 
 				renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
+				renderer.outputEncoding = THREE.LinearEncoding;
+				renderer.toneMapping = THREE.NoToneMapping;
 				renderer.setRenderTarget( renderTarget );
 				if ( renderer.autoClear === false ) renderer.clear();
 				renderer.render( scene, virtualCamera );
 				renderer.xr.enabled = currentXrEnabled;
 				renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+				renderer.outputEncoding = currentOutputEncoding;
+				renderer.toneMapping = currentToneMapping;
 				renderer.setRenderTarget( currentRenderTarget ); // restore viewport
 
 				const viewport = camera.viewport;
@@ -157,9 +169,7 @@
 
 			this.onBeforeRender = function ( renderer, scene, camera ) {
 
-				// Render
-				renderTarget.texture.encoding = renderer.outputEncoding; // ensure refractors are rendered only once per frame
-
+				// ensure refractors are rendered only once per frame
 				if ( camera.userData.refractor === true ) return; // avoid rendering when the refractor is viewed from behind
 
 				if ( ! visible( camera ) === true ) return; // update
@@ -188,7 +198,6 @@
 
 	}
 
-	Refractor.prototype.isRefractor = true;
 	Refractor.RefractorShader = {
 		uniforms: {
 			'color': {
@@ -240,6 +249,9 @@
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <tonemapping_fragment>
+			#include <encodings_fragment>
 
 		}`
 	};

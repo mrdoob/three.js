@@ -389,6 +389,15 @@ class FBXTreeParser {
 
 		}
 
+		if ( 'Translation' in textureNode ) {
+
+			const values = textureNode.Translation.value;
+
+			texture.offset.x = values[ 0 ];
+			texture.offset.y = values[ 1 ];
+
+		}
+
 		return texture;
 
 	}
@@ -1887,6 +1896,13 @@ class GeometryParser {
 			if ( geoInfo.material && geoInfo.material.mappingType !== 'AllSame' ) {
 
 				materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.material )[ 0 ];
+
+				if ( materialIndex < 0 ) {
+
+					console.warn( 'THREE.FBXLoader: Invalid material index:', materialIndex );
+					materialIndex = 0;
+
+				}
 
 			}
 
@@ -3554,6 +3570,8 @@ class BinaryParser {
 						return reader2.getInt64Array( arrayLength );
 
 				}
+
+				break; // cannot happen but is required by the DeepScan
 
 			default:
 				throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );

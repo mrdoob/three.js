@@ -12,7 +12,9 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.
+			A mesh that has a [page:Skeleton] with [page:Bone bones] that can then be used to animate the vertices of the geometry.<br /><br />
+
+			[name] can only be used with WebGL 2. With WebGL 1 `OES_texture_float` and vertex textures support is required.
 		</p>
 
 		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
@@ -112,6 +114,11 @@
 		<h3>[property:Matrix4 bindMatrixInverse]</h3>
 		<p>
 		The base matrix that is used for resetting the bound bone transforms.
+		</p>
+
+		<h3>[property:Boolean isSkinnedMesh]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Skeleton skeleton]</h3>

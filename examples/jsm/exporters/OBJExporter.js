@@ -32,12 +32,6 @@ class OBJExporter {
 
 			const normalMatrixWorld = new Matrix3();
 
-			if ( geometry.isBufferGeometry !== true ) {
-
-				throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-			}
-
 			// shortcuts
 			const vertices = geometry.getAttribute( 'position' );
 			const normals = geometry.getAttribute( 'normal' );
@@ -60,9 +54,7 @@ class OBJExporter {
 
 				for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-					vertex.x = vertices.getX( i );
-					vertex.y = vertices.getY( i );
-					vertex.z = vertices.getZ( i );
+					vertex.fromBufferAttribute( vertices, i );
 
 					// transform the vertex to world space
 					vertex.applyMatrix4( mesh.matrixWorld );
@@ -80,8 +72,7 @@ class OBJExporter {
 
 				for ( let i = 0, l = uvs.count; i < l; i ++, nbVertexUvs ++ ) {
 
-					uv.x = uvs.getX( i );
-					uv.y = uvs.getY( i );
+					uv.fromBufferAttribute( uvs, i );
 
 					// transform the uv to export format
 					output += 'vt ' + uv.x + ' ' + uv.y + '\n';
@@ -98,9 +89,7 @@ class OBJExporter {
 
 				for ( let i = 0, l = normals.count; i < l; i ++, nbNormals ++ ) {
 
-					normal.x = normals.getX( i );
-					normal.y = normals.getY( i );
-					normal.z = normals.getZ( i );
+					normal.fromBufferAttribute( normals, i );
 
 					// transform the normal to world space
 					normal.applyMatrix3( normalMatrixWorld ).normalize();
@@ -164,12 +153,6 @@ class OBJExporter {
 			const geometry = line.geometry;
 			const type = line.type;
 
-			if ( geometry.isBufferGeometry !== true ) {
-
-				throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-			}
-
 			// shortcuts
 			const vertices = geometry.getAttribute( 'position' );
 
@@ -180,9 +163,7 @@ class OBJExporter {
 
 				for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-					vertex.x = vertices.getX( i );
-					vertex.y = vertices.getY( i );
-					vertex.z = vertices.getZ( i );
+					vertex.fromBufferAttribute( vertices, i );
 
 					// transform the vertex to world space
 					vertex.applyMatrix4( line.matrixWorld );
@@ -228,12 +209,6 @@ class OBJExporter {
 			let nbVertex = 0;
 
 			const geometry = points.geometry;
-
-			if ( geometry.isBufferGeometry !== true ) {
-
-				throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-			}
 
 			const vertices = geometry.getAttribute( 'position' );
 			const colors = geometry.getAttribute( 'color' );

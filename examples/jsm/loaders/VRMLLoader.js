@@ -258,19 +258,17 @@ class VRMLLoader extends Loader {
 
 			// the visitor is created dynmaically based on the given base class
 
-			function VRMLToASTVisitor() {
+			class VRMLToASTVisitor extends BaseVRMLVisitor {
 
-				BaseVRMLVisitor.call( this );
+				constructor() {
 
-				this.validateVisitor();
+					super();
 
-			}
+					this.validateVisitor();
 
-			VRMLToASTVisitor.prototype = Object.assign( Object.create( BaseVRMLVisitor.prototype ), {
+				}
 
-				constructor: VRMLToASTVisitor,
-
-				vrml: function ( ctx ) {
+				vrml( ctx ) {
 
 					const data = {
 						version: this.visit( ctx.version ),
@@ -300,15 +298,15 @@ class VRMLLoader extends Loader {
 
 					return data;
 
-				},
+				}
 
-				version: function ( ctx ) {
+				version( ctx ) {
 
 					return ctx.Version[ 0 ].image;
 
-				},
+				}
 
-				node: function ( ctx ) {
+				node( ctx ) {
 
 					const data = {
 						name: ctx.NodeName[ 0 ].image,
@@ -337,9 +335,9 @@ class VRMLLoader extends Loader {
 
 					return data;
 
-				},
+				}
 
-				field: function ( ctx ) {
+				field( ctx ) {
 
 					const data = {
 						name: ctx.Identifier[ 0 ].image,
@@ -370,33 +368,33 @@ class VRMLLoader extends Loader {
 
 					return data;
 
-				},
+				}
 
-				def: function ( ctx ) {
+				def( ctx ) {
 
 					return ( ctx.Identifier || ctx.NodeName )[ 0 ].image;
 
-				},
+				}
 
-				use: function ( ctx ) {
+				use( ctx ) {
 
 					return { USE: ( ctx.Identifier || ctx.NodeName )[ 0 ].image };
 
-				},
+				}
 
-				singleFieldValue: function ( ctx ) {
-
-					return processField( this, ctx );
-
-				},
-
-				multiFieldValue: function ( ctx ) {
+				singleFieldValue( ctx ) {
 
 					return processField( this, ctx );
 
-				},
+				}
 
-				route: function ( ctx ) {
+				multiFieldValue( ctx ) {
+
+					return processField( this, ctx );
+
+				}
+
+				route( ctx ) {
 
 					const data = {
 						FROM: ctx.RouteIdentifier[ 0 ].image,
@@ -407,7 +405,7 @@ class VRMLLoader extends Loader {
 
 				}
 
-			} );
+			}
 
 			function processField( scope, ctx ) {
 

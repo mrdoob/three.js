@@ -139,13 +139,8 @@
 			const postProcessScene = new THREE.Scene();
 			const postProcessCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
-			const renderTargetTexture = new THREE.DataTexture2DArray();
-			renderTargetTexture.format = THREE.RedFormat;
-			renderTargetTexture.type = THREE.UnsignedByteType;
-
-			const renderTarget = new THREE.WebGLRenderTarget( DIMENSIONS.width, DIMENSIONS.height );
-			renderTarget.depth = DIMENSIONS.depth;
-			renderTarget.setTexture( renderTargetTexture );
+			const renderTarget = new THREE.WebGLArrayRenderTarget( DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth );
+			renderTarget.texture.format = THREE.RedFormat;
 
 			const postProcessMaterial = new THREE.ShaderMaterial( {
 				uniforms: {
@@ -178,7 +173,7 @@
 
 				/** Post-processing scene */
 
-				const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
+				const planeGeometry = new THREE.PlaneGeometry( 2, 2 );
 				const screenQuad = new THREE.Mesh( planeGeometry, postProcessMaterial );
 				postProcessScene.add( screenQuad );
 
@@ -208,7 +203,7 @@
 						var zip = unzipSync( new Uint8Array( data ) );
 						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
-						const texture = new THREE.DataTexture2DArray( array, DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth );
+						const texture = new THREE.DataArrayTexture( array, DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth );
 						texture.format = THREE.RedFormat;
 						texture.needsUpdate = true;
 
@@ -222,7 +217,7 @@
 							fragmentShader: document.getElementById( 'fs' ).textContent.trim()
 						} );
 
-						var geometry = new THREE.PlaneBufferGeometry( planeWidth, planeHeight );
+						var geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 
 						mesh = new THREE.Mesh( geometry, material );
 
@@ -283,8 +278,7 @@
 
 			function render() {
 
-				// Step 1 - Render the input DataTexture2DArray into a
-				// DataTexture2DArray render target.
+				// Step 1 - Render the input DataArrayTexture into render target
 				renderTo2DArray();
 
 				// Step 2 - Renders the scene containing the plane with a material

@@ -1,4 +1,4 @@
-import { WebGPUSampledTexture } from '../WebGPUSampledTexture.js';
+import { WebGPUSampledTexture, WebGPUSampledCubeTexture } from '../WebGPUSampledTexture.js';
 
 class WebGPUNodeSampledTexture extends WebGPUSampledTexture {
 
@@ -18,4 +18,22 @@ class WebGPUNodeSampledTexture extends WebGPUSampledTexture {
 
 }
 
-export { WebGPUNodeSampledTexture };
+class WebGPUNodeSampledCubeTexture extends WebGPUSampledCubeTexture {
+
+	constructor( name, textureNode ) {
+
+		super( name, textureNode.value );
+
+		this.textureNode = textureNode;
+
+	}
+
+	getTexture() {
+
+		return this.textureNode.value;
+
+	}
+
+}
+
+export { WebGPUNodeSampledTexture, WebGPUNodeSampledCubeTexture };

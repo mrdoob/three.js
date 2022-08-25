@@ -59,6 +59,7 @@ import './src/core/Uniform.tests.js';
 
 
 //src/extras
+import './src/extras/DataUtils.tests.js';
 import './src/extras/ShapeUtils.tests.js';
 
 //src/extras/core
@@ -83,6 +84,7 @@ import './src/extras/curves/SplineCurve.tests.js';
 
 //src/geometries
 import './src/geometries/BoxGeometry.tests.js';
+import './src/geometries/CapsuleGeometry.tests.js';
 import './src/geometries/CircleGeometry.tests.js';
 import './src/geometries/ConeGeometry.tests.js';
 import './src/geometries/CylinderGeometry.tests.js';

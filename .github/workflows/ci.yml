@@ -12,6 +12,9 @@ on:
       - 'docs/**'
       - 'files/**'
 
+permissions:
+  contents: read
+
 jobs:
 
   lint:

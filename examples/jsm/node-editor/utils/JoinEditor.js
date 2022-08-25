@@ -1,8 +1,8 @@
 import { LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { JoinNode, FloatNode } from '../../renderers/nodes/Nodes.js';
+import { JoinNode, UniformNode } from 'three/nodes';
 
-const NULL_VALUE = new FloatNode();
+const NULL_VALUE = new UniformNode( 0 );
 
 export class JoinEditor extends BaseNode {
 

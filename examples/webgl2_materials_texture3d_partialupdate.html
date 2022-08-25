@@ -76,7 +76,7 @@
 
 				}
 
-				return new THREE.DataTexture3D( data, size, size, size );
+				return new THREE.Data3DTexture( data, size, size, size );
 
 			}
 
@@ -116,7 +116,7 @@
 
 				// Texture
 
-				const texture = new THREE.DataTexture3D(
+				const texture = new THREE.Data3DTexture(
 					new Uint8Array( INITIAL_CLOUD_SIZE * INITIAL_CLOUD_SIZE * INITIAL_CLOUD_SIZE ).fill( 0 ),
 					INITIAL_CLOUD_SIZE,
 					INITIAL_CLOUD_SIZE,

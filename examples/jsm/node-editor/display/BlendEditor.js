@@ -1,9 +1,9 @@
 import { LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { MathNode, FloatNode } from '../../renderers/nodes/Nodes.js';
+import { MathNode, UniformNode } from 'three/nodes';
 
-const NULL_VALUE = new FloatNode();
-const ONE_VALUE = new FloatNode( 1 );
+const NULL_VALUE = new UniformNode( 0 );
+const ONE_VALUE = new UniformNode( 1 );
 
 export class BlendEditor extends BaseNode {
 

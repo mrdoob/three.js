@@ -1,9 +1,7 @@
 import {
 	AdditiveBlending,
 	Color,
-	LinearFilter,
 	MeshBasicMaterial,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector2,
@@ -38,27 +36,26 @@ class UnrealBloomPass extends Pass {
 		this.clearColor = new Color( 0, 0, 0 );
 
 		// render targets
-		const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
 		this.renderTargetsHorizontal = [];
 		this.renderTargetsVertical = [];
 		this.nMips = 5;
 		let resx = Math.round( this.resolution.x / 2 );
 		let resy = Math.round( this.resolution.y / 2 );
 
-		this.renderTargetBright = new WebGLRenderTarget( resx, resy, pars );
+		this.renderTargetBright = new WebGLRenderTarget( resx, resy );
 		this.renderTargetBright.texture.name = 'UnrealBloomPass.bright';
 		this.renderTargetBright.texture.generateMipmaps = false;
 
 		for ( let i = 0; i < this.nMips; i ++ ) {
 
-			const renderTargetHorizonal = new WebGLRenderTarget( resx, resy, pars );
+			const renderTargetHorizonal = new WebGLRenderTarget( resx, resy );
 
 			renderTargetHorizonal.texture.name = 'UnrealBloomPass.h' + i;
 			renderTargetHorizonal.texture.generateMipmaps = false;
 
 			this.renderTargetsHorizontal.push( renderTargetHorizonal );
 
-			const renderTargetVertical = new WebGLRenderTarget( resx, resy, pars );
+			const renderTargetVertical = new WebGLRenderTarget( resx, resy );
 
 			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
 			renderTargetVertical.texture.generateMipmaps = false;
@@ -357,7 +354,6 @@ class UnrealBloomPass extends Pass {
 				'blurTexture3': { value: null },
 				'blurTexture4': { value: null },
 				'blurTexture5': { value: null },
-				'dirtTexture': { value: null },
 				'bloomStrength': { value: 1.0 },
 				'bloomFactors': { value: null },
 				'bloomTintColors': { value: null },
@@ -378,7 +374,6 @@ class UnrealBloomPass extends Pass {
 				uniform sampler2D blurTexture3;
 				uniform sampler2D blurTexture4;
 				uniform sampler2D blurTexture5;
-				uniform sampler2D dirtTexture;
 				uniform float bloomStrength;
 				uniform float bloomRadius;
 				uniform float bloomFactors[NUM_MIPS];

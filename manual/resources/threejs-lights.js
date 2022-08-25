@@ -42,7 +42,6 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
       const controls = new OrbitControls(camera, elem);
       controls.enableDamping = true;
       controls.enablePanning = false;
-      controls.enableKeys = false;
       scene.background = new THREE.Color('black');
       {
         const mesh = new THREE.Mesh(cubeGeo, cubeMat);

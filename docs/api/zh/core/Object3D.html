@@ -55,6 +55,11 @@
 	<h3>[property:Integer id]</h3>
 	<p>只读 —— 表示该对象实例ID的唯一数字。</p>
 
+		<h3>[property:Boolean isObject3D]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 	<h3>[property:Layers layers]</h3>
 	<p>
 		物体的层级关系。
@@ -73,6 +78,12 @@
 	<h3>[property:Matrix4 matrixWorld]</h3>
 	<p>
 		物体的世界变换。若这个Object3D没有父级，则它将和local transform [page:.matrix]（局部变换矩阵）相同。
+	</p>
+
+	<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+	<p>
+	Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
+	When it isn't, then you have to maintain all matrices in the object and its children yourself.
 	</p>
 
 	<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
@@ -194,7 +205,7 @@
 
 	<h2>方法</h2>
 
-	<h3>[page:EventDispatcher EventDispatcher] 方法在这个类上是可用的。</h3>
+	<p>[page:EventDispatcher EventDispatcher] 在该类上可用的所有方法。</p>
 
 	<h3>[method:this add]( [param:Object3D object], ... )</h3>
 	<p>

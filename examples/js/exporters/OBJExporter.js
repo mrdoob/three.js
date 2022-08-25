@@ -20,14 +20,7 @@
 				let nbNormals = 0;
 				let nbVertexUvs = 0;
 				const geometry = mesh.geometry;
-				const normalMatrixWorld = new THREE.Matrix3();
-
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				} // shortcuts
-
+				const normalMatrixWorld = new THREE.Matrix3(); // shortcuts
 
 				const vertices = geometry.getAttribute( 'position' );
 				const normals = geometry.getAttribute( 'normal' );
@@ -47,9 +40,7 @@
 
 					for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i ); // transform the vertex to world space
+						vertex.fromBufferAttribute( vertices, i ); // transform the vertex to world space
 
 						vertex.applyMatrix4( mesh.matrixWorld ); // transform the vertex to export format
 
@@ -64,8 +55,7 @@
 
 					for ( let i = 0, l = uvs.count; i < l; i ++, nbVertexUvs ++ ) {
 
-						uv.x = uvs.getX( i );
-						uv.y = uvs.getY( i ); // transform the uv to export format
+						uv.fromBufferAttribute( uvs, i ); // transform the uv to export format
 
 						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
 
@@ -80,9 +70,7 @@
 
 					for ( let i = 0, l = normals.count; i < l; i ++, nbNormals ++ ) {
 
-						normal.x = normals.getX( i );
-						normal.y = normals.getY( i );
-						normal.z = normals.getZ( i ); // transform the normal to world space
+						normal.fromBufferAttribute( normals, i ); // transform the normal to world space
 
 						normal.applyMatrix3( normalMatrixWorld ).normalize(); // transform the normal to export format
 
@@ -138,14 +126,7 @@
 
 				let nbVertex = 0;
 				const geometry = line.geometry;
-				const type = line.type;
-
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				} // shortcuts
-
+				const type = line.type; // shortcuts
 
 				const vertices = geometry.getAttribute( 'position' ); // name of the line object
 
@@ -155,9 +136,7 @@
 
 					for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i ); // transform the vertex to world space
+						vertex.fromBufferAttribute( vertices, i ); // transform the vertex to world space
 
 						vertex.applyMatrix4( line.matrixWorld ); // transform the vertex to export format
 
@@ -200,13 +179,6 @@
 
 				let nbVertex = 0;
 				const geometry = points.geometry;
-
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				}
-
 				const vertices = geometry.getAttribute( 'position' );
 				const colors = geometry.getAttribute( 'color' );
 				output += 'o ' + points.name + '\n';
@@ -230,17 +202,18 @@
 
 					}
 
-				}
+					output += 'p ';
 
-				output += 'p ';
+					for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
 
-				for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
+						output += indexVertex + j + ' ';
 
-					output += indexVertex + j + ' ';
+					}
 
-				}
+					output += '\n';
 
-				output += '\n'; // update index
+				} // update index
+
 
 				indexVertex += nbVertex;
 

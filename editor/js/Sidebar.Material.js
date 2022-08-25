@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { UIButton, UIInput, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
+import { UIButton, UIInput, UIPanel, UIRow, UISelect, UIText, UITextArea } from './libs/ui.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
@@ -10,6 +10,7 @@ import { SidebarMaterialColorProperty } from './Sidebar.Material.ColorProperty.j
 import { SidebarMaterialConstantProperty } from './Sidebar.Material.ConstantProperty.js';
 import { SidebarMaterialMapProperty } from './Sidebar.Material.MapProperty.js';
 import { SidebarMaterialNumberProperty } from './Sidebar.Material.NumberProperty.js';
+import { SidebarMaterialRangeValueProperty } from './Sidebar.Material.RangeValueProperty.js';
 import { SidebarMaterialProgram } from './Sidebar.Material.Program.js';
 
 function SidebarMaterial( editor ) {
@@ -130,6 +131,21 @@ function SidebarMaterial( editor ) {
 	const materialClearcoatRoughness = new SidebarMaterialNumberProperty( editor, 'clearcoatRoughness', strings.getKey( 'sidebar/material/clearcoatroughness' ), [ 0, 1 ] );
 	container.add( materialClearcoatRoughness );
 
+	// iridescence
+
+	const materialIridescence = new SidebarMaterialNumberProperty( editor, 'iridescence', strings.getKey( 'sidebar/material/iridescence' ), [ 0, 1 ] );
+	container.add( materialIridescence );
+
+	// iridescenceIOR
+
+	const materialIridescenceIOR = new SidebarMaterialNumberProperty( editor, 'iridescenceIOR', strings.getKey( 'sidebar/material/iridescenceIOR' ), [ 1, 5 ] );
+	container.add( materialIridescenceIOR );
+
+	// iridescenceThicknessMax
+
+	const materialIridescenceThicknessMax = new SidebarMaterialRangeValueProperty( editor, 'iridescenceThicknessRange', strings.getKey( 'sidebar/material/iridescenceThicknessMax' ), false, [ 0, Infinity ], 0, 10, 1, 'nm' );
+	container.add( materialIridescenceThicknessMax );
+
 	// transmission
 
 	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
@@ -219,6 +235,16 @@ function SidebarMaterial( editor ) {
 
 	const materialMetalnessMap = new SidebarMaterialMapProperty( editor, 'metalnessMap', strings.getKey( 'sidebar/material/metalnessmap' ) );
 	container.add( materialMetalnessMap );
+
+	// iridescence map
+
+	const materialIridescenceMap = new SidebarMaterialMapProperty( editor, 'iridescenceMap', strings.getKey( 'sidebar/material/iridescencemap' ) );
+	container.add( materialIridescenceMap );
+
+	// iridescence thickness map
+
+	const materialIridescenceThicknessMap = new SidebarMaterialMapProperty( editor, 'iridescenceThicknessMap', strings.getKey( 'sidebar/material/iridescencethicknessmap' ) );
+	container.add( materialIridescenceThicknessMap );
 
 	// env map
 
@@ -310,6 +336,33 @@ function SidebarMaterial( editor ) {
 	const materialWireframe = new SidebarMaterialBooleanProperty( editor, 'wireframe', strings.getKey( 'sidebar/material/wireframe' ) );
 	container.add( materialWireframe );
 
+	// userData
+
+	const materialUserDataRow = new UIRow();
+	const materialUserData = new UITextArea().setWidth( '150px' ).setHeight( '40px' ).setFontSize( '12px' ).onChange( update );
+	materialUserData.onKeyUp( function () {
+
+		try {
+
+			JSON.parse( materialUserData.getValue() );
+
+			materialUserData.dom.classList.add( 'success' );
+			materialUserData.dom.classList.remove( 'fail' );
+
+		} catch ( error ) {
+
+			materialUserData.dom.classList.remove( 'success' );
+			materialUserData.dom.classList.add( 'fail' );
+
+		}
+
+	} );
+
+	materialUserDataRow.add( new UIText( strings.getKey( 'sidebar/material/userdata' ) ).setWidth( '90px' ) );
+	materialUserDataRow.add( materialUserData );
+
+	container.add( materialUserDataRow );
+
 	//
 
 	function update() {
@@ -359,6 +412,21 @@ function SidebarMaterial( editor ) {
 				// Also there should be means to create a unique
 				// copy for the current object explicitly and to
 				// attach the current material to other objects.
+
+			}
+
+			try {
+
+				const userData = JSON.parse( materialUserData.getValue() );
+				if ( JSON.stringify( material.userData ) != JSON.stringify( userData ) ) {
+
+					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'userData', userData, currentMaterialSlot ) );
+
+				}
+
+			} catch ( exception ) {
+
+				console.warn( exception );
 
 			}
 
@@ -443,6 +511,19 @@ function SidebarMaterial( editor ) {
 		materialClass.setValue( material.type );
 
 		setRowVisibility();
+
+		try {
+
+			materialUserData.setValue( JSON.stringify( material.userData, null, '  ' ) );
+
+		} catch ( error ) {
+
+			console.log( error );
+
+		}
+
+		materialUserData.setBorderColor( 'transparent' );
+		materialUserData.setBackgroundColor( '' );
 
 	}
 

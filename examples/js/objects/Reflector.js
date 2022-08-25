@@ -5,13 +5,16 @@
 		constructor( geometry, options = {} ) {
 
 			super( geometry );
+			this.isReflector = true;
 			this.type = 'Reflector';
+			this.camera = new THREE.PerspectiveCamera();
 			const scope = this;
 			const color = options.color !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
 			const textureWidth = options.textureWidth || 512;
 			const textureHeight = options.textureHeight || 512;
 			const clipBias = options.clipBias || 0;
-			const shader = options.shader || Reflector.ReflectorShader; //
+			const shader = options.shader || Reflector.ReflectorShader;
+			const multisample = options.multisample !== undefined ? options.multisample : 4; //
 
 			const reflectorPlane = new THREE.Plane();
 			const normal = new THREE.Vector3();
@@ -24,8 +27,11 @@
 			const target = new THREE.Vector3();
 			const q = new THREE.Vector4();
 			const textureMatrix = new THREE.Matrix4();
-			const virtualCamera = new THREE.PerspectiveCamera();
-			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight );
+			const virtualCamera = this.camera;
+			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, {
+				samples: multisample,
+				type: THREE.HalfFloatType
+			} );
 			const material = new THREE.ShaderMaterial( {
 				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
 				fragmentShader: shader.fragmentShader,
@@ -87,15 +93,18 @@
 				projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
 				projectionMatrix.elements[ 14 ] = clipPlane.w; // Render
 
-				renderTarget.texture.encoding = renderer.outputEncoding;
 				scope.visible = false;
 				const currentRenderTarget = renderer.getRenderTarget();
 				const currentXrEnabled = renderer.xr.enabled;
 				const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+				const currentOutputEncoding = renderer.outputEncoding;
+				const currentToneMapping = renderer.toneMapping;
 				renderer.xr.enabled = false; // Avoid camera modification
 
 				renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
+				renderer.outputEncoding = THREE.LinearEncoding;
+				renderer.toneMapping = THREE.NoToneMapping;
 				renderer.setRenderTarget( renderTarget );
 				renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 
@@ -103,6 +112,8 @@
 				renderer.render( scene, virtualCamera );
 				renderer.xr.enabled = currentXrEnabled;
 				renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+				renderer.outputEncoding = currentOutputEncoding;
+				renderer.toneMapping = currentToneMapping;
 				renderer.setRenderTarget( currentRenderTarget ); // Restore viewport
 
 				const viewport = camera.viewport;
@@ -134,7 +145,6 @@
 
 	}
 
-	Reflector.prototype.isReflector = true;
 	Reflector.ReflectorShader = {
 		uniforms: {
 			'color': {
@@ -192,6 +202,9 @@
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <tonemapping_fragment>
+			#include <encodings_fragment>
 
 		}`
 	};

@@ -51,11 +51,6 @@
 
 				scene = new THREE.Scene();
 
-				// Lights
-
-				const ambient = new THREE.AmbientLight( 0xffffff );
-				scene.add( ambient );
-
 				// Textures
 
 				const loader = new THREE.CubeTextureLoader();
@@ -75,7 +70,7 @@
 				//
 
 				const geometry = new THREE.IcosahedronGeometry( 400, 15 );
-				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
+				sphereMaterial = new THREE.MeshBasicMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 				scene.add( sphereMesh );
 

@@ -12,6 +12,7 @@ uniform float scale;
 void main() {
 
 	#include <color_vertex>
+	#include <morphcolor_vertex>
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <project_vertex>

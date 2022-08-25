@@ -16,9 +16,6 @@ class TrackballControls extends EventDispatcher {
 
 		super();
 
-		if ( domElement === undefined ) console.warn( 'THREE.TrackballControls: The second parameter "domElement" is now mandatory.' );
-		if ( domElement === document ) console.error( 'THREE.TrackballControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
-
 		const scope = this;
 		const STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
@@ -703,7 +700,7 @@ class TrackballControls extends EventDispatcher {
 
 				case 2:
 					_state = STATE.TOUCH_ZOOM_PAN;
-					_moveCurr.copy( getMouseOnCircle( event.pageX - _movePrev.pageX, event.pageY - _movePrev.pageY ) );
+					_moveCurr.copy( getMouseOnCircle( event.pageX - _movePrev.x, event.pageY - _movePrev.y ) );
 					_movePrev.copy( _moveCurr );
 					break;
 

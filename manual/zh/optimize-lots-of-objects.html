@@ -157,7 +157,7 @@ function hsl(h, s, l) {
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/images/world.jpg', render);
-  const geometry = new THREE.SphereBufferGeometry(1, 64, 32);
+  const geometry = new THREE.SphereGeometry(1, 64, 32);
   const material = new THREE.MeshBasicMaterial({map: texture});
   scene.add(new THREE.Mesh(geometry, material));
 }
@@ -173,7 +173,7 @@ function hsl(h, s, l) {
   const boxWidth = 1;
   const boxHeight = 1;
   const boxDepth = 1;
-  const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
   // 沿着z轴缩放
   geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
@@ -274,7 +274,7 @@ function hsl(h, s, l) {
 -  const boxWidth = 1;
 -  const boxHeight = 1;
 -  const boxDepth = 1;
--  const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 -  // 沿着Z轴缩放
 -  geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
@@ -315,7 +315,7 @@ function hsl(h, s, l) {
 +      const boxWidth = 1;
 +      const boxHeight = 1;
 +      const boxDepth = 1;
-+      const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
++      const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
       // 调整位置辅助器的指向
       lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
@@ -372,7 +372,7 @@ data.forEach((row, latNdx) =&gt; {
     const boxWidth = 1;
     const boxHeight = 1;
     const boxDepth = 1;
-    const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
+    const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
     latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;

@@ -18,14 +18,9 @@
 			this.pulsePeriod = 0;
 			this._visibilityCache = new Map();
 			this.resolution = resolution !== undefined ? new THREE.Vector2( resolution.x, resolution.y ) : new THREE.Vector2( 256, 256 );
-			const pars = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBAFormat
-			};
 			const resx = Math.round( this.resolution.x / this.downSampleRatio );
 			const resy = Math.round( this.resolution.y / this.downSampleRatio );
-			this.renderTargetMaskBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
+			this.renderTargetMaskBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y );
 			this.renderTargetMaskBuffer.texture.name = 'OutlinePass.mask';
 			this.renderTargetMaskBuffer.texture.generateMipmaps = false;
 			this.depthMaterial = new THREE.MeshDepthMaterial();
@@ -35,23 +30,23 @@
 			this.prepareMaskMaterial = this.getPrepareMaskMaterial();
 			this.prepareMaskMaterial.side = THREE.DoubleSide;
 			this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ( this.prepareMaskMaterial.fragmentShader, this.renderCamera );
-			this.renderTargetDepthBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
+			this.renderTargetDepthBuffer = new THREE.WebGLRenderTarget( this.resolution.x, this.resolution.y );
 			this.renderTargetDepthBuffer.texture.name = 'OutlinePass.depth';
 			this.renderTargetDepthBuffer.texture.generateMipmaps = false;
-			this.renderTargetMaskDownSampleBuffer = new THREE.WebGLRenderTarget( resx, resy, pars );
+			this.renderTargetMaskDownSampleBuffer = new THREE.WebGLRenderTarget( resx, resy );
 			this.renderTargetMaskDownSampleBuffer.texture.name = 'OutlinePass.depthDownSample';
 			this.renderTargetMaskDownSampleBuffer.texture.generateMipmaps = false;
-			this.renderTargetBlurBuffer1 = new THREE.WebGLRenderTarget( resx, resy, pars );
+			this.renderTargetBlurBuffer1 = new THREE.WebGLRenderTarget( resx, resy );
 			this.renderTargetBlurBuffer1.texture.name = 'OutlinePass.blur1';
 			this.renderTargetBlurBuffer1.texture.generateMipmaps = false;
-			this.renderTargetBlurBuffer2 = new THREE.WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), pars );
+			this.renderTargetBlurBuffer2 = new THREE.WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ) );
 			this.renderTargetBlurBuffer2.texture.name = 'OutlinePass.blur2';
 			this.renderTargetBlurBuffer2.texture.generateMipmaps = false;
 			this.edgeDetectionMaterial = this.getEdgeDetectionMaterial();
-			this.renderTargetEdgeBuffer1 = new THREE.WebGLRenderTarget( resx, resy, pars );
+			this.renderTargetEdgeBuffer1 = new THREE.WebGLRenderTarget( resx, resy );
 			this.renderTargetEdgeBuffer1.texture.name = 'OutlinePass.edge1';
 			this.renderTargetEdgeBuffer1.texture.generateMipmaps = false;
-			this.renderTargetEdgeBuffer2 = new THREE.WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), pars );
+			this.renderTargetEdgeBuffer2 = new THREE.WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ) );
 			this.renderTargetEdgeBuffer2.texture.name = 'OutlinePass.edge2';
 			this.renderTargetEdgeBuffer2.texture.generateMipmaps = false;
 			const MAX_EDGE_THICKNESS = 4;
@@ -389,9 +384,9 @@
 					#include <morphtarget_vertex>
 					#include <skinning_vertex>
 					#include <project_vertex>
+					#include <worldpos_vertex>
 
 					vPosition = mvPosition;
-					vec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );
 					projTexCoord = textureMatrix * worldPosition;
 
 				}`,
@@ -502,12 +497,14 @@
 
 				void main() {
 					vec2 invSize = 1.0 / texSize;
-					float weightSum = gaussianPdf(0.0, kernelRadius);
+					float sigma = kernelRadius/2.0;
+					float weightSum = gaussianPdf(0.0, sigma);
 					vec4 diffuseSum = texture2D( colorTexture, vUv) * weightSum;
 					vec2 delta = direction * invSize * kernelRadius/float(MAX_RADIUS);
 					vec2 uvOffset = delta;
 					for( int i = 1; i <= MAX_RADIUS; i ++ ) {
-						float w = gaussianPdf(uvOffset.x, kernelRadius);
+						float x = kernelRadius * float(i) / float(MAX_RADIUS);
+						float w = gaussianPdf(x, sigma);
 						vec4 sample1 = texture2D( colorTexture, vUv + uvOffset);
 						vec4 sample2 = texture2D( colorTexture, vUv - uvOffset);
 						diffuseSum += ((sample1 + sample2) * w);

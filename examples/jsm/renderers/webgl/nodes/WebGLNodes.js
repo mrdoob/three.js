@@ -1,5 +1,5 @@
 import { WebGLNodeBuilder } from './WebGLNodeBuilder.js';
-import NodeFrame from '../../nodes/core/NodeFrame.js';
+import { NodeFrame } from 'three/nodes';
 
 import { Material } from 'three';
 
@@ -8,7 +8,11 @@ export const nodeFrame = new NodeFrame();
 
 Material.prototype.onBuild = function ( object, parameters, renderer ) {
 
-	builders.set( this, new WebGLNodeBuilder( object, renderer, parameters ).build() );
+	if ( object.material.isNodeMaterial === true ) {
+
+		builders.set( this, new WebGLNodeBuilder( object, renderer, parameters ).build() );
+
+	}
 
 };
 
@@ -23,9 +27,20 @@ Material.prototype.onBeforeRender = function ( renderer, scene, camera, geometry
 		nodeFrame.object = object;
 		nodeFrame.renderer = renderer;
 
-		for ( const node of nodeBuilder.updateNodes ) {
+		const updateNodes = nodeBuilder.updateNodes;
 
-			nodeFrame.updateNode( node );
+		if ( updateNodes.length > 0 ) {
+
+			// force refresh material uniforms
+			renderer.state.useProgram( null );
+
+			//this.uniformsNeedUpdate = true;
+
+			for ( const node of updateNodes ) {
+
+				nodeFrame.updateNode( node );
+
+			}
 
 		}
 

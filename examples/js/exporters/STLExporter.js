@@ -22,13 +22,6 @@
 				if ( object.isMesh ) {
 
 					const geometry = object.geometry;
-
-					if ( geometry.isBufferGeometry !== true ) {
-
-						throw new Error( 'THREE.STLExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-					}
-
 					const index = geometry.index;
 					const positionAttribute = geometry.getAttribute( 'position' );
 					triangles += index !== null ? index.count / 3 : positionAttribute.count / 3;

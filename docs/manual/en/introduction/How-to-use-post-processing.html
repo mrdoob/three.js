@@ -58,8 +58,8 @@
 
 		<p>
 			Our composer is now ready so it's possible to configure the chain of post-processing passes. These passes are responsible for creating
-			the final visual output of the application. They are processed in order of their addition/insertion. In our example, the instance of *RenderPass*
-			is executed first and then the instance of *GlitchPass*. The last enabled pass in the chain is automatically rendered to the screen. The setup
+			the final visual output of the application. They are processed in order of their addition/insertion. In our example, the instance of `RenderPass`
+			is executed first and then the instance of `GlitchPass`. The last enabled pass in the chain is automatically rendered to the screen. The setup
 			of the passes looks like so:
 		</p>
 
@@ -72,8 +72,8 @@
 		</code>
 
 		<p>
-			*RenderPass* is normally placed at the beginning of the chain in order to provide the rendered scene as an input for the next post-processing step. In our case,
-			*GlitchPass* is going to use these image data to apply a wild glitch effect. Check out this [link:https://threejs.org/examples/webgl_postprocessing_glitch live example]
+			`RenderPass` is normally placed at the beginning of the chain in order to provide the rendered scene as an input for the next post-processing step. In our case,
+			`GlitchPass` is going to use these image data to apply a wild glitch effect. Check out this [link:https://threejs.org/examples/webgl_postprocessing_glitch live example]
 			to see it in action.
 		</p>
 
@@ -88,7 +88,7 @@
 
 		<p>
 			Sometimes you want to write a custom post-processing shader and include it into the chain of post-processing passes. For this scenario,
-			you can utilize *ShaderPass*. After importing the file and your custom shader, you can use the following code to setup the pass.
+			you can utilize `ShaderPass`. After importing the file and your custom shader, you can use the following code to setup the pass.
 		</p>
 
 		<code>
@@ -103,7 +103,7 @@
 
 		<p>
 			The repository provides a file called [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/shaders/CopyShader.js CopyShader] which is a
-			good starting code for your own custom shader. *CopyShader* just copies the image contents of the [page:EffectComposer]'s read buffer
+			good starting code for your own custom shader. `CopyShader` just copies the image contents of the [page:EffectComposer]'s read buffer
 			to its write buffer without applying any effects.
 		</p>
 

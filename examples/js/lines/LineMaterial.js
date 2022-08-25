@@ -218,7 +218,7 @@
 				vec4 clip = projectionMatrix * worldPos;
 
 				// shift the depth of the projected points so the line
-				// segements overlap neatly
+				// segments overlap neatly
 				vec3 clipPose = ( position.y < 0.5 ) ? ndcStart : ndcEnd;
 				clip.z = clipPose.z * clip.w;
 
@@ -445,6 +445,7 @@
 				clipping: true // required for clipping support
 
 			} );
+			this.isLineMaterial = true;
 			Object.defineProperties( this, {
 				color: {
 					enumerable: true,
@@ -635,8 +636,6 @@
 		}
 
 	}
-
-	LineMaterial.prototype.isLineMaterial = true;
 
 	THREE.LineMaterial = LineMaterial;
 

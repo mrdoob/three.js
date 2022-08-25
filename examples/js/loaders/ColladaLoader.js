@@ -2805,7 +2805,7 @@
 							const param = child.getElementsByTagName( 'param' )[ 0 ];
 							data.axis = param.textContent;
 							const tmpJointIndex = data.axis.split( 'inst_' ).pop().split( 'axis' )[ 0 ];
-							data.jointIndex = tmpJointIndex.substr( 0, tmpJointIndex.length - 1 );
+							data.jointIndex = tmpJointIndex.substring( 0, tmpJointIndex.length - 1 );
 							break;
 
 					}
@@ -3793,6 +3793,7 @@
 
 			if ( asset.upAxis === 'Z_UP' ) {
 
+				console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
 				scene.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) );
 
 			}

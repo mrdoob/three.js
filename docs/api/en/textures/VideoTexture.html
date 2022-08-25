@@ -14,7 +14,7 @@
 		<p class="desc">
 		Creates a texture for use with a video texture.<br /><br />
 
-		This is almost the same as the base [page:Texture Texture] class, except that it continuously sets [page:Texture.needsUpdate needsUpdate] to *true* so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
+		This is almost the same as the base [page:Texture Texture] class, except that it continuously sets [page:Texture.needsUpdate needsUpdate] to `true` so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
 		</p>
 
 		<h2>Code Example</h2>
@@ -51,7 +51,7 @@
 
 		[page:Constant format] -- The default is [page:Textures THREE.RGBAFormat].
 		See [page:Textures format constants] for other choices.<br />
-	
+
 		[page:Constant type] -- Default is [page:Textures THREE.UnsignedByteType].
 		See [page:Textures type constants] for other choices.<br />
 
@@ -67,6 +67,16 @@
 		See the base [page:Texture Texture] class for common properties.
 		</p>
 
+		<h3>[property:Boolean generateMipmaps]</h3>
+		<p>
+		Whether to generate mipmaps. False by default.
+		</p>
+
+		<h3>[property:Boolean isVideoTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
 		You will not need to set this manually here as it is handled by the [page:VideoTexture.update update] method.
@@ -80,7 +90,7 @@
 
 		<h3>[method:undefined update]()</h3>
 		<p>
-		This is called automatically and sets [property:Boolean needsUpdate] to *true* every time
+		This is called automatically and sets [page:VideoTexture.needsUpdate .needsUpdate] to `true` every time
 		a new frame is available.
 		</p>
 

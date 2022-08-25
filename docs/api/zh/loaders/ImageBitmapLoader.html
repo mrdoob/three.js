@@ -18,10 +18,7 @@
 		</p>
 
 		<p>
-			Note that [page:Texture.flipY] and [page:Texture.premultiplyAlpha] with [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] are ignored.
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] needs these configuration on bitmap creation
-			unlike regular images need them on uploading to GPU. You need to set the equivalent options via [page:ImageBitmapLoader.setOptions]
-			instead. Refer to [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] for the detail.
+			值得注意的是 [page:Texture.flipY] 和 [page:Texture.premultiplyAlpha] 在 [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] 中会被忽略。不像常规图像上传到 GPU 时需要这些配置，[link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap] 是创建位图时需要它们。比如你需要通过 [page:ImageBitmapLoader.setOptions] 来设置等效的选项。详情请参阅 [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] 规范。
 		</p>
 
 		<h2>代码示例</h2>
@@ -71,6 +68,11 @@
 
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h3>[property:Boolean isImageBitmapLoader]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 
 		<h3>[property:String options]</h3>

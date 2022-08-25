@@ -18,8 +18,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.FrontSide, 0, 'FrontSide is equal to 0' );
 		assert.equal( Constants.BackSide, 1, 'BackSide is equal to 1' );
 		assert.equal( Constants.DoubleSide, 2, 'DoubleSide is equal to 2' );
-		assert.equal( Constants.FlatShading, 1, 'FlatShading is equal to 1' );
-		assert.equal( Constants.SmoothShading, 2, 'SmoothShading is equal to 2' );
 		assert.equal( Constants.NoBlending, 0, 'NoBlending is equal to 0' );
 		assert.equal( Constants.NormalBlending, 1, 'NormalBlending is equal to 1' );
 		assert.equal( Constants.AdditiveBlending, 2, 'AdditiveBlending is equal to 2' );
@@ -64,7 +62,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.EquirectangularReflectionMapping, 303, 'EquirectangularReflectionMapping is equal to 303' );
 		assert.equal( Constants.EquirectangularRefractionMapping, 304, 'EquirectangularRefractionMapping is equal to 304' );
 		assert.equal( Constants.CubeUVReflectionMapping, 306, 'CubeUVReflectionMapping is equal to 306' );
-		assert.equal( Constants.CubeUVRefractionMapping, 307, 'CubeUVRefractionMapping is equal to 307' );
 		assert.equal( Constants.RepeatWrapping, 1000, 'RepeatWrapping is equal to 1000' );
 		assert.equal( Constants.ClampToEdgeWrapping, 1001, 'ClampToEdgeWrapping is equal to 1001' );
 		assert.equal( Constants.MirroredRepeatWrapping, 1002, 'MirroredRepeatWrapping is equal to 1002' );

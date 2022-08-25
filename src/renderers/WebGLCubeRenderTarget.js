@@ -1,4 +1,4 @@
-import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending, RGBAFormat } from '../constants.js';
+import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
 import { BoxGeometry } from '../geometries/BoxGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
@@ -12,6 +12,8 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 	constructor( size, options = {} ) {
 
 		super( size, size, options );
+
+		this.isWebGLCubeRenderTarget = true;
 
 		const image = { width: size, height: size, depth: 1 };
 		const images = [ image, image, image, image, image, image ];
@@ -36,7 +38,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 	fromEquirectangularTexture( renderer, texture ) {
 
 		this.texture.type = texture.type;
-		this.texture.format = RGBAFormat; // see #18859
 		this.texture.encoding = texture.encoding;
 
 		this.texture.generateMipmaps = texture.generateMipmaps;
@@ -141,7 +142,5 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 	}
 
 }
-
-WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
 export { WebGLCubeRenderTarget };

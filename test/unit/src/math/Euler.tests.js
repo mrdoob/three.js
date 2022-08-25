@@ -200,25 +200,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'set/setFromVector3/toVector3', ( assert ) => {
-
-			var a = new Euler();
-
-			a.set( 0, 1, 0, 'ZYX' );
-			assert.ok( a.equals( eulerAzyx ), 'Passed!' );
-			assert.ok( ! a.equals( eulerAxyz ), 'Passed!' );
-			assert.ok( ! a.equals( eulerZero ), 'Passed!' );
-
-			var vec = new Vector3( 0, 1, 0 );
-
-			var b = new Euler().setFromVector3( vec, 'ZYX' );
-			assert.ok( a.equals( b ), 'Passed!' );
-
-			var c = b.toVector3();
-			assert.ok( c.equals( vec ), 'Passed!' );
-
-		} );
-
 		QUnit.test( 'clone/copy/equals', ( assert ) => {
 
 			var a = eulerAxyz.clone();
@@ -429,6 +410,17 @@ export default QUnit.module( 'Maths', () => {
 
 			a._onChangeCallback();
 			assert.ok( b, 'Passed!' );
+
+		} );
+
+		QUnit.test( 'iterable', ( assert ) => {
+
+			var e = new Euler( 0.5, 0.75, 1, 'YZX' );
+			var array = [ ...e ];
+			assert.strictEqual( array[ 0 ], 0.5, 'Euler is iterable.' );
+			assert.strictEqual( array[ 1 ], 0.75, 'Euler is iterable.' );
+			assert.strictEqual( array[ 2 ], 1, 'Euler is iterable.' );
+			assert.strictEqual( array[ 3 ], 'YZX', 'Euler is iterable.' );
 
 		} );
 
