@@ -1166,10 +1166,56 @@
 				"QuaternionKeyframeTrack": "api/it/animation/tracks/QuaternionKeyframeTrack",
 				"StringKeyframeTrack": "api/it/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/it/animation/tracks/VectorKeyframeTrack"
+			},
+
+      "Audio": {
+        "Audio": "api/it/audio/Audio",
+        "AudioAnalyser": "api/it/audio/AudioAnalyser",
+        "AudioContext": "api/it/audio/AudioContext",
+        "AudioListener": "api/it/audio/AudioListener",
+        "PositionalAudio": "api/it/audio/PositionalAudio"
+		  },
+
+      "Telecamere": {
+				"ArrayCamera": "api/it/cameras/ArrayCamera",
+				"Camera": "api/it/cameras/Camera",
+				"CubeCamera": "api/it/cameras/CubeCamera",
+				"OrthographicCamera": "api/it/cameras/OrthographicCamera",
+				"PerspectiveCamera": "api/it/cameras/PerspectiveCamera",
+				"StereoCamera": "api/it/cameras/StereoCamera"
+			},
+
+      "Costanti": {
+				"Animazione": "api/it/constants/Animation",
+				"Core": "api/it/constants/Core",
+				"CustomBlendingEquation": "api/it/constants/CustomBlendingEquations",
+				"BufferAttributeUsage": "api/it/constants/BufferAttributeUsage",
+				"Materiali": "api/it/constants/Materials",
+				"Renderer": "api/it/constants/Renderer",
+				"Texture": "api/it/constants/Textures"
+			},
+
+      "Core": {
+				"BufferAttribute": "api/it/core/BufferAttribute",
+				"BufferGeometry": "api/it/core/BufferGeometry",
+				"Clock": "api/it/core/Clock",
+				"EventDispatcher": "api/it/core/EventDispatcher",
+				"GLBufferAttribute": "api/it/core/GLBufferAttribute",
+				"InstancedBufferAttribute": "api/it/core/InstancedBufferAttribute",
+				"InstancedBufferGeometry": "api/it/core/InstancedBufferGeometry",
+				"InstancedInterleavedBuffer": "api/it/core/InstancedInterleavedBuffer",
+				"InterleavedBuffer": "api/it/core/InterleavedBuffer",
+				"InterleavedBufferAttribute": "api/it/core/InterleavedBufferAttribute",
+				"Layers": "api/it/core/Layers",
+				"Object3D": "api/it/core/Object3D",
+				"Raycaster": "api/it/core/Raycaster",
+				"Uniform": "api/it/core/Uniform"
+			},
+
+			"Core / BufferAttributes": {
+				"BufferAttribute Types": "api/it/core/bufferAttributeTypes/BufferAttributeTypes"
 			}
-
-		}
-
+    }
 	},
 	"pt-br": {
 
