@@ -32,9 +32,21 @@
 			-1.0,  1.0,  1.0,
 			-1.0, -1.0,  1.0
 		] );
-
+		// define normals for each vertex - in this case the square is facing us.
+		// normals are required for mesh materials to render visibly
+		const normals = new Float32Array( [
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+			
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+		] );
+			
 		// itemSize = 3 because there are 3 values (components) per vertex
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 		const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		const mesh = new THREE.Mesh( geometry, material );
 		</code>
