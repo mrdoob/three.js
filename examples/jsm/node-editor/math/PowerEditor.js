@@ -1,6 +1,6 @@
 import { LabelElement, NumberInput } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { MathNode, UniformNode } from 'three-nodes/Nodes.js';
+import { MathNode, UniformNode } from 'three/nodes';
 
 export class PowerEditor extends BaseNode {
 

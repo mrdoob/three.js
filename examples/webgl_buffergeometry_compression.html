@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,12 +29,12 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import * as GeometryCompressionUtils from './jsm/utils/GeometryCompressionUtils.js';
-			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import * as GeometryCompressionUtils from 'three/addons/utils/GeometryCompressionUtils.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			const statsEnabled = true;
 

@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,13 +29,15 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let renderer, scene, camera;
 
 			let spotLight, lightHelper, shadowCameraHelper;
+
+			let textureUrls, textures;
 
 			let gui;
 
@@ -63,6 +66,18 @@
 
 				const ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
+
+				const textureLoader = new THREE.TextureLoader();
+				textureUrls = [ 'none', 'uv_grid_opengl.jpg', 'sprite2.png', 'colors.png' ];
+				textures = { none: null }
+
+				for ( let i = 1; i < textureUrls.length; i ++ ) {
+
+					textures[ textureUrls[ i ] ] = textureLoader.load( 'textures/' + textureUrls[ i ] );
+					textures[ textureUrls[ i ] ].minFilter = THREE.LinearFilter;
+					textures[ textureUrls[ i ] ].magFilter = THREE.LinearFilter;
+
+				}
 
 				spotLight = new THREE.SpotLight( 0xffffff, 1 );
 				spotLight.position.set( 15, 40, 35 );
@@ -144,7 +159,8 @@
 					angle: spotLight.angle,
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
-					focus: spotLight.shadow.focus
+					focus: spotLight.shadow.focus,
+					map: 'none'
 				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
@@ -193,6 +209,13 @@
 				gui.add( params, 'focus', 0, 1 ).onChange( function ( val ) {
 
 					spotLight.shadow.focus = val;
+					render();
+
+				} );
+
+				gui.add( params, 'map', textureUrls ).onChange( function ( val ) {
+
+					spotLight.map = textures[ val ];
 					render();
 
 				} );

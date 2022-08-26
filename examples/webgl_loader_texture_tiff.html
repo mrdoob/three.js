@@ -18,7 +18,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,7 +28,7 @@
 
 			import * as THREE from 'three';
 
-			import { TIFFLoader } from './jsm/loaders/TIFFLoader.js';
+			import { TIFFLoader } from 'three/addons/loaders/TIFFLoader.js';
 
 			let renderer, scene, camera;
 

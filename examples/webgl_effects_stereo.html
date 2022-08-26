@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,7 +29,7 @@
 
 			import * as THREE from 'three';
 
-			import { StereoEffect } from './jsm/effects/StereoEffect.js';
+			import { StereoEffect } from 'three/addons/effects/StereoEffect.js';
 
 			let container, camera, scene, renderer, effect;
 

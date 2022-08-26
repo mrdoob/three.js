@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,7 +29,7 @@
 
 			import * as THREE from 'three';
 
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 			let container;
 

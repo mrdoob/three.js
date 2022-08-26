@@ -21,7 +21,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -29,16 +30,16 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
 			let container, stats;
 

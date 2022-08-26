@@ -23,7 +23,8 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
@@ -31,12 +32,12 @@
 	<script type="module">
 		import * as THREE from 'three';
 
-		import Stats from './jsm/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats.module.js';
 
-		import { GUI } from './jsm/libs/lil-gui.module.min.js';
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
-		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from './jsm/shaders/ToonShader.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from 'three/addons/shaders/ToonShader.js';
 
 		let container, stats;
 

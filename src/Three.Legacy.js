@@ -20,7 +20,6 @@ import { TetrahedronGeometry } from './geometries/TetrahedronGeometry.js';
 import { TorusGeometry } from './geometries/TorusGeometry.js';
 import { TorusKnotGeometry } from './geometries/TorusKnotGeometry.js';
 import { TubeGeometry } from './geometries/TubeGeometry.js';
-import { Scene } from './scenes/Scene.js';
 
 // r134, d65e0af06644fe5a84a6fc0e372f4318f95a04c0
 
@@ -317,25 +316,5 @@ export class TubeBufferGeometry extends TubeGeometry {
 	}
 
 }
-
-// r144
-
-Object.defineProperty( Scene.prototype, 'autoUpdate', {
-
-	get() {
-
-		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
-		return this.matrixWorldAutoUpdate;
-
-	},
-
-	set( value ) {
-
-		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
-		this.matrixWorldAutoUpdate = value;
-
-	}
-
-} );
 
 

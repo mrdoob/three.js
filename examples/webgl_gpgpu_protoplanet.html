@@ -235,7 +235,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -244,11 +245,11 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 
 			// Texture width for simulation (each texel is a debris particle)
 			const WIDTH = 64;

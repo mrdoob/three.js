@@ -20,7 +20,8 @@
 <script type="importmap">
 	{
 		"imports": {
-			"three": "../build/three.module.js"
+			"three": "../build/three.module.js",
+			"three/addons/": "./jsm/"
 		}
 	}
 </script>
@@ -28,7 +29,7 @@
 <script type="module">
 	import * as THREE from 'three';
 
-	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
+	import { KTXLoader } from 'three/addons/loaders/KTXLoader.js';
 
 	/*
 	This is how compressed textures are supposed to be used:

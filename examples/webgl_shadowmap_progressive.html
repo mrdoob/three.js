@@ -20,18 +20,19 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 			import * as THREE from 'three';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TransformControls } from './jsm/controls/TransformControls.js';
-			import { ProgressiveLightMap } from './jsm/misc/ProgressiveLightMap.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
+			import { ProgressiveLightMap } from 'three/addons/misc/ProgressiveLightMap.js';
 
 			// ShadowMap + LightMap Res and Number of Directional Lights
 			const shadowMapRes = 512, lightMapRes = 1024, lightCount = 8;

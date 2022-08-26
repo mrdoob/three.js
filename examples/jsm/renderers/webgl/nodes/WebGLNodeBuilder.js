@@ -1,11 +1,7 @@
-import NodeBuilder, { defaultShaderStages } from 'three-nodes/core/NodeBuilder.js';
-import NodeFrame from 'three-nodes/core/NodeFrame.js';
+import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder } from 'three/nodes';
 import SlotNode from './SlotNode.js';
-import GLSLNodeParser from 'three-nodes/parsers/GLSLNodeParser.js';
-
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib,
 	LinearEncoding, RGBAFormat, UnsignedByteType, sRGBEncoding } from 'three';
-import MathNode from '../../../nodes/math/MathNode.js';
 
 const nodeFrame = new NodeFrame();
 nodeFrame.camera = new PerspectiveCamera();

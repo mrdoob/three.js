@@ -22,7 +22,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -30,9 +31,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
-			import { RoundedBoxGeometry } from './jsm/geometries/RoundedBoxGeometry.js';
-			import { LottieLoader } from './jsm/loaders/LottieLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+			import { LottieLoader } from 'three/addons/loaders/LottieLoader.js';
 
 			let renderer, scene, camera;
 			let mesh;

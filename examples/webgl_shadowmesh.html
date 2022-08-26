@@ -21,7 +21,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -30,7 +31,7 @@
 
 			import * as THREE from 'three';
 
-			import { ShadowMesh } from './jsm/objects/ShadowMesh.js';
+			import { ShadowMesh } from 'three/addons/objects/ShadowMesh.js';
 
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
