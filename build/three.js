@@ -21130,23 +21130,20 @@
 			const data = super.toJSON(meta);
 			if (this.fog !== null) data.object.fog = this.fog.toJSON();
 			return data;
+		} // Deprecated
+
+
+		get autoUpdate() {
+			console.warn('THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.');
+			return this.matrixWorldAutoUpdate;
 		}
 
-	} // r144
-
-
-	Object.defineProperty(Scene.prototype, 'autoUpdate', {
-		get() {
-			console.warn('THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.');
-			return this.matrixWorldAutoUpdate;
-		},
-
-		set(value) {
-			console.warn('THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.');
+		set autoUpdate(value) {
+			console.warn('THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.');
 			this.matrixWorldAutoUpdate = value;
 		}
 
-	});
+	}
 
 	class InterleavedBuffer {
 		constructor(array, stride) {
@@ -31898,7 +31895,7 @@
 
 	const _trackRe = new RegExp('' + '^' + _directoryRe + _nodeRe + _objectRe + _propertyRe + '$');
 
-	const _supportedObjectNames = ['material', 'materials', 'bones'];
+	const _supportedObjectNames = ['material', 'materials', 'bones', 'map'];
 
 	class Composite {
 		constructor(targetGroup, path, optionalParsedPath) {
@@ -32223,6 +32220,20 @@
 							}
 						}
 
+						break;
+
+					case 'map':
+						if (!targetObject.material) {
+							console.error('THREE.PropertyBinding: Can not bind to material as node does not have a material.', this);
+							return;
+						}
+
+						if (!targetObject.material.map) {
+							console.error('THREE.PropertyBinding: Can not bind to material.map as node.material does not have a map.', this);
+							return;
+						}
+
+						targetObject = targetObject.material.map;
 						break;
 
 					default:

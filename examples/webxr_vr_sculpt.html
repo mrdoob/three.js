@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,9 +28,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
-			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let container;
 			let camera, scene, renderer;

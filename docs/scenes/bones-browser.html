@@ -30,7 +30,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../../build/three.module.js"
+					"three": "../../build/three.module.js",
+					"three/addons/": "../../examples/jsm/"
 				}
 			}
 		</script>
@@ -56,8 +57,8 @@
 				WebGLRenderer
 			} from 'three';
 
-			import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let gui, scene, camera, renderer, orbit, lights, mesh, bones, skeletonHelper;
 

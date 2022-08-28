@@ -20,7 +20,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,7 +30,7 @@
 
 			import * as THREE from 'three';
 
-			import { XYZLoader } from './jsm/loaders/XYZLoader.js';
+			import { XYZLoader } from 'three/addons/loaders/XYZLoader.js';
 
 			let camera, scene, renderer, clock;
 

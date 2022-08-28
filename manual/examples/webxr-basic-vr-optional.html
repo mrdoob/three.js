@@ -36,15 +36,16 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "../../build/three.module.js"
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
   }
 }
 </script>
 
 <script type="module">
 import * as THREE from 'three';
-import {VRButton} from '../../examples/jsm/webxr/VRButton.js';
-import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
+import {VRButton} from 'three/addons/webxr/VRButton.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');

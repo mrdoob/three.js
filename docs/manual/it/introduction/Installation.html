@@ -14,7 +14,7 @@
 		</p>
 
     <p>
-			Qualsiasi soluzione venga scelta, sii coerente e importa tutti i file della stessa versione della libreria. 
+			Qualsiasi soluzione venga scelta, sii coerente e importa tutti i file della stessa versione della libreria.
       Mescolare file provenienti da fonti diverse può causare l'inclusione di codice duplicato o addirittura rompere l'applicazione in modo imprevisto.
 		</p>
 
@@ -95,7 +95,7 @@
 		<h2>Esempi</h2>
 
 		<p>
-			Il core di three.js è incentrato sui componenti più importanti di un engine 3D. Molti altri componenti utili - come i controls, i loaders e gli effetti post-processing - sono parte della sottocartella [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. Vengono definiti "esempi" perché, pur potendo essere utilizzati in modo immediato, sono anche destinati a essere remixati e personalizzati. Questi componenti vengono sempre mantenuti sincronizzati con la libreria principale, mentre i pacchetti di terze parti su npm sono gestiti da persone differenti e potrebbero non essere aggiornati. 
+			Il core di three.js è incentrato sui componenti più importanti di un engine 3D. Molti altri componenti utili - come i controls, i loaders e gli effetti post-processing - sono parte della sottocartella [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. Vengono definiti "esempi" perché, pur potendo essere utilizzati in modo immediato, sono anche destinati a essere remixati e personalizzati. Questi componenti vengono sempre mantenuti sincronizzati con la libreria principale, mentre i pacchetti di terze parti su npm sono gestiti da persone differenti e potrebbero non essere aggiornati.
 		</p>
 
     <p>
@@ -103,7 +103,7 @@
 		</p>
 
 		<code>
-		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
@@ -137,7 +137,7 @@
 		<h3>Node.js</h3>
 
 		<p>
-			Poiché three.js è stato creato per il web, dipende dal browser e dalle API del DOM che non sempre esistono in Node.js. Alcuni di questi problemi possono essere risolti usando dei "tappa buchi" come [link:https://github.com/stackgl/headless-gl headless-gl], o sostituendo i componenti come [page:TextureLoader] con alternative personalizzate. Altre API del DOM potrebbero essere profondamente intrecciate con il codice che le utilizza e potrebbe essere più difficile aggirarle. Accettiamo benvolentieri le pull request semplici e gestibili per migliorare il supporto di Node.js, ma raccomandiamo di aprire prima una issue per discutere dei tuoi miglioramenti.  
+			Poiché three.js è stato creato per il web, dipende dal browser e dalle API del DOM che non sempre esistono in Node.js. Alcuni di questi problemi possono essere risolti usando dei "tappa buchi" come [link:https://github.com/stackgl/headless-gl headless-gl], o sostituendo i componenti come [page:TextureLoader] con alternative personalizzate. Altre API del DOM potrebbero essere profondamente intrecciate con il codice che le utilizza e potrebbe essere più difficile aggirarle. Accettiamo benvolentieri le pull request semplici e gestibili per migliorare il supporto di Node.js, ma raccomandiamo di aprire prima una issue per discutere dei tuoi miglioramenti.
 		</p>
 
 		<p>

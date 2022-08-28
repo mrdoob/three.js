@@ -28973,27 +28973,23 @@ class Scene extends Object3D {
 
 	}
 
-}
+	// Deprecated
 
-// r144
+	get autoUpdate() {
 
-Object.defineProperty( Scene.prototype, 'autoUpdate', {
-
-	get() {
-
-		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
+		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
 		return this.matrixWorldAutoUpdate;
 
-	},
+	}
 
-	set( value ) {
+	set autoUpdate( value ) {
 
-		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
+		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
 		this.matrixWorldAutoUpdate = value;
 
 	}
 
-} );
+}
 
 class InterleavedBuffer {
 
@@ -44559,7 +44555,7 @@ const _trackRe = new RegExp( ''
 	+ '$'
 );
 
-const _supportedObjectNames = [ 'material', 'materials', 'bones' ];
+const _supportedObjectNames = [ 'material', 'materials', 'bones', 'map' ];
 
 class Composite {
 
@@ -45021,6 +45017,25 @@ class PropertyBinding {
 
 					}
 
+					break;
+
+				case 'map':
+
+					if ( ! targetObject.material ) {
+
+						console.error( 'THREE.PropertyBinding: Can not bind to material as node does not have a material.', this );
+						return;
+
+					}
+
+					if ( ! targetObject.material.map ) {
+
+						console.error( 'THREE.PropertyBinding: Can not bind to material.map as node.material does not have a map.', this );
+						return;
+
+					}
+
+					targetObject = targetObject.material.map;
 					break;
 
 				default:

@@ -12,8 +12,8 @@
 		<p>
 			Muitas aplicações three.js renderizam seus objetos 3D diretamente na tela. Às vezes, no entanto, você deseja aplicar um ou mais efeitos gráficos
 			como Depth-Of-Field, Bloom, Film Grain ou vários tipos de Anti-aliasing.
- 
-			O pós-processamento é uma abordagem amplamente utilizada para implementar tais efeitos. Primeiro, a cena é renderizada para um render target que representa 
+
+			O pós-processamento é uma abordagem amplamente utilizada para implementar tais efeitos. Primeiro, a cena é renderizada para um render target que representa
 			um buffer na memória da placa de vídeo. Na próxima etapa, um ou mais passos de pós-processamento aplicam filtros e efeitos ao buffer de imagem antes que ele seja renderizado para a tela.
 		</p>
 		<p>
@@ -28,9 +28,9 @@
 		</p>
 
 		<code>
-		import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
 		</code>
 
 		<p>
@@ -92,8 +92,8 @@
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-		import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 

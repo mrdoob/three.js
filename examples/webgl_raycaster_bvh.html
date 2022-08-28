@@ -32,6 +32,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
 					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@^0.5.10/build/index.module.js"
 				}
 			}
@@ -41,10 +42,10 @@
 
 			import * as THREE from 'three';
 			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, MeshBVHVisualizer } from 'three-mesh-bvh';
-			import Stats from './jsm/libs/stats.module.js';
-			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			// Add the extension functions
 			THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;

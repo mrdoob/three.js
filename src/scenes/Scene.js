@@ -50,26 +50,22 @@ class Scene extends Object3D {
 
 	}
 
-}
+	// Deprecated
 
-// r144
+	get autoUpdate() {
 
-Object.defineProperty( Scene.prototype, 'autoUpdate', {
-
-	get() {
-
-		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
+		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
 		return this.matrixWorldAutoUpdate;
 
-	},
+	}
 
-	set( value ) {
+	set autoUpdate( value ) {
 
-		console.warn( 'THREE.Scene: autoUpdate has been renamed matrixWorldAutoUpdate.' );
+		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
 		this.matrixWorldAutoUpdate = value;
 
 	}
 
-} );
+}
 
 export { Scene };
