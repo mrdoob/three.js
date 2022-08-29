@@ -3676,7 +3676,7 @@
 		if ( transformData.preRotation ) {
 
 			const array = transformData.preRotation.map( THREE.MathUtils.degToRad );
-			array.push( transformData.eulerOrder );
+			array.push( transformData.eulerOrder || THREE.Euler.DefaultOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 		}
@@ -3684,7 +3684,7 @@
 		if ( transformData.rotation ) {
 
 			const array = transformData.rotation.map( THREE.MathUtils.degToRad );
-			array.push( transformData.eulerOrder );
+			array.push( transformData.eulerOrder || THREE.Euler.DefaultOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 		}
@@ -3692,7 +3692,7 @@
 		if ( transformData.postRotation ) {
 
 			const array = transformData.postRotation.map( THREE.MathUtils.degToRad );
-			array.push( transformData.eulerOrder );
+			array.push( transformData.eulerOrder || THREE.Euler.DefaultOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 			lPostRotationM.invert();
 
