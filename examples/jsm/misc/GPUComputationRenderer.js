@@ -5,6 +5,7 @@ import {
 	FloatType,
 	Mesh,
 	NearestFilter,
+	NoToneMapping,
 	PlaneGeometry,
 	RGBAFormat,
 	Scene,
@@ -395,12 +396,21 @@ class GPUComputationRenderer {
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
+			const currentToneMapping = renderer.toneMapping
+			const currentXrEnabled = renderer.xr.enabled
+
+			renderer.toneMapping = NoToneMapping
+			renderer.xr.enabled = false
+
 			mesh.material = material;
 			renderer.setRenderTarget( output );
 			renderer.render( scene, camera );
 			mesh.material = passThruShader;
 
 			renderer.setRenderTarget( currentRenderTarget );
+
+			renderer.toneMapping = currentToneMapping
+			renderer.xr.enabled = currentXrEnabled
 
 		};
 
