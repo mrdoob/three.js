@@ -85,30 +85,6 @@ class BufferAttribute {
 
 	}
 
-	copyColorsArray() {
-
-		console.error( 'THREE.BufferAttribute: copyColorsArray() has been removed with r144.' );
-
-	}
-
-	copyVector2sArray() {
-
-		console.error( 'THREE.BufferAttribute: copyVector2sArray() has been removed with r144.' );
-
-	}
-
-	copyVector3sArray() {
-
-		console.error( 'THREE.BufferAttribute: copyVector3sArray() has been removed with r144.' );
-
-	}
-
-	copyVector4sArray() {
-
-		console.error( 'THREE.BufferAttribute: copyVector4sArray() has been removed with r144.' );
-
-	}
-
 	applyMatrix3( m ) {
 
 		if ( this.itemSize === 2 ) {
@@ -364,6 +340,32 @@ class BufferAttribute {
 		if ( this.updateRange.offset !== 0 || this.updateRange.count !== - 1 ) data.updateRange = this.updateRange;
 
 		return data;
+
+	}
+
+	// @deprecated
+
+	copyColorsArray() {
+
+		console.error( 'THREE.BufferAttribute: copyColorsArray() has been removed with r144.' );
+
+	}
+
+	copyVector2sArray() {
+
+		console.error( 'THREE.BufferAttribute: copyVector2sArray() has been removed with r144.' );
+
+	}
+
+	copyVector3sArray() {
+
+		console.error( 'THREE.BufferAttribute: copyVector3sArray() has been removed with r144.' );
+
+	}
+
+	copyVector4sArray() {
+
+		console.error( 'THREE.BufferAttribute: copyVector4sArray() has been removed with r144.' );
 
 	}
 
