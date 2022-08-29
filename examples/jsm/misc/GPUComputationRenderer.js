@@ -396,11 +396,11 @@ class GPUComputationRenderer {
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
-			const currentToneMapping = renderer.toneMapping
-			const currentXrEnabled = renderer.xr.enabled
+			const currentToneMapping = renderer.toneMapping;
+			const currentXrEnabled = renderer.xr.enabled;
 
-			renderer.toneMapping = NoToneMapping
-			renderer.xr.enabled = false
+			renderer.toneMapping = NoToneMapping;
+			renderer.xr.enabled = false;
 
 			mesh.material = material;
 			renderer.setRenderTarget( output );
@@ -409,8 +409,8 @@ class GPUComputationRenderer {
 
 			renderer.setRenderTarget( currentRenderTarget );
 
-			renderer.toneMapping = currentToneMapping
-			renderer.xr.enabled = currentXrEnabled
+			renderer.toneMapping = currentToneMapping;
+			renderer.xr.enabled = currentXrEnabled;
 
 		};
 
