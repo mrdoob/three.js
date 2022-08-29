@@ -7125,110 +7125,6 @@
 			return this;
 		}
 
-		copyColorsArray(colors) {
-			const array = this.array;
-			let offset = 0;
-
-			for (let i = 0, l = colors.length; i < l; i++) {
-				let color = colors[i];
-
-				if (color === undefined) {
-					console.warn('THREE.BufferAttribute.copyColorsArray(): color is undefined', i);
-					color = new Color();
-				}
-
-				if (this.normalized) {
-					array[offset++] = normalize(color.r, array);
-					array[offset++] = normalize(color.g, array);
-					array[offset++] = normalize(color.b, array);
-				} else {
-					array[offset++] = color.r;
-					array[offset++] = color.g;
-					array[offset++] = color.b;
-				}
-			}
-
-			return this;
-		}
-
-		copyVector2sArray(vectors) {
-			const array = this.array;
-			let offset = 0;
-
-			for (let i = 0, l = vectors.length; i < l; i++) {
-				let vector = vectors[i];
-
-				if (vector === undefined) {
-					console.warn('THREE.BufferAttribute.copyVector2sArray(): vector is undefined', i);
-					vector = new Vector2();
-				}
-
-				if (this.normalized) {
-					array[offset++] = normalize(vector.x, array);
-					array[offset++] = normalize(vector.y, array);
-				} else {
-					array[offset++] = vector.x;
-					array[offset++] = vector.y;
-				}
-			}
-
-			return this;
-		}
-
-		copyVector3sArray(vectors) {
-			const array = this.array;
-			let offset = 0;
-
-			for (let i = 0, l = vectors.length; i < l; i++) {
-				let vector = vectors[i];
-
-				if (vector === undefined) {
-					console.warn('THREE.BufferAttribute.copyVector3sArray(): vector is undefined', i);
-					vector = new Vector3();
-				}
-
-				if (this.normalized) {
-					array[offset++] = normalize(vector.x, array);
-					array[offset++] = normalize(vector.y, array);
-					array[offset++] = normalize(vector.z, array);
-				} else {
-					array[offset++] = vector.x;
-					array[offset++] = vector.y;
-					array[offset++] = vector.z;
-				}
-			}
-
-			return this;
-		}
-
-		copyVector4sArray(vectors) {
-			const array = this.array;
-			let offset = 0;
-
-			for (let i = 0, l = vectors.length; i < l; i++) {
-				let vector = vectors[i];
-
-				if (vector === undefined) {
-					console.warn('THREE.BufferAttribute.copyVector4sArray(): vector is undefined', i);
-					vector = new Vector4();
-				}
-
-				if (this.normalized) {
-					array[offset++] = normalize(vector.x, array);
-					array[offset++] = normalize(vector.y, array);
-					array[offset++] = normalize(vector.z, array);
-					array[offset++] = normalize(vector.w, array);
-				} else {
-					array[offset++] = vector.x;
-					array[offset++] = vector.y;
-					array[offset++] = vector.z;
-					array[offset++] = vector.w;
-				}
-			}
-
-			return this;
-		}
-
 		applyMatrix3(m) {
 			if (this.itemSize === 2) {
 				for (let i = 0, l = this.count; i < l; i++) {
@@ -7406,6 +7302,23 @@
 			if (this.usage !== StaticDrawUsage) data.usage = this.usage;
 			if (this.updateRange.offset !== 0 || this.updateRange.count !== -1) data.updateRange = this.updateRange;
 			return data;
+		} // @deprecated
+
+
+		copyColorsArray() {
+			console.error('THREE.BufferAttribute: copyColorsArray() was removed in r144.');
+		}
+
+		copyVector2sArray() {
+			console.error('THREE.BufferAttribute: copyVector2sArray() was removed in r144.');
+		}
+
+		copyVector3sArray() {
+			console.error('THREE.BufferAttribute: copyVector3sArray() was removed in r144.');
+		}
+
+		copyVector4sArray() {
+			console.error('THREE.BufferAttribute: copyVector4sArray() was removed in r144.');
 		}
 
 	} //
@@ -21130,7 +21043,7 @@
 			const data = super.toJSON(meta);
 			if (this.fog !== null) data.object.fog = this.fog.toJSON();
 			return data;
-		} // Deprecated
+		} // @deprecated
 
 
 		get autoUpdate() {
