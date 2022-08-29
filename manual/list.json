@@ -305,6 +305,12 @@
 		}
 	},
 	"zh": {
+		"基本": {
+			"基础": "zh/fundamentals",
+			"响应式设计": "zh/responsive",
+			"先决条件": "zh/prerequisites",
+			"设置": "zh/setup"
+		},
 		"基础": {
 			"图元": "zh/primitives",
 			"场景图": "zh/scenegraph",
