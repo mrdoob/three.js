@@ -42,7 +42,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
@@ -69,7 +69,7 @@
 				scene.add( ambient );
 
 				const loader = new THREE.TextureLoader().setPath( 'textures/' );
-				const filenames = [ 'disturb.jpg', 'uv_grid_opengl.jpg', 'colors.png' ];
+				const filenames = [ 'disturb.jpg', 'colors.png', 'uv_grid_opengl.jpg' ];
 
 				const textures = { none: null };
 
@@ -91,6 +91,7 @@
 				spotLight.penumbra = 1;
 				spotLight.decay = 2;
 				spotLight.distance = 100;
+				spotLight.map = textures[ 'disturb.jpg' ];
 
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 1024;
@@ -141,7 +142,7 @@
 				const gui = new GUI();
 
 				const params = {
-					map: 'none',
+					map: textures[ 'disturb.jpg' ],
 					color: spotLight.color.getHex(),
 					intensity: spotLight.intensity,
 					distance: spotLight.distance,
