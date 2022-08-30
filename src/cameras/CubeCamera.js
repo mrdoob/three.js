@@ -88,10 +88,10 @@ class CubeCamera extends Object3D {
 		renderer.setRenderTarget( renderTarget, 4 );
 		renderer.render( scene, cameraPZ );
 
-		renderTarget.texture.generateMipmaps = generateMipmaps;
-
 		renderer.setRenderTarget( renderTarget, 5 );
 		renderer.render( scene, cameraNZ );
+
+		renderTarget.texture.generateMipmaps = generateMipmaps;
 
 		renderer.setRenderTarget( currentRenderTarget );
 
