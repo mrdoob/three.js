@@ -80,12 +80,13 @@
 					const texture = loader.load( filename );
 					texture.minFilter = THREE.LinearFilter;
 					texture.magFilter = THREE.LinearFilter;
+					texture.encoding = THREE.sRGBEncoding;
 
 					textures[ filename ] = texture;
 
 				}
 
-				spotLight = new THREE.SpotLight( 0xffffff, 1.75 );
+				spotLight = new THREE.SpotLight( 0xffffff, 10 );
 				spotLight.position.set( 25, 50, 25 );
 				spotLight.angle = Math.PI / 6;
 				spotLight.penumbra = 1;
@@ -113,7 +114,7 @@
 
 				const mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, - 1, 0 );
-				mesh.rotation.x = - Math.PI * 0.5;
+				mesh.rotation.x = - Math.PI / 2;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
@@ -165,7 +166,7 @@
 
 				} );
 
-				gui.add( params, 'intensity', 0, 3 ).onChange( function ( val ) {
+				gui.add( params, 'intensity', 0, 10 ).onChange( function ( val ) {
 
 					spotLight.intensity = val;
 
