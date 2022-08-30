@@ -33,7 +33,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			let renderer, scene, camera;
+			let renderer, scene, camera, material;
 
 			let spotLight, lightHelper, shadowCameraHelper;
 
@@ -104,7 +104,7 @@
 
 				//
 
-				let material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
+				material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
 
 				let geometry = new THREE.PlaneGeometry( 2000, 2000 );
 
@@ -116,11 +116,11 @@
 
 				//
 
-				material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
+				let material2 = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
 
 				geometry = new THREE.CylinderGeometry( 5, 5, 2, 32, 1, false );
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material2 );
 				mesh.position.set( 0, 5, 0 );
 				mesh.castShadow = true;
 				scene.add( mesh );
@@ -165,7 +165,8 @@
 					decay: spotLight.decay,
 					focus: spotLight.shadow.focus,
 					map: 'none',
-					'shadow camera': false
+					'shadow camera': false,
+					'enable shadows': true
 				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
@@ -228,6 +229,15 @@
 				gui.add( params, 'shadow camera' ).onChange( function ( val ) {
 
 					shadowCameraHelper.visible = val;
+					render();
+
+				} );
+
+
+				gui.add( params, 'enable shadows' ).onChange( function ( val ) {
+
+					renderer.shadowMap.enabled = val
+					material.needsUpdate = true;
 					render();
 
 				} );
