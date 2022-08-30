@@ -37,7 +37,7 @@
 
 			let spotLight, lightHelper, shadowCameraHelper;
 
-			let textureUrls, textures;
+			let textures = { none: null };
 
 			let gui;
 
@@ -46,12 +46,11 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
 				renderer.shadowMap.enabled = true;
-
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				document.body.appendChild( renderer.domElement );
+
 
 				scene = new THREE.Scene();
 
@@ -62,20 +61,22 @@
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 20;
 				controls.maxDistance = 500;
-				controls.enablePan = false;
 
 				const ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
 
-				const textureLoader = new THREE.TextureLoader();
-				textureUrls = [ 'none', 'uv_grid_opengl.jpg', 'sprite2.png', 'colors.png' ];
-				textures = { none: null }
+				const loader = new THREE.TextureLoader().setPath( 'textures/' );
+				const filenames = [ 'uv_grid_opengl.jpg', 'sprite2.png', 'colors.png' ];
 
-				for ( let i = 1; i < textureUrls.length; i ++ ) {
+				for ( let i = 0; i < filenames.length; i ++ ) {
 
-					textures[ textureUrls[ i ] ] = textureLoader.load( 'textures/' + textureUrls[ i ] );
-					textures[ textureUrls[ i ] ].minFilter = THREE.LinearFilter;
-					textures[ textureUrls[ i ] ].magFilter = THREE.LinearFilter;
+					const filename = filenames[ i ];
+
+					const texture = loader.load( filename );
+					texture.minFilter = THREE.LinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+
+					textures[ filename ] = texture;
 
 				}
 
@@ -98,6 +99,7 @@
 				scene.add( lightHelper );
 
 				shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera );
+				shadowCameraHelper.visible = false;
 				scene.add( shadowCameraHelper );
 
 				//
@@ -136,6 +138,8 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
 			function render() {
@@ -160,7 +164,8 @@
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
 					focus: spotLight.shadow.focus,
-					map: 'none'
+					map: 'none',
+					'shadow camera': false
 				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
@@ -213,9 +218,16 @@
 
 				} );
 
-				gui.add( params, 'map', textureUrls ).onChange( function ( val ) {
+				gui.add( params, 'map', textures ).onChange( function ( val ) {
 
-					spotLight.map = textures[ val ];
+					spotLight.map = val;
+					render();
+
+				} );
+
+				gui.add( params, 'shadow camera' ).onChange( function ( val ) {
+
+					shadowCameraHelper.visible = val;
 					render();
 
 				} );
