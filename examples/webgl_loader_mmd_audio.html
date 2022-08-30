@@ -8,6 +8,7 @@
 		<style>
 			body {
 				color: #444;
+				background: #fff;
 			}
 			a {
 				color: #08f;
@@ -86,7 +87,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
-				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
+				scene.add( new THREE.PolarGridHelper( 30, 0 ) );
 
 				const listener = new THREE.AudioListener();
 				camera.add( listener );
