@@ -47,16 +47,16 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 0, 200, 300 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 0, 0.75, - 1 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
 
-				scene.add( new THREE.GridHelper( 400, 10 ) );
+				scene.add( new THREE.GridHelper( 2, 4 ) );
 
 				const light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 10, 10, 10 );
+				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
 				const light2 = new THREE.HemisphereLight( 0xffffff, 0x888888 );
@@ -69,13 +69,10 @@
 				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
-				// controls.minDistance = 300;
-				controls.maxDistance = 700;
 
 				const loader = new USDZLoader();
 				loader.load( 'models/usdz/saeukkang.usdz', function ( usd ) {
 
-					usd.scale.setScalar( 200 );
 					scene.add( usd );
 
 				} );
