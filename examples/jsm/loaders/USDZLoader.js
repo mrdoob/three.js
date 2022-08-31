@@ -100,9 +100,9 @@ class USDZLoader extends Loader {
 
 		if ( file === undefined ) {
 
-			console.warn( 'THREE.USDZLoader: No usda file found.' );
+			console.warn( 'THREE.USDZLoader: No usda file found.', zip );
 
-			return {};
+			return new Group();
 
 		}
 

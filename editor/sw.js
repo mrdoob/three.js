@@ -50,6 +50,7 @@ const assets = [
 	'../examples/jsm/loaders/SVGLoader.js',
 	'../examples/jsm/loaders/TGALoader.js',
 	'../examples/jsm/loaders/TDSLoader.js',
+	'../examples/jsm/loaders/USDZLoader.js',
 	'../examples/jsm/loaders/VOXLoader.js',
 	'../examples/jsm/loaders/VRMLLoader.js',
 	'../examples/jsm/loaders/VTKLoader.js',
