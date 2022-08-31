@@ -209,6 +209,14 @@ class USDZLoader extends Loader {
 
 				if ( name.startsWith( 'def Mesh' ) ) {
 
+					// Move st indices to Mesh
+
+					if ( data[ 'int[] primvars:st:indices' ] ) {
+
+						object[ 'int[] primvars:st:indices' ] = data[ 'int[] primvars:st:indices' ];
+
+					}
+
 					return object;
 
 				}
@@ -231,25 +239,66 @@ class USDZLoader extends Loader {
 			const geometry = new BufferGeometry();
 			
 			const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
-			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( positions ), 3 ) );
-
-			if ( data[ 'texCoord2f[] primvars:st' ] ) {
-
-				const uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
-				geometry.setAttribute( 'uv', new BufferAttribute( new Float32Array( uvs ), 2 ) )
-
-			}
+			const attribute = new BufferAttribute( new Float32Array( positions ), 3 );
 
 			if ( data[ 'int[] faceVertexIndices' ] ) {
 
 				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
-				geometry.setIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
+				geometry.setAttribute( 'position', toFlatBufferAttribute( attribute, indices ) );
+
+			} else {
+
+				geometry.setAttribute( 'position', attribute );
+
+			}
+
+
+			if ( data[ 'texCoord2f[] primvars:st' ] ) {
+
+				const uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
+				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
+
+				if ( data[ 'int[] primvars:st:indices' ] ) {
+
+					const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
+					geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
+
+				} else {
+
+					geometry.setAttribute( 'uv', attribute );
+
+				}
 
 			}
 
 			geometry.computeVertexNormals();
 			
 			return geometry;
+
+		}
+
+		function toFlatBufferAttribute( attribute, indices ) {
+
+			const array = attribute.array;
+			const itemSize = attribute.itemSize;
+
+			const array2 = new array.constructor( indices.length * itemSize );
+
+			let index = 0, index2 = 0;
+
+			for ( let i = 0, l = indices.length; i < l; i ++ ) {
+
+				index = indices[ i ] * itemSize;
+
+				for ( let j = 0; j < itemSize; j ++ ) {
+
+					array2[ index2 ++ ] = array[ index ++ ];
+
+				}
+
+			}
+
+			return new BufferAttribute( array2, itemSize );
 
 		}
 
@@ -282,7 +331,7 @@ class USDZLoader extends Loader {
 
 			const material = new MeshStandardMaterial();
 
-			console.log( data );
+			// console.log( data );
 
 			if ( data[ 'def Shader "diffuseColor_texture"' ] ) {
 
@@ -302,8 +351,6 @@ class USDZLoader extends Loader {
 
 			}
 
-			console.log( material )
-
 
 			return material;
 
@@ -320,7 +367,7 @@ class USDZLoader extends Loader {
 
 		}
 
-		console.log( data );
+		// console.log( data );
 
 		const group = new Group();
 
@@ -335,7 +382,7 @@ class USDZLoader extends Loader {
 
 		}
 
-		console.log( group );
+		// console.log( group );
 
 		return group;
 
