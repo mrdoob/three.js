@@ -1,8 +1,8 @@
-import { OrbitControls } from 'three-addons/controls/OrbitControls.js';
-import { ViewHelper } from 'three-addons/helpers/ViewHelper.js';
+import { OrbitControls } from '../../controls/OrbitControls.js';
+import { ViewHelper } from '../../helpers/ViewHelper.js';
 import { Element, LabelElement, SelectInput } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { MeshBasicNodeMaterial, ConstNode } from 'three-nodes/Nodes.js';
+import { MeshBasicNodeMaterial, ConstNode } from 'three/nodes';
 import { WebGLRenderer, PerspectiveCamera, Scene, Mesh, DoubleSide, SphereGeometry, BoxGeometry, PlaneGeometry, TorusKnotGeometry } from 'three';
 
 const nullValue = new ConstNode( 0 );

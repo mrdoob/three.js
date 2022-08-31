@@ -1,6 +1,4 @@
-import {
-	MathUtils
-} from 'three';
+import { MathUtils } from 'three';
 
 const _hsl = {};
 
@@ -20,13 +18,6 @@ class ColorConverter {
 
 	static getHSV( color, target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.ColorConverter: .getHSV() target is now required' );
-			target = { h: 0, s: 0, l: 0 };
-
-		}
-
 		color.getHSL( _hsl );
 
 		// based on https://gist.github.com/xpansive/1337890#file-index-js
@@ -35,45 +26,6 @@ class ColorConverter {
 		target.h = _hsl.h;
 		target.s = 2 * _hsl.s / ( _hsl.l + _hsl.s );
 		target.v = _hsl.l + _hsl.s;
-
-		return target;
-
-	}
-
-	// where c, m, y, k is between 0 and 1
-
-	static setCMYK( color, c, m, y, k ) {
-
-		const r = ( 1 - c ) * ( 1 - k );
-		const g = ( 1 - m ) * ( 1 - k );
-		const b = ( 1 - y ) * ( 1 - k );
-
-		return color.setRGB( r, g, b );
-
-	}
-
-	static getCMYK( color, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.ColorConverter: .getCMYK() target is now required' );
-			target = { c: 0, m: 0, y: 0, k: 0 };
-
-		}
-
-		const r = color.r;
-		const g = color.g;
-		const b = color.b;
-
-		const k = 1 - Math.max( r, g, b );
-		const c = ( 1 - r - k ) / ( 1 - k );
-		const m = ( 1 - g - k ) / ( 1 - k );
-		const y = ( 1 - b - k ) / ( 1 - k );
-
-		target.c = c;
-		target.m = m;
-		target.y = y;
-		target.k = k;
 
 		return target;
 

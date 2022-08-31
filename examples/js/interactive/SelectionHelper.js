@@ -53,6 +53,7 @@
 
 		onSelectStart( event ) {
 
+			this.element.style.display = 'none';
 			this.renderer.domElement.parentElement.appendChild( this.element );
 			this.element.style.left = event.clientX + 'px';
 			this.element.style.top = event.clientY + 'px';
@@ -65,6 +66,7 @@
 
 		onSelectMove( event ) {
 
+			this.element.style.display = 'block';
 			this.pointBottomRight.x = Math.max( this.startPoint.x, event.clientX );
 			this.pointBottomRight.y = Math.max( this.startPoint.y, event.clientY );
 			this.pointTopLeft.x = Math.min( this.startPoint.x, event.clientX );

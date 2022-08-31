@@ -194,7 +194,9 @@
 
 			const position = [];
 			const normal = [];
-			const color = []; // ascii
+			const color = [];
+			const intensity = [];
+			const label = []; // ascii
 
 			if ( PCDheader.data === 'ascii' ) {
 
@@ -244,6 +246,18 @@
 						normal.push( parseFloat( line[ offset.normal_x ] ) );
 						normal.push( parseFloat( line[ offset.normal_y ] ) );
 						normal.push( parseFloat( line[ offset.normal_z ] ) );
+
+					}
+
+					if ( offset.intensity !== undefined ) {
+
+						intensity.push( parseFloat( line[ offset.intensity ] ) );
+
+					}
+
+					if ( offset.label !== undefined ) {
+
+						label.push( parseInt( line[ offset.label ] ) );
 
 					}
 
@@ -297,6 +311,20 @@
 
 					}
 
+					if ( offset.intensity !== undefined ) {
+
+						const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
+						intensity.push( dataview.getFloat32( PCDheader.points * offset.intensity + PCDheader.size[ intensityIndex ] * i, this.littleEndian ) );
+
+					}
+
+					if ( offset.label !== undefined ) {
+
+						const labelIndex = PCDheader.fields.indexOf( 'label' );
+						label.push( dataview.getInt32( PCDheader.points * offset.label + PCDheader.size[ labelIndex ] * i, this.littleEndian ) );
+
+					}
+
 				}
 
 			} // binary
@@ -333,6 +361,18 @@
 
 					}
 
+					if ( offset.intensity !== undefined ) {
+
+						intensity.push( dataview.getFloat32( row + offset.intensity, this.littleEndian ) );
+
+					}
+
+					if ( offset.label !== undefined ) {
+
+						label.push( dataview.getInt32( row + offset.label, this.littleEndian ) );
+
+					}
+
 				}
 
 			} // build geometry
@@ -342,6 +382,8 @@
 			if ( position.length > 0 ) geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
 			if ( normal.length > 0 ) geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normal, 3 ) );
 			if ( color.length > 0 ) geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( color, 3 ) );
+			if ( intensity.length > 0 ) geometry.setAttribute( 'intensity', new THREE.Float32BufferAttribute( intensity, 1 ) );
+			if ( label.length > 0 ) geometry.setAttribute( 'label', new THREE.Int32BufferAttribute( label, 1 ) );
 			geometry.computeBoundingSphere(); // build material
 
 			const material = new THREE.PointsMaterial( {
@@ -351,10 +393,6 @@
 			if ( color.length > 0 ) {
 
 				material.vertexColors = true;
-
-			} else {
-
-				material.color.setHex( Math.random() * 0xffffff );
 
 			} // build point cloud
 

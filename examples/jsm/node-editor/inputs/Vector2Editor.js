@@ -1,7 +1,7 @@
 import { NumberInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { Vector2 } from 'three';
-import { UniformNode } from 'three-nodes/Nodes.js';
+import { UniformNode } from 'three/nodes';
 
 export class Vector2Editor extends BaseNode {
 

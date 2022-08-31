@@ -10,12 +10,7 @@ import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
 import WebGPUStorageBuffer from '../WebGPUStorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
-import NodeBuilder from 'three-nodes/core/NodeBuilder.js';
-import WGSLNodeParser from 'three-nodes/parsers/WGSLNodeParser.js';
-
-import CodeNode from 'three-nodes/core/CodeNode.js';
-
-import { NodeMaterial } from 'three-nodes/materials/Materials.js';
+import { NodeBuilder, WGSLNodeParser, CodeNode, NodeMaterial } from 'three/nodes';
 
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage.VERTEX,

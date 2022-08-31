@@ -58,7 +58,7 @@ Matrix4.prototype.makeOrthographic = function ( left, right, top, bottom, near, 
 
 };
 
-Frustum.prototype.setFromProjectionMatrix = function( m ) {
+Frustum.prototype.setFromProjectionMatrix = function ( m ) {
 
 	const planes = this.planes;
 	const me = m.elements;
@@ -242,9 +242,9 @@ class WebGPURenderer {
 
 		//
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( this._info.autoReset === true ) this._info.reset();
 

@@ -9,7 +9,10 @@ import {
 	UniformsUtils,
 	Vector3,
 	Vector4,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	LinearEncoding,
+	NoToneMapping,
+	HalfFloatType
 } from 'three';
 
 class Refractor extends Mesh {
@@ -45,7 +48,7 @@ class Refractor extends Mesh {
 
 		// render target
 
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample } );
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
 		// material
 
@@ -191,9 +194,13 @@ class Refractor extends Mesh {
 			const currentRenderTarget = renderer.getRenderTarget();
 			const currentXrEnabled = renderer.xr.enabled;
 			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+			const currentOutputEncoding = renderer.outputEncoding;
+			const currentToneMapping = renderer.toneMapping;
 
 			renderer.xr.enabled = false; // avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
+			renderer.outputEncoding = LinearEncoding;
+			renderer.toneMapping = NoToneMapping;
 
 			renderer.setRenderTarget( renderTarget );
 			if ( renderer.autoClear === false ) renderer.clear();
@@ -201,6 +208,8 @@ class Refractor extends Mesh {
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+			renderer.outputEncoding = currentOutputEncoding;
+			renderer.toneMapping = currentToneMapping;
 			renderer.setRenderTarget( currentRenderTarget );
 
 			// restore viewport
@@ -220,10 +229,6 @@ class Refractor extends Mesh {
 		//
 
 		this.onBeforeRender = function ( renderer, scene, camera ) {
-
-			// Render
-
-			renderTarget.texture.encoding = renderer.outputEncoding;
 
 			// ensure refractors are rendered only once per frame
 
@@ -317,6 +322,7 @@ Refractor.RefractorShader = {
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
+			#include <tonemapping_fragment>
 			#include <encodings_fragment>
 
 		}`

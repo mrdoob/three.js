@@ -263,6 +263,29 @@
 
 			};
 
+			this.dispose = function () {
+
+				mesh.geometry.dispose();
+				mesh.material.dispose();
+				const variables = this.variables;
+
+				for ( let i = 0; i < variables.length; i ++ ) {
+
+					const variable = variables[ i ];
+					variable.initialValueTexture?.dispose();
+					const renderTargets = variable.renderTargets;
+
+					for ( let j = 0; j < renderTargets.length; j ++ ) {
+
+						const renderTarget = renderTargets[ j ];
+						renderTarget.dispose();
+
+					}
+
+				}
+
+			};
+
 			function addResolutionDefine( materialShader ) {
 
 				materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + ' )';
@@ -330,10 +353,24 @@
 			this.doRenderTarget = function ( material, output ) {
 
 				const currentRenderTarget = renderer.getRenderTarget();
+				const currentXrEnabled = renderer.xr.enabled;
+				const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+				const currentOutputEncoding = renderer.outputEncoding;
+				const currentToneMapping = renderer.toneMapping;
+				renderer.xr.enabled = false; // Avoid camera modification
+
+				renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+
+				renderer.outputEncoding = THREE.LinearEncoding;
+				renderer.toneMapping = THREE.NoToneMapping;
 				mesh.material = material;
 				renderer.setRenderTarget( output );
 				renderer.render( scene, camera );
 				mesh.material = passThruShader;
+				renderer.xr.enabled = currentXrEnabled;
+				renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+				renderer.outputEncoding = currentOutputEncoding;
+				renderer.toneMapping = currentToneMapping;
 				renderer.setRenderTarget( currentRenderTarget );
 
 			}; // Shaders

@@ -25,7 +25,8 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
@@ -34,10 +35,10 @@
 
 		import * as THREE from 'three';
 
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 		let renderer, scene, camera;
-		let controls, group;
+		let group;
 
 		let selectedObject = null;
 		const raycaster = new THREE.Raycaster();
@@ -66,8 +67,10 @@
 			camera.position.set( 15, 15, 15 );
 			camera.lookAt( scene.position );
 
-			controls = new OrbitControls( camera, renderer.domElement );
-
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 15;
+			controls.maxDistance = 250;
+		
 			// add sprites
 
 			const sprite1 = new THREE.Sprite( new THREE.SpriteMaterial( { color: '#69f' } ) );

@@ -43,8 +43,8 @@
 		{
 			"imports": {
 				"three": "../build/three.module.js",
-				"three-addons/": "./jsm/",
-				"three-nodes/": "./jsm/nodes/"
+				"three/addons/": "./jsm/",
+				"three/nodes": "./jsm/nodes/Nodes.js"
 			}
 		}
 	</script>
@@ -52,17 +52,17 @@
 	<script type="module">
 
 		import * as THREE from 'three';
-		import * as Nodes from 'three-nodes/Nodes.js';
+		import * as Nodes from 'three/nodes';
 
-		import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+		import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
-		import { NodeEditor } from './jsm/node-editor/NodeEditor.js';
-		import { MeshEditor } from './jsm/node-editor/scene/MeshEditor.js';
+		import { NodeEditor } from 'three/addons/node-editor/NodeEditor.js';
+		import { MeshEditor } from 'three/addons/node-editor/scene/MeshEditor.js';
 
-		import Stats from './jsm/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats.module.js';
 
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
 		let stats;
 		let camera, scene, renderer;

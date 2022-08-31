@@ -49,7 +49,7 @@
  * // How to set outline parameters for each material
  * material.userData.outlineParameters = {
  * 	thickness: 0.01,
- * 	color: [ 0, 0, 0 ]
+ * 	color: [ 0, 0, 0 ],
  * 	alpha: 0.8,
  * 	visible: true,
  * 	keepAlive: true
@@ -336,26 +336,6 @@
 
 			this.render = function ( scene, camera ) {
 
-				let renderTarget;
-				let forceClear = false;
-
-				if ( arguments[ 2 ] !== undefined ) {
-
-					console.warn( 'THREE.OutlineEffect.render(): the renderTarget argument has been removed. Use .setRenderTarget() instead.' );
-					renderTarget = arguments[ 2 ];
-
-				}
-
-				if ( arguments[ 3 ] !== undefined ) {
-
-					console.warn( 'THREE.OutlineEffect.render(): the forceClear argument has been removed. Use .clear() instead.' );
-					forceClear = arguments[ 3 ];
-
-				}
-
-				if ( renderTarget !== undefined ) renderer.setRenderTarget( renderTarget );
-				if ( forceClear ) renderer.clear();
-
 				if ( this.enabled === false ) {
 
 					renderer.render( scene, camera );
@@ -374,10 +354,10 @@
 			this.renderOutline = function ( scene, camera ) {
 
 				const currentAutoClear = renderer.autoClear;
-				const currentSceneAutoUpdate = scene.autoUpdate;
+				const currentSceneAutoUpdate = scene.matrixWorldAutoUpdate;
 				const currentSceneBackground = scene.background;
 				const currentShadowMapEnabled = renderer.shadowMap.enabled;
-				scene.autoUpdate = false;
+				scene.matrixWorldAutoUpdate = false;
 				scene.background = null;
 				renderer.autoClear = false;
 				renderer.shadowMap.enabled = false;
@@ -385,7 +365,7 @@
 				renderer.render( scene, camera );
 				scene.traverse( restoreOriginalMaterial );
 				cleanupCache();
-				scene.autoUpdate = currentSceneAutoUpdate;
+				scene.matrixWorldAutoUpdate = currentSceneAutoUpdate;
 				scene.background = currentSceneBackground;
 				renderer.autoClear = currentAutoClear;
 				renderer.shadowMap.enabled = currentShadowMapEnabled;

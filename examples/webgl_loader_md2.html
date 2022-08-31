@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,12 +29,12 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { MD2Character } from './jsm/misc/MD2Character.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { MD2Character } from 'three/addons/misc/MD2Character.js';
 
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
@@ -106,7 +107,7 @@
 
 				//  GROUND
 
-				const gt = new THREE.TextureLoader().load( "textures/terrain/grasslight-big.jpg" );
+				const gt = new THREE.TextureLoader().load( 'textures/terrain/grasslight-big.jpg' );
 				const gg = new THREE.PlaneGeometry( 2000, 2000 );
 				const gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
@@ -166,21 +167,21 @@
 
 				const config = {
 
-					baseUrl: "models/md2/ratamahatta/",
+					baseUrl: 'models/md2/ratamahatta/',
 
-					body: "ratamahatta.md2",
-					skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],
-					weapons: [[ "weapon.md2", "weapon.png" ],
-								 [ "w_bfg.md2", "w_bfg.png" ],
-								 [ "w_blaster.md2", "w_blaster.png" ],
-								 [ "w_chaingun.md2", "w_chaingun.png" ],
-								 [ "w_glauncher.md2", "w_glauncher.png" ],
-								 [ "w_hyperblaster.md2", "w_hyperblaster.png" ],
-								 [ "w_machinegun.md2", "w_machinegun.png" ],
-								 [ "w_railgun.md2", "w_railgun.png" ],
-								 [ "w_rlauncher.md2", "w_rlauncher.png" ],
-								 [ "w_shotgun.md2", "w_shotgun.png" ],
-								 [ "w_sshotgun.md2", "w_sshotgun.png" ]
+					body: 'ratamahatta.md2',
+					skins: [ 'ratamahatta.png', 'ctf_b.png', 'ctf_r.png', 'dead.png', 'gearwhore.png' ],
+					weapons: [[ 'weapon.md2', 'weapon.png' ],
+								 [ 'w_bfg.md2', 'w_bfg.png' ],
+								 [ 'w_blaster.md2', 'w_blaster.png' ],
+								 [ 'w_chaingun.md2', 'w_chaingun.png' ],
+								 [ 'w_glauncher.md2', 'w_glauncher.png' ],
+								 [ 'w_hyperblaster.md2', 'w_hyperblaster.png' ],
+								 [ 'w_machinegun.md2', 'w_machinegun.png' ],
+								 [ 'w_railgun.md2', 'w_railgun.png' ],
+								 [ 'w_rlauncher.md2', 'w_rlauncher.png' ],
+								 [ 'w_shotgun.md2', 'w_shotgun.png' ],
+								 [ 'w_sshotgun.md2', 'w_sshotgun.png' ]
 					]
 
 				};
@@ -222,12 +223,12 @@
 
 			function labelize( text ) {
 
-				const parts = text.split( "." );
+				const parts = text.split( '.' );
 
 				if ( parts.length > 1 ) {
 
 					parts.length -= 1;
-					return parts.join( "." );
+					return parts.join( '.' );
 
 				}
 
@@ -239,7 +240,7 @@
 
 			function setupWeaponsGUI( character ) {
 
-				const folder = gui.addFolder( "Weapons" );
+				const folder = gui.addFolder( 'Weapons' );
 
 				const generateCallback = function ( index ) {
 
@@ -268,7 +269,7 @@
 
 			function setupSkinsGUI( character ) {
 
-				const folder = gui.addFolder( "Skins" );
+				const folder = gui.addFolder( 'Skins' );
 
 				const generateCallback = function ( index ) {
 
@@ -297,7 +298,7 @@
 
 			function setupGUIAnimations( character ) {
 
-				const folder = gui.addFolder( "Animations" );
+				const folder = gui.addFolder( 'Animations' );
 
 				const generateCallback = function ( animationClip ) {
 

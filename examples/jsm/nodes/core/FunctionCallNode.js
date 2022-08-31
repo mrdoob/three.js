@@ -40,17 +40,32 @@ class FunctionCallNode extends TempNode {
 		const inputs = functionNode.getInputs( builder );
 		const parameters = this.parameters;
 
-		for ( const inputNode of inputs ) {
+		if ( Array.isArray( parameters ) ) {
 
-			const node = parameters[ inputNode.name ];
+			for ( let i = 0; i < parameters.length; i ++ ) {
 
-			if ( node !== undefined ) {
+				const inputNode = inputs[ i ];
+				const node = parameters[ i ];
 
 				params.push( node.build( builder, inputNode.type ) );
 
-			} else {
+			}
 
-				throw new Error( `FunctionCallNode: Input '${inputNode.name}' not found in FunctionNode.` );
+		} else {
+
+			for ( const inputNode of inputs ) {
+
+				const node = parameters[ inputNode.name ];
+
+				if ( node !== undefined ) {
+
+					params.push( node.build( builder, inputNode.type ) );
+
+				} else {
+
+					throw new Error( `FunctionCallNode: Input '${inputNode.name}' not found in FunctionNode.` );
+
+				}
 
 			}
 

@@ -45,7 +45,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -54,7 +55,7 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let container, camera, renderer, controls;
 			let sceneL, sceneR;
@@ -139,7 +140,7 @@
 
 					sliderPos = Math.max( 0, Math.min( window.innerWidth, e.pageX ) );
 
-					slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + "px";
+					slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + 'px';
 
 				}
 

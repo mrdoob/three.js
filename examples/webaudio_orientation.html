@@ -29,7 +29,8 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
@@ -37,9 +38,9 @@
 	<script type="module">
 		import * as THREE from 'three';
 
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { PositionalAudioHelper } from './jsm/helpers/PositionalAudioHelper.js';
-		import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 		let scene, camera, renderer;
 

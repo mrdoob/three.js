@@ -21,14 +21,6 @@
 		constructor( camera, domElement ) {
 
 			super();
-
-			if ( domElement === undefined ) {
-
-				console.warn( 'THREE.PointerLockControls: The second parameter "domElement" is now mandatory.' );
-				domElement = document.body;
-
-			}
-
 			this.domElement = domElement;
 			this.isLocked = false; // Set to constrain the pitch of the camera
 			// Range is 0 to Math.PI radians

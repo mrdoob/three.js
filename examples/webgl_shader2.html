@@ -138,7 +138,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -147,7 +148,7 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let stats;
 
@@ -172,15 +173,15 @@
 				const geometry = new THREE.BoxGeometry( 0.75, 0.75, 0.75 );
 
 				uniforms1 = {
-					"time": { value: 1.0 }
+					'time': { value: 1.0 }
 				};
 
 				uniforms2 = {
-					"time": { value: 1.0 },
-					"colorTexture": { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
+					'time': { value: 1.0 },
+					'colorTexture': { value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
 				};
 
-				uniforms2[ "colorTexture" ].value.wrapS = uniforms2[ "colorTexture" ].value.wrapT = THREE.RepeatWrapping;
+				uniforms2[ 'colorTexture' ].value.wrapS = uniforms2[ 'colorTexture' ].value.wrapT = THREE.RepeatWrapping;
 
 				const params = [
 					[ 'fragment_shader1', uniforms1 ],
@@ -243,8 +244,8 @@
 
 				const delta = clock.getDelta();
 
-				uniforms1[ "time" ].value += delta * 5;
-				uniforms2[ "time" ].value = clock.elapsedTime;
+				uniforms1[ 'time' ].value += delta * 5;
+				uniforms2[ 'time' ].value = clock.elapsedTime;
 
 				for ( let i = 0; i < scene.children.length; i ++ ) {
 
