@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Una classe per generare geometrie di sfere.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#SphereGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>const geometry = new THREE.SphereGeometry( 15, 32, 16 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const sphere = new THREE.Mesh( geometry, material );
+		scene.add( sphere );
+		</code>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]([param:Float radius], [param:Integer widthSegments], [param:Integer heightSegments], [param:Float phiStart], [param:Float phiLength], [param:Float thetaStart], [param:Float thetaLength])</h3>
+
+		<p>
+		radius — raggio della sfera. Il valore predefinito è 1.<br />
+		widthSegments — numero di segmenti orizzontali. Il valore minimo è 3 e il valore predefinito è 32.<br />
+		heightSegments — numero di segmenti verticali. Il valore minimo è 2 e il valore predefinito è 16.<br />
+		phiStart — specifica l'angolo di partenza orizzontale. Il valore predefinito è 0.<br />
+		phiLength — specifica la dimensione dell'angolo di ampiezza orizzontale. Il valore predefinito è Math.PI * 2.<br />
+		thetaStart — specifica l'angolo di partenza verticale. Il valore predefinito è 0.<br />
+		thetaLength — specifica la dimensione dell'angolo di ampiezza verticale. Il valore predefinito è Math.PI.<br />
+		</p>
+
+		<p>
+      La geometria viene creata eseguendo lo sweep e il calcolo dei vertici attorno all'asse Y (sweep orizzontale) e all'asse Z (sweep verticale).
+      Pertanto, le sfere incomplete (simili a `'fette di sfere'`) possono essere create attraverso l'utilizzo dei diversi valori di 
+      phiStart, phiLength, thetaStart e thetaLength, al fine di definire i punti in cui iniziamo (o finiamo) il calcolo di quei vertici.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:BufferGeometry] per le proprietà comuni.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+      Un oggetto con una proprietà per ognuno dei parametri del costruttore. Qualsiasi modifica dopo l'istanziazione non cambia la geometria.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:BufferGeometry] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

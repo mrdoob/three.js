@@ -1244,6 +1244,30 @@
 				"QuadraticBezierCurve": "api/it/extras/curves/QuadraticBezierCurve",
 				"QuadraticBezierCurve3": "api/it/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/it/extras/curves/SplineCurve"
+			},
+
+      "Geometrie": {
+				"BoxGeometry": "api/it/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/it/geometries/CapsuleGeometry",
+				"CircleGeometry": "api/it/geometries/CircleGeometry",
+				"ConeGeometry": "api/it/geometries/ConeGeometry",
+				"CylinderGeometry": "api/it/geometries/CylinderGeometry",
+				"DodecahedronGeometry": "api/it/geometries/DodecahedronGeometry",
+				"EdgesGeometry": "api/it/geometries/EdgesGeometry",
+				"ExtrudeGeometry": "api/it/geometries/ExtrudeGeometry",
+				"IcosahedronGeometry": "api/it/geometries/IcosahedronGeometry",
+				"LatheGeometry": "api/it/geometries/LatheGeometry",
+				"OctahedronGeometry": "api/it/geometries/OctahedronGeometry",
+				"PlaneGeometry": "api/it/geometries/PlaneGeometry",
+				"PolyhedronGeometry": "api/it/geometries/PolyhedronGeometry",
+				"RingGeometry": "api/it/geometries/RingGeometry",
+				"ShapeGeometry": "api/it/geometries/ShapeGeometry",
+				"SphereGeometry": "api/it/geometries/SphereGeometry",
+				"TetrahedronGeometry": "api/it/geometries/TetrahedronGeometry",
+				"TorusGeometry": "api/it/geometries/TorusGeometry",
+				"TorusKnotGeometry": "api/it/geometries/TorusKnotGeometry",
+				"TubeGeometry": "api/it/geometries/TubeGeometry",
+				"WireframeGeometry": "api/it/geometries/WireframeGeometry"
 			}
     }
 	},
