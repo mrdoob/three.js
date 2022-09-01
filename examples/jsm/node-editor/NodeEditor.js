@@ -389,6 +389,8 @@ export class NodeEditor extends EventDispatcher {
 
 	set preview( value ) {
 
+		if ( this._preview === value ) return;
+
 		if ( value ) {
 
 			this.menu.dom.remove();
