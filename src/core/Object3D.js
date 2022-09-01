@@ -322,6 +322,15 @@ class Object3D extends EventDispatcher {
 
 		if ( object && object.isObject3D ) {
 
+			// the object already belongs to the parent
+			if ( object.parent === this ) {
+
+				// dispatch as if we did the work
+				object.dispatchEvent( _addedEvent );
+				return;
+
+			}
+
 			if ( object.parent !== null ) {
 
 				object.parent.remove( object );
@@ -884,6 +893,12 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	onCopyUserData( userData ) {
+
+		return JSON.parse( JSON.stringify( userData ) );
+
+	}
+
 	clone( recursive ) {
 
 		return new this.constructor().copy( this, recursive );
@@ -918,7 +933,7 @@ class Object3D extends EventDispatcher {
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = this.onCopyUserData( source.userData );
 
 		if ( recursive === true ) {
 
