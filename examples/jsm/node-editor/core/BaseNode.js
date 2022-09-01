@@ -34,6 +34,12 @@ export class BaseNode extends ObjectNode {
 
 	}
 
+	getColor() {
+
+		return ( this.getColorValueFromValue( this.value ) || '#777777' ) + 'BB';
+
+	}
+
 	serialize( data ) {
 
 		super.serialize( data );
@@ -64,15 +70,16 @@ export class BaseNode extends ObjectNode {
 
 		if ( value.isMaterial === true ) {
 
-			return 'forestgreen';
+			//return 'forestgreen';
+			return '#228b22';
 
 		} else if ( value.isObject3D === true ) {
 
-			return 'orange';
+			return '#ffa500';
 
 		} else if ( value.isDataFile === true ) {
 
-			return 'aqua';
+			return '#00ffff';
 
 		}
 
