@@ -36,7 +36,7 @@
 
 			let renderer, scene, camera;
 
-			let spotLight, lightHelper;
+			let spotLight, lightHelper, lightHelperProjector;
 
 			init();
 
@@ -93,7 +93,7 @@
 				spotLight.decay = 2;
 				spotLight.distance = 100;
 				spotLight.map = textures[ 'disturb.jpg' ];
-
+				spotLight.projector = true;
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 1024;
 				spotLight.shadow.mapSize.height = 1024;
@@ -104,6 +104,8 @@
 
 				lightHelper = new THREE.SpotLightHelper( spotLight );
 				scene.add( lightHelper );
+				lightHelperProjector = new THREE.CameraHelper( spotLight.shadow.camera );
+				scene.add( lightHelperProjector );
 
 				//
 
@@ -151,7 +153,9 @@
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
 					focus: spotLight.shadow.focus,
-					shadows: true
+					shadows: true,
+					projector: true,
+					projectorAspect: 1
 				};
 
 				gui.add( params, 'map', textures ).onChange( function ( val ) {
@@ -169,6 +173,16 @@
 				gui.add( params, 'intensity', 0, 10 ).onChange( function ( val ) {
 
 					spotLight.intensity = val;
+
+				} );
+				gui.add( params, 'projector' ).onChange( function ( val ) {
+
+					spotLight.projector = val;
+
+				} );
+				gui.add( params, 'projectorAspect', 0.1, 10).onChange( function ( val ) {
+
+					spotLight.projectorAspect = val;
 
 				} );
 
@@ -241,7 +255,14 @@
 				spotLight.position.z = Math.sin( time ) * 25;
 
 				lightHelper.update();
-
+				lightHelperProjector.update();
+				if (spotLight.projector) {
+					lightHelper.visible = false;
+					lightHelperProjector.visible = true;
+				} else {
+					lightHelper.visible = true;
+					lightHelperProjector.visible = false;
+				}
 				renderer.render( scene, camera );
 
 			}

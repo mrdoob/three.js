@@ -1,4 +1,4 @@
-export default /* glsl */`
+export default /* glsl */ `
 /**
  * This is a template that can be used to light a material, it uses pluggable
  * RenderEquations (RE)for specific lighting scenarios.
@@ -95,7 +95,7 @@ IncidentLight directLight;
 
 		spotLight = spotLights[ i ];
 
-		getSpotLightInfo( spotLight, geometry, directLight );
+		getSpotLightInfo( spotLight, geometry, vSpotLightCoord[ i ], directLight );
 
 		// spot lights are ordered [shadows with maps, shadows without maps, maps without shadows, none]
 		#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS )
