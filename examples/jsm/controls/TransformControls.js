@@ -38,7 +38,7 @@ const _objectChangeEvent = { type: 'objectChange' };
 
 class TransformControls extends Object3D {
 
-	constructor( camera, domElement ) {
+	constructor( camera, domElement,renderer ) {
 
 		super();
 
@@ -176,8 +176,125 @@ class TransformControls extends Object3D {
 		this.domElement.addEventListener( 'pointermove', this._onPointerHover );
 		this.domElement.addEventListener( 'pointerup', this._onPointerUp );
 
-	}
+		this.renderer = renderer; 
+		//State variable for keeping track of which controller is hovering over the gizmo. 
+		this.controllerState = {
+			RIGHT:0,
+			LEFT:0,
+		}
 
+        this._onControllerHover = this.onXRControllerEvent.bind( this );
+        this._onPointerMoveVR = this.pointerMoveVR.bind(this);
+        this._onControllerSelect = this.selectStart.bind(this);
+        this._onControllerSelectEnd = this.onSelectEnd.bind(this);
+
+        const controller1 = renderer.xr.getController( 0 );
+		controller1.name = "right"; 
+		controller1.addEventListener( 'selectstart', this.selectStart );
+
+		const controller2 = renderer.xr.getController( 1 );
+		controller2.name = "left";
+
+		controller2.addEventListener( 'selectstart', this.selectStart );
+        
+        controller1.addEventListener( 'move', this._onControllerHover );
+        controller2.addEventListener( 'move', this._onControllerHover );
+
+        controller1.addEventListener( 'move', this._onPointerMoveVR );
+        controller2.addEventListener( 'move', this._onPointerMoveVR );
+
+        controller1.addEventListener( 'selectstart', this._onControllerSelect );
+        controller2.addEventListener( 'selectstart', this._onControllerSelect );
+
+        controller1.addEventListener( 'selectend', this._onControllerSelectEnd );
+        controller2.addEventListener( 'selectend', this._onControllerSelectEnd );
+        
+	}
+    
+     onXRControllerEvent( event ) {
+    
+        const controller = event.target;
+
+        _tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+        _raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+        _raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( _tempMatrix );
+
+        if ( this.object === undefined || this.dragging === true ) return;
+
+		const intersect = intersectObjectWithRay( this._gizmo.picker[ this.mode ], _raycaster );
+
+		if ( intersect ) {
+			if(controller.name == "left") this.controllerState.LEFT=1;
+				
+			if(controller.name == "right") this.controllerState.RIGHT=1;
+			
+			//deselects axis if both controllers raycast are over the gizmo. 
+			if(this.controllerState.RIGHT ^ this.controllerState.LEFT ){
+				this.axis = intersect.object.name;
+			}
+			else{
+				this.axis = null; 
+			}
+
+		} else {
+			if(controller.name == "left") this.controllerState.LEFT=0;
+				
+			if(controller.name == "right") this.controllerState.RIGHT=0;
+		}
+		
+		if(!this.controllerState.RIGHT && !this.controllerState.LEFT ){
+			this.axis = null;
+		}
+
+    }
+
+    onSelectEnd(event ){
+            this.dragging = false;
+            this.axis = null;
+        }
+    
+
+    selectStart( event ) {
+
+		if ( this.object === undefined || this.dragging === true ) return;
+
+		const controller = event.target;
+		if(controller.name === "left" && this.controllerState.LEFT ===0 ) return; 
+
+		if(controller.name === "right" && this.controllerState.RIGHT ===0 ) return; 
+
+		if ( this.axis !== null ) {
+
+            const controller = event.target;
+
+            _tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+            _raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+            _raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( _tempMatrix );
+
+			const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
+			if ( planeIntersect ) {
+
+				this.object.updateMatrixWorld();
+				this.object.parent.updateMatrixWorld();
+
+				this._positionStart.copy( this.object.position );
+				this._quaternionStart.copy( this.object.quaternion );
+				this._scaleStart.copy( this.object.scale );
+
+				this.object.matrixWorld.decompose( this.worldPositionStart, this.worldQuaternionStart, this._worldScaleStart );
+
+				this.pointStart.copy( planeIntersect.point ).sub( this.worldPositionStart );
+
+			}
+
+			this.dragging = true;
+			_mouseDownEvent.mode = this.mode;
+			this.dispatchEvent( _mouseDownEvent );
+
+		}
+	}
 	// updateMatrixWorld  updates key transformation variables
 	updateMatrixWorld() {
 
@@ -521,6 +638,258 @@ class TransformControls extends Object3D {
 
 	}
 
+    pointerMoveVR( event ) {
+
+		const axis = this.axis;
+		const mode = this.mode;
+		const object = this.object;
+		let space = this.space;
+
+		if ( mode === 'scale' ) {
+
+			space = 'local';
+
+		} else if ( axis === 'E' || axis === 'XYZE' || axis === 'XYZ' ) {
+
+			space = 'world';
+
+		}
+
+		if ( object === undefined || axis === null || this.dragging === false ) return;
+
+		const controller = event.target;
+
+		if(controller.name === "left" && this.controllerState.LEFT ===0 ) return; 
+		if(controller.name === "right" && this.controllerState.RIGHT ===0 ) return; 
+
+		const planeIntersect = intersectObjectWithRay( this._plane, _raycaster, true );
+
+		if ( ! planeIntersect ) return;
+
+		this.pointEnd.copy( planeIntersect.point ).sub( this.worldPositionStart );
+
+		if ( mode === 'translate' ) {
+
+			// Apply translate
+
+			this._offset.copy( this.pointEnd ).sub( this.pointStart );
+
+			if ( space === 'local' && axis !== 'XYZ' ) {
+
+				this._offset.applyQuaternion( this._worldQuaternionInv );
+
+			}
+
+			if ( axis.indexOf( 'X' ) === - 1 ) this._offset.x = 0;
+			if ( axis.indexOf( 'Y' ) === - 1 ) this._offset.y = 0;
+			if ( axis.indexOf( 'Z' ) === - 1 ) this._offset.z = 0;
+
+			if ( space === 'local' && axis !== 'XYZ' ) {
+
+				this._offset.applyQuaternion( this._quaternionStart ).divide( this._parentScale );
+
+			} else {
+
+				this._offset.applyQuaternion( this._parentQuaternionInv ).divide( this._parentScale );
+
+			}
+
+			object.position.copy( this._offset ).add( this._positionStart );
+
+			// Apply translation snap
+
+			if ( this.translationSnap ) {
+
+				if ( space === 'local' ) {
+
+					object.position.applyQuaternion( _tempQuaternion.copy( this._quaternionStart ).invert() );
+
+					if ( axis.search( 'X' ) !== - 1 ) {
+
+						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
+
+					}
+
+					if ( axis.search( 'Y' ) !== - 1 ) {
+
+						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
+
+					}
+
+					if ( axis.search( 'Z' ) !== - 1 ) {
+
+						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
+
+					}
+
+					object.position.applyQuaternion( this._quaternionStart );
+
+				}
+
+				if ( space === 'world' ) {
+
+					if ( object.parent ) {
+
+						object.position.add( _tempVector.setFromMatrixPosition( object.parent.matrixWorld ) );
+
+					}
+
+					if ( axis.search( 'X' ) !== - 1 ) {
+
+						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
+
+					}
+
+					if ( axis.search( 'Y' ) !== - 1 ) {
+
+						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
+
+					}
+
+					if ( axis.search( 'Z' ) !== - 1 ) {
+
+						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
+
+					}
+
+					if ( object.parent ) {
+
+						object.position.sub( _tempVector.setFromMatrixPosition( object.parent.matrixWorld ) );
+
+					}
+
+				}
+
+			}
+
+		} else if ( mode === 'scale' ) {
+
+			if ( axis.search( 'XYZ' ) !== - 1 ) {
+
+				let d = this.pointEnd.length() / this.pointStart.length();
+
+				if ( this.pointEnd.dot( this.pointStart ) < 0 ) d *= - 1;
+
+				_tempVector2.set( d, d, d );
+
+			} else {
+
+				_tempVector.copy( this.pointStart );
+				_tempVector2.copy( this.pointEnd );
+
+				_tempVector.applyQuaternion( this._worldQuaternionInv );
+				_tempVector2.applyQuaternion( this._worldQuaternionInv );
+
+				_tempVector2.divide( _tempVector );
+
+				if ( axis.search( 'X' ) === - 1 ) {
+
+					_tempVector2.x = 1;
+
+				}
+
+				if ( axis.search( 'Y' ) === - 1 ) {
+
+					_tempVector2.y = 1;
+
+				}
+
+				if ( axis.search( 'Z' ) === - 1 ) {
+
+					_tempVector2.z = 1;
+
+				}
+
+			}
+
+			// Apply scale
+
+			object.scale.copy( this._scaleStart ).multiply( _tempVector2 );
+
+			if ( this.scaleSnap ) {
+
+				if ( axis.search( 'X' ) !== - 1 ) {
+
+					object.scale.x = Math.round( object.scale.x / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Y' ) !== - 1 ) {
+
+					object.scale.y = Math.round( object.scale.y / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Z' ) !== - 1 ) {
+
+					object.scale.z = Math.round( object.scale.z / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+			}
+
+		} else if ( mode === 'rotate' ) {
+
+			this._offset.copy( this.pointEnd ).sub( this.pointStart );
+
+			const ROTATION_SPEED = 20 / this.worldPosition.distanceTo( _tempVector.setFromMatrixPosition( this.camera.matrixWorld ) );
+
+			if ( axis === 'E' ) {
+
+				this.rotationAxis.copy( this.eye );
+				this.rotationAngle = this.pointEnd.angleTo( this.pointStart );
+
+				this._startNorm.copy( this.pointStart ).normalize();
+				this._endNorm.copy( this.pointEnd ).normalize();
+
+				this.rotationAngle *= ( this._endNorm.cross( this._startNorm ).dot( this.eye ) < 0 ? 1 : - 1 );
+
+			} else if ( axis === 'XYZE' ) {
+
+				this.rotationAxis.copy( this._offset ).cross( this.eye ).normalize();
+				this.rotationAngle = this._offset.dot( _tempVector.copy( this.rotationAxis ).cross( this.eye ) ) * ROTATION_SPEED;
+
+			} else if ( axis === 'X' || axis === 'Y' || axis === 'Z' ) {
+
+				this.rotationAxis.copy( _unit[ axis ] );
+
+				_tempVector.copy( _unit[ axis ] );
+
+				if ( space === 'local' ) {
+
+					_tempVector.applyQuaternion( this.worldQuaternion );
+
+				}
+
+				this.rotationAngle = this._offset.dot( _tempVector.cross( this.eye ).normalize() ) * ROTATION_SPEED;
+
+			}
+
+			// Apply rotation snap
+
+			if ( this.rotationSnap ) this.rotationAngle = Math.round( this.rotationAngle / this.rotationSnap ) * this.rotationSnap;
+
+			// Apply rotate
+			if ( space === 'local' && axis !== 'E' && axis !== 'XYZE' ) {
+
+				object.quaternion.copy( this._quaternionStart );
+				object.quaternion.multiply( _tempQuaternion.setFromAxisAngle( this.rotationAxis, this.rotationAngle ) ).normalize();
+
+			} else {
+
+				this.rotationAxis.applyQuaternion( this._parentQuaternionInv );
+				object.quaternion.copy( _tempQuaternion.setFromAxisAngle( this.rotationAxis, this.rotationAngle ) );
+				object.quaternion.multiply( this._quaternionStart ).normalize();
+
+			}
+
+		}
+
+		this.dispatchEvent( _changeEvent );
+		this.dispatchEvent( _objectChangeEvent );
+
+	}
+
 	pointerUp( pointer ) {
 
 		if ( pointer.button !== 0 ) return;
@@ -543,6 +912,24 @@ class TransformControls extends Object3D {
 		this.domElement.removeEventListener( 'pointermove', this._onPointerHover );
 		this.domElement.removeEventListener( 'pointermove', this._onPointerMove );
 		this.domElement.removeEventListener( 'pointerup', this._onPointerUp );
+		
+		const controller1 = this.renderer.xr.getController( 0 );
+		const controller2 = this.renderer.xr.getController( 1 );
+
+		controller1.removeEventListener( 'selectstart', this.selectStart );
+		controller2.removeEventListener( 'selectstart', this.selectStart );
+        
+        controller1.removeEventListener( 'move', this._onControllerHover );
+        controller2.removeEventListener( 'move', this._onControllerHover );
+
+        controller1.removeEventListener( 'move', this._onPointerMoveVR );
+        controller2.removeEventListener( 'move', this._onPointerMoveVR );
+
+        controller1.removeEventListener( 'selectstart', this._onControllerSelect );
+        controller2.removeEventListener( 'selectstart', this._onControllerSelect );
+
+        controller1.removeEventListener( 'selectend', this._onControllerSelectEnd );
+        controller2.removeEventListener( 'selectend', this._onControllerSelectEnd );
 
 		this.traverse( function ( child ) {
 
@@ -690,8 +1077,7 @@ function onPointerDown( event ) {
 
 	if ( ! this.enabled ) return;
 
-	if ( ! document.pointerLockElement ) {
-
+	if ( ! document.pointerLockElement && event.pointerId !== undefined ) {
 		this.domElement.setPointerCapture( event.pointerId );
 
 	}
