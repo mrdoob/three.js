@@ -4,68 +4,68 @@ import { Object3D } from '../core/Object3D.js';
 
 class SpotLight extends Light {
 
-    constructor(color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1) {
+	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
 
-        super(color, intensity);
+		super( color, intensity );
 
-        this.isSpotLight = true;
+		this.isSpotLight = true;
 
-        this.type = 'SpotLight';
+		this.type = 'SpotLight';
 
-        this.position.copy(Object3D.DefaultUp);
-        this.updateMatrix();
+		this.position.copy( Object3D.DefaultUp );
+		this.updateMatrix();
 
-        this.target = new Object3D();
+		this.target = new Object3D();
 
-        this.distance = distance;
-        this.angle = angle;
-        this.penumbra = penumbra;
-        this.decay = decay; // for physically correct lights, should be 2.
-        this.projector = false;
-        this.projectorAspect = 1;
-        this.map = null;
+		this.distance = distance;
+		this.angle = angle;
+		this.penumbra = penumbra;
+		this.decay = decay; // for physically correct lights, should be 2.
+		this.projector = false;
+		this.projectorAspect = 1;
+		this.map = null;
 
-        this.shadow = new SpotLightShadow();
+		this.shadow = new SpotLightShadow();
 
-    }
+	}
 
-    get power() {
+	get power() {
 
-        // compute the light's luminous power (in lumens) from its intensity (in candela)
-        // by convention for a spotlight, luminous power (lm) = π * luminous intensity (cd)
-        return this.intensity * Math.PI;
+		// compute the light's luminous power (in lumens) from its intensity (in candela)
+		// by convention for a spotlight, luminous power (lm) = π * luminous intensity (cd)
+		return this.intensity * Math.PI;
 
-    }
+	}
 
-    set power(power) {
+	set power( power ) {
 
-        // set the light's intensity (in candela) from the desired luminous power (in lumens)
-        this.intensity = power / Math.PI;
+		// set the light's intensity (in candela) from the desired luminous power (in lumens)
+		this.intensity = power / Math.PI;
 
-    }
+	}
 
-    dispose() {
+	dispose() {
 
-        this.shadow.dispose();
+		this.shadow.dispose();
 
-    }
+	}
 
-    copy(source, recursive) {
+	copy( source, recursive ) {
 
-        super.copy(source, recursive);
+		super.copy( source, recursive );
 
-        this.distance = source.distance;
-        this.angle = source.angle;
-        this.penumbra = source.penumbra;
-        this.decay = source.decay;
+		this.distance = source.distance;
+		this.angle = source.angle;
+		this.penumbra = source.penumbra;
+		this.decay = source.decay;
 
-        this.target = source.target.clone();
+		this.target = source.target.clone();
 
-        this.shadow = source.shadow.clone();
+		this.shadow = source.shadow.clone();
 
-        return this;
+		return this;
 
-    }
+	}
 
 }
 
