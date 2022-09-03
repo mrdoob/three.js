@@ -1268,6 +1268,22 @@
 				"TorusKnotGeometry": "api/it/geometries/TorusKnotGeometry",
 				"TubeGeometry": "api/it/geometries/TubeGeometry",
 				"WireframeGeometry": "api/it/geometries/WireframeGeometry"
+			},
+
+			"Helpers": {
+				"ArrowHelper": "api/it/helpers/ArrowHelper",
+				"AxesHelper": "api/it/helpers/AxesHelper",
+				"BoxHelper": "api/it/helpers/BoxHelper",
+				"Box3Helper": "api/it/helpers/Box3Helper",
+				"CameraHelper": "api/it/helpers/CameraHelper",
+				"DirectionalLightHelper": "api/it/helpers/DirectionalLightHelper",
+				"GridHelper": "api/it/helpers/GridHelper",
+				"PolarGridHelper": "api/it/helpers/PolarGridHelper",
+				"HemisphereLightHelper": "api/it/helpers/HemisphereLightHelper",
+				"PlaneHelper": "api/it/helpers/PlaneHelper",
+				"PointLightHelper": "api/it/helpers/PointLightHelper",
+				"SkeletonHelper": "api/it/helpers/SkeletonHelper",
+				"SpotLightHelper": "api/it/helpers/SpotLightHelper"
 			}
     }
 	},
