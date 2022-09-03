@@ -219,7 +219,10 @@
 
 			}
 
+			let lastFrame = performance.now();
 			function render() {
+				const delta = (performance.now() - lastFrame) / 1000;
+				lastFrame = performance.now(); 
 
 				updateSize();
 
@@ -275,7 +278,7 @@
 
 				} );
 
-				t ++;
+				t += delta * 30;
 
 			}
 
