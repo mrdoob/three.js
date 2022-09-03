@@ -100,6 +100,8 @@
 
 			const scenes = [];
 
+			const clock = new THREE.Clock();
+
 			let views, t, canvas, renderer;
 
 			window.onload = init;
@@ -219,10 +221,7 @@
 
 			}
 
-			let lastFrame = performance.now();
 			function render() {
-				const delta = (performance.now() - lastFrame) / 1000;
-				lastFrame = performance.now(); 
 
 				updateSize();
 
@@ -278,7 +277,7 @@
 
 				} );
 
-				t += delta * 30;
+				t += clock.getDelta() * 30;
 
 			}
 
