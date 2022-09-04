@@ -1214,6 +1214,36 @@
 
 			"Core / BufferAttributes": {
 				"BufferAttribute Types": "api/it/core/bufferAttributeTypes/BufferAttributeTypes"
+			},
+
+      "Extras": {
+				"DataUtils": "api/it/extras/DataUtils",
+				"Earcut": "api/it/extras/Earcut",
+				"ImageUtils": "api/it/extras/ImageUtils",
+				"PMREMGenerator": "api/it/extras/PMREMGenerator",
+				"ShapeUtils": "api/it/extras/ShapeUtils"
+			},
+
+			"Extras / Core": {
+				"Curve": "api/it/extras/core/Curve",
+				"CurvePath": "api/it/extras/core/CurvePath",
+				"Interpolations": "api/it/extras/core/Interpolations",
+				"Path": "api/it/extras/core/Path",
+				"Shape": "api/it/extras/core/Shape",
+				"ShapePath": "api/it/extras/core/ShapePath"
+			},
+
+			"Extras / Curves": {
+				"ArcCurve": "api/it/extras/curves/ArcCurve",
+				"CatmullRomCurve3": "api/it/extras/curves/CatmullRomCurve3",
+				"CubicBezierCurve": "api/it/extras/curves/CubicBezierCurve",
+				"CubicBezierCurve3": "api/it/extras/curves/CubicBezierCurve3",
+				"EllipseCurve": "api/it/extras/curves/EllipseCurve",
+				"LineCurve": "api/it/extras/curves/LineCurve",
+				"LineCurve3": "api/it/extras/curves/LineCurve3",
+				"QuadraticBezierCurve": "api/it/extras/curves/QuadraticBezierCurve",
+				"QuadraticBezierCurve3": "api/it/extras/curves/QuadraticBezierCurve3",
+				"SplineCurve": "api/it/extras/curves/SplineCurve"
 			}
     }
 	},
@@ -1339,6 +1369,7 @@
 		"Référence": {
 
 			"Animation": {
+<<<<<<< HEAD
 				"AnimationAction": "api/fr/animation/AnimationAction",
 				"AnimationClip": "api/fr/animation/AnimationClip",
 				"AnimationMixer": "api/fr/animation/AnimationMixer",
@@ -1364,6 +1395,25 @@
 				"AudioContext": "api/fr/audio/AudioContext",
 				"AudioListener": "api/fr/audio/AudioListener",
 				"PositionalAudio": "api/fr/audio/PositionalAudio"
+=======
+				"AnimationAction": "api/pt-br/animation/AnimationAction",
+				"AnimationClip": "api/pt-br/animation/AnimationClip",
+				"AnimationMixer": "api/pt-br/animation/AnimationMixer",
+				"AnimationObjectGroup": "api/pt-br/animation/AnimationObjectGroup",
+				"AnimationUtils": "api/pt-br/animation/AnimationUtils",
+				"KeyframeTrack": "api/pt-br/animation/KeyframeTrack",
+				"PropertyBinding": "api/pt-br/animation/PropertyBinding",
+				"PropertyMixer": "api/pt-br/animation/PropertyMixer"
+			},
+
+			"Animation / Tracks": {
+				"BooleanKeyframeTrack": "api/pt-br/animation/tracks/BooleanKeyframeTrack",
+				"ColorKeyframeTrack": "api/pt-br/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/pt-br/animation/tracks/NumberKeyframeTrack",
+				"QuaternionKeyframeTrack": "api/pt-br/animation/tracks/QuaternionKeyframeTrack",
+				"StringKeyframeTrack": "api/pt-br/animation/tracks/StringKeyframeTrack",
+				"VectorKeyframeTrack": "api/pt-br/animation/tracks/VectorKeyframeTrack"
+>>>>>>> 92b99264e8692546badf8ee1ce945ef38db443f4
 			}
 		
 		}

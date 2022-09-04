@@ -50,7 +50,7 @@ class Scene extends Object3D {
 
 	}
 
-	// Deprecated
+	// @deprecated
 
 	get autoUpdate() {
 

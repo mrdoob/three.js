@@ -28,7 +28,7 @@ export default /* glsl */`
 	for ( int i = 0; i < NUM_SPOT_LIGHT_COORDS; i ++ ) {
 
 		shadowWorldPosition = worldPosition;
-		#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
+		#if ( defined( USE_SHADOWMAP ) && UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
 			shadowWorldPosition.xyz += shadowWorldNormal * spotLightShadows[ i ].shadowNormalBias;
 		#endif
 		vSpotLightCoord[ i ] = spotLightMatrix[ i ] * shadowWorldPosition;

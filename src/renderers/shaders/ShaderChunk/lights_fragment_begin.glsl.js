@@ -110,9 +110,7 @@ IncidentLight directLight;
 			spotLightCoord = vSpotLightCoord[ i ].xyz / vSpotLightCoord[ i ].w;
 			inSpotLightMap = all( lessThan( abs( spotLightCoord * 2. - 1. ), vec3( 1.0 ) ) );
 			spotColor = texture2D( spotLightMap[ SPOT_LIGHT_MAP_INDEX ], spotLightCoord.xy );
-			inSpotLightMap = inSpotLightMap && ( spotColor.a > 0. );
-			directLight.visible = directLight.visible || inSpotLightMap;
-			directLight.color = inSpotLightMap ? mix( directLight.color, spotLight.color * spotColor.rgb, spotColor.a ) : directLight.color;
+			directLight.color = inSpotLightMap ? directLight.color * spotColor.rgb : directLight.color;
 		#endif
 
 		#undef SPOT_LIGHT_MAP_INDEX

@@ -1,10 +1,6 @@
 /* global QUnit */
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
-import { Color } from '../../../../src/math/Color.js';
-import { Vector2 } from '../../../../src/math/Vector2.js';
-import { Vector3 } from '../../../../src/math/Vector3.js';
-import { Vector4 } from '../../../../src/math/Vector4.js';
 import { DynamicDrawUsage } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Core', () => {
@@ -91,66 +87,6 @@ export default QUnit.module( 'Core', () => {
 			a.copyArray( f32a );
 
 			assert.deepEqual( a.array, f32a, 'Check array has new values' );
-
-		} );
-
-		QUnit.test( 'copyColorsArray', ( assert ) => {
-
-			var attr = new BufferAttribute( new Float32Array( 6 ), 3 );
-
-			attr.copyColorsArray( [
-				new Color( 0, 0.5, 1 ),
-				new Color( 0.25, 1, 0 )
-			] );
-
-			var i = attr.array;
-			assert.ok( i[ 0 ] === 0 && i[ 1 ] === 0.5 && i[ 2 ] === 1, 'first color was copied correctly' );
-			assert.ok( i[ 3 ] === 0.25 && i[ 4 ] === 1 && i[ 5 ] === 0, 'second color was copied correctly' );
-
-		} );
-
-		QUnit.test( 'copyVector2sArray', ( assert ) => {
-
-			var attr = new BufferAttribute( new Float32Array( 4 ), 2 );
-
-			attr.copyVector2sArray( [
-				new Vector2( 1, 2 ),
-				new Vector2( 4, 5 )
-			] );
-
-			var i = attr.array;
-			assert.ok( i[ 0 ] === 1 && i[ 1 ] === 2, 'first vector was copied correctly' );
-			assert.ok( i[ 2 ] === 4 && i[ 3 ] === 5, 'second vector was copied correctly' );
-
-		} );
-
-		QUnit.test( 'copyVector3sArray', ( assert ) => {
-
-			var attr = new BufferAttribute( new Float32Array( 6 ), 2 );
-
-			attr.copyVector3sArray( [
-				new Vector3( 1, 2, 3 ),
-				new Vector3( 10, 20, 30 )
-			] );
-
-			var i = attr.array;
-			assert.ok( i[ 0 ] === 1 && i[ 1 ] === 2 && i[ 2 ] === 3, 'first vector was copied correctly' );
-			assert.ok( i[ 3 ] === 10 && i[ 4 ] === 20 && i[ 5 ] === 30, 'second vector was copied correctly' );
-
-		} );
-
-		QUnit.test( 'copyVector4sArray', ( assert ) => {
-
-			var attr = new BufferAttribute( new Float32Array( 8 ), 2 );
-
-			attr.copyVector4sArray( [
-				new Vector4( 1, 2, 3, 4 ),
-				new Vector4( 10, 20, 30, 40 )
-			] );
-
-			var i = attr.array;
-			assert.ok( i[ 0 ] === 1 && i[ 1 ] === 2 && i[ 2 ] === 3 && i[ 3 ] === 4, 'first vector was copied correctly' );
-			assert.ok( i[ 4 ] === 10 && i[ 5 ] === 20 && i[ 6 ] === 30 && i[ 7 ] === 40, 'second vector was copied correctly' );
 
 		} );
 

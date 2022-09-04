@@ -23,10 +23,10 @@ class USDZExporter {
 
 			if ( object.isMesh ) {
 
-				if ( object.material.isMeshStandardMaterial ) {
+				const geometry = object.geometry;
+				const material = object.material;
 
-					const geometry = object.geometry;
-					const material = object.material;
+				if ( material.isMeshStandardMaterial ) {
 
 					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
 

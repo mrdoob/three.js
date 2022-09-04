@@ -656,6 +656,28 @@ function Loader( editor ) {
 
 			}
 
+			case 'usdz':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { USDZLoader } = await import( '../../examples/jsm/loaders/USDZLoader.js' );
+
+					const group = new USDZLoader().parse( contents );
+					group.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, group ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
+
 			case 'vox':
 
 			{
