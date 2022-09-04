@@ -65,22 +65,20 @@ export class BasicMaterialEditor extends BaseNode {
 
 		this.updateTransparent();
 
-		// TODO: Fix on NodeMaterial System
-		material.customProgramCacheKey = () => {
-
-			return MathUtils.generateUUID();
-
-		};
-
 	}
 
 	updateTransparent() {
 
 		const { material, opacity } = this;
 
-		material.transparent = opacity.getLinkedObject() || material.opacity < 1 ? true : false;
+		const transparent = opacity.getLinkedObject() || material.opacity < 1 ? true : false;
+		const needsUpdate = transparent !== material.transparent;
+
+		material.transparent = transparent;
 
 		opacity.setIcon( material.transparent ? 'ti ti-layers-intersect' : 'ti ti-layers-subtract' );
+
+		if ( needsUpdate === true ) material.dispose();
 
 	}
 
