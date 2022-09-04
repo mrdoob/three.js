@@ -1356,6 +1356,14 @@
 				"QuaternionKeyframeTrack": "api/pt-br/animation/tracks/QuaternionKeyframeTrack",
 				"StringKeyframeTrack": "api/pt-br/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/pt-br/animation/tracks/VectorKeyframeTrack"
+			},
+
+			"Audio": {
+				"Audio": "api/fr/audio/Audio",
+				"AudioAnalyser": "api/fr/audio/AudioAnalyser",
+				"AudioContext": "api/fr/audio/AudioContext",
+				"AudioListener": "api/fr/audio/AudioListener",
+				"PositionalAudio": "api/fr/audio/PositionalAudio"
 			}
 		
 		}
