@@ -3,7 +3,7 @@
  * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '144';
+const REVISION = '145dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -22871,7 +22871,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		state.activeTexture( 33984 + slot );
 		state.bindTexture( textureType, textureProperties.__webglTexture );
 
-		if ( source.version !== source.__currentVersion || forceUpload === true ) {
+		const sourceProperties = properties.get( source );
+
+		if ( source.version !== sourceProperties.__version || forceUpload === true ) {
 
 			_gl.pixelStorei( 37440, texture.flipY );
 			_gl.pixelStorei( 37441, texture.premultiplyAlpha );
@@ -22894,7 +22896,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const mipmaps = texture.mipmaps;
 
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
-			const allocateMemory = ( source.__currentVersion === undefined ) || ( forceUpload === true );
+			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
 			const levels = getMipLevels( texture, image, supportsMips );
 
 			if ( texture.isDepthTexture ) {
@@ -23210,7 +23212,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			source.__currentVersion = source.version;
+			sourceProperties.__version = source.version;
 
 			if ( texture.onUpdate ) texture.onUpdate( texture );
 
@@ -23230,7 +23232,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		state.activeTexture( 33984 + slot );
 		state.bindTexture( 34067, textureProperties.__webglTexture );
 
-		if ( source.version !== source.__currentVersion || forceUpload === true ) {
+		const sourceProperties = properties.get( source );
+
+		if ( source.version !== sourceProperties.__version || forceUpload === true ) {
 
 			_gl.pixelStorei( 37440, texture.flipY );
 			_gl.pixelStorei( 37441, texture.premultiplyAlpha );
@@ -23265,7 +23269,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
-			const allocateMemory = ( source.__currentVersion === undefined ) || ( forceUpload === true );
+			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
 			let levels = getMipLevels( texture, image, supportsMips );
 
 			setTextureParameters( 34067, texture, supportsMips );
@@ -23414,7 +23418,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			source.__currentVersion = source.version;
+			sourceProperties.__version = source.version;
 
 			if ( texture.onUpdate ) texture.onUpdate( texture );
 

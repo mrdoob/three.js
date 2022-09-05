@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '144';
+const REVISION = '145dev';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -16946,8 +16946,9 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 		const source = texture.source;
 		state.activeTexture(_gl.TEXTURE0 + slot);
 		state.bindTexture(textureType, textureProperties.__webglTexture);
+		const sourceProperties = properties.get(source);
 
-		if (source.version !== source.__currentVersion || forceUpload === true) {
+		if (source.version !== sourceProperties.__version || forceUpload === true) {
 			_gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
 
 			_gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
@@ -16967,7 +16968,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 			let mipmap;
 			const mipmaps = texture.mipmaps;
 			const useTexStorage = isWebGL2 && texture.isVideoTexture !== true;
-			const allocateMemory = source.__currentVersion === undefined || forceUpload === true;
+			const allocateMemory = sourceProperties.__version === undefined || forceUpload === true;
 			const levels = getMipLevels(texture, image, supportsMips);
 
 			if (texture.isDepthTexture) {
@@ -17154,7 +17155,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 				generateMipmap(textureType);
 			}
 
-			source.__currentVersion = source.version;
+			sourceProperties.__version = source.version;
 			if (texture.onUpdate) texture.onUpdate(texture);
 		}
 
@@ -17167,8 +17168,9 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 		const source = texture.source;
 		state.activeTexture(_gl.TEXTURE0 + slot);
 		state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture);
+		const sourceProperties = properties.get(source);
 
-		if (source.version !== source.__currentVersion || forceUpload === true) {
+		if (source.version !== sourceProperties.__version || forceUpload === true) {
 			_gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
 
 			_gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
@@ -17197,7 +17199,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 						glType = utils.convert(texture.type),
 						glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
 			const useTexStorage = isWebGL2 && texture.isVideoTexture !== true;
-			const allocateMemory = source.__currentVersion === undefined || forceUpload === true;
+			const allocateMemory = sourceProperties.__version === undefined || forceUpload === true;
 			let levels = getMipLevels(texture, image, supportsMips);
 			setTextureParameters(_gl.TEXTURE_CUBE_MAP, texture, supportsMips);
 			let mipmaps;
@@ -17286,7 +17288,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 				generateMipmap(_gl.TEXTURE_CUBE_MAP);
 			}
 
-			source.__currentVersion = source.version;
+			sourceProperties.__version = source.version;
 			if (texture.onUpdate) texture.onUpdate(texture);
 		}
 
