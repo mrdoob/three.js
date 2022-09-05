@@ -164,7 +164,7 @@ export const NodeList = [
 				name: 'Trigonometry',
 				icon: 'wave-sine',
 				tip: 'Sin / Cos / Tan / ...',
-				tags: 'sin, cos, tan, asin, acos, atan',
+				tags: 'sin, cos, tan, asin, acos, atan, sine, cosine, tangent, arcsine, arccosine, arctangent',
 				nodeClass: TrigonometryEditor
 			},
 			{
