@@ -335,17 +335,6 @@ export class NodeEditor extends EventDispatcher {
 
 	}
 
-	setScroll( x, y ) {
-
-		const canvas = this.canvas;
-
-		canvas.scrollLeft = x;
-		canvas.scrollTop = y;
-
-		return this;
-
-	}
-
 	centralizeNode( node ) {
 
 		const canvas = this.canvas;
@@ -423,7 +412,11 @@ export class NodeEditor extends EventDispatcher {
 
 	newProject() {
 
-		this.canvas.clear();
+		const canvas = this.canvas;
+		canvas.clear();
+		canvas.scrollLeft = 0;
+		canvas.scrollTop = 0;
+		canvas.zoom = 1;
 
 		this.dispatchEvent( { type: 'new' } );
 

@@ -848,6 +848,8 @@ class Element extends Serializer {
 
 		if ( element !== null ) {
 
+			element = element.baseElement || element;
+
 			if ( dispatchEventList( this.events.valid, this, element, 'connect' ) === false ) {
 
 				return false;
@@ -1377,6 +1379,12 @@ class Node extends Serializer {
 		};
 
 		this.setWidth( 300 ).setPosition( 0, 0 );
+
+	}
+
+	get baseElement() {
+
+		return this.elements[ 0 ];
 
 	}
 

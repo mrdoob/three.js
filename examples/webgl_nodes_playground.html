@@ -60,6 +60,7 @@
 
 			import { NodeEditor } from 'three/addons/node-editor/NodeEditor.js';
 			import { MeshEditor } from 'three/addons/node-editor/scene/MeshEditor.js';
+			import { StandardMaterialEditor } from 'three/addons/node-editor/materials/StandardMaterialEditor.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
@@ -116,15 +117,25 @@
 
 				nodeEditor = new NodeEditor( scene );
 
-				nodeEditor.addEventListener( 'new', () => {
+				const reset = () => {
 
-					const materialEditor = new MeshEditor( model );
+					const meshEditor = new MeshEditor( model );
+					const materialEditor = new StandardMaterialEditor();
 
+					nodeEditor.add( meshEditor );
 					nodeEditor.add( materialEditor );
-					nodeEditor.setScroll( 0, 0 );
-					nodeEditor.centralizeNode( materialEditor );
+					nodeEditor.centralizeNode( meshEditor );
 
-				} );
+					const { x, y } = meshEditor.getPosition();
+
+					meshEditor.setPosition( x + 250, y );
+					materialEditor.setPosition( x - 250, y );
+
+					meshEditor.material.connect( materialEditor );
+
+				};
+
+				nodeEditor.addEventListener( 'new', reset );
 
 				document.body.appendChild( nodeEditor.domElement );
 
@@ -158,10 +169,7 @@
 					model.material = defaultMaterial;
 					scene.add( model );
 
-					const materialEditor = new MeshEditor( model );
-
-					nodeEditor.add( materialEditor );
-					nodeEditor.centralizeNode( materialEditor );
+					reset();
 
 				} );
 
