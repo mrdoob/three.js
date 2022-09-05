@@ -2049,8 +2049,10 @@ class Canvas extends Serializer {
 
 				}
 
-				this.scrollLeft = data.scrollLeft + delta.x;
-				this.scrollTop = data.scrollTop + delta.y;
+				const zoom = this.zoom;
+
+				this.scrollLeft = data.scrollLeft + ( delta.x / zoom );
+				this.scrollTop = data.scrollTop + ( delta.y / zoom );
 
 			}
 
