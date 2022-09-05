@@ -1284,6 +1284,26 @@
 				"PointLightHelper": "api/it/helpers/PointLightHelper",
 				"SkeletonHelper": "api/it/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/it/helpers/SpotLightHelper"
+			},
+
+      "Lights": {
+				"AmbientLight": "api/it/lights/AmbientLight",
+				"AmbientLightProbe": "api/it/lights/AmbientLightProbe",
+				"DirectionalLight": "api/it/lights/DirectionalLight",
+				"HemisphereLight": "api/it/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/it/lights/HemisphereLightProbe",
+				"Light": "api/it/lights/Light",
+				"LightProbe": "api/it/lights/LightProbe",
+				"PointLight": "api/it/lights/PointLight",
+				"RectAreaLight": "api/it/lights/RectAreaLight",
+				"SpotLight": "api/it/lights/SpotLight"
+			},
+
+			"Lights / Shadows": {
+				"LightShadow": "api/it/lights/shadows/LightShadow",
+				"PointLightShadow": "api/it/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/it/lights/shadows/DirectionalLightShadow",
+				"SpotLightShadow": "api/it/lights/shadows/SpotLightShadow"
 			}
     }
 	},
