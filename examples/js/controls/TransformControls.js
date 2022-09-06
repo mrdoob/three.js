@@ -184,7 +184,7 @@
 
 			if ( this.camera.isOrthographicCamera ) {
 
-				this.camera.getWorldDirection( this.eye );
+				this.camera.getWorldDirection( this.eye ).negate();
 
 			} else {
 
