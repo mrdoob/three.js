@@ -295,7 +295,7 @@ three.jsの場合、すべてのexamplesを正しいフォルダ階層に入れ�
      ...
 </pre>
 <p>
-このフォルダー構造が必要な理由は、 <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a> のようなexamplesのスクリプトには相対パスがハードコーディングされてるからです。
+このフォルダー構造が必要な理由は、 <a href="https://github.com/mrdoob/three.js/blob/master/addons/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a> のようなexamplesのスクリプトには相対パスがハードコーディングされてるからです。
 </p>
 <pre class="prettyprint">import * as THREE from '../../../build/three.module.js';
 </pre>
@@ -303,11 +303,11 @@ three.jsの場合、すべてのexamplesを正しいフォルダ階層に入れ�
 同じフォルダ構造を使用すると、importしたthreeとexampleライブラリは両方とも同じthree.module.jsを参照します。
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>これにはCDNを使用する場合も含まれます。 <code class="notranslate" translate="no">three.modules.js</code> のパスが <code class="notranslate" translate="no">/build/three.modules.js</code> のようになってる事を確認して下さい。例えば</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
 

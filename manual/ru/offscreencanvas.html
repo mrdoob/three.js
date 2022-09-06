@@ -540,7 +540,7 @@ window.addEventListener('touchend', clearPickPosition);
 <p>Сделаем еще один шаг и добавим <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>. Это будет немного больше.
 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> довольно широко используют DOM для проверки мыши, событий касания и клавиатуры.</p>
 <p>В отличие от нашего кода, мы не можем использовать объект глобального <code class="notranslate" translate="no">state</code>, не переписав весь код <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> для работы с ним. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> принимают элемент, к которому они присоединяют большинство используемых ими событий DOM. Возможно, мы могли бы передать наш собственный объект, имеющий ту же поверхность API, что и элемент DOM. Нам нужно только поддерживать функции, которые необходимы <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.</p>
-<p>Копаясь в  <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js">исходном коде OrbitControls</a>
+<p>Копаясь в  <a href="https://github.com/mrdoob/three.js/blob/master/addons/controls/OrbitControls.js">исходном коде OrbitControls</a>
 похоже, что нам нужно обработать следующие события.</p>
 <ul>
 <li>contextmenu</li>
@@ -629,7 +629,7 @@ self.onmessage = function(e) {
 </pre>
 <p>Нам также нужно добавить <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> в начало скрипта.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
-+import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 export function init(data) {
 -  const {canvas} = data;

@@ -383,7 +383,7 @@ import * as THREE from '../../build/three.module.js';
      ...
 </pre>
 <p>
-이유인 즉 <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a>
+이유인 즉 <a href="https://github.com/mrdoob/three.js/blob/master/addons/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a>
 같은 코드는 다음처럼 상대경로로 모듈을 로드하기 때문에
 </p>
 <pre class="prettyprint">import * as THREE from '../../../build/three.module.js';
@@ -393,12 +393,12 @@ import * as THREE from '../../build/three.module.js';
 참조하도록 할 수 있죠.
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>아래는 CDN을 사용하는 예시입니다. <code class="notranslate" translate="no">three.modules.js</code>의 경로가 <code class="notranslate" translate="no">/build/three.modules.js</code>
 로 끝나야 한다는 것을 명심하세요.</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
         </div>

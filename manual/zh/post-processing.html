@@ -77,10 +77,10 @@ composer.addPass(filmPass);
 </pre>
 <p>由于filmPass是最后一次传递，我们将其renderToScreen属性设置为true来告诉它渲染到画布。如果不设置它，它将渲染到下一个渲染目标。</p>
 <p>为了使用这些类,我们需要导入一些js模块</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from '/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from '/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from '/examples/jsm/postprocessing/BloomPass.js';
-import {FilmPass} from '/examples/jsm/postprocessing/FilmPass.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
+import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
 </pre>
 <p>对于几乎所有的后期处理EffectComposer.js，RenderPass.js 都是必需的。</p>
 <p>们需要做的最后一件事是使用EffectComposer.render 替代 WebGLRenderer.render 并告诉EffectComposer来匹配画布的大小</p>
@@ -135,7 +135,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 </pre>
 <p>这样就很清楚如何设置它们。</p>
 <p>让我们快速创建一个GUI来设置这些值</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>和</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">const gui = new GUI();

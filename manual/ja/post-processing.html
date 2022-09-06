@@ -95,10 +95,10 @@ composer.addPass(filmPass);
 <p><code class="notranslate" translate="no">filmPass</code> は最後のPassなので、<code class="notranslate" translate="no">renderToScreen</code> プロパティをtrueに設定し、キャンバスにレンダリングするようにします。
 この設定がないと次のレンダーターゲットにレンダリングされます。</p>
 <p>これらのクラスを使用するには、以下をインポートする必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from '/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from '/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from '/examples/jsm/postprocessing/BloomPass.js';
-import {FilmPass} from '/examples/jsm/postprocessing/FilmPass.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
+import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
 </pre>
 <p>ほとんどのポストプロセスには <code class="notranslate" translate="no">EffectComposer.js</code> と <code class="notranslate" translate="no">RenderPass.js</code> が必須です。</p>
 <p>最後に <a href="/docs/#api/ja/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> の代わりに <code class="notranslate" translate="no">EffectComposer.render</code> を使用し、<code class="notranslate" translate="no">EffectComposer</code> にキャンバスのサイズを合わせます。</p>
@@ -157,7 +157,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 </pre>
 <p>これでどのように設定するか、かなり明確になりました。</p>
 <p>これらの値を設定する簡単なGUIを作ってみましょう。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>そして</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();

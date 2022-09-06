@@ -412,7 +412,7 @@ libraries in the correct folder structure
 </pre>
 <p>
 The reason this folder structure is required is because the scripts in the
-examples like <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a>
+examples like <a href="https://github.com/mrdoob/three.js/blob/master/addons/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a>
 have hard coded relative paths like
 </p>
 <pre class="prettyprint">import * as THREE from '../../../build/three.module.js';
@@ -422,12 +422,12 @@ Using the same structure assures then when you import both three and one of the 
 libraries they'll both reference the same <code class="notranslate" translate="no">three.module.js</code> file.
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>This includes when using a CDN. Be sure your path to <code class="notranslate" translate="no">three.module.js</code> ends with
 <code class="notranslate" translate="no">/build/three.modules.js</code>. For example</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0<b>/build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
 

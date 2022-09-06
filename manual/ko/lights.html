@@ -48,8 +48,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <p>다음으로 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 추가합니다. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 특정 좌표를
 중심으로 카메라를 자전 또는 <em>공전(orbit)</em>하도록 해줍니다. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는
 별도 모듈이므로, 먼저 페이지에 로드해야 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 </pre>
 <p>이제 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 카메라와, DOM 이벤트를 감지할 수 있도록
 canvas 요소를 넘겨줍니다.</p>
@@ -396,9 +396,9 @@ scene.add(helper);
 </pre>
 <p><a href="/docs/#api/ko/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>를 사용하려면 별도의 데이터를 불러와야 합니다. 또한
 <a href="/docs/#api/ko/helpers/RectAreaLightHelper"><code class="notranslate" translate="no">RectAreaLightHelper</code></a>도 같이 불러와 조명을 시각화하겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import { RectAreaLightUniformsLib } from '/examples/jsm/lights/RectAreaLightUniformsLib.js';
-+import { RectAreaLightHelper } from '/examples/jsm/helpers/RectAreaLightHelper.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
++import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 </pre>
 <p>모듈을 불러온 후 <code class="notranslate" translate="no">RectAreaLightUniformsLib.init</code> 메서드를 호출합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {

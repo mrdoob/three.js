@@ -366,7 +366,7 @@ renderが必要なのは連続的なレンダリングでなく、<a href="rende
 今回は1つ1つのジオメトリを新しく作成し、各ボックスジオメトリの頂点を移動するために <code class="notranslate" translate="no">applyMatrix</code> を使用するので、2回ではなく1回にした方が良いかもしれません。</p>
 <p>最後に全てのジオメトリの配列を <code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code> に渡します。
 また <code class="notranslate" translate="no">BufferGeometryUtils</code> も含める必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from '/examples/jsm/utils/BufferGeometryUtils.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
 <p>少なくとも私のマシンでは毎秒60フレームになりました。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

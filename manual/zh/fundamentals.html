@@ -294,7 +294,7 @@ import * as THREE from '../../build/three.module.js';
      ...
 </pre>
 <p>
-之所以需要这种文件夹结构，是因为像<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a>这样的示例中的脚本有一个复杂的相对路径，像下面这样
+之所以需要这种文件夹结构，是因为像<a href="https://github.com/mrdoob/three.js/blob/master/addons/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a>这样的示例中的脚本有一个复杂的相对路径，像下面这样
 </p>
 <pre class="prettyprint">import * as THREE from '../../../build/three.module.js';
 </pre>
@@ -302,12 +302,12 @@ import * as THREE from '../../build/three.module.js';
 使用相同的结构保证了当你导入three和任一示例库时，它们都会引用同一个three.module.js文件。
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>在使用CDN时，是同样的道理。确保<code class="notranslate" translate="no">three.modules.js</code>的路径以
 <code class="notranslate" translate="no">/build/three.modules.js</code>结尾，比如</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
         </div>

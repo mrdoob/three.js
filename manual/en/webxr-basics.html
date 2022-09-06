@@ -68,8 +68,8 @@ so that you can see console warnings, errors, and of course actually
 this site.</p>
 <p>The first thing we need to do is include the VR support after
 including three.js</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import {VRButton} from '/examples/jsm/webxr/VRButton.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {VRButton} from 'three/addons/webxr/VRButton.js';
 </pre>
 <p>Then we need to enable three.js's WebXR support and add its
 VR button to our page</p>

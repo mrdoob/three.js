@@ -511,7 +511,7 @@ window.addEventListener('touchend', clearPickPosition);
 <p></p>
 <p>좀 더 욕심을 내 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>까지 추가해봅시다. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 DOM에 꽤 다양하게 접근하기에 처리해줘야 할 것이 좀 많습니다. 제대로 작동하려면 마우스 이벤트, 터치 이벤트, 키보드 이벤트를 모두 처리해줘야 하죠.</p>
 <p>여태까지는 전역 <code class="notranslate" translate="no">state</code> 객체를 사용했지만, <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>의 경우는 객체 속성이 너무 많아 그걸 전부 다 하드 코딩하는 건 너무 번거롭습니다. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 필요한 DOM 이벤트의 대부분을 인자로 받는 <code class="notranslate" translate="no">HTMLElement</code>에 바인딩합니다. 이를 이용해 DOM 요소와 같은 구조의 객체를 넘겨준다면 어떨까요? <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 필요한 기능만 살려서 말이죠.</p>
-<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls</code>의 소스 코드</a>를 분석해보니 아래의 이벤트만 지원하면 될 듯합니다.</p>
+<p><a href="https://github.com/mrdoob/three.js/blob/master/addons/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls</code>의 소스 코드</a>를 분석해보니 아래의 이벤트만 지원하면 될 듯합니다.</p>
 <ul>
 <li>contextmenu</li>
 <li>pointerdown</li>
@@ -597,7 +597,7 @@ self.onmessage = function(e) {
 </pre>
 <p>Three.js의 공통 코드에 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 모듈도 불러와 설정해야 합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
-+import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
++import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export function init(data) {
 -  const { canvas } = data;
