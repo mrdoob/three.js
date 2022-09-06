@@ -11,108 +11,14 @@ import {
 
 import * as fflate from '../libs/fflate.module.js';
 
-class USDZLoader extends Loader {
+class USDAParser {
 
-	constructor( manager ) {
-
-		super( manager );
-
-	}
-
-	load( url, onLoad, onProgress, onError ) {
-
-		const scope = this;
-
-		const loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
-		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( scope.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
-		loader.load( url, function ( text ) {
-
-			try {
-
-				onLoad( scope.parse( text ) );
-
-			} catch ( e ) {
-
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
-				}
-
-				scope.manager.itemError( url );
-
-			}
-
-		}, onProgress, onError );
-
-	}
-
-	parse( buffer ) {
-
-		function createImages( zip ) {
-
-			const data = {};
-			const loader = new FileLoader();
-			loader.setResponseType( 'arraybuffer' );
-
-			for ( const filename in zip ) {
-
-				if ( filename.endsWith( 'png' ) ) {
-
-					const blob = new Blob( [ zip[ filename ] ], { type: { type: 'image/png' } } );
-					data[ filename ] = URL.createObjectURL( blob );
-
-				}
-
-			}
-
-			return data;
-
-		}
-
-		function findUSD( zip ) {
-
-			for ( const filename in zip ) {
-
-				if ( filename.endsWith( 'usda' ) ) {
-
-					return zip[ filename ];
-
-				}
-
-			}
-
-		}
-
-		const zip = fflate.unzipSync( new Uint8Array( buffer ) ); // eslint-disable-line no-undef
-
-		// console.log( zip );
-
-		const images = createImages( zip );
-		const file = findUSD( zip );
-
-		if ( file === undefined ) {
-
-			console.warn( 'THREE.USDZLoader: No usda file found.', zip );
-
-			return new Group();
-
-		}
-
-		// Parse file
-
-		const text = fflate.strFromU8( file );
-		const lines = text.split( '\n' );
-		const length = lines.length;
+	parse( text ) {
 
 		const data = {};
+
+		const lines = text.split( '\n' );
+		const length = lines.length;
 
 		let current = 0;
 		let string = null;
@@ -199,15 +105,164 @@ class USDZLoader extends Loader {
 
 		parseNextLine();
 
+		return data;
+
+	}
+
+}
+
+class USDZLoader extends Loader {
+
+	constructor( manager ) {
+
+		super( manager );
+
+	}
+
+	load( url, onLoad, onProgress, onError ) {
+
+		const scope = this;
+
+		const loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
+		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
+		loader.load( url, function ( text ) {
+
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
+
+		}, onProgress, onError );
+
+	}
+
+	parse( buffer ) {
+
+		const parser = new USDAParser();
+
+		function parseAssets( zip ) {
+
+			const data = {};
+			const loader = new FileLoader();
+			loader.setResponseType( 'arraybuffer' );
+
+			for ( const filename in zip ) {
+
+				if ( filename.endsWith( 'png' ) ) {
+
+					const blob = new Blob( [ zip[ filename ] ], { type: { type: 'image/png' } } );
+					data[ filename ] = URL.createObjectURL( blob );
+
+				}
+
+				if ( filename.endsWith( 'usd' ) ) {
+
+					const text = fflate.strFromU8( zip[ filename ] );
+					data[ filename ] = parser.parse( text );
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function findUSD( zip ) {
+
+			for ( const filename in zip ) {
+
+				if ( filename.endsWith( 'usda' ) ) {
+
+					return zip[ filename ];
+
+				}
+
+			}
+
+		}
+
+		const zip = fflate.unzipSync( new Uint8Array( buffer ) ); // eslint-disable-line no-undef
+
+		// console.log( zip );
+
+		const assets = parseAssets( zip );
+
+		// console.log( assets )
+
+		const file = findUSD( zip );
+
+		if ( file === undefined ) {
+
+			console.warn( 'THREE.USDZLoader: No usda file found.', zip );
+
+			return new Group();
+
+		}
+
+
+		// Parse file
+
+		const text = fflate.strFromU8( file );
+		const data = parser.parse( text );
+
 		// Build scene
 
-		function findGeometry( data ) {
+		function findGeometry( data, id ) {
+
+			if ( 'prepend references' in data ) {
+
+				const reference = data[ 'prepend references' ];
+				const parts = reference.split( '@' );
+				const path = parts[ 1 ].replace( /^.\//, '' );
+				const id = parts[ 2 ].replace( /^<\//, '' ).replace( />$/, '' );
+				return findGeometry( assets[ path ], id );
+
+			}
+
+			if ( id !== undefined ) {
+
+				const def = `def "%{id}"`;
+
+				if ( def in data ) {
+
+					return data[ def ];
+
+				}
+
+			}
 
 			for ( const name in data ) {
 
 				const object = data[ name ];
 
 				if ( name.startsWith( 'def Mesh' ) ) {
+
+					// Move points to Mesh
+
+					if ( data[ 'point3f[] points' ] ) {
+
+						object[ 'point3f[] points' ] = data[ 'point3f[] points' ];
+
+					}
 
 					// Move st indices to Mesh
 
@@ -241,7 +296,7 @@ class USDZLoader extends Loader {
 			const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
 			const attribute = new BufferAttribute( new Float32Array( positions ), 3 );
 
-			if ( data[ 'int[] faceVertexIndices' ] ) {
+			if ( 'int[] faceVertexIndices' in data ) {
 
 				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
 				geometry.setAttribute( 'position', toFlatBufferAttribute( attribute, indices ) );
@@ -252,13 +307,12 @@ class USDZLoader extends Loader {
 
 			}
 
-
-			if ( data[ 'texCoord2f[] primvars:st' ] ) {
+			if ( 'texCoord2f[] primvars:st' in data ) {
 
 				const uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
 				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
 
-				if ( data[ 'int[] primvars:st:indices' ] ) {
+				if ( 'int[] primvars:st:indices' in data ) {
 
 					const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
 					geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
@@ -331,26 +385,27 @@ class USDZLoader extends Loader {
 
 			const material = new MeshStandardMaterial();
 
-			// console.log( data );
+			if ( data !== undefined ) {
 
-			if ( data[ 'def Shader "diffuseColor_texture"' ] ) {
+				if ( 'def Shader "diffuseColor_texture"' in data ) {
 
-				const texture = data[ 'def Shader "diffuseColor_texture"' ];
-				const file = texture[ 'asset inputs:file' ].replace( /@*/g, '' );
+					const texture = data[ 'def Shader "diffuseColor_texture"' ];
+					const file = texture[ 'asset inputs:file' ].replace( /@*/g, '' );
 
-				material.map = new TextureLoader().load( images[ file ] );
+					material.map = new TextureLoader().load( assets[ file ] );
+
+				}
+
+				if ( 'def Shader "normal_texture"' in data ) {
+
+					const texture = data[ 'def Shader "normal_texture"' ];
+					const file = texture[ 'asset inputs:file' ].replace( /@*/g, '' );
+
+					material.normalMap = new TextureLoader().load( assets[ file ] );
+
+				}
 
 			}
-
-			if ( data[ 'def Shader "normal_texture"' ] ) {
-
-				const texture = data[ 'def Shader "normal_texture"' ];
-				const file = texture[ 'asset inputs:file' ].replace( /@*/g, '' );
-
-				material.normalMap = new TextureLoader().load( images[ file ] );
-
-			}
-
 
 			return material;
 
