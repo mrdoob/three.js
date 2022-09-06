@@ -461,8 +461,6 @@ class USDZLoader extends Loader {
 
 					if ( 'normal3f inputs:normal.connect' in surface ) {
 
-						console.log( surface );
-
 						const path = surface[ 'normal3f inputs:normal.connect' ];
 						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
 
