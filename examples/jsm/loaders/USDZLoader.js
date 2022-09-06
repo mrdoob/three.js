@@ -500,6 +500,13 @@ class USDZLoader extends Loader {
 			if ( name.startsWith( 'def Xform' ) ) {
 
 				const mesh = buildMesh( root[ name ] );
+
+				if ( /def Xform "(\w+)"/.test( name ) ) {
+
+					mesh.name = /def Xform "(\w+)"/.exec( name )[ 1 ];
+
+				}
+
 				group.add( mesh );
 
 			}
