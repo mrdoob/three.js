@@ -1532,11 +1532,7 @@ class GLTFMeshGpuInstancing {
 
 				nodeObject.clear();
 
-				for ( const instancedMesh of instancedMeshes ) {
-
-					nodeObject.add( instancedMesh );
-
-				}
+				nodeObject.add( ... instancedMeshes );
 
 				return nodeObject;
 			}
