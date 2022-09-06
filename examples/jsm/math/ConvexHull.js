@@ -1268,4 +1268,4 @@ class VertexList {
 
 }
 
-export { ConvexHull };
+export { ConvexHull, Face, HalfEdge, VertexNode, VertexList };
