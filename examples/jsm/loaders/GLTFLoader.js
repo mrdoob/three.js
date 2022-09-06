@@ -1530,11 +1530,7 @@ class GLTFMeshGpuInstancing {
 
 			if ( nodeObject.isGroup ) {
 
-				while ( nodeObject.children.length > 0 ) {
-
-					nodeObject.remove( nodeObject.children[ 0 ] );
-
-				}
+				nodeObject.clear();
 
 				for ( const instancedMesh of instancedMeshes ) {
 
