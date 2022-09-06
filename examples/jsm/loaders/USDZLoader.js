@@ -1,12 +1,16 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	ClampToEdgeWrapping,
 	FileLoader,
 	Group,
 	Loader,
 	Mesh,
 	MeshStandardMaterial,
-	TextureLoader
+	MirroredRepeatWrapping,
+	RepeatWrapping,
+	sRGBEncoding,
+	TextureLoader,
 } from 'three';
 
 import * as fflate from '../libs/fflate.module.js';
@@ -265,15 +269,23 @@ class USDZLoader extends Loader {
 
 					// Move points to Mesh
 
-					if ( data[ 'point3f[] points' ] ) {
+					if ( 'point3f[] points' in data ) {
 
 						object[ 'point3f[] points' ] = data[ 'point3f[] points' ];
 
 					}
 
+					// Move st to Mesh
+
+					if ( 'float2[] primvars:st' in data ) {
+
+						object[ 'float2[] primvars:st' ] = data[ 'float2[] primvars:st' ];
+
+					}
+
 					// Move st indices to Mesh
 
-					if ( data[ 'int[] primvars:st:indices' ] ) {
+					if ( 'int[] primvars:st:indices' in data ) {
 
 						object[ 'int[] primvars:st:indices' ] = data[ 'int[] primvars:st:indices' ];
 
@@ -324,6 +336,12 @@ class USDZLoader extends Loader {
 			} else {
 
 				geometry.computeVertexNormals();
+
+			}
+
+			if ( 'float2[] primvars:st' in data ) {
+
+				data[ 'texCoord2f[] primvars:st' ] = data[ 'float2[] primvars:st' ];
 
 			}
 
@@ -426,22 +444,41 @@ class USDZLoader extends Loader {
 
 					const surface = data[ 'def Shader "PreviewSurface"' ];
 
-					if ( 'color3f inputs:diffuseColor' in surface ) {
+					if ( 'color3f inputs:diffuseColor.connect' in surface ) {
+
+						const path = surface[ 'color3f inputs:diffuseColor.connect' ];
+						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
+
+						material.map = buildTexture( sampler );
+						material.map.encoding = sRGBEncoding;
+
+					} else if ( 'color3f inputs:diffuseColor' in surface ) {
 
 						const color = surface[ 'color3f inputs:diffuseColor' ].replace( /[()]*/g, '' );
 						material.color.fromArray( JSON.parse( '[' + color + ']' ) );
 
 					}
 
+					if ( 'normal3f inputs:normal.connect' in surface ) {
+
+						console.log( surface );
+
+						const path = surface[ 'normal3f inputs:normal.connect' ];
+						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
+
+						material.normalMap = buildTexture( sampler );
+
+					}
+
 					if ( 'float inputs:roughness' in surface ) {
 
-						material.roughness = surface[ 'float inputs:roughness' ];
+						material.roughness = parseFloat( surface[ 'float inputs:roughness' ] );
 
 					}
 
 					if ( 'float inputs:metallic' in surface ) {
 
-						material.metalness = surface[ 'float inputs:metallic' ];
+						material.metalness = parseFloat( surface[ 'float inputs:metallic' ] );
 
 					}
 
@@ -449,25 +486,84 @@ class USDZLoader extends Loader {
 
 				if ( 'def Shader "diffuseColor_texture"' in data ) {
 
-					const texture = data[ 'def Shader "diffuseColor_texture"' ];
-					const file = texture[ 'asset inputs:file' ].replace( /@*/g, '' );
+					const sampler = data[ 'def Shader "diffuseColor_texture"' ];
 
-					material.map = new TextureLoader().load( assets[ file ] );
+					material.map = buildTexture( sampler );
+					material.map.encoding = sRGBEncoding;
 
 				}
 
 				if ( 'def Shader "normal_texture"' in data ) {
 
-					const texture = data[ 'def Shader "normal_texture"' ];
-					const file = texture[ 'asset inputs:file' ].replace( /@*/g, '' );
+					const sampler = data[ 'def Shader "normal_texture"' ];
 
-					material.normalMap = new TextureLoader().load( assets[ file ] );
+					material.normalMap = buildTexture( sampler );
 
 				}
 
 			}
 
 			return material;
+
+		}
+
+		function findTexture( data, id ) {
+
+			for ( const name in data ) {
+
+				const object = data[ name ];
+
+				if ( name.startsWith( `def Shader "${ id }"` ) ) {
+
+					return object;
+
+				}
+
+				if ( typeof object === 'object' ) {
+
+					const texture = findTexture( object, id );
+
+					if ( texture ) return texture;
+
+				}
+
+			}			
+
+		}
+
+		function buildTexture( data ) {
+
+			if ( 'asset inputs:file' in data ) {
+
+				const path = data[ 'asset inputs:file' ].replace( /@*/g, '' );
+
+				const loader = new TextureLoader();
+
+				const texture = loader.load( assets[ path ] );
+
+				const map = {
+					'"clamp"': ClampToEdgeWrapping,
+					'"mirror"': MirroredRepeatWrapping,
+					'"repeat"': RepeatWrapping
+				};
+
+				if ( 'token inputs:wrapS' in data ) {
+
+					texture.wrapS = map[ data[ 'token inputs:wrapS' ] ];
+
+				}
+
+				if ( 'token inputs:wrapT' in data ) {
+
+					texture.wrapT = map[ data[ 'token inputs:wrapT' ] ];
+
+				}
+
+				return texture;
+
+			}
+
+			return null;
 
 		}
 
