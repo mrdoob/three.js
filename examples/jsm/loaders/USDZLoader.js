@@ -222,11 +222,11 @@ class USDZLoader extends Loader {
 		// Parse file
 
 		const text = fflate.strFromU8( file );
-		const data = parser.parse( text );
+		const root = parser.parse( text );
 
 		// Build scene
 
-		function findGeometry( data, id ) {
+		function findMeshGeometry( data ) {
 
 			if ( 'prepend references' in data ) {
 
@@ -234,9 +234,16 @@ class USDZLoader extends Loader {
 				const parts = reference.split( '@' );
 				const path = parts[ 1 ].replace( /^.\//, '' );
 				const id = parts[ 2 ].replace( /^<\//, '' ).replace( />$/, '' );
+
 				return findGeometry( assets[ path ], id );
 
 			}
+
+			return findGeometry( data );
+
+		}
+
+		function findGeometry( data, id ) {
 
 			if ( id !== undefined ) {
 
@@ -369,22 +376,37 @@ class USDZLoader extends Loader {
 
 		}
 
-		function findMaterial( data ) {
+		function findMeshMaterial( data ) {
+
+			if ( 'rel material:binding' in data ) {
+
+				const reference = data[ 'rel material:binding' ];
+				const id = reference.replace( /^<\//, '' ).replace( />$/, '' );
+				const parts = id.split( '/' );
+
+				return findMaterial( root, ` "${ parts[ 1 ] }"` );
+
+			}
+
+			return findMaterial( data );
+
+		}
+
+		function findMaterial( data, id = '' ) {
 
 			for ( const name in data ) {
 
 				const object = data[ name ];
 
-				if ( name.startsWith( 'def Material' ) ) {
+				if ( name.startsWith( 'def Material' + id ) ) {
 
 					return object;
 
 				}
 
-
 				if ( typeof object === 'object' ) {
 
-					const material = findMaterial( object );
+					const material = findMaterial( object, id );
 
 					if ( material ) return material;
 
@@ -399,6 +421,31 @@ class USDZLoader extends Loader {
 			const material = new MeshStandardMaterial();
 
 			if ( data !== undefined ) {
+
+				if ( 'def Shader "PreviewSurface"' in data ) {
+
+					const surface = data[ 'def Shader "PreviewSurface"' ];
+
+					if ( 'color3f inputs:diffuseColor' in surface ) {
+
+						const color = surface[ 'color3f inputs:diffuseColor' ].replace( /[()]*/g, '' );
+						material.color.fromArray( JSON.parse( '[' + color + ']' ) );
+
+					}
+
+					if ( 'float inputs:roughness' in surface ) {
+
+						material.roughness = surface[ 'float inputs:roughness' ];
+
+					}
+
+					if ( 'float inputs:metallic' in surface ) {
+
+						material.metalness = surface[ 'float inputs:metallic' ];
+
+					}
+
+				}
 
 				if ( 'def Shader "diffuseColor_texture"' in data ) {
 
@@ -426,8 +473,8 @@ class USDZLoader extends Loader {
 
 		function buildMesh( data ) {
 
-			const geometry = buildGeometry( findGeometry( data ) );
-			const material = buildMaterial( findMaterial( data ) );
+			const geometry = buildGeometry( findMeshGeometry( data ) );
+			const material = buildMaterial( findMeshMaterial( data ) );
 
 			const mesh = new Mesh( geometry, material );
 
@@ -448,11 +495,11 @@ class USDZLoader extends Loader {
 
 		const group = new Group();
 
-		for ( const name in data ) {
+		for ( const name in root ) {
 
 			if ( name.startsWith( 'def Xform' ) ) {
 
-				const mesh = buildMesh( data[ name ] );
+				const mesh = buildMesh( root[ name ] );
 				group.add( mesh );
 
 			}
