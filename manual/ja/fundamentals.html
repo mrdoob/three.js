@@ -52,7 +52,7 @@ three.jsがサポートするほとんどのブラウザは自動更新される
 </pre>
 <p>Three.jsはcanvasに描画するため、canvasをthree.jsに渡す必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -256,7 +256,7 @@ es6モジュールはスクリプトのロードに <code class="notranslate" tr
 両方とも以下に例を示します。
 </p>
 <pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 ...
 

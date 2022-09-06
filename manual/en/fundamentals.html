@@ -116,7 +116,7 @@ that looks like this</p>
 
 <p>First let's load three.js</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 &lt;/script&gt;
 </pre>
 <p>It's important you put <code class="notranslate" translate="no">type="module"</code> in the script tag. This enables
@@ -132,7 +132,7 @@ they are dependent on.</p>
 </pre>
 <p>We will ask three.js to draw into that canvas so we need to look it up.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -372,7 +372,7 @@ or inline via a <code class="notranslate" translate="no">&lt;script type="module
 both
 </p>
 <pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 ...
 
