@@ -578,6 +578,14 @@ class GLTFLightsExtension {
 
 	}
 
+	getDependency( type, index ) {	
+
+		if ( type !== 'light' ) return;
+
+		return this._loadLight( index );
+
+	}
+
 	createNodeAttachment( nodeIndex ) {
 
 		const self = this;
