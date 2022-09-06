@@ -291,19 +291,32 @@ class USDZLoader extends Loader {
 
 		function buildGeometry( data ) {
 
-			const geometry = new BufferGeometry();
-			
-			const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
-			const attribute = new BufferAttribute( new Float32Array( positions ), 3 );
+			let geometry = new BufferGeometry();
 
 			if ( 'int[] faceVertexIndices' in data ) {
 
 				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
-				geometry.setAttribute( 'position', toFlatBufferAttribute( attribute, indices ) );
+				geometry.setIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
+
+			}
+
+			if ( 'point3f[] points' in data ) {
+
+				const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
+				const attribute = new BufferAttribute( new Float32Array( positions ), 3 );
+				geometry.setAttribute( 'position', attribute );
+
+			}
+
+			if ( 'normal3f[] normals' in data ) {
+
+				const normals = JSON.parse( data[ 'normal3f[] normals' ].replace( /[()]*/g, '' ) );
+				const attribute = new BufferAttribute( new Float32Array( normals ), 3 );
+				geometry.setAttribute( 'normal', attribute );
 
 			} else {
 
-				geometry.setAttribute( 'position', attribute );
+				geometry.computeVertexNormals();
 
 			}
 
@@ -313,6 +326,8 @@ class USDZLoader extends Loader {
 				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
 
 				if ( 'int[] primvars:st:indices' in data ) {
+
+					geometry = geometry.toNonIndexed();
 
 					const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
 					geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
@@ -324,8 +339,6 @@ class USDZLoader extends Loader {
 				}
 
 			}
-
-			geometry.computeVertexNormals();
 			
 			return geometry;
 
