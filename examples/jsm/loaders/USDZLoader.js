@@ -206,7 +206,7 @@ class USDZLoader extends Loader {
 
 		const zip = fflate.unzipSync( new Uint8Array( buffer ) ); // eslint-disable-line no-undef
 
-		// console.log( zip );
+		console.log( zip );
 
 		const assets = parseAssets( zip );
 
@@ -216,7 +216,7 @@ class USDZLoader extends Loader {
 
 		if ( file === undefined ) {
 
-			console.warn( 'THREE.USDZLoader: No usda file found.', zip );
+			console.warn( 'THREE.USDZLoader: No usda file found.' );
 
 			return new Group();
 
