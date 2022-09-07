@@ -21,7 +21,9 @@ class TessellateModifier {
 
 	modify( geometry ) {
 
-		if ( geometry.index !== null ) {
+		const gotIndexGeometry = geometry.index !== null;
+
+		if ( gotIndexGeometry ) {
 
 			geometry = geometry.toNonIndexed();
 
@@ -295,6 +297,12 @@ class TessellateModifier {
 		if ( hasUV2s ) {
 
 			geometry2.setAttribute( 'uv2', new Float32BufferAttribute( uv2s2, 2 ) );
+
+		}
+
+		if ( gotIndexGeometry ) {
+
+			geometry.dispose();
 
 		}
 
