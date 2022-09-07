@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -12,15 +12,15 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This light gets emitted from a single point in one direction, along a cone that increases in size
-			the further from the light it gets. <br /><br />
+      Questa luce viene emessa da un unico punto in una direzione, lungo un cono che aumenta di dimensioni
+      man mano che si allontana dalla luce.<br /><br />
 
-			This light can cast shadows - see the [page:SpotLightShadow] page for details.
+      Questa luce può proiettare le ombre - vedi la pagina [page:SpotLightShadow] per i dettagli.
 		</p>
 
-		<h2>Code Example</h2>
+		<h2>Codice di Esempio</h2>
 		<code>
-		// white spotlight shining from the side, modulated by a texture, casting a shadow
+		// faretto bianco che brilla di lato, modulato da una texture, che proietta un'ombra
 
 		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 100, 1000, 100 );
@@ -38,161 +38,161 @@
 		scene.add( spotLight );
 		</code>
 
-		<h2>Examples</h2>
+		<h2>Esempi</h2>
 
 		<p>
 			[example:webgl_lights_spotlight lights / spotlight ]<br />
 			[example:webgl_lights_spotlights lights / spotlights ]
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>Costruttore</h2>
 
 
 		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float distance], [param:Radians angle], [param:Float penumbra], [param:Float decay] )</h3>
 		<p>
-			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
-			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
-			[page:Float distance] - Maximum range of the light. Default is 0 (no limit).<br />
-			[page:Radians angle] - Maximum angle of light dispersion from its direction whose upper
-			bound is Math.PI/2.<br />
-			[page:Float penumbra] - Percent of the spotlight cone that is attenuated due to penumbra.
-			Takes values between zero and 1. Default is zero.<br />
-			[page:Float decay] - The amount the light dims along the distance of the light.<br /><br />
+			[page:Integer color] - (opzionale) colore esadecimale della luce. Il valore predefinito è 0xffffff (bianco).<br />
+			[page:Float intensity] - (opzionale) il valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br /><br />
+			[page:Float distance] - Portata massima della luce. Il valore predefinito è 0 (nessun limite).<br />
+			[page:Radians angle] - Angolo massimo di dispersione della luce dalla sua direzione in cui il limite superiore è Math.PI/2.<br />
+			[page:Float penumbra] - Percentuale del cono del riflettore che viene attenuata a causa della penombra.
+			Accetta valori compresi tra zero e 1. Il valore predefinito è zero.<br />
+			[page:Float decay] - La quantità di attenuazione della luce lungo la distanza della luce.<br /><br />
 
-			Creates a new [name].
+			Crea una nuova [name].
 		</p>
 
-		<h2>Properties</h2>
-
-		<p>See the base [page:Light Light] class for common properties.</p>
+		<h2>Proprietà</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per le proprietà comuni.
+		</p>
 
 		<h3>[property:Float angle]</h3>
 		<p>
-			Maximum extent of the spotlight, in radians, from its direction. Should be no more than
-			`Math.PI/2`. The default is `Math.PI/3`.
+      Massima estensione del riflettore, in radianti, dalla sua direzione. Non dovrebbe essere più di 
+      `Math.PI/2`. Il valore predefinito è `Math.PI/3`.
 		</p>
 
 
 		<h3>[property:Boolean castShadow]</h3>
 		<p>
-			If set to `true` light will cast dynamic shadows. *Warning*: This is expensive and
-			requires tweaking to get shadows looking right. See the [page:SpotLightShadow] for details.
-			The default is `false`.
+      Se impostato a `true` la luce proietterà ombre dinamiche. *Attenzione*: Questo è costoso e richiede
+      modifiche per ottenere l'aspetto corretto delle ombre. Vedi [page:SpotLightShadow] per i dettagli.
+      Il valore predefinito è `false`.
 		</p>
 
 		<h3>[property:Float decay]</h3>
 		<p>
-			The amount the light dims along the distance of the light.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, decay = 2 leads to
-			physically realistic light falloff. The default is `1`.
+      La quantità di attenuazione della luce lungo la distanza della luce.<br />
+			Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], decay = 2 porta ad una diminuzione della luce fisicamente realistica.<br/>
+			Il valore predefinito è `1`.
 		</p>
 
 		<h3>[property:Float distance]</h3>
 		<p>
-			`Default mode` — When distance is zero, light does not attenuate. When distance is
-			non-zero, light will attenuate linearly from maximum intensity at the light's position down to
-			zero at this distance from the light.
+      `Modalità predefinita` — Quando la distanza è zero, la luce non si attenua. Quando la distanza è diversa da zero,
+      la luce si attenuerà linearmente dalla massima intensità nella posizione della luce fino a zero a questa distanza 
+      dalla luce.
 		</p>
 		<p>
-			`[page:WebGLRenderer.physicallyCorrectLights Physically correct] mode` — When distance
-			is zero, light will attenuate according to inverse-square law to infinite distance. When
-			distance is non-zero, light will attenuate according to inverse-square law until near the
-			distance cutoff, where it will then attenuate quickly and smoothly to `0`. Inherently, cutoffs
-			are not physically correct.
+      `Modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta]` — Quando la distanza è
+      zero, la luce si attenuerà secondo la legge dell'inverso del quadrato alla distanza infinita.
+      Quando la distanza è diversa da zero, la luce si attenuerà secondo la legge dell'inverso del quadrato 
+      fino in prossimità del limite di distanza, dove si attenuerà quindi rapidamente e uniformemente fino a `0`.
+      Intrinsecamente, i limiti non sono fisicamente corretti.
 		</p>
 		<p>
-			Default is `0.0`.
+			Il valore predefinito è `0.0`.
 		</p>
 
 		<h3>[property:Float intensity]</h3>
 		<p>
-			The light's intensity. Default is `1`.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, intensity is the luminous
-			intensity of the light measured in candela (cd).<br /><br />
+			L'intensità della luce. Il valore predefinito è `1`.<br />
+      Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], l'intensità 
+      è l'intensità luminosa della luce misurata in candela (cd).<br /><br />
 
-			Changing the power will also change the light's intensity.
-
+      Modificando l'intensità si modificherà anche la potenza della luce.
 		</p>
 
 		<h3>[property:Boolean isSpotLight]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
 		</p>
 
 		<h3>[property:Float penumbra]</h3>
 		<p>
-			Percent of the spotlight cone that is attenuated due to penumbra. Takes values between
-			zero and 1. The default is `0.0`.
+      Percentuale del cono del riflettore che viene attenuata a causa della penombra. Prende valori tra
+      zero e 1. Il valore predefinito è `0.0`.
 		</p>
 
 		<h3>[property:Vector3 position]</h3>
 		<p>
-			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
+      Questo è impostato uguale a [page:Object3D.DefaultUp] (0, 1, 0), così che la luce brilli dall'alto veso il basso.
 		</p>
 
 		<h3>[property:Float power]</h3>
 		<p>
-			The light's power.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, power is the luminous
-			power of the light measured in lumens (lm). <br /><br />
+      La potenza della luce. <br />
 
-			Changing this will also change the light's intensity.
+			Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], la potenza è la potenza 
+      della luminosità della luce misurata in lumen (lm).<br /><br />
+
+      Modificando la potenza si modificherà anche l'intensità della luce.
 		</p>
 
 
 		<h3>[property:SpotLightShadow shadow]</h3>
 		<p>
-			A [page:SpotLightShadow] used to calculate shadows for this light.
+      Una [page:SpotLightShadow] utilizzata per calcolare le ombre per questa luce.
 		</p>
 
 
 		<h3>[property:Object3D target]</h3>
 		<p>
-			The Spotlight points from its [page:.position position] to target.position. The default
-			position of the target is *(0, 0, 0)*.<br />
+      Spotlight punta dalla sua [page:.position posizione] alla target.position. La posizione predefinita del target
+      è *(0, 0, 0)*.<br />
 
-			*Note*: For the target's position to be changed to anything other than the default,
-			it must be added to the [page:Scene scene] using
+      *Nota*: Affinchè la posizione del target possa essere modificata in qualcosa di diverso da quella predefinita,
+      è necessario aggiungerlo alla [page:Scene scena] utilizzando
 			<code>
 				scene.add( light.target );
 			</code>
 
-			This is so that the target's [page:Object3D.matrixWorld matrixWorld] gets automatically
-			updated each frame.<br /><br />
+      In questo modo il [page:Object3D.matrixWorld matrixWorld] del target viene aggiornato automaticamente ad ogni frame.<br /><br />
 
-			It is also possible to set the target to be another object in the scene (anything with a
-			[page:Object3D.position position] property), like so:
+      È anche possibile impostare il target in modo che sia un altro oggetto nella scena (qualsiasi cosa con 
+      una proprietà [page:Object3D.position position]), in questo modo: 
 			<code>
 const targetObject = new THREE.Object3D();
 scene.add(targetObject);
 
 light.target = targetObject;
 			</code>
-			The spotlight will now track the target object.
+			La spotlight ora seguirò l'oggetto target.
 		</p>
 
 		<h3>[property:Texture map]</h3>
 		<p>
-			A [page:Texture] used to modulate the color of the light. The spot light color is mixed
-			with the RGB value of this texture, with a ratio corresponding to its
-			alpha value. The cookie-like masking effect is reproduced using pixel values (0, 0, 0, 1-cookie_value).
-			*Warning*: [param:SpotLight map] is disabled if [param:SpotLight castShadow] is *false*. 
+      Una [page:Texture] utilizzata per modulare il colore della luce. Il colore della luce spot viene mescolato con il valore
+      RGB di questa texture, con un rapporto corrispondente al suo valore alfa. L'effetto di mascheramento simile a quello dei cookie
+      viene riprodotto utilizzando i valori (0, 0, 0, 1-cookie_value).
+      *Attenzione*: [param:SpotLight map] è disabilitata se [param:SpotLight castShadow] è *false*. 
 		</p>
 
-		<h2>Methods</h2>
-
-		<p>See the base [page:Light Light] class for common methods.</p>
+		<h2>Metodi</h2>
+		<p>
+      Vedi la classe base [page:Light Light] per i metodi comuni.
+		</p>
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Override of base class's [page:Light.dispose dispose].
-		Disposes of this light's [page:SpotLightShadow shadow].
+      Sovrascrive [page:Light.dispose dispose] della classe base. 
+      Elimina l'[page:SpotLightShadow ombra] di questa luce.
 		</p>
 
 		<h3>[method:this copy]( [param:SpotLight source] )</h3>
 		<p>
-		Copies value of all the properties from the [page:SpotLight source] to this
-		SpotLight.
+      Copia il valore di tutte le proprietà dalla [page:SpotLight sorgente] della
+		  SpotLight.
 		</p>
 
 		<p>

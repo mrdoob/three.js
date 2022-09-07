@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -12,59 +12,61 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Light probes are an alternative way of adding light to a 3D scene. Unlike classical light sources (e.g. directional,
-			point or spot lights), light probes do not emit light. Instead they store information about light passing through
-			3D space. During rendering, the light that hits a 3D object is approximated by using the data from the light probe.
+      Le sonde luminose sono un metodo alternativo di aggiungere luce in una scena 3D. Diversamente dalle classiche sorgenti
+      di luce (ad esempio, direzionali, puntiformi o luci spot), le sonde luminose non emettono luce. Invece memorizzano
+      informazioni sulla luce che passa attraverso lo spazio 3D. Durante il rendering, la luce che colpisce un
+      oggetto 3D viene approssimata utilizzando i dati della sonda di luce.
 		</p>
 
 		<p class="desc">
-			Light probes are usually created from (radiance) environment maps. The class [page:LightProbeGenerator] can
-			be used to create light probes from instances of [page:CubeTexture] or [page:WebGLCubeRenderTarget].
-			However, light estimation data could also be provided in other forms e.g. by WebXR. This enables the rendering
-			of augmented reality content that reacts to real world lighting.
+      Le sonde luminose vengono solitamente create da mappe ambientali (di radianza). La classe [page:LightProbeGenerator]
+      può essere utilizzata per create le sonde luminose dalle istanze di [page:CubeTexture] o [page:WebGLCubeRenderTarget].
+      Tuttavia, i dati di stima della luce potrebbero essere forniti in altre forme, ad es. di WebXR. Ciò consente il 
+      rendering di realtà aumentata che reagiscono all'illuminazione del mondo reale.
 		</p>
 
 		<p class="desc">
-			The current probe implementation in three.js supports so-called diffuse light probes. This type of light probe
-			is functionally equivalent to an irradiance environment map.
+      L'attuale implementazione della sonda in three.js supporta le cosidette sonde a luce diffusa. Questo tipo 
+      di sonda luminosa è funzionalmente equivalente a una mappa ambientale di irradianza.
 		</p>
 
-		<h2>Examples</h2>
+		<h2>Esempi</h2>
 		<p>
 			[example:webgl_lightprobe WebGL / light probe ]<br />
 			[example:webgl_lightprobe_cubecamera WebGL / light probe / cube camera ]
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>Costruttore</h2>
 
 		<h3>[name]( [param:SphericalHarmonics3 sh], [param:Float intensity] )</h3>
 		<p>
-		[page:SphericalHarmonics3 sh] - (optional) An instance of [page:SphericalHarmonics3].<br />
-		[page:Float intensity] - (optional) Numeric value of the light probe's intensity. Default is 1.<br /><br />
+		[page:SphericalHarmonics3 sh] - (opzionale) Un'istanza di [page:SphericalHarmonics3].<br />
+		[page:Float intensity] - (opzionale) Il valore numerico dell0intensità della sonda luminosa. Il valore predefinito è 1.<br /><br />
 
-		Creates a new [name].
+		Crea una nuova [name].
 		</p>
 
-		<h2>Properties</h2>
+    <h2>Proprietà</h2>
 		<p>
-				See the base [page:Light Light] class for common properties. The [page:Light.color color] property is currently
-				not evaluated and thus has no effect.
+      Vedi la classe base [page:Light Light] per le proprietà comuni. La proprietà [page:Light.color color] al momento non è valutata e
+      quindi non ha alcun effetto.
 		</p>
 
 		<h3>[property:Boolean isLightProbe]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
 		</p>
 
 		<h3>[property:SphericalHarmonics3 sh]</h3>
 		<p>
-			A light probe uses spherical harmonics to encode lighting information.
+      Una sonda luminosa utilizza le armoniche sferiche per codificare le informazioni sull'illuminazione.
 		</p>
 
-		<h2>Methods</h2>
+		<h2>Metodi</h2>
 		<p>
-				See the base [page:Light Light] class for common methods.
+      Vedi la classe base [page:Light Light] per i metodi comuni.
 		</p>
+    
 		<h2>Source</h2>
 
 		<p>
