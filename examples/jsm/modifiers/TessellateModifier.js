@@ -21,9 +21,9 @@ class TessellateModifier {
 
 	modify( geometry ) {
 
-		const gotIndexGeometry = geometry.index !== null;
+		const gotIndexedGeometry = geometry.index !== null;
 
-		if ( gotIndexGeometry ) {
+		if ( gotIndexedGeometry ) {
 
 			geometry = geometry.toNonIndexed();
 
@@ -300,7 +300,7 @@ class TessellateModifier {
 
 		}
 
-		if ( gotIndexGeometry ) {
+		if ( gotIndexedGeometry ) {
 
 			geometry.dispose();
 
