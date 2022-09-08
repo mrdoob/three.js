@@ -22,13 +22,26 @@
 			<strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			let camera, scene, renderer;
 			let plane;
-			let mouse, raycaster, isShiftDown = false;
+			let pointer, raycaster, isShiftDown = false;
 
 			let rollOverMesh, rollOverMaterial;
 			let cubeGeo, cubeMaterial;
@@ -49,14 +62,14 @@
 
 				// roll-over helpers
 
-				const rollOverGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				const rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
 				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
 				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
 				scene.add( rollOverMesh );
 
 				// cubes
 
-				cubeGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
 				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( 'textures/square-outline-textured.png' ) } );
 
 				// grid
@@ -67,9 +80,9 @@
 				//
 
 				raycaster = new THREE.Raycaster();
-				mouse = new THREE.Vector2();
+				pointer = new THREE.Vector2();
 
-				const geometry = new THREE.PlaneBufferGeometry( 1000, 1000 );
+				const geometry = new THREE.PlaneGeometry( 1000, 1000 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
@@ -91,14 +104,14 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'keydown', onDocumentKeyDown, false );
-				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+				document.addEventListener( 'pointermove', onPointerMove );
+				document.addEventListener( 'pointerdown', onPointerDown );
+				document.addEventListener( 'keydown', onDocumentKeyDown );
+				document.addEventListener( 'keyup', onDocumentKeyUp );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -109,17 +122,17 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				event.preventDefault();
+				pointer.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
 
-				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+				raycaster.setFromCamera( pointer, camera );
 
-				raycaster.setFromCamera( mouse, camera );
-
-				const intersects = raycaster.intersectObjects( objects );
+				const intersects = raycaster.intersectObjects( objects, false );
 
 				if ( intersects.length > 0 ) {
 
@@ -128,21 +141,19 @@
 					rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
 					rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
 
-				}
+					render();
 
-				render();
+				}
 
 			}
 
-			function onDocumentMouseDown( event ) {
+			function onPointerDown( event ) {
 
-				event.preventDefault();
+				pointer.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
 
-				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+				raycaster.setFromCamera( pointer, camera );
 
-				raycaster.setFromCamera( mouse, camera );
-
-				const intersects = raycaster.intersectObjects( objects );
+				const intersects = raycaster.intersectObjects( objects, false );
 
 				if ( intersects.length > 0 ) {
 

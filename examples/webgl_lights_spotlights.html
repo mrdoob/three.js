@@ -13,12 +13,25 @@
 			by <a href="http://master-domain.com" target="_blank" rel="noopener">Master James</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { TWEEN } from './jsm/libs/tween.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { TWEEN } from 'three/addons/libs/tween.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
 			const renderer = new THREE.WebGLRenderer();
@@ -33,8 +46,8 @@
 			const matFloor = new THREE.MeshPhongMaterial();
 			const matBox = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
 
-			const geoFloor = new THREE.PlaneBufferGeometry( 2000, 2000 );
-			const geoBox = new THREE.BoxBufferGeometry( 3, 1, 2 );
+			const geoFloor = new THREE.PlaneGeometry( 2000, 2000 );
+			const geoBox = new THREE.BoxGeometry( 3, 1, 2 );
 
 			const mshFloor = new THREE.Mesh( geoFloor, matFloor );
 			mshFloor.rotation.x = - Math.PI * 0.5;
@@ -80,8 +93,8 @@
 				scene.add( lightHelper1, lightHelper2, lightHelper3 );
 
 				document.body.appendChild( renderer.domElement );
-				onResize();
-				window.addEventListener( 'resize', onResize, false );
+				onWindowResize();
+				window.addEventListener( 'resize', onWindowResize );
 
 				controls.target.set( 0, 7, 0 );
 				controls.maxPolarAngle = Math.PI / 2;
@@ -103,7 +116,7 @@
 
 			}
 
-			function onResize() {
+			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

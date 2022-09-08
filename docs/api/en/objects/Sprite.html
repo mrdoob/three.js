@@ -41,6 +41,11 @@
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
 
+		<h3>[property:Boolean isSprite]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 
 		<h3>[property:SpriteMaterial material]</h3>
 		<p>
@@ -63,12 +68,12 @@
 		Returns a clone of this Sprite object and any descendants.
 		</p>
 
-		<h3>[method:Sprite copy]( [param:Sprite sprite] )</h3>
+		<h3>[method:this copy]( [param:Sprite sprite] )</h3>
 		<p>
 		Copies the properties of the passed sprite to this one.
 		</p>
 
-		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 		Get intersections between a casted ray and this sprite. [page:Raycaster.intersectObject]() will call this method.
 		The raycaster must be initialized by calling [page:Raycaster.setFromCamera]() before raycasting against sprites.

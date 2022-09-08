@@ -1,16 +1,16 @@
 import { BackSide, FrontSide, CubeUVReflectionMapping } from '../../constants.js';
-import { BoxBufferGeometry } from '../../geometries/BoxBufferGeometry.js';
-import { PlaneBufferGeometry } from '../../geometries/PlaneBufferGeometry.js';
+import { BoxGeometry } from '../../geometries/BoxGeometry.js';
+import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms } from '../shaders/UniformsUtils.js';
 
-function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha ) {
+function WebGLBackground( renderer, cubemaps, state, objects, alpha, premultipliedAlpha ) {
 
 	const clearColor = new Color( 0x000000 );
-	let clearAlpha = 0;
+	let clearAlpha = alpha === true ? 0 : 1;
 
 	let planeMesh;
 	let boxMesh;
@@ -19,8 +19,9 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 	let currentBackgroundVersion = 0;
 	let currentTonemapping = null;
 
-	function render( renderList, scene, camera, forceClear ) {
+	function render( renderList, scene ) {
 
+		let forceClear = false;
 		let background = scene.isScene === true ? scene.background : null;
 
 		if ( background && background.isTexture ) {
@@ -58,12 +59,12 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && ( background.isCubeTexture || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
 				boxMesh = new Mesh(
-					new BoxBufferGeometry( 1, 1, 1 ),
+					new BoxGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
 						name: 'BackgroundCubeMaterial',
 						uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
@@ -85,7 +86,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 				};
 
-				// enable code injection for non-built-in material
+				// add "envMap" material property so the renderer can evaluate it like for built-in materials
 				Object.defineProperty( boxMesh.material, 'envMap', {
 
 					get: function () {
@@ -100,16 +101,8 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 			}
 
-			if ( background.isWebGLCubeRenderTarget ) {
-
-				// TODO Deprecate
-
-				background = background.texture;
-
-			}
-
 			boxMesh.material.uniforms.envMap.value = background;
-			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background._needsFlipEnvMap ) ? - 1 : 1;
+			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background.isRenderTargetTexture === false ) ? - 1 : 1;
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||
@@ -123,6 +116,8 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 			}
 
+			boxMesh.layers.enableAll();
+
 			// push to the pre-sorted opaque render list
 			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
 
@@ -131,7 +126,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 			if ( planeMesh === undefined ) {
 
 				planeMesh = new Mesh(
-					new PlaneBufferGeometry( 2, 2 ),
+					new PlaneGeometry( 2, 2 ),
 					new ShaderMaterial( {
 						name: 'BackgroundMaterial',
 						uniforms: cloneUniforms( ShaderLib.background.uniforms ),
@@ -146,7 +141,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 				planeMesh.geometry.deleteAttribute( 'normal' );
 
-				// enable code injection for non-built-in material
+				// add "map" material property so the renderer can evaluate it like for built-in materials
 				Object.defineProperty( planeMesh.material, 'map', {
 
 					get: function () {
@@ -183,6 +178,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 			}
 
+			planeMesh.layers.enableAll();
 
 			// push to the pre-sorted opaque render list
 			renderList.unshift( planeMesh, planeMesh.geometry, planeMesh.material, 0, 0, null );

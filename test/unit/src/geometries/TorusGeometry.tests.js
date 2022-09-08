@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { TorusBufferGeometry } from '../../../../src/geometries/TorusBufferGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { TorusGeometry } from '../../../../src/geometries/TorusGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'TorusBufferGeometry', ( hooks ) => {
+	QUnit.module( 'TorusGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -19,27 +19,27 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new TorusBufferGeometry(),
-				new TorusBufferGeometry( parameters.radius ),
-				new TorusBufferGeometry( parameters.radius, parameters.tube ),
-				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
-				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
-				new TorusBufferGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.arc ),
+				new TorusGeometry(),
+				new TorusGeometry( parameters.radius ),
+				new TorusGeometry( parameters.radius, parameters.tube ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
+				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.arc ),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

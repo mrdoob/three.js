@@ -155,9 +155,16 @@
 			从控制器中移除当前3D对象，并确保控制器UI是不可见的。
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			若不再需要该控制器，则应当调用此函数。
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			返回用于用户交互的 [page:Raycaster] 对象。 此对象在所有实例之间共享 变换控件。 如果您设置 [name] 的
+			[page:Object3D.layers .layers] 属性，您还需要 使用匹配值设置 [page:Raycaster] 上的
+			[page:Raycaster.layers .layers] 属性，否则设置 [name] 不会按预期工作。
 		</p>
 
 		<h3>[method:String getMode] ()</h3>
@@ -165,7 +172,7 @@
 			返回变换模式。
 		</p>
 
-		<h3>[method:null setMode] ( [param:String mode] )</h3>
+		<h3>[method:undefined setMode] ( [param:String mode] )</h3>
 		<p>
 			<p>
 				[page:String mode]: 变换模式。
@@ -175,7 +182,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setRotationSnap] ( [param:Number rotationSnap] )</h3>
+		<h3>[method:undefined setRotationSnap] ( [param:Number rotationSnap] )</h3>
 		<p>
 			<p>
 				[page:Number rotationSnap]: 旋转捕捉步幅。
@@ -185,7 +192,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setSize] ( [param:Number size] )</h3>
+		<h3>[method:undefined setSize] ( [param:Number size] )</h3>
 		<p>
 			<p>
 				[page:Number size]: 手柄UI的大小。
@@ -195,7 +202,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setSpace] ( [param:String space] )</h3>
+		<h3>[method:undefined setSpace] ( [param:String space] )</h3>
 		<p>
 			<p>
 				[page:String space]: 应用变换的坐标空间。
@@ -205,7 +212,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setTranslationSnap] ( [param:Number translationSnap] )</h3>
+		<h3>[method:undefined setTranslationSnap] ( [param:Number translationSnap] )</h3>
 		<p>
 			<p>
 				[page:Number translationSnap]: 平移捕捉步幅。

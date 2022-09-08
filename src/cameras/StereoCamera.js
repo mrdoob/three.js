@@ -1,41 +1,42 @@
 import { Matrix4 } from '../math/Matrix4.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-const _eyeRight = new Matrix4();
-const _eyeLeft = new Matrix4();
+const _eyeRight = /*@__PURE__*/ new Matrix4();
+const _eyeLeft = /*@__PURE__*/ new Matrix4();
+const _projectionMatrix = /*@__PURE__*/ new Matrix4();
 
-function StereoCamera() {
+class StereoCamera {
 
-	this.type = 'StereoCamera';
+	constructor() {
 
-	this.aspect = 1;
+		this.type = 'StereoCamera';
 
-	this.eyeSep = 0.064;
+		this.aspect = 1;
 
-	this.cameraL = new PerspectiveCamera();
-	this.cameraL.layers.enable( 1 );
-	this.cameraL.matrixAutoUpdate = false;
+		this.eyeSep = 0.064;
 
-	this.cameraR = new PerspectiveCamera();
-	this.cameraR.layers.enable( 2 );
-	this.cameraR.matrixAutoUpdate = false;
+		this.cameraL = new PerspectiveCamera();
+		this.cameraL.layers.enable( 1 );
+		this.cameraL.matrixAutoUpdate = false;
 
-	this._cache = {
-		focus: null,
-		fov: null,
-		aspect: null,
-		near: null,
-		far: null,
-		zoom: null,
-		eyeSep: null
-	};
+		this.cameraR = new PerspectiveCamera();
+		this.cameraR.layers.enable( 2 );
+		this.cameraR.matrixAutoUpdate = false;
 
-}
+		this._cache = {
+			focus: null,
+			fov: null,
+			aspect: null,
+			near: null,
+			far: null,
+			zoom: null,
+			eyeSep: null
+		};
 
-Object.assign( StereoCamera.prototype, {
+	}
 
-	update: function ( camera ) {
+	update( camera ) {
 
 		const cache = this._cache;
 
@@ -56,7 +57,7 @@ Object.assign( StereoCamera.prototype, {
 			// Off-axis stereoscopic effect based on
 			// http://paulbourke.net/stereographics/stereorender/
 
-			const projectionMatrix = camera.projectionMatrix.clone();
+			_projectionMatrix.copy( camera.projectionMatrix );
 			const eyeSepHalf = cache.eyeSep / 2;
 			const eyeSepOnProjection = eyeSepHalf * cache.near / cache.focus;
 			const ymax = ( cache.near * Math.tan( MathUtils.DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
@@ -72,20 +73,20 @@ Object.assign( StereoCamera.prototype, {
 			xmin = - ymax * cache.aspect + eyeSepOnProjection;
 			xmax = ymax * cache.aspect + eyeSepOnProjection;
 
-			projectionMatrix.elements[ 0 ] = 2 * cache.near / ( xmax - xmin );
-			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
+			_projectionMatrix.elements[ 0 ] = 2 * cache.near / ( xmax - xmin );
+			_projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-			this.cameraL.projectionMatrix.copy( projectionMatrix );
+			this.cameraL.projectionMatrix.copy( _projectionMatrix );
 
 			// for right eye
 
 			xmin = - ymax * cache.aspect - eyeSepOnProjection;
 			xmax = ymax * cache.aspect - eyeSepOnProjection;
 
-			projectionMatrix.elements[ 0 ] = 2 * cache.near / ( xmax - xmin );
-			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
+			_projectionMatrix.elements[ 0 ] = 2 * cache.near / ( xmax - xmin );
+			_projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-			this.cameraR.projectionMatrix.copy( projectionMatrix );
+			this.cameraR.projectionMatrix.copy( _projectionMatrix );
 
 		}
 
@@ -94,7 +95,6 @@ Object.assign( StereoCamera.prototype, {
 
 	}
 
-} );
-
+}
 
 export { StereoCamera };

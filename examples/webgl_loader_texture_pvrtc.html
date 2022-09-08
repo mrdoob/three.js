@@ -12,11 +12,24 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - PVR compressed textures
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { PVRLoader } from './jsm/loaders/PVRLoader.js';
+			import { PVRLoader } from 'three/addons/loaders/PVRLoader.js';
 
 			let camera, scene, renderer;
 			const meshes = [];
@@ -31,7 +44,7 @@
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
+				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
 				//
 
@@ -126,7 +139,7 @@
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				const torus = new THREE.TorusBufferGeometry( 100, 50, 32, 24 );
+				const torus = new THREE.TorusGeometry( 100, 50, 32, 24 );
 
 				mesh = new THREE.Mesh( torus, material6 );
 				mesh.position.x = 166;
@@ -147,7 +160,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

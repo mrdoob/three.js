@@ -22,11 +22,24 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - orbit controls
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, controls, scene, renderer;
 
@@ -51,6 +64,7 @@
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.listenToKeyEvents( window ); // optional
 
 				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
 
@@ -66,7 +80,7 @@
 
 				// world
 
-				const geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
+				const geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
 				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
 				for ( let i = 0; i < 500; i ++ ) {
@@ -96,7 +110,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

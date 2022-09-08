@@ -15,19 +15,32 @@
 			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank" rel="noopener">iClone</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
-			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
-			import { FocusShader } from './jsm/shaders/FocusShader.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+			import { FocusShader } from 'three/addons/shaders/FocusShader.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 			let camera, scene, renderer, mesh;
 
@@ -92,7 +105,7 @@
 				parent = new THREE.Object3D();
 				scene.add( parent );
 
-				const grid = new THREE.Points( new THREE.PlaneBufferGeometry( 15000, 15000, 64, 64 ), new THREE.PointsMaterial( { color: 0xff0000, size: 10 } ) );
+				const grid = new THREE.Points( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.PointsMaterial( { color: 0xff0000, size: 10 } ) );
 				grid.position.y = - 400;
 				grid.rotation.x = - Math.PI / 2;
 				parent.add( grid );
@@ -105,8 +118,8 @@
 
 				effectFocus = new ShaderPass( FocusShader );
 
-				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
-				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
+				effectFocus.uniforms[ 'screenWidth' ].value = window.innerWidth * window.devicePixelRatio;
+				effectFocus.uniforms[ 'screenHeight' ].value = window.innerHeight * window.devicePixelRatio;
 
 				composer = new EffectComposer( renderer );
 
@@ -119,7 +132,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -134,8 +147,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth * window.devicePixelRatio;
-				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight * window.devicePixelRatio;
+				effectFocus.uniforms[ 'screenWidth' ].value = window.innerWidth * window.devicePixelRatio;
+				effectFocus.uniforms[ 'screenHeight' ].value = window.innerHeight * window.devicePixelRatio;
 
 			}
 

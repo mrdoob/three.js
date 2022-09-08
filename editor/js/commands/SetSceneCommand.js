@@ -8,39 +8,39 @@ import { AddObjectCommand } from './AddObjectCommand.js';
  * @param scene containing children to import
  * @constructor
  */
-function SetSceneCommand( editor, scene ) {
+class SetSceneCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, scene ) {
 
-	this.type = 'SetSceneCommand';
-	this.name = 'Set Scene';
+		super( editor );
 
-	this.cmdArray = [];
+		this.type = 'SetSceneCommand';
+		this.name = 'Set Scene';
 
-	if ( scene !== undefined ) {
+		this.cmdArray = [];
 
-		this.cmdArray.push( new SetUuidCommand( this.editor, this.editor.scene, scene.uuid ) );
-		this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );
-		this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
+		if ( scene !== undefined ) {
 
-		while ( scene.children.length > 0 ) {
+			this.cmdArray.push( new SetUuidCommand( this.editor, this.editor.scene, scene.uuid ) );
+			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );
+			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
 
-			var child = scene.children.pop();
-			this.cmdArray.push( new AddObjectCommand( this.editor, child ) );
+			while ( scene.children.length > 0 ) {
+
+				const child = scene.children.pop();
+				this.cmdArray.push( new AddObjectCommand( this.editor, child ) );
+
+			}
 
 		}
 
 	}
 
-}
-
-SetSceneCommand.prototype = {
-
-	execute: function () {
+	execute() {
 
 		this.editor.signals.sceneGraphChanged.active = false;
 
-		for ( var i = 0; i < this.cmdArray.length; i ++ ) {
+		for ( let i = 0; i < this.cmdArray.length; i ++ ) {
 
 			this.cmdArray[ i ].execute();
 
@@ -49,13 +49,13 @@ SetSceneCommand.prototype = {
 		this.editor.signals.sceneGraphChanged.active = true;
 		this.editor.signals.sceneGraphChanged.dispatch();
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.editor.signals.sceneGraphChanged.active = false;
 
-		for ( var i = this.cmdArray.length - 1; i >= 0; i -- ) {
+		for ( let i = this.cmdArray.length - 1; i >= 0; i -- ) {
 
 			this.cmdArray[ i ].undo();
 
@@ -64,32 +64,33 @@ SetSceneCommand.prototype = {
 		this.editor.signals.sceneGraphChanged.active = true;
 		this.editor.signals.sceneGraphChanged.dispatch();
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
-		var cmds = [];
-		for ( var i = 0; i < this.cmdArray.length; i ++ ) {
+		const cmds = [];
+		for ( let i = 0; i < this.cmdArray.length; i ++ ) {
 
 			cmds.push( this.cmdArray[ i ].toJSON() );
 
 		}
+
 		output.cmds = cmds;
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
-		var cmds = json.cmds;
-		for ( var i = 0; i < cmds.length; i ++ ) {
+		const cmds = json.cmds;
+		for ( let i = 0; i < cmds.length; i ++ ) {
 
-			var cmd = new window[ cmds[ i ].type ]();	// creates a new object of type "json.type"
+			const cmd = new window[ cmds[ i ].type ]();	// creates a new object of type "json.type"
 			cmd.fromJSON( cmds[ i ] );
 			this.cmdArray.push( cmd );
 
@@ -97,6 +98,6 @@ SetSceneCommand.prototype = {
 
 	}
 
-};
+}
 
 export { SetSceneCommand };

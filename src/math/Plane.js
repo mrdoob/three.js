@@ -7,14 +7,14 @@ const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
 class Plane {
 
-	constructor( normal, constant ) {
+	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
 
-		Object.defineProperty( this, 'isPlane', { value: true } );
+		this.isPlane = true;
 
 		// normal is assumed to be normalized
 
-		this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
-		this.constant = ( constant !== undefined ) ? constant : 0;
+		this.normal = normal;
+		this.constant = constant;
 
 	}
 
@@ -54,12 +54,6 @@ class Plane {
 		this.setFromNormalAndCoplanarPoint( normal, a );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -107,25 +101,11 @@ class Plane {
 
 	projectPoint( point, target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .projectPoint() target is now required' );
-			target = new Vector3();
-
-		}
-
 		return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
 
 	}
 
 	intersectLine( line, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .intersectLine() target is now required' );
-			target = new Vector3();
-
-		}
 
 		const direction = line.delta( _vector1 );
 
@@ -141,7 +121,7 @@ class Plane {
 			}
 
 			// Unsure if this is the correct method to handle this case.
-			return undefined;
+			return null;
 
 		}
 
@@ -149,7 +129,7 @@ class Plane {
 
 		if ( t < 0 || t > 1 ) {
 
-			return undefined;
+			return null;
 
 		}
 
@@ -181,13 +161,6 @@ class Plane {
 	}
 
 	coplanarPoint( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .coplanarPoint() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.copy( this.normal ).multiplyScalar( - this.constant );
 
@@ -221,7 +194,12 @@ class Plane {
 
 	}
 
-}
+	clone() {
 
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 export { Plane };

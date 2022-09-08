@@ -22,8 +22,8 @@
 			<li>
 				A direction and length in 3D space. In three.js the length will always be the
 				[link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean distance]
-				(straight-line distance) from (0, 0, 0) to (x, y, z) and the direction is also
-				measured from (0, 0, 0) towards (x, y, z).
+				(straight-line distance) from `(0, 0, 0)` to `(x, y, z)` and the direction is also
+				measured from `(0, 0, 0)` towards `(x, y, z)`.
 			</li>
 			<li>
 				Any arbitrary ordered triplet of numbers.
@@ -33,6 +33,10 @@
 		<p>
 		There are other things a 3D vector can be used to represent, such as momentum
 		vectors and so on, however these are the most common uses in three.js.
+		</p>
+
+		<p>
+		Iterating through a [name] instance will yield its components `(x, y, z)` in the corresponding order.
 		</p>
 
 
@@ -52,15 +56,20 @@
 
 		<h3>[name]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-		[page:Float x] - the x value of this vector. Default is *0*.<br />
-		[page:Float y] -  the y value of this vector. Default is *0*.<br />
-		[page:Float z] - the z value of this vector. Default is *0*.<br /><br />
+		[page:Float x] - the x value of this vector. Default is `0`.<br />
+		[page:Float y] -  the y value of this vector. Default is `0`.<br />
+		[page:Float z] - the z value of this vector. Default is `0`.<br /><br />
 
 		Creates a new [name].
 		</p>
 
 
 		<h2>Properties</h2>
+
+		<h3>[property:Boolean isVector3]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -138,9 +147,8 @@
 		[page:Float min] - the minimum value the length will be clamped to <br />
 		[page:Float max] - the maximum value the length will be clamped to<br /><br />
 
-		If this vector's length is greater than the max value, it is replaced by the max value. <br /><br />
-		If this vector's length is less than the min value, it is replaced by the min value.
-		</p>
+		If this vector's length is greater than the max value, the vector will be scaled down so its length is the max value. <br /><br />
+		If this vector's length is less than the min value, the vector will be scaled up so its length is the min value.</p>
 
 		<h3>[method:this clampScalar]( [param:Float min], [param:Float max] )</h3>
 		<p>
@@ -192,8 +200,7 @@
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-		Divides this vector by scalar [page:Float s].<br />
-		Sets vector to *( 0, 0, 0 )* if *[page:Float s] = 0*.
+		Divides this vector by scalar [page:Float s].
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector3 v] )</h3>
@@ -203,7 +210,7 @@
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Vector3 v] )</h3>
-		<p>Checks for strict equality of this vector and [page:Vector3 v].</p>
+		<p>Returns `true` if the components of this vector and [page:Vector3 v] are strictly equal; `false` otherwise.</p>
 
 		<h3>[method:this floor]()</h3>
 		<p>The components of this vector are rounded down to the nearest integer value.</p>
@@ -213,8 +220,8 @@
 		[page:Array array] - the source array.<br />
 		[page:Integer offset] - ( optional) offset into the array. Default is 0.<br /><br />
 
-		Sets this vector's [page:.x x] value to be array[ offset + 0 ], [page:.y y] value to be array[ offset + 1 ]
-		and [page:.z z] value to be array[ offset + 2 ].
+		Sets this vector's [page:.x x] value to be `array[ offset + 0 ]`, [page:.y y] value to be `array[ offset + 1 ]`
+		and [page:.z z] value to be `array[ offset + 2 ]`.
 		</p>
 
 		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
@@ -253,7 +260,7 @@
 		<h3>[method:this lerp]( [param:Vector3 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector3 v] - [page:Vector3] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval `[0, 1]`.<br /><br />
 
 		Linearly interpolate between this vector and [page:Vector3 v], where alpha is the
 		percent distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector3 v].
@@ -263,7 +270,7 @@
 		<p>
 		[page:Vector3 v1] - the starting [page:Vector3].<br />
 		[page:Vector3 v2] - [page:Vector3] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval `[0, 1]`.<br /><br />
 
 		Sets this vector to be the vector linearly interpolated between [page:Vector3 v1] and
 		[page:Vector3 v2] where alpha is the percent distance along the line connecting the two vectors
@@ -337,7 +344,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>Sets the [page:.x x], [page:.y y] and [page:.z z] components of this vector.</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0, 1 or 2.<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -354,6 +361,11 @@
 
 		<h3>[method:this setFromCylindricalCoords]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
 		<p>Sets this vector from the cylindrical coordinates [page:Cylindrical radius], [page:Cylindrical theta] and [page:Cylindrical y].</p>
+
+		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
+		<p>
+		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] components from the x, y, and z components of the specified [page:Euler Euler Angle].
+		</p>
 
 		<h3>[method:this setFromMatrixColumn]( [param:Matrix4 matrix], [param:Integer index] )</h3>
 		<p>
@@ -409,7 +421,7 @@
 		<p>Subtracts [page:Vector3 v] from this vector.</p>
 
 		<h3>[method:this subScalar]( [param:Float s] )</h3>
-		<p>Subtracts [page:Float s]  from this vector's [page:.x x], [page:.y y] and [page:.z z] compnents.</p>
+		<p>Subtracts [page:Float s]  from this vector's [page:.x x], [page:.y y] and [page:.z z] components.</p>
 
 		<h3>[method:this subVectors]( [param:Vector3 a], [param:Vector3 b] )</h3>
 		<p>Sets this vector to [page:Vector3 a] - [page:Vector3 b].</p>
@@ -439,6 +451,11 @@
 		<h3>[method:this random]()</h3>
 		<p>
 			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
+
+		<h3>[method:this randomDirection]()</h3>
+		<p>
+		Sets this vector to a uniformly random point on a unit sphere.
 		</p>
 
 		<h2>Source</h2>

@@ -46,8 +46,7 @@
 			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
 			[example:webgl_effects_stereo effects / stereo ]<br />
 			[example:webgl_geometry_extrude_splines geometry / extrude / splines ]<br />
-			[example:webgl_materials_bumpmap materials / bumpmap ]<br />
-			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection ]
+			[example:webgl_materials_bumpmap materials / bumpmap ]
 		</p>
 
 		<h2>构造器</h2>
@@ -68,6 +67,11 @@
 		<p>
 			如果设置为 *true* 该平行光会产生动态阴影。 警告: 这样做的代价比较高而且需要一直调整到阴影看起来正确.
 			查看 [page:DirectionalLightShadow] 了解详细信息。该属性默认为 *false*。
+		</p>
+
+		<h3>[property:Boolean isDirectionalLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 
@@ -111,7 +115,7 @@
 
 		<p>公共方法请查看基类 [page:Light Light]。</p>
 
-		<h3>[method:DirectionalLight copy]( [param:DirectionalLight source] )</h3>
+		<h3>[method:this copy]( [param:DirectionalLight source] )</h3>
 		<p>
 			复制 source 的值到这个平行光源对象。
 		</p>

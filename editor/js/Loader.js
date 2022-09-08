@@ -1,36 +1,17 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
-import { Rhino3dmLoader } from '../../examples/jsm/loaders/3DMLoader.js';
-import { ThreeMFLoader } from '../../examples/jsm/loaders/3MFLoader.js';
-import { AMFLoader } from '../../examples/jsm/loaders/AMFLoader.js';
-import { ColladaLoader } from '../../examples/jsm/loaders/ColladaLoader.js';
-import { DRACOLoader } from '../../examples/jsm/loaders/DRACOLoader.js';
-import { FBXLoader } from '../../examples/jsm/loaders/FBXLoader.js';
-import { GLTFLoader } from '../../examples/jsm/loaders/GLTFLoader.js';
-import { KMZLoader } from '../../examples/jsm/loaders/KMZLoader.js';
-import { MD2Loader } from '../../examples/jsm/loaders/MD2Loader.js';
-import { MTLLoader } from '../../examples/jsm/loaders/MTLLoader.js';
-import { OBJLoader } from '../../examples/jsm/loaders/OBJLoader.js';
-import { PLYLoader } from '../../examples/jsm/loaders/PLYLoader.js';
-import { STLLoader } from '../../examples/jsm/loaders/STLLoader.js';
-import { SVGLoader } from '../../examples/jsm/loaders/SVGLoader.js';
-import { TDSLoader } from '../../examples/jsm/loaders/TDSLoader.js';
-import { VTKLoader } from '../../examples/jsm/loaders/VTKLoader.js';
-import { VRMLLoader } from '../../examples/jsm/loaders/VRMLLoader.js';
-import { XYZLoader } from '../../examples/jsm/loaders/XYZLoader.js';
-
-import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
+import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
 
-import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
+import { unzipSync, strFromU8 } from 'three/addons/libs/fflate.module.js';
 
 function Loader( editor ) {
 
-	var scope = this;
+	const scope = this;
 
 	this.texturePath = '';
 
@@ -48,14 +29,14 @@ function Loader( editor ) {
 
 		if ( files.length > 0 ) {
 
-			var filesMap = filesMap || LoaderUtils.createFilesMap( files );
+			filesMap = filesMap || LoaderUtils.createFilesMap( files );
 
-			var manager = new THREE.LoadingManager();
+			const manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
 				url = url.replace( /^(\.?\/)/, '' ); // remove './'
 
-				var file = filesMap[ url ];
+				const file = filesMap[ url ];
 
 				if ( file ) {
 
@@ -71,7 +52,7 @@ function Loader( editor ) {
 
 			manager.addHandler( /\.tga$/i, new TGALoader() );
 
-			for ( var i = 0; i < files.length; i ++ ) {
+			for ( let i = 0; i < files.length; i ++ ) {
 
 				scope.loadFile( files[ i ], manager );
 
@@ -83,14 +64,14 @@ function Loader( editor ) {
 
 	this.loadFile = function ( file, manager ) {
 
-		var filename = file.name;
-		var extension = filename.split( '.' ).pop().toLowerCase();
+		const filename = file.name;
+		const extension = filename.split( '.' ).pop().toLowerCase();
 
-		var reader = new FileReader();
+		const reader = new FileReader();
 		reader.addEventListener( 'progress', function ( event ) {
 
-			var size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
-			var progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
+			const size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
+			const progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
 
 			console.log( 'Loading', filename, size, progress );
 
@@ -100,11 +81,15 @@ function Loader( editor ) {
 
 			case '3dm':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var loader = new Rhino3dmLoader();
+					const contents = event.target.result;
+
+					const { Rhino3dmLoader } = await import( 'three/addons/loaders/3DMLoader.js' );
+
+					const loader = new Rhino3dmLoader();
 					loader.setLibraryPath( '../examples/jsm/libs/rhino3dm/' );
 					loader.parse( contents, function ( object ) {
 
@@ -117,12 +102,18 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case '3ds':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var loader = new TDSLoader();
-					var object = loader.parse( event.target.result );
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { TDSLoader } = await import( 'three/addons/loaders/TDSLoader.js' );
+
+					const loader = new TDSLoader();
+					const object = loader.parse( event.target.result );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 
@@ -130,13 +121,19 @@ function Loader( editor ) {
 				reader.readAsArrayBuffer( file );
 
 				break;
+
+			}
 
 			case '3mf':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var loader = new ThreeMFLoader();
-					var object = loader.parse( event.target.result );
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { ThreeMFLoader } = await import( 'three/addons/loaders/3MFLoader.js' );
+
+					const loader = new ThreeMFLoader();
+					const object = loader.parse( event.target.result );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 
@@ -145,12 +142,18 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'amf':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var loader = new AMFLoader();
-					var amfobject = loader.parse( event.target.result );
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { AMFLoader } = await import( 'three/addons/loaders/AMFLoader.js' );
+
+					const loader = new AMFLoader();
+					const amfobject = loader.parse( event.target.result );
 
 					editor.execute( new AddObjectCommand( editor, amfobject ) );
 
@@ -159,14 +162,20 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'dae':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var loader = new ColladaLoader( manager );
-					var collada = loader.parse( contents );
+					const contents = event.target.result;
+
+					const { ColladaLoader } = await import( 'three/addons/loaders/ColladaLoader.js' );
+
+					const loader = new ColladaLoader( manager );
+					const collada = loader.parse( contents );
 
 					collada.scene.name = filename;
 
@@ -177,36 +186,42 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'drc':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var loader = new DRACOLoader();
+					const contents = event.target.result;
+
+					const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
+
+					const loader = new DRACOLoader();
 					loader.setDecoderPath( '../examples/js/libs/draco/' );
 					loader.decodeDracoFile( contents, function ( geometry ) {
 
-						var object;
+						let object;
 
 						if ( geometry.index !== null ) {
 
-							var material = new THREE.MeshStandardMaterial();
+							const material = new THREE.MeshStandardMaterial();
 
 							object = new THREE.Mesh( geometry, material );
 							object.name = filename;
 
 						} else {
 
-							var material = new THREE.PointsMaterial( { size: 0.01 } );
-
-							if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+							const material = new THREE.PointsMaterial( { size: 0.01 } );
+							material.vertexColors = geometry.hasAttribute( 'color' );
 
 							object = new THREE.Points( geometry, material );
 							object.name = filename;
 
 						}
 
+						loader.dispose();
 						editor.execute( new AddObjectCommand( editor, object ) );
 
 					} );
@@ -216,14 +231,20 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'fbx':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var loader = new FBXLoader( manager );
-					var object = loader.parse( contents );
+					const contents = event.target.result;
+
+					const { FBXLoader } = await import( 'three/addons/loaders/FBXLoader.js' );
+
+					const loader = new FBXLoader( manager );
+					const object = loader.parse( contents );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 
@@ -232,20 +253,27 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'glb':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var dracoLoader = new DRACOLoader();
+					const contents = event.target.result;
+
+					const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
+					const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
+
+					const dracoLoader = new DRACOLoader();
 					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
 
-					var loader = new GLTFLoader();
+					const loader = new GLTFLoader();
 					loader.setDRACOLoader( dracoLoader );
 					loader.parse( contents, '', function ( result ) {
 
-						var scene = result.scene;
+						const scene = result.scene;
 						scene.name = filename;
 
 						scene.animations.push( ...result.animations );
@@ -258,13 +286,17 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'gltf':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var loader;
+					const contents = event.target.result;
+
+					let loader;
 
 					if ( isGLTF1( contents ) ) {
 
@@ -272,7 +304,10 @@ function Loader( editor ) {
 
 					} else {
 
-						var dracoLoader = new DRACOLoader();
+						const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
+						const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
+
+						const dracoLoader = new DRACOLoader();
 						dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
 
 						loader = new GLTFLoader( manager );
@@ -282,7 +317,7 @@ function Loader( editor ) {
 
 					loader.parse( contents, '', function ( result ) {
 
-						var scene = result.scene;
+						const scene = result.scene;
 						scene.name = filename;
 
 						scene.animations.push( ...result.animations );
@@ -295,26 +330,25 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'js':
 			case 'json':
 
-			case '3geo':
-			case '3mat':
-			case '3obj':
-			case '3scn':
+			{
 
 				reader.addEventListener( 'load', function ( event ) {
 
-					var contents = event.target.result;
+					const contents = event.target.result;
 
 					// 2.0
 
 					if ( contents.indexOf( 'postMessage' ) !== - 1 ) {
 
-						var blob = new Blob( [ contents ], { type: 'text/javascript' } );
-						var url = URL.createObjectURL( blob );
+						const blob = new Blob( [ contents ], { type: 'text/javascript' } );
+						const url = URL.createObjectURL( blob );
 
-						var worker = new Worker( url );
+						const worker = new Worker( url );
 
 						worker.onmessage = function ( event ) {
 
@@ -331,7 +365,7 @@ function Loader( editor ) {
 
 					// >= 3.0
 
-					var data;
+					let data;
 
 					try {
 
@@ -351,13 +385,41 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
+			case 'ifc':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { IFCLoader } = await import( 'three/addons/loaders/IFCLoader.js' );
+
+					var loader = new IFCLoader();
+					loader.ifcManager.setWasmPath( 'three/addons/loaders/ifc/' );
+
+					const model = await loader.parse( event.target.result );
+					model.mesh.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, model.mesh ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
 
 			case 'kmz':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var loader = new KMZLoader();
-					var collada = loader.parse( event.target.result );
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { KMZLoader } = await import( 'three/addons/loaders/KMZLoader.js' );
+
+					const loader = new KMZLoader();
+					const collada = loader.parse( event.target.result );
 
 					collada.scene.name = filename;
 
@@ -368,19 +430,50 @@ function Loader( editor ) {
 
 				break;
 
-			case 'md2':
+			}
 
-				reader.addEventListener( 'load', function ( event ) {
+			case 'ldr':
+			case 'mpd':
 
-					var contents = event.target.result;
+			{
 
-					var geometry = new MD2Loader().parse( contents );
-					var material = new THREE.MeshStandardMaterial( {
-						morphTargets: true,
-						morphNormals: true
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const { LDrawLoader } = await import( 'three/addons/loaders/LDrawLoader.js' );
+
+					const loader = new LDrawLoader();
+					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
+					loader.parse( event.target.result, undefined, function ( group ) {
+
+						group.name = filename;
+						// Convert from LDraw coordinates: rotate 180 degrees around OX
+						group.rotation.x = Math.PI;
+
+						editor.execute( new AddObjectCommand( editor, group ) );
+
 					} );
 
-					var mesh = new THREE.Mesh( geometry, material );
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			}
+
+			case 'md2':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { MD2Loader } = await import( 'three/addons/loaders/MD2Loader.js' );
+
+					const geometry = new MD2Loader().parse( contents );
+					const material = new THREE.MeshStandardMaterial();
+
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
 
@@ -392,13 +485,19 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'obj':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var object = new OBJLoader().parse( contents );
+					const contents = event.target.result;
+
+					const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
+
+					const object = new OBJLoader().parse( contents );
 					object.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, object ) );
@@ -408,41 +507,83 @@ function Loader( editor ) {
 
 				break;
 
-			case 'ply':
+			}
 
-				reader.addEventListener( 'load', function ( event ) {
+			case 'pcd':
 
-					var contents = event.target.result;
+			{
 
-					var geometry = new PLYLoader().parse( contents );
-					geometry.sourceType = "ply";
-					geometry.sourceFile = file.name;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var material = new THREE.MeshStandardMaterial();
+					const contents = event.target.result;
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.name = filename;
+					const { PCDLoader } = await import( '../../examples/jsm/loaders/PCDLoader.js' );
 
-					editor.execute( new AddObjectCommand( editor, mesh ) );
+					const points = new PCDLoader().parse( contents );
+					points.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, points ) );
 
 				}, false );
 				reader.readAsArrayBuffer( file );
 
 				break;
 
+			}
+
+			case 'ply':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { PLYLoader } = await import( 'three/addons/loaders/PLYLoader.js' );
+
+					const geometry = new PLYLoader().parse( contents );
+					let object;
+
+					if ( geometry.index !== null ) {
+
+						const material = new THREE.MeshStandardMaterial();
+
+						object = new THREE.Mesh( geometry, material );
+						object.name = filename;
+
+					} else {
+
+						const material = new THREE.PointsMaterial( { size: 0.01 } );
+						material.vertexColors = geometry.hasAttribute( 'color' );
+
+						object = new THREE.Points( geometry, material );
+						object.name = filename;
+
+					}
+
+					editor.execute( new AddObjectCommand( editor, object ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
+
 			case 'stl':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var geometry = new STLLoader().parse( contents );
-					geometry.sourceType = "stl";
-					geometry.sourceFile = file.name;
+					const contents = event.target.result;
 
-					var material = new THREE.MeshStandardMaterial();
+					const { STLLoader } = await import( 'three/addons/loaders/STLLoader.js' );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const geometry = new STLLoader().parse( contents );
+					const material = new THREE.MeshStandardMaterial();
+
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, mesh ) );
@@ -461,38 +602,44 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'svg':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var loader = new SVGLoader();
-					var paths = loader.parse( contents ).paths;
+					const contents = event.target.result;
+
+					const { SVGLoader } = await import( 'three/addons/loaders/SVGLoader.js' );
+
+					const loader = new SVGLoader();
+					const paths = loader.parse( contents ).paths;
 
 					//
 
-					var group = new THREE.Group();
+					const group = new THREE.Group();
 					group.scale.multiplyScalar( 0.1 );
 					group.scale.y *= - 1;
 
-					for ( var i = 0; i < paths.length; i ++ ) {
+					for ( let i = 0; i < paths.length; i ++ ) {
 
-						var path = paths[ i ];
+						const path = paths[ i ];
 
-						var material = new THREE.MeshBasicMaterial( {
+						const material = new THREE.MeshBasicMaterial( {
 							color: path.color,
 							depthWrite: false
 						} );
 
-						var shapes = path.toShapes( true );
+						const shapes = SVGLoader.createShapes( path );
 
-						for ( var j = 0; j < shapes.length; j ++ ) {
+						for ( let j = 0; j < shapes.length; j ++ ) {
 
-							var shape = shapes[ j ];
+							const shape = shapes[ j ];
 
-							var geometry = new THREE.ShapeBufferGeometry( shape );
-							var mesh = new THREE.Mesh( geometry, material );
+							const geometry = new THREE.ShapeGeometry( shape );
+							const mesh = new THREE.Mesh( geometry, material );
 
 							group.add( mesh );
 
@@ -507,19 +654,78 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
+			case 'usdz':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { USDZLoader } = await import( '../../examples/jsm/loaders/USDZLoader.js' );
+
+					const group = new USDZLoader().parse( contents );
+					group.name = filename;
+
+					editor.execute( new AddObjectCommand( editor, group ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
+
+			case 'vox':
+
+			{
+
+				reader.addEventListener( 'load', async function ( event ) {
+
+					const contents = event.target.result;
+
+					const { VOXLoader, VOXMesh } = await import( 'three/addons/loaders/VOXLoader.js' );
+
+					const chunks = new VOXLoader().parse( contents );
+
+					const group = new THREE.Group();
+					group.name = filename;
+
+					for ( let i = 0; i < chunks.length; i ++ ) {
+
+						const chunk = chunks[ i ];
+
+						const mesh = new VOXMesh( chunk );
+						group.add( mesh );
+
+					}
+
+					editor.execute( new AddObjectCommand( editor, group ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			}
+
 			case 'vtk':
+			case 'vtp':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var geometry = new VTKLoader().parse( contents );
-					geometry.sourceType = "vtk";
-					geometry.sourceFile = file.name;
+					const contents = event.target.result;
 
-					var material = new THREE.MeshStandardMaterial();
+					const { VTKLoader } = await import( 'three/addons/loaders/VTKLoader.js' );
 
-					var mesh = new THREE.Mesh( geometry, material );
+					const geometry = new VTKLoader().parse( contents );
+					const material = new THREE.MeshStandardMaterial();
+
+					const mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, mesh ) );
@@ -529,13 +735,19 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'wrl':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var result = new VRMLLoader().parse( contents );
+					const contents = event.target.result;
+
+					const { VRMLLoader } = await import( 'three/addons/loaders/VRMLLoader.js' );
+
+					const result = new VRMLLoader().parse( contents );
 
 					editor.execute( new SetSceneCommand( editor, result ) );
 
@@ -544,19 +756,24 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'xyz':
 
-				reader.addEventListener( 'load', function ( event ) {
+			{
 
-					var contents = event.target.result;
+				reader.addEventListener( 'load', async function ( event ) {
 
-					var geometry = new XYZLoader().parse( contents );
+					const contents = event.target.result;
 
-					var material = new THREE.PointsMaterial();
+					const { XYZLoader } = await import( 'three/addons/loaders/XYZLoader.js' );
 
-					if ( geometry.hasAttribute( 'color' ) === true ) material.vertexColors = true;
+					const geometry = new XYZLoader().parse( contents );
 
-					var points = new THREE.Points( geometry, material );
+					const material = new THREE.PointsMaterial();
+					material.vertexColors = geometry.hasAttribute( 'color' );
+
+					const points = new THREE.Points( geometry, material );
 					points.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, points ) );
@@ -566,16 +783,22 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'zip':
+
+			{
 
 				reader.addEventListener( 'load', function ( event ) {
 
 					handleZIP( event.target.result );
 
 				}, false );
-				reader.readAsBinaryString( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
+
+			}
 
 			default:
 
@@ -611,14 +834,18 @@ function Loader( editor ) {
 
 			case 'buffergeometry':
 
-				var loader = new THREE.BufferGeometryLoader();
-				var result = loader.parse( data );
+			{
 
-				var mesh = new THREE.Mesh( result );
+				const loader = new THREE.BufferGeometryLoader();
+				const result = loader.parse( data );
+
+				const mesh = new THREE.Mesh( result );
 
 				editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				break;
+
+			}
 
 			case 'geometry':
 
@@ -628,7 +855,9 @@ function Loader( editor ) {
 
 			case 'object':
 
-				var loader = new THREE.ObjectLoader();
+			{
+
+				const loader = new THREE.ObjectLoader();
 				loader.setResourcePath( scope.texturePath );
 
 				loader.parse( data, function ( result ) {
@@ -647,6 +876,8 @@ function Loader( editor ) {
 
 				break;
 
+			}
+
 			case 'app':
 
 				editor.fromJSON( data );
@@ -657,34 +888,39 @@ function Loader( editor ) {
 
 	}
 
-	function handleZIP( contents ) {
+	async function handleZIP( contents ) {
 
-		var zip = new JSZip( contents );
+		const zip = unzipSync( new Uint8Array( contents ) );
 
 		// Poly
 
-		if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+		if ( zip[ 'model.obj' ] && zip[ 'materials.mtl' ] ) {
 
-			var materials = new MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
-			var object = new OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
+			const { MTLLoader } = await import( 'three/addons/loaders/MTLLoader.js' );
+			const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
+
+			const materials = new MTLLoader().parse( strFromU8( zip[ 'materials.mtl' ] ) );
+			const object = new OBJLoader().setMaterials( materials ).parse( strFromU8( zip[ 'model.obj' ] ) );
 			editor.execute( new AddObjectCommand( editor, object ) );
 
 		}
 
 		//
 
-		zip.filter( function ( path, file ) {
+		for ( const path in zip ) {
 
-			var manager = new THREE.LoadingManager();
+			const file = zip[ path ];
+
+			const manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
-				var file = zip.files[ url ];
+				const file = zip[ url ];
 
 				if ( file ) {
 
 					console.log( 'Loading', url );
 
-					var blob = new Blob( [ file.asArrayBuffer() ], { type: 'application/octet-stream' } );
+					const blob = new Blob( [ file.buffer ], { type: 'application/octet-stream' } );
 					return URL.createObjectURL( blob );
 
 				}
@@ -693,30 +929,41 @@ function Loader( editor ) {
 
 			} );
 
-			var extension = file.name.split( '.' ).pop().toLowerCase();
+			const extension = path.split( '.' ).pop().toLowerCase();
 
 			switch ( extension ) {
 
 				case 'fbx':
 
-					var loader = new FBXLoader( manager );
-					var object = loader.parse( file.asArrayBuffer() );
+				{
+
+					const { FBXLoader } = await import( 'three/addons/loaders/FBXLoader.js' );
+
+					const loader = new FBXLoader( manager );
+					const object = loader.parse( file.buffer );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 
 					break;
 
+				}
+
 				case 'glb':
 
-					var dracoLoader = new DRACOLoader();
+				{
+
+					const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
+					const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
+
+					const dracoLoader = new DRACOLoader();
 					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
 
-					var loader = new GLTFLoader();
+					const loader = new GLTFLoader();
 					loader.setDRACOLoader( dracoLoader );
 
-					loader.parse( file.asArrayBuffer(), '', function ( result ) {
+					loader.parse( file.buffer, '', function ( result ) {
 
-						var scene = result.scene;
+						const scene = result.scene;
 
 						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
@@ -724,17 +971,24 @@ function Loader( editor ) {
 					} );
 
 					break;
+
+				}
 
 				case 'gltf':
 
-					var dracoLoader = new DRACOLoader();
+				{
+
+					const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
+					const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
+
+					const dracoLoader = new DRACOLoader();
 					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
 
-					var loader = new GLTFLoader( manager );
+					const loader = new GLTFLoader( manager );
 					loader.setDRACOLoader( dracoLoader );
-					loader.parse( file.asText(), '', function ( result ) {
+					loader.parse( strFromU8( file ), '', function ( result ) {
 
-						var scene = result.scene;
+						const scene = result.scene;
 
 						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
@@ -743,15 +997,17 @@ function Loader( editor ) {
 
 					break;
 
+				}
+
 			}
 
-		} );
+		}
 
 	}
 
 	function isGLTF1( contents ) {
 
-		var resultContent;
+		let resultContent;
 
 		if ( typeof contents === 'string' ) {
 
@@ -760,12 +1016,12 @@ function Loader( editor ) {
 
 		} else {
 
-			var magic = THREE.LoaderUtils.decodeText( new Uint8Array( contents, 0, 4 ) );
+			const magic = THREE.LoaderUtils.decodeText( new Uint8Array( contents, 0, 4 ) );
 
 			if ( magic === 'glTF' ) {
 
 				// contents is a .glb file; extract the version
-				var version = new DataView( contents ).getUint32( 4, true );
+				const version = new DataView( contents ).getUint32( 4, true );
 
 				return version < 2;
 
@@ -778,7 +1034,7 @@ function Loader( editor ) {
 
 		}
 
-		var json = JSON.parse( resultContent );
+		const json = JSON.parse( resultContent );
 
 		return ( json.asset != undefined && json.asset.version[ 0 ] < 2 );
 

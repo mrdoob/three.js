@@ -11,10 +11,10 @@ const _normal = /*@__PURE__*/ new Vector3();
 
 class Ray {
 
-	constructor( origin, direction ) {
+	constructor( origin = new Vector3(), direction = new Vector3( 0, 0, - 1 ) ) {
 
-		this.origin = ( origin !== undefined ) ? origin : new Vector3();
-		this.direction = ( direction !== undefined ) ? direction : new Vector3( 0, 0, - 1 );
+		this.origin = origin;
+		this.direction = direction;
 
 	}
 
@@ -24,12 +24,6 @@ class Ray {
 		this.direction.copy( direction );
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -43,13 +37,6 @@ class Ray {
 	}
 
 	at( t, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Ray: .at() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
@@ -72,13 +59,6 @@ class Ray {
 	}
 
 	closestPointToPoint( point, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Ray: .closestPointToPoint() target is now required' );
-			target = new Vector3();
-
-		}
 
 		target.subVectors( point, this.origin );
 
@@ -120,7 +100,7 @@ class Ray {
 
 	distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
+		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteDistRaySegment.h
 		// It returns the min distance between the ray and the segment
 		// defined by v0 and v1
 		// It can also set two optional targets :
@@ -419,7 +399,7 @@ class Ray {
 
 		// Compute the offset origin, edges, and normal.
 
-		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+		// from https://github.com/pmjoniak/GeometricTools/blob/master/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
 
 		_edge1.subVectors( b, a );
 		_edge2.subVectors( c, a );
@@ -505,7 +485,12 @@ class Ray {
 
 	}
 
-}
+	clone() {
 
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 export { Ray };

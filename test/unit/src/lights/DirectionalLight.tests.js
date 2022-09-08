@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils';
-import { DirectionalLight } from '../../../../src/lights/DirectionalLight';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
+import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
 
 export default QUnit.module( 'Lights', () => {
 
@@ -24,29 +24,29 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isDirectionalLight", ( assert ) => {
+		QUnit.todo( 'isDirectionalLight', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "copy", ( assert ) => {
+		QUnit.todo( 'copy', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

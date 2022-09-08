@@ -16,11 +16,24 @@
 		<b>O</b> orthographic <b>P</b> perspective
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
@@ -80,20 +93,20 @@
 				//
 
 				mesh = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 100, 16, 8 ),
+					new THREE.SphereGeometry( 100, 16, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
 				);
 				scene.add( mesh );
 
 				const mesh2 = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 50, 16, 8 ),
+					new THREE.SphereGeometry( 50, 16, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
 				);
 				mesh2.position.y = 150;
 				mesh.add( mesh2 );
 
 				const mesh3 = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 5, 16, 8 ),
+					new THREE.SphereGeometry( 5, 16, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
 				);
 				mesh3.position.z = 150;
@@ -133,8 +146,8 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'keydown', onKeyDown, false );
+				window.addEventListener( 'resize', onWindowResize );
+				document.addEventListener( 'keydown', onKeyDown );
 
 			}
 

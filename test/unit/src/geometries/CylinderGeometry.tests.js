@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { CylinderBufferGeometry } from '../../../../src/geometries/CylinderBufferGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { CylinderGeometry } from '../../../../src/geometries/CylinderGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'CylinderBufferGeometry', ( hooks ) => {
+	QUnit.module( 'CylinderGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -22,30 +22,30 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new CylinderBufferGeometry(),
-				new CylinderBufferGeometry( parameters.radiusTop ),
-				new CylinderBufferGeometry( parameters.radiusTop, parameters.radiusBottom ),
-				new CylinderBufferGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height ),
-				new CylinderBufferGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments ),
-				new CylinderBufferGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments ),
-				new CylinderBufferGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded ),
-				new CylinderBufferGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded, parameters.thetaStart ),
-				new CylinderBufferGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded, parameters.thetaStart, parameters.thetaLength ),
+				new CylinderGeometry(),
+				new CylinderGeometry( parameters.radiusTop ),
+				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom ),
+				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height ),
+				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments ),
+				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments ),
+				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded ),
+				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded, parameters.thetaStart ),
+				new CylinderGeometry( parameters.radiusTop, parameters.radiusBottom, parameters.height, parameters.radialSegments, parameters.heightSegments, parameters.openEnded, parameters.thetaStart, parameters.thetaLength ),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

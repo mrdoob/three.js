@@ -1,0 +1,540 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>- Несколько холстов и Несколько сцен</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – - Несколько холстов и Несколько сцен">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>- Несколько холстов и Несколько сцен</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Допустим, вы хотите создать сайт электронной коммерции или сделать 
+страницу с множеством трехмерных диаграмм. На первый взгляд все 
+выглядит просто. Просто сделайте холст для каждой диаграммы. 
+Для каждого холста сделайте <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>.</p>
+<p>Вы быстро обнаружите, что у вас возникли проблемы.</p>
+<ol>
+<li><p>Браузер ограничивает количество контекстов WebGL, которые вы можете иметь.</p>
+<p>Обычно этот предел составляет около 8. 
+Как только вы создадите 9-й контекст, самый старый будет потерян.</p>
+</li>
+<li><p>Ресурсы WebGL не могут быть разделены между контекстами (no shared memory)</p>
+<p>Это означает, что если вы хотите загрузить 10-мегабайтную модель в 2 полотна, 
+и эта модель использует 20 мегабайт текстур, ваша 10-мегабайтная модель должна 
+быть загружена дважды, а ваши текстуры также будут загружены дважды. Ничто не 
+может быть разделено между контекстами. Это также означает, что вещи должны 
+быть инициализированы дважды, шейдеры скомпилированы дважды и т.д. Всё 
+ухудшается, когда появляется больше холстов.</p>
+</li>
+</ol>
+<p>Так в чем же решение?</p>
+<p>Решением является один холст, который заполняет область просмотра в фоновом режиме 
+и некоторый другой элемент для представления каждого «виртуального» холста.
+Мы делаем один <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> и затем одну <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> для каждого виртуального холста. 
+Затем мы проверим положение элементов виртуального холста и, если они будут на 
+экране, мы скажем THREE.js нарисовать их сцену в правильном месте.</p>
+<p>С этим решением есть только 1 холст, поэтому мы решаем обе задачи 1 и 2 выше. 
+Мы не будем сталкиваться с ограничением контекста WebGL, потому что мы будем 
+использовать только один контекст. Мы также не будем сталкиваться с проблемами 
+обмена по тем же причинам.</p>
+<p>Давайте начнем с простого примера с двумя сценами. Сначала мы сделаем HTML</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;шутки про three js&lt;/canvas&gt;
+&lt;p&gt;
+  &lt;span id="box" class="diagram left"&gt;&lt;/span&gt;
+  Я люблю коробки (boxes). Подарки приходят в коробках.
+  Когда я нахожу новую коробку, я всегда рад узнать, что внутри.
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;span id="pyramid" class="diagram right"&gt;&lt;/span&gt;
+    Когда я был ребенком, я мечтал отправиться в экспедицию внутри пирамиды (pyramid).
+    и найти неоткрытую гробницу, полную мумий и сокровищ.
+&lt;/p&gt;
+</pre>
+<p>Затем мы можем настроить CSS, как-то так</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: -1;
+}
+.diagram {
+  display: inline-block;
+  width: 5em;
+  height: 3em;
+  border: 1px solid black;
+}
+.left {
+  float: left;
+  margin-right: .25em;
+}
+.right {
+  float: right;
+  margin-left: .25em;
+}
+</pre>
+<p>Мы устанавливаем холст, чтобы заполнить экран, и мы устанавливаем <code class="notranslate" translate="no">z-index</code> = 
+-1 , чтобы он появлялся позади других элементов. Нам также нужно указать некоторую 
+ширину и высоту для наших виртуальных элементов холста, поскольку внутри 
+нет ничего, что могло бы придать им какой-либо размер.</p>
+<p>Теперь мы сделаем 2 сцены с подсветкой и камерой. 
+К одной сцене мы добавим куб, а к другой ромб.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeScene(elem) {
+  const scene = new THREE.Scene();
+
+  const fov = 45;
+  const aspect = 2;  // по умолчанию для холста
+  const near = 0.1;
+  const far = 5;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.z = 2;
+  camera.position.set(0, 1, 2);
+  camera.lookAt(0, 0, 0);
+
+  {
+    const color = 0xFFFFFF;
+    const intensity = 1;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
+  }
+
+  return {scene, camera, elem};
+}
+
+function setupScene1() {
+  const sceneInfo = makeScene(document.querySelector('#box'));
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshPhongMaterial({color: 'red'});
+  const mesh = new THREE.Mesh(geometry, material);
+  sceneInfo.scene.add(mesh);
+  sceneInfo.mesh = mesh;
+  return sceneInfo;
+}
+
+function setupScene2() {
+  const sceneInfo = makeScene(document.querySelector('#pyramid'));
+  const radius = .8;
+  const widthSegments = 4;
+  const heightSegments = 2;
+  const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+  const material = new THREE.MeshPhongMaterial({
+    color: 'blue',
+    flatShading: true,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  sceneInfo.scene.add(mesh);
+  sceneInfo.mesh = mesh;
+  return sceneInfo;
+}
+
+const sceneInfo1 = setupScene1();
+const sceneInfo2 = setupScene2();
+</pre>
+<p>И тогда мы сделаем функцию для рендеринга каждой сцены, только если элемент 
+находится на экране. Мы можем указать THREE.js визуализировать только часть 
+холста, включив тест <em>scissor</em> через <a href="/docs/#api/en/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a>, затем установим 
+плоскость обрезания и область просмотра (Viewport) с помощью 
+<a href="/docs/#api/en/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a> и <a href="/docs/#api/en/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function renderSceneInfo(sceneInfo) {
+  const {scene, camera, elem} = sceneInfo;
+
+  // получаем относительную позицию окна просмотра этого элемента
+  const {left, right, top, bottom, width, height} =
+      elem.getBoundingClientRect();
+
+  const isOffscreen =
+      bottom &lt; 0 ||
+      top &gt; renderer.domElement.clientHeight ||
+      right &lt; 0 ||
+      left &gt; renderer.domElement.clientWidth;
+
+  if (isOffscreen) {
+    return;
+  }
+
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+
+  const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+  renderer.setScissor(left, positiveYUpBottom, width, height);
+  renderer.setViewport(left, positiveYUpBottom, width, height);
+
+  renderer.render(scene, camera);
+}
+</pre>
+<p>И тогда наша функция рендеринга просто сначала очистит экран, 
+а затем отрисует каждую сцену.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  resizeRendererToDisplaySize(renderer);
+
+  renderer.setScissorTest(false);
+  renderer.clear(true, true);
+  renderer.setScissorTest(true);
+
+  sceneInfo1.mesh.rotation.y = time * .1;
+  sceneInfo2.mesh.rotation.y = time * .1;
+
+  renderSceneInfo(sceneInfo1);
+  renderSceneInfo(sceneInfo2);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>И вот оно</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-v1.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/multiple-scenes-v1.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Вы можете увидеть, где на первом месте <code class="notranslate" translate="no">&lt;span&gt;</code> находится красный куб, 
+а на втором <code class="notranslate" translate="no">span</code> - синий ромб.</p>
+<h2 id="-">Синхронизация</h2>
+<p>Код выше работает, но есть одна небольшая проблема. 
+Если ваши сцены сложные или по какой-либо причине требуется 
+слишком много времени для рендеринга, положение сцен, 
+нарисованных на холсте, будет отставать от остальной части страницы.</p>
+<p>Если мы дадим каждой области границу</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">.diagram {
+  display: inline-block;
+  width: 5em;
+  height: 3em;
++  border: 1px solid black;
+}
+</pre>
+<p>И устанавливаем фон каждой сцены</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++scene.background = new THREE.Color('red');
+</pre>
+<p>И если мы <a href="../examples/multiple-scenes-v2.html" target="_blank">быстро прокрутим вверх и вниз</a> 
+мы увидим проблему. Вот анимация прокрутки, замедленная в 10 раз.</p>
+<div class="threejs_center"><img class="border" src="../resources/images/multi-view-skew.gif"></div>
+
+<p>Мы можем использовать другой метод, который имеет другой компромисс. 
+Мы переключим CSS холста с <code class="notranslate" translate="no">position: fixed</code> на <code class="notranslate" translate="no">position: absolute</code>. </p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+-  position: fixed;
++  position: absolute;
+</pre>
+<p>Затем мы установим преобразование (transform) холста, чтобы переместить его так, 
+чтобы верх холста находился в верхней части любой части, 
+на которую в данный момент прокручивается страница.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  ...
+
+  const transform = `translateY(${window.scrollY}px)`;
+  renderer.domElement.style.transform = transform;
+</pre>
+<p><code class="notranslate" translate="no">position: fixed</code> удерживает холст от прокрутки вообще, 
+в то время как остальная часть страницы прокручивалась поверх него. 
+<code class="notranslate" translate="no">position: absolute</code> позволит холсту прокручиваться с остальной частью 
+страницы, что означает, что все, что мы рисуем, будет прилипать 
+к странице, когда она прокручивается, даже если мы слишком медленны 
+для рендеринга. Когда мы наконец получаем возможность 
+рендеринга, мы перемещаем холст так, чтобы он соответствовал 
+месту прокрутки страницы, и затем мы повторно визуализируем. 
+Это означает, что только на краях окна будут отображаться некоторые не визуализированные биты, но
+<a href="../examples/multiple-scenes-v2.html" target="_blank"> материал в середине страницы должен совпадать</a>, 
+а не скользить. Вот представление результатов нового метода, замедленного в 10 раз.</p>
+<div class="threejs_center"><img class="border" src="../resources/images/multi-view-fixed.gif"></div>
+
+<h2 id="-">Делаем это более универсальным</h2>
+<p>Теперь, когда у нас работает несколько сцен, давайте сделаем это немного более обобщенным.</p>
+<p>Мы могли бы сделать так, чтобы основная функция рендеринга, управляющая холстом, просто имела 
+список элементов и связанную с ними функцию рендеринга. Для каждого элемента он проверяет, 
+находится ли элемент на экране, и, если это так, вызывает соответствующую функцию рендеринга. 
+Таким образом, у нас была бы общая система, в которой отдельные сцены на самом деле не знают, 
+что знают, что их визуализируют в каком-то меньшем пространстве.</p>
+<p>Вот основная функция отрисовки</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sceneElements = [];
+function addScene(elem, fn) {
+  sceneElements.push({elem, fn});
+}
+
+function render(time) {
+  time *= 0.001;
+
+  resizeRendererToDisplaySize(renderer);
+
+  renderer.setScissorTest(false);
+  renderer.setClearColor(clearColor, 0);
+  renderer.clear(true, true);
+  renderer.setScissorTest(true);
+
+  const transform = `translateY(${window.scrollY}px)`;
+  renderer.domElement.style.transform = transform;
+
+  for (const {elem, fn} of sceneElements) {
+    // получаем относительную позицию окна просмотра этого элемента
+    const rect = elem.getBoundingClientRect();
+    const {left, right, top, bottom, width, height} = rect;
+
+    const isOffscreen =
+        bottom &lt; 0 ||
+        top &gt; renderer.domElement.clientHeight ||
+        right &lt; 0 ||
+        left &gt; renderer.domElement.clientWidth;
+
+    if (!isOffscreen) {
+      const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+      renderer.setScissor(left, positiveYUpBottom, width, height);
+      renderer.setViewport(left, positiveYUpBottom, width, height);
+
+      fn(time, rect);
+    }
+  }
+
+  requestAnimationFrame(render);
+}
+</pre>
+<p>Вы можете видеть, что он зацикливается на массиве объектов <code class="notranslate" translate="no">sceneElements</code>, 
+каждый из которых имеет свойство <code class="notranslate" translate="no">elem</code> и <code class="notranslate" translate="no">fn</code>.</p>
+<p>Он проверяет, находится ли элемент на экране. Если это так, то он вызывает <code class="notranslate" translate="no">fn</code>
+и передает ему текущее время и его прямоугольник.</p>
+<p>Теперь установочный код для каждой сцены просто добавляет себя в список сцен</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const elem = document.querySelector('#box');
+  const {scene, camera} = makeScene();
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshPhongMaterial({color: 'red'});
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+  addScene(elem, (time, rect) =&gt; {
+    camera.aspect = rect.width / rect.height;
+    camera.updateProjectionMatrix();
+    mesh.rotation.y = time * .1;
+    renderer.render(scene, camera);
+  });
+}
+
+{
+  const elem = document.querySelector('#pyramid');
+  const {scene, camera} = makeScene();
+  const radius = .8;
+  const widthSegments = 4;
+  const heightSegments = 2;
+  const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+  const material = new THREE.MeshPhongMaterial({
+    color: 'blue',
+    flatShading: true,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+  addScene(elem, (time, rect) =&gt; {
+    camera.aspect = rect.width / rect.height;
+    camera.updateProjectionMatrix();
+    mesh.rotation.y = time * .1;
+    renderer.render(scene, camera);
+  });
+}
+</pre>
+<p>При этом нам больше не нужно <code class="notranslate" translate="no">sceneInfo1</code> и <code class="notranslate" translate="no">sceneInfo2</code>. 
+Код, который вращал меши, теперь специфичен для каждой сцены.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-generic.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/multiple-scenes-generic.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<h2 id="-html">Использование набора данных в HTML</h2>
+<p>Еще одна, еще более общая вещь, которую мы можем сделать, это использовать 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset">dataset</a>. 
+Это способ добавить свои собственные данные в элемент HTML. Вместо использования <code class="notranslate" translate="no">id="..."</code> 
+мы будем использовать <code class="notranslate" translate="no">data-diagram="..."</code> как тут</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
+&lt;p&gt;
+-  &lt;span id="box" class="diagram left"&gt;&lt;/span&gt;
++  &lt;span data-diagram="box" class="left"&gt;&lt;/span&gt;
+  Я люблю коробки (boxes). Подарки приходят в коробках.
+  Когда я нахожу новую коробку, я всегда рад узнать, что внутри.
+&lt;/p&gt;
+&lt;p&gt;
+-  &lt;span id="pyramid" class="diagram left"&gt;&lt;/span&gt;
++  &lt;span data-diagram="pyramid" class="right"&gt;&lt;/span&gt;
+   Когда я был ребенком, я мечтал отправиться в экспедицию внутри пирамиды (pyramid).
+   и найти неоткрытую гробницу, полную мумий и сокровищ.
+&lt;/p&gt;
+</pre>
+<p>Мы можем их изменить селектор CSS, чтобы выбрать для этого</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">-.diagram
++*[data-diagram] {
+  display: inline-block;
+  width: 5em;
+  height: 3em;
+}
+</pre>
+<p>Мы изменим код установки сцены, чтобы он представлял собой карту имен для <em>функций инициализации сцены</em> 
+, которые возвращают функцию <em>отрисовки сцены</em>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sceneInitFunctionsByName = {
+  'box': () =&gt; {
+    const {scene, camera} = makeScene();
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshPhongMaterial({color: 'red'});
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    return (time, rect) =&gt; {
+      mesh.rotation.y = time * .1;
+      camera.aspect = rect.width / rect.height;      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    };
+  },
+  'pyramid': () =&gt; {
+    const {scene, camera} = makeScene();
+    const radius = .8;
+    const widthSegments = 4;
+    const heightSegments = 2;
+    const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+    const material = new THREE.MeshPhongMaterial({
+      color: 'blue',
+      flatShading: true,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    return (time, rect) =&gt; {
+      mesh.rotation.y = time * .1;
+      camera.aspect = rect.width / rect.height;
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    };
+  },
+};
+</pre>
+<p>И для инициализации мы можем просто использовать <code class="notranslate" translate="no">querySelectorAll</code>, 
+чтобы найти все диаграммы и вызвать соответствующую функцию инициализации для этой диаграммы.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">document.querySelectorAll('[data-diagram]').forEach((elem) =&gt; {
+  const sceneName = elem.dataset.diagram;
+  const sceneInitFunction = sceneInitFunctionsByName[sceneName];
+  const sceneRenderFunction = sceneInitFunction(elem);
+  addScene(elem, sceneRenderFunction());
+});
+</pre>
+<p>Никаких изменений в визуальных элементах, но код легче переиспользовать.</p>
+<p></p>
+<h2 id="-">Добавление элементов управления к каждому элементу</h2>
+<p>Например, добавление <code class="notranslate" translate="no">TrackballControls</code> в интерактивном режиме так же просто. 
+Сначала мы добавляем скрипт для контролов.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {TrackballControls} from '/examples/jsm/controls/TrackballControls.js';
+</pre>
+<p>И затем мы можем добавить <code class="notranslate" translate="no">TrackballControls</code> к каждой сцене, передавая элемент, связанный с этой сценой.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makeScene() {
++function makeScene(elem) {
+  const scene = new THREE.Scene();
+
+  const fov = 45;
+  const aspect = 2;  // по умолчанию для canvas
+  const near = 0.1;
+  const far = 5;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(0, 1, 2);
+  camera.lookAt(0, 0, 0);
++  scene.add(camera);
+
++  const controls = new TrackballControls(camera, elem);
++  controls.noZoom = true;
++  controls.noPan = true;
+
+  {
+    const color = 0xFFFFFF;
+    const intensity = 1;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, 2, 4);
+-    scene.add(light);
++    camera.add(light);
+  }
+
+-  return {scene, camera};
++ return {scene, camera, controls};
+}
+</pre>
+<p>Вы заметите, что мы добавили камеру на сцену и свет на камеру. Это делает свет 
+относительно камеры. Поскольку <code class="notranslate" translate="no">TrackballControls</code> двигает камеру, 
+это, вероятно, то, что мы хотим. Он сохраняет свет, 
+сияющий на стороне объекта, на который мы смотрим.</p>
+<p>Нам нужно обновить эти элементы управления в наших функциях отрисовки</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sceneInitFunctionsByName = {
+- 'box': () =&gt; {
+-    const {scene, camera} = makeScene();
++ 'box': (elem) =&gt; {
++    const {scene, camera, controls} = makeScene(elem);
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshPhongMaterial({color: 'red'});
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    return (time, rect) =&gt; {
+      mesh.rotation.y = time * .1;
+      camera.aspect = rect.width / rect.height;
+      camera.updateProjectionMatrix();
++      controls.handleResize();
++      controls.update();
+      renderer.render(scene, camera);
+    };
+  },
+-  'pyramid': () =&gt; {
+-    const {scene, camera} = makeScene();
++  'pyramid': (elem) =&gt; {
++    const {scene, camera, controls} = makeScene(elem);
+    const radius = .8;
+    const widthSegments = 4;
+    const heightSegments = 2;
+    const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+    const material = new THREE.MeshPhongMaterial({
+      color: 'blue',
+      flatShading: true,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    return (time, rect) =&gt; {
+      mesh.rotation.y = time * .1;
+      camera.aspect = rect.width / rect.height;
+      camera.updateProjectionMatrix();
++      controls.handleResize();
++      controls.update();
+      renderer.render(scene, camera);
+    };
+  },
+};
+</pre>
+<p>Теперь, если вы перетащите объекты, они будут вращаться.</p>
+<p></p>
+<p>Эти методы используются на самом сайте. В частности, 
+<a href="primitives.html">статья о примитивах</a> и <a href="materials.html">о материалах</a> 
+используют эту технику для добавления различных примеров по всей статье.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

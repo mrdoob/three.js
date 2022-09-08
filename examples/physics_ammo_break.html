@@ -17,14 +17,27 @@
 
 	<script src="js/libs/ammo.wasm.js"></script>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
-		import Stats from './jsm/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats.module.js';
 
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { ConvexObjectBreaker } from './jsm/misc/ConvexObjectBreaker.js';
-		import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { ConvexObjectBreaker } from 'three/addons/misc/ConvexObjectBreaker.js';
+		import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 
 		// - Global variables -
 
@@ -146,7 +159,7 @@
 
 			//
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 		}
 
@@ -168,7 +181,7 @@
 
 		function createObject( mass, halfExtents, pos, quat, material ) {
 
-			const object = new THREE.Mesh( new THREE.BoxBufferGeometry( halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2 ), material );
+			const object = new THREE.Mesh( new THREE.BoxGeometry( halfExtents.x * 2, halfExtents.y * 2, halfExtents.z * 2 ), material );
 			object.position.copy( pos );
 			object.quaternion.copy( quat );
 			convexBreaker.prepareBreakableObject( object, mass, new THREE.Vector3(), new THREE.Vector3(), true );
@@ -183,7 +196,7 @@
 			quat.set( 0, 0, 0, 1 );
 			const ground = createParalellepipedWithPhysics( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 			ground.receiveShadow = true;
-			textureLoader.load( "textures/grid.png", function ( texture ) {
+			textureLoader.load( 'textures/grid.png', function ( texture ) {
 
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
@@ -236,7 +249,7 @@
 			mountainPoints.push( new THREE.Vector3( mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( - mountainHalfExtents.x, - mountainHalfExtents.y, - mountainHalfExtents.z ) );
 			mountainPoints.push( new THREE.Vector3( 0, mountainHalfExtents.y, 0 ) );
-			const mountain = new THREE.Mesh( new ConvexBufferGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
+			const mountain = new THREE.Mesh( new ConvexGeometry( mountainPoints ), createMaterial( 0xB03814 ) );
 			mountain.position.copy( pos );
 			mountain.quaternion.copy( quat );
 			convexBreaker.prepareBreakableObject( mountain, mountainMass, new THREE.Vector3(), new THREE.Vector3(), true );
@@ -246,7 +259,7 @@
 
 		function createParalellepipedWithPhysics( sx, sy, sz, mass, pos, quat, material ) {
 
-			const object = new THREE.Mesh( new THREE.BoxBufferGeometry( sx, sy, sz, 1, 1, 1 ), material );
+			const object = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
 			const shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 			shape.setMargin( margin );
 
@@ -393,7 +406,7 @@
 				const ballMass = 35;
 				const ballRadius = 0.4;
 
-				const ball = new THREE.Mesh( new THREE.SphereBufferGeometry( ballRadius, 14, 10 ), ballMaterial );
+				const ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 14, 10 ), ballMaterial );
 				ball.castShadow = true;
 				ball.receiveShadow = true;
 				const ballShape = new Ammo.btSphereShape( ballRadius );
@@ -407,7 +420,7 @@
 				pos.multiplyScalar( 24 );
 				ballBody.setLinearVelocity( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
 
-			}, false );
+			} );
 
 		}
 

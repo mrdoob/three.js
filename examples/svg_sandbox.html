@@ -13,13 +13,26 @@
 	</head>
 	<body>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { SVGRenderer, SVGObject } from './jsm/renderers/SVGRenderer.js';
+			import { SVGRenderer, SVGObject } from 'three/addons/renderers/SVGRenderer.js';
 
 			let camera, scene, renderer, stats;
 
@@ -49,7 +62,7 @@
 
 				// CUBES
 
-				const boxGeometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+				const boxGeometry = new THREE.BoxGeometry( 100, 100, 100 );
 
 				let mesh = new THREE.Mesh( boxGeometry, new THREE.MeshBasicMaterial( { color: 0x0000ff, opacity: 0.5, transparent: true } ) );
 				mesh.position.x = 500;
@@ -68,14 +81,14 @@
 
 				// PLANE
 
-				mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
+				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 				mesh.position.y = - 500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
 
 				// CYLINDER
 
-				mesh = new THREE.Mesh( new THREE.CylinderBufferGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( new THREE.CylinderGeometry( 20, 100, 200, 10 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
 				mesh.position.x = - 500;
 				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
@@ -213,7 +226,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -1,12 +1,6 @@
 class VRButton {
 
-	static createButton( renderer, options ) {
-
-		if ( options ) {
-
-			console.error( 'THREE.VRButton: The "options" parameter has been removed. Please set the reference space type via renderer.xr.setReferenceSpaceType() instead.' );
-
-		}
+	static createButton( renderer ) {
 
 		const button = document.createElement( 'button' );
 
@@ -14,11 +8,11 @@ class VRButton {
 
 			let currentSession = null;
 
-			function onSessionStarted( session ) {
+			async function onSessionStarted( session ) {
 
 				session.addEventListener( 'end', onSessionEnded );
 
-				renderer.xr.setSession( session );
+				await renderer.xr.setSession( session );
 				button.textContent = 'EXIT VR';
 
 				currentSession = session;
@@ -68,7 +62,7 @@ class VRButton {
 					// ('local' is always available for immersive sessions and doesn't need to
 					// be requested separately.)
 
-					const sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking' ] };
+					const sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking', 'layers' ] };
 					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
 
 				} else {
@@ -104,6 +98,16 @@ class VRButton {
 
 		}
 
+		function showVRNotAllowed( exception ) {
+
+			disableButton();
+
+			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+
+			button.textContent = 'VR NOT ALLOWED';
+
+		}
+
 		function stylizeElement( element ) {
 
 			element.style.position = 'absolute';
@@ -132,7 +136,13 @@ class VRButton {
 
 				supported ? showEnterVR() : showWebXRNotFound();
 
-			} );
+				if ( supported && VRButton.xrSessionIsGranted ) {
+
+					button.click();
+
+				}
+
+			} ).catch( showVRNotAllowed );
 
 			return button;
 
@@ -164,6 +174,28 @@ class VRButton {
 
 	}
 
+	static xrSessionIsGranted = false;
+
+	static registerSessionGrantedListener() {
+
+		if ( 'xr' in navigator ) {
+
+			// WebXRViewer (based on Firefox) has a bug where addEventListener
+			// throws a silent exception and aborts execution entirely.
+			if ( /WebXRViewer\//i.test( navigator.userAgent ) ) return;
+
+			navigator.xr.addEventListener( 'sessiongranted', () => {
+
+				VRButton.xrSessionIsGranted = true;
+
+			} );
+
+		}
+
+	}
+
 }
+
+VRButton.registerSessionGrantedListener();
 
 export { VRButton };

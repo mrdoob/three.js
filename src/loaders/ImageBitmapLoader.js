@@ -1,41 +1,39 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
-function ImageBitmapLoader( manager ) {
+class ImageBitmapLoader extends Loader {
 
-	if ( typeof createImageBitmap === 'undefined' ) {
+	constructor( manager ) {
 
-		console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+		super( manager );
+
+		this.isImageBitmapLoader = true;
+
+		if ( typeof createImageBitmap === 'undefined' ) {
+
+			console.warn( 'THREE.ImageBitmapLoader: createImageBitmap() not supported.' );
+
+		}
+
+		if ( typeof fetch === 'undefined' ) {
+
+			console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
+
+		}
+
+		this.options = { premultiplyAlpha: 'none' };
 
 	}
 
-	if ( typeof fetch === 'undefined' ) {
-
-		console.warn( 'THREE.ImageBitmapLoader: fetch() not supported.' );
-
-	}
-
-	Loader.call( this, manager );
-
-	this.options = { premultiplyAlpha: 'none' };
-
-}
-
-ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
-
-	constructor: ImageBitmapLoader,
-
-	isImageBitmapLoader: true,
-
-	setOptions: function setOptions( options ) {
+	setOptions( options ) {
 
 		this.options = options;
 
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		if ( url === undefined ) url = '';
 
@@ -65,6 +63,7 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		const fetchOptions = {};
 		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
+		fetchOptions.headers = this.requestHeader;
 
 		fetch( url, fetchOptions ).then( function ( res ) {
 
@@ -72,7 +71,7 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, scope.options );
+			return createImageBitmap( blob, Object.assign( scope.options, { colorSpaceConversion: 'none' } ) );
 
 		} ).then( function ( imageBitmap ) {
 
@@ -95,6 +94,6 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 	}
 
-} );
+}
 
 export { ImageBitmapLoader };

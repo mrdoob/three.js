@@ -26,9 +26,15 @@ function WebGLRenderState( extensions, capabilities ) {
 
 	}
 
-	function setupLights( camera ) {
+	function setupLights( physicallyCorrectLights ) {
 
-		lights.setup( lightsArray, shadowsArray, camera );
+		lights.setup( lightsArray, physicallyCorrectLights );
+
+	}
+
+	function setupLightsView( camera ) {
+
+		lights.setupView( lightsArray, camera );
 
 	}
 
@@ -43,6 +49,7 @@ function WebGLRenderState( extensions, capabilities ) {
 		init: init,
 		state: state,
 		setupLights: setupLights,
+		setupLightsView: setupLightsView,
 
 		pushLight: pushLight,
 		pushShadow: pushShadow
@@ -54,26 +61,26 @@ function WebGLRenderStates( extensions, capabilities ) {
 
 	let renderStates = new WeakMap();
 
-	function get( scene, camera ) {
+	function get( scene, renderCallDepth = 0 ) {
 
+		const renderStateArray = renderStates.get( scene );
 		let renderState;
 
-		if ( renderStates.has( scene ) === false ) {
+		if ( renderStateArray === undefined ) {
 
 			renderState = new WebGLRenderState( extensions, capabilities );
-			renderStates.set( scene, new WeakMap() );
-			renderStates.get( scene ).set( camera, renderState );
+			renderStates.set( scene, [ renderState ] );
 
 		} else {
 
-			if ( renderStates.get( scene ).has( camera ) === false ) {
+			if ( renderCallDepth >= renderStateArray.length ) {
 
 				renderState = new WebGLRenderState( extensions, capabilities );
-				renderStates.get( scene ).set( camera, renderState );
+				renderStateArray.push( renderState );
 
 			} else {
 
-				renderState = renderStates.get( scene ).get( camera );
+				renderState = renderStateArray[ renderCallDepth ];
 
 			}
 

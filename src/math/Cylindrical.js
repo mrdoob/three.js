@@ -4,11 +4,11 @@
 
 class Cylindrical {
 
-	constructor( radius, theta, y ) {
+	constructor( radius = 1, theta = 0, y = 0 ) {
 
-		this.radius = ( radius !== undefined ) ? radius : 1.0; // distance from the origin to a point in the x-z plane
-		this.theta = ( theta !== undefined ) ? theta : 0; // counterclockwise angle in the x-z plane measured in radians from the positive z-axis
-		this.y = ( y !== undefined ) ? y : 0; // height above the x-z plane
+		this.radius = radius; // distance from the origin to a point in the x-z plane
+		this.theta = theta; // counterclockwise angle in the x-z plane measured in radians from the positive z-axis
+		this.y = y; // height above the x-z plane
 
 		return this;
 
@@ -21,12 +21,6 @@ class Cylindrical {
 		this.y = y;
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
@@ -56,7 +50,12 @@ class Cylindrical {
 
 	}
 
-}
+	clone() {
 
+		return new this.constructor().copy( this );
+
+	}
+
+}
 
 export { Cylindrical };

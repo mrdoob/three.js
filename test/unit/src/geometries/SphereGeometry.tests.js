@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { SphereBufferGeometry } from '../../../../src/geometries/SphereBufferGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { SphereGeometry } from '../../../../src/geometries/SphereGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'SphereBufferGeometry', ( hooks ) => {
+	QUnit.module( 'SphereGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -21,29 +21,29 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				new SphereBufferGeometry(),
-				new SphereBufferGeometry( parameters.radius ),
-				new SphereBufferGeometry( parameters.radius, parameters.widthSegments ),
-				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
-				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
-				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
-				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
-				new SphereBufferGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
+				new SphereGeometry(),
+				new SphereGeometry( parameters.radius ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
+				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

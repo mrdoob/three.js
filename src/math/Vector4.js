@@ -2,7 +2,7 @@ class Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-		Object.defineProperty( this, 'isVector4', { value: true } );
+		Vector4.prototype.isVector4 = true;
 
 		this.x = x;
 		this.y = y;
@@ -136,14 +136,7 @@ class Vector4 {
 
 	}
 
-	add( v, w ) {
-
-		if ( w !== undefined ) {
-
-			console.warn( 'THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
-			return this.addVectors( v, w );
-
-		}
+	add( v ) {
 
 		this.x += v.x;
 		this.y += v.y;
@@ -187,14 +180,7 @@ class Vector4 {
 
 	}
 
-	sub( v, w ) {
-
-		if ( w !== undefined ) {
-
-			console.warn( 'THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
-			return this.subVectors( v, w );
-
-		}
+	sub( v ) {
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -222,6 +208,17 @@ class Vector4 {
 		this.y = a.y - b.y;
 		this.z = a.z - b.z;
 		this.w = a.w - b.w;
+
+		return this;
+
+	}
+
+	multiply( v ) {
+
+		this.x *= v.x;
+		this.y *= v.y;
+		this.z *= v.z;
+		this.w *= v.w;
 
 		return this;
 
@@ -611,13 +608,7 @@ class Vector4 {
 
 	}
 
-	fromBufferAttribute( attribute, index, offset ) {
-
-		if ( offset !== undefined ) {
-
-			console.warn( 'THREE.Vector4: offset has been removed from .fromBufferAttribute().' );
-
-		}
+	fromBufferAttribute( attribute, index ) {
 
 		this.x = attribute.getX( index );
 		this.y = attribute.getY( index );
@@ -636,6 +627,15 @@ class Vector4 {
 		this.w = Math.random();
 
 		return this;
+
+	}
+
+	*[ Symbol.iterator ]() {
+
+		yield this.x;
+		yield this.y;
+		yield this.z;
+		yield this.w;
 
 	}
 

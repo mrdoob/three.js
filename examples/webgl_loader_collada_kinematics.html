@@ -12,14 +12,27 @@
 			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { TWEEN } from './jsm/libs/tween.module.min.js';
-			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
+			import { TWEEN } from 'three/addons/libs/tween.module.min.js';
+			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
 
 			let container, stats;
 
@@ -32,7 +45,6 @@
 			const tweenParameters = {};
 
 			const loader = new ColladaLoader();
-			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
 			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
 				dae = collada.scene;
@@ -77,7 +89,7 @@
 
 				scene.add( dae );
 
-				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
 
 				// Lights
@@ -89,6 +101,7 @@
 				particleLight.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -100,7 +113,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

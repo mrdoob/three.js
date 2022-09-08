@@ -2,7 +2,7 @@ class Matrix3 {
 
 	constructor() {
 
-		Object.defineProperty( this, 'isMatrix3', { value: true } );
+		Matrix3.prototype.isMatrix3 = true;
 
 		this.elements = [
 
@@ -11,12 +11,6 @@ class Matrix3 {
 			0, 0, 1
 
 		];
-
-		if ( arguments.length > 0 ) {
-
-			console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
-
-		}
 
 	}
 
@@ -43,12 +37,6 @@ class Matrix3 {
 		);
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().fromArray( this.elements );
 
 	}
 
@@ -206,7 +194,7 @@ class Matrix3 {
 
 	getNormalMatrix( matrix4 ) {
 
-		return this.setFromMatrix4( matrix4 ).copy( this ).invert().transpose();
+		return this.setFromMatrix4( matrix4 ).invert().transpose();
 
 	}
 
@@ -238,6 +226,8 @@ class Matrix3 {
 			- sy * s, sy * c, - sy * ( - s * cx + c * cy ) + cy + ty,
 			0, 0, 1
 		);
+
+		return this;
 
 	}
 
@@ -329,6 +319,12 @@ class Matrix3 {
 		array[ offset + 8 ] = te[ 8 ];
 
 		return array;
+
+	}
+
+	clone() {
+
+		return new this.constructor().fromArray( this.elements );
 
 	}
 

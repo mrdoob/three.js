@@ -6,52 +6,52 @@ import { Command } from '../Command.js';
  * @param newUuid string
  * @constructor
  */
-function SetUuidCommand( editor, object, newUuid ) {
+class SetUuidCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object, newUuid ) {
 
-	this.type = 'SetUuidCommand';
-	this.name = 'Update UUID';
+		super( editor );
 
-	this.object = object;
+		this.type = 'SetUuidCommand';
+		this.name = 'Update UUID';
 
-	this.oldUuid = ( object !== undefined ) ? object.uuid : undefined;
-	this.newUuid = newUuid;
+		this.object = object;
 
-}
+		this.oldUuid = ( object !== undefined ) ? object.uuid : undefined;
+		this.newUuid = newUuid;
 
-SetUuidCommand.prototype = {
+	}
 
-	execute: function () {
+	execute() {
 
 		this.object.uuid = this.newUuid;
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.sceneGraphChanged.dispatch();
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.object.uuid = this.oldUuid;
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.sceneGraphChanged.dispatch();
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.oldUuid = this.oldUuid;
 		output.newUuid = this.newUuid;
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.oldUuid = json.oldUuid;
 		this.newUuid = json.newUuid;
@@ -65,6 +65,6 @@ SetUuidCommand.prototype = {
 
 	}
 
-};
+}
 
 export { SetUuidCommand };

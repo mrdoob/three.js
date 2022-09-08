@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+    <h1>[name]</h1>
+
+    <p class="desc">
+        この記事ではhtree.jsを[link:https://nodejs.org/en/ node.js]環境で実行する方法について説明します。 node環境で実行すると、自動テストを実行できるようになります。 テストはコマンドラインから実行可能で、[link:https://travis-ci.org/ Travis]のような自動のCIツールからも実行できます。
+    </p>
+
+    <h2>The short version(概略)</h2>
+
+    <p>
+        npmとnodeについて詳しい方は以下のコマンドを実行し
+        <code>
+				$ npm install three --save-dev
+			</code> それから以下のコードをテストに追加してください
+        <code>
+			const THREE = require('three');
+		</code>
+    </p>
+
+    <h2>一からテスト可能なプロジェクトを作成する</h2>
+    <p>
+        If you're not familiar with these tools, here's a quick guide (for linux, the installation process will be slightly different using windows, but the NPM commands are identical). もしツールについて詳しくないようであれば、簡単な説明があります(linuxでは、windowsとインストールのやり方が大きく異なります。しかしNPMコマンドはそれとは関係ありません)。
+    </p>
+
+    <h3>Basic setup(基本的な設定)</h3>
+    <div>
+        <ol>
+            <li>
+                [link:https://www.npmjs.org/ npm]とnodejsをインストールします。 もっとも早い方法は、一般的に以下のように行うことです。
+                <code>
+$ sudo apt-get install -y npm nodejs-legacy
+# fix any problems with SSL in the default registry URL
+$ npm config set registry http://registry.npmjs.org/
+					</code>
+            </li>
+
+            <li>
+                新しいプロジェクトのディレクトリを作成します。
+                <code>
+						 $ mkdir test-example; cd test-example
+					</code>
+            </li>
+
+            <li>
+                npmに新しいプロジェクトfileを作成させます。
+                <code>
+					 $ npm init
+					</code> すべてのプロンプトでEnterを押すと全てデフォルトの設定になります。 こうすることでpackage.jsonが作成されます。
+            </li><br />
+
+            <li>
+                以下のようにしてテスト機能を起動してみてください
+                <code>
+$ npm test
+					</code> おそらくですが、これは失敗します。 package.jsonの中の、テスト用のスクリプトの定義はこのようになっています。
+                <code>
+						"test": "echo \"Error: no test specified\" && exit 1"
+					</code>
+            </li>
+
+        </ol>
+    </div>
+
+    <h2>Add mocha(mochaの追加)</h2>
+    <div>
+        [link:https://mochajs.org/ mocha]を使用していきます。
+
+        <ol>
+            <li>
+                以下のようにしてmochaをインストールします。
+                <code>
+$ npm install mocha --save-dev
+					</code> node_modulesディレクトリが作られていて、依存関係がそこに示されていることが分かるかと思います。 また、package.jsonが更新されていることも分かるでしょう。 devDependencies プロパティは、--save-dev の使用により追加・更新されます。
+            </li><br />
+
+            <li>
+                テストでmochaを使うためにpackage.jsonを編集してください。 これはtestが呼ばれた時に、mochaを実行して詳細をどこに報告するかを決めるためです。 デフォルトでは、testディレクトリにあるものはなんでも実行されます。(もしtestディレクトリがない場合npm ERRが発生する可能性があります。その場合はmkdir testを実行し、ディレクトリを作成してください)
+                <code>
+						"test": "mocha --reporter list"
+					</code>
+            </li>
+
+            <li>
+                以下のコマンドでテストをもう一度実行してみてください
+                <code>
+						$ npm test
+					</code> 今度はうまくいくはずです。0 passing (1ms)などと報告されるでしょう。
+            </li>
+
+        </ol>
+    </div>
+
+    <h2>three.jsを追加する</h2>
+    <div>
+        <ol>
+            <li>
+                three.jsを依存ファイルに加えましょう。
+                <code>
+$ npm install three --save-dev
+					</code>
+                <ul>
+                    <li>
+                        もし違うバージョンのthreeが必要な場合は次のコマンドを使ってください。
+                        <code>
+								$ npm show three versions
+							</code> こうすると使用可能なバージョンが分かります。npmに使用したいバージョンを伝えましょう。
+                        <code>
+ $ npm install three@0.84.0 --save
+							</code> (この例では0.84.0をインストールしています)。--saveは、これをdevの依存関係ではなく、このプロジェクトの依存関係にします。詳しくは、ドキュメント([link:https://docs.npmjs.com/cli/v8/configuring-npm/package-json here])をご覧ください。
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                Mochaはtestディレクトリの中でテストを探します。それではtestディレクトリを作成しましょう。
+                <code>
+					$ mkdir test
+					</code>
+            </li>
+
+            <li>
+                最終的には、実際に実行するJSのテストが必要です。 three.jsのオブジェクトが利用可能で動いていることを確かめるための簡単なテストを追加してみましょう。 以下のコードが書かれたtest/verify-three.jsを作成します。
+
+
+                <code>
+const THREE = require('three');
+const assert = require('assert');
+
+describe('The THREE object', function() {
+  it('should have a defined BasicShadowMap constant', function() {
+    assert.notEqual('undefined', THREE.BasicShadowMap);
+  }),
+
+  it('should be able to construct a Vector3 with default of x=0', function() {
+    const vec3 = new THREE.Vector3();
+    assert.equal(0, vec3.x);
+  })
+})
+</code>
+            </li>
+
+            <li>
+                最後に$npm testでもう一度testを行いましょう。上のテストが実行されて成功するはずで、結果は以下のようになるでしょう。
+                <code>
+The THREE object should have a defined BasicShadowMap constant: 0ms
+The THREE object should be able to construct a Vector3 with default of x=0: 0ms
+2 passing (8ms)
+				</code>
+            </li>
+        </ol>
+    </div>
+
+    <h2>自分のコードを追加する</h2>
+    <div>
+        3つのことをやる必要があります。
+
+        <ol>
+            <li>
+                自分のコードに期待される動作についてテストを書き、それをtest/の下に置いてください。 ここ([link:https://github.com/air/encounter/blob/master/test/Physics-test.js Here])に実際のプロジェクトの例を置いておきます。
+            </li>
+
+            <li>
+                nodejsが機能的なコードを見られるようにエクスポートして、requireと組み合わせて使用します。こちら([link:https://github.com/air/encounter/blob/master/js/Physics.js here])をご覧ください。
+            </li>
+
+            <li>
+                上記のサンプルコードでrequire('three')を行なったのと同じ方法で、 テストコードに、あなたが作成したコードをインポートする必要があります。
+            </li>
+        </ol>
+
+        <p>
+            2と3の項目は、コードの管理方法によって異なります。上記のPhysics.jsの例では、exportの部分は最後の方にあります。 module.exportsにオブジェクトを割り当てています。
+        </p>
+        <code>
+//=============================================================================
+// make available in nodejs
+//=============================================================================
+if (typeof exports !== 'undefined')
+{
+  module.exports = Physics;
+}
+			</code>
+    </div>
+
+    <h2>Dealing with dependencies(依存関係に対処する)</h2>
+    <div>
+        <p>
+            もしすでに、require.jsやborwserifyといった賢いツールを使っているようなら、この章は飛ばしてください。
+        </p>
+        <p>
+            three.jsのプロジェクトはブラウザで実行するのが一般的です。そのため、モジュールのロードはブラウザによって行われ、たくさんのscriptタグが実行されます。一つのファイルであれば依存関係の心配をする必要はありません。 しかしながら、nodejsでは他の全てのものと結びつけられているindex.htmlがないので、 明示的にそうする必要があります。
+        </p>
+        <p>
+            他のファイルに依存するモジュールをexportする場合、nodeにそのファイルをロードするように伝えなくてはなりません。 以下に1つのアプローチを示します。
+        </p>
+        <ol>
+            <li>
+                モジュールを始める時に、nodejs環境であるかを確かめます。
+            </li>
+            <li>
+                もしそうであれば、依存関係を明示的に宣言します。
+            </li>
+            <li>
+                もしnodejs環境でないならおそらくブラウザ環境ですので、特に他のことはしなくても良いです。
+            </li>
+        </ol>
+        Physics.jsからのサンプルコードを示しておきます。
+        <code>
+//=============================================================================
+// setup for server-side testing
+//=============================================================================
+if (typeof require === 'function') // test for nodejs environment
+{
+  const THREE = require('three');
+  const MY3 = require('./MY3.js');
+}
+			</code>
+    </div>
+
+</body>
+
+</html>

@@ -12,7 +12,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A low level class for loading resources with XMLHttpRequest, used internaly by most loaders.
+			A low level class for loading resources with Fetch, used internally by most loaders.
 			It can also be used directly to load any file type that does not have a loader.
 		</p>
 
@@ -44,7 +44,7 @@
 		</code>
 
 		<p>
-			<em>Note:</em> The cache must be enabled using
+			*Note:* The cache must be enabled using
 			<code>THREE.Cache.enabled = true;</code>
 			This is a global property and only needs to be set once to be used by all loaders that use FileLoader internally.
 			[page:Cache Cache] is a cache module that holds the response from each request made through this loader, so each file is requested once.
@@ -65,34 +65,33 @@
 		<h3>[property:String mimeType]</h3>
 		<p>
 			The expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType].
-			See [page:.setMimeType]. Default is *undefined*.
+			See [page:.setMimeType]. Default is `undefined`.
 		</p>
 
 		<h3>[property:String responseType]</h3>
-		<p>The expected response type. See [page:.setResponseType]. Default is *undefined*.</p>
+		<p>The expected response type. See [page:.setResponseType]. Default is `undefined`.</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:XMLHttpRequest load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 			[page:String url] — the path or URL to the file. This can also be a
 				[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 			[page:Function onLoad] (optional) — Will be called when loading completes. The argument will be the loaded response.<br />
-			[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the XMLHttpRequest instance,
-				which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+			[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be the ProgressEvent instance, which contains .[page:Boolean lengthComputable], .[page:Integer total] and .[page:Integer loaded]. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 			[page:Function onError] (optional) — Will be called if an error occurs.<br /><br />
 
 			Load the URL and pass the response to the onLoad function.
 		</p>
 
-		<h3>[method:FileLoader setMimeType]( [param:String mimeType] )</h3>
+		<h3>[method:this setMimeType]( [param:String mimeType] )</h3>
 		<p>
 			Set the expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
-			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is *undefined*.
+			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is `undefined`.
 		</p>
 
-		<h3>[method:FileLoader setResponseType]( [param:String responseType] )</h3>
+		<h3>[method:this setResponseType]( [param:String responseType] )</h3>
 		<p>
 			Change the response type. Valid values are:<br />
 			[page:String text] or empty string (default) - returns the data as [page:String String].<br />

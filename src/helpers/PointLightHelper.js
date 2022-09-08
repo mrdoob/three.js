@@ -1,12 +1,12 @@
 import { Mesh } from '../objects/Mesh.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
-import { SphereBufferGeometry } from '../geometries/SphereBufferGeometry.js';
+import { SphereGeometry } from '../geometries/SphereGeometry.js';
 
 class PointLightHelper extends Mesh {
 
 	constructor( light, sphereSize, color ) {
 
-		const geometry = new SphereBufferGeometry( sphereSize, 4, 2 );
+		const geometry = new SphereGeometry( sphereSize, 4, 2 );
 		const material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
 
 		super( geometry, material );
@@ -26,7 +26,7 @@ class PointLightHelper extends Mesh {
 
 		/*
 	// TODO: delete this comment?
-	const distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+	const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 	const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 
 	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );

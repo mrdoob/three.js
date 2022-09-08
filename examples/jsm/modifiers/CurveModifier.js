@@ -1,11 +1,11 @@
 // Original src: https://github.com/zz85/threejs-path-flow
-const BITS = 3;
+const CHANNELS = 4;
 const TEXTURE_WIDTH = 1024;
 const TEXTURE_HEIGHT = 4;
 
 import {
 	DataTexture,
-	RGBFormat,
+	RGBAFormat,
 	FloatType,
 	RepeatWrapping,
 	Mesh,
@@ -13,7 +13,7 @@ import {
 	NearestFilter,
 	DynamicDrawUsage,
 	Matrix4
-} from "../../../build/three.module.js";
+} from 'three';
 
 /**
  * Make a new DataTexture to store the descriptions of the curves.
@@ -22,12 +22,12 @@ import {
  */
 export function initSplineTexture( numberOfCurves = 1 ) {
 
-	const dataArray = new Float32Array( TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * BITS );
+	const dataArray = new Float32Array( TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS );
 	const dataTexture = new DataTexture(
 		dataArray,
 		TEXTURE_WIDTH,
 		TEXTURE_HEIGHT * numberOfCurves,
-		RGBFormat,
+		RGBAFormat,
 		FloatType
 	);
 
@@ -80,10 +80,11 @@ function setTextureValue( texture, index, x, y, z, o ) {
 
 	const image = texture.image;
 	const { data } = image;
-	const i = BITS * TEXTURE_WIDTH * o; // Row Offset
-	data[ index * BITS + i + 0 ] = x;
-	data[ index * BITS + i + 1 ] = y;
-	data[ index * BITS + i + 2 ] = z;
+	const i = CHANNELS * TEXTURE_WIDTH * o; // Row Offset
+	data[ index * CHANNELS + i + 0 ] = x;
+	data[ index * CHANNELS + i + 1 ] = y;
+	data[ index * CHANNELS + i + 2 ] = z;
+	data[ index * CHANNELS + i + 3 ] = 1;
 
 }
 
@@ -132,18 +133,18 @@ export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 		${shader.vertexShader}
 		`
 		// chunk import moved in front of modified shader below
-		.replace('#include <beginnormal_vertex>', ``)
+			.replace( '#include <beginnormal_vertex>', '' )
 
-		// vec3 transformedNormal declaration overriden below
-		.replace('#include <defaultnormal_vertex>', ``)
+			// vec3 transformedNormal declaration overriden below
+			.replace( '#include <defaultnormal_vertex>', '' )
 
-		// vec3 transformed declaration overriden below
-		.replace('#include <begin_vertex>', ``)
+			// vec3 transformed declaration overriden below
+			.replace( '#include <begin_vertex>', '' )
 
-		// shader override
-		.replace(
-			/void\s*main\s*\(\)\s*\{/,
-`
+			// shader override
+			.replace(
+				/void\s*main\s*\(\)\s*\{/,
+				`
 void main() {
 #include <beginnormal_vertex>
 
@@ -169,10 +170,10 @@ float rowOffset = floor(mt);
 rowOffset += instanceMatrix[3][1] * ${TEXTURE_HEIGHT}.;
 #endif
 
-vec3 spinePos = texture(spineTexture, vec2(mt, (0. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 a =        texture(spineTexture, vec2(mt, (1. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 b =        texture(spineTexture, vec2(mt, (2. + rowOffset + 0.5) / textureLayers)).xyz;
-vec3 c =        texture(spineTexture, vec2(mt, (3. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 spinePos = texture2D(spineTexture, vec2(mt, (0. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 a =        texture2D(spineTexture, vec2(mt, (1. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 b =        texture2D(spineTexture, vec2(mt, (2. + rowOffset + 0.5) / textureLayers)).xyz;
+vec3 c =        texture2D(spineTexture, vec2(mt, (3. + rowOffset + 0.5) / textureLayers)).xyz;
 mat3 basis = mat3(a, b, c);
 
 vec3 transformed = basis
@@ -180,13 +181,11 @@ vec3 transformed = basis
 	+ spinePos;
 
 vec3 transformedNormal = normalMatrix * (basis * objectNormal);
-`).replace(
-	'#include <project_vertex>',
-`
-vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
-gl_Position = projectionMatrix * mvPosition;
-`
-);
+			` ).replace(
+				'#include <project_vertex>',
+				`vec4 mvPosition = modelViewMatrix * vec4( transformed, 1.0 );
+				gl_Position = projectionMatrix * mvPosition;`
+			);
 
 		shader.vertexShader = vertexShader;
 
@@ -317,7 +316,7 @@ export class InstancedFlow extends Flow {
 	 */
 	setCurve( index, curveNo ) {
 
-		if ( isNaN( curveNo ) ) throw Error( "curve index being set is Not a Number (NaN)" );
+		if ( isNaN( curveNo ) ) throw Error( 'curve index being set is Not a Number (NaN)' );
 		this.whichCurve[ index ] = curveNo;
 		this.writeChanges( index );
 

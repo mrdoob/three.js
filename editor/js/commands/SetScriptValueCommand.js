@@ -8,50 +8,50 @@ import { Command } from '../Command.js';
  * @param newValue string, object
  * @constructor
  */
-function SetScriptValueCommand( editor, object, script, attributeName, newValue ) {
+class SetScriptValueCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object, script, attributeName, newValue ) {
 
-	this.type = 'SetScriptValueCommand';
-	this.name = 'Set Script.' + attributeName;
-	this.updatable = true;
+		super( editor );
 
-	this.object = object;
-	this.script = script;
+		this.type = 'SetScriptValueCommand';
+		this.name = `Set Script.${attributeName}`;
+		this.updatable = true;
 
-	this.attributeName = attributeName;
-	this.oldValue = ( script !== undefined ) ? script[ this.attributeName ] : undefined;
-	this.newValue = newValue;
+		this.object = object;
+		this.script = script;
 
-}
+		this.attributeName = attributeName;
+		this.oldValue = ( script !== undefined ) ? script[ this.attributeName ] : undefined;
+		this.newValue = newValue;
 
-SetScriptValueCommand.prototype = {
+	}
 
-	execute: function () {
+	execute() {
 
 		this.script[ this.attributeName ] = this.newValue;
 
 		this.editor.signals.scriptChanged.dispatch();
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.script[ this.attributeName ] = this.oldValue;
 
 		this.editor.signals.scriptChanged.dispatch();
 
-	},
+	}
 
-	update: function ( cmd ) {
+	update( cmd ) {
 
 		this.newValue = cmd.newValue;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
@@ -61,11 +61,11 @@ SetScriptValueCommand.prototype = {
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
@@ -75,6 +75,6 @@ SetScriptValueCommand.prototype = {
 
 	}
 
-};
+}
 
 export { SetScriptValueCommand };

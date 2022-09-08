@@ -7,27 +7,27 @@ import { Command } from '../Command.js';
  * @param newValue number, string, boolean or object
  * @constructor
  */
-function SetMaterialValueCommand( editor, object, attributeName, newValue, materialSlot ) {
+class SetMaterialValueCommand extends Command {
 
-	Command.call( this, editor );
+	constructor( editor, object, attributeName, newValue, materialSlot ) {
 
-	this.type = 'SetMaterialValueCommand';
-	this.name = 'Set Material.' + attributeName;
-	this.updatable = true;
+		super( editor );
 
-	this.object = object;
-	this.material = this.editor.getObjectMaterial( object, materialSlot );
+		this.type = 'SetMaterialValueCommand';
+		this.name = `Set Material.${attributeName}`;
+		this.updatable = true;
 
-	this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ] : undefined;
-	this.newValue = newValue;
+		this.object = object;
+		this.material = this.editor.getObjectMaterial( object, materialSlot );
 
-	this.attributeName = attributeName;
+		this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ] : undefined;
+		this.newValue = newValue;
 
-}
+		this.attributeName = attributeName;
 
-SetMaterialValueCommand.prototype = {
+	}
 
-	execute: function () {
+	execute() {
 
 		this.material[ this.attributeName ] = this.newValue;
 		this.material.needsUpdate = true;
@@ -35,9 +35,9 @@ SetMaterialValueCommand.prototype = {
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.materialChanged.dispatch( this.material );
 
-	},
+	}
 
-	undo: function () {
+	undo() {
 
 		this.material[ this.attributeName ] = this.oldValue;
 		this.material.needsUpdate = true;
@@ -45,17 +45,17 @@ SetMaterialValueCommand.prototype = {
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.materialChanged.dispatch( this.material );
 
-	},
+	}
 
-	update: function ( cmd ) {
+	update( cmd ) {
 
 		this.newValue = cmd.newValue;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
-		var output = Command.prototype.toJSON.call( this );
+		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
 		output.attributeName = this.attributeName;
@@ -64,11 +64,11 @@ SetMaterialValueCommand.prototype = {
 
 		return output;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
-		Command.prototype.fromJSON.call( this, json );
+		super.fromJSON( json );
 
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
@@ -77,6 +77,6 @@ SetMaterialValueCommand.prototype = {
 
 	}
 
-};
+}
 
 export { SetMaterialValueCommand };

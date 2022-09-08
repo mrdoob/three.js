@@ -1,37 +1,41 @@
 import { Object3D } from '../core/Object3D.js';
 import { Color } from '../math/Color.js';
 
-function Light( color, intensity = 1 ) {
+class Light extends Object3D {
 
-	Object3D.call( this );
+	constructor( color, intensity = 1 ) {
 
-	this.type = 'Light';
+		super();
 
-	this.color = new Color( color );
-	this.intensity = intensity;
+		this.isLight = true;
 
-}
+		this.type = 'Light';
 
-Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
+		this.color = new Color( color );
+		this.intensity = intensity;
 
-	constructor: Light,
+	}
 
-	isLight: true,
+	dispose() {
 
-	copy: function ( source ) {
+		// Empty here in base class; some subclasses override.
 
-		Object3D.prototype.copy.call( this, source );
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
 
 		this.color.copy( source.color );
 		this.intensity = source.intensity;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		const data = Object3D.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		data.object.color = this.color.getHex();
 		data.object.intensity = this.intensity;
@@ -49,7 +53,6 @@ Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
-
+}
 
 export { Light };

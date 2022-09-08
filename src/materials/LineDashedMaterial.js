@@ -1,48 +1,35 @@
 import { LineBasicMaterial } from './LineBasicMaterial.js';
 
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *
- *  linewidth: <float>,
- *
- *  scale: <float>,
- *  dashSize: <float>,
- *  gapSize: <float>
- * }
- */
+class LineDashedMaterial extends LineBasicMaterial {
 
-function LineDashedMaterial( parameters ) {
+	constructor( parameters ) {
 
-	LineBasicMaterial.call( this );
+		super();
 
-	this.type = 'LineDashedMaterial';
+		this.isLineDashedMaterial = true;
 
-	this.scale = 1;
-	this.dashSize = 3;
-	this.gapSize = 1;
+		this.type = 'LineDashedMaterial';
 
-	this.setValues( parameters );
+		this.scale = 1;
+		this.dashSize = 3;
+		this.gapSize = 1;
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.scale = source.scale;
+		this.dashSize = source.dashSize;
+		this.gapSize = source.gapSize;
+
+		return this;
+
+	}
 
 }
-
-LineDashedMaterial.prototype = Object.create( LineBasicMaterial.prototype );
-LineDashedMaterial.prototype.constructor = LineDashedMaterial;
-
-LineDashedMaterial.prototype.isLineDashedMaterial = true;
-
-LineDashedMaterial.prototype.copy = function ( source ) {
-
-	LineBasicMaterial.prototype.copy.call( this, source );
-
-	this.scale = source.scale;
-	this.dashSize = source.dashSize;
-	this.gapSize = source.gapSize;
-
-	return this;
-
-};
-
 
 export { LineDashedMaterial };

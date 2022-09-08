@@ -1,59 +1,54 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-/**
- * parameters = {
- *  color: <hex>,
- *  map: new THREE.Texture( <Image> ),
- *  alphaMap: new THREE.Texture( <Image> ),
- *  rotation: <float>,
- *  sizeAttenuation: <bool>
- * }
- */
+class SpriteMaterial extends Material {
 
-function SpriteMaterial( parameters ) {
+	constructor( parameters ) {
 
-	Material.call( this );
+		super();
 
-	this.type = 'SpriteMaterial';
+		this.isSpriteMaterial = true;
 
-	this.color = new Color( 0xffffff );
+		this.type = 'SpriteMaterial';
 
-	this.map = null;
+		this.color = new Color( 0xffffff );
 
-	this.alphaMap = null;
+		this.map = null;
 
-	this.rotation = 0;
+		this.alphaMap = null;
 
-	this.sizeAttenuation = true;
+		this.rotation = 0;
 
-	this.transparent = true;
+		this.sizeAttenuation = true;
 
-	this.setValues( parameters );
+		this.transparent = true;
+
+		this.fog = true;
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.color.copy( source.color );
+
+		this.map = source.map;
+
+		this.alphaMap = source.alphaMap;
+
+		this.rotation = source.rotation;
+
+		this.sizeAttenuation = source.sizeAttenuation;
+
+		this.fog = source.fog;
+
+		return this;
+
+	}
 
 }
-
-SpriteMaterial.prototype = Object.create( Material.prototype );
-SpriteMaterial.prototype.constructor = SpriteMaterial;
-SpriteMaterial.prototype.isSpriteMaterial = true;
-
-SpriteMaterial.prototype.copy = function ( source ) {
-
-	Material.prototype.copy.call( this, source );
-
-	this.color.copy( source.color );
-
-	this.map = source.map;
-
-	this.alphaMap = source.alphaMap;
-
-	this.rotation = source.rotation;
-
-	this.sizeAttenuation = source.sizeAttenuation;
-
-	return this;
-
-};
-
 
 export { SpriteMaterial };

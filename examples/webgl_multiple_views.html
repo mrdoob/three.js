@@ -11,11 +11,24 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple views - webgl</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let stats;
 
@@ -119,7 +132,7 @@
 				const shadowTexture = new THREE.CanvasTexture( canvas );
 
 				const shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture, transparent: true } );
-				const shadowGeo = new THREE.PlaneBufferGeometry( 300, 300, 1, 1 );
+				const shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
 
 				let shadowMesh;
 
@@ -142,7 +155,7 @@
 
 				const radius = 200;
 
-				const geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
+				const geometry1 = new THREE.IcosahedronGeometry( radius, 1 );
 
 				const count = geometry1.attributes.position.count;
 				geometry1.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
@@ -206,7 +219,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			}
 

@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Render Targets</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Render Targets">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Render Targets</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>A render target in three.js is basically a texture you can render to.
+After you render to it you can use that texture like any other texture.</p>
+<p>Let's make a simple example. We'll start with an example from <a href="responsive.html">the article on responsiveness</a>.</p>
+<p>Rendering to a render target is almost exactly the same as normal rendering. First we create a <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
+const rtHeight = 512;
+const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+</pre>
+<p>Then we need a <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> and a <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
+const rtAspect = rtWidth / rtHeight;
+const rtNear = 0.1;
+const rtFar = 5;
+const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
+rtCamera.position.z = 2;
+
+const rtScene = new THREE.Scene();
+rtScene.background = new THREE.Color('red');
+</pre>
+<p>Notice we set the aspect to the aspect for the render target, not the canvas.
+The correct aspect to use depends on what we are rendering for. In this case
+we'll use the render target's texture on the side of a cube. Since faces of
+the cube are square we want an aspect of 1.0.</p>
+<p>We fill the scene with stuff. In this case we're using the light and the 3 cubes <a href="responsive.html">from the previous article</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(-1, 2, 4);
+*  rtScene.add(light);
+}
+
+const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+*  rtScene.add(cube);
+
+  cube.position.x = x;
+
+  return cube;
+}
+
+*const rtCubes = [
+  makeInstance(geometry, 0x44aa88,  0),
+  makeInstance(geometry, 0x8844aa, -2),
+  makeInstance(geometry, 0xaa8844,  2),
+];
+</pre>
+<p>The <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> and <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> from the previous article are still there. We'll use them to render to the canvas.
+We just need to add stuff to render.</p>
+<p>Let's add a cube that uses the render target's texture.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+  map: renderTarget.texture,
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+</pre>
+<p>Now at render time first we render the render target scene to the render target.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  ...
+
+  // rotate all the cubes in the render target scene
+  rtCubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  // draw render target scene to render target
+  renderer.setRenderTarget(renderTarget);
+  renderer.render(rtScene, rtCamera);
+  renderer.setRenderTarget(null);
+</pre>
+<p>Then we render the scene with the single cube that is using the render target's texture to the canvas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  // rotate the cube in the scene
+  cube.rotation.x = time;
+  cube.rotation.y = time * 1.1;
+
+  // render the scene to the canvas
+  renderer.render(scene, camera);
+</pre>
+<p>And voilà</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-target.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-target.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>The cube is red because we set the <code class="notranslate" translate="no">background</code> of the <code class="notranslate" translate="no">rtScene</code> to red so the
+render target's texture is being cleared to red.</p>
+<p>Render targets are used for all kinds of things. <a href="shadows.html">Shadows</a> use render targets.
+<a href="picking.html">Picking can use a render target</a>. Various kinds of
+<a href="post-processing.html">post processing effects</a> require render targets.
+Rendering a rear view mirror in a car or a live view on a monitor inside a 3D
+scene might use a render target.</p>
+<p>A few notes about using <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.</p>
+<ul>
+<li><p>By default <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> creates 2 textures. A color texture and a depth/stencil texture. If you don't need the depth or stencil textures you can request to not create them by passing in options. Example:</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
+    depthBuffer: false,
+    stencilBuffer: false,
+  });
+</pre>
+</li>
+<li><p>You might need to change the size of a render target</p>
+<p>In the example above we make a render target of a fixed size, 512x512. For things like post processing you generally need to make a render target the same size as your canvas. In our code that would mean when we change the canvas size we would also update both the render target size and the camera we're using when rendering to the render target. Example:</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+
++    renderTarget.setSize(canvas.width, canvas.height);
++    rtCamera.aspect = camera.aspect;
++    rtCamera.updateProjectionMatrix();
+}
+</pre></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

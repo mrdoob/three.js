@@ -14,14 +14,27 @@
 			fly with WASD/RF/QE + mouse
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FlyControls } from './jsm/controls/FlyControls.js';
-			import { Lensflare, LensflareElement } from './jsm/objects/Lensflare.js';
+			import { FlyControls } from 'three/addons/controls/FlyControls.js';
+			import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
 
 			let container, stats;
 
@@ -53,7 +66,7 @@
 
 				const s = 250;
 
-				const geometry = new THREE.BoxBufferGeometry( s, s, s );
+				const geometry = new THREE.BoxGeometry( s, s, s );
 				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
 				for ( let i = 0; i < 3000; i ++ ) {
@@ -135,7 +148,7 @@
 
 				// events
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

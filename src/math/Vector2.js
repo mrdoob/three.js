@@ -2,7 +2,7 @@ class Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
-		Object.defineProperty( this, 'isVector2', { value: true } );
+		Vector2.prototype.isVector2 = true;
 
 		this.x = x;
 		this.y = y;
@@ -108,14 +108,7 @@ class Vector2 {
 
 	}
 
-	add( v, w ) {
-
-		if ( w !== undefined ) {
-
-			console.warn( 'THREE.Vector2: .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
-			return this.addVectors( v, w );
-
-		}
+	add( v ) {
 
 		this.x += v.x;
 		this.y += v.y;
@@ -151,14 +144,7 @@ class Vector2 {
 
 	}
 
-	sub( v, w ) {
-
-		if ( w !== undefined ) {
-
-			console.warn( 'THREE.Vector2: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
-			return this.subVectors( v, w );
-
-		}
+	sub( v ) {
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -434,13 +420,7 @@ class Vector2 {
 
 	}
 
-	fromBufferAttribute( attribute, index, offset ) {
-
-		if ( offset !== undefined ) {
-
-			console.warn( 'THREE.Vector2: offset has been removed from .fromBufferAttribute().' );
-
-		}
+	fromBufferAttribute( attribute, index ) {
 
 		this.x = attribute.getX( index );
 		this.y = attribute.getY( index );
@@ -472,7 +452,13 @@ class Vector2 {
 
 	}
 
-}
+	*[ Symbol.iterator ]() {
 
+		yield this.x;
+		yield this.y;
+
+	}
+
+}
 
 export { Vector2 };

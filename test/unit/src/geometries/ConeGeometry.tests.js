@@ -1,32 +1,32 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { ConeBufferGeometry } from '../../../../src/geometries/ConeBufferGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { ConeGeometry } from '../../../../src/geometries/ConeGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'ConeBufferGeometry', ( hooks ) => {
+	QUnit.module( 'ConeGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
 
 			geometries = [
-				new ConeBufferGeometry()
+				new ConeGeometry(),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

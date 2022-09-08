@@ -6,9 +6,9 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 		if ( maxAnisotropy !== undefined ) return maxAnisotropy;
 
-		const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+		if ( extensions.has( 'EXT_texture_filter_anisotropic' ) === true ) {
 
-		if ( extension !== null ) {
+			const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
 			maxAnisotropy = gl.getParameter( extension.MAX_TEXTURE_MAX_ANISOTROPY_EXT );
 
@@ -52,10 +52,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
-	/* eslint-disable no-undef */
 	const isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext ) ||
 		( typeof WebGL2ComputeRenderingContext !== 'undefined' && gl instanceof WebGL2ComputeRenderingContext );
-	/* eslint-enable no-undef */
 
 	let precision = parameters.precision !== undefined ? parameters.precision : 'highp';
 	const maxPrecision = getMaxPrecision( precision );
@@ -66,6 +64,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		precision = maxPrecision;
 
 	}
+
+	const drawBuffers = isWebGL2 || extensions.has( 'WEBGL_draw_buffers' );
 
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 
@@ -80,7 +80,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	const maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
 	const vertexTextures = maxVertexTextures > 0;
-	const floatFragmentTextures = isWebGL2 || !! extensions.get( 'OES_texture_float' );
+	const floatFragmentTextures = isWebGL2 || extensions.has( 'OES_texture_float' );
 	const floatVertexTextures = vertexTextures && floatFragmentTextures;
 
 	const maxSamples = isWebGL2 ? gl.getParameter( gl.MAX_SAMPLES ) : 0;
@@ -88,6 +88,8 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	return {
 
 		isWebGL2: isWebGL2,
+
+		drawBuffers: drawBuffers,
 
 		getMaxAnisotropy: getMaxAnisotropy,
 		getMaxPrecision: getMaxPrecision,

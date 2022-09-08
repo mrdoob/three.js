@@ -20,14 +20,27 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain raycasting demo</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
 			let container, stats;
 
@@ -41,7 +54,7 @@
 			let helper;
 
 			const raycaster = new THREE.Raycaster();
-			const mouse = new THREE.Vector2();
+			const pointer = new THREE.Vector2();
 
 			init();
 			animate();
@@ -49,7 +62,7 @@
 			function init() {
 
 				container = document.getElementById( 'container' );
-				container.innerHTML = "";
+				container.innerHTML = '';
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -75,7 +88,7 @@
 				camera.position.x = 2000;
 				controls.update();
 
-				const geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				const geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
 				const vertices = geometry.attributes.position.array;
@@ -86,8 +99,6 @@
 
 				}
 
-				geometry.computeFaceNormals(); // needed for helper
-
 				//
 
 				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
@@ -97,20 +108,20 @@
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				const geometryHelper = new THREE.ConeBufferGeometry( 20, 100, 3 );
+				const geometryHelper = new THREE.ConeGeometry( 20, 100, 3 );
 				geometryHelper.translate( 0, 50, 0 );
 				geometryHelper.rotateX( Math.PI / 2 );
 				helper = new THREE.Mesh( geometryHelper, new THREE.MeshNormalMaterial() );
 				scene.add( helper );
 
-				container.addEventListener( 'mousemove', onMouseMove, false );
+				container.addEventListener( 'pointermove', onPointerMove );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -232,11 +243,11 @@
 
 			}
 
-			function onMouseMove( event ) {
+			function onPointerMove( event ) {
 
-				mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
-				raycaster.setFromCamera( mouse, camera );
+				pointer.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+				raycaster.setFromCamera( pointer, camera );
 
 				// See if the ray from the camera into the world hits one of our meshes
 				const intersects = raycaster.intersectObject( mesh );

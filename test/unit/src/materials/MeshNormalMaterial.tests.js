@@ -1,35 +1,35 @@
 /* global QUnit */
 
-import { MeshNormalMaterial } from '../../../../src/materials/MeshNormalMaterial';
+// import { MeshNormalMaterial } from '../../../../src/materials/MeshNormalMaterial.js';
 
 export default QUnit.module( 'Materials', () => {
 
 	QUnit.module( 'MeshNormalMaterial', () => {
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isMeshNormalMaterial", ( assert ) => {
+		QUnit.todo( 'isMeshNormalMaterial', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "copy", ( assert ) => {
+		QUnit.todo( 'copy', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

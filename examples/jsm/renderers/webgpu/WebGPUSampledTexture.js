@@ -3,9 +3,13 @@ import { GPUBindingType, GPUTextureViewDimension } from './constants.js';
 
 class WebGPUSampledTexture extends WebGPUBinding {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
 		super( name );
+
+		this.isSampledTexture = true;
+
+		this.texture = texture;
 
 		this.dimension = GPUTextureViewDimension.TwoD;
 
@@ -14,22 +18,25 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 		this.textureGPU = null; // set by the renderer
 
-		Object.defineProperty( this, 'isSampledTexture', { value: true } );
-
 	}
 
+	getTexture() {
+
+		return this.texture;
+
+	}
 
 }
 
 class WebGPUSampledArrayTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
+
+		this.isSampledArrayTexture = true;
 
 		this.dimension = GPUTextureViewDimension.TwoDArray;
-
-		Object.defineProperty( this, 'isSampledArrayTexture', { value: true } );
 
 	}
 
@@ -37,13 +44,13 @@ class WebGPUSampledArrayTexture extends WebGPUSampledTexture {
 
 class WebGPUSampled3DTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
+
+		this.isSampled3DTexture = true;
 
 		this.dimension = GPUTextureViewDimension.ThreeD;
-
-		Object.defineProperty( this, 'isSampled3DTexture', { value: true } );
 
 	}
 
@@ -51,13 +58,13 @@ class WebGPUSampled3DTexture extends WebGPUSampledTexture {
 
 class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
-	constructor( name ) {
+	constructor( name, texture ) {
 
-		super( name );
+		super( name, texture );
+
+		this.isSampledCubeTexture = true;
 
 		this.dimension = GPUTextureViewDimension.Cube;
-
-		Object.defineProperty( this, 'isSampledCubeTexture', { value: true } );
 
 	}
 

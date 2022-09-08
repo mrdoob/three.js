@@ -10,17 +10,15 @@ import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.j
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
 import { getTypedArray } from '../utils.js';
 
-function BufferGeometryLoader( manager ) {
+class BufferGeometryLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: BufferGeometryLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
@@ -52,9 +50,9 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		const interleavedBufferMap = {};
 		const arrayBufferMap = {};
@@ -125,6 +123,15 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 			}
 
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+			if ( attribute.usage !== undefined ) bufferAttribute.setUsage( attribute.usage );
+
+			if ( attribute.updateRange !== undefined ) {
+
+				bufferAttribute.updateRange.offset = attribute.updateRange.offset;
+				bufferAttribute.updateRange.count = attribute.updateRange.count;
+
+			}
+
 			geometry.setAttribute( key, bufferAttribute );
 
 		}
@@ -212,6 +219,6 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	}
 
-} );
+}
 
 export { BufferGeometryLoader };

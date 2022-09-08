@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <base href="../../../" />
+    <script src="page.js"></script>
+    <link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+    <h1>[name]</h1>
+
+    <h2>
+        3Dモデルの形式はどれががおすすめでしょうか？
+    </h2>
+    <div>
+        <p>
+            アセットをimportしたり、exportしたりするのにおすすめなのは、glTF(GL Transmission Format)です。 その理由としてはglTFはランタイムでのアセットの配信に焦点を合わせているので、コンパクトに変換でき、ロードが早いからです。
+        </p>
+        <p>
+            three.jsはFBX、Collada、OBJなどの他の多くの一般的なフォーマットにも対応したローダーを提供しています。 それでも、プロジェクトでは常に最初にglTF ベースのワークフローの作成を試してください。詳細については、[link:#manual/introduction/Loading-3D-models Loading-3D-models]を参照してください。
+
+        </p>
+    </div>
+
+    <h2>なぜmetaタグのviewpointがexampleに入っているのですか？</h2>
+    <div>
+        <code>&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</code>
+
+        <p>
+            これらのタグは、モバイルブラウザのビューポートのサイズとスケールを制御します（ページの内容が表示されているビューポートとは異なるサイズでレンダリングされる場合があります）。
+
+        </p>
+
+        <p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
+
+        <p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
+    </div>
+
+    <h2>
+        リサイズをしたときに、シーンのスケールを保存しておくにはどうしたらよいですか？
+    </h2>
+    <p>
+        カメラからの距離に関係なく、ウィンドウのサイズを変更しても、すべてのオブジェクトが同じサイズで表示されるようにしたいです。この問題を解くための重要な方程式は、ある距離での可視高さの計算式です。
+
+        <code>
+visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+			</code> ウィンドウの高さを一定の割合で増加させると、すべての距離で同じ割合で表示される高さが増加することになります。これは、カメラの位置を変えてもできません。 その代わりに、カメラの視野を変更する必要があります。 具体例は[link:http://jsfiddle.net/Q4Jpu/ sample]を参照してください。
+    </p>
+
+    <h2>オブジェクトの一部が非表示になる原因はなんですか？</h2>
+    <p>
+        これはface cullingが原因かもしれません。Faceにはどちらの面かを決める向きがあります。 そして、cullingは通常の状況では裏面を削除します。 これが問題となって非表示になっているかどうかを確認するには、 マテリアルの面をTHREE.DoubleSideに変更してください。
+        <code>material.side = THREE.DoubleSide</code>
+    </p>
+
+		<h2>Why does three.js sometimes return strange results for invalid inputs?</h2>
+		<p>
+			For performance reasons, three.js doesn't validate inputs in most cases. It's your app's responsibility to make sure that all inputs are valid.
+		</p>
+</body>
+
+</html>

@@ -1,36 +1,48 @@
 import { Light } from './Light.js';
 
-function RectAreaLight( color, intensity, width, height ) {
+class RectAreaLight extends Light {
 
-	Light.call( this, color, intensity );
+	constructor( color, intensity, width = 10, height = 10 ) {
 
-	this.type = 'RectAreaLight';
+		super( color, intensity );
 
-	this.width = ( width !== undefined ) ? width : 10;
-	this.height = ( height !== undefined ) ? height : 10;
+		this.isRectAreaLight = true;
 
-}
+		this.type = 'RectAreaLight';
 
-RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
+		this.width = width;
+		this.height = height;
 
-	constructor: RectAreaLight,
+	}
 
-	isRectAreaLight: true,
+	get power() {
 
-	copy: function ( source ) {
+		// compute the light's luminous power (in lumens) from its intensity (in nits)
+		return this.intensity * this.width * this.height * Math.PI;
 
-		Light.prototype.copy.call( this, source );
+	}
+
+	set power( power ) {
+
+		// set the light's intensity (in nits) from the desired luminous power (in lumens)
+		this.intensity = power / ( this.width * this.height * Math.PI );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
 
 		this.width = source.width;
 		this.height = source.height;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		const data = Light.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		data.object.width = this.width;
 		data.object.height = this.height;
@@ -39,6 +51,6 @@ RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	}
 
-} );
+}
 
 export { RectAreaLight };

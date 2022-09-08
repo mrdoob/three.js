@@ -5,7 +5,7 @@
  * The azimuthal angle (theta) is measured from the positive z-axis.
  */
 
-import { MathUtils } from './MathUtils.js';
+import * as MathUtils from './MathUtils.js';
 
 class Spherical {
 
@@ -29,12 +29,6 @@ class Spherical {
 
 	}
 
-	clone() {
-
-		return new this.constructor().copy( this );
-
-	}
-
 	copy( other ) {
 
 		this.radius = other.radius;
@@ -45,7 +39,7 @@ class Spherical {
 
 	}
 
-	// restrict phi to be betwee EPS and PI-EPS
+	// restrict phi to be between EPS and PI-EPS
 	makeSafe() {
 
 		const EPS = 0.000001;
@@ -78,6 +72,12 @@ class Spherical {
 		}
 
 		return this;
+
+	}
+
+	clone() {
+
+		return new this.constructor().copy( this );
 
 	}
 

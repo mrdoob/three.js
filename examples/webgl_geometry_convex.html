@@ -10,12 +10,26 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - convex geometry</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { ConvexBufferGeometry } from './jsm/geometries/ConvexGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
 			let group, camera, scene, renderer;
 
@@ -44,9 +58,11 @@
 				controls.maxDistance = 50;
 				controls.maxPolarAngle = Math.PI / 2;
 
+				// ambient light
+
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
-				// light
+				// point light
 
 				const light = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( light );
@@ -65,11 +81,23 @@
 
 				// points
 
-				const vertices = new THREE.DodecahedronGeometry( 10 ).vertices;
+				let dodecahedronGeometry = new THREE.DodecahedronGeometry( 10 );
 
-				for ( let i = 0; i < vertices.length; i ++ ) {
+				// if normal and uv attributes are not removed, mergeVertices() can't consolidate indentical vertices with different normal/uv data
 
-					//vertices[ i ].add( randomPoint().multiplyScalar( 2 ) ); // wiggle the points
+				dodecahedronGeometry.deleteAttribute( 'normal' );
+				dodecahedronGeometry.deleteAttribute( 'uv' );
+
+				dodecahedronGeometry = BufferGeometryUtils.mergeVertices( dodecahedronGeometry );
+
+				const vertices = [];
+				const positionAttribute = dodecahedronGeometry.getAttribute( 'position' );
+
+				for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+					const vertex = new THREE.Vector3();
+					vertex.fromBufferAttribute( positionAttribute, i );
+					vertices.push( vertex );
 
 				}
 
@@ -95,7 +123,7 @@
 					transparent: true
 				} );
 
-				const meshGeometry = new ConvexBufferGeometry( vertices );
+				const meshGeometry = new ConvexGeometry( vertices );
 
 				const mesh1 = new THREE.Mesh( meshGeometry, meshMaterial );
 				mesh1.material.side = THREE.BackSide; // back faces
@@ -109,7 +137,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

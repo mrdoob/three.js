@@ -7,12 +7,14 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Geometry] &rarr;
+		[page:BufferGeometry] &rarr;
 
-		<h1>多面几何体（[name]）</h1>
+		<h1>多面缓冲几何体（[name]）</h1>
 
 		<p class="desc">
-			多面体是在三维空间中具有一些平面的立体图形。这个类将一个顶点数组投射到一个球面上，之后将它们细分为所需的细节级别。
+				多面体在三维空间中具有一些平面的立体图形。这个类将一个顶点数组投射到一个球面上，之后将它们细分为所需的细节级别。
+				这个类由[page:DodecahedronGeometry]、[page:IcosahedronGeometry]、[page:OctahedronGeometry]和[page:TetrahedronGeometry]
+				所使用，以生成它们各自的几何结构。
 		</p>
 
 		<h2>代码示例</h2>
@@ -46,7 +48,7 @@ const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6
 		</p>
 
 		<h2>属性</h2>
-		<p>共有属性请参见其基类[page:Geometry]。</p>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
@@ -54,7 +56,7 @@ const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6
 		</p>
 
 		<h2>方法(Methods)</h2>
-		<p>共有方法请参见其基类[page:Geometry]。</p>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
 
 		<h2>源代码</h2>
 

@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A loader for loading an <em>.mtl</em> resource, used internally by [page:OBJLoader].<br />
+		<p class="desc">A loader for loading an `.mtl` resource, used internally by [page:OBJLoader].<br />
 		The Material Template Library format (MTL) or .MTL File Format is a companion file format to .OBJ that describes surface shading
 		(material) properties of objects within one or more .OBJ files.
 		</p>
@@ -32,18 +32,18 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-			[page:String url] — A string containing the path/URL of the <em>.mtl</em> file.<br />
+			[page:String url] — A string containing the path/URL of the `.mtl` file.<br />
 			[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] instance.<br />
-			[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+			[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 			[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives the error as an argument.<br />
 		</p>
 		<p>
 			Begin loading from url and return the loaded material.
 		</p>
 
-		<h3>[method:MTLLoader setMaterialOptions]( [param:Object options] )</h3>
+		<h3>[method:this setMaterialOptions]( [param:Object options] )</h3>
 		<p>
 			[page:Object options] — required
 			<ul>
@@ -61,11 +61,11 @@
 
 		<h3>[method:MTLLoaderMaterialCreator parse]( [param:String text, param:String path] )</h3>
 		<p>
-			[page:String text] — The textual <em>mtl</em> structure to parse.
+			[page:String text] — The textual `mtl` structure to parse.
 			[page:String path] — The path to the MTL file.
 		</p>
 		<p>
-			Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] instance.<br />
+			Parse a `mtl` text structure and return a [page:MTLLoaderMaterialCreator MTLLoader.MaterialCreator] instance.<br />
 		</p>
 
 

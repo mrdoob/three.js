@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { LatheBufferGeometry } from '../../../../src/geometries/LatheBufferGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { LatheGeometry } from '../../../../src/geometries/LatheGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'LatheBufferGeometry', ( hooks ) => {
+	QUnit.module( 'LatheGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -18,23 +18,22 @@ export default QUnit.module( 'Geometries', () => {
 			};
 
 			geometries = [
-				//				new LatheBufferGeometry(), // Todo: error for undefined point
-				new LatheBufferGeometry( parameters.points )
+				new LatheGeometry( parameters.points ),
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

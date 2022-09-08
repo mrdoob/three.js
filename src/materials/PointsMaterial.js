@@ -1,64 +1,50 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-/**
- * parameters = {
- *  color: <hex>,
- *  opacity: <float>,
- *  map: new THREE.Texture( <Image> ),
- *  alphaMap: new THREE.Texture( <Image> ),
- *
- *  size: <float>,
- *  sizeAttenuation: <bool>
- *
- *  morphTargets: <bool>
- * }
- */
+class PointsMaterial extends Material {
 
-function PointsMaterial( parameters ) {
+	constructor( parameters ) {
 
-	Material.call( this );
+		super();
 
-	this.type = 'PointsMaterial';
+		this.isPointsMaterial = true;
 
-	this.color = new Color( 0xffffff );
+		this.type = 'PointsMaterial';
 
-	this.map = null;
+		this.color = new Color( 0xffffff );
 
-	this.alphaMap = null;
+		this.map = null;
 
-	this.size = 1;
-	this.sizeAttenuation = true;
+		this.alphaMap = null;
 
-	this.morphTargets = false;
+		this.size = 1;
+		this.sizeAttenuation = true;
 
-	this.setValues( parameters );
+		this.fog = true;
+
+		this.setValues( parameters );
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.color.copy( source.color );
+
+		this.map = source.map;
+
+		this.alphaMap = source.alphaMap;
+
+		this.size = source.size;
+		this.sizeAttenuation = source.sizeAttenuation;
+
+		this.fog = source.fog;
+
+		return this;
+
+	}
 
 }
-
-PointsMaterial.prototype = Object.create( Material.prototype );
-PointsMaterial.prototype.constructor = PointsMaterial;
-
-PointsMaterial.prototype.isPointsMaterial = true;
-
-PointsMaterial.prototype.copy = function ( source ) {
-
-	Material.prototype.copy.call( this, source );
-
-	this.color.copy( source.color );
-
-	this.map = source.map;
-
-	this.alphaMap = source.alphaMap;
-
-	this.size = source.size;
-	this.sizeAttenuation = source.sizeAttenuation;
-
-	this.morphTargets = source.morphTargets;
-
-	return this;
-
-};
-
 
 export { PointsMaterial };

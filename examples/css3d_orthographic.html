@@ -20,12 +20,25 @@
 	<body>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - orthographic</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { CSS3DRenderer, CSS3DObject } from 'three/addons/renderers/CSS3DRenderer.js';
 
 			let camera, scene, renderer;
 
@@ -109,7 +122,7 @@
 					object.rotation.copy( rot );
 					scene2.add( object );
 
-					const geometry = new THREE.PlaneBufferGeometry( width, height );
+					const geometry = new THREE.PlaneGeometry( width, height );
 					const mesh = new THREE.Mesh( geometry, material );
 					mesh.position.copy( object.position );
 					mesh.rotation.copy( object.rotation );
@@ -117,7 +130,7 @@
 
 				}
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

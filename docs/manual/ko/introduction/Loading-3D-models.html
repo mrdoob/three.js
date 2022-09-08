@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>3D 모델 불러오기([name])</h1>
+
+	<p>
+		3D 모델들은 각자 다양한 목적, 적합한 특성, 다양한 복잡성을 가지고 있는 수백개의 파일 포맷으로 존재할 수 있습니다.
+
+		<a href="https://github.com/mrdoob/three.js/tree/dev/examples/jsm/loaders" target="_blank" rel="noopener">
+		three.js는 다양한 로더를 지원하지만</a>, 알맞는 포맷과 워크플로우를 선택하는 것이 시간을 아끼고 이후에 생길 문제를 방지할 수 있는 방법입니다.
+		몇몇 포맷들은 작업하기 어렵거나, 실시간으로 반영하기 어렵거나, 단순히 지금 시점에 전부 지원을 안하기도 합니다.
+	</p>
+
+	<p>
+		여기에서는 대부분의 사용자들에게 추천할만 한 워크플로우와, 막혔을때의 해결법을 알려드리고자 합니다.
+	</p>
+
+	<h2>시작하기에 앞서</h2>
+
+	<p>
+		로컬 서버를 돌리는 것이 처음이라면,
+		[link:#manual/introduction/How-to-run-things-locally how to run things locally]
+		를 먼저 확인하세요. 3D 모델의 대부분의 에러는 파일을 알맞게 호이스팅하는 것으로 해결할 수 있습니다.
+	</p>
+
+	<h2>추천 워크플로우</h2>
+
+	<p>
+		가능하다면, glTF(GL Transmission Format)를 사용하는 것을 추천드립니다.
+		<small>.GLB</small> 와 <small>.GLTF</small> 버전 포맷 모두 잘 지원될 것입니다.
+		glTF는 런타임 자원 효율에 초점을 맞추고 있기 때문에 로딩을 빠르고 정확하게 할 수 있습니다.
+		속성으로는 meshes, materials, textures, skins, skeletons, morph targets, animations, lights, 그리고
+		cameras 가 있습니다.
+	</p>
+
+	<p>
+		퍼블릭 도메인 glTF 파일은
+		<a href="https://sketchfab.com/models?features=downloadable&sort_by=-likeCount&type=models" target="_blank" rel="noopener">
+		Sketchfab</a> 사이트처럼 사용할 수 있고, 다양한 툴들에서 glTF로 출력해 사용할 수 있습니다.
+	</p>
+
+	<ul>
+		<li><a href="https://www.blender.org/" target="_blank" rel="noopener">Blender</a> by the Blender Foundation</li>
+		<li><a href="https://www.allegorithmic.com/products/substance-painter" target="_blank" rel="noopener">Substance Painter</a> by Allegorithmic</li>
+		<li><a href="https://www.foundry.com/products/modo" target="_blank" rel="noopener">Modo</a> by Foundry</li>
+		<li><a href="https://www.marmoset.co/toolbag/" target="_blank" rel="noopener">Toolbag</a> by Marmoset</li>
+		<li><a href="https://www.sidefx.com/products/houdini/" target="_blank" rel="noopener">Houdini</a> by SideFX</li>
+		<li><a href="https://labs.maxon.net/?p=3360" target="_blank" rel="noopener">Cinema 4D</a> by MAXON</li>
+		<li><a href="https://github.com/KhronosGroup/COLLADA2GLTF" target="_blank" rel="noopener">COLLADA2GLTF</a> by the Khronos Group</li>
+		<li><a href="https://github.com/facebookincubator/FBX2glTF" target="_blank" rel="noopener">FBX2GLTF</a> by Facebook</li>
+		<li><a href="https://github.com/AnalyticalGraphicsInc/obj2gltf" target="_blank" rel="noopener">OBJ2GLTF</a> by Analytical Graphics Inc</li>
+		<li>&hellip;and <a href="http://github.khronos.org/glTF-Project-Explorer/" target="_blank" rel="noopener">many more</a></li>
+	</ul>
+
+	<p>
+		선호하는 툴이 glTF를 지원하지 않는다면, glTF로 출력하는 것을 개발자에게 문의해보거나,
+		<a href="https://github.com/KhronosGroup/glTF/issues/1051" target="_blank" rel="noopener">the glTF roadmap thread</a>에 포스팅 해 보세요.
+	</p>
+
+	<p>
+		glTF 이외에도, FBX, OBJ, COLLADA 같은 유명한 포맷들도 잘 지원됩니다.
+	</p>
+
+	<h2>로딩</h2>
+
+	<p>
+		three.js에는 몇몇 로더들을 제외하고는(ex: [page:ObjectLoader]) 기본적으로 include되어 있지 않습니다. 다른 로더들은 개별적으로 앱에 추가해줘야 합니다.
+	</p>
+
+	<code>
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+	</code>
+
+	<p>
+		로더를 import한 후에, scene에 모델을 로드하면 됩니다. 구문은 로더에 따라 다릅니다. — 다른 포맷을 사용할 경우에는, 해당 로더에 대한 예제와 문서를 참고하세요.
+		glTF의 경우 글로벌 스크립트는 다음과 같이 사용합니다.
+	</p>
+
+	<code>
+		const loader = new GLTFLoader();
+
+		loader.load( 'path/to/model.glb', function ( gltf ) {
+
+			scene.add( gltf.scene );
+
+		}, undefined, function ( error ) {
+
+			console.error( error );
+
+		} );
+	</code>
+
+	<p>
+		[page:GLTFLoader GLTFLoader 문서]를 참고하세요.
+	</p>
+
+	<h2>문제 해결</h2>
+
+	<p>
+		많은 시간을 공 들여 걸작을 모델링하고 나서, 웹 페이지에
+		업로드 했더닝, 이런! 😭 왜곡돼있거나 색이 안 칠해져있거나 아예 나오지 않을 때가 있습니다.
+		다음 순서대로 문제 해결을 해 봅시다:
+	</p>
+
+	<ol>
+		<li>
+			자바스크립트 콘솔 에러를 체크합니다.
+			<em>.load()</em>를 사용할 때 로그 결과에 <em>onError</em> 콜백을 사용했는지를 확인합니다.
+		</li>
+		<li>
+			다른 애플리케이션에서 모델을 확인합니다. glTF에서는, 드래그-앤-드롭 뷰어가
+			<a href="https://gltf-viewer.donmccurdy.com/" target="_blank" rel="noopener">three.js</a>와
+			<a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener">babylon.js</a>에서 사용 가능합니다. 만약 모델이
+			하나 이상의 어플리케이션에서 정상적으로 나타난다면,
+			<a href="https://github.com/mrdoob/three.js/issues/new" target="_blank" rel="noopener">three.js와 관련된 버그를 알려주세요</a>.
+			어느 애플리케이션에서도 모델이 나타나지 않는다면, 모델을 만든 어플리케이션의 버그를 확인해 보는 것을 강력하게 추천드립니다.
+		</li>
+		<li>
+			모델을 1000배 확대 혹은 축소해 보세요. 여러 모델들은 다양하게 확대 및 축소되어 보여질 수 있으며
+			너무 큰 모델은 카메라가 모델 안에 있어 제대로 안 보일 수 있습니다.
+		</li>
+		<li>
+			밝은 모델을 사용하거나 위치를 바꿔보세요. 모델이 가려져 있을 수 있습니다.
+		</li>
+		<li>
+			네트워크 탭에서 failed texture requests를 확인합니다. 예를 들면,
+			<em>C:\\Path\To\Model\texture.jpg</em>. 이러한 주소 대신 상대 주소를 사용해, <em>images/texture.jpg</em>처럼 사용해 보세요
+			— 이 작업은 텍스트 에디터에서 모델 파일을 수정해야 할 수도 있습니다.
+		</li>
+	</ol>
+
+	<h2>지원 요청</h2>
+
+	<p>
+		위의 문제 해결 절차를 거치고도 모델이 제대로 나오지 않는다면, 적절한 질문을 통해 도움을 구하는 것이 가장 빠른 해결책일 것입니다.
+		<a href="https://discourse.threejs.org/" target="_blank" rel="noopener">three.js 포럼</a>에 문제제기를 하고 가능하다면,
+		아무 포맷으로 자신의 모델을 첨부(혹은 같은 문제가 있는 더 단순한 모델)을 첨부해 주세요.
+		다른 사람에게 충분한 정보를 제공해 주는 것이 문제를 해결할 수 있는 빠를 방법입니다. — live demo를 사용하면 이상적입니다.
+	</p>
+
+</body>
+
+</html>

@@ -1,23 +1,37 @@
 <html lang="en">
 	<head>
-		<title>WebGPU Sandbox</title>
+		<title>three.js - WebGPU - Sandbox</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - sandbox<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sandbox
 		</div>
+
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
+			import * as Nodes from 'three/nodes';
 
-			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
 
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer;
 
@@ -31,7 +45,7 @@
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 
@@ -41,22 +55,70 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				// textured mesh
+				// textures
 
 				const textureLoader = new THREE.TextureLoader();
 				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+				texture.name = 'uv_grid';
 
-				const geometryBox = new THREE.BoxBufferGeometry();
-				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
+				const textureDisplace = textureLoader.load( './textures/transition/transition1.png' );
+				textureDisplace.wrapS = THREE.RepeatWrapping;
+				textureDisplace.wrapT = THREE.RepeatWrapping;
+
+				// compressed texture
+
+				const ddsLoader = new DDSLoader();
+				const dxt5Texture = ddsLoader.load( './textures/compressed/explosion_dxt5_mip.dds' );
+
+				// box mesh
+
+				const geometryBox = new THREE.BoxGeometry();
+				const materialBox = new Nodes.MeshBasicNodeMaterial();
+
+				const timerNode = new Nodes.TimerNode();
+
+				// birection speed
+				const timerScaleNode = new Nodes.OperatorNode( '*', timerNode, new Nodes.ConstNode( new THREE.Vector2( - 0.5, 0.1 ) ) );
+				const animateUV = new Nodes.OperatorNode( '+', new Nodes.UVNode(), timerScaleNode );
+
+				const textureNode = new Nodes.TextureNode( texture, animateUV );
+
+				materialBox.colorNode = new Nodes.MathNode( 'mix', textureNode, new Nodes.CheckerNode( animateUV ), new Nodes.UniformNode( .5 ) );
+
+				// test uv 2
+				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
+				//materialBox.colorNode = new TextureNode( texture, new UVNode( 1 ) );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				box.position.set( 0, 1, 0 );
 				scene.add( box );
 
+				// displace example
+
+				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
+				const materialSphere = new Nodes.MeshBasicNodeMaterial();
+
+				const displaceAnimated = new Nodes.SplitNode( new Nodes.TextureNode( textureDisplace ), 'x' );
+				const displaceY = new Nodes.OperatorNode( '*', displaceAnimated, new Nodes.ConstNode( .25 ) );
+
+				const displace = new Nodes.OperatorNode( '*', new Nodes.NormalNode( Nodes.NormalNode.LOCAL ), displaceY );
+
+				materialSphere.colorNode = displaceY;
+				materialSphere.positionNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode( Nodes.PositionNode.LOCAL ), displace );
+
+				const sphere = new THREE.Mesh( geometrySphere, materialSphere );
+				sphere.position.set( - 2, - 1, 0 );
+				scene.add( sphere );
+
 				// data texture
 
-				const geometryPlane = new THREE.PlaneBufferGeometry();
-				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture(), transparent: true, opacity: 0.5 } );
+				const geometryPlane = new THREE.PlaneGeometry();
+				const materialPlane = new Nodes.MeshBasicNodeMaterial();
+				materialPlane.colorNode = new Nodes.OperatorNode( '+', new Nodes.TextureNode( createDataTexture() ), new Nodes.UniformNode( new THREE.Color( 0x0000FF ) ) );
+				materialPlane.opacityNode = new Nodes.SplitNode( new Nodes.TextureNode( dxt5Texture ), 'a' );
+				materialPlane.transparent = true;
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
 				plane.position.set( 0, - 1, 0 );
@@ -64,10 +126,11 @@
 
 				// compressed texture
 
-				const ddsLoader = new DDSLoader();
-				const dxt5Texture = ddsLoader.load( './textures/compressed/explosion_dxt5_mip.dds' );
-
-				const materialCompressed = new THREE.MeshBasicMaterial( { map: dxt5Texture, transparent: true } );
+				const materialCompressed = new Nodes.MeshBasicNodeMaterial();
+				materialCompressed.colorNode = new Nodes.TextureNode( dxt5Texture );
+				materialCompressed.emissiveNode = new Nodes.UniformNode( new THREE.Color( 0x663300 ) );
+				materialCompressed.alphaTestNode = new Nodes.OscNode();
+				materialCompressed.transparent = true;
 
 				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
 				boxCompressed.position.set( - 2, 1, 0 );
@@ -85,7 +148,9 @@
 				}
 
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-				const materialPoints = new THREE.PointsMaterial();
+				const materialPoints = new Nodes.PointsNodeMaterial();
+
+				materialPoints.colorNode = new Nodes.OperatorNode( '*', new Nodes.PositionNode(), new Nodes.ConstNode( 3 ) );
 
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );
@@ -99,19 +164,24 @@
 					new THREE.Vector3( 0.5, 0.5, 0 ),
 					new THREE.Vector3( - 0.5, 0.5, 0 )
 				] );
-				const materialLine = new THREE.LineBasicMaterial();
+
+				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
+
+				const materialLine = new Nodes.LineBasicNodeMaterial();
+				materialLine.colorNode = new Nodes.AttributeNode( 'color' );
+
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 2, 1, 0 );
 				scene.add( line );
 
 				//
 
-				renderer = new WebGPURenderer( { extensions: [ 'texture-compression-bc' ] } );
+				renderer = new WebGPURenderer( { requiredFeatures: [ 'texture-compression-bc' ] } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 				return renderer.init();
 
@@ -162,7 +232,9 @@
 
 				}
 
-				return new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
+				const texture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
+				texture.needsUpdate = true;
+				return texture;
 
 			}
 

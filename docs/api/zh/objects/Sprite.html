@@ -40,6 +40,11 @@
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Object3D]。</p>
 
+		<h3>[property:Boolean isSprite]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 
 		<h3>[property:SpriteMaterial material]</h3>
 		<p>
@@ -61,12 +66,12 @@
 			返回当前Sprite对象的一个克隆及其任何后代。
 		</p>
 
-		<h3>[method:Sprite copy]( [param:Sprite sprite] )</h3>
+		<h3>[method:this copy]( [param:Sprite sprite] )</h3>
 		<p>
 			将前一个Sprite对象的属性复制给当前的这个对象。
 		</p>
 
-		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 		在投射的光线和精灵之前产生交互。[page:Raycaster.intersectObject]将会调用这个方法。
 		在对sprite进行射线投射之前，射线投射必须通过调用[page:Raycaster.setFromCamera]()来初始化。		</p>

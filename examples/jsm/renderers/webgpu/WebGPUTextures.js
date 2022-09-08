@@ -1,17 +1,16 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
 import { CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
-	RGBFormat, RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
-} from '../../../../build/three.module.js';
+	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
+} from 'three';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
 class WebGPUTextures {
 
-	constructor( device, properties, info, glslang ) {
+	constructor( device, properties, info ) {
 
 		this.device = device;
 		this.properties = properties;
 		this.info = info;
-		this.glslang = glslang;
 
 		this.defaultTexture = null;
 		this.defaultCubeTexture = null;
@@ -42,7 +41,9 @@ class WebGPUTextures {
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.defaultTexture = this._createTexture( texture );
+			this._uploadTexture( texture );
+
+			this.defaultTexture = this.getTextureGPU( texture );
 
 		}
 
@@ -58,7 +59,9 @@ class WebGPUTextures {
 			texture.minFilter = NearestFilter;
 			texture.magFilter = NearestFilter;
 
-			this.defaultCubeTexture = this._createTexture( texture );
+			this._uploadTexture( texture );
+
+			this.defaultCubeTexture = this.getTextureGPU( texture );
 
 		}
 
@@ -84,7 +87,7 @@ class WebGPUTextures {
 
 	updateTexture( texture ) {
 
-		let forceUpdate = false;
+		let needsUpdate = false;
 
 		const textureProperties = this.properties.get( texture );
 
@@ -117,21 +120,9 @@ class WebGPUTextures {
 
 				}
 
-				// texture creation
+				//
 
-				if ( textureProperties.textureGPU !== undefined ) {
-
-					// @TODO: Avoid calling of destroy() in certain scenarios. When only the contents of a texture
-					// are updated, a buffer upload should be sufficient. However, if the user changes
-					// the dimensions of the texture, format or usage, a new instance of GPUTexture is required.
-
-					textureProperties.textureGPU.destroy();
-
-				}
-
-				textureProperties.textureGPU = this._createTexture( texture );
-				textureProperties.version = texture.version;
-				forceUpdate = true;
+				needsUpdate = this._uploadTexture( texture );
 
 			}
 
@@ -143,11 +134,11 @@ class WebGPUTextures {
 		if ( textureProperties.initializedRTT === false ) {
 
 			textureProperties.initializedRTT = true;
-			forceUpdate = true;
+			needsUpdate = true;
 
 		}
 
-		return forceUpdate;
+		return needsUpdate;
 
 	}
 
@@ -203,10 +194,10 @@ class WebGPUTextures {
 				size: {
 					width: width,
 					height: height,
-					depth: 1
+					depthOrArrayLayers: 1
 				},
 				format: colorTextureFormat,
-				usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.SAMPLED
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
 			} );
 
 			this.info.memory.textures ++;
@@ -231,10 +222,10 @@ class WebGPUTextures {
 					size: {
 						width: width,
 						height: height,
-						depth: 1
+						depthOrArrayLayers: 1
 					},
 					format: depthTextureFormat,
-					usage: GPUTextureUsage.OUTPUT_ATTACHMENT
+					usage: GPUTextureUsage.RENDER_ATTACHMENT
 				} );
 
 				this.info.memory.textures ++;
@@ -305,10 +296,14 @@ class WebGPUTextures {
 
 	}
 
-	_createTexture( texture ) {
+	_uploadTexture( texture ) {
+
+		let needsUpdate = false;
 
 		const device = this.device;
 		const image = texture.image;
+
+		const textureProperties = this.properties.get( texture );
 
 		const { width, height, depth } = this._getSize( texture );
 		const needsMipmaps = this._needsMipmaps( texture );
@@ -316,23 +311,21 @@ class WebGPUTextures {
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = this._getFormat( texture );
 
-		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
+		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
 
 		if ( needsMipmaps === true ) {
 
-			// current mipmap generation requires OUTPUT_ATTACHMENT
+			// current mipmap generation requires RENDER_ATTACHMENT
 
-			usage |= GPUTextureUsage.OUTPUT_ATTACHMENT;
+			usage |= GPUTextureUsage.RENDER_ATTACHMENT;
 
 		}
-
-		// texture creation
 
 		const textureGPUDescriptor = {
 			size: {
 				width: width,
 				height: height,
-				depth: depth,
+				depthOrArrayLayers: depth,
 			},
 			mipLevelCount: mipLevelCount,
 			sampleCount: 1,
@@ -340,11 +333,23 @@ class WebGPUTextures {
 			format: format,
 			usage: usage
 		};
-		const textureGPU = device.createTexture( textureGPUDescriptor );
+
+		// texture creation
+
+		let textureGPU = textureProperties.textureGPU;
+
+		if ( textureGPU === undefined ) {
+
+			textureGPU = device.createTexture( textureGPUDescriptor );
+			textureProperties.textureGPU = textureGPU;
+
+			needsUpdate = true;
+
+		}
 
 		// transfer texture data
 
-		if ( texture.isDataTexture || texture.isDataTexture2DArray || texture.isDataTexture3D ) {
+		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
 			this._copyBufferToTexture( image, format, textureGPU );
 
@@ -356,17 +361,21 @@ class WebGPUTextures {
 
 		} else if ( texture.isCubeTexture ) {
 
-			this._copyCubeMapToTexture( image, texture, textureGPU );
+			if ( image.length === 6 ) {
+
+				this._copyCubeMapToTexture( image, format, texture, textureGPU, textureGPUDescriptor, needsMipmaps );
+
+			}
 
 		} else {
 
-			if ( image !== undefined ) {
+			if ( image !== null ) {
 
 				// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
 
 				this._getImageBitmap( image, texture ).then( imageBitmap => {
 
-					this._copyImageBitmapToTexture( imageBitmap, textureGPU );
+					this._copyExternalImageToTexture( imageBitmap, textureGPU );
 
 					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
@@ -376,11 +385,13 @@ class WebGPUTextures {
 
 		}
 
-		return textureGPU;
+		textureProperties.version = texture.version;
+
+		return needsUpdate;
 
 	}
 
-	_copyBufferToTexture( image, format, textureGPU ) {
+	_copyBufferToTexture( image, format, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
@@ -390,10 +401,11 @@ class WebGPUTextures {
 		const bytesPerTexel = this._getBytesPerTexel( format );
 		const bytesPerRow = Math.ceil( image.width * bytesPerTexel / 256 ) * 256;
 
-		this.device.defaultQueue.writeTexture(
+		this.device.queue.writeTexture(
 			{
 				texture: textureGPU,
-				mipLevel: 0
+				mipLevel: 0,
+				origin
 			},
 			data,
 			{
@@ -403,40 +415,52 @@ class WebGPUTextures {
 			{
 				width: image.width,
 				height: image.height,
-				depth: ( image.depth !== undefined ) ? image.depth : 1
+				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
 			} );
 
 	}
 
-	_copyCubeMapToTexture( images, texture, textureGPU ) {
+	_copyCubeMapToTexture( images, format, texture, textureGPU, textureGPUDescriptor, needsMipmaps ) {
 
-		for ( let i = 0; i < images.length; i ++ ) {
+		for ( let i = 0; i < 6; i ++ ) {
 
 			const image = images[ i ];
 
-			this._getImageBitmap( image, texture ).then( imageBitmap => {
+			if ( image.isDataTexture ) {
 
-				this._copyImageBitmapToTexture( imageBitmap, textureGPU, { x: 0, y: 0, z: i } );
+				this._copyBufferToTexture( image.image, format, textureGPU, { z: i } );
 
-			} );
+				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i );
+
+			} else {
+
+				this._getImageBitmap( image, texture ).then( imageBitmap => {
+
+					this._copyExternalImageToTexture( imageBitmap, textureGPU, { z: i } );
+
+					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i );
+
+				} );
+
+			}
 
 		}
 
 	}
 
-	_copyImageBitmapToTexture( image, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
+	_copyExternalImageToTexture( image, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
 
-		this.device.defaultQueue.copyImageBitmapToTexture(
+		this.device.queue.copyExternalImageToTexture(
 			{
-				imageBitmap: image
+				source: image
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,
-				origin: origin
+				origin
 			}, {
 				width: image.width,
 				height: image.height,
-				depth: 1
+				depthOrArrayLayers: 1
 			}
 		);
 
@@ -457,7 +481,7 @@ class WebGPUTextures {
 
 			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
 
-			this.device.defaultQueue.writeTexture(
+			this.device.queue.writeTexture(
 				{
 					texture: textureGPU,
 					mipLevel: i
@@ -470,22 +494,22 @@ class WebGPUTextures {
 				{
 					width: Math.ceil( width / blockData.width ) * blockData.width,
 					height: Math.ceil( height / blockData.width ) * blockData.width,
-					depth: 1,
+					depthOrArrayLayers: 1
 				} );
 
 		}
 
 	}
 
-	_generateMipmaps( textureGPU, textureGPUDescriptor ) {
+	_generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer ) {
 
 		if ( this.utils === null ) {
 
-			this.utils = new WebGPUTextureUtils( this.device, this.glslang ); // only create this helper if necessary
+			this.utils = new WebGPUTextureUtils( this.device ); // only create this helper if necessary
 
 		}
 
-		this.utils.generateMipmaps( textureGPU, textureGPUDescriptor );
+		this.utils.generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer );
 
 	}
 
@@ -521,7 +545,7 @@ class WebGPUTextures {
 
 		let dimension;
 
-		if ( texture.isDataTexture3D ) {
+		if ( texture.isData3DTexture ) {
 
 			dimension = GPUTextureDimension.ThreeD;
 
@@ -557,7 +581,6 @@ class WebGPUTextures {
 				formatGPU = ( encoding === sRGBEncoding ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
 				break;
 
-			case RGBFormat:
 			case RGBAFormat:
 
 				switch ( type ) {
@@ -691,11 +714,13 @@ class WebGPUTextures {
 
 		if ( texture.isCubeTexture ) {
 
-			width = ( image.length > 0 ) ? image[ 0 ].width : 1;
-			height = ( image.length > 0 ) ? image[ 0 ].height : 1;
+			const faceImage = image.length > 0 ? image[ 0 ].image || image[ 0 ] : null;
+
+			width = faceImage?.width || 1;
+			height = faceImage?.height || 1;
 			depth = 6; // one image for each side of the cube map
 
-		} else if ( image !== undefined ) {
+		} else if ( image !== null ) {
 
 			width = image.width;
 			height = image.height;

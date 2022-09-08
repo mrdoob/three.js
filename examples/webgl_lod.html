@@ -12,11 +12,24 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - level of detail
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { FlyControls } from './jsm/controls/FlyControls.js';
+			import { FlyControls } from 'three/addons/controls/FlyControls.js';
 
 			let container;
 
@@ -48,11 +61,11 @@
 
 				const geometry = [
 
-					[ new THREE.IcosahedronBufferGeometry( 100, 16 ), 50 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 8 ), 300 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 4 ), 1000 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 2 ), 2000 ],
-					[ new THREE.IcosahedronBufferGeometry( 100, 1 ), 8000 ]
+					[ new THREE.IcosahedronGeometry( 100, 16 ), 50 ],
+					[ new THREE.IcosahedronGeometry( 100, 8 ), 300 ],
+					[ new THREE.IcosahedronGeometry( 100, 4 ), 1000 ],
+					[ new THREE.IcosahedronGeometry( 100, 2 ), 2000 ],
+					[ new THREE.IcosahedronGeometry( 100, 1 ), 8000 ]
 
 				];
 
@@ -95,7 +108,7 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

@@ -17,7 +17,7 @@ export function cloneUniforms( src ) {
 			if ( property && ( property.isColor ||
 				property.isMatrix3 || property.isMatrix4 ||
 				property.isVector2 || property.isVector3 || property.isVector4 ||
-				property.isTexture ) ) {
+				property.isTexture || property.isQuaternion ) ) {
 
 				dst[ u ][ p ] = property.clone();
 
@@ -56,6 +56,20 @@ export function mergeUniforms( uniforms ) {
 	}
 
 	return merged;
+
+}
+
+export function cloneUniformsGroups( src ) {
+
+	const dst = [];
+
+	for ( let u = 0; u < src.length; u ++ ) {
+
+		dst.push( src[ u ].clone() );
+
+	}
+
+	return dst;
 
 }
 

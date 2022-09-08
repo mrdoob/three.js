@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Questa classe aiuta a visualizzare ciò che una telecamera contiene nel suo frustum.<br />
+      Visualizza il frustum di una telecamera utilizzando un [page:LineSegments].
+		</p>
+
+		<h2>Codice di Esempio</h2>
+		<code>
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const helper = new THREE.CameraHelper( camera );
+scene.add( helper );
+		</code>
+
+		<h2>Esempi</h2>
+		<p>
+			[example:webgl_camera WebGL / camera]<br/>
+			[example:webgl_geometry_extrude_splines WebGL / extrude / splines]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Camera camera] )</h3>
+		<p>
+		[page:Camera camera] -- La telecamera da visualizzare.<br /><br />
+
+    Crea un nuovo [name] per la telecamera specificata.
+		</p>
+
+    <h2>Proprietà</h2>
+		<p>Vedi la classe base [page:LineSegments] per le proprietà in comune.</p>
+
+		<h3>[property:Camera camera]</h3>
+		<p>La telecamera visualizzata.</p>
+
+		<h3>[property:Object pointMap]</h3>
+		<p>Contiene i punti utilizzati per visualizzare la telecamera.</p>
+
+		<h3>[property:Object matrix]</h3>
+		<p>Riferimento a [page:Object3D.matrixWorld camera.matrixWorld].</p>
+
+		<h3>[property:Object matrixAutoUpdate]</h3>
+		<p>
+			Vedi [page:Object3D.matrixAutoUpdate]. In questo caso è impostato su `false`, poiché l'helper sta usando
+			[page:Object3D.matrixWorld matrixWorld] della telecamera.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:LineSegments] per i metodi comuni.</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+      Elimina il [page:Line.material materiale] e la [page:Line.geometry geometria] utilizzati da questo helper.
+		</p>
+
+		<h3>[method:this setColors]( [param:Color frustum], [param:Color cone], [param:Color up], [param:Color target], [param:Color cross] )</h3>
+		<p>
+      Definisce i colori dell'helper.
+		</p>
+
+		<h3>[method:undefined update]()</h3>
+		<p>Aggiorna l'helper in base alla projectionMatrix della telecamera.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

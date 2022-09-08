@@ -55,11 +55,24 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let container, stats;
 
@@ -101,7 +114,7 @@
 				light.position.set( 0, 0, - 1 ).normalize();
 				sceneRTT.add( light );
 
-				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 
 				material = new THREE.ShaderMaterial( {
 
@@ -121,13 +134,13 @@
 
 				} );
 
-				const plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );
+				const plane = new THREE.PlaneGeometry( window.innerWidth, window.innerHeight );
 
 				quad = new THREE.Mesh( plane, material );
 				quad.position.z = - 100;
 				sceneRTT.add( quad );
 
-				const torusGeometry = new THREE.TorusBufferGeometry( 100, 25, 15, 30 );
+				const torusGeometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
 
 				const mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
 				const mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
@@ -147,7 +160,7 @@
 				sceneScreen.add( quad );
 
 				const n = 5,
-					geometry = new THREE.SphereBufferGeometry( 10, 64, 32 ),
+					geometry = new THREE.SphereGeometry( 10, 64, 32 ),
 					material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: rtTexture.texture } );
 
 				for ( let j = 0; j < n; j ++ ) {
@@ -178,7 +191,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			}
 
@@ -216,13 +229,13 @@
 
 				}
 
-				if ( material.uniforms[ "time" ].value > 1 || material.uniforms[ "time" ].value < 0 ) {
+				if ( material.uniforms[ 'time' ].value > 1 || material.uniforms[ 'time' ].value < 0 ) {
 
 					delta *= - 1;
 
 				}
 
-				material.uniforms[ "time" ].value += delta;
+				material.uniforms[ 'time' ].value += delta;
 
 
 				// Render first scene into texture

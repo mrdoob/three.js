@@ -4,68 +4,27 @@ import { Vector3 } from '../math/Vector3.js';
 
 class WireframeGeometry extends BufferGeometry {
 
-	constructor( geometry ) {
+	constructor( geometry = null ) {
 
 		super();
+
 		this.type = 'WireframeGeometry';
 
-		// buffer
+		this.parameters = {
+			geometry: geometry
+		};
 
-		const vertices = [];
+		if ( geometry !== null ) {
 
-		// helper variables
+			// buffer
 
-		const edge = [ 0, 0 ], edges = {};
-		const keys = [ 'a', 'b', 'c' ];
+			const vertices = [];
+			const edges = new Set();
 
-		// different logic for Geometry and BufferGeometry
+			// helper variables
 
-		if ( geometry && geometry.isGeometry ) {
-
-			// create a data structure that contains all edges without duplicates
-
-			const faces = geometry.faces;
-
-			for ( let i = 0, l = faces.length; i < l; i ++ ) {
-
-				const face = faces[ i ];
-
-				for ( let j = 0; j < 3; j ++ ) {
-
-					const edge1 = face[ keys[ j ] ];
-					const edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
-					edge[ 0 ] = Math.min( edge1, edge2 ); // sorting prevents duplicates
-					edge[ 1 ] = Math.max( edge1, edge2 );
-
-					const key = edge[ 0 ] + ',' + edge[ 1 ];
-
-					if ( edges[ key ] === undefined ) {
-
-						edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ] };
-
-					}
-
-				}
-
-			}
-
-			// generate vertices
-
-			for ( const key in edges ) {
-
-				const e = edges[ key ];
-
-				let vertex = geometry.vertices[ e.index1 ];
-				vertices.push( vertex.x, vertex.y, vertex.z );
-
-				vertex = geometry.vertices[ e.index2 ];
-				vertices.push( vertex.x, vertex.y, vertex.z );
-
-			}
-
-		} else if ( geometry && geometry.isBufferGeometry ) {
-
-			const vertex = new Vector3();
+			const start = new Vector3();
+			const end = new Vector3();
 
 			if ( geometry.index !== null ) {
 
@@ -81,49 +40,35 @@ class WireframeGeometry extends BufferGeometry {
 
 				}
 
-				// create a data structure that contains all eges without duplicates
+				// create a data structure that contains all edges without duplicates
 
 				for ( let o = 0, ol = groups.length; o < ol; ++ o ) {
 
 					const group = groups[ o ];
 
-					const start = group.start;
-					const count = group.count;
+					const groupStart = group.start;
+					const groupCount = group.count;
 
-					for ( let i = start, l = ( start + count ); i < l; i += 3 ) {
+					for ( let i = groupStart, l = ( groupStart + groupCount ); i < l; i += 3 ) {
 
 						for ( let j = 0; j < 3; j ++ ) {
 
-							const edge1 = indices.getX( i + j );
-							const edge2 = indices.getX( i + ( j + 1 ) % 3 );
-							edge[ 0 ] = Math.min( edge1, edge2 ); // sorting prevents duplicates
-							edge[ 1 ] = Math.max( edge1, edge2 );
+							const index1 = indices.getX( i + j );
+							const index2 = indices.getX( i + ( j + 1 ) % 3 );
 
-							const key = edge[ 0 ] + ',' + edge[ 1 ];
+							start.fromBufferAttribute( position, index1 );
+							end.fromBufferAttribute( position, index2 );
 
-							if ( edges[ key ] === undefined ) {
+							if ( isUniqueEdge( start, end, edges ) === true ) {
 
-								edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ] };
+								vertices.push( start.x, start.y, start.z );
+								vertices.push( end.x, end.y, end.z );
 
 							}
 
 						}
 
 					}
-
-				}
-
-				// generate vertices
-
-				for ( const key in edges ) {
-
-					const e = edges[ key ];
-
-					vertex.fromBufferAttribute( position, e.index1 );
-					vertices.push( vertex.x, vertex.y, vertex.z );
-
-					vertex.fromBufferAttribute( position, e.index2 );
-					vertices.push( vertex.x, vertex.y, vertex.z );
 
 				}
 
@@ -141,12 +86,17 @@ class WireframeGeometry extends BufferGeometry {
 						// e.g. the first triangle has the following edges: (0,1),(1,2),(2,0)
 
 						const index1 = 3 * i + j;
-						vertex.fromBufferAttribute( position, index1 );
-						vertices.push( vertex.x, vertex.y, vertex.z );
-
 						const index2 = 3 * i + ( ( j + 1 ) % 3 );
-						vertex.fromBufferAttribute( position, index2 );
-						vertices.push( vertex.x, vertex.y, vertex.z );
+
+						start.fromBufferAttribute( position, index1 );
+						end.fromBufferAttribute( position, index2 );
+
+						if ( isUniqueEdge( start, end, edges ) === true ) {
+
+							vertices.push( start.x, start.y, start.z );
+							vertices.push( end.x, end.y, end.z );
+
+						}
 
 					}
 
@@ -154,11 +104,30 @@ class WireframeGeometry extends BufferGeometry {
 
 			}
 
+			// build geometry
+
+			this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
 		}
 
-		// build geometry
+	}
 
-		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+}
+
+function isUniqueEdge( start, end, edges ) {
+
+	const hash1 = `${start.x},${start.y},${start.z}-${end.x},${end.y},${end.z}`;
+	const hash2 = `${end.x},${end.y},${end.z}-${start.x},${start.y},${start.z}`; // coincident edge
+
+	if ( edges.has( hash1 ) === true || edges.has( hash2 ) === true ) {
+
+		return false;
+
+	} else {
+
+		edges.add( hash1 );
+		edges.add( hash2 );
+		return true;
 
 	}
 

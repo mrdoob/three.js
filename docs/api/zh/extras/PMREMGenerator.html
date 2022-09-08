@@ -42,7 +42,7 @@
 		<p>
 			[page:Texture equirectangular] - The equirectangular texture.<br /><br />
 
-			Generates a PMREM from an equirectangular texture, which can be either LDR (RGBFormat) or HDR (RGBEFormat).
+			Generates a PMREM from an equirectangular texture, which can be either LDR or HDR.
 			The ideal input image size is 1k (1024 x 512), as this matches best with the 256 x 256 cubemap output.
 		</p>
 
@@ -50,21 +50,21 @@
 		<p>
 			[page:CubeTexture cubemap] - The cubemap texture.<br /><br />
 
-			Generates a PMREM from an cubemap texture, which can be either LDR (RGBFormat) or HDR (RGBEFormat).
+			Generates a PMREM from an cubemap texture, which can be either LDR or HDR.
 			The ideal input cube size is 256 x 256, as this matches best with the 256 x 256 cubemap output.
 		</p>
 
-		<h3>[method:void compileCubemapShader]()</h3>
+		<h3>[method:undefined compileCubemapShader]()</h3>
 		<p>
 			Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during your texture's network fetch for increased concurrency.
 		</p>
 
-		<h3>[method:void compileEquirectangularShader]()</h3>
+		<h3>[method:undefined compileEquirectangularShader]()</h3>
 		<p>
 			Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during your texture's network fetch for increased concurrency.
 		</p>
 
-		<h3>[method:void dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 			Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class, so you should not need more than one
 			PMREMGenerator object. If you do, calling dispose() on one of them will cause any others to also become unusable.
