@@ -2527,7 +2527,7 @@ class GLTFMaterialsVolumeExtension {
 
 	writeMaterial( material, materialDef ) {
 
-		if ( ! material.isMeshPhysicalMaterial || material.transmission === 0 ) return;
+		if ( ! material.isMeshPhysicalMaterial || material.transmission === 0 || material.thickness === 0 ) return;
 
 		const writer = this.writer;
 		const extensionsUsed = writer.extensionsUsed;
