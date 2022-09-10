@@ -19,13 +19,6 @@
       che ne provengono sono paralleli.<br /><br />
 
       Questa luce può proiettare le ombre - vedi la pagina [page:DirectionalLightShadow] per i dettagli.
-
-			A light that gets emitted in a specific direction. This light will behave as though it is
-			infinitely far away and the rays produced from it are all parallel. The common use case
-			for this is to simulate daylight; the sun is far enough away that its position can be
-			considered to be infinite, and all light rays coming from it are parallel.<br /><br />
-
-			This light can cast shadows - see the [page:DirectionalLightShadow] page for details.
 		</p>
 
 		<h2>Una nota riguardo la posione, il target e la rotazione</h2>
@@ -34,10 +27,10 @@
       Questo succede perché la DirectionalLight di three.js è l'equivalente di ciò che viene spesso chiamato 
       'Target Direct Light' in altre applicazioni.<br /><br />
 
-      Questo significa che la sua direzione viene valcolata puntando dalla [page:Object3D.position posizione] della luce
+      Questo significa che la sua direzione viene calcolata puntando dalla [page:Object3D.position posizione] della luce
       alla posizione del [page:.target target] (al contrario di una 'Free Direct Light' che ha solo una componente di rotazione).<br /><br />
 
-      La ragione di ciò è consentire alla luce di proiettare ombre - la telecamera per le [page:.shadow ombre]
+      La ragione di ciò è consentire alla luce di proiettare ombre - la telecamera delle [page:.shadow ombre]
       ha bisogno di una posizione da cui calcolare le ombre.<br /><br />
 
       Vedi la proprietà [page:.target target] di seguito per i dettagli sull'aggiornamento del target.
@@ -134,7 +127,7 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-      Sovrascrive l'eliminazione della classe [page:Light.dispose dispose].
+      Sovrascrive il metodo [page:Light.dispose dispose] della classe base.
       Elimina l'[page:DirectionalLightShadow ombra] di questa luce.
 		</p>
 

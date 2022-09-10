@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -12,34 +12,34 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This is used internally by [page:DirectionalLight DirectionalLights] for calculating shadows.<br /><br />
+      Questa classe viene utilizzata internamente da [page:DirectionalLight DirectionalLights] per calcolare le ombre.<br /><br />
 
-			Unlike the other shadow classes, this uses an [page:OrthographicCamera] to calculate the shadows,
-			rather than a [page:PerspectiveCamera]. This is because light rays from a [page:DirectionalLight]
-			are parallel.
+      A differenza delle altre classi Ombra, questa utilizza una [page:OrthographicCamera] per calcolare le ombre,
+      piuttosto che una [page:PerspectiveCamera]. Questo è perché i raggi della luce da una [page:DirectionalLight] sono 
+      paralleli.
 		</p>
 
-		<h2>Code Example</h2>
+		<h2>Codice di Esempio</h2>
 
 		<code>
-		//Create a WebGLRenderer and turn on shadows in the renderer
+		// Crea un WebGLRenderer e attiva le ombre nel renderer
 		const renderer = new THREE.WebGLRenderer();
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 
-		//Create a DirectionalLight and turn on shadows for the light
+		// Crea una DirectionalLight e attiva le ombre per la luce
 		const light = new THREE.DirectionalLight( 0xffffff, 1 );
 		light.position.set( 0, 1, 0 ); //default; light shining from top
 		light.castShadow = true; // default false
 		scene.add( light );
 
-		//Set up shadow properties for the light
+		// Imposta le proprietà dell'ombra per la luce
 		light.shadow.mapSize.width = 512; // default
 		light.shadow.mapSize.height = 512; // default
 		light.shadow.camera.near = 0.5; // default
 		light.shadow.camera.far = 500; // default
 
-		//Create a sphere that cast shadows (but does not receive them)
+		// Crea una sfera che proietta le ombre (ma non le riceve)
 		const sphereGeometry = new THREE.SphereGeometry( 5, 32, 32 );
 		const sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
 		const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
@@ -47,50 +47,49 @@
 		sphere.receiveShadow = false; //default
 		scene.add( sphere );
 
-		//Create a plane that receives shadows (but does not cast them)
+		// Crea un piano che riceve le ombre (ma non le proietta)
 		const planeGeometry = new THREE.PlaneGeometry( 20, 20, 32, 32 );
 		const planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
 		const plane = new THREE.Mesh( planeGeometry, planeMaterial );
 		plane.receiveShadow = true;
 		scene.add( plane );
 
-		//Create a helper for the shadow camera (optional)
+		// Crea un helper per la telecamera ombra (opzionale)
 		const helper = new THREE.CameraHelper( light.shadow.camera );
 		scene.add( helper );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>Costruttore</h2>
 		<h3>[name]( )</h3>
 		<p>
-			Creates a new [name]. This is not intended to be called directly - it is called
-			internally by [page:DirectionalLight].
+			Crea una nuova [name]. Questa classe non deve essere chiamata direttamente - viene 
+      chiamata internamente da [page:DirectionalLight].
 		</p>
 
-		<h2>Properties</h2>
+    <h2>Proprietà</h2>
 		<p>
-			See the base [page:LightShadow LightShadow] class for common properties.
+      Vedi la classe base [page:LightShadow LightShadow] per le proprietà comuni.
 		</p>
 
 		<h3>[property:Camera camera]</h3>
 		<p>
-			The light's view of the world. This is used to generate a depth map of the scene; objects behind
-			other objects from the light's perspective will be in shadow.<br /><br />
+      La visione del mondo della luce. Questo viene utilizzato per generare una mappa di profondità della scena;
+      gli oggetti dietro altri oggetti dalla prospettiva della luce saranno in ombra.<br /><br />
 
-			The default is an [page:OrthographicCamera] with [page:OrthographicCamera.left left] and
-			[page:OrthographicCamera.bottom bottom] set to -5,  [page:OrthographicCamera.right right]
-			and [page:OrthographicCamera.top top] set to 5, the [page:OrthographicCamera.near near]
-			clipping plane at 0.5 and the [page:OrthographicCamera.far far] clipping plane at 500.
+      L'impostazione predefinita è una [page:OrthographicCamera] con [page:OrthographicCamera.left left] e 
+      [page:OrthographicCamera.bottom bottom] impostati a -5, [page:OrthographicCamera.right right]
+			e [page:OrthographicCamera.top top] impostati a 5, il piano [page:OrthographicCamera.near near]
+      imopstato a 0.5 e il piano [page:OrthographicCamera.far far] impostato a 500.
 		</p>
 
 		<h3>[property:Boolean isDirectionalLightShadow]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
 		</p>
 
-
-		<h2>Methods</h2>
+    <h2>Metodi</h2>
 		<p>
-			See the base [page:LightShadow LightShadow] class for common methods.
+      Vedi la classe base [page:LightShadow LightShadow] per i metodi comuni.
 		</p>
 
 		<h2>Source</h2>

@@ -13,9 +13,7 @@
 
 		<p class="desc">
       Una luce che viene emessa da un unico punto in tutte le direzioni. Un caso d'uso comune per 
-      questo è replicare la luce emessa da una lampadina spenta/nuda???.
-			A light that gets emitted from a single point in all directions. A common use case for this
-			is to replicate the light emitted from a bare lightbulb.<br /><br />
+      questo è replicare la luce emessa da una lampadina nuda.<br /><br />
 
       Questa luce può proiettare le ombre - vedi la pagina [page:PointLightShadow] per i dettagli.
 		</p>
@@ -42,7 +40,7 @@ scene.add( light );
 		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Number distance], [param:Float decay] )</h3>
 		<p>
 			[page:Integer color] - (opzionale) Il colore esadecimale della luce. Il valore predefinito è 0xffffff (bianco).<br />
-			[page:Float intensity] - (opzionale) Il valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br /><br />
+			[page:Float intensity] - (opzionale) Il valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br />
 			[page:Number distance] - Portata massima della luce. Il valore predefinito è 0 (nessun limite).<br />
 			[page:Float decay] - La quantità di attenuazione della luce lungo la distanza della luce. Il valore predefinito è 1.
 			Per un'illuminazione [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], impostarlo a 2.<br /><br />
@@ -99,11 +97,11 @@ scene.add( light );
 
 		<h3>[property:PointLightShadow shadow]</h3>
 		<p>
-			Una [page:PointLightShadow] utilizzato per calcolare le ombre per questa luce.<br /><br />
+			Una [page:PointLightShadow] utilizzata per calcolare le ombre per questa luce.<br /><br />
 
       La [page:LightShadow.camera telecamera] di lightShadow è impostata su una [page:PerspectiveCamera]
       con un [page:PerspectiveCamera.fov fov] di 90, [page:PerspectiveCamera.aspect aspect] di 1,
-      [page:PerspectiveCamera.near near] clipping plane di 0.5 e [page:PerspectiveCamera.far far] clipping plane di 500.
+      il piano [page:PerspectiveCamera.near near] a 0.5 e il piano [page:PerspectiveCamera.far far] a 500.
 		</p>
 
 		<h2>Metodi</h2>

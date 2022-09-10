@@ -1148,7 +1148,7 @@
 
 		"Riferimenti": {
 
-			"Animation": {
+			"Animazione": {
 				"AnimationAction": "api/it/animation/AnimationAction",
 				"AnimationClip": "api/it/animation/AnimationClip",
 				"AnimationMixer": "api/it/animation/AnimationMixer",
@@ -1159,7 +1159,7 @@
 				"PropertyMixer": "api/it/animation/PropertyMixer"
 			},
 
-			"Animation / Tracks": {
+			"Animazione / Tracks": {
 				"BooleanKeyframeTrack": "api/it/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/it/animation/tracks/ColorKeyframeTrack",
 				"NumberKeyframeTrack": "api/it/animation/tracks/NumberKeyframeTrack",
@@ -1286,7 +1286,7 @@
 				"SpotLightHelper": "api/it/helpers/SpotLightHelper"
 			},
 
-      "Lights": {
+      "Luci": {
 				"AmbientLight": "api/it/lights/AmbientLight",
 				"AmbientLightProbe": "api/it/lights/AmbientLightProbe",
 				"DirectionalLight": "api/it/lights/DirectionalLight",
@@ -1299,7 +1299,7 @@
 				"SpotLight": "api/it/lights/SpotLight"
 			},
 
-			"Lights / Shadows": {
+			"Luci / Ombre": {
 				"LightShadow": "api/it/lights/shadows/LightShadow",
 				"PointLightShadow": "api/it/lights/shadows/PointLightShadow",
 				"DirectionalLightShadow": "api/it/lights/shadows/DirectionalLightShadow",
