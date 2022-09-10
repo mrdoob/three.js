@@ -27,7 +27,8 @@
 		<p>
 			[page:AnimationMixer mixer] - the `AnimationMixer` that is controlled by this action.<br />
 			[page:AnimationClip clip] - the `AnimationClip` that holds the animation data for this action.<br />
-			[page:Object3D localRoot] - the root object on which this action is performed.<br /><br />
+			[page:Object3D localRoot] - the root object on which this action is performed.<br />
+			[page:Number blendMode] - defines how the animation is blended/combined when two or more animations are simultaneously played.<br /><br />
 
 			Note: Instead of calling this constructor directly you should instantiate an AnimationAction with
 			[page:AnimationMixer.clipAction] since this method provides caching for better performance.
@@ -36,6 +37,11 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Number blendMode]</h3>
+		<p>
+			Defines how the animation is blended/combined when two or more animations are simultaneously played. 
+			Valid values are *NormalAnimationBlendMode* (default) and *AdditiveAnimationBlendMode*.
+		</p>
 
 		<h3>[property:Boolean clampWhenFinished]</h3>
 		<p>

@@ -498,6 +498,13 @@ class PropertyBinding {
 
 				case 'map':
 
+					if ( 'map' in targetObject ) {
+
+						targetObject = targetObject.map;
+						break;
+
+					}
+
 					if ( ! targetObject.material ) {
 
 						console.error( 'THREE.PropertyBinding: Can not bind to material as node does not have a material.', this );
