@@ -1148,7 +1148,7 @@
 
 		"Riferimenti": {
 
-			"Animation": {
+			"Animazione": {
 				"AnimationAction": "api/it/animation/AnimationAction",
 				"AnimationClip": "api/it/animation/AnimationClip",
 				"AnimationMixer": "api/it/animation/AnimationMixer",
@@ -1159,7 +1159,7 @@
 				"PropertyMixer": "api/it/animation/PropertyMixer"
 			},
 
-			"Animation / Tracks": {
+			"Animazione / Tracks": {
 				"BooleanKeyframeTrack": "api/it/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/it/animation/tracks/ColorKeyframeTrack",
 				"NumberKeyframeTrack": "api/it/animation/tracks/NumberKeyframeTrack",
@@ -1168,15 +1168,15 @@
 				"VectorKeyframeTrack": "api/it/animation/tracks/VectorKeyframeTrack"
 			},
 
-      "Audio": {
-        "Audio": "api/it/audio/Audio",
-        "AudioAnalyser": "api/it/audio/AudioAnalyser",
-        "AudioContext": "api/it/audio/AudioContext",
-        "AudioListener": "api/it/audio/AudioListener",
-        "PositionalAudio": "api/it/audio/PositionalAudio"
-		  },
+			"Audio": {
+				"Audio": "api/it/audio/Audio",
+				"AudioAnalyser": "api/it/audio/AudioAnalyser",
+				"AudioContext": "api/it/audio/AudioContext",
+				"AudioListener": "api/it/audio/AudioListener",
+				"PositionalAudio": "api/it/audio/PositionalAudio"
+			},
 
-      "Telecamere": {
+			"Telecamere": {
 				"ArrayCamera": "api/it/cameras/ArrayCamera",
 				"Camera": "api/it/cameras/Camera",
 				"CubeCamera": "api/it/cameras/CubeCamera",
@@ -1185,7 +1185,7 @@
 				"StereoCamera": "api/it/cameras/StereoCamera"
 			},
 
-      "Costanti": {
+			"Costanti": {
 				"Animazione": "api/it/constants/Animation",
 				"Core": "api/it/constants/Core",
 				"CustomBlendingEquation": "api/it/constants/CustomBlendingEquations",
@@ -1195,7 +1195,7 @@
 				"Texture": "api/it/constants/Textures"
 			},
 
-      "Core": {
+			"Core": {
 				"BufferAttribute": "api/it/core/BufferAttribute",
 				"BufferGeometry": "api/it/core/BufferGeometry",
 				"Clock": "api/it/core/Clock",
@@ -1216,7 +1216,7 @@
 				"BufferAttribute Types": "api/it/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-      "Extras": {
+			"Extras": {
 				"DataUtils": "api/it/extras/DataUtils",
 				"Earcut": "api/it/extras/Earcut",
 				"ImageUtils": "api/it/extras/ImageUtils",
@@ -1246,7 +1246,7 @@
 				"SplineCurve": "api/it/extras/curves/SplineCurve"
 			},
 
-      "Geometrie": {
+			"Geometrie": {
 				"BoxGeometry": "api/it/geometries/BoxGeometry",
 				"CapsuleGeometry": "api/it/geometries/CapsuleGeometry",
 				"CircleGeometry": "api/it/geometries/CircleGeometry",
@@ -1284,8 +1284,28 @@
 				"PointLightHelper": "api/it/helpers/PointLightHelper",
 				"SkeletonHelper": "api/it/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/it/helpers/SpotLightHelper"
+			},
+
+			"Luci": {
+				"AmbientLight": "api/it/lights/AmbientLight",
+				"AmbientLightProbe": "api/it/lights/AmbientLightProbe",
+				"DirectionalLight": "api/it/lights/DirectionalLight",
+				"HemisphereLight": "api/it/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/it/lights/HemisphereLightProbe",
+				"Light": "api/it/lights/Light",
+				"LightProbe": "api/it/lights/LightProbe",
+				"PointLight": "api/it/lights/PointLight",
+				"RectAreaLight": "api/it/lights/RectAreaLight",
+				"SpotLight": "api/it/lights/SpotLight"
+			},
+
+			"Luci / Ombre": {
+				"LightShadow": "api/it/lights/shadows/LightShadow",
+				"PointLightShadow": "api/it/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/it/lights/shadows/DirectionalLightShadow",
+				"SpotLightShadow": "api/it/lights/shadows/SpotLightShadow"
 			}
-    }
+		}
 	},
 	"pt-br": {
 
