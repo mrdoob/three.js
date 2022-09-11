@@ -32,7 +32,7 @@ const _trackRe = new RegExp( ''
 	+ '$'
 );
 
-const _supportedObjectNames = [ 'material', 'materials', 'bones', 'map' ];
+const _supportedObjectNames = [ 'material', 'materials', 'bones', 'map', 'rotation' ];
 
 class Composite {
 
