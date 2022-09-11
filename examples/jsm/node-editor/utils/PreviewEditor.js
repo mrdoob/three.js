@@ -86,6 +86,8 @@ export class PreviewEditor extends BaseNode {
 		previewElement.dom.append( canvas );
 		previewElement.setHeight( height );
 
+		previewElement.dom.addEventListener( 'wheel', e => e.stopPropagation() );
+
 		const renderer = new WebGLRenderer( {
 			canvas,
 			alpha: true
