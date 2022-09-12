@@ -54,11 +54,22 @@
 
 			const _position = new THREE.Vector3();
 			const _normal = new THREE.Vector3();
+			const _color = new THREE.Color();
 			const _scale = new THREE.Vector3();
 
 			// let surfaceGeometry = new THREE.BoxGeometry( 10, 10, 10 ).toNonIndexed();
 			const surfaceGeometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 ).toNonIndexed();
-			const surfaceMaterial = new THREE.MeshLambertMaterial( { color: api.surfaceColor, wireframe: false } );
+
+			const textureLoader = new THREE.TextureLoader();
+			const texture = textureLoader.load( './textures/colors.png' );
+
+			// const texture = new THREE.Texture(undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping)
+			texture.flipY = false;
+			texture.wrapS = THREE.RepeatWrapping;
+			texture.wrapT = THREE.RepeatWrapping;
+
+			const surfaceMaterial = new THREE.MeshLambertMaterial( { map: texture, wireframe: false } );
+
 			const surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
 
 			// Source: https://gist.github.com/gre/1650294
@@ -99,16 +110,9 @@
 				stemMesh = new THREE.InstancedMesh( stemGeometry, stemMaterial, count );
 				blossomMesh = new THREE.InstancedMesh( blossomGeometry, blossomMaterial, count );
 
-				// Assign random colors to the blossoms.
-				const color = new THREE.Color();
-				const blossomPalette = [ 0xF20587, 0xF2D479, 0xF2C879, 0xF2B077, 0xF24405 ];
+				// Flower colors assigned from surface material texture
 
-				for ( let i = 0; i < count; i ++ ) {
 
-					color.setHex( blossomPalette[ Math.floor( Math.random() * blossomPalette.length ) ] );
-					blossomMesh.setColorAt( i, color );
-
-				}
 
 				// Instance matrices will be updated every frame.
 				stemMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
@@ -226,7 +230,7 @@
 
 			function resampleParticle( i ) {
 
-				sampler.sample( _position, _normal );
+				sampler.sample( _position, _normal, _color );
 				_normal.add( _position );
 
 				dummy.position.copy( _position );
@@ -236,6 +240,7 @@
 
 				stemMesh.setMatrixAt( i, dummy.matrix );
 				blossomMesh.setMatrixAt( i, dummy.matrix );
+				blossomMesh.setColorAt( i, _color );
 
 			}
 
@@ -309,6 +314,7 @@
 
 					stemMesh.instanceMatrix.needsUpdate = true;
 					blossomMesh.instanceMatrix.needsUpdate = true;
+					blossomMesh.instanceColor.needsUpdate = true;
 
 				}
 
