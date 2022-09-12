@@ -18,7 +18,6 @@ import {
 const _face = new Triangle();
 const _color = new Vector3();
 const _uv = new Vector3();
-const _targetUV = new Vector2();
 const _uv1 = new Vector2();
 const _uv2 = new Vector2();
 const _uv3 = new Vector2();
@@ -135,13 +134,13 @@ class MeshSurfaceSampler {
 
 	}
 
-	sample( targetPosition, targetNormal, targetColor ) {
+	  sample( targetPosition, targetNormal, targetColor, targetUV ) {
 
 		const cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
 
 		const faceIndex = this.binarySearch( this.randomFunction() * cumulativeTotal );
 
-		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor );
+		return this.sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV );
 
 	}
 
@@ -185,7 +184,7 @@ class MeshSurfaceSampler {
 
 	}
 
-	sampleFace( faceIndex, targetPosition, targetNormal, targetColor ) {
+	sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV ) {
 
 		let u = this.randomFunction();
 		let v = this.randomFunction();
@@ -239,11 +238,10 @@ class MeshSurfaceSampler {
 
 			_uv3.fromBufferAttribute( this.uvAttribute, faceIndex * 3 + 2 );
 
-			_face.getUV( _uv, _uv1, _uv2, _uv3, _targetUV );
+			_face.getUV( _uv, _uv1, _uv2, _uv3, targetUV );
 
-
-			u = _targetUV.x;
-			v = _targetUV.y;
+			u = targetUV.x;
+			v = targetUV.y;
 
 			const tx = Math.min( this.emod( u, 1 ) * this.colorMapData.width | 0, this.colorMapData.width - 1 );
 			const ty = Math.min( this.emod( v, 1 ) * this.colorMapData.height | 0, this.colorMapData.height - 1 );
