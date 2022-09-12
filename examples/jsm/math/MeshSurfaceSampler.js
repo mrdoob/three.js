@@ -1,7 +1,7 @@
 import {
 	Triangle,
 	Vector3,
-	Vector2,
+	Vector2
 } from 'three';
 
 /**
@@ -135,7 +135,7 @@ class MeshSurfaceSampler {
 
 	}
 
-	  sample( targetPosition, targetNormal, targetColor, targetUV ) {
+	sample( targetPosition, targetNormal, targetColor, targetUV ) {
 
 		const cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
 
@@ -179,11 +179,6 @@ class MeshSurfaceSampler {
 
 	}
 
-	emod( n, m ) {
-
-		return ( ( n % m ) + m ) % m;
-
-	}
 
 	sampleFace( faceIndex, targetPosition, targetNormal, targetColor, targetUV = _targetUV ) {
 
@@ -244,8 +239,14 @@ class MeshSurfaceSampler {
 			u = targetUV.x;
 			v = targetUV.y;
 
-			const tx = Math.min( this.emod( u, 1 ) * this.colorMapData.width | 0, this.colorMapData.width - 1 );
-			const ty = Math.min( this.emod( v, 1 ) * this.colorMapData.height | 0, this.colorMapData.height - 1 );
+			function emod( n, m ) {
+
+				return ( ( n % m ) + m ) % m;
+
+			}
+
+			const tx = Math.min( emod( u, 1 ) * this.colorMapData.width | 0, this.colorMapData.width - 1 );
+			const ty = Math.min( emod( v, 1 ) * this.colorMapData.height | 0, this.colorMapData.height - 1 );
 			const offset = ( ty * this.colorMapData.width + tx ) * 4;
 
 			targetColor.r = this.colorMapData.data[ offset ] / 255;
