@@ -1,6 +1,7 @@
 import {
 	Triangle,
-	Vector3
+	Vector3,
+	Vector2,
 } from 'three';
 
 /**
@@ -16,12 +17,19 @@ import {
 
 const _face = new Triangle();
 const _color = new Vector3();
+const _uv = new Vector3();
+const _targetUV = new Vector2();
+const _uv1 = new Vector2();
+const _uv2 = new Vector2();
+const _uv3 = new Vector2();
+
 
 class MeshSurfaceSampler {
 
 	constructor( mesh ) {
 
 		let geometry = mesh.geometry;
+		const material = mesh.material;
 
 		if ( ! geometry.isBufferGeometry || geometry.attributes.position.itemSize !== 3 ) {
 
@@ -42,6 +50,21 @@ class MeshSurfaceSampler {
 
 		this.positionAttribute = this.geometry.getAttribute( 'position' );
 		this.colorAttribute = this.geometry.getAttribute( 'color' );
+		this.uvAttribute = this.geometry.getAttribute( 'uv' );
+
+		if ( material.map ) {
+
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = material.map.image.width;
+			canvas.height = material.map.image.height;
+
+			const context = canvas.getContext( '2d' );
+			context.drawImage( material.map.image, 0, 0 );
+
+			this.colorMapData = context.getImageData( 0, 0, canvas.width, canvas.height );
+
+		}
+
 		this.weightAttribute = null;
 
 		this.distribution = null;
@@ -156,6 +179,12 @@ class MeshSurfaceSampler {
 
 	}
 
+	emod( n, m ) {
+
+		return ( ( n % m ) + m ) % m;
+
+	}
+
 	sampleFace( faceIndex, targetPosition, targetNormal, targetColor ) {
 
 		let u = this.randomFunction();
@@ -199,6 +228,30 @@ class MeshSurfaceSampler {
 			targetColor.r = _color.x;
 			targetColor.g = _color.y;
 			targetColor.b = _color.z;
+
+		} else if ( targetColor !== undefined && this.uvAttribute !== undefined ) {
+
+			_uv.set( 0, 0, 0 ).addScaledVector( _face.a, u ).addScaledVector( _face.b, v ).addScaledVector( _face.c, 1 - ( u + v ) );
+
+			_uv1.fromBufferAttribute( this.uvAttribute, faceIndex * 3 );
+
+			_uv2.fromBufferAttribute( this.uvAttribute, faceIndex * 3 + 1 );
+
+			_uv3.fromBufferAttribute( this.uvAttribute, faceIndex * 3 + 2 );
+
+			_face.getUV( _uv, _uv1, _uv2, _uv3, _targetUV );
+
+
+			u = _targetUV.x;
+			v = _targetUV.y;
+
+			const tx = Math.min( this.emod( u, 1 ) * this.colorMapData.width | 0, this.colorMapData.width - 1 );
+			const ty = Math.min( this.emod( v, 1 ) * this.colorMapData.height | 0, this.colorMapData.height - 1 );
+			const offset = ( ty * this.colorMapData.width + tx ) * 4;
+
+			targetColor.r = this.colorMapData.data[ offset ] / 255;
+			targetColor.g = this.colorMapData.data[ offset + 1 ] / 255;
+			targetColor.b = this.colorMapData.data[ offset + 2 ] / 255;
 
 		}
 
