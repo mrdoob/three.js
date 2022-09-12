@@ -103,59 +103,51 @@ function WebGLState( gl, extensions, capabilities ) {
 
 				if ( currentDepthFunc !== depthFunc ) {
 
-					if ( depthFunc ) {
+					switch ( depthFunc ) {
 
-						switch ( depthFunc ) {
+						case NeverDepth:
 
-							case NeverDepth:
+							gl.depthFunc( gl.NEVER );
+							break;
 
-								gl.depthFunc( gl.NEVER );
-								break;
+						case AlwaysDepth:
 
-							case AlwaysDepth:
+							gl.depthFunc( gl.ALWAYS );
+							break;
 
-								gl.depthFunc( gl.ALWAYS );
-								break;
+						case LessDepth:
 
-							case LessDepth:
+							gl.depthFunc( gl.LESS );
+							break;
 
-								gl.depthFunc( gl.LESS );
-								break;
+						case LessEqualDepth:
 
-							case LessEqualDepth:
+							gl.depthFunc( gl.LEQUAL );
+							break;
 
-								gl.depthFunc( gl.LEQUAL );
-								break;
+						case EqualDepth:
 
-							case EqualDepth:
+							gl.depthFunc( gl.EQUAL );
+							break;
 
-								gl.depthFunc( gl.EQUAL );
-								break;
+						case GreaterEqualDepth:
 
-							case GreaterEqualDepth:
+							gl.depthFunc( gl.GEQUAL );
+							break;
 
-								gl.depthFunc( gl.GEQUAL );
-								break;
+						case GreaterDepth:
 
-							case GreaterDepth:
+							gl.depthFunc( gl.GREATER );
+							break;
 
-								gl.depthFunc( gl.GREATER );
-								break;
+						case NotEqualDepth:
 
-							case NotEqualDepth:
+							gl.depthFunc( gl.NOTEQUAL );
+							break;
 
-								gl.depthFunc( gl.NOTEQUAL );
-								break;
+						default:
 
-							default:
-
-								gl.depthFunc( gl.LEQUAL );
-
-						}
-
-					} else {
-
-						gl.depthFunc( gl.LEQUAL );
+							gl.depthFunc( gl.LEQUAL );
 
 					}
 
