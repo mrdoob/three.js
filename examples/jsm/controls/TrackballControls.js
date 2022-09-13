@@ -702,13 +702,18 @@ class TrackballControls extends EventDispatcher {
 					_state = STATE.TOUCH_ZOOM_PAN;
 
 					for ( let i = 0; i < _pointers.length; i ++ ) {
-						if ( _pointers[ i ].pointerId != event.pointerId ) {
-							let position = _pointerPositions[ _pointers[ i ].pointerId ];
+
+						if ( _pointers[ i ].pointerId !== event.pointerId ) {
+
+							const position = _pointerPositions[ _pointers[ i ].pointerId ];
 							_moveCurr.copy( getMouseOnCircle( position.x, position.y ) );
 							_movePrev.copy( _moveCurr );
 							break;
+
 						}
+
 					}
+
 					break;
 
 			}
