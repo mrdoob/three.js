@@ -191,7 +191,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 			program.getUniforms().setValue( gl, 'morphTargetInfluences', objectInfluences );
 
 			program.getUniforms().setValue( gl, 'morphTargetsTexture', entry.texture, textures );
-			program.getUniforms().setValue( gl, 'morphTargetsTextureSize', entry.size );
+			program.getUniforms().setValue( gl, 'morphTargetsTextureSize', [ entry.size.x, entry.size.y ] );
 
 
 		} else {
