@@ -18,5 +18,10 @@
   },
   "dependencies": {
     "three": "file:.."
+  },
+  "overrides": {
+    "jimp": {
+      "jpeg-js": "^0.4.4"
+    }
   }
 }
