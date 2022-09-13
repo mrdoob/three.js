@@ -1018,7 +1018,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		// render scene
 
-		currentRenderState.setupLights( _this.physicallyCorrectLights );
+		currentRenderState.setupLights( _this.physicallyCorrectLights, scene.iesProfiles );
 
 		if ( camera.isArrayCamera ) {
 
@@ -1428,6 +1428,7 @@ function WebGLRenderer( parameters = {} ) {
 			uniforms.directionalShadowMap.value = lights.state.directionalShadowMap;
 			uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix;
 			uniforms.iesProfiles.value = lights.state.iesProfiles;
+			uniforms.numIESProfiles.value = ( lights.state.iesProfiles === null ) ? 0 : lights.state.iesProfiles.image.height;
 			uniforms.spotShadowMap.value = lights.state.spotShadowMap;
 			uniforms.spotShadowMatrix.value = lights.state.spotShadowMatrix;
 			uniforms.pointShadowMap.value = lights.state.pointShadowMap;

@@ -85,11 +85,11 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 
 }
 
-float getPhotometricAttenuation( sampler2D iesProfile, float angleCosine ) {
+float getPhotometricAttenuation( const in sampler2D iesProfiles, const in float numIESProfiles, const in float iesProfile, const in float angleCosine ) {
 
     float angle = acos( angleCosine ) * ( 1.0 / PI );
 
-    return texture2D( iesProfile, vec2( 0.0, angle ) ).r;
+    return texture2D( iesProfiles, vec2( angle, ( iesProfile + 0.5 ) / numIESProfiles ) ).r;
 
 }
 
@@ -152,11 +152,13 @@ float getPhotometricAttenuation( sampler2D iesProfile, float angleCosine ) {
 		float decay;
 		float coneCos;
 		float penumbraCos;
-		bool hasIESProfile;
+		float iesProfile;
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
-	uniform sampler2D iesProfiles[ NUM_SPOT_LIGHTS ];
+
+	uniform sampler2D iesProfiles;
+	uniform float numIESProfiles;
 
 	// light is an out parameter as having it as a return value caused compiler errors on some devices
 	void getSpotLightInfo( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight light ) {
@@ -186,7 +188,7 @@ float getPhotometricAttenuation( sampler2D iesProfile, float angleCosine ) {
 
 	}
 
-	void getIESSpotLightInfo( const in SpotLight spotLight, const in sampler2D iesProfile, const in GeometricContext geometry, out IncidentLight light ) {
+	void getIESSpotLightInfo( const in SpotLight spotLight, const in sampler2D iesProfiles, const in float iesProfile, const in GeometricContext geometry, out IncidentLight light ) {
 
 		vec3 lVector = spotLight.position - geometry.position;
 
@@ -194,7 +196,7 @@ float getPhotometricAttenuation( sampler2D iesProfile, float angleCosine ) {
 
 		float angleCos = dot( light.direction, spotLight.direction );
 
-		float spotAttenuation = getPhotometricAttenuation( iesProfile, angleCos );
+		float spotAttenuation = getPhotometricAttenuation( iesProfiles, numIESProfiles, iesProfile, angleCos );
 
 		if ( spotAttenuation > 0.0 ) {
 

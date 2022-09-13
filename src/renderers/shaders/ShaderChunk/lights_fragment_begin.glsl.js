@@ -91,9 +91,9 @@ IncidentLight directLight;
 
 		spotLight = spotLights[ i ];
 
-		if ( spotLight.hasIESProfile ) {
+		if ( spotLight.iesProfile != - 1.0 ) {
 
-			getIESSpotLightInfo( spotLight, iesProfiles[ i ], geometry, directLight );
+			getIESSpotLightInfo( spotLight, iesProfiles, spotLight.iesProfile, geometry, directLight );
 
 		} else {
 

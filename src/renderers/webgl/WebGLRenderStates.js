@@ -26,9 +26,10 @@ function WebGLRenderState( extensions, capabilities ) {
 
 	}
 
-	function setupLights( physicallyCorrectLights ) {
+	function setupLights( physicallyCorrectLights, iesProfiles ) {
 
 		lights.setup( lightsArray, physicallyCorrectLights );
+		lights.state.iesProfiles = iesProfiles;
 
 	}
 

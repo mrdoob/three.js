@@ -286,26 +286,11 @@ class IESLoader extends Loader {
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
 
-		const texture = new DataTexture( null, 360, 180, RedFormat, FloatType );
-		texture.minFilter = LinearFilter;
-		texture.magFilter = LinearFilter;
-
 		loader.load( url, text => {
 
-			const iesLamp = new IESLamp( text );
-
-			texture.image.data = this._getIESValues( iesLamp );
-			texture.needsUpdate = true;
-
-			if ( onLoad !== undefined ) {
-
-				onLoad( texture );
-
-			}
+			onLoad( this._getIESValues( new IESLamp( text ) ) );
 
 		}, onProgress, onError );
-
-		return texture;
 
 	}
 

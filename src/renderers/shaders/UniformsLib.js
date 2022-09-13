@@ -128,7 +128,8 @@ const UniformsLib = {
 		directionalShadowMap: { value: [] },
 		directionalShadowMatrix: { value: [] },
 
-		iesProfiles: { value: [] },
+		iesProfiles: { value: null },
+		numIESProfiles: { value: - 1.0 },
 
 		spotLights: { value: [], properties: {
 			color: {},
@@ -138,7 +139,7 @@ const UniformsLib = {
 			coneCos: {},
 			penumbraCos: {},
 			decay: {},
-			hasIESProfile: false
+			iesProfile: { value: - 1.0 }
 		} },
 
 		spotLightShadows: { value: [], properties: {

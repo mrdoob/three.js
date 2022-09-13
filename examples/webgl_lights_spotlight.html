@@ -32,13 +32,13 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			import { IESLoader } from './jsm/loaders/IESLoader.js';
+			import { IESTexture } from './jsm/textures/IESTexture.js';
 
 			let renderer, scene, camera;
 
-			let spotLight, lightHelper, shadowCameraHelper;
+			//let spotLight, lightHelper, lightHelper2, shadowCameraHelper, shadowCameraHelper2;
 
-			let gui;
+			//let gui;
 
 			function init() {
 
@@ -66,15 +66,29 @@
 				const ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
 
-				const iesProfile = new IESLoader().load( 'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/02a7562c650498ebb301153dbbf59207.ies' )
+				const iesProfilesTexture = new IESTexture( [
 
-				spotLight = new THREE.SpotLight( 0xffffff, 2 );
-				spotLight.position.set( 15, 40, 35 );
-				spotLight.angle = Math.PI / 4;
+					'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/007cfb11e343e2f42e3b476be4ab684e.ies',
+
+					'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/06b4cfdc8805709e767b5e2e904be8ad.ies',
+
+					//'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/02a7562c650498ebb301153dbbf59207.ies'
+
+				] );
+
+				// iesProfilesTexture.add( 'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/007cfb11e343e2f42e3b476be4ab684e.ies' );
+				// iesProfilesTexture.add( 'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/06b4cfdc8805709e767b5e2e904be8ad.ies' );
+				iesProfilesTexture.add( 'https://raw.githubusercontent.com/gkjohnson/3d-demo-data/main/ies/02a7562c650498ebb301153dbbf59207.ies' );
+
+				scene.iesProfiles = iesProfilesTexture;
+
+				const spotLight = new THREE.SpotLight( 0xff0000, 5 );
+				spotLight.position.set( 65, 15, 65 );
+				spotLight.angle = Math.PI / 8;
 				spotLight.penumbra = 0.1;
 				spotLight.decay = 2;
 				spotLight.distance = 200;
-				spotLight.iesProfile = iesProfile;
+				spotLight.iesProfile = 0;
 
 				spotLight.castShadow = true;
 				spotLight.shadow.mapSize.width = 512;
@@ -84,11 +98,80 @@
 				spotLight.shadow.focus = 1;
 				scene.add( spotLight );
 
-				lightHelper = new THREE.SpotLightHelper( spotLight );
-				scene.add( lightHelper );
+				// lightHelper = new THREE.SpotLightHelper( spotLight );
+				// scene.add( lightHelper );
 
-				shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera );
-				scene.add( shadowCameraHelper );
+				// shadowCameraHelper = new THREE.CameraHelper( spotLight.shadow.camera );
+				// scene.add( shadowCameraHelper );
+
+				//
+				const spotLight2 = new THREE.SpotLight( 0x00ff00, 5 );
+				spotLight2.position.set( 65, 15, -65 );
+				spotLight2.angle = Math.PI / 8;
+				spotLight2.penumbra = 0.1;
+				spotLight2.decay = 2;
+				spotLight2.distance = 200;
+				spotLight2.iesProfile = 1;
+
+				spotLight2.castShadow = true;
+				spotLight2.shadow.mapSize.width = 512;
+				spotLight2.shadow.mapSize.height = 512;
+				spotLight2.shadow.camera.near = 10;
+				spotLight2.shadow.camera.far = 200;
+				spotLight2.shadow.focus = 1;
+				scene.add( spotLight2 );
+
+				// lightHelper2 = new THREE.SpotLightHelper( spotLight2 );
+				// scene.add( lightHelper2 );
+
+				// shadowCameraHelper2 = new THREE.CameraHelper( spotLight2.shadow.camera );
+				// scene.add( shadowCameraHelper2 );
+
+				//
+				const spotLight3 = new THREE.SpotLight( 0x0000ff, 5 );
+				spotLight3.position.set( -65, 15, -65 );
+				spotLight3.angle = Math.PI / 8;
+				spotLight3.penumbra = 0.1;
+				spotLight3.decay = 2;
+				spotLight3.distance = 200;
+				spotLight3.iesProfile = 2;
+
+				spotLight3.castShadow = true;
+				spotLight3.shadow.mapSize.width = 512;
+				spotLight3.shadow.mapSize.height = 512;
+				spotLight3.shadow.camera.near = 10;
+				spotLight3.shadow.camera.far = 200;
+				spotLight3.shadow.focus = 1;
+				scene.add( spotLight3 );
+
+				// lightHelper3 = new THREE.SpotLightHelper( spotLight2 );
+				// scene.add( lightHelper2 );
+
+				// shadowCameraHelper2 = new THREE.CameraHelper( spotLight2.shadow.camera );
+				// scene.add( shadowCameraHelper2 );
+
+				//
+				const spotLight4 = new THREE.SpotLight( 0xffffff, 5 );
+				spotLight4.position.set( -65, 15, 65 );
+				spotLight4.angle = Math.PI / 8;
+				spotLight4.penumbra = 0.1;
+				spotLight4.decay = 2;
+				spotLight4.distance = 200;
+				// spotLight4.iesProfile = 2;
+
+				spotLight4.castShadow = true;
+				spotLight4.shadow.mapSize.width = 512;
+				spotLight4.shadow.mapSize.height = 512;
+				spotLight4.shadow.camera.near = 10;
+				spotLight4.shadow.camera.far = 200;
+				spotLight4.shadow.focus = 1;
+				scene.add( spotLight4 );
+
+				// lightHelper3 = new THREE.SpotLightHelper( spotLight2 );
+				// scene.add( lightHelper2 );
+
+				// shadowCameraHelper2 = new THREE.CameraHelper( spotLight2.shadow.camera );
+				// scene.add( shadowCameraHelper2 );
 
 				//
 
@@ -130,85 +213,87 @@
 
 			function render() {
 
-				lightHelper.update();
+				// lightHelper.update();
+				// lightHelper2.update();
 
-				shadowCameraHelper.update();
+				// shadowCameraHelper.update();
+				// shadowCameraHelper2.update();
 
 				renderer.render( scene, camera );
 
 			}
 
-			function buildGui() {
+			// function buildGui() {
 
-				gui = new GUI();
+			// 	gui = new GUI();
 
-				const params = {
-					'light color': spotLight.color.getHex(),
-					intensity: spotLight.intensity,
-					distance: spotLight.distance,
-					angle: spotLight.angle,
-					penumbra: spotLight.penumbra,
-					decay: spotLight.decay,
-					focus: spotLight.shadow.focus
-				};
+			// 	const params = {
+			// 		'light color': spotLight.color.getHex(),
+			// 		intensity: spotLight.intensity,
+			// 		distance: spotLight.distance,
+			// 		angle: spotLight.angle,
+			// 		penumbra: spotLight.penumbra,
+			// 		decay: spotLight.decay,
+			// 		focus: spotLight.shadow.focus
+			// 	};
 
-				gui.addColor( params, 'light color' ).onChange( function ( val ) {
+			// 	gui.addColor( params, 'light color' ).onChange( function ( val ) {
 
-					spotLight.color.setHex( val );
-					render();
+			// 		spotLight.color.setHex( val );
+			// 		render();
 
-				} );
+			// 	} );
 
-				gui.add( params, 'intensity', 0, 2 ).onChange( function ( val ) {
+			// 	gui.add( params, 'intensity', 0, 2 ).onChange( function ( val ) {
 
-					spotLight.intensity = val;
-					render();
+			// 		spotLight.intensity = val;
+			// 		render();
 
-				} );
+			// 	} );
 
 
-				gui.add( params, 'distance', 50, 200 ).onChange( function ( val ) {
+			// 	gui.add( params, 'distance', 50, 200 ).onChange( function ( val ) {
 
-					spotLight.distance = val;
-					render();
+			// 		spotLight.distance = val;
+			// 		render();
 
-				} );
+			// 	} );
 
-				gui.add( params, 'angle', 0, Math.PI / 3 ).onChange( function ( val ) {
+			// 	gui.add( params, 'angle', 0, Math.PI / 3 ).onChange( function ( val ) {
 
-					spotLight.angle = val;
-					render();
+			// 		spotLight.angle = val;
+			// 		render();
 
-				} );
+			// 	} );
 
-				gui.add( params, 'penumbra', 0, 1 ).onChange( function ( val ) {
+			// 	gui.add( params, 'penumbra', 0, 1 ).onChange( function ( val ) {
 
-					spotLight.penumbra = val;
-					render();
+			// 		spotLight.penumbra = val;
+			// 		render();
 
-				} );
+			// 	} );
 
-				gui.add( params, 'decay', 1, 2 ).onChange( function ( val ) {
+			// 	gui.add( params, 'decay', 1, 2 ).onChange( function ( val ) {
 
-					spotLight.decay = val;
-					render();
+			// 		spotLight.decay = val;
+			// 		render();
 
-				} );
+			// 	} );
 
-				gui.add( params, 'focus', 0, 1 ).onChange( function ( val ) {
+			// 	gui.add( params, 'focus', 0, 1 ).onChange( function ( val ) {
 
-					spotLight.shadow.focus = val;
-					render();
+			// 		spotLight.shadow.focus = val;
+			// 		render();
 
-				} );
+			// 	} );
 
-				gui.open();
+			// 	gui.open();
 
-			}
+			// }
 
 			init();
 
-			buildGui();
+			// buildGui();
 
 			render();
 
