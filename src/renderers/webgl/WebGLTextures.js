@@ -460,7 +460,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.bindTextureToSlot( _gl.TEXTURE0 + slot, _gl.TEXTURE_2D, textureProperties.__webglTexture );
+		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture, _gl.TEXTURE0 + slot );
 
 	}
 
@@ -475,7 +475,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.bindTextureToSlot( _gl.TEXTURE0 + slot, _gl.TEXTURE_2D_ARRAY, textureProperties.__webglTexture );
+		state.bindTexture( _gl.TEXTURE_2D_ARRAY, textureProperties.__webglTexture, _gl.TEXTURE0 + slot );
 
 	}
 
@@ -490,7 +490,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.bindTextureToSlot( _gl.TEXTURE0 + slot, _gl.TEXTURE_3D, textureProperties.__webglTexture );
+		state.bindTexture( _gl.TEXTURE_3D, textureProperties.__webglTexture, _gl.TEXTURE0 + slot );
 
 	}
 
@@ -505,7 +505,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.bindTextureToSlot( _gl.TEXTURE0 + slot, _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
+		state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture, _gl.TEXTURE0 + slot );
 
 	}
 
@@ -677,7 +677,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const forceUpload = initTexture( textureProperties, texture );
 		const source = texture.source;
 
-		state.bindTextureToSlot( _gl.TEXTURE0 + slot, textureType, textureProperties.__webglTexture );
+		state.bindTexture( textureType, textureProperties.__webglTexture, _gl.TEXTURE0 + slot );
 
 		if ( source.version !== source.__currentVersion || forceUpload === true ) {
 
@@ -1037,7 +1037,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const forceUpload = initTexture( textureProperties, texture );
 		const source = texture.source;
 
-		state.bindTextureToSlot( _gl.TEXTURE0 + slot, _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
+		state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture, _gl.TEXTURE0 + slot );
 
 		if ( source.version !== source.__currentVersion || forceUpload === true ) {
 
