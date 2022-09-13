@@ -221,8 +221,8 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Disposes the object from memory. <br />
-		You need to call this when you want the BufferGeometry removed while the application is running.
+		When a BufferGeometry is rendered, it allocates WebGL resources which can only be disposed of by calling this method.
+		For more details read: [link:https://threejs.org/docs/index.html#manual/en/introduction/How-to-dispose-of-objects How to dispose of objects].
 		</p>
 
 		<h3>[method:BufferAttribute getAttribute]( [param:String name] )</h3>
