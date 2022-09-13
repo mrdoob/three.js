@@ -16246,22 +16246,31 @@
 			}
 		}
 
-		function bindTexture(webglType, webglTexture) {
-			if (currentTextureSlot === null) {
-				activeTexture();
+		function bindTexture(webglType, webglTexture, webglSlot) {
+			if (webglSlot === undefined) {
+				if (currentTextureSlot === null) {
+					webglSlot = gl.TEXTURE0 + maxTextures - 1;
+				} else {
+					webglSlot = currentTextureSlot;
+				}
 			}
 
-			let boundTexture = currentBoundTextures[currentTextureSlot];
+			let boundTexture = currentBoundTextures[webglSlot];
 
 			if (boundTexture === undefined) {
 				boundTexture = {
 					type: undefined,
 					texture: undefined
 				};
-				currentBoundTextures[currentTextureSlot] = boundTexture;
+				currentBoundTextures[webglSlot] = boundTexture;
 			}
 
 			if (boundTexture.type !== webglType || boundTexture.texture !== webglTexture) {
+				if (currentTextureSlot !== webglSlot) {
+					gl.activeTexture(webglSlot);
+					currentTextureSlot = webglSlot;
+				}
+
 				gl.bindTexture(webglType, webglTexture || emptyTextures[webglType]);
 				boundTexture.type = webglType;
 				boundTexture.texture = webglTexture;
@@ -16796,8 +16805,7 @@
 				}
 			}
 
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_2D, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_2D, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 		}
 
 		function setTexture2DArray(texture, slot) {
@@ -16808,8 +16816,7 @@
 				return;
 			}
 
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_2D_ARRAY, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_2D_ARRAY, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 		}
 
 		function setTexture3D(texture, slot) {
@@ -16820,8 +16827,7 @@
 				return;
 			}
 
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_3D, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_3D, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 		}
 
 		function setTextureCube(texture, slot) {
@@ -16832,8 +16838,7 @@
 				return;
 			}
 
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 		}
 
 		const wrappingToGL = {
@@ -16962,11 +16967,12 @@
 			if (texture.isData3DTexture) textureType = _gl.TEXTURE_3D;
 			const forceUpload = initTexture(textureProperties, texture);
 			const source = texture.source;
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(textureType, textureProperties.__webglTexture);
+			state.bindTexture(textureType, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 			const sourceProperties = properties.get(source);
 
 			if (source.version !== sourceProperties.__version || forceUpload === true) {
+				state.activeTexture(_gl.TEXTURE0 + slot);
+
 				_gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
 
 				_gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
@@ -17184,11 +17190,12 @@
 			if (texture.image.length !== 6) return;
 			const forceUpload = initTexture(textureProperties, texture);
 			const source = texture.source;
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 			const sourceProperties = properties.get(source);
 
 			if (source.version !== sourceProperties.__version || forceUpload === true) {
+				state.activeTexture(_gl.TEXTURE0 + slot);
+
 				_gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
 
 				_gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
