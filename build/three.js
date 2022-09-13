@@ -13457,9 +13457,14 @@
 
 
 	function setValueT1Array(gl, v, textures) {
+		const cache = this.cache;
 		const n = v.length;
 		const units = allocTexUnits(textures, n);
-		gl.uniform1iv(this.addr, units);
+
+		if (!arraysEqual(cache, units)) {
+			gl.uniform1iv(this.addr, units);
+			copyArray(cache, units);
+		}
 
 		for (let i = 0; i !== n; ++i) {
 			textures.setTexture2D(v[i] || emptyTexture, units[i]);
@@ -13467,9 +13472,14 @@
 	}
 
 	function setValueT3DArray(gl, v, textures) {
+		const cache = this.cache;
 		const n = v.length;
 		const units = allocTexUnits(textures, n);
-		gl.uniform1iv(this.addr, units);
+
+		if (!arraysEqual(cache, units)) {
+			gl.uniform1iv(this.addr, units);
+			copyArray(cache, units);
+		}
 
 		for (let i = 0; i !== n; ++i) {
 			textures.setTexture3D(v[i] || empty3dTexture, units[i]);
@@ -13477,9 +13487,14 @@
 	}
 
 	function setValueT6Array(gl, v, textures) {
+		const cache = this.cache;
 		const n = v.length;
 		const units = allocTexUnits(textures, n);
-		gl.uniform1iv(this.addr, units);
+
+		if (!arraysEqual(cache, units)) {
+			gl.uniform1iv(this.addr, units);
+			copyArray(cache, units);
+		}
 
 		for (let i = 0; i !== n; ++i) {
 			textures.setTextureCube(v[i] || emptyCubeTexture, units[i]);
@@ -13487,9 +13502,14 @@
 	}
 
 	function setValueT2DArrayArray(gl, v, textures) {
+		const cache = this.cache;
 		const n = v.length;
 		const units = allocTexUnits(textures, n);
-		gl.uniform1iv(this.addr, units);
+
+		if (!arraysEqual(cache, units)) {
+			gl.uniform1iv(this.addr, units);
+			copyArray(cache, units);
+		}
 
 		for (let i = 0; i !== n; ++i) {
 			textures.setTexture2DArray(v[i] || emptyArrayTexture, units[i]);
@@ -15708,45 +15728,41 @@
 				},
 				setFunc: function (depthFunc) {
 					if (currentDepthFunc !== depthFunc) {
-						if (depthFunc) {
-							switch (depthFunc) {
-								case NeverDepth:
-									gl.depthFunc(gl.NEVER);
-									break;
+						switch (depthFunc) {
+							case NeverDepth:
+								gl.depthFunc(gl.NEVER);
+								break;
 
-								case AlwaysDepth:
-									gl.depthFunc(gl.ALWAYS);
-									break;
+							case AlwaysDepth:
+								gl.depthFunc(gl.ALWAYS);
+								break;
 
-								case LessDepth:
-									gl.depthFunc(gl.LESS);
-									break;
+							case LessDepth:
+								gl.depthFunc(gl.LESS);
+								break;
 
-								case LessEqualDepth:
-									gl.depthFunc(gl.LEQUAL);
-									break;
+							case LessEqualDepth:
+								gl.depthFunc(gl.LEQUAL);
+								break;
 
-								case EqualDepth:
-									gl.depthFunc(gl.EQUAL);
-									break;
+							case EqualDepth:
+								gl.depthFunc(gl.EQUAL);
+								break;
 
-								case GreaterEqualDepth:
-									gl.depthFunc(gl.GEQUAL);
-									break;
+							case GreaterEqualDepth:
+								gl.depthFunc(gl.GEQUAL);
+								break;
 
-								case GreaterDepth:
-									gl.depthFunc(gl.GREATER);
-									break;
+							case GreaterDepth:
+								gl.depthFunc(gl.GREATER);
+								break;
 
-								case NotEqualDepth:
-									gl.depthFunc(gl.NOTEQUAL);
-									break;
+							case NotEqualDepth:
+								gl.depthFunc(gl.NOTEQUAL);
+								break;
 
-								default:
-									gl.depthFunc(gl.LEQUAL);
-							}
-						} else {
-							gl.depthFunc(gl.LEQUAL);
+							default:
+								gl.depthFunc(gl.LEQUAL);
 						}
 
 						currentDepthFunc = depthFunc;
