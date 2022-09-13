@@ -260,6 +260,7 @@ class IESLoader extends Loader {
 
 			let theta = i % width;
 			const phi = Math.floor( i / width );
+			//console.log(theta, phi)
 
 			if ( endTheta - startTheta !== 0 && ( theta < startTheta || theta >= endTheta ) ) { // Handle symmetry for hor angles
 
@@ -269,7 +270,7 @@ class IESLoader extends Loader {
 
 			}
 
-			data[ i ] = interpolateCandelaValues( phi, theta );
+			data[ phi + theta * height ] = interpolateCandelaValues( phi, theta );
 
 		}
 

@@ -47,13 +47,8 @@ class IESTexture extends DataTexture {
 
             this.dispose();
 
-            const newImageData = new Float32Array( 180 * this.capacity );
-
-            for( var i = 0; i < this.image.data.length; ++ i ) {
-
-                newImageData[ i ] = this.image.data[ i ];
-
-            }
+            const newImageData = new Float32Array( 180 * this.capacity )
+            newImageData.set( this.image.data, 0 );
 
             this.image.data = newImageData;
             this.image.height = newCapacity;
@@ -68,11 +63,7 @@ class IESTexture extends DataTexture {
 
                 this.iesLoader.load( iesProfile, iesProfileData => {
 
-                    for( var i = 0; i < 180; ++ i) {
-
-                        this.image.data[ 180 * currentCursor + i ] = iesProfileData[ i * 360 ];
-
-                    }
+                    this.image.data.set( iesProfileData.subarray( 0, 180 ), 180 * currentCursor );
 
                     this.needsUpdate = true;
 
