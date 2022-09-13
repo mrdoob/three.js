@@ -61,7 +61,7 @@
 			const surfaceGeometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 ).toNonIndexed();
 
 			const textureLoader = new THREE.TextureLoader();
-			const texture = textureLoader.load( './textures/colors.png' );
+			const texture = await textureLoader.loadAsync( './textures/rainbow.jpg' );
 
 			// const texture = new THREE.Texture(undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping)
 			texture.flipY = false;
