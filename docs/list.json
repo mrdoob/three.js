@@ -1304,8 +1304,33 @@
 				"PointLightShadow": "api/it/lights/shadows/PointLightShadow",
 				"DirectionalLightShadow": "api/it/lights/shadows/DirectionalLightShadow",
 				"SpotLightShadow": "api/it/lights/shadows/SpotLightShadow"
+			},
+			
+			"Loaders": {
+				"AnimationLoader": "api/it/loaders/AnimationLoader",
+				"AudioLoader": "api/it/loaders/AudioLoader",
+				"BufferGeometryLoader": "api/it/loaders/BufferGeometryLoader",
+				"Cache": "api/it/loaders/Cache",
+				"CompressedTextureLoader": "api/it/loaders/CompressedTextureLoader",
+				"CubeTextureLoader": "api/it/loaders/CubeTextureLoader",
+				"DataTextureLoader": "api/it/loaders/DataTextureLoader",
+				"FileLoader": "api/it/loaders/FileLoader",
+				"ImageBitmapLoader": "api/it/loaders/ImageBitmapLoader",
+				"ImageLoader": "api/it/loaders/ImageLoader",
+				"Loader": "api/it/loaders/Loader",
+				"LoaderUtils": "api/it/loaders/LoaderUtils",
+				"MaterialLoader": "api/it/loaders/MaterialLoader",
+				"ObjectLoader": "api/it/loaders/ObjectLoader",
+				"TextureLoader": "api/it/loaders/TextureLoader"
+			},
+
+			"Loaders / Managers": {
+				"DefaultLoadingManager": "api/it/loaders/managers/DefaultLoadingManager",
+				"LoadingManager": "api/it/loaders/managers/LoadingManager"
 			}
+
 		}
+
 	},
 	"pt-br": {
 
