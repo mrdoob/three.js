@@ -1439,7 +1439,6 @@ class GLTFMeshGpuInstancing {
 		const extensionDef = nodeDef.extensions[ this.name ];
 		const attributesDef = extensionDef.attributes;
 
-		// @TODO: Should we directly create InstancedMesh, not from regular Mesh?
 		// @TODO: Can we support InstancedMesh + SkinnedMesh?
 
 		const pending = [];
@@ -1505,7 +1504,7 @@ class GLTFMeshGpuInstancing {
 
 				}
 
-				// Add instance attributes to the InstancedMesh, excluding TRS.
+				// Add instance attributes to the geometry, excluding TRS.
 				for ( const attributeName in attributes ) {
 
 					if ( attributeName !== 'TRANSLATION' &&
