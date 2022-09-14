@@ -1505,7 +1505,7 @@ class GLTFMeshGpuInstancing {
 
 				}
 
-				// We store other attributes to mesh.geometry so far.
+				// Add instance attributes to the InstancedMesh, excluding TRS.
 				for ( const attributeName in attributes ) {
 
 					if ( attributeName !== 'TRANSLATION' &&
