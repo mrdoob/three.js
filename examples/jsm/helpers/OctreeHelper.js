@@ -55,7 +55,18 @@ class OctreeHelper extends LineSegments {
 
 		traverse( this.octree.subTrees );
 
-		this.geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		if ( this.geometry.attributes.position && this.geometry.attributes.position.count === vertices.length ) {
+
+			this.geometry.attributes.position.set(vertices);
+
+		}
+		else
+		{
+
+			this.geometry.dispose();
+			this.geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+
+		}
 
 	}
 
