@@ -16,7 +16,7 @@ function __flow__addCSS( css ) {
 
 }
 
-__flow__addCSS( `@keyframes f-animation-open { 0% { transform: scale(.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; }}f-canvas,f-canvas canvas { position: absolute; top: 0; left: 0; margin: 0; padding: 0; width: 100%; height: 100%; -webkit-touch-callout: none; }f-canvas { overflow: auto; cursor: grab;}f-canvas canvas.front { z-index: 10;}body.dragging *:not(.drag) { pointer-events: none !important;}f-canvas.grabbing * { cursor: grabbing; user-select: none;}f-canvas canvas { position: fixed; overflow: hidden; pointer-events: none;}f-canvas::-webkit-scrollbar { width: 8px; height: 8px;}f-canvas::-webkit-scrollbar-thumb:hover{ background: #014fc5;}f-canvas::-webkit-scrollbar-track { background: #363636;}f-canvas::-webkit-scrollbar-thumb { background-color: #666666; border-radius: 10px; border: 0;}f-canvas f-content,f-canvas f-area { position: absolute; display: block;}f-node { position: absolute; margin: 0; padding: 0; user-select: none; width: 320px; z-index: 1; cursor: auto; filter: drop-shadow(0 0 10px #00000061); backdrop-filter: blur(4px);}f-node.selected { z-index: 2;}f-node.selected,f-canvas.dragging-rio f-node:hover,f-canvas.dragging-lio f-node:hover { filter: drop-shadow(0 0 10px #00000061) drop-shadow(0 0 8px #4444dd);}f-node.closed f-element:not(:first-child) { display: none;}f-node.center { top: 50%; left: 50%; transform: translate( -50%, -50% );}f-node.top-right { top: 0; right: 0;}f-node.top-center { top: 0; left: 50%; transform: translateX( -50% );}f-node.top-left { top: 0; left: 0;}f-node { transition: filter 0.2s ease;}f-node { animation: .2s f-animation-open 1 alternate ease-out;}f-tips,f-drop,f-menu,f-menu input,f-menu button,f-element,f-element input,f-element select,f-element button,f-element textarea { font-family: 'Open Sans', sans-serif; font-size: 13px; text-transform: capitalize; color: #eeeeee; outline: solid 0px #000; margin: 0; padding: 0; border: 0; user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.2s ease, filter 0.2s ease;}f-element input:read-only { color: #666;}f-element input,f-element textarea { text-transform: initial;}f-element input { transition: background 0.1s ease;}f-element input,f-element select,f-element button,f-element textarea { background-color: #232324d1;}f-element { position: relative; width: calc( 100% - 14px ); background: rgba(45, 45, 48, 0.95); pointer-events: auto; border-bottom: 2px solid #232323; display: flex; padding-left: 7px; padding-right: 7px; padding-top: 2px; padding-bottom: 2px;}f-element:after,f-element:before { transition: opacity .17s; opacity: 0; content: '';}f-element[tooltip]:hover:after,f-element[tooltip]:focus-within:after { font-size: 14px !important; display: flex; justify-content: center; position: fixed; margin-left: -7px; width: calc( 100% ); background: #1d1d1de8; border: 1px solid #444444a1; border-radius: 6px; color: #dadada; content: attr( tooltip ); margin-top: -41px; font-size: 16px; padding-top: 3px; padding-bottom: 3px; z-index: 10; opacity: 1; backdrop-filter: blur(4px); white-space: nowrap; overflow: hidden; text-shadow: 1px 1px 0px #0007;}f-element[tooltip]:hover:before,f-element[tooltip]:focus-within:before { border: solid; border-color: #1d1d1de8 transparent; border-width: 12px 6px 0 6px; left: calc( 50% - 6px ); bottom: 30px; position: absolute; opacity: 1; z-index: 11;}f-element[error] { background-color: #ff0000;}f-element[error]:hover:after,f-element[error]:focus-within:after { border: none; background-color: #ff0000bb; filter: drop-shadow( 2px 2px 5px #000 ); color: #fff;}f-element[error]:hover:before,f-element[error]:focus-within:before { border-color: #ff0000bb transparent;}f-element { height: 24px;}f-element input { margin-top: 2px; margin-bottom: 2px; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%); margin-left: 2px; margin-right: 2px; width: 100%; padding-left: 4px; padding-right: 4px;}f-element input.number { cursor: col-resize;}f-element input:focus[type='text'], f-element input:focus[type='range'], f-element input:focus[type='color'] { background: rgba( 0, 0, 0, 0.6 ); outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-element input[type='color'] { appearance: none; padding: 0; margin-left: 2px; margin-right: 2px; height: calc( 100% - 4px ); margin-top: 2px; border: none;}f-element input[type='color']::-webkit-color-swatch-wrapper { padding: 2px;}f-element input[type='color']::-webkit-color-swatch { border: none; cursor: alias;}f-element input[type='range'] { appearance: none; width: 100%; overflow: hidden; padding: 0; cursor: ew-resize;}f-element input[type='range']::-webkit-slider-runnable-track { appearance: none; height: 10px; color: #13bba4; margin: 0;}f-element input[type='range']::-webkit-slider-thumb { appearance: none; width: 0; background: #434343; box-shadow: -500px 0 0 500px rgba( 0, 120, 255, 0.98 ); border-radius: 50%; border: 0 !important;}f-element input[type='range']::-webkit-slider-runnable-track { margin-left: -4px; margin-right: -5px;}f-element input[type='checkbox'] { appearance: none; cursor: pointer;}f-element input[type='checkbox'].toggle { height: 20px; width: 45px; border-radius: 16px; display: inline-block; position: relative; margin: 0; margin-top: 2px; background: linear-gradient( 0deg, #292929 0%, #0a0a0ac2 100% ); transition: all 0.2s ease;}f-element input[type='checkbox'].toggle:after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: white; box-shadow: 0 1px 2px rgba(44, 44, 44, 0.2); transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);}f-element input[type='checkbox'].toggle:checked { background: linear-gradient( 0deg, #0177fb 0%, #0177fb 100% );}f-element input[type='checkbox'].toggle:checked:after { transform: translatex(25px);}f-element.auto-height { display: table;}f-element textarea { width: calc( 100% - 18px ); padding-top: 1px; padding-bottom: 3px; padding-left: 3px; padding-right: 8px; margin-top: 2px; margin-left: 2px; height: calc( 100% - 8px ); max-height: 300px; border-radius: 2px; resize: none; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element.auto-height textarea { resize: auto;}f-element select { width: 100%; margin-top: 2px; margin-bottom: 2px; margin-left: 2px; margin-right: 2px; cursor: pointer; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element f-toolbar { position: absolute; display: flex; top: 0; width: 100%; height: 100%; align-content: space-around;}f-element.input-right f-toolbar { right: 7px; float: right; justify-content: end;}f-element f-toolbar { margin-top: auto; margin-bottom: auto; margin-left: 3px; margin-right: 3px; font-size: 18px; line-height: 18px;}f-element f-toolbar button { opacity: .7; cursor: pointer; font-size: 14px; width: unset; height: unset; border-radius: unset; border: unset; outline: 0; background-color: unset; box-shadow: unset;}f-element f-toolbar button:hover,f-element f-toolbar button:active { opacity: 1; border: 0; background-color: unset;}f-element input.range-value { width: 60px; text-align: center;}f-menu.context button,f-element button { width: 100%; height: calc( 100% - 4px ); margin-left: 2px; margin-right: 2px; margin-top: 2px; border-radius: 3px; cursor: pointer;}f-element button { box-shadow: inset 1px 1px 1px 0 rgb(255 255 255 / 17%), inset -2px -2px 2px 0 rgb(0 0 0 / 26%);}f-element button:hover { color: #fff; background-color: #2a2a2a;}f-element button:active { border: 1px solid rgba( 0, 120, 255, 0.98 );}f-element f-inputs,f-element f-subinputs { display: flex; justify-content: flex-end; width: 100%;}f-element f-inputs { left: 100px; top: 50%; transform: translateY(-50%); position: absolute; width: calc( 100% - 106px ); height: calc( 100% - 4px ); z-index: 1;}f-element.inputs-disable f-inputs { filter: grayscale(100%); opacity: .5;}f-element.inputs-disable f-inputs input { pointer-events: none;}f-element f-label,f-element span { margin: auto; text-shadow: 1px 1px 0px #0007;}f-element f-label { padding-left: 4px; white-space: nowrap; position: absolute; top: 50%; transform: translateY(-50%); width: calc( 100% - 20px );}f-element.right f-label { text-align: right;}f-element.center f-label { text-align: center;}f-element f-label i { float: left; font-size: 18px; margin-right: 6px;}f-element f-label.center { width: 100%; text-align: center; display: block;}f-element.title { height: 29px; background-color: #3a3a3ab0; background-color: #3b3b43ed; cursor: all-scroll; border-top-left-radius: 6px; border-top-right-radius: 6px;}f-element.blue { background-color: #014fc5;}f-element.red { background-color: #bd0b0b;}f-element.green { background-color: #148d05;}f-element.yellow { background-color: #d6b100;}f-element.title.left { text-align: left; display: inline-grid; justify-content: start;}f-element.title span { text-align: center; font-size: 15px; padding-top: 2px;}f-element.title i { font-size: 18px; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); opacity: .5;}f-element.title f-toolbar i { font-size: 20px; right: unset; left: 0px;}f-element.input-right.title i { left: 10px; right: unset;}f-element.title.left span { text-align: left;}f-element f-io { border: 2px solid #dadada; width: 7px; height: 7px; position: absolute; background: #242427; border-radius: 8px; float: left; left: -7px; top: calc( 50% - 5px ); cursor: alias; box-shadow: 0 0 3px 2px #0000005e; z-index: 1;}f-element f-io.connect,f-canvas.dragging-rio f-element:hover f-io.lio,f-canvas.dragging-lio f-element:hover f-io.rio { zoom: 1.4;}f-node.io-connect f-io:not(.connect) { border: 2px solid #dadada !important; zoom: 1 !important;}f-element f-io.rio { float: right; right: -7px; left: unset;}f-element f-disconnect { position: absolute; left: -35px; top: 50%; font-size: 22px; transform: translateY( -50% ); filter: drop-shadow(0 0 5px #000); text-shadow: 0px 0px 5px black; cursor: pointer; transition: all .2s;}f-element.input-right f-disconnect { right: -35px; left: unset;}f-element f-disconnect:hover { color: #ff3300;}f-element textarea::-webkit-scrollbar { width: 6px;}f-element textarea::-webkit-scrollbar-track { background: #111; } f-element textarea::-webkit-scrollbar-thumb { background: #0177fb; }f-element textarea::-webkit-scrollbar-thumb:hover { background: #1187ff; }f-element.small { height: 18px;}f-element.large { height: 36px;}body.connecting f-node:not(.io-connect) f-element:hover,f-element.select { background-color: rgba(61, 70, 82, 0.98);}f-element.invalid > f-io { zoom: 1 !important;}f-element.invalid::after { font-size: 14px !important; display: flex; justify-content: center; align-items:center; margin: auto; position: absolute; width: 100%; height: 100%; background: #bd0b0b77; vertical-align: middle; color: #fff; content: 'Not Compatible'; opacity: .95; backdrop-filter: grayscale(100%); white-space: nowrap; overflow: hidden; left: 0; top: 0; text-transform: initial;}f-element.invalid > f-inputs,f-element.invalid > f-label { opacity: .1;}f-drop { width: 100%; height: 100%; position: sticky; left: 0; top: 0; background: #02358417; text-align: center; justify-content: center; align-items: center; display: flex; box-shadow: inset 0 0 20px 10px #464ace17; pointer-events: none; transition: all .07s; opacity: 0; visibility: hidden;}f-drop.visible { visibility: unset; opacity: unset; transition: all .23s;}f-drop span { opacity: .5; font-size: 40px; text-shadow: 0px 0px 5px #000; font-weight: bold;}f-tooltip { pointer-events: none;}f-tooltip { position: absolute; left: 0; top: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(4px); font-size: 14px; padding: 7px; left: 50%; border-radius: 10px; transform: translateX(-50%); visibility: hidden; pointer-events: none; opacity: 0; transition: all 0.3s ease; z-index: 150; white-space: nowrap;}f-menu.context,f-menu.search { position: absolute;}f-menu.context { width: 170px; z-index: 110;}f-menu.search { bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 10; width: 300px;}f-menu.context f-list { display: block; margin: 0; background: #171717e6; font-size: 12px; border-radius: 6px; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; box-shadow: 3px 3px 6px rgba(0,0,0,.2); transition: opacity 0.2s ease, transform 0.1s ease;}f-menu.search f-list { margin: 0 6px 0 6px; display: flex; flex-direction: column-reverse; margin-bottom: 5px;}f-menu.context.hidden { visibility: hidden; opacity: 0;}f-menu.context f-item,f-menu.search f-item { display: block; position: relative; margin: 0; padding: 0; white-space: nowrap;}f-menu.search f-item { opacity: 0;}f-menu.context f-item.submenu::after { content: ""; position: absolute; right: 6px; top: 50%; -webkit-transform: translateY(-50%); transform: translateY(-50%); border: 5px solid transparent; border-left-color: #808080;}f-menu.context f-item:hover > f-menu,f-menu.context f-item.active > f-menu { visibility: unset; transform: unset; opacity: unset;}f-menu.context f-menu { top: 0px; left: calc( 100% - 4px );}f-menu.context f-item button,f-menu.search f-item button { overflow: visible; display: block; width: calc( 100% - 6px ); text-align: left; cursor: pointer; white-space: nowrap; padding: 6px 8px; border-radius: 3px; background: rgba(45, 45, 48, 0.95); border: 0; color: #ddd; margin: 3px; text-shadow: 1px 1px 0px #0007;}f-menu.context f-item button i,f-menu.search f-item button i { float: left; font-size: 16px;}f-menu.context f-item button span,f-menu.search f-item button span { margin-left: 6px;}f-menu.context f-item:hover > button,f-menu.search f-item:hover > button,f-menu.search f-item.active > button { color: #fff; background-color: rgba(61, 70, 82, 0.98);}f-menu.search f-item:hover,f-menu.search f-item.active { opacity: 1 !important;}f-menu.context f-item button:active { outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-menu.context f-item f-tooltip { margin-left: 85px; top: -50px;}f-menu.search f-item { display: none;}f-menu.search f-item:nth-child(1) { opacity: 1; display: unset;}f-menu.search f-item:nth-child(2) { opacity: .8; display: unset;}f-menu.search f-item:nth-child(3) { opacity: .6; display: unset;}f-menu.search f-item:nth-child(4) { opacity: .4; display: unset;}f-menu.search f-item button { border-radius: 14px;}f-tips { right: 10px; top: 10px; position: absolute; z-index: 100; pointer-events: none; display: flex; flex-direction: column;}f-tips f-tip { width: 450px; font-size: 13px; border-radius: 6px; text-align: center; display: block; height: auto; color: #ffffffe0; margin: 4px; padding: 4px; background: #17171794; border: 1px solid #7e7e7e38; line-height: 100%; backdrop-filter: blur(6px); transition: all 0.2s ease; text-transform: initial; opacity: 0;}f-tips f-tip:nth-child(1) { opacity: 1;}f-tips f-tip:nth-child(2) { opacity: .75;}f-tips f-tip:nth-child(3) { opacity: .25;}f-tips f-tip:nth-child(4) { opacity: .1;}f-tips f-tip.error { background: #b900005e;}f-menu.search input { width: calc( 100% - 28px ); height: 41px; position: absolute; z-index: 10; border-radius: 20px; padding-left: 14px; padding-right: 14px; font-size: 15px; background-color: #17171794; border: 1px solid #7e7e7e45; backdrop-filter: blur(6px); box-shadow: 3px 3px 6px rgb(0 0 0 / 20%); text-transform: initial;}f-menu.circle { position: absolute; left: 40px; bottom: 40px; z-index: 100;}f-menu.circle f-item { align-content: space-around; margin-right: 20px;}f-menu.circle f-item button { width: 47px; height: 47px; font-size: 22px; background: #17171794; border-radius: 50%; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; line-height: 100%; cursor: pointer; box-shadow: 3px 3px 6px rgba(0,0,0,.2);}f-menu.circle f-item f-tooltip { margin-top: -60px;}.f-rounded f-node f-element,.f-rounded f-node f-element.title.left { border-radius: 10px 5px 10px 5px;}.f-rounded f-node f-element input, .f-rounded f-node f-element select,.f-rounded f-node f-element button,.f-rounded f-node f-element textarea,.f-rounded f-node f-element input[type='checkbox'].toggle,.f-rounded f-node f-element input[type='checkbox'].toggle:after { border-radius: 20px 10px;}.f-rounded f-node f-element input { padding-left: 7px; padding-right: 7px;}.f-rounded f-menu.context,.f-rounded f-menu.context f-item button { border-radius: 20px 10px;}@media (hover: hover) and (pointer: fine) { f-node:not(.selected):hover { filter: drop-shadow(0 0 6px #66666630); } f-element f-toolbar { visibility: hidden; opacity: 0; transition: opacity 0.2s ease; } f-node:hover > f-element f-toolbar { visibility: visible; opacity: 1; } f-element f-io:hover { zoom: 1.4; } f-menu.circle f-item button:hover { background-color: #2a2a2a; } f-menu.search input:hover, f-menu.search input:focus { background-color: #1a1a1a; filter: drop-shadow(0 0 6px #66666630); } f-menu.search input:focus { filter: drop-shadow(0 0 8px #4444dd); } f-menu.circle f-item button:hover > f-tooltip, f-menu.context f-item button:hover > f-tooltip { visibility: visible; opacity: 1; } f-menu.circle f-item button:hover > f-tooltip { margin-top: -50px; } f-menu.context f-item button:hover > f-tooltip { top: -30px; } f-menu.circle f-item button:focus > f-tooltip, f-menu.context f-item button:focus > f-tooltip { visibility: hidden; opacity: 0; }}@media (hover: none) and (pointer: coarse) { body.dragging f-canvas, body.connecting f-canvas { overflow: hidden !important; }}f-canvas { will-change: top, left;}f-node { will-change: transform !important;}` );
+__flow__addCSS( `@keyframes f-animation-open { 0% { transform: scale(.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; }}f-canvas,f-canvas canvas.background,f-canvas canvas.frontground { position: absolute; top: 0; left: 0; margin: 0; padding: 0; width: 100%; height: 100%; -webkit-touch-callout: none; transition: opacity .17s;}f-canvas { cursor: grab;}f-canvas canvas.frontground { z-index: 10;}body.dragging *:not(.drag) { pointer-events: none !important;}f-canvas.grabbing * { cursor: grabbing; user-select: none;}f-canvas canvas.background,f-canvas canvas.frontground { position: fixed; overflow: hidden;}f-canvas canvas.frontground { pointer-events: none;}f-canvas::-webkit-scrollbar { width: 8px; height: 8px;}f-canvas::-webkit-scrollbar-thumb:hover{ background: #014fc5;}f-canvas::-webkit-scrollbar-track { background: #363636;}f-canvas::-webkit-scrollbar-thumb { background-color: #666666; border-radius: 10px; border: 0;}f-canvas f-content { left: 0; top: 0;}f-canvas f-content,f-canvas f-area { position: absolute; display: block;}f-canvas canvas.map { position: absolute; top: 10px; right: 10px; z-index: 50; backdrop-filter: blur( 10px ); background-color: rgba( 45, 45, 48, .8 );}f-node { position: absolute; margin: 0; padding: 0; user-select: none; width: 320px; z-index: 1; cursor: auto; filter: drop-shadow(0 0 10px #00000061); backdrop-filter: blur(4px);}f-node.selected { z-index: 2;}f-canvas.focusing canvas.background,f-canvas.focusing f-node:not(.selected),f-canvas.focusing f-element f-disconnect:not(.selected) { opacity: 0; pointer-events: none;}.dragging f-canvas f-element f-disconnect { opacity: 0;}.dragging.node f-canvas.focusing canvas.background,.dragging.node f-canvas.focusing f-node:not(.selected) { opacity: .5;}f-node.selected,f-canvas.dragging-rio f-node:hover,f-canvas.dragging-lio f-node:hover { filter: drop-shadow(0 0 10px #00000061) drop-shadow(0 0 8px #4444dd);}f-node.closed f-element:not(:first-child) { display: none;}f-node.center { top: 50%; left: 50%; transform: translate( -50%, -50% );}f-node.top-right { top: 0; right: 0;}f-node.top-center { top: 0; left: 50%; transform: translateX( -50% );}f-node.top-left { top: 0; left: 0;}f-node { transition: filter 0.2s ease, opacity 0.12s ease;}f-node { animation: .2s f-animation-open 1 alternate ease-out;}f-tips,f-drop,f-menu,f-menu input,f-menu button,f-element,f-element input,f-element select,f-element button,f-element textarea { font-family: 'Open Sans', sans-serif; font-size: 13px; text-transform: capitalize; color: #eeeeee; outline: solid 0px #000; margin: 0; padding: 0; border: 0; user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.2s ease, filter 0.2s ease;}f-element input:read-only { color: #666;}f-element input,f-element textarea { text-transform: initial;}f-element input { transition: background 0.1s ease;}f-element input,f-element select,f-element button,f-element textarea { background-color: #232324d1;}f-element { position: relative; width: calc( 100% - 14px ); background: rgba(45, 45, 48, 0.95); pointer-events: auto; border-bottom: 2px solid #232323; display: flex; padding-left: 7px; padding-right: 7px; padding-top: 2px; padding-bottom: 2px;}f-element:after,f-element:before { transition: opacity .17s; opacity: 0; content: '';}f-element[tooltip]:hover:after,f-element[tooltip]:focus-within:after { font-size: 14px !important; display: flex; justify-content: center; position: fixed; margin-left: -7px; width: calc( 100% ); background: #1d1d1de8; border: 1px solid #444444a1; border-radius: 6px; color: #dadada; content: attr( tooltip ); margin-top: -41px; font-size: 16px; padding-top: 3px; padding-bottom: 3px; z-index: 10; opacity: 1; backdrop-filter: blur(4px); white-space: nowrap; overflow: hidden; text-shadow: 1px 1px 0px #0007;}f-element[tooltip]:hover:before,f-element[tooltip]:focus-within:before { border: solid; border-color: #1d1d1de8 transparent; border-width: 12px 6px 0 6px; left: calc( 50% - 6px ); bottom: 30px; position: absolute; opacity: 1; z-index: 11;}f-element[error] { background-color: #ff0000;}f-element[error]:hover:after,f-element[error]:focus-within:after { border: none; background-color: #ff0000bb; filter: drop-shadow( 2px 2px 5px #000 ); color: #fff;}f-element[error]:hover:before,f-element[error]:focus-within:before { border-color: #ff0000bb transparent;}f-element { height: 24px;}f-element input { margin-top: 2px; margin-bottom: 2px; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%); margin-left: 2px; margin-right: 2px; width: 100%; padding-left: 4px; padding-right: 4px;}f-element input.number { cursor: col-resize;}f-element input:focus[type='text'], f-element input:focus[type='range'], f-element input:focus[type='color'] { background: rgba( 0, 0, 0, 0.6 ); outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-element input[type='color'] { appearance: none; padding: 0; margin-left: 2px; margin-right: 2px; height: calc( 100% - 4px ); margin-top: 2px; border: none;}f-element input[type='color']::-webkit-color-swatch-wrapper { padding: 2px;}f-element input[type='color']::-webkit-color-swatch { border: none; cursor: alias;}f-element input[type='range'] { appearance: none; width: 100%; overflow: hidden; padding: 0; cursor: ew-resize;}f-element input[type='range']::-webkit-slider-runnable-track { appearance: none; height: 10px; color: #13bba4; margin: 0;}f-element input[type='range']::-webkit-slider-thumb { appearance: none; width: 0; background: #434343; box-shadow: -500px 0 0 500px rgba( 0, 120, 255, 0.98 ); border-radius: 50%; border: 0 !important;}f-element input[type='range']::-webkit-slider-runnable-track { margin-left: -4px; margin-right: -5px;}f-element input[type='checkbox'] { appearance: none; cursor: pointer;}f-element input[type='checkbox'].toggle { height: 20px; width: 45px; border-radius: 16px; display: inline-block; position: relative; margin: 0; margin-top: 2px; background: linear-gradient( 0deg, #292929 0%, #0a0a0ac2 100% ); transition: all 0.2s ease;}f-element input[type='checkbox'].toggle:after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: white; box-shadow: 0 1px 2px rgba(44, 44, 44, 0.2); transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);}f-element input[type='checkbox'].toggle:checked { background: linear-gradient( 0deg, #0177fb 0%, #0177fb 100% );}f-element input[type='checkbox'].toggle:checked:after { transform: translatex(25px);}f-element.auto-height { display: table;}f-element textarea { width: calc( 100% - 18px ); padding-top: 1px; padding-bottom: 3px; padding-left: 3px; padding-right: 8px; margin-top: 2px; margin-left: 2px; height: calc( 100% - 8px ); max-height: 300px; border-radius: 2px; resize: none; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element.auto-height textarea { resize: auto;}f-element select { width: 100%; margin-top: 2px; margin-bottom: 2px; margin-left: 2px; margin-right: 2px; cursor: pointer; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element f-toolbar { position: absolute; display: flex; top: 0; width: 100%; height: 100%; align-content: space-around;}f-element.input-right f-toolbar { right: 7px; float: right; justify-content: end;}f-element f-toolbar { margin-top: auto; margin-bottom: auto; margin-left: 3px; margin-right: 3px; font-size: 18px; line-height: 18px;}f-element f-toolbar button { opacity: .7; cursor: pointer; font-size: 14px; width: unset; height: unset; border-radius: unset; border: unset; outline: 0; background-color: unset; box-shadow: unset;}f-element f-toolbar button:hover,f-element f-toolbar button:active { opacity: 1; border: 0; background-color: unset;}f-element input.range-value { width: 60px; text-align: center;}f-menu.context button,f-element button { width: 100%; height: calc( 100% - 4px ); margin-left: 2px; margin-right: 2px; margin-top: 2px; border-radius: 3px; cursor: pointer;}f-element button { box-shadow: inset 1px 1px 1px 0 rgb(255 255 255 / 17%), inset -2px -2px 2px 0 rgb(0 0 0 / 26%);}f-element button:hover { color: #fff; background-color: #2a2a2a;}f-element button:active { border: 1px solid rgba( 0, 120, 255, 0.98 );}f-element f-inputs,f-element f-subinputs { display: flex; justify-content: flex-end; width: 100%;}f-element f-inputs { left: 100px; top: 50%; transform: translateY( -50% ); position: absolute; width: calc( 100% - 106px ); height: calc( 100% - 4px ); z-index: 1;}f-element.inputs-disable f-inputs { filter: grayscale(100%); opacity: .5;}f-element.inputs-disable f-inputs input { pointer-events: none;}f-element f-label,f-element span { margin: auto; text-shadow: 1px 1px 0px #0007;}f-element f-label { padding-left: 4px; white-space: nowrap; position: absolute; top: 50%; transform: translateY( -50% ); width: calc( 100% - 20px );}f-element.right f-label { text-align: right;}f-element.center f-label { text-align: center;}f-element f-label i { font-size: 18px; margin-right: 6px; vertical-align: sub;}f-element f-label.center { width: 100%; text-align: center; display: block;}f-element.title { height: 29px; background-color: #3a3a3ab0; background-color: #3b3b43ed; cursor: all-scroll; border-top-left-radius: 6px; border-top-right-radius: 6px;}f-element.blue { background-color: #014fc5;}f-element.red { background-color: #bd0b0b;}f-element.green { background-color: #148d05;}f-element.yellow { background-color: #d6b100;}f-element.title.left { text-align: left; display: inline-grid; justify-content: start;}f-element.title f-title { text-align: center; font-size: 15px; padding-top: 2px; position: absolute; top: 50%; transform: translateY( -50% ); width: 100%;}f-element.title i { font-size: 18px; position: absolute; right: 10px; top: 50%; transform: translateY( -50% ); opacity: .5;}f-element.title f-toolbar i { font-size: 20px; right: unset; left: 0px;}f-element.input-right.title i { left: 10px; right: unset;}f-element.title.left span { text-align: left;}f-element f-io { border: 2px solid #dadada; width: 7px; height: 7px; position: absolute; background: #242427; border-radius: 8px; float: left; left: -7px; top: calc( 50% - 5px ); cursor: alias; box-shadow: 0 0 3px 2px #0000005e; z-index: 1;}f-element f-io.connect,f-canvas.dragging-rio f-element:hover f-io.lio,f-canvas.dragging-lio f-element:hover f-io.rio { zoom: 1.4;}f-node.io-connect f-io:not(.connect) { border: 2px solid #dadada !important; zoom: 1 !important;}f-element f-io.rio { float: right; right: -7px; left: unset;}f-element f-disconnect { position: absolute; left: -35px; top: 50%; font-size: 22px; transform: translateY( -50% ); filter: drop-shadow(0 0 5px #000); text-shadow: 0px 0px 5px black; cursor: pointer; transition: all .2s;}f-element.input-right f-disconnect { right: -35px; left: unset;}f-element f-disconnect:hover { color: #ff3300;}f-element textarea::-webkit-scrollbar { width: 6px;}f-element textarea::-webkit-scrollbar-track { background: #111; } f-element textarea::-webkit-scrollbar-thumb { background: #0177fb; }f-element textarea::-webkit-scrollbar-thumb:hover { background: #1187ff; }f-element.small { height: 18px;}f-element.large { height: 36px;}f-canvas.dragging-lio f-node:not(.io-connect) f-element.rio:hover,f-canvas.dragging-rio f-node:not(.io-connect) f-element.lio:hover,f-element.select { background-color: rgba(61, 70, 82, 0.98);}f-element.invalid > f-io { zoom: 1 !important;}f-element.invalid::after { font-size: 14px !important; display: flex; justify-content: center; align-items:center; margin: auto; position: absolute; width: 100%; height: 100%; background: #bd0b0b77; vertical-align: middle; color: #fff; content: 'Not Compatible'; opacity: .95; backdrop-filter: grayscale(100%); white-space: nowrap; overflow: hidden; left: 0; top: 0; text-transform: initial;}f-drop { width: 100%; height: 100%; position: sticky; left: 0; top: 0; background: #02358417; text-align: center; justify-content: center; align-items: center; display: flex; box-shadow: inset 0 0 20px 10px #464ace17; pointer-events: none; transition: all .07s; opacity: 0; visibility: hidden;}f-drop.visible { visibility: unset; opacity: unset; transition: all .23s;}f-drop span { opacity: .5; font-size: 40px; text-shadow: 0px 0px 5px #000; font-weight: bold;}f-tooltip { pointer-events: none;}f-tooltip { position: absolute; left: 0; top: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(4px); font-size: 14px; padding: 7px; left: 50%; border-radius: 10px; transform: translateX(-50%); visibility: hidden; pointer-events: none; opacity: 0; transition: all 0.3s ease; z-index: 150; white-space: nowrap;}f-menu.context,f-menu.search { position: absolute;}f-menu.context { width: 170px; z-index: 110;}f-menu.search { bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 10; width: 300px;}f-menu.context f-list { display: block; margin: 0; background: #171717e6; font-size: 12px; border-radius: 6px; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; box-shadow: 3px 3px 6px rgba(0,0,0,.2); transition: opacity 0.2s ease, transform 0.1s ease;}f-menu.search f-list { margin: 0 6px 0 6px; display: flex; flex-direction: column-reverse; margin-bottom: 5px;}f-menu.context.hidden { visibility: hidden; opacity: 0;}f-menu.context f-item,f-menu.search f-item { display: block; position: relative; margin: 0; padding: 0; white-space: nowrap;}f-menu.search f-item { opacity: 0;}f-menu.context f-item.submenu::after { content: ""; position: absolute; right: 6px; top: 50%; -webkit-transform: translateY( -50% ); transform: translateY( -50% ); border: 5px solid transparent; border-left-color: #808080;}f-menu.context f-item:hover > f-menu,f-menu.context f-item.active > f-menu { visibility: unset; transform: unset; opacity: unset;}f-menu.context f-menu { top: 0px; left: calc( 100% - 4px );}f-menu.context f-item button,f-menu.search f-item button { overflow: visible; display: block; width: calc( 100% - 6px ); text-align: left; cursor: pointer; white-space: nowrap; padding: 6px 8px; border-radius: 3px; background: rgba(45, 45, 48, 0.95); border: 0; color: #ddd; margin: 3px; text-shadow: 1px 1px 0px #0007;}f-menu.context f-item button i,f-menu.search f-item button i { float: left; font-size: 16px;}f-menu.context f-item button span,f-menu.search f-item button span { margin-left: 6px;}f-menu.context f-item:hover > button,f-menu.search f-item:hover > button,f-menu.search f-item.active > button { color: #fff; background-color: rgba(61, 70, 82, 0.98);}f-menu.search f-item:hover,f-menu.search f-item.active { opacity: 1 !important;}f-menu.context f-item button:active { outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-menu.context f-item f-tooltip { margin-left: 85px; top: -50px;}f-menu.search f-item { display: none;}f-menu.search f-item:nth-child(1) { opacity: 1; display: unset;}f-menu.search f-item:nth-child(2) { opacity: .8; display: unset;}f-menu.search f-item:nth-child(3) { opacity: .6; display: unset;}f-menu.search f-item:nth-child(4) { opacity: .4; display: unset;}f-menu.search f-item button { border-radius: 14px;}f-tips { right: 10px; top: 10px; position: absolute; z-index: 100; pointer-events: none; display: flex; flex-direction: column;}f-tips f-tip { width: 450px; font-size: 13px; border-radius: 6px; text-align: center; display: block; height: auto; color: #ffffffe0; margin: 4px; padding: 4px; background: #17171794; border: 1px solid #7e7e7e38; line-height: 100%; backdrop-filter: blur(6px); transition: all 0.2s ease; text-transform: initial; opacity: 0;}f-tips f-tip:nth-child(1) { opacity: 1;}f-tips f-tip:nth-child(2) { opacity: .75;}f-tips f-tip:nth-child(3) { opacity: .25;}f-tips f-tip:nth-child(4) { opacity: .1;}f-tips f-tip.error { background: #b900005e;}f-menu.search input { width: calc( 100% - 28px ); height: 41px; position: absolute; z-index: 10; border-radius: 20px; padding-left: 14px; padding-right: 14px; font-size: 15px; background-color: #17171794; border: 1px solid #7e7e7e45; backdrop-filter: blur(6px); box-shadow: 3px 3px 6px rgb(0 0 0 / 20%); text-transform: initial;}f-menu.circle { position: absolute; z-index: 100;}f-menu.circle.top { top: 40px;}f-menu.circle.left { left: 40px;}f-menu.circle.bottom { bottom: 40px;}f-menu.circle.right { right: 40px;}f-menu.circle f-item { align-content: space-around; margin-right: 20px;}f-menu.circle f-item button { width: 47px; height: 47px; font-size: 22px; background: #17171794; border-radius: 50%; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; line-height: 100%; cursor: pointer; box-shadow: 3px 3px 6px rgba(0,0,0,.2);}f-menu.circle f-item f-tooltip { margin-top: -60px;}f-menu.circle.top f-item f-tooltip { margin-top: 50px;}.f-rounded f-node f-element,.f-rounded f-node f-element.title.left { border-radius: 10px 5px 10px 5px;}.f-rounded f-node f-element input, .f-rounded f-node f-element select,.f-rounded f-node f-element button,.f-rounded f-node f-element textarea,.f-rounded f-node f-element input[type='checkbox'].toggle,.f-rounded f-node f-element input[type='checkbox'].toggle:after { border-radius: 20px 10px;}.f-rounded f-node f-element input { padding-left: 7px; padding-right: 7px;}.f-rounded f-menu.context,.f-rounded f-menu.context f-item button { border-radius: 20px 10px;}@media (hover: hover) and (pointer: fine) { f-node:not(.selected):hover { filter: drop-shadow(0 0 6px #66666630); } f-element f-toolbar { visibility: hidden; opacity: 0; transition: opacity 0.2s ease; } body:not(.connecting) f-node:hover > f-element f-toolbar { visibility: visible; opacity: 1; } f-element f-io:hover { zoom: 1.4; } f-menu.circle f-item button:hover { background-color: #2a2a2a; } f-menu.search input:hover, f-menu.search input:focus { background-color: #1a1a1a; filter: drop-shadow(0 0 6px #66666630); } f-menu.search input:focus { filter: drop-shadow(0 0 8px #4444dd); } f-menu.circle f-item button:hover > f-tooltip, f-menu.context f-item button:hover > f-tooltip { visibility: visible; opacity: 1; } f-menu.circle f-item button:hover > f-tooltip { margin-top: -50px; } f-menu.circle.top f-item button:hover > f-tooltip { margin-top: 60px; } f-menu.context f-item button:hover > f-tooltip { top: -30px; } f-menu.circle f-item button:focus > f-tooltip, f-menu.context f-item button:focus > f-tooltip { visibility: hidden; opacity: 0; }}@media (hover: none) and (pointer: coarse) { body.dragging f-canvas, body.connecting f-canvas { overflow: hidden !important; }}f-element.invalid > f-inputs,f-element.invalid > f-label,f-element.invalid > f-title,f-element.invalid > f-toolbar,f-element.invalid > input,f-element.invalid > select { opacity: .1 !important;}f-canvas { will-change: top, left;}f-node { will-change: transform !important;}` );
 
 const REVISION = '1';
 
@@ -127,8 +127,8 @@ class PointerMonitor {
 
 			const event = e.touches ? e.touches[ 0 ] : e;
 
-			this.x = event.x;
-			this.y = event.y;
+			this.x = event.clientX;
+			this.y = event.clientY;
 
 		};
 
@@ -158,9 +158,17 @@ class PointerMonitor {
 
 const pointer = new PointerMonitor().start();
 
-const draggableDOM = ( dom, callback = null, className = 'dragging' ) => {
+const draggableDOM = ( dom, callback = null, settings = {} ) => {
+
+	settings = Object.assign( {
+		className: 'dragging',
+		click: false,
+		bypass: false
+	}, settings );
 
 	let dragData = null;
+
+	const { className, click, bypass } = settings;
 
 	const getZoom = () => {
 
@@ -188,15 +196,25 @@ const draggableDOM = ( dom, callback = null, className = 'dragging' ) => {
 
 		const event = e.touches ? e.touches[ 0 ] : e;
 
-		e.stopImmediatePropagation();
+		if ( bypass === false ) e.stopImmediatePropagation();
 
 		dragData = {
 			client: { x: event.clientX, y: event.clientY },
 			delta: { x: 0, y: 0 },
 			start: { x: dom.offsetLeft, y: dom.offsetTop },
+			frame: 0,
+			isDown: true,
 			dragging: false,
 			isTouch: !! e.touches
 		};
+
+		if ( click === true ) {
+
+			callback( dragData );
+
+			dragData.frame ++;
+
+		}
 
 		window.addEventListener( 'mousemove', onGlobalMouseMove );
 		window.addEventListener( 'mouseup', onGlobalMouseUp );
@@ -226,13 +244,15 @@ const draggableDOM = ( dom, callback = null, className = 'dragging' ) => {
 
 				callback( dragData );
 
+				dragData.frame ++;
+
 			} else {
 
 				dom.style.cssText += `; left: ${ dragData.x }px; top: ${ dragData.y }px;`;
 
 			}
 
-			e.stopImmediatePropagation();
+			if ( bypass === false ) e.stopImmediatePropagation();
 
 		} else {
 
@@ -242,9 +262,9 @@ const draggableDOM = ( dom, callback = null, className = 'dragging' ) => {
 
 				dom.classList.add( 'drag' );
 
-				if ( className ) document.body.classList.add( className );
+				if ( className ) document.body.classList.add( ...className.split( ' ' ) );
 
-				e.stopImmediatePropagation();
+				if ( bypass === false ) e.stopImmediatePropagation();
 
 			}
 
@@ -254,11 +274,11 @@ const draggableDOM = ( dom, callback = null, className = 'dragging' ) => {
 
 	const onGlobalMouseUp = ( e ) => {
 
-		e.stopImmediatePropagation();
+		if ( bypass === false ) e.stopImmediatePropagation();
 
 		dom.classList.remove( 'drag' );
 
-		if ( className ) document.body.classList.remove( className );
+		if ( className ) document.body.classList.remove( ...className.split( ' ' ) );
 
 		window.removeEventListener( 'mousemove', onGlobalMouseMove );
 		window.removeEventListener( 'mouseup', onGlobalMouseUp );
@@ -274,10 +294,13 @@ const draggableDOM = ( dom, callback = null, className = 'dragging' ) => {
 		}
 
 		dragData.dragging = false;
+		dragData.isDown = false;
 
 		if ( callback !== null ) {
 
 			callback( dragData );
+
+			dragData.frame ++;
 
 		}
 
@@ -315,7 +338,7 @@ const dispatchEventList = ( list, ...params ) => {
 
 };
 
-const toPX = ( val ) => {
+const numberToPX = ( val ) => {
 
 	if ( isNaN( val ) === false ) {
 
@@ -327,7 +350,7 @@ const toPX = ( val ) => {
 
 };
 
-const toHex = ( val ) => {
+const numberToHex = ( val ) => {
 
 	if ( isNaN( val ) === false ) {
 
@@ -339,14 +362,39 @@ const toHex = ( val ) => {
 
 };
 
-var Utils = /*#__PURE__*/Object.freeze( {
+const rgbaToArray = ( rgba ) => {
+
+	const values = rgba.substring( rgba.indexOf( '(' ) + 1, rgba.indexOf( ')' ) )
+		.split( ',' )
+		.map( num => parseInt( num.trim() ) );
+
+	return values;
+
+};
+
+const removeDOMClass = ( dom, classList ) => {
+
+	if ( classList ) classList.split( ' ' ).forEach( alignClass => dom.classList.remove( alignClass ) );
+
+};
+
+const addDOMClass = ( dom, classList ) => {
+
+	if ( classList ) classList.split( ' ' ).forEach( alignClass => dom.classList.add( alignClass ) );
+
+};
+
+var Utils = /*#__PURE__*/Object.freeze({
 	__proto__: null,
 	pointer: pointer,
 	draggableDOM: draggableDOM,
 	dispatchEventList: dispatchEventList,
-	toPX: toPX,
-	toHex: toHex
-} );
+	numberToPX: numberToPX,
+	numberToHex: numberToHex,
+	rgbaToArray: rgbaToArray,
+	removeDOMClass: removeDOMClass,
+	addDOMClass: addDOMClass
+});
 
 class Link {
 
@@ -397,8 +445,6 @@ class Element extends Serializer {
 	constructor( draggable = false ) {
 
 		super();
-
-		this.isElement = true;
 
 		const dom = document.createElement( 'f-element' );
 		dom.element = this;
@@ -471,7 +517,9 @@ class Element extends Serializer {
 		this.node = null;
 
 		this.style = '';
+		this.color = null;
 
+		this.object = null;
 		this.objectCallback = null;
 
 		this.enabledInputs = true;
@@ -486,9 +534,6 @@ class Element extends Serializer {
 		this.rioDOM = this._createIO( 'rio' );
 
 		this.dom.classList.add( `input-${ Link.InputDirection }` );
-
-		this.dom.append( this.lioDOM );
-		this.dom.append( this.rioDOM );
 
 		this.addEventListener( 'connect', ( ) => {
 
@@ -542,9 +587,17 @@ class Element extends Serializer {
 
 	}
 
+	setObject( value ) {
+
+		this.object = value;
+
+		return this;
+
+	}
+
 	getObject( output = null ) {
 
-		return this.objectCallback ? this.objectCallback( output ) : null;
+		return this.objectCallback ? this.objectCallback( output ) : this.object;
 
 	}
 
@@ -586,9 +639,24 @@ class Element extends Serializer {
 
 	setColor( color ) {
 
-		this.dom.style[ 'background-color' ] = toHex( color );
+		this.dom.style[ 'background-color' ] = numberToHex( color );
+		this.color = null;
 
 		return this;
+
+	}
+
+	getColor() {
+
+		if ( this.color === null ) {
+
+			const css = window.getComputedStyle( this.dom );
+
+			this.color = css.getPropertyValue( 'background-color' );
+
+		}
+
+		return this.color;
 
 	}
 
@@ -601,6 +669,7 @@ class Element extends Serializer {
 		if ( style ) dom.classList.add( style );
 
 		this.style = style;
+		this.color = null;
 
 		return this;
 
@@ -692,7 +761,7 @@ class Element extends Serializer {
 
 	setLIOColor( color ) {
 
-		this.lioDOM.style[ 'border-color' ] = toHex( color );
+		this.lioDOM.style[ 'border-color' ] = numberToHex( color );
 
 		return this;
 
@@ -703,6 +772,18 @@ class Element extends Serializer {
 		this.lioLength = length;
 
 		this.lioDOM.style.visibility = length > 0 ? '' : 'hidden';
+
+		if ( length > 0 ) {
+
+			this.dom.classList.add( 'lio' );
+			this.dom.prepend( this.lioDOM );
+
+		} else {
+
+			this.dom.classList.remove( 'lio' );
+			this.lioDOM.remove();
+
+		}
 
 		return this;
 
@@ -716,7 +797,7 @@ class Element extends Serializer {
 
 	setRIOColor( color ) {
 
-		this.rioDOM.style[ 'border-color' ] = toHex( color );
+		this.rioDOM.style[ 'border-color' ] = numberToHex( color );
 
 		return this;
 
@@ -733,6 +814,18 @@ class Element extends Serializer {
 		this.rioLength = length;
 
 		this.rioDOM.style.visibility = length > 0 ? '' : 'hidden';
+
+		if ( length > 0 ) {
+
+			this.dom.classList.add( 'rio' );
+			this.dom.prepend( this.rioDOM );
+
+		} else {
+
+			this.dom.classList.remove( 'rio' );
+			this.rioDOM.remove();
+
+		}
 
 		return this;
 
@@ -752,7 +845,7 @@ class Element extends Serializer {
 
 	setHeight( val ) {
 
-		this.dom.style.height = toPX( val );
+		this.dom.style.height = numberToPX( val );
 
 		return this;
 
@@ -775,6 +868,8 @@ class Element extends Serializer {
 		}
 
 		if ( element !== null ) {
+
+			element = element.baseElement || element;
 
 			if ( dispatchEventList( this.events.valid, this, element, 'connect' ) === false ) {
 
@@ -1085,7 +1180,7 @@ class Element extends Serializer {
 
 				}
 
-			}, 'connecting' );
+			}, { className: 'connecting' } );
 
 		};
 
@@ -1098,13 +1193,13 @@ class Element extends Serializer {
 
 }
 
+Element.prototype.isElement = true;
+
 class Input extends Serializer {
 
 	constructor( dom ) {
 
 		super();
-
-		this.isInput = true;
 
 		this.dom = dom;
 
@@ -1234,13 +1329,13 @@ class Input extends Serializer {
 
 }
 
+Input.prototype.isInput = true;
+
 class Node extends Serializer {
 
 	constructor() {
 
 		super();
-
-		this.isNode = true;
 
 		const dom = document.createElement( 'f-node' );
 
@@ -1308,6 +1403,12 @@ class Node extends Serializer {
 
 	}
 
+	get baseElement() {
+
+		return this.elements[ 0 ];
+
+	}
+
 	onFocus( callback ) {
 
 		this.events.focus.push( callback );
@@ -1342,8 +1443,8 @@ class Node extends Serializer {
 
 		const dom = this.dom;
 
-		dom.style.left = toPX( x );
-		dom.style.top = toPX( y );
+		dom.style.left = numberToPX( x );
+		dom.style.top = numberToPX( y );
 
 		return this;
 
@@ -1362,7 +1463,7 @@ class Node extends Serializer {
 
 	setWidth( val ) {
 
-		this.dom.style.width = toPX( val );
+		this.dom.style.width = numberToPX( val );
 
 		return this;
 
@@ -1371,6 +1472,22 @@ class Node extends Serializer {
 	getWidth() {
 
 		return parseInt( this.dom.style.width );
+
+	}
+
+	getHeight() {
+
+		return this.dom.offsetHeight;
+
+	}
+
+	getBound() {
+
+		const { x, y } = this.getPosition();
+		const width = this.getWidth();
+		const height = this.getHeight();
+
+		return { x, y, width, height };
 
 	}
 
@@ -1452,6 +1569,12 @@ class Node extends Serializer {
 
 	}
 
+	getColor() {
+
+		return this.elements[ 0 ]?.getColor();
+
+	}
+
 	serialize( data ) {
 
 		const { x, y } = this.getPosition();
@@ -1514,6 +1637,8 @@ class Node extends Serializer {
 
 }
 
+Node.prototype.isNode = true;
+
 class DraggableElement extends Element {
 
 	constructor( draggable = true ) {
@@ -1528,7 +1653,7 @@ class DraggableElement extends Element {
 
 			if ( this.draggable === true ) {
 
-				draggableDOM( this.node.dom );
+				draggableDOM( this.node.dom, null, { className: 'dragging node' } );
 
 			}
 
@@ -1553,8 +1678,16 @@ class TitleElement extends DraggableElement {
 
 		dom.className = 'title';
 
-		const spanDOM = document.createElement( 'span' );
-		spanDOM.innerText = title;
+		const dbClick = () => {
+
+			this.node.canvas.focusSelected = ! this.node.canvas.focusSelected;
+
+		};
+
+		dom.addEventListener( 'dblclick', dbClick );
+
+		const titleDOM = document.createElement( 'f-title' );
+		titleDOM.innerText = title;
 
 		const iconDOM = document.createElement( 'i' );
 
@@ -1562,11 +1695,11 @@ class TitleElement extends DraggableElement {
 
 		this.buttons = [];
 
-		this.spanDOM = spanDOM;
+		this.titleDOM = titleDOM;
 		this.iconDOM = iconDOM;
 		this.toolbarDOM = toolbarDOM;
 
-		dom.append( spanDOM );
+		dom.append( titleDOM );
 		dom.append( iconDOM );
 		dom.append( toolbarDOM );
 
@@ -1588,7 +1721,7 @@ class TitleElement extends DraggableElement {
 
 	setTitle( value ) {
 
-		this.spanDOM.innerText = value;
+		this.titleDOM.innerText = value;
 
 		return this;
 
@@ -1596,7 +1729,7 @@ class TitleElement extends DraggableElement {
 
 	getTitle() {
 
-		return this.spanDOM.innerText;
+		return this.titleDOM.innerText;
 
 	}
 
@@ -1699,9 +1832,11 @@ class Canvas extends Serializer {
 
 		const canvas = document.createElement( 'canvas' );
 		const frontCanvas = document.createElement( 'canvas' );
+		const mapCanvas = document.createElement( 'canvas' );
 
 		const context = canvas.getContext( '2d' );
 		const frontContext = frontCanvas.getContext( '2d' );
+		const mapContext = mapCanvas.getContext( '2d' );
 
 		this.dom = dom;
 
@@ -1711,20 +1846,17 @@ class Canvas extends Serializer {
 
 		this.canvas = canvas;
 		this.frontCanvas = frontCanvas;
+		this.mapCanvas = mapCanvas;
 
 		this.context = context;
 		this.frontContext = frontContext;
-
-		this.width = 10000;
-		this.height = 10000;
+		this.mapContext = mapContext;
 
 		this.clientX = 0;
 		this.clientY = 0;
 
 		this.relativeClientX = 0;
 		this.relativeClientY = 0;
-
-		this.zoom = 1;
 
 		this.nodes = [];
 
@@ -1738,13 +1870,20 @@ class Canvas extends Serializer {
 			'drop': []
 		};
 
-		frontCanvas.className = 'front';
+		this._scrollLeft = 0;
+		this._scrollTop = 0;
+		this._zoom = 1;
+		this._width = 0;
+		this._height = 0;
+		this._focusSelected = false;
+		this._mapInfo = {
+			scale: 1,
+			screen: {}
+		};
 
-		contentDOM.style.left = toPX( this.centerX );
-		contentDOM.style.top = toPX( this.centerY );
-
-		areaDOM.style.width = `calc( 100% + ${ this.width }px )`;
-		areaDOM.style.height = `calc( 100% + ${ this.height }px )`;
+		canvas.className = 'background';
+		frontCanvas.className = 'frontground';
+		mapCanvas.className = 'map';
 
 		dropDOM.innerHTML = '<span>drop your file</span>';
 
@@ -1753,77 +1892,108 @@ class Canvas extends Serializer {
 		dom.append( frontCanvas );
 		dom.append( contentDOM );
 		dom.append( areaDOM );
-		/*
-		let zoomTouchData = null;
+		dom.append( mapCanvas );
 
-		const onZoomStart = () => {
+		const zoomTo = ( zoom, clientX = this.clientX, clientY = this.clientY ) => {
 
-			zoomTouchData = null;
+			zoom = Math.min( Math.max( zoom, .2 ), 1 );
+
+			this.scrollLeft -= ( clientX / this.zoom ) - ( clientX / zoom );
+			this.scrollTop -= ( clientY / this.zoom ) - ( clientY / zoom );
+			this.zoom = zoom;
 
 		};
-*/
-		const onZoom = ( e ) => {
 
-			if ( e.touches ) {
+		let touchData = null;
 
-				if ( e.touches.length === 2 ) {
+		const onTouchStart = () => {
 
-					e.preventDefault();
+			touchData = null;
 
-					e.stopImmediatePropagation();
-					/*
-					const clientX = ( e.touches[ 0 ].clientX + e.touches[ 1 ].clientX ) / 2;
-					const clientY = ( e.touches[ 0 ].clientY + e.touches[ 1 ].clientY ) / 2;
+		};
 
-					const distance = Math.hypot(
-						e.touches[ 0 ].clientX - e.touches[ 1 ].clientX,
-						e.touches[ 0 ].clientY - e.touches[ 1 ].clientY
-					);
+		const onMouseZoom = ( e ) => {
 
-					if ( zoomTouchData === null ) {
+			e.preventDefault();
 
-						zoomTouchData = {
-							distance
-						};
+			e.stopImmediatePropagation();
 
-					}
+			const delta = e.deltaY * .003;
 
-					const delta = ( zoomTouchData.distance - distance );
-					zoomTouchData.distance = distance;
+			zoomTo( this.zoom - delta );
 
-					let zoom = Math.min( Math.max( this.zoom - delta * .01, .5 ), 1.2 );
+		};
 
-					if ( zoom < .52 ) zoom = .5;
-					else if ( zoom > .98 ) zoom = 1;
+		const onTouchZoom = ( e ) => {
 
-					contentDOM.style.left = toPX( this.centerX / zoom );
-					contentDOM.style.top = toPX( this.centerY / zoom );
-					contentDOM.style.zoom = this.zoom = zoom;
-*/
-
-				}
-
-			} else {
+			if ( e.touches && e.touches.length === 2 ) {
 
 				e.preventDefault();
 
 				e.stopImmediatePropagation();
-				/*
-				const delta = e.deltaY / 100;
-				const zoom = Math.min( Math.max( this.zoom - delta * .1, .5 ), 1 );
 
-				contentDOM.style.left = toPX( this.centerX / zoom );
-				contentDOM.style.top = toPX( this.centerY / zoom );
-				contentDOM.style.zoom = this.zoom = zoom;
-*/
+				const clientX = ( e.touches[ 0 ].clientX + e.touches[ 1 ].clientX ) / 2;
+				const clientY = ( e.touches[ 0 ].clientY + e.touches[ 1 ].clientY ) / 2;
+
+				const distance = Math.hypot(
+					e.touches[ 0 ].clientX - e.touches[ 1 ].clientX,
+					e.touches[ 0 ].clientY - e.touches[ 1 ].clientY
+				);
+
+				if ( touchData === null ) {
+
+					touchData = {
+						distance
+					};
+
+				}
+
+				const delta = ( touchData.distance - distance ) * .003;
+				touchData.distance = distance;
+
+				zoomTo( this.zoom - delta, clientX, clientY );
 
 			}
 
 		};
 
-		dom.addEventListener( 'wheel', onZoom );
-		dom.addEventListener( 'touchmove', onZoom );
-		//dom.addEventListener( 'touchstart', onZoomStart );
+		const onTouchMove = ( e ) => {
+
+			if ( e.touches && e.touches.length === 1 ) {
+
+				e.preventDefault();
+
+				e.stopImmediatePropagation();
+
+				const clientX = e.touches[ 0 ].clientX;
+				const clientY = e.touches[ 0 ].clientY;
+
+				if ( touchData === null ) {
+
+					const { scrollLeft, scrollTop } = this;
+
+					touchData = {
+						scrollLeft,
+						scrollTop,
+						clientX,
+						clientY
+					};
+
+				}
+
+				const zoom = this.zoom;
+
+				this.scrollLeft = touchData.scrollLeft + ( ( clientX - touchData.clientX ) / zoom );
+				this.scrollTop = touchData.scrollTop + ( ( clientY - touchData.clientY ) / zoom );
+
+			}
+
+		};
+
+		dom.addEventListener( 'wheel', onMouseZoom );
+		dom.addEventListener( 'touchmove', onTouchZoom );
+		dom.addEventListener( 'touchstart', onTouchStart );
+		canvas.addEventListener( 'touchmove', onTouchMove );
 
 		let dropEnterCount = 0;
 
@@ -1895,13 +2065,15 @@ class Canvas extends Serializer {
 
 				if ( data.scrollTop === undefined ) {
 
-					data.scrollLeft = dom.scrollLeft;
-					data.scrollTop = dom.scrollTop;
+					data.scrollLeft = this.scrollLeft;
+					data.scrollTop = this.scrollTop;
 
 				}
 
-				dom.scrollLeft = data.scrollLeft - delta.x;
-				dom.scrollTop = data.scrollTop - delta.y;
+				const zoom = this.zoom;
+
+				this.scrollLeft = data.scrollLeft + ( delta.x / zoom );
+				this.scrollTop = data.scrollTop + ( delta.y / zoom );
 
 			}
 
@@ -1915,7 +2087,48 @@ class Canvas extends Serializer {
 
 			}
 
-		}, 'dragging-canvas' );
+		}, { className: 'dragging-canvas' } );
+
+
+		draggableDOM( mapCanvas, ( data ) => {
+
+			const { scale, screen } = this._mapInfo;
+
+			if ( data.scrollLeft === undefined ) {
+
+				const rect = this.mapCanvas.getBoundingClientRect();
+
+				const clientMapX = data.client.x - rect.left;
+				const clientMapY = data.client.y - rect.top;
+
+				const overMapScreen =
+					clientMapX > screen.x && clientMapY > screen.y &&
+					clientMapX < screen.x + screen.width && clientMapY < screen.y + screen.height;
+
+				if ( overMapScreen === false ) {
+
+					const scaleX = this._mapInfo.width / this.mapCanvas.width;
+
+					let scrollLeft = - this._mapInfo.left - ( clientMapX * scaleX );
+					let scrollTop = - this._mapInfo.top - ( clientMapY * ( this._mapInfo.height / this.mapCanvas.height ) );
+
+					scrollLeft += ( screen.width / 2 ) / scale;
+					scrollTop += ( screen.height / 2 ) / scale;
+
+					this.scrollLeft = scrollLeft;
+					this.scrollTop = scrollTop;
+
+				}
+
+				data.scrollLeft = this.scrollLeft;
+				data.scrollTop = this.scrollTop;
+
+			}
+
+			this.scrollLeft = data.scrollLeft - ( data.delta.x / scale );
+			this.scrollTop = data.scrollTop - ( data.delta.y / scale );
+
+		}, { click: true } );
 
 		this._onMoveEvent = ( e ) => {
 
@@ -1925,14 +2138,11 @@ class Canvas extends Serializer {
 			this.clientX = event.clientX;
 			this.clientY = event.clientY;
 
-			this.relativeClientX = ( ( ( dom.scrollLeft - this.centerX ) + event.clientX ) - rect.left ) / zoom;
-			this.relativeClientY = ( ( ( dom.scrollTop - this.centerY ) + event.clientY ) - rect.top ) / zoom;
+			const rectClientX = ( this.clientX - rect.left ) / zoom;
+			const rectClientY = ( this.clientY - rect.top ) / zoom;
 
-		};
-
-		this._onContentLoaded = () => {
-
-			this.centralize();
+			this.relativeClientX = rectClientX - this.scrollLeft;
+			this.relativeClientY = rectClientY - this.scrollTop;
 
 		};
 
@@ -1946,33 +2156,110 @@ class Canvas extends Serializer {
 
 	}
 
+	getBounds() {
+
+		const bounds = { x: Infinity, y: Infinity, width: - Infinity, height: - Infinity };
+
+		for ( const node of this.nodes ) {
+
+			const { x, y, width, height } = node.getBound();
+
+			bounds.x = Math.min( bounds.x, x );
+			bounds.y = Math.min( bounds.y, y );
+			bounds.width = Math.max( bounds.width, x + width );
+			bounds.height = Math.max( bounds.height, y + height );
+
+		}
+
+		bounds.x = Math.round( bounds.x );
+		bounds.y = Math.round( bounds.y );
+		bounds.width = Math.round( bounds.width );
+		bounds.height = Math.round( bounds.height );
+
+		return bounds;
+
+	}
+
+	get width() {
+
+		return this._width;
+
+	}
+
+	get height() {
+
+		return this._height;
+
+	}
+
 	get rect() {
 
 		return this.dom.getBoundingClientRect();
 
 	}
 
-	get relativeX() {
+	get zoom() {
 
-		return this.dom.scrollLeft - this.centerX;
-
-	}
-
-	get relativeY() {
-
-		return this.dom.scrollTop - this.centerY;
+		return this._zoom;
 
 	}
 
-	get centerX() {
+	set zoom( val ) {
 
-		return this.width / 2;
+		this._zoom = val;
+		this.contentDOM.style.zoom = val;
 
 	}
 
-	get centerY() {
+	set scrollLeft( val ) {
 
-		return this.height / 2;
+		this._scrollLeft = val;
+		this.contentDOM.style.left = numberToPX( val );
+
+	}
+
+	get scrollLeft() {
+
+		return this._scrollLeft;
+
+	}
+
+	set scrollTop( val ) {
+
+		this._scrollTop = val;
+		this.contentDOM.style.top = numberToPX( val );
+
+	}
+
+	get scrollTop() {
+
+		return this._scrollTop;
+
+	}
+
+	set focusSelected( value ) {
+
+		if ( this._focusSelected === value ) return;
+
+		const classList = this.dom.classList;
+
+		this._focusSelected = value;
+
+		if ( value ) {
+
+			classList.add( 'focusing' );
+
+		} else {
+
+			classList.remove( 'focusing' );
+
+		}
+
+	}
+
+	get focusSelected() {
+
+		return this._focusSelected;
 
 	}
 
@@ -1998,8 +2285,6 @@ class Canvas extends Serializer {
 
 		document.addEventListener( 'dragover', this._onMoveEvent, true );
 
-		document.addEventListener( 'DOMContentLoaded', this._onContentLoaded );
-
 		requestAnimationFrame( this._onUpdate );
 
 	}
@@ -2017,8 +2302,6 @@ class Canvas extends Serializer {
 		document.removeEventListener( 'touchmove', this._onMoveEvent, true );
 
 		document.removeEventListener( 'dragover', this._onMoveEvent, true );
-
-		document.removeEventListener( 'DOMContentLoaded', this._onContentLoaded );
 
 	}
 
@@ -2114,7 +2397,21 @@ class Canvas extends Serializer {
 
 	centralize() {
 
-		this.dom.scroll( this.centerX, this.centerY );
+		const bounds = this.getBounds();
+
+		this.scrollLeft = ( this.canvas.width / 2 ) - ( ( - bounds.x + bounds.width ) / 2 );
+		this.scrollTop = ( this.canvas.height / 2 ) - ( ( - bounds.y + bounds.height ) / 2 );
+
+		return this;
+
+	}
+
+	setSize( width, height ) {
+
+		this._width = width;
+		this._height = height;
+
+		this.update();
 
 		return this;
 
@@ -2127,6 +2424,8 @@ class Canvas extends Serializer {
 		const previousNode = this.selected;
 
 		if ( previousNode !== null ) {
+
+			this.focusSelected = false;
 
 			previousNode.dom.classList.remove( 'selected' );
 
@@ -2148,31 +2447,116 @@ class Canvas extends Serializer {
 
 	}
 
-	update() {
+	updateMap() {
 
-		if ( this.updating === false ) return;
+		const { nodes, mapCanvas, mapContext, scrollLeft, scrollTop, canvas, zoom, _mapInfo } = this;
 
-		requestAnimationFrame( this._onUpdate );
+		const bounds = this.getBounds();
 
-		const { dom, zoom, canvas, frontCanvas, frontContext, context } = this;
+		mapCanvas.width = 300;
+		mapCanvas.height = 200;
 
-		const width = window.innerWidth;
-		const height = window.innerHeight;
+		mapContext.clearRect( 0, 0, mapCanvas.width, mapCanvas.height );
 
-		const domRect = this.rect;
+		mapContext.fillStyle = 'rgba( 0, 0, 0, 0 )';
+		mapContext.fillRect( 0, 0, mapCanvas.width, mapCanvas.height );
 
-		if ( canvas.width !== width || canvas.height !== height ) {
+		const boundsWidth = - bounds.x + bounds.width;
+		const boundsHeight = - bounds.y + bounds.height;
 
-			canvas.width = width;
-			canvas.height = height;
+		const mapScale = Math.min( mapCanvas.width / boundsWidth, mapCanvas.height / boundsHeight ) * .5;
 
-			frontCanvas.width = width;
-			frontCanvas.height = height;
+		const boundsMapWidth = boundsWidth * mapScale;
+		const boundsMapHeight = boundsHeight * mapScale;
+
+		const boundsOffsetX = ( mapCanvas.width / 2 ) - ( boundsMapWidth / 2 );
+		const boundsOffsetY = ( mapCanvas.height / 2 ) - ( boundsMapHeight / 2 );
+
+		let selectedNode = null;
+
+		for ( const node of nodes ) {
+
+			const nodeBound = node.getBound();
+			const nodeColor = node.getColor();
+
+			nodeBound.x += - bounds.x;
+			nodeBound.y += - bounds.y;
+
+			nodeBound.x *= mapScale;
+			nodeBound.y *= mapScale;
+			nodeBound.width *= mapScale;
+			nodeBound.height *= mapScale;
+
+			nodeBound.x += boundsOffsetX;
+			nodeBound.y += boundsOffsetY;
+
+			if ( node !== this.selected ) {
+
+				mapContext.fillStyle = nodeColor;
+				mapContext.fillRect( nodeBound.x, nodeBound.y, nodeBound.width, nodeBound.height );
+
+			} else {
+
+				selectedNode = {
+					nodeBound,
+					nodeColor
+				};
+
+			}
 
 		}
 
-		context.clearRect( 0, 0, width, height );
-		frontContext.clearRect( 0, 0, width, height );
+		if ( selectedNode !== null ) {
+
+			const { nodeBound, nodeColor } = selectedNode;
+
+			mapContext.fillStyle = nodeColor;
+			mapContext.fillRect( nodeBound.x, nodeBound.y, nodeBound.width, nodeBound.height );
+
+		}
+
+		const screenMapX = ( - ( scrollLeft + bounds.x ) * mapScale ) + boundsOffsetX;
+		const screenMapY = ( - ( scrollTop + bounds.y ) * mapScale ) + boundsOffsetY;
+		const screenMapWidth = ( canvas.width * mapScale ) / zoom;
+		const screenMapHeight = ( canvas.height * mapScale ) / zoom;
+
+		mapContext.fillStyle = 'rgba( 200, 200, 200, 0.1 )';
+		mapContext.fillRect( screenMapX, screenMapY, screenMapWidth, screenMapHeight );
+
+		//
+
+		_mapInfo.scale = mapScale;
+		_mapInfo.left = ( - boundsOffsetX / mapScale ) + bounds.x;
+		_mapInfo.top = ( - boundsOffsetY / mapScale ) + bounds.y;
+		_mapInfo.width = mapCanvas.width / mapScale;
+		_mapInfo.height = mapCanvas.height / mapScale;
+		_mapInfo.screen.x = screenMapX;
+		_mapInfo.screen.y = screenMapY;
+		_mapInfo.screen.width = screenMapWidth;
+		_mapInfo.screen.height = screenMapHeight;
+
+	}
+
+	updateLines() {
+
+		const { dom, zoom, canvas, frontCanvas, frontContext, context, _width, _height } = this;
+
+		const domRect = this.rect;
+
+		if ( canvas.width !== _width || canvas.height !== _height ) {
+
+			canvas.width = _width;
+			canvas.height = _height;
+
+			frontCanvas.width = _width;
+			frontCanvas.height = _height;
+
+		}
+
+		context.clearRect( 0, 0, _width, _height );
+		frontContext.clearRect( 0, 0, _width, _height );
+
+		//
 
 		context.globalCompositeOperation = 'lighter';
 		frontContext.globalCompositeOperation = 'source-over';
@@ -2318,6 +2702,18 @@ class Canvas extends Serializer {
 			dom.classList.remove( 'dragging-rio' );
 
 		}
+
+	}
+
+
+	update() {
+
+		if ( this.updating === false ) return;
+
+		requestAnimationFrame( this._onUpdate );
+
+		this.updateLines();
+		this.updateMap();
 
 	}
 
@@ -2484,7 +2880,7 @@ class ObjectNode extends Node {
 
 }
 
-const ENTER_KEY$1 = 13;
+const ENTER_KEY$2 = 13;
 
 class StringInput extends Input {
 
@@ -2512,7 +2908,7 @@ class StringInput extends Input {
 
 		dom.onkeyup = ( e ) => {
 
-			if ( e.keyCode === ENTER_KEY$1 ) {
+			if ( e.keyCode === ENTER_KEY$2 ) {
 
 				e.target.blur();
 
@@ -2528,7 +2924,7 @@ class StringInput extends Input {
 
 }
 
-const ENTER_KEY = 13;
+const ENTER_KEY$1 = 13;
 
 class NumberInput extends Input {
 
@@ -2565,6 +2961,8 @@ class NumberInput extends Input {
 
 		dom.onblur = () => {
 
+			this.dom.value = this._getString( this.dom.value );
+
 			this.dispatchEvent( new Event( 'blur' ) );
 
 		};
@@ -2583,7 +2981,7 @@ class NumberInput extends Input {
 
 			}
 
-			if ( e.keyCode === ENTER_KEY ) {
+			if ( e.keyCode === ENTER_KEY$1 ) {
 
 				e.target.blur();
 
@@ -2597,6 +2995,8 @@ class NumberInput extends Input {
 
 			const { delta } = data;
 
+			if ( dom.readOnly === true ) return;
+
 			if ( data.value === undefined ) {
 
 				data.value = this.getValue();
@@ -2607,7 +3007,7 @@ class NumberInput extends Input {
 
 			const value = data.value + ( diff * this.step );
 
-			this.dom.value = this._getString( value.toFixed( this.precision ) );
+			dom.value = this._getString( value.toFixed( this.precision ) );
 
 			this.dispatchEvent( new Event( 'change' ) );
 
@@ -2737,6 +3137,8 @@ class SliderInput extends Input {
 
 			rangeDOM.value = field.getValue();
 
+			this.dispatchEvent( new Event( 'change' ) );
+
 		} );
 
 		field.addEventListener( 'range', () => {
@@ -2776,7 +3178,7 @@ class SliderInput extends Input {
 
 			this.dispatchEvent( new Event( 'change' ) );
 
-		}, '' );
+		}, { className: '' } );
 
 	}
 
@@ -2855,7 +3257,7 @@ class ColorInput extends Input {
 		super( dom );
 
 		dom.type = 'color';
-		dom.value = toHex( value );
+		dom.value = numberToHex( value );
 
 		dom.oninput = () => {
 
@@ -2867,17 +3269,19 @@ class ColorInput extends Input {
 
 	setValue( value, dispatch = true ) {
 
-		return super.setValue( toHex( value ), dispatch );
+		return super.setValue( numberToHex( value ), dispatch );
 
 	}
 
 	getValue() {
 
-		return parseInt( super.getValue().slice( 1 ), 16 );
+		return parseInt( super.getValue().substr( 1 ), 16 );
 
 	}
 
 }
+
+const ENTER_KEY = 13;
 
 class TextInput extends Input {
 
@@ -2888,19 +3292,31 @@ class TextInput extends Input {
 
 		dom.innerText = innerText;
 
-	}
+		dom.onblur = () => {
 
-	setValue( val ) {
+			this.dispatchEvent( new Event( 'blur' ) );
 
-		this.dom.innerText = val;
+		};
 
-		return this;
+		dom.onchange = () => {
 
-	}
+			this.dispatchEvent( new Event( 'change' ) );
 
-	getValue() {
+		};
 
-		return this.dom.innerText;
+		dom.onkeyup = ( e ) => {
+
+			if ( e.keyCode === ENTER_KEY ) {
+
+				e.target.blur();
+
+			}
+
+			e.stopPropagation();
+
+			this.dispatchEvent( new Event( 'change' ) );
+
+		};
 
 	}
 
@@ -2916,13 +3332,11 @@ class LabelElement extends Element {
 		this.inputsDOM = document.createElement( 'f-inputs' );
 
 		const spanDOM = document.createElement( 'span' );
-		const iconDOM = document.createElement( 'i' );
 
 		this.spanDOM = spanDOM;
-		this.iconDOM = iconDOM;
+		this.iconDOM = null;
 
-		this.labelDOM.append( this.spanDOM );
-		this.labelDOM.append( this.iconDOM );
+		this.labelDOM.append( spanDOM );
 
 		this.dom.append( this.labelDOM );
 		this.dom.append( this.inputsDOM );
@@ -2936,7 +3350,11 @@ class LabelElement extends Element {
 
 	setIcon( value ) {
 
+		this.iconDOM = this.iconDOM || document.createElement( 'i' );
 		this.iconDOM.className = value;
+
+		if ( value ) this.labelDOM.prepend( this.iconDOM );
+		else this.iconDOM.remove();
 
 		return this;
 
@@ -2944,7 +3362,7 @@ class LabelElement extends Element {
 
 	getIcon() {
 
-		return this.iconDOM.className;
+		return this.iconDOM?.className;
 
 	}
 
@@ -3135,7 +3553,7 @@ class Menu extends EventTarget {
 		super();
 
 		const dom = document.createElement( 'f-menu' );
-		dom.className = className + ' hidden';
+		dom.className = className + ' bottom left hidden';
 
 		const listDOM = document.createElement( 'f-list' );
 
@@ -3145,6 +3563,8 @@ class Menu extends EventTarget {
 		this.listDOM = listDOM;
 
 		this.visible = false;
+
+		this.align = 'bottom left';
 
 		this.subMenus = new WeakMap();
 		this.domButtons = new WeakMap();
@@ -3160,6 +3580,25 @@ class Menu extends EventTarget {
 		this.events.context.push( callback );
 
 		return this;
+
+	}
+
+	setAlign( align ) {
+
+		const dom = this.dom;
+
+		removeDOMClass( dom, this.align );
+		addDOMClass( dom, align );
+
+		this.align = align;
+
+		return this;
+
+	}
+
+	getAlign() {
+
+		return this.align;
 
 	}
 
@@ -3334,8 +3773,8 @@ class ContextMenu extends Menu {
 
 		const dom = this.dom;
 
-		dom.style.left = toPX( x );
-		dom.style.top = toPX( y );
+		dom.style.left = numberToPX( x );
+		dom.style.top = numberToPX( y );
 
 		return this;
 
@@ -3481,7 +3920,7 @@ class Tips extends EventTarget {
 
 		setTimeout( () => {
 
-			this.time -= this.duration;
+			this.time = Math.max( this.time - this.duration, 0 );
 
 			dom.style.opacity = 0;
 
@@ -3509,6 +3948,8 @@ class Search extends Menu {
 
 		this.events.submit = [];
 		this.events.filter = [];
+
+		this.tags = new WeakMap();
 
 		const inputDOM = document.createElement( 'input' );
 		inputDOM.placeholder = 'Type here';
@@ -3741,10 +4182,17 @@ class Search extends Menu {
 
 	}
 
+	setTag( button, tags ) {
+
+		this.tags.set( button, tags );
+
+	}
+
 	filter( text ) {
 
 		text = filterString( text );
 
+		const tags = this.tags;
 		const filtered = [];
 
 		for ( const button of this.buttons ) {
@@ -3753,7 +4201,9 @@ class Search extends Menu {
 
 			buttonDOM.remove();
 
-			const label = filterString( button.getValue() );
+			const buttonTags = tags.has( button ) ? ' ' + tags.get( button ) : '';
+
+			const label = filterString( button.getValue() + buttonTags );
 
 			if ( text && label.includes( text ) === true ) {
 
@@ -3925,7 +4375,7 @@ class ToggleInput extends Input {
 
 }
 
-var Flow = /*#__PURE__*/Object.freeze( {
+var Flow = /*#__PURE__*/Object.freeze({
 	__proto__: null,
 	Element: Element,
 	Input: Input,
@@ -3951,7 +4401,7 @@ var Flow = /*#__PURE__*/Object.freeze( {
 	StringInput: StringInput,
 	TextInput: TextInput,
 	ToggleInput: ToggleInput
-} );
+});
 
 class Loader extends EventTarget {
 

@@ -13457,9 +13457,14 @@
 
 
 	function setValueT1Array(gl, v, textures) {
+		const cache = this.cache;
 		const n = v.length;
 		const units = allocTexUnits(textures, n);
-		gl.uniform1iv(this.addr, units);
+
+		if (!arraysEqual(cache, units)) {
+			gl.uniform1iv(this.addr, units);
+			copyArray(cache, units);
+		}
 
 		for (let i = 0; i !== n; ++i) {
 			textures.setTexture2D(v[i] || emptyTexture, units[i]);
@@ -13467,9 +13472,14 @@
 	}
 
 	function setValueT3DArray(gl, v, textures) {
+		const cache = this.cache;
 		const n = v.length;
 		const units = allocTexUnits(textures, n);
-		gl.uniform1iv(this.addr, units);
+
+		if (!arraysEqual(cache, units)) {
+			gl.uniform1iv(this.addr, units);
+			copyArray(cache, units);
+		}
 
 		for (let i = 0; i !== n; ++i) {
 			textures.setTexture3D(v[i] || empty3dTexture, units[i]);
@@ -13477,9 +13487,14 @@
 	}
 
 	function setValueT6Array(gl, v, textures) {
+		const cache = this.cache;
 		const n = v.length;
 		const units = allocTexUnits(textures, n);
-		gl.uniform1iv(this.addr, units);
+
+		if (!arraysEqual(cache, units)) {
+			gl.uniform1iv(this.addr, units);
+			copyArray(cache, units);
+		}
 
 		for (let i = 0; i !== n; ++i) {
 			textures.setTextureCube(v[i] || emptyCubeTexture, units[i]);
@@ -13487,9 +13502,14 @@
 	}
 
 	function setValueT2DArrayArray(gl, v, textures) {
+		const cache = this.cache;
 		const n = v.length;
 		const units = allocTexUnits(textures, n);
-		gl.uniform1iv(this.addr, units);
+
+		if (!arraysEqual(cache, units)) {
+			gl.uniform1iv(this.addr, units);
+			copyArray(cache, units);
+		}
 
 		for (let i = 0; i !== n; ++i) {
 			textures.setTexture2DArray(v[i] || emptyArrayTexture, units[i]);
@@ -15708,45 +15728,41 @@
 				},
 				setFunc: function (depthFunc) {
 					if (currentDepthFunc !== depthFunc) {
-						if (depthFunc) {
-							switch (depthFunc) {
-								case NeverDepth:
-									gl.depthFunc(gl.NEVER);
-									break;
+						switch (depthFunc) {
+							case NeverDepth:
+								gl.depthFunc(gl.NEVER);
+								break;
 
-								case AlwaysDepth:
-									gl.depthFunc(gl.ALWAYS);
-									break;
+							case AlwaysDepth:
+								gl.depthFunc(gl.ALWAYS);
+								break;
 
-								case LessDepth:
-									gl.depthFunc(gl.LESS);
-									break;
+							case LessDepth:
+								gl.depthFunc(gl.LESS);
+								break;
 
-								case LessEqualDepth:
-									gl.depthFunc(gl.LEQUAL);
-									break;
+							case LessEqualDepth:
+								gl.depthFunc(gl.LEQUAL);
+								break;
 
-								case EqualDepth:
-									gl.depthFunc(gl.EQUAL);
-									break;
+							case EqualDepth:
+								gl.depthFunc(gl.EQUAL);
+								break;
 
-								case GreaterEqualDepth:
-									gl.depthFunc(gl.GEQUAL);
-									break;
+							case GreaterEqualDepth:
+								gl.depthFunc(gl.GEQUAL);
+								break;
 
-								case GreaterDepth:
-									gl.depthFunc(gl.GREATER);
-									break;
+							case GreaterDepth:
+								gl.depthFunc(gl.GREATER);
+								break;
 
-								case NotEqualDepth:
-									gl.depthFunc(gl.NOTEQUAL);
-									break;
+							case NotEqualDepth:
+								gl.depthFunc(gl.NOTEQUAL);
+								break;
 
-								default:
-									gl.depthFunc(gl.LEQUAL);
-							}
-						} else {
-							gl.depthFunc(gl.LEQUAL);
+							default:
+								gl.depthFunc(gl.LEQUAL);
 						}
 
 						currentDepthFunc = depthFunc;
@@ -16230,22 +16246,31 @@
 			}
 		}
 
-		function bindTexture(webglType, webglTexture) {
-			if (currentTextureSlot === null) {
-				activeTexture();
+		function bindTexture(webglType, webglTexture, webglSlot) {
+			if (webglSlot === undefined) {
+				if (currentTextureSlot === null) {
+					webglSlot = gl.TEXTURE0 + maxTextures - 1;
+				} else {
+					webglSlot = currentTextureSlot;
+				}
 			}
 
-			let boundTexture = currentBoundTextures[currentTextureSlot];
+			let boundTexture = currentBoundTextures[webglSlot];
 
 			if (boundTexture === undefined) {
 				boundTexture = {
 					type: undefined,
 					texture: undefined
 				};
-				currentBoundTextures[currentTextureSlot] = boundTexture;
+				currentBoundTextures[webglSlot] = boundTexture;
 			}
 
 			if (boundTexture.type !== webglType || boundTexture.texture !== webglTexture) {
+				if (currentTextureSlot !== webglSlot) {
+					gl.activeTexture(webglSlot);
+					currentTextureSlot = webglSlot;
+				}
+
 				gl.bindTexture(webglType, webglTexture || emptyTextures[webglType]);
 				boundTexture.type = webglType;
 				boundTexture.texture = webglTexture;
@@ -16780,8 +16805,7 @@
 				}
 			}
 
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_2D, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_2D, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 		}
 
 		function setTexture2DArray(texture, slot) {
@@ -16792,8 +16816,7 @@
 				return;
 			}
 
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_2D_ARRAY, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_2D_ARRAY, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 		}
 
 		function setTexture3D(texture, slot) {
@@ -16804,8 +16827,7 @@
 				return;
 			}
 
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_3D, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_3D, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 		}
 
 		function setTextureCube(texture, slot) {
@@ -16816,8 +16838,7 @@
 				return;
 			}
 
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 		}
 
 		const wrappingToGL = {
@@ -16946,11 +16967,12 @@
 			if (texture.isData3DTexture) textureType = _gl.TEXTURE_3D;
 			const forceUpload = initTexture(textureProperties, texture);
 			const source = texture.source;
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(textureType, textureProperties.__webglTexture);
+			state.bindTexture(textureType, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 			const sourceProperties = properties.get(source);
 
 			if (source.version !== sourceProperties.__version || forceUpload === true) {
+				state.activeTexture(_gl.TEXTURE0 + slot);
+
 				_gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
 
 				_gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
@@ -17168,11 +17190,12 @@
 			if (texture.image.length !== 6) return;
 			const forceUpload = initTexture(textureProperties, texture);
 			const source = texture.source;
-			state.activeTexture(_gl.TEXTURE0 + slot);
-			state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture);
+			state.bindTexture(_gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture, _gl.TEXTURE0 + slot);
 			const sourceProperties = properties.get(source);
 
 			if (source.version !== sourceProperties.__version || forceUpload === true) {
+				state.activeTexture(_gl.TEXTURE0 + slot);
+
 				_gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, texture.flipY);
 
 				_gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha);
