@@ -782,6 +782,7 @@ class LDrawParsedCache {
 
 		// final results
 		const faces = [];
+		const backSideFaces = [];
 		const lineSegments = [];
 		const conditionalSegments = [];
 		const subobjects = [];
@@ -1147,7 +1148,7 @@ class LDrawParsedCache {
 
 					if ( doubleSided === true ) {
 
-						faces.push( {
+						backSideFaces.push( {
 							material: material,
 							colorCode: colorCode,
 							faceNormal: null,
@@ -1197,7 +1198,7 @@ class LDrawParsedCache {
 
 					if ( doubleSided === true ) {
 
-						faces.push( {
+						backSideFaces.push( {
 							material: material,
 							colorCode: colorCode,
 							faceNormal: null,
@@ -1225,6 +1226,7 @@ class LDrawParsedCache {
 
 		return {
 			faces,
+			backSideFaces,
 			conditionalSegments,
 			lineSegments,
 			type,
@@ -1515,6 +1517,12 @@ class LDrawPartsGeometryCache {
 		// Add the primitive objects and metadata.
 		const group = info.group;
 		if ( info.faces.length > 0 ) {
+
+			if ( info.backSideFaces && info.backSideFaces.length > 0 ) {
+
+				info.faces.push(...info.backSideFaces);
+
+			}
 
 			group.add( createObject( info.faces, 3, false, info.totalFaces ) );
 
