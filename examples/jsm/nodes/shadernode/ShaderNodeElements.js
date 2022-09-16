@@ -104,7 +104,8 @@ export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
 export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
 export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
 
-export const remap = nodeProxy( RemapNode );
+export const remap = nodeProxy( RemapNode, null, null, { doClamp: false } );
+export const remapClamp = nodeProxy( RemapNode );
 
 export const rotateUV = nodeProxy( RotateUVNode );
 
