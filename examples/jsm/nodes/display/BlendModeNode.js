@@ -74,10 +74,6 @@ class BlendModeNode extends TempNode {
 
 			outputNode = OverlayNode.call( params );
 
-		} else {
-
-			outputNode = baseNode;
-
 		}
 
 		return outputNode;
