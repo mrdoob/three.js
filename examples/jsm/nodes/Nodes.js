@@ -113,7 +113,7 @@ export * from './materials/Materials.js';
 export * from './shadernode/ShaderNodeElements.js';
 
 // shader stages
-export { defaultShaderStages }  from './core/NodeBuilder.js';
+export { defaultShaderStages } from './core/NodeBuilder.js';
 
 const nodeLib = {
 	// core
