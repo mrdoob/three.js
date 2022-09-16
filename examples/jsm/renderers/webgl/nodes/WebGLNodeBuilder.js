@@ -112,9 +112,8 @@ class WebGLNodeBuilder extends NodeBuilder {
 			this.addSlot( 'fragment', new SlotNode( {
 				node: material.colorNode,
 				nodeType: 'vec4',
-				source: getIncludeSnippet( 'color_fragment' ),
-				target: 'diffuseColor = %RESULT%;',
-				inclusionType: 'append'
+				source: 'vec4 diffuseColor = vec4( diffuse, opacity );',
+				target: 'vec4 diffuseColor = %RESULT%;'
 			} ) );
 
 		}
@@ -128,6 +127,10 @@ class WebGLNodeBuilder extends NodeBuilder {
 				target: 'diffuseColor.a = %RESULT%;',
 				inclusionType: 'append'
 			} ) );
+
+		} else {
+
+			this.addCode( 'fragment', getIncludeSnippet( 'alphatest_fragment' ), 'diffuseColor.a = opacity;', this.shader );
 
 		}
 
@@ -514,32 +517,32 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	addCodeAfterCode( shaderStage, snippet, code ) {
+	addCode( shaderStage, source, code, scope = this ) {
 
 		const shaderProperty = getShaderStageProperty( shaderStage );
 
-		let source = this[ shaderProperty ];
+		let snippet = scope[ shaderProperty ];
 
-		const index = source.indexOf( snippet );
+		const index = snippet.indexOf( source );
 
 		if ( index !== - 1 ) {
 
-			const start = source.substring( 0, index + snippet.length );
-			const end = source.substring( index + snippet.length );
+			const start = snippet.substring( 0, index + source.length );
+			const end = snippet.substring( index + source.length );
 
-			source = `${start}\n${code}\n${end}`;
+			snippet = `${start}\n${code}\n${end}`;
 
 		}
 
-		this[ shaderProperty ] = source;
+		scope[ shaderProperty ] = snippet;
 
 	}
 
-	replaceCode( shaderStage, source, target ) {
+	replaceCode( shaderStage, source, target, scope = this ) {
 
 		const shaderProperty = getShaderStageProperty( shaderStage );
 
-		this[ shaderProperty ] = this[ shaderProperty ].replaceAll( source, target );
+		scope[ shaderProperty ] = scope[ shaderProperty ].replaceAll( source, target );
 
 	}
 
@@ -644,11 +647,6 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 			const slots = this.slots[ shaderStage ].sort( ( slotA, slotB ) => {
 
-				if ( sourceCode.indexOf( slotA.source ) == - 1 ) {
-					//console.log( slotA, sourceCode.indexOf( slotA.source ), sourceCode.indexOf( slotB.source ) );
-					//console.log(sourceCode);
-				}
-
 				return sourceCode.indexOf( slotA.source ) > sourceCode.indexOf( slotB.source ) ? 1 : - 1;
 
 			} );
@@ -677,7 +675,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 				if ( inclusionType === 'append' ) {
 
-					this.addCodeAfterCode( shaderStage, source, target );
+					this.addCode( shaderStage, source, target );
 
 				} else if ( inclusionType === 'replace' ) {
 
@@ -691,7 +689,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 
 			}
 
-			this.addCodeAfterCode(
+			this.addCode(
 				shaderStage,
 				'main() {',
 				this.flowCode[ shaderStage ]

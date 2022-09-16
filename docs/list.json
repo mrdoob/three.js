@@ -1148,7 +1148,7 @@
 
 		"Riferimenti": {
 
-			"Animation": {
+			"Animazione": {
 				"AnimationAction": "api/it/animation/AnimationAction",
 				"AnimationClip": "api/it/animation/AnimationClip",
 				"AnimationMixer": "api/it/animation/AnimationMixer",
@@ -1159,7 +1159,7 @@
 				"PropertyMixer": "api/it/animation/PropertyMixer"
 			},
 
-			"Animation / Tracks": {
+			"Animazione / Tracks": {
 				"BooleanKeyframeTrack": "api/it/animation/tracks/BooleanKeyframeTrack",
 				"ColorKeyframeTrack": "api/it/animation/tracks/ColorKeyframeTrack",
 				"NumberKeyframeTrack": "api/it/animation/tracks/NumberKeyframeTrack",
@@ -1168,15 +1168,15 @@
 				"VectorKeyframeTrack": "api/it/animation/tracks/VectorKeyframeTrack"
 			},
 
-      "Audio": {
-        "Audio": "api/it/audio/Audio",
-        "AudioAnalyser": "api/it/audio/AudioAnalyser",
-        "AudioContext": "api/it/audio/AudioContext",
-        "AudioListener": "api/it/audio/AudioListener",
-        "PositionalAudio": "api/it/audio/PositionalAudio"
-		  },
+			"Audio": {
+				"Audio": "api/it/audio/Audio",
+				"AudioAnalyser": "api/it/audio/AudioAnalyser",
+				"AudioContext": "api/it/audio/AudioContext",
+				"AudioListener": "api/it/audio/AudioListener",
+				"PositionalAudio": "api/it/audio/PositionalAudio"
+			},
 
-      "Telecamere": {
+			"Telecamere": {
 				"ArrayCamera": "api/it/cameras/ArrayCamera",
 				"Camera": "api/it/cameras/Camera",
 				"CubeCamera": "api/it/cameras/CubeCamera",
@@ -1185,7 +1185,7 @@
 				"StereoCamera": "api/it/cameras/StereoCamera"
 			},
 
-      "Costanti": {
+			"Costanti": {
 				"Animazione": "api/it/constants/Animation",
 				"Core": "api/it/constants/Core",
 				"CustomBlendingEquation": "api/it/constants/CustomBlendingEquations",
@@ -1195,7 +1195,7 @@
 				"Texture": "api/it/constants/Textures"
 			},
 
-      "Core": {
+			"Core": {
 				"BufferAttribute": "api/it/core/BufferAttribute",
 				"BufferGeometry": "api/it/core/BufferGeometry",
 				"Clock": "api/it/core/Clock",
@@ -1216,7 +1216,7 @@
 				"BufferAttribute Types": "api/it/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-      "Extras": {
+			"Extras": {
 				"DataUtils": "api/it/extras/DataUtils",
 				"Earcut": "api/it/extras/Earcut",
 				"ImageUtils": "api/it/extras/ImageUtils",
@@ -1244,8 +1244,91 @@
 				"QuadraticBezierCurve": "api/it/extras/curves/QuadraticBezierCurve",
 				"QuadraticBezierCurve3": "api/it/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/it/extras/curves/SplineCurve"
+			},
+
+			"Geometrie": {
+				"BoxGeometry": "api/it/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/it/geometries/CapsuleGeometry",
+				"CircleGeometry": "api/it/geometries/CircleGeometry",
+				"ConeGeometry": "api/it/geometries/ConeGeometry",
+				"CylinderGeometry": "api/it/geometries/CylinderGeometry",
+				"DodecahedronGeometry": "api/it/geometries/DodecahedronGeometry",
+				"EdgesGeometry": "api/it/geometries/EdgesGeometry",
+				"ExtrudeGeometry": "api/it/geometries/ExtrudeGeometry",
+				"IcosahedronGeometry": "api/it/geometries/IcosahedronGeometry",
+				"LatheGeometry": "api/it/geometries/LatheGeometry",
+				"OctahedronGeometry": "api/it/geometries/OctahedronGeometry",
+				"PlaneGeometry": "api/it/geometries/PlaneGeometry",
+				"PolyhedronGeometry": "api/it/geometries/PolyhedronGeometry",
+				"RingGeometry": "api/it/geometries/RingGeometry",
+				"ShapeGeometry": "api/it/geometries/ShapeGeometry",
+				"SphereGeometry": "api/it/geometries/SphereGeometry",
+				"TetrahedronGeometry": "api/it/geometries/TetrahedronGeometry",
+				"TorusGeometry": "api/it/geometries/TorusGeometry",
+				"TorusKnotGeometry": "api/it/geometries/TorusKnotGeometry",
+				"TubeGeometry": "api/it/geometries/TubeGeometry",
+				"WireframeGeometry": "api/it/geometries/WireframeGeometry"
+			},
+
+			"Helpers": {
+				"ArrowHelper": "api/it/helpers/ArrowHelper",
+				"AxesHelper": "api/it/helpers/AxesHelper",
+				"BoxHelper": "api/it/helpers/BoxHelper",
+				"Box3Helper": "api/it/helpers/Box3Helper",
+				"CameraHelper": "api/it/helpers/CameraHelper",
+				"DirectionalLightHelper": "api/it/helpers/DirectionalLightHelper",
+				"GridHelper": "api/it/helpers/GridHelper",
+				"PolarGridHelper": "api/it/helpers/PolarGridHelper",
+				"HemisphereLightHelper": "api/it/helpers/HemisphereLightHelper",
+				"PlaneHelper": "api/it/helpers/PlaneHelper",
+				"PointLightHelper": "api/it/helpers/PointLightHelper",
+				"SkeletonHelper": "api/it/helpers/SkeletonHelper",
+				"SpotLightHelper": "api/it/helpers/SpotLightHelper"
+			},
+
+			"Luci": {
+				"AmbientLight": "api/it/lights/AmbientLight",
+				"AmbientLightProbe": "api/it/lights/AmbientLightProbe",
+				"DirectionalLight": "api/it/lights/DirectionalLight",
+				"HemisphereLight": "api/it/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/it/lights/HemisphereLightProbe",
+				"Light": "api/it/lights/Light",
+				"LightProbe": "api/it/lights/LightProbe",
+				"PointLight": "api/it/lights/PointLight",
+				"RectAreaLight": "api/it/lights/RectAreaLight",
+				"SpotLight": "api/it/lights/SpotLight"
+			},
+
+			"Luci / Ombre": {
+				"LightShadow": "api/it/lights/shadows/LightShadow",
+				"PointLightShadow": "api/it/lights/shadows/PointLightShadow",
+				"DirectionalLightShadow": "api/it/lights/shadows/DirectionalLightShadow",
+				"SpotLightShadow": "api/it/lights/shadows/SpotLightShadow"
+			},
+			
+			"Loaders": {
+				"AnimationLoader": "api/it/loaders/AnimationLoader",
+				"AudioLoader": "api/it/loaders/AudioLoader",
+				"BufferGeometryLoader": "api/it/loaders/BufferGeometryLoader",
+				"Cache": "api/it/loaders/Cache",
+				"CompressedTextureLoader": "api/it/loaders/CompressedTextureLoader",
+				"CubeTextureLoader": "api/it/loaders/CubeTextureLoader",
+				"DataTextureLoader": "api/it/loaders/DataTextureLoader",
+				"FileLoader": "api/it/loaders/FileLoader",
+				"ImageBitmapLoader": "api/it/loaders/ImageBitmapLoader",
+				"ImageLoader": "api/it/loaders/ImageLoader",
+				"Loader": "api/it/loaders/Loader",
+				"LoaderUtils": "api/it/loaders/LoaderUtils",
+				"MaterialLoader": "api/it/loaders/MaterialLoader",
+				"ObjectLoader": "api/it/loaders/ObjectLoader",
+				"TextureLoader": "api/it/loaders/TextureLoader"
+			},
+
+			"Loaders / Managers": {
+				"DefaultLoadingManager": "api/it/loaders/managers/DefaultLoadingManager",
+				"LoadingManager": "api/it/loaders/managers/LoadingManager"
 			}
-    }
+		}
 	},
 	"pt-br": {
 
