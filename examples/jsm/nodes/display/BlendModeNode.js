@@ -51,7 +51,7 @@ class BlendModeNode extends TempNode {
 
 	}
 
-	construct( ) {
+	construct() {
 
 		const { blendMode, baseNode, blendNode } = this;
 		const params = { base: baseNode, blend: blendNode };
