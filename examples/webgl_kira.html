@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>Kira</title>
+  <meta name="title" content="Kira">
+  <meta name="description" content="Three.js experiment reproducing M. C. Escher's Hand with Reflecting Sphere">
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://abernier.name/three.js/examples/webgl_esher.html">
+  <meta property="og:title" content="Kira">
+  <meta property="og:description" content="Three.js experiment reproducing M. C. Escher's Hand with Reflecting Sphere">
+  <meta property="og:image" content="https://res.cloudinary.com/dtqr57xyj/image/upload/v1663266331/kira-export6.png">
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://abernier.name/three.js/examples/webgl_esher.html">
+  <meta property="twitter:title" content="Kira">
+  <meta property="twitter:description" content="Three.js experiment reproducing M. C. Escher's Hand with Reflecting Sphere">
+  <meta property="twitter:image" content="https://res.cloudinary.com/dtqr57xyj/image/upload/v1663266331/kira-export6.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="main.css">
+  <style>
+  body {color:white;}
+  #loader {
+    pointer-events: none;
+    font-family: 'Noto Sans', sans-serif;
+    color:#323232;
+
+    position:fixed; inset:0;
+    display: flex; justify-content: center; align-items: center; text-align: center;
+    background-color: #fafafa; 
+  }
+  #info a {
+    color:inherit;
+  }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <aside id="loader"><div class="loader__in">
+      loading…
+    </div></aside>
+  </div>
+  <div id="info">
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - <a href="https://assetstore.unity.com/packages/3d/characters/humanoids/humans/kira-lowpoly-character-100303" target="_blank" rel="noopener">Kira</a>'s "<a href="https://en.wikipedia.org/wiki/Hand_with_Reflecting_Sphere" target="_blank" rel="noopener">hand with Reflecting Sphere</a>"
+  </div>
+
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+// import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
+import { OrbitControls } from './jsm/controls/OrbitControls.js';
+import { TransformControls } from './jsm/controls/TransformControls.js';
+import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+// import {RectAreaLightHelper} from './jsm/helpers/RectAreaLightHelper.js'
+
+import { EffectComposer } from './jsm/postprocessing/EffectComposer.js'
+import { RenderPass } from './jsm/postprocessing/RenderPass.js'
+import { ShaderPass } from './jsm/postprocessing/ShaderPass.js'
+// import { BokehPass } from './jsm/postprocessing/BokehPass.js';
+import { FilmPass } from './jsm/postprocessing/FilmPass.js';
+import { HalftonePass } from './jsm/postprocessing/HalftonePass.js';
+import { RGBShiftShader } from './jsm/shaders/RGBShiftShader.js'
+import { DotScreenShader } from './jsm/shaders/DotScreenShader.js'
+import { FilmShader } from './jsm/shaders/FilmShader.js';
+import { VignetteShader } from './jsm/shaders/VignetteShader.js';
+import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
+
+import { CCDIKSolver, CCDIKHelper } from "./jsm/animation/CCDIKSolver.js";
+
+import Stats from './jsm/libs/stats.module.js';
+import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+import gsap from "https://cdn.skypack.dev/gsap@3.11.1";
+window.gsap = gsap
+
+var container
+let debug = false
+
+let scene, camera, renderer, composer,dotPass,filmPass,vignettePass,halftonePass, orbitControls, transformControls, hemiLight, light;
+let mirrorSphereCamera;
+
+// Objects Of Interest
+const OOI = {}
+window.OOI = OOI
+
+let IKSolver;
+
+// let bokehPass;
+
+let stats;
+
+let gui;
+const conf = {
+  fov: 55,
+  cubeRenderTargetSize: 1024,
+  dotPass: false,
+  filmPass: true,
+  halftonePass: false,
+  followBoule: true,
+  ik: true,
+  pivot: {
+    r: (function () {
+      const min = .38
+      const max = .44
+      const initial = (max + min)/2
+
+      return {val: initial, initial, min, max}
+    })(),
+    theta: (function () {
+      const min = -.2
+      const max = .5
+      const initial = (max + min)/2
+      return {val: initial, initial, min, max}
+    })(),
+    delta: (function () {
+      const min = -.35
+      const max = .15
+      const initial = (max + min)/2
+      return {val: initial, initial, min, max}
+    })(),
+  }
+}
+globalThis.conf = conf
+
+async function init() {
+  container = document.getElementById( 'container' );
+
+  debug = location.search.includes('debug')
+
+  //
+  // scene
+  //
+  //  ######   ######  ######## ##    ## ######## 
+  // ##    ## ##    ## ##       ###   ## ##       
+  // ##       ##       ##       ####  ## ##       
+  //  ######  ##       ######   ## ## ## ######   
+  //       ## ##       ##       ##  #### ##       
+  // ##    ## ##    ## ##       ##   ### ##       
+  //  ######   ######  ######## ##    ## ######## 
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0xffffff, .1)
+  // scene.fog = new THREE.Fog(0xffffff, 0, 20);
+  window.scene = scene
+
+  scene.background = new THREE.Color(0xdddddd);
+
+  //
+  // 🎥 camera
+  //
+  //  ######     ###    ##     ## ######## ########     ###    
+  // ##    ##   ## ##   ###   ### ##       ##     ##   ## ##   
+  // ##        ##   ##  #### #### ##       ##     ##  ##   ##  
+  // ##       ##     ## ## ### ## ######   ########  ##     ## 
+  // ##       ######### ##     ## ##       ##   ##   ######### 
+  // ##    ## ##     ## ##     ## ##       ##    ##  ##     ## 
+  //  ######  ##     ## ##     ## ######## ##     ## ##     ## 
+
+  camera = new THREE.PerspectiveCamera(conf.fov, window.innerWidth/window.innerHeight, 0.001, 5000);
+  window.camera = camera
+
+  // camera.position.set(.05,.93,2.75);
+  camera.lookAt(scene.position)
+  
+  if (debug) scene.add(new THREE.AxesHelper(1));
+
+  //
+  // 💡 lights
+  //
+  // ##       ####  ######   ##     ## ########  ######  
+  // ##        ##  ##    ##  ##     ##    ##    ##    ## 
+  // ##        ##  ##        ##     ##    ##    ##       
+  // ##        ##  ##   #### #########    ##     ######  
+  // ##        ##  ##    ##  ##     ##    ##          ## 
+  // ##        ##  ##    ##  ##     ##    ##    ##    ## 
+  // ######## ####  ######   ##     ##    ##     ######  
+
+  // const directionalLight = new THREE.DirectionalLight(0xffffff, 20)
+  // directionalLight.castShadow = true;
+  // // directionalLight.shadow.bias = 0.0000001;
+  // const resolution = 1024*4
+  // directionalLight.shadow.mapSize.width = resolution;
+  // directionalLight.shadow.mapSize.height = resolution;
+  // directionalLight.shadow.camera.near = 0.5;       // default 0.5
+  // directionalLight.shadow.camera.far = 10      // default 500
+  // directionalLight.position.set(2, 1, -7)
+  // // directionalLight.target.position.set(4,2,0)
+  // scene.add( directionalLight );
+  // directionalLight.add( new THREE.DirectionalLightHelper( directionalLight ) );
+
+  // const spotLight = new THREE.SpotLight(0xffffff, .5);
+  // spotLight.position.set(50,50,50);
+  // spotLight.castShadow = true;
+  // spotLight.shadow.bias = 0.0001;
+  // spotLight.shadow.mapSize.width = 1024*4;
+  // spotLight.shadow.mapSize.height = 1024*4;
+  // spotLight.shadow.camera.near = 0.5;       // default 0.5
+  // spotLight.shadow.camera.far = 10      // default 500
+  // spotLight.position.set(0.7, 3.2, 1.9)
+  // // directionalLight.target.position.set(0,0,0)
+  // scene.add( spotLight );
+  // if (debug) scene.add(new THREE.SpotLightHelper( spotLight ))
+
+  hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1); // ground, sky, intensity
+  scene.add(hemiLight);
+
+  // const ambientLight = new THREE.AmbientLight( 0xffffff, 1.1 ); // soft white light
+  // scene.add(ambientLight);
+
+  // const rectLight = new THREE.RectAreaLight( 0xffffff, 1,  2, 2 );
+  // rectLight.position.set( 1, 2, -7)
+  // rectLight.rotation.x = Math.PI
+  // scene.add( rectLight )
+  // const rectLightHelper = new RectAreaLightHelper( rectLight );
+  // if (debug) rectLight.add( rectLightHelper );
+
+  //
+  // renderer
+  //
+  // ########  ######## ##    ## ########  ######## ########  ######## ########  
+  // ##     ## ##       ###   ## ##     ## ##       ##     ## ##       ##     ## 
+  // ##     ## ##       ####  ## ##     ## ##       ##     ## ##       ##     ## 
+  // ########  ######   ## ## ## ##     ## ######   ########  ######   ########  
+  // ##   ##   ##       ##  #### ##     ## ##       ##   ##   ##       ##   ##   
+  // ##    ##  ##       ##   ### ##     ## ##       ##    ##  ##       ##    ##  
+  // ##     ## ######## ##    ## ########  ######## ##     ## ######## ##     ## 
+
+  renderer = new THREE.WebGLRenderer( { antialias: true } );
+  window.renderer = renderer
+
+  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.physicallyCorrectLights = true
+  // renderer.toneMapping = THREE.ReinhardToneMapping; // https://threejs.org/docs/#api/en/constants/Renderer
+  // renderer.toneMapping = THREE.ACESFilmicToneMapping
+  renderer.toneMappingExposure = 2.3;
+  renderer.shadowMap.enabled = true;
+  // renderer.shadowMap.type = THREE.PCFSoftShadowMap; // https://threejs.org/docs/#api/en/constants/Renderer
+  container.appendChild(renderer.domElement);
+
+  if (debug) {
+    stats = new Stats();
+    container.appendChild( stats.dom );
+  }
+
+  //
+  // 💅🏻 composer
+  //
+  //  ######   #######  ##     ## ########   #######   ######  ######## ########  
+  // ##    ## ##     ## ###   ### ##     ## ##     ## ##    ## ##       ##     ## 
+  // ##       ##     ## #### #### ##     ## ##     ## ##       ##       ##     ## 
+  // ##       ##     ## ## ### ## ########  ##     ##  ######  ######   ########  
+  // ##       ##     ## ##     ## ##        ##     ##       ## ##       ##   ##   
+  // ##    ## ##     ## ##     ## ##        ##     ## ##    ## ##       ##    ##  
+  //  ######   #######  ##     ## ##         #######   ######  ######## ##     ## 
+
+  composer = new EffectComposer( renderer );
+  composer.addPass( new RenderPass( scene, camera ) );
+
+  // dotPass
+  dotPass = new ShaderPass( DotScreenShader );
+  dotPass.uniforms[ 'scale' ].value = 7;
+  dotPass.enabled = conf.dotPass;
+  composer.addPass(dotPass);
+
+  // filmPass
+  filmPass = new ShaderPass(FilmShader);
+  // filmPass.uniforms[ 'tDiffuse' ].value = null;
+  // filmPass.uniforms[ 'time' ].value = 0.0;
+  filmPass.uniforms[ 'nIntensity' ].value = .35;
+  // filmPass.uniforms[ 'sIntensity' ].value = .5;
+  // filmPass.uniforms[ 'sCount' ].value = 4096;
+  // filmPass.uniforms[ 'grayscale' ].value = 1;
+  filmPass.enabled = conf.filmPass;
+  composer.addPass(filmPass);
+
+  // vignettePass
+  // vignettePass = new ShaderPass( VignetteShader );
+  // vignettePass.uniforms[ 'offset' ].value = 1;
+  // vignettePass.uniforms[ 'darkness' ].value = 1.6;
+  // composer.addPass( vignettePass );
+
+  // const gammaCorrection = new ShaderPass( GammaCorrectionShader );
+  // composer.addPass( gammaCorrection );
+
+  // const effect2 = new ShaderPass( RGBShiftShader );
+  // effect2.uniforms[ 'amount' ].value = 0.0015;
+  // composer.addPass( effect2 );
+
+  // halftonePass (see https://threejs.org/examples/#webgl_postprocessing_rgb_halftone)
+  halftonePass = new HalftonePass( window.innerWidth, window.innerHeight, {
+    shape: 1, // dot
+    radius: 2, // 4
+    rotateR: Math.PI / 12,
+    rotateB: Math.PI / 12 * 2,
+    rotateG: Math.PI / 12 * 3,
+    scatter: 2, // 0
+    blending: .75, // 1
+    blendingMode: 3, // 1 (3 means lighter)
+    greyscale: true,
+    // disable: false
+  });
+  halftonePass.enabled = conf.halftonePass;
+  composer.addPass( halftonePass )
+
+  //
+  // 🕹 orbit controls
+  //
+  //  #######  ########  ########  #### ######## 
+  // ##     ## ##     ## ##     ##  ##     ##    
+  // ##     ## ##     ## ##     ##  ##     ##    
+  // ##     ## ########  ########   ##     ##    
+  // ##     ## ##   ##   ##     ##  ##     ##    
+  // ##     ## ##    ##  ##     ##  ##     ##    
+  //  #######  ##     ## ########  ####    ##    
+
+  orbitControls = new OrbitControls(camera, renderer.domElement);
+  window.orbitControls = orbitControls
+
+  // orbitControls.addEventListener( 'change', (...args) => console.log(args)); // use if there is no animation loop
+  orbitControls.minDistance = .2;
+  orbitControls.maxDistance = 2;
+  orbitControls.enableDamping = true;
+
+  // orbitControls.target.set(0,0,0);
+  // camera.position.set( 1.9558129955932704, 1.2271681373663568, -0.23431115892757726)
+  orbitControls.update(); // orbitControls.update() must be called after any manual changes to the camera's transform
+
+  //
+  // 📦 GLTF scene loader
+  //
+  //  ######   ##       ######## ######## 
+  // ##    ##  ##          ##    ##       
+  // ##        ##          ##    ##       
+  // ##   #### ##          ##    ######   
+  // ##    ##  ##          ##    ##       
+  // ##    ##  ##          ##    ##       
+  //  ######   ########    ##    ##       
+
+  const textureLoader = new THREE.TextureLoader()
+  const dracoLoader = new DRACOLoader()
+  dracoLoader.setDecoderPath('js/libs/draco/');
+  const gltfLoader = new GLTFLoader()
+  gltfLoader.setDRACOLoader(dracoLoader)
+
+  //
+  // Textures
+  //
+
+  const bakedTexture1 = await textureLoader.loadAsync('textures/kira/baked1.jpg')
+  bakedTexture1.flipY = false
+  // bakedTexture1.encoding = THREE.sRGBEncoding
+  const bakedMaterial1 = new THREE.MeshBasicMaterial({ map: bakedTexture1 })
+
+  const bakedTexture2 = await textureLoader.loadAsync('textures/kira/baked2.jpg')
+  bakedTexture2.flipY = false
+  // bakedTexture2.encoding = THREE.sRGBEncoding
+  const bakedMaterial2 = new THREE.MeshBasicMaterial({ map: bakedTexture2 })
+
+  const gltf = await gltfLoader.loadAsync('models/gltf/kira.gltf')
+  console.log('gltf loaded', gltf)
+
+  gltf.scene.traverse(n => {
+    // console.log('node', n.name, n.type)
+
+    // if (n.name === 'spine_03') OOI.spine_03 = n
+    // if (n.name === 'neck_01') OOI.neck_01 = n
+    if (n.name === 'head') OOI.head = n
+    if (n.name === 'neck_01') OOI.neck = n
+    if (n.name === 'Clavicle_l') OOI.Clavicle_l = n
+    if (n.name === 'lowerarm_l') OOI.lowerarm_l = n
+    if (n.name === 'Upperarm_l') OOI.Upperarm_l = n
+    if (n.name === 'hand_l') OOI.hand_l = n
+    if (n.name === 'target_hand_l') OOI.target_hand_l = n
+
+    if (n.name === 'boule') OOI.boule = n
+    if (n.name === 'Kira_Shirt') OOI.kira = n
+
+    if (n.isBone) {
+      console.log('🦴', n.name)
+    }
+
+    if (n.isMesh) {
+      console.log('🪨', n.name)
+
+      if (!n.name.startsWith('Kira')) {
+        n.material = bakedMaterial1 // all objects except Kira character
+      } else {
+        n.material = bakedMaterial2 // Kira character
+      }
+
+      n.frustumCulled = false // see: https://stackoverflow.com/a/32876611/133327
+
+      // n.castShadow = true;
+      // n.receiveShadow = true;
+
+      // if ([
+      //     'Cube', 'Cube_1', // murs
+      //     'plafond',
+      //   ].includes(n.name)) {
+      //   // n.visible = false
+      //   n.castShadow = false; // do NOT castShadow
+      // }
+    }
+
+    if (n.isLight) {
+      console.log('💡', n)
+
+      // Shadows
+      // n.castShadow = true
+
+      // n.shadow.bias = 0.0000001;
+      // n.shadow.mapSize.width = 1024*4;
+      // n.shadow.mapSize.height = 1024*4;
+      
+      // Helpers
+      if (debug) {
+        if (n instanceof THREE.SpotLight) scene.add(new THREE.SpotLightHelper(n)) // SpotLightHelper
+        if (n instanceof THREE.DirectionalLight) scene.add(new THREE.DirectionalLightHelper(n)) // DirectionalLightHelper
+      }
+    }
+  });
+
+  console.log('OOI', OOI.hand_l, OOI.boule)
+
+  //
+  // Attach the boule to the hand_l
+  //
+
+  // const bouleOrigin = new THREE.Object3D()
+  // OOI.bouleOrigin = bouleOrigin
+  // OOI.bouleOrigin.attach(OOI.boule)
+  OOI.hand_l.attach(OOI.boule)
+
+  //
+  // 🪞 mirror sphere cube-camera
+  //
+
+  const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(conf.cubeRenderTargetSize)
+  window.cubeRenderTarget = cubeRenderTarget
+  mirrorSphereCamera = new THREE.CubeCamera(.05, 50, cubeRenderTarget) // near, far
+  window.mirrorSphereCamera = mirrorSphereCamera;
+  scene.add(mirrorSphereCamera)
+
+  const mirrorSphereMaterial = new THREE.MeshBasicMaterial({envMap: cubeRenderTarget.texture});
+  // mirrorSphereMaterial.reflectivity = 1.1
+  // mirrorSphereMaterial.refractionRatio = 2
+  // mirrorSphereMaterial.lightMapIntensity = 2
+  OOI.boule.material = mirrorSphereMaterial;
+
+  if (orbitControls) {
+    orbitControls.target.copy(OOI.boule.position); // orbit controls lookAt the sphere
+    orbitControls.update();
+  }
+
+  //
+  // 🕹 transformControls for target_hand_l
+  //
+
+  if (false && debug) {
+    transformControls = new TransformControls(camera, renderer.domElement)
+    window.transformControls = transformControls
+    transformControls.showX = true
+    // transformControls.showY = false
+    transformControls.showZ = true
+    transformControls.size = .75
+    // transformControls.space = "local"
+
+    transformControls.attach(OOI.target_hand_l)
+    scene.add(transformControls)
+
+    // disable orbitControls while using transformControls
+    transformControls.addEventListener('mouseDown', e => orbitControls.enabled = false)
+    transformControls.addEventListener('mouseUp', e => orbitControls.enabled = true)
+  }
+
+  //
+  //
+  //
+
+  scene.add(gltf.scene)
+
+  //
+  // 🦴 IK
+  //
+  // #### ##    ## 
+  //  ##  ##   ##  
+  //  ##  ##  ##   
+  //  ##  #####    
+  //  ##  ##  ##   
+  //  ##  ##   ##  
+  // #### ##    ## 
+
+  true && (function () {
+    console.log('bones', OOI.kira.skeleton.bones)
+
+    OOI.kira.add(OOI.kira.skeleton.bones[0]);
+
+    if (false && debug) {
+      const skeletonHelper = new THREE.SkeletonHelper(OOI.kira);
+      // skeletonHelper.material.linewidth = 4;
+      scene.add(skeletonHelper);
+    }
+    
+    const iks = [
+      {
+        target: 25, // "target_hand_l"
+        effector: 9, // "hand_l"
+        links: [
+          
+          {
+            index: 7, // "Upperarm_l"
+            // limitation: new THREE.Vector3(1, 0, 1), // 
+            rotationMin: new THREE.Vector3( 0.1,  -0.7, -1.8),
+            rotationMax: new THREE.Vector3( 1.1,  0, -1.4)
+          },
+          {
+            index: 8, // "lowerarm_l"
+            // limitation: new THREE.Vector3( 0, 0, 1 ),
+            rotationMin: new THREE.Vector3(1.2,  -1.8, -.4),
+            rotationMax: new THREE.Vector3(1.7,  -1.1, .3)
+          },
+          {
+            index: 9, // "hand_l"
+            // limitation: new THREE.Vector3( 0, 0, 1 ),
+            rotationMin: new THREE.Vector3(0,  -.5, 0.3),
+            rotationMax: new THREE.Vector3(0,  -.5, .3)
+          },
+        ],
+        // iteration: 15,
+        // minAngle: 0,
+        // maxAngle: Math.PI
+      }
+    ];
+    IKSolver = new CCDIKSolver(OOI.kira, iks);
+    window.IKSolver = IKSolver;
+
+    if (debug) {
+      const ccdikhelper = new CCDIKHelper(OOI.kira, iks, {sphereSize: .01})
+      scene.add(ccdikhelper);
+    }
+
+  }).call(this)
+
+  
+  //
+  // pivot (spherical rotation) around the head
+  //
+
+  {
+    const pivotOrigin = new THREE.Object3D()
+    OOI.pivotOrigin = pivotOrigin
+    pivotOrigin.rotation.x = -Math.PI/2
+    pivotOrigin.rotation.z = Math.PI/2
+    OOI.neck.add(pivotOrigin)
+  }
+
+  //
+  // 🎛 GUI `conf` (see https://lil-gui.georgealways.com/)
+  //
+  //  ######   ##     ## #### 
+  // ##    ##  ##     ##  ##  
+  // ##        ##     ##  ##  
+  // ##   #### ##     ##  ##  
+  // ##    ##  ##     ##  ##  
+  // ##    ##  ##     ##  ##  
+  //  ######    #######  #### 
+
+  if (debug) {
+    gui = new GUI();
+    globalThis.gui = gui
+    
+    gui.add(conf, 'fov', 1, 150).onChange(function (fov) {
+      camera.fov = fov
+      camera.updateProjectionMatrix()
+    });
+    gui.add(conf, 'cubeRenderTargetSize', 1, 1024).onChange(function (size) {
+      cubeRenderTarget.setSize(size, size)
+    });
+
+    gui.add(conf, 'dotPass').onChange(function (val) {
+      dotPass.enabled = val
+    });
+    gui.add(conf, 'filmPass').onChange(function (val) {
+      filmPass.enabled = val
+    });
+    gui.add(conf, 'halftonePass').onChange(function (val) {
+      halftonePass.enabled = val
+    });
+
+    gui.add(conf, 'followBoule')
+    gui.add(conf, 'ik');
+    gui.add(IKSolver, 'update');
+
+    ['Upperarm_l', 'lowerarm_l', 'hand_l'].forEach(boneName => {
+      console.log(boneName)
+      const folder = gui.addFolder(boneName);
+      ['x','y','z'].forEach(axis => folder.add(OOI[boneName].rotation, axis, -Math.PI, Math.PI).name(`rotation.${axis}`))
+    });
+
+    {
+      const folder = gui.addFolder('pivot');
+      const r = folder.add(conf.pivot.r, 'val', conf.pivot.r.min, conf.pivot.r.max)
+      const theta = folder.add(conf.pivot.theta, 'val', conf.pivot.theta.min, conf.pivot.theta.max)
+      const delta = folder.add(conf.pivot.delta, 'val', conf.pivot.delta.min, conf.pivot.delta.max)
+
+      globalThis.r = r
+      globalThis.theta = theta
+    }
+
+    gui.open();
+  }
+
+
+  //
+  // initial camera movement
+  //
+
+
+  {
+    const $loader = document.querySelector('#loader')
+    const $loaderIn = document.querySelector('.loader__in')
+
+    const pos0 = {x: 0.44815883201976203, y: 1.1098319534086936, z: 1.348606238040144}
+    const pos1 = {x: 3.3402040042198546, y: 1.665227491297859, z: 0.8238778382846002}
+    const pos2 = {x: 2.0052064877296, y: 1.1198408313891113, z: -0.17134287979506932}
+
+    const tl = gsap.timeline({paused: false})
+
+    const duration = 1
+
+    tl.add(gsap.to($loaderIn, {opacity: 0}))
+    
+    tl.add(gsap.to($loader, {opacity: 0}), 'toto')
+
+    gsap.set(camera.position, pos0)
+    // tl.add(gsap.to(camera.position, {...pos1, duration: 1}), 0)
+    tl.add(gsap.to(camera.position, {...pos2}), 'toto+=0')
+
+    gsap.to(tl, {time:tl.duration(), duration:2, ease:"power4.InOut"})
+  }
+
+
+}
+
+function onMousemove() {
+  // console.log('mousemove', (event.pageX - window.innerWidth/2) / window.innerWidth)
+
+  conf.pivot.theta.val = conf.pivot.theta.initial + ((event.pageX - window.innerWidth/2) / window.innerWidth)*(conf.pivot.theta.min-conf.pivot.theta.max)
+  globalThis.theta?.updateDisplay()
+
+  conf.pivot.r.val = conf.pivot.r.initial + ((event.pageY - window.innerHeight/2) / window.innerHeight)*(conf.pivot.r.min-conf.pivot.r.max)
+  globalThis.r?.updateDisplay()
+  
+}
+window.addEventListener('mousemove', onMousemove, false);
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize( window.innerWidth, window.innerHeight );
+}
+window.addEventListener('resize', onWindowResize, false);
+
+//
+// 🎬 animloop
+//
+//    ###    ##    ## #### ##     ## ##        #######   #######  ########  
+//   ## ##   ###   ##  ##  ###   ### ##       ##     ## ##     ## ##     ## 
+//  ##   ##  ####  ##  ##  #### #### ##       ##     ## ##     ## ##     ## 
+// ##     ## ## ## ##  ##  ## ### ## ##       ##     ## ##     ## ########  
+// ######### ##  ####  ##  ##     ## ##       ##     ## ##     ## ##        
+// ##     ## ##   ###  ##  ##     ## ##       ##     ## ##     ## ##        
+// ##     ## ##    ## #### ##     ## ########  #######   #######  ##        
+
+// https://greensock.com/docs/v3/GSAP/gsap.updateRoot()
+gsap.ticker.remove(gsap.updateRoot);
+
+let t0 = 0
+function animloop(t) {
+  const dt = t - t0
+  
+  paint(t, dt)
+  gsap.updateRoot(t/1000) // convert to seconds
+
+  stats?.update(); // fps stats
+  t0 = t
+
+  requestAnimationFrame(animloop);  
+}
+
+
+let frame = 0
+function paint(t, dt) {
+  if (OOI.boule && mirrorSphereCamera) {
+    OOI.boule.visible = false; // hide sphere before taking cube photos
+    mirrorSphereCamera.position.copy(OOI.boule.getWorldPosition(new THREE.Vector3())) // move the cube camera to the center of the sphere
+    mirrorSphereCamera.update(renderer, scene) // shoot cube photos
+    OOI.boule.visible = true; // reveal back the sphere
+  }
+
+  // orbitControls follows the boule
+  if (OOI.boule && conf.followBoule) {
+    orbitControls.target.lerp(OOI.boule.getWorldPosition(new THREE.Vector3()), .1)
+  }
+
+
+  if (true && OOI.pivotOrigin) {
+    //
+    // Position the target_hand_l bone on a sphere from `pivotOrigin` (around the `head` bone)
+    //
+
+    const {r, theta, delta} = conf.pivot
+        
+    const x = r.val * Math.cos(delta.val) * Math.cos(theta.val)
+    const y = r.val * Math.cos(delta.val) * Math.sin(theta.val)
+    const z = r.val * Math.sin(delta.val)
+
+    // Position `target_hand_l` absolutely (see: https://stackoverflow.com/a/12547936/133327)
+    const parent = OOI.target_hand_l.parent // store original parent
+    OOI.pivotOrigin.attach( OOI.target_hand_l ); // detach from parent and add to o
+    OOI.target_hand_l.position.lerp(new THREE.Vector3(x, y, z), .1);
+    parent.attach( OOI.target_hand_l ); // reattach to original parent
+
+    // OOI.head.rotation.set(0,theta.val,0)
+    OOI.head.lookAt(OOI.boule.getWorldPosition(new THREE.Vector3()))
+    OOI.head.rotation.set(OOI.head.rotation.x, OOI.head.rotation.y + Math.PI, OOI.head.rotation.z)
+    
+  }
+
+  if (OOI.head && OOI.boule) {
+    // OOI.head.lookAt(OOI.boule.position)
+  }
+
+  if (conf.ik) {
+    IKSolver?.update()
+  }
+  
+  
+  orbitControls.update(); // required if orbitControls.enableDamping or orbitControls.autoRotate are set to true
+
+  // renderer.render(scene, camera);
+  // console.log(dt)
+  // filmPass.uniforms[ 'time' ].value = frame * 0.01;
+  composer.render(dt);
+
+  frame++
+}
+
+// ##     ##    ###    #### ##    ## 
+// ###   ###   ## ##    ##  ###   ## 
+// #### ####  ##   ##   ##  ####  ## 
+// ## ### ## ##     ##  ##  ## ## ## 
+// ##     ## #########  ##  ##  #### 
+// ##     ## ##     ##  ##  ##   ### 
+// ##     ## ##     ## #### ##    ## 
+
+init();
+animloop();
+</script>
+</body>
+</html>
