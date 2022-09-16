@@ -19,6 +19,7 @@ import LightingContextNode from '../lighting/LightingContextNode.js';
 import MatcapUVNode from '../utils/MatcapUVNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 import OscNode from '../utils/OscNode.js';
+import RemapNode from '../utils/RemapNode.js';
 import RotateUVNode from '../utils/RotateUVNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
@@ -96,6 +97,8 @@ export const oscSine = nodeProxy( OscNode, OscNode.SINE );
 export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
 export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
 export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
+
+export const remap = nodeProxy( RemapNode );
 
 export const rotateUV = nodeProxy( RotateUVNode );
 

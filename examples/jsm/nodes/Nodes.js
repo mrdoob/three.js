@@ -80,6 +80,7 @@ import JoinNode from './utils/JoinNode.js';
 import MatcapUVNode from './utils/MatcapUVNode.js';
 import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
 import OscNode from './utils/OscNode.js';
+import RemapNode from './utils/RemapNode.js';
 import RotateUVNode from './utils/RotateUVNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
@@ -196,6 +197,7 @@ const nodeLib = {
 	MatcapUVNode,
 	MaxMipLevelNode,
 	OscNode,
+	RemapNode,
 	RotateUVNode,
 	SplitNode,
 	SpriteSheetUVNode,
@@ -308,6 +310,7 @@ export {
 	MatcapUVNode,
 	MaxMipLevelNode,
 	OscNode,
+	RemapNode,
 	RotateUVNode,
 	SplitNode,
 	SpriteSheetUVNode,
