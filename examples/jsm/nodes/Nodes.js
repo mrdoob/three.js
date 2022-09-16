@@ -52,6 +52,7 @@ import RangeNode from './geometry/RangeNode.js';
 import ComputeNode from './gpgpu/ComputeNode.js';
 
 // display
+import BlendModeNode from './display/BlendModeNode.js';
 import ColorAdjustmentNode from './display/ColorAdjustmentNode.js';
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import FrontFacingNode from './display/FrontFacingNode.js';
@@ -169,6 +170,7 @@ const nodeLib = {
 	UserDataNode,
 
 	// display
+	BlendModeNode,
 	ColorAdjustmentNode,
 	ColorSpaceNode,
 	FrontFacingNode,
@@ -282,6 +284,7 @@ export {
 	UserDataNode,
 
 	// display
+	BlendModeNode,
 	ColorAdjustmentNode,
 	ColorSpaceNode,
 	FrontFacingNode,

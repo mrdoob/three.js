@@ -5,6 +5,7 @@ import ReflectVectorNode from '../accessors/ReflectVectorNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
 
 // display
+import BlendModeNode from '../display/BlendModeNode.js';
 import ColorAdjustmentNode from '../display/ColorAdjustmentNode.js';
 import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import NormalMapNode from '../display/NormalMapNode.js';
@@ -72,6 +73,11 @@ export const reflectVector = nodeImmutable( ReflectVectorNode );
 export const skinning = nodeProxy( SkinningNode );
 
 // display
+
+export const burn = nodeProxy( BlendModeNode, BlendModeNode.BURN );
+export const dodge = nodeProxy( BlendModeNode, BlendModeNode.DODGE );
+export const overlay = nodeProxy( BlendModeNode, BlendModeNode.OVERLAY );
+export const screen = nodeProxy( BlendModeNode, BlendModeNode.SCREEN );
 
 export const saturation = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.SATURATION );
 export const vibrance = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.VIBRANCE );
