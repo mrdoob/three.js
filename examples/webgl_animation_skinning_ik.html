@@ -82,11 +82,9 @@ import { FilmShader } from 'three/addons/shaders/FilmShader.js';
 import { CCDIKSolver, CCDIKHelper } from "./jsm/animation/CCDIKSolver.js";
 
 import Stats from 'three/addons/libs/stats.module.js';
-// import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-import GUI from "https://cdn.skypack.dev/lil-gui@0.17.0";
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-import gsap from "https://cdn.skypack.dev/gsap@3.11.1";
-window.gsap = gsap
+import { TWEEN } from 'three/addons/libs/tween.module.min.js';
 
 var $container
 let debug = false
@@ -535,67 +533,67 @@ async function init() {
 
     gui.add(conf, 'followSphere').name('follows sphere')
     gui.add(conf, 'turnHead').name('turn head')
-    
-    const moveHandController = gui.add(conf.moveHand, 'val', conf.moveHand.values).name('move hand')
 
-    const r = gui.add(conf.pivot.r, 'val', conf.pivot.r.min, conf.pivot.r.max).name('r')
-    const theta = gui.add(conf.pivot.theta, 'val', conf.pivot.theta.min, conf.pivot.theta.max).name('theta')
-    const delta = gui.add(conf.pivot.delta, 'val', conf.pivot.delta.min, conf.pivot.delta.max).name('delta')
+    {
+      //
+      // 📂 handFolder
+      //
 
-    moveHandController.onChange(val => {
-      if (val === 'cursor') {
-        [r, theta, delta].forEach(c => c.show())
-      } else {
-        [r, theta, delta].forEach(c => c.hide())
-      }
-    })
+      const handFolder = gui.addFolder('hand')
+
+      const moveHandController = handFolder.add(conf.moveHand, 'val', conf.moveHand.values).name('move')
+
+      const pivotFolder = handFolder.addFolder('opts')
+      const r = pivotFolder.add(conf.pivot.r, 'val', conf.pivot.r.min, conf.pivot.r.max).name('r')
+      const theta = pivotFolder.add(conf.pivot.theta, 'val', conf.pivot.theta.min, conf.pivot.theta.max).name('theta')
+      const delta = pivotFolder.add(conf.pivot.delta, 'val', conf.pivot.delta.min, conf.pivot.delta.max).name('delta')
+
+      moveHandController.onChange(val => {
+        if (val === 'cursor') {
+          pivotFolder.show()
+        } else {
+          pivotFolder.hide()
+        }
+      })
+    }
 
     {
       //
       // 📂 ikFolder
       //
 
-      let armFolders = []
-      let updateController
+      let ikOptsFolder
 
-      function toggleArmFolders(val) {
+      function toggleIkOptsFolder(val) {
         if (val === true) {
-          armFolders.forEach(f => f.hide())
+          ikOptsFolder.hide()
         } else {
-          armFolders.forEach(f => f.show())
-        }
-      }
-      function toggleUpdateController(val) {
-        if (val === true) {
-          updateController.hide()
-        } else {
-          updateController.show()
+          ikOptsFolder.show()
         }
       }
 
       const ikFolder =  gui.addFolder('ik').close()
       ikFolder.add(conf, 'ik_solver').name('auto update').onChange(val => {
-        toggleArmFolders(val)
-        toggleUpdateController(val)
+        console.log('toto', val)
+        toggleIkOptsFolder(val)
       });
-      updateController = ikFolder.add(IKSolver, 'update').name('update()');
+      ikOptsFolder = ikFolder.addFolder('opts')
+      ikOptsFolder.add(IKSolver, 'update').name('update()');
 
       ['Upperarm_l', 'lowerarm_l', 'hand_l'].forEach(boneName => {
-        const folder = ikFolder.addFolder(boneName).close();
+        const folder = ikOptsFolder.addFolder(boneName).close();
         ['x','y','z'].forEach(axis => folder.add(OOI[boneName].rotation, axis, -Math.PI, Math.PI).name(`rotation.${axis}`))
-        armFolders.push(folder)
       });
 
-      toggleArmFolders(conf.ik_solver)
-      toggleUpdateController(conf.ik_solver)
+      toggleIkOptsFolder(conf.ik_solver)
     }
 
     {
       //
-      // 📂 options
+      // 📂 rendering
       //
 
-      const optionsFolder = gui.addFolder('options').close();
+      const optionsFolder = gui.addFolder('rendering').close();
       optionsFolder.add(conf, 'fov', 1, 150).onChange(function (fov) {
         camera.fov = fov
         camera.updateProjectionMatrix()
@@ -614,7 +612,7 @@ async function init() {
 
 
   //
-  // gsap initial camera movement
+  // Tween initial camera movement
   //
 
   {
@@ -622,22 +620,34 @@ async function init() {
     const $loaderIn = document.querySelector('.loader__in')
 
     const pos0 = {x: 0.44815883201976203, y: 1.1098319534086936, z: 1.348606238040144}
-    const pos1 = {x: 3.3402040042198546, y: 1.665227491297859, z: 0.8238778382846002}
-    const pos2 = {x: 2.0052064877296, y: 1.1198408313891113, z: -0.17134287979506932}
+    const pos1 = {x: 2.0052064877296, y: 1.1198408313891113, z: -0.17134287979506932}
 
-    const tl = gsap.timeline({paused: false})
+    const t1 = new TWEEN.Tween({opacity: 1})
+      .to({opacity: 0}, 500)
+      .onUpdate(({opacity}) => {
+        $loaderIn.style.opacity = opacity
+      })
 
-    const duration = 1
-
-    tl.add(gsap.to($loaderIn, {opacity: 0}))
+    const ease = TWEEN.Easing.Quartic.InOut
+    const dur = 1500
     
-    tl.add(gsap.to($loader, {opacity: 0}), 'toto')
-
-    gsap.set(camera.position, pos0)
-    // tl.add(gsap.to(camera.position, {...pos1, duration: 1}), 0)
-    tl.add(gsap.to(camera.position, {...pos2}), 'toto+=0')
-
-    gsap.to(tl, {time:tl.duration(), duration:2, ease:"power4.InOut"})
+    const t2 = new TWEEN.Tween({opacity: 1})
+      .to({opacity: 0}, dur)
+      .onUpdate(({opacity}) => {
+        $loader.style.opacity = opacity
+      })
+      .easing(ease)
+    
+    camera.position.set(pos0.x, pos0.y, pos0.z)
+    const t3 = new TWEEN.Tween(camera.position)
+      .to(pos1, dur)
+      .easing(ease)
+		
+    t1.chain(t2)
+    t2.onStart(() => {
+      t3.start()
+    })
+    t1.start();
   }
 
   //
@@ -687,15 +697,12 @@ async function init() {
 // ##     ## ##   ###  ##  ##     ## ##       ##     ## ##     ## ##        
 // ##     ## ##    ## #### ##     ## ########  #######   #######  ##        
 
-// https://greensock.com/docs/v3/GSAP/gsap.updateRoot()
-gsap.ticker.remove(gsap.updateRoot);
-
 let t0 = 0
 function animloop(t) {
   const dt = t - t0
   
   paint(t, dt)
-  gsap.updateRoot(t/1000) // convert to seconds
+  TWEEN.update(t)
 
   stats?.update(); // fps stats
   t0 = t
