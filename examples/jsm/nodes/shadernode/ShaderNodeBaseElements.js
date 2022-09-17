@@ -273,5 +273,6 @@ export const element = nodeProxy( ArrayElementNode );
 
 // miscellaneous
 
+export const difference = ( a, b ) => nodeObject( abs( sub( a, b ) ) );
 export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
 export const transformedNormalWorld = normalize( transformDirection( transformedNormalView, cameraViewMatrix ) );

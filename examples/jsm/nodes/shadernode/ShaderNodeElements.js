@@ -5,6 +5,7 @@ import ReflectVectorNode from '../accessors/ReflectVectorNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
 
 // display
+import BlendModeNode from '../display/BlendModeNode.js';
 import ColorAdjustmentNode from '../display/ColorAdjustmentNode.js';
 import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import NormalMapNode from '../display/NormalMapNode.js';
@@ -19,6 +20,7 @@ import LightingContextNode from '../lighting/LightingContextNode.js';
 import MatcapUVNode from '../utils/MatcapUVNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 import OscNode from '../utils/OscNode.js';
+import RemapNode from '../utils/RemapNode.js';
 import RotateUVNode from '../utils/RotateUVNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
@@ -72,6 +74,11 @@ export const skinning = nodeProxy( SkinningNode );
 
 // display
 
+export const burn = nodeProxy( BlendModeNode, BlendModeNode.BURN );
+export const dodge = nodeProxy( BlendModeNode, BlendModeNode.DODGE );
+export const overlay = nodeProxy( BlendModeNode, BlendModeNode.OVERLAY );
+export const screen = nodeProxy( BlendModeNode, BlendModeNode.SCREEN );
+
 export const saturation = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.SATURATION );
 export const vibrance = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.VIBRANCE );
 export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
@@ -96,6 +103,9 @@ export const oscSine = nodeProxy( OscNode, OscNode.SINE );
 export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
 export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
 export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
+
+export const remap = nodeProxy( RemapNode, null, null, { doClamp: false } );
+export const remapClamp = nodeProxy( RemapNode );
 
 export const rotateUV = nodeProxy( RotateUVNode );
 

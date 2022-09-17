@@ -24,7 +24,7 @@ class OscNode extends Node {
 
 	}
 
-	generate( builder ) {
+	construct() {
 
 		const method = this.method;
 		const timeNode = this.timeNode;
@@ -49,7 +49,7 @@ class OscNode extends Node {
 
 		}
 
-		return outputNode.build( builder );
+		return outputNode;
 
 	}
 
