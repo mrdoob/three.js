@@ -235,7 +235,6 @@ export const negate = nodeProxy( MathNode, MathNode.NEGATE );
 export const invert = nodeProxy( MathNode, MathNode.INVERT );
 export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
 export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
-export const saturate = nodeProxy( MathNode, MathNode.SATURATE );
 export const round = nodeProxy( MathNode, MathNode.ROUND );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
@@ -274,5 +273,5 @@ export const element = nodeProxy( ArrayElementNode );
 // miscellaneous
 
 export const difference = ( a, b ) => nodeObject( abs( sub( a, b ) ) );
-export const dotNV = saturate( dot( transformedNormalView, positionViewDirection ) );
+export const dotNV = clamp( dot( transformedNormalView, positionViewDirection ) );
 export const transformedNormalWorld = normalize( transformDirection( transformedNormalView, cameraViewMatrix ) );
