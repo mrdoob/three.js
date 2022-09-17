@@ -57,26 +57,28 @@ const wgslTypeLib = {
 const wgslMethods = {
 	dFdx: 'dpdx',
 	dFdy: 'dpdy',
+	mod: 'threejs_mod',
+	lessThanEqual: 'threejs_lessThanEqual',
 	inversesqrt: 'inverseSqrt'
 };
 
 const wgslPolyfill = {
 	lessThanEqual: new CodeNode( `
-fn lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
+fn threejs_lessThanEqual( a : vec3<f32>, b : vec3<f32> ) -> vec3<bool> {
 
 	return vec3<bool>( a.x <= b.x, a.y <= b.y, a.z <= b.z );
 
 }
 ` ),
 	mod: new CodeNode( `
-fn mod( x : f32, y : f32 ) -> f32 {
+fn threejs_mod( x : f32, y : f32 ) -> f32 {
 
 	return x - y * floor( x / y );
 
 }
 ` ),
 	repeatWrapping: new CodeNode( `
-fn repeatWrapping( uv : vec2<f32>, dimension : vec2<i32> ) -> vec2<i32> {
+fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<i32> ) -> vec2<i32> {
 
 	let uvScaled = vec2<i32>( uv * vec2<f32>( dimension ) );
 
@@ -148,7 +150,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			const dimension = `textureDimensions( ${textureProperty}, 0 )`;
 
-			return `textureLoad( ${textureProperty}, repeatWrapping( ${uvSnippet}, ${dimension} ), 0 )`;
+			return `textureLoad( ${textureProperty}, threejs_repeatWrapping( ${uvSnippet}, ${dimension} ), 0 )`;
 
 		}
 
@@ -166,7 +168,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			const dimension = `textureDimensions( ${textureProperty}, 0 )`;
 
-			return `textureLoad( ${textureProperty}, repeatWrapping( ${uvSnippet}, ${dimension} ), i32( ${biasSnippet} ) )`;
+			return `textureLoad( ${textureProperty}, threejs_repeatWrapping( ${uvSnippet}, ${dimension} ), i32( ${biasSnippet} ) )`;
 
 		}
 
