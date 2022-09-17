@@ -323,8 +323,10 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		This disposes the material. Textures of a material don't get disposed.
-		These needs to be disposed by [page:Texture Texture].
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+		</p>
+		<p>
+		Material textures must be be disposed of by the dispose() method of [page:Texture Texture].</p>
 		</p>
 
 		<h3>[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
