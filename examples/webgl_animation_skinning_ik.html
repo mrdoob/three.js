@@ -110,6 +110,14 @@ async function init() {
 
 	debug = location.search.includes( 'debug' ) || window.self !== window.top;
 
+	//  ######   #######  ##    ## ########
+	// ##    ## ##     ## ###   ## ##
+	// ##       ##     ## ####  ## ##
+	// ##       ##     ## ## ## ## ######
+	// ##       ##     ## ##  #### ##
+	// ##    ## ##     ## ##   ### ##
+	//  ######   #######  ##    ## ##
+
 	conf = {
 		fov: 55,
 		cubeRenderTargetSize: 1024,
@@ -167,7 +175,6 @@ async function init() {
 
 	scene = new THREE.Scene();
 	scene.fog = new THREE.FogExp2( 0xffffff, .1 );
-	// scene.fog = new THREE.Fog(0xffffff, 0, 20);
 	window.scene = scene;
 
 	scene.background = new THREE.Color( 0xdddddd );
@@ -202,44 +209,8 @@ async function init() {
 	// ##        ##  ##    ##  ##     ##    ##    ##    ##
 	// ######## ####  ######   ##     ##    ##     ######
 
-	// const directionalLight = new THREE.DirectionalLight(0xffffff, 20)
-	// directionalLight.castShadow = true;
-	// // directionalLight.shadow.bias = 0.0000001;
-	// const resolution = 1024*4
-	// directionalLight.shadow.mapSize.width = resolution;
-	// directionalLight.shadow.mapSize.height = resolution;
-	// directionalLight.shadow.camera.near = 0.5;       // default 0.5
-	// directionalLight.shadow.camera.far = 10      // default 500
-	// directionalLight.position.set(2, 1, -7)
-	// // directionalLight.target.position.set(4,2,0)
-	// scene.add( directionalLight );
-	// directionalLight.add( new THREE.DirectionalLightHelper( directionalLight ) );
-
-	// const spotLight = new THREE.SpotLight(0xffffff, .5);
-	// spotLight.position.set(50,50,50);
-	// spotLight.castShadow = true;
-	// spotLight.shadow.bias = 0.0001;
-	// spotLight.shadow.mapSize.width = 1024*4;
-	// spotLight.shadow.mapSize.height = 1024*4;
-	// spotLight.shadow.camera.near = 0.5;       // default 0.5
-	// spotLight.shadow.camera.far = 10      // default 500
-	// spotLight.position.set(0.7, 3.2, 1.9)
-	// // directionalLight.target.position.set(0,0,0)
-	// scene.add( spotLight );
-	// if (debug) scene.add(new THREE.SpotLightHelper( spotLight ))
-
 	hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1 ); // ground, sky, intensity
 	scene.add( hemiLight );
-
-	// const ambientLight = new THREE.AmbientLight( 0xffffff, 1.1 ); // soft white light
-	// scene.add(ambientLight);
-
-	// const rectLight = new THREE.RectAreaLight( 0xffffff, 1,  2, 2 );
-	// rectLight.position.set( 1, 2, -7)
-	// rectLight.rotation.x = Math.PI
-	// scene.add( rectLight )
-	// const rectLightHelper = new RectAreaLightHelper( rectLight );
-	// if (debug) rectLight.add( rectLightHelper );
 
 	//
 	// renderer
@@ -259,11 +230,10 @@ async function init() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.outputEncoding = THREE.sRGBEncoding;
 	renderer.physicallyCorrectLights = true;
-	// renderer.toneMapping = THREE.ReinhardToneMapping; // https://threejs.org/docs/#api/en/constants/Renderer
-	// renderer.toneMapping = THREE.ACESFilmicToneMapping
+	renderer.toneMapping = THREE.NoToneMapping; // https://threejs.org/docs/#api/en/constants/Renderer
 	renderer.toneMappingExposure = 2.3;
 	renderer.shadowMap.enabled = true;
-	// renderer.shadowMap.type = THREE.PCFSoftShadowMap; // https://threejs.org/docs/#api/en/constants/Renderer
+	renderer.shadowMap.type = THREE.PCFSoftShadowMap; // https://threejs.org/docs/#api/en/constants/Renderer
 	$container.appendChild( renderer.domElement );
 
 	if ( debug ) {
@@ -287,14 +257,9 @@ async function init() {
 	composer = new EffectComposer( renderer );
 	composer.addPass( new RenderPass( scene, camera ) );
 
-	// filmPass
+	// filmPass (see: examples/jsm/shaders/FilmShader.js for uniforms options)
 	filmPass = new ShaderPass( FilmShader );
-	// filmPass.uniforms[ 'tDiffuse' ].value = null;
-	// filmPass.uniforms[ 'time' ].value = 0.0;
 	filmPass.uniforms[ 'nIntensity' ].value = .35;
-	// filmPass.uniforms[ 'sIntensity' ].value = .5;
-	// filmPass.uniforms[ 'sCount' ].value = 4096;
-	// filmPass.uniforms[ 'grayscale' ].value = 1;
 	filmPass.enabled = conf.filmPass;
 	composer.addPass( filmPass );
 
@@ -312,13 +277,10 @@ async function init() {
 	orbitControls = new OrbitControls( camera, renderer.domElement );
 	window.orbitControls = orbitControls;
 
-	// orbitControls.addEventListener( 'change', (...args) => console.log(args)); // use if there is no animation loop
 	orbitControls.minDistance = .2;
 	orbitControls.maxDistance = 2;
 	orbitControls.enableDamping = true;
 
-	// orbitControls.target.set(0,0,0);
-	// camera.position.set( 1.9558129955932704, 1.2271681373663568, -0.23431115892757726)
 	orbitControls.update(); // orbitControls.update() must be called after any manual changes to the camera's transform
 
 	//
@@ -344,20 +306,19 @@ async function init() {
 
 	const bakedTexture1 = await textureLoader.loadAsync( 'textures/kira/baked1.jpg' );
 	bakedTexture1.flipY = false;
-	// bakedTexture1.encoding = THREE.sRGBEncoding
 	const bakedMaterial1 = new THREE.MeshBasicMaterial( { map: bakedTexture1 } );
 
 	const bakedTexture2 = await textureLoader.loadAsync( 'textures/kira/baked2.jpg' );
 	bakedTexture2.flipY = false;
-	// bakedTexture2.encoding = THREE.sRGBEncoding
 	const bakedMaterial2 = new THREE.MeshBasicMaterial( { map: bakedTexture2 } );
 
 	const gltf = await gltfLoader.loadAsync( 'models/gltf/kira.glb' );
-	// console.log('gltf loaded', gltf)
 
 	gltf.scene.traverse( n => {
 
-		// console.log('node', n.name, n.type)
+		//
+		// Remarquable 🦴 bones
+		//
 
 		if ( n.name === 'head' ) OOI.head = n;
 		if ( n.name === 'neck_01' ) OOI.neck = n;
@@ -370,13 +331,11 @@ async function init() {
 		if ( n.name === 'boule' ) OOI.boule = n;
 		if ( n.name === 'Kira_Shirt' ) OOI.kira = n;
 
-		if ( n.isBone ) {
-			// console.log('🦴', n.name)
-		}
-
 		if ( n.isMesh ) {
 
-			// console.log('🪨', n.name)
+			//
+			// Apply materials
+			//
 
 			if ( ! n.name.startsWith( 'Kira' ) ) {
 
@@ -412,8 +371,6 @@ async function init() {
 	// Attach the boule to the hand_l
 	//
 
-	// console.log('OOI', OOI.hand_l, OOI.boule)
-
 	OOI.hand_l.attach( OOI.boule );
 
 	//
@@ -427,9 +384,6 @@ async function init() {
 	scene.add( mirrorSphereCamera );
 
 	const mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: cubeRenderTarget.texture } );
-	// mirrorSphereMaterial.reflectivity = 1.1
-	// mirrorSphereMaterial.refractionRatio = 2
-	// mirrorSphereMaterial.lightMapIntensity = 2
 	OOI.boule.material = mirrorSphereMaterial;
 
 	if ( orbitControls ) {
@@ -447,11 +401,8 @@ async function init() {
 
 		transformControls = new TransformControls( camera, renderer.domElement );
 		window.transformControls = transformControls;
-		transformControls.showX = true;
-		// transformControls.showY = false
-		transformControls.showZ = true;
 		transformControls.size = .75;
-		// transformControls.space = "local"
+		transformControls.space = 'world';
 
 		transformControls.attach( OOI.target_hand_l );
 		scene.add( transformControls );
@@ -481,14 +432,12 @@ async function init() {
 
 	true && ( function () {
 
-		// console.log('bones', OOI.kira.skeleton.bones)
-
 		OOI.kira.add( OOI.kira.skeleton.bones[ 0 ] );
 
 		if ( false && debug ) {
 
 			const skeletonHelper = new THREE.SkeletonHelper( OOI.kira );
-			// skeletonHelper.material.linewidth = 4;
+			skeletonHelper.material.linewidth = 1;
 			scene.add( skeletonHelper );
 
 		}
@@ -501,26 +450,20 @@ async function init() {
 
 					{
 						index: 7, // "Upperarm_l"
-						// limitation: new THREE.Vector3(1, 0, 1), //
 						rotationMin: new THREE.Vector3( 0.1, - 0.7, - 1.8 ),
 						rotationMax: new THREE.Vector3( 1.1, 0, - 1.4 )
 					},
 					{
 						index: 8, // "lowerarm_l"
-						// limitation: new THREE.Vector3( 0, 0, 1 ),
 						rotationMin: new THREE.Vector3( 1.2, - 1.8, - .4 ),
 						rotationMax: new THREE.Vector3( 1.7, - 1.1, .3 )
 					},
 					{
 						index: 9, // "hand_l"
-						// limitation: new THREE.Vector3( 0, 0, 1 ),
 						rotationMin: new THREE.Vector3( 0, - .5, 0.3 ),
 						rotationMax: new THREE.Vector3( 0, - .5, .3 )
 					},
 				],
-				// iteration: 15,
-				// minAngle: 0,
-				// maxAngle: Math.PI
 			}
 		];
 		IKSolver = new CCDIKSolver( OOI.kira, iks );
@@ -812,7 +755,6 @@ function paint( t, dt ) {
 
 	}
 
-
 	if ( OOI.pivotOrigin && conf.moveHand.val !== 'transformControls' ) {
 
 		//
@@ -843,8 +785,6 @@ function paint( t, dt ) {
 		OOI.head.rotation.set( OOI.head.rotation.x, OOI.head.rotation.y + Math.PI, OOI.head.rotation.z );
 
 	}
-
-
 
 	if ( transformControls ) {
 
