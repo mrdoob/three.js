@@ -352,7 +352,7 @@ async function init() {
 	// bakedTexture2.encoding = THREE.sRGBEncoding
 	const bakedMaterial2 = new THREE.MeshBasicMaterial( { map: bakedTexture2 } );
 
-	const gltf = await gltfLoader.loadAsync( 'models/gltf/kira.gltf' );
+	const gltf = await gltfLoader.loadAsync( 'models/gltf/kira.glb' );
 	// console.log('gltf loaded', gltf)
 
 	gltf.scene.traverse( n => {
