@@ -392,7 +392,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	this.getVendorInfo = function () {
+	this.getGraphicsDriverVendor = function () {
 
 		const debugInfo = extensions.get( 'WEBGL_debug_renderer_info' );
 		if ( ! debugInfo ) {
@@ -409,7 +409,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	 this.getRendererInfo = function () {
+	 this.getGraphicsDriverRenderer = function () {
 
 		const debugInfo = extensions.get( 'WEBGL_debug_renderer_info' );
 
