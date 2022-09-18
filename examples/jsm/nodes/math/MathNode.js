@@ -151,10 +151,6 @@ class MathNode extends TempNode {
 
 			return new MathNode( MathNode.NORMALIZE, mulNode ).build( builder );
 
-		} else if ( method === MathNode.CLAMP && b === null ) {
-
-			return builder.format( `clamp( ${ a.build( builder, inputType ) }, 0.0, 1.0 )`, type, output );
-
 		} else if ( method === MathNode.NEGATE ) {
 
 			return builder.format( '( -' + a.build( builder, inputType ) + ' )', type, output );
