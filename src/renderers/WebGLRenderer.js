@@ -392,6 +392,41 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
+	this.getVendorInfo = function () {
+
+		const debugInfo = extensions.get( 'WEBGL_debug_renderer_info' );
+		if ( ! debugInfo ) {
+
+			return null;
+
+		} else {
+
+			const vendor = _gl.getParameter( debugInfo.UNMASKED_VENDOR_WEBGL );
+
+			return vendor;
+
+		}
+
+	};
+
+	 this.getRendererInfo = function () {
+
+		const debugInfo = extensions.get( 'WEBGL_debug_renderer_info' );
+
+		if ( ! debugInfo ) {
+
+			return null;
+
+		} else {
+
+			const renderer = _gl.getParameter( debugInfo.UNMASKED_RENDERER_WEBGL );
+
+			return renderer;
+
+		}
+
+	};
+
 	this.getPixelRatio = function () {
 
 		return _pixelRatio;
