@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { add, sub, div, mul, saturate } from '../shadernode/ShaderNodeBaseElements.js';
+import { add, sub, div, mul, clamp } from '../shadernode/ShaderNodeBaseElements.js';
 
 class RemapNode extends Node {
 
@@ -23,7 +23,7 @@ class RemapNode extends Node {
 
 		let t = div( sub( node, inLowNode ), sub( inHighNode, inLowNode ) );
 
-		if ( doClamp === true ) t = saturate( t );
+		if ( doClamp === true ) t = clamp( t );
 
 		return add( mul( sub( outHighNode, outLowNode ), t ), outLowNode );
 
