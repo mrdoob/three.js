@@ -64,7 +64,7 @@
 				scene = new THREE.Scene();
 				scene.fogNode = new Nodes.FogRangeNode( color( 0xFF00FF ), float( 30 ), float( 300 ) );
 
-				const sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
+				const sphereGeometry = new THREE.SphereGeometry( 0.5, 16, 8 );
 
 				//textures
 
@@ -80,21 +80,27 @@
 
 				//lights
 
-				light1 = new THREE.PointLight( 0xff0040, 2, 1000 );
-				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) ) );
-				scene.add( light1 );
+				const addLight = ( hexColor, intensity = 2, distance = 1000 ) => {
 
-				light2 = new THREE.PointLight( 0x0040ff, 2, 1000 );
-				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) ) );
-				scene.add( light2 );
+					const material = new Nodes.MeshStandardNodeMaterial();
+					material.colorNode = color( hexColor );
+					material.lightsNode = new Nodes.LightsNode(); // ignore scene lights
 
-				light3 = new THREE.PointLight( 0x80ff80, 2, 1000 );
-				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) ) );
-				scene.add( light3 );
+					const mesh = new THREE.Mesh( sphereGeometry, material );
 
-				light4 = new THREE.PointLight( 0xffaa00, 2, 1000 );
-				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) ) );
-				scene.add( light4 );
+					const light = new THREE.PointLight( hexColor, intensity, distance );
+					light.add( mesh );
+
+					scene.add( light );
+
+					return light;
+
+				};
+
+				light1 = addLight( 0xff0040 );
+				light2 = addLight( 0x0040ff );
+				light3 = addLight( 0x80ff80 );
+				light4 = addLight( 0xffaa00 );
 
 				//light nodes ( selective lights )
 
