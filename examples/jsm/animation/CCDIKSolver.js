@@ -393,6 +393,30 @@ class CCDIKHelper extends Object3D {
 
 	}
 
+	/**
+	 * Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+	 */
+	dispose() {
+
+		this.sphereGeometry.dispose();
+
+		this.targetSphereMaterial.dispose();
+		this.effectorSphereMaterial.dispose();
+		this.linkSphereMaterial.dispose();
+		this.lineMaterial.dispose();
+
+		const children = this.children;
+
+		for ( let i = 0; i < children.length; i ++ ) {
+
+			const child = children[ i ];
+
+			if ( child.isLine ) child.geometry.dispose();
+
+		}
+
+	}
+
 	// private method
 
 	_init() {
