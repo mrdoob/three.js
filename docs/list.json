@@ -1477,6 +1477,15 @@
 				"AudioContext": "api/fr/audio/AudioContext",
 				"AudioListener": "api/fr/audio/AudioListener",
 				"PositionalAudio": "api/fr/audio/PositionalAudio"
+			},
+
+			"Caméras": {
+				"ArrayCamera": "api/fr/cameras/ArrayCamera",
+				"Camera": "api/fr/cameras/Camera",
+				"CubeCamera": "api/fr/cameras/CubeCamera",
+				"OrthographicCamera": "api/fr/cameras/OrthographicCamera",
+				"PerspectiveCamera": "api/fr/cameras/PerspectiveCamera",
+				"StereoCamera": "api/fr/cameras/StereoCamera"
 			}
 		
 		}
