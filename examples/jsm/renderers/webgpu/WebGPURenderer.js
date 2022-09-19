@@ -14,11 +14,76 @@ import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
 import WebGPUUtils from './WebGPUUtils.js';
 
-import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
+import { Camera, PerspectiveCamera, OrthographicCamera, Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
 
-console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
+console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrthographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
-Matrix4.prototype.makePerspective = function ( left, right, top, bottom, near, far ) {
+
+Camera.prototype.clippingSpace = 'webgl'
+
+PerspectiveCamera.prototype.updateProjectionMatrix = function() {
+
+	const near = this.near;
+	let top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
+	let height = 2 * top;
+	let width = this.aspect * height;
+	let left = - 0.5 * width;
+	const view = this.view;
+
+	if ( this.view !== null && this.view.enabled ) {
+
+		const fullWidth = view.fullWidth,
+			fullHeight = view.fullHeight;
+
+		left += view.offsetX * width / fullWidth;
+		top -= view.offsetY * height / fullHeight;
+		width *= view.width / fullWidth;
+		height *= view.height / fullHeight;
+
+	}
+
+	const skew = this.filmOffset;
+	if ( skew !== 0 ) left += near * skew / this.getFilmWidth();
+
+	const normalized = this.clippingSpace === 'webgpu'
+	this.projectionMatrix.makePerspective( left, left + width, top, top - height, near, this.far, normalized );
+
+	this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
+
+}
+
+OrthographicCamera.prototype.updateProjectionMatrix = function() {
+
+	const dx = ( this.right - this.left ) / ( 2 * this.zoom );
+	const dy = ( this.top - this.bottom ) / ( 2 * this.zoom );
+	const cx = ( this.right + this.left ) / 2;
+	const cy = ( this.top + this.bottom ) / 2;
+
+	let left = cx - dx;
+	let right = cx + dx;
+	let top = cy + dy;
+	let bottom = cy - dy;
+
+	if ( this.view !== null && this.view.enabled ) {
+
+		const scaleW = ( this.right - this.left ) / this.view.fullWidth / this.zoom;
+		const scaleH = ( this.top - this.bottom ) / this.view.fullHeight / this.zoom;
+
+		left += scaleW * this.view.offsetX;
+		right = left + scaleW * this.view.width;
+		top -= scaleH * this.view.offsetY;
+		bottom = top - scaleH * this.view.height;
+
+	}
+
+	const normalized = this.clippingSpace === 'webgpu'
+	this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far, normalized );
+
+	this.projectionMatrixInverse.copy( this.projectionMatrix ).invert();
+
+}
+
+Matrix4.prototype.makePerspective = function ( left, right, top, bottom, near, far, normalized = false ) {
 
 	const te = this.elements;
 	const x = 2 * near / ( right - left );
@@ -26,19 +91,30 @@ Matrix4.prototype.makePerspective = function ( left, right, top, bottom, near, f
 
 	const a = ( right + left ) / ( right - left );
 	const b = ( top + bottom ) / ( top - bottom );
-	const c = - far / ( far - near );
-	const d = - far * near / ( far - near );
 
-	te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	te[ 12 ] = 0;
-	te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	te[ 13 ] = 0;
-	te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	te[ 14 ] = d;
-	te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	te[ 15 ] = 0;
+  let c, d
+
+  if ( normalized === true ) {
+
+    c = - far / ( far - near )
+    d = ( - far * near ) / ( far - near )
+  } else {
+
+    c = - ( far + near ) / ( far - near )
+    d = ( -2 * far * near ) / ( far - near )
+
+  }
+
+	te[ 0 ] = x;	te[ 4 ] = 0;	te[ 8 ] = a;	   te[ 12 ] = 0;
+	te[ 1 ] = 0;	te[ 5 ] = y;	te[ 9 ] = b;	   te[ 13 ] = 0;
+	te[ 2 ] = 0;	te[ 6 ] = 0;	te[ 10 ] = c;	   te[ 14 ] = d;
+	te[ 3 ] = 0;	te[ 7 ] = 0;	te[ 11 ] = - 1;	 te[ 15 ] = 0;
 
 	return this;
 
 };
 
-Matrix4.prototype.makeOrthographic = function ( left, right, top, bottom, near, far ) {
+Matrix4.prototype.makeOrthographic = function ( left, right, top, bottom, near, far, normalized = false ) {
 
 	const te = this.elements;
 	const w = 1.0 / ( right - left );
@@ -47,18 +123,31 @@ Matrix4.prototype.makeOrthographic = function ( left, right, top, bottom, near, 
 
 	const x = ( right + left ) * w;
 	const y = ( top + bottom ) * h;
-	const z = near * p;
+	
+  let z, zInv
 
-	te[ 0 ] = 2 * w;	te[ 4 ] = 0;		te[ 8 ] = 0;		te[ 12 ] = - x;
-	te[ 1 ] = 0;		te[ 5 ] = 2 * h;	te[ 9 ] = 0;		te[ 13 ] = - y;
-	te[ 2 ] = 0;		te[ 6 ] = 0;		te[ 10 ] = - 1 * p;	te[ 14 ] = - z;
-	te[ 3 ] = 0;		te[ 7 ] = 0;		te[ 11 ] = 0;		te[ 15 ] = 1;
+  if ( normalized === true ) {
+
+    z = near * p
+    zInv = -1 * p
+
+  } else {
+
+    z = ( far + near ) * p
+    zInv = -2 * p
+
+  }
+
+	te[ 0 ] = 2 * w;	te[ 4 ] = 0;	    te[ 8 ] = 0;	  te[ 12 ] = - x;
+	te[ 1 ] = 0;	    te[ 5 ] = 2 * h;	te[ 9 ] = 0;	  te[ 13 ] = - y;
+	te[ 2 ] = 0;	    te[ 6 ] = 0;	    te[10] = zInv;  te[ 14 ] = - z;
+	te[ 3 ] = 0;	    te[ 7 ] = 0;	    te[ 11 ] = 0;	  te[ 15 ] = 1;
 
 	return this;
 
 };
 
-Frustum.prototype.setFromProjectionMatrix = function ( m ) {
+Frustum.prototype.setFromProjectionMatrix = function ( m, normalized = false ) {
 
 	const planes = this.planes;
 	const me = m.elements;
@@ -72,8 +161,17 @@ Frustum.prototype.setFromProjectionMatrix = function ( m ) {
 	planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
 	planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
 	planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
-	planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize();
 
+  if ( normalized === true ) {
+
+    planes[ 5 ].setComponents( me2, me6, me10, me14 ).normalize();
+
+  } else {
+
+    planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
+
+  }
+	
 	return this;
 
 };
