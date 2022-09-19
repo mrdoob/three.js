@@ -34275,6 +34275,11 @@
 			super.updateMatrixWorld(force);
 		}
 
+		dispose() {
+			this.geometry.dispose();
+			this.material.dispose();
+		}
+
 	}
 
 	function getBoneList(object) {
@@ -34442,6 +34447,11 @@
 			this.type = 'GridHelper';
 		}
 
+		dispose() {
+			this.geometry.dispose();
+			this.material.dispose();
+		}
+
 	}
 
 	class PolarGridHelper extends LineSegments {
@@ -34494,6 +34504,11 @@
 			});
 			super(geometry, material);
 			this.type = 'PolarGridHelper';
+		}
+
+		dispose() {
+			this.geometry.dispose();
+			this.material.dispose();
 		}
 
 	}
@@ -34883,6 +34898,11 @@
 			return this;
 		}
 
+		dispose() {
+			this.geometry.dispose();
+			this.material.dispose();
+		}
+
 	}
 
 	class Box3Helper extends LineSegments {
@@ -34908,6 +34928,11 @@
 			box.getSize(this.scale);
 			this.scale.multiplyScalar(0.5);
 			super.updateMatrixWorld(force);
+		}
+
+		dispose() {
+			this.geometry.dispose();
+			this.material.dispose();
 		}
 
 	}
@@ -34945,6 +34970,13 @@
 			this.lookAt(this.plane.normal);
 			this.translateZ(-this.plane.constant);
 			super.updateMatrixWorld(force);
+		}
+
+		dispose() {
+			this.geometry.dispose();
+			this.material.dispose();
+			this.children[0].geometry.dispose();
+			this.children[0].material.dispose();
 		}
 
 	}
@@ -35019,6 +35051,13 @@
 			this.line.copy(source.line);
 			this.cone.copy(source.cone);
 			return this;
+		}
+
+		dispose() {
+			this.line.geometry.dispose();
+			this.line.material.dispose();
+			this.cone.geometry.dispose();
+			this.cone.material.dispose();
 		}
 
 	}
