@@ -13,7 +13,8 @@
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
     "./addons/*": "./examples/jsm/*",
-    "./src/*": "./src/*"
+    "./src/*": "./src/*",
+    "./nodes": "./examples/jsm/nodes/Nodes.js"
   },
   "repository": {
     "type": "git",
