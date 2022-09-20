@@ -41,6 +41,7 @@ import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
 import ReflectVectorNode from './accessors/ReflectVectorNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
+import TangentNode from './accessors/TangentNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 import UserDataNode from './accessors/UserDataNode.js';
@@ -165,6 +166,7 @@ const nodeLib = {
 	ReferenceNode,
 	ReflectVectorNode,
 	SkinningNode,
+	TangentNode,
 	TextureNode,
 	UVNode,
 	UserDataNode,
@@ -279,6 +281,7 @@ export {
 	ReferenceNode,
 	ReflectVectorNode,
 	SkinningNode,
+	TangentNode,
 	TextureNode,
 	UVNode,
 	UserDataNode,
