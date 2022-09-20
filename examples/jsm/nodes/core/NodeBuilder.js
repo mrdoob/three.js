@@ -265,6 +265,12 @@ class NodeBuilder {
 
 	}
 
+	hasGeometryAttribute( name ) {
+
+		return this.geometry?.getAttribute( name ) !== undefined;
+
+	}
+
 	getAttribute( name, type ) {
 
 		const attributes = this.attributes;
