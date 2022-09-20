@@ -1,793 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Primary Meta Tags -->
-  <title>Kira</title>
-  <meta name="title" content="Kira">
-  <meta name="description" content="Three.js experiment reproducing M. C. Escher's Hand with Reflecting Sphere">
-  <meta name="author" content="Antoine BERNIER (abernier)" />
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://threejs.org/examples/#webgl_animation_skinning_ik">
-  <meta property="og:title" content="Kira">
-  <meta property="og:description" content="Three.js experiment reproducing M. C. Escher's Hand with Reflecting Sphere">
-  <meta property="og:image" content="https://res.cloudinary.com/dtqr57xyj/image/upload/v1663266331/kira-export6.png">
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://threejs.org/examples/#webgl_animation_skinning_ik">
-  <meta property="twitter:title" content="Kira">
-  <meta property="twitter:description" content="Three.js experiment reproducing M. C. Escher's Hand with Reflecting Sphere">
-  <meta property="twitter:image" content="https://res.cloudinary.com/dtqr57xyj/image/upload/v1663266331/kira-export6.png">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
-  <link type="text/css" rel="stylesheet" href="main.css">
-  <style>
-  body {color:white;}
-  #loader {
-    pointer-events: none;
-    font-family: 'Noto Sans', sans-serif;
-    color:#323232;
-
-    position:fixed; inset:0;
-    display: flex; justify-content: center; align-items: center; text-align: center;
-    background-color: #fafafa; 
-  }
-  #info a {
-    color:inherit;
-  }
-  </style>
-</head>
-<body>
-  <div id="container">
-    <aside id="loader"><div class="loader__in">
-      loading…
-    </div></aside>
-  </div>
-  <div id="info">
-    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - <a href="https://assetstore.unity.com/packages/3d/characters/humanoids/humans/kira-lowpoly-character-100303" target="_blank" rel="noopener">Kira</a>'s "<a href="https://en.wikipedia.org/wiki/Hand_with_Reflecting_Sphere" target="_blank" rel="noopener">hand with Reflecting Sphere</a>"
-  </div>
-
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "three": "../build/three.module.js",
-    "three/addons/": "./jsm/"
-  }
-}
-</script>
-
-<script type="module">
-import * as THREE from 'three';
-
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import { FilmShader } from 'three/addons/shaders/FilmShader.js';
-
-import { CCDIKSolver, CCDIKHelper } from './jsm/animation/CCDIKSolver.js';
-
-import Stats from 'three/addons/libs/stats.module.js';
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-import { TWEEN } from 'three/addons/libs/tween.module.min.js';
-
-var $container;
-let debug = false;
-
-let scene, camera, renderer, composer, filmPass, orbitControls, transformControls;
-let mirrorSphereCamera;
-
-// Objects Of Interest
-const OOI = {};
-window.OOI = OOI;
-
-let IKSolver;
-
-let stats;
-
-let gui;
-let conf;
-window.conf = conf;
-
-async function init() {
-
-	$container = document.getElementById( 'container' );
-
-	debug = location.search.includes( 'debug' ) || window.self !== window.top;
-
-	//  ######   #######  ##    ## ########
-	// ##    ## ##     ## ###   ## ##
-	// ##       ##     ## ####  ## ##
-	// ##       ##     ## ## ## ## ######
-	// ##       ##     ## ##  #### ##
-	// ##    ## ##     ## ##   ### ##
-	//  ######   #######  ##    ## ##
-
-	conf = {
-		fov: 55,
-		cubeRenderTargetSize: 1024,
-		filmPass: true,
-		followSphere: true,
-		turnHead: true,
-		ik_solver: true,
-		moveHand: ( function () {
-
-			const values = [ 'cursor', 'transformControls' ];
-
-			return { val: 'cursor', values };
-
-		} )(),
-		transformControls: true,
-		pivot: {
-			r: ( function () {
-
-				const min = .38;
-				const max = .44;
-				const initial = ( max + min ) / 2;
-
-				return { val: initial, initial, min, max };
-
-			} )(),
-			theta: ( function () {
-
-				const min = - .2;
-				const max = .5;
-				const initial = ( max + min ) / 2;
-				return { val: initial, initial, min, max };
-
-			} )(),
-			delta: ( function () {
-
-				const min = - .35;
-				const max = .15;
-				const initial = ( max + min ) / 2;
-				return { val: initial, initial, min, max };
-
-			} )(),
-		}
-	};
-
-	//
-	// scene
-	//
-	//  ######   ######  ######## ##    ## ########
-	// ##    ## ##    ## ##       ###   ## ##
-	// ##       ##       ##       ####  ## ##
-	//  ######  ##       ######   ## ## ## ######
-	//       ## ##       ##       ##  #### ##
-	// ##    ## ##    ## ##       ##   ### ##
-	//  ######   ######  ######## ##    ## ########
-
-	scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2( 0xffffff, .17 );
-	window.scene = scene;
-
-	scene.background = new THREE.Color( 0xdddddd );
-
-	//
-	// 🎥 camera
-	//
-	//  ######     ###    ##     ## ######## ########     ###
-	// ##    ##   ## ##   ###   ### ##       ##     ##   ## ##
-	// ##        ##   ##  #### #### ##       ##     ##  ##   ##
-	// ##       ##     ## ## ### ## ######   ########  ##     ##
-	// ##       ######### ##     ## ##       ##   ##   #########
-	// ##    ## ##     ## ##     ## ##       ##    ##  ##     ##
-	//  ######  ##     ## ##     ## ######## ##     ## ##     ##
-
-	camera = new THREE.PerspectiveCamera( conf.fov, window.innerWidth / window.innerHeight, 0.001, 5000 );
-	window.camera = camera;
-
-	// camera.position.set(.05,.93,2.75);
-	camera.lookAt( scene.position );
-
-	if ( debug ) scene.add( new THREE.AxesHelper( 1 ) );
-
-	//
-	// 💡 lights
-	//
-	// ##       ####  ######   ##     ## ########  ######
-	// ##        ##  ##    ##  ##     ##    ##    ##    ##
-	// ##        ##  ##        ##     ##    ##    ##
-	// ##        ##  ##   #### #########    ##     ######
-	// ##        ##  ##    ##  ##     ##    ##          ##
-	// ##        ##  ##    ##  ##     ##    ##    ##    ##
-	// ######## ####  ######   ##     ##    ##     ######
-
-	const ambientLight = new THREE.AmbientLight( 0xffffff, 8 ); // soft white light
-	scene.add( ambientLight );
-
-	//
-	// renderer
-	//
-	// ########  ######## ##    ## ########  ######## ########  ######## ########
-	// ##     ## ##       ###   ## ##     ## ##       ##     ## ##       ##     ##
-	// ##     ## ##       ####  ## ##     ## ##       ##     ## ##       ##     ##
-	// ########  ######   ## ## ## ##     ## ######   ########  ######   ########
-	// ##   ##   ##       ##  #### ##     ## ##       ##   ##   ##       ##   ##
-	// ##    ##  ##       ##   ### ##     ## ##       ##    ##  ##       ##    ##
-	// ##     ## ######## ##    ## ########  ######## ##     ## ######## ##     ##
-
-	renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
-	window.renderer = renderer;
-
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.outputEncoding = THREE.sRGBEncoding;
-	renderer.physicallyCorrectLights = true;
-	renderer.toneMapping = THREE.NoToneMapping; // https://threejs.org/docs/#api/en/constants/Renderer
-	renderer.toneMappingExposure = 2.3;
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = THREE.PCFSoftShadowMap; // https://threejs.org/docs/#api/en/constants/Renderer
-	$container.appendChild( renderer.domElement );
-
-	if ( debug ) {
-
-		stats = new Stats();
-		$container.appendChild( stats.dom );
-
-	}
-
-	//
-	// 💅🏻 composer
-	//
-	//  ######   #######  ##     ## ########   #######   ######  ######## ########
-	// ##    ## ##     ## ###   ### ##     ## ##     ## ##    ## ##       ##     ##
-	// ##       ##     ## #### #### ##     ## ##     ## ##       ##       ##     ##
-	// ##       ##     ## ## ### ## ########  ##     ##  ######  ######   ########
-	// ##       ##     ## ##     ## ##        ##     ##       ## ##       ##   ##
-	// ##    ## ##     ## ##     ## ##        ##     ## ##    ## ##       ##    ##
-	//  ######   #######  ##     ## ##         #######   ######  ######## ##     ##
-
-	composer = new EffectComposer( renderer );
-	composer.addPass( new RenderPass( scene, camera ) );
-
-	// filmPass (see: examples/jsm/shaders/FilmShader.js for uniforms options)
-	filmPass = new ShaderPass( FilmShader );
-	filmPass.uniforms[ 'nIntensity' ].value = .35;
-	filmPass.enabled = conf.filmPass;
-	composer.addPass( filmPass );
-
-	//
-	// 🕹 orbit controls
-	//
-	//  #######  ########  ########  #### ########
-	// ##     ## ##     ## ##     ##  ##     ##
-	// ##     ## ##     ## ##     ##  ##     ##
-	// ##     ## ########  ########   ##     ##
-	// ##     ## ##   ##   ##     ##  ##     ##
-	// ##     ## ##    ##  ##     ##  ##     ##
-	//  #######  ##     ## ########  ####    ##
-
-	orbitControls = new OrbitControls( camera, renderer.domElement );
-	window.orbitControls = orbitControls;
-
-	orbitControls.minDistance = .2;
-	orbitControls.maxDistance = 1.3;
-	orbitControls.enableDamping = true;
-
-	orbitControls.update(); // orbitControls.update() must be called after any manual changes to the camera's transform
-
-	//
-	// 📦 GLTF scene loader
-	//
-	//  ######   ##       ######## ########
-	// ##    ##  ##          ##    ##
-	// ##        ##          ##    ##
-	// ##   #### ##          ##    ######
-	// ##    ##  ##          ##    ##
-	// ##    ##  ##          ##    ##
-	//  ######   ########    ##    ##
-
-	const dracoLoader = new DRACOLoader();
-	dracoLoader.setDecoderPath( 'js/libs/draco/' );
-	const gltfLoader = new GLTFLoader();
-	gltfLoader.setDRACOLoader( dracoLoader );
-
-	const gltf = await gltfLoader.loadAsync( 'models/gltf/kira.glb' );
-
-	gltf.scene.traverse( n => {
-
-		//
-		// Remarquable 🦴 bones
-		//
-
-		if ( n.name === 'head' ) OOI.head = n;
-		if ( n.name === 'neck_01' ) OOI.neck = n;
-		if ( n.name === 'Clavicle_l' ) OOI.Clavicle_l = n;
-		if ( n.name === 'lowerarm_l' ) OOI.lowerarm_l = n;
-		if ( n.name === 'Upperarm_l' ) OOI.Upperarm_l = n;
-		if ( n.name === 'hand_l' ) OOI.hand_l = n;
-		if ( n.name === 'target_hand_l' ) OOI.target_hand_l = n;
-
-		if ( n.name === 'boule' ) OOI.boule = n;
-		if ( n.name === 'Kira_Shirt' ) OOI.kira = n;
-
-		if ( n.isMesh ) {
-
-			n.frustumCulled = false; // see: https://stackoverflow.com/a/32876611/133327
-
-		}
-
-		if ( n.isLight ) {
-
-			// console.log('💡', n)
-
-			// Helpers
-			if ( debug ) {
-
-				if ( n instanceof THREE.SpotLight ) scene.add( new THREE.SpotLightHelper( n ) ); // SpotLightHelper
-				if ( n instanceof THREE.DirectionalLight ) scene.add( new THREE.DirectionalLightHelper( n ) ); // DirectionalLightHelper
-
-			}
-
-		}
-
-	} );
-
-	//
-	// Attach the boule to the hand_l
-	//
-
-	OOI.hand_l.attach( OOI.boule );
-
-	//
-	// 🪞 mirror sphere cube-camera
-	//
-
-	const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( conf.cubeRenderTargetSize );
-	window.cubeRenderTarget = cubeRenderTarget;
-	mirrorSphereCamera = new THREE.CubeCamera( .05, 50, cubeRenderTarget ); // near, far
-	window.mirrorSphereCamera = mirrorSphereCamera;
-	scene.add( mirrorSphereCamera );
-
-	const mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: cubeRenderTarget.texture } );
-	OOI.boule.material = mirrorSphereMaterial;
-
-	if ( orbitControls ) {
-
-		orbitControls.target.copy( OOI.boule.position ); // orbit controls lookAt the sphere
-		orbitControls.update();
-
-	}
-
-	//
-	// 🕹 transformControls for target_hand_l
-	//
-
-	if ( debug ) {
-
-		transformControls = new TransformControls( camera, renderer.domElement );
-		window.transformControls = transformControls;
-		transformControls.size = .75;
-		transformControls.space = 'world';
-
-		transformControls.attach( OOI.target_hand_l );
-		scene.add( transformControls );
-
-		// disable orbitControls while using transformControls
-		transformControls.addEventListener( 'mouseDown', () => orbitControls.enabled = false );
-		transformControls.addEventListener( 'mouseUp', () => orbitControls.enabled = true );
-
-	}
-
-	//
-	//
-	//
-
-	scene.add( gltf.scene );
-
-	//
-	// 🦴 IK
-	//
-	// #### ##    ##
-	//  ##  ##   ##
-	//  ##  ##  ##
-	//  ##  #####
-	//  ##  ##  ##
-	//  ##  ##   ##
-	// #### ##    ##
-
-	true && ( function () {
-
-		OOI.kira.add( OOI.kira.skeleton.bones[ 0 ] );
-
-		if ( false && debug ) {
-
-			const skeletonHelper = new THREE.SkeletonHelper( OOI.kira );
-			skeletonHelper.material.linewidth = 1;
-			scene.add( skeletonHelper );
+  <head>    
+    <title>three.js webgl - animation - skinning - ik</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="author" content="Antoine BERNIER (abernier)" />
+		<link type="text/css" rel="stylesheet" href="main.css">
+    <style>
+    body {color:white;}
+    #info a {
+      color:inherit;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <div id="info">
+      <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - <a href="https://assetstore.unity.com/packages/3d/characters/humanoids/humans/kira-lowpoly-character-100303" target="_blank" rel="noopener">Kira</a>'s "<a href="https://en.wikipedia.org/wiki/Hand_with_Reflecting_Sphere" target="_blank" rel="noopener">hand with Reflecting Sphere</a>"<br />
+			(see <a href="https://abernier.name/three.js/examples/webgl_kira.html" target="_blank" rel="noopener">experiment</a>)
+    </div>
+
+    <!-- Import maps polyfill -->
+    <!-- Remove this when import maps will be widely supported -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+    
+		<script type="importmap">
+    {
+      "imports": {
+        "three": "../build/three.module.js",
+        "three/addons/": "./jsm/"
+      }
+    }
+    </script>
+
+    <script type="module">
+    import * as THREE from 'three';
+
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { TransformControls } from 'three/addons/controls/TransformControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+    import { CCDIKSolver, CCDIKHelper } from './jsm/animation/CCDIKSolver.js';
+    import Stats from 'three/addons/libs/stats.module.js';
+    import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+    let container;
+    let scene, camera, renderer, orbitControls, transformControls;
+    let mirrorSphereCamera;
+
+    const OOI = {};
+    let IKSolver;
+
+    let stats;
+    let gui;
+    let conf;
+
+    async function init() {
+
+    	container = document.getElementById( 'container' );
+
+    	conf = {
+    		turnHead: true,
+    		ik_solver: true,
+    	};
+
+    	scene = new THREE.Scene();
+    	scene.fog = new THREE.FogExp2( 0xffffff, .17 );
+    	scene.background = new THREE.Color( 0xdddddd );
+
+    	camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.001, 5000 );
+    	camera.position.set( 1.2774095977377922, 1.0497669538277439, 1.0011578425141974 );
+    	camera.lookAt( scene.position );
+
+    	const ambientLight = new THREE.AmbientLight( 0xffffff, 8 ); // soft white light
+    	scene.add( ambientLight );
+
+    	renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
+    	renderer.setPixelRatio( window.devicePixelRatio );
+    	renderer.setSize( window.innerWidth, window.innerHeight );
+    	renderer.outputEncoding = THREE.sRGBEncoding;
+    	renderer.physicallyCorrectLights = true;
+    	container.appendChild( renderer.domElement );
+
+    	stats = new Stats();
+    	container.appendChild( stats.dom );
+
+    	orbitControls = new OrbitControls( camera, renderer.domElement );
+    	orbitControls.minDistance = .2;
+    	orbitControls.maxDistance = 1.25;
+    	orbitControls.enableDamping = true;
+    	orbitControls.update();
+
+    	const dracoLoader = new DRACOLoader();
+    	dracoLoader.setDecoderPath( 'js/libs/draco/' );
+    	const gltfLoader = new GLTFLoader();
+    	gltfLoader.setDRACOLoader( dracoLoader );
+    	const gltf = await gltfLoader.loadAsync( 'models/gltf/kira.glb' );
+    	gltf.scene.traverse( n => {
+
+    		if ( n.name === 'head' ) OOI.head = n;
+    		if ( n.name === 'lowerarm_l' ) OOI.lowerarm_l = n;
+    		if ( n.name === 'Upperarm_l' ) OOI.Upperarm_l = n;
+    		if ( n.name === 'hand_l' ) OOI.hand_l = n;
+    		if ( n.name === 'target_hand_l' ) OOI.target_hand_l = n;
+
+    		if ( n.name === 'boule' ) OOI.sphere = n;
+    		if ( n.name === 'Kira_Shirt' ) OOI.kira = n;
+
+    		if ( n.isMesh ) n.frustumCulled = false;
+
+    	} );
+    	scene.add( gltf.scene );
 
-		}
+	    orbitControls.target.copy( OOI.sphere.position ); // orbit controls lookAt the sphere
+    	OOI.hand_l.attach( OOI.sphere );
 
-		const iks = [
-			{
-				target: 25, // "target_hand_l"
-				effector: 9, // "hand_l"
-				links: [
+    	// mirror sphere cube-camera
+    	const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 1024 );
+    	mirrorSphereCamera = new THREE.CubeCamera( .05, 50, cubeRenderTarget );
+    	scene.add( mirrorSphereCamera );
+    	const mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: cubeRenderTarget.texture } );
+    	OOI.sphere.material = mirrorSphereMaterial;
 
-					{
-						index: 7, // "Upperarm_l"
-						rotationMin: new THREE.Vector3( 0.1, - 0.7, - 1.8 ),
-						rotationMax: new THREE.Vector3( 1.1, 0, - 1.4 )
-					},
-					{
-						index: 8, // "lowerarm_l"
-						rotationMin: new THREE.Vector3( 1.2, - 1.8, - .4 ),
-						rotationMax: new THREE.Vector3( 1.7, - 1.1, .3 )
-					},
-					{
-						index: 9, // "hand_l"
-						rotationMin: new THREE.Vector3( 0, - .5, 0.3 ),
-						rotationMax: new THREE.Vector3( 0, - .5, .3 )
-					},
-				],
-			}
-		];
-		IKSolver = new CCDIKSolver( OOI.kira, iks );
-		window.IKSolver = IKSolver;
+    	transformControls = new TransformControls( camera, renderer.domElement );
+    	transformControls.size = .75;
+    	transformControls.space = 'world';
+    	transformControls.attach( OOI.target_hand_l );
+    	scene.add( transformControls );
+    	// disable orbitControls while using transformControls
+    	transformControls.addEventListener( 'mouseDown', () => orbitControls.enabled = false );
+    	transformControls.addEventListener( 'mouseUp', () => orbitControls.enabled = true );
 
-		if ( debug ) {
+    	OOI.kira.add( OOI.kira.skeleton.bones[ 0 ] );
+    	const iks = [
+    		{
+    			target: 25, // "target_hand_l"
+    			effector: 9, // "hand_l"
+    			links: [
 
-			const ccdikhelper = new CCDIKHelper( OOI.kira, iks, { sphereSize: .01 } );
-			scene.add( ccdikhelper );
+    				{
+    					index: 7, // "Upperarm_l"
+    					rotationMin: new THREE.Vector3( 0.1, - 0.7, - 1.8 ),
+    					rotationMax: new THREE.Vector3( 1.1, 0, - 1.4 )
+    				},
+    				{
+    					index: 8, // "lowerarm_l"
+    					rotationMin: new THREE.Vector3( 1.2, - 1.8, - .4 ),
+    					rotationMax: new THREE.Vector3( 1.7, - 1.1, .3 )
+    				},
+    				{
+    					index: 9, // "hand_l"
+    					rotationMin: new THREE.Vector3( 0, - .5, 0.3 ),
+    					rotationMax: new THREE.Vector3( 0, - .5, .3 )
+    				},
+    			],
+    		}
+    	];
+    	IKSolver = new CCDIKSolver( OOI.kira, iks );
+    	const ccdikhelper = new CCDIKHelper( OOI.kira, iks, { sphereSize: .01 } );
+    	scene.add( ccdikhelper );
 
-		}
+    	gui = new GUI();
+    	gui.add( conf, 'turnHead' ).name( 'turn head' );
+    	gui.add( conf, 'ik_solver' ).name( 'IK auto update' );
+    	gui.add( IKSolver, 'update' ).name( 'IK manual update()' );
+    	gui.open();
 
-	} ).call( this );
+    	window.addEventListener( 'resize', onWindowResize, false );
 
+    }
 
-	//
-	// pivot (spherical rotation) around the head
-	//
+    function animate( ) {
 
-	{
+    	if ( OOI.sphere && mirrorSphereCamera ) {
 
-		const pivotOrigin = new THREE.Object3D();
-		OOI.pivotOrigin = pivotOrigin;
-		pivotOrigin.rotation.x = - Math.PI / 2;
-		pivotOrigin.rotation.z = Math.PI / 2;
-		OOI.neck.add( pivotOrigin );
+    		OOI.sphere.visible = false;
+    		mirrorSphereCamera.position.copy( OOI.sphere.getWorldPosition( new THREE.Vector3() ) );
+    		mirrorSphereCamera.update( renderer, scene );
+    		OOI.sphere.visible = true;
 
-	}
+    	}
 
-	//
-	// 🎛 GUI `conf` (see https://lil-gui.georgealways.com/)
-	//
-	//  ######   ##     ## ####
-	// ##    ##  ##     ##  ##
-	// ##        ##     ##  ##
-	// ##   #### ##     ##  ##
-	// ##    ##  ##     ##  ##
-	// ##    ##  ##     ##  ##
-	//  ######    #######  ####
+    	if ( OOI.sphere ) {
 
-	if ( debug ) {
+		    // orbitControls follows the sphere
+    		orbitControls.target.lerp( OOI.sphere.getWorldPosition( new THREE.Vector3() ), .1 );
 
-		gui = new GUI();
-		window.gui = gui;
+    	}
+    
+    	if ( OOI.head && OOI.sphere && conf.turnHead ) {
 
-		gui.add( conf, 'followSphere' ).name( 'follows sphere' );
-		gui.add( conf, 'turnHead' ).name( 'turn head' );
+    		// turn head
+    		OOI.head.lookAt( OOI.sphere.getWorldPosition( new THREE.Vector3() ) );
+    		OOI.head.rotation.set( OOI.head.rotation.x, OOI.head.rotation.y + Math.PI, OOI.head.rotation.z );
 
-		{
+    	}
 
-			//
-			// 📂 handFolder
-			//
+    	if ( conf.ik_solver ) {
 
-			const handFolder = gui.addFolder( 'hand' );
+    		IKSolver?.update();
 
-			const moveHandController = handFolder.add( conf.moveHand, 'val', conf.moveHand.values ).name( 'move' );
+    	}
 
-			const pivotFolder = handFolder.addFolder( 'opts' );
-			pivotFolder.add( conf.pivot.r, 'val', conf.pivot.r.min, conf.pivot.r.max ).name( 'r' );
-			pivotFolder.add( conf.pivot.theta, 'val', conf.pivot.theta.min, conf.pivot.theta.max ).name( 'theta' );
-			pivotFolder.add( conf.pivot.delta, 'val', conf.pivot.delta.min, conf.pivot.delta.max ).name( 'delta' );
+    	orbitControls.update();
+    	renderer.render( scene, camera );
 
-			moveHandController.onChange( val => {
+    	stats?.update(); // fps stats
 
-				if ( val === 'cursor' ) {
+    	requestAnimationFrame( animate );
 
-					pivotFolder.show();
+    }
 
-				} else {
+    init();
+    animate();
 
-					pivotFolder.hide();
+    function onWindowResize() {
 
-				}
+    	camera.aspect = window.innerWidth / window.innerHeight;
+    	camera.updateProjectionMatrix();
 
-			} );
+    	renderer.setSize( window.innerWidth, window.innerHeight );
 
-		}
-
-		{
-
-			//
-			// 📂 ikFolder
-			//
-
-			function toggleIkOptsFolder( val ) {
-
-				if ( val === true ) {
-
-					ikOptsFolder.hide();
-
-				} else {
-
-					ikOptsFolder.show();
-
-				}
-
-			}
-
-			const ikFolder = gui.addFolder( 'ik' ).close();
-			ikFolder.add( conf, 'ik_solver' ).name( 'auto update' ).onChange( val => {
-
-				toggleIkOptsFolder( val );
-
-			} );
-			const ikOptsFolder = ikFolder.addFolder( 'opts' );
-			ikOptsFolder.add( IKSolver, 'update' ).name( 'update()' );
-
-			[ 'Upperarm_l', 'lowerarm_l', 'hand_l' ].forEach( boneName => {
-
-				const folder = ikOptsFolder.addFolder( boneName ).close();
-				[ 'x', 'y', 'z' ].forEach( axis => folder.add( OOI[ boneName ].rotation, axis, - Math.PI, Math.PI ).name( `rotation.${axis}` ) );
-
-			} );
-
-			toggleIkOptsFolder( conf.ik_solver );
-
-		}
-
-		{
-
-			//
-			// 📂 rendering
-			//
-
-			const optionsFolder = gui.addFolder( 'rendering' ).close();
-			optionsFolder.add( conf, 'fov', 1, 150 ).onChange( function ( fov ) {
-
-				camera.fov = fov;
-				camera.updateProjectionMatrix();
-
-			} );
-			optionsFolder.add( conf, 'cubeRenderTargetSize', 1, 1024 ).onChange( function ( size ) {
-
-				cubeRenderTarget.setSize( size, size );
-
-			} );
-
-			optionsFolder.add( conf, 'filmPass' ).onChange( function ( val ) {
-
-				filmPass.enabled = val;
-
-			} );
-
-		}
-
-		gui.open();
-
-	}
-
-
-	//
-	// Tween initial camera movement
-	//
-
-	{
-
-		const $loader = document.querySelector( '#loader' );
-		const $loaderIn = document.querySelector( '.loader__in' );
-
-		const pos0 = { x: 0.44815883201976203, y: 1.1098319534086936, z: 1.348606238040144 };
-		const pos1 = { x: 2.0052064877296, y: 1.1198408313891113, z: - 0.17134287979506932 };
-
-		const t1 = new TWEEN.Tween( { opacity: 1 } )
-			.to( { opacity: 0 }, 500 )
-			.onUpdate( ( { opacity } ) => {
-
-				$loaderIn.style.opacity = opacity;
-
-			} );
-
-		const ease = TWEEN.Easing.Quartic.InOut;
-		const dur = 2000;
-
-		const t2 = new TWEEN.Tween( { opacity: 1 } )
-			.to( { opacity: 0 }, dur )
-			.onUpdate( ( { opacity } ) => {
-
-				$loader.style.opacity = opacity;
-
-			} )
-			.easing( ease );
-
-		camera.position.set( pos0.x, pos0.y, pos0.z );
-		const t3 = new TWEEN.Tween( camera.position )
-			.to( pos1, dur )
-			.easing( ease );
-
-		t1.chain( t2 );
-		t2.onStart( () => {
-
-			t3.start();
-
-		} );
-		t1.start();
-
-	}
-
-	//
-	// events
-	//
-
-	{
-
-		let thetaGuiController, rGuiController;
-		if ( gui ) {
-
-			thetaGuiController = gui.controllersRecursive().find( c => c._name === 'theta' );
-			rGuiController = gui.controllersRecursive().find( c => c._name === 'r' );
-
-		}
-
-		function onMousemove() {
-
-			if ( conf.moveHand.val !== 'cursor' ) return;
-
-			conf.pivot.theta.val = conf.pivot.theta.initial + ( ( event.pageX - window.innerWidth / 2 ) / window.innerWidth ) * ( conf.pivot.theta.min - conf.pivot.theta.max );
-			thetaGuiController?.updateDisplay();
-
-			conf.pivot.r.val = conf.pivot.r.initial + ( ( event.pageY - window.innerHeight / 2 ) / window.innerHeight ) * ( conf.pivot.r.min - conf.pivot.r.max );
-			rGuiController?.updateDisplay();
-
-		}
-
-		renderer.domElement.addEventListener( 'mousemove', onMousemove, false );
-
-	}
-
-	{
-
-		function onWindowResize() {
-
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			composer.setSize( window.innerWidth, window.innerHeight );
-
-		}
-
-		window.addEventListener( 'resize', onWindowResize, false );
-
-	}
-
-}
-
-//
-// 🎬 animloop
-//
-//    ###    ##    ## #### ##     ## ##        #######   #######  ########
-//   ## ##   ###   ##  ##  ###   ### ##       ##     ## ##     ## ##     ##
-//  ##   ##  ####  ##  ##  #### #### ##       ##     ## ##     ## ##     ##
-// ##     ## ## ## ##  ##  ## ### ## ##       ##     ## ##     ## ########
-// ######### ##  ####  ##  ##     ## ##       ##     ## ##     ## ##
-// ##     ## ##   ###  ##  ##     ## ##       ##     ## ##     ## ##
-// ##     ## ##    ## #### ##     ## ########  #######   #######  ##
-
-let t0 = 0;
-function animloop( t ) {
-
-	const dt = t - t0;
-
-	paint( t, dt );
-	TWEEN.update( t );
-
-	stats?.update(); // fps stats
-	t0 = t;
-
-	requestAnimationFrame( animloop );
-
-}
-
-
-function paint( t, dt ) {
-
-	if ( OOI.boule && mirrorSphereCamera ) {
-
-		OOI.boule.visible = false; // hide sphere before taking cube photos
-		mirrorSphereCamera.position.copy( OOI.boule.getWorldPosition( new THREE.Vector3() ) ); // move the cube camera to the center of the sphere
-		mirrorSphereCamera.update( renderer, scene ); // shoot cube photos
-		OOI.boule.visible = true; // reveal back the sphere
-
-	}
-
-	// orbitControls follows the boule
-	if ( OOI.boule && conf.followSphere ) {
-
-		orbitControls.target.lerp( OOI.boule.getWorldPosition( new THREE.Vector3() ), .1 );
-
-	}
-
-	if ( OOI.pivotOrigin && conf.moveHand.val !== 'transformControls' ) {
-
-		//
-		// Position the target_hand_l bone on a sphere from `pivotOrigin` (around the `head` bone)
-		//
-
-		const { r, theta, delta } = conf.pivot;
-
-		const x = r.val * Math.cos( delta.val ) * Math.cos( theta.val );
-		const y = r.val * Math.cos( delta.val ) * Math.sin( theta.val );
-		const z = r.val * Math.sin( delta.val );
-
-		// Position `target_hand_l` absolutely (see: https://stackoverflow.com/a/12547936/133327)
-		const parent = OOI.target_hand_l.parent; // store original parent
-		OOI.pivotOrigin.attach( OOI.target_hand_l ); // detach from parent and add to o
-		OOI.target_hand_l.position.lerp( new THREE.Vector3( x, y, z ), .1 );
-		parent.attach( OOI.target_hand_l ); // reattach to original parent
-
-	}
-
-	//
-	// turn head
-	//
-
-	if ( OOI.head && OOI.boule && conf.turnHead ) {
-
-		OOI.head.lookAt( OOI.boule.getWorldPosition( new THREE.Vector3() ) );
-		OOI.head.rotation.set( OOI.head.rotation.x, OOI.head.rotation.y + Math.PI, OOI.head.rotation.z );
-
-	}
-
-	if ( transformControls ) {
-
-		const onOff = conf.moveHand.val === 'transformControls';
-		transformControls.enabled = onOff;
-		transformControls.visible = onOff;
-
-	}
-
-	if ( conf.ik_solver ) {
-
-		IKSolver?.update();
-
-	}
-
-	orbitControls.update(); // required if orbitControls.enableDamping or orbitControls.autoRotate are set to true
-
-	// renderer.render(scene, camera);
-	composer.render( dt );
-
-}
-
-// ##     ##    ###    #### ##    ##
-// ###   ###   ## ##    ##  ###   ##
-// #### ####  ##   ##   ##  ####  ##
-// ## ### ## ##     ##  ##  ## ## ##
-// ##     ## #########  ##  ##  ####
-// ##     ## ##     ##  ##  ##   ###
-// ##     ## ##     ## #### ##    ##
-
-init();
-animloop();
-</script>
-</body>
+    }
+    </script>
+  </body>
 </html>
