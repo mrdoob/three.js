@@ -87,7 +87,7 @@ import { TWEEN } from 'three/addons/libs/tween.module.min.js';
 var $container;
 let debug = false;
 
-let scene, camera, renderer, composer, filmPass, orbitControls, transformControls, hemiLight;
+let scene, camera, renderer, composer, filmPass, orbitControls, transformControls;
 let mirrorSphereCamera;
 
 // Objects Of Interest
@@ -172,7 +172,7 @@ async function init() {
 	//  ######   ######  ######## ##    ## ########
 
 	scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2( 0xffffff, .1 );
+	scene.fog = new THREE.FogExp2( 0xffffff, .17 );
 	window.scene = scene;
 
 	scene.background = new THREE.Color( 0xdddddd );
@@ -207,8 +207,8 @@ async function init() {
 	// ##        ##  ##    ##  ##     ##    ##    ##    ##
 	// ######## ####  ######   ##     ##    ##     ######
 
-	hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1 ); // ground, sky, intensity
-	scene.add( hemiLight );
+	const ambientLight = new THREE.AmbientLight( 0xffffff, 8 ); // soft white light
+	scene.add( ambientLight );
 
 	//
 	// renderer
@@ -276,7 +276,7 @@ async function init() {
 	window.orbitControls = orbitControls;
 
 	orbitControls.minDistance = .2;
-	orbitControls.maxDistance = 2;
+	orbitControls.maxDistance = 1.3;
 	orbitControls.enableDamping = true;
 
 	orbitControls.update(); // orbitControls.update() must be called after any manual changes to the camera's transform
@@ -292,23 +292,10 @@ async function init() {
 	// ##    ##  ##          ##    ##
 	//  ######   ########    ##    ##
 
-	const textureLoader = new THREE.TextureLoader();
 	const dracoLoader = new DRACOLoader();
 	dracoLoader.setDecoderPath( 'js/libs/draco/' );
 	const gltfLoader = new GLTFLoader();
 	gltfLoader.setDRACOLoader( dracoLoader );
-
-	//
-	// Textures
-	//
-
-	const bakedTexture1 = await textureLoader.loadAsync( 'textures/kira/baked1.jpg' );
-	bakedTexture1.flipY = false;
-	const bakedMaterial1 = new THREE.MeshBasicMaterial( { map: bakedTexture1 } );
-
-	const bakedTexture2 = await textureLoader.loadAsync( 'textures/kira/baked2.jpg' );
-	bakedTexture2.flipY = false;
-	const bakedMaterial2 = new THREE.MeshBasicMaterial( { map: bakedTexture2 } );
 
 	const gltf = await gltfLoader.loadAsync( 'models/gltf/kira.glb' );
 
@@ -330,20 +317,6 @@ async function init() {
 		if ( n.name === 'Kira_Shirt' ) OOI.kira = n;
 
 		if ( n.isMesh ) {
-
-			//
-			// Apply materials
-			//
-
-			if ( ! n.name.startsWith( 'Kira' ) ) {
-
-				n.material = bakedMaterial1; // all objects except Kira character
-
-			} else {
-
-				n.material = bakedMaterial2; // Kira character
-
-			}
 
 			n.frustumCulled = false; // see: https://stackoverflow.com/a/32876611/133327
 
