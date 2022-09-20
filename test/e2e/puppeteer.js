@@ -28,7 +28,6 @@ const exceptionList = [
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 	'webgl_effects_ascii', // blink renders text differently in every platform
-	'webgl_animation_skinning_ik', // needs a delay, otherwise it shots the preloader, see: https://github.com/mrdoob/three.js/pull/24652#issuecomment-1250362827
 	'webgl_loader_imagebitmap', // takes too long to load?
 	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
