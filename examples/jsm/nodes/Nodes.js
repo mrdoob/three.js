@@ -26,6 +26,7 @@ import VarNode from './core/VarNode.js';
 import VaryingNode from './core/VaryingNode.js';
 
 // accessors
+import BitangentNode from './accessors/BitangentNode.js';
 import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
 import CubeTextureNode from './accessors/CubeTextureNode.js';
@@ -151,6 +152,7 @@ const nodeLib = {
 	ComputeNode,
 
 	// accessors
+	BitangentNode,
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
@@ -266,6 +268,7 @@ export {
 	ComputeNode,
 
 	// accessors
+	BitangentNode,
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
