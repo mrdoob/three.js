@@ -201,7 +201,7 @@ export const refract = nodeProxy( MathNode, MathNode.REFRACT );
 export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
 export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 
-// accesors
+// accessors
 
 export const buffer = ( value, nodeOrType, count ) => nodeObject( new BufferNode( value, getConstNodeType( nodeOrType ), count ) );
 export const storage = ( value, nodeOrType, count ) => nodeObject( new StorageBufferNode( value, getConstNodeType( nodeOrType ), count ) );
