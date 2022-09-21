@@ -26,6 +26,7 @@ import VarNode from './core/VarNode.js';
 import VaryingNode from './core/VaryingNode.js';
 
 // accessors
+import BitangentNode from './accessors/BitangentNode.js';
 import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
 import CubeTextureNode from './accessors/CubeTextureNode.js';
@@ -41,6 +42,7 @@ import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
 import ReflectVectorNode from './accessors/ReflectVectorNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
+import TangentNode from './accessors/TangentNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 import UserDataNode from './accessors/UserDataNode.js';
@@ -150,6 +152,7 @@ const nodeLib = {
 	ComputeNode,
 
 	// accessors
+	BitangentNode,
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
@@ -165,6 +168,7 @@ const nodeLib = {
 	ReferenceNode,
 	ReflectVectorNode,
 	SkinningNode,
+	TangentNode,
 	TextureNode,
 	UVNode,
 	UserDataNode,
@@ -264,6 +268,7 @@ export {
 	ComputeNode,
 
 	// accessors
+	BitangentNode,
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
@@ -279,6 +284,7 @@ export {
 	ReferenceNode,
 	ReflectVectorNode,
 	SkinningNode,
+	TangentNode,
 	TextureNode,
 	UVNode,
 	UserDataNode,

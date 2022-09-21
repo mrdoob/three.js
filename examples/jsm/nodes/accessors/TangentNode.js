@@ -5,17 +5,18 @@ import ModelNode from '../accessors/ModelNode.js';
 import CameraNode from '../accessors/CameraNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import MathNode from '../math/MathNode.js';
+import SplitNode from '../utils/SplitNode.js';
 
-class NormalNode extends Node {
+class TangentNode extends Node {
 
 	static GEOMETRY = 'geometry';
 	static LOCAL = 'local';
 	static VIEW = 'view';
 	static WORLD = 'world';
 
-	constructor( scope = NormalNode.LOCAL ) {
+	constructor( scope = TangentNode.LOCAL ) {
 
-		super( 'vec3' );
+		super();
 
 		this.scope = scope;
 
@@ -23,9 +24,24 @@ class NormalNode extends Node {
 
 	getHash( /*builder*/ ) {
 
-		return `normal-${this.scope}`;
+		return `tangent-${this.scope}`;
 
 	}
+
+	getNodeType() {
+
+		const scope = this.scope;
+
+		if ( scope === TangentNode.GEOMETRY ) {
+
+			return 'vec4';
+
+		}
+
+		return 'vec3';
+
+	}
+
 
 	generate( builder ) {
 
@@ -33,23 +49,23 @@ class NormalNode extends Node {
 
 		let outputNode = null;
 
-		if ( scope === NormalNode.GEOMETRY ) {
+		if ( scope === TangentNode.GEOMETRY ) {
 
-			outputNode = new AttributeNode( 'normal', 'vec3' );
+			outputNode = new AttributeNode( 'tangent', 'vec4' );
 
-		} else if ( scope === NormalNode.LOCAL ) {
+		} else if ( scope === TangentNode.LOCAL ) {
 
-			outputNode = new VaryingNode( new NormalNode( NormalNode.GEOMETRY ) );
+			outputNode = new VaryingNode( new SplitNode( new TangentNode( TangentNode.GEOMETRY ), 'xyz' ) );
 
-		} else if ( scope === NormalNode.VIEW ) {
+		} else if ( scope === TangentNode.VIEW ) {
 
-			const vertexNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), new NormalNode( NormalNode.LOCAL ) );
+			const vertexNode = new SplitNode( new OperatorNode( '*', new ModelNode( ModelNode.VIEW_MATRIX ), new TangentNode( TangentNode.LOCAL ) ), 'xyz' );
+
 			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNode ) );
 
-		} else if ( scope === NormalNode.WORLD ) {
+		} else if ( scope === TangentNode.WORLD ) {
 
-			// To use INVERSE_TRANSFORM_DIRECTION only inverse the param order like this: MathNode( ..., Vector, Matrix );
-			const vertexNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new NormalNode( NormalNode.VIEW ), new CameraNode( CameraNode.VIEW_MATRIX ) );
+			const vertexNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new TangentNode( TangentNode.VIEW ), new CameraNode( CameraNode.VIEW_MATRIX ) );
 			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNode ) );
 
 		}
@@ -76,4 +92,4 @@ class NormalNode extends Node {
 
 }
 
-export default NormalNode;
+export default TangentNode;
