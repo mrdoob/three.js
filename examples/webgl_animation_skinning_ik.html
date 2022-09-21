@@ -92,7 +92,7 @@
 			dracoLoader.setDecoderPath( 'js/libs/draco/' );
 			const gltfLoader = new GLTFLoader();
 			gltfLoader.setDRACOLoader( dracoLoader );
-			
+		
 			const gltf = await gltfLoader.loadAsync( 'models/gltf/kira.glb' );
 			gltf.scene.traverse( n => {
 
@@ -185,7 +185,7 @@
 			if ( OOI.head && OOI.sphere && conf.turnHead ) {
 
 				// turn head
-				OOI.sphere.getWorldPosition( v0 )
+				OOI.sphere.getWorldPosition( v0 );
 				OOI.head.lookAt( v0 );
 				OOI.head.rotation.set( OOI.head.rotation.x, OOI.head.rotation.y + Math.PI, OOI.head.rotation.z );
 
