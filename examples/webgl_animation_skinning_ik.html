@@ -14,7 +14,6 @@
 		</style>
 	</head>
 	<body>
-		<div id="container"></div>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - <a href="https://assetstore.unity.com/packages/3d/characters/humanoids/humans/kira-lowpoly-character-100303" target="_blank" rel="noopener">Kira</a>'s "<a href="https://en.wikipedia.org/wiki/Hand_with_Reflecting_Sphere" target="_blank" rel="noopener">hand with Reflecting Sphere</a>"<br />
 			(see <a href="https://abernier.name/three.js/examples/webgl_kira.html" target="_blank" rel="noopener">experiment</a>)
@@ -44,20 +43,18 @@
 		import Stats from 'three/addons/libs/stats.module.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-		let container;
 		let scene, camera, renderer, orbitControls, transformControls;
 		let mirrorSphereCamera;
 
 		const OOI = {};
 		let IKSolver;
 
-		let stats;
-		let gui;
-		let conf;
+		let stats, gui, conf;
+		const v0 = new THREE.Vector3();
+
+		init().then( animate );
 
 		async function init() {
-
-			container = document.getElementById( 'container' );
 
 			conf = {
 				followSphere: false,
@@ -81,10 +78,10 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.physicallyCorrectLights = true;
-			container.appendChild( renderer.domElement );
+			document.body.appendChild( renderer.domElement );
 
 			stats = new Stats();
-			container.appendChild( stats.dom );
+			document.body.appendChild( stats.dom );
 
 			orbitControls = new OrbitControls( camera, renderer.domElement );
 			orbitControls.minDistance = .2;
@@ -95,6 +92,7 @@
 			dracoLoader.setDecoderPath( 'js/libs/draco/' );
 			const gltfLoader = new GLTFLoader();
 			gltfLoader.setDRACOLoader( dracoLoader );
+			
 			const gltf = await gltfLoader.loadAsync( 'models/gltf/kira.glb' );
 			gltf.scene.traverse( n => {
 
@@ -176,7 +174,7 @@
 			if ( OOI.sphere && mirrorSphereCamera ) {
 
 				OOI.sphere.visible = false;
-				mirrorSphereCamera.position.copy( OOI.sphere.getWorldPosition( new THREE.Vector3() ) );
+				OOI.sphere.getWorldPosition( mirrorSphereCamera.position );
 				mirrorSphereCamera.update( renderer, scene );
 				OOI.sphere.visible = true;
 
@@ -185,14 +183,16 @@
 			if ( OOI.sphere && conf.followSphere ) {
 
 				// orbitControls follows the sphere
-				orbitControls.target.lerp( OOI.sphere.getWorldPosition( new THREE.Vector3() ), .1 );
+				OOI.sphere.getWorldPosition( v0 );
+				orbitControls.target.lerp( v0, .1 );
 
 			}
 		
 			if ( OOI.head && OOI.sphere && conf.turnHead ) {
 
 				// turn head
-				OOI.head.lookAt( OOI.sphere.getWorldPosition( new THREE.Vector3() ) );
+				OOI.sphere.getWorldPosition( v0 )
+				OOI.head.lookAt( v0 );
 				OOI.head.rotation.set( OOI.head.rotation.x, OOI.head.rotation.y + Math.PI, OOI.head.rotation.z );
 
 			}
@@ -206,14 +206,11 @@
 			orbitControls.update();
 			renderer.render( scene, camera );
 
-			stats?.update(); // fps stats
+			stats.update(); // fps stats
 
 			requestAnimationFrame( animate );
 
 		}
-
-		init();
-		animate();
 
 		function onWindowResize() {
 
