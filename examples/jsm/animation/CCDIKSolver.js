@@ -283,7 +283,7 @@ function setPositionOfBoneToAttributeArray( array, index, bone, matrixWorldInv )
  */
 class CCDIKHelper extends Object3D {
 
-	constructor( mesh, iks = [], options = { sphereSize: .25 } ) {
+	constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
 		super();
 
@@ -293,7 +293,7 @@ class CCDIKHelper extends Object3D {
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
-		this.sphereGeometry = new SphereGeometry( options.sphereSize, 16, 8 );
+		this.sphereGeometry = new SphereGeometry( sphereSize, 16, 8 );
 
 		this.targetSphereMaterial = new MeshBasicMaterial( {
 			color: new Color( 0xff8888 ),
