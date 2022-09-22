@@ -448,9 +448,13 @@ class OutlinePass extends Pass {
 					vPosition = mvPosition;
 
 					vec4 worldPosition = vec4( transformed, 1.0 );
+
 					#ifdef USE_INSTANCING
+
 						worldPosition = instanceMatrix * worldPosition;
+
 					#endif
+					
 					worldPosition = modelMatrix * worldPosition;
 
 					projTexCoord = textureMatrix * worldPosition;
