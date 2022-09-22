@@ -64,17 +64,10 @@
 		<p>[page:ShapePath.currentPath currentPath] 위에 새 [page:SplineCurve]를 연결합니다.</p>
 
 
-		<h3>[method:Array toShapes]( [param:Boolean isCCW] )</h3>
+		<h3>[method:Array toShapes]()</h3>
 		<p>
-		isCCW -- solids와 holes가 생성되는 방식을 변경합니다
+		[page:ShapePath.subPaths subPaths] 배열을 Shapes 배열로 변환합니다. 
 		</p>
-		<p>
-		[page:ShapePath.subPaths subPaths] 배열을 Shapes 배열로 변환합니다. 기본값으로 solid shapes는 시계방향(CW)이고 holes는 반시계방향(CCW)입니다.
-		isCCW가 true면, 이 값들이 반대가 됩니다.
-		<br/>
-
-		</p>
-
 
 		<h2>소스코드</h2>
 

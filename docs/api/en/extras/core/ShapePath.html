@@ -10,7 +10,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		This class is used to convert a series of shapes to an array of [page:Path]s, for example an SVG shape to a
+		This class is used to convert a series of shapes to an array of [page:Shape]s, for example an SVG shape to a
 		path (see the example below).
 		</p>
 
@@ -71,17 +71,8 @@
 		<p>Connects a new [page:SplineCurve] onto the [page:ShapePath.currentPath currentPath].</p>
 
 
-		<h3>[method:Array toShapes]( [param:Boolean isCCW] )</h3>
-		<p>
-		isCCW -- Changes how solids and holes are generated
-		</p>
-		<p>
-		Converts the [page:ShapePath.subPaths subPaths] array into an array of Shapes. By default solid shapes are defined clockwise (CW) and holes are defined counterclockwise (CCW). If isCCW is set to true,
-		then those are flipped.
-		<br/>
-
-		</p>
-
+		<h3>[method:Array toShapes]()</h3>
+		<p>Converts the [page:ShapePath.subPaths subPaths] array into an array of [page:Shape]s.</p>
 
 		<h2>Source</h2>
 

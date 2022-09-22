@@ -632,7 +632,7 @@ function Loader( editor ) {
 							depthWrite: false
 						} );
 
-						const shapes = SVGLoader.createShapes( path );
+						const shapes = path.toShapes();
 
 						for ( let j = 0; j < shapes.length; j ++ ) {
 
