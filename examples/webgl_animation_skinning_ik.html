@@ -115,7 +115,7 @@
 
 			// mirror sphere cube-camera
 			const cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 1024 );
-			mirrorSphereCamera = new THREE.CubeCamera( .05, 50, cubeRenderTarget );
+			mirrorSphereCamera = new THREE.CubeCamera( 0.05, 50, cubeRenderTarget );
 			scene.add( mirrorSphereCamera );
 			const mirrorSphereMaterial = new THREE.MeshBasicMaterial( { envMap: cubeRenderTarget.texture } );
 			OOI.sphere.material = mirrorSphereMaterial;
@@ -150,7 +150,7 @@
 				}
 			];
 			IKSolver = new CCDIKSolver( OOI.kira, iks );
-			const ccdikhelper = new CCDIKHelper( OOI.kira, iks, { sphereSize: .01 } );
+			const ccdikhelper = new CCDIKHelper( OOI.kira, iks, 0.01 );
 			scene.add( ccdikhelper );
 
 			gui = new GUI();
