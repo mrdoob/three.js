@@ -28,7 +28,8 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - USDZ exporter<br />
 			Battle Damaged Sci-fi Helmet by
-			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a>
+			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
+			<a id="desktop-link" href="" download="asset.usdz"><button>Download Converted USDZ</button></a>
 		</div>
 
 		<a id="link" rel="ar" href="" download="asset.usdz">
@@ -96,11 +97,14 @@
 					// USDZ
 
 					const exporter = new USDZExporter();
-					const arraybuffer = await exporter.parse( gltf.scene );
+					const arraybuffer = await exporter.parse( scene );
 					const blob = new Blob( [ arraybuffer ], { type: 'application/octet-stream' } );
 
+					const url = URL.createObjectURL( blob );
 					const link = document.getElementById( 'link' );
-					link.href = URL.createObjectURL( blob );
+					const desktopLink = document.getElementById( 'desktop-link' );
+					link.href = url;
+					desktopLink.href = url;
 
 				} );
 
