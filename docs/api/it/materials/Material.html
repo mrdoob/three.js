@@ -340,8 +340,10 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-			Elimina il materiale. Le texture del materiale non vengono eliminate.
-			Questi devono essere smaltiti da [page:Texture Texture].
+			Libera le risorse relative alla GPU allocate da questa istanza.
+			Chiama questo metodo ogni volta che questa istanza non è più utilizzata nella tua app. <br /><br />
+
+			Le texture del materiale devono essere liberate dal metodo dispose() della [page:Texture Texture].
 		</p>
 
 		<h3>[method:undefined onBeforeCompile]( [param:Shader shader], [param:WebGLRenderer renderer] )</h3>
