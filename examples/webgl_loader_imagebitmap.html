@@ -18,7 +18,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -36,7 +37,6 @@
 			function addImageBitmap() {
 
 				new THREE.ImageBitmapLoader()
-					.setOptions( { imageOrientation: 'none' } )
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
 						const texture = new THREE.CanvasTexture( imageBitmap );

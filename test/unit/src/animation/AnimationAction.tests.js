@@ -444,6 +444,52 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		QUnit.test( 'StartAt when already executed once', ( assert ) => {
+			var root = new Object3D();
+			var mixer = new AnimationMixer( root );
+			var track = new NumberKeyframeTrack( '.rotation[x]', [ 0, 750 ], [ 0, 270 ] );
+			var clip = new AnimationClip( 'clip1', 750, [ track ] );
+		
+			var animationAction = mixer.clipAction( clip );
+			animationAction.setLoop( LoopOnce );
+			animationAction.clampWhenFinished = true;
+			animationAction.play();
+			mixer.addEventListener('finished', () => {
+				animationAction.timeScale*=-1;
+				animationAction.paused=false;
+				animationAction.startAt(mixer.time+2000).play();
+
+			});
+
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 90, 'first' );
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 180, 'first' );
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 270, 'first' );
+			//first loop done
+			mixer.update( 2000 );
+			// startAt Done
+			assert.equal( root.rotation.x, 270, 'third' );
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 180, 'fourth' );
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 90, 'fourth' );
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 0, 'sixth' );
+			mixer.update( 1 );
+			assert.equal( root.rotation.x, 0, 'seventh' );
+			mixer.update( 1000 );
+			assert.equal( root.rotation.x, 0, 'seventh' );
+			mixer.update( 1000 );
+			assert.equal( root.rotation.x, 0, 'seventh' );
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 90, 'seventh' );
+			mixer.update( 250 );
+			assert.equal( root.rotation.x, 180, 'seventh' );
+			//console.log(mixer.time);
+		});
+
 	} );
 
 } );

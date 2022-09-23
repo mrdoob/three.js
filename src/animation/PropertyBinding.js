@@ -32,7 +32,7 @@ const _trackRe = new RegExp( ''
 	+ '$'
 );
 
-const _supportedObjectNames = [ 'material', 'materials', 'bones' ];
+const _supportedObjectNames = [ 'material', 'materials', 'bones', 'map' ];
 
 class Composite {
 
@@ -494,6 +494,32 @@ class PropertyBinding {
 
 					}
 
+					break;
+
+				case 'map':
+
+					if ( 'map' in targetObject ) {
+
+						targetObject = targetObject.map;
+						break;
+
+					}
+
+					if ( ! targetObject.material ) {
+
+						console.error( 'THREE.PropertyBinding: Can not bind to material as node does not have a material.', this );
+						return;
+
+					}
+
+					if ( ! targetObject.material.map ) {
+
+						console.error( 'THREE.PropertyBinding: Can not bind to material.map as node.material does not have a map.', this );
+						return;
+
+					}
+
+					targetObject = targetObject.material.map;
 					break;
 
 				default:

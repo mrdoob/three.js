@@ -71,14 +71,13 @@
 		<p>Connects a new [page:SplineCurve] onto the [page:ShapePath.currentPath currentPath].</p>
 
 
-		<h3>[method:Array toShapes]( [param:Boolean isCCW], [param:Boolean noHoles] )</h3>
+		<h3>[method:Array toShapes]( [param:Boolean isCCW] )</h3>
 		<p>
-		isCCW -- Changes how solids and holes are generated<br/>
-		noHoles -- Whether or not to generate holes
+		isCCW -- Changes how solids and holes are generated
 		</p>
 		<p>
 		Converts the [page:ShapePath.subPaths subPaths] array into an array of Shapes. By default solid shapes are defined clockwise (CW) and holes are defined counterclockwise (CCW). If isCCW is set to true,
-		then those are flipped. If the parameter noHoles is set to true then all paths are set as solid shapes and isCCW is ignored.
+		then those are flipped.
 		<br/>
 
 		</p>

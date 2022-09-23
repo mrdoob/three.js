@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,8 +28,8 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { TubePainter } from './jsm/misc/TubePainter.js';
-			import { ARButton } from './jsm/webxr/ARButton.js';
+			import { TubePainter } from 'three/addons/misc/TubePainter.js';
+			import { ARButton } from 'three/addons/webxr/ARButton.js';
 
 			let container;
 			let camera, scene, renderer;

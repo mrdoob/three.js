@@ -135,27 +135,6 @@
 				_spritePool = []; //
 
 
-			this.projectVector = function ( vector, camera ) {
-
-				console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
-				vector.project( camera );
-
-			};
-
-			this.unprojectVector = function ( vector, camera ) {
-
-				console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
-				vector.unproject( camera );
-
-			};
-
-			this.pickingRay = function () {
-
-				console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
-
-			}; //
-
-
 			function RenderList() {
 
 				const normals = [];
@@ -399,8 +378,8 @@
 				_lineCount = 0;
 				_spriteCount = 0;
 				_renderData.elements.length = 0;
-				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-				if ( camera.parent === null ) camera.updateMatrixWorld();
+				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 				_viewMatrix.copy( camera.matrixWorldInverse );
 

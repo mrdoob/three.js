@@ -1,7 +1,7 @@
 import LightingNode from './LightingNode.js';
 import ContextNode from '../core/ContextNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
-import { ShaderNode, float, add, mul, div, log2, clamp, roughness, reflect, mix, vec3, positionViewDirection, negate, normalize, transformedNormalView, transformedNormalWorld, transformDirection, cameraViewMatrix } from '../shadernode/ShaderNodeElements.js';
+import { ShaderNode, float, add, mul, div, log2, clamp, roughness, reflect, mix, positionViewDirection, negate, normalize, transformedNormalView, transformedNormalWorld, transformDirection, cameraViewMatrix } from '../shadernode/ShaderNodeElements.js';
 
 // taken from here: http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
 const getSpecularMIPLevel = new ShaderNode( ( { texture, levelNode } ) => {
@@ -30,12 +30,9 @@ class EnvironmentNode extends LightingNode {
 		const envNode = this.envNode;
 		const properties = builder.getNodeProperties( this );
 
-		const flipNormalWorld = vec3( negate( transformedNormalWorld.x ), transformedNormalWorld.yz );
-
 		let reflectVec = reflect( negate( positionViewDirection ), transformedNormalView );
 		reflectVec = normalize( mix( reflectVec, transformedNormalView, mul( roughness, roughness ) ) );
 		reflectVec = transformDirection( reflectVec, cameraViewMatrix );
-		reflectVec = vec3( negate( reflectVec.x ), reflectVec.yz );
 
 		const radianceContext = new ContextNode( envNode, {
 			tempRead: false,
@@ -46,7 +43,7 @@ class EnvironmentNode extends LightingNode {
 
 		const irradianceContext = new ContextNode( envNode, {
 			tempRead: false,
-			uvNode: flipNormalWorld,
+			uvNode: transformedNormalWorld,
 			levelNode: float( 1 ),
 			levelShaderNode: getSpecularMIPLevel
 		} );

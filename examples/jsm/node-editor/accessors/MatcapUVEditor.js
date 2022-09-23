@@ -1,5 +1,5 @@
 import { BaseNode } from '../core/BaseNode.js';
-import { MatcapUVNode } from 'three-nodes/Nodes.js';
+import { MatcapUVNode } from 'three/nodes';
 
 export class MatcapUVEditor extends BaseNode {
 

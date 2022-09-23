@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="utf-8">
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	<h1>Créer du contenu VR ([name])</h1>
+
+	<p>
+		Ce guide fournit une brève vue d'ensemble des composants basiques d'une application VR web
+		faite avec three.js.
+	</p>
+
+	<h2>Workflow</h2>
+
+	<p>
+		Premièrement, vous devez inclure [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/VRButton.js VRButton.js]
+		dans votre projet.
+	</p>
+
+	<code>
+import { VRButton } from 'three/addons/webxr/VRButton.js';
+	</code>
+
+	<p>
+		*VRButton.createButton()* fait deux choses importantes: Cela crée un bouton qui indique
+		la compatibilité VR. De plus, cela initie une session VR si l'utilisateur active le bouton. La seule chose que vous avez
+		à faire est d'ajouter la ligne de code suivante à votre application.
+	</p>
+
+	<code>
+document.body.appendChild( VRButton.createButton( renderer ) );
+	</code>
+
+	<p>
+		Ensuite, vous devez dire à votre instance de `WebGLRenderer` d'activer le rendu XR.
+	</p>
+
+	<code>
+renderer.xr.enabled = true;
+	</code>
+
+	<p>
+		Finalement, vous n'avez plus qu'à ajuster votre boucle d'animation étant donné que nous ne pouvons pas utiliser notre fonction bien aimée
+		*window.requestAnimationFrame()*. Pour les projets VR nous utilisons [page:WebGLRenderer.setAnimationLoop setAnimationLoop].
+		Le code minimal ressemble à cela:
+	</p>
+
+	<code>
+renderer.setAnimationLoop( function () {
+
+	renderer.render( scene, camera );
+
+} );
+	</code>
+
+	<h2>Étapes Suivantes</h2>
+
+	<p>
+		Jetez un coup d'oeil à un des exemples officiels WebVR pour voir le workflow en action.<br /><br />
+
+		[example:webxr_vr_ballshooter WebXR / VR / ballshooter]<br />
+		[example:webxr_vr_cubes WebXR / VR / cubes]<br />
+		[example:webxr_vr_dragging WebXR / VR / dragging]<br />
+		[example:webxr_vr_paint WebXR / VR / paint]<br />
+		[example:webxr_vr_panorama_depth WebXR / VR / panorama_depth]<br />
+		[example:webxr_vr_panorama WebXR / VR / panorama]<br />
+		[example:webxr_vr_rollercoaster WebXR / VR / rollercoaster]<br />
+		[example:webxr_vr_sandbox WebXR / VR / sandbox]<br />
+		[example:webxr_vr_sculpt WebXR / VR / sculpt]<br />
+		[example:webxr_vr_video WebXR / VR / video]
+	</p>
+
+</body>
+
+</html>

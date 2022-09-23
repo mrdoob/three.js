@@ -21,8 +21,9 @@
 			function onPointerEvent( event ) {
 
 				event.stopPropagation();
-				_pointer.x = event.clientX / element.clientWidth * 2 - 1;
-				_pointer.y = - ( event.clientY / element.clientHeight ) * 2 + 1;
+				const rect = renderer.domElement.getBoundingClientRect();
+				_pointer.x = ( event.clientX - rect.left ) / rect.width * 2 - 1;
+				_pointer.y = - ( event.clientY - rect.top ) / rect.height * 2 + 1;
 				raycaster.setFromCamera( _pointer, camera );
 				const intersects = raycaster.intersectObjects( scope.children, false );
 

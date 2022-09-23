@@ -45,6 +45,7 @@ export const NodeList = [
 			{
 				name: 'Slider',
 				icon: 'adjustments-horizontal',
+				tags: 'number',
 				nodeClass: SliderEditor
 			},
 			{
@@ -117,6 +118,7 @@ export const NodeList = [
 			{
 				name: 'Blend',
 				icon: 'layers-subtract',
+				tags: 'mix',
 				nodeClass: BlendEditor
 			},
 			{
@@ -133,6 +135,7 @@ export const NodeList = [
 			{
 				name: 'Operator',
 				icon: 'math-symbols',
+				tags: 'addition, subtration, multiplication, division',
 				nodeClass: OperatorEditor
 			},
 			{
@@ -161,12 +164,14 @@ export const NodeList = [
 				name: 'Trigonometry',
 				icon: 'wave-sine',
 				tip: 'Sin / Cos / Tan / ...',
+				tags: 'sin, cos, tan, asin, acos, atan, sine, cosine, tangent, arcsine, arccosine, arctangent',
 				nodeClass: TrigonometryEditor
 			},
 			{
 				name: 'Angle',
 				icon: 'angle',
 				tip: 'Degress / Radians',
+				tags: 'degress, radians',
 				nodeClass: AngleEditor
 			},
 			{
@@ -303,6 +308,13 @@ export class NodeEditor extends EventDispatcher {
 		this.canvas = canvas;
 		this.domElement = domElement;
 
+		this._preview = false;
+
+		this.search = null;
+
+		this.menu = null;
+		this.previewMenu = null;
+
 		this.nodesContext = null;
 		this.examplesContext = null;
 
@@ -315,20 +327,25 @@ export class NodeEditor extends EventDispatcher {
 
 	}
 
+	setSize( width, height ) {
+
+		this.canvas.setSize( width, height );
+
+		return this;
+
+	}
+
 	centralizeNode( node ) {
 
 		const canvas = this.canvas;
-		const canvasRect = canvas.rect;
-
 		const nodeRect = node.dom.getBoundingClientRect();
 
-		const defaultOffsetX = nodeRect.width;
-		const defaultOffsetY = nodeRect.height;
-
 		node.setPosition(
-			( canvas.relativeX + ( canvasRect.width / 2 ) ) - defaultOffsetX,
-			( canvas.relativeY + ( canvasRect.height / 2 ) ) - defaultOffsetY
+			( ( canvas.width / 2 ) - canvas.scrollLeft ) - nodeRect.width,
+			( ( canvas.height / 2 ) - canvas.scrollTop ) - nodeRect.height
 		);
+
+		return this;
 
 	}
 
@@ -359,9 +376,47 @@ export class NodeEditor extends EventDispatcher {
 
 	}
 
+	set preview( value ) {
+
+		if ( this._preview === value ) return;
+
+		if ( value ) {
+
+			this.menu.dom.remove();
+			this.canvas.dom.remove();
+			this.search.dom.remove();
+
+			this.domElement.append( this.previewMenu.dom );
+
+		} else {
+
+			this.canvas.focusSelected = false;
+
+			this.domElement.append( this.menu.dom );
+			this.domElement.append( this.canvas.dom );
+			this.domElement.append( this.search.dom );
+
+			this.previewMenu.dom.remove();
+
+		}
+
+		this._preview = value;
+
+	}
+
+	get preview() {
+
+		return this._preview;
+
+	}
+
 	newProject() {
 
-		this.canvas.clear();
+		const canvas = this.canvas;
+		canvas.clear();
+		canvas.scrollLeft = 0;
+		canvas.scrollTop = 0;
+		canvas.zoom = 1;
 
 		this.dispatchEvent( { type: 'new' } );
 
@@ -426,12 +481,22 @@ export class NodeEditor extends EventDispatcher {
 	_initMenu() {
 
 		const menu = new CircleMenu();
+		const previewMenu = new CircleMenu();
 
+		menu.setAlign( 'top left' );
+		previewMenu.setAlign( 'top left' );
+
+		const previewButton = new ButtonInput().setIcon( 'ti ti-3d-cube-sphere' ).setToolTip( 'Preview' );
 		const menuButton = new ButtonInput().setIcon( 'ti ti-apps' ).setToolTip( 'Add' );
 		const examplesButton = new ButtonInput().setIcon( 'ti ti-file-symlink' ).setToolTip( 'Examples' );
 		const newButton = new ButtonInput().setIcon( 'ti ti-file' ).setToolTip( 'New' );
 		const openButton = new ButtonInput().setIcon( 'ti ti-upload' ).setToolTip( 'Open' );
 		const saveButton = new ButtonInput().setIcon( 'ti ti-download' ).setToolTip( 'Save' );
+
+		const editorButton = new ButtonInput().setIcon( 'ti ti-subtask' ).setToolTip( 'Editor' );
+
+		previewButton.onClick( () => this.preview = true );
+		editorButton.onClick( () => this.preview = false );
 
 		menuButton.onClick( () => this.nodesContext.open() );
 		examplesButton.onClick( () => this.examplesContext.open() );
@@ -486,15 +551,19 @@ export class NodeEditor extends EventDispatcher {
 
 		} );
 
-		menu.add( examplesButton )
-			.add( menuButton )
+		menu.add( previewButton )
 			.add( newButton )
+			.add( examplesButton )
 			.add( openButton )
-			.add( saveButton );
+			.add( saveButton )
+			.add( menuButton );
+
+		previewMenu.add( editorButton );
 
 		this.domElement.append( menu.dom );
 
 		this.menu = menu;
+		this.previewMenu = previewMenu;
 
 	}
 
@@ -541,7 +610,6 @@ export class NodeEditor extends EventDispatcher {
 		addExample( basicContext, 'Animate UV' );
 		addExample( basicContext, 'Fake top light' );
 		addExample( basicContext, 'Oscillator color' );
-		addExample( basicContext, 'Matcap' );
 
 		addExample( advancedContext, 'Rim' );
 
@@ -571,10 +639,17 @@ export class NodeEditor extends EventDispatcher {
 					this.add( node );
 
 					this.centralizeNode( node );
+					this.canvas.select( node );
 
 				} );
 
 				search.add( button );
+
+				if ( item.tags !== undefined ) {
+
+					search.setTag( button, item.tags );
+
+				}
 
 			}
 
@@ -652,6 +727,7 @@ export class NodeEditor extends EventDispatcher {
 							this.add( node );
 
 							this.centralizeNode( node );
+							this.canvas.select( node );
 
 						} );
 
@@ -674,6 +750,8 @@ export class NodeEditor extends EventDispatcher {
 			}
 
 		} );
+
+		this.search = search;
 
 		this.domElement.append( search.dom );
 
@@ -698,6 +776,7 @@ export class NodeEditor extends EventDispatcher {
 			} else {
 
 				this.centralizeNode( node );
+				this.canvas.select( node );
 
 			}
 

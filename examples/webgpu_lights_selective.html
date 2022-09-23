@@ -19,7 +19,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -27,19 +28,19 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { color, float } from 'three-nodes/Nodes.js';
+			import { color, float } from 'three/nodes';
 
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
@@ -61,9 +62,9 @@
 				camera.position.z = 70;
 
 				scene = new THREE.Scene();
-				scene.fogNode = new Nodes.FogRangeNode( color( 0xFF00FF ), float( 30 ), float( 300 )  );
+				scene.fogNode = new Nodes.FogRangeNode( color( 0xFF00FF ), float( 30 ), float( 300 ) );
 
-				const sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
+				const sphereGeometry = new THREE.SphereGeometry( 0.5, 16, 8 );
 
 				//textures
 
@@ -79,21 +80,27 @@
 
 				//lights
 
-				light1 = new THREE.PointLight( 0xff0040, 2, 1000 );
-				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) ) );
-				scene.add( light1 );
+				const addLight = ( hexColor, intensity = 2, distance = 1000 ) => {
 
-				light2 = new THREE.PointLight( 0x0040ff, 2, 1000 );
-				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) ) );
-				scene.add( light2 );
+					const material = new Nodes.MeshStandardNodeMaterial();
+					material.colorNode = color( hexColor );
+					material.lightsNode = new Nodes.LightsNode(); // ignore scene lights
 
-				light3 = new THREE.PointLight( 0x80ff80, 2, 1000 );
-				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) ) );
-				scene.add( light3 );
+					const mesh = new THREE.Mesh( sphereGeometry, material );
 
-				light4 = new THREE.PointLight( 0xffaa00, 2, 1000 );
-				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) ) );
-				scene.add( light4 );
+					const light = new THREE.PointLight( hexColor, intensity, distance );
+					light.add( mesh );
+
+					scene.add( light );
+
+					return light;
+
+				};
+
+				light1 = addLight( 0xff0040 );
+				light2 = addLight( 0x0040ff );
+				light3 = addLight( 0x80ff80 );
+				light4 = addLight( 0xffaa00 );
 
 				//light nodes ( selective lights )
 
@@ -197,7 +204,7 @@
 				light4.position.x = Math.sin( lightTime * 0.3 ) * 30;
 				light4.position.y = Math.cos( lightTime * 0.7 ) * 40;
 				light4.position.z = Math.sin( lightTime * 0.5 ) * 30;
-/*
+	/*
 				@TODO: Used to test scene light change ( currently unavailable )
 
 				if ( time > 2.0 && light1.parent === null ) scene.add( light1 );

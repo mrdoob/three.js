@@ -1744,6 +1744,13 @@
 
 					materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.material )[ 0 ];
 
+					if ( materialIndex < 0 ) {
+
+						console.warn( 'THREE.FBXLoader: Invalid material index:', materialIndex );
+						materialIndex = 0;
+
+					}
+
 				}
 
 				if ( geoInfo.uv ) {
@@ -3669,7 +3676,7 @@
 		if ( transformData.preRotation ) {
 
 			const array = transformData.preRotation.map( THREE.MathUtils.degToRad );
-			array.push( transformData.eulerOrder );
+			array.push( transformData.eulerOrder || THREE.Euler.DefaultOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 		}
@@ -3677,7 +3684,7 @@
 		if ( transformData.rotation ) {
 
 			const array = transformData.rotation.map( THREE.MathUtils.degToRad );
-			array.push( transformData.eulerOrder );
+			array.push( transformData.eulerOrder || THREE.Euler.DefaultOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 		}
@@ -3685,7 +3692,7 @@
 		if ( transformData.postRotation ) {
 
 			const array = transformData.postRotation.map( THREE.MathUtils.degToRad );
-			array.push( transformData.eulerOrder );
+			array.push( transformData.eulerOrder || THREE.Euler.DefaultOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 			lPostRotationM.invert();
 

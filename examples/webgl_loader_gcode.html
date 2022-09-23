@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,8 +29,8 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GCodeLoader } from './jsm/loaders/GCodeLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GCodeLoader } from 'three/addons/loaders/GCodeLoader.js';
 
 			let camera, scene, renderer;
 

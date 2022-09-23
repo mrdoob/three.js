@@ -117,18 +117,33 @@ class GLSLNodeFunction extends NodeFunction {
 
 	getCode( name = this.name ) {
 
-		const headerCode = this.headerCode;
-		const presicion = this.presicion;
+		let code;
 
-		let declarationCode = `${ this.type } ${ name } ( ${ this.inputsCode.trim() } )`;
+		const blockCode = this.blockCode;
 
-		if ( presicion !== '' ) {
+		if ( blockCode !== '' ) {
 
-			declarationCode = `${ presicion } ${ declarationCode }`;
+			const { type, inputsCode, headerCode, presicion } = this;
+
+			let declarationCode = `${ type } ${ name } ( ${ inputsCode.trim() } )`;
+
+			if ( presicion !== '' ) {
+
+				declarationCode = `${ presicion } ${ declarationCode }`;
+
+			}
+
+			code = headerCode + declarationCode + blockCode;
+
+		} else {
+
+			// interface function
+
+			code = '';
 
 		}
 
-		return headerCode + declarationCode + this.blockCode;
+		return code;
 
 	}
 

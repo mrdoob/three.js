@@ -53,9 +53,9 @@ class PeppersGhostEffect {
 
 		this.render = function ( scene, camera ) {
 
-			scene.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-			if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 			camera.matrixWorld.decompose( _position, _quaternion, _scale );
 

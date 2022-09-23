@@ -1,12 +1,12 @@
 import NodeUniform from './NodeUniform.js';
 import NodeAttribute from './NodeAttribute.js';
-import NodeVary from './NodeVary.js';
+import NodeVarying from './NodeVarying.js';
 import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
-import { REVISION, LinearEncoding } from 'three';
+import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'three';
 
 export const defaultShaderStages = [ 'fragment', 'vertex' ];
 export const shaderStages = [ ...defaultShaderStages, 'compute' ];
@@ -55,7 +55,7 @@ class NodeBuilder {
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.codes = { vertex: [], fragment: [], compute: [] };
 		this.attributes = [];
-		this.varys = [];
+		this.varyings = [];
 		this.vars = { vertex: [], fragment: [], compute: [] };
 		this.flow = { code: '' };
 		this.stack = [];
@@ -206,7 +206,18 @@ class NodeBuilder {
 	}
 
 	// @TODO: rename to .generateConst()
-	getConst( type, value ) {
+	getConst( type, value = null ) {
+
+		if ( value === null ) {
+
+			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
+			else if ( type === 'bool' ) value = false;
+			else if ( type === 'color' ) value = new Color();
+			else if ( type === 'vec2' ) value = new Vector2();
+			else if ( type === 'vec3' ) value = new Vector3();
+			else if ( type === 'vec4' ) value = new Vector4();
+
+		}
 
 		if ( type === 'float' ) return toFloat( value );
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
@@ -251,6 +262,12 @@ class NodeBuilder {
 	generateMethod( method ) {
 
 		return method;
+
+	}
+
+	hasGeometryAttribute( name ) {
+
+		return this.geometry?.getAttribute( name ) !== undefined;
 
 	}
 
@@ -456,26 +473,26 @@ class NodeBuilder {
 
 	}
 
-	getVaryFromNode( node, type ) {
+	getVaryingFromNode( node, type ) {
 
 		const nodeData = this.getDataFromNode( node, null );
 
-		let nodeVary = nodeData.vary;
+		let nodeVarying = nodeData.varying;
 
-		if ( nodeVary === undefined ) {
+		if ( nodeVarying === undefined ) {
 
-			const varys = this.varys;
-			const index = varys.length;
+			const varyings = this.varyings;
+			const index = varyings.length;
 
-			nodeVary = new NodeVary( 'nodeVary' + index, type );
+			nodeVarying = new NodeVarying( 'nodeVarying' + index, type );
 
-			varys.push( nodeVary );
+			varyings.push( nodeVarying );
 
-			nodeData.vary = nodeVary;
+			nodeData.varying = nodeVarying;
 
 		}
 
-		return nodeVary;
+		return nodeVarying;
 
 	}
 
@@ -572,7 +589,7 @@ class NodeBuilder {
 
 	}
 
-	getVarys( /*shaderStage*/ ) {
+	getVaryings( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 

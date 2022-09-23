@@ -37,30 +37,3 @@ export {
 	LineBasicMaterial,
 	Material
 };
-
-const materialLib = {
-	ShadowMaterial,
-	SpriteMaterial,
-	RawShaderMaterial,
-	ShaderMaterial,
-	PointsMaterial,
-	MeshPhysicalMaterial,
-	MeshStandardMaterial,
-	MeshPhongMaterial,
-	MeshToonMaterial,
-	MeshNormalMaterial,
-	MeshLambertMaterial,
-	MeshDepthMaterial,
-	MeshDistanceMaterial,
-	MeshBasicMaterial,
-	MeshMatcapMaterial,
-	LineDashedMaterial,
-	LineBasicMaterial,
-	Material
-};
-
-Material.fromType = function ( type ) {
-
-	return new materialLib[ type ]();
-
-};

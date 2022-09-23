@@ -12,6 +12,7 @@ class SpotLightHelper extends Object3D {
 	constructor( light, color ) {
 
 		super();
+
 		this.light = light;
 		this.light.updateMatrixWorld();
 

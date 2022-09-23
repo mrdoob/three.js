@@ -30,4 +30,4 @@ class CapsuleGeometry extends LatheGeometry {
 
 }
 
-export { CapsuleGeometry, CapsuleGeometry as CapsuleBufferGeometry };
+export { CapsuleGeometry };

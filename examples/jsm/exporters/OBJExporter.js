@@ -32,12 +32,6 @@ class OBJExporter {
 
 			const normalMatrixWorld = new Matrix3();
 
-			if ( geometry.isBufferGeometry !== true ) {
-
-				throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-			}
-
 			// shortcuts
 			const vertices = geometry.getAttribute( 'position' );
 			const normals = geometry.getAttribute( 'normal' );
@@ -159,12 +153,6 @@ class OBJExporter {
 			const geometry = line.geometry;
 			const type = line.type;
 
-			if ( geometry.isBufferGeometry !== true ) {
-
-				throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-			}
-
 			// shortcuts
 			const vertices = geometry.getAttribute( 'position' );
 
@@ -221,12 +209,6 @@ class OBJExporter {
 			let nbVertex = 0;
 
 			const geometry = points.geometry;
-
-			if ( geometry.isBufferGeometry !== true ) {
-
-				throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-			}
 
 			const vertices = geometry.getAttribute( 'position' );
 			const colors = geometry.getAttribute( 'color' );

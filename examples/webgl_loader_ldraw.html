@@ -27,7 +27,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -36,13 +37,13 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-			import { LDrawLoader } from './jsm/loaders/LDrawLoader.js';
-			import { LDrawUtils } from './jsm/utils/LDrawUtils.js';
+			import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
+			import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';
 
 			let container, progressBarDiv;
 

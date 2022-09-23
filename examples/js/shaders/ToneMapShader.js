@@ -64,7 +64,7 @@
 			#endif
 
 			// Calculate the luminance of the current pixel
-			float fLumPixel = linearToRelativeLuminance( vColor );
+			float fLumPixel = luminance( vColor );
 
 			// Apply the modified operator (Eq. 4)
 			float fLumScaled = (fLumPixel * middleGrey) / max( minLuminance, fLumAvg );

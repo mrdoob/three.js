@@ -10,7 +10,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			An AnimationClip is a reusable set of keyframe tracks which represent an animation.<br /><br />
+			An [name] is a reusable set of keyframe tracks which represent an animation.<br /><br />
 
 			For an overview of the different elements of the three.js animation system see the
 			"Animation System" article in the "Next Steps" section of the manual.
@@ -25,7 +25,9 @@
 			[page:String name] - a name for this clip.<br />
 			[page:Number duration] - the duration of this clip (in seconds). If a negative value is passed,
 			the duration will be calculated from the passed `tracks` array.<br />
-			[page:Array tracks] - an array of [page:KeyframeTrack KeyframeTracks].<br /><br />
+			[page:Array tracks] - an array of [page:KeyframeTrack KeyframeTracks].<br />
+			[page:Number blendMode] - defines how the animation is blended/combined when two or more animations are simultaneously played.<br /><br />
+
 
 			Note: Instead of instantiating an AnimationClip directly with the constructor, you can use one
 			of its static methods to create AnimationClips: from JSON ([page:.parse parse]), from morph
@@ -35,9 +37,13 @@
 			hold AnimationClips in its geometry's animations array.
 		</p>
 
-
 		<h2>Properties</h2>
 
+		<h3>[property:Number blendMode]</h3>
+		<p>
+			Defines how the animation is blended/combined when two or more animations are simultaneously played. 
+			Valid values are *NormalAnimationBlendMode* (default) and *AdditiveAnimationBlendMode*.
+		</p>
 
 		<h3>[property:Number duration]</h3>
 		<p>

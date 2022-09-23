@@ -18,7 +18,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -26,12 +27,14 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+			import { mix, range, color, oscSine, timerLocal } from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer;
 
@@ -83,8 +86,18 @@
 
 						if ( child.isMesh ) {
 
+							const oscNode = oscSine( timerLocal( .1 ) );
+
+							// random colors between instances from 0x000000 to 0xFFFFFF
+							const randomColors = range( new THREE.Color( 0x000000 ), new THREE.Color( 0xFFFFFF ) );
+
+							// random [ 0, 1 ] values between instances
+							const randomMetalness = range( 0, 1 );
+
 							child.material = new Nodes.MeshStandardNodeMaterial();
 							child.material.roughness = .1;
+							child.material.metalnessNode = mix( 0.0, randomMetalness, oscNode );
+							child.material.colorNode = mix( color( 0xFFFFFF ), randomColors, oscNode );
 
 							child.isInstancedMesh = true;
 							child.instanceMatrix = new THREE.InstancedBufferAttribute( new Float32Array( instanceCount * 16 ), 16 );

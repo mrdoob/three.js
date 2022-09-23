@@ -21,7 +21,6 @@
 
 		<p>
 			[example:webgl_instancing_dynamic WebGL / instancing / dynamic]<br />
-			[example:webgl_instancing_modified WebGL / instancing / modified]<br />
 			[example:webgl_instancing_performance WebGL / instancing / performance]<br />
 			[example:webgl_instancing_scatter WebGL / instancing / scatter]<br />
 			[example:webgl_instancing_raycast WebGL / instancing / raycast]
@@ -70,7 +69,7 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-			Frees the internal resources of this instance.
+			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:undefined getColorAt]( [param:Integer index], [param:Color color] )</h3>

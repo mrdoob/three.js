@@ -24,7 +24,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -33,10 +34,10 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let gui;
 
@@ -66,7 +67,7 @@
 
 				}
 
-			}
+			};
 
 			const clock = new THREE.Clock();
 			const textureLoader = new THREE.TextureLoader();

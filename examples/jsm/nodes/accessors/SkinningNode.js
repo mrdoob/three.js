@@ -7,6 +7,7 @@ import {
 	uniform,
 	positionLocal,
 	normalLocal,
+	tangentLocal,
 	assign,
 	element,
 	add,
@@ -55,6 +56,12 @@ const Skinning = new ShaderNode( ( inputs, builder ) => {
 
 	assign( positionLocal, skinPosition ).build( builder );
 	assign( normalLocal, skinNormal ).build( builder );
+
+	if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+
+		assign( tangentLocal, skinNormal ).build( builder );
+
+	}
 
 } );
 

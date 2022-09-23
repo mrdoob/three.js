@@ -15,8 +15,6 @@
 		constructor( object, domElement ) {
 
 			super();
-			if ( domElement === undefined ) console.warn( 'THREE.TrackballControls: The second parameter "domElement" is now mandatory.' );
-			if ( domElement === document ) console.error( 'THREE.TrackballControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
 			const scope = this;
 			const STATE = {
 				NONE: - 1,

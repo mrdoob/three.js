@@ -18,7 +18,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -26,27 +27,26 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
-			import { add, mul } from 'three-nodes/Nodes.js';
+			import { MeshStandardNodeMaterial, NodeUpdateType, Node, uniform, attribute, cubeTexture, add, mul } from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			class InstanceUniformNode extends Nodes.Node {
+			class InstanceUniformNode extends Node {
 
 				constructor() {
 
 					super( 'vec3' );
 
-					this.updateType = Nodes.NodeUpdateType.Object;
+					this.updateType = NodeUpdateType.Object;
 
-					this.uniformNode = new Nodes.UniformNode( new THREE.Color() );
+					this.uniformNode = uniform( new THREE.Color() );
 
 				}
 
@@ -98,7 +98,7 @@
 				// Grid
 
 				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = new Nodes.AttributeNode( 'color' );
+				helper.material.colorNode = attribute( 'color' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
@@ -112,14 +112,14 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				const cubeTexture = new THREE.CubeTextureLoader().load( urls );
+				const cTexture = new THREE.CubeTextureLoader().load( urls );
 
 				// Materials
 
 				const instanceUniform = new InstanceUniformNode();
-				const cubeTextureNode = new Nodes.CubeTextureNode( cubeTexture );
+				const cubeTextureNode = cubeTexture( cTexture );
 
-				const material = new THREE.MeshStandardMaterial();
+				const material = new MeshStandardNodeMaterial();
 				material.colorNode = add( instanceUniform, cubeTextureNode );
 				material.emissiveNode = mul( instanceUniform, cubeTextureNode );
 

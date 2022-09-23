@@ -1,6 +1,6 @@
 import { SelectInput, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { NormalNode } from 'three-nodes/Nodes.js';
+import { NormalNode } from 'three/nodes';
 
 export class NormalEditor extends BaseNode {
 
