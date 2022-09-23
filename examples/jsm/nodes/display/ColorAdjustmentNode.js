@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { ShaderNode, vec3, mat3, add, sub, mul, max, div, dot, float, mix, cos, sin, atan2, sqrt, luminance } from '../shadernode/ShaderNodeBaseElements.js';
+import { ShaderNode, vec3, mat3, add, sub, mul, max, div, float, mix, cos, sin, atan2, sqrt, luminance } from '../shadernode/ShaderNodeBaseElements.js';
 
 const saturationNode = new ShaderNode( ( { color, adjustment } ) => {
 
