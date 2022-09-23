@@ -107,31 +107,33 @@ const ShaderNodeArray = function ( array ) {
 
 };
 
-const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null ) {
+const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, settings = null ) {
+
+	const assignNode = ( node ) => nodeObject( settings !== null ? Object.assign( node, settings ) : node );
 
 	if ( scope === null ) {
 
 		return ( ...params ) => {
 
-			return nodeObject( new NodeClass( ...nodeArray( params ) ) );
+			return assignNode( new NodeClass( ...nodeArray( params ) ) );
 
 		};
 
-	} else if ( factor === null ) {
-
-		return ( ...params ) => {
-
-			return nodeObject( new NodeClass( scope, ...nodeArray( params ) ) );
-
-		};
-
-	} else {
+	} else if ( factor !== null ) {
 
 		factor = nodeObject( factor );
 
 		return ( ...params ) => {
 
-			return nodeObject( new NodeClass( scope, ...nodeArray( params ), factor ) );
+			return assignNode( new NodeClass( scope, ...nodeArray( params ), factor ) );
+
+		};
+
+	} else {
+
+		return ( ...params ) => {
+
+			return assignNode( new NodeClass( scope, ...nodeArray( params ) ) );
 
 		};
 

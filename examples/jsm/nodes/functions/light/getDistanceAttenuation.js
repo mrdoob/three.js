@@ -1,5 +1,5 @@
 import {
-	ShaderNode, div, max, sub, mul, saturate, pow, pow2, pow4, cond, greaterThan
+	ShaderNode, div, max, sub, mul, clamp, pow, pow2, pow4, cond, greaterThan
 } from '../../shadernode/ShaderNodeBaseElements.js';
 
 const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
@@ -13,7 +13,7 @@ const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
 
 	return cond(
 		greaterThan( cutoffDistance, 0 ),
-		mul( distanceFalloff, pow2( saturate( sub( 1.0, pow4( div( lightDistance, cutoffDistance ) ) ) ) ) ),
+		mul( distanceFalloff, pow2( clamp( sub( 1.0, pow4( div( lightDistance, cutoffDistance ) ) ) ) ) ),
 		distanceFalloff
 	);
 

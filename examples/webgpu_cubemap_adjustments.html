@@ -33,7 +33,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
-			import { uniform, mix, cubeTexture, mul, reference, add, positionWorld, normalWorld, modelWorldMatrix, transformDirection, saturate, saturation, hue, reflectVector, context } from 'three/nodes';
+			import { uniform, mix, cubeTexture, mul, reference, add, positionWorld, normalWorld, modelWorldMatrix, transformDirection, clamp, saturation, hue, reflectVector, context } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -112,7 +112,7 @@
 					const custom1UV = mul( reflectNode.xyz, uniform( rotateY1Matrix ) );
 					const custom2UV = mul( reflectNode.xyz, uniform( rotateY2Matrix ) );
 
-					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), saturate( add( positionWorld.y, mixNode ) ) );
+					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), clamp( add( positionWorld.y, mixNode ) ) );
 					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
 					const intensityFilter = mul( proceduralEnv, intensityNode );
 					const hueFilter = hue( intensityFilter, hueNode );

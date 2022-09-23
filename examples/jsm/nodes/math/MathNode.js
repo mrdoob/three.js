@@ -32,7 +32,6 @@ class MathNode extends TempNode {
 	static INVERT = 'invert';
 	static DFDX = 'dFdx';
 	static DFDY = 'dFdy';
-	static SATURATE = 'saturate';
 	static ROUND = 'round';
 
 	// 2 inputs
@@ -151,10 +150,6 @@ class MathNode extends TempNode {
 			const mulNode = new SplitNode( new OperatorNode( '*', tA, tB ), 'xyz' );
 
 			return new MathNode( MathNode.NORMALIZE, mulNode ).build( builder );
-
-		} else if ( method === MathNode.SATURATE ) {
-
-			return builder.format( `clamp( ${ a.build( builder, inputType ) }, 0.0, 1.0 )`, type, output );
 
 		} else if ( method === MathNode.NEGATE ) {
 

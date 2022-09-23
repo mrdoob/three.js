@@ -47936,6 +47936,13 @@ class SkeletonHelper extends LineSegments {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
 }
 
 
@@ -48158,6 +48165,13 @@ class GridHelper extends LineSegments {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
 }
 
 class PolarGridHelper extends LineSegments {
@@ -48236,6 +48250,13 @@ class PolarGridHelper extends LineSegments {
 		super( geometry, material );
 
 		this.type = 'PolarGridHelper';
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 
@@ -48656,7 +48677,6 @@ class BoxHelper extends LineSegments {
 
 		this.geometry.computeBoundingSphere();
 
-
 	}
 
 	setFromObject( object ) {
@@ -48675,6 +48695,13 @@ class BoxHelper extends LineSegments {
 		this.object = source.object;
 
 		return this;
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 
@@ -48717,6 +48744,13 @@ class Box3Helper extends LineSegments {
 		this.scale.multiplyScalar( 0.5 );
 
 		super.updateMatrixWorld( force );
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 
@@ -48763,6 +48797,15 @@ class PlaneHelper extends Line {
 		this.translateZ( - this.plane.constant );
 
 		super.updateMatrixWorld( force );
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+		this.children[ 0 ].geometry.dispose();
+		this.children[ 0 ].material.dispose();
 
 	}
 
@@ -48856,6 +48899,15 @@ class ArrowHelper extends Object3D {
 		this.cone.copy( source.cone );
 
 		return this;
+
+	}
+
+	dispose() {
+
+		this.line.geometry.dispose();
+		this.line.material.dispose();
+		this.cone.geometry.dispose();
+		this.cone.material.dispose();
 
 	}
 
