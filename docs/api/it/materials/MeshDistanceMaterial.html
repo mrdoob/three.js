@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] viene utilizzata internamente per implementare la mappatura delle ombre con [page:PointLight].<br/><br/>
+
+			Può anche essere utilizzato per personalizzare la proiezione dell'ombra di un oggetto assegnando un'istanza di [name] a [page:Object3D.customDistanceMaterial].
+			L'esempio seguente dimostra questo approccio per garantire che le parti trasparenti degli oggetti non proiettano ombre.
+		</p>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_shadowmap_pointlight WebGL / shadowmap / pointlight]
+		</p>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
+			Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material]) può essere passata qui.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Material] per le proprietà comuni.</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>
+			La mappa alfa è una texture in scala di grigi che controlla l'opacità sulla superficie
+			(nero: completamente trasparente; bianco: completamente opaco). Il valore predefinito è `null`.<br /><br />
+
+			Viene utilizzato solo il colore della texture, ignorando il canale alfa, se esiste.
+			Per le texuture RGB e RGBA, il renderer [page:WebGLRenderer WebGL] utilizzarà il canale del verde 
+			durante il campionamento di questa texture a causa del bit extra di precisione fornito per il verde
+			nei formati RGB 565 compressi e non compressi DXT. Anche le texture solo luminanza e luminanza/alfa continueranno
+			a funzionare come previsto.
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			La mappa di spostamento influisce sulla posizione dei vertici della mesh.
+			A differenza di altre mappe che influenzano solo la luce e l'ombra del materiale, i vertici 
+			spostati possono proiettare ombre, bloccare altri oggetti, e altrimenti agire come una vera
+			geometria. La texture di spostamento è un'immagine in cui il valore di ciascun pixel (il bianco è 
+			il più alto) viene mappato e riposizionato rispetto ai vertici della mesh.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			Quando la mappa di spostamento influenza la mesh (dove il nero non è lo spostamento,
+			e il bianco è lo spostamento massimo). Senza una mappa di spostamento impostata, questo valore
+			non viene applicato.
+			Il valore predefinito è 1.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			L'offset dei valori della mappa di spostamento sui vertici della mesh.
+			Senza una mappa di spostamento impostata, questo valore
+			non viene applicato. Il valore predefinito è 0.
+		</p>
+
+		<h3>[property:Float farDistance]</h3>
+		<p>
+			Il valore far della telecamera d'ombra interna della luce puntiforme.
+		</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Indica se il materiale è influenzato dalla nebbia. Il valore predefinito è `false`.</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			La mappa colore. Può includere facoltativamente un canale alfa, tipicamente combinato con 
+			[page:Material.transparent .transparent] o [page:Material.alphaTest .alphaTest]. Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Float nearDistance]</h3>
+		<p>
+			Il valore near della telecamera d'obra interna della luce puntiforme.
+		</p>
+
+		<h3>[property:Vector3 referencePosition]</h3>
+		<p>
+			La posizione della luce puntiforme nello spazio world.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Material] per i metodi comuni.</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
