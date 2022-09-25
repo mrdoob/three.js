@@ -273,25 +273,25 @@ class FirstPersonControls {
 		this.dispose = function () {
 
 			this.domElement.removeEventListener( 'contextmenu', contextmenu );
-			this.domElement.removeEventListener( 'pointerdown', onPointerDown );
-			this.domElement.removeEventListener( 'pointermove', onPointerMove );
-			this.domElement.removeEventListener( 'pointerup', onPointerUp );
+			this.domElement.removeEventListener( 'pointerdown', _onPointerDown );
+			this.domElement.removeEventListener( 'pointermove', _onPointerMove );
+			this.domElement.removeEventListener( 'pointerup', _onPointerUp );
 
 			window.removeEventListener( 'keydown', _onKeyDown );
 			window.removeEventListener( 'keyup', _onKeyUp );
 
 		};
 
-		const onPointerMove = this.onPointerMove.bind( this );
-		const onPointerDown = this.onPointerDown.bind( this );
-		const onPointerUp = this.onPointerUp.bind( this );
+		const _onPointerMove = this.onPointerMove.bind( this );
+		const _onPointerDown = this.onPointerDown.bind( this );
+		const _onPointerUp = this.onPointerUp.bind( this );
 		const _onKeyDown = this.onKeyDown.bind( this );
 		const _onKeyUp = this.onKeyUp.bind( this );
 
 		this.domElement.addEventListener( 'contextmenu', contextmenu );
-		this.domElement.addEventListener( 'pointerdown', onPointerDown );
-		this.domElement.addEventListener( 'pointermove', onPointerMove );
-		this.domElement.addEventListener( 'pointerup', onPointerUp );
+		this.domElement.addEventListener( 'pointerdown', _onPointerDown );
+		this.domElement.addEventListener( 'pointermove', _onPointerMove );
+		this.domElement.addEventListener( 'pointerup', _onPointerUp );
 
 		window.addEventListener( 'keydown', _onKeyDown );
 		window.addEventListener( 'keyup', _onKeyUp );
