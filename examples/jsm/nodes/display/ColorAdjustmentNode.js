@@ -1,19 +1,9 @@
 import TempNode from '../core/TempNode.js';
-import { ShaderNode, vec3, mat3, add, sub, mul, max, div, dot, float, mix, cos, sin, atan2, sqrt } from '../shadernode/ShaderNodeBaseElements.js';
-
-const luminanceNode = new ShaderNode( ( { color } ) => {
-
-	const LUMA = vec3( 0.2125, 0.7154, 0.0721 );
-
-	return dot( color, LUMA );
-
-} );
+import { ShaderNode, vec3, mat3, add, sub, mul, max, div, float, mix, cos, sin, atan2, sqrt, luminance } from '../shadernode/ShaderNodeBaseElements.js';
 
 const saturationNode = new ShaderNode( ( { color, adjustment } ) => {
 
-	const intensityNode = luminanceNode.call( { color } );
-
-	return mix( intensityNode, color, adjustment );
+	return mix( luminance( color ), color, adjustment );
 
 } );
 
