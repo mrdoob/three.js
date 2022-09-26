@@ -144,9 +144,8 @@
 				] );
 				const line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: 0x5555ff } ) );
 
-				// It's important to have all the visible GUI elements render after the invisible quads which
-				// will use the default renderOrder=0. This ensures that the invisible elements obscure any
-				// parts of the scene to create the illusion that the XR layers rendered after the 3D scene.
+				// The invisible dummyMesh quads and the guiMesh need to be rendered before the controller lines so that they
+				// leave a hole in the depth buffer that the lines can intersect.
 				line.renderOrder = 1;
 
 				const controllerModelFactory = new XRControllerModelFactory();
