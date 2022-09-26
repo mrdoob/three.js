@@ -165,6 +165,7 @@ class Sphere {
 
 			this.center.copy( point );
 			this.radius = 0;
+			return;
 
 		}
 
