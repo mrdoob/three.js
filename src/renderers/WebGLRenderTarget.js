@@ -11,11 +11,12 @@ import { Source } from '../textures/Source.js';
 */
 class WebGLRenderTarget extends EventDispatcher {
 
-	constructor( width, height, options = {} ) {
+	constructor( width, height, options = {}, iswebxr = false ) {
 
 		super();
 
 		this.isWebGLRenderTarget = true;
+		this.isWebXRRenderTarget = iswebxr;
 
 		this.width = width;
 		this.height = height;
