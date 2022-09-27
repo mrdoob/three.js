@@ -114,6 +114,9 @@ export * from './materials/Materials.js';
 // shader node
 export * from './shadernode/ShaderNodeElements.js';
 
+// extensions
+export * from './materialx/MaterialXNodes.js';
+
 // shader stages
 export { defaultShaderStages } from './core/NodeBuilder.js';
 

@@ -1,4 +1,4 @@
-import { code, fn } from '../../../Nodes.js';
+import { code, fn } from '../../Nodes.js';
 
 // Original shader code from:
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_noise.glsl
@@ -601,7 +601,17 @@ vec3 mx_worley_noise_vec3(vec3 p, float jitter, int metric)
 
 const includes = [ mx_noise ];
 
-export const mx_perlin_noise_float = fn( 'float mx_perlin_noise_float( vec3 p )', includes );
+export const mx_perlin_noise_float = fn( 'float mx_perlin_noise_float( any p )', includes );
+export const mx_perlin_noise_vec2 = fn( 'vec2 mx_perlin_noise_vec2( any p )', includes );
+export const mx_perlin_noise_vec3 = fn( 'vec3 mx_perlin_noise_vec3( any p )', includes );
+
 export const mx_cell_noise_float = fn( 'float mx_cell_noise_float( vec3 p )', includes );
-export const mx_worley_noise_float = fn( 'float mx_worley_noise_float( vec3 p, float jitter, int metric )', includes );
+
+export const mx_worley_noise_float = fn( 'float mx_worley_noise_float( any p, float jitter, int metric )', includes );
+export const mx_worley_noise_vec2 = fn( 'float mx_worley_noise_vec2( any p, float jitter, int metric )', includes );
+export const mx_worley_noise_vec3 = fn( 'float mx_worley_noise_vec3( any p, float jitter, int metric )', includes );
+
 export const mx_fractal_noise_float = fn( 'float mx_fractal_noise_float( vec3 p, int octaves, float lacunarity, float diminish )', includes );
+export const mx_fractal_noise_vec2 = fn( 'float mx_fractal_noise_vec2( vec3 p, int octaves, float lacunarity, float diminish )', includes );
+export const mx_fractal_noise_vec3 = fn( 'float mx_fractal_noise_vec3( vec3 p, int octaves, float lacunarity, float diminish )', includes );
+export const mx_fractal_noise_vec4 = fn( 'float mx_fractal_noise_vec4( vec3 p, int octaves, float lacunarity, float diminish )', includes );
