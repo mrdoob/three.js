@@ -15,7 +15,7 @@ import {
 	RGB_PVRTC_4BPPV1_Format,
 	RGB_S3TC_DXT1_Format,
 	UnsignedByteType
-} from 'three';
+} from '@oppentech/three';
 
 /**
  * Loader for Basis Universal GPU Texture Codec.

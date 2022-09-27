@@ -1,5 +1,5 @@
 import { GPULoadOp } from './constants.js';
-import { Color } from 'three';
+import { Color } from '@oppentech/three';
 
 let _clearAlpha;
 const _clearColor = new Color();

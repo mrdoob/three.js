@@ -3,7 +3,7 @@ import {
 	Loader,
 	CanvasTexture,
 	NearestFilter
-} from 'three';
+} from '@oppentech/three';
 
 class LottieLoader extends Loader {
 

@@ -5,7 +5,7 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	LoaderUtils
-} from 'three';
+} from '@oppentech/three';
 import * as fflate from '../libs/fflate.module.js';
 
 class VTKLoader extends Loader {

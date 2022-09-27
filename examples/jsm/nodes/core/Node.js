@@ -1,4 +1,4 @@
-import { MathUtils } from 'three';
+import { MathUtils } from '@oppentech/three';
 
 class Node {
 

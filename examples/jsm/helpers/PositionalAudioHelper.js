@@ -4,7 +4,7 @@ import {
 	LineBasicMaterial,
 	Line,
 	MathUtils
-} from 'three';
+} from '@oppentech/three';
 
 class PositionalAudioHelper extends Line {
 

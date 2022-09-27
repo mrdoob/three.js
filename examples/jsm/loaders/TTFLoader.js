@@ -1,7 +1,7 @@
 import {
 	FileLoader,
 	Loader
-} from 'three';
+} from '@oppentech/three';
 import { opentype } from '../libs/opentype.module.min.js';
 
 /**

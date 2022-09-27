@@ -11,7 +11,7 @@ import {
 	Quaternion,
 	SphereGeometry,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 const _q = new Quaternion();
 const _targetPos = new Vector3();

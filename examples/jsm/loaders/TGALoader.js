@@ -1,7 +1,7 @@
 import {
 	DataTextureLoader,
 	LinearMipmapLinearFilter
-} from 'three';
+} from '@oppentech/three';
 
 class TGALoader extends DataTextureLoader {
 

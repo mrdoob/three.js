@@ -1,4 +1,4 @@
-import { LinearEncoding } from 'three';
+import { LinearEncoding } from '@oppentech/three';
 
 import WebGPUNodeUniformsGroup from './WebGPUNodeUniformsGroup.js';
 import {

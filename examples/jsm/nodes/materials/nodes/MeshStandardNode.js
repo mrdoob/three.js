@@ -1,7 +1,7 @@
 import {
 	Color,
 	Vector2
-} from 'three';
+} from '@oppentech/three';
 
 import { StandardNode } from './StandardNode.js';
 import { PropertyNode } from '../../inputs/PropertyNode.js';

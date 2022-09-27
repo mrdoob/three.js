@@ -17,7 +17,7 @@ import {
 	UniformsLib,
 	UniformsUtils,
 	Vector2
-} from 'three';
+} from '@oppentech/three';
 
 
 UniformsLib.line = {

@@ -9,7 +9,7 @@ import {
 	ShaderMaterial,
 	StereoCamera,
 	WebGLRenderTarget
-} from 'three';
+} from '@oppentech/three';
 
 class ParallaxBarrierEffect {
 

@@ -7,7 +7,7 @@ import {
 	Scene,
 	Vector2,
 	WebGLRenderTarget
-} from 'three';
+} from '@oppentech/three';
 
 import { NodeMaterial } from '../materials/NodeMaterial.js';
 import { ScreenNode } from '../inputs/ScreenNode.js';

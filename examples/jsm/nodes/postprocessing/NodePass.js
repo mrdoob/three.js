@@ -1,4 +1,4 @@
-import { MathUtils } from 'three';
+import { MathUtils } from '@oppentech/three';
 
 import { ShaderPass } from '../../postprocessing/ShaderPass.js';
 import { NodeMaterial } from '../materials/NodeMaterial.js';

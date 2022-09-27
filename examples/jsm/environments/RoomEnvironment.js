@@ -10,7 +10,7 @@ import {
  	MeshStandardMaterial,
  	PointLight,
  	Scene,
-} from 'three';
+} from '@oppentech/three';
 
 class RoomEnvironment extends Scene {
 

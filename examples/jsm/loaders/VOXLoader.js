@@ -9,7 +9,7 @@ import {
 	MeshStandardMaterial,
 	NearestFilter,
 	RedFormat
-} from 'three';
+} from '@oppentech/three';
 
 class VOXLoader extends Loader {
 

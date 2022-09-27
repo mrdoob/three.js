@@ -5,7 +5,7 @@ import {
 	Matrix3,
 	Ray,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 // module scope helper variables
 

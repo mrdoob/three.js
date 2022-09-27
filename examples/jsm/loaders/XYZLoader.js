@@ -3,7 +3,7 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader
-} from 'three';
+} from '@oppentech/three';
 
 class XYZLoader extends Loader {
 

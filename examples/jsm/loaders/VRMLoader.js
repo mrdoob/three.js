@@ -1,6 +1,6 @@
 import {
 	Loader
-} from 'three';
+} from '@oppentech/three';
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
 // VRM Specification: https://dwango.github.io/vrm/vrm_spec/

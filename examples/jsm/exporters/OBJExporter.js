@@ -3,7 +3,7 @@ import {
 	Matrix3,
 	Vector2,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 class OBJExporter {
 

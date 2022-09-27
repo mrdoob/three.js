@@ -5,7 +5,7 @@ import {
 	MeshBasicMaterial,
 	PlaneGeometry,
 	sRGBEncoding
-} from 'three';
+} from '@oppentech/three';
 
 class HTMLMesh extends Mesh {
 

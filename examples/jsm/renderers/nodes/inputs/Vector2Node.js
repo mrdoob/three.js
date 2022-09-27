@@ -1,5 +1,5 @@
 import InputNode from '../core/InputNode.js';
-import { Vector2 } from 'three';
+import { Vector2 } from '@oppentech/three';
 
 class Vector2Node extends InputNode {
 

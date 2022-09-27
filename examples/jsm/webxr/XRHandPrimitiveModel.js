@@ -6,7 +6,7 @@ import {
 	InstancedMesh,
 	Matrix4,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 const _matrix = new Matrix4();
 const _vector = new Vector3();

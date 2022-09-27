@@ -1,4 +1,4 @@
-import { MeshStandardMaterial } from 'three';
+import { MeshStandardMaterial } from '@oppentech/three';
 
 class MeshStandardNodeMaterial extends MeshStandardMaterial {
 

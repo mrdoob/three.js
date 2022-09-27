@@ -1,7 +1,7 @@
 import { ColorInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { PointsNodeMaterial } from '../../renderers/nodes/Nodes.js';
-import * as THREE from 'three';
+import * as THREE from '@oppentech/three';
 
 export class PointsMaterialEditor extends BaseNode {
 

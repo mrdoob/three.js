@@ -7,7 +7,7 @@ import {
 	ShaderLib,
 	ShaderMaterial,
 	UniformsUtils
-} from 'three';
+} from '@oppentech/three';
 import { Pass } from './Pass.js';
 
 class CubeTexturePass extends Pass {

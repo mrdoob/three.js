@@ -1,6 +1,6 @@
 import {
 	Object3D
-} from 'three';
+} from '@oppentech/three';
 
 import {
 	XRHandPrimitiveModel

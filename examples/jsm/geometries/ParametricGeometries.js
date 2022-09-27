@@ -1,7 +1,7 @@
 import {
 	Curve,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 import { ParametricGeometry } from './ParametricGeometry.js';
 

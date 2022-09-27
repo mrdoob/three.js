@@ -64,7 +64,7 @@ import {
 	Vector3,
 	VectorKeyframeTrack,
 	sRGBEncoding
-} from 'three';
+} from '@oppentech/three';
 
 class GLTFLoader extends Loader {
 

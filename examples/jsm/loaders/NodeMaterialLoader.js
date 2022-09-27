@@ -1,7 +1,7 @@
 import {
 	Loader,
 	FileLoader
-} from 'three';
+} from '@oppentech/three';
 
 import * as Nodes from '../nodes/Nodes.js';
 

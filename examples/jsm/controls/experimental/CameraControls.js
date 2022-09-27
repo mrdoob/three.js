@@ -6,7 +6,7 @@ import {
 	TOUCH,
 	Vector2,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 var CameraControls = function ( object, domElement ) {
 

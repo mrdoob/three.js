@@ -1,6 +1,6 @@
 import {
 	Color
-} from 'three';
+} from '@oppentech/three';
 import { Pass } from './Pass.js';
 
 class RenderPass extends Pass {

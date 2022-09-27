@@ -1,7 +1,7 @@
 import {
 	MathUtils,
 	Mesh
-} from 'three';
+} from '@oppentech/three';
 
 class MorphBlendMesh extends Mesh {
 

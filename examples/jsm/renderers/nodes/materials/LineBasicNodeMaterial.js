@@ -1,4 +1,4 @@
-import { LineBasicMaterial } from 'three';
+import { LineBasicMaterial } from '@oppentech/three';
 
 class LineBasicNodeMaterial extends LineBasicMaterial {
 

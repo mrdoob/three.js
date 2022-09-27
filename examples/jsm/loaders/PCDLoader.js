@@ -6,7 +6,7 @@ import {
 	LoaderUtils,
 	Points,
 	PointsMaterial
-} from 'three';
+} from '@oppentech/three';
 
 class PCDLoader extends Loader {
 

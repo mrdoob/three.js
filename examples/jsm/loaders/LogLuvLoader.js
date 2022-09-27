@@ -4,7 +4,7 @@ import {
 	FloatType,
 	HalfFloatType,
 	RGBAFormat
-} from 'three';
+} from '@oppentech/three';
 
 class LogLuvLoader extends DataTextureLoader {
 

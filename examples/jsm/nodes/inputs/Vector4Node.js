@@ -1,4 +1,4 @@
-import { Vector4 } from 'three';
+import { Vector4 } from '@oppentech/three';
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';

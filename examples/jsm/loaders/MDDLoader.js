@@ -16,7 +16,7 @@ import {
 	FileLoader,
 	Loader,
 	NumberKeyframeTrack
-} from 'three';
+} from '@oppentech/three';
 
 class MDDLoader extends Loader {
 

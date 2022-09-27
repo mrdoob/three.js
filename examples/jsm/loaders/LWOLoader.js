@@ -37,7 +37,7 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	Vector2
-} from 'three';
+} from '@oppentech/three';
 
 import { IFFParser } from './lwo/IFFParser.js';
 

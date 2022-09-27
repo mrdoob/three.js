@@ -1,6 +1,6 @@
 import {
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 /**
  * Usage:

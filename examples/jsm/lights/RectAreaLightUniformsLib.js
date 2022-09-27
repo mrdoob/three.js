@@ -9,7 +9,7 @@ import {
 	RGBAFormat,
 	UVMapping,
 	UniformsLib
-} from 'three';
+} from '@oppentech/three';
 
 /**
  * Uniforms library for RectAreaLight shared webgl shaders

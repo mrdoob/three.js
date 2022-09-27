@@ -2,7 +2,7 @@ import {
 	FileLoader,
 	Loader,
 	ShapePath
-} from 'three';
+} from '@oppentech/three';
 
 class FontLoader extends Loader {
 

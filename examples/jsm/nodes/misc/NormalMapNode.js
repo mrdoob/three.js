@@ -1,6 +1,6 @@
 import {
 	BackSide
-} from 'three';
+} from '@oppentech/three';
 
 import { TempNode } from '../core/TempNode.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';

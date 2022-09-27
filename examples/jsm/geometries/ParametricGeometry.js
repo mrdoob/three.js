@@ -7,7 +7,7 @@ import {
 	BufferGeometry,
 	Float32BufferAttribute,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 class ParametricGeometry extends BufferGeometry {
 

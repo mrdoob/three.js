@@ -4,7 +4,7 @@ import {
 	Color,
 	DynamicDrawUsage,
 	Mesh
-} from 'three';
+} from '@oppentech/three';
 
 /**
  * Port of http://webglsamples.org/blob/blob.html

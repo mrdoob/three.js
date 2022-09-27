@@ -13,7 +13,7 @@ import {
 	Vector3,
 	Vector4,
 	RGBAFormat
-} from 'three';
+} from '@oppentech/three';
 
 class Lensflare extends Mesh {
 

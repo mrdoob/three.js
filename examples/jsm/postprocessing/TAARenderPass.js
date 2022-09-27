@@ -1,6 +1,6 @@
 import {
 	WebGLRenderTarget
-} from 'three';
+} from '@oppentech/three';
 import { SSAARenderPass } from './SSAARenderPass.js';
 
 /**

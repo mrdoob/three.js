@@ -1,6 +1,6 @@
 import {
 	Vector2
-} from 'three';
+} from '@oppentech/three';
 
 /**
  * Dot screen shader

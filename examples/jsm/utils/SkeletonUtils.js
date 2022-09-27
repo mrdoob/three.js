@@ -9,7 +9,7 @@ import {
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack
-} from 'three';
+} from '@oppentech/three';
 
 
 function retarget( target, source, options = {} ) {

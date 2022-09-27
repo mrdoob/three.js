@@ -22,7 +22,7 @@ import {
 	LinearFilter,
 	ClampToEdgeWrapping,
 	TextureLoader
-} from 'three';
+} from '@oppentech/three';
 
 const _taskCache = new WeakMap();
 

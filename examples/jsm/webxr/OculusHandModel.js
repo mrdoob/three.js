@@ -1,4 +1,4 @@
-import { Object3D, Sphere, Box3 } from 'three';
+import { Object3D, Sphere, Box3 } from '@oppentech/three';
 import { XRHandMeshModel } from './XRHandMeshModel.js';
 
 const TOUCH_RADIUS = 0.01;

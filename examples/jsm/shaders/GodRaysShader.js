@@ -1,7 +1,7 @@
 import {
 	Color,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 /**
  * God-rays (crepuscular rays)

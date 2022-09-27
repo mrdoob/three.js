@@ -8,7 +8,7 @@ import {
 	Skeleton,
 	Vector3,
 	VectorKeyframeTrack
-} from 'three';
+} from '@oppentech/three';
 
 /**
  * Description: reads BVH files and outputs a single Skeleton and an AnimationClip

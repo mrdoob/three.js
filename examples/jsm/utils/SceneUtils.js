@@ -1,7 +1,7 @@
 import {
 	Group,
 	Mesh
-} from 'three';
+} from '@oppentech/three';
 
 
 

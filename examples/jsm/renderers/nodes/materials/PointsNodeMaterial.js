@@ -1,4 +1,4 @@
-import { PointsMaterial } from 'three';
+import { PointsMaterial } from '@oppentech/three';
 
 class PointsNodeMaterial extends PointsMaterial {
 

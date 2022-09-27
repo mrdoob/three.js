@@ -2,7 +2,7 @@ import {
 	Curve,
 	Vector3,
 	Vector4
-} from 'three';
+} from '@oppentech/three';
 import * as NURBSUtils from '../curves/NURBSUtils.js';
 
 /**

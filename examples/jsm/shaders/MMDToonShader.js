@@ -13,7 +13,7 @@
  *  * Add mmd_toon_matcap_fragment.
  */
 
-import { UniformsUtils, ShaderLib } from 'three';
+import { UniformsUtils, ShaderLib } from '@oppentech/three';
 
 const lights_mmd_toon_pars_fragment = `
 varying vec3 vViewPosition;

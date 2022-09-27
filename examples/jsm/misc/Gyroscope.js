@@ -2,7 +2,7 @@ import {
 	Object3D,
 	Quaternion,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 const _translationObject = new Vector3();
 const _quaternionObject = new Quaternion();

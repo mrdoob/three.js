@@ -17,7 +17,7 @@
 
 import {
 	ExtrudeGeometry
-} from 'three';
+} from '@oppentech/three';
 
 class TextGeometry extends ExtrudeGeometry {
 

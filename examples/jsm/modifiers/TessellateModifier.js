@@ -4,7 +4,7 @@ import {
 	Float32BufferAttribute,
 	Vector2,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 /**
  * Break faces with edges longer than maxEdgeLength

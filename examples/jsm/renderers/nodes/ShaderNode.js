@@ -25,7 +25,7 @@ import JoinNode from './utils/JoinNode.js';
 import SplitNode from './utils/SplitNode.js';
 
 // core
-import { Vector2, Vector3, Vector4, Color } from 'three';
+import { Vector2, Vector3, Vector4, Color } from '@oppentech/three';
 
 const NodeHandler = {
 

@@ -19,7 +19,7 @@ import {
 	RepeatWrapping,
 	TextureLoader,
 	sRGBEncoding
-} from 'three';
+} from '@oppentech/three';
 import * as fflate from '../libs/fflate.module.js';
 
 /**

@@ -4,7 +4,7 @@ import {
 	Quaternion,
 	Vector2,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 const _changeEvent = { type: 'change' };
 const _startEvent = { type: 'start' };

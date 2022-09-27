@@ -1,6 +1,6 @@
 import { LabelElement } from '../../libs/flow.module.js';
 import { Object3DEditor } from './Object3DEditor.js';
-import { Points } from 'three';
+import { Points } from '@oppentech/three';
 
 export class PointsEditor extends Object3DEditor {
 

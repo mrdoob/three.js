@@ -3,7 +3,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	Object3D
-} from 'three';
+} from '@oppentech/three';
 import { LightningStrike } from '../geometries/LightningStrike.js';
 
 /**

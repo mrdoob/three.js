@@ -1,6 +1,6 @@
 import {
 	MathUtils
-} from 'three';
+} from '@oppentech/three';
 
 const _hsl = {};
 

@@ -31,7 +31,7 @@ import {
 	TextureLoader,
 	Vector2,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 import chevrotain from '../libs/chevrotain.module.min.js';
 
 

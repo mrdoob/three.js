@@ -5,7 +5,7 @@ import {
 	LineSegments,
 	Matrix3,
 	Mesh
-} from 'three';
+} from '@oppentech/three';
 
 import { mergeBufferGeometries } from './BufferGeometryUtils.js';
 

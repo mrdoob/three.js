@@ -1,4 +1,4 @@
-import { Color } from 'three';
+import { Color } from '@oppentech/three';
 
 import { InputNode } from '../core/InputNode.js';
 import { NodeUtils } from '../core/NodeUtils.js';

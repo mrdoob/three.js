@@ -8,7 +8,7 @@ import {
 	TriangleStripDrawMode,
 	TrianglesDrawMode,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 
 
 function computeTangents( geometry ) {

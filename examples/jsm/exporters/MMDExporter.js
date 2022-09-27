@@ -2,7 +2,7 @@ import {
 	Matrix4,
 	Quaternion,
 	Vector3
-} from 'three';
+} from '@oppentech/three';
 import { MMDParser } from '../libs/mmdparser.module.js';
 
 /**

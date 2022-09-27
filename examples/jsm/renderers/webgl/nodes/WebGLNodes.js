@@ -1,7 +1,7 @@
 import { WebGLNodeBuilder } from './WebGLNodeBuilder.js';
 import NodeFrame from '../../nodes/core/NodeFrame.js';
 
-import { Material } from 'three';
+import { Material } from '@oppentech/three';
 
 const builders = new WeakMap();
 export const nodeFrame = new NodeFrame();

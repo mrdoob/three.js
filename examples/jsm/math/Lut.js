@@ -1,6 +1,6 @@
 import {
 	Color
-} from 'three';
+} from '@oppentech/three';
 
 class Lut {
 

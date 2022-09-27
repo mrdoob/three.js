@@ -2,7 +2,7 @@ import {
 	LinearEncoding,
 	RGBEEncoding,
 	sRGBEncoding
-} from 'three';
+} from '@oppentech/three';
 
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';

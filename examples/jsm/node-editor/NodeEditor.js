@@ -27,7 +27,7 @@ import { JoinEditor } from './utils/JoinEditor.js';
 import { CheckerEditor } from './procedural/CheckerEditor.js';
 import { PointsEditor } from './scene/PointsEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
-import { EventDispatcher } from 'three';
+import { EventDispatcher } from '@oppentech/three';
 
 Styles.icons.unlink = 'ti ti-unlink';
 

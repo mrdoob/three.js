@@ -5,7 +5,7 @@ import {
 	CubeTexture,
 	HalfFloatType,
 	DataUtils
-} from 'three';
+} from '@oppentech/three';
 
 class RGBMLoader extends DataTextureLoader {
 

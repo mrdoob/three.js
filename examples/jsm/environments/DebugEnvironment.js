@@ -6,7 +6,7 @@ import {
 	MeshStandardMaterial,
 	PointLight,
 	Scene,
-} from 'three';
+} from '@oppentech/three';
 
 class DebugEnvironment extends Scene {
 
