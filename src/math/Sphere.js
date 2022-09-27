@@ -161,6 +161,14 @@ class Sphere {
 
 	expandByPoint( point ) {
 
+		if ( this.isEmpty() ) {
+
+			this.center.copy( point );
+			this.radius = 0;
+			return;
+
+		}
+
 		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
 
 		_toPoint.subVectors( point, this.center );
