@@ -116,6 +116,8 @@ export const fn = ( code, includes ) => func( code, includes ).call;
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
 export const property = ( name, nodeOrType ) => nodeObject( new PropertyNode( name, getConstNodeType( nodeOrType ) ) );
 
+export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
+
 export const bypass = nodeProxy( BypassNode );
 export const code = nodeProxy( CodeNode );
 export const context = nodeProxy( ContextNode );
