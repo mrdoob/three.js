@@ -21,7 +21,7 @@ const FN = {
 
 export const ColorManagement = {
 
-	legacyMode: true,
+	enabled: false,
 
 	get workingColorSpace() {
 
@@ -37,7 +37,7 @@ export const ColorManagement = {
 
 	convert: function ( color, sourceColorSpace, targetColorSpace ) {
 
-		if ( this.legacyMode || sourceColorSpace === targetColorSpace || ! sourceColorSpace || ! targetColorSpace ) {
+		if ( ! this.enabled || sourceColorSpace === targetColorSpace || ! sourceColorSpace || ! targetColorSpace ) {
 
 			return color;
 
