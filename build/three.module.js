@@ -5621,6 +5621,14 @@ class Sphere {
 
 	expandByPoint( point ) {
 
+		if ( this.isEmpty() ) {
+
+			this.center.copy( point );
+			this.radius = 0;
+			return;
+
+		}
+
 		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
 
 		_toPoint.subVectors( point, this.center );
@@ -5646,6 +5654,18 @@ class Sphere {
 	}
 
 	union( sphere ) {
+
+		// handle empty sphere cases
+		if ( sphere.isEmpty() ) {
+
+			return;
+
+		} else if ( this.isEmpty() ) {
+
+			this.copy( sphere );
+			return;
+
+		}
 
 		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
 
@@ -22361,7 +22381,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getInternalFormat( internalFormatName, glFormat, glType, encoding, isVideoTexture = false ) {
+	function getInternalFormat( internalFormatName, glFormat, glType, encoding, forceLinearEncoding = false ) {
 
 		if ( isWebGL2 === false ) return glFormat;
 
@@ -22395,7 +22415,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( glType === 5126 ) internalFormat = 34836;
 			if ( glType === 5131 ) internalFormat = 34842;
-			if ( glType === 5121 ) internalFormat = ( encoding === sRGBEncoding && isVideoTexture === false ) ? 35907 : 32856;
+			if ( glType === 5121 ) internalFormat = ( encoding === sRGBEncoding && forceLinearEncoding === false ) ? 35907 : 32856;
 			if ( glType === 32819 ) internalFormat = 32854;
 			if ( glType === 32820 ) internalFormat = 32855;
 
@@ -23819,7 +23839,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					const glFormat = utils.convert( texture.format, texture.encoding );
 					const glType = utils.convert( texture.type );
-					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding, renderTarget.isXRRenderTarget === true );
 					const samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 

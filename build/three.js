@@ -4325,7 +4325,13 @@
 		}
 
 		expandByPoint(point) {
-			// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
+			if (this.isEmpty()) {
+				this.center.copy(point);
+				this.radius = 0;
+				return;
+			} // from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
+
+
 			_toPoint.subVectors(point, this.center);
 
 			const lengthSq = _toPoint.lengthSq();
@@ -4344,10 +4350,18 @@
 		}
 
 		union(sphere) {
-			// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
+			// handle empty sphere cases
+			if (sphere.isEmpty()) {
+				return;
+			} else if (this.isEmpty()) {
+				this.copy(sphere);
+				return;
+			} // from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
 			// To enclose another sphere into this sphere, we only need to enclose two points:
 			// 1) Enclose the farthest point on the other sphere into this sphere.
 			// 2) Enclose the opposite point of the farthest point into this sphere.
+
+
 			if (this.center.equals(sphere.center) === true) {
 				_toFarthestPoint.set(0, 0, 1).multiplyScalar(sphere.radius);
 			} else {
@@ -16581,7 +16595,7 @@
 			_gl.generateMipmap(target);
 		}
 
-		function getInternalFormat(internalFormatName, glFormat, glType, encoding, isVideoTexture = false) {
+		function getInternalFormat(internalFormatName, glFormat, glType, encoding, forceLinearEncoding = false) {
 			if (isWebGL2 === false) return glFormat;
 
 			if (internalFormatName !== null) {
@@ -16606,7 +16620,7 @@
 			if (glFormat === _gl.RGBA) {
 				if (glType === _gl.FLOAT) internalFormat = _gl.RGBA32F;
 				if (glType === _gl.HALF_FLOAT) internalFormat = _gl.RGBA16F;
-				if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding && isVideoTexture === false ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+				if (glType === _gl.UNSIGNED_BYTE) internalFormat = encoding === sRGBEncoding && forceLinearEncoding === false ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
 				if (glType === _gl.UNSIGNED_SHORT_4_4_4_4) internalFormat = _gl.RGBA4;
 				if (glType === _gl.UNSIGNED_SHORT_5_5_5_1) internalFormat = _gl.RGB5_A1;
 			}
@@ -17552,7 +17566,7 @@
 
 						const glFormat = utils.convert(texture.format, texture.encoding);
 						const glType = utils.convert(texture.type);
-						const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding);
+						const glInternalFormat = getInternalFormat(texture.internalFormat, glFormat, glType, texture.encoding, renderTarget.isXRRenderTarget === true);
 						const samples = getRenderTargetSamples(renderTarget);
 
 						_gl.renderbufferStorageMultisample(_gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height);
