@@ -195,6 +195,18 @@ class Sphere {
 
 	union( sphere ) {
 
+		// handle empty sphere cases
+		if ( sphere.isEmpty() ) {
+
+			return;
+
+		} else if ( this.isEmpty() ) {
+
+			this.copy( sphere );
+			return;
+
+		}
+
 		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
 
 		// To enclose another sphere into this sphere, we only need to enclose two points:
