@@ -326,8 +326,7 @@ class WebXRManager extends EventDispatcher {
 							stencilBuffer: attributes.stencil,
 							encoding: renderer.outputEncoding,
 							samples: attributes.antialias ? 4 : 0
-						},
-						true );
+						} );
 
 					const renderTargetProperties = renderer.properties.get( newRenderTarget );
 					renderTargetProperties.__ignoreDepthValues = glProjLayer.ignoreDepthValues;
