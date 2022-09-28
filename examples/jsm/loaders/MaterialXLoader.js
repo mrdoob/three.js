@@ -212,6 +212,8 @@ class MaterialXNode {
 
 				const element = this.element;
 
+				const call = ( nodeFunc, ...params ) => nodeFunc( ...this.getNodesByNames( ...params ) );
+
 				if ( element === 'convert' ) {
 
 					const nodeClass = this.getClassFromType( type );
@@ -236,7 +238,7 @@ class MaterialXNode {
 
 				} else if ( element === 'normalmap' ) {
 
-					node = normalMap( this.getNodeByName( 'in' ), this.getNodeByName( 'scale' ) );
+					node = call( normalMap, 'in', 'scale' );
 
 				} else if ( element === 'hsvtorgb' ) {
 
@@ -250,55 +252,55 @@ class MaterialXNode {
 
 				} else if ( element === 'combine2' ) {
 
-					node = vec3( ...this.getNodesByNames( 'in1', 'in2' ) );
+					node = call( vec2, 'in1', 'in2' );
 
 				} else if ( element === 'combine3' ) {
 
-					node = vec3( ...this.getNodesByNames( 'in1', 'in2', 'in3' ) );
+					node = call( vec3, 'in1', 'in2', 'in3' );
 
 				} else if ( element === 'combine4' ) {
 
-					node = vec3( ...this.getNodesByNames( 'in1', 'in2', 'in3', 'in4' ) );
+					node = call( vec4, 'in1', 'in2', 'in3', 'in4' );
 
 				} else if ( element === 'add' ) {
 
-					node = add( ...this.getNodesByNames( 'in1', 'in2' ) );
+					node = call( add, 'in1', 'in2' );
 
 				} else if ( element === 'subtract' ) {
 
-					node = sub( ...this.getNodesByNames( 'in1', 'in2' ) );
+					node = call( sub, 'in1', 'in2' );
 
 				} else if ( element === 'multiply' ) {
 
-					node = mul( ...this.getNodesByNames( 'in1', 'in2' ) );
+					node = call( mul, 'in1', 'in2' );
 
 				} else if ( element === 'divide' ) {
 
-					node = div( ...this.getNodesByNames( 'in1', 'in2' ) );
+					node = call( div, 'in1', 'in2' );					
 
 				} else if ( element === 'clamp' ) {
 
-					node = clamp( this.getNodeByName( 'in' ), this.getNodeByName( 'low' ) || 0, this.getNodeByName( 'high' ) || 1 );
+					node = call( clamp, 'in', 'low', 'high' );
 
 				} else if ( element === 'mix' ) {
 
-					node = mix( ...this.getNodesByNames( 'bg', 'fg', 'mix' ) );
+					node = call( mix, 'bg', 'fg', 'mix' );
 
 				} else if ( element === 'power' ) {
 
-					node = pow( ...this.getNodesByNames( 'in1', 'in2' ) );
+					node = call( pow, 'in1', 'in2' );
 
 				} else if ( element === 'sin' ) {
 
-					node = sin( this.getNodeByName( 'in' ) );
+					node = call( sin, 'in' );
 
 				} else if ( element === 'dotproduct' ) {
 
-					node = dot( ...this.getNodesByNames( 'in1', 'in2' ) );
+					node = call( dot, 'in1', 'in2' );
 
 				} else if ( element === 'fractal3d' ) {
 
-					node = mx_fractal_noise_float( ...this.getNodesByNames( 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' ) );
+					node = call( mx_fractal_noise_float, 'position', 'octaves', 'lacunarity', 'diminish', 'amplitude' );
 
 				}
 
