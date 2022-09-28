@@ -165,7 +165,8 @@ class Sphere {
 
 			this.center.copy( point );
 			this.radius = 0;
-			return;
+
+			return this;
 
 		}
 
@@ -198,12 +199,13 @@ class Sphere {
 		// handle empty sphere cases
 		if ( sphere.isEmpty() ) {
 
-			return;
+			return this;
 
 		} else if ( this.isEmpty() ) {
 
 			this.copy( sphere );
-			return;
+
+			return this;
 
 		}
 
