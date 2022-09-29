@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Crea un tubo che si estrude lungo una curva 3d.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#TubeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		class CustomSinCurve extends THREE.Curve {
+
+			constructor( scale = 1 ) {
+
+				super();
+
+				this.scale = scale;
+
+			}
+
+			getPoint( t, optionalTarget = new THREE.Vector3() ) {
+
+				const tx = t * 3 - 1.5;
+				const ty = Math.sin( 2 * Math.PI * t );
+				const tz = 0;
+
+				return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+
+			}
+
+		}
+
+		const path = new CustomSinCurve( 10 );
+		const geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]([param:Curve path], [param:Integer tubularSegments], [param:Float radius], [param:Integer radialSegments], [param:Boolean closed])</h3>
+		<p>
+		path — [page:Curve] - Un path 3D che eredita dalla classe base [page:Curve]. Il valore predefinito è una curva quadratica di Bézier.<br />
+		tubularSegments — [page:Integer] - Il numero di segmenti che compongono il tubo. Il valore predefinito è `64`.<br />
+		radius — [page:Float] - Il raggio del tubo. Il valore predefinito è `1`.<br />
+		radialSegments — [page:Integer] - Il numero dei segmenti che compongono la sezione trasversale. Il valore predefinito è `8`.<br />
+		closed — [page:Boolean] Indica se il tubo è aperto o chiuso. Il valore predefinito è `false`.<br />
+		</p>
+
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:BufferGeometry] per le proprietà comuni.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+      Un oggetto con una proprietà per ognuno dei parametri del costruttore. Qualsiasi modifica dopo l'istanziazione non cambia la geometria.
+		</p>
+
+		<h3>[property:Array tangents]</h3>
+		<p>
+		  Un array [page:Vector3] di tangenti
+		</p>
+
+		<h3>[property:Array normals]</h3>
+		<p>
+		  Un array [page:Vector3] di normali
+		</p>
+
+		<h3>[property:Array binormals]</h3>
+		<p>
+		  Un array [page:Vector3] di binormali
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:BufferGeometry] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

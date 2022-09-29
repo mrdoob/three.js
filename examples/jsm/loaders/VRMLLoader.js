@@ -625,6 +625,7 @@ class VRMLLoader extends Loader {
 
 			switch ( nodeName ) {
 
+				case 'Anchor':
 				case 'Group':
 				case 'Transform':
 				case 'Collision':
@@ -706,7 +707,6 @@ class VRMLLoader extends Loader {
 					build = buildWorldInfoNode( node );
 					break;
 
-				case 'Anchor':
 				case 'Billboard':
 
 				case 'Inline':
@@ -794,7 +794,15 @@ class VRMLLoader extends Loader {
 						parseFieldChildren( fieldValues, object );
 						break;
 
+					case 'description':
+						// field not supported
+						break;
+
 					case 'collide':
+						// field not supported
+						break;
+
+					case 'parameter':
 						// field not supported
 						break;
 
@@ -817,6 +825,10 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'proxy':
+						// field not supported
+						break;
+
+					case 'url':
 						// field not supported
 						break;
 

@@ -26,6 +26,7 @@ import VarNode from './core/VarNode.js';
 import VaryingNode from './core/VaryingNode.js';
 
 // accessors
+import BitangentNode from './accessors/BitangentNode.js';
 import BufferNode from './accessors/BufferNode.js';
 import CameraNode from './accessors/CameraNode.js';
 import CubeTextureNode from './accessors/CubeTextureNode.js';
@@ -41,6 +42,7 @@ import PositionNode from './accessors/PositionNode.js';
 import ReferenceNode from './accessors/ReferenceNode.js';
 import ReflectVectorNode from './accessors/ReflectVectorNode.js';
 import SkinningNode from './accessors/SkinningNode.js';
+import TangentNode from './accessors/TangentNode.js';
 import TextureNode from './accessors/TextureNode.js';
 import UVNode from './accessors/UVNode.js';
 import UserDataNode from './accessors/UserDataNode.js';
@@ -52,6 +54,7 @@ import RangeNode from './geometry/RangeNode.js';
 import ComputeNode from './gpgpu/ComputeNode.js';
 
 // display
+import BlendModeNode from './display/BlendModeNode.js';
 import ColorAdjustmentNode from './display/ColorAdjustmentNode.js';
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import FrontFacingNode from './display/FrontFacingNode.js';
@@ -80,6 +83,7 @@ import JoinNode from './utils/JoinNode.js';
 import MatcapUVNode from './utils/MatcapUVNode.js';
 import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
 import OscNode from './utils/OscNode.js';
+import RemapNode from './utils/RemapNode.js';
 import RotateUVNode from './utils/RotateUVNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
@@ -110,8 +114,11 @@ export * from './materials/Materials.js';
 // shader node
 export * from './shadernode/ShaderNodeElements.js';
 
+// extensions
+export * from './materialx/MaterialXNodes.js';
+
 // shader stages
-export { defaultShaderStages }  from './core/NodeBuilder.js';
+export { defaultShaderStages } from './core/NodeBuilder.js';
 
 const nodeLib = {
 	// core
@@ -148,6 +155,7 @@ const nodeLib = {
 	ComputeNode,
 
 	// accessors
+	BitangentNode,
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
@@ -163,11 +171,13 @@ const nodeLib = {
 	ReferenceNode,
 	ReflectVectorNode,
 	SkinningNode,
+	TangentNode,
 	TextureNode,
 	UVNode,
 	UserDataNode,
 
 	// display
+	BlendModeNode,
 	ColorAdjustmentNode,
 	ColorSpaceNode,
 	FrontFacingNode,
@@ -196,6 +206,7 @@ const nodeLib = {
 	MatcapUVNode,
 	MaxMipLevelNode,
 	OscNode,
+	RemapNode,
 	RotateUVNode,
 	SplitNode,
 	SpriteSheetUVNode,
@@ -260,6 +271,7 @@ export {
 	ComputeNode,
 
 	// accessors
+	BitangentNode,
 	BufferNode,
 	CameraNode,
 	CubeTextureNode,
@@ -275,11 +287,13 @@ export {
 	ReferenceNode,
 	ReflectVectorNode,
 	SkinningNode,
+	TangentNode,
 	TextureNode,
 	UVNode,
 	UserDataNode,
 
 	// display
+	BlendModeNode,
 	ColorAdjustmentNode,
 	ColorSpaceNode,
 	FrontFacingNode,
@@ -308,6 +322,7 @@ export {
 	MatcapUVNode,
 	MaxMipLevelNode,
 	OscNode,
+	RemapNode,
 	RotateUVNode,
 	SplitNode,
 	SpriteSheetUVNode,

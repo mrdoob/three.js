@@ -3,7 +3,7 @@
  * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '144';
+const REVISION = '145';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -5621,6 +5621,15 @@ class Sphere {
 
 	expandByPoint( point ) {
 
+		if ( this.isEmpty() ) {
+
+			this.center.copy( point );
+			this.radius = 0;
+
+			return this;
+
+		}
+
 		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
 
 		_toPoint.subVectors( point, this.center );
@@ -5646,6 +5655,19 @@ class Sphere {
 	}
 
 	union( sphere ) {
+
+		// handle empty sphere cases
+		if ( sphere.isEmpty() ) {
+
+			return this;
+
+		} else if ( this.isEmpty() ) {
+
+			this.copy( sphere );
+
+			return this;
+
+		}
 
 		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
 
@@ -12943,7 +12965,7 @@ var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\tuniform float morphTar
 
 var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed *= morphTargetBaseInfluence;\n\t#ifdef MORPHTARGETS_TEXTURE\n\t\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\t\tif ( morphTargetInfluences[ i ] != 0.0 ) transformed += getMorph( gl_VertexID, i, 0 ).xyz * morphTargetInfluences[ i ];\n\t\t}\n\t#else\n\t\ttransformed += morphTarget0 * morphTargetInfluences[ 0 ];\n\t\ttransformed += morphTarget1 * morphTargetInfluences[ 1 ];\n\t\ttransformed += morphTarget2 * morphTargetInfluences[ 2 ];\n\t\ttransformed += morphTarget3 * morphTargetInfluences[ 3 ];\n\t\t#ifndef USE_MORPHNORMALS\n\t\t\ttransformed += morphTarget4 * morphTargetInfluences[ 4 ];\n\t\t\ttransformed += morphTarget5 * morphTargetInfluences[ 5 ];\n\t\t\ttransformed += morphTarget6 * morphTargetInfluences[ 6 ];\n\t\t\ttransformed += morphTarget7 * morphTargetInfluences[ 7 ];\n\t\t#endif\n\t#endif\n#endif";
 
-var normal_fragment_begin = "float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;\n#ifdef FLAT_SHADED\n\tvec3 fdx = vec3( dFdx( vViewPosition.x ), dFdx( vViewPosition.y ), dFdx( vViewPosition.z ) );\n\tvec3 fdy = vec3( dFdy( vViewPosition.x ), dFdy( vViewPosition.y ), dFdy( vViewPosition.z ) );\n\tvec3 normal = normalize( cross( fdx, fdy ) );\n#else\n\tvec3 normal = normalize( vNormal );\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\t#ifdef USE_TANGENT\n\t\tvec3 tangent = normalize( vTangent );\n\t\tvec3 bitangent = normalize( vBitangent );\n\t\t#ifdef DOUBLE_SIDED\n\t\t\ttangent = tangent * faceDirection;\n\t\t\tbitangent = bitangent * faceDirection;\n\t\t#endif\n\t\t#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )\n\t\t\tmat3 vTBN = mat3( tangent, bitangent, normal );\n\t\t#endif\n\t#endif\n#endif\nvec3 geometryNormal = normal;";
+var normal_fragment_begin = "float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;\n#ifdef FLAT_SHADED\n\tvec3 fdx = dFdx( vViewPosition );\n\tvec3 fdy = dFdy( vViewPosition );\n\tvec3 normal = normalize( cross( fdx, fdy ) );\n#else\n\tvec3 normal = normalize( vNormal );\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\t#ifdef USE_TANGENT\n\t\tvec3 tangent = normalize( vTangent );\n\t\tvec3 bitangent = normalize( vBitangent );\n\t\t#ifdef DOUBLE_SIDED\n\t\t\ttangent = tangent * faceDirection;\n\t\t\tbitangent = bitangent * faceDirection;\n\t\t#endif\n\t\t#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )\n\t\t\tmat3 vTBN = mat3( tangent, bitangent, normal );\n\t\t#endif\n\t#endif\n#endif\nvec3 geometryNormal = normal;";
 
 var normal_fragment_maps = "#ifdef OBJECTSPACE_NORMALMAP\n\tnormal = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( TANGENTSPACE_NORMALMAP )\n\tvec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;\n\tmapN.xy *= normalScale;\n\t#ifdef USE_TANGENT\n\t\tnormal = normalize( vTBN * mapN );\n\t#else\n\t\tnormal = perturbNormal2Arb( - vViewPosition, normal, mapN, faceDirection );\n\t#endif\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( - vViewPosition, normal, dHdxy_fwd(), faceDirection );\n#endif";
 
@@ -13005,7 +13027,7 @@ var tonemapping_pars_fragment = "#ifndef saturate\n#define saturate( a ) clamp( 
 
 var transmission_fragment = "#ifdef USE_TRANSMISSION\n\tmaterial.transmission = transmission;\n\tmaterial.transmissionAlpha = 1.0;\n\tmaterial.thickness = thickness;\n\tmaterial.attenuationDistance = attenuationDistance;\n\tmaterial.attenuationColor = attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tmaterial.transmission *= texture2D( transmissionMap, vUv ).r;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tmaterial.thickness *= texture2D( thicknessMap, vUv ).g;\n\t#endif\n\tvec3 pos = vWorldPosition;\n\tvec3 v = normalize( cameraPosition - pos );\n\tvec3 n = inverseTransformDirection( normal, viewMatrix );\n\tvec4 transmission = getIBLVolumeRefraction(\n\t\tn, v, material.roughness, material.diffuseColor, material.specularColor, material.specularF90,\n\t\tpos, modelMatrix, viewMatrix, projectionMatrix, material.ior, material.thickness,\n\t\tmaterial.attenuationColor, material.attenuationDistance );\n\tmaterial.transmissionAlpha = mix( material.transmissionAlpha, transmission.a, material.transmission );\n\ttotalDiffuse = mix( totalDiffuse, transmission.rgb, material.transmission );\n#endif";
 
-var transmission_pars_fragment = "#ifdef USE_TRANSMISSION\n\tuniform float transmission;\n\tuniform float thickness;\n\tuniform float attenuationDistance;\n\tuniform vec3 attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tuniform sampler2D transmissionMap;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tuniform sampler2D thicknessMap;\n\t#endif\n\tuniform vec2 transmissionSamplerSize;\n\tuniform sampler2D transmissionSamplerMap;\n\tuniform mat4 modelMatrix;\n\tuniform mat4 projectionMatrix;\n\tvarying vec3 vWorldPosition;\n\tvec3 getVolumeTransmissionRay( const in vec3 n, const in vec3 v, const in float thickness, const in float ior, const in mat4 modelMatrix ) {\n\t\tvec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );\n\t\tvec3 modelScale;\n\t\tmodelScale.x = length( vec3( modelMatrix[ 0 ].xyz ) );\n\t\tmodelScale.y = length( vec3( modelMatrix[ 1 ].xyz ) );\n\t\tmodelScale.z = length( vec3( modelMatrix[ 2 ].xyz ) );\n\t\treturn normalize( refractionVector ) * thickness * modelScale;\n\t}\n\tfloat applyIorToRoughness( const in float roughness, const in float ior ) {\n\t\treturn roughness * clamp( ior * 2.0 - 2.0, 0.0, 1.0 );\n\t}\n\tvec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {\n\t\tfloat framebufferLod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );\n\t\t#ifdef texture2DLodEXT\n\t\t\treturn texture2DLodEXT( transmissionSamplerMap, fragCoord.xy, framebufferLod );\n\t\t#else\n\t\t\treturn texture2D( transmissionSamplerMap, fragCoord.xy, framebufferLod );\n\t\t#endif\n\t}\n\tvec3 applyVolumeAttenuation( const in vec3 radiance, const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tif ( attenuationDistance == 0.0 ) {\n\t\t\treturn radiance;\n\t\t} else {\n\t\t\tvec3 attenuationCoefficient = -log( attenuationColor ) / attenuationDistance;\n\t\t\tvec3 transmittance = exp( - attenuationCoefficient * transmissionDistance );\t\t\treturn transmittance * radiance;\n\t\t}\n\t}\n\tvec4 getIBLVolumeRefraction( const in vec3 n, const in vec3 v, const in float roughness, const in vec3 diffuseColor,\n\t\tconst in vec3 specularColor, const in float specularF90, const in vec3 position, const in mat4 modelMatrix,\n\t\tconst in mat4 viewMatrix, const in mat4 projMatrix, const in float ior, const in float thickness,\n\t\tconst in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tvec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );\n\t\tvec3 refractedRayExit = position + transmissionRay;\n\t\tvec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );\n\t\tvec2 refractionCoords = ndcPos.xy / ndcPos.w;\n\t\trefractionCoords += 1.0;\n\t\trefractionCoords /= 2.0;\n\t\tvec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );\n\t\tvec3 attenuatedColor = applyVolumeAttenuation( transmittedLight.rgb, length( transmissionRay ), attenuationColor, attenuationDistance );\n\t\tvec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );\n\t\treturn vec4( ( 1.0 - F ) * attenuatedColor * diffuseColor, transmittedLight.a );\n\t}\n#endif";
+var transmission_pars_fragment = "#ifdef USE_TRANSMISSION\n\tuniform float transmission;\n\tuniform float thickness;\n\tuniform float attenuationDistance;\n\tuniform vec3 attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tuniform sampler2D transmissionMap;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tuniform sampler2D thicknessMap;\n\t#endif\n\tuniform vec2 transmissionSamplerSize;\n\tuniform sampler2D transmissionSamplerMap;\n\tuniform mat4 modelMatrix;\n\tuniform mat4 projectionMatrix;\n\tvarying vec3 vWorldPosition;\n\tvec3 getVolumeTransmissionRay( const in vec3 n, const in vec3 v, const in float thickness, const in float ior, const in mat4 modelMatrix ) {\n\t\tvec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );\n\t\tvec3 modelScale;\n\t\tmodelScale.x = length( vec3( modelMatrix[ 0 ].xyz ) );\n\t\tmodelScale.y = length( vec3( modelMatrix[ 1 ].xyz ) );\n\t\tmodelScale.z = length( vec3( modelMatrix[ 2 ].xyz ) );\n\t\treturn normalize( refractionVector ) * thickness * modelScale;\n\t}\n\tfloat applyIorToRoughness( const in float roughness, const in float ior ) {\n\t\treturn roughness * clamp( ior * 2.0 - 2.0, 0.0, 1.0 );\n\t}\n\tvec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {\n\t\tfloat framebufferLod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );\n\t\t#ifdef texture2DLodEXT\n\t\t\treturn texture2DLodEXT( transmissionSamplerMap, fragCoord.xy, framebufferLod );\n\t\t#else\n\t\t\treturn texture2D( transmissionSamplerMap, fragCoord.xy, framebufferLod );\n\t\t#endif\n\t}\n\tvec3 applyVolumeAttenuation( const in vec3 radiance, const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tif ( isinf( attenuationDistance ) ) {\n\t\t\treturn radiance;\n\t\t} else {\n\t\t\tvec3 attenuationCoefficient = -log( attenuationColor ) / attenuationDistance;\n\t\t\tvec3 transmittance = exp( - attenuationCoefficient * transmissionDistance );\t\t\treturn transmittance * radiance;\n\t\t}\n\t}\n\tvec4 getIBLVolumeRefraction( const in vec3 n, const in vec3 v, const in float roughness, const in vec3 diffuseColor,\n\t\tconst in vec3 specularColor, const in float specularF90, const in vec3 position, const in mat4 modelMatrix,\n\t\tconst in mat4 viewMatrix, const in mat4 projMatrix, const in float ior, const in float thickness,\n\t\tconst in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tvec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );\n\t\tvec3 refractedRayExit = position + transmissionRay;\n\t\tvec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );\n\t\tvec2 refractionCoords = ndcPos.xy / ndcPos.w;\n\t\trefractionCoords += 1.0;\n\t\trefractionCoords /= 2.0;\n\t\tvec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );\n\t\tvec3 attenuatedColor = applyVolumeAttenuation( transmittedLight.rgb, length( transmissionRay ), attenuationColor, attenuationDistance );\n\t\tvec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );\n\t\treturn vec4( ( 1.0 - F ) * attenuatedColor * diffuseColor, transmittedLight.a );\n\t}\n#endif";
 
 var uv_pars_fragment = "#if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )\n\tvarying vec2 vUv;\n#endif";
 
@@ -17644,11 +17666,19 @@ function setValueV4uiArray( gl, v ) {
 
 function setValueT1Array( gl, v, textures ) {
 
+	const cache = this.cache;
+
 	const n = v.length;
 
 	const units = allocTexUnits( textures, n );
 
-	gl.uniform1iv( this.addr, units );
+	if ( ! arraysEqual( cache, units ) ) {
+
+		gl.uniform1iv( this.addr, units );
+
+		copyArray( cache, units );
+
+	}
 
 	for ( let i = 0; i !== n; ++ i ) {
 
@@ -17660,11 +17690,19 @@ function setValueT1Array( gl, v, textures ) {
 
 function setValueT3DArray( gl, v, textures ) {
 
+	const cache = this.cache;
+
 	const n = v.length;
 
 	const units = allocTexUnits( textures, n );
 
-	gl.uniform1iv( this.addr, units );
+	if ( ! arraysEqual( cache, units ) ) {
+
+		gl.uniform1iv( this.addr, units );
+
+		copyArray( cache, units );
+
+	}
 
 	for ( let i = 0; i !== n; ++ i ) {
 
@@ -17676,11 +17714,19 @@ function setValueT3DArray( gl, v, textures ) {
 
 function setValueT6Array( gl, v, textures ) {
 
+	const cache = this.cache;
+
 	const n = v.length;
 
 	const units = allocTexUnits( textures, n );
 
-	gl.uniform1iv( this.addr, units );
+	if ( ! arraysEqual( cache, units ) ) {
+
+		gl.uniform1iv( this.addr, units );
+
+		copyArray( cache, units );
+
+	}
 
 	for ( let i = 0; i !== n; ++ i ) {
 
@@ -17692,11 +17738,19 @@ function setValueT6Array( gl, v, textures ) {
 
 function setValueT2DArrayArray( gl, v, textures ) {
 
+	const cache = this.cache;
+
 	const n = v.length;
 
 	const units = allocTexUnits( textures, n );
 
-	gl.uniform1iv( this.addr, units );
+	if ( ! arraysEqual( cache, units ) ) {
+
+		gl.uniform1iv( this.addr, units );
+
+		copyArray( cache, units );
+
+	}
 
 	for ( let i = 0; i !== n; ++ i ) {
 
@@ -21040,59 +21094,51 @@ function WebGLState( gl, extensions, capabilities ) {
 
 				if ( currentDepthFunc !== depthFunc ) {
 
-					if ( depthFunc ) {
+					switch ( depthFunc ) {
 
-						switch ( depthFunc ) {
+						case NeverDepth:
 
-							case NeverDepth:
+							gl.depthFunc( 512 );
+							break;
 
-								gl.depthFunc( 512 );
-								break;
+						case AlwaysDepth:
 
-							case AlwaysDepth:
+							gl.depthFunc( 519 );
+							break;
 
-								gl.depthFunc( 519 );
-								break;
+						case LessDepth:
 
-							case LessDepth:
+							gl.depthFunc( 513 );
+							break;
 
-								gl.depthFunc( 513 );
-								break;
+						case LessEqualDepth:
 
-							case LessEqualDepth:
+							gl.depthFunc( 515 );
+							break;
 
-								gl.depthFunc( 515 );
-								break;
+						case EqualDepth:
 
-							case EqualDepth:
+							gl.depthFunc( 514 );
+							break;
 
-								gl.depthFunc( 514 );
-								break;
+						case GreaterEqualDepth:
 
-							case GreaterEqualDepth:
+							gl.depthFunc( 518 );
+							break;
 
-								gl.depthFunc( 518 );
-								break;
+						case GreaterDepth:
 
-							case GreaterDepth:
+							gl.depthFunc( 516 );
+							break;
 
-								gl.depthFunc( 516 );
-								break;
+						case NotEqualDepth:
 
-							case NotEqualDepth:
+							gl.depthFunc( 517 );
+							break;
 
-								gl.depthFunc( 517 );
-								break;
+						default:
 
-							default:
-
-								gl.depthFunc( 515 );
-
-						}
-
-					} else {
-
-						gl.depthFunc( 515 );
+							gl.depthFunc( 515 );
 
 					}
 
@@ -21825,24 +21871,39 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
-	function bindTexture( webglType, webglTexture ) {
+	function bindTexture( webglType, webglTexture, webglSlot ) {
 
-		if ( currentTextureSlot === null ) {
+		if ( webglSlot === undefined ) {
 
-			activeTexture();
+			if ( currentTextureSlot === null ) {
+
+				webglSlot = 33984 + maxTextures - 1;
+
+			} else {
+
+				webglSlot = currentTextureSlot;
+
+			}
 
 		}
 
-		let boundTexture = currentBoundTextures[ currentTextureSlot ];
+		let boundTexture = currentBoundTextures[ webglSlot ];
 
 		if ( boundTexture === undefined ) {
 
 			boundTexture = { type: undefined, texture: undefined };
-			currentBoundTextures[ currentTextureSlot ] = boundTexture;
+			currentBoundTextures[ webglSlot ] = boundTexture;
 
 		}
 
 		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
+
+			if ( currentTextureSlot !== webglSlot ) {
+
+				gl.activeTexture( webglSlot );
+				currentTextureSlot = webglSlot;
+
+			}
 
 			gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
 
@@ -22322,7 +22383,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getInternalFormat( internalFormatName, glFormat, glType, encoding, isVideoTexture = false ) {
+	function getInternalFormat( internalFormatName, glFormat, glType, encoding, forceLinearEncoding = false ) {
 
 		if ( isWebGL2 === false ) return glFormat;
 
@@ -22356,7 +22417,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( glType === 5126 ) internalFormat = 34836;
 			if ( glType === 5131 ) internalFormat = 34842;
-			if ( glType === 5121 ) internalFormat = ( encoding === sRGBEncoding && isVideoTexture === false ) ? 35907 : 32856;
+			if ( glType === 5121 ) internalFormat = ( encoding === sRGBEncoding && forceLinearEncoding === false ) ? 35907 : 32856;
 			if ( glType === 32819 ) internalFormat = 32854;
 			if ( glType === 32820 ) internalFormat = 32855;
 
@@ -22647,8 +22708,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.activeTexture( 33984 + slot );
-		state.bindTexture( 3553, textureProperties.__webglTexture );
+		state.bindTexture( 3553, textureProperties.__webglTexture, 33984 + slot );
 
 	}
 
@@ -22663,8 +22723,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.activeTexture( 33984 + slot );
-		state.bindTexture( 35866, textureProperties.__webglTexture );
+		state.bindTexture( 35866, textureProperties.__webglTexture, 33984 + slot );
 
 	}
 
@@ -22679,8 +22738,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.activeTexture( 33984 + slot );
-		state.bindTexture( 32879, textureProperties.__webglTexture );
+		state.bindTexture( 32879, textureProperties.__webglTexture, 33984 + slot );
 
 	}
 
@@ -22695,8 +22753,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		state.activeTexture( 33984 + slot );
-		state.bindTexture( 34067, textureProperties.__webglTexture );
+		state.bindTexture( 34067, textureProperties.__webglTexture, 33984 + slot );
 
 	}
 
@@ -22868,10 +22925,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const forceUpload = initTexture( textureProperties, texture );
 		const source = texture.source;
 
-		state.activeTexture( 33984 + slot );
-		state.bindTexture( textureType, textureProperties.__webglTexture );
+		state.bindTexture( textureType, textureProperties.__webglTexture, 33984 + slot );
 
-		if ( source.version !== source.__currentVersion || forceUpload === true ) {
+		const sourceProperties = properties.get( source );
+
+		if ( source.version !== sourceProperties.__version || forceUpload === true ) {
+
+			state.activeTexture( 33984 + slot );
 
 			_gl.pixelStorei( 37440, texture.flipY );
 			_gl.pixelStorei( 37441, texture.premultiplyAlpha );
@@ -22894,7 +22954,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const mipmaps = texture.mipmaps;
 
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
-			const allocateMemory = ( source.__currentVersion === undefined ) || ( forceUpload === true );
+			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
 			const levels = getMipLevels( texture, image, supportsMips );
 
 			if ( texture.isDepthTexture ) {
@@ -23210,7 +23270,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			source.__currentVersion = source.version;
+			sourceProperties.__version = source.version;
 
 			if ( texture.onUpdate ) texture.onUpdate( texture );
 
@@ -23227,10 +23287,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const forceUpload = initTexture( textureProperties, texture );
 		const source = texture.source;
 
-		state.activeTexture( 33984 + slot );
-		state.bindTexture( 34067, textureProperties.__webglTexture );
+		state.bindTexture( 34067, textureProperties.__webglTexture, 33984 + slot );
 
-		if ( source.version !== source.__currentVersion || forceUpload === true ) {
+		const sourceProperties = properties.get( source );
+
+		if ( source.version !== sourceProperties.__version || forceUpload === true ) {
+
+			state.activeTexture( 33984 + slot );
 
 			_gl.pixelStorei( 37440, texture.flipY );
 			_gl.pixelStorei( 37441, texture.premultiplyAlpha );
@@ -23265,7 +23328,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 			const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
-			const allocateMemory = ( source.__currentVersion === undefined ) || ( forceUpload === true );
+			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
 			let levels = getMipLevels( texture, image, supportsMips );
 
 			setTextureParameters( 34067, texture, supportsMips );
@@ -23414,7 +23477,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			source.__currentVersion = source.version;
+			sourceProperties.__version = source.version;
 
 			if ( texture.onUpdate ) texture.onUpdate( texture );
 
@@ -23778,7 +23841,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					const glFormat = utils.convert( texture.format, texture.encoding );
 					const glType = utils.convert( texture.type );
-					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding, renderTarget.isXRRenderTarget === true );
 					const samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
@@ -37049,7 +37112,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.thickness = 0;
 		this.thicknessMap = null;
-		this.attenuationDistance = 0.0;
+		this.attenuationDistance = Infinity;
 		this.attenuationColor = new Color( 1, 1, 1 );
 
 		this.specularIntensity = 1.0;
@@ -40623,8 +40686,7 @@ class LightShadow {
 			0.0, 0.0, 0.0, 1.0
 		);
 
-		shadowMatrix.multiply( shadowCamera.projectionMatrix );
-		shadowMatrix.multiply( shadowCamera.matrixWorldInverse );
+		shadowMatrix.multiply( _projScreenMatrix$1 );
 
 	}
 
@@ -44903,6 +44965,13 @@ class PropertyBinding {
 
 				case 'map':
 
+					if ( 'map' in targetObject ) {
+
+						targetObject = targetObject.map;
+						break;
+
+					}
+
 					if ( ! targetObject.material ) {
 
 						console.error( 'THREE.PropertyBinding: Can not bind to material as node does not have a material.', this );
@@ -47888,6 +47957,13 @@ class SkeletonHelper extends LineSegments {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
 }
 
 
@@ -48110,6 +48186,13 @@ class GridHelper extends LineSegments {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
 }
 
 class PolarGridHelper extends LineSegments {
@@ -48188,6 +48271,13 @@ class PolarGridHelper extends LineSegments {
 		super( geometry, material );
 
 		this.type = 'PolarGridHelper';
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 
@@ -48608,7 +48698,6 @@ class BoxHelper extends LineSegments {
 
 		this.geometry.computeBoundingSphere();
 
-
 	}
 
 	setFromObject( object ) {
@@ -48627,6 +48716,13 @@ class BoxHelper extends LineSegments {
 		this.object = source.object;
 
 		return this;
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 
@@ -48669,6 +48765,13 @@ class Box3Helper extends LineSegments {
 		this.scale.multiplyScalar( 0.5 );
 
 		super.updateMatrixWorld( force );
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 
@@ -48715,6 +48818,15 @@ class PlaneHelper extends Line {
 		this.translateZ( - this.plane.constant );
 
 		super.updateMatrixWorld( force );
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+		this.children[ 0 ].geometry.dispose();
+		this.children[ 0 ].material.dispose();
 
 	}
 
@@ -48808,6 +48920,15 @@ class ArrowHelper extends Object3D {
 		this.cone.copy( source.cone );
 
 		return this;
+
+	}
+
+	dispose() {
+
+		this.line.geometry.dispose();
+		this.line.material.dispose();
+		this.cone.geometry.dispose();
+		this.cone.material.dispose();
 
 	}
 

@@ -65,6 +65,8 @@ export class PreviewEditor extends BaseNode {
 		const previewElement = new Element();
 		previewElement.dom.style[ 'padding-top' ] = 0;
 		previewElement.dom.style[ 'padding-bottom' ] = 0;
+		previewElement.dom.style[ 'padding-left' ] = 0;
+		previewElement.dom.style[ 'padding-right' ] = '14px';
 
 		const sceneInput = new SelectInput( [
 			{ name: 'Box', value: 'box' },
@@ -85,6 +87,8 @@ export class PreviewEditor extends BaseNode {
 		canvas.style.position = 'absolute';
 		previewElement.dom.append( canvas );
 		previewElement.setHeight( height );
+
+		previewElement.dom.addEventListener( 'wheel', e => e.stopPropagation() );
 
 		const renderer = new WebGLRenderer( {
 			canvas,
