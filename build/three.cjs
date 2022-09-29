@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '145dev';
+const REVISION = '145';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
