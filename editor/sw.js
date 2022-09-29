@@ -90,7 +90,9 @@ const assets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
+	'./js/libs/es-module-shims.js',
 	'./js/libs/esprima.js',
+	'./js/libs/ffmpeg.min.js',
 	'./js/libs/jsonlint.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
@@ -231,13 +233,17 @@ self.addEventListener( 'install', async function () {
 
 	const cache = await caches.open( cacheName );
 
-	assets.forEach( function ( asset ) {
+	assets.forEach( async function ( asset ) {
 
-		cache.add( asset ).catch( function () {
+		try {
+
+			await cache.add( asset );
+
+		} catch {
 
 			console.warn( '[SW] Cound\'t cache:', asset );
 
-		} );
+		}
 
 	} );
 
@@ -245,37 +251,46 @@ self.addEventListener( 'install', async function () {
 
 self.addEventListener( 'fetch', async function ( event ) {
 
-	if ( event.request.url.startsWith( 'chrome-extension' ) ) return;
-
 	const request = event.request;
+
+	if ( request.url.startsWith( 'chrome-extension' ) ) return;
+
 	event.respondWith( networkFirst( request ) );
 
 } );
 
 async function networkFirst( request ) {
 
-	return fetch( request )
-		.then( async function ( response ) {
+	try {
 
-			const cache = await caches.open( cacheName );
+		let response = await fetch( request );
 
-			cache.put( request, response.clone() );
+		if ( request.url.endsWith( 'editor/' ) || request.url.endsWith( 'editor/index.html' ) ) { // copied from coi-serviceworker
 
-			return response;
+			const newHeaders = new Headers( response.headers );
+			newHeaders.set( "Cross-Origin-Embedder-Policy", "require-corp" );
+			newHeaders.set( "Cross-Origin-Opener-Policy", "same-origin" );
 
-		} )
-		.catch( async function () {
+			response = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
 
-			const cachedResponse = await caches.match( request );
+		}
 
-			if ( cachedResponse === undefined ) {
+		const cache = await caches.open( cacheName );
+		cache.put( request, response.clone() );
+		return response;
 
-				console.warn( '[SW] Not cached:', request.url );
+	} catch {
 
-			}
+		const cachedResponse = await caches.match( request );
 
-			return cachedResponse;
+		if ( cachedResponse === undefined ) {
 
-		} );
+			console.warn( '[SW] Not cached:', request.url );
+
+		}
+
+		return cachedResponse;
+
+	}
 
 }
