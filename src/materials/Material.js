@@ -316,6 +316,8 @@ class Material extends EventDispatcher {
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
 
+		if ( this.twoPassTransparentRendering === false ) data.twoPassTransparentRendering = this.twoPassTransparentRendering;
+
 		data.depthFunc = this.depthFunc;
 		data.depthTest = this.depthTest;
 		data.depthWrite = this.depthWrite;
@@ -411,6 +413,8 @@ class Material extends EventDispatcher {
 
 		this.opacity = source.opacity;
 		this.transparent = source.transparent;
+
+		this.twoPassTransparentRendering = source.twoPassTransparentRendering;
 
 		this.blendSrc = source.blendSrc;
 		this.blendDst = source.blendDst;
