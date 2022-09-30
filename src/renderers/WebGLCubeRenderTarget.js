@@ -136,8 +136,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	}
 
-//
-
 	clear( renderer, color, depth, stencil ) {
 
 		const currentRenderTarget = renderer.getRenderTarget();
