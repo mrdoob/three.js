@@ -849,7 +849,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		function prepare( material, scene, object ) {
 
-			if ( material.transparent === true && material.side === DoubleSide ) {
+			if ( material.transparent === true && material.side === DoubleSide && material.twoPassTransparentRendering ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -1331,7 +1331,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		material.onBeforeRender( _this, scene, camera, geometry, object, group );
 
-		if ( material.transparent === true && material.side === DoubleSide ) {
+		if ( material.transparent === true && material.side === DoubleSide && material.twoPassTransparentRendering ) {
 
 			material.side = BackSide;
 			material.needsUpdate = true;

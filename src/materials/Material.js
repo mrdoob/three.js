@@ -26,6 +26,8 @@ class Material extends EventDispatcher {
 		this.opacity = 1;
 		this.transparent = false;
 
+		this.twoPassTransparentRendering = true;
+
 		this.blendSrc = SrcAlphaFactor;
 		this.blendDst = OneMinusSrcAlphaFactor;
 		this.blendEquation = AddEquation;
