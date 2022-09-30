@@ -24,6 +24,7 @@ import RemapNode from '../utils/RemapNode.js';
 import RotateUVNode from '../utils/RotateUVNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
+import TriplanarTexturesNode from '../utils/TriplanarTexturesNode.js';
 
 // geometry
 import RangeNode from '../geometry/RangeNode.js';
@@ -116,6 +117,9 @@ export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode(
 export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
 export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
 export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME );
+
+export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
+export const triplanarTexture = ( texture, ...params ) => triplanarTextures( texture, texture, texture, ...params );
 
 // geometry
 

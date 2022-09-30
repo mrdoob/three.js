@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '145dev';
+const REVISION = '145';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -4326,7 +4326,7 @@ class Sphere {
 		if (this.isEmpty()) {
 			this.center.copy(point);
 			this.radius = 0;
-			return;
+			return this;
 		} // from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
 
 
@@ -4350,10 +4350,10 @@ class Sphere {
 	union(sphere) {
 		// handle empty sphere cases
 		if (sphere.isEmpty()) {
-			return;
+			return this;
 		} else if (this.isEmpty()) {
 			this.copy(sphere);
-			return;
+			return this;
 		} // from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
 		// To enclose another sphere into this sphere, we only need to enclose two points:
 		// 1) Enclose the farthest point on the other sphere into this sphere.
