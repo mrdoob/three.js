@@ -88,6 +88,7 @@ import RotateUVNode from './utils/RotateUVNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
 import TimerNode from './utils/TimerNode.js';
+import TriplanarTexturesNode from './utils/TriplanarTexturesNode.js';
 
 // loaders
 import NodeLoader from './loaders/NodeLoader.js';
@@ -211,6 +212,7 @@ const nodeLib = {
 	SplitNode,
 	SpriteSheetUVNode,
 	TimerNode,
+	TriplanarTexturesNode,
 
 	// procedural
 	CheckerNode,
@@ -327,6 +329,7 @@ export {
 	SplitNode,
 	SpriteSheetUVNode,
 	TimerNode,
+	TriplanarTexturesNode,
 
 	// procedural
 	CheckerNode,
