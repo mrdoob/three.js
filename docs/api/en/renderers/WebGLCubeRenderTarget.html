@@ -56,10 +56,11 @@
 
 		<h3>See [page:WebGLRenderTarget] for inherited methods</h3>
 
-		<h3>[method:this fromEquirectangularTexture]( [param:WebGLRenderer renderer], [param:Texture texture] )</h3>
+		<h3>[method:this fromEquirectangularTexture]( [param:WebGLRenderer renderer], [param:Texture texture], [param:float theta] )</h3>
 		<p>
-			[page:WebGLRenderer renderer] — the renderer.<br/>
-			[page:Texture texture] — the equirectangular texture.
+			[page:WebGLRenderer renderer] - the renderer.<br />
+			[page:Texture texture] - the equirectangular texture.<br />
+			theta - the angle to rotate the equirectangular texture, in radians - default is 0.
 		</p>
 		<p>
 			Use this method if you want to convert an equirectangular panorama to the cubemap format.

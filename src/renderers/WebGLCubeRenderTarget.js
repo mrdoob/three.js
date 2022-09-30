@@ -35,7 +35,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	}
 
-	fromEquirectangularTexture( renderer, texture ) {
+	fromEquirectangularTexture( renderer, texture, theta = 0 ) {
 
 		this.texture.type = texture.type;
 		this.texture.encoding = texture.encoding;
@@ -48,9 +48,12 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 			uniforms: {
 				tEquirect: { value: null },
+				theta: 0
 			},
 
 			vertexShader: /* glsl */`
+
+				uniform float theta;
 
 				varying vec3 vWorldDirection;
 
@@ -63,6 +66,13 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 				void main() {
 
 					vWorldDirection = transformDirection( position, modelMatrix );
+
+					float c = cos( theta );
+					float s = sin( theta );
+
+					mat3 m = mat3( c, 0, - s, 0, 1, 0, s, 0, c );
+
+					vWorldDirection = m * vWorldDirection;
 
 					#include <begin_vertex>
 					#include <project_vertex>
@@ -105,6 +115,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		} );
 
 		material.uniforms.tEquirect.value = texture;
+		material.uniforms.theta.value = theta;
 
 		const mesh = new Mesh( geometry, material );
 
@@ -124,6 +135,8 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 		return this;
 
 	}
+
+//
 
 	clear( renderer, color, depth, stencil ) {
 
