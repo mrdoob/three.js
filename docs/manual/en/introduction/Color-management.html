@@ -53,7 +53,7 @@
 <body>
 	<h1>[name]</h1>
 
-	<h2 id="what-is-a-color-space">What is a color space?</h2>
+	<h2 id="what-is-a-color-space">What is a color space?<a href="#manual/en/introduction/Color-management#what-is-a-color-space" class="heading-link">#</a></h2>
 
 	<p>
 		Every color space is a collection of several design decisions, chosen together to support a
@@ -143,7 +143,7 @@
 		</p>
 	</blockquote>
 
-	<h2 id="roles-of-color-spaces">Roles of color spaces</h2>
+	<h2 id="roles-of-color-spaces">Roles of color spaces<a href="#manual/en/introduction/Color-management#roles-of-color-spaces" class="heading-link">#</a></h2>
 
 	<p>
 		Linear workflows — required for modern rendering methods — generally involve more than
@@ -151,7 +151,7 @@
 		appropriate for different roles, explained below.
 	</p>
 
-	<h3 id="input-color-space">Input color space</h3>
+	<h3 id="input-color-space">Input color space<a href="#manual/en/introduction/Color-management#input-color-space" class="heading-link">#</a></h3>
 
 	<p>
 		Colors supplied to three.js — from color pickers, textures, 3D models, and other sources —
@@ -206,7 +206,7 @@ THREE.ColorManagement.legacyMode = false;
 		</p>
 	</blockquote>
 
-	<h3 id="working-color-space">Working color space</h3>
+	<h3 id="working-color-space">Working color space<a href="#manual/en/introduction/Color-management#working-color-space" class="heading-link">#</a></h3>
 
 	<p>
 		Rendering, interpolation, and many other operations must be performed in an open domain
@@ -214,7 +214,7 @@ THREE.ColorManagement.legacyMode = false;
 		illumination. In three.js, the working color space is Linear-sRGB.
 	</p>
 
-	<h3 id="output-color-space">Output color space</h3>
+	<h3 id="output-color-space">Output color space<a href="#manual/en/introduction/Color-management#output-color-space" class="heading-link">#</a></h3>
 
 	<p>
 		Output to a display device, image, or video may involve conversion from the open domain
@@ -250,7 +250,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		</p>
 	</blockquote>
 
-	<h2 id="working-with-three-color-instances">Working with THREE.Color instances</h2>
+	<h2 id="working-with-three-color-instances">Working with THREE.Color instances<a href="#manual/en/introduction/Color-management#working-with-three-color-instances" class="heading-link">#</a></h2>
 
 	<p>
 		Methods reading or modifying [page:Color] instances assume data is already in the
@@ -295,7 +295,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		console.log( color.getHex( SRGBColorSpace ) ); // → 0xBCBCBC
 	</code>
 
-	<h2 id="common-mistakes">Common mistakes</h2>
+	<h2 id="common-mistakes">Common mistakes<a href="#manual/en/introduction/Color-management#common-mistakes" class="heading-link">#</a></h2>
 
 	<p>
 		When an individual color or texture is misconfigured, it will appear darker or lighter than
@@ -314,7 +314,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		("display referred").
 	</p>
 
-	<h2 id="further-reading">Further reading</h2>
+	<h2 id="further-reading">Further reading<a href="#manual/en/introduction/Color-management#further-reading" class="heading-link">#</a></h2>
 
 	<ul>
 		<li>

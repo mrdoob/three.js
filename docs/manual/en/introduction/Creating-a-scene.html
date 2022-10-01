@@ -11,7 +11,7 @@
 
 		<p>The goal of this section is to give a brief introduction to three.js. We will start by setting up a scene, with a spinning cube. A working example is provided at the bottom of the page in case you get stuck and need help.</p>
 
-		<h2 id="before-we-start">Before we start</h2>
+		<h2 id="before-we-start">Before we start<a href="#manual/en/introduction/Creating-a-scene#before-we-start" class="heading-link">#</a></h2>
 
 		<p>Before you can use three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of [link:https://threejs.org/build/three.js three.js] in the js/ directory, and open it in your browser.</p>
 
@@ -36,7 +36,7 @@
 
 		<p>That's all. All the code below goes into the empty &lt;script&gt; tag.</p>
 
-		<h2 id="creating-the-scene">Creating the scene</h2>
+		<h2 id="creating-the-scene">Creating the scene<a href="#manual/en/introduction/Creating-a-scene#creating-the-scene" class="heading-link">#</a></h2>
 
 		<p>To actually be able to display anything with three.js, we need three things: scene, camera and renderer, so that we can render the scene with camera.</p>
 
@@ -86,7 +86,7 @@
 
 		<p>By default, when we call `scene.add()`, the thing we add will be added to the coordinates `(0,0,0)`. This would cause both the camera and the cube to be inside each other. To avoid this, we simply move the camera out a bit.</p>
 
-		<h2 id="rendering-the-scene">Rendering the scene</h2>
+		<h2 id="rendering-the-scene">Rendering the scene<a href="#manual/en/introduction/Creating-a-scene#rendering-the-scene" class="heading-link">#</a></h2>
 
 		<p>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a `render or animate loop`.</p>
 
@@ -100,7 +100,7 @@
 
 		<p>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but `requestAnimationFrame` has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</p>
 
-		<h2 id="animating-the-cube">Animating the cube</h2>
+		<h2 id="animating-the-cube">Animating the cube<a href="#manual/en/introduction/Creating-a-scene#animating-the-cube" class="heading-link">#</a></h2>
 
 		<p>If you insert all the code above into the file you created before we began, you should see a green box. Let's make it all a little more interesting by rotating it.</p>
 
@@ -113,7 +113,7 @@
 
 		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animate loop. You can of course call other functions from there, so that you don't end up with an `animate` function that's hundreds of lines.</p>
 
-		<h2 id="the-result">The result</h2>
+		<h2 id="the-result">The result<a href="#manual/en/introduction/Creating-a-scene#the-result" class="heading-link">#</a></h2>
 		<p>Congratulations! You have now completed your first three.js application. It's simple, but you have to start somewhere.</p>
 
 		<p>The full code is available below and as an editable [link:https://jsfiddle.net/fxurzeb4/ live example]. Play around with it to get a better understanding of how it works.</p>

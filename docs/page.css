@@ -248,6 +248,28 @@ a.param:hover {
 	color: var(--text-color);
 }
 
+h2 > a.heading-link {
+	display: none;
+	color: var(--text-color);
+	padding-left: 8px;
+	transition: color .16s linear;
+}
+
+h3 > a.heading-link {
+	display: none;
+	color: var(--text-color);
+	padding-left: 6px;
+	transition: color .16s linear;
+}
+
+a.heading-link:hover, a.heading-link:active {
+	color: var(--color-blue);
+}
+
+h2:hover a.heading-link, h2:active a.heading-link, h3:hover a.heading-link, h3:active a.heading-link {
+	display: inline-block;
+}
+
 
 @media all and ( min-width: 1700px ) {
 

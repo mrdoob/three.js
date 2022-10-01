@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<h2 id="which-3d-model-format-is-best-supported">Which 3D model format is best supported?</h2>
+		<h2 id="which-3d-model-format-is-best-supported">Which 3D model format is best supported?<a href="#manual/en/introduction/FAQ#which-3d-model-format-is-best-supported" class="heading-link">#</a></h2>
 		<div>
 			<p>
 				The recommended format for importing and exporting assets is glTF (GL Transmission Format). Because glTF is focused on runtime asset delivery, it is compact to transmit and fast to load.
@@ -19,7 +19,7 @@
 			</p>
 		</div>
 
-		<h2 id="why-are-there-meta-viewport-tags-in-examples">Why are there meta viewport tags in examples?</h2>
+		<h2 id="why-are-there-meta-viewport-tags-in-examples">Why are there meta viewport tags in examples?<a href="#manual/en/introduction/FAQ#why-are-there-meta-viewport-tags-in-examples" class="heading-link">#</a></h2>
 		<div>
 				<code>&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</code>
 
@@ -30,7 +30,7 @@
 				<p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
 		</div>
 
-		<h2 id="how-can-scene-scale-be-preserved-on-resize">How can scene scale be preserved on resize?</h2>
+		<h2 id="how-can-scene-scale-be-preserved-on-resize">How can scene scale be preserved on resize?<a href="#manual/en/introduction/FAQ#how-can-scene-scale-be-preserved-on-resize" class="heading-link">#</a></h2>
 		<p>
 			We want all objects, regardless of their distance from the camera, to appear the same size, even as the window is resized.
 
@@ -46,13 +46,13 @@ visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_f
 			[link:http://jsfiddle.net/Q4Jpu/ Example].
 		</p>
 
-		<h2 id="why-is-part-of-my-object-invisible">Why is part of my object invisible?</h2>
+		<h2 id="why-is-part-of-my-object-invisible">Why is part of my object invisible?<a href="#manual/en/introduction/FAQ#why-is-part-of-my-object-invisible" class="heading-link">#</a></h2>
 		<p>
 			This could be because of face culling. Faces have an orientation that decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
 			<code>material.side = THREE.DoubleSide</code>
 		</p>
 
-		<h2 id="why-does-threejs-sometimes-return-strange-results-for-invalid-inputs">Why does three.js sometimes return strange results for invalid inputs?</h2>
+		<h2 id="why-does-threejs-sometimes-return-strange-results-for-invalid-inputs">Why does three.js sometimes return strange results for invalid inputs?<a href="#manual/en/introduction/FAQ#why-does-threejs-sometimes-return-strange-results-for-invalid-inputs" class="heading-link">#</a></h2>
 		<p>
 			For performance reasons, three.js doesn't validate inputs in most cases. It's your app's responsibility to make sure that all inputs are valid.
 		</p>
