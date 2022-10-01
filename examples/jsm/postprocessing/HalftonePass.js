@@ -72,6 +72,14 @@ class HalftonePass extends Pass {
 
  	}
 
+	dispose() {
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
 }
 
 export { HalftonePass };
