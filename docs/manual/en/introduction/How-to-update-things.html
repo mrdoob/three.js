@@ -31,7 +31,7 @@ object.matrixAutoUpdate = false;
 object.updateMatrix();
 		</code>
 
-		<h2 id="buffergeometry">BufferGeometry<a href="#manual/en/introduction/How-to-update-things#buffergeometry" class="heading-link">#</a></h2>
+		<h2 id="buffergeometry">BufferGeometry<a href="#manual/en/introduction/How-to-update-things#buffergeometry" target="_parent" class="heading-link">#</a></h2>
 		<div>
 			<p>
 				BufferGeometries store information (such as vertex positions, face indices, normals, colors,
@@ -124,7 +124,7 @@ line.geometry.computeBoundingSphere();
 				[link:https://jsfiddle.net/t4m85pLr/1/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 			</p>
 
-			<h3 id="buffergeometry-examples">Examples<a href="#manual/en/introduction/How-to-update-things#buffergeometry-examples" class="heading-link">#</a></h3>
+			<h3 id="buffergeometry-examples">Examples<a href="#manual/en/introduction/How-to-update-things#buffergeometry-examples" target="_parent" class="heading-link">#</a></h3>
 
 			<p>
 				[example:webgl_custom_attributes WebGL / custom / attributes]<br />
@@ -133,7 +133,7 @@ line.geometry.computeBoundingSphere();
 
 		</div>
 
-		<h2 id="materials">Materials<a href="#manual/en/introduction/How-to-update-things#materials" class="heading-link">#</a></h2>
+		<h2 id="materials">Materials<a href="#manual/en/introduction/How-to-update-things#materials" target="_parent" class="heading-link">#</a></h2>
 		<div>
 			<p>All uniforms values can be changed freely (e.g. colors, textures, opacity, etc), values are sent to the shader every frame.</p>
 
@@ -164,12 +164,12 @@ line.geometry.computeBoundingSphere();
 
 			<p>You can freely change the material used for geometry chunks, however you cannot change how an object is divided into chunks (according to face materials). </p>
 
-			<h3 id="if-you-need-to-have-different-configurations-of-materials-during-runtime">If you need to have different configurations of materials during runtime:<a href="#manual/en/introduction/How-to-update-things#if-you-need-to-have-different-configurations-of-materials-during-runtime" class="heading-link">#</a></h3>
+			<h3 id="if-you-need-to-have-different-configurations-of-materials-during-runtime">If you need to have different configurations of materials during runtime:<a href="#manual/en/introduction/How-to-update-things#if-you-need-to-have-different-configurations-of-materials-during-runtime" target="_parent" class="heading-link">#</a></h3>
 			<p>If the number of materials / chunks is small, you could pre-divide the object beforehand (e.g. hair / face / body / upper clothes / trousers for a human, front / sides / top / glass / tire / interior for a car). </p>
 
 			<p>If the number is large (e.g. each face could be potentially different), consider a different solution, such as using attributes / textures to drive different per-face look.</p>
 
-			<h3 id="materials-examples">Examples<a href="#manual/en/introduction/How-to-update-things#materials-examples" class="heading-link">#</a></h3>
+			<h3 id="materials-examples">Examples<a href="#manual/en/introduction/How-to-update-things#materials-examples" target="_parent" class="heading-link">#</a></h3>
 			<p>
 				[example:webgl_materials_car WebGL / materials / car]<br />
 				[example:webgl_postprocessing_dof WebGL / webgl_postprocessing / dof]
@@ -177,7 +177,7 @@ line.geometry.computeBoundingSphere();
 		</div>
 
 
-		<h2 id="textures">Textures<a href="#manual/en/introduction/How-to-update-things#textures" class="heading-link">#</a></h2>
+		<h2 id="textures">Textures<a href="#manual/en/introduction/How-to-update-things#textures" target="_parent" class="heading-link">#</a></h2>
 		<div>
 			<p>Image, canvas, video and data textures need to have the following flag set if they are changed:</p>
 			<code>
@@ -185,7 +185,7 @@ line.geometry.computeBoundingSphere();
 			</code>
 			<p>Render targets update automatically.</p>
 
-			<h3 id="textures-examples">Examples<a href="#manual/en/introduction/How-to-update-things#textures-examples" class="heading-link">#</a></h3>
+			<h3 id="textures-examples">Examples<a href="#manual/en/introduction/How-to-update-things#textures-examples" target="_parent" class="heading-link">#</a></h3>
 			<p>
 				[example:webgl_materials_video WebGL / materials / video]<br />
 				[example:webgl_rtt WebGL / rtt]
@@ -194,7 +194,7 @@ line.geometry.computeBoundingSphere();
 		</div>
 
 
-		<h2 id="cameras">Cameras<a href="#manual/en/introduction/How-to-update-things#cameras" class="heading-link">#</a></h2>
+		<h2 id="cameras">Cameras<a href="#manual/en/introduction/How-to-update-things#cameras" target="_parent" class="heading-link">#</a></h2>
 		<div>
 			<p>A camera's position and target is updated automatically. If you need to change</p>
 			<ul>

@@ -248,18 +248,18 @@ a.param:hover {
 	color: var(--text-color);
 }
 
-h2 > a.heading-link {
+h2 > a.heading-link, h3 > a.heading-link {
 	display: none;
 	color: var(--text-color);
-	padding-left: 8px;
 	transition: color .16s linear;
 }
 
+h2 > a.heading-link {
+	padding-left: 8px;
+}
+
 h3 > a.heading-link {
-	display: none;
-	color: var(--text-color);
 	padding-left: 6px;
-	transition: color .16s linear;
 }
 
 a.heading-link:hover, a.heading-link:active {
