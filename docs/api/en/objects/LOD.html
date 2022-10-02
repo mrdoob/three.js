@@ -108,7 +108,9 @@
 		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 		Get intersections between a casted [page:Ray] and this LOD.
-		[page:Raycaster.intersectObject] will call this method.
+		[page:Raycaster.intersectObject] will call this method.<br /><br />
+
+		*Note*: Be sure that the world matrix is up-to-date at the considered frame for the raycasting to work properly.
 		</p>
 
 

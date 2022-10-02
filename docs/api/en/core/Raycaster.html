@@ -155,6 +155,7 @@
 		</p>
 		<p>
 		Updates the ray with a new origin and direction.
+		*Note* that this method relies on the camera world matrix. If you intend to use it on the same frame as a change of position/rotation/scale for the camera, it is highly recommended to update the world matrix on this frame before calling setFromCamera.
 		</p>
 
 		<h3>[method:Array intersectObject]( [param:Object3D object], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
@@ -183,7 +184,8 @@
 		`Raycaster` delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].
 		</p>
 		<p>
-		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to `THREE.DoubleSide`.
+		*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to `THREE.DoubleSide`.<br /><br />
+		*Note also* that some implementation of the [page:Object3D.raycast raycast] method rely on the object's world matrix. For instance, it is the case for [page:Mesh] or [page:InstancedMesh]. If you intend to raycast on the frame where a change in position, scale or rotation occurred without updating world matrix, you could hit the mesh where it is not anymore or not hit the mesh where it is now.
 		</p>
 
 		<h3>[method:Array intersectObjects]( [param:Array objects], [param:Boolean recursive], [param:Array optionalTarget] )</h3>
