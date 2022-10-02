@@ -182,7 +182,7 @@ class Sphere {
 
 			const delta = ( length - this.radius ) * 0.5;
 
-			this.center.add( _v1.multiplyScalar( delta / length ) );
+			this.center.addScaledVector( _v1, delta / length );
 
 			this.radius += delta;
 
