@@ -3,8 +3,7 @@ import { Vector3 } from './Vector3.js';
 
 const _box = /*@__PURE__*/ new Box3();
 const _v1 = /*@__PURE__*/ new Vector3();
-const _toFarthestPoint = /*@__PURE__*/ new Vector3();
-const _toPoint = /*@__PURE__*/ new Vector3();
+const _v2 = /*@__PURE__*/ new Vector3();
 
 class Sphere {
 
@@ -164,29 +163,28 @@ class Sphere {
 		if ( this.isEmpty() ) {
 
 			this.center.copy( point );
+
 			this.radius = 0;
 
 			return this;
 
 		}
 
-		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
+		_v1.subVectors( point, this.center );
 
-		_toPoint.subVectors( point, this.center );
-
-		const lengthSq = _toPoint.lengthSq();
+		const lengthSq = _v1.lengthSq();
 
 		if ( lengthSq > ( this.radius * this.radius ) ) {
 
+			// calculate the minimal sphere
+
 			const length = Math.sqrt( lengthSq );
-			const missingRadiusHalf = ( length - this.radius ) * 0.5;
 
-			// Nudge this sphere towards the target point. Add half the missing distance to radius,
-			// and the other half to position. This gives a tighter enclosure, instead of if
-			// the whole missing distance were just added to radius.
+			const delta = ( length - this.radius ) * 0.5;
 
-			this.center.add( _toPoint.multiplyScalar( missingRadiusHalf / length ) );
-			this.radius += missingRadiusHalf;
+			this.center.addScaledVector( _v1, delta / length );
+
+			this.radius += delta;
 
 		}
 
@@ -196,12 +194,13 @@ class Sphere {
 
 	union( sphere ) {
 
-		// handle empty sphere cases
 		if ( sphere.isEmpty() ) {
 
 			return this;
 
-		} else if ( this.isEmpty() ) {
+		}
+
+		if ( this.isEmpty() ) {
 
 			this.copy( sphere );
 
@@ -209,25 +208,19 @@ class Sphere {
 
 		}
 
-		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
+		if ( this.center.equals( sphere.center ) === true ) {
 
-		// To enclose another sphere into this sphere, we only need to enclose two points:
-		// 1) Enclose the farthest point on the other sphere into this sphere.
-		// 2) Enclose the opposite point of the farthest point into this sphere.
-
-		 if ( this.center.equals( sphere.center ) === true ) {
-
-			 _toFarthestPoint.set( 0, 0, 1 ).multiplyScalar( sphere.radius );
-
+			 this.radius = Math.max( this.radius, sphere.radius );
 
 		} else {
 
-			_toFarthestPoint.subVectors( sphere.center, this.center ).normalize().multiplyScalar( sphere.radius );
+			_v2.subVectors( sphere.center, this.center ).setLength( sphere.radius );
+
+			this.expandByPoint( _v1.copy( sphere.center ).add( _v2 ) );
+
+			this.expandByPoint( _v1.copy( sphere.center ).sub( _v2 ) );
 
 		}
-
-		this.expandByPoint( _v1.copy( sphere.center ).add( _toFarthestPoint ) );
-		this.expandByPoint( _v1.copy( sphere.center ).sub( _toFarthestPoint ) );
 
 		return this;
 
