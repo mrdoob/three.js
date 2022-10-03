@@ -124,17 +124,7 @@
 
 				} else {
 
-					// one way...
-					//texture.matrix.setUvTransform( API.offsetX, API.offsetY, API.repeatX, API.repeatY, API.rotation, API.centerX, API.centerY );
-
-					// another way...
-					texture.matrix
-					    .identity()
-					    .translate( - API.centerX, - API.centerY )
-					    .rotate( API.rotation )					// I don't understand how rotation can preceed scale, but it seems to be required...
-					    .scale( API.repeatX, API.repeatY )
-					    .translate( API.centerX, API.centerY )
-					    .translate( API.offsetX, API.offsetY );
+					texture.matrix.setUvTransform( API.offsetX, API.offsetY, API.repeatX, API.repeatY, API.rotation, API.centerX, API.centerY );
 
 				}
 
