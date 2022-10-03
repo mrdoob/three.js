@@ -126,6 +126,17 @@ class BokehPass extends Pass {
 
 	}
 
+	dispose() {
+
+		this.renderTargetDepth.dispose();
+
+		this.materialDepth.dispose();
+		this.materialBokeh.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
 }
 
 export { BokehPass };

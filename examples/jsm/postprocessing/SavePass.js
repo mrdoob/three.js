@@ -57,6 +57,16 @@ class SavePass extends Pass {
 
 	}
 
+	dispose() {
+
+		this.renderTarget.dispose();
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
 }
 
 export { SavePass };

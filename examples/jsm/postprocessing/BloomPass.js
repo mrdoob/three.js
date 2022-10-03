@@ -105,6 +105,18 @@ class BloomPass extends Pass {
 
 	}
 
+	dispose() {
+
+		this.renderTargetX.dispose();
+		this.renderTargetY.dispose();
+
+		this.materialCombine.dispose();
+		this.materialConvolution.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
 }
 
 const CombineShader = {

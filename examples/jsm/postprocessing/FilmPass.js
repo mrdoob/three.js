@@ -54,6 +54,14 @@ class FilmPass extends Pass {
 
 	}
 
+	dispose() {
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
 }
 
 export { FilmPass };
