@@ -15,14 +15,14 @@
 			this.textureOld = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
 				magFilter: THREE.NearestFilter
 			} );
-			this.shaderMaterial = new THREE.ShaderMaterial( {
+			this.compFsMaterial = new THREE.ShaderMaterial( {
 				uniforms: this.uniforms,
 				vertexShader: this.shader.vertexShader,
 				fragmentShader: this.shader.fragmentShader
 			} );
-			this.compFsQuad = new THREE.FullScreenQuad( this.shaderMaterial );
-			const material = new THREE.MeshBasicMaterial();
-			this.copyFsQuad = new THREE.FullScreenQuad( material );
+			this.compFsQuad = new THREE.FullScreenQuad( this.compFsMaterial );
+			this.copyFsMaterial = new THREE.MeshBasicMaterial();
+			this.copyFsQuad = new THREE.FullScreenQuad( this.copyFsMaterial );
 
 		}
 
@@ -60,6 +60,17 @@
 
 			this.textureComp.setSize( width, height );
 			this.textureOld.setSize( width, height );
+
+		}
+
+		dispose() {
+
+			this.textureComp.dispose();
+			this.textureOld.dispose();
+			this.compFsMaterial.dispose();
+			this.copyFsMaterial.dispose();
+			this.compFsQuad.dispose();
+			this.copyFsQuad.dispose();
 
 		}
 

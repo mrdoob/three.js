@@ -23,7 +23,7 @@
 			const lastQuaternion = new THREE.Quaternion();
 			const lastPosition = new THREE.Vector3();
 			this.tmpQuaternion = new THREE.Quaternion();
-			this.mouseStatus = 0;
+			this.status = 0;
 			this.moveState = {
 				up: 0,
 				down: 0,
@@ -175,11 +175,11 @@
 
 			};
 
-			this.mousedown = function ( event ) {
+			this.pointerdown = function ( event ) {
 
 				if ( this.dragToLook ) {
 
-					this.mouseStatus ++;
+					this.status ++;
 
 				} else {
 
@@ -201,9 +201,9 @@
 
 			};
 
-			this.mousemove = function ( event ) {
+			this.pointermove = function ( event ) {
 
-				if ( ! this.dragToLook || this.mouseStatus > 0 ) {
+				if ( ! this.dragToLook || this.status > 0 ) {
 
 					const container = this.getContainerDimensions();
 					const halfWidth = container.size[ 0 ] / 2;
@@ -216,11 +216,11 @@
 
 			};
 
-			this.mouseup = function ( event ) {
+			this.pointerup = function ( event ) {
 
 				if ( this.dragToLook ) {
 
-					this.mouseStatus --;
+					this.status --;
 					this.moveState.yawLeft = this.moveState.pitchDown = 0;
 
 				} else {
@@ -305,28 +305,28 @@
 			this.dispose = function () {
 
 				this.domElement.removeEventListener( 'contextmenu', contextmenu );
-				this.domElement.removeEventListener( 'mousedown', _mousedown );
-				this.domElement.removeEventListener( 'mousemove', _mousemove );
-				this.domElement.removeEventListener( 'mouseup', _mouseup );
+				this.domElement.removeEventListener( 'pointerdown', _pointerdown );
+				this.domElement.removeEventListener( 'pointermove', _pointermove );
+				this.domElement.removeEventListener( 'pointerup', _pointerup );
 				window.removeEventListener( 'keydown', _keydown );
 				window.removeEventListener( 'keyup', _keyup );
 
 			};
 
-			const _mousemove = this.mousemove.bind( this );
+			const _pointermove = this.pointermove.bind( this );
 
-			const _mousedown = this.mousedown.bind( this );
+			const _pointerdown = this.pointerdown.bind( this );
 
-			const _mouseup = this.mouseup.bind( this );
+			const _pointerup = this.pointerup.bind( this );
 
 			const _keydown = this.keydown.bind( this );
 
 			const _keyup = this.keyup.bind( this );
 
 			this.domElement.addEventListener( 'contextmenu', contextmenu );
-			this.domElement.addEventListener( 'mousemove', _mousemove );
-			this.domElement.addEventListener( 'mousedown', _mousedown );
-			this.domElement.addEventListener( 'mouseup', _mouseup );
+			this.domElement.addEventListener( 'pointerdown', _pointerdown );
+			this.domElement.addEventListener( 'pointermove', _pointermove );
+			this.domElement.addEventListener( 'pointerup', _pointerup );
 			window.addEventListener( 'keydown', _keydown );
 			window.addEventListener( 'keyup', _keyup );
 			this.updateMovementVector();

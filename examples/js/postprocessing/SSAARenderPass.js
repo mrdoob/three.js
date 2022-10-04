@@ -49,6 +49,9 @@
 
 			}
 
+			this.copyMaterial.dispose();
+			this.fsQuad.dispose();
+
 		}
 
 		setSize( width, height ) {

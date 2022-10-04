@@ -68,6 +68,13 @@
 
 		}
 
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
+
+		}
+
 	}
 
 	THREE.HalftonePass = HalftonePass;

@@ -4,6 +4,19 @@
 
 		constructor( octree, color = 0xffff00 ) {
 
+			super( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( {
+				color: color,
+				toneMapped: false
+			} ) );
+			this.octree = octree;
+			this.color = color;
+			this.type = 'OctreeHelper';
+			this.update();
+
+		}
+
+		update() {
+
 			const vertices = [];
 
 			function traverse( tree ) {
@@ -54,16 +67,17 @@
 
 			}
 
-			traverse( octree.subTrees );
-			const geometry = new THREE.BufferGeometry();
-			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-			super( geometry, new THREE.LineBasicMaterial( {
-				color: color,
-				toneMapped: false
-			} ) );
-			this.octree = octree;
-			this.color = color;
-			this.type = 'OctreeHelper';
+			traverse( this.octree.subTrees );
+			this.geometry.dispose();
+			this.geometry = new THREE.BufferGeometry();
+			this.geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+		}
+
+		dispose() {
+
+			this.geometry.dispose();
+			this.material.dispose();
 
 		}
 

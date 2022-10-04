@@ -8,7 +8,8 @@
 			if ( THREE.DigitalGlitch === undefined ) console.error( 'THREE.GlitchPass relies on THREE.DigitalGlitch' );
 			const shader = THREE.DigitalGlitch;
 			this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-			this.uniforms[ 'tDisp' ].value = this.generateHeightmap( dt_size );
+			this.heightMap = this.generateHeightmap( dt_size );
+			this.uniforms[ 'tDisp' ].value = this.heightMap;
 			this.material = new THREE.ShaderMaterial( {
 				uniforms: this.uniforms,
 				vertexShader: shader.vertexShader,
@@ -95,6 +96,14 @@
 			const texture = new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RedFormat, THREE.FloatType );
 			texture.needsUpdate = true;
 			return texture;
+
+		}
+
+		dispose() {
+
+			this.material.dispose();
+			this.heightMap.dispose();
+			this.fsQuad.dispose();
 
 		}
 

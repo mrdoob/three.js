@@ -44,6 +44,14 @@
 
 		}
 
+		dispose() {
+
+			this.renderTarget.dispose();
+			this.material.dispose();
+			this.fsQuad.dispose();
+
+		}
+
 	}
 
 	THREE.SavePass = SavePass;

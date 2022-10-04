@@ -43,6 +43,13 @@
 
 		}
 
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
+
+		}
+
 	}
 
 	THREE.FilmPass = FilmPass;

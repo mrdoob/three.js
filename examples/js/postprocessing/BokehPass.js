@@ -96,6 +96,15 @@
 
 		}
 
+		dispose() {
+
+			this.renderTargetDepth.dispose();
+			this.materialDepth.dispose();
+			this.materialBokeh.dispose();
+			this.fsQuad.dispose();
+
+		}
+
 	}
 
 	THREE.BokehPass = BokehPass;

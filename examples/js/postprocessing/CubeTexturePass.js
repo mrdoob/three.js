@@ -50,6 +50,13 @@
 
 		}
 
+		dispose() {
+
+			this.cubeMesh.geometry.dispose();
+			this.cubeMesh.material.dispose();
+
+		}
+
 	}
 
 	THREE.CubeTexturePass = CubeTexturePass;

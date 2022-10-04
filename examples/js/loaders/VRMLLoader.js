@@ -549,6 +549,7 @@
 
 				switch ( nodeName ) {
 
+					case 'Anchor':
 					case 'Group':
 					case 'Transform':
 					case 'Collision':
@@ -630,7 +631,6 @@
 						build = buildWorldInfoNode( node );
 						break;
 
-					case 'Anchor':
 					case 'Billboard':
 					case 'Inline':
 					case 'LOD':
@@ -709,7 +709,15 @@
 							parseFieldChildren( fieldValues, object );
 							break;
 
+						case 'description':
+							// field not supported
+							break;
+
 						case 'collide':
+							// field not supported
+							break;
+
+						case 'parameter':
 							// field not supported
 							break;
 
@@ -732,6 +740,10 @@
 							break;
 
 						case 'proxy':
+							// field not supported
+							break;
+
+						case 'url':
 							// field not supported
 							break;
 

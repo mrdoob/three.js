@@ -42,6 +42,13 @@
 
 		}
 
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
+
+		}
+
 	}
 
 	THREE.DotScreenPass = DotScreenPass;

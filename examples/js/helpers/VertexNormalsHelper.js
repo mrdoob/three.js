@@ -65,6 +65,13 @@
 
 		}
 
+		dispose() {
+
+			this.geometry.dispose();
+			this.material.dispose();
+
+		}
+
 	}
 
 	THREE.VertexNormalsHelper = VertexNormalsHelper;

@@ -24,17 +24,16 @@
 
 			if ( attribute.normalized || attribute.isInterleavedBufferAttribute ) {
 
-				const srcArray = attribute.isInterleavedBufferAttribute ? attribute.data.array : attribute.array;
 				const dstArray = new Float32Array( attribute.getCount() * attribute.itemSize );
 
 				for ( let i = 0, j = 0; i < attribute.getCount(); i ++ ) {
 
-					dstArray[ j ++ ] = THREE.MathUtils.denormalize( attribute.getX( i ), srcArray );
-					dstArray[ j ++ ] = THREE.MathUtils.denormalize( attribute.getY( i ), srcArray );
+					dstArray[ j ++ ] = attribute.getX( i );
+					dstArray[ j ++ ] = attribute.getY( i );
 
 					if ( attribute.itemSize > 2 ) {
 
-						dstArray[ j ++ ] = THREE.MathUtils.denormalize( attribute.getZ( i ), srcArray );
+						dstArray[ j ++ ] = attribute.getZ( i );
 
 					}
 
@@ -532,20 +531,23 @@
 		let nextIndex = 0; // attributes and new attribute arrays
 
 		const attributeNames = Object.keys( geometry.attributes );
-		const attrArrays = {};
-		const morphAttrsArrays = {};
+		const tmpAttributes = {};
+		const tmpMorphAttributes = {};
 		const newIndices = [];
-		const getters = [ 'getX', 'getY', 'getZ', 'getW' ]; // initialize the arrays
+		const getters = [ 'getX', 'getY', 'getZ', 'getW' ];
+		const setters = [ 'setX', 'setY', 'setZ', 'setW' ]; // Initialize the arrays, allocating space conservatively. Extra
+		// space will be trimmed in the last step.
 
 		for ( let i = 0, l = attributeNames.length; i < l; i ++ ) {
 
 			const name = attributeNames[ i ];
-			attrArrays[ name ] = [];
+			const attr = geometry.attributes[ name ];
+			tmpAttributes[ name ] = new THREE.BufferAttribute( new attr.array.constructor( attr.count * attr.itemSize ), attr.itemSize, attr.normalized );
 			const morphAttr = geometry.morphAttributes[ name ];
 
 			if ( morphAttr ) {
 
-				morphAttrsArrays[ name ] = new Array( morphAttr.length ).fill().map( () => [] );
+				tmpMorphAttributes[ name ] = new THREE.BufferAttribute( new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize ), morphAttr.itemSize, morphAttr.normalized );
 
 			}
 
@@ -584,26 +586,27 @@
 
 			} else {
 
-				// copy data to the new index in the attribute arrays
+				// copy data to the new index in the temporary attributes
 				for ( let j = 0, l = attributeNames.length; j < l; j ++ ) {
 
 					const name = attributeNames[ j ];
 					const attribute = geometry.getAttribute( name );
 					const morphAttr = geometry.morphAttributes[ name ];
 					const itemSize = attribute.itemSize;
-					const newarray = attrArrays[ name ];
-					const newMorphArrays = morphAttrsArrays[ name ];
+					const newarray = tmpAttributes[ name ];
+					const newMorphArrays = tmpMorphAttributes[ name ];
 
 					for ( let k = 0; k < itemSize; k ++ ) {
 
 						const getterFunc = getters[ k ];
-						newarray.push( attribute[ getterFunc ]( index ) );
+						const setterFunc = setters[ k ];
+						newarray[ setterFunc ]( nextIndex, attribute[ getterFunc ]( index ) );
 
 						if ( morphAttr ) {
 
 							for ( let m = 0, ml = morphAttr.length; m < ml; m ++ ) {
 
-								newMorphArrays[ m ].push( morphAttr[ m ][ getterFunc ]( index ) );
+								newMorphArrays[ m ][ setterFunc ]( nextIndex, morphAttr[ m ][ getterFunc ]( index ) );
 
 							}
 
@@ -619,30 +622,21 @@
 
 			}
 
-		} // Generate typed arrays from new attribute arrays and update
-		// the attributeBuffers
+		} // generate result THREE.BufferGeometry
 
 
 		const result = geometry.clone();
 
-		for ( let i = 0, l = attributeNames.length; i < l; i ++ ) {
+		for ( const name in geometry.attributes ) {
 
-			const name = attributeNames[ i ];
-			const oldAttribute = geometry.getAttribute( name );
-			const buffer = new oldAttribute.array.constructor( attrArrays[ name ] );
-			const attribute = new THREE.BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.normalized );
-			result.setAttribute( name, attribute ); // Update the attribute arrays
+			const tmpAttribute = tmpAttributes[ name ];
+			result.setAttribute( name, new THREE.BufferAttribute( tmpAttribute.array.slice( 0, nextIndex * tmpAttribute.itemSize ), tmpAttribute.itemSize, tmpAttribute.normalized ) );
+			if ( ! ( name in tmpMorphAttributes ) ) continue;
 
-			if ( name in morphAttrsArrays ) {
+			for ( let j = 0; j < tmpMorphAttributes[ name ].length; j ++ ) {
 
-				for ( let j = 0; j < morphAttrsArrays[ name ].length; j ++ ) {
-
-					const oldMorphAttribute = geometry.morphAttributes[ name ][ j ];
-					const buffer = new oldMorphAttribute.array.constructor( morphAttrsArrays[ name ][ j ] );
-					const morphAttribute = new THREE.BufferAttribute( buffer, oldMorphAttribute.itemSize, oldMorphAttribute.normalized );
-					result.morphAttributes[ name ][ j ] = morphAttribute;
-
-				}
+				const tmpMorphAttribute = tmpMorphAttributes[ name ][ j ];
+				result.morphAttributes[ name ][ j ] = new THREE.BufferAttribute( tmpMorphAttribute.array.slice( 0, nextIndex * tmpMorphAttribute.itemSize ), tmpMorphAttribute.itemSize, tmpMorphAttribute.normalized );
 
 			}
 

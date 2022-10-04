@@ -1106,5 +1106,9 @@
 	}
 
 	THREE.ConvexHull = ConvexHull;
+	THREE.Face = Face;
+	THREE.HalfEdge = HalfEdge;
+	THREE.VertexList = VertexList;
+	THREE.VertexNode = VertexNode;
 
 } )();

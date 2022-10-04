@@ -389,7 +389,6 @@
 				binary: false,
 				trs: false,
 				onlyVisible: true,
-				truncateDrawRange: true,
 				maxTextureSize: Infinity,
 				animations: [],
 				includeCustomExtensions: false
@@ -893,7 +892,6 @@
 
 		processAccessor( attribute, geometry, start, count ) {
 
-			const options = this.options;
 			const json = this.json;
 			const types = {
 				1: 'SCALAR',
@@ -927,18 +925,7 @@
 			}
 
 			if ( start === undefined ) start = 0;
-			if ( count === undefined ) count = attribute.count; // @TODO Indexed buffer geometry with drawRange not supported yet
-
-			if ( options.truncateDrawRange && geometry !== undefined && geometry.index === null ) {
-
-				const end = start + count;
-				const end2 = geometry.drawRange.count === Infinity ? attribute.count : geometry.drawRange.start + geometry.drawRange.count;
-				start = Math.max( start, geometry.drawRange.start );
-				count = Math.min( end, end2 ) - start;
-				if ( count < 0 ) count = 0;
-
-			} // Skip creating an accessor if the attribute doesn't have data to export
-
+			if ( count === undefined ) count = attribute.count; // Skip creating an accessor if the attribute doesn't have data to export
 
 			if ( count === 0 ) return null;
 			const minMax = getMinMax( attribute, start, count );

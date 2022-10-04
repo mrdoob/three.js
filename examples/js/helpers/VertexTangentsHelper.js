@@ -55,6 +55,13 @@
 
 		}
 
+		dispose() {
+
+			this.geometry.dispose();
+			this.material.dispose();
+
+		}
+
 	}
 
 	THREE.VertexTangentsHelper = VertexTangentsHelper;

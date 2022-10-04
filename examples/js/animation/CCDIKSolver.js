@@ -272,14 +272,14 @@
 
 	class CCDIKHelper extends THREE.Object3D {
 
-		constructor( mesh, iks = [] ) {
+		constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
 			super();
 			this.root = mesh;
 			this.iks = iks;
 			this.matrix.copy( mesh.matrixWorld );
 			this.matrixAutoUpdate = false;
-			this.sphereGeometry = new THREE.SphereGeometry( 0.25, 16, 8 );
+			this.sphereGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
 			this.targetSphereMaterial = new THREE.MeshBasicMaterial( {
 				color: new THREE.Color( 0xff8888 ),
 				depthTest: false,
@@ -365,6 +365,28 @@
 
 			this.matrix.copy( mesh.matrixWorld );
 			super.updateMatrixWorld( force );
+
+		}
+		/**
+   * Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+   */
+
+
+		dispose() {
+
+			this.sphereGeometry.dispose();
+			this.targetSphereMaterial.dispose();
+			this.effectorSphereMaterial.dispose();
+			this.linkSphereMaterial.dispose();
+			this.lineMaterial.dispose();
+			const children = this.children;
+
+			for ( let i = 0; i < children.length; i ++ ) {
+
+				const child = children[ i ];
+				if ( child.isLine ) child.geometry.dispose();
+
+			}
 
 		} // private method
 

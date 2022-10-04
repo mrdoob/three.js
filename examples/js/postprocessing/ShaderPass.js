@@ -56,6 +56,13 @@
 
 		}
 
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
+
+		}
+
 	}
 
 	THREE.ShaderPass = ShaderPass;

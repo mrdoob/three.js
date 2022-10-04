@@ -39,6 +39,13 @@
 
 		}
 
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
+
+		}
+
 	}
 
 	THREE.TexturePass = TexturePass;
