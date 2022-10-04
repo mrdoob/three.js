@@ -16300,6 +16300,14 @@ function WebGLState(gl, extensions, capabilities) {
 		}
 	}
 
+	function compressedTexImage3D() {
+		try {
+			gl.compressedTexImage3D.apply(gl, arguments);
+		} catch (error) {
+			console.error('THREE.WebGLState:', error);
+		}
+	}
+
 	function texSubImage2D() {
 		try {
 			gl.texSubImage2D.apply(gl, arguments);
@@ -16319,6 +16327,14 @@ function WebGLState(gl, extensions, capabilities) {
 	function compressedTexSubImage2D() {
 		try {
 			gl.compressedTexSubImage2D.apply(gl, arguments);
+		} catch (error) {
+			console.error('THREE.WebGLState:', error);
+		}
+	}
+
+	function compressedTexSubImage3D() {
+		try {
+			gl.compressedTexSubImage3D.apply(gl, arguments);
 		} catch (error) {
 			console.error('THREE.WebGLState:', error);
 		}
@@ -16486,6 +16502,7 @@ function WebGLState(gl, extensions, capabilities) {
 		bindTexture: bindTexture,
 		unbindTexture: unbindTexture,
 		compressedTexImage2D: compressedTexImage2D,
+		compressedTexImage3D: compressedTexImage3D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,
 		updateUBOMapping: updateUBOMapping,
@@ -16495,6 +16512,7 @@ function WebGLState(gl, extensions, capabilities) {
 		texSubImage2D: texSubImage2D,
 		texSubImage3D: texSubImage3D,
 		compressedTexSubImage2D: compressedTexSubImage2D,
+		compressedTexSubImage3D: compressedTexSubImage3D,
 		scissor: scissor,
 		viewport: viewport,
 		reset: reset
@@ -17086,28 +17104,56 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 					}
 				}
 			} else if (texture.isCompressedTexture) {
-				if (useTexStorage && allocateMemory) {
-					state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[0].width, mipmaps[0].height);
-				}
+				if (texture.isDataArrayTexture) {
+					if (useTexStorage && allocateMemory) {
+						state.texStorage3D(_gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, mipmaps[0].width, mipmaps[0].height, image.depth);
+					}
 
-				for (let i = 0, il = mipmaps.length; i < il; i++) {
-					mipmap = mipmaps[i];
+					for (let i = 0, il = mipmaps.length; i < il; i++) {
+						mipmap = mipmaps[i];
 
-					if (texture.format !== RGBAFormat) {
-						if (glFormat !== null) {
-							if (useTexStorage) {
-								state.compressedTexSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data);
+						if (texture.format !== RGBAFormat) {
+							if (glFormat !== null) {
+								if (useTexStorage) {
+									state.compressedTexSubImage3D(_gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, glType, 0);
+								} else {
+									state.compressedTexImage3D(_gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, mipmap.width, mipmap.height, image.depth, 0, mipmap.data);
+								}
 							} else {
-								state.compressedTexImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data);
+								console.warn('THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()');
 							}
 						} else {
-							console.warn('THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()');
+							if (useTexStorage) {
+								state.texSubImage3D(_gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data);
+							} else {
+								state.texImage3D(_gl.TEXTURE_2D_ARRAY, i, glInternalFormat, mipmap.width, mipmap.height, image.depth, 0, glFormat, glType, mipmap.data);
+							}
 						}
-					} else {
-						if (useTexStorage) {
-							state.texSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
+					}
+				} else {
+					if (useTexStorage && allocateMemory) {
+						state.texStorage2D(_gl.TEXTURE_2D, levels, glInternalFormat, mipmaps[0].width, mipmaps[0].height);
+					}
+
+					for (let i = 0, il = mipmaps.length; i < il; i++) {
+						mipmap = mipmaps[i];
+
+						if (texture.format !== RGBAFormat) {
+							if (glFormat !== null) {
+								if (useTexStorage) {
+									state.compressedTexSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data);
+								} else {
+									state.compressedTexImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data);
+								}
+							} else {
+								console.warn('THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()');
+							}
 						} else {
-							state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+							if (useTexStorage) {
+								state.texSubImage2D(_gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, glType, mipmap.data);
+							} else {
+								state.texImage2D(_gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data);
+							}
 						}
 					}
 				}
@@ -36033,3 +36079,4 @@ exports.ZeroSlopeEnding = ZeroSlopeEnding;
 exports.ZeroStencilOp = ZeroStencilOp;
 exports._SRGBAFormat = _SRGBAFormat;
 exports.sRGBEncoding = sRGBEncoding;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuY2pzIiwic291cmNlcyI6W10sInNvdXJjZXNDb250ZW50IjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9

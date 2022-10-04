@@ -35,7 +35,10 @@ import {
 	RGBAFormat,
 	RGFormat,
 	sRGBEncoding,
-	UnsignedByteType
+	UnsignedByteType,
+	DataArrayTexture,
+	ClampToEdgeWrapping,
+	NearestFilter
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
@@ -57,6 +60,7 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
+	VK_FORMAT_R8G8B8_SRGB,
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
@@ -236,16 +240,30 @@ class KTX2Loader extends Loader {
 
 	}
 
-	_createTextureFrom( transcodeResult ) {
+	_createTextureFrom( transcodeResult, layerCount ) {
 
 		const { mipmaps, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
 
 		if ( type === 'error' ) return Promise.reject( error );
 
 		const texture = new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
+
+
 		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.generateMipmaps = false;
+
+		if ( layerCount > 1 ) {
+
+			texture.isDataArrayTexture = true;
+			texture.wrapR = ClampToEdgeWrapping;
+			texture.image.depth = layerCount;
+			texture.unpackAlignment = 1;
+			texture.minFilter = NearestFilter;
+			texture.magFilter = NearestFilter;
+
+		}
+
 		texture.needsUpdate = true;
 		texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? sRGBEncoding : LinearEncoding;
 		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
@@ -270,13 +288,13 @@ class KTX2Loader extends Loader {
 		}
 
 		//
-
+		const { layerCount } = container;
 		const taskConfig = config;
 		const texturePending = this.init().then( () => {
 
 			return this.workerPool.postMessage( { type: 'transcode', buffer, taskConfig: taskConfig }, [ buffer ] );
 
-		} ).then( ( e ) => this._createTextureFrom( e.data ) );
+		} ).then( ( e ) => this._createTextureFrom( e.data, layerCount ) );
 
 		// Cache the task result.
 		_taskCache.set( buffer, { promise: texturePending } );
@@ -622,6 +640,7 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: RGBAFormat,
 	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: RGBAFormat,
 	[ VK_FORMAT_R8G8B8A8_UNORM ]: RGBAFormat,
+	[ VK_FORMAT_R8G8B8_SRGB ]: RGBAFormat,
 	[ VK_FORMAT_R8G8B8A8_SRGB ]: RGBAFormat,
 
 	[ VK_FORMAT_R32G32_SFLOAT ]: RGFormat,
@@ -641,6 +660,7 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: FloatType,
 	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: HalfFloatType,
 	[ VK_FORMAT_R8G8B8A8_UNORM ]: UnsignedByteType,
+	[ VK_FORMAT_R8G8B8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8G8B8A8_SRGB ]: UnsignedByteType,
 
 	[ VK_FORMAT_R32G32_SFLOAT ]: FloatType,
@@ -665,15 +685,13 @@ const ENCODING_MAP = {
 
 async function createDataTexture( container ) {
 
-	const { vkFormat, pixelWidth, pixelHeight, pixelDepth } = container;
+	const { vkFormat, pixelWidth, pixelHeight, pixelDepth, layerCount } = container;
 
 	if ( FORMAT_MAP[ vkFormat ] === undefined ) {
 
 		throw new Error( 'THREE.KTX2Loader: Unsupported vkFormat.' );
 
 	}
-
-	//
 
 	const level = container.levels[ 0 ];
 
@@ -733,8 +751,7 @@ async function createDataTexture( container ) {
 	}
 
 	//
-
-	const texture = pixelDepth === 0
+	const texture = layerCount > 1 ? new DataArrayTexture( view, pixelWidth, pixelHeight, layerCount ) : pixelDepth === 0
 		? new DataTexture( view, pixelWidth, pixelHeight )
 		: new Data3DTexture( view, pixelWidth, pixelHeight, pixelDepth );
 
