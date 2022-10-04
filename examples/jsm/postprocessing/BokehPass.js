@@ -31,7 +31,7 @@ class BokehPass extends Pass {
 
 		// render targets
 
-		this.renderTargetDepth = new WebGLRenderTarget( 1, 1, {
+		this.renderTargetDepth = new WebGLRenderTarget( 1, 1, { // will be resized later
 			minFilter: NearestFilter,
 			magFilter: NearestFilter
 		} );

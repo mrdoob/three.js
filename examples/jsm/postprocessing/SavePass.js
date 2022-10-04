@@ -32,7 +32,7 @@ class SavePass extends Pass {
 
 		if ( this.renderTarget === undefined ) {
 
-			this.renderTarget = new WebGLRenderTarget( 1, 1 );
+			this.renderTarget = new WebGLRenderTarget( 1, 1 ); // will be resized later
 			this.renderTarget.texture.name = 'SavePass.rt';
 
 		}

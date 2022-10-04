@@ -16,9 +16,9 @@ class BloomPass extends Pass {
 
 		// render targets
 
-		this.renderTargetX = new WebGLRenderTarget( 1, 1 );
+		this.renderTargetX = new WebGLRenderTarget( 1, 1 ); // will be resized later
 		this.renderTargetX.texture.name = 'BloomPass.x';
-		this.renderTargetY = new WebGLRenderTarget( 1, 1 );
+		this.renderTargetY = new WebGLRenderTarget( 1, 1 ); // will be resized later
 		this.renderTargetY.texture.name = 'BloomPass.y';
 
 		// combine material
