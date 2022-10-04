@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '145';
+const REVISION = '146dev';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -4055,28 +4055,28 @@ class Box3 {
 
 		_v1$7.subVectors(triangle.b, _center);
 
-		_v2$3.subVectors(triangle.c, _center); // compute edge vectors for triangle
+		_v2$4.subVectors(triangle.c, _center); // compute edge vectors for triangle
 
 
 		_f0.subVectors(_v1$7, _v0$2);
 
-		_f1.subVectors(_v2$3, _v1$7);
+		_f1.subVectors(_v2$4, _v1$7);
 
-		_f2.subVectors(_v0$2, _v2$3); // test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
+		_f2.subVectors(_v0$2, _v2$4); // test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
 		// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
 		// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
 
 
 		let axes = [0, -_f0.z, _f0.y, 0, -_f1.z, _f1.y, 0, -_f2.z, _f2.y, _f0.z, 0, -_f0.x, _f1.z, 0, -_f1.x, _f2.z, 0, -_f2.x, -_f0.y, _f0.x, 0, -_f1.y, _f1.x, 0, -_f2.y, _f2.x, 0];
 
-		if (!satForAxes(axes, _v0$2, _v1$7, _v2$3, _extents)) {
+		if (!satForAxes(axes, _v0$2, _v1$7, _v2$4, _extents)) {
 			return false;
 		} // test 3 face normals from the aabb
 
 
 		axes = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 
-		if (!satForAxes(axes, _v0$2, _v1$7, _v2$3, _extents)) {
+		if (!satForAxes(axes, _v0$2, _v1$7, _v2$4, _extents)) {
 			return false;
 		} // finally testing the face normal of the triangle
 		// use already existing triangle edge vectors here
@@ -4085,7 +4085,7 @@ class Box3 {
 		_triangleNormal.crossVectors(_f0, _f1);
 
 		axes = [_triangleNormal.x, _triangleNormal.y, _triangleNormal.z];
-		return satForAxes(axes, _v0$2, _v1$7, _v2$3, _extents);
+		return satForAxes(axes, _v0$2, _v1$7, _v2$4, _extents);
 	}
 
 	clampPoint(point, target) {
@@ -4173,7 +4173,7 @@ const _v0$2 = /*@__PURE__*/new Vector3();
 
 const _v1$7 = /*@__PURE__*/new Vector3();
 
-const _v2$3 = /*@__PURE__*/new Vector3(); // triangle edge vectors
+const _v2$4 = /*@__PURE__*/new Vector3(); // triangle edge vectors
 
 
 const _f0 = /*@__PURE__*/new Vector3();
@@ -4215,9 +4215,7 @@ const _box$2 = /*@__PURE__*/new Box3();
 
 const _v1$6 = /*@__PURE__*/new Vector3();
 
-const _toFarthestPoint = /*@__PURE__*/new Vector3();
-
-const _toPoint = /*@__PURE__*/new Vector3();
+const _v2$3 = /*@__PURE__*/new Vector3();
 
 class Sphere {
 	constructor(center = new Vector3(), radius = -1) {
@@ -4327,47 +4325,42 @@ class Sphere {
 			this.center.copy(point);
 			this.radius = 0;
 			return this;
-		} // from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
+		}
 
+		_v1$6.subVectors(point, this.center);
 
-		_toPoint.subVectors(point, this.center);
-
-		const lengthSq = _toPoint.lengthSq();
+		const lengthSq = _v1$6.lengthSq();
 
 		if (lengthSq > this.radius * this.radius) {
+			// calculate the minimal sphere
 			const length = Math.sqrt(lengthSq);
-			const missingRadiusHalf = (length - this.radius) * 0.5; // Nudge this sphere towards the target point. Add half the missing distance to radius,
-			// and the other half to position. This gives a tighter enclosure, instead of if
-			// the whole missing distance were just added to radius.
-
-			this.center.add(_toPoint.multiplyScalar(missingRadiusHalf / length));
-			this.radius += missingRadiusHalf;
+			const delta = (length - this.radius) * 0.5;
+			this.center.addScaledVector(_v1$6, delta / length);
+			this.radius += delta;
 		}
 
 		return this;
 	}
 
 	union(sphere) {
-		// handle empty sphere cases
 		if (sphere.isEmpty()) {
 			return this;
-		} else if (this.isEmpty()) {
-			this.copy(sphere);
-			return this;
-		} // from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
-		// To enclose another sphere into this sphere, we only need to enclose two points:
-		// 1) Enclose the farthest point on the other sphere into this sphere.
-		// 2) Enclose the opposite point of the farthest point into this sphere.
-
-
-		if (this.center.equals(sphere.center) === true) {
-			_toFarthestPoint.set(0, 0, 1).multiplyScalar(sphere.radius);
-		} else {
-			_toFarthestPoint.subVectors(sphere.center, this.center).normalize().multiplyScalar(sphere.radius);
 		}
 
-		this.expandByPoint(_v1$6.copy(sphere.center).add(_toFarthestPoint));
-		this.expandByPoint(_v1$6.copy(sphere.center).sub(_toFarthestPoint));
+		if (this.isEmpty()) {
+			this.copy(sphere);
+			return this;
+		}
+
+		if (this.center.equals(sphere.center) === true) {
+			this.radius = Math.max(this.radius, sphere.radius);
+		} else {
+			_v2$3.subVectors(sphere.center, this.center).setLength(sphere.radius);
+
+			this.expandByPoint(_v1$6.copy(sphere.center).add(_v2$3));
+			this.expandByPoint(_v1$6.copy(sphere.center).sub(_v2$3));
+		}
+
 		return this;
 	}
 
@@ -16515,7 +16508,7 @@ function WebGLTextures(_gl, extensions, state, properties, capabilities, utils, 
 	const maxTextureSize = capabilities.maxTextureSize;
 	const maxSamples = capabilities.maxSamples;
 	const multisampledRTTExt = extensions.has('WEBGL_multisampled_render_to_texture') ? extensions.get('WEBGL_multisampled_render_to_texture') : null;
-	const supportsInvalidateFramebuffer = /OculusBrowser/g.test(navigator.userAgent);
+	const supportsInvalidateFramebuffer = /OculusBrowser/g.test(typeof navigator === 'undefined' ? '' : navigator.userAgent);
 
 	const _videoTextures = new WeakMap();
 
