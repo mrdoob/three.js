@@ -86,7 +86,7 @@
 
 			let container, progressBarDiv, samplesEl;
 			let camera, scene, renderer, controls, gui;
-			let pathTracer, sceneInfo, fsQuad;
+			let pathTracer, sceneInfo, fsQuad, floor;
 			let delaySamples = 0;
 
 			const params = {
@@ -97,12 +97,14 @@
 				resolutionScale: 1 / window.devicePixelRatio,
 				download: () => {
 
-					var link = document.createElement('a');
+					const link = document.createElement('a');
 					link.download = 'filename.png';
-					link.href = renderer.domElement.toDataURL().replace("image/png", "image/octet-stream");
+					link.href = renderer.domElement.toDataURL().replace( 'image/png', 'image/octet-stream' );
 					link.click();
 
 				},
+				roughness: 0.01,
+				metalness: 1,
 			};
 
 			init();
@@ -146,6 +148,7 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', () => {
 
+					delaySamples = 5;
 					pathTracer.reset();
 
 				} );
@@ -227,7 +230,7 @@
 				controls.reset();
 
 				// add floor
-				const floor = new THREE.Mesh(
+				floor = new THREE.Mesh(
 					new THREE.PlaneGeometry(),
 					new THREE.MeshStandardMaterial( {
 						side: THREE.DoubleSide,
@@ -338,8 +341,19 @@
 					pathTracer.tiles.set( v, v );
 
 				} );
+				gui.add( params, 'download' ).name( 'download image' );
 
-				gui.add( params, 'download' );
+				const floorFolder = gui.addFolder( 'floor' );
+				floorFolder.add( params, 'roughness', 0, 1 ).onChange( () => {
+
+					pathTracer.reset();
+
+				} );
+				floorFolder.add( params, 'metalness', 0, 1 ).onChange( () => {
+
+					pathTracer.reset();
+
+				} );
 
 			}
 
@@ -366,12 +380,12 @@
 					const samples = Math.floor( pathTracer.samples );
 					samplesEl.innerText = `samples: ${ samples }`;
 
+					floor.material.roughness = params.roughness;
+					floor.material.metalness = params.metalness;
+
 					pathTracer.material.materials.updateFrom( sceneInfo.materials, sceneInfo.textures );
-					// pathTracer.material.filterGlossyFactor = params.filterGlossyFactor;
-					// pathTracer.material.environmentIntensity = params.environmentIntensity;
 					pathTracer.material.filterGlossyFactor = 0.5;
 					pathTracer.material.environmentIntensity = 3;
-					// pathTracer.material.bounces = params.bounces;
 					pathTracer.material.physicalCamera.updateFrom( camera );
 
 					camera.updateMatrixWorld();
