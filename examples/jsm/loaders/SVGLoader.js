@@ -1588,7 +1588,100 @@ class SVGLoader extends Loader {
 
 			}
 
-			const isRotated = isTransformRotated( m );
+			function ellipseMatrixForm( curve, out ) {
+
+				// Build matrix form of the original ellipse curve
+				// See: https://en.wikipedia.org/wiki/Ellipse → General ellipse
+
+				const a = curve.xRadius;
+				const b = curve.yRadius;
+
+				const x0 = curve.aX;
+				const y0 = curve.aY;
+				const theta = curve.aRotation;
+				const sth = Math.sin( theta );
+				const cth = Math.cos( theta );
+
+				const A = a * a * sth * sth + b * b * cth * cth;
+				const B = 2 * (b * b - a * a) * sth * cth;
+				const C = a * a * cth * cth + b * b * sth * sth;
+				const D = -2 * A * x0 - B * y0;
+				const E = -B * x0 - 2 * C * y0;
+				const F = A * x0 * x0 + B * x0 * y0 + C * y0 * y0 - a * a * b * b;
+
+				let result = out || new Matrix3();
+
+				return result.set(
+					A,   B/2, D/2,
+					B/2, C,   E/2,
+					D/2, E/2, F,
+				);
+
+			}
+
+			function transfEllipse( curve ) {
+
+				// See:
+				// - https://math.stackexchange.com/questions/1498799/
+				// - https://math.stackexchange.com/questions/3076317/
+
+				const mQ = ellipseMatrixForm( curve, tempTransform0 );
+				const mInvT = tempTransform1.copy( m ).invert();
+				const mQNew = tempTransform2.copy( mInvT ).transpose().multiply( mQ ).multiply( mInvT );
+
+				// Perform de-composition
+
+				const elem = mQNew.elements;
+				const A = elem[ 0 ];
+				const B = elem[ 1 ] * 2;
+				const C = elem[ 4 ];
+				const D = elem[ 2 ] * 2;
+				const E = elem[ 5 ] * 2;
+				const F = elem[ 8 ];
+
+				// Compute canonical ellipse params
+
+				const discriminant = B * B - 4 * A * C;
+
+				const abP1 = 2 * ( A * E * E + C * D * D - B * D * E + discriminant * F );
+				const abP2 = Math.sqrt( ( A - C ) * ( A - C ) + B * B );
+
+				const a = Math.sqrt( abP1 * ( A + C + abP2 ) ) / discriminant;
+				const b = Math.sqrt( abP1 * ( A + C - abP2 ) ) / discriminant;
+
+				const x0 = ( 2 * C * D - B * E ) / discriminant;
+				const y0 = ( 2 * A * E - B * D ) / discriminant;
+
+				let theta = 0;
+
+				if ( B !== 0 ) {
+
+					theta = Math.atan( ( C - A - Math.sqrt( ( A - C ) * ( A - C ) + B * B ) ) / B );
+
+				} else if ( A > C ) {
+
+					theta = Math.PI / 2;
+
+				}
+
+				// Update data in-place
+
+				curve.aX = x0;
+				curve.aY = y0;
+				curve.xRadius = a;
+				curve.yRadius = b;
+				curve.aRotation = theta;
+
+				// TODO: Linear algebra voodoo required!
+				// We should also re-map start/end angles to the domain of the new ellipse.
+				// Can’t find a correct analytical way to compute it. Help is much appreciated.
+				// As a starting point see: https://math.stackexchange.com/questions/4544164/
+				//curve.aStartAngle = ???;
+				//curve.aEndAngle = ???;
+
+				return curve;
+
+			}
 
 			const subPaths = path.subPaths;
 
@@ -1621,19 +1714,41 @@ class SVGLoader extends Loader {
 
 					} else if ( curve.isEllipseCurve ) {
 
-						if ( isRotated ) {
+						if ( isTransformSkewed( m ) ) {
 
-							console.warn( 'SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented.' );
+							if ( ( curve.aEndAngle - curve.aStartAngle ) % ( 2 * Math.PI ) !== 0 ) {
+
+								console.warn( 'SVGLoader: Elliptic arc skewing is not implemented.' );
+
+							}
+
+							transfEllipse( curve );
+
+						} else {
+
+							// Faster shortcut if no skew is applied
+							// (e.g, a euclidean transform of a group containing the ellipse)
+
+							tempV2.set( curve.aX, curve.aY );
+							transfVec2( tempV2 );
+							curve.aX = tempV2.x;
+							curve.aY = tempV2.y;
+
+							const sx = getTransformScaleX( m );
+							const sy = getTransformScaleY( m );
+
+							curve.xRadius *= sx;
+							curve.yRadius *= sy;
+
+							if ( isTransformRotated( m ) ) {
+
+								const sin = m.elements[ 1 ] / sx;
+								const cos = m.elements[ 0 ] / sx;
+								curve.aRotation += Math.atan2( sin, cos );
+
+							}
 
 						}
-
-						tempV2.set( curve.aX, curve.aY );
-						transfVec2( tempV2 );
-						curve.aX = tempV2.x;
-						curve.aY = tempV2.y;
-
-						curve.xRadius *= getTransformScaleX( m );
-						curve.yRadius *= getTransformScaleY( m );
 
 					}
 
@@ -1646,6 +1761,14 @@ class SVGLoader extends Loader {
 		function isTransformRotated( m ) {
 
 			return m.elements[ 1 ] !== 0 || m.elements[ 3 ] !== 0;
+
+		}
+
+		function isTransformSkewed( m ) {
+
+			const te = m.elements;
+			const basisDot = te[ 0 ] * te[ 3 ] + te[ 1 ] * te [ 4 ];
+			return basisDot !== 0;
 
 		}
 
