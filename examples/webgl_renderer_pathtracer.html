@@ -12,7 +12,7 @@
 			}
 
 			a {
-				color: #08f;
+				color: #fb8c00;
 			}
 
 			#samples-container {
@@ -44,9 +44,10 @@
 		</style>
 	</head>
 
-	<body class="checkerboard">
+	<body>
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> raycaster - <a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">three-gpu-pathtracer</a><br/>
+			See <a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">main project repository</a> for more information and examples on high fidelity path tracing.
 		</div>
 		<div id="samples-container">
 			<div id="samples">--</div>
@@ -118,7 +119,7 @@
 				camera.position.set( 150, 200, 250 );
 
 				// initialize the renderer
-				renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true, premultipliedAlpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true, premultipliedAlpha: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
@@ -169,11 +170,11 @@
 				// load materials and then the model
 				createGUI();
 
-				reloadObject( true );
+				loadModel();
 
 			}
 
-			async function reloadObject() {
+			async function loadModel() {
 
 				progressBarDiv.innerText = 'Loading...';
 
@@ -219,6 +220,7 @@
 				await Promise.all( [ envMapPromise, ldrawPromise ] );
 
 				hideProgressBar();
+				document.body.classList.add( 'checkerboard' );
 
 				// Adjust camera
 				const bbox = new THREE.Box3().setFromObject( model );
@@ -341,19 +343,18 @@
 					pathTracer.tiles.set( v, v );
 
 				} );
+				gui.add( params, 'roughness', 0, 1 ).name( 'floor roughness' ).onChange( () => {
+
+					pathTracer.reset();
+
+				} );
+				gui.add( params, 'metalness', 0, 1 ).name( 'floor metalness' ).onChange( () => {
+
+					pathTracer.reset();
+
+				} );
 				gui.add( params, 'download' ).name( 'download image' );
 
-				const floorFolder = gui.addFolder( 'floor' );
-				floorFolder.add( params, 'roughness', 0, 1 ).onChange( () => {
-
-					pathTracer.reset();
-
-				} );
-				floorFolder.add( params, 'metalness', 0, 1 ).onChange( () => {
-
-					pathTracer.reset();
-
-				} );
 
 			}
 
