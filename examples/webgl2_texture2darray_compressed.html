@@ -118,33 +118,43 @@
 
 
 			
-					ktx2Loader.load( 'models/gltf/Sougen/atlas.ktx2', function ( texture ) {
+					ktx2Loader.load( 'models/gltf/Sougen/textures.ktx', function ( texture ) {
 
-						const material = new THREE.MeshStandardMaterial( { map: texture, defines: {
-							USE_NORMALMAP: true,
-							TANGENTSPACE_NORMALMAP: true
-						} } );
+						const material = new THREE.MeshStandardMaterial( { map: texture } );
 
 						material.onBeforeCompile = function ( shader ) {
+
+							shader.vertexShader = `
+							varying vec3 vWorldPosition;
+							${shader.vertexShader}`;
+
+							shader.vertexShader = shader.vertexShader.replace(
+								'#include <worldpos_vertex>',
+								`
+								#include <worldpos_vertex>
+								vWorldPosition = position.xyz;`
+							);
 
 							shader.fragmentShader = shader.fragmentShader.replace(
 								'#include <map_pars_fragment>',
 								`
-								uniform mat3 normalMatrix;
+								varying vec3 vWorldPosition;
 								precision highp sampler2DArray;
 								uniform sampler2DArray map;`
 							);
 
 							shader.fragmentShader = shader.fragmentShader.replace(
-								'#include <normal_fragment_maps>',
-								`
-								vec3 mapN = texture( map, vec3( vUv , 1 ) ).xyz * 2.0 - 1.0;
-								normal = perturbNormal2Arb( - vViewPosition, normal, mapN, faceDirection );
-								`
-							);
-							shader.fragmentShader = shader.fragmentShader.replace(
 								'#include <map_fragment>',
-								'diffuseColor *= texture( map, vec3( vUv, 1 ) );'
+								`
+								if ( vWorldPosition.x > 0. ) {
+
+									diffuseColor *= texture( map, vec3( vUv, 0 ) );
+
+								} else {
+
+									diffuseColor *= texture( map, vec3( vUv, 1 ) );
+
+								}`
 							);
 
 						};

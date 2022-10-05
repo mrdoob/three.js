@@ -36,9 +36,7 @@ import {
 	RGFormat,
 	sRGBEncoding,
 	UnsignedByteType,
-	DataArrayTexture,
 	ClampToEdgeWrapping,
-	NearestFilter
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
@@ -60,7 +58,6 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
-	VK_FORMAT_R8G8B8_SRGB,
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
@@ -258,9 +255,6 @@ class KTX2Loader extends Loader {
 			texture.isDataArrayTexture = true;
 			texture.wrapR = ClampToEdgeWrapping;
 			texture.image.depth = layerCount;
-			texture.unpackAlignment = 1;
-			texture.minFilter = NearestFilter;
-			texture.magFilter = NearestFilter;
 
 		}
 
@@ -459,6 +453,8 @@ KTX2Loader.BasisWorker = function () {
 		const hasAlpha = ktx2File.getHasAlpha();
 		const dfdTransferFn = ktx2File.getDFDTransferFunc();
 		const dfdFlags = ktx2File.getDFDFlags();
+		// WIP - might be useful
+		// const layers = ktx2File.getLayers();
 
 		const { transcoderFormat, engineFormat } = getTranscoderFormat( basisFormat, width, height, hasAlpha );
 
@@ -476,6 +472,7 @@ KTX2Loader.BasisWorker = function () {
 
 		}
 
+		// WIP - Add safety check for compressed textures format, (ect1s has to been power of 4 and so on)
 		const mipmaps = [];
 
 		for ( let mip = 0; mip < levels; mip ++ ) {
@@ -484,7 +481,6 @@ KTX2Loader.BasisWorker = function () {
 			const mipWidth = levelInfo.origWidth;
 			const mipHeight = levelInfo.origHeight;
 			const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, 0, 0, transcoderFormat ) );
-
 			const status = ktx2File.transcodeImage(
 				dst,
 				mip,
@@ -503,7 +499,15 @@ KTX2Loader.BasisWorker = function () {
 
 			}
 
-			mipmaps.push( { data: dst, width: mipWidth, height: mipHeight } );
+			// WIP - manually create en array buffer to test the webgl implentation
+			// it is composed of 2 layers so 8 * 8 because ktx returns only 1 layer
+			// first buffer is red 8 bits
+			// second buffer is black 8 bits
+			const dstTest = [ 0, 248, 0, 240, 170, 170, 170, 170, 0, 0, 0, 0, 0, 0, 0, 0 ];
+
+			mipmaps.push( { data: new Uint8Array( dstTest ), width: mipWidth, height: mipHeight } );
+			// WIP Go back to dst
+			// mipmaps.push( { data: new Uint8Array( dst ), width: mipWidth, height: mipHeight } );
 
 		}
 
@@ -640,7 +644,6 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: RGBAFormat,
 	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: RGBAFormat,
 	[ VK_FORMAT_R8G8B8A8_UNORM ]: RGBAFormat,
-	[ VK_FORMAT_R8G8B8_SRGB ]: RGBAFormat,
 	[ VK_FORMAT_R8G8B8A8_SRGB ]: RGBAFormat,
 
 	[ VK_FORMAT_R32G32_SFLOAT ]: RGFormat,
@@ -660,7 +663,6 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R32G32B32A32_SFLOAT ]: FloatType,
 	[ VK_FORMAT_R16G16B16A16_SFLOAT ]: HalfFloatType,
 	[ VK_FORMAT_R8G8B8A8_UNORM ]: UnsignedByteType,
-	[ VK_FORMAT_R8G8B8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8G8B8A8_SRGB ]: UnsignedByteType,
 
 	[ VK_FORMAT_R32G32_SFLOAT ]: FloatType,
@@ -749,9 +751,9 @@ async function createDataTexture( container ) {
 		view = levelData;
 
 	}
-
 	//
-	const texture = layerCount > 1 ? new DataArrayTexture( view, pixelWidth, pixelHeight, layerCount ) : pixelDepth === 0
+
+	const texture = pixelDepth === 0
 		? new DataTexture( view, pixelWidth, pixelHeight )
 		: new Data3DTexture( view, pixelWidth, pixelHeight, pixelDepth );
 
