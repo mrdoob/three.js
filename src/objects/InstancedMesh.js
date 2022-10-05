@@ -25,9 +25,9 @@ class InstancedMesh extends Mesh {
 
 		this.frustumCulled = false;
 
-		for ( let i = 0; i < count; i++ ) {
+		for ( let i = 0; i < count; i ++ ) {
 
-			this.setMatrixAt(i, _identity)
+			this.setMatrixAt( i, _identity );
 
 		}
 
