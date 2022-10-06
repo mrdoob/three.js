@@ -1603,18 +1603,18 @@ class SVGLoader extends Loader {
 				const cth = Math.cos( theta );
 
 				const A = a * a * sth * sth + b * b * cth * cth;
-				const B = 2 * (b * b - a * a) * sth * cth;
+				const B = 2 * ( b * b - a * a ) * sth * cth;
 				const C = a * a * cth * cth + b * b * sth * sth;
-				const D = -2 * A * x0 - B * y0;
-				const E = -B * x0 - 2 * C * y0;
+				const D = - 2 * A * x0 - B * y0;
+				const E = - B * x0 - 2 * C * y0;
 				const F = A * x0 * x0 + B * x0 * y0 + C * y0 * y0 - a * a * b * b;
 
-				let result = out || new Matrix3();
+				const result = out || new Matrix3();
 
 				return result.set(
-					A,   B/2, D/2,
-					B/2, C,   E/2,
-					D/2, E/2, F,
+					A, B / 2, D / 2,
+					B / 2, C, E / 2,
+					D / 2, E / 2, F,
 				);
 
 			}
@@ -1767,7 +1767,7 @@ class SVGLoader extends Loader {
 		function isTransformSkewed( m ) {
 
 			const te = m.elements;
-			const basisDot = te[ 0 ] * te[ 3 ] + te[ 1 ] * te [ 4 ];
+			const basisDot = te[ 0 ] * te[ 3 ] + te[ 1 ] * te[ 4 ];
 			return basisDot !== 0;
 
 		}
