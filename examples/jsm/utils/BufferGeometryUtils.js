@@ -124,6 +124,14 @@ function mergeBufferGeometries( geometries, useGroups = false ) {
 
 	const mergedGeometry = new BufferGeometry();
 
+	let mergedUserData;
+
+	if ( geometries.some( ( geometry ) => Object.keys( geometry.userData ).length > 0 ) ) {
+
+		mergedUserData = [];
+
+	}
+
 	let offset = 0;
 
 	for ( let i = 0; i < geometries.length; ++ i ) {
@@ -192,10 +200,11 @@ function mergeBufferGeometries( geometries, useGroups = false ) {
 
 		}
 
-		// gather .userData
+		if ( mergedUserData ) {
 
-		mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
-		mergedGeometry.userData.mergedUserData.push( geometry.userData );
+			mergedUserData.push( geometry.userData );
+
+		}
 
 		if ( useGroups ) {
 
@@ -299,6 +308,12 @@ function mergeBufferGeometries( geometries, useGroups = false ) {
 			mergedGeometry.morphAttributes[ name ].push( mergedMorphAttribute );
 
 		}
+
+	}
+
+	if ( mergedUserData ) {
+
+		mergedGeometry.userData.mergedUserData = mergedUserData;
 
 	}
 
