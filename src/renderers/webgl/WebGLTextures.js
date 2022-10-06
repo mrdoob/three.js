@@ -858,7 +858,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					if ( useTexStorage && allocateMemory ) {
 
-						state.texStorage3D( _gl.TEXTURE_2D_ARRAY, image.depth, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height, image.depth );
+						state.texStorage3D( _gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height, image.depth );
 
 					}
 
@@ -877,7 +877,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 								} else {
 
-									state.compressedTexImage3D( _gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, mipmap.width, mipmap.height, image.depth, 0, mipmap.data, 0, 0 );
+									state.compressedTexImage3D( _gl.TEXTURE_2D_ARRAY, i, glInternalFormat, mipmap.width, mipmap.height, image.depth, 0, mipmap.data, 0, 0 );
 
 								}
 
