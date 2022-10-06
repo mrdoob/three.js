@@ -46,9 +46,10 @@
 				light1, light2, light3, light4,
 				stats, controls;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -162,8 +163,6 @@
 				gui.add( centerObject.material, 'roughness', 0, 1, 0.01 );
 				gui.add( centerObject.material, 'metalness', 0, 1, 0.01 );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -213,12 +212,6 @@
 				if ( time > 3.5 && light4.parent === null ) scene.add( light4 );
 */
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

@@ -40,9 +40,10 @@
 			let camera, scene, renderer;
 			let controls;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -152,8 +153,6 @@
 
 				gui.add( timer, 'scale', 0, 1, 0.01 ).name( 'speed' );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -177,12 +176,6 @@
 			function render() {
 
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

@@ -41,9 +41,10 @@
 
 			let imageWidth = 1, imageHeight = 1;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -116,8 +117,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -158,12 +157,6 @@
 				group.rotation.z = time * 1.0;
 
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

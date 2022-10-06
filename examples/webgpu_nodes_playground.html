@@ -73,9 +73,10 @@
 			let model;
 			let nodeEditor;
 
-			init().then( animate ).catch( error => console.error( error ) );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -121,8 +122,6 @@
 				initEditor();
 
 				onWindowResize();
-
-				return renderer.init();
 
 			}
 

@@ -38,9 +38,10 @@
 
 			let mixer, clock;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -96,8 +97,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -118,12 +117,6 @@
 				if ( mixer ) mixer.update( delta );
 
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

@@ -44,9 +44,10 @@
 
 			let camera, scene, renderer;
 
-			init().then( render ).catch( error );
+			init();
+			render();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -122,8 +123,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				if ( renderer.init ) return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -142,12 +141,6 @@
 				requestAnimationFrame( render );
 
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

@@ -37,9 +37,10 @@
 
 			let light1, light2, light3;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -136,10 +137,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				//
-
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -171,12 +168,6 @@
 				light3.position.z = Math.sin( time * 0.5 ) * scale;
 
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

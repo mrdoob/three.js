@@ -37,9 +37,10 @@
 
 			let box;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -183,8 +184,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -235,12 +234,6 @@
 				const texture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
 				texture.needsUpdate = true;
 				return texture;
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

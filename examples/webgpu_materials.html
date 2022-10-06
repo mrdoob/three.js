@@ -44,9 +44,10 @@
 
 			const objects = [], materials = [];
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -209,8 +210,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 

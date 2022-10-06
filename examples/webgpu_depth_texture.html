@@ -42,9 +42,10 @@
 
 			const dpr = window.devicePixelRatio;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -121,10 +122,6 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 
-				//
-
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -143,12 +140,6 @@
 
 				textureRenderer.render( scene, camera );
 				renderer.render( sceneFX, cameraFX );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 
