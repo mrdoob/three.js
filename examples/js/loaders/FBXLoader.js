@@ -1371,13 +1371,7 @@
 
 	class GeometryParser {
 
-		constructor() {
-
-			this.negativeMaterialIndices = false;
-
-		} // Parse nodes in FBXTree.Objects.Geometry
-
-
+		// Parse nodes in FBXTree.Objects.Geometry
 		parse( deformers ) {
 
 			const geometryMap = new Map();
@@ -1393,13 +1387,6 @@
 					geometryMap.set( parseInt( nodeID ), geo );
 
 				}
-
-			} // report warnings
-
-
-			if ( this.negativeMaterialIndices === true ) {
-
-				console.warn( 'THREE.FBXLoader: The FBX file contains invalid (negative) material indices. The asset might not render as expected.' );
 
 			}
 
@@ -1759,8 +1746,8 @@
 
 					if ( materialIndex < 0 ) {
 
-						scope.negativeMaterialIndices = true;
-						materialIndex = 0; // fallback
+						console.warn( 'THREE.FBXLoader: Invalid material index:', materialIndex );
+						materialIndex = 0;
 
 					}
 
