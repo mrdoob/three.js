@@ -4,6 +4,7 @@ import {
 	LineBasicNodeMaterial,
 	MeshBasicNodeMaterial,
 	MeshStandardNodeMaterial,
+	MeshPhysicalNodeMaterial,
 	PointsNodeMaterial,
 	SpriteNodeMaterial
 } from '../materials/Materials.js';
@@ -17,8 +18,9 @@ MaterialLoader.createMaterialFromType = function ( type ) {
 		LineBasicNodeMaterial,
 		MeshBasicNodeMaterial,
 		MeshStandardNodeMaterial,
+		MeshPhysicalNodeMaterial,
 		PointsNodeMaterial,
-		SpriteNodeMaterial,
+		SpriteNodeMaterial
 	};
 
 	if ( materialLib[ type ] !== undefined ) {
