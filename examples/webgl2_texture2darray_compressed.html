@@ -30,7 +30,7 @@
 			</p>
 			Model provided by
 			<a href="https://twitter.com/sougenco" target="_blank" rel="noopener">Sougen</a>,
-			implementation by <a href="https://donmccurdy.com/" target="_blank" rel="noopener">Renaud Rohlinger</a>. CC0.<br />
+			implementation by <a href="https://twitter/onirenaud" target="_blank" rel="noopener">Renaud Rohlinger</a>. CC0.<br />
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -50,13 +50,12 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-			let container, stats, clock, mixer, actions, activeAction;
+			let container, clock, mixer, actions, activeAction;
 			let camera, scene, renderer, model;
 
 			init();
@@ -68,29 +67,19 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 100 );
-				camera.position.set( 0, 3, 10 );
-				camera.lookAt( new THREE.Vector3( 0, 2, 0 ) );
+				camera.position.set( 1, 1, 5 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xe0e0e0 );
-				scene.fog = new THREE.Fog( 0xe0e0e0, 20, 100 );
 
 				clock = new THREE.Clock();
 
 
-				// lights
-
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemiLight.position.set( 0, 10, 0 );
-				scene.add( hemiLight );
-
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 2 );
-				dirLight.position.set( 0, 10, 10 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				dirLight.position.set( 5, 5, 5 );
 				scene.add( dirLight );
 
 				// ground
-
-				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0xf1f1f1, depthWrite: false } ) );
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
@@ -107,79 +96,160 @@
 				container.appendChild( renderer.domElement );
 
 
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.background = new THREE.Color( 0xbbbbbb );
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				environment.dispose();
+
 				const ktx2Loader = new KTX2Loader();
 				ktx2Loader.setTranscoderPath( 'js/libs/basis/' );
 				ktx2Loader.detectSupport( renderer );
 
 				// model
 
+				function debug( scene, material ) {
+
+					const head_debug = new THREE.Mesh( new THREE.PlaneGeometry(), material );
+					head_debug.position.set( 1.25, 1.6, 0 );
+					head_debug.geometry.setAttribute( 'textureId', new THREE.BufferAttribute( new Int8Array( head_debug.geometry.index.count ).fill( 1 ), 1 ) );
+
+					const body_debug = new THREE.Mesh( new THREE.PlaneGeometry(), material );
+					body_debug.position.set( 1.25, 0.5, 0 );
+
+					body_debug.geometry.setAttribute( 'textureId', new THREE.BufferAttribute( new Int8Array( head_debug.geometry.index.count ).fill( 0 ), 1 ) );
+
+					return new THREE.Group().add( head_debug, body_debug );
+
+				}
+
+				function obc( material ) {
+
+					material.onBeforeCompile = function ( shader ) {
+
+						shader.vertexShader = `
+						varying vec3 vWorldPosition;
+						attribute float textureId;
+						flat varying int vTextureId;
+						${shader.vertexShader}`;
+
+						shader.vertexShader = shader.vertexShader.replace(
+							'#include <worldpos_vertex>',
+							`
+							#include <worldpos_vertex>
+							vTextureId = int(textureId);
+							vWorldPosition = position.xyz;`
+						);
+
+						shader.fragmentShader = shader.fragmentShader.replace(
+							'#include <map_pars_fragment>',
+							`
+							varying vec3 vWorldPosition;
+							flat varying int vTextureId;
+							precision highp sampler2DArray;
+							uniform sampler2DArray map;`
+						);
+						shader.fragmentShader = shader.fragmentShader.replace(
+							'#include <normalmap_pars_fragment>',
+							`
+							
+							#ifdef USE_NORMALMAP
+								uniform sampler2DArray normalMap;
+								uniform vec2 normalScale;
+							#endif
+							#ifdef OBJECTSPACE_NORMALMAP
+								uniform mat3 normalMatrix;
+							#endif
+							#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )
+								vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 mapN, float faceDirection ) {
+									vec3 q0 = dFdx( eye_pos.xyz );
+									vec3 q1 = dFdy( eye_pos.xyz );
+									vec2 st0 = dFdx( vUv.st );
+									vec2 st1 = dFdy( vUv.st );
+									vec3 N = surf_norm;
+									vec3 q1perp = cross( q1, N );
+									vec3 q0perp = cross( N, q0 );
+									vec3 T = q1perp * st0.x + q0perp * st1.x;
+									vec3 B = q1perp * st0.y + q0perp * st1.y;
+									float det = max( dot( T, T ), dot( B, B ) );
+									float scale = ( det == 0.0 ) ? 0.0 : faceDirection * inversesqrt( det );
+									return normalize( T * ( mapN.x * scale ) + B * ( mapN.y * scale ) + N * mapN.z );
+								}
+							#endif
+						`
+						);
+						shader.fragmentShader = shader.fragmentShader.replace(
+							'#include <normal_fragment_maps>',
+							`
+							#ifdef OBJECTSPACE_NORMALMAP
+								normal = texture( normalMap, vec3(vUv, vTextureId) ).xyz * 2.0 - 1.0;
+								#ifdef FLIP_SIDED
+									normal = - normal;
+								#endif
+								#ifdef DOUBLE_SIDED
+									normal = normal * faceDirection;
+								#endif
+								normal = normalize( normalMatrix * normal );
+							#elif defined( TANGENTSPACE_NORMALMAP )
+								vec3 mapN = texture( normalMap, vec3(vUv, vTextureId) ).xyz * 2.0 - 1.0;
+								mapN.xy *= normalScale;
+								#ifdef USE_TANGENT
+									normal = normalize( vTBN * mapN );
+								#else
+									normal = perturbNormal2Arb( - vViewPosition, normal, mapN, faceDirection );
+								#endif
+							#elif defined( USE_BUMPMAP )
+								normal = perturbNormalArb( - vViewPosition, normal, dHdxy_fwd(), faceDirection );
+							#endif`
+						);
+
+						shader.fragmentShader = shader.fragmentShader.replace(
+							'#include <map_fragment>',
+							`
+								diffuseColor *= texture( map, vec3( vUv, vTextureId ) );
+
+							`
+						);
+
+					};
+
+				}
+
 				const loader = new GLTFLoader();
 				loader.load( 'models/gltf/Sougen/sougen.glb', function ( gltf ) {
-
-
 			
-					ktx2Loader.load( 'models/gltf/Sougen/textures.ktx', function ( texture ) {
+					ktx2Loader.load( 'models/gltf/Sougen/color.ktx', function ( texture ) {
 
-						const material = new THREE.MeshStandardMaterial( { map: texture } );
+						ktx2Loader.load( 'models/gltf/Sougen/normal.ktx', function ( textureNormal ) {
 
-						material.onBeforeCompile = function ( shader ) {
+							const material = new THREE.MeshPhysicalMaterial( { map: texture, normalMap: textureNormal, vertexColors: 0, side: THREE.DoubleSide, envMapIntensity: 1 } );
+							obc( material );
 
-							shader.vertexShader = `
-							varying vec3 vWorldPosition;
-							${shader.vertexShader}`;
+							const head = gltf.scene.getObjectByName( 'head_1' );
+							head.geometry.setAttribute( 'textureId', new THREE.BufferAttribute( new Int8Array( head.geometry.index.count ).fill( 1 ), 1 ) );
+							head.material = material;
 
-							shader.vertexShader = shader.vertexShader.replace(
-								'#include <worldpos_vertex>',
-								`
-								#include <worldpos_vertex>
-								vWorldPosition = position.xyz;`
-							);
+							const body = gltf.scene.getObjectByName( 'body' );
+							body.geometry.setAttribute( 'textureId', new THREE.BufferAttribute( new Int8Array( head.geometry.index.count ).fill( 0 ), 1 ) );
+							body.material = material;
 
-							shader.fragmentShader = shader.fragmentShader.replace(
-								'#include <map_pars_fragment>',
-								`
-								varying vec3 vWorldPosition;
-								precision highp sampler2DArray;
-								uniform sampler2DArray map;`
-							);
+							model = gltf.scene;
 
-							shader.fragmentShader = shader.fragmentShader.replace(
-								'#include <map_fragment>',
-								`
-								if ( vWorldPosition.x > 0. ) {
+							const materialNormal = new THREE.MeshPhysicalMaterial( { map: textureNormal, normalMap: textureNormal, side: THREE.DoubleSide } );
+							obc( materialNormal );
+							const grpColorDebug = debug( scene, material );
+							const grpNormalDebug = debug( scene, materialNormal );
+							grpNormalDebug.position.x = 1.1;
+							scene.add( grpColorDebug, grpNormalDebug );
 
-									diffuseColor *= texture( map, vec3( vUv, 0 ) );
+							scene.add( model );
 
-								} else {
+							run( model, gltf.animations );
 
-									diffuseColor *= texture( map, vec3( vUv, 1 ) );
-
-								}`
-							);
-
-						};
-
-						const hair = gltf.scene.getObjectByName( 'hair' );
-						hair.material = material;
-
-						model = gltf.scene;
-						scene.add( model );
-
-						run( model, gltf.animations );
-
-					}, function () {
-
-						console.log( 'onProgress' );
-
-					}, function ( e ) {
-
-						console.error( e );
+						} );
 
 					} );
-
-				}, undefined, function ( e ) {
-
-					console.error( e );
 
 				} );
 
@@ -188,10 +258,7 @@
 
 
 				new OrbitControls( camera, renderer.domElement );
-
-				// stats
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				camera.lookAt( new THREE.Vector3( 1.5, 1, 0 ) );
 
 			}
 
@@ -205,12 +272,13 @@
 
 					const clip = animations[ i ];
 					const action = mixer.clipAction( clip );
+					action.timeScale = 0.35;
 					actions[ clip.name ] = action;
 
 				}
 
 
-				activeAction = actions[ 'run' ];
+				activeAction = actions[ 'idle' ];
 				activeAction.play();
 
 

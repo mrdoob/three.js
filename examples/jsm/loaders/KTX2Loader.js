@@ -13,6 +13,7 @@
 
 import {
 	CompressedTexture,
+	CompressedArrayTexture,
 	Data3DTexture,
 	DataTexture,
 	FileLoader,
@@ -243,20 +244,14 @@ class KTX2Loader extends Loader {
 
 		if ( type === 'error' ) return Promise.reject( error );
 
-		const texture = new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
+		const texture = container.layerCount > 1
+			? new CompressedArrayTexture( container.layerCount, mipmaps, width, height, format, UnsignedByteType )
+			: new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
 
 
 		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.generateMipmaps = false;
-
-		if ( container.layerCount > 1 ) {
-
-			texture.isDataArrayTexture = true;
-			texture.wrapR = ClampToEdgeWrapping;
-			texture.image.depth = container.layerCount;
-
-		}
 
 		texture.needsUpdate = true;
 		texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? sRGBEncoding : LinearEncoding;
@@ -269,7 +264,7 @@ class KTX2Loader extends Loader {
 	/**
 	 * @param {ArrayBuffer} buffer
 	 * @param {object?} config
-	 * @return {Promise<CompressedTexture|DataTexture|Data3DTexture>}
+	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
 	 */
 	_createTexture( buffer, config = {} ) {
 
@@ -657,6 +652,7 @@ KTX2Loader.BasisWorker = function () {
 		}
 
 		return result;
+
 	}
 
 };
