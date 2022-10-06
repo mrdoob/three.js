@@ -780,6 +780,8 @@ class ObjectLoader extends Loader {
 
 				}
 
+				if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;
+
 				break;
 
 			case 'PerspectiveCamera':
