@@ -671,7 +671,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		let textureType = _gl.TEXTURE_2D;
 
-		if ( texture.isDataArrayTexture ) textureType = _gl.TEXTURE_2D_ARRAY;
+		if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) textureType = _gl.TEXTURE_2D_ARRAY;
 		if ( texture.isData3DTexture ) textureType = _gl.TEXTURE_3D;
 
 		const forceUpload = initTexture( textureProperties, texture );
@@ -853,15 +853,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			} else if ( texture.isCompressedTexture ) {
 
-
-				if ( texture.isDataArrayTexture ) {
+				if ( texture.isCompressedArrayTexture ) {
 
 					if ( useTexStorage && allocateMemory ) {
 
 						state.texStorage3D( _gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, mipmaps[ 0 ].width, mipmaps[ 0 ].height, image.depth );
 
 					}
-
 
 					for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
 
@@ -902,7 +900,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						}
 
 					}
-
 
 				} else {
 

@@ -1967,7 +1967,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			const texture = renderTarget.texture;
 
-			if ( texture.isData3DTexture || texture.isDataArrayTexture ) {
+			if ( texture.isData3DTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
 				isRenderTarget3D = true;
 
@@ -2208,7 +2208,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		} else {
 
-			if ( srcTexture.isCompressedTexture ) {
+			if ( srcTexture.isCompressedArrayTexture ) {
 
 				console.warn( 'THREE.WebGLRenderer.copyTextureToTexture3D: untested support for compressed srcTexture.' );
 				_gl.compressedTexSubImage3D( glTarget, level, position.x, position.y, position.z, width, height, depth, glFormat, image.data );

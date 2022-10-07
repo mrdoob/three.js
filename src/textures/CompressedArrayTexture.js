@@ -3,11 +3,11 @@ import { CompressedTexture } from './CompressedTexture.js';
 
 class CompressedArrayTexture extends CompressedTexture {
 
-	constructor( depth, mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+	constructor( mipmaps, width, height, depth, format, type ) {
 
-		super( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding );
+		super( mipmaps, width, height, format, type );
 
-		this.isDataArrayTexture = true;
+		this.isCompressedArrayTexture = true;
 		this.image.depth = depth;
 		this.wrapR = ClampToEdgeWrapping;
 

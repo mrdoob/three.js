@@ -245,7 +245,7 @@ class KTX2Loader extends Loader {
 		if ( type === 'error' ) return Promise.reject( error );
 
 		const texture = container.layerCount > 1
-			? new CompressedArrayTexture( container.layerCount, mipmaps, width, height, format, UnsignedByteType )
+			? new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, UnsignedByteType )
 			: new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
 
 
