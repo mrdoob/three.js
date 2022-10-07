@@ -13,22 +13,8 @@ class VideoTexture extends Texture {
 		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
 
 		this.generateMipmaps = false;
-
-		const scope = this;
-
-		function updateVideo() {
-
-			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
-
-		}
-
-		if ( 'requestVideoFrameCallback' in video ) {
-
-			video.requestVideoFrameCallback( updateVideo );
-
-		}
-
+		
+		this._callbackSource = null;
 	}
 
 	clone() {
@@ -40,7 +26,29 @@ class VideoTexture extends Texture {
 	update() {
 
 		const video = this.image;
+		
+		if (!video) {
+			this._callbackSource = null;
+			return;
+		}
+
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
+		
+		if (hasVideoFrameCallback && video !== this._callbackSource) {
+			this._callbackSource = video;
+			
+			const update = () => {
+
+				this.needsUpdate = true;
+
+				this._callbackSource.requestVideoFrameCallback(update);
+
+			}
+
+			this._callbackSource.requestVideoFrameCallback(update);
+
+			return;
+		}
 
 		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
