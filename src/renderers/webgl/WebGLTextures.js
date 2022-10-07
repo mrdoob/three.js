@@ -1269,7 +1269,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			multisampledRTTExt.framebufferTexture2DMultisampleEXT( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, 0, getRenderTargetSamples( renderTarget ) );
 
-		} else if ( textureTarget !== _gl.TEXTURE_3D && textureTarget !== _gl.TEXTURE_2D_ARRAY ) {
+		} else if ( textureTarget === _gl.TEXTURE_2D || ( textureTarget >= _gl.TEXTURE_CUBE_MAP_POSITIVE_X && textureTarget <= _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z ) ) {
 
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
 
