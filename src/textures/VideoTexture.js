@@ -15,6 +15,7 @@ class VideoTexture extends Texture {
 		this.generateMipmaps = false;
 
 		this._callbackSource = null;
+		this._callbackId = null;
 
 	}
 
@@ -30,7 +31,15 @@ class VideoTexture extends Texture {
 
 		if ( video == null ) {
 
+			if ( this._callbackId !== null && this._callbackSource !== null ) {
+
+				this._callbackSource.cancelVideoFrameCallback( this._callbackId );
+
+			}
+
 			this._callbackSource = null;
+
+			this._callbackId = null;
 
 			return;
 
@@ -40,17 +49,23 @@ class VideoTexture extends Texture {
 
 		if ( hasVideoFrameCallback && video !== this._callbackSource ) {
 
+			if ( this._callbackId !== null && this._callbackSource !== null ) {
+
+				this._callbackSource.cancelVideoFrameCallback( this._callbackId );
+
+			}
+
 			this._callbackSource = video;
 
 			const update = () => {
 
 				this.needsUpdate = true;
 
-				this._callbackSource.requestVideoFrameCallback( update );
+				this._callbackId = this._callbackSource.requestVideoFrameCallback( update );
 
 			};
 
-			this._callbackSource.requestVideoFrameCallback( update );
+			 this._callbackId = this._callbackSource.requestVideoFrameCallback( update );
 
 			return;
 
