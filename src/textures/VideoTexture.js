@@ -15,6 +15,7 @@ class VideoTexture extends Texture {
 		this.generateMipmaps = false;
 
 		this._callbackSource = null;
+
 	}
 
 	clone() {
@@ -45,11 +46,11 @@ class VideoTexture extends Texture {
 
 				this.needsUpdate = true;
 
-				this._callbackSource.requestVideoFrameCallback(update);
+				this._callbackSource.requestVideoFrameCallback( update );
 
 			};
 
-			this._callbackSource.requestVideoFrameCallback(update);
+			this._callbackSource.requestVideoFrameCallback( update );
 
 			return;
 
