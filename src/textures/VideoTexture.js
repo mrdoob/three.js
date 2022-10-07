@@ -13,7 +13,7 @@ class VideoTexture extends Texture {
 		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
 
 		this.generateMipmaps = false;
-		
+
 		this._callbackSource = null;
 	}
 
@@ -26,7 +26,7 @@ class VideoTexture extends Texture {
 	update() {
 
 		const video = this.image;
-		
+
 		if ( video == null ) {
 
 			this._callbackSource = null;
@@ -37,7 +37,7 @@ class VideoTexture extends Texture {
 
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
 
-		if (hasVideoFrameCallback && video !== this._callbackSource) {
+		if ( hasVideoFrameCallback && video !== this._callbackSource ) {
 
 			this._callbackSource = video;
 
@@ -47,7 +47,7 @@ class VideoTexture extends Texture {
 
 				this._callbackSource.requestVideoFrameCallback(update);
 
-			}
+			};
 
 			this._callbackSource.requestVideoFrameCallback(update);
 
