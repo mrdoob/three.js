@@ -37,7 +37,6 @@ import {
 	RGFormat,
 	sRGBEncoding,
 	UnsignedByteType,
-	ClampToEdgeWrapping,
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
 import {
@@ -708,7 +707,7 @@ const ENCODING_MAP = {
 
 async function createDataTexture( container ) {
 
-	const { vkFormat, pixelWidth, pixelHeight, pixelDepth, layerCount } = container;
+	const { vkFormat, pixelWidth, pixelHeight, pixelDepth } = container;
 
 	if ( FORMAT_MAP[ vkFormat ] === undefined ) {
 
