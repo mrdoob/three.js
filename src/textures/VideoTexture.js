@@ -27,16 +27,20 @@ class VideoTexture extends Texture {
 
 		const video = this.image;
 		
-		if (!video) {
+		if ( video == null ) {
+
 			this._callbackSource = null;
+
 			return;
+
 		}
 
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
-		
+
 		if (hasVideoFrameCallback && video !== this._callbackSource) {
+
 			this._callbackSource = video;
-			
+
 			const update = () => {
 
 				this.needsUpdate = true;
@@ -48,6 +52,7 @@ class VideoTexture extends Texture {
 			this._callbackSource.requestVideoFrameCallback(update);
 
 			return;
+
 		}
 
 		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
