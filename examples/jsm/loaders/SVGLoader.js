@@ -1768,7 +1768,16 @@ class SVGLoader extends Loader {
 
 			const te = m.elements;
 			const basisDot = te[ 0 ] * te[ 3 ] + te[ 1 ] * te[ 4 ];
-			return basisDot !== 0;
+
+			// Shortcut for trivial rotations and transformations
+			if ( basisDot === 0 ) return false;
+
+			const sx = getTransformScaleX( m );
+			const sy = getTransformScaleY( m );
+
+			// 0.0175 is cos(Δ1°) near 𝜋/2, so skewing of less than 1°
+			// will be treated as a float-computation error of a pure rotation
+			return Math.abs( basisDot / sx / sy ) > 0.0175;
 
 		}
 
