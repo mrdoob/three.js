@@ -173,7 +173,11 @@ class WebGPURenderer {
 
 	async init() {
 
-		if ( this._initialized === true ) return;
+		if ( this._initialized === true ) {
+
+			throw new Error( 'WebGPURenderer: Device has already been initialized.' );
+
+		}
 
 		const parameters = this._parameters;
 
