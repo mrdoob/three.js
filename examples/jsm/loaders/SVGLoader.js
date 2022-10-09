@@ -1775,9 +1775,7 @@ class SVGLoader extends Loader {
 			const sx = getTransformScaleX( m );
 			const sy = getTransformScaleY( m );
 
-			// 0.0175 is cos(Δ1°) near 𝜋/2, so skewing of less than 1°
-			// will be treated as a float-computation error of a pure rotation
-			return Math.abs( basisDot / sx / sy ) > 0.0175;
+			return Math.abs( basisDot / ( sx * sy ) ) > Number.EPSILON;
 
 		}
 
