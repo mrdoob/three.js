@@ -44,7 +44,6 @@
 			const dummy = new THREE.Object3D();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -90,6 +89,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -116,15 +116,13 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				render();
 
 				stats.update();
 
 			}
 
-			function render() {
+			async function render() {
 
 				if ( mesh ) {
 
@@ -158,7 +156,7 @@
 
 				}
 
-				renderer.render( scene, camera );
+				await renderer.render( scene, camera );
 
 			}
 

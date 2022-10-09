@@ -38,7 +38,6 @@
 			let box;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -180,6 +179,7 @@
 				renderer = new WebGPURenderer( { requiredFeatures: [ 'texture-compression-bc' ] } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -196,8 +196,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;

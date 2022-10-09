@@ -47,7 +47,6 @@
 				stats, controls;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -139,6 +138,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 100 );
@@ -176,15 +176,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
 				const time = performance.now() / 1000;
 				const lightTime = time * 0.5;
 
@@ -212,6 +203,8 @@
 				if ( time > 3.5 && light4.parent === null ) scene.add( light4 );
 */
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

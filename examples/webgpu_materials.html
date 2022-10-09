@@ -45,7 +45,6 @@
 			const objects = [], materials = [];
 
 			init();
-			animate();
 
 			function init() {
 
@@ -200,6 +199,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -243,15 +243,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
 				const timer = 0.0001 * Date.now();
 
 				camera.position.x = Math.cos( timer ) * 1000;
@@ -270,11 +261,7 @@
 
 				renderer.render( scene, camera );
 
-			}
-
-			function error( error ) {
-
-				console.error( error );
+				stats.update();
 
 			}
 

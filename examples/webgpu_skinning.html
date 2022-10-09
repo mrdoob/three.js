@@ -39,7 +39,6 @@
 			let mixer, clock;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -93,6 +92,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 800 );
 				document.body.appendChild( renderer.domElement );
@@ -111,8 +111,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
 

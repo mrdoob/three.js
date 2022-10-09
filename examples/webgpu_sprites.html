@@ -42,7 +42,6 @@
 			let imageWidth = 1, imageHeight = 1;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -113,6 +112,7 @@
 				renderer = new WebGPURenderer( { requiredFeatures: [ 'texture-compression-bc' ] } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -128,13 +128,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
 
 			}
 

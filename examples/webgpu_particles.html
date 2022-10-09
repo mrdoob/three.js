@@ -41,7 +41,6 @@
 			let controls;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -134,6 +133,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -163,13 +163,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( innerWidth, innerHeight );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
 
 			}
 
