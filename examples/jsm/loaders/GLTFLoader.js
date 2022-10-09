@@ -4557,4 +4557,4 @@ function toTrianglesDrawMode( geometry, drawMode ) {
 
 }
 
-export { GLTFLoader };
+export { GLTFLoader, GLTFParser };
