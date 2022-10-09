@@ -213,6 +213,8 @@ function isEarHashed( ear, minX, minY, invSize ) {
 
 	if ( area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
 
+	const ax = a.x, bx = b.x, cx = c.x, ay = a.y, by = b.y, cy = c.y;
+
 	// triangle bbox; min & max are calculated like this for speed
 	const x0 = ax < bx ? ( ax < cx ? ax : cx ) : ( bx < cx ? bx : cx ),
 		y0 = ay < by ? ( ay < cy ? ay : cy ) : ( by < cy ? by : cy ),
