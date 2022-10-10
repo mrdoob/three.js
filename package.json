@@ -65,7 +65,6 @@
       "WebGL2ComputeRenderingContext": "readonly",
       "potpack": "readonly",
       "fflate": "readonly",
-      "bodymovin": "readonly",
       "OIMO": "readonly",
       "Stats": "readonly",
       "XRWebGLBinding": "readonly",

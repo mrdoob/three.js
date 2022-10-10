@@ -5,6 +5,8 @@ import {
 	NearestFilter
 } from 'three';
 
+import lottie from '../libs/lottie_canvas.module.js';
+
 class LottieLoader extends Loader {
 
 	setQuality( value ) {
@@ -28,7 +30,7 @@ class LottieLoader extends Loader {
 
 			const data = JSON.parse( text );
 
-			// bodymoving uses container.offetWidth and offsetHeight
+			// lottie uses container.offetWidth and offsetHeight
 			// to define width/height
 
 			const container = document.createElement( 'div' );
@@ -36,7 +38,7 @@ class LottieLoader extends Loader {
 			container.style.height = data.h + 'px';
 			document.body.appendChild( container );
 
-			const animation = bodymovin.loadAnimation( {
+			const animation = lottie.loadAnimation( {
 				container: container,
 				animType: 'canvas',
 				loop: true,
