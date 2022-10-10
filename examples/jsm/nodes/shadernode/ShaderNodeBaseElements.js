@@ -181,6 +181,7 @@ export const invert = nodeProxy( MathNode, MathNode.INVERT );
 export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
 export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
 export const round = nodeProxy( MathNode, MathNode.ROUND );
+export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
@@ -297,11 +298,3 @@ export const luminance = ( color, luma = lumaCoeffs ) => dot( color, luma );
 export const difference = ( a, b ) => abs( sub( a, b ) );
 export const dotNV = clamp( dot( transformedNormalView, positionViewDirection ) );
 export const TBNViewMatrix = mat3( tangentView, bitangentView, normalView );
-
-export const posterize = ( value, steps ) => {
-
-	const reciprocalSteps = div( 1, steps );
-
-	return mul( floor( div( value, reciprocalSteps ) ), reciprocalSteps );
-
-};

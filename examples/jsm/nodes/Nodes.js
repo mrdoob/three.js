@@ -59,6 +59,7 @@ import ColorAdjustmentNode from './display/ColorAdjustmentNode.js';
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
+import PosterizeNode from './display/PosterizeNode.js';
 import ToneMappingNode from './display/ToneMappingNode.js';
 
 // math
