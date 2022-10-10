@@ -14,20 +14,9 @@ class VideoTexture extends Texture {
 
 		this.generateMipmaps = false;
 
-		const scope = this;
+		this.lastImage = null;
 
-		function updateVideo() {
-
-			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
-
-		}
-
-		if ( 'requestVideoFrameCallback' in video ) {
-
-			video.requestVideoFrameCallback( updateVideo );
-
-		}
+		this.update();
 
 	}
 
@@ -42,9 +31,31 @@ class VideoTexture extends Texture {
 		const video = this.image;
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
 
-		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
+		if ( hasVideoFrameCallback === false) {
 
-			this.needsUpdate = true;
+			if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+				this.needsUpdate = true;
+
+			}
+
+		} else {
+
+			if ( ( video !== this.lastImage ) && ( video !== null ) ) {
+
+				const updateVideo = () => {
+
+					if ( video !== this.image ) return;
+					this.needsUpdate = true;
+					video.requestVideoFrameCallback( updateVideo );
+
+				};
+
+				this.lastImage = video;
+
+				video.requestVideoFrameCallback( updateVideo );
+
+			}
 
 		}
 
