@@ -192,11 +192,6 @@ function mergeBufferGeometries( geometries, useGroups = false ) {
 
 		}
 
-		// gather .userData
-
-		mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
-		mergedGeometry.userData.mergedUserData.push( geometry.userData );
-
 		if ( useGroups ) {
 
 			let count;
