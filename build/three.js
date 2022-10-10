@@ -2575,7 +2575,7 @@
 	*/
 
 	class WebGLRenderTarget extends EventDispatcher {
-		constructor(width, height, options = {}) {
+		constructor(width = 1, height = 1, options = {}) {
 			super();
 			this.isWebGLRenderTarget = true;
 			this.width = width;
@@ -2666,7 +2666,7 @@
 	}
 
 	class WebGLArrayRenderTarget extends WebGLRenderTarget {
-		constructor(width, height, depth) {
+		constructor(width = 1, height = 1, depth = 1) {
 			super(width, height);
 			this.isWebGLArrayRenderTarget = true;
 			this.depth = depth;
@@ -2704,7 +2704,7 @@
 	}
 
 	class WebGL3DRenderTarget extends WebGLRenderTarget {
-		constructor(width, height, depth) {
+		constructor(width = 1, height = 1, depth = 1) {
 			super(width, height);
 			this.isWebGL3DRenderTarget = true;
 			this.depth = depth;
@@ -2715,7 +2715,7 @@
 	}
 
 	class WebGLMultipleRenderTargets extends WebGLRenderTarget {
-		constructor(width, height, count, options = {}) {
+		constructor(width = 1, height = 1, count = 1, options = {}) {
 			super(width, height, options);
 			this.isWebGLMultipleRenderTargets = true;
 			const texture = this.texture;
@@ -9092,7 +9092,7 @@
 	}
 
 	class WebGLCubeRenderTarget extends WebGLRenderTarget {
-		constructor(size, options = {}) {
+		constructor(size = 1, options = {}) {
 			super(size, size, options);
 			this.isWebGLCubeRenderTarget = true;
 			const image = {
@@ -17347,7 +17347,8 @@
 
 			if (useMultisampledRTT(renderTarget)) {
 				multisampledRTTExt.framebufferTexture2DMultisampleEXT(_gl.FRAMEBUFFER, attachment, textureTarget, properties.get(texture).__webglTexture, 0, getRenderTargetSamples(renderTarget));
-			} else {
+			} else if (textureTarget === _gl.TEXTURE_2D || textureTarget >= _gl.TEXTURE_CUBE_MAP_POSITIVE_X && textureTarget <= _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z) {
+				// see #24753
 				_gl.framebufferTexture2D(_gl.FRAMEBUFFER, attachment, textureTarget, properties.get(texture).__webglTexture, 0);
 			}
 

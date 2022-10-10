@@ -3281,7 +3281,7 @@ class Vector4 {
 */
 class WebGLRenderTarget extends EventDispatcher {
 
-	constructor( width, height, options = {} ) {
+	constructor( width = 1, height = 1, options = {} ) {
 
 		super();
 
@@ -3402,7 +3402,7 @@ class DataArrayTexture extends Texture {
 
 class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
-	constructor( width, height, depth ) {
+	constructor( width = 1, height = 1, depth = 1 ) {
 
 		super( width, height );
 
@@ -3451,7 +3451,7 @@ class Data3DTexture extends Texture {
 
 class WebGL3DRenderTarget extends WebGLRenderTarget {
 
-	constructor( width, height, depth ) {
+	constructor( width = 1, height = 1, depth = 1 ) {
 
 		super( width, height );
 
@@ -3469,7 +3469,7 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 
 class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 
-	constructor( width, height, count, options = {} ) {
+	constructor( width = 1, height = 1, count = 1, options = {} ) {
 
 		super( width, height, options );
 
@@ -12006,7 +12006,7 @@ class CubeTexture extends Texture {
 
 class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
-	constructor( size, options = {} ) {
+	constructor( size = 1, options = {} ) {
 
 		super( size, size, options );
 
@@ -23510,7 +23510,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			multisampledRTTExt.framebufferTexture2DMultisampleEXT( 36160, attachment, textureTarget, properties.get( texture ).__webglTexture, 0, getRenderTargetSamples( renderTarget ) );
 
-		} else {
+		} else if ( textureTarget === 3553 || ( textureTarget >= 34069 && textureTarget <= 34074 ) ) { // see #24753
 
 			_gl.framebufferTexture2D( 36160, attachment, textureTarget, properties.get( texture ).__webglTexture, 0 );
 
