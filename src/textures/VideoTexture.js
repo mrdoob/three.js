@@ -29,6 +29,8 @@ class VideoTexture extends Texture {
 	update() {
 
 		const video = this.image;
+		if ( ( video === null ) || ( video === undefined ) ) return;
+
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
 
 		if ( hasVideoFrameCallback === false ) {
@@ -41,7 +43,7 @@ class VideoTexture extends Texture {
 
 		} else {
 
-			if ( ( video !== this.lastImage ) && ( video !== null ) ) {
+			if ( video !== this.lastImage ) {
 
 				const updateVideo = () => {
 
