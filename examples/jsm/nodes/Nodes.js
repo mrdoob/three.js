@@ -184,6 +184,7 @@ const nodeLib = {
 	ColorSpaceNode,
 	FrontFacingNode,
 	NormalMapNode,
+	PosterizeNode,
 	ToneMappingNode,
 
 	// math
@@ -301,6 +302,7 @@ export {
 	ColorSpaceNode,
 	FrontFacingNode,
 	NormalMapNode,
+	PosterizeNode,
 	ToneMappingNode,
 
 	// math
