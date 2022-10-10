@@ -4,7 +4,9 @@
 
 const Earcut = {
 
-	triangulate: function ( data, holeIndices, dim = 2 ) {
+	triangulate: function ( data, holeIndices, dim ) {
+
+		dim = dim || 2;
 
 		const hasHoles = holeIndices && holeIndices.length;
 		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
@@ -374,7 +376,9 @@ function eliminateHole( hole, outerNode ) {
 
 	const bridge = findHoleBridge( hole, outerNode );
 
-	if ( ! bridge ) return outerNode;
+	if ( ! bridge ) {
+		return outerNode;
+	}
 
 	const bridgeReverse = splitPolygon( bridge, hole );
 
@@ -405,8 +409,6 @@ function findHoleBridge( hole, outerNode ) {
 				m = p.x < p.next.x ? p : p.next;
 
 				if ( x === hx ) return m; // hole touches outer segment; pick leftmost endpoint
-
-				m = p.x < p.next.x ? p : p.next;
 
 			}
 
