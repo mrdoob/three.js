@@ -4243,6 +4243,8 @@ function buildNodeHierarchy( nodeId, parentObject, json, parser ) {
 
 						}
 
+						jointNode.matrixWorld.copy(mat).invert()
+
 						boneInverses.push( mat );
 
 					} else {
