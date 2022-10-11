@@ -181,6 +181,7 @@ export const invert = nodeProxy( MathNode, MathNode.INVERT );
 export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
 export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
 export const round = nodeProxy( MathNode, MathNode.ROUND );
+export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
