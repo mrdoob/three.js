@@ -4,9 +4,7 @@
 
 const Earcut = {
 
-	triangulate: function ( data, holeIndices, dim ) {
-
-		dim = dim || 2;
+	triangulate: function ( data, holeIndices, dim = 2 ) {
 
 		const hasHoles = holeIndices && holeIndices.length;
 		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
@@ -377,7 +375,9 @@ function eliminateHole( hole, outerNode ) {
 	const bridge = findHoleBridge( hole, outerNode );
 
 	if ( ! bridge ) {
+
 		return outerNode;
+
 	}
 
 	const bridgeReverse = splitPolygon( bridge, hole );
@@ -438,8 +438,7 @@ function findHoleBridge( hole, outerNode ) {
 
 			tan = Math.abs( hy - p.y ) / ( hx - p.x ); // tangential
 
-			if ( locallyInside( p, hole ) &&
-				( tan < tanMin || ( tan === tanMin && ( p.x > m.x || ( p.x === m.x && sectorContainsSector( m, p ) ) ) ) ) ) {
+			if ( locallyInside( p, hole ) && ( tan < tanMin || ( tan === tanMin && ( p.x > m.x || ( p.x === m.x && sectorContainsSector( m, p ) ) ) ) ) ) {
 
 				m = p;
 				tanMin = tan;
