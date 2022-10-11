@@ -1,5 +1,5 @@
 import TempNode from '../core/Node.js';
-import { mul, div, floor, reciprocal } from '../shadernode/ShaderNodeBaseElements.js';
+import { mul, floor, reciprocal } from '../shadernode/ShaderNodeBaseElements.js';
 
 class PosterizeNode extends TempNode {
 
@@ -16,9 +16,7 @@ class PosterizeNode extends TempNode {
 
 		const { sourceNode, stepsNode } = this;
 
-		const reciprocalSteps = reciprocal( stepsNode );
-
-		return mul( floor( div( sourceNode, reciprocalSteps ) ), reciprocalSteps );
+		return mul( floor( mul( sourceNode, stepsNode ) ), reciprocal( stepsNode ) );
 
 	}
 
