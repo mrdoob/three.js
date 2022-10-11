@@ -118,8 +118,55 @@ function createMultiMaterialObject( geometry, materials ) {
 
 }
 
+function reduceVertices( func, initialValue ) {
+
+	let value = initialValue;
+	const vertex = new Vector3();
+
+	this.traverseVisible( ( object ) => {
+
+		object.updateWorldMatrix( false, false );
+
+		const { geometry } = object;
+
+		if ( geometry !== undefined ) {
+
+			const { position } = geometry.attributes;
+
+			if ( position !== undefined ) {
+
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					vertex.fromBufferAttribute( position, i );
+
+					if ( object.isSkinnedMesh ) {
+
+						object.boneTransform( i, vertex );
+
+					} else {
+
+						vertex.applyMatrix4( object.matrixWorld );
+
+					}
+
+					value = func( value, vertex );
+
+				}
+
+			}
+
+		}
+
+	} );
+
+	return value;
+
+}
+
+
 export {
 	createMeshesFromInstancedMesh,
 	createMeshesFromMultiMaterialMesh,
-	createMultiMaterialObject
+	createMultiMaterialObject,
+	reduceVertices,
 };
