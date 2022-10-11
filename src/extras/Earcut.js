@@ -356,7 +356,7 @@ function eliminateHoles( data, holeIndices, outerNode, dim ) {
 	for ( i = 0; i < queue.length; i ++ ) {
 
 		outerNode = eliminateHole( queue[ i ], outerNode );
-		outerNode = filterPoints( outerNode, outerNode.next );
+		// outerNode = filterPoints( outerNode, outerNode.next );
 
 	}
 
@@ -384,9 +384,12 @@ function eliminateHole( hole, outerNode ) {
 	const bridgeReverse = splitPolygon( bridge, hole );
 
 	// filter collinear points around the cuts
-	const filteredBridge = filterPoints( bridge, bridge.next );
-	filterPoints( bridgeReverse, bridgeReverse.next );
-	return outerNode === bridge ? filteredBridge : outerNode;
+	// const filteredBridge = filterPoints( bridge, bridge.next );
+	return filterPoints( bridgeReverse, bridgeReverse.next );
+
+	// Check if input node was removed by the filtering
+	// return outerNode === bridge ? filteredBridge : outerNode;
+	// return filterPoints( bridge, bridge.next );
 
 }
 
