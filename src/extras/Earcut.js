@@ -125,9 +125,9 @@ function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass ) {
 		if ( invSize ? isEarHashed( ear, minX, minY, invSize ) : isEar( ear ) ) {
 
 			// cut off the triangle
-			triangles.push( prev.i / dim | 0 );
-			triangles.push( ear.i / dim | 0 );
-			triangles.push( next.i / dim | 0 );
+			triangles.push( prev.i / dim );
+			triangles.push( ear.i / dim );
+			triangles.push( next.i / dim );
 
 			removeNode( ear );
 
@@ -278,9 +278,9 @@ function cureLocalIntersections( start, triangles, dim ) {
 
 		if ( ! equals( a, b ) && intersects( a, p, p.next, b ) && locallyInside( a, b ) && locallyInside( b, a ) ) {
 
-			triangles.push( a.i / dim | 0 );
-			triangles.push( p.i / dim | 0 );
-			triangles.push( b.i / dim | 0 );
+			triangles.push( a.i / dim );
+			triangles.push( p.i / dim );
+			triangles.push( b.i / dim );
 
 			// remove two nodes involved
 			removeNode( p );
