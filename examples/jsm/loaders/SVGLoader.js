@@ -1740,11 +1740,25 @@ class SVGLoader extends Loader {
 							curve.xRadius *= sx;
 							curve.yRadius *= sy;
 
-							if ( isTransformRotated( m ) ) {
+							// Extract rotation angle from the matrix of form:
+							//
+							//  | cosθ sx   -sinθ sy |
+							//  | sinθ sx    cosθ sy |
+							//
+							// Remembering that tanθ = sinθ / cosθ; and that
+							// `sx`, `sy`, or both might be zero.
+							const theta =
+								sx > Number.EPSILON
+								? Math.atan2( m.elements[ 1 ], m.elements[ 0 ] )
+								: Math.atan2( - m.elements[ 3 ], m.elements[ 4 ] );
 
-								const sin = m.elements[ 1 ] / sx;
-								const cos = m.elements[ 0 ] / sx;
-								curve.aRotation += Math.atan2( sin, cos );
+							curve.aRotation += theta;
+
+							if ( isTransformFlipped( m ) ) {
+
+								curve.aStartAngle *= -1;
+								curve.aEndAngle *= -1;
+								curve.aClockwise = !curve.aClockwise;
 
 							}
 
@@ -1758,9 +1772,10 @@ class SVGLoader extends Loader {
 
 		}
 
-		function isTransformRotated( m ) {
+		function isTransformFlipped( m ) {
 
-			return m.elements[ 1 ] !== 0 || m.elements[ 3 ] !== 0;
+			const te = m.elements;
+			return te[ 0 ] * te[ 4 ] - te[ 1 ] * te[ 3 ] < 0;
 
 		}
 
