@@ -124,7 +124,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.setClearColor( 0xdeebed );
+				renderer.setClearColor( 0xdddddd );
 				document.body.appendChild( renderer.domElement );
 
 				// initialize the pathtracer
@@ -242,7 +242,7 @@
 						transparent: true,
 					} ),
 				);
-				floor.scale.setScalar( 5000 );
+				floor.scale.setScalar( 2500 );
 				floor.rotation.x = - Math.PI / 2;
 				floor.position.y = bbox.min.y;
 				model.add( floor );
@@ -260,13 +260,7 @@
 
 				const generator = new PathTracingSceneGenerator();
 				const result = generator.generate( model );
-				// const generator = new PathTracingSceneWorker();
-				// const result = await generator.generate( group, { onProgress: v => {
-
-				// 	updateProgressBar( v );
-
-				// } } );
-
+	
 				// add the model to the scene
 				sceneInfo = result;
 				sceneInfo.scene.traverse( c => {
@@ -295,8 +289,6 @@
 				material.materials.updateFrom( materials, textures );
 				pathTracer.material.envMapInfo.updateFrom( envMap );
 				pathTracer.reset();
-
-				// generator.dispose();
 
 			}
 
@@ -465,6 +457,7 @@
 						const yCent = 2.0 * ( yNorm - 0.5 );
 						let a = Math.max( Math.min( 1.0 - Math.sqrt( xCent ** 2 + yCent ** 2 ), 1.0 ), 0.0 );
 						a = a ** 1.5;
+						a = a * 1.5;
 						a = Math.min( a, 1.0 );
 
 						const i = y * dim + x;
