@@ -125,9 +125,9 @@ function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass ) {
 		if ( invSize ? isEarHashed( ear, minX, minY, invSize ) : isEar( ear ) ) {
 
 			// cut off the triangle
-			triangles.push( prev.i / dim );
-			triangles.push( ear.i / dim );
-			triangles.push( next.i / dim );
+			triangles.push( prev.i / dim | 0 );
+			triangles.push( ear.i / dim | 0 );
+			triangles.push( next.i / dim | 0 );
 
 			removeNode( ear );
 
@@ -278,9 +278,9 @@ function cureLocalIntersections( start, triangles, dim ) {
 
 		if ( ! equals( a, b ) && intersects( a, p, p.next, b ) && locallyInside( a, b ) && locallyInside( b, a ) ) {
 
-			triangles.push( a.i / dim );
-			triangles.push( p.i / dim );
-			triangles.push( b.i / dim );
+			triangles.push( a.i / dim | 0 );
+			triangles.push( p.i / dim | 0 );
+			triangles.push( b.i / dim | 0 );
 
 			// remove two nodes involved
 			removeNode( p );
@@ -356,6 +356,7 @@ function eliminateHoles( data, holeIndices, outerNode, dim ) {
 	for ( i = 0; i < queue.length; i ++ ) {
 
 		outerNode = eliminateHole( queue[ i ], outerNode );
+		outerNode = filterPoints( outerNode, outerNode.next );
 
 	}
 
@@ -383,8 +384,9 @@ function eliminateHole( hole, outerNode ) {
 	const bridgeReverse = splitPolygon( bridge, hole );
 
 	// filter collinear points around the cuts
+	const filteredBridge = filterPoints( bridge, bridge.next );
 	filterPoints( bridgeReverse, bridgeReverse.next );
-	return filterPoints( bridge, bridge.next );
+	return outerNode === bridge ? filteredBridge : outerNode;
 
 }
 
