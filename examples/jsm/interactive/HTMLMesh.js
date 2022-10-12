@@ -203,6 +203,38 @@ function html2canvas( element ) {
 
 	}
 
+	function getLines( element, text, maxWidth ) {
+
+	    const words = text.split( " " );
+	    const lines = [];
+	    let currentLine = words[ 0 ];
+
+	    for ( let i = 1; i < words.length; i ++ ) {
+	    	// Somehow, the textnode width in pixels differs from the parent element width.
+	    	// Using the range instead of the context to compute the wrapping width fixes this problem.
+	        const word = words[ i ];
+	        range.setStart( element, 0 );
+
+	        const newLine = currentLine + " " + word;
+			range.setEnd( element, newLine.length );
+
+	        const width = range.getBoundingClientRect().width;
+
+	        if ( width < maxWidth ) currentLine = newLine;
+	        else {
+
+	            lines.push( currentLine );
+	            currentLine = word;
+
+	        }
+
+	    }
+
+	    lines.push( currentLine );
+	    return lines;
+
+	}
+
 	function buildRectPath( x, y, w, h, r ) {
 
 		if ( w < 2 * r ) r = w / 2;
@@ -254,7 +286,38 @@ function html2canvas( element ) {
 			width = rect.width;
 			height = rect.height;
 
-			drawText( style, x, y, element.nodeValue.trim() );
+			const text = element.nodeValue.trim();
+
+
+			if ( element.parentElement ) {
+
+				const parentEl = element.parentElement;
+ 				const parentWidth = parentEl.offsetWidth;
+
+ 				//set to nowrap so that range doesn't warp in the getLines function
+ 				parentEl.style.whiteSpace = "nowrap";
+
+				const lineHeight = range.getBoundingClientRect().height;
+				const lines = getLines( element, text, parentWidth );
+
+ 				parentEl.style.whiteSpace = null;
+
+				range.selectNode( element );
+
+				for ( const line of lines ) {
+
+					drawText( style, x, y, line );
+
+					y += lineHeight;
+
+				}
+
+
+			} else drawText( style, x, y, text );
+
+
+
+
 
 		} else if ( element.nodeType === Node.COMMENT_NODE ) {
 
