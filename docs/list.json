@@ -1348,6 +1348,37 @@
 				"ShaderMaterial": "api/it/materials/ShaderMaterial",
 				"ShadowMaterial": "api/it/materials/ShadowMaterial",
 				"SpriteMaterial": "api/it/materials/SpriteMaterial"
+			},
+
+			"Math": {
+				"Box2": "api/it/math/Box2",
+				"Box3": "api/it/math/Box3",
+				"Color": "api/it/math/Color",
+				"Cylindrical": "api/it/math/Cylindrical",
+				"Euler": "api/it/math/Euler",
+				"Frustum": "api/it/math/Frustum",
+				"Interpolant": "api/it/math/Interpolant",
+				"Line3": "api/it/math/Line3",
+				"MathUtils": "api/it/math/MathUtils",
+				"Matrix3": "api/it/math/Matrix3",
+				"Matrix4": "api/it/math/Matrix4",
+				"Plane": "api/it/math/Plane",
+				"Quaternion": "api/it/math/Quaternion",
+				"Ray": "api/it/math/Ray",
+				"Sphere": "api/it/math/Sphere",
+				"Spherical": "api/it/math/Spherical",
+				"SphericalHarmonics3": "api/it/math/SphericalHarmonics3",
+				"Triangle": "api/it/math/Triangle",
+				"Vector2": "api/it/math/Vector2",
+				"Vector3": "api/it/math/Vector3",
+				"Vector4": "api/it/math/Vector4"
+			},
+
+			"Math / Interpolants": {
+				"CubicInterpolant": "api/it/math/interpolants/CubicInterpolant",
+				"DiscreteInterpolant": "api/it/math/interpolants/DiscreteInterpolant",
+				"LinearInterpolant": "api/it/math/interpolants/LinearInterpolant",
+				"QuaternionLinearInterpolant": "api/it/math/interpolants/QuaternionLinearInterpolant"
 			}
 		}
 	},
