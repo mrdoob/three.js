@@ -362,7 +362,7 @@ function setValueV1i( gl, v ) {
 
 }
 
-// Single integer / boolean vector (from flat array)
+// Single integer / boolean vector (from flat array or THREE.VectorN)
 
 function setValueV2i( gl, v ) {
 
@@ -462,17 +462,32 @@ function setValueV1ui( gl, v ) {
 
 }
 
-// Single unsigned integer vector (from flat array)
+// Single unsigned integer vector (from flat array or THREE.VectorN)
 
 function setValueV2ui( gl, v ) {
 
 	const cache = this.cache;
 
-	if ( arraysEqual( cache, v ) ) return;
+	if ( v.x !== undefined ) {
 
-	gl.uniform2uiv( this.addr, v );
+		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y ) {
 
-	copyArray( cache, v );
+			gl.uniform2ui( this.addr, v.x, v.y );
+
+			cache[ 0 ] = v.x;
+			cache[ 1 ] = v.y;
+
+		}
+
+	} else {
+
+		if ( arraysEqual( cache, v ) ) return;
+
+		gl.uniform2uiv( this.addr, v );
+
+		copyArray( cache, v );
+
+	}
 
 }
 
@@ -480,11 +495,27 @@ function setValueV3ui( gl, v ) {
 
 	const cache = this.cache;
 
-	if ( arraysEqual( cache, v ) ) return;
+	if ( v.x !== undefined ) {
 
-	gl.uniform3uiv( this.addr, v );
+		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y || cache[ 2 ] !== v.z ) {
 
-	copyArray( cache, v );
+			gl.uniform3ui( this.addr, v.x, v.y, v.z );
+
+			cache[ 0 ] = v.x;
+			cache[ 1 ] = v.y;
+			cache[ 2 ] = v.z;
+
+		}
+
+	} else {
+
+		if ( arraysEqual( cache, v ) ) return;
+
+		gl.uniform3uiv( this.addr, v );
+
+		copyArray( cache, v );
+
+	}
 
 }
 
@@ -492,11 +523,28 @@ function setValueV4ui( gl, v ) {
 
 	const cache = this.cache;
 
-	if ( arraysEqual( cache, v ) ) return;
+	if ( v.x !== undefined ) {
 
-	gl.uniform4uiv( this.addr, v );
+		if ( cache[ 0 ] !== v.x || cache[ 1 ] !== v.y || cache[ 2 ] !== v.z || cache[ 3 ] !== v.w ) {
 
-	copyArray( cache, v );
+			gl.uniform4ui( this.addr, v.x, v.y, v.z, v.w );
+
+			cache[ 0 ] = v.x;
+			cache[ 1 ] = v.y;
+			cache[ 2 ] = v.z;
+			cache[ 3 ] = v.w;
+
+		}
+
+	} else {
+
+		if ( arraysEqual( cache, v ) ) return;
+
+		gl.uniform4uiv( this.addr, v );
+
+		copyArray( cache, v );
+
+	}
 
 }
 
