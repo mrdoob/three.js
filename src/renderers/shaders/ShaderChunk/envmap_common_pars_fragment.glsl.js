@@ -1,6 +1,7 @@
 export default /* glsl */`
 #ifdef USE_ENVMAP
 
+	uniform float backgroundBlurriness;
 	uniform float envMapIntensity;
 	uniform float flipEnvMap;
 
