@@ -12,9 +12,11 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Creates a texture for use with a video texture.<br /><br />
+		Creates a texture for use with a video.
+		</p>
 
-		This is almost the same as the base [page:Texture Texture] class, except that it continuously sets [page:Texture.needsUpdate needsUpdate] to `true` so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
+		<p>
+			Note: After the initial use of a texture, the video cannot be changed. Instead, call [page:.dispose]() on the texture and instantiate a new one.
 		</p>
 
 		<h2>Code Example</h2>
@@ -27,7 +29,13 @@
 
 		<h2>Examples</h2>
 
-		<p>[example:webgl_materials_video materials / video ]</p>
+		<p>
+			[example:webgl_materials_video materials / video]<br />
+			[example:webgl_materials_video_webcam materials / video / webcam]<br />
+			[example:webgl_video_kinect video / kinect]<br />
+			[example:webgl_video_panorama_equirectangular video / panorama / equirectangular]<br />
+			[example:webxr_vr_video vr / video]
+		</p>
 
 		<h2>Constructor</h2>
 		<h3>[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
@@ -47,7 +55,7 @@
 		The default is [page:Textures THREE.LinearFilter]. See [page:Textures magnification filter constants] for other choices.<br />
 
 		[page:Constant minFilter] -- How the texture is sampled when a texel covers less than one pixel.
-		The default is [page:Textures THREE.LinearMipmapLinearFilter]. See [page:Textures minification filter constants] for other choices.<br />
+		The default is [page:Textures THREE.LinearFilter]. See [page:Textures minification filter constants] for other choices.<br />
 
 		[page:Constant format] -- The default is [page:Textures THREE.RGBAFormat].
 		See [page:Textures format constants] for other choices.<br />
@@ -69,7 +77,7 @@
 
 		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
-		Whether to generate mipmaps. False by default.
+		Whether to generate mipmaps. `false` by default.
 		</p>
 
 		<h3>[property:Boolean isVideoTexture]</h3>
@@ -79,7 +87,7 @@
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-		You will not need to set this manually here as it is handled by the [page:VideoTexture.update update] method.
+		You will not need to set this manually here as it is handled by the [page:VideoTexture.update update]() method.
 		</p>
 
 		<h2>Methods</h2>
