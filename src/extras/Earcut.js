@@ -4,7 +4,9 @@
 
 const Earcut = {
 
-	triangulate: function ( data, holeIndices, dim = 2 ) {
+	triangulate: function ( data, holeIndices, dim ) {
+
+		dim = dim || 2;
 
 		const hasHoles = holeIndices && holeIndices.length;
 		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
