@@ -337,7 +337,7 @@ function WebGLRenderer( parameters = {} ) {
 		materials = new WebGLMaterials( _this, properties );
 		renderLists = new WebGLRenderLists();
 		renderStates = new WebGLRenderStates( extensions, capabilities );
-		background = new WebGLBackground( _this, cubemaps, state, objects, _alpha, _premultipliedAlpha );
+		background = new WebGLBackground( _this, cubemaps, cubeuvmaps, state, objects, _alpha, _premultipliedAlpha );
 		shadowMap = new WebGLShadowMap( _this, objects, capabilities );
 		uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities, state );
 

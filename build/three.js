@@ -2575,7 +2575,7 @@
 	*/
 
 	class WebGLRenderTarget extends EventDispatcher {
-		constructor(width, height, options = {}) {
+		constructor(width = 1, height = 1, options = {}) {
 			super();
 			this.isWebGLRenderTarget = true;
 			this.width = width;
@@ -2666,7 +2666,7 @@
 	}
 
 	class WebGLArrayRenderTarget extends WebGLRenderTarget {
-		constructor(width, height, depth) {
+		constructor(width = 1, height = 1, depth = 1) {
 			super(width, height);
 			this.isWebGLArrayRenderTarget = true;
 			this.depth = depth;
@@ -2704,7 +2704,7 @@
 	}
 
 	class WebGL3DRenderTarget extends WebGLRenderTarget {
-		constructor(width, height, depth) {
+		constructor(width = 1, height = 1, depth = 1) {
 			super(width, height);
 			this.isWebGL3DRenderTarget = true;
 			this.depth = depth;
@@ -2715,7 +2715,7 @@
 	}
 
 	class WebGLMultipleRenderTargets extends WebGLRenderTarget {
-		constructor(width, height, count, options = {}) {
+		constructor(width = 1, height = 1, count = 1, options = {}) {
 			super(width, height, options);
 			this.isWebGLMultipleRenderTargets = true;
 			const texture = this.texture;
@@ -9092,7 +9092,7 @@
 	}
 
 	class WebGLCubeRenderTarget extends WebGLRenderTarget {
-		constructor(size, options = {}) {
+		constructor(size = 1, options = {}) {
 			super(size, size, options);
 			this.isWebGLCubeRenderTarget = true;
 			const image = {
@@ -9733,9 +9733,9 @@
 
 	var encodings_pars_fragment = "vec4 LinearToLinear( in vec4 value ) {\n\treturn value;\n}\nvec4 LinearTosRGB( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );\n}";
 
-	var envmap_fragment = "#ifdef USE_ENVMAP\n\t#ifdef ENV_WORLDPOS\n\t\tvec3 cameraToFrag;\n\t\tif ( isOrthographic ) {\n\t\t\tcameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );\n\t\t} else {\n\t\t\tcameraToFrag = normalize( vWorldPosition - cameraPosition );\n\t\t}\n\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvec3 reflectVec = reflect( cameraToFrag, worldNormal );\n\t\t#else\n\t\t\tvec3 reflectVec = refract( cameraToFrag, worldNormal, refractionRatio );\n\t\t#endif\n\t#else\n\t\tvec3 reflectVec = vReflect;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 envColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\t#elif defined( ENVMAP_TYPE_CUBE_UV )\n\t\tvec4 envColor = textureCubeUV( envMap, reflectVec, 0.0 );\n\t#else\n\t\tvec4 envColor = vec4( 0.0 );\n\t#endif\n\t#ifdef ENVMAP_BLENDING_MULTIPLY\n\t\toutgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_MIX )\n\t\toutgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_ADD )\n\t\toutgoingLight += envColor.xyz * specularStrength * reflectivity;\n\t#endif\n#endif";
+	var envmap_fragment = "#ifdef USE_ENVMAP\n\t#ifdef ENV_WORLDPOS\n\t\tvec3 cameraToFrag;\n\t\tif ( isOrthographic ) {\n\t\t\tcameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );\n\t\t} else {\n\t\t\tcameraToFrag = normalize( vWorldPosition - cameraPosition );\n\t\t}\n\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvec3 reflectVec = reflect( cameraToFrag, worldNormal );\n\t\t#else\n\t\t\tvec3 reflectVec = refract( cameraToFrag, worldNormal, refractionRatio );\n\t\t#endif\n\t#else\n\t\tvec3 reflectVec = vReflect;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 envColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\t#elif defined( ENVMAP_TYPE_CUBE_UV )\n\t\tvec4 envColor = textureCubeUV( envMap, reflectVec, backgroundBlurriness );\n\t#else\n\t\tvec4 envColor = vec4( 0.0 );\n\t#endif\n\t#ifdef ENVMAP_BLENDING_MULTIPLY\n\t\toutgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_MIX )\n\t\toutgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_ADD )\n\t\toutgoingLight += envColor.xyz * specularStrength * reflectivity;\n\t#endif\n#endif";
 
-	var envmap_common_pars_fragment = "#ifdef USE_ENVMAP\n\tuniform float envMapIntensity;\n\tuniform float flipEnvMap;\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tuniform samplerCube envMap;\n\t#else\n\t\tuniform sampler2D envMap;\n\t#endif\n\t\n#endif";
+	var envmap_common_pars_fragment = "#ifdef USE_ENVMAP\n\tuniform float backgroundBlurriness;\n\tuniform float envMapIntensity;\n\tuniform float flipEnvMap;\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tuniform samplerCube envMap;\n\t#else\n\t\tuniform sampler2D envMap;\n\t#endif\n\t\n#endif";
 
 	var envmap_pars_fragment = "#ifdef USE_ENVMAP\n\tuniform float reflectivity;\n\t#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( LAMBERT )\n\t\t#define ENV_WORLDPOS\n\t#endif\n\t#ifdef ENV_WORLDPOS\n\t\tvarying vec3 vWorldPosition;\n\t\tuniform float refractionRatio;\n\t#else\n\t\tvarying vec3 vReflect;\n\t#endif\n#endif";
 
@@ -10128,7 +10128,11 @@
 			// physical
 			refractionRatio: {
 				value: 0.98
-			} // basic, lambert, phong
+			},
+			// basic, lambert, phong
+			backgroundBlurriness: {
+				value: 0
+			} // background
 
 		},
 		aomap: {
@@ -10630,7 +10634,7 @@
 		fragmentShader: ShaderChunk.meshphysical_frag
 	};
 
-	function WebGLBackground(renderer, cubemaps, state, objects, alpha, premultipliedAlpha) {
+	function WebGLBackground(renderer, cubemaps, cubeuvmaps, state, objects, alpha, premultipliedAlpha) {
 		const clearColor = new Color(0x000000);
 		let clearAlpha = alpha === true ? 0 : 1;
 		let planeMesh;
@@ -10644,7 +10648,9 @@
 			let background = scene.isScene === true ? scene.background : null;
 
 			if (background && background.isTexture) {
-				background = cubemaps.get(background);
+				const usePMREM = scene.backgroundBlurriness > 0; // use PMREM if the user wants to blur the background
+
+				background = (usePMREM ? cubeuvmaps : cubemaps).get(background);
 			} // Ignore background in AR
 			// TODO: Reconsider this.
 
@@ -10697,6 +10703,7 @@
 
 				boxMesh.material.uniforms.envMap.value = background;
 				boxMesh.material.uniforms.flipEnvMap.value = background.isCubeTexture && background.isRenderTargetTexture === false ? -1 : 1;
+				boxMesh.material.uniforms.backgroundBlurriness.value = scene.backgroundBlurriness;
 
 				if (currentBackground !== background || currentBackgroundVersion !== background.version || currentTonemapping !== renderer.toneMapping) {
 					boxMesh.material.needsUpdate = true;
@@ -17347,7 +17354,8 @@
 
 			if (useMultisampledRTT(renderTarget)) {
 				multisampledRTTExt.framebufferTexture2DMultisampleEXT(_gl.FRAMEBUFFER, attachment, textureTarget, properties.get(texture).__webglTexture, 0, getRenderTargetSamples(renderTarget));
-			} else {
+			} else if (textureTarget === _gl.TEXTURE_2D || textureTarget >= _gl.TEXTURE_CUBE_MAP_POSITIVE_X && textureTarget <= _gl.TEXTURE_CUBE_MAP_NEGATIVE_Z) {
+				// see #24753
 				_gl.framebufferTexture2D(_gl.FRAMEBUFFER, attachment, textureTarget, properties.get(texture).__webglTexture, 0);
 			}
 
@@ -19675,7 +19683,7 @@
 			materials = new WebGLMaterials(_this, properties);
 			renderLists = new WebGLRenderLists();
 			renderStates = new WebGLRenderStates(extensions, capabilities);
-			background = new WebGLBackground(_this, cubemaps, state, objects, _alpha, _premultipliedAlpha);
+			background = new WebGLBackground(_this, cubemaps, cubeuvmaps, state, objects, _alpha, _premultipliedAlpha);
 			shadowMap = new WebGLShadowMap(_this, objects, capabilities);
 			uniformsGroups = new WebGLUniformsGroups(_gl, info, capabilities, state);
 			bufferRenderer = new WebGLBufferRenderer(_gl, extensions, info, capabilities);
@@ -21052,6 +21060,7 @@
 			this.background = null;
 			this.environment = null;
 			this.fog = null;
+			this.backgroundBlurriness = 0;
 			this.overrideMaterial = null;
 
 			if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
@@ -21066,6 +21075,7 @@
 			if (source.background !== null) this.background = source.background.clone();
 			if (source.environment !== null) this.environment = source.environment.clone();
 			if (source.fog !== null) this.fog = source.fog.clone();
+			this.backgroundBlurriness = source.backgroundBlurriness;
 			if (source.overrideMaterial !== null) this.overrideMaterial = source.overrideMaterial.clone();
 			this.matrixAutoUpdate = source.matrixAutoUpdate;
 			return this;
@@ -21074,6 +21084,7 @@
 		toJSON(meta) {
 			const data = super.toJSON(meta);
 			if (this.fog !== null) data.object.fog = this.fog.toJSON();
+			if (this.backgroundBlurriness > 0) data.backgroundBlurriness = this.backgroundBlurriness;
 			return data;
 		} // @deprecated
 
@@ -30636,6 +30647,7 @@
 						}
 					}
 
+					if (data.backgroundBlurriness !== undefined) object.backgroundBlurriness = data.backgroundBlurriness;
 					break;
 
 				case 'PerspectiveCamera':

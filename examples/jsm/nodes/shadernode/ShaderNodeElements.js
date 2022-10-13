@@ -9,6 +9,7 @@ import BlendModeNode from '../display/BlendModeNode.js';
 import ColorAdjustmentNode from '../display/ColorAdjustmentNode.js';
 import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import NormalMapNode from '../display/NormalMapNode.js';
+import PosterizeNode from '../display/PosterizeNode.js';
 import ToneMappingNode from '../display/ToneMappingNode.js';
 
 // lighting
@@ -87,6 +88,8 @@ export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
 export const normalMap = nodeProxy( NormalMapNode );
 export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
+
+export const posterize = nodeProxy( PosterizeNode );
 
 // lighting
 
