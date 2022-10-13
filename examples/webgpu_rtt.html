@@ -41,9 +41,10 @@
 
 			const dpr = window.devicePixelRatio;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -103,10 +104,6 @@
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
 
-				//
-
-				return renderer.init();
-
 			}
 
 			function onWindowMouseMove( e ) {
@@ -135,12 +132,6 @@
 
 				textureRenderer.render( scene, camera );
 				renderer.render( sceneFX, cameraFX );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 
