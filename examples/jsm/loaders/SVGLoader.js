@@ -1588,98 +1588,118 @@ class SVGLoader extends Loader {
 
 			}
 
-			function ellipseMatrixForm( curve, out ) {
+			function transfEllipseGeneric( curve ) {
 
-				// Build matrix form of the original ellipse curve
-				// See: https://en.wikipedia.org/wiki/Ellipse → General ellipse
+				// For math description see:
+				// https://math.stackexchange.com/questions/4544164
 
 				const a = curve.xRadius;
 				const b = curve.yRadius;
 
-				const x0 = curve.aX;
-				const y0 = curve.aY;
-				const theta = curve.aRotation;
-				const sth = Math.sin( theta );
-				const cth = Math.cos( theta );
+				const cosTheta = Math.cos( curve.aRotation );
+				const sinTheta = Math.sin( curve.aRotation );
 
-				const A = a * a * sth * sth + b * b * cth * cth;
-				const B = 2 * ( b * b - a * a ) * sth * cth;
-				const C = a * a * cth * cth + b * b * sth * sth;
-				const D = - 2 * A * x0 - B * y0;
-				const E = - B * x0 - 2 * C * y0;
-				const F = A * x0 * x0 + B * x0 * y0 + C * y0 * y0 - a * a * b * b;
+				const v1 = new Vector3( a * cosTheta, a * sinTheta, 0 );
+				const v2 = new Vector3( -b * sinTheta, b * cosTheta, 0 );
 
-				const result = out || new Matrix3();
+				const f1 = v1.applyMatrix3( m );
+				const f2 = v2.applyMatrix3( m );
 
-				return result.set(
-					A, B / 2, D / 2,
-					B / 2, C, E / 2,
-					D / 2, E / 2, F,
+				const mF = tempTransform0.set(
+					f1.x, f2.x, 0,
+					f1.y, f2.y, 0,
+					0,    0,    1,
 				);
 
-			}
+				const mFInv = tempTransform1.copy( mF ).invert();
+				const mFInvT = tempTransform2.copy( mFInv ).transpose();
+				const mQ = mFInvT.multiply( mFInv );
+				const mQe = mQ.elements;
 
-			function transfEllipse( curve ) {
+				const ed = eigenDecomposition( mQe[0], mQe[1], mQe[4] );
+				const rt1sqrt = Math.sqrt( ed.rt1 );
+				const rt2sqrt = Math.sqrt( ed.rt2 );
 
-				// See:
-				// - https://math.stackexchange.com/questions/1498799/
-				// - https://math.stackexchange.com/questions/3076317/
+				curve.xRadius = 1 / rt1sqrt;
+				curve.yRadius = 1 / rt2sqrt;
+				curve.aRotation = Math.atan2( ed.sn, ed.cs );
 
-				const mQ = ellipseMatrixForm( curve, tempTransform0 );
-				const mInvT = tempTransform1.copy( m ).invert();
-				const mQNew = tempTransform2.copy( mInvT ).transpose().multiply( mQ ).multiply( mInvT );
+				const isFullEllipse =
+					( curve.aEndAngle - curve.aStartAngle ) % ( 2 * Math.PI ) < Number.EPSILON;
 
-				// Perform de-composition
+				// Do not touch angles of a full ellipse because after transformation they
+				// would converge to a sinle value effectively removing the whole curve
 
-				const elem = mQNew.elements;
-				const A = elem[ 0 ];
-				const B = elem[ 1 ] * 2;
-				const C = elem[ 4 ];
-				const D = elem[ 2 ] * 2;
-				const E = elem[ 5 ] * 2;
-				const F = elem[ 8 ];
+				if ( !isFullEllipse ) {
 
-				// Compute canonical ellipse params
+					const mDsqrt = tempTransform1.set(
+						rt1sqrt, 0, 0,
+						0, rt2sqrt, 0,
+						0, 0,       1,
+					);
 
-				const discriminant = B * B - 4 * A * C;
+					const mRT = tempTransform2.set(
+						ed.cs,  ed.sn, 0,
+						-ed.sn, ed.cs, 0,
+						0,      0,     1,
+					);
 
-				const abP1 = 2 * ( A * E * E + C * D * D - B * D * E + discriminant * F );
-				const abP2 = Math.sqrt( ( A - C ) * ( A - C ) + B * B );
+					const mDRF = mDsqrt.multiply( mRT ).multiply( mF );
 
-				const a = Math.sqrt( abP1 * ( A + C + abP2 ) ) / discriminant;
-				const b = Math.sqrt( abP1 * ( A + C - abP2 ) ) / discriminant;
+					const transformAngle = phi => {
 
-				const x0 = ( 2 * C * D - B * E ) / discriminant;
-				const y0 = ( 2 * A * E - B * D ) / discriminant;
+						const { x: cosR, y: sinR } =
+							new Vector3( Math.cos( phi ), Math.sin( phi ), 0 ).applyMatrix3( mDRF );
 
-				let theta = 0;
+						return Math.atan2( sinR, cosR );
 
-				if ( B !== 0 ) {
+					}
 
-					theta = Math.atan( ( C - A - Math.sqrt( ( A - C ) * ( A - C ) + B * B ) ) / B );
+					curve.aStartAngle = transformAngle( curve.aStartAngle );
+					curve.aEndAngle = transformAngle( curve.aEndAngle );
 
-				} else if ( A > C ) {
+					if ( isTransformFlipped( m ) ) {
 
-					theta = Math.PI / 2;
+						curve.aClockwise = !curve.aClockwise;
+
+					}
 
 				}
 
-				// Update data in-place
+			}
 
-				curve.aX = x0;
-				curve.aY = y0;
-				curve.xRadius = a;
-				curve.yRadius = b;
-				curve.aRotation = theta;
+			function transfEllipseNoSkew( curve ) {
 
-				// TODO: Linear algebra voodoo required!
-				// We should also re-map start/end angles to the domain of the new ellipse.
-				// Can’t find a correct analytical way to compute it. Help is much appreciated.
-				// As a starting point see: https://math.stackexchange.com/questions/4544164/
-				//curve.aStartAngle = ???;
-				//curve.aEndAngle = ???;
+				// Faster shortcut if no skew is applied
+				// (e.g, a euclidean transform of a group containing the ellipse)
 
-				return curve;
+				const sx = getTransformScaleX( m );
+				const sy = getTransformScaleY( m );
+
+				curve.xRadius *= sx;
+				curve.yRadius *= sy;
+
+				// Extract rotation angle from the matrix of form:
+				//
+				//  | cosθ sx   -sinθ sy |
+				//  | sinθ sx    cosθ sy |
+				//
+				// Remembering that tanθ = sinθ / cosθ; and that
+				// `sx`, `sy`, or both might be zero.
+				const theta =
+					sx > Number.EPSILON
+					? Math.atan2( m.elements[ 1 ], m.elements[ 0 ] )
+					: Math.atan2( - m.elements[ 3 ], m.elements[ 4 ] );
+
+				curve.aRotation += theta;
+
+				if ( isTransformFlipped( m ) ) {
+
+					curve.aStartAngle *= -1;
+					curve.aEndAngle *= -1;
+					curve.aClockwise = !curve.aClockwise;
+
+				}
 
 			}
 
@@ -1714,39 +1734,22 @@ class SVGLoader extends Loader {
 
 					} else if ( curve.isEllipseCurve ) {
 
+						// Transform ellipse center point
+
+						tempV2.set( curve.aX, curve.aY );
+						transfVec2( tempV2 );
+						curve.aX = tempV2.x;
+						curve.aY = tempV2.y;
+
+						// Transform ellipse shape parameters
+
 						if ( isTransformSkewed( m ) ) {
 
-							if ( ( curve.aEndAngle - curve.aStartAngle ) % ( 2 * Math.PI ) !== 0 ) {
-
-								console.warn( 'SVGLoader: Elliptic arc skewing is not implemented.' );
-
-							}
-
-							transfEllipse( curve );
+							transfEllipseGeneric( curve );
 
 						} else {
 
-							// Faster shortcut if no skew is applied
-							// (e.g, a euclidean transform of a group containing the ellipse)
-
-							tempV2.set( curve.aX, curve.aY );
-							transfVec2( tempV2 );
-							curve.aX = tempV2.x;
-							curve.aY = tempV2.y;
-
-							const sx = getTransformScaleX( m );
-							const sy = getTransformScaleY( m );
-
-							curve.xRadius *= sx;
-							curve.yRadius *= sy;
-
-							if ( isTransformRotated( m ) ) {
-
-								const sin = m.elements[ 1 ] / sx;
-								const cos = m.elements[ 0 ] / sx;
-								curve.aRotation += Math.atan2( sin, cos );
-
-							}
+							transfEllipseNoSkew( curve );
 
 						}
 
@@ -1758,9 +1761,10 @@ class SVGLoader extends Loader {
 
 		}
 
-		function isTransformRotated( m ) {
+		function isTransformFlipped( m ) {
 
-			return m.elements[ 1 ] !== 0 || m.elements[ 3 ] !== 0;
+			const te = m.elements;
+			return te[ 0 ] * te[ 4 ] - te[ 1 ] * te[ 3 ] < 0;
 
 		}
 
@@ -1790,6 +1794,85 @@ class SVGLoader extends Loader {
 
 			const te = m.elements;
 			return Math.sqrt( te[ 3 ] * te[ 3 ] + te[ 4 ] * te[ 4 ] );
+
+		}
+
+		// Calculates the eigensystem of a real symmetric 2x2 matrix
+		//    [ A  B ]
+		//    [ B  C ]
+		// in the form
+		//    [ A  B ]  =  [ cs  -sn ] [ rt1   0  ] [  cs  sn ]
+		//    [ B  C ]     [ sn   cs ] [  0   rt2 ] [ -sn  cs ]
+		// where rt1 >= rt2.
+		//
+		// Adapted from: https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html
+		// -> Algorithms for real symmetric matrices -> Analytical (2x2 symmetric)
+		function eigenDecomposition( A, B, C ) {
+
+			let rt1, rt2, cs, sn, t;
+			const sm = A + C;
+			const df = A - C;
+			const rt = Math.sqrt( df * df + 4 * B * B );
+
+			if ( sm > 0 ) {
+
+				rt1 = 0.5 * ( sm + rt );
+				t = 1 / rt1;
+				rt2 = A * t * C - B * t * B;
+
+			} else if ( sm < 0 ) {
+
+				rt2 = 0.5 * ( sm - rt );
+
+			} else {
+
+				// This case needs to be treated separately to avoid div by 0
+
+				rt1 = 0.5 * rt;
+				rt2 = -0.5 * rt;
+
+			}
+
+			// Calculate eigenvectors
+
+			if ( df > 0 ) {
+
+				cs = df + rt;
+
+			} else {
+
+				cs = df - rt;
+
+			}
+
+			if ( Math.abs( cs ) > 2 * Math.abs( B ) ) {
+
+				t = -2 * B / cs;
+				sn = 1 / Math.sqrt( 1 + t * t );
+				cs = t * sn;
+
+			} else if ( Math.abs( B ) === 0 ) {
+
+				cs = 1;
+				sn = 0;
+
+			} else {
+
+				t = -0.5 * cs / B;
+				cs = 1 / Math.sqrt( 1 + t * t );
+				sn = t * cs;
+
+			}
+
+			if ( df > 0 ) {
+
+				t = cs;
+				cs = -sn;
+				sn = t;
+
+			}
+
+			return { rt1, rt2, cs, sn };
 
 		}
 
