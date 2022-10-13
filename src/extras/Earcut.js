@@ -1,7 +1,5 @@
 /**
  * Port from https://github.com/mapbox/earcut (v2.2.4)
- *
- * There is one bug fix that is different from Earcut v2.2.4. Line 388-389.
  */
 
 const Earcut = {
@@ -385,8 +383,8 @@ function eliminateHole( hole, outerNode ) {
 	const bridgeReverse = splitPolygon( bridge, hole );
 
 	// filter collinear points around the cuts
-	return filterPoints( bridgeReverse, bridgeReverse.next ); // there is different from the implementation of Earcut v2.2.4
-	// return filterPoints( bridge, bridge.next );
+	filterPoints( bridgeReverse, bridgeReverse.next );
+	return filterPoints( bridge, bridge.next );
 
 }
 
