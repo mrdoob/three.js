@@ -4,9 +4,7 @@
 
 const Earcut = {
 
-	triangulate: function ( data, holeIndices, dim ) {
-
-		dim = dim || 2;
+	triangulate: function ( data, holeIndices, dim = 2 ) {
 
 		const hasHoles = holeIndices && holeIndices.length;
 		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
@@ -193,7 +191,6 @@ function isEar( ear ) {
 		y1 = ay > by ? ( ay > cy ? ay : cy ) : ( by > cy ? by : cy );
 
 	let p = c.next;
-
 	while ( p !== a ) {
 
 		if ( p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 &&
@@ -234,13 +231,11 @@ function isEarHashed( ear, minX, minY, invSize ) {
 	while ( p && p.z >= minZ && n && n.z <= maxZ ) {
 
 		if ( p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && p !== a && p !== c &&
-			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) &&
-			area( p.prev, p, p.next ) >= 0 ) return false;
+			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) && area( p.prev, p, p.next ) >= 0 ) return false;
 		p = p.prevZ;
 
 		if ( n.x >= x0 && n.x <= x1 && n.y >= y0 && n.y <= y1 && n !== a && n !== c &&
-			pointInTriangle( ax, ay, bx, by, cx, cy, n.x, n.y ) &&
-			area( n.prev, n, n.next ) >= 0 ) return false;
+			pointInTriangle( ax, ay, bx, by, cx, cy, n.x, n.y ) && area( n.prev, n, n.next ) >= 0 ) return false;
 		n = n.nextZ;
 
 	}
@@ -249,8 +244,7 @@ function isEarHashed( ear, minX, minY, invSize ) {
 	while ( p && p.z >= minZ ) {
 
 		if ( p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && p !== a && p !== c &&
-			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) &&
-			area( p.prev, p, p.next ) >= 0 ) return false;
+			pointInTriangle( ax, ay, bx, by, cx, cy, p.x, p.y ) && area( p.prev, p, p.next ) >= 0 ) return false;
 		p = p.prevZ;
 
 	}
@@ -259,8 +253,7 @@ function isEarHashed( ear, minX, minY, invSize ) {
 	while ( n && n.z <= maxZ ) {
 
 		if ( n.x >= x0 && n.x <= x1 && n.y >= y0 && n.y <= y1 && n !== a && n !== c &&
-			pointInTriangle( ax, ay, bx, by, cx, cy, n.x, n.y ) &&
-			area( n.prev, n, n.next ) >= 0 ) return false;
+			pointInTriangle( ax, ay, bx, by, cx, cy, n.x, n.y ) && area( n.prev, n, n.next ) >= 0 ) return false;
 		n = n.nextZ;
 
 	}
@@ -375,7 +368,6 @@ function compareX( a, b ) {
 function eliminateHole( hole, outerNode ) {
 
 	const bridge = findHoleBridge( hole, outerNode );
-
 	if ( ! bridge ) {
 
 		return outerNode;
@@ -393,10 +385,11 @@ function eliminateHole( hole, outerNode ) {
 // David Eberly's algorithm for finding a bridge between hole and outer polygon
 function findHoleBridge( hole, outerNode ) {
 
-	let p = outerNode;
-	const hx = hole.x;
-	const hy = hole.y;
-	let qx = - Infinity, m;
+	let p = outerNode,
+		qx = - Infinity,
+		m;
+
+	const hx = hole.x, hy = hole.y;
 
 	// find a segment intersected by a ray from the hole's leftmost point to the left;
 	// segment's endpoint with lesser x will be potential connection point
@@ -409,7 +402,6 @@ function findHoleBridge( hole, outerNode ) {
 
 				qx = x;
 				m = p.x < p.next.x ? p : p.next;
-
 				if ( x === hx ) return m; // hole touches outer segment; pick leftmost endpoint
 
 			}
@@ -591,18 +583,18 @@ function getLeftmost( start ) {
 function pointInTriangle( ax, ay, bx, by, cx, cy, px, py ) {
 
 	return ( cx - px ) * ( ay - py ) >= ( ax - px ) * ( cy - py ) &&
-		( ax - px ) * ( by - py ) >= ( bx - px ) * ( ay - py ) &&
-		( bx - px ) * ( cy - py ) >= ( cx - px ) * ( by - py );
+           ( ax - px ) * ( by - py ) >= ( bx - px ) * ( ay - py ) &&
+           ( bx - px ) * ( cy - py ) >= ( cx - px ) * ( by - py );
 
 }
 
 // check if a diagonal between two polygon nodes is valid (lies in polygon interior)
 function isValidDiagonal( a, b ) {
 
-	return a.next.i !== b.i && a.prev.i !== b.i && ! intersectsPolygon( a, b ) && // doesn't intersect other edges
-		( locallyInside( a, b ) && locallyInside( b, a ) && middleInside( a, b ) && // locally visible
-		( area( a.prev, a, b.prev ) || area( a, b.prev, b ) ) || // does not create opposite-facing sectors
-		equals( a, b ) && area( a.prev, a, a.next ) > 0 && area( b.prev, b, b.next ) > 0 ); // special zero-length case
+	return a.next.i !== b.i && a.prev.i !== b.i && ! intersectsPolygon( a, b ) && // dones't intersect other edges
+           ( locallyInside( a, b ) && locallyInside( b, a ) && middleInside( a, b ) && // locally visible
+            ( area( a.prev, a, b.prev ) || area( a, b.prev, b ) ) || // does not create opposite-facing sectors
+            equals( a, b ) && area( a.prev, a, a.next ) > 0 && area( b.prev, b, b.next ) > 0 ); // special zero-length case
 
 }
 
@@ -659,7 +651,7 @@ function intersectsPolygon( a, b ) {
 	do {
 
 		if ( p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&
-				intersects( p, p.next, a, b ) ) return true;
+			intersects( p, p.next, a, b ) ) return true;
 		p = p.next;
 
 	} while ( p !== a );
@@ -687,7 +679,7 @@ function middleInside( a, b ) {
 	do {
 
 		if ( ( ( p.y > py ) !== ( p.next.y > py ) ) && p.next.y !== p.y &&
-				( px < ( p.next.x - p.x ) * ( py - p.y ) / ( p.next.y - p.y ) + p.x ) )
+			( px < ( p.next.x - p.x ) * ( py - p.y ) / ( p.next.y - p.y ) + p.x ) )
 			inside = ! inside;
 		p = p.next;
 
