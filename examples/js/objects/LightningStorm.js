@@ -51,7 +51,9 @@
 		constructor( stormParams = {} ) {
 
 			super();
-			this.isLightningStorm = true; // Parameters
+			this.isLightningStorm = true;
+
+			// Parameters
 
 			this.stormParams = stormParams;
 			stormParams.size = stormParams.size !== undefined ? stormParams.size : 1000.0;
@@ -68,7 +70,6 @@
 			this.lightningMaterial = stormParams.lightningMaterial !== undefined ? stormParams.lightningMaterial : new THREE.MeshBasicMaterial( {
 				color: 0xB0FFFF
 			} );
-
 			if ( stormParams.onRayPosition !== undefined ) {
 
 				this.onRayPosition = stormParams.onRayPosition;
@@ -85,13 +86,14 @@
 
 			}
 
-			this.onLightningDown = stormParams.onLightningDown; // Internal state
+			this.onLightningDown = stormParams.onLightningDown;
+
+			// Internal state
 
 			this.inited = false;
 			this.nextLightningTime = 0;
 			this.lightningsMeshes = [];
 			this.deadLightningsMeshes = [];
-
 			for ( let i = 0; i < this.stormParams.maxLightnings; i ++ ) {
 
 				const lightning = new THREE.LightningStrike( THREE.LightningStrike.copyParameters( {}, this.lightningParameters ) );
@@ -101,7 +103,6 @@
 			}
 
 		}
-
 		update( time ) {
 
 			if ( ! this.inited ) {
@@ -114,8 +115,8 @@
 			if ( time >= this.nextLightningTime ) {
 
 				// Lightning creation
-				const lightningMesh = this.deadLightningsMeshes.pop();
 
+				const lightningMesh = this.deadLightningsMeshes.pop();
 				if ( lightningMesh ) {
 
 					const lightningParams1 = THREE.LightningStrike.copyParameters( lightningMesh.geometry.rayParameters, this.lightningParameters );
@@ -126,23 +127,21 @@
 					this.add( lightningMesh );
 					this.lightningsMeshes.push( lightningMesh );
 
-				} // Schedule next lightning
+				}
 
-
+				// Schedule next lightning
 				this.nextLightningTime = this.getNextLightningTime( time );
 
 			}
 
 			let i = 0,
 				il = this.lightningsMeshes.length;
-
 			while ( i < il ) {
 
 				const mesh = this.lightningsMeshes[ i ];
 				const lightning = mesh.geometry;
 				const prevState = lightning.state;
 				lightning.update( time );
-
 				if ( prevState === THREE.LightningStrike.RAY_PROPAGATING && lightning.state > prevState ) {
 
 					if ( this.onLightningDown ) {
@@ -156,6 +155,7 @@
 				if ( lightning.state === THREE.LightningStrike.RAY_EXTINGUISHED ) {
 
 					// Lightning is to be destroyed
+
 					this.lightningsMeshes.splice( this.lightningsMeshes.indexOf( mesh ), 1 );
 					this.deadLightningsMeshes.push( mesh );
 					this.remove( mesh );
@@ -170,13 +170,11 @@
 			}
 
 		}
-
 		getNextLightningTime( currentTime ) {
 
 			return currentTime + THREE.MathUtils.lerp( this.stormParams.lightningMinPeriod, this.stormParams.lightningMaxPeriod, Math.random() ) / ( this.stormParams.maxLightnings + 1 );
 
 		}
-
 		copy( source, recursive ) {
 
 			super.copy( source, recursive );
@@ -195,7 +193,6 @@
 			return this;
 
 		}
-
 		clone() {
 
 			return new this.constructor( this.stormParams ).copy( this );

@@ -34,23 +34,21 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( text ) {
 
 			const lines = text.split( '\n' );
 			const vertices = [];
 			const colors = [];
-
 			for ( let line of lines ) {
 
 				line = line.trim();
 				if ( line.charAt( 0 ) === '#' ) continue; // skip comments
 
 				const lineValues = line.split( /\s+/ );
-
 				if ( lineValues.length === 3 ) {
 
 					// XYZ
+
 					vertices.push( parseFloat( lineValues[ 0 ] ) );
 					vertices.push( parseFloat( lineValues[ 1 ] ) );
 					vertices.push( parseFloat( lineValues[ 2 ] ) );
@@ -60,6 +58,7 @@
 				if ( lineValues.length === 6 ) {
 
 					// XYZRGB
+
 					vertices.push( parseFloat( lineValues[ 0 ] ) );
 					vertices.push( parseFloat( lineValues[ 1 ] ) );
 					vertices.push( parseFloat( lineValues[ 2 ] ) );
@@ -73,7 +72,6 @@
 
 			const geometry = new THREE.BufferGeometry();
 			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-
 			if ( colors.length > 0 ) {
 
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );

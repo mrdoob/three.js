@@ -18,7 +18,6 @@
 			let x = - widthHalf;
 			let y = - heightHalf;
 			let z = - depthHalf;
-
 			for ( let i = 0; i <= widthSegments; i ++ ) {
 
 				vertices.push( x, - heightHalf, - depthHalf, x, heightHalf, - depthHalf );

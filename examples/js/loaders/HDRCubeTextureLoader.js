@@ -9,12 +9,10 @@
 			this.type = THREE.HalfFloatType;
 
 		}
-
 		load( urls, onLoad, onProgress, onError ) {
 
 			const texture = new THREE.CubeTexture();
 			texture.type = this.type;
-
 			switch ( texture.type ) {
 
 				case THREE.FloatType:
@@ -23,7 +21,6 @@
 					texture.magFilter = THREE.LinearFilter;
 					texture.generateMipmaps = false;
 					break;
-
 				case THREE.HalfFloatType:
 					texture.encoding = THREE.LinearEncoding;
 					texture.minFilter = THREE.LinearFilter;
@@ -35,7 +32,6 @@
 
 			const scope = this;
 			let loaded = 0;
-
 			function loadHDRData( i, onLoad, onProgress, onError ) {
 
 				new THREE.FileLoader( scope.manager ).setPath( scope.path ).setResponseType( 'arraybuffer' ).setWithCredentials( scope.withCredentials ).load( urls[ i ], function ( buffer ) {
@@ -43,7 +39,6 @@
 					loaded ++;
 					const texData = scope.hdrLoader.parse( buffer );
 					if ( ! texData ) return;
-
 					if ( texData.data !== undefined ) {
 
 						const dataTexture = new THREE.DataTexture( texData.data, texData.width, texData.height );
@@ -77,7 +72,6 @@
 			return texture;
 
 		}
-
 		setDataType( value ) {
 
 			this.type = value;

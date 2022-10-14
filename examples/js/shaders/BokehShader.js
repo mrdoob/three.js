@@ -5,6 +5,7 @@
  * ported from GLSL shader by Martins Upitis
  * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
  */
+
 	const BokehShader = {
 		defines: {
 			'DEPTH_PACKING': 1,
@@ -36,9 +37,7 @@
 				value: 1000.0
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -48,9 +47,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#include <common>
 

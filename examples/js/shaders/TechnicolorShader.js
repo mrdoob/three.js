@@ -6,15 +6,14 @@
  * More historical info here: http://www.widescreenmuseum.com/oldcolor/technicolor1.htm
  * Demo here: http://charliehoey.com/technicolor_shader/shader_test.html
  */
+
 	const TechnicolorShader = {
 		uniforms: {
 			'tDiffuse': {
 				value: null
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -24,9 +23,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 		varying vec2 vUv;

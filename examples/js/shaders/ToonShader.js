@@ -24,9 +24,7 @@
 				value: new THREE.Color( 0xffffff )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec3 vNormal;
 		varying vec3 vRefract;
@@ -45,9 +43,7 @@
 			gl_Position = projectionMatrix * mvPosition;
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform vec3 uBaseColor;
 
@@ -111,9 +107,7 @@
 				value: new THREE.Color( 0x000000 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec3 vNormal;
 
@@ -123,9 +117,7 @@
 			vNormal = normalize( normalMatrix * normal );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform vec3 uBaseColor;
 		uniform vec3 uLineColor1;
@@ -188,9 +180,7 @@
 				value: new THREE.Color( 0x000000 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec3 vNormal;
 
@@ -200,9 +190,7 @@
 			vNormal = normalize( normalMatrix * normal );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform vec3 uBaseColor;
 		uniform vec3 uLineColor1;
@@ -284,9 +272,7 @@
 				value: new THREE.Color( 0x000000 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec3 vNormal;
 
@@ -296,9 +282,7 @@
 			vNormal = normalize( normalMatrix * normal );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform vec3 uBaseColor;
 		uniform vec3 uLineColor1;

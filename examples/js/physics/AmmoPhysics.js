@@ -18,11 +18,15 @@
 		const solver = new AmmoLib.btSequentialImpulseConstraintSolver();
 		const world = new AmmoLib.btDiscreteDynamicsWorld( dispatcher, broadphase, solver, collisionConfiguration );
 		world.setGravity( new AmmoLib.btVector3( 0, - 9.8, 0 ) );
-		const worldTransform = new AmmoLib.btTransform(); //
+		const worldTransform = new AmmoLib.btTransform();
+
+		//
 
 		function getShape( geometry ) {
 
-			const parameters = geometry.parameters; // TODO change type to is*
+			const parameters = geometry.parameters;
+
+			// TODO change type to is*
 
 			if ( geometry.type === 'BoxGeometry' ) {
 
@@ -48,11 +52,9 @@
 
 		const meshes = [];
 		const meshMap = new WeakMap();
-
 		function addMesh( mesh, mass = 0 ) {
 
 			const shape = getShape( mesh.geometry );
-
 			if ( shape !== null ) {
 
 				if ( mesh.isInstancedMesh ) {
@@ -81,10 +83,9 @@
 			const localInertia = new AmmoLib.btVector3( 0, 0, 0 );
 			shape.calculateLocalInertia( mass, localInertia );
 			const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia );
-			const body = new AmmoLib.btRigidBody( rbInfo ); // body.setFriction( 4 );
-
+			const body = new AmmoLib.btRigidBody( rbInfo );
+			// body.setFriction( 4 );
 			world.addRigidBody( body );
-
 			if ( mass > 0 ) {
 
 				meshes.push( mesh );
@@ -98,7 +99,6 @@
 
 			const array = mesh.instanceMatrix.array;
 			const bodies = [];
-
 			for ( let i = 0; i < mesh.count; i ++ ) {
 
 				const index = i * 16;
@@ -121,8 +121,9 @@
 
 			}
 
-		} //
+		}
 
+		//
 
 		function setMeshPosition( mesh, position, index = 0 ) {
 
@@ -147,34 +148,35 @@
 
 			}
 
-		} //
+		}
 
+		//
 
 		let lastTime = 0;
-
 		function step() {
 
 			const time = performance.now();
-
 			if ( lastTime > 0 ) {
 
-				const delta = ( time - lastTime ) / 1000; // console.time( 'world.step' );
+				const delta = ( time - lastTime ) / 1000;
 
-				world.stepSimulation( delta, 10 ); // console.timeEnd( 'world.step' );
+				// console.time( 'world.step' );
+				world.stepSimulation( delta, 10 );
+				// console.timeEnd( 'world.step' );
 
 			}
 
-			lastTime = time; //
+			lastTime = time;
+
+			//
 
 			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
 				const mesh = meshes[ i ];
-
 				if ( mesh.isInstancedMesh ) {
 
 					const array = mesh.instanceMatrix.array;
 					const bodies = meshMap.get( mesh );
-
 					for ( let j = 0; j < bodies.length; j ++ ) {
 
 						const body = bodies[ j ];
@@ -202,14 +204,15 @@
 
 			}
 
-		} // animate
+		}
 
+		// animate
 
 		setInterval( step, 1000 / frameRate );
 		return {
 			addMesh: addMesh,
-			setMeshPosition: setMeshPosition // addCompoundMesh
-
+			setMeshPosition: setMeshPosition
+			// addCompoundMesh
 		};
 
 	}

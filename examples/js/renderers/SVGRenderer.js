@@ -11,7 +11,6 @@
 		}
 
 	}
-
 	class SVGRenderer {
 
 		constructor() {
@@ -32,7 +31,6 @@
 				_quality = 1,
 				_currentPath,
 				_currentStyle;
-
 			const _this = this,
 				_clipBox = new THREE.Box2(),
 				_elemBox = new THREE.Box2(),
@@ -52,7 +50,6 @@
 				_svgPathPool = [],
 				_projector = new THREE.Projector(),
 				_svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
-
 			this.domElement = _svg;
 			this.autoClear = true;
 			this.sortObjects = true;
@@ -64,7 +61,6 @@
 					faces: 0
 				}
 			};
-
 			this.setQuality = function ( quality ) {
 
 				switch ( quality ) {
@@ -72,7 +68,6 @@
 					case 'high':
 						_quality = 1;
 						break;
-
 					case 'low':
 						_quality = 0;
 						break;
@@ -95,15 +90,10 @@
 				_svgHeight = height;
 				_svgWidthHalf = _svgWidth / 2;
 				_svgHeightHalf = _svgHeight / 2;
-
 				_svg.setAttribute( 'viewBox', - _svgWidthHalf + ' ' + - _svgHeightHalf + ' ' + _svgWidth + ' ' + _svgHeight );
-
 				_svg.setAttribute( 'width', _svgWidth );
-
 				_svg.setAttribute( 'height', _svgHeight );
-
 				_clipBox.min.set( - _svgWidthHalf, - _svgHeightHalf );
-
 				_clipBox.max.set( _svgWidthHalf, _svgHeightHalf );
 
 			};
@@ -126,7 +116,6 @@
 			function removeChildNodes() {
 
 				_pathCount = 0;
-
 				while ( _svg.childNodes.length > 0 ) {
 
 					_svg.removeChild( _svg.childNodes[ 0 ] );
@@ -158,7 +147,6 @@
 				}
 
 				const background = scene.background;
-
 				if ( background && background.isColor ) {
 
 					removeChildNodes();
@@ -172,30 +160,24 @@
 
 				_this.info.render.vertices = 0;
 				_this.info.render.faces = 0;
-
 				_viewMatrix.copy( camera.matrixWorldInverse );
-
 				_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
-
 				_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
 				_elements = _renderData.elements;
 				_lights = _renderData.lights;
-
 				_normalViewMatrix.getNormalMatrix( camera.matrixWorldInverse );
+				calculateLights( _lights );
 
-				calculateLights( _lights ); // reset accumulated path
+				// reset accumulated path
 
 				_currentPath = '';
 				_currentStyle = '';
-
 				for ( let e = 0, el = _elements.length; e < el; e ++ ) {
 
 					const element = _elements[ e ];
 					const material = element.material;
 					if ( material === undefined || material.opacity === 0 ) continue;
-
 					_elemBox.makeEmpty();
-
 					if ( element instanceof THREE.RenderableSprite ) {
 
 						_v1 = element;
@@ -211,9 +193,7 @@
 						_v1.positionScreen.y *= - _svgHeightHalf;
 						_v2.positionScreen.x *= _svgWidthHalf;
 						_v2.positionScreen.y *= - _svgHeightHalf;
-
 						_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
-
 						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 							renderLine( _v1, _v2, material );
@@ -234,7 +214,6 @@
 						_v2.positionScreen.y *= - _svgHeightHalf;
 						_v3.positionScreen.x *= _svgWidthHalf;
 						_v3.positionScreen.y *= - _svgHeightHalf;
-
 						if ( this.overdraw > 0 ) {
 
 							expand( _v1.positionScreen, _v2.positionScreen, this.overdraw );
@@ -244,7 +223,6 @@
 						}
 
 						_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
-
 						if ( _clipBox.intersectsBox( _elemBox ) === true ) {
 
 							renderFace3( _v1, _v2, _v3, element, material );
@@ -262,15 +240,12 @@
 					if ( object.isSVGObject ) {
 
 						_vector3.setFromMatrixPosition( object.matrixWorld );
-
 						_vector3.applyMatrix4( _viewProjectionMatrix );
-
 						if ( _vector3.z < - 1 || _vector3.z > 1 ) return;
 						const x = _vector3.x * _svgWidthHalf;
 						const y = - _vector3.y * _svgHeightHalf;
 						const node = object.node;
 						node.setAttribute( 'transform', 'translate(' + x + ',' + y + ')' );
-
 						_svg.appendChild( node );
 
 					}
@@ -282,16 +257,12 @@
 			function calculateLights( lights ) {
 
 				_ambientLight.setRGB( 0, 0, 0 );
-
 				_directionalLights.setRGB( 0, 0, 0 );
-
 				_pointLights.setRGB( 0, 0, 0 );
-
 				for ( let l = 0, ll = lights.length; l < ll; l ++ ) {
 
 					const light = lights[ l ];
 					const lightColor = light.color;
-
 					if ( light.isAmbientLight ) {
 
 						_ambientLight.r += lightColor.r;
@@ -322,11 +293,9 @@
 
 					const light = lights[ l ];
 					const lightColor = light.color;
-
 					if ( light.isDirectionalLight ) {
 
 						const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
-
 						let amount = normal.dot( lightPosition );
 						if ( amount <= 0 ) continue;
 						amount *= light.intensity;
@@ -337,7 +306,6 @@
 					} else if ( light.isPointLight ) {
 
 						const lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
-
 						let amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 						if ( amount <= 0 ) continue;
 						amount *= light.distance == 0 ? 1 : 1 - Math.min( position.distanceTo( lightPosition ) / light.distance, 1 );
@@ -357,7 +325,6 @@
 
 				let scaleX = element.scale.x * _svgWidthHalf;
 				let scaleY = element.scale.y * _svgHeightHalf;
-
 				if ( material.isPointsMaterial ) {
 
 					scaleX *= material.size;
@@ -367,7 +334,6 @@
 
 				const path = 'M' + convert( v1.x - scaleX * 0.5 ) + ',' + convert( v1.y - scaleY * 0.5 ) + 'h' + convert( scaleX ) + 'v' + convert( scaleY ) + 'h' + convert( - scaleX ) + 'z';
 				let style = '';
-
 				if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
 					style = 'fill:' + material.color.getStyle() + ';fill-opacity:' + material.opacity;
@@ -381,11 +347,9 @@
 			function renderLine( v1, v2, material ) {
 
 				const path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y );
-
 				if ( material.isLineBasicMaterial ) {
 
 					let style = 'fill:none;stroke:' + material.color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
-
 					if ( material.isLineDashedMaterial ) {
 
 						style = style + ';stroke-dasharray:' + material.dashSize + ',' + material.gapSize;
@@ -404,11 +368,9 @@
 				_this.info.render.faces ++;
 				const path = 'M' + convert( v1.positionScreen.x ) + ',' + convert( v1.positionScreen.y ) + 'L' + convert( v2.positionScreen.x ) + ',' + convert( v2.positionScreen.y ) + 'L' + convert( v3.positionScreen.x ) + ',' + convert( v3.positionScreen.y ) + 'z';
 				let style = '';
-
 				if ( material.isMeshBasicMaterial ) {
 
 					_color.copy( material.color );
-
 					if ( material.vertexColors ) {
 
 						_color.multiply( element.color );
@@ -418,7 +380,6 @@
 				} else if ( material.isMeshLambertMaterial || material.isMeshPhongMaterial || material.isMeshStandardMaterial ) {
 
 					_diffuseColor.copy( material.color );
-
 					if ( material.vertexColors ) {
 
 						_diffuseColor.multiply( element.color );
@@ -426,17 +387,13 @@
 					}
 
 					_color.copy( _ambientLight );
-
 					_centroid.copy( v1.positionWorld ).add( v2.positionWorld ).add( v3.positionWorld ).divideScalar( 3 );
-
 					calculateLight( _lights, _centroid, element.normalModel, _color );
-
 					_color.multiply( _diffuseColor ).add( material.emissive );
 
 				} else if ( material.isMeshNormalMaterial ) {
 
 					_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix ).normalize();
-
 					_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 				}
@@ -453,8 +410,9 @@
 
 				addPath( style, path );
 
-			} // Hide anti-alias gaps
+			}
 
+			// Hide anti-alias gaps
 
 			function expand( v1, v2, pixels ) {
 
@@ -493,11 +451,8 @@
 				if ( _currentPath ) {
 
 					_svgNode = getPathNode( _pathCount ++ );
-
 					_svgNode.setAttribute( 'd', _currentPath );
-
 					_svgNode.setAttribute( 'style', _currentStyle );
-
 					_svg.appendChild( _svgNode );
 
 				}
@@ -512,7 +467,6 @@
 				if ( _svgPathPool[ id ] == null ) {
 
 					_svgPathPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
-
 					if ( _quality == 0 ) {
 
 						_svgPathPool[ id ].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed

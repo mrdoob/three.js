@@ -5,11 +5,8 @@
  */
 
 	const _position = new THREE.Vector3();
-
 	const _quaternion = new THREE.Quaternion();
-
 	const _scale = new THREE.Vector3();
-
 	class CSS3DObject extends THREE.Object3D {
 
 		constructor( element = document.createElement( 'div' ) ) {
@@ -36,7 +33,6 @@
 			} );
 
 		}
-
 		copy( source, recursive ) {
 
 			super.copy( source, recursive );
@@ -46,7 +42,6 @@
 		}
 
 	}
-
 	class CSS3DSprite extends CSS3DObject {
 
 		constructor( element ) {
@@ -56,7 +51,6 @@
 			this.rotation2D = 0;
 
 		}
-
 		copy( source, recursive ) {
 
 			super.copy( source, recursive );
@@ -65,23 +59,19 @@
 
 		}
 
-	} //
+	}
 
+	//
 
 	const _matrix = new THREE.Matrix4();
-
 	const _matrix2 = new THREE.Matrix4();
-
 	class CSS3DRenderer {
 
 		constructor( parameters = {} ) {
 
 			const _this = this;
-
 			let _width, _height;
-
 			let _widthHalf, _heightHalf;
-
 			const cache = {
 				camera: {
 					fov: 0,
@@ -96,7 +86,6 @@
 			cameraElement.style.transformStyle = 'preserve-3d';
 			cameraElement.style.pointerEvents = 'none';
 			domElement.appendChild( cameraElement );
-
 			this.getSize = function () {
 
 				return {
@@ -109,7 +98,6 @@
 			this.render = function ( scene, camera ) {
 
 				const fov = camera.projectionMatrix.elements[ 5 ] * _heightHalf;
-
 				if ( cache.camera.fov !== fov ) {
 
 					domElement.style.perspective = camera.isPerspectiveCamera ? fov + 'px' : '';
@@ -120,7 +108,6 @@
 				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 				let tx, ty;
-
 				if ( camera.isOrthographicCamera ) {
 
 					tx = - ( camera.right + camera.left ) / 2;
@@ -130,7 +117,6 @@
 
 				const cameraCSSMatrix = camera.isOrthographicCamera ? 'scale(' + fov + ')' + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) : 'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 				const style = cameraCSSMatrix + 'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
-
 				if ( cache.camera.style !== style ) {
 
 					cameraElement.style.transform = style;
@@ -182,26 +168,20 @@
 
 					const visible = object.visible === true && object.layers.test( camera.layers ) === true;
 					object.element.style.display = visible === true ? '' : 'none';
-
 					if ( visible === true ) {
 
 						object.onBeforeRender( _this, scene, camera );
 						let style;
-
 						if ( object.isCSS3DSprite ) {
 
 							// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
+
 							_matrix.copy( camera.matrixWorldInverse );
-
 							_matrix.transpose();
-
 							if ( object.rotation2D !== 0 ) _matrix.multiply( _matrix2.makeRotationZ( object.rotation2D ) );
 							object.matrixWorld.decompose( _position, _quaternion, _scale );
-
 							_matrix.setPosition( _position );
-
 							_matrix.scale( _scale );
-
 							_matrix.elements[ 3 ] = 0;
 							_matrix.elements[ 7 ] = 0;
 							_matrix.elements[ 11 ] = 0;
@@ -216,7 +196,6 @@
 
 						const element = object.element;
 						const cachedObject = cache.objects.get( object );
-
 						if ( cachedObject === undefined || cachedObject.style !== style ) {
 
 							element.style.transform = style;

@@ -4,12 +4,12 @@
 	const CHANNELS = 4;
 	const TEXTURE_WIDTH = 1024;
 	const TEXTURE_HEIGHT = 4;
+
 	/**
  * Make a new THREE.DataTexture to store the descriptions of the curves.
  *
  * @param { number } numberOfCurves the number of curves needed to be described by this texture.
  */
-
 	function initSplineTexture( numberOfCurves = 1 ) {
 
 		const dataArray = new Float32Array( TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS );
@@ -21,6 +21,7 @@
 		return dataTexture;
 
 	}
+
 	/**
  * Write the curve description to the data texture
  *
@@ -28,7 +29,6 @@
  * @param { Curve } splineCurve The curve to describe
  * @param { number } offset Which curve slot to write to
  */
-
 	function updateSplineTexture( texture, splineCurve, offset = 0 ) {
 
 		const numberOfPoints = Math.floor( TEXTURE_WIDTH * ( TEXTURE_HEIGHT / 4 ) );
@@ -36,7 +36,6 @@
 		splineCurve.updateArcLengths();
 		const points = splineCurve.getSpacedPoints( numberOfPoints );
 		const frenetFrames = splineCurve.computeFrenetFrames( numberOfPoints, true );
-
 		for ( let i = 0; i < numberOfPoints; i ++ ) {
 
 			const rowOffset = Math.floor( i / TEXTURE_WIDTH );
@@ -63,20 +62,18 @@
 			data
 		} = image;
 		const i = CHANNELS * TEXTURE_WIDTH * o; // Row Offset
-
 		data[ index * CHANNELS + i + 0 ] = x;
 		data[ index * CHANNELS + i + 1 ] = y;
 		data[ index * CHANNELS + i + 2 ] = z;
 		data[ index * CHANNELS + i + 3 ] = 1;
 
 	}
+
 	/**
  * Create a new set of uniforms for describing the curve modifier
  *
  * @param { THREE.DataTexture } Texture which holds the curve description
  */
-
-
 	function getUniforms( splineTexture ) {
 
 		const uniforms = {
@@ -114,7 +111,6 @@
 
 		if ( material.__ok ) return;
 		material.__ok = true;
-
 		material.onBeforeCompile = shader => {
 
 			if ( shader.__modified ) return;
@@ -132,10 +128,17 @@
 		float textureStacks = ${TEXTURE_HEIGHT / 4}.;
 
 		${shader.vertexShader}
-		` // chunk import moved in front of modified shader below
-				.replace( '#include <beginnormal_vertex>', '' ) // vec3 transformedNormal declaration overriden below
-				.replace( '#include <defaultnormal_vertex>', '' ) // vec3 transformed declaration overriden below
-				.replace( '#include <begin_vertex>', '' ) // shader override
+		`
+			// chunk import moved in front of modified shader below
+				.replace( '#include <beginnormal_vertex>', '' )
+
+			// vec3 transformedNormal declaration overriden below
+				.replace( '#include <defaultnormal_vertex>', '' )
+
+			// vec3 transformed declaration overriden below
+				.replace( '#include <begin_vertex>', '' )
+
+			// shader override
 				.replace( /void\s*main\s*\(\)\s*\{/, `
 void main() {
 #include <beginnormal_vertex>
@@ -180,10 +183,10 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 		};
 
 	}
+
 	/**
  * A helper class for making meshes bend aroudn curves
  */
-
 	class Flow {
 
 		/**
@@ -212,7 +215,6 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 			this.uniforms = uniforms;
 
 		}
-
 		updateCurve( index, curve ) {
 
 			if ( index >= this.curveArray.length ) throw Error( 'Index out of range for Flow' );
@@ -223,7 +225,6 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 			updateSplineTexture( this.splineTexure, curve, index );
 
 		}
-
 		moveAlongCurve( amount ) {
 
 			this.uniforms.pathOffset.value += amount;
@@ -232,10 +233,10 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 
 	}
 	const matrix = new THREE.Matrix4();
+
 	/**
  * A helper class for creating instanced versions of flow, where the instances are placed on the curve.
  */
-
 	class InstancedFlow extends Flow {
 
 		/**
@@ -254,14 +255,13 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 			this.whichCurve = new Array( count ).fill( 0 );
 
 		}
+
 		/**
    * The extra information about which curve and curve position is stored in the translation components of the matrix for the instanced objects
    * This writes that information to the matrix and marks it as needing update.
    *
    * @param {number} index of the instanced element to update
    */
-
-
 		writeChanges( index ) {
 
 			matrix.makeTranslation( this.curveLengthArray[ this.whichCurve[ index ] ], this.whichCurve[ index ], this.offsets[ index ] );
@@ -269,28 +269,26 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 			this.object3D.instanceMatrix.needsUpdate = true;
 
 		}
+
 		/**
    * Move an individual element along the curve by a specific amount
    *
    * @param {number} index Which element to update
    * @param {number} offset Move by how much
    */
-
-
 		moveIndividualAlongCurve( index, offset ) {
 
 			this.offsets[ index ] += offset;
 			this.writeChanges( index );
 
 		}
+
 		/**
    * Select which curve to use for an element
    *
    * @param {number} index the index of the instanced element to update
    * @param {number} curveNo the index of the curve it should use
    */
-
-
 		setCurve( index, curveNo ) {
 
 			if ( isNaN( curveNo ) ) throw Error( 'curve index being set is Not a Number (NaN)' );

@@ -4,15 +4,14 @@
  * Luminosity
  * http://en.wikipedia.org/wiki/Luminosity
  */
+
 	const LuminosityShader = {
 		uniforms: {
 			'tDiffuse': {
 				value: null
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -23,9 +22,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#include <common>
 

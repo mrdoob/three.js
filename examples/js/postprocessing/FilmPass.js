@@ -20,14 +20,10 @@
 			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer, deltaTime
-			/*, maskActive */
-		) {
+		render( renderer, writeBuffer, readBuffer, deltaTime /*, maskActive */ ) {
 
 			this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 			this.uniforms[ 'time' ].value += deltaTime;
-
 			if ( this.renderToScreen ) {
 
 				renderer.setRenderTarget( null );
@@ -42,7 +38,6 @@
 			}
 
 		}
-
 		dispose() {
 
 			this.material.dispose();
