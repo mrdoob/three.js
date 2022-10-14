@@ -4634,11 +4634,9 @@
 				tymax = (box.min.y - origin.y) * invdiry;
 			}
 
-			if (tmin > tymax || tymin > tmax) return null; // These lines also handle the case where tmin or tmax is NaN
-			// (result of 0 * Infinity). x !== x returns true if x is NaN
-
-			if (tymin > tmin || tmin !== tmin) tmin = tymin;
-			if (tymax < tmax || tmax !== tmax) tmax = tymax;
+			if (tmin > tymax || tymin > tmax) return null;
+			if (tymin > tmin || isNaN(tmin)) tmin = tymin;
+			if (tymax < tmax || isNaN(tmax)) tmax = tymax;
 
 			if (invdirz >= 0) {
 				tzmin = (box.min.z - origin.z) * invdirz;
