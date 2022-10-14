@@ -92,6 +92,7 @@
 
 			const params = {
 				enable: true,
+				toneMapping: true,
 				pause: false,
 				tiles: 2,
 				transparentBackground: false,
@@ -248,8 +249,6 @@
 				model.add( floor );
 				model.updateMatrixWorld();
 
-				console.log( bbox );
-
 				// de-duplicate and reduce the number of materials used in place
 				const reducer = new MaterialReducer();
 				reducer.process( model );
@@ -260,12 +259,6 @@
 
 				const generator = new PathTracingSceneGenerator();
 				const result = generator.generate( model );
-				// const generator = new PathTracingSceneWorker();
-				// const result = await generator.generate( group, { onProgress: v => {
-
-				// 	updateProgressBar( v );
-
-				// } } );
 
 				// add the model to the scene
 				sceneInfo = result;
@@ -295,8 +288,6 @@
 				material.materials.updateFrom( materials, textures );
 				pathTracer.material.envMapInfo.updateFrom( envMap );
 				pathTracer.reset();
-
-				// generator.dispose();
 
 			}
 
@@ -330,6 +321,7 @@
 				gui = new GUI();
 				gui.add( params, 'enable' );
 				gui.add( params, 'pause' );
+				gui.add( params, 'toneMapping' );
 				gui.add( params, 'transparentBackground' ).onChange( v => {
 
 					pathTracer.material.backgroundAlpha = v ? 0 : 1;
@@ -369,6 +361,8 @@
 					return;
 
 				}
+
+				renderer.toneMapping = params.toneMapping ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
 
 				if ( pathTracer.samples < 1.0 || ! params.enable ) {
 

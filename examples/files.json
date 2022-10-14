@@ -205,6 +205,7 @@
 		"webgl_raycaster_sprite",
 		"webgl_raycaster_texture",
 		"webgl_read_float_buffer",
+		"webgl_renderer_pathtracer",
 		"webgl_refraction",
 		"webgl_rtt",
 		"webgl_shader",
