@@ -18,7 +18,8 @@
 
 			if ( this.renderTarget === undefined ) {
 
-				this.renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				this.renderTarget = new THREE.WebGLRenderTarget(); // will be resized later
+
 				this.renderTarget.texture.name = 'SavePass.rt';
 
 			}
@@ -41,6 +42,12 @@
 			renderer.setRenderTarget( this.renderTarget );
 			if ( this.clear ) renderer.clear();
 			this.fsQuad.render( renderer );
+
+		}
+
+		setSize( width, height ) {
+
+			this.renderTarget.setSize( width, height );
 
 		}
 

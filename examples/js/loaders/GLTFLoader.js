@@ -69,6 +69,11 @@
 				return new GLTFMeshoptCompression( parser );
 
 			} );
+			this.register( function ( parser ) {
+
+				return new GLTFMeshGpuInstancing( parser );
+
+			} );
 
 		}
 
@@ -373,7 +378,8 @@
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 		KHR_MATERIALS_EMISSIVE_STRENGTH: 'KHR_materials_emissive_strength',
 		EXT_TEXTURE_WEBP: 'EXT_texture_webp',
-		EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression'
+		EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
+		EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing'
 	};
 	/**
  * Punctual Lights Extension
@@ -1246,6 +1252,146 @@
 				return null;
 
 			}
+
+		}
+
+	}
+	/**
+ * GPU Instancing Extension
+ *
+ * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_mesh_gpu_instancing
+ *
+ */
+
+
+	class GLTFMeshGpuInstancing {
+
+		constructor( parser ) {
+
+			this.name = EXTENSIONS.EXT_MESH_GPU_INSTANCING;
+			this.parser = parser;
+
+		}
+
+		createNodeMesh( nodeIndex ) {
+
+			const json = this.parser.json;
+			const nodeDef = json.nodes[ nodeIndex ];
+
+			if ( ! nodeDef.extensions || ! nodeDef.extensions[ this.name ] || nodeDef.mesh === undefined ) {
+
+				return null;
+
+			}
+
+			const meshDef = json.meshes[ nodeDef.mesh ]; // No THREE.Points or Lines + Instancing support yet
+
+			for ( const primitive of meshDef.primitives ) {
+
+				if ( primitive.mode !== WEBGL_CONSTANTS.TRIANGLES && primitive.mode !== WEBGL_CONSTANTS.TRIANGLE_STRIP && primitive.mode !== WEBGL_CONSTANTS.TRIANGLE_FAN && primitive.mode !== undefined ) {
+
+					return null;
+
+				}
+
+			}
+
+			const extensionDef = nodeDef.extensions[ this.name ];
+			const attributesDef = extensionDef.attributes; // @TODO: Can we support THREE.InstancedMesh + THREE.SkinnedMesh?
+
+			const pending = [];
+			const attributes = {};
+
+			for ( const key in attributesDef ) {
+
+				pending.push( this.parser.getDependency( 'accessor', attributesDef[ key ] ).then( accessor => {
+
+					attributes[ key ] = accessor;
+					return attributes[ key ];
+
+				} ) );
+
+			}
+
+			if ( pending.length < 1 ) {
+
+				return null;
+
+			}
+
+			pending.push( this.parser.createNodeMesh( nodeIndex ) );
+			return Promise.all( pending ).then( results => {
+
+				const nodeObject = results.pop();
+				const meshes = nodeObject.isGroup ? nodeObject.children : [ nodeObject ];
+				const count = results[ 0 ].count; // All attribute counts should be same
+
+				const instancedMeshes = [];
+
+				for ( const mesh of meshes ) {
+
+					// Temporal variables
+					const m = new THREE.Matrix4();
+					const p = new THREE.Vector3();
+					const q = new THREE.Quaternion();
+					const s = new THREE.Vector3( 1, 1, 1 );
+					const instancedMesh = new THREE.InstancedMesh( mesh.geometry, mesh.material, count );
+
+					for ( let i = 0; i < count; i ++ ) {
+
+						if ( attributes.TRANSLATION ) {
+
+							p.fromBufferAttribute( attributes.TRANSLATION, i );
+
+						}
+
+						if ( attributes.ROTATION ) {
+
+							q.fromBufferAttribute( attributes.ROTATION, i );
+
+						}
+
+						if ( attributes.SCALE ) {
+
+							s.fromBufferAttribute( attributes.SCALE, i );
+
+						}
+
+						instancedMesh.setMatrixAt( i, m.compose( p, q, s ) );
+
+					} // Add instance attributes to the geometry, excluding TRS.
+
+
+					for ( const attributeName in attributes ) {
+
+						if ( attributeName !== 'TRANSLATION' && attributeName !== 'ROTATION' && attributeName !== 'SCALE' ) {
+
+							mesh.geometry.setAttribute( attributeName, attributes[ attributeName ] );
+
+						}
+
+					} // Just in case
+
+
+					THREE.Object3D.prototype.copy.call( instancedMesh, mesh ); // https://github.com/mrdoob/three.js/issues/18334
+
+					instancedMesh.frustumCulled = false;
+					this.parser.assignFinalMaterial( instancedMesh );
+					instancedMeshes.push( instancedMesh );
+
+				}
+
+				if ( nodeObject.isGroup ) {
+
+					nodeObject.clear();
+					nodeObject.add( ...instancedMeshes );
+					return nodeObject;
+
+				}
+
+				return instancedMeshes[ 0 ];
+
+			} );
 
 		}
 

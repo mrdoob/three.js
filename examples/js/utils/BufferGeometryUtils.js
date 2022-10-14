@@ -156,11 +156,7 @@
 				if ( morphAttributes[ name ] === undefined ) morphAttributes[ name ] = [];
 				morphAttributes[ name ].push( geometry.morphAttributes[ name ] );
 
-			} // gather .userData
-
-
-			mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
-			mergedGeometry.userData.mergedUserData.push( geometry.userData );
+			}
 
 			if ( useGroups ) {
 

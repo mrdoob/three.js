@@ -29,6 +29,7 @@
 				geometry.dispose();
 				material.dispose();
 				material.map.dispose();
+				canvases.delete( dom );
 				this.removeEventListener( 'mousedown', onEvent );
 				this.removeEventListener( 'mousemove', onEvent );
 				this.removeEventListener( 'mouseup', onEvent );

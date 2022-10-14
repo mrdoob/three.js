@@ -16,9 +16,8 @@
 			const aperture = params.aperture !== undefined ? params.aperture : 0.025;
 			const maxblur = params.maxblur !== undefined ? params.maxblur : 1.0; // render targets
 
-			const width = params.width || window.innerWidth || 1;
-			const height = params.height || window.innerHeight || 1;
-			this.renderTargetDepth = new THREE.WebGLRenderTarget( width, height, {
+			this.renderTargetDepth = new THREE.WebGLRenderTarget( 1, 1, {
+				// will be resized later
 				minFilter: THREE.NearestFilter,
 				magFilter: THREE.NearestFilter
 			} );
@@ -93,6 +92,12 @@
 			renderer.setClearColor( this._oldClearColor );
 			renderer.setClearAlpha( oldClearAlpha );
 			renderer.autoClear = oldAutoClear;
+
+		}
+
+		setSize( width, height ) {
+
+			this.renderTargetDepth.setSize( width, height );
 
 		}
 

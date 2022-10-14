@@ -2,13 +2,15 @@
 
 	class BloomPass extends THREE.Pass {
 
-		constructor( strength = 1, kernelSize = 25, sigma = 4, resolution = 256 ) {
+		constructor( strength = 1, kernelSize = 25, sigma = 4 ) {
 
 			super(); // render targets
 
-			this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution );
+			this.renderTargetX = new THREE.WebGLRenderTarget(); // will be resized later
+
 			this.renderTargetX.texture.name = 'BloomPass.x';
-			this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution );
+			this.renderTargetY = new THREE.WebGLRenderTarget(); // will be resized later
+
 			this.renderTargetY.texture.name = 'BloomPass.y'; // combine material
 
 			this.combineUniforms = THREE.UniformsUtils.clone( CombineShader.uniforms );
@@ -63,6 +65,13 @@
 			renderer.setRenderTarget( readBuffer );
 			if ( this.clear ) renderer.clear();
 			this.fsQuad.render( renderer );
+
+		}
+
+		setSize( width, height ) {
+
+			this.renderTargetX.setSize( width, height );
+			this.renderTargetY.setSize( width, height );
 
 		}
 
