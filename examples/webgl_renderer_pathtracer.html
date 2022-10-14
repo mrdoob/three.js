@@ -94,9 +94,9 @@
 				enable: true,
 				toneMapping: true,
 				pause: false,
-				tiles: 2,
+				tiles: 3,
 				transparentBackground: false,
-				resolutionScale: 1 / window.devicePixelRatio,
+				resolutionScale: 1,
 				download: () => {
 
 					const link = document.createElement('a');
@@ -125,7 +125,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.setClearColor( 0xdeebed );
+				renderer.setClearColor( 0xdddddd );
 				document.body.appendChild( renderer.domElement );
 
 				// initialize the pathtracer
@@ -243,7 +243,7 @@
 						transparent: true,
 					} ),
 				);
-				floor.scale.setScalar( 5000 );
+				floor.scale.setScalar( 2500 );
 				floor.rotation.x = - Math.PI / 2;
 				floor.position.y = bbox.min.y;
 				model.add( floor );
@@ -459,6 +459,7 @@
 						const yCent = 2.0 * ( yNorm - 0.5 );
 						let a = Math.max( Math.min( 1.0 - Math.sqrt( xCent ** 2 + yCent ** 2 ), 1.0 ), 0.0 );
 						a = a ** 1.5;
+						a = a * 1.5;
 						a = Math.min( a, 1.0 );
 
 						const i = y * dim + x;
