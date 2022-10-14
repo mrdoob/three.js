@@ -266,6 +266,16 @@ function SidebarMaterial( editor ) {
 	const materialGradientMap = new SidebarMaterialMapProperty( editor, 'gradientMap', strings.getKey( 'sidebar/material/gradientmap' ) );
 	container.add( materialGradientMap );
 
+	// transmission map
+
+	const transmissionMap = new SidebarMaterialMapProperty( editor, 'transmissionMap', strings.getKey( 'sidebar/material/transmissionmap' ) );
+	container.add( transmissionMap );
+
+	// thickness map
+
+	const thicknessMap = new SidebarMaterialMapProperty( editor, 'thicknessMap', strings.getKey( 'sidebar/material/thicknessmap' ) );
+	container.add( thicknessMap );
+
 	// side
 
 	const materialSideOptions = {
