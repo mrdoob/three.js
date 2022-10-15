@@ -80,7 +80,7 @@ class ImageLoader extends Loader {
 
 		function onAbortSignal() {
 
-			image.src = null;
+			image.src = '';
 
 		}
 
