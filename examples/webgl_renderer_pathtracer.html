@@ -63,7 +63,7 @@
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
 					"three/examples/": "./",
-					"three-gpu-pathtracer": "https://unpkg.com/three-gpu-pathtracer@0.0.6/build/index.module.js",
+					"three-gpu-pathtracer": "https://unpkg.com/three-gpu-pathtracer@0.0.7/build/index.module.js",
 					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@^0.5.10/build/index.module.js"
 				}
 			}
@@ -76,8 +76,6 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 			import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
 			import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';
@@ -100,12 +98,12 @@
 				download: () => {
 
 					const link = document.createElement('a');
-					link.download = 'filename.png';
+					link.download = 'pathtraced-render.png';
 					link.href = renderer.domElement.toDataURL().replace( 'image/png', 'image/octet-stream' );
 					link.click();
 
 				},
-				roughness: 0.01,
+				roughness: 0.1,
 				metalness: 1,
 			};
 
@@ -380,7 +378,6 @@
 
 					pathTracer.material.materials.updateFrom( sceneInfo.materials, sceneInfo.textures );
 					pathTracer.material.filterGlossyFactor = 0.5;
-					pathTracer.material.environmentIntensity = 3;
 					pathTracer.material.physicalCamera.updateFrom( camera );
 
 					camera.updateMatrixWorld();
