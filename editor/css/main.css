@@ -698,3 +698,10 @@ select {
 	}
 
 }
+
+/* Temporary Chrome fix (#24794) */
+
+[draggable="true"] {
+	transform: translate(0, 0);
+	z-index: 0;
+}
