@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - skinning and morphing</title>
+		<title>three.js webg2 - texture2d array compressed</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -257,8 +257,9 @@
 				window.addEventListener( 'resize', onWindowResize );
 
 
-				new OrbitControls( camera, renderer.domElement );
-				camera.lookAt( new THREE.Vector3( 1.5, 1, 0 ) );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 1.5, 1, 0 );
+				controls.update();
 
 			}
 
