@@ -144,7 +144,14 @@ function WebGLRenderList() {
 
 	}
 
-	function sort( customOpaqueSort, customTransparentSort ) {
+	function sort( customOpaqueSort, customTransparentSort, sortOverride ) {
+
+		if ( sortOverride ) {
+
+			sortOverride( opaque, transmissive, transparent, customOpaqueSort || painterSortStable, customTransparentSort || reversePainterSortStable );
+			return;
+
+		}
 
 		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
 		if ( transmissive.length > 1 ) transmissive.sort( customTransparentSort || reversePainterSortStable );
