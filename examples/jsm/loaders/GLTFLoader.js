@@ -290,9 +290,9 @@ class GLTFLoader extends Loader {
 
 		if ( typeof data === 'string' ) {
 
-			json = JSON.parse(data);
+			json = JSON.parse( data );
 
-		} else if(data instanceof ArrayBuffer) {
+		} else if( data instanceof ArrayBuffer ) {
 
 			const magic = LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
 
@@ -309,15 +309,11 @@ class GLTFLoader extends Loader {
 
 				}
 
-				json = JSON.parse(
-					extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content
-				);
+				json = JSON.parse( extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content );
 
 			} else {
 
-				json = JSON.parse(
-					LoaderUtils.decodeText( new Uint8Array( data ) )
-				);
+				json = JSON.parse( LoaderUtils.decodeText( new Uint8Array( data ) ) );
 
 			}
 
