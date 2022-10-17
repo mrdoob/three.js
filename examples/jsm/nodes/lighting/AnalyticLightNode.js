@@ -10,7 +10,7 @@ class AnalyticLightNode extends LightingNode {
 
 		super();
 
-		this.updateType = NodeUpdateType.Object;
+		this.updateType = NodeUpdateType.OBJECT;
 
 		this.light = light;
 
