@@ -77,7 +77,7 @@
 
 			}
 
-			let camera, scene, mesh, renderer, stats;
+			let camera, scene, mesh, renderer, stats, clock;
 
 			const planeWidth = 50;
 			const planeHeight = 25;
@@ -98,6 +98,7 @@
 				scene = new THREE.Scene();
 
 				//
+				clock = new THREE.Clock();
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -156,7 +157,9 @@
 
 					let value = mesh.material.uniforms[ 'depth' ].value;
 
-					depthStep += 0.08;
+					const delta = clock.getDelta() * 10;
+
+					depthStep += delta;
 
 					value = depthStep % 5;
 
