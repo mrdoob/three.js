@@ -260,7 +260,9 @@ class KTX2Loader extends Loader {
 	 * @return {Promise<CompressedTexture|DataTexture|Data3DTexture>}
 	 */
 	async _createTexture( buffer, config = {} ) {
+
 		try {
+
 			const container = read( new Uint8Array( buffer ) );
 
 			if ( container.vkFormat !== VK_FORMAT_UNDEFINED ) {
@@ -268,9 +270,11 @@ class KTX2Loader extends Loader {
 				return createDataTexture( container );
 
 			}
-		}
-		catch (error) {
+
+		} catch ( error ) {
+
 			return Promise.reject( error );
+
 		}
 
 		//
