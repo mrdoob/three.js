@@ -259,7 +259,7 @@ class KTX2Loader extends Loader {
 	 * @param {object?} config
 	 * @return {Promise<CompressedTexture|DataTexture|Data3DTexture>}
 	 */
-	_createTexture( buffer, config = {} ) {
+	async _createTexture( buffer, config = {} ) {
 		try {
 			const container = read( new Uint8Array( buffer ) );
 
