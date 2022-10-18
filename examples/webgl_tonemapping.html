@@ -43,7 +43,7 @@
 			const params = {
 				exposure: 1.0,
 				toneMapping: 'ACESFilmic',
-				blurriness: 1
+				blurriness: 0.3
 			};
 
 			const toneMappingOptions = {
@@ -87,7 +87,7 @@
 				);
 
 				scene = new THREE.Scene();
-				scene.backgroundBlurriness = 1;
+				scene.backgroundBlurriness = params.blurriness;
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.6, 2.7 );
