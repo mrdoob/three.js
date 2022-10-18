@@ -261,19 +261,11 @@ class KTX2Loader extends Loader {
 	 */
 	async _createTexture( buffer, config = {} ) {
 
-		try {
+		const container = read( new Uint8Array( buffer ) );
 
-			const container = read( new Uint8Array( buffer ) );
+		if ( container.vkFormat !== VK_FORMAT_UNDEFINED ) {
 
-			if ( container.vkFormat !== VK_FORMAT_UNDEFINED ) {
-
-				return createDataTexture( container );
-
-			}
-
-		} catch ( error ) {
-
-			return Promise.reject( error );
+			return createDataTexture( container );
 
 		}
 
