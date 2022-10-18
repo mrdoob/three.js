@@ -155,13 +155,11 @@
 
 				if ( mesh ) {
 
-					let value = mesh.material.uniforms[ 'depth' ].value;
-
 					const delta = clock.getDelta() * 10;
 
 					depthStep += delta;
 
-					value = depthStep % 5;
+					const value = depthStep % 5;
 
 					mesh.material.uniforms[ 'depth' ].value = value;
 
