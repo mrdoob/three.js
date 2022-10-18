@@ -313,6 +313,7 @@
 			"Textures": {
 				"CanvasTexture": "api/en/textures/CanvasTexture",
 				"CompressedTexture": "api/en/textures/CompressedTexture",
+				"CompressedArrayTexture": "api/en/textures/CompressedArrayTexture",
 				"CubeTexture": "api/en/textures/CubeTexture",
 				"Data3DTexture": "api/en/textures/Data3DTexture",
 				"DataArrayTexture": "api/en/textures/DataArrayTexture",
@@ -814,6 +815,7 @@
 			"纹理贴图": {
 				"CanvasTexture": "api/zh/textures/CanvasTexture",
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
+				"CompressedArrayTexture": "api/zh/textures/CompressedArrayTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
 				"DataArrayTexture": "api/zh/textures/DataArrayTexture",
 				"Data3DTexture": "api/zh/textures/Data3DTexture",
