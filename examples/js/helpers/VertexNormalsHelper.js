@@ -38,12 +38,7 @@
 
 			const objGeometry = this.object.geometry;
 
-			if ( objGeometry && objGeometry.isGeometry ) {
-
-				console.error( 'THREE.VertexNormalsHelper no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-				return;
-
-			} else if ( objGeometry && objGeometry.isBufferGeometry ) {
+			if ( objGeometry ) {
 
 				const objPos = objGeometry.attributes.position;
 				const objNorm = objGeometry.attributes.normal;

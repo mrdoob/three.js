@@ -29,8 +29,8 @@
 
 		<h3>[property:Boolean autoUpdate]</h3>
 		<p>
-			Enables automatic updates of the light's shadow. Default is *true*.
-			If you do not require dynamic lighting / shadows, you may set this to *false*.
+			Enables automatic updates of the light's shadow. Default is `true`.
+			If you do not require dynamic lighting / shadows, you may set this to `false`.
 		</p>
 
 		<h3>[property:Camera camera]</h3>
@@ -80,8 +80,8 @@
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-			When set to *true*, shadow maps will be updated in the next *render* call. Default is *false*.
-			If you have set [page:.autoUpdate] to *false*, you will need to set this property to *true* and then make a render call to update the light's shadow.
+			When set to `true`, shadow maps will be updated in the next `render` call. Default is `false`.
+			If you have set [page:.autoUpdate] to `false`, you will need to set this property to `true` and then make a render call to update the light's shadow.
 		</p>
 
 		<h3>[property:Float normalBias]</h3>
@@ -129,7 +129,7 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Disposes of this shadow's textures ([page:LightShadow.map map] and [page:LightShadow.mapPass mapPass]).
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:this copy]( [param:LightShadow source] )</h3>

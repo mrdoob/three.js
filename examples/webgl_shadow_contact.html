@@ -26,7 +26,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -34,11 +35,11 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { HorizontalBlurShader } from './jsm/shaders/HorizontalBlurShader.js';
-			import { VerticalBlurShader } from './jsm/shaders/VerticalBlurShader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js';
+			import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js';
 
 			let camera, scene, renderer, stats, gui;
 

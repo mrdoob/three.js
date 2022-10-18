@@ -21,17 +21,17 @@
 			// All values and structures referenced from:
 			// http://msdn.microsoft.com/en-us/library/bb943991.aspx/
 
-			const DDS_MAGIC = 0x20534444; // let DDSD_CAPS = 0x1;
-			// let DDSD_HEIGHT = 0x2;
-			// let DDSD_WIDTH = 0x4;
-			// let DDSD_PITCH = 0x8;
-			// let DDSD_PIXELFORMAT = 0x1000;
+			const DDS_MAGIC = 0x20534444; // const DDSD_CAPS = 0x1;
+			// const DDSD_HEIGHT = 0x2;
+			// const DDSD_WIDTH = 0x4;
+			// const DDSD_PITCH = 0x8;
+			// const DDSD_PIXELFORMAT = 0x1000;
 
-			const DDSD_MIPMAPCOUNT = 0x20000; // let DDSD_LINEARSIZE = 0x80000;
-			// let DDSD_DEPTH = 0x800000;
-			// let DDSCAPS_COMPLEX = 0x8;
-			// let DDSCAPS_MIPMAP = 0x400000;
-			// let DDSCAPS_TEXTURE = 0x1000;
+			const DDSD_MIPMAPCOUNT = 0x20000; // const DDSD_LINEARSIZE = 0x80000;
+			// const DDSD_DEPTH = 0x800000;
+			// const DDSCAPS_COMPLEX = 0x8;
+			// const DDSCAPS_MIPMAP = 0x400000;
+			// const DDSCAPS_TEXTURE = 0x1000;
 
 			const DDSCAPS2_CUBEMAP = 0x200;
 			const DDSCAPS2_CUBEMAP_POSITIVEX = 0x400;
@@ -39,13 +39,13 @@
 			const DDSCAPS2_CUBEMAP_POSITIVEY = 0x1000;
 			const DDSCAPS2_CUBEMAP_NEGATIVEY = 0x2000;
 			const DDSCAPS2_CUBEMAP_POSITIVEZ = 0x4000;
-			const DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000; // let DDSCAPS2_VOLUME = 0x200000;
-			// let DDPF_ALPHAPIXELS = 0x1;
-			// let DDPF_ALPHA = 0x2;
-
-			const DDPF_FOURCC = 0x4; // let DDPF_RGB = 0x40;
-			// let DDPF_YUV = 0x200;
-			// let DDPF_LUMINANCE = 0x20000;
+			const DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000; // const DDSCAPS2_VOLUME = 0x200000;
+			// const DDPF_ALPHAPIXELS = 0x1;
+			// const DDPF_ALPHA = 0x2;
+			// const DDPF_FOURCC = 0x4;
+			// const DDPF_RGB = 0x40;
+			// const DDPF_YUV = 0x200;
+			// const DDPF_LUMINANCE = 0x20000;
 
 			function fourCCToInt32( value ) {
 
@@ -111,17 +111,17 @@
 			const off_flags = 2;
 			const off_height = 3;
 			const off_width = 4;
-			const off_mipmapCount = 7;
-			const off_pfFlags = 20;
+			const off_mipmapCount = 7; // const off_pfFlags = 20;
+
 			const off_pfFourCC = 21;
 			const off_RGBBitCount = 22;
 			const off_RBitMask = 23;
 			const off_GBitMask = 24;
 			const off_BBitMask = 25;
-			const off_ABitMask = 26; // let off_caps = 27;
+			const off_ABitMask = 26; // const off_caps = 27;
 
-			const off_caps2 = 28; // let off_caps3 = 29;
-			// let off_caps4 = 30;
+			const off_caps2 = 28; // const off_caps3 = 29;
+			// const off_caps4 = 30;
 			// Parse header
 
 			const header = new Int32Array( buffer, 0, headerLengthInt );
@@ -129,13 +129,6 @@
 			if ( header[ off_magic ] !== DDS_MAGIC ) {
 
 				console.error( 'THREE.DDSLoader.parse: Invalid magic number in DDS header.' );
-				return dds;
-
-			}
-
-			if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
-
-				console.error( 'THREE.DDSLoader.parse: Unsupported format, must contain a FourCC code.' );
 				return dds;
 
 			}

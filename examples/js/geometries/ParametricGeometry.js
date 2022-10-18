@@ -26,14 +26,7 @@
 			const p0 = new THREE.Vector3(),
 				p1 = new THREE.Vector3();
 			const pu = new THREE.Vector3(),
-				pv = new THREE.Vector3();
-
-			if ( func.length < 3 ) {
-
-				console.error( 'THREE.ParametricGeometry: Function must now modify a THREE.Vector3 as third parameter.' );
-
-			} // generate vertices, normals and uvs
-
+				pv = new THREE.Vector3(); // generate vertices, normals and uvs
 
 			const sliceCount = slices + 1;
 

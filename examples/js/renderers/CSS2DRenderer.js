@@ -5,6 +5,7 @@
 		constructor( element = document.createElement( 'div' ) ) {
 
 			super();
+			this.isCSS2DObject = true;
 			this.element = element;
 			this.element.style.position = 'absolute';
 			this.element.style.userSelect = 'none';
@@ -33,9 +34,8 @@
 
 		}
 
-	}
+	} //
 
-	CSS2DObject.prototype.isCSS2DObject = true; //
 
 	const _vector = new THREE.Vector3();
 
@@ -75,8 +75,8 @@
 
 			this.render = function ( scene, camera ) {
 
-				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-				if ( camera.parent === null ) camera.updateMatrixWorld();
+				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 				_viewMatrix.copy( camera.matrixWorldInverse );
 
@@ -113,17 +113,7 @@
 
 						object.onBeforeRender( _this, scene, camera );
 						const element = object.element;
-
-						if ( /apple/i.test( navigator.vendor ) ) {
-
-							// https://github.com/mrdoob/three.js/issues/21415
-							element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
-
-						} else {
-
-							element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
-
-						}
+						element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
 
 						if ( element.parentNode !== domElement ) {
 

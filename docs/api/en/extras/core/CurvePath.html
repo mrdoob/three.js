@@ -46,9 +46,9 @@
 
 		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
 		<p>
-			divisions -- number of pieces to divide the curve into. Default is *12*.<br /><br />
+			divisions -- number of pieces to divide the curve into. Default is `12`.<br /><br />
 
-			Returns an array of points representing a sequence of curves. The *division* parameter defines
+			Returns an array of points representing a sequence of curves. The `division` parameter defines
 			the number of pieces each curve is divided into. However, for optimization and quality purposes,
 			the actual sampling resolution for each curve depends on its type. For example, for a [page:LineCurve],
 			the returned number of points is always just 2.
@@ -56,7 +56,7 @@
 
 		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
 		<p>
-			divisions -- number of pieces to divide the curve into. Default is *40*.<br /><br />
+			divisions -- number of pieces to divide the curve into. Default is `40`.<br /><br />
 
 			Returns a set of divisions + 1 equi-spaced points using getPointAt( u ).
 		</p>

@@ -9,103 +9,103 @@
  * @see Volume
  */
 
-	function VolumeSlice( volume, index, axis ) {
+	class VolumeSlice {
 
-		const slice = this;
-		/**
-   * @member {Volume} volume The associated volume
-   */
+		constructor( volume, index, axis ) {
 
-		this.volume = volume;
-		/**
-   * @member {Number} index The index of the slice, if changed, will automatically call updateGeometry at the next repaint
-   */
+			const slice = this;
+			/**
+     * @member {Volume} volume The associated volume
+     */
 
-		index = index || 0;
-		Object.defineProperty( this, 'index', {
-			get: function () {
+			this.volume = volume;
+			/**
+     * @member {Number} index The index of the slice, if changed, will automatically call updateGeometry at the next repaint
+     */
 
-				return index;
+			index = index || 0;
+			Object.defineProperty( this, 'index', {
+				get: function () {
 
-			},
-			set: function ( value ) {
+					return index;
 
-				index = value;
-				slice.geometryNeedsUpdate = true;
-				return index;
+				},
+				set: function ( value ) {
 
-			}
-		} );
-		/**
-   * @member {String} axis The normal axis
-   */
+					index = value;
+					slice.geometryNeedsUpdate = true;
+					return index;
 
-		this.axis = axis || 'z';
-		/**
-   * @member {HTMLCanvasElement} canvas The final canvas used for the texture
-   */
+				}
+			} );
+			/**
+     * @member {String} axis The normal axis
+     */
 
-		/**
-   * @member {CanvasRenderingContext2D} ctx Context of the canvas
-   */
+			this.axis = axis || 'z';
+			/**
+     * @member {HTMLCanvasElement} canvas The final canvas used for the texture
+     */
 
-		this.canvas = document.createElement( 'canvas' );
-		/**
-   * @member {HTMLCanvasElement} canvasBuffer The intermediary canvas used to paint the data
-   */
+			/**
+     * @member {CanvasRenderingContext2D} ctx Context of the canvas
+     */
 
-		/**
-   * @member {CanvasRenderingContext2D} ctxBuffer Context of the canvas buffer
-   */
+			this.canvas = document.createElement( 'canvas' );
+			/**
+     * @member {HTMLCanvasElement} canvasBuffer The intermediary canvas used to paint the data
+     */
 
-		this.canvasBuffer = document.createElement( 'canvas' );
-		this.updateGeometry();
-		const canvasMap = new THREE.Texture( this.canvas );
-		canvasMap.minFilter = THREE.LinearFilter;
-		canvasMap.wrapS = canvasMap.wrapT = THREE.ClampToEdgeWrapping;
-		const material = new THREE.MeshBasicMaterial( {
-			map: canvasMap,
-			side: THREE.DoubleSide,
-			transparent: true
-		} );
-		/**
-   * @member {Mesh} mesh The mesh ready to get used in the scene
-   */
+			/**
+     * @member {CanvasRenderingContext2D} ctxBuffer Context of the canvas buffer
+     */
 
-		this.mesh = new THREE.Mesh( this.geometry, material );
-		this.mesh.matrixAutoUpdate = false;
-		/**
-   * @member {Boolean} geometryNeedsUpdate If set to true, updateGeometry will be triggered at the next repaint
-   */
+			this.canvasBuffer = document.createElement( 'canvas' );
+			this.updateGeometry();
+			const canvasMap = new THREE.Texture( this.canvas );
+			canvasMap.minFilter = THREE.LinearFilter;
+			canvasMap.wrapS = canvasMap.wrapT = THREE.ClampToEdgeWrapping;
+			const material = new THREE.MeshBasicMaterial( {
+				map: canvasMap,
+				side: THREE.DoubleSide,
+				transparent: true
+			} );
+			/**
+     * @member {Mesh} mesh The mesh ready to get used in the scene
+     */
 
-		this.geometryNeedsUpdate = true;
-		this.repaint();
-		/**
-   * @member {Number} iLength Width of slice in the original coordinate system, corresponds to the width of the buffer canvas
-   */
+			this.mesh = new THREE.Mesh( this.geometry, material );
+			this.mesh.matrixAutoUpdate = false;
+			/**
+     * @member {Boolean} geometryNeedsUpdate If set to true, updateGeometry will be triggered at the next repaint
+     */
 
-		/**
-   * @member {Number} jLength Height of slice in the original coordinate system, corresponds to the height of the buffer canvas
-   */
+			this.geometryNeedsUpdate = true;
+			this.repaint();
+			/**
+     * @member {Number} iLength Width of slice in the original coordinate system, corresponds to the width of the buffer canvas
+     */
 
-		/**
-   * @member {Function} sliceAccess Function that allow the slice to access right data
-   * @see Volume.extractPerpendicularPlane
-   * @param {Number} i The first coordinate
-   * @param {Number} j The second coordinate
-   * @returns {Number} the index corresponding to the voxel in volume.data of the given position in the slice
-   */
+			/**
+     * @member {Number} jLength Height of slice in the original coordinate system, corresponds to the height of the buffer canvas
+     */
 
-	}
+			/**
+     * @member {Function} sliceAccess Function that allow the slice to access right data
+     * @see Volume.extractPerpendicularPlane
+     * @param {Number} i The first coordinate
+     * @param {Number} j The second coordinate
+     * @returns {Number} the index corresponding to the voxel in volume.data of the given position in the slice
+     */
 
-	VolumeSlice.prototype = {
-		constructor: VolumeSlice,
-
+		}
 		/**
    * @member {Function} repaint Refresh the texture and the geometry if geometryNeedsUpdate is set to true
    * @memberof VolumeSlice
    */
-		repaint: function () {
+
+
+		repaint() {
 
 			if ( this.geometryNeedsUpdate ) {
 
@@ -179,14 +179,15 @@
 			this.ctx.drawImage( canvas, 0, 0, iLength, jLength, 0, 0, this.canvas.width, this.canvas.height );
 			this.mesh.material.map.needsUpdate = true;
 
-		},
-
+		}
 		/**
    * @member {Function} Refresh the geometry according to axis and index
    * @see Volume.extractPerpendicularPlane
    * @memberof VolumeSlice
    */
-		updateGeometry: function () {
+
+
+		updateGeometry() {
 
 			const extracted = this.volume.extractPerpendicularPlane( this.axis, this.index );
 			this.sliceAccess = extracted.sliceAccess;
@@ -215,7 +216,8 @@
 			this.geometryNeedsUpdate = false;
 
 		}
-	};
+
+	}
 
 	THREE.VolumeSlice = VolumeSlice;
 

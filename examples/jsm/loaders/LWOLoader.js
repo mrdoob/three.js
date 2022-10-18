@@ -350,6 +350,8 @@ class MaterialParser {
 
 		const materialType = this.getMaterialType( connections.attributes );
 
+		if ( materialType !== MeshPhongMaterial ) delete params.refractionRatio; // PBR materials do not support "refractionRatio"
+
 		return new materialType( params );
 
 	}
@@ -591,8 +593,6 @@ class MaterialParser {
 
 		if ( attributes[ 'Bump Height' ] ) params.bumpScale = attributes[ 'Bump Height' ].value * 0.1;
 
-		if ( attributes[ 'Refraction Index' ] ) params.refractionRatio = 0.98 / attributes[ 'Refraction Index' ].value;
-
 		this.parsePhysicalAttributes( params, attributes, maps );
 		this.parseStandardAttributes( params, attributes, maps );
 		this.parsePhongAttributes( params, attributes, maps );
@@ -642,6 +642,8 @@ class MaterialParser {
 	}
 
 	parsePhongAttributes( params, attributes, maps ) {
+
+		if ( attributes[ 'Refraction Index' ] ) params.refractionRatio = 0.98 / attributes[ 'Refraction Index' ].value;
 
 		if ( attributes.Diffuse ) params.color.multiplyScalar( attributes.Diffuse.value );
 

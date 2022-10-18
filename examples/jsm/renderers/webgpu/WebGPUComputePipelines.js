@@ -14,6 +14,12 @@ class WebGPUComputePipelines {
 
 	}
 
+	has( computeNode ) {
+
+		return this.pipelines.get( computeNode ) !== undefined;
+
+	}
+
 	get( computeNode ) {
 
 		let pipeline = this.pipelines.get( computeNode );
@@ -46,7 +52,8 @@ class WebGPUComputePipelines {
 			}
 
 			pipeline = device.createComputePipeline( {
-				compute: stageCompute.stage
+				compute: stageCompute.stage,
+				layout: 'auto'
 			} );
 
 			this.pipelines.set( computeNode, pipeline );

@@ -44,6 +44,7 @@ import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
+import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createElementNS } from '../utils.js';
 
 function createCanvasElement() {
@@ -55,6 +56,8 @@ function createCanvasElement() {
 }
 
 function WebGLRenderer( parameters = {} ) {
+
+	this.isWebGLRenderer = true;
 
 	const _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 		_context = parameters.context !== undefined ? parameters.context : null,
@@ -130,6 +133,28 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.toneMapping = NoToneMapping;
 	this.toneMappingExposure = 1.0;
+
+	//
+
+	Object.defineProperties( this, {
+
+		// @deprecated since r136, 0e21088102b4de7e0a0a33140620b7a3424b9e6d
+
+		gammaFactor: {
+			get: function () {
+
+				console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
+				return 2;
+
+			},
+			set: function () {
+
+				console.warn( 'THREE.WebGLRenderer: .gammaFactor has been removed.' );
+
+			}
+		}
+
+	} );
 
 	// internal properties
 
@@ -228,6 +253,7 @@ function WebGLRenderer( parameters = {} ) {
 		// event listeners must be registered before WebGL context is created, see #12753
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
+		_canvas.addEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
 		if ( _gl === null ) {
 
@@ -282,7 +308,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	let background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
-	let utils, bindingStates;
+	let utils, bindingStates, uniformsGroups;
 
 	function initGLContext() {
 
@@ -313,6 +339,7 @@ function WebGLRenderer( parameters = {} ) {
 		renderStates = new WebGLRenderStates( extensions, capabilities );
 		background = new WebGLBackground( _this, cubemaps, state, objects, _alpha, _premultipliedAlpha );
 		shadowMap = new WebGLShadowMap( _this, objects, capabilities );
+		uniformsGroups = new WebGLUniformsGroups( _gl, info, capabilities, state );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
@@ -569,6 +596,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		_canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
+		_canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
 		renderLists.dispose();
 		renderStates.dispose();
@@ -577,6 +605,7 @@ function WebGLRenderer( parameters = {} ) {
 		cubeuvmaps.dispose();
 		objects.dispose();
 		bindingStates.dispose();
+		uniformsGroups.dispose();
 		programCache.dispose();
 
 		xr.dispose();
@@ -626,6 +655,12 @@ function WebGLRenderer( parameters = {} ) {
 		shadowMap.autoUpdate = shadowMapAutoUpdate;
 		shadowMap.needsUpdate = shadowMapNeedsUpdate;
 		shadowMap.type = shadowMapType;
+
+	}
+
+	function onContextCreationError( event ) {
+
+		console.error( 'THREE.WebGLRenderer: A WebGL context could not be created. Reason: ', event.statusMessage );
 
 	}
 
@@ -812,6 +847,28 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.compile = function ( scene, camera ) {
 
+		function prepare( material, scene, object ) {
+
+			if ( material.transparent === true && material.side === DoubleSide ) {
+
+				material.side = BackSide;
+				material.needsUpdate = true;
+				getProgram( material, scene, object );
+
+				material.side = FrontSide;
+				material.needsUpdate = true;
+				getProgram( material, scene, object );
+
+				material.side = DoubleSide;
+
+			} else {
+
+				getProgram( material, scene, object );
+
+			}
+
+		}
+
 		currentRenderState = renderStates.get( scene );
 		currentRenderState.init();
 
@@ -847,13 +904,13 @@ function WebGLRenderer( parameters = {} ) {
 
 						const material2 = material[ i ];
 
-						getProgram( material2, scene, object );
+						prepare( material2, scene, object );
 
 					}
 
 				} else {
 
-					getProgram( material, scene, object );
+					prepare( material, scene, object );
 
 				}
 
@@ -920,11 +977,11 @@ function WebGLRenderer( parameters = {} ) {
 
 		// update scene graph
 
-		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 
-		if ( camera.parent === null ) camera.updateMatrixWorld();
+		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 		if ( xr.enabled === true && xr.isPresenting === true ) {
 
@@ -1393,7 +1450,8 @@ function WebGLRenderer( parameters = {} ) {
 			uniforms.directionalShadowMap.value = lights.state.directionalShadowMap;
 			uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix;
 			uniforms.spotShadowMap.value = lights.state.spotShadowMap;
-			uniforms.spotShadowMatrix.value = lights.state.spotShadowMatrix;
+			uniforms.spotLightMatrix.value = lights.state.spotLightMatrix;
+			uniforms.spotLightMap.value = lights.state.spotLightMap;
 			uniforms.pointShadowMap.value = lights.state.pointShadowMap;
 			uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
 			// TODO (abelnation): add area lights shadow info to uniforms
@@ -1691,11 +1749,20 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-
 		if ( refreshMaterial || materialProperties.receiveShadow !== object.receiveShadow ) {
 
 			materialProperties.receiveShadow = object.receiveShadow;
 			p_uniforms.setValue( _gl, 'receiveShadow', object.receiveShadow );
+
+		}
+
+		// https://github.com/mrdoob/three.js/pull/24467#issuecomment-1209031512
+
+		if ( material.isMeshGouraudMaterial && material.envMap !== null ) {
+
+			m_uniforms.envMap.value = envMap;
+
+			m_uniforms.flipEnvMap.value = ( envMap.isCubeTexture && envMap.isRenderTargetTexture === false ) ? - 1 : 1;
 
 		}
 
@@ -1750,6 +1817,31 @@ function WebGLRenderer( parameters = {} ) {
 		p_uniforms.setValue( _gl, 'modelViewMatrix', object.modelViewMatrix );
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
+
+		// UBOs
+
+		if ( material.isShaderMaterial || material.isRawShaderMaterial ) {
+
+			const groups = material.uniformsGroups;
+
+			for ( let i = 0, l = groups.length; i < l; i ++ ) {
+
+				if ( capabilities.isWebGL2 ) {
+
+					const group = groups[ i ];
+
+					uniformsGroups.update( group, program );
+					uniformsGroups.bind( group, program );
+
+				} else {
+
+					console.warn( 'THREE.WebGLRenderer: Uniform Buffer Objects can only be used with WebGL 2.' );
+
+				}
+
+			}
+
+		}
 
 		return program;
 
@@ -2007,13 +2099,6 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.copyFramebufferToTexture = function ( position, texture, level = 0 ) {
 
-		if ( texture.isFramebufferTexture !== true ) {
-
-			console.error( 'THREE.WebGLRenderer: copyFramebufferToTexture() can only be used with FramebufferTexture.' );
-			return;
-
-		}
-
 		const levelScale = Math.pow( 2, - level );
 		const width = Math.floor( texture.image.width * levelScale );
 		const height = Math.floor( texture.image.height * levelScale );
@@ -2151,7 +2236,23 @@ function WebGLRenderer( parameters = {} ) {
 
 	this.initTexture = function ( texture ) {
 
-		textures.setTexture2D( texture, 0 );
+		if ( texture.isCubeTexture ) {
+
+			textures.setTextureCube( texture, 0 );
+
+		} else if ( texture.isData3DTexture ) {
+
+			textures.setTexture3D( texture, 0 );
+
+		} else if ( texture.isDataArrayTexture ) {
+
+			textures.setTexture2DArray( texture, 0 );
+
+		} else {
+
+			textures.setTexture2D( texture, 0 );
+
+		}
 
 		state.unbindTexture();
 
@@ -2175,7 +2276,5 @@ function WebGLRenderer( parameters = {} ) {
 	}
 
 }
-
-WebGLRenderer.prototype.isWebGLRenderer = true;
 
 export { WebGLRenderer };

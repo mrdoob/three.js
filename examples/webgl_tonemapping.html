@@ -12,7 +12,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Tone Mapping<br />
 			Battle Damaged Sci-fi Helmet by
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://hdrihaven.com/hdri/?h=venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -22,7 +22,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -31,10 +32,10 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			let mesh, renderer, scene, camera, controls;
 			let gui, guiExposure = null;
@@ -115,16 +116,8 @@
 
 				// model
 
-				gltf.scene.traverse( function ( child ) {
-
-					if ( child.isMesh ) {
-
-						mesh = child;
-						scene.add( mesh );
-
-					}
-
-				} );
+				mesh = gltf.scene.getObjectByName( 'node_damagedHelmet_-6514' );
+				scene.add( mesh );
 
 				render();
 

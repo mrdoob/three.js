@@ -8,6 +8,8 @@ class ViewHelper extends THREE.Object3D {
 
 		super();
 
+		this.isViewHelper = true;
+
 		this.animating = false;
 		this.controls = null;
 
@@ -198,6 +200,30 @@ class ViewHelper extends THREE.Object3D {
 
 		};
 
+		this.dispose = function () {
+
+			geometry.dispose();
+
+			xAxis.material.dispose();
+			yAxis.material.dispose();
+			zAxis.material.dispose();
+
+			posXAxisHelper.material.map.dispose();
+			posYAxisHelper.material.map.dispose();
+			posZAxisHelper.material.map.dispose();
+			negXAxisHelper.material.map.dispose();
+			negYAxisHelper.material.map.dispose();
+			negZAxisHelper.material.map.dispose();
+
+			posXAxisHelper.material.dispose();
+			posYAxisHelper.material.dispose();
+			posZAxisHelper.material.dispose();
+			negXAxisHelper.material.dispose();
+			negYAxisHelper.material.dispose();
+			negZAxisHelper.material.dispose();
+
+		};
+
 		function prepareAnimationData( object, focusPoint ) {
 
 			switch ( object.userData.type ) {
@@ -289,7 +315,5 @@ class ViewHelper extends THREE.Object3D {
 	}
 
 }
-
-ViewHelper.prototype.isViewHelper = true;
 
 export { ViewHelper };

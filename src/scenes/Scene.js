@@ -6,6 +6,8 @@ class Scene extends Object3D {
 
 		super();
 
+		this.isScene = true;
+
 		this.type = 'Scene';
 
 		this.background = null;
@@ -13,8 +15,6 @@ class Scene extends Object3D {
 		this.fog = null;
 
 		this.overrideMaterial = null;
-
-		this.autoUpdate = true; // checked by the renderer
 
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
@@ -34,7 +34,6 @@ class Scene extends Object3D {
 
 		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-		this.autoUpdate = source.autoUpdate;
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
 		return this;
@@ -51,8 +50,22 @@ class Scene extends Object3D {
 
 	}
 
-}
+	// @deprecated
 
-Scene.prototype.isScene = true;
+	get autoUpdate() {
+
+		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
+		return this.matrixWorldAutoUpdate;
+
+	}
+
+	set autoUpdate( value ) {
+
+		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
+		this.matrixWorldAutoUpdate = value;
+
+	}
+
+}
 
 export { Scene };

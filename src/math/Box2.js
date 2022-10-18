@@ -6,6 +6,8 @@ class Box2 {
 
 	constructor( min = new Vector2( + Infinity, + Infinity ), max = new Vector2( - Infinity, - Infinity ) ) {
 
+		this.isBox2 = true;
+
 		this.min = min;
 		this.max = max;
 
@@ -197,7 +199,5 @@ class Box2 {
 	}
 
 }
-
-Box2.prototype.isBox2 = true;
 
 export { Box2 };

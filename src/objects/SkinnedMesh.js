@@ -17,6 +17,8 @@ class SkinnedMesh extends Mesh {
 
 		super( geometry, material );
 
+		this.isSkinnedMesh = true;
+
 		this.type = 'SkinnedMesh';
 
 		this.bindMode = 'attached';
@@ -25,9 +27,9 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.bindMode = source.bindMode;
 		this.bindMatrix.copy( source.bindMatrix );
@@ -145,7 +147,5 @@ class SkinnedMesh extends Mesh {
 	}
 
 }
-
-SkinnedMesh.prototype.isSkinnedMesh = true;
 
 export { SkinnedMesh };

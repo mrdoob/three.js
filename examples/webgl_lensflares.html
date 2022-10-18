@@ -21,7 +21,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -30,10 +31,10 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FlyControls } from './jsm/controls/FlyControls.js';
-			import { Lensflare, LensflareElement } from './jsm/objects/Lensflare.js';
+			import { FlyControls } from 'three/addons/controls/FlyControls.js';
+			import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
 
 			let container, stats;
 

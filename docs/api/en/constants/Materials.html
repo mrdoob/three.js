@@ -119,12 +119,30 @@
 		[page:Materials ZeroStencilOp] will set the stencil value to 0.<br />
 		[page:Materials KeepStencilOp] will not change the current stencil value.<br />
 		[page:Materials ReplaceStencilOp] will replace the stencil value with the specified stencil reference value.<br />
-		[page:Materials IncrementStencilOp] will increment the current stencil value by 1.<br />
-		[page:Materials DecrementStencilOp] will decrement the current stencil value by 1.<br />
-		[page:Materials IncrementWrapStencilOp] will increment the current stencil value by 1. If the value increments past 255 it will be set to 0.<br />
-		[page:Materials DecrementWrapStencilOp] will increment the current stencil value by 1. If the value decrements below 0 it will be set to 255.<br />
+		[page:Materials IncrementStencilOp] will increment the current stencil value by `1`.<br />
+		[page:Materials DecrementStencilOp] will decrement the current stencil value by `1`.<br />
+		[page:Materials IncrementWrapStencilOp] will increment the current stencil value by `1`. If the value increments past `255` it will be set to `0`.<br />
+		[page:Materials DecrementWrapStencilOp] will increment the current stencil value by `1`. If the value decrements below `0` it will be set to `255`.<br />
 		[page:Materials InvertStencilOp] will perform a bitwise inversion of the current stencil value.<br />
 		</p>
+
+		<h2>Normal map type</h2>
+		<code>
+		THREE.TangentSpaceNormalMap
+		THREE.ObjectSpaceNormalMap
+		</code>
+		<p>
+		Defines the type of the normal map. 
+		For TangentSpaceNormalMap, the information is relative to the underlying surface. 
+		For ObjectSpaceNormalMap, the information is relative to the object orientation.
+		Default is [page:Constant TangentSpaceNormalMap].
+		</p>
+
+		<h2>GLSL Version</h2>
+		<code>
+		THREE.GLSL1
+		THREE.GLSL3
+		</code>
 
 		<h2>Source</h2>
 

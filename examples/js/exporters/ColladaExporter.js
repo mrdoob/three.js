@@ -208,20 +208,11 @@
 			// Returns the mesh id
 
 
-			function processGeometry( g ) {
+			function processGeometry( bufferGeometry ) {
 
-				let info = geometryInfo.get( g );
+				let info = geometryInfo.get( bufferGeometry );
 
 				if ( ! info ) {
-
-					// convert the geometry to bufferGeometry if it isn't already
-					const bufferGeometry = g;
-
-					if ( bufferGeometry.isBufferGeometry !== true ) {
-
-						throw new Error( 'THREE.ColladaExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-					}
 
 					const meshid = `Mesh${libraryGeometries.length + 1}`;
 					const indexCount = bufferGeometry.index ? bufferGeometry.index.count * bufferGeometry.index.itemSize : bufferGeometry.attributes.position.count;
@@ -230,7 +221,7 @@
 						count: indexCount,
 						materialIndex: 0
 					} ];
-					const gname = g.name ? ` name="${g.name}"` : '';
+					const gname = bufferGeometry.name ? ` name="${bufferGeometry.name}"` : '';
 					let gnode = `<geometry id="${meshid}"${gname}><mesh>`; // define the geometry node and the vertices for the geometry
 
 					const posName = `${meshid}-position`;
@@ -312,7 +303,7 @@
 						meshid: meshid,
 						bufferGeometry: bufferGeometry
 					};
-					geometryInfo.set( g, info );
+					geometryInfo.set( bufferGeometry, info );
 
 				}
 

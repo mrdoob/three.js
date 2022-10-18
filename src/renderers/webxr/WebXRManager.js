@@ -11,9 +11,8 @@ import {
 	DepthFormat,
 	DepthStencilFormat,
 	RGBAFormat,
-	sRGBEncoding,
 	UnsignedByteType,
-	UnsignedShortType,
+	UnsignedIntType,
 	UnsignedInt248Type,
 } from '../../constants.js';
 
@@ -42,7 +41,7 @@ class WebXRManager extends EventDispatcher {
 		let newRenderTarget = null;
 
 		const controllers = [];
-		const inputSourcesMap = new Map();
+		const controllerInputSources = [];
 
 		//
 
@@ -119,9 +118,17 @@ class WebXRManager extends EventDispatcher {
 
 		function onSessionEvent( event ) {
 
-			const controller = inputSourcesMap.get( event.inputSource );
+			const controllerIndex = controllerInputSources.indexOf( event.inputSource );
 
-			if ( controller ) {
+			if ( controllerIndex === - 1 ) {
+
+				return;
+
+			}
+
+			const controller = controllers[ controllerIndex ];
+
+			if ( controller !== undefined ) {
 
 				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
@@ -131,13 +138,26 @@ class WebXRManager extends EventDispatcher {
 
 		function onSessionEnd() {
 
-			inputSourcesMap.forEach( function ( controller, inputSource ) {
+			session.removeEventListener( 'select', onSessionEvent );
+			session.removeEventListener( 'selectstart', onSessionEvent );
+			session.removeEventListener( 'selectend', onSessionEvent );
+			session.removeEventListener( 'squeeze', onSessionEvent );
+			session.removeEventListener( 'squeezestart', onSessionEvent );
+			session.removeEventListener( 'squeezeend', onSessionEvent );
+			session.removeEventListener( 'end', onSessionEnd );
+			session.removeEventListener( 'inputsourceschange', onInputSourcesChange );
 
-				controller.disconnect( inputSource );
+			for ( let i = 0; i < controllers.length; i ++ ) {
 
-			} );
+				const inputSource = controllerInputSources[ i ];
 
-			inputSourcesMap.clear();
+				if ( inputSource === null ) continue;
+
+				controllerInputSources[ i ] = null;
+
+				controllers[ i ].disconnect( inputSource );
+
+			}
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
@@ -265,7 +285,8 @@ class WebXRManager extends EventDispatcher {
 						{
 							format: RGBAFormat,
 							type: UnsignedByteType,
-							encoding: renderer.outputEncoding
+							encoding: renderer.outputEncoding,
+							stencilBuffer: attributes.stencil
 						}
 					);
 
@@ -279,12 +300,12 @@ class WebXRManager extends EventDispatcher {
 
 						glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
 						depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
-						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedShortType;
+						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedIntType;
 
 					}
 
 					const projectionlayerInit = {
-						colorFormat: ( renderer.outputEncoding === sRGBEncoding ) ? gl.SRGB8_ALPHA8 : gl.RGBA8,
+						colorFormat: gl.RGBA8,
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
@@ -317,6 +338,7 @@ class WebXRManager extends EventDispatcher {
 				// Set foveation to maximum.
 				this.setFoveation( 1.0 );
 
+				customReferenceSpace = null;
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
 				animation.setContext( session );
@@ -332,28 +354,17 @@ class WebXRManager extends EventDispatcher {
 
 		function onInputSourcesChange( event ) {
 
-			const inputSources = session.inputSources;
-
-			// Assign controllers to available inputSources
-
-			for ( let i = 0; i < inputSources.length; i ++ ) {
-
-				const index = inputSources[ i ].handedness === 'right' ? 1 : 0;
-				inputSourcesMap.set( inputSources[ i ], controllers[ index ] );
-
-			}
-
 			// Notify disconnected
 
 			for ( let i = 0; i < event.removed.length; i ++ ) {
 
 				const inputSource = event.removed[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+				const index = controllerInputSources.indexOf( inputSource );
 
-				if ( controller ) {
+				if ( index >= 0 ) {
 
-					controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
-					inputSourcesMap.delete( inputSource );
+					controllerInputSources[ index ] = null;
+					controllers[ index ].dispatchEvent( { type: 'disconnected', data: inputSource } );
 
 				}
 
@@ -364,7 +375,38 @@ class WebXRManager extends EventDispatcher {
 			for ( let i = 0; i < event.added.length; i ++ ) {
 
 				const inputSource = event.added[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+
+				let controllerIndex = controllerInputSources.indexOf( inputSource );
+
+				if ( controllerIndex === - 1 ) {
+
+					// Assign input source a controller that currently has no input source
+
+					for ( let i = 0; i < controllers.length; i ++ ) {
+
+						if ( i >= controllerInputSources.length ) {
+
+							controllerInputSources.push( inputSource );
+							controllerIndex = i;
+							break;
+
+						} else if ( controllerInputSources[ i ] === null ) {
+
+							controllerInputSources[ i ] = inputSource;
+							controllerIndex = i;
+							break;
+
+						}
+
+					}
+
+					// If all controllers do currently receive input we ignore new ones
+
+					if ( controllerIndex === - 1 ) break;
+
+				}
+
+				const controller = controllers[ controllerIndex ];
 
 				if ( controller ) {
 
@@ -488,11 +530,8 @@ class WebXRManager extends EventDispatcher {
 
 			// update user camera and its children
 
-			camera.position.copy( cameraVR.position );
-			camera.quaternion.copy( cameraVR.quaternion );
-			camera.scale.copy( cameraVR.scale );
 			camera.matrix.copy( cameraVR.matrix );
-			camera.matrixWorld.copy( cameraVR.matrixWorld );
+			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 
 			const children = camera.children;
 
@@ -621,7 +660,16 @@ class WebXRManager extends EventDispatcher {
 
 					}
 
-					const camera = cameras[ i ];
+					let camera = cameras[ i ];
+
+					if ( camera === undefined ) {
+
+						camera = new PerspectiveCamera();
+						camera.layers.enable( i );
+						camera.viewport = new Vector4();
+						cameras[ i ] = camera;
+
+					}
 
 					camera.matrix.fromArray( view.transform.matrix );
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
@@ -645,14 +693,12 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
-			const inputSources = session.inputSources;
-
 			for ( let i = 0; i < controllers.length; i ++ ) {
 
-				const inputSource = inputSources[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+				const inputSource = controllerInputSources[ i ];
+				const controller = controllers[ i ];
 
-				if ( controller !== undefined ) {
+				if ( inputSource !== null && controller !== undefined ) {
 
 					controller.update( inputSource, frame, customReferenceSpace || referenceSpace );
 

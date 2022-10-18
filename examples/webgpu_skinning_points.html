@@ -5,8 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
-		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
 	</head>
 	<body>
 
@@ -20,7 +18,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -28,12 +27,12 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer;
 

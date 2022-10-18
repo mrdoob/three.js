@@ -163,13 +163,21 @@ class OperatorNode extends TempNode {
 
 				return a;
 
-			} else if ( op === '>' && outputLength > 1 ) {
+			} else if ( op === '<' && outputLength > 1 ) {
 
-				return builder.format( `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`, type, output );
+				return builder.format( `${ builder.getMethod( 'lessThan' ) }( ${a}, ${b} )`, type, output );
 
 			} else if ( op === '<=' && outputLength > 1 ) {
 
 				return builder.format( `${ builder.getMethod( 'lessThanEqual' ) }( ${a}, ${b} )`, type, output );
+
+			} else if ( op === '>' && outputLength > 1 ) {
+
+				return builder.format( `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`, type, output );
+
+			} else if ( op === '>=' && outputLength > 1 ) {
+
+				return builder.format( `${ builder.getMethod( 'greaterThanEqual' ) }( ${a}, ${b} )`, type, output );
 
 			} else {
 

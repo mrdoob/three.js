@@ -155,28 +155,6 @@ class Projector {
 
 		//
 
-		this.projectVector = function ( vector, camera ) {
-
-			console.warn( 'THREE.Projector: .projectVector() is now vector.project().' );
-			vector.project( camera );
-
-		};
-
-		this.unprojectVector = function ( vector, camera ) {
-
-			console.warn( 'THREE.Projector: .unprojectVector() is now vector.unproject().' );
-			vector.unproject( camera );
-
-		};
-
-		this.pickingRay = function () {
-
-			console.error( 'THREE.Projector: .pickingRay() is now raycaster.setFromCamera().' );
-
-		};
-
-		//
-
 		function RenderList() {
 
 			const normals = [];
@@ -433,8 +411,8 @@ class Projector {
 
 			_renderData.elements.length = 0;
 
-			if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-			if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 			_viewMatrix.copy( camera.matrixWorldInverse );
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
@@ -473,71 +451,177 @@ class Projector {
 
 				if ( object.isMesh ) {
 
-					if ( geometry.isBufferGeometry ) {
+					let material = object.material;
 
-						let material = object.material;
+					const isMultiMaterial = Array.isArray( material );
 
-						const isMultiMaterial = Array.isArray( material );
+					const attributes = geometry.attributes;
+					const groups = geometry.groups;
 
-						const attributes = geometry.attributes;
-						const groups = geometry.groups;
+					if ( attributes.position === undefined ) continue;
 
-						if ( attributes.position === undefined ) continue;
+					const positions = attributes.position.array;
 
-						const positions = attributes.position.array;
+					for ( let i = 0, l = positions.length; i < l; i += 3 ) {
 
-						for ( let i = 0, l = positions.length; i < l; i += 3 ) {
+						let x = positions[ i ];
+						let y = positions[ i + 1 ];
+						let z = positions[ i + 2 ];
 
-							let x = positions[ i ];
-							let y = positions[ i + 1 ];
-							let z = positions[ i + 2 ];
+						const morphTargets = geometry.morphAttributes.position;
 
-							const morphTargets = geometry.morphAttributes.position;
+						if ( morphTargets !== undefined ) {
 
-							if ( morphTargets !== undefined ) {
+							const morphTargetsRelative = geometry.morphTargetsRelative;
+							const morphInfluences = object.morphTargetInfluences;
 
-								const morphTargetsRelative = geometry.morphTargetsRelative;
-								const morphInfluences = object.morphTargetInfluences;
+							for ( let t = 0, tl = morphTargets.length; t < tl; t ++ ) {
 
-								for ( let t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+								const influence = morphInfluences[ t ];
 
-									const influence = morphInfluences[ t ];
+								if ( influence === 0 ) continue;
 
-									if ( influence === 0 ) continue;
+								const target = morphTargets[ t ];
 
-									const target = morphTargets[ t ];
+								if ( morphTargetsRelative ) {
 
-									if ( morphTargetsRelative ) {
+									x += target.getX( i / 3 ) * influence;
+									y += target.getY( i / 3 ) * influence;
+									z += target.getZ( i / 3 ) * influence;
 
-										x += target.getX( i / 3 ) * influence;
-										y += target.getY( i / 3 ) * influence;
-										z += target.getZ( i / 3 ) * influence;
+								} else {
 
-									} else {
-
-										x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
-										y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
-										z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
-
-									}
+									x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
+									y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
+									z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
 
 								}
 
 							}
 
-							renderList.pushVertex( x, y, z );
+						}
+
+						renderList.pushVertex( x, y, z );
+
+					}
+
+					if ( attributes.normal !== undefined ) {
+
+						const normals = attributes.normal.array;
+
+						for ( let i = 0, l = normals.length; i < l; i += 3 ) {
+
+							renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
 
 						}
 
-						if ( attributes.normal !== undefined ) {
+					}
 
-							const normals = attributes.normal.array;
+					if ( attributes.color !== undefined ) {
 
-							for ( let i = 0, l = normals.length; i < l; i += 3 ) {
+						const colors = attributes.color.array;
 
-								renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
+						for ( let i = 0, l = colors.length; i < l; i += 3 ) {
+
+							renderList.pushColor( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] );
+
+						}
+
+					}
+
+					if ( attributes.uv !== undefined ) {
+
+						const uvs = attributes.uv.array;
+
+						for ( let i = 0, l = uvs.length; i < l; i += 2 ) {
+
+							renderList.pushUv( uvs[ i ], uvs[ i + 1 ] );
+
+						}
+
+					}
+
+					if ( geometry.index !== null ) {
+
+						const indices = geometry.index.array;
+
+						if ( groups.length > 0 ) {
+
+							for ( let g = 0; g < groups.length; g ++ ) {
+
+								const group = groups[ g ];
+
+								material = isMultiMaterial === true
+									 ? object.material[ group.materialIndex ]
+									 : object.material;
+
+								if ( material === undefined ) continue;
+
+								for ( let i = group.start, l = group.start + group.count; i < l; i += 3 ) {
+
+									renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ], material );
+
+								}
 
 							}
+
+						} else {
+
+							for ( let i = 0, l = indices.length; i < l; i += 3 ) {
+
+								renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ], material );
+
+							}
+
+						}
+
+					} else {
+
+						if ( groups.length > 0 ) {
+
+							for ( let g = 0; g < groups.length; g ++ ) {
+
+								const group = groups[ g ];
+
+								material = isMultiMaterial === true
+									 ? object.material[ group.materialIndex ]
+									 : object.material;
+
+								if ( material === undefined ) continue;
+
+								for ( let i = group.start, l = group.start + group.count; i < l; i += 3 ) {
+
+									renderList.pushTriangle( i, i + 1, i + 2, material );
+
+								}
+
+							}
+
+						} else {
+
+							for ( let i = 0, l = positions.length / 3; i < l; i += 3 ) {
+
+								renderList.pushTriangle( i, i + 1, i + 2, material );
+
+							}
+
+						}
+
+					}
+
+				} else if ( object.isLine ) {
+
+					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
+
+					const attributes = geometry.attributes;
+
+					if ( attributes.position !== undefined ) {
+
+						const positions = attributes.position.array;
+
+						for ( let i = 0, l = positions.length; i < l; i += 3 ) {
+
+							renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
 						}
 
@@ -553,151 +637,27 @@ class Projector {
 
 						}
 
-						if ( attributes.uv !== undefined ) {
-
-							const uvs = attributes.uv.array;
-
-							for ( let i = 0, l = uvs.length; i < l; i += 2 ) {
-
-								renderList.pushUv( uvs[ i ], uvs[ i + 1 ] );
-
-							}
-
-						}
-
 						if ( geometry.index !== null ) {
 
 							const indices = geometry.index.array;
 
-							if ( groups.length > 0 ) {
+							for ( let i = 0, l = indices.length; i < l; i += 2 ) {
 
-								for ( let g = 0; g < groups.length; g ++ ) {
-
-									const group = groups[ g ];
-
-									material = isMultiMaterial === true
-										 ? object.material[ group.materialIndex ]
-										 : object.material;
-
-									if ( material === undefined ) continue;
-
-									for ( let i = group.start, l = group.start + group.count; i < l; i += 3 ) {
-
-										renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ], material );
-
-									}
-
-								}
-
-							} else {
-
-								for ( let i = 0, l = indices.length; i < l; i += 3 ) {
-
-									renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ], material );
-
-								}
+								renderList.pushLine( indices[ i ], indices[ i + 1 ] );
 
 							}
 
 						} else {
 
-							if ( groups.length > 0 ) {
+							const step = object.isLineSegments ? 2 : 1;
 
-								for ( let g = 0; g < groups.length; g ++ ) {
+							for ( let i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
 
-									const group = groups[ g ];
-
-									material = isMultiMaterial === true
-										 ? object.material[ group.materialIndex ]
-										 : object.material;
-
-									if ( material === undefined ) continue;
-
-									for ( let i = group.start, l = group.start + group.count; i < l; i += 3 ) {
-
-										renderList.pushTriangle( i, i + 1, i + 2, material );
-
-									}
-
-								}
-
-							} else {
-
-								for ( let i = 0, l = positions.length / 3; i < l; i += 3 ) {
-
-									renderList.pushTriangle( i, i + 1, i + 2, material );
-
-								}
+								renderList.pushLine( i, i + 1 );
 
 							}
 
 						}
-
-					} else if ( geometry.isGeometry ) {
-
-						console.error( 'THREE.Projector no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-						return;
-
-					}
-
-				} else if ( object.isLine ) {
-
-					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
-
-					if ( geometry.isBufferGeometry ) {
-
-						const attributes = geometry.attributes;
-
-						if ( attributes.position !== undefined ) {
-
-							const positions = attributes.position.array;
-
-							for ( let i = 0, l = positions.length; i < l; i += 3 ) {
-
-								renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
-
-							}
-
-							if ( attributes.color !== undefined ) {
-
-								const colors = attributes.color.array;
-
-								for ( let i = 0, l = colors.length; i < l; i += 3 ) {
-
-									renderList.pushColor( colors[ i ], colors[ i + 1 ], colors[ i + 2 ] );
-
-								}
-
-							}
-
-							if ( geometry.index !== null ) {
-
-								const indices = geometry.index.array;
-
-								for ( let i = 0, l = indices.length; i < l; i += 2 ) {
-
-									renderList.pushLine( indices[ i ], indices[ i + 1 ] );
-
-								}
-
-							} else {
-
-								const step = object.isLineSegments ? 2 : 1;
-
-								for ( let i = 0, l = ( positions.length / 3 ) - 1; i < l; i += step ) {
-
-									renderList.pushLine( i, i + 1 );
-
-								}
-
-							}
-
-						}
-
-					} else if ( geometry.isGeometry ) {
-
-						console.error( 'THREE.Projector no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-						return;
 
 					}
 
@@ -705,27 +665,18 @@ class Projector {
 
 					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
 
-					if ( geometry.isGeometry ) {
+					const attributes = geometry.attributes;
 
-						console.error( 'THREE.Projector no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-						return;
+					if ( attributes.position !== undefined ) {
 
-					} else if ( geometry.isBufferGeometry ) {
+						const positions = attributes.position.array;
 
-						const attributes = geometry.attributes;
+						for ( let i = 0, l = positions.length; i < l; i += 3 ) {
 
-						if ( attributes.position !== undefined ) {
+							_vector4.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ], 1 );
+							_vector4.applyMatrix4( _modelViewProjectionMatrix );
 
-							const positions = attributes.position.array;
-
-							for ( let i = 0, l = positions.length; i < l; i += 3 ) {
-
-								_vector4.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ], 1 );
-								_vector4.applyMatrix4( _modelViewProjectionMatrix );
-
-								pushPoint( _vector4, object, camera );
-
-							}
+							pushPoint( _vector4, object, camera );
 
 						}
 

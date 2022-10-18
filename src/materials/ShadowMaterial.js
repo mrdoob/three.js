@@ -7,6 +7,8 @@ class ShadowMaterial extends Material {
 
 		super();
 
+		this.isShadowMaterial = true;
+
 		this.type = 'ShadowMaterial';
 
 		this.color = new Color( 0x000000 );
@@ -31,7 +33,5 @@ class ShadowMaterial extends Material {
 	}
 
 }
-
-ShadowMaterial.prototype.isShadowMaterial = true;
 
 export { ShadowMaterial };

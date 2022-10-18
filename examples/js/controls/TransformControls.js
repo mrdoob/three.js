@@ -40,6 +40,7 @@
 
 			}
 
+			this.isTransformControls = true;
 			this.visible = false;
 			this.domElement = domElement;
 			this.domElement.style.touchAction = 'none'; // disable touch scroll
@@ -180,7 +181,17 @@
 
 			this.camera.updateMatrixWorld();
 			this.camera.matrixWorld.decompose( this.cameraPosition, this.cameraQuaternion, this._cameraScale );
-			this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
+
+			if ( this.camera.isOrthographicCamera ) {
+
+				this.camera.getWorldDirection( this.eye ).negate();
+
+			} else {
+
+				this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
+
+			}
+
 			super.updateMatrixWorld( this );
 
 		}
@@ -520,7 +531,7 @@
 			this.visible = true;
 			return this;
 
-		} // Detatch from object
+		} // Detach from object
 
 
 		detach() {
@@ -598,15 +609,8 @@
 
 		}
 
-		update() {
+	} // mouse / touch event handlers
 
-			console.warn( 'THREE.TransformControls: update function has no more functionality and therefore has been deprecated.' );
-
-		}
-
-	}
-
-	TransformControls.prototype.isTransformControls = true; // mouse / touch event handlers
 
 	function getPointer( event ) {
 
@@ -731,6 +735,7 @@
 		constructor() {
 
 			super();
+			this.isTransformControlsGizmo = true;
 			this.type = 'TransformControlsGizmo'; // shared materials
 
 			const gizmoMaterial = new THREE.MeshBasicMaterial( {
@@ -1108,12 +1113,12 @@
 				if ( this.mode === 'translate' || this.mode === 'scale' ) {
 
 					// Hide translate and scale axis facing the camera
-					const AXIS_HIDE_TRESHOLD = 0.99;
-					const PLANE_HIDE_TRESHOLD = 0.2;
+					const AXIS_HIDE_THRESHOLD = 0.99;
+					const PLANE_HIDE_THRESHOLD = 0.2;
 
 					if ( handle.name === 'X' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1124,7 +1129,7 @@
 
 					if ( handle.name === 'Y' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1135,7 +1140,7 @@
 
 					if ( handle.name === 'Z' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1146,7 +1151,7 @@
 
 					if ( handle.name === 'XY' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1157,7 +1162,7 @@
 
 					if ( handle.name === 'YZ' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1168,7 +1173,7 @@
 
 					if ( handle.name === 'XZ' ) {
 
-						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
+						if ( Math.abs( _alignVector.copy( _unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_THRESHOLD ) {
 
 							handle.scale.set( 1e-10, 1e-10, 1e-10 );
 							handle.visible = false;
@@ -1259,9 +1264,8 @@
 
 		}
 
-	}
+	} //
 
-	TransformControlsGizmo.prototype.isTransformControlsGizmo = true; //
 
 	class TransformControlsPlane extends THREE.Mesh {
 
@@ -1275,6 +1279,7 @@
 				opacity: 0.1,
 				toneMapped: false
 			} ) );
+			this.isTransformControlsPlane = true;
 			this.type = 'TransformControlsPlane';
 
 		}
@@ -1373,8 +1378,6 @@
 		}
 
 	}
-
-	TransformControlsPlane.prototype.isTransformControlsPlane = true;
 
 	THREE.TransformControls = TransformControls;
 	THREE.TransformControlsGizmo = TransformControlsGizmo;

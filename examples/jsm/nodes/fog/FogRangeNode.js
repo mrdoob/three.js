@@ -7,6 +7,8 @@ class FogRangeNode extends FogNode {
 
 		super( colorNode );
 
+		this.isFogRangeNode = true;
+
 		this.nearNode = nearNode;
 		this.farNode = farNode;
 
@@ -21,7 +23,5 @@ class FogRangeNode extends FogNode {
 	}
 
 }
-
-FogRangeNode.prototype.isFogRangeNode = true;
 
 export default FogRangeNode;

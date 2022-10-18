@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
 import { UIPanel } from './libs/ui.js';
 
@@ -15,7 +15,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
-import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 function Viewport( editor ) {
 
@@ -207,28 +207,7 @@ function Viewport( editor ) {
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
 			const intersects = getIntersects( onUpPosition );
-
-			if ( intersects.length > 0 ) {
-
-				const object = intersects[ 0 ].object;
-
-				if ( object.userData.object !== undefined ) {
-
-					// helper
-
-					editor.select( object.userData.object );
-
-				} else {
-
-					editor.select( object );
-
-				}
-
-			} else {
-
-				editor.select( null );
-
-			}
+			signals.intersectionsDetected.dispatch( intersects );
 
 			render();
 
@@ -471,9 +450,11 @@ function Viewport( editor ) {
 
 		}
 
-		if ( editor.helpers[ object.id ] !== undefined ) {
+		const helper = editor.helpers[ object.id ];
 
-			editor.helpers[ object.id ].update();
+		if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
+
+			helper.update();
 
 		}
 

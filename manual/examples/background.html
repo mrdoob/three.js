@@ -28,15 +28,16 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "../../build/three.module.js"
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
   }
 }
 </script>
 
 <script type="module">
 import * as THREE from 'three';
-import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
 function main() {
   const canvas = document.querySelector('#c');

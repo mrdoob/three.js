@@ -2,6 +2,7 @@ import {
 	BufferGeometry,
 	FileLoader,
 	Float32BufferAttribute,
+	Int32BufferAttribute,
 	Loader,
 	LoaderUtils,
 	Points,
@@ -31,7 +32,7 @@ class PCDLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( data, url ) );
+				onLoad( scope.parse( data ) );
 
 			} catch ( e ) {
 
@@ -53,7 +54,7 @@ class PCDLoader extends Loader {
 
 	}
 
-	parse( data, url ) {
+	parse( data ) {
 
 		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
 
@@ -229,6 +230,8 @@ class PCDLoader extends Loader {
 		const position = [];
 		const normal = [];
 		const color = [];
+		const intensity = [];
+		const label = [];
 
 		// ascii
 
@@ -285,6 +288,18 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					intensity.push( parseFloat( line[ offset.intensity ] ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					label.push( parseInt( line[ offset.label ] ) );
+
+				}
+
 			}
 
 		}
@@ -309,25 +324,46 @@ class PCDLoader extends Loader {
 
 				if ( offset.x !== undefined ) {
 
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ 0 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ 1 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ 2 ] * i, this.littleEndian ) );
+					const xIndex = PCDheader.fields.indexOf( 'x' );
+					const yIndex = PCDheader.fields.indexOf( 'y' );
+					const zIndex = PCDheader.fields.indexOf( 'z' );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ xIndex ] * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ yIndex ] * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ zIndex ] * i, this.littleEndian ) );
 
 				}
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
+					const rgbIndex = PCDheader.fields.indexOf( 'rgb' );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 2 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 1 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 0 ) / 255.0 );
 
 				}
 
 				if ( offset.normal_x !== undefined ) {
 
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + PCDheader.size[ 4 ] * i, this.littleEndian ) );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_y ) + PCDheader.size[ 5 ] * i, this.littleEndian ) );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_z ) + PCDheader.size[ 6 ] * i, this.littleEndian ) );
+					const xIndex = PCDheader.fields.indexOf( 'normal_x' );
+					const yIndex = PCDheader.fields.indexOf( 'normal_y' );
+					const zIndex = PCDheader.fields.indexOf( 'normal_z' );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + PCDheader.size[ xIndex ] * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_y ) + PCDheader.size[ yIndex ] * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_z ) + PCDheader.size[ zIndex ] * i, this.littleEndian ) );
+
+				}
+
+				if ( offset.intensity !== undefined ) {
+
+					const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
+					intensity.push( dataview.getFloat32( ( PCDheader.points * offset.intensity ) + PCDheader.size[ intensityIndex ] * i, this.littleEndian ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					const labelIndex = PCDheader.fields.indexOf( 'label' );
+					label.push( dataview.getInt32( ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, this.littleEndian ) );
 
 				}
 
@@ -368,6 +404,18 @@ class PCDLoader extends Loader {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					intensity.push( dataview.getFloat32( row + offset.intensity, this.littleEndian ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					label.push( dataview.getInt32( row + offset.label, this.littleEndian ) );
+
+				}
+
 			}
 
 		}
@@ -379,6 +427,8 @@ class PCDLoader extends Loader {
 		if ( position.length > 0 ) geometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 		if ( normal.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal, 3 ) );
 		if ( color.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+		if ( intensity.length > 0 ) geometry.setAttribute( 'intensity', new Float32BufferAttribute( intensity, 1 ) );
+		if ( label.length > 0 ) geometry.setAttribute( 'label', new Int32BufferAttribute( label, 1 ) );
 
 		geometry.computeBoundingSphere();
 
@@ -390,21 +440,11 @@ class PCDLoader extends Loader {
 
 			material.vertexColors = true;
 
-		} else {
-
-			material.color.setHex( Math.random() * 0xffffff );
-
 		}
 
 		// build point cloud
 
-		const mesh = new Points( geometry, material );
-		let name = url.split( '' ).reverse().join( '' );
-		name = /([^\/]*)/.exec( name );
-		name = name[ 1 ].split( '' ).reverse().join( '' );
-		mesh.name = name;
-
-		return mesh;
+		return new Points( geometry, material );
 
 	}
 

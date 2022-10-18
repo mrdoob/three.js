@@ -253,7 +253,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -262,11 +263,11 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
-			import { SimplexNoise } from './jsm/math/SimplexNoise.js';
+			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
+			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 
 			// Texture width for simulation
 			const WIDTH = 128;

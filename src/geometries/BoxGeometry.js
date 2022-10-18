@@ -167,4 +167,4 @@ class BoxGeometry extends BufferGeometry {
 
 }
 
-export { BoxGeometry, BoxGeometry as BoxBufferGeometry };
+export { BoxGeometry };

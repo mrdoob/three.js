@@ -5,6 +5,8 @@ class Source {
 
 	constructor( data = null ) {
 
+		this.isSource = true;
+
 		this.uuid = MathUtils.generateUUID();
 
 		this.data = data;
@@ -101,7 +103,7 @@ function serializeImage( image ) {
 			// images of DataTexture
 
 			return {
-				data: Array.prototype.slice.call( image.data ),
+				data: Array.from( image.data ),
 				width: image.width,
 				height: image.height,
 				type: image.data.constructor.name
@@ -117,7 +119,5 @@ function serializeImage( image ) {
 	}
 
 }
-
-Source.prototype.isSource = true;
 
 export { Source };

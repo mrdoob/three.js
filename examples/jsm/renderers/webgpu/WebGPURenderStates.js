@@ -1,4 +1,4 @@
-import LightsNode from 'three-nodes/lights/LightsNode.js';
+import { LightsNode } from 'three/nodes';
 
 class WebGPURenderState {
 
@@ -22,7 +22,7 @@ class WebGPURenderState {
 
 	}
 
-	getLightNode() {
+	getLightsNode() {
 
 		return this.lightsNode.fromLights( this.lightsArray );
 
@@ -38,7 +38,7 @@ class WebGPURenderStates {
 
 	}
 
-	get( scene, camera ) {
+	get( scene, /* camera */ ) {
 
 		const renderStates = this.renderStates;
 

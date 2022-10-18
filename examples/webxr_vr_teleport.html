@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,20 +29,18 @@
 
 			import * as THREE from 'three';
 
-			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
-			import { VRButton } from './jsm/webxr/VRButton.js';
-			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
+			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
 			let camera, scene, raycaster, renderer;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 
-			let room, marker, floor;
+			let room, marker, floor, baseReferenceSpace;
 
 			let INTERSECTION;
 			const tempMatrix = new THREE.Matrix4();
-
-			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -84,11 +83,11 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+
+				renderer.xr.addEventListener( 'sessionstart', () => baseReferenceSpace = renderer.xr.getReferenceSpace() );
 				renderer.xr.enabled = true;
+
 				document.body.appendChild( renderer.domElement );
-
-				//
-
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				// controllers
@@ -105,7 +104,6 @@
 
 					if ( INTERSECTION ) {
 
-						const baseReferenceSpace = renderer.xr.getReferenceSpace();
 						const offsetPosition = { x: - INTERSECTION.x, y: - INTERSECTION.y, z: - INTERSECTION.z, w: 1 };
 						const offsetRotation = new THREE.Quaternion();
 						const transform = new XRRigidTransform( offsetPosition, offsetRotation );
@@ -200,24 +198,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function handleController( controller ) {
-
-				if ( controller.userData.isSelecting ) {
-
-					const object = room.children[ count ++ ];
-
-					object.position.copy( controller.position );
-					object.userData.velocity.x = ( Math.random() - 0.5 ) * 3;
-					object.userData.velocity.y = ( Math.random() - 0.5 ) * 3;
-					object.userData.velocity.z = ( Math.random() - 9 );
-					object.userData.velocity.applyQuaternion( controller.quaternion );
-
-					if ( count === room.children.length ) count = 0;
-
-				}
 
 			}
 

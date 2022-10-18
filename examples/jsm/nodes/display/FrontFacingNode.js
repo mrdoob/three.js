@@ -6,6 +6,8 @@ class FrontFacingNode extends Node {
 
 		super( 'bool' );
 
+		this.isFrontFacingNode = true;
+
 	}
 
 	generate( builder ) {
@@ -15,7 +17,5 @@ class FrontFacingNode extends Node {
 	}
 
 }
-
-FrontFacingNode.prototype.isFrontFacingNode = true;
 
 export default FrontFacingNode;

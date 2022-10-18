@@ -3,9 +3,9 @@ import FunctionCallNode from './FunctionCallNode.js';
 
 class FunctionNode extends CodeNode {
 
-	constructor( code = '' ) {
+	constructor( code = '', includes = [] ) {
 
-		super( code );
+		super( code, includes );
 
 		this.keywords = {};
 

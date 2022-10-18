@@ -2,6 +2,8 @@ class Matrix3 {
 
 	constructor() {
 
+		Matrix3.prototype.isMatrix3 = true;
+
 		this.elements = [
 
 			1, 0, 0,
@@ -9,12 +11,6 @@ class Matrix3 {
 			0, 0, 1
 
 		];
-
-		if ( arguments.length > 0 ) {
-
-			console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
-
-		}
 
 	}
 
@@ -333,7 +329,5 @@ class Matrix3 {
 	}
 
 }
-
-Matrix3.prototype.isMatrix3 = true;
 
 export { Matrix3 };

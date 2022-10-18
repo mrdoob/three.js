@@ -9,6 +9,8 @@ class Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
+		this.isEuler = true;
+
 		this._x = x;
 		this._y = y;
 		this._z = z;
@@ -306,9 +308,15 @@ class Euler {
 
 	}
 
-}
+	// @deprecated since r138, 02cf0df1cb4575d5842fef9c85bb5a89fe020d53
 
-Euler.prototype.isEuler = true;
+	toVector3() {
+
+		console.error( 'THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead' );
+
+	}
+
+}
 
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];

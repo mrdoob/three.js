@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,9 +29,9 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { LightProbeHelper } from './jsm/helpers/LightProbeHelper.js';
-			import { LightProbeGenerator } from './jsm/lights/LightProbeGenerator.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { LightProbeHelper } from 'three/addons/helpers/LightProbeHelper.js';
+			import { LightProbeGenerator } from 'three/addons/lights/LightProbeGenerator.js';
 
 			let renderer, scene, camera, cubeCamera;
 

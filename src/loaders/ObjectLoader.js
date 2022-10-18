@@ -168,7 +168,7 @@ class ObjectLoader extends Loader {
 
 			for ( const uuid in images ) {
 
-				if ( images[ uuid ] instanceof HTMLImageElement ) {
+				if ( images[ uuid ].data instanceof HTMLImageElement ) {
 
 					hasImages = true;
 					break;
@@ -275,13 +275,6 @@ class ObjectLoader extends Loader {
 					case 'InstancedBufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
-
-						break;
-
-					case 'Geometry':
-
-						console.error( 'THREE.ObjectLoader: The legacy Geometry type is no longer supported.' );
-
 						break;
 
 					default:
@@ -327,39 +320,13 @@ class ObjectLoader extends Loader {
 
 				const data = json[ i ];
 
-				if ( data.type === 'MultiMaterial' ) {
+				if ( cache[ data.uuid ] === undefined ) {
 
-					// Deprecated
-
-					const array = [];
-
-					for ( let j = 0; j < data.materials.length; j ++ ) {
-
-						const material = data.materials[ j ];
-
-						if ( cache[ material.uuid ] === undefined ) {
-
-							cache[ material.uuid ] = loader.parse( material );
-
-						}
-
-						array.push( cache[ material.uuid ] );
-
-					}
-
-					materials[ data.uuid ] = array;
-
-				} else {
-
-					if ( cache[ data.uuid ] === undefined ) {
-
-						cache[ data.uuid ] = loader.parse( data );
-
-					}
-
-					materials[ data.uuid ] = cache[ data.uuid ];
+					cache[ data.uuid ] = loader.parse( data );
 
 				}
+
+				materials[ data.uuid ] = cache[ data.uuid ];
 
 			}
 
@@ -1082,15 +1049,6 @@ class ObjectLoader extends Loader {
 			}
 
 		} );
-
-	}
-
-	/* DEPRECATED */
-
-	setTexturePath( value ) {
-
-		console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-		return this.setResourcePath( value );
 
 	}
 

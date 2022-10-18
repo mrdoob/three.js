@@ -20,7 +20,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,9 +29,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OimoPhysics } from './jsm/physics/OimoPhysics.js';
-			import Stats from './jsm/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OimoPhysics } from 'three/addons/physics/OimoPhysics.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let camera, scene, renderer, stats;
 			let physics, position;

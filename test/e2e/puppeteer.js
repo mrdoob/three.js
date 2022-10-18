@@ -31,8 +31,8 @@ const exceptionList = [
 	'webgl_loader_imagebitmap', // takes too long to load?
 	'webgl_loader_texture_lottie', // not sure why this fails
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
-	'webgl_materials_standard_nodes', // puppeteer does not support import maps yet
 	'webgl_morphtargets_face', // To investigate...
+	'webgl_nodes_materials_standard', // puppeteer does not support import maps yet
 	'webgl_postprocessing_crossfade', // fails for some misterious reason
 	'webgl_raymarching_reflect', // exception for Github Actions
 	'webgl_test_memory2', // gives fatal error in puppeteer
@@ -44,15 +44,23 @@ const exceptionList = [
 	'webxr_ar_lighting',
 	// webgpu
 	'webgpu_compute',
+	'webgpu_cubemap_adjustments',
+	'webgpu_cubemap_mix',
+	'webgpu_depth_texture',
+	'webgpu_instance_mesh',
 	'webgpu_instance_uniform',
 	'webgpu_lights_custom',
 	'webgpu_lights_selective',
+	'webgpu_loader_gltf',
 	'webgpu_materials',
 	'webgpu_nodes_playground',
+	'webgpu_particles',
 	'webgpu_rtt',
 	'webgpu_sandbox',
+	'webgpu_skinning_instancing',
 	'webgpu_skinning_points',
-	'webgpu_skinning'
+	'webgpu_skinning',
+	'webgpu_sprites'
 ].concat( ( process.platform === 'win32' ) ? [
 
 	'webgl_effects_ascii' // windows fonts not supported

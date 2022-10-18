@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { DataUtils } from '../../../../src/extras/DataUtils.js';
+import * as DataUtils from '../../../../src/extras/DataUtils.js';
 
 export default QUnit.module( 'Extras', () => {
 

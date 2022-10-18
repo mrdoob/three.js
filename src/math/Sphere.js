@@ -161,6 +161,15 @@ class Sphere {
 
 	expandByPoint( point ) {
 
+		if ( this.isEmpty() ) {
+
+			this.center.copy( point );
+			this.radius = 0;
+
+			return this;
+
+		}
+
 		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L649-L671
 
 		_toPoint.subVectors( point, this.center );
@@ -186,6 +195,19 @@ class Sphere {
 	}
 
 	union( sphere ) {
+
+		// handle empty sphere cases
+		if ( sphere.isEmpty() ) {
+
+			return this;
+
+		} else if ( this.isEmpty() ) {
+
+			this.copy( sphere );
+
+			return this;
+
+		}
 
 		// from https://github.com/juj/MathGeoLib/blob/2940b99b99cfe575dd45103ef20f4019dee15b54/src/Geometry/Sphere.cpp#L759-L769
 

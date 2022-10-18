@@ -47,8 +47,9 @@ class SkeletonHelper extends LineSegments {
 
 		super( geometry, material );
 
-		this.type = 'SkeletonHelper';
 		this.isSkeletonHelper = true;
+
+		this.type = 'SkeletonHelper';
 
 		this.root = object;
 		this.bones = bones;
@@ -90,6 +91,13 @@ class SkeletonHelper extends LineSegments {
 		geometry.getAttribute( 'position' ).needsUpdate = true;
 
 		super.updateMatrixWorld( force );
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 

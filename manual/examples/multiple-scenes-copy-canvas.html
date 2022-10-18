@@ -50,14 +50,15 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "../../build/three.module.js"
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
   }
 }
 </script>
 
 <script type="module">
 import * as THREE from 'three';
-import {TrackballControls} from '../../examples/jsm/controls/TrackballControls.js';
+import {TrackballControls} from 'three/addons/controls/TrackballControls.js';
 
 function main() {
   const canvas = document.createElement('canvas');

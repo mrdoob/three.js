@@ -39,4 +39,4 @@ class IcosahedronGeometry extends PolyhedronGeometry {
 }
 
 
-export { IcosahedronGeometry, IcosahedronGeometry as IcosahedronBufferGeometry };
+export { IcosahedronGeometry };

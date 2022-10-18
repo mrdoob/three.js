@@ -16,7 +16,8 @@ export class MeshEditor extends Object3DEditor {
 
 		this.material = null;
 
-		this.defaultMaterial = null;
+		this.meshMaterial = null;
+		this.defaultMeshMaterial = null;
 
 		this._initMaterial();
 
@@ -34,9 +35,9 @@ export class MeshEditor extends Object3DEditor {
 
 	_initMaterial() {
 
-		const materialElement = new LabelElement( 'Material' ).setInputColor( 'forestgreen' ).setInput( 1 );
+		const material = new LabelElement( 'Material' ).setInputColor( 'forestgreen' ).setInput( 1 );
 
-		materialElement.onValid( ( source, target, stage ) => {
+		material.onValid( ( source, target, stage ) => {
 
 			const object = target.getObject();
 
@@ -56,13 +57,15 @@ export class MeshEditor extends Object3DEditor {
 
 		} ).onConnect( () => {
 
-			this.material = materialElement.getLinkedObject() || this.defaultMaterial;
+			this.meshMaterial = material.getLinkedObject() || this.defaultMeshMaterial;
 
 			this.update();
 
 		} );
 
-		this.add( materialElement );
+		this.add( material );
+
+		this.material = material;
 
 	}
 
@@ -74,7 +77,7 @@ export class MeshEditor extends Object3DEditor {
 
 		if ( mesh ) {
 
-			mesh.material = this.material || this.defaultMaterial;
+			mesh.material = this.meshMaterial || this.defaultMeshMaterial;
 
 		}
 
@@ -84,7 +87,7 @@ export class MeshEditor extends Object3DEditor {
 
 		super.updateDefault();
 
-		this.defaultMaterial = this.mesh.material;
+		this.defaultMeshMaterial = this.mesh.material;
 
 	}
 
@@ -92,7 +95,7 @@ export class MeshEditor extends Object3DEditor {
 
 		super.restoreDefault();
 
-		this.mesh.material = this.defaultMaterial;
+		this.mesh.material = this.defaultMeshMaterial;
 
 	}
 

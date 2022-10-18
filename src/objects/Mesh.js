@@ -38,6 +38,8 @@ class Mesh extends Object3D {
 
 		super();
 
+		this.isMesh = true;
+
 		this.type = 'Mesh';
 
 		this.geometry = geometry;
@@ -47,9 +49,9 @@ class Mesh extends Object3D {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		if ( source.morphTargetInfluences !== undefined ) {
 
@@ -74,40 +76,26 @@ class Mesh extends Object3D {
 
 		const geometry = this.geometry;
 
-		if ( geometry.isBufferGeometry ) {
+		const morphAttributes = geometry.morphAttributes;
+		const keys = Object.keys( morphAttributes );
 
-			const morphAttributes = geometry.morphAttributes;
-			const keys = Object.keys( morphAttributes );
+		if ( keys.length > 0 ) {
 
-			if ( keys.length > 0 ) {
+			const morphAttribute = morphAttributes[ keys[ 0 ] ];
 
-				const morphAttribute = morphAttributes[ keys[ 0 ] ];
+			if ( morphAttribute !== undefined ) {
 
-				if ( morphAttribute !== undefined ) {
+				this.morphTargetInfluences = [];
+				this.morphTargetDictionary = {};
 
-					this.morphTargetInfluences = [];
-					this.morphTargetDictionary = {};
+				for ( let m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
 
-					for ( let m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+					const name = morphAttribute[ m ].name || String( m );
 
-						const name = morphAttribute[ m ].name || String( m );
-
-						this.morphTargetInfluences.push( 0 );
-						this.morphTargetDictionary[ name ] = m;
-
-					}
+					this.morphTargetInfluences.push( 0 );
+					this.morphTargetDictionary[ name ] = m;
 
 				}
-
-			}
-
-		} else {
-
-			const morphTargets = geometry.morphTargets;
-
-			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
-
-				console.error( 'THREE.Mesh.updateMorphTargets() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 			}
 
@@ -147,67 +135,41 @@ class Mesh extends Object3D {
 
 		let intersection;
 
-		if ( geometry.isBufferGeometry ) {
+		const index = geometry.index;
+		const position = geometry.attributes.position;
+		const morphPosition = geometry.morphAttributes.position;
+		const morphTargetsRelative = geometry.morphTargetsRelative;
+		const uv = geometry.attributes.uv;
+		const uv2 = geometry.attributes.uv2;
+		const groups = geometry.groups;
+		const drawRange = geometry.drawRange;
 
-			const index = geometry.index;
-			const position = geometry.attributes.position;
-			const morphPosition = geometry.morphAttributes.position;
-			const morphTargetsRelative = geometry.morphTargetsRelative;
-			const uv = geometry.attributes.uv;
-			const uv2 = geometry.attributes.uv2;
-			const groups = geometry.groups;
-			const drawRange = geometry.drawRange;
+		if ( index !== null ) {
 
-			if ( index !== null ) {
+			// indexed buffer geometry
 
-				// indexed buffer geometry
+			if ( Array.isArray( material ) ) {
 
-				if ( Array.isArray( material ) ) {
+				for ( let i = 0, il = groups.length; i < il; i ++ ) {
 
-					for ( let i = 0, il = groups.length; i < il; i ++ ) {
+					const group = groups[ i ];
+					const groupMaterial = material[ group.materialIndex ];
 
-						const group = groups[ i ];
-						const groupMaterial = material[ group.materialIndex ];
+					const start = Math.max( group.start, drawRange.start );
+					const end = Math.min( index.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
 
-						const start = Math.max( group.start, drawRange.start );
-						const end = Math.min( index.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
+					for ( let j = start, jl = end; j < jl; j += 3 ) {
 
-						for ( let j = start, jl = end; j < jl; j += 3 ) {
+						const a = index.getX( j );
+						const b = index.getX( j + 1 );
+						const c = index.getX( j + 2 );
 
-							const a = index.getX( j );
-							const b = index.getX( j + 1 );
-							const c = index.getX( j + 2 );
-
-							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
-
-							if ( intersection ) {
-
-								intersection.faceIndex = Math.floor( j / 3 ); // triangle number in indexed buffer semantics
-								intersection.face.materialIndex = group.materialIndex;
-								intersects.push( intersection );
-
-							}
-
-						}
-
-					}
-
-				} else {
-
-					const start = Math.max( 0, drawRange.start );
-					const end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
-
-					for ( let i = start, il = end; i < il; i += 3 ) {
-
-						const a = index.getX( i );
-						const b = index.getX( i + 1 );
-						const c = index.getX( i + 2 );
-
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
 						if ( intersection ) {
 
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+							intersection.faceIndex = Math.floor( j / 3 ); // triangle number in indexed buffer semantics
+							intersection.face.materialIndex = group.materialIndex;
 							intersects.push( intersection );
 
 						}
@@ -216,59 +178,23 @@ class Mesh extends Object3D {
 
 				}
 
-			} else if ( position !== undefined ) {
+			} else {
 
-				// non-indexed buffer geometry
+				const start = Math.max( 0, drawRange.start );
+				const end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
 
-				if ( Array.isArray( material ) ) {
+				for ( let i = start, il = end; i < il; i += 3 ) {
 
-					for ( let i = 0, il = groups.length; i < il; i ++ ) {
+					const a = index.getX( i );
+					const b = index.getX( i + 1 );
+					const c = index.getX( i + 2 );
 
-						const group = groups[ i ];
-						const groupMaterial = material[ group.materialIndex ];
+					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
-						const start = Math.max( group.start, drawRange.start );
-						const end = Math.min( position.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
+					if ( intersection ) {
 
-						for ( let j = start, jl = end; j < jl; j += 3 ) {
-
-							const a = j;
-							const b = j + 1;
-							const c = j + 2;
-
-							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
-
-							if ( intersection ) {
-
-								intersection.faceIndex = Math.floor( j / 3 ); // triangle number in non-indexed buffer semantics
-								intersection.face.materialIndex = group.materialIndex;
-								intersects.push( intersection );
-
-							}
-
-						}
-
-					}
-
-				} else {
-
-					const start = Math.max( 0, drawRange.start );
-					const end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
-
-					for ( let i = start, il = end; i < il; i += 3 ) {
-
-						const a = i;
-						const b = i + 1;
-						const c = i + 2;
-
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
-
-						if ( intersection ) {
-
-							intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
-							intersects.push( intersection );
-
-						}
+						intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+						intersects.push( intersection );
 
 					}
 
@@ -276,17 +202,69 @@ class Mesh extends Object3D {
 
 			}
 
-		} else if ( geometry.isGeometry ) {
+		} else if ( position !== undefined ) {
 
-			console.error( 'THREE.Mesh.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			// non-indexed buffer geometry
+
+			if ( Array.isArray( material ) ) {
+
+				for ( let i = 0, il = groups.length; i < il; i ++ ) {
+
+					const group = groups[ i ];
+					const groupMaterial = material[ group.materialIndex ];
+
+					const start = Math.max( group.start, drawRange.start );
+					const end = Math.min( position.count, Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) ) );
+
+					for ( let j = start, jl = end; j < jl; j += 3 ) {
+
+						const a = j;
+						const b = j + 1;
+						const c = j + 2;
+
+						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+
+						if ( intersection ) {
+
+							intersection.faceIndex = Math.floor( j / 3 ); // triangle number in non-indexed buffer semantics
+							intersection.face.materialIndex = group.materialIndex;
+							intersects.push( intersection );
+
+						}
+
+					}
+
+				}
+
+			} else {
+
+				const start = Math.max( 0, drawRange.start );
+				const end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
+
+				for ( let i = start, il = end; i < il; i += 3 ) {
+
+					const a = i;
+					const b = i + 1;
+					const c = i + 2;
+
+					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+
+					if ( intersection ) {
+
+						intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+						intersects.push( intersection );
+
+					}
+
+				}
+
+			}
 
 		}
 
 	}
 
 }
-
-Mesh.prototype.isMesh = true;
 
 function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point ) {
 

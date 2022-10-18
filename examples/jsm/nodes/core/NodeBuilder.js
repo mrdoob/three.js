@@ -1,12 +1,12 @@
 import NodeUniform from './NodeUniform.js';
 import NodeAttribute from './NodeAttribute.js';
-import NodeVary from './NodeVary.js';
+import NodeVarying from './NodeVarying.js';
 import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
-import { REVISION, LinearEncoding } from 'three';
+import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'three';
 
 export const defaultShaderStages = [ 'fragment', 'vertex' ];
 export const shaderStages = [ ...defaultShaderStages, 'compute' ];
@@ -34,6 +34,7 @@ class NodeBuilder {
 
 		this.object = object;
 		this.material = object.material || null;
+		this.geometry = object.geometry || null;
 		this.renderer = renderer;
 		this.parser = parser;
 
@@ -54,7 +55,7 @@ class NodeBuilder {
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.codes = { vertex: [], fragment: [], compute: [] };
 		this.attributes = [];
-		this.varys = [];
+		this.varyings = [];
 		this.vars = { vertex: [], fragment: [], compute: [] };
 		this.flow = { code: '' };
 		this.stack = [];
@@ -68,7 +69,13 @@ class NodeBuilder {
 		this.flowsData = new WeakMap();
 
 		this.shaderStage = null;
-		this.node = null;
+		this.buildStage = null;
+
+	}
+
+	get node() {
+
+		return this.stack[ this.stack.length - 1 ];
 
 	}
 
@@ -180,7 +187,7 @@ class NodeBuilder {
 
 	}
 
-	getTextureBias( /* textureProperty, uvSnippet, biasSnippet */ ) {
+	getTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -192,14 +199,25 @@ class NodeBuilder {
 
 	}
 
-	getCubeTextureBias( /* textureProperty, uvSnippet, biasSnippet */ ) {
+	getCubeTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
 	// @TODO: rename to .generateConst()
-	getConst( type, value ) {
+	getConst( type, value = null ) {
+
+		if ( value === null ) {
+
+			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
+			else if ( type === 'bool' ) value = false;
+			else if ( type === 'color' ) value = new Color();
+			else if ( type === 'vec2' ) value = new Vector2();
+			else if ( type === 'vec3' ) value = new Vector3();
+			else if ( type === 'vec4' ) value = new Vector4();
+
+		}
 
 		if ( type === 'float' ) return toFloat( value );
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
@@ -244,6 +262,12 @@ class NodeBuilder {
 	generateMethod( method ) {
 
 		return method;
+
+	}
+
+	hasGeometryAttribute( name ) {
+
+		return this.geometry?.getAttribute( name ) !== undefined;
 
 	}
 
@@ -392,6 +416,18 @@ class NodeBuilder {
 
 	}
 
+	getNodeProperties( node, shaderStage = this.shaderStage ) {
+
+		const nodeData = this.getDataFromNode( this, shaderStage );
+		const constructHash = node.getConstructHash( this );
+
+		nodeData.properties = nodeData.properties || {};
+		nodeData.properties[ constructHash ] = nodeData.properties[ constructHash ] || { outputNode: null };
+
+		return nodeData.properties[ constructHash ];
+
+	}
+
 	getUniformFromNode( node, shaderStage, type ) {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
@@ -437,26 +473,26 @@ class NodeBuilder {
 
 	}
 
-	getVaryFromNode( node, type ) {
+	getVaryingFromNode( node, type ) {
 
 		const nodeData = this.getDataFromNode( node, null );
 
-		let nodeVary = nodeData.vary;
+		let nodeVarying = nodeData.varying;
 
-		if ( nodeVary === undefined ) {
+		if ( nodeVarying === undefined ) {
 
-			const varys = this.varys;
-			const index = varys.length;
+			const varyings = this.varyings;
+			const index = varyings.length;
 
-			nodeVary = new NodeVary( 'nodeVary' + index, type );
+			nodeVarying = new NodeVarying( 'nodeVarying' + index, type );
 
-			varys.push( nodeVary );
+			varyings.push( nodeVarying );
 
-			nodeData.vary = nodeVary;
+			nodeData.varying = nodeVarying;
 
 		}
 
-		return nodeVary;
+		return nodeVarying;
 
 	}
 
@@ -489,7 +525,7 @@ class NodeBuilder {
 
 	}
 
-	getFlowData( shaderStage, node ) {
+	getFlowData( node/*, shaderStage*/ ) {
 
 		return this.flowsData.get( node );
 
@@ -497,15 +533,11 @@ class NodeBuilder {
 
 	flowNode( node ) {
 
-		this.node = node;
-
 		const output = node.getNodeType( this );
 
 		const flowData = this.flowChildNode( node, output );
 
 		this.flowsData.set( node, flowData );
-
-		this.node = null;
 
 		return flowData;
 
@@ -557,7 +589,7 @@ class NodeBuilder {
 
 	}
 
-	getVarys( /*shaderStage*/ ) {
+	getVaryings( /*shaderStage*/ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -569,9 +601,7 @@ class NodeBuilder {
 
 		const vars = this.vars[ shaderStage ];
 
-		for ( let index = 0; index < vars.length; index ++ ) {
-
-			const variable = vars[ index ];
+		for ( const variable of vars ) {
 
 			snippet += `${variable.type} ${variable.name}; `;
 
@@ -609,15 +639,27 @@ class NodeBuilder {
 
 	}
 
+	setShaderStage( shaderStage ) {
+
+		this.shaderStage = shaderStage;
+
+	}
+
 	getShaderStage() {
 
 		return this.shaderStage;
 
 	}
 
-	setShaderStage( shaderStage ) {
+	setBuildStage( buildStage ) {
 
-		this.shaderStage = shaderStage;
+		this.buildStage = buildStage;
+
+	}
+
+	getBuildStage() {
+
+		return this.buildStage;
 
 	}
 
@@ -629,7 +671,9 @@ class NodeBuilder {
 
 	build() {
 
-		// stage 1: analyze nodes to possible optimization and validation
+		// stage 1: generate shader node
+
+		this.setBuildStage( 'construct' );
 
 		for ( const shaderStage of shaderStages ) {
 
@@ -639,13 +683,33 @@ class NodeBuilder {
 
 			for ( const node of flowNodes ) {
 
-				node.analyze( this );
+				node.build( this );
 
 			}
 
 		}
 
-		// stage 2: pre-build vertex code used in fragment shader
+		// stage 2: analyze nodes to possible optimization and validation
+
+		this.setBuildStage( 'analyze' );
+
+		for ( const shaderStage of shaderStages ) {
+
+			this.setShaderStage( shaderStage );
+
+			const flowNodes = this.flowNodes[ shaderStage ];
+
+			for ( const node of flowNodes ) {
+
+				node.build( this );
+
+			}
+
+		}
+
+		// stage 3: pre-build vertex code used in fragment shader
+
+		this.setBuildStage( 'generate' );
 
 		if ( this.context.vertex && this.context.vertex.isNode ) {
 
@@ -653,7 +717,9 @@ class NodeBuilder {
 
 		}
 
-		// stage 3: generate shader
+		// stage 4: generate shader
+
+		this.setBuildStage( 'generate' );
 
 		for ( const shaderStage of shaderStages ) {
 
@@ -663,15 +729,16 @@ class NodeBuilder {
 
 			for ( const node of flowNodes ) {
 
-				this.flowNode( node, shaderStage );
+				this.flowNode( node );
 
 			}
 
 		}
 
+		this.setBuildStage( null );
 		this.setShaderStage( null );
 
-		// stage 4: build code for a specific output
+		// stage 5: build code for a specific output
 
 		this.buildCode();
 
@@ -701,7 +768,7 @@ class NodeBuilder {
 
 		}
 
-		if ( toTypeLength > 4 ) { // toType is matrix-like
+		if ( toTypeLength > 4 || toTypeLength === 0 ) { // toType is matrix-like or unknown
 
 			// @TODO: ignore for now
 

@@ -1897,6 +1897,13 @@ class GeometryParser {
 
 				materialIndex = getData( polygonVertexIndex, polygonIndex, vertexIndex, geoInfo.material )[ 0 ];
 
+				if ( materialIndex < 0 ) {
+
+					console.warn( 'THREE.FBXLoader: Invalid material index:', materialIndex );
+					materialIndex = 0;
+
+				}
+
 			}
 
 			if ( geoInfo.uv ) {
@@ -3564,6 +3571,8 @@ class BinaryParser {
 
 				}
 
+				break; // cannot happen but is required by the DeepScan
+
 			default:
 				throw new Error( 'THREE.FBXLoader: Unknown property type ' + type );
 
@@ -3956,7 +3965,7 @@ function generateTransform( transformData ) {
 	if ( transformData.preRotation ) {
 
 		const array = transformData.preRotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder );
+		array.push( transformData.eulerOrder || Euler.DefaultOrder );
 		lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 	}
@@ -3964,7 +3973,7 @@ function generateTransform( transformData ) {
 	if ( transformData.rotation ) {
 
 		const array = transformData.rotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder );
+		array.push( transformData.eulerOrder || Euler.DefaultOrder );
 		lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 	}
@@ -3972,7 +3981,7 @@ function generateTransform( transformData ) {
 	if ( transformData.postRotation ) {
 
 		const array = transformData.postRotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder );
+		array.push( transformData.eulerOrder || Euler.DefaultOrder );
 		lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 		lPostRotationM.invert();
 

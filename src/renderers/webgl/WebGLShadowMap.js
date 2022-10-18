@@ -1,4 +1,4 @@
-import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending } from '../../constants.js';
+import { FrontSide, BackSide, DoubleSide, NearestFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending } from '../../constants.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
 import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial.js';
@@ -131,20 +131,9 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			}
 
-			if ( shadow.map === null && ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
-
-				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
-				shadow.map.texture.name = light.name + '.shadowMap';
-
-				shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
-
-				shadow.camera.updateProjectionMatrix();
-
-			}
-
 			if ( shadow.map === null ) {
 
-				const pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
+				const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 				shadow.map.texture.name = light.name + '.shadowMap';
@@ -181,7 +170,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			// do blur pass for VSM
 
-			if ( ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
+			if ( shadow.isPointLightShadow !== true && this.type === VSMShadowMap ) {
 
 				VSMPass( shadow, camera );
 
@@ -208,6 +197,12 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			shadowMaterialVertical.needsUpdate = true;
 			shadowMaterialHorizontal.needsUpdate = true;
+
+		}
+
+		if ( shadow.mapPass === null ) {
+
+			shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
 
 		}
 
@@ -247,7 +242,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		}
 
-		if ( ( _renderer.localClippingEnabled && material.clipShadows === true && material.clippingPlanes.length !== 0 ) ||
+		if ( ( _renderer.localClippingEnabled && material.clipShadows === true && Array.isArray( material.clippingPlanes ) && material.clippingPlanes.length !== 0 ) ||
 			( material.displacementMap && material.displacementScale !== 0 ) ||
 			( material.alphaMap && material.alphaTest > 0 ) ) {
 

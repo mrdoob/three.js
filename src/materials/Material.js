@@ -1,5 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
+import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
 
 let materialId = 0;
@@ -9,6 +9,8 @@ class Material extends EventDispatcher {
 	constructor() {
 
 		super();
+
+		this.isMaterial = true;
 
 		Object.defineProperty( this, 'id', { value: materialId ++ } );
 
@@ -120,15 +122,6 @@ class Material extends EventDispatcher {
 
 			}
 
-			// for backward compatibility if shading is set in the constructor
-			if ( key === 'shading' ) {
-
-				console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
-				this.flatShading = ( newValue === FlatShading ) ? true : false;
-				continue;
-
-			}
-
 			const currentValue = this[ key ];
 
 			if ( currentValue === undefined ) {
@@ -217,6 +210,22 @@ class Material extends EventDispatcher {
 
 			data.clearcoatNormalMap = this.clearcoatNormalMap.toJSON( meta ).uuid;
 			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
+
+		}
+
+		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
+		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
+		if ( this.iridescenceThicknessRange !== undefined ) data.iridescenceThicknessRange = this.iridescenceThicknessRange;
+
+		if ( this.iridescenceMap && this.iridescenceMap.isTexture ) {
+
+			data.iridescenceMap = this.iridescenceMap.toJSON( meta ).uuid;
+
+		}
+
+		if ( this.iridescenceThicknessMap && this.iridescenceThicknessMap.isTexture ) {
+
+			data.iridescenceThicknessMap = this.iridescenceThicknessMap.toJSON( meta ).uuid;
 
 		}
 
@@ -480,15 +489,5 @@ class Material extends EventDispatcher {
 	}
 
 }
-
-Material.prototype.isMaterial = true;
-
-Material.fromType = function ( /*type*/ ) {
-
-	// TODO: Behavior added in Materials.js
-
-	return null;
-
-};
 
 export { Material };

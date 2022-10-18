@@ -15,6 +15,8 @@ class InstancedMesh extends Mesh {
 
 		super( geometry, material );
 
+		this.isInstancedMesh = true;
+
 		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
 		this.instanceColor = null;
 
@@ -24,9 +26,9 @@ class InstancedMesh extends Mesh {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.instanceMatrix.copy( source.instanceMatrix );
 
@@ -120,7 +122,5 @@ class InstancedMesh extends Mesh {
 	}
 
 }
-
-InstancedMesh.prototype.isInstancedMesh = true;
 
 export { InstancedMesh };

@@ -40,7 +40,7 @@
 		<p>
 		[page:PointLight light] -- The light to be visualized. <br /><br />
 
-		[page:Float sphereSize] -- (optional) The size of the sphere helper. Default is *1*.<br /><br />
+		[page:Float sphereSize] -- (optional) The size of the sphere helper. Default is `1`.<br /><br />
 
 		[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
 		</p>
@@ -56,13 +56,13 @@
 
 		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
-			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			See [page:Object3D.matrixAutoUpdate]. Set to `false` here as the helper is using the
 			pointLight's [page:Object3D.matrixWorld matrixWorld].
 		</p>
 
 		<h3>[property:hex color]</h3>
 		<p>
-			 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
+			 The color parameter passed in the constructor. Default is `undefined`. If this is changed, the helper's color will update
 			the next time [page:.update update] is called.
 		</p>
 
@@ -70,7 +70,9 @@
 		<p>See the base [page:Mesh] class for common methods.</p>
 
 		<h3>[method:undefined dispose]()</h3>
-		<p>Dispose of the pointLightHelper.</p>
+		<p>
+			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+		</p>
 
 
 		<h3>[method:undefined update]()</h3>
