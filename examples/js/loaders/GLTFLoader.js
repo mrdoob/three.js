@@ -187,14 +187,14 @@
 		}
 		parse( data, path, onLoad, onError ) {
 
-			let content;
+			let json;
 			const extensions = {};
 			const plugins = {};
 			if ( typeof data === 'string' ) {
 
-				content = data;
+				json = JSON.parse( data );
 
-			} else {
+			} else if ( data instanceof ArrayBuffer ) {
 
 				const magic = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
 				if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
@@ -210,17 +210,20 @@
 
 					}
 
-					content = extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content;
+					json = JSON.parse( extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content );
 
 				} else {
 
-					content = THREE.LoaderUtils.decodeText( new Uint8Array( data ) );
+					json = JSON.parse( THREE.LoaderUtils.decodeText( new Uint8Array( data ) ) );
 
 				}
 
+			} else {
+
+				json = data;
+
 			}
 
-			const json = JSON.parse( content );
 			if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
 
 				if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
