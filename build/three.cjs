@@ -18516,6 +18516,9 @@ function WebGLRenderer(parameters = {}) {
 		_currentActiveCubeFace = activeCubeFace;
 		_currentActiveMipmapLevel = activeMipmapLevel;
 		let useDefaultFramebuffer = true;
+		let framebuffer = null;
+		let isCube = false;
+		let isRenderTarget3D = false;
 		if (renderTarget) {
 			const renderTargetProperties = properties.get(renderTarget);
 			if (renderTargetProperties.__useDefaultFramebuffer !== undefined) {
@@ -18528,11 +18531,6 @@ function WebGLRenderer(parameters = {}) {
 				// Color and depth texture must be rebound in order for the swapchain to update.
 				textures.rebindTextures(renderTarget, properties.get(renderTarget.texture).__webglTexture, properties.get(renderTarget.depthTexture).__webglTexture);
 			}
-		}
-		let framebuffer = null;
-		let isCube = false;
-		let isRenderTarget3D = false;
-		if (renderTarget) {
 			const texture = renderTarget.texture;
 			if (texture.isData3DTexture || texture.isDataArrayTexture || texture.isCompressedArrayTexture) {
 				isRenderTarget3D = true;
