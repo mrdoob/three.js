@@ -205,33 +205,38 @@ function html2canvas( element ) {
 
 	function getLines( element, text, maxWidth ) {
 
-	    const words = text.split( " " );
-	    const lines = [];
-	    let currentLine = words[ 0 ];
+		const words = text.split( " " );
+		const lines = [];
+		let currentLine = words[ 0 ];
 
-	    for ( let i = 1; i < words.length; i ++ ) {
-	    	// Somehow, the textnode width in pixels differs from the parent element width.
-	    	// Using the range instead of the context to compute the wrapping width fixes this problem.
-	        const word = words[ i ];
-	        range.setStart( element, 0 );
+		for ( let i = 1; i < words.length; i ++ ) {
 
-	        const newLine = currentLine + " " + word;
+			// Somehow, the textnode width in pixels differs from the parent element width.
+			// Using the range instead of the context to compute the wrapping width fixes this problem.
+
+			const word = words[ i ];
+			range.setStart( element, 0 );
+
+			const newLine = currentLine + " " + word;
 			range.setEnd( element, newLine.length );
 
-	        const width = range.getBoundingClientRect().width;
+			const width = range.getBoundingClientRect().width;
 
-	        if ( width < maxWidth ) currentLine = newLine;
-	        else {
+			if ( width < maxWidth ) {
+		
+				currentLine = newLine;
 
-	            lines.push( currentLine );
-	            currentLine = word;
+			} else {
 
-	        }
+				lines.push( currentLine );
+				currentLine = word;
 
-	    }
+			}
+			
+		}
 
-	    lines.push( currentLine );
-	    return lines;
+		lines.push( currentLine );
+		return lines;
 
 	}
 
@@ -312,12 +317,11 @@ function html2canvas( element ) {
 
 				}
 
+			} else {
+			
+				drawText( style, x, y, text );
 
-			} else drawText( style, x, y, text );
-
-
-
-
+			}
 
 		} else if ( element.nodeType === Node.COMMENT_NODE ) {
 
