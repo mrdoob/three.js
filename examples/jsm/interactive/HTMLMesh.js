@@ -300,12 +300,14 @@ function html2canvas( element ) {
  				const parentWidth = parentEl.offsetWidth;
 
  				//set to nowrap so that range doesn't warp in the getLines function
+				const whiteSpaceValue = parentEl.style.whiteSpace;
  				parentEl.style.whiteSpace = "nowrap";
 
 				const lineHeight = range.getBoundingClientRect().height;
 				const lines = getLines( element, text, parentWidth );
 
- 				parentEl.style.whiteSpace = null;
+ 				parentEl.style.whiteSpace = whiteSpaceValue;
+				
 
 				range.selectNode( element );
 
