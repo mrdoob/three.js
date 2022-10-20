@@ -4,7 +4,7 @@ import {
 	Color,
 	Group,
 	Matrix4,
-	Mesh,
+	Mesh
 } from 'three';
 
 import { mergeGroups, deepCloneAttribute } from './BufferGeometryUtils.js';
