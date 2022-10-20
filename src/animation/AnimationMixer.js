@@ -7,7 +7,7 @@ import { AnimationClip } from './AnimationClip.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
 
-const _controlInterpolantsResultBuffer = /*@__PURE__*/ new Float32Array( 1 );
+const _controlInterpolantsResultBuffer = new Float32Array( 1 );
 
 
 class AnimationMixer extends EventDispatcher {

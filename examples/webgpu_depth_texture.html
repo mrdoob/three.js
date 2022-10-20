@@ -17,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -25,15 +26,15 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import WebGPUTextureRenderer from 'three/addons/renderers/webgpu/WebGPUTextureRenderer.js';
 
-			import { smoothstep, negate, positionView, invert } from 'three-nodes/Nodes.js';
+			import { smoothstep, negate, positionView, invert } from 'three/nodes';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, controls, renderer;
 
@@ -41,9 +42,9 @@
 
 			const dpr = window.devicePixelRatio;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -93,6 +94,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				textureRenderer = new WebGPUTextureRenderer( renderer );
@@ -120,10 +122,6 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 
-				//
-
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -138,16 +136,8 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				textureRenderer.render( scene, camera );
 				renderer.render( sceneFX, cameraFX );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

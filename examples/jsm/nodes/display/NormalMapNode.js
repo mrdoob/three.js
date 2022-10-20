@@ -1,6 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import ModelNode from '../accessors/ModelNode.js';
-import { ShaderNode, positionView, normalView, uv, vec3, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, faceDirection } from '../shadernode/ShaderNodeBaseElements.js';
+import { ShaderNode, positionView, normalView, uv, vec3, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, faceDirection, modelNormalMatrix, TBNViewMatrix } from '../shadernode/ShaderNodeBaseElements.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
@@ -44,9 +43,7 @@ class NormalMapNode extends TempNode {
 
 	}
 
-	generate( builder ) {
-
-		const type = this.getNodeType( builder );
+	construct( builder ) {
 
 		const { normalMapType, scaleNode } = this;
 
@@ -60,26 +57,34 @@ class NormalMapNode extends TempNode {
 
 		}
 
+		let outputNode = null;
+
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			const vertexNormalNode = mul( new ModelNode( ModelNode.NORMAL_MATRIX ), normalMap );
-
-			const normal = normalize( vertexNormalNode );
-
-			return normal.build( builder, type );
+			outputNode = normalize( mul( modelNormalMatrix, normalMap ) );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
-			const perturbNormal2ArbCall = perturbNormal2ArbNode.call( {
-				eye_pos: positionView,
-				surf_norm: normalView,
-				mapN: normalMap,
-				uv: uv()
-			} );
+			const tangent = builder.hasGeometryAttribute( 'tangent' );
 
-			return perturbNormal2ArbCall.build( builder, type );
+			if ( tangent === true ) {
+
+				outputNode = normalize( mul( TBNViewMatrix, normalMap ) );
+
+			} else {
+
+				outputNode = perturbNormal2ArbNode.call( {
+					eye_pos: positionView,
+					surf_norm: normalView,
+					mapN: normalMap,
+					uv: uv()
+				} );
+
+			}
 
 		}
+
+		return outputNode;
 
 	}
 

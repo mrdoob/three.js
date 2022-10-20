@@ -11,7 +11,7 @@ class AONode extends LightingNode {
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
 		const aoIntensity = 1;
 		const aoNode = add( mul( sub( float( this.aoNode ), 1.0 ), aoIntensity ), 1.0 );

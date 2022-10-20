@@ -70,7 +70,7 @@
 		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
 
 		<code>
-		const geometry = new THREE.BoxGeometry();
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -104,7 +104,7 @@
 
 		<p>If you insert all the code above into the file you created before we began, you should see a green box. Let's make it all a little more interesting by rotating it.</p>
 
-		<p>Add the following right above the `renderer.render` call in your `animate` function:</p>
+		<p>Add the following code right above the `renderer.render` call in your `animate` function:</p>
 
 		<code>
 		cube.rotation.x += 0.01;
@@ -138,7 +138,7 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					const geometry = new THREE.BoxGeometry();
+					const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					const cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );

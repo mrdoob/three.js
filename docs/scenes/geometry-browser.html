@@ -30,7 +30,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../../build/three.module.js"
+					"three": "../../build/three.module.js",
+					"three/addons/": "../../examples/jsm/"
 				}
 			}
 		</script>
@@ -77,8 +78,8 @@
 				WebGLRenderer
 			} from 'three';
 
-			import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from '../../examples/jsm/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			const twoPi = Math.PI * 2;
 
@@ -172,13 +173,13 @@
 						radius: 5,
 						length: 5,
 						capSegments: 10,
-						heightSegments: 20
+						radialSegments: 20
 					};
 
 					function generateGeometry() {
 
 						updateGroupGeometry( mesh,
-							new CapsuleGeometry( data.radius, data.length, data.capSegments, data.heightSegments ),
+							new CapsuleGeometry( data.radius, data.length, data.capSegments, data.radialSegments ),
 						);
 
 					}
@@ -188,7 +189,7 @@
 					folder.add( data, 'radius', 1, 30 ).onChange( generateGeometry );
 					folder.add( data, 'length', 1, 30 ).onChange( generateGeometry );
 					folder.add( data, 'capSegments', 1, 32 ).step( 1 ).onChange( generateGeometry );
-					folder.add( data, 'heightSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
+					folder.add( data, 'radialSegments', 1, 64 ).step( 1 ).onChange( generateGeometry );
 
 					generateGeometry();
 

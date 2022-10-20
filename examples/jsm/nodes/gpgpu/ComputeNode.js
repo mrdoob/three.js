@@ -15,7 +15,7 @@ class ComputeNode extends Node {
 		this.workgroupSize = workgroupSize;
 		this.dispatchCount = 0;
 
-		this.updateType = NodeUpdateType.Object;
+		this.updateType = NodeUpdateType.OBJECT;
 
 		this.updateDispatchCount();
 
@@ -33,6 +33,8 @@ class ComputeNode extends Node {
 		this.dispatchCount = Math.ceil( count / size );
 
 	}
+
+	onInit() { }
 
 	update( { renderer } ) {
 

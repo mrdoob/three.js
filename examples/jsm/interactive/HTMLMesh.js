@@ -36,6 +36,8 @@ class HTMLMesh extends Mesh {
 			material.dispose();
 
 			material.map.dispose();
+			
+			canvases.delete( dom );
 
 			this.removeEventListener( 'mousedown', onEvent );
 			this.removeEventListener( 'mousemove', onEvent );
@@ -203,7 +205,7 @@ function html2canvas( element ) {
 
 	}
 
-	function buildRectPath(x, y, w, h, r) {
+	function buildRectPath( x, y, w, h, r ) {
 
 		if ( w < 2 * r ) r = w / 2;
 		if ( h < 2 * r ) r = h / 2;
@@ -356,7 +358,7 @@ function html2canvas( element ) {
 				const luminance = Math.sqrt( 0.299 * ( color.r ** 2 ) + 0.587 * ( color.g ** 2 ) + 0.114 * ( color.b ** 2 ) );
 				const accentTextColor = luminance < 0.5 ? 'white' : '#111111';
 
-				if ( element.type  === 'radio' ) {
+				if ( element.type === 'radio' ) {
 
 					buildRectPath( x, y, width, height, height );
 
@@ -380,7 +382,7 @@ function html2canvas( element ) {
 
 				}
 
-				if ( element.type  === 'checkbox' ) {
+				if ( element.type === 'checkbox' ) {
 
 					buildRectPath( x, y, width, height, 2 );
 
@@ -395,7 +397,7 @@ function html2canvas( element ) {
 						const currentTextAlign = context.textAlign;
 
 						context.textAlign = 'center';
-						
+
 						const properties = {
 							color: accentTextColor,
 							fontFamily: style.fontFamily,
@@ -411,10 +413,10 @@ function html2canvas( element ) {
 
 				}
 
-				if ( element.type  === 'range' ) {
+				if ( element.type === 'range' ) {
 
-					const [min,max,value] = ['min','max','value'].map(property => parseFloat(element[property]));
-					const position = ((value-min)/(max-min)) * (width - height);
+					const [ min, max, value ] = [ 'min', 'max', 'value' ].map( property => parseFloat( element[ property ] ) );
+					const position = ( ( value - min ) / ( max - min ) ) * ( width - height );
 
 					buildRectPath( x, y + ( height / 4 ), width, height / 2, height / 4 );
 					context.fillStyle = accentTextColor;
@@ -423,7 +425,7 @@ function html2canvas( element ) {
 					context.fill();
 					context.stroke();
 
-					buildRectPath( x, y + ( height / 4 ),position + ( height / 2 ), height / 2, height / 4 );
+					buildRectPath( x, y + ( height / 4 ), position + ( height / 2 ), height / 2, height / 4 );
 					context.fillStyle = accentColor;
 					context.fill();
 
@@ -469,17 +471,14 @@ function html2canvas( element ) {
 
 	const offset = element.getBoundingClientRect();
 
-	let canvas;
+	let canvas = canvases.get( element );
 
-	if ( canvases.has( element ) ) {
-
-		canvas = canvases.get( element );
-
-	} else {
+	if ( canvas === undefined ) {
 
 		canvas = document.createElement( 'canvas' );
 		canvas.width = offset.width;
 		canvas.height = offset.height;
+		canvases.set( element, canvas );
 
 	}
 
@@ -522,7 +521,7 @@ function htmlevent( element, event, x, y ) {
 
 				element.dispatchEvent( new MouseEvent( event, mouseEventInit ) );
 
-				if ( element instanceof HTMLInputElement && element.type  === 'range' && ( event === 'mousedown' || event === 'click' ) ) {
+				if ( element instanceof HTMLInputElement && element.type === 'range' && ( event === 'mousedown' || event === 'click' ) ) {
 
 					const [ min, max ] = [ 'min', 'max' ].map( property => parseFloat( element[ property ] ) );
 

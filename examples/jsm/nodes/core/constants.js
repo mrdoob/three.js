@@ -1,21 +1,21 @@
 export const NodeShaderStage = {
-	Vertex: 'vertex',
-	Fragment: 'fragment'
+	VERTEX: 'vertex',
+	FRAGMENT: 'fragment'
 };
 
 export const NodeUpdateType = {
-	None: 'none',
-	Frame: 'frame',
-	Object: 'object'
+	NONE: 'none',
+	FRAME: 'frame',
+	OBJECT: 'object'
 };
 
 export const NodeType = {
-	Boolean: 'bool',
-	Integer: 'int',
-	Float: 'float',
-	Vector2: 'vec2',
-	Vector3: 'vec3',
-	Vector4: 'vec4',
-	Matrix3: 'mat3',
-	Matrix4: 'mat4'
+	BOOLEAN: 'bool',
+	INTEGER: 'int',
+	FLOAT: 'float',
+	VECTOR2: 'vec2',
+	VECTOR3: 'vec3',
+	VECTOR4: 'vec4',
+	MATRIX3: 'mat3',
+	MATRIX4: 'mat4'
 };

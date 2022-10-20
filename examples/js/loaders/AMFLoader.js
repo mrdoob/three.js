@@ -23,7 +23,6 @@
 			super( manager );
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -57,20 +56,17 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( data ) {
 
 			function loadDocument( data ) {
 
 				let view = new DataView( data );
 				const magic = String.fromCharCode( view.getUint8( 0 ), view.getUint8( 1 ) );
-
 				if ( magic === 'PK' ) {
 
 					let zip = null;
 					let file = null;
 					console.log( 'THREE.AMFLoader: Loading Zip' );
-
 					try {
 
 						zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
@@ -103,7 +99,6 @@
 
 				const fileText = THREE.LoaderUtils.decodeText( view );
 				const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
-
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
 
 					console.log( 'THREE.AMFLoader: Error loading AMF - no AMF document found.' );
@@ -119,7 +114,6 @@
 
 				let scale = 1.0;
 				let unit = 'millimeter';
-
 				if ( node.documentElement.attributes.unit !== undefined ) {
 
 					unit = node.documentElement.attributes.unit.value.toLowerCase();
@@ -133,7 +127,6 @@
 					meter: 1000.0,
 					micron: 0.001
 				};
-
 				if ( scaleUnits[ unit ] !== undefined ) {
 
 					scale = scaleUnits[ unit ];
@@ -156,11 +149,9 @@
 					a: 1.0
 				};
 				let loadedMaterial = null;
-
 				for ( let i = 0; i < node.childNodes.length; i ++ ) {
 
 					const matChildEl = node.childNodes[ i ];
-
 					if ( matChildEl.nodeName === 'metadata' && matChildEl.attributes.type !== undefined ) {
 
 						if ( matChildEl.attributes.type.value === 'name' ) {
@@ -182,7 +173,6 @@
 					color: new THREE.Color( color.r, color.g, color.b ),
 					name: matName
 				} );
-
 				if ( color.a !== 1.0 ) {
 
 					loadedMaterial.transparent = true;
@@ -205,11 +195,9 @@
 					b: 1.0,
 					a: 1.0
 				};
-
 				for ( let i = 0; i < node.childNodes.length; i ++ ) {
 
 					const matColor = node.childNodes[ i ];
-
 					if ( matColor.nodeName === 'r' ) {
 
 						color.r = matColor.textContent;
@@ -242,7 +230,6 @@
 					materialid: null
 				};
 				let currVolumeNode = node.firstElementChild;
-
 				if ( node.attributes.materialid !== undefined ) {
 
 					volume.materialId = node.attributes.materialid.nodeValue;
@@ -285,13 +272,11 @@
 				const vertArray = [];
 				const normalArray = [];
 				let currVerticesNode = node.firstElementChild;
-
 				while ( currVerticesNode ) {
 
 					if ( currVerticesNode.nodeName === 'vertex' ) {
 
 						let vNode = currVerticesNode.firstElementChild;
-
 						while ( vNode ) {
 
 							if ( vNode.nodeName === 'coordinates' ) {
@@ -336,7 +321,6 @@
 				};
 				let currColor = null;
 				let currObjNode = node.firstElementChild;
-
 				while ( currObjNode ) {
 
 					if ( currObjNode.nodeName === 'metadata' ) {
@@ -364,7 +348,6 @@
 							volumes: [],
 							color: currColor
 						};
-
 						while ( currMeshNode ) {
 
 							if ( currMeshNode.nodeName === 'vertices' ) {
@@ -406,11 +389,9 @@
 			const amfObjects = {};
 			const childNodes = xmlData.documentElement.childNodes;
 			let i, j;
-
 			for ( i = 0; i < childNodes.length; i ++ ) {
 
 				const child = childNodes[ i ];
-
 				if ( child.nodeName === 'metadata' ) {
 
 					if ( child.attributes.type !== undefined ) {
@@ -449,21 +430,18 @@
 			sceneObject.name = amfName;
 			sceneObject.userData.author = amfAuthor;
 			sceneObject.userData.loader = 'AMF';
-
 			for ( const id in amfObjects ) {
 
 				const part = amfObjects[ id ];
 				const meshes = part.meshes;
 				const newObject = new THREE.Group();
 				newObject.name = part.name || '';
-
 				for ( i = 0; i < meshes.length; i ++ ) {
 
 					let objDefaultMaterial = defaultMaterial;
 					const mesh = meshes[ i ];
 					const vertices = new THREE.Float32BufferAttribute( mesh.vertices, 3 );
 					let normals = null;
-
 					if ( mesh.normals.length ) {
 
 						normals = new THREE.Float32BufferAttribute( mesh.normals, 3 );
@@ -475,7 +453,6 @@
 						const color = mesh.color;
 						objDefaultMaterial = defaultMaterial.clone();
 						objDefaultMaterial.color = new THREE.Color( color.r, color.g, color.b );
-
 						if ( color.a !== 1.0 ) {
 
 							objDefaultMaterial.transparent = true;
@@ -486,7 +463,6 @@
 					}
 
 					const volumes = mesh.volumes;
-
 					for ( j = 0; j < volumes.length; j ++ ) {
 
 						const volume = volumes[ j ];
@@ -494,7 +470,6 @@
 						let material = objDefaultMaterial;
 						newGeometry.setIndex( volume.triangles );
 						newGeometry.setAttribute( 'position', vertices.clone() );
-
 						if ( normals ) {
 
 							newGeometry.setAttribute( 'normal', normals.clone() );

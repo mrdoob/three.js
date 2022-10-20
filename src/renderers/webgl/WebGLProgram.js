@@ -15,7 +15,8 @@ function handleSource( string, errorLine ) {
 
 	for ( let i = from; i < to; i ++ ) {
 
-		lines2.push( ( i + 1 ) + ': ' + lines[ i ] );
+		const line = i + 1;
+		lines2.push( `${line === errorLine ? '>' : ' '} ${line}: ${lines[ i ]}` );
 
 	}
 
@@ -52,7 +53,7 @@ function getShaderErrors( gl, shader, type ) {
 		// --enable-privileged-webgl-extension
 		// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
 
-		const errorLine = parseInt( errorMatches[ 0 ] );
+		const errorLine = parseInt( errorMatches[ 1 ] );
 		return type.toUpperCase() + '\n\n' + errors + '\n\n' + handleSource( gl.getShaderSource( shader ), errorLine );
 
 	} else {
@@ -175,13 +176,18 @@ function filterEmptyLine( string ) {
 
 function replaceLightNums( string, parameters ) {
 
+	const numSpotLightCoords = parameters.numSpotLightShadows + parameters.numSpotLightMaps - parameters.numSpotLightShadowsWithMaps;
+
 	return string
 		.replace( /NUM_DIR_LIGHTS/g, parameters.numDirLights )
 		.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
+		.replace( /NUM_SPOT_LIGHT_MAPS/g, parameters.numSpotLightMaps )
+		.replace( /NUM_SPOT_LIGHT_COORDS/g, numSpotLightCoords )
 		.replace( /NUM_RECT_AREA_LIGHTS/g, parameters.numRectAreaLights )
 		.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
 		.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights )
 		.replace( /NUM_DIR_LIGHT_SHADOWS/g, parameters.numDirLightShadows )
+		.replace( /NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS/g, parameters.numSpotLightShadowsWithMaps )
 		.replace( /NUM_SPOT_LIGHT_SHADOWS/g, parameters.numSpotLightShadows )
 		.replace( /NUM_POINT_LIGHT_SHADOWS/g, parameters.numPointLightShadows );
 
@@ -221,21 +227,11 @@ function includeReplacer( match, include ) {
 
 // Unroll Loops
 
-const deprecatedUnrollLoopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
 const unrollLoopPattern = /#pragma unroll_loop_start\s+for\s*\(\s*int\s+i\s*=\s*(\d+)\s*;\s*i\s*<\s*(\d+)\s*;\s*i\s*\+\+\s*\)\s*{([\s\S]+?)}\s+#pragma unroll_loop_end/g;
 
 function unrollLoops( string ) {
 
-	return string
-		.replace( unrollLoopPattern, loopReplacer )
-		.replace( deprecatedUnrollLoopPattern, deprecatedLoopReplacer );
-
-}
-
-function deprecatedLoopReplacer( match, start, end, snippet ) {
-
-	console.warn( 'WebGLProgram: #pragma unroll_loop shader syntax is deprecated. Please use #pragma unroll_loop_start syntax instead.' );
-	return loopReplacer( match, start, end, snippet );
+	return string.replace( unrollLoopPattern, loopReplacer );
 
 }
 
@@ -478,6 +474,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.clearcoatRoughnessMap ? '#define USE_CLEARCOAT_ROUGHNESSMAP' : '',
 			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
 
+			parameters.iridescenceMap ? '#define USE_IRIDESCENCEMAP' : '',
+			parameters.iridescenceThicknessMap ? '#define USE_IRIDESCENCE_THICKNESSMAP' : '',
+
 			parameters.displacementMap && parameters.supportsVertexTextures ? '#define USE_DISPLACEMENTMAP' : '',
 
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
@@ -632,6 +631,10 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.clearcoatMap ? '#define USE_CLEARCOATMAP' : '',
 			parameters.clearcoatRoughnessMap ? '#define USE_CLEARCOAT_ROUGHNESSMAP' : '',
 			parameters.clearcoatNormalMap ? '#define USE_CLEARCOAT_NORMALMAP' : '',
+
+			parameters.iridescence ? '#define USE_IRIDESCENCE' : '',
+			parameters.iridescenceMap ? '#define USE_IRIDESCENCEMAP' : '',
+			parameters.iridescenceThicknessMap ? '#define USE_IRIDESCENCE_THICKNESSMAP' : '',
 
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 			parameters.specularIntensityMap ? '#define USE_SPECULARINTENSITYMAP' : '',

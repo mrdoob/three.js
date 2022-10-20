@@ -1,9 +1,10 @@
 import { Vector3 } from './Vector3.js';
+
 class Matrix4 {
 
 	constructor() {
 
-		this.isMatrix4 = true;
+		Matrix4.prototype.isMatrix4 = true;
 
 		this.elements = [
 
@@ -13,12 +14,6 @@ class Matrix4 {
 			0, 0, 0, 1
 
 		];
-
-		if ( arguments.length > 0 ) {
-
-			console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
-
-		}
 
 	}
 
@@ -158,12 +153,6 @@ class Matrix4 {
 	}
 
 	makeRotationFromEuler( euler ) {
-
-		if ( ! ( euler && euler.isEuler ) ) {
-
-			console.error( 'THREE.Matrix4: .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.' );
-
-		}
 
 		const te = this.elements;
 
@@ -338,14 +327,7 @@ class Matrix4 {
 
 	}
 
-	multiply( m, n ) {
-
-		if ( n !== undefined ) {
-
-			console.warn( 'THREE.Matrix4: .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
-			return this.multiplyMatrices( m, n );
-
-		}
+	multiply( m ) {
 
 		return this.multiplyMatrices( this, m );
 
@@ -771,12 +753,6 @@ class Matrix4 {
 	}
 
 	makePerspective( left, right, top, bottom, near, far ) {
-
-		if ( far === undefined ) {
-
-			console.warn( 'THREE.Matrix4: .makePerspective() has been redefined and has a new signature. Please check the docs.' );
-
-		}
 
 		const te = this.elements;
 		const x = 2 * near / ( right - left );

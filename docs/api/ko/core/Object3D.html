@@ -83,6 +83,12 @@
 		객체의 글로벌 변형입니다. Object3D가 부모를 가지고 있지 않다면, 로컬 변형 [page:.matrix]와 동일합니다.
 		</p>
 
+		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+		<p>
+		Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
+		When it isn't, then you have to maintain all matrices in the object and its children yourself.
+		</p>
+
 		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
 		<p>
 		이 값을 설정하면 When this is set, it calculates the 해당 프레임의 matrixWorld를 계산하고 이 프로퍼티를 false로 초기화합니다.
@@ -307,7 +313,7 @@
 		이 메서드는 비균일 스케일 부모를 가진 객체들은 지원하지 않습니다.
 		</p>
 
-		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 		객체와 레이캐스팅 사이의 인터섹션을 구하는 추상 (빈) 메서드입니다.
 		Subclasses such as [page:Mesh], [page:Line], 및 [page:Points] 같은 서브클래스들은 레이캐스팅을 사용하는 순서에 따라 이 메서드를 실행합니다.

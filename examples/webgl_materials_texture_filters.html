@@ -50,7 +50,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -93,15 +94,15 @@
 
 				// GROUND
 
-				const imageCanvas = document.createElement( "canvas" );
-				const context = imageCanvas.getContext( "2d" );
+				const imageCanvas = document.createElement( 'canvas' );
+				const context = imageCanvas.getContext( '2d' );
 
 				imageCanvas.width = imageCanvas.height = 128;
 
-				context.fillStyle = "#444";
+				context.fillStyle = '#444';
 				context.fillRect( 0, 0, 128, 128 );
 
-				context.fillStyle = "#fff";
+				context.fillStyle = '#fff';
 				context.fillRect( 0, 0, 64, 64 );
 				context.fillRect( 64, 64, 64, 64 );
 
@@ -176,7 +177,7 @@
 
 				};
 
-				const texturePainting = new THREE.TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
+				const texturePainting = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg', callbackPainting );
 				const texturePainting2 = new THREE.Texture();
 				const materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } );
 				const materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
@@ -191,7 +192,7 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 
-				renderer.domElement.style.position = "relative";
+				renderer.domElement.style.position = 'relative';
 				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove );

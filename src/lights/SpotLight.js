@@ -22,6 +22,8 @@ class SpotLight extends Light {
 		this.penumbra = penumbra;
 		this.decay = decay; // for physically correct lights, should be 2.
 
+		this.map = null;
+
 		this.shadow = new SpotLightShadow();
 
 	}
@@ -47,9 +49,9 @@ class SpotLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.distance = source.distance;
 		this.angle = source.angle;

@@ -23,24 +23,26 @@ class ToneMappingNode extends TempNode {
 
 	}
 
-	generate( builder ) {
-
-		const type = this.getNodeType( builder );
+	construct( builder ) {
 
 		const colorNode = this.color || builder.context.color;
 
 		const toneMapping = this.toneMapping;
 		const toneMappingParams = { exposure: this.exposureNode, color: colorNode };
 
+		let outputNode = null;
+
 		if ( toneMapping === LinearToneMapping ) {
 
-			return LinearToneMappingNode.call( toneMappingParams ).build( builder, type );
+			outputNode = LinearToneMappingNode.call( toneMappingParams );
 
 		} else {
 
-			return this.colorNode.build( builder, type );
+			outputNode = this.colorNode;
 
 		}
+
+		return outputNode;
 
 	}
 

@@ -3,11 +3,15 @@
 	async function OimoPhysics() {
 
 		const frameRate = 60;
-		const world = new OIMO.World( 2, new OIMO.Vec3( 0, - 9.8, 0 ) ); //
+		const world = new OIMO.World( 2, new OIMO.Vec3( 0, - 9.8, 0 ) );
+
+		//
 
 		function getShape( geometry ) {
 
-			const parameters = geometry.parameters; // TODO change type to is*
+			const parameters = geometry.parameters;
+
+			// TODO change type to is*
 
 			if ( geometry.type === 'BoxGeometry' ) {
 
@@ -29,11 +33,9 @@
 
 		const meshes = [];
 		const meshMap = new WeakMap();
-
 		function addMesh( mesh, mass = 0 ) {
 
 			const shape = getShape( mesh.geometry );
-
 			if ( shape !== null ) {
 
 				if ( mesh.isInstancedMesh ) {
@@ -60,7 +62,6 @@
 			const body = new OIMO.RigidBody( bodyConfig );
 			body.addShape( new OIMO.Shape( shapeConfig ) );
 			world.addRigidBody( body );
-
 			if ( mass > 0 ) {
 
 				meshes.push( mesh );
@@ -74,7 +75,6 @@
 
 			const array = mesh.instanceMatrix.array;
 			const bodies = [];
-
 			for ( let i = 0; i < mesh.count; i ++ ) {
 
 				const index = i * 16;
@@ -97,8 +97,9 @@
 
 			}
 
-		} //
+		}
 
+		//
 
 		function setMeshPosition( mesh, position, index = 0 ) {
 
@@ -115,33 +116,33 @@
 
 			}
 
-		} //
+		}
 
+		//
 
 		let lastTime = 0;
-
 		function step() {
 
 			const time = performance.now();
-
 			if ( lastTime > 0 ) {
 
 				// console.time( 'world.step' );
-				world.step( 1 / frameRate ); // console.timeEnd( 'world.step' );
+				world.step( 1 / frameRate );
+				// console.timeEnd( 'world.step' );
 
 			}
 
-			lastTime = time; //
+			lastTime = time;
+
+			//
 
 			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
 				const mesh = meshes[ i ];
-
 				if ( mesh.isInstancedMesh ) {
 
 					const array = mesh.instanceMatrix.array;
 					const bodies = meshMap.get( mesh );
-
 					for ( let j = 0; j < bodies.length; j ++ ) {
 
 						const body = bodies[ j ];
@@ -161,14 +162,15 @@
 
 			}
 
-		} // animate
+		}
 
+		// animate
 
 		setInterval( step, 1000 / frameRate );
 		return {
 			addMesh: addMesh,
-			setMeshPosition: setMeshPosition // addCompoundMesh
-
+			setMeshPosition: setMeshPosition
+			// addCompoundMesh
 		};
 
 	}

@@ -18,7 +18,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -26,16 +27,16 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import { ShaderNode, vec3, dot, sampler } from 'three-nodes/Nodes.js';
+			import { ShaderNode, vec3, dot, triplanarTexture } from 'three/nodes';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let stats;
 
@@ -43,9 +44,9 @@
 
 			const objects = [], materials = [];
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -176,6 +177,11 @@
 				material.colorNode = getWGSLTextureSample.call( { tex: textureNode, tex_sampler: textureNode, uv: new Nodes.UVNode() } );
 				materials.push( material );
 
+				// Triplanar Texture Mapping
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = triplanarTexture( new Nodes.TextureNode( texture ) );
+				materials.push( material );
+
 				//
 				// Geometry
 				//
@@ -193,6 +199,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -203,8 +210,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 
@@ -238,15 +243,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
 				const timer = 0.0001 * Date.now();
 
 				camera.position.x = Math.cos( timer ) * 1000;
@@ -265,11 +261,7 @@
 
 				renderer.render( scene, camera );
 
-			}
-
-			function error( error ) {
-
-				console.error( error );
+				stats.update();
 
 			}
 

@@ -28,7 +28,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -37,8 +38,8 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { BVHLoader } from './jsm/loaders/BVHLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
 
 			const clock = new THREE.Clock();
 
@@ -49,7 +50,7 @@
 			animate();
 
 			const loader = new BVHLoader();
-			loader.load( "models/bvh/pirouette.bvh", function ( result ) {
+			loader.load( 'models/bvh/pirouette.bvh', function ( result ) {
 
 				skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
 				skeletonHelper.skeleton = result.skeleton; // allow animation mixer to bind to THREE.SkeletonHelper directly

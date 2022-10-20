@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,7 +29,7 @@
 
 			import * as THREE from 'three';
 
-			import { MDDLoader } from './jsm/loaders/MDDLoader.js';
+			import { MDDLoader } from 'three/addons/loaders/MDDLoader.js';
 
 			let camera, scene, renderer, mixer, clock;
 

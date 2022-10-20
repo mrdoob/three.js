@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { CapsuleGeometry, CapsuleBufferGeometry } from '../../../../src/geometries/CapsuleGeometry.js';
+import { CapsuleGeometry } from '../../../../src/geometries/CapsuleGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -14,7 +14,7 @@ export default QUnit.module( 'Geometries', () => {
 				radius: 2,
 				length: 2,
 				capSegments: 20,
-				heightSegments: 20
+				radialSegments: 20
 			};
 
 			geometries = [
@@ -22,8 +22,7 @@ export default QUnit.module( 'Geometries', () => {
 				new CapsuleGeometry( parameters.radius ),
 				new CapsuleGeometry( parameters.radius, parameters.length ),
 				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments ),
-				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments, parameters.heightSegments ),
-				new CapsuleBufferGeometry(),
+				new CapsuleGeometry( parameters.radius, parameters.length, parameters.capSegments, parameters.radialSegments ),
 			];
 
 		} );

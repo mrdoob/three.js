@@ -10,12 +10,12 @@ const UniformsLib = {
 
 	common: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 
 		map: { value: null },
-		uvTransform: { value: new Matrix3() },
-		uv2Transform: { value: new Matrix3() },
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() },
+		uv2Transform: { value: /*@__PURE__*/ new Matrix3() },
 
 		alphaMap: { value: null },
 		alphaTest: { value: 0 }
@@ -34,7 +34,8 @@ const UniformsLib = {
 		flipEnvMap: { value: - 1 },
 		reflectivity: { value: 1.0 }, // basic, lambert, phong
 		ior: { value: 1.5 }, // physical
-		refractionRatio: { value: 0.98 } // basic, lambert, phong
+		refractionRatio: { value: 0.98 }, // basic, lambert, phong
+		backgroundBlurriness: { value: 0 } // background
 
 	},
 
@@ -68,7 +69,7 @@ const UniformsLib = {
 	normalmap: {
 
 		normalMap: { value: null },
-		normalScale: { value: new Vector2( 1, 1 ) }
+		normalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) }
 
 	},
 
@@ -103,7 +104,7 @@ const UniformsLib = {
 		fogDensity: { value: 0.00025 },
 		fogNear: { value: 1 },
 		fogFar: { value: 2000 },
-		fogColor: { value: new Color( 0xffffff ) }
+		fogColor: { value: /*@__PURE__*/ new Color( 0xffffff ) }
 
 	},
 
@@ -145,8 +146,9 @@ const UniformsLib = {
 			shadowMapSize: {}
 		} },
 
+		spotLightMap: { value: [] },
 		spotShadowMap: { value: [] },
-		spotShadowMatrix: { value: [] },
+		spotLightMatrix: { value: [] },
 
 		pointLights: { value: [], properties: {
 			color: {},
@@ -188,27 +190,27 @@ const UniformsLib = {
 
 	points: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
 		size: { value: 1.0 },
 		scale: { value: 1.0 },
 		map: { value: null },
 		alphaMap: { value: null },
 		alphaTest: { value: 0 },
-		uvTransform: { value: new Matrix3() }
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 
 	sprite: {
 
-		diffuse: { value: new Color( 0xffffff ) },
+		diffuse: { value: /*@__PURE__*/ new Color( 0xffffff ) },
 		opacity: { value: 1.0 },
-		center: { value: new Vector2( 0.5, 0.5 ) },
+		center: { value: /*@__PURE__*/ new Vector2( 0.5, 0.5 ) },
 		rotation: { value: 0.0 },
 		map: { value: null },
 		alphaMap: { value: null },
 		alphaTest: { value: 0 },
-		uvTransform: { value: new Matrix3() }
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	}
 

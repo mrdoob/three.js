@@ -10,19 +10,16 @@
 			this.activeAction = null;
 
 		}
-
 		setDirectionForward() {
 
 			this.mixer.timeScale = 1.0;
 
 		}
-
 		setDirectionBackward() {
 
 			this.mixer.timeScale = - 1.0;
 
 		}
-
 		playAnimation( label, fps ) {
 
 			if ( this.activeAction ) {
@@ -33,7 +30,6 @@
 			}
 
 			const clip = THREE.AnimationClip.findByName( this, label );
-
 			if ( clip ) {
 
 				const action = this.mixer.clipAction( clip );
@@ -47,16 +43,14 @@
 			}
 
 		}
-
 		updateAnimation( delta ) {
 
 			this.mixer.update( delta );
 
 		}
+		copy( source, recursive ) {
 
-		copy( source ) {
-
-			super.copy( source );
+			super.copy( source, recursive );
 			this.mixer = new THREE.AnimationMixer( this );
 			return this;
 

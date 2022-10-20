@@ -28,8 +28,8 @@ Steps to reproduce the behavior:
 
 ***Live example***
 
-* [jsfiddle-latest-release](https://jsfiddle.net/hyok6tvj/)
-* [jsfiddle-dev](https://jsfiddle.net/c5m1kazu/)
+* [jsfiddle-latest-release](https://jsfiddle.net/hbfpj2wv/2/)
+* [jsfiddle-dev](https://jsfiddle.net/086yzvgc/)
 
 **Expected behavior**
 

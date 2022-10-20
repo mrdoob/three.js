@@ -26,7 +26,7 @@
 
 		<h2>Examples</h2>
 		<p>
-			[example:webgl_raycast_sprite WebGL / raycast / sprite]<br />
+			[example:webgl_raycaster_sprite WebGL / raycast / sprite]<br />
 			[example:webgl_sprites WebGL / sprites]<br />
 			[example:svg_sandbox SVG / sandbox]
 		</p>
@@ -71,7 +71,10 @@
 		</p>
 
 		<h3>[property:Texture map]</h3>
-		<p>The texture map. Default is null.</p>
+		<p>
+			The color map. May optionally include an alpha channel, typically combined with
+			[page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest]. Default is null.
+		</p>
 
 		<h3>[property:Radians rotation]</h3>
 		<p>The rotation of the sprite in radians. Default is 0.</p>

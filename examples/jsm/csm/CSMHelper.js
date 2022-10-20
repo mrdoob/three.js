@@ -158,6 +158,36 @@ class CSMHelper extends Group {
 
 	}
 
+	dispose() {
+
+		const frustumLines = this.frustumLines;
+		const cascadeLines = this.cascadeLines;
+		const cascadePlanes = this.cascadePlanes;
+		const shadowLines = this.shadowLines;
+
+		frustumLines.geometry.dispose();
+		frustumLines.material.dispose();
+
+		const cascades = this.csm.cascades;
+
+		for ( let i = 0; i < cascades; i ++ ) {
+
+			const cascadeLine = cascadeLines[ i ];
+			const cascadePlane = cascadePlanes[ i ];
+			const shadowLineGroup = shadowLines[ i ];
+			const shadowLine = shadowLineGroup.children[ 0 ];
+
+			cascadeLine.dispose(); // Box3Helper
+
+			cascadePlane.geometry.dispose();
+			cascadePlane.material.dispose();
+
+			shadowLine.dispose(); // Box3Helper
+
+		}
+
+	}
+
 }
 
 export { CSMHelper };

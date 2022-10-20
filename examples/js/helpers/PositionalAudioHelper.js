@@ -23,7 +23,6 @@
 			this.update();
 
 		}
-
 		update() {
 
 			const audio = this.audio;
@@ -40,14 +39,15 @@
 			let stride;
 			const geometry = this.geometry;
 			const positionAttribute = geometry.attributes.position;
-			geometry.clearGroups(); //
+			geometry.clearGroups();
+
+			//
 
 			function generateSegment( from, to, divisions, materialIndex ) {
 
 				const step = ( to - from ) / divisions;
 				positionAttribute.setXYZ( start, 0, 0, 0 );
 				count ++;
-
 				for ( i = from; i < to; i += step ) {
 
 					stride = start + count;
@@ -62,18 +62,20 @@
 				start += count;
 				count = 0;
 
-			} //
+			}
 
+			//
 
 			generateSegment( - halfConeOuterAngle, - halfConeInnerAngle, divisionsOuterAngle, 0 );
 			generateSegment( - halfConeInnerAngle, halfConeInnerAngle, divisionsInnerAngle, 1 );
-			generateSegment( halfConeInnerAngle, halfConeOuterAngle, divisionsOuterAngle, 0 ); //
+			generateSegment( halfConeInnerAngle, halfConeOuterAngle, divisionsOuterAngle, 0 );
+
+			//
 
 			positionAttribute.needsUpdate = true;
 			if ( coneInnerAngle === coneOuterAngle ) this.material[ 0 ].visible = false;
 
 		}
-
 		dispose() {
 
 			this.geometry.dispose();

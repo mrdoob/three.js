@@ -21,7 +21,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,12 +30,12 @@
 		<script type="module">
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { ArcballControls } from './jsm/controls/ArcballControls.js';
+			import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
 
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			const cameras = [ 'Orthographic', 'Perspective' ];
 			const cameraType = { type: 'Perspective' };

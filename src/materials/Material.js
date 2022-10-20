@@ -1,5 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
+import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
 
 let materialId = 0;
@@ -122,15 +122,6 @@ class Material extends EventDispatcher {
 
 			}
 
-			// for backward compatibility if shading is set in the constructor
-			if ( key === 'shading' ) {
-
-				console.warn( 'THREE.' + this.type + ': .shading has been removed. Use the boolean .flatShading instead.' );
-				this.flatShading = ( newValue === FlatShading ) ? true : false;
-				continue;
-
-			}
-
 			const currentValue = this[ key ];
 
 			if ( currentValue === undefined ) {
@@ -222,6 +213,22 @@ class Material extends EventDispatcher {
 
 		}
 
+		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
+		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
+		if ( this.iridescenceThicknessRange !== undefined ) data.iridescenceThicknessRange = this.iridescenceThicknessRange;
+
+		if ( this.iridescenceMap && this.iridescenceMap.isTexture ) {
+
+			data.iridescenceMap = this.iridescenceMap.toJSON( meta ).uuid;
+
+		}
+
+		if ( this.iridescenceThicknessMap && this.iridescenceThicknessMap.isTexture ) {
+
+			data.iridescenceThicknessMap = this.iridescenceThicknessMap.toJSON( meta ).uuid;
+
+		}
+
 		if ( this.map && this.map.isTexture ) data.map = this.map.toJSON( meta ).uuid;
 		if ( this.matcap && this.matcap.isTexture ) data.matcap = this.matcap.toJSON( meta ).uuid;
 		if ( this.alphaMap && this.alphaMap.isTexture ) data.alphaMap = this.alphaMap.toJSON( meta ).uuid;
@@ -293,7 +300,7 @@ class Material extends EventDispatcher {
 		if ( this.transmissionMap && this.transmissionMap.isTexture ) data.transmissionMap = this.transmissionMap.toJSON( meta ).uuid;
 		if ( this.thickness !== undefined ) data.thickness = this.thickness;
 		if ( this.thicknessMap && this.thicknessMap.isTexture ) data.thicknessMap = this.thicknessMap.toJSON( meta ).uuid;
-		if ( this.attenuationDistance !== undefined ) data.attenuationDistance = this.attenuationDistance;
+		if ( this.attenuationDistance !== undefined && this.attenuationDistance !== Infinity ) data.attenuationDistance = this.attenuationDistance;
 		if ( this.attenuationColor !== undefined ) data.attenuationColor = this.attenuationColor.getHex();
 
 		if ( this.size !== undefined ) data.size = this.size;
@@ -481,29 +488,6 @@ class Material extends EventDispatcher {
 
 	}
 
-	// @deprecated since r131, f5803c62cc4a29d90744e9dc7811d086e354c1d8
-
-	get vertexTangents() {
-
-		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
-		return false;
-
-	}
-
-	set vertexTangents( value ) {
-
-		console.warn( 'THREE.' + this.type + ': .vertexTangents has been removed.' );
-
-	}
-
 }
-
-Material.fromType = function ( /*type*/ ) {
-
-	// TODO: Behavior added in Materials.js
-
-	return null;
-
-};
 
 export { Material };

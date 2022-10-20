@@ -28,7 +28,7 @@ class PunctualLightNode extends AnalyticLightNode {
 
 	}
 
-	generate( builder ) {
+	construct( builder ) {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode } = this;
 

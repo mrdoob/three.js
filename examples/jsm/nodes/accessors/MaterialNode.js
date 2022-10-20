@@ -12,6 +12,7 @@ class MaterialNode extends Node {
 	static ROUGHNESS = 'roughness';
 	static METALNESS = 'metalness';
 	static EMISSIVE = 'emissive';
+	static ROTATION = 'rotation';
 
 	constructor( scope = MaterialNode.COLOR ) {
 
@@ -30,7 +31,7 @@ class MaterialNode extends Node {
 
 			return material.map !== null ? 'vec4' : 'vec3';
 
-		} else if ( scope === MaterialNode.OPACITY ) {
+		} else if ( scope === MaterialNode.OPACITY || scope === MaterialNode.ROTATION ) {
 
 			return 'float';
 
@@ -129,6 +130,10 @@ class MaterialNode extends Node {
 				node = emissiveNode;
 
 			}
+
+		} else if ( scope === MaterialNode.ROTATION ) {
+
+			node = new MaterialReferenceNode( 'rotation', 'float' );
 
 		} else {
 

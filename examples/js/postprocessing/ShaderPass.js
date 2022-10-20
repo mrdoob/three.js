@@ -6,7 +6,6 @@
 
 			super();
 			this.textureID = textureID !== undefined ? textureID : 'tDiffuse';
-
 			if ( shader instanceof THREE.ShaderMaterial ) {
 
 				this.uniforms = shader.uniforms;
@@ -27,10 +26,7 @@
 			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive */
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 			if ( this.uniforms[ this.textureID ] ) {
 
@@ -39,7 +35,6 @@
 			}
 
 			this.fsQuad.material = this.material;
-
 			if ( this.renderToScreen ) {
 
 				renderer.setRenderTarget( null );
@@ -47,12 +42,18 @@
 
 			} else {
 
-				renderer.setRenderTarget( writeBuffer ); // TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
-
+				renderer.setRenderTarget( writeBuffer );
+				// TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
 				if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
 				this.fsQuad.render( renderer );
 
 			}
+
+		}
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
 
 		}
 

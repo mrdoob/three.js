@@ -40,7 +40,7 @@ export default /* glsl */`
 
 	#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-		vec4 envColor = textureCubeUV( envMap, reflectVec, 0.0 );
+		vec4 envColor = textureCubeUV( envMap, reflectVec, backgroundBlurriness );
 
 	#else
 

@@ -58,7 +58,6 @@
 			super( manager );
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -92,7 +91,6 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( data ) {
 
 			function isBinary( data ) {
@@ -101,29 +99,32 @@
 				const face_size = 32 / 8 * 3 + 32 / 8 * 3 * 3 + 16 / 8;
 				const n_faces = reader.getUint32( 80, true );
 				const expect = 80 + 32 / 8 + n_faces * face_size;
-
 				if ( expect === reader.byteLength ) {
 
 					return true;
 
-				} // An ASCII STL data must begin with 'solid ' as the first six bytes.
+				}
+
+				// An ASCII STL data must begin with 'solid ' as the first six bytes.
 				// However, ASCII STLs lacking the SPACE after the 'd' are known to be
 				// plentiful.  So, check the first 5 bytes for 'solid'.
+
 				// Several encodings, such as UTF-8, precede the text with up to 5 bytes:
 				// https://en.wikipedia.org/wiki/Byte_order_mark#Byte_order_marks_by_encoding
 				// Search for "solid" to start anywhere after those prefixes.
+
 				// US-ASCII ordinal values for 's', 'o', 'l', 'i', 'd'
 
-
 				const solid = [ 115, 111, 108, 105, 100 ];
-
 				for ( let off = 0; off < 5; off ++ ) {
 
 					// If "solid" text is matched to the current offset, declare it to be an ASCII STL.
+
 					if ( matchDataViewAt( solid, reader, off ) ) return false;
 
-				} // Couldn't find "solid" text at the beginning; it is binary STL.
+				}
 
+				// Couldn't find "solid" text at the beginning; it is binary STL.
 
 				return true;
 
@@ -132,6 +133,7 @@
 			function matchDataViewAt( query, reader, offset ) {
 
 				// Check if each byte in query matches the corresponding byte from the current offset
+
 				for ( let i = 0, il = query.length; i < il; i ++ ) {
 
 					if ( query[ i ] !== reader.getUint8( offset + i ) ) return false;
@@ -151,18 +153,14 @@
 					b,
 					hasColors = false,
 					colors;
-				let defaultR, defaultG, defaultB, alpha; // process STL header
+				let defaultR, defaultG, defaultB, alpha;
+
+				// process STL header
 				// check for default color in header ("COLOR=rgba" sequence).
 
 				for ( let index = 0; index < 80 - 10; index ++ ) {
 
-					if ( reader.getUint32( index, false ) == 0x434F4C4F
-        /*COLO*/
-        && reader.getUint8( index + 4 ) == 0x52
-        /*'R'*/
-        && reader.getUint8( index + 5 ) == 0x3D
-        /*'='*/
-					) {
+					if ( reader.getUint32( index, false ) == 0x434F4C4F /*COLO*/ && reader.getUint8( index + 4 ) == 0x52 /*'R'*/ && reader.getUint8( index + 5 ) == 0x3D /*'='*/ ) {
 
 						hasColors = true;
 						colors = new Float32Array( faces * 3 * 3 );
@@ -180,21 +178,19 @@
 				const geometry = new THREE.BufferGeometry();
 				const vertices = new Float32Array( faces * 3 * 3 );
 				const normals = new Float32Array( faces * 3 * 3 );
-
 				for ( let face = 0; face < faces; face ++ ) {
 
 					const start = dataOffset + face * faceLength;
 					const normalX = reader.getFloat32( start, true );
 					const normalY = reader.getFloat32( start + 4, true );
 					const normalZ = reader.getFloat32( start + 8, true );
-
 					if ( hasColors ) {
 
 						const packedColor = reader.getUint16( start + 48, true );
-
 						if ( ( packedColor & 0x8000 ) === 0 ) {
 
 							// facet has its own unique color
+
 							r = ( packedColor & 0x1F ) / 31;
 							g = ( packedColor >> 5 & 0x1F ) / 31;
 							b = ( packedColor >> 10 & 0x1F ) / 31;
@@ -219,7 +215,6 @@
 						normals[ componentIdx ] = normalX;
 						normals[ componentIdx + 1 ] = normalY;
 						normals[ componentIdx + 2 ] = normalZ;
-
 						if ( hasColors ) {
 
 							colors[ componentIdx ] = r;
@@ -234,7 +229,6 @@
 
 				geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 				geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-
 				if ( hasColors ) {
 
 					geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
@@ -263,18 +257,15 @@
 				let groupCount = 0;
 				let startVertex = 0;
 				let endVertex = 0;
-
 				while ( ( result = patternSolid.exec( data ) ) !== null ) {
 
 					startVertex = endVertex;
 					const solid = result[ 0 ];
-
 					while ( ( result = patternFace.exec( solid ) ) !== null ) {
 
 						let vertexCountPerFace = 0;
 						let normalCountPerFace = 0;
 						const text = result[ 0 ];
-
 						while ( ( result = patternNormal.exec( text ) ) !== null ) {
 
 							normal.x = parseFloat( result[ 1 ] );
@@ -291,15 +282,17 @@
 							vertexCountPerFace ++;
 							endVertex ++;
 
-						} // every face have to own ONE valid normal
+						}
 
+						// every face have to own ONE valid normal
 
 						if ( normalCountPerFace !== 1 ) {
 
 							console.error( 'THREE.STLLoader: Something isn\'t right with the normal of face number ' + faceCounter );
 
-						} // each face have to own THREE valid vertices
+						}
 
+						// each face have to own THREE valid vertices
 
 						if ( vertexCountPerFace !== 3 ) {
 
@@ -341,7 +334,6 @@
 				if ( typeof buffer === 'string' ) {
 
 					const array_buffer = new Uint8Array( buffer.length );
-
 					for ( let i = 0; i < buffer.length; i ++ ) {
 
 						array_buffer[ i ] = buffer.charCodeAt( i ) & 0xff; // implicitly assumes little-endian
@@ -356,8 +348,9 @@
 
 				}
 
-			} // start
+			}
 
+			// start
 
 			const binData = ensureBinary( data );
 			return isBinary( binData ) ? parseBinary( binData ) : parseASCII( ensureString( data ) );

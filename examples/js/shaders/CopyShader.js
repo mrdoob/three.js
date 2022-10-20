@@ -3,6 +3,7 @@
 	/**
  * Full-screen textured quad shader
  */
+
 	const CopyShader = {
 		uniforms: {
 			'tDiffuse': {
@@ -12,9 +13,7 @@
 				value: 1.0
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -24,9 +23,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform float opacity;
 

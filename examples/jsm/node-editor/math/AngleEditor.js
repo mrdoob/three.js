@@ -1,7 +1,7 @@
 import { SelectInput, Element, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { Vector3 } from 'three';
-import { MathNode, UniformNode } from 'three-nodes/Nodes.js';
+import { MathNode, UniformNode } from 'three/nodes';
 
 const DEFAULT_VALUE = new UniformNode( new Vector3() );
 
@@ -14,9 +14,9 @@ export class AngleEditor extends BaseNode {
 		super( 'Angle', 1, node, 175 );
 
 		const optionsField = new SelectInput( [
-			{ name: 'Degrees to Radians', value: MathNode.RAD },
-			{ name: 'Radians to Degrees', value: MathNode.DEG }
-		], MathNode.RAD ).onChange( () => {
+			{ name: 'Degrees to Radians', value: MathNode.RADIANS },
+			{ name: 'Radians to Degrees', value: MathNode.DEGREES }
+		], MathNode.RADIANS ).onChange( () => {
 
 			node.method = optionsField.getValue();
 

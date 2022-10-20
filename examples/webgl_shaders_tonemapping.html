@@ -52,7 +52,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -61,14 +62,14 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { AdaptiveToneMappingPass } from './jsm/postprocessing/AdaptiveToneMappingPass.js';
-			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
-			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { AdaptiveToneMappingPass } from 'three/addons/postprocessing/AdaptiveToneMappingPass.js';
+			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			let bloomPass, adaptToneMappingPass, ldrToneMappingPass, hdrToneMappingPass;
 			let params;
@@ -144,61 +145,61 @@
 					lights: true,
 					uniforms: THREE.UniformsUtils.merge( [
 
-						THREE.UniformsLib[ "common" ],
-						THREE.UniformsLib[ "lights" ]
+						THREE.UniformsLib[ 'common' ],
+						THREE.UniformsLib[ 'lights' ]
 
 					] ),
 					vertexShader: [
-						"varying vec3 vViewPosition;",
-						"varying vec3 vNormal;",
-						"void main() {",
-						THREE.ShaderChunk[ "beginnormal_vertex" ],
-						THREE.ShaderChunk[ "defaultnormal_vertex" ],
+						'varying vec3 vViewPosition;',
+						'varying vec3 vNormal;',
+						'void main() {',
+						THREE.ShaderChunk[ 'beginnormal_vertex' ],
+						THREE.ShaderChunk[ 'defaultnormal_vertex' ],
 
-						"	vNormal = normalize( transformedNormal );",
-						"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-						"vViewPosition = -mvPosition.xyz;",
-						"gl_Position = projectionMatrix * mvPosition;",
-						"}"
+						'	vNormal = normalize( transformedNormal );',
+						'vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
+						'vViewPosition = -mvPosition.xyz;',
+						'gl_Position = projectionMatrix * mvPosition;',
+						'}'
 
-					].join( "\n" ),
+					].join( '\n' ),
 
 					fragmentShader: [
 
-						THREE.ShaderChunk[ "common" ],
-						THREE.ShaderChunk[ "bsdfs" ],
-						THREE.ShaderChunk[ "lights_pars_begin" ],
-						THREE.ShaderChunk[ "normal_pars_fragment" ],
-						THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
+						THREE.ShaderChunk[ 'common' ],
+						THREE.ShaderChunk[ 'bsdfs' ],
+						THREE.ShaderChunk[ 'lights_pars_begin' ],
+						THREE.ShaderChunk[ 'normal_pars_fragment' ],
+						THREE.ShaderChunk[ 'lights_phong_pars_fragment' ],
 
-						"void main() {",
-						"vec3 normal = normalize( -vNormal );",
-						"vec3 viewPosition = normalize( vViewPosition );",
-						"#if NUM_DIR_LIGHTS > 0",
+						'void main() {',
+						'vec3 normal = normalize( -vNormal );',
+						'vec3 viewPosition = normalize( vViewPosition );',
+						'#if NUM_DIR_LIGHTS > 0',
 
-						"vec3 dirDiffuse = vec3( 0.0 );",
+						'vec3 dirDiffuse = vec3( 0.0 );',
 
-						"for( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {",
+						'for( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {',
 
-						"vec4 lDirection = viewMatrix * vec4( directionalLights[i].direction, 0.0 );",
-						"vec3 dirVector = normalize( lDirection.xyz );",
-						"float dotProduct = dot( viewPosition, dirVector );",
-						"dotProduct = 1.0 * max( dotProduct, 0.0 ) + (1.0 - max( -dot( normal, dirVector ), 0.0 ));",
-						"dotProduct *= dotProduct;",
-						"dirDiffuse += max( 0.5 * dotProduct, 0.0 ) * directionalLights[i].color;",
-						"}",
-						"#endif",
+						'vec4 lDirection = viewMatrix * vec4( directionalLights[i].direction, 0.0 );',
+						'vec3 dirVector = normalize( lDirection.xyz );',
+						'float dotProduct = dot( viewPosition, dirVector );',
+						'dotProduct = 1.0 * max( dotProduct, 0.0 ) + (1.0 - max( -dot( normal, dirVector ), 0.0 ));',
+						'dotProduct *= dotProduct;',
+						'dirDiffuse += max( 0.5 * dotProduct, 0.0 ) * directionalLights[i].color;',
+						'}',
+						'#endif',
 
 						//Fade out atmosphere at edge
-						"float viewDot = abs(dot( normal, viewPosition ));",
-						"viewDot = clamp( pow( viewDot + 0.6, 10.0 ), 0.0, 1.0);",
+						'float viewDot = abs(dot( normal, viewPosition ));',
+						'viewDot = clamp( pow( viewDot + 0.6, 10.0 ), 0.0, 1.0);',
 
-						"vec3 color = vec3( 0.05, 0.09, 0.13 ) * dirDiffuse;",
-						"gl_FragColor = vec4( color, viewDot );",
+						'vec3 color = vec3( 0.05, 0.09, 0.13 ) * dirDiffuse;',
+						'gl_FragColor = vec4( color, viewDot );',
 
-						"}"
+						'}'
 
-					].join( "\n" )
+					].join( '\n' )
 				};
 
 				const earthAtmoMat = new THREE.ShaderMaterial( atmoShader );
@@ -270,34 +271,34 @@
 
 				const vBGShader = [
 					// "attribute vec2 uv;",
-					"varying vec2 vUv;",
-					"void main() {",
-					"vUv = uv;",
-					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-					"}"
+					'varying vec2 vUv;',
+					'void main() {',
+					'vUv = uv;',
+					'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+					'}'
 
-				].join( "\n" );
+				].join( '\n' );
 
 				const pBGShader = [
 
-					"uniform sampler2D map;",
-					"varying vec2 vUv;",
+					'uniform sampler2D map;',
+					'varying vec2 vUv;',
 
-					"void main() {",
+					'void main() {',
 
-					"vec2 sampleUV = vUv;",
-					"vec4 color = texture2D( map, sampleUV, 0.0 );",
+					'vec2 sampleUV = vUv;',
+					'vec4 color = texture2D( map, sampleUV, 0.0 );',
 
-					"gl_FragColor = vec4( color.xyz, 1.0 );",
+					'gl_FragColor = vec4( color.xyz, 1.0 );',
 
-					"}"
+					'}'
 
-				].join( "\n" );
+				].join( '\n' );
 
 				// Skybox
 				adaptiveLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						"map": { value: null }
+						'map': { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
@@ -308,7 +309,7 @@
 
 				currentLuminanceMat = new THREE.ShaderMaterial( {
 					uniforms: {
-						"map": { value: null }
+						'map': { value: null }
 					},
 					vertexShader: vBGShader,
 					fragmentShader: pBGShader,
@@ -329,10 +330,10 @@
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				debugScene.add( quadBG );
 
-				const r = "textures/cube/MilkyWay/";
-				const urls = [ r + "dark-s_px.jpg", r + "dark-s_nx.jpg",
-							 r + "dark-s_py.jpg", r + "dark-s_ny.jpg",
-							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
+				const r = 'textures/cube/MilkyWay/';
+				const urls = [ r + 'dark-s_px.jpg', r + 'dark-s_nx.jpg',
+							 r + 'dark-s_py.jpg', r + 'dark-s_ny.jpg',
+							 r + 'dark-s_pz.jpg', r + 'dark-s_nz.jpg' ];
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.encoding = THREE.sRGBEncoding;
@@ -441,15 +442,15 @@
 				requestAnimationFrame( animate );
 				if ( bloomPass ) {
 
-					bloomPass.combineUniforms[ "strength" ].value = params.bloomAmount;
+					bloomPass.combineUniforms[ 'strength' ].value = params.bloomAmount;
 
 				}
 
 				if ( adaptToneMappingPass ) {
 
 					adaptToneMappingPass.setAdaptionRate( params.adaptionRate );
-					adaptiveLuminanceMat.uniforms[ "map" ].value = adaptToneMappingPass.luminanceRT;
-					currentLuminanceMat.uniforms[ "map" ].value = adaptToneMappingPass.currentLuminanceRT;
+					adaptiveLuminanceMat.uniforms[ 'map' ].value = adaptToneMappingPass.luminanceRT;
+					currentLuminanceMat.uniforms[ 'map' ].value = adaptToneMappingPass.currentLuminanceRT;
 
 					adaptToneMappingPass.enabled = params.enabled;
 					adaptToneMappingPass.setMaxLuminance( params.maxLuminance );

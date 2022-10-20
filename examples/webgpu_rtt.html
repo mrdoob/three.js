@@ -17,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -25,11 +26,11 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import WebGPUTextureRenderer from 'three/addons/renderers/webgpu/WebGPUTextureRenderer.js';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
@@ -40,9 +41,10 @@
 
 			const dpr = window.devicePixelRatio;
 
-			init().then( animate ).catch( error );
+			init();
+			animate();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -102,10 +104,6 @@
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
 
-				//
-
-				return renderer.init();
-
 			}
 
 			function onWindowMouseMove( e ) {
@@ -134,12 +132,6 @@
 
 				textureRenderer.render( scene, camera );
 				renderer.render( sceneFX, cameraFX );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

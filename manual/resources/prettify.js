@@ -253,7 +253,7 @@ var prettyPrint;
     var needToFoldCase = false;
     var ignoreCase = false;
     for (var i = 0, n = regexs.length; i < n; ++i) {
-      var regex = regexs[i];
+      const regex = regexs[i];
       if (regex.ignoreCase) {
         ignoreCase = true;
       } else if (/[a-z]/i.test(regex.source.replace(
@@ -352,7 +352,7 @@ var prettyPrint;
       var consolidatedRanges = [];
       var lastRange = [];
       for (var i = 0; i < ranges.length; ++i) {
-        var range = ranges[i];
+        const range = ranges[i];
         if (range[0] <= lastRange[1] + 1) {
           lastRange[1] = Math.max(lastRange[1], range[1]);
         } else {
@@ -361,7 +361,7 @@ var prettyPrint;
       }
   
       for (var i = 0; i < consolidatedRanges.length; ++i) {
-        var range = consolidatedRanges[i];
+        const range = consolidatedRanges[i];
         out.push(encodeEscape(range[0]));
         if (range[1] > range[0]) {
           if (range[1] + 1 > range[0]) { out.push('-'); }
@@ -398,13 +398,13 @@ var prettyPrint;
   
       // Walk over and identify back references to build the capturedGroups
       // mapping.
-      for (var i = 0, groupIndex = 0; i < n; ++i) {
+      for (let i = 0, groupIndex = 0; i < n; ++i) {
         var p = parts[i];
         if (p === '(') {
           // groups are 1-indexed, so max group index is count of '('
           ++groupIndex;
         } else if ('\\' === p.charAt(0)) {
-          var decimalValue = +p.substring(1);
+          const decimalValue = +p.substring(1);
           if (decimalValue) {
             if (decimalValue <= groupIndex) {
               capturedGroups[decimalValue] = -1;
@@ -425,7 +425,7 @@ var prettyPrint;
           capturedGroups[i] = ++capturedGroupIndex;
         }
       }
-      for (var i = 0, groupIndex = 0; i < n; ++i) {
+      for (let i = 0, groupIndex = 0; i < n; ++i) {
         var p = parts[i];
         if (p === '(') {
           ++groupIndex;
@@ -433,7 +433,7 @@ var prettyPrint;
             parts[i] = '(?:';
           }
         } else if ('\\' === p.charAt(0)) {
-          var decimalValue = +p.substring(1);
+          const decimalValue = +p.substring(1);
           if (decimalValue && decimalValue <= groupIndex) {
             parts[i] = '\\' + capturedGroups[decimalValue];
           }
@@ -471,7 +471,7 @@ var prettyPrint;
   
     var rewritten = [];
     for (var i = 0, n = regexs.length; i < n; ++i) {
-      var regex = regexs[i];
+      const regex = regexs[i];
       if (regex.global || regex.multiline) { throw new Error('' + regex); }
       rewritten.push(
           '(?:' + allowAnywhereFoldCaseAndRenumberGroups(regex) + ')');
@@ -1104,7 +1104,7 @@ var prettyPrint;
     }
   
     var ol = document.createElement(opt_numberLines ? 'ol' : 'ul');
-    var classNames = [];
+    const classNames = [];
     if (opt_numberLines) {
       classNames.push('linenums');
     }
@@ -1112,13 +1112,13 @@ var prettyPrint;
       classNames.push('modifiedlines');
     }
     ol.className = classNames.join(" ");
-    var offset = Math.max(0, ((opt_startLineNum - 1 /* zero index */)) | 0) || 0;
+    var offset = Math.max(0, (opt_startLineNum - 1 /* zero index */) | 0) || 0;
     for (var i = 0, n = listItems.length; i < n; ++i) {
       li = listItems[i];
       // Stick a class on the LIs so that stylesheets can
       // color odd/even rows, or any other row pattern that
       // is co-prime with 10.
-      var classNames = [];
+      const classNames = [];
       if (opt_numberLines) {
         classNames.push('L' + ((i + offset) % 10));
       }
@@ -1217,7 +1217,7 @@ var prettyPrint;
       var startPos = decorations[i];
       // Conflate all adjacent decorations that use the same style.
       var startDec = decorations[i + 1];
-      var end = i + 2;
+      let end = i + 2;
       while (end + 2 <= nDecorations && decorations[end + 1] === startDec) {
         end += 2;
       }
@@ -1241,7 +1241,7 @@ var prettyPrint;
   
         var decEnd = decorations[decorationIndex + 2] || sourceLength;
   
-        var end = Math.min(spanEnd, decEnd);
+        const end = Math.min(spanEnd, decEnd);
   
         var textNode = spans[spanIndex + 1];
         var styledText;
@@ -1686,9 +1686,9 @@ var prettyPrint;
            IN_GLOBAL_SCOPE
              ? (win['prettyPrintOne'] = $prettyPrintOne)
              : (prettyPrintOne = $prettyPrintOne),
-        'prettyPrint': prettyPrint =
+        'prettyPrint':
            IN_GLOBAL_SCOPE
-             ? (win['prettyPrint'] = $prettyPrint)
+             ? (prettyPrint = win['prettyPrint'] = $prettyPrint)
              : (prettyPrint = $prettyPrint)
       };
 

@@ -14,9 +14,9 @@ class Scene extends Object3D {
 		this.environment = null;
 		this.fog = null;
 
-		this.overrideMaterial = null;
+		this.backgroundBlurriness = 0;
 
-		this.autoUpdate = true; // checked by the renderer
+		this.overrideMaterial = null;
 
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
@@ -34,9 +34,10 @@ class Scene extends Object3D {
 		if ( source.environment !== null ) this.environment = source.environment.clone();
 		if ( source.fog !== null ) this.fog = source.fog.clone();
 
+		this.backgroundBlurriness = source.backgroundBlurriness;
+
 		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-		this.autoUpdate = source.autoUpdate;
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
 		return this;
@@ -48,8 +49,25 @@ class Scene extends Object3D {
 		const data = super.toJSON( meta );
 
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
+		if ( this.backgroundBlurriness > 0 ) data.backgroundBlurriness = this.backgroundBlurriness;
 
 		return data;
+
+	}
+
+	// @deprecated
+
+	get autoUpdate() {
+
+		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
+		return this.matrixWorldAutoUpdate;
+
+	}
+
+	set autoUpdate( value ) {
+
+		console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
+		this.matrixWorldAutoUpdate = value;
 
 	}
 

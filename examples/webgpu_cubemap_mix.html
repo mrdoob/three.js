@@ -22,7 +22,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -30,23 +31,23 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import { mix, oscSine, timerLocal } from 'three-nodes/Nodes.js';
+			import { mix, oscSine, timerLocal, cubeTexture, context, float } from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
+			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
 
-			init().then( render ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -65,13 +66,13 @@
 				scene = new THREE.Scene();
 
 				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				const cubeTexture = new RGBMLoader()
+				const cube1Texture = new RGBMLoader()
 					.setMaxRange( 16 )
 					.setPath( './textures/cube/pisaRGBM16/' )
 					.loadCubemap( rgbmUrls );
 
-				cubeTexture.generateMipmaps = true;
-				cubeTexture.minFilter = THREE.LinearMipmapLinearFilter;
+				cube1Texture.generateMipmaps = true;
+				cube1Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
 				const cube2Urls = [ 'dark-s_px.jpg', 'dark-s_nx.jpg', 'dark-s_py.jpg', 'dark-s_ny.jpg', 'dark-s_pz.jpg', 'dark-s_nz.jpg' ];
 				const cube2Texture = new THREE.CubeTextureLoader()
@@ -81,14 +82,16 @@
 				cube2Texture.generateMipmaps = true;
 				cube2Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
-				scene.environmentNode = mix( new Nodes.CubeTextureNode( cube2Texture ), new Nodes.CubeTextureNode( cubeTexture ), oscSine( timerLocal( .1 ) ) );
+				scene.environmentNode = mix( cubeTexture( cube2Texture ), cubeTexture( cube1Texture ), oscSine( timerLocal( .1 ) ) );
+
+				scene.backgroundNode = context( scene.environmentNode, {
+					levelNode: float( 9 ) // @TODO: currently it uses mipmaps value, I think it should be replaced for [0,1]
+				} );
 
 				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 					scene.add( gltf.scene );
-
-					render();
 
 				} );
 
@@ -98,6 +101,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -105,8 +109,6 @@
 				controls.maxDistance = 10;
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				if ( renderer.init ) return renderer.init();
 
 			}
 
@@ -123,15 +125,7 @@
 
 			function render() {
 
-				requestAnimationFrame( render );
-
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

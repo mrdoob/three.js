@@ -33,8 +33,7 @@
 		Default is null.<br />
 
 		[page:String precision] - Shader precision. Can be `"highp"`, `"mediump"` or `"lowp"`.
-		Defaults to `"highp"` if supported by the device. See the note in "Things to Avoid"
-		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices here].<br />
+		Defaults to `"highp"` if supported by the device.<br />
 
 		[page:Boolean alpha] - controls the default clear alpha value. When set to `true`, the value is `0`. Otherwise it's `1`. Default is `false`.<br />
 
@@ -311,7 +310,9 @@
 		<p>Copies the pixels of a texture in the bounds '[page:Box3 sourceBox]' in the destination texture starting from the given position. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].</p>
 
 		<h3>[method:undefined dispose]( )</h3>
-		<p>Dispose of the current rendering context.</p>
+		<p>
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+		</p>
 
 		<h3>[method:undefined forceContextLoss]()</h3>
 		<p>
@@ -408,7 +409,7 @@
 
 			By default render buffers are cleared before rendering but you can prevent this by setting the property [page:WebGLRenderer.autoClear autoClear] to false.
 			If you want to prevent only certain buffers being cleared you can set either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or
-			[page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false. To forcibly clear one ore more buffers call [page:WebGLRenderer.clear .clear].
+			[page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false. To forcibly clear one or more buffers call [page:WebGLRenderer.clear .clear].
 		</p>
 
 		<h3>[method:undefined resetState]()</h3>

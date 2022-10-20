@@ -5,7 +5,7 @@ import {
 	materialRoughness, materialMetalness, materialEmissive
 } from '../shadernode/ShaderNodeElements.js';
 import LightsNode from '../lighting/LightsNode.js';
-import EnvironmentLightNode from '../lighting/EnvironmentLightNode.js';
+import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import AONode from '../lighting/AONode.js';
 import getRoughness from '../functions/material/getRoughness.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
@@ -35,9 +35,6 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 		this.metalnessNode = null;
 		this.roughnessNode = null;
 
-		this.clearcoatNode = null;
-		this.clearcoatRoughnessNode = null;
-
 		this.envNode = null;
 
 		this.lightsNode = null;
@@ -52,7 +49,12 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	build( builder ) {
 
-		let { colorNode, diffuseColorNode } = this.generateMain( builder );
+		this.generatePosition( builder );
+
+		const colorNodes = this.generateDiffuseColor( builder );
+		const { colorNode } = colorNodes;
+		let { diffuseColorNode } = colorNodes;
+
 		const envNode = this.envNode || builder.scene.environmentNode;
 
 		diffuseColorNode = this.generateStandardMaterial( builder, { colorNode, diffuseColorNode } );
@@ -63,7 +65,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		if ( envNode ) {
 
-			materialLightsNode.push( new EnvironmentLightNode( envNode ) );
+			materialLightsNode.push( new EnvironmentNode( envNode ) );
 
 		}
 
@@ -152,9 +154,6 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		this.metalnessNode = source.metalnessNode;
 		this.roughnessNode = source.roughnessNode;
-
-		this.clearcoatNode = source.clearcoatNode;
-		this.clearcoatRoughnessNode = source.clearcoatRoughnessNode;
 
 		this.envNode = source.envNode;
 

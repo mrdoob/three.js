@@ -1,4 +1,4 @@
-import LightsNode from 'three-nodes/lighting/LightsNode.js';
+import { LightsNode } from 'three/nodes';
 
 class WebGPURenderState {
 
@@ -38,7 +38,7 @@ class WebGPURenderStates {
 
 	}
 
-	get( scene, camera ) {
+	get( scene, /* camera */ ) {
 
 		const renderStates = this.renderStates;
 

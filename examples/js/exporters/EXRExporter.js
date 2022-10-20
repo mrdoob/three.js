@@ -10,7 +10,6 @@
 	const NO_COMPRESSION = 0;
 	const ZIPS_COMPRESSION = 2;
 	const ZIP_COMPRESSION = 3;
-
 	class EXRExporter {
 
 		parse( renderer, renderTarget, options ) {
@@ -25,7 +24,6 @@
 		}
 
 	}
-
 	function supported( renderer, renderTarget ) {
 
 		if ( ! renderer || ! renderer.isWebGLRenderer ) {
@@ -97,7 +95,6 @@
 	function getPixelData( renderer, rtt, info ) {
 
 		let dataBuffer;
-
 		if ( info.type === THREE.FloatType ) {
 
 			dataBuffer = new Float32Array( info.width * info.height * info.numInputChannels );
@@ -131,7 +128,6 @@
 			setValue = info.dataType == 1 ? setFloat16 : setFloat32,
 			outBuffer = new Uint8Array( info.width * info.height * info.numOutputChannels * info.dataSize ),
 			dv = new DataView( outBuffer.buffer );
-
 		for ( let y = 0; y < h; ++ y ) {
 
 			for ( let x = 0; x < w; ++ x ) {
@@ -170,13 +166,11 @@
 				totalSize: 0
 			},
 			size = info.width * info.numOutputChannels * info.blockLines * info.dataSize;
-
 		switch ( info.compression ) {
 
 			case 0:
 				compress = compressNONE;
 				break;
-
 			case 2:
 			case 3:
 				compress = compressZIP;
@@ -218,11 +212,11 @@
 		//
 		// Reorder the pixel data.
 		//
+
 		let t1 = 0,
 			t2 = Math.floor( ( data.length + 1 ) / 2 ),
 			s = 0;
 		const stop = data.length - 1;
-
 		while ( true ) {
 
 			if ( s > stop ) break;
@@ -230,13 +224,13 @@
 			if ( s > stop ) break;
 			tmpBuffer[ t2 ++ ] = data[ s ++ ];
 
-		} //
+		}
+
+		//
 		// Predictor.
 		//
 
-
 		let p = tmpBuffer[ 0 ];
-
 		for ( let t = 1; t < tmpBuffer.length; t ++ ) {
 
 			const d = tmpBuffer[ t ] - p + ( 128 + 256 );
@@ -264,8 +258,8 @@
 		};
 		const dv = new DataView( outBuffer.buffer );
 		setUint32( dv, 20000630, offset ); // magic
-
 		setUint32( dv, 2, offset ); // mask
+
 		// = HEADER =
 
 		setString( dv, 'compression', offset );
@@ -326,12 +320,14 @@
 		offset.value += 4;
 		setUint32( dv, 1, offset );
 		setUint32( dv, 1, offset );
-		setUint8( dv, 0, offset ); // null-byte
+		setUint8( dv, 0, offset );
 
-		setUint8( dv, 0, offset ); // = OFFSET TABLE =
+		// null-byte
+		setUint8( dv, 0, offset );
+
+		// = OFFSET TABLE =
 
 		let sum = offset.value + info.numBlocks * 8;
-
 		for ( let i = 0; i < chunks.data.length; ++ i ) {
 
 			setUint64( dv, sum, offset );
@@ -352,7 +348,6 @@
 			outBuffer = new Uint8Array( HeaderSize + TableSize + chunks.totalSize + info.numBlocks * 8 ),
 			dv = new DataView( outBuffer.buffer );
 		fillHeader( outBuffer, chunks, info );
-
 		for ( let i = 0; i < chunks.data.length; ++ i ) {
 
 			const data = chunks.data[ i ].dataChunk;
@@ -375,13 +370,16 @@
 		dec.b = b;
 		dec.a = a;
 
-	} // function decodeSRGB( dec, r, g, b, a ) {
+	}
+
+	// function decodeSRGB( dec, r, g, b, a ) {
+
 	// 	dec.r = r > 0.04045 ? Math.pow( r * 0.9478672986 + 0.0521327014, 2.4 ) : r * 0.0773993808;
 	// 	dec.g = g > 0.04045 ? Math.pow( g * 0.9478672986 + 0.0521327014, 2.4 ) : g * 0.0773993808;
 	// 	dec.b = b > 0.04045 ? Math.pow( b * 0.9478672986 + 0.0521327014, 2.4 ) : b * 0.0773993808;
 	// 	dec.a = a;
-	// }
 
+	// }
 
 	function setUint8( dv, value, offset ) {
 
@@ -421,7 +419,6 @@
 	function setString( dv, string, offset ) {
 
 		const tmp = textEncoder.encode( string + '\0' );
-
 		for ( let i = 0; i < tmp.length; ++ i ) {
 
 			setUint8( dv, tmp[ i ], offset );

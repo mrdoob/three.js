@@ -19,14 +19,10 @@
 			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive */
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 			this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 			this.uniforms[ 'tSize' ].value.set( readBuffer.width, readBuffer.height );
-
 			if ( this.renderToScreen ) {
 
 				renderer.setRenderTarget( null );
@@ -39,6 +35,12 @@
 				this.fsQuad.render( renderer );
 
 			}
+
+		}
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
 
 		}
 

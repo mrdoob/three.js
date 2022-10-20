@@ -18,7 +18,7 @@ class Object3DNode extends Node {
 		this.scope = scope;
 		this.object3d = object3d;
 
-		this.updateType = NodeUpdateType.Object;
+		this.updateType = NodeUpdateType.OBJECT;
 
 		this._uniformNode = new UniformNode( null );
 
@@ -70,11 +70,10 @@ class Object3DNode extends Node {
 
 			const camera = frame.camera;
 
+			uniformNode.value = uniformNode.value || new Vector3();
 			uniformNode.value.setFromMatrixPosition( object.matrixWorld );
 
 			uniformNode.value.applyMatrix4( camera.matrixWorldInverse );
-
-			//uniformNode.value.setFromMatrixPosition( object.modelViewMatrix );
 
 		}
 
@@ -95,7 +94,6 @@ class Object3DNode extends Node {
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
 
 			this._uniformNode.nodeType = 'vec3';
-			this._uniformNode.value = new Vector3();
 
 		}
 

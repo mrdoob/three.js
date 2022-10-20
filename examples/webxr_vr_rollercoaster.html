@@ -14,7 +14,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,8 +30,8 @@
 				RollerCoasterLiftersGeometry,
 				TreesGeometry,
 				SkyGeometry
-			} from './jsm/misc/RollerCoaster.js';
-			import { VRButton } from './jsm/webxr/VRButton.js';
+			} from 'three/addons/misc/RollerCoaster.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let mesh, material, geometry;
 

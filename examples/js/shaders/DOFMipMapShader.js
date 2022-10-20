@@ -5,6 +5,7 @@
  * - from Matt Handley @applmak
  * - requires power-of-2 sized render target with enabled mipmaps
  */
+
 	const DOFMipMapShader = {
 		uniforms: {
 			'tColor': {
@@ -20,9 +21,7 @@
 				value: 1.0
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -32,9 +31,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform float focus;
 		uniform float maxblur;

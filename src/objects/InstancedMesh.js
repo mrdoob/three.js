@@ -7,6 +7,7 @@ const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
 
 const _instanceIntersects = [];
 
+const _identity = /*@__PURE__*/ new Matrix4();
 const _mesh = /*@__PURE__*/ new Mesh();
 
 class InstancedMesh extends Mesh {
@@ -24,11 +25,17 @@ class InstancedMesh extends Mesh {
 
 		this.frustumCulled = false;
 
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.setMatrixAt( i, _identity );
+
+		}
+
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.instanceMatrix.copy( source.instanceMatrix );
 

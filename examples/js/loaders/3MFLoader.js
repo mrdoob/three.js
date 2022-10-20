@@ -26,7 +26,6 @@
 			this.availableExtensions = [];
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -60,12 +59,10 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( data ) {
 
 			const scope = this;
 			const textureLoader = new THREE.TextureLoader( this.manager );
-
 			function loadDocument( data ) {
 
 				let zip = null;
@@ -78,7 +75,6 @@
 				const modelParts = {};
 				const printTicketParts = {};
 				const texturesParts = {};
-
 				try {
 
 					zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
@@ -114,12 +110,15 @@
 
 					}
 
-				} //
+				}
 
+				//
 
 				const relsView = zip[ relsName ];
 				const relsFileText = THREE.LoaderUtils.decodeText( relsView );
-				const rels = parseRelsXml( relsFileText ); //
+				const rels = parseRelsXml( relsFileText );
+
+				//
 
 				if ( modelRelsName ) {
 
@@ -127,8 +126,9 @@
 					const relsFileText = THREE.LoaderUtils.decodeText( relsView );
 					modelRels = parseRelsXml( relsFileText );
 
-				} //
+				}
 
+				//
 
 				for ( let i = 0; i < modelPartNames.length; i ++ ) {
 
@@ -136,7 +136,6 @@
 					const view = zip[ modelPart ];
 					const fileText = THREE.LoaderUtils.decodeText( view );
 					const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
-
 					if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
 
 						console.error( 'THREE.3MFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
@@ -145,11 +144,9 @@
 
 					const modelNode = xmlData.querySelector( 'model' );
 					const extensions = {};
-
 					for ( let i = 0; i < modelNode.attributes.length; i ++ ) {
 
 						const attr = modelNode.attributes[ i ];
-
 						if ( attr.name.match( /^xmlns:(.+)$/ ) ) {
 
 							extensions[ attr.value ] = RegExp.$1;
@@ -160,7 +157,6 @@
 
 					const modelData = parseModelNode( modelNode );
 					modelData[ 'xml' ] = modelNode;
-
 					if ( 0 < Object.keys( extensions ).length ) {
 
 						modelData[ 'extensions' ] = extensions;
@@ -169,8 +165,9 @@
 
 					modelParts[ modelPart ] = modelData;
 
-				} //
+				}
 
+				//
 
 				for ( let i = 0; i < texturesPartNames.length; i ++ ) {
 
@@ -194,7 +191,6 @@
 				const relationships = [];
 				const relsXmlData = new DOMParser().parseFromString( relsFileText, 'application/xml' );
 				const relsNodes = relsXmlData.querySelectorAll( 'Relationship' );
-
 				for ( let i = 0; i < relsNodes.length; i ++ ) {
 
 					const relsNode = relsNodes[ i ];
@@ -204,8 +200,8 @@
 						id: relsNode.getAttribute( 'Id' ),
 						//required
 						type: relsNode.getAttribute( 'Type' ) //required
-
 					};
+
 					relationships.push( relationship );
 
 				}
@@ -217,13 +213,11 @@
 			function parseMetadataNodes( metadataNodes ) {
 
 				const metadataData = {};
-
 				for ( let i = 0; i < metadataNodes.length; i ++ ) {
 
 					const metadataNode = metadataNodes[ i ];
 					const name = metadataNode.getAttribute( 'name' );
 					const validNames = [ 'Title', 'Designer', 'Description', 'Copyright', 'LicenseTerms', 'Rating', 'CreationDate', 'ModificationDate' ];
-
 					if ( 0 <= validNames.indexOf( name ) ) {
 
 						metadataData[ name ] = metadataNode.textContent;
@@ -244,13 +238,11 @@
 					basematerials: []
 				};
 				const basematerialNodes = basematerialsNode.querySelectorAll( 'base' );
-
 				for ( let i = 0; i < basematerialNodes.length; i ++ ) {
 
 					const basematerialNode = basematerialNodes[ i ];
 					const basematerialData = parseBasematerialNode( basematerialNode );
 					basematerialData.index = i; // the order and count of the material nodes form an implicit 0-based index
-
 					basematerialsData.basematerials.push( basematerialData );
 
 				}
@@ -287,7 +279,6 @@
 				};
 				const tex2coordNodes = texture2DGroupNode.querySelectorAll( 'tex2coord' );
 				const uvs = [];
-
 				for ( let i = 0; i < tex2coordNodes.length; i ++ ) {
 
 					const tex2coordNode = tex2coordNodes[ i ];
@@ -312,7 +303,6 @@
 				const colorNodes = colorGroupNode.querySelectorAll( 'color' );
 				const colors = [];
 				const colorObject = new THREE.Color();
-
 				for ( let i = 0; i < colorNodes.length; i ++ ) {
 
 					const colorNode = colorNodes[ i ];
@@ -333,11 +323,10 @@
 
 				const metallicDisplaypropertiesData = {
 					id: metallicDisplaypropetiesNode.getAttribute( 'id' ) // required
-
 				};
+
 				const metallicNodes = metallicDisplaypropetiesNode.querySelectorAll( 'pbmetallic' );
 				const metallicData = [];
-
 				for ( let i = 0; i < metallicNodes.length; i ++ ) {
 
 					const metallicNode = metallicNodes[ i ];
@@ -347,7 +336,6 @@
 						metallicness: parseFloat( metallicNode.getAttribute( 'metallicness' ) ),
 						// required
 						roughness: parseFloat( metallicNode.getAttribute( 'roughness' ) ) // required
-
 					} );
 
 				}
@@ -361,9 +349,7 @@
 
 				const basematerialData = {};
 				basematerialData[ 'name' ] = basematerialNode.getAttribute( 'name' ); // required
-
 				basematerialData[ 'displaycolor' ] = basematerialNode.getAttribute( 'displaycolor' ); // required
-
 				basematerialData[ 'displaypropertiesid' ] = basematerialNode.getAttribute( 'displaypropertiesid' );
 				return basematerialData;
 
@@ -374,7 +360,6 @@
 				const meshData = {};
 				const vertices = [];
 				const vertexNodes = meshNode.querySelectorAll( 'vertices vertex' );
-
 				for ( let i = 0; i < vertexNodes.length; i ++ ) {
 
 					const vertexNode = vertexNodes[ i ];
@@ -389,7 +374,6 @@
 				const triangleProperties = [];
 				const triangles = [];
 				const triangleNodes = meshNode.querySelectorAll( 'triangles triangle' );
-
 				for ( let i = 0; i < triangleNodes.length; i ++ ) {
 
 					const triangleNode = triangleNodes[ i ];
@@ -404,7 +388,9 @@
 					triangleProperty[ 'v1' ] = parseInt( v1, 10 );
 					triangleProperty[ 'v2' ] = parseInt( v2, 10 );
 					triangleProperty[ 'v3' ] = parseInt( v3, 10 );
-					triangles.push( triangleProperty[ 'v1' ], triangleProperty[ 'v2' ], triangleProperty[ 'v3' ] ); // optional
+					triangles.push( triangleProperty[ 'v1' ], triangleProperty[ 'v2' ], triangleProperty[ 'v3' ] );
+
+					// optional
 
 					if ( p1 ) {
 
@@ -448,7 +434,6 @@
 
 				const components = [];
 				const componentNodes = componentsNode.querySelectorAll( 'component' );
-
 				for ( let i = 0; i < componentNodes.length; i ++ ) {
 
 					const componentNode = componentNodes[ i ];
@@ -467,7 +452,6 @@
 				componentData[ 'objectId' ] = componentNode.getAttribute( 'objectid' ); // required
 
 				const transform = componentNode.getAttribute( 'transform' );
-
 				if ( transform ) {
 
 					componentData[ 'transform' ] = parseTransform( transform );
@@ -498,7 +482,6 @@
 					type: objectNode.getAttribute( 'type' )
 				};
 				const id = objectNode.getAttribute( 'id' );
-
 				if ( id ) {
 
 					objectData[ 'id' ] = id;
@@ -506,7 +489,6 @@
 				}
 
 				const pid = objectNode.getAttribute( 'pid' );
-
 				if ( pid ) {
 
 					objectData[ 'pid' ] = pid;
@@ -514,7 +496,6 @@
 				}
 
 				const pindex = objectNode.getAttribute( 'pindex' );
-
 				if ( pindex ) {
 
 					objectData[ 'pindex' ] = pindex;
@@ -522,7 +503,6 @@
 				}
 
 				const thumbnail = objectNode.getAttribute( 'thumbnail' );
-
 				if ( thumbnail ) {
 
 					objectData[ 'thumbnail' ] = thumbnail;
@@ -530,7 +510,6 @@
 				}
 
 				const partnumber = objectNode.getAttribute( 'partnumber' );
-
 				if ( partnumber ) {
 
 					objectData[ 'partnumber' ] = partnumber;
@@ -538,7 +517,6 @@
 				}
 
 				const name = objectNode.getAttribute( 'name' );
-
 				if ( name ) {
 
 					objectData[ 'name' ] = name;
@@ -546,7 +524,6 @@
 				}
 
 				const meshNode = objectNode.querySelector( 'mesh' );
-
 				if ( meshNode ) {
 
 					objectData[ 'mesh' ] = parseMeshNode( meshNode );
@@ -554,7 +531,6 @@
 				}
 
 				const componentsNode = objectNode.querySelector( 'components' );
-
 				if ( componentsNode ) {
 
 					objectData[ 'components' ] = parseComponentsNode( componentsNode );
@@ -570,67 +546,66 @@
 				const resourcesData = {};
 				resourcesData[ 'basematerials' ] = {};
 				const basematerialsNodes = resourcesNode.querySelectorAll( 'basematerials' );
-
 				for ( let i = 0; i < basematerialsNodes.length; i ++ ) {
 
 					const basematerialsNode = basematerialsNodes[ i ];
 					const basematerialsData = parseBasematerialsNode( basematerialsNode );
 					resourcesData[ 'basematerials' ][ basematerialsData[ 'id' ] ] = basematerialsData;
 
-				} //
+				}
 
+				//
 
 				resourcesData[ 'texture2d' ] = {};
 				const textures2DNodes = resourcesNode.querySelectorAll( 'texture2d' );
-
 				for ( let i = 0; i < textures2DNodes.length; i ++ ) {
 
 					const textures2DNode = textures2DNodes[ i ];
 					const texture2DData = parseTexture2DNode( textures2DNode );
 					resourcesData[ 'texture2d' ][ texture2DData[ 'id' ] ] = texture2DData;
 
-				} //
+				}
 
+				//
 
 				resourcesData[ 'colorgroup' ] = {};
 				const colorGroupNodes = resourcesNode.querySelectorAll( 'colorgroup' );
-
 				for ( let i = 0; i < colorGroupNodes.length; i ++ ) {
 
 					const colorGroupNode = colorGroupNodes[ i ];
 					const colorGroupData = parseColorGroupNode( colorGroupNode );
 					resourcesData[ 'colorgroup' ][ colorGroupData[ 'id' ] ] = colorGroupData;
 
-				} //
+				}
 
+				//
 
 				resourcesData[ 'pbmetallicdisplayproperties' ] = {};
 				const pbmetallicdisplaypropertiesNodes = resourcesNode.querySelectorAll( 'pbmetallicdisplayproperties' );
-
 				for ( let i = 0; i < pbmetallicdisplaypropertiesNodes.length; i ++ ) {
 
 					const pbmetallicdisplaypropertiesNode = pbmetallicdisplaypropertiesNodes[ i ];
 					const pbmetallicdisplaypropertiesData = parseMetallicDisplaypropertiesNode( pbmetallicdisplaypropertiesNode );
 					resourcesData[ 'pbmetallicdisplayproperties' ][ pbmetallicdisplaypropertiesData[ 'id' ] ] = pbmetallicdisplaypropertiesData;
 
-				} //
+				}
 
+				//
 
 				resourcesData[ 'texture2dgroup' ] = {};
 				const textures2DGroupNodes = resourcesNode.querySelectorAll( 'texture2dgroup' );
-
 				for ( let i = 0; i < textures2DGroupNodes.length; i ++ ) {
 
 					const textures2DGroupNode = textures2DGroupNodes[ i ];
 					const textures2DGroupData = parseTextures2DGroupNode( textures2DGroupNode );
 					resourcesData[ 'texture2dgroup' ][ textures2DGroupData[ 'id' ] ] = textures2DGroupData;
 
-				} //
+				}
 
+				//
 
 				resourcesData[ 'object' ] = {};
 				const objectNodes = resourcesNode.querySelectorAll( 'object' );
-
 				for ( let i = 0; i < objectNodes.length; i ++ ) {
 
 					const objectNode = objectNodes[ i ];
@@ -647,7 +622,6 @@
 
 				const buildData = [];
 				const itemNodes = buildNode.querySelectorAll( 'item' );
-
 				for ( let i = 0; i < itemNodes.length; i ++ ) {
 
 					const itemNode = itemNodes[ i ];
@@ -655,7 +629,6 @@
 						objectId: itemNode.getAttribute( 'objectid' )
 					};
 					const transform = itemNode.getAttribute( 'transform' );
-
 					if ( transform ) {
 
 						buildItem[ 'transform' ] = parseTransform( transform );
@@ -676,7 +649,6 @@
 					unit: modelNode.getAttribute( 'unit' ) || 'millimeter'
 				};
 				const metadataNodes = modelNode.querySelectorAll( 'metadata' );
-
 				if ( metadataNodes ) {
 
 					modelData[ 'metadata' ] = parseMetadataNodes( metadataNodes );
@@ -684,7 +656,6 @@
 				}
 
 				const resourcesNode = modelNode.querySelector( 'resources' );
-
 				if ( resourcesNode ) {
 
 					modelData[ 'resources' ] = parseResourcesNode( resourcesNode );
@@ -692,7 +663,6 @@
 				}
 
 				const buildNode = modelNode.querySelector( 'build' );
-
 				if ( buildNode ) {
 
 					modelData[ 'build' ] = parseBuildNode( buildNode );
@@ -708,7 +678,6 @@
 				const texid = texture2dgroup.texid;
 				const texture2ds = modelData.resources.texture2d;
 				const texture2d = texture2ds[ texid ];
-
 				if ( texture2d ) {
 
 					const data = textureData[ texture2d.path ];
@@ -722,23 +691,22 @@
 						URL.revokeObjectURL( sourceURI );
 
 					} );
-					texture.encoding = THREE.sRGBEncoding; // texture parameters
+					texture.encoding = THREE.sRGBEncoding;
+
+					// texture parameters
 
 					switch ( texture2d.tilestyleu ) {
 
 						case 'wrap':
 							texture.wrapS = THREE.RepeatWrapping;
 							break;
-
 						case 'mirror':
 							texture.wrapS = THREE.MirroredRepeatWrapping;
 							break;
-
 						case 'none':
 						case 'clamp':
 							texture.wrapS = THREE.ClampToEdgeWrapping;
 							break;
-
 						default:
 							texture.wrapS = THREE.RepeatWrapping;
 
@@ -749,16 +717,13 @@
 						case 'wrap':
 							texture.wrapT = THREE.RepeatWrapping;
 							break;
-
 						case 'mirror':
 							texture.wrapT = THREE.MirroredRepeatWrapping;
 							break;
-
 						case 'none':
 						case 'clamp':
 							texture.wrapT = THREE.ClampToEdgeWrapping;
 							break;
-
 						default:
 							texture.wrapT = THREE.RepeatWrapping;
 
@@ -770,17 +735,14 @@
 							texture.magFilter = THREE.LinearFilter;
 							texture.minFilter = THREE.LinearMipmapLinearFilter;
 							break;
-
 						case 'linear':
 							texture.magFilter = THREE.LinearFilter;
 							texture.minFilter = THREE.LinearFilter;
 							break;
-
 						case 'nearest':
 							texture.magFilter = THREE.NearestFilter;
 							texture.minFilter = THREE.NearestFilter;
 							break;
-
 						default:
 							texture.magFilter = THREE.LinearFilter;
 							texture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -801,7 +763,6 @@
 
 				const objectPindex = objectData.pindex;
 				const materialMap = {};
-
 				for ( let i = 0, l = triangleProperties.length; i < l; i ++ ) {
 
 					const triangleProperty = triangleProperties[ i ];
@@ -809,23 +770,24 @@
 					if ( materialMap[ pindex ] === undefined ) materialMap[ pindex ] = [];
 					materialMap[ pindex ].push( triangleProperty );
 
-				} //
+				}
 
+				//
 
 				const keys = Object.keys( materialMap );
 				const meshes = [];
-
 				for ( let i = 0, l = keys.length; i < l; i ++ ) {
 
 					const materialIndex = keys[ i ];
 					const trianglePropertiesProps = materialMap[ materialIndex ];
 					const basematerialData = basematerials.basematerials[ materialIndex ];
-					const material = getBuild( basematerialData, objects, modelData, textureData, objectData, buildBasematerial ); //
+					const material = getBuild( basematerialData, objects, modelData, textureData, objectData, buildBasematerial );
+
+					//
 
 					const geometry = new THREE.BufferGeometry();
 					const positionData = [];
 					const vertices = meshData.vertices;
-
 					for ( let j = 0, jl = trianglePropertiesProps.length; j < jl; j ++ ) {
 
 						const triangleProperty = trianglePropertiesProps[ j ];
@@ -841,7 +803,9 @@
 
 					}
 
-					geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positionData, 3 ) ); //
+					geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positionData, 3 ) );
+
+					//
 
 					const mesh = new THREE.Mesh( geometry, material );
 					meshes.push( mesh );
@@ -855,12 +819,12 @@
 			function buildTexturedMesh( texture2dgroup, triangleProperties, meshData, objects, modelData, textureData, objectData ) {
 
 				// geometry
+
 				const geometry = new THREE.BufferGeometry();
 				const positionData = [];
 				const uvData = [];
 				const vertices = meshData.vertices;
 				const uvs = texture2dgroup.uvs;
-
 				for ( let i = 0, l = triangleProperties.length; i < l; i ++ ) {
 
 					const triangleProperty = triangleProperties[ i ];
@@ -872,7 +836,9 @@
 					positionData.push( vertices[ triangleProperty.v2 * 3 + 2 ] );
 					positionData.push( vertices[ triangleProperty.v3 * 3 + 0 ] );
 					positionData.push( vertices[ triangleProperty.v3 * 3 + 1 ] );
-					positionData.push( vertices[ triangleProperty.v3 * 3 + 2 ] ); //
+					positionData.push( vertices[ triangleProperty.v3 * 3 + 2 ] );
+
+					//
 
 					uvData.push( uvs[ triangleProperty.p1 * 2 + 0 ] );
 					uvData.push( uvs[ triangleProperty.p1 * 2 + 1 ] );
@@ -884,13 +850,17 @@
 				}
 
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positionData, 3 ) );
-				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvData, 2 ) ); // material
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvData, 2 ) );
+
+				// material
 
 				const texture = getBuild( texture2dgroup, objects, modelData, textureData, objectData, buildTexture );
 				const material = new THREE.MeshPhongMaterial( {
 					map: texture,
 					flatShading: true
-				} ); // mesh
+				} );
+
+				// mesh
 
 				const mesh = new THREE.Mesh( geometry, material );
 				return mesh;
@@ -900,12 +870,12 @@
 			function buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) {
 
 				// geometry
+
 				const geometry = new THREE.BufferGeometry();
 				const positionData = [];
 				const colorData = [];
 				const vertices = meshData.vertices;
 				const colors = colorgroup.colors;
-
 				for ( let i = 0, l = triangleProperties.length; i < l; i ++ ) {
 
 					const triangleProperty = triangleProperties[ i ];
@@ -920,7 +890,9 @@
 					positionData.push( vertices[ v2 * 3 + 2 ] );
 					positionData.push( vertices[ v3 * 3 + 0 ] );
 					positionData.push( vertices[ v3 * 3 + 1 ] );
-					positionData.push( vertices[ v3 * 3 + 2 ] ); //
+					positionData.push( vertices[ v3 * 3 + 2 ] );
+
+					//
 
 					const p1 = triangleProperty.p1 !== undefined ? triangleProperty.p1 : objectData.pindex;
 					const p2 = triangleProperty.p2 !== undefined ? triangleProperty.p2 : p1;
@@ -938,12 +910,16 @@
 				}
 
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positionData, 3 ) );
-				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorData, 3 ) ); // material
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorData, 3 ) );
+
+				// material
 
 				const material = new THREE.MeshPhongMaterial( {
 					vertexColors: true,
 					flatShading: true
-				} ); // mesh
+				} );
+
+				// mesh
 
 				const mesh = new THREE.Mesh( geometry, material );
 				return mesh;
@@ -968,19 +944,16 @@
 
 				const keys = Object.keys( resourceMap );
 				const meshes = [];
-
 				for ( let i = 0, il = keys.length; i < il; i ++ ) {
 
 					const resourceId = keys[ i ];
 					const triangleProperties = resourceMap[ resourceId ];
 					const resourceType = getResourceType( resourceId, modelData );
-
 					switch ( resourceType ) {
 
 						case 'material':
 							const basematerials = modelData.resources.basematerials[ resourceId ];
 							const newMeshes = buildBasematerialsMeshes( basematerials, triangleProperties, meshData, objects, modelData, textureData, objectData );
-
 							for ( let j = 0, jl = newMeshes.length; j < jl; j ++ ) {
 
 								meshes.push( newMeshes[ j ] );
@@ -988,21 +961,17 @@
 							}
 
 							break;
-
 						case 'texture':
 							const texture2dgroup = modelData.resources.texture2dgroup[ resourceId ];
 							meshes.push( buildTexturedMesh( texture2dgroup, triangleProperties, meshData, objects, modelData, textureData, objectData ) );
 							break;
-
 						case 'vertexColors':
 							const colorgroup = modelData.resources.colorgroup[ resourceId ];
 							meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, meshData, objectData ) );
 							break;
-
 						case 'default':
 							meshes.push( buildDefaultMesh( meshData ) );
 							break;
-
 						default:
 							console.error( 'THREE.3MFLoader: Unsupported resource type.' );
 
@@ -1055,7 +1024,6 @@
 				const resourceMap = {};
 				const triangleProperties = meshData[ 'triangleProperties' ];
 				const objectPid = objectData.pid;
-
 				for ( let i = 0, l = triangleProperties.length; i < l; i ++ ) {
 
 					const triangleProperty = triangleProperties[ i ];
@@ -1075,7 +1043,6 @@
 				const group = new THREE.Group();
 				const resourceMap = analyzeObject( meshData, objectData );
 				const meshes = buildMeshes( resourceMap, meshData, objects, modelData, textureData, objectData );
-
 				for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
 					group.add( meshes[ i ] );
@@ -1096,15 +1063,12 @@
 
 				const availableExtensions = [];
 				const keys = Object.keys( extensions );
-
 				for ( let i = 0; i < keys.length; i ++ ) {
 
 					const ns = keys[ i ];
-
 					for ( let j = 0; j < scope.availableExtensions.length; j ++ ) {
 
 						const extension = scope.availableExtensions[ j ];
-
 						if ( extension.ns === ns ) {
 
 							availableExtensions.push( extension );
@@ -1137,10 +1101,10 @@
 				let material;
 				const displaypropertiesid = materialData.displaypropertiesid;
 				const pbmetallicdisplayproperties = modelData.resources.pbmetallicdisplayproperties;
-
 				if ( displaypropertiesid !== null && pbmetallicdisplayproperties[ displaypropertiesid ] !== undefined ) {
 
 					// metallic display property, use StandardMaterial
+
 					const pbmetallicdisplayproperty = pbmetallicdisplayproperties[ displaypropertiesid ];
 					const metallicData = pbmetallicdisplayproperty.data[ materialData.index ];
 					material = new THREE.MeshStandardMaterial( {
@@ -1152,18 +1116,22 @@
 				} else {
 
 					// otherwise use PhongMaterial
+
 					material = new THREE.MeshPhongMaterial( {
 						flatShading: true
 					} );
 
 				}
 
-				material.name = materialData.name; // displaycolor MUST be specified with a value of a 6 or 8 digit hexadecimal number, e.g. "#RRGGBB" or "#RRGGBBAA"
+				material.name = materialData.name;
+
+				// displaycolor MUST be specified with a value of a 6 or 8 digit hexadecimal number, e.g. "#RRGGBB" or "#RRGGBBAA"
 
 				const displaycolor = materialData.displaycolor;
 				const color = displaycolor.substring( 0, 7 );
 				material.color.setStyle( color );
 				material.color.convertSRGBToLinear(); // displaycolor is in sRGB
+
 				// process alpha if set
 
 				if ( displaycolor.length === 9 ) {
@@ -1179,12 +1147,10 @@
 			function buildComposite( compositeData, objects, modelData, textureData ) {
 
 				const composite = new THREE.Group();
-
 				for ( let j = 0; j < compositeData.length; j ++ ) {
 
 					const component = compositeData[ j ];
 					let build = objects[ component.objectId ];
-
 					if ( build === undefined ) {
 
 						buildObject( component.objectId, objects, modelData, textureData );
@@ -1192,10 +1158,11 @@
 
 					}
 
-					const object3D = build.clone(); // apply component transform
+					const object3D = build.clone();
+
+					// apply component transform
 
 					const transform = component.transform;
-
 					if ( transform ) {
 
 						object3D.applyMatrix4( transform );
@@ -1213,7 +1180,6 @@
 			function buildObject( objectId, objects, modelData, textureData ) {
 
 				const objectData = modelData[ 'resources' ][ 'object' ][ objectId ];
-
 				if ( objectData[ 'mesh' ] ) {
 
 					const meshData = objectData[ 'mesh' ];
@@ -1243,7 +1209,9 @@
 				const modelRels = data3mf.modelRels;
 				const objects = {};
 				const modelsKeys = Object.keys( modelsData );
-				const textureData = {}; // evaluate model relationships to textures
+				const textureData = {};
+
+				// evaluate model relationships to textures
 
 				if ( modelRels ) {
 
@@ -1251,7 +1219,6 @@
 
 						const modelRel = modelRels[ i ];
 						const textureKey = modelRel.target.substring( 1 );
-
 						if ( data3mf.texture[ textureKey ] ) {
 
 							textureData[ modelRel.target ] = data3mf.texture[ textureKey ];
@@ -1260,15 +1227,15 @@
 
 					}
 
-				} // start build
+				}
 
+				// start build
 
 				for ( let i = 0; i < modelsKeys.length; i ++ ) {
 
 					const modelsKey = modelsKeys[ i ];
 					const modelData = modelsData[ modelsKey ];
 					const objectIds = Object.keys( modelData[ 'resources' ][ 'object' ] );
-
 					for ( let j = 0; j < objectIds.length; j ++ ) {
 
 						const objectId = objectIds[ j ];
@@ -1299,14 +1266,14 @@
 				const group = new THREE.Group();
 				const relationship = fetch3DModelPart( data3mf[ 'rels' ] );
 				const buildData = data3mf.model[ relationship[ 'target' ].substring( 1 ) ][ 'build' ];
-
 				for ( let i = 0; i < buildData.length; i ++ ) {
 
 					const buildItem = buildData[ i ];
-					const object3D = objects[ buildItem[ 'objectId' ] ].clone(); // apply transform
+					const object3D = objects[ buildItem[ 'objectId' ] ].clone();
+
+					// apply transform
 
 					const transform = buildItem[ 'transform' ];
-
 					if ( transform ) {
 
 						object3D.applyMatrix4( transform );
@@ -1326,7 +1293,6 @@
 			return build( objects, data3mf );
 
 		}
-
 		addExtension( extension ) {
 
 			this.availableExtensions.push( extension );

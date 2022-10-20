@@ -19,17 +19,18 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 			import * as THREE from 'three';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { VOXLoader, VOXData3DTexture } from './jsm/loaders/VOXLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { VOXLoader, VOXData3DTexture } from 'three/addons/loaders/VOXLoader.js';
 
-			import WebGL from './jsm/capabilities/WebGL.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			if ( WebGL.isWebGL2Available() === false ) {
 

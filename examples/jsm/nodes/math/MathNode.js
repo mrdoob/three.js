@@ -1,6 +1,5 @@
 import TempNode from '../core/TempNode.js';
 import ExpressionNode from '../core/ExpressionNode.js';
-import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import OperatorNode from './OperatorNode.js';
 
@@ -33,11 +32,12 @@ class MathNode extends TempNode {
 	static INVERT = 'invert';
 	static DFDX = 'dFdx';
 	static DFDY = 'dFdy';
-	static SATURATE = 'saturate';
 	static ROUND = 'round';
+	static RECIPROCAL = 'reciprocal';
 
 	// 2 inputs
 
+	static ATAN2 = 'atan2';
 	static MIN = 'min';
 	static MAX = 'max';
 	static MOD = 'mod';
@@ -130,17 +130,7 @@ class MathNode extends TempNode {
 
 		const isWebGL = builder.renderer.isWebGLRenderer === true;
 
-		if ( isWebGL && ( method === MathNode.DFDX || method === MathNode.DFDY ) && output === 'vec3' ) {
-
-			// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
-
-			return new JoinNode( [
-				new MathNode( method, new SplitNode( a, 'x' ) ),
-				new MathNode( method, new SplitNode( a, 'y' ) ),
-				new MathNode( method, new SplitNode( a, 'z' ) )
-			] ).build( builder );
-
-		} else if ( method === MathNode.TRANSFORM_DIRECTION ) {
+		if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
 			// dir can be either a direction vector or a normal vector
 			// upper-left 3x3 of matrix is assumed to be orthogonal
@@ -162,10 +152,6 @@ class MathNode extends TempNode {
 
 			return new MathNode( MathNode.NORMALIZE, mulNode ).build( builder );
 
-		} else if ( method === MathNode.SATURATE ) {
-
-			return builder.format( `clamp( ${ a.build( builder, inputType ) }, 0.0, 1.0 )`, type, output );
-
 		} else if ( method === MathNode.NEGATE ) {
 
 			return builder.format( '( -' + a.build( builder, inputType ) + ' )', type, output );
@@ -173,6 +159,10 @@ class MathNode extends TempNode {
 		} else if ( method === MathNode.INVERT ) {
 
 			return builder.format( '( 1.0 - ' + a.build( builder, inputType ) + ' )', type, output );
+
+		} else if ( method === MathNode.RECIPROCAL ) {
+
+			return builder.format( '( 1.0 / ' + a.build( builder, inputType ) + ' )', type, output );
 
 		} else {
 
