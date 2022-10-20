@@ -232,7 +232,7 @@ const nodeLib = {
 
 	// parsers
 	WGSLNodeParser,
-	GLSLNodeParser,
+	GLSLNodeParser
 
 };
 
@@ -351,5 +351,5 @@ export {
 
 	// parsers
 	WGSLNodeParser,
-	GLSLNodeParser,
+	GLSLNodeParser
 };
