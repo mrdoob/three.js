@@ -62,7 +62,7 @@
 				equirectTexture.flipY = false;
 
 				scene = new THREE.Scene();
-				scene.backgroundNode = texture( equirectTexture, equirectUV() );
+				scene.backgroundNode = texture( equirectTexture, equirectUV(), 0 );
 
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
