@@ -354,7 +354,7 @@ class Projector {
 
 		const renderList = new RenderList();
 
-		function projectObject( object ) {
+		function projectObject( object, camera ) {
 
 			if ( object.visible === false ) return;
 
@@ -372,7 +372,7 @@ class Projector {
 			} else if ( object.isSprite ) {
 
 				if ( object.material.visible === false ) return;
-				if ( object.frustumCulled === true && _frustum.intersectsSprite( object ) === false ) return;
+				if ( object.frustumCulled === true && _frustum.intersectsSprite( object, camera ) === false ) return;
 
 				addObject( object );
 
@@ -382,7 +382,7 @@ class Projector {
 
 			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-				projectObject( children[ i ] );
+				projectObject( children[ i ], camera );
 
 			}
 
@@ -426,7 +426,7 @@ class Projector {
 			_renderData.objects.length = 0;
 			_renderData.lights.length = 0;
 
-			projectObject( scene );
+			projectObject( scene, camera );
 
 			if ( sortObjects === true ) {
 
