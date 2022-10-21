@@ -1138,7 +1138,7 @@ function WebGLRenderer( parameters = {} ) {
 
 			} else if ( object.isSprite ) {
 
-				if ( ! object.frustumCulled || _frustum.intersectsSprite( object ) ) {
+				if ( ! object.frustumCulled || _frustum.intersectsSprite( object, camera ) ) {
 
 					if ( sortObjects ) {
 

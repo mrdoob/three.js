@@ -5,6 +5,11 @@ import { Plane } from './Plane.js';
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
 
+const _vA = /*@__PURE__*/ new Vector3();
+const _vB = /*@__PURE__*/ new Vector3();
+const _vC = /*@__PURE__*/ new Vector3();
+const _vD = /*@__PURE__*/ new Vector3();
+
 class Frustum {
 
 	constructor( p0 = new Plane(), p1 = new Plane(), p2 = new Plane(), p3 = new Plane(), p4 = new Plane(), p5 = new Plane() ) {
@@ -74,13 +79,11 @@ class Frustum {
 
 	}
 
-	intersectsSprite( sprite ) {
+	intersectsSprite( sprite, camera ) {
 
-		_sphere.center.set( 0, 0, 0 );
-		_sphere.radius = 0.7071067811865476;
-		_sphere.applyMatrix4( sprite.matrixWorld );
-
-		return this.intersectsSphere( _sphere );
+		sprite.getWorldPoints(camera, _vA, _vB, _vC, _vD);
+		_sphere.setFromPoints([_vA, _vB, _vC, _vD]);
+		return this.intersectsSphere(_sphere);
 
 	}
 
