@@ -4,6 +4,7 @@ import { Frustum } from '../../../../src/math/Frustum.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
 import { Plane } from '../../../../src/math/Plane.js';
 import { Sprite } from '../../../../src/objects/Sprite.js';
+import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Box3 } from '../../../../src/math/Box3.js';
@@ -214,19 +215,19 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'intersectsSprite', ( assert ) => {
-
-			var m = new Matrix4().makePerspective( - 1, 1, 1, - 1, 1, 100 );
-			var a = new Frustum().setFromProjectionMatrix( m );
+			var camera = new PerspectiveCamera(50, 1, 1, 100);
+			camera.updateProjectionMatrix();
+			var a = new Frustum().setFromProjectionMatrix(camera.projectionMatrix );
 			var sprite = new Sprite();
 			var intersects;
 
-			intersects = a.intersectsSprite( sprite );
+			intersects = a.intersectsSprite( sprite, camera );
 			assert.notOk( intersects, 'No intersection' );
 
 			sprite.position.set( - 1, - 1, - 1 );
 			sprite.updateMatrixWorld();
 
-			intersects = a.intersectsSprite( sprite );
+			intersects = a.intersectsSprite( sprite, camera );
 			assert.ok( intersects, 'Successful intersection' );
 
 		} );
