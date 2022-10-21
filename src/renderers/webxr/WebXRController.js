@@ -90,23 +90,6 @@ class WebXRController {
 
 	}
 
-	getHandJoint( hand, inputjoint ) {
-
-		if ( hand.joints[ inputjoint.jointName ] === undefined ) {
-
-			const joint = new Group();
-			joint.matrixAutoUpdate = false;
-			joint.visible = false;
-			hand.joints[ inputjoint.jointName ] = joint;
-
-			hand.add( joint );
-
-		}
-
-		return hand.joints[ inputjoint.jointName ];
-
-	}
-
 	connect( inputSource ) {
 
 		if ( inputSource && inputSource.hand ) {
@@ -118,7 +101,7 @@ class WebXRController {
 				for ( const inputjoint of inputSource.hand.values() ) {
 
 					// Initialize hand with joints when connected
-					this.getHandJoint( hand, inputjoint );
+					this._getHandJoint( hand, inputjoint );
 
 				}
 
@@ -180,7 +163,7 @@ class WebXRController {
 					const jointPose = frame.getJointPose( inputjoint, referenceSpace );
 
 					// The transform of this joint will be updated with the joint pose on each frame
-					const joint = this.getHandJoint( hand, inputjoint );
+					const joint = this._getHandJoint( hand, inputjoint );
 
 					if ( jointPose !== null ) {
 
@@ -329,6 +312,25 @@ class WebXRController {
 		}
 
 		return this;
+
+	}
+
+	// private method
+
+	_getHandJoint( hand, inputjoint ) {
+
+		if ( hand.joints[ inputjoint.jointName ] === undefined ) {
+
+			const joint = new Group();
+			joint.matrixAutoUpdate = false;
+			joint.visible = false;
+			hand.joints[ inputjoint.jointName ] = joint;
+
+			hand.add( joint );
+
+		}
+
+		return hand.joints[ inputjoint.jointName ];
 
 	}
 
