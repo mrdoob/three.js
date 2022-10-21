@@ -364,7 +364,7 @@ class WebXRManager extends EventDispatcher {
 				if ( index >= 0 ) {
 
 					controllerInputSources[ index ] = null;
-					controllers[ index ].dispatchEvent( { type: 'disconnected', data: inputSource } );
+					controllers[ index ].disconnect( inputSource );
 
 				}
 
@@ -410,7 +410,7 @@ class WebXRManager extends EventDispatcher {
 
 				if ( controller ) {
 
-					controller.dispatchEvent( { type: 'connected', data: inputSource } );
+					controller.connect( inputSource );
 
 				}
 
