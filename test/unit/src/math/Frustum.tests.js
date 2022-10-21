@@ -4,7 +4,7 @@ import { Frustum } from '../../../../src/math/Frustum.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
 import { Plane } from '../../../../src/math/Plane.js';
 import { Sprite } from '../../../../src/objects/Sprite.js';
-import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera';
+import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Box3 } from '../../../../src/math/Box3.js';
