@@ -367,6 +367,28 @@ function mergeBufferAttributes( attributes ) {
 }
 
 /**
+ * @param {BufferAttribute}
+ * @return {BufferAttribute}
+ */
+export function deepCloneAttribute( attribute ) {
+
+	if ( attribute.isInstancedInterleavedBufferAttribute || attribute.isInterleavedBufferAttribute ) {
+
+		return deinterleaveAttribute( attribute );
+
+	}
+
+	if ( attribute.isInstancedBufferAttribute ) {
+
+		return new InstancedBufferAttribute().copy( attribute );
+
+	}
+
+	return new BufferAttribute().copy( attribute );
+
+}
+
+/**
  * @param {Array<BufferAttribute>} attributes
  * @return {Array<InterleavedBufferAttribute>}
  */
