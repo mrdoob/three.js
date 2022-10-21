@@ -106,6 +106,7 @@ import uv2_vertex from './ShaderChunk/uv2_vertex.glsl.js';
 import worldpos_vertex from './ShaderChunk/worldpos_vertex.glsl.js';
 
 import * as background from './ShaderLib/background.glsl.js';
+import * as backgroundCube from './ShaderLib/backgroundCube.glsl.js';
 import * as cube from './ShaderLib/cube.glsl.js';
 import * as depth from './ShaderLib/depth.glsl.js';
 import * as distanceRGBA from './ShaderLib/distanceRGBA.glsl.js';
@@ -232,6 +233,8 @@ export const ShaderChunk = {
 
 	background_vert: background.vertex,
 	background_frag: background.fragment,
+	backgroundCube_vert: backgroundCube.vertex,
+	backgroundCube_frag: backgroundCube.fragment,
 	cube_vert: cube.vertex,
 	cube_frag: cube.fragment,
 	depth_vert: depth.vertex,

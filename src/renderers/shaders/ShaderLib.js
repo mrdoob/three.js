@@ -225,6 +225,21 @@ const ShaderLib = {
 
 	},
 
+	backgroundCube: {
+
+		uniforms: /*@__PURE__*/ mergeUniforms( [
+			UniformsLib.envmap,
+			{
+				backgroundBlurriness: { value: 0 },
+				opacity: { value: 1.0 }
+			}
+		] ),
+
+		vertexShader: ShaderChunk.backgroundCube_vert,
+		fragmentShader: ShaderChunk.backgroundCube_frag
+
+	},
+
 	cube: {
 
 		uniforms: {
