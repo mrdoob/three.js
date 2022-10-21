@@ -511,15 +511,31 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getVaryings( /* shaderStage */ ) {
+	getVaryings( shaderStage ) {
 
 		let snippet = '';
 
 		const varyings = this.varyings;
 
-		for ( const varying of varyings ) {
+		if ( shaderStage === 'vertex' ) {
 
-			snippet += `varying ${varying.type} ${varying.name}; `;
+			for ( const varying of varyings ) {
+
+				snippet += `${varying.needsInterpolation ? 'varying' : '/*varying*/'} ${varying.type} ${varying.name}; `;
+
+			}
+
+		} else if ( shaderStage === 'fragment' ) {
+
+			for ( const varying of varyings ) {
+
+				if ( varying.needsInterpolation ) {
+
+					snippet += `varying ${varying.type} ${varying.name}; `;
+
+				}
+
+			}
 
 		}
 
@@ -702,7 +718,7 @@ ${this.shader[ getShaderStageProperty( shaderStage ) ]}
 			this.addCode(
 				shaderStage,
 				'main() {',
-				this.flowCode[ shaderStage ]
+				'\n\t' + this.flowCode[ shaderStage ]
 			);
 
 		}

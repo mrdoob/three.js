@@ -12,7 +12,7 @@ class Node {
 
 		this.nodeType = nodeType;
 
-		this.updateType = NodeUpdateType.None;
+		this.updateType = NodeUpdateType.NONE;
 
 		this.uuid = MathUtils.generateUUID();
 
