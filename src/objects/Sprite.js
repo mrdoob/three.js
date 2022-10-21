@@ -73,7 +73,7 @@ class Sprite extends Object3D {
 
 		_worldScale.setFromMatrixScale( this.matrixWorld );
 
-		this.getWorldPoints( raycaster.camera, _vA, _vB, _vC, _vD);
+		this.getWorldPoints( raycaster.camera, _vA, _vB, _vC, _vD );
 
 		_uvA.set( 0, 0 );
 		_uvB.set( 1, 0 );
@@ -90,6 +90,7 @@ class Sprite extends Object3D {
 		let intersect = raycaster.ray.intersectTriangle( _vA, _vB, _vC, false, _intersectPoint );
 
 		if ( intersect === null ) {
+
 			// check second triangle, A-C-D
 			intersectABC = false;
 			_uvB.set( 0, 1 );
@@ -111,7 +112,7 @@ class Sprite extends Object3D {
 
 			distance: distance,
 			point: _intersectPoint.clone(),
-			uv: Triangle.getUV(_intersectPoint, _vA, intersectABC ? _vB: _vD, _vC, _uvA, _uvB, _uvC, new Vector2() ),
+			uv: Triangle.getUV( _intersectPoint, _vA, intersectABC ? _vB : _vD, _vC, _uvA, _uvB, _uvC, new Vector2() ),
 			face: null,
 			object: this
 
@@ -121,35 +122,35 @@ class Sprite extends Object3D {
 
 	getWorldPoints( camera, vA, vB, vC, vD ) {
 
-		_worldScale.setFromMatrixScale(this.matrixWorld);
+		_worldScale.setFromMatrixScale( this.matrixWorld );
 
-		_viewWorldMatrix.copy(camera.matrixWorld);
-		this.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, this.matrixWorld);
+		_viewWorldMatrix.copy( camera.matrixWorld );
+		this.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
 
-		_mvPosition.setFromMatrixPosition(this.modelViewMatrix);
+		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
 
-		if (camera.isPerspectiveCamera && this.material.sizeAttenuation === false) {
+		if ( camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
 
-			_worldScale.multiplyScalar(- _mvPosition.z);
+			_worldScale.multiplyScalar( - _mvPosition.z );
 
 		}
 
 		const rotation = this.material.rotation;
 		let sin, cos;
 
-		if (rotation !== 0) {
+		if ( rotation !== 0 ) {
 
-			cos = Math.cos(rotation);
-			sin = Math.sin(rotation);
+			cos = Math.cos( rotation );
+			sin = Math.sin( rotation );
 
 		}
 
 		const center = this.center;
 
-		transformVertex(vA.set(- 0.5, - 0.5, 0), _mvPosition, center, _worldScale, sin, cos);
-		transformVertex(vB.set(0.5, - 0.5, 0), _mvPosition, center, _worldScale, sin, cos);
-		transformVertex(vC.set(0.5, 0.5, 0), _mvPosition, center, _worldScale, sin, cos);
-		transformVertex(vD.set(- 0.5, 0.5, 0), _mvPosition, center, _worldScale, sin, cos);
+		transformVertex( vA.set( - 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( vB.set( 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( vC.set( 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( vD.set( - 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
 
 	}
 

@@ -81,9 +81,9 @@ class Frustum {
 
 	intersectsSprite( sprite, camera ) {
 
-		sprite.getWorldPoints(camera, _vA, _vB, _vC, _vD);
-		_sphere.setFromPoints([_vA, _vB, _vC, _vD]);
-		return this.intersectsSphere(_sphere);
+		sprite.getWorldPoints( camera, _vA, _vB, _vC, _vD );
+		_sphere.setFromPoints( [ _vA, _vB, _vC, _vD ] );
+		return this.intersectsSphere( _sphere );
 
 	}
 
