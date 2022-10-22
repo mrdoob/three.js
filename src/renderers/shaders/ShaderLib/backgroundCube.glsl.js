@@ -16,9 +16,20 @@ void main() {
 `;
 
 export const fragment = /* glsl */`
-#include <envmap_common_pars_fragment>
-uniform float backgroundBlurriness;
+
+#ifdef ENVMAP_TYPE_CUBE
+
+	uniform samplerCube envMap;
+
+#elif defined( ENVMAP_TYPE_CUBE_UV )
+
+	uniform sampler2D envMap;
+
+#endif
+
+uniform float flipEnvMap;
 uniform float opacity;
+uniform float backgroundBlurriness;
 
 varying vec3 vWorldDirection;
 
@@ -28,19 +39,19 @@ void main() {
 
 	#ifdef ENVMAP_TYPE_CUBE
 
-		vec4 envColor = textureCube( envMap, vec3( flipEnvMap * vWorldDirection.x, vWorldDirection.yz ) );
+		vec4 texColor = textureCube( envMap, vec3( flipEnvMap * vWorldDirection.x, vWorldDirection.yz ) );
 
 	#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-		vec4 envColor = textureCubeUV( envMap, vWorldDirection, backgroundBlurriness );
+		vec4 texColor = textureCubeUV( envMap, vWorldDirection, backgroundBlurriness );
 
 	#else
 
-		vec4 envColor = vec4( 0.0 );
+		vec4 texColor = vec4( 0.0 );
 
 	#endif
 
-	gl_FragColor = envColor;
+	gl_FragColor = texColor;
 	gl_FragColor.a *= opacity;
 
 	#include <tonemapping_fragment>
