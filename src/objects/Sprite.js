@@ -120,6 +120,37 @@ class Sprite extends Object3D {
 
 	}
 
+	getBoundingSphere( camera, sphere ) {
+
+		_worldScale.setFromMatrixScale( this.matrixWorld );
+
+		_viewWorldMatrix.copy( camera.matrixWorld );
+		this.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
+
+		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
+
+		if ( camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
+
+			_worldScale.multiplyScalar( - _mvPosition.z );
+
+		}
+
+		const rotation = this.material.rotation;
+		let sin, cos;
+
+		if ( rotation !== 0 ) {
+
+			cos = Math.cos( rotation );
+			sin = Math.sin( rotation );
+
+		}
+
+		const center = this.center;
+		transformVertex( sphere.center.set( 0, 0, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		sphere.radius = Math.max( _worldScale.x, _worldScale.y, _worldScale.z ) * 0.7071067811865476;
+
+	}
+
 	getWorldPoints( camera, vA, vB, vC, vD ) {
 
 		_worldScale.setFromMatrixScale( this.matrixWorld );
