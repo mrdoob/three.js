@@ -21,7 +21,6 @@ const _viewWorldMatrix = /*@__PURE__*/ new Matrix4();
 const _vA = /*@__PURE__*/ new Vector3();
 const _vB = /*@__PURE__*/ new Vector3();
 const _vC = /*@__PURE__*/ new Vector3();
-const _vD = /*@__PURE__*/ new Vector3();
 
 const _uvA = /*@__PURE__*/ new Vector2();
 const _uvB = /*@__PURE__*/ new Vector2();
@@ -73,29 +72,47 @@ class Sprite extends Object3D {
 
 		_worldScale.setFromMatrixScale( this.matrixWorld );
 
-		this.getWorldPoints( raycaster.camera, _vA, _vB, _vC, _vD );
+		_viewWorldMatrix.copy( raycaster.camera.matrixWorld );
+		this.modelViewMatrix.multiplyMatrices( raycaster.camera.matrixWorldInverse, this.matrixWorld );
+
+		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
+
+		if ( raycaster.camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
+
+			_worldScale.multiplyScalar( - _mvPosition.z );
+
+		}
+
+		const rotation = this.material.rotation;
+		let sin, cos;
+
+		if ( rotation !== 0 ) {
+
+			cos = Math.cos( rotation );
+			sin = Math.sin( rotation );
+
+		}
+
+		const center = this.center;
+
+		transformVertex( _vA.set( - 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( _vB.set( 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
+		transformVertex( _vC.set( 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
 
 		_uvA.set( 0, 0 );
 		_uvB.set( 1, 0 );
 		_uvC.set( 1, 1 );
 
-		/**
-		 * The sprite points
-		 * D - - C
-		 * |  /  |
-		 * A - - B
-		 */
-		let intersectABC = true;
-		// check first triangle, A-B-C
+		// check first triangle
 		let intersect = raycaster.ray.intersectTriangle( _vA, _vB, _vC, false, _intersectPoint );
 
 		if ( intersect === null ) {
 
-			// check second triangle, A-C-D
-			intersectABC = false;
+			// check second triangle
+			transformVertex( _vB.set( - 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
 			_uvB.set( 0, 1 );
 
-			intersect = raycaster.ray.intersectTriangle( _vA, _vC, _vD, false, _intersectPoint );
+			intersect = raycaster.ray.intersectTriangle( _vA, _vC, _vB, false, _intersectPoint );
 			if ( intersect === null ) {
 
 				return;
@@ -112,11 +129,23 @@ class Sprite extends Object3D {
 
 			distance: distance,
 			point: _intersectPoint.clone(),
-			uv: Triangle.getUV( _intersectPoint, _vA, intersectABC ? _vB : _vD, _vC, _uvA, _uvB, _uvC, new Vector2() ),
+			uv: Triangle.getUV( _intersectPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() ),
 			face: null,
 			object: this
 
 		} );
+
+	}
+
+	copy( source, recursive ) {
+
+		super.copy( source, recursive );
+
+		if ( source.center !== undefined ) this.center.copy( source.center );
+
+		this.material = source.material;
+
+		return this;
 
 	}
 
@@ -148,52 +177,6 @@ class Sprite extends Object3D {
 		const center = this.center;
 		transformVertex( sphere.center.set( 0, 0, 0 ), _mvPosition, center, _worldScale, sin, cos );
 		sphere.radius = Math.max( _worldScale.x, _worldScale.y, _worldScale.z ) * 0.7071067811865476;
-
-	}
-
-	getWorldPoints( camera, vA, vB, vC, vD ) {
-
-		_worldScale.setFromMatrixScale( this.matrixWorld );
-
-		_viewWorldMatrix.copy( camera.matrixWorld );
-		this.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, this.matrixWorld );
-
-		_mvPosition.setFromMatrixPosition( this.modelViewMatrix );
-
-		if ( camera.isPerspectiveCamera && this.material.sizeAttenuation === false ) {
-
-			_worldScale.multiplyScalar( - _mvPosition.z );
-
-		}
-
-		const rotation = this.material.rotation;
-		let sin, cos;
-
-		if ( rotation !== 0 ) {
-
-			cos = Math.cos( rotation );
-			sin = Math.sin( rotation );
-
-		}
-
-		const center = this.center;
-
-		transformVertex( vA.set( - 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-		transformVertex( vB.set( 0.5, - 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-		transformVertex( vC.set( 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-		transformVertex( vD.set( - 0.5, 0.5, 0 ), _mvPosition, center, _worldScale, sin, cos );
-
-	}
-
-	copy( source, recursive ) {
-
-		super.copy( source, recursive );
-
-		if ( source.center !== undefined ) this.center.copy( source.center );
-
-		this.material = source.material;
-
-		return this;
 
 	}
 
