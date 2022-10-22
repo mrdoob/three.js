@@ -4,10 +4,9 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
-		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
 	</head>
 	<body>
+
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sandbox
 		</div>
@@ -18,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -26,20 +26,20 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer;
 
 			let box;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -168,7 +168,7 @@
 				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
 
 				const materialLine = new Nodes.LineBasicNodeMaterial();
-				materialLine.colorNode = new Nodes.AttributeNode( 'color', 'vec3' );
+				materialLine.colorNode = new Nodes.AttributeNode( 'color' );
 
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 2, 1, 0 );
@@ -179,11 +179,10 @@
 				renderer = new WebGPURenderer( { requiredFeatures: [ 'texture-compression-bc' ] } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 
@@ -197,8 +196,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;
@@ -235,12 +232,6 @@
 				const texture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
 				texture.needsUpdate = true;
 				return texture;
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

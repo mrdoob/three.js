@@ -8,7 +8,8 @@
 			if ( THREE.DigitalGlitch === undefined ) console.error( 'THREE.GlitchPass relies on THREE.DigitalGlitch' );
 			const shader = THREE.DigitalGlitch;
 			this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-			this.uniforms[ 'tDisp' ].value = this.generateHeightmap( dt_size );
+			this.heightMap = this.generateHeightmap( dt_size );
+			this.uniforms[ 'tDisp' ].value = this.heightMap;
 			this.material = new THREE.ShaderMaterial( {
 				uniforms: this.uniforms,
 				vertexShader: shader.vertexShader,
@@ -20,17 +21,12 @@
 			this.generateTrigger();
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive */
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 			if ( renderer.capabilities.isWebGL2 === false ) this.uniforms[ 'tDisp' ].value.format = THREE.LuminanceFormat;
 			this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 			this.uniforms[ 'seed' ].value = Math.random(); //default seeding
-
 			this.uniforms[ 'byp' ].value = 0;
-
 			if ( this.curF % this.randX == 0 || this.goWild == true ) {
 
 				this.uniforms[ 'amount' ].value = Math.random() / 30;
@@ -58,7 +54,6 @@
 			}
 
 			this.curF ++;
-
 			if ( this.renderToScreen ) {
 
 				renderer.setRenderTarget( null );
@@ -73,18 +68,15 @@
 			}
 
 		}
-
 		generateTrigger() {
 
 			this.randX = THREE.MathUtils.randInt( 120, 240 );
 
 		}
-
 		generateHeightmap( dt_size ) {
 
 			const data_arr = new Float32Array( dt_size * dt_size );
 			const length = dt_size * dt_size;
-
 			for ( let i = 0; i < length; i ++ ) {
 
 				const val = THREE.MathUtils.randFloat( 0, 1 );
@@ -95,6 +87,13 @@
 			const texture = new THREE.DataTexture( data_arr, dt_size, dt_size, THREE.RedFormat, THREE.FloatType );
 			texture.needsUpdate = true;
 			return texture;
+
+		}
+		dispose() {
+
+			this.material.dispose();
+			this.heightMap.dispose();
+			this.fsQuad.dispose();
 
 		}
 

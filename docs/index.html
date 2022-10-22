@@ -36,6 +36,9 @@
 						<option value="ko">한국어</option>
 						<option value="zh">中文</option>
 						<option value="ja">日本語</option>
+						<option value="it">it</option>
+						<option value="pt-br">pt-br</option>
+						<option value="fr">fr</option>
 					</select>
 				</div>
 				<div id="content"></div>
@@ -86,7 +89,7 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja|it|pt-br|fr)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 
@@ -321,7 +324,7 @@
 
 		}
 
-		// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
+		// Auto change language url. If a reader open a document in English, when they click "zh", the document they read will auto change into Chinese version
 
 		function autoChangeUrlLanguage( language ) {
 

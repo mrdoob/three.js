@@ -9,6 +9,8 @@ class MeshToonMaterial extends Material {
 
 		super();
 
+		this.isMeshToonMaterial = true;
+
 		this.defines = { 'TOON': '' };
 
 		this.type = 'MeshToonMaterial';
@@ -45,6 +47,8 @@ class MeshToonMaterial extends Material {
 		this.wireframeLinewidth = 1;
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -87,12 +91,12 @@ class MeshToonMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-MeshToonMaterial.prototype.isMeshToonMaterial = true;
 
 export { MeshToonMaterial };

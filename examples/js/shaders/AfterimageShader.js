@@ -5,6 +5,7 @@
  * I created this effect inspired by a demo on codepen:
  * https://codepen.io/brunoimbrizi/pen/MoRJaN?page=1&
  */
+
 	const AfterimageShader = {
 		uniforms: {
 			'damp': {
@@ -17,9 +18,7 @@
 				value: null
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -29,9 +28,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform float damp;
 

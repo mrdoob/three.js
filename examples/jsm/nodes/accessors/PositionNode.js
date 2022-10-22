@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
-import VaryNode from '../core/VaryNode.js';
+import VaryingNode from '../core/VaryingNode.js';
 import ModelNode from '../accessors/ModelNode.js';
 import MathNode from '../math/MathNode.js';
 import OperatorNode from '../math/OperatorNode.js';
@@ -39,22 +39,22 @@ class PositionNode extends Node {
 
 		} else if ( scope === PositionNode.LOCAL ) {
 
-			outputNode = new VaryNode( new PositionNode( PositionNode.GEOMETRY ) );
+			outputNode = new VaryingNode( new PositionNode( PositionNode.GEOMETRY ) );
 
 		} else if ( scope === PositionNode.WORLD ) {
 
 			const vertexPositionNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new ModelNode( ModelNode.WORLD_MATRIX ), new PositionNode( PositionNode.LOCAL ) );
-			outputNode = new VaryNode( vertexPositionNode );
+			outputNode = new VaryingNode( vertexPositionNode );
 
 		} else if ( scope === PositionNode.VIEW ) {
 
 			const vertexPositionNode = new OperatorNode( '*', new ModelNode( ModelNode.VIEW_MATRIX ), new PositionNode( PositionNode.LOCAL ) );
-			outputNode = new VaryNode( vertexPositionNode );
+			outputNode = new VaryingNode( vertexPositionNode );
 
 		} else if ( scope === PositionNode.VIEW_DIRECTION ) {
 
 			const vertexPositionNode = new MathNode( MathNode.NEGATE, new PositionNode( PositionNode.VIEW ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryNode( vertexPositionNode ) );
+			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexPositionNode ) );
 
 		}
 

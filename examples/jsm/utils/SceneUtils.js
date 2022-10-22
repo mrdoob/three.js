@@ -1,11 +1,16 @@
 import {
-	Group,
-	Mesh,
 	BufferAttribute,
-	BufferGeometry
+	BufferGeometry,
+	Color,
+	Group,
+	Matrix4,
+	Mesh
 } from 'three';
 
-import { mergeGroups } from './BufferGeometryUtils.js';
+import { mergeGroups, deepCloneAttribute } from './BufferGeometryUtils.js';
+
+const _color = /*@__PURE__*/new Color();
+const _matrix = /*@__PURE__*/new Matrix4();
 
 function createMeshesFromInstancedMesh( instancedMesh ) {
 
@@ -118,28 +123,81 @@ function createMultiMaterialObject( geometry, materials ) {
 
 }
 
-function detach( child, parent, scene ) {
+/**
+ * @param {InstancedMesh}
+ * @param {function(int, int):int}
+ */
+function sortInstancedMesh( mesh, compareFn ) {
 
-	console.warn( 'THREE.SceneUtils: detach() has been deprecated. Use scene.attach( child ) instead.' );
+	// store copy of instanced attributes for lookups
 
-	scene.attach( child );
+	const instanceMatrixRef = deepCloneAttribute( mesh.instanceMatrix );
+	const instanceColorRef = mesh.instanceColor ? deepCloneAttribute( mesh.instanceColor ) : null;
+
+	const attributeRefs = new Map();
+
+	for ( const name in mesh.geometry.attributes ) {
+
+		const attribute = mesh.geometry.attributes[ name ];
+
+		if ( attribute.isInstancedBufferAttribute ) {
+
+			attributeRefs.set( attribute, deepCloneAttribute( attribute ) );
+
+		}
+
+	}
+
+
+	// compute sort order
+
+	const tokens = [];
+
+	for ( let i = 0; i < mesh.count; i ++ ) tokens.push( i );
+
+	tokens.sort( compareFn );
+
+
+	// apply sort order
+
+	for ( let i = 0; i < tokens.length; i ++ ) {
+
+		const refIndex = tokens[ i ];
+
+		_matrix.fromArray( instanceMatrixRef.array, refIndex * mesh.instanceMatrix.itemSize );
+		_matrix.toArray( mesh.instanceMatrix.array, i * mesh.instanceMatrix.itemSize );
+
+		if ( mesh.instanceColor ) {
+
+			_color.fromArray( instanceColorRef.array, refIndex * mesh.instanceColor.itemSize );
+			_color.toArray( mesh.instanceColor.array, i * mesh.instanceColor.itemSize );
+
+		}
+
+		for ( const name in mesh.geometry.attributes ) {
+
+			const attribute = mesh.geometry.attributes[ name ];
+
+			if ( attribute.isInstancedBufferAttribute ) {
+
+				const attributeRef = attributeRefs.get( attribute );
+
+				attribute.setX( i, attributeRef.getX( refIndex ) );
+				if ( attribute.itemSize > 1 ) attribute.setY( i, attributeRef.getY( refIndex ) );
+				if ( attribute.itemSize > 2 ) attribute.setZ( i, attributeRef.getZ( refIndex ) );
+				if ( attribute.itemSize > 3 ) attribute.setW( i, attributeRef.getW( refIndex ) );
+
+			}
+
+		}
+
+	}
 
 }
-
-function attach( child, scene, parent ) {
-
-	console.warn( 'THREE.SceneUtils: attach() has been deprecated. Use parent.attach( child ) instead.' );
-
-	parent.attach( child );
-
-}
-
-
 
 export {
 	createMeshesFromInstancedMesh,
 	createMeshesFromMultiMaterialMesh,
 	createMultiMaterialObject,
-	detach,
-	attach,
+	sortInstancedMesh
 };

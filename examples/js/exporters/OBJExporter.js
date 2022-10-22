@@ -13,7 +13,6 @@
 			const normal = new THREE.Vector3();
 			const uv = new THREE.Vector2();
 			const face = [];
-
 			function parseMesh( mesh ) {
 
 				let nbVertex = 0;
@@ -22,71 +21,75 @@
 				const geometry = mesh.geometry;
 				const normalMatrixWorld = new THREE.Matrix3();
 
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				} // shortcuts
-
-
+				// shortcuts
 				const vertices = geometry.getAttribute( 'position' );
 				const normals = geometry.getAttribute( 'normal' );
 				const uvs = geometry.getAttribute( 'uv' );
-				const indices = geometry.getIndex(); // name of the mesh object
+				const indices = geometry.getIndex();
 
-				output += 'o ' + mesh.name + '\n'; // name of the mesh material
+				// name of the mesh object
+				output += 'o ' + mesh.name + '\n';
 
+				// name of the mesh material
 				if ( mesh.material && mesh.material.name ) {
 
 					output += 'usemtl ' + mesh.material.name + '\n';
 
-				} // vertices
+				}
 
+				// vertices
 
 				if ( vertices !== undefined ) {
 
 					for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-						vertex.fromBufferAttribute( vertices, i ); // transform the vertex to world space
+						vertex.fromBufferAttribute( vertices, i );
 
-						vertex.applyMatrix4( mesh.matrixWorld ); // transform the vertex to export format
+						// transform the vertex to world space
+						vertex.applyMatrix4( mesh.matrixWorld );
 
+						// transform the vertex to export format
 						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
 
 					}
 
-				} // uvs
+				}
 
+				// uvs
 
 				if ( uvs !== undefined ) {
 
 					for ( let i = 0, l = uvs.count; i < l; i ++, nbVertexUvs ++ ) {
 
-						uv.fromBufferAttribute( uvs, i ); // transform the uv to export format
+						uv.fromBufferAttribute( uvs, i );
 
+						// transform the uv to export format
 						output += 'vt ' + uv.x + ' ' + uv.y + '\n';
 
 					}
 
-				} // normals
+				}
 
+				// normals
 
 				if ( normals !== undefined ) {
 
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
-
 					for ( let i = 0, l = normals.count; i < l; i ++, nbNormals ++ ) {
 
-						normal.fromBufferAttribute( normals, i ); // transform the normal to world space
+						normal.fromBufferAttribute( normals, i );
 
-						normal.applyMatrix3( normalMatrixWorld ).normalize(); // transform the normal to export format
+						// transform the normal to world space
+						normal.applyMatrix3( normalMatrixWorld ).normalize();
 
+						// transform the normal to export format
 						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
 
 					}
 
-				} // faces
+				}
 
+				// faces
 
 				if ( indices !== null ) {
 
@@ -97,9 +100,9 @@
 							const j = indices.getX( i + m ) + 1;
 							face[ m ] = indexVertex + j + ( normals || uvs ? '/' + ( uvs ? indexVertexUvs + j : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
 
-						} // transform the face to export format
+						}
 
-
+						// transform the face to export format
 						output += 'f ' + face.join( ' ' ) + '\n';
 
 					}
@@ -113,16 +116,16 @@
 							const j = i + m + 1;
 							face[ m ] = indexVertex + j + ( normals || uvs ? '/' + ( uvs ? indexVertexUvs + j : '' ) + ( normals ? '/' + ( indexNormals + j ) : '' ) : '' );
 
-						} // transform the face to export format
+						}
 
-
+						// transform the face to export format
 						output += 'f ' + face.join( ' ' ) + '\n';
 
 					}
 
-				} // update index
+				}
 
-
+				// update index
 				indexVertex += nbVertex;
 				indexVertexUvs += nbVertexUvs;
 				indexNormals += nbNormals;
@@ -135,25 +138,21 @@
 				const geometry = line.geometry;
 				const type = line.type;
 
-				if ( geometry.isBufferGeometry !== true ) {
+				// shortcuts
+				const vertices = geometry.getAttribute( 'position' );
 
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				} // shortcuts
-
-
-				const vertices = geometry.getAttribute( 'position' ); // name of the line object
-
+				// name of the line object
 				output += 'o ' + line.name + '\n';
-
 				if ( vertices !== undefined ) {
 
 					for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
 
-						vertex.fromBufferAttribute( vertices, i ); // transform the vertex to world space
+						vertex.fromBufferAttribute( vertices, i );
 
-						vertex.applyMatrix4( line.matrixWorld ); // transform the vertex to export format
+						// transform the vertex to world space
+						vertex.applyMatrix4( line.matrixWorld );
 
+						// transform the vertex to export format
 						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z + '\n';
 
 					}
@@ -163,7 +162,6 @@
 				if ( type === 'Line' ) {
 
 					output += 'l ';
-
 					for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
 
 						output += indexVertex + j + ' ';
@@ -182,9 +180,9 @@
 
 					}
 
-				} // update index
+				}
 
-
+				// update index
 				indexVertex += nbVertex;
 
 			}
@@ -193,17 +191,9 @@
 
 				let nbVertex = 0;
 				const geometry = points.geometry;
-
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.OBJExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				}
-
 				const vertices = geometry.getAttribute( 'position' );
 				const colors = geometry.getAttribute( 'color' );
 				output += 'o ' + points.name + '\n';
-
 				if ( vertices !== undefined ) {
 
 					for ( let i = 0, l = vertices.count; i < l; i ++, nbVertex ++ ) {
@@ -211,7 +201,6 @@
 						vertex.fromBufferAttribute( vertices, i );
 						vertex.applyMatrix4( points.matrixWorld );
 						output += 'v ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z;
-
 						if ( colors !== undefined ) {
 
 							color.fromBufferAttribute( colors, i ).convertLinearToSRGB();
@@ -224,7 +213,6 @@
 					}
 
 					output += 'p ';
-
 					for ( let j = 1, l = vertices.count; j <= l; j ++ ) {
 
 						output += indexVertex + j + ' ';
@@ -233,9 +221,9 @@
 
 					output += '\n';
 
-				} // update index
+				}
 
-
+				// update index
 				indexVertex += nbVertex;
 
 			}

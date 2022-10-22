@@ -9,6 +9,8 @@ class MeshStandardMaterial extends Material {
 
 		super();
 
+		this.isMeshStandardMaterial = true;
+
 		this.defines = { 'STANDARD': '' };
 
 		this.type = 'MeshStandardMaterial';
@@ -55,6 +57,8 @@ class MeshStandardMaterial extends Material {
 		this.wireframeLinejoin = 'round';
 
 		this.flatShading = false;
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -109,12 +113,12 @@ class MeshStandardMaterial extends Material {
 
 		this.flatShading = source.flatShading;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
 export { MeshStandardMaterial };

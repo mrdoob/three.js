@@ -73,6 +73,9 @@
 		<h3>[property:Texture envMap]</h3>
 		<p>环境贴图。默认值为null。</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认为*true*。</p>
+
 		<h3>[property:Texture lightMap]</h3>
 		<p>光照贴图。默认值为null。lightMap需要第二组UV。</p>
 
@@ -80,7 +83,10 @@
 		<p>烘焙光的强度。默认值为1。</p>
 
 		<h3>[property:Texture map]</h3>
-		<p> 颜色贴图。默认为null。</p>
+		<p>
+			颜色贴图。可以选择包括一个alpha通道，通常与[page:Material.transparent .transparent]
+			或[page:Material.alphaTest .alphaTest]。默认为null。
+		</p>
 
 		<h3>[property:Float reflectivity]</h3>
 		<p> 环境贴图对表面的影响程度; 见[page:.combine]。默认值为1，有效范围介于0（无反射）和1（完全反射）之间。

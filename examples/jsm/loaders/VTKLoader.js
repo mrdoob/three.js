@@ -910,7 +910,7 @@ class VTKLoader extends Loader {
 
 						let arr;
 
-						if ( Object.prototype.toString.call( section.DataArray ) === '[object Array]' ) {
+						if ( Array.isArray( section.DataArray ) ) {
 
 							arr = section.DataArray;
 

@@ -6,6 +6,8 @@ class ArrayUniformNode extends UniformNode {
 
 		super();
 
+		this.isArrayUniformNode = true;
+
 		this.nodes = nodes;
 
 	}
@@ -17,7 +19,5 @@ class ArrayUniformNode extends UniformNode {
 	}
 
 }
-
-ArrayUniformNode.prototype.isArrayUniformNode = true;
 
 export default ArrayUniformNode;

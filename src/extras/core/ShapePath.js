@@ -58,7 +58,7 @@ class ShapePath {
 
 	}
 
-	toShapes( isCCW, noHoles ) {
+	toShapes( isCCW ) {
 
 		function toShapesNoHoles( inSubpaths ) {
 
@@ -143,9 +143,6 @@ class ShapePath {
 
 		const subPaths = this.subPaths;
 		if ( subPaths.length === 0 ) return [];
-
-		if ( noHoles === true )	return	toShapesNoHoles( subPaths );
-
 
 		let solid, tmpPath, tmpShape;
 		const shapes = [];

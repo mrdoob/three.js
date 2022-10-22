@@ -73,6 +73,13 @@ class CubeTexturePass extends Pass {
 
 	}
 
+	dispose() {
+
+		this.cubeMesh.geometry.dispose();
+		this.cubeMesh.material.dispose();
+
+	}
+
 }
 
 export { CubeTexturePass };

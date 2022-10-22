@@ -10,44 +10,6 @@
 				background-color: #050505;
 				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%);
 			}
-
-			#topmenu {
-				position: absolute;
-				top: 50px;
-				width: 100%;
-				padding: 10px;
-				box-sizing: border-box;
-				text-align: center;
-			}
-
-			#menu {
-				position: absolute;
-				bottom: 20px;
-				width: 100%;
-				padding: 10px;
-				box-sizing: border-box;
-				text-align: center;
-			}
-
-			button {
-				color: rgb(255,255,255);
-				background: rgb(255,255,255,0.1);
-				border: 0px;
-				padding: 5px 10px;
-				margin: 2px;
-				font-size: 14px;
-				cursor: pointer;
-			}
-
-				button:hover {
-					background-color: rgba(0,255,255,0.5);
-				}
-
-				button:active {
-					color: #000000;
-					background-color: rgba(0,255,255,1);
-				}
-
 			.bond {
 				width: 5px;
 				height: 10px;
@@ -59,10 +21,6 @@
 	<body>
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - molecules</div>
-		<div id="topmenu">
-			<button id="b_a">Atoms</button><button id="b_b">Bonds</button><button id="b_ab">Atoms + Bonds</button>
-		</div>
-		<div id="menu"></div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
@@ -71,7 +29,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -80,9 +39,10 @@
 
 			import * as THREE from 'three';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
-			import { CSS3DRenderer, CSS3DObject, CSS3DSprite } from './jsm/renderers/CSS3DRenderer.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { PDBLoader } from 'three/addons/loaders/PDBLoader.js';
+			import { CSS3DRenderer, CSS3DObject, CSS3DSprite } from 'three/addons/renderers/CSS3DRenderer.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
 			let controls;
@@ -95,7 +55,11 @@
 			const tmpVec4 = new THREE.Vector3();
 			const offset = new THREE.Vector3();
 
-			let visualizationType = 2;
+			const VIZ_TYPE = {
+				'Atoms': 0,
+				'Bonds': 1,
+				'Atoms + Bonds': 2
+			};
 
 			const MOLECULES = {
 				'Ethanol': 'ethanol.pdb',
@@ -118,11 +82,14 @@
 				'Graphite': 'graphite.pdb'
 			};
 
+			const params = {
+				vizType: 2,
+				molecule: 'caffeine.pdb'
+			};
+
 			const loader = new PDBLoader();
 			const colorSpriteMap = {};
 			const baseSprite = document.createElement( 'img' );
-
-			const menu = document.getElementById( 'menu' );
 
 			init();
 			animate();
@@ -152,8 +119,7 @@
 
 				baseSprite.onload = function () {
 
-					loadMolecule( 'models/pdb/caffeine.pdb' );
-					createMenu();
+					loadMolecule( params.molecule );
 
 				};
 
@@ -163,56 +129,21 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-			}
+				//
 
-			//
+				const gui = new GUI();
 
-			function generateButtonCallback( url ) {
-
-				return function () {
-
-					loadMolecule( url );
-
-				};
+				gui.add( params, 'vizType', VIZ_TYPE ).onChange( changeVizType );
+				gui.add( params, 'molecule', MOLECULES ).onChange( loadMolecule );
+				gui.open();
 
 			}
 
-			function createMenu() {
+			function changeVizType( value ) {
 
-				for ( const m in MOLECULES ) {
-
-					const button = document.createElement( 'button' );
-					button.innerHTML = m;
-					menu.appendChild( button );
-
-					const url = 'models/pdb/' + MOLECULES[ m ];
-
-					button.addEventListener( 'click', generateButtonCallback( url ) );
-
-				}
-
-				const b_a = document.getElementById( 'b_a' );
-				const b_b = document.getElementById( 'b_b' );
-				const b_ab = document.getElementById( 'b_ab' );
-
-				b_a.addEventListener( 'click', function () {
-
-					visualizationType = 0;
-					showAtoms();
-
-				} );
-				b_b.addEventListener( 'click', function () {
-
-					visualizationType = 1;
-					showBonds();
-
-				} );
-				b_ab.addEventListener( 'click', function () {
-
-					visualizationType = 2;
-					showAtomsBonds();
-
-				} );
+				if ( value === 0 ) showAtoms();
+				else if ( value === 1 ) showBonds();
+				else showAtomsBonds();
 
 			}
 
@@ -322,7 +253,9 @@
 
 			//
 
-			function loadMolecule( url ) {
+			function loadMolecule( model ) {
+
+				const url = 'models/pdb/' + model;
 
 				for ( let i = 0; i < objects.length; i ++ ) {
 
@@ -471,19 +404,7 @@
 
 					//console.log( "CSS3DObjects:", objects.length );
 
-					switch ( visualizationType ) {
-
-						case 0:
-							showAtoms();
-							break;
-						case 1:
-							showBonds();
-							break;
-						case 2:
-							showAtomsBonds();
-							break;
-
-					}
+					changeVizType( params.vizType );
 
 				} );
 

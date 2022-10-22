@@ -1,4 +1,4 @@
-import { LinearEncoding, NoToneMapping } from '../constants.js';
+import { NoToneMapping } from '../constants.js';
 import { Object3D } from '../core/Object3D.js';
 import { Vector3 } from '../math/Vector3.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
@@ -12,13 +12,6 @@ class CubeCamera extends Object3D {
 		super();
 
 		this.type = 'CubeCamera';
-
-		if ( renderTarget.isWebGLCubeRenderTarget !== true ) {
-
-			console.error( 'THREE.CubeCamera: The constructor now expects an instance of WebGLCubeRenderTarget as third parameter.' );
-			return;
-
-		}
 
 		this.renderTarget = renderTarget;
 
@@ -70,11 +63,9 @@ class CubeCamera extends Object3D {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
-		const currentOutputEncoding = renderer.outputEncoding;
 		const currentToneMapping = renderer.toneMapping;
 		const currentXrEnabled = renderer.xr.enabled;
 
-		renderer.outputEncoding = LinearEncoding;
 		renderer.toneMapping = NoToneMapping;
 		renderer.xr.enabled = false;
 
@@ -104,7 +95,6 @@ class CubeCamera extends Object3D {
 
 		renderer.setRenderTarget( currentRenderTarget );
 
-		renderer.outputEncoding = currentOutputEncoding;
 		renderer.toneMapping = currentToneMapping;
 		renderer.xr.enabled = currentXrEnabled;
 

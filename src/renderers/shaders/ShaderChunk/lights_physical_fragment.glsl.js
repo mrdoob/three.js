@@ -11,6 +11,8 @@ material.roughness = min( material.roughness, 1.0 );
 
 #ifdef IOR
 
+	material.ior = ior;
+
 	#ifdef SPECULAR
 
 		float specularIntensityFactor = specularIntensity;
@@ -38,7 +40,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#endif
 
-	material.specularColor = mix( min( pow2( ( ior - 1.0 ) / ( ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
+	material.specularColor = mix( min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
 
 #else
 
@@ -70,6 +72,29 @@ material.roughness = min( material.roughness, 1.0 );
 	material.clearcoatRoughness = max( material.clearcoatRoughness, 0.0525 );
 	material.clearcoatRoughness += geometryRoughness;
 	material.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );
+
+#endif
+
+#ifdef USE_IRIDESCENCE
+
+	material.iridescence = iridescence;
+	material.iridescenceIOR = iridescenceIOR;
+
+	#ifdef USE_IRIDESCENCEMAP
+
+		material.iridescence *= texture2D( iridescenceMap, vUv ).r;
+
+	#endif
+
+	#ifdef USE_IRIDESCENCE_THICKNESSMAP
+
+		material.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vUv ).g + iridescenceThicknessMinimum;
+
+	#else
+
+		material.iridescenceThickness = iridescenceThicknessMaximum;
+
+	#endif
 
 #endif
 

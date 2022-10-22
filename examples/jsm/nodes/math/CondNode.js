@@ -4,11 +4,11 @@ import ContextNode from '../core/ContextNode.js';
 
 class CondNode extends Node {
 
-	constructor( node, ifNode, elseNode ) {
+	constructor( condNode, ifNode, elseNode ) {
 
 		super();
 
-		this.node = node;
+		this.condNode = condNode;
 
 		this.ifNode = ifNode;
 		this.elseNode = elseNode;
@@ -34,10 +34,10 @@ class CondNode extends Node {
 
 		const type = this.getNodeType( builder );
 
-		const context = { temp: false };
+		const context = { tempWrite: false };
 		const nodeProperty = new PropertyNode( null, type ).build( builder );
 
-		const nodeSnippet = new ContextNode( this.node/*, context*/ ).build( builder, 'bool' ),
+		const nodeSnippet = new ContextNode( this.condNode/*, context*/ ).build( builder, 'bool' ),
 			ifSnippet = new ContextNode( this.ifNode, context ).build( builder, type ),
 			elseSnippet = new ContextNode( this.elseNode, context ).build( builder, type );
 

@@ -1,33 +1,53 @@
+import NodeMaterial from './NodeMaterial.js';
 import LineBasicNodeMaterial from './LineBasicNodeMaterial.js';
 import MeshBasicNodeMaterial from './MeshBasicNodeMaterial.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
+import MeshPhysicalNodeMaterial from './MeshPhysicalNodeMaterial.js';
 import PointsNodeMaterial from './PointsNodeMaterial.js';
-import { Material } from 'three';
+import SpriteNodeMaterial from './SpriteNodeMaterial.js';
 
 export {
+	NodeMaterial,
 	LineBasicNodeMaterial,
 	MeshBasicNodeMaterial,
 	MeshStandardNodeMaterial,
-	PointsNodeMaterial
+	MeshPhysicalNodeMaterial,
+	PointsNodeMaterial,
+	SpriteNodeMaterial
 };
 
-const materialLib = {
-	LineBasicNodeMaterial,
-	MeshBasicNodeMaterial,
-	MeshStandardNodeMaterial,
-	PointsNodeMaterial
-};
+NodeMaterial.fromMaterial = function ( material ) {
 
-const fromTypeFunction = Material.fromType;
+	const materialLib = {
+		NodeMaterial,
+		LineBasicNodeMaterial,
+		MeshBasicNodeMaterial,
+		MeshStandardNodeMaterial,
+		MeshPhysicalNodeMaterial,
+		PointsNodeMaterial,
+		SpriteNodeMaterial
+	};
 
-Material.fromType = function ( type ) {
+	const type = material.type.replace( 'Material', 'NodeMaterial' );
 
-	if ( materialLib[ type ] !== undefined ) {
+	if ( materialLib[ type ] === undefined ) {
 
-		return new materialLib[ type ]();
+		return material; // is already a node material or cannot be converted
 
 	}
 
-	return fromTypeFunction.call( this, type );
+	const nodeMaterial = new materialLib[ type ]( material );
+
+	for ( const key in material ) {
+
+		if ( nodeMaterial[ key ] === undefined ) {
+
+			nodeMaterial[ key ] = material[ key ]; // currently this is needed only for material.alphaTest
+
+		}
+
+	}
+
+	return nodeMaterial;
 
 };

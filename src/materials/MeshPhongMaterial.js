@@ -9,6 +9,8 @@ class MeshPhongMaterial extends Material {
 
 		super();
 
+		this.isMeshPhongMaterial = true;
+
 		this.type = 'MeshPhongMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
@@ -53,6 +55,8 @@ class MeshPhongMaterial extends Material {
 		this.wireframeLinejoin = 'round';
 
 		this.flatShading = false;
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -105,12 +109,12 @@ class MeshPhongMaterial extends Material {
 
 		this.flatShading = source.flatShading;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
 export { MeshPhongMaterial };

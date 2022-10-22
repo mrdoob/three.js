@@ -28,7 +28,7 @@
 		</p>
 
 		<code>
-		npm install --save three
+		npm install three
 		</code>
 
 		<p>
@@ -64,7 +64,7 @@
 
 		<p>
 			The three.js library can be used without any build system, either by uploading files to your own web server or by using an existing CDN. Because the library relies on ES modules, any script that references it must use <em>type="module"</em> as shown below.
-			It is also require to define an Import Map which resolves the bare module specifier *three*.
+			It is also required to define an Import Map which resolves the bare module specifier `three`.
 		</p>
 
 		<code>
@@ -88,9 +88,6 @@
 		</code>
 
 		<p>
-			Not all features are accessed through the <em>three</em> entrypoint. Other popular parts of the library — such as controls, loaders, and post-processing effects — must be imported from the [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] subfolder. To learn more, see <em>Examples</em> below.
-		</p>
-		<p>
 			Since Import maps are not yet supported by all browsers, it is necessary to add the polyfill *es-module-shims.js*.
 		</p>
 
@@ -106,7 +103,7 @@
 
 
 		<code>
-		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
@@ -140,15 +137,11 @@
 		<h3>Node.js</h3>
 
 		<p>
-			Using three.js in [link:https://eloquentjavascript.net/20_node.html Node.js] can be difficult, for two reasons:
+			Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
 		</p>
 
 		<p>
-			First, because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
-		</p>
-
-		<p>
-			Second, Node.js support for ES modules is ... complicated. As of Node.js v12, the core library can be imported as a CommonJS module, with <em>require('three')</em>. However, most example components in <em>examples/jsm</em> cannot. Future versions of Node.js may resolve this, but in the meantime you may need to use workarounds like [link:https://github.com/standard-things/esm esm] to enable your Node.js application to recognize ES modules.
+			Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
 		</p>
 
 	</body>

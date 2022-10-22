@@ -2,6 +2,8 @@ class NodeUniform {
 
 	constructor( name, type, node, needsUpdate = undefined ) {
 
+		this.isNodeUniform = true;
+
 		this.name = name;
 		this.type = type;
 		this.node = node;
@@ -22,7 +24,5 @@ class NodeUniform {
 	}
 
 }
-
-NodeUniform.prototype.isNodeUniform = true;
 
 export default NodeUniform;

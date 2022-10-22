@@ -1,3 +1,7 @@
+import {
+	DoubleSide
+} from 'three';
+
 import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
@@ -19,10 +23,10 @@ class USDZExporter {
 
 			if ( object.isMesh ) {
 
-				if ( object.material.isMeshStandardMaterial ) {
+				const geometry = object.geometry;
+				const material = object.material;
 
-					const geometry = object.geometry;
-					const material = object.material;
+				if ( material.isMeshStandardMaterial ) {
 
 					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
 
@@ -404,6 +408,13 @@ function buildMaterial( material, textures ) {
             float3 outputs:rgb
             ${ material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : '' }
         }`;
+
+	}
+
+
+	if ( material.side === DoubleSide ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 
 	}
 

@@ -1,6 +1,4 @@
-import {
-	Vector3
-} from 'three';
+import { Vector3 } from 'three';
 
 /**
  * Usage:
@@ -27,12 +25,6 @@ class STLExporter {
 			if ( object.isMesh ) {
 
 				const geometry = object.geometry;
-
-				if ( geometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.STLExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				}
 
 				const index = geometry.index;
 				const positionAttribute = geometry.getAttribute( 'position' );

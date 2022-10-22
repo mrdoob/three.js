@@ -6,7 +6,9 @@
 
 			super( geometry, material );
 			this.animationsMap = {};
-			this.animationsList = []; // prepare default animation
+			this.animationsList = [];
+
+			// prepare default animation
 			// (all frames played together in 1 second)
 
 			const numFrames = Object.keys( this.morphTargetDictionary ).length;
@@ -18,7 +20,6 @@
 			this.setAnimationWeight( name, 1 );
 
 		}
-
 		createAnimation( name, start, end, fps ) {
 
 			const animation = {
@@ -40,18 +41,15 @@
 			this.animationsList.push( animation );
 
 		}
-
 		autoCreateAnimations( fps ) {
 
 			const pattern = /([a-z]+)_?(\d+)/i;
 			let firstAnimation;
 			const frameRanges = {};
 			let i = 0;
-
 			for ( const key in this.morphTargetDictionary ) {
 
 				const chunks = key.match( pattern );
-
 				if ( chunks && chunks.length > 1 ) {
 
 					const name = chunks[ 1 ];
@@ -80,11 +78,9 @@
 			this.firstAnimation = firstAnimation;
 
 		}
-
 		setAnimationDirectionForward( name ) {
 
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				animation.direction = 1;
@@ -93,11 +89,9 @@
 			}
 
 		}
-
 		setAnimationDirectionBackward( name ) {
 
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				animation.direction = - 1;
@@ -106,11 +100,9 @@
 			}
 
 		}
-
 		setAnimationFPS( name, fps ) {
 
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				animation.fps = fps;
@@ -119,11 +111,9 @@
 			}
 
 		}
-
 		setAnimationDuration( name, duration ) {
 
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				animation.duration = duration;
@@ -132,11 +122,9 @@
 			}
 
 		}
-
 		setAnimationWeight( name, weight ) {
 
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				animation.weight = weight;
@@ -144,11 +132,9 @@
 			}
 
 		}
-
 		setAnimationTime( name, time ) {
 
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				animation.time = time;
@@ -156,12 +142,10 @@
 			}
 
 		}
-
 		getAnimationTime( name ) {
 
 			let time = 0;
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				time = animation.time;
@@ -171,12 +155,10 @@
 			return time;
 
 		}
-
 		getAnimationDuration( name ) {
 
 			let duration = - 1;
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				duration = animation.duration;
@@ -186,11 +168,9 @@
 			return duration;
 
 		}
-
 		playAnimation( name ) {
 
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				animation.time = 0;
@@ -203,11 +183,9 @@
 			}
 
 		}
-
 		stopAnimation( name ) {
 
 			const animation = this.animationsMap[ name ];
-
 			if ( animation ) {
 
 				animation.active = false;
@@ -215,7 +193,6 @@
 			}
 
 		}
-
 		update( delta ) {
 
 			for ( let i = 0, il = this.animationsList.length; i < il; i ++ ) {
@@ -224,13 +201,11 @@
 				if ( ! animation.active ) continue;
 				const frameTime = animation.duration / animation.length;
 				animation.time += animation.direction * delta;
-
 				if ( animation.mirroredLoop ) {
 
 					if ( animation.time > animation.duration || animation.time < 0 ) {
 
 						animation.direction *= - 1;
-
 						if ( animation.time > animation.duration ) {
 
 							animation.time = animation.duration;
@@ -256,7 +231,6 @@
 
 				const keyframe = animation.start + THREE.MathUtils.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
 				const weight = animation.weight;
-
 				if ( keyframe !== animation.currentFrame ) {
 
 					this.morphTargetInfluences[ animation.lastFrame ] = 0;
@@ -269,7 +243,6 @@
 
 				let mix = animation.time % frameTime / frameTime;
 				if ( animation.directionBackwards ) mix = 1 - mix;
-
 				if ( animation.currentFrame !== animation.lastFrame ) {
 
 					this.morphTargetInfluences[ animation.currentFrame ] = mix * weight;

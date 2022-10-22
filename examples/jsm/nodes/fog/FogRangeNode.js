@@ -1,11 +1,13 @@
 import FogNode from './FogNode.js';
-import { smoothstep, negate, positionView } from '../ShaderNode.js';
+import { smoothstep, negate, positionView } from '../shadernode/ShaderNodeBaseElements.js';
 
 class FogRangeNode extends FogNode {
 
 	constructor( colorNode, nearNode, farNode ) {
 
 		super( colorNode );
+
+		this.isFogRangeNode = true;
 
 		this.nearNode = nearNode;
 		this.farNode = farNode;
@@ -21,7 +23,5 @@ class FogRangeNode extends FogNode {
 	}
 
 }
-
-FogRangeNode.prototype.isFogRangeNode = true;
 
 export default FogRangeNode;

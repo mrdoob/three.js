@@ -1,5 +1,27 @@
 import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
 
+export const getCacheKey = ( object ) => {
+
+	let cacheKey = '{';
+
+	if ( object.isNode === true ) {
+
+		cacheKey += `uuid:"${ object.uuid }",`;
+
+	}
+
+	for ( const property of getNodesKeys( object ) ) {
+
+		cacheKey += `${ property }:${ object[ property ].getCacheKey() },`;
+
+	}
+
+	cacheKey += '}';
+
+	return cacheKey;
+
+};
+
 export const getNodesKeys = ( object ) => {
 
 	const props = [];
@@ -62,7 +84,7 @@ export const getValueType = ( value ) => {
 
 export const getValueFromType = ( type, ...params ) => {
 
-	const last4 = type?.slice( -4 );
+	const last4 = type?.slice( - 4 );
 
 	if ( type === 'color' ) {
 

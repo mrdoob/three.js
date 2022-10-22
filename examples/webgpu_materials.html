@@ -5,10 +5,9 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-101), expires 09/01/2022 -->
-		<meta http-equiv="origin-trial" content="AoS1pSJwCV3KRe73TO0YgJkK9FZ/qhmvKeafztp0ofiE8uoGrnKzfxGVKKICvoBfL8dgE0zpkp2g/oEJNS0fDgkAAABeeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NTI4MzE5OTksImlzU3ViZG9tYWluIjp0cnVlfQ==">
 	</head>
 	<body>
+
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Materials
 		</div>
@@ -19,7 +18,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -27,16 +27,16 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import { ShaderNode, vec3, dot, sampler } from 'three-nodes/ShaderNode.js';
+			import { ShaderNode, vec3, dot, triplanarTexture } from 'three/nodes';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let stats;
 
@@ -44,9 +44,9 @@
 
 			const objects = [], materials = [];
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -67,7 +67,7 @@
 				// Grid
 
 				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = new Nodes.AttributeNode( 'color', 'vec3' );
+				helper.material.colorNode = new Nodes.AttributeNode( 'color' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
@@ -141,7 +141,7 @@
 				} );
 
 				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = desaturateShaderNode( { color: new Nodes.TextureNode( texture ) } );
+				material.colorNode = desaturateShaderNode.call( { color: new Nodes.TextureNode( texture ) } );
 				materials.push( material );
 
 				// Custom WGSL ( desaturate filter )
@@ -177,6 +177,11 @@
 				material.colorNode = getWGSLTextureSample.call( { tex: textureNode, tex_sampler: textureNode, uv: new Nodes.UVNode() } );
 				materials.push( material );
 
+				// Triplanar Texture Mapping
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = triplanarTexture( new Nodes.TextureNode( texture ) );
+				materials.push( material );
+
 				//
 				// Geometry
 				//
@@ -194,6 +199,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -204,8 +210,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 
@@ -239,15 +243,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
 				const timer = 0.0001 * Date.now();
 
 				camera.position.x = Math.cos( timer ) * 1000;
@@ -266,11 +261,7 @@
 
 				renderer.render( scene, camera );
 
-			}
-
-			function error( error ) {
-
-				console.error( error );
+				stats.update();
 
 			}
 

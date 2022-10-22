@@ -1,5 +1,4 @@
 import Node from '../core/Node.js';
-
 import {
 	ShaderNode,
 	attribute,
@@ -8,12 +7,13 @@ import {
 	uniform,
 	positionLocal,
 	normalLocal,
+	tangentLocal,
 	assign,
 	element,
 	add,
 	mul,
 	transformDirection
-} from '../ShaderNode.js';
+} from '../shadernode/ShaderNodeBaseElements.js';
 
 import { NodeUpdateType } from '../core/constants.js';
 
@@ -57,6 +57,12 @@ const Skinning = new ShaderNode( ( inputs, builder ) => {
 	assign( positionLocal, skinPosition ).build( builder );
 	assign( normalLocal, skinNormal ).build( builder );
 
+	if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+
+		assign( tangentLocal, skinNormal ).build( builder );
+
+	}
+
 } );
 
 class SkinningNode extends Node {
@@ -67,7 +73,7 @@ class SkinningNode extends Node {
 
 		this.skinnedMesh = skinnedMesh;
 
-		this.updateType = NodeUpdateType.Object;
+		this.updateType = NodeUpdateType.OBJECT;
 
 		//
 
@@ -82,7 +88,7 @@ class SkinningNode extends Node {
 
 	generate( builder ) {
 
-		Skinning( {
+		Skinning.call( {
 			index: this.skinIndexNode,
 			weight: this.skinWeightNode,
 			bindMatrix: this.bindMatrixNode,

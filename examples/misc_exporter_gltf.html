@@ -18,7 +18,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,9 +28,9 @@
 
 			import * as THREE from 'three';
 
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			function exportGLTF( input ) {
 
@@ -38,7 +39,6 @@
 				const options = {
 					trs: params.trs,
 					onlyVisible: params.onlyVisible,
-					truncateDrawRange: params.truncateDrawRange,
 					binary: params.binary,
 					maxTextureSize: params.maxTextureSize
 				};
@@ -104,7 +104,6 @@
 			const params = {
 				trs: false,
 				onlyVisible: true,
-				truncateDrawRange: true,
 				binary: false,
 				maxTextureSize: 4096,
 				exportScene1: exportScene1,
@@ -345,44 +344,6 @@
 				scene1.add( object );
 
 				// ---------------------------------------------------------------------
-				// Buffer geometry truncated (DrawRange)
-				// ---------------------------------------------------------------------
-				geometry = new THREE.BufferGeometry();
-				const numElements = 6;
-				const outOfRange = 3;
-
-				positions = new Float32Array( ( numElements + outOfRange ) * 3 );
-				const colors = new Float32Array( ( numElements + outOfRange ) * 3 );
-
-				positions.set( [
-					0, 0, 0,
-					0, 80, 0,
-					80, 0, 0,
-					80, 0, 0,
-					0, 80, 0,
-					80, 80, 0
-				] );
-
-				colors.set( [
-					1, 0, 0,
-					1, 0, 0,
-					1, 1, 0,
-					1, 1, 0,
-					0, 0, 1,
-					0, 0, 1,
-				] );
-
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.setDrawRange( 0, numElements );
-
-				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: true } ) );
-				object.name = 'Custom buffered truncated';
-				object.position.set( 140, - 40, - 200 );
-
-				scene1.add( object );
-
-				// ---------------------------------------------------------------------
 				// THREE.Points
 				// ---------------------------------------------------------------------
 				numPoints = 100;
@@ -461,7 +422,7 @@
 
 					waltHead = obj;
 					waltHead.scale.multiplyScalar( 1.5 );
-					waltHead.position.set( 400, 0, 0 );
+					waltHead.position.set( 200, - 40, - 200 );
 					scene1.add( waltHead );
 
 				} );
@@ -494,7 +455,6 @@
 				let h = gui.addFolder( 'Settings' );
 				h.add( params, 'trs' ).name( 'Use TRS' );
 				h.add( params, 'onlyVisible' ).name( 'Only Visible Objects' );
-				h.add( params, 'truncateDrawRange' ).name( 'Truncate Draw Range' );
 				h.add( params, 'binary' ).name( 'Binary (GLB)' );
 				h.add( params, 'maxTextureSize', 2, 8192 ).name( 'Max Texture Size' ).step( 1 );
 

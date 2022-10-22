@@ -9,6 +9,8 @@ class MeshMatcapMaterial extends Material {
 
 		super();
 
+		this.isMeshMatcapMaterial = true;
+
 		this.defines = { 'MATCAP': '' };
 
 		this.type = 'MeshMatcapMaterial';
@@ -33,6 +35,8 @@ class MeshMatcapMaterial extends Material {
 		this.alphaMap = null;
 
 		this.flatShading = false;
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -66,12 +70,12 @@ class MeshMatcapMaterial extends Material {
 
 		this.flatShading = source.flatShading;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
 
 export { MeshMatcapMaterial };

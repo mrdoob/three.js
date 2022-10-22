@@ -36,7 +36,7 @@
 		</p>
 
 		<p>
-			对Vector3实例进行遍历将按相应的顺序生成它的分量(x, y, z)。
+			对 [name] 实例进行遍历将按相应的顺序生成它的分量 (x, y, z)。
 		</p>
 
 		<h2>代码示例</h2>
@@ -358,6 +358,11 @@
 		<h3>[method:this setFromCylindricalCoords]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
 		<p>从圆柱坐标中的[page:Cylindrical radius]、[page:Cylindrical theta]和[page:Cylindrical y]设置该向量。</p>
 
+		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
+		<p>
+		根据指定的[page:Euler Euler Angle]的x、y、z分量来设置该向量的[page:.x x]、[page:.y y]、[page:.z z]分量。
+		</p>
+		
 		<h3>[method:this setFromMatrixColumn]( [param:Matrix4 matrix], [param:Integer index] )</h3>
 		<p>
 		从传入的四阶矩阵[page:Matrix4 matrix]由[page:Integer index]指定的列中，

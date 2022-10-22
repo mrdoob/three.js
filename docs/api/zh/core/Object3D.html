@@ -80,6 +80,12 @@
 		物体的世界变换。若这个Object3D没有父级，则它将和local transform [page:.matrix]（局部变换矩阵）相同。
 	</p>
 
+	<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
+	<p>
+	Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
+	When it isn't, then you have to maintain all matrices in the object and its children yourself.
+	</p>
+
 	<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
 	<p>
 		当这个属性设置了之后，它将计算在那一帧中的matrixWorld，并将这个值重置为false。默认值为*false*。
@@ -298,7 +304,7 @@
 		这一方法不支持其父级被旋转过或者被位移过的物体。
 	</p>
 
-	<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+	<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 	<p>抽象（空方法），在一条被投射出的射线与这个物体之间获得交点。
 		在一些子类，例如[page:Mesh], [page:Line], and [page:Points]实现了这个方法，以用于光线投射。
 	</p>

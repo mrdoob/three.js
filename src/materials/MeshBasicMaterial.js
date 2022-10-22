@@ -8,6 +8,8 @@ class MeshBasicMaterial extends Material {
 
 		super();
 
+		this.isMeshBasicMaterial = true;
+
 		this.type = 'MeshBasicMaterial';
 
 		this.color = new Color( 0xffffff ); // emissive
@@ -33,6 +35,8 @@ class MeshBasicMaterial extends Material {
 		this.wireframeLinewidth = 1;
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
+
+		this.fog = true;
 
 		this.setValues( parameters );
 
@@ -66,12 +70,12 @@ class MeshBasicMaterial extends Material {
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
 
+		this.fog = source.fog;
+
 		return this;
 
 	}
 
 }
-
-MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 
 export { MeshBasicMaterial };

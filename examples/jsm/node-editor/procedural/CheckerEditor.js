@@ -1,6 +1,6 @@
 import { LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { CheckerNode, UVNode } from 'three-nodes/Nodes.js';
+import { CheckerNode, UVNode } from 'three/nodes';
 
 const defaultUV = new UVNode();
 

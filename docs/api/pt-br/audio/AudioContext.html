@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Contém métodos para configurar um [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext].<br /><br />
+
+		Usado internamente pelas classes [page:AudioListener AudioListener] e [page:AudioLoader AudioLoader].<br /><br />
+
+		Utiliza a [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+		</p>
+
+
+		<h2>Métodos</h2>
+
+		<h3>[method:AudioContext getContext]()</h3>
+		<p>
+		Retorna o valor da variável `context` no escopo externo, se definido,
+		caso contrário configura-o para um novo [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext].
+		</p>
+
+		<h3>[method:AudioContext setContext]( [param:AudioContext value] )</h3>
+		<p>
+		Define a variável `context` no escopo externo para `value`.
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

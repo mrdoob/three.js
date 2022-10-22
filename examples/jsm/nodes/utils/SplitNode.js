@@ -1,6 +1,8 @@
 import Node from '../core/Node.js';
 import { vector } from '../core/NodeBuilder.js';
 
+const vectorComponents = 'xyzw';
+
 class SplitNode extends Node {
 
 	constructor( node, components = 'x' ) {
@@ -32,10 +34,12 @@ class SplitNode extends Node {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const node = this.node;
 		const nodeTypeLength = builder.getTypeLength( node.getNodeType( builder ) );
+
+		let snippet = null;
 
 		if ( nodeTypeLength > 1 ) {
 
@@ -45,7 +49,7 @@ class SplitNode extends Node {
 
 			if ( componentsLength >= nodeTypeLength ) {
 
-				// need expand the input node
+				// needed expand the input node
 
 				type = builder.getTypeFromLength( this.getVectorLength() );
 
@@ -53,15 +57,27 @@ class SplitNode extends Node {
 
 			const nodeSnippet = node.build( builder, type );
 
-			return `${nodeSnippet}.${this.components}`;
+			if ( this.components.length === nodeTypeLength && this.components === vectorComponents.slice( 0, this.components.length ) ) {
+
+				// unecessary swizzle
+
+				snippet = builder.format( nodeSnippet, type, output );
+
+			} else {
+
+				snippet = builder.format( `${nodeSnippet}.${this.components}`, this.getNodeType( builder ), output );
+
+			}
 
 		} else {
 
-			// ignore components if node is a float
+			// ignore .components if .node returns float/integer
 
-			return node.build( builder );
+			snippet = node.build( builder, output );
 
 		}
+
+		return snippet;
 
 	}
 

@@ -3,6 +3,17 @@ import { Loader } from './Loader.js';
 
 const loading = {};
 
+class HttpError extends Error {
+
+	constructor( message, response ) {
+
+		super( message );
+		this.response = response;
+
+	}
+
+}
+
 class FileLoader extends Loader {
 
 	constructor( manager ) {
@@ -146,7 +157,7 @@ class FileLoader extends Loader {
 
 				} else {
 
-					throw Error( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}` );
+					throw new HttpError( `fetch for "${response.url}" responded with ${response.status}: ${response.statusText}`, response );
 
 				}
 

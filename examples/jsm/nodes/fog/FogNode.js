@@ -1,4 +1,5 @@
 import Node from '../core/Node.js';
+import MathNode from '../math/MathNode.js';
 
 class FogNode extends Node {
 
@@ -6,8 +7,16 @@ class FogNode extends Node {
 
 		super( 'float' );
 
+		this.isFogNode = true;
+
 		this.colorNode = colorNode;
 		this.factorNode = factorNode;
+
+	}
+
+	mix( outputNode ) {
+
+		return new MathNode( MathNode.MIX, outputNode, this.colorNode, this );
 
 	}
 
@@ -18,7 +27,5 @@ class FogNode extends Node {
 	}
 
 }
-
-FogNode.prototype.isFogNode = true;
 
 export default FogNode;

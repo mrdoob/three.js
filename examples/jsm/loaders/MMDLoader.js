@@ -2080,6 +2080,8 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		super();
 
+		this.isMMDToonMaterial = true;
+
 		this._matcapCombine = AddOperation;
 		this.emissiveIntensity = 1.0;
 		this.normalMapType = TangentSpaceNormalMap;
@@ -2133,7 +2135,6 @@ class MMDToonMaterial extends ShaderMaterial {
 		// merged from MeshToon/Phong/MatcapMaterial
 		const exposePropertyNames = [
 			'specular',
-			'shininess',
 			'opacity',
 			'diffuse',
 
@@ -2188,6 +2189,25 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		}
 
+		// Special path for shininess to handle zero shininess properly
+		this._shininess = 30;
+		Object.defineProperty( this, 'shininess', {
+
+			get: function () {
+
+				return this._shininess;
+
+			},
+
+			set: function ( value ) {
+
+				this._shininess = value;
+				this.uniforms.shininess.value = Math.max( this._shininess, 1e-4 ); // To prevent pow( 0.0, 0.0 )
+
+			},
+
+		} );
+
 		Object.defineProperty(
 			this,
 			'color',
@@ -2218,7 +2238,5 @@ class MMDToonMaterial extends ShaderMaterial {
 	}
 
 }
-
-MMDToonMaterial.prototype.isMMDToonMaterial = true;
 
 export { MMDLoader };

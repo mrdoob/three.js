@@ -32,6 +32,8 @@ class Sprite extends Object3D {
 
 		super();
 
+		this.isSprite = true;
+
 		this.type = 'Sprite';
 
 		if ( _geometry === undefined ) {
@@ -135,9 +137,9 @@ class Sprite extends Object3D {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		if ( source.center !== undefined ) this.center.copy( source.center );
 
@@ -148,8 +150,6 @@ class Sprite extends Object3D {
 	}
 
 }
-
-Sprite.prototype.isSprite = true;
 
 function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) {
 

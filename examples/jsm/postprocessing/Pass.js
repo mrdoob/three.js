@@ -31,6 +31,8 @@ class Pass {
 
 	}
 
+	dispose() {}
+
 }
 
 // Helper for passes that need to fill the viewport with a single quad.

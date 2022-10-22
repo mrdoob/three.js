@@ -6,4 +6,4 @@ A clear and concise description of what the problem was and how this pull reques
 
 <!-- Remove the line below if is not relevant -->
 
-This contribution is funded by [Example](https://example.com).
+*This contribution is funded by [Example](https://example.com)*

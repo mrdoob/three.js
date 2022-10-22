@@ -183,6 +183,22 @@ class SMAAPass extends Pass {
 
 	}
 
+	dispose() {
+
+		this.edgesRT.dispose();
+		this.weightsRT.dispose();
+
+		this.areaTexture.dispose();
+		this.searchTexture.dispose();
+
+		this.materialEdges.dispose();
+		this.materialWeights.dispose();
+		this.materialBlend.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
 }
 
 export { SMAAPass };

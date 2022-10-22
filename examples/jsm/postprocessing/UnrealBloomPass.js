@@ -170,6 +170,22 @@ class UnrealBloomPass extends Pass {
 
 		this.renderTargetBright.dispose();
 
+		//
+
+		for ( let i = 0; i < this.separableBlurMaterials.length; i ++ ) {
+
+			this.separableBlurMaterials[ i ].dispose();
+
+		}
+
+		this.compositeMaterial.dispose();
+		this.materialCopy.dispose();
+		this.basic.dispose();
+
+		//
+
+		this.fsQuad.dispose();
+
 	}
 
 	setSize( width, height ) {
@@ -354,7 +370,6 @@ class UnrealBloomPass extends Pass {
 				'blurTexture3': { value: null },
 				'blurTexture4': { value: null },
 				'blurTexture5': { value: null },
-				'dirtTexture': { value: null },
 				'bloomStrength': { value: 1.0 },
 				'bloomFactors': { value: null },
 				'bloomTintColors': { value: null },
@@ -375,7 +390,6 @@ class UnrealBloomPass extends Pass {
 				uniform sampler2D blurTexture3;
 				uniform sampler2D blurTexture4;
 				uniform sampler2D blurTexture5;
-				uniform sampler2D dirtTexture;
 				uniform float bloomStrength;
 				uniform float bloomRadius;
 				uniform float bloomFactors[NUM_MIPS];

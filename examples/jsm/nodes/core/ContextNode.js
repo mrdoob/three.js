@@ -6,6 +6,8 @@ class ContextNode extends Node {
 
 		super();
 
+		this.isContextNode = true;
+
 		this.node = node;
 		this.context = context;
 
@@ -17,11 +19,25 @@ class ContextNode extends Node {
 
 	}
 
+	construct( builder ) {
+
+		const previousContext = builder.getContext();
+
+		builder.setContext( { ...builder.context, ...this.context } );
+
+		const node = this.node.build( builder );
+
+		builder.setContext( previousContext );
+
+		return node;
+
+	}
+
 	generate( builder, output ) {
 
 		const previousContext = builder.getContext();
 
-		builder.setContext( Object.assign( {}, builder.context, this.context ) );
+		builder.setContext( { ...builder.context, ...this.context } );
 
 		const snippet = this.node.build( builder, output );
 
@@ -32,7 +48,5 @@ class ContextNode extends Node {
 	}
 
 }
-
-ContextNode.prototype.isContextNode = true;
 
 export default ContextNode;

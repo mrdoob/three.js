@@ -26,7 +26,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -34,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let camera, scene, renderer;
 

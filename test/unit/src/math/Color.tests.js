@@ -611,6 +611,30 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'setStyleHSLRedWithDecimals', ( assert ) => {
+
+			var c = new Color();
+			c.setStyle( 'hsl(360,100.0%,50.0%)' );
+			assert.ok( c.r == 1, 'Red: ' + c.r );
+			assert.ok( c.g === 0, 'Green: ' + c.g );
+			assert.ok( c.b === 0, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.test( 'setStyleHSLARedWithDecimals', ( assert ) => {
+
+			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
+			c.setStyle( 'hsla(360,100.0%,50.0%,0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
+			assert.ok( c.r == 1, 'Red: ' + c.r );
+			assert.ok( c.g === 0, 'Green: ' + c.g );
+			assert.ok( c.b === 0, 'Blue: ' + c.b );
+
+		} );
+
 		QUnit.test( 'setStyleHexSkyBlue', ( assert ) => {
 
 			var c = new Color();
@@ -648,6 +672,16 @@ export default QUnit.module( 'Maths', () => {
 			var c = new Color();
 			c.setStyle( 'powderblue' );
 			assert.ok( c.getHex() == 0xB0E0E6, 'Hex c: ' + c.getHex() );
+
+		} );
+
+		QUnit.test( 'iterable', ( assert ) => {
+
+			var c = new Color( 0.5, 0.75, 1 );
+			var array = [ ...c ];
+			assert.strictEqual( array[ 0 ], 0.5, 'Color is iterable.' );
+			assert.strictEqual( array[ 1 ], 0.75, 'Color is iterable.' );
+			assert.strictEqual( array[ 2 ], 1, 'Color is iterable.' );
 
 		} );
 

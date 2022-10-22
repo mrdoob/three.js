@@ -1,5 +1,12 @@
 import { Material, ShaderMaterial } from 'three';
-import { getNodesKeys } from '../core/NodeUtils.js';
+import { getNodesKeys, getCacheKey } from '../core/NodeUtils.js';
+import ExpressionNode from '../core/ExpressionNode.js';
+import {
+	float, vec3, vec4,
+	assign, label, mul, bypass,
+	positionLocal, skinning, instance, modelViewProjection, lightingContext, colorSpace,
+	materialAlphaTest, materialColor, materialOpacity
+} from '../shadernode/ShaderNodeElements.js';
 
 class NodeMaterial extends ShaderMaterial {
 
@@ -7,9 +14,131 @@ class NodeMaterial extends ShaderMaterial {
 
 		super();
 
+		this.isNodeMaterial = true;
+
 		this.type = this.constructor.name;
 
 		this.lights = true;
+
+	}
+
+	build( builder ) {
+
+		this.generatePosition( builder );
+
+		const { lightsNode } = this;
+		const { diffuseColorNode } = this.generateDiffuseColor( builder );
+
+		const outgoingLightNode = this.generateLight( builder, { diffuseColorNode, lightsNode } );
+
+		this.generateOutput( builder, { diffuseColorNode, outgoingLightNode } );
+
+	}
+
+	customProgramCacheKey() {
+
+		return getCacheKey( this );
+
+	}
+
+	generatePosition( builder ) {
+
+		const object = builder.object;
+
+		// < VERTEX STAGE >
+
+		let vertex = positionLocal;
+
+		if ( this.positionNode !== null ) {
+
+			vertex = bypass( vertex, assign( positionLocal, this.positionNode ) );
+
+		}
+
+		if ( object.instanceMatrix?.isInstancedBufferAttribute === true && builder.isAvailable( 'instance' ) === true ) {
+
+			vertex = bypass( vertex, instance( object ) );
+
+		}
+
+		if ( object.isSkinnedMesh === true ) {
+
+			vertex = bypass( vertex, skinning( object ) );
+
+		}
+
+		builder.context.vertex = vertex;
+
+		builder.addFlow( 'vertex', modelViewProjection() );
+
+	}
+
+	generateDiffuseColor( builder ) {
+
+		// < FRAGMENT STAGE >
+
+		let colorNode = vec4( this.colorNode || materialColor );
+		let opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
+
+		// COLOR
+
+		colorNode = builder.addFlow( 'fragment', label( colorNode, 'Color' ) );
+		const diffuseColorNode = builder.addFlow( 'fragment', label( colorNode, 'DiffuseColor' ) );
+
+		// OPACITY
+
+		opacityNode = builder.addFlow( 'fragment', label( opacityNode, 'OPACITY' ) );
+		builder.addFlow( 'fragment', assign( diffuseColorNode.a, mul( diffuseColorNode.a, opacityNode ) ) );
+
+		// ALPHA TEST
+
+		if ( this.alphaTestNode || this.alphaTest > 0 ) {
+
+			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
+
+			builder.addFlow( 'fragment', label( alphaTestNode, 'AlphaTest' ) );
+
+			// @TODO: remove ExpressionNode here and then possibly remove it completely
+			builder.addFlow( 'fragment', new ExpressionNode( 'if ( DiffuseColor.a <= AlphaTest ) { discard; }' ) );
+
+		}
+
+		return { colorNode, diffuseColorNode };
+
+	}
+
+	generateLight( builder, { diffuseColorNode, lightingModelNode, lightsNode = builder.lightsNode } ) {
+
+		// < ANALYTIC LIGHTS >
+
+		// OUTGOING LIGHT
+
+		let outgoingLightNode = diffuseColorNode.xyz;
+		if ( lightsNode && lightsNode.hasLight !== false ) outgoingLightNode = builder.addFlow( 'fragment', label( lightingContext( lightsNode, lightingModelNode ), 'Light' ) );
+
+		return outgoingLightNode;
+
+	}
+
+	generateOutput( builder, { diffuseColorNode, outgoingLightNode } ) {
+
+		// OUTPUT
+
+		let outputNode = vec4( outgoingLightNode, diffuseColorNode.a );
+
+		// ENCODING
+
+		outputNode = colorSpace( outputNode, builder.renderer.outputEncoding );
+
+		// FOG
+
+		if ( builder.fogNode ) outputNode = vec4( vec3( builder.fogNode.mix( outputNode ) ), outputNode.w );
+
+		// RESULT
+
+		builder.addFlow( 'fragment', label( outputNode, 'Output' ) );
+
+		return outputNode;
 
 	}
 
@@ -18,23 +147,13 @@ class NodeMaterial extends ShaderMaterial {
 		// This approach is to reuse the native refreshUniforms*
 		// and turn available the use of features like transmission and environment in core
 
-		let value;
-
 		for ( const property in values ) {
 
-			value = values[ property ];
+			const value = values[ property ];
 
 			if ( this[ property ] === undefined ) {
 
-				if ( value && typeof value.clone === 'function' ) {
-
-					this[ property ] = value.clone();
-
-				} else {
-
-					this[ property ] = value;
-
-				}
+				this[ property ] = value?.clone?.() || value;
 
 			}
 
@@ -103,8 +222,8 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-}
+	static fromMaterial( /*material*/ ) { }
 
-NodeMaterial.prototype.isNodeMaterial = true;
+}
 
 export default NodeMaterial;

@@ -1,5 +1,5 @@
 import * as Nodes from '../Nodes.js';
-import { Loader } from 'three';
+import { FileLoader, Loader } from 'three';
 
 class NodeLoader extends Loader {
 
@@ -79,7 +79,7 @@ class NodeLoader extends Loader {
 
 	parse( json ) {
 
-		const node = Nodes.fromType( type );
+		const node = Nodes.fromType( json.type );
 		node.uuid = json.uuid;
 
 		const nodes = this.parseNodes( json.inputNodes );

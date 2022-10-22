@@ -30,9 +30,9 @@ class WebGPUBindings {
 
 			// setup (static) binding layout and (dynamic) binding group
 
-			const renderPipeline = this.renderPipelines.get( object );
+			const pipeline = object.isNode ? this.computePipelines.get( object ) : this.renderPipelines.get( object ).pipeline;
 
-			const bindLayout = renderPipeline.pipeline.getBindGroupLayout( 0 );
+			const bindLayout = pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
@@ -108,11 +108,11 @@ class WebGPUBindings {
 			if ( binding.isUniformBuffer ) {
 
 				const buffer = binding.getBuffer();
-				const bufferGPU = binding.bufferGPU;
-
 				const needsBufferWrite = binding.update();
 
 				if ( needsBufferWrite === true ) {
+
+					const bufferGPU = binding.bufferGPU;
 
 					this.device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
 
@@ -121,6 +121,7 @@ class WebGPUBindings {
 			} else if ( binding.isStorageBuffer ) {
 
 				const attribute = binding.attribute;
+
 				this.attributes.update( attribute, false, binding.usage );
 
 			} else if ( binding.isSampler ) {
@@ -188,7 +189,7 @@ class WebGPUBindings {
 
 					binding.bufferGPU = this.device.createBuffer( {
 						size: byteLength,
-						usage: binding.usage,
+						usage: binding.usage
 					} );
 
 				}
@@ -243,8 +244,8 @@ class WebGPUBindings {
 		}
 
 		return this.device.createBindGroup( {
-			layout: layout,
-			entries: entries
+			layout,
+			entries
 		} );
 
 	}

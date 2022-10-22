@@ -3,6 +3,7 @@
 	/**
  * Pixelation shader
  */
+
 	const PixelShader = {
 		uniforms: {
 			'tDiffuse': {
@@ -15,9 +16,7 @@
 				value: 1
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying highp vec2 vUv;
 
@@ -27,9 +26,7 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 		uniform float pixelSize;

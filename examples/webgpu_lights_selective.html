@@ -5,8 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-97), expires 12/13/2021 -->
-		<meta http-equiv="origin-trial" content="Agfr4hEaaoH1kaTtGTZY4OU2lQQOv+gWq+8rYeHZBPWNnLww/smePFCIJOUdRFnQZkO3KAio+SNJapjzaoyFfQQAAABLeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NDMxNTUxOTl9">
 	</head>
 	<body>
 
@@ -21,7 +19,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -29,27 +28,27 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { color, float } from 'three-nodes/ShaderNode.js';
+			import { color, float } from 'three/nodes';
 
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
 				stats, controls;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -63,9 +62,9 @@
 				camera.position.z = 70;
 
 				scene = new THREE.Scene();
-				scene.fogNode = new Nodes.FogRangeNode( color( 0xFF00FF ), float( 30 ), float( 300 )  );
+				scene.fogNode = new Nodes.FogRangeNode( color( 0xFF00FF ), float( 30 ), float( 300 ) );
 
-				const sphere = new THREE.SphereGeometry( 0.5, 16, 8 );
+				const sphereGeometry = new THREE.SphereGeometry( 0.5, 16, 8 );
 
 				//textures
 
@@ -81,33 +80,39 @@
 
 				//lights
 
-				light1 = new THREE.PointLight( 0xff0040, 2, 100 );
-				light1.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xff0040 } ) ) );
-				scene.add( light1 );
+				const addLight = ( hexColor, intensity = 2, distance = 1000 ) => {
 
-				light2 = new THREE.PointLight( 0x0040ff, 2, 100 );
-				light2.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x0040ff } ) ) );
-				scene.add( light2 );
+					const material = new Nodes.MeshStandardNodeMaterial();
+					material.colorNode = color( hexColor );
+					material.lightsNode = new Nodes.LightsNode(); // ignore scene lights
 
-				light3 = new THREE.PointLight( 0x80ff80, 2, 100 );
-				light3.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0x80ff80 } ) ) );
-				scene.add( light3 );
+					const mesh = new THREE.Mesh( sphereGeometry, material );
 
-				light4 = new THREE.PointLight( 0xffaa00, 2, 100 );
-				light4.add( new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) ) );
-				scene.add( light4 );
+					const light = new THREE.PointLight( hexColor, intensity, distance );
+					light.add( mesh );
+
+					scene.add( light );
+
+					return light;
+
+				};
+
+				light1 = addLight( 0xff0040 );
+				light2 = addLight( 0x0040ff );
+				light3 = addLight( 0x80ff80 );
+				light4 = addLight( 0xffaa00 );
 
 				//light nodes ( selective lights )
 
-				const redLightNode = new Nodes.LightsNode().fromLights( [ light1 ] );
-				const blueLightNode = new Nodes.LightsNode().fromLights( [ light2 ] );
+				const redLightsNode = new Nodes.LightsNode().fromLights( [ light1 ] );
+				const blueLightsNode = new Nodes.LightsNode().fromLights( [ light2 ] );
 
 				//models
 
 				const geometryTeapot = new TeapotGeometry( 8, 18 );
 
 				const leftObject = new THREE.Mesh( geometryTeapot, new Nodes.MeshStandardNodeMaterial( { color: 0x555555 } ) );
-				leftObject.material.lightNode = redLightNode;
+				leftObject.material.lightsNode = redLightsNode;
 				leftObject.material.roughnessNode = new Nodes.TextureNode( alphaTexture );
 				leftObject.material.metalness = 0;
 				leftObject.position.x = - 30;
@@ -115,11 +120,12 @@
 
 				const centerObject = new THREE.Mesh( geometryTeapot, new Nodes.MeshStandardNodeMaterial( { color: 0x555555 } ) );
 				centerObject.material.normalNode = new Nodes.NormalMapNode( new Nodes.TextureNode( normalMapTexture ) );
+				centerObject.material.metalness = .5;
 				centerObject.material.roughness = .5;
 				scene.add( centerObject );
 
 				const rightObject = new THREE.Mesh( geometryTeapot, new Nodes.MeshStandardNodeMaterial( { color: 0x555555 } ) );
-				rightObject.material.lightNode = blueLightNode;
+				rightObject.material.lightsNode = blueLightsNode;
 				rightObject.material.metalnessNode = new Nodes.TextureNode( alphaTexture );
 				rightObject.position.x = 30;
 				scene.add( rightObject );
@@ -132,7 +138,10 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 100 );
 
 				//controls
 
@@ -154,8 +163,6 @@
 				gui.add( centerObject.material, 'roughness', 0, 1, 0.01 );
 				gui.add( centerObject.material, 'metalness', 0, 1, 0.01 );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -168,15 +175,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
 
 				const time = performance.now() / 1000;
 				const lightTime = time * 0.5;
@@ -196,7 +194,7 @@
 				light4.position.x = Math.sin( lightTime * 0.3 ) * 30;
 				light4.position.y = Math.cos( lightTime * 0.7 ) * 40;
 				light4.position.z = Math.sin( lightTime * 0.5 ) * 30;
-/*
+	/*
 				@TODO: Used to test scene light change ( currently unavailable )
 
 				if ( time > 2.0 && light1.parent === null ) scene.add( light1 );
@@ -206,11 +204,7 @@
 */
 				renderer.render( scene, camera );
 
-			}
-
-			function error( error ) {
-
-				console.error( error );
+				stats.update();
 
 			}
 

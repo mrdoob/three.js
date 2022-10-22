@@ -1,6 +1,6 @@
 import { NumberInput, Element } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { UniformNode } from 'three-nodes/Nodes.js';
+import { UniformNode } from 'three/nodes';
 
 export class FloatEditor extends BaseNode {
 

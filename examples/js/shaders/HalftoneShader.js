@@ -6,6 +6,7 @@
  * 		Shape (1 = Dot, 2 = Ellipse, 3 = Line, 4 = Square)
  *		Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
  */
+
 	const HalftoneShader = {
 		uniforms: {
 			'tDiffuse': {
@@ -48,9 +49,7 @@
 				value: false
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUV;
 
@@ -60,9 +59,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#define SQRT2_MINUS_ONE 0.41421356
 		#define SQRT2_HALF_MINUS_ONE 0.20710678

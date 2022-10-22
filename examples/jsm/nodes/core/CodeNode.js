@@ -2,13 +2,15 @@ import Node from './Node.js';
 
 class CodeNode extends Node {
 
-	constructor( code = '', nodeType = 'code' ) {
+	constructor( code = '', includes = [] ) {
 
-		super( nodeType );
+		super( 'code' );
+
+		this.isCodeNode = true;
 
 		this.code = code;
 
-		this._includes = [];
+		this._includes = includes;
 
 	}
 
@@ -44,7 +46,5 @@ class CodeNode extends Node {
 	}
 
 }
-
-CodeNode.prototype.isCodeNode = true;
 
 export default CodeNode;

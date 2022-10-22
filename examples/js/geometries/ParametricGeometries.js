@@ -11,7 +11,6 @@
 			v *= 2 * Math.PI;
 			u = u * 2;
 			let x, z;
-
 			if ( u < Math.PI ) {
 
 				x = 3 * Math.cos( u ) * ( 1 + Math.sin( u ) ) + 2 * ( 1 - Math.cos( u ) / 2 ) * Math.cos( u ) * Math.cos( v );
@@ -56,6 +55,7 @@
 		mobius3d: function ( u, t, target ) {
 
 			// volumetric mobius strip
+
 			u *= Math.PI;
 			t *= 2 * Math.PI;
 			u = u * 2;
@@ -71,6 +71,7 @@
 
 		}
 	};
+
 	/*********************************************
  *
  * Parametric Replacement for TubeGeometry
@@ -87,7 +88,6 @@
 				normals = frames.normals,
 				binormals = frames.binormals;
 			const position = new THREE.Vector3();
-
 			function ParametricTube( u, v, target ) {
 
 				v *= 2 * Math.PI;
@@ -96,7 +96,6 @@
 				const normal = normals[ i ];
 				const binormal = binormals[ i ];
 				const cx = - radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
-
 				const cy = radius * Math.sin( v );
 				position.x += cx * normal.x + cy * binormal.x;
 				position.y += cx * normal.y + cy * binormal.y;
@@ -105,7 +104,9 @@
 
 			}
 
-			super( ParametricTube, segments, segmentsRadius ); // proxy internals
+			super( ParametricTube, segments, segmentsRadius );
+
+			// proxy internals
 
 			this.tangents = tangents;
 			this.normals = normals;
@@ -119,12 +120,12 @@
 		}
 
 	};
+
 	/*********************************************
   *
   * Parametric Replacement for TorusKnotGeometry
   *
   *********************************************/
-
 	ParametricGeometries.TorusKnotGeometry = class TorusKnotGeometry extends ParametricGeometries.TubeGeometry {
 
 		constructor( radius = 200, tube = 40, segmentsT = 64, segmentsR = 8, p = 2, q = 3 ) {
@@ -144,7 +145,6 @@
 				}
 
 			}
-
 			const segments = segmentsT;
 			const radiusSegments = segmentsR;
 			const extrudePath = new TorusKnotCurve();
@@ -159,12 +159,12 @@
 		}
 
 	};
+
 	/*********************************************
   *
   * Parametric Replacement for SphereGeometry
   *
   *********************************************/
-
 	ParametricGeometries.SphereGeometry = class SphereGeometry extends THREE.ParametricGeometry {
 
 		constructor( size, u, v ) {
@@ -185,6 +185,7 @@
 		}
 
 	};
+
 	/*********************************************
   *
   * Parametric Replacement for PlaneGeometry

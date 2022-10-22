@@ -11,13 +11,9 @@
 			this._oldClearColor = new THREE.Color();
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive */
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 			let oldClearAlpha;
-
 			if ( this.clearColor ) {
 
 				renderer.getClearColor( this._oldClearColor );
@@ -28,7 +24,6 @@
 
 			renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
 			renderer.clear();
-
 			if ( this.clearColor ) {
 
 				renderer.setClearColor( this._oldClearColor, oldClearAlpha );

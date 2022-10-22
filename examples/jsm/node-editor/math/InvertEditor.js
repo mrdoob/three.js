@@ -1,6 +1,6 @@
-import { SelectInput, LabelElement } from '../../libs/flow.module.js';
+import { SelectInput, Element, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { MathNode, UniformNode } from 'three-nodes/Nodes.js';
+import { MathNode, UniformNode } from 'three/nodes';
 
 const DEFAULT_VALUE = new UniformNode( 0 );
 
@@ -31,7 +31,7 @@ export class InvertEditor extends BaseNode {
 
 		} );
 
-		this.add( new LabelElement( 'Method' ).add( optionsField ) )
+		this.add( new Element().add( optionsField ) )
 			.add( input );
 
 	}

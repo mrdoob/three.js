@@ -7,6 +7,8 @@ class InputNode extends Node {
 
 		super( nodeType );
 
+		this.isInputNode = true;
+
 		this.value = value;
 
 	}
@@ -51,12 +53,10 @@ class InputNode extends Node {
 
 	generate( /*builder, output*/ ) {
 
-		console.warn('Abstract function.');
+		console.warn( 'Abstract function.' );
 
 	}
 
 }
-
-InputNode.prototype.isInputNode = true;
 
 export default InputNode;

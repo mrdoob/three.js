@@ -1,26 +1,17 @@
 ( function () {
 
 	const _q = new THREE.Quaternion();
-
 	const _targetPos = new THREE.Vector3();
-
 	const _targetVec = new THREE.Vector3();
-
 	const _effectorPos = new THREE.Vector3();
-
 	const _effectorVec = new THREE.Vector3();
-
 	const _linkPos = new THREE.Vector3();
-
 	const _invLinkQ = new THREE.Quaternion();
-
 	const _linkScale = new THREE.Vector3();
-
 	const _axis = new THREE.Vector3();
-
 	const _vector = new THREE.Vector3();
-
 	const _matrix = new THREE.Matrix4();
+
 	/**
  * CCD Algorithm
  *  - https://sites.google.com/site/auraliusproject/ccd-algorithm
@@ -41,7 +32,6 @@
  * } ];
  */
 
-
 	class CCDIKSolver {
 
 		/**
@@ -52,21 +42,18 @@
 
 			this.mesh = mesh;
 			this.iks = iks;
-
 			this._valid();
 
 		}
+
 		/**
    * Update all IK bones.
    *
    * @return {CCDIKSolver}
    */
-
-
 		update() {
 
 			const iks = this.iks;
-
 			for ( let i = 0, il = iks.length; i < il; i ++ ) {
 
 				this.updateOne( iks[ i ] );
@@ -76,64 +63,55 @@
 			return this;
 
 		}
+
 		/**
    * Update one IK bone
    *
    * @param {Object} ik parameter
    * @return {CCDIKSolver}
    */
-
-
 		updateOne( ik ) {
 
-			const bones = this.mesh.skeleton.bones; // for reference overhead reduction in loop
+			const bones = this.mesh.skeleton.bones;
 
+			// for reference overhead reduction in loop
 			const math = Math;
 			const effector = bones[ ik.effector ];
-			const target = bones[ ik.target ]; // don't use getWorldPosition() here for the performance
+			const target = bones[ ik.target ];
+
+			// don't use getWorldPosition() here for the performance
 			// because it calls updateMatrixWorld( true ) inside.
-
 			_targetPos.setFromMatrixPosition( target.matrixWorld );
-
 			const links = ik.links;
 			const iteration = ik.iteration !== undefined ? ik.iteration : 1;
-
 			for ( let i = 0; i < iteration; i ++ ) {
 
 				let rotated = false;
-
 				for ( let j = 0, jl = links.length; j < jl; j ++ ) {
 
-					const link = bones[ links[ j ].index ]; // skip this link and following links.
-					// this skip is used for MMD performance optimization.
+					const link = bones[ links[ j ].index ];
 
+					// skip this link and following links.
+					// this skip is used for MMD performance optimization.
 					if ( links[ j ].enabled === false ) break;
 					const limitation = links[ j ].limitation;
 					const rotationMin = links[ j ].rotationMin;
-					const rotationMax = links[ j ].rotationMax; // don't use getWorldPosition/Quaternion() here for the performance
+					const rotationMax = links[ j ].rotationMax;
+
+					// don't use getWorldPosition/Quaternion() here for the performance
 					// because they call updateMatrixWorld( true ) inside.
-
 					link.matrixWorld.decompose( _linkPos, _invLinkQ, _linkScale );
-
 					_invLinkQ.invert();
+					_effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
-					_effectorPos.setFromMatrixPosition( effector.matrixWorld ); // work in link world
-
-
+					// work in link world
 					_effectorVec.subVectors( _effectorPos, _linkPos );
-
 					_effectorVec.applyQuaternion( _invLinkQ );
-
 					_effectorVec.normalize();
-
 					_targetVec.subVectors( _targetPos, _linkPos );
-
 					_targetVec.applyQuaternion( _invLinkQ );
-
 					_targetVec.normalize();
-
 					let angle = _targetVec.dot( _effectorVec );
-
 					if ( angle > 1.0 ) {
 
 						angle = 1.0;
@@ -144,10 +122,10 @@
 
 					}
 
-					angle = math.acos( angle ); // skip if changing angle is too small to prevent vibration of bone
+					angle = math.acos( angle );
 
+					// skip if changing angle is too small to prevent vibration of bone
 					if ( angle < 1e-5 ) continue;
-
 					if ( ik.minAngle !== undefined && angle < ik.minAngle ) {
 
 						angle = ik.minAngle;
@@ -161,13 +139,11 @@
 					}
 
 					_axis.crossVectors( _effectorVec, _targetVec );
-
 					_axis.normalize();
-
 					_q.setFromAxisAngle( _axis, angle );
+					link.quaternion.multiply( _q );
 
-					link.quaternion.multiply( _q ); // TODO: re-consider the limitation specification
-
+					// TODO: re-consider the limitation specification
 					if ( limitation !== undefined ) {
 
 						let c = link.quaternion.w;
@@ -201,25 +177,24 @@
 			return this;
 
 		}
+
 		/**
    * Creates Helper
    *
    * @return {CCDIKHelper}
    */
-
-
 		createHelper() {
 
 			return new CCDIKHelper( this.mesh, this.mesh.geometry.userData.MMD.iks );
 
-		} // private methods
+		}
 
+		// private methods
 
 		_valid() {
 
 			const iks = this.iks;
 			const bones = this.mesh.skeleton.bones;
-
 			for ( let i = 0, il = iks.length; i < il; i ++ ) {
 
 				const ik = iks[ i ];
@@ -227,11 +202,9 @@
 				const links = ik.links;
 				let link0, link1;
 				link0 = effector;
-
 				for ( let j = 0, jl = links.length; j < jl; j ++ ) {
 
 					link1 = bones[ links[ j ].index ];
-
 					if ( link0.parent !== link1 ) {
 
 						console.warn( 'THREE.CCDIKSolver: bone ' + link0.name + ' is not the child of bone ' + link1.name );
@@ -247,7 +220,6 @@
 		}
 
 	}
-
 	function getPosition( bone, matrixWorldInv ) {
 
 		return _vector.setFromMatrixPosition( bone.matrixWorld ).applyMatrix4( matrixWorldInv );
@@ -262,24 +234,23 @@
 		array[ index * 3 + 2 ] = v.z;
 
 	}
+
 	/**
  * Visualize IK bones
  *
  * @param {SkinnedMesh} mesh
  * @param {Array<Object>} iks
  */
-
-
 	class CCDIKHelper extends THREE.Object3D {
 
-		constructor( mesh, iks = [] ) {
+		constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
 			super();
 			this.root = mesh;
 			this.iks = iks;
 			this.matrix.copy( mesh.matrixWorld );
 			this.matrixAutoUpdate = false;
-			this.sphereGeometry = new THREE.SphereGeometry( 0.25, 16, 8 );
+			this.sphereGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
 			this.targetSphereMaterial = new THREE.MeshBasicMaterial( {
 				color: new THREE.Color( 0xff8888 ),
 				depthTest: false,
@@ -304,27 +275,22 @@
 				depthWrite: false,
 				transparent: true
 			} );
-
 			this._init();
 
 		}
+
 		/**
    * Updates IK bones visualization.
    */
-
-
 		updateMatrixWorld( force ) {
 
 			const mesh = this.root;
-
 			if ( this.visible ) {
 
 				let offset = 0;
 				const iks = this.iks;
 				const bones = mesh.skeleton.bones;
-
 				_matrix.copy( mesh.matrixWorld ).invert();
-
 				for ( let i = 0, il = iks.length; i < il; i ++ ) {
 
 					const ik = iks[ i ];
@@ -334,7 +300,6 @@
 					const effectorMesh = this.children[ offset ++ ];
 					targetMesh.position.copy( getPosition( targetBone, _matrix ) );
 					effectorMesh.position.copy( getPosition( effectorBone, _matrix ) );
-
 					for ( let j = 0, jl = ik.links.length; j < jl; j ++ ) {
 
 						const link = ik.links[ j ];
@@ -348,7 +313,6 @@
 					const array = line.geometry.attributes.position.array;
 					setPositionOfBoneToAttributeArray( array, 0, targetBone, _matrix );
 					setPositionOfBoneToAttributeArray( array, 1, effectorBone, _matrix );
-
 					for ( let j = 0, jl = ik.links.length; j < jl; j ++ ) {
 
 						const link = ik.links[ j ];
@@ -366,14 +330,34 @@
 			this.matrix.copy( mesh.matrixWorld );
 			super.updateMatrixWorld( force );
 
-		} // private method
+		}
 
+		/**
+   * Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+   */
+		dispose() {
+
+			this.sphereGeometry.dispose();
+			this.targetSphereMaterial.dispose();
+			this.effectorSphereMaterial.dispose();
+			this.linkSphereMaterial.dispose();
+			this.lineMaterial.dispose();
+			const children = this.children;
+			for ( let i = 0; i < children.length; i ++ ) {
+
+				const child = children[ i ];
+				if ( child.isLine ) child.geometry.dispose();
+
+			}
+
+		}
+
+		// private method
 
 		_init() {
 
 			const scope = this;
 			const iks = this.iks;
-
 			function createLineGeometry( ik ) {
 
 				const geometry = new THREE.BufferGeometry();
@@ -412,7 +396,6 @@
 				const ik = iks[ i ];
 				this.add( createTargetMesh() );
 				this.add( createEffectorMesh() );
-
 				for ( let j = 0, jl = ik.links.length; j < jl; j ++ ) {
 
 					this.add( createLinkMesh() );

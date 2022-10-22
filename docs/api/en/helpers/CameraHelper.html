@@ -52,7 +52,7 @@ scene.add( helper );
 
 		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
-			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			See [page:Object3D.matrixAutoUpdate]. Set to `false` here as the helper is using the
 			camera's [page:Object3D.matrixWorld matrixWorld].
 		</p>
 
@@ -61,7 +61,12 @@ scene.add( helper );
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-			Disposes of the internally-created [page:Line.material material] and [page:Line.geometry geometry] used by this helper.
+			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+		</p>
+
+		<h3>[method:this setColors]( [param:Color frustum], [param:Color cone], [param:Color up], [param:Color target], [param:Color cross] )</h3>
+		<p>
+			Defines the colors of the helper.
 		</p>
 
 		<h3>[method:undefined update]()</h3>

@@ -1,4 +1,4 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
+import { GPUIndexFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
 import {
 	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
@@ -11,7 +11,7 @@ import {
 
 class WebGPURenderPipeline {
 
-	constructor( device, renderer, sampleCount ) {
+	constructor( device, utils ) {
 
 		this.cacheKey = null;
 		this.shaderAttributes = null;
@@ -20,8 +20,7 @@ class WebGPURenderPipeline {
 		this.usedTimes = 0;
 
 		this._device = device;
-		this._renderer = renderer;
-		this._sampleCount = sampleCount;
+		this._utils = utils;
 
 	}
 
@@ -46,7 +45,7 @@ class WebGPURenderPipeline {
 
 			vertexBuffers.push( {
 				arrayStride: attribute.arrayStride,
-				attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ],
+				attributes: [ { shaderLocation: attribute.slot, offset: attribute.offset, format: attribute.format } ],
 				stepMode: stepMode
 			} );
 
@@ -89,8 +88,9 @@ class WebGPURenderPipeline {
 		const primitiveState = this._getPrimitiveState( object, material );
 		const colorWriteMask = this._getColorWriteMask( material );
 		const depthCompare = this._getDepthCompare( material );
-		const colorFormat = this._renderer.getCurrentColorFormat();
-		const depthStencilFormat = this._renderer.getCurrentDepthStencilFormat();
+		const colorFormat = this._utils.getCurrentColorFormat();
+		const depthStencilFormat = this._utils.getCurrentDepthStencilFormat();
+		const sampleCount = this._utils.getSampleCount();
 
 		this.pipeline = this._device.createRenderPipeline( {
 			vertex: Object.assign( {}, stageVertex.stage, { buffers: vertexBuffers } ),
@@ -113,22 +113,10 @@ class WebGPURenderPipeline {
 				stencilWriteMask: material.stencilWriteMask
 			},
 			multisample: {
-				count: this._sampleCount
-			}
+				count: sampleCount
+			},
+			layout: 'auto'
 		} );
-
-	}
-
-	_getArrayStride( type, bytesPerElement ) {
-
-		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
-
-		if ( type === 'float' || type === 'int' || type === 'uint' ) return bytesPerElement;
-		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return bytesPerElement * 2;
-		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return bytesPerElement * 3;
-		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return bytesPerElement * 4;
-
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
 	}
 
@@ -156,7 +144,13 @@ class WebGPURenderPipeline {
 				break;
 
 			case AdditiveBlending:
-				// no alphaBlend settings
+
+				alphaBlend = {
+					srcFactor: GPUBlendFactor.Zero,
+					dstFactor: GPUBlendFactor.One,
+					operation: GPUBlendOperation.Add
+				};
+
 				break;
 
 			case SubtractiveBlending:
@@ -174,6 +168,7 @@ class WebGPURenderPipeline {
 				break;
 
 			case MultiplyBlending:
+
 				if ( premultipliedAlpha === true ) {
 
 					alphaBlend = {
@@ -330,7 +325,6 @@ class WebGPURenderPipeline {
 		switch ( blending ) {
 
 			case NormalBlending:
-
 				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
 				colorBlend.dstFactor = GPUBlendFactor.OneMinusSrcAlpha;
 				colorBlend.operation = GPUBlendOperation.Add;
@@ -338,6 +332,7 @@ class WebGPURenderPipeline {
 
 			case AdditiveBlending:
 				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
+				colorBlend.dstFactor = GPUBlendFactor.One;
 				colorBlend.operation = GPUBlendOperation.Add;
 				break;
 
@@ -435,7 +430,7 @@ class WebGPURenderPipeline {
 
 		const descriptor = {};
 
-		descriptor.topology = this._getPrimitiveTopology( object );
+		descriptor.topology = this._utils.getPrimitiveTopology( object );
 
 		if ( object.isLine === true && object.isLineSegments !== true ) {
 
@@ -448,8 +443,8 @@ class WebGPURenderPipeline {
 		switch ( material.side ) {
 
 			case FrontSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
-				descriptor.cullMode = GPUCullMode.Back;
+				descriptor.frontFace = GPUFrontFace.CW;
+				descriptor.cullMode = GPUCullMode.Front;
 				break;
 
 			case BackSide:
@@ -458,7 +453,7 @@ class WebGPURenderPipeline {
 				break;
 
 			case DoubleSide:
-				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.frontFace = GPUFrontFace.CW;
 				descriptor.cullMode = GPUCullMode.None;
 				break;
 
@@ -469,15 +464,6 @@ class WebGPURenderPipeline {
 		}
 
 		return descriptor;
-
-	}
-
-	_getPrimitiveTopology( object ) {
-
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 
 	}
 
@@ -714,14 +700,26 @@ class WebGPURenderPipeline {
 			const type = nodeAttribute.type;
 
 			const geometryAttribute = geometry.getAttribute( name );
-			const bytesPerElement = ( geometryAttribute !== undefined ) ? geometryAttribute.array.BYTES_PER_ELEMENT : 4;
+			const bytesPerElement = geometryAttribute.array.BYTES_PER_ELEMENT;
 
-			const arrayStride = this._getArrayStride( type, bytesPerElement );
 			const format = this._getVertexFormat( type, bytesPerElement );
+
+			let arrayStride = geometryAttribute.itemSize * bytesPerElement;
+			let offset = 0;
+
+			if ( geometryAttribute.isInterleavedBufferAttribute === true ) {
+
+				// @TODO: It can be optimized for "vertexBuffers" on RenderPipeline
+
+				arrayStride = geometryAttribute.data.stride * bytesPerElement;
+				offset = geometryAttribute.offset * bytesPerElement;
+
+			}
 
 			attributes.push( {
 				name,
 				arrayStride,
+				offset,
 				format,
 				slot
 			} );

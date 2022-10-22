@@ -6,12 +6,12 @@ class Group extends Object3D {
 
 		super();
 
+		this.isGroup = true;
+
 		this.type = 'Group';
 
 	}
 
 }
-
-Group.prototype.isGroup = true;
 
 export { Group };
