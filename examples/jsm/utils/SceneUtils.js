@@ -123,16 +123,16 @@ function createMultiMaterialObject( geometry, materials ) {
 
 }
 
-function reduceVertices( func, initialValue ) {
+function reduceVertices( object, func, initialValue ) {
 
 	let value = initialValue;
 	const vertex = new Vector3();
 
-	this.traverseVisible( ( object ) => {
+	object.updateWorldMatrix( true, true );
 
-		object.updateWorldMatrix( false, false );
+	object.traverseVisible( ( child ) => {
 
-		const { geometry } = object;
+		const { geometry } = child;
 
 		if ( geometry !== undefined ) {
 
@@ -144,13 +144,13 @@ function reduceVertices( func, initialValue ) {
 
 					vertex.fromBufferAttribute( position, i );
 
-					if ( object.isSkinnedMesh ) {
+					if ( child.isSkinnedMesh ) {
 
-						object.boneTransform( i, vertex );
+						child.boneTransform( i, vertex );
 
 					} else {
 
-						vertex.applyMatrix4( object.matrixWorld );
+						vertex.applyMatrix4( child.matrixWorld );
 
 					}
 
