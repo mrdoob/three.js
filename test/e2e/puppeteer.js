@@ -48,6 +48,7 @@ const exceptionList = [
 	'webgpu_cubemap_adjustments',
 	'webgpu_cubemap_mix',
 	'webgpu_depth_texture',
+	'webgpu_equirectangular',
 	'webgpu_instance_mesh',
 	'webgpu_instance_uniform',
 	'webgpu_lights_custom',

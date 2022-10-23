@@ -18,6 +18,7 @@ import LightsNode from '../lighting/LightsNode.js';
 import LightingContextNode from '../lighting/LightingContextNode.js';
 
 // utils
+import EquirectUVNode from '../utils/EquirectUVNode.js';
 import MatcapUVNode from '../utils/MatcapUVNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 import OscNode from '../utils/OscNode.js';
@@ -101,6 +102,8 @@ export const lightingContext = nodeProxy( LightingContextNode );
 // utils
 
 export const matcapUV = nodeImmutable( MatcapUVNode );
+export const equirectUV = nodeProxy( EquirectUVNode );
+
 export const maxMipLevel = nodeProxy( MaxMipLevelNode );
 
 export const oscSine = nodeProxy( OscNode, OscNode.SINE );
