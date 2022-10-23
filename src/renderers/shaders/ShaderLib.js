@@ -230,7 +230,6 @@ const ShaderLib = {
 		uniforms: {
 			envMap: { value: null },
 			flipEnvMap: { value: - 1 },
-			opacity: { value: 1.0 },
 			backgroundBlurriness: { value: 0 }
 		},
 

@@ -28,7 +28,6 @@ export const fragment = /* glsl */`
 #endif
 
 uniform float flipEnvMap;
-uniform float opacity;
 uniform float backgroundBlurriness;
 
 varying vec3 vWorldDirection;
@@ -47,12 +46,11 @@ void main() {
 
 	#else
 
-		vec4 texColor = vec4( 0.0 );
+		vec4 texColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 
 	#endif
 
 	gl_FragColor = texColor;
-	gl_FragColor.a *= opacity;
 
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
