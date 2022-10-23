@@ -185,13 +185,23 @@ function SidebarScene( editor ) {
 
 	container.add( backgroundRow );
 
+	const backgroundEquirectRow = new UIRow();
+	backgroundEquirectRow.setDisplay( 'none' );
+	backgroundEquirectRow.setMarginLeft( '90px' );
+
+	const backgroundBlurriness = new UINumber( 0 ).setWidth( '40px' ).setRange( 0, 1 ).onChange( onBackgroundChanged );
+	backgroundEquirectRow.add( backgroundBlurriness );
+
+	container.add( backgroundEquirectRow );
+
 	function onBackgroundChanged() {
 
 		signals.sceneBackgroundChanged.dispatch(
 			backgroundType.getValue(),
 			backgroundColor.getHexValue(),
 			backgroundTexture.getValue(),
-			backgroundEquirectangularTexture.getValue()
+			backgroundEquirectangularTexture.getValue(),
+			backgroundBlurriness.getValue()
 		);
 
 	}
@@ -204,6 +214,7 @@ function SidebarScene( editor ) {
 		backgroundColor.setDisplay( type === 'Color' ? '' : 'none' );
 		backgroundTexture.setDisplay( type === 'Texture' ? '' : 'none' );
 		backgroundEquirectangularTexture.setDisplay( type === 'Equirectangular' ? '' : 'none' );
+		backgroundEquirectRow.setDisplay( type === 'Equirectangular' ? '' : 'none' );
 
 	}
 

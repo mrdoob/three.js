@@ -7,7 +7,6 @@
 			this._quality = value;
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const quality = this._quality || 1;
@@ -18,14 +17,16 @@
 			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( text ) {
 
-				const data = JSON.parse( text ); // bodymoving uses container.offetWidth and offsetHeight
+				const data = JSON.parse( text );
+
+				// lottie uses container.offetWidth and offsetHeight
 				// to define width/height
 
 				const container = document.createElement( 'div' );
 				container.style.width = data.w + 'px';
 				container.style.height = data.h + 'px';
 				document.body.appendChild( container );
-				const animation = bodymovin.loadAnimation( {
+				const animation = lottie.loadAnimation( {
 					container: container,
 					animType: 'canvas',
 					loop: true,
@@ -43,7 +44,6 @@
 
 				} );
 				container.style.display = 'none';
-
 				if ( onLoad !== undefined ) {
 
 					onLoad( texture );

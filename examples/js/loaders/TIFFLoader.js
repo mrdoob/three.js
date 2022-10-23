@@ -7,7 +7,6 @@
 			super( manager );
 
 		}
-
 		parse( buffer ) {
 
 			const ifds = UTIF.decode( buffer );

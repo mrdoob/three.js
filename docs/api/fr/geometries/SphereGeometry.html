@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Une classe pour générer des géométries de sphère.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#SphereGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Exemple de code : </h2>
+
+		<code>const geometry = new THREE.SphereGeometry( 15, 32, 16 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const sphere = new THREE.Mesh( geometry, material );
+		scene.add( sphere );
+		</code>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]([param:Float radius], [param:Integer widthSegments], [param:Integer heightSegments], [param:Float phiStart], [param:Float phiLength], [param:Float thetaStart], [param:Float thetaLength])</h3>
+
+		<p>
+		radius — Rayon de la sphère. La valeur par défaut est 1.<br />
+		widthSegments — Nombre de segments horizontaux. La valeur minimale est 3 et la valeur par défaut est 32.<br />
+		heightSegments — Nombre de segments verticaux. La valeur minimale est 2 et la valeur par défaut est 16.<br />
+		phiStart — Spécifie l'angle de départ horizontal. La valeur par défaut est 0.<br />
+		phiLength — Spécifie la taille de l'angle de balayage horizontal. La valeur par défaut est Math.PI * 2. <br />
+		thetaStart — Spécifie l'angle de départ vertical. La valeur par défaut est 0.<br />
+		thetaLength — Spécifie la taille de l'angle de balayage vertical. La valeur par défaut est Math.PI.<br />
+		</p>
+
+		<p>
+		La géométrie est créée en balayant et en calculant les sommets autour de l'axe Y (balayage horizontal) et de l'axe Z (balayage vertical). Ainsi, des sphères incomplètes (semblables à des `'tranches de sphère'`) peuvent être créées en utilisant différentes valeurs de phiStart, phiLength, thetaStart et thetaLength, afin de définir les points auxquels nous commençons (ou terminons) le calcul de ces sommets.
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		Un objet avec une propriété pour chacun des paramètres du constructeur. Toute modification après instanciation ne change pas la géométrie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

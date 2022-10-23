@@ -22,7 +22,6 @@
 			this.shadowLines = [];
 
 		}
-
 		updateVisibility() {
 
 			const displayFrustum = this.displayFrustum;
@@ -32,7 +31,6 @@
 			const cascadeLines = this.cascadeLines;
 			const cascadePlanes = this.cascadePlanes;
 			const shadowLines = this.shadowLines;
-
 			for ( let i = 0, l = cascadeLines.length; i < l; i ++ ) {
 
 				const cascadeLine = cascadeLines[ i ];
@@ -47,7 +45,6 @@
 			frustumLines.visible = displayFrustum;
 
 		}
-
 		update() {
 
 			const csm = this.csm;
@@ -65,7 +62,6 @@
 			this.quaternion.copy( camera.quaternion );
 			this.scale.copy( camera.scale );
 			this.updateMatrixWorld( true );
-
 			while ( cascadeLines.length > cascades ) {
 
 				this.remove( cascadeLines.pop() );
@@ -137,7 +133,6 @@
 			frustumLinePositions.needsUpdate = true;
 
 		}
-
 		dispose() {
 
 			const frustumLines = this.frustumLines;
@@ -147,7 +142,6 @@
 			frustumLines.geometry.dispose();
 			frustumLines.material.dispose();
 			const cascades = this.csm.cascades;
-
 			for ( let i = 0; i < cascades; i ++ ) {
 
 				const cascadeLine = cascadeLines[ i ];

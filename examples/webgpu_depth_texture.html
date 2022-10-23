@@ -42,9 +42,9 @@
 
 			const dpr = window.devicePixelRatio;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -94,6 +94,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				textureRenderer = new WebGPUTextureRenderer( renderer );
@@ -121,10 +122,6 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
 
-				//
-
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -139,16 +136,8 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				textureRenderer.render( scene, camera );
 				renderer.render( sceneFX, cameraFX );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

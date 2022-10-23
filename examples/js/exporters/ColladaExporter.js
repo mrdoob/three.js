@@ -24,7 +24,6 @@
 				unitName: null,
 				unitMeter: null
 			}, options );
-
 			if ( options.upAxis.match( /^[XYZ]_UP$/ ) === null ) {
 
 				console.error( 'ColladaExporter: Invalid upAxis: valid values are X_UP, Y_UP or Z_UP.' );
@@ -53,23 +52,20 @@
 			}
 
 			const version = options.version;
-
 			if ( version !== '1.4.1' && version !== '1.5.0' ) {
 
 				console.warn( `ColladaExporter : Version ${version} not supported for export. Only 1.4.1 and 1.5.0.` );
 				return null;
 
-			} // Convert the urdf xml into a well-formatted, indented format
+			}
 
-
+			// Convert the urdf xml into a well-formatted, indented format
 			function format( urdf ) {
 
 				const IS_END_TAG = /^<\//;
 				const IS_SELF_CLOSING = /(\?>$)|(\/>$)/;
 				const HAS_TEXT = /<[^>]+>[^<]*<\/[^<]+>/;
-
 				const pad = ( ch, num ) => num > 0 ? ch + pad( ch, num - 1 ) : '';
-
 				let tagnum = 0;
 				return urdf.match( /(<[^>]+>[^<]+<\/[^<]+>)|(<[^>]+>)/g ).map( tag => {
 
@@ -80,7 +76,6 @@
 					}
 
 					const res = `${pad( '  ', tagnum )}${tag}`;
-
 					if ( ! HAS_TEXT.test( tag ) && ! IS_SELF_CLOSING.test( tag ) && ! IS_END_TAG.test( tag ) ) {
 
 						tagnum ++;
@@ -91,14 +86,13 @@
 
 				} ).join( '\n' );
 
-			} // Convert an image into a png format for saving
+			}
 
-
+			// Convert an image into a png format for saving
 			function base64ToBuffer( str ) {
 
 				const b = atob( str );
 				const buf = new Uint8Array( b.length );
-
 				for ( let i = 0, l = buf.length; i < l; i ++ ) {
 
 					buf[ i ] = b.charCodeAt( i );
@@ -110,25 +104,25 @@
 			}
 
 			let canvas, ctx;
-
 			function imageToData( image, ext ) {
 
 				canvas = canvas || document.createElement( 'canvas' );
 				ctx = ctx || canvas.getContext( '2d' );
 				canvas.width = image.width;
 				canvas.height = image.height;
-				ctx.drawImage( image, 0, 0 ); // Get the base64 encoded data
+				ctx.drawImage( image, 0, 0 );
 
-				const base64data = canvas.toDataURL( `image/${ext}`, 1 ).replace( /^data:image\/(png|jpg);base64,/, '' ); // Convert to a uint8 array
+				// Get the base64 encoded data
+				const base64data = canvas.toDataURL( `image/${ext}`, 1 ).replace( /^data:image\/(png|jpg);base64,/, '' );
 
+				// Convert to a uint8 array
 				return base64ToBuffer( base64data );
 
-			} // gets the attribute array. Generate a new array if the attribute is interleaved
+			}
 
-
+			// gets the attribute array. Generate a new array if the attribute is interleaved
 			const getFuncs = [ 'getX', 'getY', 'getZ', 'getW' ];
 			const tempColor = new THREE.Color();
-
 			function attrBufferToArray( attr, isColor = false ) {
 
 				if ( isColor ) {
@@ -136,7 +130,6 @@
 					// convert the colors to srgb before export
 					// colors are always written as floats
 					const arr = new Float32Array( attr.count * 3 );
-
 					for ( let i = 0, l = attr.count; i < l; i ++ ) {
 
 						tempColor.fromBufferAttribute( attr, i ).convertLinearToSRGB();
@@ -153,7 +146,6 @@
 					// use the typed array constructor to save on memory
 					const arr = new attr.array.constructor( attr.count * attr.itemSize );
 					const size = attr.itemSize;
-
 					for ( let i = 0, l = attr.count; i < l; i ++ ) {
 
 						for ( let j = 0; j < size; j ++ ) {
@@ -172,28 +164,27 @@
 
 				}
 
-			} // Returns an array of the same type starting at the `st` index,
+			}
+
+			// Returns an array of the same type starting at the `st` index,
 			// and `ct` length
-
-
 			function subArray( arr, st, ct ) {
 
 				if ( Array.isArray( arr ) ) return arr.slice( st, st + ct ); else return new arr.constructor( arr.buffer, st * arr.BYTES_PER_ELEMENT, ct );
 
-			} // Returns the string for a geometry's attribute
+			}
 
-
+			// Returns the string for a geometry's attribute
 			function getAttribute( attr, name, params, type, isColor = false ) {
 
 				const array = attrBufferToArray( attr, isColor );
 				const res = `<source id="${name}">` + `<float_array id="${name}-array" count="${array.length}">` + array.join( ' ' ) + '</float_array>' + '<technique_common>' + `<accessor source="#${name}-array" count="${Math.floor( array.length / attr.itemSize )}" stride="${attr.itemSize}">` + params.map( n => `<param name="${n}" type="${type}" />` ).join( '' ) + '</accessor>' + '</technique_common>' + '</source>';
 				return res;
 
-			} // Returns the string for a node's transform information
+			}
 
-
+			// Returns the string for a node's transform information
 			let transMat;
-
 			function getTransform( o ) {
 
 				// ensure the object's matrix is up to date
@@ -204,14 +195,13 @@
 				transMat.transpose();
 				return `<matrix>${transMat.toArray().join( ' ' )}</matrix>`;
 
-			} // Process the given piece of geometry into the geometry library
+			}
+
+			// Process the given piece of geometry into the geometry library
 			// Returns the mesh id
-
-
 			function processGeometry( bufferGeometry ) {
 
 				let info = geometryInfo.get( bufferGeometry );
-
 				if ( ! info ) {
 
 					const meshid = `Mesh${libraryGeometries.length + 1}`;
@@ -222,46 +212,48 @@
 						materialIndex: 0
 					} ];
 					const gname = bufferGeometry.name ? ` name="${bufferGeometry.name}"` : '';
-					let gnode = `<geometry id="${meshid}"${gname}><mesh>`; // define the geometry node and the vertices for the geometry
+					let gnode = `<geometry id="${meshid}"${gname}><mesh>`;
 
+					// define the geometry node and the vertices for the geometry
 					const posName = `${meshid}-position`;
 					const vertName = `${meshid}-vertices`;
 					gnode += getAttribute( bufferGeometry.attributes.position, posName, [ 'X', 'Y', 'Z' ], 'float' );
-					gnode += `<vertices id="${vertName}"><input semantic="POSITION" source="#${posName}" /></vertices>`; // NOTE: We're not optimizing the attribute arrays here, so they're all the same length and
+					gnode += `<vertices id="${vertName}"><input semantic="POSITION" source="#${posName}" /></vertices>`;
+
+					// NOTE: We're not optimizing the attribute arrays here, so they're all the same length and
 					// can therefore share the same triangle indices. However, MeshLab seems to have trouble opening
 					// models with attributes that share an offset.
 					// MeshLab Bug#424: https://sourceforge.net/p/meshlab/bugs/424/
+
 					// serialize normals
-
 					let triangleInputs = `<input semantic="VERTEX" source="#${vertName}" offset="0" />`;
-
 					if ( 'normal' in bufferGeometry.attributes ) {
 
 						const normName = `${meshid}-normal`;
 						gnode += getAttribute( bufferGeometry.attributes.normal, normName, [ 'X', 'Y', 'Z' ], 'float' );
 						triangleInputs += `<input semantic="NORMAL" source="#${normName}" offset="0" />`;
 
-					} // serialize uvs
+					}
 
-
+					// serialize uvs
 					if ( 'uv' in bufferGeometry.attributes ) {
 
 						const uvName = `${meshid}-texcoord`;
 						gnode += getAttribute( bufferGeometry.attributes.uv, uvName, [ 'S', 'T' ], 'float' );
 						triangleInputs += `<input semantic="TEXCOORD" source="#${uvName}" offset="0" set="0" />`;
 
-					} // serialize lightmap uvs
+					}
 
-
+					// serialize lightmap uvs
 					if ( 'uv2' in bufferGeometry.attributes ) {
 
 						const uvName = `${meshid}-texcoord2`;
 						gnode += getAttribute( bufferGeometry.attributes.uv2, uvName, [ 'S', 'T' ], 'float' );
 						triangleInputs += `<input semantic="TEXCOORD" source="#${uvName}" offset="0" set="1" />`;
 
-					} // serialize colors
+					}
 
-
+					// serialize colors
 					if ( 'color' in bufferGeometry.attributes ) {
 
 						// colors are always written as floats
@@ -272,7 +264,6 @@
 					}
 
 					let indexArray = null;
-
 					if ( bufferGeometry.index ) {
 
 						indexArray = attrBufferToArray( bufferGeometry.index );
@@ -280,7 +271,6 @@
 					} else {
 
 						indexArray = new Array( indexCount );
-
 						for ( let i = 0, l = indexArray.length; i < l; i ++ ) indexArray[ i ] = i;
 
 					}
@@ -309,21 +299,19 @@
 
 				return info;
 
-			} // Process the given texture into the image library
+			}
+
+			// Process the given texture into the image library
 			// Returns the image library
-
-
 			function processTexture( tex ) {
 
 				let texid = imageMap.get( tex );
-
 				if ( texid == null ) {
 
 					texid = `image-${libraryImages.length + 1}`;
 					const ext = 'png';
 					const name = tex.name || texid;
 					let imageNode = `<image id="${texid}" name="${name}">`;
-
 					if ( version === '1.5.0' ) {
 
 						imageNode += `<init_from><ref>${options.textureDirectory}${name}.${ext}</ref></init_from>`;
@@ -350,19 +338,17 @@
 
 				return texid;
 
-			} // Process the given material into the material and effect libraries
+			}
+
+			// Process the given material into the material and effect libraries
 			// Returns the material id
-
-
 			function processMaterial( m ) {
 
 				let matid = materialMap.get( m );
-
 				if ( matid == null ) {
 
 					matid = `Mat${libraryEffects.length + 1}`;
 					let type = 'phong';
-
 					if ( m.isMeshLambertMaterial === true ) {
 
 						type = 'lambert';
@@ -370,7 +356,6 @@
 					} else if ( m.isMeshBasicMaterial === true ) {
 
 						type = 'constant';
-
 						if ( m.map !== null ) {
 
 							// The Collada spec does not support diffuse texture maps with the
@@ -389,16 +374,15 @@
 					const reflectivity = m.reflectivity || 0;
 					emissive.convertLinearToSRGB();
 					specular.convertLinearToSRGB();
-					diffuse.convertLinearToSRGB(); // Do not export and alpha map for the reasons mentioned in issue (#13792)
+					diffuse.convertLinearToSRGB();
+
+					// Do not export and alpha map for the reasons mentioned in issue (#13792)
 					// in three.js alpha maps are black and white, but collada expects the alpha
 					// channel to specify the transparency
-
 					let transparencyNode = '';
-
 					if ( m.transparent === true ) {
 
 						transparencyNode += '<transparent>' + ( m.map ? '<texture texture="diffuse-sampler"></texture>' : '<float>1</float>' ) + '</transparent>';
-
 						if ( m.opacity < 1 ) {
 
 							transparencyNode += `<transparency><float>${m.opacity}</float></transparency>`;
@@ -419,30 +403,30 @@
 
 				return matid;
 
-			} // Recursively process the object into a scene
+			}
 
-
+			// Recursively process the object into a scene
 			function processObject( o ) {
 
 				let node = `<node name="${o.name}">`;
 				node += getTransform( o );
-
 				if ( o.isMesh === true && o.geometry !== null ) {
 
 					// function returns the id associated with the mesh and a "BufferGeometry" version
 					// of the geometry in case it's not a geometry.
 					const geomInfo = processGeometry( o.geometry );
 					const meshid = geomInfo.meshid;
-					const geometry = geomInfo.bufferGeometry; // ids of the materials to bind to the geometry
+					const geometry = geomInfo.bufferGeometry;
 
+					// ids of the materials to bind to the geometry
 					let matids = null;
-					let matidsArray; // get a list of materials to bind to the sub groups of the geometry.
+					let matidsArray;
+
+					// get a list of materials to bind to the sub groups of the geometry.
 					// If the amount of subgroups is greater than the materials, than reuse
 					// the materials.
-
 					const mat = o.material || new THREE.MeshBasicMaterial();
 					const materials = Array.isArray( mat ) ? mat : [ mat ];
-
 					if ( geometry.groups.length > materials.length ) {
 
 						matidsArray = new Array( geometry.groups.length );
@@ -486,7 +470,6 @@
 				data: format( dae ),
 				textures
 			};
-
 			if ( typeof onDone === 'function' ) {
 
 				requestAnimationFrame( () => onDone( res ) );

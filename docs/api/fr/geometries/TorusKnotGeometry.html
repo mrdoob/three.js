@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Crée un nœud de tore, dont la forme particulière est définie par une paire d'entiers premiers entre eux, p et q. Si p et q ne sont pas premiers entre eux, le résultat sera un lien tore.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#TorusKnotGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Exemple de code :</h2>
+
+		<code>const geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const torusKnot = new THREE.Mesh( geometry, material );
+		scene.add( torusKnot );
+		</code>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]([param:Float radius], [param:Float tube], [param:Integer tubularSegments], [param:Integer radialSegments], [param:Integer p], [param:Integer q])</h3>
+		<p>
+			<ul>
+				<li>radius - Rayon du tore. La valeur par défaut est 1.</li>
+				<li>tube — Rayon du tube. La valeur par défaut est 0,4.</li>
+				<li>tubularSegments — La valeur par défaut est 64.</li>
+				<li>radialSegments — La valeur par défaut est 8.</li>
+				<li>p — Cette valeur détermine combien de fois la géométrie s'enroule autour de son axe de symétrie de rotation. La valeur par défaut est 2.</li>
+				<li>q — Cette valeur détermine combien de fois la géométrie s'enroule autour d'un cercle à l'intérieur du tore. La valeur par défaut est 3.</li>
+			</ul>
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		Un objet avec une propriété pour chacun des paramètres du constructeur. Toute modification après instanciation ne change pas la géométrie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

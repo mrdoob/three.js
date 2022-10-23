@@ -7,7 +7,6 @@
 			super( manager );
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -41,19 +40,17 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( text, path ) {
 
 			function getElementsByTagName( xml, name ) {
 
 				// Non recursive xml.getElementsByTagName() ...
+
 				const array = [];
 				const childNodes = xml.childNodes;
-
 				for ( let i = 0, l = childNodes.length; i < l; i ++ ) {
 
 					const child = childNodes[ i ];
-
 					if ( child.nodeName === name ) {
 
 						array.push( child );
@@ -71,7 +68,6 @@
 				if ( text.length === 0 ) return [];
 				const parts = text.trim().split( /\s+/ );
 				const array = new Array( parts.length );
-
 				for ( let i = 0, l = parts.length; i < l; i ++ ) {
 
 					array[ i ] = parts[ i ];
@@ -87,7 +83,6 @@
 				if ( text.length === 0 ) return [];
 				const parts = text.trim().split( /\s+/ );
 				const array = new Array( parts.length );
-
 				for ( let i = 0, l = parts.length; i < l; i ++ ) {
 
 					array[ i ] = parseFloat( parts[ i ] );
@@ -103,7 +98,6 @@
 				if ( text.length === 0 ) return [];
 				const parts = text.trim().split( /\s+/ );
 				const array = new Array( parts.length );
-
 				for ( let i = 0, l = parts.length; i < l; i ++ ) {
 
 					array[ i ] = parseInt( parts[ i ] );
@@ -130,8 +124,9 @@
 
 				return Object.keys( object ).length === 0;
 
-			} // asset
+			}
 
+			// asset
 
 			function parseAsset( xml ) {
 
@@ -160,17 +155,16 @@
 
 				return xml !== undefined ? xml.textContent : 'Y_UP';
 
-			} // library
+			}
 
+			// library
 
 			function parseLibrary( xml, libraryName, nodeName, parser ) {
 
 				const library = getElementsByTagName( xml, libraryName )[ 0 ];
-
 				if ( library !== undefined ) {
 
 					const elements = getElementsByTagName( library, nodeName );
-
 					for ( let i = 0; i < elements.length; i ++ ) {
 
 						parser( elements[ i ] );
@@ -190,8 +184,9 @@
 
 				}
 
-			} // get
+			}
 
+			// get
 
 			function getBuild( data, builder ) {
 
@@ -199,8 +194,9 @@
 				data.build = builder( data );
 				return data.build;
 
-			} // animation
+			}
 
+			// animation
 
 			function parseAnimation( xml ) {
 
@@ -210,36 +206,30 @@
 					channels: {}
 				};
 				let hasChildren = false;
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
 					let id;
-
 					switch ( child.nodeName ) {
 
 						case 'source':
 							id = child.getAttribute( 'id' );
 							data.sources[ id ] = parseSource( child );
 							break;
-
 						case 'sampler':
 							id = child.getAttribute( 'id' );
 							data.samplers[ id ] = parseAnimationSampler( child );
 							break;
-
 						case 'channel':
 							id = child.getAttribute( 'target' );
 							data.channels[ id ] = parseAnimationChannel( child );
 							break;
-
 						case 'animation':
 							// hierarchy of related animations
 							parseAnimation( child );
 							hasChildren = true;
 							break;
-
 						default:
 							console.log( child );
 
@@ -250,6 +240,7 @@
 				if ( hasChildren === false ) {
 
 					// since 'id' attributes can be optional, it's necessary to generate a UUID for unqiue assignment
+
 					library.animations[ xml.getAttribute( 'id' ) || THREE.MathUtils.generateUUID() ] = data;
 
 				}
@@ -261,12 +252,10 @@
 				const data = {
 					inputs: {}
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'input':
@@ -286,18 +275,22 @@
 			function parseAnimationChannel( xml ) {
 
 				const data = {};
-				const target = xml.getAttribute( 'target' ); // parsing SID Addressing Syntax
+				const target = xml.getAttribute( 'target' );
+
+				// parsing SID Addressing Syntax
 
 				let parts = target.split( '/' );
 				const id = parts.shift();
-				let sid = parts.shift(); // check selection syntax
+				let sid = parts.shift();
+
+				// check selection syntax
 
 				const arraySyntax = sid.indexOf( '(' ) !== - 1;
 				const memberSyntax = sid.indexOf( '.' ) !== - 1;
-
 				if ( memberSyntax ) {
 
 					//  member selection access
+
 					parts = sid.split( '.' );
 					sid = parts.shift();
 					data.member = parts.shift();
@@ -305,9 +298,9 @@
 				} else if ( arraySyntax ) {
 
 					// array-access syntax. can be used to express fields in one-dimensional vectors or two-dimensional matrices.
+
 					const indices = sid.split( '(' );
 					sid = indices.shift();
-
 					for ( let i = 0; i < indices.length; i ++ ) {
 
 						indices[ i ] = parseInt( indices[ i ].replace( /\)/, '' ) );
@@ -333,7 +326,6 @@
 				const channels = data.channels;
 				const samplers = data.samplers;
 				const sources = data.sources;
-
 				for ( const target in channels ) {
 
 					if ( channels.hasOwnProperty( target ) ) {
@@ -369,7 +361,9 @@
 				const defaultMatrix = node.matrix.clone().transpose();
 				let time, stride;
 				let i, il, j, jl;
-				const data = {}; // the collada spec allows the animation of data in various ways.
+				const data = {};
+
+				// the collada spec allows the animation of data in various ways.
 				// depending on the transform type (matrix, translate, rotate, scale), we execute different logic
 
 				switch ( transform ) {
@@ -380,7 +374,6 @@
 							time = inputSource.array[ i ];
 							stride = i * outputSource.stride;
 							if ( data[ time ] === undefined ) data[ time ] = {};
-
 							if ( channel.arraySyntax === true ) {
 
 								const value = outputSource.array[ stride ];
@@ -400,15 +393,12 @@
 						}
 
 						break;
-
 					case 'translate':
 						console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
 						break;
-
 					case 'rotate':
 						console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
 						break;
-
 					case 'scale':
 						console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
 						break;
@@ -426,7 +416,9 @@
 
 			function prepareAnimationData( data, defaultMatrix ) {
 
-				const keyframes = []; // transfer data into a sortable array
+				const keyframes = [];
+
+				// transfer data into a sortable array
 
 				for ( const time in data ) {
 
@@ -435,10 +427,13 @@
 						value: data[ time ]
 					} );
 
-				} // ensure keyframes are sorted by time
+				}
 
+				// ensure keyframes are sorted by time
 
-				keyframes.sort( ascending ); // now we clean up all animation data, so we can use them for keyframe tracks
+				keyframes.sort( ascending );
+
+				// now we clean up all animation data, so we can use them for keyframe tracks
 
 				for ( let i = 0; i < 16; i ++ ) {
 
@@ -446,7 +441,9 @@
 
 				}
 
-				return keyframes; // array sort function
+				return keyframes;
+
+				// array sort function
 
 				function ascending( a, b ) {
 
@@ -459,7 +456,6 @@
 			const position = new THREE.Vector3();
 			const scale = new THREE.Vector3();
 			const quaternion = new THREE.Quaternion();
-
 			function createKeyframeTracks( animation, tracks ) {
 
 				const keyframes = animation.keyframes;
@@ -468,7 +464,6 @@
 				const positionData = [];
 				const quaternionData = [];
 				const scaleData = [];
-
 				for ( let i = 0, l = keyframes.length; i < l; i ++ ) {
 
 					const keyframe = keyframes[ i ];
@@ -494,12 +489,13 @@
 
 				let keyframe;
 				let empty = true;
-				let i, l; // check, if values of a property are missing in our keyframes
+				let i, l;
+
+				// check, if values of a property are missing in our keyframes
 
 				for ( i = 0, l = keyframes.length; i < l; i ++ ) {
 
 					keyframe = keyframes[ i ];
-
 					if ( keyframe.value[ property ] === undefined ) {
 
 						keyframe.value[ property ] = null; // mark as missing
@@ -515,6 +511,7 @@
 				if ( empty === true ) {
 
 					// no values at all, so we set a default value
+
 					for ( i = 0, l = keyframes.length; i < l; i ++ ) {
 
 						keyframe = keyframes[ i ];
@@ -525,6 +522,7 @@
 				} else {
 
 					// filling gaps
+
 					createMissingKeyframes( keyframes, property );
 
 				}
@@ -534,16 +532,13 @@
 			function createMissingKeyframes( keyframes, property ) {
 
 				let prev, next;
-
 				for ( let i = 0, l = keyframes.length; i < l; i ++ ) {
 
 					const keyframe = keyframes[ i ];
-
 					if ( keyframe.value[ property ] === null ) {
 
 						prev = getPrev( keyframes, i, property );
 						next = getNext( keyframes, i, property );
-
 						if ( prev === null ) {
 
 							keyframe.value[ property ] = next.value[ property ];
@@ -605,8 +600,9 @@
 
 				key.value[ property ] = ( key.time - prev.time ) * ( next.value[ property ] - prev.value[ property ] ) / ( next.time - prev.time ) + prev.value[ property ];
 
-			} // animation clips
+			}
 
+			// animation clips
 
 			function parseAnimationClip( xml ) {
 
@@ -616,12 +612,10 @@
 					end: parseFloat( xml.getAttribute( 'end' ) || 0 ),
 					animations: []
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'instance_animation':
@@ -642,11 +636,9 @@
 				const name = data.name;
 				const duration = data.end - data.start || - 1;
 				const animations = data.animations;
-
 				for ( let i = 0, il = animations.length; i < il; i ++ ) {
 
 					const animationTracks = getAnimation( animations[ i ] );
-
 					for ( let j = 0, jl = animationTracks.length; j < jl; j ++ ) {
 
 						tracks.push( animationTracks[ j ] );
@@ -663,18 +655,17 @@
 
 				return getBuild( library.clips[ id ], buildAnimationClip );
 
-			} // controller
+			}
 
+			// controller
 
 			function parseController( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'skin':
@@ -682,7 +673,6 @@
 							data.id = parseId( child.getAttribute( 'source' ) );
 							data.skin = parseSkin( child );
 							break;
-
 						case 'morph':
 							data.id = parseId( child.getAttribute( 'source' ) );
 							console.warn( 'THREE.ColladaLoader: Morph target animation not supported yet.' );
@@ -701,27 +691,22 @@
 				const data = {
 					sources: {}
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'bind_shape_matrix':
 							data.bindShapeMatrix = parseFloats( child.textContent );
 							break;
-
 						case 'source':
 							const id = child.getAttribute( 'id' );
 							data.sources[ id ] = parseSource( child );
 							break;
-
 						case 'joints':
 							data.joints = parseJoints( child );
 							break;
-
 						case 'vertex_weights':
 							data.vertexWeights = parseVertexWeights( child );
 							break;
@@ -739,12 +724,10 @@
 				const data = {
 					inputs: {}
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'input':
@@ -766,12 +749,10 @@
 				const data = {
 					inputs: {}
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'input':
@@ -783,11 +764,9 @@
 								offset: offset
 							};
 							break;
-
 						case 'vcount':
 							data.vcount = parseInts( child.textContent );
 							break;
-
 						case 'v':
 							data.v = parseInts( child.textContent );
 							break;
@@ -806,10 +785,11 @@
 					id: data.id
 				};
 				const geometry = library.geometries[ build.id ];
-
 				if ( data.skin !== undefined ) {
 
-					build.skin = buildSkin( data.skin ); // we enhance the 'sources' property of the corresponding geometry with our skin data
+					build.skin = buildSkin( data.skin );
+
+					// we enhance the 'sources' property of the corresponding geometry with our skin data
 
 					geometry.sources.skinIndices = build.skin.indices;
 					geometry.sources.skinWeights = build.skin.weights;
@@ -845,14 +825,14 @@
 				const inverseSource = data.sources[ data.joints.inputs.INV_BIND_MATRIX ];
 				const weights = sources[ vertexWeights.inputs.WEIGHT.id ].array;
 				let stride = 0;
-				let i, j, l; // procces skin data for each vertex
+				let i, j, l;
+
+				// procces skin data for each vertex
 
 				for ( i = 0, l = vcount.length; i < l; i ++ ) {
 
 					const jointCount = vcount[ i ]; // this is the amount of joints that affect a single vertex
-
 					const vertexSkinData = [];
-
 					for ( j = 0; j < jointCount; j ++ ) {
 
 						const skinIndex = v[ stride + jointOffset ];
@@ -864,17 +844,19 @@
 						} );
 						stride += 2;
 
-					} // we sort the joints in descending order based on the weights.
+					}
+
+					// we sort the joints in descending order based on the weights.
 					// this ensures, we only procced the most important joints of the vertex
 
+					vertexSkinData.sort( descending );
 
-					vertexSkinData.sort( descending ); // now we provide for each vertex a set of four index and weight values.
+					// now we provide for each vertex a set of four index and weight values.
 					// the order of the skin data matches the order of vertices
 
 					for ( j = 0; j < BONE_LIMIT; j ++ ) {
 
 						const d = vertexSkinData[ j ];
-
 						if ( d !== undefined ) {
 
 							build.indices.array.push( d.index );
@@ -889,8 +871,9 @@
 
 					}
 
-				} // setup bind matrix
+				}
 
+				// setup bind matrix
 
 				if ( data.bindShapeMatrix ) {
 
@@ -900,8 +883,9 @@
 
 					build.bindMatrix = new THREE.Matrix4().identity();
 
-				} // process bones and inverse bind matrix data
+				}
 
+				// process bones and inverse bind matrix data
 
 				for ( i = 0, l = jointSource.array.length; i < l; i ++ ) {
 
@@ -914,7 +898,9 @@
 
 				}
 
-				return build; // array sort function
+				return build;
+
+				// array sort function
 
 				function descending( a, b ) {
 
@@ -928,8 +914,9 @@
 
 				return getBuild( library.controllers[ id ], buildController );
 
-			} // image
+			}
 
+			// image
 
 			function parseImage( xml ) {
 
@@ -950,7 +937,6 @@
 			function getImage( id ) {
 
 				const data = library.images[ id ];
-
 				if ( data !== undefined ) {
 
 					return getBuild( data, buildImage );
@@ -960,18 +946,17 @@
 				console.warn( 'THREE.ColladaLoader: Couldn\'t find image with ID:', id );
 				return null;
 
-			} // effect
+			}
 
+			// effect
 
 			function parseEffect( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'profile_COMMON':
@@ -992,22 +977,18 @@
 					surfaces: {},
 					samplers: {}
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'newparam':
 							parseEffectNewparam( child, data );
 							break;
-
 						case 'technique':
 							data.technique = parseEffectTechnique( child );
 							break;
-
 						case 'extra':
 							data.extra = parseEffectExtra( child );
 							break;
@@ -1023,18 +1004,15 @@
 			function parseEffectNewparam( xml, data ) {
 
 				const sid = xml.getAttribute( 'sid' );
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'surface':
 							data.surfaces[ sid ] = parseEffectSurface( child );
 							break;
-
 						case 'sampler2D':
 							data.samplers[ sid ] = parseEffectSampler( child );
 							break;
@@ -1048,12 +1026,10 @@
 			function parseEffectSurface( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'init_from':
@@ -1071,12 +1047,10 @@
 			function parseEffectSampler( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'source':
@@ -1094,12 +1068,10 @@
 			function parseEffectTechnique( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'constant':
@@ -1109,7 +1081,6 @@
 							data.type = child.nodeName;
 							data.parameters = parseEffectParameters( child );
 							break;
-
 						case 'extra':
 							data.extra = parseEffectExtra( child );
 							break;
@@ -1125,12 +1096,10 @@
 			function parseEffectParameters( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'emission':
@@ -1142,7 +1111,6 @@
 						case 'transparency':
 							data[ child.nodeName ] = parseEffectParameter( child );
 							break;
-
 						case 'transparent':
 							data[ child.nodeName ] = {
 								opaque: child.hasAttribute( 'opaque' ) ? child.getAttribute( 'opaque' ) : 'A_ONE',
@@ -1161,22 +1129,18 @@
 			function parseEffectParameter( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'color':
 							data[ child.nodeName ] = parseFloats( child.textContent );
 							break;
-
 						case 'float':
 							data[ child.nodeName ] = parseFloat( child.textContent );
 							break;
-
 						case 'texture':
 							data[ child.nodeName ] = {
 								id: child.getAttribute( 'texture' ),
@@ -1197,12 +1161,10 @@
 				const data = {
 					technique: {}
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'extra':
@@ -1223,7 +1185,6 @@
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'technique':
@@ -1242,7 +1203,6 @@
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'repeatU':
@@ -1251,10 +1211,10 @@
 						case 'offsetV':
 							data.technique[ child.nodeName ] = parseFloat( child.textContent );
 							break;
-
 						case 'wrapU':
 						case 'wrapV':
 							// some files have values for wrapU/wrapV which become NaN via parseInt
+
 							if ( child.textContent.toUpperCase() === 'TRUE' ) {
 
 								data.technique[ child.nodeName ] = 1;
@@ -1270,7 +1230,6 @@
 							}
 
 							break;
-
 						case 'bump':
 							data[ child.nodeName ] = parseEffectExtraTechniqueBump( child );
 							break;
@@ -1284,12 +1243,10 @@
 			function parseEffectExtra( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'technique':
@@ -1307,18 +1264,15 @@
 			function parseEffectExtraTechnique( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'double_sided':
 							data[ child.nodeName ] = parseInt( child.textContent );
 							break;
-
 						case 'bump':
 							data[ child.nodeName ] = parseEffectExtraTechniqueBump( child );
 							break;
@@ -1334,12 +1288,10 @@
 			function parseEffectExtraTechniqueBump( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'texture':
@@ -1368,20 +1320,19 @@
 
 				return getBuild( library.effects[ id ], buildEffect );
 
-			} // material
+			}
 
+			// material
 
 			function parseMaterial( xml ) {
 
 				const data = {
 					name: xml.getAttribute( 'name' )
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'instance_effect':
@@ -1400,15 +1351,12 @@
 
 				let loader;
 				let extension = image.slice( ( image.lastIndexOf( '.' ) - 1 >>> 0 ) + 2 ); // http://www.jstips.co/en/javascript/get-file-extension/
-
 				extension = extension.toLowerCase();
-
 				switch ( extension ) {
 
 					case 'tga':
 						loader = tgaLoader;
 						break;
-
 					default:
 						loader = textureLoader;
 
@@ -1423,18 +1371,15 @@
 				const effect = getEffect( data.url );
 				const technique = effect.profile.technique;
 				let material;
-
 				switch ( technique.type ) {
 
 					case 'phong':
 					case 'blinn':
 						material = new THREE.MeshPhongMaterial();
 						break;
-
 					case 'lambert':
 						material = new THREE.MeshLambertMaterial();
 						break;
-
 					default:
 						material = new THREE.MeshBasicMaterial();
 						break;
@@ -1442,11 +1387,12 @@
 				}
 
 				material.name = data.name || '';
-
 				function getTexture( textureObject, encoding = null ) {
 
 					const sampler = effect.profile.samplers[ textureObject.id ];
-					let image = null; // get image
+					let image = null;
+
+					// get image
 
 					if ( sampler !== undefined ) {
 
@@ -1458,18 +1404,17 @@
 						console.warn( 'THREE.ColladaLoader: Undefined sampler. Access image directly (see #12530).' );
 						image = getImage( textureObject.id );
 
-					} // create texture if image is avaiable
+					}
 
+					// create texture if image is avaiable
 
 					if ( image !== null ) {
 
 						const loader = getTextureLoader( image );
-
 						if ( loader !== undefined ) {
 
 							const texture = loader.load( image );
 							const extra = textureObject.extra;
-
 							if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
 
 								const technique = extra.technique;
@@ -1510,35 +1455,28 @@
 				}
 
 				const parameters = technique.parameters;
-
 				for ( const key in parameters ) {
 
 					const parameter = parameters[ key ];
-
 					switch ( key ) {
 
 						case 'diffuse':
 							if ( parameter.color ) material.color.fromArray( parameter.color );
 							if ( parameter.texture ) material.map = getTexture( parameter.texture, THREE.sRGBEncoding );
 							break;
-
 						case 'specular':
 							if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
 							if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
 							break;
-
 						case 'bump':
 							if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
 							break;
-
 						case 'ambient':
 							if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, THREE.sRGBEncoding );
 							break;
-
 						case 'shininess':
 							if ( parameter.float && material.shininess ) material.shininess = parameter.float;
 							break;
-
 						case 'emission':
 							if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
 							if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, THREE.sRGBEncoding );
@@ -1550,10 +1488,14 @@
 
 				material.color.convertSRGBToLinear();
 				if ( material.specular ) material.specular.convertSRGBToLinear();
-				if ( material.emissive ) material.emissive.convertSRGBToLinear(); //
+				if ( material.emissive ) material.emissive.convertSRGBToLinear();
+
+				//
 
 				let transparent = parameters[ 'transparent' ];
-				let transparency = parameters[ 'transparency' ]; // <transparency> does not exist but <transparent>
+				let transparency = parameters[ 'transparency' ];
+
+				// <transparency> does not exist but <transparent>
 
 				if ( transparency === undefined && transparent ) {
 
@@ -1561,8 +1503,9 @@
 						float: 1
 					};
 
-				} // <transparent> does not exist but <transparency>
+				}
 
+				// <transparent> does not exist but <transparency>
 
 				if ( transparent === undefined && transparency ) {
 
@@ -1578,33 +1521,30 @@
 				if ( transparent && transparency ) {
 
 					// handle case if a texture exists but no color
+
 					if ( transparent.data.texture ) {
 
 						// we do not set an alpha map (see #13792)
+
 						material.transparent = true;
 
 					} else {
 
 						const color = transparent.data.color;
-
 						switch ( transparent.opaque ) {
 
 							case 'A_ONE':
 								material.opacity = color[ 3 ] * transparency.float;
 								break;
-
 							case 'RGB_ZERO':
 								material.opacity = 1 - color[ 0 ] * transparency.float;
 								break;
-
 							case 'A_ZERO':
 								material.opacity = 1 - color[ 3 ] * transparency.float;
 								break;
-
 							case 'RGB_ONE':
 								material.opacity = color[ 0 ] * transparency.float;
 								break;
-
 							default:
 								console.warn( 'THREE.ColladaLoader: Invalid opaque type "%s" of transparent tag.', transparent.opaque );
 
@@ -1614,23 +1554,21 @@
 
 					}
 
-				} //
+				}
 
+				//
 
 				if ( technique.extra !== undefined && technique.extra.technique !== undefined ) {
 
 					const techniques = technique.extra.technique;
-
 					for ( const k in techniques ) {
 
 						const v = techniques[ k ];
-
 						switch ( k ) {
 
 							case 'double_sided':
 								material.side = v === 1 ? THREE.DoubleSide : THREE.FrontSide;
 								break;
-
 							case 'bump':
 								material.normalMap = getTexture( v.texture );
 								material.normalScale = new THREE.Vector2( 1, 1 );
@@ -1650,20 +1588,19 @@
 
 				return getBuild( library.materials[ id ], buildMaterial );
 
-			} // camera
+			}
 
+			// camera
 
 			function parseCamera( xml ) {
 
 				const data = {
 					name: xml.getAttribute( 'name' )
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'optics':
@@ -1683,7 +1620,6 @@
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
-
 					switch ( child.nodeName ) {
 
 						case 'technique_common':
@@ -1700,11 +1636,9 @@
 			function parseCameraTechnique( xml ) {
 
 				const data = {};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
-
 					switch ( child.nodeName ) {
 
 						case 'perspective':
@@ -1724,11 +1658,9 @@
 			function parseCameraParameters( xml ) {
 
 				const data = {};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
-
 					switch ( child.nodeName ) {
 
 						case 'xfov':
@@ -1752,13 +1684,11 @@
 			function buildCamera( data ) {
 
 				let camera;
-
 				switch ( data.optics.technique ) {
 
 					case 'perspective':
 						camera = new THREE.PerspectiveCamera( data.optics.parameters.yfov, data.optics.parameters.aspect_ratio, data.optics.parameters.znear, data.optics.parameters.zfar );
 						break;
-
 					case 'orthographic':
 						let ymag = data.optics.parameters.ymag;
 						let xmag = data.optics.parameters.xmag;
@@ -1767,10 +1697,10 @@
 						ymag = ymag === undefined ? xmag / aspectRatio : ymag;
 						xmag *= 0.5;
 						ymag *= 0.5;
-						camera = new THREE.OrthographicCamera( - xmag, xmag, ymag, - ymag, // left, right, top, bottom
+						camera = new THREE.OrthographicCamera( - xmag, xmag, ymag, - ymag,
+							// left, right, top, bottom
 							data.optics.parameters.znear, data.optics.parameters.zfar );
 						break;
-
 					default:
 						camera = new THREE.PerspectiveCamera();
 						break;
@@ -1785,7 +1715,6 @@
 			function getCamera( id ) {
 
 				const data = library.cameras[ id ];
-
 				if ( data !== undefined ) {
 
 					return getBuild( data, buildCamera );
@@ -1795,18 +1724,17 @@
 				console.warn( 'THREE.ColladaLoader: Couldn\'t find camera with ID:', id );
 				return null;
 
-			} // light
+			}
 
+			// light
 
 			function parseLight( xml ) {
 
 				let data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'technique_common':
@@ -1824,12 +1752,10 @@
 			function parseLightTechnique( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'directional':
@@ -1850,23 +1776,19 @@
 			function parseLightParameters( xml ) {
 
 				const data = {};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'color':
 							const array = parseFloats( child.textContent );
 							data.color = new THREE.Color().fromArray( array ).convertSRGBToLinear();
 							break;
-
 						case 'falloff_angle':
 							data.falloffAngle = parseFloat( child.textContent );
 							break;
-
 						case 'quadratic_attenuation':
 							const f = parseFloat( child.textContent );
 							data.distance = f ? Math.sqrt( 1 / f ) : 0;
@@ -1883,21 +1805,17 @@
 			function buildLight( data ) {
 
 				let light;
-
 				switch ( data.technique ) {
 
 					case 'directional':
 						light = new THREE.DirectionalLight();
 						break;
-
 					case 'point':
 						light = new THREE.PointLight();
 						break;
-
 					case 'spot':
 						light = new THREE.SpotLight();
 						break;
-
 					case 'ambient':
 						light = new THREE.AmbientLight();
 						break;
@@ -1913,7 +1831,6 @@
 			function getLight( id ) {
 
 				const data = library.lights[ id ];
-
 				if ( data !== undefined ) {
 
 					return getBuild( data, buildLight );
@@ -1923,8 +1840,9 @@
 				console.warn( 'THREE.ColladaLoader: Couldn\'t find light with ID:', id );
 				return null;
 
-			} // geometry
+			}
 
+			// geometry
 
 			function parseGeometry( xml ) {
 
@@ -1934,38 +1852,33 @@
 					vertices: {},
 					primitives: []
 				};
-				const mesh = getElementsByTagName( xml, 'mesh' )[ 0 ]; // the following tags inside geometry are not supported yet (see https://github.com/mrdoob/three.js/pull/12606): convex_mesh, spline, brep
+				const mesh = getElementsByTagName( xml, 'mesh' )[ 0 ];
 
+				// the following tags inside geometry are not supported yet (see https://github.com/mrdoob/three.js/pull/12606): convex_mesh, spline, brep
 				if ( mesh === undefined ) return;
-
 				for ( let i = 0; i < mesh.childNodes.length; i ++ ) {
 
 					const child = mesh.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
 					const id = child.getAttribute( 'id' );
-
 					switch ( child.nodeName ) {
 
 						case 'source':
 							data.sources[ id ] = parseSource( child );
 							break;
-
 						case 'vertices':
 							// data.sources[ id ] = data.sources[ parseId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
 							data.vertices = parseGeometryVertices( child );
 							break;
-
 						case 'polygons':
 							console.warn( 'THREE.ColladaLoader: Unsupported primitive type: ', child.nodeName );
 							break;
-
 						case 'lines':
 						case 'linestrips':
 						case 'polylist':
 						case 'triangles':
 							data.primitives.push( parseGeometryPrimitive( child ) );
 							break;
-
 						default:
 							console.log( child );
 
@@ -1983,25 +1896,20 @@
 					array: [],
 					stride: 3
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'float_array':
 							data.array = parseFloats( child.textContent );
 							break;
-
 						case 'Name_array':
 							data.array = parseStrings( child.textContent );
 							break;
-
 						case 'technique_common':
 							const accessor = getElementsByTagName( child, 'accessor' )[ 0 ];
-
 							if ( accessor !== undefined ) {
 
 								data.stride = parseInt( accessor.getAttribute( 'stride' ) );
@@ -2021,7 +1929,6 @@
 			function parseGeometryVertices( xml ) {
 
 				const data = {};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
@@ -2044,12 +1951,10 @@
 					stride: 0,
 					hasUV: false
 				};
-
 				for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'input':
@@ -2065,11 +1970,9 @@
 							primitive.stride = Math.max( primitive.stride, offset + 1 );
 							if ( semantic === 'TEXCOORD' ) primitive.hasUV = true;
 							break;
-
 						case 'vcount':
 							primitive.vcount = parseInts( child.textContent );
 							break;
-
 						case 'p':
 							primitive.p = parseInts( child.textContent );
 							break;
@@ -2085,7 +1988,6 @@
 			function groupPrimitives( primitives ) {
 
 				const build = {};
-
 				for ( let i = 0; i < primitives.length; i ++ ) {
 
 					const primitive = primitives[ i ];
@@ -2101,11 +2003,9 @@
 			function checkUVCoordinates( primitives ) {
 
 				let count = 0;
-
 				for ( let i = 0, l = primitives.length; i < l; i ++ ) {
 
 					const primitive = primitives[ i ];
-
 					if ( primitive.hasUV === true ) {
 
 						count ++;
@@ -2128,16 +2028,21 @@
 				const sources = data.sources;
 				const vertices = data.vertices;
 				const primitives = data.primitives;
-				if ( primitives.length === 0 ) return {}; // our goal is to create one buffer geometry for a single type of primitives
+				if ( primitives.length === 0 ) return {};
+
+				// our goal is to create one buffer geometry for a single type of primitives
 				// first, we group all primitives by their type
 
 				const groupedPrimitives = groupPrimitives( primitives );
-
 				for ( const type in groupedPrimitives ) {
 
-					const primitiveType = groupedPrimitives[ type ]; // second, ensure consistent uv coordinates for each type of primitives (polylist,triangles or lines)
+					const primitiveType = groupedPrimitives[ type ];
 
-					checkUVCoordinates( primitiveType ); // third, create a buffer geometry for each type of primitives
+					// second, ensure consistent uv coordinates for each type of primitives (polylist,triangles or lines)
+
+					checkUVCoordinates( primitiveType );
+
+					// third, create a buffer geometry for each type of primitives
 
 					build[ type ] = buildGeometryType( primitiveType, sources, vertices );
 
@@ -2181,45 +2086,37 @@
 				const geometry = new THREE.BufferGeometry();
 				const materialKeys = [];
 				let start = 0;
-
 				for ( let p = 0; p < primitives.length; p ++ ) {
 
 					const primitive = primitives[ p ];
-					const inputs = primitive.inputs; // groups
+					const inputs = primitive.inputs;
+
+					// groups
 
 					let count = 0;
-
 					switch ( primitive.type ) {
 
 						case 'lines':
 						case 'linestrips':
 							count = primitive.count * 2;
 							break;
-
 						case 'triangles':
 							count = primitive.count * 3;
 							break;
-
 						case 'polylist':
 							for ( let g = 0; g < primitive.count; g ++ ) {
 
 								const vc = primitive.vcount[ g ];
-
 								switch ( vc ) {
 
 									case 3:
 										count += 3; // single triangle
-
 										break;
-
 									case 4:
 										count += 6; // quad, subdivided into two triangles
-
 										break;
-
 									default:
 										count += ( vc - 2 ) * 3; // polylist with more than four vertices
-
 										break;
 
 								}
@@ -2227,55 +2124,55 @@
 							}
 
 							break;
-
 						default:
 							console.warn( 'THREE.ColladaLoader: Unknow primitive type:', primitive.type );
 
 					}
 
 					geometry.addGroup( start, count, p );
-					start += count; // material
+					start += count;
+
+					// material
 
 					if ( primitive.material ) {
 
 						materialKeys.push( primitive.material );
 
-					} // geometry data
+					}
 
+					// geometry data
 
 					for ( const name in inputs ) {
 
 						const input = inputs[ name ];
-
 						switch ( name ) {
 
 							case 'VERTEX':
 								for ( const key in vertices ) {
 
 									const id = vertices[ key ];
-
 									switch ( key ) {
 
 										case 'POSITION':
 											const prevLength = position.array.length;
 											buildGeometryData( primitive, sources[ id ], input.offset, position.array );
 											position.stride = sources[ id ].stride;
-
 											if ( sources.skinWeights && sources.skinIndices ) {
 
 												buildGeometryData( primitive, sources.skinIndices, input.offset, skinIndex.array );
 												buildGeometryData( primitive, sources.skinWeights, input.offset, skinWeight.array );
 
-											} // see #3803
+											}
 
+											// see #3803
 
 											if ( primitive.hasUV === false && primitives.uvsNeedsFix === true ) {
 
 												const count = ( position.array.length - prevLength ) / position.stride;
-
 												for ( let i = 0; i < count; i ++ ) {
 
 													// fill missing uv coordinates
+
 													uv.array.push( 0, 0 );
 
 												}
@@ -2283,27 +2180,22 @@
 											}
 
 											break;
-
 										case 'NORMAL':
 											buildGeometryData( primitive, sources[ id ], input.offset, normal.array );
 											normal.stride = sources[ id ].stride;
 											break;
-
 										case 'COLOR':
 											buildGeometryData( primitive, sources[ id ], input.offset, color.array );
 											color.stride = sources[ id ].stride;
 											break;
-
 										case 'TEXCOORD':
 											buildGeometryData( primitive, sources[ id ], input.offset, uv.array );
 											uv.stride = sources[ id ].stride;
 											break;
-
 										case 'TEXCOORD1':
 											buildGeometryData( primitive, sources[ id ], input.offset, uv2.array );
 											uv.stride = sources[ id ].stride;
 											break;
-
 										default:
 											console.warn( 'THREE.ColladaLoader: Semantic "%s" not handled in geometry build process.', key );
 
@@ -2312,22 +2204,18 @@
 								}
 
 								break;
-
 							case 'NORMAL':
 								buildGeometryData( primitive, sources[ input.id ], input.offset, normal.array );
 								normal.stride = sources[ input.id ].stride;
 								break;
-
 							case 'COLOR':
 								buildGeometryData( primitive, sources[ input.id ], input.offset, color.array, true );
 								color.stride = sources[ input.id ].stride;
 								break;
-
 							case 'TEXCOORD':
 								buildGeometryData( primitive, sources[ input.id ], input.offset, uv.array );
 								uv.stride = sources[ input.id ].stride;
 								break;
-
 							case 'TEXCOORD1':
 								buildGeometryData( primitive, sources[ input.id ], input.offset, uv2.array );
 								uv2.stride = sources[ input.id ].stride;
@@ -2337,8 +2225,9 @@
 
 					}
 
-				} // build geometry
+				}
 
+				// build geometry
 
 				if ( position.array.length > 0 ) geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position.array, position.stride ) );
 				if ( normal.array.length > 0 ) geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normal.array, normal.stride ) );
@@ -2359,12 +2248,10 @@
 				const indices = primitive.p;
 				const stride = primitive.stride;
 				const vcount = primitive.vcount;
-
 				function pushVector( i ) {
 
 					let index = indices[ i + offset ] * sourceStride;
 					const length = index + sourceStride;
-
 					for ( ; index < length; index ++ ) {
 
 						array.push( sourceArray[ index ] );
@@ -2386,15 +2273,12 @@
 
 				const sourceArray = source.array;
 				const sourceStride = source.stride;
-
 				if ( primitive.vcount !== undefined ) {
 
 					let index = 0;
-
 					for ( let i = 0, l = vcount.length; i < l; i ++ ) {
 
 						const count = vcount[ i ];
-
 						if ( count === 4 ) {
 
 							const a = index + stride * 0;
@@ -2452,8 +2336,9 @@
 
 				return getBuild( library.geometries[ id ], buildGeometry );
 
-			} // kinematics
+			}
 
+			// kinematics
 
 			function parseKinematicsModel( xml ) {
 
@@ -2462,12 +2347,10 @@
 					joints: {},
 					links: []
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'technique_common':
@@ -2501,13 +2384,11 @@
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'joint':
 							data.joints[ child.getAttribute( 'sid' ) ] = parseKinematicsJoint( child );
 							break;
-
 						case 'link':
 							data.links.push( parseKinematicsLink( child ) );
 							break;
@@ -2521,12 +2402,10 @@
 			function parseKinematicsJoint( xml ) {
 
 				let data;
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'prismatic':
@@ -2557,19 +2436,16 @@
 					zeroPosition: 0,
 					middlePosition: 0
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'axis':
 							const array = parseFloats( child.textContent );
 							data.axis.fromArray( array );
 							break;
-
 						case 'limits':
 							const max = child.getElementsByTagName( 'max' )[ 0 ];
 							const min = child.getElementsByTagName( 'min' )[ 0 ];
@@ -2579,15 +2455,17 @@
 
 					}
 
-				} // if min is equal to or greater than max, consider the joint static
+				}
 
+				// if min is equal to or greater than max, consider the joint static
 
 				if ( data.limits.min >= data.limits.max ) {
 
 					data.static = true;
 
-				} // calculate middle position
+				}
 
+				// calculate middle position
 
 				data.middlePosition = ( data.limits.min + data.limits.max ) / 2.0;
 				return data;
@@ -2602,18 +2480,15 @@
 					attachments: [],
 					transforms: []
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'attachment_full':
 							data.attachments.push( parseKinematicsAttachment( child ) );
 							break;
-
 						case 'matrix':
 						case 'translate':
 						case 'rotate':
@@ -2635,18 +2510,15 @@
 					transforms: [],
 					links: []
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'link':
 							data.links.push( parseKinematicsLink( child ) );
 							break;
-
 						case 'matrix':
 						case 'translate':
 						case 'rotate':
@@ -2667,19 +2539,16 @@
 					type: xml.nodeName
 				};
 				const array = parseFloats( xml.textContent );
-
 				switch ( data.type ) {
 
 					case 'matrix':
 						data.obj = new THREE.Matrix4();
 						data.obj.fromArray( array ).transpose();
 						break;
-
 					case 'translate':
 						data.obj = new THREE.Vector3();
 						data.obj.fromArray( array );
 						break;
-
 					case 'rotate':
 						data.obj = new THREE.Vector3();
 						data.obj.fromArray( array );
@@ -2690,8 +2559,9 @@
 
 				return data;
 
-			} // physics
+			}
 
+			// physics
 
 			function parsePhysicsModel( xml ) {
 
@@ -2699,12 +2569,10 @@
 					name: xml.getAttribute( 'name' ) || '',
 					rigidBodies: {}
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'rigid_body':
@@ -2726,7 +2594,6 @@
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'technique_common':
@@ -2745,13 +2612,11 @@
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'inertia':
 							data.inertia = parseFloats( child.textContent );
 							break;
-
 						case 'mass':
 							data.mass = parseFloats( child.textContent )[ 0 ];
 							break;
@@ -2760,20 +2625,19 @@
 
 				}
 
-			} // scene
+			}
 
+			// scene
 
 			function parseKinematicsScene( xml ) {
 
 				const data = {
 					bindJointAxis: []
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'bind_joint_axis':
@@ -2793,12 +2657,10 @@
 				const data = {
 					target: xml.getAttribute( 'target' ).split( '/' ).pop()
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
-
 					switch ( child.nodeName ) {
 
 						case 'axis':
@@ -2840,17 +2702,20 @@
 				const visualScene = getVisualScene( visualSceneId );
 				const bindJointAxis = kinematicsScene.bindJointAxis;
 				const jointMap = {};
-
 				for ( let i = 0, l = bindJointAxis.length; i < l; i ++ ) {
 
-					const axis = bindJointAxis[ i ]; // the result of the following query is an element of type 'translate', 'rotate','scale' or 'matrix'
+					const axis = bindJointAxis[ i ];
+
+					// the result of the following query is an element of type 'translate', 'rotate','scale' or 'matrix'
 
 					const targetElement = collada.querySelector( '[sid="' + axis.target + '"]' );
-
 					if ( targetElement ) {
 
 						// get the parent of the transform element
-						const parentVisualElement = targetElement.parentElement; // connect the joint of the kinematics model with the element in the visual scene
+
+						const parentVisualElement = targetElement.parentElement;
+
+						// connect the joint of the kinematics model with the element in the visual scene
 
 						connect( axis.jointIndex, parentVisualElement );
 
@@ -2885,7 +2750,6 @@
 					getJointValue: function ( jointIndex ) {
 
 						const jointData = jointMap[ jointIndex ];
-
 						if ( jointData ) {
 
 							return jointData.position;
@@ -2900,11 +2764,9 @@
 					setJointValue: function ( jointIndex, value ) {
 
 						const jointData = jointMap[ jointIndex ];
-
 						if ( jointData ) {
 
 							const joint = jointData.joint;
-
 							if ( value > joint.limits.max || value < joint.limits.min ) {
 
 								console.warn( 'THREE.ColladaLoader: Joint ' + jointIndex + ' value ' + value + ' outside of limits (min: ' + joint.limits.min + ', max: ' + joint.limits.max + ').' );
@@ -2918,11 +2780,15 @@
 								const object = jointData.object;
 								const axis = joint.axis;
 								const transforms = jointData.transforms;
-								matrix.identity(); // each update, we have to apply all transforms in the correct order
+								matrix.identity();
+
+								// each update, we have to apply all transforms in the correct order
 
 								for ( let i = 0; i < transforms.length; i ++ ) {
 
-									const transform = transforms[ i ]; // if there is a connection of the transform node with a joint, apply the joint value
+									const transform = transforms[ i ];
+
+									// if there is a connection of the transform node with a joint, apply the joint value
 
 									if ( transform.sid && transform.sid.indexOf( jointIndex ) !== - 1 ) {
 
@@ -2931,11 +2797,9 @@
 											case 'revolute':
 												matrix.multiply( m0.makeRotationAxis( axis, THREE.MathUtils.degToRad( value ) ) );
 												break;
-
 											case 'prismatic':
 												matrix.multiply( m0.makeTranslation( axis.x * value, axis.y * value, axis.z * value ) );
 												break;
-
 											default:
 												console.warn( 'THREE.ColladaLoader: Unknown joint type: ' + joint.type );
 												break;
@@ -2949,15 +2813,12 @@
 											case 'matrix':
 												matrix.multiply( transform.obj );
 												break;
-
 											case 'translate':
 												matrix.multiply( m0.makeTranslation( transform.obj.x, transform.obj.y, transform.obj.z ) );
 												break;
-
 											case 'scale':
 												matrix.scale( transform.obj );
 												break;
-
 											case 'rotate':
 												matrix.multiply( m0.makeRotationAxis( transform.obj, transform.angle ) );
 												break;
@@ -2989,13 +2850,11 @@
 
 				const transforms = [];
 				const xml = collada.querySelector( '[id="' + node.id + '"]' );
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
 					let array, vector;
-
 					switch ( child.nodeName ) {
 
 						case 'matrix':
@@ -3007,7 +2866,6 @@
 								obj: matrix
 							} );
 							break;
-
 						case 'translate':
 						case 'scale':
 							array = parseFloats( child.textContent );
@@ -3018,7 +2876,6 @@
 								obj: vector
 							} );
 							break;
-
 						case 'rotate':
 							array = parseFloats( child.textContent );
 							vector = new THREE.Vector3().fromArray( array );
@@ -3037,17 +2894,19 @@
 
 				return transforms;
 
-			} // nodes
+			}
 
+			// nodes
 
 			function prepareNodes( xml ) {
 
-				const elements = xml.getElementsByTagName( 'node' ); // ensure all node elements have id attributes
+				const elements = xml.getElementsByTagName( 'node' );
+
+				// ensure all node elements have id attributes
 
 				for ( let i = 0; i < elements.length; i ++ ) {
 
 					const element = elements[ i ];
-
 					if ( element.hasAttribute( 'id' ) === false ) {
 
 						element.setAttribute( 'id', generateId() );
@@ -3060,7 +2919,6 @@
 
 			const matrix = new THREE.Matrix4();
 			const vector = new THREE.Vector3();
-
 			function parseNode( xml ) {
 
 				const data = {
@@ -3077,69 +2935,56 @@
 					instanceNodes: [],
 					transforms: {}
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
 					if ( child.nodeType !== 1 ) continue;
 					let array;
-
 					switch ( child.nodeName ) {
 
 						case 'node':
 							data.nodes.push( child.getAttribute( 'id' ) );
 							parseNode( child );
 							break;
-
 						case 'instance_camera':
 							data.instanceCameras.push( parseId( child.getAttribute( 'url' ) ) );
 							break;
-
 						case 'instance_controller':
 							data.instanceControllers.push( parseNodeInstance( child ) );
 							break;
-
 						case 'instance_light':
 							data.instanceLights.push( parseId( child.getAttribute( 'url' ) ) );
 							break;
-
 						case 'instance_geometry':
 							data.instanceGeometries.push( parseNodeInstance( child ) );
 							break;
-
 						case 'instance_node':
 							data.instanceNodes.push( parseId( child.getAttribute( 'url' ) ) );
 							break;
-
 						case 'matrix':
 							array = parseFloats( child.textContent );
 							data.matrix.multiply( matrix.fromArray( array ).transpose() );
 							data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 							break;
-
 						case 'translate':
 							array = parseFloats( child.textContent );
 							vector.fromArray( array );
 							data.matrix.multiply( matrix.makeTranslation( vector.x, vector.y, vector.z ) );
 							data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 							break;
-
 						case 'rotate':
 							array = parseFloats( child.textContent );
 							const angle = THREE.MathUtils.degToRad( array[ 3 ] );
 							data.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
 							data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 							break;
-
 						case 'scale':
 							array = parseFloats( child.textContent );
 							data.matrix.scale( vector.fromArray( array ) );
 							data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 							break;
-
 						case 'extra':
 							break;
-
 						default:
 							console.log( child );
 
@@ -3168,16 +3013,13 @@
 					materials: {},
 					skeletons: []
 				};
-
 				for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
 					const child = xml.childNodes[ i ];
-
 					switch ( child.nodeName ) {
 
 						case 'bind_material':
 							const instances = child.getElementsByTagName( 'instance_material' );
-
 							for ( let j = 0; j < instances.length; j ++ ) {
 
 								const instance = instances[ j ];
@@ -3188,11 +3030,9 @@
 							}
 
 							break;
-
 						case 'skeleton':
 							data.skeletons.push( parseId( child.textContent ) );
 							break;
-
 						default:
 							break;
 
@@ -3208,14 +3048,15 @@
 
 				const boneData = [];
 				const sortedBoneData = [];
-				let i, j, data; // a skeleton can have multiple root bones. collada expresses this
+				let i, j, data;
+
+				// a skeleton can have multiple root bones. collada expresses this
 				// situtation with multiple "skeleton" tags per controller instance
 
 				for ( i = 0; i < skeletons.length; i ++ ) {
 
 					const skeleton = skeletons[ i ];
 					let root;
-
 					if ( hasNode( skeleton ) ) {
 
 						root = getNode( skeleton );
@@ -3224,13 +3065,12 @@
 					} else if ( hasVisualScene( skeleton ) ) {
 
 						// handle case where the skeleton refers to the visual scene (#13335)
+
 						const visualScene = library.visualScenes[ skeleton ];
 						const children = visualScene.children;
-
 						for ( let j = 0; j < children.length; j ++ ) {
 
 							const child = children[ j ];
-
 							if ( child.type === 'JOINT' ) {
 
 								const root = getNode( child.id );
@@ -3246,15 +3086,15 @@
 
 					}
 
-				} // sort bone data (the order is defined in the corresponding controller)
+				}
 
+				// sort bone data (the order is defined in the corresponding controller)
 
 				for ( i = 0; i < joints.length; i ++ ) {
 
 					for ( j = 0; j < boneData.length; j ++ ) {
 
 						data = boneData[ j ];
-
 						if ( data.bone.name === joints[ i ].name ) {
 
 							sortedBoneData[ i ] = data;
@@ -3265,13 +3105,13 @@
 
 					}
 
-				} // add unprocessed bone data at the end of the list
+				}
 
+				// add unprocessed bone data at the end of the list
 
 				for ( i = 0; i < boneData.length; i ++ ) {
 
 					data = boneData[ i ];
-
 					if ( data.processed === false ) {
 
 						sortedBoneData.push( data );
@@ -3279,12 +3119,12 @@
 
 					}
 
-				} // setup arrays for skeleton creation
+				}
 
+				// setup arrays for skeleton creation
 
 				const bones = [];
 				const boneInverses = [];
-
 				for ( i = 0; i < sortedBoneData.length; i ++ ) {
 
 					data = sortedBoneData[ i ];
@@ -3300,16 +3140,18 @@
 			function buildBoneHierarchy( root, joints, boneData ) {
 
 				// setup bone data from visual scene
+
 				root.traverse( function ( object ) {
 
 					if ( object.isBone === true ) {
 
-						let boneInverse; // retrieve the boneInverse from the controller data
+						let boneInverse;
+
+						// retrieve the boneInverse from the controller data
 
 						for ( let i = 0; i < joints.length; i ++ ) {
 
 							const joint = joints[ i ];
-
 							if ( joint.name === object.name ) {
 
 								boneInverse = joint.boneInverse;
@@ -3326,6 +3168,7 @@
 							// for the respective bone. This bone won't affect any vertices, because there are no skin indices
 							// and weights defined for it. But we still have to add the bone to the sorted bone list in order to
 							// ensure a correct animation of the model.
+
 							boneInverse = new THREE.Matrix4();
 
 						}
@@ -3352,27 +3195,30 @@
 				const instanceControllers = data.instanceControllers;
 				const instanceLights = data.instanceLights;
 				const instanceGeometries = data.instanceGeometries;
-				const instanceNodes = data.instanceNodes; // nodes
+				const instanceNodes = data.instanceNodes;
+
+				// nodes
 
 				for ( let i = 0, l = nodes.length; i < l; i ++ ) {
 
 					objects.push( getNode( nodes[ i ] ) );
 
-				} // instance cameras
+				}
 
+				// instance cameras
 
 				for ( let i = 0, l = instanceCameras.length; i < l; i ++ ) {
 
 					const instanceCamera = getCamera( instanceCameras[ i ] );
-
 					if ( instanceCamera !== null ) {
 
 						objects.push( instanceCamera.clone() );
 
 					}
 
-				} // instance controllers
+				}
 
+				// instance controllers
 
 				for ( let i = 0, l = instanceControllers.length; i < l; i ++ ) {
 
@@ -3383,11 +3229,9 @@
 					const skeletons = instance.skeletons;
 					const joints = controller.skin.joints;
 					const skeleton = buildSkeleton( skeletons, joints );
-
 					for ( let j = 0, jl = newObjects.length; j < jl; j ++ ) {
 
 						const object = newObjects[ j ];
-
 						if ( object.isSkinnedMesh ) {
 
 							object.bind( skeleton, controller.skin.bindMatrix );
@@ -3399,38 +3243,41 @@
 
 					}
 
-				} // instance lights
+				}
 
+				// instance lights
 
 				for ( let i = 0, l = instanceLights.length; i < l; i ++ ) {
 
 					const instanceLight = getLight( instanceLights[ i ] );
-
 					if ( instanceLight !== null ) {
 
 						objects.push( instanceLight.clone() );
 
 					}
 
-				} // instance geometries
+				}
 
+				// instance geometries
 
 				for ( let i = 0, l = instanceGeometries.length; i < l; i ++ ) {
 
-					const instance = instanceGeometries[ i ]; // a single geometry instance in collada can lead to multiple object3Ds.
+					const instance = instanceGeometries[ i ];
+
+					// a single geometry instance in collada can lead to multiple object3Ds.
 					// this is the case when primitives are combined like triangles and lines
 
 					const geometries = getGeometry( instance.id );
 					const newObjects = buildObjects( geometries, instance.materials );
-
 					for ( let j = 0, jl = newObjects.length; j < jl; j ++ ) {
 
 						objects.push( newObjects[ j ] );
 
 					}
 
-				} // instance nodes
+				}
 
+				// instance nodes
 
 				for ( let i = 0, l = instanceNodes.length; i < l; i ++ ) {
 
@@ -3439,7 +3286,6 @@
 				}
 
 				let object;
-
 				if ( nodes.length === 0 && objects.length === 1 ) {
 
 					object = objects[ 0 ];
@@ -3447,7 +3293,6 @@
 				} else {
 
 					object = type === 'JOINT' ? new THREE.Bone() : new THREE.Group();
-
 					for ( let i = 0; i < objects.length; i ++ ) {
 
 						object.add( objects[ i ] );
@@ -3466,15 +3311,12 @@
 			const fallbackMaterial = new THREE.MeshBasicMaterial( {
 				color: 0xff00ff
 			} );
-
 			function resolveMaterialBinding( keys, instanceMaterials ) {
 
 				const materials = [];
-
 				for ( let i = 0, l = keys.length; i < l; i ++ ) {
 
 					const id = instanceMaterials[ keys[ i ] ];
-
 					if ( id === undefined ) {
 
 						console.warn( 'THREE.ColladaLoader: Material with key %s not found. Apply fallback material.', keys[ i ] );
@@ -3495,11 +3337,12 @@
 			function buildObjects( geometries, instanceMaterials ) {
 
 				const objects = [];
-
 				for ( const type in geometries ) {
 
 					const geometry = geometries[ type ];
-					const materials = resolveMaterialBinding( geometry.materialKeys, instanceMaterials ); // handle case if no materials are defined
+					const materials = resolveMaterialBinding( geometry.materialKeys, instanceMaterials );
+
+					// handle case if no materials are defined
 
 					if ( materials.length === 0 ) {
 
@@ -3513,25 +3356,27 @@
 
 						}
 
-					} // regard skinning
+					}
 
+					// regard skinning
 
-					const skinning = geometry.data.attributes.skinIndex !== undefined; // choose between a single or multi materials (material array)
+					const skinning = geometry.data.attributes.skinIndex !== undefined;
 
-					const material = materials.length === 1 ? materials[ 0 ] : materials; // now create a specific 3D object
+					// choose between a single or multi materials (material array)
+
+					const material = materials.length === 1 ? materials[ 0 ] : materials;
+
+					// now create a specific 3D object
 
 					let object;
-
 					switch ( type ) {
 
 						case 'lines':
 							object = new THREE.LineSegments( geometry.data, material );
 							break;
-
 						case 'linestrips':
 							object = new THREE.Line( geometry.data, material );
 							break;
-
 						case 'triangles':
 						case 'polylist':
 							if ( skinning ) {
@@ -3566,8 +3411,9 @@
 
 				return getBuild( library.nodes[ id ], buildNode );
 
-			} // visual scenes
+			}
 
+			// visual scenes
 
 			function parseVisualScene( xml ) {
 
@@ -3577,7 +3423,6 @@
 				};
 				prepareNodes( xml );
 				const elements = getElementsByTagName( xml, 'node' );
-
 				for ( let i = 0; i < elements.length; i ++ ) {
 
 					data.children.push( parseNode( elements[ i ] ) );
@@ -3593,7 +3438,6 @@
 				const group = new THREE.Group();
 				group.name = data.name;
 				const children = data.children;
-
 				for ( let i = 0; i < children.length; i ++ ) {
 
 					const child = children[ i ];
@@ -3615,8 +3459,9 @@
 
 				return getBuild( library.visualScenes[ id ], buildVisualScene );
 
-			} // scenes
+			}
 
+			// scenes
 
 			function parseScene( xml ) {
 
@@ -3628,18 +3473,16 @@
 			function setupAnimations() {
 
 				const clips = library.clips;
-
 				if ( isEmpty( clips ) === true ) {
 
 					if ( isEmpty( library.animations ) === false ) {
 
 						// if there are animations but no clips, we create a default clip for playback
-						const tracks = [];
 
+						const tracks = [];
 						for ( const id in library.animations ) {
 
 							const animationTracks = getAnimation( id );
-
 							for ( let i = 0, l = animationTracks.length; i < l; i ++ ) {
 
 								tracks.push( animationTracks[ i ] );
@@ -3662,19 +3505,18 @@
 
 				}
 
-			} // convert the parser error element into text with each child elements text
-			// separated by new lines.
+			}
 
+			// convert the parser error element into text with each child elements text
+			// separated by new lines.
 
 			function parserErrorToText( parserError ) {
 
 				let result = '';
 				const stack = [ parserError ];
-
 				while ( stack.length ) {
 
 					const node = stack.shift();
-
 					if ( node.nodeType === Node.TEXT_NODE ) {
 
 						result += node.textContent;
@@ -3703,13 +3545,12 @@
 			const xml = new DOMParser().parseFromString( text, 'application/xml' );
 			const collada = getElementsByTagName( xml, 'COLLADA' )[ 0 ];
 			const parserError = xml.getElementsByTagName( 'parsererror' )[ 0 ];
-
 			if ( parserError !== undefined ) {
 
 				// Chrome will return parser error with a div in it
+
 				const errorElement = getElementsByTagName( parserError, 'div' )[ 0 ];
 				let errorText;
-
 				if ( errorElement ) {
 
 					errorText = errorElement.textContent;
@@ -3723,8 +3564,9 @@
 				console.error( 'THREE.ColladaLoader: Failed to parse collada file.\n', errorText );
 				return null;
 
-			} // metadata
+			}
 
+			// metadata
 
 			const version = collada.getAttribute( 'version' );
 			console.log( 'THREE.ColladaLoader: File version', version );
@@ -3732,19 +3574,21 @@
 			const textureLoader = new THREE.TextureLoader( this.manager );
 			textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 			let tgaLoader;
-
 			if ( THREE.TGALoader ) {
 
 				tgaLoader = new THREE.TGALoader( this.manager );
 				tgaLoader.setPath( this.resourcePath || path );
 
-			} //
+			}
 
+			//
 
 			const tempColor = new THREE.Color();
 			const animations = [];
 			let kinematics = {};
-			let count = 0; //
+			let count = 0;
+
+			//
 
 			const library = {
 				animations: {},
@@ -3790,7 +3634,6 @@
 			setupKinematics();
 			const scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
 			scene.animations = animations;
-
 			if ( asset.upAxis === 'Z_UP' ) {
 
 				console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
@@ -3806,7 +3649,6 @@
 					return animations;
 
 				},
-
 				kinematics: kinematics,
 				library: library,
 				scene: scene

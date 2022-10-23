@@ -18,8 +18,9 @@
 			super( geometry, material );
 			this.light = light;
 			this.color = color; // optional hardwired color for the helper
+			this.type = 'RectAreaLightHelper';
 
-			this.type = 'RectAreaLightHelper'; //
+			//
 
 			const positions2 = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
 			const geometry2 = new THREE.BufferGeometry();
@@ -31,11 +32,9 @@
 			} ) ) );
 
 		}
-
 		updateMatrixWorld() {
 
 			this.scale.set( 0.5 * this.light.width, 0.5 * this.light.height, 1 );
-
 			if ( this.color !== undefined ) {
 
 				this.material.color.set( this.color );
@@ -43,21 +42,21 @@
 
 			} else {
 
-				this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity ); // prevent hue shift
+				this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
+				// prevent hue shift
 				const c = this.material.color;
 				const max = Math.max( c.r, c.g, c.b );
 				if ( max > 1 ) c.multiplyScalar( 1 / max );
 				this.children[ 0 ].material.color.copy( this.material.color );
 
-			} // ignore world scale on light
+			}
 
-
+			// ignore world scale on light
 			this.matrixWorld.extractRotation( this.light.matrixWorld ).scale( this.scale ).copyPosition( this.light.matrixWorld );
 			this.children[ 0 ].matrixWorld.copy( this.matrixWorld );
 
 		}
-
 		dispose() {
 
 			this.geometry.dispose();

@@ -5,7 +5,6 @@
  */
 
 	const _shadowMatrix = new THREE.Matrix4();
-
 	class ShadowMesh extends THREE.Mesh {
 
 		constructor( mesh ) {
@@ -27,10 +26,10 @@
 			this.matrixAutoUpdate = false;
 
 		}
-
 		update( plane, lightPosition4D ) {
 
 			// based on https://www.opengl.org/archives/resources/features/StencilTalk/tsld021.htm
+
 			const dot = plane.normal.x * lightPosition4D.x + plane.normal.y * lightPosition4D.y + plane.normal.z * lightPosition4D.z + - plane.constant * lightPosition4D.w;
 			const sme = _shadowMatrix.elements;
 			sme[ 0 ] = dot - lightPosition4D.x * plane.normal.x;

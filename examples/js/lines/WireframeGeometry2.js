@@ -7,7 +7,9 @@
 			super();
 			this.isWireframeGeometry2 = true;
 			this.type = 'WireframeGeometry2';
-			this.fromWireframeGeometry( new THREE.WireframeGeometry( geometry ) ); // set colors, maybe
+			this.fromWireframeGeometry( new THREE.WireframeGeometry( geometry ) );
+
+			// set colors, maybe
 
 		}
 

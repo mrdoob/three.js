@@ -33,6 +33,7 @@ export { DataTexture } from './textures/DataTexture.js';
 export { DataArrayTexture } from './textures/DataArrayTexture.js';
 export { Data3DTexture } from './textures/Data3DTexture.js';
 export { CompressedTexture } from './textures/CompressedTexture.js';
+export { CompressedArrayTexture } from './textures/CompressedArrayTexture.js';
 export { CubeTexture } from './textures/CubeTexture.js';
 export { CanvasTexture } from './textures/CanvasTexture.js';
 export { DepthTexture } from './textures/DepthTexture.js';

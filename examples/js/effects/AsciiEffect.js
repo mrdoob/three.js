@@ -5,6 +5,7 @@
  *
  * 16 April 2012 - @blurspline
  */
+
 	class AsciiEffect {
 
 		constructor( renderer, charSet = ' .:-=+*#%@', options = {} ) {
@@ -12,18 +13,15 @@
 			// ' .,:;=|iI+hHOE#`$';
 			// darker bolder character set from https://github.com/saw/Canvas-ASCII-Art/
 			// ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'.split('');
-			// Some ASCII settings
-			const fResolution = options[ 'resolution' ] || 0.15; // Higher for more details
 
+			// Some ASCII settings
+
+			const fResolution = options[ 'resolution' ] || 0.15; // Higher for more details
 			const iScale = options[ 'scale' ] || 1;
 			const bColor = options[ 'color' ] || false; // nice but slows down rendering!
-
 			const bAlpha = options[ 'alpha' ] || false; // Transparency
-
 			const bBlock = options[ 'block' ] || false; // blocked characters. like good O dos
-
 			const bInvert = options[ 'invert' ] || false; // black is white, white is black
-
 			const strResolution = options[ 'strResolution' ] || 'low';
 			let width, height;
 			const domElement = document.createElement( 'div' );
@@ -32,7 +30,6 @@
 			domElement.appendChild( oAscii );
 			let iWidth, iHeight;
 			let oImg;
-
 			this.setSize = function ( w, h ) {
 
 				width = w;
@@ -49,19 +46,21 @@
 
 			};
 
-			this.domElement = domElement; // Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
+			this.domElement = domElement;
+
+			// Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
 
 			function initAsciiSize() {
 
 				iWidth = Math.round( width * fResolution );
 				iHeight = Math.round( height * fResolution );
 				oCanvas.width = iWidth;
-				oCanvas.height = iHeight; // oCanvas.style.display = "none";
+				oCanvas.height = iHeight;
+				// oCanvas.style.display = "none";
 				// oCanvas.style.width = iWidth;
 				// oCanvas.style.height = iHeight;
 
 				oImg = renderer.domElement;
-
 				if ( oImg.style.backgroundColor ) {
 
 					oAscii.rows[ 0 ].cells[ 0 ].style.backgroundColor = oImg.style.backgroundColor;
@@ -92,7 +91,6 @@
 			const strFont = 'courier new, monospace';
 			const oCanvasImg = renderer.domElement;
 			const oCanvas = document.createElement( 'canvas' );
-
 			if ( ! oCanvas.getContext ) {
 
 				return;
@@ -100,7 +98,6 @@
 			}
 
 			const oCtx = oCanvas.getContext( '2d' );
-
 			if ( ! oCtx.getImageData ) {
 
 				return;
@@ -108,13 +105,16 @@
 			}
 
 			let aCharList = bColor ? aDefaultColorCharList : aDefaultCharList;
-			if ( charSet ) aCharList = charSet; // Setup dom
+			if ( charSet ) aCharList = charSet;
+
+			// Setup dom
 
 			const fFontSize = 2 / fResolution * iScale;
-			const fLineHeight = 2 / fResolution * iScale; // adjust letter-spacing for all combinations of scale and resolution to get it to fit the image width.
+			const fLineHeight = 2 / fResolution * iScale;
+
+			// adjust letter-spacing for all combinations of scale and resolution to get it to fit the image width.
 
 			let fLetterSpacing = 0;
-
 			if ( strResolution == 'low' ) {
 
 				switch ( iScale ) {
@@ -122,16 +122,13 @@
 					case 1:
 						fLetterSpacing = - 1;
 						break;
-
 					case 2:
 					case 3:
 						fLetterSpacing = - 2.1;
 						break;
-
 					case 4:
 						fLetterSpacing = - 3.1;
 						break;
-
 					case 5:
 						fLetterSpacing = - 4.15;
 						break;
@@ -147,15 +144,12 @@
 					case 1:
 						fLetterSpacing = 0;
 						break;
-
 					case 2:
 						fLetterSpacing = - 1;
 						break;
-
 					case 3:
 						fLetterSpacing = - 1.04;
 						break;
-
 					case 4:
 					case 5:
 						fLetterSpacing = - 2.1;
@@ -173,7 +167,6 @@
 					case 2:
 						fLetterSpacing = 0;
 						break;
-
 					case 3:
 					case 4:
 					case 5:
@@ -182,17 +175,22 @@
 
 				}
 
-			} // can't get a span or div to flow like an img element, but a table works?
-			// convert img element to ascii
+			}
 
+			// can't get a span or div to flow like an img element, but a table works?
+
+			// convert img element to ascii
 
 			function asciifyImage( oAscii ) {
 
 				oCtx.clearRect( 0, 0, iWidth, iHeight );
 				oCtx.drawImage( oCanvasImg, 0, 0, iWidth, iHeight );
-				const oImgData = oCtx.getImageData( 0, 0, iWidth, iHeight ).data; // Coloring loop starts now
+				const oImgData = oCtx.getImageData( 0, 0, iWidth, iHeight ).data;
 
-				let strChars = ''; // console.time('rendering');
+				// Coloring loop starts now
+				let strChars = '';
+
+				// console.time('rendering');
 
 				for ( let y = 0; y < iHeight; y += 2 ) {
 
@@ -205,7 +203,8 @@
 						const iAlpha = oImgData[ iOffset + 3 ];
 						let iCharIdx;
 						let fBrightness;
-						fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255; // fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
+						fBrightness = ( 0.3 * iRed + 0.59 * iGreen + 0.11 * iBlue ) / 255;
+						// fBrightness = (0.3*iRed + 0.5*iGreen + 0.3*iBlue) / 255;
 
 						if ( iAlpha == 0 ) {
 
@@ -216,19 +215,18 @@
 						}
 
 						iCharIdx = Math.floor( ( 1 - fBrightness ) * ( aCharList.length - 1 ) );
-
 						if ( bInvert ) {
 
 							iCharIdx = aCharList.length - iCharIdx - 1;
 
-						} // good for debugging
+						}
+
+						// good for debugging
 						//fBrightness = Math.floor(fBrightness * 10);
 						//strThisChar = fBrightness;
 
-
 						let strThisChar = aCharList[ iCharIdx ];
 						if ( strThisChar === undefined || strThisChar == ' ' ) strThisChar = '&nbsp;';
-
 						if ( bColor ) {
 
 							strChars += '<span style=\'' + 'color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');' + ( bBlock ? 'background-color:rgb(' + iRed + ',' + iGreen + ',' + iBlue + ');' : '' ) + ( bAlpha ? 'opacity:' + iAlpha / 255 + ';' : '' ) + '\'>' + strThisChar + '</span>';
@@ -245,7 +243,10 @@
 
 				}
 
-				oAscii.innerHTML = '<tr><td>' + strChars + '</td></tr>'; // console.timeEnd('rendering');
+				oAscii.innerHTML = '<tr><td>' + strChars + '</td></tr>';
+
+				// console.timeEnd('rendering');
+
 				// return oAscii;
 
 			}

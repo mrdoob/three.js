@@ -5,8 +5,9 @@
 		async parse( scene ) {
 
 			const files = {};
-			const modelFileName = 'model.usda'; // model file should be first in USDZ archive so we init it here
+			const modelFileName = 'model.usda';
 
+			// model file should be first in USDZ archive so we init it here
 			files[ modelFileName ] = null;
 			let output = buildHeader();
 			const materials = {};
@@ -17,11 +18,9 @@
 
 					const geometry = object.geometry;
 					const material = object.material;
-
 					if ( material.isMeshStandardMaterial ) {
 
 						const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
-
 						if ( ! ( geometryFileName in files ) ) {
 
 							const meshObject = buildMeshObject( geometry );
@@ -49,7 +48,6 @@
 			output += buildMaterials( materials, textures );
 			files[ modelFileName ] = fflate.strToU8( output );
 			output = null;
-
 			for ( const id in textures ) {
 
 				const texture = textures[ id ];
@@ -59,19 +57,18 @@
 				const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
 				files[ `textures/Texture_${id}.${isRGBA ? 'png' : 'jpg'}` ] = new Uint8Array( await blob.arrayBuffer() );
 
-			} // 64 byte alignment
+			}
+
+			// 64 byte alignment
 			// https://github.com/101arrowz/fflate/issues/39#issuecomment-777263109
 
-
 			let offset = 0;
-
 			for ( const filename in files ) {
 
 				const file = files[ filename ];
 				const headerSize = 34 + filename.length;
 				offset += headerSize;
 				const offsetMod64 = offset & 63;
-
 				if ( offsetMod64 !== 4 ) {
 
 					const padLength = 64 - offsetMod64;
@@ -95,7 +92,6 @@
 		}
 
 	}
-
 	function imageToCanvas( image, color ) {
 
 		if ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement || typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement || typeof OffscreenCanvas !== 'undefined' && image instanceof OffscreenCanvas || typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) {
@@ -106,7 +102,6 @@
 			canvas.height = image.height * Math.min( 1, scale );
 			const context = canvas.getContext( '2d' );
 			context.drawImage( image, 0, 0, canvas.width, canvas.height );
-
 			if ( color !== undefined ) {
 
 				const hex = parseInt( color, 16 );
@@ -115,7 +110,6 @@
 				const b = ( hex & 255 ) / 255;
 				const imagedata = context.getImageData( 0, 0, canvas.width, canvas.height );
 				const data = imagedata.data;
-
 				for ( let i = 0; i < data.length; i += 4 ) {
 
 					data[ i + 0 ] = data[ i + 0 ] * r;
@@ -132,11 +126,11 @@
 
 		}
 
-	} //
+	}
 
+	//
 
 	const PRECISION = 7;
-
 	function buildHeader() {
 
 		return `#usda 1.0
@@ -158,14 +152,14 @@
 		output += dataToInsert;
 		return fflate.strToU8( output );
 
-	} // Xform
+	}
 
+	// Xform
 
 	function buildXform( object, geometry, material ) {
 
 		const name = 'Object_' + object.id;
 		const transform = buildMatrix( object.matrixWorld );
-
 		if ( object.matrixWorld.determinant() < 0 ) {
 
 			console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', object );
@@ -197,8 +191,9 @@
 
 		return `(${array[ offset + 0 ]}, ${array[ offset + 1 ]}, ${array[ offset + 2 ]}, ${array[ offset + 3 ]})`;
 
-	} // Mesh
+	}
 
+	// Mesh
 
 	function buildMeshObject( geometry ) {
 
@@ -246,7 +241,6 @@ def "Geometry"
 
 		const index = geometry.index;
 		const array = [];
-
 		if ( index !== null ) {
 
 			for ( let i = 0; i < index.count; i ++ ) {
@@ -258,7 +252,6 @@ def "Geometry"
 		} else {
 
 			const length = geometry.attributes.position.count;
-
 			for ( let i = 0; i < length; i ++ ) {
 
 				array.push( i );
@@ -281,7 +274,6 @@ def "Geometry"
 		}
 
 		const array = [];
-
 		for ( let i = 0; i < attribute.count; i ++ ) {
 
 			const x = attribute.getX( i );
@@ -305,7 +297,6 @@ def "Geometry"
 		}
 
 		const array = [];
-
 		for ( let i = 0; i < attribute.count; i ++ ) {
 
 			const x = attribute.getX( i );
@@ -316,13 +307,13 @@ def "Geometry"
 
 		return array.join( ', ' );
 
-	} // Materials
+	}
 
+	// Materials
 
 	function buildMaterials( materials, textures ) {
 
 		const array = [];
-
 		for ( const uuid in materials ) {
 
 			const material = materials[ uuid ];
@@ -342,10 +333,10 @@ ${array.join( '' )}
 	function buildMaterial( material, textures ) {
 
 		// https://graphics.pixar.com/usd/docs/UsdPreviewSurface-Proposal.html
+
 		const pad = '            ';
 		const inputs = [];
 		const samplers = [];
-
 		function buildTexture( texture, mapType, color ) {
 
 			const id = texture.id + ( color ? '_' + color.getHexString() : '' );
@@ -390,7 +381,6 @@ ${array.join( '' )}
 		if ( material.map !== null ) {
 
 			inputs.push( `${pad}color3f inputs:diffuseColor.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:rgb>` );
-
 			if ( material.transparent ) {
 
 				inputs.push( `${pad}float inputs:opacity.connect = </Materials/Material_${material.id}/Texture_${material.map.id}_diffuse.outputs:a>` );

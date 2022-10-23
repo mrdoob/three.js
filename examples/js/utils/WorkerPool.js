@@ -3,6 +3,7 @@
 	/**
  * @author Deepkolos / https://github.com/deepkolos
  */
+
 	class WorkerPool {
 
 		constructor( pool = 4 ) {
@@ -14,7 +15,6 @@
 			this.workerStatus = 0;
 
 		}
-
 		_initWorker( workerId ) {
 
 			if ( ! this.workers[ workerId ] ) {
@@ -26,20 +26,16 @@
 			}
 
 		}
-
 		_getIdleWorker() {
 
 			for ( let i = 0; i < this.pool; i ++ ) if ( ! ( this.workerStatus & 1 << i ) ) return i;
-
 			return - 1;
 
 		}
-
 		_onMessage( workerId, msg ) {
 
 			const resolve = this.workersResolve[ workerId ];
 			resolve && resolve( msg );
-
 			if ( this.queue.length ) {
 
 				const {
@@ -57,29 +53,24 @@
 			}
 
 		}
-
 		setWorkerCreator( workerCreator ) {
 
 			this.workerCreator = workerCreator;
 
 		}
-
 		setWorkerLimit( pool ) {
 
 			this.pool = pool;
 
 		}
-
 		postMessage( msg, transfer ) {
 
 			return new Promise( resolve => {
 
 				const workerId = this._getIdleWorker();
-
 				if ( workerId !== - 1 ) {
 
 					this._initWorker( workerId );
-
 					this.workerStatus |= 1 << workerId;
 					this.workersResolve[ workerId ] = resolve;
 					this.workers[ workerId ].postMessage( msg, transfer );
@@ -97,7 +88,6 @@
 			} );
 
 		}
-
 		dispose() {
 
 			this.workers.forEach( worker => worker.terminate() );

@@ -313,6 +313,7 @@
 			"Textures": {
 				"CanvasTexture": "api/en/textures/CanvasTexture",
 				"CompressedTexture": "api/en/textures/CompressedTexture",
+				"CompressedArrayTexture": "api/en/textures/CompressedArrayTexture",
 				"CubeTexture": "api/en/textures/CubeTexture",
 				"Data3DTexture": "api/en/textures/Data3DTexture",
 				"DataArrayTexture": "api/en/textures/DataArrayTexture",
@@ -814,6 +815,7 @@
 			"纹理贴图": {
 				"CanvasTexture": "api/zh/textures/CanvasTexture",
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
+				"CompressedArrayTexture": "api/zh/textures/CompressedArrayTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
 				"DataArrayTexture": "api/zh/textures/DataArrayTexture",
 				"Data3DTexture": "api/zh/textures/Data3DTexture",
@@ -1348,6 +1350,37 @@
 				"ShaderMaterial": "api/it/materials/ShaderMaterial",
 				"ShadowMaterial": "api/it/materials/ShadowMaterial",
 				"SpriteMaterial": "api/it/materials/SpriteMaterial"
+			},
+
+			"Math": {
+				"Box2": "api/it/math/Box2",
+				"Box3": "api/it/math/Box3",
+				"Color": "api/it/math/Color",
+				"Cylindrical": "api/it/math/Cylindrical",
+				"Euler": "api/it/math/Euler",
+				"Frustum": "api/it/math/Frustum",
+				"Interpolant": "api/it/math/Interpolant",
+				"Line3": "api/it/math/Line3",
+				"MathUtils": "api/it/math/MathUtils",
+				"Matrix3": "api/it/math/Matrix3",
+				"Matrix4": "api/it/math/Matrix4",
+				"Plane": "api/it/math/Plane",
+				"Quaternion": "api/it/math/Quaternion",
+				"Ray": "api/it/math/Ray",
+				"Sphere": "api/it/math/Sphere",
+				"Spherical": "api/it/math/Spherical",
+				"SphericalHarmonics3": "api/it/math/SphericalHarmonics3",
+				"Triangle": "api/it/math/Triangle",
+				"Vector2": "api/it/math/Vector2",
+				"Vector3": "api/it/math/Vector3",
+				"Vector4": "api/it/math/Vector4"
+			},
+
+			"Math / Interpolants": {
+				"CubicInterpolant": "api/it/math/interpolants/CubicInterpolant",
+				"DiscreteInterpolant": "api/it/math/interpolants/DiscreteInterpolant",
+				"LinearInterpolant": "api/it/math/interpolants/LinearInterpolant",
+				"QuaternionLinearInterpolant": "api/it/math/interpolants/QuaternionLinearInterpolant"
 			}
 		}
 	},
@@ -1466,7 +1499,12 @@
 
 			"Outils de build": {
 				"Tests avec NPM": "manual/fr/buildTools/Testing-with-NPM"
+			},
+			"Noyau": {
+				"BufferAttribute": "api/fr/core/BufferAttribute",
+				"BufferGeometry": "api/fr/core/BufferGeometry"
 			}
+
 
 		},
 
@@ -1507,6 +1545,29 @@
 				"OrthographicCamera": "api/fr/cameras/OrthographicCamera",
 				"PerspectiveCamera": "api/fr/cameras/PerspectiveCamera",
 				"StereoCamera": "api/fr/cameras/StereoCamera"
+			},
+			"Géométries": {
+				"BoxGeometry": "api/fr/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/fr/geometries/CapsuleGeometry",
+				"CircleGeometry": "api/fr/geometries/CircleGeometry",
+				"ConeGeometry": "api/fr/geometries/ConeGeometry",
+				"CylinderGeometry": "api/fr/geometries/CylinderGeometry",
+				"DodecahedronGeometry": "api/fr/geometries/DodecahedronGeometry",
+				"EdgesGeometry": "api/fr/geometries/EdgesGeometry",
+				"ExtrudeGeometry": "api/fr/geometries/ExtrudeGeometry",
+				"IcosahedronGeometry": "api/fr/geometries/IcosahedronGeometry",
+				"LatheGeometry": "api/fr/geometries/LatheGeometry",
+				"OctahedronGeometry": "api/fr/geometries/OctahedronGeometry",
+				"PlaneGeometry": "api/fr/geometries/PlaneGeometry",
+				"PolyhedronGeometry": "api/fr/geometries/PolyhedronGeometry",
+				"RingGeometry": "api/fr/geometries/RingGeometry",
+				"ShapeGeometry": "api/fr/geometries/ShapeGeometry",
+				"SphereGeometry": "api/fr/geometries/SphereGeometry",
+				"TetrahedronGeometry": "api/fr/geometries/TetrahedronGeometry",
+				"TorusGeometry": "api/fr/geometries/TorusGeometry",
+				"TorusKnotGeometry": "api/fr/geometries/TorusKnotGeometry",
+				"TubeGeometry": "api/fr/geometries/TubeGeometry",
+				"WireframeGeometry": "api/fr/geometries/WireframeGeometry"
 			}
 		
 		}

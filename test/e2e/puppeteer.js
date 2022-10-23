@@ -35,6 +35,7 @@ const exceptionList = [
 	'webgl_nodes_materials_standard', // puppeteer does not support import maps yet
 	'webgl_postprocessing_crossfade', // fails for some misterious reason
 	'webgl_raymarching_reflect', // exception for Github Actions
+	'webgl_renderer_pathtracer', // slow to render
 	'webgl_test_memory2', // gives fatal error in puppeteer
 	'webgl_tiled_forward', // exception for Github Actions
 	'webgl_video_kinect', // video tag not deterministic enough
@@ -47,6 +48,7 @@ const exceptionList = [
 	'webgpu_cubemap_adjustments',
 	'webgpu_cubemap_mix',
 	'webgpu_depth_texture',
+	'webgpu_equirectangular',
 	'webgpu_instance_mesh',
 	'webgpu_instance_uniform',
 	'webgpu_lights_custom',

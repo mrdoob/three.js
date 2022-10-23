@@ -4,14 +4,15 @@
 
 		constructor( manager ) {
 
-			super( manager ); // Default dots per inch
+			super( manager );
 
-			this.defaultDPI = 90; // Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
+			// Default dots per inch
+			this.defaultDPI = 90;
 
+			// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
 			this.defaultUnit = 'px';
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -44,77 +45,62 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( text ) {
 
 			const scope = this;
-
 			function parseNode( node, style ) {
 
 				if ( node.nodeType !== 1 ) return;
 				const transform = getNodeTransform( node );
 				let isDefsNode = false;
 				let path = null;
-
 				switch ( node.nodeName ) {
 
 					case 'svg':
 						style = parseStyle( node, style );
 						break;
-
 					case 'style':
 						parseCSSStylesheet( node );
 						break;
-
 					case 'g':
 						style = parseStyle( node, style );
 						break;
-
 					case 'path':
 						style = parseStyle( node, style );
 						if ( node.hasAttribute( 'd' ) ) path = parsePathNode( node );
 						break;
-
 					case 'rect':
 						style = parseStyle( node, style );
 						path = parseRectNode( node );
 						break;
-
 					case 'polygon':
 						style = parseStyle( node, style );
 						path = parsePolygonNode( node );
 						break;
-
 					case 'polyline':
 						style = parseStyle( node, style );
 						path = parsePolylineNode( node );
 						break;
-
 					case 'circle':
 						style = parseStyle( node, style );
 						path = parseCircleNode( node );
 						break;
-
 					case 'ellipse':
 						style = parseStyle( node, style );
 						path = parseEllipseNode( node );
 						break;
-
 					case 'line':
 						style = parseStyle( node, style );
 						path = parseLineNode( node );
 						break;
-
 					case 'defs':
 						isDefsNode = true;
 						break;
-
 					case 'use':
 						style = parseStyle( node, style );
 						const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
 						const usedNodeId = href.substring( 1 );
 						const usedNode = node.viewportElement.getElementById( usedNodeId );
-
 						if ( usedNode ) {
 
 							parseNode( usedNode, style );
@@ -126,8 +112,8 @@
 						}
 
 						break;
-
-					default: // console.log( node );
+					default:
+        // console.log( node );
 
 				}
 
@@ -149,11 +135,9 @@
 				}
 
 				const childNodes = node.childNodes;
-
 				for ( let i = 0; i < childNodes.length; i ++ ) {
 
 					const node = childNodes[ i ];
-
 					if ( isDefsNode && node.nodeName !== 'style' && node.nodeName !== 'defs' ) {
 
 						// Ignore everything in defs except CSS style definitions
@@ -170,7 +154,6 @@
 				if ( transform ) {
 
 					transformStack.pop();
-
 					if ( transformStack.length > 0 ) {
 
 						currentTransform.copy( transformStack[ transformStack.length - 1 ] );
@@ -193,16 +176,16 @@
 				const firstPoint = new THREE.Vector2();
 				let isFirstPoint = true;
 				let doSetFirstPoint = false;
-				const d = node.getAttribute( 'd' ); // console.log( d );
+				const d = node.getAttribute( 'd' );
+
+				// console.log( d );
 
 				const commands = d.match( /[a-df-z][^a-df-z]*/ig );
-
 				for ( let i = 0, l = commands.length; i < l; i ++ ) {
 
 					const command = commands[ i ];
 					const type = command.charAt( 0 );
 					const data = command.slice( 1 ).trim();
-
 					if ( isFirstPoint === true ) {
 
 						doSetFirstPoint = true;
@@ -211,19 +194,16 @@
 					}
 
 					let numbers;
-
 					switch ( type ) {
 
 						case 'M':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 2 ) {
 
 								point.x = numbers[ j + 0 ];
 								point.y = numbers[ j + 1 ];
 								control.x = point.x;
 								control.y = point.y;
-
 								if ( j === 0 ) {
 
 									path.moveTo( point.x, point.y );
@@ -239,10 +219,8 @@
 							}
 
 							break;
-
 						case 'H':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j ++ ) {
 
 								point.x = numbers[ j ];
@@ -254,10 +232,8 @@
 							}
 
 							break;
-
 						case 'V':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j ++ ) {
 
 								point.y = numbers[ j ];
@@ -269,10 +245,8 @@
 							}
 
 							break;
-
 						case 'L':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 2 ) {
 
 								point.x = numbers[ j + 0 ];
@@ -285,10 +259,8 @@
 							}
 
 							break;
-
 						case 'C':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 6 ) {
 
 								path.bezierCurveTo( numbers[ j + 0 ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], numbers[ j + 5 ] );
@@ -301,10 +273,8 @@
 							}
 
 							break;
-
 						case 'S':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 4 ) {
 
 								path.bezierCurveTo( getReflection( point.x, control.x ), getReflection( point.y, control.y ), numbers[ j + 0 ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ] );
@@ -317,10 +287,8 @@
 							}
 
 							break;
-
 						case 'Q':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 4 ) {
 
 								path.quadraticCurveTo( numbers[ j + 0 ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ] );
@@ -333,10 +301,8 @@
 							}
 
 							break;
-
 						case 'T':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 2 ) {
 
 								const rx = getReflection( point.x, control.x );
@@ -351,10 +317,8 @@
 							}
 
 							break;
-
 						case 'A':
 							numbers = parseFloats( data, [ 3, 4 ], 7 );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
 								// skip command if start point == end point
@@ -370,17 +334,14 @@
 							}
 
 							break;
-
 						case 'm':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 2 ) {
 
 								point.x += numbers[ j + 0 ];
 								point.y += numbers[ j + 1 ];
 								control.x = point.x;
 								control.y = point.y;
-
 								if ( j === 0 ) {
 
 									path.moveTo( point.x, point.y );
@@ -396,10 +357,8 @@
 							}
 
 							break;
-
 						case 'h':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j ++ ) {
 
 								point.x += numbers[ j ];
@@ -411,10 +370,8 @@
 							}
 
 							break;
-
 						case 'v':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j ++ ) {
 
 								point.y += numbers[ j ];
@@ -426,10 +383,8 @@
 							}
 
 							break;
-
 						case 'l':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 2 ) {
 
 								point.x += numbers[ j + 0 ];
@@ -442,10 +397,8 @@
 							}
 
 							break;
-
 						case 'c':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 6 ) {
 
 								path.bezierCurveTo( point.x + numbers[ j + 0 ], point.y + numbers[ j + 1 ], point.x + numbers[ j + 2 ], point.y + numbers[ j + 3 ], point.x + numbers[ j + 4 ], point.y + numbers[ j + 5 ] );
@@ -458,10 +411,8 @@
 							}
 
 							break;
-
 						case 's':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 4 ) {
 
 								path.bezierCurveTo( getReflection( point.x, control.x ), getReflection( point.y, control.y ), point.x + numbers[ j + 0 ], point.y + numbers[ j + 1 ], point.x + numbers[ j + 2 ], point.y + numbers[ j + 3 ] );
@@ -474,10 +425,8 @@
 							}
 
 							break;
-
 						case 'q':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 4 ) {
 
 								path.quadraticCurveTo( point.x + numbers[ j + 0 ], point.y + numbers[ j + 1 ], point.x + numbers[ j + 2 ], point.y + numbers[ j + 3 ] );
@@ -490,10 +439,8 @@
 							}
 
 							break;
-
 						case 't':
 							numbers = parseFloats( data );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 2 ) {
 
 								const rx = getReflection( point.x, control.x );
@@ -508,10 +455,8 @@
 							}
 
 							break;
-
 						case 'a':
 							numbers = parseFloats( data, [ 3, 4 ], 7 );
-
 							for ( let j = 0, jl = numbers.length; j < jl; j += 7 ) {
 
 								// skip command if no displacement
@@ -527,11 +472,9 @@
 							}
 
 							break;
-
 						case 'Z':
 						case 'z':
 							path.currentPath.autoClose = true;
-
 							if ( path.currentPath.curves.length > 0 ) {
 
 								// Reset point to beginning of THREE.Path
@@ -542,12 +485,12 @@
 							}
 
 							break;
-
 						default:
 							console.warn( command );
 
-					} // console.log( type, parseFloats( data ), parseFloats( data ).length  )
+					}
 
+					// console.log( type, parseFloats( data ), parseFloats( data ).length  )
 
 					doSetFirstPoint = false;
 
@@ -560,13 +503,11 @@
 			function parseCSSStylesheet( node ) {
 
 				if ( ! node.sheet || ! node.sheet.cssRules || ! node.sheet.cssRules.length ) return;
-
 				for ( let i = 0; i < node.sheet.cssRules.length; i ++ ) {
 
 					const stylesheet = node.sheet.cssRules[ i ];
 					if ( stylesheet.type !== 1 ) continue;
 					const selectorList = stylesheet.selectorText.split( /,/gm ).filter( Boolean ).map( i => i.trim() );
-
 					for ( let j = 0; j < selectorList.length; j ++ ) {
 
 						// Remove empty rules
@@ -578,6 +519,7 @@
 				}
 
 			}
+
 			/**
      * https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
      * https://mortoray.com/2017/02/16/rendering-an-svg-elliptical-arc-as-bezier-curves/ Appendix: Endpoint to center arc conversion
@@ -586,7 +528,6 @@
      * To
      * aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation
      */
-
 
 			function parseArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
 
@@ -598,23 +539,26 @@
 
 				}
 
-				x_axis_rotation = x_axis_rotation * Math.PI / 180; // Ensure radii are positive
+				x_axis_rotation = x_axis_rotation * Math.PI / 180;
 
+				// Ensure radii are positive
 				rx = Math.abs( rx );
-				ry = Math.abs( ry ); // Compute (x1', y1')
+				ry = Math.abs( ry );
 
+				// Compute (x1', y1')
 				const dx2 = ( start.x - end.x ) / 2.0;
 				const dy2 = ( start.y - end.y ) / 2.0;
 				const x1p = Math.cos( x_axis_rotation ) * dx2 + Math.sin( x_axis_rotation ) * dy2;
-				const y1p = - Math.sin( x_axis_rotation ) * dx2 + Math.cos( x_axis_rotation ) * dy2; // Compute (cx', cy')
+				const y1p = - Math.sin( x_axis_rotation ) * dx2 + Math.cos( x_axis_rotation ) * dy2;
 
+				// Compute (cx', cy')
 				let rxs = rx * rx;
 				let rys = ry * ry;
 				const x1ps = x1p * x1p;
-				const y1ps = y1p * y1p; // Ensure radii are large enough
+				const y1ps = y1p * y1p;
 
+				// Ensure radii are large enough
 				const cr = x1ps / rxs + y1ps / rys;
-
 				if ( cr > 1 ) {
 
 					// scale up rx,ry equally so cr == 1
@@ -631,11 +575,13 @@
 				let q = Math.sqrt( Math.max( 0, pq ) );
 				if ( large_arc_flag === sweep_flag ) q = - q;
 				const cxp = q * rx * y1p / ry;
-				const cyp = - q * ry * x1p / rx; // Step 3: Compute (cx, cy) from (cx', cy')
+				const cyp = - q * ry * x1p / rx;
 
+				// Step 3: Compute (cx, cy) from (cx', cy')
 				const cx = Math.cos( x_axis_rotation ) * cxp - Math.sin( x_axis_rotation ) * cyp + ( start.x + end.x ) / 2;
-				const cy = Math.sin( x_axis_rotation ) * cxp + Math.cos( x_axis_rotation ) * cyp + ( start.y + end.y ) / 2; // Step 4: Compute θ1 and Δθ
+				const cy = Math.sin( x_axis_rotation ) * cxp + Math.cos( x_axis_rotation ) * cyp + ( start.y + end.y ) / 2;
 
+				// Step 4: Compute θ1 and Δθ
 				const theta = svgAngle( 1, 0, ( x1p - cxp ) / rx, ( y1p - cyp ) / ry );
 				const delta = svgAngle( ( x1p - cxp ) / rx, ( y1p - cyp ) / ry, ( - x1p - cxp ) / rx, ( - y1p - cyp ) / ry ) % ( Math.PI * 2 );
 				path.currentPath.absellipse( cx, cy, rx, ry, theta, theta + delta, sweep_flag === 0, x_axis_rotation );
@@ -647,17 +593,15 @@
 				const dot = ux * vx + uy * vy;
 				const len = Math.sqrt( ux * ux + uy * uy ) * Math.sqrt( vx * vx + vy * vy );
 				let ang = Math.acos( Math.max( - 1, Math.min( 1, dot / len ) ) ); // floating point precision, slightly over values appear
-
 				if ( ux * vy - uy * vx < 0 ) ang = - ang;
 				return ang;
 
 			}
+
 			/*
     * According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
     * rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
     */
-
-
 			function parseRectNode( node ) {
 
 				const x = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
@@ -665,43 +609,42 @@
 				const rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || node.getAttribute( 'ry' ) || 0 );
 				const ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || node.getAttribute( 'rx' ) || 0 );
 				const w = parseFloatWithUnits( node.getAttribute( 'width' ) );
-				const h = parseFloatWithUnits( node.getAttribute( 'height' ) ); // Ellipse arc to Bezier approximation Coefficient (Inversed). See:
+				const h = parseFloatWithUnits( node.getAttribute( 'height' ) );
+
+				// Ellipse arc to Bezier approximation Coefficient (Inversed). See:
 				// https://spencermortensen.com/articles/bezier-circle/
-
 				const bci = 1 - 0.551915024494;
-				const path = new THREE.ShapePath(); // top left
+				const path = new THREE.ShapePath();
 
-				path.moveTo( x + rx, y ); // top right
+				// top left
+				path.moveTo( x + rx, y );
 
+				// top right
 				path.lineTo( x + w - rx, y );
-
 				if ( rx !== 0 || ry !== 0 ) {
 
 					path.bezierCurveTo( x + w - rx * bci, y, x + w, y + ry * bci, x + w, y + ry );
 
-				} // bottom right
+				}
 
-
+				// bottom right
 				path.lineTo( x + w, y + h - ry );
-
 				if ( rx !== 0 || ry !== 0 ) {
 
 					path.bezierCurveTo( x + w, y + h - ry * bci, x + w - rx * bci, y + h, x + w - rx, y + h );
 
-				} // bottom left
+				}
 
-
+				// bottom left
 				path.lineTo( x + rx, y + h );
-
 				if ( rx !== 0 || ry !== 0 ) {
 
 					path.bezierCurveTo( x + rx * bci, y + h, x, y + h - ry * bci, x, y + h - ry );
 
-				} // back to top left
+				}
 
-
+				// back to top left
 				path.lineTo( x, y + ry );
-
 				if ( rx !== 0 || ry !== 0 ) {
 
 					path.bezierCurveTo( x, y + ry * bci, x + rx * bci, y, x + rx, y );
@@ -718,7 +661,6 @@
 
 					const x = parseFloatWithUnits( a );
 					const y = parseFloatWithUnits( b );
-
 					if ( index === 0 ) {
 
 						path.moveTo( x, y );
@@ -748,7 +690,6 @@
 
 					const x = parseFloatWithUnits( a );
 					const y = parseFloatWithUnits( b );
-
 					if ( index === 0 ) {
 
 						path.moveTo( x, y );
@@ -811,19 +752,18 @@
 				path.currentPath.autoClose = false;
 				return path;
 
-			} //
+			}
 
+			//
 
 			function parseStyle( node, style ) {
 
 				style = Object.assign( {}, style ); // clone style
 
 				let stylesheetStyles = {};
-
 				if ( node.hasAttribute( 'class' ) ) {
 
 					const classSelectors = node.getAttribute( 'class' ).split( /\s/ ).filter( Boolean ).map( i => i.trim() );
-
 					for ( let i = 0; i < classSelectors.length; i ++ ) {
 
 						stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '.' + classSelectors[ i ] ] );
@@ -878,15 +818,17 @@
 				addStyle( 'visibility', 'visibility' );
 				return style;
 
-			} // http://www.w3.org/TR/SVG11/implnote.html#PathElementImplementationNotes
+			}
 
+			// http://www.w3.org/TR/SVG11/implnote.html#PathElementImplementationNotes
 
 			function getReflection( a, b ) {
 
 				return a - ( b - a );
 
-			} // from https://github.com/ppvg/svg-numbers (MIT License)
+			}
 
+			// from https://github.com/ppvg/svg-numbers (MIT License)
 
 			function parseFloats( input, flags, stride ) {
 
@@ -894,9 +836,9 @@
 
 					throw new TypeError( 'Invalid input: ' + typeof input );
 
-				} // Character groups
+				}
 
-
+				// Character groups
 				const RE = {
 					SEPARATOR: /[ \t\r\n\,.\-+]/,
 					WHITESPACE: /[ \t\r\n]/,
@@ -906,8 +848,9 @@
 					COMMA: /,/,
 					EXP: /e/i,
 					FLAGS: /[01]/
-				}; // States
+				};
 
+				// States
 				const SEP = 0;
 				const INT = 1;
 				const FLOAT = 2;
@@ -917,7 +860,6 @@
 				let number = '',
 					exponent = '';
 				const result = [];
-
 				function throwSyntaxError( current, i, partial ) {
 
 					const error = new SyntaxError( 'Unexpected character "' + current + '" at index ' + i + '.' );
@@ -941,11 +883,11 @@
 
 				let current;
 				const length = input.length;
-
 				for ( let i = 0; i < length; i ++ ) {
 
-					current = input[ i ]; // check for flags
+					current = input[ i ];
 
+					// check for flags
 					if ( Array.isArray( flags ) && flags.includes( result.length % stride ) && RE.FLAGS.test( current ) ) {
 
 						state = INT;
@@ -953,9 +895,9 @@
 						newNumber();
 						continue;
 
-					} // parse until next number
+					}
 
-
+					// parse until next number
 					if ( state === SEP ) {
 
 						// eat whitespace
@@ -963,9 +905,9 @@
 
 							continue;
 
-						} // start new number
+						}
 
-
+						// start new number
 						if ( RE.DIGIT.test( current ) || RE.SIGN.test( current ) ) {
 
 							state = INT;
@@ -980,9 +922,9 @@
 							number = current;
 							continue;
 
-						} // throw on double commas (e.g. "1, , 2")
+						}
 
-
+						// throw on double commas (e.g. "1, , 2")
 						if ( RE.COMMA.test( current ) ) {
 
 							if ( seenComma ) {
@@ -995,9 +937,9 @@
 
 						}
 
-					} // parse integer part
+					}
 
-
+					// parse integer part
 					if ( state === INT ) {
 
 						if ( RE.DIGIT.test( current ) ) {
@@ -1020,18 +962,18 @@
 							state = EXP;
 							continue;
 
-						} // throw on double signs ("-+1"), but not on sign as separator ("-1-2")
+						}
 
-
+						// throw on double signs ("-+1"), but not on sign as separator ("-1-2")
 						if ( RE.SIGN.test( current ) && number.length === 1 && RE.SIGN.test( number[ 0 ] ) ) {
 
 							throwSyntaxError( current, i, result );
 
 						}
 
-					} // parse decimal part
+					}
 
-
+					// parse decimal part
 					if ( state === FLOAT ) {
 
 						if ( RE.DIGIT.test( current ) ) {
@@ -1046,18 +988,18 @@
 							state = EXP;
 							continue;
 
-						} // throw on double decimal points (e.g. "1..2")
+						}
 
-
+						// throw on double decimal points (e.g. "1..2")
 						if ( RE.POINT.test( current ) && number[ number.length - 1 ] === '.' ) {
 
 							throwSyntaxError( current, i, result );
 
 						}
 
-					} // parse exponent part
+					}
 
-
+					// parse exponent part
 					if ( state === EXP ) {
 
 						if ( RE.DIGIT.test( current ) ) {
@@ -1084,9 +1026,9 @@
 
 						}
 
-					} // end of number
+					}
 
-
+					// end of number
 					if ( RE.WHITESPACE.test( current ) ) {
 
 						newNumber();
@@ -1117,17 +1059,19 @@
 
 					}
 
-				} // add the last number found (if any)
+				}
 
-
+				// add the last number found (if any)
 				newNumber();
 				return result;
 
-			} // Units
+			}
 
+			// Units
 
-			const units = [ 'mm', 'cm', 'in', 'pt', 'pc', 'px' ]; // Conversion: [ fromUnit ][ toUnit ] (-1 means dpi dependent)
+			const units = [ 'mm', 'cm', 'in', 'pt', 'pc', 'px' ];
 
+			// Conversion: [ fromUnit ][ toUnit ] (-1 means dpi dependent)
 			const unitConversion = {
 				'mm': {
 					'mm': 1,
@@ -1173,17 +1117,14 @@
 					'px': 1
 				}
 			};
-
 			function parseFloatWithUnits( string ) {
 
 				let theUnit = 'px';
-
 				if ( typeof string === 'string' || string instanceof String ) {
 
 					for ( let i = 0, n = units.length; i < n; i ++ ) {
 
 						const u = units[ i ];
-
 						if ( string.endsWith( u ) ) {
 
 							theUnit = u;
@@ -1197,19 +1138,19 @@
 				}
 
 				let scale = undefined;
-
 				if ( theUnit === 'px' && scope.defaultUnit !== 'px' ) {
 
 					// Conversion scale from  pixels to inches, then to default units
+
 					scale = unitConversion[ 'in' ][ scope.defaultUnit ] / scope.defaultDPI;
 
 				} else {
 
 					scale = unitConversion[ theUnit ][ scope.defaultUnit ];
-
 					if ( scale < 0 ) {
 
 						// Conversion scale to pixels
+
 						scale = unitConversion[ theUnit ][ 'in' ] * scope.defaultDPI;
 
 					}
@@ -1218,8 +1159,9 @@
 
 				return scale * parseFloat( string );
 
-			} // Transforms
+			}
 
+			// Transforms
 
 			function getNodeTransform( node ) {
 
@@ -1230,7 +1172,6 @@
 				}
 
 				const transform = parseNodeTransform( node );
-
 				if ( transformStack.length > 0 ) {
 
 					transform.premultiply( transformStack[ transformStack.length - 1 ] );
@@ -1247,7 +1188,6 @@
 
 				const transform = new THREE.Matrix3();
 				const currentTransform = tempTransform0;
-
 				if ( node.nodeName === 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
 
 					const tx = parseFloatWithUnits( node.getAttribute( 'x' ) );
@@ -1259,20 +1199,17 @@
 				if ( node.hasAttribute( 'transform' ) ) {
 
 					const transformsTexts = node.getAttribute( 'transform' ).split( ')' );
-
 					for ( let tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
 
 						const transformText = transformsTexts[ tIndex ].trim();
 						if ( transformText === '' ) continue;
 						const openParPos = transformText.indexOf( '(' );
 						const closeParPos = transformText.length;
-
 						if ( openParPos > 0 && openParPos < closeParPos ) {
 
 							const transformType = transformText.slice( 0, openParPos );
 							const array = parseFloats( transformText.slice( openParPos + 1 ) );
 							currentTransform.identity();
-
 							switch ( transformType ) {
 
 								case 'translate':
@@ -1280,7 +1217,6 @@
 
 										const tx = array[ 0 ];
 										let ty = 0;
-
 										if ( array.length >= 2 ) {
 
 											ty = array[ 1 ];
@@ -1292,25 +1228,24 @@
 									}
 
 									break;
-
 								case 'rotate':
 									if ( array.length >= 1 ) {
 
 										let angle = 0;
 										let cx = 0;
-										let cy = 0; // Angle
+										let cy = 0;
 
+										// Angle
 										angle = - array[ 0 ] * Math.PI / 180;
-
 										if ( array.length >= 3 ) {
 
 											// Center x, y
 											cx = array[ 1 ];
 											cy = array[ 2 ];
 
-										} // Rotate around center (cx, cy)
+										}
 
-
+										// Rotate around center (cx, cy)
 										tempTransform1.identity().translate( - cx, - cy );
 										tempTransform2.identity().rotate( angle );
 										tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
@@ -1320,13 +1255,11 @@
 									}
 
 									break;
-
 								case 'scale':
 									if ( array.length >= 1 ) {
 
 										const scaleX = array[ 0 ];
 										let scaleY = scaleX;
-
 										if ( array.length >= 2 ) {
 
 											scaleY = array[ 1 ];
@@ -1338,7 +1271,6 @@
 									}
 
 									break;
-
 								case 'skewX':
 									if ( array.length === 1 ) {
 
@@ -1347,7 +1279,6 @@
 									}
 
 									break;
-
 								case 'skewY':
 									if ( array.length === 1 ) {
 
@@ -1356,7 +1287,6 @@
 									}
 
 									break;
-
 								case 'matrix':
 									if ( array.length === 6 ) {
 
@@ -1389,18 +1319,99 @@
 
 				}
 
-				const isRotated = isTransformRotated( m );
-				const subPaths = path.subPaths;
+				function transfEllipseGeneric( curve ) {
 
+					// For math description see:
+					// https://math.stackexchange.com/questions/4544164
+
+					const a = curve.xRadius;
+					const b = curve.yRadius;
+					const cosTheta = Math.cos( curve.aRotation );
+					const sinTheta = Math.sin( curve.aRotation );
+					const v1 = new THREE.Vector3( a * cosTheta, a * sinTheta, 0 );
+					const v2 = new THREE.Vector3( - b * sinTheta, b * cosTheta, 0 );
+					const f1 = v1.applyMatrix3( m );
+					const f2 = v2.applyMatrix3( m );
+					const mF = tempTransform0.set( f1.x, f2.x, 0, f1.y, f2.y, 0, 0, 0, 1 );
+					const mFInv = tempTransform1.copy( mF ).invert();
+					const mFInvT = tempTransform2.copy( mFInv ).transpose();
+					const mQ = mFInvT.multiply( mFInv );
+					const mQe = mQ.elements;
+					const ed = eigenDecomposition( mQe[ 0 ], mQe[ 1 ], mQe[ 4 ] );
+					const rt1sqrt = Math.sqrt( ed.rt1 );
+					const rt2sqrt = Math.sqrt( ed.rt2 );
+					curve.xRadius = 1 / rt1sqrt;
+					curve.yRadius = 1 / rt2sqrt;
+					curve.aRotation = Math.atan2( ed.sn, ed.cs );
+					const isFullEllipse = ( curve.aEndAngle - curve.aStartAngle ) % ( 2 * Math.PI ) < Number.EPSILON;
+
+					// Do not touch angles of a full ellipse because after transformation they
+					// would converge to a sinle value effectively removing the whole curve
+
+					if ( ! isFullEllipse ) {
+
+						const mDsqrt = tempTransform1.set( rt1sqrt, 0, 0, 0, rt2sqrt, 0, 0, 0, 1 );
+						const mRT = tempTransform2.set( ed.cs, ed.sn, 0, - ed.sn, ed.cs, 0, 0, 0, 1 );
+						const mDRF = mDsqrt.multiply( mRT ).multiply( mF );
+						const transformAngle = phi => {
+
+							const {
+								x: cosR,
+								y: sinR
+							} = new THREE.Vector3( Math.cos( phi ), Math.sin( phi ), 0 ).applyMatrix3( mDRF );
+							return Math.atan2( sinR, cosR );
+
+						};
+
+						curve.aStartAngle = transformAngle( curve.aStartAngle );
+						curve.aEndAngle = transformAngle( curve.aEndAngle );
+						if ( isTransformFlipped( m ) ) {
+
+							curve.aClockwise = ! curve.aClockwise;
+
+						}
+
+					}
+
+				}
+
+				function transfEllipseNoSkew( curve ) {
+
+					// Faster shortcut if no skew is applied
+					// (e.g, a euclidean transform of a group containing the ellipse)
+
+					const sx = getTransformScaleX( m );
+					const sy = getTransformScaleY( m );
+					curve.xRadius *= sx;
+					curve.yRadius *= sy;
+
+					// Extract rotation angle from the matrix of form:
+					//
+					//  | cosθ sx   -sinθ sy |
+					//  | sinθ sx    cosθ sy |
+					//
+					// Remembering that tanθ = sinθ / cosθ; and that
+					// `sx`, `sy`, or both might be zero.
+					const theta = sx > Number.EPSILON ? Math.atan2( m.elements[ 1 ], m.elements[ 0 ] ) : Math.atan2( - m.elements[ 3 ], m.elements[ 4 ] );
+					curve.aRotation += theta;
+					if ( isTransformFlipped( m ) ) {
+
+						curve.aStartAngle *= - 1;
+						curve.aEndAngle *= - 1;
+						curve.aClockwise = ! curve.aClockwise;
+
+					}
+
+				}
+
+				const subPaths = path.subPaths;
 				for ( let i = 0, n = subPaths.length; i < n; i ++ ) {
 
 					const subPath = subPaths[ i ];
 					const curves = subPath.curves;
-
 					for ( let j = 0; j < curves.length; j ++ ) {
 
 						const curve = curves[ j ];
-
 						if ( curve.isLineCurve ) {
 
 							transfVec2( curve.v1 );
@@ -1421,18 +1432,24 @@
 
 						} else if ( curve.isEllipseCurve ) {
 
-							if ( isRotated ) {
-
-								console.warn( 'SVGLoader: Elliptic arc or ellipse rotation or skewing is not implemented.' );
-
-							}
+							// Transform ellipse center point
 
 							tempV2.set( curve.aX, curve.aY );
 							transfVec2( tempV2 );
 							curve.aX = tempV2.x;
 							curve.aY = tempV2.y;
-							curve.xRadius *= getTransformScaleX( m );
-							curve.yRadius *= getTransformScaleY( m );
+
+							// Transform ellipse shape parameters
+
+							if ( isTransformSkewed( m ) ) {
+
+								transfEllipseGeneric( curve );
+
+							} else {
+
+								transfEllipseNoSkew( curve );
+
+							}
 
 						}
 
@@ -1442,9 +1459,23 @@
 
 			}
 
-			function isTransformRotated( m ) {
+			function isTransformFlipped( m ) {
 
-				return m.elements[ 1 ] !== 0 || m.elements[ 3 ] !== 0;
+				const te = m.elements;
+				return te[ 0 ] * te[ 4 ] - te[ 1 ] * te[ 3 ] < 0;
+
+			}
+
+			function isTransformSkewed( m ) {
+
+				const te = m.elements;
+				const basisDot = te[ 0 ] * te[ 3 ] + te[ 1 ] * te[ 4 ];
+
+				// Shortcut for trivial rotations and transformations
+				if ( basisDot === 0 ) return false;
+				const sx = getTransformScaleX( m );
+				const sy = getTransformScaleY( m );
+				return Math.abs( basisDot / ( sx * sy ) ) > Number.EPSILON;
 
 			}
 
@@ -1460,8 +1491,92 @@
 				const te = m.elements;
 				return Math.sqrt( te[ 3 ] * te[ 3 ] + te[ 4 ] * te[ 4 ] );
 
-			} //
+			}
 
+			// Calculates the eigensystem of a real symmetric 2x2 matrix
+			//    [ A  B ]
+			//    [ B  C ]
+			// in the form
+			//    [ A  B ]  =  [ cs  -sn ] [ rt1   0  ] [  cs  sn ]
+			//    [ B  C ]     [ sn   cs ] [  0   rt2 ] [ -sn  cs ]
+			// where rt1 >= rt2.
+			//
+			// Adapted from: https://www.mpi-hd.mpg.de/personalhomes/globes/3x3/index.html
+			// -> Algorithms for real symmetric matrices -> Analytical (2x2 symmetric)
+			function eigenDecomposition( A, B, C ) {
+
+				let rt1, rt2, cs, sn, t;
+				const sm = A + C;
+				const df = A - C;
+				const rt = Math.sqrt( df * df + 4 * B * B );
+				if ( sm > 0 ) {
+
+					rt1 = 0.5 * ( sm + rt );
+					t = 1 / rt1;
+					rt2 = A * t * C - B * t * B;
+
+				} else if ( sm < 0 ) {
+
+					rt2 = 0.5 * ( sm - rt );
+
+				} else {
+
+					// This case needs to be treated separately to avoid div by 0
+
+					rt1 = 0.5 * rt;
+					rt2 = - 0.5 * rt;
+
+				}
+
+				// Calculate eigenvectors
+
+				if ( df > 0 ) {
+
+					cs = df + rt;
+
+				} else {
+
+					cs = df - rt;
+
+				}
+
+				if ( Math.abs( cs ) > 2 * Math.abs( B ) ) {
+
+					t = - 2 * B / cs;
+					sn = 1 / Math.sqrt( 1 + t * t );
+					cs = t * sn;
+
+				} else if ( Math.abs( B ) === 0 ) {
+
+					cs = 1;
+					sn = 0;
+
+				} else {
+
+					t = - 0.5 * cs / B;
+					cs = 1 / Math.sqrt( 1 + t * t );
+					sn = t * cs;
+
+				}
+
+				if ( df > 0 ) {
+
+					t = cs;
+					cs = - sn;
+					sn = t;
+
+				}
+
+				return {
+					rt1,
+					rt2,
+					cs,
+					sn
+				};
+
+			}
+
+			//
 
 			const paths = [];
 			const stylesheets = {};
@@ -1487,16 +1602,17 @@
 			const data = {
 				paths: paths,
 				xml: xml.documentElement
-			}; // console.log( paths );
+			};
 
+			// console.log( paths );
 			return data;
 
 		}
-
 		static createShapes( shapePath ) {
 
 			// Param shapePath: a shapepath as returned by the parse function of this class
 			// Returns THREE.Shape object
+
 			const BIGNUMBER = 999999999;
 			const IntersectionLocationType = {
 				ORIGIN: 0,
@@ -1511,7 +1627,6 @@
 				loc: IntersectionLocationType.ORIGIN,
 				t: 0
 			};
-
 			function findEdgeIntersection( a0, a1, b0, b1 ) {
 
 				const x1 = a0.x;
@@ -1527,20 +1642,21 @@
 				const denom = ( y4 - y3 ) * ( x2 - x1 ) - ( x4 - x3 ) * ( y2 - y1 );
 				const t1 = nom1 / denom;
 				const t2 = nom2 / denom;
-
 				if ( denom === 0 && nom1 !== 0 || t1 <= 0 || t1 >= 1 || t2 < 0 || t2 > 1 ) {
 
 					//1. lines are parallel or edges don't intersect
+
 					return null;
 
 				} else if ( nom1 === 0 && denom === 0 ) {
 
 					//2. lines are colinear
+
 					//check if endpoints of edge2 (b0-b1) lies on edge1 (a0-a1)
 					for ( let i = 0; i < 2; i ++ ) {
 
-						classifyPoint( i === 0 ? b0 : b1, a0, a1 ); //find position of this endpoints relatively to edge1
-
+						classifyPoint( i === 0 ? b0 : b1, a0, a1 );
+						//find position of this endpoints relatively to edge1
 						if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
 
 							const point = i === 0 ? b0 : b1;
@@ -1569,10 +1685,10 @@
 				} else {
 
 					//3. edges intersect
+
 					for ( let i = 0; i < 2; i ++ ) {
 
 						classifyPoint( i === 0 ? b0 : b1, a0, a1 );
-
 						if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
 
 							const point = i === 0 ? b0 : b1;
@@ -1605,7 +1721,6 @@
 				const bx = p.x - edgeStart.x;
 				const by = p.y - edgeStart.y;
 				const sa = ax * by - bx * ay;
-
 				if ( p.x === edgeStart.x && p.y === edgeStart.y ) {
 
 					classifyResult.loc = IntersectionLocationType.ORIGIN;
@@ -1651,7 +1766,6 @@
 				}
 
 				let t;
-
 				if ( ax !== 0 ) {
 
 					t = bx / ax;
@@ -1671,18 +1785,15 @@
 
 				const intersectionsRaw = [];
 				const intersections = [];
-
 				for ( let index = 1; index < path1.length; index ++ ) {
 
 					const path1EdgeStart = path1[ index - 1 ];
 					const path1EdgeEnd = path1[ index ];
-
 					for ( let index2 = 1; index2 < path2.length; index2 ++ ) {
 
 						const path2EdgeStart = path2[ index2 - 1 ];
 						const path2EdgeEnd = path2[ index2 ];
 						const intersection = findEdgeIntersection( path1EdgeStart, path1EdgeEnd, path2EdgeStart, path2EdgeEnd );
-
 						if ( intersection !== null && intersectionsRaw.find( i => i.t <= intersection.t + Number.EPSILON && i.t >= intersection.t - Number.EPSILON ) === undefined ) {
 
 							intersectionsRaw.push( intersection );
@@ -1765,11 +1876,11 @@
 					}
 
 				} );
-				const firstXOfPath = baseIntersections[ 0 ].point.x; // build up the path hierarchy
+				const firstXOfPath = baseIntersections[ 0 ].point.x;
 
+				// build up the path hierarchy
 				const stack = [];
 				let i = 0;
-
 				while ( i < otherIntersections.length && otherIntersections[ i ].point.x < firstXOfPath ) {
 
 					if ( stack.length > 0 && stack[ stack.length - 1 ] === otherIntersections[ i ].identifier ) {
@@ -1787,7 +1898,6 @@
 				}
 
 				stack.push( simplePath.identifier );
-
 				if ( _fillRule === 'evenodd' ) {
 
 					const isHole = stack.length % 2 === 0 ? true : false;
@@ -1804,11 +1914,9 @@
 					let isHole = true;
 					let isHoleFor = null;
 					let lastCWValue = null;
-
 					for ( let i = 0; i < stack.length; i ++ ) {
 
 						const identifier = stack[ i ];
-
 						if ( isHole ) {
 
 							lastCWValue = allPaths[ identifier ].isCW;
@@ -1836,13 +1944,15 @@
 
 				}
 
-			} // check for self intersecting paths
+			}
+
+			// check for self intersecting paths
 			// TODO
+
 			// check intersecting paths
 			// TODO
+
 			// prepare paths for hole detection
-
-
 			let identifier = 0;
 			let scanlineMinX = BIGNUMBER;
 			let scanlineMaxX = - BIGNUMBER;
@@ -1852,12 +1962,13 @@
 				let maxY = - BIGNUMBER;
 				let minY = BIGNUMBER;
 				let maxX = - BIGNUMBER;
-				let minX = BIGNUMBER; //points.forEach(p => p.y *= -1);
+				let minX = BIGNUMBER;
+
+				//points.forEach(p => p.y *= -1);
 
 				for ( let i = 0; i < points.length; i ++ ) {
 
 					const p = points[ i ];
-
 					if ( p.y > maxY ) {
 
 						maxY = p.y;
@@ -1882,9 +1993,9 @@
 
 					}
 
-				} //
+				}
 
-
+				//
 				if ( scanlineMaxX <= maxX ) {
 
 					scanlineMaxX = maxX + 1;
@@ -1906,14 +2017,14 @@
 				};
 
 			} );
-			simplePaths = simplePaths.filter( sp => sp.points.length > 1 ); // check if path is solid or a hole
+			simplePaths = simplePaths.filter( sp => sp.points.length > 1 );
 
+			// check if path is solid or a hole
 			const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData?.style.fillRule ) );
 			const shapesToReturn = [];
 			simplePaths.forEach( p => {
 
 				const amIAHole = isAHole[ p.identifier ];
-
 				if ( ! amIAHole.isHole ) {
 
 					const shape = new THREE.Shape();
@@ -1935,7 +2046,6 @@
 			return shapesToReturn;
 
 		}
-
 		static getStrokeStyle( width, color, lineJoin, lineCap, miterLimit ) {
 
 			// Param width: Stroke width
@@ -1944,6 +2054,7 @@
 			// Param lineCap: One of "round", "square" or "butt"
 			// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
 			// Returns style object
+
 			width = width !== undefined ? width : 1;
 			color = color !== undefined ? color : '#000';
 			lineJoin = lineJoin !== undefined ? lineJoin : 'miter';
@@ -1958,7 +2069,6 @@
 			};
 
 		}
-
 		static pointsToStroke( points, style, arcDivisions, minDistance ) {
 
 			// Generates a stroke with some witdh around the given path.
@@ -1968,10 +2078,10 @@
 			// Params arcDivisions: Arc divisions for round joins and endcaps. (Optional)
 			// Param minDistance: Points closer to this distance will be merged. (Optional)
 			// Returns THREE.BufferGeometry with stroke triangles (In plane z = 0). UV coordinates are generated ('u' along path. 'v' across it, from left to right)
+
 			const vertices = [];
 			const normals = [];
 			const uvs = [];
-
 			if ( SVGLoader.pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs ) === 0 ) {
 
 				return null;
@@ -1985,7 +2095,6 @@
 			return geometry;
 
 		}
-
 		static pointsToStrokeWithBuffers( points, style, arcDivisions, minDistance, vertices, normals, uvs, vertexOffset ) {
 
 			// This function can be called to update existing arrays or buffers.
@@ -1994,6 +2103,7 @@
 			// Returns number of written vertices / normals / uvs pairs
 			// if 'vertices' parameter is undefined no triangles will be generated, but the returned vertices count will still be valid (useful to preallocate the buffers)
 			// 'normals' and 'uvs' buffers are optional
+
 			const tempV2_1 = new THREE.Vector2();
 			const tempV2_2 = new THREE.Vector2();
 			const tempV2_3 = new THREE.Vector2();
@@ -2013,8 +2123,9 @@
 			const outerPoint = new THREE.Vector2();
 			arcDivisions = arcDivisions !== undefined ? arcDivisions : 12;
 			minDistance = minDistance !== undefined ? minDistance : 0.001;
-			vertexOffset = vertexOffset !== undefined ? vertexOffset : 0; // First ensure there are no duplicated points
+			vertexOffset = vertexOffset !== undefined ? vertexOffset : 0;
 
+			// First ensure there are no duplicated points
 			points = removeDuplicatedPoints( points );
 			const numPoints = points.length;
 			if ( numPoints < 2 ) return 0;
@@ -2032,18 +2143,19 @@
 			let initialJoinIsOnLeftSide = false;
 			let numVertices = 0;
 			let currentCoordinate = vertexOffset * 3;
-			let currentCoordinateUV = vertexOffset * 2; // Get initial left and right stroke points
+			let currentCoordinateUV = vertexOffset * 2;
 
+			// Get initial left and right stroke points
 			getNormal( points[ 0 ], points[ 1 ], tempV2_1 ).multiplyScalar( strokeWidth2 );
 			lastPointL.copy( points[ 0 ] ).sub( tempV2_1 );
 			lastPointR.copy( points[ 0 ] ).add( tempV2_1 );
 			point0L.copy( lastPointL );
 			point0R.copy( lastPointR );
-
 			for ( let iPoint = 1; iPoint < numPoints; iPoint ++ ) {
 
-				currentPoint = points[ iPoint ]; // Get next point
+				currentPoint = points[ iPoint ];
 
+				// Get next point
 				if ( iPoint === numPoints - 1 ) {
 
 					if ( isClosed ) {
@@ -2057,9 +2169,9 @@
 
 					nextPoint = points[ iPoint + 1 ];
 
-				} // Normal of previous segment in tempV2_1
+				}
 
-
+				// Normal of previous segment in tempV2_1
 				const normal1 = tempV2_1;
 				getNormal( previousPoint, currentPoint, normal1 );
 				tempV2_3.copy( normal1 ).multiplyScalar( strokeWidth2 );
@@ -2067,7 +2179,6 @@
 				currentPointR.copy( currentPoint ).add( tempV2_3 );
 				u1 = u0 + deltaU;
 				innerSideModified = false;
-
 				if ( nextPoint !== undefined ) {
 
 					// Normal of next segment in tempV2_2
@@ -2077,7 +2188,6 @@
 					nextPointR.copy( currentPoint ).add( tempV2_3 );
 					joinIsOnLeftSide = true;
 					tempV2_3.subVectors( nextPoint, previousPoint );
-
 					if ( normal1.dot( tempV2_3 ) < 0 ) {
 
 						joinIsOnLeftSide = false;
@@ -2087,8 +2197,9 @@
 					if ( iPoint === 1 ) initialJoinIsOnLeftSide = joinIsOnLeftSide;
 					tempV2_3.subVectors( nextPoint, currentPoint );
 					tempV2_3.normalize();
-					const dot = Math.abs( normal1.dot( tempV2_3 ) ); // If path is straight, don't create join
+					const dot = Math.abs( normal1.dot( tempV2_3 ) );
 
+					// If path is straight, don't create join
 					if ( dot > Number.EPSILON ) {
 
 						// Compute inner and outer segment intersections
@@ -2102,8 +2213,8 @@
 						tempV2_4.divideScalar( segmentLengthPrev );
 						tempV2_6.subVectors( nextPoint, currentPoint );
 						const segmentLengthNext = tempV2_6.length();
-						tempV2_6.divideScalar( segmentLengthNext ); // Check that previous and next segments doesn't overlap with the innerPoint of intersection
-
+						tempV2_6.divideScalar( segmentLengthNext );
+						// Check that previous and next segments doesn't overlap with the innerPoint of intersection
 						if ( tempV2_4.dot( innerPoint ) < segmentLengthPrev && tempV2_6.dot( innerPoint ) < segmentLengthNext ) {
 
 							innerSideModified = true;
@@ -2113,7 +2224,6 @@
 						outerPoint.copy( tempV2_5 ).add( currentPoint );
 						innerPoint.add( currentPoint );
 						isMiter = false;
-
 						if ( innerSideModified ) {
 
 							if ( joinIsOnLeftSide ) {
@@ -2131,6 +2241,7 @@
 						} else {
 
 							// The segment triangles are generated here if there was overlapping
+
 							makeSegmentTriangles();
 
 						}
@@ -2140,10 +2251,12 @@
 							case 'bevel':
 								makeSegmentWithBevelJoin( joinIsOnLeftSide, innerSideModified, u1 );
 								break;
-
 							case 'round':
 								// Segment triangles
-								createSegmentTrianglesWithMiddleSection( joinIsOnLeftSide, innerSideModified ); // Join triangles
+
+								createSegmentTrianglesWithMiddleSection( joinIsOnLeftSide, innerSideModified );
+
+								// Join triangles
 
 								if ( joinIsOnLeftSide ) {
 
@@ -2156,15 +2269,14 @@
 								}
 
 								break;
-
 							case 'miter':
 							case 'miter-clip':
 							default:
 								const miterFraction = strokeWidth2 * style.strokeMiterLimit / miterLength2;
-
 								if ( miterFraction < 1 ) {
 
 									// The join miter length exceeds the miter limit
+
 									if ( style.strokeLineJoin !== 'miter-clip' ) {
 
 										makeSegmentWithBevelJoin( joinIsOnLeftSide, innerSideModified, u1 );
@@ -2173,7 +2285,10 @@
 									} else {
 
 										// Segment triangles
-										createSegmentTrianglesWithMiddleSection( joinIsOnLeftSide, innerSideModified ); // Miter-clip join triangles
+
+										createSegmentTrianglesWithMiddleSection( joinIsOnLeftSide, innerSideModified );
+
+										// Miter-clip join triangles
 
 										if ( joinIsOnLeftSide ) {
 
@@ -2210,9 +2325,11 @@
 								} else {
 
 									// Miter join segment triangles
+
 									if ( innerSideModified ) {
 
 										// Optimized segment + join triangles
+
 										if ( joinIsOnLeftSide ) {
 
 											addVertex( lastPointR, u0, 1 );
@@ -2246,6 +2363,7 @@
 									} else {
 
 										// Add extra miter join triangles
+
 										if ( joinIsOnLeftSide ) {
 
 											addVertex( currentPointL, u1, 0 );
@@ -2279,6 +2397,7 @@
 					} else {
 
 						// The segment triangles are generated here when two consecutive points are collinear
+
 						makeSegmentTriangles();
 
 					}
@@ -2286,6 +2405,7 @@
 				} else {
 
 					// The segment triangles are generated here if it is the ending segment
+
 					makeSegmentTriangles();
 
 				}
@@ -2295,8 +2415,9 @@
 					// Start line endcap
 					addCapGeometry( points[ 0 ], point0L, point0R, joinIsOnLeftSide, true, u0 );
 
-				} // Increment loop variables
+				}
 
+				// Increment loop variables
 
 				u0 = u1;
 				previousPoint = currentPoint;
@@ -2313,9 +2434,9 @@
 			} else if ( innerSideModified && vertices ) {
 
 				// Modify path first segment vertices to adjust to the segments inner and outer intersections
+
 				let lastOuter = outerPoint;
 				let lastInner = innerPoint;
-
 				if ( initialJoinIsOnLeftSide !== joinIsOnLeftSide ) {
 
 					lastOuter = innerPoint;
@@ -2329,7 +2450,6 @@
 
 						lastInner.toArray( vertices, 0 * 3 );
 						lastInner.toArray( vertices, 3 * 3 );
-
 						if ( isMiter ) {
 
 							lastOuter.toArray( vertices, 1 * 3 );
@@ -2344,7 +2464,6 @@
 
 						lastInner.toArray( vertices, 1 * 3 );
 						lastInner.toArray( vertices, 3 * 3 );
-
 						if ( isMiter ) {
 
 							lastOuter.toArray( vertices, 0 * 3 );
@@ -2357,7 +2476,10 @@
 
 			}
 
-			return numVertices; // -- End of algorithm
+			return numVertices;
+
+			// -- End of algorithm
+
 			// -- Functions
 
 			function getNormal( p1, p2, result ) {
@@ -2374,7 +2496,6 @@
 					vertices[ currentCoordinate ] = position.x;
 					vertices[ currentCoordinate + 1 ] = position.y;
 					vertices[ currentCoordinate + 2 ] = 0;
-
 					if ( normals ) {
 
 						normals[ currentCoordinate ] = 0;
@@ -2384,7 +2505,6 @@
 					}
 
 					currentCoordinate += 3;
-
 					if ( uvs ) {
 
 						uvs[ currentCoordinateUV ] = u;
@@ -2403,6 +2523,7 @@
 
 				// param p1, p2: Points in the circle arc.
 				// p1 and p2 are in clockwise direction.
+
 				tempV2_1.copy( p1 ).sub( center ).normalize();
 				tempV2_2.copy( p2 ).sub( center ).normalize();
 				let angle = Math.PI;
@@ -2410,7 +2531,6 @@
 				if ( Math.abs( dot ) < 1 ) angle = Math.abs( Math.acos( dot ) );
 				angle /= arcDivisions;
 				tempV2_3.copy( p1 );
-
 				for ( let i = 0, il = arcDivisions - 1; i < il; i ++ ) {
 
 					tempV2_4.copy( tempV2_3 ).rotateAround( center, angle );
@@ -2443,15 +2563,19 @@
 				if ( innerSideModified ) {
 
 					// Optimized segment + bevel triangles
+
 					if ( joinIsOnLeftSide ) {
 
 						// THREE.Path segments triangles
+
 						addVertex( lastPointR, u0, 1 );
 						addVertex( lastPointL, u0, 0 );
 						addVertex( currentPointL, u1, 0 );
 						addVertex( lastPointR, u0, 1 );
 						addVertex( currentPointL, u1, 0 );
-						addVertex( innerPoint, u1, 1 ); // Bevel join triangle
+						addVertex( innerPoint, u1, 1 );
+
+						// Bevel join triangle
 
 						addVertex( currentPointL, u, 0 );
 						addVertex( nextPointL, u, 0 );
@@ -2460,12 +2584,15 @@
 					} else {
 
 						// THREE.Path segments triangles
+
 						addVertex( lastPointR, u0, 1 );
 						addVertex( lastPointL, u0, 0 );
 						addVertex( currentPointR, u1, 1 );
 						addVertex( lastPointL, u0, 0 );
 						addVertex( innerPoint, u1, 0 );
-						addVertex( currentPointR, u1, 1 ); // Bevel join triangle
+						addVertex( currentPointR, u1, 1 );
+
+						// Bevel join triangle
 
 						addVertex( currentPointR, u, 1 );
 						addVertex( nextPointR, u, 0 );
@@ -2476,6 +2603,7 @@
 				} else {
 
 					// Bevel join triangle. The segment triangles are done in the main loop
+
 					if ( joinIsOnLeftSide ) {
 
 						addVertex( currentPointL, u, 0 );
@@ -2538,6 +2666,7 @@
 
 				// param center: End point of the path
 				// param p1, p2: Left and right cap points
+
 				switch ( style.strokeLineCap ) {
 
 					case 'round':
@@ -2552,15 +2681,15 @@
 						}
 
 						break;
-
 					case 'square':
 						if ( start ) {
 
 							tempV2_1.subVectors( p1, center );
 							tempV2_2.set( tempV2_1.y, - tempV2_1.x );
 							tempV2_3.addVectors( tempV2_1, tempV2_2 ).add( center );
-							tempV2_4.subVectors( tempV2_2, tempV2_1 ).add( center ); // Modify already existing vertices
+							tempV2_4.subVectors( tempV2_2, tempV2_1 ).add( center );
 
+							// Modify already existing vertices
 							if ( joinIsOnLeftSide ) {
 
 								tempV2_3.toArray( vertices, 1 * 3 );
@@ -2581,8 +2710,9 @@
 							tempV2_2.set( tempV2_1.y, - tempV2_1.x );
 							tempV2_3.addVectors( tempV2_1, tempV2_2 ).add( center );
 							tempV2_4.subVectors( tempV2_2, tempV2_1 ).add( center );
-							const vl = vertices.length; // Modify already existing vertices
+							const vl = vertices.length;
 
+							// Modify already existing vertices
 							if ( joinIsOnLeftSide ) {
 
 								tempV2_3.toArray( vertices, vl - 1 * 3 );
@@ -2600,7 +2730,6 @@
 						}
 
 						break;
-
 					case 'butt':
 					default:
 						// Nothing to do here
@@ -2614,8 +2743,8 @@
 
 				// Creates a new array if necessary with duplicated points removed.
 				// This does not remove duplicated initial and ending points of a closed path.
-				let dupPoints = false;
 
+				let dupPoints = false;
 				for ( let i = 1, n = points.length - 1; i < n; i ++ ) {
 
 					if ( points[ i ].distanceTo( points[ i + 1 ] ) < minDistance ) {
@@ -2630,7 +2759,6 @@
 				if ( ! dupPoints ) return points;
 				const newPoints = [];
 				newPoints.push( points[ 0 ] );
-
 				for ( let i = 1, n = points.length - 1; i < n; i ++ ) {
 
 					if ( points[ i ].distanceTo( points[ i + 1 ] ) >= minDistance ) {

@@ -4,42 +4,59 @@
 
 		constructor() {
 
-			this.scale = 1; // animation parameters
+			this.scale = 1;
+
+			// animation parameters
 
 			this.animationFPS = 6;
-			this.transitionFrames = 15; // movement model parameters
+			this.transitionFrames = 15;
+
+			// movement model parameters
 
 			this.maxSpeed = 275;
 			this.maxReverseSpeed = - 275;
 			this.frontAcceleration = 600;
 			this.backAcceleration = 600;
 			this.frontDecceleration = 600;
-			this.angularSpeed = 2.5; // rig
+			this.angularSpeed = 2.5;
+
+			// rig
 
 			this.root = new THREE.Object3D();
 			this.meshBody = null;
 			this.meshWeapon = null;
-			this.controls = null; // skins
+			this.controls = null;
+
+			// skins
 
 			this.skinsBody = [];
 			this.skinsWeapon = [];
 			this.weapons = [];
-			this.currentSkin = undefined; //
+			this.currentSkin = undefined;
 
-			this.onLoadComplete = function () {}; // internals
+			//
 
+			this.onLoadComplete = function () {};
+
+			// internals
 
 			this.meshes = [];
 			this.animations = {};
-			this.loadCounter = 0; // internal movement control variables
+			this.loadCounter = 0;
+
+			// internal movement control variables
 
 			this.speed = 0;
 			this.bodyOrientation = 0;
 			this.walkSpeed = this.maxSpeed;
-			this.crouchSpeed = this.maxSpeed * 0.5; // internal animation parameters
+			this.crouchSpeed = this.maxSpeed * 0.5;
+
+			// internal animation parameters
 
 			this.activeAnimation = null;
-			this.oldAnimation = null; // API
+			this.oldAnimation = null;
+
+			// API
 
 		}
 
@@ -53,7 +70,6 @@
 			}
 
 		}
-
 		setVisible( enable ) {
 
 			for ( let i = 0; i < this.meshes.length; i ++ ) {
@@ -64,27 +80,28 @@
 			}
 
 		}
-
 		shareParts( original ) {
 
 			this.animations = original.animations;
 			this.walkSpeed = original.walkSpeed;
 			this.crouchSpeed = original.crouchSpeed;
 			this.skinsBody = original.skinsBody;
-			this.skinsWeapon = original.skinsWeapon; // BODY
+			this.skinsWeapon = original.skinsWeapon;
+
+			// BODY
 
 			const mesh = this._createPart( original.meshBody.geometry, this.skinsBody[ 0 ] );
-
 			mesh.scale.set( this.scale, this.scale, this.scale );
 			this.root.position.y = original.root.position.y;
 			this.root.add( mesh );
 			this.meshBody = mesh;
-			this.meshes.push( mesh ); // WEAPONS
+			this.meshes.push( mesh );
+
+			// WEAPONS
 
 			for ( let i = 0; i < original.weapons.length; i ++ ) {
 
 				const meshWeapon = this._createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
-
 				meshWeapon.scale.set( this.scale, this.scale, this.scale );
 				meshWeapon.visible = false;
 				meshWeapon.name = original.weapons[ i ].name;
@@ -96,16 +113,13 @@
 			}
 
 		}
-
 		loadParts( config ) {
 
 			const scope = this;
-
 			function loadTextures( baseUrl, textureUrls ) {
 
 				const textureLoader = new THREE.TextureLoader();
 				const textures = [];
-
 				for ( let i = 0; i < textureUrls.length; i ++ ) {
 
 					textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
@@ -131,12 +145,14 @@
 			this.crouchSpeed = config.crouchSpeed;
 			this.loadCounter = config.weapons.length * 2 + config.skins.length + 1;
 			const weaponsTextures = [];
+			for ( let i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ];
 
-			for ( let i = 0; i < config.weapons.length; i ++ ) weaponsTextures[ i ] = config.weapons[ i ][ 1 ]; // SKINS
-
+			// SKINS
 
 			this.skinsBody = loadTextures( config.baseUrl + 'skins/', config.skins );
-			this.skinsWeapon = loadTextures( config.baseUrl + 'skins/', weaponsTextures ); // BODY
+			this.skinsWeapon = loadTextures( config.baseUrl + 'skins/', weaponsTextures );
+
+			// BODY
 
 			const loader = new THREE.MD2Loader();
 			loader.load( config.baseUrl + config.body, function ( geo ) {
@@ -144,23 +160,22 @@
 				const boundingBox = new THREE.Box3();
 				boundingBox.setFromBufferAttribute( geo.attributes.position );
 				scope.root.position.y = - scope.scale * boundingBox.min.y;
-
 				const mesh = scope._createPart( geo, scope.skinsBody[ 0 ] );
-
 				mesh.scale.set( scope.scale, scope.scale, scope.scale );
 				scope.root.add( mesh );
 				scope.meshBody = mesh;
 				scope.meshes.push( mesh );
 				checkLoadingComplete();
 
-			} ); // WEAPONS
+			} );
+
+			// WEAPONS
 
 			const generateCallback = function ( index, name ) {
 
 				return function ( geo ) {
 
 					const mesh = scope._createPart( geo, scope.skinsWeapon[ index ] );
-
 					mesh.scale.set( scope.scale, scope.scale, scope.scale );
 					mesh.visible = false;
 					mesh.name = name;
@@ -181,14 +196,12 @@
 			}
 
 		}
-
 		setPlaybackRate( rate ) {
 
 			if ( this.meshBody ) this.meshBody.duration = this.meshBody.baseDuration / rate;
 			if ( this.meshWeapon ) this.meshWeapon.duration = this.meshWeapon.baseDuration / rate;
 
 		}
-
 		setWireframe( wireframeEnabled ) {
 
 			if ( wireframeEnabled ) {
@@ -204,7 +217,6 @@
 			}
 
 		}
-
 		setSkin( index ) {
 
 			if ( this.meshBody && this.meshBody.material.wireframe === false ) {
@@ -215,18 +227,14 @@
 			}
 
 		}
-
 		setWeapon( index ) {
 
 			for ( let i = 0; i < this.weapons.length; i ++ ) this.weapons[ i ].visible = false;
-
 			const activeWeapon = this.weapons[ index ];
-
 			if ( activeWeapon ) {
 
 				activeWeapon.visible = true;
 				this.meshWeapon = activeWeapon;
-
 				if ( this.activeAnimation ) {
 
 					activeWeapon.playAnimation( this.activeAnimation );
@@ -237,11 +245,9 @@
 			}
 
 		}
-
 		setAnimation( animationName ) {
 
 			if ( animationName === this.activeAnimation || ! animationName ) return;
-
 			if ( this.meshBody ) {
 
 				this.meshBody.setAnimationWeight( animationName, 0 );
@@ -260,11 +266,9 @@
 			}
 
 		}
-
 		update( delta ) {
 
 			if ( this.controls ) this.updateMovementModel( delta );
-
 			if ( this.animations ) {
 
 				this.updateBehaviors();
@@ -273,11 +277,9 @@
 			}
 
 		}
-
 		updateAnimations( delta ) {
 
 			let mix = 1;
-
 			if ( this.blendCounter > 0 ) {
 
 				mix = ( this.transitionFrames - this.blendCounter ) / this.transitionFrames;
@@ -302,12 +304,13 @@
 			}
 
 		}
-
 		updateBehaviors() {
 
 			const controls = this.controls;
 			const animations = this.animations;
-			let moveAnimation, idleAnimation; // crouch vs stand
+			let moveAnimation, idleAnimation;
+
+			// crouch vs stand
 
 			if ( controls.crouch ) {
 
@@ -319,8 +322,9 @@
 				moveAnimation = animations[ 'move' ];
 				idleAnimation = animations[ 'idle' ];
 
-			} // actions
+			}
 
+			// actions
 
 			if ( controls.jump ) {
 
@@ -343,8 +347,9 @@
 
 				}
 
-			} // set animations
+			}
 
+			// set animations
 
 			if ( controls.moveForward || controls.moveBackward || controls.moveLeft || controls.moveRight ) {
 
@@ -364,8 +369,9 @@
 
 				}
 
-			} // set animation direction
+			}
 
+			// set animation direction
 
 			if ( controls.moveForward ) {
 
@@ -404,7 +410,6 @@
 			}
 
 		}
-
 		updateMovementModel( delta ) {
 
 			function exponentialEaseOut( k ) {
@@ -413,16 +418,19 @@
 
 			}
 
-			const controls = this.controls; // speed based on controls
+			const controls = this.controls;
+
+			// speed based on controls
 
 			if ( controls.crouch ) this.maxSpeed = this.crouchSpeed; else this.maxSpeed = this.walkSpeed;
 			this.maxReverseSpeed = - this.maxSpeed;
 			if ( controls.moveForward ) this.speed = THREE.MathUtils.clamp( this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
-			if ( controls.moveBackward ) this.speed = THREE.MathUtils.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed ); // orientation based on controls
+			if ( controls.moveBackward ) this.speed = THREE.MathUtils.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed );
+
+			// orientation based on controls
 			// (don't just stand while turning)
 
 			const dir = 1;
-
 			if ( controls.moveLeft ) {
 
 				this.bodyOrientation += delta * this.angularSpeed;
@@ -435,8 +443,9 @@
 				this.bodyOrientation -= delta * this.angularSpeed;
 				this.speed = THREE.MathUtils.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
-			} // speed decay
+			}
 
+			// speed decay
 
 			if ( ! ( controls.moveForward || controls.moveBackward ) ) {
 
@@ -452,17 +461,21 @@
 
 				}
 
-			} // displacement
+			}
 
+			// displacement
 
 			const forwardDelta = this.speed * delta;
 			this.root.position.x += Math.sin( this.bodyOrientation ) * forwardDelta;
-			this.root.position.z += Math.cos( this.bodyOrientation ) * forwardDelta; // steering
+			this.root.position.z += Math.cos( this.bodyOrientation ) * forwardDelta;
+
+			// steering
 
 			this.root.rotation.y = this.bodyOrientation;
 
-		} // internal
+		}
 
+		// internal
 
 		_createPart( geometry, skinMap ) {
 
@@ -474,13 +487,19 @@
 				color: 0xffffff,
 				wireframe: false,
 				map: skinMap
-			} ); //
+			} );
+
+			//
 
 			const mesh = new THREE.MorphBlendMesh( geometry, materialTexture );
-			mesh.rotation.y = - Math.PI / 2; //
+			mesh.rotation.y = - Math.PI / 2;
+
+			//
 
 			mesh.materialTexture = materialTexture;
-			mesh.materialWireframe = materialWireframe; //
+			mesh.materialWireframe = materialWireframe;
+
+			//
 
 			mesh.autoCreateAnimations( this.animationFPS );
 			return mesh;
