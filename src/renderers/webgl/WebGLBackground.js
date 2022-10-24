@@ -1,4 +1,4 @@
-import { BackSide, FrontSide, CubeUVReflectionMapping, LinearEncoding, sRGBEncoding, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { BackSide, FrontSide, CubeUVReflectionMapping, sRGBEncoding, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
