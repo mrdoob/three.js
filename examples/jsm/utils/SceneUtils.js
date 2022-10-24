@@ -4,7 +4,8 @@ import {
 	Color,
 	Group,
 	Matrix4,
-	Mesh
+	Mesh,
+	Vector3
 } from 'three';
 
 import { mergeGroups, deepCloneAttribute } from './BufferGeometryUtils.js';
@@ -123,6 +124,51 @@ function createMultiMaterialObject( geometry, materials ) {
 
 }
 
+function reduceVertices( object, func, initialValue ) {
+
+	let value = initialValue;
+	const vertex = new Vector3();
+
+	object.updateWorldMatrix( true, true );
+
+	object.traverseVisible( ( child ) => {
+
+		const { geometry } = child;
+
+		if ( geometry !== undefined ) {
+
+			const { position } = geometry.attributes;
+
+			if ( position !== undefined ) {
+
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					vertex.fromBufferAttribute( position, i );
+
+					if ( child.isSkinnedMesh ) {
+
+						child.boneTransform( i, vertex );
+
+					} else {
+
+						vertex.applyMatrix4( child.matrixWorld );
+
+					}
+
+					value = func( value, vertex );
+
+				}
+
+			}
+
+		}
+
+	} );
+
+	return value;
+
+}
+
 /**
  * @param {InstancedMesh}
  * @param {function(int, int):int}
@@ -199,5 +245,6 @@ export {
 	createMeshesFromInstancedMesh,
 	createMeshesFromMultiMaterialMesh,
 	createMultiMaterialObject,
+	reduceVertices,
 	sortInstancedMesh
 };
