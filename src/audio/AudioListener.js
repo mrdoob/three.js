@@ -17,7 +17,7 @@ class AudioListener extends Object3D {
 
 		this.type = 'AudioListener';
 
-		this.context = AudioContext.getContext();
+		this.context = new AudioContext().context;
 
 		this.gain = this.context.createGain();
 		this.gain.connect( this.context.destination );

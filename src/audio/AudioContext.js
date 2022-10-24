@@ -1,8 +1,8 @@
 let _context;
 
-const AudioContext = {
+class AudioContext {
 
-	getContext: function () {
+	constructor() {
 
 		if ( _context === undefined ) {
 
@@ -10,16 +10,20 @@ const AudioContext = {
 
 		}
 
+	}
+
+	get context() {
+
 		return _context;
 
-	},
+	}
 
-	setContext: function ( value ) {
+	set context( value ) {
 
 		_context = value;
 
 	}
 
-};
+}
 
 export { AudioContext };
