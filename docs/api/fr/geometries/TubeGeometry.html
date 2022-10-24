@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Crée un tube qui s'extrude le long d'une courbe 3D.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#TubeGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Exemple de code :</h2>
+
+		<code>
+		class CustomSinCurve extends THREE.Curve {
+
+			constructor( scale = 1 ) {
+
+				super();
+
+				this.scale = scale;
+
+			}
+
+			getPoint( t, optionalTarget = new THREE.Vector3() ) {
+
+				const tx = t * 3 - 1.5;
+				const ty = Math.sin( 2 * Math.PI * t );
+				const tz = 0;
+
+				return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+
+			}
+
+		}
+
+		const path = new CustomSinCurve( 10 );
+		const geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+		<h2>Constructeur</h2>
+
+
+		<h3>[name]([param:Curve path], [param:Integer tubularSegments], [param:Float radius], [param:Integer radialSegments], [param:Boolean closed])</h3>
+		<p>
+		path — [page:Curve] - Un chemin 3D qui hérite de la classe de base [page:Curve]. La valeur par défaut est une courbe de Bézier quadratique.<br />
+		tubularSegments — [page:Integer] - Le nombre de segments qui composent le tube. La valeur par défaut est '64'.<br />
+		radius — [page:Float] - Le rayon du tube. La valeur par défaut est '1'.<br />
+		radialSegments — [page:Integer] - Le nombre de segments qui composent la section. La valeur par défaut est '8'.<br />
+		closed — [page:Boolean] Spécifie si le tube est ouvert ou fermé. La valeur par défaut est `false`.<br />
+		</p>
+
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		Un objet avec une propriété pour chacun des paramètres du constructeur. Toute modification après instanciation ne change pas la géométrie.
+		</p>
+
+		<h3>[property:Array tangents]</h3>
+		<p>
+			Un tableau de tangentes [page:Vector3].
+		</p>
+
+		<h3>[property:Array normals]</h3>
+		<p>
+		Un tableau de normales [page:Vector3].
+		</p>
+
+		<h3>[property:Array binormals]</h3>
+		<p>
+		Un tableau de binormaux [page:Vector3].
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

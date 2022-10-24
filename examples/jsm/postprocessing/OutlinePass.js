@@ -140,6 +140,16 @@ class OutlinePass extends Pass {
 		this.renderTargetEdgeBuffer1.dispose();
 		this.renderTargetEdgeBuffer2.dispose();
 
+		this.depthMaterial.dispose();
+		this.prepareMaskMaterial.dispose();
+		this.edgeDetectionMaterial.dispose();
+		this.separableBlurMaterial1.dispose();
+		this.separableBlurMaterial2.dispose();
+		this.overlayMaterial.dispose();
+		this.materialCopy.dispose();
+
+		this.fsQuad.dispose();
+
 	}
 
 	setSize( width, height ) {

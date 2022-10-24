@@ -34,8 +34,9 @@
 			//- Internals
 			const scope = this;
 			const doRenderLabel = light.name !== undefined && light.name !== '';
-			let userAutoClearSetting; //Holds the initial position and dimension of the HUD
+			let userAutoClearSetting;
 
+			//Holds the initial position and dimension of the HUD
 			const frame = {
 				x: 10,
 				y: 10,
@@ -44,8 +45,9 @@
 			};
 			const camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 1, 10 );
 			camera.position.set( 0, 0, 2 );
-			const scene = new THREE.Scene(); //HUD for shadow map
+			const scene = new THREE.Scene();
 
+			//HUD for shadow map
 			const shader = THREE.UnpackDepthRGBAShader;
 			const uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 			const material = new THREE.ShaderMaterial( {
@@ -55,10 +57,10 @@
 			} );
 			const plane = new THREE.PlaneGeometry( frame.width, frame.height );
 			const mesh = new THREE.Mesh( plane, material );
-			scene.add( mesh ); //Label for light's name
+			scene.add( mesh );
 
+			//Label for light's name
 			let labelCanvas, labelMesh;
-
 			if ( doRenderLabel ) {
 
 				labelCanvas = document.createElement( 'canvas' );
@@ -90,12 +92,13 @@
 
 				scope.position.set( scope.position.x, scope.position.y );
 
-			} //- API
+			}
+
+			//- API
 			// Set to false to disable displaying this shadow map
+			this.enabled = true;
 
-
-			this.enabled = true; // Set the size of the displayed shadow map on the HUD
-
+			// Set the size of the displayed shadow map on the HUD
 			this.size = {
 				width: frame.width,
 				height: frame.height,
@@ -103,13 +106,15 @@
 
 					this.width = width;
 					this.height = height;
-					mesh.scale.set( this.width / frame.width, this.height / frame.height, 1 ); //Reset the position as it is off when we scale stuff
+					mesh.scale.set( this.width / frame.width, this.height / frame.height, 1 );
 
+					//Reset the position as it is off when we scale stuff
 					resetPosition();
 
 				}
-			}; // Set the position of the displayed shadow map on the HUD
+			};
 
+			// Set the position of the displayed shadow map on the HUD
 			this.position = {
 				x: frame.x,
 				y: frame.y,
@@ -124,7 +129,6 @@
 
 				}
 			};
-
 			this.render = function ( renderer ) {
 
 				if ( this.enabled ) {
@@ -137,7 +141,6 @@
 					uniforms.tDiffuse.value = light.shadow.map.texture;
 					userAutoClearSetting = renderer.autoClear;
 					renderer.autoClear = false; // To allow render overlay
-
 					renderer.clearDepth();
 					renderer.render( scene, camera );
 					renderer.autoClear = userAutoClearSetting; //Restore user's setting
@@ -166,9 +169,9 @@
 				this.position.set( this.position.x, this.position.y );
 				this.size.set( this.size.width, this.size.height );
 
-			}; //Force an update to set position/size
+			};
 
-
+			//Force an update to set position/size
 			this.update();
 
 		}

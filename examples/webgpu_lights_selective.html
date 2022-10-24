@@ -46,9 +46,9 @@
 				light1, light2, light3, light4,
 				stats, controls;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -138,6 +138,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 100 );
@@ -162,8 +163,6 @@
 				gui.add( centerObject.material, 'roughness', 0, 1, 0.01 );
 				gui.add( centerObject.material, 'metalness', 0, 1, 0.01 );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -176,15 +175,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
 
 				const time = performance.now() / 1000;
 				const lightTime = time * 0.5;
@@ -214,11 +204,7 @@
 */
 				renderer.render( scene, camera );
 
-			}
-
-			function error( error ) {
-
-				console.error( error );
+				stats.update();
 
 			}
 

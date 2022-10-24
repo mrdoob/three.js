@@ -25,7 +25,6 @@
 			} );
 
 		}
-
 		copy( source, recursive ) {
 
 			super.copy( source, recursive );
@@ -34,36 +33,28 @@
 
 		}
 
-	} //
+	}
 
+	//
 
 	const _vector = new THREE.Vector3();
-
 	const _viewMatrix = new THREE.Matrix4();
-
 	const _viewProjectionMatrix = new THREE.Matrix4();
-
 	const _a = new THREE.Vector3();
-
 	const _b = new THREE.Vector3();
-
 	class CSS2DRenderer {
 
 		constructor( parameters = {} ) {
 
 			const _this = this;
-
 			let _width, _height;
-
 			let _widthHalf, _heightHalf;
-
 			const cache = {
 				objects: new WeakMap()
 			};
 			const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
 			domElement.style.overflow = 'hidden';
 			this.domElement = domElement;
-
 			this.getSize = function () {
 
 				return {
@@ -77,11 +68,8 @@
 
 				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
-
 				_viewMatrix.copy( camera.matrixWorldInverse );
-
 				_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
-
 				renderObject( scene, scene, camera );
 				zOrder( scene );
 
@@ -103,18 +91,14 @@
 				if ( object.isCSS2DObject ) {
 
 					_vector.setFromMatrixPosition( object.matrixWorld );
-
 					_vector.applyMatrix4( _viewProjectionMatrix );
-
 					const visible = object.visible === true && _vector.z >= - 1 && _vector.z <= 1 && object.layers.test( camera.layers ) === true;
 					object.element.style.display = visible === true ? '' : 'none';
-
 					if ( visible === true ) {
 
 						object.onBeforeRender( _this, scene, camera );
 						const element = object.element;
 						element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
-
 						if ( element.parentNode !== domElement ) {
 
 							domElement.appendChild( element );
@@ -143,9 +127,7 @@
 			function getDistanceToSquared( object1, object2 ) {
 
 				_a.setFromMatrixPosition( object1.matrixWorld );
-
 				_b.setFromMatrixPosition( object2.matrixWorld );
-
 				return _a.distanceToSquared( _b );
 
 			}
@@ -178,7 +160,6 @@
 
 				} );
 				const zMax = sorted.length;
-
 				for ( let i = 0, l = sorted.length; i < l; i ++ ) {
 
 					sorted[ i ].element.style.zIndex = zMax - i;

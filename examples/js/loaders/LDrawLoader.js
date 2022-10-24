@@ -1,15 +1,16 @@
 ( function () {
 
+	// Special surface finish tag types.
 	// Note: "MATERIAL" tag (e.g. GLITTER, SPECKLE) is not implemented
-
 	const FINISH_TYPE_DEFAULT = 0;
 	const FINISH_TYPE_CHROME = 1;
 	const FINISH_TYPE_PEARLESCENT = 2;
 	const FINISH_TYPE_RUBBER = 3;
 	const FINISH_TYPE_MATTE_METALLIC = 4;
-	const FINISH_TYPE_METAL = 5; // State machine to search a subobject path.
-	// The LDraw standard establishes these various possible subfolders.
+	const FINISH_TYPE_METAL = 5;
 
+	// State machine to search a subobject path.
+	// The LDraw standard establishes these various possible subfolders.
 	const FILE_LOCATION_TRY_PARTS = 0;
 	const FILE_LOCATION_TRY_P = 1;
 	const FILE_LOCATION_TRY_MODELS = 2;
@@ -19,11 +20,8 @@
 	const FILE_LOCATION_NOT_FOUND = 6;
 	const MAIN_COLOUR_CODE = '16';
 	const MAIN_EDGE_COLOUR_CODE = '24';
-
 	const _tempVec0 = new THREE.Vector3();
-
 	const _tempVec1 = new THREE.Vector3();
-
 	class LDrawConditionalLineMaterial extends THREE.ShaderMaterial {
 
 		constructor( parameters ) {
@@ -37,9 +35,7 @@
 						value: 1.0
 					}
 				} ] ),
-				vertexShader:
-      /* glsl */
-      `
+				vertexShader: /* glsl */`
 				attribute vec3 control0;
 				attribute vec3 control1;
 				attribute vec3 direction;
@@ -86,9 +82,7 @@
 					#include <fog_vertex>
 				}
 			`,
-				fragmentShader:
-      /* glsl */
-      `
+				fragmentShader: /* glsl */`
 			uniform vec3 diffuse;
 			uniform float opacity;
 			varying float discardFlag;
@@ -143,7 +137,6 @@
 		}
 
 	}
-
 	class ConditionalLineSegments extends THREE.LineSegments {
 
 		constructor( geometry, material ) {
@@ -154,7 +147,6 @@
 		}
 
 	}
-
 	function generateFaceNormals( faces ) {
 
 		for ( let i = 0, l = faces.length; i < l; i ++ ) {
@@ -164,11 +156,8 @@
 			const v0 = vertices[ 0 ];
 			const v1 = vertices[ 1 ];
 			const v2 = vertices[ 2 ];
-
 			_tempVec0.subVectors( v1, v0 );
-
 			_tempVec1.subVectors( v2, v1 );
-
 			face.faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize();
 
 		}
@@ -176,7 +165,6 @@
 	}
 
 	const _ray = new THREE.Ray();
-
 	function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 		// NOTE: 1e2 is pretty coarse but was chosen to quantize the resulting value because
@@ -187,8 +175,8 @@
 		// vertices that should be merged might be set to "1.7" and "1.6999..." meaning they won't
 		// get merged. This added epsilon attempts to push these error values to the same quantized
 		// value for the sake of hashing. See "AT-ST mini" dishes. See mrdoob/three#23169.
-		const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
 
+		const hashMultiplier = ( 1 + 1e-10 ) * 1e2;
 		function hashVertex( v ) {
 
 			const x = ~ ~ ( v.x * hashMultiplier );
@@ -202,10 +190,10 @@
 
 			return `${hashVertex( v0 )}_${hashVertex( v1 )}`;
 
-		} // converts the two vertices to a ray with a normalized direction and origin of 0, 0, 0 projected
+		}
+
+		// converts the two vertices to a ray with a normalized direction and origin of 0, 0, 0 projected
 		// onto the original line.
-
-
 		function toNormalizedRay( v0, v1, targetRay ) {
 
 			targetRay.direction.subVectors( v1, v0 ).normalize();
@@ -224,8 +212,9 @@
 		const hardEdges = new Set();
 		const hardEdgeRays = new Map();
 		const halfEdgeList = {};
-		const normals = []; // Save the list of hard edges by hash
+		const normals = [];
 
+		// Save the list of hard edges by hash
 		for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 			const ls = lineSegments[ i ];
@@ -233,15 +222,15 @@
 			const v0 = vertices[ 0 ];
 			const v1 = vertices[ 1 ];
 			hardEdges.add( hashEdge( v0, v1 ) );
-			hardEdges.add( hashEdge( v1, v0 ) ); // only generate the hard edge ray map if we're checking subsegments because it's more expensive to check
-			// and requires more memory.
+			hardEdges.add( hashEdge( v1, v0 ) );
 
+			// only generate the hard edge ray map if we're checking subsegments because it's more expensive to check
+			// and requires more memory.
 			if ( checkSubSegments ) {
 
 				// add both ray directions to the map
 				const ray = toNormalizedRay( v0, v1, new THREE.Ray() );
 				const rh1 = hashRay( ray );
-
 				if ( ! hardEdgeRays.has( rh1 ) ) {
 
 					toNormalizedRay( v1, v0, ray );
@@ -253,14 +242,13 @@
 					hardEdgeRays.set( rh1, info );
 					hardEdgeRays.set( rh2, info );
 
-				} // store both segments ends in min, max order in the distances array to check if a face edge is a
+				}
+
+				// store both segments ends in min, max order in the distances array to check if a face edge is a
 				// subsegment later.
-
-
 				const info = hardEdgeRays.get( rh1 );
 				let d0 = info.ray.direction.dot( v0 );
 				let d1 = info.ray.direction.dot( v1 );
-
 				if ( d0 > d1 ) {
 
 					[ d0, d1 ] = [ d1, d0 ];
@@ -271,35 +259,34 @@
 
 			}
 
-		} // track the half edges associated with each triangle
+		}
 
-
+		// track the half edges associated with each triangle
 		for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
 			const tri = faces[ i ];
 			const vertices = tri.vertices;
 			const vertCount = vertices.length;
-
 			for ( let i2 = 0; i2 < vertCount; i2 ++ ) {
 
 				const index = i2;
 				const next = ( i2 + 1 ) % vertCount;
 				const v0 = vertices[ index ];
 				const v1 = vertices[ next ];
-				const hash = hashEdge( v0, v1 ); // don't add the triangle if the edge is supposed to be hard
+				const hash = hashEdge( v0, v1 );
 
+				// don't add the triangle if the edge is supposed to be hard
 				if ( hardEdges.has( hash ) ) {
 
 					continue;
 
-				} // if checking subsegments then check to see if this edge lies on a hard edge ray and whether its within any ray bounds
+				}
 
-
+				// if checking subsegments then check to see if this edge lies on a hard edge ray and whether its within any ray bounds
 				if ( checkSubSegments ) {
 
 					toNormalizedRay( v0, v1, _ray );
 					const rayHash = hashRay( _ray );
-
 					if ( hardEdgeRays.has( rayHash ) ) {
 
 						const info = hardEdgeRays.get( rayHash );
@@ -309,16 +296,14 @@
 						} = info;
 						let d0 = ray.direction.dot( v0 );
 						let d1 = ray.direction.dot( v1 );
-
 						if ( d0 > d1 ) {
 
 							[ d0, d1 ] = [ d1, d0 ];
 
-						} // return early if the face edge is found to be a subsegment of a line edge meaning the edge will have "hard" normals
+						}
 
-
+						// return early if the face edge is found to be a subsegment of a line edge meaning the edge will have "hard" normals
 						let found = false;
-
 						for ( let i = 0, l = distances.length; i < l; i += 2 ) {
 
 							if ( d0 >= distances[ i ] && d1 <= distances[ i + 1 ] ) {
@@ -348,14 +333,13 @@
 
 			}
 
-		} // Iterate until we've tried to connect all faces to share normals
+		}
 
-
+		// Iterate until we've tried to connect all faces to share normals
 		while ( true ) {
 
 			// Stop if there are no more faces left
 			let halfEdge = null;
-
 			for ( const key in halfEdgeList ) {
 
 				halfEdge = halfEdgeList[ key ];
@@ -367,62 +351,61 @@
 
 				break;
 
-			} // Exhaustively find all connected faces
+			}
 
-
+			// Exhaustively find all connected faces
 			const queue = [ halfEdge ];
-
 			while ( queue.length > 0 ) {
 
 				// initialize all vertex normals in this triangle
 				const tri = queue.pop().tri;
 				const vertices = tri.vertices;
 				const vertNormals = tri.normals;
-				const faceNormal = tri.faceNormal; // Check if any edge is connected to another triangle edge
+				const faceNormal = tri.faceNormal;
 
+				// Check if any edge is connected to another triangle edge
 				const vertCount = vertices.length;
-
 				for ( let i2 = 0; i2 < vertCount; i2 ++ ) {
 
 					const index = i2;
 					const next = ( i2 + 1 ) % vertCount;
 					const v0 = vertices[ index ];
-					const v1 = vertices[ next ]; // delete this triangle from the list so it won't be found again
+					const v1 = vertices[ next ];
 
+					// delete this triangle from the list so it won't be found again
 					const hash = hashEdge( v0, v1 );
 					delete halfEdgeList[ hash ];
 					const reverseHash = hashEdge( v1, v0 );
 					const otherInfo = halfEdgeList[ reverseHash ];
-
 					if ( otherInfo ) {
 
 						const otherTri = otherInfo.tri;
 						const otherIndex = otherInfo.index;
 						const otherNormals = otherTri.normals;
 						const otherVertCount = otherNormals.length;
-						const otherFaceNormal = otherTri.faceNormal; // NOTE: If the angle between faces is > 67.5 degrees then assume it's
+						const otherFaceNormal = otherTri.faceNormal;
+
+						// NOTE: If the angle between faces is > 67.5 degrees then assume it's
 						// hard edge. There are some cases where the line segments do not line up exactly
 						// with or span multiple triangle edges (see Lunar Vehicle wheels).
-
 						if ( Math.abs( otherTri.faceNormal.dot( tri.faceNormal ) ) < 0.25 ) {
 
 							continue;
 
-						} // if this triangle has already been traversed then it won't be in
+						}
+
+						// if this triangle has already been traversed then it won't be in
 						// the halfEdgeList. If it has not then add it to the queue and delete
 						// it so it won't be found again.
-
-
 						if ( reverseHash in halfEdgeList ) {
 
 							queue.push( otherInfo );
 							delete halfEdgeList[ reverseHash ];
 
-						} // share the first normal
+						}
 
-
+						// share the first normal
 						const otherNext = ( otherIndex + 1 ) % otherVertCount;
-
 						if ( vertNormals[ index ] && otherNormals[ otherNext ] && vertNormals[ index ] !== otherNormals[ otherNext ] ) {
 
 							otherNormals[ otherNext ].norm.add( vertNormals[ index ].norm );
@@ -431,7 +414,6 @@
 						}
 
 						let sharedNormal1 = vertNormals[ index ] || otherNormals[ otherNext ];
-
 						if ( sharedNormal1 === null ) {
 
 							// it's possible to encounter an edge of a triangle that has already been traversed meaning
@@ -456,9 +438,9 @@
 							otherNormals[ otherNext ] = sharedNormal1;
 							sharedNormal1.norm.add( otherFaceNormal );
 
-						} // share the second normal
+						}
 
-
+						// share the second normal
 						if ( vertNormals[ next ] && otherNormals[ otherIndex ] && vertNormals[ next ] !== otherNormals[ otherIndex ] ) {
 
 							otherNormals[ otherIndex ].norm.add( vertNormals[ next ].norm );
@@ -467,7 +449,6 @@
 						}
 
 						let sharedNormal2 = vertNormals[ next ] || otherNormals[ otherIndex ];
-
 						if ( sharedNormal2 === null ) {
 
 							sharedNormal2 = {
@@ -497,9 +478,9 @@
 
 			}
 
-		} // The normals of each face have been added up so now we average them by normalizing the vector.
+		}
 
-
+		// The normals of each face have been added up so now we average them by normalizing the vector.
 		for ( let i = 0, l = normals.length; i < l; i ++ ) {
 
 			normals[ i ].normalize();
@@ -531,13 +512,11 @@
 			this.lineNumber = lineNumber;
 
 		}
-
 		seekNonSpace() {
 
 			while ( this.currentCharIndex < this.lineLength ) {
 
 				this.currentChar = this.line.charAt( this.currentCharIndex );
-
 				if ( this.currentChar !== ' ' && this.currentChar !== '\t' ) {
 
 					return;
@@ -549,15 +528,14 @@
 			}
 
 		}
-
 		getToken() {
 
-			const pos0 = this.currentCharIndex ++; // Seek space
+			const pos0 = this.currentCharIndex ++;
 
+			// Seek space
 			while ( this.currentCharIndex < this.lineLength ) {
 
 				this.currentChar = this.line.charAt( this.currentCharIndex );
-
 				if ( this.currentChar === ' ' || this.currentChar === '\t' ) {
 
 					break;
@@ -573,40 +551,35 @@
 			return this.line.substring( pos0, pos1 );
 
 		}
-
 		getVector() {
 
 			return new THREE.Vector3( parseFloat( this.getToken() ), parseFloat( this.getToken() ), parseFloat( this.getToken() ) );
 
 		}
-
 		getRemainingString() {
 
 			return this.line.substring( this.currentCharIndex, this.lineLength );
 
 		}
-
 		isAtTheEnd() {
 
 			return this.currentCharIndex >= this.lineLength;
 
 		}
-
 		setToEnd() {
 
 			this.currentCharIndex = this.lineLength;
 
 		}
-
 		getLineNumberString() {
 
 			return this.lineNumber >= 0 ? ' at line ' + this.lineNumber : '';
 
 		}
 
-	} // Fetches and parses an intermediate representation of LDraw parts files.
+	}
 
-
+	// Fetches and parses an intermediate representation of LDraw parts files.
 	class LDrawParsedCache {
 
 		constructor( loader ) {
@@ -615,12 +588,12 @@
 			this._cache = {};
 
 		}
-
 		cloneResult( original ) {
 
-			const result = {}; // vertices are transformed and normals computed before being converted to geometry
-			// so these pieces must be cloned.
+			const result = {};
 
+			// vertices are transformed and normals computed before being converted to geometry
+			// so these pieces must be cloned.
 			result.faces = original.faces.map( face => {
 
 				return {
@@ -650,8 +623,9 @@
 					vertices: face.vertices.map( v => v.clone() )
 				};
 
-			} ); // none if this is subsequently modified
+			} );
 
+			// none if this is subsequently modified
 			result.type = original.type;
 			result.category = original.category;
 			result.keywords = original.keywords;
@@ -665,42 +639,34 @@
 			return result;
 
 		}
-
 		async fetchData( fileName ) {
 
 			let triedLowerCase = false;
 			let locationState = FILE_LOCATION_TRY_PARTS;
-
 			while ( locationState !== FILE_LOCATION_NOT_FOUND ) {
 
 				let subobjectURL = fileName;
-
 				switch ( locationState ) {
 
 					case FILE_LOCATION_AS_IS:
 						locationState = locationState + 1;
 						break;
-
 					case FILE_LOCATION_TRY_PARTS:
 						subobjectURL = 'parts/' + subobjectURL;
 						locationState = locationState + 1;
 						break;
-
 					case FILE_LOCATION_TRY_P:
 						subobjectURL = 'p/' + subobjectURL;
 						locationState = locationState + 1;
 						break;
-
 					case FILE_LOCATION_TRY_MODELS:
 						subobjectURL = 'models/' + subobjectURL;
 						locationState = locationState + 1;
 						break;
-
 					case FILE_LOCATION_TRY_RELATIVE:
 						subobjectURL = fileName.substring( 0, fileName.lastIndexOf( '/' ) + 1 ) + subobjectURL;
 						locationState = locationState + 1;
 						break;
-
 					case FILE_LOCATION_TRY_ABSOLUTE:
 						if ( triedLowerCase ) {
 
@@ -726,7 +692,6 @@
 				fileLoader.setPath( loader.partsLibraryPath );
 				fileLoader.setRequestHeader( loader.requestHeader );
 				fileLoader.setWithCredentials( loader.withCredentials );
-
 				try {
 
 					const text = await fileLoader.loadAsync( subobjectURL );
@@ -743,17 +708,16 @@
 			throw new Error( 'LDrawLoader: Subobject "' + fileName + '" could not be loaded.' );
 
 		}
-
 		parse( text, fileName = null ) {
 
-			const loader = this.loader; // final results
+			const loader = this.loader;
 
+			// final results
 			const faces = [];
 			const lineSegments = [];
 			const conditionalSegments = [];
 			const subobjects = [];
 			const materials = {};
-
 			const getLocalMaterial = colorCode => {
 
 				return materials[ colorCode ] || null;
@@ -764,8 +728,9 @@
 			let category = null;
 			let keywords = null;
 			let author = null;
-			let totalFaces = 0; // split into lines
+			let totalFaces = 0;
 
+			// split into lines
 			if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
 				// This is faster than String.split with regex that splits on both
@@ -782,20 +747,21 @@
 			let bfcCCW = true;
 			let bfcInverted = false;
 			let bfcCull = true;
-			let startingConstructionStep = false; // Parse all line commands
+			let startingConstructionStep = false;
 
+			// Parse all line commands
 			for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
 				const line = lines[ lineIndex ];
 				if ( line.length === 0 ) continue;
-
 				if ( parsingEmbeddedFiles ) {
 
 					if ( line.startsWith( '0 FILE ' ) ) {
 
 						// Save previous embedded file in the cache
-						this.setData( currentEmbeddedFileName, currentEmbeddedText ); // New embedded text file
+						this.setData( currentEmbeddedFileName, currentEmbeddedText );
 
+						// New embedded text file
 						currentEmbeddedFileName = line.substring( 7 );
 						currentEmbeddedText = '';
 
@@ -811,15 +777,14 @@
 
 				const lp = new LineParser( line, lineIndex + 1 );
 				lp.seekNonSpace();
-
 				if ( lp.isAtTheEnd() ) {
 
 					// Empty line
 					continue;
 
-				} // Parse the line type
+				}
 
-
+				// Parse the line type
 				const lineType = lp.getToken();
 				let material;
 				let colorCode;
@@ -827,14 +792,12 @@
 				let ccw;
 				let doubleSided;
 				let v0, v1, v2, v3, c0, c1;
-
 				switch ( lineType ) {
 
 					// Line type 0: Comment or META
 					case '0':
 						// Parse meta directive
 						const meta = lp.getToken();
-
 						if ( meta ) {
 
 							switch ( meta ) {
@@ -842,10 +805,8 @@
 								case '!LDRAW_ORG':
 									type = lp.getToken();
 									break;
-
 								case '!COLOUR':
 									material = loader.parseColorMetaDirective( lp );
-
 									if ( material ) {
 
 										materials[ material.userData.code ] = material;
@@ -857,14 +818,11 @@
 									}
 
 									break;
-
 								case '!CATEGORY':
 									category = lp.getToken();
 									break;
-
 								case '!KEYWORDS':
 									const newKeywords = lp.getRemainingString().split( ',' );
-
 									if ( newKeywords.length > 0 ) {
 
 										if ( ! keywords ) {
@@ -882,7 +840,6 @@
 									}
 
 									break;
-
 								case 'FILE':
 									if ( lineIndex > 0 ) {
 
@@ -896,13 +853,11 @@
 									}
 
 									break;
-
 								case 'BFC':
 									// Changes to the backface culling state
 									while ( ! lp.isAtTheEnd() ) {
 
 										const token = lp.getToken();
-
 										switch ( token ) {
 
 											case 'CERTIFY':
@@ -910,21 +865,17 @@
 												bfcCertified = token === 'CERTIFY';
 												bfcCCW = true;
 												break;
-
 											case 'CW':
 											case 'CCW':
 												bfcCCW = token === 'CCW';
 												break;
-
 											case 'INVERTNEXT':
 												bfcInverted = true;
 												break;
-
 											case 'CLIP':
 											case 'NOCLIP':
 												bfcCull = token === 'CLIP';
 												break;
-
 											default:
 												console.warn( 'THREE.LDrawLoader: BFC directive "' + token + '" is unknown.' );
 												break;
@@ -934,15 +885,12 @@
 									}
 
 									break;
-
 								case 'STEP':
 									startingConstructionStep = true;
 									break;
-
 								case 'Author:':
 									author = lp.getToken();
 									break;
-
 								default:
 									// Other meta directives are not implemented
 									break;
@@ -952,8 +900,8 @@
 						}
 
 						break;
-						// Line type 1: Sub-object file
 
+						// Line type 1: Sub-object file
 					case '1':
 						colorCode = lp.getToken();
 						material = getLocalMaterial( colorCode );
@@ -971,7 +919,6 @@
 						const m8 = parseFloat( lp.getToken() );
 						const matrix = new THREE.Matrix4().set( m0, m1, m2, posX, m3, m4, m5, posY, m6, m7, m8, posZ, 0, 0, 0, 1 );
 						let fileName = lp.getRemainingString().trim().replace( /\\/g, '/' );
-
 						if ( loader.fileMap[ fileName ] ) {
 
 							// Found the subobject path in the preloaded file path map
@@ -1002,8 +949,8 @@
 						} );
 						bfcInverted = false;
 						break;
-						// Line type 2: Line segment
 
+						// Line type 2: Line segment
 					case '2':
 						colorCode = lp.getToken();
 						material = getLocalMaterial( colorCode );
@@ -1016,8 +963,8 @@
 						};
 						lineSegments.push( segment );
 						break;
-						// Line type 5: Conditional Line segment
 
+						// Line type 5: Conditional Line segment
 					case '5':
 						colorCode = lp.getToken();
 						material = getLocalMaterial( colorCode );
@@ -1033,14 +980,13 @@
 						};
 						conditionalSegments.push( segment );
 						break;
-						// Line type 3: Triangle
 
+						// Line type 3: Triangle
 					case '3':
 						colorCode = lp.getToken();
 						material = getLocalMaterial( colorCode );
 						ccw = bfcCCW;
 						doubleSided = ! bfcCertified || ! bfcCull;
-
 						if ( ccw === true ) {
 
 							v0 = lp.getVector();
@@ -1063,7 +1009,6 @@
 							normals: [ null, null, null ]
 						} );
 						totalFaces ++;
-
 						if ( doubleSided === true ) {
 
 							faces.push( {
@@ -1078,14 +1023,13 @@
 						}
 
 						break;
-						// Line type 4: Quadrilateral
 
+						// Line type 4: Quadrilateral
 					case '4':
 						colorCode = lp.getToken();
 						material = getLocalMaterial( colorCode );
 						ccw = bfcCCW;
 						doubleSided = ! bfcCertified || ! bfcCull;
-
 						if ( ccw === true ) {
 
 							v0 = lp.getVector();
@@ -1100,10 +1044,10 @@
 							v1 = lp.getVector();
 							v0 = lp.getVector();
 
-						} // specifically place the triangle diagonal in the v0 and v1 slots so we can
+						}
+
+						// specifically place the triangle diagonal in the v0 and v1 slots so we can
 						// account for the doubling of vertices later when smoothing normals.
-
-
 						faces.push( {
 							material: material,
 							colorCode: colorCode,
@@ -1112,7 +1056,6 @@
 							normals: [ null, null, null, null ]
 						} );
 						totalFaces += 2;
-
 						if ( doubleSided === true ) {
 
 							faces.push( {
@@ -1127,7 +1070,6 @@
 						}
 
 						break;
-
 					default:
 						throw new Error( 'LDrawLoader: Unknown line type "' + lineType + '"' + lp.getLineNumberString() + '.' );
 
@@ -1157,14 +1099,13 @@
 				group: null
 			};
 
-		} // returns an (optionally cloned) instance of the data
+		}
 
-
+		// returns an (optionally cloned) instance of the data
 		getData( fileName, clone = true ) {
 
 			const key = fileName.toLowerCase();
 			const result = this._cache[ key ];
-
 			if ( result === null || result instanceof Promise ) {
 
 				return null;
@@ -1181,14 +1122,13 @@
 
 			}
 
-		} // kicks off a fetch and parse of the requested data if it hasn't already been loaded. Returns when
+		}
+
+		// kicks off a fetch and parse of the requested data if it hasn't already been loaded. Returns when
 		// the data is ready to use and can be retrieved synchronously with "getData".
-
-
 		async ensureDataLoaded( fileName ) {
 
 			const key = fileName.toLowerCase();
-
 			if ( ! ( key in this._cache ) ) {
 
 				// replace the promise with a copy of the parsed data for immediate processing
@@ -1204,9 +1144,9 @@
 
 			await this._cache[ key ];
 
-		} // sets the data in the cache from parsed data
+		}
 
-
+		// sets the data in the cache from parsed data
 		setData( fileName, text ) {
 
 			const key = fileName.toLowerCase();
@@ -1214,14 +1154,13 @@
 
 		}
 
-	} // returns the material for an associated color code. If the color code is 16 for a face or 24 for
+	}
+
+	// returns the material for an associated color code. If the color code is 16 for a face or 24 for
 	// an edge then the passthroughColorCode is used.
-
-
 	function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, forEdge ) {
 
 		const isPassthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
-
 		if ( isPassthrough ) {
 
 			colorCode = parentColorCode;
@@ -1230,9 +1169,9 @@
 
 		return materialHierarchy[ colorCode ] || null;
 
-	} // Class used to parse and build LDraw parts as three.js objects and cache them if they're a "Part" type.
+	}
 
-
+	// Class used to parse and build LDraw parts as three.js objects and cache them if they're a "Part" type.
 	class LDrawPartsGeometryCache {
 
 		constructor( loader ) {
@@ -1241,29 +1180,30 @@
 			this.parseCache = new LDrawParsedCache( loader );
 			this._cache = {};
 
-		} // Convert the given file information into a mesh by processing subobjects.
+		}
 
-
+		// Convert the given file information into a mesh by processing subobjects.
 		async processIntoMesh( info ) {
 
 			const loader = this.loader;
 			const parseCache = this.parseCache;
-			const faceMaterials = new Set(); // Processes the part subobject information to load child parts and merge geometry onto part
-			// piece object.
+			const faceMaterials = new Set();
 
+			// Processes the part subobject information to load child parts and merge geometry onto part
+			// piece object.
 			const processInfoSubobjects = async ( info, subobject = null ) => {
 
 				const subobjects = info.subobjects;
-				const promises = []; // Trigger load of all subobjects. If a subobject isn't a primitive then load it as a separate
-				// group which lets instruction steps apply correctly.
+				const promises = [];
 
+				// Trigger load of all subobjects. If a subobject isn't a primitive then load it as a separate
+				// group which lets instruction steps apply correctly.
 				for ( let i = 0, l = subobjects.length; i < l; i ++ ) {
 
 					const subobject = subobjects[ i ];
 					const promise = parseCache.ensureDataLoaded( subobject.fileName ).then( () => {
 
 						const subobjectInfo = parseCache.getData( subobject.fileName, false );
-
 						if ( ! isPrimitiveType( subobjectInfo.type ) ) {
 
 							return this.loadModel( subobject.fileName ).catch( error => {
@@ -1290,20 +1230,18 @@
 				group.userData.fileName = info.fileName;
 				info.group = group;
 				const subobjectInfos = await Promise.all( promises );
-
 				for ( let i = 0, l = subobjectInfos.length; i < l; i ++ ) {
 
 					const subobject = info.subobjects[ i ];
 					const subobjectInfo = subobjectInfos[ i ];
-
 					if ( subobjectInfo === null ) {
 
 						// the subobject failed to load
 						continue;
 
-					} // if the subobject was loaded as a separate group then apply the parent scopes materials
+					}
 
-
+					// if the subobject was loaded as a separate group then apply the parent scopes materials
 					if ( subobjectInfo.isGroup ) {
 
 						const subobjectGroup = subobjectInfo;
@@ -1315,17 +1253,17 @@
 						group.add( subobjectGroup );
 						continue;
 
-					} // add the subobject group if it has children in case it has both children and primitives
+					}
 
-
+					// add the subobject group if it has children in case it has both children and primitives
 					if ( subobjectInfo.group.children.length ) {
 
 						group.add( subobjectInfo.group );
 
-					} // transform the primitives into the local space of the parent piece and append them to
+					}
+
+					// transform the primitives into the local space of the parent piece and append them to
 					// to the parent primitives list.
-
-
 					const parentLineSegments = info.lineSegments;
 					const parentConditionalSegments = info.conditionalSegments;
 					const parentFaces = info.faces;
@@ -1337,7 +1275,6 @@
 					const matrixScaleInverted = matrix.determinant() < 0;
 					const colorCode = subobject.colorCode;
 					const lineColorCode = colorCode === MAIN_COLOUR_CODE ? MAIN_EDGE_COLOUR_CODE : colorCode;
-
 					for ( let i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 						const ls = lineSegments[ i ];
@@ -1369,7 +1306,6 @@
 
 						const tri = faces[ i ];
 						const vertices = tri.vertices;
-
 						for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
 							vertices[ i ].applyMatrix4( matrix );
@@ -1378,9 +1314,10 @@
 
 						tri.colorCode = tri.colorCode === MAIN_COLOUR_CODE ? colorCode : tri.colorCode;
 						tri.material = tri.material || getMaterialFromCode( tri.colorCode, colorCode, info.materials, false );
-						faceMaterials.add( tri.colorCode ); // If the scale of the object is negated then the triangle winding order
-						// needs to be flipped.
+						faceMaterials.add( tri.colorCode );
 
+						// If the scale of the object is negated then the triangle winding order
+						// needs to be flipped.
 						if ( matrixScaleInverted !== inverted ) {
 
 							vertices.reverse();
@@ -1393,10 +1330,10 @@
 
 					info.totalFaces += subobjectInfo.totalFaces;
 
-				} // Apply the parent subobjects pass through material code to this object. This is done several times due
+				}
+
+				// Apply the parent subobjects pass through material code to this object. This is done several times due
 				// to material scoping.
-
-
 				if ( subobject ) {
 
 					loader.applyMaterialsToMesh( group, subobject.colorCode, info.materials );
@@ -1406,9 +1343,9 @@
 
 				return info;
 
-			}; // Track material use to see if we need to use the normal smooth slow path for hard edges.
+			};
 
-
+			// Track material use to see if we need to use the normal smooth slow path for hard edges.
 			for ( let i = 0, l = info.faces; i < l; i ++ ) {
 
 				faceMaterials.add( info.faces[ i ].colorCode );
@@ -1416,18 +1353,16 @@
 			}
 
 			await processInfoSubobjects( info );
-
 			if ( loader.smoothNormals ) {
 
 				const checkSubSegments = faceMaterials.size > 1;
 				generateFaceNormals( info.faces );
 				smoothNormals( info.faces, info.lineSegments, checkSubSegments );
 
-			} // Add the primitive objects and metadata.
+			}
 
-
+			// Add the primitive objects and metadata.
 			const group = info.group;
-
 			if ( info.faces.length > 0 ) {
 
 				group.add( createObject( info.faces, 3, false, info.totalFaces ) );
@@ -1449,13 +1384,11 @@
 			return group;
 
 		}
-
 		hasCachedModel( fileName ) {
 
 			return fileName !== null && fileName.toLowerCase() in this._cache;
 
 		}
-
 		async getCachedModel( fileName ) {
 
 			if ( fileName !== null && this.hasCachedModel( fileName ) ) {
@@ -1470,14 +1403,13 @@
 
 			}
 
-		} // Loads and parses the model with the given file name. Returns a cached copy if available.
+		}
 
-
+		// Loads and parses the model with the given file name. Returns a cached copy if available.
 		async loadModel( fileName ) {
 
 			const parseCache = this.parseCache;
 			const key = fileName.toLowerCase();
-
 			if ( this.hasCachedModel( fileName ) ) {
 
 				// Return cached model if available.
@@ -1489,37 +1421,37 @@
 				// Ensure the file data is loaded and pre parsed.
 				await parseCache.ensureDataLoaded( fileName );
 				const info = parseCache.getData( fileName );
-				const promise = this.processIntoMesh( info ); // Now that the file has loaded it's possible that another part parse has been waiting in parallel
+				const promise = this.processIntoMesh( info );
+
+				// Now that the file has loaded it's possible that another part parse has been waiting in parallel
 				// so check the cache again to see if it's been added since the last async operation so we don't
 				// do unnecessary work.
-
 				if ( this.hasCachedModel( fileName ) ) {
 
 					return this.getCachedModel( fileName );
 
-				} // Cache object if it's a part so it can be reused later.
+				}
 
-
+				// Cache object if it's a part so it can be reused later.
 				if ( isPartType( info.type ) ) {
 
 					this._cache[ key ] = promise;
 
-				} // return a copy
+				}
 
-
+				// return a copy
 				const group = await promise;
 				return group.clone();
 
 			}
 
-		} // parses the given model text into a renderable object. Returns cached copy if available.
+		}
 
-
+		// parses the given model text into a renderable object. Returns cached copy if available.
 		async parseModel( text ) {
 
 			const parseCache = this.parseCache;
 			const info = parseCache.parse( text );
-
 			if ( isPartType( info.type ) && this.hasCachedModel( info.fileName ) ) {
 
 				return this.getCachedModel( info.fileName );
@@ -1531,7 +1463,6 @@
 		}
 
 	}
-
 	function sortByMaterial( a, b ) {
 
 		if ( a.colorCode === b.colorCode ) {
@@ -1554,9 +1485,9 @@
 
 		// Creates a THREE.LineSegments (elementSize = 2) or a THREE.Mesh (elementSize = 3 )
 		// With per face / segment material, implemented with mesh groups and materials array
+
 		// Sort the faces or line segments by color code to make later the mesh groups
 		elements.sort( sortByMaterial );
-
 		if ( totalElements === null ) {
 
 			totalElements = elements.length;
@@ -1572,12 +1503,10 @@
 		let index0 = 0;
 		let numGroupVerts = 0;
 		let offset = 0;
-
 		for ( let iElem = 0, nElem = elements.length; iElem < nElem; iElem ++ ) {
 
 			const elem = elements[ iElem ];
 			let vertices = elem.vertices;
-
 			if ( vertices.length === 4 ) {
 
 				quadArray[ 0 ] = vertices[ 0 ];
@@ -1598,9 +1527,9 @@
 				positions[ index + 1 ] = v.y;
 				positions[ index + 2 ] = v.z;
 
-			} // create the normals array if this is a set of faces
+			}
 
-
+			// create the normals array if this is a set of faces
 			if ( elementSize === 3 ) {
 
 				if ( ! elem.faceNormal ) {
@@ -1608,17 +1537,13 @@
 					const v0 = vertices[ 0 ];
 					const v1 = vertices[ 1 ];
 					const v2 = vertices[ 2 ];
-
 					_tempVec0.subVectors( v1, v0 );
-
 					_tempVec1.subVectors( v2, v1 );
-
 					elem.faceNormal = new THREE.Vector3().crossVectors( _tempVec0, _tempVec1 ).normalize();
 
 				}
 
 				let elemNormals = elem.normals;
-
 				if ( elemNormals.length === 4 ) {
 
 					quadArray[ 0 ] = elemNormals[ 0 ];
@@ -1635,7 +1560,6 @@
 
 					// use face normal if a vertex normal is not provided
 					let n = elem.faceNormal;
-
 					if ( elemNormals[ j ] ) {
 
 						n = elemNormals[ j ].norm;
@@ -1660,7 +1584,6 @@
 				}
 
 				const material = elem.material;
-
 				if ( material !== null ) {
 
 					if ( elementSize === 3 ) {
@@ -1710,7 +1633,6 @@
 		}
 
 		bufferGeometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-
 		if ( normals !== null ) {
 
 			bufferGeometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
@@ -1718,7 +1640,6 @@
 		}
 
 		let object3d = null;
-
 		if ( elementSize === 2 ) {
 
 			if ( isConditionalSegments ) {
@@ -1743,7 +1664,6 @@
 			const controlArray0 = new Float32Array( elements.length * 3 * 2 );
 			const controlArray1 = new Float32Array( elements.length * 3 * 2 );
 			const directionArray = new Float32Array( elements.length * 3 * 2 );
-
 			for ( let i = 0, l = elements.length; i < l; i ++ ) {
 
 				const os = elements[ i ];
@@ -1783,28 +1703,36 @@
 
 		return object3d;
 
-	} //
+	}
 
+	//
 
 	class LDrawLoader extends THREE.Loader {
 
 		constructor( manager ) {
 
-			super( manager ); // Array of THREE.Material
+			super( manager );
 
+			// Array of THREE.Material
 			this.materials = [];
-			this.materialLibrary = {}; // This also allows to handle the embedded text files ("0 FILE" lines)
+			this.materialLibrary = {};
 
-			this.partsCache = new LDrawPartsGeometryCache( this ); // This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
+			// This also allows to handle the embedded text files ("0 FILE" lines)
+			this.partsCache = new LDrawPartsGeometryCache( this );
 
-			this.fileMap = {}; // Initializes the materials library with default materials
+			// This object is a map from file names to paths. It agilizes the paths search. If it is not set then files will be searched by trial and error.
+			this.fileMap = {};
 
-			this.setMaterials( [] ); // If this flag is set to true the vertex normals will be smoothed.
+			// Initializes the materials library with default materials
+			this.setMaterials( [] );
 
-			this.smoothNormals = true; // The path to load parts from the LDraw parts library from.
+			// If this flag is set to true the vertex normals will be smoothed.
+			this.smoothNormals = true;
 
-			this.partsLibraryPath = ''; // Material assigned to not available colors for meshes and edges
+			// The path to load parts from the LDraw parts library from.
+			this.partsLibraryPath = '';
 
+			// Material assigned to not available colors for meshes and edges
 			this.missingColorMaterial = new THREE.MeshStandardMaterial( {
 				color: 0xFF00FF,
 				roughness: 0.3,
@@ -1824,14 +1752,12 @@
 			this.missingEdgeColorMaterial.userData.conditionalEdgeMaterial = this.missingConditionalEdgeColorMaterial;
 
 		}
-
 		setPartsLibraryPath( path ) {
 
 			this.partsLibraryPath = path;
 			return this;
 
 		}
-
 		async preloadMaterials( url ) {
 
 			const fileLoader = new THREE.FileLoader( this.manager );
@@ -1842,11 +1768,9 @@
 			const colorLineRegex = /^0 !COLOUR/;
 			const lines = text.split( /[\n\r]/g );
 			const materials = [];
-
 			for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
 				const line = lines[ i ];
-
 				if ( colorLineRegex.test( line ) ) {
 
 					const directive = line.replace( colorLineRegex, '' );
@@ -1860,7 +1784,6 @@
 			this.setMaterials( materials );
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const fileLoader = new THREE.FileLoader( this.manager );
@@ -1881,7 +1804,6 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( text, onLoad ) {
 
 			this.partsCache.parseModel( text, this.materialLibrary ).then( group => {
@@ -1894,37 +1816,33 @@
 			} );
 
 		}
-
 		setMaterials( materials ) {
 
 			this.materialLibrary = {};
 			this.materials = [];
-
 			for ( let i = 0, l = materials.length; i < l; i ++ ) {
 
 				this.addMaterial( materials[ i ] );
 
-			} // Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
+			}
 
-
+			// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
 			this.addMaterial( this.parseColorMetaDirective( new LineParser( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ) );
 			this.addMaterial( this.parseColorMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) );
 			return this;
 
 		}
-
 		setFileMap( fileMap ) {
 
 			this.fileMap = fileMap;
 			return this;
 
 		}
-
 		addMaterial( material ) {
 
 			// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array
-			const matLib = this.materialLibrary;
 
+			const matLib = this.materialLibrary;
 			if ( ! matLib[ material.userData.code ] ) {
 
 				this.materials.push( material );
@@ -1935,7 +1853,6 @@
 			return this;
 
 		}
-
 		getMaterial( colorCode ) {
 
 			if ( colorCode.startsWith( '0x2' ) ) {
@@ -1948,10 +1865,10 @@
 
 			return this.materialLibrary[ colorCode ] || null;
 
-		} // Applies the appropriate materials to a prebuilt hierarchy of geometry. Assumes that color codes are present
+		}
+
+		// Applies the appropriate materials to a prebuilt hierarchy of geometry. Assumes that color codes are present
 		// in the material array if they need to be filled in.
-
-
 		applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalMaterialPass = false ) {
 
 			// find any missing materials as indicated by a color code string and replace it with a material from the current material lib
@@ -1981,10 +1898,11 @@
 
 				}
 
-			} ); // Returns the appropriate material for the object (line or face) given color code. If the code is "pass through"
+			} );
+
+			// Returns the appropriate material for the object (line or face) given color code. If the code is "pass through"
 			// (24 for lines, 16 for edges) then the pass through color code is used. If that is also pass through then it's
 			// simply returned for the subsequent material application.
-
 			function getMaterial( c, colorCode ) {
 
 				// if our parent is a passthrough color code and we don't have the current material color available then
@@ -1997,7 +1915,6 @@
 
 				const forEdge = c.isLineSegments || c.isConditionalLine;
 				const isPassthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
-
 				if ( isPassthrough ) {
 
 					colorCode = parentColorCode;
@@ -2005,7 +1922,6 @@
 				}
 
 				let material = null;
-
 				if ( colorCode in materialHierarchy ) {
 
 					material = materialHierarchy[ colorCode ];
@@ -2015,12 +1931,12 @@
 					// see if we can get the final material from from the "getMaterial" function which will attempt to
 					// parse the "direct" colors
 					material = loader.getMaterial( colorCode );
-
 					if ( material === null ) {
 
 						// otherwise throw a warning if this is final opportunity to set the material
-						console.warn( `LDrawLoader: Material properties for code ${colorCode} not available.` ); // And return the 'missing color' material
+						console.warn( `LDrawLoader: Material properties for code ${colorCode} not available.` );
 
+						// And return the 'missing color' material
 						material = loader.missingColorMaterial;
 
 					}
@@ -2034,7 +1950,6 @@
 				if ( c.isLineSegments ) {
 
 					material = material.userData.edgeMaterial;
-
 					if ( c.isConditionalLine ) {
 
 						material = material.userData.conditionalEdgeMaterial;
@@ -2048,49 +1963,46 @@
 			}
 
 		}
-
 		getMainMaterial() {
 
 			return this.getMaterial( MAIN_COLOUR_CODE );
 
 		}
-
 		getMainEdgeMaterial() {
 
 			const mat = this.getMaterial( MAIN_EDGE_COLOUR_CODE );
 			return mat ? mat.userData.edgeMaterial : null;
 
 		}
-
 		parseColorMetaDirective( lineParser ) {
 
 			// Parses a color definition and returns a THREE.Material
-			let code = null; // Triangle and line colors
 
+			let code = null;
+
+			// Triangle and line colors
 			let color = 0xFF00FF;
-			let edgeColor = 0xFF00FF; // Transparency
+			let edgeColor = 0xFF00FF;
 
+			// Transparency
 			let alpha = 1;
-			let isTransparent = false; // Self-illumination:
-
+			let isTransparent = false;
+			// Self-illumination:
 			let luminance = 0;
 			let finishType = FINISH_TYPE_DEFAULT;
 			let edgeMaterial = null;
 			const name = lineParser.getToken();
-
 			if ( ! name ) {
 
 				throw new Error( 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.' );
 
-			} // Parse tag tokens and their parameters
+			}
 
-
+			// Parse tag tokens and their parameters
 			let token = null;
-
 			while ( true ) {
 
 				token = lineParser.getToken();
-
 				if ( ! token ) {
 
 					break;
@@ -2104,10 +2016,8 @@
 						case 'CODE':
 							code = lineParser.getToken();
 							break;
-
 						case 'VALUE':
 							color = lineParser.getToken();
-
 							if ( color.startsWith( '0x' ) ) {
 
 								color = '#' + color.substring( 2 );
@@ -2119,10 +2029,8 @@
 							}
 
 							break;
-
 						case 'EDGE':
 							edgeColor = lineParser.getToken();
-
 							if ( edgeColor.startsWith( '0x' ) ) {
 
 								edgeColor = '#' + edgeColor.substring( 2 );
@@ -2131,23 +2039,20 @@
 
 								// Try to see if edge color is a color code
 								edgeMaterial = this.getMaterial( edgeColor );
-
 								if ( ! edgeMaterial ) {
 
 									throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
 
-								} // Get the edge material for this triangle material
+								}
 
-
+								// Get the edge material for this triangle material
 								edgeMaterial = edgeMaterial.userData.edgeMaterial;
 
 							}
 
 							break;
-
 						case 'ALPHA':
 							alpha = parseInt( lineParser.getToken() );
-
 							if ( isNaN( alpha ) ) {
 
 								throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
@@ -2155,7 +2060,6 @@
 							}
 
 							alpha = Math.max( 0, Math.min( 1, alpha / 255 ) );
-
 							if ( alpha < 1 ) {
 
 								isTransparent = true;
@@ -2163,7 +2067,6 @@
 							}
 
 							break;
-
 						case 'LUMINANCE':
 							if ( ! parseLuminance( lineParser.getToken() ) ) {
 
@@ -2172,32 +2075,25 @@
 							}
 
 							break;
-
 						case 'CHROME':
 							finishType = FINISH_TYPE_CHROME;
 							break;
-
 						case 'PEARLESCENT':
 							finishType = FINISH_TYPE_PEARLESCENT;
 							break;
-
 						case 'RUBBER':
 							finishType = FINISH_TYPE_RUBBER;
 							break;
-
 						case 'MATTE_METALLIC':
 							finishType = FINISH_TYPE_MATTE_METALLIC;
 							break;
-
 						case 'METAL':
 							finishType = FINISH_TYPE_METAL;
 							break;
-
 						case 'MATERIAL':
 							// Not implemented
 							lineParser.setToEnd();
 							break;
-
 						default:
 							throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
 
@@ -2208,7 +2104,6 @@
 			}
 
 			let material = null;
-
 			switch ( finishType ) {
 
 				case FINISH_TYPE_DEFAULT:
@@ -2218,7 +2113,6 @@
 						metalness: 0
 					} );
 					break;
-
 				case FINISH_TYPE_PEARLESCENT:
 					// Try to imitate pearlescency by making the surface glossy
 					material = new THREE.MeshStandardMaterial( {
@@ -2227,7 +2121,6 @@
 						metalness: 0.25
 					} );
 					break;
-
 				case FINISH_TYPE_CHROME:
 					// Mirror finish surface
 					material = new THREE.MeshStandardMaterial( {
@@ -2236,7 +2129,6 @@
 						metalness: 1
 					} );
 					break;
-
 				case FINISH_TYPE_RUBBER:
 					// Rubber finish
 					material = new THREE.MeshStandardMaterial( {
@@ -2245,7 +2137,6 @@
 						metalness: 0
 					} );
 					break;
-
 				case FINISH_TYPE_MATTE_METALLIC:
 					// Brushed metal finish
 					material = new THREE.MeshStandardMaterial( {
@@ -2254,7 +2145,6 @@
 						metalness: 0.4
 					} );
 					break;
-
 				case FINISH_TYPE_METAL:
 					// Average metal finish
 					material = new THREE.MeshStandardMaterial( {
@@ -2263,7 +2153,6 @@
 						metalness: 0.85
 					} );
 					break;
-
 				default:
 					// Should not happen
 					break;
@@ -2277,7 +2166,6 @@
 			material.color.convertSRGBToLinear();
 			material.polygonOffset = true;
 			material.polygonOffsetFactor = 1;
-
 			if ( luminance !== 0 ) {
 
 				material.emissive.set( material.color ).multiplyScalar( luminance );
@@ -2295,8 +2183,9 @@
 				} );
 				edgeMaterial.userData.code = code;
 				edgeMaterial.name = name + ' - Edge';
-				edgeMaterial.color.convertSRGBToLinear(); // This is the material used for conditional edges
+				edgeMaterial.color.convertSRGBToLinear();
 
+				// This is the material used for conditional edges
 				edgeMaterial.userData.conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
 					fog: true,
 					transparent: isTransparent,
@@ -2315,12 +2204,11 @@
 			material.userData.edgeMaterial = edgeMaterial;
 			this.addMaterial( material );
 			return material;
-
 			function parseLuminance( token ) {
 
 				// Returns success
-				let lum;
 
+				let lum;
 				if ( token.startsWith( 'LUMINANCE' ) ) {
 
 					lum = parseInt( token.substring( 9 ) );
@@ -2343,10 +2231,10 @@
 			}
 
 		}
-
 		computeConstructionSteps( model ) {
 
 			// Sets userdata.constructionStep number in THREE.Group objects and userData.numConstructionSteps number in the root THREE.Group object.
+
 			let stepNumber = 0;
 			model.traverse( c => {
 

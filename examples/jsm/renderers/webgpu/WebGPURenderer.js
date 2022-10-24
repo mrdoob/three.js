@@ -1,4 +1,5 @@
 import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp } from './constants.js';
+import WebGPUAnimation from './WebGPUAnimation.js';
 import WebGPUObjects from './WebGPUObjects.js';
 import WebGPUAttributes from './WebGPUAttributes.js';
 import WebGPUGeometries from './WebGPUGeometries.js';
@@ -132,6 +133,8 @@ class WebGPURenderer {
 		this._textures = null;
 		this._background = null;
 
+		this._animation = new WebGPUAnimation();
+
 		this._renderPassDescriptor = null;
 
 		this._currentRenderState = null;
@@ -146,6 +149,8 @@ class WebGPURenderer {
 		this._clearStencil = 0;
 
 		this._renderTarget = null;
+
+		this._initialized = false;
 
 		// some parameters require default values other than "undefined"
 
@@ -167,6 +172,12 @@ class WebGPURenderer {
 	}
 
 	async init() {
+
+		if ( this._initialized === true ) {
+
+			throw new Error( 'WebGPURenderer: Device has already been initialized.' );
+
+		}
 
 		const parameters = this._parameters;
 
@@ -192,7 +203,7 @@ class WebGPURenderer {
 		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
 
 		context.configure( {
-			device: device,
+			device,
 			format: GPUTextureFormat.BGRA8Unorm, // this is the only valid context format right now (r121)
 			alphaMode: 'premultiplied'
 		} );
@@ -232,15 +243,20 @@ class WebGPURenderer {
 		this._setupColorBuffer();
 		this._setupDepthBuffer();
 
+		this._animation.setNodes( this._nodes );
+		this._animation.start();
+
+		this._initialized = true;
+
 	}
 
-	render( scene, camera ) {
+	async render( scene, camera ) {
 
-		// @TODO: move this to animation loop
-
-		this._nodes.updateFrame();
+		if ( this._initialized === false ) return await this.init();
 
 		//
+
+		if ( this._animation.isAnimating === false ) this._nodes.updateFrame();
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
@@ -275,6 +291,8 @@ class WebGPURenderer {
 		const renderTarget = this._renderTarget;
 
 		if ( renderTarget !== null ) {
+
+			this._textures.initRenderTarget( renderTarget );
 
 			// @TODO: Support RenderTarget with antialiasing.
 
@@ -351,6 +369,18 @@ class WebGPURenderer {
 
 		passEncoder.end();
 		device.queue.submit( [ cmdEncoder.finish() ] );
+
+	}
+
+	setAnimationLoop( callback ) {
+
+		if ( this._initialized === false ) this.init();
+
+		const animation = this._animation;
+
+		animation.setAnimationLoop( callback );
+
+		( callback === null ) ? animation.stop() : animation.start();
 
 	}
 
@@ -571,21 +601,20 @@ class WebGPURenderer {
 		this._renderStates.dispose();
 		this._textures.dispose();
 
+		this.setRenderTarget( null );
+		this.setAnimationLoop( null );
+
 	}
 
 	setRenderTarget( renderTarget ) {
 
 		this._renderTarget = renderTarget;
 
-		if ( renderTarget !== null ) {
-
-			this._textures.initRenderTarget( renderTarget );
-
-		}
-
 	}
 
-	compute( ...computeNodes ) {
+	async compute( ...computeNodes ) {
+
+		if ( this._initialized === false ) return await this.init();
 
 		const device = this._device;
 		const computePipelines = this._computePipelines;

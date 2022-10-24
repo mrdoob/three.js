@@ -26,19 +26,29 @@
 
 		<h3>[property:Object background]</h3>
 		<p>
-		If not null, sets the background used when rendering the scene, and is always rendered first.
-		Can be set to a [page:Color] which sets the clear color, a [page:Texture] covering the canvas, a cubemap as a [page:CubeTexture] or an equirectangular as a [page:Texture] . Default is null.
+			Defines the background of the scene. Default is `null`. Valid inputs are:
+			<ul>
+				<li>A [page:Color] for defining a uniform colored background.</li>
+				<li>A [page:Texture] for defining a (flat) textured background.</li>
+				<li>Texture cubes ([page:CubeTexture]) or equirectangular textures for defining a skybox.</li>
+			</ul>
+			Note: Any camera related configurations like `zoom` or `view` are ignored.
+		</p>
+
+		<h3>[property:Float backgroundBlurriness]</h3>
+		<p>
+			Sets the blurriness of the background. Only influences environment maps assigned to [page:Scene.background]. Valid input is a float between *0* and *1*. Default is *0*.
 		</p>
 
 		<h3>[property:Texture environment]</h3>
 		<p>
-		If not null, this texture is set as the environment map for all physical materials in the scene.
-		However, it's not possible to overwrite an existing texture assigned to [page:MeshStandardMaterial.envMap]. Default is null.
+		Sets the environment map for all physical materials in the scene.
+		However, it's not possible to overwrite an existing texture assigned to [page:MeshStandardMaterial.envMap]. Default is `null`.
 		</p>
 
 		<h3>[property:Fog fog]</h3>
 
-		<p>A [page:Fog fog] instance defining the type of fog that affects everything rendered in the scene. Default is null.</p>
+		<p>A [page:Fog fog] instance defining the type of fog that affects everything rendered in the scene. Default is `null`.</p>
 
 		<h3>[property:Boolean isScene]</h3>
 		<p>
@@ -47,7 +57,7 @@
 
 		<h3>[property:Material overrideMaterial]</h3>
 
-		<p>If not null, it will force everything in the scene to be rendered with that material. Default is null.</p>
+		<p>Forces everything in the scene to be rendered with the defined material. Default is `null`.</p>
 
 		<h2>Methods</h2>
 

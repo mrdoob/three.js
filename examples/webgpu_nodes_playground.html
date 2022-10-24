@@ -73,9 +73,9 @@
 			let model;
 			let nodeEditor;
 
-			init().then( animate ).catch( error => console.error( error ) );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -104,9 +104,10 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				renderer.setAnimationLoop( render );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 4000 );
+				document.body.appendChild( renderer.domElement );
 
 				renderer.domElement.className = 'renderer';
 
@@ -121,8 +122,6 @@
 				initEditor();
 
 				onWindowResize();
-
-				return renderer.init();
 
 			}
 
@@ -204,19 +203,11 @@
 
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				nodeFrame.update();
-
-				render();
-
-			}
-
 			function render() {
 
 				//if ( model ) model.rotation.y = performance.now() / 5000;
+
+				nodeFrame.update();
 
 				renderer.render( scene, camera );
 

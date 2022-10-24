@@ -1,7 +1,6 @@
 ( function () {
 
 	const vpTemp = new THREE.Vector4();
-
 	class ViewHelper extends THREE.Object3D {
 
 		constructor( editorCamera, dom ) {
@@ -71,7 +70,6 @@
 				this.updateMatrixWorld();
 				point.set( 0, 0, 1 );
 				point.applyQuaternion( editorCamera.quaternion );
-
 				if ( point.x >= 0 ) {
 
 					posXAxisHelper.material.opacity = 1;
@@ -106,8 +104,9 @@
 					posZAxisHelper.material.opacity = 0.5;
 					negZAxisHelper.material.opacity = 1;
 
-				} //
+				}
 
+				//
 
 				const x = dom.offsetWidth - dim;
 				renderer.clearDepth();
@@ -123,7 +122,6 @@
 			const q1 = new THREE.Quaternion();
 			const q2 = new THREE.Quaternion();
 			let radius = 0;
-
 			this.handleClick = function ( event ) {
 
 				if ( this.animating === true ) return false;
@@ -134,7 +132,6 @@
 				mouse.y = - ( ( event.clientY - offsetY ) / ( rect.bottom - offsetY ) ) * 2 + 1;
 				raycaster.setFromCamera( mouse, camera );
 				const intersects = raycaster.intersectObjects( interactiveObjects );
-
 				if ( intersects.length > 0 ) {
 
 					const intersection = intersects[ 0 ];
@@ -154,18 +151,42 @@
 			this.update = function ( delta ) {
 
 				const step = delta * turnRate;
-				const focusPoint = this.controls.center; // animate position by doing a slerp and then scaling the position on the unit sphere
+				const focusPoint = this.controls.center;
+
+				// animate position by doing a slerp and then scaling the position on the unit sphere
 
 				q1.rotateTowards( q2, step );
-				editorCamera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( focusPoint ); // animate orientation
+				editorCamera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( focusPoint );
+
+				// animate orientation
 
 				editorCamera.quaternion.rotateTowards( targetQuaternion, step );
-
 				if ( q1.angleTo( q2 ) === 0 ) {
 
 					this.animating = false;
 
 				}
+
+			};
+
+			this.dispose = function () {
+
+				geometry.dispose();
+				xAxis.material.dispose();
+				yAxis.material.dispose();
+				zAxis.material.dispose();
+				posXAxisHelper.material.map.dispose();
+				posYAxisHelper.material.map.dispose();
+				posZAxisHelper.material.map.dispose();
+				negXAxisHelper.material.map.dispose();
+				negYAxisHelper.material.map.dispose();
+				negZAxisHelper.material.map.dispose();
+				posXAxisHelper.material.dispose();
+				posYAxisHelper.material.dispose();
+				posZAxisHelper.material.dispose();
+				negXAxisHelper.material.dispose();
+				negYAxisHelper.material.dispose();
+				negZAxisHelper.material.dispose();
 
 			};
 
@@ -177,37 +198,32 @@
 						targetPosition.set( 1, 0, 0 );
 						targetQuaternion.setFromEuler( new THREE.Euler( 0, Math.PI * 0.5, 0 ) );
 						break;
-
 					case 'posY':
 						targetPosition.set( 0, 1, 0 );
 						targetQuaternion.setFromEuler( new THREE.Euler( - Math.PI * 0.5, 0, 0 ) );
 						break;
-
 					case 'posZ':
 						targetPosition.set( 0, 0, 1 );
 						targetQuaternion.setFromEuler( new THREE.Euler() );
 						break;
-
 					case 'negX':
 						targetPosition.set( - 1, 0, 0 );
 						targetQuaternion.setFromEuler( new THREE.Euler( 0, - Math.PI * 0.5, 0 ) );
 						break;
-
 					case 'negY':
 						targetPosition.set( 0, - 1, 0 );
 						targetQuaternion.setFromEuler( new THREE.Euler( Math.PI * 0.5, 0, 0 ) );
 						break;
-
 					case 'negZ':
 						targetPosition.set( 0, 0, - 1 );
 						targetQuaternion.setFromEuler( new THREE.Euler( 0, Math.PI, 0 ) );
 						break;
-
 					default:
 						console.error( 'ViewHelper: Invalid axis.' );
 
-				} //
+				}
 
+				//
 
 				radius = editorCamera.position.distanceTo( focusPoint );
 				targetPosition.multiplyScalar( radius ).add( focusPoint );
@@ -239,7 +255,6 @@
 				context.closePath();
 				context.fillStyle = color.getStyle();
 				context.fill();
-
 				if ( text !== null ) {
 
 					context.font = '24px Arial';

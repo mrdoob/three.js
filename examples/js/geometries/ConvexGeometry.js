@@ -4,25 +4,29 @@
 
 		constructor( points = [] ) {
 
-			super(); // buffers
+			super();
+
+			// buffers
 
 			const vertices = [];
 			const normals = [];
-
 			if ( THREE.ConvexHull === undefined ) {
 
 				console.error( 'THREE.ConvexGeometry: ConvexGeometry relies on THREE.ConvexHull' );
 
 			}
 
-			const convexHull = new THREE.ConvexHull().setFromPoints( points ); // generate vertices and normals
+			const convexHull = new THREE.ConvexHull().setFromPoints( points );
+
+			// generate vertices and normals
 
 			const faces = convexHull.faces;
-
 			for ( let i = 0; i < faces.length; i ++ ) {
 
 				const face = faces[ i ];
-				let edge = face.edge; // we move along a doubly-connected edge list to access all face points (see HalfEdge docs)
+				let edge = face.edge;
+
+				// we move along a doubly-connected edge list to access all face points (see HalfEdge docs)
 
 				do {
 
@@ -33,8 +37,9 @@
 
 				} while ( edge !== face.edge );
 
-			} // build geometry
+			}
 
+			// build geometry
 
 			this.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 			this.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );

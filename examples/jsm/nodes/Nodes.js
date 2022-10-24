@@ -59,6 +59,7 @@ import ColorAdjustmentNode from './display/ColorAdjustmentNode.js';
 import ColorSpaceNode from './display/ColorSpaceNode.js';
 import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
+import PosterizeNode from './display/PosterizeNode.js';
 import ToneMappingNode from './display/ToneMappingNode.js';
 
 // math
@@ -79,6 +80,7 @@ import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
+import EquirectUVNode from './utils/EquirectUVNode.js';
 import JoinNode from './utils/JoinNode.js';
 import MatcapUVNode from './utils/MatcapUVNode.js';
 import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
@@ -183,6 +185,7 @@ const nodeLib = {
 	ColorSpaceNode,
 	FrontFacingNode,
 	NormalMapNode,
+	PosterizeNode,
 	ToneMappingNode,
 
 	// math
@@ -203,6 +206,7 @@ const nodeLib = {
 	// utils
 	ArrayElementNode,
 	ConvertNode,
+	EquirectUVNode,
 	JoinNode,
 	MatcapUVNode,
 	MaxMipLevelNode,
@@ -228,7 +232,7 @@ const nodeLib = {
 
 	// parsers
 	WGSLNodeParser,
-	GLSLNodeParser,
+	GLSLNodeParser
 
 };
 
@@ -300,6 +304,7 @@ export {
 	ColorSpaceNode,
 	FrontFacingNode,
 	NormalMapNode,
+	PosterizeNode,
 	ToneMappingNode,
 
 	// math
@@ -320,6 +325,7 @@ export {
 	// utils
 	ArrayElementNode,
 	ConvertNode,
+	EquirectUVNode,
 	JoinNode,
 	MatcapUVNode,
 	MaxMipLevelNode,
@@ -345,5 +351,5 @@ export {
 
 	// parsers
 	WGSLNodeParser,
-	GLSLNodeParser,
+	GLSLNodeParser
 };

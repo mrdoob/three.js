@@ -20,6 +20,7 @@
 			this.meshes = [];
 
 		}
+
 		/**
    * Load 3ds file from url.
    *
@@ -29,8 +30,6 @@
    * @param {Function} onProgress onProgress callback.
    * @param {Function} onError onError callback.
    */
-
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -65,6 +64,7 @@
 			}, onProgress, onError );
 
 		}
+
 		/**
    * Parse arraybuffer data and load 3ds file.
    *
@@ -73,15 +73,12 @@
    * @param {String} path Path for external resources.
    * @return {Group} THREE.Group loaded from 3ds file.
    */
-
-
 		parse( arraybuffer, path ) {
 
 			this.group = new THREE.Group();
 			this.materials = [];
 			this.meshes = [];
 			this.readFile( arraybuffer, path );
-
 			for ( let i = 0; i < this.meshes.length; i ++ ) {
 
 				this.group.add( this.meshes[ i ] );
@@ -91,6 +88,7 @@
 			return this.group;
 
 		}
+
 		/**
    * Decode file content to read 3ds data.
    *
@@ -98,17 +96,13 @@
    * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
    * @param {String} path Path for external resources.
    */
-
-
 		readFile( arraybuffer, path ) {
 
 			const data = new DataView( arraybuffer );
 			const chunk = new Chunk( data, 0, this.debugMessage );
-
 			if ( chunk.id === MLIBMAGIC || chunk.id === CMAGIC || chunk.id === M3DMAGIC ) {
 
 				let next = chunk.readChunk();
-
 				while ( next ) {
 
 					if ( next.id === M3D_VERSION ) {
@@ -135,6 +129,7 @@
 			this.debugMessage( 'Parsed ' + this.meshes.length + ' meshes' );
 
 		}
+
 		/**
    * Read mesh data chunk.
    *
@@ -142,12 +137,9 @@
    * @param {Chunk} chunk to read mesh from
    * @param {String} path Path for external resources.
    */
-
-
 		readMeshData( chunk, path ) {
 
 			let next = chunk.readChunk();
-
 			while ( next ) {
 
 				if ( next.id === MESH_VERSION ) {
@@ -182,19 +174,17 @@
 			}
 
 		}
+
 		/**
    * Read named object chunk.
    *
    * @method readNamedObject
    * @param {Chunk} chunk Chunk in use.
    */
-
-
 		readNamedObject( chunk ) {
 
 			const name = chunk.readString();
 			let next = chunk.readChunk();
-
 			while ( next ) {
 
 				if ( next.id === N_TRI_OBJECT ) {
@@ -214,6 +204,7 @@
 			}
 
 		}
+
 		/**
    * Read material data chunk and add it to the material list.
    *
@@ -221,13 +212,10 @@
    * @param {Chunk} chunk Chunk in use.
    * @param {String} path Path for external resources.
    */
-
-
 		readMaterialEntry( chunk, path ) {
 
 			let next = chunk.readChunk();
 			const material = new THREE.MeshPhongMaterial();
-
 			while ( next ) {
 
 				if ( next.id === MAT_NAME ) {
@@ -317,6 +305,7 @@
 			this.materials[ material.name ] = material;
 
 		}
+
 		/**
    * Read mesh data chunk.
    *
@@ -324,8 +313,6 @@
    * @param {Chunk} chunk Chunk in use.
    * @return {Mesh} The parsed mesh.
    */
-
-
 		readMesh( chunk ) {
 
 			let next = chunk.readChunk();
@@ -333,16 +320,16 @@
 			const material = new THREE.MeshPhongMaterial();
 			const mesh = new THREE.Mesh( geometry, material );
 			mesh.name = 'mesh';
-
 			while ( next ) {
 
 				if ( next.id === POINT_ARRAY ) {
 
 					const points = next.readWord();
-					this.debugMessage( '   Vertex: ' + points ); //BufferGeometry
+					this.debugMessage( '   Vertex: ' + points );
+
+					//BufferGeometry
 
 					const vertices = [];
-
 					for ( let i = 0; i < points; i ++ ) {
 
 						vertices.push( next.readFloat() );
@@ -360,10 +347,11 @@
 				} else if ( next.id === TEX_VERTS ) {
 
 					const texels = next.readWord();
-					this.debugMessage( '   UV: ' + texels ); //BufferGeometry
+					this.debugMessage( '   UV: ' + texels );
+
+					//BufferGeometry
 
 					const uvs = [];
-
 					for ( let i = 0; i < texels; i ++ ) {
 
 						uvs.push( next.readFloat() );
@@ -377,30 +365,33 @@
 
 					this.debugMessage( '   Tranformation Matrix (TODO)' );
 					const values = [];
-
 					for ( let i = 0; i < 12; i ++ ) {
 
 						values[ i ] = next.readFloat();
 
 					}
 
-					const matrix = new THREE.Matrix4(); //X Line
+					const matrix = new THREE.Matrix4();
 
+					//X Line
 					matrix.elements[ 0 ] = values[ 0 ];
 					matrix.elements[ 1 ] = values[ 6 ];
 					matrix.elements[ 2 ] = values[ 3 ];
-					matrix.elements[ 3 ] = values[ 9 ]; //Y Line
+					matrix.elements[ 3 ] = values[ 9 ];
 
+					//Y Line
 					matrix.elements[ 4 ] = values[ 2 ];
 					matrix.elements[ 5 ] = values[ 8 ];
 					matrix.elements[ 6 ] = values[ 5 ];
-					matrix.elements[ 7 ] = values[ 11 ]; //Z Line
+					matrix.elements[ 7 ] = values[ 11 ];
 
+					//Z Line
 					matrix.elements[ 8 ] = values[ 1 ];
 					matrix.elements[ 9 ] = values[ 7 ];
 					matrix.elements[ 10 ] = values[ 4 ];
-					matrix.elements[ 11 ] = values[ 10 ]; //W Line
+					matrix.elements[ 11 ] = values[ 10 ];
 
+					//W Line
 					matrix.elements[ 12 ] = 0;
 					matrix.elements[ 13 ] = 0;
 					matrix.elements[ 14 ] = 0;
@@ -425,6 +416,7 @@
 			return mesh;
 
 		}
+
 		/**
    * Read face array data chunk.
    *
@@ -432,14 +424,11 @@
    * @param {Chunk} chunk Chunk in use.
    * @param {Mesh} mesh THREE.Mesh to be filled with the data read.
    */
-
-
 		readFaceArray( chunk, mesh ) {
 
 			const faces = chunk.readWord();
 			this.debugMessage( '   Faces: ' + faces );
 			const index = [];
-
 			for ( let i = 0; i < faces; ++ i ) {
 
 				index.push( chunk.readWord(), chunk.readWord(), chunk.readWord() );
@@ -447,15 +436,15 @@
 
 			}
 
-			mesh.geometry.setIndex( index ); //The rest of the FACE_ARRAY chunk is subchunks
+			mesh.geometry.setIndex( index );
+
+			//The rest of the FACE_ARRAY chunk is subchunks
 
 			let materialIndex = 0;
 			let start = 0;
-
 			while ( ! chunk.endOfChunk ) {
 
 				const subchunk = chunk.readChunk();
-
 				if ( subchunk.id === MSH_MAT_GROUP ) {
 
 					this.debugMessage( '      Material THREE.Group' );
@@ -467,7 +456,6 @@
 					materialIndex ++;
 					const material = this.materials[ group.name ];
 					if ( Array.isArray( mesh.material ) === false ) mesh.material = [];
-
 					if ( material !== undefined ) {
 
 						mesh.material.push( material );
@@ -485,6 +473,7 @@
 			if ( mesh.material.length === 1 ) mesh.material = mesh.material[ 0 ]; // for backwards compatibility
 
 		}
+
 		/**
    * Read texture map data chunk.
    *
@@ -493,15 +482,12 @@
    * @param {String} path Path for external resources.
    * @return {Texture} Texture read from this data chunk.
    */
-
-
 		readMap( chunk, path ) {
 
 			let next = chunk.readChunk();
 			let texture = {};
 			const loader = new THREE.TextureLoader( this.manager );
 			loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
-
 			while ( next ) {
 
 				if ( next.id === MAT_MAPNAME ) {
@@ -543,6 +529,7 @@
 			return texture;
 
 		}
+
 		/**
    * Read material group data chunk.
    *
@@ -550,8 +537,6 @@
    * @param {Chunk} chunk Chunk in use.
    * @return {Object} Object with name and index of the object.
    */
-
-
 		readMaterialGroup( chunk ) {
 
 			const name = chunk.readString();
@@ -559,7 +544,6 @@
 			this.debugMessage( '         Name: ' + name );
 			this.debugMessage( '         Faces: ' + numFaces );
 			const index = [];
-
 			for ( let i = 0; i < numFaces; ++ i ) {
 
 				index.push( chunk.readWord() );
@@ -572,6 +556,7 @@
 			};
 
 		}
+
 		/**
    * Read a color value.
    *
@@ -579,13 +564,10 @@
    * @param {Chunk} chunk Chunk.
    * @return {Color} THREE.Color value read..
    */
-
-
 		readColor( chunk ) {
 
 			const subChunk = chunk.readChunk();
 			const color = new THREE.Color();
-
 			if ( subChunk.id === COLOR_24 || subChunk.id === LIN_COLOR_24 ) {
 
 				const r = subChunk.readByte();
@@ -611,6 +593,7 @@
 			return color;
 
 		}
+
 		/**
    * Read percentage value.
    *
@@ -618,22 +601,17 @@
    * @param {Chunk} chunk Chunk to read data from.
    * @return {Number} Data read from the dataview.
    */
-
-
 		readPercentage( chunk ) {
 
 			const subChunk = chunk.readChunk();
-
 			switch ( subChunk.id ) {
 
 				case INT_PERCENTAGE:
 					return subChunk.readShort() / 100;
 					break;
-
 				case FLOAT_PERCENTAGE:
 					return subChunk.readFloat();
 					break;
-
 				default:
 					this.debugMessage( '      Unknown percentage chunk: ' + subChunk.hexId );
 					return 0;
@@ -641,6 +619,7 @@
 			}
 
 		}
+
 		/**
    * Print debug message to the console.
    *
@@ -649,8 +628,6 @@
    * @method debugMessage
    * @param {Object} message Debug message to print to the console.
    */
-
-
 		debugMessage( message ) {
 
 			if ( this.debug ) {
@@ -662,9 +639,8 @@
 		}
 
 	}
+
 	/** Read data/sub-chunks from chunk */
-
-
 	class Chunk {
 
 		/**
@@ -677,13 +653,12 @@
    */
 		constructor( data, position, debugMessage ) {
 
-			this.data = data; // the offset to the begin of this chunk
-
-			this.offset = position; // the current reading position
-
+			this.data = data;
+			// the offset to the begin of this chunk
+			this.offset = position;
+			// the current reading position
 			this.position = position;
 			this.debugMessage = debugMessage;
-
 			if ( this.debugMessage instanceof Function ) {
 
 				this.debugMessage = function () {};
@@ -693,7 +668,6 @@
 			this.id = this.readWord();
 			this.size = this.readDWord();
 			this.end = this.offset + this.size;
-
 			if ( this.end > data.byteLength ) {
 
 				this.debugMessage( 'Bad chunk size for chunk at ' + position );
@@ -701,14 +675,13 @@
 			}
 
 		}
+
 		/**
    * read a sub cchunk.
    *
    * @method readChunk
    * @return {Chunk | null} next sub chunk
    */
-
-
 		readChunk() {
 
 			if ( this.endOfChunk ) {
@@ -731,33 +704,30 @@
 			}
 
 		}
+
 		/**
    * return the ID of this chunk as Hex
    *
    * @method idToString
    * @return {String} hex-string of id
    */
-
-
 		get hexId() {
 
 			return this.id.toString( 16 );
 
 		}
-
 		get endOfChunk() {
 
 			return this.position >= this.end;
 
 		}
+
 		/**
    * Read byte value.
    *
    * @method readByte
    * @return {Number} Data read from the dataview.
    */
-
-
 		readByte() {
 
 			const v = this.data.getUint8( this.position, true );
@@ -765,14 +735,13 @@
 			return v;
 
 		}
+
 		/**
    * Read 32 bit float value.
    *
    * @method readFloat
    * @return {Number} Data read from the dataview.
    */
-
-
 		readFloat() {
 
 			try {
@@ -789,14 +758,13 @@
 			}
 
 		}
+
 		/**
    * Read 32 bit signed integer value.
    *
    * @method readInt
    * @return {Number} Data read from the dataview.
    */
-
-
 		readInt() {
 
 			const v = this.data.getInt32( this.position, true );
@@ -804,14 +772,13 @@
 			return v;
 
 		}
+
 		/**
    * Read 16 bit signed integer value.
    *
    * @method readShort
    * @return {Number} Data read from the dataview.
    */
-
-
 		readShort() {
 
 			const v = this.data.getInt16( this.position, true );
@@ -819,14 +786,13 @@
 			return v;
 
 		}
+
 		/**
    * Read 64 bit unsigned integer value.
    *
    * @method readDWord
    * @return {Number} Data read from the dataview.
    */
-
-
 		readDWord() {
 
 			const v = this.data.getUint32( this.position, true );
@@ -834,14 +800,13 @@
 			return v;
 
 		}
+
 		/**
    * Read 32 bit unsigned integer value.
    *
    * @method readWord
    * @return {Number} Data read from the dataview.
    */
-
-
 		readWord() {
 
 			const v = this.data.getUint16( this.position, true );
@@ -849,19 +814,17 @@
 			return v;
 
 		}
+
 		/**
    * Read NULL terminated ASCII string value from chunk-pos.
    *
    * @method readString
    * @return {String} Data read from the dataview.
    */
-
-
 		readString() {
 
 			let s = '';
 			let c = this.readByte();
-
 			while ( c ) {
 
 				s += String.fromCharCode( c );
@@ -873,17 +836,17 @@
 
 		}
 
-	} // const NULL_CHUNK = 0x0000;
+	}
 
-
-	const M3DMAGIC = 0x4D4D; // const SMAGIC = 0x2D2D;
+	// const NULL_CHUNK = 0x0000;
+	const M3DMAGIC = 0x4D4D;
+	// const SMAGIC = 0x2D2D;
 	// const LMAGIC = 0x2D3D;
-
-	const MLIBMAGIC = 0x3DAA; // const MATMAGIC = 0x3DFF;
-
+	const MLIBMAGIC = 0x3DAA;
+	// const MATMAGIC = 0x3DFF;
 	const CMAGIC = 0xC23D;
-	const M3D_VERSION = 0x0002; // const M3D_KFVERSION = 0x0005;
-
+	const M3D_VERSION = 0x0002;
+	// const M3D_KFVERSION = 0x0005;
 	const COLOR_F = 0x0010;
 	const COLOR_24 = 0x0011;
 	const LIN_COLOR_24 = 0x0012;
@@ -892,7 +855,8 @@
 	const FLOAT_PERCENTAGE = 0x0031;
 	const MDATA = 0x3D3D;
 	const MESH_VERSION = 0x3D3E;
-	const MASTER_SCALE = 0x0100; // const LO_SHADOW_BIAS = 0x1400;
+	const MASTER_SCALE = 0x0100;
+	// const LO_SHADOW_BIAS = 0x1400;
 	// const HI_SHADOW_BIAS = 0x1410;
 	// const SHADOW_MAP_SIZE = 0x1420;
 	// const SHADOW_SAMPLES = 0x1430;
@@ -915,47 +879,47 @@
 	// const USE_FOG = 0x2201;
 	// const USE_LAYER_FOG = 0x2303;
 	// const USE_DISTANCE_CUE = 0x2301;
-
 	const MAT_ENTRY = 0xAFFF;
 	const MAT_NAME = 0xA000;
 	const MAT_AMBIENT = 0xA010;
 	const MAT_DIFFUSE = 0xA020;
 	const MAT_SPECULAR = 0xA030;
-	const MAT_SHININESS = 0xA040; // const MAT_SHIN2PCT = 0xA041;
-
-	const MAT_TRANSPARENCY = 0xA050; // const MAT_XPFALL = 0xA052;
+	const MAT_SHININESS = 0xA040;
+	// const MAT_SHIN2PCT = 0xA041;
+	const MAT_TRANSPARENCY = 0xA050;
+	// const MAT_XPFALL = 0xA052;
 	// const MAT_USE_XPFALL = 0xA240;
 	// const MAT_REFBLUR = 0xA053;
 	// const MAT_SHADING = 0xA100;
 	// const MAT_USE_REFBLUR = 0xA250;
 	// const MAT_SELF_ILLUM = 0xA084;
-
-	const MAT_TWO_SIDE = 0xA081; // const MAT_DECAL = 0xA082;
-
+	const MAT_TWO_SIDE = 0xA081;
+	// const MAT_DECAL = 0xA082;
 	const MAT_ADDITIVE = 0xA083;
-	const MAT_WIRE = 0xA085; // const MAT_FACEMAP = 0xA088;
+	const MAT_WIRE = 0xA085;
+	// const MAT_FACEMAP = 0xA088;
 	// const MAT_TRANSFALLOFF_IN = 0xA08A;
 	// const MAT_PHONGSOFT = 0xA08C;
 	// const MAT_WIREABS = 0xA08E;
-
 	const MAT_WIRE_SIZE = 0xA087;
-	const MAT_TEXMAP = 0xA200; // const MAT_SXP_TEXT_DATA = 0xA320;
+	const MAT_TEXMAP = 0xA200;
+	// const MAT_SXP_TEXT_DATA = 0xA320;
 	// const MAT_TEXMASK = 0xA33E;
 	// const MAT_SXP_TEXTMASK_DATA = 0xA32A;
 	// const MAT_TEX2MAP = 0xA33A;
 	// const MAT_SXP_TEXT2_DATA = 0xA321;
 	// const MAT_TEX2MASK = 0xA340;
 	// const MAT_SXP_TEXT2MASK_DATA = 0xA32C;
-
-	const MAT_OPACMAP = 0xA210; // const MAT_SXP_OPAC_DATA = 0xA322;
+	const MAT_OPACMAP = 0xA210;
+	// const MAT_SXP_OPAC_DATA = 0xA322;
 	// const MAT_OPACMASK = 0xA342;
 	// const MAT_SXP_OPACMASK_DATA = 0xA32E;
-
-	const MAT_BUMPMAP = 0xA230; // const MAT_SXP_BUMP_DATA = 0xA324;
+	const MAT_BUMPMAP = 0xA230;
+	// const MAT_SXP_BUMP_DATA = 0xA324;
 	// const MAT_BUMPMASK = 0xA344;
 	// const MAT_SXP_BUMPMASK_DATA = 0xA330;
-
-	const MAT_SPECMAP = 0xA204; // const MAT_SXP_SPEC_DATA = 0xA325;
+	const MAT_SPECMAP = 0xA204;
+	// const MAT_SXP_SPEC_DATA = 0xA325;
 	// const MAT_SPECMASK = 0xA348;
 	// const MAT_SXP_SPECMASK_DATA = 0xA332;
 	// const MAT_SHINMAP = 0xA33C;
@@ -970,21 +934,21 @@
 	// const MAT_REFLMASK = 0xA34C;
 	// const MAT_SXP_REFLMASK_DATA = 0xA338;
 	// const MAT_ACUBIC = 0xA310;
-
-	const MAT_MAPNAME = 0xA300; // const MAT_MAP_TILING = 0xA351;
+	const MAT_MAPNAME = 0xA300;
+	// const MAT_MAP_TILING = 0xA351;
 	// const MAT_MAP_TEXBLUR = 0xA353;
-
 	const MAT_MAP_USCALE = 0xA354;
 	const MAT_MAP_VSCALE = 0xA356;
 	const MAT_MAP_UOFFSET = 0xA358;
-	const MAT_MAP_VOFFSET = 0xA35A; // const MAT_MAP_ANG = 0xA35C;
+	const MAT_MAP_VOFFSET = 0xA35A;
+	// const MAT_MAP_ANG = 0xA35C;
 	// const MAT_MAP_COL1 = 0xA360;
 	// const MAT_MAP_COL2 = 0xA362;
 	// const MAT_MAP_RCOL = 0xA364;
 	// const MAT_MAP_GCOL = 0xA366;
 	// const MAT_MAP_BCOL = 0xA368;
-
-	const NAMED_OBJECT = 0x4000; // const N_DIRECT_LIGHT = 0x4600;
+	const NAMED_OBJECT = 0x4000;
+	// const N_DIRECT_LIGHT = 0x4600;
 	// const DL_OFF = 0x4620;
 	// const DL_OUTER_RANGE = 0x465A;
 	// const DL_INNER_RANGE = 0x4659;
@@ -1013,16 +977,15 @@
 	// const OBJ_FAST = 0x4014;
 	// const OBJ_PROCEDURAL = 0x4015;
 	// const OBJ_FROZEN = 0x4016;
-
 	const N_TRI_OBJECT = 0x4100;
-	const POINT_ARRAY = 0x4110; // const POINT_FLAG_ARRAY = 0x4111;
-
+	const POINT_ARRAY = 0x4110;
+	// const POINT_FLAG_ARRAY = 0x4111;
 	const FACE_ARRAY = 0x4120;
-	const MSH_MAT_GROUP = 0x4130; // const SMOOTH_GROUP = 0x4150;
+	const MSH_MAT_GROUP = 0x4130;
+	// const SMOOTH_GROUP = 0x4150;
 	// const MSH_BOXMAP = 0x4190;
-
 	const TEX_VERTS = 0x4140;
-	const MESH_MATRIX = 0x4160; // const MESH_COLOR = 0x4165;
+	const MESH_MATRIX = 0x4160;
 
 	THREE.TDSLoader = TDSLoader;
 

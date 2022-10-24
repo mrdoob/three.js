@@ -33,7 +33,6 @@
 		}
 
 	}
-
 	Sky.SkyShader = {
 		uniforms: {
 			'turbidity': {
@@ -55,9 +54,7 @@
 				value: new THREE.Vector3( 0, 1, 0 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 		uniform vec3 sunPosition;
 		uniform float rayleigh;
 		uniform float turbidity;
@@ -128,9 +125,7 @@
 			vBetaM = totalMie( turbidity ) * mieCoefficient;
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 		varying vec3 vWorldPosition;
 		varying vec3 vSunDirection;
 		varying float vSunfade;

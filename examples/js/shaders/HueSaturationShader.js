@@ -6,6 +6,7 @@
  * hue: -1 to 1 (-1 is 180 degrees in the negative direction, 0 is no change, etc.
  * saturation: -1 to 1 (-1 is solid gray, 0 is no change, and 1 is maximum contrast)
  */
+
 	const HueSaturationShader = {
 		uniforms: {
 			'tDiffuse': {
@@ -18,9 +19,7 @@
 				value: 0
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -31,9 +30,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 		uniform float hue;

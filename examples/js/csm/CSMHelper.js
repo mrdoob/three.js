@@ -22,7 +22,6 @@
 			this.shadowLines = [];
 
 		}
-
 		updateVisibility() {
 
 			const displayFrustum = this.displayFrustum;
@@ -32,7 +31,6 @@
 			const cascadeLines = this.cascadeLines;
 			const cascadePlanes = this.cascadePlanes;
 			const shadowLines = this.shadowLines;
-
 			for ( let i = 0, l = cascadeLines.length; i < l; i ++ ) {
 
 				const cascadeLine = cascadeLines[ i ];
@@ -47,7 +45,6 @@
 			frustumLines.visible = displayFrustum;
 
 		}
-
 		update() {
 
 			const csm = this.csm;
@@ -65,7 +62,6 @@
 			this.quaternion.copy( camera.quaternion );
 			this.scale.copy( camera.scale );
 			this.updateMatrixWorld( true );
-
 			while ( cascadeLines.length > cascades ) {
 
 				this.remove( cascadeLines.pop() );
@@ -135,6 +131,30 @@
 			frustumLinePositions.setXYZ( 6, nearVerts[ 2 ].x, nearVerts[ 2 ].y, nearVerts[ 2 ].z );
 			frustumLinePositions.setXYZ( 7, nearVerts[ 1 ].x, nearVerts[ 1 ].y, nearVerts[ 1 ].z );
 			frustumLinePositions.needsUpdate = true;
+
+		}
+		dispose() {
+
+			const frustumLines = this.frustumLines;
+			const cascadeLines = this.cascadeLines;
+			const cascadePlanes = this.cascadePlanes;
+			const shadowLines = this.shadowLines;
+			frustumLines.geometry.dispose();
+			frustumLines.material.dispose();
+			const cascades = this.csm.cascades;
+			for ( let i = 0; i < cascades; i ++ ) {
+
+				const cascadeLine = cascadeLines[ i ];
+				const cascadePlane = cascadePlanes[ i ];
+				const shadowLineGroup = shadowLines[ i ];
+				const shadowLine = shadowLineGroup.children[ 0 ];
+				cascadeLine.dispose(); // THREE.Box3Helper
+
+				cascadePlane.geometry.dispose();
+				cascadePlane.material.dispose();
+				shadowLine.dispose(); // THREE.Box3Helper
+
+			}
 
 		}
 

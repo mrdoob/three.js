@@ -8,6 +8,7 @@
  * - standard deviation 2.7
  * - "h" and "v" parameters should be set to "1 / width" and "1 / height"
  */
+
 	const HorizontalBlurShader = {
 		uniforms: {
 			'tDiffuse': {
@@ -17,9 +18,7 @@
 				value: 1.0 / 512.0
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -29,9 +28,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 		uniform float h;

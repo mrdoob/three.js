@@ -36,9 +36,7 @@
 				value: 10
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		#include <common>
 
@@ -53,9 +51,7 @@
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#include <common>
 		#include <packing>
@@ -135,7 +131,6 @@
 		createSampleWeights: function ( kernelRadius, stdDev ) {
 
 			const weights = [];
-
 			for ( let i = 0; i <= kernelRadius; i ++ ) {
 
 				weights.push( gaussian( i, stdDev ) );
@@ -148,7 +143,6 @@
 		createSampleOffsets: function ( kernelRadius, uvIncrement ) {
 
 			const offsets = [];
-
 			for ( let i = 0; i <= kernelRadius; i ++ ) {
 
 				offsets.push( uvIncrement.clone().multiplyScalar( i ) );
@@ -167,7 +161,6 @@
 
 		}
 	};
-
 	function gaussian( x, stdDev ) {
 
 		return Math.exp( - ( x * x ) / ( 2.0 * ( stdDev * stdDev ) ) ) / ( Math.sqrt( 2.0 * Math.PI ) * stdDev );

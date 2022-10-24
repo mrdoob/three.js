@@ -1,0 +1,287 @@
+{
+    "extensionsUsed" : [
+	    "EXT_mesh_gpu_instancing"
+    ],
+    "extensionsRequired" : [
+	    "EXT_mesh_gpu_instancing"
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5123,
+            "count" : 46356,
+            "max" : [
+                14555
+            ],
+            "min" : [
+                0
+            ],
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 14556,
+            "max" : [
+                0.9424954056739807,
+                0.8128451108932495,
+                0.900973916053772
+            ],
+            "min" : [
+                -0.9474585652351379,
+                -1.18715500831604,
+                -0.9009949564933777
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 14556,
+            "max" : [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "min" : [
+                -1.0,
+                -1.0,
+                -1.0
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 14556,
+            "max" : [
+                0.9999759793281555,
+                1.998665988445282
+            ],
+            "min" : [
+                0.002448640065267682,
+                1.0005531199858524
+            ],
+            "type" : "VEC2"
+        },
+	{
+	    "bufferView" : 4,
+	    "componentType" : 5126,
+	    "count" : 64,
+	    "type" : "VEC3",
+	    "max" : [
+		8.0,
+		8.0,
+		0.0
+	    ],
+	    "min" : [
+		0.0,
+		0.0,
+		0.0
+	    ]
+	},
+	{
+	    "bufferView" : 5,
+	    "componentType" : 5126,
+	    "count" : 64,
+	    "type" : "VEC4"
+	},
+	{
+	    "bufferView" : 6,
+	    "componentType" : 5126,
+	    "count" : 64,
+	    "type" : "VEC3",
+	    "max" : [
+		0.125,
+		0.125,
+		0.125
+	    ],
+	    "min" : [
+		0.0,
+		0.0,
+		0.0
+	    ]
+	}
+    ],
+    "asset" : {
+        "generator" : "Khronos Blender glTF 2.0 exporter",
+        "version" : "2.0"
+    },
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 92712,
+            "byteOffset" : 0,
+            "target" : 34963
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 174672,
+            "byteOffset" : 92712,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 174672,
+            "byteOffset" : 267384,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 116448,
+            "byteOffset" : 442056,
+            "target" : 34962
+        },
+	{
+	    "buffer": 1,
+	    "byteOffset": 0,
+	    "byteLength": 768,
+	    "name": "gpuInstancingTranslation"
+	},
+	{
+	    "buffer": 2,
+	    "byteOffset": 0,
+	    "byteLength": 1024,
+	    "name": "gpuInstancingRotation"
+	},
+	{
+	    "buffer": 3,
+	    "byteOffset": 0,
+	    "byteLength": 768,
+	    "name": "gpuInstancingScale"
+	}
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 558504,
+            "uri" : "../glTF/DamagedHelmet.bin"
+        },
+	{
+	    "uri": "GpuInstancingTranslation.bin",
+	    "byteLength": 768
+	},
+	{
+	    "uri": "GpuInstancingRotation.bin",
+	    "byteLength": 1024
+	},
+	{
+	    "uri": "GpuInstancingScale.bin",
+	    "byteLength": 768
+	}
+    ],
+    "images" : [
+        {
+            "uri" : "../glTF/Default_albedo.jpg"
+        },
+        {
+            "uri" : "../glTF/Default_metalRoughness.jpg"
+        },
+        {
+            "uri" : "../glTF/Default_emissive.jpg"
+        },
+        {
+            "uri" : "../glTF/Default_AO.jpg"
+        },
+        {
+            "uri" : "../glTF/Default_normal.jpg"
+        }
+    ],
+    "materials" : [
+        {
+            "emissiveFactor" : [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "emissiveTexture" : {
+                "index" : 2
+            },
+            "name" : "Material_MR",
+            "normalTexture" : {
+                "index" : 4
+            },
+            "occlusionTexture" : {
+                "index" : 3
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 0
+                },
+                "metallicRoughnessTexture" : {
+                    "index" : 1
+                }
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "mesh_helmet_LP_13930damagedHelmet",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "NORMAL" : 2,
+                        "POSITION" : 1,
+                        "TEXCOORD_0" : 3
+                    },
+                    "indices" : 0,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+	    "extensions" : {
+	      "EXT_mesh_gpu_instancing" : {
+		"attributes" : {
+		  "TRANSLATION" : 4,
+		  "ROTATION" : 5,
+		  "SCALE" : 6
+		}
+	      }
+	    },
+            "mesh" : 0,
+            "name" : "node_damagedHelmet_-6514",
+            "rotation" : [
+                0.7071068286895752,
+                0.0,
+                -0.0,
+                0.7071068286895752
+            ]
+        }
+    ],
+    "samplers" : [
+        {}
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        },
+        {
+            "sampler" : 0,
+            "source" : 2
+        },
+        {
+            "sampler" : 0,
+            "source" : 3
+        },
+        {
+            "sampler" : 0,
+            "source" : 4
+        }
+    ]
+}

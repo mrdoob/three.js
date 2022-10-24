@@ -30,10 +30,7 @@
 			this.cubeScene.add( this.cubeMesh );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive*/
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive*/ ) {
 
 			const oldAutoClear = renderer.autoClear;
 			renderer.autoClear = false;
@@ -47,6 +44,12 @@
 			if ( this.clear ) renderer.clear();
 			renderer.render( this.cubeScene, this.cubeCamera );
 			renderer.autoClear = oldAutoClear;
+
+		}
+		dispose() {
+
+			this.cubeMesh.geometry.dispose();
+			this.cubeMesh.material.dispose();
 
 		}
 

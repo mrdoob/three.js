@@ -16,15 +16,11 @@
 			this._oldClearColor = new THREE.Color();
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive */
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 			const oldAutoClear = renderer.autoClear;
 			renderer.autoClear = false;
 			let oldClearAlpha, oldOverrideMaterial;
-
 			if ( this.overrideMaterial !== undefined ) {
 
 				oldOverrideMaterial = this.scene.overrideMaterial;
@@ -46,11 +42,11 @@
 
 			}
 
-			renderer.setRenderTarget( this.renderToScreen ? null : readBuffer ); // TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
+			renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
 
+			// TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
 			if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
 			renderer.render( this.scene, this.camera );
-
 			if ( this.clearColor ) {
 
 				renderer.setClearColor( this._oldClearColor, oldClearAlpha );

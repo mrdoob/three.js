@@ -14,7 +14,6 @@
  */
 
 	const _taskCache = new WeakMap();
-
 	class BasisTextureLoader extends THREE.Loader {
 
 		constructor( manager ) {
@@ -31,21 +30,18 @@
 			console.warn( 'THREE.BasisTextureLoader: This loader is deprecated, and will be removed in a future release. ' + 'Instead, use Basis Universal compression in KTX2 (.ktx2) files with THREE.KTX2Loader.' );
 
 		}
-
 		setTranscoderPath( path ) {
 
 			this.transcoderPath = path;
 			return this;
 
 		}
-
 		setWorkerLimit( workerLimit ) {
 
 			this.workerLimit = workerLimit;
 			return this;
 
 		}
-
 		detectSupport( renderer ) {
 
 			this.workerConfig = {
@@ -59,7 +55,6 @@
 			return this;
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const loader = new THREE.FileLoader( this.manager );
@@ -73,7 +68,6 @@
 				if ( _taskCache.has( buffer ) ) {
 
 					const cachedTask = _taskCache.get( buffer );
-
 					return cachedTask.promise.then( onLoad ).catch( onError );
 
 				}
@@ -90,41 +84,38 @@
 			return texture;
 
 		}
+
 		/** Low-level transcoding API, exposed for use by KTX2Loader. */
-
-
 		parseInternalAsync( options ) {
 
 			const {
 				levels
 			} = options;
 			const buffers = new Set();
-
 			for ( let i = 0; i < levels.length; i ++ ) {
 
 				buffers.add( levels[ i ].data.buffer );
 
 			}
 
-			return this._createTexture( Array.from( buffers ), { ...options,
+			return this._createTexture( Array.from( buffers ), {
+				...options,
 				lowLevel: true
 			} );
 
 		}
+
 		/**
    * @param {ArrayBuffer[]} buffers
    * @param {object?} config
    * @return {Promise<CompressedTexture>}
    */
-
-
 		_createTexture( buffers, config = {} ) {
 
 			let worker;
 			let taskID;
 			const taskConfig = config;
 			let taskCost = 0;
-
 			for ( let i = 0; i < buffers.length; i ++ ) {
 
 				taskCost += buffers[ i ].byteLength;
@@ -165,9 +156,9 @@
 				texture.needsUpdate = true;
 				return texture;
 
-			} ); // Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
+			} );
 
-
+			// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 			texturePending.catch( () => true ).then( () => {
 
 				if ( worker && taskID ) {
@@ -177,16 +168,15 @@
 
 				}
 
-			} ); // Cache the task result.
+			} );
 
+			// Cache the task result.
 			_taskCache.set( buffers[ 0 ], {
 				promise: texturePending
 			} );
-
 			return texturePending;
 
 		}
-
 		_initTranscoder() {
 
 			if ( ! this.transcoderPending ) {
@@ -199,8 +189,9 @@
 
 					jsLoader.load( 'basis_transcoder.js', resolve, undefined, reject );
 
-				} ); // Load transcoder WASM binary.
+				} );
 
+				// Load transcoder WASM binary.
 				const binaryLoader = new THREE.FileLoader( this.manager );
 				binaryLoader.setPath( this.transcoderPath );
 				binaryLoader.setResponseType( 'arraybuffer' );
@@ -224,7 +215,6 @@
 			return this.transcoderPending;
 
 		}
-
 		_allocateWorker( taskCost ) {
 
 			return this._initTranscoder().then( () => {
@@ -239,23 +229,17 @@
 						config: this.workerConfig,
 						transcoderBinary: this.transcoderBinary
 					} );
-
 					worker.onmessage = function ( e ) {
 
 						const message = e.data;
-
 						switch ( message.type ) {
 
 							case 'transcode':
 								worker._callbacks[ message.id ].resolve( message );
-
 								break;
-
 							case 'error':
 								worker._callbacks[ message.id ].reject( message );
-
 								break;
-
 							default:
 								console.error( 'THREE.BasisTextureLoader: Unexpected message, "' + message.type + '"' );
 
@@ -282,7 +266,6 @@
 			} );
 
 		}
-
 		dispose() {
 
 			for ( let i = 0; i < this.workerPool.length; i ++ ) {
@@ -297,8 +280,8 @@
 		}
 
 	}
-	/* CONSTANTS */
 
+	/* CONSTANTS */
 
 	BasisTextureLoader.BasisFormat = {
 		ETC1S: 0,
@@ -335,6 +318,7 @@
 		RGB_PVRTC_4BPPV1_Format: THREE.RGB_PVRTC_4BPPV1_Format,
 		RGB_S3TC_DXT1_Format: THREE.RGB_S3TC_DXT1_Format
 	};
+
 	/* WEB WORKER */
 
 	BasisTextureLoader.BasisWorker = function () {
@@ -343,22 +327,18 @@
 		let transcoderPending;
 		let BasisModule;
 		const EngineFormat = _EngineFormat; // eslint-disable-line no-undef
-
 		const TranscoderFormat = _TranscoderFormat; // eslint-disable-line no-undef
-
 		const BasisFormat = _BasisFormat; // eslint-disable-line no-undef
 
 		onmessage = function ( e ) {
 
 			const message = e.data;
-
 			switch ( message.type ) {
 
 				case 'init':
 					config = message.config;
 					init( message.transcoderBinary );
 					break;
-
 				case 'transcode':
 					transcoderPending.then( () => {
 
@@ -372,7 +352,6 @@
 								format
 							} = message.taskConfig.lowLevel ? transcodeLowLevel( message.taskConfig ) : transcode( message.buffers[ 0 ] );
 							const buffers = [];
-
 							for ( let i = 0; i < mipmaps.length; ++ i ) {
 
 								buffers.push( mipmaps[ i ].data.buffer );
@@ -440,7 +419,6 @@
 			const blockByteLength = BasisModule.getBytesPerBlockOrPixel( transcoderFormat );
 			assert( BasisModule.isFormatSupported( transcoderFormat ), 'THREE.BasisTextureLoader: Unsupported format.' );
 			const mipmaps = [];
-
 			if ( basisFormat === BasisFormat.ETC1S ) {
 
 				const transcoder = new BasisModule.LowLevelETC1SImageTranscoder();
@@ -451,7 +429,6 @@
 					selectorsData,
 					tablesData
 				} = taskConfig.globalData;
-
 				try {
 
 					let ok;
@@ -459,7 +436,6 @@
 					assert( ok, 'THREE.BasisTextureLoader: decodePalettes() failed.' );
 					ok = transcoder.decodeTables( tablesData );
 					assert( ok, 'THREE.BasisTextureLoader: decodeTables() failed.' );
-
 					for ( let i = 0; i < taskConfig.levels.length; i ++ ) {
 
 						const level = taskConfig.levels[ i ];
@@ -519,7 +495,6 @@
 			const height = basisFile.getImageHeight( 0, 0 );
 			const levels = basisFile.getNumLevels( 0 );
 			const hasAlpha = basisFile.getHasAlpha();
-
 			function cleanup() {
 
 				basisFile.close();
@@ -531,7 +506,6 @@
 				transcoderFormat,
 				engineFormat
 			} = getTranscoderFormat( basisFormat, width, height, hasAlpha );
-
 			if ( ! width || ! height || ! levels ) {
 
 				cleanup();
@@ -547,14 +521,12 @@
 			}
 
 			const mipmaps = [];
-
 			for ( let mip = 0; mip < levels; mip ++ ) {
 
 				const mipWidth = basisFile.getImageWidth( 0, mip );
 				const mipHeight = basisFile.getImageHeight( 0, mip );
 				const dst = new Uint8Array( basisFile.getImageTranscodedSizeInBytes( 0, mip, transcoderFormat ) );
 				const status = basisFile.transcodeImage( dst, 0, mip, transcoderFormat, 0, hasAlpha );
-
 				if ( ! status ) {
 
 					cleanup();
@@ -579,7 +551,10 @@
 				format: engineFormat
 			};
 
-		} //
+		}
+
+		//
+
 		// Optimal choice of a transcoder target format depends on the Basis format (ETC1S or UASTC),
 		// device capabilities, and texture dimensions. The list below ranks the formats separately
 		// for ETC1S and UASTC.
@@ -587,8 +562,6 @@
 		// In some cases, transcoding UASTC to RGBA32 might be preferred for higher quality (at
 		// significant memory cost) compared to ETC1/2, BC1/3, and PVRTC. The transcoder currently
 		// chooses RGBA32 only as a last resort and does not expose that option to the caller.
-
-
 		const FORMAT_OPTIONS = [ {
 			if: 'astcSupported',
 			basisFormat: [ BasisFormat.UASTC_4x4 ],
@@ -648,13 +621,11 @@
 			return a.priorityUASTC - b.priorityUASTC;
 
 		} );
-
 		function getTranscoderFormat( basisFormat, width, height, hasAlpha ) {
 
 			let transcoderFormat;
 			let engineFormat;
 			const options = basisFormat === BasisFormat.ETC1S ? ETC1S_OPTIONS : UASTC_OPTIONS;
-
 			for ( let i = 0; i < options.length; i ++ ) {
 
 				const opt = options[ i ];
@@ -701,7 +672,6 @@
 		function getTranscodedImageByteLength( transcoderFormat, width, height ) {
 
 			const blockByteLength = BasisModule.getBytesPerBlockOrPixel( transcoderFormat );
-
 			if ( BasisModule.formatIsUncompressed( transcoderFormat ) ) {
 
 				return width * height * blockByteLength;

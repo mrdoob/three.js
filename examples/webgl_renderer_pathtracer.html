@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - three-gpu-pathtracer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #444;
+				background-color: white;
+			}
+
+			a {
+				color: #fb8c00;
+			}
+
+			#samples-container {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				font-family: 'Courier New', Courier, monospace;
+				color: white;
+				pointer-events: none;
+			}
+
+			#samples {
+
+				background-color: rgba( 0.0, 0.0, 0.0, 0.75 );
+				padding: 5px;
+				display: inline-block;
+
+			}
+
+			.checkerboard {
+				background-image:
+					linear-gradient(45deg, #ddd 25%, transparent 25%),
+					linear-gradient(-45deg, #ddd 25%, transparent 25%),
+					linear-gradient(45deg, transparent 75%, #ddd 75%),
+					linear-gradient(-45deg, transparent 75%, #ddd 75%);
+				background-size: 20px 20px;
+				background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> pathtracer - <a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">three-gpu-pathtracer</a><br/>
+			See <a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">main project repository</a> for more information and examples on high fidelity path tracing.
+		</div>
+		<div id="samples-container">
+			<div id="samples">--</div>
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/examples/": "./",
+					"three-gpu-pathtracer": "https://unpkg.com/three-gpu-pathtracer@0.0.7/build/index.module.js",
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@^0.5.10/build/index.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
+			import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';
+			import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+
+			import { PhysicalPathTracingMaterial, PathTracingRenderer, MaterialReducer, BlurredEnvMapGenerator, PathTracingSceneGenerator } from 'three-gpu-pathtracer';
+
+			let container, progressBarDiv, samplesEl;
+			let camera, scene, renderer, controls, gui;
+			let pathTracer, sceneInfo, fsQuad, floor;
+			let delaySamples = 0;
+
+			const params = {
+				enable: true,
+				toneMapping: true,
+				pause: false,
+				tiles: 3,
+				transparentBackground: false,
+				resolutionScale: 1,
+				download: () => {
+
+					const link = document.createElement('a');
+					link.download = 'pathtraced-render.png';
+					link.href = renderer.domElement.toDataURL().replace( 'image/png', 'image/octet-stream' );
+					link.click();
+
+				},
+				roughness: 0.15,
+				metalness: 0.9,
+			};
+
+			init();
+			render();
+
+			function init() {
+
+				samplesEl = document.getElementById( 'samples' );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 150, 200, 250 );
+
+				// initialize the renderer
+				renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true, premultipliedAlpha: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.setClearColor( 0xdddddd );
+				document.body.appendChild( renderer.domElement );
+
+				// initialize the pathtracer
+				pathTracer = new PathTracingRenderer( renderer );
+				pathTracer.alpha = true;
+				pathTracer.tiles.set( params.tiles, params.tiles );
+				pathTracer.material = new PhysicalPathTracingMaterial();
+				pathTracer.material.setDefine( 'FEATURE_GRADIENT_BG', 1 );
+				pathTracer.material.setDefine( 'FEATURE_MIS', 1 );
+				pathTracer.material.bgGradientTop.set( 0xeeeeee );
+				pathTracer.material.bgGradientBottom.set( 0xeaeaea );
+				pathTracer.camera = camera;
+
+				fsQuad = new FullScreenQuad( new THREE.MeshBasicMaterial( {
+					map: pathTracer.target.texture,
+					blending: THREE.CustomBlending
+				} ) );
+
+				// scene
+				scene = new THREE.Scene();
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', () => {
+
+					delaySamples = 5;
+					pathTracer.reset();
+
+				} );
+
+				window.addEventListener( 'resize', onWindowResize );
+				onWindowResize();
+
+				progressBarDiv = document.createElement( 'div' );
+				progressBarDiv.innerText = 'Loading...';
+				progressBarDiv.style.fontSize = '3em';
+				progressBarDiv.style.color = '#888';
+				progressBarDiv.style.display = 'block';
+				progressBarDiv.style.position = 'absolute';
+				progressBarDiv.style.top = '50%';
+				progressBarDiv.style.width = '100%';
+				progressBarDiv.style.textAlign = 'center';
+
+				// load materials and then the model
+				createGUI();
+
+				loadModel();
+
+			}
+
+			async function loadModel() {
+
+				progressBarDiv.innerText = 'Loading...';
+
+				let model = null;
+				let envMap = null;
+
+				updateProgressBar( 0 );
+				showProgressBar();
+				
+				// only smooth when not rendering with flat colors to improve processing time
+				const ldrawPromise = 
+					new LDrawLoader()
+						.setPath( 'models/ldraw/officialLibrary/' )
+						.loadAsync( 'models/7140-1-X-wingFighter.mpd_Packed.mpd', onProgress )
+						.then( function ( legoGroup ) {
+
+							legoGroup = LDrawUtils.mergeObject( legoGroup );
+							legoGroup.rotation.x = Math.PI;
+
+							model = new THREE.Group();
+							model.add( legoGroup );
+
+							// Convert from LDraw coordinates: rotate 180 degrees around OX
+							model.updateMatrixWorld();
+
+						} )
+						.catch( onError );
+
+				const envMapPromise =
+					new RGBELoader()
+						.setPath( 'textures/equirectangular/' )
+						.loadAsync( 'royal_esplanade_1k.hdr' )
+						.then( tex => {
+
+							const envMapGenerator = new BlurredEnvMapGenerator( renderer );
+							const blurredEnvMap = envMapGenerator.generate( tex, 0 );
+
+							scene.environment = blurredEnvMap;
+							envMap = blurredEnvMap;
+
+						} );
+
+				await Promise.all( [ envMapPromise, ldrawPromise ] );
+
+				hideProgressBar();
+				document.body.classList.add( 'checkerboard' );
+
+				// Adjust camera
+				const bbox = new THREE.Box3().setFromObject( model );
+				const size = bbox.getSize( new THREE.Vector3() );
+				const radius = Math.max( size.x, Math.max( size.y, size.z ) ) * 0.4;
+
+				controls.target0.copy( bbox.getCenter( new THREE.Vector3() ) );
+				controls.position0.set( 2.3, 1, 2 ).multiplyScalar( radius ).add( controls.target0 );
+				controls.reset();
+
+				// add floor
+				floor = new THREE.Mesh(
+					new THREE.PlaneGeometry(),
+					new THREE.MeshStandardMaterial( {
+						side: THREE.DoubleSide,
+						roughness: 0.01,
+						metalness: 1,
+						map: generateRadialFloorTexture( 1024 ),
+						transparent: true,
+					} ),
+				);
+				floor.scale.setScalar( 2500 );
+				floor.rotation.x = - Math.PI / 2;
+				floor.position.y = bbox.min.y;
+				model.add( floor );
+				model.updateMatrixWorld();
+
+				// de-duplicate and reduce the number of materials used in place
+				const reducer = new MaterialReducer();
+				reducer.process( model );
+
+				// reset the progress bar to display bvh generation
+				progressBarDiv.innerText = 'Generating BVH...';
+				updateProgressBar( 0 );
+
+				const generator = new PathTracingSceneGenerator();
+				const result = generator.generate( model );
+
+				// add the model to the scene
+				sceneInfo = result;
+				sceneInfo.scene.traverse( c => {
+
+					if ( c.isLineSegments ) {
+
+						c.visible = false;
+
+					}
+
+				} );
+				scene.add( sceneInfo.scene );
+
+				// update the material
+				const { bvh, textures, materials } = result;
+				const geometry = bvh.geometry;
+				const material = pathTracer.material;
+
+				material.bvh.updateFrom( bvh );
+				material.normalAttribute.updateFrom( geometry.attributes.normal );
+				material.tangentAttribute.updateFrom( geometry.attributes.tangent );
+				material.uvAttribute.updateFrom( geometry.attributes.uv );
+				material.materialIndexAttribute.updateFrom( geometry.attributes.materialIndex );
+				// material.colorAttribute.updateFrom( geometry.attributes.color );
+				material.textures.setTextures( renderer, 2048, 2048, textures );
+				material.materials.updateFrom( materials, textures );
+				pathTracer.material.envMapInfo.updateFrom( envMap );
+				pathTracer.reset();
+
+			}
+
+			function onWindowResize() {
+
+				const w = window.innerWidth;
+				const h = window.innerHeight;
+				const scale = params.resolutionScale;
+				const dpr = window.devicePixelRatio;
+
+				pathTracer.setSize( w * scale * dpr, h * scale * dpr );
+				pathTracer.reset();
+
+				renderer.setSize( w, h );
+				renderer.setPixelRatio( window.devicePixelRatio * scale );
+
+				const aspect = w / h;
+				camera.aspect = aspect;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function createGUI() {
+
+				if ( gui ) {
+
+					gui.destroy();
+
+				}
+
+				gui = new GUI();
+				gui.add( params, 'enable' );
+				gui.add( params, 'pause' );
+				gui.add( params, 'toneMapping' );
+				gui.add( params, 'transparentBackground' ).onChange( v => {
+
+					pathTracer.material.backgroundAlpha = v ? 0 : 1;
+					renderer.setClearAlpha( v ? 0 : 1 );
+					pathTracer.reset();
+
+				} );
+				gui.add( params, 'resolutionScale', 0.1, 1.0 ).onChange( onWindowResize );
+				gui.add( params, 'tiles', 1, 3, 1 ).onChange( v => {
+
+					pathTracer.tiles.set( v, v );
+
+				} );
+				gui.add( params, 'roughness', 0, 1 ).name( 'floor roughness' ).onChange( () => {
+
+					pathTracer.reset();
+
+				} );
+				gui.add( params, 'metalness', 0, 1 ).name( 'floor metalness' ).onChange( () => {
+
+					pathTracer.reset();
+
+				} );
+				gui.add( params, 'download' ).name( 'download image' );
+
+
+			}
+
+			//
+
+			function render() {
+
+				requestAnimationFrame( render );
+
+				if ( ! sceneInfo ) {
+
+					return;
+
+				}
+
+				renderer.toneMapping = params.toneMapping ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
+
+				if ( pathTracer.samples < 1.0 || ! params.enable ) {
+
+					renderer.render( scene, camera );
+
+				}
+
+				if ( params.enable && delaySamples === 0 ) {
+
+					const samples = Math.floor( pathTracer.samples );
+					samplesEl.innerText = `samples: ${ samples }`;
+
+					floor.material.roughness = params.roughness;
+					floor.material.metalness = params.metalness;
+
+					pathTracer.material.materials.updateFrom( sceneInfo.materials, sceneInfo.textures );
+					pathTracer.material.filterGlossyFactor = 0.5;
+					pathTracer.material.physicalCamera.updateFrom( camera );
+
+					camera.updateMatrixWorld();
+
+					if ( ! params.pause || pathTracer.samples < 1 ) {
+
+						pathTracer.update();
+
+					}
+
+					renderer.autoClear = false;
+					fsQuad.render( renderer );
+					renderer.autoClear = true;
+
+				} else if ( delaySamples > 0 ) {
+
+					delaySamples --;
+
+				}
+
+				samplesEl.innerText = `samples: ${ Math.floor( pathTracer.samples ) }`;
+
+			}
+
+			function onProgress( xhr ) {
+
+				if ( xhr.lengthComputable ) {
+
+					updateProgressBar( xhr.loaded / xhr.total );
+
+					console.log( Math.round( xhr.loaded / xhr.total * 100, 2 ) + '% downloaded' );
+
+				}
+
+			}
+
+			function onError( error ) {
+
+				const message = 'Error loading model';
+				progressBarDiv.innerText = message;
+				console.log( message );
+				console.error( error );
+
+			}
+
+			function showProgressBar() {
+
+				document.body.appendChild( progressBarDiv );
+
+			}
+
+			function hideProgressBar() {
+
+				document.body.removeChild( progressBarDiv );
+
+			}
+
+			function updateProgressBar( fraction ) {
+
+				progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
+
+			}
+
+			function generateRadialFloorTexture( dim ) {
+
+				const data = new Uint8Array( dim * dim * 4 );
+
+				for ( let x = 0; x < dim; x ++ ) {
+
+					for ( let y = 0; y < dim; y ++ ) {
+
+						const xNorm = x / ( dim - 1 );
+						const yNorm = y / ( dim - 1 );
+
+						const xCent = 2.0 * ( xNorm - 0.5 );
+						const yCent = 2.0 * ( yNorm - 0.5 );
+						let a = Math.max( Math.min( 1.0 - Math.sqrt( xCent ** 2 + yCent ** 2 ), 1.0 ), 0.0 );
+						a = a ** 1.5;
+						a = a * 1.5;
+						a = Math.min( a, 1.0 );
+
+						const i = y * dim + x;
+						data[ i * 4 + 0 ] = 255;
+						data[ i * 4 + 1 ] = 255;
+						data[ i * 4 + 2 ] = 255;
+						data[ i * 4 + 3 ] = a * 255;
+
+					}
+
+				}
+
+				const tex = new THREE.DataTexture( data, dim, dim );
+				tex.format = THREE.RGBAFormat;
+				tex.type = THREE.UnsignedByteType;
+				tex.minFilter = THREE.LinearFilter;
+				tex.magFilter = THREE.LinearFilter;
+				tex.wrapS = THREE.RepeatWrapping;
+				tex.wrapT = THREE.RepeatWrapping;
+				tex.needsUpdate = true;
+				return tex;
+
+			}
+
+		</script>
+
+		<!-- LDraw.org CC BY 2.0 Parts Library attribution -->
+		<div style="display: block; position: absolute; bottom: 8px; left: 8px; width: 160px; padding: 10px; background-color: #F3F7F8;">
+			<center>
+				<a href="http://www.ldraw.org"><img style="width: 145px" src="models/ldraw/ldraw_org_logo/Stamp145.png"></a>
+				<br />
+				<a href="http://www.ldraw.org/">This software uses the LDraw Parts Library</a>
+			</center>
+		</div>
+
+	</body>
+</html>

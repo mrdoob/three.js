@@ -1,9 +1,7 @@
 ( function () {
 
 	const _box = new THREE.Box3();
-
 	const _vector = new THREE.Vector3();
-
 	class LineSegmentsGeometry extends THREE.InstancedBufferGeometry {
 
 		constructor() {
@@ -19,12 +17,10 @@
 			this.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 		}
-
 		applyMatrix4( matrix ) {
 
 			const start = this.attributes.instanceStart;
 			const end = this.attributes.instanceEnd;
-
 			if ( start !== undefined ) {
 
 				start.applyMatrix4( matrix );
@@ -48,11 +44,9 @@
 			return this;
 
 		}
-
 		setPositions( array ) {
 
 			let lineSegments;
-
 			if ( array instanceof Float32Array ) {
 
 				lineSegments = array;
@@ -66,8 +60,8 @@
 			const instanceBuffer = new THREE.InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
 
 			this.setAttribute( 'instanceStart', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
-
 			this.setAttribute( 'instanceEnd', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
+
 			//
 
 			this.computeBoundingBox();
@@ -75,11 +69,9 @@
 			return this;
 
 		}
-
 		setColors( array ) {
 
 			let colors;
-
 			if ( array instanceof Float32Array ) {
 
 				colors = array;
@@ -93,45 +85,42 @@
 			const instanceColorBuffer = new THREE.InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
 
 			this.setAttribute( 'instanceColorStart', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
-
 			this.setAttribute( 'instanceColorEnd', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
 
 			return this;
 
 		}
-
 		fromWireframeGeometry( geometry ) {
 
 			this.setPositions( geometry.attributes.position.array );
 			return this;
 
 		}
-
 		fromEdgesGeometry( geometry ) {
 
 			this.setPositions( geometry.attributes.position.array );
 			return this;
 
 		}
-
 		fromMesh( mesh ) {
 
-			this.fromWireframeGeometry( new THREE.WireframeGeometry( mesh.geometry ) ); // set colors, maybe
+			this.fromWireframeGeometry( new THREE.WireframeGeometry( mesh.geometry ) );
 
-			return this;
-
-		}
-
-		fromLineSegments( lineSegments ) {
-
-			const geometry = lineSegments.geometry;
-			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
 			// set colors, maybe
 
 			return this;
 
 		}
+		fromLineSegments( lineSegments ) {
 
+			const geometry = lineSegments.geometry;
+			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
+
+			// set colors, maybe
+
+			return this;
+
+		}
 		computeBoundingBox() {
 
 			if ( this.boundingBox === null ) {
@@ -142,19 +131,15 @@
 
 			const start = this.attributes.instanceStart;
 			const end = this.attributes.instanceEnd;
-
 			if ( start !== undefined && end !== undefined ) {
 
 				this.boundingBox.setFromBufferAttribute( start );
-
 				_box.setFromBufferAttribute( end );
-
 				this.boundingBox.union( _box );
 
 			}
 
 		}
-
 		computeBoundingSphere() {
 
 			if ( this.boundingSphere === null ) {
@@ -171,27 +156,21 @@
 
 			const start = this.attributes.instanceStart;
 			const end = this.attributes.instanceEnd;
-
 			if ( start !== undefined && end !== undefined ) {
 
 				const center = this.boundingSphere.center;
 				this.boundingBox.getCenter( center );
 				let maxRadiusSq = 0;
-
 				for ( let i = 0, il = start.count; i < il; i ++ ) {
 
 					_vector.fromBufferAttribute( start, i );
-
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
-
 					_vector.fromBufferAttribute( end, i );
-
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
 
 				}
 
 				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
 				if ( isNaN( this.boundingSphere.radius ) ) {
 
 					console.error( 'THREE.LineSegmentsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
@@ -201,10 +180,10 @@
 			}
 
 		}
+		toJSON() {
 
-		toJSON() { // todo
+			// todo
 		}
-
 		applyMatrix( matrix ) {
 
 			console.warn( 'THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().' );
