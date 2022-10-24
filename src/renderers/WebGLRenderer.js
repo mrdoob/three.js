@@ -123,22 +123,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	// physically based shading
 
-	let _outputEncoding = LinearEncoding;
-
-	Object.defineProperty( this, 'outputEncoding', {
-
-		get: () => _outputEncoding,
-
-		set: ( encoding ) => {
-
-			_outputEncoding = encoding;
-
-			// Reapply color space conversion.
-			background.setClearColor( background.getClearColor() );
-
-		},
-
-	} );
+	this.outputEncoding = LinearEncoding;
 
 	// physical lights
 
@@ -1510,7 +1495,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
-		const encoding = ( _currentRenderTarget === null ) ? _outputEncoding : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.encoding : LinearEncoding );
+		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.encoding : LinearEncoding );
 		const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 		const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 		const vertexTangents = !! material.normalMap && !! geometry.attributes.tangent;

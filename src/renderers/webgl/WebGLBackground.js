@@ -1,11 +1,11 @@
-import { BackSide, FrontSide, CubeUVReflectionMapping, sRGBEncoding, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { BackSide, FrontSide, CubeUVReflectionMapping } from '../../constants.js';
 import { BoxGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
-import { cloneUniforms } from '../shaders/UniformsUtils.js';
+import { cloneUniforms, getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
 const _rgb = { r: 0, b: 0, g: 0 };
 
@@ -193,11 +193,7 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 	function setClear( color, alpha ) {
 
-		const outputColorSpace = renderer.outputEncoding === sRGBEncoding
-			? SRGBColorSpace
-			: LinearSRGBColorSpace;
-
-		color.getRGB( _rgb, outputColorSpace );
+		color.getRGB( _rgb, getUnlitUniformColorSpace( renderer ) );
 
 		state.buffers.color.setClear( _rgb.r, _rgb.g, _rgb.b, alpha, premultipliedAlpha );
 
