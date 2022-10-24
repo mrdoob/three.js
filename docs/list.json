@@ -1580,7 +1580,7 @@
 
 			"Приступая к работе": {
 				"Создание сцены": "manual/ru/introduction/Creating-a-scene",
-				"Installation": "manual/en/introduction/Installation",
+				"Установка": "manual/ru/introduction/Installation",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
