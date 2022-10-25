@@ -55,7 +55,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( object.instanceMatrix?.isInstancedBufferAttribute === true && builder.isAvailable( 'instance' ) === true ) {
+		if ( object.instanceAttributes?.instanceMatrix?.isInstancedBufferAttribute === true && builder.isAvailable( 'instance' ) === true ) {
 
 			vertex = bypass( vertex, instance( object ) );
 

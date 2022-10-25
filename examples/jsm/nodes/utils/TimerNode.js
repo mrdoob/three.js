@@ -18,7 +18,7 @@ class TimerNode extends UniformNode {
 		this.updateType = NodeUpdateType.FRAME;
 
 	}
-/*
+	/*
 	@TODO:
 	getNodeType( builder ) {
 

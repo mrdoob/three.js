@@ -97,7 +97,7 @@
 				resolutionScale: 1,
 				download: () => {
 
-					const link = document.createElement('a');
+					const link = document.createElement( 'a' );
 					link.download = 'pathtraced-render.png';
 					link.href = renderer.domElement.toDataURL().replace( 'image/png', 'image/octet-stream' );
 					link.click();
@@ -182,9 +182,9 @@
 
 				updateProgressBar( 0 );
 				showProgressBar();
-				
+			
 				// only smooth when not rendering with flat colors to improve processing time
-				const ldrawPromise = 
+				const ldrawPromise =
 					new LDrawLoader()
 						.setPath( 'models/ldraw/officialLibrary/' )
 						.loadAsync( 'models/7140-1-X-wingFighter.mpd_Packed.mpd', onProgress )

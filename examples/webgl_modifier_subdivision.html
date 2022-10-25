@@ -124,7 +124,7 @@
 				folder1.add( params, 'iterations' ).min( 0 ).max( 5 ).step( 1 ).onFinishChange( updateMeshes );
 				const splitController = folder1.add( params, 'split' ).onFinishChange( updateMeshes );
 				const smoothController = folder1.add( params, 'uvSmooth' ).onFinishChange( updateMeshes );
-				folder1.add( params, 'flatOnly' ).onFinishChange ( updateMeshes );
+				folder1.add( params, 'flatOnly' ).onFinishChange( updateMeshes );
 				folder1.add( params, 'maxTriangles' ).onFinishChange( updateMeshes );
 
 				const folder2 = gui.addFolder( 'View' );
@@ -175,8 +175,8 @@
 
 						for ( let i = 0; i < 65; i += 5 ) {
 
-							let x = ( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50 ) * 1.2;
-							let y = ( i - 5 ) * 3;
+							const x = ( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50 ) * 1.2;
+							const y = ( i - 5 ) * 3;
 							points.push( new THREE.Vector2( x * 0.0075, y * 0.005 ) );
 
 						}

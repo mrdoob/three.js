@@ -73,7 +73,7 @@
 
 		function handleInstancedMesh( mesh, mass, shape ) {
 
-			const array = mesh.instanceMatrix.array;
+			const array = mesh.instanceAttributes.instanceMatrix.array;
 			const bodies = [];
 			for ( let i = 0; i < mesh.count; i ++ ) {
 
@@ -141,7 +141,7 @@
 				const mesh = meshes[ i ];
 				if ( mesh.isInstancedMesh ) {
 
-					const array = mesh.instanceMatrix.array;
+					const array = mesh.instanceAttributes.instanceMatrix.array;
 					const bodies = meshMap.get( mesh );
 					for ( let j = 0; j < bodies.length; j ++ ) {
 
@@ -150,7 +150,7 @@
 
 					}
 
-					mesh.instanceMatrix.needsUpdate = true;
+					mesh.instanceAttributes.instanceMatrix.needsUpdate = true;
 
 				} else if ( mesh.isMesh ) {
 

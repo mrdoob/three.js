@@ -34,7 +34,7 @@ class XRHandPrimitiveModel {
 		const material = new MeshStandardMaterial();
 
 		this.handMesh = new InstancedMesh( geometry, material, 30 );
-		this.handMesh.instanceMatrix.setUsage( DynamicDrawUsage ); // will be updated every frame
+		this.handMesh.instanceAttributes.instanceMatrix.setUsage( DynamicDrawUsage ); // will be updated every frame
 		this.handMesh.castShadow = true;
 		this.handMesh.receiveShadow = true;
 		this.handModel.add( this.handMesh );
@@ -93,7 +93,7 @@ class XRHandPrimitiveModel {
 		}
 
 		this.handMesh.count = count;
-		this.handMesh.instanceMatrix.needsUpdate = true;
+		this.handMesh.instanceAttributes.instanceMatrix.needsUpdate = true;
 
 	}
 

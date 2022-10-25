@@ -81,7 +81,7 @@ async function OimoPhysics() {
 
 	function handleInstancedMesh( mesh, mass, shape ) {
 
-		const array = mesh.instanceMatrix.array;
+		const array = mesh.instanceAttributes.instanceMatrix.array;
 
 		const bodies = [];
 
@@ -160,7 +160,7 @@ async function OimoPhysics() {
 
 			if ( mesh.isInstancedMesh ) {
 
-				const array = mesh.instanceMatrix.array;
+				const array = mesh.instanceAttributes.instanceMatrix.array;
 				const bodies = meshMap.get( mesh );
 
 				for ( let j = 0; j < bodies.length; j ++ ) {
@@ -171,7 +171,7 @@ async function OimoPhysics() {
 
 				}
 
-				mesh.instanceMatrix.needsUpdate = true;
+				mesh.instanceAttributes.instanceMatrix.needsUpdate = true;
 
 			} else if ( mesh.isMesh ) {
 

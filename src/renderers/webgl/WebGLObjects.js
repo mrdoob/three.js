@@ -27,11 +27,9 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 			}
 
-			attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
+			for ( const instanceAttribute of Object.values( object.instanceAttributes ) ) {
 
-			if ( object.instanceColor !== null ) {
-
-				attributes.update( object.instanceColor, gl.ARRAY_BUFFER );
+				attributes.update( instanceAttribute, gl.ARRAY_BUFFER );
 
 			}
 
@@ -53,9 +51,11 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 		instancedMesh.removeEventListener( 'dispose', onInstancedMeshDispose );
 
-		attributes.remove( instancedMesh.instanceMatrix );
+		for ( const attribute of Object.values( instancedMesh.instanceAttributes ) ) {
 
-		if ( instancedMesh.instanceColor !== null ) attributes.remove( instancedMesh.instanceColor );
+			attributes.remove( attribute );
+
+		}
 
 	}
 

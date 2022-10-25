@@ -249,7 +249,7 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 		constructor( count, curveCount, geometry, material ) {
 
 			const mesh = new THREE.InstancedMesh( geometry, material, count );
-			mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+			mesh.instanceAttributes.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 			super( mesh, curveCount );
 			this.offsets = new Array( count ).fill( 0 );
 			this.whichCurve = new Array( count ).fill( 0 );
@@ -266,7 +266,7 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 
 			matrix.makeTranslation( this.curveLengthArray[ this.whichCurve[ index ] ], this.whichCurve[ index ], this.offsets[ index ] );
 			this.object3D.setMatrixAt( index, matrix );
-			this.object3D.instanceMatrix.needsUpdate = true;
+			this.object3D.instanceAttributes.instanceMatrix.needsUpdate = true;
 
 		}
 

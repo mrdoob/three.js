@@ -18,8 +18,9 @@ class InstancedMesh extends Mesh {
 
 		this.isInstancedMesh = true;
 
-		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
-		this.instanceColor = null;
+		this.instanceAttributes = {
+			instanceMatrix: new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 )
+		};
 
 		this.count = count;
 
@@ -37,9 +38,23 @@ class InstancedMesh extends Mesh {
 
 		super.copy( source, recursive );
 
-		this.instanceMatrix.copy( source.instanceMatrix );
+		const sourceInstanceAttributeEntries = Object.entries( source.instanceAttributes );
 
-		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
+		for ( const [ sourceAttributeKey, sourceAttribute ] of sourceInstanceAttributeEntries ) {
+
+			const targetAttribute = this.instanceAttributes[ sourceAttributeKey ];
+
+			if ( targetAttribute != null ) {
+
+				targetAttribute.copy( sourceAttribute );
+
+			} else {
+
+				this.instanceAttributes[ sourceAttributeKey ] = sourceAttribute.clone();
+
+			}
+
+		}
 
 		this.count = source.count;
 
@@ -47,15 +62,21 @@ class InstancedMesh extends Mesh {
 
 	}
 
+	getAttributeAt( name, index, target, size ) {
+
+		target.fromArray( this.instanceAttributes[ name ].array, index * size );
+
+	}
+
 	getColorAt( index, color ) {
 
-		color.fromArray( this.instanceColor.array, index * 3 );
+		this.getAttributeAt( 'instanceColor', index, color, 3 );
 
 	}
 
 	getMatrixAt( index, matrix ) {
 
-		matrix.fromArray( this.instanceMatrix.array, index * 16 );
+		this.getAttributeAt( 'instanceMatrix', index, matrix, 16 );
 
 	}
 
@@ -102,19 +123,28 @@ class InstancedMesh extends Mesh {
 
 	setColorAt( index, color ) {
 
-		if ( this.instanceColor === null ) {
-
-			this.instanceColor = new InstancedBufferAttribute( new Float32Array( this.instanceMatrix.count * 3 ), 3 );
-
-		}
-
-		color.toArray( this.instanceColor.array, index * 3 );
+		this.setAttributeAt( 'instanceColor', index, color, 3 );
 
 	}
 
 	setMatrixAt( index, matrix ) {
 
-		matrix.toArray( this.instanceMatrix.array, index * 16 );
+		this.setAttributeAt( 'instanceMatrix', index, matrix, 16 );
+
+	}
+
+	setAttributeAt( name, index, source, size ) {
+
+		let attribute = this.instanceAttributes[ name ];
+
+		if ( attribute == null ) {
+
+			attribute = new InstancedBufferAttribute( new Float32Array( this.count * size ), size );
+			this.instanceAttributes[ name ] = attribute;
+
+		}
+
+		source.toArray( attribute.array, index * size );
 
 	}
 

@@ -251,7 +251,7 @@ class USDZLoader extends Loader {
 
 			if ( id !== undefined ) {
 
-				const def = `def "%{id}"`;
+				const def = 'def "%{id}"';
 
 				if ( def in data ) {
 
@@ -364,7 +364,7 @@ class USDZLoader extends Loader {
 				}
 
 			}
-			
+
 			return geometry;
 
 		}
@@ -525,7 +525,7 @@ class USDZLoader extends Loader {
 
 				}
 
-			}			
+			}
 
 		}
 
@@ -574,7 +574,7 @@ class USDZLoader extends Loader {
 
 			if ( 'matrix4d xformOp:transform' in data ) {
 
-				const array = JSON.parse( '[' + data[ 'matrix4d xformOp:transform'  ].replace( /[()]*/g, '' ) + ']' );
+				const array = JSON.parse( '[' + data[ 'matrix4d xformOp:transform' ].replace( /[()]*/g, '' ) + ']' );
 
 				mesh.matrix.fromArray( array );
 				mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );

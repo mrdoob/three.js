@@ -24,7 +24,7 @@ class InstanceNode extends Node {
 
 		//
 
-		const instanceBufferNode = buffer( instanceMesh.instanceMatrix.array, 'mat4', instanceMesh.count );
+		const instanceBufferNode = buffer( instanceMesh.instanceAttributes.instanceMatrix.array, 'mat4', instanceMesh.count );
 
 		this.instanceMatrixNode = temp( element( instanceBufferNode, instanceIndex ) ); // @TODO: a possible caching issue here?
 

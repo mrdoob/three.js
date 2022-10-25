@@ -117,7 +117,7 @@
 					new THREE.MeshBasicMaterial( { color: RAY_COLOR } ),
 					2 * MAX_RAYS
 				);
-				sphereInstance.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				sphereInstance.instanceAttributes.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 				sphereInstance.count = 0;
 
 				scene.add( sphereInstance, lineSegments );
@@ -252,7 +252,7 @@
 				}
 
 				sphereInstance.count = rayCount * 2;
-				sphereInstance.instanceMatrix.needsUpdate = true;
+				sphereInstance.instanceAttributes.instanceMatrix.needsUpdate = true;
 
 				lineSegments.geometry.setDrawRange( 0, lineNum );
 				lineSegments.geometry.attributes.position.needsUpdate = true;

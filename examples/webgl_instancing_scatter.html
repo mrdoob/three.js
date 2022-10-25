@@ -111,8 +111,8 @@
 				}
 
 				// Instance matrices will be updated every frame.
-				stemMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
-				blossomMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				stemMesh.instanceAttributes.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				blossomMesh.instanceAttributes.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 
 				resample();
 
@@ -219,8 +219,8 @@
 
 				console.timeEnd( '.sample()' );
 
-				stemMesh.instanceMatrix.needsUpdate = true;
-				blossomMesh.instanceMatrix.needsUpdate = true;
+				stemMesh.instanceAttributes.instanceMatrix.needsUpdate = true;
+				blossomMesh.instanceAttributes.instanceMatrix.needsUpdate = true;
 
 			}
 
@@ -307,8 +307,8 @@
 
 					}
 
-					stemMesh.instanceMatrix.needsUpdate = true;
-					blossomMesh.instanceMatrix.needsUpdate = true;
+					stemMesh.instanceAttributes.instanceMatrix.needsUpdate = true;
+					blossomMesh.instanceAttributes.instanceMatrix.needsUpdate = true;
 
 				}
 

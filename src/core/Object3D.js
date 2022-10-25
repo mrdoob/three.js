@@ -696,12 +696,15 @@ class Object3D extends EventDispatcher {
 
 		// object specific properties
 
-		if ( this.isInstancedMesh ) {
+		if ( this.isInstancedMesh && this.instanceAttributes ) {
 
 			object.type = 'InstancedMesh';
 			object.count = this.count;
-			object.instanceMatrix = this.instanceMatrix.toJSON();
-			if ( this.instanceColor !== null ) object.instanceColor = this.instanceColor.toJSON();
+			for ( const [ key, attribute ] of Object.entries( this.instanceAttributes ) ) {
+
+				object[ key ] = attribute.toJSON();
+
+			}
 
 		}
 

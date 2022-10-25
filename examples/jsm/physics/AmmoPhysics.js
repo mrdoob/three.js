@@ -110,7 +110,7 @@ async function AmmoPhysics() {
 
 	function handleInstancedMesh( mesh, mass, shape ) {
 
-		const array = mesh.instanceMatrix.array;
+		const array = mesh.instanceAttributes.instanceMatrix.array;
 
 		const bodies = [];
 
@@ -204,7 +204,7 @@ async function AmmoPhysics() {
 
 			if ( mesh.isInstancedMesh ) {
 
-				const array = mesh.instanceMatrix.array;
+				const array = mesh.instanceAttributes.instanceMatrix.array;
 				const bodies = meshMap.get( mesh );
 
 				for ( let j = 0; j < bodies.length; j ++ ) {
@@ -221,7 +221,7 @@ async function AmmoPhysics() {
 
 				}
 
-				mesh.instanceMatrix.needsUpdate = true;
+				mesh.instanceAttributes.instanceMatrix.needsUpdate = true;
 
 			} else if ( mesh.isMesh ) {
 

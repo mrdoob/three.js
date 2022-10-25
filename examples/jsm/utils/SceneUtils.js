@@ -10,8 +10,7 @@ import {
 
 import { mergeGroups, deepCloneAttribute } from './BufferGeometryUtils.js';
 
-const _color = /*@__PURE__*/new Color();
-const _matrix = /*@__PURE__*/new Matrix4();
+const _array = new Array( 30 );
 
 function createMeshesFromInstancedMesh( instancedMesh ) {
 
@@ -177,8 +176,8 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 	// store copy of instanced attributes for lookups
 
-	const instanceMatrixRef = deepCloneAttribute( mesh.instanceMatrix );
-	const instanceColorRef = mesh.instanceColor ? deepCloneAttribute( mesh.instanceColor ) : null;
+	const instanceAttributeEntryRefs = Object.entries( mesh.instanceAttributes )
+		.map( ( [ key, attribute ] ) => [ key, deepCloneAttribute( attribute ) ] );
 
 	const attributeRefs = new Map();
 
@@ -210,13 +209,25 @@ function sortInstancedMesh( mesh, compareFn ) {
 
 		const refIndex = tokens[ i ];
 
-		_matrix.fromArray( instanceMatrixRef.array, refIndex * mesh.instanceMatrix.itemSize );
-		_matrix.toArray( mesh.instanceMatrix.array, i * mesh.instanceMatrix.itemSize );
+		for ( const [ name, attribute ] of instanceAttributeEntryRefs ) {
 
-		if ( mesh.instanceColor ) {
+			const size = attribute.itemSize;
+			const refOffset = refIndex * size;
+			const targetOffset = i * size;
+			const refArray = attribute.array;
+			const targetArray = mesh.instanceAttributes[ name ].array;
 
-			_color.fromArray( instanceColorRef.array, refIndex * mesh.instanceColor.itemSize );
-			_color.toArray( mesh.instanceColor.array, i * mesh.instanceColor.itemSize );
+			for ( let ii = 0; ii < size; ii ++ ) {
+
+				_array[ ii ] = refArray[ refOffset + ii * size ];
+
+			}
+
+			for ( let ii = 0; ii < size; ii ++ ) {
+
+				targetArray[ targetOffset + ii ] = _array[ ii ];
+
+			}
 
 		}
 
