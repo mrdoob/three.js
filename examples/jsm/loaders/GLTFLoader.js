@@ -292,7 +292,7 @@ class GLTFLoader extends Loader {
 
 			json = JSON.parse( data );
 
-		} else if( data instanceof ArrayBuffer ) {
+		} else if ( data instanceof ArrayBuffer ) {
 
 			const magic = LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
 
@@ -1453,7 +1453,7 @@ class GLTFMeshGpuInstancing {
 				attributes[ key ] = accessor;
 				return attributes[ key ];
 
-			}));
+			} ) );
 
 		}
 
@@ -1537,6 +1537,7 @@ class GLTFMeshGpuInstancing {
 				nodeObject.add( ... instancedMeshes );
 
 				return nodeObject;
+
 			}
 
 			return instancedMeshes[ 0 ];
@@ -3189,7 +3190,7 @@ class GLTFParser {
 
 			texture.flipY = false;
 
-			if ( textureDef.name ) texture.name = textureDef.name;
+			texture.name = textureDef.name || sourceDef.name || '';
 
 			const samplers = json.samplers || {};
 			const sampler = samplers[ textureDef.sampler ] || {};
