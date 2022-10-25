@@ -1381,6 +1381,21 @@
 				"DiscreteInterpolant": "api/it/math/interpolants/DiscreteInterpolant",
 				"LinearInterpolant": "api/it/math/interpolants/LinearInterpolant",
 				"QuaternionLinearInterpolant": "api/it/math/interpolants/QuaternionLinearInterpolant"
+			},
+
+			"Oggetti": {
+				"Bone": "api/it/objects/Bone",
+				"Group": "api/it/objects/Group",
+				"InstancedMesh": "api/it/objects/InstancedMesh",
+				"Line": "api/it/objects/Line",
+				"LineLoop": "api/it/objects/LineLoop",
+				"LineSegments": "api/it/objects/LineSegments",
+				"LOD": "api/it/objects/LOD",
+				"Mesh": "api/it/objects/Mesh",
+				"Points": "api/it/objects/Points",
+				"Skeleton": "api/it/objects/Skeleton",
+				"SkinnedMesh": "api/it/objects/SkinnedMesh",
+				"Sprite": "api/it/objects/Sprite"
 			}
 		}
 	},
