@@ -27,7 +27,7 @@ class AudioLoader extends Loader {
 				// detaches the buffer when complete, preventing reuse.
 				const bufferCopy = buffer.slice( 0 );
 
-				const context = new AudioContext().context;
+				const context = AudioContext.getContext();
 				context.decodeAudioData( bufferCopy, function ( audioBuffer ) {
 
 					onLoad( audioBuffer );

@@ -2,7 +2,7 @@ let _context;
 
 class AudioContext {
 
-	constructor() {
+	static getContext() {
 
 		if ( _context === undefined ) {
 
@@ -10,15 +10,11 @@ class AudioContext {
 
 		}
 
-	}
-
-	get context() {
-
 		return _context;
 
 	}
 
-	set context( value ) {
+	static setContext( value ) {
 
 		_context = value;
 
