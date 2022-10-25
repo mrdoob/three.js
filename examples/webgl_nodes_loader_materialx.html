@@ -47,15 +47,24 @@
 
 			const SAMPLES = [
 				'standard_surface_brass_tiled.mtlx',
+				//'standard_surface_brick_procedural.mtlx',
 				'standard_surface_carpaint.mtlx',
+				//'standard_surface_chess_set.mtlx',
 				'standard_surface_chrome.mtlx',
 				'standard_surface_copper.mtlx',
+				'standard_surface_default.mtlx',
+				//'standard_surface_glass.mtlx',
+				//'standard_surface_glass_tinted.mtlx',
 				'standard_surface_gold.mtlx',
 				'standard_surface_greysphere.mtlx',
+				//'standard_surface_greysphere_calibration.mtlx',
 				'standard_surface_jade.mtlx',
+				//'standard_surface_look_brass_tiled.mtlx',
+				//'standard_surface_look_wood_tiled.mtlx',
 				'standard_surface_marble_solid.mtlx',
 				'standard_surface_metal_brushed.mtlx',
 				'standard_surface_plastic.mtlx',
+				//'standard_surface_thin_film.mtlx',
 				'standard_surface_velvet.mtlx',
 				'standard_surface_wood_tiled.mtlx'
 			];
@@ -74,15 +83,15 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 3, 2, 4 );
+				camera.position.set( - 2.5, 1.5, 3 );
 
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1;
+				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMappingExposure = .5;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
@@ -90,11 +99,8 @@
 				//
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
-				controls.target.set( 0, 1, 0 );
-				controls.update();
 
 				//
 
@@ -106,7 +112,7 @@
 
 				new RGBELoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'royal_esplanade_1k.hdr', async ( texture ) => {
+					.load( 'san_giuseppe_bridge_2k.hdr', async ( texture ) => {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -114,6 +120,7 @@
 						scene.environment = texture;
 
 						model = ( await new GLTFLoader().loadAsync( './models/gltf/MaterialX/shaderball.glb' ) ).scene;
+						model.position.set( 0, - 1, 0 );
 
 						await onSampleChange();
 
