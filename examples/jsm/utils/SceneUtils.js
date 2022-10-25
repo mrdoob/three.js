@@ -1,9 +1,7 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
-	Color,
 	Group,
-	Matrix4,
 	Mesh,
 	Vector3
 } from 'three';
