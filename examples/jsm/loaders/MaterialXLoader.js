@@ -95,9 +95,9 @@ const MtlXElements = [
 	new MtlXElement( 'mix', mix, [ 'bg', 'fg', 'mix' ] ),
 
 	// << Channel >>
-	//new MtlXElement( 'combine2', mix, [ 'in1', 'in2' ] ),
-	//new MtlXElement( 'combine3', mix, [ 'in1', 'in2', 'in3' ] ),
-	//new MtlXElement( 'combine4', mix, [ 'in1', 'in2', 'in3', 'in4' ] ),
+	new MtlXElement( 'combine2', vec2, [ 'in1', 'in2' ] ),
+	new MtlXElement( 'combine3', vec3, [ 'in1', 'in2', 'in3' ] ),
+	new MtlXElement( 'combine4', vec4, [ 'in1', 'in2', 'in3', 'in4' ] ),
 
 	// << Procedural >>
 	new MtlXElement( 'ramplr', mx_ramplr, [ 'valuel', 'valuer', 'texcoord' ] ),
@@ -389,10 +389,6 @@ class MaterialXNode {
 
 					}
 
-				} else if ( element === 'combine3' ) {
-
-					node = vec3( ...this.getNodesByNames( [ 'in1', 'in2', 'in3' ] ) );
-
 				} else if ( element === 'image' ) {
 
 					const file = this.getChildByName( 'file' );
@@ -593,15 +589,15 @@ class MaterialXNode {
 		material.clearcoatRoughnessNode = clearcoatRoughnessNode || float( 0 );
 
 	}
-	/*
-	setGltfPBR( material ) {
+
+	/*setGltfPBR( material ) {
 
 		const inputs = this.getNodes();
 
 		console.log( inputs );
 
-	}
-*/
+	}*/
+
 	setMaterial( material ) {
 
 		const element = this.element;
@@ -684,13 +680,13 @@ class MaterialX {
 		this.nodesXLib.set( materialXNode.nodePath, materialXNode );
 
 	}
-/*
-    getMaterialXNodeFromXML( xmlNode ) {
+
+    /*getMaterialXNodeFromXML( xmlNode ) {
 
         return this.nodesXRefLib.get( xmlNode );
 
-    }
-*/
+    }*/
+
 	getMaterialXNode( ...names ) {
 
 		return this.nodesXLib.get( names.join( '/' ) );
