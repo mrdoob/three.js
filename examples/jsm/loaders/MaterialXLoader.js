@@ -340,107 +340,107 @@ class MaterialXNode {
 
 		let node = this.node;
 
-		if ( node === null ) {
+		if ( node !== null ) { return node; }
 
-			const type = this.type;
+		//
 
-			if ( this.isConst ) {
+		const type = this.type;
+
+		if ( this.isConst ) {
+
+			const nodeClass = this.getClassFromType( type );
+
+			node = nodeClass( ...this.getVector() );
+
+		} else if ( this.hasReference ) {
+
+			node = this.materialX.getMaterialXNode( this.referencePath ).getNode();
+
+		} else {
+
+			const element = this.element;
+
+			if ( element === 'convert' ) {
 
 				const nodeClass = this.getClassFromType( type );
 
-				node = nodeClass( ...this.getVector() );
+				node = nodeClass( this.getNodeByName( 'in' ) );
 
-			} else if ( this.hasReference ) {
+			} else if ( element === 'constant' ) {
 
-				node = this.materialX.getMaterialXNode( this.referencePath ).getNode();
+				node = this.getNodeByName( 'value' );
 
-			} else {
+			} else if ( element === 'position' ) {
 
-				const element = this.element;
+				node = positionLocal;
 
-				if ( element === 'convert' ) {
+			} else if ( element === 'tiledimage' ) {
 
-					const nodeClass = this.getClassFromType( type );
+				const file = this.getChildByName( 'file' );
 
-					node = nodeClass( this.getNodeByName( 'in' ) );
+				const textureFile = file.getTexture();
+				const uvTiling = mx_transform_uv( ...this.getNodesByNames( [ 'uvtiling', 'uvoffset' ] ) );
 
-				} else if ( element === 'constant' ) {
+				node = texture( textureFile, uvTiling );
 
-					node = this.getNodeByName( 'value' );
+				const colorSpaceNode = file.getColorSpaceNode();
 
-				} else if ( element === 'position' ) {
+				if ( colorSpaceNode ) {
 
-					node = positionLocal;
-
-				} else if ( element === 'tiledimage' ) {
-
-					const file = this.getChildByName( 'file' );
-
-					const textureFile = file.getTexture();
-					const uvTiling = mx_transform_uv( ...this.getNodesByNames( [ 'uvtiling', 'uvoffset' ] ) );
-
-					node = texture( textureFile, uvTiling );
-
-					const colorSpaceNode = file.getColorSpaceNode();
-
-					if ( colorSpaceNode ) {
-
-						node = colorSpaceNode( node );
-
-					}
-
-				} else if ( element === 'image' ) {
-
-					const file = this.getChildByName( 'file' );
-					const uvNode = this.getNodeByName( 'texcoord' );
-
-					const textureFile = file.getTexture();
-
-					node = texture( textureFile, uvNode );
-
-					const colorSpaceNode = file.getColorSpaceNode();
-
-					if ( colorSpaceNode ) {
-
-						node = colorSpaceNode( node );
-
-					}
-
-				} else if ( MtlXLibrary[ element ] !== undefined ) {
-
-					const nodeElement = MtlXLibrary[ element ];
-
-					node = nodeElement.nodeFunc( ...this.getNodesByNames( ...nodeElement.params ) );
+					node = colorSpaceNode( node );
 
 				}
 
+			} else if ( element === 'image' ) {
+
+				const file = this.getChildByName( 'file' );
+				const uvNode = this.getNodeByName( 'texcoord' );
+
+				const textureFile = file.getTexture();
+
+				node = texture( textureFile, uvNode );
+
+				const colorSpaceNode = file.getColorSpaceNode();
+
+				if ( colorSpaceNode ) {
+
+					node = colorSpaceNode( node );
+
+				}
+
+			} else if ( MtlXLibrary[ element ] !== undefined ) {
+
+				const nodeElement = MtlXLibrary[ element ];
+
+				node = nodeElement.nodeFunc( ...this.getNodesByNames( ...nodeElement.params ) );
+
 			}
-
-			//
-
-			if ( node === null ) {
-
-				console.warn( `THREE.MaterialXLoader: Unexpected node ${ new XMLSerializer().serializeToString( this.nodeXML ) }.` );
-
-				node = float( 0 );
-
-			}
-
-			//
-
-			const nodeToTypeClass = this.getClassFromType( type );
-
-			if ( nodeToTypeClass !== null ) {
-
-				node = nodeToTypeClass( node );
-
-			}
-
-			node.name = this.name;
-
-			this.node = node;
 
 		}
+
+		//
+
+		if ( node === null ) {
+
+			console.warn( `THREE.MaterialXLoader: Unexpected node ${ new XMLSerializer().serializeToString( this.nodeXML ) }.` );
+
+			node = float( 0 );
+
+		}
+
+		//
+
+		const nodeToTypeClass = this.getClassFromType( type );
+
+		if ( nodeToTypeClass !== null ) {
+
+			node = nodeToTypeClass( node );
+
+		}
+
+		node.name = this.name;
+
+		this.node = node;
 
 		return node;
 
