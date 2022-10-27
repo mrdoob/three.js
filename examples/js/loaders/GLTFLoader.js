@@ -2730,7 +2730,7 @@
 			const promise = this.loadImageSource( sourceIndex, loader ).then( function ( texture ) {
 
 				texture.flipY = false;
-				if ( textureDef.name ) texture.name = textureDef.name;
+				texture.name = textureDef.name || sourceDef.name || '';
 				const samplers = json.samplers || {};
 				const sampler = samplers[ textureDef.sampler ] || {};
 				texture.magFilter = WEBGL_FILTERS[ sampler.magFilter ] || THREE.LinearFilter;

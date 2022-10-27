@@ -1,5 +1,7 @@
 ( function () {
 
+	const _color = /*@__PURE__*/new THREE.Color();
+	const _matrix = /*@__PURE__*/new THREE.Matrix4();
 	function createMeshesFromInstancedMesh( instancedMesh ) {
 
 		const group = new THREE.Group();
@@ -98,9 +100,115 @@
 
 	}
 
+	function reduceVertices( object, func, initialValue ) {
+
+		let value = initialValue;
+		const vertex = new THREE.Vector3();
+		object.updateWorldMatrix( true, true );
+		object.traverseVisible( child => {
+
+			const {
+				geometry
+			} = child;
+			if ( geometry !== undefined ) {
+
+				const {
+					position
+				} = geometry.attributes;
+				if ( position !== undefined ) {
+
+					for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+						vertex.fromBufferAttribute( position, i );
+						if ( child.isSkinnedMesh ) {
+
+							child.boneTransform( i, vertex );
+
+						} else {
+
+							vertex.applyMatrix4( child.matrixWorld );
+
+						}
+
+						value = func( value, vertex );
+
+					}
+
+				}
+
+			}
+
+		} );
+		return value;
+
+	}
+
+	/**
+ * @param {InstancedMesh}
+ * @param {function(int, int):int}
+ */
+	function sortInstancedMesh( mesh, compareFn ) {
+
+		// store copy of instanced attributes for lookups
+
+		const instanceMatrixRef = THREE.deepCloneAttribute( mesh.instanceMatrix );
+		const instanceColorRef = mesh.instanceColor ? THREE.deepCloneAttribute( mesh.instanceColor ) : null;
+		const attributeRefs = new Map();
+		for ( const name in mesh.geometry.attributes ) {
+
+			const attribute = mesh.geometry.attributes[ name ];
+			if ( attribute.isInstancedBufferAttribute ) {
+
+				attributeRefs.set( attribute, THREE.deepCloneAttribute( attribute ) );
+
+			}
+
+		}
+
+		// compute sort order
+
+		const tokens = [];
+		for ( let i = 0; i < mesh.count; i ++ ) tokens.push( i );
+		tokens.sort( compareFn );
+
+		// apply sort order
+
+		for ( let i = 0; i < tokens.length; i ++ ) {
+
+			const refIndex = tokens[ i ];
+			_matrix.fromArray( instanceMatrixRef.array, refIndex * mesh.instanceMatrix.itemSize );
+			_matrix.toArray( mesh.instanceMatrix.array, i * mesh.instanceMatrix.itemSize );
+			if ( mesh.instanceColor ) {
+
+				_color.fromArray( instanceColorRef.array, refIndex * mesh.instanceColor.itemSize );
+				_color.toArray( mesh.instanceColor.array, i * mesh.instanceColor.itemSize );
+
+			}
+
+			for ( const name in mesh.geometry.attributes ) {
+
+				const attribute = mesh.geometry.attributes[ name ];
+				if ( attribute.isInstancedBufferAttribute ) {
+
+					const attributeRef = attributeRefs.get( attribute );
+					attribute.setX( i, attributeRef.getX( refIndex ) );
+					if ( attribute.itemSize > 1 ) attribute.setY( i, attributeRef.getY( refIndex ) );
+					if ( attribute.itemSize > 2 ) attribute.setZ( i, attributeRef.getZ( refIndex ) );
+					if ( attribute.itemSize > 3 ) attribute.setW( i, attributeRef.getW( refIndex ) );
+
+				}
+
+			}
+
+		}
+
+	}
+
 	THREE.SceneUtils = {};
 	THREE.SceneUtils.createMeshesFromInstancedMesh = createMeshesFromInstancedMesh;
 	THREE.SceneUtils.createMeshesFromMultiMaterialMesh = createMeshesFromMultiMaterialMesh;
 	THREE.SceneUtils.createMultiMaterialObject = createMultiMaterialObject;
+	THREE.SceneUtils.reduceVertices = reduceVertices;
+	THREE.SceneUtils.sortInstancedMesh = sortInstancedMesh;
 
 } )();
