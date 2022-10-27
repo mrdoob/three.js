@@ -13,7 +13,9 @@
 
 		parse( scene, options = {} ) {
 
-			const binary = options.binary !== undefined ? options.binary : false; //
+			const binary = options.binary !== undefined ? options.binary : false;
+
+			//
 
 			const objects = [];
 			let triangles = 0;
@@ -57,17 +59,16 @@
 			const cb = new THREE.Vector3();
 			const ab = new THREE.Vector3();
 			const normal = new THREE.Vector3();
-
 			for ( let i = 0, il = objects.length; i < il; i ++ ) {
 
 				const object = objects[ i ].object3d;
 				const geometry = objects[ i ].geometry;
 				const index = geometry.index;
 				const positionAttribute = geometry.getAttribute( 'position' );
-
 				if ( index !== null ) {
 
 					// indexed geometry
+
 					for ( let j = 0; j < index.count; j += 3 ) {
 
 						const a = index.getX( j + 0 );
@@ -80,6 +81,7 @@
 				} else {
 
 					// non-indexed geometry
+
 					for ( let j = 0; j < positionAttribute.count; j += 3 ) {
 
 						const a = j + 0;
@@ -100,13 +102,11 @@
 			}
 
 			return output;
-
 			function writeFace( a, b, c, positionAttribute, object ) {
 
 				vA.fromBufferAttribute( positionAttribute, a );
 				vB.fromBufferAttribute( positionAttribute, b );
 				vC.fromBufferAttribute( positionAttribute, c );
-
 				if ( object.isSkinnedMesh === true ) {
 
 					object.boneTransform( a, vA );
@@ -122,7 +122,6 @@
 				writeVertex( vA );
 				writeVertex( vB );
 				writeVertex( vC );
-
 				if ( binary === true ) {
 
 					output.setUint16( offset, 0, true );
@@ -143,7 +142,6 @@
 				ab.subVectors( vA, vB );
 				cb.cross( ab ).normalize();
 				normal.copy( cb ).normalize();
-
 				if ( binary === true ) {
 
 					output.setFloat32( offset, normal.x, true );

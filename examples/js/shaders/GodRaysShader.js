@@ -24,9 +24,7 @@
 				value: null
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -36,9 +34,7 @@
 		 gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 	 }`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -50,6 +46,7 @@
 
 		}`
 	};
+
 	/**
  * The god-ray generation shader.
  *
@@ -77,9 +74,7 @@
 				value: new THREE.Vector3()
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -89,9 +84,7 @@
 		 gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 	 }`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#define TAPS_PER_PASS 6.0
 
@@ -177,6 +170,7 @@
 
 		}`
 	};
+
 	/**
  * Additively applies god rays from texture tGodRays to a background (tColors).
  * fGodRayIntensity attenuates the god rays.
@@ -194,9 +188,7 @@
 				value: 0.69
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -206,9 +198,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -228,6 +218,7 @@
 
 		}`
 	};
+
 	/**
  * A dodgy sun/sky shader. Makes a bright spot at the sun location. Would be
  * cheaper/faster/simpler to implement this as a simple sun sprite.
@@ -248,9 +239,7 @@
 				value: new THREE.Color( 0x000000 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -260,9 +249,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		varying vec2 vUv;
 

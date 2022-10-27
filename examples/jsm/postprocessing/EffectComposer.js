@@ -232,6 +232,15 @@ class EffectComposer {
 
 	}
 
+	dispose() {
+
+		this.renderTarget1.dispose();
+		this.renderTarget2.dispose();
+
+		this.copyPass.dispose();
+
+	}
+
 }
 
 

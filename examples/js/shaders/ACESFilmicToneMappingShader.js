@@ -7,6 +7,7 @@
  * this implementation of ACES is modified to accommodate a brighter viewing environment.
  * the scale factor of 1/0.6 is subjective. see discussion in #19621.
  */
+
 	const ACESFilmicToneMappingShader = {
 		uniforms: {
 			'tDiffuse': {
@@ -16,9 +17,7 @@
 				value: 1.0
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -28,9 +27,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#define saturate(a) clamp( a, 0.0, 1.0 )
 

@@ -5,7 +5,8 @@ import {
 	mx_fractal_noise_float as fractal_noise_float, mx_fractal_noise_vec2 as fractal_noise_vec2, mx_fractal_noise_vec3 as fractal_noise_vec3, mx_fractal_noise_vec4 as fractal_noise_vec4
 } from './lib/mx_noise.js';
 import { mx_hsvtorgb, mx_rgbtohsv } from './lib/mx_hsv.js';
-import { nodeObject, float, vec2, vec4, add, sub, mul, mix, clamp, uv, length, smoothstep, dFdx, dFdy, convert } from '../shadernode/ShaderNodeElements.js';
+import { mx_srgb_texture_to_lin_rec709 } from './lib/mx_transform_color.js';
+import { nodeObject, float, vec2, vec4, add, sub, mul, mix, clamp, uv, length, smoothstep, dFdx, dFdy, sign, pow, abs, convert } from '../shadernode/ShaderNodeElements.js';
 
 export const mx_aastep = ( threshold, value ) => {
 
@@ -27,6 +28,9 @@ export const mx_splitlr = ( valuel, valuer, center, texcoord = uv() ) => _split(
 export const mx_splittb = ( valuet, valueb, center, texcoord = uv() ) => _split( valuet, valueb, center, texcoord, 'y' );
 
 export const mx_transform_uv = ( uv_scale = 1, uv_offset = 0, uv_geo = uv() ) => add( mul( uv_geo, uv_scale ), uv_offset );
+
+export const mx_safepower = ( in1, in2 = 1 ) => mul( sign( in1 ), pow( abs( in1 ), in2 ) );
+export const mx_contrast = ( input, amount = 1, pivot = .5 ) => add( mul( sub( input, pivot ), amount ), pivot );
 
 export const mx_noise_float = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => add( mul( amplitude, mx_perlin_noise_float( convert( texcoord, 'vec2|vec3' ) ) ), pivot );
 export const mx_noise_vec2 = ( texcoord = uv(), amplitude = 1, pivot = 0 ) => add( mul( amplitude, mx_perlin_noise_vec2( convert( texcoord, 'vec2|vec3' ) ) ), pivot );
@@ -52,4 +56,4 @@ export const mx_fractal_noise_vec2 = ( position = uv(), octaves = 3, lacunarity 
 export const mx_fractal_noise_vec3 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mul( fractal_noise_vec3( position, octaves, lacunarity, diminish ), amplitude );
 export const mx_fractal_noise_vec4 = ( position = uv(), octaves = 3, lacunarity = 2, diminish = .5, amplitude = 1 ) => mul( fractal_noise_vec4( position, octaves, lacunarity, diminish ), amplitude );
 
-export { mx_hsvtorgb, mx_rgbtohsv };
+export { mx_hsvtorgb, mx_rgbtohsv, mx_srgb_texture_to_lin_rec709 };

@@ -48,6 +48,7 @@
 			<li>KHR_texture_transform<sup>2</sup></li>
 			<li>EXT_texture_webp</li>
 			<li>EXT_meshopt_compression</li>
+			<li>EXT_mesh_gpu_instancing</li>
 		</ul>
 
 		<p>
@@ -221,13 +222,13 @@
 
 		<h3>[method:undefined parse]( [param:ArrayBuffer data], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
 		<p>
-		[page:ArrayBuffer data] — glTF asset to parse, as an ArrayBuffer or `JSON` string.<br />
+		[page:ArrayBuffer data] — glTF asset to parse, as an `ArrayBuffer`, `JSON` string or object.<br />
 		[page:String path] — The base path from which to find subsequent glTF resources such as textures and .bin data files.<br />
 		[page:Function onLoad] — A function to be called when parse completes.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</p>
 		<p>
-		Parse a glTF-based ArrayBuffer or `JSON` String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:Object] that contains loaded parts: .[page:Group scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
+		Parse a glTF-based `ArrayBuffer`, `JSON` string or object and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:Object] that contains loaded parts: .[page:Group scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
 		</p>
 
 		<h2>Source</h2>

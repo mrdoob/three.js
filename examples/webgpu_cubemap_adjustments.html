@@ -47,9 +47,9 @@
 
 			let camera, scene, renderer;
 
-			init().then( render ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -136,8 +136,6 @@
 
 					scene.add( gltf.scene );
 
-					render();
-
 				} );
 
 				const sphereGeometry = new THREE.SphereGeometry( .5, 64, 32 );
@@ -158,6 +156,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -191,8 +190,6 @@
 				gui.add( adjustments, 'hue', 0, Math.PI * 2, 0.01 );
 				gui.add( adjustments, 'saturation', 0, 2, 0.01 );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -208,15 +205,7 @@
 
 			function render() {
 
-				requestAnimationFrame( render );
-
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

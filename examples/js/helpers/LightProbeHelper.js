@@ -11,6 +11,7 @@
 						value: lightProbe.sh.coefficients
 					},
 					// by reference
+
 					intensity: {
 						value: lightProbe.intensity
 					}
@@ -26,14 +27,12 @@
 			this.onBeforeRender();
 
 		}
-
 		dispose() {
 
 			this.geometry.dispose();
 			this.material.dispose();
 
 		}
-
 		onBeforeRender() {
 
 			this.position.copy( this.lightProbe.position );

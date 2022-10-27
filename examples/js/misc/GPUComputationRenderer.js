@@ -115,7 +115,6 @@
 			const passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
 			const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), passThruShader );
 			scene.add( mesh );
-
 			this.setDataType = function ( type ) {
 
 				dataType = type;
@@ -164,27 +163,26 @@
 
 				for ( let i = 0; i < this.variables.length; i ++ ) {
 
-					const variable = this.variables[ i ]; // Creates rendertargets and initialize them with input texture
+					const variable = this.variables[ i ];
 
+					// Creates rendertargets and initialize them with input texture
 					variable.renderTargets[ 0 ] = this.createRenderTarget( sizeX, sizeY, variable.wrapS, variable.wrapT, variable.minFilter, variable.magFilter );
 					variable.renderTargets[ 1 ] = this.createRenderTarget( sizeX, sizeY, variable.wrapS, variable.wrapT, variable.minFilter, variable.magFilter );
 					this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 0 ] );
-					this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 1 ] ); // Adds dependencies uniforms to the THREE.ShaderMaterial
+					this.renderTexture( variable.initialValueTexture, variable.renderTargets[ 1 ] );
 
+					// Adds dependencies uniforms to the THREE.ShaderMaterial
 					const material = variable.material;
 					const uniforms = material.uniforms;
-
 					if ( variable.dependencies !== null ) {
 
 						for ( let d = 0; d < variable.dependencies.length; d ++ ) {
 
 							const depVar = variable.dependencies[ d ];
-
 							if ( depVar.name !== variable.name ) {
 
 								// Checks if variable exists
 								let found = false;
-
 								for ( let j = 0; j < this.variables.length; j ++ ) {
 
 									if ( depVar.name === this.variables[ j ].name ) {
@@ -224,15 +222,14 @@
 
 				const currentTextureIndex = this.currentTextureIndex;
 				const nextTextureIndex = this.currentTextureIndex === 0 ? 1 : 0;
-
 				for ( let i = 0, il = this.variables.length; i < il; i ++ ) {
 
-					const variable = this.variables[ i ]; // Sets texture dependencies uniforms
+					const variable = this.variables[ i ];
 
+					// Sets texture dependencies uniforms
 					if ( variable.dependencies !== null ) {
 
 						const uniforms = variable.material.uniforms;
-
 						for ( let d = 0, dl = variable.dependencies.length; d < dl; d ++ ) {
 
 							const depVar = variable.dependencies[ d ];
@@ -240,9 +237,9 @@
 
 						}
 
-					} // Performs the computation for this variable
+					}
 
-
+					// Performs the computation for this variable
 					this.doRenderTarget( variable.material, variable.renderTargets[ nextTextureIndex ] );
 
 				}
@@ -268,13 +265,11 @@
 				mesh.geometry.dispose();
 				mesh.material.dispose();
 				const variables = this.variables;
-
 				for ( let i = 0; i < variables.length; i ++ ) {
 
 					const variable = variables[ i ];
 					variable.initialValueTexture?.dispose();
 					const renderTargets = variable.renderTargets;
-
 					for ( let j = 0; j < renderTargets.length; j ++ ) {
 
 						const renderTarget = renderTargets[ j ];
@@ -292,7 +287,9 @@
 
 			}
 
-			this.addResolutionDefine = addResolutionDefine; // The following functions can be used to compute things manually
+			this.addResolutionDefine = addResolutionDefine;
+
+			// The following functions can be used to compute things manually
 
 			function createShaderMaterial( computeFragmentShader, uniforms ) {
 
@@ -308,7 +305,6 @@
 			}
 
 			this.createShaderMaterial = createShaderMaterial;
-
 			this.createRenderTarget = function ( sizeXTexture, sizeYTexture, wrapS, wrapT, minFilter, magFilter ) {
 
 				sizeXTexture = sizeXTexture || sizeX;
@@ -344,6 +340,7 @@
 				// Takes a texture, and render out in rendertarget
 				// input = Texture
 				// output = RenderTarget
+
 				passThruUniforms.passThruTexture.value = input;
 				this.doRenderTarget( passThruShader, output );
 				passThruUniforms.passThruTexture.value = null;
@@ -358,9 +355,7 @@
 				const currentOutputEncoding = renderer.outputEncoding;
 				const currentToneMapping = renderer.toneMapping;
 				renderer.xr.enabled = false; // Avoid camera modification
-
 				renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
-
 				renderer.outputEncoding = THREE.LinearEncoding;
 				renderer.toneMapping = THREE.NoToneMapping;
 				mesh.material = material;
@@ -373,8 +368,9 @@
 				renderer.toneMapping = currentToneMapping;
 				renderer.setRenderTarget( currentRenderTarget );
 
-			}; // Shaders
+			};
 
+			// Shaders
 
 			function getPassThroughVertexShader() {
 

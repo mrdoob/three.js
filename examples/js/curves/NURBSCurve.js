@@ -11,24 +11,15 @@
 
 	class NURBSCurve extends THREE.Curve {
 
-		constructor( degree, knots
-			/* array of reals */
-			, controlPoints
-			/* array of Vector(2|3|4) */
-			, startKnot
-			/* index in knots */
-			, endKnot
-			/* index in knots */
-		) {
+		constructor( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */, startKnot /* index in knots */, endKnot /* index in knots */ ) {
 
 			super();
 			this.degree = degree;
 			this.knots = knots;
-			this.controlPoints = []; // Used by periodic NURBS to remove hidden spans
-
+			this.controlPoints = [];
+			// Used by periodic NURBS to remove hidden spans
 			this.startKnot = startKnot || 0;
 			this.endKnot = endKnot || this.knots.length - 1;
-
 			for ( let i = 0; i < controlPoints.length; ++ i ) {
 
 				// ensure THREE.Vector4 for control points
@@ -38,15 +29,13 @@
 			}
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
 			const u = this.knots[ this.startKnot ] + t * ( this.knots[ this.endKnot ] - this.knots[ this.startKnot ] ); // linear mapping t->u
+
 			// following results in (wx, wy, wz, w) homogeneous point
-
 			const hpoint = THREE.NURBSUtils.calcBSplinePoint( this.degree, this.knots, this.controlPoints, u );
-
 			if ( hpoint.w !== 1.0 ) {
 
 				// project to 3D space: (wx, wy, wz, w) -> (x, y, z, 1)
@@ -57,7 +46,6 @@
 			return point.set( hpoint.x, hpoint.y, hpoint.z );
 
 		}
-
 		getTangent( t, optionalTarget = new THREE.Vector3() ) {
 
 			const tangent = optionalTarget;

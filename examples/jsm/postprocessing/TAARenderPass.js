@@ -130,6 +130,15 @@ class TAARenderPass extends SSAARenderPass {
 
 	}
 
+	dispose() {
+
+		super.dispose();
+
+		if ( this.sampleRenderTarget !== undefined ) this.sampleRenderTarget.dispose();
+		if ( this.holdRenderTarget !== undefined ) this.holdRenderTarget.dispose();
+
+	}
+
 }
 
 const _JitterVectors = [

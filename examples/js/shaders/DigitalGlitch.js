@@ -9,6 +9,7 @@
  * amount: shift distance (1 is width of input)
  * angle: shift angle in radians
  */
+
 	const DigitalGlitch = {
 		uniforms: {
 			'tDiffuse': {
@@ -50,18 +51,14 @@
 				value: 0.05
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 		void main() {
 			vUv = uv;
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform int byp; //should we apply the glitch ?
 

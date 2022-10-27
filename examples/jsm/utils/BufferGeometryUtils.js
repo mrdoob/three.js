@@ -192,11 +192,6 @@ function mergeBufferGeometries( geometries, useGroups = false ) {
 
 		}
 
-		// gather .userData
-
-		mergedGeometry.userData.mergedUserData = mergedGeometry.userData.mergedUserData || [];
-		mergedGeometry.userData.mergedUserData.push( geometry.userData );
-
 		if ( useGroups ) {
 
 			let count;
@@ -368,6 +363,28 @@ function mergeBufferAttributes( attributes ) {
 	}
 
 	return new BufferAttribute( array, itemSize, normalized );
+
+}
+
+/**
+ * @param {BufferAttribute}
+ * @return {BufferAttribute}
+ */
+export function deepCloneAttribute( attribute ) {
+
+	if ( attribute.isInstancedInterleavedBufferAttribute || attribute.isInterleavedBufferAttribute ) {
+
+		return deinterleaveAttribute( attribute );
+
+	}
+
+	if ( attribute.isInstancedBufferAttribute ) {
+
+		return new InstancedBufferAttribute().copy( attribute );
+
+	}
+
+	return new BufferAttribute().copy( attribute );
 
 }
 

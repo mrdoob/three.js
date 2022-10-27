@@ -3,7 +3,6 @@
 	/**
  * https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts
  */
-
 	class RoomEnvironment extends THREE.Scene {
 
 		constructor() {
@@ -51,40 +50,45 @@
 			box6.position.set( - 2.193, - 0.369, - 5.547 );
 			box6.rotation.set( 0, 0.516, 0 );
 			box6.scale.set( 3.875, 3.487, 2.986 );
-			this.add( box6 ); // -x right
+			this.add( box6 );
 
+			// -x right
 			const light1 = new THREE.Mesh( geometry, createAreaLightMaterial( 50 ) );
 			light1.position.set( - 16.116, 14.37, 8.208 );
 			light1.scale.set( 0.1, 2.428, 2.739 );
-			this.add( light1 ); // -x left
+			this.add( light1 );
 
+			// -x left
 			const light2 = new THREE.Mesh( geometry, createAreaLightMaterial( 50 ) );
 			light2.position.set( - 16.109, 18.021, - 8.207 );
 			light2.scale.set( 0.1, 2.425, 2.751 );
-			this.add( light2 ); // +x
+			this.add( light2 );
 
+			// +x
 			const light3 = new THREE.Mesh( geometry, createAreaLightMaterial( 17 ) );
 			light3.position.set( 14.904, 12.198, - 1.832 );
 			light3.scale.set( 0.15, 4.265, 6.331 );
-			this.add( light3 ); // +z
+			this.add( light3 );
 
+			// +z
 			const light4 = new THREE.Mesh( geometry, createAreaLightMaterial( 43 ) );
 			light4.position.set( - 0.462, 8.89, 14.520 );
 			light4.scale.set( 4.38, 5.441, 0.088 );
-			this.add( light4 ); // -z
+			this.add( light4 );
 
+			// -z
 			const light5 = new THREE.Mesh( geometry, createAreaLightMaterial( 20 ) );
 			light5.position.set( 3.235, 11.486, - 12.541 );
 			light5.scale.set( 2.5, 2.0, 0.1 );
-			this.add( light5 ); // +y
+			this.add( light5 );
 
+			// +y
 			const light6 = new THREE.Mesh( geometry, createAreaLightMaterial( 100 ) );
 			light6.position.set( 0.0, 20.0, 0.0 );
 			light6.scale.set( 1.0, 0.1, 1.0 );
 			this.add( light6 );
 
 		}
-
 		dispose() {
 
 			const resources = new Set();
@@ -98,7 +102,6 @@
 				}
 
 			} );
-
 			for ( const resource of resources ) {
 
 				resource.dispose();
@@ -108,7 +111,6 @@
 		}
 
 	}
-
 	function createAreaLightMaterial( intensity ) {
 
 		const material = new THREE.MeshBasicMaterial();

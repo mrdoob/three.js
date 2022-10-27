@@ -324,7 +324,7 @@
 		This method does not support objects having non-uniformly-scaled parent(s).
 		</p>
 
-		<h3>[method:Array raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 		Abstract (empty) method to get intersections between a casted ray and this object.
 		Subclasses such as [page:Mesh], [page:Line], and [page:Points] implement this method in order
@@ -470,7 +470,13 @@
 		<p>Updates the local transform.</p>
 
 		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
-		<p>Updates the global transform of the object and its descendants.</p>
+		<p>
+		force - A boolean that can be used to bypass [page:.matrixWorldAutoUpdate],
+		to recalculate the world matrix of the object and descendants on the current frame.
+		Useful if you cannot wait for the renderer to update it on the next frame (assuming [page:.matrixWorldAutoUpdate] set to `true`).<br /><br />
+
+		Updates the global transform of the object and its descendants if the world matrix needs update ([page:.matrixWorldNeedsUpdate] set to true) or if the `force` parameter is set to `true`.
+		</p>
 
 		<h3>[method:undefined updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
 		<p>

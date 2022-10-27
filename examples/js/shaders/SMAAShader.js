@@ -18,9 +18,7 @@
 				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		uniform vec2 resolution;
 
@@ -42,9 +40,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 
@@ -130,9 +126,7 @@
 				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		uniform vec2 resolution;
 
@@ -161,9 +155,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#define SMAASampleLevelZeroOffset( tex, coord, offset ) texture2D( tex, coord + float( offset ) * resolution, 0.0 )
 
@@ -377,9 +369,7 @@
 				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		uniform vec2 resolution;
 
@@ -400,9 +390,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tColor;

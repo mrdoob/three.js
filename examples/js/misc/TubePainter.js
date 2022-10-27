@@ -18,7 +18,9 @@
 			vertexColors: true
 		} );
 		const mesh = new THREE.Mesh( geometry, material );
-		mesh.frustumCulled = false; //
+		mesh.frustumCulled = false;
+
+		//
 
 		function getPoints( size ) {
 
@@ -26,7 +28,6 @@
 			const sides = 10;
 			const array = [];
 			const radius = 0.01 * size;
-
 			for ( let i = 0; i < sides; i ++ ) {
 
 				const angle = i / sides * PI2;
@@ -36,8 +37,9 @@
 
 			return array;
 
-		} //
+		}
 
+		//
 
 		const vector1 = new THREE.Vector3();
 		const vector2 = new THREE.Vector3();
@@ -45,17 +47,17 @@
 		const vector4 = new THREE.Vector3();
 		const color = new THREE.Color( 0xffffff );
 		let size = 1;
-
 		function stroke( position1, position2, matrix1, matrix2 ) {
 
 			if ( position1.distanceToSquared( position2 ) === 0 ) return;
 			let count = geometry.drawRange.count;
 			const points = getPoints( size );
-
 			for ( let i = 0, il = points.length; i < il; i ++ ) {
 
 				const vertex1 = points[ i ];
-				const vertex2 = points[ ( i + 1 ) % il ]; // positions
+				const vertex2 = points[ ( i + 1 ) % il ];
+
+				// positions
 
 				vector1.copy( vertex1 ).applyMatrix4( matrix2 ).add( position2 );
 				vector2.copy( vertex2 ).applyMatrix4( matrix2 ).add( position2 );
@@ -66,7 +68,9 @@
 				vector4.toArray( positions.array, ( count + 2 ) * 3 );
 				vector2.toArray( positions.array, ( count + 3 ) * 3 );
 				vector3.toArray( positions.array, ( count + 4 ) * 3 );
-				vector4.toArray( positions.array, ( count + 5 ) * 3 ); // normals
+				vector4.toArray( positions.array, ( count + 5 ) * 3 );
+
+				// normals
 
 				vector1.copy( vertex1 ).applyMatrix4( matrix2 ).normalize();
 				vector2.copy( vertex2 ).applyMatrix4( matrix2 ).normalize();
@@ -77,7 +81,9 @@
 				vector4.toArray( normals.array, ( count + 2 ) * 3 );
 				vector2.toArray( normals.array, ( count + 3 ) * 3 );
 				vector3.toArray( normals.array, ( count + 4 ) * 3 );
-				vector4.toArray( normals.array, ( count + 5 ) * 3 ); // colors
+				vector4.toArray( normals.array, ( count + 5 ) * 3 );
+
+				// colors
 
 				color.toArray( colors.array, ( count + 0 ) * 3 );
 				color.toArray( colors.array, ( count + 1 ) * 3 );
@@ -91,15 +97,15 @@
 
 			geometry.drawRange.count = count;
 
-		} //
+		}
 
+		//
 
 		const up = new THREE.Vector3( 0, 1, 0 );
 		const point1 = new THREE.Vector3();
 		const point2 = new THREE.Vector3();
 		const matrix1 = new THREE.Matrix4();
 		const matrix2 = new THREE.Matrix4();
-
 		function moveTo( position ) {
 
 			point1.copy( position );
@@ -123,11 +129,11 @@
 
 			size = value;
 
-		} //
+		}
 
+		//
 
 		let count = 0;
-
 		function update() {
 
 			const start = count;

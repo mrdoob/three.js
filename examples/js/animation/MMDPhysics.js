@@ -34,13 +34,13 @@
 
 			this.manager = new ResourceManager();
 			this.mesh = mesh;
+
 			/*
      * I don't know why but 1/60 unitStep easily breaks models
      * so I set it 1/65 so far.
      * Don't set too small unitStep because
      * the smaller unitStep can make the performance worse.
      */
-
 			this.unitStep = params.unitStep !== undefined ? params.unitStep : 1 / 65;
 			this.maxStepNum = params.maxStepNum !== undefined ? params.maxStepNum : 3;
 			this.gravity = new THREE.Vector3( 0, - 9.8 * 10, 0 );
@@ -49,22 +49,22 @@
 
 			this.bodies = [];
 			this.constraints = [];
-
 			this._init( mesh, rigidBodyParams, constraintParams );
 
 		}
+
 		/**
    * Advances Physics calculation and updates bones.
    *
    * @param {Number} delta - time in second
    * @return {MMDPhysics}
    */
-
-
 		update( delta ) {
 
 			const manager = this.manager;
-			const mesh = this.mesh; // rigid bodies and constrains are for
+			const mesh = this.mesh;
+
+			// rigid bodies and constrains are for
 			// mesh's world scale (1, 1, 1).
 			// Convert to (1, 1, 1) if it isn't.
 
@@ -73,7 +73,6 @@
 			const quaternion = manager.allocThreeQuaternion();
 			const scale = manager.allocThreeVector3();
 			mesh.matrixWorld.decompose( position, quaternion, scale );
-
 			if ( scale.x !== 1 || scale.y !== 1 || scale.z !== 1 ) {
 
 				isNonDefaultScale = true;
@@ -81,7 +80,6 @@
 			}
 
 			let parent;
-
 			if ( isNonDefaultScale ) {
 
 				parent = mesh.parent;
@@ -90,15 +88,15 @@
 				mesh.scale.set( 1, 1, 1 );
 				mesh.updateMatrixWorld( true );
 
-			} // calculate physics and update bones
+			}
 
+			// calculate physics and update bones
 
 			this._updateRigidBodies();
-
 			this._stepSimulation( delta );
+			this._updateBones();
 
-			this._updateBones(); // restore mesh if converted above
-
+			// restore mesh if converted above
 
 			if ( isNonDefaultScale ) {
 
@@ -113,13 +111,12 @@
 			return this;
 
 		}
+
 		/**
    * Resets rigid bodies transorm to current bone's.
    *
    * @return {MMDPhysics}
    */
-
-
 		reset() {
 
 			for ( let i = 0, il = this.bodies.length; i < il; i ++ ) {
@@ -131,14 +128,13 @@
 			return this;
 
 		}
+
 		/**
    * Warm ups Rigid bodies. Calculates cycles steps.
    *
    * @param {Integer} cycles
    * @return {MMDPhysics}
    */
-
-
 		warmup( cycles ) {
 
 			for ( let i = 0; i < cycles; i ++ ) {
@@ -150,14 +146,13 @@
 			return this;
 
 		}
+
 		/**
    * Sets gravity.
    *
    * @param {Vector3} gravity
    * @return {MMDPhysicsHelper}
    */
-
-
 		setGravity( gravity ) {
 
 			this.world.setGravity( new Ammo.btVector3( gravity.x, gravity.y, gravity.z ) );
@@ -165,23 +160,25 @@
 			return this;
 
 		}
+
 		/**
    * Creates MMDPhysicsHelper
    *
    * @return {MMDPhysicsHelper}
    */
-
-
 		createHelper() {
 
 			return new MMDPhysicsHelper( this.mesh, this );
 
-		} // private methods
+		}
 
+		// private methods
 
 		_init( mesh, rigidBodyParams, constraintParams ) {
 
-			const manager = this.manager; // rigid body/constraint parameters are for
+			const manager = this.manager;
+
+			// rigid body/constraint parameters are for
 			// mesh's default world transform as position(0, 0, 0),
 			// quaternion(0, 0, 0, 1) and scale(0, 0, 0)
 
@@ -197,7 +194,6 @@
 			mesh.quaternion.set( 0, 0, 0, 1 );
 			mesh.scale.set( 1, 1, 1 );
 			mesh.updateMatrixWorld( true );
-
 			if ( this.world === null ) {
 
 				this.world = this._createWorld();
@@ -206,9 +202,7 @@
 			}
 
 			this._initRigidBodies( rigidBodyParams );
-
 			this._initConstraints( constraintParams );
-
 			if ( parent !== null ) mesh.parent = parent;
 			mesh.position.copy( currentPosition );
 			mesh.quaternion.copy( currentQuaternion );
@@ -220,7 +214,6 @@
 			manager.freeThreeVector3( currentScale );
 
 		}
-
 		_createWorld() {
 
 			const config = new Ammo.btDefaultCollisionConfiguration();
@@ -231,7 +224,6 @@
 			return world;
 
 		}
-
 		_initRigidBodies( rigidBodies ) {
 
 			for ( let i = 0, il = rigidBodies.length; i < il; i ++ ) {
@@ -241,7 +233,6 @@
 			}
 
 		}
-
 		_initConstraints( constraints ) {
 
 			for ( let i = 0, il = constraints.length; i < il; i ++ ) {
@@ -254,13 +245,11 @@
 			}
 
 		}
-
 		_stepSimulation( delta ) {
 
 			const unitStep = this.unitStep;
 			let stepTime = delta;
 			let maxStepNum = ( delta / unitStep | 0 ) + 1;
-
 			if ( stepTime < unitStep ) {
 
 				stepTime = unitStep;
@@ -277,7 +266,6 @@
 			this.world.stepSimulation( stepTime, maxStepNum, unitStep );
 
 		}
-
 		_updateRigidBodies() {
 
 			for ( let i = 0, il = this.bodies.length; i < il; i ++ ) {
@@ -287,7 +275,6 @@
 			}
 
 		}
-
 		_updateBones() {
 
 			for ( let i = 0, il = this.bodies.length; i < il; i ++ ) {
@@ -299,6 +286,7 @@
 		}
 
 	}
+
 	/**
  * This manager's responsibilies are
  *
@@ -308,8 +296,6 @@
  *
  * 2. provide simple Ammo object operations.
  */
-
-
 	class ResourceManager {
 
 		constructor() {
@@ -318,104 +304,89 @@
 			this.threeVector3s = [];
 			this.threeMatrix4s = [];
 			this.threeQuaternions = [];
-			this.threeEulers = []; // for Ammo.js
+			this.threeEulers = [];
 
+			// for Ammo.js
 			this.transforms = [];
 			this.quaternions = [];
 			this.vector3s = [];
 
 		}
-
 		allocThreeVector3() {
 
 			return this.threeVector3s.length > 0 ? this.threeVector3s.pop() : new THREE.Vector3();
 
 		}
-
 		freeThreeVector3( v ) {
 
 			this.threeVector3s.push( v );
 
 		}
-
 		allocThreeMatrix4() {
 
 			return this.threeMatrix4s.length > 0 ? this.threeMatrix4s.pop() : new THREE.Matrix4();
 
 		}
-
 		freeThreeMatrix4( m ) {
 
 			this.threeMatrix4s.push( m );
 
 		}
-
 		allocThreeQuaternion() {
 
 			return this.threeQuaternions.length > 0 ? this.threeQuaternions.pop() : new THREE.Quaternion();
 
 		}
-
 		freeThreeQuaternion( q ) {
 
 			this.threeQuaternions.push( q );
 
 		}
-
 		allocThreeEuler() {
 
 			return this.threeEulers.length > 0 ? this.threeEulers.pop() : new THREE.Euler();
 
 		}
-
 		freeThreeEuler( e ) {
 
 			this.threeEulers.push( e );
 
 		}
-
 		allocTransform() {
 
 			return this.transforms.length > 0 ? this.transforms.pop() : new Ammo.btTransform();
 
 		}
-
 		freeTransform( t ) {
 
 			this.transforms.push( t );
 
 		}
-
 		allocQuaternion() {
 
 			return this.quaternions.length > 0 ? this.quaternions.pop() : new Ammo.btQuaternion();
 
 		}
-
 		freeQuaternion( q ) {
 
 			this.quaternions.push( q );
 
 		}
-
 		allocVector3() {
 
 			return this.vector3s.length > 0 ? this.vector3s.pop() : new Ammo.btVector3();
 
 		}
-
 		freeVector3( v ) {
 
 			this.vector3s.push( v );
 
 		}
-
 		setIdentity( t ) {
 
 			t.setIdentity();
 
 		}
-
 		getBasis( t ) {
 
 			var q = this.allocQuaternion();
@@ -423,7 +394,6 @@
 			return q;
 
 		}
-
 		getBasisAsMatrix3( t ) {
 
 			var q = this.getBasis( t );
@@ -432,32 +402,27 @@
 			return m;
 
 		}
-
 		getOrigin( t ) {
 
 			return t.getOrigin();
 
 		}
-
 		setOrigin( t, v ) {
 
 			t.getOrigin().setValue( v.x(), v.y(), v.z() );
 
 		}
-
 		copyOrigin( t1, t2 ) {
 
 			var o = t2.getOrigin();
 			this.setOrigin( t1, o );
 
 		}
-
 		setBasis( t, q ) {
 
 			t.setRotation( q );
 
 		}
-
 		setBasisFromMatrix3( t, m ) {
 
 			var q = this.matrix3ToQuaternion( m );
@@ -465,19 +430,16 @@
 			this.freeQuaternion( q );
 
 		}
-
 		setOriginFromArray3( t, a ) {
 
 			t.getOrigin().setValue( a[ 0 ], a[ 1 ], a[ 2 ] );
 
 		}
-
 		setOriginFromThreeVector3( t, v ) {
 
 			t.getOrigin().setValue( v.x, v.y, v.z );
 
 		}
-
 		setBasisFromArray3( t, a ) {
 
 			var thQ = this.allocThreeQuaternion();
@@ -488,7 +450,6 @@
 			this.freeThreeQuaternion( thQ );
 
 		}
-
 		setBasisFromThreeQuaternion( t, a ) {
 
 			var q = this.allocQuaternion();
@@ -500,7 +461,6 @@
 			this.freeQuaternion( q );
 
 		}
-
 		multiplyTransforms( t1, t2 ) {
 
 			var t = this.allocTransform();
@@ -519,7 +479,6 @@
 			return t;
 
 		}
-
 		inverseTransform( t ) {
 
 			var t2 = this.allocTransform();
@@ -535,7 +494,6 @@
 			return t2;
 
 		}
-
 		multiplyMatrices3( m1, m2 ) {
 
 			var m3 = [];
@@ -563,7 +521,6 @@
 			return m3;
 
 		}
-
 		addVector3( v1, v2 ) {
 
 			var v = this.allocVector3();
@@ -571,13 +528,11 @@
 			return v;
 
 		}
-
 		dotVectors3( v1, v2 ) {
 
 			return v1.x() * v2.x() + v1.y() * v2.y() + v1.z() * v2.z();
 
 		}
-
 		rowOfMatrix3( m, i ) {
 
 			var v = this.allocVector3();
@@ -585,7 +540,6 @@
 			return v;
 
 		}
-
 		columnOfMatrix3( m, i ) {
 
 			var v = this.allocVector3();
@@ -593,7 +547,6 @@
 			return v;
 
 		}
-
 		negativeVector3( v ) {
 
 			var v2 = this.allocVector3();
@@ -601,7 +554,6 @@
 			return v2;
 
 		}
-
 		multiplyMatrix3ByVector3( m, v ) {
 
 			var v4 = this.allocVector3();
@@ -618,7 +570,6 @@
 			return v4;
 
 		}
-
 		transposeMatrix3( m ) {
 
 			var m2 = [];
@@ -634,7 +585,6 @@
 			return m2;
 
 		}
-
 		quaternionToMatrix3( q ) {
 
 			var m = [];
@@ -663,12 +613,10 @@
 			return m;
 
 		}
-
 		matrix3ToQuaternion( m ) {
 
 			var t = m[ 0 ] + m[ 4 ] + m[ 8 ];
 			var s, x, y, z, w;
-
 			if ( t > 0 ) {
 
 				s = Math.sqrt( t + 1.0 ) * 2;
@@ -713,14 +661,13 @@
 		}
 
 	}
+
 	/**
  * @param {THREE.SkinnedMesh} mesh
  * @param {Ammo.btDiscreteDynamicsWorld} world
  * @param {Object} params
  * @param {ResourceManager} manager
  */
-
-
 	class RigidBody {
 
 		constructor( mesh, world, params, manager ) {
@@ -733,31 +680,27 @@
 			this.bone = null;
 			this.boneOffsetForm = null;
 			this.boneOffsetFormInverse = null;
-
 			this._init();
 
 		}
+
 		/**
    * Resets rigid body transform to the current bone's.
    *
    * @return {RigidBody}
    */
-
-
 		reset() {
 
 			this._setTransformFromBone();
-
 			return this;
 
 		}
+
 		/**
    * Updates rigid body's transform from the current bone.
    *
    * @return {RidigBody}
    */
-
-
 		updateFromBone() {
 
 			if ( this.params.boneIndex !== - 1 && this.params.type === 0 ) {
@@ -769,13 +712,12 @@
 			return this;
 
 		}
+
 		/**
    * Updates bone from the current ridid body's transform.
    *
    * @return {RidigBody}
    */
-
-
 		updateBone() {
 
 			if ( this.params.type === 0 || this.params.boneIndex === - 1 ) {
@@ -785,7 +727,6 @@
 			}
 
 			this._updateBoneRotation();
-
 			if ( this.params.type === 1 ) {
 
 				this._updateBonePosition();
@@ -793,7 +734,6 @@
 			}
 
 			this.bone.updateMatrixWorld( true );
-
 			if ( this.params.type === 2 ) {
 
 				this._setPositionFromBone();
@@ -802,8 +742,9 @@
 
 			return this;
 
-		} // private methods
+		}
 
+		// private methods
 
 		_init() {
 
@@ -813,13 +754,10 @@
 
 					case 0:
 						return new Ammo.btSphereShape( p.width );
-
 					case 1:
 						return new Ammo.btBoxShape( new Ammo.btVector3( p.width, p.height, p.depth ) );
-
 					case 2:
 						return new Ammo.btCapsuleShape( p.width, p.height );
-
 					default:
 						throw new Error( 'unknown shape type ' + p.shapeType );
 
@@ -835,7 +773,6 @@
 			const weight = params.type === 0 ? 0 : params.weight;
 			const localInertia = manager.allocVector3();
 			localInertia.setValue( 0, 0, 0 );
-
 			if ( weight !== 0 ) {
 
 				shape.calculateLocalInertia( weight, localInertia );
@@ -856,16 +793,15 @@
 			info.set_m_friction( params.friction );
 			info.set_m_restitution( params.restitution );
 			const body = new Ammo.btRigidBody( info );
-
 			if ( params.type === 0 ) {
 
 				body.setCollisionFlags( body.getCollisionFlags() | 2 );
+
 				/*
        * It'd be better to comment out this line though in general I should call this method
        * because I'm not sure why but physics will be more like MMD's
        * if I comment out.
        */
-
 				body.setActivationState( 4 );
 
 			}
@@ -883,7 +819,6 @@
 			manager.freeThreeVector3( vector );
 
 		}
-
 		_getBoneTransform() {
 
 			const manager = this.manager;
@@ -902,7 +837,6 @@
 			return form;
 
 		}
-
 		_getWorldTransformForBone() {
 
 			const manager = this.manager;
@@ -910,45 +844,38 @@
 			return manager.multiplyTransforms( tr, this.boneOffsetFormInverse );
 
 		}
-
 		_setTransformFromBone() {
 
 			const manager = this.manager;
+			const form = this._getBoneTransform();
 
-			const form = this._getBoneTransform(); // TODO: check the most appropriate way to set
+			// TODO: check the most appropriate way to set
 			//this.body.setWorldTransform( form );
-
-
 			this.body.setCenterOfMassTransform( form );
 			this.body.getMotionState().setWorldTransform( form );
 			manager.freeTransform( form );
 
 		}
-
 		_setPositionFromBone() {
 
 			const manager = this.manager;
-
 			const form = this._getBoneTransform();
-
 			const tr = manager.allocTransform();
 			this.body.getMotionState().getWorldTransform( tr );
-			manager.copyOrigin( tr, form ); // TODO: check the most appropriate way to set
-			//this.body.setWorldTransform( tr );
+			manager.copyOrigin( tr, form );
 
+			// TODO: check the most appropriate way to set
+			//this.body.setWorldTransform( tr );
 			this.body.setCenterOfMassTransform( tr );
 			this.body.getMotionState().setWorldTransform( tr );
 			manager.freeTransform( tr );
 			manager.freeTransform( form );
 
 		}
-
 		_updateBoneRotation() {
 
 			const manager = this.manager;
-
 			const tr = this._getWorldTransformForBone();
-
 			const q = manager.getBasis( tr );
 			const thQ = manager.allocThreeQuaternion();
 			const thQ2 = manager.allocThreeQuaternion();
@@ -956,12 +883,15 @@
 			thQ.set( q.x(), q.y(), q.z(), q.w() );
 			thQ2.setFromRotationMatrix( this.bone.matrixWorld );
 			thQ2.conjugate();
-			thQ2.multiply( thQ ); //this.bone.quaternion.multiply( thQ2 );
+			thQ2.multiply( thQ );
 
-			thQ3.setFromRotationMatrix( this.bone.matrix ); // Renormalizing quaternion here because repeatedly transforming
+			//this.bone.quaternion.multiply( thQ2 );
+
+			thQ3.setFromRotationMatrix( this.bone.matrix );
+
+			// Renormalizing quaternion here because repeatedly transforming
 			// quaternion continuously accumulates floating point error and
 			// can end up being overflow. See #15335
-
 			this.bone.quaternion.copy( thQ2.multiply( thQ3 ).normalize() );
 			manager.freeThreeQuaternion( thQ );
 			manager.freeThreeQuaternion( thQ2 );
@@ -970,17 +900,13 @@
 			manager.freeTransform( tr );
 
 		}
-
 		_updateBonePosition() {
 
 			const manager = this.manager;
-
 			const tr = this._getWorldTransformForBone();
-
 			const thV = manager.allocThreeVector3();
 			const o = manager.getOrigin( tr );
 			thV.set( o.x(), o.y(), o.z() );
-
 			if ( this.bone.parent ) {
 
 				this.bone.parent.worldToLocal( thV );
@@ -993,8 +919,9 @@
 
 		}
 
-	} //
+	}
 
+	//
 
 	class Constraint {
 
@@ -1015,11 +942,11 @@
 			this.params = params;
 			this.manager = manager;
 			this.constraint = null;
-
 			this._init();
 
-		} // private method
+		}
 
+		// private method
 
 		_init() {
 
@@ -1052,7 +979,6 @@
 			constraint.setLinearUpperLimit( lul );
 			constraint.setAngularLowerLimit( all );
 			constraint.setAngularUpperLimit( aul );
-
 			for ( let i = 0; i < 3; i ++ ) {
 
 				if ( params.springPosition[ i ] !== 0 ) {
@@ -1074,14 +1000,13 @@
 				}
 
 			}
+
 			/*
      * Currently(10/31/2016) official ammo.js doesn't support
      * btGeneric6DofSpringConstraint.setParam method.
      * You need custom ammo.js (add the method into idl) if you wanna use.
      * By setting this parameter, physics will be more like MMD's
      */
-
-
 			if ( constraint.setParam !== undefined ) {
 
 				for ( let i = 0; i < 6; i ++ ) {
@@ -1108,17 +1033,14 @@
 
 		}
 
-	} //
+	}
 
+	//
 
 	const _position = new THREE.Vector3();
-
 	const _quaternion = new THREE.Quaternion();
-
 	const _scale = new THREE.Vector3();
-
 	const _matrixWorldInv = new THREE.Matrix4();
-
 	class MMDPhysicsHelper extends THREE.Object3D {
 
 		/**
@@ -1159,25 +1081,42 @@
 				opacity: 0.25,
 				transparent: true
 			} ) );
-
 			this._init();
 
 		}
+
+		/**
+   * Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+   */
+		dispose() {
+
+			const materials = this.materials;
+			const children = this.children;
+			for ( let i = 0; i < materials.length; i ++ ) {
+
+				materials[ i ].dispose();
+
+			}
+
+			for ( let i = 0; i < children.length; i ++ ) {
+
+				const child = children[ i ];
+				if ( child.isMesh ) child.geometry.dispose();
+
+			}
+
+		}
+
 		/**
    * Updates Rigid Bodies visualization.
    */
-
-
 		updateMatrixWorld( force ) {
 
 			var mesh = this.root;
-
 			if ( this.visible ) {
 
 				var bodies = this.physics.bodies;
-
 				_matrixWorldInv.copy( mesh.matrixWorld ).decompose( _position, _quaternion, _scale ).compose( _position, _quaternion, _scale.set( 1, 1, 1 ) ).invert();
-
 				for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 
 					var body = bodies[ i ].body;
@@ -1195,26 +1134,23 @@
 			this.matrix.copy( mesh.matrixWorld ).decompose( _position, _quaternion, _scale ).compose( _position, _quaternion, _scale.set( 1, 1, 1 ) );
 			super.updateMatrixWorld( force );
 
-		} // private method
+		}
 
+		// private method
 
 		_init() {
 
 			var bodies = this.physics.bodies;
-
 			function createGeometry( param ) {
 
 				switch ( param.shapeType ) {
 
 					case 0:
 						return new THREE.SphereGeometry( param.width, 16, 8 );
-
 					case 1:
 						return new THREE.BoxGeometry( param.width * 2, param.height * 2, param.depth * 2, 8, 8, 8 );
-
 					case 2:
 						return new THREE.CapsuleGeometry( param.width, param.height, 8, 16 );
-
 					default:
 						return null;
 

@@ -200,7 +200,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
-		if ( node.isNodeVarying === true ) {
+		if ( node.isNodeVarying === true && node.needsInterpolation === true ) {
 
 			if ( shaderStage === 'vertex' ) {
 
@@ -463,24 +463,42 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			this.getBuiltin( 'position', 'Vertex', 'vec4<f32>', 'vertex' );
 
 			const varyings = this.varyings;
+			const vars = this.vars[ shaderStage ];
 
 			for ( let index = 0; index < varyings.length; index ++ ) {
 
 				const varying = varyings[ index ];
 
-				snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
+				if ( varying.needsInterpolation ) {
+
+					snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
+
+				} else if ( vars.includes( varying ) === false ) {
+
+					vars.push( varying );
+
+				}
 
 			}
 
 		} else if ( shaderStage === 'fragment' ) {
 
 			const varyings = this.varyings;
+			const vars = this.vars[ shaderStage ];
 
 			for ( let index = 0; index < varyings.length; index ++ ) {
 
 				const varying = varyings[ index ];
 
-				snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
+				if ( varying.needsInterpolation ) {
+
+					snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
+
+				} else if ( vars.includes( varying ) === false ) {
+
+					vars.push( varying );
+
+				}
 
 			}
 

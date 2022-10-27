@@ -108,10 +108,7 @@
 			this.fsQuad = new THREE.FullScreenQuad( null );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer, deltaTime
-			/*, maskActive*/
-		) {
+		render( renderer, writeBuffer, readBuffer, deltaTime /*, maskActive*/ ) {
 
 			if ( this.needsInit ) {
 
@@ -129,16 +126,18 @@
 				this.fsQuad.material = this.materialLuminance;
 				this.materialLuminance.uniforms.tDiffuse.value = readBuffer.texture;
 				renderer.setRenderTarget( this.currentLuminanceRT );
-				this.fsQuad.render( renderer ); //Use the new luminance values, the previous luminance and the frame delta to
-				//adapt the luminance over time.
+				this.fsQuad.render( renderer );
 
+				//Use the new luminance values, the previous luminance and the frame delta to
+				//adapt the luminance over time.
 				this.fsQuad.material = this.materialAdaptiveLum;
 				this.materialAdaptiveLum.uniforms.delta.value = deltaTime;
 				this.materialAdaptiveLum.uniforms.lastLum.value = this.previousLuminanceRT.texture;
 				this.materialAdaptiveLum.uniforms.currentLum.value = this.currentLuminanceRT.texture;
 				renderer.setRenderTarget( this.luminanceRT );
-				this.fsQuad.render( renderer ); //Copy the new adapted luminance value so that it can be used by the next frame.
+				this.fsQuad.render( renderer );
 
+				//Copy the new adapted luminance value so that it can be used by the next frame.
 				this.fsQuad.material = this.materialCopy;
 				this.copyUniforms.tDiffuse.value = this.luminanceRT.texture;
 				renderer.setRenderTarget( this.previousLuminanceRT );
@@ -148,7 +147,6 @@
 
 			this.fsQuad.material = this.materialToneMap;
 			this.materialToneMap.uniforms.tDiffuse.value = readBuffer.texture;
-
 			if ( this.renderToScreen ) {
 
 				renderer.setRenderTarget( null );
@@ -163,7 +161,6 @@
 			}
 
 		}
-
 		reset() {
 
 			// render targets
@@ -190,7 +187,9 @@
 			this.luminanceRT.texture.generateMipmaps = false;
 			this.previousLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution );
 			this.previousLuminanceRT.texture.name = 'AdaptiveToneMappingPass.pl';
-			this.previousLuminanceRT.texture.generateMipmaps = false; // We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
+			this.previousLuminanceRT.texture.generateMipmaps = false;
+
+			// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
 
 			const pars = {
 				minFilter: THREE.LinearMipmapLinearFilter,
@@ -198,21 +197,21 @@
 			};
 			this.currentLuminanceRT = new THREE.WebGLRenderTarget( this.resolution, this.resolution, pars );
 			this.currentLuminanceRT.texture.name = 'AdaptiveToneMappingPass.cl';
-
 			if ( this.adaptive ) {
 
 				this.materialToneMap.defines[ 'ADAPTED_LUMINANCE' ] = '';
 				this.materialToneMap.uniforms.luminanceMap.value = this.luminanceRT.texture;
 
-			} //Put something in the adaptive luminance texture so that the scene can render initially
+			}
 
-
+			//Put something in the adaptive luminance texture so that the scene can render initially
 			this.fsQuad.material = new THREE.MeshBasicMaterial( {
 				color: 0x777777
 			} );
 			this.materialLuminance.needsUpdate = true;
 			this.materialAdaptiveLum.needsUpdate = true;
-			this.materialToneMap.needsUpdate = true; // renderer.render( this.scene, this.camera, this.luminanceRT );
+			this.materialToneMap.needsUpdate = true;
+			// renderer.render( this.scene, this.camera, this.luminanceRT );
 			// renderer.render( this.scene, this.camera, this.previousLuminanceRT );
 			// renderer.render( this.scene, this.camera, this.currentLuminanceRT );
 
@@ -237,7 +236,6 @@
 			this.materialToneMap.needsUpdate = true;
 
 		}
-
 		setAdaptionRate( rate ) {
 
 			if ( rate ) {
@@ -247,7 +245,6 @@
 			}
 
 		}
-
 		setMinLuminance( minLum ) {
 
 			if ( minLum ) {
@@ -258,7 +255,6 @@
 			}
 
 		}
-
 		setMaxLuminance( maxLum ) {
 
 			if ( maxLum ) {
@@ -268,7 +264,6 @@
 			}
 
 		}
-
 		setAverageLuminance( avgLum ) {
 
 			if ( avgLum ) {
@@ -278,7 +273,6 @@
 			}
 
 		}
-
 		setMiddleGrey( middleGrey ) {
 
 			if ( middleGrey ) {
@@ -288,7 +282,6 @@
 			}
 
 		}
-
 		dispose() {
 
 			if ( this.luminanceRT ) {

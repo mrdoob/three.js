@@ -34,12 +34,13 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( buffer ) {
 
-			const group = new THREE.Group(); // https://docs.google.com/document/d/11ZsHozYn9FnWG7y3s3WAyKIACfbfwb4PbaS8cZ_xjvo/edit#
+			const group = new THREE.Group();
+			// https://docs.google.com/document/d/11ZsHozYn9FnWG7y3s3WAyKIACfbfwb4PbaS8cZ_xjvo/edit#
 
 			const zip = fflate.unzipSync( new Uint8Array( buffer.slice( 16 ) ) );
+
 			/*
     const thumbnail = zip[ 'thumbnail.png' ].buffer;
     const img = document.createElement( 'img' );
@@ -48,6 +49,7 @@
     */
 
 			const metadata = JSON.parse( fflate.strFromU8( zip[ 'metadata.json' ] ) );
+
 			/*
     const blob = new Blob( [ zip[ 'data.sketch' ].buffer ], { type: 'application/octet-stream' } );
     window.open( URL.createObjectURL( blob ) );
@@ -57,7 +59,6 @@
 			const num_strokes = data.getInt32( 16, true );
 			const brushes = {};
 			let offset = 20;
-
 			for ( let i = 0; i < num_strokes; i ++ ) {
 
 				const brush_index = data.getInt32( offset, true );
@@ -67,26 +68,28 @@
 				const controlpoint_mask = data.getUint32( offset + 28, true );
 				let offset_stroke_mask = 0;
 				let offset_controlpoint_mask = 0;
-
 				for ( let j = 0; j < 4; j ++ ) {
 
 					// TOFIX: I don't understand these masks yet
+
 					const byte = 1 << j;
 					if ( ( stroke_mask & byte ) > 0 ) offset_stroke_mask += 4;
 					if ( ( controlpoint_mask & byte ) > 0 ) offset_controlpoint_mask += 4;
 
-				} // console.log( { brush_index, brush_color, brush_size, stroke_mask, controlpoint_mask } );
-				// console.log( offset_stroke_mask, offset_controlpoint_mask );
+				}
 
+				// console.log( { brush_index, brush_color, brush_size, stroke_mask, controlpoint_mask } );
+				// console.log( offset_stroke_mask, offset_controlpoint_mask );
 
 				offset = offset + 28 + offset_stroke_mask + 4; // TOFIX: This is wrong
 
-				const num_control_points = data.getInt32( offset, true ); // console.log( { num_control_points } );
+				const num_control_points = data.getInt32( offset, true );
+
+				// console.log( { num_control_points } );
 
 				const positions = new Float32Array( num_control_points * 3 );
 				const quaternions = new Float32Array( num_control_points * 4 );
 				offset = offset + 4;
-
 				for ( let j = 0, k = 0; j < positions.length; j += 3, k += 4 ) {
 
 					positions[ j + 0 ] = data.getFloat32( offset + 0, true );
@@ -123,7 +126,6 @@
 		}
 
 	}
-
 	class StrokeGeometry extends THREE.BufferGeometry {
 
 		constructor( strokes ) {
@@ -139,7 +141,9 @@
 			const vector1 = new THREE.Vector3();
 			const vector2 = new THREE.Vector3();
 			const vector3 = new THREE.Vector3();
-			const vector4 = new THREE.Vector3(); // size = size / 2;
+			const vector4 = new THREE.Vector3();
+
+			// size = size / 2;
 
 			for ( const k in strokes ) {
 
@@ -150,7 +154,6 @@
 				const color = stroke[ 3 ];
 				prevPosition.fromArray( positions, 0 );
 				prevQuaternion.fromArray( quaternions, 0 );
-
 				for ( let i = 3, j = 4, l = positions.length; i < l; i += 3, j += 4 ) {
 
 					position.fromArray( positions, i );
@@ -201,7 +204,6 @@
 		}
 
 	}
-
 	const BRUSH_LIST_ARRAY = {
 		'89d104cd-d012-426b-b5b3-bbaee63ac43c': 'Bubbles',
 		'700f3aa8-9a7c-2384-8b8a-ea028905dd8c': 'CelVinyl',
@@ -335,7 +337,6 @@
 		}
 	};
 	let shaders = null;
-
 	function getShaders() {
 
 		if ( shaders === null ) {
@@ -439,12 +440,10 @@
 	function getMaterial( GUID ) {
 
 		const name = BRUSH_LIST_ARRAY[ GUID ];
-
 		switch ( name ) {
 
 			case 'Light':
 				return new THREE.RawShaderMaterial( getShaders().Light );
-
 			default:
 				return new THREE.MeshBasicMaterial( {
 					vertexColors: true,

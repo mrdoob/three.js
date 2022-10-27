@@ -18,20 +18,18 @@ class SpriteSheetUVNode extends Node {
 
 	}
 
-	generate( builder ) {
+	construct() {
 
-		const count = this.countNode;
-		const uv = this.uvNode;
-		const frame = this.frameNode;
+		const { frameNode, uvNode, countNode } = this;
 
 		const one = new ConstNode( 1 );
 
-		const width = new SplitNode( count, 'x' );
-		const height = new SplitNode( count, 'y' );
+		const width = new SplitNode( countNode, 'x' );
+		const height = new SplitNode( countNode, 'y' );
 
 		const total = new OperatorNode( '*', width, height );
 
-		const roundFrame = new MathNode( MathNode.FLOOR, new MathNode( MathNode.MOD, frame, total ) );
+		const roundFrame = new MathNode( MathNode.FLOOR, new MathNode( MathNode.MOD, frameNode, total ) );
 
 		const frameNum = new OperatorNode( '+', roundFrame, one );
 
@@ -39,17 +37,17 @@ class SpriteSheetUVNode extends Node {
 		const row = new MathNode( MathNode.CEIL, new OperatorNode( '/', frameNum, width ) );
 		const rowInv = new OperatorNode( '-', height, row );
 
-		const scale = new OperatorNode( '/', one, count );
+		const scale = new OperatorNode( '/', one, countNode );
 
 		const uvFrameOffset = new JoinNode( [
 			new OperatorNode( '*', cell, new SplitNode( scale, 'x' ) ),
 			new OperatorNode( '*', rowInv, new SplitNode( scale, 'y' ) )
 		] );
 
-		const uvScale = new OperatorNode( '*', uv, scale );
+		const uvScale = new OperatorNode( '*', uvNode, scale );
 		const uvFrame = new OperatorNode( '+', uvScale, uvFrameOffset );
 
-		return uvFrame.build( builder, this.getNodeType( builder ) );
+		return uvFrame;
 
 	}
 
