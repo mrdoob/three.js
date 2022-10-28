@@ -15,23 +15,6 @@
 				color: #fb8c00;
 			}
 
-			#samples-container {
-				position: absolute;
-				bottom: 0;
-				right: 0;
-				font-family: 'Courier New', Courier, monospace;
-				color: white;
-				pointer-events: none;
-			}
-
-			#samples {
-
-				background-color: rgba( 0.0, 0.0, 0.0, 0.75 );
-				padding: 5px;
-				display: inline-block;
-
-			}
-
 			.checkerboard {
 				background-image:
 					linear-gradient(45deg, #ddd 25%, transparent 25%),
@@ -41,6 +24,11 @@
 				background-size: 20px 20px;
 				background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 			}
+
+			.lil-gui .gui-render {
+				line-height: var(--widget-height);
+				padding: var(--padding);
+			}
 		</style>
 	</head>
 
@@ -48,9 +36,6 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> pathtracer - <a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">three-gpu-pathtracer</a><br/>
 			See <a href="https://github.com/gkjohnson/three-gpu-pathtracer" target="_blank" rel="noopener">main project repository</a> for more information and examples on high fidelity path tracing.
-		</div>
-		<div id="samples-container">
-			<div id="samples">--</div>
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -83,7 +68,7 @@
 
 			import { PhysicalPathTracingMaterial, PathTracingRenderer, MaterialReducer, BlurredEnvMapGenerator, PathTracingSceneGenerator } from 'three-gpu-pathtracer';
 
-			let container, progressBarDiv, samplesEl;
+			let progressBarDiv, samplesEl;
 			let camera, scene, renderer, controls, gui;
 			let pathTracer, sceneInfo, fsQuad, floor;
 			let delaySamples = 0;
@@ -97,7 +82,7 @@
 				resolutionScale: 1,
 				download: () => {
 
-					const link = document.createElement('a');
+					const link = document.createElement( 'a' );
 					link.download = 'pathtraced-render.png';
 					link.href = renderer.domElement.toDataURL().replace( 'image/png', 'image/octet-stream' );
 					link.click();
@@ -111,8 +96,6 @@
 			render();
 
 			function init() {
-
-				samplesEl = document.getElementById( 'samples' );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 150, 200, 250 );
@@ -182,9 +165,9 @@
 
 				updateProgressBar( 0 );
 				showProgressBar();
-				
+			
 				// only smooth when not rendering with flat colors to improve processing time
-				const ldrawPromise = 
+				const ldrawPromise =
 					new LDrawLoader()
 						.setPath( 'models/ldraw/officialLibrary/' )
 						.loadAsync( 'models/7140-1-X-wingFighter.mpd_Packed.mpd', onProgress )
@@ -344,6 +327,15 @@
 
 				} );
 				gui.add( params, 'download' ).name( 'download image' );
+
+				const renderFolder = gui.addFolder( 'Render' );
+
+				samplesEl = document.createElement( 'div' );
+				samplesEl.classList.add( 'gui-render' );
+				samplesEl.innerText = 'samples: 0';
+
+				renderFolder.$children.appendChild( samplesEl );
+				renderFolder.open();
 
 
 			}
