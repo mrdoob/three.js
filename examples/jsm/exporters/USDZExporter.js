@@ -6,19 +6,7 @@ import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-	constructor() {
-
-		this.options = { ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'vertical' } } };
-
-	}
-
-	setOptions( options ) {
-
-		this.options = options;
-
-	}
-
-	async parse( scene ) {
+	async parse( scene, options = { ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'vertical' } } } ) {
 
 		const files = {};
 		const modelFileName = 'model.usda';
@@ -28,7 +16,7 @@ class USDZExporter {
 
 		let output = buildHeader();
 
-		output += buildSceneStart( this.options );
+		output += buildSceneStart( options );
 
 		const materials = {};
 		const textures = {};
