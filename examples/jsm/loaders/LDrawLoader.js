@@ -820,6 +820,7 @@ class LDrawParsedCache {
 		let bfcCull = true;
 
 		let startingConstructionStep = false;
+		let buildingStep = 0;
 
 		// Parse all line commands
 		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
@@ -995,6 +996,7 @@ class LDrawParsedCache {
 							case 'STEP':
 
 								startingConstructionStep = true;
+								buildingStep ++;
 
 								break;
 
@@ -1068,7 +1070,8 @@ class LDrawParsedCache {
 						matrix: matrix,
 						fileName: fileName,
 						inverted: bfcInverted,
-						startingConstructionStep: startingConstructionStep
+						startingConstructionStep: startingConstructionStep,
+						buildingStep: buildingStep
 					} );
 
 					bfcInverted = false;
@@ -1390,6 +1393,7 @@ class LDrawPartsGeometryCache {
 					const subobjectGroup = subobjectInfo;
 					subobject.matrix.decompose( subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
 					subobjectGroup.userData.startingConstructionStep = subobject.startingConstructionStep;
+					subobjectGroup.userData.buildingStep = subobject.buildingStep;
 					subobjectGroup.name = subobject.fileName;
 
 					loader.applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
@@ -1959,6 +1963,7 @@ class LDrawLoader extends Loader {
 
 					this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 					this.computeConstructionSteps( group );
+					this.computeBuildingSteps( group );
 					group.userData.fileName = url;
 					onLoad( group );
 
@@ -1977,6 +1982,7 @@ class LDrawLoader extends Loader {
 
 				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
 				this.computeConstructionSteps( group );
+				this.computeBuildingSteps( group );
 				group.userData.fileName = '';
 				onLoad( group );
 
@@ -2457,6 +2463,15 @@ class LDrawLoader extends Loader {
 
 		model.userData.numConstructionSteps = stepNumber + 1;
 
+	}
+	computeBuildingSteps( model ) {
+
+		// Sets userData.numBuildingSteps number in the root THREE.Group object based on the userdata.buildingStep number in THREE.Group objects.
+		model.userData.buildingStep = model.children[0].userData.buildingStep;
+
+		// Add one if zero-based
+		model.userData.numBuildingSteps = model.children[model.children.length - 1].userData.buildingStep + (1 - model.userData.buildingStep);
+	
 	}
 
 }
