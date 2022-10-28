@@ -25,7 +25,7 @@
 				background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 			}
 
-			.lil-gui .gui-stats {
+			.lil-gui .gui-render {
 				line-height: var(--widget-height);
 				padding: var(--padding);
 			}
@@ -328,14 +328,14 @@
 				} );
 				gui.add( params, 'download' ).name( 'download image' );
 
-				const statsFolder = gui.addFolder( 'Render' );
+				const renderFolder = gui.addFolder( 'Render' );
 
 				samplesEl = document.createElement( 'div' );
-				samplesEl.classList.add( 'gui-stats' );
+				samplesEl.classList.add( 'gui-render' );
 				samplesEl.innerText = 'samples: 0';
 
-				statsFolder.$children.appendChild( samplesEl );
-				statsFolder.open();
+				renderFolder.$children.appendChild( samplesEl );
+				renderFolder.open();
 
 
 			}
