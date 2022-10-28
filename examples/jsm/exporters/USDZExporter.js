@@ -6,6 +6,16 @@ import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
+	options = {
+		ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'vertical' } }
+	};
+
+	setOptions( options ) {
+
+		this.options = options;
+
+	}
+
 	async parse( scene ) {
 
 		const files = {};
@@ -15,6 +25,25 @@ class USDZExporter {
 		files[ modelFileName ] = null;
 
 		let output = buildHeader();
+
+		output += `def Xform "Root"
+{
+    def Scope "Scenes" (
+        kind = "sceneLibrary"
+    )
+    {
+        def Xform "Scene" (
+            customData = {
+                bool preliminary_collidesWithEnvironment = 0
+                string sceneName = "Scene"
+            }
+            sceneName = "Scene"
+        )
+        {
+        token preliminary:anchoring:type = "${this.options.ar.anchoring.type}"
+        token preliminary:planeAnchoring:alignment = "${this.options.ar.planeAnchoring.alignment}"
+
+`;
 
 		const materials = {};
 		const textures = {};
@@ -58,6 +87,14 @@ class USDZExporter {
 			}
 
 		} );
+
+
+		output += `
+        }
+    }
+}
+
+`;
 
 		output += buildMaterials( materials, textures );
 
