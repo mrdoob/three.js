@@ -6,9 +6,11 @@ import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-	options = {
-		ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'vertical' } }
-	};
+	constructor() {
+
+		this.options = { ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'vertical' } } };
+
+	}
 
 	setOptions( options ) {
 
@@ -26,24 +28,7 @@ class USDZExporter {
 
 		let output = buildHeader();
 
-		output += `def Xform "Root"
-{
-    def Scope "Scenes" (
-        kind = "sceneLibrary"
-    )
-    {
-        def Xform "Scene" (
-            customData = {
-                bool preliminary_collidesWithEnvironment = 0
-                string sceneName = "Scene"
-            }
-            sceneName = "Scene"
-        )
-        {
-        token preliminary:anchoring:type = "${this.options.ar.anchoring.type}"
-        token preliminary:planeAnchoring:alignment = "${this.options.ar.planeAnchoring.alignment}"
-
-`;
+		output += buildSceneStart( this.options );
 
 		const materials = {};
 		const textures = {};
@@ -81,7 +66,7 @@ class USDZExporter {
 				}
 
 			} else if ( object.isCamera ) {
-				
+
 				output += buildCamera( object );
 
 			}
@@ -89,12 +74,7 @@ class USDZExporter {
 		} );
 
 
-		output += `
-        }
-    }
-}
-
-`;
+		output += buildSceneEnd();
 
 		output += buildMaterials( materials, textures );
 
@@ -206,6 +186,40 @@ function buildHeader() {
     metersPerUnit = 1
     upAxis = "Y"
 )
+
+`;
+
+}
+
+function buildSceneStart( options ) {
+
+	return `def Xform "Root"
+{
+    def Scope "Scenes" (
+        kind = "sceneLibrary"
+    )
+    {
+        def Xform "Scene" (
+            customData = {
+                bool preliminary_collidesWithEnvironment = 0
+                string sceneName = "Scene"
+            }
+            sceneName = "Scene"
+        )
+        {
+        token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+        token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+
+`;
+
+}
+
+function buildSceneEnd() {
+
+	return `
+        }
+    }
+}
 
 `;
 
@@ -609,20 +623,23 @@ function buildCamera( camera ) {
 
 	}
 
-	if (camera.isOrthographicCamera) {
+	if ( camera.isOrthographicCamera ) {
+
 		return `def Camera "${name}"
 		{
 			matrix4d xformOp:transform = ${ transform }
 			uniform token[] xformOpOrder = ["xformOp:transform"]
 	
 			float2 clippingRange = (${camera.near}, ${camera.far})
-			float horizontalAperture = ${(Math.abs(camera.left) + Math.abs(camera.right)) * 10}
-			float verticalAperture = ${(Math.abs(camera.top) + Math.abs(camera.bottom)) * 10}
+			float horizontalAperture = ${( Math.abs( camera.left ) + Math.abs( camera.right ) ) * 10}
+			float verticalAperture = ${( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10}
 			token projection = "orthographic"
 		}
 	
 	`;
+
 	} else {
+
 		return `def Camera "${name}"
 		{
 			matrix4d xformOp:transform = ${ transform }
@@ -637,6 +654,7 @@ function buildCamera( camera ) {
 		}
 	
 	`;
+
 	}
 
 }
