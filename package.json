@@ -73,9 +73,9 @@
       "GPUBufferUsage": "readonly",
       "GPUTextureUsage": "readonly",
       "QUnit": "readonly",
-      "Ammo":"readonly",
-      "XRRigidTransform":"readonly",
-      "XRMediaBinding":"readonly"
+      "Ammo": "readonly",
+      "XRRigidTransform": "readonly",
+      "XRMediaBinding": "readonly"
     },
     "rules": {
       "no-throw-literal": [
@@ -105,7 +105,7 @@
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
-    "build-module": "ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
+    "build-module": "cross-env ONLY_MODULE=true rollup -c utils/build/rollup.config.js",
     "build-examples": "rollup -c utils/build/rollup.examples.config.js && echo '\nFormatting...' && eslint examples/js --ext js --ignore-pattern libs --ignore-pattern ifc --fix",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
     "lint": "eslint src --ext js",
@@ -170,5 +170,8 @@
       "build/three.module.js"
     ],
     "directories": {}
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3"
   }
 }
