@@ -16,6 +16,15 @@
 
 		<h2>Methods</h2>
 
+		<h3>[method:BufferGeometry toCreasedNormals]( [param:BufferGeometry geometry], [param:Number creaseAngle] )</h3>
+		<p>
+			geometry -- The input geometry. <br />
+			creaseAngle -- The crease angle.
+		</p>
+		<p>
+		Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at an angle greater than the crease angle.
+		</p>
+
 		<h3>[method:BufferGeometry mergeBufferGeometries]( [param:Array geometries], [param:Boolean useGroups] )</h3>
 		<p>
 		geometries -- Array of [page:BufferGeometry BufferGeometry] instances.<br />
