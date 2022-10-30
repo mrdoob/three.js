@@ -149,6 +149,7 @@
     "@rollup/plugin-node-resolve": "^14.1.0",
     "chalk": "^5.0.1",
     "concurrently": "^7.4.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.24.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.0.2",
@@ -170,8 +171,5 @@
       "build/three.module.js"
     ],
     "directories": {}
-  },
-  "dependencies": {
-    "cross-env": "^7.0.3"
   }
 }
