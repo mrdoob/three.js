@@ -21,6 +21,8 @@ class SpotLightHelper extends Object3D {
 
 		this.color = color;
 
+		this.type = 'SpotLightHelper';
+
 		const geometry = new BufferGeometry();
 
 		const positions = [
