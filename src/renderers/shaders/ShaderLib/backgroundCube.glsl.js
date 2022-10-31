@@ -29,6 +29,7 @@ export const fragment = /* glsl */`
 
 uniform float flipEnvMap;
 uniform float backgroundBlurriness;
+uniform float backgroundIntensity;
 
 varying vec3 vWorldDirection;
 
@@ -49,6 +50,8 @@ void main() {
 		vec4 texColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 
 	#endif
+
+	texColor.rgb *= backgroundIntensity;
 
 	gl_FragColor = texColor;
 
