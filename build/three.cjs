@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '146dev';
+const REVISION = '147dev';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -17407,22 +17407,6 @@ function WebGLRenderer(parameters = {}) {
 	this.toneMapping = NoToneMapping;
 	this.toneMappingExposure = 1.0;
 
-	//
-
-	Object.defineProperties(this, {
-		// @deprecated since r136, 0e21088102b4de7e0a0a33140620b7a3424b9e6d
-
-		gammaFactor: {
-			get: function () {
-				console.warn('THREE.WebGLRenderer: .gammaFactor has been removed.');
-				return 2;
-			},
-			set: function () {
-				console.warn('THREE.WebGLRenderer: .gammaFactor has been removed.');
-			}
-		}
-	});
-
 	// internal properties
 
 	const _this = this;
@@ -17795,23 +17779,34 @@ function WebGLRenderer(parameters = {}) {
 		//
 
 		let index = geometry.index;
-		const position = geometry.attributes.position;
-
-		//
-
-		if (index === null) {
-			if (position === undefined || position.count === 0) return;
-		} else if (index.count === 0) {
-			return;
-		}
-
-		//
-
 		let rangeFactor = 1;
 		if (material.wireframe === true) {
 			index = geometries.getWireframeAttribute(geometry);
 			rangeFactor = 2;
 		}
+
+		//
+
+		const drawRange = geometry.drawRange;
+		const position = geometry.attributes.position;
+		let drawStart = drawRange.start * rangeFactor;
+		let drawEnd = (drawRange.start + drawRange.count) * rangeFactor;
+		if (group !== null) {
+			drawStart = Math.max(drawStart, group.start * rangeFactor);
+			drawEnd = Math.min(drawEnd, (group.start + group.count) * rangeFactor);
+		}
+		if (index !== null) {
+			drawStart = Math.max(drawStart, 0);
+			drawEnd = Math.min(drawEnd, index.count);
+		} else if (position !== undefined && position !== null) {
+			drawStart = Math.max(drawStart, 0);
+			drawEnd = Math.min(drawEnd, position.count);
+		}
+		const drawCount = drawEnd - drawStart;
+		if (drawCount < 0 || drawCount === Infinity) return;
+
+		//
+
 		bindingStates.setup(object, material, program, geometry, index);
 		let attribute;
 		let renderer = bufferRenderer;
@@ -17820,18 +17815,6 @@ function WebGLRenderer(parameters = {}) {
 			renderer = indexedBufferRenderer;
 			renderer.setIndex(attribute);
 		}
-
-		//
-
-		const dataCount = index !== null ? index.count : position.count;
-		const rangeStart = geometry.drawRange.start * rangeFactor;
-		const rangeCount = geometry.drawRange.count * rangeFactor;
-		const groupStart = group !== null ? group.start * rangeFactor : 0;
-		const groupCount = group !== null ? group.count * rangeFactor : Infinity;
-		const drawStart = Math.max(rangeStart, groupStart);
-		const drawEnd = Math.min(dataCount, rangeStart + rangeCount, groupStart + groupCount) - 1;
-		const drawCount = Math.max(0, drawEnd - drawStart + 1);
-		if (drawCount === 0) return;
 
 		//
 
@@ -17862,7 +17845,8 @@ function WebGLRenderer(parameters = {}) {
 		if (object.isInstancedMesh) {
 			renderer.renderInstances(drawStart, drawCount, object.count);
 		} else if (geometry.isInstancedBufferGeometry) {
-			const instanceCount = Math.min(geometry.instanceCount, geometry._maxInstanceCount);
+			const maxInstanceCount = geometry._maxInstanceCount !== undefined ? geometry._maxInstanceCount : Infinity;
+			const instanceCount = Math.min(geometry.instanceCount, maxInstanceCount);
 			renderer.renderInstances(drawStart, drawCount, instanceCount);
 		} else {
 			renderer.render(drawStart, drawCount);
@@ -30787,10 +30771,10 @@ class SpotLightHelper extends Object3D {
 	constructor(light, color) {
 		super();
 		this.light = light;
-		this.light.updateMatrixWorld();
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 		this.color = color;
+		this.type = 'SpotLightHelper';
 		const geometry = new BufferGeometry();
 		const positions = [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, -1, 1];
 		for (let i = 0, j = 1, l = 32; i < l; i++, j++) {
@@ -30812,7 +30796,8 @@ class SpotLightHelper extends Object3D {
 		this.cone.material.dispose();
 	}
 	update() {
-		this.light.updateMatrixWorld();
+		this.light.updateWorldMatrix(true, false);
+		this.light.target.updateWorldMatrix(true, false);
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan(this.light.angle);
 		this.cone.scale.set(coneWidth, coneWidth, coneLength);
@@ -30909,7 +30894,6 @@ class PointLightHelper extends Mesh {
 		});
 		super(geometry, material);
 		this.light = light;
-		this.light.updateMatrixWorld();
 		this.color = color;
 		this.type = 'PointLightHelper';
 		this.matrix = this.light.matrixWorld;
@@ -30937,6 +30921,7 @@ class PointLightHelper extends Mesh {
 		this.material.dispose();
 	}
 	update() {
+		this.light.updateWorldMatrix(true, false);
 		if (this.color !== undefined) {
 			this.material.color.set(this.color);
 		} else {
@@ -30962,10 +30947,10 @@ class HemisphereLightHelper extends Object3D {
 	constructor(light, size, color) {
 		super();
 		this.light = light;
-		this.light.updateMatrixWorld();
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 		this.color = color;
+		this.type = 'HemisphereLightHelper';
 		const geometry = new OctahedronGeometry(size);
 		geometry.rotateY(Math.PI * 0.5);
 		this.material = new MeshBasicMaterial({
@@ -30998,6 +30983,7 @@ class HemisphereLightHelper extends Object3D {
 			}
 			colors.needsUpdate = true;
 		}
+		this.light.updateWorldMatrix(true, false);
 		mesh.lookAt(_vector$1.setFromMatrixPosition(this.light.matrixWorld).negate());
 	}
 }
@@ -31108,10 +31094,10 @@ class DirectionalLightHelper extends Object3D {
 	constructor(light, size, color) {
 		super();
 		this.light = light;
-		this.light.updateMatrixWorld();
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 		this.color = color;
+		this.type = 'DirectionalLightHelper';
 		if (size === undefined) size = 1;
 		let geometry = new BufferGeometry();
 		geometry.setAttribute('position', new Float32BufferAttribute([-size, size, 0, size, size, 0, size, -size, 0, -size, -size, 0, -size, size, 0], 3));
@@ -31134,6 +31120,8 @@ class DirectionalLightHelper extends Object3D {
 		this.targetLine.material.dispose();
 	}
 	update() {
+		this.light.updateWorldMatrix(true, false);
+		this.light.target.updateWorldMatrix(true, false);
 		_v1.setFromMatrixPosition(this.light.matrixWorld);
 		_v2.setFromMatrixPosition(this.light.target.matrixWorld);
 		_v3.subVectors(_v2, _v1);

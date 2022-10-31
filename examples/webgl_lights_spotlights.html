@@ -27,15 +27,13 @@
 		</script>
 
 		<script type="module">
-
 			import * as THREE from 'three';
-
 			import { TWEEN } from 'three/addons/libs/tween.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-
-			const renderer = new THREE.WebGLRenderer();
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			const camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 2000 );
 
@@ -43,7 +41,7 @@
 
 			const scene = new THREE.Scene();
 
-			const matFloor = new THREE.MeshPhongMaterial();
+			const matFloor = new THREE.MeshPhongMaterial( { color: 0x808080 } );
 			const matBox = new THREE.MeshPhongMaterial( { color: 0xaaaaaa } );
 
 			const geoFloor = new THREE.PlaneGeometry( 2000, 2000 );
@@ -77,8 +75,6 @@
 				lightHelper2 = new THREE.SpotLightHelper( spotLight2 );
 				lightHelper3 = new THREE.SpotLightHelper( spotLight3 );
 
-				matFloor.color.set( 0x808080 );
-
 				mshFloor.receiveShadow = true;
 				mshFloor.position.set( 0, - 0.05, 0 );
 
@@ -93,7 +89,6 @@
 				scene.add( lightHelper1, lightHelper2, lightHelper3 );
 
 				document.body.appendChild( renderer.domElement );
-				onWindowResize();
 				window.addEventListener( 'resize', onWindowResize );
 
 				controls.target.set( 0, 7, 0 );

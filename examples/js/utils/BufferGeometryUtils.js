@@ -324,6 +324,28 @@
 	}
 
 	/**
+ * @param {BufferAttribute}
+ * @return {BufferAttribute}
+ */
+	function deepCloneAttribute( attribute ) {
+
+		if ( attribute.isInstancedInterleavedBufferAttribute || attribute.isInterleavedBufferAttribute ) {
+
+			return deinterleaveAttribute( attribute );
+
+		}
+
+		if ( attribute.isInstancedBufferAttribute ) {
+
+			return new THREE.InstancedBufferAttribute().copy( attribute );
+
+		}
+
+		return new THREE.BufferAttribute().copy( attribute );
+
+	}
+
+	/**
  * @param {Array<BufferAttribute>} attributes
  * @return {Array<InterleavedBufferAttribute>}
  */
@@ -1022,6 +1044,7 @@
 	THREE.BufferGeometryUtils.computeMikkTSpaceTangents = computeMikkTSpaceTangents;
 	THREE.BufferGeometryUtils.computeMorphedAttributes = computeMorphedAttributes;
 	THREE.BufferGeometryUtils.computeTangents = computeTangents;
+	THREE.BufferGeometryUtils.deepCloneAttribute = deepCloneAttribute;
 	THREE.BufferGeometryUtils.deinterleaveAttribute = deinterleaveAttribute;
 	THREE.BufferGeometryUtils.deinterleaveGeometry = deinterleaveGeometry;
 	THREE.BufferGeometryUtils.estimateBytesUsed = estimateBytesUsed;
