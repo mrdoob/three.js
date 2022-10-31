@@ -14,7 +14,6 @@ class SpotLightHelper extends Object3D {
 		super();
 
 		this.light = light;
-		this.light.updateMatrixWorld();
 
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
@@ -65,7 +64,8 @@ class SpotLightHelper extends Object3D {
 
 	update() {
 
-		this.light.updateMatrixWorld();
+		this.light.updateWorldMatrix( true, false );
+		this.light.target.updateWorldMatrix( true, false );
 
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan( this.light.angle );
