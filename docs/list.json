@@ -1396,6 +1396,27 @@
 				"Skeleton": "api/it/objects/Skeleton",
 				"SkinnedMesh": "api/it/objects/SkinnedMesh",
 				"Sprite": "api/it/objects/Sprite"
+			},
+
+			"Renderers": {
+				"WebGLMultipleRenderTargets": "api/it/renderers/WebGLMultipleRenderTargets",
+				"WebGLRenderer": "api/it/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/it/renderers/WebGL1Renderer",
+				"WebGLRenderTarget": "api/it/renderers/WebGLRenderTarget",
+				"WebGL3DRenderTarget": "api/it/renderers/WebGL3DRenderTarget",
+				"WebGLArrayRenderTarget": "api/it/renderers/WebGLArrayRenderTarget",
+				"WebGLCubeRenderTarget": "api/it/renderers/WebGLCubeRenderTarget"
+			},
+
+			"Renderers / Shaders": {
+				"ShaderChunk": "api/it/renderers/shaders/ShaderChunk",
+				"ShaderLib": "api/it/renderers/shaders/ShaderLib",
+				"UniformsLib": "api/it/renderers/shaders/UniformsLib",
+				"UniformsUtils": "api/it/renderers/shaders/UniformsUtils"
+			},
+
+			"Renderers / WebXR": {
+				"WebXRManager": "api/it/renderers/webxr/WebXRManager"
 			}
 		}
 	},
