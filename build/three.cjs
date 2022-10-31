@@ -30771,10 +30771,10 @@ class SpotLightHelper extends Object3D {
 	constructor(light, color) {
 		super();
 		this.light = light;
-		this.light.updateMatrixWorld();
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 		this.color = color;
+		this.type = 'SpotLightHelper';
 		const geometry = new BufferGeometry();
 		const positions = [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, -1, 1];
 		for (let i = 0, j = 1, l = 32; i < l; i++, j++) {
@@ -30796,7 +30796,8 @@ class SpotLightHelper extends Object3D {
 		this.cone.material.dispose();
 	}
 	update() {
-		this.light.updateMatrixWorld();
+		this.light.updateWorldMatrix(true, false);
+		this.light.target.updateWorldMatrix(true, false);
 		const coneLength = this.light.distance ? this.light.distance : 1000;
 		const coneWidth = coneLength * Math.tan(this.light.angle);
 		this.cone.scale.set(coneWidth, coneWidth, coneLength);
@@ -30893,7 +30894,6 @@ class PointLightHelper extends Mesh {
 		});
 		super(geometry, material);
 		this.light = light;
-		this.light.updateMatrixWorld();
 		this.color = color;
 		this.type = 'PointLightHelper';
 		this.matrix = this.light.matrixWorld;
@@ -30921,6 +30921,7 @@ class PointLightHelper extends Mesh {
 		this.material.dispose();
 	}
 	update() {
+		this.light.updateWorldMatrix(true, false);
 		if (this.color !== undefined) {
 			this.material.color.set(this.color);
 		} else {
@@ -30946,10 +30947,10 @@ class HemisphereLightHelper extends Object3D {
 	constructor(light, size, color) {
 		super();
 		this.light = light;
-		this.light.updateMatrixWorld();
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 		this.color = color;
+		this.type = 'HemisphereLightHelper';
 		const geometry = new OctahedronGeometry(size);
 		geometry.rotateY(Math.PI * 0.5);
 		this.material = new MeshBasicMaterial({
@@ -30982,6 +30983,7 @@ class HemisphereLightHelper extends Object3D {
 			}
 			colors.needsUpdate = true;
 		}
+		this.light.updateWorldMatrix(true, false);
 		mesh.lookAt(_vector$1.setFromMatrixPosition(this.light.matrixWorld).negate());
 	}
 }
@@ -31092,10 +31094,10 @@ class DirectionalLightHelper extends Object3D {
 	constructor(light, size, color) {
 		super();
 		this.light = light;
-		this.light.updateMatrixWorld();
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 		this.color = color;
+		this.type = 'DirectionalLightHelper';
 		if (size === undefined) size = 1;
 		let geometry = new BufferGeometry();
 		geometry.setAttribute('position', new Float32BufferAttribute([-size, size, 0, size, size, 0, size, -size, 0, -size, -size, 0, -size, size, 0], 3));
@@ -31118,6 +31120,8 @@ class DirectionalLightHelper extends Object3D {
 		this.targetLine.material.dispose();
 	}
 	update() {
+		this.light.updateWorldMatrix(true, false);
+		this.light.target.updateWorldMatrix(true, false);
 		_v1.setFromMatrixPosition(this.light.matrixWorld);
 		_v2.setFromMatrixPosition(this.light.target.matrixWorld);
 		_v3.subVectors(_v2, _v1);
