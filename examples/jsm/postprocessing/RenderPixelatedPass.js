@@ -125,8 +125,7 @@ class RenderPixelatedPass extends Pass {
 				normalEdgeStrength: { value: 0 },
 				depthEdgeStrength: { value: 0 }
 			},
-			vertexShader:
-				`
+			vertexShader: /* glsl */`
 				varying vec2 vUv;
 
 				void main() {
@@ -135,9 +134,8 @@ class RenderPixelatedPass extends Pass {
 					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 				}
-				`,
-			fragmentShader:
-				`
+			`,
+			fragmentShader: /* glsl */`
 				uniform sampler2D tDiffuse;
 				uniform sampler2D tDepth;
 				uniform sampler2D tNormal;
@@ -173,12 +171,12 @@ class RenderPixelatedPass extends Pass {
 
 					float depthDiff = getDepth(x, y) - depth;
 					vec3 neighborNormal = getNormal(x, y);
-					
+
 					// Edge pixels should yield to faces who's normals are closer to the bias normal.
 					vec3 normalEdgeBias = vec3(1., 1., 1.); // This should probably be a parameter.
 					float normalDiff = dot(normal - neighborNormal, normalEdgeBias);
 					float normalIndicator = clamp(smoothstep(-.01, .01, normalDiff), 0.0, 1.0);
-					
+
 					// Only the shallower pixel should detect the normal edge.
 					float depthIndicator = clamp(sign(depthDiff * .25 + .0025), 0.0, 1.0);
 
@@ -187,7 +185,7 @@ class RenderPixelatedPass extends Pass {
 				}
 
 				float normalEdgeIndicator(float depth, vec3 normal) {
-					
+
 					float indicator = 0.0;
 
 					indicator += neighborNormalEdgeIndicator(0, -1, depth, normal);
@@ -214,11 +212,11 @@ class RenderPixelatedPass extends Pass {
 					}
 
 					float dei = 0.0;
-					if (depthEdgeStrength > 0.0) 
+					if (depthEdgeStrength > 0.0)
 						dei = depthEdgeIndicator(depth, normal);
 
-					float nei = 0.0; 
-					if (normalEdgeStrength > 0.0) 
+					float nei = 0.0;
+					if (normalEdgeStrength > 0.0)
 						nei = normalEdgeIndicator(depth, normal);
 
 					float Strength = dei > 0.0 ? (1.0 - depthEdgeStrength * dei) : (1.0 + normalEdgeStrength * nei);
@@ -226,7 +224,7 @@ class RenderPixelatedPass extends Pass {
 					gl_FragColor = texel * Strength;
 
 				}
-				`
+			`
 		} );
 
 	}
