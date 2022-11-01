@@ -101,7 +101,7 @@ class ObjectLoader extends Loader {
 
 			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
 
-				if ( onError !== undefined ) onError( new Error('THREE.ObjectLoader: Can\'t load ' + url) );
+				if ( onError !== undefined ) onError( new Error( 'THREE.ObjectLoader: Can\'t load ' + url ) );
 
 				console.error( 'THREE.ObjectLoader: Can\'t load ' + url );
 				return;
