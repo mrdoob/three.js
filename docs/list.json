@@ -327,7 +327,7 @@
 
 		},
 
-		"Examples": {
+		"Addons": {
 
 			"Animations": {
 				"CCDIKSolver": "examples/en/animations/CCDIKSolver",
@@ -829,7 +829,7 @@
 
 		},
 
-		"示例": {
+		"Addons": {
 
 			"动画": {
 				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
@@ -1065,7 +1065,7 @@
 
 		},
 
-		"예제": {
+		"Addons": {
 
 			"컨트롤": {
 				"DragControls": "examples/ko/controls/DragControls",
