@@ -35,7 +35,7 @@
 		uniform vec3 cameraPosition;
 		</code>
 		<code>
-		// default vertex attributes provided by Geometry and BufferGeometry
+		// default vertex attributes provided by BufferGeometry
 		attribute vec3 position;
 		attribute vec3 normal;
 		attribute vec2 uv;
@@ -55,6 +55,9 @@
 		<h3>Vertex shader (conditional):</h3>
 		<div>
 		<code>
+		#ifdef USE_TANGENT
+			attribute vec4 tangent;
+		#endif
 		#if defined( USE_COLOR_ALPHA )
 			// vertex color attribute with alpha
 			attribute vec4 color;
