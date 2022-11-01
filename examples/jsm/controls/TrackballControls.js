@@ -19,8 +19,6 @@ class TrackballControls extends EventDispatcher {
 		const scope = this;
 		const STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4 };
 
-		this.multiTouchRotate = false;
-
 		this.object = object;
 		this.domElement = domElement;
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
@@ -34,8 +32,6 @@ class TrackballControls extends EventDispatcher {
 		this.rotateSpeed = 1.0;
 		this.zoomSpeed = 1.2;
 		this.panSpeed = 0.3;
-
-		this.rotateThreshold = 0.5;
 
 		this.noRotate = false;
 		this.noZoom = false;
@@ -67,11 +63,6 @@ class TrackballControls extends EventDispatcher {
 			_touchZoomDistanceEnd = 0,
 
 			_lastAngle = 0;
-
-		let _touchRotationAnglePrev = 0;
-		let _touchRotationAngleNew = 0;
-		let _touchRotationAngleDelta = 0;
-		let _pointersSet = {};
 
 		const _eye = new Vector3(),
 
@@ -158,30 +149,7 @@ class TrackballControls extends EventDispatcher {
 				moveDirection.set( _moveCurr.x - _movePrev.x, _moveCurr.y - _movePrev.y, 0 );
 				let angle = moveDirection.length();
 
-				if ( this.multiTouchRotate && _state === STATE.TOUCH_ZOOM_PAN ) {
-
-					_touchRotationAngleDelta = _touchRotationAngleNew - _touchRotationAnglePrev;
-					_touchRotationAnglePrev = _touchRotationAngleNew;
-					if (
-						_touchRotationAngleDelta &&
-							Math.abs( _touchRotationAngleDelta ) < this.rotateThreshold
-					) {
-
-						angle = _touchRotationAngleDelta;
-						_eye.copy( scope.object.position ).sub( scope.target );
-
-						eyeDirection.copy( _eye ).normalize();
-
-						quaternion.setFromAxisAngle( eyeDirection, angle );
-
-						scope.object.up.applyQuaternion( quaternion );
-
-						_lastAxis.copy( eyeDirection );
-						_lastAngle = angle;
-
-					}
-
-				} else if ( angle && Math.abs( angle ) < this.rotateThreshold ) {
+				if ( angle ) {
 
 					_eye.copy( scope.object.position ).sub( scope.target );
 
@@ -661,8 +629,6 @@ class TrackballControls extends EventDispatcher {
 		function onTouchStart( event ) {
 
 			trackPointer( event );
-			_pointersSet = {};
-			gatherPointers( event );
 
 			switch ( _pointers.length ) {
 
@@ -677,11 +643,6 @@ class TrackballControls extends EventDispatcher {
 					const dx = _pointers[ 0 ].pageX - _pointers[ 1 ].pageX;
 					const dy = _pointers[ 0 ].pageY - _pointers[ 1 ].pageY;
 					_touchZoomDistanceEnd = _touchZoomDistanceStart = Math.sqrt( dx * dx + dy * dy );
-
-					_touchRotationAnglePrev = Math.atan2(
-						_pointers[ 0 ].pageY - _pointers[ 1 ].pageY,
-						_pointers[ 0 ].pageX - _pointers[ 1 ].pageX
-					);
 
 					const x = ( _pointers[ 0 ].pageX + _pointers[ 1 ].pageX ) / 2;
 					const y = ( _pointers[ 0 ].pageY + _pointers[ 1 ].pageY ) / 2;
@@ -698,7 +659,6 @@ class TrackballControls extends EventDispatcher {
 		function onTouchMove( event ) {
 
 			trackPointer( event );
-			const points = gatherPointers( event );
 
 			switch ( _pointers.length ) {
 
@@ -714,15 +674,6 @@ class TrackballControls extends EventDispatcher {
 					const dx = event.pageX - position.x;
 					const dy = event.pageY - position.y;
 					_touchZoomDistanceEnd = Math.sqrt( dx * dx + dy * dy );
-
-					if ( points ) {
-
-						_touchRotationAngleNew = Math.atan2(
-							points[ 0 ].y - points[ 1 ].y,
-							points[ 0 ].x - points[ 1 ].x
-						);
-
-					}
 
 					const x = ( event.pageX + position.x ) / 2;
 					const y = ( event.pageY + position.y ) / 2;
@@ -814,26 +765,6 @@ class TrackballControls extends EventDispatcher {
 			}
 
 			position.set( event.pageX, event.pageY );
-
-		}
-
-		function gatherPointers( event ) {
-
-			_pointersSet[ event.pointerId ] = event;
-
-			if ( Object.keys( _pointersSet ).length === _pointers.length ) {
-
-				const result = _pointers.map( function ( pointer ) {
-
-					return _pointersSet[ pointer.pointerId ];
-
-				} );
-
-				return result;
-
-			}
-
-			return false;
 
 		}
 
