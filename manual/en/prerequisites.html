@@ -35,7 +35,7 @@ They assume you know how to program in JavaScript. They assume
 you know what the DOM is, how to write HTML as well as create DOM elements
 in JavaScript. They assume you know how to use
 <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a> 
-via import and via <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> tags.
+via import and via <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> tags. They assume you know how to use import maps.
 They assume you know some CSS and that you know what
 <a href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors">CSS selectors are</a>. 
 They also assume you know ES5, ES6 and maybe some ES7.
@@ -44,18 +44,27 @@ They assume you know what a closure is.</p>
 <p>Here's some brief refreshers and notes</p>
 <h2 id="es6-modules">es6 modules</h2>
 <p>es6 modules can be loaded via the <code class="notranslate" translate="no">import</code> keyword in a script
-or inline via a <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> tag. Here's an example of
-both</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+or inline via a <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> tag. Here's an example</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"&gt;&lt;/script&gt;
+
+&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "three": "./path/to/three.module.js",
+    "three/addons/": "./different/path/to/examples/jsm/"
+  }
+}
+&lt;/script&gt;
+
+&lt;script type="module"&gt;
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 ...
 
 &lt;/script&gt;
 </pre>
-<p>Paths must be absolute or relative. Relative paths always start with <code class="notranslate" translate="no">./</code> or <code class="notranslate" translate="no">../</code>
-which is different than other tags like <code class="notranslate" translate="no">&lt;img&gt;</code> and <code class="notranslate" translate="no">&lt;a&gt;</code> and css references.</p>
-<p>More details are mentioned at the bottom of <a href="fundamentals.html">this article</a>.</p>
+<p>See more details at the bottom of <a href="fundamentals.html">this article</a>.</p>
 <h2 id="-document-queryselector-and-document-queryselectorall-"><code class="notranslate" translate="no">document.querySelector</code> and <code class="notranslate" translate="no">document.querySelectorAll</code></h2>
 <p>You can use <code class="notranslate" translate="no">document.querySelector</code> to select the first element
 that matches a CSS selector. <code class="notranslate" translate="no">document.querySelectorAll</code> returns

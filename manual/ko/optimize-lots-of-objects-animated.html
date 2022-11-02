@@ -294,10 +294,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 <p>이제 각 데이터 그룹에 전환 효과를 줘야 합니다. mesh를 사라지고 나타나게 하는 대신 mesh의 <code class="notranslate" translate="no">morphTargetInfluences</code> 속성을 바꿔 애니메이션을 구현할 겁니다. 화면에 렌더링할 데이터 그룹의 influence(영향)은 1, 렌더링하지 않을 그룹의 influence는 0으로 설정하는 것이죠.</p>
 <p>단순히 숫자 0, 1을 바로 지정할 수도 있지만 그러면 애니메이션이 하나도 보이지 않을 겁니다. 아까 썼던 방법과 전혀 차이가 없는 결과가 나오겠죠. 물론 직접 애니메이션 코드를 작성할 수도 있지만 원본 WebGL 지구본이 <a href="https://github.com/tweenjs/tween.js/">애니메이션 라이브러리</a>를 썼으므로 같은 라이브러리를 사용해보겠습니다.</p>
 <p>먼저 라이브러리를 불러옵니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import { BufferGeometryUtils } from '/examples/jsm/utils/BufferGeometryUtils.js';
-import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
-+import { TWEEN } from '/examples/jsm/libs/tween.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import { BufferGeometryUtils } from 'three/addons/utils/BufferGeometryUtils.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
++import { TWEEN } from 'three/addons/libs/tween.min.js';
 </pre>
 <p>그리고 <code class="notranslate" translate="no">Tween</code>으로 influence 속성에 애니메이션을 줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 선택한 데이터를 보여주고 나머지는 숨깁니다.

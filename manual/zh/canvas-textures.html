@@ -230,8 +230,8 @@ cubes.push(cube);  // 添加到cube list中方便旋转</pre>
 +makePerson(-0, 32, 'Green Machine', 'green');
 +makePerson(+3, 32, 'Red Menace', 'red');</pre>
           <p>剩下的就是添加 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 这样我们就可以移动相机了。</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';</pre>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';</pre>
           <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // Canvas默认值
 const near = 0.1;

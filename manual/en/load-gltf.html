@@ -112,10 +112,10 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 </pre>
 <p>I kept the auto framing code as before</p>
 <p>We also need to include the <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> and we can get rid of the <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from '/examples/jsm/loaders/LoaderSupport.js';
--import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
--import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
-+import {GLTFLoader} from '/examples/jsm/loaders/GLTFLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
+-import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
+-import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
++import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 </pre>
 <p>And running that we get</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

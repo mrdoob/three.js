@@ -380,7 +380,7 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 для перемещения вершин каждой геометрии блока, мы могли бы сделать это один раз, а не два. </p>
 <p>В конце мы передаем массив всех геометрий в <code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code>, который объединит их все в одну сетку. </p>
 <p>Нам также нужно включить <code class="notranslate" translate="no">BufferGeometryUtils</code> </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from '/examples/jsm/utils/BufferGeometryUtils.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
 <p>И теперь, по крайней мере на моей машине, я получаю 60 кадров в секунду </p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

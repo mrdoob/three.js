@@ -66,7 +66,7 @@ the hemispherical lighting example so I ended up with one
 related to adjusting the lights. I also removed the cube and sphere
 that were being added to the scene.</p>
 <p>From that the first thing we need to do is include the <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> loader in our script.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 </pre>
 <p>Then to load the .OBJ file we create an instance of <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>,
 pass it the URL of our .OBJ file, and pass in a callback that adds
@@ -148,10 +148,10 @@ file to.</p>
 
 <p>Now that we have the textures available we can load the .MTL file.</p>
 <p>First we need to include the <a href="/docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a>;</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
-+import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
++import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
 </pre>
 <p>Then we first load the .MTL file. When it's finished loading we add
 the just loaded materials on to the <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> itself via the <code class="notranslate" translate="no">setMaterials</code>
