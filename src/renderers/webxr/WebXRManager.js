@@ -26,6 +26,7 @@ class WebXRManager extends EventDispatcher {
 
 		let session = null;
 		let framebufferScaleFactor = 1.0;
+		let limitWithNativeFramebufferScaleFactor = false;
 
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
@@ -182,9 +183,10 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.setFramebufferScaleFactor = function ( value ) {
+		this.setFramebufferScaleFactor = function ( value, limited = false ) {
 
 			framebufferScaleFactor = value;
+			limitWithNativeFramebufferScaleFactor = limited;
 
 			if ( scope.isPresenting === true ) {
 
@@ -262,6 +264,18 @@ class WebXRManager extends EventDispatcher {
 				if ( attributes.xrCompatible !== true ) {
 
 					await gl.makeXRCompatible();
+
+				}
+
+				if ( limitWithNativeFramebufferScaleFactor && XRWebGLLayer.getNativeFramebufferScaleFactor ) {
+
+					const nativeFramebufferScaleFactor = XRWebGLLayer.getNativeFramebufferScaleFactor( session );
+
+					if ( nativeFramebufferScaleFactor < framebufferScaleFactor ) {
+
+						framebufferScaleFactor = nativeFramebufferScaleFactor;
+
+					}
 
 				}
 
