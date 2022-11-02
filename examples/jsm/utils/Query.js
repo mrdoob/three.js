@@ -23,7 +23,7 @@ class Query {
 	constructor( query = '' ) {
 
 		query = query.replace( /\bAND\b/g, '&&' ).replace( /\bOR\b/g, '||' );
-		const tokens = query.match( /[\w|\d|\.]+|[\?\!\=\<\>\&\|\%\+\-\*\/\%\"\'\(\)]+|[\,]/g );
+		const tokens = query.match( /[\w\d\.]+|[\?\!\=\<\>\&\|\+\-\*\/\%\"\'\(\)]+|[\,]/g );
 
 		this.select = [];
 		this.where = [];
