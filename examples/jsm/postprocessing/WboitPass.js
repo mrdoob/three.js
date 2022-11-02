@@ -34,9 +34,9 @@ const _clearColorOne = new Color( 1.0, 1.0, 1.0 );
 
 class WboitPass extends Pass {
 
-	constructor ( renderer, scene, camera, clearColor, clearAlpha ) {
+	constructor( renderer, scene, camera, clearColor, clearAlpha ) {
 
-		if ( ! renderer ) return console.error( `WboitPass: Renderer must be supplied!` );
+		if ( ! renderer ) return console.error( 'WboitPass: Renderer must be supplied!' );
 
 		super();
 
@@ -136,7 +136,11 @@ class WboitPass extends Pass {
 			rgba[ 2 ] /= targetDivisor[ i ];
 			rgba[ 3 ] /= targetDivisor[ i ];
 
-			function fuzzyCompare( a, b, epsilon = 0.01 ) { return Math.abs( a - b ) < epsilon; }
+			function fuzzyCompare( a, b, epsilon = 0.01 ) {
+
+				return Math.abs( a - b ) < epsilon;
+
+			}
 
 			let complete = gl.checkFramebufferStatus( gl.FRAMEBUFFER ) === gl.FRAMEBUFFER_COMPLETE;
 			complete = complete && fuzzyCompare( rgba[ 0 ], testR );
@@ -218,12 +222,12 @@ class WboitPass extends Pass {
 
 				if ( ! object.material ) return;
 
-				let materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+				const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
 				let isWboitCapable = true;
 
 				for ( let i = 0; i < materials.length; i ++ ) {
 
-					if ( materials[i].isMeshWboitMaterial !== true || materials[i].transparent !== true ) {
+					if ( materials[ i ].isMeshWboitMaterial !== true || materials[ i ].transparent !== true ) {
 
 						isWboitCapable = false;
 						break;
@@ -273,44 +277,44 @@ class WboitPass extends Pass {
 
 				for ( let i = 0; i < materials.length; i ++ ) {
 
-					if ( materials[i].isMeshWboitMaterial !== true || materials[i].transparent !== true ) continue;
+					if ( materials[ i ].isMeshWboitMaterial !== true || materials[ i ].transparent !== true ) continue;
 
-					materials[i].uniforms[ 'renderStage' ].value = stage.toFixed( 1 );
+					materials[ i ].uniforms[ 'renderStage' ].value = stage.toFixed( 1 );
 
 					switch ( stage ) {
 
 						case WboitStages.Acummulation:
 
-							testCache.set( materials[i], materials[i].depthTest );
-							writeCache.set( materials[i], materials[i].depthWrite );
-							materials[i].blending = CustomBlending;
-							materials[i].blendEquation = AddEquation;
-							materials[i].blendSrc = OneFactor;
-							materials[i].blendDst = OneFactor;
-							materials[i].depthWrite = false;
-							materials[i].depthTest = true;
+							testCache.set( materials[ i ], materials[ i ].depthTest );
+							writeCache.set( materials[ i ], materials[ i ].depthWrite );
+							materials[ i ].blending = CustomBlending;
+							materials[ i ].blendEquation = AddEquation;
+							materials[ i ].blendSrc = OneFactor;
+							materials[ i ].blendDst = OneFactor;
+							materials[ i ].depthWrite = false;
+							materials[ i ].depthTest = true;
 
 							break;
 
 						case WboitStages.Revealage:
 
-							materials[i].blending = CustomBlending;
-							materials[i].blendEquation = AddEquation;
-							materials[i].blendSrc = ZeroFactor;
-							materials[i].blendDst = OneMinusSrcAlphaFactor;
-							materials[i].depthWrite = false;
-							materials[i].depthTest = true;
+							materials[ i ].blending = CustomBlending;
+							materials[ i ].blendEquation = AddEquation;
+							materials[ i ].blendSrc = ZeroFactor;
+							materials[ i ].blendDst = OneMinusSrcAlphaFactor;
+							materials[ i ].depthWrite = false;
+							materials[ i ].depthTest = true;
 
 							break;
 
 						default:
 
-							materials[i].blending = NormalBlending;
-							materials[i].blendEquation = AddEquation
-							materials[i].blendSrc = SrcAlphaFactor;
-							materials[i].blendDst = OneMinusSrcAlphaFactor;
-							materials[i].depthWrite = testCache.get( materials[i] );
-							materials[i].depthTest = writeCache.get( materials[i] );
+							materials[ i ].blending = NormalBlending;
+							materials[ i ].blendEquation = AddEquation;
+							materials[ i ].blendSrc = SrcAlphaFactor;
+							materials[ i ].blendDst = OneMinusSrcAlphaFactor;
+							materials[ i ].depthWrite = testCache.get( materials[ i ] );
+							materials[ i ].depthTest = writeCache.get( materials[ i ] );
 
 					}
 
@@ -321,7 +325,7 @@ class WboitPass extends Pass {
 		}
 
 		// Save Current State
-		const oldAutoClear = renderer.autoClear;;
+		const oldAutoClear = renderer.autoClear;
 		const oldClearAlpha = renderer.getClearAlpha();
 		const oldRenderTarget = renderer.getRenderTarget();
 		const oldOverrideMaterial = scene.overrideMaterial;
@@ -342,10 +346,13 @@ class WboitPass extends Pass {
 
 		// Copy Opaque Render to Write Buffer (so we can re-use depth buffer)
 		if ( this.clearColor ) {
+
 			renderer.setRenderTarget( writeBuffer );
 			renderer.setClearColor( this.clearColor, this.clearAlpha );
 			renderer.clearColor();
+
 		}
+
 		this.blendPass.render( renderer, writeBuffer, this.baseTarget );
 
 		// Render Transparent Objects, Accumulation Pass

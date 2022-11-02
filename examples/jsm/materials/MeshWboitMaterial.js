@@ -10,7 +10,7 @@ const WboitStages = {
 	Normal: 0.0,
 	Acummulation: 1.0,
 	Revealage: 2.0,
-}
+};
 
 const WboitBasicShader = {
 
@@ -262,9 +262,17 @@ class MeshWboitMaterial extends ShaderMaterial {
 
 			Object.defineProperty( this, propertyName, {
 
-				get: function () { return this.uniforms[ propertyName ].value; },
+				get: function () {
 
-				set: function ( value ) { this.uniforms[ propertyName ].value = value; }
+					return this.uniforms[ propertyName ].value;
+
+				},
+
+				set: function ( value ) {
+
+					this.uniforms[ propertyName ].value = value;
+
+				}
 
 			} );
 
