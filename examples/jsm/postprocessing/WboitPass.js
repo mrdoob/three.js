@@ -21,8 +21,8 @@ import {
 	ZeroFactor
 } from 'three';
 
-import { Pass } from './postprocessing/Pass.js';
-import { ShaderPass } from './postprocessing/ShaderPass.js';
+import { Pass } from './Pass.js';
+import { ShaderPass } from './ShaderPass.js';
 
 import { CopyShader } from '../shaders/CopyShader.js';
 import { FillShader } from '../shaders/FillShader.js';
