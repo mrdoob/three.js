@@ -8638,10 +8638,10 @@ var uv2_vertex = "#if defined( USE_LIGHTMAP ) || defined( USE_AOMAP )\n\tvUv2 = 
 var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP ) || defined ( USE_TRANSMISSION ) || NUM_SPOT_LIGHT_COORDS > 0\n\tvec4 worldPosition = vec4( transformed, 1.0 );\n\t#ifdef USE_INSTANCING\n\t\tworldPosition = instanceMatrix * worldPosition;\n\t#endif\n\tworldPosition = modelMatrix * worldPosition;\n#endif";
 
 const vertex$h = "varying vec2 vUv;\nuniform mat3 uvTransform;\nvoid main() {\n\tvUv = ( uvTransform * vec3( uv, 1 ) ).xy;\n\tgl_Position = vec4( position.xy, 1.0, 1.0 );\n}";
-const fragment$h = "uniform sampler2D t2D;\nvarying vec2 vUv;\nvoid main() {\n\tgl_FragColor = texture2D( t2D, vUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\tgl_FragColor = vec4( mix( pow( gl_FragColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), gl_FragColor.rgb * 0.0773993808, vec3( lessThanEqual( gl_FragColor.rgb, vec3( 0.04045 ) ) ) ), gl_FragColor.w );\n\t#endif\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
+const fragment$h = "uniform sampler2D t2D;\nuniform float backgroundIntensity;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\ttexColor = vec4( mix( pow( texColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), texColor.rgb * 0.0773993808, vec3( lessThanEqual( texColor.rgb, vec3( 0.04045 ) ) ) ), texColor.w );\n\t#endif\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
 
 const vertex$g = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}";
-const fragment$g = "#ifdef ENVMAP_TYPE_CUBE\n\tuniform samplerCube envMap;\n#elif defined( ENVMAP_TYPE_CUBE_UV )\n\tuniform sampler2D envMap;\n#endif\nuniform float flipEnvMap;\nuniform float backgroundBlurriness;\nvarying vec3 vWorldDirection;\n#include <cube_uv_reflection_fragment>\nvoid main() {\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 texColor = textureCube( envMap, vec3( flipEnvMap * vWorldDirection.x, vWorldDirection.yz ) );\n\t#elif defined( ENVMAP_TYPE_CUBE_UV )\n\t\tvec4 texColor = textureCubeUV( envMap, vWorldDirection, backgroundBlurriness );\n\t#else\n\t\tvec4 texColor = vec4( 0.0, 0.0, 0.0, 1.0 );\n\t#endif\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
+const fragment$g = "#ifdef ENVMAP_TYPE_CUBE\n\tuniform samplerCube envMap;\n#elif defined( ENVMAP_TYPE_CUBE_UV )\n\tuniform sampler2D envMap;\n#endif\nuniform float flipEnvMap;\nuniform float backgroundBlurriness;\nuniform float backgroundIntensity;\nvarying vec3 vWorldDirection;\n#include <cube_uv_reflection_fragment>\nvoid main() {\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 texColor = textureCube( envMap, vec3( flipEnvMap * vWorldDirection.x, vWorldDirection.yz ) );\n\t#elif defined( ENVMAP_TYPE_CUBE_UV )\n\t\tvec4 texColor = textureCubeUV( envMap, vWorldDirection, backgroundBlurriness );\n\t#else\n\t\tvec4 texColor = vec4( 0.0, 0.0, 0.0, 1.0 );\n\t#endif\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
 
 const vertex$f = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}";
 const fragment$f = "uniform samplerCube tCube;\nuniform float tFlip;\nuniform float opacity;\nvarying vec3 vWorldDirection;\nvoid main() {\n\tvec4 texColor = textureCube( tCube, vec3( tFlip * vWorldDirection.x, vWorldDirection.yz ) );\n\tgl_FragColor = texColor;\n\tgl_FragColor.a *= opacity;\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
@@ -9238,6 +9238,9 @@ const ShaderLib = {
 			},
 			t2D: {
 				value: null
+			},
+			backgroundIntensity: {
+				value: 1
 			}
 		},
 		vertexShader: ShaderChunk.background_vert,
@@ -9253,6 +9256,9 @@ const ShaderLib = {
 			},
 			backgroundBlurriness: {
 				value: 0
+			},
+			backgroundIntensity: {
+				value: 1
 			}
 		},
 		vertexShader: ShaderChunk.backgroundCube_vert,
@@ -9466,6 +9472,7 @@ function WebGLBackground(renderer, cubemaps, cubeuvmaps, state, objects, alpha, 
 			boxMesh.material.uniforms.envMap.value = background;
 			boxMesh.material.uniforms.flipEnvMap.value = background.isCubeTexture && background.isRenderTargetTexture === false ? -1 : 1;
 			boxMesh.material.uniforms.backgroundBlurriness.value = scene.backgroundBlurriness;
+			boxMesh.material.uniforms.backgroundIntensity.value = scene.backgroundIntensity;
 			if (currentBackground !== background || currentBackgroundVersion !== background.version || currentTonemapping !== renderer.toneMapping) {
 				boxMesh.material.needsUpdate = true;
 				currentBackground = background;
@@ -9499,6 +9506,7 @@ function WebGLBackground(renderer, cubemaps, cubeuvmaps, state, objects, alpha, 
 				objects.update(planeMesh);
 			}
 			planeMesh.material.uniforms.t2D.value = background;
+			planeMesh.material.uniforms.backgroundIntensity.value = scene.backgroundIntensity;
 			if (background.matrixAutoUpdate === true) {
 				background.updateMatrix();
 			}
@@ -16253,6 +16261,8 @@ class WebXRManager extends EventDispatcher {
 		let newRenderTarget = null;
 		const controllers = [];
 		const controllerInputSources = [];
+		const planes = new Set();
+		const planesLastChangedTimes = new Map();
 
 		//
 
@@ -16630,6 +16640,9 @@ class WebXRManager extends EventDispatcher {
 				glBaseLayer.fixedFoveation = foveation;
 			}
 		};
+		this.getPlanes = function () {
+			return planes;
+		};
 
 		// Animation Loop
 
@@ -16695,6 +16708,50 @@ class WebXRManager extends EventDispatcher {
 				}
 			}
 			if (onAnimationFrameCallback) onAnimationFrameCallback(time, frame);
+			if (frame.detectedPlanes) {
+				scope.dispatchEvent({
+					type: 'planesdetected',
+					data: frame.detectedPlanes
+				});
+				let planesToRemove = null;
+				for (const plane of planes) {
+					if (!frame.detectedPlanes.has(plane)) {
+						if (planesToRemove === null) {
+							planesToRemove = [];
+						}
+						planesToRemove.push(plane);
+					}
+				}
+				if (planesToRemove !== null) {
+					for (const plane of planesToRemove) {
+						planes.delete(plane);
+						planesLastChangedTimes.delete(plane);
+						scope.dispatchEvent({
+							type: 'planeremoved',
+							data: plane
+						});
+					}
+				}
+				for (const plane of frame.detectedPlanes) {
+					if (!planes.has(plane)) {
+						planes.add(plane);
+						planesLastChangedTimes.set(plane, frame.lastChangedTime);
+						scope.dispatchEvent({
+							type: 'planeadded',
+							data: plane
+						});
+					} else {
+						const lastKnownTime = planesLastChangedTimes.get(plane);
+						if (plane.lastChangedTime > lastKnownTime) {
+							planesLastChangedTimes.set(plane, plane.lastChangedTime);
+							scope.dispatchEvent({
+								type: 'planechanged',
+								data: plane
+							});
+						}
+					}
+				}
+			}
 			xrFrame = null;
 		}
 		const animation = new WebGLAnimation();
@@ -18785,6 +18842,7 @@ class Scene extends Object3D {
 		this.environment = null;
 		this.fog = null;
 		this.backgroundBlurriness = 0;
+		this.backgroundIntensity = 1;
 		this.overrideMaterial = null;
 		if (typeof __THREE_DEVTOOLS__ !== 'undefined') {
 			__THREE_DEVTOOLS__.dispatchEvent(new CustomEvent('observe', {
@@ -18798,6 +18856,7 @@ class Scene extends Object3D {
 		if (source.environment !== null) this.environment = source.environment.clone();
 		if (source.fog !== null) this.fog = source.fog.clone();
 		this.backgroundBlurriness = source.backgroundBlurriness;
+		this.backgroundIntensity = source.backgroundIntensity;
 		if (source.overrideMaterial !== null) this.overrideMaterial = source.overrideMaterial.clone();
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 		return this;
@@ -18806,6 +18865,7 @@ class Scene extends Object3D {
 		const data = super.toJSON(meta);
 		if (this.fog !== null) data.object.fog = this.fog.toJSON();
 		if (this.backgroundBlurriness > 0) data.backgroundBlurriness = this.backgroundBlurriness;
+		if (this.backgroundIntensity !== 1) data.backgroundIntensity = this.backgroundIntensity;
 		return data;
 	}
 
@@ -27304,6 +27364,7 @@ class ObjectLoader extends Loader {
 			}
 			const metadata = json.metadata;
 			if (metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry') {
+				if (onError !== undefined) onError(new Error('THREE.ObjectLoader: Can\'t load ' + url));
 				console.error('THREE.ObjectLoader: Can\'t load ' + url);
 				return;
 			}
