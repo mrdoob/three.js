@@ -17,9 +17,10 @@
 
 			#queryInput {
 				position: absolute;
-				bottom: 50px;
-				left: calc( 50% - 300px );
-				width: 600px;
+				bottom: 70px;
+				left: 50%;
+				width: 80%;
+				max-width: 700px;
 				height: 30px;
 				text-align: center;
 				background: #0009;
@@ -27,6 +28,7 @@
 				font-size: 20px;
 				border: 2px solid #666;
 				border-radius: 4px;
+				transform: translateX( -50% );
 			}
 		</style>
 	</head>
@@ -78,7 +80,8 @@
 				'SELECT SkinnedMesh',
 				'SELECT MeshStandardMaterial WHERE self.map?.image.width < 2048',
 				'SELECT Material WHERE self.transparent ORDER self.opacity DESC',
-				'SELECT Material WHERE self.name == "Material_5518" OR self.name == "alpha_glass"'
+				'SELECT Material WHERE self.name == "Material_5518" OR self.name == "alpha_glass"',
+				'SELECT Mesh, Material WHERE self.name == "hand1_normal_0", self.transparent'
 			];
 
 			const guiData = {
