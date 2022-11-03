@@ -48,7 +48,7 @@ class LOD extends Object3D {
 
 	}
 
-	addLevel( object, distance = 0, hysteresis = 0.05 ) {
+	addLevel( object, distance = 0, hysteresis = 0 ) {
 
 		distance = Math.abs( distance );
 

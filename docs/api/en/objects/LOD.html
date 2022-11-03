@@ -73,7 +73,7 @@
 		Each level is an object with the following properties:<br />
 		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
 		[page:Float distance] - The distance at which to display this level of detail.<br />
-		[page:Float hysteresis] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance. Default 0.05.
+		[page:Float hysteresis] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.
 		</p>
 
 		<h2>Methods</h2>
@@ -82,8 +82,8 @@
 		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance], [param:Float hysteresis] )</h3>
 		<p>
 		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
-		[page:Float distance] - The distance at which to display this level of detail.<br />
-		[page:Float hysteresis] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance. Default 0.05.<br /><br />
+		[page:Float distance] - The distance at which to display this level of detail. Default 0.0.<br />
+		[page:Float hysteresis] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance. Default 0.0.<br /><br />
 
 		Adds a mesh that will display at a certain distance and greater. Typically the further away the distance,
 		the lower the detail on the mesh.
