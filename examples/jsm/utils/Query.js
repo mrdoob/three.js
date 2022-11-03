@@ -40,63 +40,59 @@ class Query {
 
 		// COLLECT
 
-		const objects = [];
+		const uniques = new Set();
 
 		object3d.traverse( obj3d => {
 
-			objects.push( obj3d );
+			uniques.add( obj3d );
 
 			if ( obj3d.isMesh ) {
 
-				objects.push( obj3d.material );
+				uniques.add( obj3d.material );
+				uniques.add( obj3d.geometry );
 
 			}
 
 		} );
 
+		const objects = [ ...uniques ];
+		const result = [];
+
 		// SELECT
 
-		let result = [];
+		for ( let i = 0; i < this.select.length; i ++ ) {
 
-		for ( const obj of objects ) {
+			const select = this.select[ i ];
+			const where = this.where[ i ];
+			const order = this.order[ i ];
 
-			for ( const className of this.select ) {
+			let queryObjects = [];
 
-				if ( obj[ 'is' + className ] === true ) {
+			for ( const obj of objects ) {
 
-					result.push( obj );
+				if ( obj[ 'is' + select ] === true ) {
+
+					queryObjects.push( obj );
 
 				}
 
 			}
 
+			// WHERE
+
+			if ( where !== undefined ) queryObjects = queryObjects.filter( where );
+
+			// ORDER
+
+			if ( order !== undefined ) queryObjects = queryObjects.sort( order );
+
+			//
+
+			result.push( ...queryObjects );
+
 		}
-
-		// WHERE
-
-		for ( const method of this.where ) result = result.filter( method );
-
-		// ORDER
-
-		for ( const method of this.order ) result = result.sort( method );
 
 		return result;
-
-	}
-
-	_parseSelect() {
-
-		const select = [];
-
-		let token = null;
-
-		while ( token = this._nextLiteralString() ) {
-
-			select.push( token );
-
-		}
-
-		return select;
 
 	}
 
@@ -111,7 +107,6 @@ class Query {
 
 		}
 
-		console.log( script );
 		return eval( '( self ) => ' + script );
 
 	}
@@ -158,7 +153,11 @@ class Query {
 
 			if ( token === 'SELECT' ) {
 
-				this.select.push( ...this._parseSelect() );
+				do {
+
+					this.select.push( this._nextLiteralString() );
+
+				} while ( this._token() === ',' && this._nextToken() );
 
 			} else if ( token === 'WHERE' ) {
 
