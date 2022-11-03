@@ -719,8 +719,6 @@ class WebXRManager extends EventDispatcher {
 
 			if ( frame.detectedPlanes ) {
 
-				scope.dispatchEvent( { type: 'planesdetected', data: frame.detectedPlanes } );
-
 				let planesToRemove = null;
 
 				for ( const plane of planes ) {
@@ -773,6 +771,8 @@ class WebXRManager extends EventDispatcher {
 					}
 
 				}
+
+				scope.dispatchEvent( { type: 'planesdetected', data: frame.detectedPlanes } );
 
 			}
 

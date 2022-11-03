@@ -29,14 +29,22 @@
 
 			import * as THREE from 'three';
 			import { ARButton } from 'three/addons/webxr/ARButton.js';
+			import { XRPlaneUtils,
+				UncategorizedPlaneType,
+				WallPlaneType,
+				FloorPlaneType,
+				CeilingPlaneType,
+				PlatformPlaneType, } from 'three/addons/webxr/XRPlaneUtils.js';
 
 			let camera, scene, renderer;
 			let controller;
+			let planeUtils;
 
 			init();
 			animate();
 
 			const planesAdded = new Set();
+			const planesType = new Map();
 
 			function init() {
 
@@ -58,6 +66,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
+
+				planeUtils = new XRPlaneUtils( renderer );
 
 				//
 
@@ -127,9 +137,38 @@
 						const width = maxX - minX;
 						const height = maxZ - minZ;
 
+						const mat = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+						let planeType = planesType.get( plane );
+						
+						if ( ! planeType ) {
+
+							planeType = planeUtils.getPlaneType( plane );
+
+							if ( planeType === CeilingPlaneType ) {
+
+								mat.color.set( 0xeeeeee );
+
+							} else if ( planeType === FloorPlaneType ) {
+
+								mat.color.set( 0x666666 );
+
+							} else if ( planeType === WallPlaneType ) {
+
+								mat.color.set( 0xaaaaaa );
+
+							} else if ( planeType === PlatformPlaneType ) {
+
+								mat.color.set( 0x999999 );
+
+							}
+
+							planesType.set( plane, planeType );
+
+						} 
+
 						const boxMesh = new THREE.Mesh(
 							new THREE.BoxGeometry( width, 0.01, height ),
-							new THREE.MeshBasicMaterial( { color: 0xffffff * Math.random() } )
+							mat
 						);
 						boxMesh.matrixAutoUpdate = false;
 						boxMesh.matrix.fromArray( planePose.transform.matrix );
