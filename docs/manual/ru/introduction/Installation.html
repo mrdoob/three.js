@@ -143,12 +143,22 @@
 	</p>
 
 	<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+		{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+			}
+		}
+		&lt;/script>
 		&lt;script type="module">
 
-		import * as THREE from 'three';
-		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		const controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 	</code>
@@ -166,28 +176,20 @@
 		В то время как большинство современных пакетов JavaScript теперь поддерживают модули по умолчанию, некоторые
 		старые
 		инструменты сборки могут этого не делать. В этих случаях вы, вероятно, можете настроить пакет для подключения
-		модулей ES: [link:http://browserify.org/ Browserify] просто нужен плагин [link:https://github.com/babel/babelify
-		babelify], как пример.
-	<hr>
-	While most modern JavaScript bundlers now support ES modules by default, some older build tools might not. In those
-	cases you can likely configure the bundler to understand ES modules: [link:http://browserify.org/ Browserify] just
-	needs
-	the [link:https://github.com/babel/babelify babelify] plugin, for example.
+		модулей ES: [link:http://browserify.org/ Browserify] просто нужен плагин [link:https://github.com/babel/babelify babelify] , как пример.
+
 	</p>
 
 	<h3>Node.js</h3>
 
 	<p>
-		Так как three.js создан для Интернета, он зависит от браузера и DOM API, которые не всегда существуют в Node.js
-		.
+		Так как three.js создан для Интернета, он зависит от браузера и DOM API, которые не всегда существуют в Node.js.
 		Некоторые из этих проблем могут быть решены с помощью прослоек, таких как
 		[link:https://github.com/stackgl/headless-gl headless-gl], или путем замены компонентов, таких как
 		[page:TextureLoader], пользовательскими альтернативами. Другие API-интерфейсы DOM могут быть глубоко переплетены
-		с
-		использующим их кодом, и обойти их будет сложнее.
+		с использующим их кодом, и обойти их будет сложнее.
 		Мы приветствуем простые и поддерживаемые предложения `pull requests` для улучшения поддержки Node.js, но
-		рекомендуем
-		сначала открыть `issue`(вопрос), чтобы обсудить ваши улучшения.
+		рекомендуем сначала открыть `issue`(вопрос), чтобы обсудить ваши улучшения.
 	</p>
 
 	<p>
