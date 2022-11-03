@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Rappresenta l'origine dati di una texture.
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Any data] )</h3>
+		<p>
+			[page:Any data] -- La definizione dei dati della texture. Il valore predefinito è `null`.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Any data]</h3>
+		<p>
+			I dati effettivi di una texture. Il tipo di questa proprietà dipende dalla texture che utilizza questa istanza.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			Impostalo a `true` per attivare un caricamento di dati sulla GPU la prossima volta che viene utilizzata la sorgente.
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] di questa istanza dell'oggetto.
+		Questo viene assegnato automaticamente, quindi non deve essere modificato.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+			Questo inizia a `0` e conta quante volte [page:Source.needsUpdate .needsUpdate] viene impostato a `true`.
+		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
+		<p>
+		meta -- oggetto opzionale contenente i metadati.<br />
+		Converte l'origine dati nel [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 formato JSON Oggetto/Scena] di three.js.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
