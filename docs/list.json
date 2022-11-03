@@ -1423,6 +1423,21 @@
 				"Fog": "api/it/scenes/Fog",
 				"FogExp2": "api/it/scenes/FogExp2",
 				"Scene": "api/it/scenes/Scene"
+			},
+
+			"Textures": {
+				"CanvasTexture": "api/it/textures/CanvasTexture",
+				"CompressedTexture": "api/it/textures/CompressedTexture",
+				"CompressedArrayTexture": "api/it/textures/CompressedArrayTexture",
+				"CubeTexture": "api/it/textures/CubeTexture",
+				"Data3DTexture": "api/it/textures/Data3DTexture",
+				"DataArrayTexture": "api/it/textures/DataArrayTexture",
+				"DataTexture": "api/it/textures/DataTexture",
+				"DepthTexture": "api/it/textures/DepthTexture",
+				"FramebufferTexture": "api/it/textures/FramebufferTexture",
+				"Source": "api/it/textures/Source",
+				"Texture": "api/it/textures/Texture",
+				"VideoTexture": "api/it/textures/VideoTexture"
 			}
 		}
 	},
