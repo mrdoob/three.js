@@ -32,6 +32,41 @@ import { WboitStages } from '../materials/MeshWboitMaterial.js';
 const _clearColorZero = new Color( 0.0, 0.0, 0.0 );
 const _clearColorOne = new Color( 1.0, 1.0, 1.0 );
 
+const CopyVisibleShader = {
+
+	uniforms: {
+
+		'tDiffuse': { value: null },
+
+	},
+
+	vertexShader: /* glsl */`
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}`,
+
+	fragmentShader: /* glsl */`
+
+		uniform sampler2D tDiffuse;
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vec4 color = texture2D( tDiffuse, vUv );
+			if ( color.a == 0.0 ) discard;
+			gl_FragColor = color;
+
+		}`
+
+};
+
 class WboitPass extends Pass {
 
 	constructor( renderer, scene, camera, clearColor, clearAlpha ) {
@@ -59,13 +94,13 @@ class WboitPass extends Pass {
 
 		// Passes
 
-		this.blendPass = new ShaderPass( CopyShader );
+		this.blendPass = new ShaderPass( CopyVisibleShader );
 		this.blendPass.material.depthTest = false;
 		this.blendPass.material.depthWrite = false;
 		this.blendPass.material.blending = CustomBlending;
 		this.blendPass.material.blendEquation = AddEquation;
-		this.blendPass.material.blendSrc = SrcAlphaFactor;
-		this.blendPass.material.blendDst = OneMinusSrcAlphaFactor;
+		this.blendPass.material.blendSrc = OneFactor;
+		this.blendPass.material.blendDst = ZeroFactor;
 
 		this.copyPass = new ShaderPass( CopyShader );
 		this.copyPass.material.depthTest = false;
@@ -136,17 +171,17 @@ class WboitPass extends Pass {
 			rgba[ 2 ] /= targetDivisor[ i ];
 			rgba[ 3 ] /= targetDivisor[ i ];
 
-			function fuzzyCompare( a, b, epsilon = 0.01 ) {
+			function fuzzyEqual( a, b, epsilon = 0.01 ) {
 
-				return Math.abs( a - b ) < epsilon;
+				return ( ( a < ( b + epsilon ) ) && ( a > ( b - epsilon ) ) );
 
 			}
 
 			let complete = gl.checkFramebufferStatus( gl.FRAMEBUFFER ) === gl.FRAMEBUFFER_COMPLETE;
-			complete = complete && fuzzyCompare( rgba[ 0 ], testR );
-			complete = complete && fuzzyCompare( rgba[ 1 ], testG );
-			complete = complete && fuzzyCompare( rgba[ 2 ], testB );
-			complete = complete && fuzzyCompare( rgba[ 3 ], testA );
+			complete = complete && fuzzyEqual( rgba[ 0 ], testR );
+			complete = complete && fuzzyEqual( rgba[ 1 ], testG );
+			complete = complete && fuzzyEqual( rgba[ 2 ], testB );
+			complete = complete && fuzzyEqual( rgba[ 3 ], testA );
 			complete = complete || i === targetTypes.length - 1;
 
 			testTarget.dispose();
@@ -227,7 +262,7 @@ class WboitPass extends Pass {
 
 				for ( let i = 0; i < materials.length; i ++ ) {
 
-					if ( materials[ i ].isMeshWboitMaterial !== true || materials[ i ].transparent !== true ) {
+					if ( materials[ i ].wboitEnabled !== true || materials[ i ].transparent !== true ) {
 
 						isWboitCapable = false;
 						break;
@@ -277,7 +312,7 @@ class WboitPass extends Pass {
 
 				for ( let i = 0; i < materials.length; i ++ ) {
 
-					if ( materials[ i ].isMeshWboitMaterial !== true || materials[ i ].transparent !== true ) continue;
+					if ( materials[ i ].wboitEnabled !== true || materials[ i ].transparent !== true ) continue;
 
 					materials[ i ].uniforms[ 'renderStage' ].value = stage.toFixed( 1 );
 

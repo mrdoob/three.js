@@ -209,6 +209,12 @@ class MeshWboitMaterial extends ShaderMaterial {
 
 		this.type = 'MeshWboitMaterial';
 
+		// Flag for WboitPass
+
+		this.wboitEnabled = true;
+
+		//
+
 		const shader = WboitBasicShader;
 
 		this.defines = {};

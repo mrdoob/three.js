@@ -343,7 +343,7 @@
 
 							materials[ i ].side = ( params.doubleSide ) ? THREE.DoubleSide : THREE.FrontSide;
 
-							if ( materials[ i ].isMeshWboitMaterial !== true ) continue;
+							if ( materials[ i ].wboitEnabled !== true ) continue;
 
 							materials[ i ].transparent = params.transparent;
 							materials[ i ].opacity = params.opacity;
