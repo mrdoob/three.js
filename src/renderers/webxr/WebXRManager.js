@@ -267,7 +267,7 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
-				if ( limitWithNativeFramebufferScaleFactor && XRWebGLLayer.getNativeFramebufferScaleFactor ) {
+				if ( limitWithNativeFramebufferScaleFactor === true && XRWebGLLayer.getNativeFramebufferScaleFactor ) {
 
 					const nativeFramebufferScaleFactor = XRWebGLLayer.getNativeFramebufferScaleFactor( session );
 
