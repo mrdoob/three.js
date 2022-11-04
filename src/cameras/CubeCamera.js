@@ -1,6 +1,5 @@
 import { NoToneMapping } from '../constants.js';
 import { Object3D } from '../core/Object3D.js';
-import { Vector3 } from '../math/Vector3.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
 const fov = 90, aspect = 1;

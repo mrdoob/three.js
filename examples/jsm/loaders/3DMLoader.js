@@ -15,7 +15,6 @@ import {
 	PointLight,
 	SpotLight,
 	RectAreaLight,
-	Vector3,
 	Sprite,
 	SpriteMaterial,
 	CanvasTexture,
