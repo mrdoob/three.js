@@ -71,16 +71,18 @@
 
 			Ogni livello è un oggetto con due proprietà:<br />
 			[page:Object3D object] - L'[page:Object3D] da visualizzare a questo livello.<br />
-			[page:Float distance] - La distanza alla quale visualizzare questo livello di dettaglio.
+			[page:Float distance] - La distanza alla quale visualizzare questo livello di dettaglio.<br />
+			[page:Float hysteresis] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.
 		</p>
 
 		<h2>Metodi</h2>
 		<p>Vedi la classe base [page:Object3D] per i metodi comuni.</p>
 
-		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance] )</h3>
+		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance], [param:Float hysteresis] )</h3>
 		<p>
 		[page:Object3D object] - L'[page:Object3D] da visualizzare a questo livello.<br />
-		[page:Float distance] - La distanza alla quale visualizzare questo livello di dettaglio.<br /><br />
+		[page:Float distance] - La distanza alla quale visualizzare questo livello di dettaglio.<br />
+		[page:Float hysteresis] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance. Default 0.0.<br /><br />
 
 		Aggiunge una mesh che sarà visualizzata ad una certa distanza e maggiore. In genere, maggiore è 
 		la distanza, minore è il dettaglio sulla mesh.
