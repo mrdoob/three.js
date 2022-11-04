@@ -78,10 +78,10 @@
 
 			const examples = [
 				'SELECT SkinnedMesh',
-				'SELECT MeshStandardMaterial WHERE self.map?.image.width < 2048',
-				'SELECT Material WHERE self.transparent ORDER self.opacity DESC',
-				'SELECT Material WHERE self.name == "Material_5518" OR self.name == "alpha_glass"',
-				'SELECT Mesh, Material WHERE self.name == "hand1_normal_0", self.transparent'
+				'SELECT MeshStandardMaterial WHERE map?.image.width < 2048',
+				'SELECT Material WHERE transparent ORDER opacity DESC',
+				'SELECT Material WHERE name == "Material_5518" OR name == "alpha_glass"',
+				'SELECT Mesh, Material WHERE name == "hand1_normal_0", transparent'
 			];
 
 			const guiData = {

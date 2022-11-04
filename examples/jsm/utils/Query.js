@@ -4,15 +4,13 @@ const orderKeywords = [ 'ASC', 'DESC' ];
 
 const addTokenToScript = ( script, token ) => {
 
-	if ( /^W/i.test( token ) === false ) {
+	if ( /^[a-z]/i.test( token ) && /^(window|Math)\./i.test( token ) === false ) {
 
-		script += token;
-
-	} else {
-
-		script += token + ' ';
+		token = 'self.' + token;
 
 	}
+
+	script += token;
 
 	return script;
 
@@ -23,7 +21,7 @@ class Query {
 	constructor( query = '' ) {
 
 		query = query.replace( /\bAND\b/g, '&&' ).replace( /\bOR\b/g, '||' );
-		const tokens = query.match( /[\w\d\.]+|[\?\!\=\<\>\&\|\+\-\*\/\%\"\'\(\)]+|[\,]/g );
+		const tokens = query.match( /[\w\d\.\?]+|[\?\!\=\<\>\&\|\+\-\*\/\%]+|[\,\(\)]|"([^"\\]|\\.)*"|'([^'\\]|\\.)*'/g );
 
 		this.select = [];
 		this.where = [];
