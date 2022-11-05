@@ -16091,6 +16091,22 @@ class WebXRController {
 		}
 		return this;
 	}
+	connect(inputSource) {
+		if (inputSource && inputSource.hand) {
+			const hand = this._hand;
+			if (hand) {
+				for (const inputjoint of inputSource.hand.values()) {
+					// Initialize hand with joints when connected
+					this._getHandJoint(hand, inputjoint);
+				}
+			}
+		}
+		this.dispatchEvent({
+			type: 'connected',
+			data: inputSource
+		});
+		return this;
+	}
 	disconnect(inputSource) {
 		this.dispatchEvent({
 			type: 'disconnected',
@@ -16120,16 +16136,9 @@ class WebXRController {
 				for (const inputjoint of inputSource.hand.values()) {
 					// Update the joints groups with the XRJoint poses
 					const jointPose = frame.getJointPose(inputjoint, referenceSpace);
-					if (hand.joints[inputjoint.jointName] === undefined) {
-						// The transform of this joint will be updated with the joint pose on each frame
-						const joint = new Group();
-						joint.matrixAutoUpdate = false;
-						joint.visible = false;
-						hand.joints[inputjoint.jointName] = joint;
-						// ??
-						hand.add(joint);
-					}
-					const joint = hand.joints[inputjoint.jointName];
+
+					// The transform of this joint will be updated with the joint pose on each frame
+					const joint = this._getHandJoint(hand, inputjoint);
 					if (jointPose !== null) {
 						joint.matrix.fromArray(jointPose.transform.matrix);
 						joint.matrix.decompose(joint.position, joint.rotation, joint.scale);
@@ -16218,6 +16227,19 @@ class WebXRController {
 			hand.visible = handPose !== null;
 		}
 		return this;
+	}
+
+	// private method
+
+	_getHandJoint(hand, inputjoint) {
+		if (hand.joints[inputjoint.jointName] === undefined) {
+			const joint = new Group();
+			joint.matrixAutoUpdate = false;
+			joint.visible = false;
+			hand.joints[inputjoint.jointName] = joint;
+			hand.add(joint);
+		}
+		return hand.joints[inputjoint.jointName];
 	}
 }
 
@@ -16482,10 +16504,7 @@ class WebXRManager extends EventDispatcher {
 				const index = controllerInputSources.indexOf(inputSource);
 				if (index >= 0) {
 					controllerInputSources[index] = null;
-					controllers[index].dispatchEvent({
-						type: 'disconnected',
-						data: inputSource
-					});
+					controllers[index].disconnect(inputSource);
 				}
 			}
 
@@ -16515,10 +16534,7 @@ class WebXRManager extends EventDispatcher {
 				}
 				const controller = controllers[controllerIndex];
 				if (controller) {
-					controller.dispatchEvent({
-						type: 'connected',
-						data: inputSource
-					});
+					controller.connect(inputSource);
 				}
 			}
 		}
