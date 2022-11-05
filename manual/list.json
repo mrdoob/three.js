@@ -69,7 +69,7 @@
 		},
 		"Principes de base": {
 			"Primitives": "fr/primitives",
-			"Graphique de scène": "fr/scenegraph",
+			"Graphe de scène": "fr/scenegraph",
 			"Matériaux": "fr/materials",
 			"Textures": "fr/textures",
 			"Lumières": "fr/lights",
