@@ -2234,7 +2234,7 @@
 		}
 		computeBuildingSteps( model ) {
 
-			// Sets userdata.buildingSteps number in THREE.Group objects and userData.numBuildingSteps number in the root THREE.Group object.
+			// Sets userdata.buildingStep number in THREE.Group objects and userData.numBuildingSteps number in the root THREE.Group object.
 
 			let stepNumber = 0;
 			model.traverse( c => {
@@ -2247,7 +2247,7 @@
 
 					}
 
-					c.userData.buildingSteps = stepNumber;
+					c.userData.buildingStep = stepNumber;
 
 				}
 

@@ -2436,7 +2436,7 @@ class LDrawLoader extends Loader {
 
 	computeBuildingSteps( model ) {
 
-		// Sets userdata.buildingSteps number in Group objects and userData.numBuildingSteps number in the root Group object.
+		// Sets userdata.buildingStep number in Group objects and userData.numBuildingSteps number in the root Group object.
 
 		let stepNumber = 0;
 
@@ -2450,7 +2450,7 @@ class LDrawLoader extends Loader {
 
 				}
 
-				c.userData.buildingSteps = stepNumber;
+				c.userData.buildingStep = stepNumber;
 
 			}
 
