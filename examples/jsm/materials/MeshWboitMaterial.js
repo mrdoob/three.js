@@ -177,16 +177,15 @@ const WboitBasicShader = {
 
 				/* Equation #9 */
 				// float w = accum.a * clamp( 0.03 / ( 1e-5 + pow( abs( z ) / 200.0, 4.0 ) ), 0.01, 300.0 );
-				// gl_FragColor = vec4( accum.rgb, accum.a ) * w;
 
 				/* McGuire 10/2013 */
 				// float w = clamp( pow( ( accum.a * 8.0 + 0.01 ) * ( - z * 0.95 + 1.0 ), 3.0 ) * 1e3, 1e-2, 3e2 );
-				// gl_FragColor = vec4( accum.rgb, accum.a ) * w;
 
 				/* Stevinz, Adjustable Weight */
 				float scaleWeight = 0.7 + ( 0.3 * weight );
 				float w = clamp( pow( ( accum.a * 8.0 + 0.001 ) * ( - z * scaleWeight + 1.0 ), 3.0 ) * 1000.0, 0.001, 300.0 );
-				gl_FragColor = vec4( accum.rgb, accum.a ) * w;
+
+				gl_FragColor = accum * w;
 
 			} else if ( renderStage == ${ WboitStages.Revealage.toFixed( 1 ) } ) {
 
