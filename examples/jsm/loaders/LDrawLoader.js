@@ -692,7 +692,7 @@ class LDrawParsedCache {
 		result.subobjects = original.subobjects;
 		result.fileName = original.fileName;
 		result.totalFaces = original.totalFaces;
-		result.startingConstructionStep = original.startingConstructionStep;
+		result.startingBuildingStep = original.startingBuildingStep;
 		result.materials = original.materials;
 		result.group = null;
 		return result;
@@ -819,8 +819,7 @@ class LDrawParsedCache {
 		let bfcInverted = false;
 		let bfcCull = true;
 
-		let startingConstructionStep = false;
-		let buildingStep = 0;
+		let startingBuildingStep = false;
 
 		// Parse all line commands
 		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
@@ -995,8 +994,7 @@ class LDrawParsedCache {
 
 							case 'STEP':
 
-								startingConstructionStep = true;
-								buildingStep ++;
+								startingBuildingStep = true;
 
 								break;
 
@@ -1070,10 +1068,10 @@ class LDrawParsedCache {
 						matrix: matrix,
 						fileName: fileName,
 						inverted: bfcInverted,
-						startingConstructionStep: startingConstructionStep,
-						buildingStep: buildingStep
+						startingBuildingStep: startingBuildingStep
 					} );
 
+					startingBuildingStep = false;
 					bfcInverted = false;
 
 					break;
@@ -1236,7 +1234,7 @@ class LDrawParsedCache {
 			author,
 			subobjects,
 			totalFaces,
-			startingConstructionStep,
+			startingBuildingStep,
 			materials,
 			fileName,
 			group: null
@@ -1392,8 +1390,7 @@ class LDrawPartsGeometryCache {
 
 					const subobjectGroup = subobjectInfo;
 					subobject.matrix.decompose( subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
-					subobjectGroup.userData.startingConstructionStep = subobject.startingConstructionStep;
-					subobjectGroup.userData.buildingStep = subobject.buildingStep;
+					subobjectGroup.userData.startingBuildingStep = subobject.startingBuildingStep;
 					subobjectGroup.name = subobject.fileName;
 
 					loader.applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
@@ -1962,7 +1959,6 @@ class LDrawLoader extends Loader {
 				.then( group => {
 
 					this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
-					this.computeConstructionSteps( group );
 					this.computeBuildingSteps( group );
 					group.userData.fileName = url;
 					onLoad( group );
@@ -1981,7 +1977,6 @@ class LDrawLoader extends Loader {
 			.then( group => {
 
 				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
-				this.computeConstructionSteps( group );
 				this.computeBuildingSteps( group );
 				group.userData.fileName = '';
 				onLoad( group );
@@ -2439,9 +2434,9 @@ class LDrawLoader extends Loader {
 
 	}
 
-	computeConstructionSteps( model ) {
+	computeBuildingSteps( model ) {
 
-		// Sets userdata.constructionStep number in Group objects and userData.numConstructionSteps number in the root Group object.
+		// Sets userdata.buildingSteps number in Group objects and userData.numBuildingSteps number in the root Group object.
 
 		let stepNumber = 0;
 
@@ -2449,29 +2444,20 @@ class LDrawLoader extends Loader {
 
 			if ( c.isGroup ) {
 
-				if ( c.userData.startingConstructionStep ) {
+				if ( c.userData.startingBuildingStep ) {
 
 					stepNumber ++;
 
 				}
 
-				c.userData.constructionStep = stepNumber;
+				c.userData.buildingSteps = stepNumber;
 
 			}
 
 		} );
 
-		model.userData.numConstructionSteps = stepNumber + 1;
+		model.userData.numBuildingSteps = stepNumber + 1;
 
-	}
-	computeBuildingSteps( model ) {
-
-		// Sets userData.numBuildingSteps number in the root THREE.Group object based on the userdata.buildingStep number in THREE.Group objects.
-		model.userData.buildingStep = model.children[0].userData.buildingStep;
-
-		// Add one if zero-based
-		model.userData.numBuildingSteps = model.children[model.children.length - 1].userData.buildingStep + (1 - model.userData.buildingStep);
-	
 	}
 
 }

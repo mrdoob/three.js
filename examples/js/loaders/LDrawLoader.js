@@ -633,7 +633,7 @@
 			result.subobjects = original.subobjects;
 			result.fileName = original.fileName;
 			result.totalFaces = original.totalFaces;
-			result.startingConstructionStep = original.startingConstructionStep;
+			result.startingBuildingStep = original.startingBuildingStep;
 			result.materials = original.materials;
 			result.group = null;
 			return result;
@@ -747,8 +747,7 @@
 			let bfcCCW = true;
 			let bfcInverted = false;
 			let bfcCull = true;
-			let startingConstructionStep = false;
-			let buildingStep = 0;
+			let startingBuildingStep = false;
 
 			// Parse all line commands
 			for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
@@ -887,8 +886,7 @@
 
 									break;
 								case 'STEP':
-									startingConstructionStep = true;
-									buildingStep ++;
+									startingBuildingStep = true;
 									break;
 								case 'Author:':
 									author = lp.getToken();
@@ -947,9 +945,9 @@
 							matrix: matrix,
 							fileName: fileName,
 							inverted: bfcInverted,
-							startingConstructionStep: startingConstructionStep,
-							buildingStep: buildingStep
+							startingBuildingStep: startingBuildingStep
 						} );
+						startingBuildingStep = false;
 						bfcInverted = false;
 						break;
 
@@ -1096,7 +1094,7 @@
 				author,
 				subobjects,
 				totalFaces,
-				startingConstructionStep,
+				startingBuildingStep,
 				materials,
 				fileName,
 				group: null
@@ -1249,8 +1247,7 @@
 
 						const subobjectGroup = subobjectInfo;
 						subobject.matrix.decompose( subobjectGroup.position, subobjectGroup.quaternion, subobjectGroup.scale );
-						subobjectGroup.userData.startingConstructionStep = subobject.startingConstructionStep;
-						subobjectGroup.userData.buildingStep = subobject.buildingStep;
+						subobjectGroup.userData.startingBuildingStep = subobject.startingBuildingStep;
 						subobjectGroup.name = subobject.fileName;
 						loader.applyMaterialsToMesh( subobjectGroup, subobject.colorCode, info.materials );
 						subobjectGroup.userData.colorCode = subobject.colorCode;
@@ -1799,7 +1796,6 @@
 				this.partsCache.parseModel( text, this.materialLibrary ).then( group => {
 
 					this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
-					this.computeConstructionSteps( group );
 					this.computeBuildingSteps( group );
 					group.userData.fileName = url;
 					onLoad( group );
@@ -1814,7 +1810,6 @@
 			this.partsCache.parseModel( text, this.materialLibrary ).then( group => {
 
 				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
-				this.computeConstructionSteps( group );
 				this.computeBuildingSteps( group );
 				group.userData.fileName = '';
 				onLoad( group );
@@ -2237,37 +2232,28 @@
 			}
 
 		}
-		computeConstructionSteps( model ) {
+		computeBuildingSteps( model ) {
 
-			// Sets userdata.constructionStep number in THREE.Group objects and userData.numConstructionSteps number in the root THREE.Group object.
+			// Sets userdata.buildingSteps number in THREE.Group objects and userData.numBuildingSteps number in the root THREE.Group object.
 
 			let stepNumber = 0;
 			model.traverse( c => {
 
 				if ( c.isGroup ) {
 
-					if ( c.userData.startingConstructionStep ) {
+					if ( c.userData.startingBuildingStep ) {
 
 						stepNumber ++;
 
 					}
 
-					c.userData.constructionStep = stepNumber;
+					c.userData.buildingSteps = stepNumber;
 
 				}
 
 			} );
-			model.userData.numConstructionSteps = stepNumber + 1;
+			model.userData.numBuildingSteps = stepNumber + 1;
 
-		}
-		computeBuildingSteps( model ) {
-			
-			// Sets userData.numBuildingSteps number in the root THREE.Group object based on the userdata.buildingStep number in THREE.Group objects.
-			model.userData.buildingStep = model.children[0].userData.buildingStep;
-	
-			// Add one if zero-based
-			model.userData.numBuildingSteps = model.children[model.children.length - 1].userData.buildingStep + (1 - model.userData.buildingStep);
-		
 		}
 
 	}
