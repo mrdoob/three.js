@@ -62,7 +62,7 @@
 				// Optionally, use LDrawUtils.mergeObject() from
 				// 'examples/jsm/utils/LDrawUtils.js' to merge all
 				// geometries by material (it gives better runtime
-				// performance, but construction steps are lost)
+				// performance, but building steps are lost)
 				// group = LDrawUtils.mergeObject( group );
 
 				scene.add( group );
@@ -103,10 +103,10 @@
 		type, its .userData member will contain the following members: <br />
 		In a [page:Group], the userData member will contain: <br />
 		<ul>
-			<li>.numConstructionSteps: Only in the root [page:Group], Indicates total number of construction steps in
-			the model. These can be used to set visibility of objects to show different construction steps, which is
+			<li>.numBuildingSteps: Only in the root [page:Group], Indicates total number of building steps in
+			the model. These can be used to set visibility of objects to show different building steps, which is
 			done in the example.</li>
-			<li>.constructionStep: Indicates the construction index of this step.</li>
+			<li>.buildingStep: Indicates the building index of this step.</li>
 			<li>.category: Contains, if not null, the [page:String] category for this piece or model.</li>
 			<li>.keywords: Contains, if not null, an array of [page:String] keywords for this piece or model.</li>
 		</ul>
