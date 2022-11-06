@@ -94,7 +94,7 @@
 				// adding extra silence to delay and pitch
 				waveBuffer = new Float32Array( [ ...waveBuffer, ...new Float32Array( 200000 ) ] );
 
-				sampleRate = audioBuffer.sampleRate;
+				sampleRate = audioBuffer.sampleRate / audioBuffer.numberOfChannels;
 
 
 				// create webgpu buffers
@@ -113,7 +113,7 @@
 
 				const pitch = uniform( 1.5 );
 				const delayVolume = uniform( .3 );
-				const delayOffset = uniform( 4000 );
+				const delayOffset = uniform( .5 );
 
 
 				// compute (shader-node)
@@ -131,8 +131,8 @@
 
 					for ( let i = 1; i < 7; i ++ ) {
 
-						const waveOffset = element( waveNode, sub( time, mul( delayOffset, i ) ) );
-						const waveOffsetVolume = mul( waveOffset, div( delayVolume, i ) );
+						const waveOffset = element( waveNode, mul( sub( float( instanceIndex ), mul( mul( delayOffset, sampleRate ), i ) ), pitch ) );
+						const waveOffsetVolume = mul( waveOffset, div( delayVolume, i * i ) );
 
 						wave = add( wave, waveOffsetVolume );
 
@@ -158,7 +158,7 @@
 
 				gui.add( pitch, 'value', .5, 2, 0.01 ).name( 'pitch' );
 				gui.add( delayVolume, 'value', 0, 1, .01 ).name( 'delayVolume' );;
-				gui.add( delayOffset, 'value', 500, 10000, 1 ).name( 'delayOffset' );;
+				gui.add( delayOffset, 'value', .1, 1, .01 ).name( 'delayOffset' );;
 
 
 				// renderer
