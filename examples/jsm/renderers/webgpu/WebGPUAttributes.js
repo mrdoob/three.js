@@ -76,6 +76,7 @@ class WebGPUAttributes {
 		const size = gpuBuffer.size;
 
 		let gpuReadBuffer = data.readBuffer;
+		let needsUnmap = true;
 
 		if ( gpuReadBuffer === null ) {
 
@@ -83,6 +84,8 @@ class WebGPUAttributes {
 				size,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
+
+			needsUnmap = false;
 
 			data.readBuffer = gpuReadBuffer;
 
@@ -98,7 +101,7 @@ class WebGPUAttributes {
 			size
 		);
 
-		gpuReadBuffer.unmap();
+		if ( needsUnmap ) gpuReadBuffer.unmap();
 
 		const gpuCommands = cmdEncoder.finish();
 		device.queue.submit( [ gpuCommands ] );
