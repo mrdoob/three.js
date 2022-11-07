@@ -50,14 +50,14 @@
 
 				renderer.compute( computeNode );
 
-				const waveBuffer = await renderer.getArrayFromBuffer( waveGPUBuffer );
+				const waveArray = await renderer.getArrayFromBuffer( waveGPUBuffer );
 
 				//
 
 				const audioOutputContext = new AudioContext( { sampleRate } );
-				const audioOutputBuffer = audioOutputContext.createBuffer( 1, waveBuffer.length, sampleRate );
+				const audioOutputBuffer = audioOutputContext.createBuffer( 1, waveArray.length, sampleRate );
 
-				audioOutputBuffer.copyToChannel( waveBuffer, 0 );
+				audioOutputBuffer.copyToChannel( waveArray, 0 );
 
 				const source = audioOutputContext.createBufferSource();
 				source.connect( audioOutputContext.destination );
@@ -112,8 +112,8 @@
 				// params
 
 				const pitch = uniform( 1.5 );
-				const delayVolume = uniform( .3 );
-				const delayOffset = uniform( .5 );
+				const delayVolume = uniform( .2 );
+				const delayOffset = uniform( .55 );
 
 
 				// compute (shader-node)
