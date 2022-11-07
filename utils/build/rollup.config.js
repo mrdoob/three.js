@@ -286,7 +286,7 @@ ${ code }`;
 
 }
 
-let builds = [
+const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
@@ -355,12 +355,5 @@ let builds = [
 		]
 	}
 ];
-
-
-if ( process.env.ONLY_MODULE === 'true' ) {
-
-	builds = builds[ 0 ];
-
-}
 
 export default builds;
