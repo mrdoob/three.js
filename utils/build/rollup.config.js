@@ -356,4 +356,4 @@ const builds = [
 	}
 ];
 
-export default builds;
+export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;
