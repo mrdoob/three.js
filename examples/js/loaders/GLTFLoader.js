@@ -444,11 +444,18 @@
 			// here, because node-level parsing will only override position if explicitly specified.
 			lightNode.position.set( 0, 0, 0 );
 			lightNode.decay = 2;
+			assignExtrasToUserData( lightNode, lightDef );
 			if ( lightDef.intensity !== undefined ) lightNode.intensity = lightDef.intensity;
 			lightNode.name = parser.createUniqueName( lightDef.name || 'light_' + lightIndex );
 			dependency = Promise.resolve( lightNode );
 			parser.cache.add( cacheKey, dependency );
 			return dependency;
+
+		}
+		getDependency( type, index ) {
+
+			if ( type !== 'light' ) return;
+			return this._loadLight( index );
 
 		}
 		createNodeAttachment( nodeIndex ) {
@@ -2478,7 +2485,18 @@
 						dependency = this.loadCamera( index );
 						break;
 					default:
-						throw new Error( 'Unknown type: ' + type );
+						dependency = this._invokeOne( function ( ext ) {
+
+							return ext != this && ext.getDependency && ext.getDependency( type, index );
+
+						} );
+						if ( ! dependency ) {
+
+							throw new Error( 'Unknown type: ' + type );
+
+						}
+
+						break;
 
 				}
 
@@ -2580,10 +2598,11 @@
 			const accessorDef = this.json.accessors[ accessorIndex ];
 			if ( accessorDef.bufferView === undefined && accessorDef.sparse === undefined ) {
 
-				// Ignore empty accessors, which may be used to declare runtime
-				// information about attributes coming from another source (e.g. Draco
-				// compression extension).
-				return Promise.resolve( null );
+				const itemSize = WEBGL_TYPE_SIZES[ accessorDef.type ];
+				const TypedArray = WEBGL_COMPONENT_TYPES[ accessorDef.componentType ];
+				const normalized = accessorDef.normalized === true;
+				const array = new TypedArray( accessorDef.count * itemSize );
+				return Promise.resolve( new THREE.BufferAttribute( array, itemSize, normalized ) );
 
 			}
 
