@@ -427,6 +427,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		array.push( texture.flipY );
 		array.push( texture.unpackAlignment );
 		array.push( texture.encoding );
+		array.push( texture.source.version );
 
 		return array.join();
 
