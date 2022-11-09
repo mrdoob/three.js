@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Constantes d'équations de mélange personnalisées</h1>
+
+		<p>
+			Elles fonctionnent avec tous les types de matériaux. Définissez d'abord le mode de fusion du matériau sur THREE.CustomBlending, définissez ensuite l'équation de fusion, le facteur source et le facteur de destination souhaités.
+		</p>
+
+		<h2>Exemple de code</h2>
+
+		<code>
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		material.blending = THREE.CustomBlending;
+		material.blendEquation = THREE.AddEquation; //default
+		material.blendSrc = THREE.SrcAlphaFactor; //default
+		material.blendDst = THREE.OneMinusSrcAlphaFactor; //default
+		</code>
+
+		<h2>Exemples</h2>
+		<p>[example:webgl_materials_blending_custom materials / blending / custom ]</p>
+
+		<h2>Équations de mélange</h2>
+		<code>
+		THREE.AddEquation
+		THREE.SubtractEquation
+		THREE.ReverseSubtractEquation
+		THREE.MinEquation
+		THREE.MaxEquation
+		</code>
+
+		<h2>Facteurs sources</h2>
+		<code>
+		THREE.ZeroFactor
+		THREE.OneFactor
+		THREE.SrcColorFactor
+		THREE.OneMinusSrcColorFactor
+		THREE.SrcAlphaFactor
+		THREE.OneMinusSrcAlphaFactor
+		THREE.DstAlphaFactor
+		THREE.OneMinusDstAlphaFactor
+		THREE.DstColorFactor
+		THREE.OneMinusDstColorFactor
+		THREE.SrcAlphaSaturateFactor
+		</code>
+
+		<h2>Facteur de déstination</h2>
+		<p>
+			Tous les facteurs source sont valides comme facteurs de destination, à l'exception de <code>THREE.SrcAlphaSaturateFactor</code>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>
