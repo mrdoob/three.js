@@ -399,6 +399,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getFragCoord() {
+
+		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>', 'fragment' );
+
+	}
+
+	isFlipY() {
+
+		return false;
+
+	}
+
 	getAttributes( shaderStage ) {
 
 		const snippets = [];
