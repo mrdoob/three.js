@@ -44,6 +44,12 @@
 				// Add Sky
 				sky = new Sky();
 				sky.scale.setScalar( 450000 );
+				// Clip at the horizon
+				sky.material.clippingPlanes = [
+					new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 )
+				];
+				// This must be set, otherwise the clipping won't work
+				sky.material.clipping = true;
 				scene.add( sky );
 
 				sun = new THREE.Vector3();
@@ -57,7 +63,8 @@
 					mieDirectionalG: 0.7,
 					elevation: 2,
 					azimuth: 180,
-					exposure: renderer.toneMappingExposure
+					exposure: renderer.toneMappingExposure,
+					clipped: false
 				};
 
 				function guiChanged() {
@@ -76,6 +83,7 @@
 					uniforms[ 'sunPosition' ].value.copy( sun );
 
 					renderer.toneMappingExposure = effectController.exposure;
+					renderer.localClippingEnabled = effectController.clipped;
 					renderer.render( scene, camera );
 
 				}
@@ -86,9 +94,10 @@
 				gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'elevation', - 5, 90, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
+				gui.add( effectController, 'clipped', false ).onChange( guiChanged );
 
 				guiChanged();
 
@@ -110,6 +119,7 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
+				renderer.localClippingEnabled = true;
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );

@@ -69,6 +69,8 @@ Sky.SkyShader = {
 		varying vec3 vBetaM;
 		varying float vSunE;
 
+		#include <clipping_planes_pars_vertex>
+
 		// constants for atmospheric scattering
 		const float e = 2.71828182845904523536028747135266249775724709369995957;
 		const float pi = 3.141592653589793238462643383279502884197169;
@@ -107,7 +109,10 @@ Sky.SkyShader = {
 			vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
 			vWorldPosition = worldPosition.xyz;
 
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			#include <begin_vertex>
+			#include <project_vertex>
+			#include <clipping_planes_vertex>
+
 			gl_Position.z = gl_Position.w; // set z to camera.far
 
 			vSunDirection = normalize( sunPosition );
@@ -137,6 +142,8 @@ Sky.SkyShader = {
 
 		uniform float mieDirectionalG;
 		uniform vec3 up;
+
+		#include <clipping_planes_pars_fragment>
 
 		const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );
 
@@ -168,6 +175,8 @@ Sky.SkyShader = {
 		}
 
 		void main() {
+
+			#include <clipping_planes_fragment>
 
 			vec3 direction = normalize( vWorldPosition - cameraPos );
 
@@ -211,7 +220,6 @@ Sky.SkyShader = {
 
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>
-
 		}`
 
 };
