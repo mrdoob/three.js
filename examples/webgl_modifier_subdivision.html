@@ -74,8 +74,7 @@
 				controls.target.set( 0, 0, 0 );
 				controls.update();
 
-				scene.add( new THREE.AmbientLight( 0xffffff, 0.25 ) );
-				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444, 0.75 ) );
+				scene.add( new THREE.HemisphereLight( 0xffffff, 0x737373, 1 ) );
 
 				const frontLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				const backLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
