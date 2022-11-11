@@ -37,7 +37,8 @@ function UniformsCache() {
 						distance: 0,
 						coneCos: 0,
 						penumbraCos: 0,
-						decay: 0
+						decay: 0,
+						projector: false
 					};
 					break;
 
@@ -126,7 +127,7 @@ function ShadowUniformsCache() {
 					};
 					break;
 
-				// TODO (abelnation): set RectAreaLight shadow uniforms
+                    // TODO (abelnation): set RectAreaLight shadow uniforms
 
 			}
 
@@ -204,7 +205,9 @@ function WebGLLights( extensions, capabilities ) {
 
 	function setup( lights, physicallyCorrectLights ) {
 
-		let r = 0, g = 0, b = 0;
+		let r = 0,
+			g = 0,
+			b = 0;
 
 		for ( let i = 0; i < 9; i ++ ) state.probe[ i ].set( 0, 0, 0 );
 
@@ -289,9 +292,9 @@ function WebGLLights( extensions, capabilities ) {
 				uniforms.distance = distance;
 
 				uniforms.coneCos = Math.cos( light.angle );
-				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
+				uniforms.penumbraCos = Math.cos( light.angle * ( light.projector ? light.penumbra : 1 - ( light.penumbra ) ) );
 				uniforms.decay = light.decay;
-
+				uniforms.projector = light.projector;
 				state.spot[ spotLength ] = uniforms;
 
 				const shadow = light.shadow;
@@ -398,7 +401,7 @@ function WebGLLights( extensions, capabilities ) {
 
 			if ( capabilities.isWebGL2 ) {
 
-				// WebGL 2
+				// WebGL 2ÍÍ
 
 				state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
 				state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
@@ -434,14 +437,14 @@ function WebGLLights( extensions, capabilities ) {
 		const hash = state.hash;
 
 		if ( hash.directionalLength !== directionalLength ||
-			hash.pointLength !== pointLength ||
-			hash.spotLength !== spotLength ||
-			hash.rectAreaLength !== rectAreaLength ||
-			hash.hemiLength !== hemiLength ||
-			hash.numDirectionalShadows !== numDirectionalShadows ||
-			hash.numPointShadows !== numPointShadows ||
-			hash.numSpotShadows !== numSpotShadows ||
-			hash.numSpotMaps !== numSpotMaps ) {
+            hash.pointLength !== pointLength ||
+            hash.spotLength !== spotLength ||
+            hash.rectAreaLength !== rectAreaLength ||
+            hash.hemiLength !== hemiLength ||
+            hash.numDirectionalShadows !== numDirectionalShadows ||
+            hash.numPointShadows !== numPointShadows ||
+            hash.numSpotShadows !== numSpotShadows ||
+            hash.numSpotMaps !== numSpotMaps ) {
 
 			state.directional.length = directionalLength;
 			state.spot.length = spotLength;
