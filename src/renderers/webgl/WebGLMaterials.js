@@ -1,10 +1,11 @@
 import { BackSide } from '../../constants.js';
+import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
 function WebGLMaterials( renderer, properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
-		uniforms.fogColor.value.copy( fog.color );
+		fog.color.getRGB( uniforms.fogColor.value, getUnlitUniformColorSpace( renderer ) );
 
 		if ( fog.isFog ) {
 

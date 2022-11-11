@@ -7827,8 +7827,8 @@
 		}
 	}
 
-	const fov = 90,
-		aspect = 1;
+	const fov = -90; // negative fov is not an error
+	const aspect = 1;
 	class CubeCamera extends Object3D {
 		constructor(near, far, renderTarget) {
 			super();
@@ -7836,32 +7836,32 @@
 			this.renderTarget = renderTarget;
 			const cameraPX = new PerspectiveCamera(fov, aspect, near, far);
 			cameraPX.layers = this.layers;
-			cameraPX.up.set(0, -1, 0);
+			cameraPX.up.set(0, 1, 0);
 			cameraPX.lookAt(1, 0, 0);
 			this.add(cameraPX);
 			const cameraNX = new PerspectiveCamera(fov, aspect, near, far);
 			cameraNX.layers = this.layers;
-			cameraNX.up.set(0, -1, 0);
+			cameraNX.up.set(0, 1, 0);
 			cameraNX.lookAt(-1, 0, 0);
 			this.add(cameraNX);
 			const cameraPY = new PerspectiveCamera(fov, aspect, near, far);
 			cameraPY.layers = this.layers;
-			cameraPY.up.set(0, 0, 1);
+			cameraPY.up.set(0, 0, -1);
 			cameraPY.lookAt(0, 1, 0);
 			this.add(cameraPY);
 			const cameraNY = new PerspectiveCamera(fov, aspect, near, far);
 			cameraNY.layers = this.layers;
-			cameraNY.up.set(0, 0, -1);
+			cameraNY.up.set(0, 0, 1);
 			cameraNY.lookAt(0, -1, 0);
 			this.add(cameraNY);
 			const cameraPZ = new PerspectiveCamera(fov, aspect, near, far);
 			cameraPZ.layers = this.layers;
-			cameraPZ.up.set(0, -1, 0);
+			cameraPZ.up.set(0, 1, 0);
 			cameraPZ.lookAt(0, 0, 1);
 			this.add(cameraPZ);
 			const cameraNZ = new PerspectiveCamera(fov, aspect, near, far);
 			cameraNZ.layers = this.layers;
-			cameraNZ.up.set(0, -1, 0);
+			cameraNZ.up.set(0, 1, 0);
 			cameraNZ.lookAt(0, 0, -1);
 			this.add(cameraNZ);
 		}
@@ -8327,6 +8327,8 @@
 				}
 				updateRange.count = -1; // reset range
 			}
+
+			attribute.onUploadCallback();
 		}
 
 		//
@@ -14685,7 +14687,7 @@
 		const maxTextureSize = capabilities.maxTextureSize;
 		const maxSamples = capabilities.maxSamples;
 		const multisampledRTTExt = extensions.has('WEBGL_multisampled_render_to_texture') ? extensions.get('WEBGL_multisampled_render_to_texture') : null;
-		const supportsInvalidateFramebuffer = /OculusBrowser/g.test(typeof navigator === 'undefined' ? '' : navigator.userAgent);
+		const supportsInvalidateFramebuffer = typeof navigator === 'undefined' ? false : /OculusBrowser/g.test(navigator.userAgent);
 		const _videoTextures = new WeakMap();
 		let _canvas;
 		const _sources = new WeakMap(); // maps WebglTexture objects to instances of Source

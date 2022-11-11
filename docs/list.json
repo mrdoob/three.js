@@ -1603,6 +1603,15 @@
 				"PerspectiveCamera": "api/fr/cameras/PerspectiveCamera",
 				"StereoCamera": "api/fr/cameras/StereoCamera"
 			},
+			"Constantes": {
+				"Animation": "api/fr/constants/Animation",
+				"Core": "api/fr/constants/Core",
+				"CustomBlendingEquation": "api/fr/constants/CustomBlendingEquations",
+				"BufferAttributeUsage": "api/fr/constants/BufferAttributeUsage",
+				"Materials": "api/fr/constants/Materials",
+				"Renderer": "api/fr/constants/Renderer",
+				"Textures": "api/fr/constants/Textures"
+			},
 			"Géométries": {
 				"BoxGeometry": "api/fr/geometries/BoxGeometry",
 				"CapsuleGeometry": "api/fr/geometries/CapsuleGeometry",

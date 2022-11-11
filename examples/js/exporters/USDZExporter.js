@@ -2,7 +2,16 @@
 
 	class USDZExporter {
 
-		async parse( scene ) {
+		async parse( scene, options = {
+			ar: {
+				anchoring: {
+					type: 'plane'
+				},
+				planeAnchoring: {
+					alignment: 'vertical'
+				}
+			}
+		} ) {
 
 			const files = {};
 			const modelFileName = 'model.usda';
@@ -10,6 +19,7 @@
 			// model file should be first in USDZ archive so we init it here
 			files[ modelFileName ] = null;
 			let output = buildHeader();
+			output += buildSceneStart( options );
 			const materials = {};
 			const textures = {};
 			scene.traverseVisible( object => {
@@ -49,6 +59,7 @@
 				}
 
 			} );
+			output += buildSceneEnd();
 			output += buildMaterials( materials, textures );
 			files[ modelFileName ] = fflate.strToU8( output );
 			output = null;
@@ -145,6 +156,40 @@
     metersPerUnit = 1
     upAxis = "Y"
 )
+
+`;
+
+	}
+
+	function buildSceneStart( options ) {
+
+		return `def Xform "Root"
+{
+    def Scope "Scenes" (
+        kind = "sceneLibrary"
+    )
+    {
+        def Xform "Scene" (
+            customData = {
+                bool preliminary_collidesWithEnvironment = 0
+                string sceneName = "Scene"
+            }
+            sceneName = "Scene"
+        )
+        {
+        token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+        token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+
+`;
+
+	}
+
+	function buildSceneEnd() {
+
+		return `
+        }
+    }
+}
 
 `;
 
