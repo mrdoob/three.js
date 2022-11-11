@@ -200,7 +200,7 @@
 
 				analyserTexture = new THREE.DataTexture( analyserBuffer, analyserBuffer.length, 1, THREE.RedFormat );
 
-				const spectrum = mul( texture( analyserTexture, viewportTopLeft.x ), viewportTopLeft.y ).x;
+				const spectrum = mul( texture( analyserTexture, viewportTopLeft.x ).x, viewportTopLeft.y );
 				const backgroundNode = mul( color( 0x0000FF ), spectrum );
 
 
