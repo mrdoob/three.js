@@ -11,6 +11,7 @@ import ColorSpaceNode from '../display/ColorSpaceNode.js';
 import NormalMapNode from '../display/NormalMapNode.js';
 import PosterizeNode from '../display/PosterizeNode.js';
 import ToneMappingNode from '../display/ToneMappingNode.js';
+import ViewportNode from '../display/ViewportNode.js';
 
 // lighting
 import LightsNode from '../lighting/LightsNode.js';
@@ -91,6 +92,13 @@ export const normalMap = nodeProxy( NormalMapNode );
 export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
 
 export const posterize = nodeProxy( PosterizeNode );
+
+export const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
+export const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
+export const viewportTopLeft = nodeImmutable( ViewportNode, ViewportNode.TOP_LEFT );
+export const viewportBottomLeft = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_LEFT );
+export const viewportTopRight = nodeImmutable( ViewportNode, ViewportNode.TOP_RIGHT );
+export const viewportBottomRight = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_RIGHT );
 
 // lighting
 
