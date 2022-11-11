@@ -76,7 +76,7 @@ class XRInputEventsDispatcher extends Object3D {
 				motionController.updateFromGamepad();
 
 				// Send out events for each component
-				this.dispatchStateChangeEvents( controllerIdx );
+				this._dispatchStateChangeEvents( controllerIdx );
 
 			}
 
@@ -84,7 +84,9 @@ class XRInputEventsDispatcher extends Object3D {
 
 	}
 
-	dispatchStateChangeEvents( controllerIdx ) {
+	// Private method
+
+	_dispatchStateChangeEvents( controllerIdx ) {
 
 		const motionController = this.motionControllers[ controllerIdx ];
 
