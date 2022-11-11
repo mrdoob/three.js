@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - input events</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - input events
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+			import { XRInputEventsDispatcher } from 'three/addons/webxr/XRInputEventsDispatcher.js';
+
+			let camera, scene, renderer;
+			let controller1, controller2;
+			let controllerGrip1, controllerGrip2;
+			let inputEventsDispatcher1, inputEventsDispatcher2;
+			const inputTrackingStates = {};
+			const inputValues = {};
+
+			init();
+			animate();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				camera = new THREE.PerspectiveCamera(
+					50,
+					window.innerWidth / window.innerHeight,
+					0.01,
+					50
+				);
+				camera.position.set( 0, 1.6, 3 );
+
+				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light.position.set( 0, 4, 0 );
+				scene.add( light );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.xr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				controller1 = renderer.xr.getController( 0 );
+				scene.add( controller1 );
+
+				controller2 = renderer.xr.getController( 1 );
+				scene.add( controller2 );
+
+				const controllerModelFactory = new XRControllerModelFactory();
+
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				inputEventsDispatcher1 = new XRInputEventsDispatcher( controllerGrip1 );
+				scene.add( inputEventsDispatcher1 );
+				inputEventsDispatcher1.addEventListener( 'xrInputStateChanged', onXrInputStateChanged );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				const controllerModel2 = controllerModelFactory.createControllerModel( controllerGrip2 );
+				controllerGrip2.add( controllerModel2 );
+				inputEventsDispatcher2 = new XRInputEventsDispatcher( controllerGrip2 );
+				scene.add( inputEventsDispatcher2 );
+				inputEventsDispatcher2.addEventListener( 'xrInputStateChanged', onXrInputStateChanged );
+				scene.add( controllerGrip2 );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onXrInputStateChanged( event ) {
+
+				inputTrackingStates[ event.id ] = ( event.values.state !== 'default' ) ? true : false;
+				inputValues[ event.id ] = event.values;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				for ( const [ componentId, trackingState ] of Object.entries( inputTrackingStates ) ) {
+
+					if ( trackingState ) {
+
+						const { state, button, xAxis, yAxis } = inputValues[ componentId ];
+						console.log( `${componentId}: ${state}, ${button}, ${xAxis}, ${yAxis}` );
+
+					}
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
