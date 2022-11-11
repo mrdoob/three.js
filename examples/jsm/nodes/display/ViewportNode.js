@@ -20,7 +20,7 @@ class ViewportNode extends Node {
 
 		this.scope = scope;
 
-		this.isScreenNode = true;
+		this.isViewportNode = true;
 
 	}
 
