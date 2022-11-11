@@ -36,7 +36,7 @@
 			let camera, scene, renderer;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
-			let inputEventsDispatcher1, inputEventsDispatcher2;
+			let inputEventsDispatcher;
 			const inputTrackingStates = {};
 			const inputValues = {};
 
@@ -84,18 +84,16 @@
 
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
 				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-				inputEventsDispatcher1 = new XRInputEventsDispatcher( controllerGrip1 );
-				scene.add( inputEventsDispatcher1 );
-				inputEventsDispatcher1.addEventListener( 'xrInputStateChanged', onXrInputStateChanged );
 				scene.add( controllerGrip1 );
 
 				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
 				const controllerModel2 = controllerModelFactory.createControllerModel( controllerGrip2 );
 				controllerGrip2.add( controllerModel2 );
-				inputEventsDispatcher2 = new XRInputEventsDispatcher( controllerGrip2 );
-				scene.add( inputEventsDispatcher2 );
-				inputEventsDispatcher2.addEventListener( 'xrInputStateChanged', onXrInputStateChanged );
 				scene.add( controllerGrip2 );
+
+				inputEventsDispatcher = new XRInputEventsDispatcher( renderer.xr, [ 0, 1 ] );
+				scene.add( inputEventsDispatcher );
+				inputEventsDispatcher.addEventListener( 'xrInputStateChanged', onXrInputStateChanged );
 
 				window.addEventListener( 'resize', onWindowResize );
 

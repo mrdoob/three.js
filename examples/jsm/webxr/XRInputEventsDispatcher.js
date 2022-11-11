@@ -10,42 +10,57 @@ const DEFAULT_PROFILE = 'generic-trigger';
 
 class XRInputEventsDispatcher extends Object3D {
 
-	constructor( controller ) {
+	constructor( xrManager, controllerIndices ) {
 
 		super();
 
-		this.previousStates = [];
-		this.componentIdList = [];
+		this.xrManager = xrManager;
 
-		controller.addEventListener( 'connected', ( event ) => {
+		this.controllers = {};
+		this.motionControllers = {};
+		this.previousStates = {};
+		// this.componentIdList = [];
 
-			const xrInputSource = event.data;
+		controllerIndices.forEach( controllerIdx => {
 
-			if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad ) return;
+			const controllerGrip = xrManager.getControllerGrip( controllerIdx );
+			this.controllers[ controllerIdx ] = controllerGrip;
+			this.previousStates[ controllerIdx ] = {};
 
-			fetchProfile( xrInputSource, DEFAULT_PROFILES_PATH, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
+			controllerGrip.addEventListener( 'connected', ( event ) => {
 
-				this.motionController = new MotionController(
-					xrInputSource,
-					profile,
-					assetPath
-				);
+				const xrInputSource = event.data;
 
-				this.componentIdList = Object.keys( this.motionController.components );
+				if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad ) return;
 
-			} ).catch( ( err ) => {
+				fetchProfile( xrInputSource, DEFAULT_PROFILES_PATH, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
 
-				console.warn( err );
+					this.motionControllers[ controllerIdx ] = new MotionController(
+						xrInputSource,
+						profile,
+						assetPath
+					);
+
+					// this.componentIdList = Object.keys( this.motionController.components );
+
+				} ).catch( ( err ) => {
+
+					console.warn( err );
+
+				} );
+
+			} );
+
+			controllerGrip.addEventListener( 'disconnected', () => {
+
+				this.controllers[ controllerIdx ] = null;
+				this.motionControllers[ controllerIdx ] = null;
 
 			} );
 
 		} );
 
-		controller.addEventListener( 'disconnected', () => {
-
-			this.motionController = null;
-
-		} );
+		return this;
 
 	}
 
@@ -53,26 +68,32 @@ class XRInputEventsDispatcher extends Object3D {
 
 		super.updateMatrixWorld( force );
 
-		if ( ! this.motionController ) return;
+		for ( const [ controllerIdx, motionController ] of Object.entries( this.motionControllers ) ) {
 
-		// Cause the MotionController to poll the Gamepad for data
-		this.motionController.updateFromGamepad();
+			if ( motionController ) {
 
-		// Send out events for each component
-		this.dispatchStateChangeEvents();
+				// Cause the MotionController to poll the Gamepad for data
+				motionController.updateFromGamepad();
+
+				// Send out events for each component
+				this.dispatchStateChangeEvents( controllerIdx );
+
+			}
+
+		}
 
 	}
 
-	dispatchStateChangeEvents() {
+	dispatchStateChangeEvents( controllerIdx ) {
 
-		const motionController = this.motionController;
+		const motionController = this.motionControllers[ controllerIdx ];
 
 		Object.values( motionController.components ).forEach( ( component ) => {
 
 			const { id, values } = component;
 
 			// Compare current states against previous ones
-			if ( this.previousStates[ id ] !== values.state ) {
+			if ( this.previousStates[ controllerIdx ][ id ] !== values.state ) {
 
 				this.dispatchEvent( {
 					type: 'xrInputStateChanged',
@@ -86,7 +107,7 @@ class XRInputEventsDispatcher extends Object3D {
 			}
 
 			// Cache current states to compare against in the next frame
-			this.previousStates[ id ] = values.state;
+			this.previousStates[ controllerIdx ][ id ] = values.state;
 
 		} );
 
