@@ -120,9 +120,10 @@ class XRInputEventsDispatcher extends Object3D {
 
 	registerInputForEvents( handedness, partialId ) {
 
-		if ( ! handedness || handedness !== MotionControllerConstants.Handedness.LEFT
-			|| handedness !== MotionControllerConstants.Handedness.RIGHT
-			|| handedness !== MotionControllerConstants.Handedness.NONE ) {
+		if ( ! handedness
+			|| ( handedness !== MotionControllerConstants.Handedness.LEFT
+			  && handedness !== MotionControllerConstants.Handedness.RIGHT
+			  && handedness !== MotionControllerConstants.Handedness.NONE ) ) {
 
 			console.warn( 'XRInputEventsDispatcher.registerInputForEvents requires a valid handedness value.' );
 			return;
