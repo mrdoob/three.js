@@ -14,8 +14,6 @@ class XRInputEventsDispatcher extends Object3D {
 
 		super();
 
-		this.xrManager = xrManager;
-
 		this.controllers = {};
 		this.motionControllers = {};
 
@@ -40,36 +38,7 @@ class XRInputEventsDispatcher extends Object3D {
 
 
 					const handedness = xrInputSource.handedness;
-					this.partialIds[ handedness ]?.forEach( partialId => {
-
-						/*
-						// Find the first component that matches the partial id
-						const components = this.motionControllers[ controllerIdx ].components;
-						let matchedComponent;
-						Object.keys( components ).some( ( componentId ) => {
-
-							const partialMatch = componentId.includes( partialId );
-							if ( partialMatch ) {
-
-								matchedComponent = components[ componentId ];
-
-							}
-
-							return !! matchedComponent;
-
-						} );
-
-						if ( ! matchedComponent ) {
-
-							console.warn( `Could not find ${ partialId } on the ${ handedness } controller` );
-							return;
-
-						}
-
-						if ( ! this.registeredComponents[ handedness ] ) this.registeredComponents[ handedness ] = [];
-						this.registeredComponents[ handedness ].push( matchedComponent.id );
-						this._dispatchResolvedComponent( handedness, partialId, matchedComponent );
-						*/
+					this._partialIds[ handedness ]?.forEach( partialId => {
 
 						const components = this.motionControllers[ controllerIdx ].components;
 						const matchedComponents = Object.values( components ).filter( ( component ) => {
@@ -127,10 +96,10 @@ class XRInputEventsDispatcher extends Object3D {
 
 	registerInputForEvents( handedness, partialId ) {
 
-		if ( ! this.partialIds ) this.partialIds = {};
-		if ( ! this.partialIds[ handedness ] ) this.partialIds[ handedness ] = [];
+		if ( ! this._partialIds ) this._partialIds = {};
+		if ( ! this._partialIds[ handedness ] ) this._partialIds[ handedness ] = [];
 
-		this.partialIds[ handedness ].push( partialId );
+		this._partialIds[ handedness ].push( partialId );
 
 	}
 

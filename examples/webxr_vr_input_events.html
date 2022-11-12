@@ -94,6 +94,7 @@
 				scene.add( inputEventsDispatcher );
 
 				// Listen for all 'button' components on left or right controllers
+				// For oculus-touch-v3 this means X, Y buttons on left, A, B buttons on right
 				inputEventsDispatcher.registerInputForEvents( 'left', 'button' );
 				inputEventsDispatcher.registerInputForEvents( 'right', 'button' );
 				inputEventsDispatcher.addEventListener( 'left-button', onAnyButton );
@@ -140,7 +141,7 @@
 						const { state, button, xAxis, yAxis } = value;
 						if ( state != 'default' ) {
 
-							console.log( `diff ${handedness}-${id}: ${state}, ${button}, ${xAxis}, ${yAxis}` );
+							console.log( `${handedness}-${id}: ${state}, ${button}, ${xAxis}, ${yAxis}` );
 
 						}
 
