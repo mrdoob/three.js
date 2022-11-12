@@ -1187,7 +1187,7 @@ const _colorKeywords = {
 	'yellow': 0xFFFF00,
 	'yellowgreen': 0x9ACD32
 };
-const _rgb = {
+const _rgb$1 = {
 	r: 0,
 	g: 0,
 	b: 0
@@ -1392,8 +1392,8 @@ class Color {
 		return this;
 	}
 	getHex(colorSpace = SRGBColorSpace) {
-		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
-		return clamp(_rgb.r * 255, 0, 255) << 16 ^ clamp(_rgb.g * 255, 0, 255) << 8 ^ clamp(_rgb.b * 255, 0, 255) << 0;
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb$1), colorSpace);
+		return clamp(_rgb$1.r * 255, 0, 255) << 16 ^ clamp(_rgb$1.g * 255, 0, 255) << 8 ^ clamp(_rgb$1.b * 255, 0, 255) << 0;
 	}
 	getHexString(colorSpace = SRGBColorSpace) {
 		return ('000000' + this.getHex(colorSpace).toString(16)).slice(-6);
@@ -1401,10 +1401,10 @@ class Color {
 	getHSL(target, colorSpace = LinearSRGBColorSpace) {
 		// h,s,l ranges are in 0.0 - 1.0
 
-		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
-		const r = _rgb.r,
-			g = _rgb.g,
-			b = _rgb.b;
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb$1), colorSpace);
+		const r = _rgb$1.r,
+			g = _rgb$1.g,
+			b = _rgb$1.b;
 		const max = Math.max(r, g, b);
 		const min = Math.min(r, g, b);
 		let hue, saturation;
@@ -1434,19 +1434,19 @@ class Color {
 		return target;
 	}
 	getRGB(target, colorSpace = LinearSRGBColorSpace) {
-		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
-		target.r = _rgb.r;
-		target.g = _rgb.g;
-		target.b = _rgb.b;
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb$1), colorSpace);
+		target.r = _rgb$1.r;
+		target.g = _rgb$1.g;
+		target.b = _rgb$1.b;
 		return target;
 	}
 	getStyle(colorSpace = SRGBColorSpace) {
-		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb), colorSpace);
+		ColorManagement.fromWorkingColorSpace(toComponents(this, _rgb$1), colorSpace);
 		if (colorSpace !== SRGBColorSpace) {
 			// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
-			return `color(${colorSpace} ${_rgb.r} ${_rgb.g} ${_rgb.b})`;
+			return `color(${colorSpace} ${_rgb$1.r} ${_rgb$1.g} ${_rgb$1.b})`;
 		}
-		return `rgb(${_rgb.r * 255 | 0},${_rgb.g * 255 | 0},${_rgb.b * 255 | 0})`;
+		return `rgb(${_rgb$1.r * 255 | 0},${_rgb$1.g * 255 | 0},${_rgb$1.b * 255 | 0})`;
 	}
 	offsetHSL(h, s, l) {
 		this.getHSL(_hslA);
@@ -7496,6 +7496,13 @@ function cloneUniformsGroups(src) {
 	}
 	return dst;
 }
+function getUnlitUniformColorSpace(renderer) {
+	if (renderer.getRenderTarget() === null) {
+		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
+		return renderer.outputEncoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
+	}
+	return LinearSRGBColorSpace;
+}
 
 // Legacy
 
@@ -9412,6 +9419,11 @@ ShaderLib.physical = {
 	fragmentShader: ShaderChunk.meshphysical_frag
 };
 
+const _rgb = {
+	r: 0,
+	b: 0,
+	g: 0
+};
 function WebGLBackground(renderer, cubemaps, cubeuvmaps, state, objects, alpha, premultipliedAlpha) {
 	const clearColor = new Color(0x000000);
 	let clearAlpha = alpha === true ? 0 : 1;
@@ -9526,7 +9538,8 @@ function WebGLBackground(renderer, cubemaps, cubeuvmaps, state, objects, alpha, 
 		}
 	}
 	function setClear(color, alpha) {
-		state.buffers.color.setClear(color.r, color.g, color.b, alpha, premultipliedAlpha);
+		color.getRGB(_rgb, getUnlitUniformColorSpace(renderer));
+		state.buffers.color.setClear(_rgb.r, _rgb.g, _rgb.b, alpha, premultipliedAlpha);
 	}
 	return {
 		getClearColor: function () {
@@ -16791,7 +16804,7 @@ class WebXRManager extends EventDispatcher {
 
 function WebGLMaterials(renderer, properties) {
 	function refreshFogUniforms(uniforms, fog) {
-		uniforms.fogColor.value.copy(fog.color);
+		fog.color.getRGB(uniforms.fogColor.value, getUnlitUniformColorSpace(renderer));
 		if (fog.isFog) {
 			uniforms.fogNear.value = fog.near;
 			uniforms.fogFar.value = fog.far;
@@ -26575,7 +26588,7 @@ class SpotLightShadow extends LightShadow {
 }
 
 class SpotLight extends Light {
-	constructor(color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1) {
+	constructor(color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 2) {
 		super(color, intensity);
 		this.isSpotLight = true;
 		this.type = 'SpotLight';
@@ -26585,8 +26598,7 @@ class SpotLight extends Light {
 		this.distance = distance;
 		this.angle = angle;
 		this.penumbra = penumbra;
-		this.decay = decay; // for physically correct lights, should be 2.
-
+		this.decay = decay;
 		this.map = null;
 		this.shadow = new SpotLightShadow();
 	}
@@ -26674,13 +26686,12 @@ class PointLightShadow extends LightShadow {
 }
 
 class PointLight extends Light {
-	constructor(color, intensity, distance = 0, decay = 1) {
+	constructor(color, intensity, distance = 0, decay = 2) {
 		super(color, intensity);
 		this.isPointLight = true;
 		this.type = 'PointLight';
 		this.distance = distance;
-		this.decay = decay; // for physically correct lights, should be 2.
-
+		this.decay = decay;
 		this.shadow = new PointLightShadow();
 	}
 	get power() {
