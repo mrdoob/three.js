@@ -37,7 +37,21 @@
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 			let inputEventsDispatcher;
-			let trackedInputValues = {};
+
+			let demoCube;
+
+			const trackedButtonValues = {};
+			let previousButtonStates;
+
+			const trackedAxisValues = {};
+			let newPositionDelta;
+
+			const trackedTriggerValues = {};
+			let newPullDelta;
+
+			const trackedSqueezeValues = {};
+			let newScaleDelta;
+
 
 			init();
 			animate();
@@ -73,6 +87,20 @@
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
+				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
+				const floorMaterial = new THREE.MeshPhongMaterial( { color: 0x222222 } );
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				floor.rotation.x = - Math.PI / 2;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				const geometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
+				const material = new THREE.MeshPhongMaterial( { color: 0x888888 } );
+				demoCube = new THREE.Mesh( geometry, material );
+				demoCube.castShadow = true;
+				scene.add( demoCube );
+				demoCube.position.set( 0, 0.8, - 1 );
+
 				controller1 = renderer.xr.getController( 0 );
 				scene.add( controller1 );
 
@@ -100,6 +128,31 @@
 				inputEventsDispatcher.addEventListener( 'left-button', onAnyButton );
 				inputEventsDispatcher.addEventListener( 'right-button', onAnyButton );
 
+				// Listen for all 'thumbsticks' and 'touchpad' components on left or right controllers
+				// For oculus-touch-v3 this means thumbsticks on the left and right
+				inputEventsDispatcher.registerInputForEvents( 'left', 'thumbstick' );
+				inputEventsDispatcher.registerInputForEvents( 'left', 'touchpad' );
+				inputEventsDispatcher.registerInputForEvents( 'right', 'thumbstick' );
+				inputEventsDispatcher.registerInputForEvents( 'right', 'touchpad' );
+				inputEventsDispatcher.addEventListener( 'left-thumbstick', onAnyAxis );
+				inputEventsDispatcher.addEventListener( 'left-touchpad', onAnyAxis );
+				inputEventsDispatcher.addEventListener( 'right-thumbstick', onAnyAxis );
+				inputEventsDispatcher.addEventListener( 'right-touchpad', onAnyAxis );
+
+				// Listen for all 'trigger' components on left or right controllers
+				// For oculus-touch-v3 this means trigger buttons on the both left and right
+				inputEventsDispatcher.registerInputForEvents( 'left', 'trigger' );
+				inputEventsDispatcher.registerInputForEvents( 'right', 'trigger' );
+				inputEventsDispatcher.addEventListener( 'left-trigger', onAnyTrigger );
+				inputEventsDispatcher.addEventListener( 'right-trigger', onAnyTrigger );
+
+				// Listen for all 'squeeze' components on left or right controllers
+				// For oculus-touch-v3 this means squeeze buttons on both the left and right
+				inputEventsDispatcher.registerInputForEvents( 'left', 'squeeze' );
+				inputEventsDispatcher.registerInputForEvents( 'right', 'squeeze' );
+				inputEventsDispatcher.addEventListener( 'left-squeeze', onAnySqueeze );
+				inputEventsDispatcher.addEventListener( 'right-squeeze', onAnySqueeze );
+
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -109,11 +162,168 @@
 				for ( const component of event.components ) {
 
 					console.log( `${event.handedness} ${component.id}` );
-					if ( ! trackedInputValues ) trackedInputValues = {};
-					if ( ! trackedInputValues[ event.handedness ] ) trackedInputValues[ event.handedness ] = {};
-					trackedInputValues[ event.handedness ][ component.id ] = component.values;
+					if ( ! trackedButtonValues[ event.handedness ] ) trackedButtonValues[ event.handedness ] = {};
+					trackedButtonValues[ event.handedness ][ component.id ] = component.values;
 
 				}
+
+			}
+
+			function onAnyAxis( event ) {
+
+				for ( const component of event.components ) {
+
+					console.log( `${event.handedness} ${component.id}` );
+					if ( ! trackedAxisValues[ event.handedness ] ) trackedAxisValues[ event.handedness ] = {};
+					trackedAxisValues[ event.handedness ][ component.id ] = component.values;
+
+				}
+
+			}
+
+			function onAnyTrigger( event ) {
+
+				for ( const component of event.components ) {
+
+					console.log( `${event.handedness} ${component.id}` );
+					if ( ! trackedTriggerValues[ event.handedness ] ) trackedTriggerValues[ event.handedness ] = {};
+					trackedTriggerValues[ event.handedness ][ component.id ] = component.values;
+
+				}
+
+			}
+
+			function onAnySqueeze( event ) {
+
+				for ( const component of event.components ) {
+
+					console.log( `${event.handedness} ${component.id}` );
+					if ( ! trackedSqueezeValues[ event.handedness ] ) trackedSqueezeValues[ event.handedness ] = {};
+					trackedSqueezeValues[ event.handedness ][ component.id ] = component.values;
+
+				}
+
+			}
+
+			function createRandomColor() {
+
+				return Math.floor( Math.random() * ( 1 << 24 ) );
+
+			}
+
+			// Change color of the cube to a random color when button pressed
+			function handleButtons() {
+
+				for ( const [ handedness, trackedInput ] of Object.entries( trackedButtonValues ) ) {
+
+					for ( const [ id, value ] of Object.entries( trackedInput ) ) {
+
+						// Each component value object holds 4 pieces of data
+						const { state, button, xAxis, yAxis } = value;
+						if ( state !== 'default' ) {
+
+							console.log( `${handedness}-${id}: ${state}, ${button}, ${xAxis}, ${yAxis}` );
+
+						}
+
+						if ( previousButtonStates
+							&& previousButtonStates[ handedness ]
+							&& previousButtonStates[ handedness ][ id ]
+							&& state !== previousButtonStates[ handedness ][ id ]
+							&& state === 'pressed' ) {
+
+							// Button presed in this frame
+							demoCube.material.color.set( createRandomColor() );
+
+						}
+
+						// Cache state for comparing states in the next frame
+						if ( ! previousButtonStates ) previousButtonStates = {};
+						if ( ! previousButtonStates[ handedness ] ) previousButtonStates[ handedness ] = {};
+						previousButtonStates[ handedness ][ id ] = state;
+
+					}
+
+				}
+
+			}
+
+			// Move the cube in the XY plane
+			function handleAxes() {
+
+				if ( ! newPositionDelta ) newPositionDelta = new THREE.Vector2();
+				newPositionDelta.x = 0;
+				newPositionDelta.y = 0;
+
+				for ( const trackedAxisValue of Object.values( trackedAxisValues ) ) {
+
+					for ( const value of Object.values( trackedAxisValue ) ) {
+
+						// Thumbsticks only go from 'default' to 'touched' with axis movements
+						// oculus-touch-v3 also has a button below each thumbstick
+						// So this component also tracks the thumbstick button state
+
+						const { xAxis, yAxis } = value;
+						if ( xAxis !== undefined && yAxis !== undefined ) {
+
+							newPositionDelta.x = ( Math.abs( xAxis ) > Math.abs( newPositionDelta.x ) ) ? xAxis : newPositionDelta.x;
+							newPositionDelta.y = ( Math.abs( yAxis ) > Math.abs( newPositionDelta.y ) ) ? yAxis : newPositionDelta.y;
+
+						}
+
+					}
+
+				}
+
+				demoCube.position.set( 0 + newPositionDelta.x * 0.1, 0.8 + newPositionDelta.y * - 0.1, demoCube.position.z );
+
+			}
+
+			// Pull the cube towards the user
+			function handleTriggerButtons() {
+
+				newPullDelta = 0;
+
+				for ( const trackedTriggerValue of Object.values( trackedTriggerValues ) ) {
+
+					for ( const value of Object.values( trackedTriggerValue ) ) {
+
+						const { button } = value;
+						if ( button !== undefined ) {
+
+							newPullDelta = ( button > newPullDelta ) ? button : newPullDelta;
+
+						}
+
+					}
+
+				}
+
+				demoCube.position.set( demoCube.position.x, demoCube.position.y, - 1 + newPullDelta * 0.2 );
+
+			}
+
+			// Make the cube smaller
+			function handleSqueezeButtons() {
+
+				newScaleDelta = 0;
+
+				for ( const trackedSqueezeValue of Object.values( trackedSqueezeValues ) ) {
+
+					for ( const value of Object.values( trackedSqueezeValue ) ) {
+
+						const { button } = value;
+						if ( button !== undefined ) {
+
+							newScaleDelta = ( button > newScaleDelta ) ? button : newScaleDelta;
+
+						}
+
+					}
+
+				}
+
+				demoCube.scale.set( 1 - newScaleDelta * 0.5, 1 - newScaleDelta * 0.5, 1 - newScaleDelta * 0.5 );
 
 			}
 
@@ -134,20 +344,13 @@
 
 			function render() {
 
-				for ( const [ handedness, trackedInput ] of Object.entries( trackedInputValues ) ) {
+				handleButtons();
 
-					for ( const [ id, value ] of Object.entries( trackedInput ) ) {
+				handleAxes();
 
-						const { state, button, xAxis, yAxis } = value;
-						if ( state != 'default' ) {
+				handleTriggerButtons();
 
-							console.log( `${handedness}-${id}: ${state}, ${button}, ${xAxis}, ${yAxis}` );
-
-						}
-
-					}
-
-				}
+				handleSqueezeButtons();
 
 				renderer.render( scene, camera );
 
