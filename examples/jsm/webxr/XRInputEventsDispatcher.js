@@ -18,14 +18,11 @@ class XRInputEventsDispatcher extends Object3D {
 
 		this.controllers = {};
 		this.motionControllers = {};
-		this.previousStates = {};
-		// this.componentIdList = [];
 
 		controllerIndices.forEach( controllerIdx => {
 
 			const controllerGrip = xrManager.getControllerGrip( controllerIdx );
 			this.controllers[ controllerIdx ] = controllerGrip;
-			this.previousStates[ controllerIdx ] = {};
 
 			controllerGrip.addEventListener( 'connected', ( event ) => {
 
@@ -41,7 +38,58 @@ class XRInputEventsDispatcher extends Object3D {
 						assetPath
 					);
 
-					// this.componentIdList = Object.keys( this.motionController.components );
+
+					const handedness = xrInputSource.handedness;
+					this.partialIds[ handedness ]?.forEach( partialId => {
+
+						/*
+						// Find the first component that matches the partial id
+						const components = this.motionControllers[ controllerIdx ].components;
+						let matchedComponent;
+						Object.keys( components ).some( ( componentId ) => {
+
+							const partialMatch = componentId.includes( partialId );
+							if ( partialMatch ) {
+
+								matchedComponent = components[ componentId ];
+
+							}
+
+							return !! matchedComponent;
+
+						} );
+
+						if ( ! matchedComponent ) {
+
+							console.warn( `Could not find ${ partialId } on the ${ handedness } controller` );
+							return;
+
+						}
+
+						if ( ! this.registeredComponents[ handedness ] ) this.registeredComponents[ handedness ] = [];
+						this.registeredComponents[ handedness ].push( matchedComponent.id );
+						this._dispatchResolvedComponent( handedness, partialId, matchedComponent );
+						*/
+
+						const components = this.motionControllers[ controllerIdx ].components;
+						const matchedComponents = Object.values( components ).filter( ( component ) => {
+
+							return component.id.includes( partialId );
+
+					 	} );
+
+						if ( matchedComponents.length > 0 ) {
+
+							this._dispatchMatchedComponents( matchedComponents, handedness, partialId, xrInputSource );
+
+						} else {
+
+							console.warn( `Could not find ${ partialId } on the ${ handedness } controller` );
+
+						}
+
+
+					} );
 
 				} ).catch( ( err ) => {
 
@@ -68,49 +116,37 @@ class XRInputEventsDispatcher extends Object3D {
 
 		super.updateMatrixWorld( force );
 
-		for ( const [ controllerIdx, motionController ] of Object.entries( this.motionControllers ) ) {
+		for ( const motionController of Object.values( this.motionControllers ) ) {
 
-			if ( motionController ) {
-
-				// Cause the MotionController to poll the Gamepad for data
-				motionController.updateFromGamepad();
-
-				// Send out events for each component
-				this._dispatchStateChangeEvents( controllerIdx );
-
-			}
+			// Cause the MotionController to poll the Gamepad for data
+			motionController.updateFromGamepad();
 
 		}
 
 	}
 
+	registerInputForEvents( handedness, partialId ) {
+
+		if ( ! this.partialIds ) this.partialIds = {};
+		if ( ! this.partialIds[ handedness ] ) this.partialIds[ handedness ] = [];
+
+		this.partialIds[ handedness ].push( partialId );
+
+	}
+
 	// Private method
 
-	_dispatchStateChangeEvents( controllerIdx ) {
+	_dispatchMatchedComponents( matchedComponents, handedness, partialId, xrInputSource ) {
 
-		const motionController = this.motionControllers[ controllerIdx ];
-
-		Object.values( motionController.components ).forEach( ( component ) => {
-
-			const { id, values } = component;
-
-			// Compare current states against previous ones
-			if ( this.previousStates[ controllerIdx ][ id ] !== values.state ) {
-
-				this.dispatchEvent( {
-					type: 'xrInputStateChanged',
-					target: this,
-					id: id,
-					valuesType: component.type,
-					// Send reference instead of copy so that the listener can use it after the initial state change event
-					values: component.values
-				} );
-
-			}
-
-			// Cache current states to compare against in the next frame
-			this.previousStates[ controllerIdx ][ id ] = values.state;
-
+		const eventTypeString = `${handedness}-${partialId}`;
+		this.dispatchEvent( {
+			type: eventTypeString,
+			target: this,
+			partialId: partialId,
+			handedness: handedness,
+			xrInputSource: xrInputSource,
+			// Send references instead of a copy so that the listener can use it after the initial state change event
+			components: matchedComponents
 		} );
 
 	}

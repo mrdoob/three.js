@@ -37,8 +37,7 @@
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 			let inputEventsDispatcher;
-			const inputTrackingStates = {};
-			const inputValues = {};
+			let trackedInputValues = {};
 
 			init();
 			animate();
@@ -93,16 +92,27 @@
 
 				inputEventsDispatcher = new XRInputEventsDispatcher( renderer.xr, [ 0, 1 ] );
 				scene.add( inputEventsDispatcher );
-				inputEventsDispatcher.addEventListener( 'xrInputStateChanged', onXrInputStateChanged );
+
+				// Listen for all 'button' components on left or right controllers
+				inputEventsDispatcher.registerInputForEvents( 'left', 'button' );
+				inputEventsDispatcher.registerInputForEvents( 'right', 'button' );
+				inputEventsDispatcher.addEventListener( 'left-button', onAnyButton );
+				inputEventsDispatcher.addEventListener( 'right-button', onAnyButton );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
-			function onXrInputStateChanged( event ) {
+			function onAnyButton( event ) {
 
-				inputTrackingStates[ event.id ] = ( event.values.state !== 'default' ) ? true : false;
-				inputValues[ event.id ] = event.values;
+				for ( const component of event.components ) {
+
+					console.log( `${event.handedness} ${component.id}` );
+					if ( ! trackedInputValues ) trackedInputValues = {};
+					if ( ! trackedInputValues[ event.handedness ] ) trackedInputValues[ event.handedness ] = {};
+					trackedInputValues[ event.handedness ][ component.id ] = component.values;
+
+				}
 
 			}
 
@@ -123,12 +133,16 @@
 
 			function render() {
 
-				for ( const [ componentId, trackingState ] of Object.entries( inputTrackingStates ) ) {
+				for ( const [ handedness, trackedInput ] of Object.entries( trackedInputValues ) ) {
 
-					if ( trackingState ) {
+					for ( const [ id, value ] of Object.entries( trackedInput ) ) {
 
-						const { state, button, xAxis, yAxis } = inputValues[ componentId ];
-						console.log( `${componentId}: ${state}, ${button}, ${xAxis}, ${yAxis}` );
+						const { state, button, xAxis, yAxis } = value;
+						if ( state != 'default' ) {
+
+							console.log( `diff ${handedness}-${id}: ${state}, ${button}, ${xAxis}, ${yAxis}` );
+
+						}
 
 					}
 
