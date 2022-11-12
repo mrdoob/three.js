@@ -10,6 +10,15 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - input events
+
+			<p> This example demonstrates the use of <a href="https://www.npmjs.com/package/@webxr-input-profiles/motion-controllers">Motion Controllers library</a> to create dynamic WebXR input mappings. Controls for the demo:<br />
+			Thumbstick / touchpad to move the cube in a plane<br />
+			Trigger to pull the cube closer<br />
+			Squeeze to make the cube smaller<br />
+			Any of the buttons to randomize the cube's color
+			</p>
+			<p><i>See the comments in the code for more information.</i></p>
+
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -122,14 +131,15 @@
 				scene.add( inputEventsDispatcher );
 
 				// Listen for all 'button' components on left or right controllers
-				// For oculus-touch-v3 this means X, Y buttons on left, A, B buttons on right
+				// For example with oculus-touch-v3 this matches X, Y buttons on left, A, B buttons on right
 				inputEventsDispatcher.registerInputForEvents( 'left', 'button' );
 				inputEventsDispatcher.registerInputForEvents( 'right', 'button' );
+				// Corresponding to the the register functions above
+				// Each event is of type `${handedness}-${partialId}`
 				inputEventsDispatcher.addEventListener( 'left-button', onAnyButton );
 				inputEventsDispatcher.addEventListener( 'right-button', onAnyButton );
 
 				// Listen for all 'thumbsticks' and 'touchpad' components on left or right controllers
-				// For oculus-touch-v3 this means thumbsticks on the left and right
 				inputEventsDispatcher.registerInputForEvents( 'left', 'thumbstick' );
 				inputEventsDispatcher.registerInputForEvents( 'left', 'touchpad' );
 				inputEventsDispatcher.registerInputForEvents( 'right', 'thumbstick' );
@@ -140,14 +150,12 @@
 				inputEventsDispatcher.addEventListener( 'right-touchpad', onAnyAxis );
 
 				// Listen for all 'trigger' components on left or right controllers
-				// For oculus-touch-v3 this means trigger buttons on the both left and right
 				inputEventsDispatcher.registerInputForEvents( 'left', 'trigger' );
 				inputEventsDispatcher.registerInputForEvents( 'right', 'trigger' );
 				inputEventsDispatcher.addEventListener( 'left-trigger', onAnyTrigger );
 				inputEventsDispatcher.addEventListener( 'right-trigger', onAnyTrigger );
 
 				// Listen for all 'squeeze' components on left or right controllers
-				// For oculus-touch-v3 this means squeeze buttons on both the left and right
 				inputEventsDispatcher.registerInputForEvents( 'left', 'squeeze' );
 				inputEventsDispatcher.registerInputForEvents( 'right', 'squeeze' );
 				inputEventsDispatcher.addEventListener( 'left-squeeze', onAnySqueeze );
