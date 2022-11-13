@@ -43,7 +43,6 @@ function WebGLUtils( gl, extensions, capabilities ) {
 		if ( p === LuminanceAlphaFormat ) return gl.LUMINANCE_ALPHA;
 		if ( p === DepthFormat ) return gl.DEPTH_COMPONENT;
 		if ( p === DepthStencilFormat ) return gl.DEPTH_STENCIL;
-		if ( p === RedFormat ) return gl.RED;
 
 		// @deprecated since r137
 
@@ -74,6 +73,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		// WebGL2 formats.
 
+		if ( p === RedFormat ) return gl.RED;
 		if ( p === RedIntegerFormat ) return gl.RED_INTEGER;
 		if ( p === RGFormat ) return gl.RG;
 		if ( p === RGIntegerFormat ) return gl.RG_INTEGER;
