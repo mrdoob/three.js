@@ -24,7 +24,7 @@ export const ColorManagement = {
 
 	get legacyMode() {
 
-		console.warn( 'THREE.ColorManagement: .legacyMode=false renamed to .enabled=true.' );
+		console.warn( 'THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r147.' );
 
 		return ! this.enabled;
 
@@ -32,7 +32,7 @@ export const ColorManagement = {
 
 	set legacyMode( legacyMode ) {
 
-		console.warn( 'THREE.ColorManagement: .legacyMode=false renamed to .enabled=true.' );
+		console.warn( 'THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r147.' );
 
 		this.enabled = ! legacyMode;
 
