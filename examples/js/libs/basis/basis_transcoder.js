@@ -13,9 +13,4 @@ var Module=typeof BASIS!=="undefined"?BASIS:{};var readyPromiseResolve,readyProm
 }
 );
 })();
-if (typeof exports === 'object' && typeof module === 'object')
-  module.exports = BASIS;
-else if (typeof define === 'function' && define['amd'])
-  define([], function() { return BASIS; });
-else if (typeof exports === 'object')
-  exports["BASIS"] = BASIS;
+export { BASIS };

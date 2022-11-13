@@ -61,6 +61,9 @@ import {
 } from '../libs/ktx-parse.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
+const TRANSCODER_JS_PATH = new URL( '../../js/libs/basis/basis_transcoder.js', import.meta.url ).href;
+const TRANSCODER_WASM_PATH = new URL( '../../js/libs/basis/basis_transcoder.wasm', import.meta.url ).href;
+
 const _taskCache = new WeakMap();
 
 let _activeLoaders = 0;
@@ -73,13 +76,12 @@ class KTX2Loader extends Loader {
 
 		super( manager );
 
-		this.transcoderPath = '';
-		this.transcoderBinary = null;
-		this.transcoderPending = null;
-
 		this.workerPool = new WorkerPool();
 		this.workerSourceURL = '';
-		this.workerConfig = null;
+		this.workerConfig = {
+			jsPath: TRANSCODER_JS_PATH,
+			wasmPath: TRANSCODER_WASM_PATH,
+		};
 
 		if ( typeof MSC_TRANSCODER !== 'undefined' ) {
 
@@ -96,7 +98,8 @@ class KTX2Loader extends Loader {
 
 	setTranscoderPath( path ) {
 
-		this.transcoderPath = path;
+		this.workerConfig.jsPath = `${path}basis_transcoder.js`;
+		this.workerConfig.wasmPath = `${path}basis_transcoder.wasm`;
 
 		return this;
 
@@ -113,6 +116,7 @@ class KTX2Loader extends Loader {
 	detectSupport( renderer ) {
 
 		this.workerConfig = {
+			...this.workerConfig,
 			astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
 			etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
 			etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
@@ -136,71 +140,45 @@ class KTX2Loader extends Loader {
 
 	init() {
 
-		if ( ! this.transcoderPending ) {
+		if ( this.workerSourceURL ) return;
 
-			// Load transcoder wrapper.
-			const jsLoader = new FileLoader( this.manager );
-			jsLoader.setPath( this.transcoderPath );
-			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = jsLoader.loadAsync( 'basis_transcoder.js' );
+		const fn = KTX2Loader.BasisWorker.toString();
 
-			// Load transcoder WASM binary.
-			const binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPath( this.transcoderPath );
-			binaryLoader.setResponseType( 'arraybuffer' );
-			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = binaryLoader.loadAsync( 'basis_transcoder.wasm' );
+		const body = [
+			'/* constants */',
+			'let _EngineFormat = ' + JSON.stringify( KTX2Loader.EngineFormat ),
+			'let _TranscoderFormat = ' + JSON.stringify( KTX2Loader.TranscoderFormat ),
+			'let _BasisFormat = ' + JSON.stringify( KTX2Loader.BasisFormat ),
+			'/* worker */',
+			fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) )
+		].join( '\n' );
 
-			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
-				.then( ( [ jsContent, binaryContent ] ) => {
+		this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
 
-					const fn = KTX2Loader.BasisWorker.toString();
+		this.workerPool.setWorkerCreator( () => {
 
-					const body = [
-						'/* constants */',
-						'let _EngineFormat = ' + JSON.stringify( KTX2Loader.EngineFormat ),
-						'let _TranscoderFormat = ' + JSON.stringify( KTX2Loader.TranscoderFormat ),
-						'let _BasisFormat = ' + JSON.stringify( KTX2Loader.BasisFormat ),
-						'/* basis_transcoder.js */',
-						jsContent,
-						'/* worker */',
-						fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) )
-					].join( '\n' );
+			const worker = new Worker( this.workerSourceURL );
 
-					this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
-					this.transcoderBinary = binaryContent;
+			worker.postMessage( { type: 'init', config: this.workerConfig } );
 
-					this.workerPool.setWorkerCreator( () => {
+			return worker;
 
-						const worker = new Worker( this.workerSourceURL );
-						const transcoderBinary = this.transcoderBinary.slice( 0 );
+		} );
 
-						worker.postMessage( { type: 'init', config: this.workerConfig, transcoderBinary }, [ transcoderBinary ] );
+		if ( _activeLoaders > 0 ) {
 
-						return worker;
+			// Each instance loads a transcoder and allocates workers, increasing network and memory cost.
 
-					} );
+			console.warn(
 
-				} );
+				'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.'
+				+ ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
 
-			if ( _activeLoaders > 0 ) {
-
-				// Each instance loads a transcoder and allocates workers, increasing network and memory cost.
-
-				console.warn(
-
-					'THREE.KTX2Loader: Multiple active KTX2 loaders may cause performance issues.'
-					+ ' Use a single KTX2Loader instance, or call .dispose() on old instances.'
-
-				);
-
-			}
-
-			_activeLoaders ++;
+			);
 
 		}
 
-		return this.transcoderPending;
+		_activeLoaders ++;
 
 	}
 
@@ -277,11 +255,11 @@ class KTX2Loader extends Loader {
 
 		//
 		const taskConfig = config;
-		const texturePending = this.init().then( () => {
 
-			return this.workerPool.postMessage( { type: 'transcode', buffer, taskConfig: taskConfig }, [ buffer ] );
+		this.init();
 
-		} ).then( ( e ) => this._createTextureFrom( e.data, container ) );
+		const texturePending = this.workerPool.postMessage( { type: 'transcode', buffer, taskConfig, }, [ buffer ] )
+			.then( ( e ) => this._createTextureFrom( e.data, container ) );
 
 		// Cache the task result.
 		_taskCache.set( buffer, { promise: texturePending } );
@@ -347,11 +325,12 @@ KTX2Loader.EngineFormat = {
 
 /* WEB WORKER */
 
-KTX2Loader.BasisWorker = function () {
+KTX2Loader.BasisWorker = async function () {
 
 	let config;
 	let transcoderPending;
 	let BasisModule;
+	let BASIS;
 
 	const EngineFormat = _EngineFormat; // eslint-disable-line no-undef
 	const TranscoderFormat = _TranscoderFormat; // eslint-disable-line no-undef
@@ -365,7 +344,7 @@ KTX2Loader.BasisWorker = function () {
 
 			case 'init':
 				config = message.config;
-				init( message.transcoderBinary );
+				init();
 				break;
 
 			case 'transcode':
@@ -400,14 +379,26 @@ KTX2Loader.BasisWorker = function () {
 
 	} );
 
-	function init( wasmBinary ) {
+	async function init() {
 
-		transcoderPending = new Promise( ( resolve ) => {
+		let resolve;
 
-			BasisModule = { wasmBinary, onRuntimeInitialized: resolve };
-			BASIS( BasisModule ); // eslint-disable-line no-undef
+		transcoderPending = new Promise( ( _resolve ) => ( resolve = _resolve ) );
 
-		} ).then( () => {
+		Promise.all( [
+
+			import( config.jsPath ),
+			fetch( config.wasmPath ).then( ( response ) => response.arrayBuffer() ),
+
+		] ).then( ( [ { BASIS: _BASIS }, wasmBinary ] ) => {
+
+			BASIS = _BASIS;
+			BasisModule = { wasmBinary, onRuntimeInitialized };
+			BASIS( BasisModule );
+
+		} );
+
+		function onRuntimeInitialized() {
 
 			BasisModule.initializeBasis();
 
@@ -417,7 +408,9 @@ KTX2Loader.BasisWorker = function () {
 
 			}
 
-		} );
+			resolve();
+
+		}
 
 	}
 
