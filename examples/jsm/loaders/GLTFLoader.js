@@ -53,7 +53,6 @@ import {
 	SkinnedMesh,
 	Sphere,
 	SpotLight,
-	TangentSpaceNormalMap,
 	Texture,
 	TextureLoader,
 	TriangleFanDrawMode,
