@@ -24445,7 +24445,6 @@ function WebGLUtils( gl, extensions, capabilities ) {
 		if ( p === LuminanceAlphaFormat ) return 6410;
 		if ( p === DepthFormat ) return 6402;
 		if ( p === DepthStencilFormat ) return 34041;
-		if ( p === RedFormat ) return 6403;
 
 		// @deprecated since r137
 
@@ -24476,6 +24475,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		// WebGL2 formats.
 
+		if ( p === RedFormat ) return 6403;
 		if ( p === RedIntegerFormat ) return 36244;
 		if ( p === RGFormat ) return 33319;
 		if ( p === RGIntegerFormat ) return 33320;
@@ -42187,7 +42187,7 @@ class InstancedBufferGeometry extends BufferGeometry {
 
 	toJSON() {
 
-		const data = super.toJSON( this );
+		const data = super.toJSON();
 
 		data.instanceCount = this.instanceCount;
 
