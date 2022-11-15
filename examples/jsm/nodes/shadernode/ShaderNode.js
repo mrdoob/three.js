@@ -1,3 +1,4 @@
+import Node from '../core/Node.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
@@ -147,31 +148,35 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 };
 
+class ShaderNodeInternal extends Node {
+
+	constructor( jsFunc ) {
+
+		super();
+
+		this._jsFunc = jsFunc;
+
+	}
+
+	call( inputs, builder ) {
+
+		inputs = nodeObjects( inputs );
+
+		return nodeObject( this._jsFunc( inputs, builder ) );
+
+	}
+
+	construct( builder ) {
+
+		return this.call( {}, builder );
+
+	}
+
+}
+
 const ShaderNodeScript = function ( jsFunc ) {
 
-	// @TODO: Move this to Node extended class
-
-	const self = {
-
-		build: ( builder ) => {
-
-			self.call( {}, builder );
-
-			return '';
-
-		},
-
-		call: ( inputs, builder ) => {
-
-			inputs = nodeObjects( inputs );
-
-			return nodeObject( jsFunc( inputs, builder ) );
-
-		}
-
-	};
-
-	return self;
+	return new ShaderNodeInternal( jsFunc );
 
 };
 
