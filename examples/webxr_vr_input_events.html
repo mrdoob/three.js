@@ -39,12 +39,10 @@
 			import * as THREE from 'three';
 
 			import { VRButton } from 'three/addons/webxr/VRButton.js';
-			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 			import { XRInputEventsDispatcher } from 'three/addons/webxr/XRInputEventsDispatcher.js';
 
 			let camera, scene, renderer;
 			let controller1, controller2;
-			let controllerGrip1, controllerGrip2;
 			let inputEventsDispatcher;
 
 			let demoCube;
@@ -116,16 +114,18 @@
 				controller2 = renderer.xr.getController( 1 );
 				scene.add( controller2 );
 
-				const controllerModelFactory = new XRControllerModelFactory();
+				const controllerGeometry = new THREE.CylinderGeometry( 0.01, 0.02, 0.08, 5 );
+				controllerGeometry.rotateX( - Math.PI / 2 );
+				const controllerMaterial = new THREE.MeshStandardMaterial( { flatShading: true } );
+				const mesh = new THREE.Mesh( controllerGeometry, controllerMaterial );
 
-				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
-				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
-				scene.add( controllerGrip1 );
+				const pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 3 ) );
+				pivot.name = 'pivot';
+				pivot.position.z = - 0.05;
+				mesh.add( pivot );
 
-				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
-				const controllerModel2 = controllerModelFactory.createControllerModel( controllerGrip2 );
-				controllerGrip2.add( controllerModel2 );
-				scene.add( controllerGrip2 );
+				controller1.add( mesh.clone() );
+				controller2.add( mesh.clone() );
 
 				inputEventsDispatcher = new XRInputEventsDispatcher( renderer.xr, [ 0, 1 ] );
 				scene.add( inputEventsDispatcher );
