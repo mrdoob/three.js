@@ -14356,7 +14356,7 @@ function WebGLState(gl, extensions, capabilities) {
 			currentBlendDstAlpha = blendDstAlpha;
 		}
 		currentBlending = blending;
-		currentPremultipledAlpha = null;
+		currentPremultipledAlpha = false;
 	}
 	function setMaterial(material, frontFaceCW) {
 		material.side === DoubleSide ? disable(gl.CULL_FACE) : enable(gl.CULL_FACE);
@@ -27259,9 +27259,6 @@ class InstancedBufferGeometry extends BufferGeometry {
 		super.copy(source);
 		this.instanceCount = source.instanceCount;
 		return this;
-	}
-	clone() {
-		return new this.constructor().copy(this);
 	}
 	toJSON() {
 		const data = super.toJSON();

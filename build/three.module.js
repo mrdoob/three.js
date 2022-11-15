@@ -21839,7 +21839,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		}
 
 		currentBlending = blending;
-		currentPremultipledAlpha = null;
+		currentPremultipledAlpha = false;
 
 	}
 
@@ -42176,12 +42176,6 @@ class InstancedBufferGeometry extends BufferGeometry {
 		this.instanceCount = source.instanceCount;
 
 		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
