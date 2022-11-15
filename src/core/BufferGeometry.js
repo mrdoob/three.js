@@ -424,6 +424,8 @@ class BufferGeometry extends EventDispatcher {
 			for ( let i = 0, il = position.count; i < il; i ++ ) {
 
 				_vector.fromBufferAttribute( position, i );
+				
+				if ( isNaN( _vector.x ) || isNaN( _vector.y ) || isNaN( _vector.z ) ) continue;
 
 				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
 
