@@ -87,7 +87,7 @@
 		<h3>[property:Float autoRotateSpeed]</h3>
 		<p>
 			How fast to rotate around the target if [page:.autoRotate] is true. Default is 2.0, which equates to 30 seconds
-			per orbit at 60fps.<br> Note that if [page:.autoRotate] is enabled, you must call [page:.update]
+			per orbit at 60fps. To unlock [page:.autoRotate] from framerate, utilise 'controls.autoRotateSpeed = 15 * clock.getDelta();', you must import the clock module and set up its' constructor first, Example : 'let clock = new Clock( {autoStart : true} )'.  <br> Note that if [page:.autoRotate] is enabled, you must call [page:.update]
 			() in your animation loop.
 		</p>
 
