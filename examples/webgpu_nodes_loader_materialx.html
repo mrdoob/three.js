@@ -43,7 +43,7 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			import { nodeFrame } from './jsm/renderers/webgl/nodes/WebGLNodes.js';
+			// import { nodeFrame } from './jsm/renderers/webgpu/nodes/WebGPUNodes.js';
 
 			const SAMPLE_PATH = 'https://raw.githubusercontent.com/materialx/MaterialX/main/resources/Materials/Examples/StandardSurface/';
 
@@ -194,7 +194,7 @@
 
 			function render() {
 
-				nodeFrame.update();
+				// nodeFrame.update();
 
 				renderer.render( scene, camera );
 
