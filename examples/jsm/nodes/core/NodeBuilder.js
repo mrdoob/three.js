@@ -386,9 +386,11 @@ class NodeBuilder {
 
 	}
 
-	getTypeFromLength( length ) {
+	getTypeFromLength( length, componentType = 'float' ) {
 
-		return typeFromLength.get( length );
+		const baseType = typeFromLength.get( length );
+		const prefix = componentType === 'float' ? '' : componentType[ 0 ];
+		return prefix + baseType;
 
 	}
 
@@ -800,15 +802,19 @@ class NodeBuilder {
 
 		}
 
+		const fromTypeComponentType = this.getComponentType( fromType );
+
 		if ( toTypeLength === 4 ) { // toType is vec4-like
 
-			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec3' ) }, 1.0 )`;
+			const vec3Like = this.getTypeFromLength( 3, fromTypeComponentType );
+			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, vec3Like ) }, 1.0 )`;
 
 		}
 
 		if ( fromTypeLength === 2 ) { // fromType is vec2-like and toType is vec3-like
 
-			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec2' ) }, 0.0 )`;
+			const vec2Like = this.getTypeFromLength( 2, fromTypeComponentType );
+			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, vec2Like ) }, 0.0 )`;
 
 		}
 
