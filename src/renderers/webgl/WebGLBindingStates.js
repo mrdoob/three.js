@@ -389,7 +389,7 @@
 
 							}
 
-							if ( object.isInstancedMesh !== true && geometry._maxInstanceCount === undefined ) {
+							if ( object.isInstancedMesh !== true ) {
 
 								geometry._maxInstanceCount = data.meshPerAttribute * data.count;
 
@@ -430,7 +430,7 @@
 
 							}
 
-							if ( object.isInstancedMesh !== true && geometry._maxInstanceCount === undefined ) {
+							if ( object.isInstancedMesh !== true ) {
 
 								geometry._maxInstanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
