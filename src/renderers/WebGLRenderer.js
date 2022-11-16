@@ -127,7 +127,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	// physical lights
 
-	this.physicallyCorrectLights = false;
+	this.useLegacyLights = true;
 
 	// tone mapping
 
@@ -869,7 +869,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		} );
 
-		currentRenderState.setupLights( _this.physicallyCorrectLights );
+		currentRenderState.setupLights( _this.useLegacyLights );
 
 		scene.traverse( function ( object ) {
 
@@ -1019,7 +1019,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		// render scene
 
-		currentRenderState.setupLights( _this.physicallyCorrectLights );
+		currentRenderState.setupLights( _this.useLegacyLights );
 
 		if ( camera.isArrayCamera ) {
 
@@ -2250,5 +2250,29 @@ function WebGLRenderer( parameters = {} ) {
 	}
 
 }
+
+Object.defineProperties( WebGLRenderer.prototype, {
+
+	// @deprecated since r147
+
+	physicallyCorrectLights: {
+
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
+			return undefined;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
+			this.useLegacyLights = ! value;
+
+		}
+
+	}
+
+} );
 
 export { WebGLRenderer };

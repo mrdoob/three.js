@@ -231,7 +231,7 @@
 
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.physicallyCorrectLights = true;
+				renderer.useLegacyLights = false;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
