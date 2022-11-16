@@ -47,7 +47,7 @@ class OperatorNode extends TempNode {
 
 		} else if ( op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 
-			return 'int';
+			return builder.getIntegerType( typeA );
 
 		} else if ( op === '==' || op === '&&' || op === '||' || op === '^^' ) {
 
@@ -123,6 +123,11 @@ class OperatorNode extends TempNode {
 					typeA = typeB = 'float';
 
 				}
+
+			} else if ( op === '>>' || op === '<<' ) {
+
+				typeA = type;
+				typeB = builder.changeComponentType( typeB, 'uint' );
 
 			} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
