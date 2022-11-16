@@ -52,7 +52,7 @@
 		<h2>Properties</h2>
 		<p>See the base [page:CurvePath] class for common properties.</p>
 
-		<h3>[property:Array currentPoint]</h3>
+		<h3>[property:Vector2 currentPoint]</h3>
 		<p>The current offset of the path. Any new [page:Curve] added will start here.</p>
 
 
@@ -65,7 +65,7 @@
 			radius -- The radius of the arc.<br />
 			startAngle -- The start angle in radians.<br />
 			endAngle -- The end angle in radians.<br />
-			clockwise -- Sweep the arc clockwise. Defaults to *false*.<br /><br />
+			clockwise -- Sweep the arc clockwise. Defaults to `false`.<br /><br />
 
 			Adds an absolutely positioned [page:EllipseCurve EllipseCurve] to the path.
 		</p>
@@ -89,7 +89,7 @@
 		radius -- The radius of the arc.<br />
 		startAngle -- The start angle in radians.<br />
 		endAngle -- The end angle in radians.<br />
-		clockwise -- Sweep the arc clockwise. Defaults to *false*.<br /><br />
+		clockwise -- Sweep the arc clockwise. Defaults to `false`.<br /><br />
 
 		Adds an [page:EllipseCurve EllipseCurve] to the path, positioned relative to [page:.currentPoint].
 		</p>
@@ -105,8 +105,8 @@
 			yRadius -- The radius of the ellipse in the y axis.<br />
 			startAngle -- The start angle in radians.<br />
 			endAngle -- The end angle in radians.<br />
-			clockwise -- Sweep the ellipse clockwise. Defaults to *false*.<br />
-			rotation -- The rotation angle of the ellipse in radians, counterclockwise from the positive X axis. Optional, defaults to *0*.<br /><br />
+			clockwise -- Sweep the ellipse clockwise. Defaults to `false`.<br />
+			rotation -- The rotation angle of the ellipse in radians, counterclockwise from the positive X axis. Optional, defaults to `0`.<br /><br />
 
 			Adds an [page:EllipseCurve EllipseCurve] to the path, positioned relative to [page:.currentPoint].
 		</p>

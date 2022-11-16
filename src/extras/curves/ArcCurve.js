@@ -6,12 +6,12 @@ class ArcCurve extends EllipseCurve {
 
 		super( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 
+		this.isArcCurve = true;
+
 		this.type = 'ArcCurve';
 
 	}
 
 }
-
-ArcCurve.prototype.isArcCurve = true;
 
 export { ArcCurve };

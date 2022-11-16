@@ -1,15 +1,32 @@
-import { FunctionNode } from './FunctionNode.js';
+import TempNode from './TempNode.js';
 
-class ExpressionNode extends FunctionNode {
+class ExpressionNode extends TempNode {
 
-	constructor( src, type, keywords, extensions, includes ) {
+	constructor( snipped = '', nodeType = 'void' ) {
 
-		super( src, includes, extensions, keywords, type );
+		super( nodeType );
+
+		this.snipped = snipped;
+
+	}
+
+	generate( builder ) {
+
+		const type = this.getNodeType( builder );
+		const snipped = this.snipped;
+
+		if ( type === 'void' ) {
+
+			builder.addFlowCode( snipped );
+
+		} else {
+
+			return `( ${ snipped } )`;
+
+		}
 
 	}
 
 }
 
-ExpressionNode.prototype.nodeType = 'Expression';
-
-export { ExpressionNode };
+export default ExpressionNode;

@@ -1,20 +1,21 @@
-import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
-import { MathNode, FloatNode } from '../../renderers/nodes/Nodes.js';
+import { SelectInput, Element, LabelElement } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { MathNode, UniformNode } from 'three/nodes';
 
-const DEFAULT_VALUE = new FloatNode();
+const DEFAULT_VALUE = new UniformNode( 0 );
 
-export class InvertEditor extends ObjectNode {
+export class InvertEditor extends BaseNode {
 
 	constructor() {
 
 		const node = new MathNode( MathNode.INVERT, DEFAULT_VALUE );
 
-		super( 'Invert / Negate', 1, node );
+		super( 'Invert / Negate', 1, node, 175 );
 
 		const optionsField = new SelectInput( [
 			{ name: 'Invert ( 1 - Source )', value: MathNode.INVERT },
 			{ name: 'Negate ( - Source )', value: MathNode.NEGATE }
-		] ).onChange( () => {
+		], MathNode.INVERT ).onChange( () => {
 
 			node.method = optionsField.getValue();
 
@@ -26,11 +27,11 @@ export class InvertEditor extends ObjectNode {
 
 		input.onConnect( () => {
 
-			node.aNode = input.linkedExtra || DEFAULT_VALUE;
+			node.aNode = input.getLinkedObject() || DEFAULT_VALUE;
 
 		} );
 
-		this.add( new LabelElement( 'Method' ).add( optionsField ) )
+		this.add( new Element().add( optionsField ) )
 			.add( input );
 
 	}

@@ -1,23 +1,22 @@
-import { ObjectNode, NumberInput, LabelElement } from '../../libs/flow.module.js';
-import { FloatNode } from '../../renderers/nodes/Nodes.js';
+import { NumberInput, Element } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { UniformNode } from 'three/nodes';
 
-export class FloatEditor extends ObjectNode {
+export class FloatEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new FloatNode();
+		const node = new UniformNode( 0 );
 
-		super( 'Float', 1, node, 250 );
+		super( 'Float', 1, node, 150 );
 
-		this.title.setIcon( 'ti ti-box-multiple-1' );
-
-		const field = new NumberInput().onChange( () => {
+		const field = new NumberInput().setTagColor( 'red' ).onChange( () => {
 
 			node.value = field.getValue();
 
 		} );
 
-		this.add( new LabelElement( 'Value' ).add( field ) );
+		this.add( new Element().add( field ) );
 
 	}
 

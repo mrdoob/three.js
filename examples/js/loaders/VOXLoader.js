@@ -34,13 +34,11 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( buffer ) {
 
 			const data = new DataView( buffer );
 			const id = data.getUint32( 0, true );
 			const version = data.getUint32( 4, true );
-
 			if ( id !== 542658390 || version !== 150 ) {
 
 				console.error( 'Not a valid VOX file' );
@@ -52,20 +50,17 @@
 			let i = 8;
 			let chunk;
 			const chunks = [];
-
 			while ( i < data.byteLength ) {
 
 				let id = '';
-
 				for ( let j = 0; j < 4; j ++ ) {
 
-					id += String.fromCharCode( data.getUint8( i ++, true ) );
+					id += String.fromCharCode( data.getUint8( i ++ ) );
 
 				}
 
 				const chunkSize = data.getUint32( i, true );
 				i += 4;
-				data.getUint32( i, true );
 				i += 4; // childChunks
 
 				if ( id === 'SIZE' ) {
@@ -97,7 +92,6 @@
 				} else if ( id === 'RGBA' ) {
 
 					const palette = [ 0 ];
-
 					for ( let j = 0; j < 256; j ++ ) {
 
 						palette[ j + 1 ] = data.getUint32( i, true );
@@ -110,6 +104,7 @@
 				} else {
 
 					// console.log( id, chunkSize, childChunks );
+
 					i += chunkSize;
 
 				}
@@ -121,14 +116,15 @@
 		}
 
 	}
-
 	class VOXMesh extends THREE.Mesh {
 
 		constructor( chunk ) {
 
 			const data = chunk.data;
 			const size = chunk.size;
-			const palette = chunk.palette; //
+			const palette = chunk.palette;
+
+			//
 
 			const vertices = [];
 			const colors = [];
@@ -138,13 +134,11 @@
 			const ny = [ 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0 ];
 			const nz = [ 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0 ];
 			const pz = [ 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 ];
-
 			function add( tile, x, y, z, r, g, b ) {
 
 				x -= size.x / 2;
 				y -= size.z / 2;
 				z += size.y / 2;
-
 				for ( let i = 0; i < 18; i += 3 ) {
 
 					vertices.push( tile[ i + 0 ] + x, tile[ i + 1 ] + y, tile[ i + 2 ] + z );
@@ -152,13 +146,13 @@
 
 				}
 
-			} // Store data in a volume for sampling
+			}
 
+			// Store data in a volume for sampling
 
 			const offsety = size.x;
 			const offsetz = size.x * size.y;
 			const array = new Uint8Array( size.x * size.y * size.z );
-
 			for ( let j = 0; j < data.length; j += 4 ) {
 
 				const x = data[ j + 0 ];
@@ -167,11 +161,11 @@
 				const index = x + y * offsety + z * offsetz;
 				array[ index ] = 255;
 
-			} // Construct geometry
+			}
 
+			// Construct geometry
 
 			let hasColors = false;
-
 			for ( let j = 0; j < data.length; j += 4 ) {
 
 				const x = data[ j + 0 ];
@@ -197,7 +191,6 @@
 			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 			geometry.computeVertexNormals();
 			const material = new THREE.MeshStandardMaterial();
-
 			if ( hasColors ) {
 
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
@@ -210,8 +203,7 @@
 		}
 
 	}
-
-	class VOXDataTexture3D extends THREE.DataTexture3D {
+	class VOXData3DTexture extends THREE.Data3DTexture {
 
 		constructor( chunk ) {
 
@@ -220,7 +212,6 @@
 			const offsety = size.x;
 			const offsetz = size.x * size.y;
 			const array = new Uint8Array( size.x * size.y * size.z );
-
 			for ( let j = 0; j < data.length; j += 4 ) {
 
 				const x = data[ j + 0 ];
@@ -236,12 +227,13 @@
 			this.minFilter = THREE.NearestFilter;
 			this.magFilter = THREE.LinearFilter;
 			this.unpackAlignment = 1;
+			this.needsUpdate = true;
 
 		}
 
 	}
 
-	THREE.VOXDataTexture3D = VOXDataTexture3D;
+	THREE.VOXData3DTexture = VOXData3DTexture;
 	THREE.VOXLoader = VOXLoader;
 	THREE.VOXMesh = VOXMesh;
 

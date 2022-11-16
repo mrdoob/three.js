@@ -42,7 +42,12 @@
 		<p>
 			The light's intensity, or strength.<br />
 			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, the units of intensity depend on the type of light.<br />
-			Default - *1.0*.
+			Default - `1.0`.
+		</p>
+
+		<h3>[property:Boolean isLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 
@@ -53,7 +58,7 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Abstract dispose method for lights; implemented by subclasses that have disposable resources.
+		Abstract dispose method for classes that extend this class; implemented by subclasses that have disposable GPU-related resources.
 		</p>
 
 		<h3>[method:this copy]( [param:Light source] )</h3>

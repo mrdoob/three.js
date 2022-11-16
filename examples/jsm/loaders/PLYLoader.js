@@ -3,8 +3,9 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	LoaderUtils
-} from '../../../build/three.module.js';
+	LoaderUtils,
+	Color
+} from 'three';
 
 /**
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
@@ -32,6 +33,7 @@ import {
  *
  */
 
+const _color = new Color();
 
 class PLYLoader extends Loader {
 
@@ -88,7 +90,7 @@ class PLYLoader extends Loader {
 
 		function parseHeader( data ) {
 
-			const patternHeader = /ply([\s\S]*)end_header\r?\n/;
+			const patternHeader = /^ply([\s\S]*)end_header(\r\n|\r|\n)/;
 			let headerText = '';
 			let headerLength = 0;
 			const result = patternHeader.exec( data );
@@ -107,7 +109,7 @@ class PLYLoader extends Loader {
 				objInfo: ''
 			};
 
-			const lines = headerText.split( '\n' );
+			const lines = headerText.split( /\r\n|\r|\n/ );
 			let currentElement;
 
 			function make_ply_element_property( propertValues, propertyNameMapping ) {
@@ -281,7 +283,7 @@ class PLYLoader extends Loader {
 
 			}
 
-			const lines = body.split( '\n' );
+			const lines = body.split( /\r\n|\r|\n/ );
 			let currentElement = 0;
 			let currentElementCount = 0;
 
@@ -407,7 +409,13 @@ class PLYLoader extends Loader {
 
 				if ( attrR !== null && attrG !== null && attrB !== null ) {
 
-					buffer.colors.push( element[ attrR ] / 255.0, element[ attrG ] / 255.0, element[ attrB ] / 255.0 );
+					_color.setRGB(
+						element[ attrR ] / 255.0,
+						element[ attrG ] / 255.0,
+						element[ attrB ] / 255.0
+					).convertSRGBToLinear();
+
+					buffer.colors.push( _color.r, _color.g, _color.b );
 
 				}
 

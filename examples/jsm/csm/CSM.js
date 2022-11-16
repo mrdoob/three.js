@@ -6,7 +6,7 @@ import {
 	ShaderChunk,
 	Matrix4,
 	Box3
-} from '../../../build/three.module.js';
+} from 'three';
 import { CSMFrustum } from './CSMFrustum.js';
 import { CSMShader } from './CSMShader.js';
 
@@ -343,6 +343,7 @@ export class CSM {
 
 		for ( let i = 0; i < this.lights.length; i ++ ) {
 
+			this.parent.remove( this.lights[ i ].target );
 			this.parent.remove( this.lights[ i ] );
 
 		}

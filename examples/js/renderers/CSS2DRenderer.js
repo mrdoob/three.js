@@ -5,6 +5,7 @@
 		constructor( element = document.createElement( 'div' ) ) {
 
 			super();
+			this.isCSS2DObject = true;
 			this.element = element;
 			this.element.style.position = 'absolute';
 			this.element.style.userSelect = 'none';
@@ -24,7 +25,6 @@
 			} );
 
 		}
-
 		copy( source, recursive ) {
 
 			super.copy( source, recursive );
@@ -35,35 +35,26 @@
 
 	}
 
-	CSS2DObject.prototype.isCSS2DObject = true; //
+	//
 
 	const _vector = new THREE.Vector3();
-
 	const _viewMatrix = new THREE.Matrix4();
-
 	const _viewProjectionMatrix = new THREE.Matrix4();
-
 	const _a = new THREE.Vector3();
-
 	const _b = new THREE.Vector3();
-
 	class CSS2DRenderer {
 
 		constructor( parameters = {} ) {
 
 			const _this = this;
-
 			let _width, _height;
-
 			let _widthHalf, _heightHalf;
-
 			const cache = {
 				objects: new WeakMap()
 			};
 			const domElement = parameters.element !== undefined ? parameters.element : document.createElement( 'div' );
 			domElement.style.overflow = 'hidden';
 			this.domElement = domElement;
-
 			this.getSize = function () {
 
 				return {
@@ -75,13 +66,10 @@
 
 			this.render = function ( scene, camera ) {
 
-				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
-				if ( camera.parent === null ) camera.updateMatrixWorld();
-
+				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 				_viewMatrix.copy( camera.matrixWorldInverse );
-
 				_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
-
 				renderObject( scene, scene, camera );
 				zOrder( scene );
 
@@ -102,38 +90,29 @@
 
 				if ( object.isCSS2DObject ) {
 
-					object.onBeforeRender( _this, scene, camera );
-
 					_vector.setFromMatrixPosition( object.matrixWorld );
-
 					_vector.applyMatrix4( _viewProjectionMatrix );
+					const visible = object.visible === true && _vector.z >= - 1 && _vector.z <= 1 && object.layers.test( camera.layers ) === true;
+					object.element.style.display = visible === true ? '' : 'none';
+					if ( visible === true ) {
 
-					const element = object.element;
-
-					if ( /apple/i.test( navigator.vendor ) ) {
-
-						// https://github.com/mrdoob/three.js/issues/21415
-						element.style.transform = 'translate(-50%,-50%) translate(' + Math.round( _vector.x * _widthHalf + _widthHalf ) + 'px,' + Math.round( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
-
-					} else {
-
+						object.onBeforeRender( _this, scene, camera );
+						const element = object.element;
 						element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+						if ( element.parentNode !== domElement ) {
+
+							domElement.appendChild( element );
+
+						}
+
+						object.onAfterRender( _this, scene, camera );
 
 					}
 
-					element.style.display = object.visible && _vector.z >= - 1 && _vector.z <= 1 ? '' : 'none';
 					const objectData = {
 						distanceToCameraSquared: getDistanceToSquared( camera, object )
 					};
 					cache.objects.set( object, objectData );
-
-					if ( element.parentNode !== domElement ) {
-
-						domElement.appendChild( element );
-
-					}
-
-					object.onAfterRender( _this, scene, camera );
 
 				}
 
@@ -148,9 +127,7 @@
 			function getDistanceToSquared( object1, object2 ) {
 
 				_a.setFromMatrixPosition( object1.matrixWorld );
-
 				_b.setFromMatrixPosition( object2.matrixWorld );
-
 				return _a.distanceToSquared( _b );
 
 			}
@@ -171,13 +148,18 @@
 
 				const sorted = filterAndFlatten( scene ).sort( function ( a, b ) {
 
+					if ( a.renderOrder !== b.renderOrder ) {
+
+						return b.renderOrder - a.renderOrder;
+
+					}
+
 					const distanceA = cache.objects.get( a ).distanceToCameraSquared;
 					const distanceB = cache.objects.get( b ).distanceToCameraSquared;
 					return distanceA - distanceB;
 
 				} );
 				const zMax = sorted.length;
-
 				for ( let i = 0, l = sorted.length; i < l; i ++ ) {
 
 					sorted[ i ].element.style.zIndex = zMax - i;

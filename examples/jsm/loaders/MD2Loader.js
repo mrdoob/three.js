@@ -5,7 +5,7 @@ import {
 	Float32BufferAttribute,
 	Loader,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _normalData = [
 	[ - 0.525731, 0.000000, 0.850651 ], [ - 0.442863, 0.238856, 0.864188 ],
@@ -243,7 +243,7 @@ class MD2Loader extends Loader {
 
 			for ( let j = 0; j < 16; j ++ ) {
 
-				const character = data.getUint8( offset + j, true );
+				const character = data.getUint8( offset + j );
 				if ( character === 0 ) break;
 
 				string[ j ] = character;
@@ -260,10 +260,10 @@ class MD2Loader extends Loader {
 
 			for ( let j = 0; j < header.num_vertices; j ++ ) {
 
-				let x = data.getUint8( offset ++, true );
-				let y = data.getUint8( offset ++, true );
-				let z = data.getUint8( offset ++, true );
-				const n = _normalData[ data.getUint8( offset ++, true ) ];
+				let x = data.getUint8( offset ++ );
+				let y = data.getUint8( offset ++ );
+				let z = data.getUint8( offset ++ );
+				const n = _normalData[ data.getUint8( offset ++ ) ];
 
 				x = x * scale.x + translation.x;
 				y = y * scale.y + translation.y;

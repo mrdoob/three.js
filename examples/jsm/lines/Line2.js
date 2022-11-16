@@ -8,12 +8,12 @@ class Line2 extends LineSegments2 {
 
 		super( geometry, material );
 
+		this.isLine2 = true;
+
 		this.type = 'Line2';
 
 	}
 
 }
-
-Line2.prototype.isLine2 = true;
 
 export { Line2 };

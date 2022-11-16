@@ -537,6 +537,16 @@ iframe#viewer {
 	line-height: calc(var(--line-height) - 6px);
 }
 
+.card .tag {
+	background-color: var(--background-color);
+	color: var(--color-blue);
+	margin-left: 6px;
+	padding: 1px 6px 2px;
+	border-radius: 2px;
+	font-size: calc(var(--font-size) - 2px);
+	line-height: calc(var(--line-height) - 6px);
+}
+
 /* mobile */
 
 @media all and ( max-width: 640px ) {

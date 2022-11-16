@@ -1,4 +1,4 @@
-import { Vector3, Matrix4 } from '../../../build/three.module.js';
+import { Vector3, Matrix4 } from 'three';
 
 const inverseProjectionMatrix = new Matrix4();
 
@@ -133,7 +133,7 @@ class CSMFrustum {
 
 	toSpace( cameraMatrix, target ) {
 
-		for ( var i = 0; i < 4; i ++ ) {
+		for ( let i = 0; i < 4; i ++ ) {
 
 			target.vertices.near[ i ]
 				.copy( this.vertices.near[ i ] )

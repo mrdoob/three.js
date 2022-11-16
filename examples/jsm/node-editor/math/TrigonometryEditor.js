@@ -1,21 +1,27 @@
-import { ObjectNode, SelectInput, Element, LabelElement } from '../../libs/flow.module.js';
-import { MathNode, Vector3Node } from '../../renderers/nodes/Nodes.js';
+import { SelectInput, Element, LabelElement } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { Vector3 } from 'three';
+import { MathNode, UniformNode } from 'three/nodes';
 
-const DEFAULT_VALUE = new Vector3Node();
+const DEFAULT_VALUE = new UniformNode( new Vector3() );
 
-export class TrigonometryEditor extends ObjectNode {
+export class TrigonometryEditor extends BaseNode {
 
 	constructor() {
 
 		const node = new MathNode( MathNode.SIN, DEFAULT_VALUE );
 
-		super( 'Trigonometry', 1, node, 200 );
+		super( 'Trigonometry', 1, node, 175 );
 
 		const optionsField = new SelectInput( [
 			{ name: 'Sin', value: MathNode.SIN },
 			{ name: 'Cos', value: MathNode.COS },
-			{ name: 'Tan', value: MathNode.TAN }
-		] ).onChange( () => {
+			{ name: 'Tan', value: MathNode.TAN },
+
+			{ name: 'asin', value: MathNode.ASIN },
+			{ name: 'acos', value: MathNode.ACOS },
+			{ name: 'atan', value: MathNode.ATAN }
+		], MathNode.SIN ).onChange( () => {
 
 			node.method = optionsField.getValue();
 
@@ -23,11 +29,11 @@ export class TrigonometryEditor extends ObjectNode {
 
 		} );
 
-		const input = new LabelElement( 'Source' ).setInput( 1 );
+		const input = new LabelElement( 'A' ).setInput( 1 );
 
 		input.onConnect( () => {
 
-			node.aNode = input.linkedExtra || DEFAULT_VALUE;
+			node.aNode = input.getLinkedObject() || DEFAULT_VALUE;
 
 		} );
 

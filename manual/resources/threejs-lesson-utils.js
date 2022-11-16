@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
 
 export const threejsLessonUtils = {
@@ -17,7 +17,7 @@ export const threejsLessonUtils = {
       powerPreference: 'low-power',
       ...options.threejsOptions,
     });
-    this.pixelRatio = Math.max(2, window.devicePixelRatio);
+    this.pixelRatio = window.devicePixelRatio;
 
     this.renderer = renderer;
     this.elemToRenderFuncMap = new Map();
@@ -197,7 +197,6 @@ export const threejsLessonUtils = {
         controls.rotateSpeed = 1 / 6;
         controls.enableZoom = false;
         controls.enablePan = false;
-        controls.enableKeys = false;
         elem.removeAttribute('tabIndex');
         //resizeFunctions.push(controls.handleResize.bind(controls));
         updateFunctions.push(controls.update.bind(controls));

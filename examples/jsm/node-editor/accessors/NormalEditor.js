@@ -1,21 +1,21 @@
-import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
-import { NormalNode } from '../../renderers/nodes/Nodes.js';
+import { SelectInput, Element } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { NormalNode } from 'three/nodes';
 
-export class NormalEditor extends ObjectNode {
+export class NormalEditor extends BaseNode {
 
 	constructor() {
 
 		const node = new NormalNode();
 
-		super( 'Normal', 3, node, 250 );
-
-		this.title.setStyle( 'red' );
+		super( 'Normal', 3, node, 200 );
 
 		const optionsField = new SelectInput( [
 			{ name: 'Local', value: NormalNode.LOCAL },
 			{ name: 'World', value: NormalNode.WORLD },
-			{ name: 'View', value: NormalNode.VIEW }
-		] ).onChange( () => {
+			{ name: 'View', value: NormalNode.VIEW },
+			{ name: 'Geometry', value: NormalNode.GEOMETRY }
+		], NormalNode.LOCAL ).onChange( () => {
 
 			node.scope = optionsField.getValue();
 
@@ -23,7 +23,7 @@ export class NormalEditor extends ObjectNode {
 
 		} );
 
-		this.add( new LabelElement( 'Scope' ).add( optionsField ) );
+		this.add( new Element().add( optionsField ) );
 
 	}
 

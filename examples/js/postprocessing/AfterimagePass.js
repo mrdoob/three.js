@@ -10,36 +10,28 @@
 			this.uniforms = THREE.UniformsUtils.clone( this.shader.uniforms );
 			this.uniforms[ 'damp' ].value = damp;
 			this.textureComp = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat
+				magFilter: THREE.NearestFilter
 			} );
 			this.textureOld = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.NearestFilter,
-				format: THREE.RGBAFormat
+				magFilter: THREE.NearestFilter
 			} );
-			this.shaderMaterial = new THREE.ShaderMaterial( {
+			this.compFsMaterial = new THREE.ShaderMaterial( {
 				uniforms: this.uniforms,
 				vertexShader: this.shader.vertexShader,
 				fragmentShader: this.shader.fragmentShader
 			} );
-			this.compFsQuad = new THREE.FullScreenQuad( this.shaderMaterial );
-			const material = new THREE.MeshBasicMaterial();
-			this.copyFsQuad = new THREE.FullScreenQuad( material );
+			this.compFsQuad = new THREE.FullScreenQuad( this.compFsMaterial );
+			this.copyFsMaterial = new THREE.MeshBasicMaterial();
+			this.copyFsQuad = new THREE.FullScreenQuad( this.copyFsMaterial );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive*/
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive*/ ) {
 
 			this.uniforms[ 'tOld' ].value = this.textureOld.texture;
 			this.uniforms[ 'tNew' ].value = readBuffer.texture;
 			renderer.setRenderTarget( this.textureComp );
 			this.compFsQuad.render( renderer );
 			this.copyFsQuad.material.map = this.textureComp.texture;
-
 			if ( this.renderToScreen ) {
 
 				renderer.setRenderTarget( null );
@@ -51,12 +43,13 @@
 				if ( this.clear ) renderer.clear();
 				this.copyFsQuad.render( renderer );
 
-			} // Swap buffers.
+			}
 
-
+			// Swap buffers.
 			const temp = this.textureOld;
 			this.textureOld = this.textureComp;
-			this.textureComp = temp; // Now textureOld contains the latest image, ready for the next frame.
+			this.textureComp = temp;
+			// Now textureOld contains the latest image, ready for the next frame.
 
 		}
 
@@ -64,6 +57,16 @@
 
 			this.textureComp.setSize( width, height );
 			this.textureOld.setSize( width, height );
+
+		}
+		dispose() {
+
+			this.textureComp.dispose();
+			this.textureOld.dispose();
+			this.compFsMaterial.dispose();
+			this.copyFsMaterial.dispose();
+			this.compFsQuad.dispose();
+			this.copyFsQuad.dispose();
 
 		}
 

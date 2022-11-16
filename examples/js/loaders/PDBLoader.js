@@ -7,7 +7,6 @@
 			super( manager );
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -39,8 +38,9 @@
 
 			}, onProgress, onError );
 
-		} // Based on CanvasMol PDB parser
+		}
 
+		// Based on CanvasMol PDB parser
 
 		parse( text ) {
 
@@ -52,7 +52,7 @@
 
 			function capitalize( text ) {
 
-				return text.charAt( 0 ).toUpperCase() + text.substr( 1 ).toLowerCase();
+				return text.charAt( 0 ).toUpperCase() + text.slice( 1 ).toLowerCase();
 
 			}
 
@@ -64,19 +64,18 @@
 
 			function parseBond( start, length, satom, i ) {
 
-				const eatom = parseInt( lines[ i ].substr( start, length ) );
-
+				const eatom = parseInt( lines[ i ].slice( start, start + length ) );
 				if ( eatom ) {
 
 					const h = hash( satom, eatom );
-
 					if ( _bhash[ h ] === undefined ) {
 
 						_bonds.push( [ satom - 1, eatom - 1, 1 ] );
-
 						_bhash[ h ] = _bonds.length - 1;
 
-					} else { // doesn't really work as almost all PDBs
+					} else {
+
+						// doesn't really work as almost all PDBs
 						// have just normal bonds appearing multiple
 						// times instead of being double/triple bonds
 						// bonds[bhash[h]][2] += 1;
@@ -99,7 +98,9 @@
 				const geometryBonds = build.geometryBonds;
 				const verticesAtoms = [];
 				const colorsAtoms = [];
-				const verticesBonds = []; // atoms
+				const verticesBonds = [];
+
+				// atoms
 
 				for ( let i = 0, l = atoms.length; i < l; i ++ ) {
 
@@ -113,8 +114,9 @@
 					const b = atom[ 3 ][ 2 ] / 255;
 					colorsAtoms.push( r, g, b );
 
-				} // bonds
+				}
 
+				// bonds
 
 				for ( let i = 0, l = _bonds.length; i < l; i ++ ) {
 
@@ -132,8 +134,9 @@
 					z = endAtom[ 2 ];
 					verticesBonds.push( x, y, z );
 
-				} // build geometry
+				}
 
+				// build geometry
 
 				geometryAtoms.setAttribute( 'position', new THREE.Float32BufferAttribute( verticesAtoms, 3 ) );
 				geometryAtoms.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsAtoms, 3 ) );
@@ -265,23 +268,23 @@
 			const atoms = [];
 			const _bonds = [];
 			const _bhash = {};
-			const _atomMap = {}; // parse
+			const _atomMap = {};
+
+			// parse
 
 			const lines = text.split( '\n' );
-
 			for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
-				if ( lines[ i ].substr( 0, 4 ) === 'ATOM' || lines[ i ].substr( 0, 6 ) === 'HETATM' ) {
+				if ( lines[ i ].slice( 0, 4 ) === 'ATOM' || lines[ i ].slice( 0, 6 ) === 'HETATM' ) {
 
-					const x = parseFloat( lines[ i ].substr( 30, 7 ) );
-					const y = parseFloat( lines[ i ].substr( 38, 7 ) );
-					const z = parseFloat( lines[ i ].substr( 46, 7 ) );
-					const index = parseInt( lines[ i ].substr( 6, 5 ) ) - 1;
-					let e = trim( lines[ i ].substr( 76, 2 ) ).toLowerCase();
-
+					const x = parseFloat( lines[ i ].slice( 30, 37 ) );
+					const y = parseFloat( lines[ i ].slice( 38, 45 ) );
+					const z = parseFloat( lines[ i ].slice( 46, 53 ) );
+					const index = parseInt( lines[ i ].slice( 6, 11 ) ) - 1;
+					let e = trim( lines[ i ].slice( 76, 78 ) ).toLowerCase();
 					if ( e === '' ) {
 
-						e = trim( lines[ i ].substr( 12, 2 ) ).toLowerCase();
+						e = trim( lines[ i ].slice( 12, 14 ) ).toLowerCase();
 
 					}
 
@@ -289,9 +292,9 @@
 					atoms.push( atomData );
 					_atomMap[ index ] = atomData;
 
-				} else if ( lines[ i ].substr( 0, 6 ) === 'CONECT' ) {
+				} else if ( lines[ i ].slice( 0, 6 ) === 'CONECT' ) {
 
-					const satom = parseInt( lines[ i ].substr( 6, 5 ) );
+					const satom = parseInt( lines[ i ].slice( 6, 11 ) );
 					parseBond( 11, 5, satom, i );
 					parseBond( 16, 5, satom, i );
 					parseBond( 21, 5, satom, i );
@@ -299,8 +302,9 @@
 
 				}
 
-			} // build and return geometry
+			}
 
+			// build and return geometry
 
 			return buildGeometry();
 

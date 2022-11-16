@@ -2,7 +2,7 @@
 
 	class SelectionHelper {
 
-		constructor( selectionBox, renderer, cssClassName ) {
+		constructor( renderer, cssClassName ) {
 
 			this.element = document.createElement( 'div' );
 			this.element.classList.add( cssClassName );
@@ -12,13 +12,13 @@
 			this.pointTopLeft = new THREE.Vector2();
 			this.pointBottomRight = new THREE.Vector2();
 			this.isDown = false;
-			this.renderer.domElement.addEventListener( 'pointerdown', function ( event ) {
+			this.onPointerDown = function ( event ) {
 
 				this.isDown = true;
 				this.onSelectStart( event );
 
-			}.bind( this ) );
-			this.renderer.domElement.addEventListener( 'pointermove', function ( event ) {
+			}.bind( this );
+			this.onPointerMove = function ( event ) {
 
 				if ( this.isDown ) {
 
@@ -26,18 +26,28 @@
 
 				}
 
-			}.bind( this ) );
-			this.renderer.domElement.addEventListener( 'pointerup', function ( event ) {
+			}.bind( this );
+			this.onPointerUp = function () {
 
 				this.isDown = false;
-				this.onSelectOver( event );
+				this.onSelectOver();
 
-			}.bind( this ) );
+			}.bind( this );
+			this.renderer.domElement.addEventListener( 'pointerdown', this.onPointerDown );
+			this.renderer.domElement.addEventListener( 'pointermove', this.onPointerMove );
+			this.renderer.domElement.addEventListener( 'pointerup', this.onPointerUp );
 
 		}
+		dispose() {
 
+			this.renderer.domElement.removeEventListener( 'pointerdown', this.onPointerDown );
+			this.renderer.domElement.removeEventListener( 'pointermove', this.onPointerMove );
+			this.renderer.domElement.removeEventListener( 'pointerup', this.onPointerUp );
+
+		}
 		onSelectStart( event ) {
 
+			this.element.style.display = 'none';
 			this.renderer.domElement.parentElement.appendChild( this.element );
 			this.element.style.left = event.clientX + 'px';
 			this.element.style.top = event.clientY + 'px';
@@ -47,9 +57,9 @@
 			this.startPoint.y = event.clientY;
 
 		}
-
 		onSelectMove( event ) {
 
+			this.element.style.display = 'block';
 			this.pointBottomRight.x = Math.max( this.startPoint.x, event.clientX );
 			this.pointBottomRight.y = Math.max( this.startPoint.y, event.clientY );
 			this.pointTopLeft.x = Math.min( this.startPoint.x, event.clientX );
@@ -60,7 +70,6 @@
 			this.element.style.height = this.pointBottomRight.y - this.pointTopLeft.y + 'px';
 
 		}
-
 		onSelectOver() {
 
 			this.element.parentElement.removeChild( this.element );

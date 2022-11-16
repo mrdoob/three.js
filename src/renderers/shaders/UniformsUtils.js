@@ -1,3 +1,5 @@
+import { sRGBEncoding, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+
 /**
  * Uniform Utilities
  */
@@ -56,6 +58,33 @@ export function mergeUniforms( uniforms ) {
 	}
 
 	return merged;
+
+}
+
+export function cloneUniformsGroups( src ) {
+
+	const dst = [];
+
+	for ( let u = 0; u < src.length; u ++ ) {
+
+		dst.push( src[ u ].clone() );
+
+	}
+
+	return dst;
+
+}
+
+export function getUnlitUniformColorSpace( renderer ) {
+
+	if ( renderer.getRenderTarget() === null ) {
+
+		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
+		return renderer.outputEncoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
+
+	}
+
+	return LinearSRGBColorSpace;
 
 }
 

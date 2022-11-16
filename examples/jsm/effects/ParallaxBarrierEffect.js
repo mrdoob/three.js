@@ -9,7 +9,7 @@ import {
 	ShaderMaterial,
 	StereoCamera,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
 
 class ParallaxBarrierEffect {
 
@@ -90,9 +90,9 @@ class ParallaxBarrierEffect {
 
 		this.render = function ( scene, camera ) {
 
-			scene.updateMatrixWorld();
+			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-			if ( camera.parent === null ) camera.updateMatrixWorld();
+			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 			_stereo.update( camera );
 

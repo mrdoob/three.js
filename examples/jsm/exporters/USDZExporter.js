@@ -1,8 +1,12 @@
+import {
+	DoubleSide
+} from 'three';
+
 import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-	async parse( scene ) {
+	async parse( scene, options = { ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'vertical' } } } ) {
 
 		const files = {};
 		const modelFileName = 'model.usda';
@@ -12,6 +16,8 @@ class USDZExporter {
 
 		let output = buildHeader();
 
+		output += buildSceneStart( options );
+
 		const materials = {};
 		const textures = {};
 
@@ -19,10 +25,10 @@ class USDZExporter {
 
 			if ( object.isMesh ) {
 
-				if ( object.material.isMeshStandardMaterial ) {
+				const geometry = object.geometry;
+				const material = object.material;
 
-					const geometry = object.geometry;
-					const material = object.material;
+				if ( material.isMeshStandardMaterial ) {
 
 					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
 
@@ -47,9 +53,16 @@ class USDZExporter {
 
 				}
 
+			} else if ( object.isCamera ) {
+
+				output += buildCamera( object );
+
 			}
 
 		} );
+
+
+		output += buildSceneEnd();
 
 		output += buildMaterials( materials, textures );
 
@@ -161,6 +174,40 @@ function buildHeader() {
     metersPerUnit = 1
     upAxis = "Y"
 )
+
+`;
+
+}
+
+function buildSceneStart( options ) {
+
+	return `def Xform "Root"
+{
+    def Scope "Scenes" (
+        kind = "sceneLibrary"
+    )
+    {
+        def Xform "Scene" (
+            customData = {
+                bool preliminary_collidesWithEnvironment = 0
+                string sceneName = "Scene"
+            }
+            sceneName = "Scene"
+        )
+        {
+        token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+        token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+
+`;
+
+}
+
+function buildSceneEnd() {
+
+	return `
+        }
+    }
+}
 
 `;
 
@@ -402,13 +449,32 @@ function buildMaterial( material, textures ) {
             float outputs:g
             float outputs:b
             float3 outputs:rgb
+            ${ material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : '' }
         }`;
+
+	}
+
+
+	if ( material.side === DoubleSide ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 
 	}
 
 	if ( material.map !== null ) {
 
 		inputs.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:rgb>` );
+
+		if ( material.transparent ) {
+
+			inputs.push( `${ pad }float inputs:opacity.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:a>` );
+
+		} else if ( material.alphaTest > 0.0 ) {
+
+			inputs.push( `${ pad }float inputs:opacity.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:a>` );
+			inputs.push( `${ pad }float inputs:opacityThreshold = ${material.alphaTest}` );
+
+		}
 
 		samplers.push( buildTexture( material.map, 'diffuse', material.color ) );
 
@@ -529,6 +595,55 @@ function buildColor( color ) {
 function buildVector2( vector ) {
 
 	return `(${ vector.x }, ${ vector.y })`;
+
+}
+
+
+function buildCamera( camera ) {
+
+	const name = camera.name ? camera.name : 'Camera_' + camera.id;
+
+	const transform = buildMatrix( camera.matrixWorld );
+
+	if ( camera.matrixWorld.determinant() < 0 ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', camera );
+
+	}
+
+	if ( camera.isOrthographicCamera ) {
+
+		return `def Camera "${name}"
+		{
+			matrix4d xformOp:transform = ${ transform }
+			uniform token[] xformOpOrder = ["xformOp:transform"]
+	
+			float2 clippingRange = (${camera.near}, ${camera.far})
+			float horizontalAperture = ${( Math.abs( camera.left ) + Math.abs( camera.right ) ) * 10}
+			float verticalAperture = ${( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10}
+			token projection = "orthographic"
+		}
+	
+	`;
+
+	} else {
+
+		return `def Camera "${name}"
+		{
+			matrix4d xformOp:transform = ${ transform }
+			uniform token[] xformOpOrder = ["xformOp:transform"]
+	
+			float2 clippingRange = (${camera.near}, ${camera.far})
+			float focalLength = ${camera.getFocalLength()}
+			float focusDistance = ${camera.focus}
+			float horizontalAperture = ${camera.getFilmWidth()}
+			token projection = "perspective"
+			float verticalAperture = ${camera.getFilmHeight()}
+		}
+	
+	`;
+
+	}
 
 }
 

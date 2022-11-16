@@ -1,4 +1,4 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 import {FontLoader} from '../../examples/jsm/loaders/FontLoader.js';
 import {ParametricGeometry} from '../../examples/jsm/geometries/ParametricGeometry.js';
@@ -707,6 +707,7 @@ const geometry = new THREE.WireframeGeometry(
 
   function addLink(parent, name, href) {
     const a = document.createElement('a');
+    a.setAttribute('target', '_blank');
     a.href = href || `https://threejs.org/docs/#api/geometries/${name}`;
     const code = document.createElement('code');
     code.textContent = name;

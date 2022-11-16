@@ -122,6 +122,26 @@ const htmlParts = {
   },
 };
 
+function getRootPrefix(url) {
+  const u = new URL(url, window.location.href);
+  return u.origin;
+}
+
+function removeDotDotSlash(href) {
+  // assumes a well formed URL. In other words: 'https://..//foo.html" is a bad URL and this code would fail.
+  const url = new URL(href, window.location.href);
+  const parts = url.pathname.split('/');
+  for (;;) {
+    const dotDotNdx = parts.indexOf('..');
+    if (dotDotNdx < 0) {
+      break;
+    }
+    parts.splice(dotDotNdx - 1, 2);
+  }
+  url.pathname = parts.join('/');
+  return url.toString();
+}
+
 function forEachHTMLPart(fn) {
   Object.keys(htmlParts).forEach(function(name, ndx) {
     const info = htmlParts[name];
@@ -178,7 +198,7 @@ async function getWorkerScripts(text, baseUrl, scriptInfos = {}) {
   const parentScriptInfo = scriptInfos[baseUrl];
   const workerRE = /(new\s+Worker\s*\(\s*)('|")(.*?)('|")/g;
   const importScriptsRE = /(importScripts\s*\(\s*)('|")(.*?)('|")/g;
-  const importRE = /(import.*?)('|")(.*?)('|")/g;
+  const importRE = /(import.*?)(?!'three')('|")(.*?)('|")/g;
 
   const newScripts = [];
   const slashRE = /\/manual\/examples\/[^/]+$/;
@@ -201,10 +221,17 @@ async function getWorkerScripts(text, baseUrl, scriptInfos = {}) {
 
     return `${prefix}${quote}${fqURL}${quote}`;
   }
+  function replaceWithUUIDModule(match, prefix, quote, url) {
+    // modules are either relative, fully qualified, or a module name
+    // Skip it if it's a module name
+    return (url.startsWith('.') || url.includes('://'))
+        ? replaceWithUUID(match, prefix, quote, url)
+        : match.toString();
+  }
 
   text = text.replace(workerRE, replaceWithUUID);
   text = text.replace(importScriptsRE, replaceWithUUID);
-  text = text.replace(importRE, replaceWithUUID);
+  text = text.replace(importRE, replaceWithUUIDModule);
 
   await Promise.all(newScripts.map((url) => {
     return getScript(url, scriptInfos);
@@ -233,8 +260,8 @@ async function parseHTML(url, html) {
   const bodyRE = /<body>([^]*?)<\/body>/i;
   const inlineScriptRE = /<script>([^]*?)<\/script>/i;
   const inlineModuleScriptRE = /<script type="module">([^]*?)<\/script>/i;
-  const externalScriptRE = /(<!--(?:(?!-->)[\s\S])*?-->\n){0,1}<script\s+(type="module"\s+)?src\s*=\s*"(.*?)"\s*>\s*<\/script>/ig;
-  const dataScriptRE = /(<!--(?:(?!-->)[\s\S])*?-->\n){0,1}<script(.*?id=".*?)>([^]*?)<\/script>/ig;
+  const externalScriptRE = /(<!--(?:(?!-->)[\s\S])*?-->\n){0,1}<script\s+([^>]*?)(type="module"\s+)?src\s*=\s*"(.*?)"(.*?)>\s*<\/script>/ig;
+  const dataScriptRE = /(<!--(?:(?!-->)[\s\S])*?-->\n){0,1}<script([^>]*?type="(?!module).*?".*?)>([^]*?)<\/script>/ig;
   const cssLinkRE = /<link ([^>]+?)>/g;
   const isCSSLinkRE = /type="text\/css"|rel="stylesheet"/;
   const hrefRE = /href="([^"]+)"/;
@@ -270,18 +297,47 @@ async function parseHTML(url, html) {
 
   const kScript = 'script';
   const scripts = [];
-  html = html.replace(externalScriptRE, function(p0, p1, type, p2) {
+  html = html.replace(externalScriptRE, function(p0, p1, p2, type, p3, p4) {
     p1 = p1 || '';
-    scripts.push(`${p1}<${kScript} ${safeStr(type)}src="${p2}"></${kScript}>`);
+    scripts.push(`${p1}<${kScript} ${p2}${safeStr(type)}src="${p3}"${p4}></${kScript}>`);
     return '';
   });
 
+  const prefix = getPrefix(url);
+  const rootPrefix = getRootPrefix(url);
+
+  function addCorrectPrefix(href) {
+    return (href.startsWith('/'))
+       ? `${rootPrefix}${href}`
+       : removeDotDotSlash((`${prefix}/${href}`).replace(/\/.\//g, '/'));
+  }
+
+  function addPrefix(url) {
+    return url.indexOf('://') < 0 && !url.startsWith('data:') && url[0] !== '?'
+        ? removeDotDotSlash(addCorrectPrefix(url))
+        : url;
+  }
+
+  const importMapRE = /type\s*=["']importmap["']/;
   const dataScripts = [];
-  html = html.replace(dataScriptRE, function(p0, p1, p2, p3) {
-    p1 = p1 || '';
-    dataScripts.push(`${p1}<${kScript} ${p2}>${p3}</${kScript}>`);
+  html = html.replace(dataScriptRE, function(p0, blockComments, scriptTagAttrs, content) {
+    blockComments = blockComments || '';
+    if (importMapRE.test(scriptTagAttrs)) {
+      const imap = JSON.parse(content);
+      const imports = imap.imports;
+      if (imports) {
+        for (let [k, url] of Object.entries(imports)) {
+          if (url.indexOf('://') < 0 && !url.startsWith('data:')) {
+            imports[k] = addPrefix(url);
+          }
+        }
+      }
+      content = JSON.stringify(imap, null, '\t');
+    }
+    dataScripts.push(`${blockComments}<${kScript} ${scriptTagAttrs}>${content}</${kScript}>`);
     return '';
   });
+
 
   htmlParts.html.sources[0].source += dataScripts.join('\n');
   htmlParts.html.sources[0].source += scripts.join('\n');
@@ -1440,6 +1496,3 @@ function start() {
 
 start();
 }());
-
-
-

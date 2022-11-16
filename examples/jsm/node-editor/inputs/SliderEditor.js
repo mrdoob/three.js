@@ -1,15 +1,14 @@
-import { ObjectNode, ButtonInput, SliderInput, NumberInput, LabelElement, Element } from '../../libs/flow.module.js';
-import { FloatNode } from '../../renderers/nodes/Nodes.js';
+import { ButtonInput, SliderInput, NumberInput, LabelElement, Element } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { UniformNode } from 'three/nodes';
 
-export class SliderEditor extends ObjectNode {
+export class SliderEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new FloatNode();
+		const node = new UniformNode( 0 );
 
 		super( 'Slider', 1, node );
-
-		this.title.setIcon( 'ti ti-adjustments-horizontal' );
 
 		this.collapse = true;
 
@@ -50,7 +49,7 @@ export class SliderEditor extends ObjectNode {
 
 		} ) ).setSerializable( false );
 
-		this.add( new LabelElement( 'Value' ).add( field ) )
+		this.add( new Element().add( field ) )
 			.add( minElement )
 			.add( maxElement )
 			.add( moreElement );

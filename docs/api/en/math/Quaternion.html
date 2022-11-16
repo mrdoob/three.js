@@ -14,6 +14,10 @@
 			Quaternions are used in three.js to represent [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotations].
 		</p>
 
+		<p>
+		Iterating through a [name] instance will yield its components (x, y, z, w) in the corresponding order.
+		</p>
+
 		<h2>Code Example</h2>
 
 		<code>
@@ -38,6 +42,11 @@
 
 
 		<h2>Properties</h2>
+
+		<h3>[property:Boolean isQuaternion]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -122,8 +131,8 @@
 		<h3>[method:this normalize]()</h3>
 		<p>
 			[link:https://en.wikipedia.org/wiki/Normalized_vector Normalizes] this quaternion - that is,
-		calculated the quaternion that performs the same rotation as this one, but has  [page:.length length]
-		equal to *1*.
+		calculated the quaternion that performs the same rotation as this one, but has [page:.length length]
+		equal to `1`.
 		</p>
 
 		<h3>[method:this multiply]( [param:Quaternion q] )</h3>
@@ -155,12 +164,12 @@
 		<h3>[method:this slerp]( [param:Quaternion qb], [param:Float t] )</h3>
 		<p>
 			[page:Quaternion qb] - The other quaternion rotation<br />
-			[page:Float t] - interpolation factor in the closed interval [0, 1].<br /><br />
+			[page:Float t] - interpolation factor in the closed interval `[0, 1]`.<br /><br />
 
 			Handles the spherical linear interpolation between quaternions. [page:Float t] represents the
 			amount of rotation between this quaternion (where [page:Float t] is 0) and [page:Quaternion qb] (where
 			[page:Float t] is 1). This quaternion is set to the result. Also see the static version of the
-			*slerp* below.
+			`slerp` below.
 
 			<code>
 			// rotate a mesh towards a target quaternion
@@ -178,7 +187,7 @@
 		<p>
 		Sets this quaternion from rotation specified by [page:Vector3 axis] and [page:Float angle].<br />
 		Adapted from the method [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm here].<br />
-		*Axis* is assumed to be normalized, *angle* is in radians.
+		`Axis` is assumed to be normalized, `angle` is in radians.
 		</p>
 
 		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
@@ -224,13 +233,24 @@
 		[page:Array dst] - The output array.<br />
 		[page:Integer dstOffset] - An offset into the output array.<br />
 		[page:Array src0] - The source array of the starting quaternion.<br />
-		[page:Integer srcOffset0] - An offset into the array *src0*.<br />
-		[page:Array src1] - The source array of the target quatnerion.<br />
-		[page:Integer srcOffset1] - An offset into the array *src1*.<br />
+		[page:Integer srcOffset0] - An offset into the array `src0`.<br />
+		[page:Array src1] - The source array of the target quaternion.<br />
+		[page:Integer srcOffset1] - An offset into the array `src1`.<br />
 		[page:Float t] - Normalized interpolation factor (between 0 and 1).<br /><br />
+
+		This SLERP implementation assumes the quaternion data are managed in flat arrays.
 		</p>
+
+		<h3>[method:Array multiplyQuaternionsFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1] )</h3>
 		<p>
-		Like the static *slerp* method above, but operates directly on flat arrays of numbers.
+		[page:Array dst] - The output array.<br />
+		[page:Integer dstOffset] - An offset into the output array.<br />
+		[page:Array src0] - The source array of the starting quaternion.<br />
+		[page:Integer srcOffset0] - An offset into the array `src0`.<br />
+		[page:Array src1] - The source array of the target quaternion.<br />
+		[page:Integer srcOffset1] - An offset into the array `src1`.<br /><br />
+
+		This multiplication implementation assumes the quaternion data are managed in flat arrays.
 		</p>
 
 		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->

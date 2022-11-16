@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Questo è quasi identico ad un [page:Object3D Object3D]. 
+			Il suo scopo è rendere sintatticamente più chiaro il lavoro con gruppi di oggetti.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+
+		const cubeA = new THREE.Mesh( geometry, material );
+		cubeA.position.set( 100, 100, 0 );
+
+		const cubeB = new THREE.Mesh( geometry, material );
+		cubeB.position.set( -100, -100, 0 );
+
+		// Crea un gruppo e aggiunge due cubi
+		// Questi cubi possono essere ruotati / ridimensionati etc come gruppo
+		const group = new THREE.Group();
+		group.add( cubeA );
+		group.add( cubeB );
+
+		scene.add( group );
+		</code>
+
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( )</h3>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Object3D] per le proprietà comuni.</p>
+
+		<h3>[property:Boolean isGroup]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:String type]</h3>
+		<p>Una stringa 'Group'. Non deve essere modificata.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Object3D] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

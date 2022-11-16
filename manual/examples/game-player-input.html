@@ -119,15 +119,29 @@
       </div>
     </div>
   </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
 <script type="module">
-import * as THREE from '../../build/three.module.js';
-import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
-import * as SkeletonUtils from '../../examples/jsm/utils/SkeletonUtils.js';
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
+  renderer.outputEncoding = THREE.sRGBEncoding;
 
   const fov = 45;
   const aspect = 2;  // the canvas default
@@ -137,7 +151,6 @@ function main() {
   camera.position.set(0, 40, 80);
 
   const controls = new OrbitControls(camera, canvas);
-  controls.enableKeys = false;
   controls.target.set(0, 5, 0);
   controls.update();
 
@@ -146,7 +159,7 @@ function main() {
 
   function addLight(...pos) {
     const color = 0xFFFFFF;
-    const intensity = 1;
+    const intensity = 0.8;
     const light = new THREE.DirectionalLight(color, intensity);
     light.position.set(...pos);
     scene.add(light);
@@ -549,4 +562,3 @@ function main() {
 main();
 </script>
 </html>
-

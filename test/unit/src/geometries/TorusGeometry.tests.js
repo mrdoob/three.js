@@ -1,11 +1,11 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { TorusGeometry, TorusBufferGeometry } from '../../../../src/geometries/TorusGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { TorusGeometry } from '../../../../src/geometries/TorusGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'TorusBufferGeometry', ( hooks ) => {
+	QUnit.module( 'TorusGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -25,22 +25,21 @@ export default QUnit.module( 'Geometries', () => {
 				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments ),
 				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments ),
 				new TorusGeometry( parameters.radius, parameters.tube, parameters.radialSegments, parameters.tubularSegments, parameters.arc ),
-				new TorusBufferGeometry()
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

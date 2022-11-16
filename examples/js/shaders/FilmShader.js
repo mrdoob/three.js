@@ -4,7 +4,7 @@
  * Film grain & scanlines shader
  *
  * - ported from HLSL to WebGL / GLSL
- * http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
+ * https://web.archive.org/web/20210226214859/http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
  *
  * Screen Space Static Postprocessor
  *
@@ -19,6 +19,7 @@
  * This version is provided under a Creative Commons Attribution 3.0 License
  * http://creativecommons.org/licenses/by/3.0/
  */
+
 	const FilmShader = {
 		uniforms: {
 			'tDiffuse': {
@@ -40,9 +41,7 @@
 				value: 1
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -52,9 +51,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#include <common>
 

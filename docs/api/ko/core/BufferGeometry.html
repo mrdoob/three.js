@@ -127,9 +127,15 @@
 			기본값은 *null* 입니다.
 		</p>
 
+		<h3>[property:Boolean isBufferGeometry]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
-			[page:BufferAttribute]의 해쉬맵은 기하학의 모프 타겟에 대한 세부정보를 담고 있습니다.
+			[page:BufferAttribute]의 해쉬맵은 기하학의 모프 타겟에 대한 세부정보를 담고 있습니다.<br />
+			Note: Once the geometry has been rendered, the morph attribute data cannot be changed. You will have to call [page:.dispose](), and create a new instance of [name].
 		</p>
 
 		<h3>[property:Boolean morphTargetsRelative]</h3>
@@ -158,7 +164,7 @@
 
 		<h2>메서드</h2>
 
-		<h3>이 클래스에서는 [page:EventDispatcher EventDispatcher] 메서드들이 활용 가능합니다.</h3>
+		<p>이 클래스에서는 [page:EventDispatcher EventDispatcher] 메서드들이 활용 가능합니다.</p>
 
 		<h3>[method:this setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
@@ -203,6 +209,8 @@
 		<p>
 		기하학에 탄젠트 속성을 계산하고 추가합니다.<br />
 		이 계산은 인덱스가 있는 기하학에만 지원되며 위치, 법선, uv 속성이 정의되어야 합니다.
+		When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
+		[page:BufferGeometryUtils.computeMikkTSpaceTangents] instead.
 		</p>
 
 		<h3>[method:undefined computeVertexNormals]()</h3>
@@ -230,9 +238,6 @@
 		공간의 점을 기준으로 기하학을 면을 회전시킵니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 사용은 [page:Object3D.lookAt] 을 사용하세요.
 		</p>
-
-		<h3>[method:this merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
-		<p>병합을 시작할 지점인 임의의 오프셋으로 다른 BufferGeometry에 병합합니다.</p>
 
 		<h3>[method:undefined normalizeNormals]()</h3>
 		<p>

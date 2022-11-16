@@ -52,7 +52,7 @@
 		Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
 
 		The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-		string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+		string and is `0xffffff` (white) by default. [page:Color.set]( color ) is called internally.
 		</p>
 
 		<h2>Properties</h2>
@@ -61,9 +61,12 @@
 		<h3>[property:Color color]</h3>
 		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>Whether the material is affected by fog. Default is `true`.</p>
+
 		<h3>[property:Float linewidth]</h3>
 		<p>
-			Controls line thickness. Default is *1*.<br /><br />
+			Controls line thickness. Default is `1`.<br /><br />
 
 			Due to limitations of the [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
 			with the [page:WebGLRenderer WebGL] renderer on most platforms linewidth will

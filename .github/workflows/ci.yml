@@ -12,6 +12,9 @@ on:
       - 'docs/**'
       - 'files/**'
 
+permissions:
+  contents: read
+
 jobs:
 
   lint:
@@ -21,9 +24,10 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
       - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 16
+          cache: 'npm'
       - name: Install packages
         run: npm ci
 
@@ -37,9 +41,10 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
       - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 16
+          cache: 'npm'
       - name: Install packages
         run: |
           npm ci
@@ -63,9 +68,10 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
       - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 16
+          cache: 'npm'
       - name: Install packages
         run: |
           npm ci
@@ -84,9 +90,10 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
       - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 16
+          cache: 'npm'
       - name: Install packages
         run: npm ci
 

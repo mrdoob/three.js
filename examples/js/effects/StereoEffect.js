@@ -5,10 +5,8 @@
 		constructor( renderer ) {
 
 			const _stereo = new THREE.StereoCamera();
-
 			_stereo.aspect = 0.5;
 			const size = new THREE.Vector2();
-
 			this.setEyeSeparation = function ( eyeSep ) {
 
 				_stereo.eyeSep = eyeSep;
@@ -23,11 +21,9 @@
 
 			this.render = function ( scene, camera ) {
 
-				scene.updateMatrixWorld();
-				if ( camera.parent === null ) camera.updateMatrixWorld();
-
+				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 				_stereo.update( camera );
-
 				renderer.getSize( size );
 				if ( renderer.autoClear ) renderer.clear();
 				renderer.setScissorTest( true );

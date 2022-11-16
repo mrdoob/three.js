@@ -33,14 +33,14 @@
 
 		<h3>[property:Number time]</h3>
 		<p>
-			The global mixer time (in seconds; starting with 0 on the mixer's creation).
+			The global mixer time (in seconds; starting with `0` on the mixer's creation).
 		</p>
 
 		<h3>[property:Number timeScale]</h3>
 		<p>
 			A scaling factor for the global [page:.time mixer time].<br /><br />
 
-			Note: Setting the mixer's timeScale to 0 and later back to 1 is a possibility to pause/unpause
+			Note: Setting the mixer's timeScale to `0` and later back to `1` is a possibility to pause/unpause
 			all actions that are controlled by this mixer.
 		</p>
 
@@ -81,7 +81,7 @@
 		<p>
 			Advances the global mixer time and updates the animation.<br /><br />
 
-			This is usually done in the render loop, passing [page:Clock.getDelta clock.getDelta] scaled by the mixer's [page:.timeScale timeScale]).
+			This is usually done in the render loop, passing [page:Clock.getDelta clock.getDelta] scaled by the mixer's [page:.timeScale timeScale].
 		</p>
 
 		<h3>[method:this setTime]([param:Number timeInSeconds]) </h3>

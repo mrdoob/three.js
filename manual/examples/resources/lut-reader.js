@@ -49,7 +49,7 @@ const isNum = s => intRE.test(s);
 
 const quotesRE = /^".*"$/;
 function trimQuotes(s) {
-  return quotesRE.test(s) ? s.substr(s, s.length - 2) : s;
+  return quotesRE.test(s) ? s.slice(1, -1) : s;
 }
 
 const splitToNumbers = s => s.split(' ').map(parseFloat);
@@ -82,17 +82,15 @@ export function parseCSP(str) {
       break;
     }
     if (line.startsWith('TITLE ')) {
-      lut.name = trimQuotes(line.substr(6).trim());
+      lut.name = trimQuotes(line.slice(6).trim());
     }
   }
 
   // read ranges
-  const ranges = [];
   for (let i = 0; i < 3; ++i) {
     ++lineNdx;
     const input = splitToNumbers(lines[lineNdx++]);
     const output = splitToNumbers(lines[lineNdx++]);
-    ranges.push({input, output});
     if (input.length !== 2 || output.length !== 2 ||
         input[0] !== 0 || input[1] !==  1 ||
         output[0] !== 0 || output[1] !== 1) {
@@ -211,7 +209,7 @@ export function parse(str, format = 'cube') {
   return parser(str);
 }
 
-export function lutTo2D3Drgb8(lut) {
+export function lutTo2D3Drgba8(lut) {
   if (lut.type === '1D') {
     lut = lut1Dto3D(lut);
   }
@@ -220,9 +218,12 @@ export function lutTo2D3Drgb8(lut) {
     return max[ndx] - min;
   });
   const src = lut.data;
-  const data = new Uint8Array(src.length);
-  const offset = (offX, offY, offZ) => {
+  const data = new Uint8Array(size*size*size * 4);
+  const srcOffset = (offX, offY, offZ) => {
     return (offX + offY * size + offZ * size * size) * 3;
+  };
+  const dOffset = (offX, offY, offZ) => {
+    return (offX + offY * size + offZ * size * size) * 4;
   };
   for (let dz = 0; dz < size; ++dz) {
     for (let dy = 0; dy < size; ++dy) {
@@ -230,11 +231,12 @@ export function lutTo2D3Drgb8(lut) {
         const sx = dx;
         const sy = dz;
         const sz = dy;
-        const sOff = offset(sx, sy, sz);
-        const dOff = offset(dx, dy, dz);
+        const sOff = srcOffset(sx, sy, sz);
+        const dOff = dOffset(dx, dy, dz);
         data[dOff + 0] = (src[sOff + 0] - min[0]) / range[0] * 255;
         data[dOff + 1] = (src[sOff + 1] - min[1]) / range[1] * 255;
         data[dOff + 2] = (src[sOff + 2] - min[2]) / range[2] * 255;
+        data[dOff + 3] = 255;
       }
     }
   }

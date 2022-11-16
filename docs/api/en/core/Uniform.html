@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Uniforms are global [link:https://www.opengl.org/documentation/glsl/ GLSL] variables. They are passed to shader programs.
+		<p class="desc">Uniforms are global GLSL variables. They are passed to shader programs.
 		</p>
 
 		<h2>Code Example</h2>
@@ -26,14 +26,14 @@
 		<h2>Uniform types</h2>
 
 		<p>
-		Each uniform must have a *value* property. The type of the value must correspond to the
+		Each uniform must have a `value` property. The type of the value must correspond to the
 		type of the uniform variable in the GLSL code as specified for the primitive GLSL types
 		in the table below. Uniform structures and arrays are also supported. GLSL arrays of primitive
 		type must either be specified as an array of the corresponding THREE objects or as a flat
 		array containing the data of all the objects. In other words; GLSL primitives in arrays
 		must not be represented by arrays. This rule does not apply transitively.
-		An array of *vec2* arrays, each with a length of five vectors, must be an array of arrays,
-		of either five [page:Vector2] objects or ten *number*s.
+		An array of `vec2` arrays, each with a length of five vectors, must be an array of arrays,
+		of either five [page:Vector2] objects or ten `number`s.
 		</p>
 		<table>
 			<caption><a id="uniform-types">Uniform types</a></caption>
@@ -188,7 +188,7 @@
 		<h2>Structured Uniforms</h2>
 
 		<p>
-			Sometimes you want to organize uniforms as *structs* in your shader code. The following style must be used so *three.js* is able
+			Sometimes you want to organize uniforms as `structs` in your shader code. The following style must be used so `three.js` is able
 			to process structured uniform data.
 		</p>
 		<code>
@@ -214,7 +214,7 @@
 		<h2>Structured Uniforms with Arrays</h2>
 
 		<p>
-			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
+			It's also possible to manage `structs` in arrays. The syntax for this use case looks like so:
 		</p>
 		<code>
 		const entry1 = {

@@ -13,9 +13,9 @@
  *  * Add mmd_toon_matcap_fragment.
  */
 
-import { UniformsUtils, ShaderLib } from '../../../build/three.module.js';
+import { UniformsUtils, ShaderLib } from 'three';
 
-const lights_mmd_toon_pars_fragment = `
+const lights_mmd_toon_pars_fragment = /* glsl */`
 varying vec3 vViewPosition;
 
 struct BlinnPhongMaterial {
@@ -49,7 +49,7 @@ void RE_IndirectDiffuse_BlinnPhong( const in vec3 irradiance, const in Geometric
 #define Material_LightProbeLOD( material )	(0)
 `;
 
-const mmd_toon_matcap_fragment = `
+const mmd_toon_matcap_fragment = /* glsl */`
 #ifdef USE_MATCAP
 
 	vec3 viewDir = normalize( vViewPosition );
@@ -57,7 +57,6 @@ const mmd_toon_matcap_fragment = `
 	vec3 y = cross( viewDir, x );
 	vec2 uv = vec2( dot( x, normal ), dot( y, normal ) ) * 0.495 + 0.5; // 0.495 to remove artifacts caused by undersized matcap disks
 	vec4 matcapColor = texture2D( matcap, uv );
-	matcapColor = matcapTexelToLinear( matcapColor );
 
 	#ifdef MATCAP_BLENDING_MULTIPLY
 

@@ -3,7 +3,7 @@ import {
 	Plane,
 	Triangle,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Ported from: https://github.com/maurizzzio/quickhull3d/ by Mauricio Poppe (https://github.com/maurizzzio)
@@ -46,27 +46,21 @@ class ConvexHull {
 
 	setFromPoints( points ) {
 
-		if ( Array.isArray( points ) !== true ) {
+		// The algorithm needs at least four points.
 
-			console.error( 'THREE.ConvexHull: Points parameter is not an array.' );
+		if ( points.length >= 4 ) {
 
-		}
+			this.makeEmpty();
 
-		if ( points.length < 4 ) {
+			for ( let i = 0, l = points.length; i < l; i ++ ) {
 
-			console.error( 'THREE.ConvexHull: The algorithm needs at least four points.' );
+				this.vertices.push( new VertexNode( points[ i ] ) );
 
-		}
+			}
 
-		this.makeEmpty();
-
-		for ( let i = 0, l = points.length; i < l; i ++ ) {
-
-			this.vertices.push( new VertexNode( points[ i ] ) );
+			this.compute();
 
 		}
-
-		this.compute();
 
 		return this;
 
@@ -84,26 +78,17 @@ class ConvexHull {
 
 			if ( geometry !== undefined ) {
 
-				if ( geometry.isGeometry ) {
+				const attribute = geometry.attributes.position;
 
-					console.error( 'THREE.ConvexHull no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-					return;
+				if ( attribute !== undefined ) {
 
-				} else if ( geometry.isBufferGeometry ) {
+					for ( let i = 0, l = attribute.count; i < l; i ++ ) {
 
-					const attribute = geometry.attributes.position;
+						const point = new Vector3();
 
-					if ( attribute !== undefined ) {
+						point.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
 
-						for ( let i = 0, l = attribute.count; i < l; i ++ ) {
-
-							const point = new Vector3();
-
-							point.fromBufferAttribute( attribute, i ).applyMatrix4( node.matrixWorld );
-
-							points.push( point );
-
-						}
+						points.push( point );
 
 					}
 
@@ -1283,4 +1268,4 @@ class VertexList {
 
 }
 
-export { ConvexHull };
+export { ConvexHull, Face, HalfEdge, VertexNode, VertexList };

@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
   </head>
   <body>
     <div class="container">
@@ -35,7 +46,7 @@ déjà censés connaître</a>.</p>
 <p>La plupart des navigateurs qui supportent three.js se mettent à jour automatiquement
 donc la plupart des utilisateurs devraient être capables d'exécuter ce code.
 Si vous souhaitez exécuter ce code sur un très vieux navigateur, nous vous recommandons
-un transpileur tel que <a href="https://babel.io">Babel</a>.
+un transpileur tel que <a href="https://babeljs.io">Babel</a>.
 Bien sûr, les utilisateurs exécutant de très vieux navigateurs ont probablement
 des machines incapables de faire tourner Three.js.</p>
 <p>Lors de l'apprentissage de la plupart des langages de programmation,
@@ -105,7 +116,7 @@ nombre minimum d'élements Three.js :</p>
 
 <p>Tout d'abord, chargeons Three.js :</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r130/build/three.module.js';
+import * as THREE from 'three';
 &lt;/script&gt;
 </pre>
 <p>Il est important d'écrire <code class="notranslate" translate="no">type="module"</code> dans la balise script.
@@ -122,7 +133,7 @@ facilement importer les autres modules dont ils ont besoin. Cela nous
 <p>Nous allons demander à Three.js de dessiner dans ce canevas donc nous devons le rechercher
 dans le document html :</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -357,7 +368,7 @@ Ils sont chargés via le mot-clé <code class="notranslate" translate="no">impor
 par le biais d'une balise <code class="notranslate" translate="no">&lt;script type="module"&gt;</code>. Voici un exemple d'utilisation avec les deux :
 </p>
 <pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 ...
 
@@ -410,12 +421,12 @@ Three.js et d'une autre bibliothèque d'exemple, qu'ils référenceront le même
 three.module.js.
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>Cela est valable aussi lors de l'utilisation d'un CDN. Assurez vous que vos chemins versThis includes when using a CDN. Be  <code class="notranslate" translate="no">three.modules.js</code> terminent par
 <code class="notranslate" translate="no">/build/three.modules.js</code>. Par exemple :</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
 

@@ -8,19 +8,31 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
-			<button id="export">Export COLLADA</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { ColladaExporter } from './jsm/exporters/ColladaExporter.js';
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ColladaExporter } from 'three/addons/exporters/ColladaExporter.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			////////////////////////////////////////////////////////////////////////////////
 			// Utah/Newell Teapot demo
@@ -40,6 +52,7 @@
 			let bFitLid;
 			let bNonBlinn;
 			let shading;
+			let vertexColors;
 			let wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, normalMaterial, reflectiveMaterial;
 
 			let teapot, textureCube;
@@ -170,6 +183,7 @@
 					lhue:	0.04,
 					lsaturation: 0.01,	// non-zero so that fractions will be shown
 					llightness: 1.0,
+					vertexColors: false,
 
 					// bizarrely, if you initialize these with negative numbers, the sliders
 					// will not show any decimal places.
@@ -182,7 +196,9 @@
 					body: true,
 					fitLid: false,
 					nonblinn: false,
-					newShading: 'glossy'
+					newShading: 'glossy',
+
+					export: exportCollada
 				};
 
 				let h;
@@ -205,6 +221,7 @@
 				h.add( effectController, 'hue', 0.0, 1.0, 0.025 ).name( 'hue' ).onChange( render );
 				h.add( effectController, 'saturation', 0.0, 1.0, 0.025 ).name( 'saturation' ).onChange( render );
 				h.add( effectController, 'lightness', 0.0, 1.0, 0.025 ).name( 'lightness' ).onChange( render );
+				h.add( effectController, 'vertexColors' ).onChange( render );
 
 				// light (point)
 
@@ -235,8 +252,8 @@
 
 				gui.add( effectController, 'newShading', [ 'wireframe', 'flat', 'smooth', 'glossy', 'textured', 'normal', 'reflective' ] ).name( 'Shading' ).onChange( render );
 
-				const exportButton = document.getElementById( 'export' );
-				exportButton.addEventListener( 'click', exportCollada );
+				h = gui.addFolder( 'Export' );
+				h.add( effectController, 'export' ).name( 'Export Collada' );
 
 			}
 
@@ -251,7 +268,8 @@
 					effectController.body !== bBody ||
 					effectController.fitLid !== bFitLid ||
 					effectController.nonblinn !== bNonBlinn ||
-					effectController.newShading !== shading ) {
+					effectController.newShading !== shading ||
+					effectController.vertexColors !== vertexColors ) {
 
 					tess = effectController.newTess;
 					bBottom = effectController.bottom;
@@ -260,6 +278,7 @@
 					bFitLid = effectController.fitLid;
 					bNonBlinn = effectController.nonblinn;
 					shading = effectController.newShading;
+					vertexColors = effectController.vertexColors;
 
 					createNewTeapot();
 
@@ -343,6 +362,38 @@
 								shading === 'glossy' ? phongMaterial : (
 									shading === 'textured' ? texturedMaterial : (
 										shading === 'normal' ? normalMaterial : reflectiveMaterial ) ) ) ) ) );	// if no match, pick Phong
+
+
+				if ( effectController.vertexColors ) {
+
+					teapot.geometry.computeBoundingBox();
+					const minY = teapot.geometry.boundingBox.min.y;
+					const maxY = teapot.geometry.boundingBox.max.y;
+					const sizeY = maxY - minY;
+
+					const colors = [];
+					const position = teapot.geometry.getAttribute( 'position' );
+					for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+						const y = position.getY( i );
+						const r = ( y - minY ) / sizeY;
+						const b = 1.0 - r;
+
+						colors.push( r * 128, 0, b * 128 );
+
+					}
+
+					teapot.geometry.setAttribute( 'color', new THREE.Uint8BufferAttribute( colors, 3, true ) );
+					teapot.material.vertexColors = true;
+					teapot.material.needsUpdate = true;
+
+				} else {
+
+					teapot.geometry.deleteAttribute( 'color' );
+					teapot.material.vertexColors = false;
+					teapot.material.needsUpdate = true;
+
+				}
 
 				scene.add( teapot );
 

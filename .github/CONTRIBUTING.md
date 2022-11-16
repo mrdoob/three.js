@@ -30,6 +30,12 @@ This script will start a local server similar to [threejs.org](https://threejs.o
 
 The next most important script runs all the appropriate testing. The E-2-E testing is intended to be run by github actions.
 
+Run this command from the root folder to install test dependencies.
+
+    npm install --prefix test
+
+And run tests.
+
     npm test
 
 The linting is there to keep a consistent code style across all of the code and the testing is there to help catch bugs and check that the code behaves as expected. It is important that neither of these steps comes up with any errors due to your changes.

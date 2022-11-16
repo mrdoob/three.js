@@ -36,8 +36,9 @@ import {
 	TextureLoader,
 	Vector2,
 	Vector3,
-	VectorKeyframeTrack
-} from '../../../build/three.module.js';
+	VectorKeyframeTrack,
+	sRGBEncoding
+} from 'three';
 import { TGALoader } from '../loaders/TGALoader.js';
 
 class ColladaLoader extends Loader {
@@ -1469,11 +1470,11 @@ class ColladaLoader extends Loader {
 
 		function parseEffectExtraTechniqueBump( xml ) {
 
-			var data = {};
+			const data = {};
 
-			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+			for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
-				var child = xml.childNodes[ i ];
+				const child = xml.childNodes[ i ];
 
 				if ( child.nodeType !== 1 ) continue;
 
@@ -1579,7 +1580,7 @@ class ColladaLoader extends Loader {
 
 			material.name = data.name || '';
 
-			function getTexture( textureObject ) {
+			function getTexture( textureObject, encoding = null ) {
 
 				const sampler = effect.profile.samplers[ textureObject.id ];
 				let image = null;
@@ -1627,6 +1628,12 @@ class ColladaLoader extends Loader {
 
 						}
 
+						if ( encoding !== null ) {
+
+							texture.encoding = encoding;
+
+						}
+
 						return texture;
 
 					} else {
@@ -1657,7 +1664,7 @@ class ColladaLoader extends Loader {
 
 					case 'diffuse':
 						if ( parameter.color ) material.color.fromArray( parameter.color );
-						if ( parameter.texture ) material.map = getTexture( parameter.texture );
+						if ( parameter.texture ) material.map = getTexture( parameter.texture, sRGBEncoding );
 						break;
 					case 'specular':
 						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
@@ -1667,19 +1674,23 @@ class ColladaLoader extends Loader {
 						if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
 						break;
 					case 'ambient':
-						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture );
+						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, sRGBEncoding );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
 						break;
 					case 'emission':
 						if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
-						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture );
+						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, sRGBEncoding );
 						break;
 
 				}
 
 			}
+
+			material.color.convertSRGBToLinear();
+			if ( material.specular ) material.specular.convertSRGBToLinear();
+			if ( material.emissive ) material.emissive.convertSRGBToLinear();
 
 			//
 
@@ -2015,7 +2026,7 @@ class ColladaLoader extends Loader {
 
 					case 'color':
 						const array = parseFloats( child.textContent );
-						data.color = new Color().fromArray( array );
+						data.color = new Color().fromArray( array ).convertSRGBToLinear();
 						break;
 
 					case 'falloff_angle':
@@ -2481,7 +2492,7 @@ class ColladaLoader extends Loader {
 							break;
 
 						case 'COLOR':
-							buildGeometryData( primitive, sources[ input.id ], input.offset, color.array );
+							buildGeometryData( primitive, sources[ input.id ], input.offset, color.array, true );
 							color.stride = sources[ input.id ].stride;
 							break;
 
@@ -2520,7 +2531,7 @@ class ColladaLoader extends Loader {
 
 		}
 
-		function buildGeometryData( primitive, source, offset, array ) {
+		function buildGeometryData( primitive, source, offset, array, isColor = false ) {
 
 			const indices = primitive.p;
 			const stride = primitive.stride;
@@ -2534,6 +2545,22 @@ class ColladaLoader extends Loader {
 				for ( ; index < length; index ++ ) {
 
 					array.push( sourceArray[ index ] );
+
+				}
+
+				if ( isColor ) {
+
+					// convert the vertex colors from srgb to linear if present
+					const startIndex = array.length - sourceStride - 1;
+					tempColor.setRGB(
+						array[ startIndex + 0 ],
+						array[ startIndex + 1 ],
+						array[ startIndex + 2 ]
+					).convertSRGBToLinear();
+
+					array[ startIndex + 0 ] = tempColor.r;
+					array[ startIndex + 1 ] = tempColor.g;
+					array[ startIndex + 2 ] = tempColor.b;
 
 				}
 
@@ -2974,7 +3001,7 @@ class ColladaLoader extends Loader {
 						const param = child.getElementsByTagName( 'param' )[ 0 ];
 						data.axis = param.textContent;
 						const tmpJointIndex = data.axis.split( 'inst_' ).pop().split( 'axis' )[ 0 ];
-						data.jointIndex = tmpJointIndex.substr( 0, tmpJointIndex.length - 1 );
+						data.jointIndex = tmpJointIndex.substring( 0, tmpJointIndex.length - 1 );
 						break;
 
 				}
@@ -3981,6 +4008,7 @@ class ColladaLoader extends Loader {
 
 		//
 
+		const tempColor = new Color();
 		const animations = [];
 		let kinematics = {};
 		let count = 0;
@@ -4038,6 +4066,7 @@ class ColladaLoader extends Loader {
 
 		if ( asset.upAxis === 'Z_UP' ) {
 
+			console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
 			scene.quaternion.setFromEuler( new Euler( - Math.PI / 2, 0, 0 ) );
 
 		}

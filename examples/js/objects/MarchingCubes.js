@@ -10,33 +10,46 @@
 
 			const geometry = new THREE.BufferGeometry();
 			super( geometry, material );
-			const scope = this; // temp buffers used in polygonize
+			this.isMarchingCubes = true;
+			const scope = this;
+
+			// temp buffers used in polygonize
 
 			const vlist = new Float32Array( 12 * 3 );
 			const nlist = new Float32Array( 12 * 3 );
 			const clist = new Float32Array( 12 * 3 );
 			this.enableUvs = enableUvs;
-			this.enableColors = enableColors; // functions have to be object properties
+			this.enableColors = enableColors;
+
+			// functions have to be object properties
 			// prototype functions kill performance
 			// (tested and it was 4x slower !!!)
 
 			this.init = function ( resolution ) {
 
-				this.resolution = resolution; // parameters
+				this.resolution = resolution;
 
-				this.isolation = 80.0; // size of field, 32 is pushing it in Javascript :)
+				// parameters
+
+				this.isolation = 80.0;
+
+				// size of field, 32 is pushing it in Javascript :)
 
 				this.size = resolution;
 				this.size2 = this.size * this.size;
 				this.size3 = this.size2 * this.size;
-				this.halfsize = this.size / 2.0; // deltas
+				this.halfsize = this.size / 2.0;
+
+				// deltas
 
 				this.delta = 2.0 / this.size;
 				this.yd = this.size;
 				this.zd = this.size2;
 				this.field = new Float32Array( this.size3 );
 				this.normal_cache = new Float32Array( this.size3 * 3 );
-				this.palette = new Float32Array( this.size3 * 3 ); //
+				this.palette = new Float32Array( this.size3 * 3 );
+
+				//
 
 				this.count = 0;
 				const maxVertexCount = maxPolyCount * 3;
@@ -48,7 +61,6 @@
 				const normalAttribute = new THREE.BufferAttribute( this.normalArray, 3 );
 				normalAttribute.setUsage( THREE.DynamicDrawUsage );
 				geometry.setAttribute( 'normal', normalAttribute );
-
 				if ( this.enableUvs ) {
 
 					this.uvArray = new Float32Array( maxVertexCount * 2 );
@@ -67,10 +79,11 @@
 
 				}
 
-			}; ///////////////////////
+			};
+
+			///////////////////////
 			// Polygonization
 			///////////////////////
-
 
 			function lerp( a, b, t ) {
 
@@ -131,7 +144,6 @@
 			function compNorm( q ) {
 
 				const q3 = q * 3;
-
 				if ( scope.normal_cache[ q3 ] === 0.0 ) {
 
 					scope.normal_cache[ q3 + 0 ] = scope.field[ q - 1 ] - scope.field[ q + 1 ];
@@ -140,9 +152,10 @@
 
 				}
 
-			} // Returns total number of triangles. Fills triangles.
-			// (this is where most of time is spent - it's inner work of O(n3) loop )
+			}
 
+			// Returns total number of triangles. Fills triangles.
+			// (this is where most of time is spent - it's inner work of O(n3) loop )
 
 			function polygonize( fx, fy, fz, q, isol ) {
 
@@ -170,14 +183,18 @@
 				if ( field4 < isol ) cubeindex |= 16;
 				if ( field5 < isol ) cubeindex |= 32;
 				if ( field6 < isol ) cubeindex |= 128;
-				if ( field7 < isol ) cubeindex |= 64; // if cube is entirely in/out of the surface - bail, nothing to draw
+				if ( field7 < isol ) cubeindex |= 64;
+
+				// if cube is entirely in/out of the surface - bail, nothing to draw
 
 				const bits = edgeTable[ cubeindex ];
 				if ( bits === 0 ) return 0;
 				const d = scope.delta,
 					fx2 = fx + d,
 					fy2 = fy + d,
-					fz2 = fz + d; // top of the cube
+					fz2 = fz + d;
+
+				// top of the cube
 
 				if ( bits & 1 ) {
 
@@ -209,8 +226,9 @@
 					compNorm( qy );
 					VIntY( q * 3, 9, isol, fx, fy, fz, field0, field2, q, qy );
 
-				} // bottom of the cube
+				}
 
+				// bottom of the cube
 
 				if ( bits & 16 ) {
 
@@ -242,9 +260,9 @@
 					compNorm( qyz );
 					VIntY( qz * 3, 21, isol, fx, fy, fz2, field4, field6, qz, qyz );
 
-				} // vertical lines of the cube
+				}
 
-
+				// vertical lines of the cube
 				if ( bits & 256 ) {
 
 					compNorm( q );
@@ -283,7 +301,9 @@
 					o2,
 					o3,
 					numtris = 0,
-					i = 0; // here is where triangles are created
+					i = 0;
+
+				// here is where triangles are created
 
 				while ( triTable[ cubeindex + i ] != - 1 ) {
 
@@ -302,7 +322,9 @@
 
 			function posnormtriv( pos, norm, colors, o1, o2, o3 ) {
 
-				const c = scope.count * 3; // positions
+				const c = scope.count * 3;
+
+				// positions
 
 				scope.positionArray[ c + 0 ] = pos[ o1 ];
 				scope.positionArray[ c + 1 ] = pos[ o1 + 1 ];
@@ -312,7 +334,9 @@
 				scope.positionArray[ c + 5 ] = pos[ o2 + 2 ];
 				scope.positionArray[ c + 6 ] = pos[ o3 ];
 				scope.positionArray[ c + 7 ] = pos[ o3 + 1 ];
-				scope.positionArray[ c + 8 ] = pos[ o3 + 2 ]; // normals
+				scope.positionArray[ c + 8 ] = pos[ o3 + 2 ];
+
+				// normals
 
 				if ( scope.material.flatShading === true ) {
 
@@ -341,8 +365,9 @@
 					scope.normalArray[ c + 7 ] = norm[ o3 + 1 ];
 					scope.normalArray[ c + 8 ] = norm[ o3 + 2 ];
 
-				} // uvs
+				}
 
+				// uvs
 
 				if ( scope.enableUvs ) {
 
@@ -354,8 +379,9 @@
 					scope.uvArray[ d + 4 ] = pos[ o3 + 0 ];
 					scope.uvArray[ d + 5 ] = pos[ o3 + 2 ];
 
-				} // colors
+				}
 
+				// colors
 
 				if ( scope.enableColors ) {
 
@@ -373,12 +399,14 @@
 
 				scope.count += 3;
 
-			} /////////////////////////////////////
+			}
+
+			/////////////////////////////////////
 			// Metaballs
 			/////////////////////////////////////
+
 			// Adds a reciprocal ball (nice and blobby) that, to be fast, fades to zero after
 			// a fixed distance, determined by strength and subtract.
-
 
 			this.addBall = function ( ballx, bally, ballz, strength, subtract, colors ) {
 
@@ -386,7 +414,6 @@
 				strength = Math.abs( strength );
 				const userDefineColor = ! ( colors === undefined || colors === null );
 				let ballColor = new THREE.Color( ballx, bally, ballz );
-
 				if ( userDefineColor ) {
 
 					try {
@@ -399,13 +426,14 @@
 
 					}
 
-				} // Let's solve the equation to find the radius:
+				}
+
+				// Let's solve the equation to find the radius:
 				// 1.0 / (0.000001 + radius^2) * strength - subtract = 0
 				// strength / (radius^2) = subtract
 				// strength = subtract * radius^2
 				// radius^2 = strength / subtract
 				// radius = sqrt(strength / subtract)
-
 
 				const radius = this.size * Math.sqrt( strength / subtract ),
 					zs = ballz * this.size,
@@ -422,33 +450,32 @@
 				let min_x = Math.floor( xs - radius );
 				if ( min_x < 1 ) min_x = 1;
 				let max_x = Math.floor( xs + radius );
-				if ( max_x > this.size - 1 ) max_x = this.size - 1; // Don't polygonize in the outer layer because normals aren't
+				if ( max_x > this.size - 1 ) max_x = this.size - 1;
+
+				// Don't polygonize in the outer layer because normals aren't
 				// well-defined there.
 
 				let x, y, z, y_offset, z_offset, fx, fy, fz, fz2, fy2, val;
-
 				for ( z = min_z; z < max_z; z ++ ) {
 
 					z_offset = this.size2 * z;
 					fz = z / this.size - ballz;
 					fz2 = fz * fz;
-
 					for ( y = min_y; y < max_y; y ++ ) {
 
 						y_offset = z_offset + this.size * y;
 						fy = y / this.size - bally;
 						fy2 = fy * fy;
-
 						for ( x = min_x; x < max_x; x ++ ) {
 
 							fx = x / this.size - ballx;
 							val = strength / ( 0.000001 + fx * fx + fy2 + fz2 ) - subtract;
-
 							if ( val > 0.0 ) {
 
-								this.field[ y_offset + x ] += val * sign; // optimization
-								// http://www.geisswerks.com/ryan/BLOBS/blobs.html
+								this.field[ y_offset + x ] += val * sign;
 
+								// optimization
+								// http://www.geisswerks.com/ryan/BLOBS/blobs.html
 								const ratio = Math.sqrt( ( x - xs ) * ( x - xs ) + ( y - ys ) * ( y - ys ) + ( z - zs ) * ( z - zs ) ) / radius;
 								const contrib = 1 - ratio * ratio * ratio * ( ratio * ( ratio * 6 - 15 ) + 10 );
 								this.palette[ ( y_offset + x ) * 3 + 0 ] += ballColor.r * contrib;
@@ -481,19 +508,16 @@
 					cxy,
 					dist = size * Math.sqrt( strength / subtract );
 				if ( dist > size ) dist = size;
-
 				for ( x = 0; x < dist; x ++ ) {
 
 					xdiv = x / size;
 					xx = xdiv * xdiv;
 					val = strength / ( 0.0001 + xx ) - subtract;
-
 					if ( val > 0.0 ) {
 
 						for ( y = 0; y < size; y ++ ) {
 
 							cxy = x + y * yd;
-
 							for ( z = 0; z < size; z ++ ) {
 
 								field[ zd * z + cxy ] += val;
@@ -525,21 +549,17 @@
 					cxy,
 					dist = size * Math.sqrt( strength / subtract );
 				if ( dist > size ) dist = size;
-
 				for ( y = 0; y < dist; y ++ ) {
 
 					ydiv = y / size;
 					yy = ydiv * ydiv;
 					val = strength / ( 0.0001 + yy ) - subtract;
-
 					if ( val > 0.0 ) {
 
 						cy = y * yd;
-
 						for ( x = 0; x < size; x ++ ) {
 
 							cxy = cy + x;
-
 							for ( z = 0; z < size; z ++ ) field[ zd * z + cxy ] += val;
 
 						}
@@ -553,6 +573,7 @@
 			this.addPlaneZ = function ( strength, subtract ) {
 
 				// cache attribute lookups
+
 				const size = this.size,
 					yd = this.yd,
 					zd = this.zd,
@@ -567,21 +588,17 @@
 					cyz,
 					dist = size * Math.sqrt( strength / subtract );
 				if ( dist > size ) dist = size;
-
 				for ( z = 0; z < dist; z ++ ) {
 
 					zdiv = z / size;
 					zz = zdiv * zdiv;
 					val = strength / ( 0.0001 + zz ) - subtract;
-
 					if ( val > 0.0 ) {
 
 						cz = zd * z;
-
 						for ( y = 0; y < size; y ++ ) {
 
 							cyz = cz + y * yd;
-
 							for ( x = 0; x < size; x ++ ) field[ cyz + x ] += val;
 
 						}
@@ -590,10 +607,11 @@
 
 				}
 
-			}; /////////////////////////////////////
+			};
+
+			/////////////////////////////////////
 			// Updates
 			/////////////////////////////////////
-
 
 			this.setCell = function ( x, y, z, value ) {
 
@@ -615,7 +633,6 @@
 				const fieldCopy = field.slice();
 				const size = this.size;
 				const size2 = this.size2;
-
 				for ( let x = 0; x < size; x ++ ) {
 
 					for ( let y = 0; y < size; y ++ ) {
@@ -625,17 +642,14 @@
 							const index = size2 * z + size * y + x;
 							let val = fieldCopy[ index ];
 							let count = 1;
-
 							for ( let x2 = - 1; x2 <= 1; x2 += 2 ) {
 
 								const x3 = x2 + x;
 								if ( x3 < 0 || x3 >= size ) continue;
-
 								for ( let y2 = - 1; y2 <= 1; y2 += 2 ) {
 
 									const y3 = y2 + y;
 									if ( y3 < 0 || y3 >= size ) continue;
-
 									for ( let z2 = - 1; z2 <= 1; z2 += 2 ) {
 
 										const z3 = z2 + z;
@@ -664,6 +678,7 @@
 			this.reset = function () {
 
 				// wipe the normal cache
+
 				for ( let i = 0; i < this.size3; i ++ ) {
 
 					this.normal_cache[ i * 3 ] = 0.0;
@@ -674,12 +689,13 @@
 
 			};
 
-			this.onBeforeRender = function () {
+			this.update = function () {
 
-				this.count = 0; // Triangulate. Yeah, this is slow.
+				this.count = 0;
+
+				// Triangulate. Yeah, this is slow.
 
 				const smin2 = this.size - 2;
-
 				for ( let z = 1; z < smin2; z ++ ) {
 
 					const z_offset = this.size2 * z;
@@ -693,7 +709,6 @@
 						for ( let x = 1; x < smin2; x ++ ) {
 
 							const fx = ( x - this.halfsize ) / this.halfsize; //+ 1
-
 							const q = y_offset + x;
 							polygonize( fx, fy, fz, q, this.isolation );
 
@@ -701,20 +716,20 @@
 
 					}
 
-				} // reset unneeded data
+				}
 
+				// set the draw range to only the processed triangles
 
-				for ( let i = this.count * 3; i < this.positionArray.length; i ++ ) {
+				this.geometry.setDrawRange( 0, this.count );
 
-					this.positionArray[ i ] = 0.0;
-
-				} // update geometry data
-
+				// update geometry data
 
 				geometry.getAttribute( 'position' ).needsUpdate = true;
 				geometry.getAttribute( 'normal' ).needsUpdate = true;
 				if ( this.enableUvs ) geometry.getAttribute( 'uv' ).needsUpdate = true;
-				if ( this.enableColors ) geometry.getAttribute( 'color' ).needsUpdate = true; // safety check
+				if ( this.enableColors ) geometry.getAttribute( 'color' ).needsUpdate = true;
+
+				// safety check
 
 				if ( this.count / 3 > maxPolyCount ) console.warn( 'THREE.MarchingCubes: Geometry buffers too small for rendering. Please create an instance with a higher poly count.' );
 
@@ -726,9 +741,10 @@
 
 	}
 
-	MarchingCubes.prototype.isMarchingCubes = true; /////////////////////////////////////
+	/////////////////////////////////////
 	// Marching cubes lookup tables
 	/////////////////////////////////////
+
 	// These tables are straight from Paul Bourke's page:
 	// http://paulbourke.net/geometry/polygonise/
 	// who in turn got them from Cory Gene Bloyd.

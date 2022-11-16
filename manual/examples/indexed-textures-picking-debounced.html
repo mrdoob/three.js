@@ -59,9 +59,22 @@
       <div id="labels"></div>
     </div>
   </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
 <script type="module">
-import * as THREE from '../../build/three.module.js';
-import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -90,15 +103,16 @@ function main() {
   const tempColor = new THREE.Color();
   function get255BasedColor(color) {
     tempColor.set(color);
-    return tempColor.toArray().map(v => v * 255);
+    const base = tempColor.toArray().map(v => v * 255);
+    base.push(255); // alpha
+    return base;
   }
 
   const maxNumCountries = 512;
   const paletteTextureWidth = maxNumCountries;
   const paletteTextureHeight = 1;
-  const palette = new Uint8Array(paletteTextureWidth * 3);
-  const paletteTexture = new THREE.DataTexture(
-      palette, paletteTextureWidth, paletteTextureHeight, THREE.RGBFormat);
+  const palette = new Uint8Array(paletteTextureWidth * 4);
+  const paletteTexture = new THREE.DataTexture(palette, paletteTextureWidth, paletteTextureHeight);
   paletteTexture.minFilter = THREE.NearestFilter;
   paletteTexture.magFilter = THREE.NearestFilter;
 
@@ -108,7 +122,7 @@ function main() {
   resetPalette();
 
   function setPaletteColor(index, color) {
-    palette.set(color, index * 3);
+    palette.set(color, index * 4);
   }
 
   function resetPalette() {
@@ -457,4 +471,3 @@ function main() {
 main();
 </script>
 </html>
-

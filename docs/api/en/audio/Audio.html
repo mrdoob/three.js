@@ -56,13 +56,13 @@
 		<h2>Properties</h2>
 
 		<h3>[property:Boolean autoplay]</h3>
-		<p>Whether to start playback automatically. Default is *false*.</p>
+		<p>Whether to start playback automatically. Default is `false`.</p>
 
 		<h3>[property:AudioContext context]</h3>
 		<p>The [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] of the [page:AudioListener listener] given in the constructor.</p>
 
 		<h3>[property:Number detune]</h3>
-		<p>Modify pitch, measured in cents. +/- 100 is a semitone. +/- 1200 is an octave. Default is *0*.</p>
+		<p>Modify pitch, measured in cents. +/- 100 is a semitone. +/- 1200 is an octave. Default is `0`.</p>
 
 		<h3>[property:Array filters]</h3>
 		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioNode AudioNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects.
@@ -74,7 +74,7 @@
 
 		<h3>[property:Boolean hasPlaybackControl]</h3>
 		<p>Whether playback can be controlled using the [page:Audio.play play](),
-			[page:Audio.pause pause]() etc. methods. Default is *true*.</p>
+			[page:Audio.pause pause]() etc. methods. Default is `true`.</p>
 
 		<h3>[property:Boolean isPlaying]</h3>
 		<p>Whether the audio is currently playing.</p>
@@ -83,13 +83,13 @@
 		<p>A reference to the listener object of this audio.</p>
 
 		<h3>[property:Number playbackRate]</h3>
-		<p>Speed of playback. Default is *1*.</p>
+		<p>Speed of playback. Default is `1`.</p>
 
 		<h3>[property:Number offset]</h3>
-		<p>An offset to the time within the audio buffer that playback should begin. Same as the *offset* parameter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *0*.</p>
+		<p>An offset to the time within the audio buffer that playback should begin. Same as the `offset` parameter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is `0`.</p>
 
 		<h3>[property:Number duration]</h3>
-		<p>Overrides the duration of the audio. Same as the *duration* parameter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is *undefined* to play the whole buffer.</p>
+		<p>Overrides the duration of the audio. Same as the `duration` parameter of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/start AudioBufferSourceNode.start](). Default is `undefined` to play the whole buffer.</p>
 
 		<h3>[property:String source]</h3>
 		<p>An [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode AudioBufferSourceNode] created
@@ -114,6 +114,11 @@
 		<p>
 		Disconnect from the [page:Audio.source]. This is used internally when
 		setting / removing filters.
+		</p>
+
+		<h3>[method:Float getDetune]()</h3>
+		<p>
+		Returns the detuning of oscillation in cents.
 		</p>
 
 		<h3>[method:BiquadFilterNode getFilter]()</h3>
@@ -168,6 +173,11 @@
 		If [page:Audio.autoplay autoplay], also starts playback.
 		</p>
 
+		<h3>[method:this setDetune]( [param:Float value] )</h3>
+		<p>
+		Defines the detuning of oscillation in cents.
+		</p>
+
 		<h3>[method:this setFilter]( filter )</h3>
 		<p>
 		Applies a single filter node to the audio.
@@ -181,18 +191,18 @@
 
 		<h3>[method:this setLoop]( [param:Boolean value] )</h3>
 		<p>
-		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop] to *value*
+		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop] to `value`
 		(whether playback should loop).
 		</p>
 
 		<h3>[method:this setLoopStart]( [param:Float value] )</h3>
 		<p>
-		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopStart source.loopStart] to *value*.
+		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopStart source.loopStart] to `value`.
 		</p>
 
 		<h3>[method:this setLoopEnd]( [param:Float value] )</h3>
 		<p>
-		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopEnd source.loopEnd] to *value*.
+		Set [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopEnd source.loopEnd] to `value`.
 		</p>
 
 		<h3>[method:this setMediaElementSource]( mediaElement )</h3>
@@ -216,7 +226,7 @@
 
 		<h3>[method:this setPlaybackRate]( [param:Float value] )</h3>
 		<p>
-		If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, set the [page:Audio.playbackRate playbackRate] to *value*.
+		If [page:Audio.hasPlaybackControl hasPlaybackControl] is enabled, set the [page:Audio.playbackRate playbackRate] to `value`.
 		</p>
 
 		<h3>[method:this setVolume]( [param:Float value] )</h3>

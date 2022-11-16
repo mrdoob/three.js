@@ -20,7 +20,6 @@
 
 		<p>
 			[example:webgl_instancing_dynamic WebGL / instancing / dynamic]<br />
-			[example:webgl_instancing_modified WebGL / instancing / modified]<br />
 			[example:webgl_instancing_performance WebGL / instancing / performance]<br />
 			[example:webgl_instancing_scatter WebGL / instancing / scatter]<br />
 			[example:webgl_instancing_raycast WebGL / instancing / raycast]
@@ -56,6 +55,11 @@
 		<p>
 			表示所有实例的本地变换。
 			如果你要通过 [page:.setMatrixAt]() 来修改实例数据，你必须将它的 [page:BufferAttribute.needsUpdate needsUpdate] 标识为 true 。
+		</p>
+
+		<h3>[property:Boolean isInstancedMesh]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 

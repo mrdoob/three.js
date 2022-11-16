@@ -29,7 +29,7 @@
 		const points = curve.getPoints( 50 );
 		const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-		const material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 		// Create the final object to add to the scene
 		const curveObject = new THREE.Line( geometry, material );
@@ -46,9 +46,9 @@
 		<h3>[name]( [param:Array points], [param:Boolean closed], [param:String curveType], [param:Float tension] )</h3>
 		<p>
 			points – An array of [page:Vector3] points<br/>
-			closed – Whether the curve is closed. Default is *false*.<br/>
-			curveType – Type of the curve. Default is *centripetal*.<br/>
-			tension – Tension of the curve. Default is *0.5*.
+			closed – Whether the curve is closed. Default is `false`.<br/>
+			curveType – Type of the curve. Default is `centripetal`.<br/>
+			tension – Tension of the curve. Default is `0.5`.
 		</p>
 
 
@@ -62,10 +62,10 @@
 		<p>The curve will loop back onto itself when this is true.</p>
 
 		<h3>[property:String curveType]</h3>
-		<p>Possible values are *centripetal*, *chordal* and *catmullrom*.</p>
+		<p>Possible values are `centripetal`, `chordal` and `catmullrom`.</p>
 
 		<h3>[property:Float tension]</h3>
-		<p>When [page:.curveType] is *catmullrom*, defines catmullrom's tension.</p>
+		<p>When [page:.curveType] is `catmullrom`, defines catmullrom's tension.</p>
 
 
 		<h2>Methods</h2>

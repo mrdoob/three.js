@@ -1,16 +1,16 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
   function makeCheckerTexture(repeats) {
     const data = new Uint8Array([
-      0x88, 0x88, 0x88, 0xCC, 0xCC, 0xCC,
-      0xCC, 0xCC, 0xCC, 0x88, 0x88, 0x88,
+      0x88, 0x88, 0x88, 0xFF, 0xCC, 0xCC, 0xCC, 0xFF,
+      0xCC, 0xCC, 0xCC, 0xFF, 0x88, 0x88, 0x88, 0xFF
     ]);
     const width = 2;
     const height = 2;
-    const texture = new THREE.DataTexture(data, width, height, THREE.RGBFormat);
+    const texture = new THREE.DataTexture(data, width, height);
     texture.needsUpdate = true;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
@@ -42,7 +42,6 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
       const controls = new OrbitControls(camera, elem);
       controls.enableDamping = true;
       controls.enablePanning = false;
-      controls.enableKeys = false;
       scene.background = new THREE.Color('black');
       {
         const mesh = new THREE.Mesh(cubeGeo, cubeMat);
@@ -107,4 +106,3 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     },
   });
 }
-

@@ -5,7 +5,7 @@
  * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
  */
 
-	var SSRShader = {
+	const SSRShader = {
 		defines: {
 			MAX_STEP: 0,
 			PERSPECTIVE_CAMERA: true,
@@ -55,9 +55,7 @@
 				value: .018
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -70,9 +68,7 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -197,7 +193,7 @@
 				vec3 vP=getViewPosition( uv, d, cW );
 
 				#ifdef PERSPECTIVE_CAMERA
-					// https://www.comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
+					// https://comp.nus.edu.sg/~lowkl/publications/lowk_persp_interp_techrep.pdf
 					float recipVPZ=1./viewPosition.z;
 					float viewReflectRayZ=1./(recipVPZ+s*(1./d1viewPosition.z-recipVPZ));
 				#else
@@ -251,7 +247,7 @@
 		}
 	`
 	};
-	var SSRDepthShader = {
+	const SSRDepthShader = {
 		defines: {
 			'PERSPECTIVE_CAMERA': 1
 		},
@@ -266,9 +262,7 @@
 				value: null
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -280,9 +274,7 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDepth;
 
@@ -320,7 +312,7 @@
 
 	`
 	};
-	var SSRBlurShader = {
+	const SSRBlurShader = {
 		uniforms: {
 			'tDiffuse': {
 				value: null
@@ -332,9 +324,7 @@
 				value: .5
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -346,9 +336,7 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;

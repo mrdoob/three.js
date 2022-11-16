@@ -17,30 +17,15 @@
 
 		parse( object, onDone, options ) {
 
-			if ( onDone && typeof onDone === 'object' ) {
-
-				console.warn( 'THREE.PLYExporter: The options parameter is now the third argument to the "parse" function. See the documentation for the new API.' );
-				options = onDone;
-				onDone = undefined;
-
-			} // Iterate over the valid meshes in the object
-
-
+			// Iterate over the valid meshes in the object
 			function traverseMeshes( cb ) {
 
 				object.traverse( function ( child ) {
 
-					if ( child.isMesh === true ) {
+					if ( child.isMesh === true || child.isPoints ) {
 
 						const mesh = child;
 						const geometry = mesh.geometry;
-
-						if ( geometry.isBufferGeometry !== true ) {
-
-							throw new Error( 'THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-						}
-
 						if ( geometry.hasAttribute( 'position' ) === true ) {
 
 							cb( mesh, geometry );
@@ -51,9 +36,9 @@
 
 				} );
 
-			} // Default options
+			}
 
-
+			// Default options
 			const defaultOptions = {
 				binary: false,
 				excludeAttributes: [],
@@ -62,11 +47,13 @@
 			};
 			options = Object.assign( defaultOptions, options );
 			const excludeAttributes = options.excludeAttributes;
+			let includeIndices = true;
 			let includeNormals = false;
 			let includeColors = false;
-			let includeUVs = false; // count the vertices, check which properties are used,
-			// and cache the BufferGeometry
+			let includeUVs = false;
 
+			// count the vertices, check which properties are used,
+			// and cache the BufferGeometry
 			let vertexCount = 0;
 			let faceCount = 0;
 			object.traverse( function ( child ) {
@@ -75,19 +62,11 @@
 
 					const mesh = child;
 					const geometry = mesh.geometry;
-
-					if ( geometry.isBufferGeometry !== true ) {
-
-						throw new Error( 'THREE.PLYExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-					}
-
 					const vertices = geometry.getAttribute( 'position' );
 					const normals = geometry.getAttribute( 'normal' );
 					const uvs = geometry.getAttribute( 'uv' );
 					const colors = geometry.getAttribute( 'color' );
 					const indices = geometry.getIndex();
-
 					if ( vertices === undefined ) {
 
 						return;
@@ -100,14 +79,22 @@
 					if ( uvs !== undefined ) includeUVs = true;
 					if ( colors !== undefined ) includeColors = true;
 
+				} else if ( child.isPoints ) {
+
+					const mesh = child;
+					const geometry = mesh.geometry;
+					const vertices = geometry.getAttribute( 'position' );
+					vertexCount += vertices.count;
+					includeIndices = false;
+
 				}
 
 			} );
-			const includeIndices = excludeAttributes.indexOf( 'index' ) === - 1;
+			const tempColor = new THREE.Color();
+			includeIndices = includeIndices && excludeAttributes.indexOf( 'index' ) === - 1;
 			includeNormals = includeNormals && excludeAttributes.indexOf( 'normal' ) === - 1;
 			includeColors = includeColors && excludeAttributes.indexOf( 'color' ) === - 1;
 			includeUVs = includeUVs && excludeAttributes.indexOf( 'uv' ) === - 1;
-
 			if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
 
 				// point cloud meshes will not have an index array and may not have a
@@ -119,9 +106,9 @@
 			}
 
 			const indexByteCount = 4;
-			let header = 'ply\n' + `format ${options.binary ? options.littleEndian ? 'binary_little_endian' : 'binary_big_endian' : 'ascii'} 1.0\n` + `element vertex ${vertexCount}\n` + // position
+			let header = 'ply\n' + `format ${options.binary ? options.littleEndian ? 'binary_little_endian' : 'binary_big_endian' : 'ascii'} 1.0\n` + `element vertex ${vertexCount}\n` +
+    // position
     'property float x\n' + 'property float y\n' + 'property float z\n';
-
 			if ( includeNormals === true ) {
 
 				// normal
@@ -150,23 +137,25 @@
 
 			}
 
-			header += 'end_header\n'; // Generate attribute data
+			header += 'end_header\n';
 
+			// Generate attribute data
 			const vertex = new THREE.Vector3();
 			const normalMatrixWorld = new THREE.Matrix3();
 			let result = null;
-
 			if ( options.binary === true ) {
 
 				// Binary File Generation
-				const headerBin = new TextEncoder().encode( header ); // 3 position values at 4 bytes
+				const headerBin = new TextEncoder().encode( header );
+
+				// 3 position values at 4 bytes
 				// 3 normal values at 4 bytes
 				// 3 color channels with 1 byte
 				// 2 uv values at 4 bytes
+				const vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
 
-				const vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) ); // 1 byte shape desciptor
+				// 1 byte shape desciptor
 				// 3 vertex indices at ${indexByteCount} bytes
-
 				const faceListLength = includeIndices ? faceCount * ( indexByteCount * 3 + 1 ) : 0;
 				const output = new DataView( new ArrayBuffer( headerBin.length + vertexListLength + faceListLength ) );
 				new Uint8Array( output.buffer ).set( headerBin, 0 );
@@ -181,28 +170,25 @@
 					const colors = geometry.getAttribute( 'color' );
 					const indices = geometry.getIndex();
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
-
 					for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
-						vertex.applyMatrix4( mesh.matrixWorld ); // Position information
+						vertex.fromBufferAttribute( vertices, i );
+						vertex.applyMatrix4( mesh.matrixWorld );
 
+						// Position information
 						output.setFloat32( vOffset, vertex.x, options.littleEndian );
 						vOffset += 4;
 						output.setFloat32( vOffset, vertex.y, options.littleEndian );
 						vOffset += 4;
 						output.setFloat32( vOffset, vertex.z, options.littleEndian );
-						vOffset += 4; // Normal information
+						vOffset += 4;
 
+						// Normal information
 						if ( includeNormals === true ) {
 
 							if ( normals != null ) {
 
-								vertex.x = normals.getX( i );
-								vertex.y = normals.getY( i );
-								vertex.z = normals.getZ( i );
+								vertex.fromBufferAttribute( normals, i );
 								vertex.applyMatrix3( normalMatrixWorld ).normalize();
 								output.setFloat32( vOffset, vertex.x, options.littleEndian );
 								vOffset += 4;
@@ -222,9 +208,9 @@
 
 							}
 
-						} // UV information
+						}
 
-
+						// UV information
 						if ( includeUVs === true ) {
 
 							if ( uvs != null ) {
@@ -234,7 +220,7 @@
 								output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
 								vOffset += 4;
 
-							} else if ( includeUVs !== false ) {
+							} else {
 
 								output.setFloat32( vOffset, 0, options.littleEndian );
 								vOffset += 4;
@@ -243,18 +229,19 @@
 
 							}
 
-						} // Color information
+						}
 
-
+						// THREE.Color information
 						if ( includeColors === true ) {
 
 							if ( colors != null ) {
 
-								output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
+								tempColor.fromBufferAttribute( colors, i ).convertLinearToSRGB();
+								output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 								vOffset += 1;
-								output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
+								output.setUint8( vOffset, Math.floor( tempColor.g * 255 ) );
 								vOffset += 1;
-								output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
+								output.setUint8( vOffset, Math.floor( tempColor.b * 255 ) );
 								vOffset += 1;
 
 							} else {
@@ -275,6 +262,7 @@
 					if ( includeIndices === true ) {
 
 						// Create the face list
+
 						if ( indices !== null ) {
 
 							for ( let i = 0, l = indices.count; i < l; i += 3 ) {
@@ -307,10 +295,10 @@
 
 						}
 
-					} // Save the amount of verts we've already written so we can offset
+					}
+
+					// Save the amount of verts we've already written so we can offset
 					// the face index on the next mesh
-
-
 					writtenVertices += vertices.count;
 
 				} );
@@ -330,24 +318,23 @@
 					const uvs = geometry.getAttribute( 'uv' );
 					const colors = geometry.getAttribute( 'color' );
 					const indices = geometry.getIndex();
-					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld ); // form each line
+					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
+					// form each line
 					for ( let i = 0, l = vertices.count; i < l; i ++ ) {
 
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
-						vertex.applyMatrix4( mesh.matrixWorld ); // Position information
+						vertex.fromBufferAttribute( vertices, i );
+						vertex.applyMatrix4( mesh.matrixWorld );
 
-						let line = vertex.x + ' ' + vertex.y + ' ' + vertex.z; // Normal information
+						// Position information
+						let line = vertex.x + ' ' + vertex.y + ' ' + vertex.z;
 
+						// Normal information
 						if ( includeNormals === true ) {
 
 							if ( normals != null ) {
 
-								vertex.x = normals.getX( i );
-								vertex.y = normals.getY( i );
-								vertex.z = normals.getZ( i );
+								vertex.fromBufferAttribute( normals, i );
 								vertex.applyMatrix3( normalMatrixWorld ).normalize();
 								line += ' ' + vertex.x + ' ' + vertex.y + ' ' + vertex.z;
 
@@ -357,29 +344,30 @@
 
 							}
 
-						} // UV information
+						}
 
-
+						// UV information
 						if ( includeUVs === true ) {
 
 							if ( uvs != null ) {
 
 								line += ' ' + uvs.getX( i ) + ' ' + uvs.getY( i );
 
-							} else if ( includeUVs !== false ) {
+							} else {
 
 								line += ' 0 0';
 
 							}
 
-						} // Color information
+						}
 
-
+						// THREE.Color information
 						if ( includeColors === true ) {
 
 							if ( colors != null ) {
 
-								line += ' ' + Math.floor( colors.getX( i ) * 255 ) + ' ' + Math.floor( colors.getY( i ) * 255 ) + ' ' + Math.floor( colors.getZ( i ) * 255 );
+								tempColor.fromBufferAttribute( colors, i ).convertLinearToSRGB();
+								line += ' ' + Math.floor( tempColor.r * 255 ) + ' ' + Math.floor( tempColor.g * 255 ) + ' ' + Math.floor( tempColor.b * 255 );
 
 							} else {
 
@@ -391,9 +379,9 @@
 
 						vertexList += line + '\n';
 
-					} // Create the face list
+					}
 
-
+					// Create the face list
 					if ( includeIndices === true ) {
 
 						if ( indices !== null ) {

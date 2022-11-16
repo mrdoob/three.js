@@ -30,13 +30,22 @@
     <p><button type="button">Save...</button></p>
     <div id="cube"><canvas id="c"></canvas></div>
   </body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
 <script type="module">
+import * as THREE from 'three';
 import * as lutParser from './resources/lut-reader.js';
 import * as dragAndDrop from './resources/drag-and-drop.js';
-import * as THREE from '../../build/three.module.js';
-import {EffectComposer} from '../../examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from '../../examples/jsm/postprocessing/RenderPass.js';
-import {ShaderPass} from '../../examples/jsm/postprocessing/ShaderPass.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -55,7 +64,7 @@ function main() {
     ]);
 
     return function(filter) {
-      const texture = new THREE.DataTexture(identityLUT, 4, 2, THREE.RGBAFormat);
+      const texture = new THREE.DataTexture(identityLUT, 4, 2);
       texture.minFilter = filter;
       texture.magFilter = filter;
       texture.needsUpdate = true;
@@ -163,8 +172,7 @@ function main() {
 
   const rtParameters = {
     minFilter: THREE.NearestFilter,
-    magFilter: THREE.NearestFilter,
-    format: THREE.RGBFormat,
+    magFilter: THREE.NearestFilter
   };
   const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
 
@@ -196,21 +204,20 @@ function main() {
 
   function ext(s) {
     const period = s.lastIndexOf('.');
-    return s.substr(period + 1);
+    return s.slice(period + 1);
   }
 
   function readLUTFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
       const type = ext(file.name);
-      const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
+      const lut = lutParser.lutTo2D3Drgba8(lutParser.parse(e.target.result, type));
 
       effectLUT.uniforms.lutMapSize.value = lut.size;
 
       lutTexture.image.data = lut.data;
       lutTexture.image.width = lut.size * lut.size;
       lutTexture.image.height = lut.size;
-      lutTexture.format = THREE.RGBFormat;
       lutTexture.needsUpdate = true;
 
       render();

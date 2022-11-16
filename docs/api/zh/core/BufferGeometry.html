@@ -123,9 +123,15 @@
 			默认值是 *null*。
 		</p>
 
+		<h3>[property:Boolean isBufferGeometry]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
-			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 morph targets 的细节信息。
+			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 morph targets 的细节信息。<br />
+			Note: Once the geometry has been rendered, the morph attribute data cannot be changed. You will have to call [page:.dispose](), and create a new instance of [name].
 		</p>
 
 		<h3>[property:Boolean morphTargetsRelative]</h3>
@@ -152,7 +158,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[page:EventDispatcher EventDispatcher] 在该类上可用的所有方法。</h3>
+		<p>[page:EventDispatcher EventDispatcher] 在该类上可用的所有方法。</p>
 
 		<h3>[method:this setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
@@ -197,7 +203,8 @@
 		<h3>[method:undefined computeTangents]()</h3>
 		<p>
 		Calculates and adds a tangent attribute to this geometry.<br />
-		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined.
+		The computation is only supported for indexed geometries and if position, normal, and uv attributes are defined. When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
+		[page:BufferGeometryUtils.computeMikkTSpaceTangents] instead.
 		</p>
 
 		<h3>[method:undefined computeVertexNormals]()</h3>
@@ -224,9 +231,6 @@
 
 			旋转几何体朝向控件中的一点。该过程通常在一次处理中完成，不会循环处理。典型的用法是过通过调用 [page:Object3D.lookAt] 实时改变 mesh 朝向。
 		</p>
-
-		<h3>[method:this merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
-		<p>同参数指定的 BufferGeometry 进行合并。可以通过可选参数指定，从哪个偏移位置开始进行 merge。</p>
 
 		<h3>[method:undefined normalizeNormals]()</h3>
 		<p>

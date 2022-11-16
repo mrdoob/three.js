@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Una versione speciale di [page:Mesh] con il supporto per il rendering istanziato. Utilizza [name]
+			se devi renderizzare un grande numero di oggetti con la stessa geometria e materiale ma con 
+			diverse trasformazioni world. L'utilizzo di [name] ti aiuterà a ridurre il numero di 
+			chiamate di disegno e quindi migliorare le prestazioni complessive del rendering nell'applicazione.
+		</p>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_instancing_dynamic WebGL / instancing / dynamic]<br />
+			[example:webgl_instancing_performance WebGL / instancing / performance]<br />
+			[example:webgl_instancing_scatter WebGL / instancing / scatter]<br />
+			[example:webgl_instancing_raycast WebGL / instancing / raycast]
+		</p>
+
+		<h2>Costruttore</h2>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material], [param:Integer count] )</h3>
+		<p>
+		[page:BufferGeometry geometry] - un'istanza di [page:BufferGeometry].<br />
+		[page:Material material] - un'istanza di [page:Material]. Il valore di default è un nuovo [page:MeshBasicMaterial].<br />
+		[page:Integer count] - il numero di istanze.<br />
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Mesh] per le proprietà comuni.</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			Il numero di istanze. Il valore `count` passato nel costruttore rappresenta il numero 
+			massimo di istanze di questa mesh. Puoi modificare il numero di istanze in fase di esecuzione ad un valore intero
+			nell'intervallo [0, count].
+		</p>
+		<p>
+			Se hai bisogno di più istanze del valore count originale, devi creare una nuova [name].
+		</p>
+
+		<h3>[property:InstancedBufferAttribute instanceColor]</h3>
+		<p>
+			Rappresenta i colori di tutte le istanze. Il valore predefinito è `null`.
+			È necessario impostare il suo flag [page:BufferAttribute.needsUpdate needsUpdate] 
+			a true se si modificano i dati di istanza tramite [page:.setColorAt]().
+		</p>
+
+		<h3>[property:InstancedBufferAttribute instanceMatrix]</h3>
+		<p>
+			Rappresenta la trasformazione locale di tutte le istanze.
+			È necessario impostare il suo flag [page:BufferAttribute.needsUpdate needsUpdate] 
+			a true se si modificano i dati di istanza tramite [page:.setMatrixAt]().
+		</p>
+
+		<h3>[property:Boolean isInstancedMesh]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Mesh] per i metodi comuni.</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Libera le risorse relative alla GPU allocate da questa istanza.
+			Chiama questo metodo ogni volta che questa istanza non è più utilizzata nella tua applicazione.
+		</p>
+
+		<h3>[method:undefined getColorAt]( [param:Integer index], [param:Color color] )</h3>
+		<p>
+			[page:Integer index]: L'indice di un'istanza. I valori devono essere nell'intervallo [0, count].
+		</p>
+		<p>
+			[page:Color color]: Il colore dell'oggetto sarà impostato al colore dell'istanza definita.
+		</p>
+		<p>
+			Ottieni il colore dell'istanza definita.
+		</p>
+
+		<h3>[method:undefined getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Integer index]: L'indice di un'istanza. I valori devono essere nell'intervallo [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: Questa matrice 4x4 sarà impostata alla matrice trasformazione locale dell'istanza definita.
+		</p>
+		<p>
+			Ottieni la matrice trasformazione locale dell'istanza definita.
+		</p>
+
+		<h3>[method:undefined setColorAt]( [param:Integer index], [param:Color color] )</h3>
+		<p>
+			[page:Integer index]: L'indice di un'istanza. I valori devono essere nell'intervallo [0, count].
+		</p>
+		<p>
+			[page:Color color]: Il colore di una singola istanza.
+		</p>
+		<p>
+			Imposta il colore dato all'istanza definita.
+			Assicurati di impostare [page:.instanceColor][page:BufferAttribute.needsUpdate .needsUpdate] 
+			a true dopo l'aggiornamento di tutti i colori.
+		</p>
+
+		<h3>[method:undefined setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Integer index]: L'indice di un'istanza. I valori devono essere nell'intervallo [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: Una matrice 4x4 che rappresenta la trasformazione locale di una singola istanza.
+		</p>
+		<p>
+			Imposta la matrice trasformazione locale data all'istanza definita.
+			Assicurati di impostare [page:.instanceColor][page:BufferAttribute.needsUpdate .needsUpdate] 
+			a true dopo l'aggiornamento di tutte le matrici.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

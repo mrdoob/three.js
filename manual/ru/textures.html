@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
   </head>
   <body>
     <div class="container">
@@ -107,7 +118,7 @@ const material = new THREE.MeshBasicMaterial({
 
 <p></p>
 <p>Однако следует отметить, что по умолчанию единственной геометрией, которая поддерживает 
-несколько материалов, является <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> и <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a>. В других случаях вам 
+несколько материалов, является <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> и <a href="/docs/#api/en/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>. В других случаях вам 
 нужно будет создать или загрузить пользовательскую геометрию и/или изменить координаты 
 текстуры. Гораздо более распространенным является использование 
 <a href="https://ru.wikipedia.org/wiki/Текстурный_атлас">Текстурного атласа</a> 
@@ -450,7 +461,7 @@ const material = new THREE.MeshBasicMaterial({
 </pre>
 <p>Затем мы снова будем использовать <a href="https://github.com/georgealways/lil-gui">lil-gui</a> 
 для обеспечения простого интерфейса.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>Как мы делали в предыдущих примерах lil-gui, мы будем использовать простой класс, 
 чтобы дать lil-gui объект, которым он может манипулировать в градусах, 

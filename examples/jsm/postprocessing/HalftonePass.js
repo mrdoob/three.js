@@ -1,7 +1,7 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
+} from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 import { HalftoneShader } from '../shaders/HalftoneShader.js';
 
@@ -71,6 +71,14 @@ class HalftonePass extends Pass {
  		this.uniforms.height.value = height;
 
  	}
+
+	dispose() {
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
+
+	}
 
 }
 

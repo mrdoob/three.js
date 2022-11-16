@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
     <link rel="stylesheet" href="/manual/ko/lang.css">
   </head>
   <body>
@@ -24,7 +35,7 @@
 <hr>
 <p><a id="screenshot" data-toc="스크린샷 찍기"></a></p>
 <h1 id="-">캔버스의 스크린샷 찍기</h1>
-<p>브라우저에서 스크린샷을 찍을 수 있는 방법은 2가지 정도가 있습니다. 예전부터 사용하던 <a href="https://developer.mozilla.org/ko/docs/Web/API/HTMLCanvasElement/toDataURL"><code class="notranslate" translate="no">canvas.toDataURL</code></a>과, 새로 등장한 <a href="https://developer.mozilla.org/ko/docs/Web/API/HTMLCanvasElement/toBlob"><code class="notranslate" translate="no">canvas.toBlob</code></a>이 있죠.</p>
+<p>브라우저에서 스크린샷을 찍을 수 있는 방법은 2가지 정도가 있습니다. 예전부터 사용하던 <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL"><code class="notranslate" translate="no">canvas.toDataURL</code></a>과, 새로 등장한 <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob"><code class="notranslate" translate="no">canvas.toBlob</code></a>이 있죠.</p>
 <p>그냥 메서드만 호출하면 되는 거라니, 얼핏 쉬워 보입니다. 아래 정도의 코드면 손쉽게 스크린샷을 찍을 수 있을 것 같네요.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
 +&lt;button id="screenshot" type="button"&gt;Save...&lt;/button&gt;

@@ -36,7 +36,7 @@ import {
 	RGB_PVRTC_2BPPV1_Format,
 	RGB_ETC1_Format,
 	RGB_ETC2_Format
-} from '../../../build/three.module.js';
+} from 'three';
 import { MMDToonShader } from '../shaders/MMDToonShader.js';
 import { TGALoader } from '../loaders/TGALoader.js';
 import { MMDParser } from '../libs/mmdparser.module.js';
@@ -357,7 +357,6 @@ class MMDLoader extends Loader {
 /*
 	 * base64 encoded defalut toon textures toon00.bmp - toon10.bmp.
 	 * We don't need to request external toon image files.
-	 * This idea is from http://www20.atpages.jp/katwat/three.js_r58/examples/mytest37/mmd.three.js
 	 */
 const DEFAULT_TOON_TEXTURES = [
 	'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAL0lEQVRYR+3QQREAAAzCsOFfNJPBJ1XQS9r2hsUAAQIECBAgQIAAAQIECBAgsBZ4MUx/ofm2I/kAAAAASUVORK5CYII=',
@@ -2081,6 +2080,8 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		super();
 
+		this.isMMDToonMaterial = true;
+
 		this._matcapCombine = AddOperation;
 		this.emissiveIntensity = 1.0;
 		this.normalMapType = TangentSpaceNormalMap;
@@ -2134,7 +2135,6 @@ class MMDToonMaterial extends ShaderMaterial {
 		// merged from MeshToon/Phong/MatcapMaterial
 		const exposePropertyNames = [
 			'specular',
-			'shininess',
 			'opacity',
 			'diffuse',
 
@@ -2189,6 +2189,25 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		}
 
+		// Special path for shininess to handle zero shininess properly
+		this._shininess = 30;
+		Object.defineProperty( this, 'shininess', {
+
+			get: function () {
+
+				return this._shininess;
+
+			},
+
+			set: function ( value ) {
+
+				this._shininess = value;
+				this.uniforms.shininess.value = Math.max( this._shininess, 1e-4 ); // To prevent pow( 0.0, 0.0 )
+
+			},
+
+		} );
+
 		Object.defineProperty(
 			this,
 			'color',
@@ -2219,7 +2238,5 @@ class MMDToonMaterial extends ShaderMaterial {
 	}
 
 }
-
-MMDToonMaterial.prototype.isMMDToonMaterial = true;
 
 export { MMDLoader };

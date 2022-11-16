@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { PolyhedronGeometry, PolyhedronBufferGeometry } from '../../../../src/geometries/PolyhedronGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -20,22 +20,21 @@ export default QUnit.module( 'Geometries', () => {
 
 			geometries = [
 				new PolyhedronGeometry( vertices, indices ),
-				new PolyhedronBufferGeometry( vertices, indices )
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

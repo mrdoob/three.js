@@ -13,15 +13,55 @@ struct PhysicalMaterial {
 		float clearcoatF90;
 	#endif
 
+	#ifdef USE_IRIDESCENCE
+		float iridescence;
+		float iridescenceIOR;
+		float iridescenceThickness;
+		vec3 iridescenceFresnel;
+		vec3 iridescenceF0;
+	#endif
+
 	#ifdef USE_SHEEN
 		vec3 sheenColor;
 		float sheenRoughness;
+	#endif
+
+	#ifdef IOR
+		float ior;
+	#endif
+
+	#ifdef USE_TRANSMISSION
+		float transmission;
+		float transmissionAlpha;
+		float thickness;
+		float attenuationDistance;
+		vec3 attenuationColor;
 	#endif
 
 };
 
 // temporary
 vec3 clearcoatSpecular = vec3( 0.0 );
+vec3 sheenSpecular = vec3( 0.0 );
+
+// This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from 
+// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
+// in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
+float IBLSheenBRDF( const in vec3 normal, const in vec3 viewDir, const in float roughness ) {
+
+	float dotNV = saturate( dot( normal, viewDir ) );
+
+	float r2 = roughness * roughness;
+
+	float a = roughness < 0.25 ? -339.2 * r2 + 161.4 * roughness - 25.9 : -8.48 * r2 + 14.3 * roughness - 9.95;
+
+	float b = roughness < 0.25 ? 44.0 * r2 - 23.7 * roughness + 3.26 : 1.97 * r2 - 3.27 * roughness + 0.72;
+
+	float DG = exp( a * dotNV + b ) + ( roughness < 0.25 ? 0.0 : 0.1 * ( roughness - 0.25 ) );
+
+	return saturate( DG * RECIPROCAL_PI );
+
+}
 
 // Analytical approximation of the DFG LUT, one half of the
 // split-sum approximation used in indirect specular lighting.
@@ -56,16 +96,30 @@ vec3 EnvironmentBRDF( const in vec3 normal, const in vec3 viewDir, const in vec3
 // Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
 // Approximates multiscattering in order to preserve energy.
 // http://www.jcgt.org/published/0008/01/03/
+#ifdef USE_IRIDESCENCE
+void computeMultiscatteringIridescence( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float iridescence, const in vec3 iridescenceF0, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
+#else
 void computeMultiscattering( const in vec3 normal, const in vec3 viewDir, const in vec3 specularColor, const in float specularF90, const in float roughness, inout vec3 singleScatter, inout vec3 multiScatter ) {
+#endif
 
 	vec2 fab = DFGApprox( normal, viewDir, roughness );
 
-	vec3 FssEss = specularColor * fab.x + specularF90 * fab.y;
+	#ifdef USE_IRIDESCENCE
+
+		vec3 Fr = mix( specularColor, iridescenceF0, iridescence );
+
+	#else
+
+		vec3 Fr = specularColor;
+
+	#endif
+
+	vec3 FssEss = Fr * fab.x + specularF90 * fab.y;
 
 	float Ess = fab.x + fab.y;
 	float Ems = 1.0 - Ess;
 
-	vec3 Favg = specularColor + ( 1.0 - specularColor ) * 0.047619; // 1/21
+	vec3 Favg = Fr + ( 1.0 - Fr ) * 0.047619; // 1/21
 	vec3 Fms = FssEss * Favg / ( 1.0 - Ems * Favg );
 
 	singleScatter += FssEss;
@@ -133,12 +187,19 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#ifdef USE_SHEEN
 
-		reflectedLight.directSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, geometry.normal, material.sheenColor, material.sheenRoughness );
+		sheenSpecular += irradiance * BRDF_Sheen( directLight.direction, geometry.viewDir, geometry.normal, material.sheenColor, material.sheenRoughness );
 
 	#endif
 
-	reflectedLight.directSpecular += irradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.roughness );
+	#ifdef USE_IRIDESCENCE
 
+		reflectedLight.directSpecular += irradiance * BRDF_GGX_Iridescence( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness );
+
+	#else
+
+		reflectedLight.directSpecular += irradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.roughness );
+
+	#endif
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 }
@@ -157,15 +218,30 @@ void RE_IndirectSpecular_Physical( const in vec3 radiance, const in vec3 irradia
 
 	#endif
 
+	#ifdef USE_SHEEN
+
+		sheenSpecular += irradiance * material.sheenColor * IBLSheenBRDF( geometry.normal, geometry.viewDir, material.sheenRoughness );
+
+	#endif
+
 	// Both indirect specular and indirect diffuse light accumulate here
 
 	vec3 singleScattering = vec3( 0.0 );
 	vec3 multiScattering = vec3( 0.0 );
 	vec3 cosineWeightedIrradiance = irradiance * RECIPROCAL_PI;
 
-	computeMultiscattering( geometry.normal, geometry.viewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );
+	#ifdef USE_IRIDESCENCE
 
-	vec3 diffuse = material.diffuseColor * ( 1.0 - ( singleScattering + multiScattering ) );
+		computeMultiscatteringIridescence( geometry.normal, geometry.viewDir, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness, singleScattering, multiScattering );
+
+	#else
+
+		computeMultiscattering( geometry.normal, geometry.viewDir, material.specularColor, material.specularF90, material.roughness, singleScattering, multiScattering );
+
+	#endif
+
+	vec3 totalScattering = singleScattering + multiScattering;
+	vec3 diffuse = material.diffuseColor * ( 1.0 - max( max( totalScattering.r, totalScattering.g ), totalScattering.b ) );
 
 	reflectedLight.indirectSpecular += radiance * singleScattering;
 	reflectedLight.indirectSpecular += multiScattering * cosineWeightedIrradiance;

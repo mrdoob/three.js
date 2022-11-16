@@ -3,7 +3,7 @@ import {
 	DoubleSide,
 	Matrix4,
 	MeshBasicMaterial
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * https://github.com/gkjohnson/collada-exporter-js
@@ -144,10 +144,30 @@ class ColladaExporter {
 
 		// gets the attribute array. Generate a new array if the attribute is interleaved
 		const getFuncs = [ 'getX', 'getY', 'getZ', 'getW' ];
+		const tempColor = new Color();
 
-		function attrBufferToArray( attr ) {
+		function attrBufferToArray( attr, isColor = false ) {
 
-			if ( attr.isInterleavedBufferAttribute ) {
+			if ( isColor ) {
+
+				// convert the colors to srgb before export
+				// colors are always written as floats
+				const arr = new Float32Array( attr.count * 3 );
+				for ( let i = 0, l = attr.count; i < l; i ++ ) {
+
+					tempColor
+						.fromBufferAttribute( attr, i )
+						.convertLinearToSRGB();
+
+					arr[ 3 * i + 0 ] = tempColor.r;
+					arr[ 3 * i + 1 ] = tempColor.g;
+					arr[ 3 * i + 2 ] = tempColor.b;
+
+				}
+
+				return arr;
+
+			} else if ( attr.isInterleavedBufferAttribute ) {
 
 				// use the typed array constructor to save on memory
 				const arr = new attr.array.constructor( attr.count * attr.itemSize );
@@ -183,9 +203,9 @@ class ColladaExporter {
 		}
 
 		// Returns the string for a geometry's attribute
-		function getAttribute( attr, name, params, type ) {
+		function getAttribute( attr, name, params, type, isColor = false ) {
 
-			const array = attrBufferToArray( attr );
+			const array = attrBufferToArray( attr, isColor );
 			const res =
 					`<source id="${ name }">` +
 
@@ -223,20 +243,11 @@ class ColladaExporter {
 
 		// Process the given piece of geometry into the geometry library
 		// Returns the mesh id
-		function processGeometry( g ) {
+		function processGeometry( bufferGeometry ) {
 
-			let info = geometryInfo.get( g );
+			let info = geometryInfo.get( bufferGeometry );
 
 			if ( ! info ) {
-
-				// convert the geometry to bufferGeometry if it isn't already
-				const bufferGeometry = g;
-
-				if ( bufferGeometry.isBufferGeometry !== true ) {
-
-					throw new Error( 'THREE.ColladaExporter: Geometry is not of type THREE.BufferGeometry.' );
-
-				}
 
 				const meshid = `Mesh${ libraryGeometries.length + 1 }`;
 
@@ -251,7 +262,7 @@ class ColladaExporter {
 						[ { start: 0, count: indexCount, materialIndex: 0 } ];
 
 
-				const gname = g.name ? ` name="${ g.name }"` : '';
+				const gname = bufferGeometry.name ? ` name="${ bufferGeometry.name }"` : '';
 				let gnode = `<geometry id="${ meshid }"${ gname }><mesh>`;
 
 				// define the geometry node and the vertices for the geometry
@@ -296,8 +307,9 @@ class ColladaExporter {
 				// serialize colors
 				if ( 'color' in bufferGeometry.attributes ) {
 
+					// colors are always written as floats
 					const colName = `${ meshid }-color`;
-					gnode += getAttribute( bufferGeometry.attributes.color, colName, [ 'X', 'Y', 'Z' ], 'uint8' );
+					gnode += getAttribute( bufferGeometry.attributes.color, colName, [ 'R', 'G', 'B' ], 'float', true );
 					triangleInputs += `<input semantic="COLOR" source="#${ colName }" offset="0" />`;
 
 				}
@@ -332,7 +344,7 @@ class ColladaExporter {
 				libraryGeometries.push( gnode );
 
 				info = { meshid: meshid, bufferGeometry: bufferGeometry };
-				geometryInfo.set( g, info );
+				geometryInfo.set( bufferGeometry, info );
 
 			}
 
@@ -418,6 +430,10 @@ class ColladaExporter {
 				const specular = m.specular ? m.specular : new Color( 1, 1, 1 );
 				const shininess = m.shininess || 0;
 				const reflectivity = m.reflectivity || 0;
+
+				emissive.convertLinearToSRGB();
+				specular.convertLinearToSRGB();
+				diffuse.convertLinearToSRGB();
 
 				// Do not export and alpha map for the reasons mentioned in issue (#13792)
 				// in three.js alpha maps are black and white, but collada expects the alpha
@@ -608,7 +624,7 @@ class ColladaExporter {
 					`<instance_geometry url="#${ meshid }">` +
 
 					(
-						matids != null ?
+						matids.length > 0 ?
 							'<bind_material><technique_common>' +
 							matids.map( ( id, i ) =>
 

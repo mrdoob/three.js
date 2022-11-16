@@ -5,12 +5,11 @@
  *
  * Formulas collected from various sources
  * http://mathworld.wolfram.com/HeartCurve.html
- * http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page6.html
  * http://en.wikipedia.org/wiki/Viviani%27s_curve
- * http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page4.html
  * http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
  * https://prideout.net/blog/old/blog/index.html@p=44.html
  */
+
 	// GrannyKnot
 
 	class GrannyKnot extends THREE.Curve {
@@ -26,8 +25,9 @@
 
 		}
 
-	} // HeartCurve
+	}
 
+	// HeartCurve
 
 	class HeartCurve extends THREE.Curve {
 
@@ -37,7 +37,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -49,8 +48,9 @@
 
 		}
 
-	} // Viviani's THREE.Curve
+	}
 
+	// Viviani's THREE.Curve
 
 	class VivianiCurve extends THREE.Curve {
 
@@ -60,12 +60,10 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
 			t = t * 4 * Math.PI; // normalized to 0..1
-
 			const a = this.scale / 2;
 			const x = a * ( 1 + Math.cos( t ) );
 			const y = a * Math.sin( t );
@@ -74,8 +72,9 @@
 
 		}
 
-	} // KnotCurve
+	}
 
+	// KnotCurve
 
 	class KnotCurve extends THREE.Curve {
 
@@ -92,8 +91,9 @@
 
 		}
 
-	} // HelixCurve
+	}
 
+	// HelixCurve
 
 	class HelixCurve extends THREE.Curve {
 
@@ -101,7 +101,6 @@
 
 			const point = optionalTarget;
 			const a = 30; // radius
-
 			const b = 150; // height
 
 			const t2 = 2 * Math.PI * t * b / 30;
@@ -112,8 +111,9 @@
 
 		}
 
-	} // TrefoilKnot
+	}
 
+	// TrefoilKnot
 
 	class TrefoilKnot extends THREE.Curve {
 
@@ -123,7 +123,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -135,8 +134,9 @@
 
 		}
 
-	} // TorusKnot
+	}
 
+	// TorusKnot
 
 	class TorusKnot extends THREE.Curve {
 
@@ -146,7 +146,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -160,8 +159,9 @@
 
 		}
 
-	} // CinquefoilKnot
+	}
 
+	// CinquefoilKnot
 
 	class CinquefoilKnot extends THREE.Curve {
 
@@ -171,7 +171,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -185,8 +184,9 @@
 
 		}
 
-	} // TrefoilPolynomialKnot
+	}
 
+	// TrefoilPolynomialKnot
 
 	class TrefoilPolynomialKnot extends THREE.Curve {
 
@@ -196,7 +196,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -209,14 +208,14 @@
 		}
 
 	}
-
 	function scaleTo( x, y, t ) {
 
 		const r = y - x;
 		return t * r + x;
 
-	} // FigureEightPolynomialKnot
+	}
 
+	// FigureEightPolynomialKnot
 
 	class FigureEightPolynomialKnot extends THREE.Curve {
 
@@ -226,7 +225,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -238,8 +236,9 @@
 
 		}
 
-	} // DecoratedTorusKnot4a
+	}
 
+	// DecoratedTorusKnot4a
 
 	class DecoratedTorusKnot4a extends THREE.Curve {
 
@@ -249,7 +248,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -261,8 +259,9 @@
 
 		}
 
-	} // DecoratedTorusKnot4b
+	}
 
+	// DecoratedTorusKnot4b
 
 	class DecoratedTorusKnot4b extends THREE.Curve {
 
@@ -272,7 +271,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -284,8 +282,9 @@
 
 		}
 
-	} // DecoratedTorusKnot5a
+	}
 
+	// DecoratedTorusKnot5a
 
 	class DecoratedTorusKnot5a extends THREE.Curve {
 
@@ -295,7 +294,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -307,8 +305,9 @@
 
 		}
 
-	} // DecoratedTorusKnot5c
+	}
 
+	// DecoratedTorusKnot5c
 
 	class DecoratedTorusKnot5c extends THREE.Curve {
 
@@ -318,7 +317,6 @@
 			this.scale = scale;
 
 		}
-
 		getPoint( t, optionalTarget = new THREE.Vector3() ) {
 
 			const point = optionalTarget;
@@ -332,23 +330,19 @@
 
 	}
 
-	const Curves = {
-		GrannyKnot: GrannyKnot,
-		HeartCurve: HeartCurve,
-		VivianiCurve: VivianiCurve,
-		KnotCurve: KnotCurve,
-		HelixCurve: HelixCurve,
-		TrefoilKnot: TrefoilKnot,
-		TorusKnot: TorusKnot,
-		CinquefoilKnot: CinquefoilKnot,
-		TrefoilPolynomialKnot: TrefoilPolynomialKnot,
-		FigureEightPolynomialKnot: FigureEightPolynomialKnot,
-		DecoratedTorusKnot4a: DecoratedTorusKnot4a,
-		DecoratedTorusKnot4b: DecoratedTorusKnot4b,
-		DecoratedTorusKnot5a: DecoratedTorusKnot5a,
-		DecoratedTorusKnot5c: DecoratedTorusKnot5c
-	};
-
-	THREE.Curves = Curves;
+	THREE.CinquefoilKnot = CinquefoilKnot;
+	THREE.DecoratedTorusKnot4a = DecoratedTorusKnot4a;
+	THREE.DecoratedTorusKnot4b = DecoratedTorusKnot4b;
+	THREE.DecoratedTorusKnot5a = DecoratedTorusKnot5a;
+	THREE.DecoratedTorusKnot5c = DecoratedTorusKnot5c;
+	THREE.FigureEightPolynomialKnot = FigureEightPolynomialKnot;
+	THREE.GrannyKnot = GrannyKnot;
+	THREE.HeartCurve = HeartCurve;
+	THREE.HelixCurve = HelixCurve;
+	THREE.KnotCurve = KnotCurve;
+	THREE.TorusKnot = TorusKnot;
+	THREE.TrefoilKnot = TrefoilKnot;
+	THREE.TrefoilPolynomialKnot = TrefoilPolynomialKnot;
+	THREE.VivianiCurve = VivianiCurve;
 
 } )();

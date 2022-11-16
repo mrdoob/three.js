@@ -8,6 +8,8 @@ class SplineCurve extends Curve {
 
 		super();
 
+		this.isSplineCurve = true;
+
 		this.type = 'SplineCurve';
 
 		this.points = points;
@@ -91,7 +93,5 @@ class SplineCurve extends Curve {
 	}
 
 }
-
-SplineCurve.prototype.isSplineCurve = true;
 
 export { SplineCurve };

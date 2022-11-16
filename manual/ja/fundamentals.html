@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
   </head>
   <body>
     <div class="container">
@@ -29,7 +40,7 @@ three.jsを使わない場合、WebGLで何か便利な事を行うには通常�
 <p>これらのチュートリアルはJavaScriptを知っている事を前提としており、ほとんどの部分でES6スタイルを使用します。
 <a href="prerequisites.html">あなたがすでに知っている事が期待される簡潔なリストはこちらをご覧下さい</a>。
 three.jsがサポートするほとんどのブラウザは自動更新されるため、ほとんどのユーザーはこのコードを実行できます。
-古いブラウザーで実行したい場合は、<a href="https://babel.io">Babel</a> のようなトランスパイラーを調べて下さい。
+古いブラウザーで実行したい場合は、<a href="https://babeljs.io">Babel</a> のようなトランスパイラーを調べて下さい。
 もちろん、本当に古いブラウザを実行しているユーザーはthree.jsを実行できないマシンを持っている可能性があります。</p>
 <p>ほとんどのプログラミング言語を学ぶ時、最初にする事は <code class="notranslate" translate="no">"Hello World!"</code> を表示する事です。
 3Dで最初に行う最も一般的な事の1つは、3Dキューブを作成する事です。
@@ -41,7 +52,7 @@ three.jsがサポートするほとんどのブラウザは自動更新される
 </pre>
 <p>Three.jsはcanvasに描画するため、canvasをthree.jsに渡す必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -245,7 +256,7 @@ es6モジュールはスクリプトのロードに <code class="notranslate" tr
 両方とも以下に例を示します。
 </p>
 <pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 ...
 
@@ -292,11 +303,11 @@ three.jsの場合、すべてのexamplesを正しいフォルダ階層に入れ�
 同じフォルダ構造を使用すると、importしたthreeとexampleライブラリは両方とも同じthree.module.jsを参照します。
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>これにはCDNを使用する場合も含まれます。 <code class="notranslate" translate="no">three.modules.js</code> のパスが <code class="notranslate" translate="no">/build/three.modules.js</code> のようになってる事を確認して下さい。例えば</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
 

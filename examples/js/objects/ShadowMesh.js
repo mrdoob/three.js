@@ -5,7 +5,6 @@
  */
 
 	const _shadowMatrix = new THREE.Matrix4();
-
 	class ShadowMesh extends THREE.Mesh {
 
 		constructor( mesh ) {
@@ -14,18 +13,23 @@
 				color: 0x000000,
 				transparent: true,
 				opacity: 0.6,
-				depthWrite: false
+				depthWrite: false,
+				stencilWrite: true,
+				stencilFunc: THREE.EqualStencilFunc,
+				stencilRef: 0,
+				stencilZPass: THREE.IncrementStencilOp
 			} );
 			super( mesh.geometry, shadowMaterial );
+			this.isShadowMesh = true;
 			this.meshMatrix = mesh.matrixWorld;
 			this.frustumCulled = false;
 			this.matrixAutoUpdate = false;
 
 		}
-
 		update( plane, lightPosition4D ) {
 
 			// based on https://www.opengl.org/archives/resources/features/StencilTalk/tsld021.htm
+
 			const dot = plane.normal.x * lightPosition4D.x + plane.normal.y * lightPosition4D.y + plane.normal.z * lightPosition4D.z + - plane.constant * lightPosition4D.w;
 			const sme = _shadowMatrix.elements;
 			sme[ 0 ] = dot - lightPosition4D.x * plane.normal.x;
@@ -49,8 +53,6 @@
 		}
 
 	}
-
-	ShadowMesh.prototype.isShadowMesh = true;
 
 	THREE.ShadowMesh = ShadowMesh;
 

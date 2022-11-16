@@ -17,7 +17,6 @@
 		THREE.EquirectangularReflectionMapping
 		THREE.EquirectangularRefractionMapping
 		THREE.CubeUVReflectionMapping
-		THREE.CubeUVRefractionMapping
 		</code>
 
 		<p>
@@ -129,7 +128,6 @@
 		THREE.HalfFloatType
 		THREE.UnsignedShort4444Type
 		THREE.UnsignedShort5551Type
-		THREE.UnsignedShort565Type
 		THREE.UnsignedInt248Type
 		</code>
 		<p>
@@ -145,23 +143,22 @@
 		THREE.RedIntegerFormat
 		THREE.RGFormat
 		THREE.RGIntegerFormat
-		THREE.RGBFormat
-		THREE.RGBIntegerFormat
 		THREE.RGBAFormat
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat
 		THREE.LuminanceAlphaFormat
-		THREE.RGBEFormat
 		THREE.DepthFormat
 		THREE.DepthStencilFormat
 		</code>
 		<p>
 		For use with a texture's [page:Texture.format format]	property, these define
-		how elements of a 2d texture, or *texels*, are read by shaders.<br /><br />
+		how elements of a 2d texture, or `texels`, are read by shaders.<br /><br />
 
 		[page:constant AlphaFormat] discards the red, green and blue components and reads just the alpha component.<br /><br />
 
-		[page:constant RedFormat] discards the green and blue components and reads just the red component.<br /><br />
+		[page:constant RedFormat] discards the green and blue components and reads just the red component.
+		(can only be used with a WebGL 2 rendering context).
+		<br /><br />
 
 		[page:constant RedIntegerFormat] discards the green and blue components and reads just the red component.
 		The texels are read as integers instead of floating point.
@@ -174,12 +171,6 @@
 
 		[page:constant RGIntegerFormat] discards the alpha, and blue components and reads the red, and green components.
 		The texels are read as integers instead of floating point.
-		(can only be used with a WebGL 2 rendering context).
-		<br /><br />
-
-		[page:constant RGBFormat] discards the alpha components and reads the red, green and blue components.<br /><br />
-
-		[page:constant RGBIntegerFormat] discards the alpha components and reads the red, green and blue components.
 		(can only be used with a WebGL 2 rendering context).
 		<br /><br />
 
@@ -197,9 +188,7 @@
 
 		[page:constant LuminanceAlphaFormat] reads each element as a luminance/alpha double.
 		The same process occurs as for the [page:constant LuminanceFormat], except that the
-		alpha channel may have values other than *1.0*.<br /><br />
-
-		[page:constant RGBEFormat] is identical to [page:constant RGBAFormat].<br /><br />
+		alpha channel may have values other than `1.0`.<br /><br />
 
 		[page:constant DepthFormat] reads each element as a single depth value, converts it to floating point, and clamps to the range [0,1].
 		This is the default for [page:DepthTexture DepthTexture].<br /><br />
@@ -282,24 +271,19 @@
 		THREE.RGBA_ASTC_10x10_Format
 		THREE.RGBA_ASTC_12x10_Format
 		THREE.RGBA_ASTC_12x12_Format
-		THREE.SRGB8_ALPHA8_ASTC_4x4_Format
-		THREE.SRGB8_ALPHA8_ASTC_5x4_Format
-		THREE.SRGB8_ALPHA8_ASTC_5x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_6x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_6x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_8x8_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x5_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x6_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x8_Format
-		THREE.SRGB8_ALPHA8_ASTC_10x10_Format
-		THREE.SRGB8_ALPHA8_ASTC_12x10_Format
-		THREE.SRGB8_ALPHA8_ASTC_12x12_Format
 		</code>
 		<p>
-		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format] property,
 		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] extension. <br /><br />
+		</p>
+
+		<h2>BPTC Compressed Texture Format</h2>
+		<code>
+		THREE.RGBA_BPTC_Format
+		</code>
+		<p>
+		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format] property,
+		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/EXT_texture_compression_bptc/ EXT_texture_compression_bptc] extension. <br /><br />
 		</p>
 
 		<h2>Internal Formats</h2>
@@ -372,7 +356,7 @@
 		texture when using a WebGL 2 rendering context.<br /><br />
 
 		For use with a texture's [page:Texture.internalFormat internalFormat]	property,
-		these define how elements of a texture, or *texels*, are stored on the GPU.<br /><br />
+		these define how elements of a texture, or `texels`, are stored on the GPU.<br /><br />
 
 		[page:constant R8] stores the red component on 8 bits.<br /><br />
 
@@ -559,11 +543,6 @@
 		<code>
 		THREE.LinearEncoding
 		THREE.sRGBEncoding
-		THREE.GammaEncoding
-		THREE.RGBEEncoding
-		THREE.RGBM7Encoding
-		THREE.RGBM16Encoding
-		THREE.RGBDEncoding
 		THREE.BasicDepthPacking
 		THREE.RGBADepthPacking
 		</code>
@@ -571,7 +550,7 @@
 		For use with a Texture's [page:Texture.encoding encoding]	property.<br /><br />
 
 		If the encoding type is changed after the texture has already been used by a material,
-		you will need to set [page:Material.needsUpdate Material.needsUpdate] to *true* to make the material recompile.<br /><br />
+		you will need to set [page:Material.needsUpdate Material.needsUpdate] to `true` to make the material recompile.<br /><br />
 
 		[page:constant LinearEncoding] is the default.
 		Values other than this are only valid for a material's map, envMap and emissiveMap.

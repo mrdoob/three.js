@@ -20,18 +20,12 @@
 			[link:http://area.autodesk.com/blogs/the-3ds-max-blog/what039s-new-for-rendering-in-3ds-max-2017 3D Studio Max].<br /><br />
 
 			This approach differs from older approaches in that instead of using approximations for the way in which
-			light	interacts with a surface, a physically correct model is used. The idea is that, instead of
+			light interacts with a surface, a physically correct model is used. The idea is that, instead of
 			tweaking materials to look good under specific lighting, a material can	be created that
 			will react 'correctly' under all lighting scenarios.<br /><br />
 
-			In practice this gives a more	accurate and realistic looking result than the [page:MeshLambertMaterial]
-			or [page:MeshPhongMaterial], at the cost of being somewhat more computationally expensive.<br /><br />
-
-			Shading is calculated in the same way as for the [page:MeshPhongMaterial], using a
-			[link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.	This calculates shading
-			per pixel (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragment shader],
-			AKA pixel shader) which gives more accurate results than the Gouraud model used by
-			[page:MeshLambertMaterial], at the cost of some performance.<br /><br />
+			In practice this gives a more accurate and realistic looking result than the [page:MeshLambertMaterial]
+			or [page:MeshPhongMaterial], at the cost of being somewhat more computationally expensive. [name] uses per-fragment shading.<br /><br />
 
 			Note that for best results you should always specify an [page:.envMap environment map] when using
 			this material.<br /><br />
@@ -79,7 +73,7 @@
 			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
 
 			The exception is the property [page:Hexadecimal color], which can be passed in as a hexadecimal
-			string and is *0xffffff* (white) by default. [page:Color.set]( color ) is called internally.
+			string and is `0xffffff` (white) by default. [page:Color.set]( color ) is called internally.
 		</p>
 
 		<h2>Properties</h2>
@@ -156,7 +150,7 @@
 
 		<h3>[property:Texture emissiveMap]</h3>
 		<p>
-		Set emisssive (glow) map. Default is null. The emissive map color is modulated by
+		Set emissive (glow) map. Default is null. The emissive map color is modulated by
 		the emissive color and the emissive intensity. If you have an emissive map, be sure to
 		set the emissive color to something other than black.
 		</p>
@@ -177,6 +171,14 @@
 		Define whether the material is rendered with flat shading. Default is false.
 		</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>Whether the material is affected by fog. Default is `true`.</p>
+
+		<h3>[property:Boolean isMeshStandardMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Texture lightMap]</h3>
 		<p>The light map. Default is null. The lightMap requires a second set of UVs.</p>
 
@@ -184,7 +186,11 @@
 		<p>Intensity of the baked light. Default is 1.</p>
 
 		<h3>[property:Texture map]</h3>
-		<p>The color map. Default is null. The texture map color is modulated by the diffuse [page:.color].</p>
+		<p>
+			The color map. May optionally include an alpha channel, typically combined with
+			[page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest]. Default is null.
+			The texture map color is modulated by the diffuse [page:.color].
+		</p>
 
 		<h3>[property:Float metalness]</h3>
 		<p>
@@ -217,13 +223,6 @@
 			Default is a [page:Vector2] set to (1,1).
 		</p>
 
-		<h3>[property:Float refractionRatio]</h3>
-		<p>
-			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
-			It is used with environment mapping modes [page:Textures THREE.CubeRefractionMapping] and [page:Textures THREE.EquirectangularRefractionMapping].
-			The refraction ratio should not exceed 1. Default is *0.98*.
-		</p>
-
 		<h3>[property:Float roughness]</h3>
 		<p>
 			How rough the material appears. 0.0 means a smooth mirror reflection, 1.0 means fully diffuse. Default is 1.0.
@@ -234,7 +233,7 @@
 		<p>The green channel of this texture is used to alter the roughness of the material.</p>
 
 		<h3>[property:Boolean wireframe]</h3>
-		<p>Render geometry as wireframe. Default is *false* (i.e. render as flat polygons).</p>
+		<p>Render geometry as wireframe. Default is `false` (i.e. render as flat polygons).</p>
 
 		<h3>[property:String wireframeLinecap]</h3>
 		<p>

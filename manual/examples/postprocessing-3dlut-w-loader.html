@@ -19,16 +19,26 @@
   <body>
     <canvas id="c"></canvas>
   </body>
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
 <script type="module">
+import * as THREE from 'three';
 import * as lutParser from './resources/lut-reader.js';
 import * as dragAndDrop from './resources/drag-and-drop.js';
-import * as THREE from '../../build/three.module.js';
-import {OrbitControls} from '../../examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from '../../examples/jsm/loaders/GLTFLoader.js';
-import {EffectComposer} from '../../examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from '../../examples/jsm/postprocessing/RenderPass.js';
-import {ShaderPass} from '../../examples/jsm/postprocessing/ShaderPass.js';
-import {GUI} from '../../examples/jsm/libs/lil-gui.module.min.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
+import {GammaCorrectionShader} from 'three/addons/shaders/GammaCorrectionShader.js';
+import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -88,9 +98,8 @@ function main() {
     ]);
 
     return function(filter) {
-      const texture = new THREE.DataTexture(identityLUT, 4, 2, THREE.RGBAFormat);
-      texture.minFilter = filter;
-      texture.magFilter = filter;
+      const texture = new THREE.DataTexture(identityLUT, 4, 2);
+      texture.minFilter = texture.magFilter = filter ? THREE.LinearFilter : THREE.NearestFilter;
       texture.needsUpdate = true;
       texture.flipY = false;
       return texture;
@@ -102,21 +111,16 @@ function main() {
     const ctx = document.createElement('canvas').getContext('2d');
 
     return function(info) {
-      const texture = makeIdentityLutTexture(
-          info.filter ? THREE.LinearFilter : THREE.NearestFilter);
+      const lutSize = info.size;
+      const width = lutSize * lutSize;
+      const height = lutSize;
+      const texture = new THREE.DataTexture(new Uint8Array(width * height), width, height);
+      texture.minFilter = texture.magFilter = info.filter ? THREE.LinearFilter : THREE.NearestFilter;
+      texture.flipY = false;
 
       if (info.url) {
-        const lutSize = info.size;
-
-        // set the size to 2 (the identity size). We'll restore it when the
-        // image has loaded. This way the code using the lut doesn't have to
-        // care if the image has loaded or not
-        info.size = 2;
 
         imgLoader.load(info.url, function(image) {
-          const width = lutSize * lutSize;
-          const height = lutSize;
-          info.size = lutSize;
           ctx.canvas.width = width;
           ctx.canvas.height = height;
           ctx.drawImage(image, 0, 0);
@@ -148,36 +152,22 @@ function main() {
         info.size = parseInt(m[1]);
         info.filter = info.filter === undefined ? m[2] !== 'n' : info.filter;
       }
+      info.texture = makeLUTTexture(info);
+    } else {
+      info.texture = makeIdentityLutTexture(info.filter);
     }
-
-    info.texture = makeLUTTexture(info);
   });
 
-  let lutNameIndexMap = {};
-  function makeLutNameIndexMap() {
-    lutNameIndexMap = {};
-    lutTextures.forEach((info, ndx) => {
-      lutNameIndexMap[info.name] = ndx;
-    });
-  }
-  makeLutNameIndexMap();  // called so we can set lutSettings below
+  const lutNameIndexMap = {};
+  lutTextures.forEach((info, ndx) => {
+    lutNameIndexMap[info.name] = ndx;
+  });
 
   const lutSettings = {
-    dummy: () => {},
-    lut: lutNameIndexMap.thermal,
+    lut: lutNameIndexMap.custom,
   };
   const gui = new GUI({ width: 300 });
-  gui.addFolder('Choose LUT or Drag&Drop LUT File(s)');
-
-  let lutGUI;
-  function updateGUI() {
-    makeLutNameIndexMap();
-    if (lutGUI) {
-      gui.remove(lutGUI);
-    }
-    lutGUI = gui.add(lutSettings, 'lut', lutNameIndexMap);
-  }
-  updateGUI();
+  gui.add(lutSettings, 'lut', lutNameIndexMap);
 
   const scene = new THREE.Scene();
 
@@ -189,6 +179,7 @@ function main() {
   {
     const loader = new THREE.TextureLoader();
     bgTexture = loader.load('resources/images/beach.jpg');
+    bgTexture.encoding = THREE.sRGBEncoding;
     const planeGeo = new THREE.PlaneGeometry(2, 2);
     const planeMat = new THREE.MeshBasicMaterial({
       map: bgTexture,
@@ -317,25 +308,20 @@ function main() {
   };
 
   const effectLUT = new ShaderPass(lutShader);
-  effectLUT.renderToScreen = true;
   const effectLUTNearest = new ShaderPass(lutNearestShader);
-  effectLUTNearest.renderToScreen = true;
 
   const renderModel = new RenderPass(scene, camera);
   renderModel.clear = false;  // so we don't clear out the background
   const renderBG = new RenderPass(sceneBG, cameraBG);
+  const gammaPass = new ShaderPass(GammaCorrectionShader);
 
-  const rtParameters = {
-    minFilter: THREE.LinearFilter,
-    magFilter: THREE.LinearFilter,
-    format: THREE.RGBFormat,
-  };
-  const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
+  const composer = new EffectComposer(renderer);
 
   composer.addPass(renderBG);
   composer.addPass(renderModel);
   composer.addPass(effectLUT);
   composer.addPass(effectLUTNearest);
+  composer.addPass(gammaPass);
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -393,16 +379,16 @@ function main() {
 
   function ext(s) {
     const period = s.lastIndexOf('.');
-    return s.substr(period + 1);
+    return s.slice(period + 1);
   }
 
   function readLUTFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
       const type = ext(file.name);
-      const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
+      const lut = lutParser.lutTo2D3Drgba8(lutParser.parse(e.target.result, type));
       const {size, data, name} = lut;
-      const texture = new THREE.DataTexture(data, size * size, size, THREE.RGBFormat);
+      const texture = new THREE.DataTexture(data, size * size, size);
       texture.magFilter = THREE.LinearFilter;
       texture.minFilter = THREE.LinearFilter;
       texture.needsUpdate = true;
@@ -417,7 +403,6 @@ function main() {
       };
       lutTextures.push(lutTexture);
       lutSettings.lut = lutTextures.length - 1;
-      updateGUI();
 
     };
 

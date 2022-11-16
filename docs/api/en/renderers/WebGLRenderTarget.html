@@ -23,9 +23,9 @@
 		<h3>[name]([param:Number width], [param:Number height], [param:Object options])</h3>
 
 		<p>
-		[page:Float width] - The width of the renderTarget. <br />
-		[page:Float height] - The height of the renderTarget.<br />
-		options - (optional object that holds texture parameters for an auto-generated target
+		[page:Float width] - The width of the renderTarget. Default is `1`.<br />
+		[page:Float height] - The height of the renderTarget. Default is `1`.<br />
+		options - optional object that holds texture parameters for an auto-generated target
 		texture and depthBuffer/stencilBuffer booleans.
 
 		For an explanation of the texture parameters see [page:Texture Texture]. The following are
@@ -35,18 +35,24 @@
 		[page:Constant wrapT] - default is [page:Textures ClampToEdgeWrapping]. <br />
 		[page:Constant magFilter] - default is [page:Textures LinearFilter]. <br />
 		[page:Constant minFilter] - default is [page:Textures LinearFilter]. <br />
-		[page:Boolean generateMipmaps] - default is *false*.<br />
+		[page:Boolean generateMipmaps] - default is `false`.<br />
 		[page:Constant format] - default is [page:Textures RGBAFormat]. <br />
 		[page:Constant type] - default is [page:Textures UnsignedByteType]. <br />
-		[page:Number anisotropy] - default is *1*. See [page:Texture.anisotropy]<br />
+		[page:Number anisotropy] - default is `1`. See [page:Texture.anisotropy]<br />
 		[page:Constant encoding] - default is [page:Textures LinearEncoding]. <br />
-		[page:Boolean depthBuffer] - default is *true*. <br />
-		[page:Boolean stencilBuffer] - default is *false*.<br /><br />
+		[page:Boolean depthBuffer] - default is `true`. <br />
+		[page:Boolean stencilBuffer] - default is `false`.<br />
+		[page:Number samples] - default is 0.<br /><br />
 
 		Creates a new [name]
 		</p>
 
 		<h2>Properties</h2>
+
+		<h3>[property:Boolean isWebGLRenderTarget]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:number width]</h3>
 		<p>
@@ -93,6 +99,10 @@
 		If set, the scene depth will be rendered to this texture. Default is null.
 		</p>
 
+		<h3>[property:Number samples]</h3>
+		<p>
+		Defines the count of MSAA samples. Can only be used with WebGL 2. Default is `0`.
+		</p>
 
 		<h2>Methods</h2>
 
@@ -113,14 +123,10 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Dispatches a dispose event.
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
-
-
-
-
-		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+		<p>[page:EventDispatcher EventDispatcher] methods are available on this class.</p>
 
 		<h2>Source</h2>
 

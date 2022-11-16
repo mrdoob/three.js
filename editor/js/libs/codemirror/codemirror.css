@@ -60,19 +60,13 @@
 .cm-fat-cursor div.CodeMirror-cursors {
   z-index: 1;
 }
-.cm-fat-cursor-mark {
-  background-color: rgba(20, 255, 20, 0.5);
-  -webkit-animation: blink 1.06s steps(1) infinite;
-  -moz-animation: blink 1.06s steps(1) infinite;
-  animation: blink 1.06s steps(1) infinite;
-}
-.cm-animate-fat-cursor {
-  width: auto;
-  -webkit-animation: blink 1.06s steps(1) infinite;
-  -moz-animation: blink 1.06s steps(1) infinite;
-  animation: blink 1.06s steps(1) infinite;
-  background-color: #7e7;
-}
+.cm-fat-cursor .CodeMirror-line::selection,
+.cm-fat-cursor .CodeMirror-line > span::selection, 
+.cm-fat-cursor .CodeMirror-line > span > span::selection { background: transparent; }
+.cm-fat-cursor .CodeMirror-line::-moz-selection,
+.cm-fat-cursor .CodeMirror-line > span::-moz-selection,
+.cm-fat-cursor .CodeMirror-line > span > span::-moz-selection { background: transparent; }
+.cm-fat-cursor { caret-color: transparent; }
 @-moz-keyframes blink {
   0% {}
   50% { background-color: transparent; }
@@ -170,6 +164,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
   height: 100%;
   outline: none; /* Prevent dragging from highlighting the element */
   position: relative;
+  z-index: 0;
 }
 .CodeMirror-sizer {
   position: relative;

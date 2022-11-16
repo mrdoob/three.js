@@ -23,7 +23,7 @@ class WebGPUAttributes {
 
 		if ( data ) {
 
-			data.buffer.destroy();
+			this._destroyBuffers( data );
 
 			this.buffers.delete( attribute );
 
@@ -51,7 +51,7 @@ class WebGPUAttributes {
 
 		} else if ( usage && usage !== data.usage ) {
 
-			data.buffer.destroy();
+			this._destroyBuffers( data );
 
 			data = this._createBuffer( attribute, usage );
 
@@ -67,15 +67,62 @@ class WebGPUAttributes {
 
 	}
 
+	async getArrayBuffer( attribute ) {
+
+		const data = this.get( attribute );
+		const device = this.device;
+
+		const gpuBuffer = data.buffer;
+		const size = gpuBuffer.size;
+
+		let gpuReadBuffer = data.readBuffer;
+		let needsUnmap = true;
+
+		if ( gpuReadBuffer === null ) {
+
+			gpuReadBuffer = device.createBuffer( {
+				size,
+				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+			} );
+
+			needsUnmap = false;
+
+			data.readBuffer = gpuReadBuffer;
+
+		}
+
+		const cmdEncoder = device.createCommandEncoder( {} );
+
+		cmdEncoder.copyBufferToBuffer(
+			gpuBuffer,
+			0,
+			gpuReadBuffer,
+			0,
+			size
+		);
+
+		if ( needsUnmap ) gpuReadBuffer.unmap();
+
+		const gpuCommands = cmdEncoder.finish();
+		device.queue.submit( [ gpuCommands ] );
+
+		await gpuReadBuffer.mapAsync( GPUMapMode.READ );
+
+		const arrayBuffer = gpuReadBuffer.getMappedRange();
+
+		return new Float32Array( arrayBuffer );
+
+	}
+
 	_createBuffer( attribute, usage ) {
 
 		const array = attribute.array;
 		const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
 		const buffer = this.device.createBuffer( {
-			size: size,
-			usage: usage | GPUBufferUsage.COPY_DST,
-			mappedAtCreation: true,
+			size,
+			usage: usage | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
+			mappedAtCreation: true
 		} );
 
 		new array.constructor( buffer.getMappedRange() ).set( array );
@@ -86,13 +133,16 @@ class WebGPUAttributes {
 
 		return {
 			version: attribute.version,
-			buffer: buffer,
-			usage: usage
+			buffer,
+			readBuffer: null,
+			usage
 		};
 
 	}
 
 	_writeBuffer( buffer, attribute ) {
+
+		const device = this.device;
 
 		const array = attribute.array;
 		const updateRange = attribute.updateRange;
@@ -101,7 +151,7 @@ class WebGPUAttributes {
 
 			// Not using update ranges
 
-			this.device.queue.writeBuffer(
+			device.queue.writeBuffer(
 				buffer,
 				0,
 				array,
@@ -110,7 +160,7 @@ class WebGPUAttributes {
 
 		} else {
 
-			this.device.queue.writeBuffer(
+			device.queue.writeBuffer(
 				buffer,
 				0,
 				array,
@@ -121,6 +171,14 @@ class WebGPUAttributes {
 			updateRange.count = - 1; // reset range
 
 		}
+
+	}
+
+	_destroyBuffers( { buffer, readBuffer } ) {
+
+		buffer.destroy();
+
+		if ( readBuffer !== null ) readBuffer.destroy();
 
 	}
 

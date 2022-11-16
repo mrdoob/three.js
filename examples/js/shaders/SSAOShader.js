@@ -53,9 +53,7 @@
 				value: 0.05
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -66,9 +64,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tNormal;
@@ -155,7 +151,7 @@
 			vec3 viewNormal = getViewNormal( vUv );
 
 			vec2 noiseScale = vec2( resolution.x / 4.0, resolution.y / 4.0 );
-			vec3 random = texture2D( tNoise, vUv * noiseScale ).xyz;
+			vec3 random = vec3( texture2D( tNoise, vUv * noiseScale ).r );
 
 			// compute matrix used to reorient a kernel vector
 

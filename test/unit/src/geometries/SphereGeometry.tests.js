@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { SphereGeometry, SphereBufferGeometry } from '../../../../src/geometries/SphereGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { SphereGeometry } from '../../../../src/geometries/SphereGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -29,22 +29,21 @@ export default QUnit.module( 'Geometries', () => {
 				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength ),
 				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart ),
 				new SphereGeometry( parameters.radius, parameters.widthSegments, parameters.heightSegments, parameters.phiStart, parameters.phiLength, parameters.thetaStart, parameters.thetaLength ),
-				new SphereBufferGeometry()
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

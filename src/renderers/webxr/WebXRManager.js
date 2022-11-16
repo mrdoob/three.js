@@ -7,14 +7,12 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { WebGLMultisampleRenderTarget } from '../WebGLMultisampleRenderTarget.js';
 import {
 	DepthFormat,
 	DepthStencilFormat,
 	RGBAFormat,
-	RGBFormat,
 	UnsignedByteType,
-	UnsignedShortType,
+	UnsignedIntType,
 	UnsignedInt248Type,
 } from '../../constants.js';
 
@@ -28,23 +26,26 @@ class WebXRManager extends EventDispatcher {
 
 		let session = null;
 		let framebufferScaleFactor = 1.0;
+		let limitWithNativeFramebufferScaleFactor = false;
 
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
-		const hasMultisampledRenderToTexture = renderer.extensions.has( 'WEBGL_multisampled_render_to_texture' );
+		let customReferenceSpace = null;
 
 		let pose = null;
 		let glBinding = null;
 		let glProjLayer = null;
 		let glBaseLayer = null;
-		let isMultisample = false;
 		let xrFrame = null;
 		const attributes = gl.getContextAttributes();
 		let initialRenderTarget = null;
 		let newRenderTarget = null;
 
 		const controllers = [];
-		const inputSourcesMap = new Map();
+		const controllerInputSources = [];
+
+		const planes = new Set();
+		const planesLastChangedTimes = new Map();
 
 		//
 
@@ -121,9 +122,17 @@ class WebXRManager extends EventDispatcher {
 
 		function onSessionEvent( event ) {
 
-			const controller = inputSourcesMap.get( event.inputSource );
+			const controllerIndex = controllerInputSources.indexOf( event.inputSource );
 
-			if ( controller ) {
+			if ( controllerIndex === - 1 ) {
+
+				return;
+
+			}
+
+			const controller = controllers[ controllerIndex ];
+
+			if ( controller !== undefined ) {
 
 				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
@@ -133,13 +142,26 @@ class WebXRManager extends EventDispatcher {
 
 		function onSessionEnd() {
 
-			inputSourcesMap.forEach( function ( controller, inputSource ) {
+			session.removeEventListener( 'select', onSessionEvent );
+			session.removeEventListener( 'selectstart', onSessionEvent );
+			session.removeEventListener( 'selectend', onSessionEvent );
+			session.removeEventListener( 'squeeze', onSessionEvent );
+			session.removeEventListener( 'squeezestart', onSessionEvent );
+			session.removeEventListener( 'squeezeend', onSessionEvent );
+			session.removeEventListener( 'end', onSessionEnd );
+			session.removeEventListener( 'inputsourceschange', onInputSourcesChange );
 
-				controller.disconnect( inputSource );
+			for ( let i = 0; i < controllers.length; i ++ ) {
 
-			} );
+				const inputSource = controllerInputSources[ i ];
 
-			inputSourcesMap.clear();
+				if ( inputSource === null ) continue;
+
+				controllerInputSources[ i ] = null;
+
+				controllers[ i ].disconnect( inputSource );
+
+			}
 
 			_currentDepthNear = null;
 			_currentDepthFar = null;
@@ -164,9 +186,10 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.setFramebufferScaleFactor = function ( value ) {
+		this.setFramebufferScaleFactor = function ( value, limited = false ) {
 
 			framebufferScaleFactor = value;
+			limitWithNativeFramebufferScaleFactor = limited;
 
 			if ( scope.isPresenting === true ) {
 
@@ -190,7 +213,13 @@ class WebXRManager extends EventDispatcher {
 
 		this.getReferenceSpace = function () {
 
-			return referenceSpace;
+			return customReferenceSpace || referenceSpace;
+
+		};
+
+		this.setReferenceSpace = function ( space ) {
+
+			customReferenceSpace = space;
 
 		};
 
@@ -241,6 +270,18 @@ class WebXRManager extends EventDispatcher {
 
 				}
 
+				if ( limitWithNativeFramebufferScaleFactor === true && XRWebGLLayer.getNativeFramebufferScaleFactor ) {
+
+					const nativeFramebufferScaleFactor = XRWebGLLayer.getNativeFramebufferScaleFactor( session );
+
+					if ( nativeFramebufferScaleFactor < framebufferScaleFactor ) {
+
+						framebufferScaleFactor = nativeFramebufferScaleFactor;
+
+					}
+
+				}
+
 				if ( ( session.renderState.layers === undefined ) || ( renderer.capabilities.isWebGL2 === false ) ) {
 
 					const layerInit = {
@@ -257,12 +298,17 @@ class WebXRManager extends EventDispatcher {
 
 					newRenderTarget = new WebGLRenderTarget(
 						glBaseLayer.framebufferWidth,
-						glBaseLayer.framebufferHeight
+						glBaseLayer.framebufferHeight,
+						{
+							format: RGBAFormat,
+							type: UnsignedByteType,
+							encoding: renderer.outputEncoding,
+							stencilBuffer: attributes.stencil
+						}
 					);
 
 				} else {
 
-					isMultisample = attributes.antialias;
 					let depthFormat = null;
 					let depthType = null;
 					let glDepthFormat = null;
@@ -271,12 +317,12 @@ class WebXRManager extends EventDispatcher {
 
 						glDepthFormat = attributes.stencil ? gl.DEPTH24_STENCIL8 : gl.DEPTH_COMPONENT24;
 						depthFormat = attributes.stencil ? DepthStencilFormat : DepthFormat;
-						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedShortType;
+						depthType = attributes.stencil ? UnsignedInt248Type : UnsignedIntType;
 
 					}
 
 					const projectionlayerInit = {
-						colorFormat: ( attributes.alpha || isMultisample ) ? gl.RGBA8 : gl.RGB8,
+						colorFormat: gl.RGBA8,
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
@@ -287,42 +333,29 @@ class WebXRManager extends EventDispatcher {
 
 					session.updateRenderState( { layers: [ glProjLayer ] } );
 
-					if ( isMultisample ) {
+					newRenderTarget = new WebGLRenderTarget(
+						glProjLayer.textureWidth,
+						glProjLayer.textureHeight,
+						{
+							format: RGBAFormat,
+							type: UnsignedByteType,
+							depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
+							stencilBuffer: attributes.stencil,
+							encoding: renderer.outputEncoding,
+							samples: attributes.antialias ? 4 : 0
+						} );
 
-						newRenderTarget = new WebGLMultisampleRenderTarget(
-							glProjLayer.textureWidth,
-							glProjLayer.textureHeight,
-							{
-								format: RGBAFormat,
-								type: UnsignedByteType,
-								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
-								stencilBuffer: attributes.stencil,
-								ignoreDepth: glProjLayer.ignoreDepthValues,
-								useRenderToTexture: hasMultisampledRenderToTexture,
-								encoding: renderer.outputEncoding
-							} );
-
-					} else {
-
-						newRenderTarget = new WebGLRenderTarget(
-							glProjLayer.textureWidth,
-							glProjLayer.textureHeight,
-							{
-								format: attributes.alpha ? RGBAFormat : RGBFormat,
-								type: UnsignedByteType,
-								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
-								stencilBuffer: attributes.stencil,
-								ignoreDepth: glProjLayer.ignoreDepthValues,
-								encoding: renderer.outputEncoding
-							} );
-
-					}
+					const renderTargetProperties = renderer.properties.get( newRenderTarget );
+					renderTargetProperties.__ignoreDepthValues = glProjLayer.ignoreDepthValues;
 
 				}
+
+				newRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
 
 				// Set foveation to maximum.
 				this.setFoveation( 1.0 );
 
+				customReferenceSpace = null;
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
 
 				animation.setContext( session );
@@ -338,27 +371,17 @@ class WebXRManager extends EventDispatcher {
 
 		function onInputSourcesChange( event ) {
 
-			const inputSources = session.inputSources;
-
-			// Assign inputSources to available controllers
-
-			for ( let i = 0; i < controllers.length; i ++ ) {
-
-				inputSourcesMap.set( inputSources[ i ], controllers[ i ] );
-
-			}
-
 			// Notify disconnected
 
 			for ( let i = 0; i < event.removed.length; i ++ ) {
 
 				const inputSource = event.removed[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+				const index = controllerInputSources.indexOf( inputSource );
 
-				if ( controller ) {
+				if ( index >= 0 ) {
 
-					controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
-					inputSourcesMap.delete( inputSource );
+					controllerInputSources[ index ] = null;
+					controllers[ index ].disconnect( inputSource );
 
 				}
 
@@ -369,11 +392,42 @@ class WebXRManager extends EventDispatcher {
 			for ( let i = 0; i < event.added.length; i ++ ) {
 
 				const inputSource = event.added[ i ];
-				const controller = inputSourcesMap.get( inputSource );
+
+				let controllerIndex = controllerInputSources.indexOf( inputSource );
+
+				if ( controllerIndex === - 1 ) {
+
+					// Assign input source a controller that currently has no input source
+
+					for ( let i = 0; i < controllers.length; i ++ ) {
+
+						if ( i >= controllerInputSources.length ) {
+
+							controllerInputSources.push( inputSource );
+							controllerIndex = i;
+							break;
+
+						} else if ( controllerInputSources[ i ] === null ) {
+
+							controllerInputSources[ i ] = inputSource;
+							controllerIndex = i;
+							break;
+
+						}
+
+					}
+
+					// If all controllers do currently receive input we ignore new ones
+
+					if ( controllerIndex === - 1 ) break;
+
+				}
+
+				const controller = controllers[ controllerIndex ];
 
 				if ( controller ) {
 
-					controller.dispatchEvent( { type: 'connected', data: inputSource } );
+					controller.connect( inputSource );
 
 				}
 
@@ -493,11 +547,8 @@ class WebXRManager extends EventDispatcher {
 
 			// update user camera and its children
 
-			camera.position.copy( cameraVR.position );
-			camera.quaternion.copy( cameraVR.quaternion );
-			camera.scale.copy( cameraVR.scale );
 			camera.matrix.copy( cameraVR.matrix );
-			camera.matrixWorld.copy( cameraVR.matrixWorld );
+			camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 
 			const children = camera.children;
 
@@ -566,13 +617,19 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getPlanes = function () {
+
+			return planes;
+
+		};
+
 		// Animation Loop
 
 		let onAnimationFrameCallback = null;
 
 		function onAnimationFrame( time, frame ) {
 
-			pose = frame.getViewerPose( referenceSpace );
+			pose = frame.getViewerPose( customReferenceSpace || referenceSpace );
 			xrFrame = frame;
 
 			if ( pose !== null ) {
@@ -626,7 +683,16 @@ class WebXRManager extends EventDispatcher {
 
 					}
 
-					const camera = cameras[ i ];
+					let camera = cameras[ i ];
+
+					if ( camera === undefined ) {
+
+						camera = new PerspectiveCamera();
+						camera.layers.enable( i );
+						camera.viewport = new Vector4();
+						cameras[ i ] = camera;
+
+					}
 
 					camera.matrix.fromArray( view.transform.matrix );
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
@@ -650,18 +716,79 @@ class WebXRManager extends EventDispatcher {
 
 			//
 
-			const inputSources = session.inputSources;
-
 			for ( let i = 0; i < controllers.length; i ++ ) {
 
+				const inputSource = controllerInputSources[ i ];
 				const controller = controllers[ i ];
-				const inputSource = inputSources[ i ];
 
-				controller.update( inputSource, frame, referenceSpace );
+				if ( inputSource !== null && controller !== undefined ) {
+
+					controller.update( inputSource, frame, customReferenceSpace || referenceSpace );
+
+				}
 
 			}
 
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
+
+			if ( frame.detectedPlanes ) {
+
+				scope.dispatchEvent( { type: 'planesdetected', data: frame.detectedPlanes } );
+
+				let planesToRemove = null;
+
+				for ( const plane of planes ) {
+
+					if ( ! frame.detectedPlanes.has( plane ) ) {
+
+						if ( planesToRemove === null ) {
+
+							planesToRemove = [];
+
+						}
+
+						planesToRemove.push( plane );
+
+					}
+
+				}
+
+				if ( planesToRemove !== null ) {
+
+					for ( const plane of planesToRemove ) {
+
+						planes.delete( plane );
+						planesLastChangedTimes.delete( plane );
+						scope.dispatchEvent( { type: 'planeremoved', data: plane } );
+
+					}
+
+				}
+
+				for ( const plane of frame.detectedPlanes ) {
+
+					if ( ! planes.has( plane ) ) {
+
+						planes.add( plane );
+						planesLastChangedTimes.set( plane, frame.lastChangedTime );
+						scope.dispatchEvent( { type: 'planeadded', data: plane } );
+
+					} else {
+
+						const lastKnownTime = planesLastChangedTimes.get( plane );
+
+						if ( plane.lastChangedTime > lastKnownTime ) {
+
+							planesLastChangedTimes.set( plane, plane.lastChangedTime );
+							scope.dispatchEvent( { type: 'planechanged', data: plane } );
+
+						}
+
+					}
+
+				}
+
+			}
 
 			xrFrame = null;
 

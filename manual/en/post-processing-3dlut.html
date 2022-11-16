@@ -11,6 +11,17 @@
 
     <link rel="stylesheet" href="/manual/resources/lesson.css">
     <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
   </head>
   <body>
     <div class="container">
@@ -155,9 +166,7 @@ const lutNearestShader = {
 <p>To generate the second shader we comment out that line.</p>
 <p>Then we use them to make 2 custom effects</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const effectLUT = new THREE.ShaderPass(lutShader);
-effectLUT.renderToScreen = true;
 const effectLUTNearest = new THREE.ShaderPass(lutNearestShader);
-effectLUTNearest.renderToScreen = true;
 </pre>
 <p>Translating our existing code that draws the background as a separate scene we a <code class="notranslate" translate="no">RenderPass</code> for both the scene drawing the glTF and the scene drawing the background.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderModel = new THREE.RenderPass(scene, camera);
@@ -165,17 +174,14 @@ renderModel.clear = false;  // so we don't clear out the background
 const renderBG = new THREE.RenderPass(sceneBG, cameraBG);
 </pre>
 <p>and we can setup our <code class="notranslate" translate="no">EffectComposer</code> to use all the passes</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtParameters = {
-  minFilter: THREE.LinearFilter,
-  magFilter: THREE.LinearFilter,
-  format: THREE.RGBFormat,
-};
-const composer = new THREE.EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, rtParameters));
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const composer = new THREE.EffectComposer(renderer);
 
 composer.addPass(renderBG);
 composer.addPass(renderModel);
 composer.addPass(effectLUT);
 composer.addPass(effectLUTNearest);
+composer.addPass(effectLUTNearest);
+composer.addPass(gammaPass);
 </pre>
 <p>Let's make some GUI code to select one lut or the other</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lutNameIndexMap = {};
@@ -277,21 +283,16 @@ separately and then copying and pasting it into the screen capture worked.</p>
   const ctx = document.createElement('canvas').getContext('2d');
 
   return function(info) {
-    const texture = makeIdentityLutTexture(
-        info.filter ? THREE.LinearFilter : THREE.NearestFilter);
+    const lutSize = info.size;
+    const width = lutSize * lutSize;
+    const height = lutSize;
+    const texture = new THREE.DataTexture(new Uint8Array(width * height), width, height);
+    texture.minFilter = texture.magFilter = info.filter ? THREE.LinearFilter : THREE.NearestFilter;
+    texture.flipY = false;
 
     if (info.url) {
-      const lutSize = info.size;
-
-      // set the size to 2 (the identity size). We'll restore it when the
-      // image has loaded. This way the code using the lut doesn't have to
-      // care if the image has loaded or not
-      info.size = 2;
 
       imgLoader.load(info.url, function(image) {
-        const width = lutSize * lutSize;
-        const height = lutSize;
-        info.size = lutSize;
         ctx.canvas.width = width;
         ctx.canvas.height = height;
         ctx.drawImage(image, 0, 0);
@@ -387,16 +388,16 @@ dragAndDrop.onDropFile(readLUTFile);
 
 function ext(s) {
   const period = s.lastIndexOf('.');
-  return s.substr(period + 1);
+  return s.slice(period + 1);
 }
 
 function readLUTFile(file) {
   const reader = new FileReader();
   reader.onload = (e) =&gt; {
     const type = ext(file.name);
-    const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
+    const lut = lutParser.lutTo2D3Drgba8(lutParser.parse(e.target.result, type));
     const {size, data, name} = lut;
-    const texture = new THREE.DataTexture(data, size * size, size, THREE.RGBFormat);
+    const texture = new THREE.DataTexture(data, size * size, size);
     texture.minFilter = THREE.LinearFilter;
     texture.needsUpdate = true;
     texture.flipY = false;
@@ -415,23 +416,6 @@ function readLUTFile(file) {
 
   reader.readAsText(file);
 }
-</pre>
-<p>and we need to make the GUI update to include the new file(s)</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lutSettings = {
-  lut: lutNameIndexMap.thermal,
-};
-const gui = new GUI({ width: 300 });
-gui.addFolder('Choose LUT or Drag&amp;Drop LUT File(s)');
-
-let lutGUI;
-function updateGUI() {
-  makeLutNameIndexMap();
-  if (lutGUI) {
-    gui.remove(lutGUI);
-  }
-  lutGUI = gui.add(lutSettings, 'lut', lutNameIndexMap);
-}
-updateGUI();
 </pre>
 <p>so you should be able to <a href="https://www.google.com/search?q=lut+files">download an Adobe LUT</a> and then drag and drop it on the example below.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -455,7 +439,7 @@ updateGUI();
         </div>
       </div>
     </div>
-  
+
   <script src="/manual/resources/prettify.js"></script>
   <script src="/manual/resources/lesson.js"></script>
 

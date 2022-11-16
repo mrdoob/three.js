@@ -33,17 +33,16 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( str ) {
 
 			// remove empty lines and comment lints
 			str = str.replace( /^#.*?(\n|\r)/gm, '' ).replace( /^\s*?(\n|\r)/gm, '' ).trim();
-			const lines = str.split( /[\n\r]+/g ); // first line is the positions on the grid that are provided by the LUT
+			const lines = str.split( /[\n\r]+/g );
 
+			// first line is the positions on the grid that are provided by the LUT
 			const gridLines = lines[ 0 ].trim().split( /\s+/g ).map( e => parseFloat( e ) );
 			const gridStep = gridLines[ 1 ] - gridLines[ 0 ];
 			const size = gridLines.length;
-
 			for ( let i = 1, l = gridLines.length; i < l; i ++ ) {
 
 				if ( gridStep !== gridLines[ i ] - gridLines[ i - 1 ] ) {
@@ -54,10 +53,9 @@
 
 			}
 
-			const dataArray = new Array( size * size * size * 3 );
+			const dataArray = new Array( size * size * size * 4 );
 			let index = 0;
 			let maxOutputValue = 0.0;
-
 			for ( let i = 1, l = lines.length; i < l; i ++ ) {
 
 				const line = lines[ i ].trim();
@@ -68,25 +66,30 @@
 				maxOutputValue = Math.max( maxOutputValue, r, g, b );
 				const bLayer = index % size;
 				const gLayer = Math.floor( index / size ) % size;
-				const rLayer = Math.floor( index / ( size * size ) ) % size; // b grows first, then g, then r
+				const rLayer = Math.floor( index / ( size * size ) ) % size;
 
+				// b grows first, then g, then r
 				const pixelIndex = bLayer * size * size + gLayer * size + rLayer;
-				dataArray[ 3 * pixelIndex + 0 ] = r;
-				dataArray[ 3 * pixelIndex + 1 ] = g;
-				dataArray[ 3 * pixelIndex + 2 ] = b;
+				dataArray[ 4 * pixelIndex + 0 ] = r;
+				dataArray[ 4 * pixelIndex + 1 ] = g;
+				dataArray[ 4 * pixelIndex + 2 ] = b;
+				dataArray[ 4 * pixelIndex + 3 ] = 1.0;
 				index += 1;
 
-			} // Find the apparent bit depth of the stored RGB values and scale the
+			}
+
+			// Find the apparent bit depth of the stored RGB values and map the
 			// values to [ 0, 255 ].
-
-
 			const bits = Math.ceil( Math.log2( maxOutputValue ) );
 			const maxBitValue = Math.pow( 2.0, bits );
+			for ( let i = 0, l = dataArray.length; i < l; i += 4 ) {
 
-			for ( let i = 0, l = dataArray.length; i < l; i ++ ) {
-
-				const val = dataArray[ i ];
-				dataArray[ i ] = 255 * val / maxBitValue;
+				const r = dataArray[ i + 0 ];
+				const g = dataArray[ i + 1 ];
+				const b = dataArray[ i + 2 ];
+				dataArray[ i + 0 ] = 255 * r / maxBitValue; // r
+				dataArray[ i + 1 ] = 255 * g / maxBitValue; // g
+				dataArray[ i + 2 ] = 255 * b / maxBitValue; // b
 
 			}
 
@@ -95,19 +98,20 @@
 			texture.image.data = data;
 			texture.image.width = size;
 			texture.image.height = size * size;
-			texture.format = THREE.RGBFormat;
+			texture.format = THREE.RGBAFormat;
 			texture.type = THREE.UnsignedByteType;
 			texture.magFilter = THREE.LinearFilter;
 			texture.minFilter = THREE.LinearFilter;
 			texture.wrapS = THREE.ClampToEdgeWrapping;
 			texture.wrapT = THREE.ClampToEdgeWrapping;
 			texture.generateMipmaps = false;
-			const texture3D = new THREE.DataTexture3D();
+			texture.needsUpdate = true;
+			const texture3D = new THREE.Data3DTexture();
 			texture3D.image.data = data;
 			texture3D.image.width = size;
 			texture3D.image.height = size;
 			texture3D.image.depth = size;
-			texture3D.format = THREE.RGBFormat;
+			texture3D.format = THREE.RGBAFormat;
 			texture3D.type = THREE.UnsignedByteType;
 			texture3D.magFilter = THREE.LinearFilter;
 			texture3D.minFilter = THREE.LinearFilter;
@@ -115,6 +119,7 @@
 			texture3D.wrapT = THREE.ClampToEdgeWrapping;
 			texture3D.wrapR = THREE.ClampToEdgeWrapping;
 			texture3D.generateMipmaps = false;
+			texture3D.needsUpdate = true;
 			return {
 				size,
 				texture,

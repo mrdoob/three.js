@@ -6,7 +6,7 @@
  * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
  *
  * First implemented by Simon Wallner
- * http://www.simonwallner.at/projects/atmospheric-scattering
+ * http://simonwallner.at/project/atmospheric-scattering/
  *
  * Improved by Martin Upitis
  * http://blenderartists.org/forum/showthread.php?245954-preethams-sky-impementation-HDR
@@ -28,12 +28,11 @@
 				depthWrite: false
 			} );
 			super( new THREE.BoxGeometry( 1, 1, 1 ), material );
+			this.isSky = true;
 
 		}
 
 	}
-
-	Sky.prototype.isSky = true;
 	Sky.SkyShader = {
 		uniforms: {
 			'turbidity': {
@@ -55,9 +54,7 @@
 				value: new THREE.Vector3( 0, 1, 0 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 		uniform vec3 sunPosition;
 		uniform float rayleigh;
 		uniform float turbidity;
@@ -128,9 +125,7 @@
 			vBetaM = totalMie( turbidity ) * mieCoefficient;
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 		varying vec3 vWorldPosition;
 		varying vec3 vSunDirection;
 		varying float vSunfade;

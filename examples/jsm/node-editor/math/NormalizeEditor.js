@@ -1,21 +1,23 @@
-import { ObjectNode, LabelElement } from '../../libs/flow.module.js';
-import { MathNode, Vector3Node } from '../../renderers/nodes/Nodes.js';
+import { LabelElement } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { Vector3 } from 'three';
+import { MathNode, UniformNode } from 'three/nodes';
 
-const DEFAULT_VALUE = new Vector3Node();
+const DEFAULT_VALUE = new UniformNode( new Vector3() );
 
-export class NormalizeEditor extends ObjectNode {
+export class NormalizeEditor extends BaseNode {
 
 	constructor() {
 
 		const node = new MathNode( MathNode.NORMALIZE, DEFAULT_VALUE );
 
-		super( 'Normalize', 3, node, 200 );
+		super( 'Normalize', 3, node, 175 );
 
-		const input = new LabelElement( 'Source' ).setInput( 3 );
+		const input = new LabelElement( 'A' ).setInput( 3 );
 
 		input.onConnect( () => {
 
-			node.aNode = input.linkedExtra || DEFAULT_VALUE;
+			node.aNode = input.getLinkedObject() || DEFAULT_VALUE;
 
 		} );
 

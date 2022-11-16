@@ -1,24 +1,28 @@
-import { ObjectNode, SelectInput, LabelElement } from '../../libs/flow.module.js';
-import { MathNode, FloatNode } from '../../renderers/nodes/Nodes.js';
+import { SelectInput, LabelElement, Element, NumberInput } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { MathNode, UniformNode } from 'three/nodes';
 
-const NULL_VALUE = new FloatNode();
-
-export class LimiterEditor extends ObjectNode {
+export class LimiterEditor extends BaseNode {
 
 	constructor() {
 
-		const node = new MathNode( MathNode.MAX, NULL_VALUE, NULL_VALUE );
+		const NULL_VALUE = new UniformNode( 0 );
 
-		super( 'Limiter', 1, node, 250 );
+		const node = new MathNode( MathNode.MIN, NULL_VALUE, NULL_VALUE );
+
+		super( 'Limiter', 1, node, 175 );
 
 		const methodInput = new SelectInput( [
+			{ name: 'Min', value: MathNode.MIN },
 			{ name: 'Max', value: MathNode.MAX },
-			{ name: 'Min', value: MathNode.MIN }
-		] );
+			// { name: 'Clamp', value: MathNode.CLAMP }
+			{ name: 'Saturate', value: MathNode.SATURATE }
+		], MathNode.MIN );
 
 		methodInput.onChange( ( data ) => {
 
 			node.method = data.getValue();
+			bElement.setVisible( data.getValue() !== MathNode.SATURATE );
 
 			this.invalidate();
 
@@ -27,19 +31,29 @@ export class LimiterEditor extends ObjectNode {
 		const aElement = new LabelElement( 'A' ).setInput( 1 );
 		const bElement = new LabelElement( 'B' ).setInput( 1 );
 
-		aElement.onConnect( () => {
+		aElement.add( new NumberInput().onChange( ( field ) => {
 
-			node.aNode = aElement.linkedExtra || NULL_VALUE;
+			node.aNode.value = field.getValue();
+
+		} ) ).onConnect( ( elmt ) => {
+
+			elmt.setEnabledInputs( ! elmt.getLinkedObject() );
+			node.aNode = elmt.getLinkedObject() || NULL_VALUE;
 
 		} );
 
-		bElement.onConnect( () => {
+		bElement.add( new NumberInput().onChange( ( field ) => {
 
-			node.bNode = bElement.linkedExtra || NULL_VALUE;
+			node.bNode.value = field.getValue();
+
+		} ) ).onConnect( ( elmt ) => {
+
+			elmt.setEnabledInputs( ! elmt.getLinkedObject() );
+			node.bNode = elmt.getLinkedObject() || NULL_VALUE;
 
 		} );
 
-		this.add( new LabelElement( 'Method' ).add( methodInput ) )
+		this.add( new Element().add( methodInput ) )
 			.add( aElement )
 			.add( bElement );
 

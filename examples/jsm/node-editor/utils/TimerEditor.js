@@ -1,13 +1,14 @@
-import { ObjectNode, NumberInput, LabelElement, Element, ButtonInput } from '../../libs/flow.module.js';
-import { TimerNode } from '../../renderers/nodes/Nodes.js';
+import { NumberInput, LabelElement, Element, ButtonInput } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { TimerNode } from 'three/nodes';
 
-export class TimerEditor extends ObjectNode {
+export class TimerEditor extends BaseNode {
 
 	constructor() {
 
 		const node = new TimerNode();
 
-		super( 'Timer', 1, node, 250 );
+		super( 'Timer', 1, node, 200 );
 
 		this.title.setIcon( 'ti ti-clock' );
 
@@ -37,8 +38,8 @@ export class TimerEditor extends ObjectNode {
 
 		} ) ).setSerializable( false );
 
-		this.add( new LabelElement( 'Value' ).add( field ).setSerializable( false ) )
-			.add( new LabelElement( 'Scale' ).add( scaleField ) )
+		this.add( new Element().add( field ).setSerializable( false ) )
+			.add( new LabelElement( 'Speed' ).add( scaleField ) )
 			.add( moreElement );
 
 		// extends node

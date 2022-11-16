@@ -7,7 +7,7 @@ import {
 	BufferGeometry,
 	Float32BufferAttribute,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 class ParametricGeometry extends BufferGeometry {
 
@@ -36,12 +36,6 @@ class ParametricGeometry extends BufferGeometry {
 
 		const p0 = new Vector3(), p1 = new Vector3();
 		const pu = new Vector3(), pv = new Vector3();
-
-		if ( func.length < 3 ) {
-
-			console.error( 'THREE.ParametricGeometry: Function must now modify a Vector3 as third parameter.' );
-
-		}
 
 		// generate vertices, normals and uvs
 

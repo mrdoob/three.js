@@ -13,6 +13,10 @@
 		Class representing a color.
 		</p>
 
+		<p>
+		Iterating through a [name] instance will yield its components (r, g, b) in the corresponding order.
+		</p>
+
 		<h2>Code Examples</h2>
 
 		<p>
@@ -74,6 +78,11 @@ const color7 = new THREE.Color( 1, 0, 0 );
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean isColor]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Float r]</h3>
 		<p>
 		Red channel value between 0 and 1. Default is 1.
@@ -113,18 +122,6 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			Copies the [page:.r r], [page:.g g] and [page:.b b] parameters from [page:Color color] in to this color.
 		</p>
 
-		<h3>[method:this convertGammaToLinear]( [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-		Converts this color from gamma space to linear space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
-		</p>
-
-		<h3>[method:this convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-		Converts this color from linear space to gamma space by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
-		</p>
-
 		<h3>[method:this convertLinearToSRGB]() </h3>
 		<p>
 		Converts this color from linear space to sRGB space.
@@ -135,25 +132,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Converts this color from sRGB space to linear space.
 		</p>
 
-		<h3>[method:this copyGammaToLinear]( [param:Color color], [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Color color] — Color to copy.<br />
-		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-
-		Copies the given color into this color, and then converts this color from gamma space to linear space
-		by taking [page:.r r], [page:.g g] and [page:.b b] to the power of [page:Float gammaFactor].
-		</p>
-
-		<h3>[method:this copyLinearToGamma]( [param:Color color], [param:Float gammaFactor] ) </h3>
-		<p>
-		[page:Color color] — Color to copy.<br />
-		[page:Float gammaFactor] - (optional). Default is *2.0*.<br /><br />
-
-		Copies the given color into this color, and then converts this color from linear space to gamma space
-		by taking [page:.r r], [page:.g g] and [page:.b b] to the power of 1 / [page:Float gammaFactor].
-		</p>
-
-		<h3>[method:this copyLinearToSRGB]( [param:Color color]] ) </h3>
+		<h3>[method:this copyLinearToSRGB]( [param:Color color] ) </h3>
 		<p>
 		[page:Color color] — Color to copy.<br />
 
@@ -186,13 +165,13 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Sets this color's components from the [page:BufferAttribute attribute].
 		</p>
 
-		<h3>[method:Integer getHex]()</h3>
+		<h3>[method:Integer getHex]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>Returns the hexadecimal value of this color.</p>
 
-		<h3>[method:String getHexString]()</h3>
+		<h3>[method:String getHexString]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>Returns the hexadecimal value of this color as a string (for example, 'FFFFFF').</p>
 
-		<h3>[method:Object getHSL]( [param:Object target] )</h3>
+		<h3>[method:Object getHSL]( [param:Object target], [param:string colorSpace] = LinearSRGBColorSpace )</h3>
 		<p>
 			[page:Object target] — the result will be copied into this Object. Adds h, s and l keys to the object (if not already present).<br /><br />
 
@@ -205,24 +184,24 @@ const color7 = new THREE.Color( 1, 0, 0 );
 
 		</p>
 
-		<h3>[method:String getStyle]()</h3>
-		<p>Returns the value of this color as a CSS style string. Example: 'rgb(255,0,0)'.</p>
+		<h3>[method:String getStyle]( [param:string colorSpace] = SRGBColorSpace )</h3>
+		<p>Returns the value of this color as a CSS style string. Example: `rgb(255,0,0)`.</p>
 
 		<h3>[method:this lerp]( [param:Color color], [param:Float alpha] ) </h3>
 		<p>
 		[page:Color color] - color to converge on.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor in the closed interval `[0, 1]`.<br /><br />
 
 		Linearly interpolates this color's RGB values toward the RGB values of the passed argument.
-		The alpha argument can be thought of as the ratio between the two colors, where 0.0 is
-		this color and 1.0 is the first argument.
+		The alpha argument can be thought of as the ratio between the two colors, where `0.0` is
+		this color and `1.0` is the first argument.
 		</p>
 
 		<h3>[method:this lerpColors]( [param:Color color1], [param:Color color2], [param:Float alpha] )</h3>
 		<p>
 		[page:Color color1] - the starting [page:Color].<br />
 		[page:Color color2] - [page:Color] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval `[0, 1]`.<br /><br />
 
 		Sets this color to be the color linearly interpolated between [page:Color color1] and
 		[page:Color color2] where alpha is the percent distance along the line connecting the two colors
@@ -232,7 +211,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		<h3>[method:this lerpHSL]( [param:Color color], [param:Float alpha] ) </h3>
 		<p>
 		[page:Color color] - color to converge on.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor in the closed interval `[0, 1]`.<br /><br />
 
 		Linearly interpolates this color's HSL values toward the HSL values of the passed argument.
 		It differs from the classic [page:.lerp] by not interpolating straight from one color to the other,
@@ -262,14 +241,14 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Delegates to [page:.copy], [page:.setStyle], or [page:.setHex] depending on input type.
 		</p>
 
-		<h3>[method:this setHex]( [param:Integer hex] ) </h3>
+		<h3>[method:this setHex]( [param:Integer hex], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:Integer hex] — [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet hexadecimal triplet] format.<br /><br />
 
 		Sets this color from a hexadecimal value.
 		</p>
 
-		<h3>[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l] ) </h3>
+		<h3>[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l], [param:string colorSpace] = LinearSRGBColorSpace ) </h3>
 		<p>
 		[page:Float h] — hue value between 0.0 and 1.0 <br />
 		[page:Float s] — saturation value between 0.0 and 1.0 <br />
@@ -278,7 +257,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Sets color from HSL values.
 		</p>
 
-		<h3>[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b] ) </h3>
+		<h3>[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b], [param:string colorSpace] = LinearSRGBColorSpace ) </h3>
 		<p>
 		[page:Float r] — Red channel value between 0.0 and 1.0.<br />
 		[page:Float g] — Green channel value between 0.0 and 1.0.<br />
@@ -294,7 +273,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Sets all three color components to the value [page:Float scalar].
 		</p>
 
-		<h3>[method:this setStyle]( [param:String style] ) </h3>
+		<h3>[method:this setStyle]( [param:String style], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:String style] — color as a CSS-style string.<br /><br />
 
@@ -313,7 +292,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Note that for X11 color names, multiple words such as Dark Orange become the string 'darkorange'.
 		</p>
 
-		<h3>[method:this setColorName]( [param:String style] ) </h3>
+		<h3>[method:this setColorName]( [param:String style], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:String style] — color name ( from [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart X11 color names] ).<br /><br />
 

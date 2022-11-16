@@ -2,31 +2,30 @@
 
 	class BloomPass extends THREE.Pass {
 
-		constructor( strength = 1, kernelSize = 25, sigma = 4, resolution = 256 ) {
+		constructor( strength = 1, kernelSize = 25, sigma = 4 ) {
 
-			super(); // render targets
+			super();
 
-			const pars = {
-				minFilter: THREE.LinearFilter,
-				magFilter: THREE.LinearFilter,
-				format: THREE.RGBAFormat
-			};
-			this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+			// render targets
+
+			this.renderTargetX = new THREE.WebGLRenderTarget(); // will be resized later
 			this.renderTargetX.texture.name = 'BloomPass.x';
-			this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
-			this.renderTargetY.texture.name = 'BloomPass.y'; // copy material
+			this.renderTargetY = new THREE.WebGLRenderTarget(); // will be resized later
+			this.renderTargetY.texture.name = 'BloomPass.y';
 
-			if ( THREE.CopyShader === undefined ) console.error( 'THREE.BloomPass relies on THREE.CopyShader' );
-			const copyShader = THREE.CopyShader;
-			this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
-			this.copyUniforms[ 'opacity' ].value = strength;
-			this.materialCopy = new THREE.ShaderMaterial( {
-				uniforms: this.copyUniforms,
-				vertexShader: copyShader.vertexShader,
-				fragmentShader: copyShader.fragmentShader,
+			// combine material
+
+			this.combineUniforms = THREE.UniformsUtils.clone( CombineShader.uniforms );
+			this.combineUniforms[ 'strength' ].value = strength;
+			this.materialCombine = new THREE.ShaderMaterial( {
+				uniforms: this.combineUniforms,
+				vertexShader: CombineShader.vertexShader,
+				fragmentShader: CombineShader.fragmentShader,
 				blending: THREE.AdditiveBlending,
 				transparent: true
-			} ); // convolution material
+			} );
+
+			// convolution material
 
 			if ( THREE.ConvolutionShader === undefined ) console.error( 'THREE.BloomPass relies on THREE.ConvolutionShader' );
 			const convolutionShader = THREE.ConvolutionShader;
@@ -46,35 +45,88 @@
 			this.fsQuad = new THREE.FullScreenQuad( null );
 
 		}
-
 		render( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
 
-			if ( maskActive ) renderer.state.buffers.stencil.setTest( false ); // Render quad with blured scene into texture (convolution pass 1)
+			if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
+
+			// Render quad with blured scene into texture (convolution pass 1)
 
 			this.fsQuad.material = this.materialConvolution;
 			this.convolutionUniforms[ 'tDiffuse' ].value = readBuffer.texture;
 			this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurX;
 			renderer.setRenderTarget( this.renderTargetX );
 			renderer.clear();
-			this.fsQuad.render( renderer ); // Render quad with blured scene into texture (convolution pass 2)
+			this.fsQuad.render( renderer );
+
+			// Render quad with blured scene into texture (convolution pass 2)
 
 			this.convolutionUniforms[ 'tDiffuse' ].value = this.renderTargetX.texture;
 			this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurY;
 			renderer.setRenderTarget( this.renderTargetY );
 			renderer.clear();
-			this.fsQuad.render( renderer ); // Render original scene with superimposed blur to texture
+			this.fsQuad.render( renderer );
 
-			this.fsQuad.material = this.materialCopy;
-			this.copyUniforms[ 'tDiffuse' ].value = this.renderTargetY.texture;
+			// Render original scene with superimposed blur to texture
+
+			this.fsQuad.material = this.materialCombine;
+			this.combineUniforms[ 'tDiffuse' ].value = this.renderTargetY.texture;
 			if ( maskActive ) renderer.state.buffers.stencil.setTest( true );
 			renderer.setRenderTarget( readBuffer );
 			if ( this.clear ) renderer.clear();
 			this.fsQuad.render( renderer );
 
 		}
+		setSize( width, height ) {
+
+			this.renderTargetX.setSize( width, height );
+			this.renderTargetY.setSize( width, height );
+
+		}
+		dispose() {
+
+			this.renderTargetX.dispose();
+			this.renderTargetY.dispose();
+			this.materialCombine.dispose();
+			this.materialConvolution.dispose();
+			this.fsQuad.dispose();
+
+		}
 
 	}
+	const CombineShader = {
+		uniforms: {
+			'tDiffuse': {
+				value: null
+			},
+			'strength': {
+				value: 1.0
+			}
+		},
+		vertexShader: /* glsl */`
 
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}`,
+		fragmentShader: /* glsl */`
+
+		uniform float strength;
+
+		uniform sampler2D tDiffuse;
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vec4 texel = texture2D( tDiffuse, vUv );
+			gl_FragColor = strength * texel;
+
+		}`
+	};
 	BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
 	BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );
 

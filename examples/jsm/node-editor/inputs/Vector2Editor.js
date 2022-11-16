@@ -1,15 +1,15 @@
-import { ObjectNode, NumberInput, LabelElement } from '../../libs/flow.module.js';
-import { Vector2Node } from '../../renderers/nodes/Nodes.js';
+import { NumberInput, LabelElement } from '../../libs/flow.module.js';
+import { BaseNode } from '../core/BaseNode.js';
+import { Vector2 } from 'three';
+import { UniformNode } from 'three/nodes';
 
-export class Vector2Editor extends ObjectNode {
+export class Vector2Editor extends BaseNode {
 
 	constructor() {
 
-		const node = new Vector2Node();
+		const node = new UniformNode( new Vector2() );
 
 		super( 'Vector 2', 2, node );
-
-		this.title.setIcon( 'ti ti-box-multiple-2' );
 
 		const onUpdate = () => {
 
@@ -18,10 +18,10 @@ export class Vector2Editor extends ObjectNode {
 
 		};
 
-		const fieldX = new NumberInput().onChange( onUpdate );
-		const fieldY = new NumberInput().onChange( onUpdate );
+		const fieldX = new NumberInput().setTagColor( 'red' ).onChange( onUpdate );
+		const fieldY = new NumberInput().setTagColor( 'green' ).onChange( onUpdate );
 
-		this.add( new LabelElement( 'Values' ).add( fieldX ).add( fieldY ) );
+		this.add( new LabelElement( 'XY' ).add( fieldX ).add( fieldY ) );
 
 	}
 

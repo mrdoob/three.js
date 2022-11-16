@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Classe per il caricamento di una [page:CubeTexture CubeTexture].
+      Utilizza internamente l'[page:ImageLoader] per caricare i file.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+const scene = new THREE.Scene();
+scene.background = new THREE.CubeTextureLoader()
+	.setPath( 'textures/cubeMaps/' )
+	.load( [
+				'px.png',
+				'nx.png',
+				'py.png',
+				'ny.png',
+				'pz.png',
+				'nz.png'
+			] );
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_materials_cubemap materials / cubemap]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic]<br />
+			[example:webgl_materials_cubemap_refraction materials / cubemap / refraction]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — Il [page:LoadingManager loadingManager] del loader da utilizzare. Il valore predefinito è [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+		Crea un nuovo [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Loader] per le proprietà comuni.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Loader] per i metodi comuni.</p>
+
+		<h3>[method:CubeTexture load]( [param:String urls], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String urls] — array di 6 url di immagini, una per ogni lato della CubeTexture.
+    Le url devono essere specificate nel seguente ordine: pos-x, neg-x, pos-y, neg-y, pos-z, neg-z.
+    Possono anche essere [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URIs].<br />
+    Si noti che, per convenzione, le mappe cubiche sono specificate in un sistema di coordinate in cui la x positiva è 
+    a destra quando si guarda l'asse z positivo -- in altre parole, utilizza un sistema di coordinate sinistrorso.
+    Poiché Three.js utilizza un sistema di coordinate destrorso, le mappe d'ambiente utilizzate in three.js avranno pos-x e neg-x invertiti.<br />
+		[page:Function onLoad] (opzionale) — Verrà chiamato quando il caricamento sarà completato. L'argomento sarà la [page:CubeTexture texture] caricata.<br />
+		[page:Function onProgress] (opzionale) — Questa funzione di callback non è al momento supportata.<br />
+		[page:Function onError] (opzionale) — Verrà chiamato in caso di errori di caricamento.<br />
+		</p>
+		<p>
+      Inizia il caricamento dall'url e passa la [page:CubeTexture texture] caricata a onLoad. 
+      Il metodo inoltre restituisce un nuovo oggetto texture che può essere direttamente utilizzato per la creazione di materiale.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
