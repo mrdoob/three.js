@@ -13,7 +13,6 @@ export const shaderStages = [ ...defaultShaderStages, 'compute' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
 
 const typeFromLength = new Map();
-typeFromLength.set( 1, 'float' );
 typeFromLength.set( 2, 'vec2' );
 typeFromLength.set( 3, 'vec3' );
 typeFromLength.set( 4, 'vec4' );
@@ -390,6 +389,7 @@ class NodeBuilder {
 
 	getTypeFromLength( length, componentType = 'float' ) {
 
+		if ( length === 1 ) return componentType;
 		const baseType = typeFromLength.get( length );
 		const prefix = componentType === 'float' ? '' : componentType[ 0 ];
 		return prefix + baseType;
