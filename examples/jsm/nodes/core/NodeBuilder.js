@@ -365,6 +365,8 @@ class NodeBuilder {
 
 		type = this.getVectorType( type );
 
+		if ( type === 'float' || type === 'bool' || type === 'int' || type === 'uint' ) return type;
+
 		const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( type );
 
 		if ( componentType === null ) return null;
@@ -386,9 +388,11 @@ class NodeBuilder {
 
 	}
 
-	getTypeFromLength( length ) {
+	getTypeFromLength( length, componentType = 'float' ) {
 
-		return typeFromLength.get( length );
+		const baseType = typeFromLength.get( length );
+		const prefix = componentType === 'float' ? '' : componentType[ 0 ];
+		return prefix + baseType;
 
 	}
 
@@ -409,6 +413,22 @@ class NodeBuilder {
 	getVectorFromMatrix( type ) {
 
 		return type.replace( 'mat', 'vec' );
+
+	}
+
+	changeComponentType( type, newComponentType ) {
+
+		return this.getTypeFromLength( this.getTypeLength( type ), newComponentType );
+
+	}
+
+	getIntegerType( type ) {
+
+		const componentType = this.getComponentType( type );
+
+		if ( componentType === 'int' || componentType === 'uint' ) return type;
+
+		return this.changeComponentType( type, 'int' );
 
 	}
 
