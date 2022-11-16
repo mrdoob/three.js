@@ -253,7 +253,7 @@ export const ConvertType = function ( type, cacheMap = null ) {
 
 			}
 
-			return nodeObject( new ConvertNode( new JoinNode( nodes ), type ) );
+			return nodeObject( new JoinNode( nodes, type ) );
 
 		}
 
