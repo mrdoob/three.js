@@ -12,8 +12,13 @@ class JoinNode extends TempNode {
 
 	getNodeType( builder ) {
 
-		const defaultType = builder.getTypeFromLength( this.nodes.reduce( ( count, cur ) => count + builder.getTypeLength( cur.getNodeType( builder ) ), 0 ) );
-		return builder.getVectorType( this.nodeType ) || defaultType;
+		if ( this.nodeType !== null ) {
+
+			return builder.getVectorType( this.nodeType );
+
+		}
+
+		return builder.getTypeFromLength( this.nodes.reduce( ( count, cur ) => count + builder.getTypeLength( cur.getNodeType( builder ) ), 0 ) );
 
 	}
 
