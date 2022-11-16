@@ -10,9 +10,9 @@
   font-weight: bold;
   display: flex;
   align-items: center;
-  justify-content: center;  
+  justify-content: center;
 }
-.contextlost>div {
+.contextlost > div {
   padding: 0.5em;
   background: darkred;
   cursor: pointer;

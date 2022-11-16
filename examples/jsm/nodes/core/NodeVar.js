@@ -1,14 +1,10 @@
 class NodeVar {
-
-	constructor( name, type ) {
-
+	constructor(name, type) {
 		this.isNodeVar = true;
 
 		this.name = name;
 		this.type = type;
-
 	}
-
 }
 
 export default NodeVar;

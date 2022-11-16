@@ -19,19 +19,16 @@
  */
 
 const FilmShader = {
-
 	uniforms: {
-
-		'tDiffuse': { value: null },
-		'time': { value: 0.0 },
-		'nIntensity': { value: 0.5 },
-		'sIntensity': { value: 0.05 },
-		'sCount': { value: 4096 },
-		'grayscale': { value: 1 }
-
+		tDiffuse: { value: null },
+		time: { value: 0.0 },
+		nIntensity: { value: 0.5 },
+		sIntensity: { value: 0.05 },
+		sCount: { value: 4096 },
+		grayscale: { value: 1 },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -42,7 +39,7 @@ const FilmShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		#include <common>
 
@@ -94,7 +91,6 @@ const FilmShader = {
 			gl_FragColor =  vec4( cResult, cTextureScreen.a );
 
 		}`,
-
 };
 
 export { FilmShader };

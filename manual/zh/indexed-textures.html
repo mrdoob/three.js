@@ -1,71 +1,151 @@
 <!DOCTYPE html>
 <html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<title>使用纹理索引来拾取和着色</title>
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@threejs" />
+		<meta
+			name="twitter:title"
+			content="Three.js – Indexed Textures for Picking and Color"
+		/>
+		<meta property="og:image" content="https://threejs.org/files/share.png" />
+		<link
+			rel="shortcut icon"
+			href="/files/favicon_white.ico"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<link
+			rel="shortcut icon"
+			href="/files/favicon.ico"
+			media="(prefers-color-scheme: light)"
+		/>
 
-<head>
-  <meta charset="utf-8">
-  <title>使用纹理索引来拾取和着色</title>
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:site" content="@threejs">
-  <meta name="twitter:title" content="Three.js – Indexed Textures for Picking and Color">
-  <meta property="og:image" content="https://threejs.org/files/share.png">
-  <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-  <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+		<link rel="stylesheet" href="/manual/resources/lesson.css" />
+		<link rel="stylesheet" href="/manual/resources/lang.css" />
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
-  <link rel="stylesheet" href="/manual/resources/lesson.css">
-  <link rel="stylesheet" href="/manual/resources/lang.css">
-  <!-- Import maps polyfill -->
-  <!-- Remove this when import maps will be widely supported -->
-  <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.module.js"
+				}
+			}
+		</script>
+		<link rel="stylesheet" href="/manual/zh/lang.css" />
+	</head>
 
-  <script type="importmap">
-{
-  "imports": {
-    "three": "../../build/three.module.js"
-  }
-}
-</script>
-  <link rel="stylesheet" href="/manual/zh/lang.css">
-</head>
+	<body>
+		<div class="container">
+			<div class="lesson-title">
+				<h1>使用纹理索引来拾取和着色</h1>
+			</div>
+			<div class="lesson">
+				<div class="lesson-main">
+					<p>
+						这篇文章是
+						<a href="align-html-elements-to-3d.html">对齐HTML元素到3D对象</a>
+						的延续。
+						如果你还没有读过上篇文章，你应该先从那里开始，然后再回来继续阅读。
+					</p>
+					<p>
+						有时候使用Three.js需要提出一些创造性的解决思路。我不确定这是一个很好的解决方案，但我想我会分享它，你可以看看是否可以为你的需求提供了一些解决思路或方案。
+					</p>
+					<p>
+						在
+						<a href="align-html-elements-to-3d.html">上一篇文章中</a
+						>，我们在3D地球周围显示了国家名称，那么我们如何做到，让用户选中一个国家并高亮他的选择？
+					</p>
+					<p>
+						第一个想法是为每个国家生成几何图形，我们可以
+						<a href="picking.html">使用射线拾取</a> ，就像之前介绍的那样。
+						我们将为每个国家构建3D几何对象。如果用户点击代表那个国家的网格对象，我们就会知道对应的国家被点击了。
+					</p>
+					<p>
+						所以，为了验证这个解决方案，我尝试生成所有国家的3D网格对象，使用了<a
+							href="align-html-elements-to-3d.html"
+							>在上一篇文章中</a
+						>和我生成轮廓一样的数据。
+						结果生成了15.5m的二进制GLTF(.glb)文件，让用户下载15.5m的数据对于我来说实在太多了。
+					</p>
+					<p>
+						有很多方法可以压缩数据。第一种可能是应用一些算法来降低轮廓的分辨率，但是我没有花时间来研究它。可能出现美国边界变大而加拿大边界变小的情况。
+					</p>
+					<p>
+						另一种解决方案是仅使用数据压缩，比如gzip将其降至11m，这减少了30%，但是还不够。
+					</p>
+					<p>
+						我们可以将所有数据存储为16位而不是32位浮点值。或者我们也可以使用像<a
+							href="https://google.github.io/draco/"
+							>draco 压缩</a
+						>
+						这种东西也许就够了。不过我没有去试，我推荐你去试下回来告诉我是怎么回事，因为我很想知道😅
+					</p>
+					<p>
+						就我而言，我考虑使用 <a href="picking.html">GPU拾取方案</a>，
+						这在上一篇
+						<a href="picking.html">关于拾取的文章</a>
+						的最后有提到。这种方案中，我们使用一种独特的颜色代表不同网格对象的ID，然后我们绘制了所有网格，看看哪个颜色被点击了。
+					</p>
+					<p>
+						基于这种灵感，我们可以预先生成一张国家的地图，每个国家的颜色是它在国家数组中的索引号。我们可以使用类似GPU拾取技术，我们使用索引纹理绘制一个离屏全局画布，查看颜色会告诉我们用户点击了那个国家ID。
+					</p>
+					<p>
+						因此，我
+						<a
+							href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/"
+							>写了一些代码</a
+						>
+						生成这样的一个纹理，在这里：
+					</p>
+					<div class="threejs_center">
+						<img
+							src="../examples/resources/data/world/country-index-texture.png"
+							style="width: 700px"
+						/>
+					</div>
 
-<body>
-  <div class="container">
-    <div class="lesson-title">
-      <h1>使用纹理索引来拾取和着色</h1>
-    </div>
-    <div class="lesson">
-      <div class="lesson-main">
-        <p>这篇文章是 <a href="align-html-elements-to-3d.html">对齐HTML元素到3D对象</a> 的延续。
-          如果你还没有读过上篇文章，你应该先从那里开始，然后再回来继续阅读。</p>
-        <p>有时候使用Three.js需要提出一些创造性的解决思路。我不确定这是一个很好的解决方案，但我想我会分享它，你可以看看是否可以为你的需求提供了一些解决思路或方案。</p>
-        <p>在 <a href="align-html-elements-to-3d.html">上一篇文章中</a>，我们在3D地球周围显示了国家名称，那么我们如何做到，让用户选中一个国家并高亮他的选择？</p>
-        <p>第一个想法是为每个国家生成几何图形，我们可以 <a href="picking.html">使用射线拾取</a> ，就像之前介绍的那样。
-          我们将为每个国家构建3D几何对象。如果用户点击代表那个国家的网格对象，我们就会知道对应的国家被点击了。</p>
-        <p>所以，为了验证这个解决方案，我尝试生成所有国家的3D网格对象，使用了<a href="align-html-elements-to-3d.html">在上一篇文章中</a>和我生成轮廓一样的数据。
-          结果生成了15.5m的二进制GLTF(.glb)文件，让用户下载15.5m的数据对于我来说实在太多了。
-        </p>
-        <p>有很多方法可以压缩数据。第一种可能是应用一些算法来降低轮廓的分辨率，但是我没有花时间来研究它。可能出现美国边界变大而加拿大边界变小的情况。</p>
-        <p>另一种解决方案是仅使用数据压缩，比如gzip将其降至11m，这减少了30%，但是还不够。</p>
-        <p>我们可以将所有数据存储为16位而不是32位浮点值。或者我们也可以使用像<a href="https://google.github.io/draco/">draco 压缩</a>
-          这种东西也许就够了。不过我没有去试，我推荐你去试下回来告诉我是怎么回事，因为我很想知道😅</p>
-        <p>就我而言，我考虑使用 <a href="picking.html">GPU拾取方案</a>，
-          这在上一篇 <a href="picking.html">关于拾取的文章</a> 的最后有提到。这种方案中，我们使用一种独特的颜色代表不同网格对象的ID，然后我们绘制了所有网格，看看哪个颜色被点击了。</p>
-        <p>基于这种灵感，我们可以预先生成一张国家的地图，每个国家的颜色是它在国家数组中的索引号。我们可以使用类似GPU拾取技术，我们使用索引纹理绘制一个离屏全局画布，查看颜色会告诉我们用户点击了那个国家ID。</p>
-        <p>因此，我 <a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">写了一些代码</a>
-          生成这样的一个纹理，在这里： </p>
-        <div class="threejs_center"><img src="../examples/resources/data/world/country-index-texture.png"
-            style="width: 700px;"></div>
-
-        <p>注意：生成这份纹理的数据来源于 <a href="http://thematicmapping.org/downloads/world_borders.php">这个网站</a>
-          ，使用的协议是 <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>。</p>
-        <p>它只有217k，比国家网格对象的15m要好得多，事实上我们可以使用更低的分辨率，但现在217k似乎已经足够了。</p>
-        <p>所以让我们试着用它来选择国家。</p>
-        <p>从 <a href="picking.html">GPU拾取案例中</a> 获取代码，我们需要一个场景来做拾取。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickingScene = new THREE.Scene();
+					<p>
+						注意：生成这份纹理的数据来源于
+						<a href="http://thematicmapping.org/downloads/world_borders.php"
+							>这个网站</a
+						>
+						，使用的协议是
+						<a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a
+						>。
+					</p>
+					<p>
+						它只有217k，比国家网格对象的15m要好得多，事实上我们可以使用更低的分辨率，但现在217k似乎已经足够了。
+					</p>
+					<p>所以让我们试着用它来选择国家。</p>
+					<p>
+						从
+						<a href="picking.html">GPU拾取案例中</a>
+						获取代码，我们需要一个场景来做拾取。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const pickingScene = new THREE.Scene();
 pickingScene.background = new THREE.Color(0);
-</pre>
-        <p>我们需要将带有索引纹理的地球添加到拾取场景中。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+</pre
+					>
+					<p>我们需要将带有索引纹理的地球添加到拾取场景中。</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
 
@@ -80,9 +160,18 @@ pickingScene.background = new THREE.Color(0);
   const material = new THREE.MeshBasicMaterial({map: texture});
   scene.add(new THREE.Mesh(geometry, material));
 }
-</pre>
-        <p>然后我们把 <code class="notranslate" translate="no">GPUPickingHelper</code>这个类拷贝下，在使用前我们需要做一些小改动</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class GPUPickHelper {
+</pre
+					>
+					<p>
+						然后我们把
+						<code class="notranslate" translate="no">GPUPickingHelper</code
+						>这个类拷贝下，在使用前我们需要做一些小改动
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+class GPUPickHelper {
   constructor() {
     // 创造一个 1x1 的渲染对象
     this.pickingTexture = new THREE.WebGLRenderTarget(1, 1);
@@ -139,9 +228,14 @@ pickingScene.background = new THREE.Color(0);
 -    }
   }
 }
-</pre>
-        <p>现在我们可以用它来选择国家了。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new GPUPickHelper();
+</pre
+					>
+					<p>现在我们可以用它来选择国家了。</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const pickHelper = new GPUPickHelper();
 
 function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
@@ -184,13 +278,22 @@ function unselectAllCountries() {
 }
 
 canvas.addEventListener('pointerup', pickCountry);
-</pre>
-        <p>上面的代码，设置/重置了国家数组元素的 <code class="notranslate" translate="no">selected</code> 属性。如果 <code class="notranslate"
-            translate="no">shift</code> 或 <code class="notranslate" translate="no">ctrl</code> 或 <code
-            class="notranslate" translate="no">cmd</code>
-          被按下了，你就可以选择多个国家。</p>
-        <p>剩下的就是显示选择的国家，现在让我们更新标签</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLabels() {
+</pre
+					>
+					<p>
+						上面的代码，设置/重置了国家数组元素的
+						<code class="notranslate" translate="no">selected</code> 属性。如果
+						<code class="notranslate" translate="no">shift</code> 或
+						<code class="notranslate" translate="no">ctrl</code> 或
+						<code class="notranslate" translate="no">cmd</code>
+						被按下了，你就可以选择多个国家。
+					</p>
+					<p>剩下的就是显示选择的国家，现在让我们更新标签</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+function updateLabels() {
   // 如果我们还没有加载好数据，退出
   if (!countryInfos) {
     return;
@@ -214,27 +317,51 @@ canvas.addEventListener('pointerup', pickCountry);
     }
 
     ...
-</pre>
-        <p>通过上面的代码，我们就有能力拾取对应的国家了。</p>
-        <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
-              src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking.html"></iframe>
-          </div>
-          <a class="threejs_center" href="/manual/examples/indexed-textures-picking.html" target="_blank">点击在新窗口打开</a>
-        </div>
+</pre
+					>
+					<p>通过上面的代码，我们就有能力拾取对应的国家了。</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/indexed-textures-picking.html"
+							target="_blank"
+							>点击在新窗口打开</a
+						>
+					</div>
 
-        <p></p>
-        <p>代码仍然会根据地区显示对应的国家。不过如果你点击一个，只会显示对应的标签。</p>
-        <p>所以这似乎是选择国家的有效解决方案，但是如何突出显示选定的国家？</p>
-        <p>我们可以从 <em>调色板图形算法</em> 中获取灵感。</p>
-        <p><a href="https://en.wikipedia.org/wiki/Palette_%28computing%29">调色板算法</a>
-          或者 <a href="https://en.wikipedia.org/wiki/Indexed_color">索引颜色</a>
-          是被旧的系统，比如Atari 800、Amiga、NES、Super Nintendolder及IBM
-          PCs所使用的。并非以RGBA的形式给每个颜色存储8位、每个像素至少32字节的位图，他们存储位图是8位或者更少。每个像素都是一个调色板的索引值，
-          所以举例一个像素值为3，表示“显示3号颜色值”，而定义3号颜色值的地方就叫“调色板”。</p>
-        <p>在JavaScript中就像这样：</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
+					<p></p>
+					<p>
+						代码仍然会根据地区显示对应的国家。不过如果你点击一个，只会显示对应的标签。
+					</p>
+					<p>
+						所以这似乎是选择国家的有效解决方案，但是如何突出显示选定的国家？
+					</p>
+					<p>我们可以从 <em>调色板图形算法</em> 中获取灵感。</p>
+					<p>
+						<a href="https://en.wikipedia.org/wiki/Palette_%28computing%29"
+							>调色板算法</a
+						>
+						或者
+						<a href="https://en.wikipedia.org/wiki/Indexed_color">索引颜色</a>
+						是被旧的系统，比如Atari 800、Amiga、NES、Super Nintendolder及IBM
+						PCs所使用的。并非以RGBA的形式给每个颜色存储8位、每个像素至少32字节的位图，他们存储位图是8位或者更少。每个像素都是一个调色板的索引值，
+						所以举例一个像素值为3，表示“显示3号颜色值”，而定义3号颜色值的地方就叫“调色板”。
+					</p>
+					<p>在JavaScript中就像这样：</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const face7x7PixelImageData = [
   0, 1, 1, 1, 1, 1, 0,
   1, 0, 0, 0, 0, 0, 1,
   1, 0, 2, 0, 2, 0, 1,
@@ -250,19 +377,36 @@ const palette = [
   [  0, 255, 255],  // 青
   [255,   0,   0],  // 红
 ];
-</pre>
-        <p>图像数据中每个像素都是调色板的索引，如果你分析上面调色板的数据你会得到这个图像：</p>
-        <div class="threejs_center"><img src="../resources/images/7x7-indexed-face.png"></div>
+</pre
+					>
+					<p>
+						图像数据中每个像素都是调色板的索引，如果你分析上面调色板的数据你会得到这个图像：
+					</p>
+					<div class="threejs_center">
+						<img src="../resources/images/7x7-indexed-face.png" />
+					</div>
 
-        <p>
-          在我们的例子中，上面已经有一个用不同id代表不同国家的纹理了，所以我们可以通过调色板使用相同的纹理赋予每个国家各自的颜色。通过更改调色板颜色我们可以为单独的国家着色。比如通过设置整个调色板纹理为黑色，给某个国家使用不同的颜色，就可以凸显那个国家了。
-        </p>
-        <p>要做调色板索引的话，需要一些自定义着色器代码，让我们修改Three.js中默认的着色器，这样我们也可以根据需要使用照明或其他特性。</p>
-        <p>就像我们在 <a href="optimize-lots-of-objects-animated.html">大量移动物体的优化</a> 这篇文章中提到的，通过
-          <code class="notranslate" translate="no">onBeforeCompile</code> 属性，我们可以通过向材质添加函数来修改默认的着色器。
-        </p>
-        <p>默认的片元着色器在编译之前看起来就像这样：</p>
-        <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
+					<p>
+						在我们的例子中，上面已经有一个用不同id代表不同国家的纹理了，所以我们可以通过调色板使用相同的纹理赋予每个国家各自的颜色。通过更改调色板颜色我们可以为单独的国家着色。比如通过设置整个调色板纹理为黑色，给某个国家使用不同的颜色，就可以凸显那个国家了。
+					</p>
+					<p>
+						要做调色板索引的话，需要一些自定义着色器代码，让我们修改Three.js中默认的着色器，这样我们也可以根据需要使用照明或其他特性。
+					</p>
+					<p>
+						就像我们在
+						<a href="optimize-lots-of-objects-animated.html"
+							>大量移动物体的优化</a
+						>
+						这篇文章中提到的，通过
+						<code class="notranslate" translate="no">onBeforeCompile</code>
+						属性，我们可以通过向材质添加函数来修改默认的着色器。
+					</p>
+					<p>默认的片元着色器在编译之前看起来就像这样：</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-glsl"
+						translate="no"
+					>
+#include &lt;common&gt;
 #include &lt;color_pars_fragment&gt;
 #include &lt;uv_pars_fragment&gt;
 #include &lt;uv2_pars_fragment&gt;
@@ -300,19 +444,43 @@ void main() {
     #include &lt;encodings_fragment&gt;
     #include &lt;fog_fragment&gt;
 }
-</pre>
-        <p><a href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk">查看所有的片段</a>
-          我们发现THREE.js使用了一个名为 <code class="notranslate" translate="no">diffuseColor</code> 的变量去管理基本材质颜色。它在这里设置： <code
-            class="notranslate" translate="no">&lt;color_fragment&gt;</code> <a
-            href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">片段</a>
-          所以我们应该能够在这部分之后进行修改。</p>
-        <p><code class="notranslate" translate="no">diffuseColor</code>
-          在这个时刻应该已经是从我们轮廓纹理中获取的颜色了，所以我们应该可以从调色盘中获取颜色，然后把他们和最终颜色混合。</p>
-        <p>就像我们 <a href="optimize-lots-of-objects-animated.html">之前做的那样</a> ，
-          在<a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate"
-              translate="no">Material.onBeforeCompile</code></a>我们使用一个用来搜索和替换着色器代码的数组。
-        </p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+</pre
+					>
+					<p>
+						<a
+							href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk"
+							>查看所有的片段</a
+						>
+						我们发现THREE.js使用了一个名为
+						<code class="notranslate" translate="no">diffuseColor</code>
+						的变量去管理基本材质颜色。它在这里设置：
+						<code class="notranslate" translate="no"
+							>&lt;color_fragment&gt;</code
+						>
+						<a
+							href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js"
+							>片段</a
+						>
+						所以我们应该能够在这部分之后进行修改。
+					</p>
+					<p>
+						<code class="notranslate" translate="no">diffuseColor</code>
+						在这个时刻应该已经是从我们轮廓纹理中获取的颜色了，所以我们应该可以从调色盘中获取颜色，然后把他们和最终颜色混合。
+					</p>
+					<p>
+						就像我们
+						<a href="optimize-lots-of-objects-animated.html">之前做的那样</a> ，
+						在<a href="/docs/#api/en/materials/Material.onBeforeCompile"
+							><code class="notranslate" translate="no"
+								>Material.onBeforeCompile</code
+							></a
+						>我们使用一个用来搜索和替换着色器代码的数组。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
 
@@ -358,21 +526,37 @@ void main() {
 +  };
   scene.add(new THREE.Mesh(geometry, material));
 }
-</pre>
-        <p>在上面可以看到我们添加了3个uniforms变量，<code class="notranslate" translate="no">indexTexture</code>, <code
-            class="notranslate" translate="no">paletteTexture</code>,
-          and <code class="notranslate" translate="no">paletteTextureWidth</code>。我们从 <code class="notranslate"
-            translate="no">indexTexture</code>
-          获取颜色，并且把它转化成索引下标。 <code class="notranslate" translate="no">vUv</code>
-          是由Three.js提供的纹理坐标。然后我们使用索引下标从调色板中获取颜色。然后我们使用当前的 <code class="notranslate"
-            translate="no">diffuseColor</code>和最终的结果作混合。
-          <code class="notranslate"
-            translate="no">diffuseColor</code>在此时是我们黑色纹理，而调色盘是白色纹理。所以如果我们相加两个颜色，得出的是白色轮廓。如果我们二者相减，得出的是黑色轮廓。
-        </p>
-        <p>在我们渲染前，我们还需要设置调色板纹理，以及这3个uniforms变量。</p>
-        <p>对于调色板纹理，它只需要足够宽即可。每个国家保留一种颜色 + 一种海洋颜色。这里有240个国家或地区，我们可以等到国家列表加载完成后以获取确切的数字来查找。不过选择一些更大的数字没有危害，所以让我们选择512。</p>
-        <p>这里是创建调色板的代码</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
+</pre
+					>
+					<p>
+						在上面可以看到我们添加了3个uniforms变量，<code
+							class="notranslate"
+							translate="no"
+							>indexTexture</code
+						>, <code class="notranslate" translate="no">paletteTexture</code>,
+						and
+						<code class="notranslate" translate="no">paletteTextureWidth</code
+						>。我们从
+						<code class="notranslate" translate="no">indexTexture</code>
+						获取颜色，并且把它转化成索引下标。
+						<code class="notranslate" translate="no">vUv</code>
+						是由Three.js提供的纹理坐标。然后我们使用索引下标从调色板中获取颜色。然后我们使用当前的
+						<code class="notranslate" translate="no">diffuseColor</code
+						>和最终的结果作混合。
+						<code class="notranslate" translate="no">diffuseColor</code
+						>在此时是我们黑色纹理，而调色盘是白色纹理。所以如果我们相加两个颜色，得出的是白色轮廓。如果我们二者相减，得出的是黑色轮廓。
+					</p>
+					<p>在我们渲染前，我们还需要设置调色板纹理，以及这3个uniforms变量。</p>
+					<p>
+						对于调色板纹理，它只需要足够宽即可。每个国家保留一种颜色 +
+						一种海洋颜色。这里有240个国家或地区，我们可以等到国家列表加载完成后以获取确切的数字来查找。不过选择一些更大的数字没有危害，所以让我们选择512。
+					</p>
+					<p>这里是创建调色板的代码</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const maxNumCountries = 512;
 const paletteTextureWidth = maxNumCountries;
 const paletteTextureHeight = 1;
 const palette = new Uint8Array(paletteTextureWidth * 4);
@@ -380,22 +564,43 @@ const paletteTexture = new THREE.DataTexture(
     palette, paletteTextureWidth, paletteTextureHeight);
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
-</pre>
-        <p>一个<a href="/docs/#api/en/textures/DataTexture"><code class="notranslate"
-              translate="no">DataTexture</code></a> 提供原始的纹理数据。在这种情况下，我们给他512个RGBA颜色，每个颜色4字节，每个包含0-255的红、绿、蓝分量。</p>
-        <p>让我们用随机颜色填充它，只是为了看看它是否有效</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
+</pre
+					>
+					<p>
+						一个<a href="/docs/#api/en/textures/DataTexture"
+							><code class="notranslate" translate="no">DataTexture</code></a
+						>
+						提供原始的纹理数据。在这种情况下，我们给他512个RGBA颜色，每个颜色4字节，每个包含0-255的红、绿、蓝分量。
+					</p>
+					<p>让我们用随机颜色填充它，只是为了看看它是否有效</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+for (let i = 1; i &lt; palette.length; ++i) {
   palette[i] = Math.random() * 256;
 }
 // 设置海洋颜色 (索引 #0)
 palette.set([100, 200, 255, 255], 0);
 paletteTexture.needsUpdate = true;
-</pre>
-        <p>任何时候我们想要Three.js通过 <code class="notranslate" translate="no">palette</code> 数组的内容来更新调色板上的纹理，我们需要去设置<code
-            class="notranslate" translate="no">paletteTexture.needsUpdate</code>
-          为 <code class="notranslate" translate="no">true</code>。</p>
-        <p>然后我们还需要设置材质上的uniforms变量</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry(1, 64, 32);
+</pre
+					>
+					<p>
+						任何时候我们想要Three.js通过
+						<code class="notranslate" translate="no">palette</code>
+						数组的内容来更新调色板上的纹理，我们需要去设置<code
+							class="notranslate"
+							translate="no"
+							>paletteTexture.needsUpdate</code
+						>
+						为 <code class="notranslate" translate="no">true</code>。
+					</p>
+					<p>然后我们还需要设置材质上的uniforms变量</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const geometry = new THREE.SphereGeometry(1, 64, 32);
 const material = new THREE.MeshBasicMaterial({map: texture});
 material.onBeforeCompile = function(shader) {
   fragmentShaderReplacements.forEach((rep) =&gt; {
@@ -406,32 +611,62 @@ material.onBeforeCompile = function(shader) {
 +  shader.uniforms.paletteTextureWidth = {value: paletteTextureWidth};
 };
 scene.add(new THREE.Mesh(geometry, material));
-</pre>
-        <p>这样我们就得到了随机着色的国家</p>
-        <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
-              src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-random-colors.html"></iframe>
-          </div>
-          <a class="threejs_center" href="/manual/examples/indexed-textures-random-colors.html" target="_blank">click
-            here to open in a separate window</a>
-        </div>
+</pre
+					>
+					<p>这样我们就得到了随机着色的国家</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-random-colors.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/indexed-textures-random-colors.html"
+							target="_blank"
+							>click here to open in a separate window</a
+						>
+					</div>
 
-        <p></p>
-        <p>现在我们可以看到索引和调色板纹理生效了，让我们控制调色板进行高亮显示</p>
-        <p>首先让我们创建一个函数，我们传入一个THREE.js颜色，并格式化为可以放入调色板纹理的值。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
+					<p></p>
+					<p>
+						现在我们可以看到索引和调色板纹理生效了，让我们控制调色板进行高亮显示
+					</p>
+					<p>
+						首先让我们创建一个函数，我们传入一个THREE.js颜色，并格式化为可以放入调色板纹理的值。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const tempColor = new THREE.Color();
 function get255BasedColor(color) {
   tempColor.set(color);
   const base = tempColor.toArray().map(v =&gt; v * 255);
   base.push(255); // alpha
   return base;
 }
-</pre>
-        <p>像这样来调用 <code class="notranslate" translate="no">color = get255BasedColor('red')</code> 会返回一个像 <code
-            class="notranslate" translate="no">[255, 0, 0, 255]</code>这样的数组。</p>
-        <p>接下来让我们用它来生成一些颜色并填充调色板。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const selectedColor = get255BasedColor('red');
+</pre
+					>
+					<p>
+						像这样来调用
+						<code class="notranslate" translate="no"
+							>color = get255BasedColor('red')</code
+						>
+						会返回一个像
+						<code class="notranslate" translate="no">[255, 0, 0, 255]</code
+						>这样的数组。
+					</p>
+					<p>接下来让我们用它来生成一些颜色并填充调色板。</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const selectedColor = get255BasedColor('red');
 const unselectedColor = get255BasedColor('#444');
 const oceanColor = get255BasedColor('rgb(100,200,255)');
 resetPalette();
@@ -450,9 +685,14 @@ function resetPalette() {
   setPaletteColor(0, oceanColor);
   paletteTexture.needsUpdate = true;
 }
-</pre>
-        <p>现在让我们使用这些函数来更新调色板，当一个国家被选中时：</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+</pre
+					>
+					<p>现在让我们使用这些函数来更新调色板，当一个国家被选中时：</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: (event.clientX - rect.left) * canvas.width  / rect.width,
@@ -491,22 +731,40 @@ function unselectAllCountries() {
   });
 +  resetPalette();
 }
-</pre>
-        <p>我们应该能够突出显示1个或多个国家。</p>
-        <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
-              src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-and-highlighting.html"></iframe>
-          </div>
-          <a class="threejs_center" href="/manual/examples/indexed-textures-picking-and-highlighting.html"
-            target="_blank">点击在新窗口打开</a>
-        </div>
+</pre
+					>
+					<p>我们应该能够突出显示1个或多个国家。</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-and-highlighting.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/indexed-textures-picking-and-highlighting.html"
+							target="_blank"
+							>点击在新窗口打开</a
+						>
+					</div>
 
-        <p></p>
-        <p>这看起来有效！</p>
-        <p>一件小事是我们不能不改变选中状态就渲染地球。如果我们选择一个国家然后想要旋转地球，选中状态将改变。</p>
-        <p>让我们尝试解决这个问题。我认为，我们可以检查两件事情。点击和松开经过了多少时间；用户是否移动了鼠标。如果时间很短，或者他们没有移动鼠标，那么这个行为可能是点击。否则他们可能正在尝试拖动地球。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const maxClickTimeMs = 200;
+					<p></p>
+					<p>这看起来有效！</p>
+					<p>
+						一件小事是我们不能不改变选中状态就渲染地球。如果我们选择一个国家然后想要旋转地球，选中状态将改变。
+					</p>
+					<p>
+						让我们尝试解决这个问题。我认为，我们可以检查两件事情。点击和松开经过了多少时间；用户是否移动了鼠标。如果时间很短，或者他们没有移动鼠标，那么这个行为可能是点击。否则他们可能正在尝试拖动地球。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
++const maxClickTimeMs = 200;
 +const maxMoveDeltaSq = 5 * 5;
 +const startPosition = {};
 +let startTimeMs;
@@ -575,33 +833,38 @@ function unselectAllCountries() {
 
 +canvas.addEventListener('pointerdown', recordStartTimeAndPosition);
 canvas.addEventListener('pointerup', pickCountry);
-</pre>
-        <p>添加了这些操作，这<em>看起来</em> 对我有效。</p>
-        <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
-              src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-debounced.html"></iframe>
-          </div>
-          <a class="threejs_center" href="/manual/examples/indexed-textures-picking-debounced.html"
-            target="_blank">点击在新窗口打开</a>
-        </div>
+</pre
+					>
+					<p>添加了这些操作，这<em>看起来</em> 对我有效。</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-debounced.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/indexed-textures-picking-debounced.html"
+							target="_blank"
+							>点击在新窗口打开</a
+						>
+					</div>
 
-        <p></p>
-        <p>我不是用户交互的专家，所以我很想知道是否有更好的解决方案。</p>
-        <p>我希望这能让你了解图形索引的用处，以及如何修改Three.js的着色器以添加简单的功能。对于如何使用GLSL，编写着色器语言对于本文来说太多了，这个链接有一些少量的信息，参考
-          <a href="post-processing.html">关于后处理的这篇文章</a>。
-        </p>
+					<p></p>
+					<p>我不是用户交互的专家，所以我很想知道是否有更好的解决方案。</p>
+					<p>
+						我希望这能让你了解图形索引的用处，以及如何修改Three.js的着色器以添加简单的功能。对于如何使用GLSL，编写着色器语言对于本文来说太多了，这个链接有一些少量的信息，参考
+						<a href="post-processing.html">关于后处理的这篇文章</a>。
+					</p>
+				</div>
+			</div>
+		</div>
 
-      </div>
-    </div>
-  </div>
-
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
-
-
-
-
-</body>
-
+		<script src="/manual/resources/prettify.js"></script>
+		<script src="/manual/resources/lesson.js"></script>
+	</body>
 </html>

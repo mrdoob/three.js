@@ -1,9 +1,8 @@
-( function () {
-
+(function () {
 	/**
- * References:
- * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
- */
+	 * References:
+	 * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
+	 */
 
 	const SSRShader = {
 		defines: {
@@ -12,50 +11,50 @@
 			DISTANCE_ATTENUATION: true,
 			FRESNEL: true,
 			INFINITE_THICK: false,
-			SELECTIVE: false
+			SELECTIVE: false,
 		},
 		uniforms: {
-			'tDiffuse': {
-				value: null
+			tDiffuse: {
+				value: null,
 			},
-			'tNormal': {
-				value: null
+			tNormal: {
+				value: null,
 			},
-			'tMetalness': {
-				value: null
+			tMetalness: {
+				value: null,
 			},
-			'tDepth': {
-				value: null
+			tDepth: {
+				value: null,
 			},
-			'cameraNear': {
-				value: null
+			cameraNear: {
+				value: null,
 			},
-			'cameraFar': {
-				value: null
+			cameraFar: {
+				value: null,
 			},
-			'resolution': {
-				value: new THREE.Vector2()
+			resolution: {
+				value: new THREE.Vector2(),
 			},
-			'cameraProjectionMatrix': {
-				value: new THREE.Matrix4()
+			cameraProjectionMatrix: {
+				value: new THREE.Matrix4(),
 			},
-			'cameraInverseProjectionMatrix': {
-				value: new THREE.Matrix4()
+			cameraInverseProjectionMatrix: {
+				value: new THREE.Matrix4(),
 			},
-			'opacity': {
-				value: .5
+			opacity: {
+				value: 0.5,
 			},
-			'maxDistance': {
-				value: 180
+			maxDistance: {
+				value: 180,
 			},
-			'cameraRange': {
-				value: 0
+			cameraRange: {
+				value: 0,
 			},
-			'thickness': {
-				value: .018
-			}
+			thickness: {
+				value: 0.018,
+			},
 		},
-		vertexShader: /* glsl */`
+		vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -68,7 +67,7 @@
 		}
 
 	`,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -245,24 +244,24 @@
 				}
 			}
 		}
-	`
+	`,
 	};
 	const SSRDepthShader = {
 		defines: {
-			'PERSPECTIVE_CAMERA': 1
+			PERSPECTIVE_CAMERA: 1,
 		},
 		uniforms: {
-			'tDepth': {
-				value: null
+			tDepth: {
+				value: null,
 			},
-			'cameraNear': {
-				value: null
+			cameraNear: {
+				value: null,
 			},
-			'cameraFar': {
-				value: null
-			}
+			cameraFar: {
+				value: null,
+			},
 		},
-		vertexShader: /* glsl */`
+		vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -274,7 +273,7 @@
 		}
 
 	`,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 
 		uniform sampler2D tDepth;
 
@@ -310,21 +309,21 @@
 
 		}
 
-	`
+	`,
 	};
 	const SSRBlurShader = {
 		uniforms: {
-			'tDiffuse': {
-				value: null
+			tDiffuse: {
+				value: null,
 			},
-			'resolution': {
-				value: new THREE.Vector2()
+			resolution: {
+				value: new THREE.Vector2(),
 			},
-			'opacity': {
-				value: .5
-			}
+			opacity: {
+				value: 0.5,
+			},
 		},
-		vertexShader: /* glsl */`
+		vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -336,7 +335,7 @@
 		}
 
 	`,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;
@@ -371,11 +370,10 @@
 			gl_FragColor=vec4(rgb,a);
 
 		}
-	`
+	`,
 	};
 
 	THREE.SSRBlurShader = SSRBlurShader;
 	THREE.SSRDepthShader = SSRDepthShader;
 	THREE.SSRShader = SSRShader;
-
-} )();
+})();

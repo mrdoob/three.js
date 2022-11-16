@@ -1,50 +1,46 @@
-import Node from './Node.js';
+import Node from "./Node.js";
 
 class TempNode extends Node {
-
-	constructor( type ) {
-
-		super( type );
+	constructor(type) {
+		super(type);
 
 		this.isTempNode = true;
-
 	}
 
-	build( builder, output ) {
-
+	build(builder, output) {
 		const buildStage = builder.getBuildStage();
 
-		if ( buildStage === 'generate' ) {
+		if (buildStage === "generate") {
+			const type = builder.getVectorType(this.getNodeType(builder, output));
+			const nodeData = builder.getDataFromNode(this);
 
-			const type = builder.getVectorType( this.getNodeType( builder, output ) );
-			const nodeData = builder.getDataFromNode( this );
+			if (
+				builder.context.tempRead !== false &&
+				nodeData.propertyName !== undefined
+			) {
+				return builder.format(nodeData.propertyName, type, output);
+			} else if (
+				builder.context.tempWrite !== false &&
+				type !== "void " &&
+				output !== "void" &&
+				nodeData.dependenciesCount > 1
+			) {
+				const snippet = super.build(builder, type);
 
-			if ( builder.context.tempRead !== false && nodeData.propertyName !== undefined ) {
+				const nodeVar = builder.getVarFromNode(this, type);
+				const propertyName = builder.getPropertyName(nodeVar);
 
-				return builder.format( nodeData.propertyName, type, output );
-
-			} else if ( builder.context.tempWrite !== false && type !== 'void ' && output !== 'void' && nodeData.dependenciesCount > 1 ) {
-
-				const snippet = super.build( builder, type );
-
-				const nodeVar = builder.getVarFromNode( this, type );
-				const propertyName = builder.getPropertyName( nodeVar );
-
-				builder.addFlowCode( `${propertyName} = ${snippet}` );
+				builder.addFlowCode(`${propertyName} = ${snippet}`);
 
 				nodeData.snippet = snippet;
 				nodeData.propertyName = propertyName;
 
-				return builder.format( nodeData.propertyName, type, output );
-
+				return builder.format(nodeData.propertyName, type, output);
 			}
-
 		}
 
-		return super.build( builder, output );
-
+		return super.build(builder, output);
 	}
-
 }
 
 export default TempNode;

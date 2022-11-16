@@ -1,63 +1,62 @@
-( function () {
-
+(function () {
 	/**
- * TODO
- */
+	 * TODO
+	 */
 
 	const SAOShader = {
 		defines: {
-			'NUM_SAMPLES': 7,
-			'NUM_RINGS': 4,
-			'NORMAL_TEXTURE': 0,
-			'DIFFUSE_TEXTURE': 0,
-			'DEPTH_PACKING': 1,
-			'PERSPECTIVE_CAMERA': 1
+			NUM_SAMPLES: 7,
+			NUM_RINGS: 4,
+			NORMAL_TEXTURE: 0,
+			DIFFUSE_TEXTURE: 0,
+			DEPTH_PACKING: 1,
+			PERSPECTIVE_CAMERA: 1,
 		},
 		uniforms: {
-			'tDepth': {
-				value: null
+			tDepth: {
+				value: null,
 			},
-			'tDiffuse': {
-				value: null
+			tDiffuse: {
+				value: null,
 			},
-			'tNormal': {
-				value: null
+			tNormal: {
+				value: null,
 			},
-			'size': {
-				value: new THREE.Vector2( 512, 512 )
+			size: {
+				value: new THREE.Vector2(512, 512),
 			},
-			'cameraNear': {
-				value: 1
+			cameraNear: {
+				value: 1,
 			},
-			'cameraFar': {
-				value: 100
+			cameraFar: {
+				value: 100,
 			},
-			'cameraProjectionMatrix': {
-				value: new THREE.Matrix4()
+			cameraProjectionMatrix: {
+				value: new THREE.Matrix4(),
 			},
-			'cameraInverseProjectionMatrix': {
-				value: new THREE.Matrix4()
+			cameraInverseProjectionMatrix: {
+				value: new THREE.Matrix4(),
 			},
-			'scale': {
-				value: 1.0
+			scale: {
+				value: 1.0,
 			},
-			'intensity': {
-				value: 0.1
+			intensity: {
+				value: 0.1,
 			},
-			'bias': {
-				value: 0.5
+			bias: {
+				value: 0.5,
 			},
-			'minResolution': {
-				value: 0.0
+			minResolution: {
+				value: 0.0,
 			},
-			'kernelRadius': {
-				value: 100.0
+			kernelRadius: {
+				value: 100.0,
 			},
-			'randomSeed': {
-				value: 0.0
-			}
+			randomSeed: {
+				value: 0.0,
+			},
 		},
-		vertexShader: /* glsl */`
+		vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -65,7 +64,7 @@
 			vUv = uv;
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 		}`,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 
 		#include <common>
 
@@ -201,9 +200,8 @@
 
 			gl_FragColor = getDefaultColor( vUv );
 			gl_FragColor.xyz *=  1.0 - ambientOcclusion;
-		}`
+		}`,
 	};
 
 	THREE.SAOShader = SAOShader;
-
-} )();
+})();

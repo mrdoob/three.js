@@ -2,19 +2,26 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - loader - ttf</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - TTFLoader using opentype by gero3
-			<br/>type to enter new text, drag to spin the text
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- TTFLoader using opentype by gero3 <br />type to enter new text, drag to
+			spin the text
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -26,19 +33,18 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
-			import { Font } from 'three/addons/loaders/FontLoader.js';
-			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+			import { TTFLoader } from "three/addons/loaders/TTFLoader.js";
+			import { Font } from "three/addons/loaders/FontLoader.js";
+			import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 
 			let container;
 			let camera, cameraTarget, scene, renderer;
 			let group, textMesh1, textMesh2, textGeo, material;
 			let firstLetter = true;
 
-			let text = 'three.js';
+			let text = "three.js";
 			const height = 20,
 				size = 70,
 				hover = 30,
@@ -61,139 +67,131 @@
 			animate();
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.createElement("div");
+				document.body.appendChild(container);
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
-				camera.position.set( 0, 400, 700 );
+				camera = new THREE.PerspectiveCamera(
+					30,
+					window.innerWidth / window.innerHeight,
+					1,
+					1500
+				);
+				camera.position.set(0, 400, 700);
 
-				cameraTarget = new THREE.Vector3( 0, 150, 0 );
+				cameraTarget = new THREE.Vector3(0, 150, 0);
 
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
-				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
+				scene.background = new THREE.Color(0x000000);
+				scene.fog = new THREE.Fog(0x000000, 250, 1400);
 
 				// LIGHTS
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
-				dirLight.position.set( 0, 0, 1 ).normalize();
-				scene.add( dirLight );
+				const dirLight = new THREE.DirectionalLight(0xffffff, 0.125);
+				dirLight.position.set(0, 0, 1).normalize();
+				scene.add(dirLight);
 
-				const pointLight = new THREE.PointLight( 0xffffff, 1.5 );
-				pointLight.position.set( 0, 100, 90 );
-				pointLight.color.setHSL( Math.random(), 1, 0.5 );
-				scene.add( pointLight );
+				const pointLight = new THREE.PointLight(0xffffff, 1.5);
+				pointLight.position.set(0, 100, 90);
+				pointLight.color.setHSL(Math.random(), 1, 0.5);
+				scene.add(pointLight);
 
-				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				material = new THREE.MeshPhongMaterial({
+					color: 0xffffff,
+					flatShading: true,
+				});
 
 				group = new THREE.Group();
 				group.position.y = 100;
 
-				scene.add( group );
+				scene.add(group);
 
 				const loader = new TTFLoader();
 
-				loader.load( 'fonts/ttf/kenpixel.ttf', function ( json ) {
-
-					font = new Font( json );
+				loader.load("fonts/ttf/kenpixel.ttf", function (json) {
+					font = new Font(json);
 					createText();
-
-				} );
+				});
 
 				const plane = new THREE.Mesh(
-					new THREE.PlaneGeometry( 10000, 10000 ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
+					new THREE.PlaneGeometry(10000, 10000),
+					new THREE.MeshBasicMaterial({
+						color: 0xffffff,
+						opacity: 0.5,
+						transparent: true,
+					})
 				);
 				plane.position.y = 100;
-				plane.rotation.x = - Math.PI / 2;
-				scene.add( plane );
+				plane.rotation.x = -Math.PI / 2;
+				scene.add(plane);
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
 
 				// EVENTS
 
-				container.style.touchAction = 'none';
-				container.addEventListener( 'pointerdown', onPointerDown );
+				container.style.touchAction = "none";
+				container.addEventListener("pointerdown", onPointerDown);
 
-				document.addEventListener( 'keypress', onDocumentKeyPress );
-				document.addEventListener( 'keydown', onDocumentKeyDown );
+				document.addEventListener("keypress", onDocumentKeyPress);
+				document.addEventListener("keydown", onDocumentKeyDown);
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				windowHalfX = window.innerWidth / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
-			function onDocumentKeyDown( event ) {
-
-				if ( firstLetter ) {
-
+			function onDocumentKeyDown(event) {
+				if (firstLetter) {
 					firstLetter = false;
-					text = '';
-
+					text = "";
 				}
 
 				const keyCode = event.keyCode;
 
 				// backspace
 
-				if ( keyCode === 8 ) {
-
+				if (keyCode === 8) {
 					event.preventDefault();
 
-					text = text.substring( 0, text.length - 1 );
+					text = text.substring(0, text.length - 1);
 					refreshText();
 
 					return false;
-
 				}
-
 			}
 
-			function onDocumentKeyPress( event ) {
-
+			function onDocumentKeyPress(event) {
 				const keyCode = event.which;
 
 				// backspace
 
-				if ( keyCode === 8 ) {
-
+				if (keyCode === 8) {
 					event.preventDefault();
-
 				} else {
-
-					const ch = String.fromCharCode( keyCode );
+					const ch = String.fromCharCode(keyCode);
 					text += ch;
 
 					refreshText();
-
 				}
-
 			}
 
 			function createText() {
-
-				textGeo = new TextGeometry( text, {
-
+				textGeo = new TextGeometry(text, {
 					font: font,
 
 					size: size,
@@ -202,16 +200,16 @@
 
 					bevelThickness: bevelThickness,
 					bevelSize: bevelSize,
-					bevelEnabled: true
-
-				} );
+					bevelEnabled: true,
+				});
 
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
 
-				const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+				const centerOffset =
+					-0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x);
 
-				textMesh1 = new THREE.Mesh( textGeo, material );
+				textMesh1 = new THREE.Mesh(textGeo, material);
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
@@ -220,82 +218,69 @@
 				textMesh1.rotation.x = 0;
 				textMesh1.rotation.y = Math.PI * 2;
 
-				group.add( textMesh1 );
+				group.add(textMesh1);
 
-				if ( mirror ) {
-
-					textMesh2 = new THREE.Mesh( textGeo, material );
+				if (mirror) {
+					textMesh2 = new THREE.Mesh(textGeo, material);
 
 					textMesh2.position.x = centerOffset;
-					textMesh2.position.y = - hover;
+					textMesh2.position.y = -hover;
 					textMesh2.position.z = height;
 
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
 
-					group.add( textMesh2 );
-
+					group.add(textMesh2);
 				}
-
 			}
 
 			function refreshText() {
+				group.remove(textMesh1);
+				if (mirror) group.remove(textMesh2);
 
-				group.remove( textMesh1 );
-				if ( mirror ) group.remove( textMesh2 );
-
-				if ( ! text ) return;
+				if (!text) return;
 
 				createText();
-
 			}
 
-			function onPointerDown( event ) {
-
-				if ( event.isPrimary === false ) return;
+			function onPointerDown(event) {
+				if (event.isPrimary === false) return;
 
 				pointerXOnPointerDown = event.clientX - windowHalfX;
 				targetRotationOnPointerDown = targetRotation;
 
-				document.addEventListener( 'pointermove', onPointerMove );
-				document.addEventListener( 'pointerup', onPointerUp );
-
+				document.addEventListener("pointermove", onPointerMove);
+				document.addEventListener("pointerup", onPointerUp);
 			}
 
-			function onPointerMove( event ) {
-
-				if ( event.isPrimary === false ) return;
+			function onPointerMove(event) {
+				if (event.isPrimary === false) return;
 
 				pointerX = event.clientX - windowHalfX;
 
-				targetRotation = targetRotationOnPointerDown + ( pointerX - pointerXOnPointerDown ) * 0.02;
-
+				targetRotation =
+					targetRotationOnPointerDown +
+					(pointerX - pointerXOnPointerDown) * 0.02;
 			}
 
 			function onPointerUp() {
+				if (event.isPrimary === false) return;
 
-				if ( event.isPrimary === false ) return;
-
-				document.removeEventListener( 'pointermove', onPointerMove );
-				document.removeEventListener( 'pointerup', onPointerUp );
-
+				document.removeEventListener("pointermove", onPointerMove);
+				document.removeEventListener("pointerup", onPointerUp);
 			}
 
 			//
 
 			function animate() {
+				requestAnimationFrame(animate);
 
-				requestAnimationFrame( animate );
+				group.rotation.y += (targetRotation - group.rotation.y) * 0.05;
 
-				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
+				camera.lookAt(cameraTarget);
 
-				camera.lookAt( cameraTarget );
-
-				renderer.render( scene, camera );
-
+				renderer.render(scene, camera);
 			}
-
 		</script>
-
 	</body>
 </html>

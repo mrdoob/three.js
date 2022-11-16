@@ -2,19 +2,31 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - KMZLoader</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-			<a href="https://developers.google.com/kml/documentation/kmzarchives" target="_blank" rel="noopener">KMZLoader</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			-
+			<a
+				href="https://developers.google.com/kml/documentation/kmzarchives"
+				target="_blank"
+				rel="noopener"
+				>KMZLoader</a
+			>
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -26,76 +38,71 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { KMZLoader } from 'three/addons/loaders/KMZLoader.js';
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+			import { KMZLoader } from "three/addons/loaders/KMZLoader.js";
 
 			let camera, scene, renderer;
 
 			init();
 
 			function init() {
-
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x999999 );
+				scene.background = new THREE.Color(0x999999);
 
-				const light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0.5, 1.0, 0.5 ).normalize();
+				const light = new THREE.DirectionalLight(0xffffff);
+				light.position.set(0.5, 1.0, 0.5).normalize();
 
-				scene.add( light );
+				scene.add(light);
 
-				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 500 );
+				camera = new THREE.PerspectiveCamera(
+					35,
+					window.innerWidth / window.innerHeight,
+					1,
+					500
+				);
 
 				camera.position.y = 5;
 				camera.position.z = 10;
 
-				scene.add( camera );
+				scene.add(camera);
 
-				const grid = new THREE.GridHelper( 50, 50, 0xffffff, 0x333333 );
-				scene.add( grid );
+				const grid = new THREE.GridHelper(50, 50, 0xffffff, 0x333333);
+				scene.add(grid);
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer({ antialias: true });
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
 
 				const loader = new KMZLoader();
-				loader.load( './models/kmz/Box.kmz', function ( kmz ) {
-
+				loader.load("./models/kmz/Box.kmz", function (kmz) {
 					kmz.scene.position.y = 0.5;
-					scene.add( kmz.scene );
+					scene.add(kmz.scene);
 					render();
+				});
 
-				} );
-
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render );
+				const controls = new OrbitControls(camera, renderer.domElement);
+				controls.addEventListener("change", render);
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize(window.innerWidth, window.innerHeight);
 
 				render();
-
 			}
 
 			function render() {
-
-				renderer.render( scene, camera );
-
+				renderer.render(scene, camera);
 			}
-
 		</script>
 	</body>
 </html>

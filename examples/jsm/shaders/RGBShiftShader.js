@@ -9,16 +9,13 @@
  */
 
 const RGBShiftShader = {
-
 	uniforms: {
-
-		'tDiffuse': { value: null },
-		'amount': { value: 0.005 },
-		'angle': { value: 0.0 }
-
+		tDiffuse: { value: null },
+		amount: { value: 0.005 },
+		angle: { value: 0.0 },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -29,7 +26,7 @@ const RGBShiftShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		uniform sampler2D tDiffuse;
 		uniform float amount;
@@ -45,8 +42,7 @@ const RGBShiftShader = {
 			vec4 cb = texture2D(tDiffuse, vUv - offset);
 			gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);
 
-		}`
-
+		}`,
 };
 
 export { RGBShiftShader };

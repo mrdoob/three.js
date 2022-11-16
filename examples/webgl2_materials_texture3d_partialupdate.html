@@ -2,19 +2,26 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl2 - volume - cloud</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl2 - volume - cloud
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			webgl2 - volume - cloud
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -26,17 +33,15 @@
 		</script>
 
 		<script type="module">
-			import * as THREE from 'three';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+			import * as THREE from "three";
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+			import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+			import WebGL from "three/addons/capabilities/WebGL.js";
 
-			if ( WebGL.isWebGL2Available() === false ) {
-
-				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
-
+			if (WebGL.isWebGL2Available() === false) {
+				document.body.appendChild(WebGL.getWebGL2ErrorMessage());
 			}
 
 			const INITIAL_CLOUD_SIZE = 128;
@@ -49,75 +54,88 @@
 			init();
 			animate();
 
-			function generateCloudTexture( size, scaleFactor = 1.0 ) {
-
-				const data = new Uint8Array( size * size * size );
-				const scale = scaleFactor * 10.0 / size;
+			function generateCloudTexture(size, scaleFactor = 1.0) {
+				const data = new Uint8Array(size * size * size);
+				const scale = (scaleFactor * 10.0) / size;
 
 				let i = 0;
 				const perlin = new ImprovedNoise();
 				const vector = new THREE.Vector3();
 
-				for ( let z = 0; z < size; z ++ ) {
+				for (let z = 0; z < size; z++) {
+					for (let y = 0; y < size; y++) {
+						for (let x = 0; x < size; x++) {
+							const dist = vector
+								.set(x, y, z)
+								.subScalar(size / 2)
+								.divideScalar(size)
+								.length();
+							const fadingFactor = (1.0 - dist) * (1.0 - dist);
+							data[i] =
+								(128 +
+									128 *
+										perlin.noise(
+											(x * scale) / 1.5,
+											y * scale,
+											(z * scale) / 1.5
+										)) *
+								fadingFactor;
 
-					for ( let y = 0; y < size; y ++ ) {
-
-						for ( let x = 0; x < size; x ++ ) {
-
-							const dist = vector.set( x, y, z ).subScalar( size / 2 ).divideScalar( size ).length();
-							const fadingFactor = ( 1.0 - dist ) * ( 1.0 - dist );
-							data[ i ] = ( 128 + 128 * perlin.noise( x * scale / 1.5, y * scale, z * scale / 1.5 ) ) * fadingFactor;
-
-							i ++;
-
+							i++;
 						}
-
 					}
-
 				}
 
-				return new THREE.Data3DTexture( data, size, size, size );
-
+				return new THREE.Data3DTexture(data, size, size, size);
 			}
 
 			function init() {
-
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 0, 1.5 );
+				camera = new THREE.PerspectiveCamera(
+					60,
+					window.innerWidth / window.innerHeight,
+					0.1,
+					100
+				);
+				camera.position.set(0, 0, 1.5);
 
-				new OrbitControls( camera, renderer.domElement );
+				new OrbitControls(camera, renderer.domElement);
 
 				// Sky
 
-				const canvas = document.createElement( 'canvas' );
+				const canvas = document.createElement("canvas");
 				canvas.width = 1;
 				canvas.height = 32;
 
-				const context = canvas.getContext( '2d' );
-				const gradient = context.createLinearGradient( 0, 0, 0, 32 );
-				gradient.addColorStop( 0.0, '#014a84' );
-				gradient.addColorStop( 0.5, '#0561a0' );
-				gradient.addColorStop( 1.0, '#437ab6' );
+				const context = canvas.getContext("2d");
+				const gradient = context.createLinearGradient(0, 0, 0, 32);
+				gradient.addColorStop(0.0, "#014a84");
+				gradient.addColorStop(0.5, "#0561a0");
+				gradient.addColorStop(1.0, "#437ab6");
 				context.fillStyle = gradient;
-				context.fillRect( 0, 0, 1, 32 );
+				context.fillRect(0, 0, 1, 32);
 
 				const sky = new THREE.Mesh(
-					new THREE.SphereGeometry( 10 ),
-					new THREE.MeshBasicMaterial( { map: new THREE.CanvasTexture( canvas ), side: THREE.BackSide } )
+					new THREE.SphereGeometry(10),
+					new THREE.MeshBasicMaterial({
+						map: new THREE.CanvasTexture(canvas),
+						side: THREE.BackSide,
+					})
 				);
-				scene.add( sky );
+				scene.add(sky);
 
 				// Texture
 
 				const texture = new THREE.Data3DTexture(
-					new Uint8Array( INITIAL_CLOUD_SIZE * INITIAL_CLOUD_SIZE * INITIAL_CLOUD_SIZE ).fill( 0 ),
+					new Uint8Array(
+						INITIAL_CLOUD_SIZE * INITIAL_CLOUD_SIZE * INITIAL_CLOUD_SIZE
+					).fill(0),
 					INITIAL_CLOUD_SIZE,
 					INITIAL_CLOUD_SIZE,
 					INITIAL_CLOUD_SIZE
@@ -132,7 +150,7 @@
 
 				// Material
 
-				const vertexShader = /* glsl */`
+				const vertexShader = /* glsl */ `
 					in vec3 position;
 
 					uniform mat4 modelMatrix;
@@ -153,7 +171,7 @@
 					}
 				`;
 
-				const fragmentShader = /* glsl */`
+				const fragmentShader = /* glsl */ `
 					precision highp float;
 					precision highp sampler3D;
 
@@ -262,27 +280,27 @@
 					}
 				`;
 
-				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-				const material = new THREE.RawShaderMaterial( {
+				const geometry = new THREE.BoxGeometry(1, 1, 1);
+				const material = new THREE.RawShaderMaterial({
 					glslVersion: THREE.GLSL3,
 					uniforms: {
-						base: { value: new THREE.Color( 0x798aa0 ) },
+						base: { value: new THREE.Color(0x798aa0) },
 						map: { value: texture },
 						cameraPos: { value: new THREE.Vector3() },
 						threshold: { value: 0.25 },
 						opacity: { value: 0.25 },
 						range: { value: 0.1 },
 						steps: { value: 100 },
-						frame: { value: 0 }
+						frame: { value: 0 },
 					},
 					vertexShader,
 					fragmentShader,
 					side: THREE.BackSide,
-					transparent: true
-				} );
+					transparent: true,
+				});
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				mesh = new THREE.Mesh(geometry, material);
+				scene.add(mesh);
 
 				//
 
@@ -290,35 +308,30 @@
 					threshold: 0.25,
 					opacity: 0.25,
 					range: 0.1,
-					steps: 100
+					steps: 100,
 				};
 
 				function update() {
-
 					material.uniforms.threshold.value = parameters.threshold;
 					material.uniforms.opacity.value = parameters.opacity;
 					material.uniforms.range.value = parameters.range;
 					material.uniforms.steps.value = parameters.steps;
-
 				}
 
 				const gui = new GUI();
-				gui.add( parameters, 'threshold', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'opacity', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'range', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'steps', 0, 200, 1 ).onChange( update );
+				gui.add(parameters, "threshold", 0, 1, 0.01).onChange(update);
+				gui.add(parameters, "opacity", 0, 1, 0.01).onChange(update);
+				gui.add(parameters, "range", 0, 1, 0.01).onChange(update);
+				gui.add(parameters, "steps", 0, 200, 1).onChange(update);
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
 			let curr = 0;
@@ -328,45 +341,46 @@
 			const totalCount = sliceCount * countPerSlice;
 			const margins = 8;
 
-			const perElementPaddedSize = ( INITIAL_CLOUD_SIZE - margins ) / countPerRow;
-			const perElementSize = Math.floor( ( INITIAL_CLOUD_SIZE - 1 ) / countPerRow );
+			const perElementPaddedSize = (INITIAL_CLOUD_SIZE - margins) / countPerRow;
+			const perElementSize = Math.floor((INITIAL_CLOUD_SIZE - 1) / countPerRow);
 
 			function animate() {
-
-				requestAnimationFrame( animate );
+				requestAnimationFrame(animate);
 
 				const time = performance.now();
-				if ( time - prevTime > 1500.0 && curr < totalCount ) {
-
+				if (time - prevTime > 1500.0 && curr < totalCount) {
 					const position = new THREE.Vector3(
-						Math.floor( curr % countPerRow ) * perElementSize + margins * 0.5,
-						( Math.floor( ( ( curr % countPerSlice ) / countPerRow ) ) ) * perElementSize + margins * 0.5,
-						Math.floor( curr / countPerSlice ) * perElementSize + margins * 0.5
+						Math.floor(curr % countPerRow) * perElementSize + margins * 0.5,
+						Math.floor((curr % countPerSlice) / countPerRow) * perElementSize +
+							margins * 0.5,
+						Math.floor(curr / countPerSlice) * perElementSize + margins * 0.5
 					).floor();
 
 					const maxDimension = perElementPaddedSize - 1;
-					const box = new THREE.Box3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( maxDimension, maxDimension, maxDimension ) );
-					const scaleFactor = ( Math.random() + 0.5 ) * 0.5;
-					const source = generateCloudTexture( perElementPaddedSize, scaleFactor );
+					const box = new THREE.Box3(
+						new THREE.Vector3(0, 0, 0),
+						new THREE.Vector3(maxDimension, maxDimension, maxDimension)
+					);
+					const scaleFactor = (Math.random() + 0.5) * 0.5;
+					const source = generateCloudTexture(
+						perElementPaddedSize,
+						scaleFactor
+					);
 
-					renderer.copyTextureToTexture3D( box, position, source, cloudTexture );
+					renderer.copyTextureToTexture3D(box, position, source, cloudTexture);
 
 					prevTime = time;
 
-					curr ++;
-
+					curr++;
 				}
 
-				mesh.material.uniforms.cameraPos.value.copy( camera.position );
+				mesh.material.uniforms.cameraPos.value.copy(camera.position);
 				// mesh.rotation.y = - performance.now() / 7500;
 
-				mesh.material.uniforms.frame.value ++;
+				mesh.material.uniforms.frame.value++;
 
-				renderer.render( scene, camera );
-
+				renderer.render(scene, camera);
 			}
-
 		</script>
-
 	</body>
 </html>

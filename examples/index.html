@@ -1,22 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<title>three.js examples</title>
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="shortcut icon" href="../files/favicon_white.ico" media="(prefers-color-scheme: dark)"/>
-		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
-		<link rel="stylesheet" type="text/css" href="../files/main.css">
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link
+			rel="shortcut icon"
+			href="../files/favicon_white.ico"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<link
+			rel="shortcut icon"
+			href="../files/favicon.ico"
+			media="(prefers-color-scheme: light)"
+		/>
+		<link rel="stylesheet" type="text/css" href="../files/main.css" />
 	</head>
 	<body>
-
 		<div id="panel">
-
 			<div id="header">
 				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
-					<a href="../docs/index.html#manual/introduction/Creating-a-scene">docs</a>
+					<a href="../docs/index.html#manual/introduction/Creating-a-scene"
+						>docs</a
+					>
 					<span class="selected">examples</span>
 				</div>
 
@@ -26,385 +37,339 @@
 			<div id="panelScrim"></div>
 
 			<div id="contentWrapper">
-
 				<div id="inputWrapper">
-					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<input
+						placeholder=""
+						type="text"
+						id="filterInput"
+						autocorrect="off"
+						autocapitalize="off"
+						spellcheck="false"
+					/>
 					<div id="exitSearchButton"></div>
 				</div>
 
 				<div id="content">
-					<img id="previewsToggler" src="./files/thumbnails.svg" width="20" height="20" />
+					<img
+						id="previewsToggler"
+						src="./files/thumbnails.svg"
+						width="20"
+						height="20"
+					/>
 				</div>
 			</div>
-
 		</div>
 
-		<iframe id="viewer" name="viewer" allow="fullscreen; xr-spatial-tracking;"></iframe>
+		<iframe
+			id="viewer"
+			name="viewer"
+			allow="fullscreen; xr-spatial-tracking;"
+		></iframe>
 
-		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
+		<a id="button" target="_blank"
+			><img src="../files/ic_code_black_24dp.svg"
+		/></a>
 
 		<script>
+			const panel = document.getElementById("panel");
+			const content = document.getElementById("content");
+			const viewer = document.getElementById("viewer");
+			const filterInput = document.getElementById("filterInput");
+			const exitSearchButton = document.getElementById("exitSearchButton");
+			const expandButton = document.getElementById("expandButton");
+			const viewSrcButton = document.getElementById("button");
+			const panelScrim = document.getElementById("panelScrim");
+			const previewsToggler = document.getElementById("previewsToggler");
 
-		const panel = document.getElementById( 'panel' );
-		const content = document.getElementById( 'content' );
-		const viewer = document.getElementById( 'viewer' );
-		const filterInput = document.getElementById( 'filterInput' );
-		const exitSearchButton = document.getElementById( 'exitSearchButton' );
-		const expandButton = document.getElementById( 'expandButton' );
-		const viewSrcButton = document.getElementById( 'button' );
-		const panelScrim = document.getElementById( 'panelScrim' );
-		const previewsToggler = document.getElementById( 'previewsToggler' );
+			const sectionLink = document.querySelector("#sections > a");
+			const sectionDefaultHref = sectionLink.href;
 
-		const sectionLink = document.querySelector( '#sections > a' );
-		const sectionDefaultHref = sectionLink.href;
+			const links = {};
+			const validRedirects = new Map();
+			const container = document.createElement("div");
 
-		const links = {};
-		const validRedirects = new Map();
-		const container = document.createElement( 'div' );
+			let selected = null;
 
-		let selected = null;
+			init();
 
-		init();
+			async function init() {
+				content.appendChild(container);
 
-		async function init() {
+				viewSrcButton.style.display = "none";
 
-			content.appendChild( container );
+				const files = await (await fetch("files.json")).json();
+				const tags = await (await fetch("tags.json")).json();
 
-			viewSrcButton.style.display = 'none';
+				for (const key in files) {
+					const category = files[key];
 
-			const files = await ( await fetch( 'files.json' ) ).json();
-			const tags = await ( await fetch( 'tags.json' ) ).json();
+					const header = document.createElement("h2");
+					header.textContent = key;
+					header.setAttribute("data-category", key);
+					container.appendChild(header);
 
-			for ( const key in files ) {
+					for (let i = 0; i < category.length; i++) {
+						const file = category[i];
 
-				const category = files[ key ];
+						const link = createLink(file, tags[file]);
+						container.appendChild(link);
 
-				const header = document.createElement( 'h2' );
-				header.textContent = key;
-				header.setAttribute( 'data-category', key );
-				container.appendChild( header );
-
-				for ( let i = 0; i < category.length; i ++ ) {
-
-					const file = category[ i ];
-
-					const link = createLink( file, tags[ file ] );
-					container.appendChild( link );
-
-					links[ file ] = link;
-					validRedirects.set( file, file + '.html' );
-
+						links[file] = link;
+						validRedirects.set(file, file + ".html");
+					}
 				}
 
-			}
+				if (window.location.hash !== "") {
+					const file = window.location.hash.substring(1);
 
-			if ( window.location.hash !== '' ) {
+					// use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
 
-				const file = window.location.hash.substring( 1 );
-
-				// use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
-
-				if ( validRedirects.has( file ) === true ) {
-
-					selectFile( file );
-					viewer.src = validRedirects.get( file );
-					viewer.style.display = 'unset';
-
+					if (validRedirects.has(file) === true) {
+						selectFile(file);
+						viewer.src = validRedirects.get(file);
+						viewer.style.display = "unset";
+					}
 				}
 
-			}
-
-			if ( viewer.src === '' ) {
-
-				viewer.srcdoc = document.getElementById( 'PlaceholderHTML' ).innerHTML;
-				viewer.style.display = 'unset';
-
-			}
-
-			filterInput.value = extractQuery();
-
-			if ( filterInput.value !== '' ) {
-
-				panel.classList.add( 'searchFocused' );
-
-				updateFilter( files, tags );
-
-			} else {
-
-				updateLink( '' );
-
-			}
-
-			// Events
-
-			filterInput.onfocus = function ( ) {
-
-				panel.classList.add( 'searchFocused' );
-
-			};
-
-			filterInput.onblur = function ( ) {
-
-				if ( filterInput.value === '' ) {
-
-					panel.classList.remove( 'searchFocused' );
-
+				if (viewer.src === "") {
+					viewer.srcdoc = document.getElementById("PlaceholderHTML").innerHTML;
+					viewer.style.display = "unset";
 				}
 
-			};
+				filterInput.value = extractQuery();
 
-			exitSearchButton.onclick = function ( ) {
+				if (filterInput.value !== "") {
+					panel.classList.add("searchFocused");
 
-				filterInput.value = '';
-				updateFilter( files, tags );
-				panel.classList.remove( 'searchFocused' );
+					updateFilter(files, tags);
+				} else {
+					updateLink("");
+				}
 
-			};
+				// Events
 
-			filterInput.addEventListener( 'input', function () {
+				filterInput.onfocus = function () {
+					panel.classList.add("searchFocused");
+				};
 
-				updateFilter( files, tags );
+				filterInput.onblur = function () {
+					if (filterInput.value === "") {
+						panel.classList.remove("searchFocused");
+					}
+				};
 
-			} );
+				exitSearchButton.onclick = function () {
+					filterInput.value = "";
+					updateFilter(files, tags);
+					panel.classList.remove("searchFocused");
+				};
 
+				filterInput.addEventListener("input", function () {
+					updateFilter(files, tags);
+				});
 
-			expandButton.addEventListener( 'click', function ( event ) {
+				expandButton.addEventListener("click", function (event) {
+					event.preventDefault();
+					panel.classList.toggle("open");
+				});
 
-				event.preventDefault();
-				panel.classList.toggle( 'open' );
+				panelScrim.onclick = function (event) {
+					event.preventDefault();
+					panel.classList.toggle("open");
+				};
 
-			} );
+				previewsToggler.onclick = function (event) {
+					event.preventDefault();
+					content.classList.toggle("minimal");
+				};
 
-			panelScrim.onclick = function ( event ) {
+				// iOS iframe auto-resize workaround
 
-				event.preventDefault();
-				panel.classList.toggle( 'open' );
-
-			};
-
-			previewsToggler.onclick = function ( event ) {
-
-				event.preventDefault();
-				content.classList.toggle( 'minimal' );
-
-			};
-
-			// iOS iframe auto-resize workaround
-
-			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-				viewer.style.width = getComputedStyle( viewer ).width;
-				viewer.style.height = getComputedStyle( viewer ).height;
-				viewer.setAttribute( 'scrolling', 'no' );
-
+				if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
+					viewer.style.width = getComputedStyle(viewer).width;
+					viewer.style.height = getComputedStyle(viewer).height;
+					viewer.setAttribute("scrolling", "no");
+				}
 			}
 
-		}
+			function createLink(file, tags) {
+				const external =
+					Array.isArray(tags) && tags.includes("external")
+						? ' <span class="tag">external</span>'
+						: "";
 
-		function createLink( file, tags ) {
-
-			const external = Array.isArray( tags ) && tags.includes( 'external' ) ? ' <span class="tag">external</span>' : '';
-
-			const template = `
+				const template = `
 				<div class="card">
-					<a href="${ file }.html" target="viewer">
+					<a href="${file}.html" target="viewer">
 						<div class="cover">
-							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
+							<img src="screenshots/${file}.jpg" loading="lazy" width="400" />
 						</div>
-						<div class="title">${ getName( file ) }${ external }</div>
+						<div class="title">${getName(file)}${external}</div>
 					</a>
 				</div>
 			`;
 
-			const link = createElementFromHTML( template );
+				const link = createElementFromHTML(template);
 
-			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
+				link
+					.querySelector('a[target="viewer"]')
+					.addEventListener("click", function (event) {
+						if (
+							event.button !== 0 ||
+							event.ctrlKey ||
+							event.altKey ||
+							event.metaKey
+						)
+							return;
 
-				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+						selectFile(file);
+					});
 
-				selectFile( file );
-
-			} );
-
-			return link;
-
-		}
-
-		function selectFile( file ) {
-
-			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
-
-			links[ file ].classList.add( 'selected' );
-
-			window.location.hash = file;
-			viewer.focus();
-			viewer.style.display = 'unset';
-
-			panel.classList.remove( 'open' );
-
-			selected = file;
-
-			// Reveal "View source" button and set attributes to this example
-			viewSrcButton.style.display = '';
-			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
-			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
-
-		}
-
-		function escapeRegExp( string ) {
-
-			return string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // https://stackoverflow.com/a/6969486/5250847
-
-		}
-
-		function updateFilter( files, tags ) {
-
-			let v = filterInput.value.trim();
-			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
-
-			if ( v !== '' ) {
-
-				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
-
-			} else {
-
-				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
-
+				return link;
 			}
 
-			const exp = new RegExp( escapeRegExp( v ), 'gi' );
+			function selectFile(file) {
+				if (selected !== null) links[selected].classList.remove("selected");
 
-			for ( const key in files ) {
+				links[file].classList.add("selected");
 
-				const section = files[ key ];
+				window.location.hash = file;
+				viewer.focus();
+				viewer.style.display = "unset";
 
-				for ( let i = 0; i < section.length; i ++ ) {
+				panel.classList.remove("open");
 
-					filterExample( section[ i ], exp, tags );
+				selected = file;
 
+				// Reveal "View source" button and set attributes to this example
+				viewSrcButton.style.display = "";
+				viewSrcButton.href =
+					"https://github.com/mrdoob/three.js/blob/master/examples/" +
+					selected +
+					".html";
+				viewSrcButton.title =
+					"View source code for " + getName(selected) + " on GitHub";
+			}
+
+			function escapeRegExp(string) {
+				return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // https://stackoverflow.com/a/6969486/5250847
+			}
+
+			function updateFilter(files, tags) {
+				let v = filterInput.value.trim();
+				v = v.replace(/\s+/gi, " "); // replace multiple whitespaces with a single one
+
+				if (v !== "") {
+					window.history.replaceState({}, "", "?q=" + v + window.location.hash);
+				} else {
+					window.history.replaceState(
+						{},
+						"",
+						window.location.pathname + window.location.hash
+					);
 				}
 
+				const exp = new RegExp(escapeRegExp(v), "gi");
+
+				for (const key in files) {
+					const section = files[key];
+
+					for (let i = 0; i < section.length; i++) {
+						filterExample(section[i], exp, tags);
+					}
+				}
+
+				layoutList(files);
+
+				updateLink(v);
 			}
 
-			layoutList( files );
+			function updateLink(search) {
+				// update docs link
 
-			updateLink( v );
-
-		}
-
-		function updateLink( search ) {
-
-			// update docs link
-
-			if ( search ) {
-
-				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
-				sectionLink.href = `${link}?q=${search}`;
-
-			} else {
-
-				sectionLink.href = sectionDefaultHref;
-
+				if (search) {
+					const link = sectionLink.href.split(/[?#]/)[0];
+					sectionLink.href = `${link}?q=${search}`;
+				} else {
+					sectionLink.href = sectionDefaultHref;
+				}
 			}
 
-		}
+			function filterExample(file, exp, tags) {
+				const link = links[file];
+				if (file in tags) file += " " + tags[file].join(" ");
+				const res = file.replace(/_+/g, " ").match(exp);
 
-		function filterExample( file, exp, tags ) {
-
-			const link = links[ file ];
-			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
-			const res = file.replace( /_+/g, ' ' ).match( exp );
-
-			if ( res && res.length > 0 ) {
-
-				link.classList.remove( 'hidden' );
-
-			} else {
-
-				link.classList.add( 'hidden' );
-
+				if (res && res.length > 0) {
+					link.classList.remove("hidden");
+				} else {
+					link.classList.add("hidden");
+				}
 			}
 
-		}
+			function getName(file) {
+				const name = file.split("_");
+				name.shift();
+				return name.join(" / ");
+			}
 
-		function getName( file ) {
+			function layoutList(files) {
+				for (const key in files) {
+					let collapsed = true;
 
-			const name = file.split( '_' );
-			name.shift();
-			return name.join( ' / ' );
+					const section = files[key];
 
-		}
+					for (let i = 0; i < section.length; i++) {
+						const file = section[i];
 
-		function layoutList( files ) {
-
-			for ( const key in files ) {
-
-				let collapsed = true;
-
-				const section = files[ key ];
-
-				for ( let i = 0; i < section.length; i ++ ) {
-
-					const file = section[ i ];
-
-					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
-
-						collapsed = false;
-						break;
-
+						if (links[file].classList.contains("hidden") === false) {
+							collapsed = false;
+							break;
+						}
 					}
 
+					const element = document.querySelector(
+						'h2[data-category="' + key + '"]'
+					);
+
+					if (collapsed) {
+						element.classList.add("hidden");
+					} else {
+						element.classList.remove("hidden");
+					}
 				}
-
-				const element = document.querySelector( 'h2[data-category="' + key + '"]' );
-
-				if ( collapsed ) {
-
-					element.classList.add( 'hidden' );
-
-				} else {
-
-					element.classList.remove( 'hidden' );
-
-				}
-
 			}
 
-		}
+			function extractQuery() {
+				const search = window.location.search;
 
-		function extractQuery() {
+				if (search.indexOf("?q=") !== -1) {
+					return decodeURI(search.slice(3));
+				}
 
-			const search = window.location.search;
-
-			if ( search.indexOf( '?q=' ) !== - 1 ) {
-
-				return decodeURI( search.slice( 3 ) );
-
+				return "";
 			}
 
-			return '';
-
-		}
-
-		function createElementFromHTML( htmlString ) {
-
-			const div = document.createElement( 'div' );
-			div.innerHTML = htmlString.trim();
-			return div.firstChild;
-
-		}
-
+			function createElementFromHTML(htmlString) {
+				const div = document.createElement("div");
+				div.innerHTML = htmlString.trim();
+				return div.firstChild;
+			}
 		</script>
 		<template id="PlaceholderHTML">
 			<!DOCTYPE html>
-				<html lang="en">
-					<head>
-						<meta charset="utf-8">
-						<title>three.js examples</title>
-						<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-						<link rel="stylesheet" type="text/css" href="../files/main.css">
-						<style>
-						html, body {
+			<html lang="en">
+				<head>
+					<meta charset="utf-8" />
+					<title>three.js examples</title>
+					<meta
+						name="viewport"
+						content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+					/>
+					<link rel="stylesheet" type="text/css" href="../files/main.css" />
+					<style>
+						html,
+						body {
 							height: 100%;
 						}
 						body {
@@ -414,12 +379,12 @@
 							justify-content: center;
 							user-select: none;
 						}
-						</style>
-					</head>
-					<body>
-						Select an example from the sidebar
-					</body>
-				</html>
+					</style>
+				</head>
+				<body>
+					Select an example from the sidebar
+				</body>
+			</html>
 		</template>
 	</body>
 </html>

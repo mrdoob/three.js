@@ -2,21 +2,26 @@
 <html lang="en">
 	<head>
 		<title>three.js WebGL 2 - buffergeometry - attributes - none</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
-
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGL 2 - buffergeometry - attributes - none</div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			WebGL 2 - buffergeometry - attributes - none
+		</div>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
-			
+
 			uniform mat4 modelViewMatrix;
 			uniform mat4 projectionMatrix;
-			
+
 			uniform float seed;
-			
+
 			const uint ieeeMantissa = 0x007FFFFFu;
 			const uint ieeeOne = 0x3F800000u;
 
@@ -28,22 +33,22 @@
 				x += ( x << 15u );
 				return x;
 			}
-			
+
 			uint hash(uvec2 v) { return hash( v.x ^ hash(v.y) ); }
-			
+
 			float hashNoise(vec2 xy) {
-				uint m = hash(floatBitsToUint(xy)); 
-				
+				uint m = hash(floatBitsToUint(xy));
+
 				m &= ieeeMantissa;
 				m |= ieeeOne;
-				
+
 				return uintBitsToFloat( m ) - 1.0;
 			}
-			
+
 			float pseudoRandom(float lower, float delta, in vec2 xy) {
 				return lower + delta*hashNoise(xy);
 			}
-			
+
 			vec3 pseudoRandomVec3(float lower, float upper, int index) {
 				float delta = upper - lower;
 				float x = pseudoRandom(lower, delta, vec2(index, 0));
@@ -51,7 +56,7 @@
 				float z = pseudoRandom(lower, delta, vec2(index, 2));
 				return vec3(x, y, z);
 			}
-			
+
 			out vec3 vColor;
 
 			void main()	{
@@ -66,11 +71,11 @@
 		</script>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
-					
+
 			precision mediump float;
 
 			in vec3 vColor;
-			
+
 			out vec4 fColor;
 
 			void main()	{
@@ -82,7 +87,10 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -94,15 +102,12 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
+			import WebGL from "three/addons/capabilities/WebGL.js";
 
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			if ( WebGL.isWebGL2Available() === false ) {
-
-				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
-
+			if (WebGL.isWebGL2Available() === false) {
+				document.body.appendChild(WebGL.getWebGL2ErrorMessage());
 			}
 
 			let camera, scene, renderer, mesh;
@@ -111,13 +116,17 @@
 			animate();
 
 			function init() {
-
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera = new THREE.PerspectiveCamera(
+					27,
+					window.innerWidth / window.innerHeight,
+					1,
+					3500
+				);
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x050505 );
-				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+				scene.background = new THREE.Color(0x050505);
+				scene.fog = new THREE.Fog(0x050505, 2000, 3500);
 
 				// geometry
 
@@ -126,47 +135,42 @@
 				const vertexCount = triangleCount * vertexCountPerTriangle;
 
 				const geometry = new THREE.BufferGeometry();
-				geometry.setDrawRange( 0, vertexCount );
+				geometry.setDrawRange(0, vertexCount);
 
 				// material
 
-				const material = new THREE.RawShaderMaterial( {
+				const material = new THREE.RawShaderMaterial({
 					uniforms: {
 						seed: { value: 42 },
 					},
-					vertexShader: document.getElementById( 'vertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					vertexShader: document.getElementById("vertexShader").textContent,
+					fragmentShader: document.getElementById("fragmentShader").textContent,
 					side: THREE.DoubleSide,
-					glslVersion: THREE.GLSL3
-				} );
+					glslVersion: THREE.GLSL3,
+				});
 
 				// mesh
 
-				mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh(geometry, material);
 				mesh.frustumCulled = false;
-				scene.add( mesh );
+				scene.add(mesh);
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
 			}
 
-			function animate( time ) {
+			function animate(time) {
+				requestAnimationFrame(animate);
 
-				requestAnimationFrame( animate );
+				mesh.rotation.x = (time / 1000.0) * 0.25;
+				mesh.rotation.y = (time / 1000.0) * 0.5;
 
-				mesh.rotation.x = time / 1000.0 * 0.25;
-				mesh.rotation.y = time / 1000.0 * 0.50;
-			
-				renderer.render( scene, camera );
-
+				renderer.render(scene, camera);
 			}
-
 		</script>
-
 	</body>
 </html>

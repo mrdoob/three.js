@@ -1,19 +1,13 @@
-import Node from '../core/Node.js';
+import Node from "../core/Node.js";
 
 class LightingNode extends Node {
-
 	constructor() {
-
-		super( 'vec3' );
-
+		super("vec3");
 	}
 
-	generate( /*builder*/ ) {
-
-		console.warn( 'Abstract function.' );
-
+	generate(/*builder*/) {
+		console.warn("Abstract function.");
 	}
-
 }
 
 export default LightingNode;

@@ -3,17 +3,14 @@
  */
 
 const BlendShader = {
-
 	uniforms: {
-
-		'tDiffuse1': { value: null },
-		'tDiffuse2': { value: null },
-		'mixRatio': { value: 0.5 },
-		'opacity': { value: 1.0 }
-
+		tDiffuse1: { value: null },
+		tDiffuse2: { value: null },
+		mixRatio: { value: 0.5 },
+		opacity: { value: 1.0 },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -24,7 +21,7 @@ const BlendShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		uniform float opacity;
 		uniform float mixRatio;
@@ -41,8 +38,7 @@ const BlendShader = {
 			gl_FragColor = mix( texel1, texel2, mixRatio );
 			gl_FragColor.a *= opacity;
 
-		}`
-
+		}`,
 };
 
 export { BlendShader };

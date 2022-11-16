@@ -1,10 +1,8 @@
-import WebGPURenderPipeline from './WebGPURenderPipeline.js';
-import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
+import WebGPURenderPipeline from "./WebGPURenderPipeline.js";
+import WebGPUProgrammableStage from "./WebGPUProgrammableStage.js";
 
 class WebGPURenderPipelines {
-
-	constructor( device, nodes, utils ) {
-
+	constructor(device, nodes, utils) {
 		this.device = device;
 		this.nodes = nodes;
 		this.utils = utils;
@@ -16,254 +14,263 @@ class WebGPURenderPipelines {
 
 		this.stages = {
 			vertex: new Map(),
-			fragment: new Map()
+			fragment: new Map(),
 		};
-
 	}
 
-	get( object ) {
-
+	get(object) {
 		const device = this.device;
 
-		const cache = this._getCache( object );
+		const cache = this._getCache(object);
 
 		let currentPipeline;
 
-		if ( this._needsUpdate( object, cache ) ) {
-
+		if (this._needsUpdate(object, cache)) {
 			const material = object.material;
 
 			// release previous cache
 
-			if ( cache.currentPipeline !== undefined ) {
-
-				this._releaseObject( object );
-
+			if (cache.currentPipeline !== undefined) {
+				this._releaseObject(object);
 			}
 
 			// get shader
 
-			const nodeBuilder = this.nodes.get( object );
+			const nodeBuilder = this.nodes.get(object);
 
 			// programmable stages
 
-			let stageVertex = this.stages.vertex.get( nodeBuilder.vertexShader );
+			let stageVertex = this.stages.vertex.get(nodeBuilder.vertexShader);
 
-			if ( stageVertex === undefined ) {
-
-				stageVertex = new WebGPUProgrammableStage( device, nodeBuilder.vertexShader, 'vertex' );
-				this.stages.vertex.set( nodeBuilder.vertexShader, stageVertex );
-
+			if (stageVertex === undefined) {
+				stageVertex = new WebGPUProgrammableStage(
+					device,
+					nodeBuilder.vertexShader,
+					"vertex"
+				);
+				this.stages.vertex.set(nodeBuilder.vertexShader, stageVertex);
 			}
 
-			let stageFragment = this.stages.fragment.get( nodeBuilder.fragmentShader );
+			let stageFragment = this.stages.fragment.get(nodeBuilder.fragmentShader);
 
-			if ( stageFragment === undefined ) {
-
-				stageFragment = new WebGPUProgrammableStage( device, nodeBuilder.fragmentShader, 'fragment' );
-				this.stages.fragment.set( nodeBuilder.fragmentShader, stageFragment );
-
+			if (stageFragment === undefined) {
+				stageFragment = new WebGPUProgrammableStage(
+					device,
+					nodeBuilder.fragmentShader,
+					"fragment"
+				);
+				this.stages.fragment.set(nodeBuilder.fragmentShader, stageFragment);
 			}
 
 			// determine render pipeline
 
-			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, object, nodeBuilder );
+			currentPipeline = this._acquirePipeline(
+				stageVertex,
+				stageFragment,
+				object,
+				nodeBuilder
+			);
 			cache.currentPipeline = currentPipeline;
 
 			// keep track of all used times
 
-			currentPipeline.usedTimes ++;
-			stageVertex.usedTimes ++;
-			stageFragment.usedTimes ++;
+			currentPipeline.usedTimes++;
+			stageVertex.usedTimes++;
+			stageFragment.usedTimes++;
 
 			// events
 
-			material.addEventListener( 'dispose', cache.dispose );
-
+			material.addEventListener("dispose", cache.dispose);
 		} else {
-
 			currentPipeline = cache.currentPipeline;
-
 		}
 
 		return currentPipeline;
-
 	}
 
 	dispose() {
-
 		this.pipelines = [];
 		this.objectCache = new WeakMap();
 		this.shaderModules = {
 			vertex: new Map(),
-			fragment: new Map()
+			fragment: new Map(),
 		};
-
 	}
 
-	_acquirePipeline( stageVertex, stageFragment, object, nodeBuilder ) {
-
+	_acquirePipeline(stageVertex, stageFragment, object, nodeBuilder) {
 		let pipeline;
 		const pipelines = this.pipelines;
 
 		// check for existing pipeline
 
-		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, object );
+		const cacheKey = this._computeCacheKey(stageVertex, stageFragment, object);
 
-		for ( let i = 0, il = pipelines.length; i < il; i ++ ) {
+		for (let i = 0, il = pipelines.length; i < il; i++) {
+			const preexistingPipeline = pipelines[i];
 
-			const preexistingPipeline = pipelines[ i ];
-
-			if ( preexistingPipeline.cacheKey === cacheKey ) {
-
+			if (preexistingPipeline.cacheKey === cacheKey) {
 				pipeline = preexistingPipeline;
 				break;
-
 			}
-
 		}
 
-		if ( pipeline === undefined ) {
+		if (pipeline === undefined) {
+			pipeline = new WebGPURenderPipeline(this.device, this.utils);
+			pipeline.init(cacheKey, stageVertex, stageFragment, object, nodeBuilder);
 
-			pipeline = new WebGPURenderPipeline( this.device, this.utils );
-			pipeline.init( cacheKey, stageVertex, stageFragment, object, nodeBuilder );
-
-			pipelines.push( pipeline );
-
+			pipelines.push(pipeline);
 		}
 
 		return pipeline;
-
 	}
 
-	_computeCacheKey( stageVertex, stageFragment, object ) {
-
+	_computeCacheKey(stageVertex, stageFragment, object) {
 		const material = object.material;
 		const utils = this.utils;
 
 		const parameters = [
-			stageVertex.id, stageFragment.id,
-			material.transparent, material.blending, material.premultipliedAlpha,
-			material.blendSrc, material.blendDst, material.blendEquation,
-			material.blendSrcAlpha, material.blendDstAlpha, material.blendEquationAlpha,
+			stageVertex.id,
+			stageFragment.id,
+			material.transparent,
+			material.blending,
+			material.premultipliedAlpha,
+			material.blendSrc,
+			material.blendDst,
+			material.blendEquation,
+			material.blendSrcAlpha,
+			material.blendDstAlpha,
+			material.blendEquationAlpha,
 			material.colorWrite,
-			material.depthWrite, material.depthTest, material.depthFunc,
-			material.stencilWrite, material.stencilFunc,
-			material.stencilFail, material.stencilZFail, material.stencilZPass,
-			material.stencilFuncMask, material.stencilWriteMask,
+			material.depthWrite,
+			material.depthTest,
+			material.depthFunc,
+			material.stencilWrite,
+			material.stencilFunc,
+			material.stencilFail,
+			material.stencilZFail,
+			material.stencilZPass,
+			material.stencilFuncMask,
+			material.stencilWriteMask,
 			material.side,
 			utils.getSampleCount(),
-			utils.getCurrentEncoding(), utils.getCurrentColorFormat(), utils.getCurrentDepthStencilFormat(),
-			utils.getPrimitiveTopology( object )
+			utils.getCurrentEncoding(),
+			utils.getCurrentColorFormat(),
+			utils.getCurrentDepthStencilFormat(),
+			utils.getPrimitiveTopology(object),
 		];
 
 		return parameters.join();
-
 	}
 
-	_getCache( object ) {
+	_getCache(object) {
+		let cache = this.objectCache.get(object);
 
-		let cache = this.objectCache.get( object );
-
-		if ( cache === undefined ) {
-
+		if (cache === undefined) {
 			cache = {
-
 				dispose: () => {
+					this._releaseObject(object);
 
-					this._releaseObject( object );
+					this.objectCache.delete(object);
 
-					this.objectCache.delete( object );
-
-					object.material.removeEventListener( 'dispose', cache.dispose );
-
-				}
-
+					object.material.removeEventListener("dispose", cache.dispose);
+				},
 			};
 
-			this.objectCache.set( object, cache );
-
+			this.objectCache.set(object, cache);
 		}
 
 		return cache;
-
 	}
 
-	_releaseObject( object ) {
+	_releaseObject(object) {
+		const cache = this.objectCache.get(object);
 
-		const cache = this.objectCache.get( object );
-
-		this._releasePipeline( cache.currentPipeline );
+		this._releasePipeline(cache.currentPipeline);
 		delete cache.currentPipeline;
 
-		this.nodes.remove( object );
-		this.bindings.remove( object );
-
+		this.nodes.remove(object);
+		this.bindings.remove(object);
 	}
 
-	_releasePipeline( pipeline ) {
-
-		if ( -- pipeline.usedTimes === 0 ) {
-
+	_releasePipeline(pipeline) {
+		if (--pipeline.usedTimes === 0) {
 			const pipelines = this.pipelines;
 
-			const i = pipelines.indexOf( pipeline );
-			pipelines[ i ] = pipelines[ pipelines.length - 1 ];
+			const i = pipelines.indexOf(pipeline);
+			pipelines[i] = pipelines[pipelines.length - 1];
 			pipelines.pop();
 
-			this._releaseStage( pipeline.stageVertex );
-			this._releaseStage( pipeline.stageFragment );
-
+			this._releaseStage(pipeline.stageVertex);
+			this._releaseStage(pipeline.stageFragment);
 		}
-
 	}
 
-	_releaseStage( stage ) {
-
-		if ( -- stage.usedTimes === 0 ) {
-
+	_releaseStage(stage) {
+		if (--stage.usedTimes === 0) {
 			const code = stage.code;
 			const type = stage.type;
 
-			this.stages[ type ].delete( code );
-
+			this.stages[type].delete(code);
 		}
-
 	}
 
-	_needsUpdate( object, cache ) {
-
+	_needsUpdate(object, cache) {
 		const material = object.material;
 
 		let needsUpdate = false;
 
 		// check material state
 
-		if ( cache.material !== material || cache.materialVersion !== material.version ||
-			cache.transparent !== material.transparent || cache.blending !== material.blending || cache.premultipliedAlpha !== material.premultipliedAlpha ||
-			cache.blendSrc !== material.blendSrc || cache.blendDst !== material.blendDst || cache.blendEquation !== material.blendEquation ||
-			cache.blendSrcAlpha !== material.blendSrcAlpha || cache.blendDstAlpha !== material.blendDstAlpha || cache.blendEquationAlpha !== material.blendEquationAlpha ||
+		if (
+			cache.material !== material ||
+			cache.materialVersion !== material.version ||
+			cache.transparent !== material.transparent ||
+			cache.blending !== material.blending ||
+			cache.premultipliedAlpha !== material.premultipliedAlpha ||
+			cache.blendSrc !== material.blendSrc ||
+			cache.blendDst !== material.blendDst ||
+			cache.blendEquation !== material.blendEquation ||
+			cache.blendSrcAlpha !== material.blendSrcAlpha ||
+			cache.blendDstAlpha !== material.blendDstAlpha ||
+			cache.blendEquationAlpha !== material.blendEquationAlpha ||
 			cache.colorWrite !== material.colorWrite ||
-			cache.depthWrite !== material.depthWrite || cache.depthTest !== material.depthTest || cache.depthFunc !== material.depthFunc ||
-			cache.stencilWrite !== material.stencilWrite || cache.stencilFunc !== material.stencilFunc ||
-			cache.stencilFail !== material.stencilFail || cache.stencilZFail !== material.stencilZFail || cache.stencilZPass !== material.stencilZPass ||
-			cache.stencilFuncMask !== material.stencilFuncMask || cache.stencilWriteMask !== material.stencilWriteMask ||
+			cache.depthWrite !== material.depthWrite ||
+			cache.depthTest !== material.depthTest ||
+			cache.depthFunc !== material.depthFunc ||
+			cache.stencilWrite !== material.stencilWrite ||
+			cache.stencilFunc !== material.stencilFunc ||
+			cache.stencilFail !== material.stencilFail ||
+			cache.stencilZFail !== material.stencilZFail ||
+			cache.stencilZPass !== material.stencilZPass ||
+			cache.stencilFuncMask !== material.stencilFuncMask ||
+			cache.stencilWriteMask !== material.stencilWriteMask ||
 			cache.side !== material.side
 		) {
-
-			cache.material = material; cache.materialVersion = material.version;
-			cache.transparent = material.transparent; cache.blending = material.blending; cache.premultipliedAlpha = material.premultipliedAlpha;
-			cache.blendSrc = material.blendSrc; cache.blendDst = material.blendDst; cache.blendEquation = material.blendEquation;
-			cache.blendSrcAlpha = material.blendSrcAlpha; cache.blendDstAlpha = material.blendDstAlpha; cache.blendEquationAlpha = material.blendEquationAlpha;
+			cache.material = material;
+			cache.materialVersion = material.version;
+			cache.transparent = material.transparent;
+			cache.blending = material.blending;
+			cache.premultipliedAlpha = material.premultipliedAlpha;
+			cache.blendSrc = material.blendSrc;
+			cache.blendDst = material.blendDst;
+			cache.blendEquation = material.blendEquation;
+			cache.blendSrcAlpha = material.blendSrcAlpha;
+			cache.blendDstAlpha = material.blendDstAlpha;
+			cache.blendEquationAlpha = material.blendEquationAlpha;
 			cache.colorWrite = material.colorWrite;
-			cache.depthWrite = material.depthWrite; cache.depthTest = material.depthTest; cache.depthFunc = material.depthFunc;
-			cache.stencilWrite = material.stencilWrite; cache.stencilFunc = material.stencilFunc;
-			cache.stencilFail = material.stencilFail; cache.stencilZFail = material.stencilZFail; cache.stencilZPass = material.stencilZPass;
-			cache.stencilFuncMask = material.stencilFuncMask; cache.stencilWriteMask = material.stencilWriteMask;
+			cache.depthWrite = material.depthWrite;
+			cache.depthTest = material.depthTest;
+			cache.depthFunc = material.depthFunc;
+			cache.stencilWrite = material.stencilWrite;
+			cache.stencilFunc = material.stencilFunc;
+			cache.stencilFail = material.stencilFail;
+			cache.stencilZFail = material.stencilZFail;
+			cache.stencilZPass = material.stencilZPass;
+			cache.stencilFuncMask = material.stencilFuncMask;
+			cache.stencilWriteMask = material.stencilWriteMask;
 			cache.side = material.side;
 
 			needsUpdate = true;
-
 		}
 
 		// check renderer state
@@ -275,22 +282,22 @@ class WebGPURenderPipelines {
 		const colorFormat = utils.getCurrentColorFormat();
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat();
 
-		if ( cache.sampleCount !== sampleCount || cache.encoding !== encoding ||
-			cache.colorFormat !== colorFormat || cache.depthStencilFormat !== depthStencilFormat ) {
-
+		if (
+			cache.sampleCount !== sampleCount ||
+			cache.encoding !== encoding ||
+			cache.colorFormat !== colorFormat ||
+			cache.depthStencilFormat !== depthStencilFormat
+		) {
 			cache.sampleCount = sampleCount;
 			cache.encoding = encoding;
 			cache.colorFormat = colorFormat;
 			cache.depthStencilFormat = depthStencilFormat;
 
 			needsUpdate = true;
-
 		}
 
 		return needsUpdate;
-
 	}
-
 }
 
 export default WebGPURenderPipelines;

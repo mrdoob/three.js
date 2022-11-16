@@ -1,133 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>three.js webgl - loaders - Draco loader</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css" rel="stylesheet" href="main.css">
-</head>
+	<head>
+		<title>three.js webgl - loaders - Draco loader</title>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
 
-<body>
-	<div id="container"></div>
-	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		<a href="https://github.com/google/draco" target="_blank" rel="noopener">DRACO</a> loader
-	</div>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			-
+			<a href="https://github.com/google/draco" target="_blank" rel="noopener"
+				>DRACO</a
+			>
+			loader
+		</div>
 
-	<!-- Import maps polyfill -->
-	<!-- Remove this when import maps will be widely supported -->
-	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
-	<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.module.js",
-				"three/addons/": "./jsm/"
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
 			}
-		}
-	</script>
+		</script>
 
-	<script type="module">
-		import * as THREE from 'three';
+		<script type="module">
+			import * as THREE from "three";
 
-		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 
-		let camera, scene, renderer;
+			let camera, scene, renderer;
 
-		const container = document.querySelector( '#container' );
+			const container = document.querySelector("#container");
 
-		// Configure and create Draco decoder.
-		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath( 'js/libs/draco/' );
-		dracoLoader.setDecoderConfig( { type: 'js' } );
+			// Configure and create Draco decoder.
+			const dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath("js/libs/draco/");
+			dracoLoader.setDecoderConfig({ type: "js" });
 
-		init();
-		animate();
+			init();
+			animate();
 
-		function init() {
+			function init() {
+				camera = new THREE.PerspectiveCamera(
+					35,
+					window.innerWidth / window.innerHeight,
+					0.1,
+					15
+				);
+				camera.position.set(3, 0.25, 3);
 
-			camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 15 );
-			camera.position.set( 3, 0.25, 3 );
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x443333);
+				scene.fog = new THREE.Fog(0x443333, 1, 4);
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x443333 );
-			scene.fog = new THREE.Fog( 0x443333, 1, 4 );
+				// Ground
+				const plane = new THREE.Mesh(
+					new THREE.PlaneGeometry(8, 8),
+					new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
+				);
+				plane.rotation.x = -Math.PI / 2;
+				plane.position.y = 0.03;
+				plane.receiveShadow = true;
+				scene.add(plane);
 
-			// Ground
-			const plane = new THREE.Mesh(
-				new THREE.PlaneGeometry( 8, 8 ),
-				new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
-			);
-			plane.rotation.x = - Math.PI / 2;
-			plane.position.y = 0.03;
-			plane.receiveShadow = true;
-			scene.add( plane );
+				// Lights
+				const hemiLight = new THREE.HemisphereLight(0x443333, 0x111122);
+				scene.add(hemiLight);
 
-			// Lights
-			const hemiLight = new THREE.HemisphereLight( 0x443333, 0x111122 );
-			scene.add( hemiLight );
+				const spotLight = new THREE.SpotLight();
+				spotLight.angle = Math.PI / 16;
+				spotLight.penumbra = 0.5;
+				spotLight.castShadow = true;
+				spotLight.position.set(-1, 1, 1);
+				scene.add(spotLight);
 
-			const spotLight = new THREE.SpotLight();
-			spotLight.angle = Math.PI / 16;
-			spotLight.penumbra = 0.5;
-			spotLight.castShadow = true;
-			spotLight.position.set( - 1, 1, 1 );
-			scene.add( spotLight );
+				dracoLoader.load("models/draco/bunny.drc", function (geometry) {
+					geometry.computeVertexNormals();
 
-			dracoLoader.load( 'models/draco/bunny.drc', function ( geometry ) {
+					const material = new THREE.MeshStandardMaterial({ color: 0x606060 });
+					const mesh = new THREE.Mesh(geometry, material);
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+					scene.add(mesh);
 
-				geometry.computeVertexNormals();
+					// Release decoder resources.
+					dracoLoader.dispose();
+				});
 
-				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
-				const mesh = new THREE.Mesh( geometry, material );
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
-				scene.add( mesh );
+				// renderer
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.shadowMap.enabled = true;
+				container.appendChild(renderer.domElement);
 
-				// Release decoder resources.
-				dracoLoader.dispose();
+				window.addEventListener("resize", onWindowResize);
+			}
 
-			} );
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-			// renderer
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.outputEncoding = THREE.sRGBEncoding;
-			renderer.shadowMap.enabled = true;
-			container.appendChild( renderer.domElement );
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			}
 
-			window.addEventListener( 'resize', onWindowResize );
+			function animate() {
+				render();
+				requestAnimationFrame(animate);
+			}
 
-		}
+			function render() {
+				const timer = Date.now() * 0.0003;
 
-		function onWindowResize() {
+				camera.position.x = Math.sin(timer) * 0.5;
+				camera.position.z = Math.cos(timer) * 0.5;
+				camera.lookAt(0, 0.1, 0);
 
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-
-			renderer.setSize( window.innerWidth, window.innerHeight );
-
-		}
-
-		function animate() {
-
-			render();
-			requestAnimationFrame( animate );
-
-		}
-
-		function render() {
-
-			const timer = Date.now() * 0.0003;
-
-			camera.position.x = Math.sin( timer ) * 0.5;
-			camera.position.z = Math.cos( timer ) * 0.5;
-			camera.lookAt( 0, 0.1, 0 );
-
-			renderer.render( scene, camera );
-
-		}
-	</script>
-</body>
+				renderer.render(scene, camera);
+			}
+		</script>
+	</body>
 </html>

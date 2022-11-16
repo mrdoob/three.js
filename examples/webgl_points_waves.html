@@ -2,14 +2,17 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - particles - waves</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
-
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particles waves example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- webgl particles waves example
 		</div>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
@@ -25,7 +28,6 @@
 				gl_Position = projectionMatrix * mvPosition;
 
 			}
-
 		</script>
 
 		<script type="x-shader/x-fragment" id="fragmentshader">
@@ -39,12 +41,14 @@
 				gl_FragColor = vec4( color, 1.0 );
 
 			}
-
 		</script>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -56,19 +60,22 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
+			import Stats from "three/addons/libs/stats.module.js";
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			const SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
+			const SEPARATION = 100,
+				AMOUNTX = 50,
+				AMOUNTY = 50;
 
 			let container, stats;
 			let camera, scene, renderer;
 
-			let particles, count = 0;
+			let particles,
+				count = 0;
 
-			let mouseX = 0, mouseY = 0;
+			let mouseX = 0,
+				mouseY = 0;
 
 			let windowHalfX = window.innerWidth / 2;
 			let windowHalfY = window.innerHeight / 2;
@@ -77,11 +84,15 @@
 			animate();
 
 			function init() {
+				container = document.createElement("div");
+				document.body.appendChild(container);
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera(
+					75,
+					window.innerWidth / window.innerHeight,
+					1,
+					10000
+				);
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
@@ -90,137 +101,124 @@
 
 				const numParticles = AMOUNTX * AMOUNTY;
 
-				const positions = new Float32Array( numParticles * 3 );
-				const scales = new Float32Array( numParticles );
+				const positions = new Float32Array(numParticles * 3);
+				const scales = new Float32Array(numParticles);
 
-				let i = 0, j = 0;
+				let i = 0,
+					j = 0;
 
-				for ( let ix = 0; ix < AMOUNTX; ix ++ ) {
+				for (let ix = 0; ix < AMOUNTX; ix++) {
+					for (let iy = 0; iy < AMOUNTY; iy++) {
+						positions[i] = ix * SEPARATION - (AMOUNTX * SEPARATION) / 2; // x
+						positions[i + 1] = 0; // y
+						positions[i + 2] = iy * SEPARATION - (AMOUNTY * SEPARATION) / 2; // z
 
-					for ( let iy = 0; iy < AMOUNTY; iy ++ ) {
-
-						positions[ i ] = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 ); // x
-						positions[ i + 1 ] = 0; // y
-						positions[ i + 2 ] = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 ); // z
-
-						scales[ j ] = 1;
+						scales[j] = 1;
 
 						i += 3;
-						j ++;
-
+						j++;
 					}
-
 				}
 
 				const geometry = new THREE.BufferGeometry();
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'scale', new THREE.BufferAttribute( scales, 1 ) );
+				geometry.setAttribute(
+					"position",
+					new THREE.BufferAttribute(positions, 3)
+				);
+				geometry.setAttribute("scale", new THREE.BufferAttribute(scales, 1));
 
-				const material = new THREE.ShaderMaterial( {
-
+				const material = new THREE.ShaderMaterial({
 					uniforms: {
-						color: { value: new THREE.Color( 0xffffff ) },
+						color: { value: new THREE.Color(0xffffff) },
 					},
-					vertexShader: document.getElementById( 'vertexshader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
-
-				} );
-
-				//
-
-				particles = new THREE.Points( geometry, material );
-				scene.add( particles );
+					vertexShader: document.getElementById("vertexshader").textContent,
+					fragmentShader: document.getElementById("fragmentshader").textContent,
+				});
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				particles = new THREE.Points(geometry, material);
+				scene.add(particles);
+
+				//
+
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				container.appendChild(stats.dom);
 
-				container.style.touchAction = 'none';
-				container.addEventListener( 'pointermove', onPointerMove );
+				container.style.touchAction = "none";
+				container.addEventListener("pointermove", onPointerMove);
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				windowHalfX = window.innerWidth / 2;
 				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
 			//
 
-			function onPointerMove( event ) {
-
-				if ( event.isPrimary === false ) return;
+			function onPointerMove(event) {
+				if (event.isPrimary === false) return;
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
-
 			}
 
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
+				requestAnimationFrame(animate);
 
 				render();
 				stats.update();
-
 			}
 
 			function render() {
-
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.lookAt( scene.position );
+				camera.position.x += (mouseX - camera.position.x) * 0.05;
+				camera.position.y += (-mouseY - camera.position.y) * 0.05;
+				camera.lookAt(scene.position);
 
 				const positions = particles.geometry.attributes.position.array;
 				const scales = particles.geometry.attributes.scale.array;
 
-				let i = 0, j = 0;
+				let i = 0,
+					j = 0;
 
-				for ( let ix = 0; ix < AMOUNTX; ix ++ ) {
+				for (let ix = 0; ix < AMOUNTX; ix++) {
+					for (let iy = 0; iy < AMOUNTY; iy++) {
+						positions[i + 1] =
+							Math.sin((ix + count) * 0.3) * 50 +
+							Math.sin((iy + count) * 0.5) * 50;
 
-					for ( let iy = 0; iy < AMOUNTY; iy ++ ) {
-
-						positions[ i + 1 ] = ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
-										( Math.sin( ( iy + count ) * 0.5 ) * 50 );
-
-						scales[ j ] = ( Math.sin( ( ix + count ) * 0.3 ) + 1 ) * 20 +
-										( Math.sin( ( iy + count ) * 0.5 ) + 1 ) * 20;
+						scales[j] =
+							(Math.sin((ix + count) * 0.3) + 1) * 20 +
+							(Math.sin((iy + count) * 0.5) + 1) * 20;
 
 						i += 3;
-						j ++;
-
+						j++;
 					}
-
 				}
 
 				particles.geometry.attributes.position.needsUpdate = true;
 				particles.geometry.attributes.scale.needsUpdate = true;
 
-				renderer.render( scene, camera );
+				renderer.render(scene, camera);
 
 				count += 0.1;
-
 			}
-
 		</script>
 	</body>
 </html>

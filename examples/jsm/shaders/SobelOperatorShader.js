@@ -1,6 +1,4 @@
-import {
-	Vector2
-} from 'three';
+import { Vector2 } from "three";
 
 /**
  * Sobel Edge Detection (see https://youtu.be/uihBwtPIBxM)
@@ -10,15 +8,12 @@ import {
  */
 
 const SobelOperatorShader = {
-
 	uniforms: {
-
-		'tDiffuse': { value: null },
-		'resolution': { value: new Vector2() }
-
+		tDiffuse: { value: null },
+		resolution: { value: new Vector2() },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -30,7 +25,7 @@ const SobelOperatorShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;
@@ -83,8 +78,7 @@ const SobelOperatorShader = {
 
 			gl_FragColor = vec4( vec3( G ), 1 );
 
-		}`
-
+		}`,
 };
 
 export { SobelOperatorShader };

@@ -1,11 +1,9 @@
-import WebGPUBinding from './WebGPUBinding.js';
-import { GPUBindingType } from './constants.js';
+import WebGPUBinding from "./WebGPUBinding.js";
+import { GPUBindingType } from "./constants.js";
 
 class WebGPUSampler extends WebGPUBinding {
-
-	constructor( name, texture ) {
-
-		super( name );
+	constructor(name, texture) {
+		super(name);
 
 		this.isSampler = true;
 
@@ -15,15 +13,11 @@ class WebGPUSampler extends WebGPUBinding {
 		this.visibility = GPUShaderStage.FRAGMENT;
 
 		this.samplerGPU = null; // set by the renderer
-
 	}
 
 	getTexture() {
-
 		return this.texture;
-
 	}
-
 }
 
 export default WebGPUSampler;

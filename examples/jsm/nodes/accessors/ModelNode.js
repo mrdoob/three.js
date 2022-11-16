@@ -1,21 +1,15 @@
-import Object3DNode from './Object3DNode.js';
+import Object3DNode from "./Object3DNode.js";
 
 class ModelNode extends Object3DNode {
-
-	constructor( scope = ModelNode.VIEW_MATRIX ) {
-
-		super( scope );
-
+	constructor(scope = ModelNode.VIEW_MATRIX) {
+		super(scope);
 	}
 
-	update( frame ) {
-
+	update(frame) {
 		this.object3d = frame.object;
 
-		super.update( frame );
-
+		super.update(frame);
 	}
-
 }
 
 export default ModelNode;

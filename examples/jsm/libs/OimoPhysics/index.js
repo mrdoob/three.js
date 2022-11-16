@@ -1,4 +1,4 @@
-import {oimo} from './OimoPhysics.js';
+import { oimo } from "./OimoPhysics.js";
 
 // dynamics
 export const World = oimo.dynamics.World;
@@ -8,19 +8,27 @@ export const ShapeConfig = oimo.dynamics.rigidbody.ShapeConfig;
 export const RigidBody = oimo.dynamics.rigidbody.RigidBody;
 export const Shape = oimo.dynamics.rigidbody.Shape;
 export const SphericalJoint = oimo.dynamics.constraint.joint.SphericalJoint;
-export const RevoluteJointConfig = oimo.dynamics.constraint.joint.RevoluteJointConfig;
-export const UniversalJointConfig = oimo.dynamics.constraint.joint.UniversalJointConfig;
+export const RevoluteJointConfig =
+	oimo.dynamics.constraint.joint.RevoluteJointConfig;
+export const UniversalJointConfig =
+	oimo.dynamics.constraint.joint.UniversalJointConfig;
 export const CylindricalJoint = oimo.dynamics.constraint.joint.CylindricalJoint;
 export const PrismaticJoint = oimo.dynamics.constraint.joint.PrismaticJoint;
-export const PrismaticJointConfig = oimo.dynamics.constraint.joint.PrismaticJointConfig;
+export const PrismaticJointConfig =
+	oimo.dynamics.constraint.joint.PrismaticJointConfig;
 export const RevoluteJoint = oimo.dynamics.constraint.joint.RevoluteJoint;
 export const RagdollJoint = oimo.dynamics.constraint.joint.RagdollJoint;
-export const CylindricalJointConfig = oimo.dynamics.constraint.joint.CylindricalJointConfig;
-export const SphericalJointConfig = oimo.dynamics.constraint.joint.SphericalJointConfig;
-export const RagdollJointConfig = oimo.dynamics.constraint.joint.RagdollJointConfig;
+export const CylindricalJointConfig =
+	oimo.dynamics.constraint.joint.CylindricalJointConfig;
+export const SphericalJointConfig =
+	oimo.dynamics.constraint.joint.SphericalJointConfig;
+export const RagdollJointConfig =
+	oimo.dynamics.constraint.joint.RagdollJointConfig;
 export const SpringDamper = oimo.dynamics.constraint.joint.SpringDamper;
-export const TranslationalLimitMotor = oimo.dynamics.constraint.joint.TranslationalLimitMotor;
-export const RotationalLimitMotor = oimo.dynamics.constraint.joint.RotationalLimitMotor;
+export const TranslationalLimitMotor =
+	oimo.dynamics.constraint.joint.TranslationalLimitMotor;
+export const RotationalLimitMotor =
+	oimo.dynamics.constraint.joint.RotationalLimitMotor;
 export const UniversalJoint = oimo.dynamics.constraint.joint.UniversalJoint;
 
 // common

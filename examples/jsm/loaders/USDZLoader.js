@@ -11,608 +11,467 @@ import {
 	RepeatWrapping,
 	sRGBEncoding,
 	TextureLoader,
-} from 'three';
+} from "three";
 
-import * as fflate from '../libs/fflate.module.js';
+import * as fflate from "../libs/fflate.module.js";
 
 class USDAParser {
-
-	parse( text ) {
-
+	parse(text) {
 		const data = {};
 
-		const lines = text.split( '\n' );
+		const lines = text.split("\n");
 		const length = lines.length;
 
 		let current = 0;
 		let string = null;
 		let target = data;
 
-		const stack = [ data ];
+		const stack = [data];
 
 		// debugger;
 
 		function parseNextLine() {
-
-			const line = lines[ current ];
+			const line = lines[current];
 
 			// console.log( line );
 
-			if ( line.includes( '=' ) ) {
+			if (line.includes("=")) {
+				const assignment = line.split("=");
 
-				const assignment = line.split( '=' );
+				const lhs = assignment[0].trim();
+				const rhs = assignment[1].trim();
 
-				const lhs = assignment[ 0 ].trim();
-				const rhs = assignment[ 1 ].trim();
-
-				if ( rhs.endsWith( '{' ) ) {
-
+				if (rhs.endsWith("{")) {
 					const group = {};
-					stack.push( group );
+					stack.push(group);
 
-					target[ lhs ] = group;
+					target[lhs] = group;
 					target = group;
-
 				} else {
-
-					target[ lhs ] = rhs;
-
+					target[lhs] = rhs;
 				}
+			} else if (line.endsWith("{")) {
+				const group = target[string] || {};
+				stack.push(group);
 
-			} else if ( line.endsWith( '{' ) ) {
-
-				const group = target[ string ] || {};
-				stack.push( group );
-
-				target[ string ] = group;
+				target[string] = group;
 				target = group;
-
-			} else if ( line.endsWith( '}' ) ) {
-
+			} else if (line.endsWith("}")) {
 				stack.pop();
 
-				if ( stack.length === 0 ) return;
+				if (stack.length === 0) return;
 
-				target = stack[ stack.length - 1 ];
-
-			} else if ( line.endsWith( '(' ) ) {
-
+				target = stack[stack.length - 1];
+			} else if (line.endsWith("(")) {
 				const meta = {};
-				stack.push( meta );
+				stack.push(meta);
 
-				string = line.split( '(' )[ 0 ].trim() || string;
+				string = line.split("(")[0].trim() || string;
 
-				target[ string ] = meta;
+				target[string] = meta;
 				target = meta;
-
-			} else if ( line.endsWith( ')' ) ) {
-
+			} else if (line.endsWith(")")) {
 				stack.pop();
 
-				target = stack[ stack.length - 1 ];
-
+				target = stack[stack.length - 1];
 			} else {
-
 				string = line.trim();
-
 			}
 
-			current ++;
+			current++;
 
-			if ( current < length ) {
-
+			if (current < length) {
 				parseNextLine();
-
 			}
-
 		}
 
 		parseNextLine();
 
 		return data;
-
 	}
-
 }
 
 class USDZLoader extends Loader {
-
-	constructor( manager ) {
-
-		super( manager );
-
+	constructor(manager) {
+		super(manager);
 	}
 
-	load( url, onLoad, onProgress, onError ) {
-
+	load(url, onLoad, onProgress, onError) {
 		const scope = this;
 
-		const loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
-		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( scope.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
-		loader.load( url, function ( text ) {
+		const loader = new FileLoader(scope.manager);
+		loader.setPath(scope.path);
+		loader.setResponseType("arraybuffer");
+		loader.setRequestHeader(scope.requestHeader);
+		loader.setWithCredentials(scope.withCredentials);
+		loader.load(
+			url,
+			function (text) {
+				try {
+					onLoad(scope.parse(text));
+				} catch (e) {
+					if (onError) {
+						onError(e);
+					} else {
+						console.error(e);
+					}
 
-			try {
-
-				onLoad( scope.parse( text ) );
-
-			} catch ( e ) {
-
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
+					scope.manager.itemError(url);
 				}
-
-				scope.manager.itemError( url );
-
-			}
-
-		}, onProgress, onError );
-
+			},
+			onProgress,
+			onError
+		);
 	}
 
-	parse( buffer ) {
-
+	parse(buffer) {
 		const parser = new USDAParser();
 
-		function parseAssets( zip ) {
-
+		function parseAssets(zip) {
 			const data = {};
 			const loader = new FileLoader();
-			loader.setResponseType( 'arraybuffer' );
+			loader.setResponseType("arraybuffer");
 
-			for ( const filename in zip ) {
-
-				if ( filename.endsWith( 'png' ) ) {
-
-					const blob = new Blob( [ zip[ filename ] ], { type: { type: 'image/png' } } );
-					data[ filename ] = URL.createObjectURL( blob );
-
+			for (const filename in zip) {
+				if (filename.endsWith("png")) {
+					const blob = new Blob([zip[filename]], {
+						type: { type: "image/png" },
+					});
+					data[filename] = URL.createObjectURL(blob);
 				}
 
-				if ( filename.endsWith( 'usd' ) ) {
-
-					const text = fflate.strFromU8( zip[ filename ] );
-					data[ filename ] = parser.parse( text );
-
+				if (filename.endsWith("usd")) {
+					const text = fflate.strFromU8(zip[filename]);
+					data[filename] = parser.parse(text);
 				}
-
 			}
 
 			return data;
-
 		}
 
-		function findUSD( zip ) {
-
-			for ( const filename in zip ) {
-
-				if ( filename.endsWith( 'usda' ) ) {
-
-					return zip[ filename ];
-
+		function findUSD(zip) {
+			for (const filename in zip) {
+				if (filename.endsWith("usda")) {
+					return zip[filename];
 				}
-
 			}
-
 		}
 
-		const zip = fflate.unzipSync( new Uint8Array( buffer ) ); // eslint-disable-line no-undef
+		const zip = fflate.unzipSync(new Uint8Array(buffer)); // eslint-disable-line no-undef
 
-		console.log( zip );
+		console.log(zip);
 
-		const assets = parseAssets( zip );
+		const assets = parseAssets(zip);
 
 		// console.log( assets )
 
-		const file = findUSD( zip );
+		const file = findUSD(zip);
 
-		if ( file === undefined ) {
-
-			console.warn( 'THREE.USDZLoader: No usda file found.' );
+		if (file === undefined) {
+			console.warn("THREE.USDZLoader: No usda file found.");
 
 			return new Group();
-
 		}
-
 
 		// Parse file
 
-		const text = fflate.strFromU8( file );
-		const root = parser.parse( text );
+		const text = fflate.strFromU8(file);
+		const root = parser.parse(text);
 
 		// Build scene
 
-		function findMeshGeometry( data ) {
+		function findMeshGeometry(data) {
+			if ("prepend references" in data) {
+				const reference = data["prepend references"];
+				const parts = reference.split("@");
+				const path = parts[1].replace(/^.\//, "");
+				const id = parts[2].replace(/^<\//, "").replace(/>$/, "");
 
-			if ( 'prepend references' in data ) {
-
-				const reference = data[ 'prepend references' ];
-				const parts = reference.split( '@' );
-				const path = parts[ 1 ].replace( /^.\//, '' );
-				const id = parts[ 2 ].replace( /^<\//, '' ).replace( />$/, '' );
-
-				return findGeometry( assets[ path ], id );
-
+				return findGeometry(assets[path], id);
 			}
 
-			return findGeometry( data );
-
+			return findGeometry(data);
 		}
 
-		function findGeometry( data, id ) {
-
-			if ( id !== undefined ) {
-
+		function findGeometry(data, id) {
+			if (id !== undefined) {
 				const def = `def "%{id}"`;
 
-				if ( def in data ) {
-
-					return data[ def ];
-
+				if (def in data) {
+					return data[def];
 				}
-
 			}
 
-			for ( const name in data ) {
+			for (const name in data) {
+				const object = data[name];
 
-				const object = data[ name ];
-
-				if ( name.startsWith( 'def Mesh' ) ) {
-
+				if (name.startsWith("def Mesh")) {
 					// Move points to Mesh
 
-					if ( 'point3f[] points' in data ) {
-
-						object[ 'point3f[] points' ] = data[ 'point3f[] points' ];
-
+					if ("point3f[] points" in data) {
+						object["point3f[] points"] = data["point3f[] points"];
 					}
 
 					// Move st to Mesh
 
-					if ( 'float2[] primvars:st' in data ) {
-
-						object[ 'float2[] primvars:st' ] = data[ 'float2[] primvars:st' ];
-
+					if ("float2[] primvars:st" in data) {
+						object["float2[] primvars:st"] = data["float2[] primvars:st"];
 					}
 
 					// Move st indices to Mesh
 
-					if ( 'int[] primvars:st:indices' in data ) {
-
-						object[ 'int[] primvars:st:indices' ] = data[ 'int[] primvars:st:indices' ];
-
+					if ("int[] primvars:st:indices" in data) {
+						object["int[] primvars:st:indices"] =
+							data["int[] primvars:st:indices"];
 					}
 
 					return object;
-
 				}
 
+				if (typeof object === "object") {
+					const geometry = findGeometry(object);
 
-				if ( typeof object === 'object' ) {
-
-					const geometry = findGeometry( object );
-
-					if ( geometry ) return geometry;
-
+					if (geometry) return geometry;
 				}
-
 			}
-
 		}
 
-		function buildGeometry( data ) {
-
+		function buildGeometry(data) {
 			let geometry = new BufferGeometry();
 
-			if ( 'int[] faceVertexIndices' in data ) {
-
-				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
-				geometry.setIndex( new BufferAttribute( new Uint16Array( indices ), 1 ) );
-
+			if ("int[] faceVertexIndices" in data) {
+				const indices = JSON.parse(data["int[] faceVertexIndices"]);
+				geometry.setIndex(new BufferAttribute(new Uint16Array(indices), 1));
 			}
 
-			if ( 'point3f[] points' in data ) {
-
-				const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( positions ), 3 );
-				geometry.setAttribute( 'position', attribute );
-
+			if ("point3f[] points" in data) {
+				const positions = JSON.parse(
+					data["point3f[] points"].replace(/[()]*/g, "")
+				);
+				const attribute = new BufferAttribute(new Float32Array(positions), 3);
+				geometry.setAttribute("position", attribute);
 			}
 
-			if ( 'normal3f[] normals' in data ) {
-
-				const normals = JSON.parse( data[ 'normal3f[] normals' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( normals ), 3 );
-				geometry.setAttribute( 'normal', attribute );
-
+			if ("normal3f[] normals" in data) {
+				const normals = JSON.parse(
+					data["normal3f[] normals"].replace(/[()]*/g, "")
+				);
+				const attribute = new BufferAttribute(new Float32Array(normals), 3);
+				geometry.setAttribute("normal", attribute);
 			} else {
-
 				geometry.computeVertexNormals();
-
 			}
 
-			if ( 'float2[] primvars:st' in data ) {
-
-				data[ 'texCoord2f[] primvars:st' ] = data[ 'float2[] primvars:st' ];
-
+			if ("float2[] primvars:st" in data) {
+				data["texCoord2f[] primvars:st"] = data["float2[] primvars:st"];
 			}
 
-			if ( 'texCoord2f[] primvars:st' in data ) {
+			if ("texCoord2f[] primvars:st" in data) {
+				const uvs = JSON.parse(
+					data["texCoord2f[] primvars:st"].replace(/[()]*/g, "")
+				);
+				const attribute = new BufferAttribute(new Float32Array(uvs), 2);
 
-				const uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
-
-				if ( 'int[] primvars:st:indices' in data ) {
-
+				if ("int[] primvars:st:indices" in data) {
 					geometry = geometry.toNonIndexed();
 
-					const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
-					geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
-
+					const indices = JSON.parse(data["int[] primvars:st:indices"]);
+					geometry.setAttribute(
+						"uv",
+						toFlatBufferAttribute(attribute, indices)
+					);
 				} else {
-
-					geometry.setAttribute( 'uv', attribute );
-
+					geometry.setAttribute("uv", attribute);
 				}
-
 			}
-			
-			return geometry;
 
+			return geometry;
 		}
 
-		function toFlatBufferAttribute( attribute, indices ) {
-
+		function toFlatBufferAttribute(attribute, indices) {
 			const array = attribute.array;
 			const itemSize = attribute.itemSize;
 
-			const array2 = new array.constructor( indices.length * itemSize );
+			const array2 = new array.constructor(indices.length * itemSize);
 
-			let index = 0, index2 = 0;
+			let index = 0,
+				index2 = 0;
 
-			for ( let i = 0, l = indices.length; i < l; i ++ ) {
+			for (let i = 0, l = indices.length; i < l; i++) {
+				index = indices[i] * itemSize;
 
-				index = indices[ i ] * itemSize;
-
-				for ( let j = 0; j < itemSize; j ++ ) {
-
-					array2[ index2 ++ ] = array[ index ++ ];
-
+				for (let j = 0; j < itemSize; j++) {
+					array2[index2++] = array[index++];
 				}
-
 			}
 
-			return new BufferAttribute( array2, itemSize );
-
+			return new BufferAttribute(array2, itemSize);
 		}
 
-		function findMeshMaterial( data ) {
+		function findMeshMaterial(data) {
+			if ("rel material:binding" in data) {
+				const reference = data["rel material:binding"];
+				const id = reference.replace(/^<\//, "").replace(/>$/, "");
+				const parts = id.split("/");
 
-			if ( 'rel material:binding' in data ) {
-
-				const reference = data[ 'rel material:binding' ];
-				const id = reference.replace( /^<\//, '' ).replace( />$/, '' );
-				const parts = id.split( '/' );
-
-				return findMaterial( root, ` "${ parts[ 1 ] }"` );
-
+				return findMaterial(root, ` "${parts[1]}"`);
 			}
 
-			return findMaterial( data );
-
+			return findMaterial(data);
 		}
 
-		function findMaterial( data, id = '' ) {
+		function findMaterial(data, id = "") {
+			for (const name in data) {
+				const object = data[name];
 
-			for ( const name in data ) {
-
-				const object = data[ name ];
-
-				if ( name.startsWith( 'def Material' + id ) ) {
-
+				if (name.startsWith("def Material" + id)) {
 					return object;
-
 				}
 
-				if ( typeof object === 'object' ) {
+				if (typeof object === "object") {
+					const material = findMaterial(object, id);
 
-					const material = findMaterial( object, id );
-
-					if ( material ) return material;
-
+					if (material) return material;
 				}
-
 			}
-
 		}
 
-		function buildMaterial( data ) {
-
+		function buildMaterial(data) {
 			const material = new MeshStandardMaterial();
 
-			if ( data !== undefined ) {
+			if (data !== undefined) {
+				if ('def Shader "PreviewSurface"' in data) {
+					const surface = data['def Shader "PreviewSurface"'];
 
-				if ( 'def Shader "PreviewSurface"' in data ) {
+					if ("color3f inputs:diffuseColor.connect" in surface) {
+						const path = surface["color3f inputs:diffuseColor.connect"];
+						const sampler = findTexture(root, /(\w+).output/.exec(path)[1]);
 
-					const surface = data[ 'def Shader "PreviewSurface"' ];
-
-					if ( 'color3f inputs:diffuseColor.connect' in surface ) {
-
-						const path = surface[ 'color3f inputs:diffuseColor.connect' ];
-						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
-
-						material.map = buildTexture( sampler );
+						material.map = buildTexture(sampler);
 						material.map.encoding = sRGBEncoding;
-
-					} else if ( 'color3f inputs:diffuseColor' in surface ) {
-
-						const color = surface[ 'color3f inputs:diffuseColor' ].replace( /[()]*/g, '' );
-						material.color.fromArray( JSON.parse( '[' + color + ']' ) );
-
+					} else if ("color3f inputs:diffuseColor" in surface) {
+						const color = surface["color3f inputs:diffuseColor"].replace(
+							/[()]*/g,
+							""
+						);
+						material.color.fromArray(JSON.parse("[" + color + "]"));
 					}
 
-					if ( 'normal3f inputs:normal.connect' in surface ) {
+					if ("normal3f inputs:normal.connect" in surface) {
+						const path = surface["normal3f inputs:normal.connect"];
+						const sampler = findTexture(root, /(\w+).output/.exec(path)[1]);
 
-						const path = surface[ 'normal3f inputs:normal.connect' ];
-						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
-
-						material.normalMap = buildTexture( sampler );
-
+						material.normalMap = buildTexture(sampler);
 					}
 
-					if ( 'float inputs:roughness' in surface ) {
-
-						material.roughness = parseFloat( surface[ 'float inputs:roughness' ] );
-
+					if ("float inputs:roughness" in surface) {
+						material.roughness = parseFloat(surface["float inputs:roughness"]);
 					}
 
-					if ( 'float inputs:metallic' in surface ) {
-
-						material.metalness = parseFloat( surface[ 'float inputs:metallic' ] );
-
+					if ("float inputs:metallic" in surface) {
+						material.metalness = parseFloat(surface["float inputs:metallic"]);
 					}
-
 				}
 
-				if ( 'def Shader "diffuseColor_texture"' in data ) {
+				if ('def Shader "diffuseColor_texture"' in data) {
+					const sampler = data['def Shader "diffuseColor_texture"'];
 
-					const sampler = data[ 'def Shader "diffuseColor_texture"' ];
-
-					material.map = buildTexture( sampler );
+					material.map = buildTexture(sampler);
 					material.map.encoding = sRGBEncoding;
-
 				}
 
-				if ( 'def Shader "normal_texture"' in data ) {
+				if ('def Shader "normal_texture"' in data) {
+					const sampler = data['def Shader "normal_texture"'];
 
-					const sampler = data[ 'def Shader "normal_texture"' ];
-
-					material.normalMap = buildTexture( sampler );
-
+					material.normalMap = buildTexture(sampler);
 				}
-
 			}
 
 			return material;
-
 		}
 
-		function findTexture( data, id ) {
+		function findTexture(data, id) {
+			for (const name in data) {
+				const object = data[name];
 
-			for ( const name in data ) {
-
-				const object = data[ name ];
-
-				if ( name.startsWith( `def Shader "${ id }"` ) ) {
-
+				if (name.startsWith(`def Shader "${id}"`)) {
 					return object;
-
 				}
 
-				if ( typeof object === 'object' ) {
+				if (typeof object === "object") {
+					const texture = findTexture(object, id);
 
-					const texture = findTexture( object, id );
-
-					if ( texture ) return texture;
-
+					if (texture) return texture;
 				}
-
-			}			
-
+			}
 		}
 
-		function buildTexture( data ) {
-
-			if ( 'asset inputs:file' in data ) {
-
-				const path = data[ 'asset inputs:file' ].replace( /@*/g, '' );
+		function buildTexture(data) {
+			if ("asset inputs:file" in data) {
+				const path = data["asset inputs:file"].replace(/@*/g, "");
 
 				const loader = new TextureLoader();
 
-				const texture = loader.load( assets[ path ] );
+				const texture = loader.load(assets[path]);
 
 				const map = {
 					'"clamp"': ClampToEdgeWrapping,
 					'"mirror"': MirroredRepeatWrapping,
-					'"repeat"': RepeatWrapping
+					'"repeat"': RepeatWrapping,
 				};
 
-				if ( 'token inputs:wrapS' in data ) {
-
-					texture.wrapS = map[ data[ 'token inputs:wrapS' ] ];
-
+				if ("token inputs:wrapS" in data) {
+					texture.wrapS = map[data["token inputs:wrapS"]];
 				}
 
-				if ( 'token inputs:wrapT' in data ) {
-
-					texture.wrapT = map[ data[ 'token inputs:wrapT' ] ];
-
+				if ("token inputs:wrapT" in data) {
+					texture.wrapT = map[data["token inputs:wrapT"]];
 				}
 
 				return texture;
-
 			}
 
 			return null;
-
 		}
 
-		function buildMesh( data ) {
+		function buildMesh(data) {
+			const geometry = buildGeometry(findMeshGeometry(data));
+			const material = buildMaterial(findMeshMaterial(data));
 
-			const geometry = buildGeometry( findMeshGeometry( data ) );
-			const material = buildMaterial( findMeshMaterial( data ) );
+			const mesh = new Mesh(geometry, material);
 
-			const mesh = new Mesh( geometry, material );
+			if ("matrix4d xformOp:transform" in data) {
+				const array = JSON.parse(
+					"[" + data["matrix4d xformOp:transform"].replace(/[()]*/g, "") + "]"
+				);
 
-			if ( 'matrix4d xformOp:transform' in data ) {
-
-				const array = JSON.parse( '[' + data[ 'matrix4d xformOp:transform'  ].replace( /[()]*/g, '' ) + ']' );
-
-				mesh.matrix.fromArray( array );
-				mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
-
+				mesh.matrix.fromArray(array);
+				mesh.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
 			}
 
 			return mesh;
-
 		}
 
 		// console.log( data );
 
 		const group = new Group();
 
-		for ( const name in root ) {
+		for (const name in root) {
+			if (name.startsWith("def Xform")) {
+				const mesh = buildMesh(root[name]);
 
-			if ( name.startsWith( 'def Xform' ) ) {
-
-				const mesh = buildMesh( root[ name ] );
-
-				if ( /def Xform "(\w+)"/.test( name ) ) {
-
-					mesh.name = /def Xform "(\w+)"/.exec( name )[ 1 ];
-
+				if (/def Xform "(\w+)"/.test(name)) {
+					mesh.name = /def Xform "(\w+)"/.exec(name)[1];
 				}
 
-				group.add( mesh );
-
+				group.add(mesh);
 			}
-
 		}
 
 		// console.log( group );
 
 		return group;
-
 	}
-
 }
 
 export { USDZLoader };

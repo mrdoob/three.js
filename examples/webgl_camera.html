@@ -2,9 +2,12 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - cameras</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 		<style>
 			b {
 				color: lightgreen;
@@ -12,13 +15,18 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras<br/>
-		<b>O</b> orthographic <b>P</b> perspective
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- cameras<br />
+			<b>O</b> orthographic <b>P</b> perspective
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -30,10 +38,9 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from "three/addons/libs/stats.module.js";
 
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
@@ -50,33 +57,43 @@
 			animate();
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.createElement("div");
+				document.body.appendChild(container);
 
 				scene = new THREE.Scene();
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 1, 10000 );
+				camera = new THREE.PerspectiveCamera(50, 0.5 * aspect, 1, 10000);
 				camera.position.z = 2500;
 
-				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * aspect, 150, 1000 );
+				cameraPerspective = new THREE.PerspectiveCamera(
+					50,
+					0.5 * aspect,
+					150,
+					1000
+				);
 
-				cameraPerspectiveHelper = new THREE.CameraHelper( cameraPerspective );
-				scene.add( cameraPerspectiveHelper );
+				cameraPerspectiveHelper = new THREE.CameraHelper(cameraPerspective);
+				scene.add(cameraPerspectiveHelper);
 
 				//
-				cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 150, 1000 );
+				cameraOrtho = new THREE.OrthographicCamera(
+					(0.5 * frustumSize * aspect) / -2,
+					(0.5 * frustumSize * aspect) / 2,
+					frustumSize / 2,
+					frustumSize / -2,
+					150,
+					1000
+				);
 
-				cameraOrthoHelper = new THREE.CameraHelper( cameraOrtho );
-				scene.add( cameraOrthoHelper );
+				cameraOrthoHelper = new THREE.CameraHelper(cameraOrtho);
+				scene.add(cameraOrthoHelper);
 
 				//
 
 				activeCamera = cameraPerspective;
 				activeHelper = cameraPerspectiveHelper;
-
 
 				// counteract different front orientation of cameras vs rig
 
@@ -85,105 +102,101 @@
 
 				cameraRig = new THREE.Group();
 
-				cameraRig.add( cameraPerspective );
-				cameraRig.add( cameraOrtho );
+				cameraRig.add(cameraPerspective);
+				cameraRig.add(cameraOrtho);
 
-				scene.add( cameraRig );
+				scene.add(cameraRig);
 
 				//
 
 				mesh = new THREE.Mesh(
-					new THREE.SphereGeometry( 100, 16, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } )
+					new THREE.SphereGeometry(100, 16, 8),
+					new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
 				);
-				scene.add( mesh );
+				scene.add(mesh);
 
 				const mesh2 = new THREE.Mesh(
-					new THREE.SphereGeometry( 50, 16, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } )
+					new THREE.SphereGeometry(50, 16, 8),
+					new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true })
 				);
 				mesh2.position.y = 150;
-				mesh.add( mesh2 );
+				mesh.add(mesh2);
 
 				const mesh3 = new THREE.Mesh(
-					new THREE.SphereGeometry( 5, 16, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } )
+					new THREE.SphereGeometry(5, 16, 8),
+					new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true })
 				);
 				mesh3.position.z = 150;
-				cameraRig.add( mesh3 );
+				cameraRig.add(mesh3);
 
 				//
 
 				const geometry = new THREE.BufferGeometry();
 				const vertices = [];
 
-				for ( let i = 0; i < 10000; i ++ ) {
-
-					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // x
-					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // y
-					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // z
-
+				for (let i = 0; i < 10000; i++) {
+					vertices.push(THREE.MathUtils.randFloatSpread(2000)); // x
+					vertices.push(THREE.MathUtils.randFloatSpread(2000)); // y
+					vertices.push(THREE.MathUtils.randFloatSpread(2000)); // z
 				}
 
-				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute(
+					"position",
+					new THREE.Float32BufferAttribute(vertices, 3)
+				);
 
-				const particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
-				scene.add( particles );
+				const particles = new THREE.Points(
+					geometry,
+					new THREE.PointsMaterial({ color: 0x888888 })
+				);
+				scene.add(particles);
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+				container.appendChild(renderer.domElement);
 
 				renderer.autoClear = false;
 
 				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				container.appendChild(stats.dom);
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize );
-				document.addEventListener( 'keydown', onKeyDown );
-
+				window.addEventListener("resize", onWindowResize);
+				document.addEventListener("keydown", onKeyDown);
 			}
 
 			//
 
-			function onKeyDown( event ) {
-
-				switch ( event.keyCode ) {
-
-					case 79: /*O*/
-
+			function onKeyDown(event) {
+				switch (event.keyCode) {
+					case 79 /*O*/:
 						activeCamera = cameraOrtho;
 						activeHelper = cameraOrthoHelper;
 
 						break;
 
-					case 80: /*P*/
-
+					case 80 /*P*/:
 						activeCamera = cameraPerspective;
 						activeHelper = cameraPerspectiveHelper;
 
 						break;
-
 				}
-
 			}
 
 			//
 
 			function onWindowResize() {
-
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
 				aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 				camera.aspect = 0.5 * aspect;
 				camera.updateProjectionMatrix();
@@ -191,40 +204,34 @@
 				cameraPerspective.aspect = 0.5 * aspect;
 				cameraPerspective.updateProjectionMatrix();
 
-				cameraOrtho.left = - 0.5 * frustumSize * aspect / 2;
-				cameraOrtho.right = 0.5 * frustumSize * aspect / 2;
+				cameraOrtho.left = (-0.5 * frustumSize * aspect) / 2;
+				cameraOrtho.right = (0.5 * frustumSize * aspect) / 2;
 				cameraOrtho.top = frustumSize / 2;
-				cameraOrtho.bottom = - frustumSize / 2;
+				cameraOrtho.bottom = -frustumSize / 2;
 				cameraOrtho.updateProjectionMatrix();
-
 			}
 
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
+				requestAnimationFrame(animate);
 
 				render();
 				stats.update();
-
 			}
 
-
 			function render() {
-
 				const r = Date.now() * 0.0005;
 
-				mesh.position.x = 700 * Math.cos( r );
-				mesh.position.z = 700 * Math.sin( r );
-				mesh.position.y = 700 * Math.sin( r );
+				mesh.position.x = 700 * Math.cos(r);
+				mesh.position.z = 700 * Math.sin(r);
+				mesh.position.y = 700 * Math.sin(r);
 
-				mesh.children[ 0 ].position.x = 70 * Math.cos( 2 * r );
-				mesh.children[ 0 ].position.z = 70 * Math.sin( r );
+				mesh.children[0].position.x = 70 * Math.cos(2 * r);
+				mesh.children[0].position.z = 70 * Math.sin(r);
 
-				if ( activeCamera === cameraPerspective ) {
-
-					cameraPerspective.fov = 35 + 30 * Math.sin( 0.5 * r );
+				if (activeCamera === cameraPerspective) {
+					cameraPerspective.fov = 35 + 30 * Math.sin(0.5 * r);
 					cameraPerspective.far = mesh.position.length();
 					cameraPerspective.updateProjectionMatrix();
 
@@ -232,9 +239,7 @@
 					cameraPerspectiveHelper.visible = true;
 
 					cameraOrthoHelper.visible = false;
-
 				} else {
-
 					cameraOrtho.far = mesh.position.length();
 					cameraOrtho.updateProjectionMatrix();
 
@@ -242,27 +247,27 @@
 					cameraOrthoHelper.visible = true;
 
 					cameraPerspectiveHelper.visible = false;
-
 				}
 
-				cameraRig.lookAt( mesh.position );
+				cameraRig.lookAt(mesh.position);
 
 				renderer.clear();
 
 				activeHelper.visible = false;
 
-				renderer.setViewport( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
-				renderer.render( scene, activeCamera );
+				renderer.setViewport(0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+				renderer.render(scene, activeCamera);
 
 				activeHelper.visible = true;
 
-				renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
-				renderer.render( scene, camera );
-
+				renderer.setViewport(
+					SCREEN_WIDTH / 2,
+					0,
+					SCREEN_WIDTH / 2,
+					SCREEN_HEIGHT
+				);
+				renderer.render(scene, camera);
 			}
-
-
 		</script>
-
 	</body>
 </html>

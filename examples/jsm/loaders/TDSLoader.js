@@ -11,8 +11,8 @@ import {
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
-	TextureLoader
-} from 'three';
+	TextureLoader,
+} from "three";
 
 /**
  * Autodesk 3DS three.js file loader, based on lib3ds.
@@ -24,10 +24,8 @@ import {
  */
 
 class TDSLoader extends Loader {
-
-	constructor( manager ) {
-
-		super( manager );
+	constructor(manager) {
+		super(manager);
 
 		this.debug = false;
 
@@ -35,7 +33,6 @@ class TDSLoader extends Loader {
 
 		this.materials = [];
 		this.meshes = [];
-
 	}
 
 	/**
@@ -47,42 +44,35 @@ class TDSLoader extends Loader {
 	 * @param {Function} onProgress onProgress callback.
 	 * @param {Function} onError onError callback.
 	 */
-	load( url, onLoad, onProgress, onError ) {
-
+	load(url, onLoad, onProgress, onError) {
 		const scope = this;
 
-		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+		const path = this.path === "" ? LoaderUtils.extractUrlBase(url) : this.path;
 
-		const loader = new FileLoader( this.manager );
-		loader.setPath( this.path );
-		loader.setResponseType( 'arraybuffer' );
-		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( this.withCredentials );
+		const loader = new FileLoader(this.manager);
+		loader.setPath(this.path);
+		loader.setResponseType("arraybuffer");
+		loader.setRequestHeader(this.requestHeader);
+		loader.setWithCredentials(this.withCredentials);
 
-		loader.load( url, function ( data ) {
+		loader.load(
+			url,
+			function (data) {
+				try {
+					onLoad(scope.parse(data, path));
+				} catch (e) {
+					if (onError) {
+						onError(e);
+					} else {
+						console.error(e);
+					}
 
-			try {
-
-				onLoad( scope.parse( data, path ) );
-
-			} catch ( e ) {
-
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
+					scope.manager.itemError(url);
 				}
-
-				scope.manager.itemError( url );
-
-			}
-
-		}, onProgress, onError );
-
+			},
+			onProgress,
+			onError
+		);
 	}
 
 	/**
@@ -93,22 +83,18 @@ class TDSLoader extends Loader {
 	 * @param {String} path Path for external resources.
 	 * @return {Group} Group loaded from 3ds file.
 	 */
-	parse( arraybuffer, path ) {
-
+	parse(arraybuffer, path) {
 		this.group = new Group();
 		this.materials = [];
 		this.meshes = [];
 
-		this.readFile( arraybuffer, path );
+		this.readFile(arraybuffer, path);
 
-		for ( let i = 0; i < this.meshes.length; i ++ ) {
-
-			this.group.add( this.meshes[ i ] );
-
+		for (let i = 0; i < this.meshes.length; i++) {
+			this.group.add(this.meshes[i]);
 		}
 
 		return this.group;
-
 	}
 
 	/**
@@ -118,40 +104,32 @@ class TDSLoader extends Loader {
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
 	 * @param {String} path Path for external resources.
 	 */
-	readFile( arraybuffer, path ) {
+	readFile(arraybuffer, path) {
+		const data = new DataView(arraybuffer);
+		const chunk = new Chunk(data, 0, this.debugMessage);
 
-		const data = new DataView( arraybuffer );
-		const chunk = new Chunk( data, 0, this.debugMessage );
-
-		if ( chunk.id === MLIBMAGIC || chunk.id === CMAGIC || chunk.id === M3DMAGIC ) {
-
+		if (
+			chunk.id === MLIBMAGIC ||
+			chunk.id === CMAGIC ||
+			chunk.id === M3DMAGIC
+		) {
 			let next = chunk.readChunk();
 
-			while ( next ) {
-
-				if ( next.id === M3D_VERSION ) {
-
+			while (next) {
+				if (next.id === M3D_VERSION) {
 					const version = next.readDWord();
-					this.debugMessage( '3DS file version: ' + version );
-
-				} else if ( next.id === MDATA ) {
-
-					this.readMeshData( next, path );
-
+					this.debugMessage("3DS file version: " + version);
+				} else if (next.id === MDATA) {
+					this.readMeshData(next, path);
 				} else {
-
-					this.debugMessage( 'Unknown main chunk: ' + next.hexId );
-
+					this.debugMessage("Unknown main chunk: " + next.hexId);
 				}
 
 				next = chunk.readChunk();
-
 			}
-
 		}
 
-		this.debugMessage( 'Parsed ' + this.meshes.length + ' meshes' );
-
+		this.debugMessage("Parsed " + this.meshes.length + " meshes");
 	}
 
 	/**
@@ -161,43 +139,29 @@ class TDSLoader extends Loader {
 	 * @param {Chunk} chunk to read mesh from
 	 * @param {String} path Path for external resources.
 	 */
-	readMeshData( chunk, path ) {
-
+	readMeshData(chunk, path) {
 		let next = chunk.readChunk();
 
-		while ( next ) {
-
-			if ( next.id === MESH_VERSION ) {
-
-				const version = + next.readDWord();
-				this.debugMessage( 'Mesh Version: ' + version );
-
-			} else if ( next.id === MASTER_SCALE ) {
-
+		while (next) {
+			if (next.id === MESH_VERSION) {
+				const version = +next.readDWord();
+				this.debugMessage("Mesh Version: " + version);
+			} else if (next.id === MASTER_SCALE) {
 				const scale = next.readFloat();
-				this.debugMessage( 'Master scale: ' + scale );
-				this.group.scale.set( scale, scale, scale );
-
-			} else if ( next.id === NAMED_OBJECT ) {
-
-				this.debugMessage( 'Named Object' );
-				this.readNamedObject( next );
-
-			} else if ( next.id === MAT_ENTRY ) {
-
-				this.debugMessage( 'Material' );
-				this.readMaterialEntry( next, path );
-
+				this.debugMessage("Master scale: " + scale);
+				this.group.scale.set(scale, scale, scale);
+			} else if (next.id === NAMED_OBJECT) {
+				this.debugMessage("Named Object");
+				this.readNamedObject(next);
+			} else if (next.id === MAT_ENTRY) {
+				this.debugMessage("Material");
+				this.readMaterialEntry(next, path);
 			} else {
-
-				this.debugMessage( 'Unknown MDATA chunk: ' + next.hexId );
-
+				this.debugMessage("Unknown MDATA chunk: " + next.hexId);
 			}
 
 			next = chunk.readChunk();
-
 		}
-
 	}
 
 	/**
@@ -206,29 +170,21 @@ class TDSLoader extends Loader {
 	 * @method readNamedObject
 	 * @param {Chunk} chunk Chunk in use.
 	 */
-	readNamedObject( chunk ) {
-
+	readNamedObject(chunk) {
 		const name = chunk.readString();
 
 		let next = chunk.readChunk();
-		while ( next ) {
-
-			if ( next.id === N_TRI_OBJECT ) {
-
-				const mesh = this.readMesh( next );
+		while (next) {
+			if (next.id === N_TRI_OBJECT) {
+				const mesh = this.readMesh(next);
 				mesh.name = name;
-				this.meshes.push( mesh );
-
+				this.meshes.push(mesh);
 			} else {
-
-				this.debugMessage( 'Unknown named object chunk: ' + next.hexId );
-
+				this.debugMessage("Unknown named object chunk: " + next.hexId);
 			}
 
-			next = chunk.readChunk( );
-
+			next = chunk.readChunk();
 		}
-
 	}
 
 	/**
@@ -238,99 +194,65 @@ class TDSLoader extends Loader {
 	 * @param {Chunk} chunk Chunk in use.
 	 * @param {String} path Path for external resources.
 	 */
-	readMaterialEntry( chunk, path ) {
-
+	readMaterialEntry(chunk, path) {
 		let next = chunk.readChunk();
 		const material = new MeshPhongMaterial();
 
-		while ( next ) {
-
-			if ( next.id === MAT_NAME ) {
-
+		while (next) {
+			if (next.id === MAT_NAME) {
 				material.name = next.readString();
-				this.debugMessage( '   Name: ' + material.name );
-
-			} else if ( next.id === MAT_WIRE ) {
-
-				this.debugMessage( '   Wireframe' );
+				this.debugMessage("   Name: " + material.name);
+			} else if (next.id === MAT_WIRE) {
+				this.debugMessage("   Wireframe");
 				material.wireframe = true;
-
-			} else if ( next.id === MAT_WIRE_SIZE ) {
-
+			} else if (next.id === MAT_WIRE_SIZE) {
 				const value = next.readByte();
 				material.wireframeLinewidth = value;
-				this.debugMessage( '   Wireframe Thickness: ' + value );
-
-			} else if ( next.id === MAT_TWO_SIDE ) {
-
+				this.debugMessage("   Wireframe Thickness: " + value);
+			} else if (next.id === MAT_TWO_SIDE) {
 				material.side = DoubleSide;
-				this.debugMessage( '   DoubleSided' );
-
-			} else if ( next.id === MAT_ADDITIVE ) {
-
-				this.debugMessage( '   Additive Blending' );
+				this.debugMessage("   DoubleSided");
+			} else if (next.id === MAT_ADDITIVE) {
+				this.debugMessage("   Additive Blending");
 				material.blending = AdditiveBlending;
-
-			} else if ( next.id === MAT_DIFFUSE ) {
-
-				this.debugMessage( '   Diffuse Color' );
-				material.color = this.readColor( next );
-
-			} else if ( next.id === MAT_SPECULAR ) {
-
-				this.debugMessage( '   Specular Color' );
-				material.specular = this.readColor( next );
-
-			} else if ( next.id === MAT_AMBIENT ) {
-
-				this.debugMessage( '   Ambient color' );
-				material.color = this.readColor( next );
-
-			} else if ( next.id === MAT_SHININESS ) {
-
-				const shininess = this.readPercentage( next );
+			} else if (next.id === MAT_DIFFUSE) {
+				this.debugMessage("   Diffuse Color");
+				material.color = this.readColor(next);
+			} else if (next.id === MAT_SPECULAR) {
+				this.debugMessage("   Specular Color");
+				material.specular = this.readColor(next);
+			} else if (next.id === MAT_AMBIENT) {
+				this.debugMessage("   Ambient color");
+				material.color = this.readColor(next);
+			} else if (next.id === MAT_SHININESS) {
+				const shininess = this.readPercentage(next);
 				material.shininess = shininess * 100;
-				this.debugMessage( '   Shininess : ' + shininess );
-
-			} else if ( next.id === MAT_TRANSPARENCY ) {
-
-				const transparency = this.readPercentage( next );
+				this.debugMessage("   Shininess : " + shininess);
+			} else if (next.id === MAT_TRANSPARENCY) {
+				const transparency = this.readPercentage(next);
 				material.opacity = 1 - transparency;
-				this.debugMessage( '  Transparency : ' + transparency );
+				this.debugMessage("  Transparency : " + transparency);
 				material.transparent = material.opacity < 1 ? true : false;
-
-			} else if ( next.id === MAT_TEXMAP ) {
-
-				this.debugMessage( '   ColorMap' );
-				material.map = this.readMap( next, path );
-
-			} else if ( next.id === MAT_BUMPMAP ) {
-
-				this.debugMessage( '   BumpMap' );
-				material.bumpMap = this.readMap( next, path );
-
-			} else if ( next.id === MAT_OPACMAP ) {
-
-				this.debugMessage( '   OpacityMap' );
-				material.alphaMap = this.readMap( next, path );
-
-			} else if ( next.id === MAT_SPECMAP ) {
-
-				this.debugMessage( '   SpecularMap' );
-				material.specularMap = this.readMap( next, path );
-
+			} else if (next.id === MAT_TEXMAP) {
+				this.debugMessage("   ColorMap");
+				material.map = this.readMap(next, path);
+			} else if (next.id === MAT_BUMPMAP) {
+				this.debugMessage("   BumpMap");
+				material.bumpMap = this.readMap(next, path);
+			} else if (next.id === MAT_OPACMAP) {
+				this.debugMessage("   OpacityMap");
+				material.alphaMap = this.readMap(next, path);
+			} else if (next.id === MAT_SPECMAP) {
+				this.debugMessage("   SpecularMap");
+				material.specularMap = this.readMap(next, path);
 			} else {
-
-				this.debugMessage( '   Unknown material chunk: ' + next.hexId );
-
+				this.debugMessage("   Unknown material chunk: " + next.hexId);
 			}
 
 			next = chunk.readChunk();
-
 		}
 
-		this.materials[ material.name ] = material;
-
+		this.materials[material.name] = material;
 	}
 
 	/**
@@ -340,121 +262,103 @@ class TDSLoader extends Loader {
 	 * @param {Chunk} chunk Chunk in use.
 	 * @return {Mesh} The parsed mesh.
 	 */
-	readMesh( chunk ) {
-
-		let next = chunk.readChunk( );
+	readMesh(chunk) {
+		let next = chunk.readChunk();
 
 		const geometry = new BufferGeometry();
 
 		const material = new MeshPhongMaterial();
-		const mesh = new Mesh( geometry, material );
-		mesh.name = 'mesh';
+		const mesh = new Mesh(geometry, material);
+		mesh.name = "mesh";
 
-		while ( next ) {
+		while (next) {
+			if (next.id === POINT_ARRAY) {
+				const points = next.readWord();
 
-			if ( next.id === POINT_ARRAY ) {
-
-				const points = next.readWord( );
-
-				this.debugMessage( '   Vertex: ' + points );
+				this.debugMessage("   Vertex: " + points);
 
 				//BufferGeometry
 
 				const vertices = [];
 
-				for ( let i = 0; i < points; i ++ )		{
-
-					vertices.push( next.readFloat( ) );
-					vertices.push( next.readFloat( ) );
-					vertices.push( next.readFloat( ) );
-
+				for (let i = 0; i < points; i++) {
+					vertices.push(next.readFloat());
+					vertices.push(next.readFloat());
+					vertices.push(next.readFloat());
 				}
 
-				geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute(
+					"position",
+					new Float32BufferAttribute(vertices, 3)
+				);
+			} else if (next.id === FACE_ARRAY) {
+				this.readFaceArray(next, mesh);
+			} else if (next.id === TEX_VERTS) {
+				const texels = next.readWord();
 
-			} else if ( next.id === FACE_ARRAY ) {
-
-				this.readFaceArray( next, mesh );
-
-			} else if ( next.id === TEX_VERTS ) {
-
-				const texels = next.readWord( );
-
-				this.debugMessage( '   UV: ' + texels );
+				this.debugMessage("   UV: " + texels);
 
 				//BufferGeometry
 
 				const uvs = [];
 
-				for ( let i = 0; i < texels; i ++ ) {
-
-					uvs.push( next.readFloat( ) );
-					uvs.push( next.readFloat( ) );
-
+				for (let i = 0; i < texels; i++) {
+					uvs.push(next.readFloat());
+					uvs.push(next.readFloat());
 				}
 
-				geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-
-			} else if ( next.id === MESH_MATRIX ) {
-
-				this.debugMessage( '   Tranformation Matrix (TODO)' );
+				geometry.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
+			} else if (next.id === MESH_MATRIX) {
+				this.debugMessage("   Tranformation Matrix (TODO)");
 
 				const values = [];
-				for ( let i = 0; i < 12; i ++ ) {
-
-					values[ i ] = next.readFloat( );
-
+				for (let i = 0; i < 12; i++) {
+					values[i] = next.readFloat();
 				}
 
 				const matrix = new Matrix4();
 
 				//X Line
-				matrix.elements[ 0 ] = values[ 0 ];
-				matrix.elements[ 1 ] = values[ 6 ];
-				matrix.elements[ 2 ] = values[ 3 ];
-				matrix.elements[ 3 ] = values[ 9 ];
+				matrix.elements[0] = values[0];
+				matrix.elements[1] = values[6];
+				matrix.elements[2] = values[3];
+				matrix.elements[3] = values[9];
 
 				//Y Line
-				matrix.elements[ 4 ] = values[ 2 ];
-				matrix.elements[ 5 ] = values[ 8 ];
-				matrix.elements[ 6 ] = values[ 5 ];
-				matrix.elements[ 7 ] = values[ 11 ];
+				matrix.elements[4] = values[2];
+				matrix.elements[5] = values[8];
+				matrix.elements[6] = values[5];
+				matrix.elements[7] = values[11];
 
 				//Z Line
-				matrix.elements[ 8 ] = values[ 1 ];
-				matrix.elements[ 9 ] = values[ 7 ];
-				matrix.elements[ 10 ] = values[ 4 ];
-				matrix.elements[ 11 ] = values[ 10 ];
+				matrix.elements[8] = values[1];
+				matrix.elements[9] = values[7];
+				matrix.elements[10] = values[4];
+				matrix.elements[11] = values[10];
 
 				//W Line
-				matrix.elements[ 12 ] = 0;
-				matrix.elements[ 13 ] = 0;
-				matrix.elements[ 14 ] = 0;
-				matrix.elements[ 15 ] = 1;
+				matrix.elements[12] = 0;
+				matrix.elements[13] = 0;
+				matrix.elements[14] = 0;
+				matrix.elements[15] = 1;
 
 				matrix.transpose();
 
 				const inverse = new Matrix4();
-				inverse.copy( matrix ).invert();
-				geometry.applyMatrix4( inverse );
+				inverse.copy(matrix).invert();
+				geometry.applyMatrix4(inverse);
 
-				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
-
+				matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
 			} else {
-
-				this.debugMessage( '   Unknown mesh chunk: ' + next.hexId );
-
+				this.debugMessage("   Unknown mesh chunk: " + next.hexId);
 			}
 
-			next = chunk.readChunk( );
-
+			next = chunk.readChunk();
 		}
 
 		geometry.computeVertexNormals();
 
 		return mesh;
-
 	}
 
 	/**
@@ -464,65 +368,53 @@ class TDSLoader extends Loader {
 	 * @param {Chunk} chunk Chunk in use.
 	 * @param {Mesh} mesh Mesh to be filled with the data read.
 	 */
-	readFaceArray( chunk, mesh ) {
+	readFaceArray(chunk, mesh) {
+		const faces = chunk.readWord();
 
-		const faces = chunk.readWord( );
-
-		this.debugMessage( '   Faces: ' + faces );
+		this.debugMessage("   Faces: " + faces);
 
 		const index = [];
 
-		for ( let i = 0; i < faces; ++ i ) {
+		for (let i = 0; i < faces; ++i) {
+			index.push(chunk.readWord(), chunk.readWord(), chunk.readWord());
 
-			index.push( chunk.readWord( ), chunk.readWord( ), chunk.readWord( ) );
-
-			chunk.readWord( ); // visibility
-
+			chunk.readWord(); // visibility
 		}
 
-		mesh.geometry.setIndex( index );
+		mesh.geometry.setIndex(index);
 
 		//The rest of the FACE_ARRAY chunk is subchunks
 
 		let materialIndex = 0;
 		let start = 0;
 
-		while ( ! chunk.endOfChunk ) {
+		while (!chunk.endOfChunk) {
+			const subchunk = chunk.readChunk();
 
-			const subchunk = chunk.readChunk( );
+			if (subchunk.id === MSH_MAT_GROUP) {
+				this.debugMessage("      Material Group");
 
-			if ( subchunk.id === MSH_MAT_GROUP ) {
-
-				this.debugMessage( '      Material Group' );
-
-				const group = this.readMaterialGroup( subchunk );
+				const group = this.readMaterialGroup(subchunk);
 				const count = group.index.length * 3; // assuming successive indices
 
-				mesh.geometry.addGroup( start, count, materialIndex );
+				mesh.geometry.addGroup(start, count, materialIndex);
 
 				start += count;
-				materialIndex ++;
+				materialIndex++;
 
-				const material = this.materials[ group.name ];
+				const material = this.materials[group.name];
 
-				if ( Array.isArray( mesh.material ) === false ) mesh.material = [];
+				if (Array.isArray(mesh.material) === false) mesh.material = [];
 
-				if ( material !== undefined )	{
-
-					mesh.material.push( material );
-
+				if (material !== undefined) {
+					mesh.material.push(material);
 				}
-
 			} else {
-
-				this.debugMessage( '      Unknown face array chunk: ' + subchunk.hexId );
-
+				this.debugMessage("      Unknown face array chunk: " + subchunk.hexId);
 			}
-
 		}
 
-		if ( mesh.material.length === 1 ) mesh.material = mesh.material[ 0 ]; // for backwards compatibility
-
+		if (mesh.material.length === 1) mesh.material = mesh.material[0]; // for backwards compatibility
 	}
 
 	/**
@@ -533,55 +425,39 @@ class TDSLoader extends Loader {
 	 * @param {String} path Path for external resources.
 	 * @return {Texture} Texture read from this data chunk.
 	 */
-	readMap( chunk, path ) {
-
-		let next = chunk.readChunk( );
+	readMap(chunk, path) {
+		let next = chunk.readChunk();
 		let texture = {};
 
-		const loader = new TextureLoader( this.manager );
-		loader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const loader = new TextureLoader(this.manager);
+		loader.setPath(this.resourcePath || path).setCrossOrigin(this.crossOrigin);
 
-		while ( next ) {
-
-			if ( next.id === MAT_MAPNAME ) {
-
+		while (next) {
+			if (next.id === MAT_MAPNAME) {
 				const name = next.readString();
-				texture = loader.load( name );
+				texture = loader.load(name);
 
-				this.debugMessage( '      File: ' + path + name );
-
-			} else if ( next.id === MAT_MAP_UOFFSET ) {
-
-				texture.offset.x = next.readFloat( );
-				this.debugMessage( '      OffsetX: ' + texture.offset.x );
-
-			} else if ( next.id === MAT_MAP_VOFFSET ) {
-
-				texture.offset.y = next.readFloat( );
-				this.debugMessage( '      OffsetY: ' + texture.offset.y );
-
-			} else if ( next.id === MAT_MAP_USCALE ) {
-
-				texture.repeat.x = next.readFloat( );
-				this.debugMessage( '      RepeatX: ' + texture.repeat.x );
-
-			} else if ( next.id === MAT_MAP_VSCALE ) {
-
-				texture.repeat.y = next.readFloat( );
-				this.debugMessage( '      RepeatY: ' + texture.repeat.y );
-
+				this.debugMessage("      File: " + path + name);
+			} else if (next.id === MAT_MAP_UOFFSET) {
+				texture.offset.x = next.readFloat();
+				this.debugMessage("      OffsetX: " + texture.offset.x);
+			} else if (next.id === MAT_MAP_VOFFSET) {
+				texture.offset.y = next.readFloat();
+				this.debugMessage("      OffsetY: " + texture.offset.y);
+			} else if (next.id === MAT_MAP_USCALE) {
+				texture.repeat.x = next.readFloat();
+				this.debugMessage("      RepeatX: " + texture.repeat.x);
+			} else if (next.id === MAT_MAP_VSCALE) {
+				texture.repeat.y = next.readFloat();
+				this.debugMessage("      RepeatY: " + texture.repeat.y);
 			} else {
-
-				this.debugMessage( '      Unknown map chunk: ' + next.hexId );
-
+				this.debugMessage("      Unknown map chunk: " + next.hexId);
 			}
 
-			next = chunk.readChunk( );
-
+			next = chunk.readChunk();
 		}
 
 		return texture;
-
 	}
 
 	/**
@@ -591,23 +467,19 @@ class TDSLoader extends Loader {
 	 * @param {Chunk} chunk Chunk in use.
 	 * @return {Object} Object with name and index of the object.
 	 */
-	readMaterialGroup( chunk ) {
-
+	readMaterialGroup(chunk) {
 		const name = chunk.readString();
 		const numFaces = chunk.readWord();
 
-		this.debugMessage( '         Name: ' + name );
-		this.debugMessage( '         Faces: ' + numFaces );
+		this.debugMessage("         Name: " + name);
+		this.debugMessage("         Faces: " + numFaces);
 
 		const index = [];
-		for ( let i = 0; i < numFaces; ++ i ) {
-
-			index.push( chunk.readWord( ) );
-
+		for (let i = 0; i < numFaces; ++i) {
+			index.push(chunk.readWord());
 		}
 
 		return { name: name, index: index };
-
 	}
 
 	/**
@@ -617,39 +489,35 @@ class TDSLoader extends Loader {
 	 * @param {Chunk} chunk Chunk.
 	 * @return {Color} Color value read..
 	 */
-	readColor( chunk ) {
-
-		const subChunk = chunk.readChunk( );
+	readColor(chunk) {
+		const subChunk = chunk.readChunk();
 		const color = new Color();
 
-		if ( subChunk.id === COLOR_24 || subChunk.id === LIN_COLOR_24 ) {
+		if (subChunk.id === COLOR_24 || subChunk.id === LIN_COLOR_24) {
+			const r = subChunk.readByte();
+			const g = subChunk.readByte();
+			const b = subChunk.readByte();
 
-			const r = subChunk.readByte( );
-			const g = subChunk.readByte( );
-			const b = subChunk.readByte( );
+			color.setRGB(r / 255, g / 255, b / 255);
 
-			color.setRGB( r / 255, g / 255, b / 255 );
+			this.debugMessage(
+				"      Color: " + color.r + ", " + color.g + ", " + color.b
+			);
+		} else if (subChunk.id === COLOR_F || subChunk.id === LIN_COLOR_F) {
+			const r = subChunk.readFloat();
+			const g = subChunk.readFloat();
+			const b = subChunk.readFloat();
 
-			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
+			color.setRGB(r, g, b);
 
-		}	else if ( subChunk.id === COLOR_F || subChunk.id === LIN_COLOR_F ) {
-
-			const r = subChunk.readFloat( );
-			const g = subChunk.readFloat( );
-			const b = subChunk.readFloat( );
-
-			color.setRGB( r, g, b );
-
-			this.debugMessage( '      Color: ' + color.r + ', ' + color.g + ', ' + color.b );
-
-		}	else {
-
-			this.debugMessage( '      Unknown color chunk: ' + subChunk.hexId );
-
+			this.debugMessage(
+				"      Color: " + color.r + ", " + color.g + ", " + color.b
+			);
+		} else {
+			this.debugMessage("      Unknown color chunk: " + subChunk.hexId);
 		}
 
 		return color;
-
 	}
 
 	/**
@@ -659,26 +527,22 @@ class TDSLoader extends Loader {
 	 * @param {Chunk} chunk Chunk to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readPercentage( chunk ) {
+	readPercentage(chunk) {
+		const subChunk = chunk.readChunk();
 
-		const subChunk = chunk.readChunk( );
-
-		switch ( subChunk.id ) {
-
+		switch (subChunk.id) {
 			case INT_PERCENTAGE:
-				return ( subChunk.readShort( ) / 100 );
+				return subChunk.readShort() / 100;
 				break;
 
 			case FLOAT_PERCENTAGE:
-				return subChunk.readFloat( );
+				return subChunk.readFloat();
 				break;
 
 			default:
-				this.debugMessage( '      Unknown percentage chunk: ' + subChunk.hexId );
+				this.debugMessage("      Unknown percentage chunk: " + subChunk.hexId);
 				return 0;
-
 		}
-
 	}
 
 	/**
@@ -689,22 +553,15 @@ class TDSLoader extends Loader {
 	 * @method debugMessage
 	 * @param {Object} message Debug message to print to the console.
 	 */
-	debugMessage( message ) {
-
-		if ( this.debug ) {
-
-			console.log( message );
-
+	debugMessage(message) {
+		if (this.debug) {
+			console.log(message);
 		}
-
 	}
-
 }
-
 
 /** Read data/sub-chunks from chunk */
 class Chunk {
-
 	/**
 	 * Create a new chunk
 	 *
@@ -713,8 +570,7 @@ class Chunk {
 	 * @param {Number} position in data.
 	 * @param {Function} debugMessage logging callback.
 	 */
-	constructor( data, position, debugMessage ) {
-
+	constructor(data, position, debugMessage) {
 		this.data = data;
 		// the offset to the begin of this chunk
 		this.offset = position;
@@ -722,22 +578,17 @@ class Chunk {
 		this.position = position;
 		this.debugMessage = debugMessage;
 
-		if ( this.debugMessage instanceof Function ) {
-
+		if (this.debugMessage instanceof Function) {
 			this.debugMessage = function () {};
-
 		}
 
 		this.id = this.readWord();
 		this.size = this.readDWord();
 		this.end = this.offset + this.size;
 
-		if ( this.end > data.byteLength ) {
-
-			this.debugMessage( 'Bad chunk size for chunk at ' + position );
-
+		if (this.end > data.byteLength) {
+			this.debugMessage("Bad chunk size for chunk at " + position);
 		}
-
 	}
 
 	/**
@@ -747,26 +598,18 @@ class Chunk {
 	 * @return {Chunk | null} next sub chunk
 	 */
 	readChunk() {
-
-		if ( this.endOfChunk ) {
-
+		if (this.endOfChunk) {
 			return null;
-
 		}
 
 		try {
-
-			const next = new Chunk( this.data, this.position, this.debugMessage );
+			const next = new Chunk(this.data, this.position, this.debugMessage);
 			this.position += next.size;
 			return next;
-
-		}	catch ( e ) {
-
-			this.debugMessage( 'Unable to read chunk at ' + this.position );
+		} catch (e) {
+			this.debugMessage("Unable to read chunk at " + this.position);
 			return null;
-
 		}
-
 	}
 
 	/**
@@ -776,15 +619,11 @@ class Chunk {
 	 * @return {String} hex-string of id
 	 */
 	get hexId() {
-
-		return this.id.toString( 16 );
-
+		return this.id.toString(16);
 	}
 
 	get endOfChunk() {
-
 		return this.position >= this.end;
-
 	}
 
 	/**
@@ -794,11 +633,9 @@ class Chunk {
 	 * @return {Number} Data read from the dataview.
 	 */
 	readByte() {
-
-		const v = this.data.getUint8( this.position, true );
+		const v = this.data.getUint8(this.position, true);
 		this.position += 1;
 		return v;
-
 	}
 
 	/**
@@ -808,20 +645,14 @@ class Chunk {
 	 * @return {Number} Data read from the dataview.
 	 */
 	readFloat() {
-
 		try {
-
-			const v = this.data.getFloat32( this.position, true );
+			const v = this.data.getFloat32(this.position, true);
 			this.position += 4;
 			return v;
-
-		}	catch ( e ) {
-
-			this.debugMessage( e + ' ' + this.position + ' ' + this.data.byteLength );
+		} catch (e) {
+			this.debugMessage(e + " " + this.position + " " + this.data.byteLength);
 			return 0;
-
 		}
-
 	}
 
 	/**
@@ -831,11 +662,9 @@ class Chunk {
 	 * @return {Number} Data read from the dataview.
 	 */
 	readInt() {
-
-		const v = this.data.getInt32( this.position, true );
+		const v = this.data.getInt32(this.position, true);
 		this.position += 4;
 		return v;
-
 	}
 
 	/**
@@ -845,11 +674,9 @@ class Chunk {
 	 * @return {Number} Data read from the dataview.
 	 */
 	readShort() {
-
-		const v = this.data.getInt16( this.position, true );
+		const v = this.data.getInt16(this.position, true);
 		this.position += 2;
 		return v;
-
 	}
 
 	/**
@@ -859,11 +686,9 @@ class Chunk {
 	 * @return {Number} Data read from the dataview.
 	 */
 	readDWord() {
-
-		const v = this.data.getUint32( this.position, true );
+		const v = this.data.getUint32(this.position, true);
 		this.position += 4;
 		return v;
-
 	}
 
 	/**
@@ -873,11 +698,9 @@ class Chunk {
 	 * @return {Number} Data read from the dataview.
 	 */
 	readWord() {
-
-		const v = this.data.getUint16( this.position, true );
+		const v = this.data.getUint16(this.position, true);
 		this.position += 2;
 		return v;
-
 	}
 
 	/**
@@ -887,29 +710,24 @@ class Chunk {
 	 * @return {String} Data read from the dataview.
 	 */
 	readString() {
-
-		let s = '';
+		let s = "";
 		let c = this.readByte();
-		while ( c ) {
-
-			s += String.fromCharCode( c );
+		while (c) {
+			s += String.fromCharCode(c);
 			c = this.readByte();
-
 		}
 
 		return s;
-
 	}
-
 }
 
 // const NULL_CHUNK = 0x0000;
-const M3DMAGIC = 0x4D4D;
+const M3DMAGIC = 0x4d4d;
 // const SMAGIC = 0x2D2D;
 // const LMAGIC = 0x2D3D;
-const MLIBMAGIC = 0x3DAA;
+const MLIBMAGIC = 0x3daa;
 // const MATMAGIC = 0x3DFF;
-const CMAGIC = 0xC23D;
+const CMAGIC = 0xc23d;
 const M3D_VERSION = 0x0002;
 // const M3D_KFVERSION = 0x0005;
 const COLOR_F = 0x0010;
@@ -918,8 +736,8 @@ const LIN_COLOR_24 = 0x0012;
 const LIN_COLOR_F = 0x0013;
 const INT_PERCENTAGE = 0x0030;
 const FLOAT_PERCENTAGE = 0x0031;
-const MDATA = 0x3D3D;
-const MESH_VERSION = 0x3D3E;
+const MDATA = 0x3d3d;
+const MESH_VERSION = 0x3d3e;
 const MASTER_SCALE = 0x0100;
 // const LO_SHADOW_BIAS = 0x1400;
 // const HI_SHADOW_BIAS = 0x1410;
@@ -944,30 +762,30 @@ const MASTER_SCALE = 0x0100;
 // const USE_FOG = 0x2201;
 // const USE_LAYER_FOG = 0x2303;
 // const USE_DISTANCE_CUE = 0x2301;
-const MAT_ENTRY = 0xAFFF;
-const MAT_NAME = 0xA000;
-const MAT_AMBIENT = 0xA010;
-const MAT_DIFFUSE = 0xA020;
-const MAT_SPECULAR = 0xA030;
-const MAT_SHININESS = 0xA040;
+const MAT_ENTRY = 0xafff;
+const MAT_NAME = 0xa000;
+const MAT_AMBIENT = 0xa010;
+const MAT_DIFFUSE = 0xa020;
+const MAT_SPECULAR = 0xa030;
+const MAT_SHININESS = 0xa040;
 // const MAT_SHIN2PCT = 0xA041;
-const MAT_TRANSPARENCY = 0xA050;
+const MAT_TRANSPARENCY = 0xa050;
 // const MAT_XPFALL = 0xA052;
 // const MAT_USE_XPFALL = 0xA240;
 // const MAT_REFBLUR = 0xA053;
 // const MAT_SHADING = 0xA100;
 // const MAT_USE_REFBLUR = 0xA250;
 // const MAT_SELF_ILLUM = 0xA084;
-const MAT_TWO_SIDE = 0xA081;
+const MAT_TWO_SIDE = 0xa081;
 // const MAT_DECAL = 0xA082;
-const MAT_ADDITIVE = 0xA083;
-const MAT_WIRE = 0xA085;
+const MAT_ADDITIVE = 0xa083;
+const MAT_WIRE = 0xa085;
 // const MAT_FACEMAP = 0xA088;
 // const MAT_TRANSFALLOFF_IN = 0xA08A;
 // const MAT_PHONGSOFT = 0xA08C;
 // const MAT_WIREABS = 0xA08E;
-const MAT_WIRE_SIZE = 0xA087;
-const MAT_TEXMAP = 0xA200;
+const MAT_WIRE_SIZE = 0xa087;
+const MAT_TEXMAP = 0xa200;
 // const MAT_SXP_TEXT_DATA = 0xA320;
 // const MAT_TEXMASK = 0xA33E;
 // const MAT_SXP_TEXTMASK_DATA = 0xA32A;
@@ -975,15 +793,15 @@ const MAT_TEXMAP = 0xA200;
 // const MAT_SXP_TEXT2_DATA = 0xA321;
 // const MAT_TEX2MASK = 0xA340;
 // const MAT_SXP_TEXT2MASK_DATA = 0xA32C;
-const MAT_OPACMAP = 0xA210;
+const MAT_OPACMAP = 0xa210;
 // const MAT_SXP_OPAC_DATA = 0xA322;
 // const MAT_OPACMASK = 0xA342;
 // const MAT_SXP_OPACMASK_DATA = 0xA32E;
-const MAT_BUMPMAP = 0xA230;
+const MAT_BUMPMAP = 0xa230;
 // const MAT_SXP_BUMP_DATA = 0xA324;
 // const MAT_BUMPMASK = 0xA344;
 // const MAT_SXP_BUMPMASK_DATA = 0xA330;
-const MAT_SPECMAP = 0xA204;
+const MAT_SPECMAP = 0xa204;
 // const MAT_SXP_SPEC_DATA = 0xA325;
 // const MAT_SPECMASK = 0xA348;
 // const MAT_SXP_SPECMASK_DATA = 0xA332;
@@ -999,13 +817,13 @@ const MAT_SPECMAP = 0xA204;
 // const MAT_REFLMASK = 0xA34C;
 // const MAT_SXP_REFLMASK_DATA = 0xA338;
 // const MAT_ACUBIC = 0xA310;
-const MAT_MAPNAME = 0xA300;
+const MAT_MAPNAME = 0xa300;
 // const MAT_MAP_TILING = 0xA351;
 // const MAT_MAP_TEXBLUR = 0xA353;
-const MAT_MAP_USCALE = 0xA354;
-const MAT_MAP_VSCALE = 0xA356;
-const MAT_MAP_UOFFSET = 0xA358;
-const MAT_MAP_VOFFSET = 0xA35A;
+const MAT_MAP_USCALE = 0xa354;
+const MAT_MAP_VSCALE = 0xa356;
+const MAT_MAP_UOFFSET = 0xa358;
+const MAT_MAP_VOFFSET = 0xa35a;
 // const MAT_MAP_ANG = 0xA35C;
 // const MAT_MAP_COL1 = 0xA360;
 // const MAT_MAP_COL2 = 0xA362;

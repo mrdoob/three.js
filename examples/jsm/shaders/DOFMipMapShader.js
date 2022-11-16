@@ -5,17 +5,14 @@
  */
 
 const DOFMipMapShader = {
-
 	uniforms: {
-
-		'tColor': { value: null },
-		'tDepth': { value: null },
-		'focus': { value: 1.0 },
-		'maxblur': { value: 1.0 }
-
+		tColor: { value: null },
+		tDepth: { value: null },
+		focus: { value: 1.0 },
+		maxblur: { value: 1.0 },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -26,7 +23,7 @@ const DOFMipMapShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		uniform float focus;
 		uniform float maxblur;
@@ -47,8 +44,7 @@ const DOFMipMapShader = {
 			gl_FragColor = col;
 			gl_FragColor.a = 1.0;
 
-		}`
-
+		}`,
 };
 
 export { DOFMipMapShader };

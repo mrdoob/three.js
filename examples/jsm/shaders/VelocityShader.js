@@ -1,26 +1,21 @@
-import {
-	UniformsLib,
-	UniformsUtils,
-	Matrix4
-} from 'three';
+import { UniformsLib, UniformsUtils, Matrix4 } from "three";
 
 /**
  * Mesh Velocity Shader @bhouston
  */
 
 const VelocityShader = {
-
-	uniforms: UniformsUtils.merge( [
+	uniforms: UniformsUtils.merge([
 		UniformsLib.common,
 		UniformsLib.displacementmap,
 		{
 			modelMatrixPrev: { value: new Matrix4() },
 			currentProjectionViewMatrix: { value: new Matrix4() },
-			previousProjectionViewMatrix: { value: new Matrix4() }
-		}
-	] ),
+			previousProjectionViewMatrix: { value: new Matrix4() },
+		},
+	]),
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 #define NORMAL
 
 #if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )
@@ -85,7 +80,7 @@ void main() {
 	#include <clipping_planes_vertex>
 }
 `,
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 #define NORMAL
 
 uniform float opacity;
@@ -122,7 +117,7 @@ void main() {
 
 }
 
-`
+`,
 };
 
 export { VelocityShader };

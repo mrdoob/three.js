@@ -2,14 +2,25 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - shaders [lava]</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
-
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shader material demo. featuring lava shader by <a href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057" target="_blank" rel="noopener">TheGameMaker</a></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- shader material demo. featuring lava shader by
+			<a
+				href="http://irrlicht.sourceforge.net/phpBB2/viewtopic.php?t=21057"
+				target="_blank"
+				rel="noopener"
+				>TheGameMaker</a
+			>
+		</div>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
 
@@ -55,7 +66,6 @@
 				gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
 
 			}
-
 		</script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
@@ -71,12 +81,14 @@
 				gl_Position = projectionMatrix * mvPosition;
 
 			}
-
 		</script>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -88,13 +100,12 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
-			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+			import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+			import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+			import { FilmPass } from "three/addons/postprocessing/FilmPass.js";
+			import { BloomPass } from "three/addons/postprocessing/BloomPass.js";
 
 			let camera, renderer, composer, clock;
 
@@ -104,10 +115,14 @@
 			animate();
 
 			function init() {
+				const container = document.getElementById("container");
 
-				const container = document.getElementById( 'container' );
-
-				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera(
+					35,
+					window.innerWidth / window.innerHeight,
+					1,
+					3000
+				);
 				camera.position.z = 4;
 
 				const scene = new THREE.Scene();
@@ -117,96 +132,87 @@
 				const textureLoader = new THREE.TextureLoader();
 
 				uniforms = {
-
-					'fogDensity': { value: 0.45 },
-					'fogColor': { value: new THREE.Vector3( 0, 0, 0 ) },
-					'time': { value: 1.0 },
-					'uvScale': { value: new THREE.Vector2( 3.0, 1.0 ) },
-					'texture1': { value: textureLoader.load( 'textures/lava/cloud.png' ) },
-					'texture2': { value: textureLoader.load( 'textures/lava/lavatile.jpg' ) }
-
+					fogDensity: { value: 0.45 },
+					fogColor: { value: new THREE.Vector3(0, 0, 0) },
+					time: { value: 1.0 },
+					uvScale: { value: new THREE.Vector2(3.0, 1.0) },
+					texture1: { value: textureLoader.load("textures/lava/cloud.png") },
+					texture2: { value: textureLoader.load("textures/lava/lavatile.jpg") },
 				};
 
-				uniforms[ 'texture1' ].value.wrapS = uniforms[ 'texture1' ].value.wrapT = THREE.RepeatWrapping;
-				uniforms[ 'texture2' ].value.wrapS = uniforms[ 'texture2' ].value.wrapT = THREE.RepeatWrapping;
+				uniforms["texture1"].value.wrapS = uniforms["texture1"].value.wrapT =
+					THREE.RepeatWrapping;
+				uniforms["texture2"].value.wrapS = uniforms["texture2"].value.wrapT =
+					THREE.RepeatWrapping;
 
 				const size = 0.65;
 
-				const material = new THREE.ShaderMaterial( {
-
+				const material = new THREE.ShaderMaterial({
 					uniforms: uniforms,
-					vertexShader: document.getElementById( 'vertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+					vertexShader: document.getElementById("vertexShader").textContent,
+					fragmentShader: document.getElementById("fragmentShader").textContent,
+				});
 
-				} );
-
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( size, 0.3, 30, 30 ), material );
+				mesh = new THREE.Mesh(
+					new THREE.TorusGeometry(size, 0.3, 30, 30),
+					material
+				);
 				mesh.rotation.x = 0.3;
-				scene.add( mesh );
+				scene.add(mesh);
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				container.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				container.appendChild(renderer.domElement);
 				renderer.autoClear = false;
 
-
 				//
 
-				const renderModel = new RenderPass( scene, camera );
-				const effectBloom = new BloomPass( 1.25 );
-				const effectFilm = new FilmPass( 0.35, 0.95, 2048, false );
+				const renderModel = new RenderPass(scene, camera);
+				const effectBloom = new BloomPass(1.25);
+				const effectFilm = new FilmPass(0.35, 0.95, 2048, false);
 
-				composer = new EffectComposer( renderer );
+				composer = new EffectComposer(renderer);
 
-				composer.addPass( renderModel );
-				composer.addPass( effectBloom );
-				composer.addPass( effectFilm );
+				composer.addPass(renderModel);
+				composer.addPass(effectBloom);
+				composer.addPass(effectFilm);
 
 				//
 
 				onWindowResize();
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				composer.setSize(window.innerWidth, window.innerHeight);
 			}
 
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
+				requestAnimationFrame(animate);
 
 				render();
-
 			}
 
 			function render() {
-
 				const delta = 5 * clock.getDelta();
 
-				uniforms[ 'time' ].value += 0.2 * delta;
+				uniforms["time"].value += 0.2 * delta;
 
 				mesh.rotation.y += 0.0125 * delta;
 				mesh.rotation.x += 0.05 * delta;
 
 				renderer.clear();
-				composer.render( 0.01 );
-
+				composer.render(0.01);
 			}
-
 		</script>
-
 	</body>
 </html>

@@ -1,38 +1,36 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
-function createText( message, height ) {
-
-	const canvas = document.createElement( 'canvas' );
-	const context = canvas.getContext( '2d' );
+function createText(message, height) {
+	const canvas = document.createElement("canvas");
+	const context = canvas.getContext("2d");
 	let metrics = null;
 	const textHeight = 100;
-	context.font = 'normal ' + textHeight + 'px Arial';
-	metrics = context.measureText( message );
+	context.font = "normal " + textHeight + "px Arial";
+	metrics = context.measureText(message);
 	const textWidth = metrics.width;
 	canvas.width = textWidth;
 	canvas.height = textHeight;
-	context.font = 'normal ' + textHeight + 'px Arial';
-	context.textAlign = 'center';
-	context.textBaseline = 'middle';
-	context.fillStyle = '#ffffff';
-	context.fillText( message, textWidth / 2, textHeight / 2 );
+	context.font = "normal " + textHeight + "px Arial";
+	context.textAlign = "center";
+	context.textBaseline = "middle";
+	context.fillStyle = "#ffffff";
+	context.fillText(message, textWidth / 2, textHeight / 2);
 
-	const texture = new THREE.Texture( canvas );
+	const texture = new THREE.Texture(canvas);
 	texture.needsUpdate = true;
 
-	const material = new THREE.MeshBasicMaterial( {
+	const material = new THREE.MeshBasicMaterial({
 		color: 0xffffff,
 		side: THREE.DoubleSide,
 		map: texture,
 		transparent: true,
-	} );
+	});
 	const geometry = new THREE.PlaneGeometry(
-		( height * textWidth ) / textHeight,
+		(height * textWidth) / textHeight,
 		height
 	);
-	const plane = new THREE.Mesh( geometry, material );
+	const plane = new THREE.Mesh(geometry, material);
 	return plane;
-
 }
 
 export { createText };

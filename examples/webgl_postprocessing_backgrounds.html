@@ -2,21 +2,29 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - postprocessing backgrounds</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass<br/>
-			by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- Backgrounds: ClearPass, TexturePass and CubeTexturePass<br />
+			by
+			<a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
 		</div>
 
 		<div id="container"></div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -28,20 +36,19 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
+			import Stats from "three/addons/libs/stats.module.js";
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
-			import { CubeTexturePass } from 'three/addons/postprocessing/CubeTexturePass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { ClearPass } from 'three/addons/postprocessing/ClearPass.js';
-			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+			import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+			import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+			import { TexturePass } from "three/addons/postprocessing/TexturePass.js";
+			import { CubeTexturePass } from "three/addons/postprocessing/CubeTexturePass.js";
+			import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+			import { ClearPass } from "three/addons/postprocessing/ClearPass.js";
+			import { CopyShader } from "three/addons/shaders/CopyShader.js";
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 			let scene, renderer, composer;
 			let clearPass, texturePass, renderPass;
@@ -49,9 +56,8 @@
 			let gui, stats;
 
 			const params = {
-
 				clearPass: true,
-				clearColor: 'white',
+				clearColor: "white",
 				clearAlpha: 1.0,
 
 				texturePass: true,
@@ -60,7 +66,7 @@
 				cubeTexturePass: true,
 				cubeTexturePassOpacity: 1.0,
 
-				renderPass: true
+				renderPass: true,
 			};
 
 			init();
@@ -69,30 +75,33 @@
 			clearGui();
 
 			function clearGui() {
-
-				if ( gui ) gui.destroy();
+				if (gui) gui.destroy();
 
 				gui = new GUI();
 
-				gui.add( params, 'clearPass' );
-				gui.add( params, 'clearColor', [ 'black', 'white', 'blue', 'green', 'red' ] );
-				gui.add( params, 'clearAlpha', 0, 1 );
+				gui.add(params, "clearPass");
+				gui.add(params, "clearColor", [
+					"black",
+					"white",
+					"blue",
+					"green",
+					"red",
+				]);
+				gui.add(params, "clearAlpha", 0, 1);
 
-				gui.add( params, 'texturePass' );
-				gui.add( params, 'texturePassOpacity', 0, 1 );
+				gui.add(params, "texturePass");
+				gui.add(params, "texturePassOpacity", 0, 1);
 
-				gui.add( params, 'cubeTexturePass' );
-				gui.add( params, 'cubeTexturePassOpacity', 0, 1 );
+				gui.add(params, "cubeTexturePass");
+				gui.add(params, "cubeTexturePassOpacity", 0, 1);
 
-				gui.add( params, 'renderPass' );
+				gui.add(params, "renderPass");
 
 				gui.open();
-
 			}
 
 			function init() {
-
-				const container = document.getElementById( 'container' );
+				const container = document.getElementById("container");
 
 				const width = window.innerWidth || 1;
 				const height = window.innerHeight || 1;
@@ -100,104 +109,99 @@
 				const devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( devicePixelRatio );
-				renderer.setSize( width, height );
-				document.body.appendChild( renderer.domElement );
+				renderer.setPixelRatio(devicePixelRatio);
+				renderer.setSize(width, height);
+				document.body.appendChild(renderer.domElement);
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				container.appendChild(stats.dom);
 
 				//
 
-				cameraP = new THREE.PerspectiveCamera( 65, aspect, 1, 10 );
+				cameraP = new THREE.PerspectiveCamera(65, aspect, 1, 10);
 				cameraP.position.z = 7;
 
 				scene = new THREE.Scene();
 
 				const group = new THREE.Group();
-				scene.add( group );
+				scene.add(group);
 
-				const light = new THREE.PointLight( 0xddffdd, 1.0 );
+				const light = new THREE.PointLight(0xddffdd, 1.0);
 				light.position.z = 70;
-				light.position.y = - 70;
-				light.position.x = - 70;
-				scene.add( light );
+				light.position.y = -70;
+				light.position.x = -70;
+				scene.add(light);
 
-				const light2 = new THREE.PointLight( 0xffdddd, 1.0 );
+				const light2 = new THREE.PointLight(0xffdddd, 1.0);
 				light2.position.z = 70;
-				light2.position.x = - 70;
+				light2.position.x = -70;
 				light2.position.y = 70;
-				scene.add( light2 );
+				scene.add(light2);
 
-				const light3 = new THREE.PointLight( 0xddddff, 1.0 );
+				const light3 = new THREE.PointLight(0xddddff, 1.0);
 				light3.position.z = 70;
 				light3.position.x = 70;
-				light3.position.y = - 70;
-				scene.add( light3 );
+				light3.position.y = -70;
+				scene.add(light3);
 
-				const geometry = new THREE.SphereGeometry( 1, 48, 24 );
+				const geometry = new THREE.SphereGeometry(1, 48, 24);
 
 				const material = new THREE.MeshStandardMaterial();
 				material.roughness = 0.5 * Math.random() + 0.25;
 				material.metalness = 0;
-				material.color.setHSL( Math.random(), 1.0, 0.3 );
+				material.color.setHSL(Math.random(), 1.0, 0.3);
 
-				const mesh = new THREE.Mesh( geometry, material );
-				group.add( mesh );
+				const mesh = new THREE.Mesh(geometry, material);
+				group.add(mesh);
 
 				// postprocessing
 
-				const genCubeUrls = function ( prefix, postfix ) {
-
+				const genCubeUrls = function (prefix, postfix) {
 					return [
-						prefix + 'px' + postfix, prefix + 'nx' + postfix,
-						prefix + 'py' + postfix, prefix + 'ny' + postfix,
-						prefix + 'pz' + postfix, prefix + 'nz' + postfix
+						prefix + "px" + postfix,
+						prefix + "nx" + postfix,
+						prefix + "py" + postfix,
+						prefix + "ny" + postfix,
+						prefix + "pz" + postfix,
+						prefix + "nz" + postfix,
 					];
-
 				};
 
-				composer = new EffectComposer( renderer );
+				composer = new EffectComposer(renderer);
 
-				clearPass = new ClearPass( params.clearColor, params.clearAlpha );
-				composer.addPass( clearPass );
+				clearPass = new ClearPass(params.clearColor, params.clearAlpha);
+				composer.addPass(clearPass);
 
 				texturePass = new TexturePass();
-				composer.addPass( texturePass );
+				composer.addPass(texturePass);
 
 				const textureLoader = new THREE.TextureLoader();
-				textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
-
+				textureLoader.load("textures/hardwood2_diffuse.jpg", function (map) {
 					texturePass.map = map;
-
-				} );
+				});
 
 				cubeTexturePassP = null;
 
-				const ldrUrls = genCubeUrls( 'textures/cube/pisa/', '.png' );
-				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
+				const ldrUrls = genCubeUrls("textures/cube/pisa/", ".png");
+				new THREE.CubeTextureLoader().load(ldrUrls, function (ldrCubeMap) {
+					cubeTexturePassP = new CubeTexturePass(cameraP, ldrCubeMap);
+					composer.insertPass(cubeTexturePassP, 2);
+				});
 
-					cubeTexturePassP = new CubeTexturePass( cameraP, ldrCubeMap );
-					composer.insertPass( cubeTexturePassP, 2 );
-
-				} );
-
-				renderPass = new RenderPass( scene, cameraP );
+				renderPass = new RenderPass(scene, cameraP);
 				renderPass.clear = false;
-				composer.addPass( renderPass );
+				composer.addPass(renderPass);
 
-				const copyPass = new ShaderPass( CopyShader );
-				composer.addPass( copyPass );
+				const copyPass = new ShaderPass(CopyShader);
+				composer.addPass(copyPass);
 
-				const controls = new OrbitControls( cameraP, renderer.domElement );
+				const controls = new OrbitControls(cameraP, renderer.domElement);
 				controls.enableZoom = false;
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 				const aspect = width / height;
@@ -205,29 +209,35 @@
 				cameraP.aspect = aspect;
 				cameraP.updateProjectionMatrix();
 
-				renderer.setSize( width, height );
-				composer.setSize( width, height );
-
+				renderer.setSize(width, height);
+				composer.setSize(width, height);
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
+				requestAnimationFrame(animate);
 
 				stats.begin();
 
-				cameraP.updateMatrixWorld( true );
+				cameraP.updateMatrixWorld(true);
 
 				let newColor = clearPass.clearColor;
 
-				switch ( params.clearColor ) {
-
-					case 'blue': newColor = 0x0000ff; break;
-					case 'red': newColor = 0xff0000; break;
-					case 'green': newColor = 0x00ff00; break;
-					case 'white': newColor = 0xffffff; break;
-					case 'black': newColor = 0x000000; break;
-
+				switch (params.clearColor) {
+					case "blue":
+						newColor = 0x0000ff;
+						break;
+					case "red":
+						newColor = 0xff0000;
+						break;
+					case "green":
+						newColor = 0x00ff00;
+						break;
+					case "white":
+						newColor = 0xffffff;
+						break;
+					case "black":
+						newColor = 0x000000;
+						break;
 				}
 
 				clearPass.enabled = params.clearPass;
@@ -237,11 +247,9 @@
 				texturePass.enabled = params.texturePass;
 				texturePass.opacity = params.texturePassOpacity;
 
-				if ( cubeTexturePassP !== null ) {
-
+				if (cubeTexturePassP !== null) {
 					cubeTexturePassP.enabled = params.cubeTexturePass;
 					cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
-
 				}
 
 				renderPass.enabled = params.renderPass;
@@ -249,9 +257,7 @@
 				composer.render();
 
 				stats.end();
-
 			}
-
 		</script>
 	</body>
 </html>

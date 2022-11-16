@@ -3,7 +3,9 @@
 html {
   box-sizing: border-box;
 }
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
   user-select: none;
 }
@@ -21,23 +23,25 @@ body {
   font-family: monospace;
   pointer-events: none;
 
-  text-shadow:
-   -1px -1px 0 #FFF,
-    1px -1px 0 #FFF,
-    -1px 1px 0 #FFF,
-     1px 1px 0 #FFF;
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
+    1px 1px 0 #fff;
 }
 #ui {
   opacity: 0.8;
 }
-#ui>div {
+#ui > div {
   pointer-events: none;
 }
-#ui input, #ui select, #ui option, #ui canvas {
+#ui input,
+#ui select,
+#ui option,
+#ui canvas {
   pointer-events: auto;
 }
 
-.gman-slider-label, .gman-widget-label, .gman-checkbox-label {
+.gman-slider-label,
+.gman-widget-label,
+.gman-checkbox-label {
   font-size: small;
   min-width: 10em;
   text-align: right;
@@ -55,17 +59,20 @@ body {
 .gman-slider-upper {
   height: 1.5em;
 }
-.gman-slider-outer, .gman-widget-outer {
+.gman-slider-outer,
+.gman-widget-outer {
   float: right;
   display: flex;
   align-items: center;
   height: 1.7em;
 }
-.gman-widget-slider, .gman-widget-checkbox, .gman-widget-select {
+.gman-widget-slider,
+.gman-widget-checkbox,
+.gman-widget-select {
   opacity: 0.5;
   font-size: large;
-  margin-left: .3em;
-  margin-right: .3em;
+  margin-left: 0.3em;
+  margin-right: 0.3em;
 }
 .gman-widget-select {
   font-size: small;
@@ -74,11 +81,10 @@ body {
   min-width: 120px;
 }
 
-
 /* styles to apply if in an iframe */
 
 html.iframe {
-    height: 100%;
+  height: 100%;
 }
 body.iframe {
   width: 100%;
@@ -87,63 +93,63 @@ body.iframe {
   overflow: hidden;
 }
 
-.iframe>.description {
+.iframe > .description {
   display: none;
 }
 .iframe .divcavnas {
   width: 100%;
   height: 100%;
 }
-.iframe>#example {
+.iframe > #example {
   width: 100%;
   height: 100%;
 }
-#ui #rotation>canvas {
+#ui #rotation > canvas {
   background-color: rgba(255, 255, 255, 0.6);
 }
 #ui {
-    width: 200px;
+  width: 200px;
 }
 
 .console {
-    font-family: monospace;
-    max-height: 50%;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    overflow: auto;
-    background: #DDD;
+  font-family: monospace;
+  max-height: 50%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: auto;
+  background: #ddd;
 }
-.console>div {
-    white-space: pre-wrap;
-    border-top: 1px solid black;
-    padding-left: 0.2em;
-    padding-right: 0.2em;
+.console > div {
+  white-space: pre-wrap;
+  border-top: 1px solid black;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
 }
-.console>.error {
-    background: red;
-    color: white;
+.console > .error {
+  background: red;
+  color: white;
 }
 
 .contextlost {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  z-index: 10000;
 }
-.contextlost>div {
-    padding: 1em;
-    border-radius: 0.5em;
-    background: red;
-    color: white;
+.contextlost > div {
+  padding: 1em;
+  border-radius: 0.5em;
+  background: red;
+  color: white;
 }
 
 @media (max-width: 390px) {
@@ -163,9 +169,6 @@ body.iframe {
     top: 120px;
   }
   .iframe #uiContainer {
-      top: 10px;
+    top: 10px;
   }
 }
-
-
-

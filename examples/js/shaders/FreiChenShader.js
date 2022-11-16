@@ -1,22 +1,21 @@
-( function () {
-
+(function () {
 	/**
- * Edge Detection Shader using Frei-Chen filter
- * Based on http://rastergrid.com/blog/2011/01/frei-chen-edge-detector
- *
- * aspect: vec2 of (1/width, 1/height)
- */
+	 * Edge Detection Shader using Frei-Chen filter
+	 * Based on http://rastergrid.com/blog/2011/01/frei-chen-edge-detector
+	 *
+	 * aspect: vec2 of (1/width, 1/height)
+	 */
 
 	const FreiChenShader = {
 		uniforms: {
-			'tDiffuse': {
-				value: null
+			tDiffuse: {
+				value: null,
 			},
-			'aspect': {
-				value: new THREE.Vector2( 512, 512 )
-			}
+			aspect: {
+				value: new THREE.Vector2(512, 512),
+			},
 		},
-		vertexShader: /* glsl */`
+		vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -26,7 +25,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 
 		uniform sampler2D tDiffuse;
 		varying vec2 vUv;
@@ -85,9 +84,8 @@
 			float S = (cnv[4] + cnv[5]) + (cnv[6] + cnv[7]) + (cnv[8] + M);
 
 			gl_FragColor = vec4(vec3(sqrt(M/S)), 1.0);
-		}`
+		}`,
 	};
 
 	THREE.FreiChenShader = FreiChenShader;
-
-} )();
+})();

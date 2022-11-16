@@ -1,43 +1,42 @@
-( function () {
-
+(function () {
 	/**
- * Depth-of-field shader with bokeh
- * ported from GLSL shader by Martins Upitis
- * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
- */
+	 * Depth-of-field shader with bokeh
+	 * ported from GLSL shader by Martins Upitis
+	 * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
+	 */
 
 	const BokehShader = {
 		defines: {
-			'DEPTH_PACKING': 1,
-			'PERSPECTIVE_CAMERA': 1
+			DEPTH_PACKING: 1,
+			PERSPECTIVE_CAMERA: 1,
 		},
 		uniforms: {
-			'tColor': {
-				value: null
+			tColor: {
+				value: null,
 			},
-			'tDepth': {
-				value: null
+			tDepth: {
+				value: null,
 			},
-			'focus': {
-				value: 1.0
+			focus: {
+				value: 1.0,
 			},
-			'aspect': {
-				value: 1.0
+			aspect: {
+				value: 1.0,
 			},
-			'aperture': {
-				value: 0.025
+			aperture: {
+				value: 0.025,
 			},
-			'maxblur': {
-				value: 0.01
+			maxblur: {
+				value: 0.01,
 			},
-			'nearClip': {
-				value: 1.0
+			nearClip: {
+				value: 1.0,
 			},
-			'farClip': {
-				value: 1000.0
-			}
+			farClip: {
+				value: 1000.0,
+			},
 		},
-		vertexShader: /* glsl */`
+		vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -47,7 +46,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 
 		#include <common>
 
@@ -148,9 +147,8 @@
 			gl_FragColor = col / 41.0;
 			gl_FragColor.a = 1.0;
 
-		}`
+		}`,
 	};
 
 	THREE.BokehShader = BokehShader;
-
-} )();
+})();

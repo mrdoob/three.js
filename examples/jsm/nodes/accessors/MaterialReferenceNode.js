@@ -1,23 +1,17 @@
-import ReferenceNode from './ReferenceNode.js';
+import ReferenceNode from "./ReferenceNode.js";
 
 class MaterialReferenceNode extends ReferenceNode {
-
-	constructor( property, inputType, material = null ) {
-
-		super( property, inputType, material );
+	constructor(property, inputType, material = null) {
+		super(property, inputType, material);
 
 		this.material = material;
-
 	}
 
-	update( frame ) {
-
+	update(frame) {
 		this.object = this.material !== null ? this.material : frame.material;
 
-		super.update( frame );
-
+		super.update(frame);
 	}
-
 }
 
 export default MaterialReferenceNode;

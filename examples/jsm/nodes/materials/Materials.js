@@ -1,10 +1,10 @@
-import NodeMaterial from './NodeMaterial.js';
-import LineBasicNodeMaterial from './LineBasicNodeMaterial.js';
-import MeshBasicNodeMaterial from './MeshBasicNodeMaterial.js';
-import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
-import MeshPhysicalNodeMaterial from './MeshPhysicalNodeMaterial.js';
-import PointsNodeMaterial from './PointsNodeMaterial.js';
-import SpriteNodeMaterial from './SpriteNodeMaterial.js';
+import NodeMaterial from "./NodeMaterial.js";
+import LineBasicNodeMaterial from "./LineBasicNodeMaterial.js";
+import MeshBasicNodeMaterial from "./MeshBasicNodeMaterial.js";
+import MeshStandardNodeMaterial from "./MeshStandardNodeMaterial.js";
+import MeshPhysicalNodeMaterial from "./MeshPhysicalNodeMaterial.js";
+import PointsNodeMaterial from "./PointsNodeMaterial.js";
+import SpriteNodeMaterial from "./SpriteNodeMaterial.js";
 
 export {
 	NodeMaterial,
@@ -13,11 +13,10 @@ export {
 	MeshStandardNodeMaterial,
 	MeshPhysicalNodeMaterial,
 	PointsNodeMaterial,
-	SpriteNodeMaterial
+	SpriteNodeMaterial,
 };
 
-NodeMaterial.fromMaterial = function ( material ) {
-
+NodeMaterial.fromMaterial = function (material) {
 	const materialLib = {
 		NodeMaterial,
 		LineBasicNodeMaterial,
@@ -25,29 +24,22 @@ NodeMaterial.fromMaterial = function ( material ) {
 		MeshStandardNodeMaterial,
 		MeshPhysicalNodeMaterial,
 		PointsNodeMaterial,
-		SpriteNodeMaterial
+		SpriteNodeMaterial,
 	};
 
-	const type = material.type.replace( 'Material', 'NodeMaterial' );
+	const type = material.type.replace("Material", "NodeMaterial");
 
-	if ( materialLib[ type ] === undefined ) {
-
+	if (materialLib[type] === undefined) {
 		return material; // is already a node material or cannot be converted
-
 	}
 
-	const nodeMaterial = new materialLib[ type ]( material );
+	const nodeMaterial = new materialLib[type](material);
 
-	for ( const key in material ) {
-
-		if ( nodeMaterial[ key ] === undefined ) {
-
-			nodeMaterial[ key ] = material[ key ]; // currently this is needed only for material.alphaTest
-
+	for (const key in material) {
+		if (nodeMaterial[key] === undefined) {
+			nodeMaterial[key] = material[key]; // currently this is needed only for material.alphaTest
 		}
-
 	}
 
 	return nodeMaterial;
-
 };

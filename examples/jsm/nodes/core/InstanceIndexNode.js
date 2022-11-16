@@ -1,21 +1,15 @@
-import Node from './Node.js';
+import Node from "./Node.js";
 
 class InstanceIndexNode extends Node {
-
 	constructor() {
-
-		super( 'uint' );
+		super("uint");
 
 		this.isInstanceIndexNode = true;
-
 	}
 
-	generate( builder ) {
-
+	generate(builder) {
 		return builder.getInstanceIndex();
-
 	}
-
 }
 
 export default InstanceIndexNode;

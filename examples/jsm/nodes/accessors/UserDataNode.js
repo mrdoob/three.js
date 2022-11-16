@@ -1,23 +1,18 @@
-import ReferenceNode from './ReferenceNode.js';
+import ReferenceNode from "./ReferenceNode.js";
 
 class UserDataNode extends ReferenceNode {
-
-	constructor( property, inputType, userData = null ) {
-
-		super( property, inputType, userData );
+	constructor(property, inputType, userData = null) {
+		super(property, inputType, userData);
 
 		this.userData = userData;
-
 	}
 
-	update( frame ) {
+	update(frame) {
+		this.object =
+			this.userData !== null ? this.userData : frame.object.userData;
 
-		this.object = this.userData !== null ? this.userData : frame.object.userData;
-
-		super.update( frame );
-
+		super.update(frame);
 	}
-
 }
 
 export default UserDataNode;

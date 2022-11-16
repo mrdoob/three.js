@@ -1,367 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>three.js webgl - marching cubes</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css" rel="stylesheet" href="main.css">
-</head>
+	<head>
+		<title>three.js webgl - marching cubes</title>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
 
-<body>
+	<body>
+		<div id="container"></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- marching cubes<br />
+			based on greggman's
+			<a href="https://webglsamples.org/blob/blob.html">blob</a>, original code
+			by Henrik Rydgård
+		</div>
 
-	<div id="container"></div>
-	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		marching cubes<br/>
-		based on greggman's <a href="https://webglsamples.org/blob/blob.html">blob</a>, original code by Henrik Rydgård
-	</div>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
-	<!-- Import maps polyfill -->
-	<!-- Remove this when import maps will be widely supported -->
-	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
-
-	<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.module.js",
-				"three/addons/": "./jsm/"
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
 			}
-		}
-	</script>
+		</script>
 
-	<script type="module">
-		import * as THREE from 'three';
+		<script type="module">
+			import * as THREE from "three";
 
-		import Stats from 'three/addons/libs/stats.module.js';
+			import Stats from "three/addons/libs/stats.module.js";
 
-		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
-		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from 'three/addons/shaders/ToonShader.js';
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+			import { MarchingCubes } from "three/addons/objects/MarchingCubes.js";
+			import {
+				ToonShader1,
+				ToonShader2,
+				ToonShaderHatching,
+				ToonShaderDotted,
+			} from "three/addons/shaders/ToonShader.js";
 
-		let container, stats;
+			let container, stats;
 
-		let camera, scene, renderer;
+			let camera, scene, renderer;
 
-		let materials, current_material;
+			let materials, current_material;
 
-		let light, pointLight, ambientLight;
+			let light, pointLight, ambientLight;
 
-		let effect, resolution;
+			let effect, resolution;
 
-		let effectController;
+			let effectController;
 
-		let time = 0;
+			let time = 0;
 
-		const clock = new THREE.Clock();
+			const clock = new THREE.Clock();
 
-		init();
-		animate();
+			init();
+			animate();
 
-		function init() {
+			function init() {
+				container = document.getElementById("container");
 
-			container = document.getElementById( 'container' );
+				// CAMERA
 
-			// CAMERA
+				camera = new THREE.PerspectiveCamera(
+					45,
+					window.innerWidth / window.innerHeight,
+					1,
+					10000
+				);
+				camera.position.set(-500, 500, 1500);
 
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-			camera.position.set( - 500, 500, 1500 );
+				// SCENE
 
-			// SCENE
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x050505);
 
-			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x050505 );
+				// LIGHTS
 
-			// LIGHTS
+				light = new THREE.DirectionalLight(0xffffff);
+				light.position.set(0.5, 0.5, 1);
+				scene.add(light);
 
-			light = new THREE.DirectionalLight( 0xffffff );
-			light.position.set( 0.5, 0.5, 1 );
-			scene.add( light );
+				pointLight = new THREE.PointLight(0xff3300);
+				pointLight.position.set(0, 0, 100);
+				scene.add(pointLight);
 
-			pointLight = new THREE.PointLight( 0xff3300 );
-			pointLight.position.set( 0, 0, 100 );
-			scene.add( pointLight );
+				ambientLight = new THREE.AmbientLight(0x080808);
+				scene.add(ambientLight);
 
-			ambientLight = new THREE.AmbientLight( 0x080808 );
-			scene.add( ambientLight );
+				// MATERIALS
 
-			// MATERIALS
+				materials = generateMaterials();
+				current_material = "shiny";
 
-			materials = generateMaterials();
-			current_material = 'shiny';
+				// MARCHING CUBES
 
-			// MARCHING CUBES
+				resolution = 28;
 
-			resolution = 28;
+				effect = new MarchingCubes(
+					resolution,
+					materials[current_material],
+					true,
+					true,
+					100000
+				);
+				effect.position.set(0, 0, 0);
+				effect.scale.set(700, 700, 700);
 
-			effect = new MarchingCubes( resolution, materials[ current_material ], true, true, 100000 );
-			effect.position.set( 0, 0, 0 );
-			effect.scale.set( 700, 700, 700 );
+				effect.enableUvs = false;
+				effect.enableColors = false;
 
-			effect.enableUvs = false;
-			effect.enableColors = false;
+				scene.add(effect);
 
-			scene.add( effect );
+				// RENDERER
 
-			// RENDERER
-
-			renderer = new THREE.WebGLRenderer();
-			renderer.outputEncoding = THREE.sRGBEncoding;
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			container.appendChild( renderer.domElement );
-
-			// CONTROLS
-
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.minDistance = 500;
-			controls.maxDistance = 5000;
-
-			// STATS
-
-			stats = new Stats();
-			container.appendChild( stats.dom );
-
-			// GUI
-
-			setupGui();
-
-			// EVENTS
-
-			window.addEventListener( 'resize', onWindowResize );
-
-		}
-
-		//
-
-		function onWindowResize() {
-
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-
-			renderer.setSize( window.innerWidth, window.innerHeight );
-
-		}
-
-		function generateMaterials() {
-
-			// environment map
-
-			const path = 'textures/cube/SwedishRoyalCastle/';
-			const format = '.jpg';
-			const urls = [
-				path + 'px' + format, path + 'nx' + format,
-				path + 'py' + format, path + 'ny' + format,
-				path + 'pz' + format, path + 'nz' + format
-			];
-
-			const cubeTextureLoader = new THREE.CubeTextureLoader();
-
-			const reflectionCube = cubeTextureLoader.load( urls );
-			const refractionCube = cubeTextureLoader.load( urls );
-			refractionCube.mapping = THREE.CubeRefractionMapping;
-
-			// toons
-
-			const toonMaterial1 = createShaderMaterial( ToonShader1, light, ambientLight );
-			const toonMaterial2 = createShaderMaterial( ToonShader2, light, ambientLight );
-			const hatchingMaterial = createShaderMaterial( ToonShaderHatching, light, ambientLight );
-			const dottedMaterial = createShaderMaterial( ToonShaderDotted, light, ambientLight );
-
-			const texture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
-			texture.wrapS = THREE.RepeatWrapping;
-			texture.wrapT = THREE.RepeatWrapping;
-
-			const materials = {
-				'shiny': new THREE.MeshStandardMaterial( { color: 0x550000, envMap: reflectionCube, roughness: 0.1, metalness: 1.0 } ),
-				'chrome': new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
-				'liquid': new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
-				'matte': new THREE.MeshPhongMaterial( { specular: 0x111111, shininess: 1 } ),
-				'flat': new THREE.MeshLambertMaterial( { /*TODO flatShading: true */ } ),
-				'textured': new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
-				'colors': new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: true } ),
-				'multiColors': new THREE.MeshPhongMaterial( { shininess: 2, vertexColors: true } ),
-				'plastic': new THREE.MeshPhongMaterial( { specular: 0x888888, shininess: 250 } ),
-				'toon1': toonMaterial1,
-				'toon2': toonMaterial2,
-				'hatching': hatchingMaterial,
-				'dotted': dottedMaterial
-			};
-
-			return materials;
-
-		}
-
-		function createShaderMaterial( shader, light, ambientLight ) {
-
-			const u = THREE.UniformsUtils.clone( shader.uniforms );
-
-			const vs = shader.vertexShader;
-			const fs = shader.fragmentShader;
-
-			const material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
-
-			material.uniforms[ 'uDirLightPos' ].value = light.position;
-			material.uniforms[ 'uDirLightColor' ].value = light.color;
-
-			material.uniforms[ 'uAmbientLightColor' ].value = ambientLight.color;
-
-			return material;
-
-		}
-
-		//
-
-		function setupGui() {
-
-			const createHandler = function ( id ) {
-
-				return function () {
-
-					current_material = id;
-
-					effect.material = materials[ id ];
-					effect.enableUvs = ( current_material === 'textured' ) ? true : false;
-					effect.enableColors = ( current_material === 'colors' || current_material === 'multiColors' ) ? true : false;
-
+				renderer = new THREE.WebGLRenderer();
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
+
+				// CONTROLS
+
+				const controls = new OrbitControls(camera, renderer.domElement);
+				controls.minDistance = 500;
+				controls.maxDistance = 5000;
+
+				// STATS
+
+				stats = new Stats();
+				container.appendChild(stats.dom);
+
+				// GUI
+
+				setupGui();
+
+				// EVENTS
+
+				window.addEventListener("resize", onWindowResize);
+			}
+
+			//
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			}
+
+			function generateMaterials() {
+				// environment map
+
+				const path = "textures/cube/SwedishRoyalCastle/";
+				const format = ".jpg";
+				const urls = [
+					path + "px" + format,
+					path + "nx" + format,
+					path + "py" + format,
+					path + "ny" + format,
+					path + "pz" + format,
+					path + "nz" + format,
+				];
+
+				const cubeTextureLoader = new THREE.CubeTextureLoader();
+
+				const reflectionCube = cubeTextureLoader.load(urls);
+				const refractionCube = cubeTextureLoader.load(urls);
+				refractionCube.mapping = THREE.CubeRefractionMapping;
+
+				// toons
+
+				const toonMaterial1 = createShaderMaterial(
+					ToonShader1,
+					light,
+					ambientLight
+				);
+				const toonMaterial2 = createShaderMaterial(
+					ToonShader2,
+					light,
+					ambientLight
+				);
+				const hatchingMaterial = createShaderMaterial(
+					ToonShaderHatching,
+					light,
+					ambientLight
+				);
+				const dottedMaterial = createShaderMaterial(
+					ToonShaderDotted,
+					light,
+					ambientLight
+				);
+
+				const texture = new THREE.TextureLoader().load(
+					"textures/uv_grid_opengl.jpg"
+				);
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+
+				const materials = {
+					shiny: new THREE.MeshStandardMaterial({
+						color: 0x550000,
+						envMap: reflectionCube,
+						roughness: 0.1,
+						metalness: 1.0,
+					}),
+					chrome: new THREE.MeshLambertMaterial({
+						color: 0xffffff,
+						envMap: reflectionCube,
+					}),
+					liquid: new THREE.MeshLambertMaterial({
+						color: 0xffffff,
+						envMap: refractionCube,
+						refractionRatio: 0.85,
+					}),
+					matte: new THREE.MeshPhongMaterial({
+						specular: 0x111111,
+						shininess: 1,
+					}),
+					flat: new THREE.MeshLambertMaterial({
+						/*TODO flatShading: true */
+					}),
+					textured: new THREE.MeshPhongMaterial({
+						color: 0xffffff,
+						specular: 0x111111,
+						shininess: 1,
+						map: texture,
+					}),
+					colors: new THREE.MeshPhongMaterial({
+						color: 0xffffff,
+						specular: 0xffffff,
+						shininess: 2,
+						vertexColors: true,
+					}),
+					multiColors: new THREE.MeshPhongMaterial({
+						shininess: 2,
+						vertexColors: true,
+					}),
+					plastic: new THREE.MeshPhongMaterial({
+						specular: 0x888888,
+						shininess: 250,
+					}),
+					toon1: toonMaterial1,
+					toon2: toonMaterial2,
+					hatching: hatchingMaterial,
+					dotted: dottedMaterial,
 				};
 
-			};
-
-			effectController = {
-
-				material: 'shiny',
-
-				speed: 1.0,
-				numBlobs: 10,
-				resolution: 28,
-				isolation: 80,
-
-				floor: true,
-				wallx: false,
-				wallz: false,
-
-				dummy: function () {}
-
-			};
-
-			let h;
-
-			const gui = new GUI();
-
-			// material (type)
-
-			h = gui.addFolder( 'Materials' );
-
-			for ( const m in materials ) {
-
-				effectController[ m ] = createHandler( m );
-				h.add( effectController, m ).name( m );
-
+				return materials;
 			}
 
-			// simulation
+			function createShaderMaterial(shader, light, ambientLight) {
+				const u = THREE.UniformsUtils.clone(shader.uniforms);
 
-			h = gui.addFolder( 'Simulation' );
+				const vs = shader.vertexShader;
+				const fs = shader.fragmentShader;
 
-			h.add( effectController, 'speed', 0.1, 8.0, 0.05 );
-			h.add( effectController, 'numBlobs', 1, 50, 1 );
-			h.add( effectController, 'resolution', 14, 100, 1 );
-			h.add( effectController, 'isolation', 10, 300, 1 );
+				const material = new THREE.ShaderMaterial({
+					uniforms: u,
+					vertexShader: vs,
+					fragmentShader: fs,
+				});
 
-			h.add( effectController, 'floor' );
-			h.add( effectController, 'wallx' );
-			h.add( effectController, 'wallz' );
+				material.uniforms["uDirLightPos"].value = light.position;
+				material.uniforms["uDirLightColor"].value = light.color;
 
-		}
+				material.uniforms["uAmbientLightColor"].value = ambientLight.color;
 
-		// this controls content of marching cubes voxel field
+				return material;
+			}
 
-		function updateCubes( object, time, numblobs, floor, wallx, wallz ) {
+			//
 
-			object.reset();
+			function setupGui() {
+				const createHandler = function (id) {
+					return function () {
+						current_material = id;
 
-			// fill the field with some metaballs
+						effect.material = materials[id];
+						effect.enableUvs = current_material === "textured" ? true : false;
+						effect.enableColors =
+							current_material === "colors" ||
+							current_material === "multiColors"
+								? true
+								: false;
+					};
+				};
 
-			const rainbow = [
-				new THREE.Color( 0xff0000 ),
-				new THREE.Color( 0xff7f00 ),
-				new THREE.Color( 0xffff00 ),
-				new THREE.Color( 0x00ff00 ),
-				new THREE.Color( 0x0000ff ),
-				new THREE.Color( 0x4b0082 ),
-				new THREE.Color( 0x9400d3 )
-			];
-			const subtract = 12;
-			const strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
+				effectController = {
+					material: "shiny",
 
-			for ( let i = 0; i < numblobs; i ++ ) {
+					speed: 1.0,
+					numBlobs: 10,
+					resolution: 28,
+					isolation: 80,
 
-				const ballx = Math.sin( i + 1.26 * time * ( 1.03 + 0.5 * Math.cos( 0.21 * i ) ) ) * 0.27 + 0.5;
-				const bally = Math.abs( Math.cos( i + 1.12 * time * Math.cos( 1.22 + 0.1424 * i ) ) ) * 0.77; // dip into the floor
-				const ballz = Math.cos( i + 1.32 * time * 0.1 * Math.sin( ( 0.92 + 0.53 * i ) ) ) * 0.27 + 0.5;
+					floor: true,
+					wallx: false,
+					wallz: false,
 
-				if ( current_material === 'multiColors' ) {
+					dummy: function () {},
+				};
 
-					object.addBall( ballx, bally, ballz, strength, subtract, rainbow[ i % 7 ] );
+				let h;
 
-				} else {
+				const gui = new GUI();
 
-					object.addBall( ballx, bally, ballz, strength, subtract );
+				// material (type)
 
+				h = gui.addFolder("Materials");
+
+				for (const m in materials) {
+					effectController[m] = createHandler(m);
+					h.add(effectController, m).name(m);
 				}
 
+				// simulation
+
+				h = gui.addFolder("Simulation");
+
+				h.add(effectController, "speed", 0.1, 8.0, 0.05);
+				h.add(effectController, "numBlobs", 1, 50, 1);
+				h.add(effectController, "resolution", 14, 100, 1);
+				h.add(effectController, "isolation", 10, 300, 1);
+
+				h.add(effectController, "floor");
+				h.add(effectController, "wallx");
+				h.add(effectController, "wallz");
 			}
 
-			if ( floor ) object.addPlaneY( 2, 12 );
-			if ( wallz ) object.addPlaneZ( 2, 12 );
-			if ( wallx ) object.addPlaneX( 2, 12 );
+			// this controls content of marching cubes voxel field
 
-			object.update();
+			function updateCubes(object, time, numblobs, floor, wallx, wallz) {
+				object.reset();
 
-		}
+				// fill the field with some metaballs
 
-		//
+				const rainbow = [
+					new THREE.Color(0xff0000),
+					new THREE.Color(0xff7f00),
+					new THREE.Color(0xffff00),
+					new THREE.Color(0x00ff00),
+					new THREE.Color(0x0000ff),
+					new THREE.Color(0x4b0082),
+					new THREE.Color(0x9400d3),
+				];
+				const subtract = 12;
+				const strength = 1.2 / ((Math.sqrt(numblobs) - 1) / 4 + 1);
 
-		function animate() {
+				for (let i = 0; i < numblobs; i++) {
+					const ballx =
+						Math.sin(i + 1.26 * time * (1.03 + 0.5 * Math.cos(0.21 * i))) *
+							0.27 +
+						0.5;
+					const bally =
+						Math.abs(Math.cos(i + 1.12 * time * Math.cos(1.22 + 0.1424 * i))) *
+						0.77; // dip into the floor
+					const ballz =
+						Math.cos(i + 1.32 * time * 0.1 * Math.sin(0.92 + 0.53 * i)) * 0.27 +
+						0.5;
 
-			requestAnimationFrame( animate );
+					if (current_material === "multiColors") {
+						object.addBall(
+							ballx,
+							bally,
+							ballz,
+							strength,
+							subtract,
+							rainbow[i % 7]
+						);
+					} else {
+						object.addBall(ballx, bally, ballz, strength, subtract);
+					}
+				}
 
-			render();
-			stats.update();
+				if (floor) object.addPlaneY(2, 12);
+				if (wallz) object.addPlaneZ(2, 12);
+				if (wallx) object.addPlaneX(2, 12);
 
-		}
-
-		function render() {
-
-			const delta = clock.getDelta();
-
-			time += delta * effectController.speed * 0.5;
-
-			// marching cubes
-
-			if ( effectController.resolution !== resolution ) {
-
-				resolution = effectController.resolution;
-				effect.init( Math.floor( resolution ) );
-
+				object.update();
 			}
 
-			if ( effectController.isolation !== effect.isolation ) {
+			//
 
-				effect.isolation = effectController.isolation;
+			function animate() {
+				requestAnimationFrame(animate);
 
+				render();
+				stats.update();
 			}
 
-			updateCubes( effect, time, effectController.numBlobs, effectController.floor, effectController.wallx, effectController.wallz );
+			function render() {
+				const delta = clock.getDelta();
 
-			// render
+				time += delta * effectController.speed * 0.5;
 
-			renderer.render( scene, camera );
+				// marching cubes
 
-		}
+				if (effectController.resolution !== resolution) {
+					resolution = effectController.resolution;
+					effect.init(Math.floor(resolution));
+				}
 
-</script>
+				if (effectController.isolation !== effect.isolation) {
+					effect.isolation = effectController.isolation;
+				}
 
-</body>
+				updateCubes(
+					effect,
+					time,
+					effectController.numBlobs,
+					effectController.floor,
+					effectController.wallx,
+					effectController.wallz
+				);
+
+				// render
+
+				renderer.render(scene, camera);
+			}
+		</script>
+	</body>
 </html>

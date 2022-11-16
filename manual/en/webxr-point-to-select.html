@@ -1,67 +1,126 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="utf-8">
-    <title>VR - 3DOF Point to Select</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – VR - 3DOF Point to Select">
-    <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>VR - 3DOF Point to Select</title>
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@threejs" />
+		<meta name="twitter:title" content="Three.js – VR - 3DOF Point to Select" />
+		<meta property="og:image" content="https://threejs.org/files/share.png" />
+		<link
+			rel="shortcut icon"
+			href="/files/favicon_white.ico"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<link
+			rel="shortcut icon"
+			href="/files/favicon.ico"
+			media="(prefers-color-scheme: light)"
+		/>
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<link rel="stylesheet" href="/manual/resources/lesson.css" />
+		<link rel="stylesheet" href="/manual/resources/lang.css" />
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "../../build/three.module.js"
-  }
-}
-</script>
-  </head>
-  <body>
-    <div class="container">
-      <div class="lesson-title">
-        <h1>VR - 3DOF Point to Select</h1>
-      </div>
-      <div class="lesson">
-        <div class="lesson-main">
-          <p><strong>NOTE: The examples on this page require a VR capable
-device with a pointing device. Without one they won't work. See <a href="webxr.html">this article</a>
-as to why</strong></p>
-<p>In the <a href="webxr-look-to-select.html">previous article</a> we went over
-a very simple VR example where we let the user choose things by
-pointing via looking. In this article we will take it one step further
-and let the user choose with a pointing device </p>
-<p>Three.js makes is relatively easy by providing 2 controller objects in VR
-and tries to handle both cases of a single 3DOF controller and two 6DOF
-controllers. Each of the controllers are <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> objects which give
-the orientation and position of that controller. They also provide 
-<code class="notranslate" translate="no">selectstart</code>, <code class="notranslate" translate="no">select</code> and <code class="notranslate" translate="no">selectend</code> events when the user starts pressing,
-is pressing, and stops pressing (ends) the "main" button on the controller.</p>
-<p>Starting with the last example from <a href="webxr-look-to-select.html">the previous article</a>
-let's change the <code class="notranslate" translate="no">PickHelper</code> into a <code class="notranslate" translate="no">ControllerPickHelper</code>.</p>
-<p>Our new implementation will emit a <code class="notranslate" translate="no">select</code> event that gives us the object that was picked
-so to use it we'll just need to do this.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new ControllerPickHelper(scene);
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.module.js"
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="lesson-title">
+				<h1>VR - 3DOF Point to Select</h1>
+			</div>
+			<div class="lesson">
+				<div class="lesson-main">
+					<p>
+						<strong
+							>NOTE: The examples on this page require a VR capable device with
+							a pointing device. Without one they won't work. See
+							<a href="webxr.html">this article</a> as to why</strong
+						>
+					</p>
+					<p>
+						In the <a href="webxr-look-to-select.html">previous article</a> we
+						went over a very simple VR example where we let the user choose
+						things by pointing via looking. In this article we will take it one
+						step further and let the user choose with a pointing device
+					</p>
+					<p>
+						Three.js makes is relatively easy by providing 2 controller objects
+						in VR and tries to handle both cases of a single 3DOF controller and
+						two 6DOF controllers. Each of the controllers are
+						<a href="/docs/#api/en/core/Object3D"
+							><code class="notranslate" translate="no">Object3D</code></a
+						>
+						objects which give the orientation and position of that controller.
+						They also provide
+						<code class="notranslate" translate="no">selectstart</code>,
+						<code class="notranslate" translate="no">select</code> and
+						<code class="notranslate" translate="no">selectend</code> events
+						when the user starts pressing, is pressing, and stops pressing
+						(ends) the "main" button on the controller.
+					</p>
+					<p>
+						Starting with the last example from
+						<a href="webxr-look-to-select.html">the previous article</a> let's
+						change the
+						<code class="notranslate" translate="no">PickHelper</code> into a
+						<code class="notranslate" translate="no">ControllerPickHelper</code
+						>.
+					</p>
+					<p>
+						Our new implementation will emit a
+						<code class="notranslate" translate="no">select</code> event that
+						gives us the object that was picked so to use it we'll just need to
+						do this.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const pickHelper = new ControllerPickHelper(scene);
 pickHelper.addEventListener('select', (event) =&gt; {
   event.selectedObject.visible = false;
   const partnerObject = meshToMeshMap.get(event.selectedObject);
   partnerObject.visible = true;
 });
-</pre>
-<p>Remember from our previous code <code class="notranslate" translate="no">meshToMeshMap</code> maps our boxes and spheres to
-each other so if we have one we can look up its partner through <code class="notranslate" translate="no">meshToMeshMap</code> 
-so here we're just hiding the selected object and un-hiding its partner.</p>
-<p>As for the actual implementation of <code class="notranslate" translate="no">ControllerPickHelper</code>, first we need
-to add the VR controller objects to the scene and to those add some 3D lines
-we can use to display where the user is pointing. We save off both the controllers
-and the their lines.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+</pre
+					>
+					<p>
+						Remember from our previous code
+						<code class="notranslate" translate="no">meshToMeshMap</code> maps
+						our boxes and spheres to each other so if we have one we can look up
+						its partner through
+						<code class="notranslate" translate="no">meshToMeshMap</code> so
+						here we're just hiding the selected object and un-hiding its
+						partner.
+					</p>
+					<p>
+						As for the actual implementation of
+						<code class="notranslate" translate="no">ControllerPickHelper</code
+						>, first we need to add the VR controller objects to the scene and
+						to those add some 3D lines we can use to display where the user is
+						pointing. We save off both the controllers and the their lines.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+class ControllerPickHelper {
   constructor(scene) {
     const pointerGeometry = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0, 0, 0),
@@ -80,13 +139,28 @@ and the their lines.</p>
     }
   }
 }
-</pre>
-<p>Without doing anything else this alone would give us 1 or 2 lines in the scene
-showing where the user's pointing devices are and which way they are pointing.</p>
-<p>One problem we have though, we don't want have our <code class="notranslate" translate="no">RayCaster</code> pick the line itself
-so an easy solution is separate the objects we wanted to be able to pick from the
-objects we don't by parenting them under another <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+</pre
+					>
+					<p>
+						Without doing anything else this alone would give us 1 or 2 lines in
+						the scene showing where the user's pointing devices are and which
+						way they are pointing.
+					</p>
+					<p>
+						One problem we have though, we don't want have our
+						<code class="notranslate" translate="no">RayCaster</code> pick the
+						line itself so an easy solution is separate the objects we wanted to
+						be able to pick from the objects we don't by parenting them under
+						another
+						<a href="/docs/#api/en/core/Object3D"
+							><code class="notranslate" translate="no">Object3D</code></a
+						>.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const scene = new THREE.Scene();
 +// object to put pickable objects on so we can easily
 +// separate them from non-pickable objects
 +const pickRoot = new THREE.Object3D();
@@ -102,15 +176,24 @@ function makeInstance(geometry, color, x) {
 +  pickRoot.add(cube);
 
 ...
-</pre>
-<p>Next let's add some code to pick from the controllers. This is the first time
-we've picked with something not the camera. In our <a href="picking.html">article on picking</a>
-the user uses the mouse or finger to pick which means picking comes from the camera
-into the screen. In <a href="webxr-look-to-select.html">the previous article</a> we 
-were picking based on which way the user is looking so again that comes from the
-camera. This time though we're picking from the position of the controllers so
-we're not using the camera.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+</pre
+					>
+					<p>
+						Next let's add some code to pick from the controllers. This is the
+						first time we've picked with something not the camera. In our
+						<a href="picking.html">article on picking</a> the user uses the
+						mouse or finger to pick which means picking comes from the camera
+						into the screen. In
+						<a href="webxr-look-to-select.html">the previous article</a> we were
+						picking based on which way the user is looking so again that comes
+						from the camera. This time though we're picking from the position of
+						the controllers so we're not using the camera.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+class ControllerPickHelper {
   constructor(scene) {
 +    this.raycaster = new THREE.Raycaster();
 +    this.objectToColorMap = new Map();
@@ -163,14 +246,28 @@ we're not using the camera.</p>
 +    }
 +  }
 }
-</pre>
-<p>Like before we use a <a href="/docs/#api/en/core/Raycaster"><code class="notranslate" translate="no">Raycaster</code></a> but this time we take the ray from the controller.
-Our previous <code class="notranslate" translate="no">PickHelper</code> there was only one thing picking but here we have up to 2
-controllers, one for each hand. We save off which object each controller is
-looking at in <code class="notranslate" translate="no">controllerToObjectMap</code>. We also save off the original emissive color in
-<code class="notranslate" translate="no">objectToColorMap</code> and we make the line long enough to touch whatever it's pointing at.</p>
-<p>We need to add some code to reset these settings every frame.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper {
+</pre
+					>
+					<p>
+						Like before we use a
+						<a href="/docs/#api/en/core/Raycaster"
+							><code class="notranslate" translate="no">Raycaster</code></a
+						>
+						but this time we take the ray from the controller. Our previous
+						<code class="notranslate" translate="no">PickHelper</code> there was
+						only one thing picking but here we have up to 2 controllers, one for
+						each hand. We save off which object each controller is looking at in
+						<code class="notranslate" translate="no">controllerToObjectMap</code
+						>. We also save off the original emissive color in
+						<code class="notranslate" translate="no">objectToColorMap</code> and
+						we make the line long enough to touch whatever it's pointing at.
+					</p>
+					<p>We need to add some code to reset these settings every frame.</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+class ControllerPickHelper {
 
   ...
 
@@ -188,13 +285,28 @@ looking at in <code class="notranslate" translate="no">controllerToObjectMap</co
     ...
 
 }
-</pre>
-<p>Next we want to emit a <code class="notranslate" translate="no">select</code> event when the user clicks the controller.
-To do that we can extend three.js's <a href="/docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> and then we'll check
-when we get a <code class="notranslate" translate="no">select</code> event from the controller, then if that controller
-is pointing at something we emit what that controller is pointing at
-as our own <code class="notranslate" translate="no">select</code> event.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-class ControllerPickHelper {
+</pre
+					>
+					<p>
+						Next we want to emit a
+						<code class="notranslate" translate="no">select</code> event when
+						the user clicks the controller. To do that we can extend three.js's
+						<a href="/docs/#api/en/core/EventDispatcher"
+							><code class="notranslate" translate="no"
+								>EventDispatcher</code
+							></a
+						>
+						and then we'll check when we get a
+						<code class="notranslate" translate="no">select</code> event from
+						the controller, then if that controller is pointing at something we
+						emit what that controller is pointing at as our own
+						<code class="notranslate" translate="no">select</code> event.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+-class ControllerPickHelper {
 +class ControllerPickHelper extends THREE.EventDispatcher {
   constructor(scene) {
 +    super();
@@ -227,9 +339,18 @@ as our own <code class="notranslate" translate="no">select</code> event.</p>
     }
   }
 }
-</pre>
-<p>All that is left is to call <code class="notranslate" translate="no">update</code> in our render loop</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+</pre
+					>
+					<p>
+						All that is left is to call
+						<code class="notranslate" translate="no">update</code> in our render
+						loop
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+function render(time) {
 
   ...
 
@@ -237,19 +358,41 @@ as our own <code class="notranslate" translate="no">select</code> event.</p>
 
   renderer.render(scene, camera);
 }
-</pre>
-<p>and assuming you have a VR device with a controller you should
-be able to use the controllers to pick things.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-point-to-select.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/webxr-point-to-select.html" target="_blank">click here to open in a separate window</a>
-</div>
+</pre
+					>
+					<p>
+						and assuming you have a VR device with a controller you should be
+						able to use the controllers to pick things.
+					</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-point-to-select.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/webxr-point-to-select.html"
+							target="_blank"
+							>click here to open in a separate window</a
+						>
+					</div>
 
-<p></p>
-<p>And what if we wanted to be able to move the objects?</p>
-<p>That's relatively easy. Let's move our controller 'select' listener
-code out into a function so we can use it for more than one thing.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+					<p></p>
+					<p>And what if we wanted to be able to move the objects?</p>
+					<p>
+						That's relatively easy. Let's move our controller 'select' listener
+						code out into a function so we can use it for more than one thing.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+class ControllerPickHelper extends THREE.EventDispatcher {
   constructor(scene) {
     super();
 
@@ -277,9 +420,18 @@ code out into a function so we can use it for more than one thing.</p>
 +      controller.addEventListener('select', selectListener);
 
        ...
-</pre>
-<p>Then let's use it for both <code class="notranslate" translate="no">selectstart</code> and <code class="notranslate" translate="no">select</code></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+</pre
+					>
+					<p>
+						Then let's use it for both
+						<code class="notranslate" translate="no">selectstart</code> and
+						<code class="notranslate" translate="no">select</code>
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+class ControllerPickHelper extends THREE.EventDispatcher {
   constructor(scene) {
     super();
 
@@ -302,10 +454,19 @@ code out into a function so we can use it for more than one thing.</p>
       controller.addEventListener('selectstart', selectListener);
 
        ...
-</pre>
-<p>and let's also pass on the <code class="notranslate" translate="no">selectend</code> event which three.js sends out
-when you user lets of the button on the controller.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ControllerPickHelper extends THREE.EventDispatcher {
+</pre
+					>
+					<p>
+						and let's also pass on the
+						<code class="notranslate" translate="no">selectend</code> event
+						which three.js sends out when you user lets of the button on the
+						controller.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+class ControllerPickHelper extends THREE.EventDispatcher {
   constructor(scene) {
     super();
 
@@ -333,12 +494,22 @@ when you user lets of the button on the controller.</p>
 +      controller.addEventListener('selectend', endListener);
 
        ...
-</pre>
-<p>Now let's change the code so when we get a <code class="notranslate" translate="no">selectstart</code> event we'll
-remove the selected object from the scene and make it a child of the controller.
-This means it will move with the controller. When we get a <code class="notranslate" translate="no">selectend</code>
-event we'll put it back in the scene.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new ControllerPickHelper(scene);
+</pre
+					>
+					<p>
+						Now let's change the code so when we get a
+						<code class="notranslate" translate="no">selectstart</code> event
+						we'll remove the selected object from the scene and make it a child
+						of the controller. This means it will move with the controller. When
+						we get a
+						<code class="notranslate" translate="no">selectend</code> event
+						we'll put it back in the scene.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const pickHelper = new ControllerPickHelper(scene);
 -pickHelper.addEventListener('select', (event) =&gt; {
 -  event.selectedObject.visible = false;
 -  const partnerObject = meshToMeshMap.get(event.selectedObject);
@@ -366,34 +537,59 @@ event we'll put it back in the scene.</p>
 +    selection.parent.attach(selection.object);
 +  }
 +});
-</pre>
-<p>When an object is selected we save off that object and its
-original parent. When the user is done we can put the object back.</p>
-<p>We use the <a href="/docs/#api/en/core/Object3D.attach"><code class="notranslate" translate="no">Object3D.attach</code></a> to re-parent
-the selected objects. These functions let us change the parent
-of an object without changing its orientation and position in the
-scene. </p>
-<p>And with that we should be able to move the objects around with a 6DOF
-controller or at least change their orientation with a 3DOF controller</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-point-to-select-w-move.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/webxr-point-to-select-w-move.html" target="_blank">click here to open in a separate window</a>
-</div>
+</pre
+					>
+					<p>
+						When an object is selected we save off that object and its original
+						parent. When the user is done we can put the object back.
+					</p>
+					<p>
+						We use the
+						<a href="/docs/#api/en/core/Object3D.attach"
+							><code class="notranslate" translate="no"
+								>Object3D.attach</code
+							></a
+						>
+						to re-parent the selected objects. These functions let us change the
+						parent of an object without changing its orientation and position in
+						the scene.
+					</p>
+					<p>
+						And with that we should be able to move the objects around with a
+						6DOF controller or at least change their orientation with a 3DOF
+						controller
+					</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-point-to-select-w-move.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/webxr-point-to-select-w-move.html"
+							target="_blank"
+							>click here to open in a separate window</a
+						>
+					</div>
 
-<p></p>
-<p>To be honest I'm not 100% sure this <code class="notranslate" translate="no">ControllerPickHelper</code> is
-the best way to organize the code but it's useful to demonstrating
-the various parts of getting something simple working in VR
-in three.js</p>
+					<p></p>
+					<p>
+						To be honest I'm not 100% sure this
+						<code class="notranslate" translate="no">ControllerPickHelper</code>
+						is the best way to organize the code but it's useful to
+						demonstrating the various parts of getting something simple working
+						in VR in three.js
+					</p>
+				</div>
+			</div>
+		</div>
 
-        </div>
-      </div>
-    </div>
-  
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
-
-
-
-
-</body></html>
+		<script src="/manual/resources/prettify.js"></script>
+		<script src="/manual/resources/lesson.js"></script>
+	</body>
+</html>

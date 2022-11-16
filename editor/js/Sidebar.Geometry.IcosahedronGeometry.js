@@ -1,11 +1,10 @@
-import * as THREE from 'three';
+import * as THREE from "three";
 
-import { UIDiv, UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
+import { UIDiv, UIRow, UIText, UIInteger, UINumber } from "./libs/ui.js";
 
-import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
+import { SetGeometryCommand } from "./commands/SetGeometryCommand.js";
 
-function GeometryParametersPanel( editor, object ) {
-
+function GeometryParametersPanel(editor, object) {
 	const strings = editor.strings;
 
 	const signals = editor.signals;
@@ -18,38 +17,48 @@ function GeometryParametersPanel( editor, object ) {
 	// radius
 
 	const radiusRow = new UIRow();
-	const radius = new UINumber( parameters.radius ).onChange( update );
+	const radius = new UINumber(parameters.radius).onChange(update);
 
-	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/radius' ) ).setWidth( '90px' ) );
-	radiusRow.add( radius );
+	radiusRow.add(
+		new UIText(
+			strings.getKey("sidebar/geometry/icosahedron_geometry/radius")
+		).setWidth("90px")
+	);
+	radiusRow.add(radius);
 
-	container.add( radiusRow );
+	container.add(radiusRow);
 
 	// detail
 
 	const detailRow = new UIRow();
-	const detail = new UIInteger( parameters.detail ).setRange( 0, Infinity ).onChange( update );
+	const detail = new UIInteger(parameters.detail)
+		.setRange(0, Infinity)
+		.onChange(update);
 
-	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/detail' ) ).setWidth( '90px' ) );
-	detailRow.add( detail );
+	detailRow.add(
+		new UIText(
+			strings.getKey("sidebar/geometry/icosahedron_geometry/detail")
+		).setWidth("90px")
+	);
+	detailRow.add(detail);
 
-	container.add( detailRow );
+	container.add(detailRow);
 
 	//
 
 	function update() {
+		editor.execute(
+			new SetGeometryCommand(
+				editor,
+				object,
+				new THREE.IcosahedronGeometry(radius.getValue(), detail.getValue())
+			)
+		);
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronGeometry(
-			radius.getValue(),
-			detail.getValue()
-		) ) );
-
-		signals.objectChanged.dispatch( object );
-
+		signals.objectChanged.dispatch(object);
 	}
 
 	return container;
-
 }
 
 export { GeometryParametersPanel };

@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command } from "../Command.js";
 
 /**
  * @param editor Editor
@@ -8,54 +8,45 @@ import { Command } from '../Command.js';
  * @constructor
  */
 class SetMaterialValueCommand extends Command {
+	constructor(editor, object, attributeName, newValue, materialSlot) {
+		super(editor);
 
-	constructor( editor, object, attributeName, newValue, materialSlot ) {
-
-		super( editor );
-
-		this.type = 'SetMaterialValueCommand';
+		this.type = "SetMaterialValueCommand";
 		this.name = `Set Material.${attributeName}`;
 		this.updatable = true;
 
 		this.object = object;
-		this.material = this.editor.getObjectMaterial( object, materialSlot );
+		this.material = this.editor.getObjectMaterial(object, materialSlot);
 
-		this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ] : undefined;
+		this.oldValue =
+			this.material !== undefined ? this.material[attributeName] : undefined;
 		this.newValue = newValue;
 
 		this.attributeName = attributeName;
-
 	}
 
 	execute() {
-
-		this.material[ this.attributeName ] = this.newValue;
+		this.material[this.attributeName] = this.newValue;
 		this.material.needsUpdate = true;
 
-		this.editor.signals.objectChanged.dispatch( this.object );
-		this.editor.signals.materialChanged.dispatch( this.material );
-
+		this.editor.signals.objectChanged.dispatch(this.object);
+		this.editor.signals.materialChanged.dispatch(this.material);
 	}
 
 	undo() {
-
-		this.material[ this.attributeName ] = this.oldValue;
+		this.material[this.attributeName] = this.oldValue;
 		this.material.needsUpdate = true;
 
-		this.editor.signals.objectChanged.dispatch( this.object );
-		this.editor.signals.materialChanged.dispatch( this.material );
-
+		this.editor.signals.objectChanged.dispatch(this.object);
+		this.editor.signals.materialChanged.dispatch(this.material);
 	}
 
-	update( cmd ) {
-
+	update(cmd) {
 		this.newValue = cmd.newValue;
-
 	}
 
 	toJSON() {
-
-		const output = super.toJSON( this );
+		const output = super.toJSON(this);
 
 		output.objectUuid = this.object.uuid;
 		output.attributeName = this.attributeName;
@@ -63,20 +54,16 @@ class SetMaterialValueCommand extends Command {
 		output.newValue = this.newValue;
 
 		return output;
-
 	}
 
-	fromJSON( json ) {
-
-		super.fromJSON( json );
+	fromJSON(json) {
+		super.fromJSON(json);
 
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
-		this.object = this.editor.objectByUuid( json.objectUuid );
-
+		this.object = this.editor.objectByUuid(json.objectUuid);
 	}
-
 }
 
 export { SetMaterialValueCommand };

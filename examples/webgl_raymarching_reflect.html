@@ -2,11 +2,15 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - raymarching - reflect</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 		<style type="text/css">
-			html, body {
+			html,
+			body {
 				height: 100%;
 			}
 			#container {
@@ -19,10 +23,19 @@
 		</style>
 	</head>
 	<body>
-
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example<br/>
-			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article</a>)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- webgl raymarching example<br />
+			reflect by
+			<a href="https://github.com/gam0022" target="_blank" rel="noopener"
+				>gam0022</a
+			>
+			(<a
+				href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f"
+				target="_blank"
+				rel="noopener"
+				>article</a
+			>)
 		</div>
 		<div id="container">
 			<canvas id="canvas"></canvas>
@@ -221,7 +234,6 @@
 				gl_FragColor = vec4( color, 1.0 );
 
 			}
-
 		</script>
 
 		<script id="vertex_shader" type="x-shader/x-vertex">
@@ -233,12 +245,14 @@
 				gl_Position = vec4(position, 1.0);
 
 			}
-
 		</script>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -250,117 +264,117 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
+			import Stats from "three/addons/libs/stats.module.js";
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 			let dolly, camera, scene, renderer;
 			let geometry, material, mesh;
 			let stats, clock;
 
-			const canvas = document.querySelector( '#canvas' );
+			const canvas = document.querySelector("#canvas");
 
 			const config = {
 				saveImage: function () {
-
-					renderer.render( scene, camera );
-					window.open( canvas.toDataURL() );
-
+					renderer.render(scene, camera);
+					window.open(canvas.toDataURL());
 				},
-				resolution: '512'
+				resolution: "512",
 			};
 
 			init();
 			render();
 
 			function init() {
+				renderer = new THREE.WebGLRenderer({ canvas: canvas });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(config.resolution, config.resolution);
 
-				renderer = new THREE.WebGLRenderer( { canvas: canvas } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( config.resolution, config.resolution );
-
-				window.addEventListener( 'resize', onWindowResize );
+				window.addEventListener("resize", onWindowResize);
 
 				// THREE.Scene
 				scene = new THREE.Scene();
 
 				dolly = new THREE.Group();
-				scene.add( dolly );
+				scene.add(dolly);
 
 				clock = new THREE.Clock();
 
-				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
+				camera = new THREE.PerspectiveCamera(
+					60,
+					canvas.width / canvas.height,
+					1,
+					2000
+				);
 				camera.position.z = 4;
-				dolly.add( camera );
+				dolly.add(camera);
 
-				geometry = new THREE.PlaneGeometry( 2.0, 2.0 );
-				material = new THREE.RawShaderMaterial( {
+				geometry = new THREE.PlaneGeometry(2.0, 2.0);
+				material = new THREE.RawShaderMaterial({
 					uniforms: {
-						resolution: { value: new THREE.Vector2( canvas.width, canvas.height ) },
+						resolution: {
+							value: new THREE.Vector2(canvas.width, canvas.height),
+						},
 						cameraWorldMatrix: { value: camera.matrixWorld },
-						cameraProjectionMatrixInverse: { value: camera.projectionMatrixInverse.clone() }
+						cameraProjectionMatrixInverse: {
+							value: camera.projectionMatrixInverse.clone(),
+						},
 					},
-					vertexShader: document.getElementById( 'vertex_shader' ).textContent,
-					fragmentShader: document.getElementById( 'fragment_shader' ).textContent
-				} );
-				mesh = new THREE.Mesh( geometry, material );
+					vertexShader: document.getElementById("vertex_shader").textContent,
+					fragmentShader:
+						document.getElementById("fragment_shader").textContent,
+				});
+				mesh = new THREE.Mesh(geometry, material);
 				mesh.frustumCulled = false;
-				scene.add( mesh );
+				scene.add(mesh);
 
 				// Controls
-				const controls = new OrbitControls( camera, canvas );
+				const controls = new OrbitControls(camera, canvas);
 				controls.enableZoom = false;
 
 				// GUI
 				const gui = new GUI();
-				gui.add( config, 'saveImage' ).name( 'Save Image' );
-				gui.add( config, 'resolution', [ '256', '512', '800', 'full' ] ).name( 'Resolution' ).onChange( onWindowResize );
+				gui.add(config, "saveImage").name("Save Image");
+				gui
+					.add(config, "resolution", ["256", "512", "800", "full"])
+					.name("Resolution")
+					.onChange(onWindowResize);
 
 				stats = new Stats();
-				document.body.appendChild( stats.dom );
-
+				document.body.appendChild(stats.dom);
 			}
 
 			function onWindowResize() {
-
-				if ( config.resolution === 'full' ) {
-
-					renderer.setSize( window.innerWidth, window.innerHeight );
-
+				if (config.resolution === "full") {
+					renderer.setSize(window.innerWidth, window.innerHeight);
 				} else {
-
-					renderer.setSize( config.resolution, config.resolution );
-
+					renderer.setSize(config.resolution, config.resolution);
 				}
 
 				camera.aspect = canvas.width / canvas.height;
 				camera.updateProjectionMatrix();
 
-				material.uniforms.resolution.value.set( canvas.width, canvas.height );
-				material.uniforms.cameraProjectionMatrixInverse.value.copy( camera.projectionMatrixInverse );
-
+				material.uniforms.resolution.value.set(canvas.width, canvas.height);
+				material.uniforms.cameraProjectionMatrixInverse.value.copy(
+					camera.projectionMatrixInverse
+				);
 			}
 
 			function render() {
-
 				stats.begin();
 
 				const elapsedTime = clock.getElapsedTime();
 
-				dolly.position.z = - elapsedTime;
+				dolly.position.z = -elapsedTime;
 
-				renderer.render( scene, camera );
+				renderer.render(scene, camera);
 
 				stats.end();
-				requestAnimationFrame( render );
-
+				requestAnimationFrame(render);
 			}
-
 		</script>
-
 	</body>
 </html>

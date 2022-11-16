@@ -2,19 +2,25 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - particles - billboards</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
-
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl particle billboards example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- webgl particle billboards example
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -26,15 +32,15 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
+			import Stats from "three/addons/libs/stats.module.js";
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
 			let camera, scene, renderer, stats, material;
-			let mouseX = 0, mouseY = 0;
+			let mouseX = 0,
+				mouseY = 0;
 
 			let windowHalfX = window.innerWidth / 2;
 			let windowHalfY = window.innerHeight / 2;
@@ -43,119 +49,120 @@
 			animate();
 
 			function init() {
-
-				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 2, 2000 );
+				camera = new THREE.PerspectiveCamera(
+					55,
+					window.innerWidth / window.innerHeight,
+					2,
+					2000
+				);
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.001 );
+				scene.fog = new THREE.FogExp2(0x000000, 0.001);
 
 				const geometry = new THREE.BufferGeometry();
 				const vertices = [];
 
-				const sprite = new THREE.TextureLoader().load( 'textures/sprites/disc.png' );
+				const sprite = new THREE.TextureLoader().load(
+					"textures/sprites/disc.png"
+				);
 
-				for ( let i = 0; i < 10000; i ++ ) {
-
+				for (let i = 0; i < 10000; i++) {
 					const x = 2000 * Math.random() - 1000;
 					const y = 2000 * Math.random() - 1000;
 					const z = 2000 * Math.random() - 1000;
 
-					vertices.push( x, y, z );
-
+					vertices.push(x, y, z);
 				}
 
-				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute(
+					"position",
+					new THREE.Float32BufferAttribute(vertices, 3)
+				);
 
-				material = new THREE.PointsMaterial( { size: 35, sizeAttenuation: true, map: sprite, alphaTest: 0.5, transparent: true } );
-				material.color.setHSL( 1.0, 0.3, 0.7 );
+				material = new THREE.PointsMaterial({
+					size: 35,
+					sizeAttenuation: true,
+					map: sprite,
+					alphaTest: 0.5,
+					transparent: true,
+				});
+				material.color.setHSL(1.0, 0.3, 0.7);
 
-				const particles = new THREE.Points( geometry, material );
-				scene.add( particles );
+				const particles = new THREE.Points(geometry, material);
+				scene.add(particles);
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
 
 				//
 
 				stats = new Stats();
-				document.body.appendChild( stats.dom );
+				document.body.appendChild(stats.dom);
 
 				//
 
 				const gui = new GUI();
 
-				gui.add( material, 'sizeAttenuation' ).onChange( function () {
-
+				gui.add(material, "sizeAttenuation").onChange(function () {
 					material.needsUpdate = true;
-
-				} );
+				});
 
 				gui.open();
 
 				//
 
-				document.body.style.touchAction = 'none';
-				document.body.addEventListener( 'pointermove', onPointerMove );
+				document.body.style.touchAction = "none";
+				document.body.addEventListener("pointermove", onPointerMove);
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				windowHalfX = window.innerWidth / 2;
 				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
-			function onPointerMove( event ) {
-
-				if ( event.isPrimary === false ) return;
+			function onPointerMove(event) {
+				if (event.isPrimary === false) return;
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
-
 			}
 
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
+				requestAnimationFrame(animate);
 
 				render();
 				stats.update();
-
 			}
 
 			function render() {
-
 				const time = Date.now() * 0.00005;
 
-				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+				camera.position.x += (mouseX - camera.position.x) * 0.05;
+				camera.position.y += (-mouseY - camera.position.y) * 0.05;
 
-				camera.lookAt( scene.position );
+				camera.lookAt(scene.position);
 
-				const h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
-				material.color.setHSL( h, 0.5, 0.5 );
+				const h = ((360 * (1.0 + time)) % 360) / 360;
+				material.color.setHSL(h, 0.5, 0.5);
 
-				renderer.render( scene, camera );
-
+				renderer.render(scene, camera);
 			}
-
 		</script>
 	</body>
 </html>

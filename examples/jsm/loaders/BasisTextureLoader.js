@@ -14,8 +14,8 @@ import {
 	RGB_ETC2_Format,
 	RGB_PVRTC_4BPPV1_Format,
 	RGB_S3TC_DXT1_Format,
-	UnsignedByteType
-} from 'three';
+	UnsignedByteType,
+} from "three";
 
 /**
  * Loader for Basis Universal GPU Texture Codec.
@@ -33,115 +33,101 @@ import {
 const _taskCache = new WeakMap();
 
 class BasisTextureLoader extends Loader {
+	constructor(manager) {
+		super(manager);
 
-	constructor( manager ) {
-
-		super( manager );
-
-		this.transcoderPath = '';
+		this.transcoderPath = "";
 		this.transcoderBinary = null;
 		this.transcoderPending = null;
 
 		this.workerLimit = 4;
 		this.workerPool = [];
 		this.workerNextTaskID = 1;
-		this.workerSourceURL = '';
+		this.workerSourceURL = "";
 		this.workerConfig = null;
 
 		console.warn(
-
-			'THREE.BasisTextureLoader: This loader is deprecated, and will be removed in a future release. '
-			+ 'Instead, use Basis Universal compression in KTX2 (.ktx2) files with THREE.KTX2Loader.'
-
+			"THREE.BasisTextureLoader: This loader is deprecated, and will be removed in a future release. " +
+				"Instead, use Basis Universal compression in KTX2 (.ktx2) files with THREE.KTX2Loader."
 		);
-
 	}
 
-	setTranscoderPath( path ) {
-
+	setTranscoderPath(path) {
 		this.transcoderPath = path;
 
 		return this;
-
 	}
 
-	setWorkerLimit( workerLimit ) {
-
+	setWorkerLimit(workerLimit) {
 		this.workerLimit = workerLimit;
 
 		return this;
-
 	}
 
-	detectSupport( renderer ) {
-
+	detectSupport(renderer) {
 		this.workerConfig = {
-			astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
-			etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
-			etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
-			dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
-			bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
-			pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
-				|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
+			astcSupported: renderer.extensions.has("WEBGL_compressed_texture_astc"),
+			etc1Supported: renderer.extensions.has("WEBGL_compressed_texture_etc1"),
+			etc2Supported: renderer.extensions.has("WEBGL_compressed_texture_etc"),
+			dxtSupported: renderer.extensions.has("WEBGL_compressed_texture_s3tc"),
+			bptcSupported: renderer.extensions.has("EXT_texture_compression_bptc"),
+			pvrtcSupported:
+				renderer.extensions.has("WEBGL_compressed_texture_pvrtc") ||
+				renderer.extensions.has("WEBKIT_WEBGL_compressed_texture_pvrtc"),
 		};
 
 		return this;
-
 	}
 
-	load( url, onLoad, onProgress, onError ) {
+	load(url, onLoad, onProgress, onError) {
+		const loader = new FileLoader(this.manager);
 
-		const loader = new FileLoader( this.manager );
-
-		loader.setResponseType( 'arraybuffer' );
-		loader.setWithCredentials( this.withCredentials );
+		loader.setResponseType("arraybuffer");
+		loader.setWithCredentials(this.withCredentials);
 
 		const texture = new CompressedTexture();
 
-		loader.load( url, ( buffer ) => {
+		loader.load(
+			url,
+			(buffer) => {
+				// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+				// again from this thread.
+				if (_taskCache.has(buffer)) {
+					const cachedTask = _taskCache.get(buffer);
 
-			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
-			// again from this thread.
-			if ( _taskCache.has( buffer ) ) {
+					return cachedTask.promise.then(onLoad).catch(onError);
+				}
 
-				const cachedTask = _taskCache.get( buffer );
+				this._createTexture([buffer])
+					.then(function (_texture) {
+						texture.copy(_texture);
+						texture.needsUpdate = true;
 
-				return cachedTask.promise.then( onLoad ).catch( onError );
-
-			}
-
-			this._createTexture( [ buffer ] )
-				.then( function ( _texture ) {
-
-					texture.copy( _texture );
-					texture.needsUpdate = true;
-
-					if ( onLoad ) onLoad( texture );
-
-				} )
-				.catch( onError );
-
-		}, onProgress, onError );
+						if (onLoad) onLoad(texture);
+					})
+					.catch(onError);
+			},
+			onProgress,
+			onError
+		);
 
 		return texture;
-
 	}
 
 	/** Low-level transcoding API, exposed for use by KTX2Loader. */
-	parseInternalAsync( options ) {
-
+	parseInternalAsync(options) {
 		const { levels } = options;
 
 		const buffers = new Set();
 
-		for ( let i = 0; i < levels.length; i ++ ) {
-
-			buffers.add( levels[ i ].data.buffer );
-
+		for (let i = 0; i < levels.length; i++) {
+			buffers.add(levels[i].data.buffer);
 		}
 
-		return this._createTexture( Array.from( buffers ), { ...options, lowLevel: true } );
-
+		return this._createTexture(Array.from(buffers), {
+			...options,
+			lowLevel: true,
+		});
 	}
 
 	/**
@@ -149,196 +135,176 @@ class BasisTextureLoader extends Loader {
 	 * @param {object?} config
 	 * @return {Promise<CompressedTexture>}
 	 */
-	_createTexture( buffers, config = {} ) {
-
+	_createTexture(buffers, config = {}) {
 		let worker;
 		let taskID;
 
 		const taskConfig = config;
 		let taskCost = 0;
 
-		for ( let i = 0; i < buffers.length; i ++ ) {
-
-			taskCost += buffers[ i ].byteLength;
-
+		for (let i = 0; i < buffers.length; i++) {
+			taskCost += buffers[i].byteLength;
 		}
 
-		const texturePending = this._allocateWorker( taskCost )
-			.then( ( _worker ) => {
-
+		const texturePending = this._allocateWorker(taskCost)
+			.then((_worker) => {
 				worker = _worker;
-				taskID = this.workerNextTaskID ++;
+				taskID = this.workerNextTaskID++;
 
-				return new Promise( ( resolve, reject ) => {
+				return new Promise((resolve, reject) => {
+					worker._callbacks[taskID] = { resolve, reject };
 
-					worker._callbacks[ taskID ] = { resolve, reject };
-
-					worker.postMessage( { type: 'transcode', id: taskID, buffers: buffers, taskConfig: taskConfig }, buffers );
-
-				} );
-
-			} )
-			.then( ( message ) => {
-
+					worker.postMessage(
+						{
+							type: "transcode",
+							id: taskID,
+							buffers: buffers,
+							taskConfig: taskConfig,
+						},
+						buffers
+					);
+				});
+			})
+			.then((message) => {
 				const { mipmaps, width, height, format } = message;
 
-				const texture = new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
-				texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+				const texture = new CompressedTexture(
+					mipmaps,
+					width,
+					height,
+					format,
+					UnsignedByteType
+				);
+				texture.minFilter =
+					mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;
 
 				return texture;
-
-			} );
+			});
 
 		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 		texturePending
-			.catch( () => true )
-			.then( () => {
-
-				if ( worker && taskID ) {
-
+			.catch(() => true)
+			.then(() => {
+				if (worker && taskID) {
 					worker._taskLoad -= taskCost;
-					delete worker._callbacks[ taskID ];
-
+					delete worker._callbacks[taskID];
 				}
-
-			} );
+			});
 
 		// Cache the task result.
-		_taskCache.set( buffers[ 0 ], { promise: texturePending } );
+		_taskCache.set(buffers[0], { promise: texturePending });
 
 		return texturePending;
-
 	}
 
 	_initTranscoder() {
-
-		if ( ! this.transcoderPending ) {
-
+		if (!this.transcoderPending) {
 			// Load transcoder wrapper.
-			const jsLoader = new FileLoader( this.manager );
-			jsLoader.setPath( this.transcoderPath );
-			jsLoader.setWithCredentials( this.withCredentials );
-			const jsContent = new Promise( ( resolve, reject ) => {
-
-				jsLoader.load( 'basis_transcoder.js', resolve, undefined, reject );
-
-			} );
+			const jsLoader = new FileLoader(this.manager);
+			jsLoader.setPath(this.transcoderPath);
+			jsLoader.setWithCredentials(this.withCredentials);
+			const jsContent = new Promise((resolve, reject) => {
+				jsLoader.load("basis_transcoder.js", resolve, undefined, reject);
+			});
 
 			// Load transcoder WASM binary.
-			const binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPath( this.transcoderPath );
-			binaryLoader.setResponseType( 'arraybuffer' );
-			binaryLoader.setWithCredentials( this.withCredentials );
-			const binaryContent = new Promise( ( resolve, reject ) => {
+			const binaryLoader = new FileLoader(this.manager);
+			binaryLoader.setPath(this.transcoderPath);
+			binaryLoader.setResponseType("arraybuffer");
+			binaryLoader.setWithCredentials(this.withCredentials);
+			const binaryContent = new Promise((resolve, reject) => {
+				binaryLoader.load("basis_transcoder.wasm", resolve, undefined, reject);
+			});
 
-				binaryLoader.load( 'basis_transcoder.wasm', resolve, undefined, reject );
-
-			} );
-
-			this.transcoderPending = Promise.all( [ jsContent, binaryContent ] )
-				.then( ( [ jsContent, binaryContent ] ) => {
-
+			this.transcoderPending = Promise.all([jsContent, binaryContent]).then(
+				([jsContent, binaryContent]) => {
 					const fn = BasisTextureLoader.BasisWorker.toString();
 
 					const body = [
-						'/* constants */',
-						'let _EngineFormat = ' + JSON.stringify( BasisTextureLoader.EngineFormat ),
-						'let _TranscoderFormat = ' + JSON.stringify( BasisTextureLoader.TranscoderFormat ),
-						'let _BasisFormat = ' + JSON.stringify( BasisTextureLoader.BasisFormat ),
-						'/* basis_transcoder.js */',
+						"/* constants */",
+						"let _EngineFormat = " +
+							JSON.stringify(BasisTextureLoader.EngineFormat),
+						"let _TranscoderFormat = " +
+							JSON.stringify(BasisTextureLoader.TranscoderFormat),
+						"let _BasisFormat = " +
+							JSON.stringify(BasisTextureLoader.BasisFormat),
+						"/* basis_transcoder.js */",
 						jsContent,
-						'/* worker */',
-						fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) )
-					].join( '\n' );
+						"/* worker */",
+						fn.substring(fn.indexOf("{") + 1, fn.lastIndexOf("}")),
+					].join("\n");
 
-					this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
+					this.workerSourceURL = URL.createObjectURL(new Blob([body]));
 					this.transcoderBinary = binaryContent;
-
-				} );
-
+				}
+			);
 		}
 
 		return this.transcoderPending;
-
 	}
 
-	_allocateWorker( taskCost ) {
-
-		return this._initTranscoder().then( () => {
-
-			if ( this.workerPool.length < this.workerLimit ) {
-
-				const worker = new Worker( this.workerSourceURL );
+	_allocateWorker(taskCost) {
+		return this._initTranscoder().then(() => {
+			if (this.workerPool.length < this.workerLimit) {
+				const worker = new Worker(this.workerSourceURL);
 
 				worker._callbacks = {};
 				worker._taskLoad = 0;
 
-				worker.postMessage( {
-					type: 'init',
+				worker.postMessage({
+					type: "init",
 					config: this.workerConfig,
 					transcoderBinary: this.transcoderBinary,
-				} );
+				});
 
-				worker.onmessage = function ( e ) {
-
+				worker.onmessage = function (e) {
 					const message = e.data;
 
-					switch ( message.type ) {
-
-						case 'transcode':
-							worker._callbacks[ message.id ].resolve( message );
+					switch (message.type) {
+						case "transcode":
+							worker._callbacks[message.id].resolve(message);
 							break;
 
-						case 'error':
-							worker._callbacks[ message.id ].reject( message );
+						case "error":
+							worker._callbacks[message.id].reject(message);
 							break;
 
 						default:
-							console.error( 'THREE.BasisTextureLoader: Unexpected message, "' + message.type + '"' );
-
+							console.error(
+								'THREE.BasisTextureLoader: Unexpected message, "' +
+									message.type +
+									'"'
+							);
 					}
-
 				};
 
-				this.workerPool.push( worker );
-
+				this.workerPool.push(worker);
 			} else {
-
-				this.workerPool.sort( function ( a, b ) {
-
-					return a._taskLoad > b._taskLoad ? - 1 : 1;
-
-				} );
-
+				this.workerPool.sort(function (a, b) {
+					return a._taskLoad > b._taskLoad ? -1 : 1;
+				});
 			}
 
-			const worker = this.workerPool[ this.workerPool.length - 1 ];
+			const worker = this.workerPool[this.workerPool.length - 1];
 
 			worker._taskLoad += taskCost;
 
 			return worker;
-
-		} );
-
+		});
 	}
 
 	dispose() {
-
-		for ( let i = 0; i < this.workerPool.length; i ++ ) {
-
-			this.workerPool[ i ].terminate();
-
+		for (let i = 0; i < this.workerPool.length; i++) {
+			this.workerPool[i].terminate();
 		}
 
 		this.workerPool.length = 0;
 
 		return this;
-
 	}
-
 }
 
 /* CONSTANTS */
@@ -381,11 +347,9 @@ BasisTextureLoader.EngineFormat = {
 	RGB_S3TC_DXT1_Format: RGB_S3TC_DXT1_Format,
 };
 
-
 /* WEB WORKER */
 
 BasisTextureLoader.BasisWorker = function () {
-
 	let config;
 	let transcoderPending;
 	let BasisModule;
@@ -394,208 +358,242 @@ BasisTextureLoader.BasisWorker = function () {
 	const TranscoderFormat = _TranscoderFormat; // eslint-disable-line no-undef
 	const BasisFormat = _BasisFormat; // eslint-disable-line no-undef
 
-	onmessage = function ( e ) {
-
+	onmessage = function (e) {
 		const message = e.data;
 
-		switch ( message.type ) {
-
-			case 'init':
+		switch (message.type) {
+			case "init":
 				config = message.config;
-				init( message.transcoderBinary );
+				init(message.transcoderBinary);
 				break;
 
-			case 'transcode':
-				transcoderPending.then( () => {
-
+			case "transcode":
+				transcoderPending.then(() => {
 					try {
-
-						const { width, height, hasAlpha, mipmaps, format } = message.taskConfig.lowLevel
-							? transcodeLowLevel( message.taskConfig )
-							: transcode( message.buffers[ 0 ] );
+						const { width, height, hasAlpha, mipmaps, format } = message
+							.taskConfig.lowLevel
+							? transcodeLowLevel(message.taskConfig)
+							: transcode(message.buffers[0]);
 
 						const buffers = [];
 
-						for ( let i = 0; i < mipmaps.length; ++ i ) {
-
-							buffers.push( mipmaps[ i ].data.buffer );
-
+						for (let i = 0; i < mipmaps.length; ++i) {
+							buffers.push(mipmaps[i].data.buffer);
 						}
 
-						self.postMessage( { type: 'transcode', id: message.id, width, height, hasAlpha, mipmaps, format }, buffers );
+						self.postMessage(
+							{
+								type: "transcode",
+								id: message.id,
+								width,
+								height,
+								hasAlpha,
+								mipmaps,
+								format,
+							},
+							buffers
+						);
+					} catch (error) {
+						console.error(error);
 
-					} catch ( error ) {
-
-						console.error( error );
-
-						self.postMessage( { type: 'error', id: message.id, error: error.message } );
-
+						self.postMessage({
+							type: "error",
+							id: message.id,
+							error: error.message,
+						});
 					}
-
-				} );
+				});
 				break;
-
 		}
-
 	};
 
-	function init( wasmBinary ) {
-
-		transcoderPending = new Promise( ( resolve ) => {
-
+	function init(wasmBinary) {
+		transcoderPending = new Promise((resolve) => {
 			BasisModule = { wasmBinary, onRuntimeInitialized: resolve };
-			BASIS( BasisModule ); // eslint-disable-line no-undef
-
-		} ).then( () => {
-
+			BASIS(BasisModule); // eslint-disable-line no-undef
+		}).then(() => {
 			BasisModule.initializeBasis();
-
-		} );
-
+		});
 	}
 
-	function transcodeLowLevel( taskConfig ) {
-
+	function transcodeLowLevel(taskConfig) {
 		const { basisFormat, width, height, hasAlpha } = taskConfig;
 
-		const { transcoderFormat, engineFormat } = getTranscoderFormat( basisFormat, width, height, hasAlpha );
+		const { transcoderFormat, engineFormat } = getTranscoderFormat(
+			basisFormat,
+			width,
+			height,
+			hasAlpha
+		);
 
-		const blockByteLength = BasisModule.getBytesPerBlockOrPixel( transcoderFormat );
+		const blockByteLength =
+			BasisModule.getBytesPerBlockOrPixel(transcoderFormat);
 
-		assert( BasisModule.isFormatSupported( transcoderFormat ), 'THREE.BasisTextureLoader: Unsupported format.' );
+		assert(
+			BasisModule.isFormatSupported(transcoderFormat),
+			"THREE.BasisTextureLoader: Unsupported format."
+		);
 
 		const mipmaps = [];
 
-		if ( basisFormat === BasisFormat.ETC1S ) {
-
+		if (basisFormat === BasisFormat.ETC1S) {
 			const transcoder = new BasisModule.LowLevelETC1SImageTranscoder();
 
-			const { endpointCount, endpointsData, selectorCount, selectorsData, tablesData } = taskConfig.globalData;
+			const {
+				endpointCount,
+				endpointsData,
+				selectorCount,
+				selectorsData,
+				tablesData,
+			} = taskConfig.globalData;
 
 			try {
-
 				let ok;
 
-				ok = transcoder.decodePalettes( endpointCount, endpointsData, selectorCount, selectorsData );
+				ok = transcoder.decodePalettes(
+					endpointCount,
+					endpointsData,
+					selectorCount,
+					selectorsData
+				);
 
-				assert( ok, 'THREE.BasisTextureLoader: decodePalettes() failed.' );
+				assert(ok, "THREE.BasisTextureLoader: decodePalettes() failed.");
 
-				ok = transcoder.decodeTables( tablesData );
+				ok = transcoder.decodeTables(tablesData);
 
-				assert( ok, 'THREE.BasisTextureLoader: decodeTables() failed.' );
+				assert(ok, "THREE.BasisTextureLoader: decodeTables() failed.");
 
-				for ( let i = 0; i < taskConfig.levels.length; i ++ ) {
+				for (let i = 0; i < taskConfig.levels.length; i++) {
+					const level = taskConfig.levels[i];
+					const imageDesc = taskConfig.globalData.imageDescs[i];
 
-					const level = taskConfig.levels[ i ];
-					const imageDesc = taskConfig.globalData.imageDescs[ i ];
-
-					const dstByteLength = getTranscodedImageByteLength( transcoderFormat, level.width, level.height );
-					const dst = new Uint8Array( dstByteLength );
+					const dstByteLength = getTranscodedImageByteLength(
+						transcoderFormat,
+						level.width,
+						level.height
+					);
+					const dst = new Uint8Array(dstByteLength);
 
 					ok = transcoder.transcodeImage(
 						transcoderFormat,
-						dst, dstByteLength / blockByteLength,
+						dst,
+						dstByteLength / blockByteLength,
 						level.data,
-						getWidthInBlocks( transcoderFormat, level.width ),
-						getHeightInBlocks( transcoderFormat, level.height ),
-						level.width, level.height, level.index,
-						imageDesc.rgbSliceByteOffset, imageDesc.rgbSliceByteLength,
-						imageDesc.alphaSliceByteOffset, imageDesc.alphaSliceByteLength,
+						getWidthInBlocks(transcoderFormat, level.width),
+						getHeightInBlocks(transcoderFormat, level.height),
+						level.width,
+						level.height,
+						level.index,
+						imageDesc.rgbSliceByteOffset,
+						imageDesc.rgbSliceByteLength,
+						imageDesc.alphaSliceByteOffset,
+						imageDesc.alphaSliceByteLength,
 						imageDesc.imageFlags,
 						hasAlpha,
 						false,
-						0, 0
+						0,
+						0
 					);
 
-					assert( ok, 'THREE.BasisTextureLoader: transcodeImage() failed for level ' + level.index + '.' );
+					assert(
+						ok,
+						"THREE.BasisTextureLoader: transcodeImage() failed for level " +
+							level.index +
+							"."
+					);
 
-					mipmaps.push( { data: dst, width: level.width, height: level.height } );
-
+					mipmaps.push({ data: dst, width: level.width, height: level.height });
 				}
-
 			} finally {
-
 				transcoder.delete();
-
 			}
-
 		} else {
+			for (let i = 0; i < taskConfig.levels.length; i++) {
+				const level = taskConfig.levels[i];
 
-			for ( let i = 0; i < taskConfig.levels.length; i ++ ) {
-
-				const level = taskConfig.levels[ i ];
-
-				const dstByteLength = getTranscodedImageByteLength( transcoderFormat, level.width, level.height );
-				const dst = new Uint8Array( dstByteLength );
+				const dstByteLength = getTranscodedImageByteLength(
+					transcoderFormat,
+					level.width,
+					level.height
+				);
+				const dst = new Uint8Array(dstByteLength);
 
 				const ok = BasisModule.transcodeUASTCImage(
 					transcoderFormat,
-					dst, dstByteLength / blockByteLength,
+					dst,
+					dstByteLength / blockByteLength,
 					level.data,
-					getWidthInBlocks( transcoderFormat, level.width ),
-					getHeightInBlocks( transcoderFormat, level.height ),
-					level.width, level.height, level.index,
+					getWidthInBlocks(transcoderFormat, level.width),
+					getHeightInBlocks(transcoderFormat, level.height),
+					level.width,
+					level.height,
+					level.index,
 					0,
 					level.data.byteLength,
 					0,
 					hasAlpha,
 					false,
-					0, 0,
-					- 1, - 1
+					0,
+					0,
+					-1,
+					-1
 				);
 
-				assert( ok, 'THREE.BasisTextureLoader: transcodeUASTCImage() failed for level ' + level.index + '.' );
+				assert(
+					ok,
+					"THREE.BasisTextureLoader: transcodeUASTCImage() failed for level " +
+						level.index +
+						"."
+				);
 
-				mipmaps.push( { data: dst, width: level.width, height: level.height } );
-
+				mipmaps.push({ data: dst, width: level.width, height: level.height });
 			}
-
 		}
 
 		return { width, height, hasAlpha, mipmaps, format: engineFormat };
-
 	}
 
-	function transcode( buffer ) {
+	function transcode(buffer) {
+		const basisFile = new BasisModule.BasisFile(new Uint8Array(buffer));
 
-		const basisFile = new BasisModule.BasisFile( new Uint8Array( buffer ) );
-
-		const basisFormat = basisFile.isUASTC() ? BasisFormat.UASTC_4x4 : BasisFormat.ETC1S;
-		const width = basisFile.getImageWidth( 0, 0 );
-		const height = basisFile.getImageHeight( 0, 0 );
-		const levels = basisFile.getNumLevels( 0 );
+		const basisFormat = basisFile.isUASTC()
+			? BasisFormat.UASTC_4x4
+			: BasisFormat.ETC1S;
+		const width = basisFile.getImageWidth(0, 0);
+		const height = basisFile.getImageHeight(0, 0);
+		const levels = basisFile.getNumLevels(0);
 		const hasAlpha = basisFile.getHasAlpha();
 
 		function cleanup() {
-
 			basisFile.close();
 			basisFile.delete();
-
 		}
 
-		const { transcoderFormat, engineFormat } = getTranscoderFormat( basisFormat, width, height, hasAlpha );
+		const { transcoderFormat, engineFormat } = getTranscoderFormat(
+			basisFormat,
+			width,
+			height,
+			hasAlpha
+		);
 
-		if ( ! width || ! height || ! levels ) {
-
+		if (!width || !height || !levels) {
 			cleanup();
-			throw new Error( 'THREE.BasisTextureLoader:	Invalid texture' );
-
+			throw new Error("THREE.BasisTextureLoader:	Invalid texture");
 		}
 
-		if ( ! basisFile.startTranscoding() ) {
-
+		if (!basisFile.startTranscoding()) {
 			cleanup();
-			throw new Error( 'THREE.BasisTextureLoader: .startTranscoding failed' );
-
+			throw new Error("THREE.BasisTextureLoader: .startTranscoding failed");
 		}
 
 		const mipmaps = [];
 
-		for ( let mip = 0; mip < levels; mip ++ ) {
-
-			const mipWidth = basisFile.getImageWidth( 0, mip );
-			const mipHeight = basisFile.getImageHeight( 0, mip );
-			const dst = new Uint8Array( basisFile.getImageTranscodedSizeInBytes( 0, mip, transcoderFormat ) );
+		for (let mip = 0; mip < levels; mip++) {
+			const mipWidth = basisFile.getImageWidth(0, mip);
+			const mipHeight = basisFile.getImageHeight(0, mip);
+			const dst = new Uint8Array(
+				basisFile.getImageTranscodedSizeInBytes(0, mip, transcoderFormat)
+			);
 
 			const status = basisFile.transcodeImage(
 				dst,
@@ -606,21 +604,17 @@ BasisTextureLoader.BasisWorker = function () {
 				hasAlpha
 			);
 
-			if ( ! status ) {
-
+			if (!status) {
 				cleanup();
-				throw new Error( 'THREE.BasisTextureLoader: .transcodeImage failed.' );
-
+				throw new Error("THREE.BasisTextureLoader: .transcodeImage failed.");
 			}
 
-			mipmaps.push( { data: dst, width: mipWidth, height: mipHeight } );
-
+			mipmaps.push({ data: dst, width: mipWidth, height: mipHeight });
 		}
 
 		cleanup();
 
 		return { width, height, hasAlpha, mipmaps, format: engineFormat };
-
 	}
 
 	//
@@ -634,157 +628,166 @@ BasisTextureLoader.BasisWorker = function () {
 	// chooses RGBA32 only as a last resort and does not expose that option to the caller.
 	const FORMAT_OPTIONS = [
 		{
-			if: 'astcSupported',
-			basisFormat: [ BasisFormat.UASTC_4x4 ],
-			transcoderFormat: [ TranscoderFormat.ASTC_4x4, TranscoderFormat.ASTC_4x4 ],
-			engineFormat: [ EngineFormat.RGBA_ASTC_4x4_Format, EngineFormat.RGBA_ASTC_4x4_Format ],
+			if: "astcSupported",
+			basisFormat: [BasisFormat.UASTC_4x4],
+			transcoderFormat: [TranscoderFormat.ASTC_4x4, TranscoderFormat.ASTC_4x4],
+			engineFormat: [
+				EngineFormat.RGBA_ASTC_4x4_Format,
+				EngineFormat.RGBA_ASTC_4x4_Format,
+			],
 			priorityETC1S: Infinity,
 			priorityUASTC: 1,
 			needsPowerOfTwo: false,
 		},
 		{
-			if: 'bptcSupported',
-			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
-			transcoderFormat: [ TranscoderFormat.BC7_M5, TranscoderFormat.BC7_M5 ],
-			engineFormat: [ EngineFormat.RGBA_BPTC_Format, EngineFormat.RGBA_BPTC_Format ],
+			if: "bptcSupported",
+			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
+			transcoderFormat: [TranscoderFormat.BC7_M5, TranscoderFormat.BC7_M5],
+			engineFormat: [
+				EngineFormat.RGBA_BPTC_Format,
+				EngineFormat.RGBA_BPTC_Format,
+			],
 			priorityETC1S: 3,
 			priorityUASTC: 2,
 			needsPowerOfTwo: false,
 		},
 		{
-			if: 'dxtSupported',
-			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
-			transcoderFormat: [ TranscoderFormat.BC1, TranscoderFormat.BC3 ],
-			engineFormat: [ EngineFormat.RGB_S3TC_DXT1_Format, EngineFormat.RGBA_S3TC_DXT5_Format ],
+			if: "dxtSupported",
+			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
+			transcoderFormat: [TranscoderFormat.BC1, TranscoderFormat.BC3],
+			engineFormat: [
+				EngineFormat.RGB_S3TC_DXT1_Format,
+				EngineFormat.RGBA_S3TC_DXT5_Format,
+			],
 			priorityETC1S: 4,
 			priorityUASTC: 5,
 			needsPowerOfTwo: false,
 		},
 		{
-			if: 'etc2Supported',
-			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
-			transcoderFormat: [ TranscoderFormat.ETC1, TranscoderFormat.ETC2 ],
-			engineFormat: [ EngineFormat.RGB_ETC2_Format, EngineFormat.RGBA_ETC2_EAC_Format ],
+			if: "etc2Supported",
+			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
+			transcoderFormat: [TranscoderFormat.ETC1, TranscoderFormat.ETC2],
+			engineFormat: [
+				EngineFormat.RGB_ETC2_Format,
+				EngineFormat.RGBA_ETC2_EAC_Format,
+			],
 			priorityETC1S: 1,
 			priorityUASTC: 3,
 			needsPowerOfTwo: false,
 		},
 		{
-			if: 'etc1Supported',
-			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
-			transcoderFormat: [ TranscoderFormat.ETC1, TranscoderFormat.ETC1 ],
-			engineFormat: [ EngineFormat.RGB_ETC1_Format, EngineFormat.RGB_ETC1_Format ],
+			if: "etc1Supported",
+			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
+			transcoderFormat: [TranscoderFormat.ETC1, TranscoderFormat.ETC1],
+			engineFormat: [
+				EngineFormat.RGB_ETC1_Format,
+				EngineFormat.RGB_ETC1_Format,
+			],
 			priorityETC1S: 2,
 			priorityUASTC: 4,
 			needsPowerOfTwo: false,
 		},
 		{
-			if: 'pvrtcSupported',
-			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC_4x4 ],
-			transcoderFormat: [ TranscoderFormat.PVRTC1_4_RGB, TranscoderFormat.PVRTC1_4_RGBA ],
-			engineFormat: [ EngineFormat.RGB_PVRTC_4BPPV1_Format, EngineFormat.RGBA_PVRTC_4BPPV1_Format ],
+			if: "pvrtcSupported",
+			basisFormat: [BasisFormat.ETC1S, BasisFormat.UASTC_4x4],
+			transcoderFormat: [
+				TranscoderFormat.PVRTC1_4_RGB,
+				TranscoderFormat.PVRTC1_4_RGBA,
+			],
+			engineFormat: [
+				EngineFormat.RGB_PVRTC_4BPPV1_Format,
+				EngineFormat.RGBA_PVRTC_4BPPV1_Format,
+			],
 			priorityETC1S: 5,
 			priorityUASTC: 6,
 			needsPowerOfTwo: true,
 		},
 	];
 
-	const ETC1S_OPTIONS = FORMAT_OPTIONS.sort( function ( a, b ) {
-
+	const ETC1S_OPTIONS = FORMAT_OPTIONS.sort(function (a, b) {
 		return a.priorityETC1S - b.priorityETC1S;
-
-	} );
-	const UASTC_OPTIONS = FORMAT_OPTIONS.sort( function ( a, b ) {
-
+	});
+	const UASTC_OPTIONS = FORMAT_OPTIONS.sort(function (a, b) {
 		return a.priorityUASTC - b.priorityUASTC;
+	});
 
-	} );
-
-	function getTranscoderFormat( basisFormat, width, height, hasAlpha ) {
-
+	function getTranscoderFormat(basisFormat, width, height, hasAlpha) {
 		let transcoderFormat;
 		let engineFormat;
 
-		const options = basisFormat === BasisFormat.ETC1S ? ETC1S_OPTIONS : UASTC_OPTIONS;
+		const options =
+			basisFormat === BasisFormat.ETC1S ? ETC1S_OPTIONS : UASTC_OPTIONS;
 
-		for ( let i = 0; i < options.length; i ++ ) {
+		for (let i = 0; i < options.length; i++) {
+			const opt = options[i];
 
-			const opt = options[ i ];
+			if (!config[opt.if]) continue;
+			if (!opt.basisFormat.includes(basisFormat)) continue;
+			if (opt.needsPowerOfTwo && !(isPowerOfTwo(width) && isPowerOfTwo(height)))
+				continue;
 
-			if ( ! config[ opt.if ] ) continue;
-			if ( ! opt.basisFormat.includes( basisFormat ) ) continue;
-			if ( opt.needsPowerOfTwo && ! ( isPowerOfTwo( width ) && isPowerOfTwo( height ) ) ) continue;
-
-			transcoderFormat = opt.transcoderFormat[ hasAlpha ? 1 : 0 ];
-			engineFormat = opt.engineFormat[ hasAlpha ? 1 : 0 ];
+			transcoderFormat = opt.transcoderFormat[hasAlpha ? 1 : 0];
+			engineFormat = opt.engineFormat[hasAlpha ? 1 : 0];
 
 			return { transcoderFormat, engineFormat };
-
 		}
 
-		console.warn( 'THREE.BasisTextureLoader: No suitable compressed texture format found. Decoding to RGBA32.' );
+		console.warn(
+			"THREE.BasisTextureLoader: No suitable compressed texture format found. Decoding to RGBA32."
+		);
 
 		transcoderFormat = TranscoderFormat.RGBA32;
 		engineFormat = EngineFormat.RGBAFormat;
 
 		return { transcoderFormat, engineFormat };
-
 	}
 
-	function assert( ok, message ) {
-
-		if ( ! ok ) throw new Error( message );
-
+	function assert(ok, message) {
+		if (!ok) throw new Error(message);
 	}
 
-	function getWidthInBlocks( transcoderFormat, width ) {
-
-		return Math.ceil( width / BasisModule.getFormatBlockWidth( transcoderFormat ) );
-
+	function getWidthInBlocks(transcoderFormat, width) {
+		return Math.ceil(width / BasisModule.getFormatBlockWidth(transcoderFormat));
 	}
 
-	function getHeightInBlocks( transcoderFormat, height ) {
-
-		return Math.ceil( height / BasisModule.getFormatBlockHeight( transcoderFormat ) );
-
+	function getHeightInBlocks(transcoderFormat, height) {
+		return Math.ceil(
+			height / BasisModule.getFormatBlockHeight(transcoderFormat)
+		);
 	}
 
-	function getTranscodedImageByteLength( transcoderFormat, width, height ) {
+	function getTranscodedImageByteLength(transcoderFormat, width, height) {
+		const blockByteLength =
+			BasisModule.getBytesPerBlockOrPixel(transcoderFormat);
 
-		const blockByteLength = BasisModule.getBytesPerBlockOrPixel( transcoderFormat );
-
-		if ( BasisModule.formatIsUncompressed( transcoderFormat ) ) {
-
+		if (BasisModule.formatIsUncompressed(transcoderFormat)) {
 			return width * height * blockByteLength;
-
 		}
 
-		if ( transcoderFormat === TranscoderFormat.PVRTC1_4_RGB
-				|| transcoderFormat === TranscoderFormat.PVRTC1_4_RGBA ) {
-
+		if (
+			transcoderFormat === TranscoderFormat.PVRTC1_4_RGB ||
+			transcoderFormat === TranscoderFormat.PVRTC1_4_RGBA
+		) {
 			// GL requires extra padding for very small textures:
 			// https://www.khronos.org/registry/OpenGL/extensions/IMG/IMG_texture_compression_pvrtc.txt
-			const paddedWidth = ( width + 3 ) & ~ 3;
-			const paddedHeight = ( height + 3 ) & ~ 3;
+			const paddedWidth = (width + 3) & ~3;
+			const paddedHeight = (height + 3) & ~3;
 
-			return ( Math.max( 8, paddedWidth ) * Math.max( 8, paddedHeight ) * 4 + 7 ) / 8;
-
+			return (Math.max(8, paddedWidth) * Math.max(8, paddedHeight) * 4 + 7) / 8;
 		}
 
-		return ( getWidthInBlocks( transcoderFormat, width )
-			* getHeightInBlocks( transcoderFormat, height )
-			* blockByteLength );
-
+		return (
+			getWidthInBlocks(transcoderFormat, width) *
+			getHeightInBlocks(transcoderFormat, height) *
+			blockByteLength
+		);
 	}
 
-	function isPowerOfTwo( value ) {
+	function isPowerOfTwo(value) {
+		if (value <= 2) return true;
 
-		if ( value <= 2 ) return true;
-
-		return ( value & ( value - 1 ) ) === 0 && value !== 0;
-
+		return (value & (value - 1)) === 0 && value !== 0;
 	}
-
 };
 
 export { BasisTextureLoader };

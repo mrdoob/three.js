@@ -1,7 +1,6 @@
-( function () {
-
+(function () {
 	const CSMShader = {
-		lights_fragment_begin: /* glsl */`
+		lights_fragment_begin: /* glsl */ `
 GeometricContext geometry;
 
 geometry.position = - vViewPosition;
@@ -239,15 +238,15 @@ IncidentLight directLight;
 
 #endif
 `,
-		lights_pars_begin: /* glsl */`
+		lights_pars_begin:
+			/* glsl */ `
 #if defined( USE_CSM ) && defined( CSM_CASCADES )
 uniform vec2 CSM_cascades[CSM_CASCADES];
 uniform float cameraNear;
 uniform float shadowFar;
 #endif
-	` + THREE.ShaderChunk.lights_pars_begin
+	` + THREE.ShaderChunk.lights_pars_begin,
 	};
 
 	THREE.CSMShader = CSMShader;
-
-} )();
+})();

@@ -64,9 +64,9 @@
   max-width: 40em;
   position: absolute;
   z-index: 10;
-  -webkit-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-  -moz-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-  box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  -webkit-box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.2);
 
   transition: opacity 1s;
   -moz-transition: opacity 1s;
@@ -80,8 +80,18 @@
   margin-top: -3px;
 }
 
-.CodeMirror-Tern-fname { color: black; }
-.CodeMirror-Tern-farg { color: #70a; }
-.CodeMirror-Tern-farg-current { text-decoration: underline; }
-.CodeMirror-Tern-type { color: #07c; }
-.CodeMirror-Tern-fhint-guess { opacity: .7; }
+.CodeMirror-Tern-fname {
+  color: black;
+}
+.CodeMirror-Tern-farg {
+  color: #70a;
+}
+.CodeMirror-Tern-farg-current {
+  text-decoration: underline;
+}
+.CodeMirror-Tern-type {
+  color: #07c;
+}
+.CodeMirror-Tern-fhint-guess {
+  opacity: 0.7;
+}

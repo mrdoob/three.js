@@ -1,9 +1,10 @@
 .CodeMirror-dialog {
   position: absolute;
-  left: 0; right: 0;
+  left: 0;
+  right: 0;
   background: inherit;
   z-index: 15;
-  padding: .1em .8em;
+  padding: 0.1em 0.8em;
   overflow: hidden;
   color: inherit;
 }

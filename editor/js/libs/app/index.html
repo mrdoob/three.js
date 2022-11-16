@@ -2,9 +2,12 @@
 <html lang="en">
 	<head>
 		<title><!-- title --></title>
-		<meta charset="utf-8">
-		<meta name="generator" content="Three.js Editor">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta charset="utf-8" />
+		<meta name="generator" content="Three.js Editor" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
 		<style>
 			body {
 				font-family: sans-serif;
@@ -19,34 +22,28 @@
 	</head>
 	<body ontouchstart="">
 		<script type="module">
-
-			import * as THREE from './js/three.module.js';
-			import { APP } from './js/app.js';
-			import { VRButton } from './js/VRButton.js';
+			import * as THREE from "./js/three.module.js";
+			import { APP } from "./js/app.js";
+			import { VRButton } from "./js/VRButton.js";
 
 			window.THREE = THREE; // Used by APP Scripts.
 			window.VRButton = VRButton; // Used by APP Scripts.
 
 			var loader = new THREE.FileLoader();
-			loader.load( 'app.json', function ( text ) {
-
+			loader.load("app.json", function (text) {
 				var player = new APP.Player();
-				player.load( JSON.parse( text ) );
-				player.setSize( window.innerWidth, window.innerHeight );
+				player.load(JSON.parse(text));
+				player.setSize(window.innerWidth, window.innerHeight);
 				player.play();
 
-				document.body.appendChild( player.dom );
+				document.body.appendChild(player.dom);
 
-				window.addEventListener( 'resize', function () {
-
-					player.setSize( window.innerWidth, window.innerHeight );
-
-				} );
-
-			} );
+				window.addEventListener("resize", function () {
+					player.setSize(window.innerWidth, window.innerHeight);
+				});
+			});
 
 			/* edit button */
-
 		</script>
 	</body>
 </html>

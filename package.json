@@ -73,9 +73,9 @@
       "GPUBufferUsage": "readonly",
       "GPUTextureUsage": "readonly",
       "QUnit": "readonly",
-      "Ammo":"readonly",
-      "XRRigidTransform":"readonly",
-      "XRMediaBinding":"readonly"
+      "Ammo": "readonly",
+      "XRRigidTransform": "readonly",
+      "XRMediaBinding": "readonly"
     },
     "rules": {
       "no-throw-literal": [

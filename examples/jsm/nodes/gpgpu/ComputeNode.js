@@ -1,11 +1,9 @@
-import Node from '../core/Node.js';
-import { NodeUpdateType } from '../core/constants.js';
+import Node from "../core/Node.js";
+import { NodeUpdateType } from "../core/constants.js";
 
 class ComputeNode extends Node {
-
-	constructor( computeNode, count, workgroupSize = [ 64 ] ) {
-
-		super( 'void' );
+	constructor(computeNode, count, workgroupSize = [64]) {
+		super("void");
 
 		this.isComputeNode = true;
 
@@ -18,48 +16,35 @@ class ComputeNode extends Node {
 		this.updateType = NodeUpdateType.OBJECT;
 
 		this.updateDispatchCount();
-
 	}
 
 	updateDispatchCount() {
-
 		const { count, workgroupSize } = this;
 
-		let size = workgroupSize[ 0 ];
+		let size = workgroupSize[0];
 
-		for ( let i = 1; i < workgroupSize.length; i ++ )
-			size *= workgroupSize[ i ];
+		for (let i = 1; i < workgroupSize.length; i++) size *= workgroupSize[i];
 
-		this.dispatchCount = Math.ceil( count / size );
-
+		this.dispatchCount = Math.ceil(count / size);
 	}
 
-	onInit() { }
+	onInit() {}
 
-	update( { renderer } ) {
-
-		renderer.compute( this );
-
+	update({ renderer }) {
+		renderer.compute(this);
 	}
 
-	generate( builder ) {
-
+	generate(builder) {
 		const { shaderStage } = builder;
 
-		if ( shaderStage === 'compute' ) {
+		if (shaderStage === "compute") {
+			const snippet = this.computeNode.build(builder, "void");
 
-			const snippet = this.computeNode.build( builder, 'void' );
-
-			if ( snippet !== '' ) {
-
-				builder.addFlowCode( snippet );
-
+			if (snippet !== "") {
+				builder.addFlowCode(snippet);
 			}
-
 		}
-
 	}
-
 }
 
 export default ComputeNode;

@@ -1,21 +1,15 @@
-import Node from '../core/Node.js';
+import Node from "../core/Node.js";
 
 class FrontFacingNode extends Node {
-
 	constructor() {
-
-		super( 'bool' );
+		super("bool");
 
 		this.isFrontFacingNode = true;
-
 	}
 
-	generate( builder ) {
-
+	generate(builder) {
 		return builder.getFrontFacing();
-
 	}
-
 }
 
 export default FrontFacingNode;

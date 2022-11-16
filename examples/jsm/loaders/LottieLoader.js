@@ -1,75 +1,63 @@
-import {
-	FileLoader,
-	Loader,
-	CanvasTexture,
-	NearestFilter
-} from 'three';
+import { FileLoader, Loader, CanvasTexture, NearestFilter } from "three";
 
-import lottie from '../libs/lottie_canvas.module.js';
+import lottie from "../libs/lottie_canvas.module.js";
 
 class LottieLoader extends Loader {
-
-	setQuality( value ) {
-
+	setQuality(value) {
 		this._quality = value;
-
 	}
 
-	load( url, onLoad, onProgress, onError ) {
-
+	load(url, onLoad, onProgress, onError) {
 		const quality = this._quality || 1;
 
 		const texture = new CanvasTexture();
 		texture.minFilter = NearestFilter;
 
-		const loader = new FileLoader( this.manager );
-		loader.setPath( this.path );
-		loader.setWithCredentials( this.withCredentials );
+		const loader = new FileLoader(this.manager);
+		loader.setPath(this.path);
+		loader.setWithCredentials(this.withCredentials);
 
-		loader.load( url, function ( text ) {
+		loader.load(
+			url,
+			function (text) {
+				const data = JSON.parse(text);
 
-			const data = JSON.parse( text );
+				// lottie uses container.offetWidth and offsetHeight
+				// to define width/height
 
-			// lottie uses container.offetWidth and offsetHeight
-			// to define width/height
+				const container = document.createElement("div");
+				container.style.width = data.w + "px";
+				container.style.height = data.h + "px";
+				document.body.appendChild(container);
 
-			const container = document.createElement( 'div' );
-			container.style.width = data.w + 'px';
-			container.style.height = data.h + 'px';
-			document.body.appendChild( container );
+				const animation = lottie.loadAnimation({
+					container: container,
+					animType: "canvas",
+					loop: true,
+					autoplay: true,
+					animationData: data,
+					rendererSettings: { dpr: quality },
+				});
 
-			const animation = lottie.loadAnimation( {
-				container: container,
-				animType: 'canvas',
-				loop: true,
-				autoplay: true,
-				animationData: data,
-				rendererSettings: { dpr: quality }
-			} );
+				texture.animation = animation;
+				texture.image = animation.container;
 
-			texture.animation = animation;
-			texture.image = animation.container;
+				animation.addEventListener("enterFrame", function () {
+					texture.needsUpdate = true;
+				});
 
-			animation.addEventListener( 'enterFrame', function () {
+				container.style.display = "none";
 
-				texture.needsUpdate = true;
-
-			} );
-
-			container.style.display = 'none';
-
-			if ( onLoad !== undefined ) {
-
-				onLoad( texture );
-
-			}
-
-		}, onProgress, onError );
+				if (onLoad !== undefined) {
+					onLoad(texture);
+				}
+			},
+			onProgress,
+			onError
+		);
 
 		return texture;
-
 	}
-
 }
 
 export { LottieLoader };

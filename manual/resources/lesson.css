@@ -1,94 +1,95 @@
 /* TODO Use ../files/main.css instead */
 
 :root {
-	color-scheme: light dark;
+  color-scheme: light dark;
 
-	--color-blue: #049EF4;
-	--text-color: #444;
+  --color-blue: #049ef4;
+  --text-color: #444;
 
-	--font-size: 16px;
-	--line-height: 26px;
+  --font-size: 16px;
+  --line-height: 26px;
 
-	--border-style: 1px solid #E8E8E8;
-	--panel-width: 300px;
-	--page-padding: 24px;
-	--max-width: 760px;
-	--icon-size: 20px;
+  --border-style: 1px solid #e8e8e8;
+  --panel-width: 300px;
+  --page-padding: 24px;
+  --max-width: 760px;
+  --icon-size: 20px;
 }
 
 @media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #222;
+    --secondary-background-color: #2e2e2e;
 
-	:root {
-		--background-color: #222;
-		--secondary-background-color: #2e2e2e;
+    --text-color: #bbb;
+    --secondary-text-color: #666;
 
-		--text-color: #bbb;
-		--secondary-text-color: #666;
-
-		--border-style: 1px solid #444;
-	}
-
+    --border-style: 1px solid #444;
+  }
 }
 
 @font-face {
-	font-family: 'Roboto Mono';
-	src: local('Roboto Mono'), local('RobotoMono-Regular'), url('../../files/RobotoMono-Regular.woff2') format('woff2');
-	font-style: normal;
-	font-weight: 400;
+  font-family: "Roboto Mono";
+  src: local("Roboto Mono"), local("RobotoMono-Regular"),
+    url("../../files/RobotoMono-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
 }
 
 @font-face {
-	font-family: 'Inter';
-	font-style: normal;
-	font-weight: 400;
-	src: local('Inter-Regular'), url("../../files/Inter-Regular.woff2?v=3.6") format("woff2");
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Inter-Regular"),
+    url("../../files/Inter-Regular.woff2?v=3.6") format("woff2");
 }
 
 @font-face {
-	font-family: 'Inter';
-	font-style: normal;
-	font-weight: 600;
-	src: local('Inter-SemiBold'), url("../../files/Inter-SemiBold.woff2?v=3.6") format("woff2");
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Inter-SemiBold"),
+    url("../../files/Inter-SemiBold.woff2?v=3.6") format("woff2");
 }
 
 html {
-	font-family: 'Inter', sans-serif;
-	font-size: var(--font-size);
-	line-height: var(--line-height);
+  font-family: "Inter", sans-serif;
+  font-size: var(--font-size);
+  line-height: var(--line-height);
 }
 
 body {
-	color: var(--text-color);
-	tab-size: 4;
-	overflow: auto;
-	max-width: var(--max-width);
-	margin: 0 auto;
-	padding-top: var(--page-padding);
-	padding-bottom: var(--page-padding);
-	padding-right: var(--page-padding);
-	padding-left: calc(var(--page-padding) + var(--panel-width));
-	word-break: break-word;
+  color: var(--text-color);
+  tab-size: 4;
+  overflow: auto;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-top: var(--page-padding);
+  padding-bottom: var(--page-padding);
+  padding-right: var(--page-padding);
+  padding-left: calc(var(--page-padding) + var(--panel-width));
+  word-break: break-word;
 }
 
 a {
-	color: var(--color-blue);
-	cursor: pointer;
-	text-decoration: none;
+  color: var(--color-blue);
+  cursor: pointer;
+  text-decoration: none;
 }
 
 h1 {
-	font-size: 40px;
-	line-height: 48px;
-	font-weight: normal;
-	margin-left: -2px;
-	margin-top: 16px;
-	margin-bottom: -8px;
+  font-size: 40px;
+  line-height: 48px;
+  font-weight: normal;
+  margin-left: -2px;
+  margin-top: 16px;
+  margin-bottom: -8px;
 }
 
 p {
-	margin-top: 16px;
-	margin-bottom: 16px;
-	padding-right: 16px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding-right: 16px;
 }
 
 li > p {
@@ -96,8 +97,8 @@ li > p {
 }
 
 table {
-    margin-top: 1em;
-    margin-bottom: 1em;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 .warning {
@@ -122,9 +123,9 @@ table {
 pre {
   background: rgb(143, 140, 140);
   padding: 1em;
-	position: relative;
+  position: relative;
 }
-pre>code {
+pre > code {
   white-space: inherit;
   background: none;
 }
@@ -136,8 +137,9 @@ pre.prettyprint {
 pre.prettyprint li {
   white-space: pre;
 }
-pre.prettyprint code, .dos {
-  color: #CCC;
+pre.prettyprint code,
+.dos {
+  color: #ccc;
   font-family: var(--code-block-font-family);
   display: block;
 }
@@ -157,15 +159,15 @@ div[data-diagram] {
   margin: 2em auto 3em;
 }
 .spread div[data-diagram] {
-    height: 150px;
+  height: 150px;
 }
-.spread>div {
+.spread > div {
   flex: 1 1 100%;
 }
 .spread .code {
   font-family: var(--code-font-family);
 }
-.spread .code>div {
+.spread .code > div {
   text-align: left;
 }
 #c {
@@ -183,32 +185,32 @@ div[data-diagram] {
 .lesson-comment-notes {
   padding: 1em;
   margin: 1em;
-  background: #DDD;
+  background: #ddd;
   color: red;
 }
 
-.threejs_navbar>div,
+.threejs_navbar > div,
 .lesson-comments,
 .lesson-comment-sep,
-.lesson-main>h1:not(:first-child),
-.lesson-main>h2:not(:first-child),
-.lesson-main>h3:not(:first-child),
-.lesson-main>h4:not(:first-child),
-.lesson-main>h5:not(:first-child),
-.lesson-main>h6:not(:first-child) {
-    margin-top: 1.66em;
+.lesson-main > h1:not(:first-child),
+.lesson-main > h2:not(:first-child),
+.lesson-main > h3:not(:first-child),
+.lesson-main > h4:not(:first-child),
+.lesson-main > h5:not(:first-child),
+.lesson-main > h6:not(:first-child) {
+  margin-top: 1.66em;
 }
 
-.lesson-main>.threejs_example_container {
-    max-width: 90%;
+.lesson-main > .threejs_example_container {
+  max-width: 90%;
 }
-.lesson-main>img {
+.lesson-main > img {
   width: unset;
 }
 
 .threejs_example {
-    width: 100%;
-    height: 500px;
+  width: 100%;
+  height: 500px;
 }
 .color {
   padding: 0.25em;
@@ -222,51 +224,50 @@ div[data-diagram] {
 }
 .checkerboard {
   background-color: #404040;
-  background-image:
-     linear-gradient(45deg, #808080 25%, transparent 25%),
-     linear-gradient(-45deg, #808080 25%, transparent 25%),
-     linear-gradient(45deg, transparent 75%, #808080 75%),
-     linear-gradient(-45deg, transparent 75%, #808080 75%);
+  background-image: linear-gradient(45deg, #808080 25%, transparent 25%),
+    linear-gradient(-45deg, #808080 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #808080 75%),
+    linear-gradient(-45deg, transparent 75%, #808080 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 .fullscreen {
-    position: fixed !important;
-    left: var(--panel-width);
-    top: 0;
-    width: calc(100% - var(--panel-width)) !important;
-    height: 100% !important;
-    z-index: 100;
+  position: fixed !important;
+  left: var(--panel-width);
+  top: 0;
+  width: calc(100% - var(--panel-width)) !important;
+  height: 100% !important;
+  z-index: 100;
 }
-.lesson-main>blockquote {
-    background-color: #DEF;
-    padding: 1em;
+.lesson-main > blockquote {
+  background-color: #def;
+  padding: 1em;
 }
 .lesson-sidebar {
-    font-size: small;
-    columns: 220px;
-    padding: 1em;
-    column-rule: dashed 1px #CCC;
-    background: #eee;
-    margin-bottom: 1em;
+  font-size: small;
+  columns: 220px;
+  padding: 1em;
+  column-rule: dashed 1px #ccc;
+  background: #eee;
+  margin-bottom: 1em;
 }
-.lesson-sidebar>ul>li {
-    line-height: 1.3em;
-}
-.lesson-sidebar ul {
-    line-height: 1.3em;
-    margin-bottom: 1em;
+.lesson-sidebar > ul > li {
+  line-height: 1.3em;
 }
 .lesson-sidebar ul {
-    list-style-type: none;
-    padding-left: 1em;
-    text-indent: -1em;
+  line-height: 1.3em;
+  margin-bottom: 1em;
+}
+.lesson-sidebar ul {
+  list-style-type: none;
+  padding-left: 1em;
+  text-indent: -1em;
 }
 code {
-    color: black;
-    background-color: #ddd;
-    padding: 0.1em 0.2em 0.1em 0.2em;
-    white-space: nowrap;
+  color: black;
+  background-color: #ddd;
+  padding: 0.1em 0.2em 0.1em 0.2em;
+  white-space: nowrap;
 }
 
 .threejs_table_div_center {
@@ -287,11 +288,11 @@ code {
   text-align: center;
   max-width: 95%;
 }
-.threejs_center>img,
-.threejs_center>object {
+.threejs_center > img,
+.threejs_center > object {
   max-width: 100%;
 }
-.threejs_image>img {
+.threejs_image > img {
   width: 100%;
   display: block;
 }
@@ -345,13 +346,14 @@ table.vertex_table td {
 }
 
 iframe {
-    display: block;
+  display: block;
 }
 
 iframe.body {
   height: 100%;
 }
-iframe.threejs_example, iframe.threejs_diagram {
+iframe.threejs_example,
+iframe.threejs_diagram {
   border: none;
   margin-left: auto;
   margin-right: auto;
@@ -363,7 +365,7 @@ iframe.threejs_example {
 iframe.noborder {
   border: none !important;
 }
-.threejs_example_container>div {
+.threejs_example_container > div {
   border: 1px solid black;
   margin: 0 auto;
 }
@@ -380,13 +382,13 @@ div.threejs_bottombar {
   margin-top: var(--page-padding);
   outline: var(--page-padding) solid #def;
 }
-div.threejs_bottombar>h3 {
+div.threejs_bottombar > h3 {
   font-size: x-large;
   font-weight: bold;
   margin-bottom: 1em;
 }
 div.threejs_bottombar code {
-    background-color: #ccc;
+  background-color: #ccc;
 }
 
 .dos {
@@ -395,60 +397,55 @@ div.threejs_bottombar code {
 }
 
 @media (max-width: 720px) {
-    .threejs_example {
-        max-height: 400px;
-    }
-    .threejs_example_container>div {
-        max-width: 95%;
-    }
-    .threejs_diagram_container iframe {
-      max-width: 95%;
-    }
-    iframe.background {
-        max-width: 100%;
-    }
+  .threejs_example {
+    max-height: 400px;
+  }
+  .threejs_example_container > div {
+    max-width: 95%;
+  }
+  .threejs_diagram_container iframe {
+    max-width: 95%;
+  }
+  iframe.background {
+    max-width: 100%;
+  }
 }
 
-@media all and ( min-width: 1700px ) {
+@media all and (min-width: 1700px) {
+  :root {
+    --panel-width: 360px;
+    --font-size: 18px;
+    --line-height: 28px;
+    --max-width: 880px;
+    --page-padding: 28px;
+    --icon-size: 24px;
+  }
 
-	:root {
-		--panel-width: 360px;
-		--font-size: 18px;
-		--line-height: 28px;
-		--max-width: 880px;
-		--page-padding: 28px;
-		--icon-size: 24px;
-	}
-
-	h1 {
-		font-size: 42px;
-		line-height: 50px;
-	}
-
+  h1 {
+    font-size: 42px;
+    line-height: 50px;
+  }
 }
 
-@media all and ( max-width: 640px ) {
+@media all and (max-width: 640px) {
+  :root {
+    --page-padding: 16px;
+    --icon-size: 24px;
+  }
 
-	:root {
-		--page-padding: 16px;
-		--icon-size: 24px;
-	}
+  body {
+    padding: var(--page-padding);
+  }
 
-	body {
-		padding: var(--page-padding);
-	}
-
-	h1 {
-		font-size: 28px;
-		line-height: 36px;
-		padding-right: 20px;
-		margin-top: 0;
-	}
-
+  h1 {
+    font-size: 28px;
+    line-height: 36px;
+    padding-right: 20px;
+    margin-top: 0;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
-
   html {
     scrollbar-color: hsl(0, 0%, 35%) hsl(0, 0%, 13%);
   }
@@ -457,10 +454,10 @@ div.threejs_bottombar code {
   }
   code {
     background: #666;
-    color: #CCC;
+    color: #ccc;
   }
   img {
-    background: #DDD;
+    background: #ddd;
   }
   img[src$=".svg"] {
     filter: invert(1) hue-rotate(180deg);
@@ -475,7 +472,7 @@ div.threejs_bottombar code {
   .lesson-sidebar {
     background: #222;
   }
-  .lesson-main>blockquote {
+  .lesson-main > blockquote {
     background-color: #1b1b44;
   }
   div.threejs_bottombar {
@@ -488,11 +485,10 @@ div.threejs_bottombar code {
   .lesson-comment-notes {
     background: #222;
   }
-  input[type=text] {
+  input[type="text"] {
     background: #444;
     color: white;
     border: none;
     padding: 3px;
   }
-
 }

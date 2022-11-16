@@ -2,20 +2,35 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - effects - peppers ghost</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
-
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://en.wikipedia.org/wiki/Pepper%27s_ghost">peppers ghost effect</a> demo <br />
-			<a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS" target="_blank" rel="noopener">how to build the reflective prism</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			-
+			<a href="https://en.wikipedia.org/wiki/Pepper%27s_ghost"
+				>peppers ghost effect</a
+			>
+			demo <br />
+			<a
+				href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS"
+				target="_blank"
+				rel="noopener"
+				>how to build the reflective prism</a
+			>
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -27,10 +42,9 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import { PeppersGhostEffect } from 'three/addons/effects/PeppersGhostEffect.js';
+			import { PeppersGhostEffect } from "three/addons/effects/PeppersGhostEffect.js";
 
 			let container;
 
@@ -41,16 +55,20 @@
 			animate();
 
 			function init() {
+				container = document.createElement("div");
+				document.body.appendChild(container);
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
+				camera = new THREE.PerspectiveCamera(
+					60,
+					window.innerWidth / window.innerHeight,
+					1,
+					100000
+				);
 
 				scene = new THREE.Scene();
 
 				group = new THREE.Group();
-				scene.add( group );
+				scene.add(group);
 
 				// Cube
 
@@ -62,71 +80,63 @@
 
 				// generate for each side of the cube a different color
 
-				for ( let i = 0; i < position.count; i += 6 ) {
-
-					color.setHex( Math.random() * 0xffffff );
+				for (let i = 0; i < position.count; i += 6) {
+					color.setHex(Math.random() * 0xffffff);
 
 					// first face
 
-					colors.push( color.r, color.g, color.b );
-					colors.push( color.r, color.g, color.b );
-					colors.push( color.r, color.g, color.b );
+					colors.push(color.r, color.g, color.b);
+					colors.push(color.r, color.g, color.b);
+					colors.push(color.r, color.g, color.b);
 
 					// second face
 
-					colors.push( color.r, color.g, color.b );
-					colors.push( color.r, color.g, color.b );
-					colors.push( color.r, color.g, color.b );
-
+					colors.push(color.r, color.g, color.b);
+					colors.push(color.r, color.g, color.b);
+					colors.push(color.r, color.g, color.b);
 				}
 
-				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute(
+					"color",
+					new THREE.Float32BufferAttribute(colors, 3)
+				);
 
-				const material = new THREE.MeshBasicMaterial( { vertexColors: true } );
+				const material = new THREE.MeshBasicMaterial({ vertexColors: true });
 
-				for ( let i = 0; i < 10; i ++ ) {
-
-					const cube = new THREE.Mesh( geometry, material );
+				for (let i = 0; i < 10; i++) {
+					const cube = new THREE.Mesh(geometry, material);
 					cube.position.x = Math.random() * 2 - 1;
 					cube.position.y = Math.random() * 2 - 1;
 					cube.position.z = Math.random() * 2 - 1;
-					cube.scale.multiplyScalar( Math.random() + 0.5 );
-					group.add( cube );
-
+					cube.scale.multiplyScalar(Math.random() + 0.5);
+					group.add(cube);
 				}
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				container.appendChild( renderer.domElement );
+				renderer.setPixelRatio(window.devicePixelRatio);
+				container.appendChild(renderer.domElement);
 
-				effect = new PeppersGhostEffect( renderer );
-				effect.setSize( window.innerWidth, window.innerHeight );
+				effect = new PeppersGhostEffect(renderer);
+				effect.setSize(window.innerWidth, window.innerHeight);
 				effect.cameraDistance = 5;
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				effect.setSize( window.innerWidth, window.innerHeight );
-
+				effect.setSize(window.innerWidth, window.innerHeight);
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
+				requestAnimationFrame(animate);
 
 				group.rotation.y += 0.01;
 
-				effect.render( scene, camera );
-
+				effect.render(scene, camera);
 			}
-
 		</script>
-
 	</body>
 </html>

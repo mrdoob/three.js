@@ -1,13 +1,11 @@
-import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
+import MeshStandardNodeMaterial from "./MeshStandardNodeMaterial.js";
 
-import { MeshPhysicalMaterial } from 'three';
+import { MeshPhysicalMaterial } from "three";
 
 const defaultValues = new MeshPhysicalMaterial();
 
 export default class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
-
-	constructor( parameters ) {
-
+	constructor(parameters) {
 		super();
 
 		this.isMeshPhysicalNodeMaterial = true;
@@ -36,14 +34,12 @@ export default class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.iridescence = 0;
 		this.transmission = 0;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues(defaultValues);
 
-		this.setValues( parameters );
-
+		this.setValues(parameters);
 	}
 
-	copy( source ) {
-
+	copy(source) {
 		this.clearcoatNode = source.clearcoatNode;
 		this.clearcoatRoughnessNode = source.clearcoatRoughnessNode;
 		this.clearcoatNormalNode = source.clearcoatNormalNode;
@@ -63,8 +59,6 @@ export default class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.attenuationDistanceNode = source.attenuationDistanceNode;
 		this.attenuationColorNode = source.attenuationColorNode;
 
-		return super.copy( source );
-
+		return super.copy(source);
 	}
-
 }

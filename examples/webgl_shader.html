@@ -2,14 +2,25 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - shader [Monjori]</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
-
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank" rel="noopener">Monjori by Mic</a></div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- shader demo. featuring
+			<a
+				href="http://www.pouet.net/prod.php?which=52761"
+				target="_blank"
+				rel="noopener"
+				>Monjori by Mic</a
+			>
+		</div>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -22,7 +33,6 @@
 				gl_Position = vec4( position, 1.0 );
 
 			}
-
 		</script>
 
 		<script id="fragmentShader" type="x-shader/x-fragment">
@@ -60,12 +70,14 @@
 				gl_FragColor = vec4( vec3( f * i / 1.6, i / 2.0 + d / 13.0, i ) * d * p.x + vec3( i / 1.3 + d / 8.0, i / 2.0 + d / 18.0, i ) * d * ( 1.0 - p.x ), 1.0 );
 
 			}
-
 		</script>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -77,8 +89,7 @@
 		</script>
 
 		<script type="module">
-
-			import * as THREE from 'three';
+			import * as THREE from "three";
 
 			let camera, scene, renderer;
 
@@ -88,59 +99,49 @@
 			animate();
 
 			function init() {
+				const container = document.getElementById("container");
 
-				const container = document.getElementById( 'container' );
-
-				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.PlaneGeometry( 2, 2 );
+				const geometry = new THREE.PlaneGeometry(2, 2);
 
 				uniforms = {
-					time: { value: 1.0 }
+					time: { value: 1.0 },
 				};
 
-				const material = new THREE.ShaderMaterial( {
-
+				const material = new THREE.ShaderMaterial({
 					uniforms: uniforms,
-					vertexShader: document.getElementById( 'vertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+					vertexShader: document.getElementById("vertexShader").textContent,
+					fragmentShader: document.getElementById("fragmentShader").textContent,
+				});
 
-				} );
-
-				const mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				const mesh = new THREE.Mesh(geometry, material);
+				scene.add(mesh);
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				container.appendChild( renderer.domElement );
+				renderer.setPixelRatio(window.devicePixelRatio);
+				container.appendChild(renderer.domElement);
 
 				onWindowResize();
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
 			//
 
 			function animate() {
+				requestAnimationFrame(animate);
 
-				requestAnimationFrame( animate );
+				uniforms["time"].value = performance.now() / 1000;
 
-				uniforms[ 'time' ].value = performance.now() / 1000;
-
-				renderer.render( scene, camera );
-
+				renderer.render(scene, camera);
 			}
-
 		</script>
-
 	</body>
 </html>

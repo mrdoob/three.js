@@ -2,13 +2,15 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - lightmap</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 
 	<body>
-
 		<script type="x-shader/x-vertex" id="vertexShader">
 
 			varying vec3 vWorldPosition;
@@ -21,7 +23,6 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 			}
-
 		</script>
 
 		<script type="x-shader/x-fragment" id="fragmentShader">
@@ -39,12 +40,14 @@
 				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h, 0.0 ), exponent ), 0.0 ) ), 1.0 );
 
 			}
-
 		</script>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -56,12 +59,11 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
+			import Stats from "three/addons/libs/stats.module.js";
 
-			import Stats from 'three/addons/libs/stats.module.js';
-
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 			const SCREEN_WIDTH = window.innerWidth;
 			const SCREEN_HEIGHT = window.innerHeight;
@@ -73,14 +75,18 @@
 			animate();
 
 			async function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.createElement("div");
+				document.body.appendChild(container);
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
-				camera.position.set( 700, 200, - 500 );
+				camera = new THREE.PerspectiveCamera(
+					40,
+					SCREEN_WIDTH / SCREEN_HEIGHT,
+					1,
+					10000
+				);
+				camera.position.set(700, 200, -500);
 
 				// SCENE
 
@@ -88,88 +94,84 @@
 
 				// LIGHTS
 
-				const light = new THREE.DirectionalLight( 0xaabbff, 0.3 );
+				const light = new THREE.DirectionalLight(0xaabbff, 0.3);
 				light.position.x = 300;
 				light.position.y = 250;
-				light.position.z = - 500;
-				scene.add( light );
+				light.position.z = -500;
+				scene.add(light);
 
 				// SKYDOME
 
-				const vertexShader = document.getElementById( 'vertexShader' ).textContent;
-				const fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+				const vertexShader =
+					document.getElementById("vertexShader").textContent;
+				const fragmentShader =
+					document.getElementById("fragmentShader").textContent;
 				const uniforms = {
-					topColor: { value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { value: new THREE.Color( 0xffffff ) },
+					topColor: { value: new THREE.Color(0x0077ff) },
+					bottomColor: { value: new THREE.Color(0xffffff) },
 					offset: { value: 400 },
-					exponent: { value: 0.6 }
+					exponent: { value: 0.6 },
 				};
-				uniforms.topColor.value.copy( light.color );
+				uniforms.topColor.value.copy(light.color);
 
-				const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
-				const skyMat = new THREE.ShaderMaterial( {
+				const skyGeo = new THREE.SphereGeometry(4000, 32, 15);
+				const skyMat = new THREE.ShaderMaterial({
 					uniforms: uniforms,
 					vertexShader: vertexShader,
 					fragmentShader: fragmentShader,
-					side: THREE.BackSide
-				} );
+					side: THREE.BackSide,
+				});
 
-				const sky = new THREE.Mesh( skyGeo, skyMat );
-				scene.add( sky );
+				const sky = new THREE.Mesh(skyGeo, skyMat);
+				scene.add(sky);
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+				container.appendChild(renderer.domElement);
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// CONTROLS
 
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = 0.9 * Math.PI / 2;
+				const controls = new OrbitControls(camera, renderer.domElement);
+				controls.maxPolarAngle = (0.9 * Math.PI) / 2;
 				controls.enableZoom = false;
 
 				// STATS
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				container.appendChild(stats.dom);
 
 				// MODEL
 
 				const loader = new THREE.ObjectLoader();
-				const object = await loader.loadAsync( 'models/json/lightmap/lightmap.json' );
-				scene.add( object );
+				const object = await loader.loadAsync(
+					"models/json/lightmap/lightmap.json"
+				);
+				scene.add(object);
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
 			//
 
 			function animate() {
+				requestAnimationFrame(animate);
 
-				requestAnimationFrame( animate );
-
-				renderer.render( scene, camera );
+				renderer.render(scene, camera);
 				stats.update();
-
 			}
-
 		</script>
-
 	</body>
-
 </html>

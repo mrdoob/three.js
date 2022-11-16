@@ -2,22 +2,43 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - tone mapping</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Tone Mapping<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- Tone Mapping<br />
 			Battle Damaged Sci-fi Helmet by
-			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a
+				href="https://sketchfab.com/theblueturtle_"
+				target="_blank"
+				rel="noopener"
+				>theblueturtle_</a
+			><br />
+			<a
+				href="https://hdrihaven.com/hdri/?h=venice_sunset"
+				target="_blank"
+				rel="noopener"
+				>Venice Sunset</a
+			>
+			by
+			<a href="https://hdrihaven.com/" target="_blank" rel="noopener"
+				>HDRI Haven</a
+			>
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -29,21 +50,21 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+			import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+			import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 
 			let mesh, renderer, scene, camera, controls;
-			let gui, guiExposure = null;
+			let gui,
+				guiExposure = null;
 
 			const params = {
 				exposure: 1.0,
-				toneMapping: 'ACESFilmic',
-				blurriness: 0.3
+				toneMapping: "ACESFilmic",
+				blurriness: 0.3,
 			};
 
 			const toneMappingOptions = {
@@ -52,23 +73,20 @@
 				Reinhard: THREE.ReinhardToneMapping,
 				Cineon: THREE.CineonToneMapping,
 				ACESFilmic: THREE.ACESFilmicToneMapping,
-				Custom: THREE.CustomToneMapping
+				Custom: THREE.CustomToneMapping,
 			};
 
-			init().catch( function ( err ) {
-
-				console.error( err );
-
-			} );
+			init().catch(function (err) {
+				console.error(err);
+			});
 
 			async function init() {
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
-				renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
+				renderer.toneMapping = toneMappingOptions[params.toneMapping];
 				renderer.toneMappingExposure = params.exposure;
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
@@ -76,38 +94,47 @@
 				// Set CustomToneMapping to Uncharted2
 				// source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
 
-				THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment.replace(
-					'vec3 CustomToneMapping( vec3 color ) { return color; }',
-					`#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )
+				THREE.ShaderChunk.tonemapping_pars_fragment =
+					THREE.ShaderChunk.tonemapping_pars_fragment.replace(
+						"vec3 CustomToneMapping( vec3 color ) { return color; }",
+						`#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )
 					float toneMappingWhitePoint = 1.0;
 					vec3 CustomToneMapping( vec3 color ) {
 						color *= toneMappingExposure;
 						return saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );
 					}`
-				);
+					);
 
 				scene = new THREE.Scene();
 				scene.backgroundBlurriness = params.blurriness;
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 1.8, 0.6, 2.7 );
+				camera = new THREE.PerspectiveCamera(
+					45,
+					window.innerWidth / window.innerHeight,
+					0.25,
+					20
+				);
+				camera.position.set(-1.8, 0.6, 2.7);
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls = new OrbitControls(camera, renderer.domElement);
+				controls.addEventListener("change", render); // use if there is no animation loop
 				controls.enableZoom = false;
 				controls.enablePan = false;
-				controls.target.set( 0, 0, - 0.2 );
+				controls.target.set(0, 0, -0.2);
 				controls.update();
 
-				const rgbeLoader = new RGBELoader()
-					.setPath( 'textures/equirectangular/' );
+				const rgbeLoader = new RGBELoader().setPath(
+					"textures/equirectangular/"
+				);
 
-				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+				const gltfLoader = new GLTFLoader().setPath(
+					"models/gltf/DamagedHelmet/glTF/"
+				);
 
-				const [ texture, gltf ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
-					gltfLoader.loadAsync( 'DamagedHelmet.gltf' ),
-				] );
+				const [texture, gltf] = await Promise.all([
+					rgbeLoader.loadAsync("venice_sunset_1k.hdr"),
+					gltfLoader.loadAsync("DamagedHelmet.gltf"),
+				]);
 
 				// environment
 
@@ -118,84 +145,68 @@
 
 				// model
 
-				mesh = gltf.scene.getObjectByName( 'node_damagedHelmet_-6514' );
-				scene.add( mesh );
+				mesh = gltf.scene.getObjectByName("node_damagedHelmet_-6514");
+				scene.add(mesh);
 
 				render();
 
-				window.addEventListener( 'resize', onWindowResize );
+				window.addEventListener("resize", onWindowResize);
 
 				gui = new GUI();
 
-				gui.add( params, 'toneMapping', Object.keys( toneMappingOptions ) )
+				gui
+					.add(params, "toneMapping", Object.keys(toneMappingOptions))
 
-					.onChange( function () {
-
+					.onChange(function () {
 						updateGUI();
 
-						renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
+						renderer.toneMapping = toneMappingOptions[params.toneMapping];
 						render();
+					});
 
-					} );
+				gui
+					.add(params, "blurriness", 0, 1)
 
-				gui.add( params, 'blurriness', 0, 1 )
-
-					.onChange( function ( value ) {
-
+					.onChange(function (value) {
 						scene.backgroundBlurriness = value;
 						render();
-
-					} );
+					});
 
 				updateGUI();
 
 				gui.open();
-
 			}
 
 			function updateGUI() {
-
-				if ( guiExposure !== null ) {
-
+				if (guiExposure !== null) {
 					guiExposure.destroy();
 					guiExposure = null;
-
 				}
 
-				if ( params.toneMapping !== 'None' ) {
+				if (params.toneMapping !== "None") {
+					guiExposure = gui
+						.add(params, "exposure", 0, 2)
 
-					guiExposure = gui.add( params, 'exposure', 0, 2 )
-
-						.onChange( function () {
-
+						.onChange(function () {
 							renderer.toneMappingExposure = params.exposure;
 							render();
-
-						} );
-
+						});
 				}
-
 			}
 
 			function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize(window.innerWidth, window.innerHeight);
 
 				render();
-
 			}
 
 			function render() {
-
-				renderer.render( scene, camera );
-
+				renderer.render(scene, camera);
 			}
-
 		</script>
-
 	</body>
 </html>

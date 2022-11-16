@@ -2,9 +2,12 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - worker - offscreen canvas</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 		<style>
 			body {
 				background-color: #fff;
@@ -52,21 +55,41 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - offscreen canvas (<a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas" target="_blank" rel="noopener noreferrer">about</a>)<br/>
-			<p id="message">Your browser does not support OffscreenCanvas. Check the browser support <a href="https://caniuse.com/#feat=offscreencanvas" target="_blank" rel="noopener noreferrer">here</a></p>
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer"
+				>three.js</a
+			>
+			- offscreen canvas (<a
+				href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"
+				target="_blank"
+				rel="noopener noreferrer"
+				>about</a
+			>)<br />
+			<p id="message">
+				Your browser does not support OffscreenCanvas. Check the browser support
+				<a
+					href="https://caniuse.com/#feat=offscreencanvas"
+					target="_blank"
+					rel="noopener noreferrer"
+					>here</a
+				>
+			</p>
 		</div>
 
 		<div id="container">
-			<canvas id="canvas1" style="width: 50%; height: 100%"></canvas><canvas id="canvas2" style="width: 50%; height: 100%"></canvas>
+			<canvas id="canvas1" style="width: 50%; height: 100%"></canvas
+			><canvas id="canvas2" style="width: 50%; height: 100%"></canvas>
 		</div>
 		<div id="ui">
-			<button id="button">START JANK</button><br/>
+			<button id="button">START JANK</button><br />
 			<span id="result"></span>
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -78,42 +101,41 @@
 		</script>
 
 		<script type="module">
-
-			import initJank from 'three/addons/offscreen/jank.js';
-			import init from 'three/addons/offscreen/scene.js';
+			import initJank from "three/addons/offscreen/jank.js";
+			import init from "three/addons/offscreen/scene.js";
 
 			// onscreen
 
-			const canvas1 = document.getElementById( 'canvas1' );
-			const canvas2 = document.getElementById( 'canvas2' );
+			const canvas1 = document.getElementById("canvas1");
+			const canvas2 = document.getElementById("canvas2");
 
 			const width = canvas1.clientWidth;
 			const height = canvas1.clientHeight;
 			const pixelRatio = window.devicePixelRatio;
 
-			init( canvas1, width, height, pixelRatio, './' );
+			init(canvas1, width, height, pixelRatio, "./");
 			initJank();
 
 			// offscreen
 
-			if ( 'transferControlToOffscreen' in canvas2 ) {
-
+			if ("transferControlToOffscreen" in canvas2) {
 				const offscreen = canvas2.transferControlToOffscreen();
-				const worker = new Worker( 'jsm/offscreen/offscreen.js', { type: 'module' } );
-				worker.postMessage( {
-					drawingSurface: offscreen,
-					width: canvas2.clientWidth,
-					height: canvas2.clientHeight,
-					pixelRatio: window.devicePixelRatio,
-					path: '../../'
-				}, [ offscreen ] );
-
+				const worker = new Worker("jsm/offscreen/offscreen.js", {
+					type: "module",
+				});
+				worker.postMessage(
+					{
+						drawingSurface: offscreen,
+						width: canvas2.clientWidth,
+						height: canvas2.clientHeight,
+						pixelRatio: window.devicePixelRatio,
+						path: "../../",
+					},
+					[offscreen]
+				);
 			} else {
-
-				document.getElementById( 'message' ).style.display = 'block';
-
+				document.getElementById("message").style.display = "block";
 			}
-
 		</script>
 	</body>
 </html>

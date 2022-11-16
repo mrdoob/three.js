@@ -1,84 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>加载 .gltf 文件</title>
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@threejs" />
+		<meta name="twitter:title" content="Three.js – 加载 .gltf 文件" />
+		<meta property="og:image" content="https://threejs.org/files/share.png" />
+		<link
+			rel="shortcut icon"
+			href="/files/favicon_white.ico"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<link
+			rel="shortcut icon"
+			href="/files/favicon.ico"
+			media="(prefers-color-scheme: light)"
+		/>
 
-<head>
-	<meta charset="utf-8">
-	<title>加载 .gltf 文件</title>
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<meta name="twitter:card" content="summary_large_image">
-	<meta name="twitter:site" content="@threejs">
-	<meta name="twitter:title" content="Three.js – 加载 .gltf 文件">
-	<meta property="og:image" content="https://threejs.org/files/share.png">
-	<link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-	<link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+		<link rel="stylesheet" href="/manual/resources/lesson.css" />
+		<link rel="stylesheet" href="/manual/resources/lang.css" />
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
-	<link rel="stylesheet" href="/manual/resources/lesson.css">
-	<link rel="stylesheet" href="/manual/resources/lang.css">
-	<!-- Import maps polyfill -->
-	<!-- Remove this when import maps will be widely supported -->
-	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.module.js"
+				}
+			}
+		</script>
+	</head>
 
-	<script type="importmap">
-{
-"imports": {
-	"three": "../../build/three.module.js"
-}
-}
-</script>
-</head>
+	<body>
+		<div class="container">
+			<div class="lesson-title">
+				<h1>加载 .gltf 文件</h1>
+			</div>
+			<div class="lesson">
+				<div class="lesson-main">
+					<p>
+						在上一章中,我们<a href="load-obj.html">加载 .OBJ 文件</a>.
+						如果你还没有阅读它,你可能需要先查看一下。
+					</p>
+					<p>
+						正如之前所指出的，“.OBJ 文件格式已经非常古老，并且相当简单”。
+						它没有提供任何场景图（scene
+						graph），所以所有的数据都需要加载到一个巨大的Mesh中。
+						它被设计出来主要是作为3D编辑器之间的一种简单的数据传输方式。
+					</p>
+					<p>
+						<a href="https://github.com/KhronosGroup/glTF">gLTF 格式</a>
+						是从头开始设计的一种格式，用于显示图形。 3D
+						格式可被划分为3~4中基本类型。
+					</p>
+					<ul>
+						<li>
+							<p>3D编辑器格式</p>
+							<p>
+								用于特定应用程序(主要是3D编辑器)：. .blend (Blender), .max (3d
+								Studio Max), .mb and .ma (Maya), etc...
+							</p>
+						</li>
+						<li>
+							<p>交换格式</p>
+							<p>
+								有.OBJ, .DAE (Collada),
+								.FBX.等格式。它们被设计出来用于3D编辑器之间交换信息的。因此，它们通常比所需的大得多（内含3D编辑器内所需要的信息）。
+							</p>
+						</li>
+						<li>
+							<p>应用程序格式</p>
+							<p>用于特定的应用程序:游戏</p>
+						</li>
+						<li>
+							<p>传输格式</p>
+							<p>
+								gLTF可能是第一个真正意义上的传输格式。我猜想VRML可能会被认为是第一个，但是VRML实际上是个相当糟的格式。
+							</p>
+							<p>这是gLTF被设计出来擅长做的一些事情，其他格式没有的</p>
+							<ol>
+								<li>
+									<p>体积小，适合用于传输</p>
+									<p>
+										例如：这意味着大量它们的大数据量的数据，像顶点（vertices），被存为二进制格式。当你下载.gLTF格式文件后，可以将它零处理的传入GPU。这是它准备好的。相比较之下，VRML,
+										.OBJ, or .DAE 这些格式
+										顶点（vertices）的存储和解析都是通过文本（text)。
+										文本存储的顶点位置(vertex
+										positions)大约有二进制存储的3倍到5倍大。
+									</p>
+								</li>
+								<li>
+									<p>易于被渲染（render）</p>
+									<p>
+										与其他格式（尤其是应用程序格式）另一个不同是：glTF格式文件中的数据，意味着是用于渲染（render）的，而不是用于编辑的。对渲染不重要的那部分数据大都被删除了。多边形被转为三角形。材质有其应该有的值，可以在任何地方运行。
+									</p>
+								</li>
+							</ol>
+						</li>
+					</ul>
+					<p>
+						gLTF是被特别设计的。因此你应该能轻易下载glTF文件，显示它们，很少出麻烦。祝我们好运，真是这种情况，因为没有其他格式已经能够这样做。
+					</p>
+					<p>
+						我不确定我要展示什么。在某种程度上加载和显示gLTF文件比.OBJ文件要简单。不像.OBJ文件，材质是格式的一部分。我想我需要至少加载一个.OBJ文件，我遇到的问题可能会提供一些良好的信息
+					</p>
+					<p>
+						在网上搜索我发现
+						<a
+							href="https://sketchfab.com/models/edd1c604e1e045a0a2a552ddd9a293e6"
+							>这个低模城市</a
+						>
+						作者：
+						<a href="https://sketchfab.com/antonmoek">antonmoek</a>
+						这意味着我们可以做一个好的案例。
+					</p>
+					<div class="threejs_center">
+						<img
+							src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"
+						/>
+					</div>
 
-<body>
-	<div class="container">
-		<div class="lesson-title">
-			<h1>加载 .gltf 文件</h1>
-		</div>
-		<div class="lesson">
-			<div class="lesson-main">
-				<p>在上一章中,我们<a href="load-obj.html">加载 .OBJ 文件</a>. 如果你还没有阅读它,你可能需要先查看一下。</p>
-				<p>正如之前所指出的，“.OBJ 文件格式已经非常古老，并且相当简单”。
-					它没有提供任何场景图（scene graph），所以所有的数据都需要加载到一个巨大的Mesh中。 它被设计出来主要是作为3D编辑器之间的一种简单的数据传输方式。</p>
-				<p><a href="https://github.com/KhronosGroup/glTF">gLTF 格式</a> 是从头开始设计的一种格式，用于显示图形。 3D 格式可被划分为3~4中基本类型。 </p>
-				<ul>
-					<li>
-						<p>3D编辑器格式</p>
-						<p>用于特定应用程序(主要是3D编辑器)：. .blend (Blender), .max (3d Studio Max), .mb and .ma (Maya), etc...</p>
-					</li>
-					<li>
-						<p>交换格式</p>
-						<p>有.OBJ, .DAE (Collada), .FBX.等格式。它们被设计出来用于3D编辑器之间交换信息的。因此，它们通常比所需的大得多（内含3D编辑器内所需要的信息）。</p>
-					</li>
-					<li>
-						<p>应用程序格式</p>
-						<p>用于特定的应用程序:游戏</p>
-					</li>
-					<li>
-						<p>传输格式</p>
-						<p>gLTF可能是第一个真正意义上的传输格式。我猜想VRML可能会被认为是第一个，但是VRML实际上是个相当糟的格式。</p>
-						<p>这是gLTF被设计出来擅长做的一些事情，其他格式没有的</p>
-						<ol>
-							<li>
-								<p>体积小，适合用于传输</p>
-								<p>例如：这意味着大量它们的大数据量的数据，像顶点（vertices），被存为二进制格式。当你下载.gLTF格式文件后，可以将它零处理的传入GPU。这是它准备好的。相比较之下，VRML, .OBJ, or
-									.DAE 这些格式 顶点（vertices）的存储和解析都是通过文本（text)。 文本存储的顶点位置(vertex positions)大约有二进制存储的3倍到5倍大。</p>
-							</li>
-							<li>
-								<p>易于被渲染（render）</p>
-								<p>
-									与其他格式（尤其是应用程序格式）另一个不同是：glTF格式文件中的数据，意味着是用于渲染（render）的，而不是用于编辑的。对渲染不重要的那部分数据大都被删除了。多边形被转为三角形。材质有其应该有的值，可以在任何地方运行。
-								</p>
-							</li>
-						</ol>
-					</li>
-				</ul>
-				<p>gLTF是被特别设计的。因此你应该能轻易下载glTF文件，显示它们，很少出麻烦。祝我们好运，真是这种情况，因为没有其他格式已经能够这样做。</p>
-				<p>我不确定我要展示什么。在某种程度上加载和显示gLTF文件比.OBJ文件要简单。不像.OBJ文件，材质是格式的一部分。我想我需要至少加载一个.OBJ文件，我遇到的问题可能会提供一些良好的信息</p>
-				<p>在网上搜索我发现 <a href="https://sketchfab.com/models/edd1c604e1e045a0a2a552ddd9a293e6">这个低模城市</a>
-					作者： <a href="https://sketchfab.com/antonmoek">antonmoek</a> 这意味着我们可以做一个好的案例。</p>
-				<div class="threejs_center"><img src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"></div>
-
-				<p><a href="load-obj.html">an example from the .OBJ article</a>从这里开始，我删除了加载.OBJ的代码 ，替换为加载.gLTF的</p>
-				<p>旧.OBJ代码</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mtlLoader = new MTLLoader();
+					<p>
+						<a href="load-obj.html">an example from the .OBJ article</a
+						>从这里开始，我删除了加载.OBJ的代码 ，替换为加载.gLTF的
+					</p>
+					<p>旧.OBJ代码</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const mtlLoader = new MTLLoader();
 mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 mtl.preload();
 mtl.materials.Material.side = THREE.DoubleSide;
@@ -89,9 +149,14 @@ objLoader.load('resources/models/windmill/windmill.obj', (event) =&gt; {
 	...
 });
 });
-</pre>
-				<p>新.GLTF代码</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+</pre
+					>
+					<p>新.GLTF代码</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+{
 const gltfLoader = new GLTFLoader();
 const url = 'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf';
 gltfLoader.load(url, (gltf) =&gt; {
@@ -99,31 +164,63 @@ gltfLoader.load(url, (gltf) =&gt; {
 	scene.add(root);
 	...
 });
-</pre>
-				<p>我像以前一样保持自动框架代码</p>
-				<p>我们需要包含 <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate"
-							translate="no">GLTFLoader</code></a> 并删除 <a href="/docs/#examples/loaders/OBJLoader"><code
-							class="notranslate" translate="no">OBJLoader</code></a>.</p>
-				<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
+</pre
+					>
+					<p>我像以前一样保持自动框架代码</p>
+					<p>
+						我们需要包含
+						<a href="/docs/#examples/loaders/GLTFLoader"
+							><code class="notranslate" translate="no">GLTFLoader</code></a
+						>
+						并删除
+						<a href="/docs/#examples/loaders/OBJLoader"
+							><code class="notranslate" translate="no">OBJLoader</code></a
+						>.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-html"
+						translate="no"
+					>
+-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
 -import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 -import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
 +import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-</pre>
-				<p>像这样运行</p>
-				<p></p>
-				<div translate="no" class="threejs_example_container notranslate">
-					<div><iframe class="threejs_example notranslate" translate="no" style=" "
-							src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"></iframe></div>
-					<a class="threejs_center" href="/manual/examples/load-gltf.html" target="_blank">点击这里在其他窗口打开</a>
-				</div>
+</pre
+					>
+					<p>像这样运行</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/load-gltf.html"
+							target="_blank"
+							>点击这里在其他窗口打开</a
+						>
+					</div>
 
-				<p></p>
-				<p>神奇吧！它工作了，纹理和其他都工作了。</p>
-				<p>然后，我想看看我能否给汽车添加绕圈动画（animate），我得检查场景有没有这些汽车的分离的实体，还得检查场景有没有一条路可以用。</p>
-				<p>我写了一些代码将场景图（scenegraph）打印到 <a href="debugging-javascript.html">JavaScript
-						console</a>.</p>
-				<p>打印场景图（scenegraph）代码</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+					<p></p>
+					<p>神奇吧！它工作了，纹理和其他都工作了。</p>
+					<p>
+						然后，我想看看我能否给汽车添加绕圈动画（animate），我得检查场景有没有这些汽车的分离的实体，还得检查场景有没有一条路可以用。
+					</p>
+					<p>
+						我写了一些代码将场景图（scenegraph）打印到
+						<a href="debugging-javascript.html">JavaScript console</a>.
+					</p>
+					<p>打印场景图（scenegraph）代码</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+function dumpObject(obj, lines = [], isLast = true, prefix = '') {
 const localPrefix = isLast ? '└─' : '├─';
 lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
 const newPrefix = prefix + (isLast ? '  ' : '│ ');
@@ -134,16 +231,31 @@ obj.children.forEach((child, ndx) =&gt; {
 });
 return lines;
 }
-</pre>
-				<p>我将在场景加载完时调用</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
+</pre
+					>
+					<p>我将在场景加载完时调用</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const gltfLoader = new GLTFLoader();
 gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
 const root = gltf.scene;
 scene.add(root);
 console.log(dumpObject(root).join('\n'));
-</pre>
-				<p><a href="../examples/load-gltf-dump-scenegraph.html">Running that</a> 获得清单</p>
-				<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+</pre
+					>
+					<p>
+						<a href="../examples/load-gltf-dump-scenegraph.html"
+							>Running that</a
+						>
+						获得清单
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-text"
+						translate="no"
+					>
+OSG_Scene [Scene]
 └─RootNode_(gltf_orientation_matrix) [Object3D]
 	└─RootNode_(model_correction_matrix) [Object3D]
 		└─4d4100bcb1c640e69699a87140df79d7fbx [Object3D]
@@ -181,29 +293,56 @@ console.log(dumpObject(root).join('\n'));
 				│ ├─Car_04_2_2 [Object3D]
 				│ │ └─Car_04_2_2_World_ap_0 [Mesh]
 				...
-</pre>
-				<p>从这里我们可以看到所有的汽车，都在它们父节点<code class="notranslate" translate="no">"Cars"</code>中</p>
-				<pre class="prettyprint showlinemods notranslate lang-text" translate="no">*          ├─Cars [Object3D]
+</pre
+					>
+					<p>
+						从这里我们可以看到所有的汽车，都在它们父节点<code
+							class="notranslate"
+							translate="no"
+							>"Cars"</code
+						>中
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-text"
+						translate="no"
+					>
+*          ├─Cars [Object3D]
 				│ ├─CAR_03_1 [Object3D]
 				│ │ └─CAR_03_1_World_ap_0 [Mesh]
 				│ ├─CAR_03 [Object3D]
 				│ │ └─CAR_03_World_ap_0 [Mesh]
 				│ ├─Car_04 [Object3D]
 				│ │ └─Car_04_World_ap_0 [Mesh]
-</pre>
-				<p>做一个简单的测试，我尝试将这些"Cars"节点的子节点绕它们的Y轴旋转。</p>
-				<p>在加载场景后，我查找了“Cars”节点并保存了结果。</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let cars;
+</pre
+					>
+					<p>
+						做一个简单的测试，我尝试将这些"Cars"节点的子节点绕它们的Y轴旋转。
+					</p>
+					<p>在加载场景后，我查找了“Cars”节点并保存了结果。</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
++let cars;
 {
 const gltfLoader = new GLTFLoader();
 gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
 	const root = gltf.scene;
 	scene.add(root);
 +    cars = root.getObjectByName('Cars');
-</pre>
-				<p>然后在<code class="notranslate" translate="no">render</code> render函数中我们可以设置<code class="notranslate"
-						translate="no">cars</code>Cars每个子节点旋转。</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function render(time) {
+</pre
+					>
+					<p>
+						然后在<code class="notranslate" translate="no">render</code>
+						render函数中我们可以设置<code class="notranslate" translate="no"
+							>cars</code
+						>Cars每个子节点旋转。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
++function render(time) {
 +  time *= 0.001;  // convert to seconds
 
 if (resizeRendererToDisplaySize(renderer)) {
@@ -222,36 +361,72 @@ renderer.render(scene, camera);
 
 requestAnimationFrame(render);
 }
-</pre>
-				<p>于是我们得到</p>
-				<p></p>
-				<div translate="no" class="threejs_example_container notranslate">
-					<div><iframe class="threejs_example notranslate" translate="no" style=" "
-							src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"></iframe>
+</pre
+					>
+					<p>于是我们得到</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/load-gltf-rotate-cars.html"
+							target="_blank"
+							>click here to open in a separate window</a
+						>
 					</div>
-					<a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars.html" target="_blank">click here to
-						open in a separate window</a>
-				</div>
 
-				<p></p>
-				<p>呃~，看起来很不幸，这场景没有设计汽车动画，因为他们当初不是用于此目的的。这卡车在错误的方向旋转。</p>
-				<p>这引出一个很重要的点，当你把东西做成3D时，你需要预先计划并设计你的资源（assets），让它们拥有能正确使用的初始功能。所以它们应该有正确的比例...</p>
-				<p>因为我不是艺术家，我不懂blender，我只能hack这个例子。我们将把每辆车，和它们的父节点，放到另一个
-					<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>.
-					我们将移动这些 <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no"> Object3D</code></a>
-					的对象去移动车，但是我们可以设置汽车的原始<a href="/docs/#api/en/core/Object3D"><code class="notranslate"
-							translate="no">Object3D</code></a>
-					重新定位它，所以它是关于我们真正需要的地方。
-				</p>
-				<p>回顾下场景图（scene graph）看起来只有三种车，Car_08", "CAR_03", and "Car_04"。每种汽车都会使用相同的调整。</p>
-				<p>我给每个汽车都写了代码，将它们的父节点换成新的
-					<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, 将新
-					<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 添加到场景,
-					应用于每种 <em>类型</em>的车的设置，修正它的朝向。 增加新的
-					<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> a
-					<code class="notranslate" translate="no">cars</code> array.
-				</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
+					<p></p>
+					<p>
+						呃~，看起来很不幸，这场景没有设计汽车动画，因为他们当初不是用于此目的的。这卡车在错误的方向旋转。
+					</p>
+					<p>
+						这引出一个很重要的点，当你把东西做成3D时，你需要预先计划并设计你的资源（assets），让它们拥有能正确使用的初始功能。所以它们应该有正确的比例...
+					</p>
+					<p>
+						因为我不是艺术家，我不懂blender，我只能hack这个例子。我们将把每辆车，和它们的父节点，放到另一个
+						<a href="/docs/#api/en/core/Object3D"
+							><code class="notranslate" translate="no">Object3D</code></a
+						>. 我们将移动这些
+						<a href="/docs/#api/en/core/Object3D"
+							><code class="notranslate" translate="no"> Object3D</code></a
+						>
+						的对象去移动车，但是我们可以设置汽车的原始<a
+							href="/docs/#api/en/core/Object3D"
+							><code class="notranslate" translate="no">Object3D</code></a
+						>
+						重新定位它，所以它是关于我们真正需要的地方。
+					</p>
+					<p>
+						回顾下场景图（scene graph）看起来只有三种车，Car_08", "CAR_03", and
+						"Car_04"。每种汽车都会使用相同的调整。
+					</p>
+					<p>
+						我给每个汽车都写了代码，将它们的父节点换成新的
+						<a href="/docs/#api/en/core/Object3D"
+							><code class="notranslate" translate="no">Object3D</code></a
+						>, 将新
+						<a href="/docs/#api/en/core/Object3D"
+							><code class="notranslate" translate="no">Object3D</code></a
+						>
+						添加到场景, 应用于每种 <em>类型</em>的车的设置，修正它的朝向。
+						增加新的
+						<a href="/docs/#api/en/core/Object3D"
+							><code class="notranslate" translate="no">Object3D</code></a
+						>
+						a <code class="notranslate" translate="no">cars</code> array.
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+-let cars;
 +const cars = [];
 {
 const gltfLoader = new GLTFLoader();
@@ -279,29 +454,56 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 +      cars.push(obj);
 +    }
 	 ...
-</pre>
-				<p>这些修正朝向的车 </p>
-				<p></p>
-				<div translate="no" class="threejs_example_container notranslate">
-					<div><iframe class="threejs_example notranslate" translate="no" style=" "
-							src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"></iframe>
+</pre
+					>
+					<p>这些修正朝向的车</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/load-gltf-rotate-cars-fixed.html"
+							target="_blank"
+							>click here to open in a separate window</a
+						>
 					</div>
-					<a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars-fixed.html" target="_blank">click here
-						to open in a separate window</a>
-				</div>
 
-				<p></p>
-				<p>现在让我们驾驶着它们绕圈</p>
-				<p>制作一个简单的驾驶系统对这篇文章来说太多了，但作为代替我们可以做一个基于所有道路做一个弯曲路径，然后放置车到路上。下面的图是blender创建的路径。</p>
-				<div class="threejs_center"><img src="../resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
+					<p></p>
+					<p>现在让我们驾驶着它们绕圈</p>
+					<p>
+						制作一个简单的驾驶系统对这篇文章来说太多了，但作为代替我们可以做一个基于所有道路做一个弯曲路径，然后放置车到路上。下面的图是blender创建的路径。
+					</p>
+					<div class="threejs_center">
+						<img
+							src="../resources/images/making-path-for-cars.jpg"
+							style="width: 1094px"
+						/>
+					</div>
 
-				<p>我需要一种方式在Blender之外花去路径数据的方法
-					幸运的是，我能选择我的路径并通过"write nurbs"导出.OBJ</p>
-				<div class="threejs_center"><img src="../resources/images/blender-export-obj-write-nurbs.jpg"
-						style="width: 498px"></div>
+					<p>
+						我需要一种方式在Blender之外花去路径数据的方法
+						幸运的是，我能选择我的路径并通过"write nurbs"导出.OBJ
+					</p>
+					<div class="threejs_center">
+						<img
+							src="../resources/images/blender-export-obj-write-nurbs.jpg"
+							style="width: 498px"
+						/>
+					</div>
 
-				<p>打开.OBJ文件我能够获取点列表,我格式化后</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controlPoints = [
+					<p>打开.OBJ文件我能够获取点列表,我格式化后</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const controlPoints = [
 [1.118281, 5.115846, -3.681386],
 [3.948875, 5.115846, -3.641834],
 [3.960072, 5.115846, -0.240352],
@@ -324,22 +526,48 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 [-5.373599, 5.115846, -3.704133],
 [1.004861, 5.115846, -3.641834],
 ];
-</pre>
-				<p>THREE.js有几个曲线（curve）的类。 <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate"
-							translate="no">CatmullRomCurve3</code></a> 那种曲线的事情是尝试通过这些点进行平滑的曲线</p>
-				<p>事实上直接提供这些点会生成这样的曲线</p>
-				<div class="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
+</pre
+					>
+					<p>
+						THREE.js有几个曲线（curve）的类。
+						<a href="/docs/#api/en/extras/curves/CatmullRomCurve3"
+							><code class="notranslate" translate="no"
+								>CatmullRomCurve3</code
+							></a
+						>
+						那种曲线的事情是尝试通过这些点进行平滑的曲线
+					</p>
+					<p>事实上直接提供这些点会生成这样的曲线</p>
+					<div class="threejs_center">
+						<img
+							src="../resources/images/car-curves-before.png"
+							style="width: 400px"
+						/>
+					</div>
 
-				<p>但是，我想要更尖锐的转角。如果我们计算了一些额外的点，我们可以得到我们想要的东西。
-					每两对点之间,我们需要在两点之间的10%处和90%处计算额外的两个点，并将它们传递给
-					<a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate"
-							translate="no">CatmullRomCurve3</code></a>.
-				</p>
-				<p>这会得到这样的曲线</p>
-				<div class="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
+					<p>
+						但是，我想要更尖锐的转角。如果我们计算了一些额外的点，我们可以得到我们想要的东西。
+						每两对点之间,我们需要在两点之间的10%处和90%处计算额外的两个点，并将它们传递给
+						<a href="/docs/#api/en/extras/curves/CatmullRomCurve3"
+							><code class="notranslate" translate="no"
+								>CatmullRomCurve3</code
+							></a
+						>.
+					</p>
+					<p>这会得到这样的曲线</p>
+					<div class="threejs_center">
+						<img
+							src="../resources/images/car-curves-after.png"
+							style="width: 400px"
+						/>
+					</div>
 
-				<p>曲线代码 </p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let curve;
+					<p>曲线代码</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+let curve;
 let curveObject;
 {
 const controlPoints = [
@@ -387,36 +615,64 @@ curve = new THREE.CatmullRomCurve3(
 	scene.add(curveObject);
 }
 }
-</pre>
-				<p>
-					代码第一部分是创建了曲线。
-					代码第二部分是从曲线生成了250个点，然后创建了一个对象来显示这些点连起来的线。
-				</p>
-				<p>运行 <a href="../examples/load-gltf-car-path.html">the example</a>
-					我没有看见曲线。 为了让它可见我关闭了深度测试，并最后渲染它</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    curveObject = new THREE.Line(geometry, material);
+</pre
+					>
+					<p>
+						代码第一部分是创建了曲线。
+						代码第二部分是从曲线生成了250个点，然后创建了一个对象来显示这些点连起来的线。
+					</p>
+					<p>
+						运行
+						<a href="../examples/load-gltf-car-path.html">the example</a>
+						我没有看见曲线。 为了让它可见我关闭了深度测试，并最后渲染它
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+    curveObject = new THREE.Line(geometry, material);
 +    material.depthTest = false;
 +    curveObject.renderOrder = 1;
-</pre>
-				<p>我发现路线实在太小了</p>
-				<div class="threejs_center"><img src="../resources/images/car-curves-too-small.png" style="width: 498px"></div>
+</pre
+					>
+					<p>我发现路线实在太小了</p>
+					<div class="threejs_center">
+						<img
+							src="../resources/images/car-curves-too-small.png"
+							style="width: 498px"
+						/>
+					</div>
 
-				<p>检查Blender中的层次结构我发现艺术家缩放了节点所有汽车。</p>
-				<div class="threejs_center"><img src="../resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
+					<p>检查Blender中的层次结构我发现艺术家缩放了节点所有汽车。</p>
+					<div class="threejs_center">
+						<img
+							src="../resources/images/cars-scale-0.01.png"
+							style="width: 342px"
+						/>
+					</div>
 
-				<p>缩放对于实时3D应用程序是十分糟糕的。这会到这各种各样的问题，并且会以无休止的沮丧结束。
-					艺术家经常不知道这些，因为在3D编辑程序中缩放整个场景是非常容易的。
-					但是，如果你决定要做实时3D应用程序，我建议要求你的艺术家/设计人员不要缩放任何东西。
-					如果他们修改了scale，他们必须找到一种方式应用于缩放后的顶点。这样你就能，在导入程序后不用管缩放了。</p>
-				<p>还有, 不仅是缩放, 在这个例子中，车辆是通过父节点缩放，偏移的。 <code class="notranslate" translate="no">Cars</code> 节点.
-					这将让在世界空间中实时移动车辆变得非常困难。
-					清楚地说，这个例子中，我们能希望车辆绕着世界空间开，这就会带来问题。
-					如果有些东西地数据处理在局部空间，如月球绕着地球转，就很少带来问题。
-				</p>
-				<p>
-					回到我写地打印场景图地方法。
-					让我们每个节点打印 位置， 旋转， 缩放 。</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dumpVec3(v3, precision = 3) {
+					<p>
+						缩放对于实时3D应用程序是十分糟糕的。这会到这各种各样的问题，并且会以无休止的沮丧结束。
+						艺术家经常不知道这些，因为在3D编辑程序中缩放整个场景是非常容易的。
+						但是，如果你决定要做实时3D应用程序，我建议要求你的艺术家/设计人员不要缩放任何东西。
+						如果他们修改了scale，他们必须找到一种方式应用于缩放后的顶点。这样你就能，在导入程序后不用管缩放了。
+					</p>
+					<p>
+						还有, 不仅是缩放, 在这个例子中，车辆是通过父节点缩放，偏移的。
+						<code class="notranslate" translate="no">Cars</code> 节点.
+						这将让在世界空间中实时移动车辆变得非常困难。
+						清楚地说，这个例子中，我们能希望车辆绕着世界空间开，这就会带来问题。
+						如果有些东西地数据处理在局部空间，如月球绕着地球转，就很少带来问题。
+					</p>
+					<p>
+						回到我写地打印场景图地方法。 让我们每个节点打印 位置， 旋转， 缩放
+						。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
++function dumpVec3(v3, precision = 3) {
 +  return `${v3.x.toFixed(precision)}, ${v3.y.toFixed(precision)}, ${v3.z.toFixed(precision)}`;
 +}
 
@@ -437,9 +693,17 @@ obj.children.forEach((child, ndx) =&gt; {
 });
 return lines;
 }
-</pre>
-				<p><a href="../examples/load-gltf-dump-scenegraph-extra.html">运行</a>的结果 </p>
-				<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+</pre
+					>
+					<p>
+						<a href="../examples/load-gltf-dump-scenegraph-extra.html">运行</a
+						>的结果
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-text"
+						translate="no"
+					>
+OSG_Scene [Scene]
 │   pos: 0.000, 0.000, 0.000
 │   rot: 0.000, 0.000, 0.000
 │   scl: 1.000, 1.000, 1.000
@@ -471,13 +735,24 @@ return lines;
 				│ │       pos: 0.000, 0.000, 0.000
 				│ │       rot: 0.000, 0.000, 0.000
 				│ │       scl: 1.000, 1.000, 1.000
-</pre>
-				<p>这向我们展示了原始场景中的 <code class="notranslate" translate="no">Cars</code>
-					已移除其旋转和缩放并应用于其子节点。
-					这表明用于创建 .GLTF 文件的导出器在这里做了一些特殊的处理，或者艺术家更可能导出了与相应 .blend 文件不同的文件版本，这就是它们不匹配的原因。</p>
-				<p>这意味着,我可能需要亲自下载这个.blend文件并导出它。导出它之前，我需要检查所有主要节点，并移除它的任何变换。</p>
-				<p>顶部的所有节点</p>
-				<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+</pre
+					>
+					<p>
+						这向我们展示了原始场景中的
+						<code class="notranslate" translate="no">Cars</code>
+						已移除其旋转和缩放并应用于其子节点。 这表明用于创建 .GLTF
+						文件的导出器在这里做了一些特殊的处理，或者艺术家更可能导出了与相应
+						.blend 文件不同的文件版本，这就是它们不匹配的原因。
+					</p>
+					<p>
+						这意味着,我可能需要亲自下载这个.blend文件并导出它。导出它之前，我需要检查所有主要节点，并移除它的任何变换。
+					</p>
+					<p>顶部的所有节点</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-text"
+						translate="no"
+					>
+OSG_Scene [Scene]
 │   pos: 0.000, 0.000, 0.000
 │   rot: 0.000, 0.000, 0.000
 │   scl: 1.000, 1.000, 1.000
@@ -493,17 +768,26 @@ return lines;
 			│   pos: 0.000, 0.000, 0.000
 			│   rot: 1.571, 0.000, 0.000
 			│   scl: 1.000, 1.000, 1.000
-</pre>
-				<p>也是浪费。</p>
-				<p>理想情况下，场景将由一个没有位置、旋转或缩放的“根”节点组成。
-					在运行时，我可以将所有子节点从该根中拉出，并将它们作为场景本身的父级。
-					可能有像“Cars”这样的根的子节点，它可以帮助我找到所有的汽车，但理想情况下它也没有平移、旋转或缩放，因此我可以用最少的工作将汽车重新设置为场景。
-				</p>
-				<p>
-					在任何情况下，最快速的（虽然可能不是最好的）修复，就是只调整用于显示曲线的对象。</p>
-				<p>这是我完成后的</p>
-				<p>首先，我调整了曲线的位置，然后发现了可以正常显示的数值，接着我把它隐藏了。</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+</pre
+					>
+					<p>也是浪费。</p>
+					<p>
+						理想情况下，场景将由一个没有位置、旋转或缩放的“根”节点组成。
+						在运行时，我可以将所有子节点从该根中拉出，并将它们作为场景本身的父级。
+						可能有像“Cars”这样的根的子节点，它可以帮助我找到所有的汽车，但理想情况下它也没有平移、旋转或缩放，因此我可以用最少的工作将汽车重新设置为场景。
+					</p>
+					<p>
+						在任何情况下，最快速的（虽然可能不是最好的）修复，就是只调整用于显示曲线的对象。
+					</p>
+					<p>这是我完成后的</p>
+					<p>
+						首先，我调整了曲线的位置，然后发现了可以正常显示的数值，接着我把它隐藏了。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+{
 const points = curve.getPoints(250);
 const geometry = new THREE.BufferGeometry().setFromPoints(points);
 const material = new THREE.LineBasicMaterial({color: 0xff0000});
@@ -515,12 +799,20 @@ material.depthTest = false;
 curveObject.renderOrder = 1;
 scene.add(curveObject);
 }
-</pre>
-				<p>然后，我写了代码来沿着曲线移动汽车。
-					给每辆车选取曲线上的从0到1的位置，用 <code class="notranslate" translate="no">curveObject</code>对象变换计算出一个世界空间的点
-					接下来，我们选取曲线远一点的点。
-					使用<code class="notranslate" translate="no">lookAt</code> 设置汽车的朝向 并将汽车放置在两点重点。</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+</pre
+					>
+					<p>
+						然后，我写了代码来沿着曲线移动汽车。
+						给每辆车选取曲线上的从0到1的位置，用
+						<code class="notranslate" translate="no">curveObject</code
+						>对象变换计算出一个世界空间的点 接下来，我们选取曲线远一点的点。
+						使用<code class="notranslate" translate="no">lookAt</code>
+						设置汽车的朝向 并将汽车放置在两点重点。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
 // 创建两个向量用于路径计算 
 const carPosition = new THREE.Vector3();
 const carTarget = new THREE.Vector3();
@@ -556,10 +848,16 @@ function render(time) {
 +      car.position.lerpVectors(carPosition, carTarget, 0.5);
 +    });
 +  }
-</pre>
-				<p>
-					当我运行它时，我发现每种汽车车，它们的高度都不是固定的，所以我要给每种车调整一下。</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loadedCars = root.getObjectByName('Cars');
+</pre
+					>
+					<p>
+						当我运行它时，我发现每种汽车车，它们的高度都不是固定的，所以我要给每种车调整一下。
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const loadedCars = root.getObjectByName('Cars');
 const fixes = [
 -  { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
 -  { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
@@ -581,27 +879,46 @@ obj.add(car);
 scene.add(obj);
 cars.push(obj);
 }
-</pre>
-				<p>结果是</p>
-				<p></p>
-				<div translate="no" class="threejs_example_container notranslate">
-					<div><iframe class="threejs_example notranslate" translate="no" style=" "
-							src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"></iframe>
+</pre
+					>
+					<p>结果是</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/load-gltf-animated-cars.html"
+							target="_blank"
+							>click here to open in a separate window</a
+						>
 					</div>
-					<a class="threejs_center" href="/manual/examples/load-gltf-animated-cars.html" target="_blank">click here to
-						open in a separate window</a>
-				</div>
 
-				<p></p>
-				<p>几分钟运行的还不错</p>
-				<p>最后我想做的是开启阴影</p>
-				<p>我获取了所有
-					<a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate"
-							translate="no">DirectionalLight</code></a>的GUI代码，
-					<a href="shadows.html">the article on shadows</a>中的阴影实例 。并粘贴到最新代码
-				</p>
-				<p>加载完之后，我们需要开启所有物体的阴影</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+					<p></p>
+					<p>几分钟运行的还不错</p>
+					<p>最后我想做的是开启阴影</p>
+					<p>
+						我获取了所有
+						<a href="/docs/#api/en/lights/DirectionalLight"
+							><code class="notranslate" translate="no"
+								>DirectionalLight</code
+							></a
+						>的GUI代码，
+						<a href="shadows.html">the article on shadows</a>中的阴影实例
+						。并粘贴到最新代码
+					</p>
+					<p>加载完之后，我们需要开启所有物体的阴影</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+{
 const gltfLoader = new GLTFLoader();
 gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
 	const root = gltf.scene;
@@ -613,14 +930,30 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 +        obj.receiveShadow = true;
 +      }
 +    });
-</pre>
-				<p>我花了将近4小时，尝试搞清楚为啥shadow helpers不工作。因为我忘记了用以下代码开启阴影</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">renderer.shadowMap.enabled = true;
-</pre>
-				<p>😭</p>
-				<p>I then adjusted the values until our <code class="notranslate" translate="no">DirectionLight</code>的阴影
-					相机的视锥能覆盖所有场景。 我最后完成的设置</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+</pre
+					>
+					<p>
+						我花了将近4小时，尝试搞清楚为啥shadow
+						helpers不工作。因为我忘记了用以下代码开启阴影
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+renderer.shadowMap.enabled = true;
+</pre
+					>
+					<p>😭</p>
+					<p>
+						I then adjusted the values until our
+						<code class="notranslate" translate="no">DirectionLight</code>的阴影
+						相机的视锥能覆盖所有场景。 我最后完成的设置
+					</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+{
 const color = 0xFFFFFF;
 const intensity = 1;
 const light = new THREE.DirectionalLight(color, intensity);
@@ -642,48 +975,63 @@ scene.add(light.target);
 +  cam.top = 1500;
 +  cam.bottom = -1500;
 ...
-</pre>
-				<p>我设置背景为蓝色</p>
-				<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+</pre
+					>
+					<p>我设置背景为蓝色</p>
+					<pre
+						class="prettyprint showlinemods notranslate lang-js"
+						translate="no"
+					>
+const scene = new THREE.Scene();
 -scene.background = new THREE.Color('black');
 +scene.background = new THREE.Color('#DEFEFF');
-</pre>
-				<p>阴影</p>
-				<p></p>
-				<div translate="no" class="threejs_example_container notranslate">
-					<div><iframe class="threejs_example notranslate" translate="no" style=" "
-							src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"></iframe></div>
-					<a class="threejs_center" href="/manual/examples/load-gltf-shadows.html" target="_blank">click here to open in
-						a separate window</a>
+</pre
+					>
+					<p>阴影</p>
+					<p></p>
+					<div translate="no" class="threejs_example_container notranslate">
+						<div>
+							<iframe
+								class="threejs_example notranslate"
+								translate="no"
+								style=""
+								src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"
+							></iframe>
+						</div>
+						<a
+							class="threejs_center"
+							href="/manual/examples/load-gltf-shadows.html"
+							target="_blank"
+							>click here to open in a separate window</a
+						>
+					</div>
+
+					<p></p>
+					<p>
+						我希望详细讲完这个工程是有用的，并且能作为
+						在使用场景图（scenegraph）加载文件时
+						解决一些问题（issues）很好的案例。
+					</p>
+					<p>
+						有一件趣事，当对比.blend文件时与.gltf文件时，.blend
+						文件有多个灯光（lights），但加载到场景中后它们不是灯光（lights）
+						一个.GLTF文件只是JSON文件，因此你能查看它内部。
+						它由几个数组构成（scenes，nodes,
+						meshes,accessors,materials...），数组中每一项都通过索引来引用其他项。
+						虽然工作中有扩展，但它们指出了几乎所有 3d 格式的问题。
+						<strong>它们无法涵盖任何情况</strong>.
+					</p>
+					<p>
+						总是需要更多的数据。 例如，我们手动导出的车辆绕着跑的路径。
+						理想的情况是，这些信息可以成为GLTF文件。但是这么做。我们需要自己写导出器，以及一些如何标记节点以了解我们希望它们如何导出或使用命名方案或类似的东西来从我们使用的任何工具获取数据
+						用于将数据创建到我们的应用程序中。
+					</p>
+					<p>所有这些练习都留给了读者了。</p>
 				</div>
-
-				<p></p>
-				<p>我希望详细讲完这个工程是有用的，并且能作为 在使用场景图（scenegraph）加载文件时 解决一些问题（issues）很好的案例。
-				</p>
-				<p>
-					有一件趣事，当对比.blend文件时与.gltf文件时，.blend 文件有多个灯光（lights），但加载到场景中后它们不是灯光（lights）
-					一个.GLTF文件只是JSON文件，因此你能查看它内部。
-					它由几个数组构成（scenes，nodes, meshes,accessors,materials...），数组中每一项都通过索引来引用其他项。
-					虽然工作中有扩展，但它们指出了几乎所有 3d 格式的问题。
-					<strong>它们无法涵盖任何情况</strong>.
-				</p>
-				<p>
-					总是需要更多的数据。
-					例如，我们手动导出的车辆绕着跑的路径。
-					理想的情况是，这些信息可以成为GLTF文件。但是这么做。我们需要自己写导出器，以及一些如何标记节点以了解我们希望它们如何导出或使用命名方案或类似的东西来从我们使用的任何工具获取数据 用于将数据创建到我们的应用程序中。
-				</p>
-				<p>所有这些练习都留给了读者了。</p>
-
 			</div>
 		</div>
-	</div>
 
-	<script src="/manual/resources/prettify.js"></script>
-	<script src="/manual/resources/lesson.js"></script>
-
-
-
-
-</body>
-
+		<script src="/manual/resources/prettify.js"></script>
+		<script src="/manual/resources/lesson.js"></script>
+	</body>
 </html>

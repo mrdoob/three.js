@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command } from "../Command.js";
 
 /**
  * @param editor Editor
@@ -8,47 +8,37 @@ import { Command } from '../Command.js';
  * @constructor
  */
 class SetValueCommand extends Command {
+	constructor(editor, object, attributeName, newValue) {
+		super(editor);
 
-	constructor( editor, object, attributeName, newValue ) {
-
-		super( editor );
-
-		this.type = 'SetValueCommand';
+		this.type = "SetValueCommand";
 		this.name = `Set ${attributeName}`;
 		this.updatable = true;
 
 		this.object = object;
 		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? object[ attributeName ] : undefined;
+		this.oldValue = object !== undefined ? object[attributeName] : undefined;
 		this.newValue = newValue;
-
 	}
 
 	execute() {
-
-		this.object[ this.attributeName ] = this.newValue;
-		this.editor.signals.objectChanged.dispatch( this.object );
+		this.object[this.attributeName] = this.newValue;
+		this.editor.signals.objectChanged.dispatch(this.object);
 		// this.editor.signals.sceneGraphChanged.dispatch();
-
 	}
 
 	undo() {
-
-		this.object[ this.attributeName ] = this.oldValue;
-		this.editor.signals.objectChanged.dispatch( this.object );
+		this.object[this.attributeName] = this.oldValue;
+		this.editor.signals.objectChanged.dispatch(this.object);
 		// this.editor.signals.sceneGraphChanged.dispatch();
-
 	}
 
-	update( cmd ) {
-
+	update(cmd) {
 		this.newValue = cmd.newValue;
-
 	}
 
 	toJSON() {
-
-		const output = super.toJSON( this );
+		const output = super.toJSON(this);
 
 		output.objectUuid = this.object.uuid;
 		output.attributeName = this.attributeName;
@@ -56,20 +46,16 @@ class SetValueCommand extends Command {
 		output.newValue = this.newValue;
 
 		return output;
-
 	}
 
-	fromJSON( json ) {
-
-		super.fromJSON( json );
+	fromJSON(json) {
+		super.fromJSON(json);
 
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
-		this.object = this.editor.objectByUuid( json.objectUuid );
-
+		this.object = this.editor.objectByUuid(json.objectUuid);
 	}
-
 }
 
 export { SetValueCommand };

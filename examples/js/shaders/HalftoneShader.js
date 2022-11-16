@@ -1,55 +1,54 @@
-( function () {
-
+(function () {
 	/**
- * RGB Halftone shader for three.js.
- *	NOTE:
- * 		Shape (1 = Dot, 2 = Ellipse, 3 = Line, 4 = Square)
- *		Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
- */
+	 * RGB Halftone shader for three.js.
+	 *	NOTE:
+	 * 		Shape (1 = Dot, 2 = Ellipse, 3 = Line, 4 = Square)
+	 *		Blending Mode (1 = Linear, 2 = Multiply, 3 = Add, 4 = Lighter, 5 = Darker)
+	 */
 
 	const HalftoneShader = {
 		uniforms: {
-			'tDiffuse': {
-				value: null
+			tDiffuse: {
+				value: null,
 			},
-			'shape': {
-				value: 1
+			shape: {
+				value: 1,
 			},
-			'radius': {
-				value: 4
+			radius: {
+				value: 4,
 			},
-			'rotateR': {
-				value: Math.PI / 12 * 1
+			rotateR: {
+				value: (Math.PI / 12) * 1,
 			},
-			'rotateG': {
-				value: Math.PI / 12 * 2
+			rotateG: {
+				value: (Math.PI / 12) * 2,
 			},
-			'rotateB': {
-				value: Math.PI / 12 * 3
+			rotateB: {
+				value: (Math.PI / 12) * 3,
 			},
-			'scatter': {
-				value: 0
+			scatter: {
+				value: 0,
 			},
-			'width': {
-				value: 1
+			width: {
+				value: 1,
 			},
-			'height': {
-				value: 1
+			height: {
+				value: 1,
 			},
-			'blending': {
-				value: 1
+			blending: {
+				value: 1,
 			},
-			'blendingMode': {
-				value: 1
+			blendingMode: {
+				value: 1,
 			},
-			'greyscale': {
-				value: false
+			greyscale: {
+				value: false,
 			},
-			'disable': {
-				value: false
-			}
+			disable: {
+				value: false,
+			},
 		},
-		vertexShader: /* glsl */`
+		vertexShader: /* glsl */ `
 
 		varying vec2 vUV;
 
@@ -59,7 +58,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
 		}`,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 
 		#define SQRT2_MINUS_ONE 0.41421356
 		#define SQRT2_HALF_MINUS_ONE 0.20710678
@@ -328,9 +327,8 @@
 
 			}
 
-		}`
+		}`,
 	};
 
 	THREE.HalftoneShader = HalftoneShader;
-
-} )();
+})();

@@ -3,15 +3,12 @@
  */
 
 const CopyShader = {
-
 	uniforms: {
-
-		'tDiffuse': { value: null },
-		'opacity': { value: 1.0 }
-
+		tDiffuse: { value: null },
+		opacity: { value: 1.0 },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -22,7 +19,7 @@ const CopyShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		uniform float opacity;
 
@@ -36,8 +33,7 @@ const CopyShader = {
 			gl_FragColor.a *= opacity;
 
 
-		}`
-
+		}`,
 };
 
 export { CopyShader };

@@ -2,19 +2,28 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - simple global illumination</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
-
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- simple global illumination (<a
+				href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm"
+				>article</a
+			>)
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -26,39 +35,34 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 			class GIMesh extends THREE.Mesh {
-
-				copy( source ) {
-
-					super.copy( source );
+				copy(source) {
+					super.copy(source);
 
 					this.geometry = source.geometry.clone();
 
 					return this;
-
 				}
-
 			}
 
 			//
 
-			const SimpleGI = function ( renderer, scene ) {
+			const SimpleGI = function (renderer, scene) {
+				const SIZE = 32,
+					SIZE2 = SIZE * SIZE;
 
-				const SIZE = 32, SIZE2 = SIZE * SIZE;
+				const camera = new THREE.PerspectiveCamera(90, 1, 0.01, 100);
 
-				const camera = new THREE.PerspectiveCamera( 90, 1, 0.01, 100 );
-
-				scene.updateMatrixWorld( true );
+				scene.updateMatrixWorld(true);
 
 				let clone = scene.clone();
 				clone.autoUpdate = false;
 
-				const rt = new THREE.WebGLRenderTarget( SIZE, SIZE );
+				const rt = new THREE.WebGLRenderTarget(SIZE, SIZE);
 
 				const normalMatrix = new THREE.Matrix3();
 
@@ -68,25 +72,27 @@
 				let bounces = 0;
 				let currentVertex = 0;
 
-				const color = new Float32Array( 3 );
-				const buffer = new Uint8Array( SIZE2 * 4 );
+				const color = new Float32Array(3);
+				const buffer = new Uint8Array(SIZE2 * 4);
 
 				function compute() {
+					if (bounces === 3) return;
 
-					if ( bounces === 3 ) return;
-
-					const object = scene.children[ 0 ]; // torusKnot
+					const object = scene.children[0]; // torusKnot
 					const geometry = object.geometry;
 
 					const attributes = geometry.attributes;
 					const positions = attributes.position.array;
 					const normals = attributes.normal.array;
 
-					if ( attributes.color === undefined ) {
-
-						const colors = new Float32Array( positions.length );
-						geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ).setUsage( THREE.DynamicDrawUsage ) );
-
+					if (attributes.color === undefined) {
+						const colors = new Float32Array(positions.length);
+						geometry.setAttribute(
+							"color",
+							new THREE.BufferAttribute(colors, 3).setUsage(
+								THREE.DynamicDrawUsage
+							)
+						);
 					}
 
 					const colors = attributes.color.array;
@@ -94,64 +100,59 @@
 					const startVertex = currentVertex;
 					const totalVertex = positions.length / 3;
 
-					for ( let i = 0; i < 32; i ++ ) {
+					for (let i = 0; i < 32; i++) {
+						if (currentVertex >= totalVertex) break;
 
-						if ( currentVertex >= totalVertex ) break;
+						position.fromArray(positions, currentVertex * 3);
+						position.applyMatrix4(object.matrixWorld);
 
-						position.fromArray( positions, currentVertex * 3 );
-						position.applyMatrix4( object.matrixWorld );
+						normal.fromArray(normals, currentVertex * 3);
+						normal
+							.applyMatrix3(normalMatrix.getNormalMatrix(object.matrixWorld))
+							.normalize();
 
-						normal.fromArray( normals, currentVertex * 3 );
-						normal.applyMatrix3( normalMatrix.getNormalMatrix( object.matrixWorld ) ).normalize();
+						camera.position.copy(position);
+						camera.lookAt(position.add(normal));
 
-						camera.position.copy( position );
-						camera.lookAt( position.add( normal ) );
+						renderer.setRenderTarget(rt);
+						renderer.render(clone, camera);
 
-						renderer.setRenderTarget( rt );
-						renderer.render( clone, camera );
+						renderer.readRenderTargetPixels(rt, 0, 0, SIZE, SIZE, buffer);
 
-						renderer.readRenderTargetPixels( rt, 0, 0, SIZE, SIZE, buffer );
+						color[0] = 0;
+						color[1] = 0;
+						color[2] = 0;
 
-						color[ 0 ] = 0;
-						color[ 1 ] = 0;
-						color[ 2 ] = 0;
-
-						for ( let k = 0, kl = buffer.length; k < kl; k += 4 ) {
-
-							color[ 0 ] += buffer[ k + 0 ];
-							color[ 1 ] += buffer[ k + 1 ];
-							color[ 2 ] += buffer[ k + 2 ];
-
+						for (let k = 0, kl = buffer.length; k < kl; k += 4) {
+							color[0] += buffer[k + 0];
+							color[1] += buffer[k + 1];
+							color[2] += buffer[k + 2];
 						}
 
-						colors[ currentVertex * 3 + 0 ] = color[ 0 ] / ( SIZE2 * 255 );
-						colors[ currentVertex * 3 + 1 ] = color[ 1 ] / ( SIZE2 * 255 );
-						colors[ currentVertex * 3 + 2 ] = color[ 2 ] / ( SIZE2 * 255 );
+						colors[currentVertex * 3 + 0] = color[0] / (SIZE2 * 255);
+						colors[currentVertex * 3 + 1] = color[1] / (SIZE2 * 255);
+						colors[currentVertex * 3 + 2] = color[2] / (SIZE2 * 255);
 
-						currentVertex ++;
-
+						currentVertex++;
 					}
 
 					attributes.color.updateRange.offset = startVertex * 3;
-					attributes.color.updateRange.count = ( currentVertex - startVertex ) * 3;
+					attributes.color.updateRange.count =
+						(currentVertex - startVertex) * 3;
 					attributes.color.needsUpdate = true;
 
-					if ( currentVertex >= totalVertex ) {
-
+					if (currentVertex >= totalVertex) {
 						clone = scene.clone();
 						clone.autoUpdate = false;
 
-						bounces ++;
+						bounces++;
 						currentVertex = 0;
-
 					}
 
-					requestAnimationFrame( compute );
-
+					requestAnimationFrame(compute);
 				}
 
-				requestAnimationFrame( compute );
-
+				requestAnimationFrame(compute);
 			};
 
 			//
@@ -162,71 +163,77 @@
 			animate();
 
 			function init() {
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera = new THREE.PerspectiveCamera(
+					70,
+					window.innerWidth / window.innerHeight,
+					0.1,
+					100
+				);
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
 
 				// torus knot
 
-				const torusGeometry = new THREE.TorusKnotGeometry( 0.75, 0.3, 128, 32, 1 );
-				const material = new THREE.MeshBasicMaterial( { vertexColors: true } );
+				const torusGeometry = new THREE.TorusKnotGeometry(
+					0.75,
+					0.3,
+					128,
+					32,
+					1
+				);
+				const material = new THREE.MeshBasicMaterial({ vertexColors: true });
 
-				const torusKnot = new GIMesh( torusGeometry, material );
-				scene.add( torusKnot );
+				const torusKnot = new GIMesh(torusGeometry, material);
+				scene.add(torusKnot);
 
 				// room
 
 				const materials = [];
 
-				for ( let i = 0; i < 8; i ++ ) {
-
-					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.BackSide } ) );
-
+				for (let i = 0; i < 8; i++) {
+					materials.push(
+						new THREE.MeshBasicMaterial({
+							color: Math.random() * 0xffffff,
+							side: THREE.BackSide,
+						})
+					);
 				}
 
-				const boxGeometry = new THREE.BoxGeometry( 3, 3, 3 );
+				const boxGeometry = new THREE.BoxGeometry(3, 3, 3);
 
-				const box = new THREE.Mesh( boxGeometry, materials );
-				scene.add( box );
+				const box = new THREE.Mesh(boxGeometry, materials);
+				scene.add(box);
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
 
-				new SimpleGI( renderer, scene );
+				new SimpleGI(renderer, scene);
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls(camera, renderer.domElement);
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
 			function animate() {
+				requestAnimationFrame(animate);
 
-				requestAnimationFrame( animate );
-
-				renderer.setRenderTarget( null );
-				renderer.render( scene, camera );
-
+				renderer.setRenderTarget(null);
+				renderer.render(scene, camera);
 			}
-
 		</script>
-
 	</body>
 </html>

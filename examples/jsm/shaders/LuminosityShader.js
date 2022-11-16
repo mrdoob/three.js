@@ -4,14 +4,11 @@
  */
 
 const LuminosityShader = {
-
 	uniforms: {
-
-		'tDiffuse': { value: null }
-
+		tDiffuse: { value: null },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -23,7 +20,7 @@ const LuminosityShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		#include <common>
 
@@ -39,8 +36,7 @@ const LuminosityShader = {
 
 			gl_FragColor = vec4( l, l, l, texel.w );
 
-		}`
-
+		}`,
 };
 
 export { LuminosityShader };

@@ -1,94 +1,66 @@
-import Node from './Node.js';
-import VaryingNode from './VaryingNode.js';
+import Node from "./Node.js";
+import VaryingNode from "./VaryingNode.js";
 
 class AttributeNode extends Node {
-
-	constructor( attributeName, nodeType = null ) {
-
-		super( nodeType );
+	constructor(attributeName, nodeType = null) {
+		super(nodeType);
 
 		this._attributeName = attributeName;
-
 	}
 
-	getHash( builder ) {
-
-		return this.getAttributeName( builder );
-
+	getHash(builder) {
+		return this.getAttributeName(builder);
 	}
 
-	getNodeType( builder ) {
+	getNodeType(builder) {
+		const attributeName = this.getAttributeName(builder);
 
-		const attributeName = this.getAttributeName( builder );
+		let nodeType = super.getNodeType(builder);
 
-		let nodeType = super.getNodeType( builder );
+		if (nodeType === null) {
+			if (builder.hasGeometryAttribute(attributeName)) {
+				const attribute = builder.geometry.getAttribute(attributeName);
 
-		if ( nodeType === null ) {
-
-			if ( builder.hasGeometryAttribute( attributeName ) ) {
-
-				const attribute = builder.geometry.getAttribute( attributeName );
-
-				nodeType = builder.getTypeFromLength( attribute.itemSize );
-
+				nodeType = builder.getTypeFromLength(attribute.itemSize);
 			} else {
-
-				nodeType = 'float';
-
+				nodeType = "float";
 			}
-
 		}
 
 		return nodeType;
-
 	}
 
-	setAttributeName( attributeName ) {
-
+	setAttributeName(attributeName) {
 		this._attributeName = attributeName;
 
 		return this;
-
 	}
 
-	getAttributeName( /*builder*/ ) {
-
+	getAttributeName(/*builder*/) {
 		return this._attributeName;
-
 	}
 
-	generate( builder ) {
+	generate(builder) {
+		const attributeName = this.getAttributeName(builder);
+		const nodeType = this.getNodeType(builder);
+		const geometryAttribute = builder.hasGeometryAttribute(attributeName);
 
-		const attributeName = this.getAttributeName( builder );
-		const nodeType = this.getNodeType( builder );
-		const geometryAttribute = builder.hasGeometryAttribute( attributeName );
+		if (geometryAttribute === true) {
+			const nodeAttribute = builder.getAttribute(attributeName, nodeType);
 
-		if ( geometryAttribute === true ) {
-
-			const nodeAttribute = builder.getAttribute( attributeName, nodeType );
-
-			if ( builder.isShaderStage( 'vertex' ) ) {
-
+			if (builder.isShaderStage("vertex")) {
 				return nodeAttribute.name;
-
 			} else {
+				const nodeVarying = new VaryingNode(this);
 
-				const nodeVarying = new VaryingNode( this );
-
-				return nodeVarying.build( builder, nodeAttribute.type );
-
+				return nodeVarying.build(builder, nodeAttribute.type);
 			}
-
 		} else {
+			console.warn(`Attribute "${attributeName}" not found.`);
 
-			console.warn( `Attribute "${ attributeName }" not found.` );
-
-			return builder.getConst( nodeType );
-
+			return builder.getConst(nodeType);
 		}
-
 	}
-
 }
 
 export default AttributeNode;

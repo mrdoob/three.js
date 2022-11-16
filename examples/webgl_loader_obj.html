@@ -2,19 +2,26 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - loaders - OBJ loader</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- OBJLoader test
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -26,16 +33,16 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 
 			let container;
 
 			let camera, scene, renderer;
 
-			let mouseX = 0, mouseY = 0;
+			let mouseX = 0,
+				mouseY = 0;
 
 			let windowHalfX = window.innerWidth / 2;
 			let windowHalfY = window.innerHeight / 2;
@@ -45,125 +52,114 @@
 			init();
 			animate();
 
-
 			function init() {
+				container = document.createElement("div");
+				document.body.appendChild(container);
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera(
+					45,
+					window.innerWidth / window.innerHeight,
+					1,
+					2000
+				);
 				camera.position.z = 250;
 
 				// scene
 
 				scene = new THREE.Scene();
 
-				const ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-				scene.add( ambientLight );
+				const ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+				scene.add(ambientLight);
 
-				const pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-				camera.add( pointLight );
-				scene.add( camera );
+				const pointLight = new THREE.PointLight(0xffffff, 0.8);
+				camera.add(pointLight);
+				scene.add(camera);
 
 				// manager
 
 				function loadModel() {
+					object.traverse(function (child) {
+						if (child.isMesh) child.material.map = texture;
+					});
 
-					object.traverse( function ( child ) {
-
-						if ( child.isMesh ) child.material.map = texture;
-
-					} );
-
-					object.position.y = - 95;
-					scene.add( object );
-
+					object.position.y = -95;
+					scene.add(object);
 				}
 
-				const manager = new THREE.LoadingManager( loadModel );
+				const manager = new THREE.LoadingManager(loadModel);
 
 				// texture
 
-				const textureLoader = new THREE.TextureLoader( manager );
-				const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
+				const textureLoader = new THREE.TextureLoader(manager);
+				const texture = textureLoader.load("textures/uv_grid_opengl.jpg");
 
 				// model
 
-				function onProgress( xhr ) {
-
-					if ( xhr.lengthComputable ) {
-
-						const percentComplete = xhr.loaded / xhr.total * 100;
-						console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
-
+				function onProgress(xhr) {
+					if (xhr.lengthComputable) {
+						const percentComplete = (xhr.loaded / xhr.total) * 100;
+						console.log(
+							"model " + Math.round(percentComplete, 2) + "% downloaded"
+						);
 					}
-
 				}
 
 				function onError() {}
 
-				const loader = new OBJLoader( manager );
-				loader.load( 'models/obj/male02/male02.obj', function ( obj ) {
-
-					object = obj;
-
-				}, onProgress, onError );
+				const loader = new OBJLoader(manager);
+				loader.load(
+					"models/obj/male02/male02.obj",
+					function (obj) {
+						object = obj;
+					},
+					onProgress,
+					onError
+				);
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				document.addEventListener("mousemove", onDocumentMouseMove);
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				windowHalfX = window.innerWidth / 2;
 				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.setSize(window.innerWidth, window.innerHeight);
 			}
 
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
-
+			function onDocumentMouseMove(event) {
+				mouseX = (event.clientX - windowHalfX) / 2;
+				mouseY = (event.clientY - windowHalfY) / 2;
 			}
 
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
+				requestAnimationFrame(animate);
 				render();
-
 			}
 
 			function render() {
+				camera.position.x += (mouseX - camera.position.x) * 0.05;
+				camera.position.y += (-mouseY - camera.position.y) * 0.05;
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt(scene.position);
 
-				camera.lookAt( scene.position );
-
-				renderer.render( scene, camera );
-
+				renderer.render(scene, camera);
 			}
-
 		</script>
-
 	</body>
 </html>

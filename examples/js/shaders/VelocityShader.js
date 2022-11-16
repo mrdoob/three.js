@@ -1,22 +1,25 @@
-( function () {
-
+(function () {
 	/**
- * Mesh Velocity Shader @bhouston
- */
+	 * Mesh Velocity Shader @bhouston
+	 */
 
 	const VelocityShader = {
-		uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.common, THREE.UniformsLib.displacementmap, {
-			modelMatrixPrev: {
-				value: new THREE.Matrix4()
+		uniforms: THREE.UniformsUtils.merge([
+			THREE.UniformsLib.common,
+			THREE.UniformsLib.displacementmap,
+			{
+				modelMatrixPrev: {
+					value: new THREE.Matrix4(),
+				},
+				currentProjectionViewMatrix: {
+					value: new THREE.Matrix4(),
+				},
+				previousProjectionViewMatrix: {
+					value: new THREE.Matrix4(),
+				},
 			},
-			currentProjectionViewMatrix: {
-				value: new THREE.Matrix4()
-			},
-			previousProjectionViewMatrix: {
-				value: new THREE.Matrix4()
-			}
-		} ] ),
-		vertexShader: /* glsl */`
+		]),
+		vertexShader: /* glsl */ `
 #define NORMAL
 
 #if defined( FLAT_SHADED ) || defined( USE_BUMPMAP ) || defined( TANGENTSPACE_NORMALMAP )
@@ -81,7 +84,7 @@ void main() {
 	#include <clipping_planes_vertex>
 }
 `,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 #define NORMAL
 
 uniform float opacity;
@@ -118,9 +121,8 @@ void main() {
 
 }
 
-`
+`,
 	};
 
 	THREE.VelocityShader = VelocityShader;
-
-} )();
+})();

@@ -7,15 +7,12 @@
  */
 
 const ACESFilmicToneMappingShader = {
-
 	uniforms: {
-
-		'tDiffuse': { value: null },
-		'exposure': { value: 1.0 }
-
+		tDiffuse: { value: null },
+		exposure: { value: 1.0 },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -26,7 +23,7 @@ const ACESFilmicToneMappingShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		#define saturate(a) clamp( a, 0.0, 1.0 )
 
@@ -80,8 +77,7 @@ const ACESFilmicToneMappingShader = {
 
 			gl_FragColor = vec4( ACESFilmicToneMapping( tex.rgb ), tex.a );
 
-		}`
-
+		}`,
 };
 
 export { ACESFilmicToneMappingShader };

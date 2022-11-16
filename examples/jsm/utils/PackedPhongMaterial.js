@@ -1,4 +1,3 @@
-
 /**
  * `PackedPhongMaterial` inherited from THREE.MeshPhongMaterial
  *
@@ -9,31 +8,27 @@ import {
 	ShaderChunk,
 	ShaderLib,
 	UniformsUtils,
-} from 'three';
+} from "three";
 
 class PackedPhongMaterial extends MeshPhongMaterial {
-
-	constructor( parameters ) {
-
+	constructor(parameters) {
 		super();
 
 		this.defines = {};
-		this.type = 'PackedPhongMaterial';
-		this.uniforms = UniformsUtils.merge( [
-
+		this.type = "PackedPhongMaterial";
+		this.uniforms = UniformsUtils.merge([
 			ShaderLib.phong.uniforms,
 
 			{
 				quantizeMatPos: { value: null },
-				quantizeMatUV: { value: null }
-			}
-
-		] );
+				quantizeMatUV: { value: null },
+			},
+		]);
 
 		this.vertexShader = [
-			'#define PHONG',
+			"#define PHONG",
 
-			'varying vec3 vViewPosition;',
+			"varying vec3 vViewPosition;",
 
 			ShaderChunk.common,
 			ShaderChunk.uv_pars_vertex,
@@ -112,7 +107,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 					#endif
 				#endif`,
 
-			'void main() {',
+			"void main() {",
 
 			ShaderChunk.uv_vertex,
 
@@ -156,25 +151,25 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			ShaderChunk.logdepthbuf_vertex,
 			ShaderChunk.clipping_planes_vertex,
 
-			'vViewPosition = - mvPosition.xyz;',
+			"vViewPosition = - mvPosition.xyz;",
 
 			ShaderChunk.worldpos_vertex,
 			ShaderChunk.envmap_vertex,
 			ShaderChunk.shadowmap_vertex,
 			ShaderChunk.fog_vertex,
 
-			'}',
-		].join( '\n' );
+			"}",
+		].join("\n");
 
 		// Use the original MeshPhongMaterial's fragmentShader.
 		this.fragmentShader = [
-			'#define PHONG',
+			"#define PHONG",
 
-			'uniform vec3 diffuse;',
-			'uniform vec3 emissive;',
-			'uniform vec3 specular;',
-			'uniform float shininess;',
-			'uniform float opacity;',
+			"uniform vec3 diffuse;",
+			"uniform vec3 emissive;",
+			"uniform vec3 specular;",
+			"uniform float shininess;",
+			"uniform float opacity;",
 
 			ShaderChunk.common,
 			ShaderChunk.packing,
@@ -201,13 +196,13 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			ShaderChunk.logdepthbuf_pars_fragment,
 			ShaderChunk.clipping_planes_pars_fragment,
 
-			'void main() {',
+			"void main() {",
 
 			ShaderChunk.clipping_planes_fragment,
 
-			'vec4 diffuseColor = vec4( diffuse, opacity );',
-			'ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );',
-			'vec3 totalEmissiveRadiance = emissive;',
+			"vec4 diffuseColor = vec4( diffuse, opacity );",
+			"ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
+			"vec3 totalEmissiveRadiance = emissive;",
 
 			ShaderChunk.logdepthbuf_fragment,
 			ShaderChunk.map_fragment,
@@ -228,24 +223,22 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			// modulation
 			ShaderChunk.aomap_fragment,
 
-			'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;',
+			"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
 
 			ShaderChunk.envmap_fragment,
 
-			'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
+			"gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
 
 			ShaderChunk.tonemapping_fragment,
 			ShaderChunk.encodings_fragment,
 			ShaderChunk.fog_fragment,
 			ShaderChunk.premultiplied_alpha_fragment,
 			ShaderChunk.dithering_fragment,
-			'}',
-		].join( '\n' );
+			"}",
+		].join("\n");
 
-		this.setValues( parameters );
-
+		this.setValues(parameters);
 	}
-
 }
 
 export { PackedPhongMaterial };

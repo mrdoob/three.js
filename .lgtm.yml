@@ -9,5 +9,5 @@ path_classifiers:
     - exclude: /
   docs:
     - exclude: /
-  generated: 
+  generated:
     - "build/*.*"

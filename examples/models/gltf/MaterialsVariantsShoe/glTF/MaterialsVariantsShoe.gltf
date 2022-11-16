@@ -6,16 +6,8 @@
       "count": 13540,
       "componentType": 5126,
       "type": "VEC3",
-      "min": [
-        -0.999970018863678,
-        -1,
-        -0.9999949932098388
-      ],
-      "max": [
-        0.999809980392456,
-        0.9999020099639891,
-        0.9999240040779114
-      ]
+      "min": [-0.999970018863678, -1, -0.9999949932098388],
+      "max": [0.999809980392456, 0.9999020099639891, 0.9999240040779114]
     },
     {
       "bufferView": 1,
@@ -23,16 +15,8 @@
       "count": 13540,
       "componentType": 5126,
       "type": "VEC3",
-      "min": [
-        -1,
-        -0.5139704942703247,
-        -0.38874176144599915
-      ],
-      "max": [
-        1.0000001192092896,
-        0.5139704942703247,
-        0.38874176144599915
-      ]
+      "min": [-1, -0.5139704942703247, -0.38874176144599915],
+      "max": [1.0000001192092896, 0.5139704942703247, 0.38874176144599915]
     },
     {
       "bufferView": 2,
@@ -40,14 +24,8 @@
       "count": 13540,
       "componentType": 5126,
       "type": "VEC2",
-      "min": [
-        0.001952999969944358,
-        0.03520399332046509
-      ],
-      "max": [
-        0.9980469942092896,
-        0.9980469942092896
-      ]
+      "min": [0.001952999969944358, 0.03520399332046509],
+      "max": [0.9980469942092896, 0.9980469942092896]
     },
     {
       "bufferView": 3,
@@ -55,12 +33,8 @@
       "count": 68100,
       "componentType": 5125,
       "type": "SCALAR",
-      "min": [
-        0
-      ],
-      "max": [
-        13539
-      ]
+      "min": [0],
+      "max": [13539]
     }
   ],
   "asset": {
@@ -107,15 +81,13 @@
   "extensions": {
     "KHR_materials_variants": {
       "variants": [
-          {"name": "midnight"},
-          {"name": "beach" },
-          {"name": "street" }
-        ]
+        { "name": "midnight" },
+        { "name": "beach" },
+        { "name": "street" }
+      ]
     }
   },
-  "extensionsUsed": [
-    "KHR_materials_variants"
-  ],
+  "extensionsUsed": ["KHR_materials_variants"],
   "images": [
     {
       "mimeType": "image/jpeg",
@@ -144,12 +116,7 @@
       "doubleSided": false,
       "name": "phong1SG",
       "pbrMetallicRoughness": {
-        "baseColorFactor": [
-          1,
-          1,
-          1,
-          1
-        ],
+        "baseColorFactor": [1, 1, 1, 1],
         "baseColorTexture": {
           "index": 1,
           "texCoord": 0
@@ -171,23 +138,14 @@
         "strength": 1,
         "texCoord": 0
       },
-      "emissiveFactor": [
-        0,
-        0,
-        0
-      ]
+      "emissiveFactor": [0, 0, 0]
     },
     {
       "alphaMode": "OPAQUE",
       "doubleSided": false,
       "name": "phong1SG",
       "pbrMetallicRoughness": {
-        "baseColorFactor": [
-          1,
-          1,
-          1,
-          1
-        ],
+        "baseColorFactor": [1, 1, 1, 1],
         "baseColorTexture": {
           "index": 3,
           "texCoord": 0
@@ -209,23 +167,14 @@
         "strength": 1,
         "texCoord": 0
       },
-      "emissiveFactor": [
-        0,
-        0,
-        0
-      ]
+      "emissiveFactor": [0, 0, 0]
     },
     {
       "alphaMode": "OPAQUE",
       "doubleSided": false,
       "name": "phong1SG",
       "pbrMetallicRoughness": {
-        "baseColorFactor": [
-          1,
-          1,
-          1,
-          1
-        ],
+        "baseColorFactor": [1, 1, 1, 1],
         "baseColorTexture": {
           "index": 4,
           "texCoord": 0
@@ -247,11 +196,7 @@
         "strength": 1,
         "texCoord": 0
       },
-      "emissiveFactor": [
-        0,
-        0,
-        0
-      ]
+      "emissiveFactor": [0, 0, 0]
     }
   ],
   "meshes": [
@@ -269,21 +214,15 @@
               "mappings": [
                 {
                   "material": 0,
-                  "variants": [
-                    0
-                  ]
+                  "variants": [0]
                 },
                 {
                   "material": 1,
-                  "variants": [
-                    1
-                  ]
+                  "variants": [1]
                 },
                 {
                   "material": 2,
-                  "variants": [
-                    2
-                  ]
+                  "variants": [2]
                 }
               ]
             }
@@ -304,38 +243,20 @@
       "name": "Shoe"
     },
     {
-      "children": [
-        0
-      ],
+      "children": [0],
       "extras": {
         "name": "g Shoe"
       },
       "name": "g_Shoe"
     },
     {
-      "children": [
-        1
-      ],
+      "children": [1],
       "extras": {
         "name": "Shoe.obj"
       },
       "matrix": [
-        0.14893949,
-        0,
-        0,
-        0,
-        0,
-        0.14893949,
-        0,
-        0,
-        0,
-        0,
-        0.14893949,
-        0,
-        0.0016104877,
-        0.07590251,
-        0.0048509985,
-        1
+        0.14893949, 0, 0, 0, 0, 0.14893949, 0, 0, 0, 0, 0.14893949, 0,
+        0.0016104877, 0.07590251, 0.0048509985, 1
       ],
       "name": "Shoeobj"
     }
@@ -363,9 +284,7 @@
   "scenes": [
     {
       "name": "Scene",
-      "nodes": [
-        2
-      ]
+      "nodes": [2]
     }
   ],
   "textures": [

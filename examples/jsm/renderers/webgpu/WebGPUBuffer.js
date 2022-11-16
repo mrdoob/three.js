@@ -1,11 +1,9 @@
-import WebGPUBinding from './WebGPUBinding.js';
-import { getFloatLength } from './WebGPUBufferUtils.js';
+import WebGPUBinding from "./WebGPUBinding.js";
+import { getFloatLength } from "./WebGPUBufferUtils.js";
 
 class WebGPUBuffer extends WebGPUBinding {
-
-	constructor( name, type, buffer = null ) {
-
-		super( name );
+	constructor(name, type, buffer = null) {
+		super(name);
 
 		this.isBuffer = true;
 
@@ -17,27 +15,19 @@ class WebGPUBuffer extends WebGPUBinding {
 
 		this.buffer = buffer;
 		this.bufferGPU = null; // set by the renderer
-
 	}
 
 	getByteLength() {
-
-		return getFloatLength( this.buffer.byteLength );
-
+		return getFloatLength(this.buffer.byteLength);
 	}
 
 	getBuffer() {
-
 		return this.buffer;
-
 	}
 
 	update() {
-
 		return true;
-
 	}
-
 }
 
 export default WebGPUBuffer;

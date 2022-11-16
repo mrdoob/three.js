@@ -1,6 +1,4 @@
-import {
-	Vector2
-} from 'three';
+import { Vector2 } from "three";
 
 /**
  * Convolution shader
@@ -8,23 +6,18 @@ import {
  */
 
 const ConvolutionShader = {
-
 	defines: {
-
-		'KERNEL_SIZE_FLOAT': '25.0',
-		'KERNEL_SIZE_INT': '25'
-
+		KERNEL_SIZE_FLOAT: "25.0",
+		KERNEL_SIZE_INT: "25",
 	},
 
 	uniforms: {
-
-		'tDiffuse': { value: null },
-		'uImageIncrement': { value: new Vector2( 0.001953125, 0.0 ) },
-		'cKernel': { value: [] }
-
+		tDiffuse: { value: null },
+		uImageIncrement: { value: new Vector2(0.001953125, 0.0) },
+		cKernel: { value: [] },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		uniform vec2 uImageIncrement;
 
@@ -37,7 +30,7 @@ const ConvolutionShader = {
 
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 		uniform float cKernel[ KERNEL_SIZE_INT ];
 
@@ -62,40 +55,33 @@ const ConvolutionShader = {
 
 		}`,
 
-	buildKernel: function ( sigma ) {
-
+	buildKernel: function (sigma) {
 		// We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
 
 		const kMaxKernelSize = 25;
-		let kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
+		let kernelSize = 2 * Math.ceil(sigma * 3.0) + 1;
 
-		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
+		if (kernelSize > kMaxKernelSize) kernelSize = kMaxKernelSize;
 
-		const halfWidth = ( kernelSize - 1 ) * 0.5;
+		const halfWidth = (kernelSize - 1) * 0.5;
 
-		const values = new Array( kernelSize );
+		const values = new Array(kernelSize);
 		let sum = 0.0;
-		for ( let i = 0; i < kernelSize; ++ i ) {
-
-			values[ i ] = gauss( i - halfWidth, sigma );
-			sum += values[ i ];
-
+		for (let i = 0; i < kernelSize; ++i) {
+			values[i] = gauss(i - halfWidth, sigma);
+			sum += values[i];
 		}
 
 		// normalize the kernel
 
-		for ( let i = 0; i < kernelSize; ++ i ) values[ i ] /= sum;
+		for (let i = 0; i < kernelSize; ++i) values[i] /= sum;
 
 		return values;
-
-	}
-
+	},
 };
 
-function gauss( x, sigma ) {
-
-	return Math.exp( - ( x * x ) / ( 2.0 * sigma * sigma ) );
-
+function gauss(x, sigma) {
+	return Math.exp(-(x * x) / (2.0 * sigma * sigma));
 }
 
 export { ConvolutionShader };

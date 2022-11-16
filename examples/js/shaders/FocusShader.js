@@ -1,30 +1,29 @@
-( function () {
-
+(function () {
 	/**
- * Focus shader
- * based on PaintEffect postprocess from ro.me
- * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
- */
+	 * Focus shader
+	 * based on PaintEffect postprocess from ro.me
+	 * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
+	 */
 
 	const FocusShader = {
 		uniforms: {
-			'tDiffuse': {
-				value: null
+			tDiffuse: {
+				value: null,
 			},
-			'screenWidth': {
-				value: 1024
+			screenWidth: {
+				value: 1024,
 			},
-			'screenHeight': {
-				value: 1024
+			screenHeight: {
+				value: 1024,
 			},
-			'sampleDistance': {
-				value: 0.94
+			sampleDistance: {
+				value: 0.94,
 			},
-			'waveFactor': {
-				value: 0.00125
-			}
+			waveFactor: {
+				value: 0.00125,
+			},
 		},
-		vertexShader: /* glsl */`
+		vertexShader: /* glsl */ `
 
 		varying vec2 vUv;
 
@@ -34,7 +33,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader: /* glsl */`
+		fragmentShader: /* glsl */ `
 
 		uniform float screenWidth;
 		uniform float screenHeight;
@@ -87,9 +86,8 @@
 
 			gl_FragColor = vec4( color.rgb * color.rgb * vec3( 0.95 ) + color.rgb, 1.0 );
 
-		}`
+		}`,
 	};
 
 	THREE.FocusShader = FocusShader;
-
-} )();
+})();

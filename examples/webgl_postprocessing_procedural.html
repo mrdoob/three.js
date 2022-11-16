@@ -2,13 +2,19 @@
 <html lang="en">
 	<head>
 		<title>three.js webgl - postprocessing procedural effects</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Procedural Effects Example by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- Procedural Effects Example by
+			<a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a
+			><br /><br />
 		</div>
 
 		<script id="procedural-vert" type="x-shader/x-vertex">
@@ -56,7 +62,10 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
+		></script>
 
 		<script type="importmap">
 			{
@@ -68,17 +77,20 @@
 		</script>
 
 		<script type="module">
+			import * as THREE from "three";
 
-			import * as THREE from 'three';
-
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import Stats from "three/addons/libs/stats.module.js";
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
 			let postCamera, postScene, renderer;
-			let postMaterial, noiseRandom1DMaterial, noiseRandom2DMaterial, noiseRandom3DMaterial, postQuad;
+			let postMaterial,
+				noiseRandom1DMaterial,
+				noiseRandom2DMaterial,
+				noiseRandom3DMaterial,
+				postQuad;
 			let stats;
 
-			const params = { procedure: 'noiseRandom3D' };
+			const params = { procedure: "noiseRandom3D" };
 
 			init();
 			animate();
@@ -86,81 +98,92 @@
 
 			// Init gui
 			function initGui() {
-
 				const gui = new GUI();
-				gui.add( params, 'procedure', [ 'noiseRandom1D', 'noiseRandom2D', 'noiseRandom3D' ] );
-
+				gui.add(params, "procedure", [
+					"noiseRandom1D",
+					"noiseRandom2D",
+					"noiseRandom3D",
+				]);
 			}
 
 			function init() {
-
-				const container = document.getElementById( 'container' );
+				const container = document.getElementById("container");
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				container.appendChild(stats.dom);
 
 				// Setup post processing stage
-				postCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-				noiseRandom1DMaterial = new THREE.ShaderMaterial( {
-					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
-					fragmentShader: document.querySelector( '#noiseRandom1D-frag' ).textContent.trim()
-				} );
-				noiseRandom2DMaterial = new THREE.ShaderMaterial( {
-					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
-					fragmentShader: document.querySelector( '#noiseRandom2D-frag' ).textContent.trim()
-				} );
-				noiseRandom3DMaterial = new THREE.ShaderMaterial( {
-					vertexShader: document.querySelector( '#procedural-vert' ).textContent.trim(),
-					fragmentShader: document.querySelector( '#noiseRandom3D-frag' ).textContent.trim()
-				} );
+				postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+				noiseRandom1DMaterial = new THREE.ShaderMaterial({
+					vertexShader: document
+						.querySelector("#procedural-vert")
+						.textContent.trim(),
+					fragmentShader: document
+						.querySelector("#noiseRandom1D-frag")
+						.textContent.trim(),
+				});
+				noiseRandom2DMaterial = new THREE.ShaderMaterial({
+					vertexShader: document
+						.querySelector("#procedural-vert")
+						.textContent.trim(),
+					fragmentShader: document
+						.querySelector("#noiseRandom2D-frag")
+						.textContent.trim(),
+				});
+				noiseRandom3DMaterial = new THREE.ShaderMaterial({
+					vertexShader: document
+						.querySelector("#procedural-vert")
+						.textContent.trim(),
+					fragmentShader: document
+						.querySelector("#noiseRandom3D-frag")
+						.textContent.trim(),
+				});
 				postMaterial = noiseRandom3DMaterial;
-				const postPlane = new THREE.PlaneGeometry( 2, 2 );
-				postQuad = new THREE.Mesh( postPlane, postMaterial );
+				const postPlane = new THREE.PlaneGeometry(2, 2);
+				postQuad = new THREE.Mesh(postPlane, postMaterial);
 				postScene = new THREE.Scene();
-				postScene.add( postQuad );
+				postScene.add(postQuad);
 
-				window.addEventListener( 'resize', onWindowResize );
-
+				window.addEventListener("resize", onWindowResize);
 			}
 
 			function onWindowResize() {
-
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
 				postCamera.aspect = width / height;
 				postCamera.updateProjectionMatrix();
 
-				renderer.setSize( width, height );
-
+				renderer.setSize(width, height);
 			}
 
 			function animate() {
+				requestAnimationFrame(animate);
 
-				requestAnimationFrame( animate );
-
-				switch ( params.procedure ) {
-
-					case 'noiseRandom1D': postMaterial = noiseRandom1DMaterial; break;
-					case 'noiseRandom2D': postMaterial = noiseRandom2DMaterial; break;
-					case 'noiseRandom3D': postMaterial = noiseRandom3DMaterial; break;
-
+				switch (params.procedure) {
+					case "noiseRandom1D":
+						postMaterial = noiseRandom1DMaterial;
+						break;
+					case "noiseRandom2D":
+						postMaterial = noiseRandom2DMaterial;
+						break;
+					case "noiseRandom3D":
+						postMaterial = noiseRandom3DMaterial;
+						break;
 				}
 
 				postQuad.material = postMaterial;
 
 				// render post FX
-				renderer.render( postScene, postCamera );
+				renderer.render(postScene, postCamera);
 
 				stats.update();
-
 			}
-
 		</script>
 	</body>
 </html>

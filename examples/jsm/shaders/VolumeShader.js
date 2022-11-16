@@ -1,7 +1,4 @@
-import {
-	Vector2,
-	Vector3
-} from 'three';
+import { Vector2, Vector3 } from "three";
 
 /**
  * Shaders to render 3D volumes using raycasting.
@@ -10,17 +7,16 @@ import {
  */
 
 const VolumeRenderShader1 = {
-
 	uniforms: {
-		'u_size': { value: new Vector3( 1, 1, 1 ) },
-		'u_renderstyle': { value: 0 },
-		'u_renderthreshold': { value: 0.5 },
-		'u_clim': { value: new Vector2( 1, 1 ) },
-		'u_data': { value: null },
-		'u_cmdata': { value: null }
+		u_size: { value: new Vector3(1, 1, 1) },
+		u_renderstyle: { value: 0 },
+		u_renderthreshold: { value: 0.5 },
+		u_clim: { value: new Vector2(1, 1) },
+		u_data: { value: null },
+		u_cmdata: { value: null },
 	},
 
-	vertexShader: /* glsl */`
+	vertexShader: /* glsl */ `
 
 		varying vec4 v_nearpos;
 		varying vec4 v_farpos;
@@ -52,7 +48,7 @@ const VolumeRenderShader1 = {
 				gl_Position = projectionMatrix * viewMatrix * modelMatrix * position4;
 		}`,
 
-	fragmentShader: /* glsl */`
+	fragmentShader: /* glsl */ `
 
 				precision highp float;
 				precision mediump sampler3D;
@@ -282,8 +278,7 @@ const VolumeRenderShader1 = {
 						final_color = color * (ambient_color + diffuse_color) + specular_color;
 						final_color.a = color.a;
 						return final_color;
-				}`
-
+				}`,
 };
 
 export { VolumeRenderShader1 };

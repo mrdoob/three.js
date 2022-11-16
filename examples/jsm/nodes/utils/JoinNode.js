@@ -1,42 +1,37 @@
-import TempNode from '../core/Node.js';
+import TempNode from "../core/Node.js";
 
 class JoinNode extends TempNode {
-
-	constructor( nodes = [] ) {
-
+	constructor(nodes = []) {
 		super();
 
 		this.nodes = nodes;
-
 	}
 
-	getNodeType( builder ) {
-
-		return builder.getTypeFromLength( this.nodes.reduce( ( count, cur ) => count + builder.getTypeLength( cur.getNodeType( builder ) ), 0 ) );
-
+	getNodeType(builder) {
+		return builder.getTypeFromLength(
+			this.nodes.reduce(
+				(count, cur) => count + builder.getTypeLength(cur.getNodeType(builder)),
+				0
+			)
+		);
 	}
 
-	generate( builder, output ) {
-
-		const type = this.getNodeType( builder );
+	generate(builder, output) {
+		const type = this.getNodeType(builder);
 		const nodes = this.nodes;
 
 		const snippetValues = [];
 
-		for ( const input of nodes ) {
+		for (const input of nodes) {
+			const inputSnippet = input.build(builder);
 
-			const inputSnippet = input.build( builder );
-
-			snippetValues.push( inputSnippet );
-
+			snippetValues.push(inputSnippet);
 		}
 
-		const snippet = `${ builder.getType( type ) }( ${ snippetValues.join( ', ' ) } )`;
+		const snippet = `${builder.getType(type)}( ${snippetValues.join(", ")} )`;
 
-		return builder.format( snippet, type, output );
-
+		return builder.format(snippet, type, output);
 	}
-
 }
 
 export default JoinNode;
