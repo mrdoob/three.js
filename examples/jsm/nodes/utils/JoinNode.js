@@ -2,9 +2,9 @@ import TempNode from '../core/Node.js';
 
 class JoinNode extends TempNode {
 
-	constructor( nodes = [] ) {
+	constructor( nodes = [], nodeType = null ) {
 
-		super();
+		super( nodeType );
 
 		this.nodes = nodes;
 
@@ -12,7 +12,8 @@ class JoinNode extends TempNode {
 
 	getNodeType( builder ) {
 
-		return builder.getTypeFromLength( this.nodes.reduce( ( count, cur ) => count + builder.getTypeLength( cur.getNodeType( builder ) ), 0 ) );
+		const defaultType = builder.getTypeFromLength( this.nodes.reduce( ( count, cur ) => count + builder.getTypeLength( cur.getNodeType( builder ) ), 0 ) );
+		return this.nodeType || defaultType;
 
 	}
 
