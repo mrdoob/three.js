@@ -109,7 +109,9 @@ class FileLoader extends Loader {
 
 					const callbacks = loading[ url ];
 					const reader = response.body.getReader();
-					// Extra header added because of: https://serverfault.com/questions/482875/why-does-nginx-remove-content-length-header-for-chunked-content
+
+					// Nginx needs X-File-Size check
+					// https://serverfault.com/questions/482875/why-does-nginx-remove-content-length-header-for-chunked-content
 					const contentLength = response.headers.get( 'Content-Length' ) || response.headers.get( 'X-File-Size' );
 					const total = contentLength ? parseInt( contentLength ) : 0;
 					const lengthComputable = total !== 0;
