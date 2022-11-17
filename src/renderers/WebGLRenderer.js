@@ -2260,7 +2260,7 @@ Object.defineProperties( WebGLRenderer.prototype, {
 		get: function () {
 
 			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
-			return undefined;
+			return ! this.useLegacyLights;
 
 		},
 
