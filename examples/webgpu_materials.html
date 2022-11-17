@@ -146,14 +146,14 @@
 
 				// Custom ShaderNode(no inputs) > Approach 2
 
-				const desaturateVoidShaderNode = new ShaderNode( () => {
+				const desaturateNoInputsShaderNode = new ShaderNode( () => {
 
 					return dot( vec3( 0.299, 0.587, 0.114 ), Nodes.texture( texture ).xyz );
 
 				} );
 
 				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = desaturateVoidShaderNode;
+				material.colorNode = desaturateNoInputsShaderNode;
 				materials.push( material );
 
 				// Custom WGSL ( desaturate filter )
