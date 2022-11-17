@@ -5,7 +5,6 @@ export default /* glsl */`
  *
  * Instructions for use:
  * - Ensure that both RE_Direct, RE_IndirectDiffuse and RE_IndirectSpecular are defined
- * - If you have defined an RE_IndirectSpecular, you need to also provide a Material_LightProbeLOD. <---- ???
  * - Create a material parameter that is to be passed as the third parameter to your lighting functions.
  *
  * TODO:
