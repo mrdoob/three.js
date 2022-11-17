@@ -166,17 +166,17 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	build( builder ) {
+	generate( builder, output ) {
 
-		const output = this.call( {}, builder );
+		const nodeCall = this.call( {}, builder );
 
-		if ( output === undefined ) {
+		if ( nodeCall === undefined ) {
 
 			return '';
 
 		}
 
-		return output.build( builder );
+		return builder.format( nodeCall.build( builder ), nodeCall.getNodeType( builder ), output );
 
 	}
 
