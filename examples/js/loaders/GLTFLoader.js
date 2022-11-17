@@ -3385,6 +3385,11 @@
 
 			}
 
+			if ( ! camera ) {
+				console.warn( 'THREE.GLTFLoader: Missing camera.' );
+				return;
+			}
+
 			if ( cameraDef.name ) camera.name = this.createUniqueName( cameraDef.name );
 			assignExtrasToUserData( camera, cameraDef );
 			return Promise.resolve( camera );
