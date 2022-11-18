@@ -95,8 +95,29 @@ class OrbitControls extends EventDispatcher {
 		// the target DOM element for key events
 		this._domElementKeyEvents = null;
 
+		// ZOOM-TO-CURSOR
+		this.cursorScreen = new Vector3();
+		this.cursorWorld = new Vector3();
+		this.enableZoomToCursor = false;
+		this.adjustmentAfterZoomNeeded = false;
+		//
+
 		//
 		// public methods
+		//
+
+		// ZOOM-TO-CURSOR
+		this.adjustAfterZoom = function () {
+			const newCursorWorld = new Vector3(scope.cursorScreen.x, scope.cursorScreen.y, scope.target.clone().project(scope.object).z).clone().unproject(scope.object);
+			const delta = new Vector3().subVectors(scope.cursorWorld, newCursorWorld);
+		
+			scope.object.position.add(delta);
+			scope.target.add(delta);
+		}
+
+		this.setCursorWorld = function () {
+			scope.cursorWorld.copy(new Vector3(scope.cursorScreen.x, scope.cursorScreen.y, scope.target.clone().project(scope.object).z).unproject(scope.object));
+		}
 		//
 
 		this.getPolarAngle = function () {
@@ -274,6 +295,13 @@ class OrbitControls extends EventDispatcher {
 					8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
 
 					scope.dispatchEvent( _changeEvent );
+
+					// ZOOM-TO-CURSOR
+					if(scope.enableZoomToCursor && scope.adjustmentAfterZoomNeeded){
+						scope.adjustmentAfterZoomNeeded = false;
+						this.adjustAfterZoom();
+					}
+					//
 
 					lastPosition.copy( scope.object.position );
 					lastQuaternion.copy( scope.object.quaternion );
@@ -461,6 +489,9 @@ class OrbitControls extends EventDispatcher {
 		}();
 
 		function dollyOut( dollyScale ) {
+			// ZOOM-TO-CURSOR
+			if(scope.enableZoomToCursor) scope.setCursorWorld();
+			//
 
 			if ( scope.object.isPerspectiveCamera ) {
 
@@ -479,9 +510,18 @@ class OrbitControls extends EventDispatcher {
 
 			}
 
+			// ZOOM-TO-CURSOR
+			if(scope.enableZoomToCursor){
+				if( scope.object.isOrthographicCamera) scope.adjustAfterZoom();
+				else if(scope.object.isPerspectiveCamera) scope.adjustmentAfterZoomNeeded = true;
+			}
+			//
 		}
 
 		function dollyIn( dollyScale ) {
+			// ZOOM-TO-CURSOR
+			if(scope.enableZoomToCursor) scope.setCursorWorld();
+			//
 
 			if ( scope.object.isPerspectiveCamera ) {
 
@@ -500,6 +540,12 @@ class OrbitControls extends EventDispatcher {
 
 			}
 
+			// ZOOM-TO-CURSOR
+			if(scope.enableZoomToCursor){
+				if( scope.object.isOrthographicCamera) scope.adjustAfterZoom();
+				else if(scope.object.isPerspectiveCamera) scope.adjustmentAfterZoomNeeded = true;
+			}
+			//
 		}
 
 		//
@@ -1208,6 +1254,43 @@ class OrbitControls extends EventDispatcher {
 		scope.domElement.addEventListener( 'pointerdown', onPointerDown );
 		scope.domElement.addEventListener( 'pointercancel', onPointerCancel );
 		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+
+		// ZOOM-TO-CURSOR
+		scope.domElement.addEventListener( 'mousemove', event => {
+			if(!scope.enableZoomToCursor) return;
+			scope.cursorScreen.copy(
+				new Vector3(
+					((event.clientX) / scope.domElement.clientWidth) * 2 - 1,
+					- ((event.clientY) / scope.domElement.clientHeight) * 2 + 1,
+					scope.target.clone().project(scope.object).z
+				)
+			);
+		});
+
+		const handleTouch = event => {
+			const touches = event.touches;
+			let touch;
+			if(touches.length === 1){
+				touch = new Vector2(touches[0].clientX, touches[0].clientY);		
+			}
+			else if(touches.length === 2){
+				touch = new Vector2((touches[0].clientX + touches[1].clientX) / 2, (touches[0].clientY + touches[1].clientY) / 2);
+			}
+
+			if(touch !== undefined){
+				scope.cursorScreen.copy(
+					new Vector3(
+						((touch.x) / scope.domElement.clientWidth) * 2 - 1,
+						- ((touch.y) / scope.domElement.clientHeight) * 2 + 1,
+						scope.target.clone().project(scope.object).z
+					)
+				);	
+			}
+		};
+
+		scope.domElement.addEventListener( 'touchstart', handleTouch);
+		scope.domElement.addEventListener( 'touchmove', handleTouch);
+		//
 
 		// force an update at start
 
