@@ -601,42 +601,62 @@ class OrbitControls extends EventDispatcher {
 			switch ( event.code ) {
 
 				case scope.keys.UP:
+
 					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
-						rotateUp( 2 * Math.PI * scope.rotateSpeed /
-								  scope.domElement.clientHeight );
+
+						rotateUp( 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
+
 					} else {
+
 						pan( 0, scope.keyPanSpeed );
+
 					}
+
 					needsUpdate = true;
 					break;
 
 				case scope.keys.BOTTOM:
+
 					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
-						rotateUp( -2 * Math.PI * scope.rotateSpeed /
-								  scope.domElement.clientHeight );
-					} else {					
+
+						rotateUp( - 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
+
+					} else {
+
 						pan( 0, - scope.keyPanSpeed );
+
 					}
+
 					needsUpdate = true;
 					break;
 
 				case scope.keys.LEFT:
+
 					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
-						rotateLeft( 2 * Math.PI * scope.rotateSpeed /
-								  scope.domElement.clientHeight );
-					} else {					
+
+						rotateLeft( 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
+
+					} else {
+
 						pan( scope.keyPanSpeed, 0 );
+
 					}
+
 					needsUpdate = true;
 					break;
 
 				case scope.keys.RIGHT:
+
 					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
-						rotateLeft( -2 * Math.PI * scope.rotateSpeed /
-								  scope.domElement.clientHeight );
-					} else {					
+
+						rotateLeft( - 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
+
+					} else {
+
 						pan( - scope.keyPanSpeed, 0 );
+
 					}
+
 					needsUpdate = true;
 					break;
 
