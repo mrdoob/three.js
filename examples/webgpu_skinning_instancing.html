@@ -129,7 +129,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 800 );
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 160000 );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

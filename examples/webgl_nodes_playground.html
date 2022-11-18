@@ -82,11 +82,11 @@
 
 				// Lights
 
-				const topLight = new THREE.PointLight( 0xF4F6F0, 1 );
+				const topLight = new THREE.PointLight( 0xF4F6F0, 5, 60000 );
 				topLight.position.set( 0, 1000, 1000 );
 				scene.add( topLight );
 
-				const backLight = new THREE.PointLight( 0x0c1445, 1 );
+				const backLight = new THREE.PointLight( 0x0c1445, 3, 60000 );
 				backLight.position.set( - 100, 20, - 260 );
 				scene.add( backLight );
 
@@ -94,7 +94,7 @@
 				document.body.appendChild( renderer.domElement );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.LinearToneMapping;
-				renderer.toneMappingExposure = 4000;
+				renderer.toneMappingExposure = 900000;
 				renderer.physicallyCorrectLights = true;
 
 				renderer.domElement.className = 'renderer';
