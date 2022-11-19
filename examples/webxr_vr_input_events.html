@@ -56,6 +56,7 @@
 			let shouldSnapTurn = false;
 			const snapTurnAngle = Math.PI / 4;
 			let snapTurnAxis;
+			const playerMoveSpeed = 0.01;
 
 			const trackedTriggerValues = {};
 			let newTriggerFloat;
@@ -295,7 +296,7 @@
 
 			}
 
-			// Move the cube in the XY plane and snap-turn player
+			// Smoothly move in the direction of camera and snap-turn
 			function handleAxes() {
 
 				if ( ! newAxisVector2 ) newAxisVector2 = new THREE.Vector2();
@@ -322,7 +323,16 @@
 
 				}
 
-				demoCube.position.set( 0 + newAxisVector2.x * 0.1, 0.8 + newAxisVector2.y * - 0.1, demoCube.position.z );
+				if ( Math.abs( newAxisVector2.y ) > 0.1 ) {
+
+					const dirVec = new THREE.Vector3();
+					const prevHeight = player.position.y;
+					camera.getWorldDirection( dirVec );
+					const newPosition = player.position.add( dirVec.multiplyScalar( playerMoveSpeed * - newAxisVector2.y ) );
+					newPosition.y = prevHeight;
+					player.position.copy( newPosition );
+
+				}
 
 				if ( shouldSnapTurn ) {
 
