@@ -1,22 +1,20 @@
-import { TangentSpaceNormalMap } from '../constants.js';
-import { Material } from './Material.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Color } from '../math/Color.js';
+import { TangentSpaceNormalMap } from "../constants.js";
+import { Material } from "./Material.js";
+import { Vector2 } from "../math/Vector2.js";
+import { Color } from "../math/Color.js";
 
 class MeshStandardMaterial extends Material {
-
-	constructor( parameters ) {
-
+	constructor(parameters) {
 		super();
 
 		this.isMeshStandardMaterial = true;
 
-		this.defines = { 'STANDARD': '' };
+		this.defines = { STANDARD: "" };
 
-		this.type = 'MeshStandardMaterial';
+		this.type = "MeshStandardMaterial";
 
-		this.color = new Color( 0xffffff ); // diffuse
-		this.roughness = 1.0;
+		this.color = new Color(0xffffff); // diffuse
+		this.roughness = 0.0;
 		this.metalness = 0.0;
 
 		this.map = null;
@@ -27,7 +25,7 @@ class MeshStandardMaterial extends Material {
 		this.aoMap = null;
 		this.aoMapIntensity = 1.0;
 
-		this.emissive = new Color( 0x000000 );
+		this.emissive = new Color(0x000000);
 		this.emissiveIntensity = 1.0;
 		this.emissiveMap = null;
 
@@ -36,7 +34,7 @@ class MeshStandardMaterial extends Material {
 
 		this.normalMap = null;
 		this.normalMapType = TangentSpaceNormalMap;
-		this.normalScale = new Vector2( 1, 1 );
+		this.normalScale = new Vector2(1, 1);
 
 		this.displacementMap = null;
 		this.displacementScale = 1;
@@ -53,24 +51,22 @@ class MeshStandardMaterial extends Material {
 
 		this.wireframe = false;
 		this.wireframeLinewidth = 1;
-		this.wireframeLinecap = 'round';
-		this.wireframeLinejoin = 'round';
+		this.wireframeLinecap = "round";
+		this.wireframeLinejoin = "round";
 
 		this.flatShading = false;
 
 		this.fog = true;
 
-		this.setValues( parameters );
-
+		this.setValues(parameters);
 	}
 
-	copy( source ) {
+	copy(source) {
+		super.copy(source);
 
-		super.copy( source );
+		this.defines = { STANDARD: "" };
 
-		this.defines = { 'STANDARD': '' };
-
-		this.color.copy( source.color );
+		this.color.copy(source.color);
 		this.roughness = source.roughness;
 		this.metalness = source.metalness;
 
@@ -82,7 +78,7 @@ class MeshStandardMaterial extends Material {
 		this.aoMap = source.aoMap;
 		this.aoMapIntensity = source.aoMapIntensity;
 
-		this.emissive.copy( source.emissive );
+		this.emissive.copy(source.emissive);
 		this.emissiveMap = source.emissiveMap;
 		this.emissiveIntensity = source.emissiveIntensity;
 
@@ -91,7 +87,7 @@ class MeshStandardMaterial extends Material {
 
 		this.normalMap = source.normalMap;
 		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
+		this.normalScale.copy(source.normalScale);
 
 		this.displacementMap = source.displacementMap;
 		this.displacementScale = source.displacementScale;
@@ -116,9 +112,7 @@ class MeshStandardMaterial extends Material {
 		this.fog = source.fog;
 
 		return this;
-
 	}
-
 }
 
 export { MeshStandardMaterial };
