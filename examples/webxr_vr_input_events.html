@@ -44,6 +44,7 @@
 			let camera, scene, renderer;
 			let controller1, controller2;
 			let inputEventsDispatcher;
+			let player;
 
 			let demoCube;
 
@@ -51,14 +52,16 @@
 			let previousButtonStates;
 
 			const trackedAxisValues = {};
-			let newPositionDelta;
+			let newAxisVector2;
+			let shouldSnapTurn = false;
+			const snapTurnAngle = Math.PI / 4;
+			let snapTurnAxis;
 
 			const trackedTriggerValues = {};
-			let newPullDelta;
+			let newTriggerFloat;
 
 			const trackedSqueezeValues = {};
-			let newScaleDelta;
-
+			let newSqueezeFloat;
 
 			init();
 			animate();
@@ -78,6 +81,10 @@
 					50
 				);
 				camera.position.set( 0, 1.6, 3 );
+
+				player = new THREE.Group();
+				player.add( camera );
+				scene.add( player );
 
 				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
 
@@ -109,10 +116,10 @@
 				demoCube.position.set( 0, 0.8, - 1 );
 
 				controller1 = renderer.xr.getController( 0 );
-				scene.add( controller1 );
+				player.add( controller1 );
 
 				controller2 = renderer.xr.getController( 1 );
-				scene.add( controller2 );
+				player.add( controller2 );
 
 				const controllerGeometry = new THREE.CylinderGeometry( 0.01, 0.02, 0.08, 5 );
 				controllerGeometry.rotateX( - Math.PI / 2 );
@@ -129,6 +136,7 @@
 
 				inputEventsDispatcher = new XRInputEventsDispatcher( renderer.xr, [ 0, 1 ] );
 				scene.add( inputEventsDispatcher );
+				snapTurnAxis = new THREE.Vector3( 0, 1, 0 );
 
 				const buttonPairs = [
 					[ 'left', 'button' ],
@@ -287,12 +295,12 @@
 
 			}
 
-			// Move the cube in the XY plane
+			// Move the cube in the XY plane and snap-turn player
 			function handleAxes() {
 
-				if ( ! newPositionDelta ) newPositionDelta = new THREE.Vector2();
-				newPositionDelta.x = 0;
-				newPositionDelta.y = 0;
+				if ( ! newAxisVector2 ) newAxisVector2 = new THREE.Vector2();
+				newAxisVector2.x = 0;
+				newAxisVector2.y = 0;
 
 				for ( const trackedAxisValue of Object.values( trackedAxisValues ) ) {
 
@@ -305,8 +313,8 @@
 						const { xAxis, yAxis } = value;
 						if ( xAxis !== undefined && yAxis !== undefined ) {
 
-							newPositionDelta.x = ( Math.abs( xAxis ) > Math.abs( newPositionDelta.x ) ) ? xAxis : newPositionDelta.x;
-							newPositionDelta.y = ( Math.abs( yAxis ) > Math.abs( newPositionDelta.y ) ) ? yAxis : newPositionDelta.y;
+							newAxisVector2.x = ( Math.abs( xAxis ) > Math.abs( newAxisVector2.x ) ) ? xAxis : newAxisVector2.x;
+							newAxisVector2.y = ( Math.abs( yAxis ) > Math.abs( newAxisVector2.y ) ) ? yAxis : newAxisVector2.y;
 
 						}
 
@@ -314,14 +322,38 @@
 
 				}
 
-				demoCube.position.set( 0 + newPositionDelta.x * 0.1, 0.8 + newPositionDelta.y * - 0.1, demoCube.position.z );
+				demoCube.position.set( 0 + newAxisVector2.x * 0.1, 0.8 + newAxisVector2.y * - 0.1, demoCube.position.z );
+
+				if ( shouldSnapTurn ) {
+
+					if ( newAxisVector2.x > 0.6 ) {
+
+						player.rotateOnWorldAxis( snapTurnAxis, - snapTurnAngle );
+						shouldSnapTurn = false;
+
+					} else if ( newAxisVector2.x < - 0.6 ) {
+
+						player.rotateOnWorldAxis( snapTurnAxis, snapTurnAngle );
+						shouldSnapTurn = false;
+
+					}
+
+				} else {
+
+					if ( Math.abs( newAxisVector2.x ) < 0.2 ) {
+
+						shouldSnapTurn = true;
+
+					}
+
+				}
 
 			}
 
 			// Pull the cube towards the user
 			function handleTriggerButtons() {
 
-				newPullDelta = 0;
+				newTriggerFloat = 0;
 
 				for ( const trackedTriggerValue of Object.values( trackedTriggerValues ) ) {
 
@@ -330,7 +362,7 @@
 						const { button } = value;
 						if ( button !== undefined ) {
 
-							newPullDelta = ( button > newPullDelta ) ? button : newPullDelta;
+							newTriggerFloat = ( button > newTriggerFloat ) ? button : newTriggerFloat;
 
 						}
 
@@ -338,14 +370,14 @@
 
 				}
 
-				demoCube.position.set( demoCube.position.x, demoCube.position.y, - 1 + newPullDelta * 0.2 );
+				demoCube.position.set( demoCube.position.x, demoCube.position.y, - 1 + newTriggerFloat * 0.2 );
 
 			}
 
 			// Make the cube smaller
 			function handleSqueezeButtons() {
 
-				newScaleDelta = 0;
+				newSqueezeFloat = 0;
 
 				for ( const trackedSqueezeValue of Object.values( trackedSqueezeValues ) ) {
 
@@ -354,7 +386,7 @@
 						const { button } = value;
 						if ( button !== undefined ) {
 
-							newScaleDelta = ( button > newScaleDelta ) ? button : newScaleDelta;
+							newSqueezeFloat = ( button > newSqueezeFloat ) ? button : newSqueezeFloat;
 
 						}
 
@@ -362,7 +394,7 @@
 
 				}
 
-				demoCube.scale.set( 1 - newScaleDelta * 0.5, 1 - newScaleDelta * 0.5, 1 - newScaleDelta * 0.5 );
+				demoCube.scale.set( 1 - newSqueezeFloat * 0.5, 1 - newSqueezeFloat * 0.5, 1 - newSqueezeFloat * 0.5 );
 
 			}
 
