@@ -217,8 +217,7 @@ class CCDIKSolver {
 	 */
 	createHelper() {
 
-		const iks = this.mesh.geometry.userData.MMD?.iks ?? this.iks;
-		return new CCDIKHelper( this.mesh, iks );
+		return new CCDIKHelper( this.mesh, this.iks );
 
 	}
 
