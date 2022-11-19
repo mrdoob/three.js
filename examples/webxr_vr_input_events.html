@@ -130,38 +130,69 @@
 				inputEventsDispatcher = new XRInputEventsDispatcher( renderer.xr, [ 0, 1 ] );
 				scene.add( inputEventsDispatcher );
 
+				const buttonPairs = [
+					[ 'left', 'button' ],
+					[ 'right', 'button' ]
+				];
+				const axisPairs = [
+					[ 'left', 'thumbstick' ],
+					[ 'left', 'touchpad' ],
+					[ 'right', 'thumbstick' ],
+					[ 'right', 'touchpad' ],
+				];
+				const triggerPairs = [
+					[ 'left', 'trigger' ],
+					[ 'right', 'trigger' ]
+				];
+				const squeezePairs = [
+					[ 'left', 'squeeze' ],
+					[ 'right', 'squeeze' ]
+				];
+
+				// Register all handedness-partialId pairs of interest
+				inputEventsDispatcher.registerInputForEvents( [
+					...buttonPairs, ...axisPairs, ...triggerPairs, ...squeezePairs
+				] );
+
+				// registerInputForEvents can also take two parameters instead of an array
+				// inputEventsDispatcher.registerInputForEvents( 'right', 'a-button' );
+
+				// Each event is of type `${handedness}-${partialId}` corresponding to registered pairs
+				const buttonEvents = buttonPairs.map( ( pair ) => getEventType( pair ) );
+				const axisEvents = axisPairs.map( ( pair ) => getEventType( pair ) );
+				const triggerEvents = triggerPairs.map( ( pair ) => getEventType( pair ) );
+				const squeezeEvents = squeezePairs.map( ( pair ) => getEventType( pair ) );
+
 				// Listen for all 'button' components on left or right controllers
 				// For example with oculus-touch-v3 this matches X, Y buttons on left, A, B buttons on right
-				inputEventsDispatcher.registerInputForEvents( 'left', 'button' );
-				inputEventsDispatcher.registerInputForEvents( 'right', 'button' );
-				// Corresponding to the the register functions above
-				// Each event is of type `${handedness}-${partialId}`
-				inputEventsDispatcher.addEventListener( 'left-button', onAnyButton );
-				inputEventsDispatcher.addEventListener( 'right-button', onAnyButton );
+				addInputListeners( buttonEvents, onAnyButton );
 
 				// Listen for all 'thumbsticks' and 'touchpad' components on left or right controllers
-				inputEventsDispatcher.registerInputForEvents( 'left', 'thumbstick' );
-				inputEventsDispatcher.registerInputForEvents( 'left', 'touchpad' );
-				inputEventsDispatcher.registerInputForEvents( 'right', 'thumbstick' );
-				inputEventsDispatcher.registerInputForEvents( 'right', 'touchpad' );
-				inputEventsDispatcher.addEventListener( 'left-thumbstick', onAnyAxis );
-				inputEventsDispatcher.addEventListener( 'left-touchpad', onAnyAxis );
-				inputEventsDispatcher.addEventListener( 'right-thumbstick', onAnyAxis );
-				inputEventsDispatcher.addEventListener( 'right-touchpad', onAnyAxis );
+				addInputListeners( axisEvents, onAnyAxis );
 
 				// Listen for all 'trigger' components on left or right controllers
-				inputEventsDispatcher.registerInputForEvents( 'left', 'trigger' );
-				inputEventsDispatcher.registerInputForEvents( 'right', 'trigger' );
-				inputEventsDispatcher.addEventListener( 'left-trigger', onAnyTrigger );
-				inputEventsDispatcher.addEventListener( 'right-trigger', onAnyTrigger );
+				addInputListeners( triggerEvents, onAnyTrigger );
 
 				// Listen for all 'squeeze' components on left or right controllers
-				inputEventsDispatcher.registerInputForEvents( 'left', 'squeeze' );
-				inputEventsDispatcher.registerInputForEvents( 'right', 'squeeze' );
-				inputEventsDispatcher.addEventListener( 'left-squeeze', onAnySqueeze );
-				inputEventsDispatcher.addEventListener( 'right-squeeze', onAnySqueeze );
+				addInputListeners( squeezeEvents, onAnySqueeze );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function getEventType( [ handedness, partialId ] ) {
+
+				return `${handedness}-${partialId}`;
+
+			}
+
+			function addInputListeners( events, eventHandler ) {
+
+				for ( const event of events ) {
+
+					inputEventsDispatcher.addEventListener( event, eventHandler );
+
+				}
 
 			}
 

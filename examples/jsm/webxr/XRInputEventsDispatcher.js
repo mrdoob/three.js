@@ -118,29 +118,49 @@ class XRInputEventsDispatcher extends Object3D {
 
 	}
 
-	registerInputForEvents( handedness, partialId ) {
+	registerInputForEvents( pairsOrHandedness, partialId ) {
 
-		if ( ! handedness
-			|| ( handedness !== MotionControllerConstants.Handedness.LEFT
-			  && handedness !== MotionControllerConstants.Handedness.RIGHT
-			  && handedness !== MotionControllerConstants.Handedness.NONE ) ) {
+		if ( ! pairsOrHandedness ) {
 
-			console.warn( 'XRInputEventsDispatcher.registerInputForEvents requires a valid handedness value.' );
+			console.warn( 'XRInputEvntsDispatcher.registerInputForEvents requires an array of handedness and partial IDs.' );
 			return;
 
 		}
 
-		if ( ! partialId ) {
+		let pairs = pairsOrHandedness;
 
-			console.warn( 'XRInputEventsDispatcher.registerInputForEvents requires a valid partialId value.' );
-			return;
+		// Check if handedness and paritalId passed separately instead of an array of arrays
+		if ( arguments.length === 2 ) {
+
+			pairs = [[ pairsOrHandedness, partialId ]];
 
 		}
 
-		if ( ! this._partialIds ) this._partialIds = {};
-		if ( ! this._partialIds[ handedness ] ) this._partialIds[ handedness ] = [];
+		for ( const [ handedness, partialId ] of pairs ) {
 
-		this._partialIds[ handedness ].push( partialId );
+			if ( ! handedness
+				|| ( handedness !== MotionControllerConstants.Handedness.LEFT
+					&& handedness !== MotionControllerConstants.Handedness.RIGHT
+					&& handedness !== MotionControllerConstants.Handedness.NONE ) ) {
+
+				console.warn( 'XRInputEventsDispatcher.registerInputForEvents requires a valid handedness value.' );
+				continue;
+
+			}
+
+			if ( ! partialId ) {
+
+				console.warn( 'XRInputEventsDispatcher.registerInputForEvents requires a valid partialId value.' );
+				continue;
+
+			}
+
+			if ( ! this._partialIds ) this._partialIds = {};
+			if ( ! this._partialIds[ handedness ] ) this._partialIds[ handedness ] = [];
+
+			this._partialIds[ handedness ].push( partialId );
+
+		}
 
 	}
 
