@@ -1482,7 +1482,7 @@ class SVGLoader extends Loader {
 									let cy = 0;
 
 									// Angle
-									angle = - array[ 0 ] * Math.PI / 180;
+									angle = array[ 0 ] * Math.PI / 180;
 
 									if ( array.length >= 3 ) {
 
@@ -1493,10 +1493,10 @@ class SVGLoader extends Loader {
 									}
 
 									// Rotate around center (cx, cy)
-									tempTransform1.identity().translate( - cx, - cy );
-									tempTransform2.identity().rotate( angle );
+									tempTransform1.makeTranslation( - cx, - cy );
+									tempTransform2.makeRotation( angle );
 									tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
-									tempTransform1.identity().translate( cx, cy );
+									tempTransform1.makeTranslation( cx, cy );
 									currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
 
 								}
