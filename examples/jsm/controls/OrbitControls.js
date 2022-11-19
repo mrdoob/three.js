@@ -601,22 +601,62 @@ class OrbitControls extends EventDispatcher {
 			switch ( event.code ) {
 
 				case scope.keys.UP:
-					pan( 0, scope.keyPanSpeed );
+
+					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+
+						rotateUp( 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
+
+					} else {
+
+						pan( 0, scope.keyPanSpeed );
+
+					}
+
 					needsUpdate = true;
 					break;
 
 				case scope.keys.BOTTOM:
-					pan( 0, - scope.keyPanSpeed );
+
+					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+
+						rotateUp( - 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
+
+					} else {
+
+						pan( 0, - scope.keyPanSpeed );
+
+					}
+
 					needsUpdate = true;
 					break;
 
 				case scope.keys.LEFT:
-					pan( scope.keyPanSpeed, 0 );
+
+					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+
+						rotateLeft( 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
+
+					} else {
+
+						pan( scope.keyPanSpeed, 0 );
+
+					}
+
 					needsUpdate = true;
 					break;
 
 				case scope.keys.RIGHT:
-					pan( - scope.keyPanSpeed, 0 );
+
+					if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+
+						rotateLeft( - 2 * Math.PI * scope.rotateSpeed / scope.domElement.clientHeight );
+
+					} else {
+
+						pan( - scope.keyPanSpeed, 0 );
+
+					}
+
 					needsUpdate = true;
 					break;
 
