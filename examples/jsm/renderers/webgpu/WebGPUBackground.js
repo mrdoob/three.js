@@ -1,5 +1,5 @@
 import { GPULoadOp, GPUStoreOp } from './constants.js';
-import { Color, Mesh, BoxGeometry, BackSide, EquirectangularReflectionMapping } from 'three';
+import { Color, Mesh, BoxGeometry, BackSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
 import { context, vec2, invert, texture, cubeTexture, transformDirection, positionWorld, modelWorldMatrix, viewportBottomLeft, equirectUV, MeshBasicNodeMaterial } from 'three/nodes';
 
 let _clearAlpha;
@@ -64,7 +64,7 @@ class WebGPUBackground {
 
 					let nodeUV = null;
 
-					if ( background.mapping === EquirectangularReflectionMapping ) {
+					if ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
 
 						const dirNode = transformDirection( positionWorld, modelWorldMatrix );
 
