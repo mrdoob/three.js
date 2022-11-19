@@ -1,6 +1,6 @@
 import { GPULoadOp, GPUStoreOp } from './constants.js';
-import { Color, Mesh, BoxGeometry, BackSide } from 'three';
-import { context, transformDirection, positionWorld, modelWorldMatrix, MeshBasicNodeMaterial } from 'three/nodes';
+import { Color, Mesh, BoxGeometry, BackSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
+import { context, vec2, invert, texture, cubeTexture, transformDirection, positionWorld, modelWorldMatrix, viewportBottomLeft, equirectUV, MeshBasicNodeMaterial } from 'three/nodes';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -45,7 +45,7 @@ class WebGPUBackground {
 			_clearAlpha = 1;
 			forceClear = true;
 
-		} else if ( background.isNode === true ) {
+		} else if ( background.isNode === true || background.isTexture === true ) {
 
 			_clearColor.copy( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
@@ -54,12 +54,41 @@ class WebGPUBackground {
 
 			if ( boxMesh === null ) {
 
-				const colorNode = context( background, {
-					uvNode: transformDirection( positionWorld, modelWorldMatrix )
-				} );
+				let node = null;
+
+				if ( background.isCubeTexture === true ) {
+
+					node = cubeTexture( background, transformDirection( positionWorld, modelWorldMatrix ) );
+
+				} else if ( background.isTexture === true ) {
+
+					let nodeUV = null;
+
+					if ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
+
+						const dirNode = transformDirection( positionWorld, modelWorldMatrix );
+
+						nodeUV = equirectUV( dirNode );
+						nodeUV = vec2( nodeUV.x, invert( nodeUV.y ) );
+
+					} else {
+
+						nodeUV = viewportBottomLeft;
+
+					}
+
+					node = texture( background, nodeUV );
+
+				} else /*if ( background.isNode === true )*/ {
+
+					node = context( background, {
+						uvNode: transformDirection( positionWorld, modelWorldMatrix )
+					} );
+
+				}
 
 				const nodeMaterial = new MeshBasicNodeMaterial();
-				nodeMaterial.colorNode = colorNode;
+				nodeMaterial.colorNode = node;
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
