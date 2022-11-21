@@ -355,7 +355,6 @@ export default QUnit.module( 'Maths', () => {
 				- 0.17677669529663687, 0.1767766952966369, 0.5,
 				0, 0, 1
 			);
-			var b = new Matrix3();
 			var params = {
 				centerX: 0.5,
 				centerY: 0.5,
