@@ -10,7 +10,6 @@
 			const context = canvas.getContext( '2d' );
 			context.fillStyle = 'rgb(127,127,255)';
 			context.fillRect( 0, 0, width, height );
-
 			for ( let i = 0; i < 4000; i ++ ) {
 
 				const x = Math.random() * width;

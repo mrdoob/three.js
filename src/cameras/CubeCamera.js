@@ -1,9 +1,9 @@
 import { NoToneMapping } from '../constants.js';
 import { Object3D } from '../core/Object3D.js';
-import { Vector3 } from '../math/Vector3.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-const fov = 90, aspect = 1;
+const fov = - 90; // negative fov is not an error
+const aspect = 1;
 
 class CubeCamera extends Object3D {
 
@@ -17,38 +17,38 @@ class CubeCamera extends Object3D {
 
 		const cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPX.layers = this.layers;
-		cameraPX.up.set( 0, - 1, 0 );
-		cameraPX.lookAt( new Vector3( 1, 0, 0 ) );
+		cameraPX.up.set( 0, 1, 0 );
+		cameraPX.lookAt( 1, 0, 0 );
 		this.add( cameraPX );
 
 		const cameraNX = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNX.layers = this.layers;
-		cameraNX.up.set( 0, - 1, 0 );
-		cameraNX.lookAt( new Vector3( - 1, 0, 0 ) );
+		cameraNX.up.set( 0, 1, 0 );
+		cameraNX.lookAt( - 1, 0, 0 );
 		this.add( cameraNX );
 
 		const cameraPY = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPY.layers = this.layers;
-		cameraPY.up.set( 0, 0, 1 );
-		cameraPY.lookAt( new Vector3( 0, 1, 0 ) );
+		cameraPY.up.set( 0, 0, - 1 );
+		cameraPY.lookAt( 0, 1, 0 );
 		this.add( cameraPY );
 
 		const cameraNY = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNY.layers = this.layers;
-		cameraNY.up.set( 0, 0, - 1 );
-		cameraNY.lookAt( new Vector3( 0, - 1, 0 ) );
+		cameraNY.up.set( 0, 0, 1 );
+		cameraNY.lookAt( 0, - 1, 0 );
 		this.add( cameraNY );
 
 		const cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
 		cameraPZ.layers = this.layers;
-		cameraPZ.up.set( 0, - 1, 0 );
-		cameraPZ.lookAt( new Vector3( 0, 0, 1 ) );
+		cameraPZ.up.set( 0, 1, 0 );
+		cameraPZ.lookAt( 0, 0, 1 );
 		this.add( cameraPZ );
 
 		const cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
 		cameraNZ.layers = this.layers;
-		cameraNZ.up.set( 0, - 1, 0 );
-		cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
+		cameraNZ.up.set( 0, 1, 0 );
+		cameraNZ.lookAt( 0, 0, - 1 );
 		this.add( cameraNZ );
 
 	}

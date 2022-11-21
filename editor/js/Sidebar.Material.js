@@ -146,6 +146,21 @@ function SidebarMaterial( editor ) {
 	const materialIridescenceThicknessMax = new SidebarMaterialRangeValueProperty( editor, 'iridescenceThicknessRange', strings.getKey( 'sidebar/material/iridescenceThicknessMax' ), false, [ 0, Infinity ], 0, 10, 1, 'nm' );
 	container.add( materialIridescenceThicknessMax );
 
+	// sheen
+
+	const materialSheen = new SidebarMaterialNumberProperty( editor, 'sheen', strings.getKey( 'sidebar/material/sheen' ), [ 0, 1 ] );
+	container.add( materialSheen );
+
+	// sheen roughness
+
+	const materialSheenRoughness = new SidebarMaterialNumberProperty( editor, 'sheenRoughness', strings.getKey( 'sidebar/material/sheenroughness' ), [ 0, 1 ] );
+	container.add( materialSheenRoughness );
+
+	// sheen color
+
+	const materialSheenColor = new SidebarMaterialColorProperty( editor, 'sheenColor', strings.getKey( 'sidebar/material/sheencolor' ) );
+	container.add( materialSheenColor );
+
 	// transmission
 
 	const materialTransmission = new SidebarMaterialNumberProperty( editor, 'transmission', strings.getKey( 'sidebar/material/transmission' ), [ 0, 1 ] );
@@ -241,6 +256,16 @@ function SidebarMaterial( editor ) {
 	const materialIridescenceMap = new SidebarMaterialMapProperty( editor, 'iridescenceMap', strings.getKey( 'sidebar/material/iridescencemap' ) );
 	container.add( materialIridescenceMap );
 
+	// sheen color map
+
+	const materialSheenColorMap = new SidebarMaterialMapProperty( editor, 'sheenColorMap', strings.getKey( 'sidebar/material/sheencolormap' ) );
+	container.add( materialSheenColorMap );
+
+	// sheen roughness map
+
+	const materialSheenRoughnessMap = new SidebarMaterialMapProperty( editor, 'sheenRoughnessMap', strings.getKey( 'sidebar/material/sheenroughnessmap' ) );
+	container.add( materialSheenRoughnessMap );
+
 	// iridescence thickness map
 
 	const materialIridescenceThicknessMap = new SidebarMaterialMapProperty( editor, 'iridescenceThicknessMap', strings.getKey( 'sidebar/material/iridescencethicknessmap' ) );
@@ -265,6 +290,16 @@ function SidebarMaterial( editor ) {
 
 	const materialGradientMap = new SidebarMaterialMapProperty( editor, 'gradientMap', strings.getKey( 'sidebar/material/gradientmap' ) );
 	container.add( materialGradientMap );
+
+	// transmission map
+
+	const transmissionMap = new SidebarMaterialMapProperty( editor, 'transmissionMap', strings.getKey( 'sidebar/material/transmissionmap' ) );
+	container.add( transmissionMap );
+
+	// thickness map
+
+	const thicknessMap = new SidebarMaterialMapProperty( editor, 'thicknessMap', strings.getKey( 'sidebar/material/thicknessmap' ) );
+	container.add( thicknessMap );
 
 	// side
 

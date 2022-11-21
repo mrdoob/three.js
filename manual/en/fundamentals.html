@@ -116,13 +116,12 @@ that looks like this</p>
 
 <p>First let's load three.js</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 &lt;/script&gt;
 </pre>
 <p>It's important you put <code class="notranslate" translate="no">type="module"</code> in the script tag. This enables
-us to use the <code class="notranslate" translate="no">import</code> keyword to load three.js. There are other ways
-to load three.js but as of r106 using modules is the recommended way.
-Modules have the advantage that they can easily import other modules
+us to use the <code class="notranslate" translate="no">import</code> keyword to load three.js. As of r147, this is the
+only way to load three.js properly. Modules have the advantage that they can easily import other modules
 they need. That saves us from having to manually load extra scripts
 they are dependent on.</p>
 <p>Next we need is a <code class="notranslate" translate="no">&lt;canvas&gt;</code> tag so...</p>
@@ -132,7 +131,7 @@ they are dependent on.</p>
 </pre>
 <p>We will ask three.js to draw into that canvas so we need to look it up.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -177,7 +176,7 @@ cube, prism, frustum.</p>
 <p><img src="../resources/frustum-3d.svg" width="500" class="threejs_center"></p>
 <p>The height of the near and far planes are determined by the field of view.
 The width of both planes is determined by the field of view and the aspect.</p>
-<p>Anything inside the defined frustum will be be drawn. Anything outside
+<p>Anything inside the defined frustum will be drawn. Anything outside
 will not.</p>
 <p>The camera defaults to looking down the -Z axis with +Y up. We'll put our cube
 at the origin so we need to move the camera back a little from the origin
@@ -210,7 +209,7 @@ be specified using standard CSS style 6 digit hex color values.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 </pre>
 <p>We then create a <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. A <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> in three represents the combination
-of a three things</p>
+of three things</p>
 <ol>
 <li>A <code class="notranslate" translate="no">Geometry</code> (the shape of the object)</li>
 <li>A <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> (how to draw the object, shiny or flat, what color, what texture(s) to apply. Etc.)</li>
@@ -365,69 +364,86 @@ a different color.</p>
 making our code responsive so it is adaptable to multiple situations</a>.</p>
 <div id="es6" class="threejs_bottombar">
 <h3>es6 modules, three.js, and folder structure</h3>
-<p>As of version r106 the preferred way to use three.js is via <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a>.</p>
+<p>As of version r147 the preferred way to use three.js is via <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a> and import maps.</p>
 <p>
 es6 modules can be loaded via the <code class="notranslate" translate="no">import</code> keyword in a script
-or inline via a <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> tag. Here's an example of
-both
+or inline via a <code class="notranslate" translate="no">&lt;script type="module"&gt;</code> tag. Here's an example
 </p>
-<pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
+import * as THREE from 'three';
 
 ...
 
 &lt;/script&gt;
 </pre>
 <p>
-Paths must be absolute or relative. Relative paths always start with <code class="notranslate" translate="no">./</code> or <code class="notranslate" translate="no">../</code>
-which is different than other tags like <code class="notranslate" translate="no">&lt;img&gt;</code> and <code class="notranslate" translate="no">&lt;a&gt;</code>.
+Notice <code class="notranslate" translate="no">'three'</code> specifier there. If you leave it as it is, it will likely produce an error. An <i>import map</i> should be used to tell the browser where to find three.js
 </p>
-<p>
-References to the same script will only be loaded once as long as their absolute paths
-are exactly the same. For three.js this means it's required that you put all the examples
-libraries in the correct folder structure
-</p>
-<pre class="dos">someFolder
- |
- ├-build
- | |
- | +-three.module.js
- |
- +-examples
-   |
-   +-jsm
-     |
-     +-controls
-     | |
-     | +-OrbitControls.js
-     | +-TrackballControls.js
-     | +-...
-     |
-     +-loaders
-     | |
-     | +-GLTFLoader.js
-     | +-...
-     |
-     ...
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "three": "./path/to/three.module.js"
+  }
+}
+&lt;/script&gt;
 </pre>
 <p>
-The reason this folder structure is required is because the scripts in the
-examples like <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a>
-have hard coded relative paths like
+Note that path specifier can start only with <code class="notranslate" translate="no">./</code> or <code class="notranslate" translate="no">../</code>.
 </p>
-<pre class="prettyprint">import * as THREE from '../../../build/three.module.js';
+<p>
+Import maps are still unsupported in Firefox and Safari, so it is recommended to use <a href="https://github.com/guybedford/es-module-shims">an import maps polyfill</a> like so
+</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"&gt;&lt;/script&gt;</pre>
+<p>
+To import addons like <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js"><code class="notranslate" translate="no">OrbitControls.js</code></a> use the following
+</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
 <p>
-Using the same structure assures then when you import both three and one of the example
-libraries they'll both reference the same <code class="notranslate" translate="no">three.module.js</code> file.
+Don't forget to add addons to the import map like so
 </p>
-<pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "three": "./path/to/three.module.js",
+    "three/addons/": "./different/path/to/examples/jsm/"
+  }
+}
+&lt;/script&gt;
 </pre>
-<p>This includes when using a CDN. Be sure your path to <code class="notranslate" translate="no">three.module.js</code> ends with
-<code class="notranslate" translate="no">/build/three.modules.js</code>. For example</p>
-<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0<b>/build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+<p>
+You can also use a CDN
+</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.147.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.147.0/examples/jsm/"
+  }
+}
+&lt;/script&gt;
+</pre>
+<p>
+To conclude, the recommended way of using three.js is
+</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"&gt;&lt;/script&gt;
+
+&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "three": "./path/to/three.module.js",
+    "three/addons/": "./different/path/to/examples/jsm/"
+  }
+}
+&lt;/script&gt;
+
+&lt;script type="module"&gt;
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+...
+
+&lt;/script&gt;
 </pre>
 </div>
 

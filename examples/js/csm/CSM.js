@@ -1,13 +1,9 @@
 ( function () {
 
 	const _cameraToLightMatrix = new THREE.Matrix4();
-
 	const _lightSpaceFrustum = new THREE.CSMFrustum();
-
 	const _center = new THREE.Vector3();
-
 	const _bbox = new THREE.Box3();
-
 	const _uniformArray = [];
 	const _logArray = [];
 	class CSM {
@@ -39,7 +35,6 @@
 			this.injectInclude();
 
 		}
-
 		createLights() {
 
 			for ( let i = 0; i < this.cascades; i ++ ) {
@@ -58,7 +53,6 @@
 			}
 
 		}
-
 		initCascades() {
 
 			const camera = this.camera;
@@ -67,24 +61,22 @@
 			this.mainFrustum.split( this.breaks, this.frustums );
 
 		}
-
 		updateShadowBounds() {
 
 			const frustums = this.frustums;
-
 			for ( let i = 0; i < frustums.length; i ++ ) {
 
 				const light = this.lights[ i ];
 				const shadowCam = light.shadow.camera;
-				const frustum = this.frustums[ i ]; // Get the two points that represent that furthest points on the frustum assuming
+				const frustum = this.frustums[ i ];
+
+				// Get the two points that represent that furthest points on the frustum assuming
 				// that's either the diagonal across the far plane or the diagonal across the whole
 				// frustum itself.
-
 				const nearVerts = frustum.vertices.near;
 				const farVerts = frustum.vertices.far;
 				const point1 = farVerts[ 0 ];
 				let point2;
-
 				if ( point1.distanceTo( farVerts[ 2 ] ) > point1.distanceTo( nearVerts[ 2 ] ) ) {
 
 					point2 = farVerts[ 2 ];
@@ -96,7 +88,6 @@
 				}
 
 				let squaredBBWidth = point1.distanceTo( point2 );
-
 				if ( this.fade ) {
 
 					// expand the shadow extents by the fade margin if fade is enabled.
@@ -117,27 +108,22 @@
 			}
 
 		}
-
 		getBreaks() {
 
 			const camera = this.camera;
 			const far = Math.min( camera.far, this.maxFar );
 			this.breaks.length = 0;
-
 			switch ( this.mode ) {
 
 				case 'uniform':
 					uniformSplit( this.cascades, camera.near, far, this.breaks );
 					break;
-
 				case 'logarithmic':
 					logarithmicSplit( this.cascades, camera.near, far, this.breaks );
 					break;
-
 				case 'practical':
 					practicalSplit( this.cascades, camera.near, far, 0.5, this.breaks );
 					break;
-
 				case 'custom':
 					if ( this.customSplitsCallback === undefined ) console.error( 'CSM: Custom split scheme callback not defined.' );
 					this.customSplitsCallback( this.cascades, camera.near, far, this.breaks );
@@ -175,7 +161,6 @@
 				_logArray.length = 0;
 				logarithmicSplit( amount, near, far, _logArray );
 				uniformSplit( amount, near, far, _uniformArray );
-
 				for ( let i = 1; i < amount; i ++ ) {
 
 					target.push( THREE.MathUtils.lerp( _uniformArray[ i - 1 ], _logArray[ i - 1 ], lambda ) );
@@ -187,12 +172,10 @@
 			}
 
 		}
-
 		update() {
 
 			const camera = this.camera;
 			const frustums = this.frustums;
-
 			for ( let i = 0; i < frustums.length; i ++ ) {
 
 				const light = this.lights[ i ];
@@ -200,31 +183,23 @@
 				const texelWidth = ( shadowCam.right - shadowCam.left ) / this.shadowMapSize;
 				const texelHeight = ( shadowCam.top - shadowCam.bottom ) / this.shadowMapSize;
 				light.shadow.camera.updateMatrixWorld( true );
-
 				_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, camera.matrixWorld );
-
 				frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 				const nearVerts = _lightSpaceFrustum.vertices.near;
 				const farVerts = _lightSpaceFrustum.vertices.far;
-
 				_bbox.makeEmpty();
-
 				for ( let j = 0; j < 4; j ++ ) {
 
 					_bbox.expandByPoint( nearVerts[ j ] );
-
 					_bbox.expandByPoint( farVerts[ j ] );
 
 				}
 
 				_bbox.getCenter( _center );
-
 				_center.z = _bbox.max.z + this.lightMargin;
 				_center.x = Math.floor( _center.x / texelWidth ) * texelWidth;
 				_center.y = Math.floor( _center.y / texelHeight ) * texelHeight;
-
 				_center.applyMatrix4( light.shadow.camera.matrixWorld );
-
 				light.position.copy( _center );
 				light.target.position.copy( _center );
 				light.target.position.x += this.lightDirection.x;
@@ -234,20 +209,17 @@
 			}
 
 		}
-
 		injectInclude() {
 
 			THREE.ShaderChunk.lights_fragment_begin = THREE.CSMShader.lights_fragment_begin;
 			THREE.ShaderChunk.lights_pars_begin = THREE.CSMShader.lights_pars_begin;
 
 		}
-
 		setupMaterial( material ) {
 
 			material.defines = material.defines || {};
 			material.defines.USE_CSM = 1;
 			material.defines.CSM_CASCADES = this.cascades;
-
 			if ( this.fade ) {
 
 				material.defines.CSM_FADE = '';
@@ -257,7 +229,6 @@
 			const breaksVec2 = [];
 			const scope = this;
 			const shaders = this.shaders;
-
 			material.onBeforeCompile = function ( shader ) {
 
 				const far = Math.min( scope.camera.far, scope.maxFar );
@@ -278,7 +249,6 @@
 			shaders.set( material, null );
 
 		}
-
 		updateUniforms() {
 
 			const far = Math.min( this.camera.far, this.maxFar );
@@ -309,7 +279,6 @@
 			}, this );
 
 		}
-
 		getExtendedBreaks( target ) {
 
 			while ( target.length < this.breaks.length ) {
@@ -319,7 +288,6 @@
 			}
 
 			target.length = this.breaks.length;
-
 			for ( let i = 0; i < this.cascades; i ++ ) {
 
 				const amount = this.breaks[ i ];
@@ -330,7 +298,6 @@
 			}
 
 		}
-
 		updateFrustums() {
 
 			this.getBreaks();
@@ -339,17 +306,16 @@
 			this.updateUniforms();
 
 		}
-
 		remove() {
 
 			for ( let i = 0; i < this.lights.length; i ++ ) {
 
+				this.parent.remove( this.lights[ i ].target );
 				this.parent.remove( this.lights[ i ] );
 
 			}
 
 		}
-
 		dispose() {
 
 			const shaders = this.shaders;
@@ -359,7 +325,6 @@
 				delete material.defines.USE_CSM;
 				delete material.defines.CSM_CASCADES;
 				delete material.defines.CSM_FADE;
-
 				if ( shader !== null ) {
 
 					delete shader.uniforms.CSM_cascades;

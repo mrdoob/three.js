@@ -64,21 +64,26 @@
 			const defaultThickness = parameters.defaultThickness !== undefined ? parameters.defaultThickness : 0.003;
 			const defaultColor = new THREE.Color().fromArray( parameters.defaultColor !== undefined ? parameters.defaultColor : [ 0, 0, 0 ] );
 			const defaultAlpha = parameters.defaultAlpha !== undefined ? parameters.defaultAlpha : 1.0;
-			const defaultKeepAlive = parameters.defaultKeepAlive !== undefined ? parameters.defaultKeepAlive : false; // object.material.uuid -> outlineMaterial or
+			const defaultKeepAlive = parameters.defaultKeepAlive !== undefined ? parameters.defaultKeepAlive : false;
+
+			// object.material.uuid -> outlineMaterial or
 			// object.material[ n ].uuid -> outlineMaterial
 			// save at the outline material creation and release
 			// if it's unused removeThresholdCount frames
 			// unless keepAlive is true.
-
 			const cache = {};
-			const removeThresholdCount = 60; // outlineMaterial.uuid -> object.material or
+			const removeThresholdCount = 60;
+
+			// outlineMaterial.uuid -> object.material or
 			// outlineMaterial.uuid -> object.material[ n ]
 			// save before render and release after render.
+			const originalMaterials = {};
 
-			const originalMaterials = {}; // object.uuid -> originalOnBeforeRender
+			// object.uuid -> originalOnBeforeRender
 			// save before render and release after render.
+			const originalOnBeforeRenders = {};
 
-			const originalOnBeforeRenders = {}; //this.cache = cache;  // for debug
+			//this.cache = cache;  // for debug
 
 			const uniformsOutline = {
 				outlineThickness: {
@@ -91,12 +96,15 @@
 					value: defaultAlpha
 				}
 			};
-			const vertexShader = [ '#include <common>', '#include <uv_pars_vertex>', '#include <displacementmap_pars_vertex>', '#include <fog_pars_vertex>', '#include <morphtarget_pars_vertex>', '#include <skinning_pars_vertex>', '#include <logdepthbuf_pars_vertex>', '#include <clipping_planes_pars_vertex>', 'uniform float outlineThickness;', 'vec4 calculateOutline( vec4 pos, vec3 normal, vec4 skinned ) {', '	float thickness = outlineThickness;', '	const float ratio = 1.0;', // TODO: support outline thickness ratio for each vertex
-				'	vec4 pos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + normal, 1.0 );', // NOTE: subtract pos2 from pos because THREE.BackSide objectNormal is negative
-				'	vec4 norm = normalize( pos - pos2 );', '	return pos + norm * thickness * pos.w * ratio;', '}', 'void main() {', '	#include <uv_vertex>', '	#include <beginnormal_vertex>', '	#include <morphnormal_vertex>', '	#include <skinbase_vertex>', '	#include <skinnormal_vertex>', '	#include <begin_vertex>', '	#include <morphtarget_vertex>', '	#include <skinning_vertex>', '	#include <displacementmap_vertex>', '	#include <project_vertex>', '	vec3 outlineNormal = - objectNormal;', // the outline material is always rendered with THREE.BackSide
+			const vertexShader = [ '#include <common>', '#include <uv_pars_vertex>', '#include <displacementmap_pars_vertex>', '#include <fog_pars_vertex>', '#include <morphtarget_pars_vertex>', '#include <skinning_pars_vertex>', '#include <logdepthbuf_pars_vertex>', '#include <clipping_planes_pars_vertex>', 'uniform float outlineThickness;', 'vec4 calculateOutline( vec4 pos, vec3 normal, vec4 skinned ) {', '	float thickness = outlineThickness;', '	const float ratio = 1.0;',
+				// TODO: support outline thickness ratio for each vertex
+				'	vec4 pos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + normal, 1.0 );',
+				// NOTE: subtract pos2 from pos because THREE.BackSide objectNormal is negative
+				'	vec4 norm = normalize( pos - pos2 );', '	return pos + norm * thickness * pos.w * ratio;', '}', 'void main() {', '	#include <uv_vertex>', '	#include <beginnormal_vertex>', '	#include <morphnormal_vertex>', '	#include <skinbase_vertex>', '	#include <skinnormal_vertex>', '	#include <begin_vertex>', '	#include <morphtarget_vertex>', '	#include <skinning_vertex>', '	#include <displacementmap_vertex>', '	#include <project_vertex>', '	vec3 outlineNormal = - objectNormal;',
+				// the outline material is always rendered with THREE.BackSide
+
 				'	gl_Position = calculateOutline( gl_Position, outlineNormal, vec4( transformed, 1.0 ) );', '	#include <logdepthbuf_vertex>', '	#include <clipping_planes_vertex>', '	#include <fog_vertex>', '}' ].join( '\n' );
 			const fragmentShader = [ '#include <common>', '#include <fog_pars_fragment>', '#include <logdepthbuf_pars_fragment>', '#include <clipping_planes_pars_fragment>', 'uniform vec3 outlineColor;', 'uniform float outlineAlpha;', 'void main() {', '	#include <clipping_planes_fragment>', '	#include <logdepthbuf_fragment>', '	gl_FragColor = vec4( outlineColor, outlineAlpha );', '	#include <tonemapping_fragment>', '	#include <encodings_fragment>', '	#include <fog_fragment>', '	#include <premultiplied_alpha_fragment>', '}' ].join( '\n' );
-
 			function createMaterial() {
 
 				return new THREE.ShaderMaterial( {
@@ -112,7 +120,6 @@
 			function getOutlineMaterialFromCache( originalMaterial ) {
 
 				let data = cache[ originalMaterial.uuid ];
-
 				if ( data === undefined ) {
 
 					data = {
@@ -143,7 +150,6 @@
 
 				const geometry = object.geometry;
 				let hasNormals = false;
-
 				if ( object.geometry !== undefined ) {
 
 					if ( geometry.isBufferGeometry ) {
@@ -165,7 +171,6 @@
 			function setOutlineMaterial( object ) {
 
 				if ( isCompatible( object ) === false ) return;
-
 				if ( Array.isArray( object.material ) ) {
 
 					for ( let i = 0, il = object.material.length; i < il; i ++ ) {
@@ -188,7 +193,6 @@
 			function restoreOriginalMaterial( object ) {
 
 				if ( isCompatible( object ) === false ) return;
-
 				if ( Array.isArray( object.material ) ) {
 
 					for ( let i = 0, il = object.material.length; i < il; i ++ ) {
@@ -209,8 +213,9 @@
 
 			function onBeforeRender( renderer, scene, camera, geometry, material ) {
 
-				const originalMaterial = originalMaterials[ material.uuid ]; // just in case
+				const originalMaterial = originalMaterials[ material.uuid ];
 
+				// just in case
 				if ( originalMaterial === undefined ) return;
 				updateUniforms( material, originalMaterial );
 
@@ -220,7 +225,6 @@
 
 				const outlineParameters = originalMaterial.userData.outlineParameters;
 				material.uniforms.outlineAlpha.value = originalMaterial.opacity;
-
 				if ( outlineParameters !== undefined ) {
 
 					if ( outlineParameters.thickness !== undefined ) material.uniforms.outlineThickness.value = outlineParameters.thickness;
@@ -247,7 +251,6 @@
 				material.toneMapped = originalMaterial.toneMapped;
 				material.premultipliedAlpha = originalMaterial.premultipliedAlpha;
 				material.displacementMap = originalMaterial.displacementMap;
-
 				if ( outlineParameters !== undefined ) {
 
 					if ( originalMaterial.visible === false ) {
@@ -271,7 +274,6 @@
 				}
 
 				if ( originalMaterial.wireframe === true || originalMaterial.depthTest === false ) material.visible = false;
-
 				if ( originalMaterial.clippingPlanes ) {
 
 					material.clipping = true;
@@ -287,36 +289,32 @@
 
 			function cleanupCache() {
 
-				let keys; // clear originialMaterials
+				let keys;
 
+				// clear originialMaterials
 				keys = Object.keys( originalMaterials );
-
 				for ( let i = 0, il = keys.length; i < il; i ++ ) {
 
 					originalMaterials[ keys[ i ] ] = undefined;
 
-				} // clear originalOnBeforeRenders
+				}
 
-
+				// clear originalOnBeforeRenders
 				keys = Object.keys( originalOnBeforeRenders );
-
 				for ( let i = 0, il = keys.length; i < il; i ++ ) {
 
 					originalOnBeforeRenders[ keys[ i ] ] = undefined;
 
-				} // remove unused outlineMaterial from cache
+				}
 
-
+				// remove unused outlineMaterial from cache
 				keys = Object.keys( cache );
-
 				for ( let i = 0, il = keys.length; i < il; i ++ ) {
 
 					const key = keys[ i ];
-
 					if ( cache[ key ].used === false ) {
 
 						cache[ key ].count ++;
-
 						if ( cache[ key ].keepAlive === false && cache[ key ].count > removeThresholdCount ) {
 
 							delete cache[ key ];
@@ -371,6 +369,7 @@
 				renderer.shadowMap.enabled = currentShadowMapEnabled;
 
 			};
+
 			/*
      * See #9918
      *
@@ -385,12 +384,9 @@
      *
      * }
      */
-
-
 			this.autoClear = renderer.autoClear;
 			this.domElement = renderer.domElement;
 			this.shadowMap = renderer.shadowMap;
-
 			this.clear = function ( color, depth, stencil ) {
 
 				renderer.clear( color, depth, stencil );

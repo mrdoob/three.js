@@ -106,7 +106,7 @@ Three.js는 3차원 세계를 다루므로, 우리는 정육면체(cube)를 3차
 
 <p>먼저, Three.js를 로드합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 &lt;/script&gt;
 </pre>
 <p><code class="notranslate" translate="no">type="module"</code> 속성을 지정하는 것을 잊지 마세요. 이러면 <code class="notranslate" translate="no">import</code> 키워드를
@@ -121,7 +121,7 @@ import * as THREE from '../../build/three.module.js';
 </pre>
 <p>이제 Three.js에게 렌더링을 맡겨보죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -345,7 +345,7 @@ es6 모듈은 js 파일이나 인라인 <code class="notranslate" translate="no"
 <code class="notranslate" translate="no">import</code> 키워드를 사용해 로드할 수 있습니다.
 </p>
 <pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 ...
 
@@ -393,12 +393,12 @@ import * as THREE from '../../build/three.module.js';
 참조하도록 할 수 있죠.
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>아래는 CDN을 사용하는 예시입니다. <code class="notranslate" translate="no">three.modules.js</code>의 경로가 <code class="notranslate" translate="no">/build/three.modules.js</code>
 로 끝나야 한다는 것을 명심하세요.</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
         </div>

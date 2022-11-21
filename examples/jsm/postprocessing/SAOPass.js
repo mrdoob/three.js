@@ -400,6 +400,26 @@ class SAOPass extends Pass {
 
 	}
 
+	dispose() {
+
+		this.saoRenderTarget.dispose();
+		this.blurIntermediateRenderTarget.dispose();
+		this.beautyRenderTarget.dispose();
+		this.normalRenderTarget.dispose();
+		this.depthRenderTarget.dispose();
+
+		this.depthMaterial.dispose();
+		this.normalMaterial.dispose();
+		this.saoMaterial.dispose();
+		this.vBlurMaterial.dispose();
+		this.hBlurMaterial.dispose();
+		this.materialCopy.dispose();
+		this.depthCopy.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
 }
 
 SAOPass.OUTPUT = {

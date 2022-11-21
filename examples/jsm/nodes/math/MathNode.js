@@ -33,6 +33,7 @@ class MathNode extends TempNode {
 	static DFDX = 'dFdx';
 	static DFDY = 'dFdy';
 	static ROUND = 'round';
+	static RECIPROCAL = 'reciprocal';
 
 	// 2 inputs
 
@@ -158,6 +159,10 @@ class MathNode extends TempNode {
 		} else if ( method === MathNode.INVERT ) {
 
 			return builder.format( '( 1.0 - ' + a.build( builder, inputType ) + ' )', type, output );
+
+		} else if ( method === MathNode.RECIPROCAL ) {
+
+			return builder.format( '( 1.0 / ' + a.build( builder, inputType ) + ' )', type, output );
 
 		} else {
 

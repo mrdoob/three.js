@@ -17,9 +17,7 @@
 				value: new THREE.Vector2( 1 / 1024, 1 / 512 )
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 

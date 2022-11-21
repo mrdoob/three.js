@@ -60,8 +60,8 @@
         <p>我们会添加一个 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate"
               translate="no">OrbitControls</code></a> 就像我们在 <a href="lights.html">这篇光照的文章</a>里做的一样。</p>
         <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
-import * as THREE from '/build/three.module.js';
-+import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';</pre>
+import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';</pre>
         <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
 const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 0, 0);
@@ -613,9 +613,9 @@ for (const countryInfo of countryInfos) {
 
   ...</pre>
           <p>最后，由于我不确定这些值设多少好，于是添加一个GUI，就可以调试了</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-+import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';</pre>
+          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import {GUI} from 'three/addons/libs/lil-gui.module.min.js';</pre>
           <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const settings = {
 +  minArea: 20,
 +  maxVisibleDot: -0.2,

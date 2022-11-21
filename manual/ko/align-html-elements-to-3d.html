@@ -47,8 +47,8 @@
 <p>이 글에서는 맨 마지막 방법에 대해 다룰 겁니다.</p>
 <p>간단한 것부터 시작해보죠. 원시 모델 위에 이름표를 붙인 3D 장면을 구현할 겁니다. 예제는 <a href="responsive.html">반응형 디자인에 관한 글</a>의 예제를 수정해 쓰도록 하죠.</p>
 <p>여기에 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>를 넣습니다. <a href="lights.html">조명에 관한 글</a>에서 다뤘었죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 0, 0);
@@ -590,9 +590,9 @@ for (const countryInfo of countryInfos) {
   ...
 </pre>
 <p>마지막으로 어떤 값이 적당한지 알기 어려우니 이 값을 조정할 수 있도록 GUI를 추가합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
-+import { GUI } from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
++import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const settings = {
 +  minArea: 20,

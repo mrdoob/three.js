@@ -7,7 +7,6 @@
 			super( manager );
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -41,18 +40,15 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( data ) {
 
 			// this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
+
 			let _data = data;
 			let _dataPointer = 0;
-
 			const _nativeLittleEndian = new Int8Array( new Int16Array( [ 1 ] ).buffer )[ 0 ] > 0;
-
 			const _littleEndian = true;
 			const headerObject = {};
-
 			function scan( type, chunks ) {
 
 				if ( chunks === undefined || chunks === null ) {
@@ -63,60 +59,51 @@
 
 				let _chunkSize = 1;
 				let _array_type = Uint8Array;
-
 				switch ( type ) {
 
 					// 1 byte data types
 					case 'uchar':
 						break;
-
 					case 'schar':
 						_array_type = Int8Array;
 						break;
 						// 2 byte data types
-
 					case 'ushort':
 						_array_type = Uint16Array;
 						_chunkSize = 2;
 						break;
-
 					case 'sshort':
 						_array_type = Int16Array;
 						_chunkSize = 2;
 						break;
 						// 4 byte data types
-
 					case 'uint':
 						_array_type = Uint32Array;
 						_chunkSize = 4;
 						break;
-
 					case 'sint':
 						_array_type = Int32Array;
 						_chunkSize = 4;
 						break;
-
 					case 'float':
 						_array_type = Float32Array;
 						_chunkSize = 4;
 						break;
-
 					case 'complex':
 						_array_type = Float64Array;
 						_chunkSize = 8;
 						break;
-
 					case 'double':
 						_array_type = Float64Array;
 						_chunkSize = 8;
 						break;
 
-				} // increase the data pointer in-place
+				}
 
+				// increase the data pointer in-place
+				let _bytes = new _array_type( _data.slice( _dataPointer, _dataPointer += chunks * _chunkSize ) );
 
-				let _bytes = new _array_type( _data.slice( _dataPointer, _dataPointer += chunks * _chunkSize ) ); // if required, flip the endianness of the bytes
-
-
+				// if required, flip the endianness of the bytes
 				if ( _nativeLittleEndian != _littleEndian ) {
 
 					// we need to flip here since the format doesn't match the native endianness
@@ -129,18 +116,18 @@
 					// if only one chunk was requested, just return one value
 					return _bytes[ 0 ];
 
-				} // return the byte array
+				}
 
-
+				// return the byte array
 				return _bytes;
 
-			} //Flips typed array endianness in-place. Based on https://github.com/kig/DataStream.js/blob/master/DataStream.js.
+			}
 
+			//Flips typed array endianness in-place. Based on https://github.com/kig/DataStream.js/blob/master/DataStream.js.
 
 			function flipEndianness( array, chunkSize ) {
 
 				const u8 = new Uint8Array( array.buffer, array.byteOffset, array.byteLength );
-
 				for ( let i = 0; i < array.byteLength; i += chunkSize ) {
 
 					for ( let j = i + chunkSize - 1, k = i; j > k; j --, k ++ ) {
@@ -155,19 +142,16 @@
 
 				return array;
 
-			} //parse the header
+			}
 
-
+			//parse the header
 			function parseHeader( header ) {
 
 				let data, field, fn, i, l, m, _i, _len;
-
 				const lines = header.split( /\r?\n/ );
-
 				for ( _i = 0, _len = lines.length; _i < _len; _i ++ ) {
 
 					l = lines[ _i ];
-
 					if ( l.match( /NRRD\d+/ ) ) {
 
 						headerObject.isNrrd = true;
@@ -177,7 +161,6 @@
 						field = m[ 1 ].trim();
 						data = m[ 2 ].trim();
 						fn = _fieldFunctions[ field ];
-
 						if ( fn ) {
 
 							fn.call( headerObject, data );
@@ -210,8 +193,9 @@
 					headerObject.vectors = [];
 					headerObject.vectors.push( [ 1, 0, 0 ] );
 					headerObject.vectors.push( [ 0, 1, 0 ] );
-					headerObject.vectors.push( [ 0, 0, 1 ] ); //apply spacing if defined
+					headerObject.vectors.push( [ 0, 0, 1 ] );
 
+					//apply spacing if defined
 					if ( headerObject.spacings ) {
 
 						for ( i = 0; i <= 2; i ++ ) {
@@ -232,23 +216,22 @@
 
 				}
 
-			} //parse the data when registred as one of this type : 'text', 'ascii', 'txt'
+			}
 
-
+			//parse the data when registred as one of this type : 'text', 'ascii', 'txt'
 			function parseDataAsText( data, start, end ) {
 
 				let number = '';
 				start = start || 0;
 				end = end || data.length;
-				let value; //length of the result is the product of the sizes
-
+				let value;
+				//length of the result is the product of the sizes
 				const lengthOfTheResult = headerObject.sizes.reduce( function ( previous, current ) {
 
 					return previous * current;
 
 				}, 1 );
 				let base = 10;
-
 				if ( headerObject.encoding === 'hex' ) {
 
 					base = 16;
@@ -258,7 +241,6 @@
 				const result = new headerObject.__array( lengthOfTheResult );
 				let resultIndex = 0;
 				let parsingFunction = parseInt;
-
 				if ( headerObject.__array === Float32Array || headerObject.__array === Float64Array ) {
 
 					parsingFunction = parseFloat;
@@ -267,8 +249,8 @@
 
 				for ( let i = start; i < end; i ++ ) {
 
-					value = data[ i ]; //if value is not a space
-
+					value = data[ i ];
+					//if value is not a space
 					if ( ( value < 9 || value > 13 ) && value !== 32 ) {
 
 						number += String.fromCharCode( value );
@@ -300,31 +282,28 @@
 			}
 
 			const _bytes = scan( 'uchar', data.byteLength );
-
 			const _length = _bytes.length;
 			let _header = null;
 			let _data_start = 0;
 			let i;
-
 			for ( i = 1; i < _length; i ++ ) {
 
 				if ( _bytes[ i - 1 ] == 10 && _bytes[ i ] == 10 ) {
 
 					// we found two line breaks in a row
 					// now we know what the header is
-					_header = this.parseChars( _bytes, 0, i - 2 ); // this is were the data starts
-
+					_header = this.parseChars( _bytes, 0, i - 2 );
+					// this is were the data starts
 					_data_start = i + 1;
 					break;
 
 				}
 
-			} // parse the header
+			}
 
-
+			// parse the header
 			parseHeader( _header );
 			_data = _bytes.subarray( _data_start ); // the data without header
-
 			if ( headerObject.encoding.substring( 0, 2 ) === 'gz' ) {
 
 				// we need to decompress the datastream
@@ -339,7 +318,6 @@
 
 				//we need to copy the array to create a new array buffer, else we retrieve the original arraybuffer with the header
 				const _copy = new Uint8Array( _data.length );
-
 				for ( let i = 0; i < _data.length; i ++ ) {
 
 					_copy[ i ] = _data[ i ];
@@ -348,29 +326,31 @@
 
 				_data = _copy;
 
-			} // .. let's use the underlying array buffer
+			}
 
-
+			// .. let's use the underlying array buffer
 			_data = _data.buffer;
 			const volume = new THREE.Volume();
-			volume.header = headerObject; //
+			volume.header = headerObject;
+			//
 			// parse the (unzipped) data to a datastream of the correct type
 			//
-
-			volume.data = new headerObject.__array( _data ); // get the min and max intensities
-
+			volume.data = new headerObject.__array( _data );
+			// get the min and max intensities
 			const min_max = volume.computeMinMax();
 			const min = min_max[ 0 ];
-			const max = min_max[ 1 ]; // attach the scalar range to the volume
-
+			const max = min_max[ 1 ];
+			// attach the scalar range to the volume
 			volume.windowLow = min;
-			volume.windowHigh = max; // get the image dimensions
+			volume.windowHigh = max;
 
+			// get the image dimensions
 			volume.dimensions = [ headerObject.sizes[ 0 ], headerObject.sizes[ 1 ], headerObject.sizes[ 2 ] ];
 			volume.xLength = volume.dimensions[ 0 ];
 			volume.yLength = volume.dimensions[ 1 ];
-			volume.zLength = volume.dimensions[ 2 ]; // Identify axis order in the space-directions matrix from the header if possible.
+			volume.zLength = volume.dimensions[ 2 ];
 
+			// Identify axis order in the space-directions matrix from the header if possible.
 			if ( headerObject.vectors ) {
 
 				const xIndex = headerObject.vectors.findIndex( vector => vector[ 0 ] !== 0 );
@@ -386,17 +366,17 @@
 
 				volume.axisOrder = [ 'x', 'y', 'z' ];
 
-			} // spacing
+			}
 
-
+			// spacing
 			const spacingX = new THREE.Vector3().fromArray( headerObject.vectors[ 0 ] ).length();
 			const spacingY = new THREE.Vector3().fromArray( headerObject.vectors[ 1 ] ).length();
 			const spacingZ = new THREE.Vector3().fromArray( headerObject.vectors[ 2 ] ).length();
-			volume.spacing = [ spacingX, spacingY, spacingZ ]; // Create IJKtoRAS matrix
+			volume.spacing = [ spacingX, spacingY, spacingZ ];
 
+			// Create IJKtoRAS matrix
 			volume.matrix = new THREE.Matrix4();
 			const transitionMatrix = new THREE.Matrix4();
-
 			if ( headerObject.space === 'left-posterior-superior' ) {
 
 				transitionMatrix.set( - 1, 0, 0, 0, 0, - 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
@@ -422,9 +402,10 @@
 
 			volume.inverseMatrix = new THREE.Matrix4();
 			volume.inverseMatrix.copy( volume.matrix ).invert();
-			volume.RASDimensions = new THREE.Vector3( volume.xLength, volume.yLength, volume.zLength ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs ); // .. and set the default threshold
-			// only if the threshold was not already set
+			volume.RASDimensions = new THREE.Vector3( volume.xLength, volume.yLength, volume.zLength ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
 
+			// .. and set the default threshold
+			// only if the threshold was not already set
 			if ( volume.lowerThreshold === - Infinity ) {
 
 				volume.lowerThreshold = min;
@@ -440,7 +421,6 @@
 			return volume;
 
 		}
-
 		parseChars( array, start, end ) {
 
 			// without borders, use the whole array
@@ -456,10 +436,9 @@
 
 			}
 
-			let output = ''; // create and append the chars
-
+			let output = '';
+			// create and append the chars
 			let i = 0;
-
 			for ( i = start; i < end; ++ i ) {
 
 				output += String.fromCharCode( array[ i ] );
@@ -471,7 +450,6 @@
 		}
 
 	}
-
 	const _fieldFunctions = {
 		type: function ( data ) {
 
@@ -483,13 +461,11 @@
 				case 'uint8_t':
 					this.__array = Uint8Array;
 					break;
-
 				case 'signed char':
 				case 'int8':
 				case 'int8_t':
 					this.__array = Int8Array;
 					break;
-
 				case 'short':
 				case 'short int':
 				case 'signed short':
@@ -498,7 +474,6 @@
 				case 'int16_t':
 					this.__array = Int16Array;
 					break;
-
 				case 'ushort':
 				case 'unsigned short':
 				case 'unsigned short int':
@@ -506,29 +481,24 @@
 				case 'uint16_t':
 					this.__array = Uint16Array;
 					break;
-
 				case 'int':
 				case 'signed int':
 				case 'int32':
 				case 'int32_t':
 					this.__array = Int32Array;
 					break;
-
 				case 'uint':
 				case 'unsigned int':
 				case 'uint32':
 				case 'uint32_t':
 					this.__array = Uint32Array;
 					break;
-
 				case 'float':
 					this.__array = Float32Array;
 					break;
-
 				case 'double':
 					this.__array = Float64Array;
 					break;
-
 				default:
 					throw new Error( 'Unsupported NRRD data type: ' + data );
 
@@ -558,13 +528,10 @@
 			return this.sizes = function () {
 
 				const _ref = data.split( /\s+/ );
-
 				const _results = [];
-
 				for ( let _i = 0, _len = _ref.length; _i < _len; _i ++ ) {
 
 					i = _ref[ _i ];
-
 					_results.push( parseInt( i, 10 ) );
 
 				}
@@ -591,21 +558,16 @@
 			return this.vectors = function () {
 
 				const _results = [];
-
 				for ( let _i = 0, _len = parts.length; _i < _len; _i ++ ) {
 
 					v = parts[ _i ];
-
 					_results.push( function () {
 
 						const _ref = v.slice( 1, - 1 ).split( /,/ );
-
 						const _results2 = [];
-
 						for ( let _j = 0, _len2 = _ref.length; _j < _len2; _j ++ ) {
 
 							f = _ref[ _j ];
-
 							_results2.push( parseFloat( f ) );
 
 						}
@@ -628,11 +590,9 @@
 			return this.spacings = function () {
 
 				const _results = [];
-
 				for ( let _i = 0, _len = parts.length; _i < _len; _i ++ ) {
 
 					f = parts[ _i ];
-
 					_results.push( parseFloat( f ) );
 
 				}

@@ -1,5 +1,6 @@
 ( function () {
 
+	//trackball state
 	const STATE = {
 		IDLE: Symbol(),
 		ROTATE: Symbol(),
@@ -19,18 +20,21 @@
 		TWO_FINGER: Symbol(),
 		MULT_FINGER: Symbol(),
 		CURSOR: Symbol()
-	}; //cursor center coordinates
+	};
 
+	//cursor center coordinates
 	const _center = {
 		x: 0,
 		y: 0
-	}; //transformation matrices for gizmos and camera
+	};
 
+	//transformation matrices for gizmos and camera
 	const _transformation = {
 		camera: new THREE.Matrix4(),
 		gizmos: new THREE.Matrix4()
-	}; //events
+	};
 
+	//events
 	const _changeEvent = {
 		type: 'change'
 	};
@@ -40,15 +44,10 @@
 	const _endEvent = {
 		type: 'end'
 	};
-
 	const _raycaster = new THREE.Raycaster();
-
 	const _offset = new THREE.Vector3();
-
 	const _gizmoMatrixStateTemp = new THREE.Matrix4();
-
 	const _cameraMatrixStateTemp = new THREE.Matrix4();
-
 	const _scalePointTemp = new THREE.Vector3();
 	/**
  *
@@ -56,14 +55,11 @@
  * @param {HTMLElement} domElement Renderer's dom element
  * @param {Scene} scene The scene to be rendered
  */
-
-
 	class ArcballControls extends THREE.EventDispatcher {
 
 		constructor( _camera, domElement, scene = null ) {
 
 			super();
-
 			this.onWindowResize = () => {
 
 				const scale = ( this._gizmos.scale.x + this._gizmos.scale.y + this._gizmos.scale.z ) / 3;
@@ -72,7 +68,6 @@
 				const curve = new THREE.EllipseCurve( 0, 0, newRadius, newRadius );
 				const points = curve.getPoints( this._curvePts );
 				const curveGeometry = new THREE.BufferGeometry().setFromPoints( points );
-
 				for ( const gizmo in this._gizmos.children ) {
 
 					this._gizmos.children[ gizmo ].geometry = curveGeometry;
@@ -108,9 +103,7 @@
 			this.onPointerCancel = () => {
 
 				this._touchStart.splice( 0, this._touchStart.length );
-
 				this._touchCurrent.splice( 0, this._touchCurrent.length );
-
 				this._input = INPUT.NONE;
 
 			};
@@ -120,9 +113,7 @@
 				if ( event.button == 0 && event.isPrimary ) {
 
 					this._downValid = true;
-
 					this._downEvents.push( event );
-
 					this._downStart = performance.now();
 
 				} else {
@@ -134,9 +125,7 @@
 				if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
 					this._touchStart.push( event );
-
 					this._touchCurrent.push( event );
-
 					switch ( this._input ) {
 
 						case INPUT.NONE:
@@ -146,7 +135,6 @@
 							window.addEventListener( 'pointermove', this.onPointerMove );
 							window.addEventListener( 'pointerup', this.onPointerUp );
 							break;
-
 						case INPUT.ONE_FINGER:
 						case INPUT.ONE_FINGER_SWITCHED:
 							//doubleStart
@@ -155,7 +143,6 @@
 							this.onPinchStart();
 							this.onDoublePanStart();
 							break;
-
 						case INPUT.TWO_FINGER:
 							//multipleStart
 							this._input = INPUT.MULT_FINGER;
@@ -167,7 +154,6 @@
 				} else if ( event.pointerType != 'touch' && this._input == INPUT.NONE ) {
 
 					let modifier = null;
-
 					if ( event.ctrlKey || event.metaKey ) {
 
 						modifier = 'CTRL';
@@ -179,12 +165,12 @@
 					}
 
 					this._mouseOp = this.getOpFromAction( event.button, modifier );
-
 					if ( this._mouseOp != null ) {
 
 						window.addEventListener( 'pointermove', this.onPointerMove );
-						window.addEventListener( 'pointerup', this.onPointerUp ); //singleStart
+						window.addEventListener( 'pointerup', this.onPointerUp );
 
+						//singleStart
 						this._input = INPUT.CURSOR;
 						this._button = event.button;
 						this.onSinglePanStart( event, this._mouseOp );
@@ -206,10 +192,8 @@
 							this.updateTouchEvent( event );
 							this.onSinglePanMove( event, STATE.ROTATE );
 							break;
-
 						case INPUT.ONE_FINGER_SWITCHED:
 							const movement = this.calculatePointersDistance( this._touchCurrent[ 0 ], event ) * this._devPxRatio;
-
 							if ( movement >= this._switchSensibility ) {
 
 								//singleMove
@@ -221,7 +205,6 @@
 							}
 
 							break;
-
 						case INPUT.TWO_FINGER:
 							//rotate/pan/pinchMove
 							this.updateTouchEvent( event );
@@ -229,7 +212,6 @@
 							this.onPinchMove();
 							this.onDoublePanMove();
 							break;
-
 						case INPUT.MULT_FINGER:
 							//multMove
 							this.updateTouchEvent( event );
@@ -241,7 +223,6 @@
 				} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
 
 					let modifier = null;
-
 					if ( event.ctrlKey || event.metaKey ) {
 
 						modifier = 'CTRL';
@@ -253,20 +234,18 @@
 					}
 
 					const mouseOpState = this.getOpStateFromAction( this._button, modifier );
-
 					if ( mouseOpState != null ) {
 
 						this.onSinglePanMove( event, mouseOpState );
 
 					}
 
-				} //checkDistance
+				}
 
-
+				//checkDistance
 				if ( this._downValid ) {
 
 					const movement = this.calculatePointersDistance( this._downEvents[ this._downEvents.length - 1 ], event ) * this._devPxRatio;
-
 					if ( movement > this._movementThreshold ) {
 
 						this._downValid = false;
@@ -282,15 +261,12 @@
 				if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
 
 					const nTouch = this._touchCurrent.length;
-
 					for ( let i = 0; i < nTouch; i ++ ) {
 
 						if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
 
 							this._touchCurrent.splice( i, 1 );
-
 							this._touchStart.splice( i, 1 );
-
 							break;
 
 						}
@@ -307,22 +283,22 @@
 							this._input = INPUT.NONE;
 							this.onSinglePanEnd();
 							break;
-
 						case INPUT.TWO_FINGER:
 							//doubleEnd
 							this.onDoublePanEnd( event );
 							this.onPinchEnd( event );
-							this.onRotateEnd( event ); //switching to singleStart
+							this.onRotateEnd( event );
 
+							//switching to singleStart
 							this._input = INPUT.ONE_FINGER_SWITCHED;
 							break;
-
 						case INPUT.MULT_FINGER:
 							if ( this._touchCurrent.length == 0 ) {
 
 								window.removeEventListener( 'pointermove', this.onPointerMove );
-								window.removeEventListener( 'pointerup', this.onPointerUp ); //multCancel
+								window.removeEventListener( 'pointerup', this.onPointerUp );
 
+								//multCancel
 								this._input = INPUT.NONE;
 								this.onTriplePanEnd();
 
@@ -347,7 +323,6 @@
 					if ( this._downValid ) {
 
 						const downTime = event.timeStamp - this._downEvents[ this._downEvents.length - 1 ].timeStamp;
-
 						if ( downTime <= this._maxDownTime ) {
 
 							if ( this._nclicks == 0 ) {
@@ -359,26 +334,20 @@
 							} else {
 
 								const clickInterval = event.timeStamp - this._clickStart;
-
 								const movement = this.calculatePointersDistance( this._downEvents[ 1 ], this._downEvents[ 0 ] ) * this._devPxRatio;
-
 								if ( clickInterval <= this._maxInterval && movement <= this._posThreshold ) {
 
 									//second valid click detected
 									//fire double tap and reset values
 									this._nclicks = 0;
-
 									this._downEvents.splice( 0, this._downEvents.length );
-
 									this.onDoubleTap( event );
 
 								} else {
 
 									//new 'first click'
 									this._nclicks = 1;
-
 									this._downEvents.shift();
-
 									this._clickStart = performance.now();
 
 								}
@@ -389,7 +358,6 @@
 
 							this._downValid = false;
 							this._nclicks = 0;
-
 							this._downEvents.splice( 0, this._downEvents.length );
 
 						}
@@ -397,7 +365,6 @@
 					} else {
 
 						this._nclicks = 0;
-
 						this._downEvents.splice( 0, this._downEvents.length );
 
 					}
@@ -411,7 +378,6 @@
 				if ( this.enabled && this.enableZoom ) {
 
 					let modifier = null;
-
 					if ( event.ctrlKey || event.metaKey ) {
 
 						modifier = 'CTRL';
@@ -423,16 +389,13 @@
 					}
 
 					const mouseOp = this.getOpFromAction( 'WHEEL', modifier );
-
 					if ( mouseOp != null ) {
 
 						event.preventDefault();
 						this.dispatchEvent( _startEvent );
 						const notchDeltaY = 125; //distance of one notch of mouse wheel
-
 						let sgn = event.deltaY / notchDeltaY;
 						let size = 1;
-
 						if ( sgn > 0 ) {
 
 							size = 1 / this.scaleFactor;
@@ -447,7 +410,6 @@
 
 							case 'ZOOM':
 								this.updateTbState( STATE.SCALE, true );
-
 								if ( sgn > 0 ) {
 
 									size = 1 / Math.pow( this.scaleFactor, sgn );
@@ -461,7 +423,6 @@
 								if ( this.cursorZoom && this.enablePan ) {
 
 									let scalePoint;
-
 									if ( this.camera.isOrthographicCamera ) {
 
 										scalePoint = this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.camera.quaternion ).multiplyScalar( 1 / this.camera.zoom ).add( this._gizmos.position );
@@ -491,11 +452,13 @@
 								this.dispatchEvent( _changeEvent );
 								this.dispatchEvent( _endEvent );
 								break;
-
 							case 'FOV':
 								if ( this.camera.isPerspectiveCamera ) {
 
-									this.updateTbState( STATE.FOV, true ); //Vertigo effect
+									this.updateTbState( STATE.FOV, true );
+
+									//Vertigo effect
+
 									//	  fov / 2
 									//		|\
 									//		| \
@@ -505,13 +468,12 @@
 									//		| 	  \
 									//		| _ _ _\
 									//			y
-									//check for iOs shift shortcut
 
+									//check for iOs shift shortcut
 									if ( event.deltaX != 0 ) {
 
 										sgn = event.deltaX / notchDeltaY;
 										size = 1;
-
 										if ( sgn > 0 ) {
 
 											size = 1 / Math.pow( this.scaleFactor, sgn );
@@ -525,17 +487,17 @@
 									}
 
 									this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
-
 									const x = this._v3_1.distanceTo( this._gizmos.position );
-
 									let xNew = x / size; //distance between camera and gizmos if scale(size, scalepoint) would be performed
+
 									//check min and max distance
-
 									xNew = THREE.MathUtils.clamp( xNew, this.minDistance, this.maxDistance );
-									const y = x * Math.tan( THREE.MathUtils.DEG2RAD * this.camera.fov * 0.5 ); //calculate new fov
+									const y = x * Math.tan( THREE.MathUtils.DEG2RAD * this.camera.fov * 0.5 );
 
-									let newFov = THREE.MathUtils.RAD2DEG * ( Math.atan( y / xNew ) * 2 ); //check min and max fov
+									//calculate new fov
+									let newFov = THREE.MathUtils.RAD2DEG * ( Math.atan( y / xNew ) * 2 );
 
+									//check min and max fov
 									if ( newFov > this.maxFov ) {
 
 										newFov = this.maxFov;
@@ -579,7 +541,6 @@
 
 					this.dispatchEvent( _startEvent );
 					this.setCenter( event.clientX, event.clientY );
-
 					switch ( operation ) {
 
 						case 'PAN':
@@ -600,9 +561,7 @@
 							}
 
 							this.updateTbState( STATE.PAN, true );
-
 							this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ) );
-
 							if ( this.enableGrid ) {
 
 								this.drawGrid();
@@ -611,7 +570,6 @@
 							}
 
 							break;
-
 						case 'ROTATE':
 							if ( ! this.enableRotate ) {
 
@@ -628,20 +586,14 @@
 							}
 
 							this.updateTbState( STATE.ROTATE, true );
-
 							this._startCursorPosition.copy( this.unprojectOnTbSurface( this.camera, _center.x, _center.y, this.domElement, this._tbRadius ) );
-
 							this.activateGizmos( true );
-
 							if ( this.enableAnimations ) {
 
 								this._timePrev = this._timeCurrent = performance.now();
 								this._angleCurrent = this._anglePrev = 0;
-
 								this._cursorPosPrev.copy( this._startCursorPosition );
-
 								this._cursorPosCurr.copy( this._cursorPosPrev );
-
 								this._wCurr = 0;
 								this._wPrev = this._wCurr;
 
@@ -649,7 +601,6 @@
 
 							this.dispatchEvent( _changeEvent );
 							break;
-
 						case 'FOV':
 							if ( ! this.camera.isPerspectiveCamera || ! this.enableZoom ) {
 
@@ -668,13 +619,9 @@
 							}
 
 							this.updateTbState( STATE.FOV, true );
-
 							this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-
 							this._currentCursorPosition.copy( this._startCursorPosition );
-
 							break;
-
 						case 'ZOOM':
 							if ( ! this.enableZoom ) {
 
@@ -693,11 +640,8 @@
 							}
 
 							this.updateTbState( STATE.SCALE, true );
-
 							this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-
 							this._currentCursorPosition.copy( this._startCursorPosition );
-
 							break;
 
 					}
@@ -712,7 +656,6 @@
 
 					const restart = opState != this._state;
 					this.setCenter( event.clientX, event.clientY );
-
 					switch ( opState ) {
 
 						case STATE.PAN:
@@ -721,12 +664,11 @@
 								if ( restart ) {
 
 									//switch to pan operation
+
 									this.dispatchEvent( _endEvent );
 									this.dispatchEvent( _startEvent );
 									this.updateTbState( opState, true );
-
 									this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ) );
-
 									if ( this.enableGrid ) {
 
 										this.drawGrid();
@@ -739,7 +681,6 @@
 
 									//continue with pan operation
 									this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ) );
-
 									this.applyTransformMatrix( this.pan( this._startCursorPosition, this._currentCursorPosition ) );
 
 								}
@@ -747,19 +688,17 @@
 							}
 
 							break;
-
 						case STATE.ROTATE:
 							if ( this.enableRotate ) {
 
 								if ( restart ) {
 
 									//switch to rotate operation
+
 									this.dispatchEvent( _endEvent );
 									this.dispatchEvent( _startEvent );
 									this.updateTbState( opState, true );
-
 									this._startCursorPosition.copy( this.unprojectOnTbSurface( this.camera, _center.x, _center.y, this.domElement, this._tbRadius ) );
-
 									if ( this.enableGrid ) {
 
 										this.disposeGrid();
@@ -772,26 +711,19 @@
 
 									//continue with rotate operation
 									this._currentCursorPosition.copy( this.unprojectOnTbSurface( this.camera, _center.x, _center.y, this.domElement, this._tbRadius ) );
-
 									const distance = this._startCursorPosition.distanceTo( this._currentCursorPosition );
-
 									const angle = this._startCursorPosition.angleTo( this._currentCursorPosition );
-
 									const amount = Math.max( distance / this._tbRadius, angle ); //effective rotation angle
 
 									this.applyTransformMatrix( this.rotate( this.calculateRotationAxis( this._startCursorPosition, this._currentCursorPosition ), amount ) );
-
 									if ( this.enableAnimations ) {
 
 										this._timePrev = this._timeCurrent;
 										this._timeCurrent = performance.now();
 										this._anglePrev = this._angleCurrent;
 										this._angleCurrent = amount;
-
 										this._cursorPosPrev.copy( this._cursorPosCurr );
-
 										this._cursorPosCurr.copy( this._currentCursorPosition );
-
 										this._wPrev = this._wCurr;
 										this._wCurr = this.calculateAngularSpeed( this._anglePrev, this._angleCurrent, this._timePrev, this._timeCurrent );
 
@@ -802,21 +734,18 @@
 							}
 
 							break;
-
 						case STATE.SCALE:
 							if ( this.enableZoom ) {
 
 								if ( restart ) {
 
 									//switch to zoom operation
+
 									this.dispatchEvent( _endEvent );
 									this.dispatchEvent( _startEvent );
 									this.updateTbState( opState, true );
-
 									this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-
 									this._currentCursorPosition.copy( this._startCursorPosition );
-
 									if ( this.enableGrid ) {
 
 										this.disposeGrid();
@@ -829,12 +758,9 @@
 
 									//continue with zoom operation
 									const screenNotches = 8; //how many wheel notches corresponds to a full screen pan
-
 									this._currentCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-
 									const movement = this._currentCursorPosition.y - this._startCursorPosition.y;
 									let size = 1;
-
 									if ( movement < 0 ) {
 
 										size = 1 / Math.pow( this.scaleFactor, - movement * screenNotches );
@@ -846,7 +772,6 @@
 									}
 
 									this._v3_1.setFromMatrixPosition( this._gizmoMatrixState );
-
 									this.applyTransformMatrix( this.scale( size, this._v3_1 ) );
 
 								}
@@ -854,21 +779,18 @@
 							}
 
 							break;
-
 						case STATE.FOV:
 							if ( this.enableZoom && this.camera.isPerspectiveCamera ) {
 
 								if ( restart ) {
 
 									//switch to fov operation
+
 									this.dispatchEvent( _endEvent );
 									this.dispatchEvent( _startEvent );
 									this.updateTbState( opState, true );
-
 									this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-
 									this._currentCursorPosition.copy( this._startCursorPosition );
-
 									if ( this.enableGrid ) {
 
 										this.disposeGrid();
@@ -881,12 +803,9 @@
 
 									//continue with fov operation
 									const screenNotches = 8; //how many wheel notches corresponds to a full screen pan
-
 									this._currentCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-
 									const movement = this._currentCursorPosition.y - this._startCursorPosition.y;
 									let size = 1;
-
 									if ( movement < 0 ) {
 
 										size = 1 / Math.pow( this.scaleFactor, - movement * screenNotches );
@@ -898,28 +817,26 @@
 									}
 
 									this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
-
 									const x = this._v3_1.distanceTo( this._gizmos.position );
-
 									let xNew = x / size; //distance between camera and gizmos if scale(size, scalepoint) would be performed
+
 									//check min and max distance
-
 									xNew = THREE.MathUtils.clamp( xNew, this.minDistance, this.maxDistance );
-									const y = x * Math.tan( THREE.MathUtils.DEG2RAD * this._fovState * 0.5 ); //calculate new fov
+									const y = x * Math.tan( THREE.MathUtils.DEG2RAD * this._fovState * 0.5 );
 
-									let newFov = THREE.MathUtils.RAD2DEG * ( Math.atan( y / xNew ) * 2 ); //check min and max fov
+									//calculate new fov
+									let newFov = THREE.MathUtils.RAD2DEG * ( Math.atan( y / xNew ) * 2 );
 
+									//check min and max fov
 									newFov = THREE.MathUtils.clamp( newFov, this.minFov, this.maxFov );
 									const newDistance = y / Math.tan( THREE.MathUtils.DEG2RAD * ( newFov / 2 ) );
 									size = x / newDistance;
-
 									this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
-
 									this.setFov( newFov );
-									this.applyTransformMatrix( this.scale( size, this._v3_2, false ) ); //adjusting distance
+									this.applyTransformMatrix( this.scale( size, this._v3_2, false ) );
 
+									//adjusting distance
 									_offset.copy( this._gizmos.position ).sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
-
 									this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
 
 								}
@@ -950,7 +867,6 @@
 
 						//perform rotation animation
 						const deltaTime = performance.now() - this._timeCurrent;
-
 						if ( deltaTime < 120 ) {
 
 							const w = Math.abs( ( this._wPrev + this._wCurr ) / 2 );
@@ -983,7 +899,6 @@
 				} else if ( this._state == STATE.PAN || this._state == STATE.IDLE ) {
 
 					this.updateTbState( STATE.IDLE, false );
-
 					if ( this.enableGrid ) {
 
 						this.disposeGrid();
@@ -1006,11 +921,9 @@
 					this.dispatchEvent( _startEvent );
 					this.setCenter( event.clientX, event.clientY );
 					const hitP = this.unprojectOnObj( this.getCursorNDC( _center.x, _center.y, this.domElement ), this.camera );
-
 					if ( hitP != null && this.enableAnimations ) {
 
 						const self = this;
-
 						if ( this._animationId != - 1 ) {
 
 							window.cancelAnimationFrame( this._animationId );
@@ -1047,11 +960,8 @@
 					this.dispatchEvent( _startEvent );
 					this.updateTbState( STATE.PAN, true );
 					this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
-
 					this._startCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement, true ) );
-
 					this._currentCursorPosition.copy( this._startCursorPosition );
-
 					this.activateGizmos( false );
 
 				}
@@ -1063,17 +973,14 @@
 				if ( this.enabled && this.enablePan ) {
 
 					this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
-
 					if ( this._state != STATE.PAN ) {
 
 						this.updateTbState( STATE.PAN, true );
-
 						this._startCursorPosition.copy( this._currentCursorPosition );
 
 					}
 
 					this._currentCursorPosition.copy( this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement, true ) );
-
 					this.applyTransformMatrix( this.pan( this._startCursorPosition, this._currentCursorPosition, true ) );
 					this.dispatchEvent( _changeEvent );
 
@@ -1093,7 +1000,9 @@
 				if ( this.enabled && this.enableRotate ) {
 
 					this.dispatchEvent( _startEvent );
-					this.updateTbState( STATE.ZROTATE, true ); //this._startFingerRotation = event.rotation;
+					this.updateTbState( STATE.ZROTATE, true );
+
+					//this._startFingerRotation = event.rotation;
 
 					this._startFingerRotation = this.getAngle( this._touchCurrent[ 1 ], this._touchCurrent[ 0 ] ) + this.getAngle( this._touchStart[ 1 ], this._touchStart[ 0 ] );
 					this._currentFingerRotation = this._startFingerRotation;
@@ -1115,17 +1024,15 @@
 
 					this.setCenter( ( this._touchCurrent[ 0 ].clientX + this._touchCurrent[ 1 ].clientX ) / 2, ( this._touchCurrent[ 0 ].clientY + this._touchCurrent[ 1 ].clientY ) / 2 );
 					let rotationPoint;
-
 					if ( this._state != STATE.ZROTATE ) {
 
 						this.updateTbState( STATE.ZROTATE, true );
 						this._startFingerRotation = this._currentFingerRotation;
 
-					} //this._currentFingerRotation = event.rotation;
+					}
 
-
+					//this._currentFingerRotation = event.rotation;
 					this._currentFingerRotation = this.getAngle( this._touchCurrent[ 1 ], this._touchCurrent[ 0 ] ) + this.getAngle( this._touchStart[ 1 ], this._touchStart[ 0 ] );
-
 					if ( ! this.enablePan ) {
 
 						rotationPoint = new THREE.Vector3().setFromMatrixPosition( this._gizmoMatrixState );
@@ -1133,7 +1040,6 @@
 					} else {
 
 						this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
-
 						rotationPoint = this.unprojectOnTbPlane( this.camera, _center.x, _center.y, this.domElement ).applyQuaternion( this.camera.quaternion ).multiplyScalar( 1 / this.camera.zoom ).add( this._v3_2 );
 
 					}
@@ -1185,7 +1091,6 @@
 					this._currentFingerDistance = Math.max( this.calculatePointersDistance( this._touchCurrent[ 0 ], this._touchCurrent[ 1 ] ), minDistance * this._devPxRatio );
 					const amount = this._currentFingerDistance / this._startFingerDistance;
 					let scalePoint;
-
 					if ( ! this.enablePan ) {
 
 						scalePoint = this._gizmos.position;
@@ -1223,12 +1128,12 @@
 				if ( this.enabled && this.enableZoom ) {
 
 					this.dispatchEvent( _startEvent );
-					this.updateTbState( STATE.SCALE, true ); //const center = event.center;
+					this.updateTbState( STATE.SCALE, true );
 
+					//const center = event.center;
 					let clientX = 0;
 					let clientY = 0;
 					const nFingers = this._touchCurrent.length;
-
 					for ( let i = 0; i < nFingers; i ++ ) {
 
 						clientX += this._touchCurrent[ i ].clientX;
@@ -1237,9 +1142,7 @@
 					}
 
 					this.setCenter( clientX / nFingers, clientY / nFingers );
-
 					this._startCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-
 					this._currentCursorPosition.copy( this._startCursorPosition );
 
 				}
@@ -1259,11 +1162,11 @@
 					//		| 	  \
 					//		| _ _ _\
 					//			y
+
 					//const center = event.center;
 					let clientX = 0;
 					let clientY = 0;
 					const nFingers = this._touchCurrent.length;
-
 					for ( let i = 0; i < nFingers; i ++ ) {
 
 						clientX += this._touchCurrent[ i ].clientX;
@@ -1273,12 +1176,9 @@
 
 					this.setCenter( clientX / nFingers, clientY / nFingers );
 					const screenNotches = 8; //how many wheel notches corresponds to a full screen pan
-
 					this._currentCursorPosition.setY( this.getCursorNDC( _center.x, _center.y, this.domElement ).y * 0.5 );
-
 					const movement = this._currentCursorPosition.y - this._startCursorPosition.y;
 					let size = 1;
-
 					if ( movement < 0 ) {
 
 						size = 1 / Math.pow( this.scaleFactor, - movement * screenNotches );
@@ -1290,30 +1190,27 @@
 					}
 
 					this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
-
 					const x = this._v3_1.distanceTo( this._gizmos.position );
-
 					let xNew = x / size; //distance between camera and gizmos if scale(size, scalepoint) would be performed
+
 					//check min and max distance
-
 					xNew = THREE.MathUtils.clamp( xNew, this.minDistance, this.maxDistance );
-					const y = x * Math.tan( THREE.MathUtils.DEG2RAD * this._fovState * 0.5 ); //calculate new fov
+					const y = x * Math.tan( THREE.MathUtils.DEG2RAD * this._fovState * 0.5 );
 
-					let newFov = THREE.MathUtils.RAD2DEG * ( Math.atan( y / xNew ) * 2 ); //check min and max fov
+					//calculate new fov
+					let newFov = THREE.MathUtils.RAD2DEG * ( Math.atan( y / xNew ) * 2 );
 
+					//check min and max fov
 					newFov = THREE.MathUtils.clamp( newFov, this.minFov, this.maxFov );
 					const newDistance = y / Math.tan( THREE.MathUtils.DEG2RAD * ( newFov / 2 ) );
 					size = x / newDistance;
-
 					this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
-
 					this.setFov( newFov );
-					this.applyTransformMatrix( this.scale( size, this._v3_2, false ) ); //adjusting distance
+					this.applyTransformMatrix( this.scale( size, this._v3_2, false ) );
 
+					//adjusting distance
 					_offset.copy( this._gizmos.position ).sub( this.camera.position ).normalize().multiplyScalar( newDistance / x );
-
 					this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
-
 					this.dispatchEvent( _changeEvent );
 
 				}
@@ -1323,7 +1220,8 @@
 			this.onTriplePanEnd = () => {
 
 				this.updateTbState( STATE.IDLE, false );
-				this.dispatchEvent( _endEvent ); //this.dispatchEvent( _changeEvent );
+				this.dispatchEvent( _endEvent );
+				//this.dispatchEvent( _changeEvent );
 
 			};
 
@@ -1374,7 +1272,6 @@
 				const mouseInput = [ 0, 1, 2, 'WHEEL' ];
 				const keyInput = [ 'CTRL', 'SHIFT', null ];
 				let state;
-
 				if ( ! operationInput.includes( operation ) || ! mouseInput.includes( mouse ) || ! keyInput.includes( key ) ) {
 
 					//invalid parameters
@@ -1398,15 +1295,12 @@
 					case 'PAN':
 						state = STATE.PAN;
 						break;
-
 					case 'ROTATE':
 						state = STATE.ROTATE;
 						break;
-
 					case 'ZOOM':
 						state = STATE.SCALE;
 						break;
-
 					case 'FOV':
 						state = STATE.FOV;
 						break;
@@ -1419,7 +1313,6 @@
 					key: key,
 					state: state
 				};
-
 				for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 					if ( this.mouseActions[ i ].mouse == action.mouse && this.mouseActions[ i ].key == action.key ) {
@@ -1456,11 +1349,9 @@
 			this.getOpFromAction = ( mouse, key ) => {
 
 				let action;
-
 				for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 					action = this.mouseActions[ i ];
-
 					if ( action.mouse == mouse && action.key == key ) {
 
 						return action.operation;
@@ -1474,7 +1365,6 @@
 					for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 						action = this.mouseActions[ i ];
-
 						if ( action.mouse == mouse && action.key == null ) {
 
 							return action.operation;
@@ -1492,11 +1382,9 @@
 			this.getOpStateFromAction = ( mouse, key ) => {
 
 				let action;
-
 				for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 					action = this.mouseActions[ i ];
-
 					if ( action.mouse == mouse && action.key == key ) {
 
 						return action.state;
@@ -1510,7 +1398,6 @@
 					for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
 						action = this.mouseActions[ i ];
-
 						if ( action.mouse == mouse && action.key == null ) {
 
 							return action.state;
@@ -1538,7 +1425,6 @@
 					if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
 
 						this._touchCurrent.splice( i, 1, event );
-
 						break;
 
 					}
@@ -1551,7 +1437,6 @@
 
 				const s = p1 - p0;
 				const t = ( t1 - t0 ) / 1000;
-
 				if ( t == 0 ) {
 
 					return 0;
@@ -1571,11 +1456,8 @@
 			this.calculateRotationAxis = ( vec1, vec2 ) => {
 
 				this._rotationMatrix.extractRotation( this._cameraMatrixState );
-
 				this._quat.setFromRotationMatrix( this._rotationMatrix );
-
 				this._rotationAxis.crossVectors( vec1, vec2 ).applyQuaternion( this._quat );
-
 				return this._rotationAxis.normalize().clone();
 
 			};
@@ -1583,13 +1465,10 @@
 			this.calculateTbRadius = camera => {
 
 				const distance = camera.position.distanceTo( this._gizmos.position );
-
 				if ( camera.type == 'PerspectiveCamera' ) {
 
 					const halfFovV = THREE.MathUtils.DEG2RAD * camera.fov * 0.5; //vertical fov/2 in radians
-
 					const halfFovH = Math.atan( camera.aspect * Math.tan( halfFovV ) ); //horizontal fov/2 in radians
-
 					return Math.tan( Math.min( halfFovV, halfFovH ) ) * distance * this.radiusFactor;
 
 				} else if ( camera.type == 'OrthographicCamera' ) {
@@ -1604,22 +1483,15 @@
 
 				//move center of camera (along with gizmos) towards point of interest
 				_offset.copy( point ).sub( this._gizmos.position ).multiplyScalar( amount );
-
 				this._translationMatrix.makeTranslation( _offset.x, _offset.y, _offset.z );
-
 				_gizmoMatrixStateTemp.copy( this._gizmoMatrixState );
-
 				this._gizmoMatrixState.premultiply( this._translationMatrix );
-
 				this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
-
 				_cameraMatrixStateTemp.copy( this._cameraMatrixState );
-
 				this._cameraMatrixState.premultiply( this._translationMatrix );
+				this._cameraMatrixState.decompose( this.camera.position, this.camera.quaternion, this.camera.scale );
 
-				this._cameraMatrixState.decompose( this.camera.position, this.camera.quaternion, this.camera.scale ); //apply zoom
-
-
+				//apply zoom
 				if ( this.enableZoom ) {
 
 					this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
@@ -1627,7 +1499,6 @@
 				}
 
 				this._gizmoMatrixState.copy( _gizmoMatrixStateTemp );
-
 				this._cameraMatrixState.copy( _cameraMatrixStateTemp );
 
 			};
@@ -1639,7 +1510,6 @@
 					const color = 0x888888;
 					const multiplier = 3;
 					let size, divisions, maxLength, tick;
-
 					if ( this.camera.isOrthographicCamera ) {
 
 						const width = this.camera.right - this.camera.left;
@@ -1664,15 +1534,10 @@
 					if ( this._grid == null ) {
 
 						this._grid = new THREE.GridHelper( size, divisions, color, color );
-
 						this._grid.position.copy( this._gizmos.position );
-
 						this._gridPosition.copy( this._grid.position );
-
 						this._grid.quaternion.copy( this.camera.quaternion );
-
 						this._grid.rotateX( Math.PI * 0.5 );
-
 						this.scene.add( this._grid );
 
 					}
@@ -1723,7 +1588,6 @@
 				const gizmoX = this._gizmos.children[ 0 ];
 				const gizmoY = this._gizmos.children[ 1 ];
 				const gizmoZ = this._gizmos.children[ 2 ];
-
 				if ( isActive ) {
 
 					gizmoX.material.setValues( {
@@ -1755,11 +1619,8 @@
 			this.getCursorNDC = ( cursorX, cursorY, canvas ) => {
 
 				const canvasRect = canvas.getBoundingClientRect();
-
 				this._v2_1.setX( ( cursorX - canvasRect.left ) / canvasRect.width * 2 - 1 );
-
 				this._v2_1.setY( ( canvasRect.bottom - cursorY ) / canvasRect.height * 2 - 1 );
-
 				return this._v2_1.clone();
 
 			};
@@ -1767,7 +1628,6 @@
 			this.getCursorPosition = ( cursorX, cursorY, canvas ) => {
 
 				this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
-
 				this._v2_1.x *= ( this.camera.right - this.camera.left ) * 0.5;
 				this._v2_1.y *= ( this.camera.top - this.camera.bottom ) * 0.5;
 				return this._v2_1.clone();
@@ -1777,8 +1637,9 @@
 			this.setCamera = camera => {
 
 				camera.lookAt( this.target );
-				camera.updateMatrix(); //setting state
+				camera.updateMatrix();
 
+				//setting state
 				if ( camera.type == 'PerspectiveCamera' ) {
 
 					this._fov0 = camera.fov;
@@ -1787,11 +1648,8 @@
 				}
 
 				this._cameraMatrixState0.copy( camera.matrix );
-
 				this._cameraMatrixState.copy( this._cameraMatrixState0 );
-
 				this._cameraProjectionState.copy( camera.projectionMatrix );
-
 				this._zoom0 = camera.zoom;
 				this._zoomState = this._zoom0;
 				this._initialNear = camera.near;
@@ -1800,14 +1658,12 @@
 				this._initialFar = camera.far;
 				this._farPos0 = camera.position.distanceTo( this.target ) - camera.far;
 				this._farPos = this._initialFar;
-
 				this._up0.copy( camera.up );
-
 				this._upState.copy( camera.up );
-
 				this.camera = camera;
-				this.camera.updateProjectionMatrix(); //making gizmos
+				this.camera.updateProjectionMatrix();
 
+				//making gizmos
 				this._tbRadius = this.calculateTbRadius( camera );
 				this.makeGizmos( this.target, this._tbRadius );
 
@@ -1816,10 +1672,12 @@
 			this.makeGizmos = ( tbCenter, tbRadius ) => {
 
 				const curve = new THREE.EllipseCurve( 0, 0, tbRadius, tbRadius );
-				const points = curve.getPoints( this._curvePts ); //geometry
+				const points = curve.getPoints( this._curvePts );
 
-				const curveGeometry = new THREE.BufferGeometry().setFromPoints( points ); //material
+				//geometry
+				const curveGeometry = new THREE.BufferGeometry().setFromPoints( points );
 
+				//material
 				const curveMaterialX = new THREE.LineBasicMaterial( {
 					color: 0xff8080,
 					fog: false,
@@ -1837,38 +1695,34 @@
 					fog: false,
 					transparent: true,
 					opacity: 0.6
-				} ); //line
+				} );
 
+				//line
 				const gizmoX = new THREE.Line( curveGeometry, curveMaterialX );
 				const gizmoY = new THREE.Line( curveGeometry, curveMaterialY );
 				const gizmoZ = new THREE.Line( curveGeometry, curveMaterialZ );
 				const rotation = Math.PI * 0.5;
 				gizmoX.rotation.x = rotation;
-				gizmoY.rotation.y = rotation; //setting state
+				gizmoY.rotation.y = rotation;
 
+				//setting state
 				this._gizmoMatrixState0.identity().setPosition( tbCenter );
-
 				this._gizmoMatrixState.copy( this._gizmoMatrixState0 );
-
 				if ( this.camera.zoom !== 1 ) {
 
 					//adapt gizmos size to camera zoom
 					const size = 1 / this.camera.zoom;
-
 					this._scaleMatrix.makeScale( size, size, size );
-
 					this._translationMatrix.makeTranslation( - tbCenter.x, - tbCenter.y, - tbCenter.z );
-
 					this._gizmoMatrixState.premultiply( this._translationMatrix ).premultiply( this._scaleMatrix );
-
 					this._translationMatrix.makeTranslation( tbCenter.x, tbCenter.y, tbCenter.z );
-
 					this._gizmoMatrixState.premultiply( this._translationMatrix );
 
 				}
 
-				this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale ); //
+				this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
+				//
 
 				this._gizmos.traverse( function ( object ) {
 
@@ -1880,14 +1734,12 @@
 					}
 
 				} );
+				this._gizmos.clear();
 
-				this._gizmos.clear(); //
-
+				//
 
 				this._gizmos.add( gizmoX );
-
 				this._gizmos.add( gizmoY );
-
 				this._gizmos.add( gizmoZ );
 
 			};
@@ -1905,14 +1757,12 @@
 
 					const deltaTime = time - this._timeStart;
 					const animTime = deltaTime / this.focusAnimationTime;
-
 					this._gizmoMatrixState.copy( gizmoMatrix );
-
 					if ( animTime >= 1 ) {
 
 						//animation end
-						this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
+						this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 						this.focus( point, this.scaleFactor );
 						this._timeStart = - 1;
 						this.updateTbState( STATE.IDLE, false );
@@ -1923,9 +1773,7 @@
 
 						const amount = this.easeOutCubic( animTime );
 						const size = 1 - amount + this.scaleFactor * amount;
-
 						this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
-
 						this.focus( point, size, amount );
 						this.dispatchEvent( _changeEvent );
 						const self = this;
@@ -1940,6 +1788,7 @@
 				} else {
 
 					//interrupt animation
+
 					this._animationId = - 1;
 					this._timeStart = - 1;
 
@@ -1963,7 +1812,6 @@
 					//w = w0 + alpha * t
 					const deltaTime = ( time - this._timeStart ) / 1000;
 					const w = w0 + - this.dampingFactor * deltaTime;
-
 					if ( w > 0 ) {
 
 						//tetha = 0.5 * alpha * t^2 + w0 * t + tetha0
@@ -1990,9 +1838,9 @@
 				} else {
 
 					//interrupt animation
+
 					this._animationId = - 1;
 					this._timeStart = - 1;
-
 					if ( this._state != STATE.ROTATE ) {
 
 						this.activateGizmos( false );
@@ -2007,7 +1855,6 @@
 			this.pan = ( p0, p1, adjust = false ) => {
 
 				const movement = p0.clone().sub( p1 );
-
 				if ( this.camera.isOrthographicCamera ) {
 
 					//adjust movement amount
@@ -2017,20 +1864,14 @@
 
 					//adjust movement amount
 					this._v3_1.setFromMatrixPosition( this._cameraMatrixState0 ); //camera's initial position
-
-
 					this._v3_2.setFromMatrixPosition( this._gizmoMatrixState0 ); //gizmo's initial position
-
-
 					const distanceFactor = this._v3_1.distanceTo( this._v3_2 ) / this.camera.position.distanceTo( this._gizmos.position );
 					movement.multiplyScalar( 1 / distanceFactor );
 
 				}
 
 				this._v3_1.set( movement.x, movement.y, 0 ).applyQuaternion( this.camera.quaternion );
-
 				this._m4_1.makeTranslation( this._v3_1.x, this._v3_1.y, this._v3_1.z );
-
 				this.setTransformationMatrices( this._m4_1, this._m4_1 );
 				return _transformation;
 
@@ -2039,7 +1880,6 @@
 			this.reset = () => {
 
 				this.camera.zoom = this._zoom0;
-
 				if ( this.camera.isPerspectiveCamera ) {
 
 					this.camera.fov = this._fov0;
@@ -2048,21 +1888,14 @@
 
 				this.camera.near = this._nearPos;
 				this.camera.far = this._farPos;
-
 				this._cameraMatrixState.copy( this._cameraMatrixState0 );
-
 				this._cameraMatrixState.decompose( this.camera.position, this.camera.quaternion, this.camera.scale );
-
 				this.camera.up.copy( this._up0 );
 				this.camera.updateMatrix();
 				this.camera.updateProjectionMatrix();
-
 				this._gizmoMatrixState.copy( this._gizmoMatrixState0 );
-
 				this._gizmoMatrixState0.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
-
 				this._gizmos.updateMatrix();
-
 				this._tbRadius = this.calculateTbRadius( this.camera );
 				this.makeGizmos( this._gizmos.position, this._tbRadius );
 				this.camera.lookAt( this._gizmos.position );
@@ -2074,18 +1907,13 @@
 			this.rotate = ( axis, angle ) => {
 
 				const point = this._gizmos.position; //rotation center
-
 				this._translationMatrix.makeTranslation( - point.x, - point.y, - point.z );
+				this._rotationMatrix.makeRotationAxis( axis, - angle );
 
-				this._rotationMatrix.makeRotationAxis( axis, - angle ); //rotate camera
-
-
+				//rotate camera
 				this._m4_1.makeTranslation( point.x, point.y, point.z );
-
 				this._m4_1.multiply( this._rotationMatrix );
-
 				this._m4_1.multiply( this._translationMatrix );
-
 				this.setTransformationMatrices( this._m4_1 );
 				return _transformation;
 
@@ -2094,7 +1922,6 @@
 			this.copyState = () => {
 
 				let state;
-
 				if ( this.camera.isOrthographicCamera ) {
 
 					state = JSON.stringify( {
@@ -2142,15 +1969,11 @@
 			this.saveState = () => {
 
 				this._cameraMatrixState0.copy( this.camera.matrix );
-
 				this._gizmoMatrixState0.copy( this._gizmos.matrix );
-
 				this._nearPos = this.camera.near;
 				this._farPos = this.camera.far;
 				this._zoom0 = this.camera.zoom;
-
 				this._up0.copy( this.camera.up );
-
 				if ( this.camera.isPerspectiveCamera ) {
 
 					this._fov0 = this.camera.fov;
@@ -2162,15 +1985,14 @@
 			this.scale = ( size, point, scaleGizmos = true ) => {
 
 				_scalePointTemp.copy( point );
-
 				let sizeInverse = 1 / size;
-
 				if ( this.camera.isOrthographicCamera ) {
 
 					//camera zoom
 					this.camera.zoom = this._zoomState;
-					this.camera.zoom *= size; //check min and max zoom
+					this.camera.zoom *= size;
 
+					//check min and max zoom
 					if ( this.camera.zoom > this.maxZoom ) {
 
 						this.camera.zoom = this.maxZoom;
@@ -2184,46 +2006,34 @@
 					}
 
 					this.camera.updateProjectionMatrix();
-
 					this._v3_1.setFromMatrixPosition( this._gizmoMatrixState ); //gizmos position
+
 					//scale gizmos so they appear in the same spot having the same dimension
-
-
 					this._scaleMatrix.makeScale( sizeInverse, sizeInverse, sizeInverse );
-
 					this._translationMatrix.makeTranslation( - this._v3_1.x, - this._v3_1.y, - this._v3_1.z );
-
 					this._m4_2.makeTranslation( this._v3_1.x, this._v3_1.y, this._v3_1.z ).multiply( this._scaleMatrix );
+					this._m4_2.multiply( this._translationMatrix );
 
-					this._m4_2.multiply( this._translationMatrix ); //move camera and gizmos to obtain pinch effect
-
-
+					//move camera and gizmos to obtain pinch effect
 					_scalePointTemp.sub( this._v3_1 );
-
 					const amount = _scalePointTemp.clone().multiplyScalar( sizeInverse );
-
 					_scalePointTemp.sub( amount );
-
 					this._m4_1.makeTranslation( _scalePointTemp.x, _scalePointTemp.y, _scalePointTemp.z );
-
 					this._m4_2.premultiply( this._m4_1 );
-
 					this.setTransformationMatrices( this._m4_1, this._m4_2 );
 					return _transformation;
 
 				} else if ( this.camera.isPerspectiveCamera ) {
 
 					this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
+					this._v3_2.setFromMatrixPosition( this._gizmoMatrixState );
 
-					this._v3_2.setFromMatrixPosition( this._gizmoMatrixState ); //move camera
-
-
+					//move camera
 					let distance = this._v3_1.distanceTo( _scalePointTemp );
+					let amount = distance - distance * sizeInverse;
 
-					let amount = distance - distance * sizeInverse; //check min and max distance
-
+					//check min and max distance
 					const newDistance = distance - amount;
-
 					if ( newDistance < this.minDistance ) {
 
 						sizeInverse = this.minDistance / distance;
@@ -2237,30 +2047,20 @@
 					}
 
 					_offset.copy( _scalePointTemp ).sub( this._v3_1 ).normalize().multiplyScalar( amount );
-
 					this._m4_1.makeTranslation( _offset.x, _offset.y, _offset.z );
-
 					if ( scaleGizmos ) {
 
 						//scale gizmos so they appear in the same spot having the same dimension
 						const pos = this._v3_2;
 						distance = pos.distanceTo( _scalePointTemp );
 						amount = distance - distance * sizeInverse;
-
 						_offset.copy( _scalePointTemp ).sub( this._v3_2 ).normalize().multiplyScalar( amount );
-
 						this._translationMatrix.makeTranslation( pos.x, pos.y, pos.z );
-
 						this._scaleMatrix.makeScale( sizeInverse, sizeInverse, sizeInverse );
-
 						this._m4_2.makeTranslation( _offset.x, _offset.y, _offset.z ).multiply( this._translationMatrix );
-
 						this._m4_2.multiply( this._scaleMatrix );
-
 						this._translationMatrix.makeTranslation( - pos.x, - pos.y, - pos.z );
-
 						this._m4_2.multiply( this._translationMatrix );
-
 						this.setTransformationMatrices( this._m4_1, this._m4_2 );
 
 					} else {
@@ -2289,25 +2089,14 @@
 			this.zRotate = ( point, angle ) => {
 
 				this._rotationMatrix.makeRotationAxis( this._rotationAxis, angle );
-
 				this._translationMatrix.makeTranslation( - point.x, - point.y, - point.z );
-
 				this._m4_1.makeTranslation( point.x, point.y, point.z );
-
 				this._m4_1.multiply( this._rotationMatrix );
-
 				this._m4_1.multiply( this._translationMatrix );
-
 				this._v3_1.setFromMatrixPosition( this._gizmoMatrixState ).sub( point ); //vector from rotation center to gizmos position
-
-
 				this._v3_2.copy( this._v3_1 ).applyAxisAngle( this._rotationAxis, angle ); //apply rotation
-
-
 				this._v3_2.sub( this._v3_1 );
-
 				this._m4_2.makeTranslation( this._v3_2.x, this._v3_2.y, this._v3_2.z );
-
 				this.setTransformationMatrices( this._m4_1, this._m4_2 );
 				return _transformation;
 
@@ -2320,7 +2109,6 @@
 				raycaster.far = camera.far;
 				raycaster.setFromCamera( cursor, camera );
 				const intersect = raycaster.intersectObjects( this.scene.children, true );
-
 				for ( let i = 0; i < intersect.length; i ++ ) {
 
 					if ( intersect[ i ].object.uuid != this._gizmos.uuid && intersect[ i ].face != null ) {
@@ -2340,13 +2128,10 @@
 				if ( camera.type == 'OrthographicCamera' ) {
 
 					this._v2_1.copy( this.getCursorPosition( cursorX, cursorY, canvas ) );
-
 					this._v3_1.set( this._v2_1.x, this._v2_1.y, 0 );
-
 					const x2 = Math.pow( this._v2_1.x, 2 );
 					const y2 = Math.pow( this._v2_1.y, 2 );
 					const r2 = Math.pow( this._tbRadius, 2 );
-
 					if ( x2 + y2 <= r2 * 0.5 ) {
 
 						//intersection with sphere
@@ -2365,16 +2150,13 @@
 
 					//unproject cursor on the near plane
 					this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
-
 					this._v3_1.set( this._v2_1.x, this._v2_1.y, - 1 );
-
 					this._v3_1.applyMatrix4( camera.projectionMatrixInverse );
-
 					const rayDir = this._v3_1.clone().normalize(); //unprojected ray direction
-
-
 					const cameraGizmoDistance = camera.position.distanceTo( this._gizmos.position );
-					const radius2 = Math.pow( tbRadius, 2 ); //	  camera
+					const radius2 = Math.pow( tbRadius, 2 );
+
+					//	  camera
 					//		|\
 					//		| \
 					//		|  \
@@ -2386,7 +2168,6 @@
 
 					const h = this._v3_1.z;
 					const l = Math.sqrt( Math.pow( this._v3_1.x, 2 ) + Math.pow( this._v3_1.y, 2 ) );
-
 					if ( l == 0 ) {
 
 						//ray aligned with camera
@@ -2397,6 +2178,7 @@
 
 					const m = h / l;
 					const q = cameraGizmoDistance;
+
 					/*
          * calculate intersection point between unprojected ray and trackball surface
          *|y = m * x + q
@@ -2404,25 +2186,21 @@
          *
          * (m^2 + 1) * x^2 + (2 * m * q) * x + q^2 - r^2 = 0
          */
-
 					let a = Math.pow( m, 2 ) + 1;
 					let b = 2 * m * q;
 					let c = Math.pow( q, 2 ) - radius2;
 					let delta = Math.pow( b, 2 ) - 4 * a * c;
-
 					if ( delta >= 0 ) {
 
 						//intersection with sphere
 						this._v2_1.setX( ( - b - Math.sqrt( delta ) ) / ( 2 * a ) );
-
 						this._v2_1.setY( m * this._v2_1.x + q );
-
 						const angle = THREE.MathUtils.RAD2DEG * this._v2_1.angle();
-
 						if ( angle >= 45 ) {
 
 							//if angle between intersection point and X' axis is >= 45°, return that point
 							//otherwise, calculate intersection point with hyperboloid
+
 							const rayLength = Math.sqrt( Math.pow( this._v2_1.x, 2 ) + Math.pow( cameraGizmoDistance - this._v2_1.y, 2 ) );
 							rayDir.multiplyScalar( rayLength );
 							rayDir.z += cameraGizmoDistance;
@@ -2430,8 +2208,9 @@
 
 						}
 
-					} //intersection with hyperboloid
+					}
 
+					//intersection with hyperboloid
 					/*
          *|y = m * x + q
          *|y = (1 / x) * (r^2 / 2)
@@ -2439,16 +2218,12 @@
          * m * x^2 + q * x - r^2 / 2 = 0
          */
 
-
 					a = m;
 					b = q;
 					c = - radius2 * 0.5;
 					delta = Math.pow( b, 2 ) - 4 * a * c;
-
 					this._v2_1.setX( ( - b - Math.sqrt( delta ) ) / ( 2 * a ) );
-
 					this._v2_1.setY( m * this._v2_1.x + q );
-
 					const rayLength = Math.sqrt( Math.pow( this._v2_1.x, 2 ) + Math.pow( cameraGizmoDistance - this._v2_1.y, 2 ) );
 					rayDir.multiplyScalar( rayLength );
 					rayDir.z += cameraGizmoDistance;
@@ -2463,21 +2238,18 @@
 				if ( camera.type == 'OrthographicCamera' ) {
 
 					this._v2_1.copy( this.getCursorPosition( cursorX, cursorY, canvas ) );
-
 					this._v3_1.set( this._v2_1.x, this._v2_1.y, 0 );
-
 					return this._v3_1.clone();
 
 				} else if ( camera.type == 'PerspectiveCamera' ) {
 
-					this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) ); //unproject cursor on the near plane
+					this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
 
-
+					//unproject cursor on the near plane
 					this._v3_1.set( this._v2_1.x, this._v2_1.y, - 1 );
-
 					this._v3_1.applyMatrix4( camera.projectionMatrixInverse );
-
 					const rayDir = this._v3_1.clone().normalize(); //unprojected ray direction
+
 					//	  camera
 					//		|\
 					//		| \
@@ -2488,11 +2260,9 @@
 					//	_ _ | _ _ _\ _ _  near plane
 					//			l
 
-
 					const h = this._v3_1.z;
 					const l = Math.sqrt( Math.pow( this._v3_1.x, 2 ) + Math.pow( this._v3_1.y, 2 ) );
 					let cameraGizmoDistance;
-
 					if ( initialDistance ) {
 
 						cameraGizmoDistance = this._v3_1.setFromMatrixPosition( this._cameraMatrixState0 ).distanceTo( this._v3_2.setFromMatrixPosition( this._gizmoMatrixState0 ) );
@@ -2502,6 +2272,7 @@
 						cameraGizmoDistance = camera.position.distanceTo( this._gizmos.position );
 
 					}
+
 					/*
          * calculate intersection point between unprojected ray and the plane
          *|y = mx + q
@@ -2509,8 +2280,6 @@
          *
          * x = -q/m
         */
-
-
 					if ( l == 0 ) {
 
 						//ray aligned with camera
@@ -2535,13 +2304,10 @@
 
 				//update camera and gizmos state
 				this._cameraMatrixState.copy( this.camera.matrix );
-
 				this._gizmoMatrixState.copy( this._gizmos.matrix );
-
 				if ( this.camera.isOrthographicCamera ) {
 
 					this._cameraProjectionState.copy( this.camera.projectionMatrix );
-
 					this.camera.updateProjectionMatrix();
 					this._zoomState = this.camera.zoom;
 
@@ -2556,7 +2322,6 @@
 			this.updateTbState = ( newState, updateMatrices ) => {
 
 				this._state = newState;
-
 				if ( updateMatrices ) {
 
 					this.updateMatrixState();
@@ -2568,20 +2333,16 @@
 			this.update = () => {
 
 				const EPS = 0.000001;
-
 				if ( this.target.equals( this._currentTarget ) === false ) {
 
 					this._gizmos.position.copy( this.target ); //for correct radius calculation
-
-
 					this._tbRadius = this.calculateTbRadius( this.camera );
 					this.makeGizmos( this.target, this._tbRadius );
-
 					this._currentTarget.copy( this.target );
 
-				} //check min/max parameters
+				}
 
-
+				//check min/max parameters
 				if ( this.camera.isOrthographicCamera ) {
 
 					//check zoom
@@ -2596,16 +2357,15 @@
 
 					//check distance
 					const distance = this.camera.position.distanceTo( this._gizmos.position );
-
 					if ( distance > this.maxDistance + EPS || distance < this.minDistance - EPS ) {
 
 						const newDistance = THREE.MathUtils.clamp( distance, this.minDistance, this.maxDistance );
 						this.applyTransformMatrix( this.scale( newDistance / distance, this._gizmos.position ) );
 						this.updateMatrixState();
 
-					} //check fov
+					}
 
-
+					//check fov
 					if ( this.camera.fov < this.minFov || this.camera.fov > this.maxFov ) {
 
 						this.camera.fov = THREE.MathUtils.clamp( this.camera.fov, this.minFov, this.maxFov );
@@ -2615,7 +2375,6 @@
 
 					const oldRadius = this._tbRadius;
 					this._tbRadius = this.calculateTbRadius( this.camera );
-
 					if ( oldRadius < this._tbRadius - EPS || oldRadius > this._tbRadius + EPS ) {
 
 						const scale = ( this._gizmos.scale.x + this._gizmos.scale.y + this._gizmos.scale.z ) / 3;
@@ -2623,7 +2382,6 @@
 						const curve = new THREE.EllipseCurve( 0, 0, newRadius, newRadius );
 						const points = curve.getPoints( this._curvePts );
 						const curveGeometry = new THREE.BufferGeometry().setFromPoints( points );
-
 						for ( const gizmo in this._gizmos.children ) {
 
 							this._gizmos.children[ gizmo ].geometry = curveGeometry;
@@ -2641,18 +2399,14 @@
 			this.setStateFromJSON = json => {
 
 				const state = JSON.parse( json );
-
 				if ( state.arcballState != undefined ) {
 
 					this._cameraMatrixState.fromArray( state.arcballState.cameraMatrix.elements );
-
 					this._cameraMatrixState.decompose( this.camera.position, this.camera.quaternion, this.camera.scale );
-
 					this.camera.up.copy( state.arcballState.cameraUp );
 					this.camera.near = state.arcballState.cameraNear;
 					this.camera.far = state.arcballState.cameraFar;
 					this.camera.zoom = state.arcballState.cameraZoom;
-
 					if ( this.camera.isPerspectiveCamera ) {
 
 						this.camera.fov = state.arcballState.cameraFov;
@@ -2660,20 +2414,14 @@
 					}
 
 					this._gizmoMatrixState.fromArray( state.arcballState.gizmoMatrix.elements );
-
 					this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
-
 					this.camera.updateMatrix();
 					this.camera.updateProjectionMatrix();
-
 					this._gizmos.updateMatrix();
-
 					this._tbRadius = this.calculateTbRadius( this.camera );
 					const gizmoTmp = new THREE.Matrix4().copy( this._gizmoMatrixState0 );
 					this.makeGizmos( this._gizmos.position, this._tbRadius );
-
 					this._gizmoMatrixState0.copy( gizmoTmp );
-
 					this.camera.lookAt( this._gizmos.position );
 					this.updateTbState( STATE.IDLE, false );
 					this.dispatchEvent( _changeEvent );
@@ -2689,24 +2437,24 @@
 			this._currentTarget = new THREE.Vector3();
 			this.radiusFactor = 0.67;
 			this.mouseActions = [];
-			this._mouseOp = null; //global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
+			this._mouseOp = null;
 
+			//global vectors and matrices that are used in some operations to avoid creating new objects every time (e.g. every time cursor moves)
 			this._v2_1 = new THREE.Vector2();
 			this._v3_1 = new THREE.Vector3();
 			this._v3_2 = new THREE.Vector3();
 			this._m4_1 = new THREE.Matrix4();
 			this._m4_2 = new THREE.Matrix4();
-			this._quat = new THREE.Quaternion(); //transformation matrices
+			this._quat = new THREE.Quaternion();
 
+			//transformation matrices
 			this._translationMatrix = new THREE.Matrix4(); //matrix for translation operation
-
 			this._rotationMatrix = new THREE.Matrix4(); //matrix for rotation operation
-
 			this._scaleMatrix = new THREE.Matrix4(); //matrix for scaling operation
 
 			this._rotationAxis = new THREE.Vector3(); //axis for rotate operation
-			//camera state
 
+			//camera state
 			this._cameraMatrixState = new THREE.Matrix4();
 			this._cameraProjectionState = new THREE.Matrix4();
 			this._fovState = 1;
@@ -2714,8 +2462,9 @@
 			this._zoomState = 1;
 			this._nearPos = 0;
 			this._farPos = 0;
-			this._gizmoMatrixState = new THREE.Matrix4(); //initial values
+			this._gizmoMatrixState = new THREE.Matrix4();
 
+			//initial values
 			this._up0 = new THREE.Vector3();
 			this._zoom0 = 1;
 			this._fov0 = 0;
@@ -2724,81 +2473,70 @@
 			this._initialFar = 0;
 			this._farPos0 = 0;
 			this._cameraMatrixState0 = new THREE.Matrix4();
-			this._gizmoMatrixState0 = new THREE.Matrix4(); //pointers array
+			this._gizmoMatrixState0 = new THREE.Matrix4();
 
+			//pointers array
 			this._button = - 1;
 			this._touchStart = [];
 			this._touchCurrent = [];
-			this._input = INPUT.NONE; //two fingers touch interaction
+			this._input = INPUT.NONE;
 
+			//two fingers touch interaction
 			this._switchSensibility = 32; //minimum movement to be performed to fire single pan start after the second finger has been released
-
 			this._startFingerDistance = 0; //distance between two fingers
-
 			this._currentFingerDistance = 0;
 			this._startFingerRotation = 0; //amount of rotation performed with two fingers
+			this._currentFingerRotation = 0;
 
-			this._currentFingerRotation = 0; //double tap
-
+			//double tap
 			this._devPxRatio = 0;
 			this._downValid = true;
 			this._nclicks = 0;
 			this._downEvents = [];
 			this._downStart = 0; //pointerDown time
-
 			this._clickStart = 0; //first click time
-
 			this._maxDownTime = 250;
 			this._maxInterval = 300;
 			this._posThreshold = 24;
-			this._movementThreshold = 24; //cursor positions
+			this._movementThreshold = 24;
 
+			//cursor positions
 			this._currentCursorPosition = new THREE.Vector3();
-			this._startCursorPosition = new THREE.Vector3(); //grid
+			this._startCursorPosition = new THREE.Vector3();
 
+			//grid
 			this._grid = null; //grid to be visualized during pan operation
+			this._gridPosition = new THREE.Vector3();
 
-			this._gridPosition = new THREE.Vector3(); //gizmos
-
+			//gizmos
 			this._gizmos = new THREE.Group();
-			this._curvePts = 128; //animations
+			this._curvePts = 128;
 
+			//animations
 			this._timeStart = - 1; //initial time
+			this._animationId = - 1;
 
-			this._animationId = - 1; //focus animation
-
+			//focus animation
 			this.focusAnimationTime = 500; //duration of focus animation in ms
+
 			//rotate animation
-
 			this._timePrev = 0; //time at which previous rotate operation has been detected
-
 			this._timeCurrent = 0; //time at which current rotate operation has been detected
-
 			this._anglePrev = 0; //angle of previous rotation
-
 			this._angleCurrent = 0; //angle of current rotation
-
 			this._cursorPosPrev = new THREE.Vector3(); //cursor position when previous rotate operation has been detected
-
 			this._cursorPosCurr = new THREE.Vector3(); //cursor position when current rotate operation has been detected
-
 			this._wPrev = 0; //angular velocity of the previous rotate operation
-
 			this._wCurr = 0; //angular velocity of the current rotate operation
-			//parameters
 
+			//parameters
 			this.adjustNearFar = false;
 			this.scaleFactor = 1.1; //zoom/distance multiplier
-
 			this.dampingFactor = 25;
 			this.wMax = 20; //maximum angular velocity allowed
-
 			this.enableAnimations = true; //if animations should be performed
-
 			this.enableGrid = false; //if grid should be showed during pan operation
-
 			this.cursorZoom = false; //if wheel zoom should be cursor centered
-
 			this.minFov = 5;
 			this.maxFov = 90;
 			this.enabled = true;
@@ -2809,13 +2547,14 @@
 			this.minDistance = 0;
 			this.maxDistance = Infinity;
 			this.minZoom = 0;
-			this.maxZoom = Infinity; //trackball parameters
+			this.maxZoom = Infinity;
 
-			this._tbRadius = 1; //FSA
+			//trackball parameters
+			this._tbRadius = 1;
 
+			//FSA
 			this._state = STATE.IDLE;
 			this.setCamera( _camera );
-
 			if ( this.scene != null ) {
 
 				this.scene.add( this._gizmos );
@@ -2831,8 +2570,9 @@
 			this.domElement.addEventListener( 'pointercancel', this.onPointerCancel );
 			window.addEventListener( 'resize', this.onWindowResize );
 
-		} //listeners
+		}
 
+		//listeners
 
 		/**
    * Apply a transformation matrix, to the camera and gizmos
@@ -2843,11 +2583,10 @@
 			if ( transformation.camera != null ) {
 
 				this._m4_1.copy( this._cameraMatrixState ).premultiply( transformation.camera );
-
 				this._m4_1.decompose( this.camera.position, this.camera.quaternion, this.camera.scale );
+				this.camera.updateMatrix();
 
-				this.camera.updateMatrix(); //update camera up vector
-
+				//update camera up vector
 				if ( this._state == STATE.ROTATE || this._state == STATE.ZROTATE || this._state == STATE.ANIMATION_ROTATE ) {
 
 					this.camera.up.copy( this._upState ).applyQuaternion( this.camera.quaternion );
@@ -2859,9 +2598,7 @@
 			if ( transformation.gizmos != null ) {
 
 				this._m4_1.copy( this._gizmoMatrixState ).premultiply( transformation.gizmos );
-
 				this._m4_1.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
-
 				this._gizmos.updateMatrix();
 
 			}
@@ -2869,7 +2606,6 @@
 			if ( this._state == STATE.SCALE || this._state == STATE.FOCUS || this._state == STATE.ANIMATION_FOCUS ) {
 
 				this._tbRadius = this.calculateTbRadius( this.camera );
-
 				if ( this.adjustNearFar ) {
 
 					const cameraDistance = this.camera.position.distanceTo( this._gizmos.position );
@@ -2890,7 +2626,6 @@
 				} else {
 
 					let update = false;
-
 					if ( this.camera.near != this._initialNear ) {
 
 						this.camera.near = this._initialNear;
@@ -2916,6 +2651,7 @@
 			}
 
 		}
+
 		/**
    * Calculate the angular speed
    * @param {Number} p0 Position at t0
@@ -2923,7 +2659,6 @@
    * @param {Number} t0 Initial time in milliseconds
    * @param {Number} t1 Ending time in milliseconds
    */
-
 
 		/**
    * Set gizmos visibility
@@ -2935,12 +2670,11 @@
 			this.dispatchEvent( _changeEvent );
 
 		}
+
 		/**
    * Set gizmos radius factor and redraws gizmos
    * @param {Float} value Value of radius factor
    */
-
-
 		setTbRadius( value ) {
 
 			this.radiusFactor = value;
@@ -2948,7 +2682,6 @@
 			const curve = new THREE.EllipseCurve( 0, 0, this._tbRadius, this._tbRadius );
 			const points = curve.getPoints( this._curvePts );
 			const curveGeometry = new THREE.BufferGeometry().setFromPoints( points );
-
 			for ( const gizmo in this._gizmos.children ) {
 
 				this._gizmos.children[ gizmo ].geometry = curveGeometry;
@@ -2958,12 +2691,12 @@
 			this.dispatchEvent( _changeEvent );
 
 		}
+
 		/**
    * Creates the rotation gizmos matching trackball center and radius
    * @param {Vector3} tbCenter The trackball center
    * @param {number} tbRadius The trackball radius
    */
-
 
 		/**
    * Set values in transformation object
@@ -3009,6 +2742,7 @@
 			}
 
 		}
+
 		/**
    * Rotate camera around its direction axis passing by a given point by a given angle
    * @param {Vector3} point The point where the rotation axis is passing trough
@@ -3016,19 +2750,18 @@
    * @returns The computed transormation matix
    */
 
-
 		getRaycaster() {
 
 			return _raycaster;
 
 		}
+
 		/**
    * Unproject the cursor on the 3D object surface
    * @param {Vector2} cursor Cursor coordinates in NDC
    * @param {Camera} camera Virtual camera
    * @returns {Vector3} The point of intersection with the model, if exist, null otherwise
    */
-
 
 	}
 

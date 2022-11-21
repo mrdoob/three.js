@@ -113,10 +113,10 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 <p>자동으로 카메라의 시야를 조정하는 코드는 그대로 두었습니다.</p>
 <p>모듈이 바뀌었으니 import 문도 변경해야 합니다. <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>를 제거하고 <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a>를
 추가합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import { LoaderSupport } from '/examples/jsm/loaders/LoaderSupport.js';
--import { OBJLoader } from '/examples/jsm/loaders/OBJLoader.js';
--import { MTLLoader } from '/examples/jsm/loaders/MTLLoader.js';
-+import { GLTFLoader } from '/examples/jsm/loaders/GLTFLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import { LoaderSupport } from 'three/addons/loaders/LoaderSupport.js';
+-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+-import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
++import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 </pre>
 <p>이제 실행해보죠.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -262,7 +262,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 -    cars = root.getObjectByName('Cars');
 +    const loadedCars = root.getObjectByName('Cars');
 +    const fixes = [
-+      { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI +* .5], },
++      { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
 +      { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
 +      { prefix: 'Car_04', rot: [0, Math.PI, 0], },
 +    ];

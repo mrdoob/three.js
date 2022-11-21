@@ -55,9 +55,7 @@
 				value: .018
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -70,9 +68,7 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
@@ -266,9 +262,7 @@
 				value: null
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -280,9 +274,7 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDepth;
 
@@ -332,9 +324,7 @@
 				value: .5
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -346,9 +336,7 @@
 		}
 
 	`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;

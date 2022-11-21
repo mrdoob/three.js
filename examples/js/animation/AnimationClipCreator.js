@@ -11,7 +11,6 @@
 			return new THREE.AnimationClip( null, period, [ track ] );
 
 		}
-
 		static CreateScaleAxisAnimation( period, axis = 'x' ) {
 
 			const times = [ 0, period ],
@@ -21,13 +20,11 @@
 			return new THREE.AnimationClip( null, period, [ track ] );
 
 		}
-
 		static CreateShakeAnimation( duration, shakeScale ) {
 
 			const times = [],
 				values = [],
 				tmp = new THREE.Vector3();
-
 			for ( let i = 0; i < duration * 10; i ++ ) {
 
 				times.push( i / 10 );
@@ -40,13 +37,11 @@
 			return new THREE.AnimationClip( null, duration, [ track ] );
 
 		}
-
 		static CreatePulsationAnimation( duration, pulseScale ) {
 
 			const times = [],
 				values = [],
 				tmp = new THREE.Vector3();
-
 			for ( let i = 0; i < duration * 10; i ++ ) {
 
 				times.push( i / 10 );
@@ -60,7 +55,6 @@
 			return new THREE.AnimationClip( null, duration, [ track ] );
 
 		}
-
 		static CreateVisibilityAnimation( duration ) {
 
 			const times = [ 0, duration / 2, duration ],
@@ -70,13 +64,11 @@
 			return new THREE.AnimationClip( null, duration, [ track ] );
 
 		}
-
 		static CreateMaterialColorAnimation( duration, colors ) {
 
 			const times = [],
 				values = [],
 				timeStep = duration / colors.length;
-
 			for ( let i = 0; i <= colors.length; i ++ ) {
 
 				times.push( i * timeStep );

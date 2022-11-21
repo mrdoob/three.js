@@ -366,9 +366,9 @@ gui.add(new AllMaterialPropertyGUIHelper('transparent', scene), 'value')
     .onChange(requestRenderIfNotRequested);
 </pre>
 <p>and of course we need to include lil-gui</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-+import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>and here's the results</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

@@ -44,7 +44,7 @@
 
 					super( 'vec3' );
 
-					this.updateType = NodeUpdateType.Object;
+					this.updateType = NodeUpdateType.OBJECT;
 
 					this.uniformNode = uniform( new THREE.Color() );
 
@@ -75,9 +75,9 @@
 
 			const objects = [];
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -138,6 +138,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -154,8 +155,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 
@@ -191,15 +190,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
 				for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
 					const object = objects[ i ];
@@ -211,11 +201,7 @@
 
 				renderer.render( scene, camera );
 
-			}
-
-			function error( error ) {
-
-				console.error( error );
+				stats.update();
 
 			}
 

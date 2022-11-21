@@ -42,8 +42,7 @@ scene.add( light );
 			[page:Integer color] - (opzionale) Il colore esadecimale della luce. Il valore predefinito è 0xffffff (bianco).<br />
 			[page:Float intensity] - (opzionale) Il valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br />
 			[page:Number distance] - Portata massima della luce. Il valore predefinito è 0 (nessun limite).<br />
-			[page:Float decay] - La quantità di attenuazione della luce lungo la distanza della luce. Il valore predefinito è 1.
-			Per un'illuminazione [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], impostarlo a 2.<br /><br />
+			[page:Float decay] - La quantità di attenuazione della luce lungo la distanza della luce. Il valore predefinito è 2.<br /><br />
 
 			Crea una nuova [name].
 		</p>
@@ -55,9 +54,8 @@ scene.add( light );
 
 		<h3>[property:Float decay]</h3>
 		<p>
-			La quantità di attenuazione della luce lungo la distanza della luce.<br />
-			Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], decay = 2 porta ad una diminuzione della luce fisicamente realistica.<br/>
-			Il valore predefinito è `1`.
+			The amount the light dims along the distance of the light. Default is `2`.<br />
+			In context of physically-correct rendering the default value should not be changed.
 		</p>
 
 		<h3>[property:Float distance]</h3>

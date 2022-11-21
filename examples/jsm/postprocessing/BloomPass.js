@@ -10,15 +10,15 @@ import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
 
 class BloomPass extends Pass {
 
-	constructor( strength = 1, kernelSize = 25, sigma = 4, resolution = 256 ) {
+	constructor( strength = 1, kernelSize = 25, sigma = 4 ) {
 
 		super();
 
 		// render targets
 
-		this.renderTargetX = new WebGLRenderTarget( resolution, resolution );
+		this.renderTargetX = new WebGLRenderTarget(); // will be resized later
 		this.renderTargetX.texture.name = 'BloomPass.x';
-		this.renderTargetY = new WebGLRenderTarget( resolution, resolution );
+		this.renderTargetY = new WebGLRenderTarget(); // will be resized later
 		this.renderTargetY.texture.name = 'BloomPass.y';
 
 		// combine material
@@ -102,6 +102,25 @@ class BloomPass extends Pass {
 		renderer.setRenderTarget( readBuffer );
 		if ( this.clear ) renderer.clear();
 		this.fsQuad.render( renderer );
+
+	}
+
+	setSize( width, height ) {
+
+		this.renderTargetX.setSize( width, height );
+		this.renderTargetY.setSize( width, height );
+
+	}
+
+	dispose() {
+
+		this.renderTargetX.dispose();
+		this.renderTargetY.dispose();
+
+		this.materialCombine.dispose();
+		this.materialConvolution.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

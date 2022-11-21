@@ -62,6 +62,13 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -89,38 +96,27 @@
 
 				};
 
-				new EXRLoader()
-					.load( 'textures/piz_compressed.exr', function ( texture ) {
+				new EXRLoader().load( 'textures/piz_compressed.exr', function ( texture ) {
 
-						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
-						exrBackground = exrCubeRenderTarget.texture;
+					texture.mapping = THREE.EquirectangularReflectionMapping;
 
-						texture.dispose();
+					exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
+					exrBackground = texture;
 
-					} );
+				} );
 
 				new THREE.TextureLoader().load( 'textures/equirectangular.png', function ( texture ) {
 
+					texture.mapping = THREE.EquirectangularReflectionMapping;
 					texture.encoding = THREE.sRGBEncoding;
 
 					pngCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
-
-					pngBackground = pngCubeRenderTarget.texture;
-
-					texture.dispose();
+					pngBackground = texture;
 
 				} );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
-
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.appendChild( renderer.domElement );
-
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

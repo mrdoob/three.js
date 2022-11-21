@@ -30,7 +30,6 @@
 */
 
 	const _v1 = new THREE.Vector3();
-
 	class ConvexObjectBreaker {
 
 		constructor( minSizeForBreak = 1.4, smallDelta = 0.0001 ) {
@@ -59,16 +58,15 @@
 			};
 			this.segments = [];
 			const n = 30 * 30;
-
 			for ( let i = 0; i < n; i ++ ) this.segments[ i ] = false;
 
 		}
-
 		prepareBreakableObject( object, mass, velocity, angularVelocity, breakable ) {
 
 			// object is a Object3d (normally a THREE.Mesh), must have a BufferGeometry, and it must be convex.
 			// Its material property is propagated to its children (sub-pieces)
 			// mass must be > 0
+
 			if ( ! object.geometry.isBufferGeometry ) {
 
 				console.error( 'THREE.ConvexObjectBreaker.prepareBreakableObject(): Parameter object must have a BufferGeometry.' );
@@ -82,14 +80,13 @@
 			userData.breakable = breakable;
 
 		}
+
 		/*
    * @param {int} maxRadialIterations Iterations for radial cuts.
    * @param {int} maxRandomIterations Max random iterations for not-radial cuts
    *
    * Returns the array of pieces
    */
-
-
 		subdivideByImpact( object, pointOfImpact, normal, maxRadialIterations, maxRandomIterations ) {
 
 			const debris = [];
@@ -99,7 +96,6 @@
 			tempPlane1.setFromCoplanarPoints( pointOfImpact, object.position, this.tempVector3 );
 			const maxTotalIterations = maxRandomIterations + maxRadialIterations;
 			const scope = this;
-
 			function subdivideRadial( subObject, startAngle, endAngle, numIterations ) {
 
 				if ( Math.random() < numIterations * 0.05 || numIterations > maxTotalIterations ) {
@@ -110,7 +106,6 @@
 				}
 
 				let angle = Math.PI;
-
 				if ( numIterations === 0 ) {
 
 					tempPlane2.normal.copy( tempPlane1.normal );
@@ -120,28 +115,29 @@
 
 					if ( numIterations <= maxRadialIterations ) {
 
-						angle = ( endAngle - startAngle ) * ( 0.2 + 0.6 * Math.random() ) + startAngle; // Rotate tempPlane2 at impact point around normal axis and the angle
+						angle = ( endAngle - startAngle ) * ( 0.2 + 0.6 * Math.random() ) + startAngle;
 
+						// Rotate tempPlane2 at impact point around normal axis and the angle
 						scope.tempVector3_2.copy( object.position ).sub( pointOfImpact ).applyAxisAngle( normal, angle ).add( pointOfImpact );
 						tempPlane2.setFromCoplanarPoints( pointOfImpact, scope.tempVector3, scope.tempVector3_2 );
 
 					} else {
 
-						angle = ( 0.5 * ( numIterations & 1 ) + 0.2 * ( 2 - Math.random() ) ) * Math.PI; // Rotate tempPlane2 at object position around normal axis and the angle
+						angle = ( 0.5 * ( numIterations & 1 ) + 0.2 * ( 2 - Math.random() ) ) * Math.PI;
 
+						// Rotate tempPlane2 at object position around normal axis and the angle
 						scope.tempVector3_2.copy( pointOfImpact ).sub( subObject.position ).applyAxisAngle( normal, angle ).add( subObject.position );
 						scope.tempVector3_3.copy( normal ).add( subObject.position );
 						tempPlane2.setFromCoplanarPoints( subObject.position, scope.tempVector3_3, scope.tempVector3_2 );
 
 					}
 
-				} // Perform the cut
+				}
 
-
+				// Perform the cut
 				scope.cutByPlane( subObject, tempPlane2, scope.tempResultObjects );
 				const obj1 = scope.tempResultObjects.object1;
 				const obj2 = scope.tempResultObjects.object2;
-
 				if ( obj1 ) {
 
 					subdivideRadial( obj1, startAngle, angle, numIterations + 1 );
@@ -160,20 +156,19 @@
 			return debris;
 
 		}
-
 		cutByPlane( object, plane, output ) {
 
 			// Returns breakable objects in output.object1 and output.object2 members, the resulting 2 pieces of the cut.
 			// object2 can be null if the plane doesn't cut the object.
 			// object1 can be null only in case of internal error
 			// Returned value is number of pieces, 0 for error.
+
 			const geometry = object.geometry;
 			const coords = geometry.attributes.position.array;
 			const normals = geometry.attributes.normal.array;
 			const numPoints = coords.length / 3;
 			let numFaces = numPoints / 3;
 			let indices = geometry.getIndex();
-
 			if ( indices ) {
 
 				indices = indices.array;
@@ -184,6 +179,7 @@
 			function getVertexIndex( faceIdx, vert ) {
 
 				// vert = 0, 1 or 2.
+
 				const idx = faceIdx * 3 + vert;
 				return indices ? indices[ idx ] : idx;
 
@@ -191,34 +187,34 @@
 
 			const points1 = [];
 			const points2 = [];
-			const delta = this.smallDelta; // Reset segments mark
+			const delta = this.smallDelta;
 
+			// Reset segments mark
 			const numPointPairs = numPoints * numPoints;
-
 			for ( let i = 0; i < numPointPairs; i ++ ) this.segments[ i ] = false;
-
 			const p0 = this.tempVector3_P0;
 			const p1 = this.tempVector3_P1;
 			const n0 = this.tempVector3_N0;
-			const n1 = this.tempVector3_N1; // Iterate through the faces to mark edges shared by coplanar faces
+			const n1 = this.tempVector3_N1;
 
+			// Iterate through the faces to mark edges shared by coplanar faces
 			for ( let i = 0; i < numFaces - 1; i ++ ) {
 
 				const a1 = getVertexIndex( i, 0 );
 				const b1 = getVertexIndex( i, 1 );
-				const c1 = getVertexIndex( i, 2 ); // Assuming all 3 vertices have the same normal
+				const c1 = getVertexIndex( i, 2 );
 
+				// Assuming all 3 vertices have the same normal
 				n0.set( normals[ a1 ], normals[ a1 ] + 1, normals[ a1 ] + 2 );
-
 				for ( let j = i + 1; j < numFaces; j ++ ) {
 
 					const a2 = getVertexIndex( j, 0 );
 					const b2 = getVertexIndex( j, 1 );
-					const c2 = getVertexIndex( j, 2 ); // Assuming all 3 vertices have the same normal
+					const c2 = getVertexIndex( j, 2 );
 
+					// Assuming all 3 vertices have the same normal
 					n1.set( normals[ a2 ], normals[ a2 ] + 1, normals[ a2 ] + 2 );
 					const coplanar = 1 - n0.dot( n1 ) < delta;
-
 					if ( coplanar ) {
 
 						if ( a1 === a2 || a1 === b2 || a1 === c2 ) {
@@ -246,35 +242,35 @@
 
 				}
 
-			} // Transform the plane to object local space
+			}
 
-
+			// Transform the plane to object local space
 			const localPlane = this.tempPlane_Cut;
 			object.updateMatrix();
-			ConvexObjectBreaker.transformPlaneToLocalSpace( plane, object.matrix, localPlane ); // Iterate through the faces adding points to both pieces
+			ConvexObjectBreaker.transformPlaneToLocalSpace( plane, object.matrix, localPlane );
 
+			// Iterate through the faces adding points to both pieces
 			for ( let i = 0; i < numFaces; i ++ ) {
 
 				const va = getVertexIndex( i, 0 );
 				const vb = getVertexIndex( i, 1 );
 				const vc = getVertexIndex( i, 2 );
-
 				for ( let segment = 0; segment < 3; segment ++ ) {
 
 					const i0 = segment === 0 ? va : segment === 1 ? vb : vc;
 					const i1 = segment === 0 ? vb : segment === 1 ? vc : va;
 					const segmentState = this.segments[ i0 * numPoints + i1 ];
 					if ( segmentState ) continue; // The segment already has been processed in another face
-					// Mark segment as processed (also inverted segment)
 
+					// Mark segment as processed (also inverted segment)
 					this.segments[ i0 * numPoints + i1 ] = true;
 					this.segments[ i1 * numPoints + i0 ] = true;
 					p0.set( coords[ 3 * i0 ], coords[ 3 * i0 + 1 ], coords[ 3 * i0 + 2 ] );
-					p1.set( coords[ 3 * i1 ], coords[ 3 * i1 + 1 ], coords[ 3 * i1 + 2 ] ); // mark: 1 for negative side, 2 for positive side, 3 for coplanar point
+					p1.set( coords[ 3 * i1 ], coords[ 3 * i1 + 1 ], coords[ 3 * i1 + 2 ] );
 
+					// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
 					let mark0 = 0;
 					let d = localPlane.distanceToPoint( p0 );
-
 					if ( d > delta ) {
 
 						mark0 = 2;
@@ -291,12 +287,11 @@
 						points1.push( p0.clone() );
 						points2.push( p0.clone() );
 
-					} // mark: 1 for negative side, 2 for positive side, 3 for coplanar point
+					}
 
-
+					// mark: 1 for negative side, 2 for positive side, 3 for coplanar point
 					let mark1 = 0;
 					d = localPlane.distanceToPoint( p1 );
-
 					if ( d > delta ) {
 
 						mark1 = 2;
@@ -318,11 +313,11 @@
 					if ( mark0 === 1 && mark1 === 2 || mark0 === 2 && mark1 === 1 ) {
 
 						// Intersection of segment with the plane
+
 						this.tempLine1.start.copy( p0 );
 						this.tempLine1.end.copy( p1 );
 						let intersection = new THREE.Vector3();
 						intersection = localPlane.intersectLine( this.tempLine1, intersection );
-
 						if ( intersection === null ) {
 
 							// Shouldn't happen
@@ -340,21 +335,19 @@
 
 				}
 
-			} // Calculate debris mass (very fast and imprecise):
+			}
 
+			// Calculate debris mass (very fast and imprecise):
+			const newMass = object.userData.mass * 0.5;
 
-			const newMass = object.userData.mass * 0.5; // Calculate debris Center of Mass (again fast and imprecise)
-
+			// Calculate debris Center of Mass (again fast and imprecise)
 			this.tempCM1.set( 0, 0, 0 );
 			let radius1 = 0;
 			const numPoints1 = points1.length;
-
 			if ( numPoints1 > 0 ) {
 
 				for ( let i = 0; i < numPoints1; i ++ ) this.tempCM1.add( points1[ i ] );
-
 				this.tempCM1.divideScalar( numPoints1 );
-
 				for ( let i = 0; i < numPoints1; i ++ ) {
 
 					const p = points1[ i ];
@@ -370,13 +363,10 @@
 			this.tempCM2.set( 0, 0, 0 );
 			let radius2 = 0;
 			const numPoints2 = points2.length;
-
 			if ( numPoints2 > 0 ) {
 
 				for ( let i = 0; i < numPoints2; i ++ ) this.tempCM2.add( points2[ i ] );
-
 				this.tempCM2.divideScalar( numPoints2 );
-
 				for ( let i = 0; i < numPoints2; i ++ ) {
 
 					const p = points2[ i ];
@@ -392,7 +382,6 @@
 			let object1 = null;
 			let object2 = null;
 			let numObjects = 0;
-
 			if ( numPoints1 > 4 ) {
 
 				object1 = new THREE.Mesh( new THREE.ConvexGeometry( points1 ), object.material );
@@ -418,12 +407,12 @@
 			return numObjects;
 
 		}
-
 		static transformFreeVector( v, m ) {
 
 			// input:
 			// vector interpreted as a free vector
 			// THREE.Matrix4 orthogonal matrix (matrix without scale)
+
 			const x = v.x,
 				y = v.y,
 				z = v.z;
@@ -434,12 +423,12 @@
 			return v;
 
 		}
-
 		static transformFreeVectorInverse( v, m ) {
 
 			// input:
 			// vector interpreted as a free vector
 			// THREE.Matrix4 orthogonal matrix (matrix without scale)
+
 			const x = v.x,
 				y = v.y,
 				z = v.z;
@@ -450,12 +439,12 @@
 			return v;
 
 		}
-
 		static transformTiedVectorInverse( v, m ) {
 
 			// input:
 			// vector interpreted as a tied (ordinary) vector
 			// THREE.Matrix4 orthogonal matrix (matrix without scale)
+
 			const x = v.x,
 				y = v.y,
 				z = v.z;
@@ -466,14 +455,14 @@
 			return v;
 
 		}
-
 		static transformPlaneToLocalSpace( plane, m, resultPlane ) {
 
 			resultPlane.normal.copy( plane.normal );
 			resultPlane.constant = plane.constant;
 			const referencePoint = ConvexObjectBreaker.transformTiedVectorInverse( plane.coplanarPoint( _v1 ), m );
-			ConvexObjectBreaker.transformFreeVectorInverse( resultPlane.normal, m ); // recalculate constant (like in setFromNormalAndCoplanarPoint)
+			ConvexObjectBreaker.transformFreeVectorInverse( resultPlane.normal, m );
 
+			// recalculate constant (like in setFromNormalAndCoplanarPoint)
 			resultPlane.constant = - referencePoint.dot( resultPlane.normal );
 
 		}

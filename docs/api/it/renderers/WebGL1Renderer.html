@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:WebGLRenderer] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Poiché la versione r118 [page:WebGLRenderer] utilizza automaticamente un contesto di rendering WebGL 2, quando viene aggiornato un progetto estistente a
+		=> r118, l'applicazione potrebbe rompersi per due ragioni:
+
+		<ul>
+			<li>Il codice dello shader personalizzato deve essere conforme a GLSL 3.0.</li>
+			<li>I controlli dell'estensione WebGL 1 devono essere cambiati.</li>
+		</ul>
+
+		Se non hai tempo di cambiare il tuo codice ma vuoi ancora utilizzare l'ultima versione, puoi usare [name]. 
+		Questa versione di renderer forzerà un contesto di rendering WebGL 1.
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		Crea un nuovo [name].
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:WebGLRenderer] per le proprietà comuni.</p>
+
+		<h3>[property:Boolean isWebGL1Renderer]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:WebGLRenderer] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

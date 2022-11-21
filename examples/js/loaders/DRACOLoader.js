@@ -1,7 +1,6 @@
 ( function () {
 
 	const _taskCache = new WeakMap();
-
 	class DRACOLoader extends THREE.Loader {
 
 		constructor( manager ) {
@@ -29,28 +28,24 @@
 			};
 
 		}
-
 		setDecoderPath( path ) {
 
 			this.decoderPath = path;
 			return this;
 
 		}
-
 		setDecoderConfig( config ) {
 
 			this.decoderConfig = config;
 			return this;
 
 		}
-
 		setWorkerLimit( workerLimit ) {
 
 			this.workerLimit = workerLimit;
 			return this;
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const loader = new THREE.FileLoader( this.manager );
@@ -65,7 +60,6 @@
 			}, onProgress, onError );
 
 		}
-
 		decodeDracoFile( buffer, callback, attributeIDs, attributeTypes ) {
 
 			const taskConfig = {
@@ -76,16 +70,15 @@
 			return this.decodeGeometry( buffer, taskConfig ).then( callback );
 
 		}
-
 		decodeGeometry( buffer, taskConfig ) {
 
-			const taskKey = JSON.stringify( taskConfig ); // Check for an existing task using this buffer. A transferred buffer cannot be transferred
-			// again from this thread.
+			const taskKey = JSON.stringify( taskConfig );
 
+			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+			// again from this thread.
 			if ( _taskCache.has( buffer ) ) {
 
 				const cachedTask = _taskCache.get( buffer );
-
 				if ( cachedTask.key === taskKey ) {
 
 					return cachedTask.promise;
@@ -100,14 +93,16 @@
 
 				}
 
-			} //
+			}
 
+			//
 
 			let worker;
 			const taskID = this.workerNextTaskID ++;
-			const taskCost = buffer.byteLength; // Obtain a worker and assign a task, and construct a geometry instance
-			// when the task completes.
+			const taskCost = buffer.byteLength;
 
+			// Obtain a worker and assign a task, and construct a geometry instance
+			// when the task completes.
 			const geometryPending = this._getWorker( taskID, taskCost ).then( _worker => {
 
 				worker = _worker;
@@ -122,37 +117,39 @@
 						id: taskID,
 						taskConfig,
 						buffer
-					}, [ buffer ] ); // this.debug();
+					}, [ buffer ] );
+
+					// this.debug();
 
 				} );
 
-			} ).then( message => this._createGeometry( message.geometry ) ); // Remove task from the task list.
+			} ).then( message => this._createGeometry( message.geometry ) );
+
+			// Remove task from the task list.
 			// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
-
-
 			geometryPending.catch( () => true ).then( () => {
 
 				if ( worker && taskID ) {
 
-					this._releaseTask( worker, taskID ); // this.debug();
+					this._releaseTask( worker, taskID );
+
+					// this.debug();
 
 				}
 
-			} ); // Cache the task result.
+			} );
 
+			// Cache the task result.
 			_taskCache.set( buffer, {
 				key: taskKey,
 				promise: geometryPending
 			} );
-
 			return geometryPending;
 
 		}
-
 		_createGeometry( geometryData ) {
 
 			const geometry = new THREE.BufferGeometry();
-
 			if ( geometryData.index ) {
 
 				geometry.setIndex( new THREE.BufferAttribute( geometryData.index.array, 1 ) );
@@ -172,7 +169,6 @@
 			return geometry;
 
 		}
-
 		_loadLibrary( url, responseType ) {
 
 			const loader = new THREE.FileLoader( this.manager );
@@ -186,21 +182,17 @@
 			} );
 
 		}
-
 		preload() {
 
 			this._initDecoder();
-
 			return this;
 
 		}
-
 		_initDecoder() {
 
 			if ( this.decoderPending ) return this.decoderPending;
 			const useJS = typeof WebAssembly !== 'object' || this.decoderConfig.type === 'js';
 			const librariesPending = [];
-
 			if ( useJS ) {
 
 				librariesPending.push( this._loadLibrary( 'draco_decoder.js', 'text' ) );
@@ -215,7 +207,6 @@
 			this.decoderPending = Promise.all( librariesPending ).then( libraries => {
 
 				const jsContent = libraries[ 0 ];
-
 				if ( ! useJS ) {
 
 					this.decoderConfig.wasmBinary = libraries[ 1 ];
@@ -230,7 +221,6 @@
 			return this.decoderPending;
 
 		}
-
 		_getWorker( taskID, taskCost ) {
 
 			return this._initDecoder().then( () => {
@@ -245,23 +235,17 @@
 						type: 'init',
 						decoderConfig: this.decoderConfig
 					} );
-
 					worker.onmessage = function ( e ) {
 
 						const message = e.data;
-
 						switch ( message.type ) {
 
 							case 'decode':
 								worker._callbacks[ message.id ].resolve( message );
-
 								break;
-
 							case 'error':
 								worker._callbacks[ message.id ].reject( message );
-
 								break;
-
 							default:
 								console.error( 'THREE.DRACOLoader: Unexpected message, "' + message.type + '"' );
 
@@ -289,7 +273,6 @@
 			} );
 
 		}
-
 		_releaseTask( worker, taskID ) {
 
 			worker._taskLoad -= worker._taskCosts[ taskID ];
@@ -297,13 +280,11 @@
 			delete worker._taskCosts[ taskID ];
 
 		}
-
 		debug() {
 
 			console.log( 'Task load: ', this.workerPool.map( worker => worker._taskLoad ) );
 
 		}
-
 		dispose() {
 
 			for ( let i = 0; i < this.workerPool.length; ++ i ) {
@@ -318,25 +299,21 @@
 		}
 
 	}
-	/* WEB WORKER */
 
+	/* WEB WORKER */
 
 	function DRACOWorker() {
 
 		let decoderConfig;
 		let decoderPending;
-
 		onmessage = function ( e ) {
 
 			const message = e.data;
-
 			switch ( message.type ) {
 
 				case 'init':
 					decoderConfig = message.decoderConfig;
-					decoderPending = new Promise( function ( resolve
-						/*, reject*/
-					) {
+					decoderPending = new Promise( function ( resolve /*, reject*/ ) {
 
 						decoderConfig.onModuleLoaded = function ( draco ) {
 
@@ -350,8 +327,8 @@
 						DracoDecoderModule( decoderConfig ); // eslint-disable-line no-undef
 
 					} );
-					break;
 
+					break;
 				case 'decode':
 					const buffer = message.buffer;
 					const taskConfig = message.taskConfig;
@@ -361,7 +338,6 @@
 						const decoder = new draco.Decoder();
 						const decoderBuffer = new draco.DecoderBuffer();
 						decoderBuffer.Init( new Int8Array( buffer ), buffer.byteLength );
-
 						try {
 
 							const geometry = decodeGeometry( draco, decoder, decoderBuffer, taskConfig );
@@ -403,7 +379,6 @@
 			let dracoGeometry;
 			let decodingStatus;
 			const geometryType = decoder.GetEncodedGeometryType( decoderBuffer );
-
 			if ( geometryType === draco.TRIANGULAR_MESH ) {
 
 				dracoGeometry = new draco.Mesh();
@@ -429,17 +404,19 @@
 			const geometry = {
 				index: null,
 				attributes: []
-			}; // Gather all vertex attributes.
+			};
 
+			// Gather all vertex attributes.
 			for ( const attributeName in attributeIDs ) {
 
 				const attributeType = self[ attributeTypes[ attributeName ] ];
 				let attribute;
-				let attributeID; // A Draco file may be created with default vertex attributes, whose attribute IDs
+				let attributeID;
+
+				// A Draco file may be created with default vertex attributes, whose attribute IDs
 				// are mapped 1:1 from their semantic name (POSITION, NORMAL, ...). Alternatively,
 				// a Draco file may contain a custom set of attributes, identified by known unique
 				// IDs. glTF files always do the latter, and `.drc` files typically do the former.
-
 				if ( taskConfig.useUniqueIDs ) {
 
 					attributeID = attributeIDs[ attributeName ];
@@ -455,9 +432,9 @@
 
 				geometry.attributes.push( decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) );
 
-			} // Add index.
+			}
 
-
+			// Add index.
 			if ( geometryType === draco.TRIANGULAR_MESH ) {
 
 				geometry.index = decodeIndex( draco, decoder, dracoGeometry );
@@ -474,14 +451,10 @@
 			const numFaces = dracoGeometry.num_faces();
 			const numIndices = numFaces * 3;
 			const byteLength = numIndices * 4;
-
 			const ptr = draco._malloc( byteLength );
-
 			decoder.GetTrianglesUInt32Array( dracoGeometry, byteLength, ptr );
 			const index = new Uint32Array( draco.HEAPF32.buffer, ptr, numIndices ).slice();
-
 			draco._free( ptr );
-
 			return {
 				array: index,
 				itemSize: 1
@@ -496,14 +469,10 @@
 			const numValues = numPoints * numComponents;
 			const byteLength = numValues * attributeType.BYTES_PER_ELEMENT;
 			const dataType = getDracoDataType( draco, attributeType );
-
 			const ptr = draco._malloc( byteLength );
-
 			decoder.GetAttributeDataArrayForAllPoints( dracoGeometry, attribute, dataType, byteLength, ptr );
 			const array = new attributeType( draco.HEAPF32.buffer, ptr, numValues ).slice();
-
 			draco._free( ptr );
-
 			return {
 				name: attributeName,
 				array: array,
@@ -518,22 +487,16 @@
 
 				case Float32Array:
 					return draco.DT_FLOAT32;
-
 				case Int8Array:
 					return draco.DT_INT8;
-
 				case Int16Array:
 					return draco.DT_INT16;
-
 				case Int32Array:
 					return draco.DT_INT32;
-
 				case Uint8Array:
 					return draco.DT_UINT8;
-
 				case Uint16Array:
 					return draco.DT_UINT16;
-
 				case Uint32Array:
 					return draco.DT_UINT32;
 

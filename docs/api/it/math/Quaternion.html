@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Implementazione di un [link:http://en.wikipedia.org/wiki/Quaternion quaternione].<br/>
+			I quaternioni sono utilizzati in three.js per rappresentare le [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotazioni].
+		</p>
+
+		<p>
+			L'iterazione di un'istanza di [name] produrrà le sue componenti (x, y, z, w) nell'ordine corrispondente.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const quaternion = new THREE.Quaternion();
+		quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
+
+		const vector = new THREE.Vector3( 1, 0, 0 );
+		vector.applyQuaternion( quaternion );
+		</code>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
+		<p>
+		[page:Float x] - coordinata x.<br />
+		[page:Float y] - coordinata y.<br />
+		[page:Float z] - coordinata z.<br />
+		[page:Float w] - coordinata w.
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean isQuaternion]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Float x]</h3>
+
+		<h3>[property:Float y]</h3>
+
+		<h3>[property:Float z]</h3>
+
+		<h3>[property:Float w]</h3>
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:Float angleTo]( [param:Quaternion q] )</h3>
+		<p>
+			Restituisce l'angolo tra questo quaternione e il quaternione [page:Quaternion q] in radianti. 
+		</p>
+
+		<h3>[method:Quaternion clone]()</h3>
+		<p>
+			Crea un nuovo [name] con le proprietà [page:.x x], [page:.y y],
+			[page:.z z] e [page:.w w] identiche a questo.
+		</p>
+
+		<h3>[method:this conjugate]()</h3>
+		<p>
+			Restituisce il coniugato rotazionale di questo quaternione. Il coniugato di un quaternione
+			rappresenta la stessa rotazione nella direzione opposta rispetto all'asse di rotazione.
+		</p>
+
+		<h3>[method:this copy]( [param:Quaternion q] )</h3>
+		<p>
+			Copia le proprietà [page:.x x], [page:.y y], [page:.z z] e [page:.w w] di 
+			[page:Quaternion q] in questo quaterione.
+		</p>
+
+		<h3>[method:Boolean equals]( [param:Quaternion v] )</h3>
+		<p>
+		[page:Quaternion v] - Quaterione a cui verrà paragonato questo quaternione.<br /><br />
+
+		Compara le proprietà [page:.x x], [page:.y y],	[page:.z z] and [page:.w w] di
+		[page:Quaternion v] alle proprietà equivalenti di questo quaternione per determinare 
+		se rappresentano la stessa rotazione.
+		</p>
+
+		<h3>[method:Float dot]( [param:Quaternion v] )</h3>
+		<p>
+			Calcola il [link:https://en.wikipedia.org/wiki/Dot_product prodotto scalare] dei
+			quaternioni [page:Quaternion v] e questo.
+		</p>
+
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - array di formato (x, y, z, w) utilizzato per costruire il quaternione.<br />
+		[page:Integer offset] - (opzionale) un offset nell'array.<br /><br />
+
+		Imposta le proprietà [page:.x x], [page:.y y], [page:.z z] e [page:.w w] di questo quaternione
+		da un array.
+		</p>
+
+		<h3>[method:this identity]()</h3>
+		<p>
+			Imposta questo quaternione al quaterione identità; cioè al quaternione che rappresenta "nessuna rotazione".
+		</p>
+
+		<h3>[method:this invert]()</h3>
+		<p>
+			Inverte questo quaternione - calcola il [page:.conjugate coniugato]. Si presume che il quaternione abbia lunghezza unitaria.
+		</p>
+
+		<h3>[method:Float length]()</h3>
+		<p>Calcola la [link:https://en.wikipedia.org/wiki/Euclidean_distance lunghezza Euclidea]
+			(lunghezza in linea retta) di questo quaternione, considerato come un vettore a quattro dimensioni.
+		</p>
+
+		<h3>[method:Float lengthSq]()</h3>
+		<p>
+			Calcola la radice della [link:https://en.wikipedia.org/wiki/Euclidean_distance lunghezza Euclidea]
+			(lunghezza in linea retta) di questo quaternione, considerato come un vettore a quattro dimensioni.
+			Questo può essere utile se stai confrontando le lunghezze di due quaternioni, 
+			poiché questo è un calcolo leggermente più efficiente di [page:.length length]().
+		</p>
+
+		<h3>[method:this normalize]()</h3>
+		<p>
+			[link:https://en.wikipedia.org/wiki/Normalized_vector Normalizza] questo quaternione - cioè,
+			calcolato il quaternione che esegue la stessa rotazione di questo, ma con [page:.length lunghezza]
+			uguale a `1`.
+		</p>
+
+		<h3>[method:this multiply]( [param:Quaternion q] )</h3>
+		<p>Moltiplica questo quaternione per [page:Quaternion q].</p>
+
+		<h3>[method:this multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )</h3>
+		<p>
+			Imposta questo quaternione a [page:Quaternion a] x [page:Quaternion b].<br />
+			Adattato dal metodo descritto [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm qui].
+		</p>
+
+		<h3>[method:this premultiply]( [param:Quaternion q] )</h3>
+		<p>Pre-moltiplica questo quaternione per [page:Quaternion q].</p>
+
+		<h3>[method:this random]()</h3>
+		<p>
+			Imposta questo quaternione ad un quaternione normalizzato uniformemente casuale.
+		</p>
+
+		<h3>[method:this rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
+		<p>
+			[page:Quaternion q] - Il target quaternione.<br />
+			[page:Float step] - Il passo angolare in radianti.<br /><br />
+
+			Ruota questo quaternione di un dato passo angolare al quaternione definito *q*.
+			Il metodo assicura che il quaternione finale non superi *q*.
+		</p>
+
+		<h3>[method:this slerp]( [param:Quaternion qb], [param:Float t] )</h3>
+		<p>
+			[page:Quaternion qb] - L'altra rotazione del quaternione.<br />
+			[page:Float t] - Fattore di interpolazione nell'intervallo chiuso `[0, 1]`.<br /><br />
+
+			Gestisce l'interpolazione lineare tra i quaternioni. [page:Float t] rappresenta la quantità di rotazione
+			tra questo quaternione (dove [page:Float t] è 0) e [page:Quaternion qb] (dove
+			[page:Float t] è 1). Questo quaternione è impostato sul risultato. Vedi, anche, la versione
+			statica dello `slerp` qui sotto.
+
+			<code>
+			// ruota una mesh verso un quaternione target
+			mesh.quaternion.slerp( endQuaternion, 0.01 );
+			</code>
+		</p>
+
+		<h3>[method:this slerpQuaternions]( [param:Quaternion qa], [param:Quaternion qb], [param:Float t] )</h3>
+		<p>Esegue un'interpolazione sferica lineare tra i quaternioni dati e memorizza il risultato in questo quaternione.</p>
+
+		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
+		<p>Imposta le proprietà [page:.x x], [page:.y y], [page:.z z], [page:.w w] di questo quaternione.</p>
+
+		<h3>[method:this setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
+		<p>
+			Imposta questo quaternione dalla rotazione specificata dall'[page:Vector3 asse] e dall'[page:Float angolo].<br />
+			Adattato dal metodo [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm qui].<br />
+			Si presume che l'`asse` sia normalizzato e l'`angolo` sia in radianti.
+		</p>
+
+		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
+		<p>Imposta questo quaternione dalla rotazione specificata dall'angolo di [page:Eulero].</p>
+
+		<h3>[method:this setFromRotationMatrix]( [param:Matrix4 m] )</h3>
+		<p>
+		[page:Matrix4 m] - una [page:Matrix4] di cui il 3x3 superiore della matrice è una
+		[link:https://en.wikipedia.org/wiki/Rotation_matrix matrice di rotazione] pura (cioè non ridimensionata).<br />
+		Imposta questo quaternione dalla componente di rotazione di [page:Matrix4 m].<br />
+		Adattato dal metodo [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm qui].
+		</p>
+
+		<h3>[method:this setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )</h3>
+		<p>
+			Imposta questo quaterione alla rotazinoe richiesta per ruotare il vettore di direzione [page:Vector3 vFrom] a
+			[page:Vector3 vTo].<br />
+			Adattato dal metodo [link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors qui].<br />
+			Si presume che [page:Vector3 vFrom] e [page:Vector3 vTo] siano normalizzati.
+		</p>
+
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
+		<p>
+		[page:Array array] - Un array facoltativo per memorizzare il quaternione. Se non specificato, verrà creato un nuovo array.<br/>
+		[page:Integer offset] - (opzionale) se specificato, il risultato verrà copiato in questo [page:Array].<br /><br />
+
+		Restituisce gli elementi numerici di questo quaternione in un array del formato [x, y, z, w].
+		</p>
+
+		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
+		<p>
+		[page:BufferAttribute attribute] - l'attributo sorgente.<br />
+		[page:Integer index] - l'indice dell'attributo.<br /><br />
+
+		Imposta le proprietà [page:.x x], [page:.y y], [page:.z z], [page:.w w] di questo quaternione dall'[page:BufferAttribute attributo].
+		</p>
+
+		<h2>Metodi Statici</h2>
+
+		<h3>[method:undefined slerpFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1], [param:Float t] )</h3>
+		<p>
+		[page:Array dst] - L'array di output.<br />
+		[page:Integer dstOffset] - Un offset nell'array di output.<br />
+		[page:Array src0] - L'array sorgente del quaternione iniziale.<br />
+		[page:Integer srcOffset0] - Un offset nell'array `src0`.<br />
+		[page:Array src1] - L'array sorgente del quaternione target.<br />
+		[page:Integer srcOffset1] - Un offset nell'array `src1`.<br />
+		[page:Float t] - Fattore di interpolazione normalizzato (tra 0 e 1).<br /><br />
+
+		Questa implementazione SLERP presuppone che i dati del quaternione siano gestiti in array flat.
+		</p>
+
+		<h3>[method:Array multiplyQuaternionsFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1] )</h3>
+		<p>
+		[page:Array dst] - L'array di output.<br />
+		[page:Integer dstOffset] - Un offset nell'array di output.<br />
+		[page:Array src0] - L'array sorgente del quaternione iniziale.<br />
+		[page:Integer srcOffset0] - Un offset nell'array `src0`.<br />
+		[page:Array src1] - L'array sorgente del quaternione target.<br />
+		[page:Integer srcOffset1] - Un offset nell'array `src1`.<br /><br />
+
+		Questa implementazione della moltiplicazione presuppone che i dati del quaterione siano gestiti in array flat.
+		</p>
+
+		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

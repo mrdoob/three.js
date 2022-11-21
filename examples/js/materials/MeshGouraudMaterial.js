@@ -12,9 +12,7 @@
 				value: new THREE.Color( 0x000000 )
 			}
 		} ] ),
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		#define GOURAUD
 
@@ -190,9 +188,7 @@
 			#include <fog_vertex>
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#define GOURAUD
 
@@ -291,7 +287,9 @@
 			#include <dithering_fragment>
 
 		}`
-	}; //
+	};
+
+	//
 
 	class MeshGouraudMaterial extends THREE.ShaderMaterial {
 
@@ -299,27 +297,33 @@
 
 			super();
 			this.isMeshGouraudMaterial = true;
-			this.type = 'MeshGouraudMaterial'; //this.color = new THREE.Color( 0xffffff ); // diffuse
+			this.type = 'MeshGouraudMaterial';
+
+			//this.color = new THREE.Color( 0xffffff ); // diffuse
+
 			//this.map = null;
+
 			//this.lightMap = null;
 			//this.lightMapIntensity = 1.0;
+
 			//this.aoMap = null;
 			//this.aoMapIntensity = 1.0;
+
 			//this.emissive = new THREE.Color( 0x000000 );
 			//this.emissiveIntensity = 1.0;
 			//this.emissiveMap = null;
-			//this.specularMap = null;
-			//this.alphaMap = null;
-			//this.envMap = null;
 
+			//this.specularMap = null;
+
+			//this.alphaMap = null;
+
+			//this.envMap = null;
 			this.combine = THREE.MultiplyOperation; // combine has no uniform
 			//this.reflectivity = 1;
 			//this.refractionRatio = 0.98;
 
 			this.fog = false; // set to use scene fog
-
 			this.lights = true; // set to use scene lights
-
 			this.clipping = false; // set to use user-defined clipping planes
 
 			const shader = GouraudShader;
@@ -328,7 +332,6 @@
 			this.vertexShader = shader.vertexShader;
 			this.fragmentShader = shader.fragmentShader;
 			const exposePropertyNames = [ 'map', 'lightMap', 'lightMapIntensity', 'aoMap', 'aoMapIntensity', 'emissive', 'emissiveIntensity', 'emissiveMap', 'specularMap', 'alphaMap', 'envMap', 'reflectivity', 'refractionRatio', 'opacity', 'diffuse' ];
-
 			for ( const propertyName of exposePropertyNames ) {
 
 				Object.defineProperty( this, propertyName, {
@@ -350,7 +353,6 @@
 			this.setValues( parameters );
 
 		}
-
 		copy( source ) {
 
 			super.copy( source );

@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Velocity, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span><br/>
 			by <a href="https://Clara.io">Ben Houston</a>. ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 		</div>
 
@@ -35,6 +35,8 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { VelocityShader } from 'three/addons/shaders/VelocityShader.js';
+
 
 			let stats;
 
@@ -55,7 +57,7 @@
 			let cameraOrtho, cameraPerspective;
 			let controlsOrtho, controlsPerspective;
 
-			let mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal;
+			let mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal, materialVelocity;
 
 			const SCALE = 2.436143; // from original model
 			const BIAS = - 0.428408; // from original model
@@ -68,7 +70,7 @@
 			function initGui() {
 
 				const gui = new GUI();
-				gui.add( params, 'material', [ 'standard', 'normal', 'depthBasic', 'depthRGBA' ] );
+				gui.add( params, 'material', [ 'standard', 'normal', 'velocity', 'depthBasic', 'depthRGBA' ] );
 				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
 				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
 
@@ -191,6 +193,17 @@
 					side: THREE.DoubleSide
 				} );
 
+				materialVelocity = new THREE.ShaderMaterial( {
+					uniforms: THREE.UniformsUtils.clone( VelocityShader.uniforms ),
+					vertexShader: VelocityShader.vertexShader,
+					fragmentShader: VelocityShader.fragmentShader,
+					side: THREE.DoubleSide
+				} );
+				materialVelocity.uniforms.displacementMap.value = displacementMap;
+				materialVelocity.uniforms.displacementScale.value = SCALE;
+				materialVelocity.uniforms.displacementBias.value = BIAS;
+				materialVelocity.extensions.derivatives = true;
+
 				//
 
 				const loader = new OBJLoader();
@@ -202,6 +215,7 @@
 
 					mesh = new THREE.Mesh( geometry, materialNormal );
 					mesh.scale.multiplyScalar( 25 );
+					mesh.userData.matrixWorldPrevious = new THREE.Matrix4(); // for velocity
 					scene.add( mesh );
 
 				} );
@@ -261,6 +275,7 @@
 						case 'depthBasic': material = materialDepthBasic; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
 						case 'normal': material = materialNormal; break;
+						case 'velocity': material = materialVelocity; break;
 
 					}
 
@@ -296,7 +311,28 @@
 				controlsPerspective.update();
 				controlsOrtho.update(); // must update both controls for damping to complete
 
+				// remember camera projection changes
+			
+				materialVelocity.uniforms.previousProjectionViewMatrix.value.copy( materialVelocity.uniforms.currentProjectionViewMatrix.value );
+				materialVelocity.uniforms.currentProjectionViewMatrix.value.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+
+				if ( mesh && mesh.userData.matrixWorldPrevious ) {
+
+					materialVelocity.uniforms.modelMatrixPrev.value.copy( mesh.userData.matrixWorldPrevious );
+			
+				}
+
 				renderer.render( scene, camera );
+
+				scene.traverse( function ( object ) {
+
+					if ( object.isMesh ) {
+
+						object.userData.matrixWorldPrevious.copy( object.matrixWorld );
+			
+					}
+			
+				} );
 
 			}
 

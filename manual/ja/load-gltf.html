@@ -106,10 +106,10 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 </pre>
 <p>自動フレーミングのコードは以前のままです。</p>
 <p>また <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> を取り除き <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> を含める必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from '/examples/jsm/loaders/LoaderSupport.js';
--import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
--import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
-+import {GLTFLoader} from '/examples/jsm/loaders/GLTFLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
+-import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
+-import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
++import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 </pre>
 <p>実行すると以下になりました。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -249,7 +249,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 -    cars = root.getObjectByName('Cars');
 +    const loadedCars = root.getObjectByName('Cars');
 +    const fixes = [
-+      { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI +* .5], },
++      { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
 +      { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
 +      { prefix: 'Car_04', rot: [0, Math.PI, 0], },
 +    ];

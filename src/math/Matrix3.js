@@ -231,6 +231,83 @@ class Matrix3 {
 
 	}
 
+	//
+
+	scale( sx, sy ) {
+
+		this.premultiply( _m3.makeScale( sx, sy ) );
+
+		return this;
+
+	}
+
+	rotate( theta ) {
+
+		this.premultiply( _m3.makeRotation( - theta ) );
+
+		return this;
+
+	}
+
+	translate( tx, ty ) {
+
+		this.premultiply( _m3.makeTranslation( tx, ty ) );
+
+		return this;
+
+	}
+
+	// for 2D Transforms
+
+	makeTranslation( x, y ) {
+
+		this.set(
+
+			1, 0, x,
+			0, 1, y,
+			0, 0, 1
+
+		);
+
+		return this;
+
+	}
+
+	makeRotation( theta ) {
+
+		// counterclockwise
+
+		const c = Math.cos( theta );
+		const s = Math.sin( theta );
+
+		this.set(
+
+			c, - s, 0,
+			s, c, 0,
+			0, 0, 1
+
+		);
+
+		return this;
+
+	}
+
+	makeScale( x, y ) {
+
+		this.set(
+
+			x, 0, 0,
+			0, y, 0,
+			0, 0, 1
+
+		);
+
+		return this;
+
+	}
+
+	//
+
 	equals( matrix ) {
 
 		const te = this.elements;
@@ -285,5 +362,7 @@ class Matrix3 {
 	}
 
 }
+
+const _m3 = /*@__PURE__*/ new Matrix3();
 
 export { Matrix3 };

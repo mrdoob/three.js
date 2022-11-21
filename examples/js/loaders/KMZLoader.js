@@ -7,7 +7,6 @@
 			super( manager );
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -41,7 +40,6 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( data ) {
 
 			function findFile( url ) {
@@ -62,7 +60,6 @@
 			manager.setURLModifier( function ( url ) {
 
 				const image = findFile( url );
-
 				if ( image ) {
 
 					console.log( 'Loading', url );
@@ -75,7 +72,9 @@
 
 				return url;
 
-			} ); //
+			} );
+
+			//
 
 			const zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
 
@@ -84,7 +83,6 @@
 				const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' ); // eslint-disable-line no-undef
 
 				const model = xml.querySelector( 'Placemark Model Link href' );
-
 				if ( model ) {
 
 					const loader = new THREE.ColladaLoader( manager );
@@ -95,11 +93,9 @@
 			} else {
 
 				console.warn( 'KMZLoader: Missing doc.kml file.' );
-
 				for ( const path in zip ) {
 
 					const extension = path.split( '.' ).pop().toLowerCase();
-
 					if ( extension === 'dae' ) {
 
 						const loader = new THREE.ColladaLoader( manager );

@@ -21,10 +21,7 @@
 			this.fsQuad = new THREE.FullScreenQuad( null );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive */
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 			const oldAutoClear = renderer.autoClear;
 			renderer.autoClear = false;
@@ -36,6 +33,12 @@
 			if ( this.clear ) renderer.clear();
 			this.fsQuad.render( renderer );
 			renderer.autoClear = oldAutoClear;
+
+		}
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
 
 		}
 

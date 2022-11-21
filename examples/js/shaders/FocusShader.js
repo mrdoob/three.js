@@ -5,6 +5,7 @@
  * based on PaintEffect postprocess from ro.me
  * http://code.google.com/p/3-dreams-of-black/source/browse/deploy/js/effects/PaintEffect.js
  */
+
 	const FocusShader = {
 		uniforms: {
 			'tDiffuse': {
@@ -23,9 +24,7 @@
 				value: 0.00125
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -35,9 +34,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform float screenWidth;
 		uniform float screenHeight;

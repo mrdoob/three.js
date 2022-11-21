@@ -9,7 +9,6 @@
 		constructor( width, height, params ) {
 
 			super();
-
 			if ( THREE.HalftoneShader === undefined ) {
 
 				console.error( 'THREE.HalftonePass requires THREE.HalftoneShader' );
@@ -21,11 +20,11 @@
 				uniforms: this.uniforms,
 				fragmentShader: THREE.HalftoneShader.fragmentShader,
 				vertexShader: THREE.HalftoneShader.vertexShader
-			} ); // set params
+			} );
 
+			// set params
 			this.uniforms.width.value = width;
 			this.uniforms.height.value = height;
-
 			for ( const key in params ) {
 
 				if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
@@ -39,13 +38,9 @@
 			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive*/
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive*/ ) {
 
 			this.material.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
-
 			if ( this.renderToScreen ) {
 
 				renderer.setRenderTarget( null );
@@ -60,11 +55,16 @@
 			}
 
 		}
-
 		setSize( width, height ) {
 
 			this.uniforms.width.value = width;
 			this.uniforms.height.value = height;
+
+		}
+		dispose() {
+
+			this.material.dispose();
+			this.fsQuad.dispose();
 
 		}
 

@@ -12,14 +12,12 @@
 			this.pointTopLeft = new THREE.Vector2();
 			this.pointBottomRight = new THREE.Vector2();
 			this.isDown = false;
-
 			this.onPointerDown = function ( event ) {
 
 				this.isDown = true;
 				this.onSelectStart( event );
 
 			}.bind( this );
-
 			this.onPointerMove = function ( event ) {
 
 				if ( this.isDown ) {
@@ -29,20 +27,17 @@
 				}
 
 			}.bind( this );
-
 			this.onPointerUp = function () {
 
 				this.isDown = false;
 				this.onSelectOver();
 
 			}.bind( this );
-
 			this.renderer.domElement.addEventListener( 'pointerdown', this.onPointerDown );
 			this.renderer.domElement.addEventListener( 'pointermove', this.onPointerMove );
 			this.renderer.domElement.addEventListener( 'pointerup', this.onPointerUp );
 
 		}
-
 		dispose() {
 
 			this.renderer.domElement.removeEventListener( 'pointerdown', this.onPointerDown );
@@ -50,7 +45,6 @@
 			this.renderer.domElement.removeEventListener( 'pointerup', this.onPointerUp );
 
 		}
-
 		onSelectStart( event ) {
 
 			this.element.style.display = 'none';
@@ -63,7 +57,6 @@
 			this.startPoint.y = event.clientY;
 
 		}
-
 		onSelectMove( event ) {
 
 			this.element.style.display = 'block';
@@ -77,7 +70,6 @@
 			this.element.style.height = this.pointBottomRight.y - this.pointTopLeft.y + 'px';
 
 		}
-
 		onSelectOver() {
 
 			this.element.parentElement.removeChild( this.element );

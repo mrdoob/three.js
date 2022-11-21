@@ -13,7 +13,6 @@
 			this.setColorMap( colormap, count );
 
 		}
-
 		set( value ) {
 
 			if ( value.isLut === true ) {
@@ -25,21 +24,18 @@
 			return this;
 
 		}
-
 		setMin( min ) {
 
 			this.minV = min;
 			return this;
 
 		}
-
 		setMax( max ) {
 
 			this.maxV = max;
 			return this;
 
 		}
-
 		setColorMap( colormap, count = 32 ) {
 
 			this.map = ColorMapKeywords[ colormap ] || ColorMapKeywords.rainbow;
@@ -47,14 +43,17 @@
 			const step = 1.0 / this.n;
 			const minColor = new THREE.Color();
 			const maxColor = new THREE.Color();
-			this.lut.length = 0; // sample at 0
+			this.lut.length = 0;
 
-			this.lut.push( new THREE.Color( this.map[ 0 ][ 1 ] ) ); // sample at 1/n, ..., (n-1)/n
+			// sample at 0
+
+			this.lut.push( new THREE.Color( this.map[ 0 ][ 1 ] ) );
+
+			// sample at 1/n, ..., (n-1)/n
 
 			for ( let i = 1; i < count; i ++ ) {
 
 				const alpha = i * step;
-
 				for ( let j = 0; j < this.map.length - 1; j ++ ) {
 
 					if ( alpha > this.map[ j ][ 0 ] && alpha <= this.map[ j + 1 ][ 0 ] ) {
@@ -70,14 +69,14 @@
 
 				}
 
-			} // sample at 1
+			}
 
+			// sample at 1
 
 			this.lut.push( new THREE.Color( this.map[ this.map.length - 1 ][ 1 ] ) );
 			return this;
 
 		}
-
 		copy( lut ) {
 
 			this.lut = lut.lut;
@@ -88,7 +87,6 @@
 			return this;
 
 		}
-
 		getColor( alpha ) {
 
 			alpha = THREE.MathUtils.clamp( alpha, this.minV, this.maxV );
@@ -97,14 +95,12 @@
 			return this.lut[ colorPosition ];
 
 		}
-
 		addColorMap( name, arrayOfColors ) {
 
 			ColorMapKeywords[ name ] = arrayOfColors;
 			return this;
 
 		}
-
 		createCanvas() {
 
 			const canvas = document.createElement( 'canvas' );
@@ -114,7 +110,6 @@
 			return canvas;
 
 		}
-
 		updateCanvas( canvas ) {
 
 			const ctx = canvas.getContext( '2d', {
@@ -127,7 +122,6 @@
 			const minColor = new THREE.Color();
 			const maxColor = new THREE.Color();
 			const finalColor = new THREE.Color();
-
 			for ( let i = 1; i >= 0; i -= step ) {
 
 				for ( let j = this.map.length - 1; j >= 0; j -- ) {
@@ -157,7 +151,6 @@
 		}
 
 	}
-
 	const ColorMapKeywords = {
 		'rainbow': [[ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFF0000 ]],
 		'cooltowarm': [[ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ], [ 1.0, 0xB40426 ]],

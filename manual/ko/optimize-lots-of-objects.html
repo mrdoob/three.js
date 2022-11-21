@@ -350,7 +350,7 @@ function hsl(h, s, l) {
 <p>위 코드에서는 육면체의 중심을 옮기는 대신 <code class="notranslate" translate="no">originHelper</code>를 새로 만들어 중심축을 옮겼습니다. 이전에는 같은 geometry를 19000번 재활용했지만, 이번에는 데이터마다 geometry를 새로 생성했죠. 또한 <code class="notranslate" translate="no">applyMatrix</code>를 이용해 육면체 자체의 정점을 이동시키므로 메서드를 두 번 쓰는 대신 한 번만 썼습니다.</p>
 <p>그리고 생성한 육면체를 전부 배열에 저장한 뒤 이 배열을 <code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code>에 넘겨 하나의 geometry로 합쳤습니다.</p>
 <p>물론 <code class="notranslate" translate="no">BufferGeometryUtils</code>을 불러와야죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { BufferGeometryUtils } from '/examples/jsm/utils/BufferGeometryUtils.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { BufferGeometryUtils } from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
 <p>이제 제 컴퓨터에서는 적어도 60 프레임 이상이 나오네요.</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">

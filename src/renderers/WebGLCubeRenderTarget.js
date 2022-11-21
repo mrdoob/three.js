@@ -9,7 +9,7 @@ import { CubeTexture } from '../textures/CubeTexture.js';
 
 class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
-	constructor( size, options = {} ) {
+	constructor( size = 1, options = {} ) {
 
 		super( size, size, options );
 

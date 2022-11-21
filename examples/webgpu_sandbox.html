@@ -37,9 +37,9 @@
 
 			let box;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -179,11 +179,10 @@
 				renderer = new WebGPURenderer( { requiredFeatures: [ 'texture-compression-bc' ] } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 
@@ -197,8 +196,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;
@@ -235,12 +232,6 @@
 				const texture = new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
 				texture.needsUpdate = true;
 				return texture;
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

@@ -181,6 +181,7 @@ export const invert = nodeProxy( MathNode, MathNode.INVERT );
 export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
 export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
 export const round = nodeProxy( MathNode, MathNode.ROUND );
+export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
@@ -265,6 +266,7 @@ export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITI
 export const positionGeometry = nodeImmutable( PositionNode, PositionNode.GEOMETRY );
 export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );
 export const positionWorld = nodeImmutable( PositionNode, PositionNode.WORLD );
+export const positionWorldDirection = nodeImmutable( PositionNode, PositionNode.WORLD_DIRECTION );
 export const positionView = nodeImmutable( PositionNode, PositionNode.VIEW );
 export const positionViewDirection = nodeImmutable( PositionNode, PositionNode.VIEW_DIRECTION );
 

@@ -16,19 +16,17 @@ void main() {
 `;
 
 export const fragment = /* glsl */`
-#include <envmap_common_pars_fragment>
+uniform samplerCube tCube;
+uniform float tFlip;
 uniform float opacity;
 
 varying vec3 vWorldDirection;
 
-#include <cube_uv_reflection_fragment>
-
 void main() {
 
-	vec3 vReflect = vWorldDirection;
-	#include <envmap_fragment>
+	vec4 texColor = textureCube( tCube, vec3( tFlip * vWorldDirection.x, vWorldDirection.yz ) );
 
-	gl_FragColor = envColor;
+	gl_FragColor = texColor;
 	gl_FragColor.a *= opacity;
 
 	#include <tonemapping_fragment>

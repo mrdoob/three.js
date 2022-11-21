@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Utilizza un array di [page:Bone ossa] per creare uno scheletro che può essere utilizzato da una
+			[page:SkinnedMesh].
+		</p>
+
+		<h2>Codice di Esempio</h2>
+		<code>
+		// Crea un semplice "braccio"
+
+		const bones = [];
+
+		const shoulder = new THREE.Bone();
+		const elbow = new THREE.Bone();
+		const hand = new THREE.Bone();
+
+		shoulder.add( elbow );
+		elbow.add( hand );
+
+		bones.push( shoulder );
+		bones.push( elbow );
+		bones.push( hand );
+
+		shoulder.position.y = -5;
+		elbow.position.y = 0;
+		hand.position.y = 5;
+
+		const armSkeleton = new THREE.Skeleton( bones );
+		</code>
+
+		<p>
+			Vedi la pagina [page:SkinnedMesh] per un esempio dell'utilizzo con [page:BufferGeometry].
+ 		</p>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Array bones], [param:Array boneInverses] )</h3>
+		<p>
+		[page:Array bones] - L'array di [page:Bone ossa]. Il valore predefinito è un array vuoto.<br/>
+		[page:Array boneInverses] - (opzionale) Un array di [page:Matrix4 Matrix4].<br /><br />
+
+		Crea un nuovo [name].
+		</p>
+
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Array bones]</h3>
+		<p>
+			L'array di [page:Bone ossa]. Si noti che questa è una copia dell'array originale, non un riferimento,
+			quindi puoi modificare l'array originale senza che ci siano effetti su questo.
+		</p>
+
+		<h3>[property:Array boneInverses]</h3>
+		<p>
+			Un array di [page:Matrix4 Matrix4] che rappresenta l'inverso della [page:Matrix4 matrixWorld]
+			delle singole ossa.
+		</p>
+
+		<h3>[property:Float32Array boneMatrices]</h3>
+		<p>
+			Il buffer dell'array che contiene i dati dell'osso quando si utilizza una texture di vertice.
+		</p>
+
+		<h3>[property:DataTexture boneTexture]</h3>
+		<p>
+			Il [page:DataTexture] che contiene i dati dell'osso quando si utilizza una texture di vertice.
+		</p>
+
+		<h3>[property:Integer boneTextureSize]</h3>
+		<p>
+			La dimensione del [page:.boneTexture].
+		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:Skeleton clone]()</h3>
+		<p>
+			Restituisce un clone di questo oggetto Skeleton.
+		</p>
+
+		<h3>[method:undefined calculateInverses]()</h3>
+		<p>Genera l'array [page:.boneInverses boneInverses] se non viene fornito nel costruttore.</p>
+
+		<h3>[method:this computeBoneTexture]()</h3>
+		<p>Calcola un'istanza di [page:DataTexture] in moda da passare i dati dell'osso in modo più efficiente allo shader.
+			La texture viene assegnata a [page:.boneTexture boneTexture].</p>
+
+		<h3>[method:undefined pose]()</h3>
+		<p>Restituisce lo scheletro nella posa di base.</p>
+
+		<h3>[method:undefined update]()</h3>
+		<p>
+			Aggiorna [page:Float32Array boneMatrices] e [page:DataTexture boneTexture] dopo che le ossa sono state modificate.
+			Questo viene chiamato automaticamente dal [page:WebGLRenderer] se lo scheletro viene utilizzato con una [page:SkinnedMesh].
+		</p>
+
+		<h3>[method:Bone getBoneByName]( [param:String name] )</h3>
+		<p>
+		name -- Stringa da abbinare alla proprietà .name di Bone. <br /><br />
+
+		Cerca nell'array osseo dello scheletro e restituisce il primo con un nome corrispondente.<br />
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+			Libera le risorse relative alla GPU allocate da questa istanza. Chiama questo metodo ogni 
+			volta che questa istanza non viene più utilizzata nella tua app.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

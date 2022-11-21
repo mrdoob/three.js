@@ -1,7 +1,6 @@
 ( function () {
 
 	const inverseProjectionMatrix = new THREE.Matrix4();
-
 	class CSMFrustum {
 
 		constructor( data ) {
@@ -11,7 +10,6 @@
 				near: [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ],
 				far: [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ]
 			};
-
 			if ( data.projectionMatrix !== undefined ) {
 
 				this.setFromProjectionMatrix( data.projectionMatrix, data.maxFar || 10000 );
@@ -19,11 +17,12 @@
 			}
 
 		}
-
 		setFromProjectionMatrix( projectionMatrix, maxFar ) {
 
 			const isOrthographic = projectionMatrix.elements[ 2 * 4 + 3 ] === 0;
-			inverseProjectionMatrix.copy( projectionMatrix ).invert(); // 3 --- 0  vertices.near/far order
+			inverseProjectionMatrix.copy( projectionMatrix ).invert();
+
+			// 3 --- 0  vertices.near/far order
 			// |     |
 			// 2 --- 1
 			// clip space spans from [-1, 1]
@@ -45,7 +44,6 @@
 
 				v.applyMatrix4( inverseProjectionMatrix );
 				const absZ = Math.abs( v.z );
-
 				if ( isOrthographic ) {
 
 					v.z *= Math.min( maxFar / absZ, 1.0 );
@@ -60,7 +58,6 @@
 			return this.vertices;
 
 		}
-
 		split( breaks, target ) {
 
 			while ( breaks.length > target.length ) {
@@ -70,11 +67,9 @@
 			}
 
 			target.length = breaks.length;
-
 			for ( let i = 0; i < breaks.length; i ++ ) {
 
 				const cascade = target[ i ];
-
 				if ( i === 0 ) {
 
 					for ( let j = 0; j < 4; j ++ ) {
@@ -114,7 +109,6 @@
 			}
 
 		}
-
 		toSpace( cameraMatrix, target ) {
 
 			for ( let i = 0; i < 4; i ++ ) {

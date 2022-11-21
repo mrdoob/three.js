@@ -17,7 +17,6 @@
 			this.splitLayer = false;
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -50,7 +49,6 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( data ) {
 
 			let state = {
@@ -72,7 +70,6 @@
 				color: 0x00FF00
 			} );
 			extrudingMaterial.name = 'extruded';
-
 			function newLayer( line ) {
 
 				currentLayer = {
@@ -82,9 +79,9 @@
 				};
 				layers.push( currentLayer );
 
-			} //Create lie segment between p1 and p2
+			}
 
-
+			//Create lie segment between p1 and p2
 			function addSegment( p1, p2 ) {
 
 				if ( currentLayer === undefined ) {
@@ -120,12 +117,12 @@
 			}
 
 			const lines = data.replace( /;.+/g, '' ).split( '\n' );
-
 			for ( let i = 0; i < lines.length; i ++ ) {
 
 				const tokens = lines[ i ].split( ' ' );
-				const cmd = tokens[ 0 ].toUpperCase(); //Argumments
+				const cmd = tokens[ 0 ].toUpperCase();
 
+				//Argumments
 				const args = {};
 				tokens.splice( 1 ).forEach( function ( token ) {
 
@@ -137,9 +134,10 @@
 
 					}
 
-				} ); //Process commands
-				//G0/G1 – Linear Movement
+				} );
 
+				//Process commands
+				//G0/G1 – Linear Movement
 				if ( cmd === 'G0' || cmd === 'G1' ) {
 
 					const line = {
@@ -148,12 +146,12 @@
 						z: args.z !== undefined ? absolute( state.z, args.z ) : state.z,
 						e: args.e !== undefined ? absolute( state.e, args.e ) : state.e,
 						f: args.f !== undefined ? absolute( state.f, args.f ) : state.f
-					}; //Layer change detection is or made by watching Z, it's made by watching when we extrude at a new Z position
+					};
 
+					//Layer change detection is or made by watching Z, it's made by watching when we extrude at a new Z position
 					if ( delta( state.e, line.e ) > 0 ) {
 
 						state.extruding = delta( state.e, line.e ) > 0;
-
 						if ( currentLayer == undefined || line.z != currentLayer.z ) {
 
 							newLayer( line );
@@ -165,7 +163,9 @@
 					addSegment( state, line );
 					state = line;
 
-				} else if ( cmd === 'G2' || cmd === 'G3' ) { //G2/G3 - Arc Movement ( G2 clock wise and G3 counter clock wise )
+				} else if ( cmd === 'G2' || cmd === 'G3' ) {
+
+					//G2/G3 - Arc Movement ( G2 clock wise and G3 counter clock wise )
 					//console.warn( 'THREE.GCodeLoader: Arc command not supported' );
 				} else if ( cmd === 'G90' ) {
 
@@ -186,7 +186,9 @@
 					line.z = args.z !== undefined ? args.z : line.z;
 					line.e = args.e !== undefined ? args.e : line.e;
 
-				} else { //console.warn( 'THREE.GCodeLoader: Command not supported:' + cmd );
+				} else {
+
+					//console.warn( 'THREE.GCodeLoader: Command not supported:' + cmd );
 				}
 
 			}
@@ -203,7 +205,6 @@
 
 			const object = new THREE.Group();
 			object.name = 'gcode';
-
 			if ( this.splitLayer ) {
 
 				for ( let i = 0; i < layers.length; i ++ ) {
@@ -218,13 +219,11 @@
 
 				const vertex = [],
 					pathVertex = [];
-
 				for ( let i = 0; i < layers.length; i ++ ) {
 
 					const layer = layers[ i ];
 					const layerVertex = layer.vertex;
 					const layerPathVertex = layer.pathVertex;
-
 					for ( let j = 0; j < layerVertex.length; j ++ ) {
 
 						vertex.push( layerVertex[ j ] );
