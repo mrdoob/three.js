@@ -171,6 +171,11 @@ controls.keys = {
 			How far you can orbit vertically, upper limit. Range is 0 to Math.PI radians, and default is Math.PI.
 		</p>
 
+		<h3>[property:Float maxTargetDistanceFromOrigin]</h3>
+		<p>
+			How far you can target be from origin, default is `Infinity`. This is mainly used with [page:.enableZoomToCursor] and MapControls to prevent target from moving to huge coordinates while zooming to cursor.
+		</p>
+
 		<h3>[property:Float maxZoom]</h3>
 		<p>
 			How far you can zoom out ( [page:OrthographicCamera] only ). Default is Infinity.
