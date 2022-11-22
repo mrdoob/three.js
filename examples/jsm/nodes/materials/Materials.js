@@ -32,19 +32,21 @@ NodeMaterial.fromMaterial = function ( material ) {
 
 	if ( materialLib[ type ] === undefined ) {
 
-		return material; // is already a node material or cannot be converted
+		if ( material.isNodeMaterial !== true ) {
+
+			throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
+
+		}
+
+		return material; // is already a node material
 
 	}
 
-	const nodeMaterial = new materialLib[ type ]( material );
+	const nodeMaterial = new materialLib[ type ]();
 
 	for ( const key in material ) {
 
-		if ( nodeMaterial[ key ] === undefined ) {
-
-			nodeMaterial[ key ] = material[ key ]; // currently this is needed only for material.alphaTest
-
-		}
+		nodeMaterial[ key ] = material[ key ];
 
 	}
 
