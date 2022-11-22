@@ -1,4 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
+import { attribute, mul, vec4 } from '../shadernode/ShaderNodeElements.js';
 import { LineBasicMaterial } from 'three';
 
 const defaultValues = new LineBasicMaterial();
@@ -23,6 +24,20 @@ class LineBasicNodeMaterial extends NodeMaterial {
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
+
+	}
+
+	generateDiffuseColor( builder ) {
+
+		let { diffuseColorNode } = super.generateDiffuseColor( builder );
+
+		if ( this.vertexColors === true && builder.geometry.hasAttribute( 'color' ) ) {
+
+			diffuseColorNode = vec4( mul( diffuseColorNode.xyz, attribute( 'color' ) ), diffuseColorNode.a );
+
+		}
+
+		return { diffuseColorNode };
 
 	}
 
