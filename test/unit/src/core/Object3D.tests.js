@@ -547,8 +547,8 @@ export default QUnit.module( 'Core', () => {
 			childName.add( childName2 );
 			parent.add( childName, childId, childNothing );
 
-			assert.strictEqual( parent.getAllObjectsByProperty( 'foo' ).length, 3, 'Get amount of all childs by name "foo"' );
-			assert.strictEqual( parent.getAllObjectsByProperty( 'foo' ).some(obj => obj.name !== 'foo') , false, 'Get all childs by name "foo"' );
+			assert.strictEqual( parent.getAllObjectsByProperty( 'name', 'foo' ).length, 3, 'Get amount of all childs by name "foo"' );
+			assert.strictEqual( parent.getAllObjectsByProperty( 'name', 'foo' ).some(obj => obj.name !== 'foo') , false, 'Get all childs by name "foo"' );
 
 		} );
 
