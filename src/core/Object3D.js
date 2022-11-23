@@ -466,6 +466,23 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	getAllObjectsByProperty( name, value ) {
+		let result = [];
+
+		if ( this[ name ] === value )
+			result.push(this);
+	
+		for ( let i = 0, l = this.children.length; i < l; i ++ ) {
+	
+			const object = this.children[i].getAllObjectsByProperty( name, value );
+	
+			if ( object.length > 0 ) {
+				result = result.concat(object);
+			}
+		}
+		return result;
+	}
+
 	getWorldPosition( target ) {
 
 		this.updateWorldMatrix( true, false );
