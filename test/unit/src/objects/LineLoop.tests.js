@@ -1,16 +1,21 @@
 /* global QUnit */
 
-// import { LineLoop } from '../../../../src/objects/LineLoop.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Line } from '../../../../src/objects/Line.js';
+import { LineLoop } from '../../../../src/objects/LineLoop.js';
 
 export default QUnit.module( 'Objects', () => {
 
 	QUnit.module( 'LineLoop', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
+			var lineLoop = new LineLoop();
+	
+			assert.strictEqual( lineLoop instanceof Object3D, true, 'LineLoop extends from Object3D' );
+			assert.strictEqual( lineLoop instanceof Line, true, 'LineLoop extends from Line' );
+	
 		} );
 
 		// INSTANCING
