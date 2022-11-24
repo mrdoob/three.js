@@ -530,11 +530,10 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'getObjectById/getObjectByName/getObjectsByProperty', ( assert ) => {
+		QUnit.test( 'getObjectsByProperty', ( assert ) => {
 
 			var parent = new Object3D();
 			var childName = new Object3D();
-			var childId = new Object3D(); // id = parent.id + 2
 			var childNothing = new Object3D();
 			var childName2 = new Object3D();
 			var childName3 = new Object3D();
@@ -545,7 +544,7 @@ export default QUnit.module( 'Core', () => {
 			childName3.name = 'foo';
 			childName2.add( childName3 );
 			childName.add( childName2 );
-			parent.add( childName, childId, childNothing );
+			parent.add( childName, childNothing );
 
 			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).length, 3, 'Get amount of all childs by name "foo"' );
 			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some(obj => obj.name !== 'foo') , false, 'Get all childs by name "foo"' );
