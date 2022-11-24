@@ -466,7 +466,7 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	getAllObjectsByProperty( name, value ) {
+	getObjectsByProperty( name, value ) {
 
 		let result = [ ];
 
@@ -474,7 +474,7 @@ class Object3D extends EventDispatcher {
 
 		for ( let i = 0, l = this.children.length; i < l; i ++ ) {
 
-			const childResult = this.children[ i ].getAllObjectsByProperty( name, value );
+			const childResult = this.children[ i ].getObjectsByProperty( name, value );
 
 			if ( childResult.length > 0 ) {
 
