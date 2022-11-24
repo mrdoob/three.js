@@ -12,6 +12,7 @@ import {
 	w,
 	eps
 } from '../math/Constants.tests.js';
+import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 
 const matrixEquals4 = ( a, b ) => {
 
@@ -54,10 +55,12 @@ export default QUnit.module( 'Core', () => {
 		};
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
+			var object = new Object3D();
+	
+			assert.strictEqual( object instanceof EventDispatcher, true, 'Object3D extends from EventDispatcher' );
+	
 		} );
 
 		// INSTANCING

@@ -1,5 +1,6 @@
 /* global QUnit */
 
+import { Object3D } from '../../../../src/core/Object3D.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { Raycaster } from '../../../../src/core/Raycaster.js';
 import { PlaneGeometry } from '../../../../src/geometries/PlaneGeometry.js';
@@ -12,9 +13,11 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'Mesh', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var mesh = new Mesh();
+	
+			assert.strictEqual( mesh instanceof Object3D, true, 'Mesh extends from Object3D' );
 
 		} );
 
