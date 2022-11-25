@@ -4,14 +4,14 @@ const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-pro
 
 class XRHandMeshModel {
 
-	constructor( handModel, controller, path, handedness, loader ) {
+	constructor( handModel, controller, path, handedness, loader = null ) {
 
 		this.controller = controller;
 		this.handModel = handModel;
 
 		this.bones = [];
 
-		if ( !loader ) {
+		if ( loader === null ) {
 
 			loader = new GLTFLoader();
 			loader.setPath( path || DEFAULT_HAND_PROFILE_PATH );
