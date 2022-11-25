@@ -6,7 +6,7 @@ const POINTING_JOINT = 'index-finger-tip';
 
 class OculusHandModel extends Object3D {
 
-	constructor( controller, loader ) {
+	constructor( controller, loader = null ) {
 
 		super();
 
