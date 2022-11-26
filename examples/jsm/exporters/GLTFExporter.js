@@ -1298,7 +1298,7 @@ class GLTFWriter {
 		}
 
 		// pbrMetallicRoughness.baseColorTexture or pbrSpecularGlossiness diffuseTexture
-		if ( material.map && material.map.image ) {
+		if ( material.map?.image ) {
 
 			const baseColorMapDef = { index: this.processTexture( material.map ) };
 			this.applyTextureTransform( baseColorMapDef, material.map );
@@ -1327,7 +1327,7 @@ class GLTFWriter {
 			}
 
 			// emissiveTexture
-			if ( material.emissiveMap && material.emissiveMap.image ) {
+			if ( material.emissiveMap?.image ) {
 
 				const emissiveMapDef = { index: this.processTexture( material.emissiveMap ) };
 				this.applyTextureTransform( emissiveMapDef, material.emissiveMap );
@@ -1338,7 +1338,7 @@ class GLTFWriter {
 		}
 
 		// normalTexture
-		if ( material.normalMap && material.normalMap.image ) {
+		if ( material.normalMap?.image ) {
 
 			const normalMapDef = { index: this.processTexture( material.normalMap ) };
 
@@ -1356,7 +1356,7 @@ class GLTFWriter {
 		}
 
 		// occlusionTexture
-		if ( material.aoMap && material.aoMap.image ) {
+		if ( material.aoMap?.image ) {
 
 			const occlusionMapDef = {
 				index: this.processTexture( material.aoMap ),
