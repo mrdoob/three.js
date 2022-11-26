@@ -577,7 +577,7 @@ class USDZLoader extends Loader {
 			const geometry = buildGeometry( findMeshGeometry( data ) );
 			const material = buildMaterial( findMeshMaterial( data ) );
 
-			const mesh = geometry && material ? new Mesh( geometry, material ) : new Object3D();
+			const mesh = geometry ? new Mesh( geometry, material ) : new Object3D();
 
 			if ( 'matrix4d xformOp:transform' in data ) {
 
