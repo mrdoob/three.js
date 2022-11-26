@@ -11,6 +11,7 @@ import {
 	RepeatWrapping,
 	sRGBEncoding,
 	TextureLoader,
+	Object3D,
 } from 'three';
 
 import * as fflate from '../libs/fflate.module.js';
@@ -206,7 +207,7 @@ class USDZLoader extends Loader {
 
 		const zip = fflate.unzipSync( new Uint8Array( buffer ) ); // eslint-disable-line no-undef
 
-		console.log( zip );
+		// console.log( zip );
 
 		const assets = parseAssets( zip );
 
@@ -231,6 +232,8 @@ class USDZLoader extends Loader {
 		// Build scene
 
 		function findMeshGeometry( data ) {
+
+			if ( ! data ) return undefined;
 
 			if ( 'prepend references' in data ) {
 
@@ -310,6 +313,8 @@ class USDZLoader extends Loader {
 
 		function buildGeometry( data ) {
 
+			if ( ! data ) return undefined;
+
 			let geometry = new BufferGeometry();
 
 			if ( 'int[] faceVertexIndices' in data ) {
@@ -364,7 +369,7 @@ class USDZLoader extends Loader {
 				}
 
 			}
-			
+
 			return geometry;
 
 		}
@@ -395,6 +400,8 @@ class USDZLoader extends Loader {
 		}
 
 		function findMeshMaterial( data ) {
+
+			if ( ! data ) return undefined;
 
 			if ( 'rel material:binding' in data ) {
 
@@ -525,7 +532,7 @@ class USDZLoader extends Loader {
 
 				}
 
-			}			
+			}
 
 		}
 
@@ -565,16 +572,16 @@ class USDZLoader extends Loader {
 
 		}
 
-		function buildMesh( data ) {
+		function buildObject( data ) {
 
 			const geometry = buildGeometry( findMeshGeometry( data ) );
 			const material = buildMaterial( findMeshMaterial( data ) );
 
-			const mesh = new Mesh( geometry, material );
+			const mesh = geometry && material ? new Mesh( geometry, material ) : new Object3D();
 
 			if ( 'matrix4d xformOp:transform' in data ) {
 
-				const array = JSON.parse( '[' + data[ 'matrix4d xformOp:transform'  ].replace( /[()]*/g, '' ) + ']' );
+				const array = JSON.parse( '[' + data[ 'matrix4d xformOp:transform' ].replace( /[()]*/g, '' ) + ']' );
 
 				mesh.matrix.fromArray( array );
 				mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
@@ -585,29 +592,37 @@ class USDZLoader extends Loader {
 
 		}
 
-		// console.log( data );
+		function buildHierarchy( data, group ) {
 
-		const group = new Group();
+			for ( const name in data ) {
 
-		for ( const name in root ) {
+				if ( name.startsWith( 'def Scope' ) ) {
 
-			if ( name.startsWith( 'def Xform' ) ) {
+					buildHierarchy( data[ name ], group );
 
-				const mesh = buildMesh( root[ name ] );
+				} else if ( name.startsWith( 'def Xform' ) ) {
 
-				if ( /def Xform "(\w+)"/.test( name ) ) {
+					const mesh = buildObject( data[ name ] );
 
-					mesh.name = /def Xform "(\w+)"/.exec( name )[ 1 ];
+					if ( /def Xform "(\w+)"/.test( name ) ) {
+
+						mesh.name = /def Xform "(\w+)"/.exec( name )[ 1 ];
+
+					}
+
+					group.add( mesh );
+
+					buildHierarchy( data[ name ], mesh );
 
 				}
-
-				group.add( mesh );
 
 			}
 
 		}
 
-		// console.log( group );
+		const group = new Group();
+
+		buildHierarchy( root, group );
 
 		return group;
 
