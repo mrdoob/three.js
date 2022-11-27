@@ -483,6 +483,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.specularIntensityMap ? '#define USE_SPECULARINTENSITYMAP' : '',
 			parameters.specularColorMap ? '#define USE_SPECULARCOLORMAP' : '',
 
+			parameters.occlusionMetalRoughnessMap ? '#define USE_OMRMAP' : '',
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
@@ -639,6 +640,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.specularMap ? '#define USE_SPECULARMAP' : '',
 			parameters.specularIntensityMap ? '#define USE_SPECULARINTENSITYMAP' : '',
 			parameters.specularColorMap ? '#define USE_SPECULARCOLORMAP' : '',
+			parameters.occlusionMetalRoughnessMap ? '#define USE_OMRMAP' : '',
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
 

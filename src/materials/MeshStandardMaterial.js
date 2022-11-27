@@ -44,6 +44,8 @@ class MeshStandardMaterial extends Material {
 
 		this.roughnessMap = null;
 
+		this.occlusionMetalRoughnessMap = null;
+
 		this.metalnessMap = null;
 
 		this.alphaMap = null;
@@ -98,6 +100,8 @@ class MeshStandardMaterial extends Material {
 		this.displacementBias = source.displacementBias;
 
 		this.roughnessMap = source.roughnessMap;
+
+		this.occlusionMetalRoughnessMap = source.occlusionMetalRoughnessMap;
 
 		this.metalnessMap = source.metalnessMap;
 

@@ -80,6 +80,12 @@ const UniformsLib = {
 
 	},
 
+	occlusionMetalRoughnessMap: {
+
+		occlusionMetalRoughnessMap: { value: null }
+
+	},
+
 	roughnessmap: {
 
 		roughnessMap: { value: null }
