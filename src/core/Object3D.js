@@ -687,7 +687,7 @@ class Object3D extends EventDispatcher {
 		if ( this.visible === false ) object.visible = false;
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
-		if ( Object.keys( this.userData ).length !== 0 ) object.userData = this.userData;
+		for ( const key in this.userData ) { object.userData = this.userData; break; };
 
 		object.layers = this.layers.mask;
 		object.matrix = this.matrix.toArray();
