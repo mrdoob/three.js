@@ -2,7 +2,7 @@
 
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
-[![NPM Downloads][npm-downloads]][npmtrends-url]
+[![NPM Downloads][npm-downloads]][npmtrends-url]xxx
 [![DeepScan][deepscan]][deepscan-url]
 [![Discord][discord]][discord-url]
 
