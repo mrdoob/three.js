@@ -29,7 +29,7 @@ const _box = new Box3();
 const _sphere = new Sphere();
 const _clipToWorldVector = new Vector4();
 
-let _ray, _instanceStart, _instanceEnd, _lineWidth;
+let _ray, _lineWidth;
 
 // Returns the margin required to expand by in world space given the distance from the camera,
 // line width, resolution, and camera projection
@@ -283,9 +283,6 @@ class LineSegments2 extends Mesh {
 		const material = this.material;
 
 		_lineWidth = material.linewidth + threshold;
-
-		_instanceStart = geometry.attributes.instanceStart;
-		_instanceEnd = geometry.attributes.instanceEnd;
 
 		// check if we intersect the sphere bounds
 		if ( geometry.boundingSphere === null ) {
