@@ -1786,6 +1786,7 @@ class GeometryParser {
 
 		let polygonIndex = 0;
 		let faceLength = 0;
+		let polygonSides = 0;
 		let displayedWeightsWarning = false;
 
 		// these will hold data for a single face
@@ -1813,6 +1814,14 @@ class GeometryParser {
 
 				vertexIndex = vertexIndex ^ - 1; // equivalent to ( x * -1 ) - 1
 				endOfFace = true;
+
+				if ( polygonSides > 3 ) console.warn( 'THREE.FBXLoader: Polygons with more than three sides are not supported. Make sure to triangulate the geometry during export.' );
+
+				polygonSides = 0;
+
+			} else {
+
+				polygonSides ++;
 
 			}
 
