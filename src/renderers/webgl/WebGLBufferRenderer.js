@@ -1,16 +1,23 @@
-function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
+class WebGLBufferRenderer {
 
-	const isWebGL2 = capabilities.isWebGL2;
+	constructor( gl, extensions, info, capabilities ) {
 
-	let mode;
-
-	function setMode( value ) {
-
-		mode = value;
+		this.gl = gl;
+		this.extensions = extensions;
+		this.info = info;
+		this.capabilities = capabilities;
 
 	}
 
-	function render( start, count ) {
+	setMode( value ) {
+
+		this.mode = value;
+
+	}
+
+	render( start, count ) {
+
+		const { gl, mode, info } = this;
 
 		gl.drawArrays( mode, start, count );
 
@@ -18,9 +25,13 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 	}
 
-	function renderInstances( start, count, primcount ) {
+	renderInstances( start, count, primcount ) {
 
 		if ( primcount === 0 ) return;
+
+		const { gl, extensions, info, capabilities, mode } = this;
+
+		const isWebGL2 = capabilities.isWebGL2;
 
 		let extension, methodName;
 
@@ -49,13 +60,6 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 	}
 
-	//
-
-	this.setMode = setMode;
-	this.render = render;
-	this.renderInstances = renderInstances;
-
 }
-
 
 export { WebGLBufferRenderer };

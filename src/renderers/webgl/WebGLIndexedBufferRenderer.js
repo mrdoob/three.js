@@ -1,25 +1,30 @@
-function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
+class WebGLIndexedBufferRenderer {
 
-	const isWebGL2 = capabilities.isWebGL2;
+	constructor( gl, extensions, info, capabilities ) {
 
-	let mode;
-
-	function setMode( value ) {
-
-		mode = value;
-
-	}
-
-	let type, bytesPerElement;
-
-	function setIndex( value ) {
-
-		type = value.type;
-		bytesPerElement = value.bytesPerElement;
+		this.gl = gl;
+		this.extensions = extensions;
+		this.info = info;
+		this.capabilities = capabilities;
 
 	}
 
-	function render( start, count ) {
+	setMode( value ) {
+
+		this.mode = value;
+
+	}
+
+	setIndex( value ) {
+
+		this.type = value.type;
+		this.bytesPerElement = value.bytesPerElement;
+
+	}
+
+	render( start, count ) {
+
+		const { gl, info, mode, type, bytesPerElement } = this;
 
 		gl.drawElements( mode, count, type, start * bytesPerElement );
 
@@ -27,9 +32,13 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 	}
 
-	function renderInstances( start, count, primcount ) {
+	renderInstances( start, count, primcount ) {
 
 		if ( primcount === 0 ) return;
+
+		const { gl, extensions, info, capabilities, type, bytesPerElement, mode } = this;
+
+		const isWebGL2 = capabilities.isWebGL2;
 
 		let extension, methodName;
 
@@ -58,14 +67,6 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 	}
 
-	//
-
-	this.setMode = setMode;
-	this.setIndex = setIndex;
-	this.render = render;
-	this.renderInstances = renderInstances;
-
 }
-
 
 export { WebGLIndexedBufferRenderer };
