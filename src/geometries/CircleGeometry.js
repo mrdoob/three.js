@@ -5,7 +5,7 @@ import { Vector2 } from '../math/Vector2.js';
 
 class CircleGeometry extends BufferGeometry {
 
-	constructor( radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2 ) {
+	constructor( radius = 1, segments = 32, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
