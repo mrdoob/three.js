@@ -2229,6 +2229,8 @@ function getImageURIMimeType( uri ) {
 
 }
 
+const _identityMatrix = new Matrix4();
+
 /* GLTF PARSER */
 
 class GLTFParser {
@@ -3997,7 +3999,23 @@ class GLTFParser {
 
 			parser.associations.get( node ).nodes = nodeIndex;
 
-			return node;
+			if ( nodeDef.skin === undefined ) return node;
+
+			return parser.getDependency( 'skin', nodeDef.skin ).then( function ( skeleton ) {
+
+				// This full traverse should be fine because
+				// child glTF nodes have not been added to this node yet.
+				node.traverse( function ( mesh ) {
+
+					if ( ! mesh.isSkinnedMesh ) return;
+
+					mesh.bind( skeleton, _identityMatrix );
+
+				} );
+
+				return node;
+
+			} );
 
 		} );
 
@@ -4083,26 +4101,6 @@ function buildNodeHierarchy( nodeId, parentObject, json, parser ) {
 	const nodeDef = json.nodes[ nodeId ];
 
 	return parser.getDependency( 'node', nodeId ).then( function ( node ) {
-
-		if ( nodeDef.skin === undefined ) return node;
-
-		// build skeleton here as well
-
-		return parser.getDependency( 'skin', nodeDef.skin ).then( function ( skeleton ) {
-
-			node.traverse( function ( mesh ) {
-
-				if ( ! mesh.isSkinnedMesh ) return;
-
-				mesh.bind( skeleton, mesh.matrixWorld );
-
-			} );
-
-			return node;
-
-		} );
-
-	} ).then( function ( node ) {
 
 		// build node hierachy
 
