@@ -263,7 +263,7 @@ class ConvexHull {
 
 	}
 
-	// Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertext list
+	// Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertex list
 
 	removeAllVerticesFromFace( face ) {
 

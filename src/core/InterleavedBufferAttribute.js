@@ -230,7 +230,7 @@ class InterleavedBufferAttribute {
 
 		if ( data === undefined ) {
 
-			console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will deinterleave buffer data.' );
+			console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will de-interleave buffer data.' );
 
 			const array = [];
 
@@ -272,7 +272,7 @@ class InterleavedBufferAttribute {
 
 		if ( data === undefined ) {
 
-			console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will deinterleave buffer data.' );
+			console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.' );
 
 			const array = [];
 
@@ -288,7 +288,7 @@ class InterleavedBufferAttribute {
 
 			}
 
-			// deinterleave data and save it as an ordinary buffer attribute for now
+			// de-interleave data and save it as an ordinary buffer attribute for now
 
 			return {
 				itemSize: this.itemSize,
@@ -299,7 +299,7 @@ class InterleavedBufferAttribute {
 
 		} else {
 
-			// save as true interleaved attribtue
+			// save as true interleaved attribute
 
 			if ( data.interleavedBuffers === undefined ) {
 
