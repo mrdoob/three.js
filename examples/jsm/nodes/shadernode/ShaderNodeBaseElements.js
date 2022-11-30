@@ -2,6 +2,7 @@
 //import ArrayUniformNode from '../core/ArrayUniformNode.js';
 import AttributeNode from '../core/AttributeNode.js';
 import BypassNode from '../core/BypassNode.js';
+import CacheNode from '../core/CacheNode.js';
 import CodeNode from '../core/CodeNode.js';
 import ContextNode from '../core/ContextNode.js';
 import ExpressionNode from '../core/ExpressionNode.js';
@@ -121,6 +122,7 @@ export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObjec
 export const maxMipLevel = nodeProxy( MaxMipLevelNode );
 
 export const bypass = nodeProxy( BypassNode );
+export const cache = nodeProxy( CacheNode );
 export const code = nodeProxy( CodeNode );
 export const context = nodeProxy( ContextNode );
 export const expression = nodeProxy( ExpressionNode );
