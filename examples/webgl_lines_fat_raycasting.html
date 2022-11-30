@@ -247,13 +247,15 @@
 				const delta = clock.getDelta();
 
 				const obj = line.visible ? line : segments;
-				const thresholdObj = thresholdLine.visible ? thresholdLine : thresholdSegments;
+				thresholdLine.position.copy( line.position );
+				thresholdLine.quaternion.copy( line.quaternion );
+				thresholdSegments.position.copy( segments.position );
+				thresholdSegments.quaternion.copy( segments.quaternion );
 
 				if ( params.animate ) {
 
-					obj.rotation.y += delta * 0.5;
-					thresholdObj.position.copy( obj.position );
-					thresholdObj.quaternion.copy( obj.quaternion );
+					line.rotation.y += delta * 0.5;
+					segments.rotation.y += delta * 0.5;
 
 				}
 
@@ -394,10 +396,8 @@
 
 				gui.add( params, 'translation', 0, 10 ).onChange( function ( val ) {
 
-					const obj = line.visible ? line : segments;
-					obj.position.x = val;
-					obj.updateMatrix();
-					obj.updateMatrixWorld();
+					line.position.x = val;
+					segments.position.x = val;
 
 				} );
 
