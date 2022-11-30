@@ -102,6 +102,7 @@
 		intersectRay( ray, target ) {
 
 			// based on "Fast Ray-Convex Polyhedron Intersection" by Eric Haines, GRAPHICS GEMS II
+
 			const faces = this.faces;
 			let tNear = - Infinity;
 			let tFar = Infinity;
@@ -133,6 +134,7 @@
 				if ( vD > 0 ) {
 
 					// plane faces away from the ray, so this plane is a back-face
+
 					tFar = Math.min( t, tFar );
 
 				} else {

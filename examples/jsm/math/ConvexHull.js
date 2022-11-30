@@ -122,7 +122,7 @@ class ConvexHull {
 
 	intersectRay( ray, target ) {
 
-		// based on "Fast Ray-Convex Polyhedron Intersection"  by Eric Haines, GRAPHICS GEMS II
+		// based on "Fast Ray-Convex Polyhedron Intersection" by Eric Haines, GRAPHICS GEMS II
 
 		const faces = this.faces;
 
@@ -156,7 +156,7 @@ class ConvexHull {
 
 			if ( vD > 0 ) {
 
-				//  plane faces away from the ray, so this plane is a back-face
+				// plane faces away from the ray, so this plane is a back-face
 
 				tFar = Math.min( t, tFar );
 

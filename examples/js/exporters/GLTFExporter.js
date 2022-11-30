@@ -17,11 +17,6 @@
 			} );
 			this.register( function ( writer ) {
 
-				return new GLTFMaterialsPBRSpecularGlossiness( writer );
-
-			} );
-			this.register( function ( writer ) {
-
 				return new GLTFMaterialsTransmissionExtension( writer );
 
 			} );
@@ -2006,59 +2001,6 @@
 			extensionsUsed[ this.name ] = true;
 			materialDef.pbrMetallicRoughness.metallicFactor = 0.0;
 			materialDef.pbrMetallicRoughness.roughnessFactor = 0.9;
-
-		}
-
-	}
-
-	/**
- * Specular-Glossiness Extension
- *
- * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Archived/KHR_materials_pbrSpecularGlossiness
- */
-	class GLTFMaterialsPBRSpecularGlossiness {
-
-		constructor( writer ) {
-
-			this.writer = writer;
-			this.name = 'KHR_materials_pbrSpecularGlossiness';
-
-		}
-		writeMaterial( material, materialDef ) {
-
-			if ( ! material.isGLTFSpecularGlossinessMaterial ) return;
-			const writer = this.writer;
-			const extensionsUsed = writer.extensionsUsed;
-			const extensionDef = {};
-			if ( materialDef.pbrMetallicRoughness.baseColorFactor ) {
-
-				extensionDef.diffuseFactor = materialDef.pbrMetallicRoughness.baseColorFactor;
-
-			}
-
-			const specularFactor = [ 1, 1, 1 ];
-			material.specular.toArray( specularFactor, 0 );
-			extensionDef.specularFactor = specularFactor;
-			extensionDef.glossinessFactor = material.glossiness;
-			if ( materialDef.pbrMetallicRoughness.baseColorTexture ) {
-
-				extensionDef.diffuseTexture = materialDef.pbrMetallicRoughness.baseColorTexture;
-
-			}
-
-			if ( material.specularMap ) {
-
-				const specularMapDef = {
-					index: writer.processTexture( material.specularMap )
-				};
-				writer.applyTextureTransform( specularMapDef, material.specularMap );
-				extensionDef.specularGlossinessTexture = specularMapDef;
-
-			}
-
-			materialDef.extensions = materialDef.extensions || {};
-			materialDef.extensions[ this.name ] = extensionDef;
-			extensionsUsed[ this.name ] = true;
 
 		}
 

@@ -194,6 +194,7 @@ const files = glob.sync( '**/*.js', { cwd: jsmFolder, ignore: [
 	// dont convert new files
 	'exporters/KTX2Exporter.js',
 	'loaders/KTX2Loader.js',
+	'loaders/MaterialXLoader.js'
 
 ] } );
 
