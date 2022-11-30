@@ -24,7 +24,7 @@ Both are dependencies of `THREE.KTX2Loader` and `THREE.BasisTextureLoader`:
 
 ```js
 var ktx2Loader = new THREE.KTX2Loader();
-ktx2Loader.setTranscoderPath( 'examples/js/libs/basis/' );
+ktx2Loader.setTranscoderPath( 'examples/jsm/libs/basis/' );
 ktx2Loader.detectSupport( renderer );
 ktx2Loader.load( 'diffuse.ktx2', function ( texture ) {
 

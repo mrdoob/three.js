@@ -15,14 +15,14 @@ const assets = [
 	'../examples/jsm/libs/chevrotain.module.min.js',
 	'../examples/jsm/libs/fflate.module.js',
 
-	'../examples/js/libs/draco/draco_decoder.js',
-	'../examples/js/libs/draco/draco_decoder.wasm',
-	'../examples/js/libs/draco/draco_encoder.js',
-	'../examples/js/libs/draco/draco_wasm_wrapper.js',
+	'../examples/jsm/libs/draco/draco_decoder.js',
+	'../examples/jsm/libs/draco/draco_decoder.wasm',
+	'../examples/jsm/libs/draco/draco_encoder.js',
+	'../examples/jsm/libs/draco/draco_wasm_wrapper.js',
 
-	'../examples/js/libs/draco/gltf/draco_decoder.js',
-	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
-	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
+	'../examples/jsm/libs/draco/gltf/draco_decoder.js',
+	'../examples/jsm/libs/draco/gltf/draco_decoder.wasm',
+	'../examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js',
 
 	'../examples/jsm/libs/motion-controllers.module.js',
 

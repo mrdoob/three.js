@@ -23,7 +23,7 @@
 		<p>
 			This loader parses the KTX 2.0 container and transcodes to a supported GPU compressed
 			texture format. The required WASM transcoder and JS wrapper are available from the
-			[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/basis examples/js/libs/basis]
+			[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/libs/basis examples/jsm/libs/basis]
 			directory.
 		</p>
 
@@ -31,7 +31,7 @@
 
 		<code>
 		var ktx2Loader = new THREE.KTX2Loader();
-		ktx2Loader.setTranscoderPath( 'examples/js/libs/basis/' );
+		ktx2Loader.setTranscoderPath( 'examples/jsm/libs/basis/' );
 		ktx2Loader.detectSupport( renderer );
 		ktx2Loader.load( 'diffuse.ktx2', function ( texture ) {
 
@@ -106,7 +106,7 @@
 		</p>
 		<p>
 		The WASM transcoder and JS wrapper are available from the
-		[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/basis examples/js/libs/basis]
+		[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/libs/basis examples/jsm/libs/basis]
 		directory.
 		</p>
 
