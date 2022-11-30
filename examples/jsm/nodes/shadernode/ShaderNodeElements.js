@@ -21,10 +21,10 @@ import LightingContextNode from '../lighting/LightingContextNode.js';
 // utils
 import EquirectUVNode from '../utils/EquirectUVNode.js';
 import MatcapUVNode from '../utils/MatcapUVNode.js';
-import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 import OscNode from '../utils/OscNode.js';
 import RemapNode from '../utils/RemapNode.js';
 import RotateUVNode from '../utils/RotateUVNode.js';
+import SpecularMIPLevelNode from '../utils/SpecularMIPLevelNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
 import TriplanarTexturesNode from '../utils/TriplanarTexturesNode.js';
@@ -112,7 +112,7 @@ export const lightingContext = nodeProxy( LightingContextNode );
 export const matcapUV = nodeImmutable( MatcapUVNode );
 export const equirectUV = nodeProxy( EquirectUVNode );
 
-export const maxMipLevel = nodeProxy( MaxMipLevelNode );
+export const specularMIPLevel = nodeProxy( SpecularMIPLevelNode );
 
 export const oscSine = nodeProxy( OscNode, OscNode.SINE );
 export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );

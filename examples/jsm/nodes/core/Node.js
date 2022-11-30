@@ -26,6 +26,12 @@ class Node {
 
 	}
 
+	isGlobal( /*builder*/ ) {
+
+		return false;
+
+	}
+
 	getChildren() {
 
 		const children = [];
@@ -79,12 +85,6 @@ class Node {
 	getNodeType( /*builder*/ ) {
 
 		return this.nodeType;
-
-	}
-
-	getConstructHash( /*builder*/ ) {
-
-		return this.uuid;
 
 	}
 

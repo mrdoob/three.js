@@ -50,6 +50,12 @@ class VarNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
@@ -76,7 +82,7 @@ class VarNode extends Node {
 		const type = builder.getVectorType( this.getNodeType( builder ) );
 
 		const snippet = node.build( builder, type );
-		const nodeVar = builder.getVarFromNode( this, type );
+		const nodeVar = builder.getVarFromNode( this, type, undefined, builder.baseCache );
 
 		if ( name !== null ) {
 

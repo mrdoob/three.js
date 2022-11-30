@@ -45,6 +45,7 @@ import CondNode from '../math/CondNode.js';
 // utils
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
+import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 
 // shader node utils
 import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, getConstNodeType, cacheMaps } from './ShaderNode.js';
@@ -117,6 +118,7 @@ export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( na
 export const property = ( name, nodeOrType ) => nodeObject( new PropertyNode( name, getConstNodeType( nodeOrType ) ) );
 
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
+export const maxMipLevel = nodeProxy( MaxMipLevelNode );
 
 export const bypass = nodeProxy( BypassNode );
 export const code = nodeProxy( CodeNode );
