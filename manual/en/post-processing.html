@@ -156,7 +156,7 @@ Let's add a gui to adjust some of the parameters. Figuring out which values you
 can easily adjust and how to adjust them requires digging through the code for
 that effect.</p>
 <p>Looking inside
-<a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>
+<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>
 I found this line:</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
 </pre>
@@ -164,7 +164,7 @@ I found this line:</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
 </pre>
 <p>Similarly looking in
-<a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>
+<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>
 I found these lines:</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
 if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
@@ -272,12 +272,12 @@ gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
 too much for these articles. If you really want to know how WebGL itself works
 then check out <a href="https://webglfundamentals.org">these articles</a>. Another great
 resources is just to 
-<a href="https://github.com/mrdoob/three.js/tree/master/examples/js/shaders">read through the existing post processing shaders in the THREE.js repo</a>. Some
+<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/shaders">read through the existing post processing shaders in the THREE.js repo</a>. Some
 are more complicated than others but if you start with the smaller ones you can
 hopefully get an idea of how they work.</p>
 <p>Most of the post processing effects in the THREE.js repo are unfortunately
 undocumented so to use them you'll have to <a href="https://github.com/mrdoob/three.js/tree/master/examples">read through the examples</a> or 
-<a href="https://github.com/mrdoob/three.js/tree/master/examples/js/postprocessing">the code for the effects themselves</a>.
+<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/postprocessing">the code for the effects themselves</a>.
 Hopefully these simple example and the article on 
 <a href="rendertargets.html">render targets</a> provide enough context to get started.</p>
 
