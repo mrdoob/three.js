@@ -94,6 +94,13 @@ class SkeletonHelper extends LineSegments {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
+
+	}
+
 }
 
 

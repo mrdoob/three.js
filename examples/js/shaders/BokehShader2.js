@@ -7,7 +7,6 @@
  *
  * Requires #define RINGS and SAMPLES integers
  */
-
 	const BokehShader = {
 		uniforms: {
 			'textureWidth': {
@@ -80,9 +79,7 @@
 				value: new THREE.Vector2()
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying vec2 vUv;
 
@@ -92,9 +89,7 @@
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#include <common>
 
@@ -391,9 +386,7 @@
 				value: 1000.0
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		varying float vViewZDepth;
 
@@ -405,9 +398,7 @@
 			vViewZDepth = - mvPosition.z;
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		uniform float mNear;
 		uniform float mFar;

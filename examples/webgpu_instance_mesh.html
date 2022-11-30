@@ -18,7 +18,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -27,13 +28,13 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { mix, range, normalWorld, oscSine, timerLocal } from 'three-nodes/Nodes.js';
+			import { mix, range, normalWorld, oscSine, timerLocal } from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer, stats;
 
@@ -42,9 +43,9 @@
 			const count = Math.pow( amount, 3 );
 			const dummy = new THREE.Object3D();
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -88,6 +89,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -98,8 +100,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 
@@ -116,15 +116,13 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				render();
 
 				stats.update();
 
 			}
 
-			function render() {
+			async function render() {
 
 				if ( mesh ) {
 
@@ -158,13 +156,7 @@
 
 				}
 
-				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
+				await renderer.render( scene, camera );
 
 			}
 

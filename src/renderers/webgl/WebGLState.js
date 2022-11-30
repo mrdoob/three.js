@@ -103,59 +103,51 @@ function WebGLState( gl, extensions, capabilities ) {
 
 				if ( currentDepthFunc !== depthFunc ) {
 
-					if ( depthFunc ) {
+					switch ( depthFunc ) {
 
-						switch ( depthFunc ) {
+						case NeverDepth:
 
-							case NeverDepth:
+							gl.depthFunc( gl.NEVER );
+							break;
 
-								gl.depthFunc( gl.NEVER );
-								break;
+						case AlwaysDepth:
 
-							case AlwaysDepth:
+							gl.depthFunc( gl.ALWAYS );
+							break;
 
-								gl.depthFunc( gl.ALWAYS );
-								break;
+						case LessDepth:
 
-							case LessDepth:
+							gl.depthFunc( gl.LESS );
+							break;
 
-								gl.depthFunc( gl.LESS );
-								break;
+						case LessEqualDepth:
 
-							case LessEqualDepth:
+							gl.depthFunc( gl.LEQUAL );
+							break;
 
-								gl.depthFunc( gl.LEQUAL );
-								break;
+						case EqualDepth:
 
-							case EqualDepth:
+							gl.depthFunc( gl.EQUAL );
+							break;
 
-								gl.depthFunc( gl.EQUAL );
-								break;
+						case GreaterEqualDepth:
 
-							case GreaterEqualDepth:
+							gl.depthFunc( gl.GEQUAL );
+							break;
 
-								gl.depthFunc( gl.GEQUAL );
-								break;
+						case GreaterDepth:
 
-							case GreaterDepth:
+							gl.depthFunc( gl.GREATER );
+							break;
 
-								gl.depthFunc( gl.GREATER );
-								break;
+						case NotEqualDepth:
 
-							case NotEqualDepth:
+							gl.depthFunc( gl.NOTEQUAL );
+							break;
 
-								gl.depthFunc( gl.NOTEQUAL );
-								break;
+						default:
 
-							default:
-
-								gl.depthFunc( gl.LEQUAL );
-
-						}
-
-					} else {
-
-						gl.depthFunc( gl.LEQUAL );
+							gl.depthFunc( gl.LEQUAL );
 
 					}
 
@@ -726,7 +718,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		}
 
 		currentBlending = blending;
-		currentPremultipledAlpha = null;
+		currentPremultipledAlpha = false;
 
 	}
 
@@ -888,24 +880,39 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
-	function bindTexture( webglType, webglTexture ) {
+	function bindTexture( webglType, webglTexture, webglSlot ) {
 
-		if ( currentTextureSlot === null ) {
+		if ( webglSlot === undefined ) {
 
-			activeTexture();
+			if ( currentTextureSlot === null ) {
+
+				webglSlot = gl.TEXTURE0 + maxTextures - 1;
+
+			} else {
+
+				webglSlot = currentTextureSlot;
+
+			}
 
 		}
 
-		let boundTexture = currentBoundTextures[ currentTextureSlot ];
+		let boundTexture = currentBoundTextures[ webglSlot ];
 
 		if ( boundTexture === undefined ) {
 
 			boundTexture = { type: undefined, texture: undefined };
-			currentBoundTextures[ currentTextureSlot ] = boundTexture;
+			currentBoundTextures[ webglSlot ] = boundTexture;
 
 		}
 
 		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
+
+			if ( currentTextureSlot !== webglSlot ) {
+
+				gl.activeTexture( webglSlot );
+				currentTextureSlot = webglSlot;
+
+			}
 
 			gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
 
@@ -936,6 +943,20 @@ function WebGLState( gl, extensions, capabilities ) {
 		try {
 
 			gl.compressedTexImage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function compressedTexImage3D() {
+
+		try {
+
+			gl.compressedTexImage3D.apply( gl, arguments );
 
 		} catch ( error ) {
 
@@ -978,6 +999,20 @@ function WebGLState( gl, extensions, capabilities ) {
 		try {
 
 			gl.compressedTexSubImage2D.apply( gl, arguments );
+
+		} catch ( error ) {
+
+			console.error( 'THREE.WebGLState:', error );
+
+		}
+
+	}
+
+	function compressedTexSubImage3D() {
+
+		try {
+
+			gl.compressedTexSubImage3D.apply( gl, arguments );
 
 		} catch ( error ) {
 
@@ -1232,6 +1267,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		bindTexture: bindTexture,
 		unbindTexture: unbindTexture,
 		compressedTexImage2D: compressedTexImage2D,
+		compressedTexImage3D: compressedTexImage3D,
 		texImage2D: texImage2D,
 		texImage3D: texImage3D,
 
@@ -1243,6 +1279,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		texSubImage2D: texSubImage2D,
 		texSubImage3D: texSubImage3D,
 		compressedTexSubImage2D: compressedTexSubImage2D,
+		compressedTexSubImage3D: compressedTexSubImage3D,
 
 		scissor: scissor,
 		viewport: viewport,

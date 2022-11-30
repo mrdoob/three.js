@@ -63,6 +63,10 @@ class SSAARenderPass extends Pass {
 
 		}
 
+		this.copyMaterial.dispose();
+
+		this.fsQuad.dispose();
+
 	}
 
 	setSize( width, height ) {

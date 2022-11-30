@@ -23,7 +23,6 @@ import {
 	Vector3
 } from 'three';
 
-
 class GLTFExporter {
 
 	constructor() {
@@ -39,12 +38,6 @@ class GLTFExporter {
 		this.register( function ( writer ) {
 
 			return new GLTFMaterialsUnlitExtension( writer );
-
-		} );
-
-		this.register( function ( writer ) {
-
-			return new GLTFMaterialsPBRSpecularGlossiness( writer );
 
 		} );
 
@@ -106,14 +99,6 @@ class GLTFExporter {
 	 * @param  {Object} options options
 	 */
 	parse( input, onDone, onError, options ) {
-
-		if ( typeof onError === 'object' ) {
-
-			console.warn( 'THREE.GLTFExporter: parse() expects options as the fourth argument now.' );
-
-			options = onError;
-
-		}
 
 		const writer = new GLTFWriter();
 		const plugins = [];
@@ -447,7 +432,6 @@ class GLTFWriter {
 			binary: false,
 			trs: false,
 			onlyVisible: true,
-			truncateDrawRange: true,
 			maxTextureSize: Infinity,
 			animations: [],
 			includeCustomExtensions: false
@@ -742,7 +726,7 @@ class GLTFWriter {
 
 					return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
 
-				}
+				};
 
 			}
 
@@ -750,7 +734,7 @@ class GLTFWriter {
 
 				return c;
 
-			}
+			};
 
 		}
 
@@ -996,7 +980,6 @@ class GLTFWriter {
 	 */
 	processAccessor( attribute, geometry, start, count ) {
 
-		const options = this.options;
 		const json = this.json;
 
 		const types = {
@@ -1036,21 +1019,6 @@ class GLTFWriter {
 
 		if ( start === undefined ) start = 0;
 		if ( count === undefined ) count = attribute.count;
-
-		// @TODO Indexed buffer geometry with drawRange not supported yet
-		if ( options.truncateDrawRange && geometry !== undefined && geometry.index === null ) {
-
-			const end = start + count;
-			const end2 = geometry.drawRange.count === Infinity
-				? attribute.count
-				: geometry.drawRange.start + geometry.drawRange.count;
-
-			start = Math.max( start, geometry.drawRange.start );
-			count = Math.min( end, end2 ) - start;
-
-			if ( count < 0 ) count = 0;
-
-		}
 
 		// Skip creating an accessor if the attribute doesn't have data to export
 		if ( count === 0 ) return null;
@@ -1492,12 +1460,6 @@ class GLTFWriter {
 		} else {
 
 			mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
-
-		}
-
-		if ( geometry.isBufferGeometry !== true ) {
-
-			throw new Error( 'THREE.GLTFExporter: Geometry is not of type THREE.BufferGeometry.' );
 
 		}
 
@@ -2308,62 +2270,6 @@ class GLTFMaterialsUnlitExtension {
 
 		materialDef.pbrMetallicRoughness.metallicFactor = 0.0;
 		materialDef.pbrMetallicRoughness.roughnessFactor = 0.9;
-
-	}
-
-}
-
-/**
- * Specular-Glossiness Extension
- *
- * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Archived/KHR_materials_pbrSpecularGlossiness
- */
-class GLTFMaterialsPBRSpecularGlossiness {
-
-	constructor( writer ) {
-
-		this.writer = writer;
-		this.name = 'KHR_materials_pbrSpecularGlossiness';
-
-	}
-
-	writeMaterial( material, materialDef ) {
-
-		if ( ! material.isGLTFSpecularGlossinessMaterial ) return;
-
-		const writer = this.writer;
-		const extensionsUsed = writer.extensionsUsed;
-
-		const extensionDef = {};
-
-		if ( materialDef.pbrMetallicRoughness.baseColorFactor ) {
-
-			extensionDef.diffuseFactor = materialDef.pbrMetallicRoughness.baseColorFactor;
-
-		}
-
-		const specularFactor = [ 1, 1, 1 ];
-		material.specular.toArray( specularFactor, 0 );
-		extensionDef.specularFactor = specularFactor;
-		extensionDef.glossinessFactor = material.glossiness;
-
-		if ( materialDef.pbrMetallicRoughness.baseColorTexture ) {
-
-			extensionDef.diffuseTexture = materialDef.pbrMetallicRoughness.baseColorTexture;
-
-		}
-
-		if ( material.specularMap ) {
-
-			const specularMapDef = { index: writer.processTexture( material.specularMap ) };
-			writer.applyTextureTransform( specularMapDef, material.specularMap );
-			extensionDef.specularGlossinessTexture = specularMapDef;
-
-		}
-
-		materialDef.extensions = materialDef.extensions || {};
-		materialDef.extensions[ this.name ] = extensionDef;
-		extensionsUsed[ this.name ] = true;
 
 	}
 

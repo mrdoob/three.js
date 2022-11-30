@@ -207,7 +207,7 @@ class TransformControls extends Object3D {
 
 		if ( this.camera.isOrthographicCamera ) {
 
-			this.camera.getWorldDirection( this.eye );
+			this.camera.getWorldDirection( this.eye ).negate();
 
 		} else {
 
@@ -640,12 +640,6 @@ class TransformControls extends Object3D {
 	setSpace( space ) {
 
 		this.space = space;
-
-	}
-
-	update() {
-
-		console.warn( 'THREE.TransformControls: update function has no more functionality and therefore has been deprecated.' );
 
 	}
 

@@ -1,6 +1,6 @@
 import { SelectInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { UVNode } from 'three-nodes/Nodes.js';
+import { UVNode } from 'three/nodes';
 
 export class UVEditor extends BaseNode {
 

@@ -12,15 +12,15 @@
 			this.maxIterations = maxIterations;
 
 		}
-
 		modify( geometry ) {
 
 			if ( geometry.index !== null ) {
 
 				geometry = geometry.toNonIndexed();
 
-			} //
+			}
 
+			//
 
 			const maxIterations = this.maxIterations;
 			const maxEdgeLengthSquared = this.maxEdgeLength * this.maxEdgeLength;
@@ -66,7 +66,6 @@
 			let uv2s2 = uv2s;
 			let iteration = 0;
 			let tessellating = true;
-
 			function addTriangle( a, b, c ) {
 
 				const v1 = vs[ a ];
@@ -75,7 +74,6 @@
 				positions2.push( v1.x, v1.y, v1.z );
 				positions2.push( v2.x, v2.y, v2.z );
 				positions2.push( v3.x, v3.y, v3.z );
-
 				if ( hasNormals ) {
 
 					const n1 = ns[ a ];
@@ -128,7 +126,6 @@
 				tessellating = false;
 				positions = positions2;
 				positions2 = [];
-
 				if ( hasNormals ) {
 
 					normals = normals2;
@@ -162,7 +159,6 @@
 					va.fromArray( positions, i + 0 );
 					vb.fromArray( positions, i + 3 );
 					vc.fromArray( positions, i + 6 );
-
 					if ( hasNormals ) {
 
 						na.fromArray( normals, i + 0 );
@@ -198,11 +194,9 @@
 					const dab = va.distanceToSquared( vb );
 					const dbc = vb.distanceToSquared( vc );
 					const dac = va.distanceToSquared( vc );
-
 					if ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) {
 
 						tessellating = true;
-
 						if ( dab >= dbc && dab >= dac ) {
 
 							vm.lerpVectors( va, vb, 0.5 );
@@ -247,7 +241,6 @@
 
 			const geometry2 = new THREE.BufferGeometry();
 			geometry2.setAttribute( 'position', new THREE.Float32BufferAttribute( positions2, 3 ) );
-
 			if ( hasNormals ) {
 
 				geometry2.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals2, 3 ) );

@@ -135,7 +135,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -146,7 +147,7 @@
 
 			import * as THREE from 'three';
 
-			import WebGL from './jsm/capabilities/WebGL.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			let camera, scene, renderer, clock;
 

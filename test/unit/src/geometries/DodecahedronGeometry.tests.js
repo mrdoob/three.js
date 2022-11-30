@@ -1,11 +1,11 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { DodecahedronGeometry, DodecahedronBufferGeometry } from '../../../../src/geometries/DodecahedronGeometry.js';
+import { DodecahedronGeometry } from '../../../../src/geometries/DodecahedronGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
-	QUnit.module( 'CircleBufferGeometry', ( hooks ) => {
+	QUnit.module( 'DodecahedronGeometry', ( hooks ) => {
 
 		var geometries = undefined;
 		hooks.beforeEach( function () {
@@ -19,7 +19,6 @@ export default QUnit.module( 'Geometries', () => {
 				new DodecahedronGeometry(),
 				new DodecahedronGeometry( parameters.radius ),
 				new DodecahedronGeometry( parameters.radius, parameters.detail ),
-				new DodecahedronBufferGeometry()
 			];
 
 		} );

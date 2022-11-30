@@ -1,6 +1,6 @@
 import { clamp, euclideanModulo, lerp } from './MathUtils.js';
 import { ColorManagement, SRGBToLinear, LinearToSRGB } from './ColorManagement.js';
-import { SRGBColorSpace, LinearSRGBColorSpace } from '../constants.js';
+import { SRGBColorSpace } from '../constants.js';
 
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -117,7 +117,7 @@ class Color {
 
 	}
 
-	setRGB( r, g, b, colorSpace = LinearSRGBColorSpace ) {
+	setRGB( r, g, b, colorSpace = ColorManagement.workingColorSpace ) {
 
 		this.r = r;
 		this.g = g;
@@ -129,7 +129,7 @@ class Color {
 
 	}
 
-	setHSL( h, s, l, colorSpace = LinearSRGBColorSpace ) {
+	setHSL( h, s, l, colorSpace = ColorManagement.workingColorSpace ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 		h = euclideanModulo( h, 1 );
@@ -222,12 +222,12 @@ class Color {
 				case 'hsl':
 				case 'hsla':
 
-					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+					if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 						// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
 						const h = parseFloat( color[ 1 ] ) / 360;
-						const s = parseInt( color[ 2 ], 10 ) / 100;
-						const l = parseInt( color[ 3 ], 10 ) / 100;
+						const s = parseFloat( color[ 2 ] ) / 100;
+						const l = parseFloat( color[ 3 ] ) / 100;
 
 						handleAlpha( color[ 4 ] );
 
@@ -369,7 +369,7 @@ class Color {
 
 	}
 
-	getHSL( target, colorSpace = LinearSRGBColorSpace ) {
+	getHSL( target, colorSpace = ColorManagement.workingColorSpace ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
@@ -414,7 +414,7 @@ class Color {
 
 	}
 
-	getRGB( target, colorSpace = LinearSRGBColorSpace ) {
+	getRGB( target, colorSpace = ColorManagement.workingColorSpace ) {
 
 		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
 
@@ -579,16 +579,6 @@ class Color {
 		this.r = attribute.getX( index );
 		this.g = attribute.getY( index );
 		this.b = attribute.getZ( index );
-
-		if ( attribute.normalized === true ) {
-
-			// assuming Uint8Array
-
-			this.r /= 255;
-			this.g /= 255;
-			this.b /= 255;
-
-		}
 
 		return this;
 

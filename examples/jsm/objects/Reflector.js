@@ -8,7 +8,10 @@ import {
 	UniformsUtils,
 	Vector3,
 	Vector4,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	HalfFloatType,
+	NoToneMapping,
+	LinearEncoding
 } from 'three';
 
 class Reflector extends Mesh {
@@ -48,7 +51,7 @@ class Reflector extends Mesh {
 		const textureMatrix = new Matrix4();
 		const virtualCamera = this.camera;
 
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample } );
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
 		const material = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( shader.uniforms ),
@@ -137,18 +140,19 @@ class Reflector extends Mesh {
 			projectionMatrix.elements[ 14 ] = clipPlane.w;
 
 			// Render
-
-			renderTarget.texture.encoding = renderer.outputEncoding;
-
 			scope.visible = false;
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
 			const currentXrEnabled = renderer.xr.enabled;
 			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+			const currentOutputEncoding = renderer.outputEncoding;
+			const currentToneMapping = renderer.toneMapping;
 
 			renderer.xr.enabled = false; // Avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+			renderer.outputEncoding = LinearEncoding;
+			renderer.toneMapping = NoToneMapping;
 
 			renderer.setRenderTarget( renderTarget );
 
@@ -159,6 +163,8 @@ class Reflector extends Mesh {
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+			renderer.outputEncoding = currentOutputEncoding;
+			renderer.toneMapping = currentToneMapping;
 
 			renderer.setRenderTarget( currentRenderTarget );
 
@@ -254,6 +260,7 @@ Reflector.ReflectorShader = {
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
+			#include <tonemapping_fragment>
 			#include <encodings_fragment>
 
 		}`

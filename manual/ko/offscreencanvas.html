@@ -205,7 +205,7 @@ worker.postMessage({ type: 'main', canvas: offscreen }, [ offscreen ]);
 </li>
 </ol>
 <p><code class="notranslate" translate="no">shared-cubes.js</code>와 <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code>는 단순히 이전 <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> 파일을 쪼갠 것입니다. 먼저 <code class="notranslate" translate="no">offscreencanvas-cube.js</code>를 <code class="notranslate" translate="no">shared-cube.js</code>로 옮긴 뒤, 메인 HTML 파일에 이미 <code class="notranslate" translate="no">main</code> 함수가 있어 <code class="notranslate" translate="no">main</code> 함수의 이름만 <code class="notranslate" translate="no">init</code>으로 바꿔야 하죠. 여기에 추가로 <code class="notranslate" translate="no">init</code>과 <code class="notranslate" translate="no">state</code> 함수를 export 시켜줘야 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 
 -const state = {
 +export const state = {
@@ -529,7 +529,7 @@ window.addEventListener('touchend', clearPickPosition);
 <p>터치 이벤트의 경우는 <code class="notranslate" translate="no">touches</code> 속성의 <code class="notranslate" translate="no">pageX</code>, <code class="notranslate" translate="no">pageY</code> 속성이 필요하네요.</p>
 <p>이를 처리할 경유(proxy) 객체를 한 쌍 만들어봅시다. 한쪽은 메인 페이지에서 위 이벤트를 받아 필요한 속성을 워커에 넘겨주는 역할을 할 겁니다. 그리고 다른 한쪽은 워커 안에서 이 이벤트를 받아 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>에 넘겨줄 겁니다. 이벤트 객체가 DOM 이벤트와 같은 구조이기에 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>는 이 이벤트가 DOM 이벤트가 아니란 걸 눈치채지 못하겠죠.</p>
 <p>아래는 워커 안의 코드입니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { EventDispatcher } from '../../build/three.module.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { EventDispatcher } from 'three';
 
 class ElementProxyReceiver extends EventDispatcher {
   constructor() {
@@ -596,8 +596,8 @@ self.onmessage = function(e) {
 };
 </pre>
 <p>Three.js의 공통 코드에 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 모듈도 불러와 설정해야 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
-+import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export function init(data) {
 -  const { canvas } = data;

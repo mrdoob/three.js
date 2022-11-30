@@ -50,8 +50,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 или <em>поворачивать</em> камеру вокруг некоторой точки. <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> - это 
 дополнительные функции three.js, поэтому сначала нам нужно 
 включить их в нашу страницу.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
 <p>Теперь мы можем использовать их. Мы передаем в <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> камеру для 
 управления и элемент DOM для получения входных событий</p>
@@ -414,9 +414,9 @@ scene.add(helper);
 }
 </pre>
 <p>Для использования <a href="/docs/#api/en/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a> нам нужно включить некоторые дополнительные возможности three.js</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import {RectAreaLightUniformsLib} from '/examples/jsm/lights/RectAreaLightUniformsLib.js';
-+import {RectAreaLightHelper} from '/examples/jsm/helpers/RectAreaLightHelper.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
++import {RectAreaLightHelper} from 'three/addons/helpers/RectAreaLightHelper.js';
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');

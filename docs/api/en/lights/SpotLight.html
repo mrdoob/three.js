@@ -20,10 +20,11 @@
 
 		<h2>Code Example</h2>
 		<code>
-		// white spotlight shining from the side, casting a shadow
+		// white spotlight shining from the side, modulated by a texture, casting a shadow
 
 		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 100, 1000, 100 );
+		spotLight.map = new THREE.TextureLoader().load( url );
 
 		spotLight.castShadow = true;
 
@@ -50,7 +51,7 @@
 		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float distance], [param:Radians angle], [param:Float penumbra], [param:Float decay] )</h3>
 		<p>
 			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
-			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br />
 			[page:Float distance] - Maximum range of the light. Default is 0 (no limit).<br />
 			[page:Radians angle] - Maximum angle of light dispersion from its direction whose upper
 			bound is Math.PI/2.<br />
@@ -81,9 +82,8 @@
 
 		<h3>[property:Float decay]</h3>
 		<p>
-			The amount the light dims along the distance of the light.<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, decay = 2 leads to
-			physically realistic light falloff. The default is `1`.
+			The amount the light dims along the distance of the light. Default is `2`.<br />
+			In context of physically-correct rendering the default value should not be changed.
 		</p>
 
 		<h3>[property:Float distance]</h3>
@@ -109,7 +109,7 @@
 			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, intensity is the luminous
 			intensity of the light measured in candela (cd).<br /><br />
 
-			Changing the power will also change the light's intensity.
+			Changing the intensity will also change the light's power.
 
 		</p>
 
@@ -135,7 +135,7 @@
 			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, power is the luminous
 			power of the light measured in lumens (lm). <br /><br />
 
-			Changing this will also change the light's intensity.
+			Changing the power will also change the light's intensity.
 		</p>
 
 
@@ -170,6 +170,13 @@ light.target = targetObject;
 			The spotlight will now track the target object.
 		</p>
 
+		<h3>[property:Texture map]</h3>
+		<p>
+			A [page:Texture] used to modulate the color of the light. The spot light color is mixed
+			with the RGB value of this texture, with a ratio corresponding to its
+			alpha value. The cookie-like masking effect is reproduced using pixel values (0, 0, 0, 1-cookie_value).
+			*Warning*: [param:SpotLight map] is disabled if [param:SpotLight castShadow] is *false*. 
+		</p>
 
 		<h2>Methods</h2>
 
@@ -177,8 +184,7 @@ light.target = targetObject;
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Override of base class's [page:Light.dispose dispose].
-		Disposes of this light's [page:SpotLightShadow shadow].
+			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:this copy]( [param:SpotLight source] )</h3>

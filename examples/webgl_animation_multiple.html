@@ -19,7 +19,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,8 +29,8 @@
 
 			import * as THREE from 'three';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import * as SkeletonUtils from './jsm/utils/SkeletonUtils.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 			let camera, scene, renderer;
 			let clock;

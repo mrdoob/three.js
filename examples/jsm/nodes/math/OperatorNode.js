@@ -47,7 +47,7 @@ class OperatorNode extends TempNode {
 
 		} else if ( op === '&' || op === '|' || op === '^' || op === '>>' || op === '<<' ) {
 
-			return 'int';
+			return builder.getIntegerType( typeA );
 
 		} else if ( op === '==' || op === '&&' || op === '||' || op === '^^' ) {
 
@@ -124,6 +124,11 @@ class OperatorNode extends TempNode {
 
 				}
 
+			} else if ( op === '>>' || op === '<<' ) {
+
+				typeA = type;
+				typeB = builder.changeComponentType( typeB, 'uint' );
+
 			} else if ( builder.isMatrix( typeA ) && builder.isVector( typeB ) ) {
 
 				// matrix x vector
@@ -163,13 +168,21 @@ class OperatorNode extends TempNode {
 
 				return a;
 
-			} else if ( op === '>' && outputLength > 1 ) {
+			} else if ( op === '<' && outputLength > 1 ) {
 
-				return builder.format( `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`, type, output );
+				return builder.format( `${ builder.getMethod( 'lessThan' ) }( ${a}, ${b} )`, type, output );
 
 			} else if ( op === '<=' && outputLength > 1 ) {
 
 				return builder.format( `${ builder.getMethod( 'lessThanEqual' ) }( ${a}, ${b} )`, type, output );
+
+			} else if ( op === '>' && outputLength > 1 ) {
+
+				return builder.format( `${ builder.getMethod( 'greaterThan' ) }( ${a}, ${b} )`, type, output );
+
+			} else if ( op === '>=' && outputLength > 1 ) {
+
+				return builder.format( `${ builder.getMethod( 'greaterThanEqual' ) }( ${a}, ${b} )`, type, output );
 
 			} else {
 

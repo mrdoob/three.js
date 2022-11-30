@@ -22,7 +22,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -30,25 +31,25 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import { uniform, mix, cubeTexture, mul, reference, add, positionWorld, normalWorld, modelWorldMatrix, transformDirection, saturate, saturation, hue, reflectVector, context } from 'three-nodes/Nodes.js';
+			import { uniform, mix, cubeTexture, mul, reference, add, positionWorld, normalWorld, modelWorldMatrix, transformDirection, clamp, saturation, hue, reflectVector, context } from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { RGBMLoader } from './jsm/loaders/RGBMLoader.js';
+			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
 
-			init().then( render ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -111,21 +112,21 @@
 					const custom1UV = mul( reflectNode.xyz, uniform( rotateY1Matrix ) );
 					const custom2UV = mul( reflectNode.xyz, uniform( rotateY2Matrix ) );
 
-					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), saturate( add( positionWorld.y, mixNode ) ) );
+					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), clamp( add( positionWorld.y, mixNode ) ) );
 					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
 					const intensityFilter = mul( proceduralEnv, intensityNode );
 					const hueFilter = hue( intensityFilter, hueNode );
 
 					return saturation( hueFilter, saturationNode );
 
-				}
+				};
 
 				const blurNode = uniform( 0 );
 
 				scene.environmentNode = getEnvironmentNode( reflectVector );
 
 				scene.backgroundNode = context( getEnvironmentNode( transformDirection( positionWorld, modelWorldMatrix ) ), {
-					levelNode : blurNode // @TODO: currently it uses mipmaps value, I think it should be replaced for [0,1]
+					levelNode: blurNode // @TODO: currently it uses mipmaps value, I think it should be replaced for [0,1]
 				} );
 
 				// scene objects
@@ -134,8 +135,6 @@
 				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 					scene.add( gltf.scene );
-
-					render();
 
 				} );
 
@@ -157,6 +156,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
@@ -190,8 +190,6 @@
 				gui.add( adjustments, 'hue', 0, Math.PI * 2, 0.01 );
 				gui.add( adjustments, 'saturation', 0, 2, 0.01 );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -207,15 +205,7 @@
 
 			function render() {
 
-				requestAnimationFrame( render );
-
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

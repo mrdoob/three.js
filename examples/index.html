@@ -312,10 +312,8 @@
 		function filterExample( file, exp, tags ) {
 
 			const link = links[ file ];
-			const name = getName( file );
 			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
-			const res = file.match( exp );
-			let text;
+			const res = file.replace( /_+/g, ' ' ).match( exp );
 
 			if ( res && res.length > 0 ) {
 

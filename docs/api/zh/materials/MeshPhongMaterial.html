@@ -13,10 +13,8 @@
 
 		<p class="desc"> 一种用于具有镜面高光的光泽表面的材质。<br /><br />
 			该材质使用非物理的[link:https://en.wikipedia.org/wiki/Blinn-Phong_shading_model Blinn-Phong]模型来计算反射率。
-			与[page:MeshLambertMaterial]中使用的Lambertian模型不同，该材质可以模拟具有镜面高光的光泽表面（例如涂漆木材）。<br /><br />
-			使用[link:https://en.wikipedia.org/wiki/Phong_shading Phong]着色模型计算着色时，会计算每个像素的阴影（在[link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragment shader]，
-			AKA pixel shader中），与[page:MeshLambertMaterial]使用的Gouraud模型相比，该模型的结果更准确，但代价是牺牲一些性能。
-			[page:MeshStandardMaterial]和[page:MeshPhysicalMaterial]也使用这个着色模型。<br /><br />
+			与[page:MeshLambertMaterial]中使用的Lambertian模型不同，该材质可以模拟具有镜面高光的光泽表面（例如涂漆木材）。[name] uses per-fragment shading。<br /><br />
+
 			在[page:MeshStandardMaterial]或[page:MeshPhysicalMaterial]上使用此材质时，性能通常会更高	，但会牺牲一些图形精度。
 		</p>
 

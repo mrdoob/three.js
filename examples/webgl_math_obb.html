@@ -28,7 +28,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -37,10 +38,10 @@
 
 			import * as THREE from 'three';
 
-			import { OBB } from './jsm/math/OBB.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OBB } from 'three/addons/math/OBB.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let camera, scene, renderer, clock, controls, stats, raycaster, hitbox;
 

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
+import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
 import { UIPanel } from './libs/ui.js';
 
@@ -15,7 +15,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
-import { RoomEnvironment } from '../../examples/jsm/environments/RoomEnvironment.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 function Viewport( editor ) {
 
@@ -450,9 +450,11 @@ function Viewport( editor ) {
 
 		}
 
-		if ( editor.helpers[ object.id ] !== undefined ) {
+		const helper = editor.helpers[ object.id ];
 
-			editor.helpers[ object.id ].update();
+		if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
+
+			helper.update();
 
 		}
 
@@ -479,7 +481,7 @@ function Viewport( editor ) {
 
 	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness ) {
 
 		switch ( backgroundType ) {
 
@@ -511,6 +513,7 @@ function Viewport( editor ) {
 
 					backgroundEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
 					scene.background = backgroundEquirectangularTexture;
+					scene.backgroundBlurriness = backgroundBlurriness;
 
 				}
 

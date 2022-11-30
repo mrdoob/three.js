@@ -14,7 +14,6 @@
 			this.reversed = false;
 
 		}
-
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
@@ -48,7 +47,6 @@
 			}, onProgress, onError );
 
 		}
-
 		parse( arraybuffer ) {
 
 			function convert( font, reversed ) {
@@ -58,12 +56,10 @@
 				const scale = 100000 / ( ( font.unitsPerEm || 2048 ) * 72 );
 				const glyphIndexMap = font.encoding.cmap.glyphIndexMap;
 				const unicodes = Object.keys( glyphIndexMap );
-
 				for ( let i = 0; i < unicodes.length; i ++ ) {
 
 					const unicode = unicodes[ i ];
 					const glyph = font.glyphs.glyphs[ glyphIndexMap[ unicode ] ];
-
 					if ( unicode !== undefined ) {
 
 						const token = {
@@ -72,7 +68,6 @@
 							x_max: round( glyph.xMax * scale ),
 							o: ''
 						};
-
 						if ( reversed ) {
 
 							glyph.path.commands = reverseCommands( glyph.path.commands );
@@ -88,7 +83,6 @@
 							}
 
 							token.o += command.type.toLowerCase() + ' ';
-
 							if ( command.x !== undefined && command.y !== undefined ) {
 
 								token.o += round( command.x * scale ) + ' ' + round( command.y * scale ) + ' ';
@@ -160,14 +154,12 @@
 						y: p[ p.length - 1 ].y
 					};
 					reversed.push( result );
-
 					for ( let i = p.length - 1; i > 0; i -- ) {
 
 						const command = p[ i ];
 						const result = {
 							type: command.type
 						};
-
 						if ( command.x2 !== undefined && command.y2 !== undefined ) {
 
 							result.x1 = command.x2;

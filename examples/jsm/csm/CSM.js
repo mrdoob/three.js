@@ -343,6 +343,7 @@ export class CSM {
 
 		for ( let i = 0; i < this.lights.length; i ++ ) {
 
+			this.parent.remove( this.lights[ i ].target );
 			this.parent.remove( this.lights[ i ] );
 
 		}

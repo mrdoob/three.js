@@ -77,6 +77,11 @@
 		Use this space for visualizing the user's hands when no physical controllers are used.
 		</p>
 
+		<h3>[method:Set getPlanes]()</h3>
+		<p>
+		Returns the set of planes detected by WebXR's plane detection API.
+		</p>
+
 		<h3>[method:String getReferenceSpace]()</h3>
 		<p>
 		Returns the reference space.
@@ -87,9 +92,10 @@
 		Returns the *XRSession* object which allows a more fine-grained management of active WebXR sessions on application level.
 		</p>
 
-		<h3>[method:undefined setFramebufferScaleFactor]( [param:Float framebufferScaleFactor] )</h3>
+		<h3>[method:undefined setFramebufferScaleFactor]( [param:Float factor], [param:Boolean limited] )</h3>
 		<p>
-		[page:Float framebufferScaleFactor] — The framebuffer scale factor to set.<br /><br />
+		[page:Float factor] — The framebuffer scale factor to set.<br />
+		[page:Boolean limited] — Whether the framebuffer scale factor should be reduced to the native limit if the value ends up being higher than the device's capabilities. Default is `false`.<br /><br />
 
 		Specifies the scaling factor to use when determining the size of the framebuffer when rendering to a XR device.
 		The value is relative to the default XR device display resolution. Default is *1*. A value of *0.5* would specify

@@ -112,10 +112,10 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 </pre>
 <p>I kept the auto framing code as before</p>
 <p>We also need to include the <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> and we can get rid of the <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from '/examples/jsm/loaders/LoaderSupport.js';
--import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
--import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
-+import {GLTFLoader} from '/examples/jsm/loaders/GLTFLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
+-import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
+-import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
++import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 </pre>
 <p>And running that we get</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
@@ -271,7 +271,7 @@ the new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translat
 -    cars = root.getObjectByName('Cars');
 +    const loadedCars = root.getObjectByName('Cars');
 +    const fixes = [
-+      { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI +* .5], },
++      { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
 +      { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
 +      { prefix: 'Car_04', rot: [0, Math.PI, 0], },
 +    ];

@@ -16,13 +16,7 @@
 
 			The material uses a non-physically based [link:https://en.wikipedia.org/wiki/Blinn-Phong_shading_model Blinn-Phong]
 			model for calculating reflectance. Unlike the Lambertian model used in the [page:MeshLambertMaterial]
-			this can simulate shiny surfaces with specular highlights (such as varnished wood).<br /><br />
-
-			Shading is calculated using a [link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.
-			This calculates shading per pixel (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragment shader],
-			AKA pixel shader)	which gives more accurate results than the Gouraud model used by [page:MeshLambertMaterial],
-			at the cost of some performance. The [page:MeshStandardMaterial] and [page:MeshPhysicalMaterial]
-			also use this shading model.<br /><br />
+			this can simulate shiny surfaces with specular highlights (such as varnished wood). [name] uses per-fragment shading.<br /><br />
 
 			Performance will generally be greater when using this material over the	[page:MeshStandardMaterial]
 			or [page:MeshPhysicalMaterial], at the cost of some graphical accuracy.

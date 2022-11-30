@@ -611,6 +611,30 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'setStyleHSLRedWithDecimals', ( assert ) => {
+
+			var c = new Color();
+			c.setStyle( 'hsl(360,100.0%,50.0%)' );
+			assert.ok( c.r == 1, 'Red: ' + c.r );
+			assert.ok( c.g === 0, 'Green: ' + c.g );
+			assert.ok( c.b === 0, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.test( 'setStyleHSLARedWithDecimals', ( assert ) => {
+
+			var c = new Color();
+
+			console.level = CONSOLE_LEVEL.ERROR;
+			c.setStyle( 'hsla(360,100.0%,50.0%,0.5)' );
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
+			assert.ok( c.r == 1, 'Red: ' + c.r );
+			assert.ok( c.g === 0, 'Green: ' + c.g );
+			assert.ok( c.b === 0, 'Blue: ' + c.b );
+
+		} );
+
 		QUnit.test( 'setStyleHexSkyBlue', ( assert ) => {
 
 			var c = new Color();

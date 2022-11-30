@@ -15,10 +15,9 @@
 				fragmentShader: shader.fragmentShader
 			} );
 			this.renderTarget = renderTarget;
-
 			if ( this.renderTarget === undefined ) {
 
-				this.renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				this.renderTarget = new THREE.WebGLRenderTarget(); // will be resized later
 				this.renderTarget.texture.name = 'SavePass.rt';
 
 			}
@@ -27,10 +26,7 @@
 			this.fsQuad = new THREE.FullScreenQuad( this.material );
 
 		}
-
-		render( renderer, writeBuffer, readBuffer
-			/*, deltaTime, maskActive */
-		) {
+		render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
 			if ( this.uniforms[ this.textureID ] ) {
 
@@ -41,6 +37,18 @@
 			renderer.setRenderTarget( this.renderTarget );
 			if ( this.clear ) renderer.clear();
 			this.fsQuad.render( renderer );
+
+		}
+		setSize( width, height ) {
+
+			this.renderTarget.setSize( width, height );
+
+		}
+		dispose() {
+
+			this.renderTarget.dispose();
+			this.material.dispose();
+			this.fsQuad.dispose();
 
 		}
 

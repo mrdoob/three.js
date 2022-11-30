@@ -170,19 +170,11 @@
 
 		<p>[page:EventDispatcher EventDispatcher] methods are available on this class.</p>
 
-		<h3>[method:this setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
-		<p>
-		Sets an attribute to this geometry. Use this rather than the attributes property,
-		because an internal hashmap of [page:.attributes] is maintained to speed up iterating over
-		attributes.
-		</p>
-
 		<h3>[method:undefined addGroup]( [param:Integer start], [param:Integer count], [param:Integer materialIndex] )</h3>
 		<p>
 			Adds a group to this geometry; see the [page:BufferGeometry.groups groups]
 			property for details.
 		</p>
-
 
 		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>Applies the matrix transform to the geometry.</p>
@@ -193,14 +185,11 @@
 		<h3>[method:this center] ()</h3>
 		<p>Center the geometry based on the bounding box.</p>
 
-		<h3>[method:BufferGeometry clone]()</h3>
-		<p>Creates a clone of this BufferGeometry.</p>
-
-		<h3>[method:this copy]( [param:BufferGeometry bufferGeometry] )</h3>
-		<p>Copies another BufferGeometry to this BufferGeometry.</p>
-
 		<h3>[method:undefined clearGroups]( )</h3>
 		<p>Clears all groups.</p>
+
+		<h3>[method:BufferGeometry clone]()</h3>
+		<p>Creates a clone of this BufferGeometry.</p>
 
 		<h3>[method:undefined computeBoundingBox]()</h3>
 		<p>
@@ -224,10 +213,15 @@
 		<h3>[method:undefined computeVertexNormals]()</h3>
 		<p>Computes vertex normals by averaging face normals.</p>
 
+		<h3>[method:this copy]( [param:BufferGeometry bufferGeometry] )</h3>
+		<p>Copies another BufferGeometry to this BufferGeometry.</p>
+
+		<h3>[method:BufferAttribute deleteAttribute]( [param:String name] )</h3>
+		<p>Deletes the [page:BufferAttribute attribute] with the specified name.</p>
+
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Disposes the object from memory. <br />
-		You need to call this when you want the BufferGeometry removed while the application is running.
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:BufferAttribute getAttribute]( [param:String name] )</h3>
@@ -247,17 +241,11 @@
 		Use [page:Object3D.lookAt] for typical real-time mesh usage.
 		</p>
 
-		<h3>[method:this merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
-		<p>Merge in another BufferGeometry with an optional offset of where to start merging in.</p>
-
 		<h3>[method:undefined normalizeNormals]()</h3>
 		<p>
 		Every normal vector in a geometry will have a magnitude of 1.
 		This will correct lighting on the geometry surfaces.
 		</p>
-
-		<h3>[method:BufferAttribute deleteAttribute]( [param:String name] )</h3>
-		<p>Deletes the [page:BufferAttribute attribute] with the specified name.</p>
 
 		<h3>[method:this rotateX] ( [param:Float radians] )</h3>
 		<p>
@@ -283,8 +271,12 @@
 		Use [page:Object3D.scale] for typical real-time mesh scaling.
 		</p>
 
-		<h3>[method:this setIndex] ( [param:BufferAttribute index] )</h3>
-		<p>Set the [page:.index] buffer.</p>
+		<h3>[method:this setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
+		<p>
+		Sets an attribute to this geometry. Use this rather than the attributes property,
+		because an internal hashmap of [page:.attributes] is maintained to speed up iterating over
+		attributes.
+		</p>
 
 		<h3>[method:undefined setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
 		<p>Set the [page:.drawRange] property. For non-indexed BufferGeometry, count is the number of vertices to render.
@@ -292,6 +284,9 @@
 
 		<h3>[method:this setFromPoints] ( [param:Array points] )</h3>
 		<p>Sets the attributes for this BufferGeometry from an array of points.</p>
+
+		<h3>[method:this setIndex] ( [param:BufferAttribute index] )</h3>
+		<p>Set the [page:.index] buffer.</p>
 
 		<h3>[method:Object toJSON]()</h3>
 		<p>Convert the buffer geometry to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].</p>

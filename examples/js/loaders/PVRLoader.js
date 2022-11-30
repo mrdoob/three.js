@@ -13,7 +13,6 @@
 			super( manager );
 
 		}
-
 		parse( buffer, loadMipmaps ) {
 
 			const headerLengthInt = 13;
@@ -23,15 +22,16 @@
 				header: header,
 				loadMipmaps: loadMipmaps
 			};
-
 			if ( header[ 0 ] === 0x03525650 ) {
 
 				// PVR v3
+
 				return _parseV3( pvrDatas );
 
 			} else if ( header[ 11 ] === 0x21525650 ) {
 
 				// PVR v2
+
 				return _parseV2( pvrDatas );
 
 			} else {
@@ -43,7 +43,6 @@
 		}
 
 	}
-
 	function _parseV3( pvrDatas ) {
 
 		const header = pvrDatas.header;
@@ -55,7 +54,6 @@
 			// numSurfs = header[ 9 ],
 			numFaces = header[ 10 ],
 			numMipmaps = header[ 11 ];
-
 		switch ( pixelFormat ) {
 
 			case 0:
@@ -63,25 +61,21 @@
 				bpp = 2;
 				format = THREE.RGB_PVRTC_2BPPV1_Format;
 				break;
-
 			case 1:
 				// PVRTC 2bpp RGBA
 				bpp = 2;
 				format = THREE.RGBA_PVRTC_2BPPV1_Format;
 				break;
-
 			case 2:
 				// PVRTC 4bpp RGB
 				bpp = 4;
 				format = THREE.RGB_PVRTC_4BPPV1_Format;
 				break;
-
 			case 3:
 				// PVRTC 4bpp RGBA
 				bpp = 4;
 				format = THREE.RGBA_PVRTC_4BPPV1_Format;
 				break;
-
 			default:
 				console.error( 'THREE.PVRLoader: Unsupported PVR format:', pixelFormat );
 
@@ -120,9 +114,7 @@
 			PVRTC_4 = 25;
 		const formatFlags = flags & TYPE_MASK;
 		let bpp, format;
-
 		const _hasAlpha = bitmaskAlpha > 0;
-
 		if ( formatFlags === PVRTC_4 ) {
 
 			format = _hasAlpha ? THREE.RGBA_PVRTC_4BPPV1_Format : THREE.RGB_PVRTC_4BPPV1_Format;
@@ -145,9 +137,10 @@
 		pvrDatas.width = width;
 		pvrDatas.height = height;
 		pvrDatas.numSurfaces = numSurfs;
-		pvrDatas.numMipmaps = numMipmaps + 1; // guess cubemap type seems tricky in v2
-		// it juste a pvr containing 6 surface (no explicit cubemap type)
+		pvrDatas.numMipmaps = numMipmaps + 1;
 
+		// guess cubemap type seems tricky in v2
+		// it juste a pvr containing 6 surface (no explicit cubemap type)
 		pvrDatas.isCubemap = numSurfs === 6;
 		return _extract( pvrDatas );
 
@@ -173,7 +166,6 @@
 			heightBlocks = 0;
 		const bpp = pvrDatas.bpp,
 			numSurfs = pvrDatas.numSurfaces;
-
 		if ( bpp === 2 ) {
 
 			blockWidth = 8;
@@ -189,18 +181,17 @@
 		blockSize = blockWidth * blockHeight * bpp / 8;
 		pvr.mipmaps.length = pvrDatas.numMipmaps * numSurfs;
 		let mipLevel = 0;
-
 		while ( mipLevel < pvrDatas.numMipmaps ) {
 
 			const sWidth = pvrDatas.width >> mipLevel,
 				sHeight = pvrDatas.height >> mipLevel;
 			widthBlocks = sWidth / blockWidth;
-			heightBlocks = sHeight / blockHeight; // Clamp to minimum number of blocks
+			heightBlocks = sHeight / blockHeight;
 
+			// Clamp to minimum number of blocks
 			if ( widthBlocks < 2 ) widthBlocks = 2;
 			if ( heightBlocks < 2 ) heightBlocks = 2;
 			dataSize = widthBlocks * heightBlocks * blockSize;
-
 			for ( let surfIndex = 0; surfIndex < numSurfs; surfIndex ++ ) {
 
 				const byteArray = new Uint8Array( buffer, dataOffset, dataSize );

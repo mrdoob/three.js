@@ -113,6 +113,7 @@ export function glconstants() {
 		UNSIGNED_INT_24_8: 34042,
 		TEXTURE_CUBE_MAP: 34067,
 		TEXTURE_CUBE_MAP_POSITIVE_X: 34069,
+		TEXTURE_CUBE_MAP_NEGATIVE_Z: 34074,
 		MAX_CUBE_MAP_TEXTURE_SIZE: 34076,
 		COMPRESSED_TEXTURE_FORMATS: 34467,
 		RGBA32F: 34836,
@@ -285,7 +286,7 @@ ${ code }`;
 
 }
 
-let builds = [
+const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
@@ -355,11 +356,4 @@ let builds = [
 	}
 ];
 
-
-if ( process.env.ONLY_MODULE === 'true' ) {
-
-	builds = builds[ 0 ];
-
-}
-
-export default builds;
+export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;

@@ -26,7 +26,9 @@
 			const eye = options.eye !== undefined ? options.eye : new THREE.Vector3( 0, 0, 0 );
 			const distortionScale = options.distortionScale !== undefined ? options.distortionScale : 20.0;
 			const side = options.side !== undefined ? options.side : THREE.FrontSide;
-			const fog = options.fog !== undefined ? options.fog : false; //
+			const fog = options.fog !== undefined ? options.fog : false;
+
+			//
 
 			const mirrorPlane = new THREE.Plane();
 			const normal = new THREE.Vector3();
@@ -77,9 +79,7 @@
 						value: new THREE.Color( 0x555555 )
 					}
 				} ] ),
-				vertexShader:
-      /* glsl */
-      `
+				vertexShader: /* glsl */`
 				uniform mat4 textureMatrix;
 				uniform float time;
 
@@ -104,9 +104,7 @@
 				#include <fog_vertex>
 				#include <shadowmap_vertex>
 			}`,
-				fragmentShader:
-      /* glsl */
-      `
+				fragmentShader: /* glsl */`
 				uniform sampler2D mirrorSampler;
 				uniform float alpha;
 				uniform float time;
@@ -198,7 +196,6 @@
 			material.uniforms[ 'distortionScale' ].value = distortionScale;
 			material.uniforms[ 'eye' ].value = eye;
 			scope.material = material;
-
 			scope.onBeforeRender = function ( renderer, scene, camera ) {
 
 				mirrorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
@@ -206,7 +203,9 @@
 				rotationMatrix.extractRotation( scope.matrixWorld );
 				normal.set( 0, 0, 1 );
 				normal.applyMatrix4( rotationMatrix );
-				view.subVectors( mirrorWorldPosition, cameraWorldPosition ); // Avoid rendering when mirror is facing away
+				view.subVectors( mirrorWorldPosition, cameraWorldPosition );
+
+				// Avoid rendering when mirror is facing away
 
 				if ( view.dot( normal ) > 0 ) return;
 				view.reflect( normal ).negate();
@@ -226,13 +225,15 @@
 				mirrorCamera.far = camera.far; // Used in WebGLBackground
 
 				mirrorCamera.updateMatrixWorld();
-				mirrorCamera.projectionMatrix.copy( camera.projectionMatrix ); // Update the texture matrix
+				mirrorCamera.projectionMatrix.copy( camera.projectionMatrix );
 
+				// Update the texture matrix
 				textureMatrix.set( 0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0 );
 				textureMatrix.multiply( mirrorCamera.projectionMatrix );
-				textureMatrix.multiply( mirrorCamera.matrixWorldInverse ); // Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
-				// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
+				textureMatrix.multiply( mirrorCamera.matrixWorldInverse );
 
+				// Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
+				// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
 				mirrorPlane.setFromNormalAndCoplanarPoint( normal, mirrorWorldPosition );
 				mirrorPlane.applyMatrix4( mirrorCamera.matrixWorldInverse );
 				clipPlane.set( mirrorPlane.normal.x, mirrorPlane.normal.y, mirrorPlane.normal.z, mirrorPlane.constant );
@@ -240,22 +241,25 @@
 				q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
 				q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
 				q.z = - 1.0;
-				q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ]; // Calculate the scaled plane vector
+				q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ];
 
-				clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) ); // Replacing the third row of the projection matrix
+				// Calculate the scaled plane vector
+				clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) );
 
+				// Replacing the third row of the projection matrix
 				projectionMatrix.elements[ 2 ] = clipPlane.x;
 				projectionMatrix.elements[ 6 ] = clipPlane.y;
 				projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
 				projectionMatrix.elements[ 14 ] = clipPlane.w;
-				eye.setFromMatrixPosition( camera.matrixWorld ); // Render
+				eye.setFromMatrixPosition( camera.matrixWorld );
+
+				// Render
 
 				const currentRenderTarget = renderer.getRenderTarget();
 				const currentXrEnabled = renderer.xr.enabled;
 				const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 				scope.visible = false;
 				renderer.xr.enabled = false; // Avoid camera modification and recursion
-
 				renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 				renderer.setRenderTarget( renderTarget );
@@ -266,10 +270,11 @@
 				scope.visible = true;
 				renderer.xr.enabled = currentXrEnabled;
 				renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
-				renderer.setRenderTarget( currentRenderTarget ); // Restore viewport
+				renderer.setRenderTarget( currentRenderTarget );
+
+				// Restore viewport
 
 				const viewport = camera.viewport;
-
 				if ( viewport !== undefined ) {
 
 					renderer.state.viewport( viewport );

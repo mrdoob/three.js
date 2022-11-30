@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils.js';
-import { RingGeometry, RingBufferGeometry } from '../../../../src/geometries/RingGeometry.js';
+import { RingGeometry, } from '../../../../src/geometries/RingGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -27,7 +27,6 @@ export default QUnit.module( 'Geometries', () => {
 				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments ),
 				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart ),
 				new RingGeometry( parameters.innerRadius, parameters.outerRadius, parameters.thetaSegments, parameters.phiSegments, parameters.thetaStart, parameters.thetaLength ),
-				new RingBufferGeometry()
 			];
 
 		} );

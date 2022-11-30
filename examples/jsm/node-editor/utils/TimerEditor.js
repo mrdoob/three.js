@@ -1,6 +1,6 @@
 import { NumberInput, LabelElement, Element, ButtonInput } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
-import { TimerNode } from 'three-nodes/Nodes.js';
+import { TimerNode } from 'three/nodes';
 
 export class TimerEditor extends BaseNode {
 

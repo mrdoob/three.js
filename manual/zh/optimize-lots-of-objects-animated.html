@@ -294,10 +294,10 @@ showFileInfo(fileInfos, fileInfos[0]);
 <p>以上我们为每一组数据集创建了几何体, 以第一个作为基准, 获取了<code class="notranslate" translate="no">position</code>属性, 将其他的几何体作为其变形目标</p>
 <p>现在我们需要改变显示和隐藏各种数据集的方式. 我们需要改动变形目标的influence, 而不是简单地显示和隐藏mesh. 对于我们我们想看到的数据集, influence应该是1, 不想看到的是0. 但是我们又不能直接将他们设置成1和0, 这将会显示开与闭的两种情况, 和现在这种没有区别. 我们也可以写一段自定义的动画效果, 听起来不难. 但是我们模仿的WebGL globe用了一个<a href="https://github.com/tweenjs/tween.js/">动画库</a>, 我们也用这一个. </p>
 <p>我们这里首先引入它</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {BufferGeometryUtils} from '/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from '/examples/jsm/libs/tween.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {BufferGeometryUtils} from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import {TWEEN} from 'three/addons/libs/tween.min.js';
 </pre>
 <p>然后创建一个<code class="notranslate" translate="no">Tween</code>来使influence变化</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest

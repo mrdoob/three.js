@@ -38,7 +38,7 @@
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:LineSegments] class for common properties.</p>
+		<p>See the base [page:Line] class for common properties.</p>
 
 		<h3>[property:Plane plane]</h3>
 		<p>The [page:Plane plane] being visualized.</p>
@@ -55,6 +55,11 @@
 			This overrides the method in the base [page:Object3D] class so that it also
 			updates the helper object according to the [page:PlaneHelper.plane .plane] and
 			[page:PlaneHelper.size .size] properties.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h2>Source</h2>

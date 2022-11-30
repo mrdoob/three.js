@@ -6,6 +6,7 @@ class TimerNode extends UniformNode {
 	static LOCAL = 'local';
 	static GLOBAL = 'global';
 	static DELTA = 'delta';
+	static FRAME = 'frame';
 
 	constructor( scope = TimerNode.LOCAL, scale = 1, value = 0 ) {
 
@@ -14,10 +15,25 @@ class TimerNode extends UniformNode {
 		this.scope = scope;
 		this.scale = scale;
 
-		this.updateType = NodeUpdateType.Frame;
+		this.updateType = NodeUpdateType.FRAME;
 
 	}
+/*
+	@TODO:
+	getNodeType( builder ) {
 
+		const scope = this.scope;
+
+		if ( scope === TimerNode.FRAME ) {
+
+			return 'uint';
+
+		}
+
+		return 'float';
+
+	}
+*/
 	update( frame ) {
 
 		const scope = this.scope;
@@ -30,6 +46,10 @@ class TimerNode extends UniformNode {
 		} else if ( scope === TimerNode.DELTA ) {
 
 			this.value = frame.deltaTime * scale;
+
+		} else if ( scope === TimerNode.FRAME ) {
+
+			this.value = frame.frameId;
 
 		} else {
 

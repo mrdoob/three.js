@@ -13,6 +13,7 @@
 
 import {
 	CompressedTexture,
+	CompressedArrayTexture,
 	Data3DTexture,
 	DataTexture,
 	FileLoader,
@@ -35,15 +36,15 @@ import {
 	RGBAFormat,
 	RGFormat,
 	sRGBEncoding,
-	UnsignedByteType
+	UnsignedByteType,
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
-import * as KTX from '../libs/ktx-parse.module.js';
-
-const {
+import {
 	read,
 	KHR_DF_FLAG_ALPHA_PREMULTIPLIED,
 	KHR_DF_TRANSFER_SRGB,
+	KHR_SUPERCOMPRESSION_NONE,
+	KHR_SUPERCOMPRESSION_ZSTD,
 	VK_FORMAT_UNDEFINED,
 	VK_FORMAT_R16_SFLOAT,
 	VK_FORMAT_R16G16_SFLOAT,
@@ -57,11 +58,14 @@ const {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
-} = KTX; // eslint-disable-line no-undef
+} from '../libs/ktx-parse.module.js';
+import { ZSTDDecoder } from '../libs/zstddec.module.js';
 
 const _taskCache = new WeakMap();
 
 let _activeLoaders = 0;
+
+let _zstd;
 
 class KTX2Loader extends Loader {
 
@@ -233,16 +237,21 @@ class KTX2Loader extends Loader {
 
 	}
 
-	_createTextureFrom( transcodeResult ) {
+	_createTextureFrom( transcodeResult, container ) {
 
 		const { mipmaps, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
 
 		if ( type === 'error' ) return Promise.reject( error );
 
-		const texture = new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
+		const texture = container.layerCount > 1
+			? new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, UnsignedByteType )
+			: new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
+
+
 		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.generateMipmaps = false;
+
 		texture.needsUpdate = true;
 		texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? sRGBEncoding : LinearEncoding;
 		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
@@ -254,9 +263,9 @@ class KTX2Loader extends Loader {
 	/**
 	 * @param {ArrayBuffer} buffer
 	 * @param {object?} config
-	 * @return {Promise<CompressedTexture|DataTexture|Data3DTexture>}
+	 * @return {Promise<CompressedTexture|CompressedArrayTexture|DataTexture|Data3DTexture>}
 	 */
-	_createTexture( buffer, config = {} ) {
+	async _createTexture( buffer, config = {} ) {
 
 		const container = read( new Uint8Array( buffer ) );
 
@@ -267,13 +276,12 @@ class KTX2Loader extends Loader {
 		}
 
 		//
-
 		const taskConfig = config;
 		const texturePending = this.init().then( () => {
 
 			return this.workerPool.postMessage( { type: 'transcode', buffer, taskConfig: taskConfig }, [ buffer ] );
 
-		} ).then( ( e ) => this._createTextureFrom( e.data ) );
+		} ).then( ( e ) => this._createTextureFrom( e.data, container ) );
 
 		// Cache the task result.
 		_taskCache.set( buffer, { promise: texturePending } );
@@ -434,6 +442,7 @@ KTX2Loader.BasisWorker = function () {
 		const basisFormat = ktx2File.isUASTC() ? BasisFormat.UASTC_4x4 : BasisFormat.ETC1S;
 		const width = ktx2File.getWidth();
 		const height = ktx2File.getHeight();
+		const layers = ktx2File.getLayers() || 1;
 		const levels = ktx2File.getLevels();
 		const hasAlpha = ktx2File.getHasAlpha();
 		const dfdTransferFn = ktx2File.getDFDTransferFunc();
@@ -459,30 +468,39 @@ KTX2Loader.BasisWorker = function () {
 
 		for ( let mip = 0; mip < levels; mip ++ ) {
 
-			const levelInfo = ktx2File.getImageLevelInfo( mip, 0, 0 );
-			const mipWidth = levelInfo.origWidth;
-			const mipHeight = levelInfo.origHeight;
-			const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, 0, 0, transcoderFormat ) );
+			const layerMips = [];
 
-			const status = ktx2File.transcodeImage(
-				dst,
-				mip,
-				0,
-				0,
-				transcoderFormat,
-				0,
-				- 1,
-				- 1,
-			);
+			let mipWidth, mipHeight;
 
-			if ( ! status ) {
+			for ( let layer = 0; layer < layers; layer ++ ) {
 
-				cleanup();
-				throw new Error( 'THREE.KTX2Loader: .transcodeImage failed.' );
+				const levelInfo = ktx2File.getImageLevelInfo( mip, layer, 0 );
+				mipWidth = levelInfo.origWidth;
+				mipHeight = levelInfo.origHeight;
+				const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, layer, 0, transcoderFormat ) );
+				const status = ktx2File.transcodeImage(
+					dst,
+					mip,
+					layer,
+					0,
+					transcoderFormat,
+					0,
+					- 1,
+					- 1,
+				);
+
+				if ( ! status ) {
+
+					cleanup();
+					throw new Error( 'THREE.KTX2Loader: .transcodeImage failed.' );
+
+				}
+
+				layerMips.push( dst );
 
 			}
 
-			mipmaps.push( { data: dst, width: mipWidth, height: mipHeight } );
+			mipmaps.push( { data: concat( layerMips ), width: mipWidth, height: mipHeight } );
 
 		}
 
@@ -609,6 +627,33 @@ KTX2Loader.BasisWorker = function () {
 
 	}
 
+	/** Concatenates N byte arrays. */
+	function concat( arrays ) {
+
+		let totalByteLength = 0;
+
+		for ( const array of arrays ) {
+
+			totalByteLength += array.byteLength;
+
+		}
+
+		const result = new Uint8Array( totalByteLength );
+
+		let byteOffset = 0;
+
+		for ( const array of arrays ) {
+
+			result.set( array, byteOffset );
+
+			byteOffset += array.byteLength;
+
+		}
+
+		return result;
+
+	}
+
 };
 
 //
@@ -660,7 +705,7 @@ const ENCODING_MAP = {
 
 };
 
-function createDataTexture( container ) {
+async function createDataTexture( container ) {
 
 	const { vkFormat, pixelWidth, pixelHeight, pixelDepth } = container;
 
@@ -670,11 +715,36 @@ function createDataTexture( container ) {
 
 	}
 
-	//
+	const level = container.levels[ 0 ];
 
+	let levelData;
 	let view;
 
-	const levelData = container.levels[ 0 ].levelData;
+	if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_NONE ) {
+
+		levelData = level.levelData;
+
+	} else if ( container.supercompressionScheme === KHR_SUPERCOMPRESSION_ZSTD ) {
+
+		if ( ! _zstd ) {
+
+			_zstd = new Promise( async ( resolve ) => {
+
+				const zstd = new ZSTDDecoder();
+				await zstd.init();
+				resolve( zstd );
+
+			} );
+
+		}
+
+		levelData = ( await _zstd ).decode( level.levelData, level.uncompressedByteLength );
+
+	} else {
+
+		throw new Error( 'THREE.KTX2Loader: Unsupported supercompressionScheme.' );
+
+	}
 
 	if ( TYPE_MAP[ vkFormat ] === FloatType ) {
 
@@ -701,7 +771,6 @@ function createDataTexture( container ) {
 		view = levelData;
 
 	}
-
 	//
 
 	const texture = pixelDepth === 0

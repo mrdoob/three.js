@@ -32,8 +32,8 @@ class MathNode extends TempNode {
 	static INVERT = 'invert';
 	static DFDX = 'dFdx';
 	static DFDY = 'dFdy';
-	static SATURATE = 'saturate';
 	static ROUND = 'round';
+	static RECIPROCAL = 'reciprocal';
 
 	// 2 inputs
 
@@ -152,10 +152,6 @@ class MathNode extends TempNode {
 
 			return new MathNode( MathNode.NORMALIZE, mulNode ).build( builder );
 
-		} else if ( method === MathNode.SATURATE ) {
-
-			return builder.format( `clamp( ${ a.build( builder, inputType ) }, 0.0, 1.0 )`, type, output );
-
 		} else if ( method === MathNode.NEGATE ) {
 
 			return builder.format( '( -' + a.build( builder, inputType ) + ' )', type, output );
@@ -163,6 +159,10 @@ class MathNode extends TempNode {
 		} else if ( method === MathNode.INVERT ) {
 
 			return builder.format( '( 1.0 - ' + a.build( builder, inputType ) + ' )', type, output );
+
+		} else if ( method === MathNode.RECIPROCAL ) {
+
+			return builder.format( '( 1.0 / ' + a.build( builder, inputType ) + ' )', type, output );
 
 		} else {
 

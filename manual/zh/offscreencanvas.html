@@ -1,47 +1,924 @@
-<!DOCTYPE html><html lang="zh"><head>
-    <meta charset="utf-8">
-    <title>OffscreenCanvas</title>
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – OffscreenCanvas">
-    <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+<!DOCTYPE html>
+<html lang="zh">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
-<!-- Import maps polyfill -->
-<!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<head>
+  <meta charset="utf-8">
+  <title>离屏渲染</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@threejs">
+  <meta name="twitter:title" content="Three.js – OffscreenCanvas">
+  <meta property="og:image" content="https://threejs.org/files/share.png">
+  <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+  <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
 
-<script type="importmap">
+  <link rel="stylesheet" href="/manual/resources/lesson.css">
+  <link rel="stylesheet" href="/manual/resources/lang.css">
+  <!-- Import maps polyfill -->
+  <!-- Remove this when import maps will be widely supported -->
+  <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+  <script type="importmap">
 {
   "imports": {
     "three": "../../build/three.module.js"
   }
 }
 </script>
-    <link rel="stylesheet" href="/manual/zh/lang.css">
-  </head>
-  <body>
-    <div class="container">
-      <div class="lesson-title">
-        <h1>OffscreenCanvas</h1>
-      </div>
-      <div class="lesson">
-        <div class="lesson-main">
-          <p>抱歉，还没有中文翻译哦。 <a href="https://github.com/mrdoob/three.js">欢迎加入翻译</a>! 😄</p>
-<p><a href="/manual/en/offscreencanvas.html">英文原文链接</a>.</p>
+  <link rel="stylesheet" href="/manual/zh/lang.css">
+</head>
 
+<body>
+  <div class="container">
+    <div class="lesson-title">
+      <h1>离屏渲染</h1>
+    </div>
+    <div class="lesson">
+      <div class="lesson-main">
+        <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code class="notranslate"
+              translate="no">OffscreenCanvas</code></a>
+          是一个相对较新的浏览器功能，目前仅在Chrome可用，但显然未来会适用到别的浏览器上。 <code class="notranslate" translate="no">OffscreenCanvas</code>
+          允许使用Web Worker去渲染画布，这是一种减轻繁重复杂工作的方法，比如把渲染一个复杂的3D场景交给一个Web
+          Worker，避免减慢浏览器的响应速度。它也意味着数据在Worker中加载和解析，因此可能会减少页面加载时的卡顿。</p>
+        <p><em>开始</em> 使用它非常的简单。我们从移植 <a href="responsive.html">关于响应式的文章中</a> 3个旋转的立方体开始。</p>
+        <p>Worker通常会把代码分割到另一个脚本文件中，本网页的大多数示例都有单独的脚本嵌入到他们所在的HTML文件中。</p>
+        <p>在我们的例子中，我们会创建一个叫 <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> 的文件，
+          并且复制 <a href="responsive.html">响应式例子</a> 中所有的JavaScript到里面。我们会进行一些必要的修改以使其在Worker中运行。</p>
+        <p>我们的HTML文件中仍然需要一些JavaScript，第一件事就是我们需要查找画布，然后转移对它的控制。通过调用 <code class="notranslate"
+            translate="no">canvas.transferControlToOffscreen</code>来使画布脱离屏幕。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const offscreen = canvas.transferControlToOffscreen();
+
+  ...</pre>
+        <p>然后我们可以用 <code class="notranslate"
+            translate="no">new Worker(pathToScript, {type: 'module'})</code>来启用我们的Worker。
+          并把 <code class="notranslate" translate="no">offscreen</code> 对象传入给它。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+}
+main();</pre>
+        <p>特别需要关注一个重点，Worker不能访问 <code class="notranslate" translate="no">DOM</code>。
+          它们不能查看HTML元素，也不能接受鼠标或者键盘事件。它们通常唯一能做的事情就是响应发送给他们的消息并将消息发送回主页面。</p>
+
+        <p>想要发送消息给Worker，需要调用 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code
+              class="notranslate" translate="no">worker.postMessage</code></a> 并传入1个或2个参数。第一个参数是一个JavaScript对象，它会被 <a
+            href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">结构化拷贝</a>
+          并发送给Worker。第二个参数是一个可选的对象数组，它是第一个对象的子集，属于我们想 <em>传递</em>
+          给Worker的一部分，这些对象是不会被克隆的。相反他们会被 <em>转移</em>
+          并且不再存在于主页面中。不复存在可能是一个不准确的描述，它们更像是不可访问。只有某些类型的对象可以转移而不是克隆，包括 <code class="notranslate"
+            translate="no">OffscreenCanvas</code>。
+          所以一旦转移了 <code class="notranslate" translate="no">offscreen</code> 对象，在主页面它就没用了。</p>
+
+        <p>Worker从它们的 <code class="notranslate" translate="no">onmessage</code> 方法获取消息。我们调用 <code class="notranslate"
+            translate="no">postMessage</code> 传递的对象，在 <code class="notranslate" translate="no">onmessage</code> 方法中，通过
+          <code class="notranslate" translate="no">event.data</code> 可以获取到。
+          上面的代码在传递给Worker的对象中声明了 <code class="notranslate" translate="no">type: 'main'</code>
+          。这个对象对浏览器完全没有意义，完全是我们自定义的用法。我们会写一个处理函数，基于 <code class="notranslate" translate="no">type</code>
+          参数来调用Worker中的不同方法。然后我们可以按需添加处理函数，并很容易的从主页面中调用它们。
+        </p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const handlers = {
+  main,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};</pre>
+        <p>在上面你可以看到我们只是根据从主页面传入的 <code class="notranslate" translate="no">data</code> 中的 <code class="notranslate"
+            translate="no">type</code> 查找处理函数。 </p>
+        <p>所以现在我们只需要开始修改我们从 <a href="responsive.html">响应式文章</a>中粘贴进
+          <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> 的 <code class="notranslate"
+            translate="no">main</code> 函数即可。
+        </p>
+        <p>我们不会从 DOM 中获取画布，而是从事件数据中获取到它。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function main() {
+-  const canvas = document.querySelector('#c');
++function main(data) {
++  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({canvas});
+
+  ...</pre>
+        <p>记住Worker根本看不见 DOM 结构。我们遇到的第一个问题是 <code class="notranslate" translate="no">resizeRendererToDisplaySize</code>
+          不能获取到 <code class="notranslate" translate="no">canvas.clientWidth</code>
+          和 <code class="notranslate" translate="no">canvas.clientHeight</code> ，因为它们是DOM属性。这是原始代码</p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}</pre>
+        <p>相对的，我们需要把尺寸变化发送给Worker。所以，让我们添加一些保存宽度和高度的全局状态。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const state = {
+  width: 300,  // canvas default
+  height: 150,  // canvas default
+};</pre>
+        <p>然后我们添加一个 <code class="notranslate" translate="no">'size'</code> 处理函数来更新这些值。 </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function size(data) {
++  state.width = data.width;
++  state.height = data.height;
++}
+
+const handlers = {
+  main,
++  size,
+};</pre>
+        <p>现在我们可以修改 <code class="notranslate" translate="no">resizeRendererToDisplaySize</code> 函数以使用<code
+            class="notranslate" translate="no">state.width</code> 和 <code class="notranslate"
+            translate="no">state.height</code></p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+-  const width = canvas.clientWidth;
+-  const height = canvas.clientHeight;
++  const width = state.width;
++  const height = state.height;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}</pre>
+        <p>其他我们需要用到长宽的地方也需要做类似的修改。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
++    camera.aspect = state.width / state.height;
+    camera.updateProjectionMatrix();
+  }
+
+  ...</pre>
+        <p>回到主页面，在任何页面尺寸发生变化的时候，我们都需要发送一个<code class="notranslate" translate="no">size</code> 事件。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
++function sendSize() {
++  worker.postMessage({
++    type: 'size',
++    width: canvas.clientWidth,
++    height: canvas.clientHeight,
++  });
++}
++
++window.addEventListener('resize', sendSize);
++sendSize();</pre>
+        <p>我们也需要调用它一次来初始化大小。</p>
+        <p>通过这些细小改动，假设你的浏览器完全支持 <code class="notranslate" translate="no">OffscreenCanvas</code>
+          ，它应该是有效的。在我们运行它之前，让我们检查一下浏览器是否真的支持
+          <code class="notranslate" translate="no">OffscreenCanvas</code> 并且不显示错误。首先添加一些HTML片段来展示错误。
+        </p>
+        <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
++    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;</pre>
+        <p>和一些CSS代码</p>
+        <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#noOffscreenCanvas {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: red;
+    color: white;
+}</pre>
+        <p>然后我们可以通过检查<code class="notranslate" translate="no">transferControlToOffscreen</code>是否存在
+          来判断浏览器对 <code class="notranslate" translate="no">OffscreenCanvas</code>的兼容性。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
++  if (!canvas.transferControlToOffscreen) {
++    canvas.style.display = 'none';
++    document.querySelector('#noOffscreenCanvas').style.display = '';
++    return;
++  }
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-picking.js', {type: 'module});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  ...</pre>
+        <p>如上，如果你的浏览器支持 <code class="notranslate" translate="no">OffscreenCanvas</code> ，这个例子应该会生效。</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas.html"></iframe></div>
+          <a class="threejs_center" href="/manual/examples/offscreencanvas.html" target="_blank">点击在新窗口打开</a>
         </div>
+
+        <p></p>
+        <p>这很棒，不过现在不是每个浏览器都支持 <code class="notranslate" translate="no">OffscreenCanvas</code>。
+          让我们更改代码以同时适用 <code class="notranslate" translate="no">OffscreenCanvas</code> 以及在主页面和通常用法一样的降级方案。</p>
+
+        <blockquote>
+          <p>
+            顺便说一句，如果你需要OffscreenCanvas来使页面具有尺寸自适应调整，降级的意义不大。也许基于你最终是在主页面还是Worker中运行，你可能会调整Worker的数量，以便让Worker运行时做的事情比在主页面可做的事情更多。这些都取决于你。
+          </p>
+        </blockquote>
+
+        <p>我们应该做的第一件事就是分离出THREE.js中特定于Worker相关的代码。这样我们就可以在主页面和Worker中使用相同的代码，换句话说，我们将会有3个文件</p>
+
+        <ol>
+          <li>
+            <p>我们的HTML文件</p>
+            <p><code class="notranslate" translate="no">threejs-offscreencanvas-w-fallback.html</code></p>
+          </li>
+          <li>
+            <p>一个包含THREE.js的JavaScript代码文件</p>
+            <p><code class="notranslate" translate="no">shared-cubes.js</code></p>
+          </li>
+          <li>
+            <p>我们支持Worker的代码文件</p>
+            <p><code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code></p>
+          </li>
+        </ol>
+        <p><code class="notranslate" translate="no">shared-cubes.js</code> 和 <code class="notranslate"
+            translate="no">offscreencanvas-worker-cubes.js</code> 基本上都是从我们之前的 <code class="notranslate"
+            translate="no">offscreencanvas-cubes.js</code> 文件分割而来。
+          第一步我们拷贝所有的 <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> 代码到 <code
+            class="notranslate" translate="no">shared-cube.js</code>中。然后
+          我们重命名 <code class="notranslate" translate="no">main</code> 为 <code class="notranslate"
+            translate="no">init</code> 因为我们已经有一个 <code class="notranslate" translate="no">main</code>
+          函数在我们的HTML文件中了，我们还需要导出 <code class="notranslate" translate="no">init</code> 函数和 <code class="notranslate"
+            translate="no">state</code>对象。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
+
+-const state = {
++export const state = {
+  width: 300,   // canvas default
+  height: 150,  // canvas default
+};
+
+-function main(data) {
++export function init(data) {
+  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({canvas});</pre>
+        <p>并去掉和THREE.js无关的部分</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
+-  state.width = data.width;
+-  state.height = data.height;
+-}
+-
+-const handlers = {
+-  main,
+-  size,
+-};
+-
+-self.onmessage = function(e) {
+-  const fn = handlers[e.data.type];
+-  if (typeof fn !== 'function') {
+-    throw new Error('no handler for type: ' + e.data.type);
+-  }
+-  fn(e.data);
+-};</pre>
+        <p>然后我们需要把刚刚删除的部分拷贝到 <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code>
+          ，并导入 <code class="notranslate" translate="no">shared-cubes.js</code> 以及调用 <code class="notranslate"
+            translate="no">init</code> 而不是 <code class="notranslate" translate="no">main</code>方法。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {init, state} from './shared-cubes.js';
+
+function size(data) {
+  state.width = data.width;
+  state.height = data.height;
+}
+
+const handlers = {
+-  main,
++  init,
+  size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};</pre>
+        <p>类似的我们需要在主页面引入 <code class="notranslate" translate="no">shared-cubes.js</code> 模块
+        </p>
+        <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
++import {init, state} from './shared-cubes.js';</pre>
+        <p>我们也可以移除之前添加的HTML</p>
+        <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
+-  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
+-    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
+-  &lt;/div&gt;
+&lt;/body&gt;</pre>
+        <p>以及CSS</p>
+        <pre class="prettyprint showlinemods notranslate lang-css" translate="no">-#noOffscreenCanvas {
+-    display: flex;
+-    width: 100%;
+-    height: 100%;
+-    align-items: center;
+-    justify-content: center;
+-    background: red;
+-    color: white;
+-}</pre>
+        <p>然后我们把主页面的代码改成调用一次启动函数，启动函数取决于浏览器是否支持 <code class="notranslate" translate="no">OffscreenCanvas</code>。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+-  if (!canvas.transferControlToOffscreen) {
+-    canvas.style.display = 'none';
+-    document.querySelector('#noOffscreenCanvas').style.display = '';
+-    return;
+-  }
+-  const offscreen = canvas.transferControlToOffscreen();
+-  const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  if (canvas.transferControlToOffscreen) {
++    startWorker(canvas);
++  } else {
++    startMainPage(canvas);
++  }
+  ...</pre>
+        <p>我们需要把启动Worker的代码移动到 <code class="notranslate" translate="no">startWorker</code>函数中</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');
+}</pre>
+        <p>然后发送消息类型为 <code class="notranslate" translate="no">init</code> 而不是 <code class="notranslate"
+            translate="no">main</code></p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);</pre>
+        <p>若是从主页面启动，我们可以这样做</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+  init({canvas});
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');
+}</pre>
+        <p>这样，我们的示例在离屏画布或者主页面都可以运行了。</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-fallback.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/offscreencanvas-w-fallback.html" target="_blank">点击在新窗口打开</a>
+        </div>
+        <p>这应该是比较容易的。我们尝试下拾取，我们会从 <a href="picking.html">关于拾取的文章</a> 中的 <code class="notranslate"
+            translate="no">射线</code> 案例获取一些代码，
+          让它在离屏时也可运行。</p>
+        <p>我们现在拷贝 <code class="notranslate" translate="no">shared-cube.js</code> 到 <code class="notranslate"
+            translate="no">shared-picking.js</code> ，然后添加拾取部分。拷贝到 <code class="notranslate"
+            translate="no">PickHelper</code> 函数中 </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+  constructor() {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
+    // cast a ray through the frustum
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // get the list of objects the ray intersected
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // pick the first object. It's the closest one
+      this.pickedObject = intersectedObjects[0].object;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+
+const pickPosition = {x: 0, y: 0};
+const pickHelper = new PickHelper();</pre>
+        <p>我们从鼠标位置中更新 <code class="notranslate" translate="no">pickPosition</code>，就像这样</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+  pickPosition.x = (pos.x / canvas.width ) *  2 - 1;
+  pickPosition.y = (pos.y / canvas.height) * -2 + 1;  // note we flip Y
+}
+window.addEventListener('mousemove', setPickPosition);
+        </pre>
+        <p>Worker不能直接读取鼠标位置，所以就像调整尺寸的代码那样，发送带有鼠标位置的消息。像刚才的代码一样我们发送鼠标位置消息并且更新 <code class="notranslate"
+            translate="no">pickPosition</code></p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function size(data) {
+  state.width = data.width;
+  state.height = data.height;
+}
+
++function mouse(data) {
++  pickPosition.x = data.x;
++  pickPosition.y = data.y;
++}
+
+const handlers = {
+  init,
++  mouse,
+  size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};</pre>
+        <p>回到我们的主页面，我需要添加代码去把鼠标位置传给Worker或者主页面。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let sendMouse;
+
+function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-picking.js', {type: 'module'});
+  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+
++  sendMouse = (x, y) =&gt; {
++    worker.postMessage({
++      type: 'mouse',
++      x,
++      y,
++    });
++  };
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}
+
+function startMainPage(canvas) {
+  init({canvas});
+
++  sendMouse = (x, y) =&gt; {
++    pickPosition.x = x;
++    pickPosition.y = y;
++  };
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');  /* eslint-disable-line no-console */
+}</pre>
+        <p>然后我们可以将所有鼠标处理代码复制到主页面，只需稍作更改即可调用<code class="notranslate" translate="no">sendMouse</code></p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+-  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
++  sendMouse(
++      (pos.x / canvas.clientWidth ) *  2 - 1,
++      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
+}
+
+function clearPickPosition() {
+  // unlike the mouse which always has a position
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+-  pickPosition.x = -100000;
+-  pickPosition.y = -100000;
++  sendMouse(-100000, -100000);
+}
+window.addEventListener('mousemove', setPickPosition);
+window.addEventListener('mouseout', clearPickPosition);
+window.addEventListener('mouseleave', clearPickPosition);
+
+window.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+window.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+window.addEventListener('touchend', clearPickPosition);</pre>
+        <p>通过这种方式， <code class="notranslate" translate="no">OffscreenCanvas</code> 的拾取应该也是有效的。
+        </p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-picking.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/offscreencanvas-w-picking.html" target="_blank">点击在新窗口打开</a>
+        </div>
+
+        <p></p>
+        <p>我们更进一步，添加进 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate"
+              translate="no">OrbitControls</code></a>。
+          这会有一些复杂。 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate"
+              translate="no">OrbitControls</code></a>利用了很多DOM特性，比如鼠标、触摸、键盘等等。</p>
+        <p>与我们现在的代码不同，我们不能真正使用全局 <code class="notranslate" translate="no">state</code> 对象，不重写所有的OrbitControls代码是无法做到的。
+          OrbitControls附加绑定了一个 <code class="notranslate" translate="no">HTMLElement</code>
+          的DOM事件。也许我们可以通过自行实现与DOM元素相同API签名的对象，我们只需要支持OrbitControls需要的功能即可。</p>
+        <p>挖掘了一下 <a
+            href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js">OrbitControls
+            源代码</a>
+          ，看起来我们需要处理以下事件：</p>
+        <ul>
+          <li>contextmenu</li>
+          <li>pointerdown</li>
+          <li>pointermove</li>
+          <li>pointerup</li>
+          <li>touchstart</li>
+          <li>touchmove</li>
+          <li>touchend</li>
+          <li>wheel</li>
+          <li>keydown</li>
+        </ul>
+        <p>对于点击事件，我们需要 <code class="notranslate" translate="no">ctrlKey</code>， <code class="notranslate"
+            translate="no">metaKey</code>， <code class="notranslate" translate="no">shiftKey</code>，
+          <code class="notranslate" translate="no">button</code>， <code class="notranslate"
+            translate="no">pointerType</code>， <code class="notranslate" translate="no">clientX</code>， <code
+            class="notranslate" translate="no">clientY</code>， <code class="notranslate" translate="no">pageX</code>，
+          和 <code class="notranslate" translate="no">pageY</code> 这些属性。
+        </p>
+        <p>对于键盘事件，我们需要 <code class="notranslate" translate="no">ctrlKey</code>， <code class="notranslate"
+            translate="no">metaKey</code>， <code class="notranslate" translate="no">shiftKey</code>，
+          和 <code class="notranslate" translate="no">keyCode</code> 这些属性。</p>
+
+        <p>对于滚轮事件，我们只需要 <code class="notranslate" translate="no">deltaY</code> 属性。</p>
+        <p>最后对于点击事件，我们只需要 <code class="notranslate" translate="no">pageX</code> 和 <code class="notranslate"
+            translate="no">pageY</code> ，来自
+          <code class="notranslate" translate="no">touches</code> 属性。
+        </p>
+        <p>
+          所以，让我们做一个代理的键值对，一部分会运行在主页面，获取所有这些事件，然后传递相关属性值给Worker。另一部分将在Worker中运行，接收事件并使用和原始DOM事件相同的事件参数。因此OrbitControls无法分辨其中的不同。
+        </p>
+        <p>这里是Worker部分的代码。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EventDispatcher} from '../../build/three.module.js';
+
+class ElementProxyReceiver extends EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
+    this.dispatchEvent(data);
+  }
+}</pre>
+        <p>它所做的就是接收到一条消息，就把它分发出去。它继承自<a href="/docs/#api/en/core/EventDispatcher"><code class="notranslate"
+              translate="no">EventDispatcher</code></a>，这提供了一些方法，像<code class="notranslate"
+            translate="no">addEventListener</code> 和 <code class="notranslate"
+            translate="no">removeEventListener</code>，就像一个DOM元素一样，我们把它传给OrbitControls的话，应该能行。
+        <p><code class="notranslate" translate="no">ElementProxyReceiver</code>
+          接受一个元素，在我们的例子中，只需要一个。不过最好还是好好思考下，让Manager来管理多个。</p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ProxyManager {
+  constructor() {
+    this.targets = {};
+    this.handleEvent = this.handleEvent.bind(this);
+  }
+  makeProxy(data) {
+    const {id} = data;
+    const proxy = new ElementProxyReceiver();
+    this.targets[id] = proxy;
+  }
+  getProxy(id) {
+    return this.targets[id];
+  }
+  handleEvent(data) {
+    this.targets[data.id].handleEvent(data.data);
+  }
+}</pre>
+        <p>我们可以创建一个 <code class="notranslate" translate="no">ProxyManager</code> 实例，然后调用它的 <code class="notranslate"
+            translate="no">makeProxy</code>
+          方法，通过一个id，可以生成一个响应对应id信息的 <code class="notranslate" translate="no">ElementProxyReceiver</code> 对象。</p>
+        <p>让我们将它关联到Worker的消息处理函数上</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const proxyManager = new ProxyManager();
+
+function start(data) {
+  const proxy = proxyManager.getProxy(data.canvasId);
+  init({
+    canvas: data.canvas,
+    inputElement: proxy,
+  });
+}
+
+function makeProxy(data) {
+  proxyManager.makeProxy(data);
+}
+
+...
+
+const handlers = {
+-  init,
+-  mouse,
++  start,
++  makeProxy,
++  event: proxyManager.handleEvent,
+    size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};</pre>
+        <p>在共享的THREE.js代码中，我们需要导入 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate"
+              translate="no">OrbitControls</code></a> 并且设置它。</p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '../../build/three.module.js';
++import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
+
+export function init(data) {
+-  const {canvas} = data;
++  const {canvas, inputElement} = data;
+  const renderer = new THREE.WebGLRenderer({canvas});
+
++  const controls = new OrbitControls(camera, inputElement);
++  controls.target.set(0, 0, 0);
++  controls.update();</pre>
+        <p>注意，我们通过传入代理的 <code class="notranslate" translate="no">inputElement</code> 给了OrbitControls，而不是
+          像我们在其他非离屏渲染的例子中那样。</p>
+        <p>接下来我们可以从HTML文件中移动所有的拾取事件代码，把 <code class="notranslate" translate="no">canvas</code> 修改为 <code
+            class="notranslate" translate="no">inputElement</code>。
+        </p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+-  const rect = canvas.getBoundingClientRect();
++  const rect = inputElement.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  sendMouse(
+-      (pos.x / canvas.clientWidth ) *  2 - 1,
+-      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
++  pickPosition.x = (pos.x / inputElement.clientWidth ) *  2 - 1;
++  pickPosition.y = (pos.y / inputElement.clientHeight) * -2 + 1;  // note we flip Y
+}
+
+function clearPickPosition() {
+  // unlike the mouse which always has a position
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+-  sendMouse(-100000, -100000);
++  pickPosition.x = -100000;
++  pickPosition.y = -100000;
+}
+
+*inputElement.addEventListener('mousemove', setPickPosition);
+*inputElement.addEventListener('mouseout', clearPickPosition);
+*inputElement.addEventListener('mouseleave', clearPickPosition);
+
+*inputElement.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+*inputElement.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+*inputElement.addEventListener('touchend', clearPickPosition);</pre>
+        <p>回到主页面，我们需要写一些代码来发送包含上面列举所有事件的消息。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">let nextProxyId = 0;
+class ElementProxy {
+  constructor(element, worker, eventHandlers) {
+    this.id = nextProxyId++;
+    this.worker = worker;
+    const sendEvent = (data) =&gt; {
+      this.worker.postMessage({
+        type: 'event',
+        id: this.id,
+        data,
+      });
+    };
+
+    // register an id
+    worker.postMessage({
+      type: 'makeProxy',
+      id: this.id,
+    });
+    for (const [eventName, handler] of Object.entries(eventHandlers)) {
+      element.addEventListener(eventName, function(event) {
+        handler(event, sendEvent);
+      });
+    }
+  }
+}</pre>
+        <p><code class="notranslate" translate="no">ElementProxy</code> 代理了事件需要被代理的元素，
+          它向Worker注册了一个ID，通过选取和发送
+          我们早先注册的 <code class="notranslate" translate="no">makeProxy</code>消息，Worker会生成一个 <code class="notranslate"
+            translate="no">ElementProxyReceiver</code> 并使用这个ID注册。</p>
+
+        <p>然后我们又一个注册事件处理的对，这样我们可以对特定事件应用处理函数，并转发给Worker。</p>
+        <p>当我们启动Worker时，我们先创建一个代理，并传给我们的事件处理函数</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-orbitcontrols.js', {type: 'module'});
+
++  const eventHandlers = {
++    contextmenu: preventDefaultHandler,
++    mousedown: mouseEventHandler,
++    mousemove: mouseEventHandler,
++    mouseup: mouseEventHandler,
++    pointerdown: mouseEventHandler,
++    pointermove: mouseEventHandler,
++    pointerup: mouseEventHandler,
++    touchstart: touchEventHandler,
++    touchmove: touchEventHandler,
++    touchend: touchEventHandler,
++    wheel: wheelEventHandler,
++    keydown: filteredKeydownEventHandler,
++  };
++  const proxy = new ElementProxy(canvas, worker, eventHandlers);
+  worker.postMessage({
+    type: 'start',
+    canvas: offscreen,
++    canvasId: proxy.id,
+  }, [offscreen]);
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}</pre>
+        <p>下面是事件处理函数。他们所做的只是从接收到的时间中复制属性列表。它们应用了一个 <code class="notranslate" translate="no">sendEvent</code>函数
+          ，这个函数会包含事件的数据，添加正确的ID，以及发送给Worker。</p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxy {
+  constructor(element, worker, eventHandlers) {
+    this.id = nextProxyId++;
+    this.worker = worker;
+    const sendEvent = (data) =&gt; {
+      this.worker.postMessage({
+        type: 'event',
+        id: this.id,
+        data,
+      });
+    };
+
+    // register an id
+    worker.postMessage({
+      type: 'makeProxy',
+      id: this.id,
+    });
++    sendSize();
+    for (const [eventName, handler] of Object.entries(eventHandlers)) {
+      element.addEventListener(eventName, function(event) {
+        handler(event, sendEvent);
+      });
+    }
+
++    function sendSize() {
++      const rect = element.getBoundingClientRect();
++      sendEvent({
++        type: 'size',
++        left: rect.left,
++        top: rect.top,
++        width: element.clientWidth,
++        height: element.clientHeight,
++      });
++    }
++
++    window.addEventListener('resize', sendSize);
+  }
+}</pre>
+        <p>在我们共享的THREE.js代码中，我们不再需要 <code class="notranslate" translate="no">state</code></p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-export const state = {
+-  width: 300,   // canvas default
+-  height: 150,  // canvas default
+-};
+
+...
+
+function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+-  const width = state.width;
+-  const height = state.height;
++  const width = inputElement.clientWidth;
++  const height = inputElement.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+
+function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+-    camera.aspect = state.width / state.height;
++    camera.aspect = inputElement.clientWidth / inputElement.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  ...</pre>
+        <p>还有一些黑科技。OrbitControls 监听了 <code class="notranslate" translate="no">pointermove</code> 和 <code
+            class="notranslate" translate="no">pointerup</code> 事件到元素的
+          <code class="notranslate" translate="no">ownerDocument</code> 属性上，这样可以处理鼠标捕获(当鼠标离开窗口时)
+        </p>
+        <p>此外，代码引用了全局<code class="notranslate" translate="no">document</code> 不过在Worker中没有全局document对象。</p>
+
+        <p>我们可以通过2个小hack来快速解决这些问题。在我们Worker的代码中，我们会使用Proxy来解决这两个问题。</p>
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function start(data) {
+  const proxy = proxyManager.getProxy(data.canvasId);
++  proxy.ownerDocument = proxy; // HACK!
++  self.document = {} // HACK!
+  init({
+    canvas: data.canvas,
+    inputElement: proxy,
+  });
+}</pre>
+        <p>这会给 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate"
+              translate="no">OrbitControls</code></a> 检查到一些符合它期望的东西。</p>
+
+        <p>我知道这会有点难以理解。简单来说就是：
+          <code class="notranslate" translate="no">ElementProxy</code> 在主页面运行，并转发 DOM 事件给Worker中的
+          <code class="notranslate" translate="no">ElementProxyReceiver</code>，
+          它会伪装成一个 <code class="notranslate" translate="no">HTMLElement</code> ，这样我们可以同时使用
+          <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate"
+              translate="no">OrbitControls</code></a> 和我们自己的代码。
+        </p>
+        <p>最后一件事是我们在不使用离屏渲染时的降级。我们所要做的就是将画布本身作为 <code class="notranslate" translate="no">inputElement</code> 即可。</p>
+
+        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+-  init({canvas});
++  init({canvas, inputElement: canvas});
+  console.log('using regular canvas');
+}</pre>
+        <p>现在我们应该可以让OrbitControls在离屏渲染时正常工作了。</p>
+        <p></p>
+        <div translate="no" class="threejs_example_container notranslate">
+          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+              src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-orbitcontrols.html"></iframe>
+          </div>
+          <a class="threejs_center" href="/manual/examples/offscreencanvas-w-orbitcontrols.html"
+            target="_blank">点击在新窗口打开</a>
+        </div>
+
+        <p></p>
+        <p>这可能是站点上目前为止最复杂的示例，可能会有点难以理解，因为每个案例都有3个文件：HTML文件、Worker文件、共享的THREE.js代码。</p>
+        <p>我希望它不会太难理解。希望它可以提供一些使用THREE.js、OffscreenCanvas和Web Worker有用的示例。</p>
       </div>
     </div>
-  
+  </div>
+
   <script src="/manual/resources/prettify.js"></script>
   <script src="/manual/resources/lesson.js"></script>
 
 
 
 
-</body></html>
+</body>
+
+</html>

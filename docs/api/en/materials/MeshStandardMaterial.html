@@ -20,18 +20,12 @@
 			[link:http://area.autodesk.com/blogs/the-3ds-max-blog/what039s-new-for-rendering-in-3ds-max-2017 3D Studio Max].<br /><br />
 
 			This approach differs from older approaches in that instead of using approximations for the way in which
-			light	interacts with a surface, a physically correct model is used. The idea is that, instead of
+			light interacts with a surface, a physically correct model is used. The idea is that, instead of
 			tweaking materials to look good under specific lighting, a material can	be created that
 			will react 'correctly' under all lighting scenarios.<br /><br />
 
-			In practice this gives a more	accurate and realistic looking result than the [page:MeshLambertMaterial]
-			or [page:MeshPhongMaterial], at the cost of being somewhat more computationally expensive.<br /><br />
-
-			Shading is calculated in the same way as for the [page:MeshPhongMaterial], using a
-			[link:https://en.wikipedia.org/wiki/Phong_shading Phong] shading model.	This calculates shading
-			per pixel (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Pixel_shaders fragment shader],
-			AKA pixel shader) which gives more accurate results than the Gouraud model used by
-			[page:MeshLambertMaterial], at the cost of some performance.<br /><br />
+			In practice this gives a more accurate and realistic looking result than the [page:MeshLambertMaterial]
+			or [page:MeshPhongMaterial], at the cost of being somewhat more computationally expensive. [name] uses per-fragment shading.<br /><br />
 
 			Note that for best results you should always specify an [page:.envMap environment map] when using
 			this material.<br /><br />

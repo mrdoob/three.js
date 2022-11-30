@@ -16,13 +16,7 @@
 
 			The material uses a non-physically based [link:https://en.wikipedia.org/wiki/Lambertian_reflectance Lambertian]
 			model for calculating reflectance. This can simulate some surfaces (such as untreated wood or stone) well,
-			but cannot simulate shiny surfaces with specular highlights (such as varnished wood).<br /><br />
-
-
-
-			Shading is calculated using a [link:https://en.wikipedia.org/wiki/Gouraud_shading Gouraud] shading model.
-			This calculates shading per vertex (i.e. in the [link:https://en.wikipedia.org/wiki/Shader#Vertex_shaders vertex shader])
-			and interpolates the results over the polygon's faces.<br /><br />
+			but cannot simulate shiny surfaces with specular highlights (such as varnished wood). [name] uses per-fragment shading.<br /><br />
 
 			Due to the simplicity of the reflectance and illumination models, performance will be greater
 			when using this material over the [page:MeshPhongMaterial],	[page:MeshStandardMaterial] or [page:MeshPhysicalMaterial],
@@ -79,6 +73,16 @@
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</p>
 
+		<h3>[property:Texture bumpMap]</h3>
+		<p>
+			The texture to create a bump map. The black and white values map to the perceived depth in relation to the lights.
+			Bump doesn't actually affect the geometry of the object, only the lighting. If a normal map is defined this will
+			be ignored.
+		</p>
+
+		<h3>[property:Float bumpScale]</h3>
+		<p>How much the bump map affects the material. Typical ranges are 0-1. Default is 1.</p>
+
 		<h3>[property:Color color]</h3>
 		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
 
@@ -89,6 +93,28 @@
 			Options are [page:Materials THREE.MultiplyOperation] (default), [page:Materials THREE.MixOperation],
 			[page:Materials THREE.AddOperation]. If mix is chosen, the [page:.reflectivity] is used to
 			blend between the two colors.
+		</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p>
+			The displacement map affects the position of the mesh's vertices. Unlike other maps
+			which only affect the light and shade of the material the displaced vertices can cast shadows,
+			block other objects, and otherwise act as real geometry. The displacement texture is
+			an image where the value of each pixel (white being the highest) is mapped against,
+			and repositions, the vertices of the mesh.
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>
+			How much the displacement map affects the mesh (where black is no displacement,
+			and white is maximum displacement). Without a displacement map set, this value is not applied.
+			 Default is 1.
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p>
+			The offset of the displacement map's values on the mesh's vertices.
+			Without a displacement map set, this value is not applied. Default is 0.
 		</p>
 
 		<h3>[property:Color emissive]</h3>
@@ -110,6 +136,11 @@
 		<h3>[property:Texture envMap]</h3>
 		<p>The environment map. Default is null.</p>
 
+		<h3>[property:Boolean flatShading]</h3>
+		<p>
+		Define whether the material is rendered with flat shading. Default is false.
+		</p>
+
 		<h3>[property:Boolean fog]</h3>
 		<p>Whether the material is affected by fog. Default is `true`.</p>
 
@@ -123,6 +154,27 @@
 		<p>
 			The color map. May optionally include an alpha channel, typically combined with
 			[page:Material.transparent .transparent] or [page:Material.alphaTest .alphaTest]. Default is null.
+		</p>
+
+		<h3>[property:Texture normalMap]</h3>
+		<p>
+			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
+			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
+			In case the material has a normal map authored using the left handed convention, the y component of normalScale
+			should be negated to compensate for the different handedness.
+		</p>
+
+		<h3>[property:Integer normalMapType]</h3>
+		<p>
+			The type of normal map.<br /><br />
+
+			Options are [page:constant THREE.TangentSpaceNormalMap] (default), and [page:constant THREE.ObjectSpaceNormalMap].
+		</p>
+
+		<h3>[property:Vector2 normalScale]</h3>
+		<p>
+			How much the normal map affects the material. Typical ranges are 0-1.
+			Default is a [page:Vector2] set to (1,1).
 		</p>
 
 		<h3>[property:Float reflectivity]</h3>

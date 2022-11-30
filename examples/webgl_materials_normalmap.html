@@ -20,7 +20,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,16 +30,16 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
-			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
-			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
-			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js';
+			import { ColorCorrectionShader } from 'three/addons/shaders/ColorCorrectionShader.js';
+			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
 			let container, stats, loader;
 
@@ -78,7 +79,7 @@
 				ambientLight = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffffff, 1.25, 1000 );
+				pointLight = new THREE.PointLight( 0xffffff, 2, 1000 );
 				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
@@ -142,7 +143,9 @@
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
 
-				composer = new EffectComposer( renderer );
+				const renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture() } );
+
+				composer = new EffectComposer( renderer, renderTarget );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFXAA );

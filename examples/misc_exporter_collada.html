@@ -18,7 +18,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,11 +28,11 @@
 
 			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { ColladaExporter } from './jsm/exporters/ColladaExporter.js';
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ColladaExporter } from 'three/addons/exporters/ColladaExporter.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 			////////////////////////////////////////////////////////////////////////////////
 			// Utah/Newell Teapot demo
@@ -381,6 +382,7 @@
 						colors.push( r * 128, 0, b * 128 );
 
 					}
+
 					teapot.geometry.setAttribute( 'color', new THREE.Uint8BufferAttribute( colors, 3, true ) );
 					teapot.material.vertexColors = true;
 					teapot.material.needsUpdate = true;

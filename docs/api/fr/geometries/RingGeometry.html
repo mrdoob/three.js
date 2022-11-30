@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Une classe pour générer une géométrie d'anneau bidimensionnelle.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#RingGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Exemple de code : </h2>
+
+		<code>const geometry = new THREE.RingGeometry( 1, 5, 32 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } );
+		const mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		</code>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]([param:Float innerRadius], [param:Float outerRadius], [param:Integer thetaSegments], [param:Integer phiSegments], [param:Float thetaStart], [param:Float thetaLength])</h3>
+		<p>
+		innerRadius — La valeur par défaut est 0.5.<br />
+		outerRadius — La valeur par défaut est 1. <br />
+		thetaSegments — Nombre de segments. Un nombre plus élevé signifie que l'anneau sera plus rond. Le minimum est 3. La valeur par défaut est 8. <br />
+		phiSegments — Le minimum est 1. La valeur par défaut est 1.<br />
+		thetaStart —  Angle de départ. La valeur par défaut est 0.<br />
+		thetaLength — Angle central. La valeur par défaut est Math.PI * 2.
+		</p>
+
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les propriétés communes.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		Un objet avec une propriété pour chacun des paramètres du constructeur. Toute modification après instanciation ne change pas la géométrie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe de base [page:BufferGeometry] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

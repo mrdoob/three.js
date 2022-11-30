@@ -28,7 +28,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -37,10 +38,10 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let scene, renderer, camera, stats;
 			let model, skeleton, mixer, clock;
@@ -203,10 +204,10 @@
 						const currentAction = currentSettings ? currentSettings.action : null;
 						const action = settings ? settings.action : null;
 
-						if ( currentAction !== action ) { 
-						
+						if ( currentAction !== action ) {
+			
 							prepareCrossFade( currentAction, action, 0.35 );
-						
+			
 						}
 
 					};

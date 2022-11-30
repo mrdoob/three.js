@@ -1,6 +1,6 @@
 import { UIDiv, UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
 
-import { TeapotGeometry } from '../../examples/jsm/geometries/TeapotGeometry.js';
+import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
 function GeometryParametersPanel( signals, object ) {
 

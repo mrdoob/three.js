@@ -29,10 +29,11 @@
 			const normalMap0 = options.normalMap0 || textureLoader.load( 'textures/water/Water_1_M_Normal.jpg' );
 			const normalMap1 = options.normalMap1 || textureLoader.load( 'textures/water/Water_2_M_Normal.jpg' );
 			const cycle = 0.15; // a cycle of a flow map phase
-
 			const halfCycle = cycle * 0.5;
 			const textureMatrix = new THREE.Matrix4();
-			const clock = new THREE.Clock(); // internal components
+			const clock = new THREE.Clock();
+
+			// internal components
 
 			if ( THREE.Reflector === undefined ) {
 
@@ -59,7 +60,9 @@
 				clipBias: clipBias
 			} );
 			reflector.matrixAutoUpdate = false;
-			refractor.matrixAutoUpdate = false; // material
+			refractor.matrixAutoUpdate = false;
+
+			// material
 
 			this.material = new THREE.ShaderMaterial( {
 				uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib[ 'fog' ], shader.uniforms ] ),
@@ -68,7 +71,6 @@
 				transparent: true,
 				fog: true
 			} );
-
 			if ( flowMap !== undefined ) {
 
 				this.material.defines.USE_FLOWMAP = '';
@@ -84,27 +86,30 @@
 					value: flowDirection
 				};
 
-			} // maps
+			}
 
+			// maps
 
 			normalMap0.wrapS = normalMap0.wrapT = THREE.RepeatWrapping;
 			normalMap1.wrapS = normalMap1.wrapT = THREE.RepeatWrapping;
 			this.material.uniforms[ 'tReflectionMap' ].value = reflector.getRenderTarget().texture;
 			this.material.uniforms[ 'tRefractionMap' ].value = refractor.getRenderTarget().texture;
 			this.material.uniforms[ 'tNormalMap0' ].value = normalMap0;
-			this.material.uniforms[ 'tNormalMap1' ].value = normalMap1; // water
+			this.material.uniforms[ 'tNormalMap1' ].value = normalMap1;
+
+			// water
 
 			this.material.uniforms[ 'color' ].value = color;
 			this.material.uniforms[ 'reflectivity' ].value = reflectivity;
-			this.material.uniforms[ 'textureMatrix' ].value = textureMatrix; // inital values
+			this.material.uniforms[ 'textureMatrix' ].value = textureMatrix;
+
+			// inital values
 
 			this.material.uniforms[ 'config' ].value.x = 0; // flowMapOffset0
-
 			this.material.uniforms[ 'config' ].value.y = halfCycle; // flowMapOffset1
-
 			this.material.uniforms[ 'config' ].value.z = halfCycle; // halfCycle
-
 			this.material.uniforms[ 'config' ].value.w = scale; // scale
+
 			// functions
 
 			function updateTextureMatrix( camera ) {
@@ -121,8 +126,8 @@
 				const delta = clock.getDelta();
 				const config = scope.material.uniforms[ 'config' ];
 				config.value.x += flowSpeed * delta; // flowMapOffset0
-
 				config.value.y = config.value.x + halfCycle; // flowMapOffset1
+
 				// Important: The distance between offsets should be always the value of "halfCycle".
 				// Moreover, both offsets should be in the range of [ 0, cycle ].
 				// This approach ensures a smooth water flow and avoids "reset" effects.
@@ -138,8 +143,9 @@
 
 				}
 
-			} //
+			}
 
+			//
 
 			this.onBeforeRender = function ( renderer, scene, camera ) {
 
@@ -157,7 +163,6 @@
 		}
 
 	}
-
 	Water.WaterShader = {
 		uniforms: {
 			'color': {
@@ -193,9 +198,7 @@
 				value: new THREE.Vector4()
 			}
 		},
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 
 		#include <common>
 		#include <fog_pars_vertex>
@@ -222,9 +225,7 @@
 			#include <fog_vertex>
 
 		}`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 
 		#include <common>
 		#include <fog_pars_fragment>

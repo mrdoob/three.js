@@ -101,6 +101,8 @@ class ObjectLoader extends Loader {
 
 			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
 
+				if ( onError !== undefined ) onError( new Error( 'THREE.ObjectLoader: Can\'t load ' + url ) );
+
 				console.error( 'THREE.ObjectLoader: Can\'t load ' + url );
 				return;
 
@@ -275,13 +277,6 @@ class ObjectLoader extends Loader {
 					case 'InstancedBufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
-
-						break;
-
-					case 'Geometry':
-
-						console.error( 'THREE.ObjectLoader: The legacy Geometry type is no longer supported.' );
-
 						break;
 
 					default:
@@ -327,39 +322,13 @@ class ObjectLoader extends Loader {
 
 				const data = json[ i ];
 
-				if ( data.type === 'MultiMaterial' ) {
+				if ( cache[ data.uuid ] === undefined ) {
 
-					// Deprecated
-
-					const array = [];
-
-					for ( let j = 0; j < data.materials.length; j ++ ) {
-
-						const material = data.materials[ j ];
-
-						if ( cache[ material.uuid ] === undefined ) {
-
-							cache[ material.uuid ] = loader.parse( material );
-
-						}
-
-						array.push( cache[ material.uuid ] );
-
-					}
-
-					materials[ data.uuid ] = array;
-
-				} else {
-
-					if ( cache[ data.uuid ] === undefined ) {
-
-						cache[ data.uuid ] = loader.parse( data );
-
-					}
-
-					materials[ data.uuid ] = cache[ data.uuid ];
+					cache[ data.uuid ] = loader.parse( data );
 
 				}
+
+				materials[ data.uuid ] = cache[ data.uuid ];
 
 			}
 
@@ -813,6 +782,8 @@ class ObjectLoader extends Loader {
 
 				}
 
+				if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;
+
 				break;
 
 			case 'PerspectiveCamera':
@@ -1047,7 +1018,7 @@ class ObjectLoader extends Loader {
 
 				if ( child !== undefined ) {
 
-					object.addLevel( child, level.distance );
+					object.addLevel( child, level.distance, level.hysteresis );
 
 				}
 

@@ -18,7 +18,7 @@ class Object3DNode extends Node {
 		this.scope = scope;
 		this.object3d = object3d;
 
-		this.updateType = NodeUpdateType.Object;
+		this.updateType = NodeUpdateType.OBJECT;
 
 		this._uniformNode = new UniformNode( null );
 

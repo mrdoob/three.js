@@ -15,7 +15,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,12 +25,12 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { EdgeSplitModifier } from './jsm/modifiers/EdgeSplitModifier.js';
-			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { EdgeSplitModifier } from 'three/addons/modifiers/EdgeSplitModifier.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let renderer, scene, camera;
 			let modifier, mesh, baseGeometry;

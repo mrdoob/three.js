@@ -20,7 +20,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,13 +30,13 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { LineMaterial } from './jsm/lines/LineMaterial.js';
-			import { Wireframe } from './jsm/lines/Wireframe.js';
-			import { WireframeGeometry2 } from './jsm/lines/WireframeGeometry2.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+			import { Wireframe } from 'three/addons/lines/Wireframe.js';
+			import { WireframeGeometry2 } from 'three/addons/lines/WireframeGeometry2.js';
 
 			let wireframe, renderer, scene, camera, camera2, controls;
 			let wireframe1;
@@ -222,7 +223,7 @@
 					// dashed is implemented as a defines -- not as a uniform. this could be changed.
 					// ... or THREE.LineDashedMaterial could be implemented as a separate material
 					// temporary hack - renderer should do this eventually
-					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
+					if ( val ) matLine.defines.USE_DASH = ''; else delete matLine.defines.USE_DASH;
 					matLine.needsUpdate = true;
 
 					wireframe1.material = val ? matLineDashed : matLineBasic;

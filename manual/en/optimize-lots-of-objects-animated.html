@@ -354,10 +354,10 @@ have. We could also write some custom animation code which would be easy but
 because the original webgl globe uses 
 <a href="https://github.com/tweenjs/tween.js/">an animation library</a> let's use the same one here.</p>
 <p>We need to include the library</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import * as BufferGeometryUtils from '/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-+import {TWEEN} from '/examples/jsm/libs/tween.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import {TWEEN} from 'three/addons/libs/tween.min.js';
 </pre>
 <p>And then create a <code class="notranslate" translate="no">Tween</code> to animate the influences.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest

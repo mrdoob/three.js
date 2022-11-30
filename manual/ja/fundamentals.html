@@ -52,7 +52,7 @@ three.jsがサポートするほとんどのブラウザは自動更新される
 </pre>
 <p>Three.jsはcanvasに描画するため、canvasをthree.jsに渡す必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -256,7 +256,7 @@ es6モジュールはスクリプトのロードに <code class="notranslate" tr
 両方とも以下に例を示します。
 </p>
 <pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 ...
 
@@ -303,11 +303,11 @@ three.jsの場合、すべてのexamplesを正しいフォルダ階層に入れ�
 同じフォルダ構造を使用すると、importしたthreeとexampleライブラリは両方とも同じthree.module.jsを参照します。
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>これにはCDNを使用する場合も含まれます。 <code class="notranslate" translate="no">three.modules.js</code> のパスが <code class="notranslate" translate="no">/build/three.modules.js</code> のようになってる事を確認して下さい。例えば</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
 

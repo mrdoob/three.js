@@ -36,6 +36,8 @@ class HTMLMesh extends Mesh {
 			material.dispose();
 
 			material.map.dispose();
+			
+			canvases.delete( dom );
 
 			this.removeEventListener( 'mousedown', onEvent );
 			this.removeEventListener( 'mousemove', onEvent );
@@ -469,17 +471,14 @@ function html2canvas( element ) {
 
 	const offset = element.getBoundingClientRect();
 
-	let canvas;
+	let canvas = canvases.get( element );
 
-	if ( canvases.has( element ) ) {
-
-		canvas = canvases.get( element );
-
-	} else {
+	if ( canvas === undefined ) {
 
 		canvas = document.createElement( 'canvas' );
 		canvas.width = offset.width;
 		canvas.height = offset.height;
+		canvases.set( element, canvas );
 
 	}
 

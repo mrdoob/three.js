@@ -18,13 +18,14 @@
 			prevQuaternion.setFromAxisAngle( up, Math.PI / 2 );
 			const point = new THREE.Vector3();
 			const prevPoint = new THREE.Vector3();
-			prevPoint.copy( curve.getPointAt( 0 ) ); // shapes
+			prevPoint.copy( curve.getPointAt( 0 ) );
+
+			// shapes
 
 			const step = [ new THREE.Vector3( - 0.225, 0, 0 ), new THREE.Vector3( 0, - 0.050, 0 ), new THREE.Vector3( 0, - 0.175, 0 ), new THREE.Vector3( 0, - 0.050, 0 ), new THREE.Vector3( 0.225, 0, 0 ), new THREE.Vector3( 0, - 0.175, 0 ) ];
 			const PI2 = Math.PI * 2;
 			let sides = 5;
 			const tube1 = [];
-
 			for ( let i = 0; i < sides; i ++ ) {
 
 				const angle = i / sides * PI2;
@@ -34,7 +35,6 @@
 
 			sides = 6;
 			const tube2 = [];
-
 			for ( let i = 0; i < sides; i ++ ) {
 
 				const angle = i / sides * PI2;
@@ -44,11 +44,9 @@
 
 			const vector = new THREE.Vector3();
 			const normal = new THREE.Vector3();
-
 			function drawShape( shape, color ) {
 
 				normal.set( 0, 0, - 1 ).applyQuaternion( quaternion );
-
 				for ( let j = 0; j < shape.length; j ++ ) {
 
 					vector.copy( shape[ j ] );
@@ -61,7 +59,6 @@
 				}
 
 				normal.set( 0, 0, 1 ).applyQuaternion( quaternion );
-
 				for ( let j = shape.length - 1; j >= 0; j -- ) {
 
 					vector.copy( shape[ j ] );
@@ -83,7 +80,6 @@
 			const normal2 = new THREE.Vector3();
 			const normal3 = new THREE.Vector3();
 			const normal4 = new THREE.Vector3();
-
 			function extrudeShape( shape, offset, color ) {
 
 				for ( let j = 0, jl = shape.length; j < jl; j ++ ) {
@@ -107,7 +103,9 @@
 					vertices.push( vector4.x, vector4.y, vector4.z );
 					vertices.push( vector2.x, vector2.y, vector2.z );
 					vertices.push( vector3.x, vector3.y, vector3.z );
-					vertices.push( vector4.x, vector4.y, vector4.z ); //
+					vertices.push( vector4.x, vector4.y, vector4.z );
+
+					//
 
 					normal1.copy( point1 );
 					normal1.applyQuaternion( quaternion );
@@ -139,7 +137,6 @@
 			}
 
 			const offset = new THREE.Vector3();
-
 			for ( let i = 1; i <= divisions; i ++ ) {
 
 				point.copy( curve.getPointAt( i / divisions ) );
@@ -149,7 +146,6 @@
 				up.crossVectors( forward, right );
 				const angle = Math.atan2( forward.x, forward.z );
 				quaternion.setFromAxisAngle( up, angle );
-
 				if ( i % 2 === 0 ) {
 
 					drawShape( step, color2 );
@@ -162,8 +158,9 @@
 				prevPoint.copy( point );
 				prevQuaternion.copy( quaternion );
 
-			} // console.log( vertices.length );
+			}
 
+			// console.log( vertices.length );
 
 			this.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 			this.setAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
@@ -172,7 +169,6 @@
 		}
 
 	}
-
 	class RollerCoasterLiftersGeometry extends THREE.BufferGeometry {
 
 		constructor( curve, divisions ) {
@@ -183,7 +179,9 @@
 			const quaternion = new THREE.Quaternion();
 			const up = new THREE.Vector3( 0, 1, 0 );
 			const point = new THREE.Vector3();
-			const tangent = new THREE.Vector3(); // shapes
+			const tangent = new THREE.Vector3();
+
+			// shapes
 
 			const tube1 = [ new THREE.Vector3( 0, 0.05, - 0.05 ), new THREE.Vector3( 0, 0.05, 0.05 ), new THREE.Vector3( 0, - 0.05, 0 ) ];
 			const tube2 = [ new THREE.Vector3( - 0.05, 0, 0.05 ), new THREE.Vector3( - 0.05, 0, - 0.05 ), new THREE.Vector3( 0.05, 0, 0 ) ];
@@ -196,7 +194,6 @@
 			const normal2 = new THREE.Vector3();
 			const normal3 = new THREE.Vector3();
 			const normal4 = new THREE.Vector3();
-
 			function extrudeShape( shape, fromPoint, toPoint ) {
 
 				for ( let j = 0, jl = shape.length; j < jl; j ++ ) {
@@ -220,7 +217,9 @@
 					vertices.push( vector4.x, vector4.y, vector4.z );
 					vertices.push( vector2.x, vector2.y, vector2.z );
 					vertices.push( vector3.x, vector3.y, vector3.z );
-					vertices.push( vector4.x, vector4.y, vector4.z ); //
+					vertices.push( vector4.x, vector4.y, vector4.z );
+
+					//
 
 					normal1.copy( point1 );
 					normal1.applyQuaternion( quaternion );
@@ -247,13 +246,14 @@
 
 			const fromPoint = new THREE.Vector3();
 			const toPoint = new THREE.Vector3();
-
 			for ( let i = 1; i <= divisions; i ++ ) {
 
 				point.copy( curve.getPointAt( i / divisions ) );
 				tangent.copy( curve.getTangentAt( i / divisions ) );
 				const angle = Math.atan2( tangent.x, tangent.z );
-				quaternion.setFromAxisAngle( up, angle ); //
+				quaternion.setFromAxisAngle( up, angle );
+
+				//
 
 				if ( point.y > 10 ) {
 
@@ -299,7 +299,6 @@
 		}
 
 	}
-
 	class RollerCoasterShadowGeometry extends THREE.BufferGeometry {
 
 		constructor( curve, divisions ) {
@@ -319,7 +318,6 @@
 			const vector2 = new THREE.Vector3();
 			const vector3 = new THREE.Vector3();
 			const vector4 = new THREE.Vector3();
-
 			for ( let i = 1; i <= divisions; i ++ ) {
 
 				point.copy( curve.getPointAt( i / divisions ) );
@@ -355,14 +353,12 @@
 		}
 
 	}
-
 	class SkyGeometry extends THREE.BufferGeometry {
 
 		constructor() {
 
 			super();
 			const vertices = [];
-
 			for ( let i = 0; i < 100; i ++ ) {
 
 				const x = Math.random() * 800 - 400;
@@ -383,7 +379,6 @@
 		}
 
 	}
-
 	class TreesGeometry extends THREE.BufferGeometry {
 
 		constructor( landscape ) {
@@ -393,7 +388,6 @@
 			const colors = [];
 			const raycaster = new THREE.Raycaster();
 			raycaster.ray.direction.set( 0, - 1, 0 );
-
 			for ( let i = 0; i < 2000; i ++ ) {
 
 				const x = Math.random() * 500 - 250;
@@ -412,7 +406,6 @@
 				vertices.push( x, y + height, z );
 				vertices.push( x + Math.sin( angle + Math.PI ), y, z + Math.cos( angle + Math.PI ) );
 				const random = Math.random() * 0.1;
-
 				for ( let j = 0; j < 6; j ++ ) {
 
 					colors.push( 0.2 + random, 0.4 + random, 0 );

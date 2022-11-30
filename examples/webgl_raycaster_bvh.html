@@ -32,6 +32,7 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
 					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@^0.5.10/build/index.module.js"
 				}
 			}
@@ -41,10 +42,10 @@
 
 			import * as THREE from 'three';
 			import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast, MeshBVHVisualizer } from 'three-mesh-bvh';
-			import Stats from './jsm/libs/stats.module.js';
-			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			// Add the extension functions
 			THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -52,7 +53,7 @@
 			THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
 			let stats;
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer;
 			let mesh, helper, bvh;
 			let sphereInstance, lineSegments;
 
@@ -147,7 +148,9 @@
 
 				} );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 75;
 
 				// set up gui
 				const gui = new GUI();
@@ -223,7 +226,7 @@
 
 					// raycast
 					_raycaster.ray.origin.copy( _position );
-					_raycaster.ray.direction.copy( _position ).multiplyScalar( - 1).normalize();
+					_raycaster.ray.direction.copy( _position ).multiplyScalar( - 1 ).normalize();
 
 					// update hits points and lines
 					const hits = _raycaster.intersectObject( mesh );
@@ -258,9 +261,6 @@
 
 			function onWindowResize() {
 
-				const hx = window.innerWidth / 2;
-				const hy = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
@@ -291,6 +291,7 @@
 					mesh.updateMatrixWorld();
 
 				}
+
 				updateRays();
 
 				renderer.render( scene, camera );

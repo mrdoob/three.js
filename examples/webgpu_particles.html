@@ -17,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three-nodes/": "./jsm/nodes/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -25,23 +26,23 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three-nodes/Nodes.js';
+			import * as Nodes from 'three/nodes';
 
-			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { range, texture, mix, uv, mul, mod, rotateUV, color, max, min, div, saturate, positionWorld, invert, timerLocal } from 'three-nodes/Nodes.js';
+			import { range, texture, mix, uv, mul, mod, rotateUV, color, max, min, div, clamp, positionWorld, invert, timerLocal } from 'three/nodes';
 
-			import WebGPU from './jsm/capabilities/WebGPU.js';
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
 			let controls;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
@@ -83,7 +84,7 @@
 
 				const opacityNode = mul( textureNode.a, invert( life ) );
 
-				const smokeColor = mix( color( 0x2c1501 ), color( 0x222222 ), saturate( mul( positionWorld.y, 3 ) ) );
+				const smokeColor = mix( color( 0x2c1501 ), color( 0x222222 ), clamp( mul( positionWorld.y, 3 ) ) );
 
 				// create particles
 
@@ -132,6 +133,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -151,8 +153,6 @@
 
 				gui.add( timer, 'scale', 0, 1, 0.01 ).name( 'speed' );
 
-				return renderer.init();
-
 			}
 
 			function onWindowResize() {
@@ -166,22 +166,9 @@
 
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-
-			}
-
 			function render() {
 
 				renderer.render( scene, camera );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

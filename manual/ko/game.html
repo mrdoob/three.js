@@ -173,10 +173,10 @@ function init() {
 </pre>
 <p>이제 애니메이션이 들어간 모델을 화면에 띄워봅시다.</p>
 <p><a href="load-gltf.html">이전 glTF 파일 예제</a>와 달리 이번에는 각 모델을 하나 이상 배치할 계획입니다. 그러니 파일을 불러온 뒤 바로 장면에 넣는 대신 각 glTF의 씬 그래프(scene), 이 경우에는 움직이는 캐릭터를 복사해야 합니다. 다행히 Three.js에는 <code class="notranslate" translate="no">SkeletonUtil.clone</code>이라는 함수가 있어 이를 쉽게 구현할 수 있죠. 먼저 해당 모듈을 불러오겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from '/examples/jsm/loaders/GLTFLoader.js';
-+import { SkeletonUtils } from '/examples/jsm/utils/SkeletonUtils.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
++import { SkeletonUtils } from 'three/addons/utils/SkeletonUtils.js';
 </pre>
 <p>그리고 아까 불러왔던 모델을 복사합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
@@ -1316,11 +1316,11 @@ class StateDisplayHelper extends Component {
 }
 </pre>
 <p>추가로 lil-gui를 이용해 위 디버깅 요소들를 켜고 끌 수 있도록 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import { OrbitControls } from '/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from '/examples/jsm/loaders/GLTFLoader.js';
-import { SkeletonUtils } from '/examples/jsm/utils/SkeletonUtils.js';
-+import { GUI } from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { SkeletonUtils } from 'three/addons/utils/SkeletonUtils.js';
++import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const gui = new GUI();
 +gui.add(globals, 'debug').onChange(showHideDebugInfo);

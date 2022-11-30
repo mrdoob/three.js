@@ -40,6 +40,25 @@
 			该方法对于同时需要材质和线框绘制的物体非常有用。
 		</p>
 
+		<h3>[method:undefined sortInstancedMesh]( [param:InstancedMesh mesh], [param:Function compareFn] )</h3>
+		<p>
+		mesh -- InstancedMesh in which instances will be sorted. <br />
+		compareFn -- Comparator function defining the sort order.
+		</p>
+		<p>
+		Sorts the instances within an [page:InstancedMesh], according to a user-defined
+		callback. The callback will be provided with two arguments, <i>indexA</i>
+		and <i>indexB</i>, and must return a numerical value. See
+		[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#description Array.prototype.sort]
+		for more information on sorting callbacks and their return values.
+		</p>
+		<p>
+		Because of the high performance cost, three.js does not sort
+		[page:InstancedMesh] instances automatically. Manually sorting may be
+		helpful to improve display of alpha blended materials (back to front),
+		and to reduce overdraw in opaque materials (front to back).
+		</p>
+
 		<h2>源代码</h2>
 
 		<p>

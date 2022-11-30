@@ -21,7 +21,8 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js"
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
@@ -29,7 +30,7 @@
 	<script type="module">
 		import * as THREE from 'three';
 
-		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 		let camera, scene, renderer;
 

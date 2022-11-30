@@ -1,9 +1,9 @@
 import { Material, ShaderMaterial } from 'three';
-import { getNodesKeys } from '../core/NodeUtils.js';
+import { getNodesKeys, getCacheKey } from '../core/NodeUtils.js';
 import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
-	assign, label, mul, bypass,
+	assign, label, mul, bypass, attribute,
 	positionLocal, skinning, instance, modelViewProjection, lightingContext, colorSpace,
 	materialAlphaTest, materialColor, materialOpacity
 } from '../shadernode/ShaderNodeElements.js';
@@ -37,7 +37,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	customProgramCacheKey() {
 
-		return this.uuid + '-' + this.version;
+		return getCacheKey( this );
 
 	}
 
@@ -79,6 +79,14 @@ class NodeMaterial extends ShaderMaterial {
 
 		let colorNode = vec4( this.colorNode || materialColor );
 		let opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
+
+		// VERTEX COLORS
+
+		if ( this.vertexColors === true && builder.geometry.hasAttribute( 'color' ) ) {
+
+			colorNode = vec4( mul( colorNode.xyz, attribute( 'color' ) ), colorNode.a );
+		
+		}
 
 		// COLOR
 

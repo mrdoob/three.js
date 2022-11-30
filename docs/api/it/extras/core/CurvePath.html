@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Curve] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Una classe base atratta che estende [page:Curve]. Una CurvePath è semplicemente un array di curve collegate,
+      ma mantiene le API di una curva.
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]()</h3>
+		<p>
+      Il costruttore non prende parametri.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Curve] per le proprietà comuni.</p>
+
+		<h3>[property:Array curves]</h3>
+		<p>L'array di [page:Curve Curve].</p>
+
+		<h3>[property:Boolean autoClose]</h3>
+		<p>Se chiudere automaticamente o meno il percorso.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Curve] per i metodi comuni.</p>
+
+		<h3>[method:undefined add]( [param:Curve curve] )</h3>
+		<p>Aggiunge una curva all'array [page:.curves].</p>
+
+		<h3>[method:undefined closePath]()</h3>
+		<p>Aggiunge una [page:LineCurve lineCurve] per chiudere il percorso.</p>
+
+		<h3>[method:Array getCurveLengths]()</h3>
+		<p>Ottieni l'elenco delle lunghezze delle curve cumulative nell'array [page:.curves].</p>
+
+		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- il numero di pezzi in cui dividere la curva. Il valore predefinito è `12`.<br /><br />
+
+      Restituisce un array di punti che rappresentano una sequenza di curve. Il paramentro `division`
+      definisce il numero di pezzi in cui è suddivisa ciascuna curva. Tuttavia, ai fini dell'ottimizzazione
+      e della qualità, la risoluzione di campionamento per ogni curva dipende dal suo tipo. Ad esempio, per una
+      [page:LineCurve], il numero restituito di punti è sempre solo 2.
+		</p>
+
+		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- il numero di pezzi in cui dividere la curva. Il valore predefinito è `40`.<br /><br />
+
+      Restituisce un insieme di divisioni + 1 punto equispaziato usando getPointAt( u ).
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

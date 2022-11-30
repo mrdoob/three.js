@@ -6,14 +6,13 @@ import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import { NodeUpdateType } from './constants.js';
 
-import { REVISION, LinearEncoding } from 'three';
+import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'three';
 
 export const defaultShaderStages = [ 'fragment', 'vertex' ];
 export const shaderStages = [ ...defaultShaderStages, 'compute' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
 
 const typeFromLength = new Map();
-typeFromLength.set( 1, 'float' );
 typeFromLength.set( 2, 'vec2' );
 typeFromLength.set( 3, 'vec3' );
 typeFromLength.set( 4, 'vec4' );
@@ -117,7 +116,7 @@ class NodeBuilder {
 
 			const updateType = node.getUpdateType( this );
 
-			if ( updateType !== NodeUpdateType.None ) {
+			if ( updateType !== NodeUpdateType.NONE ) {
 
 				this.updateNodes.push( node );
 
@@ -181,6 +180,18 @@ class NodeBuilder {
 
 	}
 
+	getFragCoord() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	isFlipY() {
+
+		return false;
+
+	}
+
 	getTexture( /* textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
@@ -206,7 +217,18 @@ class NodeBuilder {
 	}
 
 	// @TODO: rename to .generateConst()
-	getConst( type, value ) {
+	getConst( type, value = null ) {
+
+		if ( value === null ) {
+
+			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
+			else if ( type === 'bool' ) value = false;
+			else if ( type === 'color' ) value = new Color();
+			else if ( type === 'vec2' ) value = new Vector2();
+			else if ( type === 'vec3' ) value = new Vector3();
+			else if ( type === 'vec4' ) value = new Vector4();
+
+		}
 
 		if ( type === 'float' ) return toFloat( value );
 		if ( type === 'int' ) return `${ Math.round( value ) }`;
@@ -251,6 +273,12 @@ class NodeBuilder {
 	generateMethod( method ) {
 
 		return method;
+
+	}
+
+	hasGeometryAttribute( name ) {
+
+		return this.geometry?.getAttribute( name ) !== undefined;
 
 	}
 
@@ -336,6 +364,8 @@ class NodeBuilder {
 
 		type = this.getVectorType( type );
 
+		if ( type === 'float' || type === 'bool' || type === 'int' || type === 'uint' ) return type;
+
 		const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( type );
 
 		if ( componentType === null ) return null;
@@ -357,9 +387,12 @@ class NodeBuilder {
 
 	}
 
-	getTypeFromLength( length ) {
+	getTypeFromLength( length, componentType = 'float' ) {
 
-		return typeFromLength.get( length );
+		if ( length === 1 ) return componentType;
+		const baseType = typeFromLength.get( length );
+		const prefix = componentType === 'float' ? '' : componentType[ 0 ];
+		return prefix + baseType;
 
 	}
 
@@ -380,6 +413,22 @@ class NodeBuilder {
 	getVectorFromMatrix( type ) {
 
 		return type.replace( 'mat', 'vec' );
+
+	}
+
+	changeComponentType( type, newComponentType ) {
+
+		return this.getTypeFromLength( this.getTypeLength( type ), newComponentType );
+
+	}
+
+	getIntegerType( type ) {
+
+		const componentType = this.getComponentType( type );
+
+		if ( componentType === 'int' || componentType === 'uint' ) return type;
+
+		return this.changeComponentType( type, 'int' );
 
 	}
 

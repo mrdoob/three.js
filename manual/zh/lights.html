@@ -42,8 +42,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 10, 20);
 </pre>
 <p>然后我们添加一个 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>。<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 让我们可以围绕某一个点旋转控制相机。<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 是 three.js 的可选模块，所以我们首先需要引入这个模块。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
 <p>然后我们就可以使用了。创建 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> 时传入两个参数，一个是要控制的相机对象，第二个是检测事件的 DOM 元素。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controls = new OrbitControls(camera, canvas);
@@ -338,9 +338,9 @@ scene.add(helper);
 }
 </pre>
 <p>为了使用 <a href="/docs/#api/zh/lights/RectAreaLight"><code class="notranslate" translate="no">RectAreaLight</code></a>，我们需要引入 three.js 的<code class="notranslate" translate="no">RectAreaLightUniformsLib</code> 模块，同时使用 <a href="/docs/#api/zh/helpers/RectAreaLightHelper"><code class="notranslate" translate="no">RectAreaLightHelper</code></a> 来辅助查看灯光对象。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-+import {RectAreaLightUniformsLib} from '/examples/jsm/lights/RectAreaLightUniformsLib.js';
-+import {RectAreaLightHelper} from '/examples/jsm/helpers/RectAreaLightHelper.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
++import {RectAreaLightHelper} from 'three/addons/helpers/RectAreaLightHelper.js';
 </pre>
 <p>我们需要先调用 <code class="notranslate" translate="no">RectAreaLightUniformsLib.init</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {

@@ -253,7 +253,7 @@
 
 		<h3>[property:Integer version]</h3>
 		<p>
-		This starts at `0` and counts how many times [property:Boolean needsUpdate] is set to `true`.
+		This starts at `0` and counts how many times [page:Texture.needsUpdate .needsUpdate] is set to `true`.
 		</p>
 
 		<h3>[property:Function onUpdate]</h3>
@@ -292,7 +292,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 		Make copy of the texture. Note this is not a "deep copy", the image is shared.
-		Besides, cloning a texture does not automatically mark it for a texture upload. You have to set [page:Texture.needsUpdate] to true as soon as its image property (the data source) is fully loaded or ready.
+		Besides, cloning a texture does not automatically mark it for a texture upload. You have to set [page:Texture.needsUpdate .needsUpdate] to true as soon as its image property (the data source) is fully loaded or ready.
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -303,7 +303,7 @@
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
-		Frees the GPU related resources allocated by a texture. Call this method whenever a texture is no longer used in your app.
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h3>[method:Vector2 transformUv]( [param:Vector2 uv] )</h3>

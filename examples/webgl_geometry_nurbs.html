@@ -27,7 +27,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -36,11 +37,11 @@
 
 			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { NURBSCurve } from './jsm/curves/NURBSCurve.js';
-			import { NURBSSurface } from './jsm/curves/NURBSSurface.js';
-			import { ParametricGeometry } from './jsm/geometries/ParametricGeometry.js';
+			import { NURBSCurve } from 'three/addons/curves/NURBSCurve.js';
+			import { NURBSSurface } from 'three/addons/curves/NURBSSurface.js';
+			import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
 
 			let container, stats;
 

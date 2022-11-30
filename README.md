@@ -8,15 +8,16 @@
 
 #### JavaScript 3D library
 
-The aim of the project is to create an easy to use, lightweight, cross-browser, general purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available in the examples.
+The aim of the project is to create an easy to use, lightweight, cross-browser, general purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available as addons.
 
 [Examples](https://threejs.org/examples/) &mdash;
-[Documentation](https://threejs.org/docs/) &mdash;
+[Docs](https://threejs.org/docs/) &mdash;
+[Manual](https://threejs.org/manual/) &mdash;
 [Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
 [Questions](https://stackoverflow.com/questions/tagged/three.js) &mdash;
 [Forum](https://discourse.threejs.org/) &mdash;
-[Slack](https://join.slack.com/t/threejs/shared_invite/zt-rnuegz5e-FQpc6YboDVW~5idlp7GfDw)
+[Discord](https://discord.gg/56GBJwAnUS)
 
 ### Usage
 

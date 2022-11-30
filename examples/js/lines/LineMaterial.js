@@ -34,13 +34,11 @@
 		gapSize: {
 			value: 1
 		} // todo FIX - maybe change to totalSize
-
 	};
+
 	THREE.ShaderLib[ 'line' ] = {
 		uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.common, THREE.UniformsLib.fog, THREE.UniformsLib.line ] ),
-		vertexShader:
-  /* glsl */
-  `
+		vertexShader: /* glsl */`
 		#include <common>
 		#include <color_pars_vertex>
 		#include <fog_pars_vertex>
@@ -269,9 +267,7 @@
 
 		}
 		`,
-		fragmentShader:
-  /* glsl */
-  `
+		fragmentShader: /* glsl */`
 		uniform vec3 diffuse;
 		uniform float opacity;
 		uniform float linewidth;
@@ -432,7 +428,6 @@
 		}
 		`
 	};
-
 	class LineMaterial extends THREE.ShaderMaterial {
 
 		constructor( parameters ) {
@@ -443,8 +438,8 @@
 				vertexShader: THREE.ShaderLib[ 'line' ].vertexShader,
 				fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader,
 				clipping: true // required for clipping support
-
 			} );
+
 			this.isLineMaterial = true;
 			Object.defineProperties( this, {
 				color: {
@@ -501,7 +496,6 @@
 						return Boolean( 'USE_DASH' in this.defines );
 
 					},
-
 					set( value ) {
 
 						if ( Boolean( value ) !== Boolean( 'USE_DASH' in this.defines ) ) {
@@ -521,7 +515,6 @@
 						}
 
 					}
-
 				},
 				dashScale: {
 					enumerable: true,

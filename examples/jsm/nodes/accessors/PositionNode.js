@@ -10,6 +10,7 @@ class PositionNode extends Node {
 	static GEOMETRY = 'geometry';
 	static LOCAL = 'local';
 	static WORLD = 'world';
+	static WORLD_DIRECTION = 'worldDirection';
 	static VIEW = 'view';
 	static VIEW_DIRECTION = 'viewDirection';
 
@@ -54,6 +55,11 @@ class PositionNode extends Node {
 		} else if ( scope === PositionNode.VIEW_DIRECTION ) {
 
 			const vertexPositionNode = new MathNode( MathNode.NEGATE, new PositionNode( PositionNode.VIEW ) );
+			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexPositionNode ) );
+
+		} else if ( scope === PositionNode.WORLD_DIRECTION ) {
+
+			const vertexPositionNode = new MathNode( MathNode.NEGATE, new PositionNode( PositionNode.WORLD ) );
 			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexPositionNode ) );
 
 		}

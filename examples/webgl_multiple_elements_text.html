@@ -86,7 +86,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js"
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -95,9 +96,11 @@
 
 			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			const scenes = [];
+
+			const clock = new THREE.Clock();
 
 			let views, t, canvas, renderer;
 
@@ -274,7 +277,7 @@
 
 				} );
 
-				t ++;
+				t += clock.getDelta() * 60;
 
 			}
 

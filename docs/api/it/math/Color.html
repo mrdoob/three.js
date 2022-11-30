@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Classe che rappresenta un colore.
+		</p>
+
+		<p>
+			L'iterazione di un'istanza [name] produrrà i suoi componenti (r, g, b) nell'ordine corrispondente.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<p>
+			Un colore può essere inizializzato in qualsiasi dei seguenti modi:
+		</p>
+		<code>
+// Un costruttore vuoto - per impostazione predefinita sarà bianco
+const color1 = new THREE.Color();
+
+// Colore esadecimale (raccomandato)
+const color2 = new THREE.Color( 0xff0000 );
+
+// Una stringa RGB
+const color3 = new THREE.Color("rgb(255, 0, 0)");
+const color4 = new THREE.Color("rgb(100%, 0%, 0%)");
+
+// Nome del colore X11 - tutti i 140 nomi dei colori sono supportati.
+// Si noti la mancanza del CamelCase nel nome
+const color5 = new THREE.Color( 'skyblue' );
+
+// Una stringa HSL
+const color6 = new THREE.Color("hsl(0, 100%, 50%)");
+
+// Separa i valori RGB tra 0 e 1
+const color7 = new THREE.Color( 1, 0, 0 );
+		</code>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Color_Hex_or_String r], [param:Float g], [param:Float b] )</h3>
+		<p>
+		[page:Color_Hex_or_String r] - (opzionale) Se gli argomenti [page:Float g] e [page:Float b] sono definiti, indica il componente rosso del colore.
+		Se non sono definiti, questo può essere una [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet tripletta esadecimale] (consigliato), 
+		una stringa CSS-style, o un'altra istanza Color.<br />
+		[page:Float g] - (opzionale) Se è definito, indica la componente verde del colore.<br />
+		[page:Float b] - (opzionale) Se è definito, indica la componente blu del colore.<br /><br />
+
+		Si noti che il metodo standard per definire il colore in three.js è con una [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet tripletta esadecimale],
+		questo metodo viene utilizzato nel resto della documentazione.<br /><br />
+
+		Quando tutti gli argomenti sono definiti allora [page:Color_Hex_or_String r] è il componente rosso,
+		[page:Float g] è il componente verde e [page:Float b] è il componente blue del colore.<br />
+		Quando solo [page:Color_Hex_or_String r] è definito:<br />
+		<ul>
+			<li>Può essere una [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet tripletta esadecimale] che rappresenta il colore (consigliato).</li>
+			<li>Può essere un'altra istanza di Color.</li>
+			<li>Può essere una stringa CSS-style. Per esempio:
+				<ul>
+					<li>'rgb(250, 0,0)'</li>
+					<li>'rgb(100%,0%,0%)'</li>
+					<li>'hsl(0, 100%, 50%)'</li>
+					<li>'#ff0000'</li>
+					<li>'#f00'</li>
+					<li>'red'</li>
+				</ul>
+
+			</li>
+		</ul>
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean isColor]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Float r]</h3>
+		<p>
+			Valore del canale rosso tra 0 e 1. Il valore predefinito è 1.
+		</p>
+
+		<h3>[property:Float g]</h3>
+		<p>
+			Valore del canale verde tra 0 e 1. Il valore predefinito è 1.
+		</p>
+
+		<h3>[property:Float b]</h3>
+		<p>
+			Valore del canale blu tra 0 e 1. Il valore predefinito è 1.
+		</p>
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this add]( [param:Color color] ) </h3>
+		<p>Aggiunge i valori RGB del [page:Color colore] ai valori RGB di questo colore.</p>
+
+		<h3>[method:this addColors]( [param:Color color1], [param:Color color2] ) </h3>
+		<p>Imposta questi valori RGB del colore alla somma dei valori RGB di [page:Color color1] e [page:Color color2].</p>
+
+		<h3>[method:this addScalar]( [param:Number s] ) </h3>
+		<p>Aggiunge [page:Number s] ai valori RGB di questo colore.</p>
+
+		<h3>[method:Color clone]() </h3>
+		<p>Restituisce un nuovo Color con gli stessi valori [page:.r r], [page:.g g] e [page:.b b] di questo.</p>
+
+		<h3>[method:this copy]( [param:Color color] ) </h3>
+		<p>
+			Copia i parametri [page:.r r], [page:.g g] e [page:.b b] dal [page:Color colore] in questo colore.
+		</p>
+
+		<h3>[method:this convertLinearToSRGB]() </h3>
+		<p>
+			Converte questo colore dallo spazio lineare allo spazio sRGB.
+		</p>
+
+		<h3>[method:this convertSRGBToLinear]() </h3>
+		<p>
+			Converte questo colore dallo spazio sRGB allo spazio lineare.
+		</p>
+
+		<h3>[method:this copyLinearToSRGB]( [param:Color color] ) </h3>
+		<p>
+		[page:Color color] - Colore da copiare.<br /><br />
+
+		Copia il colore passato in questo colore, e poi converte questo colore dallo spazio lineare allo spazio sRGB.
+		</p>
+
+		<h3>[method:this copySRGBToLinear]( [param:Color color] ) </h3>
+		<p>
+		[page:Color color] - Colore da copiare.<br /><br />
+
+		Copia il colore passato in questo colore, e poi converte questo colore dallo spazio sRGB allo spazio lineare.
+		</p>
+
+		<h3>[method:Boolean equals]( [param:Color color] ) </h3>
+		<p>Compara i valori RGB del [page:Color colore] con quelli di questo oggetto. Restituisce true se sono gli stessi, false altrimenti.</p>
+
+		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] ) </h3>
+		<p>
+		[page:Array array] - [page:Array] di float nella forma [ [page:Float r], [page:Float g], [page:Float b] ].<br />
+		[page:Integer offset] - Un offset opzionale nell'array.<br /><br />
+
+		Imposta i componenti di questo colore in base a un array formattato come [ [page:Float r], [page:Float g], [page:Float b] ].
+		</p>
+
+		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
+		<p>
+		[page:BufferAttribute attribute] - l'attributo sorgente.<br />
+		[page:Integer index] - l'indice dell'attributo.<br /><br />
+
+		Imposta i componenti del colore dall'[page:BufferAttribute attributo].
+		</p>
+
+		<h3>[method:Integer getHex]( [param:string colorSpace] = SRGBColorSpace )</h3>
+		<p>Restituisce il valore esadecimale di questo colore.</p>
+
+		<h3>[method:String getHexString]( [param:string colorSpace] = SRGBColorSpace )</h3>
+		<p>Restituisce il valore esadecimale di questo colore come una stringa (per esempio, 'FFFFFF').</p>
+
+		<h3>[method:Object getHSL]( [param:Object target], [param:string colorSpace] = LinearSRGBColorSpace )</h3>
+		<p>
+			[page:Object target] - questo risultato sarà copiato in questo Oggetto. Aggiunge le chiavi h, s e l all'oggetto (se non è già presente).<br /><br />
+
+			Converte i valori [page:.r r], [page:.g g] e [page:.b b] del Color al formato [link:https://en.wikipedia.org/wiki/HSL_and_HSV HSL]
+			e restituisce un oggetto della forma:
+
+			<code>
+				{ h: 0, s: 0, l: 0 }
+			</code>
+
+		</p>
+
+		<h3>[method:String getStyle]( [param:string colorSpace] = SRGBColorSpace )</h3>
+		<p>Restituisce il valore di questo colore come una stringa CSS style. Esempio: `rgb(255,0,0)`.</p>
+
+		<h3>[method:this lerp]( [param:Color color], [param:Float alpha] ) </h3>
+		<p>
+		[page:Color color] - colore su cui convergere.<br />
+		[page:Float alpha] - fattore di interpolazione nell'intervallo chiuso `[0, 1]`.<br /><br />
+
+		Interpola linearmente i valori RGB di questo colore verso i valori RGB dell'argomento passato.
+		L'argomento alfa può essere considerato come il rapporto tra i due colori, dove `0.0` è
+		questo colore e `1.0` è il primo argomento.
+		</p>
+
+		<h3>[method:this lerpColors]( [param:Color color1], [param:Color color2], [param:Float alpha] )</h3>
+		<p>
+		[page:Color color1] - [page:Color colore] iniziale.<br />
+		[page:Color color2] - [page:Color colore] verso cui interpolare.<br />
+		[page:Float alpha] - fattore interpolazione, tipicamente nell'intervallo chiuso `[0, 1]`.<br /><br />
+
+		Imposta questo colore per essere il colore interpolato linearmente tra [page:Color color1] e
+		[page:Color color2] dove alfa è la distanza percentuale lungo la linea che collega i due colori
+		- alfa = 0 sarà [page:Color color1], e alpha = 1 sarà [page:Color color2].
+		</p>
+
+		<h3>[method:this lerpHSL]( [param:Color color], [param:Float alpha] ) </h3>
+		<p>
+		[page:Color color] - colore su cui convergere.<br />
+		[page:Float alpha] - fattore di interpolazione nell'intervallo chiuso`[0, 1]`.<br /><br />
+
+		Interpola linearmente i valori HSL di questo colore verso i valori HSL dell'argomento passato.
+		Si differenzia dal classico [page:.lerp] non interpolando direttamente da un colore all'altro,
+		ma passando invece attraverso tutte le sfumature tra questi due colori.
+		L'argomento alfa può essere considerato come il rapporto tra i due colori, dove `0.0` è
+		questo colore e `1.0` è il primo argomento.
+		</p>
+
+		<h3>[method:this multiply]( [param:Color color] ) </h3>
+		<p>Moltiplica i valori RGB di questo colore per i valori RGB del colore passato.</p>
+
+		<h3>[method:this multiplyScalar]( [param:Number s] ) </h3>
+		<p>Moltiplica i valori RGB di questo colore per [page:Number s].</p>
+
+		<h3>[method:this offsetHSL]( [param:Float h], [param:Float s], [param:Float l] ) </h3>
+		<p>
+			Aggiunge [page:Float h], [page:Float s] e [page:Float l] passati ai valori di questo colore.
+			Internamente, converte i valori [page:.r r], [page:.g g] e [page:.b b] del colore a HSL,
+			aggiunge [page:Float h], [page:Float s], e [page:Float l] e poi converte il colore nero a RGB.
+		</p>
+
+		<h3>[method:this set]( [param:Color_Hex_or_String value] ) </h3>
+		<p>
+		[page:Color_Hex_or_String value] - Valore a cui impostare il valore.<br /><br />
+
+		Vedi il costruttore sopra per i dettagli completi di quale [page:Color_Hex_or_String valore] può assumere.
+		Delega a [page:.copy], [page:.setStyle], o [page:.setHex] a seconda del tipo di input.
+		</p>
+
+		<h3>[method:this setHex]( [param:Integer hex], [param:string colorSpace] = SRGBColorSpace ) </h3>
+		<p>
+		[page:Integer hex] - formato [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet tripletta esadecimale].<br /><br />
+
+		Imposta questo colore da un valore esadecimale.
+		</p>
+
+		<h3>[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l], [param:string colorSpace] = LinearSRGBColorSpace ) </h3>
+		<p>
+		[page:Float h] - Valore di tonalità compreso tra 0.0 e 1.0 <br />
+		[page:Float s] - Valore di saturazione compreso tra 0.0 e 1.0 <br />
+		[page:Float l] - Valore di luminosità compreso tra 0.0 e 1.0<br /><br />
+
+		Imposta il colore dai valori HSL.
+		</p>
+
+		<h3>[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b], [param:string colorSpace] = LinearSRGBColorSpace ) </h3>
+		<p>
+		[page:Float r] - Valore del canale rosso tra 0.0 e 1.0.<br />
+		[page:Float g] - Valore del canale verde tra 0.0 e 1.0.<br />
+		[page:Float b] - Valore del canale blu tra 0.0 e 1.0.<br /><br />
+
+		Imposta questo colore dai valori RGB.
+		</p>
+
+		<h3>[method:this setScalar]( [param:Float scalar] ) </h3>
+		<p>
+		[page:Float scalar] - un valore tra 0.0 e 1.0.<br /><br />
+
+		Imposta tutti e tre i componenti del colore al valore [page:Float scalare].
+		</p>
+
+		<h3>[method:this setStyle]( [param:String style], [param:string colorSpace] = SRGBColorSpace ) </h3>
+		<p>
+		[page:String style] - colore come una stringa CSS-style.<br /><br />
+
+		Imposta questo colore da una stringa CSS. Per esempio,
+		"rgb(250, 0,0)",
+		"rgb(100%, 0%, 0%)",
+		"hsl(0, 100%, 50%)",
+		"#ff0000",
+		"#f00", o
+		"red" ( o qualsiasi [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart nome dei colori X11]
+		- tutti i 140 nomi dei colori sono supportati ).<br />
+
+		Sono accettati anche colori traslucidi come "rgba(255, 0, 0, 0.5)" e "hsla(0, 100%, 50%, 0.5)",
+		ma le coordinate del canale alfa verranno eliminate.<br /><br />
+
+		Si noti che per i nomi dei colori X11, più parole come Dark Orange diventano la stringa 'darkorange'.
+		</p>
+
+		<h3>[method:this setColorName]( [param:String style], [param:string colorSpace] = SRGBColorSpace ) </h3>
+		<p>
+		[page:String style] - nome del colore ( dai [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart nomi dei colori X11] ).<br /><br />
+
+		Imposta questo colore dal nome del colore. Più veloce del metodo [page:.setStyle] se non hai bisogno di altri formati in stile CSS.<br/><br/>
+
+		Per convenienza, la lista dei nomi è esposta in Color.NAMES come un hash: <code>Color.NAMES.aliceblue // returns 0xF0F8FF</code>
+		</p>
+
+		<h3>[method:this sub]( [param:Color color] ) </h3>
+		<p>
+			Sottrae i componenti RGB del colore dato dai componenti RGB di questo colore.
+			Se questo ritorna un componente negativo, tale componente viene impostato a zero.
+		</p>
+
+		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] ) </h3>
+		<p>
+		[page:Array array] - Un array opzionale in cui memorizzare il colore. <br />
+		[page:Integer offset] - Un offset opzionale nell'array.<br /><br />
+
+		Restituisce un array della forma [ r, g, b ].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
