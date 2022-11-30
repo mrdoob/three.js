@@ -247,10 +247,13 @@
 				const delta = clock.getDelta();
 
 				const obj = line.visible ? line : segments;
+				const thresholdObj = thresholdLine.visible ? thresholdLine : thresholdSegments;
 
 				if ( params.animate ) {
 
 					obj.rotation.y += delta * 0.5;
+					thresholdObj.position.copy( obj.position );
+					thresholdObj.quaternion.copy( obj.quaternion );
 
 				}
 
@@ -259,7 +262,7 @@
 				renderer.setViewport( 0, 0, window.innerWidth, window.innerHeight );
 
 				raycaster.setFromCamera( pointer, camera );
-				
+
 				// renderer will set this eventually
 				// set the new resolution before raycasting so it is set correctly
 				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
@@ -391,9 +394,10 @@
 
 				gui.add( params, 'translation', 0, 10 ).onChange( function ( val ) {
 
-								segments.position.x = val;
-								segments.updateMatrix();
-								segments.updateMatrixWorld();
+					const obj = line.visible ? line : segments;
+					obj.position.x = val;
+					obj.updateMatrix();
+					obj.updateMatrixWorld();
 
 				} );
 
