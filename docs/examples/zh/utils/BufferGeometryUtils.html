@@ -16,80 +16,6 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:BufferGeometry mergeBufferGeometries]( [param:Array geometries], [param:Boolean useGroups] )</h3>
-		<p>
-		geometries -- 由 [page:BufferGeometry BufferGeometry] 实例的数组。<br />
-		useGroups -- 是否要为了合并几何体而产生组。<br /><br />
-
-		将一组几何体合并到一个实例中。所有几何体都必须兼容该属性。
-		如果合并不成功，则该方法返回 null。
-
-		</p>
-
-		<h3>[method:BufferAttribute mergeBufferAttributes]( [param:Array attributes] )</h3>
-		<p>
-		attributes -- 由 [page:BufferAttribute BufferAttribute] 实例组成的数组。<br /><br />
-
-		将一组属性合并为一个单一的实例。所有几何体都必须兼容该属性，不支持 [page:InterleavedBufferAttribute InterleavedBufferAttributes] 。
-		如果合并不成功，则该方法返回 null 。
-
-		</p>
-
-		<h3>[method:InterleavedBufferAttribute interleaveAttributes]( [param:Array attributes] )</h3>
-		<p>
-		attributes -- 由 [page:BufferAttribute BufferAttribute] 实例组成的数组。<br /><br />
-
-		交叉存储一组属性并返回一个新的对应属性数组，这些属性共享一个 InterleavedBuffer 实例。所有属性都必须兼容的该类型。如果合并不成功，则该方法返回 null 。
-
-		</p>
-
-		<h3>[method:Number estimateBytesUsed]( [param:BufferGeometry geometry] )</h3>
-		<p>
-		geometry -- 通过 [page:BufferGeometry BufferGeometry] 的实例来估计内存使用情况。<br /><br />
-
-		返回所有用于表示几何体的属性所占用的字节数。
-
-		</p>
-
-		<h3>[method:BufferGeometry mergeGroups]( [param:BufferGeometry geometry] )</h3>
-		<p>
-		geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the groups of.<br /><br />
-
-		Merges the [page:BufferGeometry.groups groups] for the given geometry.
-		</p>
-
-		<h3>[method:BufferGeometry mergeVertices]( [param:BufferGeometry geometry], [param:Number tolerance] )</h3>
-		<p>
-		geometry -- 用于合并顶点的 [page:BufferGeometry BufferGeometry] 实例。<br />
-		tolerance -- 要合并的顶点属性之间允许的最大差异。 默认为 1e-4。<br /><br />
-
-		返回一个新的 [page:BufferGeometry BufferGeometry] ，其中包含将所有（在容差范围内的）具有相似属性的顶点合并而成的顶点。
-
-		</p>
-
-		<h3>[method:BufferGeometry toTrianglesDrawMode]( [param:BufferGeometry geometry], [param:TrianglesDrawMode drawMode] )</h3>
-		<p>
-		geometry -- Instance of [page:BufferGeometry BufferGeometry].<br />
-		drawMode -- The draw mode of the given geometry. Valid inputs are `THREE.TriangleStripDrawMode` and `THREE.TriangleFanDrawMode`.<br /><br />
-
-		Returns a new indexed geometry based on `THREE.TrianglesDrawMode` draw mode. This mode corresponds to the `gl.TRIANGLES` WebGL primitive.
-		</p>
-
-		<h3>[method:Object computeMorphedAttributes]( [param:Mesh | Line | Points object] )</h3>
-		<p>
-		object -- Instance of [page:Mesh Mesh] | [page:Line Line] | [page:Points Points].<br /><br />
-
-		Returns the current attributes (Position and Normal) of a morphed/skinned [page:Object3D Object3D] whose geometry is a
-		[page:BufferGeometry BufferGeometry], together with the original ones: An Object with 4 properties:
-		`positionAttribute`, `normalAttribute`, `morphedPositionAttribute` and `morphedNormalAttribute`.
-
-		Helpful for Raytracing or Decals (i.e. a [page:DecalGeometry DecalGeometry] applied to a morphed Object
-		with a [page:BufferGeometry BufferGeometry] will use the original BufferGeometry, not the morphed/skinned one,
-		generating an incorrect result.
-		Using this function to create a shadow Object3D the DecalGeometry can be correctly generated).
-
-		</p>
-
 		<h3>[method:Object computeMikkTSpaceTangents]( [param:BufferGeometry geometry], [param:Object MikkTSpace], [param:Boolean negateSign] = true )</h3>
 		<ul>
 			<li>geometry -- Instance of [page:BufferGeometry].</li>
@@ -117,7 +43,90 @@
 		Requires position, normal, and uv attributes.
 		</p>
 
-		<h2></h2>
+		<h3>[method:Object computeMorphedAttributes]( [param:Mesh | Line | Points object] )</h3>
+		<p>
+		object -- Instance of [page:Mesh Mesh] | [page:Line Line] | [page:Points Points].<br /><br />
+
+		Returns the current attributes (Position and Normal) of a morphed/skinned [page:Object3D Object3D] whose geometry is a
+		[page:BufferGeometry BufferGeometry], together with the original ones: An Object with 4 properties:
+		`positionAttribute`, `normalAttribute`, `morphedPositionAttribute` and `morphedNormalAttribute`.
+
+		Helpful for Raytracing or Decals (i.e. a [page:DecalGeometry DecalGeometry] applied to a morphed Object
+		with a [page:BufferGeometry BufferGeometry] will use the original BufferGeometry, not the morphed/skinned one,
+		generating an incorrect result.
+		Using this function to create a shadow Object3D the DecalGeometry can be correctly generated).
+
+		</p>
+
+		<h3>[method:Number estimateBytesUsed]( [param:BufferGeometry geometry] )</h3>
+		<p>
+		geometry -- 通过 [page:BufferGeometry BufferGeometry] 的实例来估计内存使用情况。<br /><br />
+
+		返回所有用于表示几何体的属性所占用的字节数。
+
+		</p>
+
+		<h3>[method:InterleavedBufferAttribute interleaveAttributes]( [param:Array attributes] )</h3>
+		<p>
+		attributes -- 由 [page:BufferAttribute BufferAttribute] 实例组成的数组。<br /><br />
+
+		交叉存储一组属性并返回一个新的对应属性数组，这些属性共享一个 InterleavedBuffer 实例。所有属性都必须兼容的该类型。如果合并不成功，则该方法返回 null 。
+
+		</p>
+
+		<h3>[method:BufferAttribute mergeBufferAttributes]( [param:Array attributes] )</h3>
+		<p>
+		attributes -- 由 [page:BufferAttribute BufferAttribute] 实例组成的数组。<br /><br />
+
+		将一组属性合并为一个单一的实例。所有几何体都必须兼容该属性，不支持 [page:InterleavedBufferAttribute InterleavedBufferAttributes] 。
+		如果合并不成功，则该方法返回 null 。
+
+		</p>
+
+		<h3>[method:BufferGeometry mergeBufferGeometries]( [param:Array geometries], [param:Boolean useGroups] )</h3>
+		<p>
+		geometries -- 由 [page:BufferGeometry BufferGeometry] 实例的数组。<br />
+		useGroups -- 是否要为了合并几何体而产生组。<br /><br />
+
+		将一组几何体合并到一个实例中。所有几何体都必须兼容该属性。
+		如果合并不成功，则该方法返回 null。
+
+		</p>
+
+		<h3>[method:BufferGeometry mergeGroups]( [param:BufferGeometry geometry] )</h3>
+		<p>
+		geometry -- Instance of [page:BufferGeometry BufferGeometry] to merge the groups of.<br /><br />
+
+		Merges the [page:BufferGeometry.groups groups] for the given geometry.
+		</p>
+
+		<h3>[method:BufferGeometry mergeVertices]( [param:BufferGeometry geometry], [param:Number tolerance] )</h3>
+		<p>
+		geometry -- 用于合并顶点的 [page:BufferGeometry BufferGeometry] 实例。<br />
+		tolerance -- 要合并的顶点属性之间允许的最大差异。 默认为 1e-4。<br /><br />
+
+		返回一个新的 [page:BufferGeometry BufferGeometry] ，其中包含将所有（在容差范围内的）具有相似属性的顶点合并而成的顶点。
+
+		</p>
+
+		<h3>[method:BufferGeometry toCreasedNormals]( [param:BufferGeometry geometry], [param:Number creaseAngle] )</h3>
+		<p>
+			geometry -- The input geometry. <br />
+			creaseAngle -- The crease angle.
+		</p>
+		<p>
+		Creates a new, non-indexed geometry with smooth normals everywhere except faces that meet at an angle greater than the crease angle.
+		</p>
+
+		<h3>[method:BufferGeometry toTrianglesDrawMode]( [param:BufferGeometry geometry], [param:TrianglesDrawMode drawMode] )</h3>
+		<p>
+		geometry -- Instance of [page:BufferGeometry BufferGeometry].<br />
+		drawMode -- The draw mode of the given geometry. Valid inputs are `THREE.TriangleStripDrawMode` and `THREE.TriangleFanDrawMode`.<br /><br />
+
+		Returns a new indexed geometry based on `THREE.TrianglesDrawMode` draw mode. This mode corresponds to the `gl.TRIANGLES` WebGL primitive.
+		</p>
+
+		<h2>Source</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/BufferGeometryUtils.js examples/jsm/utils/BufferGeometryUtils.js]

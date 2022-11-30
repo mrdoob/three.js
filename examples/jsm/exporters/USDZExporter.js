@@ -6,7 +6,7 @@ import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-	async parse( scene ) {
+	async parse( scene, options = { ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'horizontal' } } } ) {
 
 		const files = {};
 		const modelFileName = 'model.usda';
@@ -15,6 +15,8 @@ class USDZExporter {
 		files[ modelFileName ] = null;
 
 		let output = buildHeader();
+
+		output += buildSceneStart( options );
 
 		const materials = {};
 		const textures = {};
@@ -52,12 +54,15 @@ class USDZExporter {
 				}
 
 			} else if ( object.isCamera ) {
-				
+
 				output += buildCamera( object );
 
 			}
 
 		} );
+
+
+		output += buildSceneEnd();
 
 		output += buildMaterials( materials, textures );
 
@@ -169,6 +174,40 @@ function buildHeader() {
     metersPerUnit = 1
     upAxis = "Y"
 )
+
+`;
+
+}
+
+function buildSceneStart( options ) {
+
+	return `def Xform "Root"
+{
+    def Scope "Scenes" (
+        kind = "sceneLibrary"
+    )
+    {
+        def Xform "Scene" (
+            customData = {
+                bool preliminary_collidesWithEnvironment = 0
+                string sceneName = "Scene"
+            }
+            sceneName = "Scene"
+        )
+        {
+        token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+        token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+
+`;
+
+}
+
+function buildSceneEnd() {
+
+	return `
+        }
+    }
+}
 
 `;
 
@@ -572,34 +611,38 @@ function buildCamera( camera ) {
 
 	}
 
-	if (camera.isOrthographicCamera) {
+	if ( camera.isOrthographicCamera ) {
+
 		return `def Camera "${name}"
 		{
 			matrix4d xformOp:transform = ${ transform }
 			uniform token[] xformOpOrder = ["xformOp:transform"]
 	
-			float2 clippingRange = (${camera.near}, ${camera.far})
-			float horizontalAperture = ${(Math.abs(camera.left) + Math.abs(camera.right)) * 10}
-			float verticalAperture = ${(Math.abs(camera.top) + Math.abs(camera.bottom)) * 10}
+			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
+			float horizontalAperture = ${ ( ( Math.abs( camera.left ) + Math.abs( camera.right ) ) * 10 ).toPrecision( PRECISION ) }
+			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
 			token projection = "orthographic"
 		}
 	
 	`;
+
 	} else {
+
 		return `def Camera "${name}"
 		{
 			matrix4d xformOp:transform = ${ transform }
 			uniform token[] xformOpOrder = ["xformOp:transform"]
 	
-			float2 clippingRange = (${camera.near}, ${camera.far})
-			float focalLength = ${camera.getFocalLength()}
-			float focusDistance = ${camera.focus}
-			float horizontalAperture = ${camera.getFilmWidth()}
+			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
+			float focalLength = ${ camera.getFocalLength().toPrecision( PRECISION ) }
+			float focusDistance = ${ camera.focus.toPrecision( PRECISION ) }
+			float horizontalAperture = ${ camera.getFilmWidth().toPrecision( PRECISION ) }
 			token projection = "perspective"
-			float verticalAperture = ${camera.getFilmHeight()}
+			float verticalAperture = ${ camera.getFilmHeight().toPrecision( PRECISION ) }
 		}
 	
 	`;
+
 	}
 
 }

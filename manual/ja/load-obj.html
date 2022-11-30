@@ -52,7 +52,7 @@
 <p><a href="lights.html">ライティングの記事</a> にあるディレクショナルライティングの例から始めて、半球ライティングの例と組み合わせて <a href="/docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> と <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> を1つ作る事にしました。その結果として <a href="/docs/#api/ja/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a> は1つ、<a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> は1つになりました。
 また、ライトの調整に関連する全てのGUIを削除しました。シーンに追加していたキューブとスフィアも削除しました。</p>
 <p>まず最初に <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> のローダーをコードに含める必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 </pre>
 <p>次にOBJファイルをロードするために <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> のインスタンスを作成し、OBJファイルのURLを渡し、ロードされたモデルをシーンに追加するコールバックを渡します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
@@ -124,10 +124,10 @@ blenderで <strong>File-&gt;External Data-&gt;Unpack All Into Files</strong> を
 
 <p>テクスチャを利用できるようになったのでMTLファイルをロードします。
 <a href="/docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a> をimportする必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
-+import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
++import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
 </pre>
 <p>まず、MTLファイルをロードします。
 読込後にロードしたマテリアルを <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>に設定して、<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> でOBJファイルをロードします。</p>

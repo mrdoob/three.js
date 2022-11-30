@@ -61,6 +61,7 @@ import FrontFacingNode from './display/FrontFacingNode.js';
 import NormalMapNode from './display/NormalMapNode.js';
 import PosterizeNode from './display/PosterizeNode.js';
 import ToneMappingNode from './display/ToneMappingNode.js';
+import ViewportNode from './display/ViewportNode.js';
 
 // math
 import MathNode from './math/MathNode.js';
@@ -187,6 +188,7 @@ const nodeLib = {
 	NormalMapNode,
 	PosterizeNode,
 	ToneMappingNode,
+	ViewportNode,
 
 	// math
 	MathNode,
@@ -306,6 +308,7 @@ export {
 	NormalMapNode,
 	PosterizeNode,
 	ToneMappingNode,
+	ViewportNode,
 
 	// math
 	MathNode,

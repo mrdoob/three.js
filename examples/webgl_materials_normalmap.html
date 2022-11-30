@@ -79,7 +79,7 @@
 				ambientLight = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambientLight );
 
-				pointLight = new THREE.PointLight( 0xffffff, 1.25, 1000 );
+				pointLight = new THREE.PointLight( 0xffffff, 2, 1000 );
 				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
@@ -143,7 +143,9 @@
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
 
-				composer = new EffectComposer( renderer );
+				const renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { type: THREE.HalfFloatType, depthTexture: new THREE.DepthTexture() } );
+
+				composer = new EffectComposer( renderer, renderTarget );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFXAA );

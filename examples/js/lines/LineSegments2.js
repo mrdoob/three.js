@@ -33,10 +33,12 @@
 
 	function raycastWorldUnits( lineSegments, intersects ) {
 
+		const matrixWorld = lineSegments.matrixWorld;
 		for ( let i = 0, l = _instanceStart.count; i < l; i ++ ) {
 
 			_line.start.fromBufferAttribute( _instanceStart, i );
 			_line.end.fromBufferAttribute( _instanceEnd, i );
+			_line.applyMatrix4( matrixWorld );
 			const pointOnLine = new THREE.Vector3();
 			const point = new THREE.Vector3();
 			_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );

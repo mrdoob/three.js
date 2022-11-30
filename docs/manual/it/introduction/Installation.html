@@ -92,14 +92,14 @@
       Poiché le mappe di importazione non sono ancora supportate da tutti i browser, è necessario aggiungere il polyfill *es-module-shims.js*.
 		</p>
 
-		<h2>Esempi</h2>
+		<h2>Addons</h2>
 
 		<p>
 			Il core di three.js è incentrato sui componenti più importanti di un engine 3D. Molti altri componenti utili - come i controls, i loaders e gli effetti post-processing - sono parte della sottocartella [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. Vengono definiti "esempi" perché, pur potendo essere utilizzati in modo immediato, sono anche destinati a essere remixati e personalizzati. Questi componenti vengono sempre mantenuti sincronizzati con la libreria principale, mentre i pacchetti di terze parti su npm sono gestiti da persone differenti e potrebbero non essere aggiornati.
 		</p>
 
-    <p>
-			Non è necessario <em>installare</em> gli esempi separatamente, ma dovranno essere <em>importati</em> separatamente. Se three.js è stato installato con npm, è possibile caricare il componente [page:OrbitControls] con:
+		<p>
+			Non è necessario <em>installare</em> gli addons separatamente, ma dovranno essere <em>importati</em> separatamente. Se three.js è stato installato con npm, è possibile caricare il componente [page:OrbitControls] con:
 		</p>
 
 		<code>
@@ -113,17 +113,29 @@
 		</p>
 
 		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+			{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+			}
+			}
+		&lt;/script>
+
 		&lt;script type="module">
 
-		  import { OrbitControls } from 'https://unpkg.com/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		  const controls = new OrbitControls( camera, renderer.domElement );
+			const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 		</code>
 
 		<p>
-			È importante che tutti i file usino la stessa versione. Non devono essere importati esempi diversi con versioni diverse, o usare esempi che derivano da una versione differente di three.js.
+			È importante che tutti i file usino la stessa versione. Non devono essere importati addons diversi con versioni diverse, o usare addons che derivano da una versione differente di three.js.
 		</p>
 
 		<h2>Compatibilità</h2>

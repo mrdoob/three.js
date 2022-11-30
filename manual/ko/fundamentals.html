@@ -80,7 +80,7 @@ Three.js는 3차원 세계를 다루므로, 우리는 정육면체(cube)를 3차
 <a href="/docs/#api/ko/materials/Material"><code class="notranslate" translate="no">Material</code></a>, <code class="notranslate" translate="no">Geometry</code>는 재사용이 가능하여 여러개의 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>가 하나의
 <a href="/docs/#api/ko/materials/Material"><code class="notranslate" translate="no">Material</code></a> 또는 <code class="notranslate" translate="no">Geometry</code>를 동시에 참조할 수 있습니다. 파란색 정육면체 2개를
 그린다고 해보죠. 일단 두 정육면체의 위치가 달라야 하니, 2개의 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>가
-필요합니다. 그리고 정점(vertext, 꼭지점) 데이터를 가진 한 개의 <code class="notranslate" translate="no">Geometry</code>와
+필요합니다. 그리고 정점(vertex, 꼭지점) 데이터를 가진 한 개의 <code class="notranslate" translate="no">Geometry</code>와
 채색을 위한 하나의 <a href="/docs/#api/ko/materials/Material"><code class="notranslate" translate="no">Material</code></a>이 필요하겠죠. 이때 각 <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>는 객체를 복사할
 필요 없이, 같은 <code class="notranslate" translate="no">Geometry</code> 그리고 <a href="/docs/#api/ko/materials/Material"><code class="notranslate" translate="no">Material</code></a>을 참조할 수 있습니다.</p>
 </li>
@@ -106,7 +106,7 @@ Three.js는 3차원 세계를 다루므로, 우리는 정육면체(cube)를 3차
 
 <p>먼저, Three.js를 로드합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 &lt;/script&gt;
 </pre>
 <p><code class="notranslate" translate="no">type="module"</code> 속성을 지정하는 것을 잊지 마세요. 이러면 <code class="notranslate" translate="no">import</code> 키워드를
@@ -121,7 +121,7 @@ import * as THREE from '../../build/three.module.js';
 </pre>
 <p>이제 Three.js에게 렌더링을 맡겨보죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -260,7 +260,7 @@ Three.js에는 다양한 종류의 광원이 있습니다. 다 살펴보기 힘�
   scene.add(light);
 }
 </pre>
-<p><code class="notranslate" translate="no">DirectionnalLight</code>에는 <code class="notranslate" translate="no">위치(position)</code>와 <code class="notranslate" translate="no">목표(target)</code> 속성이 있습니다.
+<p><code class="notranslate" translate="no">DirectionalLight</code>에는 <code class="notranslate" translate="no">위치(position)</code>와 <code class="notranslate" translate="no">목표(target)</code> 속성이 있습니다.
 기본값은 <code class="notranslate" translate="no">0, 0, 0</code> 이죠. 먼저 <code class="notranslate" translate="no">position</code>을 <code class="notranslate" translate="no">-1, 2, 4</code>로 설정해 카메라보다
 약간 동서쪽, Z축으로는 약간 위로 보냅니다. <code class="notranslate" translate="no">target</code>은 기본값 <code class="notranslate" translate="no">0, 0, 0</code> 그대로
 두어 공간의 중앙을 비추도록 합니다.</p>
@@ -345,7 +345,7 @@ es6 모듈은 js 파일이나 인라인 <code class="notranslate" translate="no"
 <code class="notranslate" translate="no">import</code> 키워드를 사용해 로드할 수 있습니다.
 </p>
 <pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 ...
 
@@ -393,18 +393,18 @@ import * as THREE from '../../build/three.module.js';
 참조하도록 할 수 있죠.
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>아래는 CDN을 사용하는 예시입니다. <code class="notranslate" translate="no">three.modules.js</code>의 경로가 <code class="notranslate" translate="no">/build/three.modules.js</code>
 로 끝나야 한다는 것을 명심하세요.</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
         </div>
       </div>
     </div>
-  
+
   <script src="/manual/resources/prettify.js"></script>
   <script src="/manual/resources/lesson.js"></script>
 

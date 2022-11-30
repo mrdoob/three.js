@@ -1,3 +1,4 @@
+import Node from '../core/Node.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
@@ -147,31 +148,43 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 };
 
-const ShaderNodeScript = function ( jsFunc ) {
+class ShaderNodeInternal extends Node {
 
-	// @TODO: Move this to Node extended class
+	constructor( jsFunc ) {
 
-	const self = {
+		super();
 
-		build: ( builder ) => {
+		this._jsFunc = jsFunc;
 
-			self.call( {}, builder );
+	}
+
+	call( inputs, builder ) {
+
+		inputs = nodeObjects( inputs );
+
+		return nodeObject( this._jsFunc( inputs, builder ) );
+
+	}
+
+	generate( builder, output ) {
+
+		const nodeCall = this.call( {}, builder );
+
+		if ( nodeCall === undefined ) {
 
 			return '';
 
-		},
-
-		call: ( inputs, builder ) => {
-
-			inputs = nodeObjects( inputs );
-
-			return nodeObject( jsFunc( inputs, builder ) );
-
 		}
 
-	};
+		return builder.format( nodeCall.build( builder ), nodeCall.getNodeType( builder ), output );
 
-	return self;
+	}
+
+}
+
+const ShaderNodeScript = function ( jsFunc ) {
+
+	return new ShaderNodeInternal( jsFunc );
 
 };
 
@@ -253,7 +266,7 @@ export const ConvertType = function ( type, cacheMap = null ) {
 
 			}
 
-			return nodeObject( new ConvertNode( new JoinNode( nodes ), type ) );
+			return nodeObject( new JoinNode( nodes, type ) );
 
 		}
 

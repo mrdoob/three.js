@@ -310,6 +310,7 @@
 	],
 	"webgl2": [
 		"webgl2_buffergeometry_attributes_integer",
+		"webgl2_buffergeometry_attributes_none",
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
 		"webgl2_materials_texture3d_partialupdate",
@@ -323,6 +324,7 @@
 		"webgl2_volume_perlin"
 	],
 	"webgpu": [
+		"webgpu_audio_processing",
 		"webgpu_compute",
 		"webgpu_cubemap_adjustments",
 		"webgpu_cubemap_mix",
@@ -355,6 +357,7 @@
 		"webxr_ar_hittest",
 		"webxr_ar_lighting",
 		"webxr_ar_paint",
+		"webxr_ar_plane_detection",
 		"webxr_vr_ballshooter",
 		"webxr_vr_cubes",
 		"webxr_vr_dragging",

@@ -78,10 +78,10 @@ composer.addPass(filmPass);
 </pre>
 <p><code class="notranslate" translate="no">filmPass</code>가 마지막 pass이기에 캔버스에 결과를 바로 렌더링하도록 <code class="notranslate" translate="no">renderToScreen</code> 옵션을 true로 설정했습니다. 이 옵션을 설정하지 않으면 캔버스가 아닌 다음 렌더 타겟에 장면을 렌더링할 거예요.</p>
 <p>또 이 클래스들을 사용하기 위해 여러 스크립트를 불러와야 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { EffectComposer } from '/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from '/examples/jsm/postprocessing/RenderPass.js';
-import { BloomPass } from '/examples/jsm/postprocessing/BloomPass.js';
-import { FilmPass } from '/examples/jsm/postprocessing/FilmPass.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
 </pre>
 <p>대부분의 후처리에는 <code class="notranslate" translate="no">EffectComposer.js</code>와 <code class="notranslate" translate="no">RenderPass.js</code>가 필수입니다.</p>
 <p>이제 <a href="/docs/#api/ko/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> 대신 <code class="notranslate" translate="no">EffectComposer.render</code>를 사용<em>하고</em> <code class="notranslate" translate="no">EffectComposer</code>가 결과물을 캔버스의 크기에 맞추도록 해야 합니다.</p>
@@ -137,7 +137,7 @@ if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlin
 if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 </pre>
 <p>이제 어떻게 값을 지정해야 하는지 알았으니 이 값을 조작하는 GUI를 만들어봅시다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { GUI } from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>일단 모듈을 로드합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();

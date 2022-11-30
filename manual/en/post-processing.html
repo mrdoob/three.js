@@ -103,10 +103,10 @@ composer.addPass(filmPass);
 true to tell it to render to the canvas. Without setting this it would instead
 render to the next render target.</p>
 <p>To use these classes we need to import a bunch of scripts.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from '/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from '/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from '/examples/jsm/postprocessing/BloomPass.js';
-import {FilmPass} from '/examples/jsm/postprocessing/FilmPass.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
+import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
 </pre>
 <p>For pretty much any post processing <code class="notranslate" translate="no">EffectComposer.js</code>, and <code class="notranslate" translate="no">RenderPass.js</code>
 are required.</p>
@@ -173,7 +173,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 </pre>
 <p>So which makes it pretty clear how to set them.</p>
 <p>Let's make a quick GUI to set those values</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>and</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();

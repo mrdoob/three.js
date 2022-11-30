@@ -116,7 +116,7 @@ nombre minimum d'élements Three.js :</p>
 
 <p>Tout d'abord, chargeons Three.js :</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r130/build/three.module.js';
+import * as THREE from 'three';
 &lt;/script&gt;
 </pre>
 <p>Il est important d'écrire <code class="notranslate" translate="no">type="module"</code> dans la balise script.
@@ -133,7 +133,7 @@ facilement importer les autres modules dont ils ont besoin. Cela nous
 <p>Nous allons demander à Three.js de dessiner dans ce canevas donc nous devons le rechercher
 dans le document html :</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -368,7 +368,7 @@ Ils sont chargés via le mot-clé <code class="notranslate" translate="no">impor
 par le biais d'une balise <code class="notranslate" translate="no">&lt;script type="module"&gt;</code>. Voici un exemple d'utilisation avec les deux :
 </p>
 <pre class="prettyprint">&lt;script type="module"&gt;
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
 ...
 
@@ -421,12 +421,12 @@ Three.js et d'une autre bibliothèque d'exemple, qu'ils référenceront le même
 three.module.js.
 </p>
 <pre class="prettyprint">import * as THREE from './someFolder/build/three.module.js';
-import {OrbitControls} from './someFolder/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>Cela est valable aussi lors de l'utilisation d'un CDN. Assurez vous que vos chemins versThis includes when using a CDN. Be  <code class="notranslate" translate="no">three.modules.js</code> terminent par
 <code class="notranslate" translate="no">/build/three.modules.js</code>. Par exemple :</p>
 <pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/examples/jsm/controls/OrbitControls.js';
+import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
 </pre>
 </div>
 

@@ -51,10 +51,14 @@ function getWorldSpaceHalfWidth( camera, distance, resolution ) {
 
 function raycastWorldUnits( lineSegments, intersects ) {
 
+	const matrixWorld = lineSegments.matrixWorld;
+
 	for ( let i = 0, l = _instanceStart.count; i < l; i ++ ) {
 
 		_line.start.fromBufferAttribute( _instanceStart, i );
 		_line.end.fromBufferAttribute( _instanceEnd, i );
+
+		_line.applyMatrix4( matrixWorld );
 
 		const pointOnLine = new Vector3();
 		const point = new Vector3();

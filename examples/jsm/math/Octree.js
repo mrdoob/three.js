@@ -49,7 +49,7 @@ class Octree {
 
 		this.box = this.bounds.clone();
 
-		// offset small ammount to account for regular grid
+		// offset small amount to account for regular grid
 		this.box.min.x -= 0.01;
 		this.box.min.y -= 0.01;
 		this.box.min.z -= 0.01;

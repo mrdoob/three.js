@@ -69,25 +69,33 @@
     </p>
 
     <code>
-		&lt;script type="module">
+&lt;script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js">&lt;/script>
 
-		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+&lt;script type="importmap">
+    {
+    "imports": {
+        "three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js"
+    }
+    }
+&lt;/script>
 
-		  import * as THREE from 'https://cdn.skypack.dev/three@&lt;version&gt;';
+&lt;script type="module">
 
-		  const scene = new THREE.Scene();
+    import * as THREE from 'three';
 
-		&lt;/script>
-		</code>
+    const scene = new THREE.Scene();
 
-    <h2>Examples</h2>
+&lt;/script>
+</code>
+
+    <h2>Addons</h2>
 
     <p>
         three.jsのコアは、3Dエンジンの最も重要なコンポーネントに焦点を当てています。コントロール、ローダー、エフェクトの前処理といった、他の多くの便利なコンポーネントは [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] ディレクトリの一部です。これらは「examples」と呼ばれています。その理由としては、ユーザーが既製品を使用でき、リミックスやカスタマイズも可能だからです。これらのコンポーネントは常にコアライブラリと同期していますが、npm上の同様のサードパーティ製パッケージは別の人によってメンテナンスされており、最新ではないかもしれません。
     </p>
 
     <p>
-        Examplesはそれだけ別でインストールする必要はありませんが、importは分けて行う必要があります。 three.jsをnpmでインストールしている場合、以下のようにして[page:OrbitControls]コンポーネントを読み込むことができます。
+        Addonsはそれだけ別でインストールする必要はありませんが、importは分けて行う必要があります。 three.jsをnpmでインストールしている場合、以下のようにして[page:OrbitControls]コンポーネントを読み込むことができます。
     </p>
 
 
@@ -102,19 +110,29 @@
     </p>
 
     <code>
-		&lt;script type="module">
+&lt;script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js">&lt;/script>
 
-		  // Find the latest version by visiting https://cdn.skypack.dev/three. The URL will
-		  // redirect to the newest stable release.
-		  import { OrbitControls } from 'https://cdn.skypack.dev/three/examples/jsm/controls/OrbitControls.js';
+&lt;script type="importmap">
+    {
+    "imports": {
+        "three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+    }
+    }
+&lt;/script>
 
-		  const controls = new OrbitControls( camera, renderer.domElement );
+&lt;script type="module">
 
-		&lt;/script>
-		</code>
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const controls = new OrbitControls( camera, renderer.domElement );
+
+&lt;/script>
+</code>
 
     <p>
-        重要なのは、すべてのファイルで同じバージョンを使用することです。異なるバージョンの異なるExamplesをインポートしたり、three.jsライブラリ自体とは異なるバージョンのExamplesを使用したりしないでください。
+        重要なのは、すべてのファイルで同じバージョンを使用することです。異なるバージョンの異なるAddonsをインポートしたり、three.jsライブラリ自体とは異なるバージョンのAddonsを使用したりしないでください。
     </p>
 
     <h2>互換性について</h2>

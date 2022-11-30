@@ -191,14 +191,6 @@ THREE.ColorManagement.legacyMode = false;
 
 	<blockquote>
 		<p>
-			⚠️ <i><b>WARNING:</b> [page:Scene.fog], [page:Scene.background], and [page:WebGLRenderer.setClearColor]
-			are exceptions to the rule. These properties are unaffected by [page:WebGLRenderer.outputEncoding]
-			and so must store RGB components in the renderer's <u>output</u> color space.</i>
-		</p>
-	</blockquote>
-
-	<blockquote>
-		<p>
 			⚠️ <i><b>WARNING:</b> Many formats for 3D models do not correctly or consistently
 			define color space information. While three.js attempts to handle most cases, problems
 			are common with older file formats. For best results, use glTF 2.0 ([page:GLTFLoader])
