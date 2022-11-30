@@ -25103,7 +25103,6 @@ class WebXRManager extends EventDispatcher {
 
 		let session = null;
 		let framebufferScaleFactor = 1.0;
-		let limitWithNativeFramebufferScaleFactor = false;
 
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
@@ -25263,10 +25262,9 @@ class WebXRManager extends EventDispatcher {
 
 		}
 
-		this.setFramebufferScaleFactor = function ( value, limited = false ) {
+		this.setFramebufferScaleFactor = function ( value ) {
 
 			framebufferScaleFactor = value;
-			limitWithNativeFramebufferScaleFactor = limited;
 
 			if ( scope.isPresenting === true ) {
 
@@ -25344,18 +25342,6 @@ class WebXRManager extends EventDispatcher {
 				if ( attributes.xrCompatible !== true ) {
 
 					await gl.makeXRCompatible();
-
-				}
-
-				if ( limitWithNativeFramebufferScaleFactor === true && XRWebGLLayer.getNativeFramebufferScaleFactor ) {
-
-					const nativeFramebufferScaleFactor = XRWebGLLayer.getNativeFramebufferScaleFactor( session );
-
-					if ( nativeFramebufferScaleFactor < framebufferScaleFactor ) {
-
-						framebufferScaleFactor = nativeFramebufferScaleFactor;
-
-					}
 
 				}
 
@@ -29649,7 +29635,7 @@ class InterleavedBufferAttribute {
 
 		if ( data === undefined ) {
 
-			console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will deinterleave buffer data.' );
+			console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will de-interleave buffer data.' );
 
 			const array = [];
 
@@ -29691,7 +29677,7 @@ class InterleavedBufferAttribute {
 
 		if ( data === undefined ) {
 
-			console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will deinterleave buffer data.' );
+			console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.' );
 
 			const array = [];
 
@@ -29707,7 +29693,7 @@ class InterleavedBufferAttribute {
 
 			}
 
-			// deinterleave data and save it as an ordinary buffer attribute for now
+			// de-interleave data and save it as an ordinary buffer attribute for now
 
 			return {
 				itemSize: this.itemSize,
@@ -29718,7 +29704,7 @@ class InterleavedBufferAttribute {
 
 		} else {
 
-			// save as true interleaved attribtue
+			// save as true interleaved attribute
 
 			if ( data.interleavedBuffers === undefined ) {
 
@@ -33955,7 +33941,7 @@ class PolyhedronGeometry extends BufferGeometry {
 			const b = new Vector3();
 			const c = new Vector3();
 
-			// iterate over all faces and apply a subdivison with the given detail value
+			// iterate over all faces and apply a subdivision with the given detail value
 
 			for ( let i = 0; i < indices.length; i += 3 ) {
 
@@ -36457,7 +36443,7 @@ class ShapeGeometry extends BufferGeometry {
 
 			}
 
-			// incides
+			// indices
 
 			for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
