@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '147dev';
+const REVISION = '147';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -16282,7 +16282,6 @@ class WebXRManager extends EventDispatcher {
 		const scope = this;
 		let session = null;
 		let framebufferScaleFactor = 1.0;
-		let limitWithNativeFramebufferScaleFactor = false;
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
 		let customReferenceSpace = null;
@@ -16394,9 +16393,8 @@ class WebXRManager extends EventDispatcher {
 				type: 'sessionend'
 			});
 		}
-		this.setFramebufferScaleFactor = function (value, limited = false) {
+		this.setFramebufferScaleFactor = function (value) {
 			framebufferScaleFactor = value;
-			limitWithNativeFramebufferScaleFactor = limited;
 			if (scope.isPresenting === true) {
 				console.warn('THREE.WebXRManager: Cannot change framebuffer scale while presenting.');
 			}
@@ -16439,12 +16437,6 @@ class WebXRManager extends EventDispatcher {
 				session.addEventListener('inputsourceschange', onInputSourcesChange);
 				if (attributes.xrCompatible !== true) {
 					await gl.makeXRCompatible();
-				}
-				if (limitWithNativeFramebufferScaleFactor === true && XRWebGLLayer.getNativeFramebufferScaleFactor) {
-					const nativeFramebufferScaleFactor = XRWebGLLayer.getNativeFramebufferScaleFactor(session);
-					if (nativeFramebufferScaleFactor < framebufferScaleFactor) {
-						framebufferScaleFactor = nativeFramebufferScaleFactor;
-					}
 				}
 				if (session.renderState.layers === undefined || renderer.capabilities.isWebGL2 === false) {
 					const layerInit = {
@@ -19123,7 +19115,7 @@ class InterleavedBufferAttribute {
 	}
 	clone(data) {
 		if (data === undefined) {
-			console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will deinterleave buffer data.');
+			console.log('THREE.InterleavedBufferAttribute.clone(): Cloning an interleaved buffer attribute will de-interleave buffer data.');
 			const array = [];
 			for (let i = 0; i < this.count; i++) {
 				const index = i * this.data.stride + this.offset;
@@ -19144,7 +19136,7 @@ class InterleavedBufferAttribute {
 	}
 	toJSON(data) {
 		if (data === undefined) {
-			console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will deinterleave buffer data.');
+			console.log('THREE.InterleavedBufferAttribute.toJSON(): Serializing an interleaved buffer attribute will de-interleave buffer data.');
 			const array = [];
 			for (let i = 0; i < this.count; i++) {
 				const index = i * this.data.stride + this.offset;
@@ -19153,7 +19145,7 @@ class InterleavedBufferAttribute {
 				}
 			}
 
-			// deinterleave data and save it as an ordinary buffer attribute for now
+			// de-interleave data and save it as an ordinary buffer attribute for now
 
 			return {
 				itemSize: this.itemSize,
@@ -19162,7 +19154,7 @@ class InterleavedBufferAttribute {
 				normalized: this.normalized
 			};
 		} else {
-			// save as true interleaved attribtue
+			// save as true interleaved attribute
 
 			if (data.interleavedBuffers === undefined) {
 				data.interleavedBuffers = {};
@@ -21864,7 +21856,7 @@ class PolyhedronGeometry extends BufferGeometry {
 			const b = new Vector3();
 			const c = new Vector3();
 
-			// iterate over all faces and apply a subdivison with the given detail value
+			// iterate over all faces and apply a subdivision with the given detail value
 
 			for (let i = 0; i < indices.length; i += 3) {
 				// get the vertices of the face
@@ -23562,7 +23554,7 @@ class ShapeGeometry extends BufferGeometry {
 				uvs.push(vertex.x, vertex.y); // world uvs
 			}
 
-			// incides
+			// indices
 
 			for (let i = 0, l = faces.length; i < l; i++) {
 				const face = faces[i];

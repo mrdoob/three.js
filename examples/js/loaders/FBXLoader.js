@@ -1706,6 +1706,7 @@
 				faceLength ++;
 				if ( endOfFace ) {
 
+					if ( faceLength > 4 ) console.warn( 'THREE.FBXLoader: Polygons with more than four sides are not supported. Make sure to triangulate the geometry during export.' );
 					scope.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
 					polygonIndex ++;
 					faceLength = 0;
