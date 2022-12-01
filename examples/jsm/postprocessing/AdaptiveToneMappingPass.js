@@ -33,8 +33,6 @@ class AdaptiveToneMappingPass extends Pass {
 		this.previousLuminanceRT = null;
 		this.currentLuminanceRT = null;
 
-		if ( CopyShader === undefined ) console.error( 'THREE.AdaptiveToneMappingPass relies on CopyShader' );
-
 		const copyShader = CopyShader;
 
 		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
@@ -48,9 +46,6 @@ class AdaptiveToneMappingPass extends Pass {
 			depthTest: false
 
 		} );
-
-		if ( LuminosityShader === undefined )
-			console.error( 'THREE.AdaptiveToneMappingPass relies on LuminosityShader' );
 
 		this.materialLuminance = new ShaderMaterial( {
 
@@ -118,9 +113,6 @@ class AdaptiveToneMappingPass extends Pass {
 			defines: Object.assign( {}, this.adaptLuminanceShader.defines ),
 			blending: NoBlending
 		} );
-
-		if ( ToneMapShader === undefined )
-			console.error( 'THREE.AdaptiveToneMappingPass relies on ToneMapShader' );
 
 		this.materialToneMap = new ShaderMaterial( {
 

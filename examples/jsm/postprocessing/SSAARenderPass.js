@@ -35,8 +35,6 @@ class SSAARenderPass extends Pass {
 		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 		this._oldClearColor = new Color();
 
-		if ( CopyShader === undefined ) console.error( 'THREE.SSAARenderPass relies on CopyShader' );
-
 		const copyShader = CopyShader;
 		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
 

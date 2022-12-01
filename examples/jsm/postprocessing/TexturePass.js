@@ -11,8 +11,6 @@ class TexturePass extends Pass {
 
 		super();
 
-		if ( CopyShader === undefined ) console.error( 'THREE.TexturePass relies on CopyShader' );
-
 		const shader = CopyShader;
 
 		this.map = map;
