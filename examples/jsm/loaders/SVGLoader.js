@@ -1653,7 +1653,7 @@ class SVGLoader extends Loader {
 
 						return Math.atan2( sinR, cosR );
 
-					}
+					};
 
 					curve.aStartAngle = transformAngle( curve.aStartAngle );
 					curve.aEndAngle = transformAngle( curve.aEndAngle );
