@@ -13,7 +13,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev", "enable-github-code-scanning-replacing-lgtm" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "dev" ]
