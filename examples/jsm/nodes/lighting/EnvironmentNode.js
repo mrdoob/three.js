@@ -1,6 +1,7 @@
 import LightingNode from './LightingNode.js';
 import ContextNode from '../core/ContextNode.js';
 import CacheNode from '../core/CacheNode.js';
+import SpecularMIPLevelNode from '../utils/SpecularMIPLevelNode.js';
 import { float, mul, roughness, reflect, mix, positionViewDirection, negate, normalize, transformedNormalView, transformedNormalWorld, transformDirection, cameraViewMatrix, equirectUV, vec2, invert } from '../shadernode/ShaderNodeElements.js';
 
 class EnvironmentNode extends LightingNode {
@@ -61,6 +62,11 @@ class EnvironmentNode extends LightingNode {
 
 				return roughness;
 
+			},
+			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
+
+				return new SpecularMIPLevelNode( textureNode, levelNode );
+
 			}
 		} );
 
@@ -94,6 +100,11 @@ class EnvironmentNode extends LightingNode {
 			getSamplerLevelNode: () => {
 
 				return float( 1 );
+
+			},
+			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
+
+				return new SpecularMIPLevelNode( textureNode, levelNode );
 
 			}
 		} );

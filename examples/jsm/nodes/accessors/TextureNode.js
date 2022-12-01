@@ -65,7 +65,7 @@ class TextureNode extends UniformNode {
 		//
 
 		properties.uvNode = uvNode;
-		properties.levelNode = levelNode ? builder.getMIPLevelAlgorithmNode( this, levelNode ) : null;
+		properties.levelNode = levelNode ? builder.context.getMIPLevelAlgorithmNode( this, levelNode ) : null;
 
 	}
 

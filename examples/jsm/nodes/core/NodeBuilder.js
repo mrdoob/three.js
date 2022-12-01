@@ -9,7 +9,7 @@ import { NodeUpdateType } from './constants.js';
 
 import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'three';
 
-import SpecularMIPLevelNode from '../utils/SpecularMIPLevelNode.js';
+import { mul, maxMipLevel } from '../shadernode/ShaderNodeElements.js';
 
 export const defaultShaderStages = [ 'fragment', 'vertex' ];
 export const defaultBuildStages = [ 'construct', 'analyze', 'generate' ]
@@ -65,7 +65,8 @@ class NodeBuilder {
 
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: object.material
+			material: object.material,
+			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => mul( levelNode, maxMipLevel( textureNode ) )
 		};
 
 		this.cache = new NodeCache();
@@ -207,12 +208,6 @@ class NodeBuilder {
 	isFlipY() {
 
 		return false;
-
-	}
-
-	getMIPLevelAlgorithmNode( textureNode, levelNode ) {
-
-		return new SpecularMIPLevelNode( textureNode, levelNode );
 
 	}
 
