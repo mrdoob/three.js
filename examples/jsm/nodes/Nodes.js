@@ -2,6 +2,7 @@
 import ArrayUniformNode from './core/ArrayUniformNode.js';
 import AttributeNode from './core/AttributeNode.js';
 import BypassNode from './core/BypassNode.js';
+import CacheNode from './core/CacheNode.js';
 import CodeNode from './core/CodeNode.js';
 import ConstNode from './core/ConstNode.js';
 import ContextNode from './core/ContextNode.js';
@@ -12,6 +13,7 @@ import InstanceIndexNode from './core/InstanceIndexNode.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
+import NodeCache from './core/NodeCache.js';
 import NodeCode from './core/NodeCode.js';
 import NodeFrame from './core/NodeFrame.js';
 import NodeFunctionInput from './core/NodeFunctionInput.js';
@@ -20,6 +22,7 @@ import NodeUniform from './core/NodeUniform.js';
 import NodeVar from './core/NodeVar.js';
 import NodeVarying from './core/NodeVarying.js';
 import PropertyNode from './core/PropertyNode.js';
+import StackNode from './core/StackNode.js';
 import TempNode from './core/TempNode.js';
 import UniformNode from './core/UniformNode.js';
 import VarNode from './core/VarNode.js';
@@ -88,6 +91,7 @@ import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
 import OscNode from './utils/OscNode.js';
 import RemapNode from './utils/RemapNode.js';
 import RotateUVNode from './utils/RotateUVNode.js';
+import SpecularMIPLevelNode from './utils/SpecularMIPLevelNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
 import TimerNode from './utils/TimerNode.js';
@@ -129,6 +133,7 @@ const nodeLib = {
 	ArrayUniformNode,
 	AttributeNode,
 	BypassNode,
+	CacheNode,
 	CodeNode,
 	ContextNode,
 	ConstNode,
@@ -139,6 +144,7 @@ const nodeLib = {
 	Node,
 	NodeAttribute,
 	NodeBuilder,
+	NodeCache,
 	NodeCode,
 	NodeFrame,
 	NodeFunctionInput,
@@ -147,6 +153,7 @@ const nodeLib = {
 	NodeVar,
 	NodeVarying,
 	PropertyNode,
+	StackNode,
 	TempNode,
 	UniformNode,
 	VarNode,
@@ -215,6 +222,7 @@ const nodeLib = {
 	OscNode,
 	RemapNode,
 	RotateUVNode,
+	SpecularMIPLevelNode,
 	SplitNode,
 	SpriteSheetUVNode,
 	TimerNode,
@@ -249,6 +257,7 @@ export {
 	ArrayUniformNode,
 	AttributeNode,
 	BypassNode,
+	CacheNode,
 	CodeNode,
 	ContextNode,
 	ConstNode,
@@ -259,6 +268,7 @@ export {
 	Node,
 	NodeAttribute,
 	NodeBuilder,
+	NodeCache,
 	NodeCode,
 	NodeFrame,
 	NodeFunctionInput,
@@ -267,6 +277,7 @@ export {
 	NodeVar,
 	NodeVarying,
 	PropertyNode,
+	StackNode,
 	TempNode,
 	UniformNode,
 	VarNode,
@@ -335,6 +346,7 @@ export {
 	OscNode,
 	RemapNode,
 	RotateUVNode,
+	SpecularMIPLevelNode,
 	SplitNode,
 	SpriteSheetUVNode,
 	TimerNode,

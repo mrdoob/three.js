@@ -27,6 +27,12 @@ class OperatorNode extends TempNode {
 
 	}
 
+	hasDependencies( builder ) {
+
+		return this.op !== '=' ? super.hasDependencies( builder ) : false;
+
+	}
+
 	getNodeType( builder, output ) {
 
 		const op = this.op;

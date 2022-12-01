@@ -22,6 +22,12 @@ class PositionNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	getHash( /*builder*/ ) {
 
 		return `position-${this.scope}`;
