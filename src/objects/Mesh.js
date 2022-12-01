@@ -18,12 +18,7 @@ const _vB = /*@__PURE__*/ new Vector3();
 const _vC = /*@__PURE__*/ new Vector3();
 
 const _tempA = /*@__PURE__*/ new Vector3();
-const _tempB = /*@__PURE__*/ new Vector3();
-const _tempC = /*@__PURE__*/ new Vector3();
-
 const _morphA = /*@__PURE__*/ new Vector3();
-const _morphB = /*@__PURE__*/ new Vector3();
-const _morphC = /*@__PURE__*/ new Vector3();
 
 const _uvA = /*@__PURE__*/ new Vector2();
 const _uvB = /*@__PURE__*/ new Vector2();
@@ -103,55 +98,55 @@ class Mesh extends Object3D {
 
 	}
 
-  getUpdatedVertex( vert, target ) {
+	getVertexPosition( vert, target ) {
 
-    const geometry = this.geometry;
-    const position = geometry.attributes.position;
+		const geometry = this.geometry;
+		const position = geometry.attributes.position;
 		const morphPosition = geometry.morphAttributes.position;
 		const morphTargetsRelative = geometry.morphTargetsRelative;
 
-    target.fromBufferAttribute( position, vert );
+		target.fromBufferAttribute( position, vert );
 
-    const morphInfluences = this.morphTargetInfluences;
+		const morphInfluences = this.morphTargetInfluences;
 
-    if ( morphPosition && morphInfluences ) {
+		if ( morphPosition && morphInfluences ) {
 
-      _morphA.set( 0, 0, 0 );
+			_morphA.set( 0, 0, 0 );
 
-      for ( let i = 0, il = morphPosition.length; i < il; i ++ ) {
+			for ( let i = 0, il = morphPosition.length; i < il; i ++ ) {
 
-        const influence = morphInfluences[ i ];
-        const morphAttribute = morphPosition[ i ];
+				const influence = morphInfluences[ i ];
+				const morphAttribute = morphPosition[ i ];
 
-        if ( influence === 0 ) continue;
+				if ( influence === 0 ) continue;
 
-        _tempA.fromBufferAttribute( morphAttribute, vert );
+				_tempA.fromBufferAttribute( morphAttribute, vert );
 
-        if ( morphTargetsRelative ) {
+				if ( morphTargetsRelative ) {
 
-          _morphA.addScaledVector( _tempA, influence );
+					_morphA.addScaledVector( _tempA, influence );
 
-        } else {
+				} else {
 
-          _morphA.addScaledVector( _tempA.sub( target ), influence );
+					_morphA.addScaledVector( _tempA.sub( target ), influence );
 
-        }
+				}
 
-      }
+			}
 
-      target.add( _morphA );
+			target.add( _morphA );
 
-    }
+		}
 
-    if ( this.isSkinnedMesh ) {
+		if ( this.isSkinnedMesh ) {
 
-      this.boneTransform( vert, target );
+			this.boneTransform( vert, target );
 
-    }
+		}
 
-    return target;
+		return target;
 
-  }
+	}
 
 	raycast( raycaster, intersects ) {
 
@@ -347,9 +342,9 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 function checkBufferGeometryIntersection( object, material, raycaster, ray, uv, uv2, a, b, c ) {
 
-  object.getUpdatedVertex( a, _vA );
-  object.getUpdatedVertex( b, _vB );
-  object.getUpdatedVertex( c, _vC );
+	object.getVertexPosition( a, _vA );
+	object.getVertexPosition( b, _vB );
+	object.getVertexPosition( c, _vC );
 
 	const intersection = checkIntersection( object, material, raycaster, ray, _vA, _vB, _vC, _intersectionPoint );
 

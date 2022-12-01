@@ -145,7 +145,7 @@ function reduceVertices( object, func, initialValue ) {
 
           if ( child.isMesh ) {
 
-            child.getUpdatedVertex( i, vertex );
+            child.getVertexPosition( i, vertex );
 
           } else {
 
