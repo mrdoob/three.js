@@ -31,7 +31,7 @@
 			import * as THREE from 'three';
 
 			import { AsciiEffect } from 'three/addons/effects/AsciiEffect.js';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
 			let camera, controls, scene, renderer, effect;
 
@@ -82,7 +82,7 @@
 
 				document.body.appendChild( effect.domElement );
 
-				controls = new OrbitControls( camera, effect.domElement );
+				controls = new TrackballControls( camera, effect.domElement );
 
 				//
 
