@@ -157,7 +157,7 @@ function unicodeToShiftjis( str ) {
 
 	if ( u2sTable === undefined ) {
 
-		const encoder = new MMDParser.CharsetEncoder(); // eslint-disable-line no-undef
+		const encoder = new MMDParser.CharsetEncoder();
 		const table = encoder.s2uTable;
 		u2sTable = {};
 

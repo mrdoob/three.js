@@ -205,7 +205,7 @@ class USDZLoader extends Loader {
 
 		}
 
-		const zip = fflate.unzipSync( new Uint8Array( buffer ) ); // eslint-disable-line no-undef
+		const zip = fflate.unzipSync( new Uint8Array( buffer ) );
 
 		// console.log( zip );
 
@@ -254,7 +254,7 @@ class USDZLoader extends Loader {
 
 			if ( id !== undefined ) {
 
-				const def = `def "%{id}"`;
+				const def = 'def "%{id}"';
 
 				if ( def in data ) {
 
