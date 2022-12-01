@@ -5,3 +5,4 @@ paths-ignore:
   - "examples/jsm/loaders/ifc/**/*.*"
   - "examples/js/loaders/ifc/**/*.*"
   - "build/*.*"
+  - "**/3rdparty/**"
