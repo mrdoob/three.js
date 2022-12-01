@@ -60,9 +60,7 @@ class CubeTextureNode extends TextureNode {
 
 			if ( propertyName === undefined ) {
 
-				const finalUVNode = uvNode || this.getDefaultUV(); // @TODO: Remove it after ShaderNode class was finished.
-
-				const uvNodeObject = nodeObject( finalUVNode );
+				const uvNodeObject = nodeObject( uvNode );
 				const cubeUV = vec3( negate( uvNodeObject.x ), uvNodeObject.yz );
 				const uvSnippet = cubeUV.build( builder, 'vec3' );
 

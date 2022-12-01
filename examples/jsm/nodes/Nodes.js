@@ -22,6 +22,7 @@ import NodeUniform from './core/NodeUniform.js';
 import NodeVar from './core/NodeVar.js';
 import NodeVarying from './core/NodeVarying.js';
 import PropertyNode from './core/PropertyNode.js';
+import StackNode from './core/StackNode.js';
 import TempNode from './core/TempNode.js';
 import UniformNode from './core/UniformNode.js';
 import VarNode from './core/VarNode.js';
@@ -152,6 +153,7 @@ const nodeLib = {
 	NodeVar,
 	NodeVarying,
 	PropertyNode,
+	StackNode,
 	TempNode,
 	UniformNode,
 	VarNode,
@@ -275,6 +277,7 @@ export {
 	NodeVar,
 	NodeVarying,
 	PropertyNode,
+	StackNode,
 	TempNode,
 	UniformNode,
 	VarNode,

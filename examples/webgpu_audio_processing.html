@@ -35,7 +35,7 @@
 			import {
 				ShaderNode, compute,
 				uniform, element, storage, instanceIndex,
-				float, assign, add, sub, div, mul, texture, viewportTopLeft, color
+				float, add, sub, div, mul, texture, viewportTopLeft, color
 			} from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -141,7 +141,7 @@
 
 				// compute (shader-node)
 
-				const computeShaderNode = new ShaderNode( ( inputs, builder ) => {
+				const computeShaderNode = new ShaderNode( ( inputs, stack ) => {
 
 					const index = float( instanceIndex );
 
@@ -169,7 +169,7 @@
 
 					const waveStorageElementNode = element( waveStorageNode, instanceIndex );
 
-					assign( waveStorageElementNode, wave ).build( builder );
+					stack.assign( waveStorageElementNode, wave );
 
 				} );
 

@@ -82,7 +82,7 @@ class VarNode extends Node {
 		const type = builder.getVectorType( this.getNodeType( builder ) );
 
 		const snippet = node.build( builder, type );
-		const nodeVar = builder.getVarFromNode( this, type, undefined, builder.baseCache );
+		const nodeVar = builder.getVarFromNode( this, type );
 
 		if ( name !== null ) {
 

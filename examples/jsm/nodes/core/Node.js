@@ -56,6 +56,20 @@ class Node {
 
 				children.push( object );
 
+			} else if ( typeof object === 'object' ) {
+
+				for ( const property in object ) {
+
+					const child = object[ property ];
+
+					if ( child?.isNode === true ) {
+
+						children.push( child );
+
+					}
+
+				}
+
 			}
 
 		}

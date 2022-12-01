@@ -4,6 +4,7 @@ import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import ConstNode from '../core/ConstNode.js';
+import StackNode from '../core/StackNode.js';
 import { getValueFromType } from '../core/NodeUtils.js';
 
 const shaderNodeHandler = {
@@ -166,17 +167,20 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	generate( builder, output ) {
+	getNodeType( builder ) {
 
-		const nodeCall = this.call( {}, builder );
+		const { outputNode } = builder.getNodeProperties( this );
 
-		if ( nodeCall === undefined ) {
+		return outputNode ? outputNode.getNodeType( builder ) : super.getNodeType( builder );
 
-			return '';
+	}
 
-		}
+	construct( builder ) {
 
-		return builder.format( nodeCall.build( builder ), nodeCall.getNodeType( builder ), output );
+		const stackNode = new StackNode();
+		stackNode.outputNode = this.call( {}, stackNode, builder );
+
+		return stackNode;
 
 	}
 

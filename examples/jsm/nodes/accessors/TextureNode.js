@@ -99,9 +99,7 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const finalUVNode = uvNode || this.getDefaultUV(); // @TODO: Remove it after ShaderNode class was finished.
-
-				const uvSnippet = finalUVNode.build( builder, 'vec2' );
+				const uvSnippet = uvNode.build( builder, 'vec2' );
 				const nodeVar = builder.getVarFromNode( this, 'vec4' );
 
 				propertyName = builder.getPropertyName( nodeVar );
