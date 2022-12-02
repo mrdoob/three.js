@@ -2311,11 +2311,7 @@ class SVGLoader extends Loader {
 
 			}
 
-<<<<<<< HEAD
-			return { points: points, isCW: ShapeUtils.isClockWise( points ), identifier: -1, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
-=======
-			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: identifier ++, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
->>>>>>> 5368e6a206eba8afd93760a4b8c815e13a43c257
+			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: -1, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
 
 		} );
 
