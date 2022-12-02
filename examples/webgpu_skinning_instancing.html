@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Skinning Instancing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGPU - Skinning Instancing
+		</div>
+
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import * as Nodes from 'three/nodes';
+
+			import { mix, range, color, oscSine, timerLocal } from 'three/nodes';
+
+			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			let camera, scene, renderer;
+
+			let mixer, clock;
+
+			init();
+
+			function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+				camera.position.set( 1, 2, 3 );
+
+				scene = new THREE.Scene();
+				camera.lookAt( 0, 1, 0 );
+
+				clock = new THREE.Clock();
+
+				//lights
+
+				const centerLight = new THREE.PointLight( 0xff9900, 1, 100 );
+				centerLight.position.y = 4.5;
+				centerLight.position.z = - 2;
+				centerLight.power = 1700;
+				scene.add( centerLight );
+
+				const cameraLight = new THREE.PointLight( 0x0099ff, 1, 100 );
+				cameraLight.power = 1700;
+				camera.add( cameraLight );
+				scene.add( camera );
+
+				const loader = new FBXLoader();
+				loader.load( 'models/fbx/Samba Dancing.fbx', ( object ) => {
+
+					object.scale.setScalar( .01 );
+
+					mixer = new THREE.AnimationMixer( object );
+
+					const action = mixer.clipAction( object.animations[ 0 ] );
+					action.play();
+
+					const instanceCount = 30;
+					const dummy = new THREE.Object3D();
+
+					object.traverse( ( child ) => {
+
+						if ( child.isMesh ) {
+
+							const oscNode = oscSine( timerLocal( .1 ) );
+
+							// random colors between instances from 0x000000 to 0xFFFFFF
+							const randomColors = range( new THREE.Color( 0x000000 ), new THREE.Color( 0xFFFFFF ) );
+
+							// random [ 0, 1 ] values between instances
+							const randomMetalness = range( 0, 1 );
+
+							child.material = new Nodes.MeshStandardNodeMaterial();
+							child.material.roughness = .1;
+							child.material.metalnessNode = mix( 0.0, randomMetalness, oscNode );
+							child.material.colorNode = mix( color( 0xFFFFFF ), randomColors, oscNode );
+
+							child.isInstancedMesh = true;
+							child.instanceMatrix = new THREE.InstancedBufferAttribute( new Float32Array( instanceCount * 16 ), 16 );
+							child.count = instanceCount;
+
+							for ( let i = 0; i < instanceCount; i ++ ) {
+
+								dummy.position.x = - 200 + ( ( i % 5 ) * 70 );
+								dummy.position.z = Math.floor( i / 5 ) * - 200;
+
+								dummy.updateMatrix();
+
+								dummy.matrix.toArray( child.instanceMatrix.array, i * 16 );
+
+							}
+
+						}
+
+					} );
+
+					scene.add( object );
+
+				} );
+
+				//renderer
+
+				renderer = new WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, .17 );
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				const delta = clock.getDelta();
+
+				if ( mixer ) mixer.update( delta );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

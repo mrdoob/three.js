@@ -49,11 +49,16 @@
 		<p>See the base [page:LineSegments] class for common methods.</p>
 
 
-		<h3>[method:void updateMatrixWorld]( [param:Boolean force] )</h3>
+		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
 			This overrides the method in the base [page:Object3D] class so that it
 			also updates the wireframe box to the extent of the [page:Box3Helper.box .box]
 			property.
+		</p>
+
+		<h3>[method:undefined dispose]()</h3>
+		<p>
+		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
 		<h2>Source</h2>

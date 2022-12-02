@@ -44,7 +44,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:Ray applyMatrix4]( [param:Matrix4 matrix4] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix4] )</h3>
 		<p>
 		[page:Matrix4 matrix4] - 将被用于这个[page:Ray]的[page:Matrix4]。<br /><br />
 
@@ -72,7 +72,7 @@
 		沿着[page:Ray]，获得与所传入[page:Vector3]最接近的点。
 		</p>
 
-		<h3>[method:Ray copy]( [param:Ray ray] )</h3>
+		<h3>[method:this copy]( [param:Ray ray] )</h3>
 		<p>
 			复制所传入Ray的[page:.origin origin]和[page:.direction direction]属性到这个Ray上。
 		</p>
@@ -171,21 +171,21 @@
 		若这一射线与[page:Sphere]相交，则将返回true。
 		</p>
 
-		<h3>[method:Ray lookAt]( [param:Vector3 v] )</h3>
+		<h3>[method:this lookAt]( [param:Vector3 v] )</h3>
 		<p>
 		[page:Vector3 v] - 将要“直视”的[page:Vector3]<br /><br />
 
 		调整光线的方向到世界坐标中该向量所指代的点。
 		</p>
 
-		<h3>[method:Ray recast]( [param:Float t] )</h3>
+		<h3>[method:this recast]( [param:Float t] )</h3>
 		<p>
 		[page:Float t] - 沿着[page:Ray]进行插值的距离。<br /><br />
 
 		将[page:Ray]（射线）的原点沿着其方向移动给定的距离。
 		</p>
 
-		<h3>[method:Ray set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<h3>[method:this set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
 		[page:Vector3 origin] - [page:Ray]（射线）的[page:.origin origin]（原点）。<br />
 		[page:Vector3 origin] - [page:Ray]（射线）的[page:.direction direction]（方向）。

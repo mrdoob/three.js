@@ -56,6 +56,11 @@
 		<h3>[property:BufferGeometry geometry]</h3>
 		<p>Vertices representing the line segment(s).</p>
 
+		<h3>[property:Boolean isLine]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Material material]</h3>
 		<p>Material for the line.</p>
 
@@ -74,12 +79,12 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
 
-		<h3>[method:Line computeLineDistances]()</h3>
+		<h3>[method:this computeLineDistances]()</h3>
 		<p>
 		Computes an array of distance values which are necessary for [page:LineDashedMaterial]. For each vertex in the geometry, the method calculates the cumulative length from the current point to the very beginning of the line.
 		</p>
 
-		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 		Get intersections between a casted [page:Ray] and this Line.
 		[page:Raycaster.intersectObject] will call this method.
@@ -90,7 +95,7 @@
 		Returns a clone of this Line object and its descendants.
 		</p>
 
-		<h3>[method:null updateMorphTargets]()</h3>
+		<h3>[method:undefined updateMorphTargets]()</h3>
 		<p>
 		Updates the morphTargets to have no influence on the object. Resets the
 		[page:.morphTargetInfluences] and [page:.morphTargetDictionary] properties.

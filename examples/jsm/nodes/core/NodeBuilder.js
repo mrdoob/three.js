@@ -1,932 +1,359 @@
-import {
-	CubeReflectionMapping,
-	CubeRefractionMapping,
-	CubeUVReflectionMapping,
-	CubeUVRefractionMapping,
-	LinearEncoding,
-	GammaEncoding
-} from '../../../../build/three.module.js';
+import NodeUniform from './NodeUniform.js';
+import NodeAttribute from './NodeAttribute.js';
+import NodeVarying from './NodeVarying.js';
+import NodeVar from './NodeVar.js';
+import NodeCode from './NodeCode.js';
+import NodeKeywords from './NodeKeywords.js';
+import NodeCache from './NodeCache.js';
+import { NodeUpdateType } from './constants.js';
 
-import { NodeUniform } from './NodeUniform.js';
-import { NodeUtils } from './NodeUtils.js';
-import { NodeLib } from './NodeLib.js';
-import { FunctionNode } from './FunctionNode.js';
-import { ConstNode } from './ConstNode.js';
-import { StructNode } from './StructNode.js';
-import { Vector2Node } from '../inputs/Vector2Node.js';
-import { Vector3Node } from '../inputs/Vector3Node.js';
-import { Vector4Node } from '../inputs/Vector4Node.js';
-import { TextureNode } from '../inputs/TextureNode.js';
-import { CubeTextureNode } from '../inputs/CubeTextureNode.js';
-import { TextureCubeNode } from '../misc/TextureCubeNode.js';
+import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'three';
 
+import { mul, maxMipLevel } from '../shadernode/ShaderNodeElements.js';
 
-const elements = NodeUtils.elements,
-	constructors = [ 'float', 'vec2', 'vec3', 'vec4' ],
-	convertFormatToType = {
-		float: 'f',
-		vec2: 'v2',
-		vec3: 'v3',
-		vec4: 'v4',
-		mat4: 'v4',
-		int: 'i',
-		bool: 'b'
-	},
-	convertTypeToFormat = {
-		t: 'sampler2D',
-		tc: 'samplerCube',
-		b: 'bool',
-		i: 'int',
-		f: 'float',
-		c: 'vec3',
-		v2: 'vec2',
-		v3: 'vec3',
-		v4: 'vec4',
-		m3: 'mat3',
-		m4: 'mat4'
-	};
+export const defaultShaderStages = [ 'fragment', 'vertex' ];
+export const defaultBuildStages = [ 'construct', 'analyze', 'generate' ];
+export const shaderStages = [ ...defaultShaderStages, 'compute' ];
+export const vector = [ 'x', 'y', 'z', 'w' ];
+
+const typeFromLength = new Map();
+typeFromLength.set( 2, 'vec2' );
+typeFromLength.set( 3, 'vec3' );
+typeFromLength.set( 4, 'vec4' );
+typeFromLength.set( 9, 'mat3' );
+typeFromLength.set( 16, 'mat4' );
+
+const toFloat = ( value ) => {
+
+	value = Number( value );
+
+	return value + ( value % 1 ? '' : '.0' );
+
+};
 
 class NodeBuilder {
 
-	constructor() {
+	constructor( object, renderer, parser ) {
 
-		this.slots = [];
-		this.caches = [];
-		this.contexts = [];
-
-		this.keywords = {};
-
-		this.nodeData = {};
-
-		this.requires = {
-			uv: [],
-			color: [],
-			lights: false,
-			fog: false,
-			transparent: false,
-			irradiance: false
-		};
-
-		this.includes = {
-			consts: [],
-			functions: [],
-			structs: []
-		};
-
-		this.attributes = {};
-
-		this.prefixCode = /* glsl */`
-			#ifdef TEXTURE_LOD_EXT
-
-				#define texCube(a, b) textureCube(a, b)
-				#define texCubeBias(a, b, c) textureCubeLodEXT(a, b, c)
-
-				#define tex2D(a, b) texture2D(a, b)
-				#define tex2DBias(a, b, c) texture2DLodEXT(a, b, c)
-
-			#else
-
-				#define texCube(a, b) textureCube(a, b)
-				#define texCubeBias(a, b, c) textureCube(a, b, c)
-
-				#define tex2D(a, b) texture2D(a, b)
-				#define tex2DBias(a, b, c) texture2D(a, b, c)
-
-			#endif
-
-			#include <packing>
-			#include <common>`;
-
-		this.parsCode = {
-			vertex: '',
-			fragment: ''
-		};
-
-		this.code = {
-			vertex: '',
-			fragment: ''
-		};
-
-		this.nodeCode = {
-			vertex: '',
-			fragment: ''
-		};
-
-		this.resultCode = {
-			vertex: '',
-			fragment: ''
-		};
-
-		this.finalCode = {
-			vertex: '',
-			fragment: ''
-		};
-
-		this.inputs = {
-			uniforms: {
-				list: [],
-				vertex: [],
-				fragment: []
-			},
-			vars: {
-				varying: [],
-				vertex: [],
-				fragment: []
-			}
-		};
-
-		// send to material
-
-		this.defines = {};
-
-		this.uniforms = {};
-
-		this.extensions = {};
-
-		this.updaters = [];
+		this.object = object;
+		this.material = object.material || null;
+		this.geometry = object.geometry || null;
+		this.renderer = renderer;
+		this.parser = parser;
 
 		this.nodes = [];
+		this.updateNodes = [];
+		this.hashNodes = {};
 
-		// --
+		this.scene = null;
+		this.lightsNode = null;
+		this.fogNode = null;
 
-		this.analyzing = false;
+		this.vertexShader = null;
+		this.fragmentShader = null;
+		this.computeShader = null;
+
+		this.flowNodes = { vertex: [], fragment: [], compute: [] };
+		this.flowCode = { vertex: '', fragment: '', compute: [] };
+		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
+		this.codes = { vertex: [], fragment: [], compute: [] };
+		this.attributes = [];
+		this.varyings = [];
+		this.vars = { vertex: [], fragment: [], compute: [] };
+		this.flow = { code: '' };
+		this.stack = [];
+
+		this.context = {
+			keywords: new NodeKeywords(),
+			material: object.material,
+			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => mul( levelNode, maxMipLevel( textureNode ) )
+		};
+
+		this.cache = new NodeCache();
+		this.globalCache = this.cache;
+
+		this.flowsData = new WeakMap();
+
+		this.shaderStage = null;
+		this.buildStage = null;
 
 	}
 
-	build( vertex, fragment ) {
+	get node() {
 
-		this.buildShader( 'vertex', vertex );
-		this.buildShader( 'fragment', fragment );
+		return this.stack[ this.stack.length - 1 ];
 
-		for ( let i = 0; i < this.requires.uv.length; i ++ ) {
+	}
 
-			if ( this.requires.uv[ i ] ) {
+	addStack( node ) {
 
-				const uvIndex = i > 0 ? i + 1 : '';
+		/*
+		if ( this.stack.indexOf( node ) !== - 1 ) {
 
-				this.addVaryCode( 'varying vec2 vUv' + uvIndex + ';' );
+			console.warn( 'Recursive node: ', node );
 
-				if ( i > 0 ) {
+		}
+		*/
 
-					this.addVertexParsCode( 'attribute vec2 uv' + uvIndex + ';' );
+		this.stack.push( node );
 
-				}
+	}
 
-				this.addVertexFinalCode( 'vUv' + uvIndex + ' = uv' + uvIndex + ';' );
+	removeStack( node ) {
+
+		const lastStack = this.stack.pop();
+
+		if ( lastStack !== node ) {
+
+			throw new Error( 'NodeBuilder: Invalid node stack!' );
+
+		}
+
+	}
+
+	setHashNode( node, hash ) {
+
+		this.hashNodes[ hash ] = node;
+
+	}
+
+	addNode( node ) {
+
+		if ( this.nodes.indexOf( node ) === - 1 ) {
+
+			const updateType = node.getUpdateType( this );
+
+			if ( updateType !== NodeUpdateType.NONE ) {
+
+				this.updateNodes.push( node );
 
 			}
 
-		}
+			this.nodes.push( node );
 
-		if ( this.requires.color[ 0 ] ) {
-
-			this.addVaryCode( 'varying vec4 vColor;' );
-			this.addVertexParsCode( 'attribute vec4 color;' );
-
-			this.addVertexFinalCode( 'vColor = color;' );
+			this.setHashNode( node, node.getHash( this ) );
 
 		}
 
-		if ( this.requires.color[ 1 ] ) {
+	}
 
-			this.addVaryCode( 'varying vec4 vColor2;' );
-			this.addVertexParsCode( 'attribute vec4 color2;' );
+	getMethod( method ) {
 
-			this.addVertexFinalCode( 'vColor2 = color2;' );
+		return method;
+
+	}
+
+	getNodeFromHash( hash ) {
+
+		return this.hashNodes[ hash ];
+
+	}
+
+	addFlow( shaderStage, node ) {
+
+		this.flowNodes[ shaderStage ].push( node );
+
+		return node;
+
+	}
+
+	setContext( context ) {
+
+		this.context = context;
+
+	}
+
+	getContext() {
+
+		return this.context;
+
+	}
+
+	setCache( cache ) {
+
+		this.cache = cache;
+
+	}
+
+	getCache() {
+
+		return this.cache;
+
+	}
+
+	isAvailable( /*name*/ ) {
+
+		return false;
+
+	}
+
+	getInstanceIndex() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getFrontFacing() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getFragCoord() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	isFlipY() {
+
+		return false;
+
+	}
+
+	getTexture( /* textureProperty, uvSnippet */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getCubeTexture( /* textureProperty, uvSnippet */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getCubeTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	// @TODO: rename to .generateConst()
+	getConst( type, value = null ) {
+
+		if ( value === null ) {
+
+			if ( type === 'float' || type === 'int' || type === 'uint' ) value = 0;
+			else if ( type === 'bool' ) value = false;
+			else if ( type === 'color' ) value = new Color();
+			else if ( type === 'vec2' ) value = new Vector2();
+			else if ( type === 'vec3' ) value = new Vector3();
+			else if ( type === 'vec4' ) value = new Vector4();
 
 		}
 
-		if ( this.requires.position ) {
+		if ( type === 'float' ) return toFloat( value );
+		if ( type === 'int' ) return `${ Math.round( value ) }`;
+		if ( type === 'uint' ) return value >= 0 ? `${ Math.round( value ) }u` : '0u';
+		if ( type === 'bool' ) return value ? 'true' : 'false';
+		if ( type === 'color' ) return `${ this.getType( 'vec3' ) }( ${ toFloat( value.r ) }, ${ toFloat( value.g ) }, ${ toFloat( value.b ) } )`;
 
-			this.addVaryCode( 'varying vec3 vPosition;' );
+		const typeLength = this.getTypeLength( type );
 
-			this.addVertexFinalCode( 'vPosition = transformed;' );
+		const componentType = this.getComponentType( type );
 
-		}
+		const getConst = value => this.getConst( componentType, value );
 
-		if ( this.requires.worldPosition ) {
+		if ( typeLength === 2 ) {
 
-			this.addVaryCode( 'varying vec3 vWPosition;' );
+			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) } )`;
 
-			this.addVertexFinalCode( 'vWPosition = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;' );
+		} else if ( typeLength === 3 ) {
 
-		}
+			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) } )`;
 
-		if ( this.requires.normal ) {
+		} else if ( typeLength === 4 ) {
 
-			this.addVaryCode( 'varying vec3 vObjectNormal;' );
+			return `${ this.getType( type ) }( ${ getConst( value.x ) }, ${ getConst( value.y ) }, ${ getConst( value.z ) }, ${ getConst( value.w ) } )`;
 
-			this.addVertexFinalCode( 'vObjectNormal = normal;' );
+		} else if ( typeLength > 4 ) {
 
-		}
-
-		if ( this.requires.worldNormal ) {
-
-			this.addVaryCode( 'varying vec3 vWNormal;' );
-
-			this.addVertexFinalCode( 'vWNormal = inverseTransformDirection( transformedNormal, viewMatrix ).xyz;' );
+			return `${ this.getType( type ) }()`;
 
 		}
 
-		return this;
+		throw new Error( `NodeBuilder: Type '${type}' not found in generate constant attempt.` );
 
 	}
 
-	buildShader( shader, node ) {
+	getType( type ) {
 
-		this.resultCode[ shader ] = node.build( this.setShader( shader ), 'v4' );
-
-	}
-
-	setMaterial( material, renderer ) {
-
-		this.material = material;
-		this.renderer = renderer;
-
-		this.requires.lights = material.lights;
-		this.requires.fog = material.fog;
-
-		this.mergeDefines( material.defines );
-
-		return this;
+		return type;
 
 	}
 
-	addFlow( slot, cache, context ) {
+	generateMethod( method ) {
 
-		return this.addSlot( slot ).addCache( cache ).addContext( context );
-
-	}
-
-	removeFlow() {
-
-		return this.removeSlot().removeCache().removeContext();
+		return method;
 
 	}
 
-	addCache( name ) {
+	hasGeometryAttribute( name ) {
 
-		this.cache = name || '';
-		this.caches.push( this.cache );
-
-		return this;
-
-	}
-
-	removeCache() {
-
-		this.caches.pop();
-		this.cache = this.caches[ this.caches.length - 1 ] || '';
-
-		return this;
-
-	}
-
-	addContext( context ) {
-
-		this.context = Object.assign( {}, this.context, context );
-		this.context.extra = this.context.extra || {};
-
-		this.contexts.push( this.context );
-
-		return this;
-
-	}
-
-	removeContext() {
-
-		this.contexts.pop();
-		this.context = this.contexts[ this.contexts.length - 1 ] || {};
-
-		return this;
-
-	}
-
-	addSlot( name = '' ) {
-
-		this.slot = name;
-		this.slots.push( this.slot );
-
-		return this;
-
-	}
-
-	removeSlot() {
-
-		this.slots.pop();
-		this.slot = this.slots[ this.slots.length - 1 ] || '';
-
-		return this;
-
-	}
-
-	addVertexCode( code ) {
-
-		this.addCode( code, 'vertex' );
-
-	}
-
-	addFragmentCode( code ) {
-
-		this.addCode( code, 'fragment' );
-
-	}
-
-	addCode( code, shader ) {
-
-		this.code[ shader || this.shader ] += code + '\n';
-
-	}
-
-	addVertexNodeCode( code ) {
-
-		this.addNodeCode( code, 'vertex' );
-
-	}
-
-	addFragmentNodeCode( code ) {
-
-		this.addNodeCode( code, 'fragment' );
-
-	}
-
-	addNodeCode( code, shader ) {
-
-		this.nodeCode[ shader || this.shader ] += code + '\n';
-
-	}
-
-	clearNodeCode( shader ) {
-
-		shader = shader || this.shader;
-
-		const code = this.nodeCode[ shader ];
-
-		this.nodeCode[ shader ] = '';
-
-		return code;
-
-	}
-
-	clearVertexNodeCode( ) {
-
-		return this.clearNodeCode( 'vertex' );
-
-	}
-
-	clearFragmentNodeCode( ) {
-
-		return this.clearNodeCode( 'fragment' );
-
-	}
-
-	addVertexFinalCode( code ) {
-
-		this.addFinalCode( code, 'vertex' );
-
-	}
-
-	addFragmentFinalCode( code ) {
-
-		this.addFinalCode( code, 'fragment' );
-
-	}
-
-	addFinalCode( code, shader ) {
-
-		this.finalCode[ shader || this.shader ] += code + '\n';
-
-	}
-
-	addVertexParsCode( code ) {
-
-		this.addParsCode( code, 'vertex' );
-
-	}
-
-	addFragmentParsCode( code ) {
-
-		this.addParsCode( code, 'fragment' );
-
-	}
-
-	addParsCode( code, shader ) {
-
-		this.parsCode[ shader || this.shader ] += code + '\n';
-
-	}
-
-	addVaryCode( code ) {
-
-		this.addVertexParsCode( code );
-		this.addFragmentParsCode( code );
-
-	}
-
-	isCache( name ) {
-
-		return this.caches.indexOf( name ) !== - 1;
-
-	}
-
-	isSlot( name ) {
-
-		return this.slots.indexOf( name ) !== - 1;
-
-	}
-
-	define( name, value ) {
-
-		this.defines[ name ] = value === undefined ? 1 : value;
-
-	}
-
-	require( name ) {
-
-		this.requires[ name ] = true;
-
-	}
-
-	isDefined( name ) {
-
-		return this.defines[ name ] !== undefined;
-
-	}
-
-	getVar( uuid, type, ns, shader = 'varying', prefix = 'V', label = '' ) {
-
-		const vars = this.getVars( shader );
-		let data = vars[ uuid ];
-
-		if ( ! data ) {
-
-			const index = vars.length,
-				name = ns ? ns : 'node' + prefix + index + ( label ? '_' + label : '' );
-
-			data = { name: name, type: type };
-
-			vars.push( data );
-			vars[ uuid ] = data;
-
-		}
-
-		return data;
-
-	}
-
-	getTempVar( uuid, type, ns, label ) {
-
-		return this.getVar( uuid, type, ns, this.shader, 'T', label );
+		return this.geometry?.getAttribute( name ) !== undefined;
 
 	}
 
 	getAttribute( name, type ) {
 
-		if ( ! this.attributes[ name ] ) {
+		const attributes = this.attributes;
 
-			const varying = this.getVar( name, type );
+		// find attribute
 
-			this.addVertexParsCode( 'attribute ' + type + ' ' + name + ';' );
-			this.addVertexFinalCode( varying.name + ' = ' + name + ';' );
+		for ( const attribute of attributes ) {
 
-			this.attributes[ name ] = { varying: varying, name: name, type: type };
+			if ( attribute.name === name ) {
 
-		}
-
-		return this.attributes[ name ];
-
-	}
-
-	getCode( shader ) {
-
-		return [
-			this.prefixCode,
-			this.parsCode[ shader ],
-			this.getVarListCode( this.getVars( 'varying' ), 'varying' ),
-			this.getVarListCode( this.inputs.uniforms[ shader ], 'uniform' ),
-			this.getIncludesCode( 'consts', shader ),
-			this.getIncludesCode( 'structs', shader ),
-			this.getIncludesCode( 'functions', shader ),
-			'void main() {',
-			this.getVarListCode( this.getVars( shader ) ),
-			this.code[ shader ],
-			this.resultCode[ shader ],
-			this.finalCode[ shader ],
-			'}'
-		].join( '\n' );
-
-	}
-
-	getVarListCode( vars, prefix = '' ) {
-
-		let code = '';
-
-		for ( let i = 0, l = vars.length; i < l; ++ i ) {
-
-			const nVar = vars[ i ],
-				type = nVar.type,
-				name = nVar.name;
-
-			const formatType = this.getFormatByType( type );
-
-			if ( formatType === undefined ) {
-
-				throw new Error( 'Node pars ' + formatType + ' not found.' );
+				return attribute;
 
 			}
 
-			code += prefix + ' ' + formatType + ' ' + name + ';\n';
-
 		}
 
-		return code;
+		// create a new if no exist
+
+		const attribute = new NodeAttribute( name, type );
+
+		attributes.push( attribute );
+
+		return attribute;
 
 	}
 
-	getVars( shader ) {
+	getPropertyName( node/*, shaderStage*/ ) {
 
-		return this.inputs.vars[ shader || this.shader ];
-
-	}
-
-	getNodeData( node ) {
-
-		const uuid = node.isNode ? node.uuid : node;
-
-		return this.nodeData[ uuid ] = this.nodeData[ uuid ] || {};
+		return node.name;
 
 	}
 
-	createUniform( shader, type, node, ns, needsUpdate, label ) {
+	isVector( type ) {
 
-		const uniforms = this.inputs.uniforms,
-			index = uniforms.list.length;
-
-		const uniform = new NodeUniform( {
-			type: type,
-			name: ns ? ns : 'nodeU' + index + ( label ? '_' + label : '' ),
-			node: node,
-			needsUpdate: needsUpdate
-		} );
-
-		uniforms.list.push( uniform );
-
-		uniforms[ shader ].push( uniform );
-		uniforms[ shader ][ uniform.name ] = uniform;
-
-		this.uniforms[ uniform.name ] = uniform;
-
-		return uniform;
+		return /vec\d/.test( type );
 
 	}
 
-	createVertexUniform( type, node, ns, needsUpdate, label ) {
+	isMatrix( type ) {
 
-		return this.createUniform( 'vertex', type, node, ns, needsUpdate, label );
-
-	}
-
-	createFragmentUniform( type, node, ns, needsUpdate, label ) {
-
-		return this.createUniform( 'fragment', type, node, ns, needsUpdate, label );
+		return /mat\d/.test( type );
 
 	}
 
-	include( node, parent, source ) {
+	isReference( type ) {
 
-		let includesStruct;
-
-		node = typeof node === 'string' ? NodeLib.get( node ) : node;
-
-		if ( this.context.include === false ) {
-
-			return node.name;
-
-		}
-
-
-		if ( node instanceof FunctionNode ) {
-
-			includesStruct = this.includes.functions;
-
-		} else if ( node instanceof ConstNode ) {
-
-			includesStruct = this.includes.consts;
-
-		} else if ( node instanceof StructNode ) {
-
-			includesStruct = this.includes.structs;
-
-		}
-
-		const includes = includesStruct[ this.shader ] = includesStruct[ this.shader ] || [];
-
-		if ( node ) {
-
-			let included = includes[ node.name ];
-
-			if ( ! included ) {
-
-				included = includes[ node.name ] = {
-					node: node,
-					deps: []
-				};
-
-				includes.push( included );
-
-				included.src = node.build( this, 'source' );
-
-			}
-
-			if ( node instanceof FunctionNode && parent && includes[ parent.name ] && includes[ parent.name ].deps.indexOf( node ) == - 1 ) {
-
-				includes[ parent.name ].deps.push( node );
-
-				if ( node.includes && node.includes.length ) {
-
-					let i = 0;
-
-					do {
-
-						this.include( node.includes[ i ++ ], parent );
-
-					} while ( i < node.includes.length );
-
-				}
-
-			}
-
-			if ( source ) {
-
-				included.src = source;
-
-			}
-
-			return node.name;
-
-		} else {
-
-			throw new Error( 'Include not found.' );
-
-		}
+		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture';
 
 	}
 
-	colorToVectorProperties( color ) {
+	isShaderStage( shaderStage ) {
 
-		return color.replace( 'r', 'x' ).replace( 'g', 'y' ).replace( 'b', 'z' ).replace( 'a', 'w' );
-
-	}
-
-	colorToVector( color ) {
-
-		return color.replace( /c/g, 'v3' );
-
-	}
-
-	getIncludes( type, shader ) {
-
-		return this.includes[ type ][ shader || this.shader ];
-
-	}
-
-	getIncludesCode( type, shader ) {
-
-		let includes = this.getIncludes( type, shader );
-
-		if ( ! includes ) return '';
-
-		let code = '';
-
-		includes = includes.sort( sortByPosition );
-
-		for ( let i = 0; i < includes.length; i ++ ) {
-
-			if ( includes[ i ].src ) code += includes[ i ].src + '\n';
-
-		}
-
-		return code;
-
-	}
-
-	getConstructorFromLength( len ) {
-
-		return constructors[ len - 1 ];
-
-	}
-
-	isTypeMatrix( format ) {
-
-		return /^m/.test( format );
-
-	}
-
-	getTypeLength( type ) {
-
-		if ( type === 'f' ) return 1;
-
-		return parseInt( this.colorToVector( type ).substr( 1 ) );
-
-	}
-
-	getTypeFromLength( len ) {
-
-		if ( len === 1 ) return 'f';
-
-		return 'v' + len;
-
-	}
-
-	findNode() {
-
-		for ( let i = 0; i < arguments.length; i ++ ) {
-
-			const nodeCandidate = arguments[ i ];
-
-			if ( nodeCandidate !== undefined && nodeCandidate.isNode ) {
-
-				return nodeCandidate;
-
-			}
-
-		}
-
-	}
-
-	resolve() {
-
-		for ( let i = 0; i < arguments.length; i ++ ) {
-
-			const nodeCandidate = arguments[ i ];
-
-			if ( nodeCandidate !== undefined ) {
-
-				if ( nodeCandidate.isNode ) {
-
-					return nodeCandidate;
-
-				} else if ( nodeCandidate.isTexture ) {
-
-					switch ( nodeCandidate.mapping ) {
-
-						case CubeReflectionMapping:
-						case CubeRefractionMapping:
-
-							return new CubeTextureNode( nodeCandidate );
-
-							break;
-
-						case CubeUVReflectionMapping:
-						case CubeUVRefractionMapping:
-
-							return new TextureCubeNode( new TextureNode( nodeCandidate ) );
-
-							break;
-
-						default:
-
-							return new TextureNode( nodeCandidate );
-
-					}
-
-				} else if ( nodeCandidate.isVector2 ) {
-
-					return new Vector2Node( nodeCandidate );
-
-				} else if ( nodeCandidate.isVector3 ) {
-
-					return new Vector3Node( nodeCandidate );
-
-				} else if ( nodeCandidate.isVector4 ) {
-
-					return new Vector4Node( nodeCandidate );
-
-				}
-
-			}
-
-		}
-
-	}
-
-	format( code, from, to ) {
-
-		const typeToType = this.colorToVector( to + ' <- ' + from );
-
-		switch ( typeToType ) {
-
-			case 'f <- v2' : return code + '.x';
-			case 'f <- v3' : return code + '.x';
-			case 'f <- v4' : return code + '.x';
-			case 'f <- i' :
-			case 'f <- b' :	return 'float( ' + code + ' )';
-
-			case 'v2 <- f' : return 'vec2( ' + code + ' )';
-			case 'v2 <- v3': return code + '.xy';
-			case 'v2 <- v4': return code + '.xy';
-			case 'v2 <- i' :
-			case 'v2 <- b' : return 'vec2( float( ' + code + ' ) )';
-
-			case 'v3 <- f' : return 'vec3( ' + code + ' )';
-			case 'v3 <- v2': return 'vec3( ' + code + ', 0.0 )';
-			case 'v3 <- v4': return code + '.xyz';
-			case 'v3 <- i' :
-			case 'v3 <- b' : return 'vec2( float( ' + code + ' ) )';
-
-			case 'v4 <- f' : return 'vec4( ' + code + ' )';
-			case 'v4 <- v2': return 'vec4( ' + code + ', 0.0, 1.0 )';
-			case 'v4 <- v3': return 'vec4( ' + code + ', 1.0 )';
-			case 'v4 <- i' :
-			case 'v4 <- b' : return 'vec4( float( ' + code + ' ) )';
-
-			case 'i <- f' :
-			case 'i <- b' : return 'int( ' + code + ' )';
-			case 'i <- v2' : return 'int( ' + code + '.x )';
-			case 'i <- v3' : return 'int( ' + code + '.x )';
-			case 'i <- v4' : return 'int( ' + code + '.x )';
-
-			case 'b <- f' : return '( ' + code + ' != 0.0 )';
-			case 'b <- v2' : return '( ' + code + ' != vec2( 0.0 ) )';
-			case 'b <- v3' : return '( ' + code + ' != vec3( 0.0 ) )';
-			case 'b <- v4' : return '( ' + code + ' != vec4( 0.0 ) )';
-			case 'b <- i' : return '( ' + code + ' != 0 )';
-
-		}
-
-		return code;
-
-	}
-
-	getTypeByFormat( format ) {
-
-		return convertFormatToType[ format ] || format;
-
-	}
-
-	getFormatByType( type ) {
-
-		return convertTypeToFormat[ type ] || type;
-
-	}
-
-	getUuid( uuid, useCache ) {
-
-		useCache = useCache !== undefined ? useCache : true;
-
-		if ( useCache && this.cache ) uuid = this.cache + '-' + uuid;
-
-		return uuid;
-
-	}
-
-	getElementByIndex( index ) {
-
-		return elements[ index ];
-
-	}
-
-	getIndexByElement( elm ) {
-
-		return elements.indexOf( elm );
-
-	}
-
-	isShader( shader ) {
-
-		return this.shader === shader;
-
-	}
-
-	setShader( shader ) {
-
-		this.shader = shader;
-
-		return this;
-
-	}
-
-	mergeDefines( defines ) {
-
-		for ( const name in defines ) {
-
-			this.defines[ name ] = defines[ name ];
-
-		}
-
-		return this.defines;
-
-	}
-
-	mergeUniform( uniforms ) {
-
-		for ( const name in uniforms ) {
-
-			this.uniforms[ name ] = uniforms[ name ];
-
-		}
-
-		return this.uniforms;
+		return this.shaderStage === shaderStage;
 
 	}
 
@@ -934,24 +361,17 @@ class NodeBuilder {
 
 		let encoding;
 
-		if ( ! map ) {
-
-			encoding = LinearEncoding;
-
-		} else if ( map.isTexture ) {
+		if ( map && map.isTexture ) {
 
 			encoding = map.encoding;
 
-		} else if ( map.isWebGLRenderTarget ) {
+		} else if ( map && map.isWebGLRenderTarget ) {
 
-			console.warn( 'THREE.WebGLPrograms.getTextureEncodingFromMap: don\'t use render targets as textures. Use their .texture property instead.' );
 			encoding = map.texture.encoding;
 
-		}
+		} else {
 
-		if ( encoding === LinearEncoding && this.context.gamma ) {
-
-			encoding = GammaEncoding;
+			encoding = LinearEncoding;
 
 		}
 
@@ -959,12 +379,462 @@ class NodeBuilder {
 
 	}
 
+	getComponentType( type ) {
+
+		type = this.getVectorType( type );
+
+		if ( type === 'float' || type === 'bool' || type === 'int' || type === 'uint' ) return type;
+
+		const componentType = /(b|i|u|)(vec|mat)([2-4])/.exec( type );
+
+		if ( componentType === null ) return null;
+
+		if ( componentType[ 1 ] === 'b' ) return 'bool';
+		if ( componentType[ 1 ] === 'i' ) return 'int';
+		if ( componentType[ 1 ] === 'u' ) return 'uint';
+
+		return 'float';
+
+	}
+
+	getVectorType( type ) {
+
+		if ( type === 'color' ) return 'vec3';
+		if ( type === 'texture' ) return 'vec4';
+
+		return type;
+
+	}
+
+	getTypeFromLength( length, componentType = 'float' ) {
+
+		if ( length === 1 ) return componentType;
+		const baseType = typeFromLength.get( length );
+		const prefix = componentType === 'float' ? '' : componentType[ 0 ];
+		return prefix + baseType;
+
+	}
+
+	getTypeLength( type ) {
+
+		const vecType = this.getVectorType( type );
+		const vecNum = /vec([2-4])/.exec( vecType );
+
+		if ( vecNum !== null ) return Number( vecNum[ 1 ] );
+		if ( vecType === 'float' || vecType === 'bool' || vecType === 'int' || vecType === 'uint' ) return 1;
+		if ( /mat3/.test( type ) === true ) return 9;
+		if ( /mat4/.test( type ) === true ) return 16;
+
+		return 0;
+
+	}
+
+	getVectorFromMatrix( type ) {
+
+		return type.replace( 'mat', 'vec' );
+
+	}
+
+	changeComponentType( type, newComponentType ) {
+
+		return this.getTypeFromLength( this.getTypeLength( type ), newComponentType );
+
+	}
+
+	getIntegerType( type ) {
+
+		const componentType = this.getComponentType( type );
+
+		if ( componentType === 'int' || componentType === 'uint' ) return type;
+
+		return this.changeComponentType( type, 'int' );
+
+	}
+
+	getDataFromNode( node, shaderStage = this.shaderStage ) {
+
+		const cache = node.isGlobal( this ) ? this.globalCache : this.cache;
+
+		let nodeData = cache.getNodeData( node );
+
+		if ( nodeData === undefined ) {
+
+			nodeData = { vertex: {}, fragment: {}, compute: {} };
+
+			cache.setNodeData( node, nodeData );
+
+		}
+
+		return shaderStage !== null ? nodeData[ shaderStage ] : nodeData;
+
+	}
+
+	getNodeProperties( node, shaderStage = this.shaderStage ) {
+
+		const nodeData = this.getDataFromNode( node, shaderStage );
+
+		nodeData.properties ||= { outputNode: null };
+
+		return nodeData.properties;
+
+	}
+
+	getUniformFromNode( node, shaderStage, type ) {
+
+		const nodeData = this.getDataFromNode( node, shaderStage );
+
+		let nodeUniform = nodeData.uniform;
+
+		if ( nodeUniform === undefined ) {
+
+			const index = this.uniforms.index ++;
+
+			nodeUniform = new NodeUniform( 'nodeUniform' + index, type, node );
+
+			this.uniforms[ shaderStage ].push( nodeUniform );
+
+			nodeData.uniform = nodeUniform;
+
+		}
+
+		return nodeUniform;
+
+	}
+
+	getVarFromNode( node, type, shaderStage = this.shaderStage ) {
+
+		const nodeData = this.getDataFromNode( node, shaderStage );
+
+		let nodeVar = nodeData.variable;
+
+		if ( nodeVar === undefined ) {
+
+			const vars = this.vars[ shaderStage ];
+			const index = vars.length;
+
+			nodeVar = new NodeVar( 'nodeVar' + index, type );
+
+			vars.push( nodeVar );
+
+			nodeData.variable = nodeVar;
+
+		}
+
+		return nodeVar;
+
+	}
+
+	getVaryingFromNode( node, type ) {
+
+		const nodeData = this.getDataFromNode( node, null );
+
+		let nodeVarying = nodeData.varying;
+
+		if ( nodeVarying === undefined ) {
+
+			const varyings = this.varyings;
+			const index = varyings.length;
+
+			nodeVarying = new NodeVarying( 'nodeVarying' + index, type );
+
+			varyings.push( nodeVarying );
+
+			nodeData.varying = nodeVarying;
+
+		}
+
+		return nodeVarying;
+
+	}
+
+	getCodeFromNode( node, type, shaderStage = this.shaderStage ) {
+
+		const nodeData = this.getDataFromNode( node );
+
+		let nodeCode = nodeData.code;
+
+		if ( nodeCode === undefined ) {
+
+			const codes = this.codes[ shaderStage ];
+			const index = codes.length;
+
+			nodeCode = new NodeCode( 'nodeCode' + index, type );
+
+			codes.push( nodeCode );
+
+			nodeData.code = nodeCode;
+
+		}
+
+		return nodeCode;
+
+	}
+
+	addFlowCode( code ) {
+
+		this.flow.code += code;
+
+	}
+
+	getFlowData( node/*, shaderStage*/ ) {
+
+		return this.flowsData.get( node );
+
+	}
+
+	flowNode( node ) {
+
+		const output = node.getNodeType( this );
+
+		const flowData = this.flowChildNode( node, output );
+
+		this.flowsData.set( node, flowData );
+
+		return flowData;
+
+	}
+
+	flowChildNode( node, output = null ) {
+
+		const previousFlow = this.flow;
+
+		const flow = {
+			code: '',
+		};
+
+		this.flow = flow;
+
+		flow.result = node.build( this, output );
+
+		this.flow = previousFlow;
+
+		return flow;
+
+	}
+
+	flowNodeFromShaderStage( shaderStage, node, output = null, propertyName = null ) {
+
+		const previousShaderStage = this.shaderStage;
+
+		this.setShaderStage( shaderStage );
+
+		const flowData = this.flowChildNode( node, output );
+
+		if ( propertyName !== null ) {
+
+			flowData.code += `${propertyName} = ${flowData.result};\n\t`;
+
+		}
+
+		this.flowCode[ shaderStage ] = this.flowCode[ shaderStage ] + flowData.code;
+
+		this.setShaderStage( previousShaderStage );
+
+		return flowData;
+
+	}
+
+	getAttributes( /*shaderStage*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getVaryings( /*shaderStage*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getVars( shaderStage ) {
+
+		let snippet = '';
+
+		const vars = this.vars[ shaderStage ];
+
+		for ( const variable of vars ) {
+
+			snippet += `${variable.type} ${variable.name}; `;
+
+		}
+
+		return snippet;
+
+	}
+
+	getUniforms( /*shaderStage*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	getCodes( shaderStage ) {
+
+		const codes = this.codes[ shaderStage ];
+
+		let code = '';
+
+		for ( const nodeCode of codes ) {
+
+			code += nodeCode.code + '\n';
+
+		}
+
+		return code;
+
+	}
+
+	getHash() {
+
+		return this.vertexShader + this.fragmentShader + this.computeShader;
+
+	}
+
+	setShaderStage( shaderStage ) {
+
+		this.shaderStage = shaderStage;
+
+	}
+
+	getShaderStage() {
+
+		return this.shaderStage;
+
+	}
+
+	setBuildStage( buildStage ) {
+
+		this.buildStage = buildStage;
+
+	}
+
+	getBuildStage() {
+
+		return this.buildStage;
+
+	}
+
+	buildCode() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	build() {
+
+		// construct() -> stage 1: create possible new nodes and returns an output reference node
+		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
+		// generate()  -> stage 3: generate shader
+
+		for ( const buildStage of defaultBuildStages ) {
+
+			this.setBuildStage( buildStage );
+
+			if ( this.context.vertex && this.context.vertex.isNode ) {
+
+				this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
+
+			}
+
+			for ( const shaderStage of shaderStages ) {
+
+				this.setShaderStage( shaderStage );
+
+				const flowNodes = this.flowNodes[ shaderStage ];
+
+				for ( const node of flowNodes ) {
+
+					if ( buildStage === 'generate' ) {
+
+						this.flowNode( node );
+
+					} else {
+
+						node.build( this );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		this.setBuildStage( null );
+		this.setShaderStage( null );
+
+		// stage 4: build code for a specific output
+
+		this.buildCode();
+
+		return this;
+
+	}
+
+	format( snippet, fromType, toType ) {
+
+		fromType = this.getVectorType( fromType );
+		toType = this.getVectorType( toType );
+
+		if ( fromType === toType || toType === null || this.isReference( toType ) ) {
+
+			return snippet;
+
+		}
+
+		const fromTypeLength = this.getTypeLength( fromType );
+		const toTypeLength = this.getTypeLength( toType );
+
+		if ( fromTypeLength > 4 ) { // fromType is matrix-like
+
+			// @TODO: ignore for now
+
+			return snippet;
+
+		}
+
+		if ( toTypeLength > 4 || toTypeLength === 0 ) { // toType is matrix-like or unknown
+
+			// @TODO: ignore for now
+
+			return snippet;
+
+		}
+
+		if ( fromTypeLength === toTypeLength ) {
+
+			return `${ this.getType( toType ) }( ${ snippet } )`;
+
+		}
+
+		if ( fromTypeLength > toTypeLength ) {
+
+			return this.format( `${ snippet }.${ 'xyz'.slice( 0, toTypeLength ) }`, this.getTypeFromLength( toTypeLength ), toType );
+
+		}
+
+		if ( toTypeLength === 4 ) { // toType is vec4-like
+
+			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec3' ) }, 1.0 )`;
+
+		}
+
+		if ( fromTypeLength === 2 ) { // fromType is vec2-like and toType is vec3-like
+
+			return `${ this.getType( toType ) }( ${ this.format( snippet, fromType, 'vec2' ) }, 0.0 )`;
+
+		}
+
+		return `${ this.getType( toType ) }( ${ snippet } )`; // fromType is float-like
+
+	}
+
+	getSignature() {
+
+		return `// Three.js r${ REVISION } - NodeMaterial System\n`;
+
+	}
+
 }
 
-function sortByPosition( a, b ) {
-
-	return a.deps.length - b.deps.length;
-
-}
-
-export { NodeBuilder };
+export default NodeBuilder;

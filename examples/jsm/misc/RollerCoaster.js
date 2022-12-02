@@ -4,7 +4,7 @@ import {
 	Quaternion,
 	Raycaster,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 class RollerCoasterGeometry extends BufferGeometry {
 

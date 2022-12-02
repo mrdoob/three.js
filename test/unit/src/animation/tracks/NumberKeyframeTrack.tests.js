@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { NumberKeyframeTrack } from '../../../../../src/animation/tracks/NumberKeyframeTrack';
+// import { NumberKeyframeTrack } from '../../../../../src/animation/tracks/NumberKeyframeTrack.js';
 
 export default QUnit.module( 'Animation', () => {
 
@@ -10,7 +10,7 @@ export default QUnit.module( 'Animation', () => {
 
 			QUnit.todo( 'write me !', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

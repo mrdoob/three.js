@@ -11,31 +11,94 @@
 
 		<p class="desc"> A solver for IK with <a href="https://sites.google.com/site/auraliusproject/ccd-algorithm"><em>CCD Algorithm</em></a>. <br /><br />
 		[name] solves Inverse Kinematics Problem with CCD Algorithm.
-		[name] is designed to work with [page:SkinnedMesh] loaded by [page:MMDLoader] but also can be used for generic [page:SkinnedMesh].
+		[name] is designed to work with [page:SkinnedMesh] but also can be used with [page:MMDLoader] or [page:GLTFLoader] skeleton.
 		</p>
+
+		<iframe id="scene" src="scenes/ccdiksolver-browser.html"></iframe>
 
 		<h2>代码示例</h2>
 
 		<code>
-		const ikSolver;
+		let ikSolver;
 
-		// Load MMD resources and instantiate CCDIKSolver
-		new MMDLoader().load(
-			'models/mmd/miku.pmd',
-			function ( mesh ) {
+		//
+		// Bones hierarchy:
+		//
+		//   root
+		//     ├── bone0
+		//     │    └── bone1
+		//     │          └── bone2
+		//     │                └── bone3
+		//     └── target
+		//
+		// Positioned as follow on the cylinder:
+		//
+		//        o      <- target      (y =  20)
+		//        
+		//   +----o----+ <- bone3       (y =  12)
+		//   |         |
+		//   |    o    | <- bone2       (y =   4)
+		//   |         |
+		//   |    o    | <- bone1       (y =  -4)
+		//   |         |
+		//   +----oo---+ <- root, bone0 (y = -12)
+		//
 
-				ikSolver = new CCDIKSolver( mesh, mesh.geometry.iks );
-				scene.add( mesh );
+		let bones = []
 
+		// "root"
+		let rootBone = new Bone();
+		rootBone.position.y = -12;
+		bones.push( rootBone );
+
+		// "bone0"
+		let prevBone = new Bone();
+		prevBone.position.y = 0;
+		rootBone.add( prevBone );
+		bones.push( prevBone );
+
+		// "bone1", "bone2", "bone3"
+		for ( let i = 1; i <= 3; i ++ ) {
+			const bone = new Bone();
+			bone.position.y = 8;
+			bones.push( bone );
+			
+			prevBone.add( bone );
+			prevBone = bone;
+		}
+
+		// "target"
+		const targetBone = new Bone();
+		targetBone.position.y = 24 + 8
+		rootBone.add( targetBone );
+		bones.push( targetBone );
+
+		//
+		// skinned mesh
+		//
+
+		const mesh = new SkinnedMesh( geometry,	material );
+		const skeleton = new Skeleton( bones );
+
+		mesh.add( bones[ 0 ] ); // "root" bone
+		mesh.bind( skeleton );
+
+		//
+		// ikSolver
+		//
+
+		const iks = [
+			{
+				target: 5, // "target"
+				effector: 4, // "bone3"
+				links: [ { index: 3 }, { index: 2 }, { index: 1 } ] // "bone2", "bone1", "bone0"
 			}
-		);
+		];
+		ikSolver = new CCDIKSolver( mesh, iks );
 
 		function render() {
-
-			animate(); // update bones
-			if ( ikSolver !== undefined ) ikSolver.update();
+			ikSolver?.update();
 			renderer.render( scene, camera );
-
 		}
 		</code>
 
@@ -57,7 +120,7 @@
 		<ul>
 			<li>[page:Integer target] — Target bone.</li>
 			<li>[page:Integer effector] — Effector bone.</li>
-			<li>[page:Array links] — An array of [page: Object] specifying link bones.
+			<li>[page:Array links] — An array of [page:Object] specifying link bones.
 			<ul>
 				<li>[page:Integer index] — Link bone.</li>
 				<li>[page:Vector3 limitation] — (optional) Rotation axis. Default is undefined.</li>
@@ -90,12 +153,12 @@
 		Return [page:CCDIKHelper]. You can visualize IK bones by adding the helper to scene.
 		</p>
 
-		<h3>[method:CCDIKSolver update]()</h3>
+		<h3>[method:this update]()</h3>
 		<p>
-		Update bones quaternion by solving CCD algorithm.
+		Update IK bones quaternion by solving CCD algorithm.
 		</p>
 
-		<h3>[method:CCDIKSolver updateOne]( [param:Object ikParam] )</h3>
+		<h3>[method:this updateOne]( [param:Object ikParam] )</h3>
 		<p>
 		Update an IK bone quaternion by solving CCD algorithm.
 		</p>

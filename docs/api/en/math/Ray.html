@@ -32,7 +32,7 @@
 		<h2>Properties</h2>
 
 		<h3>[property:Vector3 origin]</h3>
-		<p>The origin of the [page:Ray]. Default is a [page:Vector3] at (0, 0, 0).</p>
+		<p>The origin of the [page:Ray]. Default is a [page:Vector3] at `(0, 0, 0)`.</p>
 
 		<h3>[property:Vector3 direction]</h3>
 		<p>
@@ -45,7 +45,7 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:Ray applyMatrix4]( [param:Matrix4 matrix4] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix4] )</h3>
 		<p>
 		[page:Matrix4 matrix4] - the [page:Matrix4] to apply to this [page:Ray].<br /><br />
 
@@ -73,7 +73,7 @@
 		Get the point along this [page:Ray] that is closest to the [page:Vector3] provided.
 		</p>
 
-		<h3>[method:Ray copy]( [param:Ray ray] )</h3>
+		<h3>[method:this copy]( [param:Ray ray] )</h3>
 		<p>
 			Copies the [page:.origin origin] and [page:.direction direction] properties
 			of [page:Ray ray] into this ray.
@@ -102,7 +102,7 @@
 		<p>
 		[page:Plane plane] - the [page:Plane] to get the distance to.<br /><br />
 
-		Get the distance from [page:.origin origin] to the [page:Plane], or *null* if the [page:Ray] doesn't intersect the [page:Plane].
+		Get the distance from [page:.origin origin] to the [page:Plane], or `null` if the [page:Ray] doesn't intersect the [page:Plane].
 		</p>
 
 		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
@@ -127,7 +127,7 @@
 		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Intersect this [page:Ray] with a [page:Box3], returning the intersection point or
-		*null* if there is no intersection.
+		`null` if there is no intersection.
 		</p>
 
 		<h3>[method:Vector3 intersectPlane]( [param:Plane plane], [param:Vector3 target] )</h3>
@@ -136,7 +136,7 @@
 		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Intersect this [page:Ray] with a [page:Plane], returning the intersection point or
-		*null* if there is no intersection.
+		`null` if there is no intersection.
 		</p>
 
 		<h3>[method:Vector3 intersectSphere]( [param:Sphere sphere], [param:Vector3 target] )</h3>
@@ -145,7 +145,7 @@
 		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
 		Intersect this [page:Ray] with a [page:Sphere], returning the intersection point or
-		*null* if there is no intersection.
+		`null` if there is no intersection.
 		</p>
 
 		<h3>[method:Vector3 intersectTriangle]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c], [param:Boolean backfaceCulling], [param:Vector3 target] )</h3>
@@ -154,7 +154,7 @@
 		[page:Boolean backfaceCulling] - whether to use backface culling.<br />
 		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		Intersect this [page:Ray] with a triangle, returning the intersection point or *null*
+		Intersect this [page:Ray] with a triangle, returning the intersection point or `null`
 		if there is no intersection.
 		</p>
 
@@ -179,21 +179,21 @@
 		Return true if this [page:Ray] intersects with the [page:Sphere].
 		</p>
 
-		<h3>[method:Ray lookAt]( [param:Vector3 v] )</h3>
+		<h3>[method:this lookAt]( [param:Vector3 v] )</h3>
 		<p>
 		[page:Vector3 v] - The [page:Vector3] to look at.<br /><br />
 
 		Adjusts the direction of the ray to point at the vector in world coordinates.
 		</p>
 
-		<h3>[method:Ray recast]( [param:Float t] )</h3>
+		<h3>[method:this recast]( [param:Float t] )</h3>
 		<p>
 		[page:Float t] - The distance along the [page:Ray] to interpolate.<br /><br />
 
 		Shift the origin of this [page:Ray] along its direction by the distance given.
 		</p>
 
-		<h3>[method:Ray set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
+		<h3>[method:this set]( [param:Vector3 origin], [param:Vector3 direction] )</h3>
 		<p>
 		[page:Vector3 origin] - the [page:.origin origin] of the [page:Ray].<br />
 		[page:Vector3 origin] - the [page:.direction direction] of the [page:Ray].

@@ -40,14 +40,6 @@
 			说明: 将混合器的时间比例设为0, 稍后再设置为1，可以暂停/取消暂停由该混合器控制的所有动作。
 		</p>
 
-		<h3>[method:AnimationMixer setTime]([param:Number timeInSeconds]) </h3>
-		<p>
-			设置全局混合器到一个给定的时间，并相应地更新动画。<br /><br />
-
-			当你需要在一个动画里跳转到一个精确的时间，该函数将是十分有用的。输入的参数将会被混合器的[page:.timeScale timeScale]进行缩放。
-		</p>
-
-
 		<h2>方法</h2>
 
 
@@ -70,30 +62,37 @@
 			返回混合器的根对象
 		</p>
 
-		<h3>[method:AnimationMixer stopAllAction]()</h3>
+		<h3>[method:this stopAllAction]()</h3>
 		<p>
 			停用混合器上所有预定的动作
 		</p>
 
-		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
+		<h3>[method:this update]([param:Number deltaTimeInSeconds]) </h3>
 		<p>
 			推进混合器时间并更新动画 <br /><br />
 
 			通常在渲染循环中完成, 传入按照混合器的时间比例([page:.timeScale timeScale])缩放过的[page:Clock.getDelta clock.getDelta]
 		</p>
 
-		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
+		<h3>[method:this setTime]([param:Number timeInSeconds]) </h3>
+		<p>
+			设置全局混合器到一个给定的时间，并相应地更新动画。<br /><br />
+
+			当你需要在一个动画里跳转到一个精确的时间，该函数将是十分有用的。输入的参数将会被混合器的[page:.timeScale timeScale]进行缩放。
+		</p>
+
+		<h3>[method:undefined uncacheClip]([param:AnimationClip clip])</h3>
 
 		<p>
 			释放剪辑的所有内存资源
 		</p>
 
-		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
+		<h3>[method:undefined uncacheRoot]([param:Object3D root]) </h3>
 		<p>
 			释放根对象的所有内存资源
 		</p>
 
-		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<h3>[method:undefined uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
 			释放动作的所有内存资源
 		</p>

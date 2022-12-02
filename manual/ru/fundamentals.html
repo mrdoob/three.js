@@ -1,0 +1,280 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Основы </title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Основы ">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="/manual/resources/lesson.css">
+    <link rel="stylesheet" href="/manual/resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Основы </h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p></p>
+<p>Это первая статья в серии статей о three.js.
+<a href="http://threejs.org">Three.js</a> это 3D-библиотека, которая максимально 
+упрощает создание 3D-контента на веб-странице.</p>
+<p>Three.js часто путают с WebGL, поскольку чаще всего, 
+но не всегда, three.js использует WebGL для рисования 3D.
+<a href="https://webglfundamentals.org">WebGL - это очень низкоуровневое api, рисующее только точки, линии и треугольники</a>. 
+Чтобы сделать что-нибудь полезное с WebGL, как правило, требуется немало кода, 
+и именно здесь приходит Three.js. Он обрабатывает такие вещи, как сцены, 
+источники света, тени, материалы, текстуры, 3D-математику, все, 
+что вам нужно было бы написать самостоятельно, если бы вы использовали WebGL напрямую.</p>
+<p>В этих руководствах предполагается, что вы уже знаете JavaScript, 
+и по большей части они будут использовать стандарт ES6+. <a href="prerequisites.html">Смотрите здесь 
+краткий список вещей, которые вы, как ожидается, уже знаете</a>. 
+Большинство браузеров, которые поддерживают three.js, 
+обновляются автоматически, поэтому большинство пользователей 
+должны иметь возможность запускать этот код. Если вы хотите, 
+чтобы этот код запускался в действительно старых браузерах, 
+посмотрите на транспайлер, такой как <a href="http://babeljs.io">Babel</a>.
+Конечно, пользователи, использующие действительно старые браузеры, 
+вероятно, имеют машины, которые не могут запускать three.js.</p>
+<p>При изучении большинства языков программирования первое, что делают люди, 
+это заставляют компьютер напечатать <code class="notranslate" translate="no">"Hello World!"</code>. Для 3D одна из самых 
+распространенных задач - создать 3D-куб, так что давайте начнем с <code class="notranslate" translate="no">"Hello Cube!"</code></p>
+<p>Первое, что нам нужно, это тэг <code class="notranslate" translate="no">&lt;canvas&gt;</code>:</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+</pre><p>Three.js будет рисовать на этом холсте, так что нам нужно найти 
+его и передать three.js.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;script type="module"&gt;
+import * as THREE from 'three';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas});
+  ...
+&lt;/script&gt;
+</pre><p>Обратите внимание, что здесь есть некоторые не явные детали. 
+Если вы не передадите холст в three.js, библиотека создаст его за вас, 
+но затем нужно будет добавить его в DOM. Место добавления 
+может меняться в зависимости от вашего варианта использования, 
+и вам придется изменить свой код, поэтому я считаю, что передача canvas 
+в three.js выглядит немного более гибкой. Я могу поместить холст где угодно, 
+и код найдет его там, как если бы у меня был код для вставки холста в документ, 
+и мне, вероятно, пришлось бы изменить этот код, если бы изменился мой вариант 
+использования.</p>
+<p>Когда канвас найден, мы создаем <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Renderer - это то, что отвечает 
+за фактическое получение всех предоставленных вами данных и их отрисовку 
+на холст. В прошлом были другие рендеры, такие как <code class="notranslate" translate="no">CSSRenderer</code>, 
+<code class="notranslate" translate="no">CanvasRenderer</code>, а в будущем могут быть
+<code class="notranslate" translate="no">WebGL2Renderer</code> или <code class="notranslate" translate="no">WebGPURenderer</code>. На данный момент есть <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>, 
+который использует WebGL для рисования 3D на холсте.</p>
+<p>Далее нам нужна камера.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const fov = 75;
+const aspect = 2;  // значение для canvas по умолчанию
+const near = 0.1;
+const far = 5;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+</pre><p><code class="notranslate" translate="no">fov</code> сокращение от <code class="notranslate" translate="no">field of view</code>, <a href="https://en.wikipedia.org/wiki/Field_of_view">поле зрения</a>. В этом случае 75 градусов в 
+вертикальном измерении. Обратите внимание, что большинство углов в Three.js 
+указаны в радианах, но по какой-то причине перспективная камера принимает градусы.</p>
+<p><code class="notranslate" translate="no">aspect</code> это <a href="https://ru.wikipedia.org/wiki/Соотношение_сторон_экрана">соотношение сторон холста</a> (англ. aspect ratio). Мы рассмотрим детали 
+в другой статье, но по умолчанию холст имеет размер 300x150 пикселей, 
+значит соотношение сторон 300/150 или 2.</p>
+<p><code class="notranslate" translate="no">near</code> и <code class="notranslate" translate="no">far</code> представляют пространство перед камерой, которое будет отображаться. 
+Все, что находится до или после этого диапазона, будет обрезано (не нарисовано).</p>
+<p>Эти 4 параметра определяют <a href="https://ru.wikipedia.org/wiki/Усечённая_пирамида">усеченную пирамиду</a> <em>"frustum"</em>. <em>Frustum</em> это 
+название 3D фигуры, напоминающей пирамиду с отсеченной верхушкой. Другими словами, 
+думайте о слове "frustum" как о трехмерной фигуре,
+такой как сфера, куб и призма.</p>
+<p><img src="../resources/frustum-3d.svg" width="500" class="threejs_center"></p>
+<p>Высота ближней и дальней плоскостей определяется полем зрения (field of view). 
+Ширина обеих плоскостей определяется полем зрения и соотношением сторон (aspect).</p>
+<p>Все, что находится внутри определенного усеченного контура, будет нарисовано. 
+Снаружи ничего не будет.</p>
+<p>По умолчанию камера смотрит вниз по оси -Z и вверх по оси +Y. Мы поместим наш куб 
+в начало координат (origin), поэтому нам нужно немного отодвинуть камеру назад, 
+чтобы что-то увидеть.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">camera.position.z = 2;
+</pre><p>Вот как мы её направили.</p>
+<p><img src="../resources/scene-down.svg" width="500" class="threejs_center"></p>
+<p>На диаграмме выше мы видим, что наша камера находится в <code class="notranslate" translate="no">z = 2</code>. И смотрит вниз по оси -Z. 
+Усеченная пирамида начинается с 0.1 единицы спереди камеры и до 5 единиц перед камерой. 
+Поскольку на этой диаграмме мы смотрим вниз, поле зрения (fov) зависит от отношения 
+сторон (aspect). Так как ширина холста в 2 раза больше высоты, при просмотре поле обзора 
+будет намного шире, чем указанные нами 75 градусов, которые являются вертикальным 
+полем зрения.</p>
+<p>Далее создадим <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> в three.js корень формы графа сцены. 
+Все, что вы хотите нарисовать необходимо добавить на сцену. Мы рассмотрим подробнее, 
+<a href="scenegraph.html">как работают сцены, в следующей статье</a>.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const scene = new THREE.Scene();
+</pre><p>Далее мы создаем <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> который содержит данные для <a href="https://ru.wikipedia.org/wiki/Прямоугольный_параллелепипед">прямоугольного параллелепипеда</a>. 
+Почти все, что мы хотим отобразить в Three.js, нуждается в геометрии, 
+которая определяет вершины нашего трехмерного объекта.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+</pre><p>Затем мы создаем основной материал и устанавливаем его цвет. 
+Цвета могут быть определены с использованием 6-значных шестнадцатеричных 
+значений цвета, как в CSS.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
+</pre><p>Затем мы создаем <a href="https://ru.wikipedia.org/wiki/Полигональная_сетка">полигональную сетку</a> 
+<a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> в three.js представляет комбинацию 
+формы объекта <code class="notranslate" translate="no">Geometry</code> и <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> (как нарисовать объект, 
+блестящий или плоский, какой цвет, какую текстуру(ры) применить и т.д.)
+а также положение, ориентацию, и масштаб этого объекта в сцене.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const cube = new THREE.Mesh(geometry, material);
+</pre><p>И, наконец, мы добавляем <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> на сцену</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">scene.add(cube);
+</pre><p>Затем мы можем отрендерить сцену, вызвав функцию <code class="notranslate" translate="no">render</code> рендерера 
+передав ей сцену и камеру.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">renderer.render(scene, camera);
+</pre><p>Вот рабочий пример</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/fundamentals.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Трудно сказать, что это 3D-куб, так как мы видим его непосредственно по оси 
+-Z, а сам куб выровнен по этой оси, поэтому мы видим только одну грань.</p>
+<p>Давайте оживим его, и, надеюсь, это прояснит, что он рисуется в 3D. Для его 
+анимации мы будем отрисовывать внутри цикла отрисовки, используя
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame"><code class="notranslate" translate="no">requestAnimationFrame</code></a>.</p>
+<p>Вот наш цикл</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;  // конвертировать время в секунды
+
+  cube.rotation.x = time;
+  cube.rotation.y = time;
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</pre><p><code class="notranslate" translate="no">requestAnimationFrame</code> это запрос к браузеру, что вы хотите что-то анимировать.
+Вы передаете ему функцию для вызова. В нашем случае эта функция <code class="notranslate" translate="no">render</code>. 
+Браузер вызовет вашу функцию, и если вы обновите что-либо, связанное с 
+отображением страницы, браузер выполнит перерисовку страницы. 
+В нашем случае мы вызываем <code class="notranslate" translate="no">renderer.render</code>, которая нарисует нашу сцену.</p>
+<p><code class="notranslate" translate="no">requestAnimationFrame</code> передает время с момента загрузки страницы в нашу функцию. 
+Это время приходит в миллисекундах. Я считаю, что работать с секундами намного проще, 
+поэтому здесь мы конвертируем время в секунды.</p>
+<p>Затем мы устанавливаем вращение куба по X и Y на текущее время. Эти повороты в 
+<a href="https://ru.wikipedia.org/wiki/Радиан">радианах</a>. В круге 2 пи радиана, 
+поэтому наш куб должен повернуться вокруг каждой оси примерно за 6.28
+секунд.</p>
+<p>Затем мы отрисовываем сцену и запрашиваем еще один кадр анимации, 
+чтобы продолжить наш цикл.</p>
+<p>Вне цикла мы вызываем <code class="notranslate" translate="no">requestAnimationFrame</code> один раз, чтобы запустить цикл.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-with-animation.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/fundamentals-with-animation.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Это немного лучше, но все еще трудно увидеть 3d. Что может помочь, так это 
+добавить немного освещения, поэтому давайте добавим источник света. 
+В Three.js есть много разных источников света, о которых мы поговорим в 
+следующей статье. А пока давайте создадим направленный свет.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(-1, 2, 4);
+  scene.add(light);
+}
+</pre><p>Направленные источники имеет положение и цель. Оба по умолчанию равны 0, 0, 0. В нашем
+случае мы устанавливаем положение источника света на -1, 2, 4 чтобы оно было немного слева, 
+сверху и позади нашей камеры. Цель по-прежнему 0, 0, 0, поэтому они будут светить 
+в направлении начала координат.</p>
+<p>Нам также нужно изменить материал. <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> не воспреимчив к свету. 
+Давайте изменим его на <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>, который отражает свет.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
++const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
+</pre><p>И вот оно работает.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-with-light.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/fundamentals-with-light.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Теперь должно быть довольно четко видно 3D.</p>
+<p>Просто для удовольствия добавим еще 2 кубика.</p>
+<p>Мы будем использовать одну и ту же геометрию для каждого куба, но 
+создадим другой материал, чтобы каждый куб мог иметь свой цвет.</p>
+<p>Сначала мы сделаем функцию, которая создает новый материал с указанным цветом. 
+Затем создает mesh, используя указанную геометрию, добавляет ее к сцене и 
+устанавливает ей позицию X.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  cube.position.x = x;
+
+  return cube;
+}
+</pre><p>Затем мы будем вызывать его 3 раза с 3 разными цветами и позициями X, 
+сохраняя экземпляры <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> в массив.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const cubes = [
+  makeInstance(geometry, 0x44aa88,  0),
+  makeInstance(geometry, 0x8844aa, -2),
+  makeInstance(geometry, 0xaa8844,  2),
+];
+</pre><p>Наконец, мы закрутим все 3 куба в нашей функции отрисовки. 
+Мы рассчитываем немного разные коэффициенты вращения для каждого.</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;  // конвертировать время в секунды
+
+  cubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  ...
+</pre><p>и вот оно.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-3-cubes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/fundamentals-3-cubes.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Если вы сравните его с диаграммой сверху вниз, вы увидите, что она соответствует 
+нашим ожиданиям. С кубами в X = -2 и X = +2 они частично находятся вне нашей 
+усеченной пирамиды. Они также несколько искривлены, так как 
+поле зрения на холсте очень велико.</p>
+<p>Я надеюсь, что это короткое вступление поможет вам начать изучение. 
+<a href="responsive.html">Далее мы рассмотрим, как сделать отзывчивый дизайн, чтобы код можно было применять 
+к различным ситуациям</a>.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="/manual/resources/prettify.js"></script>
+  <script src="/manual/resources/lesson.js"></script>
+
+
+
+
+</body></html>

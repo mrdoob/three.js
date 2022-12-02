@@ -7,16 +7,16 @@ export default /* glsl */`
 
 		uniform float morphTargetInfluences[ MORPHTARGETS_COUNT ];
 		uniform sampler2DArray morphTargetsTexture;
-		uniform vec2 morphTargetsTextureSize;
+		uniform ivec2 morphTargetsTextureSize;
 
-		vec3 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset, const in int stride ) {
+		vec4 getMorph( const in int vertexIndex, const in int morphTargetIndex, const in int offset ) {
 
-			float texelIndex = float( vertexIndex * stride + offset );
-			float y = floor( texelIndex / morphTargetsTextureSize.x );
-			float x = texelIndex - y * morphTargetsTextureSize.x;
+			int texelIndex = vertexIndex * MORPHTARGETS_TEXTURE_STRIDE + offset;
+			int y = texelIndex / morphTargetsTextureSize.x;
+			int x = texelIndex - y * morphTargetsTextureSize.x;
 
-			vec3 morphUV = vec3( ( x + 0.5 ) / morphTargetsTextureSize.x, y / morphTargetsTextureSize.y, morphTargetIndex );
-			return texture( morphTargetsTexture, morphUV ).xyz;
+			ivec3 morphUV = ivec3( x, y, morphTargetIndex );
+			return texelFetch( morphTargetsTexture, morphUV, 0 );
 
 		}
 

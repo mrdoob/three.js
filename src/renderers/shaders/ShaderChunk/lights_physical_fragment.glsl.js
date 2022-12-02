@@ -11,10 +11,12 @@ material.roughness = min( material.roughness, 1.0 );
 
 #ifdef IOR
 
+	material.ior = ior;
+
 	#ifdef SPECULAR
 
 		float specularIntensityFactor = specularIntensity;
-		vec3 specularTintFactor = specularTint;
+		vec3 specularColorFactor = specularColor;
 
 		#ifdef USE_SPECULARINTENSITYMAP
 
@@ -22,9 +24,9 @@ material.roughness = min( material.roughness, 1.0 );
 
 		#endif
 
-		#ifdef USE_SPECULARTINTMAP
+		#ifdef USE_SPECULARCOLORMAP
 
-			specularTintFactor *= specularTintMapTexelToLinear( texture2D( specularTintMap, vUv ) ).rgb;
+			specularColorFactor *= texture2D( specularColorMap, vUv ).rgb;
 
 		#endif
 
@@ -33,12 +35,12 @@ material.roughness = min( material.roughness, 1.0 );
 	#else
 
 		float specularIntensityFactor = 1.0;
-		vec3 specularTintFactor = vec3( 1.0 );
+		vec3 specularColorFactor = vec3( 1.0 );
 		material.specularF90 = 1.0;
 
 	#endif
 
-	material.specularColor = mix( min( pow2( ( ior - 1.0 ) / ( ior + 1.0 ) ) * specularTintFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
+	material.specularColor = mix( min( pow2( ( material.ior - 1.0 ) / ( material.ior + 1.0 ) ) * specularColorFactor, vec3( 1.0 ) ) * specularIntensityFactor, diffuseColor.rgb, metalnessFactor );
 
 #else
 
@@ -73,10 +75,46 @@ material.roughness = min( material.roughness, 1.0 );
 
 #endif
 
+#ifdef USE_IRIDESCENCE
+
+	material.iridescence = iridescence;
+	material.iridescenceIOR = iridescenceIOR;
+
+	#ifdef USE_IRIDESCENCEMAP
+
+		material.iridescence *= texture2D( iridescenceMap, vUv ).r;
+
+	#endif
+
+	#ifdef USE_IRIDESCENCE_THICKNESSMAP
+
+		material.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vUv ).g + iridescenceThicknessMinimum;
+
+	#else
+
+		material.iridescenceThickness = iridescenceThicknessMaximum;
+
+	#endif
+
+#endif
+
 #ifdef USE_SHEEN
 
-	material.sheenTint = sheenTint;
+	material.sheenColor = sheenColor;
+
+	#ifdef USE_SHEENCOLORMAP
+
+		material.sheenColor *= texture2D( sheenColorMap, vUv ).rgb;
+
+	#endif
+
 	material.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );
+
+	#ifdef USE_SHEENROUGHNESSMAP
+
+		material.sheenRoughness *= texture2D( sheenRoughnessMap, vUv ).a;
+
+	#endif
 
 #endif
 `;

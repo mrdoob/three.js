@@ -2,20 +2,17 @@ import {
 	AdditiveBlending,
 	Color,
 	DoubleSide,
-	LinearFilter,
 	Matrix4,
-	MeshBasicMaterial,
 	MeshDepthMaterial,
 	NoBlending,
 	RGBADepthPacking,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector2,
 	Vector3,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 class OutlinePass extends Pass {
@@ -41,14 +38,10 @@ class OutlinePass extends Pass {
 
 		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
 
-		const pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
-
 		const resx = Math.round( this.resolution.x / this.downSampleRatio );
 		const resy = Math.round( this.resolution.y / this.downSampleRatio );
 
-		this.maskBufferMaterial = new MeshBasicMaterial( { color: 0xffffff } );
-		this.maskBufferMaterial.side = DoubleSide;
-		this.renderTargetMaskBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
+		this.renderTargetMaskBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y );
 		this.renderTargetMaskBuffer.texture.name = 'OutlinePass.mask';
 		this.renderTargetMaskBuffer.texture.generateMipmaps = false;
 
@@ -61,26 +54,26 @@ class OutlinePass extends Pass {
 		this.prepareMaskMaterial.side = DoubleSide;
 		this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ( this.prepareMaskMaterial.fragmentShader, this.renderCamera );
 
-		this.renderTargetDepthBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y, pars );
+		this.renderTargetDepthBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y );
 		this.renderTargetDepthBuffer.texture.name = 'OutlinePass.depth';
 		this.renderTargetDepthBuffer.texture.generateMipmaps = false;
 
-		this.renderTargetMaskDownSampleBuffer = new WebGLRenderTarget( resx, resy, pars );
+		this.renderTargetMaskDownSampleBuffer = new WebGLRenderTarget( resx, resy );
 		this.renderTargetMaskDownSampleBuffer.texture.name = 'OutlinePass.depthDownSample';
 		this.renderTargetMaskDownSampleBuffer.texture.generateMipmaps = false;
 
-		this.renderTargetBlurBuffer1 = new WebGLRenderTarget( resx, resy, pars );
+		this.renderTargetBlurBuffer1 = new WebGLRenderTarget( resx, resy );
 		this.renderTargetBlurBuffer1.texture.name = 'OutlinePass.blur1';
 		this.renderTargetBlurBuffer1.texture.generateMipmaps = false;
-		this.renderTargetBlurBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), pars );
+		this.renderTargetBlurBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ) );
 		this.renderTargetBlurBuffer2.texture.name = 'OutlinePass.blur2';
 		this.renderTargetBlurBuffer2.texture.generateMipmaps = false;
 
 		this.edgeDetectionMaterial = this.getEdgeDetectionMaterial();
-		this.renderTargetEdgeBuffer1 = new WebGLRenderTarget( resx, resy, pars );
+		this.renderTargetEdgeBuffer1 = new WebGLRenderTarget( resx, resy );
 		this.renderTargetEdgeBuffer1.texture.name = 'OutlinePass.edge1';
 		this.renderTargetEdgeBuffer1.texture.generateMipmaps = false;
-		this.renderTargetEdgeBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), pars );
+		this.renderTargetEdgeBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ) );
 		this.renderTargetEdgeBuffer2.texture.name = 'OutlinePass.edge2';
 		this.renderTargetEdgeBuffer2.texture.generateMipmaps = false;
 
@@ -98,7 +91,6 @@ class OutlinePass extends Pass {
 		this.overlayMaterial = this.getOverlayMaterial();
 
 		// copy material
-		if ( CopyShader === undefined ) console.error( 'THREE.OutlinePass relies on CopyShader' );
 
 		const copyShader = CopyShader;
 
@@ -129,7 +121,7 @@ class OutlinePass extends Pass {
 
 		function replaceDepthToViewZ( string, camera ) {
 
-			var type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
+			const type = camera.isPerspectiveCamera ? 'perspective' : 'orthographic';
 
 			return string.replace( /DEPTH_TO_VIEW_Z/g, type + 'DepthToViewZ' );
 
@@ -146,6 +138,16 @@ class OutlinePass extends Pass {
 		this.renderTargetBlurBuffer2.dispose();
 		this.renderTargetEdgeBuffer1.dispose();
 		this.renderTargetEdgeBuffer2.dispose();
+
+		this.depthMaterial.dispose();
+		this.prepareMaskMaterial.dispose();
+		this.edgeDetectionMaterial.dispose();
+		this.separableBlurMaterial1.dispose();
+		this.separableBlurMaterial2.dispose();
+		this.overlayMaterial.dispose();
+		this.materialCopy.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 
@@ -453,7 +455,17 @@ class OutlinePass extends Pass {
 					#include <project_vertex>
 
 					vPosition = mvPosition;
-					vec4 worldPosition = modelMatrix * vec4( transformed, 1.0 );
+
+					vec4 worldPosition = vec4( transformed, 1.0 );
+
+					#ifdef USE_INSTANCING
+
+						worldPosition = instanceMatrix * worldPosition;
+
+					#endif
+					
+					worldPosition = modelMatrix * worldPosition;
+
 					projTexCoord = textureMatrix * worldPosition;
 
 				}`,
@@ -562,12 +574,14 @@ class OutlinePass extends Pass {
 
 				void main() {
 					vec2 invSize = 1.0 / texSize;
-					float weightSum = gaussianPdf(0.0, kernelRadius);
+					float sigma = kernelRadius/2.0;
+					float weightSum = gaussianPdf(0.0, sigma);
 					vec4 diffuseSum = texture2D( colorTexture, vUv) * weightSum;
 					vec2 delta = direction * invSize * kernelRadius/float(MAX_RADIUS);
 					vec2 uvOffset = delta;
 					for( int i = 1; i <= MAX_RADIUS; i ++ ) {
-						float w = gaussianPdf(uvOffset.x, kernelRadius);
+						float x = kernelRadius * float(i) / float(MAX_RADIUS);
+						float w = gaussianPdf(x, sigma);
 						vec4 sample1 = texture2D( colorTexture, vUv + uvOffset);
 						vec4 sample2 = texture2D( colorTexture, vUv - uvOffset);
 						diffuseSum += ((sample1 + sample2) * w);

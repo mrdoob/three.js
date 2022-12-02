@@ -63,37 +63,37 @@
 			إرجاع جذركائن الخالط.
 		</p>
 
-		<h3>[method:AnimationMixer stopAllAction]()</h3>
+		<h3>[method:this stopAllAction]()</h3>
 		<p>
 			يقوم بإلغاء تنشيط كافة الإجراءات المجدولة مسبقًا على هذا الخالط.
 		</p>
 
-		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
+		<h3>[method:this update]([param:Number deltaTimeInSeconds]) </h3>
 		<p>
 			يعمل على تقدم وقت الخالط العالمي وتحديث الرسوم المتحركة.<br /><br />
 
 			يتم ذلك عادةً في حلقة العرض ، حيث يتم تمرير [page:Clock.getDelta clock.getDelta] مقياسًا بواسطة جهاز الخلاط [page:.timeScale timeScale]).
 		</p>
 
-		<h3>[method:AnimationMixer setTime]([param:Number timeInSeconds]) </h3>
+		<h3>[method:this setTime]([param:Number timeInSeconds]) </h3>
 		<p>
 			يضبط الخالط العام على وقت محدد ويقوم بتحديث الرسوم المتحركة وفقًا لذلك.<br /><br />
 
 			يكون هذا مفيدًا عندما تحتاج إلى الانتقال إلى وقت محدد في رسم متحرك. سيتم قياس القيمة المدخلة حسب مقياس الوقت لجهاز الخالط [page:.timeScale timeScale].
 		</p>
 
-		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
+		<h3>[method:undefined uncacheClip]([param:AnimationClip clip])</h3>
 
 		<p>
 			إلغاء تخصيص كل موارد الذاكرة لمقطع.
 		</p>
 
-		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
+		<h3>[method:undefined uncacheRoot]([param:Object3D root]) </h3>
 		<p>
 			إلغاء تخصيص كافة موارد الذاكرة لكائن جذر.
 		</p>
 
-		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<h3>[method:undefined uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
 			إلغاء تخصيص كل موارد الذاكرة لإجراء ما.
 		</p>

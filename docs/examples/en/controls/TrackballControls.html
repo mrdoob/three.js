@@ -64,7 +64,7 @@
 
 		<h3>[property:Number dynamicDampingFactor]</h3>
 		<p>
-			Defines the intensity of damping. Only considered if [page:.staticMoving staticMoving] is set to *false*. Default is *0.2*.
+			Defines the intensity of damping. Only considered if [page:.staticMoving staticMoving] is set to `false`. Default is `0.2`.
 		</p>
 
 		<h3>[property:Boolean enabled]</h3>
@@ -85,7 +85,7 @@
 
 		<h3>[property:Number maxDistance]</h3>
 		<p>
-			How far you can zoom out. Default is *Infinity*.
+			How far you can zoom out. Default is `Infinity`.
 		</p>
 
 		<h3>[property:Number minDistance]</h3>
@@ -98,25 +98,25 @@
 		<p>
 			This object contains references to the mouse actions used by the controls.
 			<ul>
-				<li>.LEFT is assigned with *THREE.MOUSE.ROTATE*</li>
-				<li>.MIDDLE is assigned with *THREE.MOUSE.ZOOM*</li>
-				<li>.RIGHT is assigned with *THREE.MOUSE.PAN*</li>
+				<li>.LEFT is assigned with `THREE.MOUSE.ROTATE`</li>
+				<li>.MIDDLE is assigned with `THREE.MOUSE.ZOOM`</li>
+				<li>.RIGHT is assigned with `THREE.MOUSE.PAN`</li>
 			</ul>
 		</p>
 
 		<h3>[property:Boolean noPan]</h3>
 		<p>
-			Whether or not panning is disabled. Default is *false*.
+			Whether or not panning is disabled. Default is `false`.
 		</p>
 
 		<h3>[property:Boolean noRotate]</h3>
 		<p>
-			Whether or not rotation is disabled. Default is *false*.
+			Whether or not rotation is disabled. Default is `false`.
 		</p>
 
 		<h3>[property:Boolean noZoom]</h3>
 		<p>
-			Whether or not zooming is disabled. Default is *false*.
+			Whether or not zooming is disabled. Default is `false`.
 		</p>
 
 		<h3>[property:Camera object]</h3>
@@ -126,12 +126,12 @@
 
 		<h3>[property:Number panSpeed]</h3>
 		<p>
-			The pan speed. Default is *0.3*.
+			The pan speed. Default is `0.3`.
 		</p>
 
 		<h3>[property:Number rotateSpeed]</h3>
 		<p>
-			The rotation speed. Default is *1.0*.
+			The rotation speed. Default is `1.0`.
 		</p>
 
 		<h3>[property:Object screen]</h3>
@@ -147,52 +147,52 @@
 
 		<h3>[property:Boolean staticMoving]</h3>
 		<p>
-			Whether or not damping is disabled. Default is *false*.
+			Whether or not damping is disabled. Default is `false`.
 		</p>
 
 		<h3>[property:Number zoomSpeed]</h3>
 		<p>
-			The zoom speed. Default is *1.2*.
+			The zoom speed. Default is `1.2`.
 		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:null checkDistances] ()</h3>
+		<h3>[method:undefined checkDistances] ()</h3>
 		<p>
 			Ensures the controls stay in the range [minDistance, maxDistance]. Called by [page:.update update]().
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			Should be called if the controls is no longer required.
 		</p>
 
-		<h3>[method:null handleResize] ()</h3>
+		<h3>[method:undefined handleResize] ()</h3>
 		<p>
 			Should be called if the application window is resized.
 		</p>
 
-		<h3>[method:null panCamera] ()</h3>
+		<h3>[method:undefined panCamera] ()</h3>
 		<p>
 			Performs panning if necessary. Called by [page:.update update]().
 		</p>
 
-		<h3>[method:null reset] ()</h3>
+		<h3>[method:undefined reset] ()</h3>
 		<p>
 			Resets the controls to its initial state.
 		</p>
 
-		<h3>[method:null rotateCamera] ()</h3>
+		<h3>[method:undefined rotateCamera] ()</h3>
 		<p>
 			Rotates the camera if necessary. Called by [page:.update update]().
 		</p>
 
-		<h3>[method:null update] ()</h3>
+		<h3>[method:undefined update] ()</h3>
 		<p>
 			Updates the controls. Usually called in the animation loop.
 		</p>
 
-		<h3>[method:null zoomCamera] ()</h3>
+		<h3>[method:undefined zoomCamera] ()</h3>
 		<p>
 			Performs zooming if necessary. Called by [page:.update update]().
 		</p>

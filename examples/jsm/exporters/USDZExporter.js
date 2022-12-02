@@ -1,8 +1,12 @@
+import {
+	DoubleSide
+} from 'three';
+
 import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-	async parse( scene ) {
+	async parse( scene, options = { ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'horizontal' } } } ) {
 
 		const files = {};
 		const modelFileName = 'model.usda';
@@ -12,36 +16,53 @@ class USDZExporter {
 
 		let output = buildHeader();
 
+		output += buildSceneStart( options );
+
 		const materials = {};
 		const textures = {};
 
 		scene.traverseVisible( ( object ) => {
 
-			if ( object.isMesh && object.material.isMeshStandardMaterial ) {
+			if ( object.isMesh ) {
 
 				const geometry = object.geometry;
 				const material = object.material;
 
-				const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
+				if ( material.isMeshStandardMaterial ) {
 
-				if ( ! ( geometryFileName in files ) ) {
+					const geometryFileName = 'geometries/Geometry_' + geometry.id + '.usd';
 
-					const meshObject = buildMeshObject( geometry );
-					files[ geometryFileName ] = buildUSDFileAsString( meshObject );
+					if ( ! ( geometryFileName in files ) ) {
+
+						const meshObject = buildMeshObject( geometry );
+						files[ geometryFileName ] = buildUSDFileAsString( meshObject );
+
+					}
+
+					if ( ! ( material.uuid in materials ) ) {
+
+						materials[ material.uuid ] = material;
+
+					}
+
+					output += buildXform( object, geometry, material );
+
+				} else {
+
+					console.warn( 'THREE.USDZExporter: Unsupported material type (USDZ only supports MeshStandardMaterial)', object );
 
 				}
 
-				if ( ! ( material.uuid in materials ) ) {
+			} else if ( object.isCamera ) {
 
-					materials[ material.uuid ] = material;
-
-				}
-
-				output += buildXform( object, geometry, material );
+				output += buildCamera( object );
 
 			}
 
 		} );
+
+
+		output += buildSceneEnd();
 
 		output += buildMaterials( materials, textures );
 
@@ -158,6 +179,40 @@ function buildHeader() {
 
 }
 
+function buildSceneStart( options ) {
+
+	return `def Xform "Root"
+{
+    def Scope "Scenes" (
+        kind = "sceneLibrary"
+    )
+    {
+        def Xform "Scene" (
+            customData = {
+                bool preliminary_collidesWithEnvironment = 0
+                string sceneName = "Scene"
+            }
+            sceneName = "Scene"
+        )
+        {
+        token preliminary:anchoring:type = "${options.ar.anchoring.type}"
+        token preliminary:planeAnchoring:alignment = "${options.ar.planeAnchoring.alignment}"
+
+`;
+
+}
+
+function buildSceneEnd() {
+
+	return `
+        }
+    }
+}
+
+`;
+
+}
+
 function buildUSDFileAsString( dataToInsert ) {
 
 	let output = buildHeader();
@@ -247,7 +302,7 @@ function buildMesh( geometry ) {
 
 function buildMeshVertexCount( geometry ) {
 
-	const count = geometry.index !== null ? geometry.index.array.length : geometry.attributes.position.count;
+	const count = geometry.index !== null ? geometry.index.count : geometry.attributes.position.count;
 
 	return Array( count / 3 ).fill( 3 ).join( ', ' );
 
@@ -255,18 +310,26 @@ function buildMeshVertexCount( geometry ) {
 
 function buildMeshVertexIndices( geometry ) {
 
-	if ( geometry.index !== null ) {
-
-		return geometry.index.array.join( ', ' );
-
-	}
-
+	const index = geometry.index;
 	const array = [];
-	const length = geometry.attributes.position.count;
 
-	for ( let i = 0; i < length; i ++ ) {
+	if ( index !== null ) {
 
-		array.push( i );
+		for ( let i = 0; i < index.count; i ++ ) {
+
+			array.push( index.getX( i ) );
+
+		}
+
+	} else {
+
+		const length = geometry.attributes.position.count;
+
+		for ( let i = 0; i < length; i ++ ) {
+
+			array.push( i );
+
+		}
 
 	}
 
@@ -284,11 +347,14 @@ function buildVector3Array( attribute, count ) {
 	}
 
 	const array = [];
-	const data = attribute.array;
 
-	for ( let i = 0; i < data.length; i += 3 ) {
+	for ( let i = 0; i < attribute.count; i ++ ) {
 
-		array.push( `(${ data[ i + 0 ].toPrecision( PRECISION ) }, ${ data[ i + 1 ].toPrecision( PRECISION ) }, ${ data[ i + 2 ].toPrecision( PRECISION ) })` );
+		const x = attribute.getX( i );
+		const y = attribute.getY( i );
+		const z = attribute.getZ( i );
+
+		array.push( `(${ x.toPrecision( PRECISION ) }, ${ y.toPrecision( PRECISION ) }, ${ z.toPrecision( PRECISION ) })` );
 
 	}
 
@@ -306,11 +372,13 @@ function buildVector2Array( attribute, count ) {
 	}
 
 	const array = [];
-	const data = attribute.array;
 
-	for ( let i = 0; i < data.length; i += 2 ) {
+	for ( let i = 0; i < attribute.count; i ++ ) {
 
-		array.push( `(${ data[ i + 0 ].toPrecision( PRECISION ) }, ${ 1 - data[ i + 1 ].toPrecision( PRECISION ) })` );
+		const x = attribute.getX( i );
+		const y = attribute.getY( i );
+
+		array.push( `(${ x.toPrecision( PRECISION ) }, ${ 1 - y.toPrecision( PRECISION ) })` );
 
 	}
 
@@ -381,13 +449,32 @@ function buildMaterial( material, textures ) {
             float outputs:g
             float outputs:b
             float3 outputs:rgb
+            ${ material.transparent || material.alphaTest > 0.0 ? 'float outputs:a' : '' }
         }`;
+
+	}
+
+
+	if ( material.side === DoubleSide ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support double sided materials', material );
 
 	}
 
 	if ( material.map !== null ) {
 
 		inputs.push( `${ pad }color3f inputs:diffuseColor.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:rgb>` );
+
+		if ( material.transparent ) {
+
+			inputs.push( `${ pad }float inputs:opacity.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:a>` );
+
+		} else if ( material.alphaTest > 0.0 ) {
+
+			inputs.push( `${ pad }float inputs:opacity.connect = </Materials/Material_${ material.id }/Texture_${ material.map.id }_diffuse.outputs:a>` );
+			inputs.push( `${ pad }float inputs:opacityThreshold = ${material.alphaTest}` );
+
+		}
 
 		samplers.push( buildTexture( material.map, 'diffuse', material.color ) );
 
@@ -508,6 +595,55 @@ function buildColor( color ) {
 function buildVector2( vector ) {
 
 	return `(${ vector.x }, ${ vector.y })`;
+
+}
+
+
+function buildCamera( camera ) {
+
+	const name = camera.name ? camera.name : 'Camera_' + camera.id;
+
+	const transform = buildMatrix( camera.matrixWorld );
+
+	if ( camera.matrixWorld.determinant() < 0 ) {
+
+		console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', camera );
+
+	}
+
+	if ( camera.isOrthographicCamera ) {
+
+		return `def Camera "${name}"
+		{
+			matrix4d xformOp:transform = ${ transform }
+			uniform token[] xformOpOrder = ["xformOp:transform"]
+	
+			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
+			float horizontalAperture = ${ ( ( Math.abs( camera.left ) + Math.abs( camera.right ) ) * 10 ).toPrecision( PRECISION ) }
+			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
+			token projection = "orthographic"
+		}
+	
+	`;
+
+	} else {
+
+		return `def Camera "${name}"
+		{
+			matrix4d xformOp:transform = ${ transform }
+			uniform token[] xformOpOrder = ["xformOp:transform"]
+	
+			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
+			float focalLength = ${ camera.getFocalLength().toPrecision( PRECISION ) }
+			float focusDistance = ${ camera.focus.toPrecision( PRECISION ) }
+			float horizontalAperture = ${ camera.getFilmWidth().toPrecision( PRECISION ) }
+			token projection = "perspective"
+			float verticalAperture = ${ camera.getFilmHeight().toPrecision( PRECISION ) }
+		}
+	
+	`;
+
+	}
 
 }
 

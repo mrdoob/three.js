@@ -2,6 +2,8 @@ class GLBufferAttribute {
 
 	constructor( buffer, type, itemSize, elementSize, count ) {
 
+		this.isGLBufferAttribute = true;
+
 		this.buffer = buffer;
 		this.type = type;
 		this.itemSize = itemSize;
@@ -52,7 +54,5 @@ class GLBufferAttribute {
 	}
 
 }
-
-GLBufferAttribute.prototype.isGLBufferAttribute = true;
 
 export { GLBufferAttribute };

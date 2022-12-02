@@ -16,6 +16,7 @@ void main() {
 	vLineDistance = scale * lineDistance;
 
 	#include <color_vertex>
+	#include <morphcolor_vertex>
 	#include <begin_vertex>
 	#include <morphtarget_vertex>
 	#include <project_vertex>

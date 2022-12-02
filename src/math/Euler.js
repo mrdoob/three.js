@@ -1,5 +1,4 @@
 import { Quaternion } from './Quaternion.js';
-import { Vector3 } from './Vector3.js';
 import { Matrix4 } from './Matrix4.js';
 import { clamp } from './MathUtils.js';
 
@@ -9,6 +8,8 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
 class Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
+
+		this.isEuler = true;
 
 		this._x = x;
 		this._y = y;
@@ -288,20 +289,6 @@ class Euler {
 
 	}
 
-	toVector3( optionalResult ) {
-
-		if ( optionalResult ) {
-
-			return optionalResult.set( this._x, this._y, this._z );
-
-		} else {
-
-			return new Vector3( this._x, this._y, this._z );
-
-		}
-
-	}
-
 	_onChange( callback ) {
 
 		this._onChangeCallback = callback;
@@ -312,9 +299,24 @@ class Euler {
 
 	_onChangeCallback() {}
 
-}
+	*[ Symbol.iterator ]() {
 
-Euler.prototype.isEuler = true;
+		yield this._x;
+		yield this._y;
+		yield this._z;
+		yield this._order;
+
+	}
+
+	// @deprecated since r138, 02cf0df1cb4575d5842fef9c85bb5a89fe020d53
+
+	toVector3() {
+
+		console.error( 'THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead' );
+
+	}
+
+}
 
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];

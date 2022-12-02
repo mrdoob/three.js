@@ -24,9 +24,9 @@
 		<p>
 			The interpretation of the data depends on type and format:
 			If the type is THREE.UnsignedByteType, a Uint8Array will be useful for addressing the texel data.
-			If the format is THREE.RGBAFormat, data needs four values for one texel; Red, Green, Blue and Alpha (typically the opacity). Similarly, THREE.RGBFormat specifies a format where only three values are used for each texel.<br />
+			If the format is THREE.RGBAFormat, data needs four values for one texel; Red, Green, Blue and Alpha (typically the opacity).<br />
 
-			For the packed types, THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type or THREE.UnsignedShort565Type, all color components of one texel can be addressed as bitfields within an integer element of a Uint16Array.<br />
+			For the packed types, THREE.UnsignedShort4444Type and THREE.UnsignedShort5551Type all color components of one texel can be addressed as bitfields within an integer element of a Uint16Array.<br />
 
 			In order to use the types THREE.FloatType and THREE.HalfFloatType, the WebGL implementation must support the respective extensions OES_texture_float and OES_texture_half_float. In order to use THREE.LinearFilter for component-wise, bilinear interpolation of the texels based on these types, the WebGL extensions OES_texture_float_linear or OES_texture_half_float_linear must also be present.
 		</p>
@@ -43,7 +43,7 @@
 		const depth = 100;
 
 		const size = width * height;
-		const data = new Uint8Array( 3 * size * depth );
+		const data = new Uint8Array( 4 * size * depth );
 
 		for ( let i = 0; i < depth; i ++ ) {
 
@@ -54,20 +54,20 @@
 
 			for ( let j = 0; j < size; j ++ ) {
 
-				const stride = ( i * size + j ) * 3;
+				const stride = ( i * size + j ) * 4;
 
 				data[ stride ] = r;
 				data[ stride + 1 ] = g;
 				data[ stride + 2 ] = b;
+				data[ stride + 3 ] = 255;
 
 			}
 		}
 
 		// used the buffer to create a [name]
 
-		const texture = new THREE.DataTexture2DArray( data, width, height, depth );
-		texture.format = THREE.RGBFormat;
-		texture.type = THREE.UnsignedByteType;
+		const texture = new THREE.DataArrayTexture( data, width, height, depth );
+		texture.needsUpdate = true;
 		</code>
 
 		<p>

@@ -4,7 +4,7 @@ import {
 	Matrix4,
 	Vector3,
 	Vector4
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Tessellates the famous Utah teapot database by Martin Newell into triangles.
@@ -48,7 +48,6 @@ import {
  *
  * Code converted from my ancient SPD software, http://tog.acm.org/resources/SPD/
  * Created for the Udacity course "Interactive Rendering", http://bit.ly/ericity
- * Lesson: https://www.udacity.com/course/viewer#!/c-cs291/l-68866048/m-106482448
  * YouTube video on teapot history: https://www.youtube.com/watch?v=DxMfblPzFNc
  *
  * See https://en.wikipedia.org/wiki/Utah_teapot for the history of the teapot

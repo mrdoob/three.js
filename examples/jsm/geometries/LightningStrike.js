@@ -5,7 +5,7 @@ import {
 	MathUtils,
 	Uint32BufferAttribute,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 import { SimplexNoise } from '../math/SimplexNoise.js';
 
 /**
@@ -114,6 +114,8 @@ class LightningStrike extends BufferGeometry {
 	constructor( rayParameters = {} ) {
 
 		super();
+
+		this.isLightningStrike = true;
 
 		this.type = 'LightningStrike';
 
@@ -1000,8 +1002,6 @@ class LightningStrike extends BufferGeometry {
 	}
 
 }
-
-LightningStrike.prototype.isLightningStrike = true;
 
 // Ray states
 LightningStrike.RAY_INITIALIZED = 0;

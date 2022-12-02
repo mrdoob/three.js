@@ -1,22 +1,25 @@
 /* global QUnit */
 
-import { Group } from '../../../../src/objects/Group';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Group } from '../../../../src/objects/Group.js';
 
 export default QUnit.module( 'Objects', () => {
 
 	QUnit.module( 'Group', () => {
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var group = new Group();
+
+			assert.strictEqual( group instanceof Object3D, true, 'Group extends from Object3D' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

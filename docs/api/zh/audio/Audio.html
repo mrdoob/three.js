@@ -20,14 +20,14 @@
 		<h2>代码示例</h2>
 
 		<code>
-		// create an AudioListener and add it to the camera
+		// 创建一个 AudioListener 并将其添加到 camera 中
 		const listener = new THREE.AudioListener();
 		camera.add( listener );
 
-		// create a global audio source
+		// 创建一个全局 audio 源
 		const sound = new THREE.Audio( listener );
 
-		// load a sound and set it as the Audio object's buffer
+		// 加载一个 sound 并将其设置为 Audio 对象的缓冲区
 		const audioLoader = new THREE.AudioLoader();
 		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
 			sound.setBuffer( buffer );
@@ -65,8 +65,7 @@
 		<p>修改音高，以音分为单位。 +/- 100为一个半音， +/- 1200为一个八度。默认值为0。</p>
 
 		<h3>[property:Array filters]</h3>
-		<p>Represents an array of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioNode AudioNodes]. Can be used to apply a variety of low-order filters to create more complex sound effects.
-			In most cases, the array contains instances of [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes]. Filters are set via [page:Audio.setFilter] or [page:Audio.setFilters].</p>
+		<p>表示是一个 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioNode AudioNodes] 数组。可用于应用各种低阶滤波器来创建更复杂的声音效果。在大多数情况下，该数组包含 [link:https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode BiquadFilterNodes] 的实例。通过 [page:Audio.setFilter] 或 [page:Audio.setFilters] 设置 filter。</p>
 
 		<h3>[property:GainNode gain]</h3>
 		<p>使用[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain]()创建的[link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode].</p>
@@ -79,7 +78,7 @@
 		<p>是否正在播放</p>
 
 		<h3>[property:AudioListener listener]</h3>
-		<p>A reference to the listener object of this audio.</p>
+		<p>该 audio listener 对象的一个引用</p>
 
 		<h3>[property:Number playbackRate]</h3>
 		<p>播放速率. 默认为 *1*.</p>
@@ -102,12 +101,12 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:Audio connect]()</h3>
+		<h3>[method:this connect]()</h3>
 		<p>
 		连接[page:Audio.source]. 在初始化和设置/删除filters时使用.
 		</p>
 
-		<h3>[method:Audio disconnect]()</h3>
+		<h3>[method:this disconnect]()</h3>
 		<p>
 		断开连接[page:Audio.source]. 在设置/删除filters时使用.
 		</p>
@@ -143,84 +142,84 @@
 		返回音量.
 		</p>
 
-		<h3>[method:Audio play]( delay )</h3>
+		<h3>[method:this play]( delay )</h3>
 		<p>
 		如果[page:Audio.hasPlaybackControl hasPlaybackControl]是true, 开始播放.
 		</p>
 
-		<h3>[method:Audio pause]()</h3>
+		<h3>[method:this pause]()</h3>
 		<p>
 		如果[page:Audio.hasPlaybackControl hasPlaybackControl]是true, 暂停播放.
 		</p>
 
-		<h3>[method:null onEnded]()</h3>
+		<h3>[method:undefined onEnded]()</h3>
 		<p>
 		播放完成后自动调用.
 		</p>
 
-		<h3>[method:Audio setBuffer]( audioBuffer )</h3>
+		<h3>[method:this setBuffer]( audioBuffer )</h3>
 		<p>
 		设置[page:Audio.source source]给audioBuffer, 和设置[page:Audio.sourceType sourceType]给'buffer'.<br />
 		如果[page:Audio.autoplay autoplay]为true, 也开始播放.
 		</p>
 
-		<h3>[method:Audio setFilter]( filter )</h3>
+		<h3>[method:this setFilter]( filter )</h3>
 		<p>
-		Applies a single filter node to the audio.
+		将单个 filter 节点应用在该 audio 上。
 		</p>
 
-		<h3>[method:Audio setFilters]( [param:Array value] )</h3>
+		<h3>[method:this setFilters]( [param:Array value] )</h3>
 		<p>
-		value - arrays of filters.<br />
-		Applies an array of filter nodes to the audio.
+		value - filter 数组。<br />
+		将一组 filter 节点应用在该 audio 上。
 		</p>
 
-		<h3>[method:Audio setLoop]( [param:Boolean value] )</h3>
+		<h3>[method:this setLoop]( [param:Boolean value] )</h3>
 		<p>
 		设置[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loop source.loop]的值
 		(是否循环播放).
 		</p>
 
-		<h3>[method:Audio setLoopStart]( [param:Float value] )</h3>
+		<h3>[method:this setLoopStart]( [param:Float value] )</h3>
 		<p>
 		设置[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopStart source.loopStart]的值
 		</p>
 
-		<h3>[method:Audio setLoopEnd]( [param:Float value] )</h3>
+		<h3>[method:this setLoopEnd]( [param:Float value] )</h3>
 		<p>
 		设置[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode/loopEnd source.loopEnd]的值
 		</p>
 
-		<h3>[method:Audio setMediaElementSource]( mediaElement )</h3>
+		<h3>[method:this setMediaElementSource]( mediaElement )</h3>
 		<p>
 		应用传入的[link:https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement HTMLMediaElement]类型对象作为音源。<br />
 		并且设置[page:Audio.hasPlaybackControl hasPlaybackControl]为false。
 		</p>
 
-		<h3>[method:Audio setMediaStreamSource]( mediaStream )</h3>
+		<h3>[method:this setMediaStreamSource]( mediaStream )</h3>
 		<p>
 		应用传入的[link:https://developer.mozilla.org/en-US/docs/Web/API/MediaStream MediaStream]类型对象作为音源。<br />
 		并且设置[page:Audio.hasPlaybackControl hasPlaybackControl]为false。
 		</p>
 
-		<h3>[method:Audio setNodeSource]( audioNode )</h3>
+		<h3>[method:this setNodeSource]( audioNode )</h3>
 		<p>
 		设置[page:Audio.source source]给audioBuffer, 和设置[page:Audio.sourceType sourceType]给 'audioNode'.<br />
 		并且设置[page:Audio.hasPlaybackControl hasPlaybackControl]为false.
 
 		</p>
 
-		<h3>[method:Audio setPlaybackRate]( [param:Float value] )</h3>
+		<h3>[method:this setPlaybackRate]( [param:Float value] )</h3>
 		<p>
 		如果[page:Audio.hasPlaybackControl hasPlaybackControl]是true, 设置[page:Audio.playbackRate playbackRate]（播放速率） 的值.
 		</p>
 
-		<h3>[method:Audio setVolume]( [param:Float value] )</h3>
+		<h3>[method:this setVolume]( [param:Float value] )</h3>
 		<p>
 		设置音量.
 		</p>
 
-		<h3>[method:Audio stop]()</h3>
+		<h3>[method:this stop]()</h3>
 		<p>
 		如果[page:Audio.hasPlaybackControl hasPlaybackControl]是true, 停止播放.
 		</p>

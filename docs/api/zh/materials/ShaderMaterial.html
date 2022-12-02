@@ -158,8 +158,8 @@
 		<div>
 			<p>
 				自定义attributes和uniforms必须在GLSL着色器代码中声明（在 *vertexShader* 和/或 *fragmentShader* 中)。
-				自定义uniforms必须定义为 *ShaderMaterial* 的  *uniforms* 属性，
-				而任何自定义attribtes必须通过[page:BufferAttribute]实例来定义。
+				自定义uniforms必须定义为 *ShaderMaterial* 的 *uniforms* 属性，
+				而任何自定义attributes必须通过[page:BufferAttribute]实例来定义。
 				注意 *varying*s 只需要在shader代码中声明（而不必在材质中）。
 			</p>
 			<p> 要声明一个自定义属性，更多细节请参考[page:BufferGeometry]页面，
@@ -311,6 +311,11 @@ this.extensions = {
 		<p> 如果设置，则调用[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation]
 			将通用顶点索引绑定到属性变量。默认值未定义。
 
+		</p>
+
+		<h3>[property:Boolean isShaderMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Boolean lights]</h3>

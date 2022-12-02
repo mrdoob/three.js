@@ -27,7 +27,7 @@ scene.add( object1 ); //object1 and object2 will automatically update their matr
 		<p>However, if you know the object will be static, you can disable this and update the transform matrix manually just when needed.</p>
 
 		<code>
-object.matrixAutoUpdate  = false;
+object.matrixAutoUpdate = false;
 object.updateMatrix();
 		</code>
 
@@ -73,7 +73,7 @@ geometry.setDrawRange( 0, drawCount );
 const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-const line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry, material );
 scene.add( line );
 			</code>
 		 	<p>
@@ -121,7 +121,7 @@ line.geometry.computeBoundingSphere();
 			</code>
 
 			<p>
-				[link:https://jsfiddle.net/xvnctbL0/2/ Here is a fiddle] showing an animated line which you can adapt to your use case.
+				[link:https://jsfiddle.net/t4m85pLr/1/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 			</p>
 
 			<h3>Examples</h3>
@@ -150,6 +150,7 @@ line.geometry.computeBoundingSphere();
 						<li>morphing</li>
 						<li>shadow map</li>
 						<li>alpha test</li>
+						<li>transparent</li>
 					</ul>
 				</li>
 			</ul>

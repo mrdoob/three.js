@@ -7,19 +7,15 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>骨架工具（[name]）</h1>
 
-		<p class="desc">Utility functions for [page:Skeleton], [page:SkinnedMesh], and [page:Bone] manipulation.</p>
+		<p class="desc">用于操控 [page:Skeleton]、 [page:SkinnedMesh]、和 [page:Bone] 的实用方法。</p>
 
-
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Object3D clone]( [param:Object3D object] )</h3>
 		<p>
-			Clones the given object and its descendants, ensuring that any [page:SkinnedMesh] instances
-			are correctly associated with their bones. Bones are also cloned, and must be descendants of
-			the object passed to this method. Other data, like geometries and materials, are reused by
-			reference.
+		克隆给定对象及其后代，确保任何 [page:SkinnedMesh] 实例都与其骨骼正确关联。同时，骨骼也会被克隆，且必须是传递给此方法的物体的后代。而其他数据，如几何形状和材料，是通过引用来实现重复使用的。
 		</p>
 
 		<h3>[method:Object findBoneTrackData]( [param:String name], [param:Array tracks] )</h3>
@@ -46,13 +42,13 @@
 		<h3>[method:this renameBones]( [param:Skeleton skeleton], [param:Array names] )</h3>
 		<p></p>
 
-		<h3>[method:null retarget]( [param:SkeletonHelper target], [param:SkeletonHelper source], [param:Object options] )</h3>
+		<h3>[method:undefined retarget]( [param:SkeletonHelper target], [param:SkeletonHelper source], [param:Object options] )</h3>
 		<p></p>
 
 		<h3>[method:AnimationClip retargetClip]( [param:SkeletonHelper target], [param:SkeletonHelper source], [param:AnimationClip clip], [param:Object options] )</h3>
 		<p></p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/SkeletonUtils.js examples/jsm/utils/SkeletonUtils.js]

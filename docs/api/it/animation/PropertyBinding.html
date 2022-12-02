@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Questa classe contiene un riferimento ad una proprietà reale nel grafo della scena; usata internamente.
+		</p>
+
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Object3D rootNode], path, parsedPath )</h3>
+		<p>
+			-- [page:Object3D rootNode]:
+			-- path
+			-- parsedPath (optional)
+
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Number path]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Number parsedPath]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Number node]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Number rootNode]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Object BindingType]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Object Versioning]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Array GetterByBindingType]</h3>
+		<p>
+
+		</p>
+
+		<h3>[property:Array SetterByBindingTypeAndVersioning]</h3>
+		<p>
+
+		</p>
+
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:undefined getValue]( [param:Array targetArray], [param:Number offset] )</h3>
+		<p>
+		</p>
+
+		<h3>[method:undefined setValue]( [param:Array sourceArray], [param:Number offset] )</h3>
+		<p>
+		</p>
+
+		<h3>[method:undefined bind]( )</h3>
+		<p>
+      Crea una coppia getter e setter per la proprietà nel grafo della scena. Usata internamente 
+      da [page:PropertyBinding.getValue getValue] e [page:PropertyBinding.setValue setValue].
+		</p>
+
+		<h3>[method:undefined unbind]( )</h3>
+		<p>
+      Unbind della coppia getter e setter per la proprietà nel grafo della scena.
+		</p>
+
+		<h3>[method:Constructor Composite]( targetGroup, path, optionalParsedPath )</h3>
+		<p>
+      Crea un nuovo Composite PropertyBinding.
+		</p>
+
+		<h3>[method:Constructor create]( root, path, parsedPath )</h3>
+		<p>
+      Crea un nuovo Composite PropertyBinding (se la root è una [page:AnimationObjectGroup] o PropertyBinding).
+		</p>
+
+		<h3>[method:Constructor parseTrackName]( trackName )</h3>
+		<p>
+      Corrisponde a stringhe nelle seguenti forme:<br />
+			-- nodeName.property<br />
+			-- nodeName.property[accessor]<br />
+			-- nodeName.material.property[accessor]<br />
+			-- uuid.property[accessor]<br />
+			-- uuid.objectName[objectIndex].propertyName[propertyIndex]<br />
+			-- parentName/nodeName.property<br />
+			-- parentName/parentName/nodeName.property[index]<br />
+			-- .bone[Armature.DEF_cog].position<br />
+			-- scene:helium_balloon_model:helium_balloon_model.position
+		</p>
+
+		<h3>[method:Constructor findNode]( root, nodeName )</h3>
+		<p>
+      Trova il nodo in un albero di nodi o in uno [page:Skeleton Skeleton].
+		</p>
+
+
+
+
+		<h2>Source</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -70,7 +70,7 @@
 		<p><em>"それはそれとして、冒頭で言っていたキューブはどこにあるの？"</em> いますぐ追加しましょう。</p>
 
 		<code>
-		const geometry = new THREE.BoxGeometry();
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -137,14 +137,14 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					const geometry = new THREE.BoxGeometry();
+					const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					const cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );
 
 					camera.position.z = 5;
 
-					const animate = function () {
+					function animate() {
 						requestAnimationFrame( animate );
 
 						cube.rotation.x += 0.01;

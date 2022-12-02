@@ -1,8 +1,8 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { HalftoneShader } from '../shaders/HalftoneShader.js';
 
 /**
@@ -14,12 +14,6 @@ class HalftonePass extends Pass {
 	constructor( width, height, params ) {
 
 		super();
-
-	 	if ( HalftoneShader === undefined ) {
-
-	 		console.error( 'THREE.HalftonePass requires HalftoneShader' );
-
-	 	}
 
 	 	this.uniforms = UniformsUtils.clone( HalftoneShader.uniforms );
 	 	this.material = new ShaderMaterial( {
@@ -71,6 +65,14 @@ class HalftonePass extends Pass {
  		this.uniforms.height.value = height;
 
  	}
+
+	dispose() {
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
+
+	}
 
 }
 

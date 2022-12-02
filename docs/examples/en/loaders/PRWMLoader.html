@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A loader for loading a <em>.prwm</em> resource.<br />
+		<p class="desc">A loader for loading a `.prwm` resource.<br />
 		Packed Raw WebGL Model is an open-source binary file format for nD geometries specifically designed for
 		JavaScript and WebGL with a strong focus on fast parsing (from 1ms to 0.1ms in Chrome 59
 		on a MBP Late 2013). The parsing of PRWM file is especially fast when the endianness of the file is
@@ -72,11 +72,11 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the <em>.prwm</em> file. Any <em>*</em> character in the URL will be automatically replaced by <em>le</em> or <em>be</em> depending on the platform endianness.<br />
+		[page:String url] — A string containing the path/URL of the `.prwm` file. Any `*` character in the URL will be automatically replaced by `le` or `be` depending on the platform endianness.<br />
 		[page:Function onLoad] — (optional) A function to be called after the loading is successfully completed. The function receives the loaded [page:BufferGeometry] as an argument.<br />
-		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The function receives a XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The function receives a XMLHttpRequest instance, which contains [page:Integer total] and [page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />
 		</p>
 		<p>
@@ -85,10 +85,10 @@
 
 		<h3>[method:BufferGeometry parse]( [param:ArrayBuffer arrayBuffer] )</h3>
 		<p>
-		[page:ArrayBuffer arrayBuffer] — ArrayBuffer containing the <em>prwm</em> data.
+		[page:ArrayBuffer arrayBuffer] — ArrayBuffer containing the `prwm` data.
 		</p>
 		<p>
-		Parse a <em>prwm</em> file passed as an ArrayBuffer and directly return an instance of [page:BufferGeometry].
+		Parse a `prwm` file passed as an ArrayBuffer and directly return an instance of [page:BufferGeometry].
 		</p>
 
 		<h3>PRWMLoader.isBigEndianPlatform( )</h3>

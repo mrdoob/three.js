@@ -1,7 +1,7 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils';
-import { IcosahedronGeometry, IcosahedronBufferGeometry } from '../../../../src/geometries/IcosahedronGeometry';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
+import { IcosahedronGeometry } from '../../../../src/geometries/IcosahedronGeometry.js';
 
 export default QUnit.module( 'Geometries', () => {
 
@@ -19,22 +19,21 @@ export default QUnit.module( 'Geometries', () => {
 				new IcosahedronGeometry(),
 				new IcosahedronGeometry( parameters.radius ),
 				new IcosahedronGeometry( parameters.radius, parameters.detail ),
-				new IcosahedronBufferGeometry()
 			];
 
 		} );
 
 		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		QUnit.todo( 'Extending', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

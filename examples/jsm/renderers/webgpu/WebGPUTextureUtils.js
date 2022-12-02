@@ -18,34 +18,63 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology } from './constants.js';
+import { GPUTextureViewDimension, GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology, GPULoadOp, GPUStoreOp } from './constants.js';
 
 // ported from https://github.com/toji/web-texture-tool/blob/master/src/webgpu-mipmap-generator.js
 
 class WebGPUTextureUtils {
 
-	constructor( device, glslang ) {
+	constructor( device ) {
 
 		this.device = device;
 
-		const mipmapVertexSource = `#version 450
-			const vec2 pos[4] = vec2[4](vec2(-1.0f, 1.0f), vec2(1.0f, 1.0f), vec2(-1.0f, -1.0f), vec2(1.0f, -1.0f));
-			const vec2 tex[4] = vec2[4](vec2(0.0f, 0.0f), vec2(1.0f, 0.0f), vec2(0.0f, 1.0f), vec2(1.0f, 1.0f));
-			layout(location = 0) out vec2 vTex;
-			void main() {
-				vTex = tex[gl_VertexIndex];
-				gl_Position = vec4(pos[gl_VertexIndex], 0.0, 1.0);
-			}
-		`;
+		const mipmapVertexSource = `
+struct VarysStruct {
+	@builtin( position ) Position: vec4<f32>,
+	@location( 0 ) vTex : vec2<f32>
+};
 
-		const mipmapFragmentSource = `#version 450
-			layout(set = 0, binding = 0) uniform sampler imgSampler;
-			layout(set = 0, binding = 1) uniform texture2D img;
-			layout(location = 0) in vec2 vTex;
-			layout(location = 0) out vec4 outColor;
-			void main() {
-				outColor = texture(sampler2D(img, imgSampler), vTex);
-			}`;
+@vertex
+fn main( @builtin( vertex_index ) vertexIndex : u32 ) -> VarysStruct {
+
+	var Varys : VarysStruct;
+
+	var pos = array< vec2<f32>, 4 >(
+		vec2<f32>( -1.0,  1.0 ),
+		vec2<f32>(  1.0,  1.0 ),
+		vec2<f32>( -1.0, -1.0 ),
+		vec2<f32>(  1.0, -1.0 )
+	);
+
+	var tex = array< vec2<f32>, 4 >(
+		vec2<f32>( 0.0, 0.0 ),
+		vec2<f32>( 1.0, 0.0 ),
+		vec2<f32>( 0.0, 1.0 ),
+		vec2<f32>( 1.0, 1.0 )
+	);
+
+	Varys.vTex = tex[ vertexIndex ];
+	Varys.Position = vec4<f32>( pos[ vertexIndex ], 0.0, 1.0 );
+
+	return Varys;
+
+}
+`;
+
+		const mipmapFragmentSource = `
+@group( 0 ) @binding( 0 )
+var imgSampler : sampler;
+
+@group( 0 ) @binding( 1 )
+var img : texture_2d<f32>;
+
+@fragment
+fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
+
+	return textureSample( img, imgSampler, vTex );
+
+}
+`;
 
 		this.sampler = device.createSampler( { minFilter: GPUFilterMode.Linear } );
 
@@ -53,10 +82,11 @@ class WebGPUTextureUtils {
 		this.pipelines = {};
 
 		this.mipmapVertexShaderModule = device.createShaderModule( {
-			code: glslang.compileGLSL( mipmapVertexSource, 'vertex' ),
+			code: mipmapVertexSource
 		} );
+
 		this.mipmapFragmentShaderModule = device.createShaderModule( {
-			code: glslang.compileGLSL( mipmapFragmentSource, 'fragment' ),
+			code: mipmapFragmentSource
 		} );
 
 	}
@@ -70,18 +100,20 @@ class WebGPUTextureUtils {
 			pipeline = this.device.createRenderPipeline( {
 				vertex: {
 					module: this.mipmapVertexShaderModule,
-					entryPoint: 'main',
+					entryPoint: 'main'
 				},
 				fragment: {
 					module: this.mipmapFragmentShaderModule,
 					entryPoint: 'main',
-					targets: [ { format } ],
+					targets: [ { format } ]
 				},
 				primitive: {
 					topology: GPUPrimitiveTopology.TriangleStrip,
 					stripIndexFormat: GPUIndexFormat.Uint32
-				}
+				},
+				layout: 'auto'
 			} );
+
 			this.pipelines[ format ] = pipeline;
 
 		}
@@ -90,7 +122,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	generateMipmaps( textureGPU, textureGPUDescriptor ) {
+	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
 
 		const pipeline = this.getMipmapPipeline( textureGPUDescriptor.format );
 
@@ -100,6 +132,8 @@ class WebGPUTextureUtils {
 		let srcView = textureGPU.createView( {
 			baseMipLevel: 0,
 			mipLevelCount: 1,
+			dimension: GPUTextureViewDimension.TwoD,
+			baseArrayLayer
 		} );
 
 		for ( let i = 1; i < textureGPUDescriptor.mipLevelCount; i ++ ) {
@@ -107,30 +141,34 @@ class WebGPUTextureUtils {
 			const dstView = textureGPU.createView( {
 				baseMipLevel: i,
 				mipLevelCount: 1,
+				dimension: GPUTextureViewDimension.TwoD,
+				baseArrayLayer
 			} );
 
 			const passEncoder = commandEncoder.beginRenderPass( {
 				colorAttachments: [ {
 					view: dstView,
-					loadValue: [ 0, 0, 0, 0 ],
-				} ],
+					loadOp: GPULoadOp.Clear,
+					storeOp: GPUStoreOp.Store,
+					clearValue: [ 0, 0, 0, 0 ]
+				} ]
 			} );
 
 			const bindGroup = this.device.createBindGroup( {
 				layout: bindGroupLayout,
 				entries: [ {
 					binding: 0,
-					resource: this.sampler,
+					resource: this.sampler
 				}, {
 					binding: 1,
-					resource: srcView,
-				} ],
+					resource: srcView
+				} ]
 			} );
 
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
 			passEncoder.draw( 4, 1, 0, 0 );
-			passEncoder.endPass();
+			passEncoder.end();
 
 			srcView = dstView;
 

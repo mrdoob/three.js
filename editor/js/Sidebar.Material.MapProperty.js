@@ -1,9 +1,10 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
-import { UICheckbox, UINumber, UIRow, UIText } from './libs/ui.js';
+import { UICheckbox, UIDiv, UINumber, UIRow, UIText } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
 import { SetMaterialMapCommand } from './commands/SetMaterialMapCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
+import { SetMaterialRangeCommand } from './commands/SetMaterialRangeCommand.js';
 import { SetMaterialVectorCommand } from './commands/SetMaterialVectorCommand.js';
 
 function SidebarMaterialMapProperty( editor, property, name ) {
@@ -51,6 +52,36 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	}
 
+	let rangeMin, rangeMax;
+
+	if ( property === 'iridescenceThicknessMap' ) {
+		
+		const range = new UIDiv().setMarginLeft( '3px' );
+		container.add( range );
+
+		const rangeMinRow = new UIRow().setMarginBottom( '0px' ).setStyle( 'min-height', '0px' );
+		range.add( rangeMinRow );
+
+		rangeMinRow.add( new UIText( 'min:' ).setWidth( '35px' ) );
+
+		rangeMin = new UINumber().setWidth( '40px' ).onChange( onRangeChange );
+		rangeMinRow.add( rangeMin );
+
+		const rangeMaxRow = new UIRow().setMarginBottom( '6px' ).setStyle( 'min-height', '0px' );
+		range.add( rangeMaxRow );
+
+		rangeMaxRow.add( new UIText( 'max:' ).setWidth( '35px' ) );
+
+		rangeMax = new UINumber().setWidth( '40px' ).onChange( onRangeChange );
+		rangeMaxRow.add( rangeMax );
+
+		// Additional settings for iridescenceThicknessMap
+		// Please add conditional if more maps are having a range property
+		rangeMin.setPrecision( 0 ).setRange( 0, Infinity ).setNudge( 1 ).setStep( 10 ).setUnit( 'nm' );
+		rangeMax.setPrecision( 0 ).setRange( 0, Infinity ).setNudge( 1 ).setStep( 10 ).setUnit( 'nm' );
+
+	}
+
 	let object = null;
 	let material = null;
 
@@ -58,13 +89,15 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		const newMap = enabled.getValue() ? map.getValue() : null;
 
-		if ( material[ 'property' ] !== newMap ) {
+		if ( material[ property ] !== newMap ) {
 
-			const geometry = object.geometry;
+			if ( newMap !== null ) {
 
-			if ( newMap !== null && geometry.isBufferGeometry && geometry.attributes.uv === undefined ) {
+				const geometry = object.geometry;
 
-				console.warn( 'Geometry doesn\'t have uvs:', geometry );
+				if ( geometry.hasAttribute( 'uv' ) === false ) console.warn( 'Geometry doesn\'t have uvs:', geometry );
+
+				if ( property === 'envMap' ) newMap.mapping = THREE.EquirectangularReflectionMapping;
 
 			}
 
@@ -125,6 +158,18 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 	}
 
+	function onRangeChange() {
+
+		const value = [ rangeMin.getValue(), rangeMax.getValue() ];
+
+		if ( material[ `${ mapType }Range` ][ 0 ] !== value[ 0 ] || material[ `${ mapType }Range` ][ 1 ] !== value[ 1 ] ) {
+
+			editor.execute( new SetMaterialRangeCommand( editor, object, `${ mapType }Range`, value[ 0 ], value[ 1 ], 0 /* TODOL currentMaterialSlot */ ) );
+
+		}
+
+	}
+
 	function update() {
 
 		if ( object === null ) return;
@@ -159,6 +204,13 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 				scaleX.setValue( material[ `${ mapType }Scale` ].x );
 				scaleY.setValue( material[ `${ mapType }Scale` ].y );
+
+			}
+
+			if ( rangeMin !== undefined ) {
+
+				rangeMin.setValue( material[ `${ mapType }Range` ][ 0 ] );
+				rangeMax.setValue( material[ `${ mapType }Range` ][ 1 ] );
 
 			}
 

@@ -17,7 +17,7 @@ import {
 	DoubleSide,
 	Loader,
 	FileLoader
-} from '../../../build/three.module.js';
+} from 'three';
 import { mergeBufferGeometries } from '../utils/BufferGeometryUtils.js';
 
 const IdAttrName = 'expressID';
@@ -363,7 +363,7 @@ class SubsetManager {
 
 	isValid( item ) {
 
-		return item != undefined && item != null;
+		return item !== undefined && item !== null;
 
 	}
 
@@ -1877,7 +1877,6 @@ class TypeManager {
 
 	getAllTypesOfModel( modelID ) {
 
-		this.state.models[ modelID ].types;
 		const elements = Object.keys( IfcElements ).map( ( e ) => parseInt( e ) );
 		const types = this.state.models[ modelID ].types;
 		elements.forEach( ( type ) => {

@@ -1,7 +1,7 @@
 export default /* glsl */`
-#ifdef USE_SHADOWMAP
+#if defined( USE_SHADOWMAP ) || ( NUM_SPOT_LIGHT_COORDS > 0 )
 
-	#if NUM_DIR_LIGHT_SHADOWS > 0 || NUM_SPOT_LIGHT_SHADOWS > 0 || NUM_POINT_LIGHT_SHADOWS > 0
+	#if NUM_DIR_LIGHT_SHADOWS > 0 || NUM_SPOT_LIGHT_COORDS > 0 || NUM_POINT_LIGHT_SHADOWS > 0
 
 		// Offsetting the position used for querying occlusion along the world normal can be used to reduce shadow acne.
 		vec3 shadowWorldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
@@ -22,13 +22,16 @@ export default /* glsl */`
 
 	#endif
 
-	#if NUM_SPOT_LIGHT_SHADOWS > 0
+	#if NUM_SPOT_LIGHT_COORDS > 0
 
 	#pragma unroll_loop_start
-	for ( int i = 0; i < NUM_SPOT_LIGHT_SHADOWS; i ++ ) {
+	for ( int i = 0; i < NUM_SPOT_LIGHT_COORDS; i ++ ) {
 
-		shadowWorldPosition = worldPosition + vec4( shadowWorldNormal * spotLightShadows[ i ].shadowNormalBias, 0 );
-		vSpotShadowCoord[ i ] = spotShadowMatrix[ i ] * shadowWorldPosition;
+		shadowWorldPosition = worldPosition;
+		#if ( defined( USE_SHADOWMAP ) && UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
+			shadowWorldPosition.xyz += shadowWorldNormal * spotLightShadows[ i ].shadowNormalBias;
+		#endif
+		vSpotLightCoord[ i ] = spotLightMatrix[ i ] * shadowWorldPosition;
 
 	}
 	#pragma unroll_loop_end

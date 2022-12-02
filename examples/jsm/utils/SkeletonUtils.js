@@ -9,7 +9,7 @@ import {
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack
-} from '../../../build/three.module.js';
+} from 'three';
 
 
 function retarget( target, source, options = {} ) {
@@ -87,7 +87,7 @@ function retarget( target, source, options = {} ) {
 			bone = bones[ i ];
 			name = options.names[ bone.name ] || bone.name;
 
-			if ( options.offsets && options.offsets[ name ] ) {
+			if ( options.offsets[ name ] ) {
 
 				bone.matrix.multiply( options.offsets[ name ] );
 

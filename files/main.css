@@ -316,6 +316,11 @@ h1 a {
 			padding-top: 12px;
 		}
 
+	        #panel #content h3 {
+			color: var(--text-color);
+			font-weight: 900;
+		}
+
 		#panel #content a {
 			position: relative;
 			color: var(--text-color);
@@ -529,6 +534,16 @@ iframe#viewer {
 	padding: 8px 12px 4px;
 	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
+	line-height: calc(var(--line-height) - 6px);
+}
+
+.card .tag {
+	background-color: var(--background-color);
+	color: var(--color-blue);
+	margin-left: 6px;
+	padding: 1px 6px 2px;
+	border-radius: 2px;
+	font-size: calc(var(--font-size) - 2px);
 	line-height: calc(var(--line-height) - 6px);
 }
 

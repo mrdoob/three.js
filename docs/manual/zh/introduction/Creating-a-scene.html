@@ -70,7 +70,7 @@
 		<p><em>“嗯，看起来很不错，那你说的那个立方体在哪儿？”</em>接下来，我们就来添加立方体。</p>
 
 		<code>
-		const geometry = new THREE.BoxGeometry();
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -138,14 +138,14 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					const geometry = new THREE.BoxGeometry();
+					const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					const cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );
 
 					camera.position.z = 5;
 
-					const animate = function () {
+					function animate() {
 						requestAnimationFrame( animate );
 
 						cube.rotation.x += 0.01;

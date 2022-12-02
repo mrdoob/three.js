@@ -92,6 +92,7 @@ export function glconstants() {
 		POLYGON_OFFSET_FILL: 32823,
 		RGB8: 32849,
 		RGBA4: 32854,
+		RGB5_A1: 32855,
 		RGBA8: 32856,
 		TEXTURE_3D: 32879,
 		CLAMP_TO_EDGE: 33071,
@@ -100,8 +101,11 @@ export function glconstants() {
 		DEPTH_COMPONENT32F: 36012,
 		DEPTH_STENCIL_ATTACHMENT: 33306,
 		R8: 33321,
+		RG8: 33323,
 		R16F: 33325,
 		R32F: 33326,
+		RG16F: 33327,
+		RG32F: 33328,
 		UNSIGNED_SHORT_5_6_5: 33635,
 		MIRRORED_REPEAT: 33648,
 		TEXTURE0: 33984,
@@ -109,6 +113,7 @@ export function glconstants() {
 		UNSIGNED_INT_24_8: 34042,
 		TEXTURE_CUBE_MAP: 34067,
 		TEXTURE_CUBE_MAP_POSITIVE_X: 34069,
+		TEXTURE_CUBE_MAP_NEGATIVE_Z: 34074,
 		MAX_CUBE_MAP_TEXTURE_SIZE: 34076,
 		COMPRESSED_TEXTURE_FORMATS: 34467,
 		RGBA32F: 34836,
@@ -118,6 +123,7 @@ export function glconstants() {
 		MAX_VERTEX_ATTRIBS: 34921,
 		MAX_TEXTURE_IMAGE_UNITS: 34930,
 		ARRAY_BUFFER: 34962,
+		UNIFORM_BUFFER: 35345,
 		ELEMENT_ARRAY_BUFFER: 34963,
 		STATIC_DRAW: 35044,
 		DYNAMIC_DRAW: 35048,
@@ -159,7 +165,9 @@ export function glconstants() {
 		READ_FRAMEBUFFER: 36008,
 		DRAW_FRAMEBUFFER: 36009,
 		SAMPLE_ALPHA_TO_COVERAGE: 32926,
-		SRGB8_ALPHA8: 35907
+		SRGB8: 35905,
+		SRGB8_ALPHA8: 35907,
+		MAX_UNIFORM_BUFFER_BINDINGS: 35375
 	};
 
 	return {
@@ -267,7 +275,7 @@ function header() {
 
 			return `/**
  * @license
- * Copyright 2010-2021 Three.js Authors
+ * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 ${ code }`;
@@ -278,7 +286,7 @@ ${ code }`;
 
 }
 
-let builds = [
+const builds = [
 	{
 		input: 'src/Three.js',
 		plugins: [
@@ -314,6 +322,12 @@ let builds = [
 				name: 'THREE',
 				file: 'build/three.js',
 				indent: '\t'
+			},
+			{
+				format: 'cjs',
+				name: 'THREE',
+				file: 'build/three.cjs',
+				indent: '\t'
 			}
 		]
 	},
@@ -342,11 +356,4 @@ let builds = [
 	}
 ];
 
-
-if ( process.env.ONLY_MODULE === 'true' ) {
-
-	builds = builds[ 0 ];
-
-}
-
-export default builds;
+export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;

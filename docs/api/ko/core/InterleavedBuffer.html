@@ -10,7 +10,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			"Interleaved"는 서로 다른 타입일 수도 있는 여러 속성들이(예를 들어 위치, 법선, uv, 색상)이 단일 배열 버퍼에 패키징되어있다는 뜻입니다. 
+			"Interleaved"는 서로 다른 타입일 수도 있는 여러 속성들이(예를 들어 위치, 법선, uv, 색상)이 단일 배열 버퍼에 패키징되어있다는 뜻입니다.
 			<br/><br/>
 			인터리브 배열에 대한 설명은 여기: [link:https://blog.tojicode.com/2011/05/interleaved-array-basics.html Interleaved array basics]에서 확인할 수 있습니다.
 		</p>
@@ -45,17 +45,9 @@
 
 		<h3>[property:Object updateRange]</h3>
 		<p>
-		오프셋과 카운트를 가지고 있는 객체입니다.
-		</p>
-
-		<h3>[property:Number updateRange.offset]</h3>
-		<p>
-		기본값은 *0* 입니다.
-		</p>
-
-		<h3>[property:Number updateRange.count]</h3>
-		<p>
-		기본값은 *-1* 입니다.
+		오프셋과 카운트를 가지고 있는 객체입니다.<br />
+		- [page:Number offset]: 기본값은 *0* 입니다.<br />
+		- [page:Number count]: 기본값은 *-1* 입니다. <br />
 		</p>
 
 		<h3>[property:String uuid]</h3>
@@ -75,21 +67,21 @@
 
 		<h3>[property:Usage usage]</h3>
 		<p>
-			최적화 목적의 데이터 저장 패턴의 사용법을 정의합니다. 
+			최적화 목적의 데이터 저장 패턴의 사용법을 정의합니다.
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]()의 *usage* 파라미터에 해당합니다.
 		</p>
 
 		<h2>메서드</h2>
 
-		<h3>[method:InterleavedBuffer copy]( [param:InterleavedBuffer source] ) </h3>
+		<h3>[method:this copy]( [param:InterleavedBuffer source] ) </h3>
 		<p>
 		 다른 [name]를 이[name]에 복사합니다.
 		</p>
 
-		<h3>[method:InterleavedBuffer copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
+		<h3>[method:this copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
 		<p>속성 [index2]의 데이터를 [page:InterleavedBuffer.array array][index1]에 복사합니다.</p>
 
-		<h3>[method:InterleavedBuffer set]( [param:TypedArray value], [param:Integer offset] ) </h3>
+		<h3>[method:this set]( [param:TypedArray value], [param:Integer offset] ) </h3>
 		<p>
 			value - 원본 (타입) 배열.<br/>
 			offset - 원본 배열로부터 값을 작성하기 시작할 타깃 배열의 오프셋. 기본값은 *0*입니다.<br/><br />
@@ -105,10 +97,10 @@
 			이 [name]의 사본을 만듭니다.
 		</p>
 
-		<h3>[method:InterleavedBuffer setUsage] ( [param:Usage value] ) </h3>
+		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
 		<p>[page:InterleavedBuffer.usage usage]를 value 로 설정합니다.</p>
 
-		<h3>[method:InterleavedBuffer toJSON]( [param:Object data] ) </h3>
+		<h3>[method:Object toJSON]( [param:Object data] ) </h3>
 		<p>
 			data - 이 오브젝트는 인터리브 속성을 가진 기하학의 적절한 시리얼라이징을 위한 공유 배열 버퍼를 가지고 있습니다.<br/><br />
 

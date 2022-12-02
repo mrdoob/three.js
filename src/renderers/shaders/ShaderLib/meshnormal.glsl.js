@@ -72,5 +72,11 @@ void main() {
 
 	gl_FragColor = vec4( packNormalToRGB( normal ), opacity );
 
+	#ifdef OPAQUE
+
+		gl_FragColor.a = 1.0;
+
+	#endif
+
 }
 `;

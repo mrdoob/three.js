@@ -21,21 +21,19 @@
 			 	security restrictions, loading from a file system will fail with a security exception.
 		 	</p>
 
-			<p>There are two ways to solve this:</p>
-
-			<ol>
-				<li>
-					Change security for local files in a browser. This allows you to access your page as: <code>file:///yourFile.html</code>
-				</li>
-				<li>
-					Run files from a local web server. This allows you to access your page as: <code>http://localhost/yourFile.html</code>
-				</li>
-			</ol>
+			<p>
+				To solve this, run files from a local web server. This allows you to access your page as:
+			</p>
+			
+			<p>
+				<code>http://localhost/yourFile.html</code>
+			</p>
 
 			<p>
-				If you use option 1, be aware that you may open yourself to some vulnerabilities if using
-				the same browser for a regular web surfing. You may want to create a separate browser
-				profile / shortcut used just for local development to be safe. Let's go over each option in turn.
+				While it is also possible to change browser security settings instead of running a local server,
+				we do not recommend that approach. Doing so may open your device up to vulnerabilities, if the
+				same browser is used for regular web surfing. Use of a local server is standard practice in 
+				web development, and we explain how to install and use a local server below.
 			</p>
 		</div>
 
@@ -47,7 +45,7 @@
 				production servers such as [link:https://www.apache.org/ Apache] or [link:https://nginx.org NGINX], however they should be sufficient for testing your
 				three.js application.
 			</p>
-			
+
 			<h3>Plugins for popular code editors</h3>
 			<div>
 				<p>Some code editors have plugins which will spawn a simple server on demand.</p>

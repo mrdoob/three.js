@@ -1,20 +1,23 @@
 /* global QUnit */
 
-import { Mesh } from '../../../../src/objects/Mesh';
-import { Raycaster } from '../../../../src/core/Raycaster';
-import { PlaneGeometry } from '../../../../src/geometries/PlaneGeometry';
-import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
-import { Vector2 } from '../../../../src/math/Vector2';
-import { Vector3 } from '../../../../src/math/Vector3';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { Raycaster } from '../../../../src/core/Raycaster.js';
+import { PlaneGeometry } from '../../../../src/geometries/PlaneGeometry.js';
+import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 
 export default QUnit.module( 'Objects', () => {
 
 	QUnit.module( 'Mesh', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var mesh = new Mesh();
+	
+			assert.strictEqual( mesh instanceof Object3D, true, 'Mesh extends from Object3D' );
 
 		} );
 

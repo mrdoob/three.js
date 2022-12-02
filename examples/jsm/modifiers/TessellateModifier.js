@@ -4,7 +4,7 @@ import {
 	Float32BufferAttribute,
 	Vector2,
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * Break faces with edges longer than maxEdgeLength
@@ -20,13 +20,6 @@ class TessellateModifier {
 	}
 
 	modify( geometry ) {
-
-		if ( geometry.isGeometry === true ) {
-
-			console.error( 'THREE.TessellateModifier no longer supports Geometry. Use BufferGeometry instead.' );
-			return geometry;
-
-		}
 
 		if ( geometry.index !== null ) {
 

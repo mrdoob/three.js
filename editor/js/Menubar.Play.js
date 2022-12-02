@@ -2,15 +2,15 @@ import { UIPanel } from './libs/ui.js';
 
 function MenubarPlay( editor ) {
 
-	var signals = editor.signals;
-	var strings = editor.strings;
+	const signals = editor.signals;
+	const strings = editor.strings;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var isPlaying = false;
+	let isPlaying = false;
 
-	var title = new UIPanel();
+	const title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/play' ) );
 	title.onClick( function () {

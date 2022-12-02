@@ -68,6 +68,11 @@
 			默认会创建 [page:Color] 并设置为白色（0xffffff）。
 		</p>
 
+		<h3>[property:Boolean isHemisphereLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Vector3 position]</h3>
 		<p>
 			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0),那么光线将会从上往下照射。
@@ -79,7 +84,7 @@
 
 		<p>公共方法请查看基类 [page:Light Light]。</p>
 
-		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
+		<h3>[method:this copy]( [param:HemisphereLight source] )</h3>
 		<p>
 			从[page:Light source]复制 [page:.color color], [page:.intensity intensity] 和
 			[page:.groundColor groundColor] 的值到当前半球光对象中。

@@ -24,12 +24,12 @@
 		<p>
 			In contrast to the animation hierarchy of the
 			[link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format] a
-			*KeyframeTrack* doesn't store its single keyframes as objects in a "keys" array (holding the
+			`KeyframeTrack` doesn't store its single keyframes as objects in a "keys" array (holding the
 			times and the values for each frame together in one place).
 		</p>
 
 		<p>
-			Instead of this there are always two arrays in a *KeyframeTrack*: the [page:.times times] array
+			Instead of this there are always two arrays in a `KeyframeTrack`: the [page:.times times] array
 			stores the time values for all keyframes of this track in sequential order, and the
 			[page:.values values] array contains the corresponding changing values of the animated property.
 		</p>
@@ -43,7 +43,7 @@
 
 		<p>
 			Corresponding to the different possible types of animated values there are several subclasses of
-			*KeyframeTrack*, inheriting the most properties and methods:
+			`KeyframeTrack`, inheriting the most properties and methods:
 		</p>
 
 		<ul>
@@ -77,7 +77,7 @@
 
 		<h3>[name]( [param:String name], [param:Array times], [param:Array values], [param:Constant interpolation] )</h3>
 		<p>
-			[page:String name] - the identifier for the *KeyframeTrack*.<br />
+			[page:String name] - the identifier for the `KeyframeTrack`.<br />
 			[page:Array times] - an array of keyframe times, converted internally to a
 			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
 			[page:Array values] - an array with the values related to the times array, converted internally to a
@@ -92,7 +92,7 @@
 
 		<h3>[property:String name]</h3>
 		<p>
-			The track's name can refer to  morph targets or [page:SkinnedMesh bones] or possibly other values within an animated object. See
+			The track's name can refer to morph targets or [page:SkinnedMesh bones] or possibly other values within an animated object. See
 			[page:PropertyBinding.parseTrackName] for the forms of strings that can be parsed for property
 			binding:
 		</p>
@@ -163,14 +163,14 @@
 			Returns a copy of this track.
 		</p>
 
-		<h3>[method:null createInterpolant]()</h3>
+		<h3>[method:Interpolant createInterpolant]()</h3>
 		<p>
 			Creates a [page:LinearInterpolant LinearInterpolant], [page:CubicInterpolant CubicInterpolant]
 			or [page:DiscreteInterpolant DiscreteInterpolant], depending on the value of the interpolation
 			parameter passed in the constructor.
 		</p>
 
-		<h3>[method:null getInterpolation]()</h3>
+		<h3>[method:Interpolant getInterpolation]()</h3>
 		<p>
 			Returns the interpolation type.
 		</p>
@@ -189,7 +189,7 @@
 			created automatically.
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:LinearInterpolant InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			Creates a new [page:LinearInterpolant LinearInterpolant] from the
 			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
@@ -197,7 +197,7 @@
 			created automatically.
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:CubicInterpolant InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			Create a new [page:CubicInterpolant CubicInterpolant] from the
 			[page:KeyframeTrack.times times] and [page:KeyframeTrack.times values]. A Float32Array can be
@@ -232,8 +232,8 @@
 
 		<h3>[method:this trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
 		<p>
-			Removes keyframes before *startTime* and after *endTime*,
-			without changing any values within the range [*startTime*, *endTime*].
+			Removes keyframes before `startTime` and after `endTime`,
+			without changing any values within the range [`startTime`, `endTime`].
 		</p>
 
 		<h3>[method:Boolean validate]()</h3>
@@ -243,7 +243,7 @@
 
 		<p>
 			This method logs errors to the console, if a track is empty, if the [page:.valueSize value size] is not valid, if an item
-			in the [page:.times times] or [page:.values values] array is not a valid number or if the items in the *times* array are out of order.
+			in the [page:.times times] or [page:.values values] array is not a valid number or if the items in the `times` array are out of order.
 		</p>
 
 		<h2>Static Methods</h2>

@@ -36,6 +36,10 @@
 						<option value="ko">한국어</option>
 						<option value="zh">中文</option>
 						<option value="ja">日本語</option>
+						<option value="it">it</option>
+						<option value="pt-br">pt-br</option>
+						<option value="fr">fr</option>
+						<option value="ru">ru</option>
 					</select>
 				</div>
 				<div id="content"></div>
@@ -72,7 +76,7 @@
 
 			// *BufferGeometry to *Geometry
 
-			if ( /Instanced/.exec( window.location.hash ) !== null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
+			if ( /Instanced/.exec( window.location.hash ) === null && /([\w]+)BufferGeometry$/.exec( window.location.hash ) ) {
 
 				window.location.hash = window.location.hash.replace( 'BufferGeometry', 'Geometry' );
 
@@ -86,7 +90,7 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja|it|pt-br|fr|ru)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 
@@ -321,15 +325,15 @@
 
 		}
 
-		// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
+		// Auto change language url. If a reader open a document in English, when they click "zh", the document they read will auto change into Chinese version
 
 		function autoChangeUrlLanguage( language ) {
 
 			const hash = location.hash;
 			if ( hash === '' ) return;
-			const docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
-			let docLink = hash.substr( hash.indexOf( '/' ) + 1 );
-			docLink = docLink.substr( docLink.indexOf( '/' ) );
+			const docType = hash.slice( 0, hash.indexOf( '/' ) + 1 );
+			let docLink = hash.slice( hash.indexOf( '/' ) + 1 );
+			docLink = docLink.slice( docLink.indexOf( '/' ) );
 			location.href = docType + language + docLink;
 
 		}
@@ -342,11 +346,17 @@
 
 			if ( search.indexOf( '?q=' ) !== - 1 ) {
 
-				return decodeURI( search.substr( 3 ) );
+				return decodeURI( search.slice( 3 ) );
 
 			}
 
 			return '';
+
+		}
+
+		function escapeRegExp( string ) {
+
+			return string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // https://stackoverflow.com/a/6969486/5250847
 
 		}
 
@@ -367,7 +377,7 @@
 
 			//
 
-			const regExp = new RegExp( filterInput.value, 'gi' );
+			const regExp = new RegExp( escapeRegExp( v ), 'gi' );
 
 			for ( let pageName in pageProperties ) {
 
@@ -404,7 +414,7 @@
 
 			if ( search ) {
 
-				let link = sectionLink.href.split( /[?#]/ )[ 0 ];
+				const link = sectionLink.href.split( /[?#]/ )[ 0 ];
 				sectionLink.href = `${link}?q=${search}`;
 
 			} else {
@@ -458,7 +468,7 @@
 
 		// Routing
 
-		function setUrlFragment( pageName ) { // eslint-disable-line no-undef
+		function setUrlFragment( pageName ) { // eslint-disable-line no-unused-vars
 
 			// Handle navigation from the subpages (iframes):
 			// First separate the member (if existing) from the page name,
@@ -498,7 +508,7 @@
 			const oldIframe = iframe;
 			iframe = oldIframe.cloneNode();
 
-			if ( hash ) {
+			if ( hash && titles[ splitHash[ 0 ] ] ) {
 
 				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';

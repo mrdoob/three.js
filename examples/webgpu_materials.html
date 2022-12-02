@@ -5,33 +5,38 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebGPU (For Chrome 94-97), expires 10/11/2021 -->
-		<meta http-equiv="origin-trial" content="Agfr4hEaaoH1kaTtGTZY4OU2lQQOv+gWq+8rYeHZBPWNnLww/smePFCIJOUdRFnQZkO3KAio+SNJapjzaoyFfQQAAABLeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJHUFUiLCJleHBpcnkiOjE2NDMxNTUxOTl9">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Materials<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Materials
 		</div>
 
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
 		<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.module.js"
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
 			}
-		}
 		</script>
+
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as Nodes from 'three/nodes';
 
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import { TeapotGeometry } from './jsm/geometries/TeapotGeometry.js';
+			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import * as Nodes from './jsm/renderers/nodes/Nodes.js';
+			import { ShaderNode, vec3, dot, triplanarTexture, viewportBottomLeft } from 'three/nodes';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let stats;
 
@@ -39,15 +44,15 @@
 
 			const objects = [], materials = [];
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 
@@ -62,7 +67,7 @@
 				// Grid
 
 				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = new Nodes.AttributeNode( 'color', 'vec3' );
+				helper.material.colorNode = new Nodes.AttributeNode( 'color' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
@@ -79,6 +84,10 @@
 				opacityTexture.wrapT = THREE.RepeatWrapping;
 
 				let material;
+
+				//
+				//	BASIC
+				//
 
 				// PositionNode.LOCAL
 				material = new Nodes.MeshBasicNodeMaterial();
@@ -107,6 +116,7 @@
 
 				// Opacity
 				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = new Nodes.UniformNode( new THREE.Color( 0x0099FF ) );
 				material.opacityNode = new Nodes.TextureNode( texture );
 				material.transparent = true;
 				materials.push( material );
@@ -115,10 +125,83 @@
 				material = new Nodes.MeshBasicNodeMaterial();
 				material.colorNode = new Nodes.TextureNode( texture );
 				material.opacityNode = new Nodes.TextureNode( opacityTexture );
-				material.alphaTestNode = new Nodes.FloatNode( 0.5 );
+				material.alphaTestNode = new Nodes.UniformNode( 0.5 );
 				materials.push( material );
 
+				//
+				//	ADVANCED
+				//
+
+				// Custom ShaderNode ( desaturate filter )
+
+				const desaturateShaderNode = new ShaderNode( ( input ) => {
+
+					return dot( vec3( 0.299, 0.587, 0.114 ), input.color.xyz );
+
+				} );
+
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = desaturateShaderNode.call( { color: new Nodes.TextureNode( texture ) } );
+				materials.push( material );
+
+				// Custom ShaderNode(no inputs) > Approach 2
+
+				const desaturateNoInputsShaderNode = new ShaderNode( () => {
+
+					return dot( vec3( 0.299, 0.587, 0.114 ), Nodes.texture( texture ).xyz );
+
+				} );
+
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = desaturateNoInputsShaderNode;
+				materials.push( material );
+
+				// Custom WGSL ( desaturate filter )
+
+				const desaturateWGSLNode = new Nodes.FunctionNode( `
+					fn desaturate( color:vec3<f32> ) -> vec3<f32> {
+
+						let lum = vec3<f32>( 0.299, 0.587, 0.114 );
+
+						return vec3<f32>( dot( lum, color ) );
+
+					}
+				` );
+
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = desaturateWGSLNode.call( { color: new Nodes.TextureNode( texture ) } );
+				materials.push( material );
+
+				// Custom WGSL ( get texture from keywords )
+
+				const getWGSLTextureSample = new Nodes.FunctionNode( `
+					fn getWGSLTextureSample( tex: texture_2d<f32>, tex_sampler: sampler, uv:vec2<f32> ) -> vec4<f32> {
+
+						return textureSample( tex, tex_sampler, uv ) * vec4<f32>( 0.0, 1.0, 0.0, 1.0 );
+
+					}
+				` );
+
+				const textureNode = new Nodes.TextureNode( texture );
+				//getWGSLTextureSample.keywords = { tex: textureNode, tex_sampler: sampler( textureNode ) };
+
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = getWGSLTextureSample.call( { tex: textureNode, tex_sampler: textureNode, uv: new Nodes.UVNode() } );
+				materials.push( material );
+
+				// Triplanar Texture Mapping
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = triplanarTexture( new Nodes.TextureNode( texture ) );
+				materials.push( material );
+
+				// Screen Projection Texture
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = Nodes.texture( texture, viewportBottomLeft );
+				materials.push( material );
+
+				//
 				// Geometry
+				//
 
 				const geometry = new TeapotGeometry( 50, 18 );
 
@@ -133,6 +216,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -143,8 +227,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				return renderer.init();
 
 			}
 
@@ -178,15 +260,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
 				const timer = 0.0001 * Date.now();
 
 				camera.position.x = Math.cos( timer ) * 1000;
@@ -205,11 +278,7 @@
 
 				renderer.render( scene, camera );
 
-			}
-
-			function error( error ) {
-
-				console.error( error );
+				stats.update();
 
 			}
 
