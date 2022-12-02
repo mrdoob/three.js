@@ -173,6 +173,7 @@
 		"webgl_materials_wireframe",
 		"webgl_math_obb",
 		"webgl_math_orientation_transform",
+		"webgl_mesh_batch",
 		"webgl_mirror",
 		"webgl_modifier_curve",
 		"webgl_modifier_curve_instanced",
