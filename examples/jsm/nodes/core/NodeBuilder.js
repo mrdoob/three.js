@@ -12,7 +12,7 @@ import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'thre
 import { mul, maxMipLevel } from '../shadernode/ShaderNodeElements.js';
 
 export const defaultShaderStages = [ 'fragment', 'vertex' ];
-export const defaultBuildStages = [ 'construct', 'analyze', 'generate' ]
+export const defaultBuildStages = [ 'construct', 'analyze', 'generate' ];
 export const shaderStages = [ ...defaultShaderStages, 'compute' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
 
