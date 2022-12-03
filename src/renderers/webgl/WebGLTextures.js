@@ -570,7 +570,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		if ( extensions.has( 'EXT_texture_filter_anisotropic' ) === true ) {
+		if ( texture.magFilter !== NearestFilter && extensions.has( 'EXT_texture_filter_anisotropic' ) === true ) {
 
 			const extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
