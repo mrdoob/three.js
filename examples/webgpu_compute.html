@@ -97,7 +97,7 @@
 					stack.assign( position, max( negate( limit ), min( limit, position ) ) );
 
 					const pointerSize = 0.1;
-					const distanceFromPointer = length( sub( pointer, position ) );
+					const distanceFromPointer = pointer.sub( position ).length();
 
 					stack.assign( particle, cond( lessThanEqual( distanceFromPointer, pointerSize ), vec3(), position ) );
 

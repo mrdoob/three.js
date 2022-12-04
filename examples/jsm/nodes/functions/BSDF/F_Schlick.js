@@ -9,9 +9,9 @@ const F_Schlick = new ShaderNode( ( inputs ) => {
 
 	// Optimized variant (presented by Epic at SIGGRAPH '13)
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
-	const fresnel = exp2( mul( sub( mul( - 5.55473, dotVH ), 6.98316 ), dotVH ) );
+	const fresnel = exp2( mul( - 5.55473, dotVH ).sub( 6.98316 ).mul( dotVH ) );
 
-	return add( mul( f0, sub( 1.0, fresnel ) ), mul( f90, fresnel ) );
+	return f0.mul( sub( 1.0, fresnel ) ).add( f90.mul( fresnel ) );
 
 } ); // validated
 
