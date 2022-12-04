@@ -2,7 +2,7 @@ import LightingNode from './LightingNode.js';
 import ContextNode from '../core/ContextNode.js';
 import CacheNode from '../core/CacheNode.js';
 import SpecularMIPLevelNode from '../utils/SpecularMIPLevelNode.js';
-import { float, mul, roughness, positionViewDirection, normalize, transformedNormalView, transformedNormalWorld, cameraViewMatrix, equirectUV, vec2 } from '../shadernode/ShaderNodeElements.js';
+import { float, mul, roughness, positionViewDirection, transformedNormalView, transformedNormalWorld, cameraViewMatrix, equirectUV, vec2 } from '../shadernode/ShaderNodeElements.js';
 
 class EnvironmentNode extends LightingNode {
 
