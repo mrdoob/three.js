@@ -38,6 +38,7 @@ import CheckerNode from '../procedural/CheckerNode.js';
 // fog
 import FogNode from '../fog/FogNode.js';
 import FogRangeNode from '../fog/FogRangeNode.js';
+import FogExp2Node from '../fog/FogExp2Node.js';
 
 // shader node utils
 import { nodeObject, nodeProxy, nodeImmutable } from './ShaderNode.js';
@@ -147,3 +148,4 @@ export const checker = nodeProxy( CheckerNode );
 
 export const fog = nodeProxy( FogNode );
 export const rangeFog = nodeProxy( FogRangeNode );
+export const exp2Fog = nodeProxy( FogExp2Node );
