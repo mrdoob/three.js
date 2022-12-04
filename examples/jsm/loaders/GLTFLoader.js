@@ -4017,6 +4017,31 @@ class GLTFParser {
 
 			} );
 
+		} ).then( function ( node ) {
+
+			if ( nodeDef.children === undefined ) return node;
+
+			const pending = [];
+			const childrenDef = nodeDef.children;
+
+			for ( let i = 0, il = childrenDef.length; i < il; i ++ ) {
+
+				pending.push( parser.getDependency( 'node', childrenDef[ i ] ) );
+
+			}
+
+			return Promise.all( pending ).then( function ( children ) {
+
+				for ( let i = 0, il = children.length; i < il; i ++ ) {
+
+					node.add( children[ i ] );
+
+				}
+
+				return node;
+
+			} );
+
 		} );
 
 	}
@@ -4028,7 +4053,6 @@ class GLTFParser {
 	 */
 	loadScene( sceneIndex ) {
 
-		const json = this.json;
 		const extensions = this.extensions;
 		const sceneDef = this.json.scenes[ sceneIndex ];
 		const parser = this;
@@ -4048,11 +4072,17 @@ class GLTFParser {
 
 		for ( let i = 0, il = nodeIds.length; i < il; i ++ ) {
 
-			pending.push( buildNodeHierarchy( nodeIds[ i ], scene, json, parser ) );
+			pending.push( parser.getDependency( 'node', nodeIds[ i ] ) );
 
 		}
 
-		return Promise.all( pending ).then( function () {
+		return Promise.all( pending ).then( function ( nodes ) {
+
+			for ( let i = 0, il = nodes.length; i < il; i ++ ) {
+
+				scene.add( nodes[ i ] );
+
+			}
 
 			// Removes dangling associations, associations that reference a node that
 			// didn't make it into the scene.
@@ -4093,37 +4123,6 @@ class GLTFParser {
 		} );
 
 	}
-
-}
-
-function buildNodeHierarchy( nodeId, parentObject, json, parser ) {
-
-	const nodeDef = json.nodes[ nodeId ];
-
-	return parser.getDependency( 'node', nodeId ).then( function ( node ) {
-
-		// build node hierachy
-
-		parentObject.add( node );
-
-		const pending = [];
-
-		if ( nodeDef.children ) {
-
-			const children = nodeDef.children;
-
-			for ( let i = 0, il = children.length; i < il; i ++ ) {
-
-				const child = children[ i ];
-				pending.push( buildNodeHierarchy( child, node, json, parser ) );
-
-			}
-
-		}
-
-		return Promise.all( pending );
-
-	} );
 
 }
 
