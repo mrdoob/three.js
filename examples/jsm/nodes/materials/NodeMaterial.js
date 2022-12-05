@@ -156,7 +156,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			} else {
 
-				console.warn( `NodeMaterial: Fog "${ fog.constructor.name }" is not compatible.` );
+				console.error( 'NodeMaterial: Unsupported fog configuration.', fog );
 
 			}
 			
