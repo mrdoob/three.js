@@ -1,5 +1,5 @@
 import {
-	ShaderNode, dotNV, vec2, vec4, add, mul, min, exp2
+	ShaderNode, dotNV, vec2, vec4, mul, min
 } from '../../shadernode/ShaderNodeElements.js';
 
 // Analytical approximation of the DFG LUT, one half of the
