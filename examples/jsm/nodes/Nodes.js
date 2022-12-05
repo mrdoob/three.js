@@ -112,6 +112,7 @@ import CheckerNode from './procedural/CheckerNode.js';
 // fog
 import FogNode from './fog/FogNode.js';
 import FogRangeNode from './fog/FogRangeNode.js';
+import FogExp2Node from './fog/FogExp2Node.js';
 
 // core
 export * from './core/constants.js';
@@ -234,6 +235,7 @@ const nodeLib = {
 	// fog
 	FogNode,
 	FogRangeNode,
+	FogExp2Node,
 
 	// loaders
 	NodeLoader,
@@ -358,6 +360,7 @@ export {
 	// fog
 	FogNode,
 	FogRangeNode,
+	FogExp2Node,
 
 	// loaders
 	NodeLoader,
