@@ -269,6 +269,12 @@ function getMinMax( attribute, start, count ) {
 				else if ( a === 2 ) value = attribute.getZ( i );
 				else if ( a === 3 ) value = attribute.getW( i );
 
+				if ( attribute.normalized === true ) {
+
+					value = MathUtils.normalize( value, attribute.array );
+
+				}
+
 			}
 
 			output.min[ a ] = Math.min( output.min[ a ], value );
@@ -875,6 +881,12 @@ class GLTFWriter {
 					else if ( a === 1 ) value = attribute.getY( i );
 					else if ( a === 2 ) value = attribute.getZ( i );
 					else if ( a === 3 ) value = attribute.getW( i );
+
+					if ( attribute.normalized === true ) {
+
+						value = MathUtils.normalize( value, attribute.array );
+
+					}
 
 				}
 
@@ -1606,12 +1618,14 @@ class GLTFWriter {
 
 						for ( let j = 0, jl = attribute.count; j < jl; j ++ ) {
 
-							relativeAttribute.setXYZ(
-								j,
-								attribute.getX( j ) - baseAttribute.getX( j ),
-								attribute.getY( j ) - baseAttribute.getY( j ),
-								attribute.getZ( j ) - baseAttribute.getZ( j )
-							);
+							for ( let a = 0; a < attribute.itemSize; a ++ ) {
+
+								if ( a === 0 ) relativeAttribute.setX( j, attribute.getX( j ) - baseAttribute.getX( j ) );
+								if ( a === 1 ) relativeAttribute.setY( j, attribute.getY( j ) - baseAttribute.getY( j ) );
+								if ( a === 2 ) relativeAttribute.setZ( j, attribute.getZ( j ) - baseAttribute.getZ( j ) );
+								if ( a === 3 ) relativeAttribute.setW( j, attribute.getW( j ) - baseAttribute.getW( j ) );
+
+							}
 
 						}
 
