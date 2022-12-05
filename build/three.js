@@ -5112,8 +5112,8 @@
 			this.animations = [];
 			this.userData = {};
 		}
-		onBeforeRender() {}
-		onAfterRender() {}
+		onBeforeRender( /* renderer, scene, camera, geometry, material, group */) {}
+		onAfterRender( /* renderer, scene, camera, geometry, material, group */) {}
 		applyMatrix4(matrix) {
 			if (this.matrixAutoUpdate) this.updateMatrix();
 			this.matrix.premultiply(matrix);
@@ -5319,7 +5319,7 @@
 			const e = this.matrixWorld.elements;
 			return target.set(e[8], e[9], e[10]).normalize();
 		}
-		raycast() {}
+		raycast( /* raycaster, intersects */) {}
 		traverse(callback) {
 			callback(this);
 			const children = this.children;
@@ -5841,9 +5841,9 @@
 			}
 			this._alphaTest = value;
 		}
-		onBuild() {}
-		onBeforeRender() {}
-		onBeforeCompile() {}
+		onBuild( /* shaderobject, renderer */) {}
+		onBeforeRender( /* renderer, scene, camera, geometry, object, group */) {}
+		onBeforeCompile( /* shaderobject, renderer */) {}
 		customProgramCacheKey() {
 			return this.onBeforeCompile.toString();
 		}
@@ -17811,8 +17811,8 @@
 			console.log('THREE.WebGLRenderer: Context Lost.');
 			_isContextLost = true;
 		}
-		function /* event */
-		onContextRestore() {
+		function onContextRestore( /* event */
+		) {
 			console.log('THREE.WebGLRenderer: Context Restored.');
 			_isContextLost = false;
 			const infoAutoReset = info.autoReset;
@@ -18833,7 +18833,8 @@
 		clone() {
 			return new FogExp2(this.color, this.density);
 		}
-		toJSON() {
+		toJSON( /* meta */
+		) {
 			return {
 				type: 'FogExp2',
 				color: this.color.getHex(),
@@ -18853,7 +18854,8 @@
 		clone() {
 			return new Fog(this.color, this.near, this.far);
 		}
-		toJSON() {
+		toJSON( /* meta */
+		) {
 			return {
 				type: 'Fog',
 				color: this.color.getHex(),
@@ -20220,7 +20222,8 @@
 		// Virtual base class method to overwrite and implement in subclasses
 		//	- t [0 .. 1]
 
-		getPoint() {
+		getPoint( /* t, optionalTarget */
+		) {
 			console.warn('THREE.Curve: .getPoint() not implemented.');
 			return null;
 		}
@@ -25091,12 +25094,14 @@
 
 		// Template methods for derived classes:
 
-		interpolate_() {
+		interpolate_( /* i1, t0, t, t1 */
+		) {
 			throw new Error('call to abstract method');
 			// implementations shall return this.resultBuffer
 		}
 
-		intervalChanged_() {
+		intervalChanged_( /* i1, t0, t1 */
+		) {
 
 			// empty
 		}
@@ -25956,14 +25961,14 @@
 			this.resourcePath = '';
 			this.requestHeader = {};
 		}
-		load() {}
+		load( /* url, onLoad, onProgress, onError */) {}
 		loadAsync(url, onProgress) {
 			const scope = this;
 			return new Promise(function (resolve, reject) {
 				scope.load(url, resolve, onProgress, reject);
 			});
 		}
-		parse() {}
+		parse( /* data */) {}
 		setCrossOrigin(crossOrigin) {
 			this.crossOrigin = crossOrigin;
 			return this;
@@ -31003,15 +31008,15 @@
 			// TODO: delete this comment?
 			const distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 			const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
-			this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
+				this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 			this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
-			const d = light.distance;
-			if ( d === 0.0 ) {
-				this.lightDistance.visible = false;
-			} else {
-				this.lightDistance.scale.set( d, d, d );
-			}
-			this.add( this.lightDistance );
+				const d = light.distance;
+				if ( d === 0.0 ) {
+					this.lightDistance.visible = false;
+				} else {
+					this.lightDistance.scale.set( d, d, d );
+				}
+				this.add( this.lightDistance );
 			*/
 		}
 
@@ -31029,12 +31034,12 @@
 
 			/*
 			const d = this.light.distance;
-				if ( d === 0.0 ) {
-					this.lightDistance.visible = false;
-				} else {
-					this.lightDistance.visible = true;
+					if ( d === 0.0 ) {
+						this.lightDistance.visible = false;
+					} else {
+						this.lightDistance.visible = true;
 				this.lightDistance.scale.set( d, d, d );
-				}
+					}
 			*/
 		}
 	}
@@ -31511,7 +31516,7 @@
 			1/___0/|
 			| 6__|_7
 			2/___3/
-				0: max.x, max.y, max.z
+					0: max.x, max.y, max.z
 			1: min.x, max.y, max.z
 			2: min.x, min.y, max.z
 			3: max.x, min.y, max.z
@@ -32676,3 +32681,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuanMiLCJzb3VyY2VzIjpbXSwic291cmNlc0NvbnRlbnQiOltdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiIn0=
