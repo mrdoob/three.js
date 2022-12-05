@@ -22,7 +22,7 @@ class CSS2DObject extends Object3D {
 		const _this = this;
 		this.addEventListener( 'added', function() {
 			
-			_this.parent.addEventListener('removed', function() {
+			_this.parent.addEventListener( 'removed', function() {
 				
 				_this.removeFromParent();
 
