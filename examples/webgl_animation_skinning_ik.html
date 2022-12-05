@@ -159,7 +159,12 @@
 				gui.add(IKSolver, 'update').name('IK manual update()')
 				gui.open()
 
-				window.addEventListener('resize', onWindowResize, false)
+				window.addEventListener(
+					//
+					'resize',
+					onWindowResize,
+					false,
+				)
 			}
 
 			function animate() {
