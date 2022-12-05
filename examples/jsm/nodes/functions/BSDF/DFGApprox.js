@@ -16,9 +16,9 @@ const DFGApprox = new ShaderNode( ( inputs ) => {
 
 	const r = roughness.mul( c0 ).add( c1 );
 
-	const a004 = add( mul( min( mul( r.x, r.x ), exp2( mul( - 9.28, dotNV ) ) ), r.x ), r.y );
+	const a004 = min( mul( r.x, r.x ), dotNV.mul( -9.28 ).exp2() ).mul( r.x ).add( r.y );
 
-	const fab = add( mul( vec2( - 1.04, 1.04 ), a004 ), r.zw );
+	const fab = vec2( - 1.04, 1.04 ).mul( a004 ).add( r.zw );
 
 	return fab;
 
