@@ -1,4 +1,4 @@
-import { ShaderNode, sub, mul, exp2 } from '../../shadernode/ShaderNodeBaseElements.js';
+import { ShaderNode, sub } from '../../shadernode/ShaderNodeBaseElements.js';
 
 const F_Schlick = new ShaderNode( ( inputs ) => {
 
