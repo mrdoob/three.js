@@ -3,7 +3,7 @@
  * Copyright 2010-2022 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '147';
+const REVISION = '148dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -9259,7 +9259,7 @@ const _vector2$1 = /*@__PURE__*/ new Vector2();
 
 class BufferAttribute {
 
-	constructor( array, itemSize, normalized ) {
+	constructor( array, itemSize, normalized = false ) {
 
 		if ( Array.isArray( array ) ) {
 
@@ -9274,7 +9274,7 @@ class BufferAttribute {
 		this.array = array;
 		this.itemSize = itemSize;
 		this.count = array !== undefined ? array.length / itemSize : 0;
-		this.normalized = normalized === true;
+		this.normalized = normalized;
 
 		this.usage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };
@@ -10685,7 +10685,7 @@ class BufferGeometry extends EventDispatcher {
 
 	clone() {
 
-		 return new this.constructor().copy( this );
+		return new this.constructor().copy( this );
 
 	}
 
@@ -29421,7 +29421,7 @@ class InterleavedBufferAttribute {
 		this.itemSize = itemSize;
 		this.offset = offset;
 
-		this.normalized = normalized === true;
+		this.normalized = normalized;
 
 	}
 

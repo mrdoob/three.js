@@ -7,7 +7,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const REVISION = '147';
+const REVISION = '148dev';
 const MOUSE = {
 	LEFT: 0,
 	MIDDLE: 1,
@@ -6145,7 +6145,7 @@ class MeshBasicMaterial extends Material {
 const _vector$9 = /*@__PURE__*/new Vector3();
 const _vector2$1 = /*@__PURE__*/new Vector2();
 class BufferAttribute {
-	constructor(array, itemSize, normalized) {
+	constructor(array, itemSize, normalized = false) {
 		if (Array.isArray(array)) {
 			throw new TypeError('THREE.BufferAttribute: array should be a Typed Array.');
 		}
@@ -6154,7 +6154,7 @@ class BufferAttribute {
 		this.array = array;
 		this.itemSize = itemSize;
 		this.count = array !== undefined ? array.length / itemSize : 0;
-		this.normalized = normalized === true;
+		this.normalized = normalized;
 		this.usage = StaticDrawUsage;
 		this.updateRange = {
 			offset: 0,
@@ -19002,7 +19002,7 @@ class InterleavedBufferAttribute {
 		this.data = interleavedBuffer;
 		this.itemSize = itemSize;
 		this.offset = offset;
-		this.normalized = normalized === true;
+		this.normalized = normalized;
 	}
 	get count() {
 		return this.data.count;
