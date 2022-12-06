@@ -79,7 +79,7 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/circle' ) );
 	option.onClick( function () {
 
-		const geometry = new THREE.CircleGeometry( 1, 8, 0, Math.PI * 2 );
+		const geometry = new THREE.CircleGeometry( 1, 32, 0, Math.PI * 2 );
 		const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Circle';
 
@@ -95,7 +95,7 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/cylinder' ) );
 	option.onClick( function () {
 
-		const geometry = new THREE.CylinderGeometry( 1, 1, 1, 8, 1, false, 0, Math.PI * 2 );
+		const geometry = new THREE.CylinderGeometry( 1, 1, 1, 32, 1, false, 0, Math.PI * 2 );
 		const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Cylinder';
 
@@ -192,7 +192,7 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/ring' ) );
 	option.onClick( function () {
 
-		const geometry = new THREE.RingGeometry( 0.5, 1, 8, 1, 0, Math.PI * 2 );
+		const geometry = new THREE.RingGeometry( 0.5, 1, 32, 1, 0, Math.PI * 2 );
 		const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Ring';
 
@@ -255,7 +255,7 @@ function MenubarAdd( editor ) {
 	option.setTextContent( strings.getKey( 'menubar/add/torus' ) );
 	option.onClick( function () {
 
-		const geometry = new THREE.TorusGeometry( 1, 0.4, 8, 6, Math.PI * 2 );
+		const geometry = new THREE.TorusGeometry( 1, 0.4, 12, 48, Math.PI * 2 );
 		const mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 		mesh.name = 'Torus';
 
