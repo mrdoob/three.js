@@ -1797,7 +1797,7 @@
 				premultiplyAlpha: this.premultiplyAlpha,
 				unpackAlignment: this.unpackAlignment
 			};
-			if (JSON.stringify(this.userData) !== '{}') output.userData = this.userData;
+			if (Object.keys(this.userData).length > 0) output.userData = this.userData;
 			if (!isRootObject) {
 				meta.textures[this.uuid] = output;
 			}
@@ -5112,8 +5112,8 @@
 			this.animations = [];
 			this.userData = {};
 		}
-		onBeforeRender() {}
-		onAfterRender() {}
+		onBeforeRender( /* renderer, scene, camera, geometry, material, group */) {}
+		onAfterRender( /* renderer, scene, camera, geometry, material, group */) {}
 		applyMatrix4(matrix) {
 			if (this.matrixAutoUpdate) this.updateMatrix();
 			this.matrix.premultiply(matrix);
@@ -5319,7 +5319,7 @@
 			const e = this.matrixWorld.elements;
 			return target.set(e[8], e[9], e[10]).normalize();
 		}
-		raycast() {}
+		raycast( /* raycaster, intersects */) {}
 		traverse(callback) {
 			callback(this);
 			const children = this.children;
@@ -5430,7 +5430,7 @@
 			if (this.visible === false) object.visible = false;
 			if (this.frustumCulled === false) object.frustumCulled = false;
 			if (this.renderOrder !== 0) object.renderOrder = this.renderOrder;
-			if (JSON.stringify(this.userData) !== '{}') object.userData = this.userData;
+			if (Object.keys(this.userData).length > 0) object.userData = this.userData;
 			object.layers = this.layers.mask;
 			object.matrix = this.matrix.toArray();
 			if (this.matrixAutoUpdate === false) object.matrixAutoUpdate = false;
@@ -5841,9 +5841,9 @@
 			}
 			this._alphaTest = value;
 		}
-		onBuild() {}
-		onBeforeRender() {}
-		onBeforeCompile() {}
+		onBuild( /* shaderobject, renderer */) {}
+		onBeforeRender( /* renderer, scene, camera, geometry, object, group */) {}
+		onBeforeCompile( /* shaderobject, renderer */) {}
 		customProgramCacheKey() {
 			return this.onBeforeCompile.toString();
 		}
@@ -6011,7 +6011,7 @@
 			if (this.visible === false) data.visible = false;
 			if (this.toneMapped === false) data.toneMapped = false;
 			if (this.fog === false) data.fog = false;
-			if (JSON.stringify(this.userData) !== '{}') data.userData = this.userData;
+			if (Object.keys(this.userData).length > 0) data.userData = this.userData;
 
 			// TODO: Copied from Object3D.toJSON
 
@@ -17811,8 +17811,8 @@
 			console.log('THREE.WebGLRenderer: Context Lost.');
 			_isContextLost = true;
 		}
-		function /* event */
-		onContextRestore() {
+		function onContextRestore( /* event */
+		) {
 			console.log('THREE.WebGLRenderer: Context Restored.');
 			_isContextLost = false;
 			const infoAutoReset = info.autoReset;
@@ -18833,7 +18833,8 @@
 		clone() {
 			return new FogExp2(this.color, this.density);
 		}
-		toJSON() {
+		toJSON( /* meta */
+		) {
 			return {
 				type: 'FogExp2',
 				color: this.color.getHex(),
@@ -18853,7 +18854,8 @@
 		clone() {
 			return new Fog(this.color, this.near, this.far);
 		}
-		toJSON() {
+		toJSON( /* meta */
+		) {
 			return {
 				type: 'Fog',
 				color: this.color.getHex(),
@@ -20220,7 +20222,8 @@
 		// Virtual base class method to overwrite and implement in subclasses
 		//	- t [0 .. 1]
 
-		getPoint() {
+		getPoint( /* t, optionalTarget */
+		) {
 			console.warn('THREE.Curve: .getPoint() not implemented.');
 			return null;
 		}
@@ -25091,12 +25094,14 @@
 
 		// Template methods for derived classes:
 
-		interpolate_() {
+		interpolate_( /* i1, t0, t, t1 */
+		) {
 			throw new Error('call to abstract method');
 			// implementations shall return this.resultBuffer
 		}
 
-		intervalChanged_() {
+		intervalChanged_( /* i1, t0, t1 */
+		) {
 
 			// empty
 		}
@@ -25956,14 +25961,14 @@
 			this.resourcePath = '';
 			this.requestHeader = {};
 		}
-		load() {}
+		load( /* url, onLoad, onProgress, onError */) {}
 		loadAsync(url, onProgress) {
 			const scope = this;
 			return new Promise(function (resolve, reject) {
 				scope.load(url, resolve, onProgress, reject);
 			});
 		}
-		parse() {}
+		parse( /* data */) {}
 		setCrossOrigin(crossOrigin) {
 			this.crossOrigin = crossOrigin;
 			return this;

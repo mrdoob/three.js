@@ -2552,7 +2552,7 @@ class Texture extends EventDispatcher {
 
 		};
 
-		if ( JSON.stringify( this.userData ) !== '{}' ) output.userData = this.userData;
+		if ( Object.keys( this.userData ).length > 0 ) output.userData = this.userData;
 
 		if ( ! isRootObject ) {
 
@@ -8140,7 +8140,7 @@ class Object3D extends EventDispatcher {
 		if ( this.visible === false ) object.visible = false;
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
-		if ( JSON.stringify( this.userData ) !== '{}' ) object.userData = this.userData;
+		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
 
 		object.layers = this.layers.mask;
 		object.matrix = this.matrix.toArray();
@@ -9047,7 +9047,7 @@ class Material extends EventDispatcher {
 
 		if ( this.fog === false ) data.fog = false;
 
-		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
+		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
 		// TODO: Copied from Object3D.toJSON
 
