@@ -11,12 +11,12 @@ class CSS2DObject extends Object3D {
 		super();
 
 		this.isCSS2DObject = true;
-		
+
 		this.element = element;
-		
+
 		this.element.style.position = 'absolute';
 		this.element.style.userSelect = 'none';
-		
+
 		this.element.setAttribute( 'draggable', false );
 		
 		const _this = this;
