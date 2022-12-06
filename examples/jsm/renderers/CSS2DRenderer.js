@@ -118,7 +118,9 @@ class CSS2DRenderer {
 
 				const visible = ( object.visible === true ) && ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
 				object.element.style.display = ( visible === true ) ? '' : 'none';
-
+				object.element.classList.add('css-object');
+				object.element.classList.toggle('visible', visible);
+	  
 				if ( visible === true ) {
 
 					object.onBeforeRender( _this, scene, camera );
