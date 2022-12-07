@@ -1,5 +1,4 @@
 import { Material } from './Material.js';
-import { Vector3 } from '../math/Vector3.js';
 
 class MeshDistanceMaterial extends Material {
 
