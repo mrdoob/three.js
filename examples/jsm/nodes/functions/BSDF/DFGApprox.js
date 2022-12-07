@@ -1,5 +1,5 @@
 import {
-	ShaderNode, dotNV, vec2, vec4, add, mul, min, exp2
+	ShaderNode, dotNV, vec2, vec4, mul, min
 } from '../../shadernode/ShaderNodeElements.js';
 
 // Analytical approximation of the DFG LUT, one half of the
@@ -14,11 +14,11 @@ const DFGApprox = new ShaderNode( ( inputs ) => {
 
 	const c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
 
-	const r = add( mul( roughness, c0 ), c1 );
+	const r = roughness.mul( c0 ).add( c1 );
 
-	const a004 = add( mul( min( mul( r.x, r.x ), exp2( mul( - 9.28, dotNV ) ) ), r.x ), r.y );
+	const a004 = min( mul( r.x, r.x ), dotNV.mul( -9.28 ).exp2() ).mul( r.x ).add( r.y );
 
-	const fab = add( mul( vec2( - 1.04, 1.04 ), a004 ), r.zw );
+	const fab = vec2( - 1.04, 1.04 ).mul( a004 ).add( r.zw );
 
 	return fab;
 

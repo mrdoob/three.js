@@ -7,6 +7,8 @@ import ConstNode from '../core/ConstNode.js';
 import StackNode from '../core/StackNode.js';
 import { getValueFromType } from '../core/NodeUtils.js';
 
+import * as NodeElements from './ShaderNodeElements.js';
+
 const shaderNodeHandler = {
 
 	construct( NodeClosure, params ) {
@@ -17,7 +19,7 @@ const shaderNodeHandler = {
 
 	},
 
-	get: function ( node, prop ) {
+	get: function ( node, prop, nodeObj ) {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
@@ -38,6 +40,12 @@ const shaderNodeHandler = {
 				// accessing array
 
 				return nodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
+
+			} else if ( NodeElements[ prop ] ) {
+
+				const nodeElement = NodeElements[ prop ];
+
+				return ( ...params ) => nodeElement( nodeObj, ...params );
 
 			}
 
