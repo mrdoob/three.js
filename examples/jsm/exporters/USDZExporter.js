@@ -163,6 +163,20 @@ function imageToCanvas( image, color ) {
 
 		return canvas;
 
+	} else if ( image === null ) {
+
+		console.warn( 'THREE.USDZExporter: Texture with no image data detected. Deserialize fallback data instead.' );
+
+		const canvas = document.createElement( 'canvas' );
+		canvas.width = 1;
+		canvas.height = 1;
+
+		return canvas;
+
+	} else {
+
+		console.error( 'THREE.USDZExporter: Unable to deserialize image data.' );
+
 	}
 
 }
