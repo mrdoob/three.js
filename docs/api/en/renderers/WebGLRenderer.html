@@ -97,10 +97,11 @@
 		<h3>[property:Object debug]</h3>
 		<p>
 		- [page:Boolean checkShaderErrors]:
-		  If it is true, defines whether material shader programs are checked
+			If set to true or a function, defines whether material shader programs are checked
 			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
 			It is strongly recommended to keep these checks enabled during development.
 			If the shader does not compile and link - it will not work and associated material will not render.
+			Setting to a function calls function with the error, and setting to true will log to `console.error`.
 			Default is `true`.
 		</p>
 
