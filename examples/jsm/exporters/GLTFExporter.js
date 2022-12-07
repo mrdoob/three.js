@@ -1299,7 +1299,6 @@ class GLTFWriter {
 		// pbrMetallicRoughness.metallicRoughnessTexture
 		const metalnessMap = material.metalnessMap?.image ? material.metalnessMap : undefined;
 		const roughnessMap = material.roughnessMap?.image ? material.roughnessMap : undefined;
-
 		if ( metalnessMap || roughnessMap ) {
 
 			const metalRoughTexture = this.buildMetalRoughTexture( metalnessMap, roughnessMap );
