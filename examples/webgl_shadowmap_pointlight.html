@@ -80,13 +80,6 @@
 					sphere.receiveShadow = true;
 					light.add( sphere );
 
-					// custom distance material
-					const distanceMaterial = new THREE.MeshDistanceMaterial( {
-						alphaMap: material.alphaMap,
-						alphaTest: material.alphaTest
-					} );
-					sphere.customDistanceMaterial = distanceMaterial;
-
 					return light;
 
 				}
