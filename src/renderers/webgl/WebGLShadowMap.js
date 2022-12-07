@@ -7,6 +7,7 @@ import { BufferAttribute } from '../../core/BufferAttribute.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { Vector3 } from '../../math/Vector3.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Frustum } from '../../math/Frustum.js';
 
@@ -303,6 +304,8 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 		result.linewidth = material.linewidth;
 
 		if ( light.isPointLight === true && result.isMeshDistanceMaterial === true ) {
+
+			if ( result.referencePosition === undefined ) result.referencePosition = new Vector3();
 
 			result.referencePosition.setFromMatrixPosition( light.matrixWorld );
 			result.nearDistance = shadowCameraNear;
