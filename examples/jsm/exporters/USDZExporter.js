@@ -15,6 +15,10 @@ import {
 } from 'three';
 import * as fflate from 'three/addons/libs/fflate.module.js';
 
+function makeNameSafe(str){
+	return str.replace(/[^a-zA-Z0-9_]/g, '');
+}
+
 class USDZDocument {
 
 	get isDocumentRoot() {
@@ -110,7 +114,7 @@ class USDZDocument {
 	customLayerData = {
 		string creator = "Three.js USDZExporter"
 	}
-	defaultPrim = "${this.name}"
+	defaultPrim = "${makeNameSafe(this.name)}"
 	metersPerUnit = 1
 	upAxis = "Y"
 	startTimeCode = 0
@@ -143,7 +147,7 @@ export class USDZObject {
 	constructor( id, name, matrix, mesh, material, camera ) {
 
 		this.uuid = id;
-		this.name = name;
+		this.name = makeNameSafe(name);
 		this.matrix = matrix;
 		this.geometry = mesh;
 		this.material = material;
