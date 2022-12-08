@@ -21462,7 +21462,7 @@ function WebGLState( gl, extensions, capabilities ) {
 	const stencilBuffer = new StencilBuffer();
 
 	const uboBindings = new WeakMap();
-	const uboProgamMap = new WeakMap();
+	const uboProgramMap = new WeakMap();
 
 	let enabledCapabilities = {};
 
@@ -22259,13 +22259,13 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	function updateUBOMapping( uniformsGroup, program ) {
 
-		let mapping = uboProgamMap.get( program );
+		let mapping = uboProgramMap.get( program );
 
 		if ( mapping === undefined ) {
 
 			mapping = new WeakMap();
 
-			uboProgamMap.set( program, mapping );
+			uboProgramMap.set( program, mapping );
 
 		}
 
@@ -22283,16 +22283,15 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	function uniformBlockBinding( uniformsGroup, program ) {
 
-		const mapping = uboProgamMap.get( program );
+		const mapping = uboProgramMap.get( program );
 		const blockIndex = mapping.get( uniformsGroup );
 
-		if ( uboBindings.get( uniformsGroup ) !== blockIndex ) {
+		if ( uboBindings.get( program ) !== blockIndex ) {
 
 			// bind shader specific block index to global block point
-
 			gl.uniformBlockBinding( program, blockIndex, uniformsGroup.__bindingPointIndex );
 
-			uboBindings.set( uniformsGroup, blockIndex );
+			uboBindings.set( program, blockIndex );
 
 		}
 
@@ -26651,42 +26650,51 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			if ( hasUniformChanged( uniform, i, cache ) === true ) {
 
-				const value = uniform.value;
 				const offset = uniform.__offset;
 
-				if ( typeof value === 'number' ) {
+				const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
 
-					uniform.__data[ 0 ] = value;
-					gl.bufferSubData( 35345, offset, uniform.__data );
+				let arrayOffset = 0;
 
-				} else {
+				for ( let i = 0; i < values.length; i ++ ) {
 
-					if ( uniform.value.isMatrix3 ) {
+					const value = values[ i ];
+
+					const info = getUniformSize( value );
+
+					if ( typeof value === 'number' ) {
+
+						uniform.__data[ 0 ] = value;
+						gl.bufferSubData( 35345, offset + arrayOffset, uniform.__data );
+
+					} else if ( value.isMatrix3 ) {
 
 						// manually converting 3x3 to 3x4
 
-						uniform.__data[ 0 ] = uniform.value.elements[ 0 ];
-						uniform.__data[ 1 ] = uniform.value.elements[ 1 ];
-						uniform.__data[ 2 ] = uniform.value.elements[ 2 ];
-						uniform.__data[ 3 ] = uniform.value.elements[ 0 ];
-						uniform.__data[ 4 ] = uniform.value.elements[ 3 ];
-						uniform.__data[ 5 ] = uniform.value.elements[ 4 ];
-						uniform.__data[ 6 ] = uniform.value.elements[ 5 ];
-						uniform.__data[ 7 ] = uniform.value.elements[ 0 ];
-						uniform.__data[ 8 ] = uniform.value.elements[ 6 ];
-						uniform.__data[ 9 ] = uniform.value.elements[ 7 ];
-						uniform.__data[ 10 ] = uniform.value.elements[ 8 ];
-						uniform.__data[ 11 ] = uniform.value.elements[ 0 ];
+						uniform.__data[ 0 ] = value.elements[ 0 ];
+						uniform.__data[ 1 ] = value.elements[ 1 ];
+						uniform.__data[ 2 ] = value.elements[ 2 ];
+						uniform.__data[ 3 ] = value.elements[ 0 ];
+						uniform.__data[ 4 ] = value.elements[ 3 ];
+						uniform.__data[ 5 ] = value.elements[ 4 ];
+						uniform.__data[ 6 ] = value.elements[ 5 ];
+						uniform.__data[ 7 ] = value.elements[ 0 ];
+						uniform.__data[ 8 ] = value.elements[ 6 ];
+						uniform.__data[ 9 ] = value.elements[ 7 ];
+						uniform.__data[ 10 ] = value.elements[ 8 ];
+						uniform.__data[ 11 ] = value.elements[ 0 ];
 
 					} else {
 
-						value.toArray( uniform.__data );
+						value.toArray( uniform.__data, arrayOffset );
+
+						arrayOffset += info.storage / Float32Array.BYTES_PER_ELEMENT;
 
 					}
 
-					gl.bufferSubData( 35345, offset, uniform.__data );
-
 				}
+
+				gl.bufferSubData( 35345, offset, uniform.__data );
 
 			}
 
@@ -26710,7 +26718,17 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			} else {
 
-				cache[ index ] = value.clone();
+				const values = Array.isArray( value ) ? value : [ value ];
+
+				const tempValues = [];
+
+				for ( let i = 0; i < values.length; i ++ ) {
+
+					tempValues.push( values[ i ].clone() );
+
+				}
+
+				cache[ index ] = tempValues;
 
 			}
 
@@ -26731,12 +26749,19 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			} else {
 
-				const cachedObject = cache[ index ];
+				const cachedObjects = Array.isArray( cache[ index ] ) ? cache[ index ] : [ cache[ index ] ];
+				const values = Array.isArray( value ) ? value : [ value ];
 
-				if ( cachedObject.equals( value ) === false ) {
+				for ( let i = 0; i < cachedObjects.length; i ++ ) {
 
-					cachedObject.copy( value );
-					return true;
+					const cachedObject = cachedObjects[ i ];
+
+					if ( cachedObject.equals( values[ i ] ) === false ) {
+
+						cachedObject.copy( values[ i ] );
+						return true;
+
+					}
 
 				}
 
@@ -26762,11 +26787,28 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		for ( let i = 0, l = uniforms.length; i < l; i ++ ) {
 
 			const uniform = uniforms[ i ];
-			const info = getUniformSize( uniform );
+
+			const infos = {
+				boundary: 0, // bytes
+				storage: 0 // bytes
+			};
+
+			const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
+
+			for ( let j = 0, jl = values.length; j < jl; j ++ ) {
+
+				const value = values[ j ];
+
+				const info = getUniformSize( value );
+
+				infos.boundary += info.boundary;
+				infos.storage += info.storage;
+
+			}
 
 			// the following two properties will be used for partial buffer updates
 
-			uniform.__data = new Float32Array( info.storage / Float32Array.BYTES_PER_ELEMENT );
+			uniform.__data = new Float32Array( infos.storage / Float32Array.BYTES_PER_ELEMENT );
 			uniform.__offset = offset;
 
 			//
@@ -26779,7 +26821,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				// check for chunk overflow
 
-				if ( chunkOffset !== 0 && ( remainingSizeInChunk - info.boundary ) < 0 ) {
+				if ( chunkOffset !== 0 && ( remainingSizeInChunk - infos.boundary ) < 0 ) {
 
 					// add padding and adjust offset
 
@@ -26790,7 +26832,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			}
 
-			offset += info.storage;
+			offset += infos.storage;
 
 		}
 
@@ -26809,9 +26851,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	}
 
-	function getUniformSize( uniform ) {
-
-		const value = uniform.value;
+	function getUniformSize( value ) {
 
 		const info = {
 			boundary: 0, // bytes
