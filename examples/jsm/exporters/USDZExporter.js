@@ -165,7 +165,7 @@ function imageToCanvas( image, color ) {
 
 	} else {
 
-		throw new Error( 'THREE.USDZExporter: No image data found. Unable to process texture.' );
+		throw new Error( 'THREE.USDZExporter: No valid image data found. Unable to process texture.' );
 
 	}
 
