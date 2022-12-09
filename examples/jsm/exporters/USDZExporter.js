@@ -163,6 +163,10 @@ function imageToCanvas( image, color ) {
 
 		return canvas;
 
+	} else {
+
+		throw new Error( 'THREE.USDZExporter: No valid image data found. Unable to process texture.' );
+
 	}
 
 }
