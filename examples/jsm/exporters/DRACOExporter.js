@@ -16,15 +16,17 @@
 
 class DRACOExporter {
 
-	parse( object, options = {
-		decodeSpeed: 5,
-		encodeSpeed: 5,
-		encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
-		quantization: [ 16, 8, 8, 8, 8 ],
-		exportUvs: true,
-		exportNormals: true,
-		exportColor: false,
-	} ) {
+	parse( object, options = {} ) {
+
+		options = Object.assign( {
+			decodeSpeed: 5,
+			encodeSpeed: 5,
+			encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
+			quantization: [ 16, 8, 8, 8, 8 ],
+			exportUvs: true,
+			exportNormals: true,
+			exportColor: false,
+		}, options );
 
 		if ( DracoEncoderModule === undefined ) {
 

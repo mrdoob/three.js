@@ -14,8 +14,6 @@ class AfterimagePass extends Pass {
 
 		super();
 
-		if ( AfterimageShader === undefined ) console.error( 'THREE.AfterimagePass relies on AfterimageShader' );
-
 		this.shader = AfterimageShader;
 
 		this.uniforms = UniformsUtils.clone( this.shader.uniforms );

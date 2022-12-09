@@ -1,15 +1,18 @@
 /* global QUnit */
 
-// import { Bone } from '../../../../src/objects/Bone.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Bone } from '../../../../src/objects/Bone.js';
 
 export default QUnit.module( 'Objects', () => {
 
 	QUnit.module( 'Bone', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var bone = new Bone();
+
+			assert.strictEqual( bone instanceof Object3D, true, 'Bone extends from Object3D' );
 
 		} );
 

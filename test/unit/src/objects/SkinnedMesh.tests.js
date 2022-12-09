@@ -1,15 +1,20 @@
 /* global QUnit */
 
-// import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { SkinnedMesh } from '../../../../src/objects/SkinnedMesh.js';
 
 export default QUnit.module( 'Objects', () => {
 
 	QUnit.module( 'SkinnedMesh', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var skinnedMesh = new SkinnedMesh();
+	
+			assert.strictEqual( skinnedMesh instanceof Object3D, true, 'SkinnedMesh extends from Object3D' );
+			assert.strictEqual( skinnedMesh instanceof Mesh, true, 'SkinnedMesh extends from Mesh' );
 
 		} );
 

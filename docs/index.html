@@ -39,6 +39,7 @@
 						<option value="it">it</option>
 						<option value="pt-br">pt-br</option>
 						<option value="fr">fr</option>
+						<option value="ru">ru</option>
 					</select>
 				</div>
 				<div id="content"></div>
@@ -89,7 +90,7 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja|it|pt-br|fr)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|ko|zh|ja|it|pt-br|fr|ru)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 

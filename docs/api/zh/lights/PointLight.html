@@ -39,12 +39,10 @@
 		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Number distance], [param:Float decay] )</h3>
 		<p>
 			[page:Integer color] - (可选参数)) 十六进制光照颜色。 缺省值 0xffffff (白色)。<br />
-			[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。 <br /><br />
+			[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。 <br />
 			[page:Number distance] - 这个距离表示从光源到光照强度为0的位置。
 			当设置为0时，光永远不会消失(距离无穷大)。缺省值 0.<br />
-			[page:Float decay] - 沿着光照距离的衰退量。缺省值 1。
-
-			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式中，decay = 2。<br /><br />
+			[page:Float decay] - 沿着光照距离的衰退量。缺省值 2。<br /><br />
 
 			创建一个新的点光源（PointLight）。
 		</p>
@@ -56,9 +54,8 @@
 
 		<h3>[property:Float decay]</h3>
 		<p>
-			沿着光照距离的衰减量<br />
-			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式下，decay 设置为等于2将实现现实世界的光衰减。<br/>
-			缺省值为 *1*。
+			The amount the light dims along the distance of the light. Default is `2`.<br />
+			In context of physically-correct rendering the default value should not be changed.
 		</p>
 
 		<h3>[property:Float distance]</h3>

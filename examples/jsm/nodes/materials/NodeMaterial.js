@@ -3,9 +3,9 @@ import { getNodesKeys, getCacheKey } from '../core/NodeUtils.js';
 import ExpressionNode from '../core/ExpressionNode.js';
 import {
 	float, vec3, vec4,
-	assign, label, mul, bypass,
+	assign, label, mul, bypass, attribute,
 	positionLocal, skinning, instance, modelViewProjection, lightingContext, colorSpace,
-	materialAlphaTest, materialColor, materialOpacity
+	materialAlphaTest, materialColor, materialOpacity, reference, rangeFog, exp2Fog
 } from '../shadernode/ShaderNodeElements.js';
 
 class NodeMaterial extends ShaderMaterial {
@@ -80,6 +80,14 @@ class NodeMaterial extends ShaderMaterial {
 		let colorNode = vec4( this.colorNode || materialColor );
 		let opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
+		// VERTEX COLORS
+
+		if ( this.vertexColors === true && builder.geometry.hasAttribute( 'color' ) ) {
+
+			colorNode = vec4( mul( colorNode.xyz, attribute( 'color' ) ), colorNode.a );
+		
+		}
+
 		// COLOR
 
 		colorNode = builder.addFlow( 'fragment', label( colorNode, 'Color' ) );
@@ -132,7 +140,29 @@ class NodeMaterial extends ShaderMaterial {
 
 		// FOG
 
-		if ( builder.fogNode ) outputNode = vec4( vec3( builder.fogNode.mix( outputNode ) ), outputNode.w );
+		let fogNode = builder.fogNode;
+
+		if ( fogNode?.isNode !== true && builder.scene.fog ) {
+
+			const fog = builder.scene.fog;
+
+			if ( fog.isFogExp2 ) {
+
+				fogNode = exp2Fog( reference( 'color', 'color', fog ), reference( 'density', 'float', fog ) );
+
+			} else if ( fog.isFog ) {
+
+				fogNode = rangeFog( reference( 'color', 'color', fog ), reference( 'near', 'float', fog ), reference( 'far', 'float', fog ) );
+
+			} else {
+
+				console.error( 'NodeMaterial: Unsupported fog configuration.', fog );
+
+			}
+			
+		}
+
+		if ( fogNode ) outputNode = vec4( vec3( fogNode.mix( outputNode ) ), outputNode.w );
 
 		// RESULT
 

@@ -384,6 +384,12 @@ class WebGPURenderer {
 
 	}
 
+	async getArrayFromBuffer( attribute ) {
+
+		return await this._attributes.getArrayBuffer( attribute );
+
+	}
+
 	getContext() {
 
 		return this._context;
@@ -584,7 +590,7 @@ class WebGPURenderer {
 
 	clear() {
 
-		this._background.clear();
+		this._background?.clear();
 
 	}
 

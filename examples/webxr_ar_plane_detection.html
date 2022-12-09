@@ -117,7 +117,6 @@
 						planesAdded.add( plane );
 						const frame = renderer.xr.getFrame();
 						const planePose = frame.getPose( plane.planeSpace, referenceSpace );
-						const planeGeometry = new THREE.BufferGeometry();
 						const polygon = plane.polygon;
 
 						let minX = Number.MAX_SAFE_INTEGER;

@@ -40,10 +40,9 @@ scene.add( light );
 		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Number distance], [param:Float decay] )</h3>
 		<p>
 			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
-			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br />
 			[page:Number distance] - Maximum range of the light. Default is 0 (no limit).<br />
-			[page:Float decay] - The amount the light dims along the distance of the light. Default is 1.
-			For [page:WebGLRenderer.physicallyCorrectLights physically correct] lighting, set this to 2.<br /><br />
+			[page:Float decay] - The amount the light dims along the distance of the light. Default is 2.<br /><br />
 
 			Creates a new [name].
 		</p>
@@ -55,9 +54,8 @@ scene.add( light );
 
 		<h3>[property:Float decay]</h3>
 		<p>
-			The amount the light dims along the distance of the light<br />
-			In [page:WebGLRenderer.physicallyCorrectLights physically correct] mode, decay = 2 leads to physically realistic light falloff.<br/>
-			Default is `1`.
+			The amount the light dims along the distance of the light. Default is `2`.<br />
+			In context of physically-correct rendering the default value should not be changed.
 		</p>
 
 		<h3>[property:Float distance]</h3>

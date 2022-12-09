@@ -67,12 +67,6 @@ class SMAAPass extends Pass {
 
 		// materials - pass 1
 
-		if ( SMAAEdgesShader === undefined ) {
-
-			console.error( 'THREE.SMAAPass relies on SMAAShader' );
-
-		}
-
 		this.uniformsEdges = UniformsUtils.clone( SMAAEdgesShader.uniforms );
 
 		this.uniformsEdges[ 'resolution' ].value.set( 1 / width, 1 / height );
