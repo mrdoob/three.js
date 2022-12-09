@@ -1197,7 +1197,6 @@ class TransformControlsGizmo extends Object3D {
 
 				if ( handle.name === 'AXIS' ) {
 
-					handle.position.copy( this.worldPositionStart );
 					handle.visible = !! this.axis;
 
 					if ( this.axis === 'X' ) {

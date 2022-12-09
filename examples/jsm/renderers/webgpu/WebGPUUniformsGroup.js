@@ -90,7 +90,7 @@ class WebGPUUniformsGroup extends WebGPUUniformBuffer {
 
 		}
 
-		return offset;
+		return Math.ceil( offset / GPUChunkSize ) * GPUChunkSize;
 
 	}
 

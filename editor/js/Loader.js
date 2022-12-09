@@ -199,7 +199,7 @@ function Loader( editor ) {
 					const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
 
 					const loader = new DRACOLoader();
-					loader.setDecoderPath( '../examples/js/libs/draco/' );
+					loader.setDecoderPath( '../examples/jsm/libs/draco/' );
 					loader.decodeDracoFile( contents, function ( geometry ) {
 
 						let object;
@@ -267,7 +267,7 @@ function Loader( editor ) {
 					const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
 
 					const dracoLoader = new DRACOLoader();
-					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+					dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
 
 					const loader = new GLTFLoader();
 					loader.setDRACOLoader( dracoLoader );
@@ -308,7 +308,7 @@ function Loader( editor ) {
 						const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
 
 						const dracoLoader = new DRACOLoader();
-						dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+						dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
 
 						loader = new GLTFLoader( manager );
 						loader.setDRACOLoader( dracoLoader );
@@ -956,7 +956,7 @@ function Loader( editor ) {
 					const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
 
 					const dracoLoader = new DRACOLoader();
-					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+					dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
 
 					const loader = new GLTFLoader();
 					loader.setDRACOLoader( dracoLoader );
@@ -982,7 +982,7 @@ function Loader( editor ) {
 					const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
 
 					const dracoLoader = new DRACOLoader();
-					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+					dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
 
 					const loader = new GLTFLoader( manager );
 					loader.setDRACOLoader( dracoLoader );

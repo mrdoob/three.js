@@ -336,13 +336,7 @@ class MMDLoader extends Loader {
 
 		if ( this.parser === null ) {
 
-			if ( typeof MMDParser === 'undefined' ) {
-
-				throw new Error( 'THREE.MMDLoader: Import MMDParser https://github.com/takahirox/mmd-parser' );
-
-			}
-
-			this.parser = new MMDParser.Parser(); // eslint-disable-line no-undef
+			this.parser = new MMDParser.Parser();
 
 		}
 

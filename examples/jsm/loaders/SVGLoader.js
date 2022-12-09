@@ -1482,7 +1482,7 @@ class SVGLoader extends Loader {
 									let cy = 0;
 
 									// Angle
-									angle = - array[ 0 ] * Math.PI / 180;
+									angle = array[ 0 ] * Math.PI / 180;
 
 									if ( array.length >= 3 ) {
 
@@ -1493,10 +1493,10 @@ class SVGLoader extends Loader {
 									}
 
 									// Rotate around center (cx, cy)
-									tempTransform1.identity().translate( - cx, - cy );
-									tempTransform2.identity().rotate( angle );
+									tempTransform1.makeTranslation( - cx, - cy );
+									tempTransform2.makeRotation( angle );
 									tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
-									tempTransform1.identity().translate( cx, cy );
+									tempTransform1.makeTranslation( cx, cy );
 									currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
 
 								}
@@ -1653,7 +1653,7 @@ class SVGLoader extends Loader {
 
 						return Math.atan2( sinR, cosR );
 
-					}
+					};
 
 					curve.aStartAngle = transformAngle( curve.aStartAngle );
 					curve.aEndAngle = transformAngle( curve.aEndAngle );
@@ -2255,8 +2255,6 @@ class SVGLoader extends Loader {
 		// TODO
 
 		// prepare paths for hole detection
-		let identifier = 0;
-
 		let scanlineMinX = BIGNUMBER;
 		let scanlineMaxX = - BIGNUMBER;
 
@@ -2313,11 +2311,17 @@ class SVGLoader extends Loader {
 
 			}
 
-			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: identifier ++, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
+			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: -1, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
 
 		} );
 
 		simplePaths = simplePaths.filter( sp => sp.points.length > 1 );
+
+		for ( let identifier = 0; identifier < simplePaths.length; identifier++ ) {
+
+			simplePaths[identifier].identifier = identifier;
+
+		}
 
 		// check if path is solid or a hole
 		const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData?.style.fillRule ) );

@@ -123,7 +123,7 @@ class PCDLoader extends Loader {
 
 			// remove comments
 
-			PCDheader.str = PCDheader.str.replace( /\#.*/gi, '' );
+			PCDheader.str = PCDheader.str.replace( /#.*/gi, '' );
 
 			// parse
 

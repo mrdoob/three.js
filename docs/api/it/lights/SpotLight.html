@@ -51,7 +51,7 @@
 		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float distance], [param:Radians angle], [param:Float penumbra], [param:Float decay] )</h3>
 		<p>
 			[page:Integer color] - (opzionale) colore esadecimale della luce. Il valore predefinito è 0xffffff (bianco).<br />
-			[page:Float intensity] - (opzionale) il valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br /><br />
+			[page:Float intensity] - (opzionale) il valore numerico della forza/intensità della luce. Il valore predefinito è 1.<br />
 			[page:Float distance] - Portata massima della luce. Il valore predefinito è 0 (nessun limite).<br />
 			[page:Radians angle] - Angolo massimo di dispersione della luce dalla sua direzione in cui il limite superiore è Math.PI/2.<br />
 			[page:Float penumbra] - Percentuale del cono del riflettore che viene attenuata a causa della penombra.
@@ -82,9 +82,8 @@
 
 		<h3>[property:Float decay]</h3>
 		<p>
-      La quantità di attenuazione della luce lungo la distanza della luce.<br />
-			Nella modalità [page:WebGLRenderer.physicallyCorrectLights fisicamente corretta], decay = 2 porta ad una diminuzione della luce fisicamente realistica.<br/>
-			Il valore predefinito è `1`.
+			The amount the light dims along the distance of the light. Default is `2`.<br />
+			In context of physically-correct rendering the default value should not be changed.
 		</p>
 
 		<h3>[property:Float distance]</h3>

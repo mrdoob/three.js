@@ -43,12 +43,6 @@ class GLTFExporter {
 
 		this.register( function ( writer ) {
 
-			return new GLTFMaterialsPBRSpecularGlossiness( writer );
-
-		} );
-
-		this.register( function ( writer ) {
-
 			return new GLTFMaterialsTransmissionExtension( writer );
 
 		} );
@@ -275,6 +269,12 @@ function getMinMax( attribute, start, count ) {
 				else if ( a === 2 ) value = attribute.getZ( i );
 				else if ( a === 3 ) value = attribute.getW( i );
 
+				if ( attribute.normalized === true ) {
+
+					value = MathUtils.normalize( value, attribute.array );
+
+				}
+
 			}
 
 			output.min[ a ] = Math.min( output.min[ a ], value );
@@ -431,9 +431,9 @@ class GLTFWriter {
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
 	 */
-	async write( input, onDone, options ) {
+	async write( input, onDone, options = {} ) {
 
-		this.options = Object.assign( {}, {
+		this.options = Object.assign( {
 			// default options
 			binary: false,
 			trs: false,
@@ -881,6 +881,12 @@ class GLTFWriter {
 					else if ( a === 1 ) value = attribute.getY( i );
 					else if ( a === 2 ) value = attribute.getZ( i );
 					else if ( a === 3 ) value = attribute.getW( i );
+
+					if ( attribute.normalized === true ) {
+
+						value = MathUtils.normalize( value, attribute.array );
+
+					}
 
 				}
 
@@ -1612,12 +1618,14 @@ class GLTFWriter {
 
 						for ( let j = 0, jl = attribute.count; j < jl; j ++ ) {
 
-							relativeAttribute.setXYZ(
-								j,
-								attribute.getX( j ) - baseAttribute.getX( j ),
-								attribute.getY( j ) - baseAttribute.getY( j ),
-								attribute.getZ( j ) - baseAttribute.getZ( j )
-							);
+							for ( let a = 0; a < attribute.itemSize; a ++ ) {
+
+								if ( a === 0 ) relativeAttribute.setX( j, attribute.getX( j ) - baseAttribute.getX( j ) );
+								if ( a === 1 ) relativeAttribute.setY( j, attribute.getY( j ) - baseAttribute.getY( j ) );
+								if ( a === 2 ) relativeAttribute.setZ( j, attribute.getZ( j ) - baseAttribute.getZ( j ) );
+								if ( a === 3 ) relativeAttribute.setW( j, attribute.getW( j ) - baseAttribute.getW( j ) );
+
+							}
 
 						}
 
@@ -2276,62 +2284,6 @@ class GLTFMaterialsUnlitExtension {
 
 		materialDef.pbrMetallicRoughness.metallicFactor = 0.0;
 		materialDef.pbrMetallicRoughness.roughnessFactor = 0.9;
-
-	}
-
-}
-
-/**
- * Specular-Glossiness Extension
- *
- * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Archived/KHR_materials_pbrSpecularGlossiness
- */
-class GLTFMaterialsPBRSpecularGlossiness {
-
-	constructor( writer ) {
-
-		this.writer = writer;
-		this.name = 'KHR_materials_pbrSpecularGlossiness';
-
-	}
-
-	writeMaterial( material, materialDef ) {
-
-		if ( ! material.isGLTFSpecularGlossinessMaterial ) return;
-
-		const writer = this.writer;
-		const extensionsUsed = writer.extensionsUsed;
-
-		const extensionDef = {};
-
-		if ( materialDef.pbrMetallicRoughness.baseColorFactor ) {
-
-			extensionDef.diffuseFactor = materialDef.pbrMetallicRoughness.baseColorFactor;
-
-		}
-
-		const specularFactor = [ 1, 1, 1 ];
-		material.specular.toArray( specularFactor, 0 );
-		extensionDef.specularFactor = specularFactor;
-		extensionDef.glossinessFactor = material.glossiness;
-
-		if ( materialDef.pbrMetallicRoughness.baseColorTexture ) {
-
-			extensionDef.diffuseTexture = materialDef.pbrMetallicRoughness.baseColorTexture;
-
-		}
-
-		if ( material.specularMap ) {
-
-			const specularMapDef = { index: writer.processTexture( material.specularMap ) };
-			writer.applyTextureTransform( specularMapDef, material.specularMap );
-			extensionDef.specularGlossinessTexture = specularMapDef;
-
-		}
-
-		materialDef.extensions = materialDef.extensions || {};
-		materialDef.extensions[ this.name ] = extensionDef;
-		extensionsUsed[ this.name ] = true;
 
 	}
 

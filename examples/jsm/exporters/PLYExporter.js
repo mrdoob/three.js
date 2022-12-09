@@ -19,7 +19,7 @@ import {
 
 class PLYExporter {
 
-	parse( object, onDone, options ) {
+	parse( object, onDone, options = {} ) {
 
 		// Iterate over the valid meshes in the object
 		function traverseMeshes( cb ) {

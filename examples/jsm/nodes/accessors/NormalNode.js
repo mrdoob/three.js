@@ -21,6 +21,12 @@ class NormalNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	getHash( /*builder*/ ) {
 
 		return `normal-${this.scope}`;

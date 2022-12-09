@@ -1,9 +1,13 @@
+import Node from '../core/Node.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import ConstNode from '../core/ConstNode.js';
+import StackNode from '../core/StackNode.js';
 import { getValueFromType } from '../core/NodeUtils.js';
+
+import * as NodeElements from './ShaderNodeElements.js';
 
 const shaderNodeHandler = {
 
@@ -15,7 +19,7 @@ const shaderNodeHandler = {
 
 	},
 
-	get: function ( node, prop ) {
+	get: function ( node, prop, nodeObj ) {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
@@ -36,6 +40,12 @@ const shaderNodeHandler = {
 				// accessing array
 
 				return nodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
+
+			} else if ( NodeElements[ prop ] ) {
+
+				const nodeElement = NodeElements[ prop ];
+
+				return ( ...params ) => nodeElement( nodeObj, ...params );
 
 			}
 
@@ -147,31 +157,46 @@ const ShaderNodeImmutable = function ( NodeClass, ...params ) {
 
 };
 
+class ShaderNodeInternal extends Node {
+
+	constructor( jsFunc ) {
+
+		super();
+
+		this._jsFunc = jsFunc;
+
+	}
+
+	call( inputs, builder ) {
+
+		inputs = nodeObjects( inputs );
+
+		return nodeObject( this._jsFunc( inputs, builder ) );
+
+	}
+
+	getNodeType( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		return outputNode ? outputNode.getNodeType( builder ) : super.getNodeType( builder );
+
+	}
+
+	construct( builder ) {
+
+		const stackNode = new StackNode();
+		stackNode.outputNode = this.call( {}, stackNode, builder );
+
+		return stackNode;
+
+	}
+
+}
+
 const ShaderNodeScript = function ( jsFunc ) {
 
-	// @TODO: Move this to Node extended class
-
-	const self = {
-
-		build: ( builder ) => {
-
-			self.call( {}, builder );
-
-			return '';
-
-		},
-
-		call: ( inputs, builder ) => {
-
-			inputs = nodeObjects( inputs );
-
-			return nodeObject( jsFunc( inputs, builder ) );
-
-		}
-
-	};
-
-	return self;
+	return new ShaderNodeInternal( jsFunc );
 
 };
 
@@ -253,7 +278,7 @@ export const ConvertType = function ( type, cacheMap = null ) {
 
 			}
 
-			return nodeObject( new ConvertNode( new JoinNode( nodes ), type ) );
+			return nodeObject( new JoinNode( nodes, type ) );
 
 		}
 

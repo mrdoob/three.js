@@ -1252,13 +1252,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof fflate === 'undefined' ) {
-
-				console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
-
-			}
-
-			const rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+			const rawBuffer = fflate.unzlibSync( compressed );
 			const tmpBuffer = new Uint8Array( rawBuffer.length );
 
 			predictor( rawBuffer ); // revert predictor
@@ -1375,13 +1369,7 @@ class EXRLoader extends DataTextureLoader {
 
 			const compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof fflate === 'undefined' ) {
-
-				console.error( 'THREE.EXRLoader: External library fflate.min.js required.' );
-
-			}
-
-			const rawBuffer = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+			const rawBuffer = fflate.unzlibSync( compressed );
 
 			const sz = info.lines * info.channels * info.width;
 			const tmpBuffer = ( info.type == 1 ) ? new Uint16Array( sz ) : new Uint32Array( sz );
@@ -1562,7 +1550,7 @@ class EXRLoader extends DataTextureLoader {
 					case DEFLATE:
 
 						const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						const data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+						const data = fflate.unzlibSync( compressed );
 						acBuffer = new Uint16Array( data.buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
@@ -1589,7 +1577,7 @@ class EXRLoader extends DataTextureLoader {
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				const compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				const data = fflate.unzlibSync( compressed ); // eslint-disable-line no-undef
+				const data = fflate.unzlibSync( compressed );
 				rleBuffer = decodeRunLength( data.buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;

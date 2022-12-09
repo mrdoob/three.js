@@ -86,7 +86,7 @@ class AMFLoader extends Loader {
 
 				try {
 
-					zip = fflate.unzipSync( new Uint8Array( data ) ); // eslint-disable-line no-undef
+					zip = fflate.unzipSync( new Uint8Array( data ) );
 
 				} catch ( e ) {
 
