@@ -76,6 +76,7 @@ body.rtl table {
 }
 body.rtl code {
 	direction: ltr !important;
+	text-align: initial;
 }
 
 a {
