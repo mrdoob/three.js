@@ -84,7 +84,7 @@
 			des valeurs chromatiques (comme le blanc ou le gris) dépend de la perception humaine, qui dépend elle-même
 			fortement du contexte d'observation. Un espace colorimétrique spécifie son "point blanc" pour équilibrer
 			ces besoins. Le point blanc définit par l'espace colorimétrique sRGB est
-			<a href="https://en.wikipedia.org/wiki/Illuminant_D65" target="_blank">D65</a>.
+			[link:https://en.wikipedia.org/wiki/Illuminant_D65 D65].
 		</li>
 		<li>
 			<b>Fonctions de transfert:</b> Après avoir choisir la gamme de couleur et le modèle de couleur, il nous reste à toujours définir
@@ -155,7 +155,7 @@
 
 	<p>
 		Les couleurs fournies à three.js — par les sélecteurs de couleurs, les textures, les modèles 3D, et d'autres sources —
-		ont toutes un espace colorimétrique associé. Celles qui ne sont pas déjà dans l'espace colorimétrique sRGB-Linéaire 
+		ont toutes un espace colorimétrique associé. Celles qui ne sont pas déjà dans l'espace colorimétrique sRGB-Linéaire
 		doivent-être converties, et les textures doivent recevoir les bonnes consignes de <i>texture.encoding</i>.
 		Certaines conversions (pour l'héxadecimal et les couleurs CSS en sRGB) peuvent être automatisées si
 		l'héritage de la gestion des couleurs est désactivé avant l'initialisation des couleurs:
@@ -201,7 +201,7 @@ THREE.ColorManagement.legacyMode = false;
 	<h3>Espaces colorimétriques fonctionnels</h3>
 
 	<p>
-		Le rendu, l'interpolation, et plusieurs autres opérations doivent être performées dans un espace colorimétrique 
+		Le rendu, l'interpolation, et plusieurs autres opérations doivent être performées dans un espace colorimétrique
 		au domaine ouvert, dans lequel les composantes RGB sont proportionnelles
 		à l'illumination physique. Dans three.js, l'espace colorimétrique est le sRGB-Linéaire.
 	</p>
@@ -225,7 +225,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		</li>
 		<li>
 			<b>Image:</b> Les couleurs envoyées à une image doivent utiliser l'espace colorimétrique approprié au
-			format et à l'utilisation. Les images entièrement rendues sur des textures au format PNG ou JPEG 
+			format et à l'utilisation. Les images entièrement rendues sur des textures au format PNG ou JPEG
 			utilisent généralement l'espace colorimétrique sRGB. Les images contenant de l'émission, des light maps, ou d'autres données
 			qui ne sont pas restreintes à l'intervalle [0,1] utiliseront généralement l'espace colorimétrique sRGB à domaine ouvert,
 			et un format d'image compatible comme OpenEXR.
@@ -298,7 +298,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 	</p>
 
 	<p>
-		Un problème plus subtil peut se produire quand <i>à la fois</i> l'espace colorimétrique d'entrée et 
+		Un problème plus subtil peut se produire quand <i>à la fois</i> l'espace colorimétrique d'entrée et
 		l'espace colorimétrique de sortie sont incorrects — les niveaux de luminosité globaux peuvent être corrects, mais les couleurs peuvent changer
 		d'une manière inattendue sous différentes lumières, ou des ombres peuvent sembler plus abruptes et moins lisses
 		que prévu. Ces deux erreurs assemblées ne forment pas une réussite, et il est important que

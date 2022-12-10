@@ -65,7 +65,7 @@
 	<figure class="float">
 		<img src="resources/srgb_gamut.png" alt="">
 		<figcaption>
-			Cores sRGB e ponto branco (D65) exibidos no diagrama de referência cromaticidade CIE 1931. 
+			Cores sRGB e ponto branco (D65) exibidos no diagrama de referência cromaticidade CIE 1931.
 			A região colorida representa uma projeção 2D da gama sRGB, que é um volume 3D.
 			Fonte: <a href="https://en.wikipedia.org/wiki/SRGB" target="_blank" rel="noopener">Wikipedia</a>
 		</figcaption>
@@ -79,12 +79,12 @@
 				capacidades dos dispositivos de exibição disponíveis. As cores são expressas como uma proporção das cores primárias.
 		</li>
 		<li>
-			<b>Ponto branco:</b> a maioria dos espaços de cores é projetada de forma que uma soma igualmente ponderada das 
+			<b>Ponto branco:</b> a maioria dos espaços de cores é projetada de forma que uma soma igualmente ponderada das
 			primárias <i>R = G = B</i> parecerão sem cor, ou "acromáticas". A aparência
 			de valores acromáticos (como branco ou cinza) dependem da percepção humana, que por sua vez depende
 			fortemente no contexto do observador. Um espaço de cor especifica seu "ponto branco" para equilibrar
 			essas necessidades. O ponto branco definido pelo espaço de cores sRGB é
-			<a href="https://en.wikipedia.org/wiki/Illuminant_D65" target="_blank">D65</a>.
+			[link:https://en.wikipedia.org/wiki/Illuminant_D65 D65].
 		</li>
 		<li>
 			<b>Transfer functions:</b> depois de escolher a gama de cores e um modelo de cores, ainda precisamos
@@ -98,7 +98,7 @@
 		</li>
 	</ul>
 
-	Esses três parâmetros — cores primárias, ponto branco e transfer functions — definem um espaço de cores, 
+	Esses três parâmetros — cores primárias, ponto branco e transfer functions — definem um espaço de cores,
 	cada um escolhido para objetivos particulares. Tendo definido os parâmetros, alguns termos adicionais
 	são úteis:
 
@@ -107,7 +107,7 @@
 			<b>Modelo de cores:</b> Sintaxe para identificar numericamente as cores dentro da gama de cores escolhida —
 			um sistema de coordenadas para cores. No three.js estamos preocupados principalmente com o modelo de cor RGB,
 			tendo três coordenadas <i>r, g, b ∈ [0,1]</i> ("domínio fechado") ou
-			<i>r, g, b ∈ [0,∞]</i> ("domínio aberto"), cada um representando uma fração de uma cor primária. 
+			<i>r, g, b ∈ [0,∞]</i> ("domínio aberto"), cada um representando uma fração de uma cor primária.
 			Outros modelos de cores (HSL, Lab, LCH) são comumente usados ​​para controle artístico.
 		</li>
 		<li>
@@ -202,7 +202,7 @@ THREE.ColorManagement.legacyMode = false;
 
 	<p>
 		Renderização, interpolação e muitas outras operações devem ser executadas em um domínio aberto
-		do espaço de cores de trabalho linear, no qual os componentes RGB são proporcionais a iluminação 
+		do espaço de cores de trabalho linear, no qual os componentes RGB são proporcionais a iluminação
 		física. No three.js, o espaço de cores de trabalho é Linear-sRGB.
 	</p>
 
@@ -234,7 +234,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 
 	<blockquote>
 		<p>
-			⚠️ <i><b>AVISO:</b> 
+			⚠️ <i><b>AVISO:</b>
 			Os render targets podem usar sRGB ou Linear-sRGB. sRGB faz
 			melhor uso de precisão limitada. No domínio fechado, 8 bits geralmente são suficientes para sRGB
 			enquanto que ≥12 bits (meio flutuante) podem ser necessários para Linear-sRGB. Se mais tarde
