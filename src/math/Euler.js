@@ -7,7 +7,7 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
 
 class Euler {
 
-	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
+	constructor( x = 0, y = 0, z = 0, order = Euler.DEFAULT_ORDER ) {
 
 		this.isEuler = true;
 
@@ -316,9 +316,38 @@ class Euler {
 
 	}
 
-}
+	// r148
 
-Euler.DefaultOrder = 'XYZ';
-Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+	static get RotationOrders() {
+
+		console.error( 'THREE.Euler.RotationOrders has been removed.' );
+
+	}
+
+	static set RotationOrders( value ) {
+
+		console.error( 'THREE.Euler.RotationOrders has been removed.' );
+
+	}
+
+	// r148
+
+	static get DefaultOrder() {
+
+		console.warn( 'THREE.Euler: Euler.DefaultOrder has been renamed to Euler.DEFAULT_ORDER.' );
+	    return Euler.DEFAULT_ORDER;
+
+	}
+
+	static set DefaultOrder( value ) {
+
+		console.warn( 'THREE.Euler: Euler.DefaultOrder has been renamed to Euler.DEFAULT_ORDER.' );
+	    Euler.DEFAULT_ORDER = value;
+
+	}
+
+	static DEFAULT_ORDER = 'XYZ';
+
+}
 
 export { Euler };
