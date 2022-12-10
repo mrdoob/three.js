@@ -335,14 +335,14 @@ class Euler {
 	static get DefaultOrder() {
 
 		console.warn( 'THREE.Euler: Euler.DefaultOrder has been renamed to Euler.DEFAULT_ORDER.' );
-	    return Euler.DEFAULT_ORDER;
+		return Euler.DEFAULT_ORDER;
 
 	}
 
 	static set DefaultOrder( value ) {
 
 		console.warn( 'THREE.Euler: Euler.DefaultOrder has been renamed to Euler.DEFAULT_ORDER.' );
-	    Euler.DEFAULT_ORDER = value;
+		Euler.DEFAULT_ORDER = value;
 
 	}
 
