@@ -25,6 +25,52 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
+class Object3DMatrixData {
+
+	constructor() {
+		this.matrix = new Matrix4();
+		this.matrixWorld = new Matrix4();
+
+		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
+		this.matrixWorldNeedsUpdate = false;
+
+		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
+
+		this.next = null;
+		this.prev = null;
+		this.parent = null;
+	}
+
+	setParent(parent) {
+		this.parent = parent;
+		const siblings = parent.children;
+		if (siblings) {
+			this.insertAfter(siblings[siblings.length - 1]);
+		}
+		else {
+			this.insertAfter(parent);
+		}
+	}
+
+	insertAfter(node) {
+		
+		this.prev = node;
+		this.next = node.next;
+		if (node.next) {
+			node.next.prev = this;
+		}
+		node.next = this;
+
+	}
+
+	remove() {
+		this.prev.next = this.next;
+		this.next.prev = this.prev;
+		this.next = null;
+		this.prev = null;
+	}
+}
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -94,13 +140,9 @@ class Object3D extends EventDispatcher {
 			}
 		} );
 
-		this.matrix = new Matrix4();
-		this.matrixWorld = new Matrix4();
-
-		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
-		this.matrixWorldNeedsUpdate = false;
-
-		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
+		this.matrixData = new Object3DMatrixData()
+		this.matrix = this.matrixData.matrix
+		this.matrixWorld = this.matrixData.matrixWorld
 
 		this.layers = new Layers();
 		this.visible = true;
@@ -115,6 +157,30 @@ class Object3D extends EventDispatcher {
 
 		this.userData = {};
 
+	}
+
+	set matrixAutoUpdate(value) {
+		this.matrixData.matrixAutoUpdate = value
+	}
+
+	get matrixAutoUpdate() {
+		return this.matrixData.matrixAutoUpdate
+	}
+
+	set matrixWorldNeedsUpdate(value) {
+		this.matrixData.matrixWorldNeedsUpdate = value
+	}
+
+	get matrixWorldNeedsUpdate() {
+		return this.matrixData.matrixWorldNeedsUpdate
+	}
+
+	set matrixWorldAutoUpdate(value) {
+		this.matrixData.matrixWorldAutoUpdate = value
+	}
+
+	get matrixWorldAutoUpdate() {
+		return this.matrixData.matrixWorldAutoUpdate
 	}
 
 	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
@@ -330,6 +396,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = this;
 			this.children.push( object );
+			object.matrixData.setParent(this.matrixData)
 
 			object.dispatchEvent( _addedEvent );
 
@@ -363,6 +430,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = null;
 			this.children.splice( index, 1 );
+			object.matrixData.remove()
 
 			object.dispatchEvent( _removedEvent );
 
@@ -393,6 +461,7 @@ class Object3D extends EventDispatcher {
 			const object = this.children[ i ];
 
 			object.parent = null;
+			object.matrixData.remove()
 
 			object.dispatchEvent( _removedEvent );
 
@@ -942,3 +1011,4 @@ Object3D.DefaultMatrixAutoUpdate = true;
 Object3D.DefaultMatrixWorldAutoUpdate = true;
 
 export { Object3D };
+
