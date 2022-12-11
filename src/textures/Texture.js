@@ -190,7 +190,6 @@ class Texture extends EventDispatcher {
 			unpackAlignment: this.unpackAlignment,
 			
 			generateMipmaps: this.generateMipmaps
-
 		};
 
 		if ( Object.keys( this.userData ).length > 0 ) output.userData = this.userData;
