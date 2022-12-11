@@ -169,8 +169,6 @@ class Texture extends EventDispatcher {
 
 			mapping: this.mapping,
 
-			generateMipmaps: this.generateMipmaps,
-
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
 			center: [ this.center.x, this.center.y ],
@@ -188,6 +186,7 @@ class Texture extends EventDispatcher {
 
 			flipY: this.flipY,
 
+			generateMipmaps: this.generateMipmaps,
 			premultiplyAlpha: this.premultiplyAlpha,
 			unpackAlignment: this.unpackAlignment
 
