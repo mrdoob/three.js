@@ -168,7 +168,7 @@ class Texture extends EventDispatcher {
 			image: this.source.toJSON( meta ).uuid,
 
 			mapping: this.mapping,
-			
+
 			generateMipmaps: this.generateMipmaps,
 
 			repeat: [ this.repeat.x, this.repeat.y ],
