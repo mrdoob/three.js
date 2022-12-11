@@ -497,7 +497,7 @@ class Object3D extends EventDispatcher {
 			const object = this.children[ i ];
 
 			object.parent = null;
-			object.matrixData.remove()
+			object.matrixData.remove(i)
 
 			object.dispatchEvent( _removedEvent );
 
