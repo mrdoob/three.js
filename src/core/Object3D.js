@@ -36,62 +36,22 @@ class Object3DMatrixData {
 
 		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
 
-		this.next = null;
-		this.prev = null;
 		this.parent = null;
+		this.children = []
 		this.object = object
 	}
 
 	setParent(parent) {
 		this.parent = parent;
-		const siblings = parent.children;
-		if (siblings) {
-			this.insertAfter(siblings[siblings.length - 1]);
-		}
-		else {
-			this.insertAfter(parent);
-		}
+		parent.children.push(this)
 	}
 
-	insertAfter(node) {
-		
-		this.prev = node;
-		this.next = node.next;
-		if (node.next) {
-			node.next.prev = this;
-		}
-		node.next = this;
+	remove(index) {
 
-	}
+		// we can assume that indices match those on the parent object.
+		this.parent.children.splice( index, 1 );
+		this.parent = null;
 
-	remove() {
-		this.prev.next = this.next;
-		this.next.prev = this.prev;
-		this.next = null;
-		this.prev = null;
-	}
-
-	nextDescendent(ancestor) {
-
-		if (this.next && (this.next.parent === this.parent ||
-		    this.next.hasAncestor(ancestor))) {
-			return this.next;
-		}
-		else {
-			return null;
-		}
-	}
-
-	hasAncestor(ancestor) {
-		 if (this.parent === ancestor) {
-			return true;
-		 }
-		 else if (this.parent) {
-			return this.parent.hasAncestor(ancestor)
-		 }
-		 else {
-			return false;
-		 }
 	}
 
 	updateMatrix() {
@@ -103,7 +63,8 @@ class Object3DMatrixData {
 
 	}
 
-	performMatrixWorldUpdates(force) {
+	updateMatrixWorld( force ) {
+
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
 		if ( this.matrixWorldNeedsUpdate || force ) {
@@ -124,17 +85,22 @@ class Object3DMatrixData {
 
 		}
 
-		return force
-	}
+		// updateChildren 
 
-	updateMatrixWorld( force ) {
+		const children = this.children;
 
-		let node = this
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-		while (node !== null) {
-			force = node.performMatrixWorldUpdates(force)
-			node = node.nextDescendent(this)
+			const child = children[ i ];
+
+			if ( child.matrixWorldAutoUpdate === true || force === true ) {
+
+				child.updateMatrixWorld( force );
+
+			}
+
 		}
+
 	}
 }
 
@@ -497,7 +463,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = null;
 			this.children.splice( index, 1 );
-			object.matrixData.remove()
+			object.matrixData.remove(index)
 
 			object.dispatchEvent( _removedEvent );
 
