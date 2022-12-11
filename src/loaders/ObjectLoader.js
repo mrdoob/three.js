@@ -665,6 +665,8 @@ class ObjectLoader extends Loader {
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 
 				if ( data.userData !== undefined ) texture.userData = data.userData;
+				
+				if ( data.generateMipmaps !== undefined ) texture.generateMipmaps = data.generateMipmaps;
 
 				textures[ data.uuid ] = texture;
 
