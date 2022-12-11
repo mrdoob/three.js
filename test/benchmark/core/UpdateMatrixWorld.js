@@ -16,6 +16,31 @@
 
 	};
 
+	var createLocallyOffsetVariedChild = function () {
+
+		var child
+		
+		var choice = Math.random();
+		if (choice < 0.05) {
+			child = new THREE.InstancedMesh();
+		}
+		else if (choice < 0.1) {
+			child = new THREE.SkinnedMesh();
+		}
+		else if (choice < 0.6) {
+			child = new THREE.Mesh();
+		}
+		else {
+			child = new THREE.Group();
+		}
+		
+		child.position.copy( position );
+		child.scale.copy( scale );
+		child.quaternion.copy( rotation );
+		return child;
+
+	};
+
 	var generateSceneGraph = function ( root, depth, breadth, initObject ) {
 
 		if ( depth > 0 ) {
@@ -47,6 +72,7 @@
 	var rootA = generateSceneGraph( new THREE.Object3D(), 100, 1, createLocallyOffsetChild );
 	var rootB = generateSceneGraph( new THREE.Object3D(), 3, 10, createLocallyOffsetChild );
 	var rootC = generateSceneGraph( new THREE.Object3D(), 9, 3, createLocallyOffsetChild );
+	var rootD = generateSceneGraph( new THREE.Object3D(), 9, 3, createLocallyOffsetVariedChild );
 
 	var s = Bench.newSuite( 'Update world transforms' );
 
@@ -63,6 +89,11 @@
 	s.add( 'Update graph depth=9, breadth=3 (' + nodeCount( rootC ) + ' nodes)', function () {
 
 		rootC.updateMatrixWorld( true );
+
+	} );
+	s.add( 'Update graph depth=9, breadth=3, varied Object3D types (' + nodeCount( rootD ) + ' nodes)', function () {
+
+		rootD.updateMatrixWorld( true );
 
 	} );
 
