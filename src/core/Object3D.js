@@ -27,7 +27,7 @@ const _removedEvent = { type: 'removed' };
 
 class Object3DMatrixData {
 
-	constructor(object) {
+	constructor() {
 		this.matrix = new Matrix4();
 		this.matrixWorld = new Matrix4();
 
@@ -38,7 +38,10 @@ class Object3DMatrixData {
 
 		this.parent = null;
 		this.children = []
-		this.object = object
+
+		this.position = new Vector3();
+		this.quaternion = new Quaternion();
+		this.scale = new Vector3( 1, 1, 1 );
 	}
 
 	setParent(parent) {
@@ -56,8 +59,7 @@ class Object3DMatrixData {
 
 	updateMatrix() {
 
-		const object = this.object
-		this.matrix.compose( object.position, object.quaternion, object.scale );
+		this.matrix.compose( this.position, this.quaternion, this.scale );
 
 		this.matrixWorldNeedsUpdate = true;
 
@@ -124,10 +126,12 @@ class Object3D extends EventDispatcher {
 
 		this.up = Object3D.DefaultUp.clone();
 
-		const position = new Vector3();
+		this.matrixData = new Object3DMatrixData()
+
+		const position = this.matrixData.position
 		const rotation = new Euler();
-		const quaternion = new Quaternion();
-		const scale = new Vector3( 1, 1, 1 );
+		const quaternion = this.matrixData.quaternion;
+		const scale = this.matrixData.scale;
 
 		function onRotationChange() {
 
@@ -173,7 +177,6 @@ class Object3D extends EventDispatcher {
 			}
 		} );
 
-		this.matrixData = new Object3DMatrixData(this)
 		this.matrix = this.matrixData.matrix
 		this.matrixWorld = this.matrixData.matrixWorld
 
