@@ -27,7 +27,7 @@ const _removedEvent = { type: 'removed' };
 
 class Object3DMatrixData {
 
-	constructor() {
+	constructor(object) {
 		this.matrix = new Matrix4();
 		this.matrixWorld = new Matrix4();
 
@@ -39,6 +39,7 @@ class Object3DMatrixData {
 		this.next = null;
 		this.prev = null;
 		this.parent = null;
+		this.object = object
 	}
 
 	setParent(parent) {
@@ -68,6 +69,72 @@ class Object3DMatrixData {
 		this.next.prev = this.prev;
 		this.next = null;
 		this.prev = null;
+	}
+
+	nextDescendent(ancestor) {
+
+		if (this.next && (this.next.parent === this.parent ||
+		    this.next.hasAncestor(ancestor))) {
+			return this.next;
+		}
+		else {
+			return null;
+		}
+	}
+
+	hasAncestor(ancestor) {
+		 if (this.parent === ancestor) {
+			return true;
+		 }
+		 else if (this.parent) {
+			return this.parent.hasAncestor(ancestor)
+		 }
+		 else {
+			return false;
+		 }
+	}
+
+	updateMatrix() {
+
+		const object = this.object
+		this.matrix.compose( object.position, object.quaternion, object.scale );
+
+		this.matrixWorldNeedsUpdate = true;
+
+	}
+
+	performMatrixWorldUpdates(force) {
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
+
+		if ( this.matrixWorldNeedsUpdate || force ) {
+
+			if ( this.parent === null ) {
+
+				this.matrixWorld.copy( this.matrix );
+
+			} else {
+
+				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+
+			}
+
+			this.matrixWorldNeedsUpdate = false;
+
+			force = true;
+
+		}
+
+		return force
+	}
+
+	updateMatrixWorld( force ) {
+
+		let node = this
+
+		while (node !== null) {
+			force = node.performMatrixWorldUpdates(force)
+			node = node.nextDescendent(this)
+		}
 	}
 }
 
@@ -140,7 +207,7 @@ class Object3D extends EventDispatcher {
 			}
 		} );
 
-		this.matrixData = new Object3DMatrixData()
+		this.matrixData = new Object3DMatrixData(this)
 		this.matrix = this.matrixData.matrix
 		this.matrixWorld = this.matrixData.matrixWorld
 
@@ -629,41 +696,7 @@ class Object3D extends EventDispatcher {
 
 	updateMatrixWorld( force ) {
 
-		if ( this.matrixAutoUpdate ) this.updateMatrix();
-
-		if ( this.matrixWorldNeedsUpdate || force ) {
-
-			if ( this.parent === null ) {
-
-				this.matrixWorld.copy( this.matrix );
-
-			} else {
-
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-			}
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
-
-		// update children
-
-		const children = this.children;
-
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			const child = children[ i ];
-
-			if ( child.matrixWorldAutoUpdate === true || force === true ) {
-
-				child.updateMatrixWorld( force );
-
-			}
-
-		}
+		this.matrixData.updateMatrixWorld( force )
 
 	}
 
