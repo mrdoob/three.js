@@ -64,7 +64,7 @@
 
 		child.position.copy( position );
 		child.scale.copy( scale );
-		child.quaternion.copy( rotation );
+		child.rotation.copy( rotation );
 		return child;
 
 	};
