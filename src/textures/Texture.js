@@ -186,6 +186,7 @@ class Texture extends EventDispatcher {
 
 			flipY: this.flipY,
 
+			generateMipmaps: this.generateMipmaps,
 			premultiplyAlpha: this.premultiplyAlpha,
 			unpackAlignment: this.unpackAlignment
 
