@@ -74,7 +74,7 @@
 				const h = positionLocal.add( offset ).normalize().y;
 
 				const skyMat = new MeshBasicNodeMaterial();
-				skyMat.colorNode = vec4( mix( color( bottomColor ), color( topColor ), max( pow( max( h, 0.0 ), exponent ), 0.0 ) ), 1.0 );
+				skyMat.colorNode = vec4( mix( color( bottomColor ), color( topColor ), h.max( 0.0 ).pow( exponent ) ), 1.0 );
 				skyMat.side = THREE.BackSide;
 
 				const sky = new THREE.Mesh( new THREE.SphereGeometry( 4000, 32, 15 ), skyMat );
