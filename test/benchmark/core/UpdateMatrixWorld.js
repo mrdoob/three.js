@@ -8,7 +8,8 @@
 	rotation.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 8 );
 	var createLocallyOffsetChild = function (type) {
 
-		let child 
+		let child;
+		let choice;
 
 		switch (type) {
 			case "Object3D":
@@ -17,18 +18,18 @@
 
 			case "Polymorphic":
 				child = new THREE.Object3D();
-				var choice = Math.random();
+				choice = Math.random();
 				if (choice < 0.2) {
-					child.extra1 = "test-polymorphism"
+					child.extra1 = "test-polymorphism";
 				}
 				else if (choice < 0.4) {
-					child.extra2 = "test-polymorphism"
+					child.extra2 = "test-polymorphism";
 				}
 				else if (choice < 0.6) {
-					child.extra3 = "test-polymorphism"
+					child.extra3 = "test-polymorphism";
 				}
 				else if (choice < 0.8) {
-					child.extra4 = "test-polymorphism"
+					child.extra4 = "test-polymorphism";
 				}
 				break;
 
@@ -41,7 +42,7 @@
 				break; 
 
 			case "Realistic":
-				var choice = Math.random();
+				choice = Math.random();
 				if (choice < 0.05) {
 					child = new THREE.InstancedMesh();
 				}
