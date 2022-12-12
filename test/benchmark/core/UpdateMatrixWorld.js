@@ -12,6 +12,7 @@
 		child.position.copy( position );
 		child.scale.copy( scale );
 		child.quaternion.copy( quaternion );
+
 		return child;
 
 	};
