@@ -85,7 +85,7 @@ export default /* glsl */`
 
 		float faceSize = exp2( mipInt );
 
-		vec2 uv = getUV( direction, face ) * ( faceSize - 2.0 ) + 1.0;
+		highp vec2 uv = getUV( direction, face ) * ( faceSize - 2.0 ) + 1.0; // #25071
 
 		if ( face > 2.0 ) {
 
