@@ -46,7 +46,7 @@ class Object3DMatrixData {
 
 	addChild(child) {
 		child.parent = this;
-		this.children.push(this)
+		this.children.push(child)
 	}
 
 	removeChild(child) {
