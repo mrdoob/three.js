@@ -44,16 +44,18 @@ class Object3DMatrixData {
 		this.scale = new Vector3( 1, 1, 1 );
 	}
 
-	setParent(parent) {
-		this.parent = parent;
-		parent.children.push(this)
+	addChild(child) {
+		child.parent = this;
+		this.children.push(this)
 	}
 
-	remove(index) {
+	removeChild(child) {
 
-		// we can assume that indices match those on the parent object.
-		this.parent.children.splice( index, 1 );
-		this.parent = null;
+		const index = this.children.indexOf( child );
+
+		if (index !== -1) {
+			this.children.splice( index, 1 );
+		}
 
 	}
 
@@ -126,7 +128,8 @@ class Object3D extends EventDispatcher {
 
 		this.up = Object3D.DefaultUp.clone();
 
-		this.matrixData = new Object3DMatrixData()
+		this.privateMatrixData = new Object3DMatrixData()
+		this.matrixData = this.privateMatrixData
 
 		const position = this.matrixData.position
 		const rotation = new Euler();
@@ -217,6 +220,64 @@ class Object3D extends EventDispatcher {
 
 	get matrixWorldAutoUpdate() {
 		return this.matrixData.matrixWorldAutoUpdate
+	}
+
+	_updateMatrixDataReferences() {
+
+		this.matrix = this.matrixData.matrix
+		this.matrixWorld = this.matrixData.matrixWorld
+		this.position = this.matrixData.position
+		this.quaternion = this.matrixData.quaternion;
+		this.scale = this.matrixData.scale;
+
+	}
+
+	shareParentMatrix() {
+		
+		this.matrixData = this.parent.matrixData
+
+		this._updateMatrixDataReferences()
+		
+		// Transfer children's matrices into parent matrix data.
+		// Don't worry about ordering, as it's not possible to guarantee preveration of 
+		// matching ordering.
+
+		const children = this.privateMatrixData.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			const child = children[ i ];
+
+			this.matrixData.addChild(child)
+
+		}
+
+		// privateMatrixData retains a list of children to re-instate when restoring private matrix.
+		// This list is maintained as further children are added / removed & as matrix sharing occurs
+		// as this avoids us ever having to perform a full analysis of the entire descendent scene graph.
+		// !! TO DO 
+		// There are lots of cases here to consider & the current code probably has some bug / limitations
+		// Lots of Unit Testing of this is needed.
+	}
+
+	restorePrivateMatrix() {
+
+		this.matrixData = this.privateMatrixData
+
+		this._updateMatrixDataReferences()
+
+		// Remove children's matrices from the parent matrix data.
+		// privateMatrixData is maintained as an up-to-date maintained list of the set of children to move.
+		const children = this.privateMatrixData.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			const child = children[ i ];
+
+			this.parent.matrixData.removeChild(child)
+
+		}
+
 	}
 
 	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
@@ -432,7 +493,10 @@ class Object3D extends EventDispatcher {
 
 			object.parent = this;
 			this.children.push( object );
-			object.matrixData.setParent(this.matrixData)
+			this.matrixData.addChild(object.matrixData);
+			if (this.matrixData !== this.privateMatrixData) {
+				this.privateMatrixData.addChild(object.matrixData);
+			}
 
 			object.dispatchEvent( _addedEvent );
 
@@ -466,7 +530,14 @@ class Object3D extends EventDispatcher {
 
 			object.parent = null;
 			this.children.splice( index, 1 );
-			object.matrixData.remove(index)
+
+			// remove all traces of object matrices from our matrixData (whether shared or private)
+			this.matrixData.removeChild(object.matrixData)
+			this.matrixData.removeChild(object.privateMatrixData)
+			if (this.matrixData !== this.privateMatrixData) {
+				this.privateMatrixData.removeChild(object.matrixData)
+			  this.privateMatrixData.removeChild(object.privateMatrixData)
+			}
 
 			object.dispatchEvent( _removedEvent );
 
@@ -497,13 +568,14 @@ class Object3D extends EventDispatcher {
 			const object = this.children[ i ];
 
 			object.parent = null;
-			object.matrixData.remove(i)
 
 			object.dispatchEvent( _removedEvent );
 
 		}
 
 		this.children.length = 0;
+		this.matrixData.children.length = 0;
+		this.privateMatrixData.children.length = 0;
 
 		return this;
 
