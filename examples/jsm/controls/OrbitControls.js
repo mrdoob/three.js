@@ -298,7 +298,7 @@ class OrbitControls extends EventDispatcher {
 			scope.domElement.removeEventListener( 'wheel', onMouseWheel );
 
 			scope.domElement.removeEventListener( 'pointermove', onPointerMove );
-			scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+			window.removeEventListener( 'pointerup', onPointerUp );
 
 
 			if ( scope._domElementKeyEvents !== null ) {
@@ -837,7 +837,7 @@ class OrbitControls extends EventDispatcher {
 				scope.domElement.setPointerCapture( event.pointerId );
 
 				scope.domElement.addEventListener( 'pointermove', onPointerMove );
-				scope.domElement.addEventListener( 'pointerup', onPointerUp );
+				window.addEventListener( 'pointerup', onPointerUp );
 
 			}
 
@@ -882,7 +882,7 @@ class OrbitControls extends EventDispatcher {
 		        scope.domElement.releasePointerCapture( event.pointerId );
 
 		        scope.domElement.removeEventListener( 'pointermove', onPointerMove );
-		        scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+		        window.removeEventListener( 'pointerup', onPointerUp );
 
 		    }
 
