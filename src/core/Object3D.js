@@ -28,6 +28,7 @@ const _removedEvent = { type: 'removed' };
 class Object3DMatrixData {
 
 	constructor() {
+
 		this.matrix = new Matrix4();
 		this.matrixWorld = new Matrix4();
 
@@ -37,19 +38,22 @@ class Object3DMatrixData {
 		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
 
 		this.parent = null;
-		this.children = []
+		this.children = [];
 
 		this.position = new Vector3();
 		this.quaternion = new Quaternion();
 		this.scale = new Vector3( 1, 1, 1 );
+
 	}
 
-	setParent(parent) {
+	setParent( parent 	) {
+
 		this.parent = parent;
-		parent.children.push(this)
+		parent.children.push( this );
+
 	}
 
-	remove(index) {
+	remove( index ) {
 
 		// we can assume that indices match those on the parent object.
 		this.parent.children.splice( index, 1 );
@@ -87,7 +91,7 @@ class Object3DMatrixData {
 
 		}
 
-		// updateChildren 
+		// update Children
 
 		const children = this.children;
 
@@ -104,6 +108,7 @@ class Object3DMatrixData {
 		}
 
 	}
+
 }
 
 class Object3D extends EventDispatcher {
@@ -126,9 +131,9 @@ class Object3D extends EventDispatcher {
 
 		this.up = Object3D.DefaultUp.clone();
 
-		this.matrixData = new Object3DMatrixData()
+		this.matrixData = new Object3DMatrixData();
 
-		const position = this.matrixData.position
+		const position = this.matrixData.position;
 		const rotation = new Euler();
 		const quaternion = this.matrixData.quaternion;
 		const scale = this.matrixData.scale;
@@ -177,8 +182,8 @@ class Object3D extends EventDispatcher {
 			}
 		} );
 
-		this.matrix = this.matrixData.matrix
-		this.matrixWorld = this.matrixData.matrixWorld
+		this.matrix = this.matrixData.matrix;
+		this.matrixWorld = this.matrixData.matrixWorld;
 
 		this.layers = new Layers();
 		this.visible = true;
@@ -195,28 +200,40 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	set matrixAutoUpdate(value) {
-		this.matrixData.matrixAutoUpdate = value
+	set matrixAutoUpdate( value ) {
+
+		this.matrixData.matrixAutoUpdate = value;
+
 	}
 
 	get matrixAutoUpdate() {
-		return this.matrixData.matrixAutoUpdate
+
+		return this.matrixData.matrixAutoUpdate;
+
 	}
 
-	set matrixWorldNeedsUpdate(value) {
-		this.matrixData.matrixWorldNeedsUpdate = value
+	set matrixWorldNeedsUpdate( value ) {
+
+		this.matrixData.matrixWorldNeedsUpdate = value;
+
 	}
 
 	get matrixWorldNeedsUpdate() {
-		return this.matrixData.matrixWorldNeedsUpdate
+
+		return this.matrixData.matrixWorldNeedsUpdate;
+
 	}
 
-	set matrixWorldAutoUpdate(value) {
-		this.matrixData.matrixWorldAutoUpdate = value
+	set matrixWorldAutoUpdate( value ) {
+
+		this.matrixData.matrixWorldAutoUpdate = value;
+
 	}
 
 	get matrixWorldAutoUpdate() {
-		return this.matrixData.matrixWorldAutoUpdate
+
+		return this.matrixData.matrixWorldAutoUpdate;
+
 	}
 
 	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
@@ -432,7 +449,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = this;
 			this.children.push( object );
-			object.matrixData.setParent(this.matrixData)
+			object.matrixData.setParent( this.matrixData );
 
 			object.dispatchEvent( _addedEvent );
 
@@ -466,7 +483,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = null;
 			this.children.splice( index, 1 );
-			object.matrixData.remove(index)
+			object.matrixData.remove( index );
 
 			object.dispatchEvent( _removedEvent );
 
@@ -497,7 +514,7 @@ class Object3D extends EventDispatcher {
 			const object = this.children[ i ];
 
 			object.parent = null;
-			object.matrixData.remove(i)
+			object.matrixData.remove( i );
 
 			object.dispatchEvent( _removedEvent );
 
@@ -665,7 +682,7 @@ class Object3D extends EventDispatcher {
 
 	updateMatrixWorld( force ) {
 
-		this.matrixData.updateMatrixWorld( force )
+		this.matrixData.updateMatrixWorld( force );
 
 	}
 
