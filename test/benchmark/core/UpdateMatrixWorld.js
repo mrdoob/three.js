@@ -4,8 +4,8 @@
 
 	var position = new THREE.Vector3( 1, 1, 1 );
 	var scale = new THREE.Vector3( 2, 1, 0.5 );
-	var rotation = new THREE.Quaternion();
-	rotation.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 8 );
+	var quaternion = new THREE.Quaternion();
+	quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 8 );
 	var createLocallyOffsetChild = function () {
 
 		var child = new THREE.Object3D();
@@ -36,7 +36,8 @@
 		
 		child.position.copy( position );
 		child.scale.copy( scale );
-		child.quaternion.copy( rotation );
+		child.quaternion.copy( quaternion );
+
 		return child;
 
 	};
