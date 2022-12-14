@@ -58,7 +58,7 @@ class CCDIKSolver {
 		this.iks = iks;
 
 		this._valid();
-    this.setUpdateMatrixWorldBefore(this.updateMatrixWorldBefore)
+		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 	}
 

@@ -16,7 +16,7 @@ class OculusHandModel extends Object3D {
 		this.loader = loader;
 
 		this.mesh = null;
-    this.setUpdateMatrixWorldAfter(this.updateMatrixWorldAfter)
+		this.setUpdateMatrixWorldAfter( this.updateMatrixWorldAfter );
 
 		controller.addEventListener( 'connected', ( event ) => {
 

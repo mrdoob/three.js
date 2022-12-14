@@ -27,7 +27,7 @@ const _removedEvent = { type: 'removed' };
 
 class Object3DMatrixData {
 
-	constructor(object) {
+	constructor( object ) {
 
 		this.matrix = new Matrix4();
 		this.matrixWorld = new Matrix4();
@@ -64,11 +64,15 @@ class Object3DMatrixData {
 	}
 
 	registerBeforeUpdate() {
-		this.beforeUpdate = true
+
+		this.beforeUpdate = true;
+
 	}
 
 	registerAfterUpdate() {
-		this.afterUpdate = true
+
+		this.afterUpdate = true;
+
 	}
 
 	updateMatrix() {
@@ -81,7 +85,7 @@ class Object3DMatrixData {
 
 	updateMatrixWorld( force ) {
 
-		if ( this.updateMatrixWorldBefore ) this.updateMatrixWorldBefore( force )
+		if ( this.updateMatrixWorldBefore ) this.updateMatrixWorldBefore( force );
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
@@ -119,7 +123,7 @@ class Object3DMatrixData {
 
 		}
 
-		if ( this.updateMatrixWorldAfter ) this.updateMatrixWorldAfter( force )
+		if ( this.updateMatrixWorldAfter ) this.updateMatrixWorldAfter( force );
 
 	}
 
@@ -145,7 +149,7 @@ class Object3D extends EventDispatcher {
 
 		this.up = Object3D.DefaultUp.clone();
 
-		this.matrixData = new Object3DMatrixData(this);
+		this.matrixData = new Object3DMatrixData( this );
 
 		const position = this.matrixData.position;
 		const rotation = new Euler();
@@ -250,12 +254,16 @@ class Object3D extends EventDispatcher {
 
 	}
 
-	setUpdateMatrixWorldAfter(after) {
-		this.matrixData.updateMatrixWorldAfter = after.bind(this)
+	setUpdateMatrixWorldAfter( after ) {
+
+		this.matrixData.updateMatrixWorldAfter = after.bind( this );
+
 	}
 
-	setUpdateMatrixWorldBefore(before) {
-		this.matrixData.updateMatrixWorldBefore = before.bind(this)
+	setUpdateMatrixWorldBefore( before ) {
+
+		this.matrixData.updateMatrixWorldBefore = before.bind( this );
+
 	}
 
 	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}

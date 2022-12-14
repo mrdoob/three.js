@@ -68,7 +68,7 @@ class MMDPhysics {
 
 		this._init( mesh, rigidBodyParams, constraintParams );
 
-    this.setUpdateMatrixWorldBefore(this.updateMatrixWorldBefore)
+		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 	}
 

@@ -65,7 +65,7 @@ class TransformControls extends Object3D {
 
 		const scope = this;
 
-    this.setUpdateMatrixWorldBefore(this.updateMatrixWorldBefore)
+		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 		// Defined getter, setter and store for a property
 		function defineProperty( propName, defaultValue ) {
@@ -771,7 +771,7 @@ class TransformControlsGizmo extends Object3D {
 		this.isTransformControlsGizmo = true;
 
 		this.type = 'TransformControlsGizmo';
-    this.setUpdateMatrixWorldBefore(this.updateMatrixWorldBefore)
+		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 		// shared materials
 
@@ -1472,7 +1472,7 @@ class TransformControlsPlane extends Mesh {
 		this.isTransformControlsPlane = true;
 
 		this.type = 'TransformControlsPlane';
-    this.setUpdateMatrixWorldBefore(this.updateMatrixWorldBefore)
+		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 	}
 
