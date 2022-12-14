@@ -39,6 +39,7 @@
 			function init() {
 
 				scene = new THREE.Scene();
+        window.scene = scene;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -154,7 +155,7 @@
 
 				requestAnimationFrame( animate );
 
-				group.rotation.y += 0.005;
+				//group.rotation.y += 0.005;
 
 				render();
 

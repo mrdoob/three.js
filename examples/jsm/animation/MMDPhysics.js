@@ -1252,6 +1252,7 @@ class MMDPhysicsHelper extends Object3D {
 
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
+    this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 		this.materials = [];
 
@@ -1320,7 +1321,7 @@ class MMDPhysicsHelper extends Object3D {
 	/**
 	 * Updates Rigid Bodies visualization.
 	 */
-	updateMatrixWorld( force ) {
+	updateMatrixWorldBefore( force ) {
 
 		var mesh = this.root;
 
@@ -1361,8 +1362,6 @@ class MMDPhysicsHelper extends Object3D {
 			.copy( mesh.matrixWorld )
 			.decompose( _position, _quaternion, _scale )
 			.compose( _position, _quaternion, _scale.set( 1, 1, 1 ) );
-
-		super.updateMatrixWorld( force );
 
 	}
 

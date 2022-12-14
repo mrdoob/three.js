@@ -75,6 +75,8 @@ class Object3DMatrixData {
 
 	updateMatrixWorld( force ) {
 
+		if ( this.updateMatrixWorldBefore ) this.updateMatrixWorldBefore( force );
+
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
 		if ( this.matrixWorldNeedsUpdate || force ) {
@@ -110,6 +112,8 @@ class Object3DMatrixData {
 			}
 
 		}
+
+		if ( this.updateMatrixWorldAfter ) this.updateMatrixWorldAfter( force );
 
 	}
 
@@ -297,6 +301,18 @@ class Object3D extends EventDispatcher {
 			this.parent.matrixData.removeChild( child );
 
 		}
+
+	}
+
+	setUpdateMatrixWorldAfter( after ) {
+
+		this.matrixData.updateMatrixWorldAfter = after.bind( this );
+
+	}
+
+	setUpdateMatrixWorldBefore( before ) {
+
+		this.matrixData.updateMatrixWorldBefore = before.bind( this );
 
 	}
 

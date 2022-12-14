@@ -293,6 +293,8 @@ class CCDIKHelper extends Object3D {
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
 
+		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
+
 		this.sphereGeometry = new SphereGeometry( sphereSize, 16, 8 );
 
 		this.targetSphereMaterial = new MeshBasicMaterial( {
@@ -330,7 +332,7 @@ class CCDIKHelper extends Object3D {
 	/**
 	 * Updates IK bones visualization.
 	 */
-	updateMatrixWorld( force ) {
+	updateMatrixWorldBefore( force ) {
 
 		const mesh = this.root;
 
@@ -388,8 +390,6 @@ class CCDIKHelper extends Object3D {
 		}
 
 		this.matrix.copy( mesh.matrixWorld );
-
-		super.updateMatrixWorld( force );
 
 	}
 

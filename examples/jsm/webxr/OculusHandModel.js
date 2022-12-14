@@ -16,6 +16,7 @@ class OculusHandModel extends Object3D {
 		this.loader = loader;
 
 		this.mesh = null;
+		this.setUpdateMatrixWorldAfter( this.updateMatrixWorldAfter );
 
 		controller.addEventListener( 'connected', ( event ) => {
 
@@ -40,9 +41,7 @@ class OculusHandModel extends Object3D {
 
 	}
 
-	updateMatrixWorld( force ) {
-
-		super.updateMatrixWorld( force );
+	updateMatrixWorldAfter( force ) {
 
 		if ( this.motionController ) {
 

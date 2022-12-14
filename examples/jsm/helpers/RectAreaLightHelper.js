@@ -40,9 +40,11 @@ class RectAreaLightHelper extends Line {
 
 		this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: BackSide, fog: false } ) ) );
 
+    this.setUpdateMatrixWorldAfter( this.updateMatrixWorldAfter );
+
 	}
 
-	updateMatrixWorld() {
+	updateMatrixWorldAfter() {
 
 		this.scale.set( 0.5 * this.light.width, 0.5 * this.light.height, 1 );
 
