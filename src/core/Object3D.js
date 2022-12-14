@@ -61,18 +61,6 @@ class Object3DMatrixData {
 
 	}
 
-	registerBeforeUpdate() {
-
-		this.beforeUpdate = true;
-
-	}
-
-	registerAfterUpdate() {
-
-		this.afterUpdate = true;
-
-	}
-
 	updateMatrix() {
 
 		this.matrix.compose( this.position, this.quaternion, this.scale );
