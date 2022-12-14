@@ -27,7 +27,7 @@ const _removedEvent = { type: 'removed' };
 
 class Object3DMatrixData {
 
-	constructor( object ) {
+	constructor() {
 
 		this.matrix = new Matrix4();
 		this.matrixWorld = new Matrix4();
@@ -43,8 +43,6 @@ class Object3DMatrixData {
 		this.position = new Vector3();
 		this.quaternion = new Quaternion();
 		this.scale = new Vector3( 1, 1, 1 );
-
-		this.object = object;
 
 	}
 
@@ -149,7 +147,7 @@ class Object3D extends EventDispatcher {
 
 		this.up = Object3D.DefaultUp.clone();
 
-		this.matrixData = new Object3DMatrixData( this );
+		this.matrixData = new Object3DMatrixData();
 
 		const position = this.matrixData.position;
 		const rotation = new Euler();
