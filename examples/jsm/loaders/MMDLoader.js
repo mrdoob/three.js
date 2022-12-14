@@ -2076,6 +2076,8 @@ class MMDToonMaterial extends ShaderMaterial {
 
 		this.isMMDToonMaterial = true;
 
+		this.type = 'MMDToonMaterial';
+
 		this._matcapCombine = AddOperation;
 		this.emissiveIntensity = 1.0;
 		this.normalMapType = TangentSpaceNormalMap;
