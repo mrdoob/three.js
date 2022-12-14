@@ -11,7 +11,7 @@
 		var child = new THREE.Object3D();
 		child.position.copy( position );
 		child.scale.copy( scale );
-		child.quaternion.copy( rotation );
+		child.quaternion.copy( quaternion );
 		return child;
 
 	};
