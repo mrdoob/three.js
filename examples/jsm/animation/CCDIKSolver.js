@@ -58,7 +58,6 @@ class CCDIKSolver {
 		this.iks = iks;
 
 		this._valid();
-		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 	}
 
@@ -293,6 +292,8 @@ class CCDIKHelper extends Object3D {
 
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
+
+		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 		this.sphereGeometry = new SphereGeometry( sphereSize, 16, 8 );
 
