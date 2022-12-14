@@ -57,8 +57,10 @@ class Object3DMatrixData {
 
 		const index = this.children.indexOf( child );
 
-		if (index !== -1) {
+		if ( index !== - 1 ) {
+
 			this.children.splice( index, 1 );
+
 		}
 
 	}
@@ -133,7 +135,7 @@ class Object3D extends EventDispatcher {
 
 		this.up = Object3D.DefaultUp.clone();
 
-		this.privateMatrixData = new Object3DMatrixData()
+		this.privateMatrixData = new Object3DMatrixData();
 		this.matrixData = this.privateMatrixData;
 
 		const position = this.matrixData.position;
@@ -241,22 +243,22 @@ class Object3D extends EventDispatcher {
 
 	_updateMatrixDataReferences() {
 
-		this.matrix = this.matrixData.matrix
-		this.matrixWorld = this.matrixData.matrixWorld
-		this.position = this.matrixData.position
+		this.matrix = this.matrixData.matrix;
+		this.matrixWorld = this.matrixData.matrixWorld;
+		this.position = this.matrixData.position;
 		this.quaternion = this.matrixData.quaternion;
 		this.scale = this.matrixData.scale;
 
 	}
 
 	shareParentMatrix() {
-		
-		this.matrixData = this.parent.matrixData
 
-		this._updateMatrixDataReferences()
-		
+		this.matrixData = this.parent.matrixData;
+
+		this._updateMatrixDataReferences();
+
 		// Transfer children's matrices into parent matrix data.
-		// Don't worry about ordering, as it's not possible to guarantee preveration of 
+		// Don't worry about ordering, as it's not possible to guarantee preveration of
 		// matching ordering.
 
 		const children = this.privateMatrixData.children;
@@ -265,23 +267,24 @@ class Object3D extends EventDispatcher {
 
 			const child = children[ i ];
 
-			this.matrixData.addChild(child)
+			this.matrixData.addChild( child );
 
 		}
 
 		// privateMatrixData retains a list of children to re-instate when restoring private matrix.
 		// This list is maintained as further children are added / removed & as matrix sharing occurs
 		// as this avoids us ever having to perform a full analysis of the entire descendent scene graph.
-		// !! TO DO 
+		// !! TO DO
 		// There are lots of cases here to consider & the current code probably has some bug / limitations
 		// Lots of Unit Testing of this is needed.
+
 	}
 
 	restorePrivateMatrix() {
 
-		this.matrixData = this.privateMatrixData
+		this.matrixData = this.privateMatrixData;
 
-		this._updateMatrixDataReferences()
+		this._updateMatrixDataReferences();
 
 		// Remove children's matrices from the parent matrix data.
 		// privateMatrixData is maintained as an up-to-date maintained list of the set of children to move.
@@ -291,7 +294,7 @@ class Object3D extends EventDispatcher {
 
 			const child = children[ i ];
 
-			this.parent.matrixData.removeChild(child)
+			this.parent.matrixData.removeChild( child );
 
 		}
 
@@ -516,7 +519,7 @@ class Object3D extends EventDispatcher {
 			this.children.push( object );
 			this.matrixData.addChild( object.matrixData );
 
-			if (this.matrixData !== this.privateMatrixData) {
+			if ( this.matrixData !== this.privateMatrixData ) {
 
 				this.privateMatrixData.addChild( object.matrixData );
 
@@ -556,11 +559,13 @@ class Object3D extends EventDispatcher {
 			this.children.splice( index, 1 );
 
 			// remove all traces of object matrices from our matrixData (whether shared or private)
-			this.matrixData.removeChild(object.matrixData)
-			this.matrixData.removeChild(object.privateMatrixData)
-			if (this.matrixData !== this.privateMatrixData) {
-				this.privateMatrixData.removeChild(object.matrixData)
-			  this.privateMatrixData.removeChild(object.privateMatrixData)
+			this.matrixData.removeChild( object.matrixData );
+			this.matrixData.removeChild( object.privateMatrixData );
+			if ( this.matrixData !== this.privateMatrixData ) {
+
+				this.privateMatrixData.removeChild( object.matrixData );
+			  this.privateMatrixData.removeChild( object.privateMatrixData );
+
 			}
 
 			object.dispatchEvent( _removedEvent );
