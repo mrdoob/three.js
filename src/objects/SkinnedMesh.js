@@ -24,6 +24,7 @@ class SkinnedMesh extends Mesh {
 		this.bindMode = 'attached';
 		this.bindMatrix = new Matrix4();
 		this.bindMatrixInverse = new Matrix4();
+    this.setUpdateMatrixWorldAfter(this.updateMatrixWorldAfter)
 
 	}
 
@@ -94,9 +95,7 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	updateMatrixWorld( force ) {
-
-		super.updateMatrixWorld( force );
+	updateMatrixWorldAfter( force ) {
 
 		if ( this.bindMode === 'attached' ) {
 

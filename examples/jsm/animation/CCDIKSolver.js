@@ -58,6 +58,7 @@ class CCDIKSolver {
 		this.iks = iks;
 
 		this._valid();
+    this.setUpdateMatrixWorldBefore(this.updateMatrixWorldBefore)
 
 	}
 
@@ -330,7 +331,7 @@ class CCDIKHelper extends Object3D {
 	/**
 	 * Updates IK bones visualization.
 	 */
-	updateMatrixWorld( force ) {
+	updateMatrixWorldBefore( force ) {
 
 		const mesh = this.root;
 
@@ -388,8 +389,6 @@ class CCDIKHelper extends Object3D {
 		}
 
 		this.matrix.copy( mesh.matrixWorld );
-
-		super.updateMatrixWorld( force );
 
 	}
 

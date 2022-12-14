@@ -16,6 +16,7 @@ class PositionalAudio extends Audio {
 		this.panner = this.context.createPanner();
 		this.panner.panningModel = 'HRTF';
 		this.panner.connect( this.gain );
+    this.setUpdateMatrixWorldAfter(this.updateMatrixWorldAfter)
 
 	}
 
@@ -99,9 +100,7 @@ class PositionalAudio extends Audio {
 
 	}
 
-	updateMatrixWorld( force ) {
-
-		super.updateMatrixWorld( force );
+	updateMatrixWorldAfter( force ) {
 
 		if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 
