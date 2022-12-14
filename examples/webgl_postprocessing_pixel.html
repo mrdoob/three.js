@@ -180,11 +180,12 @@
 			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;
 			crystalMesh.rotation.y = stopGoEased( t, 2, 4 ) * 2 * Math.PI;
 
-			const rendererSize = renderer.getSize(new THREE.Vector2());
+			const rendererSize = renderer.getSize( new THREE.Vector2() );
 			const aspectRatio = rendererSize.x / rendererSize.y;
-			if ( params["pixelAlignedPanning"] ){
+			if ( params["pixelAlignedPanning"] ) {
 
-				pixelAlignFrustum( camera, Math.floor( rendererSize.x / params[ "pixelSize" ] ), aspectRatio );
+				pixelAlignFrustum( camera, aspectRatio, Math.floor( rendererSize.x / params[ "pixelSize" ] ), 
+														Math.floor( rendererSize.y / params[ "pixelSize" ] ) );
 
 			} else if ( camera.left != - aspectRatio || camera.top != 1.0 ) {
 
@@ -238,11 +239,13 @@
 
 		}
 
-		function pixelAlignFrustum( camera, pixelsPerScreenWidth, aspectRatio ) {
+		function pixelAlignFrustum( camera, aspectRatio, pixelsPerScreenWidth, pixelsPerScreenHeight ) {
 
 				// 0. Get Pixel Grid Units
-				let worldScreenWidth = (( camera.right - camera.left ) / camera.zoom );
-				let pixelWidth = worldScreenWidth / pixelsPerScreenWidth;
+				let worldScreenWidth  = ( ( camera.right - camera.left ) / camera.zoom );
+				let worldScreenHeight = ( ( camera.top - camera.bottom ) / camera.zoom );
+				let pixelWidth  = worldScreenWidth  / pixelsPerScreenWidth;
+				let pixelHeight = worldScreenHeight / pixelsPerScreenHeight;
 
 				// 1. Project the current camera position along its local rotation bases
 				let camPos      = new THREE.Vector3   ();   camera.getWorldPosition  ( camPos );
@@ -254,17 +257,17 @@
 
 				// 2. Find how far along its position is along these bases in pixel units
 				let camPosRightPx = camPosRight / pixelWidth;
-				let camPosUpPx    = camPosUp    / pixelWidth;
+				let camPosUpPx    = camPosUp    / pixelHeight;
 
 				// 3. Find the fractional pixel units and convert to world units
 				let fractX = camPosRightPx - Math.round( camPosRightPx );
 				let fractY = camPosUpPx    - Math.round(    camPosUpPx );
 
 				// 4. Add fractional world units to the left/right top/bottom to align with the pixel grid
-				camera.left   = - aspectRatio - ( fractX * pixelWidth );
-				camera.right  =   aspectRatio - ( fractX * pixelWidth );
-				camera.top    =   1.0         - ( fractY * pixelWidth );
-				camera.bottom = - 1.0         - ( fractY * pixelWidth );
+				camera.left   = - aspectRatio - ( fractX * pixelWidth  );
+				camera.right  =   aspectRatio - ( fractX * pixelWidth  );
+				camera.top    =   1.0         - ( fractY * pixelHeight );
+				camera.bottom = - 1.0         - ( fractY * pixelHeight );
 				camera.updateProjectionMatrix();
 
 		}
