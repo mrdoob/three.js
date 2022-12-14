@@ -68,8 +68,6 @@ class MMDPhysics {
 
 		this._init( mesh, rigidBodyParams, constraintParams );
 
-		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
-
 	}
 
 	/**
@@ -1254,6 +1252,7 @@ class MMDPhysicsHelper extends Object3D {
 
 		this.matrix.copy( mesh.matrixWorld );
 		this.matrixAutoUpdate = false;
+    this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 		this.materials = [];
 
