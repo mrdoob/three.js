@@ -1186,6 +1186,271 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-	} );
+		QUnit.test( 'shareParentMatrix', ( assert ) => {
 
+			const p = new Object3D();
+			const c = new Object3D();
+			const g = new Object3D();
+
+			p.name="Parent"
+			c.name="Child"
+			g.name="Grandchild"
+
+			p.add(c)
+			c.add(g)
+
+			p.position.set(1, 1, 1)
+			p.updateMatrix()
+			g.position.set(2, 2, 2)
+			g.updateMatrix()
+
+			p.updateMatrixWorld()
+			const cMW = new Matrix4()
+			const gMW = new Matrix4()
+			cMW.copy(c.matrixWorld)
+			gMW.copy(g.matrixWorld)
+
+			// c now shares parent matrix - does not change world transforms
+			c.shareParentMatrix()
+			assert.equal(p.matrixData.children[0], g.matrixData, 'G is now direct child of P')
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' );
+
+			// restore private matrix - does not change world transforms
+			c.restorePrivateMatrix()
+			assert.equal(p.matrixData.children[0], c.matrixData, 'C is now child of P')
+			assert.equal(c.matrixData.children[0], g.matrixData, 'C is now child of G')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' )
+
+	  } );
+
+		// Multi-generational merges are disallowed.
+		QUnit.test( 'shareParentMatrix2', ( assert ) => {
+
+			const p = new Object3D();
+			const c = new Object3D();
+			const g = new Object3D();
+			const g2 = new Object3D();
+
+			p.name="Parent"
+			c.name="Child"
+			g.name="Grandchild"
+			g2.name="Great-grandchild"
+
+			p.add(c)
+			c.add(g)
+			g.add(g2)
+
+			p.position.set(1, 1, 1)
+			p.updateMatrix()
+			g2.position.set(2, 2, 2)
+			g2.updateMatrix()
+
+			p.updateMatrixWorld()
+			const cMW = new Matrix4()
+			const gMW = new Matrix4()
+			const g2MW = new Matrix4()
+			cMW.copy(c.matrixWorld)
+			gMW.copy(g.matrixWorld)
+			g2MW.copy(g2.matrixWorld)
+
+			// c & g now share parent matrix - does not change world transforms
+			c.shareParentMatrix()
+			g.shareParentMatrix()
+
+			assert.equal(p.matrixData.children[0], g2.matrixData, 'G2 is now direct child of P')
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' );
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+			// restore child private matrix - does not change world transforms
+			c.restorePrivateMatrix()
+
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+			assert.equal(p.matrixData.children[0], c.matrixData, 'C is now child of P again')
+			assert.equal(c.matrixData.children.length, 1, 'C has just one child')
+			assert.equal(c.matrixData.children[0], g2.matrixData, 'G2 is now direct child of C')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' )
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+			// restore grandchild private matrix - does not change world transforms
+			g.restorePrivateMatrix()
+
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+			assert.equal(p.matrixData.children[0], c.matrixData, 'C is now child of P again')
+			assert.equal(c.matrixData.children.length, 1, 'C has just one child')
+			assert.equal(c.matrixData.children[0], g.matrixData, 'G is now child of C again')
+			assert.equal(g.matrixData.children.length, 1, 'G has just one child')
+			assert.equal(g.matrixData.children[0], g2.matrixData, 'G2 is now child of G again')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' )
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+	  } );
+
+		// like test 2, but with different ordering on sharing parent Matrix
+		QUnit.test( 'shareParentMatrix3', ( assert ) => {
+
+			const p = new Object3D();
+			const c = new Object3D();
+			const g = new Object3D();
+			const g2 = new Object3D();
+
+			p.name="Parent"
+			c.name="Child"
+			g.name="Grandchild"
+			g2.name="Great-grandchild"
+
+			p.add(c)
+			c.add(g)
+			g.add(g2)
+
+			p.position.set(1, 1, 1)
+			p.updateMatrix()
+			g2.position.set(2, 2, 2)
+			g2.updateMatrix()
+
+			p.updateMatrixWorld()
+			const cMW = new Matrix4()
+			const gMW = new Matrix4()
+			const g2MW = new Matrix4()
+			cMW.copy(c.matrixWorld)
+			gMW.copy(g.matrixWorld)
+			g2MW.copy(g2.matrixWorld)
+
+			// c & g now share parent matrix - does not change world transforms
+			g.shareParentMatrix()
+			c.shareParentMatrix()
+
+			assert.equal(p.matrixData.children[0], g2.matrixData, 'G2 is now direct child of P')
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+			
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' );
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+			// restore child private matrix - does not change world transforms
+			c.restorePrivateMatrix()
+
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+			assert.equal(p.matrixData.children[0], c.matrixData, 'C is now child of P again')
+			assert.equal(c.matrixData.children[0], g2.matrixData, 'G2 is still a child of C')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' )
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+			// restore grandchild private matrix - does not change world transforms
+			g.restorePrivateMatrix()
+
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+			assert.equal(p.matrixData.children[0], c.matrixData, 'C is now child of P again')
+			assert.equal(c.matrixData.children.length, 1, 'C has just one child')
+			assert.equal(c.matrixData.children[0], g.matrixData, 'G is now child of C again')
+			assert.equal(g.matrixData.children.length, 1, 'G has just one child')
+			assert.equal(g.matrixData.children[0], g2.matrixData, 'G2 is now child of G again')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' )
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+	  } );
+
+		// like test 3, but with different ordering on removing sharing of parent Matrix
+		QUnit.test( 'shareParentMatrix4', ( assert ) => {
+
+			const p = new Object3D();
+			const c = new Object3D();
+			const g = new Object3D();
+			const g2 = new Object3D();
+
+			p.name="Parent"
+			c.name="Child"
+			g.name="Grandchild"
+			g2.name="Great-grandchild"
+
+			p.add(c)
+			c.add(g)
+			g.add(g2)
+
+			p.position.set(1, 1, 1)
+			p.updateMatrix()
+			g2.position.set(2, 2, 2)
+			g2.updateMatrix()
+
+			p.updateMatrixWorld()
+			const cMW = new Matrix4()
+			const gMW = new Matrix4()
+			const g2MW = new Matrix4()
+			cMW.copy(c.matrixWorld)
+			gMW.copy(g.matrixWorld)
+			g2MW.copy(g2.matrixWorld)
+
+			// c & g now share parent matrix - does not change world transforms
+			g.shareParentMatrix()
+			c.shareParentMatrix()
+			
+			assert.equal(p.matrixData.children[0], g2.matrixData, 'G2 is now direct child of P')
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' );
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+			// restore grandchild private matrix - does not change world transforms
+			g.restorePrivateMatrix()
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+			assert.equal(g.matrixData.children.length, 1, 'G has just one child')
+			assert.equal(g.matrixData.children[0], g2.matrixData,  'G2 is now child of G')
+			assert.equal(p.matrixData.children[0], g.matrixData,  'G is still a child of P')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' )
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+			// restore child private matrix - does not change world transforms
+			c.restorePrivateMatrix()
+			assert.equal(p.matrixData.children.length, 1, 'P has just one child')
+			assert.equal(p.matrixData.children[0], c.matrixData, 'C is now child of P again')
+			assert.equal(c.matrixData.children.length, 1, 'C has just one child')
+			assert.equal(c.matrixData.children[0], g.matrixData, 'G is now child of C again')
+			assert.equal(g.matrixData.children.length, 1, 'G has just one child')
+			assert.equal(g.matrixData.children[0], g2.matrixData, 'G2 is now child of G again')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g.matrixWorld, 'Grandchild matrices are unchanged' )
+			assert.deepEqual( g2MW, g2.matrixWorld, 'Great-grandchild matrices are unchanged' );
+
+	  } );
+
+  } );
 } );

@@ -61,7 +61,11 @@ class Object3DMatrixData {
 
 			this.children.splice( index, 1 );
 
+			return true;
+
 		}
+
+		return false;
 
 	}
 
@@ -136,6 +140,7 @@ class Object3D extends EventDispatcher {
 
 		this.parent = null;
 		this.children = [];
+		this.descandantsAdoptedByAncestor = new Set()
 
 		this.up = Object3D.DefaultUp.clone();
 
@@ -249,9 +254,12 @@ class Object3D extends EventDispatcher {
 
 		this.matrix = this.matrixData.matrix;
 		this.matrixWorld = this.matrixData.matrixWorld;
-		this.position = this.matrixData.position;
-		this.quaternion = this.matrixData.quaternion;
-		this.scale = this.matrixData.scale;
+
+		// No updates to position / scale / quaternion - these 
+		// continue to refer to the private Matrix.
+		// Not an issue as they shouldn't be accessed in any case...
+		// Doing differently would require them to no longer be
+		// set up as read-only properties.
 
 	}
 
@@ -260,6 +268,9 @@ class Object3D extends EventDispatcher {
 		this.matrixData = this.parent.matrixData;
 
 		this._updateMatrixDataReferences();
+
+		// Remove this child from parent matrix data.
+		this.matrixData.removeChild( this.privateMatrixData );
 
 		// Transfer children's matrices into parent matrix data.
 		// Don't worry about ordering, as it's not possible to guarantee preveration of
@@ -273,14 +284,11 @@ class Object3D extends EventDispatcher {
 
 			this.matrixData.addChild( child );
 
-		}
+			// Don't attempt to keep track of children in private Matrix data.
+			// We reconstruct this correctly when we restore the private Matrix.
+			this.privateMatrixData.removeChild( child );
 
-		// privateMatrixData retains a list of children to re-instate when restoring private matrix.
-		// This list is maintained as further children are added / removed & as matrix sharing occurs
-		// as this avoids us ever having to perform a full analysis of the entire descendent scene graph.
-		// !! TO DO
-		// There are lots of cases here to consider & the current code probably has some bug / limitations
-		// Lots of Unit Testing of this is needed.
+		}
 
 	}
 
@@ -291,16 +299,45 @@ class Object3D extends EventDispatcher {
 		this._updateMatrixDataReferences();
 
 		// Remove children's matrices from the parent matrix data.
-		// privateMatrixData is maintained as an up-to-date maintained list of the set of children to move.
-		const children = this.privateMatrixData.children;
+		// We need to worry about our own children, and also potentially grandchildren as
+		// well in the case of multi-generational merges...
+		const oldParent = this.parent
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+		function findNonMergedNode(node) {
+			if (node.matrixData === node.privateMatrixData) {
+				// found non-merged node.
+				return node
+			}
+			else return findNonMergedNode(node.parent)
+		}
 
-			const child = children[ i ];
+		function retrieveChildren (node) {
 
-			this.parent.matrixData.removeChild( child );
+			const children = node.children;
+
+			for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+				const childData = children[ i ].matrixData;
+
+				const found = oldParent.matrixData.removeChild( childData );
+
+				if (found) {
+
+					const newParent = findNonMergedNode(node)
+
+				  newParent.matrixData.addChild( childData );
+
+				}
+
+			}
 
 		}
+
+		this.traverse(retrieveChildren)
+
+		// parent becomes a parent of *this* node again (this node was
+		// previously merged into the parent).
+		oldParent.matrixData.addChild( this.matrixData );
 
 	}
 
@@ -533,13 +570,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = this;
 			this.children.push( object );
-			this.matrixData.addChild( object.matrixData );
-
-			if ( this.matrixData !== this.privateMatrixData ) {
-
-				this.privateMatrixData.addChild( object.matrixData );
-
-			}
+			this.matrixData.addChild( object.matrixData );			
 
 			object.dispatchEvent( _addedEvent );
 
@@ -574,15 +605,7 @@ class Object3D extends EventDispatcher {
 			object.parent = null;
 			this.children.splice( index, 1 );
 
-			// remove all traces of object matrices from our matrixData (whether shared or private)
 			this.matrixData.removeChild( object.matrixData );
-			this.matrixData.removeChild( object.privateMatrixData );
-			if ( this.matrixData !== this.privateMatrixData ) {
-
-				this.privateMatrixData.removeChild( object.matrixData );
-			  this.privateMatrixData.removeChild( object.privateMatrixData );
-
-			}
 
 			object.dispatchEvent( _removedEvent );
 
