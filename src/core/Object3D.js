@@ -254,7 +254,7 @@ class Object3D extends EventDispatcher {
 		this.matrix = this.matrixData.matrix;
 		this.matrixWorld = this.matrixData.matrixWorld;
 
-		// No updates to position / scale / quaternion - these 
+		// No updates to position / scale / quaternion - these
 		// continue to refer to the private Matrix.
 		// Not an issue as they shouldn't be accessed in any case...
 		// Doing differently would require them to no longer be
@@ -300,17 +300,20 @@ class Object3D extends EventDispatcher {
 		// Remove children's matrices from the parent matrix data.
 		// We need to worry about our own children, and also potentially grandchildren as
 		// well in the case of multi-generational merges...
-		const oldParent = this.parent
+		const oldParent = this.parent;
 
-		function findNonMergedNode(node) {
-			if (node.matrixData === node.privateMatrixData) {
+		function findNonMergedNode( node ) {
+
+			if ( node.matrixData === node.privateMatrixData ) {
+
 				// found non-merged node.
-				return node
-			}
-			else return findNonMergedNode(node.parent)
+				return node;
+
+			} else return findNonMergedNode( node.parent );
+
 		}
 
-		function retrieveChildren (node) {
+		function retrieveChildren( node ) {
 
 			const children = node.children;
 
@@ -320,9 +323,9 @@ class Object3D extends EventDispatcher {
 
 				const found = oldParent.matrixData.removeChild( childData );
 
-				if (found) {
+				if ( found ) {
 
-					const newParent = findNonMergedNode(node)
+					const newParent = findNonMergedNode( node );
 
 				  newParent.matrixData.addChild( childData );
 
@@ -332,7 +335,7 @@ class Object3D extends EventDispatcher {
 
 		}
 
-		this.traverse(retrieveChildren)
+		this.traverse( retrieveChildren );
 
 		// parent becomes a parent of *this* node again (this node was
 		// previously merged into the parent).
@@ -569,7 +572,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = this;
 			this.children.push( object );
-			this.matrixData.addChild( object.matrixData );			
+			this.matrixData.addChild( object.matrixData );
 
 			object.dispatchEvent( _addedEvent );
 
