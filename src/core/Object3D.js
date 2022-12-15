@@ -140,7 +140,6 @@ class Object3D extends EventDispatcher {
 
 		this.parent = null;
 		this.children = [];
-		this.descandantsAdoptedByAncestor = new Set()
 
 		this.up = Object3D.DefaultUp.clone();
 
