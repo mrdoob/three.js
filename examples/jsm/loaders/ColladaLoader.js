@@ -7,7 +7,6 @@ import {
 	Color,
 	DirectionalLight,
 	DoubleSide,
-	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	FrontSide,

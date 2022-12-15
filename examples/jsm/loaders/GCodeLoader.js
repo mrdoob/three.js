@@ -1,6 +1,5 @@
 import {
 	BufferGeometry,
-	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
