@@ -1452,5 +1452,68 @@ export default QUnit.module( 'Core', () => {
 
 	  } );
 
+		// Multiple children
+		QUnit.test( 'shareParentMatrix5', ( assert ) => {
+
+			const p = new Object3D();
+			const c = new Object3D();
+			const g1 = new Object3D();
+			const g2 = new Object3D();
+			const g3 = new Object3D();
+			const g4 = new Object3D();
+
+			p.name="Parent"
+			c.name="Child"
+			g1.name="Grandchild1"
+			g2.name="Grandchild2"
+			g3.name="Grandchild3"
+			g4.name="Grandchild4"
+
+			p.add(c)
+			c.add(g1)
+			c.add(g2)
+			c.add(g3)
+			c.add(g4)
+			
+			p.position.set(1, 1, 1)
+			p.updateMatrix()
+			g1.position.set(1, 1, 1)
+			g1.updateMatrix()
+			g1.position.set(2, 2, 2)
+			g1.updateMatrix()
+			g1.position.set(3, 3, 3)
+			g1.updateMatrix()
+			g1.position.set(4, 4, 4)
+			g1.updateMatrix()
+
+			p.updateMatrixWorld()
+			const cMW = new Matrix4()
+			const gMW = new Matrix4()
+			cMW.copy(c.matrixWorld)
+			gMW.copy(g1.matrixWorld)
+
+			// c now shares parent matrix - does not change world transforms
+			c.shareParentMatrix()
+			assert.equal(p.matrixData.children.length, 4, 'P now has 4 children child')
+			assert.equal(p.matrixData.children[0], g1.matrixData, 'G1 is now direct child of P')
+			
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g1.matrixWorld, 'Grandchild matrices are unchanged' );
+
+			// restore private matrix - does not change world transforms
+			c.restorePrivateMatrix()
+			assert.equal(p.matrixData.children[0], c.matrixData, 'C is now child of P')
+			assert.equal(c.matrixData.children[0], g1.matrixData, 'G is now child of C')
+
+			p.updateMatrixWorld()
+
+			assert.deepEqual( cMW, c.matrixWorld, 'Child matrices are unchanged' );
+			assert.deepEqual( gMW, g1.matrixWorld, 'Grandchild matrices are unchanged' )
+
+	  } );
+
+
   } );
 } );

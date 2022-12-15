@@ -283,11 +283,11 @@ class Object3D extends EventDispatcher {
 
 			this.matrixData.addChild( child );
 
-			// Don't attempt to keep track of children in private Matrix data.
-			// We reconstruct this correctly when we restore the private Matrix.
-			this.privateMatrixData.removeChild( child );
-
 		}
+
+		// Don't attempt to keep track of children in private Matrix data.
+		// We reconstruct this correctly when we restore the private Matrix.
+		this.privateMatrixData.children.length = 0;
 
 	}
 
