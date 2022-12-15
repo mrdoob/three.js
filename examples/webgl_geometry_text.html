@@ -203,17 +203,17 @@
 
 						refreshText();
 
-					},
+					}
 				};
 
 				//
 
 				const gui = new GUI();
 
-				gui.add( params, 'changeColor' );
-				gui.add( params, 'changeFont' );
-				gui.add( params, 'changeWeight' );
-				gui.add( params, 'changeBevel' );
+				gui.add( params, 'changeColor' ).name( 'change color' );
+				gui.add( params, 'changeFont' ).name( 'change font' );
+				gui.add( params, 'changeWeight' ).name( 'change weight' );
+				gui.add( params, 'changeBevel' ).name( 'change bevel' );
 				gui.open();
 
 				//
