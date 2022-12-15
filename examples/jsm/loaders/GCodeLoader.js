@@ -251,7 +251,7 @@ class GCodeLoader extends Loader {
 
 		}
 
-		object.quaternion.setFromEuler( new Euler( - Math.PI / 2, 0, 0 ) );
+		object.rotation.set( - Math.PI / 2, 0, 0 );
 
 		return object;
 
