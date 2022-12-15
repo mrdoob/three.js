@@ -2,6 +2,8 @@
 
 	const input = new THREE.BufferAttribute( new Float32Array( 10000 * 3 ), 3 );
 
+	const vector = new THREE.Vector3();
+
 	for ( let i = 0, il = input.count; i < il; i ++ ) {
 
 		input.setItem( i, Math.random(), Math.random(), Math.random() );
@@ -43,6 +45,24 @@
 			maxX = Math.max( x, maxX );
 			maxY = Math.max( y, maxY );
 			maxZ = Math.max( z, maxZ );
+
+		}
+
+	} );
+
+	s.add( 'fromBufferAttribute', function () {
+
+		let maxX = Infinity;
+		let maxY = Infinity;
+		let maxZ = Infinity;
+
+		for ( let i = 0, il = input.count; i < il; i ++ ) {
+
+			vector.fromBufferAttribute( input, i );
+
+			maxX = Math.max( vector.x, maxX );
+			maxY = Math.max( vector.y, maxY );
+			maxZ = Math.max( vector.z, maxZ );
 
 		}
 
