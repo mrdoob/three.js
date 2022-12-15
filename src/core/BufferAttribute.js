@@ -172,6 +172,34 @@ class BufferAttribute {
 
 	}
 
+	*getItem( index ) {
+
+		for ( let i = 0, l = this.itemSize; i < l; i ++ ) {
+
+			let value = this.array[ index * this.itemSize + i ];
+
+			if ( this.normalized ) value = denormalize( value, this.array );
+
+			yield value;
+
+		}
+
+	}
+
+	setItem( index, ...components ) {
+
+		for ( let i = 0, l = this.itemSize; i < l; i ++ ) {
+
+			let value = components[ i ];
+
+			if ( this.normalized ) value = normalize( value, this.array );
+
+			this.array[ index * this.itemSize + i ] = value;
+
+		}
+
+	}
+
 	getX( index ) {
 
 		let x = this.array[ index * this.itemSize ];

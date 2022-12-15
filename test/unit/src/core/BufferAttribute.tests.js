@@ -103,6 +103,42 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'getItem', ( assert ) => {
+
+			const position = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
+			const uv = new BufferAttribute( new Uint8Array( [ 0, 0, 85, 127 ] ), 2, true );
+
+			const [ x, y, z ] = position.getItem( 0 );
+			const [ u, v ] = uv.getItem( 1 );
+
+			assert.numEqual( x, 1, 'reads vec3.x' );
+			assert.numEqual( y, 2, 'reads vec3.y' );
+			assert.numEqual( z, 3, 'reads vec3.z' );
+
+			assert.numEqual( u, 0.333, 'reads vec2.u' );
+			assert.numEqual( v, 0.500, 'reads vec2.v' );
+
+		} );
+
+		QUnit.test( 'setItem', ( assert ) => {
+
+			const position = new BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 0 ] ), 3 );
+			const uv = new BufferAttribute( new Uint8Array( [ 0, 0, 0, 0 ] ), 2, true );
+
+			position.setItem( 0, 1.5, 2.5, 3.5 );
+			uv.setItem( 1, 0.333, 0.5 );
+
+			assert.numEqual( position.getX( 0 ), 1.5, 'writes vec3.x' );
+			assert.numEqual( uv.getY( 1 ), 0.5, 'writes vec2.v' );
+
+			const position2 = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
+
+			position.setItem( 0, ...position2.getItem( 1 ) );
+
+			assert.deepEqual( Array.from( position.getItem( 0 ) ), [ 4, 5, 6 ], 'writes iterators' );
+
+		} );
+
 		QUnit.test( 'set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]', ( assert ) => {
 
 			var f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
