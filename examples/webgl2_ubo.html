@@ -88,23 +88,30 @@
 
 		<script id="vertexShader2" type="x-shader/x-vertex">
 
-			uniform ViewData {
+			layout(std140) uniform ViewData {
 				mat4 projectionMatrix;
 				mat4 viewMatrix;
 			};
 
 			uniform mat4 modelMatrix;
+			uniform mat3 normalMatrix;
 
 			in vec3 position;
+			in vec3 normal;
 			in vec2 uv;
 
+			out vec3 vPositionEye;
+			out vec3 vNormalEye;
 			out vec2 vUv;
 
 			void main()	{
 
-				vUv = uv;
+				vec4 vertexPositionEye = viewMatrix * modelMatrix * vec4( position, 1.0 );
 
-				gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4( position, 1.0 );
+				vPositionEye = vertexPositionEye.xyz;
+				vNormalEye = normalMatrix * normal;
+				vUv = uv;
+				gl_Position = projectionMatrix * vertexPositionEye;
 
 			}
 
@@ -117,12 +124,38 @@
 			uniform sampler2D diffuseMap;
 
 			in vec2 vUv;
-
+			in vec3 vPositionEye;
+			in vec3 vNormalEye;
 			out vec4 fragColor;
+
+			uniform LightingData {
+				vec3 position;
+				vec3 ambientColor;
+				vec3 diffuseColor;
+				vec3 specularColor;
+				float shininess;
+			} Light;
 
 			void main()	{
 
-				fragColor = texture( diffuseMap, vUv );
+
+				// a very basic lighting equation (Phong reflection model) for testing
+
+				vec3 l = normalize( Light.position - vPositionEye );
+				vec3 n = normalize( vNormalEye );
+				vec3 e = - normalize( vPositionEye );
+				vec3 r = normalize( reflect( - l, n ) );
+
+				float diffuseLightWeighting = max( dot( n, l ), 0.0 );
+				float specularLightWeighting = max( dot( r, e ), 0.0 );
+
+				specularLightWeighting = pow( specularLightWeighting, Light.shininess );
+
+				vec3 lightWeighting = Light.ambientColor +
+					Light.diffuseColor * diffuseLightWeighting +
+					Light.specularColor * specularLightWeighting;
+
+				fragColor = vec4( texture( diffuseMap, vUv ).rgb * lightWeighting.rgb, 1.0 );
 
 			}
 
@@ -242,7 +275,7 @@
 
 						mesh = new THREE.Mesh( geometry2, material2.clone() );
 
-						mesh.material.uniformsGroups = [ cameraUniformsGroup ];
+						mesh.material.uniformsGroups = [ cameraUniformsGroup, lightingUniformsGroup ];
 						mesh.material.uniforms.modelMatrix.value = mesh.matrixWorld;
 						mesh.material.uniforms.diffuseMap.value = texture;
 

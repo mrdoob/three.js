@@ -2540,7 +2540,11 @@ class GLTFParser {
 					break;
 
 				case 'node':
-					dependency = this.loadNode( index );
+					dependency = this._invokeOne( function ( ext ) {
+
+						return ext.loadNode && ext.loadNode( index );
+
+					} );
 					break;
 
 				case 'mesh':
@@ -3883,7 +3887,7 @@ class GLTFParser {
 
 		return ( function () {
 
-			const pending = [];
+			const objectPending = [];
 
 			const meshPromise = parser._invokeOne( function ( ext ) {
 
@@ -3893,13 +3897,13 @@ class GLTFParser {
 
 			if ( meshPromise ) {
 
-				pending.push( meshPromise );
+				objectPending.push( meshPromise );
 
 			}
 
 			if ( nodeDef.camera !== undefined ) {
 
-				pending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
+				objectPending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
 
 					return parser._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
 
@@ -3913,13 +3917,34 @@ class GLTFParser {
 
 			} ).forEach( function ( promise ) {
 
-				pending.push( promise );
+				objectPending.push( promise );
 
 			} );
 
-			return Promise.all( pending );
+			const childPending = [];
+			const childrenDef = nodeDef.children || [];
 
-		}() ).then( function ( objects ) {
+			for ( let i = 0, il = childrenDef.length; i < il; i ++ ) {
+
+				childPending.push( parser.getDependency( 'node', childrenDef[ i ] ) );
+
+			}
+
+			const skeletonPending = nodeDef.skin === undefined
+				? Promise.resolve( null )
+				: parser.getDependency( 'skin', nodeDef.skin );
+
+			return Promise.all( [
+				Promise.all( objectPending ),
+				Promise.all( childPending ),
+				skeletonPending
+			] );
+
+		}() ).then( function ( results ) {
+
+			const objects = results[ 0 ];
+			const children = results[ 1 ];
+			const skeleton = results[ 2 ];
 
 			let node;
 
@@ -3999,9 +4024,7 @@ class GLTFParser {
 
 			parser.associations.get( node ).nodes = nodeIndex;
 
-			if ( nodeDef.skin === undefined ) return node;
-
-			return parser.getDependency( 'skin', nodeDef.skin ).then( function ( skeleton ) {
+			if ( skeleton !== null ) {
 
 				// This full traverse should be fine because
 				// child glTF nodes have not been added to this node yet.
@@ -4013,34 +4036,15 @@ class GLTFParser {
 
 				} );
 
-				return node;
+			}
 
-			} );
+			for ( let i = 0, il = children.length; i < il; i ++ ) {
 
-		} ).then( function ( node ) {
-
-			if ( nodeDef.children === undefined ) return node;
-
-			const pending = [];
-			const childrenDef = nodeDef.children;
-
-			for ( let i = 0, il = childrenDef.length; i < il; i ++ ) {
-
-				pending.push( parser.getDependency( 'node', childrenDef[ i ] ) );
+				node.add( children[ i ] );
 
 			}
 
-			return Promise.all( pending ).then( function ( children ) {
-
-				for ( let i = 0, il = children.length; i < il; i ++ ) {
-
-					node.add( children[ i ] );
-
-				}
-
-				return node;
-
-			} );
+			return node;
 
 		} );
 
