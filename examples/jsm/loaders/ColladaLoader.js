@@ -7,7 +7,6 @@ import {
 	Color,
 	DirectionalLight,
 	DoubleSide,
-	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	FrontSide,
@@ -4019,7 +4018,7 @@ class ColladaLoader extends Loader {
 		// metadata
 
 		const version = collada.getAttribute( 'version' );
-		console.log( 'THREE.ColladaLoader: File version', version );
+		console.debug( 'THREE.ColladaLoader: File version', version );
 
 		const asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 		const textureLoader = new TextureLoader( this.manager );
@@ -4095,7 +4094,7 @@ class ColladaLoader extends Loader {
 		if ( asset.upAxis === 'Z_UP' ) {
 
 			console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
-			scene.quaternion.setFromEuler( new Euler( - Math.PI / 2, 0, 0 ) );
+			scene.rotation.set( - Math.PI / 2, 0, 0 );
 
 		}
 

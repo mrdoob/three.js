@@ -23,6 +23,7 @@ import MaterialReferenceNode from '../accessors/MaterialReferenceNode.js';
 import ModelViewProjectionNode from '../accessors/ModelViewProjectionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
 import ModelNode from '../accessors/ModelNode.js';
+import Object3DNode from '../accessors/Object3DNode.js';
 import PointUVNode from '../accessors/PointUVNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import ReferenceNode from '../accessors/ReferenceNode.js';
@@ -266,6 +267,12 @@ export const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATR
 export const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
 export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
 export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
+
+export const objectViewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
+export const objectNormalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
+export const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
+export const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
+export const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
 
 export const positionGeometry = nodeImmutable( PositionNode, PositionNode.GEOMETRY );
 export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );
