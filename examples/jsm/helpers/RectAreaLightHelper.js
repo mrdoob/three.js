@@ -42,9 +42,7 @@ class RectAreaLightHelper extends Line {
 
 	}
 
-	updateMatrixWorld( force ) {
-
-		super.updateMatrixWorld( force );
+	updateMatrixWorld() {
 
 		this.scale.set( 0.5 * this.light.width, 0.5 * this.light.height, 1 );
 
