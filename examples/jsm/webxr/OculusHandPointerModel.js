@@ -43,8 +43,6 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 		this.raycaster = null;
 
-		this.setUpdateMatrixWorldAfter( this.updateMatrixWorldAfter );
-
 		hand.addEventListener( 'connected', ( event ) => {
 
 			const xrInputSource = event.data;
@@ -306,7 +304,9 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
-	updateMatrixWorldAfter( force ) {
+	updateMatrixWorld( force ) {
+
+		super.updateMatrixWorld( force );
 
 		if ( this.pointerGeometry ) {
 

@@ -25,6 +25,8 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
+var skipUMWToAvoidLoop = false;
+
 class Object3DMatrixData {
 
 	constructor() {
@@ -71,7 +73,13 @@ class Object3DMatrixData {
 
 	updateMatrixWorld( force ) {
 
-		if ( this.updateMatrixWorldBefore ) this.updateMatrixWorldBefore( force );
+		if ( this.updateMatrixWorldBefore ) {
+
+			skipUMWToAvoidLoop = true;
+			this.updateMatrixWorldBefore( force );
+			skipUMWToAvoidLoop = false;
+
+		}
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
@@ -109,7 +117,13 @@ class Object3DMatrixData {
 
 		}
 
-		if ( this.updateMatrixWorldAfter ) this.updateMatrixWorldAfter( force );
+		if ( this.updateMatrixWorldAfter ) {
+
+			skipUMWToAvoidLoop = true;
+			this.updateMatrixWorldAfter( force );
+			skipUMWToAvoidLoop = false;
+
+		}
 
 	}
 
@@ -202,6 +216,21 @@ class Object3D extends EventDispatcher {
 
 		this.userData = {};
 
+		if ( window.reference ) {
+
+			if ( Object.getPrototypeOf( this ).updateMatrixWorld !== Object.getPrototypeOf( window.reference ).updateMatrixWorld ) {
+
+				this.matrixData.updateMatrixWorldBefore = this.updateMatrixWorld;
+				this.matrixData.updateMatrixWorldAfter = this.updateMatrixWorld;
+
+			}
+
+		} else {
+
+			this.overridesUMW = false;
+
+		}
+
 	}
 
 	set matrixAutoUpdate( value ) {
@@ -237,18 +266,6 @@ class Object3D extends EventDispatcher {
 	get matrixWorldAutoUpdate() {
 
 		return this.matrixData.matrixWorldAutoUpdate;
-
-	}
-
-	setUpdateMatrixWorldAfter( after ) {
-
-		this.matrixData.updateMatrixWorldAfter = after.bind( this );
-
-	}
-
-	setUpdateMatrixWorldBefore( before ) {
-
-		this.matrixData.updateMatrixWorldBefore = before.bind( this );
 
 	}
 
@@ -702,6 +719,8 @@ class Object3D extends EventDispatcher {
 
 	updateMatrixWorld( force ) {
 
+    if ( skipUMWToAvoidLoop ) return;
+
 		this.matrixData.updateMatrixWorld( force );
 
 	}
@@ -1051,3 +1070,4 @@ Object3D.DefaultMatrixWorldAutoUpdate = true;
 
 export { Object3D };
 
+window.reference = /*@__PURE__*/ new Object3D();

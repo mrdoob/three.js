@@ -25,7 +25,6 @@ class AudioListener extends Object3D {
 		this.filter = null;
 
 		this.timeDelta = 0;
-		this.setUpdateMatrixWorldAfter( this.updateMatrixWorldAfter );
 
 		// private
 
@@ -95,7 +94,9 @@ class AudioListener extends Object3D {
 
 	}
 
-	updateMatrixWorldAfter() {
+	updateMatrixWorld( force ) {
+
+		super.updateMatrixWorld( force );
 
 		const listener = this.context.listener;
 		const up = this.up;

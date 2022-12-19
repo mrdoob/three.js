@@ -15,7 +15,6 @@ class Camera extends Object3D {
 
 		this.projectionMatrix = new Matrix4();
 		this.projectionMatrixInverse = new Matrix4();
-		this.setUpdateMatrixWorldAfter( this.updateMatrixWorldAfter );
 
 	}
 
@@ -42,7 +41,9 @@ class Camera extends Object3D {
 
 	}
 
-	updateMatrixWorldAfter() {
+	updateMatrixWorld( force ) {
+
+		super.updateMatrixWorld( force );
 
 		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
 

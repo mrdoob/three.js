@@ -25,11 +25,10 @@ class Box3Helper extends LineSegments {
 		this.type = 'Box3Helper';
 
 		this.geometry.computeBoundingSphere();
-		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 	}
 
-	updateMatrixWorldBefore() {
+	updateMatrixWorld( force ) {
 
 		const box = this.box;
 
@@ -40,6 +39,8 @@ class Box3Helper extends LineSegments {
 		box.getSize( this.scale );
 
 		this.scale.multiplyScalar( 0.5 );
+
+		super.updateMatrixWorld( force );
 
 	}
 
