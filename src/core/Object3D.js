@@ -220,8 +220,8 @@ class Object3D extends EventDispatcher {
 
 			if ( Object.getPrototypeOf( this ).updateMatrixWorld !== Object.getPrototypeOf( window.reference ).updateMatrixWorld ) {
 
-				this.matrixData.updateMatrixWorldBefore = this.updateMatrixWorld;
-				this.matrixData.updateMatrixWorldAfter = this.updateMatrixWorld;
+				this.matrixData.updateMatrixWorldBefore = this.updateMatrixWorld.bind(this);
+				this.matrixData.updateMatrixWorldAfter = this.updateMatrixWorld.bind(this);
 
 			}
 
