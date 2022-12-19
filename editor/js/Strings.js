@@ -126,6 +126,7 @@ function Strings( config ) {
 			'sidebar/object/visible': 'Visible',
 			'sidebar/object/frustumcull': 'Frustum Cull',
 			'sidebar/object/renderorder': 'Render Order',
+			'sidebar/object/twoPassTransparentRendering': 'Two Pass Transparent Rendering',
 			'sidebar/object/userdata': 'User data',
 
 			'sidebar/geometry/type': 'Type',
@@ -477,6 +478,7 @@ function Strings( config ) {
 			'sidebar/object/visible': 'Visible',
 			'sidebar/object/frustumcull': 'Culling',
 			'sidebar/object/renderorder': 'Ordre de rendus',
+			'sidebar/object/twoPassTransparentRendering': 'Two Pass Transparent Rendering',
 			'sidebar/object/userdata': 'Données utilisateur',
 
 			'sidebar/geometry/type': 'Type',
@@ -828,6 +830,7 @@ function Strings( config ) {
 			'sidebar/object/visible': '可见性',
 			'sidebar/object/frustumcull': '视锥体裁剪',
 			'sidebar/object/renderorder': '渲染次序',
+			'sidebar/object/twoPassTransparentRendering': 'Two Pass Transparent Rendering',
 			'sidebar/object/userdata': '自定义数据',
 
 			'sidebar/geometry/type': '类型',

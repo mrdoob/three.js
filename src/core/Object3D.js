@@ -110,6 +110,7 @@ class Object3D extends EventDispatcher {
 
 		this.frustumCulled = true;
 		this.renderOrder = 0;
+		this.twoPassTransparentRendering = true;
 
 		this.animations = [];
 
@@ -691,6 +692,7 @@ class Object3D extends EventDispatcher {
 		if ( this.visible === false ) object.visible = false;
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
+		if ( this.twoPassTransparentRendering === false ) object.twoPassTransparentRendering = this.twoPassTransparentRendering;
 		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
 
 		object.layers = this.layers.mask;
@@ -921,6 +923,7 @@ class Object3D extends EventDispatcher {
 
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
+		this.twoPassTransparentRendering = source.twoPassTransparentRendering;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

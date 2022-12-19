@@ -359,6 +359,16 @@ function SidebarObject( editor ) {
 
 	container.add( objectRenderOrderRow );
 
+	// twoPassTransparentRendering
+
+	const objectTwoPassTransparentRenderingRow = new UIRow();
+	const objectTwoPassTransparentRendering = new UICheckbox().onChange( update );
+
+	objectTwoPassTransparentRenderingRow.add( new UIText( strings.getKey( 'sidebar/object/twoPassTransparentRendering' ) ).setWidth( '90px' ) );
+	objectTwoPassTransparentRenderingRow.add( objectTwoPassTransparentRendering );
+
+	container.add( objectTwoPassTransparentRenderingRow );
+
 	// user data
 
 	const objectUserDataRow = new UIRow();
@@ -530,6 +540,12 @@ function SidebarObject( editor ) {
 			if ( object.renderOrder !== objectRenderOrder.getValue() ) {
 
 				editor.execute( new SetValueCommand( editor, object, 'renderOrder', objectRenderOrder.getValue() ) );
+
+			}
+
+			if ( object.twoPassTransparentRendering !== objectTwoPassTransparentRendering.getValue() ) {
+
+				editor.execute( new SetValueCommand( editor, object, 'twoPassTransparentRendering', objectTwoPassTransparentRendering.getValue() ) );
 
 			}
 
@@ -823,6 +839,7 @@ function SidebarObject( editor ) {
 		objectVisible.setValue( object.visible );
 		objectFrustumCulled.setValue( object.frustumCulled );
 		objectRenderOrder.setValue( object.renderOrder );
+		objectTwoPassTransparentRendering.setValue( object.twoPassTransparentRendering );
 
 		try {
 
