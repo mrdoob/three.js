@@ -65,8 +65,6 @@ class TransformControls extends Object3D {
 
 		const scope = this;
 
-		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
-
 		// Defined getter, setter and store for a property
 		function defineProperty( propName, defaultValue ) {
 
@@ -181,7 +179,7 @@ class TransformControls extends Object3D {
 	}
 
 	// updateMatrixWorld  updates key transformation variables
-	updateMatrixWorldBefore() {
+	updateMatrixWorld( force ) {
 
 		if ( this.object !== undefined ) {
 
@@ -216,6 +214,8 @@ class TransformControls extends Object3D {
 			this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
 
 		}
+
+		super.updateMatrixWorld( force );
 
 	}
 
@@ -771,7 +771,6 @@ class TransformControlsGizmo extends Object3D {
 		this.isTransformControlsGizmo = true;
 
 		this.type = 'TransformControlsGizmo';
-		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 		// shared materials
 
@@ -1144,7 +1143,7 @@ class TransformControlsGizmo extends Object3D {
 
 	// updateMatrixWorld will update transformations and appearance of individual handles
 
-	updateMatrixWorldBefore( force ) {
+	updateMatrixWorld( force ) {
 
 		const space = ( this.mode === 'scale' ) ? 'local' : this.space; // scale always oriented to local rotation
 
@@ -1454,6 +1453,8 @@ class TransformControlsGizmo extends Object3D {
 
 		}
 
+		super.updateMatrixWorld( force );
+
 	}
 
 }
@@ -1472,11 +1473,10 @@ class TransformControlsPlane extends Mesh {
 		this.isTransformControlsPlane = true;
 
 		this.type = 'TransformControlsPlane';
-		this.setUpdateMatrixWorldBefore( this.updateMatrixWorldBefore );
 
 	}
 
-	updateMatrixWorldBefore( force ) {
+	updateMatrixWorld( force ) {
 
 		let space = this.space;
 
@@ -1547,6 +1547,8 @@ class TransformControlsPlane extends Mesh {
 			this.quaternion.setFromRotationMatrix( _tempMatrix );
 
 		}
+
+		super.updateMatrixWorld( force );
 
 	}
 

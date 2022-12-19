@@ -21,11 +21,12 @@ class XRHandModel extends Object3D {
 		this.envMap = null;
 
 		this.mesh = null;
-		this.setUpdateMatrixWorldAfter( this.updateMatrixWorldAfter );
 
 	}
 
-	updateMatrixWorldAfter( force ) {
+	updateMatrixWorld( force ) {
+
+		super.updateMatrixWorld( force );
 
 		if ( this.motionController ) {
 

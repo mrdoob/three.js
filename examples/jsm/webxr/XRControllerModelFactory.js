@@ -24,7 +24,6 @@ class XRControllerModel extends Object3D {
 
 		this.motionController = null;
 		this.envMap = null;
-		this.setUpdateMatrixWorldAfter( this.updateMatrixWorldAfter );
 
 	}
 
@@ -56,7 +55,9 @@ class XRControllerModel extends Object3D {
 	 * Polls data from the XRInputSource and updates the model's components to match
 	 * the real world data
 	 */
-	updateMatrixWorldAfter( force ) {
+	updateMatrixWorld( force ) {
+
+		super.updateMatrixWorld( force );
 
 		if ( ! this.motionController ) return;
 
