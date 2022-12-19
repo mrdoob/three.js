@@ -24,7 +24,7 @@ class XRHandModel extends Object3D {
 
 	}
 
-	updateMatrixWorldAfter( force ) {
+	updateMatrixWorld( force ) {
 
 		if ( this.motionController ) {
 
