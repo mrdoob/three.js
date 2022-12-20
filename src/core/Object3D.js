@@ -52,7 +52,7 @@ class Object3DMatrixData {
 
 	}
 
-	setParent( parent 	) {
+	setParent( parent ) {
 
 		this.parent = parent;
 		parent.children.push( this );
