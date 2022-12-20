@@ -46,6 +46,10 @@ class Object3DMatrixData {
 		this.quaternion = new Quaternion();
 		this.scale = new Vector3( 1, 1, 1 );
 
+		// These must exist for all instances, even if unused, to ensure monomorphism.
+		this.updateMatrixWorldBefore = null;
+		this.updateMatrixWorldAfter = null;
+
 	}
 
 	setParent( parent 	) {
