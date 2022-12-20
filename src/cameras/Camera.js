@@ -41,9 +41,7 @@ class Camera extends Object3D {
 
 	}
 
-	updateMatrixWorld( force ) {
-
-		super.updateMatrixWorld( force );
+	onAfterMatrixUpdate() {
 
 		this.matrixWorldInverse.copy( this.matrixWorld ).invert();
 
