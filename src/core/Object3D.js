@@ -216,9 +216,9 @@ class Object3D extends EventDispatcher {
 
 		this.userData = {};
 
-		if ( window.reference ) {
+		if ( Object3D ) {
 
-			if ( Object.getPrototypeOf( this ).updateMatrixWorld !== Object.getPrototypeOf( window.reference ).updateMatrixWorld ) {
+			if ( this.updateMatrixWorld !== 	Object3D.prototype.updateMatrixWorld ) {
 
 				// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
 				// so we call it twice.
@@ -227,10 +227,6 @@ class Object3D extends EventDispatcher {
 				this.matrixData.updateMatrixWorldAfter = this.updateMatrixWorld.bind( this );
 
 			}
-
-		} else {
-
-			this.overridesUMW = false;
 
 		}
 
@@ -1073,4 +1069,3 @@ Object3D.DefaultMatrixWorldAutoUpdate = true;
 
 export { Object3D };
 
-window.reference = /*@__PURE__*/ new Object3D();
