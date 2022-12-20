@@ -269,33 +269,33 @@ class Object3D extends EventDispatcher {
 			this.matrixData.updateMatrixWorldAfter = this.onAfterMatrixUpdate.bind( this );
 
 		}
-		
+
 		if ( this.updateMatrixWorld !== Object3D.prototype.updateMatrixWorld ) {
 
-			console.warn("Do not override updateMatrixWorld() in Object3D sub-classes.")
-			console.warn("To extend behaviour on updateMatrixWorld(), use onBeforeMatrixUpdate() and onAfterMatrixUpdate().")
+			console.warn( 'Do not override updateMatrixWorld() in Object3D sub-classes.' );
+			console.warn( 'To extend behaviour on updateMatrixWorld(), use onBeforeMatrixUpdate() and onAfterMatrixUpdate().' );
 
 			// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
 			// so we call it twice.
 			// Slight performance hit, but more than compensated by the gains from monomorphic iteration.
 
-			this.matrixData.updateMatrixWorldBefore = function( force ) {
+			this.matrixData.updateMatrixWorldBefore = function ( force ) {
 
-				this.onBeforeMatrixUpdate()
+				this.onBeforeMatrixUpdate();
 				skipUMWToAvoidLoop = true;
-				this.updateMatrixWorld( force )
+				this.updateMatrixWorld( force );
 				skipUMWToAvoidLoop = false;
 
-			}.bind(this)
-			
-			this.matrixData.updateMatrixWorldAfter = function( force ) {
+			}.bind( this );
+
+			this.matrixData.updateMatrixWorldAfter = function ( force ) {
 
 				skipUMWToAvoidLoop = true;
-				this.updateMatrixWorld( force )
+				this.updateMatrixWorld( force );
 				skipUMWToAvoidLoop = false;
-				this.onAfterMatrixUpdate()
+				this.onAfterMatrixUpdate();
 
-			}.bind(this)
+			}.bind( this );
 
 		}
 
