@@ -79,9 +79,7 @@ class Object3DMatrixData {
 
 		if ( this.updateMatrixWorldBefore ) {
 
-			skipUMWToAvoidLoop = true;
 			this.updateMatrixWorldBefore( force );
-			skipUMWToAvoidLoop = false;
 
 		}
 
@@ -123,9 +121,7 @@ class Object3DMatrixData {
 
 		if ( this.updateMatrixWorldAfter ) {
 
-			skipUMWToAvoidLoop = true;
 			this.updateMatrixWorldAfter( force );
-			skipUMWToAvoidLoop = false;
 
 		}
 
@@ -220,15 +216,7 @@ class Object3D extends EventDispatcher {
 
 		this.userData = {};
 
-		if ( this.updateMatrixWorld !== Object3D.prototype.updateMatrixWorld ) {
-
-			// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
-			// so we call it twice.
-			// Slight performance hit, but more than compensated by the gains from monomorphic iteration.
-			this.matrixData.updateMatrixWorldBefore = this.updateMatrixWorld.bind( this );
-			this.matrixData.updateMatrixWorldAfter = this.updateMatrixWorld.bind( this );
-
-		}
+		this.updateMatrixSideEffects();
 
 	}
 
@@ -267,6 +255,55 @@ class Object3D extends EventDispatcher {
 		return this.matrixData.matrixWorldAutoUpdate;
 
 	}
+
+	updateMatrixSideEffects() {
+
+		if ( this.onBeforeMatrixUpdate !== Object3D.prototype.onBeforeMatrixUpdate ) {
+
+			this.matrixData.updateMatrixWorldBefore = this.onBeforeMatrixUpdate.bind( this );
+
+		}
+
+		if ( this.onAfterMatrixUpdate !== Object3D.prototype.onAfterMatrixUpdate ) {
+
+			this.matrixData.updateMatrixWorldAfter = this.onAfterMatrixUpdate.bind( this );
+
+		}
+		
+		if ( this.updateMatrixWorld !== Object3D.prototype.updateMatrixWorld ) {
+
+			console.warn("Do not override updateMatrixWorld() in Object3D sub-classes.")
+			console.warn("To extend behaviour on updateMatrixWorld(), use onBeforeMatrixUpdate() and onAfterMatrixUpdate().")
+
+			// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
+			// so we call it twice.
+			// Slight performance hit, but more than compensated by the gains from monomorphic iteration.
+
+			this.matrixData.updateMatrixWorldBefore = function( force ) {
+
+				this.onBeforeMatrixUpdate()
+				skipUMWToAvoidLoop = true;
+				this.updateMatrixWorld( force )
+				skipUMWToAvoidLoop = false;
+
+			}.bind(this)
+			
+			this.matrixData.updateMatrixWorldAfter = function( force ) {
+
+				skipUMWToAvoidLoop = true;
+				this.updateMatrixWorld( force )
+				skipUMWToAvoidLoop = false;
+				this.onAfterMatrixUpdate()
+
+			}.bind(this)
+
+		}
+
+	}
+
+	onBeforeMatrixUpdate() {}
+
+	onAfterMatrixUpdate() {}
 
 	onBeforeRender( /* renderer, scene, camera, geometry, material, group */ ) {}
 
