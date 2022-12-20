@@ -216,9 +216,9 @@ class Object3D extends EventDispatcher {
 
 		this.userData = {};
 
-		if ( THREE.Object3D ) {
+		if ( Object3D ) {
 
-			if ( this.updateMatrixWorld !== THREE.Object3D.prototype.updateMatrixWorld ) {
+			if ( this.updateMatrixWorld !== Object3D.prototype.updateMatrixWorld ) {
 
 				// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
 				// so we call it twice.
