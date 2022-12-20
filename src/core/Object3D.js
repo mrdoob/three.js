@@ -216,17 +216,13 @@ class Object3D extends EventDispatcher {
 
 		this.userData = {};
 
-		if ( Object3D ) {
+		if ( this.updateMatrixWorld !== Object3D.prototype.updateMatrixWorld ) {
 
-			if ( this.updateMatrixWorld !== Object3D.prototype.updateMatrixWorld ) {
-
-				// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
-				// so we call it twice.
-				// Slight performance hit, but more than compensated by the gains from monomorphic iteration.
-				this.matrixData.updateMatrixWorldBefore = this.updateMatrixWorld.bind( this );
-				this.matrixData.updateMatrixWorldAfter = this.updateMatrixWorld.bind( this );
-
-			}
+			// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
+			// so we call it twice.
+			// Slight performance hit, but more than compensated by the gains from monomorphic iteration.
+			this.matrixData.updateMatrixWorldBefore = this.updateMatrixWorld.bind( this );
+			this.matrixData.updateMatrixWorldAfter = this.updateMatrixWorld.bind( this );
 
 		}
 
