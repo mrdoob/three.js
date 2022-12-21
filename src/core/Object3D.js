@@ -25,7 +25,7 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
-var skipUMWToAvoidLoop = false;
+let _skipUMWToAvoidLoop = false;
 
 class Object3DMatrixData {
 
@@ -272,27 +272,29 @@ class Object3D extends EventDispatcher {
 
 		if ( this.updateMatrixWorld !== Object3D.prototype.updateMatrixWorld ) {
 
+			// @deprecated
+
 			console.warn( 'Do not override updateMatrixWorld() in Object3D sub-classes.' );
 			console.warn( 'To extend behaviour on updateMatrixWorld(), use onBeforeMatrixUpdate() and onAfterMatrixUpdate().' );
 
 			// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
-			// so we call it twice.
+			// so we call it multiple times.
 			// Slight performance hit, but more than compensated by the gains from monomorphic iteration.
 
 			this.matrixData.updateMatrixWorldBefore = function ( force ) {
 
 				this.onBeforeMatrixUpdate();
-				skipUMWToAvoidLoop = true;
+				_skipUMWToAvoidLoop = true;
 				this.updateMatrixWorld( force );
-				skipUMWToAvoidLoop = false;
+				_skipUMWToAvoidLoop = false;
 
 			}.bind( this );
 
 			this.matrixData.updateMatrixWorldAfter = function ( force ) {
 
-				skipUMWToAvoidLoop = true;
+				_skipUMWToAvoidLoop = true;
 				this.updateMatrixWorld( force );
-				skipUMWToAvoidLoop = false;
+				_skipUMWToAvoidLoop = false;
 				this.onAfterMatrixUpdate();
 
 			}.bind( this );
@@ -755,7 +757,7 @@ class Object3D extends EventDispatcher {
 
 	updateMatrixWorld( force ) {
 
-		if ( skipUMWToAvoidLoop ) return;
+		if ( _skipUMWToAvoidLoop ) return;
 
 		this.matrixData.updateMatrixWorld( force );
 
