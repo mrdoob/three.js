@@ -6,6 +6,8 @@ let materialId = 0;
 
 class Material extends EventDispatcher {
 
+	#alphaTest = 0;
+
 	constructor() {
 
 		super();
@@ -73,25 +75,23 @@ class Material extends EventDispatcher {
 
 		this.version = 0;
 
-		this._alphaTest = 0;
-
 	}
 
 	get alphaTest() {
 
-		return this._alphaTest;
+		return this.#alphaTest;
 
 	}
 
 	set alphaTest( value ) {
 
-		if ( this._alphaTest > 0 !== value > 0 ) {
+		if ( this.#alphaTest > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this._alphaTest = value;
+		this.#alphaTest = value;
 
 	}
 
