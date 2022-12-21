@@ -7924,6 +7924,28 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	getObjectsByProperty( name, value ) {
+
+		let result = [];
+
+		if ( this[ name ] === value ) result.push( this );
+
+		for ( let i = 0, l = this.children.length; i < l; i ++ ) {
+
+			const childResult = this.children[ i ].getObjectsByProperty( name, value );
+
+			if ( childResult.length > 0 ) {
+
+				result = result.concat( childResult );
+
+			}
+
+		}
+
+		return result;
+
+	}
+
 	getWorldPosition( target ) {
 
 		this.updateWorldMatrix( true, false );
@@ -33555,7 +33577,7 @@ class CapsuleGeometry extends LatheGeometry {
 
 class CircleGeometry extends BufferGeometry {
 
-	constructor( radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2 ) {
+	constructor( radius = 1, segments = 32, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -33639,7 +33661,7 @@ class CircleGeometry extends BufferGeometry {
 
 class CylinderGeometry extends BufferGeometry {
 
-	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
+	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -33908,7 +33930,7 @@ class CylinderGeometry extends BufferGeometry {
 
 class ConeGeometry extends CylinderGeometry {
 
-	constructor( radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
+	constructor( radius = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super( 0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength );
 
@@ -36276,7 +36298,7 @@ class OctahedronGeometry extends PolyhedronGeometry {
 
 class RingGeometry extends BufferGeometry {
 
-	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 8, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
+	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 32, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
 		super();
 
@@ -36718,7 +36740,7 @@ class TetrahedronGeometry extends PolyhedronGeometry {
 
 class TorusGeometry extends BufferGeometry {
 
-	constructor( radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2 ) {
+	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2 ) {
 
 		super();
 

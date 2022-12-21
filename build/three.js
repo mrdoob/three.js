@@ -5303,6 +5303,17 @@
 			}
 			return undefined;
 		}
+		getObjectsByProperty(name, value) {
+			let result = [];
+			if (this[name] === value) result.push(this);
+			for (let i = 0, l = this.children.length; i < l; i++) {
+				const childResult = this.children[i].getObjectsByProperty(name, value);
+				if (childResult.length > 0) {
+					result = result.concat(childResult);
+				}
+			}
+			return result;
+		}
 		getWorldPosition(target) {
 			this.updateWorldMatrix(true, false);
 			return target.setFromMatrixPosition(this.matrixWorld);
@@ -21555,7 +21566,7 @@
 	}
 
 	class CircleGeometry extends BufferGeometry {
-		constructor(radius = 1, segments = 8, thetaStart = 0, thetaLength = Math.PI * 2) {
+		constructor(radius = 1, segments = 32, thetaStart = 0, thetaLength = Math.PI * 2) {
 			super();
 			this.type = 'CircleGeometry';
 			this.parameters = {
@@ -21622,7 +21633,7 @@
 	}
 
 	class CylinderGeometry extends BufferGeometry {
-		constructor(radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
+		constructor(radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
 			super();
 			this.type = 'CylinderGeometry';
 			this.parameters = {
@@ -21842,7 +21853,7 @@
 	}
 
 	class ConeGeometry extends CylinderGeometry {
-		constructor(radius = 1, height = 1, radialSegments = 8, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
+		constructor(radius = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
 			super(0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength);
 			this.type = 'ConeGeometry';
 			this.parameters = {
@@ -23437,7 +23448,7 @@
 	}
 
 	class RingGeometry extends BufferGeometry {
-		constructor(innerRadius = 0.5, outerRadius = 1, thetaSegments = 8, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2) {
+		constructor(innerRadius = 0.5, outerRadius = 1, thetaSegments = 32, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2) {
 			super();
 			this.type = 'RingGeometry';
 			this.parameters = {
@@ -23750,7 +23761,7 @@
 	}
 
 	class TorusGeometry extends BufferGeometry {
-		constructor(radius = 1, tube = 0.4, radialSegments = 8, tubularSegments = 6, arc = Math.PI * 2) {
+		constructor(radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2) {
 			super();
 			this.type = 'TorusGeometry';
 			this.parameters = {
