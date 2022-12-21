@@ -7,7 +7,6 @@ body:
       label: Description
       description: Is your feature request related to a problem? Please describe.
       placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-      render: bash
     validations:
       required: true
   - type: textarea
@@ -16,7 +15,6 @@ body:
       label: Solution
       description: Describe the solution you'd like.
       placeholder: A clear and concise description of what you want to happen.
-      render: bash
     validations:
       required: true
   - type: textarea
@@ -25,7 +23,6 @@ body:
       label: Alternatives
       description: Describe alternatives you've considered.
       placeholder: A clear and concise description of any alternative solutions or features you've considered.
-      render: bash
     validations:
       required: true
   - type: textarea
@@ -33,6 +30,5 @@ body:
     attributes:
       label: Additional context
       description: Add any other context about the feature request here.
-      render: bash
     validations:
       required: false
