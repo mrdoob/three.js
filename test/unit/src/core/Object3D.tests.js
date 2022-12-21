@@ -533,6 +533,27 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( 'getObjectsByProperty', ( assert ) => {
+
+			var parent = new Object3D();
+			var childName = new Object3D();
+			var childNothing = new Object3D();
+			var childName2 = new Object3D();
+			var childName3 = new Object3D();
+
+			parent.prop = true;
+			childName.name = 'foo';
+			childName2.name = 'foo';
+			childName3.name = 'foo';
+			childName2.add( childName3 );
+			childName.add( childName2 );
+			parent.add( childName, childNothing );
+
+			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).length, 3, 'Get amount of all childs by name "foo"' );
+			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some(obj => obj.name !== 'foo') , false, 'Get all childs by name "foo"' );
+
+		} );
+
 		QUnit.test( 'getWorldPosition', ( assert ) => {
 
 			var a = new Object3D();
