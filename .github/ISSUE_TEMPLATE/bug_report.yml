@@ -6,6 +6,7 @@ body:
     attributes:
       label: Description
       description: A clear and concise description of what the bug is.
+      render: bash
     validations:
       required: true
   - type: textarea
@@ -28,6 +29,7 @@ body:
         ```js
         // code goes here
         ```
+      render: bash
     validations:
       required: true
   - type: textarea
@@ -37,13 +39,9 @@ body:
       value: |
         * [jsfiddle-latest-release](https://jsfiddle.net/g3atw6k5/)
         * [jsfiddle-dev](https://jsfiddle.net/eL7gqyhd/)
+      render: bash
     validations:
       required: true
-  - type: markdown
-    attributes:
-      label: Screenshots
-      value: |
-        Please attach relevant screenshots after filing the issue.
   - type: input
     id: version
     attributes:
