@@ -58,7 +58,7 @@
 				break; 
 
 			default:
-				console.error("Unexpected test type:", type)
+				console.error("Unexpected test type:", type);
 				break;
 		}
 
