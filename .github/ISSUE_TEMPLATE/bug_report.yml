@@ -39,6 +39,11 @@ body:
         * [jsfiddle-dev](https://jsfiddle.net/eL7gqyhd/)
     validations:
       required: true
+  - type: markdown
+    attributes:
+      label: Screenshots
+      value: |
+        Please attach relevant screenshots after filing the issue.
   - type: input
     id: version
     attributes:
@@ -77,7 +82,3 @@ body:
         - Linux
         - Android
         - iOS
-  - type: markdown
-    attributes:
-      value: |
-        Please attach screenshots if possible.
