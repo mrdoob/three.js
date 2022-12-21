@@ -468,7 +468,7 @@ class Object3D extends EventDispatcher {
 
 	getObjectsByProperty( name, value ) {
 
-		let result = [ ];
+		let result = [];
 
 		if ( this[ name ] === value ) result.push( this );
 
