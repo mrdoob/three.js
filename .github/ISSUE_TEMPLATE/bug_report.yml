@@ -6,7 +6,6 @@ body:
     attributes:
       label: Description
       description: A clear and concise description of what the bug is.
-      render: bash
     validations:
       required: true
   - type: textarea
@@ -18,7 +17,6 @@ body:
         1.
         2.
         3.
-      render: bash
     validations:
       required: true
   - type: textarea
@@ -29,7 +27,6 @@ body:
         ```js
         // code goes here
         ```
-      render: bash
     validations:
       required: true
   - type: textarea
@@ -39,7 +36,6 @@ body:
       value: |
         * [jsfiddle-latest-release](https://jsfiddle.net/g3atw6k5/)
         * [jsfiddle-dev](https://jsfiddle.net/eL7gqyhd/)
-      render: bash
     validations:
       required: true
   - type: input
@@ -53,16 +49,16 @@ body:
   - type: dropdown
     id: device
     attributes:
-      label: What device are you seeing the problem on?
+      label: Device
       multiple: true
       options:
         - Desktop
         - Mobile
         - Headset
   - type: dropdown
-    id: browsers
+    id: browser
     attributes:
-      label: What browsers are you seeing the problem on?
+      label: Browser
       multiple: true
       options:
         - Chrome
@@ -72,7 +68,7 @@ body:
   - type: dropdown
     id: os
     attributes:
-      label: What OS are you seeing the problem on?
+      label: OS
       multiple: true
       options:
         - Windows
