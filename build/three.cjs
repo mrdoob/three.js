@@ -5781,10 +5781,26 @@ class Triangle {
 	}
 }
 
+var id$1 = 0;
+function _classPrivateFieldLooseKey(name) {
+	return "__private_" + id$1++ + "_" + name;
+}
+function _classPrivateFieldLooseBase(receiver, privateKey) {
+	if (!Object.prototype.hasOwnProperty.call(receiver, privateKey)) {
+		throw new TypeError("attempted to use private field on non-instance");
+	}
+	return receiver;
+}
+
 let materialId = 0;
+var _alphaTest = /*#__PURE__*/_classPrivateFieldLooseKey("alphaTest");
 class Material extends EventDispatcher {
 	constructor() {
 		super();
+		Object.defineProperty(this, _alphaTest, {
+			writable: true,
+			value: 0
+		});
 		this.isMaterial = true;
 		Object.defineProperty(this, 'id', {
 			value: materialId++
@@ -5831,16 +5847,15 @@ class Material extends EventDispatcher {
 		this.toneMapped = true;
 		this.userData = {};
 		this.version = 0;
-		this._alphaTest = 0;
 	}
 	get alphaTest() {
-		return this._alphaTest;
+		return _classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest];
 	}
 	set alphaTest(value) {
-		if (this._alphaTest > 0 !== value > 0) {
+		if (_classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest] > 0 !== value > 0) {
 			this.version++;
 		}
-		this._alphaTest = value;
+		_classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest] = value;
 	}
 	onBuild( /* shaderobject, renderer */) {}
 	onBeforeRender( /* renderer, scene, camera, geometry, object, group */) {}
