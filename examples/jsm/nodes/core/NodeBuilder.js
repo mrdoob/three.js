@@ -297,7 +297,7 @@ class NodeBuilder {
 
 	hasGeometryAttribute( name ) {
 
-		return this.geometry ? ( this.geometry.getAttribute( name ) !== undefined ) : undefined;
+		return this.geometry && ( this.geometry.getAttribute( name ) !== undefined );
 
 	}
 
