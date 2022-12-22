@@ -186,7 +186,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	constructLighting( builder, stack ) {
+	constructLighting( builder ) {
 
 		const { material, renderer } = builder;
 
