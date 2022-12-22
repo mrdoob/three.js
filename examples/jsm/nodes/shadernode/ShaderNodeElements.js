@@ -153,4 +153,4 @@ export const checker = nodeProxy( CheckerNode );
 
 export const fog = nodeProxy( FogNode );
 export const rangeFog = nodeProxy( FogRangeNode );
-export const exp2Fog = nodeProxy( FogExp2Node );
+export const densityFog = nodeProxy( FogExp2Node );

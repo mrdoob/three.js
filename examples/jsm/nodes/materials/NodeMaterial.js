@@ -148,7 +148,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			if ( fog.isFogExp2 ) {
 
-				fogNode = exp2Fog( reference( 'color', 'color', fog ), reference( 'density', 'float', fog ) );
+				fogNode = densityFog( reference( 'color', 'color', fog ), reference( 'density', 'float', fog ) );
 
 			} else if ( fog.isFog ) {
 
