@@ -44,7 +44,7 @@ class Node {
 
 				for ( const child of object ) {
 
-					if ( child?.isNode === true ) {
+					if ( child && child.isNode === true ) {
 
 						children.push( child );
 
@@ -52,7 +52,7 @@ class Node {
 
 				}
 
-			} else if ( object?.isNode === true ) {
+			} else if ( object && object.isNode === true ) {
 
 				children.push( object );
 
@@ -62,7 +62,7 @@ class Node {
 
 					const child = object[ property ];
 
-					if ( child?.isNode === true ) {
+					if ( child && child.isNode === true ) {
 
 						children.push( child );
 
@@ -139,7 +139,7 @@ class Node {
 
 			for ( const childNode of Object.values( nodeProperties ) ) {
 
-				if ( childNode?.isNode === true ) {
+				if ( childNode && childNode.isNode === true ) {
 
 					childNode.build( builder );
 
@@ -155,7 +155,7 @@ class Node {
 
 		const { outputNode } = builder.getNodeProperties( this );
 
-		if ( outputNode?.isNode === true ) {
+		if ( outputNode && outputNode.isNode === true ) {
 
 			return outputNode.build( builder, output );
 
@@ -202,7 +202,7 @@ class Node {
 
 				for ( const childNode of Object.values( properties ) ) {
 
-					if ( childNode?.isNode === true ) {
+					if ( childNode && childNode.isNode === true ) {
 
 						childNode.build( builder );
 

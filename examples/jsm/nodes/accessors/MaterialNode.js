@@ -6,14 +6,6 @@ import SplitNode from '../utils/SplitNode.js';
 
 class MaterialNode extends Node {
 
-	static ALPHA_TEST = 'alphaTest';
-	static COLOR = 'color';
-	static OPACITY = 'opacity';
-	static ROUGHNESS = 'roughness';
-	static METALNESS = 'metalness';
-	static EMISSIVE = 'emissive';
-	static ROTATION = 'rotation';
-
 	constructor( scope = MaterialNode.COLOR ) {
 
 		super();
@@ -62,7 +54,7 @@ class MaterialNode extends Node {
 
 			const colorNode = new MaterialReferenceNode( 'color', 'color' );
 
-			if ( material.map?.isTexture === true ) {
+			if ( material.map && material.map.isTexture === true ) {
 
 				//new MaterialReferenceNode( 'map', 'texture' )
 				const map = new TextureNode( material.map );
@@ -79,7 +71,7 @@ class MaterialNode extends Node {
 
 			const opacityNode = new MaterialReferenceNode( 'opacity', 'float' );
 
-			if ( material.alphaMap?.isTexture === true ) {
+			if ( material.alphaMap && material.alphaMap.isTexture === true ) {
 
 				node = new OperatorNode( '*', opacityNode, new MaterialReferenceNode( 'alphaMap', 'texture' ) );
 
@@ -93,7 +85,7 @@ class MaterialNode extends Node {
 
 			const roughnessNode = new MaterialReferenceNode( 'roughness', 'float' );
 
-			if ( material.roughnessMap?.isTexture === true ) {
+			if ( material.roughnessMap && material.roughnessMap.isTexture === true ) {
 
 				node = new OperatorNode( '*', roughnessNode, new SplitNode( new TextureNode( material.roughnessMap ), 'g' ) );
 
@@ -107,7 +99,7 @@ class MaterialNode extends Node {
 
 			const metalnessNode = new MaterialReferenceNode( 'metalness', 'float' );
 
-			if ( material.metalnessMap?.isTexture === true ) {
+			if ( material.metalnessMap && material.metalnessMap.isTexture === true ) {
 
 				node = new OperatorNode( '*', metalnessNode, new SplitNode( new TextureNode( material.metalnessMap ), 'b' ) );
 
@@ -121,7 +113,7 @@ class MaterialNode extends Node {
 
 			const emissiveNode = new MaterialReferenceNode( 'emissive', 'color' );
 
-			if ( material.emissiveMap?.isTexture === true ) {
+			if ( material.emissiveMap && material.emissiveMap.isTexture === true ) {
 
 				node = new OperatorNode( '*', emissiveNode, new TextureNode( material.emissiveMap ) );
 
@@ -148,5 +140,13 @@ class MaterialNode extends Node {
 	}
 
 }
+
+MaterialNode.ALPHA_TEST = 'alphaTest';
+MaterialNode.COLOR = 'color';
+MaterialNode.OPACITY = 'opacity';
+MaterialNode.ROUGHNESS = 'roughness';
+MaterialNode.METALNESS = 'metalness';
+MaterialNode.EMISSIVE = 'emissive';
+MaterialNode.ROTATION = 'rotation';
 
 export default MaterialNode;

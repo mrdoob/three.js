@@ -301,7 +301,7 @@ class GPUComputationRenderer {
 
 				const variable = variables[ i ];
 
-				variable.initialValueTexture?.dispose();
+				if ( variable.initialValueTexture ) variable.initialValueTexture.dispose();
 
 				const renderTargets = variable.renderTargets;
 

@@ -31,7 +31,7 @@ class DirectionalLightNode extends AnalyticLightNode {
 		const lightingModelFunctionNode = builder.context.lightingModelNode;
 		const reflectedLight = builder.context.reflectedLight;
 
-		if ( lightingModelFunctionNode?.direct ) {
+		if ( lightingModelFunctionNode && lightingModelFunctionNode.direct ) {
 
 			lightingModelFunctionNode.direct.call( {
 				lightDirection,

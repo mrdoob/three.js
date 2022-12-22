@@ -70,7 +70,7 @@ class CubeTextureNode extends TextureNode {
 
 				let snippet = null;
 
-				if ( levelNode?.isNode === true) {
+				if ( levelNode && levelNode.isNode === true ) {
 
 					const levelSnippet = levelNode.build( builder, 'float' );
 

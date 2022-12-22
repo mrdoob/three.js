@@ -2,8 +2,6 @@ import Object3DNode from './Object3DNode.js';
 
 class CameraNode extends Object3DNode {
 
-	static PROJECTION_MATRIX = 'projectionMatrix';
-
 	constructor( scope = CameraNode.POSITION ) {
 
 		super( scope );
@@ -63,5 +61,7 @@ class CameraNode extends Object3DNode {
 	}
 
 }
+
+CameraNode.PROJECTION_MATRIX = 'projectionMatrix';
 
 export default CameraNode;

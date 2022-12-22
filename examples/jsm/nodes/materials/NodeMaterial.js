@@ -55,7 +55,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( object.instanceMatrix?.isInstancedBufferAttribute === true && builder.isAvailable( 'instance' ) === true ) {
+		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
 			vertex = bypass( vertex, instance( object ) );
 
@@ -85,7 +85,7 @@ class NodeMaterial extends ShaderMaterial {
 		if ( this.vertexColors === true && builder.geometry.hasAttribute( 'color' ) ) {
 
 			colorNode = vec4( mul( colorNode.xyz, attribute( 'color' ) ), colorNode.a );
-		
+
 		}
 
 		// COLOR
@@ -142,7 +142,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		let fogNode = builder.fogNode;
 
-		if ( fogNode?.isNode !== true && builder.scene.fog ) {
+		if ( ( fogNode && fogNode.isNode !== true ) && builder.scene.fog ) {
 
 			const fog = builder.scene.fog;
 
@@ -159,7 +159,7 @@ class NodeMaterial extends ShaderMaterial {
 				console.error( 'NodeMaterial: Unsupported fog configuration.', fog );
 
 			}
-			
+
 		}
 
 		if ( fogNode ) outputNode = vec4( vec3( fogNode.mix( outputNode ) ), outputNode.w );
@@ -183,7 +183,9 @@ class NodeMaterial extends ShaderMaterial {
 
 			if ( this[ property ] === undefined ) {
 
-				this[ property ] = value?.clone?.() || value;
+				this[ property ] = value;
+
+				if ( value && value.clone ) this[ property ] = value.clone();
 
 			}
 
