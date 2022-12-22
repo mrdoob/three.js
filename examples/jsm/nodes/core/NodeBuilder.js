@@ -570,7 +570,13 @@ class NodeBuilder {
 
 	}
 
-	addFlowCode( code ) {
+	addFlowCode( code, breakline = true ) {
+
+		if ( breakline && ! /;\s*$/.test( code ) ) {
+
+			code += ';\n\t';
+
+		}
 
 		this.flow.code += code;
 
