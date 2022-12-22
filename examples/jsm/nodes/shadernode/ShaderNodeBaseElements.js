@@ -9,6 +9,7 @@ import ExpressionNode from '../core/ExpressionNode.js';
 import FunctionCallNode from '../core/FunctionCallNode.js';
 import FunctionNode from '../core/FunctionNode.js';
 import InstanceIndexNode from '../core/InstanceIndexNode.js';
+import LightingModel from '../core/LightingModel.js';
 import PropertyNode from '../core/PropertyNode.js';
 import UniformNode from '../core/UniformNode.js';
 import VarNode from '../core/VarNode.js';
@@ -297,6 +298,7 @@ export const faceDirection = sub( mul( float( frontFacing ), 2 ), 1 );
 
 // lighting
 
+export const lightingModel = ( ...params ) => new LightingModel( ...params );
 
 // utils
 

@@ -10,6 +10,7 @@ import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
 import FunctionNode from './core/FunctionNode.js';
 import InstanceIndexNode from './core/InstanceIndexNode.js';
+import LightingModel from './core/LightingModel.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
@@ -145,6 +146,7 @@ const nodeLib = {
 	FunctionCallNode,
 	FunctionNode,
 	InstanceIndexNode,
+	LightingModel,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -273,6 +275,7 @@ export {
 	FunctionCallNode,
 	FunctionNode,
 	InstanceIndexNode,
+	LightingModel,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
