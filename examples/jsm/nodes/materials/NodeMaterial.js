@@ -1,6 +1,5 @@
 import { Material, ShaderMaterial } from 'three';
 import { getNodesKeys, getCacheKey } from '../core/NodeUtils.js';
-import ExpressionNode from '../core/ExpressionNode.js';
 import StackNode from '../core/StackNode.js';
 import LightsNode from '../lighting/LightsNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';

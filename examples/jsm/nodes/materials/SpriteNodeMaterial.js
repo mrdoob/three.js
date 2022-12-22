@@ -2,8 +2,8 @@ import NodeMaterial from './NodeMaterial.js';
 import { SpriteMaterial } from 'three';
 import {
 	vec2, vec3, vec4,
-	uniform, add, mul, sub,
-	positionLocal, length, cos, sin,
+	uniform, mul,
+	positionLocal, cos, sin,
 	modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialRotation
 } from '../shadernode/ShaderNodeElements.js';
 

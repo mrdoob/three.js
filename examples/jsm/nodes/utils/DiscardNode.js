@@ -1,5 +1,5 @@
 import CondNode from '../math/CondNode.js';
-import { ExpressionNode } from '../Nodes.js'; '../core/ExpressionNode.js';
+import ExpressionNode from '../core/ExpressionNode.js';
 
 let discardExpression;
 
