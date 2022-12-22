@@ -221,11 +221,14 @@ export const cameraNormalMatrix = nodeImmutable( CameraNode, CameraNode.NORMAL_M
 export const cameraWorldMatrix = nodeImmutable( CameraNode, CameraNode.WORLD_MATRIX );
 export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
 
+export const materialUV = nodeImmutable( MaterialNode, MaterialNode.UV );
 export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
+export const materialShininess = nodeImmutable( MaterialNode, MaterialNode.SHININESS );
 export const materialEmissive = nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
 export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
-//export const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
+export const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
+export const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
 export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
