@@ -35,7 +35,10 @@ class InputNode extends Node {
 
 		super.serialize( data );
 
-		data.value = this.value?.toArray?.() || this.value;
+		data.value = this.value;
+
+		if ( this.value && this.value.toArray ) data.value = this.value.toArray();
+
 		data.valueType = getValueType( this.value );
 		data.nodeType = this.nodeType;
 
@@ -47,7 +50,9 @@ class InputNode extends Node {
 
 		this.nodeType = data.nodeType;
 		this.value = getValueFromType( data.valueType );
-		this.value = this.value?.fromArray?.( data.value ) || data.value;
+		this.value = data.value;
+
+		if ( this.value && this.value.fromArray ) this.value = this.value.fromArray( data.value );
 
 	}
 

@@ -25,7 +25,7 @@ class WebGPUNodes {
 
 			nodeBuilder = new WebGPUNodeBuilder( object, this.renderer );
 			nodeBuilder.lightsNode = lightsNode;
-			nodeBuilder.fogNode = scene?.fogNode;
+			nodeBuilder.fogNode = scene ? scene.fogNode : undefined;
 			nodeBuilder.scene = scene;
 			nodeBuilder.build();
 

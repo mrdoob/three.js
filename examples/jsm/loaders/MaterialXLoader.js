@@ -340,7 +340,11 @@ class MaterialXNode {
 
 		let node = this.node;
 
-		if ( node !== null ) { return node; }
+		if ( node !== null ) {
+
+			return node;
+
+		}
 
 		//
 
@@ -478,7 +482,9 @@ class MaterialXNode {
 
 	getNodeByName( name ) {
 
-		return this.getChildByName( name )?.getNode();
+		const child = this.getChildByName( name );
+
+		return child ? child.getNode() : undefined;
 
 	}
 
@@ -681,7 +687,7 @@ class MaterialX {
 
 	}
 
-    /*getMaterialXNodeFromXML( xmlNode ) {
+	/*getMaterialXNodeFromXML( xmlNode ) {
 
         return this.nodesXRefLib.get( xmlNode );
 

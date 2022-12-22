@@ -6,7 +6,7 @@ import { Mesh, IcosahedronGeometry, ShaderMaterial, DoubleSide } from 'three';
  */
 export class GroundProjectedEnv extends Mesh {
 
-	constructor( texture, options ) {
+	constructor( texture, options = {} ) {
 
 		const isCubeMap = texture.isCubeTexture;
 
@@ -131,8 +131,8 @@ export class GroundProjectedEnv extends Mesh {
 
 		const uniforms = {
 			map: { value: texture },
-			height: { value: options?.height || 15 },
-			radius: { value: options?.radius || 100 },
+			height: { value: options.height || 15 },
+			radius: { value: options.radius || 100 },
 		};
 
 		const geometry = new IcosahedronGeometry( 1, 16 );
