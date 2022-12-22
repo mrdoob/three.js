@@ -84,7 +84,7 @@
 
 					const material = new Nodes.MeshStandardNodeMaterial();
 					material.colorNode = color( hexColor );
-					material.lightsNode = new Nodes.LightsNode(); // ignore scene lights
+					material.lights = false;
 
 					const mesh = new THREE.Mesh( sphereGeometry, material );
 
