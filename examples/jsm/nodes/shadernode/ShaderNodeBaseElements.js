@@ -308,6 +308,7 @@ export const lightingModel = ( ...params ) => new LightingModel( ...params );
 // utils
 
 export const element = nodeProxy( ArrayElementNode );
+export const discard = nodeProxy( DiscardNode );
 
 // miscellaneous
 

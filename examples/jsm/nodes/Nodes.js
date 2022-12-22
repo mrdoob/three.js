@@ -88,6 +88,7 @@ import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
+import DiscardNode from './utils/DiscardNode.js';
 import EquirectUVNode from './utils/EquirectUVNode.js';
 import JoinNode from './utils/JoinNode.js';
 import MatcapUVNode from './utils/MatcapUVNode.js';
@@ -224,6 +225,7 @@ const nodeLib = {
 	// utils
 	ArrayElementNode,
 	ConvertNode,
+	DiscardNode,
 	EquirectUVNode,
 	JoinNode,
 	MatcapUVNode,
@@ -353,6 +355,7 @@ export {
 	// utils
 	ArrayElementNode,
 	ConvertNode,
+	DiscardNode,
 	EquirectUVNode,
 	JoinNode,
 	MatcapUVNode,
