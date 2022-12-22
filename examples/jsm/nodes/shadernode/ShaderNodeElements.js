@@ -54,7 +54,8 @@ export * from './ShaderNodeBaseElements.js';
 
 // functions
 
-export { default as BRDF_GGX } from '../functions/BSDF/BRDF_GGX.js'; // see https://github.com/tc39/proposal-export-default-from
+export { default as BRDF_BlinnPhong } from '../functions/BSDF/BRDF_BlinnPhong.js';
+export { default as BRDF_GGX } from '../functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from '../functions/BSDF/BRDF_Lambert.js';
 export { default as D_GGX } from '../functions/BSDF/D_GGX.js';
 export { default as DFGApprox } from '../functions/BSDF/DFGApprox.js';
@@ -66,7 +67,8 @@ export { default as getDistanceAttenuation } from '../functions/light/getDistanc
 export { default as getGeometryRoughness } from '../functions/material/getGeometryRoughness.js';
 export { default as getRoughness } from '../functions/material/getRoughness.js';
 
-export { default as PhysicalLightingModel } from '../functions/PhysicalLightingModel.js';
+export { default as phongLightingModel } from '../functions/PhongLightingModel.js';
+export { default as physicalLightingModel } from '../functions/PhysicalLightingModel.js';
 
 // accessors
 

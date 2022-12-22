@@ -48,6 +48,7 @@ import CondNode from '../math/CondNode.js';
 // utils
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
+import DiscardNode from '../utils/DiscardNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 
 // shader node utils
@@ -233,11 +234,11 @@ export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGH
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
 export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
 
-export const diffuseColor = nodeImmutable( PropertyNode, 'DiffuseColor', 'vec4' );
-export const roughness = nodeImmutable( PropertyNode, 'Roughness', 'float' );
-export const metalness = nodeImmutable( PropertyNode, 'Metalness', 'float' );
-export const alphaTest = nodeImmutable( PropertyNode, 'AlphaTest', 'float' );
-export const specularColor = nodeImmutable( PropertyNode, 'SpecularColor', 'color' );
+export const diffuseColor = nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
+export const roughness = nodeImmutable( PropertyNode, 'float', 'Roughness' );
+export const metalness = nodeImmutable( PropertyNode, 'float', 'Metalness' );
+export const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
+export const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
 
 export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object ) );
 export const materialReference = ( name, nodeOrType, material ) => nodeObject( new MaterialReferenceNode( name, getConstNodeType( nodeOrType ), material ) );
@@ -248,8 +249,8 @@ export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
 export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
-export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
-export const transformedNormalView = nodeImmutable( VarNode, normalView, 'TransformedNormalView' );
+export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );;
+export const transformedNormalView = nodeImmutable( PropertyNode, 'vec3', 'TransformedNormalView' );
 export const transformedNormalWorld = normalize( transformDirection( transformedNormalView, cameraViewMatrix ) );
 
 export const tangentGeometry = nodeImmutable( TangentNode, TangentNode.GEOMETRY );
