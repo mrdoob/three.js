@@ -263,12 +263,14 @@ export const bitangentWorld = nodeImmutable( BitangentNode, BitangentNode.WORLD 
 export const transformedBitangentView = normalize( mul( cross( transformedNormalView, transformedTangentView ), tangentGeometry.w ) );
 export const transformedBitangentWorld = normalize( transformDirection( transformedBitangentView, cameraViewMatrix ) );
 
+export const modelDirection = nodeImmutable( ModelNode, ModelNode.DIRECTION );
 export const modelViewMatrix = nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX );
 export const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
 export const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
 export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
 export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
 
+export const objectDirection = nodeProxy( Object3DNode, Object3DNode.DIRECTION );
 export const objectViewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
 export const objectNormalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
 export const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
