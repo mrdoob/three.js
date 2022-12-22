@@ -50,6 +50,12 @@ class VarNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );

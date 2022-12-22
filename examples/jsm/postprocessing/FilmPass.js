@@ -11,8 +11,6 @@ class FilmPass extends Pass {
 
 		super();
 
-		if ( FilmShader === undefined ) console.error( 'THREE.FilmPass relies on FilmShader' );
-
 		const shader = FilmShader;
 
 		this.uniforms = UniformsUtils.clone( shader.uniforms );

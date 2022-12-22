@@ -82,7 +82,8 @@ class WebGPUBackground {
 				} else /*if ( background.isNode === true )*/ {
 
 					node = context( background, {
-						uvNode: transformDirection( positionWorld, modelWorldMatrix )
+						// @TODO: Add Texture2D support using node context
+						getUVNode: () => transformDirection( positionWorld, modelWorldMatrix )
 					} );
 
 				}

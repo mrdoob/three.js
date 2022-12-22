@@ -488,16 +488,32 @@
 			// First separate the member (if existing) from the page name,
 			// then identify the subpage's URL and set it as URL fragment (re-adding the member)
 
+			const pageURL = getPageURL( pageName );
+
+			if ( pageURL ) {
+
+				window.location.hash = pageURL;
+
+				createNewIframe();
+
+			}
+
+		}
+
+		function getPageURL( pageName ) {
+
 			const splitPageName = decomposePageName( pageName, '.', '.' );
 
 			const currentProperties = pageProperties[ splitPageName[ 0 ] ];
 
 			if ( currentProperties ) {
 
-				window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
+				return currentProperties.pageURL + splitPageName[ 1 ];
+		
+			} else {
 
-				createNewIframe();
-
+				return null;
+		
 			}
 
 		}

@@ -2,6 +2,7 @@
 import ArrayUniformNode from './core/ArrayUniformNode.js';
 import AttributeNode from './core/AttributeNode.js';
 import BypassNode from './core/BypassNode.js';
+import CacheNode from './core/CacheNode.js';
 import CodeNode from './core/CodeNode.js';
 import ConstNode from './core/ConstNode.js';
 import ContextNode from './core/ContextNode.js';
@@ -12,6 +13,7 @@ import InstanceIndexNode from './core/InstanceIndexNode.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
+import NodeCache from './core/NodeCache.js';
 import NodeCode from './core/NodeCode.js';
 import NodeFrame from './core/NodeFrame.js';
 import NodeFunctionInput from './core/NodeFunctionInput.js';
@@ -20,6 +22,7 @@ import NodeUniform from './core/NodeUniform.js';
 import NodeVar from './core/NodeVar.js';
 import NodeVarying from './core/NodeVarying.js';
 import PropertyNode from './core/PropertyNode.js';
+import StackNode from './core/StackNode.js';
 import TempNode from './core/TempNode.js';
 import UniformNode from './core/UniformNode.js';
 import VarNode from './core/VarNode.js';
@@ -69,7 +72,10 @@ import OperatorNode from './math/OperatorNode.js';
 import CondNode from './math/CondNode.js';
 
 // lighting
-import PunctualLightNode from './lighting/PunctualLightNode.js';
+import PointLightNode from './lighting/PointLightNode.js';
+import DirectionalLightNode from './lighting/DirectionalLightNode.js';
+import SpotLightNode from './lighting/SpotLightNode.js';
+import AmbientLightNode from './lighting/AmbientLightNode.js';
 import LightsNode from './lighting/LightsNode.js';
 import LightingNode from './lighting/LightingNode.js';
 import LightingContextNode from './lighting/LightingContextNode.js';
@@ -88,6 +94,7 @@ import MaxMipLevelNode from './utils/MaxMipLevelNode.js';
 import OscNode from './utils/OscNode.js';
 import RemapNode from './utils/RemapNode.js';
 import RotateUVNode from './utils/RotateUVNode.js';
+import SpecularMIPLevelNode from './utils/SpecularMIPLevelNode.js';
 import SplitNode from './utils/SplitNode.js';
 import SpriteSheetUVNode from './utils/SpriteSheetUVNode.js';
 import TimerNode from './utils/TimerNode.js';
@@ -108,6 +115,7 @@ import CheckerNode from './procedural/CheckerNode.js';
 // fog
 import FogNode from './fog/FogNode.js';
 import FogRangeNode from './fog/FogRangeNode.js';
+import FogExp2Node from './fog/FogExp2Node.js';
 
 // core
 export * from './core/constants.js';
@@ -129,6 +137,7 @@ const nodeLib = {
 	ArrayUniformNode,
 	AttributeNode,
 	BypassNode,
+	CacheNode,
 	CodeNode,
 	ContextNode,
 	ConstNode,
@@ -139,6 +148,7 @@ const nodeLib = {
 	Node,
 	NodeAttribute,
 	NodeBuilder,
+	NodeCache,
 	NodeCode,
 	NodeFrame,
 	NodeFunctionInput,
@@ -147,6 +157,7 @@ const nodeLib = {
 	NodeVar,
 	NodeVarying,
 	PropertyNode,
+	StackNode,
 	TempNode,
 	UniformNode,
 	VarNode,
@@ -196,7 +207,10 @@ const nodeLib = {
 	CondNode,
 
 	// lighting
-	PunctualLightNode,
+	PointLightNode,
+	DirectionalLightNode,
+	SpotLightNode,
+	AmbientLightNode,
 	LightsNode,
 	LightingNode,
 	LightingContextNode,
@@ -215,6 +229,7 @@ const nodeLib = {
 	OscNode,
 	RemapNode,
 	RotateUVNode,
+	SpecularMIPLevelNode,
 	SplitNode,
 	SpriteSheetUVNode,
 	TimerNode,
@@ -226,6 +241,7 @@ const nodeLib = {
 	// fog
 	FogNode,
 	FogRangeNode,
+	FogExp2Node,
 
 	// loaders
 	NodeLoader,
@@ -249,6 +265,7 @@ export {
 	ArrayUniformNode,
 	AttributeNode,
 	BypassNode,
+	CacheNode,
 	CodeNode,
 	ContextNode,
 	ConstNode,
@@ -259,6 +276,7 @@ export {
 	Node,
 	NodeAttribute,
 	NodeBuilder,
+	NodeCache,
 	NodeCode,
 	NodeFrame,
 	NodeFunctionInput,
@@ -267,6 +285,7 @@ export {
 	NodeVar,
 	NodeVarying,
 	PropertyNode,
+	StackNode,
 	TempNode,
 	UniformNode,
 	VarNode,
@@ -316,7 +335,10 @@ export {
 	CondNode,
 
 	// lighting
-	PunctualLightNode,
+	PointLightNode,
+	DirectionalLightNode,
+	SpotLightNode,
+	AmbientLightNode,
 	LightsNode,
 	LightingNode,
 	LightingContextNode,
@@ -335,6 +357,7 @@ export {
 	OscNode,
 	RemapNode,
 	RotateUVNode,
+	SpecularMIPLevelNode,
 	SplitNode,
 	SpriteSheetUVNode,
 	TimerNode,
@@ -346,6 +369,7 @@ export {
 	// fog
 	FogNode,
 	FogRangeNode,
+	FogExp2Node,
 
 	// loaders
 	NodeLoader,

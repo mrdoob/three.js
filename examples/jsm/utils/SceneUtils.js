@@ -143,13 +143,17 @@ function reduceVertices( object, func, initialValue ) {
 
 				for ( let i = 0, l = position.count; i < l; i ++ ) {
 
-					vertex.fromBufferAttribute( position, i );
+					if ( child.isMesh ) {
 
-					if ( child.isSkinnedMesh ) {
-
-						child.boneTransform( i, vertex );
+						child.getVertexPosition( i, vertex );
 
 					} else {
+
+						vertex.fromBufferAttribute( position, i );
+
+					}
+
+					if ( ! child.isSkinnedMesh ) {
 
 						vertex.applyMatrix4( child.matrixWorld );
 

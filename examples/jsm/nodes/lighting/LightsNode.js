@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import LightingNode from './LightingNode.js';
+import AnalyticLightNode from './AnalyticLightNode.js';
 
 const references = new WeakMap();
 
@@ -92,7 +92,7 @@ class LightsNode extends Node {
 			if ( lightNode === null ) {
 
 				const lightClass = light.constructor;
-				const lightNodeClass = references.has( lightClass ) ? references.get( lightClass ) : LightingNode;
+				const lightNodeClass = references.has( lightClass ) ? references.get( lightClass ) : AnalyticLightNode;
 
 				lightNode = new lightNodeClass( light );
 

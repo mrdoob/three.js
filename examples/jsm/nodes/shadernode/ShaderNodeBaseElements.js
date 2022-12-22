@@ -2,6 +2,7 @@
 //import ArrayUniformNode from '../core/ArrayUniformNode.js';
 import AttributeNode from '../core/AttributeNode.js';
 import BypassNode from '../core/BypassNode.js';
+import CacheNode from '../core/CacheNode.js';
 import CodeNode from '../core/CodeNode.js';
 import ContextNode from '../core/ContextNode.js';
 import ExpressionNode from '../core/ExpressionNode.js';
@@ -22,6 +23,7 @@ import MaterialReferenceNode from '../accessors/MaterialReferenceNode.js';
 import ModelViewProjectionNode from '../accessors/ModelViewProjectionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
 import ModelNode from '../accessors/ModelNode.js';
+import Object3DNode from '../accessors/Object3DNode.js';
 import PointUVNode from '../accessors/PointUVNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import ReferenceNode from '../accessors/ReferenceNode.js';
@@ -45,6 +47,7 @@ import CondNode from '../math/CondNode.js';
 // utils
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
+import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 
 // shader node utils
 import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, getConstNodeType, cacheMaps } from './ShaderNode.js';
@@ -117,8 +120,10 @@ export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( na
 export const property = ( name, nodeOrType ) => nodeObject( new PropertyNode( name, getConstNodeType( nodeOrType ) ) );
 
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
+export const maxMipLevel = nodeProxy( MaxMipLevelNode );
 
 export const bypass = nodeProxy( BypassNode );
+export const cache = nodeProxy( CacheNode );
 export const code = nodeProxy( CodeNode );
 export const context = nodeProxy( ContextNode );
 export const expression = nodeProxy( ExpressionNode );
@@ -262,6 +267,12 @@ export const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATR
 export const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
 export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
 export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
+
+export const objectViewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
+export const objectNormalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
+export const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
+export const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
+export const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
 
 export const positionGeometry = nodeImmutable( PositionNode, PositionNode.GEOMETRY );
 export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );

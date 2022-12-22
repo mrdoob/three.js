@@ -205,7 +205,7 @@ class USDZLoader extends Loader {
 
 		}
 
-		const zip = fflate.unzipSync( new Uint8Array( buffer ) ); // eslint-disable-line no-undef
+		const zip = fflate.unzipSync( new Uint8Array( buffer ) );
 
 		// console.log( zip );
 

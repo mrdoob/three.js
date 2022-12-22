@@ -27,6 +27,7 @@ const wgslTypeLib = {
 	int: 'i32',
 	uint: 'u32',
 	bool: 'bool',
+	color: 'vec3<f32>',
 
 	vec2: 'vec2<f32>',
 	ivec2: 'vec2<i32>',

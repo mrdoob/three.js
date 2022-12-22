@@ -131,10 +131,10 @@ zAxis = (c, f, i)
 
 		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
 		<p>
-		[page:Float theta] — Rotation angle in radians. Positive values rotate counterclockwise.<br /><br />
+		[page:Float theta] — Angolo di rotazione in radianti. I valori positivi ruotano in senso antiorario.<br /><br />
 
-		Sets this matrix as a 2D rotational transformation by [page:Float theta] radians.
-		The resulting matrix will be:
+		Imposta questa matrice come una trasformazione rotazionale 2D di [page:Float teta] radianti.
+		La matrice risultante sarà:
 		<code>
 cos(&theta;) -sin(&theta;) 0
 sin(&theta;) cos(&theta;)  0
@@ -144,10 +144,10 @@ sin(&theta;) cos(&theta;)  0
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
 		<p>
-		[page:Float x] - the amount to scale in the X axis.<br />
-		[page:Float y] - the amount to scale in the Y axis.<br />
+		[page:Float x] - la quantità da scalare sull'asse X.<br />
+		[page:Float y] - la quantità da scalare sull'asse Y.<br />
 
-		Sets this matrix as a 2D scale transform:
+		Imposta questa matrice come una trasformazione di scala 2D:
 		<code>
 x, 0, 0,
 0, y, 0,
@@ -157,10 +157,10 @@ x, 0, 0,
 
 		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
 		<p>
-		[page:Float x] - the amount to translate in the X axis.<br />
-		[page:Float y] - the amount to translate in the Y axis.<br />
+		[page:Float x] - la quantità da translare sull'asse X.<br />
+		[page:Float y] - la quantità da translare sull'asse Y.<br />
 
-		Sets this matrix as a 2D translation transform:
+		Imposta questa matrice come una trasformazione di traslazione 2D:
 		<code>
 1, 0, x,
 0, 1, y,
@@ -208,7 +208,7 @@ x, 0, 0,
 		[page:Float ty] - offset y<br />
 		[page:Float sx] - repeat x<br />
 		[page:Float sy] - repeat y<br />
-		[page:Float rotation] - rotazione, in radianti. Positive values rotate counterclockwise<br />
+		[page:Float rotation] - rotazione, in radianti. I valori positivi ruotano in senso antiorario<br />
 		[page:Float cx] - centro x di rotazione<br />
 		[page:Float cy] - centro y di rotazione<br /><br />
 

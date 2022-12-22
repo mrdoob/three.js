@@ -336,13 +336,7 @@ class MMDLoader extends Loader {
 
 		if ( this.parser === null ) {
 
-			if ( typeof MMDParser === 'undefined' ) {
-
-				throw new Error( 'THREE.MMDLoader: Import MMDParser https://github.com/takahirox/mmd-parser' );
-
-			}
-
-			this.parser = new MMDParser.Parser(); // eslint-disable-line no-undef
+			this.parser = new MMDParser.Parser();
 
 		}
 
@@ -2081,6 +2075,8 @@ class MMDToonMaterial extends ShaderMaterial {
 		super();
 
 		this.isMMDToonMaterial = true;
+
+		this.type = 'MMDToonMaterial';
 
 		this._matcapCombine = AddOperation;
 		this.emissiveIntensity = 1.0;

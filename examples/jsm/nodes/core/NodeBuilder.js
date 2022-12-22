@@ -4,11 +4,15 @@ import NodeVarying from './NodeVarying.js';
 import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
+import NodeCache from './NodeCache.js';
 import { NodeUpdateType } from './constants.js';
 
 import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'three';
 
+import { mul, maxMipLevel } from '../shadernode/ShaderNodeElements.js';
+
 export const defaultShaderStages = [ 'fragment', 'vertex' ];
+export const defaultBuildStages = [ 'construct', 'analyze', 'generate' ];
 export const shaderStages = [ ...defaultShaderStages, 'compute' ];
 export const vector = [ 'x', 'y', 'z', 'w' ];
 
@@ -61,10 +65,13 @@ class NodeBuilder {
 
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: object.material
+			material: object.material,
+			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => mul( levelNode, maxMipLevel( textureNode ) )
 		};
 
-		this.nodesData = new WeakMap();
+		this.cache = new NodeCache();
+		this.globalCache = this.cache;
+
 		this.flowsData = new WeakMap();
 
 		this.shaderStage = null;
@@ -159,6 +166,18 @@ class NodeBuilder {
 	getContext() {
 
 		return this.context;
+
+	}
+
+	setCache( cache ) {
+
+		this.cache = cache;
+
+	}
+
+	getCache() {
+
+		return this.cache;
 
 	}
 
@@ -434,13 +453,15 @@ class NodeBuilder {
 
 	getDataFromNode( node, shaderStage = this.shaderStage ) {
 
-		let nodeData = this.nodesData.get( node );
+		const cache = node.isGlobal( this ) ? this.globalCache : this.cache;
+
+		let nodeData = cache.getNodeData( node );
 
 		if ( nodeData === undefined ) {
 
 			nodeData = { vertex: {}, fragment: {}, compute: {} };
 
-			this.nodesData.set( node, nodeData );
+			cache.setNodeData( node, nodeData );
 
 		}
 
@@ -450,13 +471,11 @@ class NodeBuilder {
 
 	getNodeProperties( node, shaderStage = this.shaderStage ) {
 
-		const nodeData = this.getDataFromNode( this, shaderStage );
-		const constructHash = node.getConstructHash( this );
+		const nodeData = this.getDataFromNode( node, shaderStage );
 
-		nodeData.properties = nodeData.properties || {};
-		nodeData.properties[ constructHash ] = nodeData.properties[ constructHash ] || { outputNode: null };
+		nodeData.properties ||= { outputNode: null };
 
-		return nodeData.properties[ constructHash ];
+		return nodeData.properties;
 
 	}
 
@@ -703,65 +722,39 @@ class NodeBuilder {
 
 	build() {
 
-		// stage 1: generate shader node
+		// construct() -> stage 1: create possible new nodes and returns an output reference node
+		// analyze()   -> stage 2: analyze nodes to possible optimization and validation
+		// generate()  -> stage 3: generate shader
 
-		this.setBuildStage( 'construct' );
+		for ( const buildStage of defaultBuildStages ) {
 
-		for ( const shaderStage of shaderStages ) {
+			this.setBuildStage( buildStage );
 
-			this.setShaderStage( shaderStage );
+			if ( this.context.vertex && this.context.vertex.isNode ) {
 
-			const flowNodes = this.flowNodes[ shaderStage ];
-
-			for ( const node of flowNodes ) {
-
-				node.build( this );
+				this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
 
 			}
 
-		}
+			for ( const shaderStage of shaderStages ) {
 
-		// stage 2: analyze nodes to possible optimization and validation
+				this.setShaderStage( shaderStage );
 
-		this.setBuildStage( 'analyze' );
+				const flowNodes = this.flowNodes[ shaderStage ];
 
-		for ( const shaderStage of shaderStages ) {
+				for ( const node of flowNodes ) {
 
-			this.setShaderStage( shaderStage );
+					if ( buildStage === 'generate' ) {
 
-			const flowNodes = this.flowNodes[ shaderStage ];
+						this.flowNode( node );
 
-			for ( const node of flowNodes ) {
+					} else {
 
-				node.build( this );
+						node.build( this );
 
-			}
+					}
 
-		}
-
-		// stage 3: pre-build vertex code used in fragment shader
-
-		this.setBuildStage( 'generate' );
-
-		if ( this.context.vertex && this.context.vertex.isNode ) {
-
-			this.flowNodeFromShaderStage( 'vertex', this.context.vertex );
-
-		}
-
-		// stage 4: generate shader
-
-		this.setBuildStage( 'generate' );
-
-		for ( const shaderStage of shaderStages ) {
-
-			this.setShaderStage( shaderStage );
-
-			const flowNodes = this.flowNodes[ shaderStage ];
-
-			for ( const node of flowNodes ) {
-
-				this.flowNode( node );
+				}
 
 			}
 
@@ -770,7 +763,7 @@ class NodeBuilder {
 		this.setBuildStage( null );
 		this.setShaderStage( null );
 
-		// stage 5: build code for a specific output
+		// stage 4: build code for a specific output
 
 		this.buildCode();
 

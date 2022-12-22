@@ -6,7 +6,14 @@ import * as fflate from '../libs/fflate.module.js';
 
 class USDZExporter {
 
-	async parse( scene, options = { ar: { anchoring: { type: 'plane' }, planeAnchoring: { alignment: 'horizontal' } } } ) {
+	async parse( scene, options = {} ) {
+
+		options = Object.assign( {
+			ar: {
+				anchoring: { type: 'plane' },
+				planeAnchoring: { alignment: 'horizontal' }
+			}
+		}, options );
 
 		const files = {};
 		const modelFileName = 'model.usda';
@@ -155,6 +162,10 @@ function imageToCanvas( image, color ) {
 		}
 
 		return canvas;
+
+	} else {
+
+		throw new Error( 'THREE.USDZExporter: No valid image data found. Unable to process texture.' );
 
 	}
 

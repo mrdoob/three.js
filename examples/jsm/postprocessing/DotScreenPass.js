@@ -11,8 +11,6 @@ class DotScreenPass extends Pass {
 
 		super();
 
-		if ( DotScreenShader === undefined ) console.error( 'THREE.DotScreenPass relies on DotScreenShader' );
-
 		const shader = DotScreenShader;
 
 		this.uniforms = UniformsUtils.clone( shader.uniforms );

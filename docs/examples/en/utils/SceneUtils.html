@@ -40,6 +40,20 @@
 		This is mostly useful for objects that need both a material and a wireframe implementation.
 		</p>
 
+    <h3>[method:T reduceVertices]( [param:Object3D object], [param:function func], [param:T initialValue] )</h3>
+		<p>
+		object -- The object to traverse (uses [page:Object3D.traverseVisible traverseVisible] internally). <br />
+		func -- The binary function applied for the reduction. Must have the signature: (value: T, vertex: Vector3): T. <br />
+    initialValue -- The value to initialize the reduction with. This is required
+    as it also sets the reduction type, which is not required to be Vector3.
+		</p>
+		<p>
+		Akin to Array.prototype.reduce(), but operating on the vertices of all the
+		visible descendant objects, in world space. Additionally, it can operate as a
+		transform-reduce, returning a different type T than the Vector3 input. This
+		can be useful for e.g. fitting a viewing frustum to the scene.
+		</p>
+
 		<h3>[method:undefined sortInstancedMesh]( [param:InstancedMesh mesh], [param:Function compareFn] )</h3>
 		<p>
 		mesh -- InstancedMesh in which instances will be sorted. <br />

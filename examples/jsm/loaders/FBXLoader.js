@@ -2271,13 +2271,6 @@ class GeometryParser {
 	// Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
 	parseNurbsGeometry( geoNode ) {
 
-		if ( NURBSCurve === undefined ) {
-
-			console.error( 'THREE.FBXLoader: The loader relies on NURBSCurve for any nurbs present in the model. Nurbs will show up as empty geometry.' );
-			return new BufferGeometry();
-
-		}
-
 		const order = parseInt( geoNode.Order );
 
 		if ( isNaN( order ) ) {
@@ -3558,13 +3551,7 @@ class BinaryParser {
 
 				}
 
-				if ( typeof fflate === 'undefined' ) {
-
-					console.error( 'THREE.FBXLoader: External library fflate.min.js required.' );
-
-				}
-
-				const data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
+				const data = fflate.unzlibSync( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) );
 				const reader2 = new BinaryReader( data.buffer );
 
 				switch ( type ) {

@@ -47,7 +47,7 @@ class MaterialNode extends Node {
 
 	}
 
-	generate( builder, output ) {
+	construct( builder ) {
 
 		const material = builder.context.material;
 		const scope = this.scope;
@@ -143,7 +143,7 @@ class MaterialNode extends Node {
 
 		}
 
-		return node.build( builder, output );
+		return node;
 
 	}
 
