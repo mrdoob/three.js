@@ -127,7 +127,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			stack.add( discard( lessThanEqual( diffuseColor.a, alphaTestNode ) ) )
+			stack.add( discard( lessThanEqual( diffuseColor.a, alphaTestNode ) ) );
 
 		}
 
