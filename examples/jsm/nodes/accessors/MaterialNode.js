@@ -6,14 +6,6 @@ import SplitNode from '../utils/SplitNode.js';
 
 class MaterialNode extends Node {
 
-	static ALPHA_TEST = 'alphaTest';
-	static COLOR = 'color';
-	static OPACITY = 'opacity';
-	static ROUGHNESS = 'roughness';
-	static METALNESS = 'metalness';
-	static EMISSIVE = 'emissive';
-	static ROTATION = 'rotation';
-
 	constructor( scope = MaterialNode.COLOR ) {
 
 		super();
@@ -148,5 +140,13 @@ class MaterialNode extends Node {
 	}
 
 }
+
+MaterialNode.ALPHA_TEST = 'alphaTest';
+MaterialNode.COLOR = 'color';
+MaterialNode.OPACITY = 'opacity';
+MaterialNode.ROUGHNESS = 'roughness';
+MaterialNode.METALNESS = 'metalness';
+MaterialNode.EMISSIVE = 'emissive';
+MaterialNode.ROTATION = 'rotation';
 
 export default MaterialNode;

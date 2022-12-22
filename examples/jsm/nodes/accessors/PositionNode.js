@@ -7,13 +7,6 @@ import OperatorNode from '../math/OperatorNode.js';
 
 class PositionNode extends Node {
 
-	static GEOMETRY = 'geometry';
-	static LOCAL = 'local';
-	static WORLD = 'world';
-	static WORLD_DIRECTION = 'worldDirection';
-	static VIEW = 'view';
-	static VIEW_DIRECTION = 'viewDirection';
-
 	constructor( scope = PositionNode.LOCAL ) {
 
 		super( 'vec3' );
@@ -91,5 +84,12 @@ class PositionNode extends Node {
 	}
 
 }
+
+PositionNode.GEOMETRY = 'geometry';
+PositionNode.LOCAL = 'local';
+PositionNode.WORLD = 'world';
+PositionNode.WORLD_DIRECTION = 'worldDirection';
+PositionNode.VIEW = 'view';
+PositionNode.VIEW_DIRECTION = 'viewDirection';
 
 export default PositionNode;

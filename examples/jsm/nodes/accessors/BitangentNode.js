@@ -8,11 +8,6 @@ import TangentNode from './TangentNode.js';
 
 class BitangentNode extends Node {
 
-	static GEOMETRY = 'geometry';
-	static LOCAL = 'local';
-	static VIEW = 'view';
-	static WORLD = 'world';
-
 	constructor( scope = BitangentNode.LOCAL ) {
 
 		super( 'vec3' );
@@ -58,5 +53,10 @@ class BitangentNode extends Node {
 	}
 
 }
+
+BitangentNode.GEOMETRY = 'geometry';
+BitangentNode.LOCAL = 'local';
+BitangentNode.VIEW = 'view';
+BitangentNode.WORLD = 'world';
 
 export default BitangentNode;
