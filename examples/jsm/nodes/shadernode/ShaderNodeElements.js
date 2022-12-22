@@ -3,6 +3,7 @@ import CubeTextureNode from '../accessors/CubeTextureNode.js';
 import InstanceNode from '../accessors/InstanceNode.js';
 import ReflectVectorNode from '../accessors/ReflectVectorNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
+import ExtendedMaterialNode from '../accessors/ExtendedMaterialNode.js';
 
 // display
 import BlendModeNode from '../display/BlendModeNode.js';
@@ -76,6 +77,10 @@ export const instance = nodeProxy( InstanceNode );
 export const reflectVector = nodeImmutable( ReflectVectorNode );
 
 export const skinning = nodeProxy( SkinningNode );
+
+// material
+
+export const materialNormal = nodeImmutable( ExtendedMaterialNode, ExtendedMaterialNode.NORMAL );
 
 // display
 
