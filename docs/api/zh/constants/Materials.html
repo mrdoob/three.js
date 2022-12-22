@@ -20,10 +20,14 @@
 		THREE.FrontSide
 		THREE.BackSide
 		THREE.DoubleSide
+		THREE.TwoPassDoubleSide
 		</code>
 		<p>
 			定义了哪一边的面将会被渲染 —— 正面，或是反面，还是两个面都渲染。
 			默认值是[page:Constant FrontSide]（只渲染正面）。
+		</p>
+		<p>
+		[page:Materials TwoPassDoubleSide] will renderer double-sided transparent materials in two passes in back-front order to mitigate transparency artifacts.
 		</p>
 
 		<h2>混合模式</h2>
