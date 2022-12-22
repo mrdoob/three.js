@@ -35,6 +35,7 @@
 	const FrontSide = 0;
 	const BackSide = 1;
 	const DoubleSide = 2;
+	const TwoPassDoubleSide = 3;
 	const NoBlending = 0;
 	const NormalBlending = 1;
 	const AdditiveBlending = 2;
@@ -5794,26 +5795,10 @@
 		}
 	}
 
-	var id$1 = 0;
-	function _classPrivateFieldLooseKey(name) {
-		return "__private_" + id$1++ + "_" + name;
-	}
-	function _classPrivateFieldLooseBase(receiver, privateKey) {
-		if (!Object.prototype.hasOwnProperty.call(receiver, privateKey)) {
-			throw new TypeError("attempted to use private field on non-instance");
-		}
-		return receiver;
-	}
-
 	let materialId = 0;
-	var _alphaTest = /*#__PURE__*/_classPrivateFieldLooseKey("alphaTest");
 	class Material extends EventDispatcher {
 		constructor() {
 			super();
-			Object.defineProperty(this, _alphaTest, {
-				writable: true,
-				value: 0
-			});
 			this.isMaterial = true;
 			Object.defineProperty(this, 'id', {
 				value: materialId++
@@ -5860,15 +5845,16 @@
 			this.toneMapped = true;
 			this.userData = {};
 			this.version = 0;
+			this._alphaTest = 0;
 		}
 		get alphaTest() {
-			return _classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest];
+			return this._alphaTest;
 		}
 		set alphaTest(value) {
-			if (_classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest] > 0 !== value > 0) {
+			if (this._alphaTest > 0 !== value > 0) {
 				this.version++;
 			}
-			_classPrivateFieldLooseBase(this, _alphaTest)[_alphaTest] = value;
+			this._alphaTest = value;
 		}
 		onBuild( /* shaderobject, renderer */) {}
 		onBeforeRender( /* renderer, scene, camera, geometry, object, group */) {}
@@ -7118,11 +7104,7 @@
 	const _vB$1 = /*@__PURE__*/new Vector3();
 	const _vC$1 = /*@__PURE__*/new Vector3();
 	const _tempA = /*@__PURE__*/new Vector3();
-	const _tempB = /*@__PURE__*/new Vector3();
-	const _tempC = /*@__PURE__*/new Vector3();
 	const _morphA = /*@__PURE__*/new Vector3();
-	const _morphB = /*@__PURE__*/new Vector3();
-	const _morphC = /*@__PURE__*/new Vector3();
 	const _uvA$1 = /*@__PURE__*/new Vector2();
 	const _uvB$1 = /*@__PURE__*/new Vector2();
 	const _uvC$1 = /*@__PURE__*/new Vector2();
@@ -7166,6 +7148,33 @@
 				}
 			}
 		}
+		getVertexPosition(vert, target) {
+			const geometry = this.geometry;
+			const position = geometry.attributes.position;
+			const morphPosition = geometry.morphAttributes.position;
+			const morphTargetsRelative = geometry.morphTargetsRelative;
+			target.fromBufferAttribute(position, vert);
+			const morphInfluences = this.morphTargetInfluences;
+			if (morphPosition && morphInfluences) {
+				_morphA.set(0, 0, 0);
+				for (let i = 0, il = morphPosition.length; i < il; i++) {
+					const influence = morphInfluences[i];
+					const morphAttribute = morphPosition[i];
+					if (influence === 0) continue;
+					_tempA.fromBufferAttribute(morphAttribute, vert);
+					if (morphTargetsRelative) {
+						_morphA.addScaledVector(_tempA, influence);
+					} else {
+						_morphA.addScaledVector(_tempA.sub(target), influence);
+					}
+				}
+				target.add(_morphA);
+			}
+			if (this.isSkinnedMesh) {
+				this.boneTransform(vert, target);
+			}
+			return target;
+		}
 		raycast(raycaster, intersects) {
 			const geometry = this.geometry;
 			const material = this.material;
@@ -7192,8 +7201,6 @@
 			let intersection;
 			const index = geometry.index;
 			const position = geometry.attributes.position;
-			const morphPosition = geometry.morphAttributes.position;
-			const morphTargetsRelative = geometry.morphTargetsRelative;
 			const uv = geometry.attributes.uv;
 			const uv2 = geometry.attributes.uv2;
 			const groups = geometry.groups;
@@ -7211,7 +7218,7 @@
 							const a = index.getX(j);
 							const b = index.getX(j + 1);
 							const c = index.getX(j + 2);
-							intersection = checkBufferGeometryIntersection(this, groupMaterial, raycaster, _ray$2, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c);
+							intersection = checkBufferGeometryIntersection(this, groupMaterial, raycaster, _ray$2, uv, uv2, a, b, c);
 							if (intersection) {
 								intersection.faceIndex = Math.floor(j / 3); // triangle number in indexed buffer semantics
 								intersection.face.materialIndex = group.materialIndex;
@@ -7226,7 +7233,7 @@
 						const a = index.getX(i);
 						const b = index.getX(i + 1);
 						const c = index.getX(i + 2);
-						intersection = checkBufferGeometryIntersection(this, material, raycaster, _ray$2, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c);
+						intersection = checkBufferGeometryIntersection(this, material, raycaster, _ray$2, uv, uv2, a, b, c);
 						if (intersection) {
 							intersection.faceIndex = Math.floor(i / 3); // triangle number in indexed buffer semantics
 							intersects.push(intersection);
@@ -7246,7 +7253,7 @@
 							const a = j;
 							const b = j + 1;
 							const c = j + 2;
-							intersection = checkBufferGeometryIntersection(this, groupMaterial, raycaster, _ray$2, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c);
+							intersection = checkBufferGeometryIntersection(this, groupMaterial, raycaster, _ray$2, uv, uv2, a, b, c);
 							if (intersection) {
 								intersection.faceIndex = Math.floor(j / 3); // triangle number in non-indexed buffer semantics
 								intersection.face.materialIndex = group.materialIndex;
@@ -7261,7 +7268,7 @@
 						const a = i;
 						const b = i + 1;
 						const c = i + 2;
-						intersection = checkBufferGeometryIntersection(this, material, raycaster, _ray$2, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c);
+						intersection = checkBufferGeometryIntersection(this, material, raycaster, _ray$2, uv, uv2, a, b, c);
 						if (intersection) {
 							intersection.faceIndex = Math.floor(i / 3); // triangle number in non-indexed buffer semantics
 							intersects.push(intersection);
@@ -7276,7 +7283,7 @@
 		if (material.side === BackSide) {
 			intersect = ray.intersectTriangle(pC, pB, pA, true, point);
 		} else {
-			intersect = ray.intersectTriangle(pA, pB, pC, material.side !== DoubleSide, point);
+			intersect = ray.intersectTriangle(pA, pB, pC, material.side === FrontSide, point);
 		}
 		if (intersect === null) return null;
 		_intersectionPointWorld.copy(point);
@@ -7289,41 +7296,10 @@
 			object: object
 		};
 	}
-	function checkBufferGeometryIntersection(object, material, raycaster, ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c) {
-		_vA$1.fromBufferAttribute(position, a);
-		_vB$1.fromBufferAttribute(position, b);
-		_vC$1.fromBufferAttribute(position, c);
-		const morphInfluences = object.morphTargetInfluences;
-		if (morphPosition && morphInfluences) {
-			_morphA.set(0, 0, 0);
-			_morphB.set(0, 0, 0);
-			_morphC.set(0, 0, 0);
-			for (let i = 0, il = morphPosition.length; i < il; i++) {
-				const influence = morphInfluences[i];
-				const morphAttribute = morphPosition[i];
-				if (influence === 0) continue;
-				_tempA.fromBufferAttribute(morphAttribute, a);
-				_tempB.fromBufferAttribute(morphAttribute, b);
-				_tempC.fromBufferAttribute(morphAttribute, c);
-				if (morphTargetsRelative) {
-					_morphA.addScaledVector(_tempA, influence);
-					_morphB.addScaledVector(_tempB, influence);
-					_morphC.addScaledVector(_tempC, influence);
-				} else {
-					_morphA.addScaledVector(_tempA.sub(_vA$1), influence);
-					_morphB.addScaledVector(_tempB.sub(_vB$1), influence);
-					_morphC.addScaledVector(_tempC.sub(_vC$1), influence);
-				}
-			}
-			_vA$1.add(_morphA);
-			_vB$1.add(_morphB);
-			_vC$1.add(_morphC);
-		}
-		if (object.isSkinnedMesh) {
-			object.boneTransform(a, _vA$1);
-			object.boneTransform(b, _vB$1);
-			object.boneTransform(c, _vC$1);
-		}
+	function checkBufferGeometryIntersection(object, material, raycaster, ray, uv, uv2, a, b, c) {
+		object.getVertexPosition(a, _vA$1);
+		object.getVertexPosition(b, _vB$1);
+		object.getVertexPosition(c, _vC$1);
 		const intersection = checkIntersection(object, material, raycaster, ray, _vA$1, _vB$1, _vC$1, _intersectionPoint);
 		if (intersection) {
 			if (uv) {
@@ -18000,14 +17976,14 @@
 
 		this.compile = function (scene, camera) {
 			function prepare(material, scene, object) {
-				if (material.transparent === true && material.side === DoubleSide) {
+				if (material.transparent === true && material.side === TwoPassDoubleSide) {
 					material.side = BackSide;
 					material.needsUpdate = true;
 					getProgram(material, scene, object);
 					material.side = FrontSide;
 					material.needsUpdate = true;
 					getProgram(material, scene, object);
-					material.side = DoubleSide;
+					material.side = TwoPassDoubleSide;
 				} else {
 					getProgram(material, scene, object);
 				}
@@ -18293,14 +18269,14 @@
 			object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
 			object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
 			material.onBeforeRender(_this, scene, camera, geometry, object, group);
-			if (material.transparent === true && material.side === DoubleSide) {
+			if (material.transparent === true && material.side === TwoPassDoubleSide) {
 				material.side = BackSide;
 				material.needsUpdate = true;
 				_this.renderBufferDirect(camera, scene, geometry, material, object, group);
 				material.side = FrontSide;
 				material.needsUpdate = true;
 				_this.renderBufferDirect(camera, scene, geometry, material, object, group);
-				material.side = DoubleSide;
+				material.side = TwoPassDoubleSide;
 			} else {
 				_this.renderBufferDirect(camera, scene, geometry, material, object, group);
 			}
@@ -32696,6 +32672,7 @@
 	exports.TrianglesDrawMode = TrianglesDrawMode;
 	exports.TubeBufferGeometry = TubeBufferGeometry;
 	exports.TubeGeometry = TubeGeometry;
+	exports.TwoPassDoubleSide = TwoPassDoubleSide;
 	exports.UVMapping = UVMapping;
 	exports.Uint16BufferAttribute = Uint16BufferAttribute;
 	exports.Uint32BufferAttribute = Uint32BufferAttribute;

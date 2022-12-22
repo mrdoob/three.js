@@ -17,6 +17,7 @@ const VSMShadowMap = 3;
 const FrontSide = 0;
 const BackSide = 1;
 const DoubleSide = 2;
+const TwoPassDoubleSide = 3;
 const NoBlending = 0;
 const NormalBlending = 1;
 const AdditiveBlending = 2;
@@ -8721,8 +8722,6 @@ let materialId = 0;
 
 class Material extends EventDispatcher {
 
-	#alphaTest = 0;
-
 	constructor() {
 
 		super();
@@ -8790,23 +8789,25 @@ class Material extends EventDispatcher {
 
 		this.version = 0;
 
+		this._alphaTest = 0;
+
 	}
 
 	get alphaTest() {
 
-		return this.#alphaTest;
+		return this._alphaTest;
 
 	}
 
 	set alphaTest( value ) {
 
-		if ( this.#alphaTest > 0 !== value > 0 ) {
+		if ( this._alphaTest > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this.#alphaTest = value;
+		this._alphaTest = value;
 
 	}
 
@@ -10842,12 +10843,7 @@ const _vB$1 = /*@__PURE__*/ new Vector3();
 const _vC$1 = /*@__PURE__*/ new Vector3();
 
 const _tempA = /*@__PURE__*/ new Vector3();
-const _tempB = /*@__PURE__*/ new Vector3();
-const _tempC = /*@__PURE__*/ new Vector3();
-
 const _morphA = /*@__PURE__*/ new Vector3();
-const _morphB = /*@__PURE__*/ new Vector3();
-const _morphC = /*@__PURE__*/ new Vector3();
 
 const _uvA$1 = /*@__PURE__*/ new Vector2();
 const _uvB$1 = /*@__PURE__*/ new Vector2();
@@ -10927,6 +10923,56 @@ class Mesh extends Object3D {
 
 	}
 
+	getVertexPosition( vert, target ) {
+
+		const geometry = this.geometry;
+		const position = geometry.attributes.position;
+		const morphPosition = geometry.morphAttributes.position;
+		const morphTargetsRelative = geometry.morphTargetsRelative;
+
+		target.fromBufferAttribute( position, vert );
+
+		const morphInfluences = this.morphTargetInfluences;
+
+		if ( morphPosition && morphInfluences ) {
+
+			_morphA.set( 0, 0, 0 );
+
+			for ( let i = 0, il = morphPosition.length; i < il; i ++ ) {
+
+				const influence = morphInfluences[ i ];
+				const morphAttribute = morphPosition[ i ];
+
+				if ( influence === 0 ) continue;
+
+				_tempA.fromBufferAttribute( morphAttribute, vert );
+
+				if ( morphTargetsRelative ) {
+
+					_morphA.addScaledVector( _tempA, influence );
+
+				} else {
+
+					_morphA.addScaledVector( _tempA.sub( target ), influence );
+
+				}
+
+			}
+
+			target.add( _morphA );
+
+		}
+
+		if ( this.isSkinnedMesh ) {
+
+			this.boneTransform( vert, target );
+
+		}
+
+		return target;
+
+	}
+
 	raycast( raycaster, intersects ) {
 
 		const geometry = this.geometry;
@@ -10961,8 +11007,6 @@ class Mesh extends Object3D {
 
 		const index = geometry.index;
 		const position = geometry.attributes.position;
-		const morphPosition = geometry.morphAttributes.position;
-		const morphTargetsRelative = geometry.morphTargetsRelative;
 		const uv = geometry.attributes.uv;
 		const uv2 = geometry.attributes.uv2;
 		const groups = geometry.groups;
@@ -10988,7 +11032,7 @@ class Mesh extends Object3D {
 						const b = index.getX( j + 1 );
 						const c = index.getX( j + 2 );
 
-						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray$2, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray$2, uv, uv2, a, b, c );
 
 						if ( intersection ) {
 
@@ -11013,7 +11057,7 @@ class Mesh extends Object3D {
 					const b = index.getX( i + 1 );
 					const c = index.getX( i + 2 );
 
-					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray$2, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray$2, uv, uv2, a, b, c );
 
 					if ( intersection ) {
 
@@ -11046,7 +11090,7 @@ class Mesh extends Object3D {
 						const b = j + 1;
 						const c = j + 2;
 
-						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray$2, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray$2, uv, uv2, a, b, c );
 
 						if ( intersection ) {
 
@@ -11071,7 +11115,7 @@ class Mesh extends Object3D {
 					const b = i + 1;
 					const c = i + 2;
 
-					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray$2, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray$2, uv, uv2, a, b, c );
 
 					if ( intersection ) {
 
@@ -11100,7 +11144,7 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 	} else {
 
-		intersect = ray.intersectTriangle( pA, pB, pC, material.side !== DoubleSide, point );
+		intersect = ray.intersectTriangle( pA, pB, pC, ( material.side === FrontSide ), point );
 
 	}
 
@@ -11121,60 +11165,11 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 }
 
-function checkBufferGeometryIntersection( object, material, raycaster, ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c ) {
+function checkBufferGeometryIntersection( object, material, raycaster, ray, uv, uv2, a, b, c ) {
 
-	_vA$1.fromBufferAttribute( position, a );
-	_vB$1.fromBufferAttribute( position, b );
-	_vC$1.fromBufferAttribute( position, c );
-
-	const morphInfluences = object.morphTargetInfluences;
-
-	if ( morphPosition && morphInfluences ) {
-
-		_morphA.set( 0, 0, 0 );
-		_morphB.set( 0, 0, 0 );
-		_morphC.set( 0, 0, 0 );
-
-		for ( let i = 0, il = morphPosition.length; i < il; i ++ ) {
-
-			const influence = morphInfluences[ i ];
-			const morphAttribute = morphPosition[ i ];
-
-			if ( influence === 0 ) continue;
-
-			_tempA.fromBufferAttribute( morphAttribute, a );
-			_tempB.fromBufferAttribute( morphAttribute, b );
-			_tempC.fromBufferAttribute( morphAttribute, c );
-
-			if ( morphTargetsRelative ) {
-
-				_morphA.addScaledVector( _tempA, influence );
-				_morphB.addScaledVector( _tempB, influence );
-				_morphC.addScaledVector( _tempC, influence );
-
-			} else {
-
-				_morphA.addScaledVector( _tempA.sub( _vA$1 ), influence );
-				_morphB.addScaledVector( _tempB.sub( _vB$1 ), influence );
-				_morphC.addScaledVector( _tempC.sub( _vC$1 ), influence );
-
-			}
-
-		}
-
-		_vA$1.add( _morphA );
-		_vB$1.add( _morphB );
-		_vC$1.add( _morphC );
-
-	}
-
-	if ( object.isSkinnedMesh ) {
-
-		object.boneTransform( a, _vA$1 );
-		object.boneTransform( b, _vB$1 );
-		object.boneTransform( c, _vC$1 );
-
-	}
+	object.getVertexPosition( a, _vA$1 );
+	object.getVertexPosition( b, _vB$1 );
+	object.getVertexPosition( c, _vC$1 );
 
 	const intersection = checkIntersection( object, material, raycaster, ray, _vA$1, _vB$1, _vC$1, _intersectionPoint );
 
@@ -27769,7 +27764,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		function prepare( material, scene, object ) {
 
-			if ( material.transparent === true && material.side === DoubleSide ) {
+			if ( material.transparent === true && material.side === TwoPassDoubleSide ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -27779,7 +27774,7 @@ function WebGLRenderer( parameters = {} ) {
 				material.needsUpdate = true;
 				getProgram( material, scene, object );
 
-				material.side = DoubleSide;
+				material.side = TwoPassDoubleSide;
 
 			} else {
 
@@ -28251,7 +28246,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		material.onBeforeRender( _this, scene, camera, geometry, object, group );
 
-		if ( material.transparent === true && material.side === DoubleSide ) {
+		if ( material.transparent === true && material.side === TwoPassDoubleSide ) {
 
 			material.side = BackSide;
 			material.needsUpdate = true;
@@ -28261,7 +28256,7 @@ function WebGLRenderer( parameters = {} ) {
 			material.needsUpdate = true;
 			_this.renderBufferDirect( camera, scene, geometry, material, object, group );
 
-			material.side = DoubleSide;
+			material.side = TwoPassDoubleSide;
 
 		} else {
 
@@ -50219,4 +50214,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleBufferGeometry, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, CompressedArrayTexture, CompressedTexture, CompressedTextureLoader, ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderBufferGeometry, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeBufferGeometry, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, Float64BufferAttribute, FloatType, Fog, FogExp2, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheBufferGeometry, LatheGeometry, Layers, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, Path, PerspectiveCamera, Plane, PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingBufferGeometry, RingGeometry, SRGBColorSpace, Scene, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronBufferGeometry, TetrahedronGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusGeometry, TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeBufferGeometry, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoTexture, WebGL1Renderer, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderer, WebGLUtils, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };
+export { ACESFilmicToneMapping, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AlphaFormat, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightProbe, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrowHelper, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BackSide, BasicDepthPacking, BasicShadowMap, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxBufferGeometry, BoxGeometry, BoxHelper, BufferAttribute, BufferGeometry, BufferGeometryLoader, ByteType, Cache, Camera, CameraHelper, CanvasTexture, CapsuleBufferGeometry, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleBufferGeometry, CircleGeometry, ClampToEdgeWrapping, Clock, Color, ColorKeyframeTrack, ColorManagement, CompressedArrayTexture, CompressedTexture, CompressedTextureLoader, ConeBufferGeometry, ConeGeometry, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderBufferGeometry, CylinderGeometry, Cylindrical, Data3DTexture, DataArrayTexture, DataTexture, DataTexture2DArray, DataTexture3D, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DepthFormat, DepthStencilFormat, DepthTexture, DirectionalLight, DirectionalLightHelper, DiscreteInterpolant, DodecahedronBufferGeometry, DodecahedronGeometry, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EdgesGeometry, EllipseCurve, EqualDepth, EqualStencilFunc, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExtrudeBufferGeometry, ExtrudeGeometry, FileLoader, Float16BufferAttribute, Float32BufferAttribute, Float64BufferAttribute, FloatType, Fog, FogExp2, FramebufferTexture, FrontSide, Frustum, GLBufferAttribute, GLSL1, GLSL3, GreaterDepth, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightProbe, IcosahedronBufferGeometry, IcosahedronGeometry, ImageBitmapLoader, ImageLoader, ImageUtils, ImmediateRenderObject, IncrementStencilOp, IncrementWrapStencilOp, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, KeepStencilOp, KeyframeTrack, LOD, LatheBufferGeometry, LatheGeometry, Layers, LessDepth, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightProbe, Line, Line3, LineBasicMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineLoop, LineSegments, LinearEncoding, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, Loader, LoaderUtils, LoadingManager, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, MOUSE, Material, MaterialLoader, MathUtils, Matrix3, Matrix4, MaxEquation, Mesh, MeshBasicMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshMatcapMaterial, MeshNormalMaterial, MeshPhongMaterial, MeshPhysicalMaterial, MeshStandardMaterial, MeshToonMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, NormalAnimationBlendMode, NormalBlending, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, ObjectLoader, ObjectSpaceNormalMap, OctahedronBufferGeometry, OctahedronGeometry, OneFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, PCFShadowMap, PCFSoftShadowMap, PMREMGenerator, Path, PerspectiveCamera, Plane, PlaneBufferGeometry, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, Points, PointsMaterial, PolarGridHelper, PolyhedronBufferGeometry, PolyhedronGeometry, PositionalAudio, PropertyBinding, PropertyMixer, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBFormat, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGFormat, RGIntegerFormat, RawShaderMaterial, Ray, Raycaster, RectAreaLight, RedFormat, RedIntegerFormat, ReinhardToneMapping, RepeatWrapping, ReplaceStencilOp, ReverseSubtractEquation, RingBufferGeometry, RingGeometry, SRGBColorSpace, Scene, ShaderChunk, ShaderLib, ShaderMaterial, ShadowMaterial, Shape, ShapeBufferGeometry, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, Source, Sphere, SphereBufferGeometry, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SpotLight, SpotLightHelper, Sprite, SpriteMaterial, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TOUCH, TangentSpaceNormalMap, TetrahedronBufferGeometry, TetrahedronGeometry, Texture, TextureLoader, TorusBufferGeometry, TorusGeometry, TorusKnotBufferGeometry, TorusKnotGeometry, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TubeBufferGeometry, TubeGeometry, TwoPassDoubleSide, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform, UniformsGroup, UniformsLib, UniformsUtils, UnsignedByteType, UnsignedInt248Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, VSMShadowMap, Vector2, Vector3, Vector4, VectorKeyframeTrack, VideoTexture, WebGL1Renderer, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLMultisampleRenderTarget, WebGLRenderTarget, WebGLRenderer, WebGLUtils, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, _SRGBAFormat, sRGBEncoding };
