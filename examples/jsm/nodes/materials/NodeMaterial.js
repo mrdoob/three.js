@@ -61,7 +61,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		const outgoingLightNode = this.constructLighting( builder, fragmentStack );
 
-		fragmentStack.outputNode = this.constructOutput( builder, fragmentStack, vec4( outgoingLightNode, diffuseColor.a ) );
+		fragmentStack.outputNode = this.constructOutput( builder, fragmentStack, outgoingLightNode, diffuseColor.a );
 
 		// < FLOW >
 
@@ -188,13 +188,13 @@ class NodeMaterial extends ShaderMaterial {
 
 	constructLighting( builder ) {
 
-		const { material, renderer } = builder;
+		const { material } = builder;
 
 		// OUTGOING LIGHT
 
 		const lights = ( this.lights === true ) || this.lightsNode !== null;
 
-		const lightsNode = lights	 ? this.constructLights( builder ) : null;
+		const lightsNode = lights ? this.constructLights( builder ) : null;
 		const lightingModelNode = lightsNode ? this.constructLightingModel( builder ) : null;
 
 		let outgoingLightNode = diffuseColor.xyz;
@@ -213,23 +213,27 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		// TONE MAPPING
-
-		if ( renderer.toneMappingNode?.isNode === true ) {
-
-			outgoingLightNode = context( renderer.toneMappingNode, { color: outgoingLightNode } );
-
-		}
-
 		return outgoingLightNode;
 
 	}
 
-	constructOutput( builder, stack, outputNode ) {
+	constructOutput( builder, stack, outgoingLight, opacity ) {
+
+		const renderer = builder.renderer;
+
+		// TONE MAPPING
+
+		if ( renderer.toneMappingNode?.isNode === true ) {
+
+			outgoingLight = context( renderer.toneMappingNode, { color: outgoingLight } );
+
+		}
+
+		let outputNode = vec4( outgoingLight, opacity );
 
 		// ENCODING
 
-		outputNode = colorSpace( outputNode, builder.renderer.outputEncoding );
+		outputNode = colorSpace( outputNode, renderer.outputEncoding );
 
 		// FOG
 
