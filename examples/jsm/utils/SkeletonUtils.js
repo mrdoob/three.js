@@ -1,6 +1,7 @@
 import {
 	AnimationClip,
 	AnimationMixer,
+	BufferAttribute,
 	Euler,
 	Matrix4,
 	Quaternion,
@@ -476,6 +477,30 @@ function getNearestBone( bone, names ) {
 
 }
 
+function getRootBone( rootNode ) {
+
+	const rootBones = [];
+
+	rootNode.traverse( function ( object ) {
+
+		if ( object.isBone && ! ( object.parent && object.parent.isBone ) ) {
+
+			rootBones.push( object );
+
+		}
+
+	} );
+
+	if ( rootBones.length !== 1 ) {
+
+		throw new Error( `THREE.SkeletonUtils: Expected 1 root bone, found ${rootBones.length}.` );
+
+	}
+
+	return rootBones[ 0 ];
+
+}
+
 function findBoneTrackData( name, tracks ) {
 
 	const regexp = /\[(.*)\]\.(.*)/,
@@ -566,9 +591,6 @@ function clone( source ) {
 
 }
 
-
-
-
 function parallelTraverse( a, b, callback ) {
 
 	callback( a, b );
@@ -581,6 +603,45 @@ function parallelTraverse( a, b, callback ) {
 
 }
 
+function extractRootMotion( rootNode, targetClip, targetVelocity ) {
+
+	const rootBone = getRootBone( rootNode );
+	const trackName = ( rootBone.name || rootBone.uuid ) + '.position';
+	const track = targetClip.tracks.find( ( track ) => track.name === trackName );
+
+	const startTime = track.times[ 0 ]
+	const endTime = track.times[ track.times.length - 1 ]
+	const duration = endTime - startTime;
+
+	const valueSize = track.getValueSize(); // 3 (default), or 9 (cubicspline)
+	const values = new BufferAttribute( track.values, valueSize );
+
+	const startPosition = new Vector3().fromBufferAttribute( values, 0 );
+	const endPosition = new Vector3().fromBufferAttribute( values, values.count - 1 );
+
+	targetVelocity
+		.copy( endPosition )
+		.sub( startPosition )
+		.divideScalar( duration );
+
+	const position = new Vector3();
+
+	for ( let i = 0, il = track.times.length; i < il; i ++ ) {
+
+		const dt = track.times[ i ] - startTime;
+
+		position.fromBufferAttribute( values, i );
+		position.x -= targetVelocity.x * dt;
+		position.y -= targetVelocity.y * dt;
+		position.z -= targetVelocity.z * dt;
+		values.setXYZ( i, position.x, position.y, position.z );
+
+	}
+
+	return targetVelocity;
+
+}
+
 export {
 	retarget,
 	retargetClip,
@@ -590,7 +651,9 @@ export {
 	getBones,
 	getBoneByName,
 	getNearestBone,
+	getRootBone,
 	findBoneTrackData,
 	getEqualsBonesNames,
 	clone,
+	extractRootMotion,
 };
