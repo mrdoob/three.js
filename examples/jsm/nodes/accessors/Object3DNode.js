@@ -30,7 +30,7 @@ class Object3DNode extends Node {
 
 			return 'mat3';
 
-		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
+		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION ) {
 
 			return 'vec3';
 
@@ -60,6 +60,12 @@ class Object3DNode extends Node {
 
 			uniformNode.value.setFromMatrixPosition( object.matrixWorld );
 
+		} else if ( scope === Object3DNode.DIRECTION ) {
+
+			uniformNode.value = uniformNode.value || new Vector3();
+
+			object.getWorldDirection( uniformNode.value );
+
 		} else if ( scope === Object3DNode.VIEW_POSITION ) {
 
 			const camera = frame.camera;
@@ -85,7 +91,7 @@ class Object3DNode extends Node {
 
 			this._uniformNode.nodeType = 'mat3';
 
-		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
+		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION ) {
 
 			this._uniformNode.nodeType = 'vec3';
 
@@ -118,5 +124,6 @@ Object3DNode.NORMAL_MATRIX = 'normalMatrix';
 Object3DNode.WORLD_MATRIX = 'worldMatrix';
 Object3DNode.POSITION = 'position';
 Object3DNode.VIEW_POSITION = 'viewPosition';
+Object3DNode.DIRECTION = 'direction';
 
 export default Object3DNode;

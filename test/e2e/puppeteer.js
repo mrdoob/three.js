@@ -53,6 +53,7 @@ const exceptionList = [
 	'webgpu_instance_mesh',
 	'webgpu_instance_uniform',
 	'webgpu_lights_custom',
+	'webgpu_lights_phong',
 	'webgpu_lights_selective',
 	'webgpu_loader_gltf',
 	'webgpu_materials',
