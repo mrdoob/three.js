@@ -58,16 +58,10 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.test( 'RotationOrders', ( assert ) => {
 
-			assert.ok( Array.isArray( Euler.RotationOrders ), 'Passed!' );
-			assert.deepEqual( Euler.RotationOrders, [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ], 'Passed!' );
+		QUnit.test( 'DEFAULT_ORDER', ( assert ) => {
 
-		} );
-
-		QUnit.test( 'DefaultOrder', ( assert ) => {
-
-			assert.equal( Euler.DefaultOrder, 'XYZ', 'Passed!' );
+			assert.equal( Euler.DEFAULT_ORDER, 'XYZ', 'Passed!' );
 
 
 		} );
@@ -163,10 +157,10 @@ export default QUnit.module( 'Maths', () => {
 
 
 			var a = new Euler();
-			assert.ok( a.order === Euler.DefaultOrder, 'Passed!' );
+			assert.ok( a.order === Euler.DEFAULT_ORDER, 'Passed!' );
 
 			a = new Euler( 1, 2, 3 );
-			assert.ok( a.order === Euler.DefaultOrder, 'Passed!' );
+			assert.ok( a.order === Euler.DEFAULT_ORDER, 'Passed!' );
 
 			a = new Euler( 4, 5, 6, 'YZX' );
 			assert.ok( a.order === 'YZX', 'Passed!' );

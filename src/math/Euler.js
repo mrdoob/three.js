@@ -7,7 +7,7 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
 
 class Euler {
 
-	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
+	constructor( x = 0, y = 0, z = 0, order = Euler.DEFAULT_ORDER ) {
 
 		this.isEuler = true;
 
@@ -318,7 +318,6 @@ class Euler {
 
 }
 
-Euler.DefaultOrder = 'XYZ';
-Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+Euler.DEFAULT_ORDER = 'XYZ';
 
 export { Euler };
