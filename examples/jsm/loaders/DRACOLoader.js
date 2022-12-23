@@ -351,6 +351,12 @@ class DRACOLoader extends Loader {
 
 		this.workerPool.length = 0;
 
+		if ( this.workerSourceURL !== '' ) {
+
+			URL.revokeObjectURL( this.workerSourceURL );
+
+		}
+
 		return this;
 
 	}

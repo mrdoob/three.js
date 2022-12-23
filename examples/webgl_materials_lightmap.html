@@ -9,39 +9,6 @@
 
 	<body>
 
-		<script type="x-shader/x-vertex" id="vertexShader">
-
-			varying vec3 vWorldPosition;
-
-			void main() {
-
-				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
-				vWorldPosition = worldPosition.xyz;
-
-				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-			}
-
-		</script>
-
-		<script type="x-shader/x-fragment" id="fragmentShader">
-
-			uniform vec3 topColor;
-			uniform vec3 bottomColor;
-			uniform float offset;
-			uniform float exponent;
-
-			varying vec3 vWorldPosition;
-
-			void main() {
-
-				float h = normalize( vWorldPosition + offset ).y;
-				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h, 0.0 ), exponent ), 0.0 ) ), 1.0 );
-
-			}
-
-		</script>
-
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
 		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
@@ -50,7 +17,8 @@
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
 				}
 			}
 		</script>
@@ -63,8 +31,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			const SCREEN_WIDTH = window.innerWidth;
-			const SCREEN_HEIGHT = window.innerHeight;
+			import { MeshBasicNodeMaterial, vec4, color, positionLocal, mix, max, pow } from 'three/nodes';
+			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
 			let container, stats;
 			let camera, scene, renderer;
@@ -74,12 +42,14 @@
 
 			async function init() {
 
+				const { innerWidth, innerHeight } = window;
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				// CAMERA
 
-				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 40, innerWidth / innerHeight, 1, 10000 );
 				camera.position.set( 700, 200, - 500 );
 
 				// SCENE
@@ -96,32 +66,25 @@
 
 				// SKYDOME
 
-				const vertexShader = document.getElementById( 'vertexShader' ).textContent;
-				const fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
-				const uniforms = {
-					topColor: { value: new THREE.Color( 0x0077ff ) },
-					bottomColor: { value: new THREE.Color( 0xffffff ) },
-					offset: { value: 400 },
-					exponent: { value: 0.6 }
-				};
-				uniforms.topColor.value.copy( light.color );
+				const topColor = new THREE.Color().copy( light.color ).convertSRGBToLinear();
+				const bottomColor = new THREE.Color( 0xffffff ).convertSRGBToLinear();
+				const offset = 400;
+				const exponent = 0.6;
 
-				const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
-				const skyMat = new THREE.ShaderMaterial( {
-					uniforms: uniforms,
-					vertexShader: vertexShader,
-					fragmentShader: fragmentShader,
-					side: THREE.BackSide
-				} );
+				const h = positionLocal.add( offset ).normalize().y;
 
-				const sky = new THREE.Mesh( skyGeo, skyMat );
+				const skyMat = new MeshBasicNodeMaterial();
+				skyMat.colorNode = vec4( mix( color( bottomColor ), color( topColor ), h.max( 0.0 ).pow( exponent ) ), 1.0 );
+				skyMat.side = THREE.BackSide;
+
+				const sky = new THREE.Mesh( new THREE.SphereGeometry( 4000, 32, 15 ), skyMat );
 				scene.add( sky );
 
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setSize( innerWidth, innerHeight );
 				container.appendChild( renderer.domElement );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -162,6 +125,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				nodeFrame.update();
 
 				renderer.render( scene, camera );
 				stats.update();

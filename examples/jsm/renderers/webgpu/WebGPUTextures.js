@@ -716,8 +716,8 @@ class WebGPUTextures {
 
 			const faceImage = image.length > 0 ? image[ 0 ].image || image[ 0 ] : null;
 
-			width = faceImage?.width || 1;
-			height = faceImage?.height || 1;
+			width = faceImage ? faceImage.width : 1;
+			height = faceImage ? faceImage.height : 1;
 			depth = 6; // one image for each side of the cube map
 
 		} else if ( image !== null ) {

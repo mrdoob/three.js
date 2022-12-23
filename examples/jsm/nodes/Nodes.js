@@ -72,7 +72,10 @@ import OperatorNode from './math/OperatorNode.js';
 import CondNode from './math/CondNode.js';
 
 // lighting
-import PunctualLightNode from './lighting/PunctualLightNode.js';
+import PointLightNode from './lighting/PointLightNode.js';
+import DirectionalLightNode from './lighting/DirectionalLightNode.js';
+import SpotLightNode from './lighting/SpotLightNode.js';
+import AmbientLightNode from './lighting/AmbientLightNode.js';
 import LightsNode from './lighting/LightsNode.js';
 import LightingNode from './lighting/LightingNode.js';
 import LightingContextNode from './lighting/LightingContextNode.js';
@@ -204,7 +207,10 @@ const nodeLib = {
 	CondNode,
 
 	// lighting
-	PunctualLightNode,
+	PointLightNode,
+	DirectionalLightNode,
+	SpotLightNode,
+	AmbientLightNode,
 	LightsNode,
 	LightingNode,
 	LightingContextNode,
@@ -329,7 +335,10 @@ export {
 	CondNode,
 
 	// lighting
-	PunctualLightNode,
+	PointLightNode,
+	DirectionalLightNode,
+	SpotLightNode,
+	AmbientLightNode,
 	LightsNode,
 	LightingNode,
 	LightingContextNode,

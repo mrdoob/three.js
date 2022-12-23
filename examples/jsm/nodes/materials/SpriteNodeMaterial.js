@@ -59,7 +59,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		let alignedPosition = vertex.xy;
 
-		if ( builder.object.center?.isVector2 === true ) {
+		if ( builder.object.center && builder.object.center.isVector2 === true ) {
 
 			alignedPosition = sub( alignedPosition, sub( uniform( builder.object.center ), vec2( 0.5 ) ) );
 

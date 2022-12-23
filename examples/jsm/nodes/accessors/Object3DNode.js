@@ -5,12 +5,6 @@ import { NodeUpdateType } from '../core/constants.js';
 
 class Object3DNode extends Node {
 
-	static VIEW_MATRIX = 'viewMatrix';
-	static NORMAL_MATRIX = 'normalMatrix';
-	static WORLD_MATRIX = 'worldMatrix';
-	static POSITION = 'position';
-	static VIEW_POSITION = 'viewPosition';
-
 	constructor( scope = Object3DNode.VIEW_MATRIX, object3d = null ) {
 
 		super();
@@ -118,5 +112,11 @@ class Object3DNode extends Node {
 	}
 
 }
+
+Object3DNode.VIEW_MATRIX = 'viewMatrix';
+Object3DNode.NORMAL_MATRIX = 'normalMatrix';
+Object3DNode.WORLD_MATRIX = 'worldMatrix';
+Object3DNode.POSITION = 'position';
+Object3DNode.VIEW_POSITION = 'viewPosition';
 
 export default Object3DNode;

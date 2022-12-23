@@ -23,6 +23,7 @@ import MaterialReferenceNode from '../accessors/MaterialReferenceNode.js';
 import ModelViewProjectionNode from '../accessors/ModelViewProjectionNode.js';
 import NormalNode from '../accessors/NormalNode.js';
 import ModelNode from '../accessors/ModelNode.js';
+import Object3DNode from '../accessors/Object3DNode.js';
 import PointUVNode from '../accessors/PointUVNode.js';
 import PositionNode from '../accessors/PositionNode.js';
 import ReferenceNode from '../accessors/ReferenceNode.js';
@@ -96,7 +97,7 @@ export const func = ( code, includes ) => {
 	const node = nodeObject( new FunctionNode( code, includes ) );
 
 	const call = node.call.bind( node );
-	node.call = ( ...params ) => nodeObject( call( params.length > 1 || params[ 0 ]?.isNode === true ? nodeArray( params ) : nodeObjects( params[ 0 ] ) ) );
+	node.call = ( ...params ) => nodeObject( call( params.length > 1 || ( params[ 0 ] && params[ 0 ].isNode === true ) ? nodeArray( params ) : nodeObjects( params[ 0 ] ) ) );
 
 	return node;
 
@@ -107,7 +108,7 @@ export const uniform = ( nodeOrType ) => {
 	const nodeType = getConstNodeType( nodeOrType );
 
 	// @TODO: get ConstNode from .traverse() in the future
-	const value = nodeOrType.isNode === true ? nodeOrType.node?.value || nodeOrType.value : nodeOrType;
+	const value = nodeOrType.isNode === true ? ( nodeOrType.node && nodeOrType.node.value ) || nodeOrType.value : nodeOrType;
 
 	return nodeObject( new UniformNode( value, nodeType ) );
 
@@ -266,6 +267,12 @@ export const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATR
 export const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
 export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
 export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
+
+export const objectViewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
+export const objectNormalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
+export const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
+export const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
+export const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
 
 export const positionGeometry = nodeImmutable( PositionNode, PositionNode.GEOMETRY );
 export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );

@@ -34,10 +34,6 @@ const hueNode = new ShaderNode( ( { color, adjustment } ) => {
 
 class ColorAdjustmentNode extends TempNode {
 
-	static SATURATION = 'saturation';
-	static VIBRANCE = 'vibrance';
-	static HUE = 'hue';
-
 	constructor( method, colorNode, adjustmentNode = float( 1 ) ) {
 
 		super( 'vec3' );
@@ -80,5 +76,9 @@ class ColorAdjustmentNode extends TempNode {
 	}
 
 }
+
+ColorAdjustmentNode.SATURATION = 'saturation';
+ColorAdjustmentNode.VIBRANCE = 'vibrance';
+ColorAdjustmentNode.HUE = 'hue';
 
 export default ColorAdjustmentNode;
