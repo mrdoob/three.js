@@ -316,38 +316,8 @@ class Euler {
 
 	}
 
-	// r148
-
-	static get RotationOrders() {
-
-		console.error( 'THREE.Euler.RotationOrders has been removed.' );
-
-	}
-
-	static set RotationOrders( value ) {
-
-		console.error( 'THREE.Euler.RotationOrders has been removed.' );
-
-	}
-
-	// r148
-
-	static get DefaultOrder() {
-
-		console.warn( 'THREE.Euler: Euler.DefaultOrder has been renamed to Euler.DEFAULT_ORDER.' );
-		return Euler.DEFAULT_ORDER;
-
-	}
-
-	static set DefaultOrder( value ) {
-
-		console.warn( 'THREE.Euler: Euler.DefaultOrder has been renamed to Euler.DEFAULT_ORDER.' );
-		Euler.DEFAULT_ORDER = value;
-
-	}
-
-	static DEFAULT_ORDER = 'XYZ';
-
 }
+
+Euler.DEFAULT_ORDER = 'XYZ';
 
 export { Euler };
