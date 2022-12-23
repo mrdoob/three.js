@@ -613,11 +613,13 @@ function extractRootMotion( rootNode, targetClip, targetVelocity ) {
 	const endTime = track.times[ track.times.length - 1 ]
 	const duration = endTime - startTime;
 
-	const valueSize = track.getValueSize(); // 3 (default), or 9 (cubicspline)
-	const values = new BufferAttribute( track.values, valueSize );
+	const values = new BufferAttribute( track.values, 3 );
+	const valuesPerKeyframe = track.getValueSize() / 3; // 1 (value), or 3 (inTan,value,outTan)
+	const valueOffset = valuesPerKeyframe === 3 ? 1 : 0;
 
-	const startPosition = new Vector3().fromBufferAttribute( values, 0 );
-	const endPosition = new Vector3().fromBufferAttribute( values, values.count - 1 );
+	const startPosition = new Vector3().fromBufferAttribute( values, valueOffset );
+	const endPositionIndex = values.count - valuesPerKeyframe + valueOffset;
+	const endPosition = new Vector3().fromBufferAttribute( values, endPositionIndex );
 
 	targetVelocity
 		.copy( endPosition )
@@ -630,11 +632,11 @@ function extractRootMotion( rootNode, targetClip, targetVelocity ) {
 
 		const dt = track.times[ i ] - startTime;
 
-		position.fromBufferAttribute( values, i );
+		position.fromBufferAttribute( values, i + valueOffset );
 		position.x -= targetVelocity.x * dt;
 		position.y -= targetVelocity.y * dt;
 		position.z -= targetVelocity.z * dt;
-		values.setXYZ( i, position.x, position.y, position.z );
+		values.setXYZ( i + valueOffset, position.x, position.y, position.z );
 
 	}
 
