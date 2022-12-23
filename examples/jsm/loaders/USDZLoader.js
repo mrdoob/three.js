@@ -254,7 +254,7 @@ class USDZLoader extends Loader {
 
 			if ( id !== undefined ) {
 
-				const def = `def "%{id}"`;
+				const def = `def "${id}"`;
 
 				if ( def in data ) {
 
