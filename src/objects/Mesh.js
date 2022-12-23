@@ -98,14 +98,14 @@ class Mesh extends Object3D {
 
 	}
 
-	getVertexPosition( vert, target ) {
+	getVertexPosition( index, target ) {
 
 		const geometry = this.geometry;
 		const position = geometry.attributes.position;
 		const morphPosition = geometry.morphAttributes.position;
 		const morphTargetsRelative = geometry.morphTargetsRelative;
 
-		target.fromBufferAttribute( position, vert );
+		target.fromBufferAttribute( position, index );
 
 		const morphInfluences = this.morphTargetInfluences;
 
@@ -120,7 +120,7 @@ class Mesh extends Object3D {
 
 				if ( influence === 0 ) continue;
 
-				_tempA.fromBufferAttribute( morphAttribute, vert );
+				_tempA.fromBufferAttribute( morphAttribute, index );
 
 				if ( morphTargetsRelative ) {
 
@@ -140,7 +140,7 @@ class Mesh extends Object3D {
 
 		if ( this.isSkinnedMesh ) {
 
-			this.boneTransform( vert, target );
+			this.boneTransform( index, target );
 
 		}
 
