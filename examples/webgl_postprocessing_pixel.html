@@ -182,18 +182,18 @@
 
 			const rendererSize = renderer.getSize( new THREE.Vector2() );
 			const aspectRatio = rendererSize.x / rendererSize.y;
-			if ( params["pixelAlignedPanning"] ) {
+			if ( params[ 'pixelAlignedPanning' ] ) {
 
-				pixelAlignFrustum( camera, aspectRatio, Math.floor( rendererSize.x / params[ "pixelSize" ] ), 
-									Math.floor( rendererSize.y / params[ "pixelSize" ] ) );
+				pixelAlignFrustum( camera, aspectRatio, Math.floor( rendererSize.x / params[ 'pixelSize' ] ),
+					Math.floor( rendererSize.y / params[ 'pixelSize' ] ) );
 
 			} else if ( camera.left != - aspectRatio || camera.top != 1.0 ) {
 
 				// Reset the Camera Frustum if it has been modified
-				camera.left   = - aspectRatio;
-				camera.right  =   aspectRatio;
-				camera.top    =   1.0        ;
-				camera.bottom = - 1.0        ;
+				camera.left = - aspectRatio;
+				camera.right = aspectRatio;
+				camera.top = 1.0;
+				camera.bottom = - 1.0;
 				camera.updateProjectionMatrix();
 
 			}
@@ -241,34 +241,34 @@
 
 		function pixelAlignFrustum( camera, aspectRatio, pixelsPerScreenWidth, pixelsPerScreenHeight ) {
 
-				// 0. Get Pixel Grid Units
-				let worldScreenWidth  = ( ( camera.right - camera.left ) / camera.zoom );
-				let worldScreenHeight = ( ( camera.top - camera.bottom ) / camera.zoom );
-				let pixelWidth  = worldScreenWidth  / pixelsPerScreenWidth;
-				let pixelHeight = worldScreenHeight / pixelsPerScreenHeight;
+			// 0. Get Pixel Grid Units
+			const worldScreenWidth = ( ( camera.right - camera.left ) / camera.zoom );
+			const worldScreenHeight = ( ( camera.top - camera.bottom ) / camera.zoom );
+			const pixelWidth = worldScreenWidth / pixelsPerScreenWidth;
+			const pixelHeight = worldScreenHeight / pixelsPerScreenHeight;
 
-				// 1. Project the current camera position along its local rotation bases
-				let camPos      = new THREE.Vector3   ();   camera.getWorldPosition  ( camPos );
-				let camRot      = new THREE.Quaternion();   camera.getWorldQuaternion( camRot );
-				let camRight    = new THREE.Vector3( 1.0, 0.0, 0.0 ) .applyQuaternion( camRot );
-				let camUp       = new THREE.Vector3( 0.0, 1.0, 0.0 ) .applyQuaternion( camRot );
-				let camPosRight = camPos.dot( camRight );
-				let camPosUp    = camPos.dot( camUp );
+			// 1. Project the current camera position along its local rotation bases
+			const camPos = new THREE.Vector3(); camera.getWorldPosition( camPos );
+			const camRot = new THREE.Quaternion(); camera.getWorldQuaternion( camRot );
+			const camRight = new THREE.Vector3( 1.0, 0.0, 0.0 ).applyQuaternion( camRot );
+			const camUp = new THREE.Vector3( 0.0, 1.0, 0.0 ).applyQuaternion( camRot );
+			const camPosRight = camPos.dot( camRight );
+			const camPosUp = camPos.dot( camUp );
 
-				// 2. Find how far along its position is along these bases in pixel units
-				let camPosRightPx = camPosRight / pixelWidth;
-				let camPosUpPx    = camPosUp    / pixelHeight;
+			// 2. Find how far along its position is along these bases in pixel units
+			const camPosRightPx = camPosRight / pixelWidth;
+			const camPosUpPx = camPosUp / pixelHeight;
 
-				// 3. Find the fractional pixel units and convert to world units
-				let fractX = camPosRightPx - Math.round( camPosRightPx );
-				let fractY = camPosUpPx    - Math.round(    camPosUpPx );
+			// 3. Find the fractional pixel units and convert to world units
+			const fractX = camPosRightPx - Math.round( camPosRightPx );
+			const fractY = camPosUpPx - Math.round( camPosUpPx );
 
-				// 4. Add fractional world units to the left/right top/bottom to align with the pixel grid
-				camera.left   = - aspectRatio - ( fractX * pixelWidth  );
-				camera.right  =   aspectRatio - ( fractX * pixelWidth  );
-				camera.top    =   1.0         - ( fractY * pixelHeight );
-				camera.bottom = - 1.0         - ( fractY * pixelHeight );
-				camera.updateProjectionMatrix();
+			// 4. Add fractional world units to the left/right top/bottom to align with the pixel grid
+			camera.left = - aspectRatio - ( fractX * pixelWidth );
+			camera.right = aspectRatio - ( fractX * pixelWidth );
+			camera.top = 1.0 - ( fractY * pixelHeight );
+			camera.bottom = - 1.0 - ( fractY * pixelHeight );
+			camera.updateProjectionMatrix();
 
 		}
 		
