@@ -24,7 +24,7 @@ class CubeTextureNode extends TextureNode {
 
 	getDefaultUV() {
 
-		defaultUV ||= new ReflectVectorNode();
+		defaultUV = defaultUV || new ReflectVectorNode();
 
 		return defaultUV;
 

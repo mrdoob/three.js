@@ -62,7 +62,7 @@ class Object3DNode extends Node {
 
 		} else if ( scope === Object3DNode.DIRECTION ) {
 
-			uniformNode.value ||= new Vector3();
+			uniformNode.value = uniformNode.value || new Vector3();
 
 			object.getWorldDirection( uniformNode.value );
 
@@ -70,7 +70,7 @@ class Object3DNode extends Node {
 
 			const camera = frame.camera;
 
-			uniformNode.value ||= new Vector3();
+			uniformNode.value = uniformNode.value || new Vector3();
 			uniformNode.value.setFromMatrixPosition( object.matrixWorld );
 
 			uniformNode.value.applyMatrix4( camera.matrixWorldInverse );

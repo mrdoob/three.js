@@ -473,7 +473,7 @@ class NodeBuilder {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
-		nodeData.properties ||= { outputNode: null };
+		nodeData.properties = nodeData.properties || { outputNode: null };
 
 		return nodeData.properties;
 

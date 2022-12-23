@@ -7,7 +7,7 @@ class DiscardNode extends CondNode {
 
 	constructor( condNode ) {
 
-		discardExpression ||= new ExpressionNode( 'discard' );
+		discardExpression = discardExpression || new ExpressionNode( 'discard' );
 
 		super( condNode, discardExpression );
 
