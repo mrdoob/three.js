@@ -99,7 +99,7 @@ export const func = ( code, includes ) => {
 	const node = nodeObject( new FunctionNode( code, includes ) );
 
 	const call = node.call.bind( node );
-	node.call = ( ...params ) => nodeObject( call( params.length > 1 || params[ 0 ]?.isNode === true ? nodeArray( params ) : nodeObjects( params[ 0 ] ) ) );
+	node.call = ( ...params ) => nodeObject( call( params.length > 1 || ( params[ 0 ] && params[ 0 ].isNode === true ) ? nodeArray( params ) : nodeObjects( params[ 0 ] ) ) );
 
 	return node;
 
@@ -110,7 +110,7 @@ export const uniform = ( nodeOrType ) => {
 	const nodeType = getConstNodeType( nodeOrType );
 
 	// @TODO: get ConstNode from .traverse() in the future
-	const value = nodeOrType.isNode === true ? nodeOrType.node?.value || nodeOrType.value : nodeOrType;
+	const value = nodeOrType.isNode === true ? ( nodeOrType.node && nodeOrType.node.value ) || nodeOrType.value : nodeOrType;
 
 	return nodeObject( new UniformNode( value, nodeType ) );
 

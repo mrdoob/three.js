@@ -47,7 +47,7 @@ class SpotLightNode extends AnalyticLightNode {
 		const lVector = objectViewPosition( light ).sub( positionView );
 
 		const lightDirection = lVector.normalize();
-		const angleCos = lightDirection.dot( this.directionNode )
+		const angleCos = lightDirection.dot( this.directionNode );
 		const spotAttenuation = getSpotAttenuation( this.coneCosNode, this.penumbraCosNode, angleCos );
 
 		const lightDistance = lVector.length();
@@ -65,7 +65,7 @@ class SpotLightNode extends AnalyticLightNode {
 		const lightingModelFunctionNode = builder.context.lightingModelNode;
 		const reflectedLight = builder.context.reflectedLight;
 
-		if ( lightingModelFunctionNode?.direct ) {
+		if ( lightingModelFunctionNode && lightingModelFunctionNode.direct ) {
 
 			lightingModelFunctionNode.direct.call( {
 				lightDirection,

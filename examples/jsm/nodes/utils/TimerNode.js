@@ -3,11 +3,6 @@ import { NodeUpdateType } from '../core/constants.js';
 
 class TimerNode extends UniformNode {
 
-	static LOCAL = 'local';
-	static GLOBAL = 'global';
-	static DELTA = 'delta';
-	static FRAME = 'frame';
-
 	constructor( scope = TimerNode.LOCAL, scale = 1, value = 0 ) {
 
 		super( value );
@@ -18,7 +13,7 @@ class TimerNode extends UniformNode {
 		this.updateType = NodeUpdateType.FRAME;
 
 	}
-/*
+	/*
 	@TODO:
 	getNodeType( builder ) {
 
@@ -80,5 +75,10 @@ class TimerNode extends UniformNode {
 	}
 
 }
+
+TimerNode.LOCAL = 'local';
+TimerNode.GLOBAL = 'global';
+TimerNode.DELTA = 'delta';
+TimerNode.FRAME = 'frame';
 
 export default TimerNode;

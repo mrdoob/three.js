@@ -590,7 +590,7 @@ class WebGPURenderer {
 
 	clear() {
 
-		this._background?.clear();
+		if ( this._background ) this._background.clear();
 
 	}
 

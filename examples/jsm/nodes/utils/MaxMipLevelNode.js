@@ -23,9 +23,9 @@ class MaxMipLevelNode extends UniformNode {
 
 		const texture = this.texture;
 		const images = texture.images;
-		const image = ( images && images.length > 0 ) ? ( images[ 0 ]?.image || images[ 0 ] ) : texture.image;
+		const image = ( images && images.length > 0 ) ? ( ( images[ 0 ] && images[ 0 ].image ) || images[ 0 ] ) : texture.image;
 
-		if ( image?.width !== undefined ) {
+		if ( image && image.width !== undefined ) {
 
 			const { width, height } = image;
 
