@@ -160,111 +160,31 @@ class MaterialNode extends Node {
 		} else if ( scope === MaterialNode.UV ) {
 
 			// uv repeat and offset setting priorities
-			// 1. color map
-			// 2. specular map
-			// 3. displacementMap map
-			// 4. normal map
-			// 5. bump map
-			// 6. roughnessMap map
-			// 7. metalnessMap map
-			// 8. alphaMap map
-			// 9. emissiveMap map
-			// 10. clearcoat map
-			// 11. clearcoat normal map
-			// 12. clearcoat roughnessMap map
-			// 13. iridescence map
-			// 14. iridescence thickness map
-			// 15. specular intensity map
-			// 16. specular tint map
-			// 17. transmission map
-			// 18. thickness map
 
-			let uvScaleMap;
 			let uvNode;
+			let uvScaleMap = 
+				material.map ||
+				material.specularMap ||
+				material.displacementMap ||
+				material.normalMap ||
+				material.bumpMap ||
+				material.roughnessMap ||
+				material.metalnessMap ||
+				material.alphaMap ||
+				material.emissiveMap ||
+				material.clearcoatMap ||
+				material.clearcoatNormalMap ||
+				material.clearcoatRoughnessMap ||
+				material.iridescenceMap ||
+				material.iridescenceThicknessMap ||
+				material.specularIntensityMap ||
+				material.specularColorMap ||
+				material.transmissionMap ||
+				material.thicknessMap ||
+				material.sheenColorMap ||
+				material.sheenRoughnessMap;
 
-			if ( material.map ) {
-
-				uvScaleMap = material.map;
-
-			} else if ( material.specularMap ) {
-
-				uvScaleMap = material.specularMap;
-
-			} else if ( material.displacementMap ) {
-
-				uvScaleMap = material.displacementMap;
-
-			} else if ( material.normalMap ) {
-
-				uvScaleMap = material.normalMap;
-
-			} else if ( material.bumpMap ) {
-
-				uvScaleMap = material.bumpMap;
-
-			} else if ( material.roughnessMap ) {
-
-				uvScaleMap = material.roughnessMap;
-
-			} else if ( material.metalnessMap ) {
-
-				uvScaleMap = material.metalnessMap;
-
-			} else if ( material.alphaMap ) {
-
-				uvScaleMap = material.alphaMap;
-
-			} else if ( material.emissiveMap ) {
-
-				uvScaleMap = material.emissiveMap;
-
-			} else if ( material.clearcoatMap ) {
-
-				uvScaleMap = material.clearcoatMap;
-
-			} else if ( material.clearcoatNormalMap ) {
-
-				uvScaleMap = material.clearcoatNormalMap;
-
-			} else if ( material.clearcoatRoughnessMap ) {
-
-				uvScaleMap = material.clearcoatRoughnessMap;
-
-			} else if ( material.iridescenceMap ) {
-
-				uvScaleMap = material.iridescenceMap;
-
-			} else if ( material.iridescenceThicknessMap ) {
-
-				uvScaleMap = material.iridescenceThicknessMap;
-
-			} else if ( material.specularIntensityMap ) {
-
-				uvScaleMap = material.specularIntensityMap;
-
-			} else if ( material.specularColorMap ) {
-
-				uvScaleMap = material.specularColorMap;
-
-			} else if ( material.transmissionMap ) {
-
-				uvScaleMap = material.transmissionMap;
-
-			} else if ( material.thicknessMap ) {
-
-				uvScaleMap = material.thicknessMap;
-
-			} else if ( material.sheenColorMap ) {
-
-				uvScaleMap = material.sheenColorMap;
-
-			} else if ( material.sheenRoughnessMap ) {
-
-				uvScaleMap = material.sheenRoughnessMap;
-
-			}
-
-			if ( uvScaleMap !== undefined ) {
+			if ( uvScaleMap ) {
 
 				// backwards compatibility
 				if ( uvScaleMap.isWebGLRenderTarget ) {
