@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '148';
+	const REVISION = '149dev';
 	const MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -143,6 +143,10 @@
 	const RGBA_ASTC_12x10_Format = 37820;
 	const RGBA_ASTC_12x12_Format = 37821;
 	const RGBA_BPTC_Format = 36492;
+	const RED_RGTC1_Format = 36283;
+	const SIGNED_RED_RGTC1_Format = 36284;
+	const RED_GREEN_RGTC2_Format = 36285;
+	const SIGNED_RED_GREEN_RGTC2_Format = 36286;
 	const LoopOnce = 2200;
 	const LoopRepeat = 2201;
 	const LoopPingPong = 2202;
@@ -4812,7 +4816,7 @@
 	const _matrix$1 = /*@__PURE__*/new Matrix4();
 	const _quaternion$3 = /*@__PURE__*/new Quaternion();
 	class Euler {
-		constructor(x = 0, y = 0, z = 0, order = Euler.DefaultOrder) {
+		constructor(x = 0, y = 0, z = 0, order = Euler.DEFAULT_ORDER) {
 			this.isEuler = true;
 			this._x = x;
 			this._y = y;
@@ -4996,8 +5000,7 @@
 			console.error('THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead');
 		}
 	}
-	Euler.DefaultOrder = 'XYZ';
-	Euler.RotationOrders = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX'];
+	Euler.DEFAULT_ORDER = 'XYZ';
 
 	class Layers {
 		constructor() {
@@ -7148,12 +7151,12 @@
 				}
 			}
 		}
-		getVertexPosition(vert, target) {
+		getVertexPosition(index, target) {
 			const geometry = this.geometry;
 			const position = geometry.attributes.position;
 			const morphPosition = geometry.morphAttributes.position;
 			const morphTargetsRelative = geometry.morphTargetsRelative;
-			target.fromBufferAttribute(position, vert);
+			target.fromBufferAttribute(position, index);
 			const morphInfluences = this.morphTargetInfluences;
 			if (morphPosition && morphInfluences) {
 				_morphA.set(0, 0, 0);
@@ -7161,7 +7164,7 @@
 					const influence = morphInfluences[i];
 					const morphAttribute = morphPosition[i];
 					if (influence === 0) continue;
-					_tempA.fromBufferAttribute(morphAttribute, vert);
+					_tempA.fromBufferAttribute(morphAttribute, index);
 					if (morphTargetsRelative) {
 						_morphA.addScaledVector(_tempA, influence);
 					} else {
@@ -7171,7 +7174,7 @@
 				target.add(_morphA);
 			}
 			if (this.isSkinnedMesh) {
-				this.boneTransform(vert, target);
+				this.boneTransform(index, target);
 			}
 			return target;
 		}
@@ -16014,6 +16017,20 @@
 				extension = extensions.get('EXT_texture_compression_bptc');
 				if (extension !== null) {
 					if (p === RGBA_BPTC_Format) return encoding === sRGBEncoding ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
+				} else {
+					return null;
+				}
+			}
+
+			// RGTC
+
+			if (p === RED_RGTC1_Format || p === SIGNED_RED_RGTC1_Format || p === RED_GREEN_RGTC2_Format || p === SIGNED_RED_GREEN_RGTC2_Format) {
+				extension = extensions.get('EXT_texture_compression_rgtc');
+				if (extension !== null) {
+					if (p === RGBA_BPTC_Format) return extension.COMPRESSED_RED_RGTC1_EXT;
+					if (p === SIGNED_RED_RGTC1_Format) return extension.COMPRESSED_SIGNED_RED_RGTC1_EXT;
+					if (p === RED_GREEN_RGTC2_Format) return extension.COMPRESSED_RED_GREEN_RGTC2_EXT;
+					if (p === SIGNED_RED_GREEN_RGTC2_Format) return extension.COMPRESSED_SIGNED_RED_GREEN_RGTC2_EXT;
 				} else {
 					return null;
 				}
@@ -32572,6 +32589,8 @@
 	exports.Quaternion = Quaternion;
 	exports.QuaternionKeyframeTrack = QuaternionKeyframeTrack;
 	exports.QuaternionLinearInterpolant = QuaternionLinearInterpolant;
+	exports.RED_GREEN_RGTC2_Format = RED_GREEN_RGTC2_Format;
+	exports.RED_RGTC1_Format = RED_RGTC1_Format;
 	exports.REVISION = REVISION;
 	exports.RGBADepthPacking = RGBADepthPacking;
 	exports.RGBAFormat = RGBAFormat;
@@ -32617,6 +32636,8 @@
 	exports.ReverseSubtractEquation = ReverseSubtractEquation;
 	exports.RingBufferGeometry = RingBufferGeometry;
 	exports.RingGeometry = RingGeometry;
+	exports.SIGNED_RED_GREEN_RGTC2_Format = SIGNED_RED_GREEN_RGTC2_Format;
+	exports.SIGNED_RED_RGTC1_Format = SIGNED_RED_RGTC1_Format;
 	exports.SRGBColorSpace = SRGBColorSpace;
 	exports.Scene = Scene;
 	exports.ShaderChunk = ShaderChunk;
