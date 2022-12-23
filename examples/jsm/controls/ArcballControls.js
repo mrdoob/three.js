@@ -230,553 +230,24 @@ class ArcballControls extends EventDispatcher {
 
 		this.initializeMouseActions();
 
-		this.domElement.addEventListener( 'contextmenu', this.onContextMenu );
-		this.domElement.addEventListener( 'wheel', this.onWheel );
-		this.domElement.addEventListener( 'pointerdown', this.onPointerDown );
-		this.domElement.addEventListener( 'pointercancel', this.onPointerCancel );
+		this._onContextMenu = onContextMenu.bind( this );
+		this._onWheel = onWheel.bind( this );
+		this._onPointerUp = onPointerUp.bind( this );
+		this._onPointerMove = onPointerMove.bind( this );
+		this._onPointerDown = onPointerDown.bind( this );
+		this._onPointerCancel = onPointerCancel.bind( this );
+		this._onWindowResize = onWindowResize.bind( this );
 
-		window.addEventListener( 'resize', this.onWindowResize );
+		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
+		this.domElement.addEventListener( 'wheel', this._onWheel );
+		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
+		this.domElement.addEventListener( 'pointercancel', this._onPointerCancel );
+
+		window.addEventListener( 'resize', this._onWindowResize );
 
 	}
 
-	//listeners
-
-	onWindowResize = () => {
-
-		const scale = ( this._gizmos.scale.x + this._gizmos.scale.y + this._gizmos.scale.z ) / 3;
-		this._tbRadius = this.calculateTbRadius( this.camera );
-
-		const newRadius = this._tbRadius / scale;
-		const curve = new EllipseCurve( 0, 0, newRadius, newRadius );
-		const points = curve.getPoints( this._curvePts );
-		const curveGeometry = new BufferGeometry().setFromPoints( points );
-
-
-		for ( const gizmo in this._gizmos.children ) {
-
-			this._gizmos.children[ gizmo ].geometry = curveGeometry;
-
-		}
-
-		this.dispatchEvent( _changeEvent );
-
-	};
-
-	onContextMenu = ( event ) => {
-
-		if ( ! this.enabled ) {
-
-			return;
-
-		}
-
-		for ( let i = 0; i < this.mouseActions.length; i ++ ) {
-
-			if ( this.mouseActions[ i ].mouse == 2 ) {
-
-				//prevent only if button 2 is actually used
-				event.preventDefault();
-				break;
-
-			}
-
-		}
-
-	};
-
-	onPointerCancel = () => {
-
-		this._touchStart.splice( 0, this._touchStart.length );
-		this._touchCurrent.splice( 0, this._touchCurrent.length );
-		this._input = INPUT.NONE;
-
-	};
-
-	onPointerDown = ( event ) => {
-
-		if ( event.button == 0 && event.isPrimary ) {
-
-			this._downValid = true;
-			this._downEvents.push( event );
-			this._downStart = performance.now();
-
-		} else {
-
-			this._downValid = false;
-
-		}
-
-		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
-
-			this._touchStart.push( event );
-			this._touchCurrent.push( event );
-
-			switch ( this._input ) {
-
-				case INPUT.NONE:
-
-					//singleStart
-					this._input = INPUT.ONE_FINGER;
-					this.onSinglePanStart( event, 'ROTATE' );
-
-					window.addEventListener( 'pointermove', this.onPointerMove );
-					window.addEventListener( 'pointerup', this.onPointerUp );
-
-					break;
-
-				case INPUT.ONE_FINGER:
-				case INPUT.ONE_FINGER_SWITCHED:
-
-					//doubleStart
-					this._input = INPUT.TWO_FINGER;
-
-					this.onRotateStart();
-					this.onPinchStart();
-					this.onDoublePanStart();
-
-					break;
-
-				case INPUT.TWO_FINGER:
-
-					//multipleStart
-					this._input = INPUT.MULT_FINGER;
-					this.onTriplePanStart( event );
-					break;
-
-			}
-
-		} else if ( event.pointerType != 'touch' && this._input == INPUT.NONE ) {
-
-			let modifier = null;
-
-			if ( event.ctrlKey || event.metaKey ) {
-
-				modifier = 'CTRL';
-
-			} else if ( event.shiftKey ) {
-
-				modifier = 'SHIFT';
-
-			}
-
-			this._mouseOp = this.getOpFromAction( event.button, modifier );
-			if ( this._mouseOp != null ) {
-
-				window.addEventListener( 'pointermove', this.onPointerMove );
-				window.addEventListener( 'pointerup', this.onPointerUp );
-
-				//singleStart
-				this._input = INPUT.CURSOR;
-				this._button = event.button;
-				this.onSinglePanStart( event, this._mouseOp );
-
-			}
-
-		}
-
-	};
-
-	onPointerMove = ( event ) => {
-
-		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
-
-			switch ( this._input ) {
-
-				case INPUT.ONE_FINGER:
-
-					//singleMove
-					this.updateTouchEvent( event );
-
-					this.onSinglePanMove( event, STATE.ROTATE );
-					break;
-
-				case INPUT.ONE_FINGER_SWITCHED:
-
-					const movement = this.calculatePointersDistance( this._touchCurrent[ 0 ], event ) * this._devPxRatio;
-
-					if ( movement >= this._switchSensibility ) {
-
-						//singleMove
-						this._input = INPUT.ONE_FINGER;
-						this.updateTouchEvent( event );
-
-						this.onSinglePanStart( event, 'ROTATE' );
-						break;
-
-					}
-
-					break;
-
-				case INPUT.TWO_FINGER:
-
-					//rotate/pan/pinchMove
-					this.updateTouchEvent( event );
-
-					this.onRotateMove();
-					this.onPinchMove();
-					this.onDoublePanMove();
-
-					break;
-
-				case INPUT.MULT_FINGER:
-
-					//multMove
-					this.updateTouchEvent( event );
-
-					this.onTriplePanMove( event );
-					break;
-
-			}
-
-		} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
-
-			let modifier = null;
-
-			if ( event.ctrlKey || event.metaKey ) {
-
-				modifier = 'CTRL';
-
-			} else if ( event.shiftKey ) {
-
-				modifier = 'SHIFT';
-
-			}
-
-			const mouseOpState = this.getOpStateFromAction( this._button, modifier );
-
-			if ( mouseOpState != null ) {
-
-				this.onSinglePanMove( event, mouseOpState );
-
-			}
-
-		}
-
-		//checkDistance
-		if ( this._downValid ) {
-
-			const movement = this.calculatePointersDistance( this._downEvents[ this._downEvents.length - 1 ], event ) * this._devPxRatio;
-			if ( movement > this._movementThreshold ) {
-
-				this._downValid = false;
-
-			}
-
-		}
-
-	};
-
-	onPointerUp = ( event ) => {
-
-		if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
-
-			const nTouch = this._touchCurrent.length;
-
-			for ( let i = 0; i < nTouch; i ++ ) {
-
-				if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
-
-					this._touchCurrent.splice( i, 1 );
-					this._touchStart.splice( i, 1 );
-					break;
-
-				}
-
-			}
-
-			switch ( this._input ) {
-
-				case INPUT.ONE_FINGER:
-				case INPUT.ONE_FINGER_SWITCHED:
-
-					//singleEnd
-					window.removeEventListener( 'pointermove', this.onPointerMove );
-					window.removeEventListener( 'pointerup', this.onPointerUp );
-
-					this._input = INPUT.NONE;
-					this.onSinglePanEnd();
-
-					break;
-
-				case INPUT.TWO_FINGER:
-
-					//doubleEnd
-					this.onDoublePanEnd( event );
-					this.onPinchEnd( event );
-					this.onRotateEnd( event );
-
-					//switching to singleStart
-					this._input = INPUT.ONE_FINGER_SWITCHED;
-
-					break;
-
-				case INPUT.MULT_FINGER:
-
-					if ( this._touchCurrent.length == 0 ) {
-
-						window.removeEventListener( 'pointermove', this.onPointerMove );
-						window.removeEventListener( 'pointerup', this.onPointerUp );
-
-						//multCancel
-						this._input = INPUT.NONE;
-						this.onTriplePanEnd();
-
-					}
-
-					break;
-
-			}
-
-		} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
-
-			window.removeEventListener( 'pointermove', this.onPointerMove );
-			window.removeEventListener( 'pointerup', this.onPointerUp );
-
-			this._input = INPUT.NONE;
-			this.onSinglePanEnd();
-			this._button = - 1;
-
-		}
-
-		if ( event.isPrimary ) {
-
-			if ( this._downValid ) {
-
-				const downTime = event.timeStamp - this._downEvents[ this._downEvents.length - 1 ].timeStamp;
-
-				if ( downTime <= this._maxDownTime ) {
-
-					if ( this._nclicks == 0 ) {
-
-						//first valid click detected
-						this._nclicks = 1;
-						this._clickStart = performance.now();
-
-					} else {
-
-						const clickInterval = event.timeStamp - this._clickStart;
-						const movement = this.calculatePointersDistance( this._downEvents[ 1 ], this._downEvents[ 0 ] ) * this._devPxRatio;
-
-						if ( clickInterval <= this._maxInterval && movement <= this._posThreshold ) {
-
-							//second valid click detected
-							//fire double tap and reset values
-							this._nclicks = 0;
-							this._downEvents.splice( 0, this._downEvents.length );
-							this.onDoubleTap( event );
-
-						} else {
-
-							//new 'first click'
-							this._nclicks = 1;
-							this._downEvents.shift();
-							this._clickStart = performance.now();
-
-						}
-
-					}
-
-				} else {
-
-					this._downValid = false;
-					this._nclicks = 0;
-					this._downEvents.splice( 0, this._downEvents.length );
-
-				}
-
-			} else {
-
-				this._nclicks = 0;
-				this._downEvents.splice( 0, this._downEvents.length );
-
-			}
-
-		}
-
-	};
-
-	onWheel = ( event ) => {
-
-		if ( this.enabled && this.enableZoom ) {
-
-			let modifier = null;
-
-			if ( event.ctrlKey || event.metaKey ) {
-
-				modifier = 'CTRL';
-
-			} else if ( event.shiftKey ) {
-
-				modifier = 'SHIFT';
-
-			}
-
-			const mouseOp = this.getOpFromAction( 'WHEEL', modifier );
-
-			if ( mouseOp != null ) {
-
-				event.preventDefault();
-				this.dispatchEvent( _startEvent );
-
-				const notchDeltaY = 125; //distance of one notch of mouse wheel
-				let sgn = event.deltaY / notchDeltaY;
-
-				let size = 1;
-
-				if ( sgn > 0 ) {
-
-					size = 1 / this.scaleFactor;
-
-				} else if ( sgn < 0 ) {
-
-					size = this.scaleFactor;
-
-				}
-
-				switch ( mouseOp ) {
-
-					case 'ZOOM':
-
-						this.updateTbState( STATE.SCALE, true );
-
-						if ( sgn > 0 ) {
-
-							size = 1 / ( Math.pow( this.scaleFactor, sgn ) );
-
-						} else if ( sgn < 0 ) {
-
-							size = Math.pow( this.scaleFactor, - sgn );
-
-						}
-
-						if ( this.cursorZoom && this.enablePan ) {
-
-							let scalePoint;
-
-							if ( this.camera.isOrthographicCamera ) {
-
-								scalePoint = this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.camera.quaternion ).multiplyScalar( 1 / this.camera.zoom ).add( this._gizmos.position );
-
-							} else if ( this.camera.isPerspectiveCamera ) {
-
-								scalePoint = this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.camera.quaternion ).add( this._gizmos.position );
-
-							}
-
-							this.applyTransformMatrix( this.scale( size, scalePoint ) );
-
-						} else {
-
-							this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
-
-						}
-
-						if ( this._grid != null ) {
-
-							this.disposeGrid();
-							this.drawGrid();
-
-						}
-
-						this.updateTbState( STATE.IDLE, false );
-
-						this.dispatchEvent( _changeEvent );
-						this.dispatchEvent( _endEvent );
-
-						break;
-
-					case 'FOV':
-
-						if ( this.camera.isPerspectiveCamera ) {
-
-							this.updateTbState( STATE.FOV, true );
-
-
-							//Vertigo effect
-
-							//	  fov / 2
-							//		|\
-							//		| \
-							//		|  \
-							//	x	|	\
-							//		| 	 \
-							//		| 	  \
-							//		| _ _ _\
-							//			y
-
-							//check for iOs shift shortcut
-							if ( event.deltaX != 0 ) {
-
-								sgn = event.deltaX / notchDeltaY;
-
-								size = 1;
-
-								if ( sgn > 0 ) {
-
-									size = 1 / ( Math.pow( this.scaleFactor, sgn ) );
-
-								} else if ( sgn < 0 ) {
-
-									size = Math.pow( this.scaleFactor, - sgn );
-
-								}
-
-							}
-
-							this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
-							const x = this._v3_1.distanceTo( this._gizmos.position );
-							let xNew = x / size;	//distance between camera and gizmos if scale(size, scalepoint) would be performed
-
-							//check min and max distance
-							xNew = MathUtils.clamp( xNew, this.minDistance, this.maxDistance );
-
-							const y = x * Math.tan( MathUtils.DEG2RAD * this.camera.fov * 0.5 );
-
-							//calculate new fov
-							let newFov = MathUtils.RAD2DEG * ( Math.atan( y / xNew ) * 2 );
-
-							//check min and max fov
-							if ( newFov > this.maxFov ) {
-
-								newFov = this.maxFov;
-
-							} else if ( newFov < this.minFov ) {
-
-								newFov = this.minFov;
-
-							}
-
-							const newDistance = y / Math.tan( MathUtils.DEG2RAD * ( newFov / 2 ) );
-							size = x / newDistance;
-
-							this.setFov( newFov );
-							this.applyTransformMatrix( this.scale( size, this._gizmos.position, false ) );
-
-						}
-
-						if ( this._grid != null ) {
-
-							this.disposeGrid();
-							this.drawGrid();
-
-						}
-
-						this.updateTbState( STATE.IDLE, false );
-
-						this.dispatchEvent( _changeEvent );
-						this.dispatchEvent( _endEvent );
-
-						break;
-
-				}
-
-			}
-
-		}
-
-	};
-
-	onSinglePanStart = ( event, operation ) => {
+	onSinglePanStart( event, operation ) {
 
 		if ( this.enabled ) {
 
@@ -901,9 +372,9 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onSinglePanMove = ( event, opState ) => {
+	onSinglePanMove( event, opState ) {
 
 		if ( this.enabled ) {
 
@@ -1131,9 +602,9 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onSinglePanEnd = () => {
+	onSinglePanEnd() {
 
 		if ( this._state == STATE.ROTATE ) {
 
@@ -1197,9 +668,9 @@ class ArcballControls extends EventDispatcher {
 
 		this.dispatchEvent( _endEvent );
 
-	};
+	}
 
-	onDoubleTap = ( event ) => {
+	onDoubleTap( event ) {
 
 		if ( this.enabled && this.enablePan && this.scene != null ) {
 
@@ -1238,9 +709,9 @@ class ArcballControls extends EventDispatcher {
 
 		this.dispatchEvent( _endEvent );
 
-	};
+	}
 
-	onDoublePanStart = () => {
+	onDoublePanStart() {
 
 		if ( this.enabled && this.enablePan ) {
 
@@ -1256,9 +727,9 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onDoublePanMove = () => {
+	onDoublePanMove() {
 
 		if ( this.enabled && this.enablePan ) {
 
@@ -1277,17 +748,16 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onDoublePanEnd = () => {
+	onDoublePanEnd() {
 
 		this.updateTbState( STATE.IDLE, false );
 		this.dispatchEvent( _endEvent );
 
-	};
+	}
 
-
-	onRotateStart = () => {
+	onRotateStart() {
 
 		if ( this.enabled && this.enableRotate ) {
 
@@ -1310,9 +780,9 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onRotateMove = () => {
+	onRotateMove() {
 
 		if ( this.enabled && this.enableRotate ) {
 
@@ -1347,17 +817,17 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onRotateEnd = () => {
+	onRotateEnd() {
 
 		this.updateTbState( STATE.IDLE, false );
 		this.activateGizmos( false );
 		this.dispatchEvent( _endEvent );
 
-	};
+	}
 
-	onPinchStart = () => {
+	onPinchStart() {
 
 		if ( this.enabled && this.enableZoom ) {
 
@@ -1371,9 +841,9 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onPinchMove = () => {
+	onPinchMove() {
 
 		if ( this.enabled && this.enableZoom ) {
 
@@ -1420,16 +890,16 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onPinchEnd = () => {
+	onPinchEnd() {
 
 		this.updateTbState( STATE.IDLE, false );
 		this.dispatchEvent( _endEvent );
 
-	};
+	}
 
-	onTriplePanStart = () => {
+	onTriplePanStart() {
 
 		if ( this.enabled && this.enableZoom ) {
 
@@ -1456,9 +926,9 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onTriplePanMove = () => {
+	onTriplePanMove() {
 
 		if ( this.enabled && this.enableZoom ) {
 
@@ -1533,32 +1003,32 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	onTriplePanEnd = () => {
+	onTriplePanEnd() {
 
 		this.updateTbState( STATE.IDLE, false );
 		this.dispatchEvent( _endEvent );
 		//this.dispatchEvent( _changeEvent );
 
-	};
+	}
 
 	/**
 	 * Set _center's x/y coordinates
 	 * @param {Number} clientX
 	 * @param {Number} clientY
 	 */
-	setCenter = ( clientX, clientY ) => {
+	setCenter( clientX, clientY ) {
 
 		_center.x = clientX;
 		_center.y = clientY;
 
-	};
+	}
 
 	/**
 	 * Set default mouse actions
 	 */
-	initializeMouseActions = () => {
+	initializeMouseActions() {
 
 		this.setMouseAction( 'PAN', 0, 'CTRL' );
 		this.setMouseAction( 'PAN', 2 );
@@ -1572,7 +1042,7 @@ class ArcballControls extends EventDispatcher {
 		this.setMouseAction( 'FOV', 1, 'SHIFT' );
 
 
-	};
+	}
 
 	/**
 	 * Compare two mouse actions
@@ -1580,7 +1050,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Object} action2
 	 * @returns {Boolean} True if action1 and action 2 are the same mouse action, false otherwise
 	 */
-	compareMouseAction = ( action1, action2 ) => {
+	compareMouseAction( action1, action2 ) {
 
 		if ( action1.operation == action2.operation ) {
 
@@ -1600,7 +1070,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Set a new mouse action by specifying the operation to be performed and a mouse/key combination. In case of conflict, replaces the existing one
@@ -1609,7 +1079,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
 	 * @returns {Boolean} True if the mouse action has been successfully added, false otherwise
 	 */
-	setMouseAction = ( operation, mouse, key = null ) => {
+	setMouseAction( operation, mouse, key = null ) {
 
 		const operationInput = [ 'PAN', 'ROTATE', 'ZOOM', 'FOV' ];
 		const mouseInput = [ 0, 1, 2, 'WHEEL' ];
@@ -1681,7 +1151,7 @@ class ArcballControls extends EventDispatcher {
 		this.mouseActions.push( action );
 		return true;
 
-	};
+	}
 
 	/**
 	 * Remove a mouse action by specifying its mouse/key combination
@@ -1689,7 +1159,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
 	 * @returns {Boolean} True if the operation has been succesfully removed, false otherwise
 	 */
-	unsetMouseAction = ( mouse, key = null ) => {
+	unsetMouseAction( mouse, key = null ) {
 
 		for ( let i = 0; i < this.mouseActions.length; i ++ ) {
 
@@ -1704,7 +1174,7 @@ class ArcballControls extends EventDispatcher {
 
 		return false;
 
-	};
+	}
 
 	/**
 	 * Return the operation associated to a mouse/keyboard combination
@@ -1712,7 +1182,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
 	 * @returns The operation if it has been found, null otherwise
 	 */
-	getOpFromAction = ( mouse, key ) => {
+	getOpFromAction( mouse, key ) {
 
 		let action;
 
@@ -1744,7 +1214,7 @@ class ArcballControls extends EventDispatcher {
 
 		return null;
 
-	};
+	}
 
 	/**
 	 * Get the operation associated to mouse and key combination and returns the corresponding FSA state
@@ -1752,7 +1222,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {String} key Keyboard modifier
 	 * @returns The FSA state obtained from the operation associated to mouse/keyboard combination
 	 */
-	getOpStateFromAction = ( mouse, key ) => {
+	getOpStateFromAction( mouse, key ) {
 
 		let action;
 
@@ -1784,7 +1254,7 @@ class ArcballControls extends EventDispatcher {
 
 		return null;
 
-	};
+	}
 
 	/**
 	 * Calculate the angle between two pointers
@@ -1792,17 +1262,17 @@ class ArcballControls extends EventDispatcher {
 	 * @param {PointerEvent} p2
 	 * @returns {Number} The angle between two pointers in degrees
 	 */
-	getAngle = ( p1, p2 ) => {
+	getAngle( p1, p2 ) {
 
 		return Math.atan2( p2.clientY - p1.clientY, p2.clientX - p1.clientX ) * 180 / Math.PI;
 
-	};
+	}
 
 	/**
 	 * Update a PointerEvent inside current pointerevents array
 	 * @param {PointerEvent} event
 	 */
-	updateTouchEvent = ( event ) => {
+	updateTouchEvent( event ) {
 
 		for ( let i = 0; i < this._touchCurrent.length; i ++ ) {
 
@@ -1815,7 +1285,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Apply a transformation matrix, to the camera and gizmos
@@ -1911,7 +1381,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Number} t0 Initial time in milliseconds
 	 * @param {Number} t1 Ending time in milliseconds
 	 */
-	calculateAngularSpeed = ( p0, p1, t0, t1 ) => {
+	calculateAngularSpeed( p0, p1, t0, t1 ) {
 
 		const s = p1 - p0;
 		const t = ( t1 - t0 ) / 1000;
@@ -1923,7 +1393,7 @@ class ArcballControls extends EventDispatcher {
 
 		return s / t;
 
-	};
+	}
 
 	/**
 	 * Calculate the distance between two pointers
@@ -1931,11 +1401,11 @@ class ArcballControls extends EventDispatcher {
 	 * @param {PointerEvent} p1 The second pointer
 	 * @returns {number} The distance between the two pointers
 	 */
-	calculatePointersDistance = ( p0, p1 ) => {
+	calculatePointersDistance( p0, p1 ) {
 
 		return Math.sqrt( Math.pow( p1.clientX - p0.clientX, 2 ) + Math.pow( p1.clientY - p0.clientY, 2 ) );
 
-	};
+	}
 
 	/**
 	 * Calculate the rotation axis as the vector perpendicular between two vectors
@@ -1943,7 +1413,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Vector3} vec2 The second vector
 	 * @returns {Vector3} The normalized rotation axis
 	 */
-	calculateRotationAxis = ( vec1, vec2 ) => {
+	calculateRotationAxis( vec1, vec2 ) {
 
 		this._rotationMatrix.extractRotation( this._cameraMatrixState );
 		this._quat.setFromRotationMatrix( this._rotationMatrix );
@@ -1951,14 +1421,14 @@ class ArcballControls extends EventDispatcher {
 		this._rotationAxis.crossVectors( vec1, vec2 ).applyQuaternion( this._quat );
 		return this._rotationAxis.normalize().clone();
 
-	};
+	}
 
 	/**
 	 * Calculate the trackball radius so that gizmo's diamater will be 2/3 of the minimum side of the camera frustum
 	 * @param {Camera} camera
 	 * @returns {Number} The trackball radius
 	 */
-	calculateTbRadius = ( camera ) => {
+	calculateTbRadius( camera ) {
 
 		const distance = camera.position.distanceTo( this._gizmos.position );
 
@@ -1974,7 +1444,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Focus operation consist of positioning the point of interest in front of the camera and a slightly zoom in
@@ -1982,7 +1452,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Number} size Scale factor
 	 * @param {Number} amount Amount of operation to be completed (used for focus animations, default is complete full operation)
 	 */
-	focus = ( point, size, amount = 1 ) => {
+	focus( point, size, amount = 1 ) {
 
 		//move center of camera (along with gizmos) towards point of interest
 		_offset.copy( point ).sub( this._gizmos.position ).multiplyScalar( amount );
@@ -2006,12 +1476,12 @@ class ArcballControls extends EventDispatcher {
 		this._gizmoMatrixState.copy( _gizmoMatrixStateTemp );
 		this._cameraMatrixState.copy( _cameraMatrixStateTemp );
 
-	};
+	}
 
 	/**
 	 * Draw a grid and add it to the scene
 	 */
-	drawGrid = () => {
+	drawGrid() {
 
 		if ( this.scene != null ) {
 
@@ -2058,12 +1528,12 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Remove all listeners, stop animations and clean scene
 	 */
-	dispose = () => {
+	dispose() {
 
 		if ( this._animationId != - 1 ) {
 
@@ -2071,25 +1541,25 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-		this.domElement.removeEventListener( 'pointerdown', this.onPointerDown );
-		this.domElement.removeEventListener( 'pointercancel', this.onPointerCancel );
-		this.domElement.removeEventListener( 'wheel', this.onWheel );
-		this.domElement.removeEventListener( 'contextmenu', this.onContextMenu );
+		this.domElement.removeEventListener( 'pointerdown', this._onPointerDown );
+		this.domElement.removeEventListener( 'pointercancel', this._onPointerCancel );
+		this.domElement.removeEventListener( 'wheel', this._onWheel );
+		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
 
-		window.removeEventListener( 'pointermove', this.onPointerMove );
-		window.removeEventListener( 'pointerup', this.onPointerUp );
+		window.removeEventListener( 'pointermove', this._onPointerMove );
+		window.removeEventListener( 'pointerup', this._onPointerUp );
 
-		window.removeEventListener( 'resize', this.onWindowResize );
+		window.removeEventListener( 'resize', this._onWindowResize );
 
 		if ( this.scene !== null ) this.scene.remove( this._gizmos );
 		this.disposeGrid();
 
-	};
+	}
 
 	/**
 	 * remove the grid from the scene
 	 */
-	disposeGrid = () => {
+	disposeGrid() {
 
 		if ( this._grid != null && this.scene != null ) {
 
@@ -2098,24 +1568,24 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Compute the easing out cubic function for ease out effect in animation
 	 * @param {Number} t The absolute progress of the animation in the bound of 0 (beginning of the) and 1 (ending of animation)
 	 * @returns {Number} Result of easing out cubic at time t
 	 */
-	easeOutCubic = ( t ) => {
+	easeOutCubic( t ) {
 
 		return 1 - Math.pow( 1 - t, 3 );
 
-	};
+	}
 
 	/**
 	 * Make rotation gizmos more or less visible
 	 * @param {Boolean} isActive If true, make gizmos more visible
 	 */
-	activateGizmos = ( isActive ) => {
+	activateGizmos( isActive ) {
 
 		const gizmoX = this._gizmos.children[ 0 ];
 		const gizmoY = this._gizmos.children[ 1 ];
@@ -2135,7 +1605,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Calculate the cursor position in NDC
@@ -2144,14 +1614,14 @@ class ArcballControls extends EventDispatcher {
 	 * @param {HTMLElement} canvas The canvas where the renderer draws its output
 	 * @returns {Vector2} Cursor normalized position inside the canvas
 	 */
-	getCursorNDC = ( cursorX, cursorY, canvas ) => {
+	getCursorNDC( cursorX, cursorY, canvas ) {
 
 		const canvasRect = canvas.getBoundingClientRect();
 		this._v2_1.setX( ( ( cursorX - canvasRect.left ) / canvasRect.width ) * 2 - 1 );
 		this._v2_1.setY( ( ( canvasRect.bottom - cursorY ) / canvasRect.height ) * 2 - 1 );
 		return this._v2_1.clone();
 
-	};
+	}
 
 	/**
 	 * Calculate the cursor position inside the canvas x/y coordinates with the origin being in the center of the canvas
@@ -2160,20 +1630,20 @@ class ArcballControls extends EventDispatcher {
 	 * @param {HTMLElement} canvas The canvas where the renderer draws its output
 	 * @returns {Vector2} Cursor position inside the canvas
 	 */
-	getCursorPosition = ( cursorX, cursorY, canvas ) => {
+	getCursorPosition( cursorX, cursorY, canvas ) {
 
 		this._v2_1.copy( this.getCursorNDC( cursorX, cursorY, canvas ) );
 		this._v2_1.x *= ( this.camera.right - this.camera.left ) * 0.5;
 		this._v2_1.y *= ( this.camera.top - this.camera.bottom ) * 0.5;
 		return this._v2_1.clone();
 
-	};
+	}
 
 	/**
 	 * Set the camera to be controlled
 	 * @param {Camera} camera The virtual camera to be controlled
 	 */
-	setCamera = ( camera ) => {
+	setCamera( camera ) {
 
 		camera.lookAt( this.target );
 		camera.updateMatrix();
@@ -2210,7 +1680,7 @@ class ArcballControls extends EventDispatcher {
 		this._tbRadius = this.calculateTbRadius( camera );
 		this.makeGizmos( this.target, this._tbRadius );
 
-	};
+	}
 
 	/**
 	 * Set gizmos visibility
@@ -2252,7 +1722,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Vector3} tbCenter The trackball center
 	 * @param {number} tbRadius The trackball radius
 	 */
-	makeGizmos = ( tbCenter, tbRadius ) => {
+	makeGizmos( tbCenter, tbRadius ) {
 
 		const curve = new EllipseCurve( 0, 0, tbRadius, tbRadius );
 		const points = curve.getPoints( this._curvePts );
@@ -2315,7 +1785,7 @@ class ArcballControls extends EventDispatcher {
 		this._gizmos.add( gizmoY );
 		this._gizmos.add( gizmoZ );
 
-	};
+	}
 
 	/**
 	 * Perform animation for focus operation
@@ -2324,7 +1794,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Matrix4} cameraMatrix Camera matrix
 	 * @param {Matrix4} gizmoMatrix Gizmos matrix
 	 */
-	onFocusAnim = ( time, point, cameraMatrix, gizmoMatrix ) => {
+	onFocusAnim( time, point, cameraMatrix, gizmoMatrix ) {
 
 		if ( this._timeStart == - 1 ) {
 
@@ -2381,7 +1851,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Perform animation for rotation operation
@@ -2389,7 +1859,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Vector3} rotationAxis Rotation axis
 	 * @param {number} w0 Initial angular velocity
 	 */
-	onRotationAnim = ( time, rotationAxis, w0 ) => {
+	onRotationAnim( time, rotationAxis, w0 ) {
 
 		if ( this._timeStart == - 1 ) {
 
@@ -2447,7 +1917,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 
 	/**
@@ -2456,7 +1926,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Vector3} p1 Ending point
 	 * @param {Boolean} adjust If movement should be adjusted considering camera distance (Perspective only)
 	 */
-	pan = ( p0, p1, adjust = false ) => {
+	pan( p0, p1, adjust = false ) {
 
 		const movement = p0.clone().sub( p1 );
 
@@ -2482,12 +1952,12 @@ class ArcballControls extends EventDispatcher {
 		this.setTransformationMatrices( this._m4_1, this._m4_1 );
 		return _transformation;
 
-	};
+	}
 
 	/**
 	 * Reset trackball
 	 */
-	reset = () => {
+	reset() {
 
 		this.camera.zoom = this._zoom0;
 
@@ -2519,7 +1989,7 @@ class ArcballControls extends EventDispatcher {
 
 		this.dispatchEvent( _changeEvent );
 
-	};
+	}
 
 	/**
 	 * Rotate the camera around an axis passing by trackball's center
@@ -2527,7 +1997,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {number} angle Angle in radians
 	 * @returns {Object} Object with 'camera' field containing transformation matrix resulting from the operation to be applied to the camera
 	 */
-	rotate = ( axis, angle ) => {
+	rotate( axis, angle ) {
 
 		const point = this._gizmos.position; //rotation center
 		this._translationMatrix.makeTranslation( - point.x, - point.y, - point.z );
@@ -2542,9 +2012,9 @@ class ArcballControls extends EventDispatcher {
 
 		return _transformation;
 
-	};
+	}
 
-	copyState = () => {
+	copyState() {
 
 		let state;
 		if ( this.camera.isOrthographicCamera ) {
@@ -2577,9 +2047,9 @@ class ArcballControls extends EventDispatcher {
 
 		navigator.clipboard.writeText( state );
 
-	};
+	}
 
-	pasteState = () => {
+	pasteState() {
 
 		const self = this;
 		navigator.clipboard.readText().then( function resolved( value ) {
@@ -2588,12 +2058,12 @@ class ArcballControls extends EventDispatcher {
 
 		} );
 
-	};
+	}
 
 	/**
 	 * Save the current state of the control. This can later be recover with .reset
 	 */
-	saveState = () => {
+	saveState() {
 
 		this._cameraMatrixState0.copy( this.camera.matrix );
 		this._gizmoMatrixState0.copy( this._gizmos.matrix );
@@ -2608,7 +2078,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Perform uniform scale operation around a given point
@@ -2617,7 +2087,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Boolean} scaleGizmos If gizmos should be scaled (Perspective only)
 	 * @returns {Object} Object with 'camera' and 'gizmo' fields containing transformation matrices resulting from the operation to be applied to the camera and gizmos
 	 */
-	scale = ( size, point, scaleGizmos = true ) => {
+	scale( size, point, scaleGizmos = true ) {
 
 		_scalePointTemp.copy( point );
 		let sizeInverse = 1 / size;
@@ -2724,13 +2194,13 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Set camera fov
 	 * @param {Number} value fov to be setted
 	 */
-	setFov = ( value ) => {
+	setFov( value ) {
 
 		if ( this.camera.isPerspectiveCamera ) {
 
@@ -2739,7 +2209,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Set values in transformation object
@@ -2792,7 +2262,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Number} angle Angle in radians
 	 * @returns The computed transormation matix
 	 */
-	zRotate = ( point, angle ) => {
+	zRotate( point, angle ) {
 
 		this._rotationMatrix.makeRotationAxis( this._rotationAxis, angle );
 		this._translationMatrix.makeTranslation( - point.x, - point.y, - point.z );
@@ -2810,7 +2280,7 @@ class ArcballControls extends EventDispatcher {
 		this.setTransformationMatrices( this._m4_1, this._m4_2 );
 		return _transformation;
 
-	};
+	}
 
 
 	getRaycaster() {
@@ -2826,7 +2296,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Camera} camera Virtual camera
 	 * @returns {Vector3} The point of intersection with the model, if exist, null otherwise
 	 */
-	unprojectOnObj = ( cursor, camera ) => {
+	unprojectOnObj( cursor, camera ) {
 
 		const raycaster = this.getRaycaster();
 		raycaster.near = camera.near;
@@ -2847,7 +2317,7 @@ class ArcballControls extends EventDispatcher {
 
 		return null;
 
-	};
+	}
 
 	/**
 	 * Unproject the cursor on the trackball surface
@@ -2858,7 +2328,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {number} tbRadius The trackball radius
 	 * @returns {Vector3} The unprojected point on the trackball surface
 	 */
-	unprojectOnTbSurface = ( camera, cursorX, cursorY, canvas, tbRadius ) => {
+	unprojectOnTbSurface( camera, cursorX, cursorY, canvas, tbRadius ) {
 
 		if ( camera.type == 'OrthographicCamera' ) {
 
@@ -2976,7 +2446,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 
 	/**
@@ -2988,7 +2458,7 @@ class ArcballControls extends EventDispatcher {
 	 * @param {Boolean} initialDistance If initial distance between camera and gizmos should be used for calculations instead of current (Perspective only)
 	 * @returns {Vector3} The unprojected point on the trackball plane
 	 */
-	unprojectOnTbPlane = ( camera, cursorX, cursorY, canvas, initialDistance = false ) => {
+	unprojectOnTbPlane( camera, cursorX, cursorY, canvas, initialDistance = false ) {
 
 		if ( camera.type == 'OrthographicCamera' ) {
 
@@ -3057,12 +2527,12 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Update camera and gizmos state
 	 */
-	updateMatrixState = () => {
+	updateMatrixState() {
 
 		//update camera and gizmos state
 		this._cameraMatrixState.copy( this.camera.matrix );
@@ -3080,14 +2550,14 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
 	/**
 	 * Update the trackball FSA
 	 * @param {STATE} newState New state of the FSA
 	 * @param {Boolean} updateMatrices If matriices state should be updated
 	 */
-	updateTbState = ( newState, updateMatrices ) => {
+	updateTbState( newState, updateMatrices ) {
 
 		this._state = newState;
 		if ( updateMatrices ) {
@@ -3096,9 +2566,9 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
 
-	update = () => {
+	update() {
 
 		const EPS = 0.000001;
 
@@ -3166,9 +2636,9 @@ class ArcballControls extends EventDispatcher {
 
 		this.camera.lookAt( this._gizmos.position );
 
-	};
+	}
 
-	setStateFromJSON = ( json ) => {
+	setStateFromJSON( json ) {
 
 		const state = JSON.parse( json );
 
@@ -3209,7 +2679,544 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
-	};
+	}
+
+}
+
+//listeners
+
+function onWindowResize() {
+
+	const scale = ( this._gizmos.scale.x + this._gizmos.scale.y + this._gizmos.scale.z ) / 3;
+	this._tbRadius = this.calculateTbRadius( this.camera );
+
+	const newRadius = this._tbRadius / scale;
+	const curve = new EllipseCurve( 0, 0, newRadius, newRadius );
+	const points = curve.getPoints( this._curvePts );
+	const curveGeometry = new BufferGeometry().setFromPoints( points );
+
+
+	for ( const gizmo in this._gizmos.children ) {
+
+		this._gizmos.children[ gizmo ].geometry = curveGeometry;
+
+	}
+
+	this.dispatchEvent( _changeEvent );
+
+}
+
+function onContextMenu( event ) {
+
+	if ( ! this.enabled ) {
+
+		return;
+
+	}
+
+	for ( let i = 0; i < this.mouseActions.length; i ++ ) {
+
+		if ( this.mouseActions[ i ].mouse == 2 ) {
+
+			//prevent only if button 2 is actually used
+			event.preventDefault();
+			break;
+
+		}
+
+	}
+
+}
+
+function onPointerCancel() {
+
+	this._touchStart.splice( 0, this._touchStart.length );
+	this._touchCurrent.splice( 0, this._touchCurrent.length );
+	this._input = INPUT.NONE;
+
+}
+
+function onPointerDown( event ) {
+
+	if ( event.button == 0 && event.isPrimary ) {
+
+		this._downValid = true;
+		this._downEvents.push( event );
+		this._downStart = performance.now();
+
+	} else {
+
+		this._downValid = false;
+
+	}
+
+	if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
+
+		this._touchStart.push( event );
+		this._touchCurrent.push( event );
+
+		switch ( this._input ) {
+
+			case INPUT.NONE:
+
+				//singleStart
+				this._input = INPUT.ONE_FINGER;
+				this.onSinglePanStart( event, 'ROTATE' );
+
+				window.addEventListener( 'pointermove', this._onPointerMove );
+				window.addEventListener( 'pointerup', this._onPointerUp );
+
+				break;
+
+			case INPUT.ONE_FINGER:
+			case INPUT.ONE_FINGER_SWITCHED:
+
+				//doubleStart
+				this._input = INPUT.TWO_FINGER;
+
+				this.onRotateStart();
+				this.onPinchStart();
+				this.onDoublePanStart();
+
+				break;
+
+			case INPUT.TWO_FINGER:
+
+				//multipleStart
+				this._input = INPUT.MULT_FINGER;
+				this.onTriplePanStart( event );
+				break;
+
+		}
+
+	} else if ( event.pointerType != 'touch' && this._input == INPUT.NONE ) {
+
+		let modifier = null;
+
+		if ( event.ctrlKey || event.metaKey ) {
+
+			modifier = 'CTRL';
+
+		} else if ( event.shiftKey ) {
+
+			modifier = 'SHIFT';
+
+		}
+
+		this._mouseOp = this.getOpFromAction( event.button, modifier );
+		if ( this._mouseOp != null ) {
+
+			window.addEventListener( 'pointermove', this._onPointerMove );
+			window.addEventListener( 'pointerup', this._onPointerUp );
+
+			//singleStart
+			this._input = INPUT.CURSOR;
+			this._button = event.button;
+			this.onSinglePanStart( event, this._mouseOp );
+
+		}
+
+	}
+
+}
+
+function onPointerMove( event ) {
+
+	if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
+
+		switch ( this._input ) {
+
+			case INPUT.ONE_FINGER:
+
+				//singleMove
+				this.updateTouchEvent( event );
+
+				this.onSinglePanMove( event, STATE.ROTATE );
+				break;
+
+			case INPUT.ONE_FINGER_SWITCHED:
+
+				const movement = this.calculatePointersDistance( this._touchCurrent[ 0 ], event ) * this._devPxRatio;
+
+				if ( movement >= this._switchSensibility ) {
+
+					//singleMove
+					this._input = INPUT.ONE_FINGER;
+					this.updateTouchEvent( event );
+
+					this.onSinglePanStart( event, 'ROTATE' );
+					break;
+
+				}
+
+				break;
+
+			case INPUT.TWO_FINGER:
+
+				//rotate/pan/pinchMove
+				this.updateTouchEvent( event );
+
+				this.onRotateMove();
+				this.onPinchMove();
+				this.onDoublePanMove();
+
+				break;
+
+			case INPUT.MULT_FINGER:
+
+				//multMove
+				this.updateTouchEvent( event );
+
+				this.onTriplePanMove( event );
+				break;
+
+		}
+
+	} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
+
+		let modifier = null;
+
+		if ( event.ctrlKey || event.metaKey ) {
+
+			modifier = 'CTRL';
+
+		} else if ( event.shiftKey ) {
+
+			modifier = 'SHIFT';
+
+		}
+
+		const mouseOpState = this.getOpStateFromAction( this._button, modifier );
+
+		if ( mouseOpState != null ) {
+
+			this.onSinglePanMove( event, mouseOpState );
+
+		}
+
+	}
+
+	//checkDistance
+	if ( this._downValid ) {
+
+		const movement = this.calculatePointersDistance( this._downEvents[ this._downEvents.length - 1 ], event ) * this._devPxRatio;
+		if ( movement > this._movementThreshold ) {
+
+			this._downValid = false;
+
+		}
+
+	}
+
+}
+
+function onPointerUp( event ) {
+
+	if ( event.pointerType == 'touch' && this._input != INPUT.CURSOR ) {
+
+		const nTouch = this._touchCurrent.length;
+
+		for ( let i = 0; i < nTouch; i ++ ) {
+
+			if ( this._touchCurrent[ i ].pointerId == event.pointerId ) {
+
+				this._touchCurrent.splice( i, 1 );
+				this._touchStart.splice( i, 1 );
+				break;
+
+			}
+
+		}
+
+		switch ( this._input ) {
+
+			case INPUT.ONE_FINGER:
+			case INPUT.ONE_FINGER_SWITCHED:
+
+				//singleEnd
+				window.removeEventListener( 'pointermove', this._onPointerMove );
+				window.removeEventListener( 'pointerup', this._onPointerUp );
+
+				this._input = INPUT.NONE;
+				this.onSinglePanEnd();
+
+				break;
+
+			case INPUT.TWO_FINGER:
+
+				//doubleEnd
+				this.onDoublePanEnd( event );
+				this.onPinchEnd( event );
+				this.onRotateEnd( event );
+
+				//switching to singleStart
+				this._input = INPUT.ONE_FINGER_SWITCHED;
+
+				break;
+
+			case INPUT.MULT_FINGER:
+
+				if ( this._touchCurrent.length == 0 ) {
+
+					window.removeEventListener( 'pointermove', this._onPointerMove );
+					window.removeEventListener( 'pointerup', this._onPointerUp );
+
+					//multCancel
+					this._input = INPUT.NONE;
+					this.onTriplePanEnd();
+
+				}
+
+				break;
+
+		}
+
+	} else if ( event.pointerType != 'touch' && this._input == INPUT.CURSOR ) {
+
+		window.removeEventListener( 'pointermove', this._onPointerMove );
+		window.removeEventListener( 'pointerup', this._onPointerUp );
+
+		this._input = INPUT.NONE;
+		this.onSinglePanEnd();
+		this._button = - 1;
+
+	}
+
+	if ( event.isPrimary ) {
+
+		if ( this._downValid ) {
+
+			const downTime = event.timeStamp - this._downEvents[ this._downEvents.length - 1 ].timeStamp;
+
+			if ( downTime <= this._maxDownTime ) {
+
+				if ( this._nclicks == 0 ) {
+
+					//first valid click detected
+					this._nclicks = 1;
+					this._clickStart = performance.now();
+
+				} else {
+
+					const clickInterval = event.timeStamp - this._clickStart;
+					const movement = this.calculatePointersDistance( this._downEvents[ 1 ], this._downEvents[ 0 ] ) * this._devPxRatio;
+
+					if ( clickInterval <= this._maxInterval && movement <= this._posThreshold ) {
+
+						//second valid click detected
+						//fire double tap and reset values
+						this._nclicks = 0;
+						this._downEvents.splice( 0, this._downEvents.length );
+						this.onDoubleTap( event );
+
+					} else {
+
+						//new 'first click'
+						this._nclicks = 1;
+						this._downEvents.shift();
+						this._clickStart = performance.now();
+
+					}
+
+				}
+
+			} else {
+
+				this._downValid = false;
+				this._nclicks = 0;
+				this._downEvents.splice( 0, this._downEvents.length );
+
+			}
+
+		} else {
+
+			this._nclicks = 0;
+			this._downEvents.splice( 0, this._downEvents.length );
+
+		}
+
+	}
+
+}
+
+function onWheel( event ) {
+
+	if ( this.enabled && this.enableZoom ) {
+
+		let modifier = null;
+
+		if ( event.ctrlKey || event.metaKey ) {
+
+			modifier = 'CTRL';
+
+		} else if ( event.shiftKey ) {
+
+			modifier = 'SHIFT';
+
+		}
+
+		const mouseOp = this.getOpFromAction( 'WHEEL', modifier );
+
+		if ( mouseOp != null ) {
+
+			event.preventDefault();
+			this.dispatchEvent( _startEvent );
+
+			const notchDeltaY = 125; //distance of one notch of mouse wheel
+			let sgn = event.deltaY / notchDeltaY;
+
+			let size = 1;
+
+			if ( sgn > 0 ) {
+
+				size = 1 / this.scaleFactor;
+
+			} else if ( sgn < 0 ) {
+
+				size = this.scaleFactor;
+
+			}
+
+			switch ( mouseOp ) {
+
+				case 'ZOOM':
+
+					this.updateTbState( STATE.SCALE, true );
+
+					if ( sgn > 0 ) {
+
+						size = 1 / ( Math.pow( this.scaleFactor, sgn ) );
+
+					} else if ( sgn < 0 ) {
+
+						size = Math.pow( this.scaleFactor, - sgn );
+
+					}
+
+					if ( this.cursorZoom && this.enablePan ) {
+
+						let scalePoint;
+
+						if ( this.camera.isOrthographicCamera ) {
+
+							scalePoint = this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.camera.quaternion ).multiplyScalar( 1 / this.camera.zoom ).add( this._gizmos.position );
+
+						} else if ( this.camera.isPerspectiveCamera ) {
+
+							scalePoint = this.unprojectOnTbPlane( this.camera, event.clientX, event.clientY, this.domElement ).applyQuaternion( this.camera.quaternion ).add( this._gizmos.position );
+
+						}
+
+						this.applyTransformMatrix( this.scale( size, scalePoint ) );
+
+					} else {
+
+						this.applyTransformMatrix( this.scale( size, this._gizmos.position ) );
+
+					}
+
+					if ( this._grid != null ) {
+
+						this.disposeGrid();
+						this.drawGrid();
+
+					}
+
+					this.updateTbState( STATE.IDLE, false );
+
+					this.dispatchEvent( _changeEvent );
+					this.dispatchEvent( _endEvent );
+
+					break;
+
+				case 'FOV':
+
+					if ( this.camera.isPerspectiveCamera ) {
+
+						this.updateTbState( STATE.FOV, true );
+
+
+						//Vertigo effect
+
+						//	  fov / 2
+						//		|\
+						//		| \
+						//		|  \
+						//	x	|	\
+						//		| 	 \
+						//		| 	  \
+						//		| _ _ _\
+						//			y
+
+						//check for iOs shift shortcut
+						if ( event.deltaX != 0 ) {
+
+							sgn = event.deltaX / notchDeltaY;
+
+							size = 1;
+
+							if ( sgn > 0 ) {
+
+								size = 1 / ( Math.pow( this.scaleFactor, sgn ) );
+
+							} else if ( sgn < 0 ) {
+
+								size = Math.pow( this.scaleFactor, - sgn );
+
+							}
+
+						}
+
+						this._v3_1.setFromMatrixPosition( this._cameraMatrixState );
+						const x = this._v3_1.distanceTo( this._gizmos.position );
+						let xNew = x / size;	//distance between camera and gizmos if scale(size, scalepoint) would be performed
+
+						//check min and max distance
+						xNew = MathUtils.clamp( xNew, this.minDistance, this.maxDistance );
+
+						const y = x * Math.tan( MathUtils.DEG2RAD * this.camera.fov * 0.5 );
+
+						//calculate new fov
+						let newFov = MathUtils.RAD2DEG * ( Math.atan( y / xNew ) * 2 );
+
+						//check min and max fov
+						if ( newFov > this.maxFov ) {
+
+							newFov = this.maxFov;
+
+						} else if ( newFov < this.minFov ) {
+
+							newFov = this.minFov;
+
+						}
+
+						const newDistance = y / Math.tan( MathUtils.DEG2RAD * ( newFov / 2 ) );
+						size = x / newDistance;
+
+						this.setFov( newFov );
+						this.applyTransformMatrix( this.scale( size, this._gizmos.position, false ) );
+
+					}
+
+					if ( this._grid != null ) {
+
+						this.disposeGrid();
+						this.drawGrid();
+
+					}
+
+					this.updateTbState( STATE.IDLE, false );
+
+					this.dispatchEvent( _changeEvent );
+					this.dispatchEvent( _endEvent );
+
+					break;
+
+			}
+
+		}
+
+	}
 
 }
 
