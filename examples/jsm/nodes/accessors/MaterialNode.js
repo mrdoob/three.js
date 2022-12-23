@@ -101,7 +101,7 @@ class MaterialNode extends Node {
 
 			const reflectivityNode = new MaterialReferenceNode( 'reflectivity', 'float' );
 
-			if ( material.specularMap?.isTexture === true ) {
+			if ( material.specularMap && material.specularMap.isTexture === true ) {
 
 				node = new OperatorNode( '*', reflectivityNode, new SplitNode( new TextureNode( material.specularMap ), 'r' ) );
 

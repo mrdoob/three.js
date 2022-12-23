@@ -207,7 +207,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// EMISSIVE
 
-		if ( this.emissiveNode?.isNode === true || material.emissive?.isColor === true ) {
+		if ( ( this.emissiveNode && this.emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
 			outgoingLightNode = outgoingLightNode.add( vec3( this.emissiveNode || materialEmissive ) );
 
@@ -223,7 +223,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// TONE MAPPING
 
-		if ( renderer.toneMappingNode?.isNode === true ) {
+		if ( renderer.toneMappingNode && renderer.toneMappingNode.isNode === true ) {
 
 			outgoingLight = context( renderer.toneMappingNode, { color: outgoingLight } );
 

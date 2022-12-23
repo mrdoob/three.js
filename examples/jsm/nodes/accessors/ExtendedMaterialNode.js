@@ -7,8 +7,6 @@ import {
 
 class ExtendedMaterialNode extends MaterialNode {
 
-	static NORMAL = 'normal';
-
 	constructor( scope ) {
 
 		super( scope );
@@ -47,5 +45,7 @@ class ExtendedMaterialNode extends MaterialNode {
 	}
 
 }
+
+ExtendedMaterialNode.NORMAL = 'normal';
 
 export default ExtendedMaterialNode;
