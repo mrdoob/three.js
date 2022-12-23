@@ -55,9 +55,7 @@ class ViewportNode extends Node {
 
 		if ( scope === ViewportNode.RESOLUTION ) {
 
-			resolution = resolution || new Vector2();
-
-			output = uniform( resolution );
+			output = uniform( resolution || ( resolution = new Vector2() ) );
 
 		} else {
 

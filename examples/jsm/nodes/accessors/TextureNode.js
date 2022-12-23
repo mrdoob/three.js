@@ -30,9 +30,7 @@ class TextureNode extends UniformNode {
 
 	getDefaultUV() {
 
-		defaultUV = defaultUV || new UVNode();
-
-		return defaultUV;
+		return defaultUV || ( defaultUV = new UVNode() );
 
 	}
 
@@ -50,7 +48,7 @@ class TextureNode extends UniformNode {
 
 		}
 
-		uvNode = uvNode || this.getDefaultUV();
+		uvNode || ( uvNode = this.getDefaultUV() );
 
 		//
 

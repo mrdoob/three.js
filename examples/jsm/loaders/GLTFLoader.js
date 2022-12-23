@@ -584,7 +584,7 @@ class GLTFLightsExtension {
 
 	}
 
-	getDependency( type, index ) {	
+	getDependency( type, index ) {
 
 		if ( type !== 'light' ) return;
 
@@ -2264,7 +2264,7 @@ class GLTFParser {
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
-		
+
 		let isSafari = false;
 		let isFirefox = false;
 		let firefoxVersion = - 1;

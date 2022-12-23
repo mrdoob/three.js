@@ -28,7 +28,7 @@ class InteractiveGroup extends Group {
 			event.stopPropagation();
 
 			const rect = renderer.domElement.getBoundingClientRect();
-			
+
 			_pointer.x = ( event.clientX - rect.left ) / rect.width * 2 - 1;
 			_pointer.y = - ( event.clientY - rect.top ) / rect.height * 2 + 1;
 
