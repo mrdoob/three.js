@@ -61,7 +61,7 @@
 				//
 
 				document.body.appendChild( ARButton.createButton( renderer, {
-					requiredFeatures: ['plane-detection']
+					requiredFeatures: [ 'plane-detection' ]
 				} ) );
 
 				//
@@ -74,26 +74,26 @@
 
 				} );
 
-				renderer.xr.addEventListener( 'planeadded', function (e) {
-				
-					console.log( "plane added", e.data )
-				
+				renderer.xr.addEventListener( 'planeadded', function ( e ) {
+			
+					console.log( 'plane added', e.data );
+			
 				} );
 
-				renderer.xr.addEventListener( 'planeremoved', function (e) {
-				
-					console.log( "plane removed", e.data )
-				
+				renderer.xr.addEventListener( 'planeremoved', function ( e ) {
+			
+					console.log( 'plane removed', e.data );
+			
 				} );
 
-				renderer.xr.addEventListener( 'planechanged', function (e) {
-				
-					console.log( "plane changed", e.data)
-				
+				renderer.xr.addEventListener( 'planechanged', function ( e ) {
+			
+					console.log( 'plane changed', e.data );
+			
 				} );
 
-				renderer.xr.addEventListener( 'planesdetected', function (e) {
-					
+				renderer.xr.addEventListener( 'planesdetected', function ( e ) {
+			
 					const detectedPlanes = e.data;
 					const referenceSpace = renderer.xr.getReferenceSpace();
 
@@ -102,7 +102,7 @@
 					detectedPlanes.forEach( plane => {
 
 						if ( planesAdded.has( plane ) ) return;
-						
+			
 						planesAdded.add( plane );
 						const frame = renderer.xr.getFrame();
 						const planePose = frame.getPose( plane.planeSpace, referenceSpace );
@@ -134,7 +134,9 @@
 						scene.add( boxMesh );
 
 					} );
+			
 				} );
+
 			}
 
 			function onWindowResize() {
