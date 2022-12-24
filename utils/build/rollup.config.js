@@ -1,8 +1,8 @@
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 
 export function glconstants() {
 
-	var constants = {
+	const constants = {
 		POINTS: 0, ZERO: 0, NONE: 0,
 		LINES: 1, ONE: 1,
 		LINE_LOOP: 2,
