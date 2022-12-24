@@ -29,7 +29,7 @@
 			<div id="contentWrapper">
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
-					<div id="exitSearchButton"></div>
+					<div id="clearSearchButton"></div>
 					<select id="language">
 						<option value="en">en</option>
 						<option value="ar">ar</option>
@@ -54,7 +54,7 @@
 		const panel = document.getElementById( 'panel' );
 		const content = document.getElementById( 'content' );
 		const expandButton = document.getElementById( 'expandButton' );
-		const exitSearchButton = document.getElementById( 'exitSearchButton' );
+		const clearSearchButton = document.getElementById( 'clearSearchButton' );
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const filterInput = document.getElementById( 'filterInput' );
 		let iframe = document.querySelector( 'iframe' );
@@ -165,7 +165,7 @@
 
 			};
 
-			exitSearchButton.onclick = function () {
+			clearSearchButton.onclick = function () {
 
 				filterInput.value = '';
 				updateFilter();
