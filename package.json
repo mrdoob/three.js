@@ -75,10 +75,6 @@
       "no-throw-literal": [
         "error"
       ],
-      "import/extensions": [
-        "error",
-        "always"
-      ],
       "quotes": [
         "error",
         "single"

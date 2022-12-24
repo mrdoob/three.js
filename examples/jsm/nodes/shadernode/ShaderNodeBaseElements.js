@@ -249,7 +249,7 @@ export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
 export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
 export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
 export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
-export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );;
+export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
 export const transformedNormalView = nodeImmutable( PropertyNode, 'vec3', 'TransformedNormalView' );
 export const transformedNormalWorld = normalize( transformDirection( transformedNormalView, cameraViewMatrix ) );
 
