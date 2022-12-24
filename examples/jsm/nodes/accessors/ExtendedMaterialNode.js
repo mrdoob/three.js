@@ -25,6 +25,7 @@ class ExtendedMaterialNode extends MaterialNode {
 		}
 
 		return type || super.getNodeType( builder );
+
 	}
 
 	construct( builder ) {

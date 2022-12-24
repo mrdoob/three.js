@@ -53,7 +53,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// METALNESS
 
-		let metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
+		const metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
 
 		stack.assign( metalness, metalnessNode );
 		stack.assign( diffuseColor, vec4( diffuseColor.rgb.mul( metalnessNode.invert() ), diffuseColor.a ) );
