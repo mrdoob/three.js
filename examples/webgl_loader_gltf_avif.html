@@ -61,7 +61,7 @@
 					0.25,
 					20
 				);
-				camera.position.set( 2.5, 1.5, 3.0 );
+				camera.position.set( 2.5, 0, 3.0 );
 
 				scene = new THREE.Scene();
 
@@ -79,7 +79,7 @@
 						// model
 
 						const loader = new GLTFLoader().setPath( 'models/gltf/AVIFTest/' );
-						loader.load( 'avif-test.gltf', function ( gltf ) {
+						loader.load( 'DamagedHelmetAVIF.glb', function ( gltf ) {
 
 							scene.add( gltf.scene );
 
@@ -101,7 +101,7 @@
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
-				controls.target.set( 0, 0.5, - 0.2 );
+				controls.target.set( 0, 0, 0);
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
