@@ -1,6 +1,5 @@
 ( function () {
-
-	/**
+/**
      * @author Maxime Quiblier / http://github.com/maximeq
      *
      * @param {boolean} useFloatTexture If true, we consider floatTexture extension is activated and available.
@@ -12,31 +11,25 @@
      *                            x = 4*unpackRGBAToDepth(rgba) - 1;
      */
 
-	class MeshViewPositionMaterial extends THREE.ShaderMaterial {
+class MeshViewPositionMaterial extends THREE.ShaderMaterial {
+  constructor(parameters) {
+    parameters = parameters || {};
+    parameters.uniforms = THREE.UniformsUtils.merge([THREE.ShaderLib.displacementmap]);
+    parameters.vertexShader = ['#include <common>', '#include <displacementmap_pars_vertex>', '#include <fog_pars_vertex>', '#include <morphtarget_pars_vertex>', '#include <skinning_pars_vertex>', '#include <shadowmap_pars_vertex>', '#include <logdepthbuf_pars_vertex>', '#include <clipping_planes_pars_vertex>', 'varying vec3 vViewPosition;', 'void main() {', '#include <skinbase_vertex>', '#include <begin_vertex>', '#include <morphtarget_vertex>', '#include <skinning_vertex>', '#include <displacementmap_vertex>', '#include <project_vertex>', '#include <logdepthbuf_vertex>', '#include <clipping_planes_vertex>', 'vViewPosition = (viewMatrix * modelMatrix * vec4( transformed, 1.0)).xyz;', '}'].join('\n');
+    parameters.fragmentShader = ['varying vec3 vViewPosition;', 'void main() {', 'gl_FragColor = vec4(vViewPosition.xyz,1.0);', '}'].join('\n');
+    super(parameters);
+    this.displacementMap = null;
+    this.displacementScale = 1;
+    this.displacementBias = 0;
+    this.wireframe = false;
+    this.wireframeLinewidth = 1;
+    this.fog = false;
+    this.lights = false;
+    this.skinning = false;
+    this.morphTargets = false;
+  }
 
-		constructor( parameters ) {
+}
 
-			parameters = parameters || {};
-			parameters.uniforms = THREE.UniformsUtils.merge( [ THREE.ShaderLib.displacementmap ] );
-			parameters.vertexShader = [ '#include <common>', '#include <displacementmap_pars_vertex>', '#include <fog_pars_vertex>', '#include <morphtarget_pars_vertex>', '#include <skinning_pars_vertex>', '#include <shadowmap_pars_vertex>', '#include <logdepthbuf_pars_vertex>', '#include <clipping_planes_pars_vertex>', 'varying vec3 vViewPosition;', 'void main() {', '#include <skinbase_vertex>', '#include <begin_vertex>', '#include <morphtarget_vertex>', '#include <skinning_vertex>', '#include <displacementmap_vertex>', '#include <project_vertex>', '#include <logdepthbuf_vertex>', '#include <clipping_planes_vertex>', 'vViewPosition = gl_Position', '}' ].join( '\n' );
-			parameters.fragmentShader = [ '#include <packing>', // packDepthToRGBA can only pack [0,1[ with 1.0 exluded
-				'#define packUnitFloat32ToRGBA packDepthToRGBA', // alias for better understanding
-				'varying vec3 vViewPosition;', 'void main() {', parameters.useFloatTexture ? 'gl_FragColor = vViewPosition;' : 'gl_FragColor = packUnitFloat32ToRGBA((vViewPosition.' + parameters.coordinate + ' + 1.0) / 4.0);', '}' ].join( '\n' );
-			super( parameters );
-			this.displacementMap = null;
-			this.displacementScale = 1;
-			this.displacementBias = 0;
-			this.wireframe = false;
-			this.wireframeLinewidth = 1;
-			this.fog = false;
-			this.lights = false;
-			this.skinning = false;
-			this.morphTargets = false;
-
-		}
-
-	}
-
-	THREE.MeshViewPositionMaterial = MeshViewPositionMaterial;
-
+THREE.MeshViewPositionMaterial = MeshViewPositionMaterial;
 } )();

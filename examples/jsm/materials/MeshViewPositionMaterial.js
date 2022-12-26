@@ -45,19 +45,15 @@ class MeshViewPositionMaterial extends ShaderMaterial {
             '#include <logdepthbuf_vertex>',
             '#include <clipping_planes_vertex>',
 
-            'vViewPosition = gl_Position',
+            'vViewPosition = (viewMatrix * modelMatrix * vec4( transformed, 1.0)).xyz;',
 
             '}'
         ].join('\n');
 
         parameters.fragmentShader = [
-            '#include <packing>',
-            // packDepthToRGBA can only pack [0,1[ with 1.0 exluded
-            '#define packUnitFloat32ToRGBA packDepthToRGBA', // alias for better understanding
             'varying vec3 vViewPosition;',
             'void main() {',
-            parameters.useFloatTexture ?
-                'gl_FragColor = vViewPosition;' : 'gl_FragColor = packUnitFloat32ToRGBA((vViewPosition.' + parameters.coordinate + ' + 1.0) / 4.0);',
+                'gl_FragColor = vec4(vViewPosition.xyz,1.0);',
             '}',
         ].join('\n');
 
