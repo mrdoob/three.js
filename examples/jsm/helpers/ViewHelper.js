@@ -16,8 +16,6 @@ import {
 	Vector4
 } from 'three';
 
-const vpTemp = new Vector4();
-
 class ViewHelper extends Object3D {
 
 	constructor( camera, domElement ) {
@@ -27,7 +25,7 @@ class ViewHelper extends Object3D {
 		this.isViewHelper = true;
 
 		this.animating = false;
-		this.controls = null;
+		this.center = new Vector3();
 
 		const color1 = new Color( '#ff3653' );
 		const color2 = new Color( '#8adb00' );
@@ -145,12 +143,12 @@ class ViewHelper extends Object3D {
 
 			renderer.clearDepth();
 
-			renderer.getViewport( vpTemp );
+			renderer.getViewport( viewport );
 			renderer.setViewport( x, 0, dim, dim );
 
 			renderer.render( this, orthoCamera );
 
-			renderer.setViewport( vpTemp.x, vpTemp.y, vpTemp.z, vpTemp.w );
+			renderer.setViewport( viewport.x, viewport.y, viewport.z, viewport.w );
 
 		};
 
@@ -159,6 +157,7 @@ class ViewHelper extends Object3D {
 
 		const q1 = new Quaternion();
 		const q2 = new Quaternion();
+		const viewport = new Vector4();
 		let radius = 0;
 
 		this.handleClick = function ( event ) {
@@ -180,7 +179,7 @@ class ViewHelper extends Object3D {
 				const intersection = intersects[ 0 ];
 				const object = intersection.object;
 
-				prepareAnimationData( object, this.controls.center );
+				prepareAnimationData( object, this.center );
 
 				this.animating = true;
 
@@ -197,12 +196,11 @@ class ViewHelper extends Object3D {
 		this.update = function ( delta ) {
 
 			const step = delta * turnRate;
-			const focusPoint = this.controls.center;
 
 			// animate position by doing a slerp and then scaling the position on the unit sphere
 
 			q1.rotateTowards( q2, step );
-			camera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( focusPoint );
+			camera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( this.center );
 
 			// animate orientation
 
