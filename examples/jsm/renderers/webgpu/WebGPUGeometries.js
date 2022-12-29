@@ -67,14 +67,14 @@ class WebGPUGeometries {
 	}
 
 	getIndex( geometry, wireframe = false ) {
-
-		let wireframeAttribute = geometry.index;
+ 
+		let index = geometry.index;
 
 		if ( wireframe ) {
 
 			const wireframeGeometries = this.wireframeGeometries;
 
-			wireframeAttribute = wireframeGeometries.get( geometry );
+			let wireframeAttribute = wireframeGeometries.get( geometry );
 
 			if ( wireframeAttribute === undefined ) {
 
@@ -92,9 +92,11 @@ class WebGPUGeometries {
 
 			}
 
+			index = wireframeAttribute;
+
 		}
 
-		return wireframeAttribute;
+		return index;
 
 	}
 
