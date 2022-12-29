@@ -84,7 +84,7 @@ class WebGPUGeometries {
 
 			} else if ( wireframeAttribute.version !== this.getWireframeVersion( geometry ) ) {
 
-				attribute.remove( wireframeAttribute );
+				this.attributes.remove( wireframeAttribute );
 
 				wireframeAttribute = this.getWireframeIndex( geometry );
 
