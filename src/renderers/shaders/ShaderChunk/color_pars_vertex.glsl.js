@@ -1,5 +1,5 @@
 export default /* glsl */`
-#if defined( USE_COLOR_ALPHA )
+#if defined( USE_COLOR_ALPHA ) || defined( USE_INSTANCING_COLOR_ALPHA )
 
 	varying vec4 vColor;
 

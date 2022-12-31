@@ -877,10 +877,11 @@ class ObjectLoader extends Loader {
 				geometry = getGeometry( data.geometry );
 				material = getMaterial( data.material );
 				const count = data.count;
+				const useAlphas = data.useAlphas;
 				const instanceMatrix = data.instanceMatrix;
 				const instanceColor = data.instanceColor;
 
-				object = new InstancedMesh( geometry, material, count );
+				object = new InstancedMesh( geometry, material, count, useAlphas );
 				object.instanceMatrix = new InstancedBufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
 				if ( instanceColor !== undefined ) object.instanceColor = new InstancedBufferAttribute( new Float32Array( instanceColor.array ), instanceColor.itemSize );
 

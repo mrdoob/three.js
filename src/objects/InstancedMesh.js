@@ -12,7 +12,7 @@ const _mesh = /*@__PURE__*/ new Mesh();
 
 class InstancedMesh extends Mesh {
 
-	constructor( geometry, material, count ) {
+	constructor( geometry, material, count, useAlphas ) {
 
 		super( geometry, material );
 
@@ -24,6 +24,9 @@ class InstancedMesh extends Mesh {
 		this.count = count;
 
 		this.frustumCulled = false;
+
+		this.useAlphas = useAlphas;
+		this.colorItemsSize = useAlphas ? 4 : 3;
 
 		for ( let i = 0; i < count; i ++ ) {
 
@@ -42,6 +45,8 @@ class InstancedMesh extends Mesh {
 		if ( source.instanceColor !== null ) this.instanceColor = source.instanceColor.clone();
 
 		this.count = source.count;
+		this.useAlphas = source.useAlphas;
+		this.colorItemsSize = source.colorItemsSize;
 
 		return this;
 
@@ -49,7 +54,7 @@ class InstancedMesh extends Mesh {
 
 	getColorAt( index, color ) {
 
-		color.fromArray( this.instanceColor.array, index * 3 );
+		color.fromArray( this.instanceColor.array, index * this.colorItemsSize );
 
 	}
 
@@ -100,15 +105,21 @@ class InstancedMesh extends Mesh {
 
 	}
 
-	setColorAt( index, color ) {
+	setColorAt( index, color, opacity = 1.0 ) {
 
 		if ( this.instanceColor === null ) {
 
-			this.instanceColor = new InstancedBufferAttribute( new Float32Array( this.instanceMatrix.count * 3 ), 3 );
+			this.instanceColor = new InstancedBufferAttribute( new Float32Array( this.instanceMatrix.count * this.colorItemsSize ), this.colorItemsSize );
 
 		}
 
-		color.toArray( this.instanceColor.array, index * 3 );
+		color.toArray( this.instanceColor.array, index * this.colorItemsSize );
+
+		if ( this.useAlphas ) {
+
+			this.instanceColor.array[ index * this.colorItemsSize + 3 ] = opacity;
+
+		}
 
 	}
 

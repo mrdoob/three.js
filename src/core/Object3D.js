@@ -726,6 +726,7 @@ class Object3D extends EventDispatcher {
 
 			object.type = 'InstancedMesh';
 			object.count = this.count;
+			object.useAlphas = this.useAlphas;
 			object.instanceMatrix = this.instanceMatrix.toJSON();
 			if ( this.instanceColor !== null ) object.instanceColor = this.instanceColor.toJSON();
 

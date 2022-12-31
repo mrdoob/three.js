@@ -56,9 +56,9 @@
 				scene.add( light );
 
 				const geometry = new THREE.IcosahedronGeometry( 0.5, 3 );
-				const material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, transparent: true } );
 
-				mesh = new THREE.InstancedMesh( geometry, material, count );
+				mesh = new THREE.InstancedMesh( geometry, material, count, true );
 
 				let i = 0;
 				const offset = ( amount - 1 ) / 2;
@@ -145,7 +145,7 @@
 
 					if ( color.equals( white ) ) {
 
-						mesh.setColorAt( instanceId, color.setHex( Math.random() * 0xffffff ) );
+						mesh.setColorAt( instanceId, color.setHex( Math.random() * 0xffffff ), Math.random() );
 
 						mesh.instanceColor.needsUpdate = true;
 

@@ -122,6 +122,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			instancing: object.isInstancedMesh === true,
 			instancingColor: object.isInstancedMesh === true && object.instanceColor !== null,
+			instancingColorAlphas: object.isInstancedMesh === true && object.instanceColor && object.instanceColor.itemSize === 4,
 
 			supportsVertexTextures: vertexTextures,
 			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.encoding : LinearEncoding ),

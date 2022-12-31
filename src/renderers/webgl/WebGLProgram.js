@@ -453,6 +453,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.instancing ? '#define USE_INSTANCING' : '',
 			parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
+			parameters.instancingColorAlphas ? '#define USE_INSTANCING_COLOR_ALPHA' : '',
 
 			parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
@@ -535,7 +536,11 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			'#endif',
 
-			'#ifdef USE_INSTANCING_COLOR',
+			'#if defined( USE_INSTANCING_COLOR_ALPHA )',
+
+			'	attribute vec4 instanceColor;',
+
+			'#elif defined( USE_INSTANCING_COLOR )',
 
 			'	attribute vec3 instanceColor;',
 
@@ -657,7 +662,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
-			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
+			parameters.vertexAlphas || parameters.instancingColorAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
