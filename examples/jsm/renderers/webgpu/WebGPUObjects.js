@@ -17,7 +17,9 @@ class WebGPUObjects {
 
 		if ( this.geometries.has( geometry ) === false || updateMap.get( geometry ) !== frame ) {
 
-			this.geometries.update( geometry );
+			const material = object.material;
+
+			this.geometries.update( geometry, material.wireframe === true );
 
 			updateMap.set( geometry, frame );
 
