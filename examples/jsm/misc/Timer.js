@@ -103,7 +103,7 @@ class Timer {
 
 	}
 
-	update() {
+	update( timestamp = null ) {
 
 		if ( this._useFixedDelta === true ) {
 
@@ -112,7 +112,7 @@ class Timer {
 		} else {
 
 			this._previousTime = this._currentTime;
-			this._currentTime = this._now();
+			this._currentTime = ( timestamp !== null ) ? timestamp : this._now();
 
 			this._delta = this._currentTime - this._previousTime;
 
