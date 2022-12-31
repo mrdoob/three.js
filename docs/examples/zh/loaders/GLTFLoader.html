@@ -122,12 +122,6 @@
 			[example:webgl_loader_gltf]
 		</p>
 
-		<h2>浏览器兼容性</h2>
-
-		<p>GLTFLoader 依赖 ES6 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promises]，
-		这一特性不支持IE11。若要在IE11中使用该加载器，你必须引入polyfill（[link:https://github.com/stefanpenner/es6-promise include a polyfill]）
-		来提供一个Promise的替代方案。</p>
-
 		<h2>纹理</h2>
 
 		<p>纹理中包含的颜色信息（.map, .emissiveMap, 和 .specularMap）在glTF中总是使用sRGB颜色空间，而顶点颜色和材质属性（.color, .emissive, .specular）
