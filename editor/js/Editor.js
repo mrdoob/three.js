@@ -136,6 +136,7 @@ Editor.prototype = {
 		this.scene.background = scene.background;
 		this.scene.environment = scene.environment;
 		this.scene.fog = scene.fog;
+		this.scene.backgroundBlurriness = scene.backgroundBlurriness;
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 

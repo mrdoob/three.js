@@ -395,6 +395,7 @@ function SidebarScene( editor ) {
 
 					backgroundType.setValue( 'Equirectangular' );
 					backgroundEquirectangularTexture.setValue( scene.background );
+					backgroundBlurriness.setValue( scene.backgroundBlurriness );
 
 				} else {
 
