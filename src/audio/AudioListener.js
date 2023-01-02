@@ -94,9 +94,7 @@ class AudioListener extends Object3D {
 
 	}
 
-	updateMatrixWorld( force ) {
-
-		super.updateMatrixWorld( force );
+	onAfterMatrixUpdate() {
 
 		const listener = this.context.listener;
 		const up = this.up;
