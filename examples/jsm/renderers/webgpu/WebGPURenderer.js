@@ -15,7 +15,7 @@ import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
 import WebGPUUtils from './WebGPUUtils.js';
 
-import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
+import { Frustum, Matrix4, Vector3, Color, LinearEncoding, NoToneMapping } from 'three';
 
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
@@ -99,6 +99,9 @@ class WebGPURenderer {
 		this.autoClearStencil = true;
 
 		this.outputEncoding = LinearEncoding;
+
+		this.toneMapping = NoToneMapping;
+		this.toneMappingExposure = 1.0;
 
 		this.sortObjects = true;
 
