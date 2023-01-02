@@ -56,6 +56,11 @@
 			The expected number of vertices in VBO.
 		</p>
 
+		<h3>[property:Boolean isGLBufferAttribute]</h3>
+		<p>
+			Read-only. Always *true*.
+		</p>
+
 		<h3>[property:Integer itemSize]</h3>
 		<p>
 			How many values make up each item (vertex).
@@ -69,6 +74,11 @@
 			See above (constructor) for a list of known type sizes.
 		</p>
 
+		<h3>[property:String name]</h3>
+		<p>
+			该 attribute 实例的别名，默认值为空字符串。
+		</p>
+
 		<h3>[property:GLenum type]</h3>
 		<p>
 			A [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types WebGL Data Type]
@@ -77,11 +87,6 @@
 		<p>
 			Set this property together with *elementSize*. The recommended way is
 			using the *setType* method.
-		</p>
-
-		<h3>[property:Boolean isGLBufferAttribute]</h3>
-		<p>
-			Read-only. Always *true*.
 		</p>
 
 		<h2>Methods</h2>
