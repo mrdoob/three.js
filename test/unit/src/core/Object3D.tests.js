@@ -98,27 +98,27 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'DEFAULT_MATRIXAUTOUPDATE', ( assert ) => {
+		QUnit.test( 'DEFAULT_MATRIX_AUTO_UPDATE', ( assert ) => {
 
-			const currentDefaultMatrixAutoUpdate = Object3D.DEFAULT_MATRIXAUTOUPDATE;
+			const currentDefaultMatrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
 
 			try {
 
-				assert.equal( currentDefaultMatrixAutoUpdate, true, 'default DEFAULT_MATRIXAUTOUPDATE is true' );
+				assert.equal( currentDefaultMatrixAutoUpdate, true, 'default DEFAULT_MATRIX_AUTO_UPDATE is true' );
 
 				const object = new Object3D();
 
-				assert.equal( object.matrixAutoUpdate, true, '.matrixAutoUpdate of a new object inherits Object3D.DEFAULT_MATRIXAUTOUPDATE = true' );
+				assert.equal( object.matrixAutoUpdate, true, '.matrixAutoUpdate of a new object inherits Object3D.DEFAULT_MATRIX_AUTO_UPDATE = true' );
 
-				Object3D.DEFAULT_MATRIXAUTOUPDATE = false;
+				Object3D.DEFAULT_MATRIX_AUTO_UPDATE = false;
 
 				const object2 = new Object3D();
 
-				assert.equal( object2.matrixAutoUpdate, false, '.matrixAutoUpdate of a new object inherits Object3D.DEFAULT_MATRIXAUTOUPDATE = false' );
+				assert.equal( object2.matrixAutoUpdate, false, '.matrixAutoUpdate of a new object inherits Object3D.DEFAULT_MATRIX_AUTO_UPDATE = false' );
 
 			} finally {
 
-				Object3D.DEFAULT_MATRIXAUTOUPDATE = currentDefaultMatrixAutoUpdate;
+				Object3D.DEFAULT_MATRIX_AUTO_UPDATE = currentDefaultMatrixAutoUpdate;
 
 			}
 
