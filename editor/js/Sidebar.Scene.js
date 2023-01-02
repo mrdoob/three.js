@@ -192,7 +192,7 @@ function SidebarScene( editor ) {
 	const backgroundBlurriness = new UINumber( 0 ).setWidth( '40px' ).setRange( 0, 1 ).onChange( onBackgroundChanged );
 	backgroundEquirectRow.add( backgroundBlurriness );
 
-	const backgroundIntensity = new UINumber( 1 ).setWidth( '40px' ).setRange( 0, 10 ).onChange( onBackgroundChanged );
+	const backgroundIntensity = new UINumber( 1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onBackgroundChanged );
 	backgroundEquirectRow.add( backgroundIntensity );
 
 	container.add( backgroundEquirectRow );
