@@ -1,8 +1,9 @@
-import { Material, ShaderMaterial } from 'three';
+import { Material, ShaderMaterial, NoToneMapping } from 'three';
 import { getNodesKeys, getCacheKey } from '../core/NodeUtils.js';
 import StackNode from '../core/StackNode.js';
 import LightsNode from '../lighting/LightsNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
+import ToneMappingNode from '../display/ToneMappingNode.js';
 import AONode from '../lighting/AONode.js';
 import {
 	float, vec3, vec4,
@@ -223,11 +224,21 @@ class NodeMaterial extends ShaderMaterial {
 
 		// TONE MAPPING
 
-		if ( renderer.toneMappingNode && renderer.toneMappingNode.isNode === true ) {
+		let toneMappingNode = renderer.toneMappingNode;
 
-			outgoingLight = context( renderer.toneMappingNode, { color: outgoingLight } );
+		if ( ! toneMappingNode && renderer.toneMapping !== NoToneMapping ) {
+
+			toneMappingNode = new ToneMappingNode( renderer.toneMapping, reference( 'toneMappingExposure', 'float', renderer ), outgoingLight );
 
 		}
+
+		if ( toneMappingNode && toneMappingNode.isNode === true ) {
+
+			outgoingLight = context( toneMappingNode, { color: outgoingLight } );
+
+		}
+
+		// @TODO: Optimize outputNode to vec3.
 
 		let outputNode = vec4( outgoingLight, opacity );
 

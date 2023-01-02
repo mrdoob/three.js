@@ -132,6 +132,7 @@ class WebGPUBackground {
 			} else {
 
 				colorAttachment.loadOp = GPULoadOp.Load;
+				colorAttachment.storeOp = GPUStoreOp.Store;
 
 			}
 
@@ -139,10 +140,12 @@ class WebGPUBackground {
 
 				depthStencilAttachment.depthClearValue = renderer._clearDepth;
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Clear;
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 			} else {
 
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 			}
 
@@ -150,10 +153,12 @@ class WebGPUBackground {
 
 				depthStencilAttachment.stencilClearValue = renderer._clearStencil;
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Clear;
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 			} else {
 
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 			}
 

@@ -49,8 +49,7 @@ class InputNode extends Node {
 		super.deserialize( data );
 
 		this.nodeType = data.nodeType;
-		this.value = getValueFromType( data.valueType );
-		this.value = data.value;
+		this.value = Array.isArray( data.value ) ? getValueFromType( data.valueType, ...data.value ) : data.value;
 
 		if ( this.value && this.value.fromArray ) this.value = this.value.fromArray( data.value );
 

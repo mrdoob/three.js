@@ -112,11 +112,11 @@ export const getValueFromType = ( type, ...params ) => {
 
 	} else if ( type === 'bool' ) {
 
-		return false;
+		return params[ 0 ] || false;
 
 	} else if ( ( type === 'float' ) || ( type === 'int' ) || ( type === 'uint' ) ) {
 
-		return 0;
+		return params[ 0 ] || 0;
 
 	}
 
