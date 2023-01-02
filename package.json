@@ -26,7 +26,6 @@
     "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
-    "examples/js",
     "examples/jsm",
     "examples/fonts",
     "LICENSE",
@@ -45,12 +44,6 @@
       "mdcs",
       "plugin:compat/recommended"
     ],
-    "parser": "@babel/eslint-parser",
-    "parserOptions": {
-      "babelOptions": {
-        "configFile": "./utils/build/.babelrc.json"
-      }
-    },
     "plugins": [
       "html",
       "import"
@@ -74,17 +67,13 @@
       "GPUTextureUsage": "readonly",
       "GPUMapMode": "readonly",
       "QUnit": "readonly",
-      "Ammo":"readonly",
-      "XRRigidTransform":"readonly",
-      "XRMediaBinding":"readonly"
+      "Ammo": "readonly",
+      "XRRigidTransform": "readonly",
+      "XRMediaBinding": "readonly"
     },
     "rules": {
       "no-throw-literal": [
         "error"
-      ],
-      "import/extensions": [
-        "error",
-        "always"
       ],
       "quotes": [
         "error",
@@ -141,22 +130,17 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@babel/core": "^7.20.5",
-    "@babel/eslint-parser": "^7.19.1",
-    "@babel/plugin-proposal-class-properties": "^7.18.6",
-    "@babel/preset-env": "^7.20.2",
-    "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-node-resolve": "^15.0.1",
-    "chalk": "^5.1.2",
+    "@rollup/plugin-terser": "^0.2.1",
+    "chalk": "^5.2.0",
     "concurrently": "^7.6.0",
-    "eslint": "^8.28.0",
+    "eslint": "^8.30.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.0.2",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.26.0",
-    "rollup": "^2.79.1",
+    "rollup": "^3.8.1",
     "rollup-plugin-filesize": "^9.1.2",
-    "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-visualizer": "^5.8.3",
     "servez": "^1.14.1"
   },

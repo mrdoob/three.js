@@ -162,7 +162,7 @@ class MaterialNode extends Node {
 			// uv repeat and offset setting priorities
 
 			let uvNode;
-			let uvScaleMap = 
+			let uvScaleMap =
 				material.map ||
 				material.specularMap ||
 				material.displacementMap ||

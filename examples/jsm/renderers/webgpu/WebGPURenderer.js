@@ -855,7 +855,7 @@ class WebGPURenderer {
 
 		// index
 
-		const index = geometry.index;
+		const index = this._geometries.getIndex( geometry, material.wireframe === true );
 
 		const hasIndex = ( index !== null );
 
