@@ -29337,8 +29337,8 @@
 			const data = super.toJSON( meta );
 
 			if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
-			if ( this.backgroundBlurriness > 0 ) data.backgroundBlurriness = this.backgroundBlurriness;
-			if ( this.backgroundIntensity !== 1 ) data.backgroundIntensity = this.backgroundIntensity;
+			if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
+			if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
 
 			return data;
 
@@ -43247,6 +43247,7 @@
 					}
 
 					if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;
+					if ( data.backgroundIntensity !== undefined ) object.backgroundIntensity = data.backgroundIntensity;
 
 					break;
 
@@ -47642,6 +47643,8 @@
 		constructor( buffer, type, itemSize, elementSize, count ) {
 
 			this.isGLBufferAttribute = true;
+
+			this.name = '';
 
 			this.buffer = buffer;
 			this.type = type;
