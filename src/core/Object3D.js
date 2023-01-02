@@ -25,6 +25,110 @@ const _zAxis = /*@__PURE__*/ new Vector3( 0, 0, 1 );
 const _addedEvent = { type: 'added' };
 const _removedEvent = { type: 'removed' };
 
+var skipUMWToAvoidLoop = false;
+
+class Object3DMatrixData {
+
+	constructor() {
+
+		this.matrix = new Matrix4();
+		this.matrixWorld = new Matrix4();
+
+		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
+		this.matrixWorldNeedsUpdate = false;
+
+		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
+
+		this.parent = null;
+		this.children = [];
+
+		this.position = new Vector3();
+		this.quaternion = new Quaternion();
+		this.scale = new Vector3( 1, 1, 1 );
+
+	}
+
+	setParent( parent 	) {
+
+		this.parent = parent;
+		parent.children.push( this );
+
+	}
+
+	remove( index ) {
+
+		// we can assume that indices match those on the parent object.
+		this.parent.children.splice( index, 1 );
+		this.parent = null;
+
+	}
+
+	updateMatrix() {
+
+		this.matrix.compose( this.position, this.quaternion, this.scale );
+
+		this.matrixWorldNeedsUpdate = true;
+
+	}
+
+	updateMatrixWorld( force ) {
+
+		if ( this.updateMatrixWorldBefore ) {
+
+			skipUMWToAvoidLoop = true;
+			this.updateMatrixWorldBefore( force );
+			skipUMWToAvoidLoop = false;
+
+		}
+
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
+
+		if ( this.matrixWorldNeedsUpdate || force ) {
+
+			if ( this.parent === null ) {
+
+				this.matrixWorld.copy( this.matrix );
+
+			} else {
+
+				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+
+			}
+
+			this.matrixWorldNeedsUpdate = false;
+
+			force = true;
+
+		}
+
+		// update Children
+
+		const children = this.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			const child = children[ i ];
+
+			if ( child.matrixWorldAutoUpdate === true || force === true ) {
+
+				child.updateMatrixWorld( force );
+
+			}
+
+		}
+
+		if ( this.updateMatrixWorldAfter ) {
+
+			skipUMWToAvoidLoop = true;
+			this.updateMatrixWorldAfter( force );
+			skipUMWToAvoidLoop = false;
+
+		}
+
+	}
+
+}
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -45,10 +149,12 @@ class Object3D extends EventDispatcher {
 
 		this.up = Object3D.DefaultUp.clone();
 
-		const position = new Vector3();
+		this.matrixData = new Object3DMatrixData();
+
+		const position = this.matrixData.position;
 		const rotation = new Euler();
-		const quaternion = new Quaternion();
-		const scale = new Vector3( 1, 1, 1 );
+		const quaternion = this.matrixData.quaternion;
+		const scale = this.matrixData.scale;
 
 		function onRotationChange() {
 
@@ -94,13 +200,8 @@ class Object3D extends EventDispatcher {
 			}
 		} );
 
-		this.matrix = new Matrix4();
-		this.matrixWorld = new Matrix4();
-
-		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
-		this.matrixWorldNeedsUpdate = false;
-
-		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
+		this.matrix = this.matrixData.matrix;
+		this.matrixWorld = this.matrixData.matrixWorld;
 
 		this.layers = new Layers();
 		this.visible = true;
@@ -114,6 +215,56 @@ class Object3D extends EventDispatcher {
 		this.animations = [];
 
 		this.userData = {};
+
+		if ( Object3D ) {
+
+			if ( this.updateMatrixWorld !== 	Object3D.prototype.updateMatrixWorld ) {
+
+				// We don't know whether the additional processing should be performed before or after updateMatrixWorld()
+				// so we call it twice.
+				// Slight performance hit, but more than compensated by the gains from monomorphic iteration.
+				this.matrixData.updateMatrixWorldBefore = this.updateMatrixWorld.bind( this );
+				this.matrixData.updateMatrixWorldAfter = this.updateMatrixWorld.bind( this );
+
+			}
+
+		}
+
+	}
+
+	set matrixAutoUpdate( value ) {
+
+		this.matrixData.matrixAutoUpdate = value;
+
+	}
+
+	get matrixAutoUpdate() {
+
+		return this.matrixData.matrixAutoUpdate;
+
+	}
+
+	set matrixWorldNeedsUpdate( value ) {
+
+		this.matrixData.matrixWorldNeedsUpdate = value;
+
+	}
+
+	get matrixWorldNeedsUpdate() {
+
+		return this.matrixData.matrixWorldNeedsUpdate;
+
+	}
+
+	set matrixWorldAutoUpdate( value ) {
+
+		this.matrixData.matrixWorldAutoUpdate = value;
+
+	}
+
+	get matrixWorldAutoUpdate() {
+
+		return this.matrixData.matrixWorldAutoUpdate;
 
 	}
 
@@ -334,6 +485,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = this;
 			this.children.push( object );
+			object.matrixData.setParent( this.matrixData );
 
 			object.dispatchEvent( _addedEvent );
 
@@ -367,6 +519,7 @@ class Object3D extends EventDispatcher {
 
 			object.parent = null;
 			this.children.splice( index, 1 );
+			object.matrixData.remove( index );
 
 			object.dispatchEvent( _removedEvent );
 
@@ -397,6 +550,7 @@ class Object3D extends EventDispatcher {
 			const object = this.children[ i ];
 
 			object.parent = null;
+			object.matrixData.remove( i );
 
 			object.dispatchEvent( _removedEvent );
 
@@ -586,41 +740,9 @@ class Object3D extends EventDispatcher {
 
 	updateMatrixWorld( force ) {
 
-		if ( this.matrixAutoUpdate ) this.updateMatrix();
+		if ( skipUMWToAvoidLoop ) return;
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
-
-			if ( this.parent === null ) {
-
-				this.matrixWorld.copy( this.matrix );
-
-			} else {
-
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-			}
-
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
-		}
-
-		// update children
-
-		const children = this.children;
-
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			const child = children[ i ];
-
-			if ( child.matrixWorldAutoUpdate === true || force === true ) {
-
-				child.updateMatrixWorld( force );
-
-			}
-
-		}
+		this.matrixData.updateMatrixWorld( force );
 
 	}
 
@@ -968,3 +1090,4 @@ Object3D.DefaultMatrixAutoUpdate = true;
 Object3D.DefaultMatrixWorldAutoUpdate = true;
 
 export { Object3D };
+
