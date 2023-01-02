@@ -58,6 +58,8 @@ class Object3DNode extends Node {
 
 		} else if ( scope === Object3DNode.POSITION ) {
 
+			uniformNode.value = uniformNode.value || new Vector3();
+
 			uniformNode.value.setFromMatrixPosition( object.matrixWorld );
 
 		} else if ( scope === Object3DNode.DIRECTION ) {
