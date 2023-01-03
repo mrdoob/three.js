@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2010-2022 Three.js Authors
+ * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 (function (global, factory) {
@@ -7507,7 +7507,7 @@
 			this.parent = null;
 			this.children = [];
 
-			this.up = Object3D.DefaultUp.clone();
+			this.up = Object3D.DEFAULT_UP.clone();
 
 			const position = new Vector3();
 			const rotation = new Euler();
@@ -7561,10 +7561,10 @@
 			this.matrix = new Matrix4();
 			this.matrixWorld = new Matrix4();
 
-			this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
+			this.matrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
 			this.matrixWorldNeedsUpdate = false;
 
-			this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
+			this.matrixWorldAutoUpdate = Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE; // checked by the renderer
 
 			this.layers = new Layers();
 			this.visible = true;
@@ -8427,9 +8427,9 @@
 
 	}
 
-	Object3D.DefaultUp = /*@__PURE__*/ new Vector3( 0, 1, 0 );
-	Object3D.DefaultMatrixAutoUpdate = true;
-	Object3D.DefaultMatrixWorldAutoUpdate = true;
+	Object3D.DEFAULT_UP = /*@__PURE__*/ new Vector3( 0, 1, 0 );
+	Object3D.DEFAULT_MATRIX_AUTO_UPDATE = true;
+	Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true;
 
 	const _v0$1 = /*@__PURE__*/ new Vector3();
 	const _v1$3 = /*@__PURE__*/ new Vector3();
@@ -41065,7 +41065,7 @@
 
 			this.type = 'HemisphereLight';
 
-			this.position.copy( Object3D.DefaultUp );
+			this.position.copy( Object3D.DEFAULT_UP );
 			this.updateMatrix();
 
 			this.groundColor = new Color( groundColor );
@@ -41279,7 +41279,7 @@
 
 			this.type = 'SpotLight';
 
-			this.position.copy( Object3D.DefaultUp );
+			this.position.copy( Object3D.DEFAULT_UP );
 			this.updateMatrix();
 
 			this.target = new Object3D();
@@ -41498,7 +41498,7 @@
 
 			this.type = 'DirectionalLight';
 
-			this.position.copy( Object3D.DefaultUp );
+			this.position.copy( Object3D.DEFAULT_UP );
 			this.updateMatrix();
 
 			this.target = new Object3D();
