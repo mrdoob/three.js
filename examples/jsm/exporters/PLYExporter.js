@@ -97,7 +97,14 @@ class PLYExporter {
 				const geometry = mesh.geometry;
 
 				const vertices = geometry.getAttribute( 'position' );
+				const normals = geometry.getAttribute( 'normal' );
+				const colors = geometry.getAttribute( 'color' );
+
 				vertexCount += vertices.count;
+
+				if ( normals !== undefined ) includeNormals = true;
+
+				if ( colors !== undefined ) includeColors = true;
 
 				includeIndices = false;
 
