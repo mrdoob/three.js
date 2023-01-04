@@ -9,7 +9,6 @@ import {
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Loader,
-	LoaderUtils,
 	Matrix4,
 	Mesh,
 	MeshPhongMaterial,
@@ -104,6 +103,8 @@ class ThreeMFLoader extends Loader {
 			const printTicketParts = {};
 			const texturesParts = {};
 
+			const textDecoder = new TextDecoder();
+
 			try {
 
 				zip = fflate.unzipSync( new Uint8Array( data ) );
@@ -144,7 +145,7 @@ class ThreeMFLoader extends Loader {
 			//
 
 			const relsView = zip[ relsName ];
-			const relsFileText = LoaderUtils.decodeText( relsView );
+			const relsFileText = textDecoder.decode( relsView );
 			const rels = parseRelsXml( relsFileText );
 
 			//
@@ -152,7 +153,7 @@ class ThreeMFLoader extends Loader {
 			if ( modelRelsName ) {
 
 				const relsView = zip[ modelRelsName ];
-				const relsFileText = LoaderUtils.decodeText( relsView );
+				const relsFileText = textDecoder.decode( relsView );
 				modelRels = parseRelsXml( relsFileText );
 
 			}
@@ -164,7 +165,7 @@ class ThreeMFLoader extends Loader {
 				const modelPart = modelPartNames[ i ];
 				const view = zip[ modelPart ];
 
-				const fileText = LoaderUtils.decodeText( view );
+				const fileText = textDecoder.decode( view );
 				const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
