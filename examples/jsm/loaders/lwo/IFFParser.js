@@ -1065,35 +1065,38 @@ DataViewReader.prototype = {
 
 		if ( size === 0 ) return;
 
-		// note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
-		var a = [];
+		const start = this.offset;
+
+		let result;
+		let length;
 
 		if ( size ) {
 
-			for ( var i = 0; i < size; i ++ ) {
-
-				a[ i ] = this.getUint8();
-
-			}
+			length = size;
+			result = this._textDecoder.decode( new Uint8Array( this.dv.buffer, start, size ) );
 
 		} else {
 
-			var currentChar;
-			var len = 0;
+			const bytes = new Uint8Array( this.dv.buffer, start );
+			length = bytes.indexOf( 0 );
 
-			while ( currentChar !== 0 ) {
+			result = this._textDecoder.decode( new Uint8Array( this.dv.buffer, start, length ) );
 
-				currentChar = this.getUint8();
-				if ( currentChar !== 0 ) a.push( currentChar );
-				len ++;
+			// account for null byte in length
+			length++;
+
+			if ( length % 2 !== 0 ) {
+
+				// if string with terminating nullbyte is uneven, extra nullbyte is added
+				length++;
 
 			}
 
-			if ( ! isEven( len + 1 ) ) this.getUint8(); // if string with terminating nullbyte is uneven, extra nullbyte is added
-
 		}
 
-		return this._textDecoder.decode( new Uint8Array( a ) );
+		this.skip( length );
+
+		return result;
 
 	},
 
