@@ -335,6 +335,7 @@
 		"webgpu_lights_custom",
 		"webgpu_lights_phong",
 		"webgpu_lights_selective",
+		"webgpu_lights_spotlights",
 		"webgpu_loader_gltf",
 		"webgpu_materials",
 		"webgpu_nodes_playground",
