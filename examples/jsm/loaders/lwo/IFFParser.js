@@ -908,6 +908,7 @@ function DataViewReader( buffer ) {
 	this.dv = new DataView( buffer );
 	this.offset = 0;
 	this._textDecoder = new TextDecoder();
+	this._bytes = new Uint8Array( buffer );
 
 }
 
@@ -1077,15 +1078,15 @@ DataViewReader.prototype = {
 
 		} else {
 
-			const bytes = new Uint8Array( this.dv.buffer, start );
-			length = bytes.indexOf( 0 );
+			// use 1:1 mapping of buffer to avoid redundant new array creation.
+			length = this._bytes.indexOf( 0, start ) - start;
 
 			result = this._textDecoder.decode( new Uint8Array( this.dv.buffer, start, length ) );
 
 			// account for null byte in length
 			length++;
 
-			// if string with terminating nullbyte is uneven, extra nullbyte is added
+			// if string with terminating nullbyte is uneven, extra nullbyte is added, skip that too
 			length += length % 2;
 
 		}
