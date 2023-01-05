@@ -3811,19 +3811,15 @@ class BinaryReader {
 
 	getString( size ) {
 
-		// note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
-		let a = [];
+		const start = this.offset;
+		let a = new Uint8Array( this.dv.buffer, start, size );
 
-		for ( let i = 0; i < size; i ++ ) {
-
-			a[ i ] = this.getUint8();
-
-		}
+		this.skip( size );
 
 		const nullByte = a.indexOf( 0 );
-		if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
+		if ( nullByte >= 0 ) a = new Uint8Array( this.dv.buffer, start, nullByte );
 
-		return this._textDecoder.decode( new Uint8Array( a ) );
+		return this.textDecoder.decode( a );
 
 	}
 
