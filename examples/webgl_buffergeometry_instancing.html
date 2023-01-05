@@ -173,6 +173,7 @@
 			//
 
 			const mesh = new THREE.Mesh( geometry, material );
+			mesh.renderForceSinglePass = true;
 			scene.add( mesh );
 
 			//
