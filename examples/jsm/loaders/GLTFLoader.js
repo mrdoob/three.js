@@ -286,6 +286,7 @@ class GLTFLoader extends Loader {
 		let json;
 		const extensions = {};
 		const plugins = {};
+		const textDecoder = new TextDecoder();
 
 		if ( typeof data === 'string' ) {
 
@@ -293,7 +294,7 @@ class GLTFLoader extends Loader {
 
 		} else if ( data instanceof ArrayBuffer ) {
 
-			const magic = LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
+			const magic = textDecoder.decode( new Uint8Array( data, 0, 4 ) );
 
 			if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
@@ -312,7 +313,7 @@ class GLTFLoader extends Loader {
 
 			} else {
 
-				json = JSON.parse( LoaderUtils.decodeText( new Uint8Array( data ) ) );
+				json = JSON.parse( textDecoder.decode( data ) );
 
 			}
 
@@ -584,7 +585,7 @@ class GLTFLightsExtension {
 
 	}
 
-	getDependency( type, index ) {	
+	getDependency( type, index ) {
 
 		if ( type !== 'light' ) return;
 
@@ -1566,9 +1567,10 @@ class GLTFBinaryExtension {
 		this.body = null;
 
 		const headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
+		const textDecoder = new TextDecoder();
 
 		this.header = {
-			magic: LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
+			magic: textDecoder.decode( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true )
 		};
@@ -1598,7 +1600,7 @@ class GLTFBinaryExtension {
 			if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.JSON ) {
 
 				const contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH + chunkIndex, chunkLength );
-				this.content = LoaderUtils.decodeText( contentArray );
+				this.content = textDecoder.decode( contentArray );
 
 			} else if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.BIN ) {
 
@@ -2229,6 +2231,8 @@ function getImageURIMimeType( uri ) {
 
 }
 
+const _identityMatrix = new Matrix4();
+
 /* GLTF PARSER */
 
 class GLTFParser {
@@ -2263,9 +2267,17 @@ class GLTFParser {
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
 
-		const isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === true;
-		const isFirefox = navigator.userAgent.indexOf( 'Firefox' ) > - 1;
-		const firefoxVersion = isFirefox ? navigator.userAgent.match( /Firefox\/([0-9]+)\./ )[ 1 ] : - 1;
+		let isSafari = false;
+		let isFirefox = false;
+		let firefoxVersion = - 1;
+
+		if ( typeof navigator !== 'undefined' ) {
+
+			isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === true;
+			isFirefox = navigator.userAgent.indexOf( 'Firefox' ) > - 1;
+			firefoxVersion = isFirefox ? navigator.userAgent.match( /Firefox\/([0-9]+)\./ )[ 1 ] : - 1;
+
+		}
 
 		if ( typeof createImageBitmap === 'undefined' || isSafari || ( isFirefox && firefoxVersion < 98 ) ) {
 
@@ -2530,7 +2542,11 @@ class GLTFParser {
 					break;
 
 				case 'node':
-					dependency = this.loadNode( index );
+					dependency = this._invokeOne( function ( ext ) {
+
+						return ext.loadNode && ext.loadNode( index );
+
+					} );
 					break;
 
 				case 'mesh':
@@ -2835,7 +2851,7 @@ class GLTFParser {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#textures
 	 * @param {number} textureIndex
-	 * @return {Promise<THREE.Texture>}
+	 * @return {Promise<THREE.Texture|null>}
 	 */
 	loadTexture( textureIndex ) {
 
@@ -3004,6 +3020,8 @@ class GLTFParser {
 		const parser = this;
 
 		return this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
+
+			if ( ! texture ) return null;
 
 			// Materials sample aoMap from UV set 1 and other maps from UV set 0 - this can't be configured
 			// However, we will copy UV set 0 to UV set 1 on demand for aoMap
@@ -3583,25 +3601,65 @@ class GLTFParser {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#skins
 	 * @param {number} skinIndex
-	 * @return {Promise<Object>}
+	 * @return {Promise<Skeleton>}
 	 */
 	loadSkin( skinIndex ) {
 
 		const skinDef = this.json.skins[ skinIndex ];
 
-		const skinEntry = { joints: skinDef.joints };
+		const pending = [];
 
-		if ( skinDef.inverseBindMatrices === undefined ) {
+		for ( let i = 0, il = skinDef.joints.length; i < il; i ++ ) {
 
-			return Promise.resolve( skinEntry );
+			pending.push( this.getDependency( 'node', skinDef.joints[ i ] ) );
 
 		}
 
-		return this.getDependency( 'accessor', skinDef.inverseBindMatrices ).then( function ( accessor ) {
+		if ( skinDef.inverseBindMatrices !== undefined ) {
 
-			skinEntry.inverseBindMatrices = accessor;
+			pending.push( this.getDependency( 'accessor', skinDef.inverseBindMatrices ) );
 
-			return skinEntry;
+		} else {
+
+			pending.push( null );
+
+		}
+
+		return Promise.all( pending ).then( function ( results ) {
+
+			const inverseBindMatrices = results.pop();
+			const jointNodes = results;
+
+			const bones = [];
+			const boneInverses = [];
+
+			for ( let i = 0, il = jointNodes.length; i < il; i ++ ) {
+
+				const jointNode = jointNodes[ i ];
+
+				if ( jointNode ) {
+
+					bones.push( jointNode );
+
+					const mat = new Matrix4();
+
+					if ( inverseBindMatrices !== null ) {
+
+						mat.fromArray( inverseBindMatrices.array, i * 16 );
+
+					}
+
+					boneInverses.push( mat );
+
+				} else {
+
+					console.warn( 'THREE.GLTFLoader: Joint "%s" could not be found.', skinDef.joints[ i ] );
+
+				}
+
+			}
+
+			return new Skeleton( bones, boneInverses );
 
 		} );
 
@@ -3831,7 +3889,7 @@ class GLTFParser {
 
 		return ( function () {
 
-			const pending = [];
+			const objectPending = [];
 
 			const meshPromise = parser._invokeOne( function ( ext ) {
 
@@ -3841,13 +3899,13 @@ class GLTFParser {
 
 			if ( meshPromise ) {
 
-				pending.push( meshPromise );
+				objectPending.push( meshPromise );
 
 			}
 
 			if ( nodeDef.camera !== undefined ) {
 
-				pending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
+				objectPending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
 
 					return parser._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
 
@@ -3861,13 +3919,34 @@ class GLTFParser {
 
 			} ).forEach( function ( promise ) {
 
-				pending.push( promise );
+				objectPending.push( promise );
 
 			} );
 
-			return Promise.all( pending );
+			const childPending = [];
+			const childrenDef = nodeDef.children || [];
 
-		}() ).then( function ( objects ) {
+			for ( let i = 0, il = childrenDef.length; i < il; i ++ ) {
+
+				childPending.push( parser.getDependency( 'node', childrenDef[ i ] ) );
+
+			}
+
+			const skeletonPending = nodeDef.skin === undefined
+				? Promise.resolve( null )
+				: parser.getDependency( 'skin', nodeDef.skin );
+
+			return Promise.all( [
+				Promise.all( objectPending ),
+				Promise.all( childPending ),
+				skeletonPending
+			] );
+
+		}() ).then( function ( results ) {
+
+			const objects = results[ 0 ];
+			const children = results[ 1 ];
+			const skeleton = results[ 2 ];
 
 			let node;
 
@@ -3947,6 +4026,26 @@ class GLTFParser {
 
 			parser.associations.get( node ).nodes = nodeIndex;
 
+			if ( skeleton !== null ) {
+
+				// This full traverse should be fine because
+				// child glTF nodes have not been added to this node yet.
+				node.traverse( function ( mesh ) {
+
+					if ( ! mesh.isSkinnedMesh ) return;
+
+					mesh.bind( skeleton, _identityMatrix );
+
+				} );
+
+			}
+
+			for ( let i = 0, il = children.length; i < il; i ++ ) {
+
+				node.add( children[ i ] );
+
+			}
+
 			return node;
 
 		} );
@@ -3960,7 +4059,6 @@ class GLTFParser {
 	 */
 	loadScene( sceneIndex ) {
 
-		const json = this.json;
 		const extensions = this.extensions;
 		const sceneDef = this.json.scenes[ sceneIndex ];
 		const parser = this;
@@ -3980,11 +4078,17 @@ class GLTFParser {
 
 		for ( let i = 0, il = nodeIds.length; i < il; i ++ ) {
 
-			pending.push( buildNodeHierarchy( nodeIds[ i ], scene, json, parser ) );
+			pending.push( parser.getDependency( 'node', nodeIds[ i ] ) );
 
 		}
 
-		return Promise.all( pending ).then( function () {
+		return Promise.all( pending ).then( function ( nodes ) {
+
+			for ( let i = 0, il = nodes.length; i < il; i ++ ) {
+
+				scene.add( nodes[ i ] );
+
+			}
 
 			// Removes dangling associations, associations that reference a node that
 			// didn't make it into the scene.
@@ -4025,102 +4129,6 @@ class GLTFParser {
 		} );
 
 	}
-
-}
-
-function buildNodeHierarchy( nodeId, parentObject, json, parser ) {
-
-	const nodeDef = json.nodes[ nodeId ];
-
-	return parser.getDependency( 'node', nodeId ).then( function ( node ) {
-
-		if ( nodeDef.skin === undefined ) return node;
-
-		// build skeleton here as well
-
-		let skinEntry;
-
-		return parser.getDependency( 'skin', nodeDef.skin ).then( function ( skin ) {
-
-			skinEntry = skin;
-
-			const pendingJoints = [];
-
-			for ( let i = 0, il = skinEntry.joints.length; i < il; i ++ ) {
-
-				pendingJoints.push( parser.getDependency( 'node', skinEntry.joints[ i ] ) );
-
-			}
-
-			return Promise.all( pendingJoints );
-
-		} ).then( function ( jointNodes ) {
-
-			node.traverse( function ( mesh ) {
-
-				if ( ! mesh.isMesh ) return;
-
-				const bones = [];
-				const boneInverses = [];
-
-				for ( let j = 0, jl = jointNodes.length; j < jl; j ++ ) {
-
-					const jointNode = jointNodes[ j ];
-
-					if ( jointNode ) {
-
-						bones.push( jointNode );
-
-						const mat = new Matrix4();
-
-						if ( skinEntry.inverseBindMatrices !== undefined ) {
-
-							mat.fromArray( skinEntry.inverseBindMatrices.array, j * 16 );
-
-						}
-
-						boneInverses.push( mat );
-
-					} else {
-
-						console.warn( 'THREE.GLTFLoader: Joint "%s" could not be found.', skinEntry.joints[ j ] );
-
-					}
-
-				}
-
-				mesh.bind( new Skeleton( bones, boneInverses ), mesh.matrixWorld );
-
-			} );
-
-			return node;
-
-		} );
-
-	} ).then( function ( node ) {
-
-		// build node hierachy
-
-		parentObject.add( node );
-
-		const pending = [];
-
-		if ( nodeDef.children ) {
-
-			const children = nodeDef.children;
-
-			for ( let i = 0, il = children.length; i < il; i ++ ) {
-
-				const child = children[ i ];
-				pending.push( buildNodeHierarchy( child, node, json, parser ) );
-
-			}
-
-		}
-
-		return Promise.all( pending );
-
-	} );
 
 }
 

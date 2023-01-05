@@ -12,7 +12,7 @@ class SpotLight extends Light {
 
 		this.type = 'SpotLight';
 
-		this.position.copy( Object3D.DefaultUp );
+		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
 		this.target = new Object3D();

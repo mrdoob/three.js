@@ -144,6 +144,18 @@
 				material.colorNode = desaturateShaderNode.call( { color: new Nodes.TextureNode( texture ) } );
 				materials.push( material );
 
+				// Custom ShaderNode(no inputs) > Approach 2
+
+				const desaturateNoInputsShaderNode = new ShaderNode( () => {
+
+					return dot( vec3( 0.299, 0.587, 0.114 ), Nodes.texture( texture ).xyz );
+
+				} );
+
+				material = new Nodes.MeshBasicNodeMaterial();
+				material.colorNode = desaturateNoInputsShaderNode;
+				materials.push( material );
+
 				// Custom WGSL ( desaturate filter )
 
 				const desaturateWGSLNode = new Nodes.FunctionNode( `

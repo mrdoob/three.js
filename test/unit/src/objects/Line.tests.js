@@ -1,15 +1,18 @@
 /* global QUnit */
 
-// import { Line } from '../../../../src/objects/Line.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Line } from '../../../../src/objects/Line.js';
 
 export default QUnit.module( 'Objects', () => {
 
 	QUnit.module( 'Line', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var line = new Line();
+	
+			assert.strictEqual( line instanceof Object3D, true, 'Line extends from Object3D' );
 
 		} );
 

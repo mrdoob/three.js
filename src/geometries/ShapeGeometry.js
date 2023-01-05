@@ -111,7 +111,7 @@ class ShapeGeometry extends BufferGeometry {
 
 			}
 
-			// incides
+			// indices
 
 			for ( let i = 0, l = faces.length; i < l; i ++ ) {
 

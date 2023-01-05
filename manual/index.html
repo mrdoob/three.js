@@ -28,7 +28,7 @@
 			<div id="contentWrapper">
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
-					<div id="exitSearchButton"></div>
+					<div id="clearSearchButton"></div>
 					<select id="language">
 						<option value="en">en</option>
 						<option value="fr">fr</option>
@@ -51,7 +51,7 @@
 		const panel = document.querySelector( '#panel' );
 		const content = document.querySelector( '#content' );
 		const expandButton = document.querySelector( '#expandButton' );
-		const exitSearchButton = document.querySelector( '#exitSearchButton' );
+		const clearSearchButton = document.querySelector( '#clearSearchButton' );
 		const panelScrim = document.querySelector( '#panelScrim' );
 		const filterInput = document.querySelector( '#filterInput' );
 		let iframe = document.querySelector( 'iframe' );
@@ -141,11 +141,11 @@
 
 			};
 
-			exitSearchButton.onclick = function () {
+			clearSearchButton.onclick = function () {
 
 				filterInput.value = '';
 				updateFilter();
-				panel.classList.remove( 'searchFocused' );
+				filterInput.focus();
 
 			};
 

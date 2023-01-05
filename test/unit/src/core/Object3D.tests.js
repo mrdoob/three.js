@@ -12,6 +12,7 @@ import {
 	w,
 	eps
 } from '../math/Constants.tests.js';
+import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 
 const matrixEquals4 = ( a, b ) => {
 
@@ -54,10 +55,12 @@ export default QUnit.module( 'Core', () => {
 		};
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
+			var object = new Object3D();
+	
+			assert.strictEqual( object instanceof EventDispatcher, true, 'Object3D extends from EventDispatcher' );
+	
 		} );
 
 		// INSTANCING
@@ -68,54 +71,54 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// STATIC STUFF
-		QUnit.test( 'DefaultUp', ( assert ) => {
+		QUnit.test( 'DEFAULT_UP', ( assert ) => {
 
-			const currentDefaultUp = new Vector3().copy( Object3D.DefaultUp );
+			const currentDefaultUp = new Vector3().copy( Object3D.DEFAULT_UP );
 			const v = new Vector3();
 
 			try {
 
-				assert.deepEqual( Object3D.DefaultUp, v.set( 0, 1, 0 ), 'default DefaultUp is Y-up' );
+				assert.deepEqual( Object3D.DEFAULT_UP, v.set( 0, 1, 0 ), 'default DEFAULT_UP is Y-up' );
 
 				const object = new Object3D();
 
-				assert.deepEqual( object.up, v.set( 0, 1, 0 ), '.up of a new object inherits Object3D.DefaultUp = Y-up' );
+				assert.deepEqual( object.up, v.set( 0, 1, 0 ), '.up of a new object inherits Object3D.DEFAULT_UP = Y-up' );
 
-				Object3D.DefaultUp.set( 0, 0, 1 );
+				Object3D.DEFAULT_UP.set( 0, 0, 1 );
 
 				const object2 = new Object3D();
 
-				assert.deepEqual( object2.up, v.set( 0, 0, 1 ), '.up of a new object inherits Object3D.DefaultUp = Z-up' );
+				assert.deepEqual( object2.up, v.set( 0, 0, 1 ), '.up of a new object inherits Object3D.DEFAULT_UP = Z-up' );
 
 			} finally {
 
-				Object3D.DefaultUp.copy( currentDefaultUp );
+				Object3D.DEFAULT_UP.copy( currentDefaultUp );
 
 			}
 
 		} );
 
-		QUnit.test( 'DefaultMatrixAutoUpdate', ( assert ) => {
+		QUnit.test( 'DEFAULT_MATRIX_AUTO_UPDATE', ( assert ) => {
 
-			const currentDefaultMatrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
+			const currentDefaultMatrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
 
 			try {
 
-				assert.equal( currentDefaultMatrixAutoUpdate, true, 'default DefaultMatrixAutoUpdate is true' );
+				assert.equal( currentDefaultMatrixAutoUpdate, true, 'default DEFAULT_MATRIX_AUTO_UPDATE is true' );
 
 				const object = new Object3D();
 
-				assert.equal( object.matrixAutoUpdate, true, '.matrixAutoUpdate of a new object inherits Object3D.DefaultMatrixAutoUpdate = true' );
+				assert.equal( object.matrixAutoUpdate, true, '.matrixAutoUpdate of a new object inherits Object3D.DEFAULT_MATRIX_AUTO_UPDATE = true' );
 
-				Object3D.DefaultMatrixAutoUpdate = false;
+				Object3D.DEFAULT_MATRIX_AUTO_UPDATE = false;
 
 				const object2 = new Object3D();
 
-				assert.equal( object2.matrixAutoUpdate, false, '.matrixAutoUpdate of a new object inherits Object3D.DefaultMatrixAutoUpdate = false' );
+				assert.equal( object2.matrixAutoUpdate, false, '.matrixAutoUpdate of a new object inherits Object3D.DEFAULT_MATRIX_AUTO_UPDATE = false' );
 
 			} finally {
 
-				Object3D.DefaultMatrixAutoUpdate = currentDefaultMatrixAutoUpdate;
+				Object3D.DEFAULT_MATRIX_AUTO_UPDATE = currentDefaultMatrixAutoUpdate;
 
 			}
 
@@ -527,6 +530,27 @@ export default QUnit.module( 'Core', () => {
 				parent.getObjectByProperty( 'no-property', 'no-value' ), undefined,
 				'Unknown property results in undefined'
 			);
+
+		} );
+
+		QUnit.test( 'getObjectsByProperty', ( assert ) => {
+
+			var parent = new Object3D();
+			var childName = new Object3D();
+			var childNothing = new Object3D();
+			var childName2 = new Object3D();
+			var childName3 = new Object3D();
+
+			parent.prop = true;
+			childName.name = 'foo';
+			childName2.name = 'foo';
+			childName3.name = 'foo';
+			childName2.add( childName3 );
+			childName.add( childName2 );
+			parent.add( childName, childNothing );
+
+			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).length, 3, 'Get amount of all childs by name "foo"' );
+			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some(obj => obj.name !== 'foo') , false, 'Get all childs by name "foo"' );
 
 		} );
 

@@ -12,7 +12,7 @@ class DirectionalLight extends Light {
 
 		this.type = 'DirectionalLight';
 
-		this.position.copy( Object3D.DefaultUp );
+		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
 		this.target = new Object3D();

@@ -8,7 +8,7 @@ const _vector2 = /*@__PURE__*/ new Vector2();
 
 class BufferAttribute {
 
-	constructor( array, itemSize, normalized ) {
+	constructor( array, itemSize, normalized = false ) {
 
 		if ( Array.isArray( array ) ) {
 
@@ -23,7 +23,7 @@ class BufferAttribute {
 		this.array = array;
 		this.itemSize = itemSize;
 		this.count = array !== undefined ? array.length / itemSize : 0;
-		this.normalized = normalized === true;
+		this.normalized = normalized;
 
 		this.usage = StaticDrawUsage;
 		this.updateRange = { offset: 0, count: - 1 };

@@ -3,6 +3,7 @@ import CubeTextureNode from '../accessors/CubeTextureNode.js';
 import InstanceNode from '../accessors/InstanceNode.js';
 import ReflectVectorNode from '../accessors/ReflectVectorNode.js';
 import SkinningNode from '../accessors/SkinningNode.js';
+import ExtendedMaterialNode from '../accessors/ExtendedMaterialNode.js';
 
 // display
 import BlendModeNode from '../display/BlendModeNode.js';
@@ -21,10 +22,10 @@ import LightingContextNode from '../lighting/LightingContextNode.js';
 // utils
 import EquirectUVNode from '../utils/EquirectUVNode.js';
 import MatcapUVNode from '../utils/MatcapUVNode.js';
-import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 import OscNode from '../utils/OscNode.js';
 import RemapNode from '../utils/RemapNode.js';
 import RotateUVNode from '../utils/RotateUVNode.js';
+import SpecularMIPLevelNode from '../utils/SpecularMIPLevelNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
 import TriplanarTexturesNode from '../utils/TriplanarTexturesNode.js';
@@ -38,6 +39,7 @@ import CheckerNode from '../procedural/CheckerNode.js';
 // fog
 import FogNode from '../fog/FogNode.js';
 import FogRangeNode from '../fog/FogRangeNode.js';
+import FogExp2Node from '../fog/FogExp2Node.js';
 
 // shader node utils
 import { nodeObject, nodeProxy, nodeImmutable } from './ShaderNode.js';
@@ -52,7 +54,8 @@ export * from './ShaderNodeBaseElements.js';
 
 // functions
 
-export { default as BRDF_GGX } from '../functions/BSDF/BRDF_GGX.js'; // see https://github.com/tc39/proposal-export-default-from
+export { default as BRDF_BlinnPhong } from '../functions/BSDF/BRDF_BlinnPhong.js';
+export { default as BRDF_GGX } from '../functions/BSDF/BRDF_GGX.js';
 export { default as BRDF_Lambert } from '../functions/BSDF/BRDF_Lambert.js';
 export { default as D_GGX } from '../functions/BSDF/D_GGX.js';
 export { default as DFGApprox } from '../functions/BSDF/DFGApprox.js';
@@ -64,7 +67,8 @@ export { default as getDistanceAttenuation } from '../functions/light/getDistanc
 export { default as getGeometryRoughness } from '../functions/material/getGeometryRoughness.js';
 export { default as getRoughness } from '../functions/material/getRoughness.js';
 
-export { default as PhysicalLightingModel } from '../functions/PhysicalLightingModel.js';
+export { default as phongLightingModel } from '../functions/PhongLightingModel.js';
+export { default as physicalLightingModel } from '../functions/PhysicalLightingModel.js';
 
 // accessors
 
@@ -75,6 +79,10 @@ export const instance = nodeProxy( InstanceNode );
 export const reflectVector = nodeImmutable( ReflectVectorNode );
 
 export const skinning = nodeProxy( SkinningNode );
+
+// material
+
+export const materialNormal = nodeImmutable( ExtendedMaterialNode, ExtendedMaterialNode.NORMAL );
 
 // display
 
@@ -112,7 +120,7 @@ export const lightingContext = nodeProxy( LightingContextNode );
 export const matcapUV = nodeImmutable( MatcapUVNode );
 export const equirectUV = nodeProxy( EquirectUVNode );
 
-export const maxMipLevel = nodeProxy( MaxMipLevelNode );
+export const specularMIPLevel = nodeProxy( SpecularMIPLevelNode );
 
 export const oscSine = nodeProxy( OscNode, OscNode.SINE );
 export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
@@ -147,3 +155,4 @@ export const checker = nodeProxy( CheckerNode );
 
 export const fog = nodeProxy( FogNode );
 export const rangeFog = nodeProxy( FogRangeNode );
+export const densityFog = nodeProxy( FogExp2Node );

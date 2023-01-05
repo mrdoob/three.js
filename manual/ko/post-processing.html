@@ -122,14 +122,14 @@ import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
 
 <p></p>
 <p>런타임에 효과의 속성을 변경할 때는 보통 uniform의 value 값을 바꿉니다. GUI를 추가해 이 속성을 조정할 수 있게 만들어보죠. 어떤 속성을 어떻게 조작할 수 있는지는 해당 효과의 소스 코드를 열어봐야 알 수 있습니다.</p>
-<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>에서
+<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>에서
 아래 코드를 찾았습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
 </pre>
 <p>아래처럼 하면 강도를 런타임에 바꿀 수 있겠네요.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
 </pre>
-<p>마찬가지로 <a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>에서
+<p>마찬가지로 <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>에서
 아래 코드를 찾았습니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
 if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
@@ -215,8 +215,8 @@ gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
 </div>
 
 <p></p>
-<p>언급했듯 이 글에서 GLSL의 작성법과 사용자 지정 쉐이더를 만드는 법을 모두 다루기는 무리입니다. WebGL이 어떻게 동작하는지 알고 싶다면 <a href="https://webglfundamentals.org">이 시리즈</a>를 참고하세요. <a href="https://github.com/mrdoob/three.js/tree/master/examples/js/shaders">Three.js의 후처리 쉐이더 소스 코드</a>를 분석하는 것도 좋은 방법입니다. 상대적으로 복잡한 쉐이더도 있지만 작은 것부터 차근차근 살펴본다면 언젠가 전체를 이해할 수 있을 거예요.</p>
-<p>아쉽게도 Three.js의 후처리 효과 대부분은 공식 문서가 없어 <a href="https://github.com/mrdoob/three.js/tree/master/examples">예제를 참고하거나</a> <a href="https://github.com/mrdoob/three.js/tree/master/examples/js/postprocessing">후처리 효과의 소스 코드</a>를 직접 분석해야 합니다. 부디 이 글과 이 시리즈의 <a href="rendertargets.html">렌더 타겟에 관한 글</a>이 좋은 출발점을 마련해주었으면 좋겠네요.</p>
+<p>언급했듯 이 글에서 GLSL의 작성법과 사용자 지정 쉐이더를 만드는 법을 모두 다루기는 무리입니다. WebGL이 어떻게 동작하는지 알고 싶다면 <a href="https://webglfundamentals.org">이 시리즈</a>를 참고하세요. <a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/shaders">Three.js의 후처리 쉐이더 소스 코드</a>를 분석하는 것도 좋은 방법입니다. 상대적으로 복잡한 쉐이더도 있지만 작은 것부터 차근차근 살펴본다면 언젠가 전체를 이해할 수 있을 거예요.</p>
+<p>아쉽게도 Three.js의 후처리 효과 대부분은 공식 문서가 없어 <a href="https://github.com/mrdoob/three.js/tree/master/examples">예제를 참고하거나</a> <a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/postprocessing">후처리 효과의 소스 코드</a>를 직접 분석해야 합니다. 부디 이 글과 이 시리즈의 <a href="rendertargets.html">렌더 타겟에 관한 글</a>이 좋은 출발점을 마련해주었으면 좋겠네요.</p>
 
         </div>
       </div>

@@ -10,6 +10,12 @@ class TempNode extends Node {
 
 	}
 
+	hasDependencies( builder ) {
+
+		return builder.getDataFromNode( this ).dependenciesCount > 1;
+
+	}
+
 	build( builder, output ) {
 
 		const buildStage = builder.getBuildStage();
@@ -23,7 +29,7 @@ class TempNode extends Node {
 
 				return builder.format( nodeData.propertyName, type, output );
 
-			} else if ( builder.context.tempWrite !== false && type !== 'void ' && output !== 'void' && nodeData.dependenciesCount > 1 ) {
+			} else if ( builder.context.tempWrite !== false && type !== 'void ' && output !== 'void' && this.hasDependencies( builder ) ) {
 
 				const snippet = super.build( builder, type );
 

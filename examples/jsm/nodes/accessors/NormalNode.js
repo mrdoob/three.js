@@ -8,16 +8,17 @@ import MathNode from '../math/MathNode.js';
 
 class NormalNode extends Node {
 
-	static GEOMETRY = 'geometry';
-	static LOCAL = 'local';
-	static VIEW = 'view';
-	static WORLD = 'world';
-
 	constructor( scope = NormalNode.LOCAL ) {
 
 		super( 'vec3' );
 
 		this.scope = scope;
+
+	}
+
+	isGlobal() {
+
+		return true;
 
 	}
 
@@ -75,5 +76,10 @@ class NormalNode extends Node {
 	}
 
 }
+
+NormalNode.GEOMETRY = 'geometry';
+NormalNode.LOCAL = 'local';
+NormalNode.VIEW = 'view';
+NormalNode.WORLD = 'world';
 
 export default NormalNode;

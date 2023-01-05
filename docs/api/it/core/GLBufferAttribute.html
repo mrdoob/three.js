@@ -10,24 +10,24 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-      Questa classe di attributi del buffer non costruisce un VBO. Invece, 
+      Questa classe di attributi del buffer non costruisce un VBO. Invece,
       utilizza qualsiasi VBO che gli viene passato nel costruttore e può essere
       successivamente alterato tramite la proprietà `buffer`.<br /><br />
       È necessario passare parametri aggiuntivi insieme a VBO. I quali sono:
       il contesto GL, il tipo di dati GL, il numero di componenti per vertice,
       il numero di byte per componente, e il numero di vertici. <br /><br />
-      Il caso d'uso più comune per questa classe è quando un qualche tipo di 
+      Il caso d'uso più comune per questa classe è quando un qualche tipo di
       calcolo GPGPU interferisce o addirittura produce i VBO in questione.
 		</p>
 
 		<h2>Costruttore</h2>
 		<h3>[name]( [param:WebGLBuffer buffer], [param:GLenum type], [param:Integer itemSize], [param:Integer elementSize], [param:Integer count] )</h3>
 		<p>
-		`buffer` — Deve essere un <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer" target="_blank">WebGLBuffer</a>.
+		`buffer` — Deve essere un [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer].
 		<br />
-		`type` — Uno dei <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types" target="_blank">Tipi di dati WebGL</a>.
+		`type` — Uno dei [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types Tipi di dati WebGL].
 		<br />
-		`itemSize` — Il numero dei valori dell'array che devono essere associati con un particolare vertice. Ad esempio, 
+		`itemSize` — Il numero dei valori dell'array che devono essere associati con un particolare vertice. Ad esempio,
     se questo attributo memorizza un vettore a 3 componenti (come una posizione, una normale, un colore), allora itemSize dovrebbe essere 3.
 		<br />
 		`elementSize` — 1, 2 o 4. La dimensione corrispondente (in byte) per il parametro "type" passato.
@@ -47,12 +47,17 @@
 
 		<h3>[property:WebGLBuffer buffer]</h3>
 		<p>
-			L'istanza corrente di <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer" target="_blank">WebGLBuffer</a>.
+			L'istanza corrente di [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLBuffer WebGLBuffer].
 		</p>
 
 		<h3>[property:Integer count]</h3>
 		<p>
       Il numero previsto di vertici in VBO.
+		</p>
+
+		<h3>[property:Boolean isGLBufferAttribute]</h3>
+		<p>
+      Solo lettura. Sempre `true`.
 		</p>
 
 		<h3>[property:Integer itemSize]</h3>
@@ -68,19 +73,19 @@
       Vedi sopra (costruttore) per un elenco di dimensioni di type conosciute.
 		</p>
 
+		<h3>[property:String name]</h3>
+		<p>
+      Un nome opzionale per questa istanza dell'attributo. Il valore predefinito è una stringa vuota.
+		</p>
+
 		<h3>[property:GLenum type]</h3>
 		<p>
-      Un <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types" target="_blank">WebGL Data Type</a> 
+      Un [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Data_types WebGL Data Type]
       che descrive i contenuti VBO.
 		</p>
 		<p>
-      Imposta questa proprietà insieme a `elementSize`. Il modo consigliato è 
+      Imposta questa proprietà insieme a `elementSize`. Il modo consigliato è
       di usare il metodo `setType`.
-		</p>
-
-		<h3>[property:Boolean isGLBufferAttribute]</h3>
-		<p>
-      Solo lettura. Sempre `true`.
 		</p>
 
 		<h2>Metodi</h2>

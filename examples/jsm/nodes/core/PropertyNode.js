@@ -2,7 +2,7 @@ import Node from './Node.js';
 
 class PropertyNode extends Node {
 
-	constructor( name = null, nodeType = 'vec4' ) {
+	constructor( nodeType, name = null ) {
 
 		super( nodeType );
 
@@ -13,6 +13,12 @@ class PropertyNode extends Node {
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
+
+	}
+
+	isGlobal( /*builder*/ ) {
+
+		return true;
 
 	}
 

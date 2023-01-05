@@ -11,6 +11,9 @@ class PointsNodeMaterial extends NodeMaterial {
 
 		this.isPointsNodeMaterial = true;
 
+		this.lights = false;
+		this.normals = false;
+
 		this.transparent = true;
 
 		this.colorNode = null;

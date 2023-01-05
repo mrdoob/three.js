@@ -12,6 +12,12 @@ class VaryingNode extends Node {
 
 	}
 
+	isGlobal() {
+
+		return true;
+
+	}
+
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
@@ -34,7 +40,7 @@ class VaryingNode extends Node {
 		const nodeVarying = builder.getVaryingFromNode( this, type );
 
 		// this property can be used to check if the varying can be optimized for a var
-		nodeVarying.needsInterpolation ||= builder.shaderStage === 'fragment';
+		nodeVarying.needsInterpolation || ( nodeVarying.needsInterpolation = ( builder.shaderStage === 'fragment' ) );
 
 		if ( name !== null ) {
 

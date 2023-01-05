@@ -359,7 +359,7 @@ class Material extends EventDispatcher {
 
 		if ( this.fog === false ) data.fog = false;
 
-		if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
+		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
 
 		// TODO: Copied from Object3D.toJSON
 

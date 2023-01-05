@@ -110,15 +110,8 @@ export default /* glsl */`
 		shadowCoord.xyz /= shadowCoord.w;
 		shadowCoord.z += shadowBias;
 
-		// if ( something && something ) breaks ATI OpenGL shader compiler
-		// if ( all( something, something ) ) using this instead
-
-		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
-		bool inFrustum = all( inFrustumVec );
-
-		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
-
-		bool frustumTest = all( frustumTestVec );
+		bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;
+		bool frustumTest = inFrustum && shadowCoord.z <= 1.0;
 
 		if ( frustumTest ) {
 

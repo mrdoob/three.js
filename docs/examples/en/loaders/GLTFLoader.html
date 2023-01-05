@@ -83,7 +83,7 @@
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
 		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
+		dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
 		// Load a glTF resource
@@ -122,13 +122,6 @@
 		<p>
 			[example:webgl_loader_gltf]
 		</p>
-
-		<h2>Browser compatibility</h2>
-
-		<p>GLTFLoader relies on ES6 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promises],
-		which are not supported in IE11. To use the loader in IE11, you must
-		[link:https://github.com/stefanpenner/es6-promise include a polyfill]
-		providing a Promise replacement.</p>
 
 		<h2>Textures</h2>
 
@@ -211,7 +204,7 @@
 		[page:DRACOLoader dracoLoader] — Instance of THREE.DRACOLoader, to be used for decoding assets compressed with the KHR_draco_mesh_compression extension.
 		</p>
 		<p>
-		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
+		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/libs/draco#readme readme] for the details of Draco and its decoder.
 		</p>
 
 		<h3>[method:this setKTX2Loader]( [param:KTX2Loader ktx2Loader] )</h3>

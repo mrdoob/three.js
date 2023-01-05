@@ -2,8 +2,8 @@ import NodeMaterial from './NodeMaterial.js';
 import { SpriteMaterial } from 'three';
 import {
 	vec2, vec3, vec4,
-	uniform, add, mul, sub,
-	positionLocal, length, cos, sin,
+	uniform, mul,
+	positionLocal, cos, sin,
 	modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialRotation
 } from '../shadernode/ShaderNodeElements.js';
 
@@ -17,7 +17,8 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		this.isSpriteNodeMaterial = true;
 
-		this.lights = true;
+		this.lights = false;
+		this.normals = false;
 
 		this.colorNode = null;
 		this.opacityNode = null;
@@ -36,7 +37,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
-	generatePosition( builder ) {
+	constructPosition( { object, context } ) {
 
 		// < VERTEX STAGE >
 
@@ -47,21 +48,21 @@ class SpriteNodeMaterial extends NodeMaterial {
 		let mvPosition = mul( modelViewMatrix, positionNode ? vec4( positionNode.xyz, 1 ) : vec4( 0, 0, 0, 1 ) );
 
 		let scale = vec2(
-			length( vec3( modelWorldMatrix[ 0 ].x, modelWorldMatrix[ 0 ].y, modelWorldMatrix[ 0 ].z ) ),
-			length( vec3( modelWorldMatrix[ 1 ].x, modelWorldMatrix[ 1 ].y, modelWorldMatrix[ 1 ].z ) )
+			vec3( modelWorldMatrix[ 0 ].x, modelWorldMatrix[ 0 ].y, modelWorldMatrix[ 0 ].z ).length(),
+			vec3( modelWorldMatrix[ 1 ].x, modelWorldMatrix[ 1 ].y, modelWorldMatrix[ 1 ].z ).length()
 		);
 
 		if ( scaleNode !== null ) {
 
-			scale = mul( scale, scaleNode );
+			scale = scale.mul( scaleNode );
 
 		}
 
 		let alignedPosition = vertex.xy;
 
-		if ( builder.object.center?.isVector2 === true ) {
+		if ( object.center && object.center.isVector2 === true ) {
 
-			alignedPosition = sub( alignedPosition, sub( uniform( builder.object.center ), vec2( 0.5 ) ) );
+			alignedPosition = alignedPosition.sub( uniform( object.center ).sub( vec2( 0.5 ) ) );
 
 		}
 
@@ -70,17 +71,17 @@ class SpriteNodeMaterial extends NodeMaterial {
 		const rotation = rotationNode || materialRotation;
 
 		const rotatedPosition = vec2(
-			sub( mul( cos( rotation ), alignedPosition.x ), mul( sin( rotation ), alignedPosition.y ) ),
-			add( mul( sin( rotation ), alignedPosition.x ), mul( cos( rotation ), alignedPosition.y ) )
+			cos( rotation ).mul( alignedPosition.x ).sub( sin( rotation ).mul( alignedPosition.y ) ),
+			sin( rotation ).mul( alignedPosition.x ).add( cos( rotation ).mul( alignedPosition.y ) )
 		);
 
-		mvPosition = vec4( add( mvPosition.xy, rotatedPosition.xy ), mvPosition.z, mvPosition.w );
+		mvPosition = vec4( mvPosition.xy.add( rotatedPosition.xy ), mvPosition.z, mvPosition.w );
 
-		const modelViewProjection = mul( cameraProjectionMatrix, mvPosition );
+		const modelViewProjection = cameraProjectionMatrix.mul( mvPosition );
 
-		builder.context.vertex = vertex;
+		context.vertex = vertex;
 
-		builder.addFlow( 'vertex', modelViewProjection );
+		return modelViewProjection;
 
 	}
 

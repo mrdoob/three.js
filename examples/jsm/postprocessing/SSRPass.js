@@ -202,12 +202,6 @@ class SSRPass extends Pass {
 
 		// ssr material
 
-		if ( SSRShader === undefined ) {
-
-			console.error( 'THREE.SSRPass: The pass relies on SSRShader.' );
-
-		}
-
 		this.ssrMaterial = new ShaderMaterial( {
 			defines: Object.assign( {}, SSRShader.defines, {
 				MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )

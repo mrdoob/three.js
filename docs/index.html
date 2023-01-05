@@ -29,7 +29,7 @@
 			<div id="contentWrapper">
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
-					<div id="exitSearchButton"></div>
+					<div id="clearSearchButton"></div>
 					<select id="language">
 						<option value="en">en</option>
 						<option value="ar">ar</option>
@@ -54,7 +54,7 @@
 		const panel = document.getElementById( 'panel' );
 		const content = document.getElementById( 'content' );
 		const expandButton = document.getElementById( 'expandButton' );
-		const exitSearchButton = document.getElementById( 'exitSearchButton' );
+		const clearSearchButton = document.getElementById( 'clearSearchButton' );
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const filterInput = document.getElementById( 'filterInput' );
 		let iframe = document.querySelector( 'iframe' );
@@ -165,11 +165,11 @@
 
 			};
 
-			exitSearchButton.onclick = function () {
+			clearSearchButton.onclick = function () {
 
 				filterInput.value = '';
 				updateFilter();
-				panel.classList.remove( 'searchFocused' );
+				filterInput.focus();
 
 			};
 
@@ -474,16 +474,32 @@
 			// First separate the member (if existing) from the page name,
 			// then identify the subpage's URL and set it as URL fragment (re-adding the member)
 
+			const pageURL = getPageURL( pageName );
+
+			if ( pageURL ) {
+
+				window.location.hash = pageURL;
+
+				createNewIframe();
+
+			}
+
+		}
+
+		function getPageURL( pageName ) {
+
 			const splitPageName = decomposePageName( pageName, '.', '.' );
 
 			const currentProperties = pageProperties[ splitPageName[ 0 ] ];
 
 			if ( currentProperties ) {
 
-				window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
+				return currentProperties.pageURL + splitPageName[ 1 ];
+		
+			} else {
 
-				createNewIframe();
-
+				return null;
+		
 			}
 
 		}

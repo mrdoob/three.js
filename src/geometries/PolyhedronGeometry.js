@@ -59,7 +59,7 @@ class PolyhedronGeometry extends BufferGeometry {
 			const b = new Vector3();
 			const c = new Vector3();
 
-			// iterate over all faces and apply a subdivison with the given detail value
+			// iterate over all faces and apply a subdivision with the given detail value
 
 			for ( let i = 0; i < indices.length; i += 3 ) {
 

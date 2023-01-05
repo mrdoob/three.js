@@ -9,11 +9,6 @@ import SplitNode from '../utils/SplitNode.js';
 
 class TangentNode extends Node {
 
-	static GEOMETRY = 'geometry';
-	static LOCAL = 'local';
-	static VIEW = 'view';
-	static WORLD = 'world';
-
 	constructor( scope = TangentNode.LOCAL ) {
 
 		super();
@@ -91,5 +86,10 @@ class TangentNode extends Node {
 	}
 
 }
+
+TangentNode.GEOMETRY = 'geometry';
+TangentNode.LOCAL = 'local';
+TangentNode.VIEW = 'view';
+TangentNode.WORLD = 'world';
 
 export default TangentNode;

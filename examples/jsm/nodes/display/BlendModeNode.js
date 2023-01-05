@@ -35,11 +35,6 @@ export const OverlayNode = new ShaderNode( ( { base, blend } ) => {
 
 class BlendModeNode extends TempNode {
 
-	static BURN = 'burn';
-	static DODGE = 'dodge';
-	static SCREEN = 'screen';
-	static OVERLAY = 'overlay';
-
 	constructor( blendMode, baseNode, blendNode ) {
 
 		super();
@@ -81,5 +76,10 @@ class BlendModeNode extends TempNode {
 	}
 
 }
+
+BlendModeNode.BURN = 'burn';
+BlendModeNode.DODGE = 'dodge';
+BlendModeNode.SCREEN = 'screen';
+BlendModeNode.OVERLAY = 'overlay';
 
 export default BlendModeNode;

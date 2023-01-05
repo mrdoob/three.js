@@ -3,7 +3,6 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	LoaderUtils,
 	Color
 } from 'three';
 
@@ -31,6 +30,16 @@ import {
  *	diffuse_blue: 'blue'
  * } );
  *
+ * Custom properties outside of the defaults for position, uv, normal
+ * and color attributes can be added using the setCustomPropertyMapping method.
+ * For example, the following maps the element properties “custom_property_a”
+ * and “custom_property_b” to an attribute “customAttribute” with an item size of 2.
+ * Attribute item sizes are set from the number of element properties in the property array.
+ *
+ * loader.setCustomPropertyMapping( {
+ *	customAttribute: ['custom_property_a', 'custom_property_b'],
+ * } );
+ *
  */
 
 const _color = new Color();
@@ -42,6 +51,7 @@ class PLYLoader extends Loader {
 		super( manager );
 
 		this.propertyNameMapping = {};
+		this.customPropertyMapping = {};
 
 	}
 
@@ -83,6 +93,12 @@ class PLYLoader extends Loader {
 	setPropertyNameMapping( mapping ) {
 
 		this.propertyNameMapping = mapping;
+
+	}
+
+	setCustomPropertyNameMapping( mapping ) {
+
+		this.customPropertyMapping = mapping;
 
 	}
 
@@ -260,18 +276,66 @@ class PLYLoader extends Loader {
 
 		}
 
+		function createBuffer() {
+
+			const buffer = {
+			  indices: [],
+			  vertices: [],
+			  normals: [],
+			  uvs: [],
+			  faceVertexUvs: [],
+			  colors: [],
+			};
+
+			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
+
+			  buffer[ customProperty ] = [];
+
+			}
+
+			return buffer;
+
+		}
+
+		function mapElementAttributes( properties ) {
+
+			const elementNames = properties.map(  property => { return property.name } );
+
+			function findAttrName( names ) {
+
+				for ( let i = 0, l = names.length; i < l; i ++ ) {
+
+					const name = names[ i ];
+
+					if ( name in elementNames ) return name;
+
+				}
+
+				return null;
+
+			}
+
+			return {
+				attrX: findAttrName( [ 'x', 'px', 'posx' ] ) || 'x',
+				attrY: findAttrName( [ 'y', 'py', 'posy' ] ) || 'y',
+				attrZ: findAttrName( [ 'z', 'pz', 'posz' ] ) || 'z',
+				attrNX: findAttrName( [ 'nx', 'normalx' ] ),
+				attrNY: findAttrName( [ 'ny', 'normaly' ] ),
+				attrNZ: findAttrName( [ 'nz', 'normalz' ] ),
+				attrS: findAttrName( [ 's', 'u', 'texture_u', 'tx' ] ),
+				attrT: findAttrName( [ 't', 'v', 'texture_v', 'ty' ] ),
+				attrR: findAttrName( [ 'red', 'diffuse_red', 'r', 'diffuse_r' ] ),
+				attrG: findAttrName( [ 'green', 'diffuse_green', 'g', 'diffuse_g' ] ),
+				attrB: findAttrName( [ 'blue', 'diffuse_blue', 'b', 'diffuse_b' ] ),
+			};
+
+		}
+
 		function parseASCII( data, header ) {
 
 			// PLY ascii format specification, as per http://en.wikipedia.org/wiki/PLY_(file_format)
 
-			const buffer = {
-				indices: [],
-				vertices: [],
-				normals: [],
-				uvs: [],
-				faceVertexUvs: [],
-				colors: []
-			};
+			const buffer = createBuffer();
 
 			let result;
 
@@ -286,6 +350,8 @@ class PLYLoader extends Loader {
 			const lines = body.split( /\r\n|\r|\n/ );
 			let currentElement = 0;
 			let currentElementCount = 0;
+			let elementDesc = header.elements[ currentElement ];
+			let attributeMap = mapElementAttributes( elementDesc.properties );
 
 			for ( let i = 0; i < lines.length; i ++ ) {
 
@@ -297,16 +363,19 @@ class PLYLoader extends Loader {
 
 				}
 
-				if ( currentElementCount >= header.elements[ currentElement ].count ) {
+				if ( currentElementCount >= elementDesc.count ) {
 
 					currentElement ++;
 					currentElementCount = 0;
+					elementDesc = header.elements[ currentElement ];
+
+					attributeMap = mapElementAttributes( elementDesc.properties );
 
 				}
 
-				const element = parseASCIIElement( header.elements[ currentElement ].properties, line );
+				const element = parseASCIIElement( elementDesc.properties, line );
 
-				handleElement( buffer, header.elements[ currentElement ].name, element );
+				handleElement( buffer, elementDesc.name, element, attributeMap );
 
 				currentElementCount ++;
 
@@ -357,65 +426,67 @@ class PLYLoader extends Loader {
 
 			}
 
+			// custom buffer data
+
+			for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
+
+				if ( buffer[ customProperty ].length > 0 ) {
+
+				  	geometry.setAttribute(
+						customProperty,
+						new Float32BufferAttribute(
+					  		buffer[ customProperty ],
+					  		scope.customPropertyMapping[ customProperty ].length
+						)
+				  	);
+
+				}
+
+			}
+
 			geometry.computeBoundingSphere();
 
 			return geometry;
 
 		}
 
-		function handleElement( buffer, elementName, element ) {
-
-			function findAttrName( names ) {
-
-				for ( let i = 0, l = names.length; i < l; i ++ ) {
-
-					const name = names[ i ];
-
-					if ( name in element ) return name;
-
-				}
-
-				return null;
-
-			}
-
-			const attrX = findAttrName( [ 'x', 'px', 'posx' ] ) || 'x';
-			const attrY = findAttrName( [ 'y', 'py', 'posy' ] ) || 'y';
-			const attrZ = findAttrName( [ 'z', 'pz', 'posz' ] ) || 'z';
-			const attrNX = findAttrName( [ 'nx', 'normalx' ] );
-			const attrNY = findAttrName( [ 'ny', 'normaly' ] );
-			const attrNZ = findAttrName( [ 'nz', 'normalz' ] );
-			const attrS = findAttrName( [ 's', 'u', 'texture_u', 'tx' ] );
-			const attrT = findAttrName( [ 't', 'v', 'texture_v', 'ty' ] );
-			const attrR = findAttrName( [ 'red', 'diffuse_red', 'r', 'diffuse_r' ] );
-			const attrG = findAttrName( [ 'green', 'diffuse_green', 'g', 'diffuse_g' ] );
-			const attrB = findAttrName( [ 'blue', 'diffuse_blue', 'b', 'diffuse_b' ] );
+		function handleElement( buffer, elementName, element, cacheEntry ) {
 
 			if ( elementName === 'vertex' ) {
 
-				buffer.vertices.push( element[ attrX ], element[ attrY ], element[ attrZ ] );
+				buffer.vertices.push( element[ cacheEntry.attrX ], element[ cacheEntry.attrY ], element[ cacheEntry.attrZ ] );
 
-				if ( attrNX !== null && attrNY !== null && attrNZ !== null ) {
+				if ( cacheEntry.attrNX !== null && cacheEntry.attrNY !== null && cacheEntry.attrNZ !== null ) {
 
-					buffer.normals.push( element[ attrNX ], element[ attrNY ], element[ attrNZ ] );
-
-				}
-
-				if ( attrS !== null && attrT !== null ) {
-
-					buffer.uvs.push( element[ attrS ], element[ attrT ] );
+					buffer.normals.push( element[ cacheEntry.attrNX ], element[ cacheEntry.attrNY ], element[ cacheEntry.attrNZ ] );
 
 				}
 
-				if ( attrR !== null && attrG !== null && attrB !== null ) {
+				if ( cacheEntry.attrS !== null && cacheEntry.attrT !== null ) {
+
+					buffer.uvs.push( element[ cacheEntry.attrS ], element[ cacheEntry.attrT ] );
+
+				}
+
+				if ( cacheEntry.attrR !== null && cacheEntry.attrG !== null && cacheEntry.attrB !== null ) {
 
 					_color.setRGB(
-						element[ attrR ] / 255.0,
-						element[ attrG ] / 255.0,
-						element[ attrB ] / 255.0
+						element[ cacheEntry.attrR ] / 255.0,
+						element[ cacheEntry.attrG ] / 255.0,
+						element[ cacheEntry.attrB ] / 255.0
 					).convertSRGBToLinear();
 
 					buffer.colors.push( _color.r, _color.g, _color.b );
+
+				}
+
+				for ( const customProperty of Object.keys( scope.customPropertyMapping ) ) {
+
+					for ( const elementProperty of scope.customPropertyMapping[ customProperty ] ) {
+
+					  buffer[ customProperty ].push( element[ elementProperty ] );
+
+					}
 
 				}
 
@@ -506,14 +577,7 @@ class PLYLoader extends Loader {
 
 		function parseBinary( data, header ) {
 
-			const buffer = {
-				indices: [],
-				vertices: [],
-				normals: [],
-				uvs: [],
-				faceVertexUvs: [],
-				colors: []
-			};
+			const buffer = createBuffer();
 
 			const little_endian = ( header.format === 'binary_little_endian' );
 			const body = new DataView( data, header.headerLength );
@@ -521,19 +585,56 @@ class PLYLoader extends Loader {
 
 			for ( let currentElement = 0; currentElement < header.elements.length; currentElement ++ ) {
 
-				for ( let currentElementCount = 0; currentElementCount < header.elements[ currentElement ].count; currentElementCount ++ ) {
+				const elementDesc = header.elements[ currentElement ];
+				const attributeMap = mapElementAttributes( elementDesc.properties );
 
-					result = binaryReadElement( body, loc, header.elements[ currentElement ].properties, little_endian );
+				for ( let currentElementCount = 0; currentElementCount < elementDesc.count; currentElementCount ++ ) {
+
+					result = binaryReadElement( body, loc, elementDesc.properties, little_endian );
 					loc += result[ 1 ];
 					const element = result[ 0 ];
 
-					handleElement( buffer, header.elements[ currentElement ].name, element );
+					handleElement( buffer, elementDesc.name, element, attributeMap );
 
 				}
 
 			}
 
 			return postProcess( buffer );
+
+		}
+
+		function extractHeaderText( bytes ) {
+
+			let i = 0;
+			let cont = true;
+
+			let line = '';
+			const lines = [];
+
+			do {
+
+				const c = String.fromCharCode( bytes[ i++ ] );
+
+				if ( c !== "\n" && c !== "\r" ) {
+
+					line += c;
+
+				} else {
+
+					if ( line === 'end_header' ) cont = false;
+					if ( line !== '' ) {
+
+						lines.push( line );
+						line = '';
+
+					}
+
+				}
+
+			}  while ( cont && i < bytes.length );
+
+			return lines.join( "\r" ) + "\r";
 
 		}
 
@@ -544,10 +645,21 @@ class PLYLoader extends Loader {
 
 		if ( data instanceof ArrayBuffer ) {
 
-			const text = LoaderUtils.decodeText( new Uint8Array( data ) );
-			const header = parseHeader( text );
+			const bytes = new Uint8Array( data );
+			const headerText = extractHeaderText( bytes );
+			const header = parseHeader( headerText );
 
-			geometry = header.format === 'ascii' ? parseASCII( text, header ) : parseBinary( data, header );
+			if ( header.format === 'ascii' ) {
+
+				const text = new TextDecoder().decode( bytes );
+
+				geometry = parseASCII( text, header );
+
+			} else {
+
+				geometry = parseBinary( data, header );
+
+			}
 
 		} else {
 

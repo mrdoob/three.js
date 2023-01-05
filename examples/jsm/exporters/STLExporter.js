@@ -13,7 +13,11 @@ class STLExporter {
 
 	parse( scene, options = {} ) {
 
-		const binary = options.binary !== undefined ? options.binary : false;
+		options = Object.assign( {
+			binary: false
+		}, options );
+
+		const binary = options.binary;
 
 		//
 

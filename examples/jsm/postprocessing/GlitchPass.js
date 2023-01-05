@@ -16,8 +16,6 @@ class GlitchPass extends Pass {
 
 		super();
 
-		if ( DigitalGlitch === undefined ) console.error( 'THREE.GlitchPass relies on DigitalGlitch' );
-
 		const shader = DigitalGlitch;
 
 		this.uniforms = UniformsUtils.clone( shader.uniforms );

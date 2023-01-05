@@ -1,7 +1,7 @@
 import {
 	REVISION,
 	BackSide,
-	DoubleSide,
+	TwoPassDoubleSide,
 	FrontSide,
 	RGBAFormat,
 	HalfFloatType,
@@ -828,7 +828,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		function prepare( material, scene, object ) {
 
-			if ( material.transparent === true && material.side === DoubleSide ) {
+			if ( material.transparent === true && material.side === TwoPassDoubleSide ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -838,7 +838,7 @@ function WebGLRenderer( parameters = {} ) {
 				material.needsUpdate = true;
 				getProgram( material, scene, object );
 
-				material.side = DoubleSide;
+				material.side = TwoPassDoubleSide;
 
 			} else {
 
@@ -1310,7 +1310,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		material.onBeforeRender( _this, scene, camera, geometry, object, group );
 
-		if ( material.transparent === true && material.side === DoubleSide ) {
+		if ( material.transparent === true && material.side === TwoPassDoubleSide ) {
 
 			material.side = BackSide;
 			material.needsUpdate = true;
@@ -1320,7 +1320,7 @@ function WebGLRenderer( parameters = {} ) {
 			material.needsUpdate = true;
 			_this.renderBufferDirect( camera, scene, geometry, material, object, group );
 
-			material.side = DoubleSide;
+			material.side = TwoPassDoubleSide;
 
 		} else {
 

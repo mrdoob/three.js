@@ -1,10 +1,8 @@
-import babel from '@rollup/plugin-babel';
-import { terser } from 'rollup-plugin-terser';
-import babelrc from './.babelrc.json';
+import terser from '@rollup/plugin-terser';
 
 export function glconstants() {
 
-	var constants = {
+	const constants = {
 		POINTS: 0, ZERO: 0, NONE: 0,
 		LINES: 1, ONE: 1,
 		LINE_LOOP: 2,
@@ -246,27 +244,6 @@ export function glsl() {
 
 }
 
-function babelCleanup() {
-
-	const doubleSpaces = / {2}/g;
-
-	return {
-
-		transform( code ) {
-
-			code = code.replace( doubleSpaces, '\t' );
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
-
 function header() {
 
 	return {
@@ -275,7 +252,7 @@ function header() {
 
 			return `/**
  * @license
- * Copyright 2010-2022 Three.js Authors
+ * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
 ${ code }`;
@@ -307,13 +284,6 @@ const builds = [
 		plugins: [
 			addons(),
 			glsl(),
-			babel( {
-				babelHelpers: 'bundled',
-				compact: false,
-				babelrc: false,
-				...babelrc
-			} ),
-			babelCleanup(),
 			header()
 		],
 		output: [
@@ -337,12 +307,6 @@ const builds = [
 			addons(),
 			glconstants(),
 			glsl(),
-			babel( {
-				babelHelpers: 'bundled',
-				babelrc: false,
-				...babelrc
-			} ),
-			babelCleanup(),
 			terser(),
 			header()
 		],

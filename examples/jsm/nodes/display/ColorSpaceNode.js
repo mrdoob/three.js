@@ -32,9 +32,6 @@ const EncodingLib = {
 
 class ColorSpaceNode extends TempNode {
 
-	static LINEAR_TO_LINEAR = 'LinearToLinear';
-	static LINEAR_TO_SRGB = 'LinearTosRGB';
-
 	constructor( method, node ) {
 
 		super( 'vec4' );
@@ -91,5 +88,8 @@ class ColorSpaceNode extends TempNode {
 	}
 
 }
+
+ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
+ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
 
 export default ColorSpaceNode;

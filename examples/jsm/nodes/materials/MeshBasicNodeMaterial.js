@@ -11,7 +11,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 		this.isMeshBasicNodeMaterial = true;
 
-		this.lights = true;
+		this.lights = false;
 
 		this.colorNode = null;
 		this.opacityNode = null;

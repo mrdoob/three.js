@@ -7,13 +7,6 @@ let resolution;
 
 class ViewportNode extends Node {
 
-	static COORDINATE = 'coordinate';
-	static RESOLUTION = 'resolution';
-	static TOP_LEFT = 'topLeft';
-	static BOTTOM_LEFT = 'bottomLeft';
-	static TOP_RIGHT = 'topRight';
-	static BOTTOM_RIGHT = 'bottomRight';
-
 	constructor( scope ) {
 
 		super();
@@ -62,9 +55,7 @@ class ViewportNode extends Node {
 
 		if ( scope === ViewportNode.RESOLUTION ) {
 
-			resolution ||= new Vector2();
-
-			output = uniform( resolution );
+			output = uniform( resolution || ( resolution = new Vector2() ) );
 
 		} else {
 
@@ -102,5 +93,12 @@ class ViewportNode extends Node {
 	}
 
 }
+
+ViewportNode.COORDINATE = 'coordinate';
+ViewportNode.RESOLUTION = 'resolution';
+ViewportNode.TOP_LEFT = 'topLeft';
+ViewportNode.BOTTOM_LEFT = 'bottomLeft';
+ViewportNode.TOP_RIGHT = 'topRight';
+ViewportNode.BOTTOM_RIGHT = 'bottomRight';
 
 export default ViewportNode;

@@ -1,15 +1,18 @@
 /* global QUnit */
 
-// import { Points } from '../../../../src/objects/Points.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Points } from '../../../../src/objects/Points.js';
 
 export default QUnit.module( 'Objects', () => {
 
 	QUnit.module( 'Points', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'isPoints', ( assert ) => {
+		QUnit.test( 'isPoints', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var points = new Points();
+	
+			assert.strictEqual( points instanceof Object3D, true, 'Points extends from Object3D' );
 
 		} );
 

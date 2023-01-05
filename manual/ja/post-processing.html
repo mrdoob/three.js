@@ -143,13 +143,13 @@ deltaTimeをアニメーションしてる様々なエフェクトに渡しま�
 <p>実行時にエフェクトパラメーターを変更するには、uniformの値を設定する必要があります。
 パラメータを調整するためのGUIを追加してみましょう。
 どの値を調整できるか把握するには、以下のコードを調べる必要があります。</p>
-<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>の中でこの行を見つけました。</p>
+<p><a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>の中でこの行を見つけました。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
 </pre>
 <p>strengthを設定できます。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
 </pre>
-<p>同様に<a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>でこの行を見つけました。</p>
+<p>同様に<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>でこの行を見つけました。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
 if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
 if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
@@ -247,10 +247,10 @@ gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
 <p></p>
 <p>GLSLやカスタムシェーダーの詳細は、ネット上にたくさんの記事があります。
 WebGL自体がどのように動作するかを知りたいならば、<a href="https://webglfundamentals.org">これらの記事</a>をチェックしてみて下さい。
-もう1つの素晴らしいリソースは、<a href="https://github.com/mrdoob/three.js/tree/master/examples/js/shaders">THREE.jsレポートの既存ポストプロセスシェーダーを読み解く</a>事です。
+もう1つの素晴らしいリソースは、<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/shaders">THREE.jsレポートの既存ポストプロセスシェーダーを読み解く</a>事です。
 複雑なものもいくつかありますが、小さいものから始めるとどのように動作するかのアイデアを得る事ができます。</p>
 <p>残念ながらThree.jsレポートにあるほとんどのポストプロセスエフェクトは文書化されていないので、使用するには<a href="https://github.com/mrdoob/three.js/tree/master/examples">この例</a>か
-<a href="https://github.com/mrdoob/three.js/tree/master/examples/js/postprocessing">エフェクト自体のコード</a>を読んで下さい。
+<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/postprocessing">エフェクト自体のコード</a>を読んで下さい。
 これらのシンプルな例と<a href="rendertargets.html">レンダーターゲット</a>の記事がポストプロセスを始めるのに十分な知識を提供してくれると思います。</p>
 
         </div>

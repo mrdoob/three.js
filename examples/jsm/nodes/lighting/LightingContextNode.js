@@ -51,9 +51,9 @@ class LightingContextNode extends ContextNode {
 		context.reflectedLight = reflectedLight;
 		context.lightingModelNode = lightingModelNode || context.lightingModelNode;
 
-		if ( lightingModelNode?.indirectDiffuse ) lightingModelNode.indirectDiffuse.call( context );
-		if ( lightingModelNode?.indirectSpecular ) lightingModelNode.indirectSpecular.call( context );
-		if ( lightingModelNode?.ambientOcclusion ) lightingModelNode.ambientOcclusion.call( context );
+		if ( lightingModelNode && lightingModelNode.indirectDiffuse ) lightingModelNode.indirectDiffuse.call( context );
+		if ( lightingModelNode && lightingModelNode.indirectSpecular ) lightingModelNode.indirectSpecular.call( context );
+		if ( lightingModelNode && lightingModelNode.ambientOcclusion ) lightingModelNode.ambientOcclusion.call( context );
 
 		return super.construct( builder );
 

@@ -661,6 +661,7 @@ class ObjectLoader extends Loader {
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
 
+				if ( data.generateMipmaps !== undefined ) texture.generateMipmaps = data.generateMipmaps;
 				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
 				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 
@@ -783,6 +784,7 @@ class ObjectLoader extends Loader {
 				}
 
 				if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;
+				if ( data.backgroundIntensity !== undefined ) object.backgroundIntensity = data.backgroundIntensity;
 
 				break;
 

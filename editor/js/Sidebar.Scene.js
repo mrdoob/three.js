@@ -192,6 +192,9 @@ function SidebarScene( editor ) {
 	const backgroundBlurriness = new UINumber( 0 ).setWidth( '40px' ).setRange( 0, 1 ).onChange( onBackgroundChanged );
 	backgroundEquirectRow.add( backgroundBlurriness );
 
+	const backgroundIntensity = new UINumber( 1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onBackgroundChanged );
+	backgroundEquirectRow.add( backgroundIntensity );
+
 	container.add( backgroundEquirectRow );
 
 	function onBackgroundChanged() {
@@ -201,7 +204,8 @@ function SidebarScene( editor ) {
 			backgroundColor.getHexValue(),
 			backgroundTexture.getValue(),
 			backgroundEquirectangularTexture.getValue(),
-			backgroundBlurriness.getValue()
+			backgroundBlurriness.getValue(),
+			backgroundIntensity.getValue()
 		);
 
 	}
@@ -395,6 +399,8 @@ function SidebarScene( editor ) {
 
 					backgroundType.setValue( 'Equirectangular' );
 					backgroundEquirectangularTexture.setValue( scene.background );
+					backgroundBlurriness.setValue( scene.backgroundBlurriness );
+					backgroundIntensity.setValue( scene.backgroundIntensity );
 
 				} else {
 
