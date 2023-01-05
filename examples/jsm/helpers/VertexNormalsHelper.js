@@ -37,6 +37,15 @@ class VertexNormalsHelper extends LineSegments {
 	}
 
 	update() {
+		
+		//	remake buffer if capacity changes
+		if ( this.object.geometry.attributes.normal.count != this.geometry.attributes.position.length*2*3 )
+		{
+			const object = this.object;
+			const nNormals = object.geometry.attributes.normal.count;
+			const positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
+			this.geometry.setAttribute( 'position', positions );
+		}
 
 		this.object.updateMatrixWorld( true );
 
