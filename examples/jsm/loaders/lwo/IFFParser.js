@@ -32,7 +32,6 @@
  *
  **/
 
-import { LoaderUtils } from 'three';
 import { LWO2Parser } from './LWO2Parser.js';
 import { LWO3Parser } from './LWO3Parser.js';
 
@@ -908,6 +907,7 @@ function DataViewReader( buffer ) {
 
 	this.dv = new DataView( buffer );
 	this.offset = 0;
+	this._textDecoder = new TextDecoder();
 
 }
 
@@ -1093,7 +1093,7 @@ DataViewReader.prototype = {
 
 		}
 
-		return LoaderUtils.decodeText( new Uint8Array( a ) );
+		return this._textDecoder.decode( new Uint8Array( a ) );
 
 	},
 
@@ -1211,7 +1211,7 @@ function stringOffset( string ) {
 // printBuffer( this.reader.dv.buffer, this.reader.offset, length );
 function printBuffer( buffer, from, to ) {
 
-	console.log( LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) ) );
+	console.log( new TextDecoder().decode( new Uint8Array( buffer, from, to ) ) );
 
 }
 

@@ -4,7 +4,6 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	LoaderUtils,
 	Vector3
 } from 'three';
 
@@ -357,7 +356,7 @@ class STLLoader extends Loader {
 
 			if ( typeof buffer !== 'string' ) {
 
-				return LoaderUtils.decodeText( new Uint8Array( buffer ) );
+				return new TextDecoder().decode( buffer );
 
 			}
 

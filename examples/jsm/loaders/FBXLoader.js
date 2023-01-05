@@ -3592,6 +3592,7 @@ class BinaryReader {
 		this.dv = new DataView( buffer );
 		this.offset = 0;
 		this.littleEndian = ( littleEndian !== undefined ) ? littleEndian : true;
+		this._textDecoder = new TextDecoder();
 
 	}
 
@@ -3822,7 +3823,7 @@ class BinaryReader {
 		const nullByte = a.indexOf( 0 );
 		if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
 
-		return LoaderUtils.decodeText( new Uint8Array( a ) );
+		return this._textDecoder.decode( new Uint8Array( a ) );
 
 	}
 
@@ -4104,7 +4105,7 @@ function convertArrayBufferToString( buffer, from, to ) {
 	if ( from === undefined ) from = 0;
 	if ( to === undefined ) to = buffer.byteLength;
 
-	return LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) );
+	return new TextDecoder().decode( new Uint8Array( buffer, from, to ) );
 
 }
 

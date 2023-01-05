@@ -3,7 +3,6 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	LoaderUtils,
 	Color
 } from 'three';
 
@@ -652,7 +651,7 @@ class PLYLoader extends Loader {
 
 			if ( header.format === 'ascii' ) {
 
-				const text = LoaderUtils.decodeText( bytes );
+				const text = new TextDecoder().decode( bytes );
 
 				geometry = parseASCII( text, header );
 
