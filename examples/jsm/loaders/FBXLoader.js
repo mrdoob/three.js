@@ -3819,7 +3819,7 @@ class BinaryReader {
 		const nullByte = a.indexOf( 0 );
 		if ( nullByte >= 0 ) a = new Uint8Array( this.dv.buffer, start, nullByte );
 
-		return this.textDecoder.decode( a );
+		return this._textDecoder.decode( a );
 
 	}
 
