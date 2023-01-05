@@ -139,7 +139,6 @@ class IESLoader extends Loader {
 		const texture = new DataTexture( data, 180, 1, RedFormat, type );
 		texture.minFilter = LinearFilter;
 		texture.magFilter = LinearFilter;
-		texture.generateMipmaps = true;
 		texture.needsUpdate = true;
 
 		return texture;
