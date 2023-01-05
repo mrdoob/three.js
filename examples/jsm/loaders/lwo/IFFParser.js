@@ -907,7 +907,7 @@ function DataViewReader( buffer ) {
 
 	this.dv = new DataView( buffer );
 	this.offset = 0;
-	this.textDecoder = new TextDecoder();
+	this._textDecoder = new TextDecoder();
 
 }
 
@@ -1093,7 +1093,7 @@ DataViewReader.prototype = {
 
 		}
 
-		return this.textDecoder.decode( new Uint8Array( a ) );
+		return this._textDecoder.decode( new Uint8Array( a ) );
 
 	},
 
