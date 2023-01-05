@@ -103,7 +103,7 @@ class IESLoader extends Loader {
 
 		let result = null;
 
-		if ( type === UnsignedByteType ) result = Uint8Array.from( data.map( v => v * 0xFF ) );
+		if ( type === UnsignedByteType ) result = Uint8Array.from( data.map( v => Math.min( v * 0xFF, 0xFF ) ) );
 		else if ( type === HalfFloatType ) result = Uint16Array.from( data.map( v => DataUtils.toHalfFloat( v ) ) );
 		else if ( type === FloatType ) result = Float32Array.from( data );
 		else console.error( 'IESLoader: Unsupported type:', type );
