@@ -6,8 +6,6 @@ import { uniform, smoothstep, positionView, objectViewPosition } from '../shader
 
 import { Vector3, SpotLight } from 'three';
 
-const getSpotAttenuation = ( coneCosine, penumbraCosine, angleCosine ) => smoothstep( coneCosine, penumbraCosine, angleCosine );
-
 class SpotLightNode extends AnalyticLightNode {
 
 	constructor( light = null ) {
@@ -40,6 +38,14 @@ class SpotLightNode extends AnalyticLightNode {
 
 	}
 
+	getSpotAttenuation( angleCosine ) {
+
+		const { coneCosNode, penumbraCosNode } = this;
+
+		return smoothstep( coneCosNode, penumbraCosNode, angleCosine );
+
+	}
+
 	construct( builder ) {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
@@ -48,7 +54,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 		const lightDirection = lVector.normalize();
 		const angleCos = lightDirection.dot( this.directionNode );
-		const spotAttenuation = getSpotAttenuation( this.coneCosNode, this.penumbraCosNode, angleCos );
+		const spotAttenuation = this.getSpotAttenuation( angleCos );
 
 		const lightDistance = lVector.length();
 
