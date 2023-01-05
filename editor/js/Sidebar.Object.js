@@ -349,6 +349,16 @@ function SidebarObject( editor ) {
 
 	container.add( objectFrustumCulledRow );
 
+	// renderDoubleSideSinglePass
+
+	const objectRenderDoubleSideSinglePassRow = new UIRow();
+	const objectRenderDoubleSideSinglePass = new UICheckbox().onChange( update );
+
+	objectRenderDoubleSideSinglePassRow.add( new UIText( strings.getKey( 'sidebar/object/renderdoublesidesinglepass' ) ).setWidth( '90px' ) );
+	objectRenderDoubleSideSinglePassRow.add( objectRenderDoubleSideSinglePass );
+
+	container.add( objectRenderDoubleSideSinglePassRow );
+
 	// renderOrder
 
 	const objectRenderOrderRow = new UIRow();
@@ -524,6 +534,12 @@ function SidebarObject( editor ) {
 			if ( object.frustumCulled !== objectFrustumCulled.getValue() ) {
 
 				editor.execute( new SetValueCommand( editor, object, 'frustumCulled', objectFrustumCulled.getValue() ) );
+
+			}
+
+			if ( object.renderDoubleSideSinglePass !== objectRenderDoubleSideSinglePass.getValue() ) {
+
+				editor.execute( new SetValueCommand( editor, object, 'renderDoubleSideSinglePass', objectRenderDoubleSideSinglePass.getValue() ) );
 
 			}
 

@@ -306,8 +306,7 @@ function SidebarMaterial( editor ) {
 	const materialSideOptions = {
 		0: 'Front',
 		1: 'Back',
-		2: 'Double',
-		3: 'TwoPassDouble'
+		2: 'Double'
 	};
 
 	const materialSide = new SidebarMaterialConstantProperty( editor, 'side', strings.getKey( 'sidebar/material/side' ), materialSideOptions );
