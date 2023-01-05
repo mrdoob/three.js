@@ -109,7 +109,7 @@ class Object3D extends EventDispatcher {
 		this.receiveShadow = false;
 
 		this.frustumCulled = true;
-		this.renderDoubleSideSinglePass = false;
+		this.renderForceSinglePass = false;
 		this.renderOrder = 0;
 
 		this.animations = [];
@@ -713,7 +713,7 @@ class Object3D extends EventDispatcher {
 		if ( this.receiveShadow === true ) object.receiveShadow = true;
 		if ( this.visible === false ) object.visible = false;
 		if ( this.frustumCulled === false ) object.frustumCulled = false;
-		if ( this.renderDoubleSideSinglePass === true ) object.renderDoubleSideSinglePass = true;
+		if ( this.renderForceSinglePass === true ) object.renderForceSinglePass = true;
 		if ( this.renderOrder !== 0 ) object.renderOrder = this.renderOrder;
 		if ( Object.keys( this.userData ).length > 0 ) object.userData = this.userData;
 
@@ -944,7 +944,7 @@ class Object3D extends EventDispatcher {
 		this.receiveShadow = source.receiveShadow;
 
 		this.frustumCulled = source.frustumCulled;
-		this.renderDoubleSideSinglePass = source.renderDoubleSideSinglePass;
+		this.renderForceSinglePass = source.renderForceSinglePass;
 		this.renderOrder = source.renderOrder;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );

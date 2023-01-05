@@ -349,15 +349,15 @@ function SidebarObject( editor ) {
 
 	container.add( objectFrustumCulledRow );
 
-	// renderDoubleSideSinglePass
+	// renderForceSinglePass
 
-	const objectRenderDoubleSideSinglePassRow = new UIRow();
-	const objectRenderDoubleSideSinglePass = new UICheckbox().onChange( update );
+	const objectrenderForceSinglePassRow = new UIRow();
+	const objectrenderForceSinglePass = new UICheckbox().onChange( update );
 
-	objectRenderDoubleSideSinglePassRow.add( new UIText( strings.getKey( 'sidebar/object/renderdoublesidesinglepass' ) ).setWidth( '90px' ) );
-	objectRenderDoubleSideSinglePassRow.add( objectRenderDoubleSideSinglePass );
+	objectrenderForceSinglePassRow.add( new UIText( strings.getKey( 'sidebar/object/renderforcesinglepass' ) ).setWidth( '90px' ) );
+	objectrenderForceSinglePassRow.add( objectrenderForceSinglePass );
 
-	container.add( objectRenderDoubleSideSinglePassRow );
+	container.add( objectrenderForceSinglePassRow );
 
 	// renderOrder
 
@@ -537,9 +537,9 @@ function SidebarObject( editor ) {
 
 			}
 
-			if ( object.renderDoubleSideSinglePass !== objectRenderDoubleSideSinglePass.getValue() ) {
+			if ( object.renderForceSinglePass !== objectrenderForceSinglePass.getValue() ) {
 
-				editor.execute( new SetValueCommand( editor, object, 'renderDoubleSideSinglePass', objectRenderDoubleSideSinglePass.getValue() ) );
+				editor.execute( new SetValueCommand( editor, object, 'renderForceSinglePass', objectrenderForceSinglePass.getValue() ) );
 
 			}
 
