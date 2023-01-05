@@ -1085,12 +1085,8 @@ DataViewReader.prototype = {
 			// account for null byte in length
 			length++;
 
-			if ( length % 2 !== 0 ) {
-
-				// if string with terminating nullbyte is uneven, extra nullbyte is added
-				length++;
-
-			}
+			// if string with terminating nullbyte is uneven, extra nullbyte is added
+			length += length % 2;
 
 		}
 
