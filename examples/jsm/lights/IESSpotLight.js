@@ -2,7 +2,7 @@ import { SpotLight } from 'three';
 
 class IESSpotLight extends SpotLight {
 
-	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 2 ) {
+	constructor( color, intensity, distance, angle, penumbra, decay ) {
 
 		super( color, intensity, distance, angle, penumbra, decay );
 
