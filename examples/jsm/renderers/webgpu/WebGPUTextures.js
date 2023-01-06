@@ -399,7 +399,7 @@ class WebGPUTextures {
 		const data = image.data;
 
 		const bytesPerTexel = this._getBytesPerTexel( format );
-		const bytesPerRow = Math.ceil( image.width * bytesPerTexel / 256 ) * 256;
+		const bytesPerRow = image.width * bytesPerTexel;
 
 		this.device.queue.writeTexture(
 			{
