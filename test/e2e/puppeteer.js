@@ -53,6 +53,7 @@ const exceptionList = [
 	'webgpu_instance_mesh',
 	'webgpu_instance_uniform',
 	'webgpu_lights_custom',
+	'webgpu_lights_ies_spotlight',
 	'webgpu_lights_phong',
 	'webgpu_lights_selective',
 	'webgpu_loader_gltf',
@@ -61,9 +62,9 @@ const exceptionList = [
 	'webgpu_particles',
 	'webgpu_rtt',
 	'webgpu_sandbox',
+	'webgpu_skinning',
 	'webgpu_skinning_instancing',
 	'webgpu_skinning_points',
-	'webgpu_skinning',
 	'webgpu_sprites'
 ].concat( ( process.platform === 'win32' ) ? [
 

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - lights - ies spotlight</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - ies spotlight<br />
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			import IESSpotLight from 'three/addons/lights/IESSpotLight.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			import { IESLoader } from './jsm/loaders/IESLoader.js';
+
+			let renderer, scene, camera;
+			let lights;
+
+			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
+				//
+
+				scene = new THREE.Scene();
+
+				//
+
+				const iesLoader = new IESLoader().setPath( './ies/' );
+				//iesLoader.type = THREE.UnsignedByteType; // LDR
+
+				const [ iesTexture1, iesTexture2, iesTexture3, iesTexture4 ] = await Promise.all( [
+					iesLoader.loadAsync( '007cfb11e343e2f42e3b476be4ab684e.ies' ),
+					iesLoader.loadAsync( '06b4cfdc8805709e767b5e2e904be8ad.ies' ),
+					iesLoader.loadAsync( '02a7562c650498ebb301153dbbf59207.ies' ),
+					iesLoader.loadAsync( '1a936937a49c63374e6d4fbed9252b29.ies' )
+				] );
+
+				//
+
+				const spotLight = new IESSpotLight( 0xff0000, 500 );
+				spotLight.position.set( 6.5, 1.5, 6.5 );
+				spotLight.angle = Math.PI / 8;
+				spotLight.penumbra = 0.7;
+				spotLight.distance = 20;
+				spotLight.iesMap = iesTexture1;
+				scene.add( spotLight );
+
+				//
+
+				const spotLight2 = new IESSpotLight( 0x00ff00, 500 );
+				spotLight2.position.set( 6.5, 1.5, - 6.5 );
+				spotLight2.angle = Math.PI / 8;
+				spotLight2.penumbra = 0.7;
+				spotLight2.distance = 20;
+				spotLight2.iesMap = iesTexture2;
+				scene.add( spotLight2 );
+
+				//
+
+				const spotLight3 = new IESSpotLight( 0x0000ff, 500 );
+				spotLight3.position.set( - 6.5, 1.5, - 6.5 );
+				spotLight3.angle = Math.PI / 8;
+				spotLight3.penumbra = 0.7;
+				spotLight3.distance = 20;
+				spotLight3.iesMap = iesTexture3;
+				scene.add( spotLight3 );
+
+				//
+
+				const spotLight4 = new IESSpotLight( 0xffffff, 500 );
+				spotLight4.position.set( - 6.5, 1.5, 6.5 );
+				spotLight4.angle = Math.PI / 8;
+				spotLight4.penumbra = 0.7;
+				spotLight4.distance = 20;
+				spotLight4.iesMap = iesTexture4;
+				scene.add( spotLight4 );
+
+				//
+
+				lights = [ spotLight, spotLight2, spotLight3, spotLight4 ];
+
+				//
+
+				const material = new THREE.MeshPhongMaterial( { color: 0x808080/*, dithering: true*/ } );
+
+				const geometry = new THREE.PlaneGeometry( 200, 200 );
+
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.x = - Math.PI * 0.5;
+				scene.add( mesh );
+
+				//
+
+				renderer = new WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, .1, 100 );
+				camera.position.set( 16, 4, 1 );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render );
+				controls.minDistance = 2;
+				controls.maxDistance = 50;
+				controls.enablePan = false;
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render( time ) {
+
+				time = ( time / 1000 ) * 2.0;
+
+				for ( let i = 0; i < lights.length; i ++ ) {
+
+					lights[ i ].position.y = Math.sin( time + i ) + 0.97;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			init();
+
+		</script>
+
+	</body>
+
+</html>
