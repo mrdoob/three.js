@@ -105,7 +105,7 @@
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm --ext .js --ignore-pattern libs --ignore-pattern ifc",
     "lint-examples": "eslint examples --ext .html",
-    "lint-docs": "eslint docs",
+    "lint-docs": "eslint docs --ignore-pattern prettify.js",
     "lint-editor": "eslint editor --ignore-pattern libs",
     "lint-manual": "eslint manual --ignore-pattern 3rdparty --ignore-pattern prettify.js --ignore-pattern shapefile.js",
     "lint-test": "eslint test --ignore-pattern vendor",
