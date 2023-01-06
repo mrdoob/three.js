@@ -299,7 +299,11 @@ class PLYLoader extends Loader {
 
 		function mapElementAttributes( properties ) {
 
-			const elementNames = properties.map(  property => { return property.name } );
+			const elementNames = properties.map( property => {
+
+				return property.name;
+
+			} );
 
 			function findAttrName( names ) {
 
@@ -614,9 +618,9 @@ class PLYLoader extends Loader {
 
 			do {
 
-				const c = String.fromCharCode( bytes[ i++ ] );
+				const c = String.fromCharCode( bytes[ i ++ ] );
 
-				if ( c !== "\n" && c !== "\r" ) {
+				if ( c !== '\n' && c !== '\r' ) {
 
 					line += c;
 
@@ -632,9 +636,9 @@ class PLYLoader extends Loader {
 
 				}
 
-			}  while ( cont && i < bytes.length );
+			} while ( cont && i < bytes.length );
 
-			return lines.join( "\r" ) + "\r";
+			return lines.join( '\r' ) + '\r';
 
 		}
 
