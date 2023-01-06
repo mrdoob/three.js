@@ -28,7 +28,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		_maxTextureSize = _capabilities.maxTextureSize;
 
-	const shadowSide = { 0: BackSide, 1: FrontSide, 2: DoubleSide };
+	const shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
 
 	const shadowMaterialVertical = new ShaderMaterial( {
 		defines: {
