@@ -11,7 +11,7 @@ export default QUnit.module( 'Objects', () => {
 		QUnit.test( 'isPoints', ( assert ) => {
 
 			var points = new Points();
-	
+
 			assert.strictEqual( points instanceof Object3D, true, 'Points extends from Object3D' );
 
 		} );

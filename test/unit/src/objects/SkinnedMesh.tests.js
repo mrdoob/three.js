@@ -12,7 +12,7 @@ export default QUnit.module( 'Objects', () => {
 		QUnit.test( 'Extending', ( assert ) => {
 
 			var skinnedMesh = new SkinnedMesh();
-	
+
 			assert.strictEqual( skinnedMesh instanceof Object3D, true, 'SkinnedMesh extends from Object3D' );
 			assert.strictEqual( skinnedMesh instanceof Mesh, true, 'SkinnedMesh extends from Mesh' );
 

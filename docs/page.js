@@ -165,7 +165,7 @@ function onDocumentLoad() {
 
 		}
 
-		prettyPrint();
+		prettyPrint(); // eslint-disable-line no-undef
 
 	};
 

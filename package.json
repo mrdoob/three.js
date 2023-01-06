@@ -69,7 +69,12 @@
       "QUnit": "readonly",
       "Ammo": "readonly",
       "XRRigidTransform": "readonly",
-      "XRMediaBinding": "readonly"
+      "XRMediaBinding": "readonly",
+      "CodeMirror": "readonly",
+      "esprima": "readonly",
+      "jsonlint": "readonly",
+      "Benchmark": "readonly",
+      "Bench": "readonly"
     },
     "rules": {
       "no-throw-literal": [
@@ -102,8 +107,8 @@
     "lint-examples": "eslint examples --ext .html",
     "lint-docs": "eslint docs",
     "lint-editor": "eslint editor --ignore-pattern libs",
-    "lint-manual": "eslint manual --ignore-pattern 3rdparty",
-    "lint-test": "eslint test",
+    "lint-manual": "eslint manual --ignore-pattern 3rdparty --ignore-pattern prettify.js --ignore-pattern shapefile.js",
+    "lint-test": "eslint test --ignore-pattern vendor",
     "lint-utils": "eslint utils",
     "lint": "npm run lint-core && npm run lint-addons && npm run lint-examples && npm run lint-docs && npm run lint-editor && npm run lint-manual && npm run lint-test && npm run lint-utils",
     "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix && npm run lint-editor -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix",

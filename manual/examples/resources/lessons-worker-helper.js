@@ -132,7 +132,7 @@
 	const isWebGLRE = /^(webgl|webgl2|experimental-webgl)$/i;
 	function installWebGLLessonSetup() {
 
-		OffscreenCanvas.prototype.getContext = ( function ( oldFn ) {
+		OffscreenCanvas.prototype.getContext = ( function ( oldFn ) { // eslint-disable-line compat/compat
 
 			return function () {
 
@@ -153,7 +153,7 @@
 
 			};
 
-		}( OffscreenCanvas.prototype.getContext ) );
+		}( OffscreenCanvas.prototype.getContext ) ); // eslint-disable-line compat/compat
 
 	}
 
@@ -172,7 +172,7 @@
 		} = self.webglDebugHelper;
 
 		// capture GL errors
-		OffscreenCanvas.prototype.getContext = ( function ( oldFn ) {
+		OffscreenCanvas.prototype.getContext = ( function ( oldFn ) { // eslint-disable-line compat/compat
 
 			return function () {
 
@@ -220,7 +220,7 @@
 
 			};
 
-		}( OffscreenCanvas.prototype.getContext ) );
+		}( OffscreenCanvas.prototype.getContext ) ); // eslint-disable-line compat/compat
 
 	}
 

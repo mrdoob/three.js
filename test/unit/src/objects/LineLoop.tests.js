@@ -12,10 +12,10 @@ export default QUnit.module( 'Objects', () => {
 		QUnit.test( 'Extending', ( assert ) => {
 
 			var lineLoop = new LineLoop();
-	
+
 			assert.strictEqual( lineLoop instanceof Object3D, true, 'LineLoop extends from Object3D' );
 			assert.strictEqual( lineLoop instanceof Line, true, 'LineLoop extends from Line' );
-	
+
 		} );
 
 		// INSTANCING
