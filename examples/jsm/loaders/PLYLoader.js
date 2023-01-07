@@ -522,54 +522,36 @@ class PLYLoader extends Loader {
 
 		}
 
-		function binaryRead( dataview, at, type, little_endian ) {
-
-			switch ( type ) {
-
-				// corespondences for non-specific length types here match rply:
-				case 'int8':		case 'char':	 return [ dataview.getInt8( at ), 1 ];
-				case 'uint8':		case 'uchar':	 return [ dataview.getUint8( at ), 1 ];
-				case 'int16':		case 'short':	 return [ dataview.getInt16( at, little_endian ), 2 ];
-				case 'uint16':	case 'ushort': return [ dataview.getUint16( at, little_endian ), 2 ];
-				case 'int32':		case 'int':		 return [ dataview.getInt32( at, little_endian ), 4 ];
-				case 'uint32':	case 'uint':	 return [ dataview.getUint32( at, little_endian ), 4 ];
-				case 'float32': case 'float':	 return [ dataview.getFloat32( at, little_endian ), 4 ];
-				case 'float64': case 'double': return [ dataview.getFloat64( at, little_endian ), 8 ];
-
-			}
-
-		}
-
-		function binaryReadElement( dataview, at, properties, little_endian ) {
+		function binaryReadElement( at, properties ) {
 
 			const element = {};
-			let result, read = 0;
+			let read = 0;
 
 			for ( let i = 0; i < properties.length; i ++ ) {
 
-				if ( properties[ i ].type === 'list' ) {
+				const property = properties[ i ];
+				const valueReader = property.valueReader;
+
+				if ( property.type === 'list' ) {
 
 					const list = [];
 
-					result = binaryRead( dataview, at + read, properties[ i ].countType, little_endian );
-					const n = result[ 0 ];
-					read += result[ 1 ];
+					const n = property.countReader.read( at + read );
+					read += property.countReader.size;
 
 					for ( let j = 0; j < n; j ++ ) {
 
-						result = binaryRead( dataview, at + read, properties[ i ].itemType, little_endian );
-						list.push( result[ 0 ] );
-						read += result[ 1 ];
+						list.push( valueReader.read( at + read ) );
+						read += valueReader.size;
 
 					}
 
-					element[ properties[ i ].name ] = list;
+					element[ property.name ] = list;
 
 				} else {
 
-					result = binaryRead( dataview, at + read, properties[ i ].type, little_endian );
-					element[ properties[ i ].name ] = result[ 0 ];
-					read += result[ 1 ];
+					element[ property.name ] = valueReader.read( at + read );
+					read += valueReader.size;
 
 				}
 
@@ -578,6 +560,45 @@ class PLYLoader extends Loader {
 			return [ element, read ];
 
 		}
+
+		function setPropertyBinaryReaders( properties, body, little_endian ) {
+
+			function getBinaryReader( dataview, type, little_endian ) {
+
+				switch ( type ) {
+
+					// corespondences for non-specific length types here match rply:
+					case 'int8':	case 'char':	return { read: ( at ) => { return dataview.getInt8( at ) }, size: 1 };
+					case 'uint8':	case 'uchar':	return { read: ( at ) => { return dataview.getUint8( at ) }, size: 1 };
+					case 'int16':	case 'short':	return { read: ( at ) => { return dataview.getInt16( at, little_endian ) }, size: 2 };
+					case 'uint16':	case 'ushort':	return { read: ( at ) => { return dataview.getUint16( at, little_endian ) }, size: 2 };
+					case 'int32':	case 'int':		return { read: ( at ) => { return dataview.getInt32( at, little_endian ) }, size: 4 };
+					case 'uint32':	case 'uint':	return { read: ( at ) => { return dataview.getUint32( at, little_endian ) }, size: 4 };
+					case 'float32': case 'float':	return { read: ( at ) => { return dataview.getFloat32( at, little_endian ) }, size: 4 };
+					case 'float64': case 'double':	return { read: ( at ) => { return dataview.getFloat64( at, little_endian ) }, size: 8 };
+
+				}
+
+			}
+
+			for ( let i = 0, l = properties.length; i < l; i++ ) {
+
+				const property = properties[ i ];
+
+				if ( property.type === 'list' ) {
+
+					property.countReader = getBinaryReader( body, property.countType, little_endian );
+					property.valueReader = getBinaryReader( body, property.itemType, little_endian );
+
+				} else {
+
+					property.valueReader = getBinaryReader( body, property.type, little_endian );
+
+				}
+
+			}
+
+		};
 
 		function parseBinary( data, header ) {
 
@@ -590,11 +611,14 @@ class PLYLoader extends Loader {
 			for ( let currentElement = 0; currentElement < header.elements.length; currentElement ++ ) {
 
 				const elementDesc = header.elements[ currentElement ];
-				const attributeMap = mapElementAttributes( elementDesc.properties );
+				const properties = elementDesc.properties;
+				const attributeMap = mapElementAttributes( properties );
+
+				setPropertyBinaryReaders( properties, body, little_endian );
 
 				for ( let currentElementCount = 0; currentElementCount < elementDesc.count; currentElementCount ++ ) {
 
-					result = binaryReadElement( body, loc, elementDesc.properties, little_endian );
+					result = binaryReadElement( loc, properties );
 					loc += result[ 1 ];
 					const element = result[ 0 ];
 
