@@ -10,7 +10,7 @@ var BenchClass = function () {
 
 BenchClass.prototype.isTHREELoaded = function () {
 
-	return _.isObject( this.THREE );
+	return _.isObject( this.THREE ); // eslint-disable-line no-undef
 
 };
 
@@ -64,7 +64,7 @@ SuiteUI.prototype.render = function () {
 
 SuiteUI.prototype.run = function () {
 
-	this.runButton.click = _.noop;
+	this.runButton.click = _.noop; // eslint-disable-line no-undef
 	this.runButton.innerText = 'Running...';
 	this.suite.on( 'complete', this.complete.bind( this ) );
 	this.suite.run( {
@@ -77,7 +77,7 @@ SuiteUI.prototype.complete = function () {
 
 	this.runButton.style.display = 'none';
 	this.results.style.display = 'block';
-	var f = _.orderBy( this.suite, [ 'hz' ], [ 'desc' ] );
+	var f = _.orderBy( this.suite, [ 'hz' ], [ 'desc' ] ); // eslint-disable-line no-undef
 	for ( var i = 0; i < f.length; i ++ ) {
 
 		var x = f[ i ];

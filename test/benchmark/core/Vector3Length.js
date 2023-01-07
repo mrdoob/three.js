@@ -52,6 +52,8 @@
 
 		}
 
+		return result;
+
 	} );
 
 	suite.add( 'InlineCallTest', function () {
@@ -63,6 +65,8 @@
 
 		}
 
+		return result;
+
 	} );
 
 	suite.add( 'FunctionCallTest', function () {
@@ -73,6 +77,8 @@
 			result += a[ i ].length();
 
 		}
+
+		return result;
 
 	} );
 

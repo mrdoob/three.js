@@ -34,7 +34,7 @@
 	const maxFrameId = 2;
 	window.requestAnimationFrame = function ( cb ) {
 
-		if ( ! _renderStarted ) {
+		if ( ! window._renderStarted ) {
 
 			setTimeout( function () {
 
@@ -52,7 +52,7 @@
 
 				} else {
 
-					_renderFinished = true;
+					window._renderFinished = true;
 
 				}
 

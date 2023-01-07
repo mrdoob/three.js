@@ -108,6 +108,8 @@
 
 		}
 
+		return result;
+
 	} );
 
 	s.add( 'SwitchStatement', function () {
@@ -118,6 +120,8 @@
 			result += a[ i ].getComponent2( i % 3 );
 
 		}
+
+		return result;
 
 	} );
 
@@ -130,6 +134,8 @@
 
 		}
 
+		return result;
+
 	} );
 
 	s.add( 'IfReturnElseSeries', function () {
@@ -140,6 +146,8 @@
 			result += a[ i ].getComponent4( i % 3 );
 
 		}
+
+		return result;
 
 	} );
 
