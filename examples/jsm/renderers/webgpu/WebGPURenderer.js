@@ -255,7 +255,7 @@ class WebGPURenderer {
 
 	async render( scene, camera ) {
 
-		if ( this._initialized === false ) return await this.init();
+		if ( this._initialized === false ) await this.init();
 
 		//
 
@@ -623,7 +623,7 @@ class WebGPURenderer {
 
 	async compute( ...computeNodes ) {
 
-		if ( this._initialized === false ) return await this.init();
+		if ( this._initialized === false ) await this.init();
 
 		const device = this._device;
 		const computePipelines = this._computePipelines;
