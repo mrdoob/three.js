@@ -387,7 +387,7 @@ class WebGPURenderer {
 
 	}
 
-	async getArrayFromBuffer( attribute ) {
+	async getArrayBuffer( attribute ) {
 
 		return await this._attributes.getArrayBuffer( attribute );
 
