@@ -2,7 +2,7 @@ import MaterialNode from './MaterialNode.js';
 import NormalMapNode from '../display/NormalMapNode.js';
 
 import {
-	texture, normalView, materialReference
+	normalView, materialReference
 } from '../shadernode/ShaderNodeElements.js';
 
 class ExtendedMaterialNode extends MaterialNode {
@@ -37,7 +37,7 @@ class ExtendedMaterialNode extends MaterialNode {
 
 		if ( scope === ExtendedMaterialNode.NORMAL ) {
 
-			node = material.normalMap ? new NormalMapNode( texture( material.normalMap ), materialReference( 'normalScale', 'vec2' ) ) : normalView;
+			node = material.normalMap ? new NormalMapNode( this.getTexture( 'normalMap' ), materialReference( 'normalScale', 'vec2' ) ) : normalView;
 
 		}
 
