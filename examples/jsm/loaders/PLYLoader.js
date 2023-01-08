@@ -307,7 +307,7 @@ class PLYLoader extends Loader {
 
 					const name = names[ i ];
 
-					if ( name in elementNames ) return name;
+					if ( elementNames.includes( name ) ) return name;
 
 				}
 
