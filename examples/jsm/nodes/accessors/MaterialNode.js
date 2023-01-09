@@ -5,7 +5,6 @@ import ConstNode from '../core/ConstNode.js';
 import OperatorNode from '../math/OperatorNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import MaterialReferenceNode from './MaterialReferenceNode.js';
-import TextureNode from './TextureNode.js';
 import SplitNode from '../utils/SplitNode.js';
 
 class MaterialNode extends Node {
@@ -47,6 +46,33 @@ class MaterialNode extends Node {
 
 	}
 
+	getFloat( property ) {
+
+		//@TODO: Check if it can be cached by property name.
+
+		return new MaterialReferenceNode( property, 'float' );
+
+	}
+
+	getColor( property ) {
+
+		//@TODO: Check if it can be cached by property name.
+
+		return new MaterialReferenceNode( property, 'color' );
+
+	}
+
+	getTexture( property ) {
+
+		//@TODO: Check if it can be cached by property name.
+
+		const textureRefNode = new MaterialReferenceNode( property, 'texture' );
+		textureRefNode.node.uvNode = new MaterialNode( MaterialNode.UV );
+
+		return textureRefNode;
+
+	}
+
 	construct( builder ) {
 
 		const material = builder.context.material;
@@ -56,18 +82,15 @@ class MaterialNode extends Node {
 
 		if ( scope === MaterialNode.ALPHA_TEST ) {
 
-			node = new MaterialReferenceNode( 'alphaTest', 'float' );
+			node = this.getFloat( 'alphaTest' );
 
 		} else if ( scope === MaterialNode.COLOR ) {
 
-			const colorNode = new MaterialReferenceNode( 'color', 'color' );
+			const colorNode = this.getColor( 'color' );
 
 			if ( material.map && material.map.isTexture === true ) {
 
-				//const map = new MaterialReferenceNode( 'map', 'texture' );
-				const map = new TextureNode( material.map, new MaterialNode( MaterialNode.UV ) );
-
-				node = new OperatorNode( '*', colorNode, map );
+				node = new OperatorNode( '*', colorNode, this.getTexture( 'map' ) );
 
 			} else {
 
@@ -77,11 +100,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.OPACITY ) {
 
-			const opacityNode = new MaterialReferenceNode( 'opacity', 'float' );
+			const opacityNode = this.getFloat( 'opacity' );
 
 			if ( material.alphaMap && material.alphaMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', opacityNode, new MaterialReferenceNode( 'alphaMap', 'texture' ) );
+				node = new OperatorNode( '*', opacityNode, this.getTexture( 'alphaMap' ) );
 
 			} else {
 
@@ -91,19 +114,19 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SHININESS ) {
 
-			return new MaterialReferenceNode( 'shininess', 'float' );
+			node = this.getFloat( 'shininess' );
 
 		} else if ( scope === MaterialNode.SPECULAR_COLOR ) {
 
-			node = new MaterialReferenceNode( 'specular', 'color' );
+			node = this.getColor( 'specular' );
 
 		} else if ( scope === MaterialNode.REFLECTIVITY ) {
 
-			const reflectivityNode = new MaterialReferenceNode( 'reflectivity', 'float' );
+			const reflectivityNode = this.getFloat( 'reflectivity' );
 
 			if ( material.specularMap && material.specularMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', reflectivityNode, new SplitNode( new TextureNode( material.specularMap ), 'r' ) );
+				node = new OperatorNode( '*', reflectivityNode, new SplitNode( this.getTexture( 'specularMap' ), 'r' ) );
 
 			} else {
 
@@ -113,11 +136,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.ROUGHNESS ) {
 
-			const roughnessNode = new MaterialReferenceNode( 'roughness', 'float' );
+			const roughnessNode = this.getFloat( 'roughness' );
 
 			if ( material.roughnessMap && material.roughnessMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', roughnessNode, new SplitNode( new TextureNode( material.roughnessMap ), 'g' ) );
+				node = new OperatorNode( '*', roughnessNode, new SplitNode( this.getTexture( 'roughnessMap' ), 'g' ) );
 
 			} else {
 
@@ -127,11 +150,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.METALNESS ) {
 
-			const metalnessNode = new MaterialReferenceNode( 'metalness', 'float' );
+			const metalnessNode = this.getFloat( 'metalness' );
 
 			if ( material.metalnessMap && material.metalnessMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', metalnessNode, new SplitNode( new TextureNode( material.metalnessMap ), 'b' ) );
+				node = new OperatorNode( '*', metalnessNode, new SplitNode( this.getTexture( 'metalnessMap' ), 'b' ) );
 
 			} else {
 
@@ -141,11 +164,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.EMISSIVE ) {
 
-			const emissiveNode = new MaterialReferenceNode( 'emissive', 'color' );
+			const emissiveNode = this.getColor( 'emissive' );
 
 			if ( material.emissiveMap && material.emissiveMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', emissiveNode, new TextureNode( material.emissiveMap ) );
+				node = new OperatorNode( '*', emissiveNode, this.getTexture( 'emissiveMap' ) );
 
 			} else {
 
@@ -155,7 +178,7 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.ROTATION ) {
 
-			node = new MaterialReferenceNode( 'rotation', 'float' );
+			node = this.getFloat( 'rotation' );
 
 		} else if ( scope === MaterialNode.UV ) {
 
