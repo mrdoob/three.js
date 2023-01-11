@@ -1,15 +1,14 @@
 export default /* glsl */`
-#if defined( USE_SHADOWMAP ) || ( NUM_SPOT_LIGHT_COORDS > 0 )
 
-	#if NUM_DIR_LIGHT_SHADOWS > 0 || NUM_SPOT_LIGHT_COORDS > 0 || NUM_POINT_LIGHT_SHADOWS > 0
+#if ( defined( USE_SHADOWMAP ) && ( ( NUM_DIR_LIGHT_SHADOWS > 0 ) || ( NUM_POINT_LIGHT_SHADOWS > 0 ) ) ) || ( NUM_SPOT_LIGHT_COORDS > 0 )
 
-		// Offsetting the position used for querying occlusion along the world normal can be used to reduce shadow acne.
-		vec3 shadowWorldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
-		vec4 shadowWorldPosition;
+	// Offsetting the position used for querying occlusion along the world normal can be used to reduce shadow acne.
+	vec3 shadowWorldNormal = inverseTransformDirection( transformedNormal, viewMatrix );
+	vec4 shadowWorldPosition;
 
-	#endif
+#endif
 
-	#if NUM_DIR_LIGHT_SHADOWS > 0
+#if defined( USE_SHADOWMAP ) && ( NUM_DIR_LIGHT_SHADOWS > 0 )
 
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_DIR_LIGHT_SHADOWS; i ++ ) {
@@ -20,9 +19,9 @@ export default /* glsl */`
 	}
 	#pragma unroll_loop_end
 
-	#endif
+#endif
 
-	#if NUM_SPOT_LIGHT_COORDS > 0
+#if NUM_SPOT_LIGHT_COORDS > 0
 
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_SPOT_LIGHT_COORDS; i ++ ) {
@@ -36,9 +35,9 @@ export default /* glsl */`
 	}
 	#pragma unroll_loop_end
 
-	#endif
+#endif
 
-	#if NUM_POINT_LIGHT_SHADOWS > 0
+#if defined( USE_SHADOWMAP ) && ( NUM_POINT_LIGHT_SHADOWS > 0 )
 
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_POINT_LIGHT_SHADOWS; i ++ ) {
@@ -49,15 +48,13 @@ export default /* glsl */`
 	}
 	#pragma unroll_loop_end
 
-	#endif
+#endif
 
-	/*
-	#if NUM_RECT_AREA_LIGHTS > 0
+/*
+#if defined( USE_SHADOWMAP ) && ( NUM_RECT_AREA_LIGHTS > 0 )
 
-		// TODO (abelnation): update vAreaShadowCoord with area light info
-
-	#endif
-	*/
+	// TODO (abelnation): update vAreaShadowCoord with area light info
 
 #endif
+*/
 `;
