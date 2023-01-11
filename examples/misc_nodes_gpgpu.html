@@ -41,7 +41,7 @@
 
 			const params = {
 
-				renderer: 'WebGL',
+				backend: 'WebGL',
 				example: 'Multiplication',
 				reuploadOutput: true,
 				warmUps: 2,
@@ -52,7 +52,7 @@
 
 			};
 
-			const hash = new ShaderNode( ( { num }, builder ) => { // Taken from pcg-random.org
+			const hash = new ShaderNode( ( { num }, builder ) => { // Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
 
 				const state = add( mul( uint( num ), 747796405 ), 2891336453 );
 				const word = mul( bitXor( shiftRight( state, add( shiftRight( state, 28 ), 4 ) ), state ), 277803737 );
@@ -83,16 +83,16 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'renderer', [ 'WebGL', 'WebGPU' ] ).onChange( () => { setRenderer().then( showExample ); } );
+				gui.add( params, 'backend', [ 'WebGL', 'WebGPU' ] ).onChange( () => { setBackend().then( showExample ); } );
 				gui.add( params, 'example', [ 'Passthrough', 'AntiPassthrough', 'PassthroughColor', 'ElementManipulation', 'Multiplication', 'Random' ] ).onChange( showExample );
 				gui.add( params, 'reuploadOutput' ).onChange( showExample );
 				gui.add( params, 'warmUps', 0, 5, 1 );
 				gui.add( params, 'logBuffers' );
 				gui.add( params, 'logPerformance' );
-				gui.add( params, 'refresh' ).onChange( () => { params.refresh = false; setRenderer().then( showExample ); } );
+				gui.add( params, 'refresh' ).onChange( () => { params.refresh = false; setBackend().then( showExample ); } );
 				gui.add( params, 'clearConsole' ).onChange( () => { params.clearConsole = false; console.clear(); } );
 
-				setRenderer();
+				setBackend();
 				showExample();
 
 			}
@@ -124,13 +124,13 @@
 
 			}
 
-			async function setRenderer() {
+			async function setBackend() {
 
 				const oldRenderer = renderer;
 
 				document.getElementById( 'webgpumessage' )?.remove();
 
-				if ( params.renderer === 'WebGPU' && WebGPU.isAvailable() === false ) {
+				if ( params.backend === 'WebGPU' && WebGPU.isAvailable() === false ) {
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
@@ -140,7 +140,7 @@
 
 				}
 
-				if ( params.renderer === 'WebGL' ) {
+				if ( params.backend === 'WebGL' ) {
 
 					renderer = new THREE.WebGLRenderer();
 					computationRenderer = new WebGLComputationRenderer( renderer );
@@ -169,7 +169,7 @@
 				const iteration = iterations[ params.example ];
 				iterations[ params.example ] ++;
 
-				if ( params.logPerformance ) console.time( params.renderer + ' ' + params.example + ' Iteration-' + iteration );
+				if ( params.logPerformance ) console.time( params.backend + ' ' + params.example + ' Iteration-' + iteration );
 
 				if ( material.map !== null ) {
 
@@ -180,7 +180,7 @@
 
 				let shaderNode, outAttribute;
 
-				const TypedArray = params.renderer === 'WebGL' ? Uint8Array : Uint32Array; // WebGPU can only work with uint32
+				const TypedArray = params.backend === 'WebGL' ? Uint8Array : Uint32Array; // WebGPU can only work with uint32
 
 				switch ( params.example ) {
 
@@ -195,7 +195,7 @@
 						break;
 
 					case 'PassthroughColor':
-						shaderNode = new ShaderNode( ( { index }, builder ) => params.renderer === 'WebGL' ? index : uvec4( index, index, index, uint( 255 ) ) );
+						shaderNode = new ShaderNode( ( { index }, builder ) => params.backend === 'WebGL' ? index : uvec4( index, index, index, uint( 255 ) ) );
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 * 4 ), 4 );
 						break;
 
@@ -213,7 +213,7 @@
 					case 'Multiplication':
 						shaderNode = new ShaderNode( ( { index }, builder ) => {
 							const result = [ remainder( mul( index, 2 ), 256 ), remainder( mul( index, 3 ), 256 ), remainder( mul( index, 5 ), 256 ) ];
-							return params.renderer === 'WebGL' ? color( ...result ) : uvec4( ...result, uint( 255 ) );
+							return params.backend === 'WebGL' ? color( ...result ) : uvec4( ...result, uint( 255 ) );
 						} );
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 * 4 ), 4 );
 						break;
@@ -238,9 +238,9 @@
 				await computationRenderer.compute( shaderNode, outBuffer, params.reuploadOutput );
 				const { typedArray, buffer } = outBuffer;
 
-				if ( params.logBuffers && iteration === 0 ) console.log( params.renderer, params.example, typedArray );
+				if ( params.logBuffers && iteration === 0 ) console.log( params.backend, params.example, typedArray );
 
-				if ( params.renderer === 'WebGL' ) {
+				if ( params.backend === 'WebGL' ) {
 
 					if ( params.reuploadOutput === true ) {
 
@@ -276,7 +276,7 @@
 
 				computationRenderer.disposeBuffers();
 
-				if ( params.logPerformance ) console.timeEnd( params.renderer + ' ' + params.example + ' Iteration-' + iteration );
+				if ( params.logPerformance ) console.timeEnd( params.backend + ' ' + params.example + ' Iteration-' + iteration );
 
 				if ( iteration < params.warmUps ) await showExample();
 

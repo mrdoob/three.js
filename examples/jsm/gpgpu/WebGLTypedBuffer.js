@@ -13,7 +13,7 @@ import {
 	RGFormat,
 	RGBAFormat
 } from 'three';
-import { texture, add, div, remainder, floor, vec2, mul, float, int } from 'three/nodes';
+import { texture, add, div, remainder, vec2, mul, int } from 'three/nodes';
 import TypedBuffer, { getFunction, getFloatFunction } from './TypedBuffer.js';
 
 function getTextureElement( dataTexture, i, width, height ) {
@@ -88,7 +88,7 @@ export function getTextureFormat( bufferAttribute ) { // @TODO: possibly support
 export function calculateWidthHeight( length ) {
 
 	let width; // @TODO: maybe just set width and height to Math.sqrt( length ) and pad the texture with zeroes?
-	for ( width = Math.floor( Math.sqrt( length ) ); width > 0; width ++ ) {
+	for ( width = Math.floor( Math.sqrt( length ) ); width > 0; width -- ) {
 
 		if ( length % width === 0 ) break;
 
