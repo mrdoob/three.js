@@ -1,41 +1,29 @@
 import { instanceIndex, ComputeNode, ShaderNode } from 'three/nodes';
+import ComputationRenderer from './ComputationRenderer.js';
 import WebGPUTypedBuffer from './WebGPUTypedBuffer.js';
 
-export default class WebGPUComputationRenderer {
-
-	constructor( shaderNode ) {
-
-		this.shaderNode = shaderNode;
-
-	}
+export default class WebGPUComputationRenderer extends ComputationRenderer {
 
 	createBuffer( ...params ) {
 
-		return new WebGPUTypedBuffer( ...params );
+		const buffer = new WebGPUTypedBuffer( ...params );
+		this._buffers.push( buffer );
+		return buffer;
 
 	}
 
-	setBuffers( srcBuffer, outBuffer ) {
-
-		this.srcBuffer = srcBuffer;
-		this.outBuffer = outBuffer;
+	async compute( shaderNode, outBuffer, populateTypedArray = true ) {
 
 		const index = instanceIndex;
-		const shaderParams = { index, element: srcBuffer.getBufferElement( index ), buffer: srcBuffer }; // Same arguments as in Array.forEach()
-		this._shader = new ShaderNode( ( inputs, builder ) => {
+		const shader = new ShaderNode( ( inputs, builder ) => {
 
-			return outBuffer.setBufferElement( index, this.shaderNode.call( shaderParams, builder ) );
+			return outBuffer.setBufferElement( index, shaderNode.call( { index }, builder ) );
 
 		} );
 
-	}
+		await this.renderer.compute( new ComputeNode( shader, outBuffer.length ) );
 
-	async compute( renderer, populateTypedArray = true ) {
-
-		await renderer.compute( new ComputeNode( this._shader, this.outBuffer.length ) );
-
-		const buffer = populateTypedArray ? await renderer.getArrayBuffer( this.outBuffer.buffer ) : this.outBuffer.buffer.length;
-		this.outBuffer.typedArray = new this.outBuffer.typedArray.constructor( buffer );
+		outBuffer.typedArray = populateTypedArray ? await this.renderer.getArrayBuffer( outBuffer.buffer ) : outBuffer.length;
 
 	}
 

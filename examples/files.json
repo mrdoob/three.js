@@ -413,6 +413,9 @@
 		"misc_exporter_usdz",
 		"misc_lookat"
 	],
+	"misc / nodes": [
+		"misc_nodes_gpgpu"
+	],
 	"css2d": [
 		"css2d_label"
 	],

@@ -25,35 +25,37 @@ function getTextureElement( dataTexture, i, width, height ) {
 
 }
 
-export function getTextureType( typedArray ) {
+function getTextureType( bufferAttribute ) {
+
+	const array = bufferAttribute.array;
 
 	let textureType;
 
-	if ( typedArray instanceof Int8Array ) {
+	if ( array instanceof Int8Array ) {
 
 		textureType = ByteType;
 
-	} else if ( ( typedArray instanceof Uint8Array ) || ( typedArray instanceof Uint8ClampedArray ) ) {
+	} else if ( ( array instanceof Uint8Array ) || ( array instanceof Uint8ClampedArray ) ) {
 
 		textureType = UnsignedByteType;
 
-	} else if ( typedArray instanceof Int16Array ) {
+	} else if ( array instanceof Int16Array ) {
 
 		textureType = ShortType;
 
-	} else if ( typedArray instanceof Uint16Array ) {
+	} else if ( array instanceof Uint16Array ) {
 
 		textureType = UnsignedShortType;
 
-	} else if ( typedArray instanceof Int32Array ) {
+	} else if ( array instanceof Int32Array ) {
 
 		textureType = IntType;
 
-	} else if ( typedArray instanceof Uint32Array ) {
+	} else if ( array instanceof Uint32Array ) {
 
 		textureType = UnsignedIntType;
 
-	} else if ( typedArray instanceof Float32Array ) {
+	} else if ( array instanceof Float32Array ) {
 
 		textureType = FloatType;
 
@@ -63,9 +65,9 @@ export function getTextureType( typedArray ) {
 
 }
 
-export function getTextureFormat( elementSize ) { // @TODO: possibly support impossible type-format combinations by using padding
+export function getTextureFormat( bufferAttribute ) { // @TODO: possibly support impossible type-format combinations by using padding
 
-	switch ( elementSize ) {
+	switch ( bufferAttribute.itemSize ) {
 
 		case 1:
 			return RedFormat;
@@ -99,21 +101,21 @@ export function calculateWidthHeight( length ) {
 
 export default class WebGLTypedBuffer extends TypedBuffer {
 
-	constructor( typedArray, elementSize = 1 ) {
+	constructor( bufferAttribute ) {
 
 		// @TODO: add support for UBOs
 
-		super( typedArray, elementSize );
+		super( bufferAttribute );
 
 		const { width, height } = calculateWidthHeight( this.length );
 		this.width = width;
 		this.height = height;
 
-		const buffer = this._buffer = new DataTexture( typedArray, width, height, getTextureFormat( elementSize ), getTextureType( typedArray ) );
+		const buffer = this._buffer = new DataTexture( this.typedArray, width, height, getTextureFormat( bufferAttribute ), getTextureType( bufferAttribute ) );
 		buffer.needsUpdate = true;
 
-		this._function = getFunction( typedArray, elementSize );
-		this._floatFunction = getFloatFunction( elementSize );
+		this._function = getFunction( bufferAttribute );
+		this._floatFunction = getFloatFunction( bufferAttribute );
 
 	}
 

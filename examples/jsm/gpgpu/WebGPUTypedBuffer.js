@@ -1,15 +1,14 @@
-import { InstancedBufferAttribute } from 'three';
 import { storage, element, assign } from 'three/nodes';
 import TypedBuffer, { getFunction } from './TypedBuffer.js';
 
 export default class WebGPUTypedBuffer extends TypedBuffer {
 
-	constructor( typedArray, elementSize = 1 ) {
+	constructor( bufferAttribute ) {
 
-		super( typedArray, elementSize );
+		super( bufferAttribute );
 
-		this._buffer = new InstancedBufferAttribute( typedArray, elementSize );
-		this._nodeBuffer = storage( this._buffer, getFunction( typedArray, elementSize )().nodeType, this.length );
+		this._buffer = bufferAttribute;
+		this._nodeBuffer = storage( bufferAttribute, getFunction( bufferAttribute )().nodeType, this.length );
 	
 	}
 

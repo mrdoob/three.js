@@ -2,40 +2,28 @@ import { float, int, uint, vec2, ivec2, uvec2, vec3, ivec3, uvec3, vec4, ivec4, 
 
 export default class TypedBuffer {
 
-	constructor( typedArray, elementSize = 1 ) {
+	constructor( bufferAttribute ) {
 
-		if ( ( elementSize !== 1 ) && ( elementSize !== 2 ) && ( elementSize !== 3 ) && ( elementSize !== 4 ) ) {
-
-			throw new Error( 'Element size can be only 1, 2, 3, or 4' );
-
-		}
-
-		if ( ( typedArray instanceof Float64Array ) || ( typedArray instanceof BigInt64Array ) || ( typedArray instanceof BigUint64Array ) ) {
+		if ( ( bufferAttribute.array instanceof Float64Array ) || ( bufferAttribute.array instanceof BigInt64Array ) || ( bufferAttribute.array instanceof BigUint64Array ) ) {
 
 			throw new Error( 'Float64Array, BigInt64Array, and BigUint64Array are not supported, because float64 and int64 are not supported either in WebGL or WebGPU' );
 
-		} else if ( ! ArrayBuffer.isView( typedArray ) || ( typedArray instanceof DataView ) ) {
-
-			throw new Error( 'First argument must be a typed array' );
-
 		}
 
-		this.elementSize = elementSize;
-
-		this._typedArray = typedArray;
+		this._attribute = bufferAttribute;
 		this._buffer = null;
 
 	}
 
 	get typedArray() {
 
-		return this._typedArray;
+		return this._attribute.array;
 
 	}
 
 	set typedArray( typedArray ) {
 
-		this._typedArray.set( typedArray );
+		this._attribute.array.set( new this._attribute.array.constructor( typedArray ) );
 
 	}
 
@@ -53,23 +41,23 @@ export default class TypedBuffer {
 
 	get arrayLength() {
 
-		return this._typedArray.length;
+		return this._attribute.array.length;
 
 	}
 
 	get length() {
 
-		return this._typedArray.length / this.elementSize;
+		return this._attribute.count;
 
 	}
 
-	getBufferElement( i ) {
+	getBufferElement( /* i */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	setBufferElement( i, value ) {
+	setBufferElement( /* i, value */ ) {
 
 		console.warn( 'Abstract function.' );
 
@@ -89,25 +77,27 @@ export default class TypedBuffer {
 
 }
 
-export function getFunction( typedArray, elementSize ) {
+export function getFunction( bufferAttribute ) {
+
+	const array = bufferAttribute.array;
 
 	let functionType;
 
-	if ( ( typedArray instanceof Int8Array ) || ( typedArray instanceof Int16Array ) || ( typedArray instanceof Int32Array ) ) {
+	if ( ( array instanceof Int8Array ) || ( array instanceof Int16Array ) || ( array instanceof Int32Array ) ) {
 
 		functionType = 'int';
 
-	} else if ( ( typedArray instanceof Uint8Array ) || ( typedArray instanceof Uint8ClampedArray ) || ( typedArray instanceof Uint16Array ) || ( typedArray instanceof Uint32Array ) ) {
+	} else if ( ( array instanceof Uint8Array ) || ( array instanceof Uint8ClampedArray ) || ( array instanceof Uint16Array ) || ( array instanceof Uint32Array ) ) {
 
 		functionType = 'uint';
 
-	} else if ( typedArray instanceof Float32Array ) {
+	} else if ( array instanceof Float32Array ) {
 
 		functionType = 'float';
 
 	}
 
-	switch ( elementSize ) {
+	switch ( bufferAttribute.itemSize ) {
 
 		case 1:
 			return ( functionType === 'uint' ) ? uint : ( functionType === 'int' ) ? int : float;
@@ -125,9 +115,9 @@ export function getFunction( typedArray, elementSize ) {
 
 }
 
-export function getFloatFunction( elementSize ) {
+export function getFloatFunction( bufferAttribute ) {
 
-	switch ( elementSize ) {
+	switch ( bufferAttribute.itemSize ) {
 
 		case 1:
 			return float;
