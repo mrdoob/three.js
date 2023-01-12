@@ -357,7 +357,7 @@ function get_axes( order ) {
 	var parity = ( k - j ) * ( j - i ) * ( i - k ) / 2;
 
 	return [ i, j, k, parity, symmetric ];
-	
+
 }
 
 
