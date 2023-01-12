@@ -326,6 +326,8 @@ class Euler {
 		this._y = angles[ 1 ];
 		this._z = angles[ 2 ];
 
+		if ( update === true ) this._onChangeCallback();
+
 		return this;
 
 	}
