@@ -294,32 +294,46 @@ function normalize( value, array ) {
 }
 
 function elementary_unit_vector( axis ){
+
 	switch ( axis ) {
+
 		case 'X':
 			return new Vector3( 1, 0, 0 );
 			break;
+
 		case 'Y':
 			return new Vector3( 0, 1, 0 );
 			break;
+
 		case 'Z':
 			return new Vector3( 0, 0, 1 );
 			break;
+
 		default:
 			throw new Error( 'axis must be X, Y or Z.' );
+
 	  }
+
 }
 
 function get_axes( order ){
+
     if ( !(typeof order === 'string' || order instanceof String) ){
+
         throw new Error( 'Order must be a string.' );
+
     }
 
     if ( order.length != 3 ){
+
         throw new Error( 'Order must have a length of 3.' );
+
     }
 
     if ( order != order.toUpperCase() ){
+
         throw new Error( 'Order must be an uppercase string.' );
+
     }
 
     var i = order.charCodeAt( 0 ) - 'X'.charCodeAt( 0 );
@@ -327,13 +341,17 @@ function get_axes( order ){
     var k = order.charCodeAt( 2 ) - 'X'.charCodeAt( 0 );
 
     if ( i == j || j == k ){
+
         throw new Error( 'Consecutive axes must be different.' );
+
     }
 
     // check if sequence are equivalent to Proper Euler angles
     var symmetric = i == k; 
     if ( symmetric ) {
+
         k = 3 - i - j;
+		
     }
 
     var parity = ( k - j ) * ( j - i ) * ( i - k ) / 2;

@@ -297,20 +297,29 @@ class Euler {
 
 			angles[ 2 ] = half_sum - half_diff;
 			angles[ 0 ] = half_sum + half_diff;
+
 		}
 
 		if ( !symmetric ){
+
 			angles[ 0 ] *= parity;
 			angles[ 1 ] -= Math.PI / 2;
+			
 		}
 
 		// making sure angles are in set [-pi, pi]
 		for ( let i = 0; i < 3; i++ ) {
+
 			if ( angles[ i ] < -Math.PI ) {
+
 				angles[ i ] += 2 * Math.PI;
+
 			} else if (angles[ i ] > Math.PI) {
+
 				angles[ i ] -= 2 * Math.PI;
+
 			}
+
 		}
 
 		this._x = angles[ 0 ];
