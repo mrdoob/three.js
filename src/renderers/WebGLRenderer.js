@@ -982,7 +982,7 @@ function WebGLRenderer( parameters = {} ) {
 		_frustum.setFromProjectionMatrix( _projScreenMatrix );
 
 		_localClippingEnabled = this.localClippingEnabled;
-		_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
+		_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled );
 
 		currentRenderList = renderLists.get( scene, renderListStack.length );
 		currentRenderList.init();
@@ -1210,6 +1210,8 @@ function WebGLRenderer( parameters = {} ) {
 		const transparentObjects = currentRenderList.transparent;
 
 		currentRenderState.setupLightsView( camera );
+
+		if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
 
 		if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, scene, camera );
 
