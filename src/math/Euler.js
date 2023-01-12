@@ -248,14 +248,15 @@ class Euler {
 	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
 	setFromQuaternionDirect( q, order, update ){
 
-		axes = MathUtils.get_axes( order );
-		i = axes[0];
-		j = axes[1];
-		k = axes[2];
-		parity = axes[3];
-		symmetric = axes[4];
+		const axes = MathUtils.get_axes( order );
+		const i = axes[0];
+		const j = axes[1];
+		const k = axes[2];
+		const parity = axes[3];
+		const symmetric = axes[4];
 
-		v = [q.x, q.y, q.z]
+		const v = [q.x, q.y, q.z];
+		var a, b, c, d;
 		if (symmetric) {
 			a = q.w;
 			b = v[i];
@@ -268,16 +269,17 @@ class Euler {
 			d = v[k] * parity - v[i];
 		}
 
-		angles = [0, 0, 0];
+		var angles = [0, 0, 0];
 
 		// middle angle is always easy
 		angles[1] = Math.atan2(Math.hypot(c, d), Math.hypot(a, b));
 
-		half_sum = Math.atan2(b, a);
-		half_diff = Math.atan2(d, c);
+		const half_sum = Math.atan2(b, a);
+		const half_diff = Math.atan2(d, c);
 
 		// check if the case is degenerate
-		eps = 10E-7
+		const eps = 10E-7
+		var unsafe;
 		if (Math.abs(angles[1]) < eps){
 			unsafe = 1;
 		} else if (Math.abs(angles[1] - Math.PI) < eps){
@@ -303,17 +305,17 @@ class Euler {
 			angles[1] -= Math.PI / 2;
 		}
 
-		for (let i = 0; i < 3; i++) {
-			if (angles[i] < -Math.PI) {
+		for ( let i = 0; i < 3; i++ ) {
+			if ( angles[i] < -Math.PI ) {
 				angles[i] += 2 * Math.PI;
 			} else if (angles[i] > Math.PI) {
 				angles[i] -= 2 * Math.PI;
 			}
 		} 
 
-		this._x = angles[0];
-		this._y = angles[1];
-		this._z = angles[2];
+		this._x = angles[ 0 ];
+		this._y = angles[ 1 ];
+		this._z = angles[ 2 ];
 
 		return this;
 	}

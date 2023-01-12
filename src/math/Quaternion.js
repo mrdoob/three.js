@@ -201,15 +201,19 @@ class Quaternion {
 	setFromEulerDirect( euler, update ) {
 
 		const x = euler._x, y = euler._y, z = euler._z
-		const ux = MathUtils.elementary_unit_vector(order[0]);
-		const uy = MathUtils.elementary_unit_vector(order[1]);
-		const uz = MathUtils.elementary_unit_vector(order[2]);
+		const ux = MathUtils.elementary_unit_vector(euler.order[0]);
+		const uy = MathUtils.elementary_unit_vector(euler.order[1]);
+		const uz = MathUtils.elementary_unit_vector(euler.order[2]);
 		
-		q1 = Quaternion.setFromAxisAngle( ux, x );
-		q2 = Quaternion.setFromAxisAngle( uy, y );
-		q3 = Quaternion.setFromAxisAngle( uz, z );
+		const q1 = Quaternion.setFromAxisAngle( ux, x );
+		const q2 = Quaternion.setFromAxisAngle( uy, y );
+		const q3 = Quaternion.setFromAxisAngle( uz, z );
+		const q = q1 * q2 * q3;
 		
-		this = q1 * q2 * q3;
+		this._x = q._x;
+		this._y = q._y;
+		this._z = q._z;
+		this._w = q._w;
 
 		if ( update !== false ) this._onChangeCallback();
 
