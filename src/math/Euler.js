@@ -308,14 +308,6 @@ class Euler {
 
 	}
 
-	// @deprecated since r138, 02cf0df1cb4575d5842fef9c85bb5a89fe020d53
-
-	toVector3() {
-
-		console.error( 'THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead' );
-
-	}
-
 }
 
 Euler.DEFAULT_ORDER = 'XYZ';
