@@ -224,6 +224,22 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'Quaternion.setFromEuler/Euler.setFromQuaternionDirect', ( assert ) => {
+
+			var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
+			for ( var i = 0; i < testValues.length; i ++ ) {
+
+				var v = testValues[ i ];
+				var q = new Quaternion().setFromEuler( v );
+
+				var euler = new Euler().setFromQuaternion( q, v.order );
+				var euler2 = new Euler().setFromQuaternionDirect( q, v.order );
+				assert.ok( euler.equals(euler2), 'Passed!' );
+
+			}
+
+		} );
+
 		QUnit.test( 'Matrix4.setFromEuler/Euler.fromRotationMatrix', ( assert ) => {
 
 			var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];

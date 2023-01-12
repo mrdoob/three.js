@@ -1,6 +1,7 @@
 import { Quaternion } from './Quaternion.js';
 import { Matrix4 } from './Matrix4.js';
 import { clamp } from './MathUtils.js';
+import * as MathUtils from './MathUtils.js';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
 const _quaternion = /*@__PURE__*/ new Quaternion();
@@ -241,6 +242,80 @@ class Euler {
 
 		return this.setFromRotationMatrix( _matrix, order, update );
 
+	}
+
+	// Based on: Bernardes E, Viollet S (2022) Quaternion to Euler angles conversion: 
+	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
+	setFromQuaternionDirect( q, order, update ){
+
+		axes = MathUtils.get_axes( order );
+		i = axes[0];
+		j = axes[1];
+		k = axes[2];
+		parity = axes[3];
+		symmetric = axes[4];
+
+		v = [q.x, q.y, q.z]
+		if (symmetric) {
+			a = q.w;
+			b = v[i];
+			c = v[j];
+			d = v[k] * parity;
+		} else {
+			a = q.w - v[j];
+			b = v[i] + v[k] * parity;
+			c = v[j] + q.w;
+			d = v[k] * parity - v[i];
+		}
+
+		angles = [0, 0, 0];
+
+		// middle angle is always easy
+		angles[1] = Math.atan2(Math.hypot(c, d), Math.hypot(a, b));
+
+		half_sum = Math.atan2(b, a);
+		half_diff = Math.atan2(d, c);
+
+		// check if the case is degenerate
+		eps = 10E-7
+		if (Math.abs(angles[1]) < eps){
+			unsafe = 1;
+		} else if (Math.abs(angles[1] - Math.PI) < eps){
+			unsafe = 2;
+		} else {
+			unsafe = 0;
+		}
+
+		if (unsafe == 0) {
+			angles[2] = half_sum - half_diff
+			angles[0] = half_sum + half_diff
+		} else { // degenerate cases
+			angles[2] = 0;
+			if (unsafe == 1) {
+				angles[0] = 2 * half_sum;
+			} else {
+				angles[0] = 2 * half_diff;
+			}
+		}
+
+		if (!symmetric){
+			angles[0] *= parity;
+			angles[1] -= Math.PI / 2;
+		}
+
+		for (let i = 0; i < 3; i++) {
+			if (angles[i] < -Math.PI) {
+				angles[i] += 2 * Math.PI;
+			} else if (angles[i] > Math.PI) {
+				angles[i] -= 2 * Math.PI;
+			}
+		} 
+
+		this._x = angles[0];
+		this._y = angles[1];
+		this._z = angles[2];
+
+		return this;
 	}
 
 	setFromVector3( v, order = this._order ) {

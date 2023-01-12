@@ -198,6 +198,24 @@ class Quaternion {
 
 	}
 
+	setFromEulerDirect( euler, update ) {
+
+		const x = euler._x, y = euler._y, z = euler._z
+		const ux = MathUtils.elementary_unit_vector(order[0]);
+		const uy = MathUtils.elementary_unit_vector(order[1]);
+		const uz = MathUtils.elementary_unit_vector(order[2]);
+		
+		q1 = Quaternion.setFromAxisAngle( ux, x );
+		q2 = Quaternion.setFromAxisAngle( uy, y );
+		q3 = Quaternion.setFromAxisAngle( uz, z );
+		
+		this = q1 * q2 * q3;
+
+		if ( update !== false ) this._onChangeCallback();
+
+		return this;
+	}
+
 	setFromEuler( euler, update ) {
 
 		const x = euler._x, y = euler._y, z = euler._z, order = euler._order;

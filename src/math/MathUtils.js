@@ -291,6 +291,54 @@ function normalize( value, array ) {
 
 }
 
+function elementary_unit_vector( axis ){
+	switch (axis) {
+		case 'X':
+			return Vector3(x = 1);
+			break;
+		case 'Y':
+			return Vector3(y = 1);
+			break;
+		case 'Z':
+			return Vector3(z = 1);
+			break;
+		default:
+			throw new Error( 'axis must be X, Y or Z.' );
+	  }
+}
+
+function get_axes( order ){
+    if (!(typeof order === 'string' || order instanceof String)){
+        throw new Error( 'Order must be a string.' );
+    }
+
+    if (order.length != 3){
+        throw new Error( 'Order must have a length of 3.' );
+    }
+
+    if (order != order.toUpperCase()){
+        throw new Error( 'Order must be an uppercase string.' );
+    }
+
+    if (i == j || j == k){
+        throw new Error( 'Consecutive axes must be different.' );
+    }
+
+    i = order.charCodeAt(0) - 'X'.charCodeAt(0);
+    j = order.charCodeAt(1) - 'X'.charCodeAt(0);
+    k = order.charCodeAt(2) - 'X'.charCodeAt(0);
+
+    // check if sequence are equivalent to Proper Euler angles
+    symmetric = i == k; 
+    if (symmetric) {
+        k = 3 - i - j;
+    }
+
+    parity = (k - j) * (j - i) * (i - k) / 2;
+
+    return [i, j, k, parity, symmetric];
+}
+
 
 
 export {
@@ -318,4 +366,6 @@ export {
 	setQuaternionFromProperEuler,
 	normalize,
 	denormalize,
+	elementary_unit_vector,
+	get_axes,
 };
