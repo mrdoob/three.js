@@ -8,7 +8,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'ShapeGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		var geometries = undefined; // eslint-disable-line no-unused-vars
 		hooks.beforeEach( function () {
 
 			var triangleShape = new Shape();

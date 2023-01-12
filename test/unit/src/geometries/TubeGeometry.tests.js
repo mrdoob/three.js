@@ -9,7 +9,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'TubeGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		var geometries = undefined; // eslint-disable-line no-unused-vars
 		hooks.beforeEach( function () {
 
 			var path = new LineCurve3( new Vector3( 0, 0, 0 ), new Vector3( 0, 1, 0 ) );

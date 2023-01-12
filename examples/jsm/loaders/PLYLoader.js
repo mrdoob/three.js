@@ -299,7 +299,11 @@ class PLYLoader extends Loader {
 
 		function mapElementAttributes( properties ) {
 
-			const elementNames = properties.map(  property => { return property.name } );
+			const elementNames = properties.map( property => {
+
+				return property.name;
+
+			} );
 
 			function findAttrName( names ) {
 
@@ -564,20 +568,52 @@ class PLYLoader extends Loader {
 				switch ( type ) {
 
 					// corespondences for non-specific length types here match rply:
-					case 'int8':	case 'char':	return { read: ( at ) => { return dataview.getInt8( at ) }, size: 1 };
-					case 'uint8':	case 'uchar':	return { read: ( at ) => { return dataview.getUint8( at ) }, size: 1 };
-					case 'int16':	case 'short':	return { read: ( at ) => { return dataview.getInt16( at, little_endian ) }, size: 2 };
-					case 'uint16':	case 'ushort':	return { read: ( at ) => { return dataview.getUint16( at, little_endian ) }, size: 2 };
-					case 'int32':	case 'int':		return { read: ( at ) => { return dataview.getInt32( at, little_endian ) }, size: 4 };
-					case 'uint32':	case 'uint':	return { read: ( at ) => { return dataview.getUint32( at, little_endian ) }, size: 4 };
-					case 'float32': case 'float':	return { read: ( at ) => { return dataview.getFloat32( at, little_endian ) }, size: 4 };
-					case 'float64': case 'double':	return { read: ( at ) => { return dataview.getFloat64( at, little_endian ) }, size: 8 };
+					case 'int8':	case 'char':	return { read: ( at ) => {
+
+						return dataview.getInt8( at );
+
+					}, size: 1 };
+					case 'uint8':	case 'uchar':	return { read: ( at ) => {
+
+						return dataview.getUint8( at );
+
+					}, size: 1 };
+					case 'int16':	case 'short':	return { read: ( at ) => {
+
+						return dataview.getInt16( at, little_endian );
+
+					}, size: 2 };
+					case 'uint16':	case 'ushort':	return { read: ( at ) => {
+
+						return dataview.getUint16( at, little_endian );
+
+					}, size: 2 };
+					case 'int32':	case 'int':		return { read: ( at ) => {
+
+						return dataview.getInt32( at, little_endian );
+
+					}, size: 4 };
+					case 'uint32':	case 'uint':	return { read: ( at ) => {
+
+						return dataview.getUint32( at, little_endian );
+
+					}, size: 4 };
+					case 'float32': case 'float':	return { read: ( at ) => {
+
+						return dataview.getFloat32( at, little_endian );
+
+					}, size: 4 };
+					case 'float64': case 'double':	return { read: ( at ) => {
+
+						return dataview.getFloat64( at, little_endian );
+
+					}, size: 8 };
 
 				}
 
 			}
 
-			for ( let i = 0, l = properties.length; i < l; i++ ) {
+			for ( let i = 0, l = properties.length; i < l; i ++ ) {
 
 				const property = properties[ i ];
 
@@ -594,7 +630,7 @@ class PLYLoader extends Loader {
 
 			}
 
-		};
+		}
 
 		function parseBinary( data, header ) {
 
@@ -638,9 +674,9 @@ class PLYLoader extends Loader {
 
 			do {
 
-				const c = String.fromCharCode( bytes[ i++ ] );
+				const c = String.fromCharCode( bytes[ i ++ ] );
 
-				if ( c !== "\n" && c !== "\r" ) {
+				if ( c !== '\n' && c !== '\r' ) {
 
 					line += c;
 
@@ -656,9 +692,9 @@ class PLYLoader extends Loader {
 
 				}
 
-			}  while ( cont && i < bytes.length );
+			} while ( cont && i < bytes.length );
 
-			return lines.join( "\r" ) + "\r";
+			return lines.join( '\r' ) + '\r';
 
 		}
 

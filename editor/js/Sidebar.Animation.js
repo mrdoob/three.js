@@ -23,11 +23,11 @@ function SidebarAnimation( editor ) {
 		const name = new UIText( animation.name ).setWidth( '200px' );
 		container.add( name );
 
-		const button = new UIButton( getButtonText( action  ) );
+		const button = new UIButton( getButtonText( action ) );
 		button.onClick( function () {
 
 			action.isRunning() ? action.stop() : action.play();
-			button.setTextContent( getButtonText( action  ) );
+			button.setTextContent( getButtonText( action ) );
 
 		} );
 

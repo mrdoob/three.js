@@ -83,6 +83,8 @@
 
 		}
 
+		return result;
+
 	} );
 
 	suite.add( 'Vector3-Float32Array', function () {
@@ -103,6 +105,8 @@
 
 		}
 
+		return result;
+
 	} );
 
 	suite.add( 'Vector3-Array', function () {
@@ -122,6 +126,8 @@
 			result += v.length();
 
 		}
+
+		return result;
 
 	} );
 

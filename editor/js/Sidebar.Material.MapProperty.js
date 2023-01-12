@@ -55,7 +55,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	let rangeMin, rangeMax;
 
 	if ( property === 'iridescenceThicknessMap' ) {
-		
+
 		const range = new UIDiv().setMarginLeft( '3px' );
 		container.add( range );
 

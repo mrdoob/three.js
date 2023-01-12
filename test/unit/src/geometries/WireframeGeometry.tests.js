@@ -6,7 +6,7 @@ export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'WireframeGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		var geometries = undefined; // eslint-disable-line no-unused-vars
 		hooks.beforeEach( function () {
 
 			geometries = [

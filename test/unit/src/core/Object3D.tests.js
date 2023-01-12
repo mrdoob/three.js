@@ -58,9 +58,9 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'Extending', ( assert ) => {
 
 			var object = new Object3D();
-	
+
 			assert.strictEqual( object instanceof EventDispatcher, true, 'Object3D extends from EventDispatcher' );
-	
+
 		} );
 
 		// INSTANCING
@@ -550,7 +550,7 @@ export default QUnit.module( 'Core', () => {
 			parent.add( childName, childNothing );
 
 			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).length, 3, 'Get amount of all childs by name "foo"' );
-			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some(obj => obj.name !== 'foo') , false, 'Get all childs by name "foo"' );
+			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some( obj => obj.name !== 'foo' ), false, 'Get all childs by name "foo"' );
 
 		} );
 

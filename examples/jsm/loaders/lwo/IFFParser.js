@@ -1084,7 +1084,7 @@ DataViewReader.prototype = {
 			result = this._textDecoder.decode( new Uint8Array( this.dv.buffer, start, length ) );
 
 			// account for null byte in length
-			length++;
+			length ++;
 
 			// if string with terminating nullbyte is uneven, extra nullbyte is added, skip that too
 			length += length % 2;

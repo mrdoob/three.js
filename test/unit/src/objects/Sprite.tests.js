@@ -11,7 +11,7 @@ export default QUnit.module( 'Objects', () => {
 		QUnit.test( 'Extending', ( assert ) => {
 
 			var sprite = new Sprite();
-	
+
 			assert.strictEqual( sprite instanceof Object3D, true, 'Sprite extends from Object3D' );
 
 		} );

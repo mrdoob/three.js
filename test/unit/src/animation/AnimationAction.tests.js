@@ -445,21 +445,23 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		QUnit.test( 'StartAt when already executed once', ( assert ) => {
+
 			var root = new Object3D();
 			var mixer = new AnimationMixer( root );
 			var track = new NumberKeyframeTrack( '.rotation[x]', [ 0, 750 ], [ 0, 270 ] );
 			var clip = new AnimationClip( 'clip1', 750, [ track ] );
-		
+
 			var animationAction = mixer.clipAction( clip );
 			animationAction.setLoop( LoopOnce );
 			animationAction.clampWhenFinished = true;
 			animationAction.play();
-			mixer.addEventListener('finished', () => {
-				animationAction.timeScale*=-1;
-				animationAction.paused=false;
-				animationAction.startAt(mixer.time+2000).play();
+			mixer.addEventListener( 'finished', () => {
 
-			});
+				animationAction.timeScale *= - 1;
+				animationAction.paused = false;
+				animationAction.startAt( mixer.time + 2000 ).play();
+
+			} );
 
 			mixer.update( 250 );
 			assert.equal( root.rotation.x, 90, 'first' );
@@ -488,7 +490,8 @@ export default QUnit.module( 'Animation', () => {
 			mixer.update( 250 );
 			assert.equal( root.rotation.x, 180, 'seventh' );
 			//console.log(mixer.time);
-		});
+
+		} );
 
 	} );
 
