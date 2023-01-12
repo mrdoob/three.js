@@ -293,7 +293,7 @@ function normalize( value, array ) {
 
 }
 
-function elementary_unit_vector( axis ){
+function elementary_unit_vector( axis ) {
 
 	switch ( axis ) {
 
@@ -316,21 +316,21 @@ function elementary_unit_vector( axis ){
 
 }
 
-function get_axes( order ){
+function get_axes( order ) {
 
-    if ( !(typeof order === 'string' || order instanceof String) ){
+    if ( ! (typeof order === 'string' || order instanceof String) ) {
 
         throw new Error( 'Order must be a string.' );
 
     }
 
-    if ( order.length != 3 ){
+    if ( order.length != 3 ) {
 
         throw new Error( 'Order must have a length of 3.' );
 
     }
 
-    if ( order != order.toUpperCase() ){
+    if ( order != order.toUpperCase() ) {
 
         throw new Error( 'Order must be an uppercase string.' );
 
@@ -340,7 +340,7 @@ function get_axes( order ){
     var j = order.charCodeAt( 1 ) - 'X'.charCodeAt( 0 );
     var k = order.charCodeAt( 2 ) - 'X'.charCodeAt( 0 );
 
-    if ( i == j || j == k ){
+    if ( i == j || j == k ) {
 
         throw new Error( 'Consecutive axes must be different.' );
 
@@ -351,7 +351,7 @@ function get_axes( order ){
     if ( symmetric ) {
 
         k = 3 - i - j;
-		
+
     }
 
     var parity = ( k - j ) * ( j - i ) * ( i - k ) / 2;

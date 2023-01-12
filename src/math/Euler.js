@@ -246,7 +246,7 @@ class Euler {
 
 	// Based on: Bernardes E, Viollet S (2022) Quaternion to Euler angles conversion:
 	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
-	setFromQuaternionDirect( q, order, update ){
+	setFromQuaternionDirect( q, order, update ) {
 
 		const axes = MathUtils.get_axes( order );
 		const i = axes[ 0 ];
@@ -257,7 +257,7 @@ class Euler {
 
 		const v = [ q.x, q.y, q.z ];
 		var a, b, c, d;
-		if (symmetric) {
+		if ( symmetric ) {
 
 			a = q.w;
 			b = v[ i ];
@@ -276,19 +276,19 @@ class Euler {
 		var angles = [ 0, 0, 0 ];
 
 		// middle angle is always easy
-		angles[1] = Math.atan2( Math.hypot( c, d ), Math.hypot( a, b ) );
+		angles[ 1 ] = Math.atan2( Math.hypot( c, d ), Math.hypot( a, b ) );
 
 		const half_sum = Math.atan2( b, a );
 		const half_diff = Math.atan2( d, c );
-		const eps = 10E-7
+		const eps = 10E-7;
 
 		// check if the case is degenerate
-		if ( Math.abs( angles[ 1 ] ) < eps ){
+		if ( Math.abs( angles[ 1 ] ) < eps ) {
 
 			angles[ 2 ] = 0;
 			angles[ 0 ] = 2 * half_sum;
 
-		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < eps ){
+		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < eps ) {
 
 			angles[ 2 ] = 0;
 			angles[ 0 ] = 2 * half_diff;
@@ -300,11 +300,11 @@ class Euler {
 
 		}
 
-		if ( !symmetric ){
+		if ( ! symmetric ) {
 
 			angles[ 0 ] *= parity;
 			angles[ 1 ] -= Math.PI / 2;
-			
+
 		}
 
 		// making sure angles are in set [-pi, pi]
