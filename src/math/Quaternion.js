@@ -200,7 +200,7 @@ class Quaternion {
 
 	setFromEulerDirect( euler, update ) {
 
-		const x = euler._x, y = euler._y, z = euler._z
+		const x = euler._x, y = euler._y, z = euler._z;
 		const ux = MathUtils.elementary_unit_vector( euler.order[ 0 ] );
 		const uy = MathUtils.elementary_unit_vector( euler.order[ 1 ] );
 		const uz = MathUtils.elementary_unit_vector( euler.order[ 2 ] );
