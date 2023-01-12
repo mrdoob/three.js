@@ -249,67 +249,67 @@ class Euler {
 	setFromQuaternionDirect( q, order, update ){
 
 		const axes = MathUtils.get_axes( order );
-		const i = axes[0];
-		const j = axes[1];
-		const k = axes[2];
-		const parity = axes[3];
-		const symmetric = axes[4];
+		const i = axes[ 0 ];
+		const j = axes[ 1 ];
+		const k = axes[ 2 ];
+		const parity = axes[ 3 ];
+		const symmetric = axes[ 4 ];
 
-		const v = [q.x, q.y, q.z];
+		const v = [ q.x, q.y, q.z ];
 		var a, b, c, d;
 		if (symmetric) {
 			a = q.w;
-			b = v[i];
-			c = v[j];
-			d = v[k] * parity;
+			b = v[ i ];
+			c = v[ j ];
+			d = v[ k ] * parity;
 		} else {
-			a = q.w - v[j];
-			b = v[i] + v[k] * parity;
-			c = v[j] + q.w;
-			d = v[k] * parity - v[i];
+			a = q.w - v[ j ];
+			b = v[ i ] + v[ k ] * parity;
+			c = v[ j ] + q.w;
+			d = v[ k ] * parity - v[ i ];
 		}
 
-		var angles = [0, 0, 0];
+		var angles = [ 0, 0, 0 ];
 
 		// middle angle is always easy
-		angles[1] = Math.atan2(Math.hypot(c, d), Math.hypot(a, b));
+		angles[1] = Math.atan2( Math.hypot( c, d ), Math.hypot( a, b ) );
 
-		const half_sum = Math.atan2(b, a);
-		const half_diff = Math.atan2(d, c);
+		const half_sum = Math.atan2( b, a );
+		const half_diff = Math.atan2( d, c );
 
 		// check if the case is degenerate
 		const eps = 10E-7
 		var unsafe;
-		if (Math.abs(angles[1]) < eps){
+		if ( Math.abs( angles[ 1 ] ) < eps ){
 			unsafe = 1;
-		} else if (Math.abs(angles[1] - Math.PI) < eps){
+		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < eps ){
 			unsafe = 2;
 		} else {
 			unsafe = 0;
 		}
 
-		if (unsafe == 0) {
-			angles[2] = half_sum - half_diff
-			angles[0] = half_sum + half_diff
+		if ( unsafe == 0 ) {
+			angles[ 2 ] = half_sum - half_diff
+			angles[ 0 ] = half_sum + half_diff
 		} else { // degenerate cases
-			angles[2] = 0;
-			if (unsafe == 1) {
-				angles[0] = 2 * half_sum;
+			angles[ 2 ] = 0;
+			if ( unsafe == 1 ) {
+				angles[ 0 ] = 2 * half_sum;
 			} else {
-				angles[0] = 2 * half_diff;
+				angles[ 0 ] = 2 * half_diff;
 			}
 		}
 
-		if (!symmetric){
-			angles[0] *= parity;
-			angles[1] -= Math.PI / 2;
+		if ( !symmetric ){
+			angles[ 0 ] *= parity;
+			angles[ 1 ] -= Math.PI / 2;
 		}
 
 		for ( let i = 0; i < 3; i++ ) {
-			if ( angles[i] < -Math.PI ) {
-				angles[i] += 2 * Math.PI;
-			} else if (angles[i] > Math.PI) {
-				angles[i] -= 2 * Math.PI;
+			if ( angles[ i ] < -Math.PI ) {
+				angles[ i ] += 2 * Math.PI;
+			} else if (angles[ i ] > Math.PI) {
+				angles[ i ] -= 2 * Math.PI;
 			}
 		}
 

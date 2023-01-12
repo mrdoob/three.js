@@ -294,7 +294,7 @@ function normalize( value, array ) {
 }
 
 function elementary_unit_vector( axis ){
-	switch (axis) {
+	switch ( axis ) {
 		case 'X':
 			return new Vector3( 1, 0, 0 );
 			break;
@@ -310,35 +310,35 @@ function elementary_unit_vector( axis ){
 }
 
 function get_axes( order ){
-    if (!(typeof order === 'string' || order instanceof String)){
+    if ( !(typeof order === 'string' || order instanceof String) ){
         throw new Error( 'Order must be a string.' );
     }
 
-    if (order.length != 3){
+    if ( order.length != 3 ){
         throw new Error( 'Order must have a length of 3.' );
     }
 
-    if (order != order.toUpperCase()){
+    if ( order != order.toUpperCase() ){
         throw new Error( 'Order must be an uppercase string.' );
     }
 
-    var i = order.charCodeAt(0) - 'X'.charCodeAt(0);
-    var j = order.charCodeAt(1) - 'X'.charCodeAt(0);
-    var k = order.charCodeAt(2) - 'X'.charCodeAt(0);
+    var i = order.charCodeAt( 0 ) - 'X'.charCodeAt( 0 );
+    var j = order.charCodeAt( 1 ) - 'X'.charCodeAt( 0 );
+    var k = order.charCodeAt( 2 ) - 'X'.charCodeAt( 0 );
 
-    if (i == j || j == k){
+    if ( i == j || j == k ){
         throw new Error( 'Consecutive axes must be different.' );
     }
 
     // check if sequence are equivalent to Proper Euler angles
     var symmetric = i == k; 
-    if (symmetric) {
+    if ( symmetric ) {
         k = 3 - i - j;
     }
 
-    var parity = (k - j) * (j - i) * (i - k) / 2;
+    var parity = ( k - j ) * ( j - i ) * ( i - k ) / 2;
 
-    return [i, j, k, parity, symmetric];
+    return [ i, j, k, parity, symmetric ];
 }
 
 
