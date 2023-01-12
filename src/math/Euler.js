@@ -289,8 +289,8 @@ class Euler {
 		}
 
 		if ( unsafe == 0 ) {
-			angles[ 2 ] = half_sum - half_diff
-			angles[ 0 ] = half_sum + half_diff
+			angles[ 2 ] = half_sum - half_diff;
+			angles[ 0 ] = half_sum + half_diff;
 		} else { // degenerate cases
 			angles[ 2 ] = 0;
 			if ( unsafe == 1 ) {
