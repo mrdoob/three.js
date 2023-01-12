@@ -258,15 +258,19 @@ class Euler {
 		const v = [ q.x, q.y, q.z ];
 		var a, b, c, d;
 		if (symmetric) {
+
 			a = q.w;
 			b = v[ i ];
 			c = v[ j ];
 			d = v[ k ] * parity;
+
 		} else {
+
 			a = q.w - v[ j ];
 			b = v[ i ] + v[ k ] * parity;
 			c = v[ j ] + q.w;
 			d = v[ k ] * parity - v[ i ];
+
 		}
 
 		var angles = [ 0, 0, 0 ];
@@ -276,28 +280,23 @@ class Euler {
 
 		const half_sum = Math.atan2( b, a );
 		const half_diff = Math.atan2( d, c );
+		const eps = 10E-7
 
 		// check if the case is degenerate
-		const eps = 10E-7
-		var unsafe;
 		if ( Math.abs( angles[ 1 ] ) < eps ){
-			unsafe = 1;
-		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < eps ){
-			unsafe = 2;
-		} else {
-			unsafe = 0;
-		}
 
-		if ( unsafe == 0 ) {
+			angles[ 2 ] = 0;
+			angles[ 0 ] = 2 * half_sum;
+
+		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < eps ){
+
+			angles[ 2 ] = 0;
+			angles[ 0 ] = 2 * half_diff;
+
+		} else {
+
 			angles[ 2 ] = half_sum - half_diff;
 			angles[ 0 ] = half_sum + half_diff;
-		} else { // degenerate cases
-			angles[ 2 ] = 0;
-			if ( unsafe == 1 ) {
-				angles[ 0 ] = 2 * half_sum;
-			} else {
-				angles[ 0 ] = 2 * half_diff;
-			}
 		}
 
 		if ( !symmetric ){
@@ -305,6 +304,7 @@ class Euler {
 			angles[ 1 ] -= Math.PI / 2;
 		}
 
+		// making sure angles are in set [-pi, pi]
 		for ( let i = 0; i < 3; i++ ) {
 			if ( angles[ i ] < -Math.PI ) {
 				angles[ i ] += 2 * Math.PI;
