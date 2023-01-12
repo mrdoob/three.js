@@ -327,7 +327,7 @@ class Euler {
 		this._z = angles[ 2 ];
 
 		return this;
-		
+
 	}
 
 	setFromVector3( v, order = this._order ) {

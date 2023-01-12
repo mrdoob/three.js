@@ -318,7 +318,7 @@ function elementary_unit_vector( axis ) {
 
 function get_axes( order ) {
 
-	if ( ! (typeof order === 'string' || order instanceof String) ) {
+	if ( ! ( typeof order === 'string' || order instanceof String ) ) {
 
 		throw new Error( 'Order must be a string.' );
 
@@ -357,6 +357,7 @@ function get_axes( order ) {
 	var parity = ( k - j ) * ( j - i ) * ( i - k ) / 2;
 
 	return [ i, j, k, parity, symmetric ];
+	
 }
 
 
