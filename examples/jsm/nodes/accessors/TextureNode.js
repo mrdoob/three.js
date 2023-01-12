@@ -69,6 +69,8 @@ class TextureNode extends UniformNode {
 
 	generate( builder, output ) {
 
+		this.construct( builder ); // this is required for some reason?
+
 		const { uvNode, levelNode } = builder.getNodeProperties( this );
 
 		const texture = this.value;

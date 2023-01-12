@@ -52,7 +52,7 @@ import DiscardNode from '../utils/DiscardNode.js';
 import MaxMipLevelNode from '../utils/MaxMipLevelNode.js';
 
 // shader node utils
-import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, getConstNodeType, cacheMaps } from './ShaderNode.js';
+import { ShaderNode, nodeObject, nodeObjects, nodeArray, nodeProxy, nodeImmutable, ConvertType, cacheMaps } from './ShaderNode.js';
 
 // shader node base
 
@@ -89,6 +89,68 @@ export const mat4 = new ConvertType( 'mat4' );
 export const imat4 = new ConvertType( 'imat4' );
 export const umat4 = new ConvertType( 'umat4' );
 export const bmat4 = new ConvertType( 'bmat4' );
+
+// utils functions
+
+const getConstNodeType = ( value ) => ( value === undefined || value === null ) ? null : ( value.nodeType || value.convertTo || ( typeof value === 'string' ? value : null ) );
+
+export function getBufferSrcFunction( bufferAttribute ) {
+
+	const array = bufferAttribute.array;
+
+	let functionType;
+
+	if ( ( array instanceof Int8Array ) || ( array instanceof Int16Array ) || ( array instanceof Int32Array ) ) {
+
+		functionType = 'int';
+
+	} else if ( ( array instanceof Uint8Array ) || ( array instanceof Uint8ClampedArray ) || ( array instanceof Uint16Array ) || ( array instanceof Uint32Array ) ) {
+
+		functionType = 'uint';
+
+	} else if ( array instanceof Float32Array ) {
+
+		functionType = 'float';
+
+	}
+
+	switch ( bufferAttribute.itemSize ) {
+
+		case 1:
+			return ( functionType === 'uint' ) ? uint : ( functionType === 'int' ) ? int : float;
+
+		case 2:
+			return ( functionType === 'uint' ) ? uvec2 : ( functionType === 'int' ) ? ivec2 : vec2;
+
+		case 3:
+			return ( functionType === 'uint' ) ? uvec3 : ( functionType === 'int' ) ? ivec3 : vec3;
+
+		case 4:
+			return ( functionType === 'uint' ) ? uvec4 : ( functionType === 'int' ) ? ivec4 : vec4;
+
+	}
+
+}
+
+export function getBufferOutFunction( bufferAttribute ) {
+
+	switch ( bufferAttribute.itemSize ) {
+
+		case 1:
+			return float;
+
+		case 2:
+			return vec2;
+
+		case 3:
+			return vec3;
+
+		case 4:
+			return vec4;
+
+	}
+
+}
 
 // core
 
@@ -213,8 +275,8 @@ export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 
 // accessors
 
-export const buffer = ( value, nodeOrType, count ) => nodeObject( new BufferNode( value, getConstNodeType( nodeOrType ), count ) );
-export const storage = ( value, nodeOrType, count ) => nodeObject( new StorageBufferNode( value, getConstNodeType( nodeOrType ), count ) );
+export const buffer = ( value, nodeOrType, count ) => nodeObject( new BufferNode( value, getConstNodeType( nodeOrType ) || getBufferSrcFunction( value )().nodeType, count ) );
+export const storage = ( value, nodeOrType, count ) => nodeObject( new StorageBufferNode( value, getConstNodeType( nodeOrType ) || getBufferSrcFunction( value )().nodeType, count ) );
 
 export const cameraProjectionMatrix = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX );
 export const cameraViewMatrix = nodeImmutable( CameraNode, CameraNode.VIEW_MATRIX );

@@ -27,7 +27,7 @@
 
 			import * as THREE from 'three';
 
-			import { ShaderNode, color, remainder, add, sub, mul, uint, bitXor, shiftRight, vec4, uvec4 } from 'three/nodes';
+			import { ShaderNode, color, remainder, add, sub, mul, uint, bitXor, shiftRight, vec4, uvec4, storage, element, compute } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -35,7 +35,7 @@
 			import WebGLComputationRenderer from 'three/addons/gpgpu/WebGLComputationRenderer.js';
 			import WebGPUComputationRenderer from 'three/addons/gpgpu/WebGPUComputationRenderer.js';
 
-			import { getTextureFormat, calculateWidthHeight } from 'three/addons/gpgpu/WebGLTypedBuffer.js';
+			import WebGLBuffer, { getTextureFormat, calculateWidthHeight } from 'three/addons/renderers/webgl/WebGLBuffer.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -43,7 +43,6 @@
 
 				backend: 'WebGL',
 				example: 'Multiplication',
-				reuploadOutput: true,
 				warmUps: 2,
 				logBuffers: false,
 				logPerformance: true,
@@ -52,7 +51,7 @@
 
 			};
 
-			const hash = new ShaderNode( ( { num }, builder ) => { // Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
+			const hash = new ShaderNode( ( { num }, stack ) => { // Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
 
 				const state = add( mul( uint( num ), 747796405 ), 2891336453 );
 				const word = mul( bitXor( shiftRight( state, add( shiftRight( state, 28 ), 4 ) ), state ), 277803737 );
@@ -85,7 +84,6 @@
 
 				gui.add( params, 'backend', [ 'WebGL', 'WebGPU' ] ).onChange( () => { setBackend().then( showExample ); } );
 				gui.add( params, 'example', [ 'Passthrough', 'AntiPassthrough', 'PassthroughColor', 'ElementManipulation', 'Multiplication', 'Random' ] ).onChange( showExample );
-				gui.add( params, 'reuploadOutput' ).onChange( showExample );
 				gui.add( params, 'warmUps', 0, 5, 1 );
 				gui.add( params, 'logBuffers' );
 				gui.add( params, 'logPerformance' );
@@ -185,18 +183,18 @@
 				switch ( params.example ) {
 
 					case 'Passthrough':
-						shaderNode = new ShaderNode( ( { index }, builder ) => index );
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 ), 1 );
+						shaderNode = new ShaderNode( ( { index }, stack ) => stack.assign( element( storage( outAttribute ), index ), index ) );
 						break;
 
 					case 'AntiPassthrough':
-						shaderNode = new ShaderNode( ( { index }, builder ) => sub( 255, index ) );
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 ), 1 );
+						shaderNode = new ShaderNode( ( { index }, stack ) => stack.assign( element( storage( outAttribute ), index ), sub( 255, index ) ) );
 						break;
 
 					case 'PassthroughColor':
-						shaderNode = new ShaderNode( ( { index }, builder ) => params.backend === 'WebGL' ? index : uvec4( index, index, index, uint( 255 ) ) );
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 * 4 ), 4 );
+						shaderNode = new ShaderNode( ( { index }, stack ) => stack.assign( element( storage( outAttribute ), index ), params.backend === 'WebGL' ? index : uvec4( index, index, index, uint( 255 ) ) ) );
 						break;
 
 					case 'ElementManipulation':
@@ -205,76 +203,66 @@
 						srcAttribute.array[ 7 ] = 192 - 7;
 						srcAttribute.array[ 8 ] = 64 - 8;
 						srcAttribute.array[ 15 ] = 255 - 15;
-						const srcBuffer = computationRenderer.createBuffer( srcAttribute );
-						shaderNode = new ShaderNode( ( { index }, builder ) => add( index, srcBuffer.getBufferElement( index ) ) );
+						const srcBuffer = storage( srcAttribute );
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 ), 1 );
+						shaderNode = new ShaderNode( ( { index }, stack ) => stack.assign( element( storage( outAttribute ), index ), add( index, element( srcBuffer, index ) ) ) );
 						break;
 
 					case 'Multiplication':
-						shaderNode = new ShaderNode( ( { index }, builder ) => {
-							const result = [ remainder( mul( index, 2 ), 256 ), remainder( mul( index, 3 ), 256 ), remainder( mul( index, 5 ), 256 ) ];
-							return params.backend === 'WebGL' ? color( ...result ) : uvec4( ...result, uint( 255 ) );
-						} );
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 * 4 ), 4 );
+						shaderNode = new ShaderNode( ( { index }, stack ) => {
+							const result = [ remainder( mul( index, 2 ), 256 ), remainder( mul( index, 3 ), 256 ), remainder( mul( index, 5 ), 256 ) ];
+							stack.assign( element( storage( outAttribute ), index ), params.backend === 'WebGL' ? color( ...result ) : uvec4( ...result, uint( 255 ) ) );
+						} );
 						break;
 
 					case 'Random':
-						shaderNode = new ShaderNode( ( { index }, builder ) => {
+						outAttribute = new THREE.BufferAttribute( new TypedArray( 1024 ** 2 * 4 ), 4 );
+						shaderNode = new ShaderNode( ( { index }, stack ) => {
 
-							const r = hash.call( { num: add( mul( index, 4 ), 0 ) }, builder ); // @TODO: Tweak parameters to some that produce a more random image
-							const g = hash.call( { num: add( mul( index, 4 ), 1 ) }, builder );
-							const b = hash.call( { num: add( mul( index, 4 ), 2 ) }, builder );
-							const a = hash.call( { num: add( mul( index, 4 ), 3 ) }, builder ); // Works only in WebGPU
+							const r = hash.call( { num: add( mul( index, 4 ), 0 ) }, stack ); // @TODO: Tweak parameters to some that produce a more random image
+							const g = hash.call( { num: add( mul( index, 4 ), 1 ) }, stack );
+							const b = hash.call( { num: add( mul( index, 4 ), 2 ) }, stack );
+							const a = hash.call( { num: add( mul( index, 4 ), 3 ) }, stack ); // Works only in WebGPU
 
-							return mul( vec4( r, g, b, a ), vec4( 256, 256, 256, 256 ) );
+							stack.assign( element( storage( outAttribute ), index ), mul( vec4( r, g, b, a ), vec4( 256, 256, 256, 256 ) ) );
 
 						} );
-						outAttribute = new THREE.BufferAttribute( new TypedArray( 1024 ** 2 * 4 ), 4 );
 						break;
 
 				}
 
-				const outBuffer = computationRenderer.createBuffer( outAttribute );
-				await computationRenderer.compute( shaderNode, outBuffer, params.reuploadOutput );
-				const { typedArray, buffer } = outBuffer;
+				if ( params.backend === 'WebGL' ) {
+
+					await computationRenderer.compute( shaderNode, new WebGLBuffer( outAttribute ), true );
+
+				} else {
+
+					await computationRenderer.compute( compute( shaderNode, outAttribute.count ), outAttribute, true );
+
+				}
+
+				const typedArray = outAttribute.array;
 
 				if ( params.logBuffers && iteration === 0 ) console.log( params.backend, params.example, typedArray );
 
 				if ( params.backend === 'WebGL' ) {
 
-					if ( params.reuploadOutput === true ) {
-
-						material.map = new THREE.DataTexture( typedArray, buffer.image.width, buffer.image.height, buffer.format, buffer.type );
-						material.map.needsUpdate = true;
-
-					} else {
-
-						material.map = buffer;
-
-					}
+					material.map = new THREE.DataTexture( typedArray, buffer.image.width, buffer.image.height, buffer.format, buffer.type );
+					material.map.needsUpdate = true;
 
 				} else {
 
-					if ( params.reuploadOutput === true ) {
-
-						const uint8TypedArray = uint32ToUint8( typedArray ); // WebGPU can only work with uint8 textures
-						const type = THREE.UnsignedByteType;
-						const format = getTextureFormat( outAttribute );
-						const { width, height } = calculateWidthHeight( outAttribute.count );
-						material.map = new THREE.DataTexture( uint8TypedArray, width, height, format, type );
-						material.map.needsUpdate = true;
-
-					} else {
-
-						// @TODO: Investigate how params.reuploadOutput === false can work with WebGPU renderer (can WebGPU storage buffer be used to populate a texture?)
-
-					}
+					const uint8TypedArray = uint32ToUint8( typedArray ); // WebGPU doesn't currently support sampling uint32 textures
+					const type = THREE.UnsignedByteType;
+					const format = getTextureFormat( outAttribute );
+					const { width, height } = calculateWidthHeight( outAttribute.count );
+					material.map = new THREE.DataTexture( uint8TypedArray, width, height, format, type );
+					material.map.needsUpdate = true;
 
 				}
 
 				await renderer.render( scene, camera );
-
-				computationRenderer.disposeBuffers();
 
 				if ( params.logPerformance ) console.timeEnd( params.backend + ' ' + params.example + ' Iteration-' + iteration );
 

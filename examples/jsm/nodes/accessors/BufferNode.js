@@ -2,7 +2,7 @@ import UniformNode from '../core/UniformNode.js';
 
 class BufferNode extends UniformNode {
 
-	constructor( value, bufferType, bufferCount = 0 ) {
+	constructor( value, bufferType = 'float', bufferCount = 0 ) {
 
 		super( value, bufferType );
 

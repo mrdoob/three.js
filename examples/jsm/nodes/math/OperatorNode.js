@@ -170,7 +170,14 @@ class OperatorNode extends TempNode {
 
 			if ( op === '=' ) {
 
-				builder.addFlowCode( `${a} ${this.op} ${b}` );
+				if ( aNode.isBufferNode === true || aNode.node.isBufferNode === true ) {
+
+					const nodeData = builder.getDataFromNode( aNode.isBufferNode ? aNode : aNode.node, builder.getShaderStage() );
+					if ( nodeData.uniformBuffer !== undefined ) return nodeData.uniformBuffer.setElement( bNode ).build( builder );
+
+				}
+
+				builder.addFlowCode( `${a} = ${b}` );
 
 				return a;
 
