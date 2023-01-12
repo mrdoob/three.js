@@ -218,6 +218,7 @@ class Quaternion {
 		if ( update !== false ) this._onChangeCallback();
 
 		return this;
+		
 	}
 
 	setFromEuler( euler, update ) {

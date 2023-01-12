@@ -308,13 +308,13 @@ class Euler {
 		}
 
 		// making sure angles are in set [-pi, pi]
-		for ( let i = 0; i < 3; i++ ) {
+		for ( let i = 0; i < 3; i ++ ) {
 
-			if ( angles[ i ] < -Math.PI ) {
+			if ( angles[ i ] < - Math.PI ) {
 
 				angles[ i ] += 2 * Math.PI;
 
-			} else if (angles[ i ] > Math.PI) {
+			} else if ( angles[ i ] > Math.PI ) {
 
 				angles[ i ] -= 2 * Math.PI;
 
@@ -327,6 +327,7 @@ class Euler {
 		this._z = angles[ 2 ];
 
 		return this;
+		
 	}
 
 	setFromVector3( v, order = this._order ) {
