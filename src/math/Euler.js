@@ -244,7 +244,7 @@ class Euler {
 
 	}
 
-	// Based on: Bernardes E, Viollet S (2022) Quaternion to Euler angles conversion: 
+	// Based on: Bernardes E, Viollet S (2022) Quaternion to Euler angles conversion:
 	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
 	setFromQuaternionDirect( q, order, update ){
 
@@ -311,7 +311,7 @@ class Euler {
 			} else if (angles[i] > Math.PI) {
 				angles[i] -= 2 * Math.PI;
 			}
-		} 
+		}
 
 		this._x = angles[ 0 ];
 		this._y = angles[ 1 ];

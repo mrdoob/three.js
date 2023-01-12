@@ -204,12 +204,12 @@ class Quaternion {
 		const ux = MathUtils.elementary_unit_vector(euler.order[0]);
 		const uy = MathUtils.elementary_unit_vector(euler.order[1]);
 		const uz = MathUtils.elementary_unit_vector(euler.order[2]);
-		
+
 		const q1 = Quaternion.setFromAxisAngle( ux, x );
 		const q2 = Quaternion.setFromAxisAngle( uy, y );
 		const q3 = Quaternion.setFromAxisAngle( uz, z );
 		const q = q1 * q2 * q3;
-		
+
 		this._x = q._x;
 		this._y = q._y;
 		this._z = q._z;
