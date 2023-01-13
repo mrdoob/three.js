@@ -279,6 +279,8 @@ function Loader( editor ) {
 						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
+						dracoLoader.dispose();
+
 					} );
 
 				}, false );
@@ -296,7 +298,7 @@ function Loader( editor ) {
 
 					const contents = event.target.result;
 
-					let loader;
+					let loader, dracoLoader;
 
 					if ( isGLTF1( contents ) ) {
 
@@ -307,7 +309,7 @@ function Loader( editor ) {
 						const { DRACOLoader } = await import( 'three/addons/loaders/DRACOLoader.js' );
 						const { GLTFLoader } = await import( 'three/addons/loaders/GLTFLoader.js' );
 
-						const dracoLoader = new DRACOLoader();
+						dracoLoader = new DRACOLoader();
 						dracoLoader.setDecoderPath( '../examples/jsm/libs/draco/gltf/' );
 
 						loader = new GLTFLoader( manager );
@@ -322,6 +324,8 @@ function Loader( editor ) {
 
 						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
+
+						dracoLoader.dispose();
 
 					} );
 
@@ -968,6 +972,8 @@ function Loader( editor ) {
 						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
 
+						dracoLoader.dispose();
+
 					} );
 
 					break;
@@ -992,6 +998,8 @@ function Loader( editor ) {
 
 						scene.animations.push( ...result.animations );
 						editor.execute( new AddObjectCommand( editor, scene ) );
+
+						dracoLoader.dispose();
 
 					} );
 
