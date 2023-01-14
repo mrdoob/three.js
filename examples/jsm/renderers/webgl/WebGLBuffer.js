@@ -25,7 +25,7 @@ function getTextureElement( dataTexture, i, width, height ) {
 
 }
 
-function getTextureType( attribute ) {
+export function getTextureType( attribute ) {
 
 	const array = attribute.array;
 

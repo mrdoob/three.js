@@ -44,7 +44,9 @@ class StackNode extends Node {
 
 		}
 
-		return this.outputNode && ( this.outputNode !== this ) ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
+		const outputNode = this.outputNode && ( this.outputNode.uuid !== this.uuid ) ? this.outputNode : this.nodes[ this.nodes.length - 1 ].callNode;
+
+		return outputNode ? outputNode.build( builder, ...params ) : super.build( builder, ...params );
 
 	}
 

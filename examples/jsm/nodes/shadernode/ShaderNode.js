@@ -35,6 +35,12 @@ const shaderNodeHandler = {
 
 				return nodeObject( new SplitNode( node, prop ) );
 
+			} else if ( prop === 'width' || prop === 'height' ) {
+
+				// accessing property
+
+				return nodeObject( new SplitNode( node, prop === 'width' ? 'x' : 'y' ) );
+
 			} else if ( /^\d+$/.test( prop ) === true ) {
 
 				// accessing array

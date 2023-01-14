@@ -1,7 +1,6 @@
+import { Material, WebGLRenderer, Mesh, PlaneGeometry, Scene, Camera } from 'three';
+import { NodeFrame, MeshBasicNodeMaterial } from 'three/nodes';
 import { WebGLNodeBuilder } from './WebGLNodeBuilder.js';
-import { NodeFrame } from 'three/nodes';
-
-import { Material } from 'three';
 
 const builders = new WeakMap();
 export const nodeFrame = new NodeFrame();
@@ -45,5 +44,41 @@ Material.prototype.onBeforeRender = function ( renderer, scene, camera, geometry
 		}
 
 	}
+
+};
+
+WebGLRenderer.prototype.compute = async function ( ...computeNodes ) {
+
+	const material = new MeshBasicNodeMaterial();
+	const geometry = new PlaneGeometry( 2, 2 );
+	const object = new Mesh( geometry, material );
+	const scene = new Scene().add( object );
+	const camera = new Camera();
+
+	for ( const computeNode of computeNodes ) {
+
+		material.colorNode = computeNode.computeNode;
+		material.needsUpdate = true;
+
+		this.compile( scene, camera ); // Compile material and populate outComputeBuffer
+
+		const outBuffer = builders.get( material ).outComputeBuffer;
+
+		const renderTarget = outBuffer.renderTarget;
+		const currentRenderTarget = this.getRenderTarget();
+		this.setRenderTarget( renderTarget );
+		// nodeFrame.update();
+		this.render( scene, camera );
+		if ( computeNode.populateOutArray === true ) { // Note that if this is false then the results will be available only for further computeNodes, and will not be available after the completion of WebGLRenderer.compute()
+
+			this.readRenderTargetPixels( renderTarget, 0, 0, renderTarget.width, renderTarget.height, outBuffer.attribute.array );
+
+		}
+		this.setRenderTarget( currentRenderTarget );
+
+	}
+
+	material.dispose();
+	geometry.dispose();
 
 };

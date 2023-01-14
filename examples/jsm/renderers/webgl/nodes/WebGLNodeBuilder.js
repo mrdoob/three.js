@@ -1,7 +1,7 @@
-import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder } from 'three/nodes';
+import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
+import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, uint, viewportCoordinate, viewportResolution } from 'three/nodes';
 import SlotNode from './SlotNode.js';
 import WebGLBuffer from '../WebGLBuffer.js';
-import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
 
 const nodeFrame = new NodeFrame();
 nodeFrame.camera = new PerspectiveCamera();
@@ -32,12 +32,14 @@ function getShaderStageProperty( shaderStage ) {
 
 class WebGLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, shader ) {
+	constructor( object, renderer, shader = {} ) {
 
 		super( object, renderer, new GLSLNodeParser() );
 
 		this.shader = shader;
 		this.slots = { vertex: [], fragment: [] };
+
+		this.outComputeBuffer = null;
 
 		this._parseShaderLib();
 		this._parseInclude( 'fragment', 'lights_physical_fragment', 'clearcoat_normal_fragment_begin', 'transmission_fragment' );
@@ -523,6 +525,18 @@ class WebGLNodeBuilder extends NodeBuilder {
 		}
 
 		return snippet;
+
+	}
+
+	getInstanceIndex() {
+
+		const node = uint( viewportCoordinate.y ).mul( viewportResolution.width ).add( uint( viewportCoordinate.x ) ); // @COMMENT: Not sure why this uints are needed -- I fixed ViewportNode so that it produces uvec viewportCoordinate and viewportResolution...
+
+		const currentBuildStage = this.getBuildStage();
+		this.setBuildStage( 'construct' );
+		node.build( this );
+		this.setBuildStage( currentBuildStage );
+		return node.build( this ); // @COMMENT: I feel like this is a little bit overcomplicated...
 
 	}
 

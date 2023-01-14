@@ -375,6 +375,56 @@ class WebGPURenderer {
 
 	}
 
+	async compute( ...computeNodes ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		const device = this._device;
+		const computePipelines = this._computePipelines;
+
+		const cmdEncoder = device.createCommandEncoder( {} );
+		const passEncoder = cmdEncoder.beginComputePass();
+
+		for ( const computeNode of computeNodes ) {
+
+			// onInit
+
+			if ( computePipelines.has( computeNode ) === false ) {
+
+				computeNode.onInit( { renderer: this } );
+
+			}
+
+			// pipeline
+
+			const pipeline = computePipelines.get( computeNode );
+			passEncoder.setPipeline( pipeline );
+
+			// node
+
+			//this._nodes.update( computeNode );
+
+			// bind group
+
+			const bindGroup = this._bindings.get( computeNode ).group;
+			this._bindings.update( computeNode );
+			passEncoder.setBindGroup( 0, bindGroup );
+
+			passEncoder.dispatchWorkgroups( computeNode.dispatchCount );
+
+		}
+
+		passEncoder.end();
+		device.queue.submit( [ cmdEncoder.finish() ] );
+
+	}
+
+	async populateArray( attribute ) {
+
+		attribute.array = new attribute.array.constructor( await this._attributes.getArrayBuffer( attribute ) );
+
+	}
+
 	setAnimationLoop( callback ) {
 
 		if ( this._initialized === false ) this.init();
@@ -384,12 +434,6 @@ class WebGPURenderer {
 		animation.setAnimationLoop( callback );
 
 		( callback === null ) ? animation.stop() : animation.start();
-
-	}
-
-	async getArrayBuffer( attribute ) {
-
-		return await this._attributes.getArrayBuffer( attribute );
 
 	}
 
@@ -618,50 +662,6 @@ class WebGPURenderer {
 	setRenderTarget( renderTarget ) {
 
 		this._renderTarget = renderTarget;
-
-	}
-
-	async compute( ...computeNodes ) {
-
-		if ( this._initialized === false ) await this.init();
-
-		const device = this._device;
-		const computePipelines = this._computePipelines;
-
-		const cmdEncoder = device.createCommandEncoder( {} );
-		const passEncoder = cmdEncoder.beginComputePass();
-
-		for ( const computeNode of computeNodes ) {
-
-			// onInit
-
-			if ( computePipelines.has( computeNode ) === false ) {
-
-				computeNode.onInit( { renderer: this } );
-
-			}
-
-			// pipeline
-
-			const pipeline = computePipelines.get( computeNode );
-			passEncoder.setPipeline( pipeline );
-
-			// node
-
-			//this._nodes.update( computeNode );
-
-			// bind group
-
-			const bindGroup = this._bindings.get( computeNode ).group;
-			this._bindings.update( computeNode );
-			passEncoder.setBindGroup( 0, bindGroup );
-
-			passEncoder.dispatchWorkgroups( computeNode.dispatchCount );
-
-		}
-
-		passEncoder.end();
-		device.queue.submit( [ cmdEncoder.finish() ] );
 
 	}
 

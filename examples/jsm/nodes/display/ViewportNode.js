@@ -19,7 +19,7 @@ class ViewportNode extends Node {
 
 	getNodeType() {
 
-		return this.scope === ViewportNode.COORDINATE ? 'vec4' : 'vec2';
+		return this.scope === ViewportNode.COORDINATE ? 'uvec4' : ( this.scope === ViewportNode.COORDINATE ? 'uvec2' : 'vec2' );
 
 	}
 
@@ -41,7 +41,7 @@ class ViewportNode extends Node {
 
 	update( { renderer } ) {
 
-		renderer.getSize( resolution );
+		renderer.getSize( resolution || ( resolution = new Vector2() ) );
 
 	}
 
@@ -55,7 +55,7 @@ class ViewportNode extends Node {
 
 		if ( scope === ViewportNode.RESOLUTION ) {
 
-			output = uniform( resolution || ( resolution = new Vector2() ) );
+			output = uniform( resolution || ( resolution = new Vector2() ), 'uvec2' );
 
 		} else {
 

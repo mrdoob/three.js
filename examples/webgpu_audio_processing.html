@@ -59,9 +59,9 @@
 
 				// compute audio
 
-				renderer.compute( computeNode );
-
-				const waveArray = new Float32Array( await renderer.getArrayBuffer( waveGPUBuffer ) );
+				await renderer.compute( computeNode );
+				await renderer.populateArray( waveGPUBuffer );
+				const waveArray = waveGPUBuffer.array;
 
 				// play result
 

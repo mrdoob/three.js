@@ -40,23 +40,26 @@ class AssignNode extends TempNode {
 	generate( builder, output ) {
 
 		const aNode = this.aNode;
-		const bNode = this.bNode;
-
 		const type = this.getNodeType( builder, output );
-
 		const a = aNode.build( builder, type );
-		const b = bNode.build( builder, type );
 
-		const outputLength = builder.getTypeLength( output );
+		if ( aNode.isBufferNode === true || aNode.node.isBufferNode === true ) {
 
-		if ( output !== 'void' ) {
+			const nodeData = builder.getDataFromNode( aNode.isBufferNode ? aNode : aNode.node, builder.getShaderStage() );
+			const buffer = nodeData.uniformBuffer;
+			if ( buffer !== undefined ) {
 
-			if ( aNode.isBufferNode === true || aNode.node.isBufferNode === true ) {
-
-				const nodeData = builder.getDataFromNode( aNode.isBufferNode ? aNode : aNode.node, builder.getShaderStage() );
-				if ( nodeData.uniformBuffer !== undefined ) return nodeData.uniformBuffer.setElement( bNode ).build( builder );
+				builder.outComputeBuffer = buffer;
+				return buffer.setElement( this.bNode ).build( builder );
 
 			}
+
+		}
+
+		const bNode = this.bNode;
+		const b = bNode.build( builder, type );
+
+		if ( output !== 'void' ) {
 
 			builder.addFlowCode( `${a} = ${b}` );
 

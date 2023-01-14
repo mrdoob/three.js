@@ -27,15 +27,14 @@
 
 			import * as THREE from 'three';
 
-			import { ShaderNode, color, remainder, add, sub, mul, uint, bitXor, shiftRight, vec4, uvec4, storage, element, compute } from 'three/nodes';
+			import { ShaderNode, color, remainder, add, sub, mul, uint, bitXor, shiftRight, vec4, uvec4, storage, element, compute, instanceIndex } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
-			import WebGLComputationRenderer from 'three/addons/gpgpu/WebGLComputationRenderer.js';
-			import WebGPUComputationRenderer from 'three/addons/gpgpu/WebGPUComputationRenderer.js';
+			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
-			import WebGLBuffer, { getTextureFormat, calculateWidthHeight } from 'three/addons/renderers/webgl/WebGLBuffer.js';
+			import { getTextureType, getTextureFormat, calculateWidthHeight } from 'three/addons/renderers/webgl/WebGLBuffer.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -141,13 +140,11 @@
 				if ( params.backend === 'WebGL' ) {
 
 					renderer = new THREE.WebGLRenderer();
-					computationRenderer = new WebGLComputationRenderer( renderer );
 
 				} else {
 
 					renderer = new WebGPURenderer();
 					await renderer.init();
-					computationRenderer = new WebGPUComputationRenderer( renderer );
 
 				}
 
@@ -180,21 +177,23 @@
 
 				const TypedArray = params.backend === 'WebGL' ? Uint8Array : Uint32Array; // WebGPU can only work with uint32
 
+				const index = instanceIndex; // @COMMENT: Maybe make this an alias to instanceIndex in ShaderNodeBaseElements?
+
 				switch ( params.example ) {
 
 					case 'Passthrough':
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 ), 1 );
-						shaderNode = new ShaderNode( ( { index }, stack ) => stack.assign( element( storage( outAttribute ), index ), index ) );
+						shaderNode = new ShaderNode( ( {}, stack ) => stack.assign( element( storage( outAttribute ), index ), index ) );
 						break;
 
 					case 'AntiPassthrough':
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 ), 1 );
-						shaderNode = new ShaderNode( ( { index }, stack ) => stack.assign( element( storage( outAttribute ), index ), sub( 255, index ) ) );
+						shaderNode = new ShaderNode( ( {}, stack ) => stack.assign( element( storage( outAttribute ), index ), sub( 255, index ) ) );
 						break;
 
 					case 'PassthroughColor':
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 * 4 ), 4 );
-						shaderNode = new ShaderNode( ( { index }, stack ) => stack.assign( element( storage( outAttribute ), index ), params.backend === 'WebGL' ? index : uvec4( index, index, index, uint( 255 ) ) ) );
+						shaderNode = new ShaderNode( ( {}, stack ) => stack.assign( element( storage( outAttribute ), index ), params.backend === 'WebGL' ? index : uvec4( index, index, index, uint( 255 ) ) ) );
 						break;
 
 					case 'ElementManipulation':
@@ -205,20 +204,23 @@
 						srcAttribute.array[ 15 ] = 255 - 15;
 						const srcBuffer = storage( srcAttribute );
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 ), 1 );
-						shaderNode = new ShaderNode( ( { index }, stack ) => stack.assign( element( storage( outAttribute ), index ), add( index, element( srcBuffer, index ) ) ) );
+						shaderNode = new ShaderNode( ( {}, stack ) => stack.assign( element( storage( outAttribute ), index ), add( index, element( srcBuffer, index ) ) ) );
 						break;
 
 					case 'Multiplication':
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 256 * 4 ), 4 );
-						shaderNode = new ShaderNode( ( { index }, stack ) => {
+						shaderNode = new ShaderNode( ( {}, stack ) => {
+
 							const result = [ remainder( mul( index, 2 ), 256 ), remainder( mul( index, 3 ), 256 ), remainder( mul( index, 5 ), 256 ) ];
 							stack.assign( element( storage( outAttribute ), index ), params.backend === 'WebGL' ? color( ...result ) : uvec4( ...result, uint( 255 ) ) );
+							return stack; // @COMMENT: This `return stack`s should not be needed...
+
 						} );
 						break;
 
 					case 'Random':
 						outAttribute = new THREE.BufferAttribute( new TypedArray( 1024 ** 2 * 4 ), 4 );
-						shaderNode = new ShaderNode( ( { index }, stack ) => {
+						shaderNode = new ShaderNode( ( {}, stack ) => {
 
 							const r = hash.call( { num: add( mul( index, 4 ), 0 ) }, stack ); // @TODO: Tweak parameters to some that produce a more random image
 							const g = hash.call( { num: add( mul( index, 4 ), 1 ) }, stack );
@@ -227,40 +229,28 @@
 
 							stack.assign( element( storage( outAttribute ), index ), mul( vec4( r, g, b, a ), vec4( 256, 256, 256, 256 ) ) );
 
+							return stack;
+
 						} );
 						break;
 
 				}
 
-				if ( params.backend === 'WebGL' ) {
+				await renderer.compute( compute( shaderNode, outAttribute.count ) );
+				if ( params.backend === 'WebGPU' ) await renderer.populateArray( outAttribute );
 
-					await computationRenderer.compute( shaderNode, new WebGLBuffer( outAttribute ), true );
-
-				} else {
-
-					await computationRenderer.compute( compute( shaderNode, outAttribute.count ), outAttribute, true );
-
-				}
-
-				const typedArray = outAttribute.array;
+				let typedArray = outAttribute.array;
 
 				if ( params.logBuffers && iteration === 0 ) console.log( params.backend, params.example, typedArray );
 
-				if ( params.backend === 'WebGL' ) {
+				if ( params.backend === 'WebGPU' ) typedArray = uint32ToUint8( typedArray ); // WebGPU doesn't currently support sampling uint32 textures
 
-					material.map = new THREE.DataTexture( typedArray, buffer.image.width, buffer.image.height, buffer.format, buffer.type );
-					material.map.needsUpdate = true;
+				const type = getTextureType( outAttribute );
+				const format = getTextureFormat( outAttribute );
+				const { width, height } = calculateWidthHeight( outAttribute.count );
 
-				} else {
-
-					const uint8TypedArray = uint32ToUint8( typedArray ); // WebGPU doesn't currently support sampling uint32 textures
-					const type = THREE.UnsignedByteType;
-					const format = getTextureFormat( outAttribute );
-					const { width, height } = calculateWidthHeight( outAttribute.count );
-					material.map = new THREE.DataTexture( uint8TypedArray, width, height, format, type );
-					material.map.needsUpdate = true;
-
-				}
+				material.map = new THREE.DataTexture( typedArray, width, height, format, type );
+				material.map.needsUpdate = true;
 
 				await renderer.render( scene, camera );
 
