@@ -1,5 +1,6 @@
 // core
 //import ArrayUniformNode from '../core/ArrayUniformNode.js';
+import AssignNode from '../core/AssignNode.js';
 import AttributeNode from '../core/AttributeNode.js';
 import BypassNode from '../core/BypassNode.js';
 import CacheNode from '../core/CacheNode.js';
@@ -204,13 +205,14 @@ export const INFINITY = float( 1e6 );
 
 export const cond = nodeProxy( CondNode );
 
+export const assign = nodeProxy( AssignNode );
+
 export const add = nodeProxy( OperatorNode, '+' );
 export const sub = nodeProxy( OperatorNode, '-' );
 export const mul = nodeProxy( OperatorNode, '*' );
 export const div = nodeProxy( OperatorNode, '/' );
 export const remainder = nodeProxy( OperatorNode, '%' );
 export const equal = nodeProxy( OperatorNode, '==' );
-export const assign = nodeProxy( OperatorNode, '=' );
 export const lessThan = nodeProxy( OperatorNode, '<' );
 export const greaterThan = nodeProxy( OperatorNode, '>' );
 export const lessThanEqual = nodeProxy( OperatorNode, '<=' );

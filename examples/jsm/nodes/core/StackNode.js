@@ -1,5 +1,5 @@
 import Node from './Node.js';
-import OperatorNode from '../math/OperatorNode.js';
+import AssignNode from './AssignNode.js';
 import BypassNode from '../core/BypassNode.js';
 import ExpressionNode from '../core/ExpressionNode.js';
 
@@ -32,7 +32,7 @@ class StackNode extends Node {
 
 	assign( targetNode, sourceValue ) {
 
-		return this.add( new OperatorNode( '=', targetNode, sourceValue ) );
+		return this.add( new AssignNode( targetNode, sourceValue ) );
 
 	}
 
@@ -44,7 +44,7 @@ class StackNode extends Node {
 
 		}
 
-		return this.outputNode ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
+		return this.outputNode && ( this.outputNode !== this ) ? this.outputNode.build( builder, ...params ) : super.build( builder, ...params );
 
 	}
 

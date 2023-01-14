@@ -27,12 +27,6 @@ class OperatorNode extends TempNode {
 
 	}
 
-	hasDependencies( builder ) {
-
-		return this.op !== '=' ? super.hasDependencies( builder ) : false;
-
-	}
-
 	getNodeType( builder, output ) {
 
 		const op = this.op;
@@ -47,7 +41,7 @@ class OperatorNode extends TempNode {
 
 			return 'void';
 
-		} else if ( op === '=' || op === '%' ) {
+		} else if ( op === '%' ) {
 
 			return typeA;
 
@@ -114,11 +108,7 @@ class OperatorNode extends TempNode {
 			typeA = aNode.getNodeType( builder );
 			typeB = bNode.getNodeType( builder );
 
-			if ( op === '=' ) {
-
-				typeB = typeA;
-
-			} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
+			if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
 				if ( builder.isVector( typeA ) ) {
 
@@ -168,20 +158,7 @@ class OperatorNode extends TempNode {
 
 		if ( output !== 'void' ) {
 
-			if ( op === '=' ) {
-
-				if ( aNode.isBufferNode === true || aNode.node.isBufferNode === true ) {
-
-					const nodeData = builder.getDataFromNode( aNode.isBufferNode ? aNode : aNode.node, builder.getShaderStage() );
-					if ( nodeData.uniformBuffer !== undefined ) return nodeData.uniformBuffer.setElement( bNode ).build( builder );
-
-				}
-
-				builder.addFlowCode( `${a} = ${b}` );
-
-				return a;
-
-			} else if ( op === '<' && outputLength > 1 ) {
+			if ( op === '<' && outputLength > 1 ) {
 
 				return builder.format( `${ builder.getMethod( 'lessThan' ) }( ${a}, ${b} )`, type, output );
 

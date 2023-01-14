@@ -29,7 +29,7 @@ class TempNode extends Node {
 
 				return builder.format( nodeData.propertyName, type, output );
 
-			} else if ( builder.context.tempWrite !== false && type !== 'void ' && output !== 'void' && this.hasDependencies( builder ) ) {
+			} else if ( builder.context.tempWrite !== false && type !== 'void' && output !== 'void' && this.hasDependencies( builder ) ) {
 
 				const snippet = super.build( builder, type );
 

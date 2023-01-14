@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import OperatorNode from '../math/OperatorNode.js';
+import AssignNode from './AssignNode.js';
 
 class VarNode extends Node {
 
@@ -22,7 +23,9 @@ class VarNode extends Node {
 
 	assign( ...params ) {
 
-		return this.op( '=', ...params );
+		this.node = new AssignNode( this.node, ...params );
+
+		return this;
 
 	}
 
