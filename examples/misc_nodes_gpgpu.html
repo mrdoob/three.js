@@ -213,7 +213,7 @@
 
 							const result = [ remainder( mul( index, 2 ), 256 ), remainder( mul( index, 3 ), 256 ), remainder( mul( index, 5 ), 256 ) ];
 							stack.assign( element( storage( outAttribute ), index ), params.backend === 'WebGL' ? color( ...result ) : uvec4( ...result, uint( 255 ) ) );
-							return stack; // @COMMENT: This `return stack`s should not be needed...
+							return stack;
 
 						} );
 						break;

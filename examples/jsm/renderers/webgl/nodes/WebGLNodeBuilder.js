@@ -530,13 +530,13 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	getInstanceIndex() {
 
-		const node = uint( viewportCoordinate.y ).mul( viewportResolution.width ).add( uint( viewportCoordinate.x ) ); // @COMMENT: Not sure why this uints are needed -- I fixed ViewportNode so that it produces uvec viewportCoordinate and viewportResolution...
+		const node = uint( viewportCoordinate.y ).mul( viewportResolution.width ).add( uint( viewportCoordinate.x ) );
 
 		const currentBuildStage = this.getBuildStage();
 		this.setBuildStage( 'construct' );
 		node.build( this );
 		this.setBuildStage( currentBuildStage );
-		return node.build( this ); // @COMMENT: I feel like this is a little bit overcomplicated...
+		return node.build( this );
 
 	}
 
