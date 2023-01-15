@@ -3,7 +3,7 @@ import { NodeUpdateType } from '../core/constants.js';
 
 class ComputeNode extends Node {
 
-	constructor( computeNode, count = 0, populateOutArray = true, workgroupSize = [ 64 ] ) {
+	constructor( computeNode, count = 0, workgroupSize = [ 64 ] ) {
 
 		super( 'void' );
 
@@ -14,8 +14,6 @@ class ComputeNode extends Node {
 		this.count = count;
 		this.workgroupSize = workgroupSize;
 		this.dispatchCount = 0;
-
-		this.populateOutArray = true;
 
 		this.updateType = NodeUpdateType.OBJECT;
 

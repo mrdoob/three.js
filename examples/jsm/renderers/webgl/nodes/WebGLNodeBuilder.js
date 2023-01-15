@@ -1,5 +1,5 @@
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
-import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, uint, viewportCoordinate, viewportResolution } from 'three/nodes';
+import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, viewportCoordinate, viewportResolution } from 'three/nodes';
 import SlotNode from './SlotNode.js';
 import WebGLBuffer from '../WebGLBuffer.js';
 
@@ -466,7 +466,10 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		if ( ( nodeData.uniformBuffer === undefined ) && ( type === 'buffer' || type === 'storageBuffer' ) ) {
 
-			nodeData.uniformBuffer = new WebGLBuffer( node.value );
+			if ( this.renderer.bindings === undefined ) this.renderer.bindings = new Map();
+			const buffer = this.renderer.bindings.get( node.value ) || new WebGLBuffer( node.value );
+			this.renderer.bindings.set( node.value, buffer );
+			nodeData.uniformBuffer = buffer;
 
 		}
 
@@ -530,7 +533,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	getInstanceIndex() {
 
-		const node = uint( viewportCoordinate.y ).mul( viewportResolution.width ).add( uint( viewportCoordinate.x ) );
+		const node = ( viewportCoordinate.y ).mul( viewportResolution.width ).add( viewportCoordinate.x );
 
 		const currentBuildStage = this.getBuildStage();
 		this.setBuildStage( 'construct' );
@@ -609,7 +612,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	getFragCoord() {
 
-		return 'gl_FragCoord';
+		return 'uvec4( gl_FragCoord )';
 
 	}
 

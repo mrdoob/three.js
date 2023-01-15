@@ -419,9 +419,19 @@ class WebGPURenderer {
 
 	}
 
-	async populateArray( attribute ) {
+	async deuploadBufferAttribute( attribute, overwrite = true ) {
 
-		attribute.array = new attribute.array.constructor( await this._attributes.getArrayBuffer( attribute ) );
+		const array = new attribute.array.constructor( await this._attributes.getArrayBuffer( attribute ) );
+
+		if ( overwrite === true ) {
+
+			attribute.array = array;
+
+		} else {
+
+			attribute.array.set( array );
+
+		}
 
 	}
 

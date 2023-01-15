@@ -168,12 +168,12 @@ export const func = ( code, includes ) => {
 
 };
 
-export const uniform = ( nodeOrType ) => {
+export const uniform = ( arg1, arg2 ) => {
 
-	const nodeType = getConstNodeType( nodeOrType );
+	const nodeType = getConstNodeType( arg2 || arg1 );
 
 	// @TODO: get ConstNode from .traverse() in the future
-	const value = nodeOrType.isNode === true ? ( nodeOrType.node && nodeOrType.node.value ) || nodeOrType.value : nodeOrType;
+	const value = arg1.isNode === true ? ( arg1.node && arg1.node.value ) || arg1.value : arg1;
 
 	return nodeObject( new UniformNode( value, nodeType ) );
 
@@ -359,7 +359,7 @@ export const pointUV = nodeImmutable( PointUVNode );
 
 // gpgpu
 
-export const compute = ( node, count, populateOutArray, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, populateOutArray, workgroupSize ) );
+export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
 
 // display
 

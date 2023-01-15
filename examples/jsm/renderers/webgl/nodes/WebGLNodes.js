@@ -55,6 +55,8 @@ WebGLRenderer.prototype.compute = async function ( ...computeNodes ) {
 	const scene = new Scene().add( object );
 	const camera = new Camera();
 
+	const currentRenderTarget = this.getRenderTarget();
+
 	for ( const computeNode of computeNodes ) {
 
 		material.colorNode = computeNode.computeNode;
@@ -64,21 +66,35 @@ WebGLRenderer.prototype.compute = async function ( ...computeNodes ) {
 
 		const outBuffer = builders.get( material ).outComputeBuffer;
 
-		const renderTarget = outBuffer.renderTarget;
-		const currentRenderTarget = this.getRenderTarget();
-		this.setRenderTarget( renderTarget );
+		this.setRenderTarget( outBuffer.renderTarget );
 		// nodeFrame.update();
 		this.render( scene, camera );
-		if ( computeNode.populateOutArray === true ) { // Note that if this is false then the results will be available only for further computeNodes, and will not be available after the completion of WebGLRenderer.compute()
-
-			this.readRenderTargetPixels( renderTarget, 0, 0, renderTarget.width, renderTarget.height, outBuffer.attribute.array );
-
-		}
-		this.setRenderTarget( currentRenderTarget );
 
 	}
 
+	this.setRenderTarget( currentRenderTarget );
+
 	material.dispose();
 	geometry.dispose();
+
+};
+
+WebGLRenderer.prototype.deuploadBufferAttribute = async function ( attribute ) {
+
+	const { renderTarget } = this.bindings.get( attribute );
+	this.readRenderTargetPixels( renderTarget, 0, 0, renderTarget.width, renderTarget.height, attribute.array );
+
+};
+
+const dispose = WebGLRenderer.prototype.dispose;
+WebGLRenderer.prototype.dispose = function() {
+
+	dispose.apply( this );
+	if ( this.bindings !== undefined ) {
+
+		this.bindings.forEach( buffer => buffer.dispose() );
+		this.bindings.clear();
+
+	}
 
 };

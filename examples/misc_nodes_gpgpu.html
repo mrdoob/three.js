@@ -60,7 +60,7 @@
 
 			} );
 
-			let camera, scene, material, renderer, computationRenderer, iterations;
+			let camera, scene, material, renderer, iterations;
 
 			init();
 
@@ -177,7 +177,7 @@
 
 				const TypedArray = params.backend === 'WebGL' ? Uint8Array : Uint32Array; // WebGPU can only work with uint32
 
-				const index = instanceIndex; // @COMMENT: Maybe make this an alias to instanceIndex in ShaderNodeBaseElements?
+				const index = instanceIndex;
 
 				switch ( params.example ) {
 
@@ -237,7 +237,7 @@
 				}
 
 				await renderer.compute( compute( shaderNode, outAttribute.count ) );
-				if ( params.backend === 'WebGPU' ) await renderer.populateArray( outAttribute );
+				await renderer.deuploadBufferAttribute( outAttribute );
 
 				let typedArray = outAttribute.array;
 

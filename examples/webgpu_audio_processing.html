@@ -60,7 +60,7 @@
 				// compute audio
 
 				await renderer.compute( computeNode );
-				await renderer.populateArray( waveGPUBuffer );
+				await renderer.deuploadBufferAttribute( waveGPUBuffer );
 				const waveArray = waveGPUBuffer.array;
 
 				// play result
