@@ -99,6 +99,8 @@ class Object3DNode extends Node {
 
 		}
 
+		this._uniformNode.construct( builder );
+
 		return this._uniformNode.build( builder );
 
 	}

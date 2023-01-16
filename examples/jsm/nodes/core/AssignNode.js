@@ -42,7 +42,7 @@ class AssignNode extends TempNode {
 		const aNode = this.aNode;
 		const bNode = this.bNode;
 
-		if ( aNode.isBufferNode === true || aNode.node.isBufferNode === true ) { // TODO: Maybe this can be moved to .construct()?
+		if ( aNode.isBufferNode === true || ( aNode.node && aNode.node.isBufferNode === true ) ) { // TODO: Maybe this can be moved to .construct()?
 
 			const nodeData = builder.getDataFromNode( aNode.isBufferNode ? aNode : aNode.node, builder.getShaderStage() );
 			const buffer = nodeData.uniformBuffer;

@@ -243,11 +243,16 @@
 
 				if ( params.logBuffers && iteration === 0 ) console.log( params.backend, params.example, typedArray );
 
-				if ( params.backend === 'WebGPU' ) typedArray = uint32ToUint8( typedArray ); // WebGPU doesn't currently support sampling uint32 textures
-
-				const type = getTextureType( outAttribute );
+				let type = getTextureType( outAttribute );
 				const format = getTextureFormat( outAttribute );
 				const { width, height } = calculateWidthHeight( outAttribute.count );
+
+				if ( params.backend === 'WebGPU' ) { // WebGPU doesn't currently support sampling uint32 textures
+
+					typedArray = uint32ToUint8( typedArray );
+					type = THREE.UnsignedByteType;
+
+				}
 
 				material.map = new THREE.DataTexture( typedArray, width, height, format, type );
 				material.map.needsUpdate = true;
