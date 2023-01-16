@@ -30,14 +30,15 @@ class SplitNode extends Node {
 
 	getNodeType( builder ) {
 
-		return builder.getTypeFromLength( this.components.length );
+		return builder.getTypeFromLength( this.components.length, builder.getComponentType( this.node.getNodeType( builder ) ) );
 
 	}
 
 	generate( builder, output ) {
 
 		const node = this.node;
-		const nodeTypeLength = builder.getTypeLength( node.getNodeType( builder ) );
+		const nodeType = node.getNodeType( builder );
+		const nodeTypeLength = builder.getTypeLength( nodeType );
 
 		let snippet = null;
 
@@ -51,7 +52,7 @@ class SplitNode extends Node {
 
 				// needed expand the input node
 
-				type = builder.getTypeFromLength( this.getVectorLength() );
+				type = builder.getTypeFromLength( this.getVectorLength(), builder.getComponentType( nodeType ) );
 
 			}
 

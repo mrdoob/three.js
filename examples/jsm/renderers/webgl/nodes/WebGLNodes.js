@@ -69,7 +69,7 @@ WebGLRenderer.prototype.compute = async function ( ...computeNodes ) {
 		const outBuffer = builders.get( material ).outComputeBuffer;
 
 		this.setRenderTarget( outBuffer.renderTarget );
-		// nodeFrame.update();
+		nodeFrame.update();
 		this.render( scene, camera );
 
 	}

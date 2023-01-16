@@ -1,5 +1,5 @@
 import { PerspectiveCamera, ShaderChunk, ShaderLib, UniformsUtils, UniformsLib } from 'three';
-import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, viewportCoordinate, viewportResolution } from 'three/nodes';
+import { defaultShaderStages, NodeFrame, MathNode, GLSLNodeParser, NodeBuilder, viewportCoordinate } from 'three/nodes';
 import SlotNode from './SlotNode.js';
 import WebGLBuffer from '../WebGLBuffer.js';
 
@@ -533,7 +533,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	getInstanceIndex() {
 
-		const node = ( viewportCoordinate.y ).mul( viewportResolution.width ).add( viewportCoordinate.x );
+		const node = ( viewportCoordinate.y ).mul( this.outComputeBuffer.texture.image.width ).add( viewportCoordinate.x );
 
 		const currentBuildStage = this.getBuildStage();
 		this.setBuildStage( 'construct' );
