@@ -49,7 +49,7 @@ class AssignNode extends TempNode {
 			if ( buffer !== undefined ) {
 
 				builder.outComputeBuffer = buffer;
-				return buffer.setElement( bNode ).build( builder );
+				return buffer.setElement( bNode ).build( builder, output );
 
 			}
 
