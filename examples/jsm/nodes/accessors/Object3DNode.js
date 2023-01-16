@@ -81,6 +81,8 @@ class Object3DNode extends Node {
 
 	}
 
+	construct() {} // Clear .construct() so that if it is called (e.g. for CameraNode) it does not call this._uniformNode.construct() before its nodeType is set
+
 	generate( builder ) {
 
 		const scope = this.scope;

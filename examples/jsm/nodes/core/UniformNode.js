@@ -40,6 +40,8 @@ class UniformNode extends InputNode {
 
 	generate( builder, output ) {
 
+		if ( this._nodeUniform === undefined ) this.construct( builder ); // just-in-case -- this line shouldn't be required
+
 		const type = this.getNodeType( builder );
 
 		const propertyName = builder.getPropertyName( this._nodeUniform );

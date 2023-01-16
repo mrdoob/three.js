@@ -164,8 +164,6 @@
 				const iteration = iterations[ params.example ];
 				iterations[ params.example ] ++;
 
-				if ( params.logPerformance ) console.time( params.backend + ' ' + params.example + ' Iteration-' + iteration );
-
 				if ( material.map !== null ) {
 
 					material.map.dispose();
@@ -236,8 +234,12 @@
 
 				}
 
+				if ( params.logPerformance ) console.time( params.backend + ' ' + params.example + ' Iteration-' + iteration );
+
 				await renderer.compute( compute( shaderNode, outAttribute.count ) );
 				await renderer.deuploadBufferAttribute( outAttribute );
+
+				if ( params.logPerformance ) console.timeEnd( params.backend + ' ' + params.example + ' Iteration-' + iteration );
 
 				let typedArray = outAttribute.array;
 
@@ -258,8 +260,6 @@
 				material.map.needsUpdate = true;
 
 				await renderer.render( scene, camera );
-
-				if ( params.logPerformance ) console.timeEnd( params.backend + ' ' + params.example + ' Iteration-' + iteration );
 
 				if ( iteration < params.warmUps ) await showExample();
 
