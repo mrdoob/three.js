@@ -40,23 +40,24 @@ class AssignNode extends TempNode {
 	generate( builder, output ) {
 
 		const aNode = this.aNode;
-		const type = this.getNodeType( builder, output );
-		const a = aNode.build( builder, type );
+		const bNode = this.bNode;
 
-		if ( aNode.isBufferNode === true || aNode.node.isBufferNode === true ) {
+		if ( aNode.isBufferNode === true || aNode.node.isBufferNode === true ) { // TODO: Maybe this can be moved to .construct()?
 
 			const nodeData = builder.getDataFromNode( aNode.isBufferNode ? aNode : aNode.node, builder.getShaderStage() );
 			const buffer = nodeData.uniformBuffer;
 			if ( buffer !== undefined ) {
 
 				builder.outComputeBuffer = buffer;
-				return buffer.setElement( this.bNode ).build( builder );
+				return buffer.setElement( bNode ).build( builder );
 
 			}
 
 		}
 
-		const bNode = this.bNode;
+		const type = this.getNodeType( builder, output );
+
+		const a = aNode.build( builder, type );
 		const b = bNode.build( builder, type );
 
 		if ( output !== 'void' ) {

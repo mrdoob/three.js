@@ -2,26 +2,26 @@ import Node from './Node.js';
 
 class ExpressionNode extends Node {
 
-	constructor( snipped = '', nodeType = 'void' ) {
+	constructor( snippet = '', nodeType = 'void' ) {
 
 		super( nodeType );
 
-		this.snipped = snipped;
+		this.snippet = snippet;
 
 	}
 
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
-		const snipped = this.snipped;
+		const snippet = this.snippet;
 
 		if ( type === 'void' ) {
 
-			builder.addFlowCode( snipped );
+			builder.addFlowCode( snippet );
 
 		} else {
 
-			return builder.format( `( ${ snipped } )`, type, output );
+			return builder.format( `( ${ snippet } )`, type, output );
 
 		}
 

@@ -9,7 +9,9 @@ Material.prototype.onBuild = function ( object, parameters, renderer ) {
 
 	if ( object.material.isNodeMaterial === true ) {
 
-		builders.set( this, new WebGLNodeBuilder( object, renderer, parameters ).build() );
+		const builder = new WebGLNodeBuilder( object, renderer, parameters );
+		builder.build();
+		builders.set( this, builder );
 
 	}
 

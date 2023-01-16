@@ -19,9 +19,7 @@ class ArrayElementNode extends TempNode {
 
 	generate( builder ) {
 
-		const nodeSnippet = this.node.build( builder ); // We should build the node before accessing its nodeData
-
-		if ( this.node.isBufferNode === true ) {
+		if ( this.node.isBufferNode === true ) { // TODO: Maybe this can be moved to .construct()?
 
 			const nodeData = builder.getDataFromNode( this.node, builder.getShaderStage() );
 			const buffer = nodeData.uniformBuffer;
@@ -33,6 +31,7 @@ class ArrayElementNode extends TempNode {
 
 		}
 
+		const nodeSnippet = this.node.build( builder );
 		const indexSnippet = this.indexNode.build( builder, 'uint' );
 
 		return `${nodeSnippet}[ ${indexSnippet} ]`;

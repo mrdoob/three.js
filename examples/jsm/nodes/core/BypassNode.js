@@ -2,14 +2,14 @@ import Node from './Node.js';
 
 class BypassNode extends Node {
 
-	constructor( returnNode, callNode ) {
+	constructor( callNode, outputNode = null ) {
 
 		super();
 
 		this.isBypassNode = true;
 
-		this.outputNode = returnNode;
 		this.callNode = callNode;
+		this.outputNode = outputNode;
 
 	}
 
@@ -29,7 +29,7 @@ class BypassNode extends Node {
 
 		}
 
-		return this.outputNode.build( builder, output );
+		return this.outputNode ? this.outputNode.build( builder, output ) : '';
 
 	}
 

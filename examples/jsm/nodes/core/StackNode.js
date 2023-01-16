@@ -1,7 +1,6 @@
 import Node from './Node.js';
 import AssignNode from './AssignNode.js';
 import BypassNode from '../core/BypassNode.js';
-import ExpressionNode from '../core/ExpressionNode.js';
 
 class StackNode extends Node {
 
@@ -24,7 +23,7 @@ class StackNode extends Node {
 
 	add( node ) {
 
-		this.nodes.push( new BypassNode( new ExpressionNode(), node ) );
+		this.nodes.push( new BypassNode( node ) );
 
 		return this;
 
@@ -38,13 +37,19 @@ class StackNode extends Node {
 
 	build( builder, ...params ) {
 
-		for ( const node of this.nodes ) {
+		let outputNode = this.outputNode;
 
-			node.build( builder );
+		if ( ( ! outputNode || ( this.outputNode.uuid === this.uuid ) ) && this.nodes.length ) { // Make last node the output node
+
+			outputNode = this.nodes[ this.nodes.length - 1 ].callNode;
 
 		}
 
-		const outputNode = this.outputNode && ( this.outputNode.uuid !== this.uuid ) ? this.outputNode : this.nodes[ this.nodes.length - 1 ].callNode;
+		for ( const node of this.nodes ) {
+
+			if ( node.callNode !== outputNode ) node.build( builder );
+
+		}
 
 		return outputNode ? outputNode.build( builder, ...params ) : super.build( builder, ...params );
 

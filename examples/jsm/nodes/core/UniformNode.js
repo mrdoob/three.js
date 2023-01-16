@@ -16,9 +16,7 @@ class UniformNode extends InputNode {
 
 	}
 
-	generate( builder, output ) {
-
-		const type = this.getNodeType( builder );
+	construct( builder ) {
 
 		const hash = this.getUniformHash( builder );
 
@@ -34,8 +32,17 @@ class UniformNode extends InputNode {
 
 		const sharedNodeType = sharedNode.getInputType( builder );
 
-		const nodeUniform = builder.getUniformFromNode( sharedNode, builder.shaderStage, sharedNodeType );
-		const propertyName = builder.getPropertyName( nodeUniform );
+		this._nodeUniform = builder.getUniformFromNode( sharedNode, builder.shaderStage, sharedNodeType );
+
+		return null;
+
+	}
+
+	generate( builder, output ) {
+
+		const type = this.getNodeType( builder );
+
+		const propertyName = builder.getPropertyName( this._nodeUniform );
 
 		return builder.format( propertyName, type, output );
 
