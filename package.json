@@ -55,7 +55,6 @@
     },
     "globals": {
       "__THREE_DEVTOOLS__": "readonly",
-      "WebGL2ComputeRenderingContext": "readonly",
       "potpack": "readonly",
       "fflate": "readonly",
       "OIMO": "readonly",
