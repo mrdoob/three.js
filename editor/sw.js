@@ -92,7 +92,7 @@ const assets = [
 
 	'./js/libs/es-module-shims.js',
 	'./js/libs/esprima.js',
-	'./js/libs/mp4box.all.js',	
+	'./js/libs/mp4box.all.js',
 	'./js/libs/jsonlint.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
