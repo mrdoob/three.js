@@ -234,12 +234,12 @@
 
 				}
 
-				if ( params.logPerformance ) console.time( params.backend + ' ' + params.example + ' Iteration-' + iteration );
-
+				if ( params.logPerformance ) console.time( params.backend + ' ' + params.example + ' Iteration-' + iteration + ' Computation' );
 				await renderer.compute( compute( shaderNode, outAttribute.count ) );
+				if ( params.logPerformance ) console.timeEnd( params.backend + ' ' + params.example + ' Iteration-' + iteration + ' Computation' );
+				if ( params.logPerformance ) console.time( params.backend + ' ' + params.example + ' Iteration-' + iteration + ' Transfer' );
 				await renderer.deuploadBufferAttribute( outAttribute );
-
-				if ( params.logPerformance ) console.timeEnd( params.backend + ' ' + params.example + ' Iteration-' + iteration );
+				if ( params.logPerformance ) console.timeEnd( params.backend + ' ' + params.example + ' Iteration-' + iteration + ' Transfer' );
 
 				let typedArray = outAttribute.array;
 
