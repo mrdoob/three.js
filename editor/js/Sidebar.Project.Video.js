@@ -80,7 +80,7 @@ function SidebarProjectVideo( editor ) {
 
 		//
 
-		const mp4 = MP4Box.createFile();
+		const mp4 = MP4Box.createFile(); // eslint-disable-line no-undef
 		let trackID = null;
 		let frame = 0;
 
