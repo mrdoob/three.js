@@ -92,7 +92,7 @@ const assets = [
 
 	'./js/libs/es-module-shims.js',
 	'./js/libs/esprima.js',
-	'./js/libs/ffmpeg.min.js',
+	'./js/libs/mp4box.all.js',	
 	'./js/libs/jsonlint.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
@@ -264,16 +264,6 @@ async function networkFirst( request ) {
 	try {
 
 		let response = await fetch( request );
-
-		if ( request.url.endsWith( 'editor/' ) || request.url.endsWith( 'editor/index.html' ) ) { // copied from coi-serviceworker
-
-			const newHeaders = new Headers( response.headers );
-			newHeaders.set( 'Cross-Origin-Embedder-Policy', 'require-corp' );
-			newHeaders.set( 'Cross-Origin-Opener-Policy', 'same-origin' );
-
-			response = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
-
-		}
 
 		const cache = await caches.open( cacheName );
 		cache.put( request, response.clone() );

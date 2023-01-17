@@ -70,73 +70,108 @@ function SidebarProjectVideo( editor ) {
 
 		//
 
-		const { createFFmpeg, fetchFile } = FFmpeg; // eslint-disable-line no-undef
-		const ffmpeg = createFFmpeg( { log: true } );
+		const width = videoWidth.getValue();
+		const height = videoHeight.getValue();
 
-		await ffmpeg.load();
+		const duration = videoDuration.getValue();
+		const fps = videoFPS.getValue();
+		const frames = duration * fps;
+		const frameDuration = Math.floor( 1_000_000 / fps );
 
-		ffmpeg.setProgress( ( { ratio } ) => {
+		//
 
-			progress.setValue( ( ratio * 0.5 ) + 0.5 );
+		const mp4 = MP4Box.createFile();
+		let trackID = null;
+		let frame = 0;
+
+		const encoder = new VideoEncoder( {
+
+			output: function ( chunk, config ) {
+
+				if ( trackID === null ) {
+
+					trackID = mp4.addTrack( {
+						timescale: 1_000 * 1_000,
+						width: width,
+						height: height,
+						nb_samples: frames,
+						media_duration: duration * 1_000 * 1_000,
+						avcDecoderConfigRecord: config.decoderConfig.description
+					} );
+
+				}
+
+				let uint8 = new ArrayBuffer( chunk.byteLength );
+				chunk.copyTo( uint8 );
+
+				mp4.addSample( trackID, uint8, {
+					dts: chunk.timestamp,
+					cts: chunk.timestamp,
+					duration: chunk.duration,
+					is_sync: chunk.type === 'key'
+				} );
+
+				frame ++;
+
+				if ( frame === frames ) {
+
+					encoder.close();
+					
+					mp4.save( "mp4box.mp4" );
+
+					renderButton.setDisplay( '' );
+					progress.setDisplay( 'none' );
+
+				}
+
+				progress.setValue( ( frame / frames ) * 0.5 + 0.5 );
+
+			},
+
+			error: function ( error ) {
+
+				console.error( error );
+
+			}
 
 		} );
 
-		const fps = videoFPS.getValue();
-		const duration = videoDuration.getValue();
-		const frames = duration * fps;
+		encoder.configure( {
+
+			codec: 'avc1.640020',
+			width: width,
+			height: height,
+			framerate: fps,
+			bitrate: 50_000_000 // Doesn't seem to work?
+
+		} );
 
 		let currentTime = 0;
+		let nextKeyFrameTime = 0;
 
 		for ( let i = 0; i < frames; i ++ ) {
 
-			player.render( currentTime );
+			currentTime = i * frameDuration;
 
-			const num = i.toString().padStart( 5, '0' );
-			ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
-			currentTime += 1 / fps;
+			player.render( currentTime / 1_000_000 );
+
+			const frame = new VideoFrame( canvas, { timestamp: currentTime, duration: frameDuration } );
+
+			const isKeyFrame = currentTime >= nextKeyFrameTime;
+			if ( isKeyFrame ) nextKeyFrameTime += 2_000_000;
+
+			encoder.encode( frame, { keyFrame: isKeyFrame } );
+
+			frame.close();
 
 			progress.setValue( ( i / frames ) * 0.5 );
 
 		}
 
-		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
-
-		const data = ffmpeg.FS( 'readFile', 'out.mp4' );
-
-		for ( let i = 0; i < frames; i ++ ) {
-
-			const num = i.toString().padStart( 5, '0' );
-			ffmpeg.FS( 'unlink', `tmp.${num}.png` );
-
-		}
-
-		save( new Blob( [ data.buffer ], { type: 'video/mp4' } ), 'out.mp4' );
-
 		player.dispose();
-
-		renderButton.setDisplay( '' );
-		progress.setDisplay( 'none' );
 
 	} );
 	container.add( renderButton );
-
-	// SAVE
-
-	const link = document.createElement( 'a' );
-
-	function save( blob, filename ) {
-
-		if ( link.href ) {
-
-			URL.revokeObjectURL( link.href );
-
-		}
-
-		link.href = URL.createObjectURL( blob );
-		link.download = filename;
-		link.dispatchEvent( new MouseEvent( 'click' ) );
-
-	}
 
 	//
 

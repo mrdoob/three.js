@@ -64,7 +64,7 @@ function SidebarProject( editor ) {
 	/* container.add( new SidebarProjectMaterials( editor ) ); */
 	container.add( new SidebarProjectRenderer( editor ) );
 
-	if ( 'SharedArrayBuffer' in window ) {
+	if ( 'VideoEncoder' in window ) {
 
 		container.add( new SidebarProjectVideo( editor ) );
 
