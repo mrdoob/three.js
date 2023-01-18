@@ -71,8 +71,9 @@
 				camera.position.set( - 1, 1, 1 ).normalize().multiplyScalar( 10 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xfff3e0 );
+				scene.background = new THREE.Color( 0xfce4ec );
 
+				// lights
 				const ambient = new THREE.HemisphereLight( 0xffffff, 0xbfd4d2, 0.9 );
 				scene.add( ambient );
 
@@ -95,20 +96,24 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
+				// add shadow plane
 				const plane = new THREE.Mesh(
 					new THREE.PlaneGeometry(),
 					new THREE.ShadowMaterial( {
-						color: 0xff6d00,
+						color: 0xd81b60,
 						transparent: true,
 						opacity: 0.075,
 						side: THREE.DoubleSide,
 					} ),
 				);
-				plane.receiveShadow = true;
+				plane.position.y = - 3;
 				plane.rotation.x = - Math.PI / 2;
 				plane.scale.setScalar( 10 );
-				plane.position.y = - 3;
+				plane.receiveShadow = true;
 				scene.add( plane );
+
+				// create brushes
+				evaluator = new Evaluator();
 
 				baseBrush = new Brush(
 					new THREE.IcosahedronGeometry( 2, 3 ),
@@ -149,16 +154,16 @@
 				);
 				scene.add( core );
 
+				// create wireframe
 				wireframe = new THREE.Mesh(
 					undefined,
 					new THREE.MeshBasicMaterial( { color: 0x009688, wireframe: true } ),
 				);
 				scene.add( wireframe );
 
-				evaluator = new Evaluator();
-
+				// controls
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 0;
+				controls.minDistance = 5;
 				controls.maxDistance = 75;
 
 				// set up gui
@@ -169,8 +174,6 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
-
-				updateCSG();
 
 			}
 
@@ -198,6 +201,7 @@
 
 				requestAnimationFrame( animate );
 
+				// update the transforms
 				const t = window.performance.now() + 9000;
 				baseBrush.rotation.x = t * 0.0001;
 				baseBrush.rotation.y = t * 0.00025;
@@ -212,6 +216,7 @@
 				brush.scale.set( s, 1, s );
 				brush.updateMatrixWorld();
 
+				// update the csg
 				updateCSG();
 
 				wireframe.geometry = result.geometry;
