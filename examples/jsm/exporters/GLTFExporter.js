@@ -164,6 +164,8 @@ const WEBGL_CONSTANTS = {
 	REPEAT: 10497
 };
 
+const KHR_MESH_QUANTIZATION = 'KHR_mesh_quantization';
+
 const THREE_TO_WEBGL = {};
 
 THREE_TO_WEBGL[ NearestFilter ] = WEBGL_CONSTANTS.NEAREST;
@@ -400,7 +402,9 @@ class GLTFWriter {
 		this.buffers = [];
 		this.nodeMap = new Map();
 		this.skins = [];
+
 		this.extensionsUsed = {};
+		this.extensionsRequired = {};
 
 		this.uids = new Map();
 		this.uid = 0;
@@ -462,15 +466,19 @@ class GLTFWriter {
 		const buffers = writer.buffers;
 		const json = writer.json;
 		options = writer.options;
+
 		const extensionsUsed = writer.extensionsUsed;
+		const extensionsRequired = writer.extensionsRequired;
 
 		// Merge buffers.
 		const blob = new Blob( buffers, { type: 'application/octet-stream' } );
 
 		// Declare extensions.
 		const extensionsUsedList = Object.keys( extensionsUsed );
+		const extensionsRequiredList = Object.keys( extensionsRequired );
 
 		if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList;
+		if ( extensionsRequiredList.length > 0 ) json.extensionsRequired = extensionsRequiredList;
 
 		// Update bytelength of the single buffer.
 		if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
@@ -1030,7 +1038,7 @@ class GLTFWriter {
 
 		let componentType;
 
-		// Detect the component type of the attribute array (float, uint or ushort)
+		// Detect the component type of the attribute array
 		if ( attribute.array.constructor === Float32Array ) {
 
 			componentType = WEBGL_CONSTANTS.FLOAT;
@@ -1560,7 +1568,15 @@ class GLTFWriter {
 			const validVertexAttributes =
 					/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
 
-			if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
+			let isValidVertexAttribute = true;
+
+			if ( ! validVertexAttributes.test( attributeName ) ) {
+
+				attributeName = '_' + attributeName;
+
+				isValidVertexAttribute = false;
+
+			}
 
 			if ( cache.attributes.has( this.getUID( attribute ) ) ) {
 
@@ -1585,6 +1601,12 @@ class GLTFWriter {
 			const accessor = this.processAccessor( modifiedAttribute || attribute, geometry );
 
 			if ( accessor !== null ) {
+
+				if ( isValidVertexAttribute ) {
+
+					this.detectMeshQuantization( attributeName, attribute );
+
+				}
 
 				attributes[ attributeName ] = accessor;
 				cache.attributes.set( this.getUID( attribute ), accessor );
@@ -1763,6 +1785,55 @@ class GLTFWriter {
 		const index = json.meshes.push( meshDef ) - 1;
 		cache.meshes.set( meshCacheKey, index );
 		return index;
+
+	}
+
+	/**
+	 * If a vertex attribute with a
+	 * [non-standard data type](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview)
+	 * is used, then it is assumed that this is an allowed data type according to the
+	 * [KHR_mesh_quantization](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_mesh_quantization/README.md)
+	 * extension.
+	 * In this case the extension is automatically added to the list of used extensions.
+	 *
+	 * @param {string} attributeName
+	 * @param {THREE.BufferAttribute} attribute
+	 */
+	detectMeshQuantization( attributeName, attribute ) {
+
+		if ( this.extensionsUsed[ KHR_MESH_QUANTIZATION ] ) return;
+
+		let useMeshQuantization = false;
+
+		const isNonFloatAttribute = attribute.array.constructor !== Float32Array;
+
+		if ( isNonFloatAttribute ) {
+
+			if ( [ 'POSITION', 'NORMAL', 'TANGENT' ].includes( attributeName ) ) {
+
+				useMeshQuantization = true;
+
+			} else if ( attributeName.startsWith( 'TEXCOORD_' ) ) {
+
+				const isUnsignedByte = attribute.array.constructor === Uint8Array;
+				const isUnsignedShort = attribute.array.constructor === Uint16Array;
+
+				if ( ! ( attribute.normalized && ( isUnsignedByte || isUnsignedShort ) ) ) {
+
+					useMeshQuantization = true;
+
+				}
+
+			}
+
+		}
+
+		if ( useMeshQuantization ) {
+
+			this.extensionsUsed[ KHR_MESH_QUANTIZATION ] = true;
+			this.extensionsRequired[ KHR_MESH_QUANTIZATION ] = true;
+
+		}
 
 	}
 
