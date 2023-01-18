@@ -116,7 +116,7 @@ function SidebarProjectVideo( editor ) {
 				if ( frame === frames ) {
 
 					encoder.close();
-					
+
 					mp4.save( "mp4box.mp4" );
 
 					renderButton.setDisplay( '' );
@@ -142,7 +142,8 @@ function SidebarProjectVideo( editor ) {
 			width: width,
 			height: height,
 			framerate: fps,
-			bitrate: 50_000_000 // Doesn't seem to work?
+			bitrate: 20_000_000, // Doesn't seem to work?
+			// hardwareAcceleration: "prefer-software"
 
 		} );
 
@@ -158,7 +159,7 @@ function SidebarProjectVideo( editor ) {
 			const frame = new VideoFrame( canvas, { timestamp: currentTime, duration: frameDuration } );
 
 			const isKeyFrame = currentTime >= nextKeyFrameTime;
-			if ( isKeyFrame ) nextKeyFrameTime += 2_000_000;
+			if ( isKeyFrame ) nextKeyFrameTime += 5_000_000;
 
 			encoder.encode( frame, { keyFrame: isKeyFrame } );
 
