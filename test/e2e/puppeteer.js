@@ -43,7 +43,7 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 	// webxr
 	'webxr_ar_lighting'
-] );
+];
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
