@@ -91,7 +91,13 @@ const pup = puppeteer.launch( {
 	args: [
 		'--use-gl=swiftshader',
 		'--no-sandbox',
-		'--enable-surface-synchronization'
+		'--enable-surface-synchronization',
+
+		'--enable-unsafe-webgpu',
+		'--enable-features=Vulkan',
+		'--use-angle=swiftshader',
+		'--use-vulkan=swiftshader'
+		'--use-webgpu-adapter=swiftshader'
 	]
 } ).then( async browser => {
 
