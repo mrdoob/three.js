@@ -17,7 +17,6 @@ const _bbox = new Box3();
 const _uniformArray = [];
 const _logArray = [];
 const _lightOrientationMatrix = new Matrix4()
-const _lightTarget = new Vector3();
 const _lightOrientationMatrixInverse = new Matrix4()
 const _up = new Vector3( 0, 1, 0 );
 
@@ -207,9 +206,8 @@ export class CSM {
 
 		// for each frustum we need to find its min-max box aligned with the light orientation
 		// the position in _lightOrientationMatrix does not matter, as we transform there and back
-		_lightTarget.copy( this.lightDirection ).add( camera.position );
-		_lightOrientationMatrix.lookAt( camera.position, _lightTarget, _up );
-		_lightOrientationMatrixInverse.copy(_lightOrientationMatrix).invert();
+		_lightOrientationMatrix.lookAt( new Vector3(), this.lightDirection, _up );
+		_lightOrientationMatrixInverse.copy( _lightOrientationMatrix ).invert();
 
 		for ( let i = 0; i < frustums.length; i ++ ) {
 
