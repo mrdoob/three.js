@@ -73,7 +73,7 @@ const pup = puppeteer.launch( {
 		'--enable-unsafe-webgpu',
 		'--enable-features=Vulkan',
 		'--use-angle=swiftshader',
-		'--use-vulkan=swiftshader'
+		'--use-vulkan=swiftshader',
 		'--use-webgpu-adapter=swiftshader'
 	]
 } ).then( async browser => {
