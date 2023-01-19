@@ -310,17 +310,17 @@ const pup = puppeteer.launch( {
 				numFailedPixels /= actual.width * actual.height;
 
 				/* Print results */
-
+				const percFailedPixels = 100 * numFailedPixels;
 				if ( numFailedPixels < maxFailedPixels ) {
 
 					attemptId = maxAttemptId;
-					console.green( `diff: ${ numFailedPixels.toFixed( 3 ) }, file: ${ file }` );
+					console.green( `diff: ${ percFailedPixels.toFixed( 1 ) }%, file: ${ file }` );
 
 				} else {
 
 					if ( ++ attemptId === maxAttemptId ) {
 
-						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
+						console.red( `ERROR! Diff wrong in ${ percFailedPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 						failedScreenshots.push( file );
 						continue;
 
