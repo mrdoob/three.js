@@ -42,35 +42,8 @@ const exceptionList = [
 	'webgl_video_panorama_equirectangular', // video tag not deterministic enough?
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 	// webxr
-	'webxr_ar_lighting',
-	// webgpu
-	'webgpu_audio_processing',
-	'webgpu_compute',
-	'webgpu_cubemap_adjustments',
-	'webgpu_cubemap_mix',
-	'webgpu_depth_texture',
-	'webgpu_equirectangular',
-	'webgpu_instance_mesh',
-	'webgpu_instance_uniform',
-	'webgpu_lights_custom',
-	'webgpu_lights_ies_spotlight',
-	'webgpu_lights_phong',
-	'webgpu_lights_selective',
-	'webgpu_loader_gltf',
-	'webgpu_materials',
-	'webgpu_nodes_playground',
-	'webgpu_particles',
-	'webgpu_rtt',
-	'webgpu_sandbox',
-	'webgpu_skinning',
-	'webgpu_skinning_instancing',
-	'webgpu_skinning_points',
-	'webgpu_sprites'
-].concat( ( process.platform === 'win32' ) ? [
-
-	'webgl_effects_ascii' // windows fonts not supported
-
-] : [] );
+	'webxr_ar_lighting'
+];
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
@@ -91,7 +64,13 @@ const pup = puppeteer.launch( {
 	args: [
 		'--use-gl=swiftshader',
 		'--no-sandbox',
-		'--enable-surface-synchronization'
+		'--enable-surface-synchronization',
+
+		'--enable-unsafe-webgpu',
+		'--enable-features=Vulkan',
+		'--use-angle=swiftshader',
+		'--use-vulkan=swiftshader',
+		'--use-webgpu-adapter=swiftshader'
 	]
 } ).then( async browser => {
 
