@@ -42,30 +42,7 @@ const exceptionList = [
 	'webgl_video_panorama_equirectangular', // video tag not deterministic enough?
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 	// webxr
-	'webxr_ar_lighting',
-	// webgpu
-	'webgpu_audio_processing',
-	'webgpu_compute',
-	'webgpu_cubemap_adjustments',
-	'webgpu_cubemap_mix',
-	'webgpu_depth_texture',
-	'webgpu_equirectangular',
-	'webgpu_instance_mesh',
-	'webgpu_instance_uniform',
-	'webgpu_lights_custom',
-	'webgpu_lights_ies_spotlight',
-	'webgpu_lights_phong',
-	'webgpu_lights_selective',
-	'webgpu_loader_gltf',
-	'webgpu_materials',
-	'webgpu_nodes_playground',
-	'webgpu_particles',
-	'webgpu_rtt',
-	'webgpu_sandbox',
-	'webgpu_skinning',
-	'webgpu_skinning_instancing',
-	'webgpu_skinning_points',
-	'webgpu_sprites'
+	'webxr_ar_lighting'
 ].concat( ( process.platform === 'win32' ) ? [
 
 	'webgl_effects_ascii' // windows fonts not supported
