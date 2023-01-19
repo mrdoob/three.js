@@ -55,8 +55,7 @@ class TextureLoader extends Loader {
             this.cache.set(url, texture);
             // if the cache size exceeds the maximum size, remove the least recently used texture
             if (this.cache.size > this.maxCacheSize) {
-                const firstKey = this.cache.keys().next().value;
-                this.cache.delete(firstKey);
+                this.cache.delete(this.cache.keys().next().value);
             }
             // call the onLoad callback
             if (onLoad) onLoad(texture);
