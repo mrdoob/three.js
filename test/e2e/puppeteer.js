@@ -43,11 +43,7 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 	// webxr
 	'webxr_ar_lighting'
-].concat( ( process.platform === 'win32' ) ? [
-
-	'webgl_effects_ascii' // windows fonts not supported
-
-] : [] );
+] );
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
