@@ -33,157 +33,210 @@
 
 'use strict';  // eslint-disable-line
 
-(function() {
+( function () {
 
-  const lessonSettings = self.lessonSettings || {};
+	const lessonSettings = self.lessonSettings || {};
 
-  function isInEditor() {
-    return self.location.href.substring(0, 4) === 'blob';
-  }
+	function isInEditor() {
 
-  function sendMessage(data) {
-    self.postMessage({
-      type: '__editor__',
-      data,
-    });
-  }
+		return self.location.href.substring( 0, 4 ) === 'blob';
 
-  const origConsole = {};
+	}
 
-  function setupConsole() {
-    function wrapFunc(obj, logType) {
-      const origFunc = obj[logType].bind(obj);
-      origConsole[logType] = origFunc;
-      return function(...args) {
-        origFunc(...args);
-        sendMessage({
-          type: 'log',
-          logType,
-          msg: [...args].join(' '),
-        });
-      };
-    }
-    self.console.log = wrapFunc(self.console, 'log');
-    self.console.warn = wrapFunc(self.console, 'warn');
-    self.console.error = wrapFunc(self.console, 'error');
-  }
+	function sendMessage( data ) {
 
-  /**
+		self.postMessage( {
+			type: '__editor__',
+			data,
+		} );
+
+	}
+
+	const origConsole = {};
+
+	function setupConsole() {
+
+		function wrapFunc( obj, logType ) {
+
+			const origFunc = obj[ logType ].bind( obj );
+			origConsole[ logType ] = origFunc;
+			return function ( ...args ) {
+
+				origFunc( ...args );
+				sendMessage( {
+					type: 'log',
+					logType,
+					msg: [ ...args ].join( ' ' ),
+				} );
+
+			};
+
+		}
+
+		self.console.log = wrapFunc( self.console, 'log' );
+		self.console.warn = wrapFunc( self.console, 'warn' );
+		self.console.error = wrapFunc( self.console, 'error' );
+
+	}
+
+	/**
    * Gets a WebGL context.
    * makes its backing store the size it is displayed.
    * @param {OffscreenCanvas} canvas a canvas element.
    * @memberOf module:webgl-utils
    */
-  let setupLesson = function(canvas) {
-    // only once
-    setupLesson = function() {};
+	let setupLesson = function ( canvas ) {
 
-    if (canvas) {
-      canvas.addEventListener('webglcontextlost', function() {
-          // the default is to do nothing. Preventing the default
-          // means allowing context to be restored
-          // e.preventDefault();  // can't do this because firefox bug - https://bugzilla.mozilla.org/show_bug.cgi?id=1633280
-          sendMessage({
-            type: 'lostContext',
-          });
-      });
-    }
+		// only once
+		setupLesson = function () {};
 
-  };
+		if ( canvas ) {
 
-  function captureJSErrors() {
-    // capture JavaScript Errors
-    self.addEventListener('error', function(e) {
-      const msg = e.message || e.error;
-      const url = e.filename;
-      const lineNo = e.lineno || 1;
-      const colNo = e.colno || 1;
-      sendMessage({
-        type: 'jsError',
-        lineNo,
-        colNo,
-        url,
-        msg,
-      });
-    });
-  }
+			canvas.addEventListener( 'webglcontextlost', function () {
+
+				// the default is to do nothing. Preventing the default
+				// means allowing context to be restored
+				// e.preventDefault();  // can't do this because firefox bug - https://bugzilla.mozilla.org/show_bug.cgi?id=1633280
+				sendMessage( {
+					type: 'lostContext',
+				} );
+
+			} );
+
+		}
+
+	};
+
+	function captureJSErrors() {
+
+		// capture JavaScript Errors
+		self.addEventListener( 'error', function ( e ) {
+
+			const msg = e.message || e.error;
+			const url = e.filename;
+			const lineNo = e.lineno || 1;
+			const colNo = e.colno || 1;
+			sendMessage( {
+				type: 'jsError',
+				lineNo,
+				colNo,
+				url,
+				msg,
+			} );
+
+		} );
+
+	}
 
 
-  const isWebGLRE = /^(webgl|webgl2|experimental-webgl)$/i;
-  function installWebGLLessonSetup() {
-    OffscreenCanvas.prototype.getContext = (function(oldFn) {
-      return function() {
-        const type = arguments[0];
-        const isWebGL = isWebGLRE.test(type);
-        if (isWebGL) {
-          setupLesson(this);
-        }
-        const args = [].slice.apply(arguments);
-        args[1] = {
-          powerPreference: 'low-power',
-          ...args[1],
-        };
-        return oldFn.apply(this, args);
-      };
-    }(OffscreenCanvas.prototype.getContext));
-  }
+	const isWebGLRE = /^(webgl|webgl2|experimental-webgl)$/i;
+	function installWebGLLessonSetup() {
 
-  function installWebGLDebugContextCreator() {
-    if (!self.webglDebugHelper) {
-      return;
-    }
+		OffscreenCanvas.prototype.getContext = ( function ( oldFn ) { // eslint-disable-line compat/compat
 
-    const {
-      makeDebugContext,
-      glFunctionArgToString,
-      glEnumToString,
-    } = self.webglDebugHelper;
+			return function () {
 
-    // capture GL errors
-    OffscreenCanvas.prototype.getContext = (function(oldFn) {
-      return function() {
-        let ctx = oldFn.apply(this, arguments);
-        // Using bindTexture to see if it's WebGL. Could check for instanceof WebGLRenderingContext
-        // but that might fail if wrapped by debugging extension
-        if (ctx && ctx.bindTexture) {
-          ctx = makeDebugContext(ctx, {
-            maxDrawCalls: 100,
-            errorFunc: function(err, funcName, args) {
-              const numArgs = args.length;
-              const enumedArgs = [].map.call(args, function(arg, ndx) {
-                let str = glFunctionArgToString(funcName, numArgs, ndx, arg);
-                // shorten because of long arrays
-                if (str.length > 200) {
-                  str = str.substring(0, 200) + '...';
-                }
-                return str;
-              });
+				const type = arguments[ 0 ];
+				const isWebGL = isWebGLRE.test( type );
+				if ( isWebGL ) {
 
-              {
-                const error = new Error();
-                sendMessage({
-                  type: 'jsErrorWithStack',
-                  stack: error.stack,
-                  msg: `${glEnumToString(err)} in ${funcName}(${enumedArgs.join(', ')})`,
-                });
-              }
-            },
-          });
-        }
-        return ctx;
-      };
-    }(OffscreenCanvas.prototype.getContext));
-  }
+					setupLesson( this );
 
-  installWebGLLessonSetup();
+				}
 
-  if (isInEditor()) {
-    setupConsole();
-    captureJSErrors();
-    if (lessonSettings.glDebug !== false) {
-      installWebGLDebugContextCreator();
-    }
-  }
+				const args = [].slice.apply( arguments );
+				args[ 1 ] = {
+					powerPreference: 'low-power',
+					...args[ 1 ],
+				};
+				return oldFn.apply( this, args );
 
-}());
+			};
+
+		}( OffscreenCanvas.prototype.getContext ) ); // eslint-disable-line compat/compat
+
+	}
+
+	function installWebGLDebugContextCreator() {
+
+		if ( ! self.webglDebugHelper ) {
+
+			return;
+
+		}
+
+		const {
+			makeDebugContext,
+			glFunctionArgToString,
+			glEnumToString,
+		} = self.webglDebugHelper;
+
+		// capture GL errors
+		OffscreenCanvas.prototype.getContext = ( function ( oldFn ) { // eslint-disable-line compat/compat
+
+			return function () {
+
+				let ctx = oldFn.apply( this, arguments );
+				// Using bindTexture to see if it's WebGL. Could check for instanceof WebGLRenderingContext
+				// but that might fail if wrapped by debugging extension
+				if ( ctx && ctx.bindTexture ) {
+
+					ctx = makeDebugContext( ctx, {
+						maxDrawCalls: 100,
+						errorFunc: function ( err, funcName, args ) {
+
+							const numArgs = args.length;
+							const enumedArgs = [].map.call( args, function ( arg, ndx ) {
+
+								let str = glFunctionArgToString( funcName, numArgs, ndx, arg );
+								// shorten because of long arrays
+								if ( str.length > 200 ) {
+
+									str = str.substring( 0, 200 ) + '...';
+
+								}
+
+								return str;
+
+							} );
+
+							{
+
+								const error = new Error();
+								sendMessage( {
+									type: 'jsErrorWithStack',
+									stack: error.stack,
+									msg: `${glEnumToString( err )} in ${funcName}(${enumedArgs.join( ', ' )})`,
+								} );
+
+							}
+
+						},
+					} );
+
+				}
+
+				return ctx;
+
+			};
+
+		}( OffscreenCanvas.prototype.getContext ) ); // eslint-disable-line compat/compat
+
+	}
+
+	installWebGLLessonSetup();
+
+	if ( isInEditor() ) {
+
+		setupConsole();
+		captureJSErrors();
+		if ( lessonSettings.glDebug !== false ) {
+
+			installWebGLDebugContextCreator();
+
+		}
+
+	}
+
+}() );
 

@@ -16,8 +16,8 @@ const _center = new Vector3();
 const _bbox = new Box3();
 const _uniformArray = [];
 const _logArray = [];
-const _lightOrientationMatrix = new Matrix4()
-const _lightOrientationMatrixInverse = new Matrix4()
+const _lightOrientationMatrix = new Matrix4();
+const _lightOrientationMatrixInverse = new Matrix4();
 const _up = new Vector3( 0, 1, 0 );
 
 export class CSM {
