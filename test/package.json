@@ -12,7 +12,7 @@
     "failonlyreporter": "^1.0.0",
     "jimp": "^0.16.0",
     "pixelmatch": "^5.3.0",
-    "puppeteer": "^15.2.0",
+    "puppeteer": "^19.4.0",
     "qunit": "^2.19.1",
     "serve-handler": "^6.1.5"
   },
