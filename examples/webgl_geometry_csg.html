@@ -34,7 +34,7 @@
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
 					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@^0.5.22/build/index.module.js",
-					"three-bvh-csg": "https://unpkg.com/three-bvh-csg@^0.0.3/build/index.module.js"
+					"three-bvh-csg": "https://unpkg.com/three-bvh-csg@^0.0.4/build/index.module.js"
 				}
 			}
 		</script>
@@ -139,7 +139,7 @@
 				);
 
 				core = new Brush(
-					new THREE.IcosahedronGeometry( 0.1, 1 ),
+					new THREE.IcosahedronGeometry( 0.15, 1 ),
 					new THREE.MeshStandardMaterial( {
 						flatShading: true,
 						color: 0xff9800,
@@ -152,6 +152,7 @@
 
 					} ),
 				);
+				core.castShadow = true;
 				scene.add( core );
 
 				// create wireframe
@@ -169,9 +170,7 @@
 				// set up gui
 				const gui = new GUI();
 				gui.add( params, 'operation', { SUBTRACTION, INTERSECTION, ADDITION } );
-				
-				// disabling wireframe until next CSG release. See mrdoob/three.js#25299
-				// gui.add( params, 'wireframe' );
+				gui.add( params, 'wireframe' );
 				gui.add( params, 'useGroups' );
 
 				window.addEventListener( 'resize', onWindowResize );
