@@ -1,15 +1,16 @@
+import chalk from 'chalk';
 import fs from 'fs';
 
 // examples
 const E = fs.readdirSync( './examples' )
-	.filter( s => s.slice( - 5 ) === '.html' )
-	.map( s => s.slice( 0, s.length - 5 ) )
+	.filter( s => s.endsWith( '.html' ) )
+	.map( s => s.slice( 0, s.indexOf( '.' ) ) )
 	.filter( f => f !== 'index' );
 
 // screenshots
 const S = fs.readdirSync( './examples/screenshots' )
-	.filter( s => s.slice( - 4 ) === '.jpg' )
-	.map( s => s.slice( 0, s.length - 4 ) );
+	.filter( s => s.indexOf( '.' ) !== -1 )
+	.map( s => s.slice( 0, s.indexOf( '.' ) ) );
 
 // files.js
 const F = [];
@@ -32,8 +33,8 @@ const subSE = S.filter( x => ! E.includes( x ) );
 const subEF = E.filter( x => ! F.includes( x ) );
 const subFE = F.filter( x => ! E.includes( x ) );
 
-console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
-console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
+console.red = msg => console.log( chalk.red( msg ) );
+console.green = msg => console.log( chalk.green( msg ) );
 
 if ( subES.length + subSE.length + subEF.length + subFE.length === 0 ) {
 
