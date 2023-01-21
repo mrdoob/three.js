@@ -54,6 +54,8 @@ const renderTimeout = 1.5; // 1.5 seconds, set to 0 to disable
 
 const numAttempts = 3; // perform 3 progressive attempts before failing
 
+const numCIJobs = 8; // GitHub Actions run the script in 8 threads
+
 const width = 400;
 const height = 250;
 const viewScale = 2;
@@ -107,13 +109,11 @@ async function main() {
 
 	if ( 'CI' in process.env ) {
 
-		const jobs = 8;
-
 		const CI = parseInt( process.env.CI );
 
 		files = files.slice(
-			Math.floor( CI * files.length / jobs ),
-			Math.floor( ( CI + 1 ) * files.length / jobs )
+			Math.floor( CI * files.length / numCIJobs ),
+			Math.floor( ( CI + 1 ) * files.length / numCIJobs )
 		);
 
 	}
