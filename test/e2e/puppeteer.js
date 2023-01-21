@@ -45,7 +45,7 @@ const exceptionList = [
 
 /* CONFIG VARIABLES END */
 
-const port = 8567;
+const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // at most 5% failed pixels
 
