@@ -24,14 +24,9 @@ async function main() {
 
 	const files = JSON.parse( await fs.readFile( 'examples/files.json' ) );
 
-	for ( const key in files ) {
+	for ( const section of Object.values( files ) ) {
 
-		const section = files[ key ];
-		for ( let i = 0, len = section.length; i < len; i ++ ) {
-
-			F.push( section[ i ] );
-
-		}
+		F.push( ...section );
 
 	}
 
