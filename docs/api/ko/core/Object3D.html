@@ -75,7 +75,7 @@
 		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
 		이 값을 설정하면 위치의 매트릭스를 계산하고 (회전 및 쿼터니언), 매 프레임마다 확대/축소하고 matrixWorld 프로퍼티를 재계산합니다.
-		기본값은 [page:Object3D.DefaultMatrixAutoUpdate] (true)입니다.
+		기본값은 [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE] (true)입니다.
 		</p>
 
 		<h3>[property:Matrix4 matrixWorld]</h3>
@@ -85,8 +85,9 @@
 
 		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
 		<p>
-		Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
+		If set, then the renderer checks every frame if the object and its children need matrix updates.
 		When it isn't, then you have to maintain all matrices in the object and its children yourself.
+		Default is [page:Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE] (true).
 		</p>
 
 		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
@@ -163,7 +164,7 @@
 		<h3>[property:Vector3 up]</h3>
 		<p>
 		[page:.lookAt lookAt] 메서드에서 사용되며, 결과의 방향을 결정합니다.<br />
-		기본값은 [page:Object3D.DefaultUp]값, ( 0, 1, 0 )입니다.
+		기본값은 [page:Object3D.DEFAULT_UP]값, ( 0, 1, 0 )입니다.
 		</p>
 
 		<h3>[property:Object userData]</h3>
@@ -186,24 +187,28 @@
 		<h2>정적 프로퍼티</h2>
 		<p>
 			정적 프로퍼티와 메서드는 해당 클래스의 인스턴스가 아니라 클래스 별로 정의됩니다.
-			이는 [page:Object3D.DefaultUp] 혹은 [page:Object3D.DefaultMatrixAutoUpdate]를 변경하면
+			이는 [page:Object3D.DEFAULT_UP] 혹은 [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE]를 변경하면
 			변경이 이루어진 시점 이후의(이미 만들어진 Object3Ds는 영향을 받지 않습니다) 모든 Object3D(및 파생 클래스)의
 			[page:.up up]과 [page:.matrixAutoUpdate matrixAutoUpdate] 값을 변경시킬 것입니다.
 		</p>
 
-		<h3>[property:Vector3 DefaultUp]</h3>
+		<h3>[property:Vector3 DEFAULT_UP]</h3>
 		<p>
 			The default 오브젝트의 기본값 [page:.up up] 방향이며
 			[page:DirectionalLight], [page:HemisphereLight] 및 [page:Spotlight]의 기본 위치값으로도 사용됩니다(위에서 아래로 내려오는 빛을 만듭니다).<br />
 			기본값으로 ( 0, 1, 0 ) 을 설정합니다.
 		</p>
 
-		<h3>[property:Boolean DefaultMatrixAutoUpdate]</h3>
+		<h3>[property:Boolean DEFAULT_MATRIX_AUTO_UPDATE]</h3>
 		<p>
 			새로 만들어진 Object3D의 [page:.matrixAutoUpdate matrixAutoUpdate] 기본 세팅입니다.<br />
 
 		</p>
 
+		<h3>[property:Boolean DEFAULT_MATRIX_WORLD_AUTO_UPDATE]</h3>
+		<p>
+			새로 만들어진 Object3D의 [page:.matrixWorldAutoUpdate matrixWorldAutoUpdate] 기본 세팅입니다.<br />
+		</p>
 
 		<h2>메서드</h2>
 

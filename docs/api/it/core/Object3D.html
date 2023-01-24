@@ -79,7 +79,7 @@
 		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
       Quando viene settato calcola la matrice di posizione, (rotazione o quaternione) e 
-      ridimensiona ogni fotogramma ed inoltre ricalcola la  proprietà matrixWorld. L'impostazione predefinita è [page:Object3D.DefaultMatrixAutoUpdate] (true).
+      ridimensiona ogni fotogramma ed inoltre ricalcola la  proprietà matrixWorld. L'impostazione predefinita è [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE] (true).
 		</p>
 
 		<h3>[property:Matrix4 matrixWorld]</h3>
@@ -89,9 +89,9 @@
 
 		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
 		<p>
-      Il valore predefinito è true. Se impostato, il renderer controlla ogni frame se l'oggetto e i suo figli 
-      necessitano di aggiornare la matrice.
+      Se impostato, il renderer controlla ogni frame se l'oggetto e i suo figli necessitano di aggiornare la matrice.
       Quando non lo è, devi mantenere tu stesso tutte le matrici nell'oggetto e i suoi figli.
+	  Default is [page:Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE] (true).
 		</p>
 
 		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
@@ -173,7 +173,7 @@
 		<h3>[property:Vector3 up]</h3>
 		<p>
       Questa proprietà viene utilizzata dal metodo [page:.lookAt lookAt], per esempio, per determinare l'orientamento del risultato.<br />
-      L'impostazione predefinita è [page:Object3D.DefaultUp] - che è, `( 0, 1, 0 )`.
+      L'impostazione predefinita è [page:Object3D.DEFAULT_UP] - che è, `( 0, 1, 0 )`.
 		</p>
 
 		<h3>[property:Object userData]</h3>
@@ -197,24 +197,28 @@
 		<h2>Proprietà Statiche</h2>
 		<p>
       Le proprietà statiche e i metodi sono definiti per classe piuttosto che per istanza della classe.
-      Questo significa che modificando [page:Object3D.DefaultUp] o [page:Object3D.DefaultMatrixAutoUpdate]
+      Questo significa che modificando [page:Object3D.DEFAULT_UP] o [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE]
       verranno modificati i valori di [page:.up up] e [page:.matrixAutoUpdate matrixAutoUpdate] per `ogni`
       istanza di Object3D (o classi derivate) creata dopo che la modifica è stata fatta 
       (gli Object3D già creati non saranno interessati).
 		</p>
 
-		<h3>[property:Vector3 DefaultUp]</h3>
+		<h3>[property:Vector3 DEFAULT_UP]</h3>
 		<p>
       La direzione predefinita di [page:.up up] per gli oggetti, utilizzata anche come posizione predefinita per [page:DirectionalLight],
 			[page:HemisphereLight] e [page:Spotlight] (che crea luci che brillano dall'alto verso il basso).<br />
       Impostare su ( 0, 1, 0 ) per impostazione predefinita.
 		</p>
 
-		<h3>[property:Boolean DefaultMatrixAutoUpdate]</h3>
+		<h3>[property:Boolean DEFAULT_MATRIX_AUTO_UPDATE]</h3>
 		<p>
       L'impostazione predefinita per [page:.matrixAutoUpdate matrixAutoUpdate] per Object3D appena creati.<br />
 		</p>
 
+		<h3>[property:Boolean DEFAULT_MATRIX_WORLD_AUTO_UPDATE]</h3>
+		<p>
+			L'impostazione predefinita per[page:.matrixWorldAutoUpdate matrixWorldAutoUpdate] per Object3D appena creati.<br />
+		</p>
 
 		<h2>Metodi</h2>
 
