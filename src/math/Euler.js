@@ -254,42 +254,42 @@ class Euler {
 
 			case 'XYZ':
 
-				this._y = Math.acos( clamp( -2 * q.w * q.y - 2 * q.x * q.z, -1, 1 ) );
-				consthalf_sum = -Math.atan2( -q.x - q.z, q.w + q.y );
-				half_diff = -Math.atan2( -q.x + q.z, q.w - q.y );
+				this._y = Math.acos( clamp( - 2 * q.w * q.y - 2 * q.x * q.z, - 1, 1 ) );
+				half_sum = -Math.atan2( - q.x - q.z, q.w + q.y );
+				half_diff = -Math.atan2( - q.x + q.z, q.w - q.y );
 				break;
 
 			case 'XZY':
 
-				this._y = Math.acos( clamp( -2 * q.w * q.z + 2 * q.x * q.y, -1, 1 ) );
+				this._y = Math.acos( clamp( - 2 * q.w * q.z + 2 * q.x * q.y, - 1, 1 ) );
 				half_sum = Math.atan2( q.x + q.y, q.w - q.z );
 				half_diff = Math.atan2( q.x - q.y, q.w + q.z );
 				break;
 
 			case 'YXZ':
 
-				this._y = Math.acos( clamp( -2 * q.w * q.x + 2 * q.y * q.z, -1, 1 ) );
+				this._y = Math.acos( clamp( - 2 * q.w * q.x + 2 * q.y * q.z, - 1, 1 ) );
 				half_sum = Math.atan2( q.y + q.z, q.w - q.x );
 				half_diff = Math.atan2( q.y - q.z, q.w + q.x );
 				break;
 
 			case 'YZX':
 
-				this._y = Math.acos( clamp( -2 * q.w * q.z - 2 * q.x * q.y, -1, 1 ) );
+				this._y = Math.acos( clamp( - 2 * q.w * q.z - 2 * q.x * q.y, - 1, 1 ) );
 				half_sum = -Math.atan2( -q.x - q.y, q.w + q.z );
 				half_diff = -Math.atan2( q.x - q.y, q.w - q.z );
 				break;
 
 			case 'ZXY':
 
-				this._y = Math.acos( clamp( -2 * q.w * q.x - 2 * q.y * q.z, -1, 1 ) );
-				half_sum = -Math.atan2( -q.y - q.z, q.w + q.x );
+				this._y = Math.acos( clamp( - 2 * q.w * q.x - 2 * q.y * q.z, - 1, 1 ) );
+				half_sum = -Math.atan2( - q.y - q.z, q.w + q.x );
 				half_diff = -Math.atan2( q.y - q.z, q.w - q.x );
 				break;
 
 			case 'ZYX':
 
-				this._y = Math.acos( clamp( -2 * q.w * q.y + 2 * q.x * q.z, -1, 1 ) );
+				this._y = Math.acos( clamp( - 2 * q.w * q.y + 2 * q.x * q.z, -1, 1 ) );
 				half_sum = Math.atan2( q.x + q.z, q.w - q.y );
 				half_diff = Math.atan2( -q.x + q.z, q.w + q.y );
 				break;
@@ -319,7 +319,7 @@ class Euler {
 
 			this._x -= 2 * Math.PI;
 
-		} else if ( -this._x > Math.PI ) {
+		} else if ( - this._x > Math.PI ) {
 
 			this._x += 2 * Math.PI;
 
@@ -329,7 +329,7 @@ class Euler {
 
 			this._z -= 2 * Math.PI;
 
-		} else if ( -this._z > Math.PI ) {
+		} else if ( - this._z > Math.PI ) {
 
 			this._z += 2 * Math.PI;
 
