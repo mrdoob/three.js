@@ -248,89 +248,96 @@ class Euler {
 	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
 	setFromQuaternionDirect( q, order, update ) {
 
-		const axes = MathUtils.get_axes( order );
-		const i = axes[ 0 ];
-		const j = axes[ 1 ];
-		const k = axes[ 2 ];
-		const parity = axes[ 3 ];
-		const symmetric = axes[ 4 ];
+        switch ( order ) {
 
-		const v = [ q.x, q.y, q.z ];
-		var a, b, c, d;
-		if ( symmetric ) {
+            case 'XYZ':
 
-			a = q.w;
-			b = v[ i ];
-			c = v[ j ];
-			d = v[ k ] * parity;
+                this._y = Mathutils.acos( clamp( -2 * q.w * q.y - 2 * q.x * q.z, -1, 1 ) );
+                half_sum = -Mathutils.atan2( -q.x - q.z, q.w + q.y );
+                half_diff = -Mathutils.atan2( -q.x + q.z, q.w - q.y );
+                break;
 
-		} else {
+            case 'XZY':
 
-			a = q.w - v[ j ];
-			b = v[ i ] + v[ k ] * parity;
-			c = v[ j ] + q.w;
-			d = v[ k ] * parity - v[ i ];
+                this._y = Mathutils.acos( clamp( -2 * q.w * q.z + 2 * q.x * q.y, -1, 1 ) );
+                half_sum = Mathutils.atan2( q.x + q.y, q.w - q.z );
+                half_diff = Mathutils.atan2( q.x - q.y, q.w + q.z );
+                break;
 
-		}
+            case 'YXZ':
 
-		var angles = [ 0, 0, 0 ];
+                this._y = Mathutils.acos( clamp( -2 * q.w * q.x + 2 * q.y * q.z, -1, 1 ) );
+                half_sum = Mathutils.atan2( q.y + q.z, q.w - q.x );
+                half_diff = Mathutils.atan2( q.y - q.z, q.w + q.x );
+                break;
 
-		// middle angle is always easy
-		angles[ 1 ] = Math.atan2( Math.hypot( c, d ), Math.hypot( a, b ) );
+            case 'YZX':
 
-		const half_sum = Math.atan2( b, a );
-		const half_diff = Math.atan2( d, c );
-		const eps = 10E-7;
+                this._y = Mathutils.acos( clamp( -2 * q.w * q.z - 2 * q.x * q.y, -1, 1 ) );
+                half_sum = -Mathutils.atan2( -q.x - q.y, q.w + q.z );
+                half_diff = -Mathutils.atan2( q.x - q.y, q.w - q.z );
+                break;
 
-		// check if the case is degenerate
-		if ( Math.abs( angles[ 1 ] ) < eps ) {
+            case 'ZXY':
 
-			angles[ 2 ] = 0;
-			angles[ 0 ] = 2 * half_sum;
+                this._y = Mathutils.acos( clamp( -2 * q.w * q.x - 2 * q.y * q.z, -1, 1 ) );
+                half_sum = -Mathutils.atan2( -q.y - q.z, q.w + q.x );
+                half_diff = -Mathutils.atan2( q.y - q.z, q.w - q.x );
+                break;
 
-		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < eps ) {
+            case 'ZYX':
 
-			angles[ 2 ] = 0;
-			angles[ 0 ] = 2 * half_diff;
+                this._y = Mathutils.acos( clamp( -2 * q.w * q.y + 2 * q.x * q.z, -1, 1 ) );
+                half_sum = Mathutils.atan2( q.x + q.z, q.w - q.y );
+                half_diff = Mathutils.atan2( -q.x + q.z, q.w + q.y );
+                break;
 
-		} else {
+            }
 
-			angles[ 2 ] = half_sum - half_diff;
-			angles[ 0 ] = half_sum + half_diff;
+        if ( Math.abs( this._y) < 0.00001 ) {
 
-		}
+            this._x = 2 * half_sum;
+            this._z = 0;
 
-		if ( ! symmetric ) {
+        } else if ( Math.abs( this._y - Math.PI ) < 0.00001) {
 
-			angles[ 0 ] *= parity;
-			angles[ 1 ] -= Math.PI / 2;
+            this._x = 2 * half_diff;
+            this._z = 0;
 
-		}
+        } else {
 
-		// making sure angles are in set [-pi, pi]
-		for ( let i = 0; i < 3; i ++ ) {
+            this._x = half_sum + half_diff;
+            this._z = half_sum - half_diff;
 
-			if ( angles[ i ] < - Math.PI ) {
+        }
 
-				angles[ i ] += 2 * Math.PI;
+        this._y -= Math.PI/2;
 
-			} else if ( angles[ i ] > Math.PI ) {
+        if ( this._x > Math.PI ) {
 
-				angles[ i ] -= 2 * Math.PI;
+            this._x -= 2 * Math.PI;
 
-			}
+        } else if ( -this._x > Math.PI ) {
 
-		}
+            this._x += 2 * Math.PI;
 
-		this._x = angles[ 0 ];
-		this._y = angles[ 1 ];
-		this._z = angles[ 2 ];
+        }
+
+        if ( this._z > Math.PI ) {
+
+            this._z -= 2 * Math.PI;
+
+        } else if ( -this._z > Math.PI ) {
+
+            this._z += 2 * Math.PI;
+
+        }
 
 		if ( update === true ) this._onChangeCallback();
 
 		return this;
 
-	}
+    }
 
 	setFromVector3( v, order = this._order ) {
 
