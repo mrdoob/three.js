@@ -289,7 +289,7 @@ class Euler {
 				break;
 
 			default:
-				console.warn(  'THREE.Euler: .setFromQuaternionDirect(  ) encountered an unknown order: ' + order  );'
+				console.warn(  'THREE.Euler: .setFromQuaternionDirect(  ) encountered an unknown order: ' + order  );
 
 		}
 
