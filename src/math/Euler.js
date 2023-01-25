@@ -253,46 +253,43 @@ class Euler {
 		switch ( order ) {
 
 			case 'XYZ':
-
 				this._y = Math.acos( clamp( - 2 * q.w * q.y - 2 * q.x * q.z, - 1, 1 ) );
-				half_sum = -Math.atan2( - q.x - q.z, q.w + q.y );
-				half_diff = -Math.atan2( - q.x + q.z, q.w - q.y );
+				half_sum = - Math.atan2( - q.x - q.z, q.w + q.y );
+				half_diff = - Math.atan2( - q.x + q.z, q.w - q.y );
 				break;
 
 			case 'XZY':
-
 				this._y = Math.acos( clamp( - 2 * q.w * q.z + 2 * q.x * q.y, - 1, 1 ) );
 				half_sum = Math.atan2( q.x + q.y, q.w - q.z );
 				half_diff = Math.atan2( q.x - q.y, q.w + q.z );
 				break;
 
 			case 'YXZ':
-
 				this._y = Math.acos( clamp( - 2 * q.w * q.x + 2 * q.y * q.z, - 1, 1 ) );
 				half_sum = Math.atan2( q.y + q.z, q.w - q.x );
 				half_diff = Math.atan2( q.y - q.z, q.w + q.x );
 				break;
 
 			case 'YZX':
-
 				this._y = Math.acos( clamp( - 2 * q.w * q.z - 2 * q.x * q.y, - 1, 1 ) );
-				half_sum = -Math.atan2( -q.x - q.y, q.w + q.z );
-				half_diff = -Math.atan2( q.x - q.y, q.w - q.z );
+				half_sum = - Math.atan2( - q.x - q.y, q.w + q.z );
+				half_diff = - Math.atan2( q.x - q.y, q.w - q.z );
 				break;
 
 			case 'ZXY':
-
 				this._y = Math.acos( clamp( - 2 * q.w * q.x - 2 * q.y * q.z, - 1, 1 ) );
-				half_sum = -Math.atan2( - q.y - q.z, q.w + q.x );
-				half_diff = -Math.atan2( q.y - q.z, q.w - q.x );
+				half_sum = - Math.atan2( - q.y - q.z, q.w + q.x );
+				half_diff = - Math.atan2( q.y - q.z, q.w - q.x );
 				break;
 
 			case 'ZYX':
-
-				this._y = Math.acos( clamp( - 2 * q.w * q.y + 2 * q.x * q.z, -1, 1 ) );
+				this._y = Math.acos( clamp( - 2 * q.w * q.y + 2 * q.x * q.z, - 1, 1 ) );
 				half_sum = Math.atan2( q.x + q.z, q.w - q.y );
-				half_diff = Math.atan2( -q.x + q.z, q.w + q.y );
+				half_diff = Math.atan2( - q.x + q.z, q.w + q.y );
 				break;
+
+			default:
+				console.warn(  'THREE.Euler: .setFromQuaternionDirect(  ) encountered an unknown order: ' + order  );'
 
 		}
 
@@ -311,7 +308,7 @@ class Euler {
 			this._x = half_sum + half_diff;
 			this._z = half_sum - half_diff;
 
-		}
+        }
 
 		this._y -= Math.PI/2;
 
