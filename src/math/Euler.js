@@ -293,12 +293,12 @@ class Euler {
 
 		}
 
-		if ( Math.abs( this._y) < 0.00001 ) {
+		if ( Math.abs( this._y ) < 0.00001 ) {
 
 			this._x = 2 * half_sum;
 			this._z = 0;
 
-		} else if ( Math.abs( this._y - Math.PI ) < 0.00001) {
+		} else if ( Math.abs( this._y - Math.PI ) < 0.00001 ) {
 
 			this._x = 2 * half_diff;
 			this._z = 0;
@@ -310,7 +310,7 @@ class Euler {
 
 		}
 
-		this._y -= Math.PI/2;
+		this._y -= Math.PI / 2;
 
 		if ( this._x > Math.PI ) {
 
