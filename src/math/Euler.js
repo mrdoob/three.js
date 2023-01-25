@@ -247,96 +247,99 @@ class Euler {
 	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
 	setFromQuaternionDirect( q, order, update ) {
 
-        switch ( order ) {
+		let half_sum;
+		let half_diff;
 
-            case 'XYZ':
+		switch ( order ) {
 
-                this._y = Mathutils.acos( clamp( -2 * q.w * q.y - 2 * q.x * q.z, -1, 1 ) );
-                half_sum = -Mathutils.atan2( -q.x - q.z, q.w + q.y );
-                half_diff = -Mathutils.atan2( -q.x + q.z, q.w - q.y );
-                break;
+			case 'XYZ':
 
-            case 'XZY':
+				this._y = Math.acos( clamp( -2 * q.w * q.y - 2 * q.x * q.z, -1, 1 ) );
+				consthalf_sum = -Math.atan2( -q.x - q.z, q.w + q.y );
+				half_diff = -Math.atan2( -q.x + q.z, q.w - q.y );
+				break;
 
-                this._y = Mathutils.acos( clamp( -2 * q.w * q.z + 2 * q.x * q.y, -1, 1 ) );
-                half_sum = Mathutils.atan2( q.x + q.y, q.w - q.z );
-                half_diff = Mathutils.atan2( q.x - q.y, q.w + q.z );
-                break;
+			case 'XZY':
 
-            case 'YXZ':
+				this._y = Math.acos( clamp( -2 * q.w * q.z + 2 * q.x * q.y, -1, 1 ) );
+				half_sum = Math.atan2( q.x + q.y, q.w - q.z );
+				half_diff = Math.atan2( q.x - q.y, q.w + q.z );
+				break;
 
-                this._y = Mathutils.acos( clamp( -2 * q.w * q.x + 2 * q.y * q.z, -1, 1 ) );
-                half_sum = Mathutils.atan2( q.y + q.z, q.w - q.x );
-                half_diff = Mathutils.atan2( q.y - q.z, q.w + q.x );
-                break;
+			case 'YXZ':
 
-            case 'YZX':
+				this._y = Math.acos( clamp( -2 * q.w * q.x + 2 * q.y * q.z, -1, 1 ) );
+				half_sum = Math.atan2( q.y + q.z, q.w - q.x );
+				half_diff = Math.atan2( q.y - q.z, q.w + q.x );
+				break;
 
-                this._y = Mathutils.acos( clamp( -2 * q.w * q.z - 2 * q.x * q.y, -1, 1 ) );
-                half_sum = -Mathutils.atan2( -q.x - q.y, q.w + q.z );
-                half_diff = -Mathutils.atan2( q.x - q.y, q.w - q.z );
-                break;
+			case 'YZX':
 
-            case 'ZXY':
+				this._y = Math.acos( clamp( -2 * q.w * q.z - 2 * q.x * q.y, -1, 1 ) );
+				half_sum = -Math.atan2( -q.x - q.y, q.w + q.z );
+				half_diff = -Math.atan2( q.x - q.y, q.w - q.z );
+				break;
 
-                this._y = Mathutils.acos( clamp( -2 * q.w * q.x - 2 * q.y * q.z, -1, 1 ) );
-                half_sum = -Mathutils.atan2( -q.y - q.z, q.w + q.x );
-                half_diff = -Mathutils.atan2( q.y - q.z, q.w - q.x );
-                break;
+			case 'ZXY':
 
-            case 'ZYX':
+				this._y = Math.acos( clamp( -2 * q.w * q.x - 2 * q.y * q.z, -1, 1 ) );
+				half_sum = -Math.atan2( -q.y - q.z, q.w + q.x );
+				half_diff = -Math.atan2( q.y - q.z, q.w - q.x );
+				break;
 
-                this._y = Mathutils.acos( clamp( -2 * q.w * q.y + 2 * q.x * q.z, -1, 1 ) );
-                half_sum = Mathutils.atan2( q.x + q.z, q.w - q.y );
-                half_diff = Mathutils.atan2( -q.x + q.z, q.w + q.y );
-                break;
+			case 'ZYX':
 
-            }
+				this._y = Math.acos( clamp( -2 * q.w * q.y + 2 * q.x * q.z, -1, 1 ) );
+				half_sum = Math.atan2( q.x + q.z, q.w - q.y );
+				half_diff = Math.atan2( -q.x + q.z, q.w + q.y );
+				break;
 
-        if ( Math.abs( this._y) < 0.00001 ) {
+		}
 
-            this._x = 2 * half_sum;
-            this._z = 0;
+		if ( Math.abs( this._y) < 0.00001 ) {
 
-        } else if ( Math.abs( this._y - Math.PI ) < 0.00001) {
+			this._x = 2 * half_sum;
+			this._z = 0;
 
-            this._x = 2 * half_diff;
-            this._z = 0;
+		} else if ( Math.abs( this._y - Math.PI ) < 0.00001) {
 
-        } else {
+			this._x = 2 * half_diff;
+			this._z = 0;
 
-            this._x = half_sum + half_diff;
-            this._z = half_sum - half_diff;
+		} else {
 
-        }
+			this._x = half_sum + half_diff;
+			this._z = half_sum - half_diff;
 
-        this._y -= Math.PI/2;
+		}
 
-        if ( this._x > Math.PI ) {
+		this._y -= Math.PI/2;
 
-            this._x -= 2 * Math.PI;
+		if ( this._x > Math.PI ) {
 
-        } else if ( -this._x > Math.PI ) {
+			this._x -= 2 * Math.PI;
 
-            this._x += 2 * Math.PI;
+		} else if ( -this._x > Math.PI ) {
 
-        }
+			this._x += 2 * Math.PI;
 
-        if ( this._z > Math.PI ) {
+		}
 
-            this._z -= 2 * Math.PI;
+		if ( this._z > Math.PI ) {
 
-        } else if ( -this._z > Math.PI ) {
+			this._z -= 2 * Math.PI;
 
-            this._z += 2 * Math.PI;
+		} else if ( -this._z > Math.PI ) {
 
-        }
+			this._z += 2 * Math.PI;
+
+		}
 
 		if ( update === true ) this._onChangeCallback();
 
 		return this;
 
-    }
+	}
 
 	setFromVector3( v, order = this._order ) {
 
