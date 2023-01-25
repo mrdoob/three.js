@@ -289,7 +289,7 @@ class Euler {
 				break;
 
 			default:
-				console.warn(  'THREE.Euler: .setFromQuaternionDirect(  ) encountered an unknown order: ' + order  );
+				console.warn( 'THREE.Euler: .setFromQuaternionDirect(  ) encountered an unknown order: ' + order );
 
 		}
 
@@ -308,7 +308,7 @@ class Euler {
 			this._x = half_sum + half_diff;
 			this._z = half_sum - half_diff;
 
-        }
+		}
 
 		this._y -= Math.PI/2;
 
