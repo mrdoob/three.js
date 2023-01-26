@@ -30,9 +30,7 @@ class TextureNode extends UniformNode {
 
 	getDefaultUV() {
 
-		defaultUV ||= new UVNode();
-
-		return defaultUV;
+		return defaultUV || ( defaultUV = new UVNode() );
 
 	}
 
@@ -46,11 +44,11 @@ class TextureNode extends UniformNode {
 
 		if ( uvNode === null && builder.context.getUVNode ) {
 
-			uvNode = builder.context.getUVNode( this )
+			uvNode = builder.context.getUVNode( this );
 
 		}
 
-		uvNode ||= this.getDefaultUV();
+		uvNode || ( uvNode = this.getDefaultUV() );
 
 		//
 
@@ -106,7 +104,7 @@ class TextureNode extends UniformNode {
 
 				let snippet = null;
 
-				if ( levelNode?.isNode === true) {
+				if ( levelNode && levelNode.isNode === true ) {
 
 					const levelSnippet = levelNode.build( builder, 'float' );
 

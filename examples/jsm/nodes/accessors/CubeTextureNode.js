@@ -2,7 +2,7 @@ import TextureNode from './TextureNode.js';
 import UniformNode from '../core/UniformNode.js';
 import ReflectVectorNode from './ReflectVectorNode.js';
 
-import { negate, vec3, nodeObject } from '../shadernode/ShaderNodeBaseElements.js';
+import { vec3, nodeObject } from '../shadernode/ShaderNodeBaseElements.js';
 
 let defaultUV;
 
@@ -24,9 +24,7 @@ class CubeTextureNode extends TextureNode {
 
 	getDefaultUV() {
 
-		defaultUV ||= new ReflectVectorNode();
-
-		return defaultUV;
+		return defaultUV || ( defaultUV = new ReflectVectorNode() );
 
 	}
 
@@ -61,7 +59,7 @@ class CubeTextureNode extends TextureNode {
 			if ( propertyName === undefined ) {
 
 				const uvNodeObject = nodeObject( uvNode );
-				const cubeUV = vec3( negate( uvNodeObject.x ), uvNodeObject.yz );
+				const cubeUV = vec3( uvNodeObject.x.negate(), uvNodeObject.yz );
 				const uvSnippet = cubeUV.build( builder, 'vec3' );
 
 				const nodeVar = builder.getVarFromNode( this, 'vec4' );
@@ -70,7 +68,7 @@ class CubeTextureNode extends TextureNode {
 
 				let snippet = null;
 
-				if ( levelNode?.isNode === true) {
+				if ( levelNode && levelNode.isNode === true ) {
 
 					const levelSnippet = levelNode.build( builder, 'float' );
 

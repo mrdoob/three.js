@@ -3,7 +3,6 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	LoaderUtils,
 	Color
 } from 'three';
 
@@ -298,6 +297,44 @@ class PLYLoader extends Loader {
 
 		}
 
+		function mapElementAttributes( properties ) {
+
+			const elementNames = properties.map( property => {
+
+				return property.name;
+
+			} );
+
+			function findAttrName( names ) {
+
+				for ( let i = 0, l = names.length; i < l; i ++ ) {
+
+					const name = names[ i ];
+
+					if ( elementNames.includes( name ) ) return name;
+
+				}
+
+				return null;
+
+			}
+
+			return {
+				attrX: findAttrName( [ 'x', 'px', 'posx' ] ) || 'x',
+				attrY: findAttrName( [ 'y', 'py', 'posy' ] ) || 'y',
+				attrZ: findAttrName( [ 'z', 'pz', 'posz' ] ) || 'z',
+				attrNX: findAttrName( [ 'nx', 'normalx' ] ),
+				attrNY: findAttrName( [ 'ny', 'normaly' ] ),
+				attrNZ: findAttrName( [ 'nz', 'normalz' ] ),
+				attrS: findAttrName( [ 's', 'u', 'texture_u', 'tx' ] ),
+				attrT: findAttrName( [ 't', 'v', 'texture_v', 'ty' ] ),
+				attrR: findAttrName( [ 'red', 'diffuse_red', 'r', 'diffuse_r' ] ),
+				attrG: findAttrName( [ 'green', 'diffuse_green', 'g', 'diffuse_g' ] ),
+				attrB: findAttrName( [ 'blue', 'diffuse_blue', 'b', 'diffuse_b' ] ),
+			};
+
+		}
+
 		function parseASCII( data, header ) {
 
 			// PLY ascii format specification, as per http://en.wikipedia.org/wiki/PLY_(file_format)
@@ -317,6 +354,8 @@ class PLYLoader extends Loader {
 			const lines = body.split( /\r\n|\r|\n/ );
 			let currentElement = 0;
 			let currentElementCount = 0;
+			let elementDesc = header.elements[ currentElement ];
+			let attributeMap = mapElementAttributes( elementDesc.properties );
 
 			for ( let i = 0; i < lines.length; i ++ ) {
 
@@ -328,16 +367,19 @@ class PLYLoader extends Loader {
 
 				}
 
-				if ( currentElementCount >= header.elements[ currentElement ].count ) {
+				if ( currentElementCount >= elementDesc.count ) {
 
 					currentElement ++;
 					currentElementCount = 0;
+					elementDesc = header.elements[ currentElement ];
+
+					attributeMap = mapElementAttributes( elementDesc.properties );
 
 				}
 
-				const element = parseASCIIElement( header.elements[ currentElement ].properties, line );
+				const element = parseASCIIElement( elementDesc.properties, line );
 
-				handleElement( buffer, header.elements[ currentElement ].name, element );
+				handleElement( buffer, elementDesc.name, element, attributeMap );
 
 				currentElementCount ++;
 
@@ -412,56 +454,30 @@ class PLYLoader extends Loader {
 
 		}
 
-		function handleElement( buffer, elementName, element ) {
-
-			function findAttrName( names ) {
-
-				for ( let i = 0, l = names.length; i < l; i ++ ) {
-
-					const name = names[ i ];
-
-					if ( name in element ) return name;
-
-				}
-
-				return null;
-
-			}
-
-			const attrX = findAttrName( [ 'x', 'px', 'posx' ] ) || 'x';
-			const attrY = findAttrName( [ 'y', 'py', 'posy' ] ) || 'y';
-			const attrZ = findAttrName( [ 'z', 'pz', 'posz' ] ) || 'z';
-			const attrNX = findAttrName( [ 'nx', 'normalx' ] );
-			const attrNY = findAttrName( [ 'ny', 'normaly' ] );
-			const attrNZ = findAttrName( [ 'nz', 'normalz' ] );
-			const attrS = findAttrName( [ 's', 'u', 'texture_u', 'tx' ] );
-			const attrT = findAttrName( [ 't', 'v', 'texture_v', 'ty' ] );
-			const attrR = findAttrName( [ 'red', 'diffuse_red', 'r', 'diffuse_r' ] );
-			const attrG = findAttrName( [ 'green', 'diffuse_green', 'g', 'diffuse_g' ] );
-			const attrB = findAttrName( [ 'blue', 'diffuse_blue', 'b', 'diffuse_b' ] );
+		function handleElement( buffer, elementName, element, cacheEntry ) {
 
 			if ( elementName === 'vertex' ) {
 
-				buffer.vertices.push( element[ attrX ], element[ attrY ], element[ attrZ ] );
+				buffer.vertices.push( element[ cacheEntry.attrX ], element[ cacheEntry.attrY ], element[ cacheEntry.attrZ ] );
 
-				if ( attrNX !== null && attrNY !== null && attrNZ !== null ) {
+				if ( cacheEntry.attrNX !== null && cacheEntry.attrNY !== null && cacheEntry.attrNZ !== null ) {
 
-					buffer.normals.push( element[ attrNX ], element[ attrNY ], element[ attrNZ ] );
-
-				}
-
-				if ( attrS !== null && attrT !== null ) {
-
-					buffer.uvs.push( element[ attrS ], element[ attrT ] );
+					buffer.normals.push( element[ cacheEntry.attrNX ], element[ cacheEntry.attrNY ], element[ cacheEntry.attrNZ ] );
 
 				}
 
-				if ( attrR !== null && attrG !== null && attrB !== null ) {
+				if ( cacheEntry.attrS !== null && cacheEntry.attrT !== null ) {
+
+					buffer.uvs.push( element[ cacheEntry.attrS ], element[ cacheEntry.attrT ] );
+
+				}
+
+				if ( cacheEntry.attrR !== null && cacheEntry.attrG !== null && cacheEntry.attrB !== null ) {
 
 					_color.setRGB(
-						element[ attrR ] / 255.0,
-						element[ attrG ] / 255.0,
-						element[ attrB ] / 255.0
+						element[ cacheEntry.attrR ] / 255.0,
+						element[ cacheEntry.attrG ] / 255.0,
+						element[ cacheEntry.attrB ] / 255.0
 					).convertSRGBToLinear();
 
 					buffer.colors.push( _color.r, _color.g, _color.b );
@@ -506,60 +522,113 @@ class PLYLoader extends Loader {
 
 		}
 
-		function binaryRead( dataview, at, type, little_endian ) {
-
-			switch ( type ) {
-
-				// corespondences for non-specific length types here match rply:
-				case 'int8':		case 'char':	 return [ dataview.getInt8( at ), 1 ];
-				case 'uint8':		case 'uchar':	 return [ dataview.getUint8( at ), 1 ];
-				case 'int16':		case 'short':	 return [ dataview.getInt16( at, little_endian ), 2 ];
-				case 'uint16':	case 'ushort': return [ dataview.getUint16( at, little_endian ), 2 ];
-				case 'int32':		case 'int':		 return [ dataview.getInt32( at, little_endian ), 4 ];
-				case 'uint32':	case 'uint':	 return [ dataview.getUint32( at, little_endian ), 4 ];
-				case 'float32': case 'float':	 return [ dataview.getFloat32( at, little_endian ), 4 ];
-				case 'float64': case 'double': return [ dataview.getFloat64( at, little_endian ), 8 ];
-
-			}
-
-		}
-
-		function binaryReadElement( dataview, at, properties, little_endian ) {
+		function binaryReadElement( at, properties ) {
 
 			const element = {};
-			let result, read = 0;
+			let read = 0;
 
 			for ( let i = 0; i < properties.length; i ++ ) {
 
-				if ( properties[ i ].type === 'list' ) {
+				const property = properties[ i ];
+				const valueReader = property.valueReader;
+
+				if ( property.type === 'list' ) {
 
 					const list = [];
 
-					result = binaryRead( dataview, at + read, properties[ i ].countType, little_endian );
-					const n = result[ 0 ];
-					read += result[ 1 ];
+					const n = property.countReader.read( at + read );
+					read += property.countReader.size;
 
 					for ( let j = 0; j < n; j ++ ) {
 
-						result = binaryRead( dataview, at + read, properties[ i ].itemType, little_endian );
-						list.push( result[ 0 ] );
-						read += result[ 1 ];
+						list.push( valueReader.read( at + read ) );
+						read += valueReader.size;
 
 					}
 
-					element[ properties[ i ].name ] = list;
+					element[ property.name ] = list;
 
 				} else {
 
-					result = binaryRead( dataview, at + read, properties[ i ].type, little_endian );
-					element[ properties[ i ].name ] = result[ 0 ];
-					read += result[ 1 ];
+					element[ property.name ] = valueReader.read( at + read );
+					read += valueReader.size;
 
 				}
 
 			}
 
 			return [ element, read ];
+
+		}
+
+		function setPropertyBinaryReaders( properties, body, little_endian ) {
+
+			function getBinaryReader( dataview, type, little_endian ) {
+
+				switch ( type ) {
+
+					// corespondences for non-specific length types here match rply:
+					case 'int8':	case 'char':	return { read: ( at ) => {
+
+						return dataview.getInt8( at );
+
+					}, size: 1 };
+					case 'uint8':	case 'uchar':	return { read: ( at ) => {
+
+						return dataview.getUint8( at );
+
+					}, size: 1 };
+					case 'int16':	case 'short':	return { read: ( at ) => {
+
+						return dataview.getInt16( at, little_endian );
+
+					}, size: 2 };
+					case 'uint16':	case 'ushort':	return { read: ( at ) => {
+
+						return dataview.getUint16( at, little_endian );
+
+					}, size: 2 };
+					case 'int32':	case 'int':		return { read: ( at ) => {
+
+						return dataview.getInt32( at, little_endian );
+
+					}, size: 4 };
+					case 'uint32':	case 'uint':	return { read: ( at ) => {
+
+						return dataview.getUint32( at, little_endian );
+
+					}, size: 4 };
+					case 'float32': case 'float':	return { read: ( at ) => {
+
+						return dataview.getFloat32( at, little_endian );
+
+					}, size: 4 };
+					case 'float64': case 'double':	return { read: ( at ) => {
+
+						return dataview.getFloat64( at, little_endian );
+
+					}, size: 8 };
+
+				}
+
+			}
+
+			for ( let i = 0, l = properties.length; i < l; i ++ ) {
+
+				const property = properties[ i ];
+
+				if ( property.type === 'list' ) {
+
+					property.countReader = getBinaryReader( body, property.countType, little_endian );
+					property.valueReader = getBinaryReader( body, property.itemType, little_endian );
+
+				} else {
+
+					property.valueReader = getBinaryReader( body, property.type, little_endian );
+
+				}
+
+			}
 
 		}
 
@@ -573,19 +642,59 @@ class PLYLoader extends Loader {
 
 			for ( let currentElement = 0; currentElement < header.elements.length; currentElement ++ ) {
 
-				for ( let currentElementCount = 0; currentElementCount < header.elements[ currentElement ].count; currentElementCount ++ ) {
+				const elementDesc = header.elements[ currentElement ];
+				const properties = elementDesc.properties;
+				const attributeMap = mapElementAttributes( properties );
 
-					result = binaryReadElement( body, loc, header.elements[ currentElement ].properties, little_endian );
+				setPropertyBinaryReaders( properties, body, little_endian );
+
+				for ( let currentElementCount = 0; currentElementCount < elementDesc.count; currentElementCount ++ ) {
+
+					result = binaryReadElement( loc, properties );
 					loc += result[ 1 ];
 					const element = result[ 0 ];
 
-					handleElement( buffer, header.elements[ currentElement ].name, element );
+					handleElement( buffer, elementDesc.name, element, attributeMap );
 
 				}
 
 			}
 
 			return postProcess( buffer );
+
+		}
+
+		function extractHeaderText( bytes ) {
+
+			let i = 0;
+			let cont = true;
+
+			let line = '';
+			const lines = [];
+
+			do {
+
+				const c = String.fromCharCode( bytes[ i ++ ] );
+
+				if ( c !== '\n' && c !== '\r' ) {
+
+					line += c;
+
+				} else {
+
+					if ( line === 'end_header' ) cont = false;
+					if ( line !== '' ) {
+
+						lines.push( line );
+						line = '';
+
+					}
+
+				}
+
+			} while ( cont && i < bytes.length );
+
+			return lines.join( '\r' ) + '\r';
 
 		}
 
@@ -596,10 +705,21 @@ class PLYLoader extends Loader {
 
 		if ( data instanceof ArrayBuffer ) {
 
-			const text = LoaderUtils.decodeText( new Uint8Array( data ) );
-			const header = parseHeader( text );
+			const bytes = new Uint8Array( data );
+			const headerText = extractHeaderText( bytes );
+			const header = parseHeader( headerText );
 
-			geometry = header.format === 'ascii' ? parseASCII( text, header ) : parseBinary( data, header );
+			if ( header.format === 'ascii' ) {
+
+				const text = new TextDecoder().decode( bytes );
+
+				geometry = parseASCII( text, header );
+
+			} else {
+
+				geometry = parseBinary( data, header );
+
+			}
 
 		} else {
 

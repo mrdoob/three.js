@@ -1,7 +1,6 @@
 import Node from '../core/Node.js';
 import {
-	transformedNormalView, positionViewDirection,
-	transformDirection, negate, reflect, cameraViewMatrix
+	transformedNormalView, positionViewDirection, cameraViewMatrix
 } from '../shadernode/ShaderNodeBaseElements.js';
 
 class ReflectVectorNode extends Node {
@@ -20,9 +19,9 @@ class ReflectVectorNode extends Node {
 
 	construct() {
 
-		const reflectView = reflect( negate( positionViewDirection ), transformedNormalView );
+		const reflectView = positionViewDirection.negate().reflect( transformedNormalView );
 
-		return transformDirection( reflectView, cameraViewMatrix );
+		return reflectView.transformDirection( cameraViewMatrix );
 
 	}
 

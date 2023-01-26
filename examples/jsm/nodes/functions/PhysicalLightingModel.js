@@ -5,7 +5,7 @@ import {
 	ShaderNode,
 	vec3, mul, clamp, add, sub, dot, div, transformedNormalView,
 	pow, exp2, dotNV,
-	diffuseColor, specularColor, roughness, temp
+	diffuseColor, specularColor, roughness, temp, lightingModel
 } from '../shadernode/ShaderNodeElements.js';
 
 // Fdez-Agüera's "Multiple-Scattering Microfacet Model for Real-Time Image Based Lighting"
@@ -84,11 +84,6 @@ const RE_AmbientOcclusion_Physical = new ShaderNode( ( { ambientOcclusion, refle
 
 } );
 
-const PhysicalLightingModel = {
-	direct: RE_Direct_Physical,
-	indirectDiffuse: RE_IndirectDiffuse_Physical,
-	indirectSpecular: RE_IndirectSpecular_Physical,
-	ambientOcclusion: RE_AmbientOcclusion_Physical
-};
+const physicalLightingModel = lightingModel( RE_Direct_Physical, RE_IndirectDiffuse_Physical, RE_IndirectSpecular_Physical, RE_AmbientOcclusion_Physical );
 
-export default PhysicalLightingModel;
+export default physicalLightingModel;

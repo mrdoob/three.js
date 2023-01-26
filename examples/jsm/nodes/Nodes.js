@@ -10,6 +10,7 @@ import ExpressionNode from './core/ExpressionNode.js';
 import FunctionCallNode from './core/FunctionCallNode.js';
 import FunctionNode from './core/FunctionNode.js';
 import InstanceIndexNode from './core/InstanceIndexNode.js';
+import LightingModel from './core/LightingModel.js';
 import Node from './core/Node.js';
 import NodeAttribute from './core/NodeAttribute.js';
 import NodeBuilder from './core/NodeBuilder.js';
@@ -75,6 +76,7 @@ import CondNode from './math/CondNode.js';
 import PointLightNode from './lighting/PointLightNode.js';
 import DirectionalLightNode from './lighting/DirectionalLightNode.js';
 import SpotLightNode from './lighting/SpotLightNode.js';
+import IESSpotLightNode from './lighting/IESSpotLightNode.js';
 import AmbientLightNode from './lighting/AmbientLightNode.js';
 import LightsNode from './lighting/LightsNode.js';
 import LightingNode from './lighting/LightingNode.js';
@@ -87,6 +89,7 @@ import AnalyticLightNode from './lighting/AnalyticLightNode.js';
 // utils
 import ArrayElementNode from './utils/ArrayElementNode.js';
 import ConvertNode from './utils/ConvertNode.js';
+import DiscardNode from './utils/DiscardNode.js';
 import EquirectUVNode from './utils/EquirectUVNode.js';
 import JoinNode from './utils/JoinNode.js';
 import MatcapUVNode from './utils/MatcapUVNode.js';
@@ -145,6 +148,7 @@ const nodeLib = {
 	FunctionCallNode,
 	FunctionNode,
 	InstanceIndexNode,
+	LightingModel,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -210,6 +214,7 @@ const nodeLib = {
 	PointLightNode,
 	DirectionalLightNode,
 	SpotLightNode,
+	IESSpotLightNode,
 	AmbientLightNode,
 	LightsNode,
 	LightingNode,
@@ -222,6 +227,7 @@ const nodeLib = {
 	// utils
 	ArrayElementNode,
 	ConvertNode,
+	DiscardNode,
 	EquirectUVNode,
 	JoinNode,
 	MatcapUVNode,
@@ -273,6 +279,7 @@ export {
 	FunctionCallNode,
 	FunctionNode,
 	InstanceIndexNode,
+	LightingModel,
 	Node,
 	NodeAttribute,
 	NodeBuilder,
@@ -338,6 +345,7 @@ export {
 	PointLightNode,
 	DirectionalLightNode,
 	SpotLightNode,
+	IESSpotLightNode,
 	AmbientLightNode,
 	LightsNode,
 	LightingNode,
@@ -350,6 +358,7 @@ export {
 	// utils
 	ArrayElementNode,
 	ConvertNode,
+	DiscardNode,
 	EquirectUVNode,
 	JoinNode,
 	MatcapUVNode,

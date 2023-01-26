@@ -306,8 +306,7 @@ function SidebarMaterial( editor ) {
 	const materialSideOptions = {
 		0: 'Front',
 		1: 'Back',
-		2: 'Double',
-		3: 'TwoPassDouble'
+		2: 'Double'
 	};
 
 	const materialSide = new SidebarMaterialConstantProperty( editor, 'side', strings.getKey( 'sidebar/material/side' ), materialSideOptions );
@@ -351,6 +350,11 @@ function SidebarMaterial( editor ) {
 
 	const materialTransparent = new SidebarMaterialBooleanProperty( editor, 'transparent', strings.getKey( 'sidebar/material/transparent' ) );
 	container.add( materialTransparent );
+
+	// forceSinglePass
+
+	const materialForceSinglePass = new SidebarMaterialBooleanProperty( editor, 'forceSinglePass', strings.getKey( 'sidebar/material/forcesinglepass' ) );
+	container.add( materialForceSinglePass );
 
 	// alpha test
 

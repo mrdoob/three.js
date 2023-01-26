@@ -102,12 +102,10 @@
 				}
 
 				const pointsMaterial = new THREE.PointsMaterial( {
-
 					color: 0x0080ff,
 					map: texture,
 					size: 1,
 					alphaTest: 0.5
-
 				} );
 
 				const pointsGeometry = new THREE.BufferGeometry().setFromPoints( vertices );
@@ -120,20 +118,14 @@
 				const meshMaterial = new THREE.MeshLambertMaterial( {
 					color: 0xffffff,
 					opacity: 0.5,
+					side: THREE.DoubleSide,
 					transparent: true
 				} );
 
 				const meshGeometry = new ConvexGeometry( vertices );
 
-				const mesh1 = new THREE.Mesh( meshGeometry, meshMaterial );
-				mesh1.material.side = THREE.BackSide; // back faces
-				mesh1.renderOrder = 0;
-				group.add( mesh1 );
-
-				const mesh2 = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
-				mesh2.material.side = THREE.FrontSide; // front faces
-				mesh2.renderOrder = 1;
-				group.add( mesh2 );
+				const mesh = new THREE.Mesh( meshGeometry, meshMaterial );
+				group.add( mesh );
 
 				//
 

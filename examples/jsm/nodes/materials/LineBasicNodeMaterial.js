@@ -11,6 +11,9 @@ class LineBasicNodeMaterial extends NodeMaterial {
 
 		this.isLineBasicNodeMaterial = true;
 
+		this.lights = false;
+		this.normals = false;
+
 		this.colorNode = null;
 		this.opacityNode = null;
 

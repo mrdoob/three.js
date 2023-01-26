@@ -7,6 +7,8 @@ import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
 import { Selector } from './Viewport.Selector.js';
 
+THREE.ColorManagement.legacyMode = false;
+
 var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
 _DEFAULT_CAMERA.name = 'Camera';
 _DEFAULT_CAMERA.position.set( 0, 5, 10 );
@@ -136,6 +138,8 @@ Editor.prototype = {
 		this.scene.background = scene.background;
 		this.scene.environment = scene.environment;
 		this.scene.fog = scene.fog;
+		this.scene.backgroundBlurriness = scene.backgroundBlurriness;
+		this.scene.backgroundIntensity = scene.backgroundIntensity;
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 

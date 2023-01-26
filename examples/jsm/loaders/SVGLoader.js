@@ -866,7 +866,7 @@ class SVGLoader extends Loader {
 
 			}
 
-			const regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
+			const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
 
 			const path = new ShapePath();
 
@@ -901,7 +901,7 @@ class SVGLoader extends Loader {
 
 			}
 
-			const regex = /(-?[\d\.?]+)[,|\s](-?[\d\.?]+)/g;
+			const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
 
 			const path = new ShapePath();
 
@@ -1600,7 +1600,7 @@ class SVGLoader extends Loader {
 				const sinTheta = Math.sin( curve.aRotation );
 
 				const v1 = new Vector3( a * cosTheta, a * sinTheta, 0 );
-				const v2 = new Vector3( -b * sinTheta, b * cosTheta, 0 );
+				const v2 = new Vector3( - b * sinTheta, b * cosTheta, 0 );
 
 				const f1 = v1.applyMatrix3( m );
 				const f2 = v2.applyMatrix3( m );
@@ -1608,7 +1608,7 @@ class SVGLoader extends Loader {
 				const mF = tempTransform0.set(
 					f1.x, f2.x, 0,
 					f1.y, f2.y, 0,
-					0,    0,    1,
+					0, 0, 1,
 				);
 
 				const mFInv = tempTransform1.copy( mF ).invert();
@@ -1616,7 +1616,7 @@ class SVGLoader extends Loader {
 				const mQ = mFInvT.multiply( mFInv );
 				const mQe = mQ.elements;
 
-				const ed = eigenDecomposition( mQe[0], mQe[1], mQe[4] );
+				const ed = eigenDecomposition( mQe[ 0 ], mQe[ 1 ], mQe[ 4 ] );
 				const rt1sqrt = Math.sqrt( ed.rt1 );
 				const rt2sqrt = Math.sqrt( ed.rt2 );
 
@@ -1630,18 +1630,18 @@ class SVGLoader extends Loader {
 				// Do not touch angles of a full ellipse because after transformation they
 				// would converge to a sinle value effectively removing the whole curve
 
-				if ( !isFullEllipse ) {
+				if ( ! isFullEllipse ) {
 
 					const mDsqrt = tempTransform1.set(
 						rt1sqrt, 0, 0,
 						0, rt2sqrt, 0,
-						0, 0,       1,
+						0, 0, 1,
 					);
 
 					const mRT = tempTransform2.set(
-						ed.cs,  ed.sn, 0,
-						-ed.sn, ed.cs, 0,
-						0,      0,     1,
+						ed.cs, ed.sn, 0,
+						- ed.sn, ed.cs, 0,
+						0, 0, 1,
 					);
 
 					const mDRF = mDsqrt.multiply( mRT ).multiply( mF );
@@ -1660,7 +1660,7 @@ class SVGLoader extends Loader {
 
 					if ( isTransformFlipped( m ) ) {
 
-						curve.aClockwise = !curve.aClockwise;
+						curve.aClockwise = ! curve.aClockwise;
 
 					}
 
@@ -1688,16 +1688,16 @@ class SVGLoader extends Loader {
 				// `sx`, `sy`, or both might be zero.
 				const theta =
 					sx > Number.EPSILON
-					? Math.atan2( m.elements[ 1 ], m.elements[ 0 ] )
-					: Math.atan2( - m.elements[ 3 ], m.elements[ 4 ] );
+						? Math.atan2( m.elements[ 1 ], m.elements[ 0 ] )
+						: Math.atan2( - m.elements[ 3 ], m.elements[ 4 ] );
 
 				curve.aRotation += theta;
 
 				if ( isTransformFlipped( m ) ) {
 
-					curve.aStartAngle *= -1;
-					curve.aEndAngle *= -1;
-					curve.aClockwise = !curve.aClockwise;
+					curve.aStartAngle *= - 1;
+					curve.aEndAngle *= - 1;
+					curve.aClockwise = ! curve.aClockwise;
 
 				}
 
@@ -1829,7 +1829,7 @@ class SVGLoader extends Loader {
 				// This case needs to be treated separately to avoid div by 0
 
 				rt1 = 0.5 * rt;
-				rt2 = -0.5 * rt;
+				rt2 = - 0.5 * rt;
 
 			}
 
@@ -1847,7 +1847,7 @@ class SVGLoader extends Loader {
 
 			if ( Math.abs( cs ) > 2 * Math.abs( B ) ) {
 
-				t = -2 * B / cs;
+				t = - 2 * B / cs;
 				sn = 1 / Math.sqrt( 1 + t * t );
 				cs = t * sn;
 
@@ -1858,7 +1858,7 @@ class SVGLoader extends Loader {
 
 			} else {
 
-				t = -0.5 * cs / B;
+				t = - 0.5 * cs / B;
 				cs = 1 / Math.sqrt( 1 + t * t );
 				sn = t * cs;
 
@@ -1867,7 +1867,7 @@ class SVGLoader extends Loader {
 			if ( df > 0 ) {
 
 				t = cs;
-				cs = -sn;
+				cs = - sn;
 				sn = t;
 
 			}
@@ -2311,20 +2311,20 @@ class SVGLoader extends Loader {
 
 			}
 
-			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: -1, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
+			return { curves: p.curves, points: points, isCW: ShapeUtils.isClockWise( points ), identifier: - 1, boundingBox: new Box2( new Vector2( minX, minY ), new Vector2( maxX, maxY ) ) };
 
 		} );
 
 		simplePaths = simplePaths.filter( sp => sp.points.length > 1 );
 
-		for ( let identifier = 0; identifier < simplePaths.length; identifier++ ) {
+		for ( let identifier = 0; identifier < simplePaths.length; identifier ++ ) {
 
-			simplePaths[identifier].identifier = identifier;
+			simplePaths[ identifier ].identifier = identifier;
 
 		}
 
 		// check if path is solid or a hole
-		const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, shapePath.userData?.style.fillRule ) );
+		const isAHole = simplePaths.map( p => isHoleTo( p, simplePaths, scanlineMinX, scanlineMaxX, ( shapePath.userData ? shapePath.userData.style.fillRule : undefined ) ) );
 
 
 		const shapesToReturn = [];

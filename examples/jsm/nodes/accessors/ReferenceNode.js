@@ -1,5 +1,6 @@
 import Node from '../core/Node.js';
 import UniformNode from '../core/UniformNode.js';
+import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 class ReferenceNode extends Node {
@@ -24,39 +25,40 @@ class ReferenceNode extends Node {
 
 	setNodeType( uniformType ) {
 
-		this.node = new UniformNode( null, uniformType );
-		this.nodeType = uniformType;
+		let node = null;
 
-		if ( uniformType === 'color' ) {
+		if ( uniformType === 'texture' ) {
 
-			this.nodeType = 'vec3';
+			node = new TextureNode( null );
 
-		} else if ( uniformType === 'texture' ) {
+		} else {
 
-			this.nodeType = 'vec4';
+			node = new UniformNode( null, uniformType );
 
 		}
 
+		this.node = node;
+
 	}
 
-	getNodeType() {
+	getNodeType( builder ) {
 
-		return this.uniformType;
+		return this.node.getNodeType( builder );
 
 	}
 
 	update( frame ) {
 
 		const object = this.object !== null ? this.object : frame.object;
-		const value = object[ this.property ];
+		const property = this.property;
 
-		this.node.value = value;
+		this.node.value = object[ property ];
 
 	}
 
-	generate( builder ) {
+	construct( /*builder*/ ) {
 
-		return this.node.build( builder, this.getNodeType( builder ) );
+		return this.node;
 
 	}
 

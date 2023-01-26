@@ -127,18 +127,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	addFlowCode( code ) {
-
-		if ( ! /;\s*$/.test( code ) ) {
-
-			code += ';';
-
-		}
-
-		super.addFlowCode( code + '\n\t' );
-
-	}
-
 	getSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {

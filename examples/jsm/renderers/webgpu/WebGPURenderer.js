@@ -15,7 +15,7 @@ import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
 import WebGPUUtils from './WebGPUUtils.js';
 
-import { Frustum, Matrix4, Vector3, Color, LinearEncoding } from 'three';
+import { Frustum, Matrix4, Vector3, Color, LinearEncoding, NoToneMapping } from 'three';
 
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
@@ -99,6 +99,9 @@ class WebGPURenderer {
 		this.autoClearStencil = true;
 
 		this.outputEncoding = LinearEncoding;
+
+		this.toneMapping = NoToneMapping;
+		this.toneMappingExposure = 1.0;
 
 		this.sortObjects = true;
 
@@ -252,7 +255,7 @@ class WebGPURenderer {
 
 	async render( scene, camera ) {
 
-		if ( this._initialized === false ) return await this.init();
+		if ( this._initialized === false ) await this.init();
 
 		//
 
@@ -384,7 +387,7 @@ class WebGPURenderer {
 
 	}
 
-	async getArrayFromBuffer( attribute ) {
+	async getArrayBuffer( attribute ) {
 
 		return await this._attributes.getArrayBuffer( attribute );
 
@@ -590,7 +593,7 @@ class WebGPURenderer {
 
 	clear() {
 
-		this._background?.clear();
+		if ( this._background ) this._background.clear();
 
 	}
 
@@ -620,7 +623,7 @@ class WebGPURenderer {
 
 	async compute( ...computeNodes ) {
 
-		if ( this._initialized === false ) return await this.init();
+		if ( this._initialized === false ) await this.init();
 
 		const device = this._device;
 		const computePipelines = this._computePipelines;
@@ -855,7 +858,7 @@ class WebGPURenderer {
 
 		// index
 
-		const index = geometry.index;
+		const index = this._geometries.getIndex( geometry, material.wireframe === true );
 
 		const hasIndex = ( index !== null );
 

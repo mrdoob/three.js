@@ -3,8 +3,7 @@ import {
 	BufferGeometry,
 	FileLoader,
 	Float32BufferAttribute,
-	Loader,
-	LoaderUtils
+	Loader
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
@@ -1130,16 +1129,18 @@ class VTKLoader extends Loader {
 
 		}
 
+		const textDecoder = new TextDecoder();
+
 		// get the 5 first lines of the files to check if there is the key word binary
-		const meta = LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
+		const meta = textDecoder.decode( new Uint8Array( data, 0, 250 ) ).split( '\n' );
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 
-			return parseXML( LoaderUtils.decodeText( data ) );
+			return parseXML( textDecoder.decode( data ) );
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return parseASCII( LoaderUtils.decodeText( data ) );
+			return parseASCII( textDecoder.decode( data ) );
 
 		} else {
 

@@ -3592,6 +3592,7 @@ class BinaryReader {
 		this.dv = new DataView( buffer );
 		this.offset = 0;
 		this.littleEndian = ( littleEndian !== undefined ) ? littleEndian : true;
+		this._textDecoder = new TextDecoder();
 
 	}
 
@@ -3810,19 +3811,15 @@ class BinaryReader {
 
 	getString( size ) {
 
-		// note: safari 9 doesn't support Uint8Array.indexOf; create intermediate array instead
-		let a = [];
+		const start = this.offset;
+		let a = new Uint8Array( this.dv.buffer, start, size );
 
-		for ( let i = 0; i < size; i ++ ) {
-
-			a[ i ] = this.getUint8();
-
-		}
+		this.skip( size );
 
 		const nullByte = a.indexOf( 0 );
-		if ( nullByte >= 0 ) a = a.slice( 0, nullByte );
+		if ( nullByte >= 0 ) a = new Uint8Array( this.dv.buffer, start, nullByte );
 
-		return LoaderUtils.decodeText( new Uint8Array( a ) );
+		return this._textDecoder.decode( a );
 
 	}
 
@@ -3968,7 +3965,7 @@ function generateTransform( transformData ) {
 	if ( transformData.preRotation ) {
 
 		const array = transformData.preRotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder || Euler.DefaultOrder );
+		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
 		lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 	}
@@ -3976,7 +3973,7 @@ function generateTransform( transformData ) {
 	if ( transformData.rotation ) {
 
 		const array = transformData.rotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder || Euler.DefaultOrder );
+		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
 		lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 	}
@@ -3984,7 +3981,7 @@ function generateTransform( transformData ) {
 	if ( transformData.postRotation ) {
 
 		const array = transformData.postRotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder || Euler.DefaultOrder );
+		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
 		lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 		lPostRotationM.invert();
 
@@ -4104,7 +4101,7 @@ function convertArrayBufferToString( buffer, from, to ) {
 	if ( from === undefined ) from = 0;
 	if ( to === undefined ) to = buffer.byteLength;
 
-	return LoaderUtils.decodeText( new Uint8Array( buffer, from, to ) );
+	return new TextDecoder().decode( new Uint8Array( buffer, from, to ) );
 
 }
 

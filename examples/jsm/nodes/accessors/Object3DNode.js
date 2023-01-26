@@ -5,12 +5,6 @@ import { NodeUpdateType } from '../core/constants.js';
 
 class Object3DNode extends Node {
 
-	static VIEW_MATRIX = 'viewMatrix';
-	static NORMAL_MATRIX = 'normalMatrix';
-	static WORLD_MATRIX = 'worldMatrix';
-	static POSITION = 'position';
-	static VIEW_POSITION = 'viewPosition';
-
 	constructor( scope = Object3DNode.VIEW_MATRIX, object3d = null ) {
 
 		super();
@@ -36,7 +30,7 @@ class Object3DNode extends Node {
 
 			return 'mat3';
 
-		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
+		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION ) {
 
 			return 'vec3';
 
@@ -64,7 +58,15 @@ class Object3DNode extends Node {
 
 		} else if ( scope === Object3DNode.POSITION ) {
 
+			uniformNode.value = uniformNode.value || new Vector3();
+
 			uniformNode.value.setFromMatrixPosition( object.matrixWorld );
+
+		} else if ( scope === Object3DNode.DIRECTION ) {
+
+			uniformNode.value = uniformNode.value || new Vector3();
+
+			object.getWorldDirection( uniformNode.value );
 
 		} else if ( scope === Object3DNode.VIEW_POSITION ) {
 
@@ -91,7 +93,7 @@ class Object3DNode extends Node {
 
 			this._uniformNode.nodeType = 'mat3';
 
-		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION ) {
+		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION ) {
 
 			this._uniformNode.nodeType = 'vec3';
 
@@ -118,5 +120,12 @@ class Object3DNode extends Node {
 	}
 
 }
+
+Object3DNode.VIEW_MATRIX = 'viewMatrix';
+Object3DNode.NORMAL_MATRIX = 'normalMatrix';
+Object3DNode.WORLD_MATRIX = 'worldMatrix';
+Object3DNode.POSITION = 'position';
+Object3DNode.VIEW_POSITION = 'viewPosition';
+Object3DNode.DIRECTION = 'direction';
 
 export default Object3DNode;

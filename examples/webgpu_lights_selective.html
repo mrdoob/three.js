@@ -84,7 +84,7 @@
 
 					const material = new Nodes.MeshStandardNodeMaterial();
 					material.colorNode = color( hexColor );
-					material.lightsNode = new Nodes.LightsNode(); // ignore scene lights
+					material.lights = false;
 
 					const mesh = new THREE.Mesh( sphereGeometry, material );
 
@@ -142,7 +142,8 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, .2 );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = .2;
 
 				//controls
 

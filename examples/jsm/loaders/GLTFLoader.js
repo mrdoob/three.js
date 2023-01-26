@@ -62,6 +62,7 @@ import {
 	VectorKeyframeTrack,
 	sRGBEncoding
 } from 'three';
+import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
 
 class GLTFLoader extends Loader {
 
@@ -286,6 +287,7 @@ class GLTFLoader extends Loader {
 		let json;
 		const extensions = {};
 		const plugins = {};
+		const textDecoder = new TextDecoder();
 
 		if ( typeof data === 'string' ) {
 
@@ -293,7 +295,7 @@ class GLTFLoader extends Loader {
 
 		} else if ( data instanceof ArrayBuffer ) {
 
-			const magic = LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
+			const magic = textDecoder.decode( new Uint8Array( data, 0, 4 ) );
 
 			if ( magic === BINARY_EXTENSION_HEADER_MAGIC ) {
 
@@ -312,7 +314,7 @@ class GLTFLoader extends Loader {
 
 			} else {
 
-				json = JSON.parse( LoaderUtils.decodeText( new Uint8Array( data ) ) );
+				json = JSON.parse( textDecoder.decode( data ) );
 
 			}
 
@@ -584,7 +586,7 @@ class GLTFLightsExtension {
 
 	}
 
-	getDependency( type, index ) {	
+	getDependency( type, index ) {
 
 		if ( type !== 'light' ) return;
 
@@ -1566,9 +1568,10 @@ class GLTFBinaryExtension {
 		this.body = null;
 
 		const headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
+		const textDecoder = new TextDecoder();
 
 		this.header = {
-			magic: LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
+			magic: textDecoder.decode( new Uint8Array( data.slice( 0, 4 ) ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true )
 		};
@@ -1598,7 +1601,7 @@ class GLTFBinaryExtension {
 			if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.JSON ) {
 
 				const contentArray = new Uint8Array( data, BINARY_EXTENSION_HEADER_LENGTH + chunkIndex, chunkLength );
-				this.content = LoaderUtils.decodeText( contentArray );
+				this.content = textDecoder.decode( contentArray );
 
 			} else if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.BIN ) {
 
@@ -2264,7 +2267,7 @@ class GLTFParser {
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
-		
+
 		let isSafari = false;
 		let isFirefox = false;
 		let firefoxVersion = - 1;
@@ -4302,100 +4305,6 @@ function addPrimitiveAttributes( geometry, primitiveDef, parser ) {
 			: geometry;
 
 	} );
-
-}
-
-/**
- * @param {BufferGeometry} geometry
- * @param {Number} drawMode
- * @return {BufferGeometry}
- */
-function toTrianglesDrawMode( geometry, drawMode ) {
-
-	let index = geometry.getIndex();
-
-	// generate index if not present
-
-	if ( index === null ) {
-
-		const indices = [];
-
-		const position = geometry.getAttribute( 'position' );
-
-		if ( position !== undefined ) {
-
-			for ( let i = 0; i < position.count; i ++ ) {
-
-				indices.push( i );
-
-			}
-
-			geometry.setIndex( indices );
-			index = geometry.getIndex();
-
-		} else {
-
-			console.error( 'THREE.GLTFLoader.toTrianglesDrawMode(): Undefined position attribute. Processing not possible.' );
-			return geometry;
-
-		}
-
-	}
-
-	//
-
-	const numberOfTriangles = index.count - 2;
-	const newIndices = [];
-
-	if ( drawMode === TriangleFanDrawMode ) {
-
-		// gl.TRIANGLE_FAN
-
-		for ( let i = 1; i <= numberOfTriangles; i ++ ) {
-
-			newIndices.push( index.getX( 0 ) );
-			newIndices.push( index.getX( i ) );
-			newIndices.push( index.getX( i + 1 ) );
-
-		}
-
-	} else {
-
-		// gl.TRIANGLE_STRIP
-
-		for ( let i = 0; i < numberOfTriangles; i ++ ) {
-
-			if ( i % 2 === 0 ) {
-
-				newIndices.push( index.getX( i ) );
-				newIndices.push( index.getX( i + 1 ) );
-				newIndices.push( index.getX( i + 2 ) );
-
-
-			} else {
-
-				newIndices.push( index.getX( i + 2 ) );
-				newIndices.push( index.getX( i + 1 ) );
-				newIndices.push( index.getX( i ) );
-
-			}
-
-		}
-
-	}
-
-	if ( ( newIndices.length / 3 ) !== numberOfTriangles ) {
-
-		console.error( 'THREE.GLTFLoader.toTrianglesDrawMode(): Unable to generate correct amount of triangles.' );
-
-	}
-
-	// build final geometry
-
-	const newGeometry = geometry.clone();
-	newGeometry.setIndex( newIndices );
-
-	return newGeometry;
 
 }
 

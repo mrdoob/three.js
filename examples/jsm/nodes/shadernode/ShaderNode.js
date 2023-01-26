@@ -69,7 +69,7 @@ const ShaderNodeObject = function ( obj ) {
 
 	} else if ( type === 'object' ) {
 
-		if ( obj?.isNode === true ) {
+		if ( obj && obj.isNode === true ) {
 
 			let nodeObject = nodeObjectsCacheMap.get( obj );
 

@@ -103,7 +103,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		const { material, renderer } = this;
 
-		if ( renderer.toneMappingNode?.isNode === true ) {
+		if ( renderer.toneMappingNode && renderer.toneMappingNode.isNode === true ) {
 
 			this.addSlot( 'fragment', new SlotNode( {
 				node: material.colorNode,

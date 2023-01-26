@@ -297,7 +297,7 @@ class NodeBuilder {
 
 	hasGeometryAttribute( name ) {
 
-		return this.geometry?.getAttribute( name ) !== undefined;
+		return this.geometry && this.geometry.getAttribute( name ) !== undefined;
 
 	}
 
@@ -473,9 +473,7 @@ class NodeBuilder {
 
 		const nodeData = this.getDataFromNode( node, shaderStage );
 
-		nodeData.properties ||= { outputNode: null };
-
-		return nodeData.properties;
+		return nodeData.properties || ( nodeData.properties = { outputNode: null } );
 
 	}
 
@@ -570,7 +568,13 @@ class NodeBuilder {
 
 	}
 
-	addFlowCode( code ) {
+	addFlowCode( code, breakline = true ) {
+
+		if ( breakline && ! /;\s*$/.test( code ) ) {
+
+			code += ';\n\t';
+
+		}
 
 		this.flow.code += code;
 

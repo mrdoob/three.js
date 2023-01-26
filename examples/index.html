@@ -42,7 +42,7 @@
 
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
-					<div id="exitSearchButton"></div>
+					<div id="clearSearchButton"></div>
 				</div>
 
 				<div id="content">
@@ -62,7 +62,7 @@
 		const content = document.getElementById( 'content' );
 		const viewer = document.getElementById( 'viewer' );
 		const filterInput = document.getElementById( 'filterInput' );
-		const exitSearchButton = document.getElementById( 'exitSearchButton' );
+		const clearSearchButton = document.getElementById( 'clearSearchButton' );
 		const expandButton = document.getElementById( 'expandButton' );
 		const viewSrcButton = document.getElementById( 'button' );
 		const panelScrim = document.getElementById( 'panelScrim' );
@@ -166,11 +166,11 @@
 
 			};
 
-			exitSearchButton.onclick = function ( ) {
+			clearSearchButton.onclick = function ( ) {
 
 				filterInput.value = '';
 				updateFilter( files, tags );
-				panel.classList.remove( 'searchFocused' );
+				filterInput.focus();
 
 			};
 
