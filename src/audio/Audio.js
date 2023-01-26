@@ -169,8 +169,13 @@ class Audio extends Object3D {
 
 		this._progress = 0;
 
-		this.source.stop();
-		this.source.onended = null;
+		if ( this.source ) {
+
+			this.source.stop();
+			this.source.onended = null;
+
+		}
+
 		this.isPlaying = false;
 
 		return this;
