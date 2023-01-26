@@ -247,90 +247,95 @@ class Euler {
 	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
 	setFromQuaternionDirect( q, order, update ) {
 
+		let angles = [0, 0, 0];
 		let half_sum;
 		let half_diff;
 
 		switch ( order ) {
 
 			case 'XYZ':
-				this._y = Math.acos( clamp( - 2 * q.w * q.y - 2 * q.x * q.z, - 1, 1 ) );
+				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.y - q.x * q.z ), - 1, 1 ) );
 				half_sum = - Math.atan2( - q.x - q.z, q.w + q.y );
 				half_diff = - Math.atan2( - q.x + q.z, q.w - q.y );
 				break;
 
 			case 'XZY':
-				this._y = Math.acos( clamp( - 2 * q.w * q.z + 2 * q.x * q.y, - 1, 1 ) );
+				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.z + q.x * q.y ), - 1, 1 ) );
 				half_sum = Math.atan2( q.x + q.y, q.w - q.z );
 				half_diff = Math.atan2( q.x - q.y, q.w + q.z );
 				break;
 
 			case 'YXZ':
-				this._y = Math.acos( clamp( - 2 * q.w * q.x + 2 * q.y * q.z, - 1, 1 ) );
+				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.x + q.y * q.z ), - 1, 1 ) );
 				half_sum = Math.atan2( q.y + q.z, q.w - q.x );
 				half_diff = Math.atan2( q.y - q.z, q.w + q.x );
 				break;
 
 			case 'YZX':
-				this._y = Math.acos( clamp( - 2 * q.w * q.z - 2 * q.x * q.y, - 1, 1 ) );
+				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.z - q.x * q.y ), - 1, 1 ) );
 				half_sum = - Math.atan2( - q.x - q.y, q.w + q.z );
 				half_diff = - Math.atan2( q.x - q.y, q.w - q.z );
 				break;
 
 			case 'ZXY':
-				this._y = Math.acos( clamp( - 2 * q.w * q.x - 2 * q.y * q.z, - 1, 1 ) );
+				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.x - q.y * q.z ), - 1, 1 ) );
 				half_sum = - Math.atan2( - q.y - q.z, q.w + q.x );
 				half_diff = - Math.atan2( q.y - q.z, q.w - q.x );
 				break;
 
 			case 'ZYX':
-				this._y = Math.acos( clamp( - 2 * q.w * q.y + 2 * q.x * q.z, - 1, 1 ) );
+				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.y + q.x * q.z ), - 1, 1 ) );
 				half_sum = Math.atan2( q.x + q.z, q.w - q.y );
 				half_diff = Math.atan2( - q.x + q.z, q.w + q.y );
 				break;
 
 			default:
-				console.warn( 'THREE.Euler: .setFromQuaternionDirect(  ) encountered an unknown order: ' + order );
+				console.warn( 'THREE.Euler: .setFromQuaternionDirect( ) encountered an unknown order: ' + order );
 
 		}
 
-		if ( Math.abs( this._y ) < 0.00001 ) {
+		// degenerate case checking for numerical safety
+		if ( Math.abs( angles[ 1 ] ) < 0.00001 ) {
 
-			this._x = 2 * half_sum;
-			this._z = 0;
+			angles[ 0 ] = 2 * half_sum;
 
-		} else if ( Math.abs( this._y - Math.PI ) < 0.00001 ) {
+		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < 0.00001) {
 
-			this._x = 2 * half_diff;
-			this._z = 0;
+			angles[ 0 ] = 2 * half_diff;
 
 		} else {
 
-			this._x = half_sum + half_diff;
-			this._z = half_sum - half_diff;
+			angles[ 0 ] = half_sum + half_diff;
+			angles[ 2 ] = half_sum - half_diff;
 
 		}
 
-		this._y -= Math.PI / 2;
+		angles[ 1 ] -= Math.PI/2;
 
-		if ( this._x > Math.PI ) {
+		// wrapping angles to the set [ - PI, PI ]
+		if ( angles[ 0 ] > Math.PI ) {
 
-			this._x -= 2 * Math.PI;
+			angles[ 0 ] -= 2 * Math.PI;
 
-		} else if ( - this._x > Math.PI ) {
+		} else if ( - angles[ 0 ] > Math.PI ) {
 
-			this._x += 2 * Math.PI;
+			angles[ 0 ] += 2 * Math.PI;
+
+		}
+
+		if ( angles[ 2 ] > Math.PI ) {
+
+			angles[ 2 ] -= 2 * Math.PI;
+
+		} else if ( - angles[ 2 ] > Math.PI ) {
+
+			angles[ 2 ] += 2 * Math.PI;
 
 		}
 
-		if ( this._z > Math.PI ) {
-
-			this._z -= 2 * Math.PI;
-
-		} else if ( - this._z > Math.PI ) {
-
-			this._z += 2 * Math.PI;
-
-		}
+		this._x = angles[ order.indexOf( 'X' ) ];
+		this._y = angles[ order.indexOf( 'Y' ) ];
+		this._z = angles[ order.indexOf( 'Z' ) ];
 
 		if ( update === true ) this._onChangeCallback();
 
