@@ -1,4 +1,4 @@
-import { FrontSide, BackSide, DoubleSide, TwoPassDoubleSide, NearestFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending } from '../../constants.js';
+import { FrontSide, BackSide, DoubleSide, NearestFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending } from '../../constants.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
 import { MeshDistanceMaterial } from '../../materials/MeshDistanceMaterial.js';
@@ -28,7 +28,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		_maxTextureSize = _capabilities.maxTextureSize;
 
-	const shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide, [ TwoPassDoubleSide ]: DoubleSide };
+	const shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
 
 	const shadowMaterialVertical = new ShaderMaterial( {
 		defines: {
