@@ -1,7 +1,7 @@
 import {
 	BufferAttribute,
 	ClampToEdgeWrapping,
-  Color,
+	Color,
 	DoubleSide,
 	InterpolateDiscrete,
 	InterpolateLinear,
@@ -54,13 +54,13 @@ class GLTFExporter {
 
 		} );
 
-    this.register( function ( writer ) {
+	this.register( function ( writer ) {
 
 			return new GLTFMaterialsIorExtension( writer );
 
 		} );
 
-    this.register( function ( writer ) {
+	this.register( function ( writer ) {
 
 			return new GLTFMaterialsSpecularExtension( writer );
 
@@ -2565,8 +2565,8 @@ class GLTFMaterialsSpecularExtension {
 	writeMaterial( material, materialDef ) {
 
 		if ( ! material.isMeshPhysicalMaterial || ( material.specularIntensity === 1.0 && 
-      material.specularColor.equals(DEFAULT_SPECULAR_COLOR) && 
-      !material.specularIntensityMap && !material.specularColorTexture ) ) return;
+		       material.specularColor.equals( DEFAULT_SPECULAR_COLOR ) && 
+		     ! material.specularIntensityMap && ! material.specularColorTexture ) ) return;
 
 		const writer = this.writer;
 		const extensionsUsed = writer.extensionsUsed;
@@ -2581,7 +2581,7 @@ class GLTFMaterialsSpecularExtension {
 
 		}
 
-    if ( material.specularColorMap ) {
+		if ( material.specularColorMap ) {
 
 			const specularColorMapDef = { index: writer.processTexture( material.specularColorMap ) };
 			writer.applyTextureTransform( specularColorMapDef, material.specularColorMap );
