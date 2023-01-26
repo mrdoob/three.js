@@ -193,7 +193,7 @@ const PATH_PROPERTIES = {
 	morphTargetInfluences: 'weights'
 };
 
-const DEFAULT_SPECULAR_COLOR = new Color(1, 1, 1);
+const DEFAULT_SPECULAR_COLOR = new Color();
 
 // GLB constants
 // https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
