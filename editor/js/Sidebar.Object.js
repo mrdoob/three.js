@@ -349,16 +349,6 @@ function SidebarObject( editor ) {
 
 	container.add( objectFrustumCulledRow );
 
-	// renderForceSinglePass
-
-	const objectrenderForceSinglePassRow = new UIRow();
-	const objectrenderForceSinglePass = new UICheckbox().onChange( update );
-
-	objectrenderForceSinglePassRow.add( new UIText( strings.getKey( 'sidebar/object/renderforcesinglepass' ) ).setWidth( '90px' ) );
-	objectrenderForceSinglePassRow.add( objectrenderForceSinglePass );
-
-	container.add( objectrenderForceSinglePassRow );
-
 	// renderOrder
 
 	const objectRenderOrderRow = new UIRow();
@@ -534,12 +524,6 @@ function SidebarObject( editor ) {
 			if ( object.frustumCulled !== objectFrustumCulled.getValue() ) {
 
 				editor.execute( new SetValueCommand( editor, object, 'frustumCulled', objectFrustumCulled.getValue() ) );
-
-			}
-
-			if ( object.renderForceSinglePass !== objectrenderForceSinglePass.getValue() ) {
-
-				editor.execute( new SetValueCommand( editor, object, 'renderForceSinglePass', objectrenderForceSinglePass.getValue() ) );
 
 			}
 
