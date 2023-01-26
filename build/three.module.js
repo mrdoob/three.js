@@ -17,7 +17,7 @@ const VSMShadowMap = 3;
 const FrontSide = 0;
 const BackSide = 1;
 const DoubleSide = 2;
-const TwoPassDoubleSide = 3;
+const TwoPassDoubleSide = 2; // r149
 const NoBlending = 0;
 const NormalBlending = 1;
 const AdditiveBlending = 2;
@@ -8774,6 +8774,7 @@ class Material extends EventDispatcher {
 
 		this.alphaToCoverage = false;
 		this.premultipliedAlpha = false;
+		this.forceSinglePass = false;
 
 		this.visible = true;
 
@@ -9055,6 +9056,7 @@ class Material extends EventDispatcher {
 		if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
 		if ( this.alphaToCoverage === true ) data.alphaToCoverage = this.alphaToCoverage;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
+		if ( this.forceSinglePass === true ) data.forceSinglePass = this.forceSinglePass;
 
 		if ( this.wireframe === true ) data.wireframe = this.wireframe;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
@@ -9175,6 +9177,7 @@ class Material extends EventDispatcher {
 		this.alphaTest = source.alphaTest;
 		this.alphaToCoverage = source.alphaToCoverage;
 		this.premultipliedAlpha = source.premultipliedAlpha;
+		this.forceSinglePass = source.forceSinglePass;
 
 		this.visible = source.visible;
 
@@ -20833,7 +20836,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 		_maxTextureSize = _capabilities.maxTextureSize;
 
-	const shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide, [ TwoPassDoubleSide ]: DoubleSide };
+	const shadowSide = { [ FrontSide ]: BackSide, [ BackSide ]: FrontSide, [ DoubleSide ]: DoubleSide };
 
 	const shadowMaterialVertical = new ShaderMaterial( {
 		defines: {
@@ -25140,6 +25143,8 @@ class WebXRManager extends EventDispatcher {
 
 		let referenceSpace = null;
 		let referenceSpaceType = 'local-floor';
+		// Set default foveation to maximum.
+		let foveation = 1.0;
 		let customReferenceSpace = null;
 
 		let pose = null;
@@ -25449,8 +25454,7 @@ class WebXRManager extends EventDispatcher {
 
 				newRenderTarget.isXRRenderTarget = true; // TODO Remove this when possible, see #23278
 
-				// Set foveation to maximum.
-				this.setFoveation( 1.0 );
+				this.setFoveation( foveation );
 
 				customReferenceSpace = null;
 				referenceSpace = await session.requestReferenceSpace( referenceSpaceType );
@@ -25679,36 +25683,32 @@ class WebXRManager extends EventDispatcher {
 
 		this.getFoveation = function () {
 
-			if ( glProjLayer !== null ) {
+			if ( glProjLayer === null && glBaseLayer === null ) {
 
-				return glProjLayer.fixedFoveation;
-
-			}
-
-			if ( glBaseLayer !== null ) {
-
-				return glBaseLayer.fixedFoveation;
+				return undefined;
 
 			}
 
-			return undefined;
+			return foveation;
 
 		};
 
-		this.setFoveation = function ( foveation ) {
+		this.setFoveation = function ( value ) {
 
 			// 0 = no foveation = full resolution
 			// 1 = maximum foveation = the edges render at lower resolution
 
+			foveation = value;
+
 			if ( glProjLayer !== null ) {
 
-				glProjLayer.fixedFoveation = foveation;
+				glProjLayer.fixedFoveation = value;
 
 			}
 
 			if ( glBaseLayer !== null && glBaseLayer.fixedFoveation !== undefined ) {
 
-				glBaseLayer.fixedFoveation = foveation;
+				glBaseLayer.fixedFoveation = value;
 
 			}
 
@@ -27773,7 +27773,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		function prepare( material, scene, object ) {
 
-			if ( material.transparent === true && material.side === TwoPassDoubleSide ) {
+			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -27783,7 +27783,7 @@ function WebGLRenderer( parameters = {} ) {
 				material.needsUpdate = true;
 				getProgram( material, scene, object );
 
-				material.side = TwoPassDoubleSide;
+				material.side = DoubleSide;
 
 			} else {
 
@@ -28257,7 +28257,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		material.onBeforeRender( _this, scene, camera, geometry, object, group );
 
-		if ( material.transparent === true && material.side === TwoPassDoubleSide ) {
+		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
 			material.needsUpdate = true;
@@ -28267,7 +28267,7 @@ function WebGLRenderer( parameters = {} ) {
 			material.needsUpdate = true;
 			_this.renderBufferDirect( camera, scene, geometry, material, object, group );
 
-			material.side = TwoPassDoubleSide;
+			material.side = DoubleSide;
 
 		} else {
 
@@ -41982,6 +41982,7 @@ class MaterialLoader extends Loader {
 
 		if ( json.alphaToCoverage !== undefined ) material.alphaToCoverage = json.alphaToCoverage;
 		if ( json.premultipliedAlpha !== undefined ) material.premultipliedAlpha = json.premultipliedAlpha;
+		if ( json.forceSinglePass !== undefined ) material.forceSinglePass = json.forceSinglePass;
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
 
