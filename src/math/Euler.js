@@ -247,44 +247,44 @@ class Euler {
 	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
 	setFromQuaternionDirect( q, order, update ) {
 
-		let angles = [0, 0, 0];
+		let angles = [ 0, 0, 0 ];
 		let half_sum;
 		let half_diff;
 
 		switch ( order ) {
 
 			case 'XYZ':
-				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.y - q.x * q.z ), - 1, 1 ) );
+				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.y - q.x * q.z ), - 1, 1 ) );
 				half_sum = - Math.atan2( - q.x - q.z, q.w + q.y );
 				half_diff = - Math.atan2( - q.x + q.z, q.w - q.y );
 				break;
 
 			case 'XZY':
-				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.z + q.x * q.y ), - 1, 1 ) );
+				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.z + q.x * q.y ), - 1, 1 ) );
 				half_sum = Math.atan2( q.x + q.y, q.w - q.z );
 				half_diff = Math.atan2( q.x - q.y, q.w + q.z );
 				break;
 
 			case 'YXZ':
-				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.x + q.y * q.z ), - 1, 1 ) );
+				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.x + q.y * q.z ), - 1, 1 ) );
 				half_sum = Math.atan2( q.y + q.z, q.w - q.x );
 				half_diff = Math.atan2( q.y - q.z, q.w + q.x );
 				break;
 
 			case 'YZX':
-				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.z - q.x * q.y ), - 1, 1 ) );
+				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.z - q.x * q.y ), - 1, 1 ) );
 				half_sum = - Math.atan2( - q.x - q.y, q.w + q.z );
 				half_diff = - Math.atan2( q.x - q.y, q.w - q.z );
 				break;
 
 			case 'ZXY':
-				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.x - q.y * q.z ), - 1, 1 ) );
+				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.x - q.y * q.z ), - 1, 1 ) );
 				half_sum = - Math.atan2( - q.y - q.z, q.w + q.x );
 				half_diff = - Math.atan2( q.y - q.z, q.w - q.x );
 				break;
 
 			case 'ZYX':
-				angles[1] = Math.acos( clamp( 2 * ( - q.w * q.y + q.x * q.z ), - 1, 1 ) );
+				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.y + q.x * q.z ), - 1, 1 ) );
 				half_sum = Math.atan2( q.x + q.z, q.w - q.y );
 				half_diff = Math.atan2( - q.x + q.z, q.w + q.y );
 				break;
@@ -299,7 +299,7 @@ class Euler {
 
 			angles[ 0 ] = 2 * half_sum;
 
-		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < 0.00001) {
+		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < 0.00001 ) {
 
 			angles[ 0 ] = 2 * half_diff;
 
@@ -310,7 +310,7 @@ class Euler {
 
 		}
 
-		angles[ 1 ] -= Math.PI/2;
+		angles[ 1 ] -= Math.PI / 2;
 
 		// wrapping angles to the set [ - PI, PI ]
 		if ( angles[ 0 ] > Math.PI ) {
