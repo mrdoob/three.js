@@ -54,13 +54,13 @@ class GLTFExporter {
 
 		} );
 
-	this.register( function ( writer ) {
+		this.register( function ( writer ) {
 
 			return new GLTFMaterialsIorExtension( writer );
 
 		} );
 
-	this.register( function ( writer ) {
+		this.register( function ( writer ) {
 
 			return new GLTFMaterialsSpecularExtension( writer );
 
