@@ -6,6 +6,7 @@ import {
 	Plane,
 	ShaderMaterial,
 	UniformsUtils,
+	Vector2,
 	Vector3,
 	Vector4,
 	WebGLRenderTarget,
@@ -33,6 +34,9 @@ class Reflector extends Mesh {
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Reflector.ReflectorShader;
 		const multisample = ( options.multisample !== undefined ) ? options.multisample : 4;
+		const displacementMap = options.displacementMap || null;
+		const displacementResolution = displacementMap ? options.displacementResolution || new Vector2( 1, 1 ) : new Vector2( 0, 0 );
+		const displacementScale = displacementMap ? options.displacementScale || new Vector2( 1, 1 ) : new Vector2( 0, 0 );
 
 		//
 
@@ -62,6 +66,9 @@ class Reflector extends Mesh {
 		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
 		material.uniforms[ 'color' ].value = color;
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
+		material.uniforms[ 'displacementMap' ].value = displacementMap;
+		material.uniforms[ 'displacementResolution' ].value = displacementResolution;
+		material.uniforms[ 'displacementScale' ].value = displacementScale;
 
 		this.material = material;
 
@@ -213,20 +220,33 @@ Reflector.ReflectorShader = {
 
 		'textureMatrix': {
 			value: null
-		}
+		},
 
+		'displacementMap': {
+			value: null
+		},
+
+		'displacementResolution': {
+			value: null
+		},
+
+		'displacementScale': {
+			value: null
+		},
 	},
 
 	vertexShader: /* glsl */`
 		uniform mat4 textureMatrix;
-		varying vec4 vUv;
+		varying vec4 vUv4;
+		varying vec2 vUv2;
 
 		#include <common>
 		#include <logdepthbuf_pars_vertex>
 
 		void main() {
 
-			vUv = textureMatrix * vec4( position, 1.0 );
+			vUv4 = textureMatrix * vec4( position, 1.0 );
+			vUv2 = uv;
 
 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
@@ -237,7 +257,11 @@ Reflector.ReflectorShader = {
 	fragmentShader: /* glsl */`
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
-		varying vec4 vUv;
+		uniform sampler2D displacementMap;
+		uniform vec2 displacementResolution;
+		uniform vec2 displacementScale;
+		varying vec4 vUv4;
+		varying vec2 vUv2;
 
 		#include <logdepthbuf_pars_fragment>
 
@@ -257,7 +281,14 @@ Reflector.ReflectorShader = {
 
 			#include <logdepthbuf_fragment>
 
-			vec4 base = texture2DProj( tDiffuse, vUv );
+			vec4 uv = vec4( vUv4 );
+
+			vec3 displacement = texture2D( displacementMap, vUv2 * displacementResolution ).rgb * 2.0 - 1.0;
+			uv.x += displacement.r * displacementScale.x;
+			uv.y += displacement.g * displacementScale.y;
+
+			vec4 base = texture2DProj( tDiffuse, uv );
+
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
 
 			#include <tonemapping_fragment>
