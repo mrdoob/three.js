@@ -44,10 +44,6 @@ Many linting errors can be fixed automatically by running
 
     npm lint-fix
 
-If you’d like to make a minified version of the build files i.e. ‘build/three.min.js’ run:
-
-    npm run build
-
 ## Making changes
 
 When you’ve decided to make changes, start with the following:

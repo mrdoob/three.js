@@ -3,12 +3,10 @@
   "version": "0.149.0",
   "description": "JavaScript 3D library",
   "type": "module",
-  "main": "./build/three.js",
   "module": "./build/three.module.js",
   "exports": {
     ".": {
-      "import": "./build/three.module.js",
-      "require": "./build/three.cjs"
+      "import": "./build/three.module.js"
     },
     "./examples/fonts/*": "./examples/fonts/*",
     "./examples/jsm/*": "./examples/jsm/*",
@@ -22,9 +20,6 @@
   },
   "sideEffects": false,
   "files": [
-    "build/three.js",
-    "build/three.cjs",
-    "build/three.min.js",
     "build/three.module.js",
     "examples/jsm",
     "examples/fonts",
@@ -99,7 +94,6 @@
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
-    "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080 --ssl\"",
     "lint-core": "eslint src",
     "lint-addons": "eslint examples/jsm --ext .js --ignore-pattern libs --ignore-pattern ifc",
@@ -141,7 +135,6 @@
   "homepage": "https://threejs.org/",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-terser": "^0.2.1",
     "chalk": "^5.2.0",
     "concurrently": "^7.6.0",
     "eslint": "^8.30.0",
@@ -159,8 +152,6 @@
       "package.json",
       "LICENSE",
       "README.md",
-      "build/three.js",
-      "build/three.min.js",
       "build/three.module.js"
     ],
     "directories": {}

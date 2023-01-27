@@ -1,5 +1,3 @@
-import terser from '@rollup/plugin-terser';
-
 export function glconstants() {
 
 	const constants = {
@@ -278,46 +276,7 @@ const builds = [
 				file: 'build/three.module.js'
 			}
 		]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glsl(),
-			header()
-		],
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.js',
-				indent: '\t'
-			},
-			{
-				format: 'cjs',
-				name: 'THREE',
-				file: 'build/three.cjs',
-				indent: '\t'
-			}
-		]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glconstants(),
-			glsl(),
-			terser(),
-			header()
-		],
-		output: [
-			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.min.js'
-			}
-		]
 	}
 ];
 
-export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;
+export default builds;
