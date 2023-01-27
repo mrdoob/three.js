@@ -23,6 +23,42 @@ import {
 	Vector3
 } from 'three';
 
+
+/**
+ * The KHR_mesh_quantization extension allows these extra attribute component types
+ *
+ * @see https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_mesh_quantization/README.md#extending-mesh-attributes
+ */
+const KHR_mesh_quantization_ExtraAttrTypes = {
+	POSITION: [
+		'byte',
+		'byte normalized',
+		'unsigned byte',
+		'unsigned byte normalized',
+		'short',
+		'short normalized',
+		'unsigned short',
+		'unsigned short normalized',
+	],
+	NORMAL: [
+		'byte normalized',
+		'short normalized',
+	],
+	TANGENT: [
+		'byte normalized',
+		'short normalized',
+	],
+	TEXCOORD: [
+		'byte',
+		'byte normalized',
+		'unsigned byte',
+		'short',
+		'short normalized',
+		'unsigned short',
+	],
+};
+
+
 class GLTFExporter {
 
 	constructor() {
@@ -1568,15 +1604,7 @@ class GLTFWriter {
 			const validVertexAttributes =
 					/^(POSITION|NORMAL|TANGENT|TEXCOORD_\d+|COLOR_\d+|JOINTS_\d+|WEIGHTS_\d+)$/;
 
-			let isValidVertexAttribute = true;
-
-			if ( ! validVertexAttributes.test( attributeName ) ) {
-
-				attributeName = '_' + attributeName;
-
-				isValidVertexAttribute = false;
-
-			}
+			if ( ! validVertexAttributes.test( attributeName ) ) attributeName = '_' + attributeName;
 
 			if ( cache.attributes.has( this.getUID( attribute ) ) ) {
 
@@ -1602,7 +1630,7 @@ class GLTFWriter {
 
 			if ( accessor !== null ) {
 
-				if ( isValidVertexAttribute ) {
+				if ( ! attributeName.startsWith( '_' ) ) {
 
 					this.detectMeshQuantization( attributeName, attribute );
 
@@ -1791,7 +1819,7 @@ class GLTFWriter {
 	/**
 	 * If a vertex attribute with a
 	 * [non-standard data type](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview)
-	 * is used, then it is assumed that this is an allowed data type according to the
+	 * is used, it is checked whether it is a valid data type according to the
 	 * [KHR_mesh_quantization](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_mesh_quantization/README.md)
 	 * extension.
 	 * In this case the extension is automatically added to the list of used extensions.
@@ -1803,32 +1831,45 @@ class GLTFWriter {
 
 		if ( this.extensionsUsed[ KHR_MESH_QUANTIZATION ] ) return;
 
-		let useMeshQuantization = false;
+		let attrType = undefined;
 
-		const isNonFloatAttribute = attribute.array.constructor !== Float32Array;
+		switch ( attribute.array.constructor ) {
 
-		if ( isNonFloatAttribute ) {
+			case Int8Array:
 
-			if ( [ 'POSITION', 'NORMAL', 'TANGENT' ].includes( attributeName ) ) {
+				attrType = 'byte';
 
-				useMeshQuantization = true;
+				break;
 
-			} else if ( attributeName.startsWith( 'TEXCOORD_' ) ) {
+			case Uint8Array:
 
-				const isUnsignedByte = attribute.array.constructor === Uint8Array;
-				const isUnsignedShort = attribute.array.constructor === Uint16Array;
+				attrType = 'unsigned byte';
 
-				if ( ! ( attribute.normalized && ( isUnsignedByte || isUnsignedShort ) ) ) {
+				break;
 
-					useMeshQuantization = true;
+			case Int16Array:
 
-				}
+				attrType = 'short';
 
-			}
+				break;
+
+			case Uint16Array:
+
+				attrType = 'unsigned short';
+
+				break;
+
+			default:
+
+				return;
 
 		}
 
-		if ( useMeshQuantization ) {
+		if ( attribute.normalized ) attrType += ' normalized';
+
+		const attrNamePrefix = attributeName.split( '_', 1 )[ 0 ];
+
+		if ( KHR_mesh_quantization_ExtraAttrTypes[ attrNamePrefix ]?.includes( attrType ) ) {
 
 			this.extensionsUsed[ KHR_MESH_QUANTIZATION ] = true;
 			this.extensionsRequired[ KHR_MESH_QUANTIZATION ] = true;
