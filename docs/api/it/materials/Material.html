@@ -137,6 +137,15 @@
 			cose insieme senza creare artefatti z.index.
 		</p>
 
+		<h3>[property:Boolean forceSinglePass]</h3>
+		<p>
+		Whether double-sided, transparent objects should be rendered with a single pass or not. Default is `false`.<br /><br />
+
+		The engine renders double-sided, transparent objects with two draw calls (back faces first, then front faces) to mitigate transparency artifacts.
+		There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grass sprites. 
+		In these cases, set the `forceSinglePass` flag to `false` to disable the two pass rendering to avoid performance issues.
+		</p>
+
 		<h3>[property:Boolean isMaterial]</h3>
 		<p>
 			Flag di sola lettura per  verificare se l'oggetto dato è di tipo [name].
