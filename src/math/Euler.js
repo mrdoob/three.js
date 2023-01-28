@@ -247,95 +247,114 @@ class Euler {
 	// A direct, general and computationally efficient method. PLoS ONE 17(11): e0276302.
 	setFromQuaternionDirect( q, order, update ) {
 
-		let angles = [ 0, 0, 0 ];
-		let half_sum;
-		let half_diff;
-
 		switch ( order ) {
 
 			case 'XYZ':
-				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.y - q.x * q.z ), - 1, 1 ) );
-				half_sum = - Math.atan2( - q.x - q.z, q.w + q.y );
-				half_diff = - Math.atan2( - q.x + q.z, q.w - q.y );
+
+				this._y = Math.asin( clamp( 2 * ( q.w * q.y + q.x * q.z ), - 1, 1 ) );
+
+				if ( Math.PI / 2 - Math.abs( this._y ) < 0.00001 ) {
+
+					this._z = Math.atan2( - 2 * q.w * q.x, ( q.w - q.x ) * ( q.w + q.x ) );
+
+				} else {
+
+					this._z = - Math.atan2( - 2 * ( q.w * q.x - q.y * q.z ), q.w ** 2 - q.x ** 2 - q.y ** 2 + q.z ** 2 );
+					this._x = Math.atan2( 2 * ( q.w * q.z - q.x * q.y ), q.w ** 2 + q.x ** 2 - q.y ** 2 - q.z ** 2 );
+
+				}
+
 				break;
 
 			case 'XZY':
-				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.z + q.x * q.y ), - 1, 1 ) );
-				half_sum = Math.atan2( q.x + q.y, q.w - q.z );
-				half_diff = Math.atan2( q.x - q.y, q.w + q.z );
+
+				this._z = Math.asin( clamp( 2 * ( q.w * q.z - q.x * q.y ), - 1, 1 ) );
+
+				if ( Math.PI / 2 - Math.abs( this._z ) < 0.00001 ) {
+
+					this._y = Math.atan2( 2 * q.w * q.x, ( q.w - q.x ) * ( q.w + q.x ) );
+
+				} else {
+
+					this._y = Math.atan2( 2 * ( q.w * q.x + q.y * q.z ), q.w ** 2 - q.x ** 2 + q.y ** 2 - q.z ** 2 );
+					this._x = Math.atan2( 2 * ( q.w * q.y + q.x * q.z ), q.w ** 2 + q.x ** 2 - q.y ** 2 - q.z ** 2 );
+
+				}
+
 				break;
 
 			case 'YXZ':
-				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.x + q.y * q.z ), - 1, 1 ) );
-				half_sum = Math.atan2( q.y + q.z, q.w - q.x );
-				half_diff = Math.atan2( q.y - q.z, q.w + q.x );
+
+				this._x = Math.asin( clamp( 2 * ( q.w * q.x - q.y * q.z ), - 1, 1 ) );
+
+				if ( Math.PI / 2 - Math.abs( this._x ) < 0.00001 ) {
+
+					this._z = Math.atan2( 2 * q.w * q.y, ( q.w - q.y ) * ( q.w + q.y ) );
+
+				} else {
+
+					this._z = Math.atan2( 2 * ( q.w * q.y + q.x * q.z ), q.w ** 2 - q.x ** 2 - q.y ** 2 + q.z ** 2 );
+					this._y = Math.atan2( 2 * ( q.w * q.z + q.x * q.y ), q.w ** 2 - q.x ** 2 + q.y ** 2 - q.z ** 2 );
+
+				}
+
 				break;
 
 			case 'YZX':
-				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.z - q.x * q.y ), - 1, 1 ) );
-				half_sum = - Math.atan2( - q.x - q.y, q.w + q.z );
-				half_diff = - Math.atan2( q.x - q.y, q.w - q.z );
+
+				this._z = Math.asin( clamp( 2 * ( q.w * q.z + q.x * q.y ), - 1, 1 ) );
+
+				if ( Math.PI / 2 - Math.abs( this._z ) < 0.00001 ) {
+
+					this._x = Math.atan2( - 2 * q.w * q.y, ( q.w - q.y ) * ( q.w + q.y ) );
+
+				} else {
+
+					this._x = - Math.atan2( - 2 * ( q.w * q.y - q.x * q.z ), q.w ** 2 + q.x ** 2 - q.y ** 2 - q.z ** 2 );
+					this._y = Math.atan2( 2 * ( q.w * q.x - q.y * q.z ), q.w ** 2 - q.x ** 2 + q.y ** 2 - q.z ** 2 );
+
+				}
+
 				break;
 
 			case 'ZXY':
-				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.x - q.y * q.z ), - 1, 1 ) );
-				half_sum = - Math.atan2( - q.y - q.z, q.w + q.x );
-				half_diff = - Math.atan2( q.y - q.z, q.w - q.x );
+
+				this._x = Math.asin( clamp( 2 * ( q.w * q.x + q.y * q.z ), - 1, 1 ) );
+
+				if ( Math.PI / 2 - Math.abs( this._x ) < 0.00001 ) {
+
+					this._y = Math.atan2( - 2 * q.w * q.z, ( q.w - q.z ) * ( q.w + q.z ) );
+
+				} else {
+
+					this._y = - Math.atan2( - 2 * ( q.w * q.z - q.x * q.y ), q.w ** 2 - q.x ** 2 + q.y ** 2 - q.z ** 2 );
+					this._z = Math.atan2( 2 * ( q.w * q.y - q.x * q.z ), q.w ** 2 - q.x ** 2 - q.y ** 2 + q.z ** 2 );
+
+				}
+
 				break;
 
 			case 'ZYX':
-				angles[ 1 ] = Math.acos( clamp( 2 * ( - q.w * q.y + q.x * q.z ), - 1, 1 ) );
-				half_sum = Math.atan2( q.x + q.z, q.w - q.y );
-				half_diff = Math.atan2( - q.x + q.z, q.w + q.y );
+
+				this._y = Math.asin( clamp( 2 * ( q.w * q.y - q.x * q.z ), - 1, 1 ) );
+
+				if ( Math.PI / 2 - Math.abs( this._y ) < 0.00001 ) {
+
+					this._x = Math.atan2( 2 * q.w * q.z, ( q.w - q.z ) * ( q.w + q.z ) );
+
+				} else {
+
+					this._x = Math.atan2( 2 * ( q.w * q.z + q.x * q.y ), q.w ** 2 + q.x ** 2 - q.y ** 2 - q.z ** 2 );
+					this._z = Math.atan2( 2 * ( q.w * q.x + q.y * q.z ), q.w ** 2 - q.x ** 2 - q.y ** 2 + q.z ** 2 );
+
+				}
+
 				break;
 
 			default:
 				console.warn( 'THREE.Euler: .setFromQuaternionDirect( ) encountered an unknown order: ' + order );
 
 		}
-
-		// degenerate case checking for numerical safety
-		if ( Math.abs( angles[ 1 ] ) < 0.00001 ) {
-
-			angles[ 0 ] = 2 * half_sum;
-
-		} else if ( Math.abs( angles[ 1 ] - Math.PI ) < 0.00001 ) {
-
-			angles[ 0 ] = 2 * half_diff;
-
-		} else {
-
-			angles[ 0 ] = half_sum + half_diff;
-			angles[ 2 ] = half_sum - half_diff;
-
-		}
-
-		angles[ 1 ] -= Math.PI / 2;
-
-		// wrapping angles to the set [ - PI, PI ]
-		if ( angles[ 0 ] > Math.PI ) {
-
-			angles[ 0 ] -= 2 * Math.PI;
-
-		} else if ( - angles[ 0 ] > Math.PI ) {
-
-			angles[ 0 ] += 2 * Math.PI;
-
-		}
-
-		if ( angles[ 2 ] > Math.PI ) {
-
-			angles[ 2 ] -= 2 * Math.PI;
-
-		} else if ( - angles[ 2 ] > Math.PI ) {
-
-			angles[ 2 ] += 2 * Math.PI;
-
-		}
-
-		this._x = angles[ order.indexOf( 'X' ) ];
-		this._y = angles[ order.indexOf( 'Y' ) ];
-		this._z = angles[ order.indexOf( 'Z' ) ];
 
 		if ( update === true ) this._onChangeCallback();
 
