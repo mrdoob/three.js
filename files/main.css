@@ -138,7 +138,7 @@ h1 a {
 	transition: 0s 0s height;
 }
 
-	#panel #exitSearchButton {
+	#panel #clearSearchButton {
 		width: 48px;
 		height: 48px;
 		display: none;
@@ -154,7 +154,7 @@ h1 a {
 		margin-right: 0px;
 	}
 
-	#panel.searchFocused #exitSearchButton {
+	#panel.searchFocused #clearSearchButton {
 		display: block;
 	}
 
