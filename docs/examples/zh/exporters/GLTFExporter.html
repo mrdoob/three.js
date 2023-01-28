@@ -10,7 +10,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		An exporter for *glTF* 2.0.
+		An exporter for `glTF` 2.0.
 		<br /><br />
 		[link:https://www.khronos.org/gltf glTF] (GL Transmission Format) is an
 		[link:https://github.com/KhronosGroup/glTF/tree/master/specification/2.0 open format specification]
@@ -30,9 +30,14 @@
 		<ul>
 			<li>KHR_lights_punctual</li>
 			<li>KHR_materials_unlit</li>
+			<li>KHR_materials_clearcoat</li>
+			<li>KHR_materials_iridescence</li>
+			<li>KHR_materials_transmission</li>
+			<li>KHR_materials_volume</li>
+			<li>KHR_materials_ior</li>
+			<li>KHR_materials_specular</li>
 			<li>KHR_texture_transform</li>
 		</ul>
-
 		<p>
 			The following glTF 2.0 extension is supported by an external user plugin
 		</p>
@@ -73,7 +78,7 @@
 			[example:misc_exporter_gltf]
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]()</h3>
 		<p>
@@ -82,7 +87,7 @@
 		Creates a new [name].
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:undefined parse]( [param:Object3D input], [param:Function onCompleted], [param:Function onError], [param:Object options] )</h3>
 
@@ -120,7 +125,6 @@
 			<li>binary - bool. Export in binary (.glb) format, returning an ArrayBuffer. Default is false.</li>
 			<li>maxTextureSize - int. Restricts the image maximum size (both width and height) to the given value. Default is Infinity.</li>
 			<li>animations - Array<[page:AnimationClip AnimationClip]>. List of animations to be included in the export.</li>
-			<li>forceIndices - bool. Generate indices for non-index geometry and export with them. Default is false.</li>
 			<li>includeCustomExtensions - bool. Export custom glTF extensions defined on an object's <em>userData.gltfExtensions</em> property. Default is false.</li>
 		</ul>
 		</p>
