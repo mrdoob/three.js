@@ -259,8 +259,8 @@ class Euler {
 
 				} else {
 
-					this._z = - Math.atan2( - 2 * ( q.w * q.x - q.y * q.z ), q.w ** 2 - q.x ** 2 - q.y ** 2 + q.z ** 2 );
-					this._x = Math.atan2( 2 * ( q.w * q.z - q.x * q.y ), q.w ** 2 + q.x ** 2 - q.y ** 2 - q.z ** 2 );
+					this._z = - Math.atan2( - 2 * ( q.w * q.x - q.y * q.z ), 1 - 2 * ( q.x ** 2 + q.y ** 2 ) );
+					this._x = Math.atan2( 2 * ( q.w * q.z - q.x * q.y ), 1 - 2 * ( q.y ** 2 + q.z ** 2 ) );
 
 				}
 
@@ -276,8 +276,8 @@ class Euler {
 
 				} else {
 
-					this._y = Math.atan2( 2 * ( q.w * q.x + q.y * q.z ), q.w ** 2 - q.x ** 2 + q.y ** 2 - q.z ** 2 );
-					this._x = Math.atan2( 2 * ( q.w * q.y + q.x * q.z ), q.w ** 2 + q.x ** 2 - q.y ** 2 - q.z ** 2 );
+					this._y = Math.atan2( 2 * ( q.w * q.x + q.y * q.z ), 1 - 2 * ( q.x ** 2 + q.z ** 2 ) );
+					this._x = Math.atan2( 2 * ( q.w * q.y + q.x * q.z ), 1 - 2 * ( q.y ** 2 + q.z ** 2 ) );
 
 				}
 
@@ -293,8 +293,8 @@ class Euler {
 
 				} else {
 
-					this._z = Math.atan2( 2 * ( q.w * q.y + q.x * q.z ), q.w ** 2 - q.x ** 2 - q.y ** 2 + q.z ** 2 );
-					this._y = Math.atan2( 2 * ( q.w * q.z + q.x * q.y ), q.w ** 2 - q.x ** 2 + q.y ** 2 - q.z ** 2 );
+					this._z = Math.atan2( 2 * ( q.w * q.y + q.x * q.z ), 1 - 2 * ( q.x ** 2 + q.y ** 2 ) );
+					this._y = Math.atan2( 2 * ( q.w * q.z + q.x * q.y ), 1 - 2 * ( q.x ** 2 + q.z ** 2 ) );
 
 				}
 
@@ -310,8 +310,8 @@ class Euler {
 
 				} else {
 
-					this._x = - Math.atan2( - 2 * ( q.w * q.y - q.x * q.z ), q.w ** 2 + q.x ** 2 - q.y ** 2 - q.z ** 2 );
-					this._y = Math.atan2( 2 * ( q.w * q.x - q.y * q.z ), q.w ** 2 - q.x ** 2 + q.y ** 2 - q.z ** 2 );
+					this._x = - Math.atan2( - 2 * ( q.w * q.y - q.x * q.z ), 1 - 2 * ( q.y ** 2 + q.z ** 2 ) );
+					this._y = Math.atan2( 2 * ( q.w * q.x - q.y * q.z ), 1 - 2 * ( q.x ** 2 + q.z ** 2 ) );
 
 				}
 
@@ -327,8 +327,8 @@ class Euler {
 
 				} else {
 
-					this._y = - Math.atan2( - 2 * ( q.w * q.z - q.x * q.y ), q.w ** 2 - q.x ** 2 + q.y ** 2 - q.z ** 2 );
-					this._z = Math.atan2( 2 * ( q.w * q.y - q.x * q.z ), q.w ** 2 - q.x ** 2 - q.y ** 2 + q.z ** 2 );
+					this._y = - Math.atan2( - 2 * ( q.w * q.z - q.x * q.y ), 1 - 2 * ( q.x ** 2 + q.z ** 2 ) );
+					this._z = Math.atan2( 2 * ( q.w * q.y - q.x * q.z ), 1 - 2 * ( q.x ** 2 + q.y ** 2 ) );
 
 				}
 
@@ -344,8 +344,8 @@ class Euler {
 
 				} else {
 
-					this._x = Math.atan2( 2 * ( q.w * q.z + q.x * q.y ), q.w ** 2 + q.x ** 2 - q.y ** 2 - q.z ** 2 );
-					this._z = Math.atan2( 2 * ( q.w * q.x + q.y * q.z ), q.w ** 2 - q.x ** 2 - q.y ** 2 + q.z ** 2 );
+					this._x = Math.atan2( 2 * ( q.w * q.z + q.x * q.y ), 1 - 2 * ( q.y ** 2 + q.z ** 2 ) );
+					this._z = Math.atan2( 2 * ( q.w * q.x + q.y * q.z ), 1 - 2 * ( q.x ** 2 + q.y ** 2 ) );
 
 				}
 
@@ -361,6 +361,7 @@ class Euler {
 		return this;
 
 	}
+
 
 	setFromVector3( v, order = this._order ) {
 
