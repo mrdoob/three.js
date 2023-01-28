@@ -10,6 +10,7 @@
  *  - quantization, indicates the presision of each type of data stored in the draco file in the order (POSITION, NORMAL, COLOR, TEX_COORD, GENERIC)
  *  - exportUvs
  *  - exportNormals
+ *  - exportColor
  */
 
 /* global DracoEncoderModule */
