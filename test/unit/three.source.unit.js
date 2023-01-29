@@ -263,5 +263,6 @@ import './src/textures/CompressedTexture.tests.js';
 import './src/textures/CubeTexture.tests.js';
 import './src/textures/DataTexture.tests.js';
 import './src/textures/DepthTexture.tests.js';
+import './src/textures/Source.tests.js';
 import './src/textures/Texture.tests.js';
 import './src/textures/VideoTexture.tests.js';
