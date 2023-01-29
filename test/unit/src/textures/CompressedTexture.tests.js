@@ -1,15 +1,19 @@
 /* global QUnit */
 
-// import { CompressedTexture } from '../../../../src/textures/CompressedTexture.js';
+import { CompressedTexture } from '../../../../src/textures/CompressedTexture.js';
+
+import { Texture } from '../../../../src/textures/Texture.js';
 
 export default QUnit.module( 'Textures', () => {
 
 	QUnit.module( 'CompressedTexture', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var object = new CompressedTexture();
+
+			assert.strictEqual( object instanceof Texture, true, 'CompressedTexture extends from Texture' );
 
 		} );
 
