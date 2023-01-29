@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -13,18 +13,23 @@
 			Represents the data source of a texture.
 		</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:Any data] )</h3>
 		<p>
 			[page:Any data] -- The data definition of a texture. Default is *null*.
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Any data]</h3>
 		<p>
 		The actual data of a texture. The type of this property depends on the texture that uses this instance.
+		</p>
+
+		<h3>[property:Boolean isCubeTexture]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Boolean needsUpdate]</h3>
@@ -43,7 +48,7 @@
 		This starts at *0* and counts how many times [page:Source.needsUpdate .needsUpdate] is set to *true*.
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 		<p>
@@ -51,7 +56,7 @@
 		Convert the data source to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
