@@ -1,15 +1,19 @@
 /* global QUnit */
 
-// import { FramebufferTexture } from '../../../../src/textures/FramebufferTexture.js';
+import { FramebufferTexture } from '../../../../src/textures/FramebufferTexture.js';
+
+import { Texture } from '../../../../src/textures/Texture.js';
 
 export default QUnit.module( 'Textures', () => {
 
 	QUnit.module( 'FramebufferTexture', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var object = new FramebufferTexture();
+
+			assert.strictEqual( object instanceof Texture, true, 'FramebufferTexture extends from Texture' );
 
 		} );
 
