@@ -396,7 +396,8 @@
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"OBJExporter": "examples/en/exporters/OBJExporter",
-				"PLYExporter": "examples/en/exporters/PLYExporter"
+				"PLYExporter": "examples/en/exporters/PLYExporter",
+				"STLExporter": "examples/en/exporters/STLExporter"
 			},
 
 			"Math": {
