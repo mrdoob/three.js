@@ -8,12 +8,19 @@ export default QUnit.module( 'Textures', () => {
 
 	QUnit.module( 'Texture', () => {
 
-		// INSTANCING
+		// INHERITANCE
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			var object = new Texture();
 
 			assert.strictEqual( object instanceof EventDispatcher, true, 'Texture extends from EventDispatcher' );
+
+		} );
+
+		// INSTANCING
+		QUnit.todo( 'Instancing', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
