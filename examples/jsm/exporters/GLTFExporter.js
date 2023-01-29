@@ -24,6 +24,42 @@ import {
 	Vector3
 } from 'three';
 
+
+/**
+ * The KHR_mesh_quantization extension allows these extra attribute component types
+ *
+ * @see https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_mesh_quantization/README.md#extending-mesh-attributes
+ */
+const KHR_mesh_quantization_ExtraAttrTypes = {
+	POSITION: [
+		'byte',
+		'byte normalized',
+		'unsigned byte',
+		'unsigned byte normalized',
+		'short',
+		'short normalized',
+		'unsigned short',
+		'unsigned short normalized',
+	],
+	NORMAL: [
+		'byte normalized',
+		'short normalized',
+	],
+	TANGENT: [
+		'byte normalized',
+		'short normalized',
+	],
+	TEXCOORD: [
+		'byte',
+		'byte normalized',
+		'unsigned byte',
+		'short',
+		'short normalized',
+		'unsigned short',
+	],
+};
+
+
 class GLTFExporter {
 
 	constructor() {
@@ -154,10 +190,14 @@ const WEBGL_CONSTANTS = {
 	TRIANGLE_STRIP: 0x0005,
 	TRIANGLE_FAN: 0x0006,
 
+	BYTE: 0x1400,
 	UNSIGNED_BYTE: 0x1401,
+	SHORT: 0x1402,
 	UNSIGNED_SHORT: 0x1403,
-	FLOAT: 0x1406,
+	INT: 0x1404,
 	UNSIGNED_INT: 0x1405,
+	FLOAT: 0x1406,
+
 	ARRAY_BUFFER: 0x8892,
 	ELEMENT_ARRAY_BUFFER: 0x8893,
 
@@ -172,6 +212,8 @@ const WEBGL_CONSTANTS = {
 	MIRRORED_REPEAT: 33648,
 	REPEAT: 10497
 };
+
+const KHR_MESH_QUANTIZATION = 'KHR_mesh_quantization';
 
 const THREE_TO_WEBGL = {};
 
@@ -411,7 +453,9 @@ class GLTFWriter {
 		this.buffers = [];
 		this.nodeMap = new Map();
 		this.skins = [];
+
 		this.extensionsUsed = {};
+		this.extensionsRequired = {};
 
 		this.uids = new Map();
 		this.uid = 0;
@@ -473,15 +517,19 @@ class GLTFWriter {
 		const buffers = writer.buffers;
 		const json = writer.json;
 		options = writer.options;
+
 		const extensionsUsed = writer.extensionsUsed;
+		const extensionsRequired = writer.extensionsRequired;
 
 		// Merge buffers.
 		const blob = new Blob( buffers, { type: 'application/octet-stream' } );
 
 		// Declare extensions.
 		const extensionsUsedList = Object.keys( extensionsUsed );
+		const extensionsRequiredList = Object.keys( extensionsRequired );
 
 		if ( extensionsUsedList.length > 0 ) json.extensionsUsed = extensionsUsedList;
+		if ( extensionsRequiredList.length > 0 ) json.extensionsRequired = extensionsRequiredList;
 
 		// Update bytelength of the single buffer.
 		if ( json.buffers && json.buffers.length > 0 ) json.buffers[ 0 ].byteLength = blob.size;
@@ -860,17 +908,25 @@ class GLTFWriter {
 
 		let componentSize;
 
-		if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
+		switch ( componentType ) {
 
-			componentSize = 1;
+			case WEBGL_CONSTANTS.BYTE:
+			case WEBGL_CONSTANTS.UNSIGNED_BYTE:
 
-		} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
+				componentSize = 1;
 
-			componentSize = 2;
+				break;
 
-		} else {
+			case WEBGL_CONSTANTS.SHORT:
+			case WEBGL_CONSTANTS.UNSIGNED_SHORT:
 
-			componentSize = 4;
+				componentSize = 2;
+
+				break;
+
+			default:
+
+				componentSize = 4;
 
 		}
 
@@ -909,13 +965,25 @@ class GLTFWriter {
 
 					dataView.setFloat32( offset, value, true );
 
+				} else if ( componentType === WEBGL_CONSTANTS.INT ) {
+
+					dataView.setInt32( offset, value, true );
+
 				} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_INT ) {
 
 					dataView.setUint32( offset, value, true );
 
+				} else if ( componentType === WEBGL_CONSTANTS.SHORT ) {
+
+					dataView.setInt16( offset, value, true );
+
 				} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_SHORT ) {
 
 					dataView.setUint16( offset, value, true );
+
+				} else if ( componentType === WEBGL_CONSTANTS.BYTE ) {
+
+					dataView.setInt8( offset, value );
 
 				} else if ( componentType === WEBGL_CONSTANTS.UNSIGNED_BYTE ) {
 
@@ -1021,18 +1089,30 @@ class GLTFWriter {
 
 		let componentType;
 
-		// Detect the component type of the attribute array (float, uint or ushort)
+		// Detect the component type of the attribute array
 		if ( attribute.array.constructor === Float32Array ) {
 
 			componentType = WEBGL_CONSTANTS.FLOAT;
+
+		} else if ( attribute.array.constructor === Int32Array ) {
+
+			componentType = WEBGL_CONSTANTS.INT;
 
 		} else if ( attribute.array.constructor === Uint32Array ) {
 
 			componentType = WEBGL_CONSTANTS.UNSIGNED_INT;
 
+		} else if ( attribute.array.constructor === Int16Array ) {
+
+			componentType = WEBGL_CONSTANTS.SHORT;
+
 		} else if ( attribute.array.constructor === Uint16Array ) {
 
 			componentType = WEBGL_CONSTANTS.UNSIGNED_SHORT;
+
+		} else if ( attribute.array.constructor === Int8Array ) {
+
+			componentType = WEBGL_CONSTANTS.BYTE;
 
 		} else if ( attribute.array.constructor === Uint8Array ) {
 
@@ -1565,6 +1645,12 @@ class GLTFWriter {
 
 			if ( accessor !== null ) {
 
+				if ( ! attributeName.startsWith( '_' ) ) {
+
+					this.detectMeshQuantization( attributeName, attribute );
+
+				}
+
 				attributes[ attributeName ] = accessor;
 				cache.attributes.set( this.getUID( attribute ), accessor );
 
@@ -1742,6 +1828,68 @@ class GLTFWriter {
 		const index = json.meshes.push( meshDef ) - 1;
 		cache.meshes.set( meshCacheKey, index );
 		return index;
+
+	}
+
+	/**
+	 * If a vertex attribute with a
+	 * [non-standard data type](https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview)
+	 * is used, it is checked whether it is a valid data type according to the
+	 * [KHR_mesh_quantization](https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_mesh_quantization/README.md)
+	 * extension.
+	 * In this case the extension is automatically added to the list of used extensions.
+	 *
+	 * @param {string} attributeName
+	 * @param {THREE.BufferAttribute} attribute
+	 */
+	detectMeshQuantization( attributeName, attribute ) {
+
+		if ( this.extensionsUsed[ KHR_MESH_QUANTIZATION ] ) return;
+
+		let attrType = undefined;
+
+		switch ( attribute.array.constructor ) {
+
+			case Int8Array:
+
+				attrType = 'byte';
+
+				break;
+
+			case Uint8Array:
+
+				attrType = 'unsigned byte';
+
+				break;
+
+			case Int16Array:
+
+				attrType = 'short';
+
+				break;
+
+			case Uint16Array:
+
+				attrType = 'unsigned short';
+
+				break;
+
+			default:
+
+				return;
+
+		}
+
+		if ( attribute.normalized ) attrType += ' normalized';
+
+		const attrNamePrefix = attributeName.split( '_', 1 )[ 0 ];
+
+		if ( KHR_mesh_quantization_ExtraAttrTypes[ attrNamePrefix ]?.includes( attrType ) ) {
+
+			this.extensionsUsed[ KHR_MESH_QUANTIZATION ] = true;
+			this.extensionsRequired[ KHR_MESH_QUANTIZATION ] = true;
+
+		}
 
 	}
 
