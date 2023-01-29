@@ -1,15 +1,19 @@
 /* global QUnit */
 
-// import { DepthTexture } from '../../../../src/textures/DepthTexture.js';
+import { DepthTexture } from '../../../../src/textures/DepthTexture.js';
+
+import { Texture } from '../../../../src/textures/Texture.js';
 
 export default QUnit.module( 'Textures', () => {
 
 	QUnit.module( 'DepthTexture', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			var object = new DepthTexture();
+
+			assert.strictEqual( object instanceof Texture, true, 'DepthTexture extends from Texture' );
 
 		} );
 
