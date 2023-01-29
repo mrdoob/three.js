@@ -73,7 +73,7 @@ class ImageLoader extends Loader {
 
 		if ( url.slice( 0, 5 ) !== 'data:' ) {
 
-			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+			if ( this.crossOrigin !== undefined && this.crossOrigin != null ) image.crossOrigin = this.crossOrigin;
 
 		}
 
