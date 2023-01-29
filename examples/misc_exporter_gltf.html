@@ -417,15 +417,15 @@
 				// ---------------------------------------------------------------------
 				// Model requiring KHR_mesh_quantization
 				// ---------------------------------------------------------------------
-				const loader = new GLTFLoader()
-					.load( 'models/gltf/ShaderBall.glb', function ( gltf ) {
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/ShaderBall.glb', function ( gltf ) {
 
-						model = gltf.scene;
-						model.scale.setScalar( 50 );
-						model.position.set( 200, - 40, - 200 );
-						scene1.add( model );
+					model = gltf.scene;
+					model.scale.setScalar( 50 );
+					model.position.set( 200, - 40, - 200 );
+					scene1.add( model );
 
-					} );
+				} );
 
 				// ---------------------------------------------------------------------
 				// 2nd THREE.Scene
