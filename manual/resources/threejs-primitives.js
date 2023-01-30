@@ -901,7 +901,7 @@ const geometry = new THREE.WireframeGeometry(
 
 			const rawLines = createFn.toString().replace( /return (new THREE\.[a-zA-Z]+Geometry)/, 'const geometry = $1' ).split( /\n/ );
 			const createRE = /^ *(?:function *)*create\d*\((.*?)\)/;
-			const indentRE = /^( *)[^ ]/;
+			const indentRE = /^(\s*)\S/;
 			const m = indentRE.exec( rawLines[ 1 ] );
 			const prefixLen = m[ 1 ].length;
 			const m2 = createRE.exec( rawLines[ 0 ] );
