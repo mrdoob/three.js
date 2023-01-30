@@ -347,8 +347,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 		}
 
-		domElement.addEventListener( 'touchstart', touchStart );
-		domElement.addEventListener( 'touchmove', touchMove );
+		domElement.addEventListener( 'touchstart', touchStart, { passive: false } );
+		domElement.addEventListener( 'touchmove', touchMove, { passive: false } );
 
 	}
 
