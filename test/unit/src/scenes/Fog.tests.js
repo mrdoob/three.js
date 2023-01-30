@@ -1,6 +1,6 @@
 /* global QUnit */
 
-// import { Fog } from '../../../../src/scenes/Fog.js';
+import { Fog } from '../../../../src/scenes/Fog.js';
 
 export default QUnit.module( 'Scenes', () => {
 
@@ -39,9 +39,13 @@ export default QUnit.module( 'Scenes', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isFog', ( assert ) => {
+		QUnit.test( 'isFog', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Fog();
+			assert.ok(
+				object.isFog,
+				'Fog.isFog should be true'
+			);
 
 		} );
 
