@@ -2,16 +2,9 @@
 
 // import { Fog } from '../../../../src/scenes/Fog.js';
 
-export default QUnit.module( 'Fog', () => {
+export default QUnit.module( 'Scenes', () => {
 
-	QUnit.module( 'Scene', () => {
-
-		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
+	QUnit.module( 'Fog', () => {
 
 		// INSTANCING
 		QUnit.todo( 'Instancing', ( assert ) => {
@@ -20,7 +13,32 @@ export default QUnit.module( 'Fog', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		// PROPERTIES
+		QUnit.todo( 'name', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'color', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'near', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'far', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'isFog', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );

@@ -1,19 +1,19 @@
 /* global QUnit */
 
-import { FramebufferTexture } from '../../../../src/textures/FramebufferTexture.js';
+import { DataArrayTexture } from '../../../../src/textures/DataArrayTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module( 'FramebufferTexture', () => {
+	QUnit.module( 'DataArrayTexture', () => {
 
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new FramebufferTexture();
+			var object = new DataArrayTexture();
 
-			assert.strictEqual( object instanceof Texture, true, 'FramebufferTexture extends from Texture' );
+			assert.strictEqual( object instanceof Texture, true, 'DataArrayTexture extends from Texture' );
 
 		} );
 
@@ -25,7 +25,7 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'format', ( assert ) => {
+		QUnit.todo( 'image', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -43,20 +43,32 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
+		QUnit.todo( 'wrapR', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.todo( 'generateMipmaps', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'needsUpdate', ( assert ) => {
+		QUnit.todo( 'flipY', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'unpackAlignment', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isFramebufferTexture', ( assert ) => {
+		QUnit.todo( 'isDataArrayTexture', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
