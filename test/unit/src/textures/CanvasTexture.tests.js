@@ -32,9 +32,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isCanvasTexture', ( assert ) => {
+		QUnit.test( 'isCanvasTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new CanvasTexture();
+			assert.ok(
+				object.isCanvasTexture,
+				'CanvasTexture.isCanvasTexture should be true'
+			);
 
 		} );
 

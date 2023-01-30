@@ -68,9 +68,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isData3DTexture', ( assert ) => {
+		QUnit.test( 'isData3DTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Data3DTexture();
+			assert.ok(
+				object.isData3DTexture,
+				'Data3DTexture.isData3DTexture should be true'
+			);
 
 		} );
 

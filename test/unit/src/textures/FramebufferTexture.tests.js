@@ -56,9 +56,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isFramebufferTexture', ( assert ) => {
+		QUnit.test( 'isFramebufferTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new FramebufferTexture();
+			assert.ok(
+				object.isFramebufferTexture,
+				'FramebufferTexture.isFramebufferTexture should be true'
+			);
 
 		} );
 

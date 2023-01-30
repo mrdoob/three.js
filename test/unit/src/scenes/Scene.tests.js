@@ -68,9 +68,13 @@ export default QUnit.module( 'Scenes', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isScene', ( assert ) => {
+		QUnit.test( 'isScene', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Scene();
+			assert.ok(
+				object.isScene,
+				'Scene.isScene should be true'
+			);
 
 		} );
 

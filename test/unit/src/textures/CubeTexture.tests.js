@@ -38,9 +38,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isCubeTexture', ( assert ) => {
+		QUnit.test( 'isCubeTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new CubeTexture();
+			assert.ok(
+				object.isCubeTexture,
+				'CubeTexture.isCubeTexture should be true'
+			);
 
 		} );
 

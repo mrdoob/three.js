@@ -56,9 +56,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isDepthTexture', ( assert ) => {
+		QUnit.test( 'isDepthTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new DepthTexture();
+			assert.ok(
+				object.isDepthTexture,
+				'DepthTexture.isDepthTexture should be true'
+			);
 
 		} );
 
