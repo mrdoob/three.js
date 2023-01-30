@@ -1,19 +1,19 @@
 /* global QUnit */
 
-import { WebGLCubeRenderTarget } from '../../../../src/renderers/WebGLCubeRenderTarget.js';
+import { WebGLMultipleRenderTargets } from '../../../../src/renderers/WebGLMultipleRenderTargets.js';
 
 import { WebGLRenderTarget } from '../../../../src/renderers/WebGLRenderTarget.js';
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module( 'WebGLCubeRenderTarget', () => {
+	QUnit.module( 'WebGLMultipleRenderTargets', () => {
 
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new WebGLCubeRenderTarget();
+			var object = new WebGLMultipleRenderTargets();
 
-			assert.strictEqual( object instanceof WebGLRenderTarget, true, 'WebGLCubeRenderTarget extends from WebGLRenderTarget' );
+			assert.strictEqual( object instanceof WebGLRenderTarget, true, 'WebGLMultipleRenderTargets extends from WebGLRenderTarget' );
 
 		} );
 
@@ -27,25 +27,25 @@ export default QUnit.module( 'Renderers', () => {
 		// PROPERTIES
 		QUnit.todo( 'texture', ( assert ) => {
 
-			// doc update needed, this needs to be a CubeTexture unlike parent class
+			// must be Array of texture
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isWebGLCubeRenderTarget', ( assert ) => {
+		QUnit.todo( 'isWebGLMultipleRenderTargets', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'fromEquirectangularTexture', ( assert ) => {
+		QUnit.todo( 'setSize', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clear', ( assert ) => {
+		QUnit.todo( 'copy', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
