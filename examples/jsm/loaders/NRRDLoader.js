@@ -50,6 +50,14 @@ class NRRDLoader extends Loader {
 
 	}
 
+	/**
+	 *
+	 * @param {boolean} segmentation is a option for user to choose
+   	 */
+    setSegmentation(segmentation) {
+	    this.segmentation = segmentation;
+    }
+
 	parse( data ) {
 
 		// this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
@@ -378,10 +386,14 @@ class NRRDLoader extends Loader {
 			const yIndex = headerObject.vectors.findIndex( vector => vector[ 1 ] !== 0 );
 			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
-			const axisOrder = [];
-			axisOrder[ xIndex ] = 'x';
-			axisOrder[ yIndex ] = 'y';
-			axisOrder[ zIndex ] = 'z';
+			let axisOrder = [];
+			if (xIndex !== yIndex && xIndex !== zIndex && yIndex !== zIndex) {
+				axisOrder[xIndex] = 'x';
+				axisOrder[yIndex] = 'y';
+				axisOrder[zIndex] = 'z';
+			}else {
+        		axisOrder = ["x", "y", "z"];
+      		}
 			volume.axisOrder = axisOrder;
 
 		} else {
@@ -423,7 +435,7 @@ class NRRDLoader extends Loader {
 		}
 
 
-		if ( ! headerObject.vectors ) {
+		if ( ! headerObject.vectors || this.segmentation ) {
 
 			volume.matrix.set(
 				1, 0, 0, 0,
