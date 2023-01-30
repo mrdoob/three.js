@@ -45,9 +45,7 @@ jobs:
           node-version: 16
           cache: 'npm'
       - name: Install packages
-        run: |
-          npm ci
-          npm ci --prefix test
+        run: npm ci
       - name: Build
         run: npm run build
 
@@ -73,9 +71,7 @@ jobs:
           node-version: 16
           cache: 'npm'
       - name: Install packages
-        run: |
-          npm ci
-          npm ci --prefix test
+        run: npm ci
       - name: Build
         run: npm run build
 

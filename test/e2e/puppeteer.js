@@ -1,10 +1,11 @@
 import chalk from 'chalk';
-import puppeteer from 'puppeteer';
+import puppeteer, { BrowserFetcher } from 'puppeteer-core';
 import express from 'express';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
 import jimp from 'jimp';
 import * as fs from 'fs/promises';
+import fetch from 'node-fetch';
 
 /* CONFIG VARIABLES START */
 
@@ -44,6 +45,14 @@ const exceptionList = [
 ];
 
 /* CONFIG VARIABLES END */
+
+const LAST_REVISION_URLS = {
+    linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
+    mac: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/LAST_CHANGE',
+    mac_arm: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac_Arm/LAST_CHANGE',
+    win32: 'https://storage.googleapis.com/chromium-browser-snapshots/Win/LAST_CHANGE',
+    win64: 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/LAST_CHANGE'
+};
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
@@ -118,6 +127,10 @@ async function main() {
 
 	}
 
+	/* Download browser */
+
+	const { executablePath } = await downloadLatestChromium();
+
 	/* Launch browser */
 
 	const flags = [ '--hide-scrollbars', '--enable-unsafe-webgpu' ];
@@ -127,6 +140,7 @@ async function main() {
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
 	browser = await puppeteer.launch( {
+		executablePath,
 		headless: ! process.env.VISIBLE,
 		args: flags,
 		defaultViewport: viewport,
@@ -181,6 +195,29 @@ async function main() {
 	}
 
 	setTimeout( close, 300, failedScreenshots.length );
+
+}
+
+async function downloadLatestChromium() {
+
+	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
+
+	const lastRevisionURL = LAST_REVISION_URLS[ browserFetcher.platform() ];
+	const revision = await ( await fetch( lastRevisionURL ) ).text();
+
+	let revisionInfo = browserFetcher.revisionInfo( revision );
+	if ( revisionInfo.local === true ) {
+
+		console.log( 'Latest Chromium has been already downloaded.' );
+
+	} else {
+
+		console.log( 'Downloading latest Chromium...' );
+		revisionInfo = await browserFetcher.download( revision );
+		console.log( 'Downloaded.' );
+
+	}
+	return revisionInfo;
 
 }
 
