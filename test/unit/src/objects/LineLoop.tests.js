@@ -25,13 +25,27 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isLineLoop', ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new LineLoop();
+			assert.ok(
+				object.type === 'LineLoop',
+				'LineLoop.type should be LineLoop'
+			);
 
 		} );
 
+		// PUBLIC
+		QUnit.test( 'isLineLoop', ( assert ) => {
+
+			const object = new LineLoop();
+			assert.ok(
+				object.isLineLoop,
+				'LineLoop.isLineLoop should be true'
+			);
+
+		} );
 
 	} );
 
