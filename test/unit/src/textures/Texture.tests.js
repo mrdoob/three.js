@@ -206,9 +206,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isTexture', ( assert ) => {
+		QUnit.test( 'isTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Texture();
+			assert.ok(
+				object.isTexture,
+				'Texture.isTexture should be true'
+			);
 
 		} );
 

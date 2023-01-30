@@ -38,9 +38,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isCompressedArrayTexture', ( assert ) => {
+		QUnit.test( 'isCompressedArrayTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new CompressedArrayTexture();
+			assert.ok(
+				object.isCompressedArrayTexture,
+				'CompressedArrayTexture.isCompressedArrayTexture should be true'
+			);
 
 		} );
 

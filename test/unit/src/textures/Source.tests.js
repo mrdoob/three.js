@@ -1,6 +1,6 @@
 /* global QUnit */
 
-// import { Source } from '../../../../src/textures/Source.js';
+import { Source } from '../../../../src/textures/Source.js';
 
 export default QUnit.module( 'Textures', () => {
 
@@ -39,9 +39,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isSource', ( assert ) => {
+		QUnit.test( 'isSource', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Source();
+			assert.ok(
+				object.isSource,
+				'Source.isSource should be true'
+			);
 
 		} );
 

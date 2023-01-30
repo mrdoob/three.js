@@ -50,9 +50,13 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isCompressedTexture', ( assert ) => {
+		QUnit.test( 'isCompressedTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new CompressedTexture();
+			assert.ok(
+				object.isCompressedTexture,
+				'CompressedTexture.isCompressedTexture should be true'
+			);
 
 		} );
 

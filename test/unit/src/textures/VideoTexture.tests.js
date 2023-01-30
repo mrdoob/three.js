@@ -46,9 +46,16 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( 'isVideoTexture', ( assert ) => {
+		QUnit.test( 'isVideoTexture', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const videoDocumentElement = {};
+
+			const object = new VideoTexture( videoDocumentElement );
+
+			assert.ok(
+				object.isVideoTexture,
+				'VideoTexture.isVideoTexture should be true'
+			);
 
 		} );
 
