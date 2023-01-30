@@ -145,8 +145,10 @@ async function main() {
 
 	/* Prepare page */
 
+	const errorMessagesCache = [];
+
 	const page = ( await browser.pages() )[ 0 ];
-	await preparePage( page, injection, build );
+	await preparePage( page, injection, build, errorMessagesCache );
 
 	/* Loop for each file */
 
@@ -184,12 +186,57 @@ async function main() {
 
 }
 
-async function preparePage( page, injection, build ) {
+async function preparePage( page, injection, build, errorMessages ) {
 
-	/* let page.pageSize */
+	/* let page.file, page.pageSize, page.error */
 
 	await page.evaluateOnNewDocument( injection );
 	await page.setRequestInterception( true );
+
+	page.on( 'console', async msg => {
+
+		const type = msg.type();
+
+		if ( type !== 'warning' && type !== 'error' ) {
+
+			return;
+
+		}
+
+		const file = page.file;
+
+		if ( file === undefined ) {
+
+			return;
+
+		}
+
+		let text = ( await Promise.all( msg.args().map( arg => arg.executionContext().evaluate( arg => arg instanceof Error ? arg.message : arg, arg ) ) ) ).join( ' ' ); // https://github.com/puppeteer/puppeteer/issues/3397#issuecomment-434970058
+
+		text = text.trim();
+		if ( text === '' ) return;
+
+		text = file + ': ' + text.replace( /\[\.WebGL-(.+?)\] /g, '' );
+
+		if ( errorMessages.includes( text ) ) {
+
+			return;
+
+		}
+
+		errorMessages.push( text );
+
+		if ( type === 'warning' ) {
+
+			console.yellow( text );
+
+		} else {
+
+			page.error = text;
+
+		}
+
+	} );
 
 	page.on( 'response', async ( response ) => {
 
@@ -231,7 +278,9 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 	try {
 
+		page.file = file;
 		page.pageSize = 0;
+		page.error = undefined;
 
 		/* Load target page */
 
@@ -295,19 +344,21 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 		} catch ( e ) {
 
-			if ( e.message.includes( 'Render timeout exceeded' ) ) { // This can mean that the example doesn't use requestAnimationFrame loop
-
-				console.yellow( `Render timeout exceeded in file ${ file }` );
-
-			} else {
+			if ( ! e.message.includes( 'Render timeout exceeded' ) ) {
 
 				throw new Error( `Error happened while rendering file ${ file }: ${ e }` );
 
-			}
+			} /* else { // This can mean that the example doesn't use requestAnimationFrame loop
+
+				console.yellow( `Render timeout exceeded in file ${ file }` );
+
+			} */
 
 		}
 
 		const screenshot = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality );
+
+		if ( page.error !== undefined ) throw new Error( page.error );
 
 		if ( isMakeScreenshot ) {
 
