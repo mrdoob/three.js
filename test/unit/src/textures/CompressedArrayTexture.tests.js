@@ -1,19 +1,19 @@
 /* global QUnit */
 
-import { CanvasTexture } from '../../../../src/textures/CanvasTexture.js';
+import { CompressedArrayTexture } from '../../../../src/textures/CompressedArrayTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module( 'CanvasTexture', () => {
+	QUnit.module( 'CompressedArrayTexture', () => {
 
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new CanvasTexture();
+			var object = new CompressedArrayTexture();
 
-			assert.strictEqual( object instanceof Texture, true, 'CanvasTexture extends from Texture' );
+			assert.strictEqual( object instanceof Texture, true, 'CompressedArrayTexture extends from Texture' );
 
 		} );
 
@@ -25,14 +25,20 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'needsUpdate', ( assert ) => {
+		QUnit.todo( 'image.depth', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'wrapR', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isCanvasTexture', ( assert ) => {
+		QUnit.todo( 'isCompressedArrayTexture', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

@@ -1,19 +1,19 @@
 /* global QUnit */
 
-import { DepthTexture } from '../../../../src/textures/DepthTexture.js';
+import { Data3DTexture } from '../../../../src/textures/Data3DTexture.js';
 
 import { Texture } from '../../../../src/textures/Texture.js';
 
 export default QUnit.module( 'Textures', () => {
 
-	QUnit.module( 'DepthTexture', () => {
+	QUnit.module( 'Data3DTexture', () => {
 
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new DepthTexture();
+			var object = new Data3DTexture();
 
-			assert.strictEqual( object instanceof Texture, true, 'DepthTexture extends from Texture' );
+			assert.strictEqual( object instanceof Texture, true, 'Data3DTexture extends from Texture' );
 
 		} );
 
@@ -43,7 +43,7 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		QUnit.todo( 'flipY', ( assert ) => {
+		QUnit.todo( 'wrapR', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -55,8 +55,20 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
+		QUnit.todo( 'flipY', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'unpackAlignment', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		// PUBLIC
-		QUnit.todo( 'isDepthTexture', ( assert ) => {
+		QUnit.todo( 'isData3DTexture', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
