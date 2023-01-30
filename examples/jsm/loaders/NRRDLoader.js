@@ -54,9 +54,11 @@ class NRRDLoader extends Loader {
 	 *
 	 * @param {boolean} segmentation is a option for user to choose
    	 */
-    setSegmentation(segmentation) {
+	setSegmentation( segmentation ) {
+
 	    this.segmentation = segmentation;
-    }
+
+	}
 
 	parse( data ) {
 
@@ -387,13 +389,18 @@ class NRRDLoader extends Loader {
 			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
 			let axisOrder = [];
-			if (xIndex !== yIndex && xIndex !== zIndex && yIndex !== zIndex) {
-				axisOrder[xIndex] = 'x';
-				axisOrder[yIndex] = 'y';
-				axisOrder[zIndex] = 'z';
-			}else {
-        		axisOrder = ["x", "y", "z"];
-      		}
+			if ( xIndex !== yIndex && xIndex !== zIndex && yIndex !== zIndex ) {
+
+				axisOrder[ xIndex ] = 'x';
+				axisOrder[ yIndex ] = 'y';
+				axisOrder[ zIndex ] = 'z';
+
+			} else {
+
+				axisOrder = [ 'x', 'y', 'z' ];
+
+			}
+
 			volume.axisOrder = axisOrder;
 
 		} else {
