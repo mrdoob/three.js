@@ -224,6 +224,12 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 		}
 
+		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
+
+			return;
+
+		}
+
 		errorMessages.push( text );
 
 		if ( type === 'warning' ) {
