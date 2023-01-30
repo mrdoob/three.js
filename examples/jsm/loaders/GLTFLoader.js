@@ -2254,6 +2254,9 @@ class GLTFParser {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
+		// Node cache
+		this.nodeCache = {};
+
 		// Object3D instance caches
 		this.meshCache = { refs: {}, uses: {} };
 		this.cameraCache = { refs: {}, uses: {} };
@@ -2324,6 +2327,7 @@ class GLTFParser {
 
 		// Clear the loader cache
 		this.cache.removeAll();
+		this.nodeCache = {};
 
 		// Mark the special nodes/meshes in json for efficient parse
 		this._invokeAll( function ( ext ) {
@@ -3612,7 +3616,7 @@ class GLTFParser {
 
 		for ( let i = 0, il = skinDef.joints.length; i < il; i ++ ) {
 
-			pending.push( this.getDependency( 'node', skinDef.joints[ i ] ) );
+			pending.push( this._loadNode( skinDef.joints[ i ] ) );
 
 		}
 
@@ -3630,6 +3634,10 @@ class GLTFParser {
 
 			const inverseBindMatrices = results.pop();
 			const jointNodes = results;
+
+			// Note that bones (joint nodes) may or may not be in the
+			// scene graph at this time.
+			// Child nodes are added in .loadNode() (no '_' prefix).
 
 			const bones = [];
 			const boneInverses = [];
@@ -3880,49 +3888,13 @@ class GLTFParser {
 	loadNode( nodeIndex ) {
 
 		const json = this.json;
-		const extensions = this.extensions;
 		const parser = this;
 
 		const nodeDef = json.nodes[ nodeIndex ];
 
-		// reserve node's name before its dependencies, so the root has the intended name.
-		const nodeName = nodeDef.name ? parser.createUniqueName( nodeDef.name ) : '';
-
 		return ( function () {
 
-			const objectPending = [];
-
-			const meshPromise = parser._invokeOne( function ( ext ) {
-
-				return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
-
-			} );
-
-			if ( meshPromise ) {
-
-				objectPending.push( meshPromise );
-
-			}
-
-			if ( nodeDef.camera !== undefined ) {
-
-				objectPending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
-
-					return parser._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
-
-				} ) );
-
-			}
-
-			parser._invokeAll( function ( ext ) {
-
-				return ext.createNodeAttachment && ext.createNodeAttachment( nodeIndex );
-
-			} ).forEach( function ( promise ) {
-
-				objectPending.push( promise );
-
-			} );
+			const nodePending = parser._loadNode( nodeIndex );
 
 			const childPending = [];
 			const childrenDef = nodeDef.children || [];
@@ -3938,16 +3910,104 @@ class GLTFParser {
 				: parser.getDependency( 'skin', nodeDef.skin );
 
 			return Promise.all( [
-				Promise.all( objectPending ),
+				nodePending,
 				Promise.all( childPending ),
 				skeletonPending
 			] );
 
 		}() ).then( function ( results ) {
 
-			const objects = results[ 0 ];
+			const node = results[ 0 ];
 			const children = results[ 1 ];
 			const skeleton = results[ 2 ];
+
+			if ( skeleton !== null ) {
+
+				// This full traverse should be fine because
+				// child glTF nodes have not been added to this node yet.
+				node.traverse( function ( mesh ) {
+
+					if ( ! mesh.isSkinnedMesh ) return;
+
+					mesh.bind( skeleton, _identityMatrix );
+
+				} );
+
+			}
+
+			for ( let i = 0, il = children.length; i < il; i ++ ) {
+
+				node.add( children[ i ] );
+
+			}
+
+			return node;
+
+		} );
+
+	}
+
+	// ._loadNode() parses a single node.
+	// skin and child nodes are created and added in .loadNode() (no '_' prefix).
+	_loadNode( nodeIndex ) {
+
+		const json = this.json;
+		const extensions = this.extensions;
+		const parser = this;
+
+		// This method is called from .loadNode() and .loadSkin().
+		// Cache a node to avoid duplication.
+
+		if ( this.nodeCache[ nodeIndex ] !== undefined ) {
+
+			return this.nodeCache[ nodeIndex ];
+
+		}
+
+		const nodeDef = json.nodes[ nodeIndex ];
+
+		// reserve node's name before its dependencies, so the root has the intended name.
+		const nodeName = nodeDef.name ? parser.createUniqueName( nodeDef.name ) : '';
+
+		this.nodeCache[ nodeIndex ] = ( function () {
+
+			const pending = [];
+
+			const meshPromise = parser._invokeOne( function ( ext ) {
+
+				return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
+
+			} );
+
+			if ( meshPromise ) {
+
+				pending.push( meshPromise );
+
+			}
+
+			if ( nodeDef.camera !== undefined ) {
+
+				pending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
+
+					return parser._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
+
+				} ) );
+
+			}
+
+			parser._invokeAll( function ( ext ) {
+
+				return ext.createNodeAttachment && ext.createNodeAttachment( nodeIndex );
+
+			} ).forEach( function ( promise ) {
+
+				pending.push( promise );
+
+			} );
+
+			return Promise.all( pending );
+
+		}() ).then( function ( objects ) {
 
 			let node;
 
@@ -4027,29 +4087,11 @@ class GLTFParser {
 
 			parser.associations.get( node ).nodes = nodeIndex;
 
-			if ( skeleton !== null ) {
-
-				// This full traverse should be fine because
-				// child glTF nodes have not been added to this node yet.
-				node.traverse( function ( mesh ) {
-
-					if ( ! mesh.isSkinnedMesh ) return;
-
-					mesh.bind( skeleton, _identityMatrix );
-
-				} );
-
-			}
-
-			for ( let i = 0, il = children.length; i < il; i ++ ) {
-
-				node.add( children[ i ] );
-
-			}
-
 			return node;
 
 		} );
+
+		return this.nodeCache[ nodeIndex ];
 
 	}
 
