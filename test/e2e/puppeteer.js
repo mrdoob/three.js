@@ -54,7 +54,7 @@ const renderTimeout = 1.5; // 1.5 seconds, set to 0 to disable
 
 const numAttempts = 3; // perform 3 progressive attempts before failing
 
-const numCIJobs = 6; // GitHub Actions run the script in 6 threads
+const numCIJobs = 8; // GitHub Actions run the script in 8 threads
 
 const width = 400;
 const height = 250;
