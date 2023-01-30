@@ -56,11 +56,12 @@ jobs:
 
   e2e:
     name: "E2E testing"
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        CI: [ 0, 1, 2, 3, 4, 5, 6, 7 ]
+        CI: [ 0, 1, 2, 3, 4, 5 ]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
     env:
       CI: ${{ matrix.CI }}
       FORCE_COLOR: 1
