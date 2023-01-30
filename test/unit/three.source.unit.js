@@ -177,6 +177,7 @@ import './src/materials/SpriteMaterial.tests.js';
 import './src/math/Box2.tests.js';
 import './src/math/Box3.tests.js';
 import './src/math/Color.tests.js';
+import './src/math/ColorManagement.tests.js';
 import './src/math/Cylindrical.tests.js';
 import './src/math/Euler.tests.js';
 import './src/math/Frustum.tests.js';
