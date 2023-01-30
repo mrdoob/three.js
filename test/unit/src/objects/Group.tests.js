@@ -23,6 +23,28 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new Group();
+			assert.ok(
+				object.type === 'Group',
+				'Group.type should be Group'
+			);
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isGroup', ( assert ) => {
+
+			const object = new Group();
+			assert.ok(
+				object.isGroup,
+				'Group.isGroup should be true'
+			);
+
+		} );
+
 	} );
 
 } );
