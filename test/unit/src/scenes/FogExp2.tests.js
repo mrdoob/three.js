@@ -2,19 +2,31 @@
 
 // import { FogExp2 } from '../../../../src/scenes/FogExp2.js';
 
-export default QUnit.module( 'FoxExp2', () => {
+export default QUnit.module( 'Scenes', () => {
 
-	QUnit.module( 'Scene', () => {
+	QUnit.module( 'FoxExp2', () => {
 
-		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		// INSTANCING
+		QUnit.todo( 'Instancing', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		// PROPERTIES
+		QUnit.todo( 'name', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'color', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'density', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
