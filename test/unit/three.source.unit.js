@@ -217,9 +217,10 @@ import './src/objects/Sprite.tests.js';
 
 
 //src/renderers
+import './src/renderers/WebGLCubeRenderTarget.tests.js';
+import './src/renderers/WebGLMultipleRenderTargets.tests.js';
 import './src/renderers/WebGLRenderer.tests.js';
 import './src/renderers/WebGLRenderTarget.tests.js';
-import './src/renderers/WebGLCubeRenderTarget.tests.js';
 
 //src/renderers/shaders
 import './src/renderers/shaders/ShaderChunk.tests.js';
