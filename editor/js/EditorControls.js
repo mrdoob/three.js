@@ -258,7 +258,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 		domElement.addEventListener( 'contextmenu', contextmenu );
 		domElement.addEventListener( 'dblclick', onMouseUp );
-		domElement.addEventListener( 'wheel', onMouseWheel );
+		domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
 
 		domElement.addEventListener( 'pointerdown', onPointerDown );
 
