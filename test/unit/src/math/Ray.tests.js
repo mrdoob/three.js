@@ -12,7 +12,7 @@ import {
 	two3,
 	eps,
 	posInf3
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 

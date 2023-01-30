@@ -12,7 +12,7 @@ import {
 	z,
 	w,
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 const orders = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ];
 const eulerAngles = new Euler( 0.1, - 0.3, 0.25 );

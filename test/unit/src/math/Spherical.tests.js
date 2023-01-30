@@ -4,7 +4,7 @@ import { Spherical } from '../../../../src/math/Spherical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import {
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 

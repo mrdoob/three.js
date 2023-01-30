@@ -2,7 +2,7 @@
 
 import { Cylindrical } from '../../../../src/math/Cylindrical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
-import { eps } from './Constants.tests.js';
+import { eps } from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 

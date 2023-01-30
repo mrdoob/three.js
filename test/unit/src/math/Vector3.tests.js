@@ -16,7 +16,7 @@ import {
 	z,
 	w,
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 

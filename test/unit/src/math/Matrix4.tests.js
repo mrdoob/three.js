@@ -6,7 +6,7 @@ import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Euler } from '../../../../src/math/Euler.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import * as MathUtils from '../../../../src/math/MathUtils.js';
-import { eps } from './Constants.tests.js';
+import { eps } from '../../utils/math-constants.js';
 
 
 function matrixEquals4( a, b, tolerance ) {

@@ -13,7 +13,7 @@ import {
 	w,
 	zero3,
 	one3
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 function comparePlane( a, b, threshold ) {
 

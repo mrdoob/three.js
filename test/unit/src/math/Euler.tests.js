@@ -4,7 +4,7 @@ import { Euler } from '../../../../src/math/Euler.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
-import { x, y, z } from './Constants.tests.js';
+import { x, y, z } from '../../utils/math-constants.js';
 
 const eulerZero = new Euler( 0, 0, 0, 'XYZ' );
 const eulerAxyz = new Euler( 1, 0, 0, 'XYZ' );

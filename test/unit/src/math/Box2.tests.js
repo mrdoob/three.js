@@ -9,7 +9,7 @@ import {
 	zero2,
 	one2,
 	two2
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
