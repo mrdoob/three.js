@@ -191,6 +191,7 @@ import './src/math/Quaternion.tests.js';
 import './src/math/Ray.tests.js';
 import './src/math/Sphere.tests.js';
 import './src/math/Spherical.tests.js';
+import './src/math/SphericalHarmonics3.tests.js';
 import './src/math/Triangle.tests.js';
 import './src/math/Vector2.tests.js';
 import './src/math/Vector3.tests.js';
