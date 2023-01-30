@@ -9,7 +9,7 @@
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '149';
+	const REVISION = '150dev';
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 	const CullFaceNone = 0;
@@ -44217,8 +44217,13 @@
 
 			this._progress = 0;
 
-			this.source.stop();
-			this.source.onended = null;
+			if ( this.source !== null ) {
+
+				this.source.stop();
+				this.source.onended = null;
+
+			}
+
 			this.isPlaying = false;
 
 			return this;
@@ -45031,7 +45036,7 @@
 			this.path = path;
 			this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
 
-			this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
+			this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName );
 
 			this.rootNode = rootNode;
 
@@ -45347,7 +45352,7 @@
 
 			if ( ! targetObject ) {
 
-				targetObject = PropertyBinding.findNode( this.rootNode, parsedPath.nodeName ) || this.rootNode;
+				targetObject = PropertyBinding.findNode( this.rootNode, parsedPath.nodeName );
 
 				this.node = targetObject;
 

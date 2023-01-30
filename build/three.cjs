@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '149';
+const REVISION = '150dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -44213,8 +44213,13 @@ class Audio extends Object3D {
 
 		this._progress = 0;
 
-		this.source.stop();
-		this.source.onended = null;
+		if ( this.source !== null ) {
+
+			this.source.stop();
+			this.source.onended = null;
+
+		}
+
 		this.isPlaying = false;
 
 		return this;
@@ -45027,7 +45032,7 @@ class PropertyBinding {
 		this.path = path;
 		this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
 
-		this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
+		this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName );
 
 		this.rootNode = rootNode;
 
@@ -45343,7 +45348,7 @@ class PropertyBinding {
 
 		if ( ! targetObject ) {
 
-			targetObject = PropertyBinding.findNode( this.rootNode, parsedPath.nodeName ) || this.rootNode;
+			targetObject = PropertyBinding.findNode( this.rootNode, parsedPath.nodeName );
 
 			this.node = targetObject;
 
