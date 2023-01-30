@@ -23,6 +23,17 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new Bone();
+			assert.ok(
+				object.type === 'Bone',
+				'Bone.type should be Bone'
+			);
+
+		} );
+
 		// PUBLIC
 		QUnit.test( 'isBone', ( assert ) => {
 
