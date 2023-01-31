@@ -200,7 +200,7 @@ function Loader( editor ) {
 
 					const loader = new DRACOLoader();
 					loader.setDecoderPath( '../examples/jsm/libs/draco/' );
-					loader.decodeDracoFile( contents, function ( geometry ) {
+					loader.parse( contents, function ( geometry ) {
 
 						let object;
 
