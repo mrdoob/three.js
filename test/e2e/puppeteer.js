@@ -57,6 +57,7 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'webgl_buffergeometry_glbufferattribute',
 	'webgl_lensflares',
 	'webgl_lines_sphere',
 	'webgl_loader_imagebitmap',
@@ -84,7 +85,6 @@ const macExceptionList = [
 	'webgl_animation_skinning_ik',
 	'webgl_buffergeometry_compression',
 	'webgl_buffergeometry_custom_attributes_particles',
-	'webgl_buffergeometry_glbufferattribute',
 	'webgl_buffergeometry_indexed',
 	'webgl_buffergeometry_instancing_billboards',
 	'webgl_buffergeometry_lines_indexed',
@@ -132,8 +132,12 @@ const macExceptionList = [
 	'webgl_postprocessing_ssaa',
 	'webgl_postprocessing_ssao',
 	'webgl_postprocessing_unreal_bloom_selective',
+	'webgl_shaders_tonemapping',
+	'webgl_shadow_contact',
 	'webgl_shadowmap',
-	'webgl_shadowmesh'
+	'webgl_shadowmap_vsm',
+	'webgl_shadowmesh',
+	'webgl_tonemapping'
 
 ];
 
