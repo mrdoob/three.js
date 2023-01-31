@@ -6,7 +6,7 @@ import {
 	x,
 	y,
 	z
-} from '../math/Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Core', () => {
 

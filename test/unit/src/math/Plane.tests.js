@@ -13,7 +13,7 @@ import {
 	w,
 	zero3,
 	one3
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 function comparePlane( a, b, threshold ) {
 
@@ -220,7 +220,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'isInterestionLine/intersectLine', ( assert ) => {
+		QUnit.test( 'intersectLine', ( assert ) => {
 
 			var a = new Plane( new Vector3( 1, 0, 0 ), 0 );
 			var point = new Vector3();
@@ -232,6 +232,13 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Plane( new Vector3( 1, 0, 0 ), - 3 );
 			a.intersectLine( l1, point );
 			assert.ok( point.equals( new Vector3( 3, 0, 0 ) ), 'Passed!' );
+
+		} );
+
+		QUnit.todo( 'intersectsLine', ( assert ) => {
+
+			// intersectsLine( line ) // - boolean variant of above
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

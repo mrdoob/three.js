@@ -10,7 +10,7 @@ import {
 	one3,
 	two3,
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -29,13 +29,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isSphere', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
+		// PUBLIC
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Sphere();

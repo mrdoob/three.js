@@ -10,7 +10,7 @@ import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
-import { x, y, z } from '../math/Constants.tests.js';
+import { x, y, z } from '../../utils/math-constants.js';
 
 var DegToRad = Math.PI / 180;
 

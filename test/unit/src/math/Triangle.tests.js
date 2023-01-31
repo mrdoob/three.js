@@ -9,7 +9,7 @@ import {
 	zero3,
 	one3,
 	two3
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -30,7 +30,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		// STATIC STUFF
+		// STATIC
 		QUnit.todo( 'getNormal', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -49,7 +49,23 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		QUnit.todo( 'getUV', ( assert ) => {
+
+			// static version of class member below
+			// getUV( point, p1, p2, p3, uv1, uv2, uv3, target )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'isFrontFacing', ( assert ) => {
+
+			// static version of class member below
+			// isFrontFacing( a, b, c, direction )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Triangle();
@@ -229,6 +245,14 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( barycoord.equals( new Vector3( 0, 0, 1 ) ), 'Passed!' );
 			a.getBarycoord( midpoint, barycoord );
 			assert.ok( barycoord.distanceTo( new Vector3( 1 / 3, 1 / 3, 1 / 3 ) ) < 0.0001, 'Passed!' );
+
+		} );
+
+		QUnit.todo( 'getUV', ( assert ) => {
+
+			// class member version
+			// getUV( point, uv1, uv2, uv3, target )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -18,7 +18,7 @@ import {
 	zero3,
 	one3,
 	two3
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 function compareBox( a, b, threshold ) {
 

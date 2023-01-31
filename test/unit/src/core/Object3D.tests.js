@@ -11,7 +11,7 @@ import {
 	z,
 	w,
 	eps
-} from '../math/Constants.tests.js';
+} from '../../utils/math-constants.js';
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 
 const matrixEquals4 = ( a, b ) => {

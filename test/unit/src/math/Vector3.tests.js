@@ -16,7 +16,7 @@ import {
 	z,
 	w,
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -38,9 +38,10 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( 'isVector3', ( assert ) => {
+		QUnit.test( 'isVector3', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Vector3();
+			assert.ok( object.isVector3, 'Vector3.isVector3 should be true' );
 
 		} );
 
@@ -249,6 +250,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.x, 33, 'Check x' );
 			assert.strictEqual( a.y, 99, 'Check y' );
 			assert.strictEqual( a.z, 183, 'Check z' );
+
+		} );
+
+		QUnit.todo( 'applyNormalMatrix', ( assert ) => {
+
+			// applyNormalMatrix( m )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -638,6 +646,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.todo( 'setFromSphericalCoords', ( assert ) => {
+
+			// setFromSphericalCoords( radius, phi, theta )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'setFromCylindrical', ( assert ) => {
 
 			var a = new Vector3();
@@ -648,6 +663,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
 			assert.ok( Math.abs( a.y - expected.y ) <= eps, 'Check y' );
 			assert.ok( Math.abs( a.z - expected.z ) <= eps, 'Check z' );
+
+		} );
+
+		QUnit.todo( 'setFromCylindricalCoords', ( assert ) => {
+
+			// setFromCylindricalCoords( radius, theta, y )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -690,6 +712,20 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.x, 5, 'Index 2: check x' );
 			assert.strictEqual( a.y, 17, 'Index 2: check y' );
 			assert.strictEqual( a.z, 31, 'Index 2: check z' );
+
+		} );
+
+		QUnit.todo( 'setFromMatrix3Column', ( assert ) => {
+
+			// setFromMatrix3Column( mat3, index )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setFromEuler', ( assert ) => {
+
+			// setFromEuler( e )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -773,6 +809,30 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.todo( 'random', ( assert ) => {
+
+			// random()
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'randomDirection', ( assert ) => {
+
+			var vec = new Vector3();
+
+			vec.randomDirection();
+
+			var zero = new Vector3();
+			assert.notDeepEqual(
+				vec,
+				zero,
+				'randomizes at least one component of the vector'
+			);
+
+			assert.ok( ( 1 - vec.length() ) <= Number.EPSILON, 'produces a unit vector' );
+
+		} );
+
 		// TODO (Itee) refactor/split
 		QUnit.test( 'setX,setY,setZ', ( assert ) => {
 
@@ -790,6 +850,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.z == z, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'setComponent,getComponent', ( assert ) => {
 
 			var a = new Vector3();
@@ -805,6 +866,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.getComponent( 2 ) == 3, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'setComponent/getComponent exceptions', ( assert ) => {
 
 			var a = new Vector3();
@@ -829,6 +891,7 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 		} );
+
 		QUnit.test( 'min/max/clamp', ( assert ) => {
 
 			var a = new Vector3( x, y, z );
@@ -852,6 +915,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.z == - z, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'distanceTo/distanceToSquared', ( assert ) => {
 
 			var a = new Vector3( x, 0, 0 );
@@ -869,6 +933,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.distanceToSquared( d ) == z * z, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'setScalar/addScalar/subScalar', ( assert ) => {
 
 			var a = new Vector3();
@@ -890,6 +955,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.z, 0, 'subScalar: check z' );
 
 		} );
+
 		QUnit.test( 'multiply/divide', ( assert ) => {
 
 			var a = new Vector3( x, y, z );
@@ -907,6 +973,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( b.z - 0.5 ) <= eps, 'divide: check z' );
 
 		} );
+
 		QUnit.test( 'multiply/divide', ( assert ) => {
 
 			var a = new Vector3( x, y, z );
@@ -933,6 +1000,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.z == - z, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'project/unproject', ( assert ) => {
 
 			var a = new Vector3( x, y, z );
@@ -950,6 +1018,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( a.z - z ) <= eps, 'unproject: check z' );
 
 		} );
+
 		QUnit.test( 'length/lengthSq', ( assert ) => {
 
 			var a = new Vector3( x, 0, 0 );
@@ -971,6 +1040,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.lengthSq() == ( x * x + y * y + z * z ), 'Passed!' );
 
 		} );
+
 		QUnit.test( 'lerp/clone', ( assert ) => {
 
 			var a = new Vector3( x, 0, z );
@@ -989,23 +1059,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'randomDirection', ( assert ) => {
-
-			var vec = new Vector3();
-
-			vec.randomDirection();
-
-			var zero = new Vector3();
-			assert.notDeepEqual(
-				vec,
-				zero,
-				'randomizes at least one component of the vector'
-			);
-
-			assert.ok( ( 1 - vec.length() ) <= Number.EPSILON, 'produces a unit vector' );
-
-		} );
-
+		// OTHERS
 		QUnit.test( 'iterable', ( assert ) => {
 
 			var v = new Vector3( 0, 0.5, 1 );

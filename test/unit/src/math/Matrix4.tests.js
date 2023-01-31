@@ -6,7 +6,7 @@ import { Vector3 } from '../../../../src/math/Vector3.js';
 import { Euler } from '../../../../src/math/Euler.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import * as MathUtils from '../../../../src/math/MathUtils.js';
-import { eps } from './Constants.tests.js';
+import { eps } from '../../utils/math-constants.js';
 
 
 function matrixEquals4( a, b, tolerance ) {
@@ -164,7 +164,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromMatrix4', ( assert ) => {
+		QUnit.test( 'setFromMatrix3', ( assert ) => {
 
 			var a = new Matrix3().set(
 				0, 1, 2,
@@ -264,6 +264,13 @@ export default QUnit.module( 'Maths', () => {
 				assert.ok( eulerEquals( v, v3, eps ), 'extractRotation #' + i + ': original and extracted Eulers are equal' );
 
 			}
+
+		} );
+
+		QUnit.todo( 'makeRotationFromQuaternion', ( assert ) => {
+
+			// makeRotationFromQuaternion( q )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
