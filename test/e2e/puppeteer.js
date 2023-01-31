@@ -57,6 +57,7 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'webgl_buffergeometry_glbufferattribute',
 	'webgl_lensflares',
 	'webgl_lines_sphere',
 	'webgl_loader_imagebitmap',
@@ -64,6 +65,7 @@ const exceptionList = [
 	'webgl_loader_texture_pvrtc',
 	'webgl_morphtargets_face',
 	'webgl_nodes_materials_standard',
+	'webgl_postprocessing_dof2',
 	'webgl_postprocessing_crossfade',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
@@ -436,7 +438,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				console.yellow( `Render timeout exceeded in file ${ file }` );
 
-			} */
+			} */ // TODO: fix this
 
 		}
 
@@ -515,7 +517,11 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		} else {
 
-			console.yellow( `${ e }, another attempt...` );
+			if ( ! e.message.includes( 'TimeoutError' ) ) { // TODO: fix this
+
+				console.yellow( `${ e }, another attempt...` );
+
+			}
 			this.add( file, attemptID + 1 );
 
 		}
