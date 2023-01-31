@@ -161,6 +161,7 @@ import './src/materials/MeshBasicMaterial.tests.js';
 import './src/materials/MeshDepthMaterial.tests.js';
 import './src/materials/MeshDistanceMaterial.tests.js';
 import './src/materials/MeshLambertMaterial.tests.js';
+import './src/materials/MeshMatcapMaterial.tests.js';
 import './src/materials/MeshNormalMaterial.tests.js';
 import './src/materials/MeshPhongMaterial.tests.js';
 import './src/materials/MeshPhysicalMaterial.tests.js';

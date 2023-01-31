@@ -1,20 +1,21 @@
 /* global QUnit */
 
-import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
+import { MeshMatcapMaterial } from '../../../../src/materials/MeshMatcapMaterial.js';
 
 import { Material } from '../../../../src/materials/Material.js';
 
 export default QUnit.module( 'Materials', () => {
 
-	QUnit.module( 'MeshBasicMaterial', () => {
+	QUnit.module( 'MeshMatcapMaterial', () => {
 
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			const object = new MeshBasicMaterial();
+			const object = new MeshMatcapMaterial();
+
 			assert.strictEqual(
 				object instanceof Material, true,
-				'MeshBasicMaterial extends from Material'
+				'MeshMatcapMaterial extends from Material'
 			);
 
 		} );
@@ -27,17 +28,31 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PROPERTIES
+		QUnit.test( 'defines', ( assert ) => {
+
+			const actual = new MeshMatcapMaterial().defines;
+			const expected = { 'MATCAP': '' };
+			assert.deepEqual( actual, expected, 'Contains a MATCAP definition.' );
+
+		} );
+
 		QUnit.test( 'type', ( assert ) => {
 
-			const object = new MeshBasicMaterial();
+			const object = new MeshMatcapMaterial();
 			assert.ok(
-				object.type === 'MeshBasicMaterial',
-				'MeshBasicMaterial.type should be MeshBasicMaterial'
+				object.type === 'MeshMatcapMaterial',
+				'MeshMatcapMaterial.type should be MeshMatcapMaterial'
 			);
 
 		} );
 
 		QUnit.todo( 'color', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'matcap', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -49,31 +64,49 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.todo( 'lightMap', ( assert ) => {
+		QUnit.todo( 'bumpMap', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'lightMapIntensity', ( assert ) => {
+		QUnit.todo( 'bumpScale', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'aoMap', ( assert ) => {
+		QUnit.todo( 'normalMap', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'aoMapIntensity', ( assert ) => {
+		QUnit.todo( 'normalMapType', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'specularMap', ( assert ) => {
+		QUnit.todo( 'normalScale', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementMap', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementScale', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementBias', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -85,49 +118,7 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.todo( 'envMap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'combine', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'reflectivity', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'refractionRatio', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'wireframe', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'wireframeLinewidth', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'wireframeLinecap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'wireframeLinejoin', ( assert ) => {
+		QUnit.todo( 'flatShading', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -140,12 +131,12 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMeshBasicMaterial', ( assert ) => {
+		QUnit.test( 'isMeshMatcapMaterial', ( assert ) => {
 
-			const object = new MeshBasicMaterial();
+			const object = new MeshMatcapMaterial();
 			assert.ok(
-				object.isMeshBasicMaterial,
-				'MeshBasicMaterial.isMeshBasicMaterial should be true'
+				object.isMeshMatcapMaterial,
+				'MeshMatcapMaterial.isMeshMatcapMaterial should be true'
 			);
 
 		} );
