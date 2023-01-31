@@ -10,6 +10,11 @@
 
 The aim of the project is to create an easy to use, lightweight, cross-browser, general purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available as addons.
 
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/12ants/three.js/edit/1111/)
+
+
+
+
 [Examples](https://threejs.org/examples/) &mdash;
 [Docs](https://threejs.org/docs/) &mdash;
 [Manual](https://threejs.org/manual/) &mdash;
