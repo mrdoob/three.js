@@ -33,6 +33,16 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
+		QUnit.test( 'isBox2', ( assert ) => {
+
+			var a = new Box2();
+			assert.ok( a.isBox2 === true, 'Passed!' );
+
+			var b = new Object();
+			assert.ok( ! b.isBox2, 'Passed!' );
+
+		} );
+
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Box2();
