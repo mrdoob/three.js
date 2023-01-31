@@ -271,7 +271,15 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 		}
 
-		let text = ( await Promise.all( msg.args().map( arg => arg.executionContext().evaluate( arg => arg instanceof Error ? arg.message : arg, arg ) ) ) ).join( ' ' ); // https://github.com/puppeteer/puppeteer/issues/3397#issuecomment-434970058
+		const args = await Promise.all( msg.args().map( async arg => {
+			try {
+				return await arg.executionContext().evaluate( arg => arg instanceof Error ? arg.message : arg, arg );
+			} catch (e) { // Execution context might have been already destroyed
+				return arg;
+			}
+		} ) );
+
+		let text = args.join( ' ' ); // https://github.com/puppeteer/puppeteer/issues/3397#issuecomment-434970058
 
 		text = text.trim();
 		if ( text === '' ) return;
