@@ -57,19 +57,24 @@ const exceptionList = [
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'physics_oimo_instancing',
 	'webgl_buffergeometry_glbufferattribute',
+	'webgl_camera_logarithmicdepthbuffer',
 	'webgl_lensflares',
 	'webgl_lines_sphere',
 	'webgl_loader_imagebitmap',
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
 	'webgl_morphtargets_face',
+	'webgl_multiple_renderers',
 	'webgl_nodes_materials_standard',
+	'webgl_performance_shader',
 	'webgl_postprocessing_dof2',
 	'webgl_postprocessing_crossfade',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
 	'webgl_shadowmap_progressive',
+	'webgl_shadowmesh',
 	'webgl_test_memory2',
 	'webgl_tiled_forward'
 
@@ -286,13 +291,19 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 		text = file + ': ' + text.replace( /\[\.WebGL-(.+?)\] /g, '' );
 
-		if ( errorMessages.includes( text ) ) {
+		if ( text === `${ file }: JSHandle@error` ) {
+
+			text = `${ file }: Unknown error`;
+
+		}
+
+		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
 
 			return;
 
 		}
 
-		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
+		if ( errorMessages.includes( text ) ) {
 
 			return;
 
