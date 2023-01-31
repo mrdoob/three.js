@@ -135,8 +135,10 @@ const macExceptionList = [
 	'webgl_shaders_tonemapping',
 	'webgl_shadow_contact',
 	'webgl_shadowmap',
+	'webgl_shadowmap_viewer',
 	'webgl_shadowmap_vsm',
 	'webgl_shadowmesh',
+	'webgl_simple_gi',
 	'webgl_tonemapping'
 
 ];
