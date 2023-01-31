@@ -389,6 +389,7 @@ class NRRDLoader extends Loader {
 			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
 			let axisOrder = [];
+
 			if ( xIndex !== yIndex && xIndex !== zIndex && yIndex !== zIndex ) {
 
 				axisOrder[ xIndex ] = 'x';
@@ -397,7 +398,9 @@ class NRRDLoader extends Loader {
 
 			} else {
 
-				axisOrder = [ 'x', 'y', 'z' ];
+				axisOrder[ 0 ] = 'x';
+				axisOrder[ 1 ] = 'y';
+				axisOrder[ 2 ] = 'z';
 
 			}
 
