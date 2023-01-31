@@ -57,7 +57,11 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			var interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
-			assert.ok( interpolant !== undefined, 'instanced.' );
+
+			assert.strictEqual(
+				interpolant instanceof Interpolant, true,
+				'Mock extends from Interpolant'
+			);
 
 		} );
 
