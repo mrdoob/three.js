@@ -77,7 +77,7 @@ const exceptionList = [
 	'webgl_gpgpu_protoplanet',
 	'webgl_instancing_scatter',
 	'webgl_interactive_buffergeometry',
-	'webgl_interactive_voxelpainter'.
+	'webgl_interactive_voxelpainter',
 	'webgl_lensflares',
 	'webgl_lines_sphere',
 	'webgl_loader_gltf_compressed',
