@@ -223,7 +223,7 @@ async function downloadLatestChromium() {
 
 }
 
-async function preparePage( page, injection, build, errorMessageCache ) {
+async function preparePage( page, injection, build, errorMessages ) {
 
 	/* let page.file, page.pageSize, page.error */
 
