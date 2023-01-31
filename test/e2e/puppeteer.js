@@ -101,6 +101,8 @@ const numAttempts = 3; // perform 3 progressive attempts before failing
 
 const numPages = 16; // use 16 browser pages
 
+const numCIJobs = 2; // GitHub Actions run the script in 2 threads
+
 const width = 400;
 const height = 250;
 const viewScale = 2;
@@ -147,6 +149,19 @@ async function main() {
 			}
 
 		}
+
+	}
+
+	/* CI parallelism */
+
+	if ( 'CI' in process.env ) {
+
+		const CI = parseInt( process.env.CI );
+
+		files = files.slice(
+			Math.floor( CI * files.length / numCIJobs ),
+			Math.floor( ( CI + 1 ) * files.length / numCIJobs )
+		);
 
 	}
 
