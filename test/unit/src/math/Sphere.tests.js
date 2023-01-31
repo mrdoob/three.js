@@ -29,13 +29,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isSphere', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
+		// PUBLIC
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Sphere();
