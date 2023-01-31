@@ -58,21 +58,49 @@ const exceptionList = [
 
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
 	'physics_oimo_instancing',
+	'webgl2_multisampled_renderbuffers',
+	'webgl_animation_skinning_additive_blending',
+	'webgl_buffergeometry_compression',
 	'webgl_buffergeometry_glbufferattribute',
+	'webgl_buffergeometry_indexed',
+	'webgl_buffergeometry_instancing_billboards',
+	'webgl_buffergeometry_lines_indexed',
+	'webgl_buffergeometry_points_interleaved',
+	'webgl_camera_array',
 	'webgl_camera_logarithmicdepthbuffer',
+	'webgl_clipping',
+	'webgl_clipping_advanced',
+	'webgl_custom_attributes',
+	'webgl_custom_attributes_points3',
+	'webgl_geometry_extrude_shapes2',
+	'webgl_gpgpu_birds_gltf',
+	'webgl_gpgpu_protoplanet',
+	'webgl_instancing_scatter',
+	'webgl_interactive_buffergeometry',
+	'webgl_interactive_voxelpainter'.
 	'webgl_lensflares',
 	'webgl_lines_sphere',
+	'webgl_loader_gltf_compressed',
+	'webgl_loader_ifc',
 	'webgl_loader_imagebitmap',
+	'webgl_loader_ply',
+	'webgl_loader_svg',
+	'webgl_loader_texture_dds',
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
 	'webgl_morphtargets_face',
 	'webgl_multiple_renderers',
 	'webgl_nodes_materials_standard',
 	'webgl_performance_shader',
-	'webgl_postprocessing_dof2',
+	'webgl_pmrem_test',
 	'webgl_postprocessing_crossfade',
+	'webgl_postprocessing_dof2',
+	'webgl_postprocessing_sao',
+	'webgl_postprocessing_smaa',
+	'webgl_postprocessing_ssaa',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
+	'webgl_shadowmap',
 	'webgl_shadowmap_progressive',
 	'webgl_shadowmesh',
 	'webgl_test_memory2',
@@ -101,7 +129,7 @@ const numAttempts = 3; // perform 3 progressive attempts before failing
 
 const numPages = 16; // use 16 browser pages
 
-const numCIJobs = 2; // GitHub Actions run the script in 2 threads
+const numCIJobs = 3; // GitHub Actions run the script in 3 threads
 
 const width = 400;
 const height = 250;

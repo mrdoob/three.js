@@ -58,8 +58,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        CI: [ 0, 1 ]
         os: [ windows-latest, ubuntu-latest, macos-latest ]
+        CI: [ 0, 1, 2 ]
     env:
       CI: ${{ matrix.CI }}
       FORCE_COLOR: 1
