@@ -164,7 +164,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromMatrix4', ( assert ) => {
+		QUnit.test( 'setFromMatrix3', ( assert ) => {
 
 			var a = new Matrix3().set(
 				0, 1, 2,
@@ -264,6 +264,13 @@ export default QUnit.module( 'Maths', () => {
 				assert.ok( eulerEquals( v, v3, eps ), 'extractRotation #' + i + ': original and extracted Eulers are equal' );
 
 			}
+
+		} );
+
+		QUnit.todo( 'makeRotationFromQuaternion', ( assert ) => {
+
+			// makeRotationFromQuaternion( q )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
