@@ -25,13 +25,33 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isLineSegments', ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new LineSegments();
+			assert.ok(
+				object.type === 'LineSegments',
+				'LineSegments.type should be LineSegments'
+			);
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isLineSegments', ( assert ) => {
+
+			const object = new LineSegments();
+			assert.ok(
+				object.isLineSegments,
+				'LineSegments.isLineSegments should be true'
+			);
+
+		} );
+
+		QUnit.todo( 'computeLineDistances', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
-
 
 	} );
 
