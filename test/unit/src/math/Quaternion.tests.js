@@ -338,6 +338,13 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
+		QUnit.test( 'isQuaternion', ( assert ) => {
+
+			const object = new Quaternion();
+			assert.ok( object.isQuaternion, 'Quaternion.isQuaternion should be true' );
+
+		} );
+
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Quaternion();
