@@ -49,7 +49,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		// PUBLIC
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Frustum();
@@ -247,7 +247,8 @@ export default QUnit.module( 'Maths', () => {
 			intersects = a.intersectsBox( box );
 			assert.notOk( intersects, 'No intersection' );
 
-			// add eps so that we prevent box touching the frustum, which might intersect depending on floating point numerics
+			// add eps so that we prevent box touching the frustum,
+			// which might intersect depending on floating point numerics
 			box.translate( new Vector3( - 1 - eps, - 1 - eps, - 1 - eps ) );
 
 			intersects = a.intersectsBox( box );
