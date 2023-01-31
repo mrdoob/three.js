@@ -111,7 +111,7 @@
     "lint-utils": "eslint utils",
     "lint": "npm run lint-core",
     "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix && npm run lint-editor -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix",
-    "test-unit": "npm run unit --prefix test",
+    "test-unit": "qunit -r failonlyreporter -f !-webonly test/unit/three.source.unit.js",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
@@ -149,10 +149,19 @@
     "eslint-plugin-compat": "^4.0.2",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.27.5",
+    "failonlyreporter": "^1.0.0",
+    "jimp": "^0.16.0",
+    "node-fetch": "^3.2.6",
+    "pixelmatch": "^5.3.0",
+    "puppeteer-core": "^19.6.2",
+    "qunit": "^2.19.1",
     "rollup": "^3.12.0",
     "rollup-plugin-filesize": "^9.1.2",
     "rollup-plugin-visualizer": "^5.9.0",
     "servez": "^1.14.1"
+  },
+  "overrides": {
+    "jpeg-js": "^0.4.4"
   },
   "jspm": {
     "files": [

@@ -1,7 +1,7 @@
 # Contribution
 ## Introduction
 
-It is assumed that you know a little about node.js and git. If not, [here's some help to get started with git](https://help.github.com/en/github/using-git) and [here’s some help to get started with node.js.](https://nodejs.org/en/docs/guides/getting-started-guide/)
+It is assumed that you know a little about Node.js and Git. If not, [here's some help to get started with Git](https://help.github.com/en/github/using-git) and [here’s some help to get started with Node.js.](https://nodejs.org/en/docs/guides/getting-started-guide/)
 
 * Install [Node.js](https://nodejs.org/)
 * Install [Git](https://git-scm.com/)
@@ -26,25 +26,20 @@ As per the npm standard, ‘start’ is the place to begin the package.
 
     npm start
 
-This script will start a local server similar to [threejs.org](https://threejs.org/), but instead will be hosted on your local machine. Browse to http://localhost:8080/ to check it out. It also automatically creates the ‘build/three.module.js’ script anytime there is a change within your three.js directory.
+This script will start a local server similar to [threejs.org](https://threejs.org/), but instead will be hosted on your local machine. Browse to https://localhost:8080/ to check it out. It also automatically creates the `build/three.module.js` script anytime there is a change `src` directory.
 
-The next most important script runs all the appropriate testing. The E-2-E testing is intended to be run by GitHub Actions.
+Next scripts run all the appropriate testing.
 
-Run this command from the root folder to install test dependencies.
-
-    npm install --prefix test
-
-And run tests.
-
-    npm test
+- `npm run test` - Lint testing and unit testing (individually being `npm run lint` and `npm run test-unit`)
+- `npm run test-e2e` - E2E testing. This one can take quite a long time and installs ~200 MB Chromium browser - it is primarily intended to be run only by GitHub Actions
 
 The linting is there to keep a consistent code style across all of the code and the testing is there to help catch bugs and check that the code behaves as expected. It is important that neither of these steps comes up with any errors due to your changes.
 
-Many linting errors can be fixed automatically by running
+Most linting errors can be fixed automatically by running
 
-    npm lint-fix
+    npm run lint-fix
 
-If you’d like to make a minified version of the build files i.e. ‘build/three.min.js’ run:
+If you’d like to make a build of the source files (e.g. `build/three.module.js`) run:
 
     npm run build
 
