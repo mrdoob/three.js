@@ -69,6 +69,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'pingpong', ( assert ) => {
+
+			assert.strictEqual( MathUtils.pingpong( 2.5 ), 0.5, 'Value at 2.5 is 0.5' );
+			assert.strictEqual( MathUtils.pingpong( 2.5, 2 ), 1.5, 'Value at 2.5 with length of 2 is 1.5' );
+			assert.strictEqual( MathUtils.pingpong( - 1.5 ), 0.5, 'Value at -1.5 is 0.5' );
+
+		} );
+
 		QUnit.test( 'smoothstep', ( assert ) => {
 
 			assert.strictEqual( MathUtils.smoothstep( - 1, 0, 2 ), 0, 'Value lower than minimum' );
@@ -122,6 +130,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.todo( 'seededRandom', ( assert ) => {
+
+			// seededRandom( s ) // interval [ 0, 1 ]
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'degToRad', ( assert ) => {
 
 			assert.strictEqual( MathUtils.degToRad( 0 ), 0, '0 degrees' );
@@ -166,12 +181,24 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.todo( 'setQuaternionFromProperEuler', ( assert ) => {
 
-		QUnit.test( 'pingpong', ( assert ) => {
+			// setQuaternionFromProperEuler( q, a, b, c, order )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
-			assert.strictEqual( MathUtils.pingpong( 2.5 ), 0.5, 'Value at 2.5 is 0.5' );
-			assert.strictEqual( MathUtils.pingpong( 2.5, 2 ), 1.5, 'Value at 2.5 with length of 2 is 1.5' );
-			assert.strictEqual( MathUtils.pingpong( - 1.5 ), 0.5, 'Value at -1.5 is 0.5' );
+		} );
+
+		QUnit.todo( 'denormalize', ( assert ) => {
+
+			// denormalize( value, array )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'normalize', ( assert ) => {
+
+			// normalize( value, array )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
