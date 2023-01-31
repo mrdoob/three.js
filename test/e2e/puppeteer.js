@@ -47,11 +47,11 @@ const exceptionList = [
 /* CONFIG VARIABLES END */
 
 const LAST_REVISION_URLS = {
-    linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
-    mac: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/LAST_CHANGE',
-    mac_arm: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac_Arm/LAST_CHANGE',
-    win32: 'https://storage.googleapis.com/chromium-browser-snapshots/Win/LAST_CHANGE',
-    win64: 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/LAST_CHANGE'
+	linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
+	mac: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/LAST_CHANGE',
+	mac_arm: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac_Arm/LAST_CHANGE',
+	win32: 'https://storage.googleapis.com/chromium-browser-snapshots/Win/LAST_CHANGE',
+	win64: 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/LAST_CHANGE'
 };
 
 const port = 1234;
