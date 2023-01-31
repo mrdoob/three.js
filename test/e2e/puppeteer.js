@@ -7,6 +7,35 @@ import jimp from 'jimp';
 import * as fs from 'fs/promises';
 import fetch from 'node-fetch';
 
+class PromiseQueue {
+
+	constructor( func, ...args ) {
+
+		this.func = func.bind( this, ...args );
+		this.promises = [];
+
+	}
+
+	add( ...args ) {
+
+		const promise = this.func( ...args );
+		this.promises.push( promise );
+		promise.then( () => this.promises.splice( this.promises.indexOf( promise ), 1 ) );
+
+	}
+
+	async waitForAll() {
+
+		while ( this.promises.length > 0 ) {
+
+			await Promise.all( this.promises );
+
+		}
+
+	}
+
+}
+
 /* CONFIG VARIABLES START */
 
 const idleTime = 3; // 3 seconds - for how long there should be no network requests
@@ -56,12 +85,14 @@ const LAST_REVISION_URLS = {
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
-const maxFailedPixels = 0.05; // at most 5% failed pixels
+const maxFailedPixels = 0.05; // at most 5% different pixels
 
 const networkTimeout = 30; // 30 seconds, set to 0 to disable
 const renderTimeout = 1.5; // 1.5 seconds, set to 0 to disable
 
 const numAttempts = 3; // perform 3 progressive attempts before failing
+
+const numPages = 16; // use 16 browser pages
 
 const numCIJobs = 8; // GitHub Actions run the script in 8 threads
 
@@ -157,21 +188,26 @@ async function main() {
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) ).replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
 
-	/* Prepare page */
+	/* Prepare pages */
 
 	const errorMessagesCache = [];
 
-	const page = ( await browser.pages() )[ 0 ];
-	await preparePage( page, injection, build, errorMessagesCache );
+	const pages = await browser.pages();
+	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
+
+	for ( const page of pages ) await preparePage( page, injection, build, errorMessagesCache );
 
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	for ( const file of files ) await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file );
+	const queue = new PromiseQueue( makeAttempt, pages, failedScreenshots, cleanPage, isMakeScreenshot );
+	for ( const file of files ) queue.add( file );
+	await queue.waitForAll();
 
 	/* Finish */
 
+	failedScreenshots.sort();
 	const list = failedScreenshots.join( ' ' );
 
 	if ( isMakeScreenshot && failedScreenshots.length ) {
@@ -315,13 +351,33 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 }
 
-async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
 	const timeoutCoefficient = attemptID + 1;
 
+	const page = await new Promise( ( resolve, reject ) => {
+
+		const interval = setInterval( () => {
+
+			for ( const page of pages ) {
+
+				if ( page.file === undefined ) {
+
+					page.file = file; // acquire lock
+					clearInterval( interval );
+					resolve( page );
+					break;
+
+				}
+
+			}
+
+		}, 100 );
+
+	} );
+
 	try {
 
-		page.file = file;
 		page.pageSize = 0;
 		page.error = undefined;
 
@@ -475,11 +531,13 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 		} else {
 
 			console.yellow( `${ e }, another attempt...` );
-			await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
+			this.add( file, attemptID + 1 );
 
 		}
 
 	}
+
+	page.file = undefined; // release lock
 
 }
 
