@@ -23,8 +23,47 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isLine', ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new Line();
+			assert.ok(
+				object.type === 'Line',
+				'Line.type should be Line'
+			);
+
+		} );
+
+		QUnit.todo( 'geometry', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'material', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isLine', ( assert ) => {
+
+			const object = new Line();
+			assert.ok(
+				object.isLine,
+				'Line.isLine should be true'
+			);
+
+		} );
+
+		QUnit.todo( 'copy', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'computeLineDistances', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -36,12 +75,18 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'updateMorphTargets', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
+		QUnit.todo( 'clone', ( assert ) => {
+
+			// inherited from Object3D, test instance specific behaviour.
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
 
 	} );
 
