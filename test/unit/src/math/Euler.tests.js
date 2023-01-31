@@ -208,7 +208,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'Quaternion.setFromEuler/Euler.fromQuaternion', ( assert ) => {
+		QUnit.test( 'Quaternion.setFromEuler/Euler.setFromQuaternion', ( assert ) => {
 
 			var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 			for ( var i = 0; i < testValues.length; i ++ ) {
@@ -224,7 +224,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'Matrix4.setFromEuler/Euler.fromRotationMatrix', ( assert ) => {
+		QUnit.test( 'Matrix4.makeRotationFromEuler/Euler.setFromRotationMatrix', ( assert ) => {
 
 			var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 			for ( var i = 0; i < testValues.length; i ++ ) {
@@ -237,6 +237,13 @@ export default QUnit.module( 'Maths', () => {
 				assert.ok( matrixEquals4( m, m2, 0.0001 ), 'Passed!' );
 
 			}
+
+		} );
+
+		QUnit.todo( 'Euler.setFromVector3', ( assert ) => {
+
+			// setFromVector3( v, order = this._order )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
