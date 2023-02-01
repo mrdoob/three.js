@@ -212,7 +212,7 @@ async function main() {
 
 	} else {
 
-		pages = browsers.map( browser => ( await browser.pages() )[ 0 ] );
+		pages = await Promise.all( browsers.map( async browser => ( await browser.pages() )[ 0 ] ) );
 
 	}
 
