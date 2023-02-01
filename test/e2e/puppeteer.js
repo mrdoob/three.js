@@ -210,8 +210,9 @@ async function downloadLatestChromium() {
 	const os = PLATFORMS[ browserFetcher.platform() ];
 
 	const revisions = await ( await fetch( OMAHA_PROXY ) ).json();
-	let revision = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel ).branch_base_position;
+	const omahaRevisionInfo = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel );
 
+	let revision = omahaRevisionInfo.branch_base_position;
 	while ( ! ( await browserFetcher.canDownload( revision ) ) ) {
 
 		revision = String( revision - 1 );
@@ -230,6 +231,7 @@ async function downloadLatestChromium() {
 		console.log( 'Downloaded.' );
 
 	}
+	console.log( `Using Chromium ${ omahaRevisionInfo.current_version } (revision ${ revision }, ${ revisionInfo.url }), ${ chromiumChannel } channel on ${ os }` );
 	return revisionInfo;
 
 }
