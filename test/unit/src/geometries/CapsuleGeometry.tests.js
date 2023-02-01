@@ -1,13 +1,15 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 import { CapsuleGeometry } from '../../../../src/geometries/CapsuleGeometry.js';
+
+import { LatheGeometry } from '../../../../src/geometries/LatheGeometry.js';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'CapsuleGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -28,14 +30,42 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new CapsuleGeometry();
+			assert.strictEqual(
+				object instanceof LatheGeometry, true,
+				'CapsuleGeometry extends from LatheGeometry'
+			);
 
 		} );
 
 		// INSTANCING
 		QUnit.todo( 'Instancing', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new CapsuleGeometry();
+			assert.ok(
+				object.type === 'CapsuleGeometry',
+				'CapsuleGeometry.type should be CapsuleGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
