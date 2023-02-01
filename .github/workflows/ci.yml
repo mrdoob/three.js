@@ -59,7 +59,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest, ubuntu-latest, macos-latest ]
-        CI: [ 0, 1, 2 ]
+        CI: [ 0, 1, 2, 3 ]
     env:
       CI: ${{ matrix.CI }}
       FORCE_COLOR: 1

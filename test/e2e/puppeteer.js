@@ -96,7 +96,7 @@ const numAttempts = 3; // perform 3 progressive attempts before failing
 
 const numPages = 16; // use 16 browser pages
 
-const numCIJobs = 3; // GitHub Actions run the script in 3 threads
+const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
 const width = 400;
 const height = 250;
