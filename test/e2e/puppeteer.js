@@ -175,7 +175,7 @@ async function main() {
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
-	for ( let i = 0; i < multiPageStrategy ? 1 : numThreads; i++ ) {
+	for ( let i = 0; i < ( multiPageStrategy ? 1 : numThreads ); i++ ) {
 
 		browsers.push( await puppeteer.launch( {
 			executablePath,
