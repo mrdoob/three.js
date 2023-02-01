@@ -3616,7 +3616,7 @@ class GLTFParser {
 
 		for ( let i = 0, il = skinDef.joints.length; i < il; i ++ ) {
 
-			pending.push( this._loadNode( skinDef.joints[ i ] ) );
+			pending.push( this._loadNodeShallow( skinDef.joints[ i ] ) );
 
 		}
 
@@ -3637,7 +3637,6 @@ class GLTFParser {
 
 			// Note that bones (joint nodes) may or may not be in the
 			// scene graph at this time.
-			// Child nodes are added in .loadNode() (no '_' prefix).
 
 			const bones = [];
 			const boneInverses = [];
@@ -3894,7 +3893,7 @@ class GLTFParser {
 
 		return ( function () {
 
-			const nodePending = parser._loadNode( nodeIndex );
+			const nodePending = parser._loadNodeShallow( nodeIndex );
 
 			const childPending = [];
 			const childrenDef = nodeDef.children || [];
@@ -3947,9 +3946,9 @@ class GLTFParser {
 
 	}
 
-	// ._loadNode() parses a single node.
+	// ._loadNodeShallow() parses a single node.
 	// skin and child nodes are created and added in .loadNode() (no '_' prefix).
-	_loadNode( nodeIndex ) {
+	_loadNodeShallow( nodeIndex ) {
 
 		const json = this.json;
 		const extensions = this.extensions;
