@@ -184,7 +184,7 @@ async function main() {
 			args: flags,
 			defaultViewport: viewport,
 			handleSIGINT: false
-		} );
+		} ) );
 
 		// this line is intended to stop the script if the browser (in headful mode) is closed by user (while debugging)
 		// browser.on( 'targetdestroyed', target => ( target.type() === 'other' ) ? close() : null );
