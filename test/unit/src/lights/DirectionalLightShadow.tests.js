@@ -1,17 +1,23 @@
 /* global QUnit */
 
+import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow.js';
+
+import { LightShadow } from '../../../../src/lights/LightShadow.js';
 import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
-import { DirectionalLightShadow } from '../../../../src/lights/DirectionalLightShadow.js';
 
 export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'DirectionalLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new DirectionalLightShadow();
+			assert.strictEqual(
+				object instanceof LightShadow, true,
+				'DirectionalLightShadow extends from LightShadow'
+			);
 
 		} );
 
@@ -19,6 +25,17 @@ export default QUnit.module( 'Lights', () => {
 		QUnit.todo( 'Instancing', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isDirectionalLightShadow', ( assert ) => {
+
+			const object = new DirectionalLightShadow();
+			assert.ok(
+				object.isDirectionalLightShadow,
+				'DirectionalLightShadow.isDirectionalLightShadow should be true'
+			);
 
 		} );
 
