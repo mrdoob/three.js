@@ -128,6 +128,7 @@ import './src/lights/AmbientLightProbe.tests.js';
 import './src/lights/DirectionalLight.tests.js';
 import './src/lights/DirectionalLightShadow.tests.js';
 import './src/lights/HemisphereLight.tests.js';
+import './src/lights/HemisphereLightProbe.tests.js';
 import './src/lights/Light.tests.js';
 import './src/lights/LightShadow.tests.js';
 import './src/lights/PointLight.tests.js';
