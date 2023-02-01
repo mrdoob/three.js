@@ -6,7 +6,7 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'DataUtils', () => {
 
-		// PUBLIC STUFF
+		// PUBLIC
 		QUnit.test( 'toHalfFloat', ( assert ) => {
 
 			assert.ok( DataUtils.toHalfFloat( 0 ) === 0, 'Passed!' );
