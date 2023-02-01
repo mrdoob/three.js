@@ -94,11 +94,10 @@ const renderTimeout = 1.5; // 1.5 seconds, set to 0 to disable
 
 const numAttempts = 3; // perform 3 progressive attempts before failing
 
-const numPages = 16; // use 16 browser pages
+const numPages = 8; // use 8 browser pages
+const multiPageStrategy = process.platform !== 'darwin'; // whether to use multiple pages or multiple browsers, true if multiple pages
 
 const numCIJobs = 3; // GitHub Actions run the script in 3 threads
-
-const multiPageStrategy = process.platform !== 'darwin'; // whether to use multiple pages or multiple browsers, true if multiple pages
 
 const width = 400;
 const height = 250;
