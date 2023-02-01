@@ -54,20 +54,56 @@ export default QUnit.module( 'Maths', () => {
 		// Tests
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			var interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
+
+			assert.strictEqual(
+				interpolant instanceof Interpolant, true,
+				'Mock extends from Interpolant'
+			);
+
+		} );
+
+		// PROPERTIES
+		QUnit.todo( 'parameterPositions', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
+		QUnit.todo( 'resultBuffer', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'sampleValues', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'valueSize', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'settings', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'evaluate', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PRIVATE STUFF
+		// PRIVATE
 		QUnit.test( 'copySampleValue_', ( assert ) => {
 
 			var interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );

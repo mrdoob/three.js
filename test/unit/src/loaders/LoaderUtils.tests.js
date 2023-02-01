@@ -6,7 +6,7 @@ export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module( 'LoaderUtils', () => {
 
-		// INSTANCING
+		// STATIC
 		QUnit.test( 'decodeText', ( assert ) => {
 
 			var jsonArray = new Uint8Array( [ 123, 34, 106, 115, 111, 110, 34, 58, 32, 116, 114, 117, 101, 125 ] );
@@ -22,6 +22,13 @@ export default QUnit.module( 'Loaders', () => {
 			assert.equal( '/path/to/', LoaderUtils.extractUrlBase( '/path/to/model.glb' ) );
 			assert.equal( './', LoaderUtils.extractUrlBase( 'model.glb' ) );
 			assert.equal( '/', LoaderUtils.extractUrlBase( '/model.glb' ) );
+
+		} );
+
+		QUnit.todo( 'resolveURL', ( assert ) => {
+
+			// static resolveURL( url, path )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

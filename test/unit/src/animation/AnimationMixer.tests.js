@@ -4,7 +4,7 @@ import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
 import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
 import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyframeTrack.js';
 import { Object3D } from '../../../../src/core/Object3D.js';
-import { zero3, one3, two3 } from '../math/Constants.tests.js';
+import { zero3, one3, two3 } from '../../utils/math-constants.js';
 
 function getClips( pos1, pos2, scale1, scale2, dur ) {
 

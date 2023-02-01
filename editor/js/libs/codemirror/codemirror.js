@@ -533,7 +533,7 @@
 
   var on = function(emitter, type, f) {
     if (emitter.addEventListener) {
-      emitter.addEventListener(type, f, false);
+      emitter.addEventListener(type, f, { passive: false });
     } else if (emitter.attachEvent) {
       emitter.attachEvent("on" + type, f);
     } else {

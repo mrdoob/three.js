@@ -12,7 +12,7 @@ import {
 	z,
 	w,
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 const orders = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ];
 const eulerAngles = new Euler( 0.1, - 0.3, 0.25 );
@@ -338,6 +338,13 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
+		QUnit.test( 'isQuaternion', ( assert ) => {
+
+			const object = new Quaternion();
+			assert.ok( object.isQuaternion, 'Quaternion.isQuaternion should be true' );
+
+		} );
+
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Quaternion();

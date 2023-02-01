@@ -7,7 +7,7 @@ import {
 	x,
 	y,
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -55,9 +55,10 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( 'isVector2', ( assert ) => {
+		QUnit.test( 'isVector2', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Vector2();
+			assert.ok( object.isVector2, 'Vector2.isVector2 should be true' );
 
 		} );
 
@@ -500,6 +501,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.y == y, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'setComponent,getComponent', ( assert ) => {
 
 			var a = new Vector2();
@@ -512,6 +514,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.getComponent( 1 ) == 2, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'multiply/divide', ( assert ) => {
 
 			var a = new Vector2( x, y );
@@ -534,6 +537,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.y == - y, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'min/max/clamp', ( assert ) => {
 
 			var a = new Vector2( x, y );
@@ -559,6 +563,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.equal( c.y, x, 'scalar clamp y' );
 
 		} );
+
 		QUnit.test( 'rounding', ( assert ) => {
 
 			assert.deepEqual( new Vector2( - 0.1, 0.1 ).floor(), new Vector2( - 1, 0 ), 'floor .1' );
@@ -581,6 +586,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.deepEqual( new Vector2( - 1.9, 1.9 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.9' );
 
 		} );
+
 		QUnit.test( 'length/lengthSq', ( assert ) => {
 
 			var a = new Vector2( x, 0 );
@@ -599,6 +605,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.lengthSq() == ( x * x + y * y ), 'Passed!' );
 
 		} );
+
 		QUnit.test( 'distanceTo/distanceToSquared', ( assert ) => {
 
 			var a = new Vector2( x, 0 );
@@ -612,6 +619,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.distanceToSquared( c ) == y * y, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'lerp/clone', ( assert ) => {
 
 			var a = new Vector2( x, 0 );
@@ -628,6 +636,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.clone().lerp( b, 1 ).equals( b ), 'Passed!' );
 
 		} );
+
 		QUnit.test( 'setComponent/getComponent exceptions', ( assert ) => {
 
 			var a = new Vector2( 0, 0 );
@@ -652,6 +661,7 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 		} );
+
 		QUnit.test( 'setScalar/addScalar/subScalar', ( assert ) => {
 
 			var a = new Vector2( 1, 1 );
@@ -670,6 +680,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.y, 0, 'subScalar: check y' );
 
 		} );
+
 		QUnit.test( 'multiply/divide', ( assert ) => {
 
 			var a = new Vector2( x, y );
@@ -686,6 +697,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		// OTHERS
 		QUnit.test( 'iterable', ( assert ) => {
 
 			var v = new Vector2( 0, 1 );

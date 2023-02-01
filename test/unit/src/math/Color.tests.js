@@ -1,7 +1,7 @@
 /* global QUnit */
 
 import { Color } from '../../../../src/math/Color.js';
-import { eps } from './Constants.tests.js';
+import { eps } from '../../utils/math-constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Maths', () => {
@@ -251,6 +251,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.todo( 'getRGB', ( assert ) => {
+
+			// getRGB( target, colorSpace = ColorManagement.workingColorSpace )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'getStyle', ( assert ) => {
 
 			var c = new Color( 'plum' );
@@ -344,24 +351,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'copyHex', ( assert ) => {
-
-			var c = new Color();
-			var c2 = new Color( 0xF5FFFA );
-			c.copy( c2 );
-			assert.ok( c.getHex() == c2.getHex(), 'Hex c: ' + c.getHex() + ' Hex c2: ' + c2.getHex() );
-
-		} );
-
-		QUnit.test( 'copyColorString', ( assert ) => {
-
-			var c = new Color();
-			var c2 = new Color( 'ivory' );
-			c.copy( c2 );
-			assert.ok( c.getHex() == c2.getHex(), 'Hex c: ' + c.getHex() + ' Hex c2: ' + c2.getHex() );
-
-		} );
-
 		QUnit.test( 'lerp', ( assert ) => {
 
 			var c = new Color();
@@ -371,6 +360,20 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.r == 0.2, 'Red: ' + c.r );
 			assert.ok( c.g == 0.2, 'Green: ' + c.g );
 			assert.ok( c.b == 0.2, 'Blue: ' + c.b );
+
+		} );
+
+		QUnit.todo( 'lerpColors', ( assert ) => {
+
+			// lerpColors( color1, color2, alpha )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'lerpHSL', ( assert ) => {
+
+			// lerpHSL( color, alpha )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -438,6 +441,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.todo( 'fromBufferAttribute', ( assert ) => {
+
+			// fromBufferAttribute( attribute, index )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'toJSON', ( assert ) => {
 
 			var a = new Color( 0.0, 0.0, 0.0 );
@@ -452,7 +462,25 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		// OTHERS
+		// OTHERS - FUNCTIONAL
+		QUnit.test( 'copyHex', ( assert ) => {
+
+			var c = new Color();
+			var c2 = new Color( 0xF5FFFA );
+			c.copy( c2 );
+			assert.ok( c.getHex() == c2.getHex(), 'Hex c: ' + c.getHex() + ' Hex c2: ' + c2.getHex() );
+
+		} );
+
+		QUnit.test( 'copyColorString', ( assert ) => {
+
+			var c = new Color();
+			var c2 = new Color( 'ivory' );
+			c.copy( c2 );
+			assert.ok( c.getHex() == c2.getHex(), 'Hex c: ' + c.getHex() + ' Hex c2: ' + c2.getHex() );
+
+		} );
+
 		QUnit.test( 'setWithNum', ( assert ) => {
 
 			var c = new Color();

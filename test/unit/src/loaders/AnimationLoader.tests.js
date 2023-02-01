@@ -1,10 +1,23 @@
 /* global QUnit */
 
-// import { AnimationLoader } from '../../../../src/loaders/AnimationLoader.js';
+import { AnimationLoader } from '../../../../src/loaders/AnimationLoader.js';
+
+import { Loader } from '../../../../src/loaders/Loader.js';
 
 export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module( 'AnimationLoader', () => {
+
+		// INHERITANCE
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const object = new AnimationLoader();
+			assert.strictEqual(
+				object instanceof Loader, true,
+				'AnimationLoader extends from Loader'
+			);
+
+		} );
 
 		// INSTANCING
 		QUnit.todo( 'Instancing', ( assert ) => {
@@ -13,7 +26,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		// PUBLIC
 		QUnit.todo( 'load', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -22,6 +35,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		QUnit.todo( 'parse', ( assert ) => {
 
+			// parse( json )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );

@@ -9,7 +9,7 @@ import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Box3 } from '../../../../src/math/Box3.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
-import { zero3, one3, eps } from './Constants.tests.js';
+import { zero3, one3, eps } from '../../utils/math-constants.js';
 
 const unit3 = new Vector3( 1, 0, 0 );
 
@@ -49,7 +49,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		// PUBLIC
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Frustum();
@@ -247,7 +247,8 @@ export default QUnit.module( 'Maths', () => {
 			intersects = a.intersectsBox( box );
 			assert.notOk( intersects, 'No intersection' );
 
-			// add eps so that we prevent box touching the frustum, which might intersect depending on floating point numerics
+			// add eps so that we prevent box touching the frustum,
+			// which might intersect depending on floating point numerics
 			box.translate( new Vector3( - 1 - eps, - 1 - eps, - 1 - eps ) );
 
 			intersects = a.intersectsBox( box );

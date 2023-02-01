@@ -900,9 +900,9 @@ const geometry = new THREE.WireframeGeometry(
 		function makeExample( elem, createFn, src ) {
 
 			const rawLines = createFn.toString().replace( /return (new THREE\.[a-zA-Z]+Geometry)/, 'const geometry = $1' ).split( /\n/ );
-			const createRE = /^ *(?:function *)*create\d*\((.*?)\)/;
-			const indentRE = /^( *)[^ ]/;
-			const m = indentRE.exec( rawLines[ 1 ] );
+			const createRE = /^\s*(?:function *)*create\d*\((.*?)\)/;
+			const indentRE = /^(\s*)[^\s]/;
+			const m = indentRE.exec( rawLines[ 2 ] );
 			const prefixLen = m[ 1 ].length;
 			const m2 = createRE.exec( rawLines[ 0 ] );
 			const argString = m2[ 1 ].trim();

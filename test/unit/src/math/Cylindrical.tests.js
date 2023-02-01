@@ -2,7 +2,7 @@
 
 import { Cylindrical } from '../../../../src/math/Cylindrical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
-import { eps } from './Constants.tests.js';
+import { eps } from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -27,7 +27,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		// PUBLIC
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Cylindrical();
@@ -88,6 +88,13 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( Math.abs( a.radius - expected.radius ) <= eps, 'Normal vector: check radius' );
 			assert.ok( Math.abs( a.theta - expected.theta ) <= eps, 'Normal vector: check theta' );
 			assert.ok( Math.abs( a.y - expected.y ) <= eps, 'Normal vector: check y' );
+
+		} );
+
+		QUnit.todo( 'setFromCartesianCoords', ( assert ) => {
+
+			// setFromCartesianCoords( x, y, z )
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -4,7 +4,7 @@ import { Spherical } from '../../../../src/math/Spherical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import {
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -30,12 +30,6 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( 'isSpherical', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'set', ( assert ) => {
 
 			var a = new Spherical();
@@ -114,6 +108,23 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.theta, 0, 'Zero-length vector: check theta' );
 
 			a.setFromVector3( c );
+			assert.ok( Math.abs( a.radius - expected.radius ) <= eps, 'Normal vector: check radius' );
+			assert.ok( Math.abs( a.phi - expected.phi ) <= eps, 'Normal vector: check phi' );
+			assert.ok( Math.abs( a.theta - expected.theta ) <= eps, 'Normal vector: check theta' );
+
+		} );
+
+		QUnit.test( 'setFromCartesianCoords', ( assert ) => {
+
+			var a = new Spherical( 1, 1, 1 );
+			var expected = new Spherical( 4.554032147688322, 1.3494066171539107, 2.356194490192345 );
+
+			a.setFromCartesianCoords( 0, 0, 0 );
+			assert.strictEqual( a.radius, 0, 'Zero-length vector: check radius' );
+			assert.strictEqual( a.phi, 0, 'Zero-length vector: check phi' );
+			assert.strictEqual( a.theta, 0, 'Zero-length vector: check theta' );
+
+			a.setFromCartesianCoords( Math.PI, 1, - Math.PI );
 			assert.ok( Math.abs( a.radius - expected.radius ) <= eps, 'Normal vector: check radius' );
 			assert.ok( Math.abs( a.phi - expected.phi ) <= eps, 'Normal vector: check phi' );
 			assert.ok( Math.abs( a.theta - expected.theta ) <= eps, 'Normal vector: check theta' );
