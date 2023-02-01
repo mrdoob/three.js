@@ -1,15 +1,29 @@
 /* global QUnit */
 
-// import { DirectionalLightHelper } from '../../../../src/helpers/DirectionalLightHelper.js';
+import { DirectionalLightHelper } from '../../../../src/helpers/DirectionalLightHelper.js';
+
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
 
 export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module( 'DirectionalLightHelper', () => {
 
-		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		const parameters = {
+			size: 1,
+			color: 0xaaaaaa,
+			intensity: 0.8
+		};
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+		// INHERITANCE
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const light = new DirectionalLight( parameters.color );
+			const object = new DirectionalLightHelper( light, parameters.size, parameters.color );
+			assert.strictEqual(
+				object instanceof Object3D, true,
+				'DirectionalLightHelper extends from Object3D'
+			);
 
 		} );
 
@@ -20,7 +34,43 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const light = new DirectionalLight( parameters.color );
+			const object = new DirectionalLightHelper( light, parameters.size, parameters.color );
+			assert.ok(
+				object.type === 'DirectionalLightHelper',
+				'DirectionalLightHelper.type should be DirectionalLightHelper'
+			);
+
+		} );
+
+		QUnit.todo( 'light', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'matrix', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'color', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'dispose', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
