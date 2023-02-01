@@ -94,8 +94,7 @@ const renderTimeout = 1.5; // 1.5 seconds, set to 0 to disable
 
 const numAttempts = 3; // perform 3 progressive attempts before failing
 
-const numPages = 8; // use 8 browser pages
-const multiPageStrategy = process.platform !== 'darwin'; // whether to use multiple pages or multiple browsers, true if multiple pages
+const numPages = 16; // use 16 browser pages
 
 const numCIJobs = 3; // GitHub Actions run the script in 3 threads
 
@@ -108,7 +107,7 @@ console.red = msg => console.log( chalk.red( msg ) );
 console.yellow = msg => console.log( chalk.yellow( msg ) );
 console.green = msg => console.log( chalk.green( msg ) );
 
-const browsers = [];
+let browser;
 
 /* Launch server */
 
@@ -165,9 +164,7 @@ async function main() {
 
 	const { executablePath } = await downloadLatestChromium();
 
-	/* Launch browsers */
-
-	const numThreads = Math.min( numPages, files.length );
+	/* Launch browser */
 
 	const flags = [ '--hide-scrollbars', '--enable-unsafe-webgpu' ];
 	flags.push( '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
@@ -175,21 +172,17 @@ async function main() {
 
 	const viewport = { width: width * viewScale, height: height * viewScale };
 
-	for ( let i = 0; i < ( multiPageStrategy ? 1 : numThreads ); i++ ) {
+	browser = await puppeteer.launch( {
+		executablePath,
+		headless: ! process.env.VISIBLE,
+		args: flags,
+		defaultViewport: viewport,
+		handleSIGINT: false
+	} );
 
-		browsers.push( await puppeteer.launch( {
-			executablePath,
-			headless: ! process.env.VISIBLE,
-			args: flags,
-			defaultViewport: viewport,
-			handleSIGINT: false
-		} ) );
-
-		// this line is intended to stop the script if the browser (in headful mode) is closed by user (while debugging)
-		// browser.on( 'targetdestroyed', target => ( target.type() === 'other' ) ? close() : null );
-		// for some reason it randomly stops the script after about ~30 screenshots processed
-
-	}
+	// this line is intended to stop the script if the browser (in headful mode) is closed by user (while debugging)
+	// browser.on( 'targetdestroyed', target => ( target.type() === 'other' ) ? close() : null );
+	// for some reason it randomly stops the script after about ~30 screenshots processed
 
 	/* Prepare injections */
 
@@ -201,19 +194,8 @@ async function main() {
 
 	const errorMessagesCache = [];
 
-	let pages;
-
-	if ( multiPageStrategy ) {
-
-		const browser = browsers[ 0 ];
-		pages = await browser.pages();
-		while ( pages.length < numThreads ) pages.push( await browser.newPage() );
-
-	} else {
-
-		pages = await Promise.all( browsers.map( async browser => ( await browser.pages() )[ 0 ] ) );
-
-	}
+	const pages = await browser.pages();
+	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
 
 	for ( const page of pages ) await preparePage( page, injection, build, errorMessagesCache );
 
@@ -583,7 +565,7 @@ function close( exitCode = 1 ) {
 
 	console.log( 'Closing...' );
 
-	browsers.forEach( browser => browser.close() );
+	if ( browser !== undefined ) browser.close();
 	server.close();
 	process.exit( exitCode );
 
