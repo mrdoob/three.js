@@ -9,7 +9,7 @@ export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'Light', ( hooks ) => {
 
-		var lights = undefined;
+		let lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {

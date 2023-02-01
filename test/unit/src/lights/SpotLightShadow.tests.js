@@ -61,13 +61,12 @@ export default QUnit.module( 'Lights', () => {
 		// OTHERS
 		QUnit.test( 'clone/copy', ( assert ) => {
 
-			var a = new SpotLightShadow();
-			var b = new SpotLightShadow();
-			var c;
+			const a = new SpotLightShadow();
+			const b = new SpotLightShadow();
 
 			assert.notDeepEqual( a, b, 'Newly instanced shadows are not equal' );
 
-			c = a.clone();
+			const c = a.clone();
 			assert.smartEqual( a, c, 'Shadows are identical after clone()' );
 
 			c.mapSize.set( 256, 256 );

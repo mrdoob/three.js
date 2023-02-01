@@ -42,13 +42,12 @@ export default QUnit.module( 'Lights', () => {
 		// OTHERS
 		QUnit.test( 'clone/copy', ( assert ) => {
 
-			var a = new DirectionalLightShadow();
-			var b = new DirectionalLightShadow();
-			var c;
+			const a = new DirectionalLightShadow();
+			const b = new DirectionalLightShadow();
 
 			assert.notDeepEqual( a, b, 'Newly instanced shadows are not equal' );
 
-			c = a.clone();
+			const c = a.clone();
 			assert.smartEqual( a, c, 'Shadows are identical after clone()' );
 
 			c.mapSize.set( 1024, 1024 );
@@ -64,18 +63,21 @@ export default QUnit.module( 'Lights', () => {
 
 		QUnit.test( 'toJSON', ( assert ) => {
 
-			var light = new DirectionalLight();
-			var shadow = new DirectionalLightShadow();
+			const light = new DirectionalLight();
+			const shadow = new DirectionalLightShadow();
 
 			shadow.bias = 10;
 			shadow.radius = 5;
 			shadow.mapSize.set( 1024, 1024 );
 			light.shadow = shadow;
 
-			var json = light.toJSON();
-			var newLight = new ObjectLoader().parse( json );
+			const json = light.toJSON();
+			const newLight = new ObjectLoader().parse( json );
 
-			assert.smartEqual( newLight.shadow, light.shadow, 'Reloaded shadow is identical to the original one' );
+			assert.smartEqual(
+				newLight.shadow, light.shadow,
+				'Reloaded shadow is identical to the original one'
+			);
 
 		} );
 

@@ -9,7 +9,7 @@ export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'SpotLight', ( hooks ) => {
 
-		var lights = undefined;
+		let lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -111,7 +111,7 @@ export default QUnit.module( 'Lights', () => {
 
 		QUnit.test( 'power', ( assert ) => {
 
-			var a = new SpotLight( 0xaaaaaa );
+			const a = new SpotLight( 0xaaaaaa );
 
 			a.intensity = 100;
 			assert.numEqual( a.power, 100 * Math.PI, 'Correct power for an intensity of 100' );

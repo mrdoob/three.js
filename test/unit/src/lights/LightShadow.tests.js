@@ -139,13 +139,12 @@ export default QUnit.module( 'Lights', () => {
 		// OTHERS
 		QUnit.test( 'clone/copy', ( assert ) => {
 
-			var a = new LightShadow( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
-			var b = new LightShadow( new OrthographicCamera( - 3, 3, 3, - 3, 0.3, 300 ) );
-			var c;
+			const a = new LightShadow( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
+			const b = new LightShadow( new OrthographicCamera( - 3, 3, 3, - 3, 0.3, 300 ) );
 
 			assert.notDeepEqual( a, b, 'Newly instanced shadows are not equal' );
 
-			c = a.clone();
+			const c = a.clone();
 			assert.smartEqual( a, c, 'Shadows are identical after clone()' );
 
 			c.mapSize.set( 256, 256 );
