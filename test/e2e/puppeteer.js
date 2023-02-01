@@ -7,6 +7,18 @@ import jimp from 'jimp';
 import * as fs from 'fs/promises';
 import fetch from 'node-fetch';
 
+function regexify( str ) {
+
+	return new RegExp( '^' + str.replace( /\*/g, '.*' ) + '$' );
+
+}
+
+function unregexify( regexp ) {
+
+	return regexp.source.slice( 1, -1 ).replace( /\.\*/g, '*' );
+
+}
+
 /* CONFIG VARIABLES START */
 
 const idleTime = 3; // 3 seconds - for how long there should be no network requests
@@ -16,8 +28,7 @@ const exceptionList = [
 
 	// video tag not deterministic enough
 	'css3d_youtube',
-	'webgl_video_kinect',
-	'webgl_video_panorama_equirectangular',
+	'*video*',
 
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 
@@ -42,7 +53,7 @@ const exceptionList = [
 	'webgl_test_memory2',
 	'webgl_tiled_forward'
 
-];
+].map( regexify );
 
 /* CONFIG VARIABLES END */
 
@@ -91,22 +102,23 @@ async function main() {
 	const isMakeScreenshot = process.argv[ 2 ] === '--make';
 
 	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
-		.map( f => f.replace( '.html', '' ) );
+		.map( f => f.replace( '.html', '' ) )
+		.map( regexify );
 
 	const isExactList = exactList.length !== 0;
 
 	let files = ( await fs.readdir( 'examples' ) )
 		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
+		.filter( f => isExactList ? exactList.some( r => r.test( f ) ) : ! exceptionList.some( r => r.test( f ) ) );
 
 	if ( isExactList ) {
 
-		for ( const file of exactList ) {
+		for ( const regex of exactList ) {
 
-			if ( ! files.includes( file ) ) {
+			if ( ! files.some( f => regex.test( f ) ) ) {
 
-				console.log( `Warning! Unrecognised example name: ${ file }` );
+				console.log( `Warning! Unrecognised example name: ${ unregexify( regex ) }` );
 
 			}
 
