@@ -75,74 +75,6 @@ const exceptionList = [
 
 ];
 
-const macExceptionList = [
-
-	'physics_oimo_instancing',
-	'webgl2_multisampled_renderbuffers',
-	'webgl2_ubo',
-	'webgl_animation_keyframes',
-	'webgl_animation_skinning_additive_blending',
-	'webgl_animation_skinning_ik',
-	'webgl_buffergeometry_compression',
-	'webgl_buffergeometry_custom_attributes_particles',
-	'webgl_buffergeometry_indexed',
-	'webgl_buffergeometry_instancing_billboards',
-	'webgl_buffergeometry_lines_indexed',
-	'webgl_buffergeometry_points_interleaved',
-	'webgl_buffergeometry_uint',
-	'webgl_camera',
-	'webgl_camera_array',
-	'webgl_camera_logarithmicdepthbuffer',
-	'webgl_clipping',
-	'webgl_clipping_advanced',
-	'webgl_custom_attributes',
-	'webgl_custom_attributes_points3',
-	'webgl_decals',
-	'webgl_depth_texture',
-	'webgl_framebuffer_texture',
-	'webgl_furnace_test',
-	'webgl_geometry_extrude_shapes2',
-	'webgl_gpgpu_birds_gltf',
-	'webgl_gpgpu_protoplanet',
-	'webgl_instancing_scatter',
-	'webgl_interactive_buffergeometry',
-	'webgl_interactive_raycasting_points',
-	'webgl_interactive_voxelpainter',
-	'webgl_lightningstrike',
-	'webgl_lightprobe_cubecamera',
-	'webgl_loader_gltf_compressed',
-	'webgl_loader_gltf_instancing',
-	'webgl_loader_ifc',
-	'webgl_loader_ply',
-	'webgl_loader_svg',
-	'webgl_loader_texture_dds',
-	'webgl_materials_envmaps_groundprojected',
-	'webgl_materials_envmaps_hdr',
-	'webgl_materials_variations_lambert',
-	'webgl_materials_variations_standard',
-	'webgl_materials_variations_toon',
-	'webgl_mirror',
-	'webgl_modifier_subdivision',
-	'webgl_multiple_renderers',
-	'webgl_performance_shader',
-	'webgl_pmrem_test',
-	'webgl_points_waves',
-	'webgl_postprocessing_sao',
-	'webgl_postprocessing_smaa',
-	'webgl_postprocessing_ssaa',
-	'webgl_postprocessing_ssao',
-	'webgl_postprocessing_unreal_bloom_selective',
-	'webgl_shaders_tonemapping',
-	'webgl_shadow_contact',
-	'webgl_shadowmap',
-	'webgl_shadowmap_viewer',
-	'webgl_shadowmap_vsm',
-	'webgl_shadowmesh',
-	'webgl_simple_gi',
-	'webgl_tonemapping'
-
-];
-
 /* CONFIG VARIABLES END */
 
 const LAST_REVISION_URLS = {
@@ -196,12 +128,10 @@ async function main() {
 
 	const isExactList = exactList.length !== 0;
 
-	const filesExceptionList = process.platform === 'darwin' ? exceptionList.concat( macExceptionList ) : exceptionList;
-
 	let files = ( await fs.readdir( 'examples' ) )
 		.filter( s => s.slice( - 5 ) === '.html' && s !== 'index.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => isExactList ? exactList.includes( f ) : ! filesExceptionList.includes( f ) );
+		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 	if ( isExactList ) {
 
@@ -244,7 +174,7 @@ async function main() {
 
 	browser = await puppeteer.launch( {
 		executablePath,
-		headless: ! process.env.VISIBLE,
+		headless: process.platform !== 'darwin',
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false
