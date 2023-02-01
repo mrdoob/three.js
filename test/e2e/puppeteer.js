@@ -89,7 +89,7 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // at most 5% different pixels
 
-const networkTimeout = 30; // 30 seconds, set to 0 to disable
+const networkTimeout = 60; // 60 seconds, set to 0 to disable
 const renderTimeout = 1.5; // 1.5 seconds, set to 0 to disable
 
 const numAttempts = 3; // perform 3 progressive attempts before failing
@@ -289,7 +289,7 @@ async function preparePage( page, injection, build, errorMessages ) {
 		const args = await Promise.all( msg.args().map( async arg => {
 			try {
 				return await arg.executionContext().evaluate( arg => arg instanceof Error ? arg.message : arg, arg );
-			} catch (e) { // Execution context might have been already destroyed
+			} catch ( e ) { // Execution context might have been already destroyed
 				return arg;
 			}
 		} ) );
