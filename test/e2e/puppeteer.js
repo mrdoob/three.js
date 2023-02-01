@@ -210,7 +210,13 @@ async function downloadLatestChromium() {
 	const os = PLATFORMS[ browserFetcher.platform() ];
 
 	const revisions = await ( await fetch( OMAHA_PROXY ) ).json();
-	const revision = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel ).branch_base_position;
+	let revision = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel ).branch_base_position;
+
+	while ( ! ( await browserFetcher.canDownload( revision ) ) ) {
+
+		revision = String( revision - 1 );
+
+	}
 
 	let revisionInfo = browserFetcher.revisionInfo( revision );
 	if ( revisionInfo.local === true ) {
