@@ -1,6 +1,8 @@
 /* global QUnit */
 
 import { SpotLightShadow } from '../../../../src/lights/SpotLightShadow.js';
+
+import { LightShadow } from '../../../../src/lights/LightShadow.js';
 import { SpotLight } from '../../../../src/lights/SpotLight.js';
 import { ObjectLoader } from '../../../../src/loaders/ObjectLoader.js';
 
@@ -9,9 +11,13 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module( 'SpotLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new SpotLightShadow();
+			assert.strictEqual(
+				object instanceof LightShadow, true,
+				'SpotLightShadow extends from LightShadow'
+			);
 
 		} );
 
@@ -22,14 +28,31 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isSpotLightShadow', ( assert ) => {
+		// PROPERTIES
+		QUnit.todo( 'focus', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'update', ( assert ) => {
+		// PUBLIC
+		QUnit.test( 'isSpotLightShadow', ( assert ) => {
+
+			const object = new SpotLightShadow();
+			assert.ok(
+				object.isSpotLightShadow,
+				'SpotLightShadow.isSpotLightShadow should be true'
+			);
+
+		} );
+
+		QUnit.todo( 'updateMatrices', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'copy', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
