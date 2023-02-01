@@ -55,7 +55,7 @@ const PLATFORMS = {
 };
 const OMAHA_PROXY = 'https://omahaproxy.appspot.com/all.json';
 
-const chromiumChannel = 'dev'; // stable -> beta -> dev -> canary (Mac and Windows) -> canary_asan (Windows)
+const chromiumChannel = 'stable'; // stable -> beta -> dev -> canary (Mac and Windows) -> canary_asan (Windows)
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
