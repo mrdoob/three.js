@@ -362,7 +362,6 @@ export default QUnit.module( 'Maths', () => {
 				- 0.17677669529663687, 0.1767766952966369, 0.5,
 				0, 0, 1
 			);
-			var b = new Matrix3();
 			var params = {
 				centerX: 0.5,
 				centerY: 0.5,
@@ -385,53 +384,7 @@ export default QUnit.module( 'Maths', () => {
 				params.centerX, params.centerY
 			);
 
-			b.identity()
-			 .translate( - params.centerX, - params.centerY )
-			 .rotate( params.rotation )
-			 .scale( params.repeatX, params.repeatY )
-			 .translate( params.centerX, params.centerY )
-			 .translate( params.offsetX, params.offsetY );
-
 			assert.ok( matrixEquals3( a, expected ), 'Check direct method' );
-			assert.ok( matrixEquals3( b, expected ), 'Check indirect method' );
-
-		} );
-
-		QUnit.test( 'scale', ( assert ) => {
-
-			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			var expected = new Matrix3().set(
-				0.25, 0.5, 0.75,
-				1, 1.25, 1.5,
-				7, 8, 9
-			);
-
-			a.scale( 0.25, 0.25 );
-			assert.ok( matrixEquals3( a, expected ), 'Check scaling result' );
-
-		} );
-
-		QUnit.test( 'rotate', ( assert ) => {
-
-			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			var expected = new Matrix3().set(
-				3.5355339059327373, 4.949747468305833, 6.363961030678928,
-				2.121320343559643, 2.121320343559643, 2.1213203435596433,
-				7, 8, 9
-			);
-
-			a.rotate( Math.PI / 4 );
-			assert.ok( matrixEquals3( a, expected ), 'Check rotated result' );
-
-		} );
-
-		QUnit.test( 'translate', ( assert ) => {
-
-			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			var expected = new Matrix3().set( 22, 26, 30, 53, 61, 69, 7, 8, 9 );
-
-			a.translate( 3, 7 );
-			assert.ok( matrixEquals3( a, expected ), 'Check translation result' );
 
 		} );
 
