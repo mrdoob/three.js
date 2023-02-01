@@ -1,6 +1,8 @@
 /* global QUnit */
 
-// import { CurvePath } from '../../../../../src/extras/core/CurvePath.js';
+import { CurvePath } from '../../../../../src/extras/core/CurvePath.js';
+
+import { Curve } from '../../../../../src/extras/core/Curve.js';
 
 export default QUnit.module( 'Extras', () => {
 
@@ -9,9 +11,13 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'CurvePath', () => {
 
 			// INHERITANCE
-			QUnit.todo( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new CurvePath();
+				assert.strictEqual(
+					object instanceof Curve, true,
+					'CurvePath extends from Curve'
+				);
 
 			} );
 
@@ -22,7 +28,30 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			// PUBLIC STUFF
+			// PROPERTIES
+			QUnit.test( 'type', ( assert ) => {
+
+				const object = new Curve();
+				assert.ok(
+					object.type === 'Curve',
+					'Curve.type should be Curve'
+				);
+
+			} );
+
+			QUnit.todo( 'curves', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'autoClose', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			// PUBLIC
 			QUnit.todo( 'add', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
@@ -71,19 +100,19 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.todo( 'createPointsGeometry', ( assert ) => {
+			QUnit.todo( 'copy', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'createSpacedPointsGeometry', ( assert ) => {
+			QUnit.todo( 'toJSON', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'createGeometry', ( assert ) => {
+			QUnit.todo( 'fromJSON', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 
