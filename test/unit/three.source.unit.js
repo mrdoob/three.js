@@ -144,6 +144,7 @@ import './src/loaders/CompressedTextureLoader.tests.js';
 import './src/loaders/CubeTextureLoader.tests.js';
 import './src/loaders/DataTextureLoader.tests.js';
 import './src/loaders/FileLoader.tests.js';
+import './src/loaders/ImageBitmapLoader.tests.js';
 import './src/loaders/ImageLoader.tests.js';
 import './src/loaders/Loader.tests.js';
 import './src/loaders/LoaderUtils.tests.js';
