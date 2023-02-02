@@ -290,8 +290,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <div class="threejs_center"><img src="../resources/images/z-fighting.png" style="width: 570px;"></div>
 
 <p>解决的方法之一是告诉three.js使用不同的方法计算像素的前后关系。我们可以在创建<a href="/docs/#api/zh/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>时开启<code class="notranslate" translate="no">logarithmicDepthBuffer</code>。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
++  antialias: true,
 +  canvas,
 +  logarithmicDepthBuffer: true,
 +});

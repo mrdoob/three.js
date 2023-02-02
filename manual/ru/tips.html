@@ -138,7 +138,7 @@ elem.addEventListener('click', () =&gt; {
 Вам нужно передать <code class="notranslate" translate="no">preserveDrawingBuffer: true</code> при создании  <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. 
 Это мешает браузеру очистить холст. Вы также должны сказать three.js не очищать холст. </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
--const renderer = new THREE.WebGLRenderer({canvas});
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
 +  canvas,
 +  preserveDrawingBuffer: true,
@@ -224,7 +224,7 @@ elem.addEventListener('click', () =&gt; {
 <p>По умолчанию THREE.js делает холст непрозрачным. Если вы хотите, чтобы холст был прозрачным,
 передайте <a href="/docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> при создании <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
--const renderer = new THREE.WebGLRenderer({canvas});
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
 +  canvas,
 +  alpha: true,

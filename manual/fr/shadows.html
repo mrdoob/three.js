@@ -188,7 +188,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 <p>Donc, en passant aux cartes d'ombre, il y a 3 lumières qui peuvent projeter des ombres. Le <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>, le <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> et le <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.</p>
 <p>Commençons avec la <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> avec l'aide de <a href="lights.html">l'article sur les lumières</a>.</p>
 <p>La première chose à faire est d'activer les ombres dans le renderer (moteur de rendu).</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.shadowMap.enabled = true;
 </pre>
 <p>Ensuite, nous devons également dire à la lumière de projeter une ombre.</p>

@@ -75,7 +75,7 @@ including three.js</p>
 VR button to our page</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  renderer.xr.enabled = true;
 +  document.body.appendChild(VRButton.createButton(renderer));
 </pre>
@@ -294,7 +294,7 @@ site OR pass in a flag in the URL, something like</p>
 <p>in your code you could use that parameter like this</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 -  renderer.xr.enabled = true;
 -  document.body.appendChild(VRButton.createButton(renderer));
 

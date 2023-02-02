@@ -209,7 +209,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 <p>Итак, переходя к теневым картам, есть 3 источника света, которые могут отбрасывать тени. <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>, <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a> и <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.</p>
 <p>Давайте начнем с <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> c вспомогательного примера из <a href="lights.html">статьи о светах</a>.</p>
 <p>Первое, что нам нужно сделать, это включить тени в рендерере.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.shadowMap.enabled = true;
 </pre>
 <p>Тогда мы также должны сказать свету отбрасывать тень</p>

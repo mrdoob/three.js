@@ -4,7 +4,7 @@ import { OrbitControls } from 'https://cdn.skypack.dev/three@0.136.0/examples/js
 export function init( data ) { /* eslint-disable-line no-unused-vars */
 
 	const { canvas, inputElement } = data;
-	const renderer = new THREE.WebGLRenderer( { canvas } );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
 
 	const fov = 75;
 	const aspect = 2; // the canvas default

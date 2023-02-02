@@ -352,7 +352,7 @@ en radians. Utilisons notre <code class="notranslate" translate="no">DegRadHelpe
 <p>et nous devons appeler <code class="notranslate" translate="no">RectAreaLightUniformsLib.init</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  RectAreaLightUniformsLib.init();
 </pre>
 <p>Si vous oubliez les données, la lumière fonctionnera toujours, mais ça pourrait paraître bizarre, alors n'oubliez pas d'inclure les données supplémentaires.</p>
@@ -393,7 +393,7 @@ makeXYZGUI(gui, light.position, 'position');
 <p>Pour les lumières, l'idée de base est de ne pas définir de distance pour qu'elles s'éteignent, et vous ne définissez pas <code class="notranslate" translate="no">intensity</code>. Au lieu de cela, vous définissez la <a href="/docs/#api/en/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> de la lumière en lumens, puis three.js utilisera des calculs physiques comme de vraies lumières. Les unités de three.js dans ce cas sont des mètres et une ampoule de 60w aurait environ 800 lumens. Il y a aussi une propriété <a href="/docs/#api/en/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>. Elle doit être réglé sur 2 pour une apparence réaliste.</p>
 <p>Testons ça.</p>
 <p>D'abord, définissons <code class="notranslate" translate="no">physicallyCorrectLights</code> sur true</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.physicallyCorrectLights = true;
 </pre>
 <p>Ensuite, réglons la <code class="notranslate" translate="no">power</code> à 800 lumens, la <code class="notranslate" translate="no">decay</code> à 2, et

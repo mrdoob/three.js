@@ -354,7 +354,7 @@ function showFileInfo(fileInfos, fileInfo) {
 <p>만든 클래스의 인스턴스를 생성합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const tweenManager = new TweenManger();
 
   ...

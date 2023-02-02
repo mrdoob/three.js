@@ -43,6 +43,7 @@ function main() {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     logarithmicDepthBuffer: true,
+    antialias: true
   });
   const fov = 45;
   const aspect = 2;  // the canvas default
