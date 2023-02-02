@@ -1,15 +1,21 @@
 /* global QUnit */
 
-// import { ArrayCamera } from '../../../../src/cameras/ArrayCamera.js';
+import { ArrayCamera } from '../../../../src/cameras/ArrayCamera.js';
+
+import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 
 export default QUnit.module( 'Cameras', () => {
 
 	QUnit.module( 'ArrayCamera', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new ArrayCamera();
+			assert.strictEqual(
+				object instanceof PerspectiveCamera, true,
+				'ArrayCamera extends from PerspectiveCamera'
+			);
 
 		} );
 
@@ -20,10 +26,22 @@ export default QUnit.module( 'Cameras', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isArrayCamera', ( assert ) => {
+		// PROPERTIES
+		QUnit.todo( 'cameras', ( assert ) => {
 
+			// array
 			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isArrayCamera', ( assert ) => {
+
+			const object = new ArrayCamera();
+			assert.ok(
+				object.isArrayCamera,
+				'ArrayCamera.isArrayCamera should be true'
+			);
 
 		} );
 
