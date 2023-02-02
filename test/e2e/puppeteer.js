@@ -46,13 +46,16 @@ const exceptionList = [
 
 /* CONFIG VARIABLES END */
 
-const LAST_REVISION_URLS = {
-	linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
-	mac: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/LAST_CHANGE',
-	mac_arm: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac_Arm/LAST_CHANGE',
-	win32: 'https://storage.googleapis.com/chromium-browser-snapshots/Win/LAST_CHANGE',
-	win64: 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/LAST_CHANGE'
+const PLATFORMS = {
+	linux: 'linux',
+	mac: 'mac',
+	mac_arm: 'mac_am64',
+	win32: 'win',
+	win64: 'win64'
 };
+const OMAHA_PROXY = 'https://omahaproxy.appspot.com/all.json';
+
+const chromiumChannel = 'stable'; // stable -> beta -> dev -> canary (Mac and Windows) -> canary_asan (Windows)
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
@@ -204,8 +207,17 @@ async function downloadLatestChromium() {
 
 	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
 
-	const lastRevisionURL = LAST_REVISION_URLS[ browserFetcher.platform() ];
-	const revision = await ( await fetch( lastRevisionURL ) ).text();
+	const os = PLATFORMS[ browserFetcher.platform() ];
+
+	const revisions = await ( await fetch( OMAHA_PROXY ) ).json();
+	const omahaRevisionInfo = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel );
+
+	let revision = omahaRevisionInfo.branch_base_position;
+	while ( ! ( await browserFetcher.canDownload( revision ) ) ) {
+
+		revision = String( revision - 1 );
+
+	}
 
 	let revisionInfo = browserFetcher.revisionInfo( revision );
 	if ( revisionInfo.local === true ) {
@@ -219,6 +231,7 @@ async function downloadLatestChromium() {
 		console.log( 'Downloaded.' );
 
 	}
+	console.log( `Using Chromium ${ omahaRevisionInfo.current_version } (revision ${ revision }, ${ revisionInfo.url }), ${ chromiumChannel } channel on ${ os }` );
 	return revisionInfo;
 
 }
