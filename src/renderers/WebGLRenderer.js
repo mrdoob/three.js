@@ -55,6 +55,12 @@ function createCanvasElement() {
 
 }
 
+function createWebXRManager( renderer, gl ) {
+
+	return new WebXRManager( renderer, gl );
+
+}
+
 function WebGLRenderer( parameters = {} ) {
 
 	this.isWebGLRenderer = true;
@@ -68,7 +74,8 @@ function WebGLRenderer( parameters = {} ) {
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
-		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
+		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false,
+		_xrFactory = parameters.xrFactory !== undefined ? parameters.xrFactory : createWebXRManager;
 
 	let _alpha;
 
@@ -338,7 +345,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	// xr
 
-	const xr = new WebXRManager( _this, _gl );
+	const xr = _xrFactory( _this, _gl );
 
 	this.xr = xr;
 
