@@ -62,7 +62,7 @@ WebXR API. <a href="setup.html">the article on setting up</a>에 언급된 서�
 <p>이후 three.js's WebXR 지원을 활성화하며, 이를 위한 VR button을 페이지에 추가하여 주어야합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  renderer.xr.enabled = true;
 +  document.body.appendChild(VRButton.createButton(renderer));
 </pre>
@@ -266,7 +266,7 @@ VR 모드에서 벗어나 컨트롤을 켜고 끌 수 있습니다.</p>
 <p>코드안에서 다음과 같은 파라미터를 사용 가능합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 -  renderer.xr.enabled = true;
 -  document.body.appendChild(VRButton.createButton(renderer));
 

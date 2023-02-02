@@ -339,8 +339,9 @@ enough precision to decide which pixels are in front and which pixels are behind
 <p>One solution is to tell three.js use to a different method to compute which
 pixels are in front and which are behind. We can do that by enabling
 <code class="notranslate" translate="no">logarithmicDepthBuffer</code> when we create the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
++  antialias: true,
 +  canvas,
 +  logarithmicDepthBuffer: true,
 +});

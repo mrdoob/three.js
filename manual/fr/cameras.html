@@ -294,8 +294,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <div class="threejs_center"><img src="../resources/images/z-fighting.png" style="width: 570px;"></div>
 
 <p>Une solution consiste à indiquer à Three.js d'utiliser une méthode différente pour calculer quels pixels sont devant et lesquels sont derrière. Nous pouvons le faire en activant <code class="notranslate" translate="no">logarithmicDepthBuffer</code> lorsque nous créons le <a href="https://threejs.org/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
++  antialias: true,
 +  canvas,
 +  logarithmicDepthBuffer: true,
 +});

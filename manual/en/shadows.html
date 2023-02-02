@@ -233,7 +233,7 @@ appears to also use this kind of shadow for the main character.</p>
 the <a href="/docs/#api/en/lights/PointLight"><code class="notranslate" translate="no">PointLight</code></a>, and the <a href="/docs/#api/en/lights/SpotLight"><code class="notranslate" translate="no">SpotLight</code></a>.</p>
 <p>Let's start with the <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> with the helper example from <a href="lights.html">the lights article</a>.</p>
 <p>The first thing we need to do is turn on shadows in the renderer.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.shadowMap.enabled = true;
 </pre>
 <p>Then we also need to tell the light to cast a shadow</p>

@@ -386,7 +386,7 @@ scene.add(helper);
 <p><code class="notranslate" translate="no">RectAreaLightUniformsLib.init</code> を呼び出します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  RectAreaLightUniformsLib.init();
 </pre>
 <p>RectAreaLightUniformsLibを忘れてもライトは動作しますが、見た目がおかしくなるので忘れないようにして下さい。</p>
@@ -438,7 +438,7 @@ makeXYZGUI(gui, light.position, 'position');
 現実的な減衰のためには <code class="notranslate" translate="no">2</code> に設定します。</p>
 <p>試してみましょう。</p>
 <p>まずは物理的に正しいライトを作ります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.physicallyCorrectLights = true;
 </pre>
 <p>次に <code class="notranslate" translate="no">power</code> を800ルーメンにし、<code class="notranslate" translate="no">decay</code> を2にします。

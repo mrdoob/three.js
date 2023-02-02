@@ -420,7 +420,7 @@ scene.add(helper);
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  RectAreaLightUniformsLib.init();
 </pre>
 <p>Если вы забудете RectAreaLightUniformsLib, индикатор все равно будет работать, 
@@ -472,7 +472,7 @@ makeXYZGUI(gui, light.position, 'position');
 Там также есть распад <a href="/docs/#api/en/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>, он должен быть установлен в <code class="notranslate" translate="no">2</code> для реализма.</p>
 <p>Давайте проверим это.</p>
 <p>Сначала мы включим физически правильное освещение</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.physicallyCorrectLights = true;
 </pre>
 <p>Затем мы установим <code class="notranslate" translate="no">power</code> = 800 lumens,  <code class="notranslate" translate="no">decay</code> = 2 и <code class="notranslate" translate="no">distance</code> до <code class="notranslate" translate="no">Infinity</code>.</p>

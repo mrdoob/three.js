@@ -113,7 +113,7 @@ so let's grab that example but remove the cubes. It's pretty short so here's the
 entire thing</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
   renderer.autoClearColor = false;
 
   const camera = new THREE.OrthographicCamera(
