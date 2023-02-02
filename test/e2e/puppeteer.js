@@ -557,11 +557,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		} else {
 
-			if ( ! e.message.includes( 'TimeoutError' ) ) { // TODO: fix this
-
-				console.yellow( `${ e }, another attempt...` );
-
-			}
+			console.yellow( `${ e }, another attempt...` );
 			this.add( file, attemptID + 1 );
 
 		}
