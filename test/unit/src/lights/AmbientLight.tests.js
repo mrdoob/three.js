@@ -1,13 +1,15 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils.js';
 import { AmbientLight } from '../../../../src/lights/AmbientLight.js';
+
+import { Light } from '../../../../src/lights/Light.js';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Lights', () => {
 
-	QUnit.module( 'ArrowHelper', ( hooks ) => {
+	QUnit.module( 'AmbientLight', ( hooks ) => {
 
-		var lights = undefined;
+		let lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -24,9 +26,13 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new AmbientLight();
+			assert.strictEqual(
+				object instanceof Light, true,
+				'AmbientLight extends from Light'
+			);
 
 		} );
 
@@ -37,10 +43,25 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isAmbiantLight', ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new AmbientLight();
+			assert.ok(
+				object.type === 'AmbientLight',
+				'AmbientLight.type should be AmbientLight'
+			);
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isAmbientLight', ( assert ) => {
+
+			const object = new AmbientLight();
+			assert.ok(
+				object.isAmbientLight,
+				'AmbientLight.isAmbientLight should be true'
+			);
 
 		} );
 

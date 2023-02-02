@@ -1,6 +1,8 @@
 /* global QUnit */
 
 import { LineCurve } from '../../../../../src/extras/curves/LineCurve.js';
+
+import { Curve } from '../../../../../src/extras/core/Curve.js';
 import { Vector2 } from '../../../../../src/math/Vector2.js';
 
 export default QUnit.module( 'Extras', () => {
@@ -25,9 +27,13 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.todo( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new LineCurve();
+				assert.strictEqual(
+					object instanceof Curve, true,
+					'LineCurve extends from Curve'
+				);
 
 			} );
 
@@ -38,10 +44,37 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			// PUBLIC STUFF
-			QUnit.todo( 'isLineCurve', ( assert ) => {
+			// PROPERTIES
+			QUnit.test( 'type', ( assert ) => {
+
+				const object = new LineCurve();
+				assert.ok(
+					object.type === 'LineCurve',
+					'LineCurve.type should be LineCurve'
+				);
+
+			} );
+
+			QUnit.todo( 'v1', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'v2', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			// PUBLIC
+			QUnit.test( 'isLineCurve', ( assert ) => {
+
+				const object = new LineCurve();
+				assert.ok(
+					object.isLineCurve,
+					'LineCurve.isLineCurve should be true'
+				);
 
 			} );
 
@@ -83,6 +116,24 @@ export default QUnit.module( 'Extras', () => {
 
 				assert.numEqual( tangent.x, expectedTangent, 'tangent.x correct' );
 				assert.numEqual( tangent.y, expectedTangent, 'tangent.y correct' );
+
+			} );
+
+			QUnit.todo( 'copy', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'toJSON', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'fromJSON', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

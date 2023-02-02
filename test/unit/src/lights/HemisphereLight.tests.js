@@ -1,13 +1,15 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils.js';
 import { HemisphereLight } from '../../../../src/lights/HemisphereLight.js';
+
+import { Light } from '../../../../src/lights/Light.js';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'HemisphereLight', ( hooks ) => {
 
-		var lights = undefined;
+		let lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -26,9 +28,13 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new HemisphereLight();
+			assert.strictEqual(
+				object instanceof Light, true,
+				'HemisphereLight extends from Light'
+			);
 
 		} );
 
@@ -39,15 +45,43 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isHemisphereLight', ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new HemisphereLight();
+			assert.ok(
+				object.type === 'HemisphereLight',
+				'HemisphereLight.type should be HemisphereLight'
+			);
+
+		} );
+
+		QUnit.todo( 'position', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
+		QUnit.todo( 'groundColor', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isHemisphereLight', ( assert ) => {
+
+			const object = new HemisphereLight();
+			assert.ok(
+				object.isHemisphereLight,
+				'HemisphereLight.isHemisphereLight should be true'
+			);
+
+		} );
+
 		QUnit.todo( 'copy', ( assert ) => {
 
+			// copy( source, recursive )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );

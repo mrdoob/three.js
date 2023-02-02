@@ -60,6 +60,9 @@ import './src/core/Uniform.tests.js';
 
 //src/extras
 import './src/extras/DataUtils.tests.js';
+import './src/extras/Earcut.tests.js';
+import './src/extras/ImageUtils.tests.js';
+import './src/extras/PMREMGenerator.tests.js';
 import './src/extras/ShapeUtils.tests.js';
 
 //src/extras/core
@@ -124,12 +127,16 @@ import './src/helpers/SpotLightHelper.tests.js';
 
 //src/lights
 import './src/lights/AmbientLight.tests.js';
+import './src/lights/AmbientLightProbe.tests.js';
 import './src/lights/DirectionalLight.tests.js';
 import './src/lights/DirectionalLightShadow.tests.js';
 import './src/lights/HemisphereLight.tests.js';
+import './src/lights/HemisphereLightProbe.tests.js';
 import './src/lights/Light.tests.js';
+import './src/lights/LightProbe.tests.js';
 import './src/lights/LightShadow.tests.js';
 import './src/lights/PointLight.tests.js';
+import './src/lights/PointLightShadow.tests.js';
 import './src/lights/RectAreaLight.tests.js';
 import './src/lights/SpotLight.tests.js';
 import './src/lights/SpotLightShadow.tests.js';

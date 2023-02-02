@@ -38,8 +38,8 @@ class PromiseQueue {
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 3; // 3 seconds - for how long there should be no network requests
-const parseTime = 2; // 2 seconds per megabyte
+const idleTime = 9; // 9 seconds - for how long there should be no network requests
+const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
 
@@ -77,22 +77,25 @@ const exceptionList = [
 
 /* CONFIG VARIABLES END */
 
-const LAST_REVISION_URLS = {
-	linux: 'https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/LAST_CHANGE',
-	mac: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac/LAST_CHANGE',
-	mac_arm: 'https://storage.googleapis.com/chromium-browser-snapshots/Mac_Arm/LAST_CHANGE',
-	win32: 'https://storage.googleapis.com/chromium-browser-snapshots/Win/LAST_CHANGE',
-	win64: 'https://storage.googleapis.com/chromium-browser-snapshots/Win_x64/LAST_CHANGE'
+const PLATFORMS = {
+	linux: 'linux',
+	mac: 'mac',
+	mac_arm: 'mac_am64',
+	win32: 'win',
+	win64: 'win64'
 };
+const OMAHA_PROXY = 'https://omahaproxy.appspot.com/all.json';
+
+const chromiumChannel = 'stable'; // stable -> beta -> dev -> canary (Mac and Windows) -> canary_asan (Windows)
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // at most 5% different pixels
 
-const networkTimeout = 60; // 60 seconds, set to 0 to disable
-const renderTimeout = 1.5; // 1.5 seconds, set to 0 to disable
+const networkTimeout = 180; // 180 seconds, set to 0 to disable
+const renderTimeout = 4.5; // 4.5 seconds, set to 0 to disable
 
-const numAttempts = 3; // perform 3 progressive attempts before failing
+const numAttempts = 2; // perform 2 attempts before failing
 
 const numPages = 16; // use 16 browser pages
 
@@ -242,8 +245,17 @@ async function downloadLatestChromium() {
 
 	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
 
-	const lastRevisionURL = LAST_REVISION_URLS[ browserFetcher.platform() ];
-	const revision = await ( await fetch( lastRevisionURL ) ).text();
+	const os = PLATFORMS[ browserFetcher.platform() ];
+
+	const revisions = await ( await fetch( OMAHA_PROXY ) ).json();
+	const omahaRevisionInfo = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel );
+
+	let revision = omahaRevisionInfo.branch_base_position;
+	while ( ! ( await browserFetcher.canDownload( revision ) ) ) {
+
+		revision = String( revision - 1 );
+
+	}
 
 	let revisionInfo = browserFetcher.revisionInfo( revision );
 	if ( revisionInfo.local === true ) {
@@ -257,6 +269,7 @@ async function downloadLatestChromium() {
 		console.log( 'Downloaded.' );
 
 	}
+	console.log( `Using Chromium ${ omahaRevisionInfo.current_version } (revision ${ revision }, ${ revisionInfo.url }), ${ chromiumChannel } channel on ${ os }` );
 	return revisionInfo;
 
 }
@@ -369,8 +382,6 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
-	const timeoutCoefficient = attemptID + 1;
-
 	const page = await new Promise( ( resolve, reject ) => {
 
 		const interval = setInterval( () => {
@@ -403,7 +414,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
-				timeout: networkTimeout * timeoutCoefficient * 1000
+				timeout: networkTimeout * 1000
 			} );
 
 		} catch ( e ) {
@@ -419,8 +430,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 			await page.evaluate( cleanPage );
 
 			await page.waitForNetworkIdle( {
-				timeout: networkTimeout * timeoutCoefficient * 1000,
-				idleTime: idleTime * timeoutCoefficient * 1000
+				timeout: networkTimeout * 1000,
+				idleTime: idleTime * 1000
 			} );
 
 			await page.evaluate( async ( renderTimeout, parseTime ) => {
@@ -455,7 +466,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				} );
 
-			}, renderTimeout * timeoutCoefficient, page.pageSize / 1024 / 1024 * parseTime * 1000 * timeoutCoefficient );
+			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
 		} catch ( e ) {
 
