@@ -1,7 +1,9 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 import { BoxHelper } from '../../../../src/helpers/BoxHelper.js';
+
+import { LineSegments } from '../../../../src/objects/LineSegments.js';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { SphereGeometry } from '../../../../src/geometries/SphereGeometry.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
@@ -29,9 +31,13 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new BoxHelper();
+			assert.strictEqual(
+				object instanceof LineSegments, true,
+				'BoxHelper extends from LineSegments'
+			);
 
 		} );
 
@@ -42,7 +48,30 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new BoxHelper();
+			assert.ok(
+				object.type === 'BoxHelper',
+				'BoxHelper.type should be BoxHelper'
+			);
+
+		} );
+
+		QUnit.todo( 'object', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'update', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -50,6 +79,18 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		QUnit.todo( 'setFromObject', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'copy', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'dispose', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
