@@ -16,7 +16,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		// STATIC STUFF
+		// STATIC
 		QUnit.todo( 'Composite', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -65,7 +65,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'parseTrackName', ( assert ) => {
 
-			var paths = [
+			const paths = [
 
 				[
 					'.property',
@@ -321,22 +321,22 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'setValue', ( assert ) => {
 
-			var paths = [
+			const paths = [
 				'.material.opacity',
 				'.material[opacity]'
 			];
 
 			paths.forEach( function ( path ) {
 
-				var originalValue = 0;
-				var expectedValue = 1;
+				const originalValue = 0;
+				const expectedValue = 1;
 
-				var geometry = new BoxGeometry();
-				var material = new MeshBasicMaterial();
+				const geometry = new BoxGeometry();
+				const material = new MeshBasicMaterial();
 				material.opacity = originalValue;
-				var mesh = new Mesh( geometry, material );
+				const mesh = new Mesh( geometry, material );
 
-				var binding = new PropertyBinding( mesh, path, null );
+				const binding = new PropertyBinding( mesh, path, null );
 				binding.bind();
 
 				assert.equal(
