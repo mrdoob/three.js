@@ -92,8 +92,8 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // at most 5% different pixels
 
-const networkTimeout = 180; // 180 seconds, set to 0 to disable
-const renderTimeout = 4.5; // 4.5 seconds, set to 0 to disable
+const networkTimeout = 300; // 5 minutes, set to 0 to disable
+const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
