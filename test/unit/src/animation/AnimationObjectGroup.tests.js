@@ -1,6 +1,7 @@
 /* global QUnit */
 
 import { AnimationObjectGroup } from '../../../../src/animation/AnimationObjectGroup.js';
+
 import { Object3D } from '../../../../src/core/Object3D.js';
 import { PropertyBinding } from '../../../../src/animation/PropertyBinding.js';
 

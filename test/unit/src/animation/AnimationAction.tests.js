@@ -1,6 +1,7 @@
 /* global QUnit */
 
 import { AnimationAction } from '../../../../src/animation/AnimationAction.js';
+
 import { AnimationMixer } from '../../../../src/animation/AnimationMixer.js';
 import { AnimationClip } from '../../../../src/animation/AnimationClip.js';
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
