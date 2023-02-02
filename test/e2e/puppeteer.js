@@ -91,8 +91,8 @@ async function main() {
 
 	/* Create output directories */
 
-	try { await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } ) } catch {}
-	try { await fs.mkdir( 'test/e2e/output-screenshots' ) } catch {}
+	try { await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } ); } catch {}
+	try { await fs.mkdir( 'test/e2e/output-screenshots' ); } catch {}
 
 	/* Find files */
 
