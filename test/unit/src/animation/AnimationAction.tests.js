@@ -321,20 +321,26 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'setEffectiveWeight', ( assert ) => {
 
-			let { root, mixer, animationAction } = createAnimation();
+			const { animationAction } = createAnimation();
 			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
 			animationAction.setEffectiveWeight( 0.3 );
 			assert.equal( animationAction.getEffectiveWeight(), 0.3, 'When EffectiveWeight is set to 0.3 , EffectiveWeight is 0.3.' );
 
+		} );
 
-			( { animationAction } = createAnimation() );
+		QUnit.test( 'setEffectiveWeight - disabled', ( assert ) => {
+
+			const { animationAction } = createAnimation();
 			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
 			animationAction.enabled = false;
 			animationAction.setEffectiveWeight( 0.3 );
 			assert.equal( animationAction.getEffectiveWeight(), 0, 'When EffectiveWeight is set to 0.3 when disabled , EffectiveWeight is 0.' );
 
+		} );
 
-			( { root, mixer, animationAction } = createAnimation() );
+		QUnit.test( 'setEffectiveWeight - over duration', ( assert ) => {
+
+			const { root, mixer, animationAction } = createAnimation();
 			animationAction.setEffectiveWeight( 0.5 );
 			animationAction.play();
 			mixer.update( 500 );
