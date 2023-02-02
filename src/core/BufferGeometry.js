@@ -668,11 +668,11 @@ class BufferGeometry extends EventDispatcher {
 
 			if ( index ) {
 
-				for ( let i = 0, il = index.count; i < il; i += 3 ) {
+				for ( let i = 0, il = index.count; i < il; i++ ) {
 
-					const vA = index.getX( i + 0 );
-					const vB = index.getX( i + 1 );
-					const vC = index.getX( i + 2 );
+					const vA = index.getX( i );
+					const vB = index.getY( i );
+					const vC = index.getZ( i );
 
 					pA.fromBufferAttribute( positionAttribute, vA );
 					pB.fromBufferAttribute( positionAttribute, vB );
