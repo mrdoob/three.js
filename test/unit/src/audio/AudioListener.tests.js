@@ -6,9 +6,9 @@ import { Object3D } from '../../../../src/core/Object3D.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	function mockWindowAudioContext() {
+	QUnit.module( 'AudioListener', ( hooks ) => {
 
-		if ( typeof window === 'undefined' ) {
+		function mockWindowAudioContext() {
 
 			global.window = {
 				AudioContext: function () {
@@ -28,9 +28,21 @@ export default QUnit.module( 'Audios', () => {
 
 		}
 
-	}
+		if ( typeof window === 'undefined' ) {
 
-	QUnit.module( 'AudioListener', () => {
+			hooks.before( function () {
+
+				mockWindowAudioContext();
+
+			} );
+
+			hooks.after( function () {
+
+				global.window = undefined;
+
+			} );
+
+		}
 
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
