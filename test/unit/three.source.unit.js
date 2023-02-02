@@ -56,6 +56,7 @@ import './src/core/Layers.tests.js';
 import './src/core/Object3D.tests.js';
 import './src/core/Raycaster.tests.js';
 import './src/core/Uniform.tests.js';
+import './src/core/UniformsGroup.tests.js';
 
 
 //src/extras
