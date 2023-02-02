@@ -1,6 +1,8 @@
 /* global QUnit */
 
 import { LineCurve3 } from '../../../../../src/extras/curves/LineCurve3.js';
+
+import { Curve } from '../../../../../src/extras/core/Curve.js';
 import { Vector3 } from '../../../../../src/math/Vector3.js';
 
 export default QUnit.module( 'Extras', () => {
@@ -25,9 +27,13 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.todo( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new LineCurve3();
+				assert.strictEqual(
+					object instanceof Curve, true,
+					'LineCurve3 extends from Curve'
+				);
 
 			} );
 
@@ -38,10 +44,39 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			// PUBLIC STUFF
-			QUnit.todo( 'isCatmullRomCurve3', ( assert ) => {
+			// PROPERTIES
+			QUnit.test( 'type', ( assert ) => {
 
+				const object = new LineCurve3();
+				assert.ok(
+					object.type === 'LineCurve3',
+					'LineCurve3.type should be LineCurve3'
+				);
+
+			} );
+
+			QUnit.todo( 'v1', ( assert ) => {
+
+				// Vector3 exists
 				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'v2', ( assert ) => {
+
+				// Vector3 exists
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			// PUBLIC
+			QUnit.test( 'isLineCurve3', ( assert ) => {
+
+				const object = new LineCurve3();
+				assert.ok(
+					object.isLineCurve3,
+					'LineCurve3.isLineCurve3 should be true'
+				);
 
 			} );
 
@@ -70,6 +105,24 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				assert.deepEqual( points, expectedPoints, 'Correct getPointAt points' );
+
+			} );
+
+			QUnit.todo( 'copy', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'toJSON', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'fromJSON', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

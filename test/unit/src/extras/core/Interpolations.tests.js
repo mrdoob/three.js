@@ -8,7 +8,7 @@ export default QUnit.module( 'Extras', () => {
 
 		QUnit.module( 'Interpolations', () => {
 
-			// PUBLIC STUFF
+			// PUBLIC
 			QUnit.todo( 'CatmullRom', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );

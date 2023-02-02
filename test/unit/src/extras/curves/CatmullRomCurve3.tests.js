@@ -1,6 +1,8 @@
 /* global QUnit */
 
 import { CatmullRomCurve3 } from '../../../../../src/extras/curves/CatmullRomCurve3.js';
+
+import { Curve } from '../../../../../src/extras/core/Curve.js';
 import { Vector3 } from '../../../../../src/math/Vector3.js';
 
 export default QUnit.module( 'Extras', () => {
@@ -20,9 +22,13 @@ export default QUnit.module( 'Extras', () => {
 			/* eslint-enable */
 
 			// INHERITANCE
-			QUnit.todo( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new CatmullRomCurve3();
+				assert.strictEqual(
+					object instanceof Curve, true,
+					'CatmullRomCurve3 extends from Curve'
+				);
 
 			} );
 
@@ -33,14 +39,71 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			// PUBLIC STUFF
-			QUnit.todo( 'isCatmullRomCurve3', ( assert ) => {
+			// PROPERTIES
+			QUnit.test( 'type', ( assert ) => {
+
+				const object = new CatmullRomCurve3();
+				assert.ok(
+					object.type === 'CatmullRomCurve3',
+					'CatmullRomCurve3.type should be CatmullRomCurve3'
+				);
+
+			} );
+
+			QUnit.todo( 'points', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
+			QUnit.todo( 'closed', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'curveType', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'tension', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			// PUBLIC
+			QUnit.test( 'isCatmullRomCurve3', ( assert ) => {
+
+				const object = new CatmullRomCurve3();
+				assert.ok(
+					object.isCatmullRomCurve3,
+					'CatmullRomCurve3.isCatmullRomCurve3 should be true'
+				);
+
+			} );
+
 			QUnit.todo( 'getPoint', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'copy', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'toJSON', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'fromJSON', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 

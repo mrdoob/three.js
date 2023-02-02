@@ -60,6 +60,9 @@ import './src/core/Uniform.tests.js';
 
 //src/extras
 import './src/extras/DataUtils.tests.js';
+import './src/extras/Earcut.tests.js';
+import './src/extras/ImageUtils.tests.js';
+import './src/extras/PMREMGenerator.tests.js';
 import './src/extras/ShapeUtils.tests.js';
 
 //src/extras/core
