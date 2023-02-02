@@ -15,9 +15,11 @@ export default QUnit.module( 'Objects', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var mesh = new Mesh();
-
-			assert.strictEqual( mesh instanceof Object3D, true, 'Mesh extends from Object3D' );
+			const mesh = new Mesh();
+			assert.strictEqual(
+				mesh instanceof Object3D, true,
+				'Mesh extends from Object3D'
+			);
 
 		} );
 
