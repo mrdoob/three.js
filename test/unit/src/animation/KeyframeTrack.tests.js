@@ -14,14 +14,26 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		// STATIC STUFF
-		QUnit.todo( 'toJSON', ( assert ) => {
+		// PROPERTIES
+		QUnit.todo( 'name', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
+		QUnit.todo( 'times', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'values', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PROPERTIES - PROTOTYPE
 		QUnit.todo( 'TimeBufferType', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -40,6 +52,15 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		// STATIC
+		QUnit.todo( 'toJSON', ( assert ) => {
+
+			// static method toJSON
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'InterpolantFactoryMethodDiscrete', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -117,6 +138,12 @@ export default QUnit.module( 'Animation', () => {
 
 			assert.smartEqual( Array.from( track.times ), [ 0, 3, 4 ] );
 			assert.smartEqual( Array.from( track.values ), [ 0, 0, 1 ] );
+
+		} );
+
+		QUnit.todo( 'clone', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
