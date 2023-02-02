@@ -9,8 +9,8 @@ import fetch from 'node-fetch';
 
 /* CONFIG VARIABLES START */
 
-const idleTime = 3; // 3 seconds - for how long there should be no network requests
-const parseTime = 2; // 2 seconds per megabyte
+const idleTime = 9; // 9 seconds - for how long there should be no network requests
+const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
 
@@ -61,10 +61,10 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // at most 5% failed pixels
 
-const networkTimeout = 30; // 30 seconds, set to 0 to disable
-const renderTimeout = 1.5; // 1.5 seconds, set to 0 to disable
+const networkTimeout = 90; // 90 seconds, set to 0 to disable
+const renderTimeout = 4.5; // 4.5 seconds, set to 0 to disable
 
-const numAttempts = 3; // perform 3 progressive attempts before failing
+const numAttempts = 2; // perform 2 attempts before failing
 
 const numCIJobs = 8; // GitHub Actions run the script in 8 threads
 
@@ -338,8 +338,6 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
 
-	const timeoutCoefficient = attemptID + 1;
-
 	try {
 
 		page.file = file;
@@ -352,7 +350,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
-				timeout: networkTimeout * timeoutCoefficient * 1000
+				timeout: networkTimeout * 1000
 			} );
 
 		} catch ( e ) {
@@ -368,8 +366,8 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 			await page.evaluate( cleanPage );
 
 			await page.waitForNetworkIdle( {
-				timeout: networkTimeout * timeoutCoefficient * 1000,
-				idleTime: idleTime * timeoutCoefficient * 1000
+				timeout: networkTimeout * 1000,
+				idleTime: idleTime * 1000
 			} );
 
 			await page.evaluate( async ( renderTimeout, parseTime ) => {
@@ -404,7 +402,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 				} );
 
-			}, renderTimeout * timeoutCoefficient, page.pageSize / 1024 / 1024 * parseTime * 1000 * timeoutCoefficient );
+			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
 
 		} catch ( e ) {
 
