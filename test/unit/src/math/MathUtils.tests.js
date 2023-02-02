@@ -9,8 +9,8 @@ export default QUnit.module( 'Maths', () => {
 		// PUBLIC STUFF
 		QUnit.test( 'generateUUID', ( assert ) => {
 
-			var a = MathUtils.generateUUID();
-			var regex = /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{12}/i;
+			const a = MathUtils.generateUUID();
+			const regex = /[A-Z0-9]{8}-[A-Z0-9]{4}-4[A-Z0-9]{3}-[A-Z0-9]{4}-[A-Z0-9]{12}/i;
 			// note the fixed '4' here ----------^
 
 			assert.ok( regex.test( a ), 'Generated UUID matches the expected pattern' );
@@ -103,8 +103,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'randInt', ( assert ) => {
 
-			var low = 1, high = 3;
-			var a = MathUtils.randInt( low, high );
+			const low = 1, high = 3;
+			const a = MathUtils.randInt( low, high );
 
 			assert.ok( a >= low, 'Value equal to or higher than lower limit' );
 			assert.ok( a <= high, 'Value equal to or lower than upper limit' );
@@ -113,8 +113,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'randFloat', ( assert ) => {
 
-			var low = 1, high = 3;
-			var a = MathUtils.randFloat( low, high );
+			const low = 1, high = 3;
+			const a = MathUtils.randFloat( low, high );
 
 			assert.ok( a >= low, 'Value equal to or higher than lower limit' );
 			assert.ok( a <= high, 'Value equal to or lower than upper limit' );
@@ -123,7 +123,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'randFloatSpread', ( assert ) => {
 
-			var a = MathUtils.randFloatSpread( 3 );
+			const a = MathUtils.randFloatSpread( 3 );
 
 			assert.ok( a > - 3 / 2, 'Value higher than lower limit' );
 			assert.ok( a < 3 / 2, 'Value lower than upper limit' );
