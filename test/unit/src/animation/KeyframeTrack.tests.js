@@ -1,6 +1,7 @@
 /* global QUnit */
 
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
+
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Animation', () => {
@@ -117,8 +118,8 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'validate', ( assert ) => {
 
-			var validTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 0.5 ] );
-			var invalidTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
+			const validTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 0.5 ] );
+			const invalidTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
 
 			assert.ok( validTrack.validate() );
 
@@ -130,7 +131,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'optimize', ( assert ) => {
 
-			var track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2, 3, 4 ], [ 0, 0, 0, 0, 1 ] );
+			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2, 3, 4 ], [ 0, 0, 0, 0, 1 ] );
 
 			assert.equal( track.values.length, 5 );
 
