@@ -45,8 +45,6 @@ export default QUnit.module( 'Audios', () => {
 		// STATIC
 		QUnit.test( 'getContext', ( assert ) => {
 
-			mockWindowAudioContext();
-
 			const context = AudioContext.getContext();
 			assert.strictEqual(
 				context instanceof Object, true,

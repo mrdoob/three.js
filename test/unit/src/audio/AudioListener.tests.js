@@ -47,8 +47,6 @@ export default QUnit.module( 'Audios', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			mockWindowAudioContext();
-
 			const object = new AudioListener();
 			assert.strictEqual(
 				object instanceof Object3D, true,
