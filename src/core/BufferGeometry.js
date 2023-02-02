@@ -668,7 +668,7 @@ class BufferGeometry extends EventDispatcher {
 
 			if ( index ) {
 
-				for ( let i = 0, il = index.count; i < il; i++ ) {
+				for ( let i = 0, il = index.count; i < il; i ++ ) {
 
 					const vA = index.getX( i );
 					const vB = index.getY( i );
