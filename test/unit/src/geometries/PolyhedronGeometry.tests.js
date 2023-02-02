@@ -1,20 +1,22 @@
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 import { PolyhedronGeometry } from '../../../../src/geometries/PolyhedronGeometry.js';
+
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { runStdGeometryTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Geometries', () => {
 
 	QUnit.module( 'PolyhedronGeometry', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
 		hooks.beforeEach( function () {
 
-			var vertices = [
+			const vertices = [
 				1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
 			];
 
-			var indices = [
+			const indices = [
 				2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
 			];
 
@@ -25,14 +27,42 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new PolyhedronGeometry();
+			assert.strictEqual(
+				object instanceof BufferGeometry, true,
+				'PolyhedronGeometry extends from BufferGeometry'
+			);
 
 		} );
 
 		// INSTANCING
 		QUnit.todo( 'Instancing', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new PolyhedronGeometry();
+			assert.ok(
+				object.type === 'PolyhedronGeometry',
+				'PolyhedronGeometry.type should be PolyhedronGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'parameters', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// STATIC
+		QUnit.todo( 'fromJSON', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
