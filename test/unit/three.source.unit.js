@@ -47,6 +47,7 @@ import './src/core/BufferAttribute.tests.js';
 import './src/core/BufferGeometry.tests.js';
 import './src/core/Clock.tests.js';
 import './src/core/EventDispatcher.tests.js';
+import './src/core/GLBufferAttribute.tests.js';
 import './src/core/InstancedBufferAttribute.tests.js';
 import './src/core/InstancedBufferGeometry.tests.js';
 import './src/core/InstancedInterleavedBuffer.tests.js';
