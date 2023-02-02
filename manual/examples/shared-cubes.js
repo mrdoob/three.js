@@ -8,7 +8,7 @@ export const state = {
 export function init( data ) { /* eslint-disable-line no-unused-vars */
 
 	const { canvas } = data;
-	const renderer = new THREE.WebGLRenderer( { canvas } );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
 
 	state.width = canvas.width;
 	state.height = canvas.height;

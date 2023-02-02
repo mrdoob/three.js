@@ -67,7 +67,7 @@ import {TrackballControls} from 'three/addons/controls/TrackballControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas, alpha: true});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas, alpha: true});
 
   const sceneElements = [];
   function addScene(elem, fn) {

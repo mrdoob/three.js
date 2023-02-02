@@ -47,7 +47,7 @@ import * as THREE from 'three';
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas: canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas: canvas});
   renderer.setClearColor(0xAAAAAA);
   renderer.shadowMap.enabled = true;
 
