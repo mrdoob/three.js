@@ -92,7 +92,7 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.05; // at most 5% different pixels
 
-const networkTimeout = 300; // 5 minutes, set to 0 to disable
+const networkTimeout = 10; // 10 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
@@ -414,7 +414,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
-				timeout: networkTimeout * 1000
+				timeout: networkTimeout * 60000
 			} );
 
 		} catch ( e ) {
@@ -430,7 +430,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 			await page.evaluate( cleanPage );
 
 			await page.waitForNetworkIdle( {
-				timeout: networkTimeout * 1000,
+				timeout: networkTimeout * 60000,
 				idleTime: idleTime * 1000
 			} );
 
