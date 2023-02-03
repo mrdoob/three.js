@@ -21,7 +21,8 @@ import {
 	LinearFilter,
 	ClampToEdgeWrapping,
 	RepeatWrapping,
-	TextureLoader
+	TextureLoader,
+	DoubleSide
 } from 'three';
 
 const _taskCache = new WeakMap();
@@ -222,7 +223,7 @@ class Rhino3dmLoader extends Loader {
 				color: new Color( 1, 1, 1 ),
 				metalness: 0.8,
 				name: 'default',
-				side: 2
+				side: DoubleSide
 			} );
 
 		}
@@ -244,7 +245,7 @@ class Rhino3dmLoader extends Loader {
 		const mat = new MeshStandardMaterial( {
 			color: diffusecolor,
 			name: material.name,
-			side: 2,
+			side: DoubleSide,
 			transparent: material.transparency > 0 ? true : false,
 			opacity: 1.0 - material.transparency
 		} );
@@ -418,7 +419,7 @@ class Rhino3dmLoader extends Loader {
 					const xf = iRef.geometry.xform.array;
 
 					const matrix = new Matrix4();
-          			matrix.set( xf[ 0 ], xf[ 1 ], xf[ 2 ], xf[ 3 ], xf[ 4 ], xf[ 5 ], xf[ 6 ], xf[ 7 ], xf[ 8 ], xf[ 9 ], xf[ 10 ], xf[ 11 ], xf[ 12 ], xf[ 13 ], xf[ 14 ], xf[ 15 ] );
+					matrix.set( xf[ 0 ], xf[ 1 ], xf[ 2 ], xf[ 3 ], xf[ 4 ], xf[ 5 ], xf[ 6 ], xf[ 7 ], xf[ 8 ], xf[ 9 ], xf[ 10 ], xf[ 11 ], xf[ 12 ], xf[ 13 ], xf[ 14 ], xf[ 15 ] );
 
 					iRefObject.applyMatrix4( matrix );
 
