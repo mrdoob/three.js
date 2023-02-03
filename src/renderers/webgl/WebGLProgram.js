@@ -684,6 +684,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'uniform vec3 cameraPosition;',
 			'uniform bool isOrthographic;',
 
+			parameters.velocity ? 'varying vec4 clipPositionCurrent;' : '',
+			parameters.velocity ? 'varying vec4 clipPositionPrevious;' : '',
+
 			( parameters.toneMapping !== NoToneMapping ) ? '#define TONE_MAPPING' : '',
 			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '', // this code is required here because it is used by the toneMapping() function defined below
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( 'toneMapping', parameters.toneMapping ) : '',
@@ -745,7 +748,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		// Multiview
 
 		if ( numMultiviewViews > 0 ) {
-
+			
 			prefixVertex = 	[
 				'#extension GL_OVR_multiview : require',
 				'layout(num_views = ' + numMultiviewViews + ') in;',
@@ -793,7 +796,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	const fragmentGlsl = versionString + prefixFragment + fragmentShader;
 
 	console.log( '*VERTEX*', vertexGlsl );
-	// console.log( '*FRAGMENT*', fragmentGlsl );
+	console.log( '*FRAGMENT*', fragmentGlsl );
 
 	const glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 	const glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );

@@ -69,6 +69,8 @@ class Material extends EventDispatcher {
 
 		this.toneMapped = true;
 
+		this.velocity = false;
+
 		this.userData = {};
 
 		this.version = 0;
@@ -357,6 +359,10 @@ class Material extends EventDispatcher {
 
 		if ( this.toneMapped === false ) data.toneMapped = false;
 
+		if ( this.velocity === true ) data.velocity = true;
+		if ( this.previousModelMatrix !== undefined ) data.previousModelMatrix = this.previousModelMatrix;
+		if ( this.previousViewMatrices !== undefined ) data.previousViewMatrices = this.previousViewMatrices;
+
 		if ( this.fog === false ) data.fog = false;
 
 		if ( Object.keys( this.userData ).length > 0 ) data.userData = this.userData;
@@ -469,6 +475,8 @@ class Material extends EventDispatcher {
 		this.visible = source.visible;
 
 		this.toneMapped = source.toneMapped;
+
+		this.velocity = source.velocity;
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 

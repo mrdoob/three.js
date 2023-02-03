@@ -8,13 +8,10 @@ import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebGLMultiviewRenderTarget } from '../WebGLMultiviewRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
-import { UniformsUtils } from '../shaders/UniformsUtils.js';
+import { VelocityMaterial } from '../../materials/VelocityMaterial.js';
 import {
 	DepthFormat,
 	DepthStencilFormat,
-	DoubleSide,
-	FrontSide,
 	HalfFloatType,
 	RGBAFormat,
 	UnsignedByteType,
@@ -46,7 +43,6 @@ class WebXRManager extends EventDispatcher {
 		let initialRenderTarget = null;
 		let newRenderTarget = null;
 		let velocityRenderTarget = null;
-		let velocityShader = null;
 		let isRenderingSpaceWarp = false;
 
 		const controllers = [];
@@ -261,13 +257,8 @@ class WebXRManager extends EventDispatcher {
 			session = value;
 
 			if ( session !== null ) {
-				if (velocityShader === null) {
 
-					const velocityShaderModule = await import('three/addons/shaders/VelocityShader.js');
-					velocityShader = velocityShaderModule['VelocityShader'];
-
-				}
-				session.updateTargetFrameRate(120);
+				session.updateTargetFrameRate( 120 );
 
 				initialRenderTarget = renderer.getRenderTarget();
 
@@ -758,24 +749,23 @@ class WebXRManager extends EventDispatcher {
 
 			if ( onAnimationFrameCallback ) onAnimationFrameCallback( time, frame );
 
-			if (onVelocityCallback) {
+			if ( onVelocityCallback ) {
 
 				isRenderingSpaceWarp = true;
 
-				if (velocityRenderTarget === null) {
+				if ( velocityRenderTarget === null ) {
 
 					const rtOptions = {
 						format: RGBAFormat,
 						type: HalfFloatType,
-						depthTexture: new DepthTexture( glSubImage.depthStencilTextureWidth, glSubImage.textureHeight, UnsignedInt248Type, undefined, undefined, undefined, undefined, undefined, undefined, DepthFormat  ),
+						depthTexture: new DepthTexture( glSubImage.depthStencilTextureWidth, glSubImage.textureHeight, UnsignedInt248Type, undefined, undefined, undefined, undefined, undefined, undefined, DepthFormat ),
 						stencilBuffer: attributes.stencil,
 						encoding: renderer.outputEncoding,
 						samples: 0
 					};
 
-					const extension = extensions.get( 'OCULUS_multiview' );
-
 					velocityRenderTarget = new WebGLMultiviewRenderTarget( glSubImage.motionVectorTextureWidth, glSubImage.motionVectorTextureHeight, 2, rtOptions );
+
 				}
 
 				renderer.setRenderTargetTextures(
@@ -785,8 +775,8 @@ class WebXRManager extends EventDispatcher {
 
 				renderer.setRenderTarget( velocityRenderTarget );
 
-				cameraVR.cameras[0].viewport.set( 0, 0, glSubImage.motionVectorTextureWidth, glSubImage.motionVectorTextureHeight );
-				cameraVR.cameras[1].viewport.set( 0, 0, glSubImage.motionVectorTextureWidth, glSubImage.motionVectorTextureHeight );
+				cameraVR.cameras[ 0 ].viewport.set( 0, 0, glSubImage.motionVectorTextureWidth, glSubImage.motionVectorTextureHeight );
+				cameraVR.cameras[ 1 ].viewport.set( 0, 0, glSubImage.motionVectorTextureWidth, glSubImage.motionVectorTextureHeight );
 
 				onVelocityCallback( time, frame );
 
@@ -859,16 +849,15 @@ class WebXRManager extends EventDispatcher {
 
 		this.spaceWarpOnBeforeRender = function ( object, material ) {
 
-			if (isRenderingSpaceWarp === false) {
+			if ( isRenderingSpaceWarp === false ) {
+
 				return material;
+
 			}
 
-			if (object._velocityMaterial === undefined) {
+			if ( object._velocityMaterial === undefined ) {
 
-				object._velocityMaterial = new ShaderMaterial( {
-					uniforms: UniformsUtils.clone( velocityShader.uniforms ),
-					vertexShader: velocityShader.vertexShader,
-					fragmentShader: velocityShader.fragmentShader,
+				object._velocityMaterial = new VelocityMaterial( {
 					side: material.side
 				} );
 
@@ -878,19 +867,21 @@ class WebXRManager extends EventDispatcher {
 
 			return object._velocityMaterial;
 
-		}
+		};
 
-		this.spaceWarpOnAfterRender = function( object ) {
+		this.spaceWarpOnAfterRender = function ( object ) {
 
-			if (isRenderingSpaceWarp === false) {
+			if ( isRenderingSpaceWarp === false ) {
+
 				return;
+
 			}
 
-			object._velocityMaterial.uniforms.previousViewMatrix.value[0].copy( cameraVR.cameras[0].matrixWorldInverse );
-			object._velocityMaterial.uniforms.previousViewMatrix.value[1].copy( cameraVR.cameras[1].matrixWorldInverse );
-			object._velocityMaterial.uniforms.previousModelMatrix.value.copy( object.matrixWorld );
-			
-		}
+			object._velocityMaterial.previousViewMatrices[ 0 ].copy( cameraVR.cameras[ 0 ].matrixWorldInverse );
+			object._velocityMaterial.previousViewMatrices[ 1 ].copy( cameraVR.cameras[ 1 ].matrixWorldInverse );
+			object._velocityMaterial.previousModelMatrix.copy( object.matrixWorld );
+
+		};
 
 		const animation = new WebGLAnimation();
 

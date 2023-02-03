@@ -31,7 +31,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		LineDashedMaterial: 'dashed',
 		PointsMaterial: 'points',
 		ShadowMaterial: 'shadow',
-		SpriteMaterial: 'sprite'
+		SpriteMaterial: 'sprite',
+		VelocityMaterial: 'velocity'
 	};
 
 	function getParameters( material, lights, shadows, scene, object ) {
@@ -222,6 +223,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
 			physicallyCorrectLights: renderer.physicallyCorrectLights,
+
+			velocity: material.isVelocityMaterial === true,
 
 			premultipliedAlpha: material.premultipliedAlpha,
 
