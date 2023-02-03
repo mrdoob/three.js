@@ -89,7 +89,7 @@ self.onmessage = function(e) {
 -  const canvas = document.querySelector('#c');
 +function main(data) {
 +  const {canvas} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
   ...
 </pre>
@@ -240,7 +240,7 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 -function main(data) {
 +export function init(data) {
   const {canvas} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 </pre>
 <p>и вырезать только части, не относящиеся к three.js</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
@@ -634,7 +634,7 @@ self.onmessage = function(e) {
 export function init(data) {
 -  const {canvas} = data;
 +  const {canvas, inputElement} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
 +  const controls = new OrbitControls(camera, inputElement);
 +  controls.target.set(0, 0, 0);

@@ -103,7 +103,7 @@ outは関数が値を提供する事を意味するパラメーターです。
 かなり短いコードなので全体を紹介します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
   renderer.autoClearColor = false;
 
   const camera = new THREE.OrthographicCamera(

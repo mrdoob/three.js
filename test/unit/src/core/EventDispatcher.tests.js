@@ -13,12 +13,12 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PUBLIC STUFF
+		// PUBLIC
 		QUnit.test( 'addEventListener', ( assert ) => {
 
-			var eventDispatcher = new EventDispatcher();
+			const eventDispatcher = new EventDispatcher();
 
-			var listener = {};
+			const listener = {};
 			eventDispatcher.addEventListener( 'anyType', listener );
 
 			assert.ok( eventDispatcher._listeners.anyType.length === 1, 'listener with unknown type was added' );
@@ -33,9 +33,9 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'hasEventListener', ( assert ) => {
 
-			var eventDispatcher = new EventDispatcher();
+			const eventDispatcher = new EventDispatcher();
 
-			var listener = {};
+			const listener = {};
 			eventDispatcher.addEventListener( 'anyType', listener );
 
 			assert.ok( eventDispatcher.hasEventListener( 'anyType', listener ), 'listener was found' );
@@ -45,9 +45,9 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'removeEventListener', ( assert ) => {
 
-			var eventDispatcher = new EventDispatcher();
+			const eventDispatcher = new EventDispatcher();
 
-			var listener = {};
+			const listener = {};
 
 			assert.ok( eventDispatcher._listeners === undefined, 'there are no listeners by default' );
 
@@ -68,10 +68,10 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'dispatchEvent', ( assert ) => {
 
-			var eventDispatcher = new EventDispatcher();
+			const eventDispatcher = new EventDispatcher();
 
-			var callCount = 0;
-			var listener = function () {
+			let callCount = 0;
+			const listener = function () {
 
 				callCount ++;
 

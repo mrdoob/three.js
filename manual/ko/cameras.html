@@ -325,8 +325,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <p>한 가지 해결책은 Three.js에게 픽셀의 앞 뒤를 결정할 때 다른 방법을 쓰도록 설정하는
 것입니다. <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성할 때 <code class="notranslate" translate="no">logarithmicDepthBuffer</code> 속성을 활성화해주면
 되죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
++  antialias: true,
 +  canvas,
 +  logarithmicDepthBuffer: true,
 +});

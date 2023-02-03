@@ -320,8 +320,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
 <p>1つ目の解決策はどのピクセルが前後にあるかを計算するために、three.jsの別メソッドを使用します。
 これは <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> の作成時に <code class="notranslate" translate="no">logarithmicDepthBuffer</code> を有効にします。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
++  antialias: true,
 +  canvas,
 +  logarithmicDepthBuffer: true,
 +});

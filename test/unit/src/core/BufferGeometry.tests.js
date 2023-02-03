@@ -1,6 +1,7 @@
 /* global QUnit */
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+
 import {
 	BufferAttribute,
 	Uint16BufferAttribute,
@@ -11,8 +12,9 @@ import { Matrix4 } from '../../../../src/math/Matrix4.js';
 import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
 import { x, y, z } from '../../utils/math-constants.js';
+import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
 
-var DegToRad = Math.PI / 180;
+const DegToRad = Math.PI / 180;
 
 function bufferAttributeEquals( a, b, tolerance ) {
 
@@ -24,9 +26,9 @@ function bufferAttributeEquals( a, b, tolerance ) {
 
 	}
 
-	for ( var i = 0, il = a.count * a.itemSize; i < il; i ++ ) {
+	for ( let i = 0, il = a.count * a.itemSize; i < il; i ++ ) {
 
-		var delta = a[ i ] - b[ i ];
+		const delta = a[ i ] - b[ i ];
 		if ( delta > tolerance ) {
 
 			return false;
@@ -41,7 +43,7 @@ function bufferAttributeEquals( a, b, tolerance ) {
 
 function getBBForVertices( vertices ) {
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 
 	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
 	geometry.computeBoundingBox();
@@ -52,7 +54,7 @@ function getBBForVertices( vertices ) {
 
 function getBSForVertices( vertices ) {
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 
 	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
 	geometry.computeBoundingSphere();
@@ -63,7 +65,7 @@ function getBSForVertices( vertices ) {
 
 function getNormalsForVertices( vertices, assert ) {
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 
 	geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
 
@@ -80,9 +82,13 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'BufferGeometry', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new BufferGeometry();
+			assert.strictEqual(
+				object instanceof EventDispatcher, true,
+				'BufferGeometry extends from EventDispatcher'
+			);
 
 		} );
 
@@ -93,19 +99,106 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isBufferGeometry', ( assert ) => {
+		// PROPERTIES
+		QUnit.todo( 'id', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
+		QUnit.todo( 'uuid', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'name', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new BufferGeometry();
+			assert.ok(
+				object.type === 'BufferGeometry',
+				'BufferGeometry.type should be BufferGeometry'
+			);
+
+		} );
+
+		QUnit.todo( 'index', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'attributes', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'morphAttributes', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'morphTargetsRelative', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'groups', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'boundingBox', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'boundingSphere', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'drawRange', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'userData', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isBufferGeometry', ( assert ) => {
+
+			const object = new BufferGeometry();
+			assert.ok(
+				object.isBufferGeometry,
+				'BufferGeometry.isBufferGeometry should be true'
+			);
+
+		} );
+
 		QUnit.test( 'setIndex/getIndex', ( assert ) => {
 
-			var a = new BufferGeometry();
-			var uint16 = [ 1, 2, 3 ];
-			var uint32 = [ 65535, 65536, 65537 ];
-			var str = 'foo';
+			const a = new BufferGeometry();
+			const uint16 = [ 1, 2, 3 ];
+			const uint32 = [ 65535, 65536, 65537 ];
+			const str = 'foo';
 
 			a.setIndex( uint16 );
 			assert.ok( a.getIndex() instanceof Uint16BufferAttribute, 'Index has the right type' );
@@ -128,8 +221,8 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'set / delete Attribute', ( assert ) => {
 
-			var geometry = new BufferGeometry();
-			var attributeName = 'position';
+			const geometry = new BufferGeometry();
+			const attributeName = 'position';
 
 			assert.ok( geometry.attributes[ attributeName ] === undefined, 'no attribute defined' );
 
@@ -145,8 +238,8 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'addGroup', ( assert ) => {
 
-			var a = new BufferGeometry();
-			var expected = [
+			const a = new BufferGeometry();
+			const expected = [
 				{
 					start: 0,
 					count: 1,
@@ -176,7 +269,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'setDrawRange', ( assert ) => {
 
-			var a = new BufferGeometry();
+			const a = new BufferGeometry();
 
 			a.setDrawRange( 1.0, 7 );
 
@@ -189,10 +282,10 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'applyMatrix4', ( assert ) => {
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( 6 ), 3 ) );
 
-			var matrix = new Matrix4().set(
+			const matrix = new Matrix4().set(
 				1, 0, 0, 1.5,
 				0, 1, 0, - 2,
 				0, 0, 1, 3,
@@ -200,8 +293,8 @@ export default QUnit.module( 'Core', () => {
 			);
 			geometry.applyMatrix4( matrix );
 
-			var position = geometry.attributes.position.array;
-			var m = matrix.elements;
+			const position = geometry.attributes.position.array;
+			const m = matrix.elements;
 			assert.ok( position[ 0 ] === m[ 12 ] && position[ 1 ] === m[ 13 ] && position[ 2 ] === m[ 14 ], 'position was extracted from matrix' );
 			assert.ok( position[ 3 ] === m[ 12 ] && position[ 4 ] === m[ 13 ] && position[ 5 ] === m[ 14 ], 'position was extracted from matrix twice' );
 			assert.ok( geometry.attributes.position.version === 1, 'version was increased during update' );
@@ -210,13 +303,13 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'applyQuaternion', ( assert ) => {
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
 
-			var q = new Quaternion( 0.5, 0.5, 0.5, 0.5 );
+			const q = new Quaternion( 0.5, 0.5, 0.5, 0.5 );
 			geometry.applyQuaternion( q );
 
-			var pos = geometry.attributes.position.array;
+			const pos = geometry.attributes.position.array;
 
 			// geometry was rotated around the (1, 1, 1) axis.
 			assert.ok( pos[ 0 ] === 3 && pos[ 1 ] === 1 && pos[ 2 ] === 2 &&
@@ -226,10 +319,10 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'rotateX/Y/Z', ( assert ) => {
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
 
-			var pos = geometry.attributes.position.array;
+			const pos = geometry.attributes.position.array;
 
 			geometry.rotateX( 180 * DegToRad );
 
@@ -253,10 +346,10 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'translate', ( assert ) => {
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
 
-			var pos = geometry.attributes.position.array;
+			const pos = geometry.attributes.position.array;
 
 			geometry.translate( 10, 20, 30 );
 
@@ -267,10 +360,10 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'scale', ( assert ) => {
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [ - 1, - 1, - 1, 2, 2, 2 ] ), 3 ) );
 
-			var pos = geometry.attributes.position.array;
+			const pos = geometry.attributes.position.array;
 
 			geometry.scale( 1, 2, 3 );
 
@@ -281,8 +374,8 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'lookAt', ( assert ) => {
 
-			var a = new BufferGeometry();
-			var vertices = new Float32Array( [
+			const a = new BufferGeometry();
+			const vertices = new Float32Array( [
 				- 1.0, - 1.0, 1.0,
 				1.0, - 1.0, 1.0,
 				1.0, 1.0, 1.0,
@@ -293,8 +386,8 @@ export default QUnit.module( 'Core', () => {
 			] );
 			a.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
-			var sqrt = Math.sqrt( 2 );
-			var expected = new Float32Array( [
+			const sqrt = Math.sqrt( 2 );
+			const expected = new Float32Array( [
 				1, 0, - sqrt,
 				- 1, 0, - sqrt,
 				- 1, sqrt, 0,
@@ -312,7 +405,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'center', ( assert ) => {
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( [
 				- 1, - 1, - 1,
 				1, 1, 1,
@@ -321,7 +414,7 @@ export default QUnit.module( 'Core', () => {
 
 			geometry.center();
 
-			var pos = geometry.attributes.position.array;
+			const pos = geometry.attributes.position.array;
 
 			// the boundingBox should go from (-1, -1, -1) to (4, 4, 4) so it has a size of (5, 5, 5)
 			// after centering it the vertices should be placed between (-2.5, -2.5, -2.5) and (2.5, 2.5, 2.5)
@@ -331,14 +424,20 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.todo( 'setFromPoints', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'computeBoundingBox', ( assert ) => {
 
-			var bb = getBBForVertices( [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ] );
+			let bb = getBBForVertices( [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ] );
 
 			assert.ok( bb.min.x === - 4 && bb.min.y === - 20 && bb.min.z === - 3.5, 'min values are set correctly' );
 			assert.ok( bb.max.x === 13 && bb.max.y === 5 && bb.max.z === 6, 'max values are set correctly' );
 
-			var bb = getBBForVertices( [ - 1, - 1, - 1 ] );
+			bb = getBBForVertices( [ - 1, - 1, - 1 ] );
 
 			assert.ok( bb.min.x === bb.max.x && bb.min.y === bb.max.y && bb.min.z === bb.max.z, 'since there is only one vertex, max and min are equal' );
 			assert.ok( bb.min.x === - 1 && bb.min.y === - 1 && bb.min.z === - 1, 'since there is only one vertex, min and max are this vertex' );
@@ -347,23 +446,29 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'computeBoundingSphere', ( assert ) => {
 
-			var bs = getBSForVertices( [ - 10, 0, 0, 10, 0, 0 ] );
+			let bs = getBSForVertices( [ - 10, 0, 0, 10, 0, 0 ] );
 
 			assert.ok( bs.radius === 10, 'radius is equal to deltaMinMax / 2' );
 			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
 
-			var bs = getBSForVertices( [ - 5, 11, - 3, 5, - 11, 3 ] );
-			var radius = new Vector3( 5, 11, 3 ).length();
+			bs = getBSForVertices( [ - 5, 11, - 3, 5, - 11, 3 ] );
+			const radius = new Vector3( 5, 11, 3 ).length();
 
 			assert.ok( bs.radius === radius, 'radius is equal to directionLength' );
 			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
 
 		} );
 
+		QUnit.todo( 'computeTangents', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'computeVertexNormals', ( assert ) => {
 
 			// get normals for a counter clockwise created triangle
-			var normals = getNormalsForVertices( [ - 1, 0, 0, 1, 0, 0, 0, 1, 0 ], assert );
+			let normals = getNormalsForVertices( [ - 1, 0, 0, 1, 0, 0, 0, 1, 0 ], assert );
 
 			assert.ok( normals[ 0 ] === 0 && normals[ 1 ] === 0 && normals[ 2 ] === 1,
 				'first normal is pointing to screen since the the triangle was created counter clockwise' );
@@ -375,7 +480,7 @@ export default QUnit.module( 'Core', () => {
 				'third normal is pointing to screen since the the triangle was created counter clockwise' );
 
 			// get normals for a clockwise created triangle
-			var normals = getNormalsForVertices( [ 1, 0, 0, - 1, 0, 0, 0, 1, 0 ], assert );
+			normals = getNormalsForVertices( [ 1, 0, 0, - 1, 0, 0, 0, 1, 0 ], assert );
 
 			assert.ok( normals[ 0 ] === 0 && normals[ 1 ] === 0 && normals[ 2 ] === - 1,
 				'first normal is pointing to screen since the the triangle was created clockwise' );
@@ -386,7 +491,7 @@ export default QUnit.module( 'Core', () => {
 			assert.ok( normals[ 6 ] === 0 && normals[ 7 ] === 0 && normals[ 8 ] === - 1,
 				'third normal is pointing to screen since the the triangle was created clockwise' );
 
-			var normals = getNormalsForVertices( [ 0, 0, 1, 0, 0, - 1, 1, 1, 0 ], assert );
+			normals = getNormalsForVertices( [ 0, 0, 1, 0, 0, - 1, 1, 1, 0 ], assert );
 
 			// the triangle is rotated by 45 degrees to the right so the normals of the three vertices
 			// should point to (1, -1, 0).normalized(). The simplest solution is to check against a normalized
@@ -394,37 +499,38 @@ export default QUnit.module( 'Core', () => {
 			// valid technique is to create a vector which stands in 90 degrees to the normals and calculate the
 			// dot product which is the cos of the angle between them. This should be < floating calculation error
 			// which can be taken from Number.EPSILON
-			var direction = new Vector3( 1, 1, 0 ).normalize(); // a vector which should have 90 degrees difference to normals
-			var difference = direction.dot( new Vector3( normals[ 0 ], normals[ 1 ], normals[ 2 ] ) );
+			const direction = new Vector3( 1, 1, 0 ).normalize(); // a vector which should have 90 degrees difference to normals
+			const difference = direction.dot( new Vector3( normals[ 0 ], normals[ 1 ], normals[ 2 ] ) );
 			assert.ok( difference < Number.EPSILON, 'normal is equal to reference vector' );
 
 			// get normals for a line should be NAN because you need min a triangle to calculate normals
-			var normals = getNormalsForVertices( [ 1, 0, 0, - 1, 0, 0 ], assert );
-			for ( var i = 0; i < normals.length; i ++ ) {
+			normals = getNormalsForVertices( [ 1, 0, 0, - 1, 0, 0 ], assert );
+			for ( let i = 0; i < normals.length; i ++ ) {
 
 				assert.ok( ! normals[ i ], 'normals can\'t be calculated which is good' );
 
 			}
 
 		} );
+
 		QUnit.test( 'computeVertexNormals (indexed)', ( assert ) => {
 
-			var sqrt = 0.5 * Math.sqrt( 2 );
-			var normal = new BufferAttribute( new Float32Array( [
+			const sqrt = 0.5 * Math.sqrt( 2 );
+			const normal = new BufferAttribute( new Float32Array( [
 				- 1, 0, 0, - 1, 0, 0, - 1, 0, 0,
 				sqrt, sqrt, 0, sqrt, sqrt, 0, sqrt, sqrt, 0,
 				- 1, 0, 0
 			] ), 3 );
-			var position = new BufferAttribute( new Float32Array( [
+			const position = new BufferAttribute( new Float32Array( [
 				0.5, 0.5, 0.5, 0.5, 0.5, - 0.5, 0.5, - 0.5, 0.5,
 				0.5, - 0.5, - 0.5, - 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5,
 				- 0.5, - 0.5, - 0.5
 			] ), 3 );
-			var index = new BufferAttribute( new Uint16Array( [
+			const index = new BufferAttribute( new Uint16Array( [
 				0, 2, 1, 2, 3, 1, 4, 6, 5, 6, 7, 5
 			] ), 1 );
 
-			var a = new BufferGeometry();
+			let a = new BufferGeometry();
 			a.setAttribute( 'position', position );
 			a.computeVertexNormals();
 			assert.ok(
@@ -440,7 +546,7 @@ export default QUnit.module( 'Core', () => {
 			);
 
 			// indexed geometry
-			var a = new BufferGeometry();
+			a = new BufferGeometry();
 			a.setAttribute( 'position', position );
 			a.setIndex( index );
 			a.computeVertexNormals();
@@ -456,12 +562,12 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'toNonIndexed', ( assert ) => {
 
-			var geometry = new BufferGeometry();
-			var vertices = new Float32Array( [
+			const geometry = new BufferGeometry();
+			const vertices = new Float32Array( [
 				0.5, 0.5, 0.5, 0.5, 0.5, - 0.5, 0.5, - 0.5, 0.5, 0.5, - 0.5, - 0.5
 			] );
-			var index = new BufferAttribute( new Uint16Array( [ 0, 2, 1, 2, 3, 1 ] ) );
-			var expected = new Float32Array( [
+			const index = new BufferAttribute( new Uint16Array( [ 0, 2, 1, 2, 3, 1 ] ) );
+			const expected = new Float32Array( [
 				0.5, 0.5, 0.5, 0.5, - 0.5, 0.5, 0.5, 0.5, - 0.5,
 				0.5, - 0.5, 0.5, 0.5, - 0.5, - 0.5, 0.5, 0.5, - 0.5
 			] );
@@ -469,7 +575,7 @@ export default QUnit.module( 'Core', () => {
 			geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 			geometry.setIndex( index );
 
-			var nonIndexed = geometry.toNonIndexed();
+			const nonIndexed = geometry.toNonIndexed();
 
 			assert.deepEqual( nonIndexed.getAttribute( 'position' ).array, expected, 'Expected vertices' );
 
@@ -477,18 +583,18 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'toJSON', ( assert ) => {
 
-			var index = new BufferAttribute( new Uint16Array( [ 0, 1, 2, 3 ] ), 1 );
-			var attribute1 = new BufferAttribute( new Uint16Array( [ 1, 3, 5, 7 ] ), 1 );
+			const index = new BufferAttribute( new Uint16Array( [ 0, 1, 2, 3 ] ), 1 );
+			const attribute1 = new BufferAttribute( new Uint16Array( [ 1, 3, 5, 7 ] ), 1 );
 			attribute1.name = 'attribute1';
-			var a = new BufferGeometry();
+			const a = new BufferGeometry();
 			a.name = 'JSONQUnit.test';
 			// a.parameters = { "placeholder": 0 };
 			a.setAttribute( 'attribute1', attribute1 );
 			a.setIndex( index );
 			a.addGroup( 0, 1, 2 );
 			a.boundingSphere = new Sphere( new Vector3( x, y, z ), 0.5 );
-			var j = a.toJSON();
-			var gold = {
+			let j = a.toJSON();
+			const gold = {
 				'metadata': {
 					'version': 4.5,
 					'type': 'BufferGeometry',
@@ -548,14 +654,14 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'clone', ( assert ) => {
 
-			var a = new BufferGeometry();
+			const a = new BufferGeometry();
 			a.setAttribute( 'attribute1', new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
 			a.setAttribute( 'attribute2', new BufferAttribute( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ) );
 			a.addGroup( 0, 1, 2 );
 			a.computeBoundingBox();
 			a.computeBoundingSphere();
 			a.setDrawRange( 0, 1 );
-			var b = a.clone();
+			const b = a.clone();
 
 			assert.notEqual( a, b, 'A new object was created' );
 			assert.notEqual( a.id, b.id, 'New object has a different GUID' );
@@ -585,20 +691,20 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'copy', ( assert ) => {
 
-			var geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
 			geometry.setAttribute( 'attrName', new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ) );
 			geometry.setAttribute( 'attrName2', new BufferAttribute( new Float32Array( [ 0, 1, 3, 5, 6 ] ), 1 ) );
 
-			var copy = new BufferGeometry().copy( geometry );
+			const copy = new BufferGeometry().copy( geometry );
 
 			assert.ok( copy !== geometry && geometry.id !== copy.id, 'new object was created' );
 
 			Object.keys( geometry.attributes ).forEach( function ( key ) {
 
-				var attribute = geometry.attributes[ key ];
+				const attribute = geometry.attributes[ key ];
 				assert.ok( attribute !== undefined, 'all attributes where copied' );
 
-				for ( var i = 0; i < attribute.array.length; i ++ ) {
+				for ( let i = 0; i < attribute.array.length; i ++ ) {
 
 					assert.ok( attribute.array[ i ] === copy.attributes[ key ].array[ i ], 'values of the attribute are equal' );
 

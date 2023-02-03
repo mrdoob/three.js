@@ -49,7 +49,7 @@ import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
   const makeIdentityLutTexture = function() {
     const identityLUT = new Uint8Array([

@@ -107,7 +107,7 @@ event data.</p>
 -  const canvas = document.querySelector('#c');
 +function main(data) {
 +  const {canvas} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
   ...
 </pre>
@@ -269,7 +269,7 @@ HTML file and we need to export <code class="notranslate" translate="no">init</c
 -function main(data) {
 +export function init(data) {
   const {canvas} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 </pre>
 <p>and cut out the just the non three.js relates parts</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
@@ -689,7 +689,7 @@ self.onmessage = function(e) {
 export function init(data) {
 -  const {canvas} = data;
 +  const {canvas, inputElement} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
 +  const controls = new OrbitControls(camera, inputElement);
 +  controls.target.set(0, 0, 0);

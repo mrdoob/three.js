@@ -1,10 +1,10 @@
 /* global QUnit */
 
-// import { PropertyMixer } from '../../../../src/animation/PropertyMixer.js';
+import { GLBufferAttribute } from '../../../../src/core/GLBufferAttribute.js';
 
-export default QUnit.module( 'Animation', () => {
+export default QUnit.module( 'Core', () => {
 
-	QUnit.module( 'PropertyMixer', () => {
+	QUnit.module( 'GLBufferAttribute', () => {
 
 		// INSTANCING
 		QUnit.todo( 'Instancing', ( assert ) => {
@@ -14,13 +14,7 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'binding', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'valueSize', ( assert ) => {
+		QUnit.todo( 'name', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -32,56 +26,73 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( 'cumulativeWeight', ( assert ) => {
+		QUnit.todo( 'type', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'cumulativeWeightAdditive', ( assert ) => {
+		QUnit.todo( 'itemSize', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'useCount', ( assert ) => {
+		QUnit.todo( 'elementSize', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'referenceCount', ( assert ) => {
+		QUnit.todo( 'count', ( assert ) => {
 
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'version', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'needsUpdate', ( assert ) => {
+
+			// set needsUpdate( value )
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'accumulate', ( assert ) => {
+		QUnit.test( 'isGLBufferAttribute', ( assert ) => {
+
+			const object = new GLBufferAttribute();
+			assert.ok(
+				object.isGLBufferAttribute,
+				'GLBufferAttribute.isGLBufferAttribute should be true'
+			);
+
+		} );
+
+		QUnit.todo( 'setBuffer', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'accumulateAdditive', ( assert ) => {
+		QUnit.todo( 'setType', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'apply', ( assert ) => {
+		QUnit.todo( 'setItemSize', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'saveOriginalState', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'restoreOriginalState', ( assert ) => {
+		QUnit.todo( 'setCount', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

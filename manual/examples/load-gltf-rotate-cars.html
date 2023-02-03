@@ -40,7 +40,7 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
   renderer.outputEncoding = THREE.sRGBEncoding;
 
   const fov = 45;

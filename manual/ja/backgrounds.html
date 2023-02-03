@@ -50,8 +50,9 @@ body {
 <p>そして、何も描画していない場所が透明になるように <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> に <code class="notranslate" translate="no">alpha</code> を指定します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
--  const renderer = new THREE.WebGLRenderer({canvas});
+-  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const renderer = new THREE.WebGLRenderer({
++    antialias: true,
 +    canvas,
 +    alpha: true,
 +  });
