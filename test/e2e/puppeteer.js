@@ -92,12 +92,12 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.05; // at most 5% different pixels
 
-const networkTimeout = 5; // 5 minutes, set to 0 to disable
+const networkTimeout = 1.5; // 1.5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
-const numPages = 8; // use 8 browser pages
+const numPages = 4; // use 4 browser pages
 
 const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
