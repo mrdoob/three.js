@@ -82,6 +82,7 @@ jobs:
         with:
           name: Output screenshots
           path: test/e2e/output-screenshots
+          if-no-files-found: ignore
 
   e2e-cov:
     name: "Examples ready for release"
