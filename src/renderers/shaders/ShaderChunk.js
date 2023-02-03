@@ -79,6 +79,7 @@ import output_fragment from './ShaderChunk/output_fragment.glsl.js';
 import packing from './ShaderChunk/packing.glsl.js';
 import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl.js';
 import project_vertex from './ShaderChunk/project_vertex.glsl.js';
+import velocity_vertex from './ShaderChunk/velocity_vertex.glsl.js';
 import dithering_fragment from './ShaderChunk/dithering_fragment.glsl.js';
 import dithering_pars_fragment from './ShaderChunk/dithering_pars_fragment.glsl.js';
 import roughnessmap_fragment from './ShaderChunk/roughnessmap_fragment.glsl.js';
@@ -122,6 +123,7 @@ import * as meshtoon from './ShaderLib/meshtoon.glsl.js';
 import * as points from './ShaderLib/points.glsl.js';
 import * as shadow from './ShaderLib/shadow.glsl.js';
 import * as sprite from './ShaderLib/sprite.glsl.js';
+import * as velocity from './ShaderLib/velocity.glsl.js';
 
 export const ShaderChunk = {
 	alphamap_fragment: alphamap_fragment,
@@ -205,6 +207,7 @@ export const ShaderChunk = {
 	packing: packing,
 	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
 	project_vertex: project_vertex,
+	velocity_vertex: velocity_vertex,
 	dithering_fragment: dithering_fragment,
 	dithering_pars_fragment: dithering_pars_fragment,
 	roughnessmap_fragment: roughnessmap_fragment,
@@ -264,5 +267,7 @@ export const ShaderChunk = {
 	shadow_vert: shadow.vertex,
 	shadow_frag: shadow.fragment,
 	sprite_vert: sprite.vertex,
-	sprite_frag: sprite.fragment
+	sprite_frag: sprite.fragment,
+	velocity_vert: velocity.vertex,
+	velocity_frag: velocity.fragment,
 };

@@ -9,6 +9,7 @@ import { WebGLMultiviewRenderTarget } from '../WebGLMultiviewRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
+import { VelocityMaterial } from '../../materials/VelocityMaterial.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
 import {
 	DepthFormat,
@@ -865,10 +866,7 @@ class WebXRManager extends EventDispatcher {
 
 			if (object._velocityMaterial === undefined) {
 
-				object._velocityMaterial = new ShaderMaterial( {
-					uniforms: UniformsUtils.clone( velocityShader.uniforms ),
-					vertexShader: velocityShader.vertexShader,
-					fragmentShader: velocityShader.fragmentShader,
+				object._velocityMaterial = new VelocityMaterial( {
 					side: material.side
 				} );
 
@@ -886,9 +884,9 @@ class WebXRManager extends EventDispatcher {
 				return;
 			}
 
-			object._velocityMaterial.uniforms.previousViewMatrix.value[0].copy( cameraVR.cameras[0].matrixWorldInverse );
-			object._velocityMaterial.uniforms.previousViewMatrix.value[1].copy( cameraVR.cameras[1].matrixWorldInverse );
-			object._velocityMaterial.uniforms.previousModelMatrix.value.copy( object.matrixWorld );
+			object._velocityMaterial.previousViewMatrices[0].copy( cameraVR.cameras[0].matrixWorldInverse );
+			object._velocityMaterial.previousViewMatrices[1].copy( cameraVR.cameras[1].matrixWorldInverse );
+			object._velocityMaterial.previousModelMatrix.copy( object.matrixWorld );
 			
 		}
 
