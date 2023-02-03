@@ -182,26 +182,13 @@ class Rhino3dmLoader extends Loader {
 
 	_compareMaterials( material ) {
 
-		const mat = {};
-		mat.name = material.name;
-		mat.color = {};
-		mat.color.r = material.color.r;
-		mat.color.g = material.color.g;
-		mat.color.b = material.color.b;
-		mat.type = material.type;
+		const json = JSON.stringify( material );
 
 		for ( let i = 0; i < this.materials.length; i ++ ) {
 
 			const m = this.materials[ i ];
-			const _mat = {};
-			_mat.name = m.name;
-			_mat.color = {};
-			_mat.color.r = m.color.r;
-			_mat.color.g = m.color.g;
-			_mat.color.b = m.color.b;
-			_mat.type = m.type;
 
-			if ( JSON.stringify( mat ) === JSON.stringify( _mat ) ) {
+			if ( JSON.stringify( m ) === json ) {
 
 				return m;
 
