@@ -304,7 +304,7 @@ const ShaderLib = {
 			UniformsLib.common,
 			{
 				previousModelMatrix: { value: new Matrix4() },
-				previousViewMatrices: { value: [ new Matrix4(), new Matrix4() ] },
+				previousViewMatrices: { value: [ new Matrix4(), new Matrix4() ] }
 			}
 		] ),
 

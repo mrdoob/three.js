@@ -35,6 +35,12 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 			}
 
+			if ( object.previousInstanceMatrix !== null ) {
+
+				attributes.update( object.previousInstanceMatrix, gl.ARRAY_BUFFER );
+
+			}
+
 		}
 
 		return buffergeometry;

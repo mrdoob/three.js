@@ -1,7 +1,14 @@
 export const vertex = /* glsl */`
 uniform mat4 previousViewMatrices[2];
 uniform mat4 previousModelMatrix;
-#define previousViewMatrix previousViewMatrices[VIEW_ID];
+
+#ifdef USE_INSTANCING
+
+attribute mat4 previousInstanceMatrix;
+
+#endif
+
+#define previousViewMatrix previousViewMatrices[VIEW_ID]
 
 varying vec4 clipPositionCurrent;
 varying vec4 clipPositionPrevious;

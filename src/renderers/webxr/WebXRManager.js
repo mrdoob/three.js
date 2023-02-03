@@ -1,5 +1,6 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
+import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -863,6 +864,14 @@ class WebXRManager extends EventDispatcher {
 
 				object._velocityMaterial.precision = 'highp';
 
+				if ( object.isInstancedMesh === true ) {
+
+					object.previousInstanceMatrix = new InstancedBufferAttribute( new Float32Array( object.instanceMatrix.count * 16 ), object.instanceMatrix.count );
+					object.previousInstanceMatrix.copy( object.instanceMatrix );
+					object.previousInstanceMatrix.needsUpdate = true;
+
+				}
+
 			}
 
 			return object._velocityMaterial;
@@ -880,6 +889,13 @@ class WebXRManager extends EventDispatcher {
 			object._velocityMaterial.previousViewMatrices[ 0 ].copy( cameraVR.cameras[ 0 ].matrixWorldInverse );
 			object._velocityMaterial.previousViewMatrices[ 1 ].copy( cameraVR.cameras[ 1 ].matrixWorldInverse );
 			object._velocityMaterial.previousModelMatrix.copy( object.matrixWorld );
+
+			if ( object.isInstancedMesh === true ) {
+
+				object.previousInstanceMatrix.copy( object.instanceMatrix );
+				object.previousInstanceMatrix.needsUpdate = true;
+
+			}
 
 		};
 

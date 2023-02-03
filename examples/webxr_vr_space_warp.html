@@ -56,6 +56,7 @@
 				Float32BufferAttribute,
 				Group,
 				IcosahedronGeometry,
+				InstancedMesh,
 				LatheGeometry,
 				Line,
 				LineSegments,
@@ -64,6 +65,7 @@
 				Mesh,
 				MeshBasicMaterial,
 				MeshPhongMaterial,
+				Object3D,
 				OctahedronGeometry,
 				PerspectiveCamera,
 				PlaneGeometry,
@@ -122,10 +124,10 @@
 			function updateGroupGeometry( mesh, geometry ) {
 
 				mesh.children[ 0 ].geometry.dispose();
-				mesh.children[ 1 ].geometry.dispose();
+				//mesh.children[ 1 ].geometry.dispose();
 
-				mesh.children[ 0 ].geometry = new WireframeGeometry( geometry );
-				mesh.children[ 1 ].geometry = geometry;
+				//mesh.children[ 0 ].geometry = new WireframeGeometry( geometry );
+				mesh.children[ 0 ].geometry = geometry;
 
 				// these do not update nicely together if shared
 
@@ -136,11 +138,13 @@
 			const x = 0, y = 0;
 			let speed = 0.001;
 			let select = 0;
+			const dimension = 15;
 
 			const heartShape = new Shape();
 			let mesh, lineMesh, materialVelocity, meshMaterial, lineMaterial;
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
+			const dummy = new Object3D();
 
 			heartShape.moveTo( x + 5, y + 5 );
 			heartShape.bezierCurveTo( x + 5, y + 5, x + 4, y, x, y );
@@ -155,9 +159,9 @@
 				BoxGeometry: function ( mesh ) {
 
 					const data = {
-						width: 1.5,
-						height: 1.5,
-						depth: 1.5,
+						width: .75,
+						height: .75,
+						depth: .75,
 						widthSegments: 1,
 						heightSegments: 1,
 						depthSegments: 1
@@ -189,8 +193,8 @@
 				CapsuleGeometry: function ( mesh ) {
 
 					const data = {
-						radius: .5,
-						length: .5,
+						radius: .4,
+						length: .4,
 						capSegments: 10,
 						radialSegments: 20
 					};
@@ -219,7 +223,7 @@
 					const data = {
 						radiusTop: .5,
 						radiusBottom: .5,
-						height: 1,
+						height: .75,
 						radialSegments: 8,
 						heightSegments: 1,
 						openEnded: false,
@@ -264,7 +268,7 @@
 
 					const data = {
 						radius: .5,
-						height: 1.0,
+						height: .75,
 						radialSegments: 8,
 						heightSegments: 1,
 						openEnded: false,
@@ -306,7 +310,7 @@
 				CircleGeometry: function ( mesh ) {
 
 					const data = {
-						radius: 1,
+						radius: .75,
 						segments: 32,
 						thetaStart: 0,
 						thetaLength: twoPi
@@ -336,7 +340,7 @@
 				DodecahedronGeometry: function ( mesh ) {
 
 					const data = {
-						radius: 1,
+						radius: .5,
 						detail: 0
 					};
 
@@ -362,7 +366,7 @@
 				IcosahedronGeometry: function ( mesh ) {
 
 					const data = {
-						radius: 1,
+						radius: .5,
 						detail: 0
 					};
 
@@ -384,7 +388,7 @@
 					generateGeometry();
 
 				},
-
+/*
 				LatheGeometry: function ( mesh ) {
 
 					const points = [];
@@ -420,11 +424,11 @@
 					generateGeometry();
 
 				},
-
+*/
 				OctahedronGeometry: function ( mesh ) {
 
 					const data = {
-						radius: 1,
+						radius: .5,
 						detail: 0
 					};
 
@@ -446,7 +450,7 @@
 					generateGeometry();
 
 				},
-
+/*
 				PlaneGeometry: function ( mesh ) {
 
 					const data = {
@@ -476,12 +480,12 @@
 					generateGeometry();
 
 				},
-
+*/
 				RingGeometry: function ( mesh ) {
 
 					const data = {
-						innerRadius: .5,
-						outerRadius: 1,
+						innerRadius: .4,
+						outerRadius: .75,
 						thetaSegments: 8,
 						phiSegments: 8,
 						thetaStart: 0,
@@ -514,7 +518,7 @@
 				SphereGeometry: function ( mesh ) {
 
 					const data = {
-						radius: 1.5,
+						radius: .5,
 						widthSegments: 32,
 						heightSegments: 16,
 						phiStart: 0,
@@ -576,8 +580,8 @@
 				TorusGeometry: function ( mesh ) {
 
 					const data = {
-						radius: 1,
-						tube: .3,
+						radius: .4,
+						tube: .2,
 						radialSegments: 16,
 						tubularSegments: 100,
 						arc: twoPi
@@ -608,8 +612,8 @@
 				TorusKnotGeometry: function ( mesh ) {
 
 					const data = {
-						radius: 1,
-						tube: .3,
+						radius: .4,
+						tube: .1,
 						tubularSegments: 64,
 						radialSegments: 8,
 						p: 2,
@@ -639,7 +643,7 @@
 					generateGeometry();
 
 				},
-
+/*
 				TubeGeometry: function ( mesh ) {
 
 					const data = {
@@ -732,7 +736,7 @@
 					generateGeometry();
 
 				}
-
+*/
 			};
 
 			function chooseFromHash( mesh ) {
@@ -806,10 +810,18 @@
 			lineMaterial = new LineBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.5 } );
 			meshMaterial = new MeshPhongMaterial( { color: 0x156289, emissive: 0x072534, side: DoubleSide, flatShading: true } );
 
-			lineMesh = new LineSegments( geometry, lineMaterial );
-			group.add( lineMesh);
-			mesh = new Mesh( geometry, meshMaterial);
+			//lineMesh = new LineSegments( geometry, lineMaterial );
+			//group.add( lineMesh);
+			mesh = new InstancedMesh( geometry, meshMaterial, dimension*dimension);
 			group.add( mesh);
+
+			for (let x = 0; x < dimension; x++) {
+				for (let y = 0; y < dimension; y++) {
+					dummy.position.set( (x-(dimension-1)/2) * 1.5, (y-(dimension-1)/2)*1.5, 0 );
+					dummy.updateMatrix();
+					mesh.setMatrixAt( (x*dimension) + y, dummy.matrix );
+				}
+			}
 
 			const options = chooseFromHash( group );
 
@@ -885,7 +897,7 @@
 
 			//
 
-			function render() {
+			function render(time) {
 
 				if ( ! options.fixed ) {
 
@@ -895,9 +907,20 @@
 						if (select >= 17) {
 							select = -1;
 						}
-						Object.entries(guis)[++select][1]( group );						
+						Object.entries(guis)[++select % Object.entries(guis).length][1]( group );						
 						speed = -0.05;
 					}
+
+					for (let x = 0; x < dimension; x++) {
+						for (let y = 0; y < dimension; y++) {
+							dummy.position.set( (x-(dimension-1)/2) * 1.5, (y-(dimension-1)/2)*1.5, 0 );
+							dummy.rotation.x = group.rotation.y * (((x*dimension) + y)%2?-1:1);
+							dummy.updateMatrix();
+							mesh.setMatrixAt( (x*dimension) + y, dummy.matrix );
+						}
+					}
+
+					mesh.instanceMatrix.needsUpdate = true;
 
 				}
 

@@ -748,7 +748,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		// Multiview
 
 		if ( numMultiviewViews > 0 ) {
-			
+
 			prefixVertex = 	[
 				'#extension GL_OVR_multiview : require',
 				'layout(num_views = ' + numMultiviewViews + ') in;',

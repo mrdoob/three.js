@@ -183,6 +183,7 @@
 
 					if ( name === 'instanceMatrix' && object.instanceMatrix ) geometryAttribute = object.instanceMatrix;
 					if ( name === 'instanceColor' && object.instanceColor ) geometryAttribute = object.instanceColor;
+					if ( name === 'previousInstanceMatrix' && object.previousInstanceMatrix ) geometryAttribute = object.previousInstanceMatrix;
 
 				}
 
@@ -226,6 +227,7 @@
 
 					if ( name === 'instanceMatrix' && object.instanceMatrix ) attribute = object.instanceMatrix;
 					if ( name === 'instanceColor' && object.instanceColor ) attribute = object.instanceColor;
+					if ( name === 'previousInstanceMatrix' && object.previousInstanceMatrix ) attribute = object.previousInstanceMatrix;
 
 				}
 
@@ -357,6 +359,7 @@
 
 					if ( name === 'instanceMatrix' && object.instanceMatrix ) geometryAttribute = object.instanceMatrix;
 					if ( name === 'instanceColor' && object.instanceColor ) geometryAttribute = object.instanceColor;
+					if ( name === 'previousInstanceMatrix' && object.previousInstanceMatrix ) geometryAttribute = object.previousInstanceMatrix;
 
 				}
 

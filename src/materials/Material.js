@@ -360,8 +360,6 @@ class Material extends EventDispatcher {
 		if ( this.toneMapped === false ) data.toneMapped = false;
 
 		if ( this.velocity === true ) data.velocity = true;
-		if ( this.previousModelMatrix !== undefined ) data.previousModelMatrix = this.previousModelMatrix;
-		if ( this.previousViewMatrices !== undefined ) data.previousViewMatrices = this.previousViewMatrices;
 
 		if ( this.fog === false ) data.fog = false;
 
