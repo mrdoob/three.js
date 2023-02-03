@@ -419,7 +419,7 @@ class Rhino3dmLoader extends Loader {
 					const xf = iRef.geometry.xform.array;
 
 					const matrix = new Matrix4();
-					matrix.set( xf[ 0 ], xf[ 1 ], xf[ 2 ], xf[ 3 ], xf[ 4 ], xf[ 5 ], xf[ 6 ], xf[ 7 ], xf[ 8 ], xf[ 9 ], xf[ 10 ], xf[ 11 ], xf[ 12 ], xf[ 13 ], xf[ 14 ], xf[ 15 ] );
+					matrix.elements = xf;
 
 					iRefObject.applyMatrix4( matrix );
 
