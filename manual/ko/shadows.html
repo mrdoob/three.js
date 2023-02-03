@@ -230,7 +230,7 @@ for (let i = 0; i &lt; numSpheres; ++i) {
 <p><a href="lights.html">조명에 관한 글</a>에서 썼던 예제로 먼저 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>부터
 살펴보죠.</p>
 <p>먼저 renderer의 그림자 맵 옵션을 켜야 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.shadowMap.enabled = true;
 </pre>
 <p>조명도 그림자를 드리우도록 옵션을 활성화합니다.</p>

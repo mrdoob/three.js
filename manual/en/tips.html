@@ -144,7 +144,7 @@ you create the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notr
 clearing the canvas. You also need to tell three.js not to clear
 the canvas as well.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
--const renderer = new THREE.WebGLRenderer({canvas});
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
 +  canvas,
 +  preserveDrawingBuffer: true,
@@ -234,7 +234,7 @@ canvas has both solutions applied.</p>
 canvas to be transparent pass in <a href="/docs/#api/en/renderers/WebGLRenderer#alpha"><code class="notranslate" translate="no">alpha:true</code></a> when you create
 the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const canvas = document.querySelector('#c');
--const renderer = new THREE.WebGLRenderer({canvas});
+-const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +const renderer = new THREE.WebGLRenderer({
 +  canvas,
 +  alpha: true,

@@ -17,6 +17,7 @@ export const threejsLessonUtils = {
 		const renderer = new THREE.WebGLRenderer( {
 			canvas,
 			alpha: true,
+			antialias: true,
 			powerPreference: 'low-power',
 			...options.threejsOptions,
 		} );

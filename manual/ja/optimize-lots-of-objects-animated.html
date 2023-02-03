@@ -384,7 +384,7 @@ TweenManagerは <code class="notranslate" translate="no">update</code> メソッ
 <p>TweenMangerを使用するために次のようなコードにします。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const tweenManager = new TweenManger();
 
   ...

@@ -90,7 +90,7 @@ const chromiumChannel = 'stable'; // stable -> beta -> dev -> canary (Mac and Wi
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
-const maxFailedPixels = 0.05; // at most 5% different pixels
+const maxDifferentPixels = 0.05; // at most 5% different pixels
 
 const networkTimeout = 300; // 5 minutes, set to 0 to disable
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
@@ -513,15 +513,13 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 			const actual = screenshot.bitmap;
 			const diff = screenshot.clone();
 
-			let numFailedPixels;
+			let numDifferentPixels;
 
 			try {
 
-				numFailedPixels = pixelmatch( expected.bitmap.data, actual.data, diff.bitmap.data, actual.width, actual.height, {
+				numDifferentPixels = pixelmatch( expected.bitmap.data, actual.data, diff.bitmap.data, actual.width, actual.height, {
 					threshold: pixelThreshold,
-					alpha: 0.2,
-					diffMask: process.env.FORCE_COLOR === '0',
-					diffColor: process.env.FORCE_COLOR === '0' ? [ 255, 255, 255 ] : [ 255, 0, 0 ]
+					alpha: 0.2
 				} );
 
 			} catch {
@@ -530,19 +528,19 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			}
 
-			numFailedPixels /= actual.width * actual.height;
+			numDifferentPixels /= actual.width * actual.height;
 
 			/* Print results */
 
-			const percFailedPixels = 100 * numFailedPixels;
+			const differentPixels = 100 * numDifferentPixels;
 
-			if ( numFailedPixels < maxFailedPixels ) {
+			if ( numDifferentPixels < maxDifferentPixels ) {
 
-				console.green( `Diff ${ percFailedPixels.toFixed( 1 ) }% in file: ${ file }` );
+				console.green( `Diff ${ differentPixels.toFixed( 1 ) }% in file: ${ file }` );
 
 			} else {
 
-				throw new Error( `Diff wrong in ${ percFailedPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
+				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 
 			}
 

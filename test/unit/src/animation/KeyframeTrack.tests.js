@@ -1,6 +1,7 @@
 /* global QUnit */
 
 import { NumberKeyframeTrack } from '../../../../src/animation/tracks/NumberKeyframeTrack.js';
+
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Animation', () => {
@@ -14,14 +15,26 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		// STATIC STUFF
-		QUnit.todo( 'toJSON', ( assert ) => {
+		// PROPERTIES
+		QUnit.todo( 'name', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
+		QUnit.todo( 'times', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'values', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PROPERTIES - PROTOTYPE
 		QUnit.todo( 'TimeBufferType', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -40,6 +53,15 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
+		// STATIC
+		QUnit.todo( 'toJSON', ( assert ) => {
+
+			// static method toJSON
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
 		QUnit.todo( 'InterpolantFactoryMethodDiscrete', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -96,8 +118,8 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'validate', ( assert ) => {
 
-			var validTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 0.5 ] );
-			var invalidTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
+			const validTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, 0.5 ] );
+			const invalidTrack = new NumberKeyframeTrack( '.material.opacity', [ 0, 1 ], [ 0, NaN ] );
 
 			assert.ok( validTrack.validate() );
 
@@ -109,7 +131,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'optimize', ( assert ) => {
 
-			var track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2, 3, 4 ], [ 0, 0, 0, 0, 1 ] );
+			const track = new NumberKeyframeTrack( '.material.opacity', [ 0, 1, 2, 3, 4 ], [ 0, 0, 0, 0, 1 ] );
 
 			assert.equal( track.values.length, 5 );
 
@@ -117,6 +139,12 @@ export default QUnit.module( 'Animation', () => {
 
 			assert.smartEqual( Array.from( track.times ), [ 0, 3, 4 ] );
 			assert.smartEqual( Array.from( track.values ), [ 0, 0, 1 ] );
+
+		} );
+
+		QUnit.todo( 'clone', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
