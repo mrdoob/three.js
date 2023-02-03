@@ -3981,30 +3981,26 @@ class GLTFParser {
 
 		const nodeDef = json.nodes[ nodeIndex ];
 
-		return ( function () {
+		const nodePending = parser._loadNodeShallow( nodeIndex );
 
-			const nodePending = parser._loadNodeShallow( nodeIndex );
+		const childPending = [];
+		const childrenDef = nodeDef.children || [];
 
-			const childPending = [];
-			const childrenDef = nodeDef.children || [];
+		for ( let i = 0, il = childrenDef.length; i < il; i ++ ) {
 
-			for ( let i = 0, il = childrenDef.length; i < il; i ++ ) {
+			childPending.push( parser.getDependency( 'node', childrenDef[ i ] ) );
 
-				childPending.push( parser.getDependency( 'node', childrenDef[ i ] ) );
+		}
 
-			}
+		const skeletonPending = nodeDef.skin === undefined
+			? Promise.resolve( null )
+			: parser.getDependency( 'skin', nodeDef.skin );
 
-			const skeletonPending = nodeDef.skin === undefined
-				? Promise.resolve( null )
-				: parser.getDependency( 'skin', nodeDef.skin );
-
-			return Promise.all( [
-				nodePending,
-				Promise.all( childPending ),
-				skeletonPending
-			] );
-
-		}() ).then( function ( results ) {
+		return Promise.all( [
+			nodePending,
+			Promise.all( childPending ),
+			skeletonPending
+		] ).then( function ( results ) {
 
 			const node = results[ 0 ];
 			const children = results[ 1 ];
@@ -4058,45 +4054,41 @@ class GLTFParser {
 		// reserve node's name before its dependencies, so the root has the intended name.
 		const nodeName = nodeDef.name ? parser.createUniqueName( nodeDef.name ) : '';
 
-		this.nodeCache[ nodeIndex ] = ( function () {
+		const pending = [];
 
-			const pending = [];
+		const meshPromise = parser._invokeOne( function ( ext ) {
 
-			const meshPromise = parser._invokeOne( function ( ext ) {
+			return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
 
-				return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
+		} );
 
-			} );
+		if ( meshPromise ) {
 
-			if ( meshPromise ) {
+			pending.push( meshPromise );
 
-				pending.push( meshPromise );
+		}
 
-			}
+		if ( nodeDef.camera !== undefined ) {
 
-			if ( nodeDef.camera !== undefined ) {
+			pending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
 
-				pending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
+				return parser._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
 
-					return parser._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
+			} ) );
 
-				} ) );
+		}
 
-			}
+		parser._invokeAll( function ( ext ) {
 
-			parser._invokeAll( function ( ext ) {
+			return ext.createNodeAttachment && ext.createNodeAttachment( nodeIndex );
 
-				return ext.createNodeAttachment && ext.createNodeAttachment( nodeIndex );
+		} ).forEach( function ( promise ) {
 
-			} ).forEach( function ( promise ) {
+			pending.push( promise );
 
-				pending.push( promise );
+		} );
 
-			} );
-
-			return Promise.all( pending );
-
-		}() ).then( function ( objects ) {
+		this.nodeCache[ nodeIndex ] = Promise.all( pending ).then( function ( objects ) {
 
 			let node;
 
