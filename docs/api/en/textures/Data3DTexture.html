@@ -31,7 +31,7 @@
 
 		<h2>Code Example</h2>
 
-		<p>This creates a [name] with repeating data, 0 to 63</p>
+		<p>This creates a [name] with repeating data, 0 to 255</p>
 
 		<code>
 		// create a buffer with some data
@@ -50,7 +50,7 @@
 
 				for ( let x = 0; x < sizeX; x ++ ) {
 
-					data[ i ] = i % 64;
+					data[ i ] = i % 256;
 
 					i ++;
 
