@@ -32,10 +32,10 @@
 
 	};
 
-	const a = [];
+	const data = [];
 	for ( let i = 0; i < 100000; i ++ ) {
 
-		a[ i ] = new THREE.Vector3( i * 0.01, i * 2, i * - 1.3 );
+		data[ i ] = new THREE.Vector3( i * 0.01, i * 2, i * - 1.3 );
 
 	}
 
@@ -47,7 +47,7 @@
 		let result = 0;
 		for ( let i = 0; i < 100000; i ++ ) {
 
-			const v = a[ i ];
+			const v = data[ i ];
 			result += Math.sqrt( v.x * v.x + v.y * v.y + v.z * v.z );
 
 		}
@@ -61,7 +61,7 @@
 		let result = 0;
 		for ( let i = 0; i < 100000; i ++ ) {
 
-			result += a[ i ].length2();
+			result += data[ i ].length2();
 
 		}
 
@@ -74,7 +74,7 @@
 		let result = 0;
 		for ( let i = 0; i < 100000; i ++ ) {
 
-			result += a[ i ].length();
+			result += data[ i ].length();
 
 		}
 

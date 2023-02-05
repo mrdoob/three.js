@@ -1,6 +1,6 @@
 ( function () {
 
-	const s = Bench.newSuite( 'Vector 3 Components' );
+	const suite = Bench.newSuite( 'Vector 3 Components' );
 
 	THREE = {};
 
@@ -89,20 +89,20 @@
 		2: 'z'
 	};
 
-	const a = [];
+	const data = [];
 	for ( let i = 0; i < 100000; i ++ ) {
 
-		a[ i ] = new THREE.Vector3( i * 0.01, i * 2, i * - 1.3 );
+		data[ i ] = new THREE.Vector3( i * 0.01, i * 2, i * - 1.3 );
 
 	}
 
 
-	s.add( 'IndexToName', function () {
+	suite.add( 'IndexToName', function () {
 
 		let result = 0;
 		for ( let i = 0; i < 100000; i ++ ) {
 
-			result += a[ i ].getComponent( i % 3 );
+			result += data[ i ].getComponent( i % 3 );
 
 		}
 
@@ -110,12 +110,12 @@
 
 	} );
 
-	s.add( 'SwitchStatement', function () {
+	suite.add( 'SwitchStatement', function () {
 
 		let result = 0;
 		for ( let i = 0; i < 100000; i ++ ) {
 
-			result += a[ i ].getComponent2( i % 3 );
+			result += data[ i ].getComponent2( i % 3 );
 
 		}
 
@@ -123,12 +123,12 @@
 
 	} );
 
-	s.add( 'IfAndReturnSeries', function () {
+	suite.add( 'IfAndReturnSeries', function () {
 
 		let result = 0;
 		for ( let i = 0; i < 100000; i ++ ) {
 
-			result += a[ i ].getComponent3( i % 3 );
+			result += data[ i ].getComponent3( i % 3 );
 
 		}
 
@@ -136,12 +136,12 @@
 
 	} );
 
-	s.add( 'IfReturnElseSeries', function () {
+	suite.add( 'IfReturnElseSeries', function () {
 
 		let result = 0;
 		for ( let i = 0; i < 100000; i ++ ) {
 
-			result += a[ i ].getComponent4( i % 3 );
+			result += data[ i ].getComponent4( i % 3 );
 
 		}
 

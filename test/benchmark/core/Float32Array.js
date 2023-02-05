@@ -9,9 +9,9 @@
 
 	}
 
-	const s = Bench.newSuite( 'Float 32 Arrays' );
+	const suite = Bench.newSuite( 'Float 32 Arrays' );
 
-	s.add( 'Float32Array-Float32Array', function () {
+	suite.add( 'Float32Array-Float32Array', function () {
 
 		const value3 = new Float32Array( 3 );
 		for ( let i = 0, il = input.length / 3; i < il; i += 3 ) {
@@ -30,7 +30,7 @@
 
 	} );
 
-	s.add( 'Float32Array-Array', function () {
+	suite.add( 'Float32Array-Array', function () {
 
 		const value2 = [ 0, 0, 0 ];
 		for ( let i = 0, il = input.length / 3; i < il; i += 3 ) {
@@ -49,7 +49,7 @@
 
 	} );
 
-	s.add( 'Float32Array-Literal', function () {
+	suite.add( 'Float32Array-Literal', function () {
 
 		let x, y, z;
 		for ( let i = 0, il = input.length / 3; i < il; i += 3 ) {
@@ -68,7 +68,7 @@
 
 	} );
 
-	s.add( 'Float32Array-Vector3', function () {
+	suite.add( 'Float32Array-Vector3', function () {
 
 		const value = new THREE.Vector3();
 		for ( let i = 0, il = input.length / 3; i < il; i += 3 ) {

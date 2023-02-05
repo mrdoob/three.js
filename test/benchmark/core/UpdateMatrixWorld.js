@@ -50,21 +50,21 @@
 	const rootB = generateSceneGraph( new THREE.Object3D(), 3, 10, createLocallyOffsetChild );
 	const rootC = generateSceneGraph( new THREE.Object3D(), 9, 3, createLocallyOffsetChild );
 
-	const s = Bench.newSuite( 'Update world transforms' );
+	const suite = Bench.newSuite( 'Update world transforms' );
 
-	s.add( 'Update graph depth=100, breadth=1 (' + nodeCount( rootA ) + ' nodes)', function () {
+	suite.add( 'Update graph depth=100, breadth=1 (' + nodeCount( rootA ) + ' nodes)', function () {
 
 		rootA.updateMatrixWorld( true );
 
 	} );
 
-	s.add( 'Update graph depth=3, breadth=10 (' + nodeCount( rootB ) + ' nodes)', function () {
+	suite.add( 'Update graph depth=3, breadth=10 (' + nodeCount( rootB ) + ' nodes)', function () {
 
 		rootB.updateMatrixWorld( true );
 
 	} );
 
-	s.add( 'Update graph depth=9, breadth=3 (' + nodeCount( rootC ) + ' nodes)', function () {
+	suite.add( 'Update graph depth=9, breadth=3 (' + nodeCount( rootC ) + ' nodes)', function () {
 
 		rootC.updateMatrixWorld( true );
 

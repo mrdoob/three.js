@@ -62,9 +62,9 @@
 
 	}
 
-	const s = Bench.newSuite( 'Clamping point into triangles' );
+	const suite = Bench.newSuite( 'Clamping point into triangles' );
 
-	s.add( '9^3 points, 20 triangles', function () {
+	suite.add( '9^3 points, 20 triangles', function () {
 
 		const target = new THREE.Vector3();
 		for ( let tidx = 0; tidx < triangles.length; tidx ++ ) {
