@@ -1,4 +1,4 @@
-var BenchClass = function () {
+const BenchClass = function () {
 
 	this.suites = [];
 	this.THREE = window.THREE;
@@ -16,7 +16,7 @@ BenchClass.prototype.isTHREELoaded = function () {
 
 BenchClass.prototype.newSuite = function ( name ) {
 
-	var s = new Benchmark.Suite( name );
+	const s = new Benchmark.Suite( name );
 	this.suites.push( s );
 	return s;
 
@@ -24,9 +24,9 @@ BenchClass.prototype.newSuite = function ( name ) {
 
 BenchClass.prototype.display = function () {
 
-	for ( var x of this.suites ) {
+	for ( const x of this.suites ) {
 
-		var s = new SuiteUI( x );
+		const s = new SuiteUI( x );
 		s.render();
 
 	}
@@ -39,7 +39,7 @@ BenchClass.prototype.warning = function ( message ) {
 
 };
 
-var SuiteUI = function ( suite ) {
+const SuiteUI = function ( suite ) {
 
 	this.suite = suite;
 	this.isRunning = false;
@@ -49,7 +49,7 @@ var SuiteUI = function ( suite ) {
 
 SuiteUI.prototype.render = function () {
 
-	var n = document.importNode( this.suiteTemplate, true );
+	const n = document.importNode( this.suiteTemplate, true );
 	this.elem = n.querySelector( 'article' );
 	this.results = n.querySelector( '.results' );
 	this.title = n.querySelector( 'h2' );
@@ -77,11 +77,11 @@ SuiteUI.prototype.complete = function () {
 
 	this.runButton.style.display = 'none';
 	this.results.style.display = 'block';
-	var f = _.orderBy( this.suite, [ 'hz' ], [ 'desc' ] ); // eslint-disable-line no-undef
-	for ( var i = 0; i < f.length; i ++ ) {
+	const f = _.orderBy( this.suite, [ 'hz' ], [ 'desc' ] ); // eslint-disable-line no-undef
+	for ( let i = 0; i < f.length; i ++ ) {
 
-		var x = f[ i ];
-		var n = document.importNode( this.suiteTestTemplate, true );
+		const x = f[ i ];
+		const n = document.importNode( this.suiteTestTemplate, true );
 		n.querySelector( '.name' ).innerText = x.name;
 		n.querySelector( '.ops' ).innerText = x.hz.toFixed();
 		n.querySelector( '.desv' ).innerText = x.stats.rme.toFixed( 2 );
@@ -91,7 +91,7 @@ SuiteUI.prototype.complete = function () {
 
 };
 
-var Bench = new BenchClass();
+const Bench = new BenchClass();
 window.addEventListener( 'load', function () {
 
 	SuiteUI.prototype.suiteTemplate = document.querySelector( '#suite' ).content;
