@@ -1,20 +1,20 @@
 ( function () {
 
-	var input = new Float32Array( 10000 * 3 );
-	var output = new Float32Array( 10000 * 3 );
+	const input = new Float32Array( 10000 * 3 );
+	const output = new Float32Array( 10000 * 3 );
 
-	for ( var j = 0, jl = input.length; j < jl; j ++ ) {
+	for ( let j = 0, jl = input.length; j < jl; j ++ ) {
 
 		input[ j ] = j;
 
 	}
 
-	var s = Bench.newSuite( 'Float 32 Arrays' );
+	const s = Bench.newSuite( 'Float 32 Arrays' );
 
 	s.add( 'Float32Array-Float32Array', function () {
 
-		var value3 = new Float32Array( 3 );
-		for ( var i = 0, il = input.length / 3; i < il; i += 3 ) {
+		const value3 = new Float32Array( 3 );
+		for ( let i = 0, il = input.length / 3; i < il; i += 3 ) {
 
 			value3[ 0 ] = input[ i + 0 ];
 			value3[ 1 ] = input[ i + 1 ];
@@ -32,8 +32,8 @@
 
 	s.add( 'Float32Array-Array', function () {
 
-		var value2 = [ 0, 0, 0 ];
-		for ( var i = 0, il = input.length / 3; i < il; i += 3 ) {
+		const value2 = [ 0, 0, 0 ];
+		for ( let i = 0, il = input.length / 3; i < il; i += 3 ) {
 
 			value2[ 0 ] = input[ i + 0 ];
 			value2[ 1 ] = input[ i + 1 ];
@@ -51,10 +51,8 @@
 
 	s.add( 'Float32Array-Literal', function () {
 
-		var x,
-			y,
-			z;
-		for ( var i = 0, il = input.length / 3; i < il; i += 3 ) {
+		let x, y, z;
+		for ( let i = 0, il = input.length / 3; i < il; i += 3 ) {
 
 			x = input[ i + 0 ];
 			y = input[ i + 1 ];
@@ -72,8 +70,8 @@
 
 	s.add( 'Float32Array-Vector3', function () {
 
-		var value = new THREE.Vector3();
-		for ( var i = 0, il = input.length / 3; i < il; i += 3 ) {
+		const value = new THREE.Vector3();
+		for ( let i = 0, il = input.length / 3; i < il; i += 3 ) {
 
 			value.x = input[ i + 0 ];
 			value.y = input[ i + 1 ];
