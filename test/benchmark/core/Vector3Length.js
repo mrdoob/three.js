@@ -1,6 +1,6 @@
 ( function () {
 
-	var THREE = {};
+	const THREE = {};
 
 	THREE.Vector3 = function ( x, y, z ) {
 
@@ -32,22 +32,22 @@
 
 	};
 
-	var a = [];
-	for ( var i = 0; i < 100000; i ++ ) {
+	const a = [];
+	for ( let i = 0; i < 100000; i ++ ) {
 
 		a[ i ] = new THREE.Vector3( i * 0.01, i * 2, i * - 1.3 );
 
 	}
 
 
-	var suite = Bench.newSuite( 'Vector 3 Length' );
+	const suite = Bench.newSuite( 'Vector 3 Length' );
 
 	suite.add( 'NoCallTest', function () {
 
-		var result = 0;
-		for ( var i = 0; i < 100000; i ++ ) {
+		let result = 0;
+		for ( let i = 0; i < 100000; i ++ ) {
 
-			var v = a[ i ];
+			const v = a[ i ];
 			result += Math.sqrt( v.x * v.x + v.y * v.y + v.z * v.z );
 
 		}
@@ -58,8 +58,8 @@
 
 	suite.add( 'InlineCallTest', function () {
 
-		var result = 0;
-		for ( var i = 0; i < 100000; i ++ ) {
+		let result = 0;
+		for ( let i = 0; i < 100000; i ++ ) {
 
 			result += a[ i ].length2();
 
@@ -71,8 +71,8 @@
 
 	suite.add( 'FunctionCallTest', function () {
 
-		var result = 0;
-		for ( var i = 0; i < 100000; i ++ ) {
+		let result = 0;
+		for ( let i = 0; i < 100000; i ++ ) {
 
 			result += a[ i ].length();
 
