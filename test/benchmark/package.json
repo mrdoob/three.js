@@ -8,8 +8,8 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
-        "benchmark": "2.1.0",
-        "normalize.css": "4.1.1",
-        "underscore": "1.8.3"
+        "benchmark": "^2.1.4",
+        "normalize.css": "8.0.1",
+        "underscore": "1.13.4"
     }
 }
