@@ -1,6 +1,6 @@
 ( function () {
 
-	THREE = {};
+	const THREE = {};
 
 	THREE.Vector3 = function ( x, y, z ) {
 
@@ -24,7 +24,7 @@
 
 	THREE.Vector3X = function ( x, y, z ) {
 
-		var elements = this.elements = new Float32Array( 3 );
+		const elements = this.elements = new Float32Array( 3 );
 		elements[ 0 ] = x || 0;
 		elements[ 1 ] = y || 1;
 		elements[ 2 ] = z || 2;
@@ -63,22 +63,22 @@
 	};
 
 
-	var suite = Bench.newSuite( 'Vector 3 Storage' );
+	const suite = Bench.newSuite( 'Vector 3 Storage' );
 
 	suite.add( 'Vector3-Set', function () {
 
-		var array = [];
-		for ( var i = 0; i < 100000; i ++ ) {
+		const array = [];
+		for ( let i = 0; i < 100000; i ++ ) {
 
-			var v = new THREE.Vector3( i, i, i );
+			const v = new THREE.Vector3( i, i, i );
 			array.push( v );
 
 		}
 
-		var result = 0;
-		for ( var i = 0; i < 100000; i ++ ) {
+		let result = 0;
+		for ( let i = 0; i < 100000; i ++ ) {
 
-			var v = array[ i ];
+			const v = array[ i ];
 			result += v.length();
 
 		}
@@ -89,18 +89,18 @@
 
 	suite.add( 'Vector3-Float32Array', function () {
 
-		var array = [];
-		for ( var i = 0; i < 100000; i ++ ) {
+		const array = [];
+		for ( let i = 0; i < 100000; i ++ ) {
 
-			var v = new THREE.Vector3X( i, i, i );
+			const v = new THREE.Vector3X( i, i, i );
 			array.push( v );
 
 		}
 
-		var result = 0;
-		for ( var i = 0; i < 100000; i ++ ) {
+		let result = 0;
+		for ( let i = 0; i < 100000; i ++ ) {
 
-			var v = array[ i ];
+			const v = array[ i ];
 			result += v.length();
 
 		}
@@ -111,18 +111,18 @@
 
 	suite.add( 'Vector3-Array', function () {
 
-		var array = [];
-		for ( var i = 0; i < 100000; i ++ ) {
+		const array = [];
+		for ( let i = 0; i < 100000; i ++ ) {
 
-			var v = new THREE.Vector3Y( i, i, i );
+			const v = new THREE.Vector3Y( i, i, i );
 			array.push( v );
 
 		}
 
-		var result = 0;
-		for ( var i = 0; i < 100000; i ++ ) {
+		let result = 0;
+		for ( let i = 0; i < 100000; i ++ ) {
 
-			var v = array[ i ];
+			const v = array[ i ];
 			result += v.length();
 
 		}
