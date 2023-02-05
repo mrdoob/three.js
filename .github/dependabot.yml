@@ -5,11 +5,6 @@ updates:
     schedule:
       interval: "daily"
 
-  - package-ecosystem: "npm"
-    directory: "/test"
-    schedule:
-      interval: "daily"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
