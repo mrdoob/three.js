@@ -1,5 +1,15 @@
 # THREEJS Benchmark Suite
 
+## Setup
+
+- Execute `npm install` from test/benchmark/ folder
+
+## Run
+
+The benchmarks are run in the browser.
+
+- Browser: Execute `npm start` (or run any other local web sever) from root folder and access `https://localhost:8080/test/benchmark/benchmarks.html` on web browser. (See [How to run things locally](https://threejs.org/docs/#manual/introduction/How-to-run-things-locally))
+
 ### Example: Adding a New Suite
 
 For adding a new Tests we need two things

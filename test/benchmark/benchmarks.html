@@ -3,12 +3,16 @@
   <head>
     <meta charset="utf-8">
     <title>ThreeJS Benchmark Tests - Using Files in /src</title>
+    <link rel="icon" href="data:,">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:700" rel="stylesheet" type="text/css">
-    <link href="normalize.css" rel="stylesheet" type="text/css">
+    <link href="node_modules/normalize.css/normalize.css" rel="stylesheet" type="text/css">
     <link href="style.css" rel="stylesheet" type="text/css">
+
     <script src="../../build/three.min.js"></script>
-    <script src="vendor/lodash.min.js"></script>
-    <script src="vendor/benchmark-2.1.0.min.js"></script>
+
+    <script src="node_modules/lodash/lodash.min.js"></script>
+    <script src="node_modules/benchmark/benchmark.js"></script>
+
     <script src="benchmark.js"></script>
 
     <script src="core/Vector3Components.js"></script>
@@ -32,7 +36,7 @@
           <h3>Start</h3>
         </header>
         <div class="results">
-          <div class"head">
+          <div class"result-item">
             <p class="name">Name</p>
             <p class="ops">Ops / Sec</p>
             <p class="desv">±</p>
@@ -41,13 +45,13 @@
       </article>
     </template>
 
-    <template id="suite-test">
-      <div>
-        <p class="name"></p>
-        <p class="ops"></p>
-        <p class="desv"></p>
-    </div>
-  </template>
+		<template id="suite-test">
+			<div>
+				<p class="name"></p>
+				<p class="ops"></p>
+				<p class="desv"></p>
+			</div>
+		</template>
 
-</body>
+	</body>
 </html>

@@ -1,0 +1,15 @@
+{
+    "name": "threejs-benchmarks",
+    "version": "1.0.0",
+    "description": "Benchmarks for threejs",
+    "private": true,
+    "type": "module",
+    "keywords": [],
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "benchmark": "2.1.0",
+        "normalize.css": "4.1.1",
+        "underscore": "1.8.3"
+    }
+}
