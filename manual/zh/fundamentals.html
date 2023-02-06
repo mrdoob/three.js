@@ -93,7 +93,7 @@ import * as THREE from 'three';
 +  ...
 &lt;/script&gt;
 </pre>
-<p>拿到canvas后我们需要创建一个<a href="/docs/#api/zh/renderers/WebGLRenderer">WebGL渲染器(<code class="notranslate" translate="no">WebGLRenderer</code>)</a>。渲染器负责将你提供的所有数据渲染绘制到canvas上。之前还有其他渲染器，比如CSS渲染器(<code class="notranslate" translate="no">CSSRenderer</code>)、Canvas渲染器(<code class="notranslate" translate="no">CanvasRenderer</code>)。将来也可能会有WebGL2渲染器(<code class="notranslate" translate="no">WebGL2Renderer</code>)或WebGPU渲染器(<code class="notranslate" translate="no">WebGPURenderer</code>)。目前的话是<a href="/docs/#api/zh/renderers/WebGLRenderer">WebGL渲染器(<code class="notranslate" translate="no">WebGLRenderer</code>)</a>，它通过WebGL将三维空间渲染到canvas上。</p>
+<p>拿到canvas后我们需要创建一个<a href="/docs/#api/zh/renderers/WebGLRenderer">WebGL渲染器(<code class="notranslate" translate="no">WebGLRenderer</code>)</a>。渲染器负责将你提供的所有数据渲染绘制到canvas上。</p>
 <p>注意这里有一些细节。如果你没有给three.js传canvas，three.js会自己创建一个 ，但是你必须手动把它添加到文档中。在哪里添加可能会不一样这取决你怎么使用， 我发现给three.js传一个canvas会更灵活一些。我可以将canvas放到任何地方， 代码都会找到它，假如我有一段代码是将canvas插入到文档中，那么当需求变化时， 我很可能必须去修改这段代码。</p>
 <p>接下来我们需要一个<a href="/docs/#api/zh/cameras/PerspectiveCamera">透视摄像机(<code class="notranslate" translate="no">PerspectiveCamera</code>)</a>。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;

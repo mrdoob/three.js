@@ -141,10 +141,7 @@ import * as THREE from 'three';
 </pre>
 <p>After we look up the canvas we create a <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. The renderer
 is the thing responsible for actually taking all the data you provide
-and rendering it to the canvas. In the past there have been other renderers
-like <code class="notranslate" translate="no">CSSRenderer</code>, a <code class="notranslate" translate="no">CanvasRenderer</code> and in the future there may be a
-<code class="notranslate" translate="no">WebGL2Renderer</code> or <code class="notranslate" translate="no">WebGPURenderer</code>. For now there's the <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>
-that uses WebGL to render 3D to the canvas.</p>
+and rendering it to the canvas.</p>
 <p>Note there are some esoteric details here. If you don't pass a canvas
 into three.js it will create one for you but then you have to add it
 to your document. Where to add it may change depending on your use case
