@@ -3,6 +3,7 @@
   "version": "0.149.0",
   "description": "JavaScript 3D library",
   "type": "module",
+  "main": "./build/three.cjs",
   "module": "./build/three.module.js",
   "exports": {
     ".": {
