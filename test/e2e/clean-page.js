@@ -10,9 +10,13 @@
 
 	const style = document.createElement( 'style' );
 	style.type = 'text/css';
-	style.innerHTML = '#info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; } * { font-family: Courier, Monospace !important; }';
-
+	style.innerHTML = '#info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; } * { font-family: Ubuntu Mono, Monospace !important; }';
 	document.querySelector( 'head' ).appendChild( style );
+
+	const font = document.createElement( 'link' );
+	font.rel = 'stylesheet';
+	font.href = 'https://fonts.googleapis.com/css?family=Ubuntu%20Mono';
+	document.querySelector( 'head' ).appendChild( font );
 
 	/* Remove Stats.js */
 
