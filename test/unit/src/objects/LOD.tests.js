@@ -11,7 +11,7 @@ export default QUnit.module( 'Objects', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var lod = new LOD();
+			const lod = new LOD();
 
 			assert.strictEqual( ( lod instanceof Object3D ), true, 'LOD extends from Object3D' );
 
@@ -30,8 +30,8 @@ export default QUnit.module( 'Objects', () => {
 
 		QUnit.test( 'levels', ( assert ) => {
 
-			var lod = new LOD();
-			var levels = lod.levels;
+			const lod = new LOD();
+			const levels = lod.levels;
 
 			assert.strictEqual( Array.isArray( levels ), true, 'LOD.levels is of type array.' );
 			assert.strictEqual( levels.length, 0, 'LOD.levels is empty by default.' );
@@ -57,12 +57,12 @@ export default QUnit.module( 'Objects', () => {
 
 		QUnit.test( 'copy', ( assert ) => {
 
-			var lod1 = new LOD();
-			var lod2 = new LOD();
+			const lod1 = new LOD();
+			const lod2 = new LOD();
 
-			var high = new Object3D();
-			var mid = new Object3D();
-			var low = new Object3D();
+			const high = new Object3D();
+			const mid = new Object3D();
+			const low = new Object3D();
 
 			lod1.addLevel( high, 5 );
 			lod1.addLevel( mid, 25 );
@@ -79,11 +79,11 @@ export default QUnit.module( 'Objects', () => {
 
 		QUnit.test( 'addLevel', ( assert ) => {
 
-			var lod = new LOD();
+			const lod = new LOD();
 
-			var high = new Object3D();
-			var mid = new Object3D();
-			var low = new Object3D();
+			const high = new Object3D();
+			const mid = new Object3D();
+			const low = new Object3D();
 
 			lod.addLevel( high, 5, 0.00 );
 			lod.addLevel( mid, 25, 0.05 );
@@ -104,11 +104,11 @@ export default QUnit.module( 'Objects', () => {
 
 		QUnit.test( 'getObjectForDistance', ( assert ) => {
 
-			var lod = new LOD();
+			const lod = new LOD();
 
-			var high = new Object3D();
-			var mid = new Object3D();
-			var low = new Object3D();
+			const high = new Object3D();
+			const mid = new Object3D();
+			const low = new Object3D();
 
 			assert.strictEqual( lod.getObjectForDistance( 5 ), null, 'Returns null if no LOD levels are defined.' );
 
@@ -130,9 +130,9 @@ export default QUnit.module( 'Objects', () => {
 
 		QUnit.test( 'raycast', ( assert ) => {
 
-			var lod = new LOD();
-			var raycaster = new Raycaster();
-			var intersections = [];
+			const lod = new LOD();
+			const raycaster = new Raycaster();
+			const intersections = [];
 
 			lod.raycast( raycaster, intersections );
 
