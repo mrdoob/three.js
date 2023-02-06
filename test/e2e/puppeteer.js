@@ -94,7 +94,7 @@ const OMAHA_PROXY = 'https://omahaproxy.appspot.com/all.json';
 
 const chromiumChannel = 'stable'; // stable -> beta -> dev -> canary (Mac and Windows) -> canary_asan (Windows)
 
-const port = 1234;
+const port = 8234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
@@ -180,7 +180,7 @@ async function main() {
 
 	/* Launch browser */
 
-	const flags = [ '--hide-scrollbars', '--enable-unsafe-webgpu' ];
+	const flags = [ '--font-render-hinting=none', '--hide-scrollbars', '--enable-unsafe-webgpu' ];
 	flags.push( '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
 	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
@@ -492,6 +492,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 			} */ // TODO: fix this
 
 		}
+
+		if ( file === 'webgl_multiple_elements_text' ) await ( await jimp.read( await page.screenshot() ) ).writeAsync( 'test/e2e/output-screenshots/test-image-determining-font.png' );
 
 		const screenshot = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality );
 
