@@ -142,6 +142,11 @@ process.on( 'SIGINT', () => close() );
 
 async function main() {
 
+	/* Create output directories */
+
+	try { await fs.rm( 'test/e2e/output-screenshots', { recursive: true, force: true } ); } catch {}
+	try { await fs.mkdir( 'test/e2e/output-screenshots' ); } catch {}
+
 	/* Find files */
 
 	const isMakeScreenshot = process.argv[ 2 ] === '--make';
@@ -522,10 +527,11 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			try {
 
-				expected = await jimp.read( `examples/screenshots/${ file }.jpg` );
+				expected = ( await jimp.read( `examples/screenshots/${ file }.jpg` ) ).quality( jpgQuality );
 
 			} catch {
 
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
@@ -544,6 +550,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -558,6 +566,9 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} else {
 
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await diff.writeAsync( `test/e2e/output-screenshots/${ file }-diff.jpg` );
 				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 
 			}
