@@ -69,9 +69,7 @@
       "XRMediaBinding": "readonly",
       "CodeMirror": "readonly",
       "esprima": "readonly",
-      "jsonlint": "readonly",
-      "Benchmark": "readonly",
-      "Bench": "readonly"
+      "jsonlint": "readonly"
     },
     "rules": {
       "no-throw-literal": [
