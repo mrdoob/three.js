@@ -9,7 +9,7 @@
 
 	const style = document.createElement( 'style' );
 	style.type = 'text/css';
-	style.innerHTML = '* { -webkit-font-smoothing: antialiased; } #info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; }';
+	style.innerHTML = '#info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; } * { font-family: Monospace !important; }';
 
 	document.querySelector( 'head' ).appendChild( style );
 
