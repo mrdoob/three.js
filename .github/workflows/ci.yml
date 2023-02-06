@@ -79,6 +79,7 @@ jobs:
         run: npm run test-e2e
       - name: Upload output screenshots
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: Output screenshots
           path: test/e2e/output-screenshots
