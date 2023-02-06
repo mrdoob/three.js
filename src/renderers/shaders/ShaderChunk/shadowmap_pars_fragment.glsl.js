@@ -1,13 +1,13 @@
 export default /* glsl */`
 #if NUM_SPOT_LIGHT_COORDS > 0
 
-  varying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];
+	varying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];
 
 #endif
 
 #if NUM_SPOT_LIGHT_MAPS > 0
 
-  uniform sampler2D spotLightMap[ NUM_SPOT_LIGHT_MAPS ];
+	uniform sampler2D spotLightMap[ NUM_SPOT_LIGHT_MAPS ];
 
 #endif
 
