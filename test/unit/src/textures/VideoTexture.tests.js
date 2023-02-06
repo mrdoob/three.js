@@ -12,10 +12,11 @@ export default QUnit.module( 'Textures', () => {
 		QUnit.test( 'Extending', ( assert ) => {
 
 			const videoDocumentElement = {};
-
 			const object = new VideoTexture( videoDocumentElement );
-
-			assert.strictEqual( object instanceof Texture, true, 'VideoTexture extends from Texture' );
+			assert.strictEqual(
+				object instanceof Texture, true,
+				'VideoTexture extends from Texture'
+			);
 
 		} );
 

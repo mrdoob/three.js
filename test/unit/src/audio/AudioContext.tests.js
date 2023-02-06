@@ -4,36 +4,46 @@ import { AudioContext } from '../../../../src/audio/AudioContext.js';
 
 export default QUnit.module( 'Audios', () => {
 
-	QUnit.module( 'AudioContext', () => {
+	QUnit.module( 'AudioContext', ( hooks ) => {
 
 		function mockWindowAudioContext() {
 
-			if ( typeof window === 'undefined' ) {
+			global.window = {
+				AudioContext: function () {
 
-				global.window = {
-					AudioContext: function () {
+					return {
+						createGain: () => {
 
-						return {
-							createGain: () => {
+							return {
+								connect: () => {},
+							};
 
-								return {
-									connect: () => {},
-								};
+						}
+					};
 
-							}
-						};
+				},
+			};
 
-					},
-				};
+		}
 
-			}
+		if ( typeof window === 'undefined' ) {
+
+			hooks.before( function () {
+
+				mockWindowAudioContext();
+
+			} );
+
+			hooks.after( function () {
+
+				global.window = undefined;
+
+			} );
 
 		}
 
 		// STATIC
 		QUnit.test( 'getContext', ( assert ) => {
-
-			mockWindowAudioContext();
 
 			const context = AudioContext.getContext();
 			assert.strictEqual(

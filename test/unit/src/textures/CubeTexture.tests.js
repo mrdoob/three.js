@@ -11,9 +11,11 @@ export default QUnit.module( 'Textures', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new CubeTexture();
-
-			assert.strictEqual( object instanceof Texture, true, 'CubeTexture extends from Texture' );
+			const object = new CubeTexture();
+			assert.strictEqual(
+				object instanceof Texture, true,
+				'CubeTexture extends from Texture'
+			);
 
 		} );
 

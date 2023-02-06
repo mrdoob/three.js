@@ -11,8 +11,7 @@ export default QUnit.module( 'Objects', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var lineSegments = new LineSegments();
-
+			const lineSegments = new LineSegments();
 			assert.strictEqual( lineSegments instanceof Object3D, true, 'LineSegments extends from Object3D' );
 			assert.strictEqual( lineSegments instanceof Line, true, 'LineSegments extends from Line' );
 
