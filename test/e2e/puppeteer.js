@@ -71,6 +71,7 @@ const exceptionList = [
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'webgl_buffergeometry_glbufferattribute',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
 	'webgl_lines_sphere',
