@@ -58,8 +58,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ windows-latest, ubuntu-latest ]
-        CI: [ 0, 1, 2, 3, 4, 5, 6, 7 ]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        CI: [ 0, 1, 2, 3 ]
     env:
       CI: ${{ matrix.CI }}
     steps:

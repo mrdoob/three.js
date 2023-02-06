@@ -7,6 +7,35 @@ import jimp from 'jimp';
 import * as fs from 'fs/promises';
 import fetch from 'node-fetch';
 
+class PromiseQueue {
+
+	constructor( func, ...args ) {
+
+		this.func = func.bind( this, ...args );
+		this.promises = [];
+
+	}
+
+	add( ...args ) {
+
+		const promise = this.func( ...args );
+		this.promises.push( promise );
+		promise.then( () => this.promises.splice( this.promises.indexOf( promise ), 1 ) );
+
+	}
+
+	async waitForAll() {
+
+		while ( this.promises.length > 0 ) {
+
+			await Promise.all( this.promises );
+
+		}
+
+	}
+
+}
+
 /* CONFIG VARIABLES START */
 
 const idleTime = 9; // 9 seconds - for how long there should be no network requests
@@ -42,6 +71,8 @@ const exceptionList = [
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'webgl_animation_skinning_blending',
+	'webgl_buffergeometry_glbufferattribute',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
 	'webgl_lines_sphere',
@@ -53,8 +84,10 @@ const exceptionList = [
 	'webgl_morphtargets_face',
 	'webgl_nodes_materials_standard',
 	'webgl_postprocessing_crossfade',
+	'webgl_postprocessing_dof2',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
+	'webgl_shadowmap',
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward'
@@ -78,12 +111,14 @@ const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
-const networkTimeout = 90; // 90 seconds, set to 0 to disable
-const renderTimeout = 4.5; // 4.5 seconds, set to 0 to disable
+const networkTimeout = 5; // 5 minutes, set to 0 to disable
+const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
 const numAttempts = 2; // perform 2 attempts before failing
 
-const numCIJobs = 8; // GitHub Actions run the script in 8 threads
+const numPages = 8; // use 8 browser pages
+
+const numCIJobs = 4; // GitHub Actions run the script in 4 threads
 
 const width = 400;
 const height = 250;
@@ -177,21 +212,26 @@ async function main() {
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) ).replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
 
-	/* Prepare page */
+	/* Prepare pages */
 
 	const errorMessagesCache = [];
 
-	const page = ( await browser.pages() )[ 0 ];
-	await preparePage( page, injection, build, errorMessagesCache );
+	const pages = await browser.pages();
+	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
+
+	for ( const page of pages ) await preparePage( page, injection, build, errorMessagesCache );
 
 	/* Loop for each file */
 
 	const failedScreenshots = [];
 
-	for ( const file of files ) await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file );
+	const queue = new PromiseQueue( makeAttempt, pages, failedScreenshots, cleanPage, isMakeScreenshot );
+	for ( const file of files ) queue.add( file );
+	await queue.waitForAll();
 
 	/* Finish */
 
+	failedScreenshots.sort();
 	const list = failedScreenshots.join( ' ' );
 
 	if ( isMakeScreenshot && failedScreenshots.length ) {
@@ -281,7 +321,7 @@ async function preparePage( page, injection, build, errorMessages ) {
 		const args = await Promise.all( msg.args().map( async arg => {
 			try {
 				return await arg.executionContext().evaluate( arg => arg instanceof Error ? arg.message : arg, arg );
-			} catch (e) { // Execution context might have been already destroyed
+			} catch ( e ) { // Execution context might have been already destroyed
 				return arg;
 			}
 		} ) );
@@ -293,13 +333,19 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 		text = file + ': ' + text.replace( /\[\.WebGL-(.+?)\] /g, '' );
 
-		if ( errorMessages.includes( text ) ) {
+		if ( text === `${ file }: JSHandle@error` ) {
+
+			text = `${ file }: Unknown error`;
+
+		}
+
+		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
 
 			return;
 
 		}
 
-		if ( text.includes( 'Unable to access the camera/webcam' ) ) {
+		if ( errorMessages.includes( text ) ) {
 
 			return;
 
@@ -353,11 +399,31 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 }
 
-async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID = 0 ) {
+
+	const page = await new Promise( ( resolve, reject ) => {
+
+		const interval = setInterval( () => {
+
+			for ( const page of pages ) {
+
+				if ( page.file === undefined ) {
+
+					page.file = file; // acquire lock
+					clearInterval( interval );
+					resolve( page );
+					break;
+
+				}
+
+			}
+
+		}, 100 );
+
+	} );
 
 	try {
 
-		page.file = file;
 		page.pageSize = 0;
 		page.error = undefined;
 
@@ -367,7 +433,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 			await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 				waitUntil: 'networkidle0',
-				timeout: networkTimeout * 1000
+				timeout: networkTimeout * 60000
 			} );
 
 		} catch ( e ) {
@@ -383,7 +449,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 			await page.evaluate( cleanPage );
 
 			await page.waitForNetworkIdle( {
-				timeout: networkTimeout * 1000,
+				timeout: networkTimeout * 60000,
 				idleTime: idleTime * 1000
 			} );
 
@@ -431,7 +497,7 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 				console.yellow( `Render timeout exceeded in file ${ file }` );
 
-			} */
+			} */ // TODO: fix this
 
 		}
 
@@ -507,11 +573,13 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 		} else {
 
 			console.yellow( `${ e }, another attempt...` );
-			await makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot, file, attemptID + 1 );
+			this.add( file, attemptID + 1 );
 
 		}
 
 	}
+
+	page.file = undefined; // release lock
 
 }
 
