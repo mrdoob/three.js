@@ -78,13 +78,13 @@
 				const ifcLoader = new IFCLoader();
 				await ifcLoader.ifcManager.setWasmPath( 'https://unpkg.com/web-ifc@0.0.36/', true );
 
-				await ifcLoader.ifcManager.parser.setupOptionalCategories({
+				await ifcLoader.ifcManager.parser.setupOptionalCategories( {
 					[IFCSPACE]: false,
-				});
+				} );
 
-				await ifcLoader.ifcManager.applyWebIfcConfig({
+				await ifcLoader.ifcManager.applyWebIfcConfig( {
 					USE_FAST_BOOLS: true
-				});
+				} );
 
 				ifcLoader.load( 'models/ifc/rac_advanced_sample_project.ifc', function ( model ) {
 
