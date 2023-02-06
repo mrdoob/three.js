@@ -80,15 +80,15 @@ class ViewportNode extends Node {
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		if ( this.scope === ViewportNode.COORDINATE ) {
 
-			return builder.getFragCoord();
+			return builder.format( builder.getFragCoord(), this.getNodeType(), output );
 
 		}
 
-		return super.generate( builder );
+		return super.generate( builder, output );
 
 	}
 

@@ -698,6 +698,8 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	_getNodeUniform( uniformNode, type ) {
 
+		type = this.changeComponentType( type, 'float' );
+
 		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
 		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
 		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
