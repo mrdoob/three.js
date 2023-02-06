@@ -81,6 +81,7 @@ const exceptionList = [
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
 	'webgl_materials_blending',
+	'webgl_mirror',
 	'webgl_morphtargets_face',
 	'webgl_nodes_materials_standard',
 	'webgl_postprocessing_crossfade',
