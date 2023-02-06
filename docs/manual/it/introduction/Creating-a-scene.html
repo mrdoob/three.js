@@ -16,8 +16,7 @@
 		<h2>Prima di iniziare</h2>
 
 		<p>Prima di poter utilizzare three.js hai bisogno di un posto dove visualizzarlo. 
-      Salva il seguente codice HTML in un file sul tuo computer insieme ad una copia 
-      di [link:https://threejs.org/build/three.js three.js] nella cartella js/, e aprilo nel browser.</p>
+      Salva il seguente codice HTML in un file sul tuo computer e aprilo nel browser.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -30,8 +29,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					// Il nostro Javascript andrà qui
 				&lt;/script&gt;
 			&lt;/body&gt;
@@ -70,11 +70,7 @@
       rispetto al valore `near` non saranno renderizzati. Non è neccessario preoccuparsi di questo 
       aspetto adesso, ma potresti voler usare altri valori nella tua applicazione per avere delle prestazioni migliori.</p>
 
-		<p>Il prossimo passo è il renderer. È qui che avviene la magia. Oltre al WebGLRenderer che usiamo qui, 
-      three.js fornisce altri renderer, spesso usati come alternativa per utenti che usano browser più vecchi 
-      o per quelli che, per qualche motivo, non hanno il supporto WebGL. </p>
-
-		<p>Oltre a creare l'istanza del renderer, abbiamo bisogno di impostare le dimensioni con cui vogliamo che l'applicazione venga visualizzata. È una buona idea usare la larghezza e l'altezza dell'area che vogliamo riempire con la nostra applicazione - in questo caso, la larghezza e l'altezza della finestra del browser. Per le applicazioni ad alte prestazioni si possono dare a `setSize` dei valori più piccoli, come `window.innerWidth/2` e `window.innerHeight/2`, che faranno si che l'applicazione venga renderizzata ad una dimensione di un quarto.</p>
+		<p>Il prossimo passo è il renderer. È qui che avviene la magia. Oltre a creare l'istanza del renderer, abbiamo bisogno di impostare le dimensioni con cui vogliamo che l'applicazione venga visualizzata. È una buona idea usare la larghezza e l'altezza dell'area che vogliamo riempire con la nostra applicazione - in questo caso, la larghezza e l'altezza della finestra del browser. Per le applicazioni ad alte prestazioni si possono dare a `setSize` dei valori più piccoli, come `window.innerWidth/2` e `window.innerHeight/2`, che faranno si che l'applicazione venga renderizzata ad una dimensione di un quarto.</p>
 
 		<p>Se si desidera mantenere la dimensione dell'applicazione ma visualizzarla ad una risoluzione minore, è possibile farlo aggiungendo a `setSize` il valore false, corrispondente a `updateStyle` (il terzo parametro). Per esempio, `setSize(window.innerWidth/2, window.innerHeight/2, false)` visualizzerà l'applicazione a metà risoluzione, dato che il &lt;canvas&gt; ha larghezza e altezza del 100%.</p>
 
@@ -137,7 +133,7 @@
 		<h2>Il risultato</h2>
 		<p>Congratulazioni! Hai completato la tua prima applicazione three.js. È semplice, ma da qualche parte devi pur iniziare.</p>
 
-		<p>Il codice completo è disponibile di seguito e come esempio modificabile [link:https://jsfiddle.net/fxurzeb4/ live example]. Giocaci per capire meglio come funziona.</p>
+		<p>Il codice completo è disponibile di seguito e come esempio modificabile [link:https://jsfiddle.net/em4j9hvu/ live example]. Giocaci per capire meglio come funziona.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -150,8 +146,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -173,7 +170,7 @@
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
-					};
+					}
 
 					animate();
 				&lt;/script&gt;
