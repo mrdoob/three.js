@@ -11,9 +11,11 @@ export default QUnit.module( 'Renderers', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new WebGLArrayRenderTarget();
-
-			assert.strictEqual( object instanceof WebGLRenderTarget, true, 'WebGLArrayRenderTarget extends from WebGLRenderTarget' );
+			const object = new WebGLArrayRenderTarget();
+			assert.strictEqual(
+				object instanceof WebGLRenderTarget, true,
+				'WebGLArrayRenderTarget extends from WebGLRenderTarget'
+			);
 
 		} );
 

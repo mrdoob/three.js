@@ -3,7 +3,7 @@
   "version": "0.149.0",
   "description": "JavaScript 3D library",
   "type": "module",
-  "main": "./build/three.js",
+  "main": "./build/three.cjs",
   "module": "./build/three.module.js",
   "exports": {
     ".": {
@@ -22,9 +22,7 @@
   },
   "sideEffects": false,
   "files": [
-    "build/three.js",
     "build/three.cjs",
-    "build/three.min.js",
     "build/three.module.js",
     "examples/jsm",
     "examples/fonts",
@@ -141,7 +139,6 @@
   "homepage": "https://threejs.org/",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
     "concurrently": "^7.6.0",
     "eslint": "^8.33.0",
@@ -168,8 +165,6 @@
       "package.json",
       "LICENSE",
       "README.md",
-      "build/three.js",
-      "build/three.min.js",
       "build/three.module.js"
     ],
     "directories": {}

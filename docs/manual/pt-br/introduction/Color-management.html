@@ -162,7 +162,7 @@
 	</p>
 
 	<code>
-THREE.ColorManagement.legacyMode = false;
+THREE.ColorManagement.enabled = true;
 	</code>
 
 	<ul>
@@ -265,7 +265,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 	</code>
 
 	<p>
-		Com <i>ColorManagement.legacyMode = false</i> definido (recomendado), determinadas conversões
+		Com <i>ColorManagement.enabled = true</i> definido (recomendado), determinadas conversões
 		são feitas automaticamente. Como as cores hexadecimais e CSS geralmente são sRGB, métodos [page:Color]
 		irão converter automaticamente essas entradas de sRGB para Linear-sRGB em setters, ou
 		converter de Linear-sRGB para sRGB ao retornar hexadecimal ou CSS de getters.

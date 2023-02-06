@@ -1477,8 +1477,7 @@ function LinearToSRGB( c ) {
 
 }
 
-// JavaScript RGB-to-RGB transforms, defined as
-// FN[InputColorSpace][OutputColorSpace] callback functions.
+// RGB-to-RGB transforms, defined as `FN[InputColorSpace][OutputColorSpace] → conversionFn`.
 const FN = {
 	[ SRGBColorSpace ]: { [ LinearSRGBColorSpace ]: SRGBToLinear },
 	[ LinearSRGBColorSpace ]: { [ SRGBColorSpace ]: LinearToSRGB },
@@ -1486,7 +1485,23 @@ const FN = {
 
 const ColorManagement = {
 
-	legacyMode: true,
+	enabled: false,
+
+	get legacyMode() {
+
+		console.warn( 'THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r147.' );
+
+		return ! this.enabled;
+
+	},
+
+	set legacyMode( legacyMode ) {
+
+		console.warn( 'THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r147.' );
+
+		this.enabled = ! legacyMode;
+
+	},
 
 	get workingColorSpace() {
 
@@ -1502,7 +1517,7 @@ const ColorManagement = {
 
 	convert: function ( color, sourceColorSpace, targetColorSpace ) {
 
-		if ( this.legacyMode || sourceColorSpace === targetColorSpace || ! sourceColorSpace || ! targetColorSpace ) {
+		if ( this.enabled === false || sourceColorSpace === targetColorSpace || ! sourceColorSpace || ! targetColorSpace ) {
 
 			return color;
 

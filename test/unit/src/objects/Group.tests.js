@@ -10,9 +10,11 @@ export default QUnit.module( 'Objects', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var group = new Group();
-
-			assert.strictEqual( group instanceof Object3D, true, 'Group extends from Object3D' );
+			const group = new Group();
+			assert.strictEqual(
+				group instanceof Object3D, true,
+				'Group extends from Object3D'
+			);
 
 		} );
 

@@ -22,7 +22,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -47,6 +47,8 @@
 			let sphereGroup, smallSphere;
 
 			let groundMirror, verticalMirror;
+
+			THREE.ColorManagement.enabled = true;
 
 			init();
 			animate();
@@ -87,7 +89,7 @@
 					clipBias: 0.003,
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio,
-					color: 0x777777
+					color: 0xb5b5b5
 				} );
 				groundMirror.position.y = 0.5;
 				groundMirror.rotateX( - Math.PI / 2 );
@@ -98,7 +100,7 @@
 					clipBias: 0.003,
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio,
-					color: 0x889999
+					color: 0xc1cbcb
 				} );
 				verticalMirror.position.y = 50;
 				verticalMirror.position.z = - 50;
@@ -109,7 +111,7 @@
 				scene.add( sphereGroup );
 
 				geometry = new THREE.CylinderGeometry( 0.1, 15 * Math.cos( Math.PI / 180 * 30 ), 0.1, 24, 1 );
-				material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x444444 } );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x8d8d8d } );
 				const sphereCap = new THREE.Mesh( geometry, material );
 				sphereCap.position.y = - 15 * Math.sin( Math.PI / 180 * 30 ) - 0.05;
 				sphereCap.rotateX( - Math.PI );
@@ -124,7 +126,7 @@
 				sphereGroup.add( halfSphere );
 
 				geometry = new THREE.IcosahedronGeometry( 5, 0 );
-				material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x333333, flatShading: true } );
+				material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x7b7b7b, flatShading: true } );
 				smallSphere = new THREE.Mesh( geometry, material );
 				scene.add( smallSphere );
 
@@ -138,7 +140,7 @@
 				planeBottom.rotateX( - Math.PI / 2 );
 				scene.add( planeBottom );
 
-				const planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0x7f7fff } ) );
+				const planeFront = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xbbbbfe } ) );
 				planeFront.position.z = 50;
 				planeFront.position.y = 50;
 				planeFront.rotateY( Math.PI );
@@ -157,7 +159,7 @@
 				scene.add( planeLeft );
 
 				// lights
-				const mainLight = new THREE.PointLight( 0xcccccc, 1.5, 250 );
+				const mainLight = new THREE.PointLight( 0xe7e7e7, 1.5, 250 );
 				mainLight.position.y = 60;
 				scene.add( mainLight );
 
@@ -169,7 +171,7 @@
 				redLight.position.set( - 550, 50, 0 );
 				scene.add( redLight );
 
-				const blueLight = new THREE.PointLight( 0x7f7fff, 0.25, 1000 );
+				const blueLight = new THREE.PointLight( 0xbbbbfe, 0.25, 1000 );
 				blueLight.position.set( 0, 50, 550 );
 				scene.add( blueLight );
 

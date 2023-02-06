@@ -13,7 +13,7 @@
 
 		<h2>Antes de começar</h2>
 
-		<p>Antes de começar usar o three.js, você precisa de algum lugar para mostrá-lo. Salve o HTML abaixo em um arquivo no seu computador, junto com uma cópia do [link:https://threejs.org/build/three.js three.js] na pasta js/, e abra o arquivo no navegador.</p>
+		<p>Antes de começar usar o three.js, você precisa de algum lugar para mostrá-lo. Salve o HTML abaixo em um arquivo no seu computador e abra o arquivo no navegador.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -26,8 +26,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					// Our Javascript will go here.
 				&lt;/script&gt;
 			&lt;/body&gt;
@@ -60,9 +61,7 @@
 
 		<p>Os próximos dois atributos são os planos de corte `near` e `far`. Isso significa que os objetos mais distantes da câmera do que o valor `far` ou mais próximos que o valor `near` não serão renderizados. Você não precisa se preocupar com isso agora, mas pode ser necessário usar outros valores em seus apps para obter uma melhor performance.</p>
 
-		<p>Em seguida temos o renderizador. É aqui que a mágica acontece. Além do WebGLRenderer que usamos aqui, three.js vem com alguns outros, frequentemente usados como substitutos para usuários com navegadores antigos ou para aqueles que não possuem suporte para WebGL por algum motivo.</p>
-
-		<p>Além da criação da intância do renderizador, nós também precisamos configurar o tamanho em que queremos renderizar nossa aplicação. É uma boa ideia usar o comprimento e a altura da área que queremos preencher com nossa aplicação - no nosso caso, o comprimento e altura da janela do navegador. Para aplicativos de alto desempenho, você pode fornecer valores menores para o `setSize`, como `window.innerWidth/2` e `window.innerHeight/2`, o que fará com que a aplicação seja renderizada no tamanho de um quarto do original.</p>
+		<p>Em seguida temos o renderizador. É aqui que a mágica acontece. Além da criação da intância do renderizador, nós também precisamos configurar o tamanho em que queremos renderizar nossa aplicação. É uma boa ideia usar o comprimento e a altura da área que queremos preencher com nossa aplicação - no nosso caso, o comprimento e altura da janela do navegador. Para aplicativos de alto desempenho, você pode fornecer valores menores para o `setSize`, como `window.innerWidth/2` e `window.innerHeight/2`, o que fará com que a aplicação seja renderizada no tamanho de um quarto do original.</p>
 
 		<p>Se você deseja manter o tamanho do seu aplicativo mas renderizá-lo em uma resolução mais baixa, você pode chamar o `setSize` passando false como `updateStyle` (o terceiro argumento). Por exemplo, `setSize(window.innerWidth/2, window.innerHeight/2, false)` irá renderizar sua aplicação na metade da resolução, já que seu elemento &lt;canvas&gt; tem 100% de comprimento e altura.</p>
 
@@ -118,7 +117,7 @@
 		<h2>O resultado</h2>
 		<p>Parabéns! Agora você concluiu seu primeiro aplicativo three.js. É simples, mas você tem que começar de algum lugar.</p>
 
-		<p>O código completo está disponível abaixo e como um [link:https://jsfiddle.net/fxurzeb4/ exemplo] editável. Brinque com ele para entender melhor como funciona.</p>
+		<p>O código completo está disponível abaixo e como um [link:https://jsfiddle.net/em4j9hvu/ exemplo] editável. Brinque com ele para entender melhor como funciona.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -131,8 +130,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -154,7 +154,7 @@
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
-					};
+					}
 
 					animate();
 				&lt;/script&gt;

@@ -12,20 +12,22 @@ export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module( 'BoxHelper', ( hooks ) => {
 
-		var geometries = undefined;
+		let geometries = undefined;
+
 		hooks.beforeEach( function () {
 
 			// Test with a normal cube and a box helper
-			var boxGeometry = new BoxGeometry();
-			var box = new Mesh( boxGeometry );
-			var boxHelper = new BoxHelper( box );
+			const boxGeometry = new BoxGeometry();
+			const box = new Mesh( boxGeometry );
+			const boxHelper = new BoxHelper( box );
 
 			// The same should happen with a comparable sphere
-			var sphereGeometry = new SphereGeometry();
-			var sphere = new Mesh( sphereGeometry );
-			var sphereBoxHelper = new BoxHelper( sphere );
+			const sphereGeometry = new SphereGeometry();
+			const sphere = new Mesh( sphereGeometry );
+			const sphereBoxHelper = new BoxHelper( sphere );
 
-			// Note that unlike what I'd like to, these doesn't check the equivalency of the two generated geometries
+			// Note that unlike what I'd like to, these doesn't check the equivalency
+			// of the two generated geometries
 			geometries = [ boxHelper.geometry, sphereBoxHelper.geometry ];
 
 		} );

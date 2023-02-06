@@ -97,7 +97,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -152,18 +152,18 @@
 				fragmentShader: document.getElementById( 'fragment-postprocess' ).textContent.trim()
 			} );
 
-			var depthStep = 0.4;
+			let depthStep = 0.4;
 
-			var camera, scene, mesh, renderer, stats;
+			let camera, scene, mesh, renderer, stats;
 
-			var planeWidth = 50;
-			var planeHeight = 50;
+			const planeWidth = 50;
+			const planeHeight = 50;
 
 			init();
 
 			function init() {
 
-				var container = document.createElement( 'div' );
+				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
@@ -200,14 +200,14 @@
 					.setResponseType( 'arraybuffer' )
 					.load( 'textures/3d/head256x256x109.zip', function ( data ) {
 
-						var zip = unzipSync( new Uint8Array( data ) );
+						const zip = unzipSync( new Uint8Array( data ) );
 						const array = new Uint8Array( zip[ 'head256x256x109' ].buffer );
 
 						const texture = new THREE.DataArrayTexture( array, DIMENSIONS.width, DIMENSIONS.height, DIMENSIONS.depth );
 						texture.format = THREE.RedFormat;
 						texture.needsUpdate = true;
 
-						var material = new THREE.ShaderMaterial( {
+						const material = new THREE.ShaderMaterial( {
 							uniforms: {
 								diffuse: { value: renderTarget.texture },
 								depth: { value: 55 },
@@ -217,7 +217,7 @@
 							fragmentShader: document.getElementById( 'fs' ).textContent.trim()
 						} );
 
-						var geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
+						const geometry = new THREE.PlaneGeometry( planeWidth, planeHeight );
 
 						mesh = new THREE.Mesh( geometry, material );
 
@@ -244,7 +244,7 @@
 
 				requestAnimationFrame( animate );
 
-				var value = mesh.material.uniforms[ 'depth' ].value;
+				let value = mesh.material.uniforms[ 'depth' ].value;
 
 				value += depthStep;
 

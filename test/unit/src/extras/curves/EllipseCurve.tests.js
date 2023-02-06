@@ -139,7 +139,7 @@ export default QUnit.module( 'Extras', () => {
 			// OTHERS
 			QUnit.test( 'Simple curve', ( assert ) => {
 
-				var expectedPoints = [
+				const expectedPoints = [
 					new Vector2( 10, 0 ),
 					new Vector2( 0, 10 ),
 					new Vector2( - 10, 0 ),
@@ -147,7 +147,7 @@ export default QUnit.module( 'Extras', () => {
 					new Vector2( 10, 0 )
 				];
 
-				var points = curve.getPoints( expectedPoints.length - 1 );
+				const points = curve.getPoints( expectedPoints.length - 1 );
 
 				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
 
@@ -162,13 +162,13 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getLength/getLengths', ( assert ) => {
 
-				var length = curve.getLength();
-				var expectedLength = 62.829269247282795;
+				const length = curve.getLength();
+				const expectedLength = 62.829269247282795;
 
 				assert.numEqual( length, expectedLength, 'Correct length of curve' );
 
-				var lengths = curve.getLengths( 5 );
-				var expectedLengths = [
+				const lengths = curve.getLengths( 5 );
+				const expectedLengths = [
 					0,
 					11.755705045849462,
 					23.51141009169892,
@@ -189,15 +189,15 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getPoint/getPointAt', ( assert ) => {
 
-				var testValues = [ 0, 0.3, 0.5, 0.7, 1 ];
+				const testValues = [ 0, 0.3, 0.5, 0.7, 1 ];
 
-				var p = new Vector2();
-				var a = new Vector2();
+				const p = new Vector2();
+				const a = new Vector2();
 
 				testValues.forEach( function ( val ) {
 
-					var expectedX = Math.cos( val * Math.PI * 2 ) * 10;
-					var expectedY = Math.sin( val * Math.PI * 2 ) * 10;
+					const expectedX = Math.cos( val * Math.PI * 2 ) * 10;
+					const expectedY = Math.sin( val * Math.PI * 2 ) * 10;
 
 					curve.getPoint( val, p );
 					curve.getPointAt( val, a );
@@ -214,7 +214,7 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getTangent', ( assert ) => {
 
-				var expectedTangents = [
+				const expectedTangents = [
 					new Vector2( - 0.000314159260186071, 0.9999999506519786 ),
 					new Vector2( - 1, 0 ),
 					new Vector2( 0, - 1 ),
@@ -222,7 +222,7 @@ export default QUnit.module( 'Extras', () => {
 					new Vector2( 0.00031415926018600165, 0.9999999506519784 )
 				];
 
-				var tangents = [
+				const tangents = [
 					curve.getTangent( 0, new Vector2() ),
 					curve.getTangent( 0.25, new Vector2() ),
 					curve.getTangent( 0.5, new Vector2() ),
@@ -232,7 +232,7 @@ export default QUnit.module( 'Extras', () => {
 
 				expectedTangents.forEach( function ( exp, i ) {
 
-					var tangent = tangents[ i ];
+					const tangent = tangents[ i ];
 
 					assert.numEqual( tangent.x, exp.x, 'getTangent #' + i + ': x correct' );
 					assert.numEqual( tangent.y, exp.y, 'getTangent #' + i + ': y correct' );
@@ -243,11 +243,11 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getUtoTmapping', ( assert ) => {
 
-				var start = curve.getUtoTmapping( 0, 0 );
-				var end = curve.getUtoTmapping( 0, curve.getLength() );
-				var somewhere = curve.getUtoTmapping( 0.7, 1 );
+				const start = curve.getUtoTmapping( 0, 0 );
+				const end = curve.getUtoTmapping( 0, curve.getLength() );
+				const somewhere = curve.getUtoTmapping( 0.7, 1 );
 
-				var expectedSomewhere = 0.01591614882650014;
+				const expectedSomewhere = 0.01591614882650014;
 
 				assert.strictEqual( start, 0, 'getUtoTmapping( 0, 0 ) is the starting point' );
 				assert.strictEqual( end, 1, 'getUtoTmapping( 0, length ) is the ending point' );
@@ -257,7 +257,7 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getSpacedPoints', ( assert ) => {
 
-				var expectedPoints = [
+				const expectedPoints = [
 					new Vector2( 10, 0 ),
 					new Vector2( 3.0901699437494603, 9.51056516295154 ),
 					new Vector2( - 8.090169943749492, 5.877852522924707 ),
@@ -266,13 +266,13 @@ export default QUnit.module( 'Extras', () => {
 					new Vector2( 10, - 2.4492935982947065e-15 )
 				];
 
-				var points = curve.getSpacedPoints();
+				const points = curve.getSpacedPoints();
 
 				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
 
 				expectedPoints.forEach( function ( exp, i ) {
 
-					var point = points[ i ];
+					const point = points[ i ];
 
 					assert.numEqual( point.x, exp.x, 'Point #' + i + ': x correct' );
 					assert.numEqual( point.y, exp.y, 'Point #' + i + ': y correct' );
