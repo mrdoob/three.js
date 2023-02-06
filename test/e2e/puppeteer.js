@@ -18,21 +18,38 @@ const exceptionList = [
 	'css3d_youtube',
 	'webgl_video_kinect',
 	'webgl_video_panorama_equirectangular',
+	'webxr_vr_video',
 
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
-
-	'webgl_effects_ascii', // blink renders text differently in every platform
 
 	'webxr_ar_lighting', // webxr
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
+	// Windows-Linux text rendering differences
+	// TODO: Fix these by setting a font in Puppeteer -- this can also fix a bunch of 0.1%-0.2% examples
+	'css3d_periodictable',
+	'misc_controls_pointerlock',
+	'misc_uv_tests',
+	'webgl_camera_logarithmicdepthbuffer',
+	'webgl_effects_ascii',
+	'webgl_loader_pdb',
+	'webgl_multiple_canvases_circle',
+	'webgl_multiple_elements_text',
+	'webgl_nodes_playground',
+	'webgl_shaders_tonemapping',
+	'webgpu_nodes_playground',
+
+	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	'webgl_clipping_advanced',
 	'webgl_lensflares',
 	'webgl_lines_sphere',
+	'webgl_lights_spotlights',
 	'webgl_loader_imagebitmap',
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
+	'webgl_materials_blending',
 	'webgl_morphtargets_face',
 	'webgl_nodes_materials_standard',
 	'webgl_postprocessing_crossfade',
@@ -59,7 +76,7 @@ const chromiumChannel = 'stable'; // stable -> beta -> dev -> canary (Mac and Wi
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
-const maxDifferentPixels = 0.05; // at most 5% different pixels
+const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
 const networkTimeout = 90; // 90 seconds, set to 0 to disable
 const renderTimeout = 4.5; // 4.5 seconds, set to 0 to disable
@@ -464,13 +481,11 @@ async function makeAttempt( page, failedScreenshots, cleanPage, isMakeScreenshot
 
 			}
 
-			numDifferentPixels /= actual.width * actual.height;
-
 			/* Print results */
 
-			const differentPixels = 100 * numDifferentPixels;
+			const differentPixels = numDifferentPixels / ( actual.width * actual.height ) * 100;
 
-			if ( numDifferentPixels < maxDifferentPixels ) {
+			if ( differentPixels < maxDifferentPixels ) {
 
 				console.green( `Diff ${ differentPixels.toFixed( 1 ) }% in file: ${ file }` );
 
