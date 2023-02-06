@@ -18,7 +18,7 @@
 
 	<!-- Import maps polyfill -->
 	<!-- Remove this when import maps will be widely supported -->
-	<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 	<script type="importmap">
 		{
@@ -80,7 +80,7 @@
 				.onChange( () => {
 
 					renderPixelatedPass.setPixelSize( params.pixelSize );
-		
+
 				} );
 			gui.add( renderPixelatedPass, 'normalEdgeStrength' ).min( 0 ).max( 2 ).step( .05 );
 			gui.add( renderPixelatedPass, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
@@ -97,7 +97,7 @@
 			// meshes
 
 			const boxMaterial = new THREE.MeshPhongMaterial( { map: texChecker2 } );
-		
+
 			function addBox( boxSideLength, x, z, rotation ) {
 
 				const mesh = new THREE.Mesh( new THREE.BoxGeometry( boxSideLength, boxSideLength, boxSideLength ), boxMaterial );
@@ -108,7 +108,7 @@
 				mesh.position.set( x, boxSideLength / 2 + .0001, z );
 				scene.add( mesh );
 				return mesh;
-		
+
 			}
 
 			addBox( .4, 0, 0, Math.PI / 4 );
@@ -175,7 +175,7 @@
 			requestAnimationFrame( animate );
 
 			const t = clock.getElapsedTime();
-		
+
 			crystalMesh.material.emissiveIntensity = Math.sin( t * 3 ) * .5 + .5;
 			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;
 			crystalMesh.rotation.y = stopGoEased( t, 2, 4 ) * 2 * Math.PI;
@@ -271,7 +271,7 @@
 			camera.updateProjectionMatrix();
 
 		}
-		
+
 	</script>
 </body>
 
