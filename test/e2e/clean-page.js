@@ -1,15 +1,16 @@
 ( function () {
 
-	/* Remove start screen (or press some button ) */
+	/* Remove start screen (or press some button) */
 
 	const button = document.getElementById( 'startButton' );
 	if ( button ) button.click();
 
-	/* Remove gui and fonts */
+	/* Remove GUI and most text
+	   Set proper fonts */
 
 	const style = document.createElement( 'style' );
 	style.type = 'text/css';
-	style.innerHTML = '#info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; } * { font-family: Monospace !important; }';
+	style.innerHTML = '#info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; } * { font-family: Courier, Monospace !important; }';
 
 	document.querySelector( 'head' ).appendChild( style );
 
