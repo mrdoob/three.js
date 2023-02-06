@@ -198,25 +198,18 @@ function onDocumentLoad() {
 
 	function formatImportSelect ( _, name, modulePath ) {
 
-		var globalPath = modulePath.replace( 'examples/jsm/', 'examples/js/' );
+		var cdnPath = modulePath.replace( 'three/addons/', 'examples/jsm/' );
 
 		return [
 
-			'<h2>Import</h2>',
-			'<p>',
-			'	' + name + ' is optional, and must be included in your project before use. ',
-			'	For more information, see [link:#manual/introduction/Installation Installation - Examples].',
-			'</p>',
-			'',
 			'<div class="import-wrap">',
 			'	<select>',
 			'		<option value="npm" selected>npm</option>',
 			'		<option value="cdn">cdn</option>',
 			'	</select>',
-			'	<code data-import="npm">import { ' + name + ' } from \'three/' + modulePath + '\';</code></pre>',
+			`	<code data-import="npm">import { ${ name } } from \'${ modulePath }\';</code></pre>`,
 			'	<code data-import="cdn" style="display: none;">&lt;script type="module">\n',
-			'  // For latest version, see https://unpkg.com/three.',
-			'  import { ' + name + ' } from \'https://unpkg.com/three@&lt;VERSION>/' + modulePath + '\';\n',
+			`  import { ${ name } } from \'https://unpkg.com/three@&lt;VERSION>/${ cdnPath }\';\n`,
 			'&lt;/script></code></pre>',
 			'</div>',
 
