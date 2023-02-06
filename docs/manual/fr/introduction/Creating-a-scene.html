@@ -13,7 +13,7 @@
 
 		<h2>Avant de commencer</h2>
 
-		<p>Avant de pouvoir utiliser three.js, vous aurez besoin d'un endroit pour l'afficher. Enregistrez le code HTML suivant dans un fichier sur votre ordinateur, ainsi qu'une copie de three.js dans le dossier js/, et ouvrez-le dans votre navigateur.</p>
+		<p>Avant de pouvoir utiliser three.js, vous aurez besoin d'un endroit pour l'afficher. Enregistrez le code HTML suivant dans un fichier sur votre ordinateur et ouvrez-le dans votre navigateur.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -26,8 +26,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					// Our Javascript will go here.
 				&lt;/script&gt;
 			&lt;/body&gt;
@@ -59,9 +60,7 @@
 
 		<p>Les deux attributs suivants sont le `near` et le `far` du plan de coupe. Les objets plus loins de la caméra que la valeur `far` ou plus proches que `near` ne seront pas rendus. Vous n'avez pas besoin de vous préoccuper de ça pour l'instant, mais vous devriez ajuster ces valeurs dans vos applications afin d'obtenir de meilleures performances.</p>
 
-		<p>Ensuite vient le moteur de rendu. C'est là où la magie opère. En plus du WebGLRenderer que nous utilisons ici, three.js est livré avec quelques autres moteurs de rendu, principalement utilisés comme moteurs de support pour les utilisateurs avec des navigateurs plus anciens ou n'ayant pas de support de WebGL.</p>
-
-		<p>En plus d'instancier le moteur de rendu, nous avons aussi besoin de définir la taille à laquelle doit-être effectué le rendu de l'application. Il est recommandé d'utiliser la largeur et la hauteur de la zone qu'est censée occuper l'application - dans ce cas, la largeur et la hauteur de la fenêtre du navigateur. Pour les applications gourmandes en ressources, vous pouvez aussi donner à `setSize` des valeurs plus petites, comme `window.innerWidth/2` et `window.innerHeight/2`, qui permettra d'effectuer le rendu à un quart de sa taille initiale.</p>
+		<p>Ensuite vient le moteur de rendu. En plus d'instancier le moteur de rendu, nous avons aussi besoin de définir la taille à laquelle doit-être effectué le rendu de l'application. Il est recommandé d'utiliser la largeur et la hauteur de la zone qu'est censée occuper l'application - dans ce cas, la largeur et la hauteur de la fenêtre du navigateur. Pour les applications gourmandes en ressources, vous pouvez aussi donner à `setSize` des valeurs plus petites, comme `window.innerWidth/2` et `window.innerHeight/2`, qui permettra d'effectuer le rendu à un quart de sa taille initiale.</p>
 
 		<p>Si vous souhaitez conserver la taille de votre application mais effectuer un rendu avec une résolution plus faible, vous pouvez le faire appelant `setSize` avec false comme `updateStyle` (le troisième argument). Par exemple, `setSize(window.innerWidth/2, window.innerHeight/2, false)` effectuera un rendu de votre application à demi-résolution, en considérant que votre &lt;canvas&gt; a 100% de largeur et de hauteur.</p>
 
@@ -116,7 +115,7 @@
 		<h2>Le résultat</h2>
 		<p>Félicitations! Vous avez maintenant terminé votre première application three.js. C'est trivial, mais il faut bien commencer quelque part.</p>
 
-		<p>Le code complet est disponible ci-dessous et ainsi que sous forme d'éditable [link:https://jsfiddle.net/fxurzeb4/ exemple live]. Amusez-vous avec pour avoir une meilleure idée de son fonctionnement.</p>
+		<p>Le code complet est disponible ci-dessous et ainsi que sous forme d'éditable [link:https://jsfiddle.net/em4j9hvu/ exemple live]. Amusez-vous avec pour avoir une meilleure idée de son fonctionnement.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -129,8 +128,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -152,7 +152,7 @@
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
-					};
+					}
 
 					animate();
 				&lt;/script&gt;

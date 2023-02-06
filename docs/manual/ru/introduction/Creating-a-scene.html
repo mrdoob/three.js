@@ -14,7 +14,7 @@
 		<h2>Прежде чем мы начнем</h2>
 
 		<p>
-			Прежде чем вы сможете использовать three.js , вам нужно где-то его отобразить. Сохраните следующий HTML-код в файл на вашем компьютере вместе с копией [link:https://threejs.org/build/three.js three.js] в каталоге js/ и откройте его в своем браузере.
+			Прежде чем вы сможете использовать three.js , вам нужно где-то его отобразить. Save the following HTML to a file on your computer and open it in your browser.
 		</p>
 
 		<code>
@@ -28,8 +28,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					// Наш Javascript будет здесь..
 				&lt;/script&gt;
 			&lt;/body&gt;
@@ -115,7 +116,7 @@
 
 		<p>Поздравляю! Теперь вы завершили свой первый three.js применение. Это просто, но вы должны с чего-то начать.</p>
 
-		<p>Полный код доступен ниже и доступен для редактирования [link:https://jsfiddle.net/fxurzeb4/ live example]. Поиграйте с ним, чтобы лучше понять, как он работает.</p>
+		<p>Полный код доступен ниже и доступен для редактирования [link:https://jsfiddle.net/em4j9hvu/ live example]. Поиграйте с ним, чтобы лучше понять, как он работает.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -128,8 +129,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -151,7 +153,7 @@
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
-					};
+					}
 
 					animate();
 				&lt;/script&gt;
