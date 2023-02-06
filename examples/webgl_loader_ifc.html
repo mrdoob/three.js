@@ -37,6 +37,8 @@
 
 			import { IFCLoader } from 'three/addons/loaders/IFCLoader.js';
 
+			THREE.ColorManagement.legacyMode = false;
+
 			let scene, camera, renderer;
 
 			init();
@@ -118,6 +120,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true	} );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
 				//Controls
