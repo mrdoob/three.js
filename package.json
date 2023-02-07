@@ -22,6 +22,7 @@
   },
   "sideEffects": false,
   "files": [
+    "build/three.js",
     "build/three.cjs",
     "build/three.module.js",
     "examples/jsm",
@@ -163,6 +164,7 @@
       "package.json",
       "LICENSE",
       "README.md",
+      "build/three.js",
       "build/three.module.js"
     ],
     "directories": {}

@@ -286,6 +286,12 @@ const builds = [
 		],
 		output: [
 			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.js',
+				indent: '\t'
+			},
+			{
 				format: 'cjs',
 				name: 'THREE',
 				file: 'build/three.cjs',
