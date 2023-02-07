@@ -2,15 +2,33 @@
 
 import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 
+import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
+
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'ColorManagement', () => {
 
 		// PROPERTIES
-		QUnit.test( 'legacyMode', ( assert ) => {
+		QUnit.test( 'enabled', ( assert ) => {
 
 			assert.ok(
-				ColorManagement.legacyMode == true,
+				ColorManagement.enabled == false,
+				'ColorManagement.enabled is false by default.'
+			);
+
+		} );
+
+		QUnit.test( 'legacyMode', ( assert ) => {
+
+			// surpress the following console message during testing
+			// THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r150.
+
+			console.level = CONSOLE_LEVEL.OFF;
+			const expected = ColorManagement.legacyMode == true;
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
+			assert.ok(
+				expected,
 				'ColorManagement.legacyMode is true by default.'
 			);
 
