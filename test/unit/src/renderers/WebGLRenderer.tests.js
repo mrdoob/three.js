@@ -10,7 +10,7 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const renderer = new WebGLRenderer();
-			assert.ok( renderer, 'Can instantiate a renderer.' );
+			assert.ok( renderer, 'Can instantiate a WebGLRenderer.' );
 
 		} );
 
