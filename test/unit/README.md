@@ -17,7 +17,7 @@ Some tests can only be run in a browser environment.
 
 For browser tests, futher changes to the library will not be reflected until the page is refreshed.
 
-When adding or updating tests, the cost common cause of test failure is forgetting to change `QUnit.todo` to `QUnit.test` when the test is ready.
+When adding or updating tests, the most common cause of test failure is forgetting to change `QUnit.todo` to `QUnit.test` when the test is ready.
 
 ## Debugging
 
