@@ -24,11 +24,13 @@ export default QUnit.module( 'Maths', () => {
 			// THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r150.
 
 			console.level = CONSOLE_LEVEL.OFF;
+			const expected = ColorManagement.legacyMode == true;
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
 			assert.ok(
-				ColorManagement.legacyMode == true,
+				expected,
 				'ColorManagement.legacyMode is true by default.'
 			);
-			console.level = CONSOLE_LEVEL.DEFAULT;
 
 		} );
 
