@@ -269,7 +269,7 @@ function deprecationWarning() {
 
 		renderChunk( code ) {
 
-			return `console.warn( 'This build file will be removed with r160. Have a look at the Installation guide for alternative three.js setups: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );
+			return `console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );
 ${ code }`;
 
 		}
