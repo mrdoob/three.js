@@ -46,8 +46,6 @@ jobs:
           cache: 'npm'
       - name: Install packages
         run: npm ci
-      - name: Build
-        run: npm run build
 
       - name: === Unit testing ===
         run: npm run test-unit
