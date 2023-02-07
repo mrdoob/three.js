@@ -100,7 +100,7 @@ const exceptionList = [
 const PLATFORMS = {
 	linux: 'linux',
 	mac: 'mac',
-	mac_arm: 'mac_am64',
+	mac_arm: 'mac_arm64',
 	win32: 'win',
 	win64: 'win64'
 };
@@ -268,7 +268,7 @@ async function main() {
 
 async function downloadLatestChromium() {
 
-	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
+	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium', useMacOSARMBinary: true } ); // ARM binary is experimental
 
 	const os = PLATFORMS[ browserFetcher.platform() ];
 
