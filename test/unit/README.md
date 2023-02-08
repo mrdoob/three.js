@@ -9,7 +9,7 @@ You can run the unit tests in two environments:
 - Node.js: Execute `npm run test-unit` from the root folder
 - Browser: Execute `npx servez -p 8080 --ssl` (or run any other local web sever) from the root folder and access `https://localhost:8080/test/unit/UnitTests.html` in a web browser. 
 
-See [How to run things locally](https://threejs.org/docs/#manual/introduction/How-to-run-things-locally) for more information.
+See [Installation](https://threejs.org/docs/#manual/introduction/Installation) for more information.
 
 ## Notes
 
