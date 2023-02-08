@@ -1,0 +1,56 @@
+{
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": 2020, // parse at 2020 using rules to enforce 2018
+    "sourceType": "module"
+  },
+  "extends": [
+    "mdcs",
+    "plugin:compat/recommended"
+  ],
+  "plugins": [
+    "html",
+    "import"
+  ],
+  "settings": {
+    "polyfills": [
+      "WebGL2RenderingContext"
+    ]
+  },
+  "globals": {
+    "__THREE_DEVTOOLS__": "readonly",
+    "potpack": "readonly",
+    "fflate": "readonly",
+    "OIMO": "readonly",
+    "Stats": "readonly",
+    "XRWebGLBinding": "readonly",
+    "XRWebGLLayer": "readonly",
+    "GPUShaderStage": "readonly",
+    "GPUBufferUsage": "readonly",
+    "GPUTextureUsage": "readonly",
+    "GPUMapMode": "readonly",
+    "QUnit": "readonly",
+    "Ammo": "readonly",
+    "XRRigidTransform": "readonly",
+    "XRMediaBinding": "readonly",
+    "CodeMirror": "readonly",
+    "esprima": "readonly",
+    "jsonlint": "readonly"
+  },
+  "rules": {
+    "no-throw-literal": [
+      "error"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "prefer-const": [
+      "error",
+      {
+        "destructuring": "any",
+        "ignoreReadBeforeAssign": false
+      }
+    ]
+  }
+}
