@@ -263,6 +263,21 @@ ${ code }`;
 
 }
 
+function deprecationWarning() {
+
+	return {
+
+		renderChunk( code ) {
+
+			return `console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );
+${ code }`;
+
+		}
+
+	};
+
+}
+
 const builds = [
 	{
 		input: 'src/Three.js',
@@ -288,12 +303,6 @@ const builds = [
 		],
 		output: [
 			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.js',
-				indent: '\t'
-			},
-			{
 				format: 'cjs',
 				name: 'THREE',
 				file: 'build/three.cjs',
@@ -305,10 +314,28 @@ const builds = [
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
+			glsl(),
+			header(),
+			deprecationWarning()
+		],
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.js',
+				indent: '\t'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
 			glconstants(),
 			glsl(),
 			terser(),
-			header()
+			header(),
+			deprecationWarning()
 		],
 		output: [
 			{
