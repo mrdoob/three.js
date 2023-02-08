@@ -208,58 +208,6 @@ strong {
 	font-weight: 600;
 }
 
-.import-wrap {
-	position: relative;
-}
-
-/* Duplicates styles in main.css. Needed here because page is inside the iframe */
-.import-wrap select {
-	position: absolute;
-	right: -22px;
-	top: 4px;
-	font-family: 'Roboto Mono', monospace;
-	font-size: 1rem;
-	line-height: 1rem;
-	font-weight: 500;
-	color: var(--text-color);
-	border: 0px;
-	background-image: url(../files/ic_arrow_drop_down_black_24dp.svg);
-	background-size: var(--icon-size);
-	background-repeat: no-repeat;
-	background-position: right center;
-	background-color: #F5F5F5;
-	padding: 2px 24px 4px 4px;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	direction: rtl;
-}
-
-.import-wrap option {
-	direction: rtl;
-}
-
-.import-wrap code {
-	padding-right: 80px;
-	white-space: pre;
-}
-
-.import-wrap a {
-	float: right;
-	margin-top: -18px;
-	margin-right: -24px;
-	font-size: small;
-	text-transform: uppercase;
-}
-
-@media (prefers-color-scheme: dark) {
-
-	.import-wrap select {
-		background-color: #333333;
-	}
-
-}
-
 /* TODO: Duplicate styles in main.css. Needed here cause button is inside the iframe */
 #button {
 	position: fixed;

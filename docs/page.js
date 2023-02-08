@@ -69,8 +69,6 @@ function onDocumentLoad() {
 	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, `<a class='permalink links' data-fragment='${name}.$2' target='_parent' title='${name}.$2'>#</a> .<a class='links' data-fragment='${name}.$2' id='$2'>$2</a> $3 : <a class='param links' data-fragment='$1'>$1</a>` );
 	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a class=\'param links\' data-fragment=\'$1\'>$1</a>' ); // [param:name title]
 
-	text = text.replace( /\[import:([\w]+) ([\w\.\s\/]+)\]/gi, formatImportSelect );
-
 	text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+)\]/gi, '<a href="$1" target="_blank">$1</a>' ); // [link:url]
 	text = text.replace( /\[link:([\w:/.\-_()?#=!~]+) ([\w\p{L}:/.\-_'\s]+)\]/giu, '<a href="$1" target="_blank">$2</a>' ); // [link:url title]
 	text = text.replace( /\*([\w\d\"\-\(][\w\d\ \/\+\-\(\)\=\,\."]*[\w\d\"\)]|\w)\*/gi, '<strong>$1</strong>' ); // *text*
@@ -172,50 +170,6 @@ function onDocumentLoad() {
 	};
 
 	document.head.appendChild( prettify );
-
-	// Import module
-
-	var importSelect = document.querySelector( '.import-wrap select' );
-
-	if ( importSelect ) {
-
-		importSelect.addEventListener( 'change', function () {
-
-			var importBlocks = document.querySelectorAll( '.import-wrap [data-import]' );
-
-			for ( var i = 0; i < importBlocks.length; i ++ ) {
-
-				var block = importBlocks[ i ];
-
-				block.style.display = block.getAttribute( 'data-import' ) === importSelect.value ? '' : 'none';
-
-			}
-
-		} );
-
-	}
-
-
-	function formatImportSelect ( _, name, modulePath ) {
-
-		var cdnPath = modulePath.replace( 'three/addons/', 'examples/jsm/' );
-
-		return [
-
-			'<div class="import-wrap">',
-			'	<select>',
-			'		<option value="npm" selected>npm</option>',
-			'		<option value="cdn">cdn</option>',
-			'	</select>',
-			`	<code data-import="npm">import { ${ name } } from \'${ modulePath }\';</code></pre>`,
-			'	<code data-import="cdn" style="display: none;">&lt;script type="module">\n',
-			`  import { ${ name } } from \'https://unpkg.com/three@&lt;VERSION>/${ cdnPath }\';\n`,
-			'&lt;/script></code></pre>',
-			'</div>',
-
-		].join( '\n' );
-
-	}
 
 }
 
