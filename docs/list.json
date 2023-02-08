@@ -8,7 +8,6 @@
 				"Creating a scene": "manual/en/introduction/Creating-a-scene",
 				"Installation": "manual/en/introduction/Installation",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
-				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
@@ -18,10 +17,10 @@
 			},
 
 			"Next Steps": {
-				"How to update things": "manual/en/introduction/How-to-update-things",
-				"How to dispose of objects": "manual/en/introduction/How-to-dispose-of-objects",
-				"How to create VR content": "manual/en/introduction/How-to-create-VR-content",
-				"How to use post-processing": "manual/en/introduction/How-to-use-post-processing",
+				"Updating resources": "manual/en/introduction/How-to-update-things",
+				"Disposing resources": "manual/en/introduction/How-to-dispose-of-objects",
+				"Creating VR content": "manual/en/introduction/How-to-create-VR-content",
+				"Post-processing": "manual/en/introduction/How-to-use-post-processing",
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
 				"Animation system": "manual/en/introduction/Animation-system",
 				"Color management": "manual/en/introduction/Color-management"
