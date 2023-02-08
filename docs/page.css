@@ -208,6 +208,7 @@ strong {
 	font-weight: 600;
 }
 
+
 /* TODO: Duplicate styles in main.css. Needed here cause button is inside the iframe */
 #button {
 	position: fixed;
