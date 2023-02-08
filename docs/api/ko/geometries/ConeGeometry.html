@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">A class for generating cone geometries.</p>
+		<p class="desc">원뿔 기하학을 생성하기 위한 클래스입니다.</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#ConeGeometry"></iframe>
 
@@ -31,7 +31,7 @@
 
 		</script>
 
-		<h2>Code Example</h2>
+		<h2>예제</h2>
 
 		<code>const geometry = new THREE.ConeGeometry( 5, 20, 32 );
 		const material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
@@ -39,31 +39,31 @@
 		scene.add( cone );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>생성자</h2>
 
 		<h3>[name]([param:Float radius], [param:Float height], [param:Integer radialSegments], [param:Integer heightSegments], [param:Boolean openEnded], [param:Float thetaStart], [param:Float thetaLength])</h3>
 		<p>
-		radius — Radius of the cone base. Default is 1.<br />
-		height — Height of the cone. Default is 1.<br />
-		radialSegments — Number of segmented faces around the circumference of the cone. Default is 32<br />
-		heightSegments — Number of rows of faces along the height of the cone. Default is 1.<br />
-		openEnded — A Boolean indicating whether the base of the cone is open or capped. Default is false, meaning capped.<br />
-		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
-		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete cone.
+		radius — 원뿔 밑면의 반지름입니다. 기본값은 1 입니다.<br />
+		height — 원뿔의 높이입니다. 기본값은 1 입니다.<br />
+		radialSegments — 원뿔 둘레 주변의 분할된 면의 수입니다. 기본값은 32 입니다.<br />
+		heightSegments — 원뿔 높이를 따라 있는 면의 행 수입니다. 기본값은 1 입니다.<br />
+		openEnded — 원뿔의 밑면이 열려 있는지 닫혀 있는지를 나타내는 부울입니다. 기본값은 닫힘을 의미하는 false 입니다.<br />
+		thetaStart — 첫 번째 세그먼트의 시작 각도, 기본값은 0 입니다 (3시 위치).<br />
+		thetaLength — 원형 섹터의 중심 각도(흔히 세타라고 함)입니다. 기본값은 완전한 원을 만드는 2*Pi 입니다.
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:CylinderGeometry] class for common properties.</p>
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:CylinderGeometry] 클래스를 참조하십시오.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		각 생성자 매개 변수에 대한 속성을 가진 개체입니다. 인스턴스화 후에 수정해도 지오메트리는 변경되지 않습니다.
 		</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:CylinderGeometry] class for common methods.</p>
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:CylinderGeometry] 클래스를 참조하십시오.</p>
 
-		<h2>Source</h2>
+		<h2>소스 코드</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
