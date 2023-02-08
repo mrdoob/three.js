@@ -5,8 +5,8 @@
 		"Manual": {
 
 			"Getting Started": {
-				"Creating a scene": "manual/en/introduction/Creating-a-scene",
 				"Installation": "manual/en/introduction/Installation",
+				"Creating a scene": "manual/en/introduction/Creating-a-scene",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
