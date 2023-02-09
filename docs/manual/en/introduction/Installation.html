@@ -84,7 +84,9 @@ import * as THREE from 'three';
 				Install [link:https://nodejs.org/ Node.js]. We'll need it to load manage dependencies and to run our build tool.
 			</li>
 			<li>
-				Install three.js and a build tool, [link:https://vitejs.dev/ Vite], using a [link:https://www.joshwcomeau.com/javascript/terminal-for-js-devs/ terminal] in your project folder. Vite will be used during development, but it isn't part of the final webpage. If you prefer to use another build tool, that's fine — we support modern build tools that can import [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC ES Modules].
+				<p>
+					Install three.js and a build tool, [link:https://vitejs.dev/ Vite], using a [link:https://www.joshwcomeau.com/javascript/terminal-for-js-devs/ terminal] in your project folder. Vite will be used during development, but it isn't part of the final webpage. If you prefer to use another build tool, that's fine — we support modern build tools that can import [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC ES Modules].
+				</p>
 				<code>
 # three.js
 npm install --save three
@@ -92,6 +94,17 @@ npm install --save three
 # vite
 npm install --save-dev vite
 				</code>
+				<aside>
+					<details>
+						<summary>Installation added <i>node_modules/</i> and <i>package.json</i> to my project. What are they?</summary>
+						<p>
+							npm uses <i>package.json</i> to describe which versions of each dependency you've installed. If you have other people working on the project with you, they can install the original versions of each dependency simply by running <i>npm install</i>. If you're using version history, commit <i>package.json</i>.
+						</p>
+						<p>
+							npm the code for each dependency in a new <i>node_modules/</i> folder. When Vite builds your application, it sees imports for 'three' and pulls three.js files automatically from this folder. The <i>node_modules/</i> folder is used only during development, and shouldn't be uploaded to your web hosting provider or committed to version history.
+						</p>
+					</details>
+				</aside>
 			</li>
 			<li>
 				From your terminal, run:
@@ -114,13 +127,13 @@ npm install --save-dev vite
 
 		<ul>
 			<li>
-				[link:https://threejs-journey.com/lessons/local-server three.js journey / Local Server]
+				[link:https://threejs-journey.com/lessons/local-server three.js journey: Local Server]
 			</li>
 			<li>
-				 [link:https://vitejs.dev/guide/cli.html Vite / Command Line Interface]
+				 [link:https://vitejs.dev/guide/cli.html Vite: Command Line Interface]
 			</li>
 			<li>
-				[link:https://eloquentjavascript.net/20_node.html#h_J6hW/SmL/a Eloquent JavaScript / Installing with NPM]
+				[link:https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management MDN: Package management basics]
 			</li>
 		</ul>
 
