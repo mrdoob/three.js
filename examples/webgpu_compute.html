@@ -31,7 +31,7 @@
 			import {
 				ShaderNode, compute,
 				uniform, element, storage, attribute, mul, sin, cos,
-				add, cond, abs, max, min, float, vec2, vec3, color, instanceIndex
+				add, cond, abs, clamp, float, vec2, color, instanceIndex
 			} from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -93,12 +93,12 @@
 					stack.assign( velocity.x, abs( position.x ).greaterThanEqual( limit.x ).cond( velocity.x.negate(), velocity.x ) );
 					stack.assign( velocity.y, abs( position.y ).greaterThanEqual( limit.y ).cond( velocity.y.negate(), velocity.y ) );
 
-					stack.assign( position, max( limit.negate(), min( limit, position ) ) );
+					stack.assign( position, clamp( position, limit.negate(), limit ) );
 
 					const pointerSize = 0.1;
 					const distanceFromPointer = pointer.sub( position ).length();
 
-					stack.assign( particle, cond( distanceFromPointer.lessThanEqual( pointerSize ), vec3(), position ) );
+					stack.assign( particle, cond( distanceFromPointer.lessThanEqual( pointerSize ), vec2(), position ) );
 
 				} );
 

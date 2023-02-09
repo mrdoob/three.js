@@ -79,19 +79,19 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( this.positionNode !== null ) {
 
-			vertex = bypass( vertex, assign( positionLocal, this.positionNode ) );
+			vertex = bypass( assign( positionLocal, this.positionNode ), vertex );
 
 		}
 
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
-			vertex = bypass( vertex, instance( object ) );
+			vertex = bypass( instance( object ), vertex );
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			vertex = bypass( vertex, skinning( object ) );
+			vertex = bypass( skinning( object ), vertex );
 
 		}
 
