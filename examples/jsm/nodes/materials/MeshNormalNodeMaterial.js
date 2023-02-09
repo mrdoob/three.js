@@ -1,6 +1,6 @@
 import NodeMaterial from './NodeMaterial.js';
 import { MeshNormalMaterial } from 'three';
-import { vec4, diffuseColor, materialOpacity, transformedNormalView, normalToRGB } from '../shadernode/ShaderNodeElements.js';
+import { vec4, diffuseColor, materialOpacity, transformedNormalView, directionToColor } from '../shadernode/ShaderNodeElements.js';
 
 const defaultValues = new MeshNormalMaterial();
 
@@ -12,7 +12,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		this.isMeshNormalNodeMaterial = true;
 
-		this.opacityNode = source.opacityNode;
+		this.opacityNode = null;
 
 		this.positionNode = null;
 
@@ -26,7 +26,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
-		stack.assign( diffuseColor, vec4( normalToRGB( transformedNormalView ), opacityNode ) );
+		stack.assign( diffuseColor, vec4( directionToColor( transformedNormalView ), opacityNode ) );
 
 	}
 

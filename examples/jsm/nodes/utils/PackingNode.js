@@ -1,14 +1,20 @@
 import TempNode from '../core/TempNode.js';
-import { normalize } from '../shadernode/ShaderNodeBaseElements.js';
+import { mul } from '../shadernode/ShaderNodeBaseElements.js';
 
 class PackingNode extends TempNode {
 
 	constructor( scope, node ) {
 
-		super( 'vec3' );
+		super();
 
 		this.scope = scope;
 		this.node = node;
+
+	}
+
+	getNodeType( builder ) {
+
+		return this.node.getNodeType( builder );
 
 	}
 
@@ -18,13 +24,13 @@ class PackingNode extends TempNode {
 
 		let result = null;
 
-		if ( scope === PackingNode.NORMAL_TO_RGB ) {
+		if ( scope === PackingNode.DIRECTION_TO_COLOR ) {
 
-			result = normalize( node ).mul( 0.5 ).add( 0.5 );
+			result = mul( node, 0.5 ).add( 0.5 );
 
-		} else if ( scope === PackingNode.RGB_TO_NORMAL ) {
+		} else if ( scope === PackingNode.COLOR_TO_DIRECTION ) {
 
-			result = node.mul( 2.0 ).sub( 1 );
+			result = mul( node, 2.0 ).sub( 1 );
 
 		}
 
@@ -34,7 +40,7 @@ class PackingNode extends TempNode {
 
 }
 
-PackingNode.NORMAL_TO_RGB = 'normalToRGB';
-PackingNode.RGB_TO_NORMAL = 'rgbToNormal';
+PackingNode.DIRECTION_TO_COLOR = 'directionToColor';
+PackingNode.COLOR_TO_DIRECTION = 'colorToDirection';
 
 export default PackingNode;

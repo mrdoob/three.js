@@ -144,8 +144,8 @@ export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME );
 export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
 export const triplanarTexture = ( texture, ...params ) => triplanarTextures( texture, texture, texture, ...params );
 
-export const normalToRGB = nodeProxy( PackingNode, PackingNode.NORMAL_TO_RGB );
-export const rgbToNormal = nodeProxy( PackingNode, PackingNode.RGB_TO_NORMAL );
+export const directionToColor = nodeProxy( PackingNode, PackingNode.DIRECTION_TO_COLOR );
+export const colorToDirection = nodeProxy( PackingNode, PackingNode.COLOR_TO_DIRECTION );
 
 // geometry
 
