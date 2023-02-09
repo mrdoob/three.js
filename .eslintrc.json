@@ -1,7 +1,12 @@
 {
   "root": true,
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2018": true
+  },
   "parserOptions": {
-    "ecmaVersion": 2020, // parse at 2020 using rules to enforce 2018
+    "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "extends": [
