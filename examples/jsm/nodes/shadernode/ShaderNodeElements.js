@@ -29,6 +29,7 @@ import SpecularMIPLevelNode from '../utils/SpecularMIPLevelNode.js';
 import SpriteSheetUVNode from '../utils/SpriteSheetUVNode.js';
 import TimerNode from '../utils/TimerNode.js';
 import TriplanarTexturesNode from '../utils/TriplanarTexturesNode.js';
+import PackingNode from '../utils/PackingNode.js';
 
 // geometry
 import RangeNode from '../geometry/RangeNode.js';
@@ -142,6 +143,9 @@ export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME );
 
 export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
 export const triplanarTexture = ( texture, ...params ) => triplanarTextures( texture, texture, texture, ...params );
+
+export const normalToRGB = nodeProxy( PackingNode, PackingNode.NORMAL_TO_RGB );
+export const rgbToNormal = nodeProxy( PackingNode, PackingNode.RGB_TO_NORMAL );
 
 // geometry
 
