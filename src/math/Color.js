@@ -174,7 +174,7 @@ class Color {
 
 		let m;
 
-		if ( m = /^((?:rgb|hsl)a?)\(([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^(\w+)\(([^\)]*)\)/.exec( style ) ) {
 
 			// rgb / hsl
 
@@ -237,6 +237,10 @@ class Color {
 
 					break;
 
+				default:
+
+					console.warn( 'THREE.Color: Unknown color model ' + style );
+
 			}
 
 		} else if ( m = /^\#([A-Fa-f\d]+)$/.exec( style ) ) {
@@ -268,11 +272,13 @@ class Color {
 
 				return this;
 
+			} else {
+
+				console.warn( 'THREE.Color: Invalid hex color ' + style );
+
 			}
 
-		}
-
-		if ( style && style.length > 0 ) {
+		} else if ( style && style.length > 0 ) {
 
 			return this.setColorName( style, colorSpace );
 
