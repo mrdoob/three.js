@@ -55,7 +55,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.physicallyCorrectLights = true;
+				renderer.useLegacyLights = false;
 
 				// tonemapping
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
