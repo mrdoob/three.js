@@ -311,6 +311,7 @@ class OrbitControls extends EventDispatcher {
 			if ( scope._domElementKeyEvents !== null ) {
 
 				scope._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown );
+				scope._domElementKeyEvents = null;
 
 			}
 
