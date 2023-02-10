@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">Creates meshes with axial symmetry like vases. The lathe rotates around the Y axis.</p>
+		<p class="desc">꽃병과 같은 축 대칭으로 메쉬를 만듭니다. 선반은 Y축을 중심으로 회전합니다.</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#LatheGeometry"></iframe>
 
@@ -31,7 +31,7 @@
 
 		</script>
 
-		<h2>Code Example</h2>
+		<h2>코드 예제</h2>
 
 		<code>
 		const points = [];
@@ -44,31 +44,31 @@
 		scene.add( lathe );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>생성자</h2>
 
 		<h3>[name]([param:Array points], [param:Integer segments], [param:Float phiStart], [param:Float phiLength])</h3>
 		<p>
-		points — Array of Vector2s. The x-coordinate of each point must be greater than zero. Default is an array with (0,-0.5), (0.5,0) and (0,0.5) which creates a simple diamond shape.<br />
-		segments — the number of circumference segments to generate. Default is 12.<br />
-		phiStart — the starting angle in radians. Default is 0.<br />
-		phiLength — the radian (0 to 2PI) range of the lathed section 2PI is a closed lathe, less than 2PI is a portion. Default is 2PI.
+		points — Vector2의 배열. 각 점의 x 좌표는 0보다 커야 합니다. 기본값은 단순한 다이아몬드 모양을 만드는 (0,-0.5), (0.5,0) 및 (0,0.5)의 배열입니다.<br />
+		segments — 생성할 원주 세그먼트의 수입니다. 기본값은 12 입니다.<br />
+		phiStart — 시작 각도(라디안 단위). 기본값은 0 입니다.<br />
+		phiLength — 선반 섹션의 라디안(0 ~ 2PI) 범위 2PI는 닫힌 선반이고, 2PI 미만이 한 부분입니다. 기본값은 2PI 입니다.
 		</p>
 		<p>
-		This creates a [name] based on the parameters.
+		이렇게 하면 매개변수를 기반으로 [name]가 생성됩니다.
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:BufferGeometry] class for common properties.</p>
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		각 생성자 매개 변수에 대한 속성을 가진 개체입니다. 인스턴스화 후에 수정해도 지오메트리는 변경되지 않습니다.
 		</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:BufferGeometry] class for common methods.</p>
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
 
-		<h2>Source</h2>
+		<h2>소스 코드</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

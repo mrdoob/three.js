@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -31,39 +31,40 @@
 
 		</script>
 
-		<h2>Code Example</h2>
+		<h2>코드 예제</h2>
 
-		<code>const geometry = new THREE.RingGeometry( 1, 5, 32 );
+		<code>
+		const geometry = new THREE.RingGeometry( 1, 5, 32 );
 		const material = new THREE.MeshBasicMaterial( { color: 0xffff00, side: THREE.DoubleSide } );
 		const mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>생성자</h2>
 
 		<h3>[name]([param:Float innerRadius], [param:Float outerRadius], [param:Integer thetaSegments], [param:Integer phiSegments], [param:Float thetaStart], [param:Float thetaLength])</h3>
 		<p>
-		innerRadius — Default is 0.5. <br />
-		outerRadius — Default is 1. <br />
-		thetaSegments — Number of segments.  A higher number means the ring will be more round.  Minimum is 3.  Default is 32. <br />
-		phiSegments — Minimum is 1.  Default is 1.<br />
-		thetaStart — Starting angle. Default is 0. <br />
-		thetaLength — Central angle.  Default is Math.PI * 2.
+		innerRadius — 기본값은 0.5 입니다. <br />
+		outerRadius — 기본값은 1 입니다. <br />
+		thetaSegments — Number of segments.  A higher number means the ring will be more round.  최소값은 3 입니다.  기본값은 32 입니다. <br />
+		phiSegments — 최소값은 1 입니다.  기본값은 1 입니다.<br />
+		thetaStart — Starting angle. 기본값은 0 입니다. <br />
+		thetaLength — Central angle.  기본값은 Math.PI * 2 입니다.
 		</p>
 
 
-		<h2>Properties</h2>
-		<p>See the base [page:BufferGeometry] class for common properties.</p>
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
 		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
 		</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:BufferGeometry] class for common methods.</p>
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:BufferGeometry] 클래스를 찹조하십시오.</p>
 
-		<h2>Source</h2>
+		<h2>소스 코드</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

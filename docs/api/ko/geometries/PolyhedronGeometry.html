@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -18,26 +18,26 @@
 			and [page:TetrahedronGeometry] to generate their respective geometries.
 		</p>
 
-		<h2>Code Example</h2>
-<code>
-const verticesOfCube = [
-    -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
-    -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
-];
+		<h2>코드 예제</h2>
+		<code>
+		const verticesOfCube = [
+		    -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
+ 		    -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
+		];
 
-const indicesOfFaces = [
-    2,1,0,    0,3,2,
-    0,4,7,    7,3,0,
-    0,1,5,    5,4,0,
-    1,2,6,    6,5,1,
-    2,3,7,    7,6,2,
-    4,5,6,    6,7,4
-];
+		const indicesOfFaces = [
+ 		   2,1,0,    0,3,2,
+ 		   0,4,7,    7,3,0,
+ 		   0,1,5,    5,4,0,
+ 		   1,2,6,    6,5,1,
+ 		   2,3,7,    7,6,2,
+ 		   4,5,6,    6,7,4
+		];
 
-const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
-</code>
+		const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+		</code>
 
-		<h2>Constructor</h2>
+		<h2>생성자</h2>
 
 
 		<h3>[name]([param:Array vertices], [param:Array indices], [param:Float radius], [param:Integer detail])</h3>
@@ -48,18 +48,18 @@ const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6
 		detail — [page:Integer] - How many levels to subdivide the geometry. The more detail, the smoother the shape.
 		</p>
 
-		<h2>Properties</h2>
-		<p>See the base [page:BufferGeometry] class for common properties.</p>
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
 
 		<h3>[property:Object parameters]</h3>
 		<p>
 		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
 		</p>
 
-		<h2>Methods</h2>
-		<p>See the base [page:BufferGeometry] class for common methods.</p>
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
 
-		<h2>Source</h2>
+		<h2>소스 코드</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
