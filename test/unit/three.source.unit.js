@@ -288,3 +288,6 @@ import './src/textures/FramebufferTexture.tests.js';
 import './src/textures/Source.tests.js';
 import './src/textures/Texture.tests.js';
 import './src/textures/VideoTexture.tests.js';
+
+//examples/jsm/loaders
+import './src/examples/loaders/DRACOLoader.tests.js';
