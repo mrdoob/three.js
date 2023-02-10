@@ -7,9 +7,21 @@ export default QUnit.module( 'Scenes', () => {
 	QUnit.module( 'FoxExp2', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			// FoxExp2( color, density = 0.00025 )
+
+			// no params
+			const object = new FogExp2();
+			assert.ok( object, 'Can instantiate a FogExp2.' );
+
+			// color
+			const object_color = new FogExp2( 0xffffff );
+			assert.ok( object_color, 'Can instantiate a FogExp2 with color.' );
+
+			// color, density
+			const object_all = new FogExp2( 0xffffff, 0.00030 );
+			assert.ok( object_all, 'Can instantiate a FogExp2 with color, density.' );
 
 		} );
 

@@ -29,6 +29,7 @@ export default QUnit.module( 'Textures', () => {
 		// PROPERTIES
 		QUnit.todo( 'image', ( assert ) => {
 
+			// { width: width, height: height }
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
