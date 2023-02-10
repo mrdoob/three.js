@@ -2253,7 +2253,7 @@ function WebGLRenderer( parameters = {} ) {
 
 Object.defineProperties( WebGLRenderer.prototype, {
 
-	// @deprecated since r147
+	// @deprecated since r150
 
 	physicallyCorrectLights: {
 
