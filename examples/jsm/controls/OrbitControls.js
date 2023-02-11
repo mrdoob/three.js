@@ -129,7 +129,7 @@ class OrbitControls extends EventDispatcher {
 			this._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown );
 			this._domElementKeyEvents = null;
 
-		};        
+		};
 
 		this.saveState = function () {
 
