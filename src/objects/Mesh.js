@@ -165,6 +165,10 @@ class Mesh extends Object3D {
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
+		const R = raycaster.ray.origin.distanceToSquared( _sphere.center );
+		if ( R < ( raycaster.near - _sphere.radius ) ** 2 ) return;
+		if ( R > ( raycaster.far + _sphere.radius ) ** 2 ) return;
+
 		//
 
 		_inverseMatrix.copy( matrixWorld ).invert();
@@ -329,8 +333,6 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 	_intersectionPointWorld.applyMatrix4( object.matrixWorld );
 
 	const distance = raycaster.ray.origin.distanceTo( _intersectionPointWorld );
-
-	if ( distance < raycaster.near || distance > raycaster.far ) return null;
 
 	return {
 		distance: distance,
