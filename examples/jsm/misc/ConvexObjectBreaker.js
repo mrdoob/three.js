@@ -19,7 +19,7 @@ import { ConvexGeometry } from '../geometries/ConvexGeometry.js';
  *
  * Requisites for the object:
  *
- *  - Mesh object must have a BufferGeometry (not Geometry) and a Material
+ *  - Mesh object must have a buffer geometry and a material
  *
  *  - Vertex normals must be planar (not smoothed)
  *
@@ -70,15 +70,9 @@ class ConvexObjectBreaker {
 
 	prepareBreakableObject( object, mass, velocity, angularVelocity, breakable ) {
 
-		// object is a Object3d (normally a Mesh), must have a BufferGeometry, and it must be convex.
+		// object is a Object3d (normally a Mesh), must have a buffer geometry, and it must be convex.
 		// Its material property is propagated to its children (sub-pieces)
 		// mass must be > 0
-
-		if ( ! object.geometry.isBufferGeometry ) {
-
-			console.error( 'THREE.ConvexObjectBreaker.prepareBreakableObject(): Parameter object must have a BufferGeometry.' );
-
-		}
 
 		const userData = object.userData;
 		userData.mass = mass;
