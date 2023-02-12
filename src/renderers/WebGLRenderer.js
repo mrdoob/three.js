@@ -392,7 +392,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	this.setSize = function ( width, height, updateStyle ) {
+	this.setSize = function ( width, height, updateStyle = true ) {
 
 		if ( xr.isPresenting ) {
 
@@ -407,7 +407,7 @@ function WebGLRenderer( parameters = {} ) {
 		_canvas.width = Math.floor( width * _pixelRatio );
 		_canvas.height = Math.floor( height * _pixelRatio );
 
-		if ( updateStyle !== false ) {
+		if ( updateStyle ) {
 
 			_canvas.style.width = width + 'px';
 			_canvas.style.height = height + 'px';
