@@ -406,7 +406,15 @@ class Box3 {
 
 		this.getCenter( target.center );
 
-		target.radius = this.getSize( _vector ).length() * 0.5;
+		if ( this.isEmpty() ) {
+
+			target.radius = - 1;
+
+		} else {
+
+			target.radius = this.getSize( _vector ).length() * 0.5;
+
+		}
 
 		return target;
 
