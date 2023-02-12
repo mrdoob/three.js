@@ -165,9 +165,9 @@ class Mesh extends Object3D {
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
-		const R = raycaster.ray.origin.distanceToSquared( _sphere.center );
-		if ( R < ( raycaster.near - _sphere.radius ) ** 2 ) return;
-		if ( R > ( raycaster.far + _sphere.radius ) ** 2 ) return;
+		const R = raycaster.ray.origin.distanceTo( _sphere.center );
+		if ( R < raycaster.near - _sphere.radius ) return;
+		if ( R > raycaster.far + _sphere.radius ) return;
 
 		//
 
