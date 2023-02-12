@@ -407,7 +407,7 @@ function WebGLRenderer( parameters = {} ) {
 		_canvas.width = Math.floor( width * _pixelRatio );
 		_canvas.height = Math.floor( height * _pixelRatio );
 
-		if ( updateStyle ) {
+		if ( updateStyle === true ) {
 
 			_canvas.style.width = width + 'px';
 			_canvas.style.height = height + 'px';
