@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">Creates a tube that extrudes along a 3d curve.</p>
+		<p class="desc">3D 커브를 따라 돌출되는 튜브를 생성합니다.</p>
 
 		<iframe id="scene" src="scenes/geometry-browser.html#TubeGeometry"></iframe>
 
@@ -68,11 +68,11 @@
 
 		<h3>[name]([param:Curve path], [param:Integer tubularSegments], [param:Float radius], [param:Integer radialSegments], [param:Boolean closed])</h3>
 		<p>
-		path — [page:Curve] - A 3D path that inherits from the [page:Curve] base class. Default is a quadratic bezier curve.<br />
-		tubularSegments — [page:Integer] - The number of segments that make up the tube. 기본값은 64 입니다.<br />
-		radius — [page:Float] - The radius of the tube. 기본값은 1 입니다.<br />
-		radialSegments — [page:Integer] - The number of segments that make up the cross-section. 기본값은 8 입니다.<br />
-		closed — [page:Boolean] Is the tube open or closed. 기본값은 false 입니다.<br />
+		path — [page:Curve] - [page:Curve] 기본 클래스 에서 상속되는 3D 경로입니다. 기본값은 2차 베지어 곡선입니다.<br />
+		tubularSegments — [page:Integer] - 튜브를 구성하는 세그먼트 수입니다. 기본값은 64 입니다.<br />
+		radius — [page:Float] - 튜브의 반지름입니다. 기본값은 1 입니다.<br />
+		radialSegments — [page:Integer] - 횡단면을 구성하는 세그먼트의 수입니다. 기본값은 8 입니다.<br />
+		closed — [page:Boolean] 튜브가 열려 있거나 닫혀 있는지 여부입니다. 기본값은 false 입니다.<br />
 		</p>
 
 
@@ -81,22 +81,22 @@
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		각 생성자 매개 변수에 대한 속성이 있는 개체입니다. 인스턴스화 후 수정해도 형상은 변경되지 않습니다.
 		</p>
 
 		<h3>[property:Array tangents]</h3>
 		<p>
-		An array of [page:Vector3] tangents
+		[page:Vector3] 접선의 배열
 		</p>
 
 		<h3>[property:Array normals]</h3>
 		<p>
-		An array of [page:Vector3] normals
+		[page:Vector3] 법선의 배열
 		</p>
 
 		<h3>[property:Array binormals]</h3>
 		<p>
-		An array of [page:Vector3] binormals
+		[page:Vector3] 종법선의 배열
 		</p>
 
 		<h2>메서드</h2>
