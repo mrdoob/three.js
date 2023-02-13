@@ -163,11 +163,11 @@ class Mesh extends Object3D {
 		_sphere.copy( geometry.boundingSphere );
 		_sphere.applyMatrix4( matrixWorld );
 
-		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+		if ( raycaster.ray.intersectSphere( _sphere, _intersectionPoint ) === null ) return;
 
-		const R = raycaster.ray.origin.distanceToSquared( _sphere.center );
-		if ( ( _sphere.radius < raycaster.near ) && R < ( raycaster.near - _sphere.radius ) ** 2 ) return;
-		if ( R > ( raycaster.far + _sphere.radius ) ** 2 ) return;
+		const R = raycaster.ray.origin.distanceToSquared( _intersectionPoint );
+
+		if ( R < raycaster.near ** 2 || R > raycaster.far ** 2 ) return;
 
 		//
 
