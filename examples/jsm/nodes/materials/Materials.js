@@ -1,5 +1,6 @@
 import NodeMaterial from './NodeMaterial.js';
 import LineBasicNodeMaterial from './LineBasicNodeMaterial.js';
+import MeshNormalNodeMaterial from './MeshNormalNodeMaterial.js';
 import MeshBasicNodeMaterial from './MeshBasicNodeMaterial.js';
 import MeshPhongNodeMaterial from './MeshPhongNodeMaterial.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
@@ -10,6 +11,7 @@ import SpriteNodeMaterial from './SpriteNodeMaterial.js';
 export {
 	NodeMaterial,
 	LineBasicNodeMaterial,
+	MeshNormalNodeMaterial,
 	MeshBasicNodeMaterial,
 	MeshPhongNodeMaterial,
 	MeshStandardNodeMaterial,
@@ -23,6 +25,7 @@ NodeMaterial.fromMaterial = function ( material ) {
 	const materialLib = {
 		NodeMaterial,
 		LineBasicNodeMaterial,
+		MeshNormalNodeMaterial,
 		MeshBasicNodeMaterial,
 		MeshPhongNodeMaterial,
 		MeshStandardNodeMaterial,

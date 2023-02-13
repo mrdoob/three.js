@@ -20,9 +20,10 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const renderer = new WebGL1Renderer();
+			assert.ok( renderer, 'Can instantiate a WebGL1Renderer.' );
 
 		} );
 

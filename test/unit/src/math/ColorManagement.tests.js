@@ -11,8 +11,8 @@ export default QUnit.module( 'Maths', () => {
 		// PROPERTIES
 		QUnit.test( 'enabled', ( assert ) => {
 
-			assert.ok(
-				ColorManagement.enabled == false,
+			assert.strictEqual(
+				ColorManagement.enabled, false,
 				'ColorManagement.enabled is false by default.'
 			);
 
@@ -24,7 +24,7 @@ export default QUnit.module( 'Maths', () => {
 			// THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r150.
 
 			console.level = CONSOLE_LEVEL.OFF;
-			const expected = ColorManagement.legacyMode == true;
+			const expected = ColorManagement.legacyMode === true;
 			console.level = CONSOLE_LEVEL.DEFAULT;
 
 			assert.ok(

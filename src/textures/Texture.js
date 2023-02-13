@@ -177,6 +177,7 @@ class Texture extends EventDispatcher {
 			wrap: [ this.wrapS, this.wrapT ],
 
 			format: this.format,
+			internalFormat: this.internalFormat,
 			type: this.type,
 			encoding: this.encoding,
 
