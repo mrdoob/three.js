@@ -27,6 +27,10 @@ const _uvC = /*@__PURE__*/ new Vector2();
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
+const _rayFromNear = /*@__PURE__*/ new Ray();
+const _rayNearAt = /*@__PURE__*/ new Vector3();
+const _raySphereHitAt = /*@__PURE__*/ new Vector3();
+
 class Mesh extends Object3D {
 
 	constructor( geometry = new BufferGeometry(), material = new MeshBasicMaterial() ) {
@@ -163,11 +167,13 @@ class Mesh extends Object3D {
 		_sphere.copy( geometry.boundingSphere );
 		_sphere.applyMatrix4( matrixWorld );
 
-		if ( raycaster.ray.intersectSphere( _sphere, _intersectionPoint ) === null ) return;
+		raycaster.ray.at( raycaster.near, _rayNearAt );
 
-		const R = raycaster.ray.origin.distanceToSquared( _intersectionPoint );
+		_rayFromNear.set( _rayNearAt, raycaster.ray.direction );
 
-		if ( R < raycaster.near ** 2 || R > raycaster.far ** 2 ) return;
+		if ( _rayFromNear.intersectSphere( _sphere, _raySphereHitAt ) === null ) return;
+
+		if ( _rayNearAt.distanceToSquared( _raySphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
 
 		//
 
