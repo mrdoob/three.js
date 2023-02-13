@@ -13,11 +13,15 @@ See [How to run things locally](https://threejs.org/docs/#manual/introduction/Ho
 
 ## Notes
 
-Some tests can only be run in a browser environment.
+A small number of tests can only be run in a browser environment.
 
 For browser tests, futher changes to the library will not be reflected until the page is refreshed.
 
-When adding or updating tests, the cost common cause of test failure is forgetting to change `QUnit.todo` to `QUnit.test` when the test is ready.
+## Troubleshooting
+
+When adding or updating tests, the most common cause of test failure is forgetting to change `QUnit.todo` to `QUnit.test` when the test is ready.
+
+An error that indicates "no tests were found" means that an import statement could not be resolved. This is usually caused by a typo in the import path.
 
 ## Debugging
 
