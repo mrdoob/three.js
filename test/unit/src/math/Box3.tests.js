@@ -551,7 +551,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( c.getBoundingSphere( sphere ).equals( new Sphere( zero3, Math.sqrt( 12 ) * 0.5 ) ), 'Passed!' );
 
 			const d = new Box3().makeEmpty();
-			assert.ok( d.getBoundingSphere( sphere ).radius < 0, 'Empty box\'s bounding sphere is empty' );
+			assert.ok( d.getBoundingSphere( sphere ).isEmpty(), 'Empty box\'s bounding sphere is empty' );
 
 		} );
 
