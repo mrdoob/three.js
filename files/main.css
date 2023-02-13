@@ -388,6 +388,12 @@ iframe {
 	width: 100%;
 	height: 100%;
 	overflow: auto;
+	transition: opacity 0.2s;
+}
+
+#viewer.hide,
+iframe.hide {
+	opacity: 0;
 }
 
 iframe#viewer {

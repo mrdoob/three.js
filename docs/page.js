@@ -167,6 +167,8 @@ function onDocumentLoad() {
 
 		prettyPrint(); // eslint-disable-line no-undef
 
+		window.parent.postMessage( { type: 'done' } );
+
 	};
 
 	document.head.appendChild( prettify );

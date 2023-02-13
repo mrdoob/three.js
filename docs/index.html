@@ -541,6 +541,8 @@
 
 			}
 
+			iframe.classList.add( 'hide' );
+
 			document.body.replaceChild( iframe, oldIframe );
 			document.title = subtitle + 'three.js docs';
 
@@ -572,6 +574,18 @@
 			return parts;
 
 		}
+
+		//
+
+		window.addEventListener( 'message', (ev) => {
+
+			if ( ev.origin === window.location.origin && ev.data.type === 'done' ) {
+
+				iframe.classList.remove( 'hide' );
+
+			}
+
+		} );
 
 		//
 
