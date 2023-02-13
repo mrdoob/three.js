@@ -1,4 +1,5 @@
 import TempNode from '../core/TempNode.js';
+import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class OperatorNode extends TempNode {
 
@@ -38,7 +39,7 @@ class OperatorNode extends TempNode {
 		const op = this.op;
 
 		const aNode = this.aNode;
-		const bNode = this.bNode;
+		const bNode = this.bNode
 
 		const typeA = aNode.getNodeType( builder );
 		const typeB = bNode.getNodeType( builder );
@@ -61,7 +62,7 @@ class OperatorNode extends TempNode {
 
 		} else if ( op === '<' || op === '>' || op === '<=' || op === '>=' ) {
 
-			const typeLength = builder.getTypeLength( output );
+			const typeLength = output ? builder.getTypeLength( output ) : Math.max( builder.getTypeLength( typeA ), builder.getTypeLength( typeB ) );
 
 			return typeLength > 1 ? `bvec${ typeLength }` : 'bool';
 
@@ -223,3 +224,43 @@ class OperatorNode extends TempNode {
 }
 
 export default OperatorNode;
+
+export const add = nodeProxy( OperatorNode, '+' );
+export const sub = nodeProxy( OperatorNode, '-' );
+export const mul = nodeProxy( OperatorNode, '*' );
+export const div = nodeProxy( OperatorNode, '/' );
+export const remainder = nodeProxy( OperatorNode, '%' );
+export const equal = nodeProxy( OperatorNode, '==' );
+export const assign = nodeProxy( OperatorNode, '=' );
+export const lessThan = nodeProxy( OperatorNode, '<' );
+export const greaterThan = nodeProxy( OperatorNode, '>' );
+export const lessThanEqual = nodeProxy( OperatorNode, '<=' );
+export const greaterThanEqual = nodeProxy( OperatorNode, '>=' );
+export const and = nodeProxy( OperatorNode, '&&' );
+export const or = nodeProxy( OperatorNode, '||' );
+export const xor = nodeProxy( OperatorNode, '^^' );
+export const bitAnd = nodeProxy( OperatorNode, '&' );
+export const bitOr = nodeProxy( OperatorNode, '|' );
+export const bitXor = nodeProxy( OperatorNode, '^' );
+export const shiftLeft = nodeProxy( OperatorNode, '<<' );
+export const shiftRight = nodeProxy( OperatorNode, '>>' );
+
+addNode( 'add', add );
+addNode( 'sub', sub );
+addNode( 'mul', mul );
+addNode( 'div', div );
+addNode( 'remainder', remainder );
+addNode( 'equal', equal );
+addNode( 'assign', assign );
+addNode( 'lessThan', lessThan );
+addNode( 'greaterThan', greaterThan );
+addNode( 'lessThanEqual', lessThanEqual );
+addNode( 'greaterThanEqual', greaterThanEqual );
+addNode( 'and', and );
+addNode( 'or', or );
+addNode( 'xor', xor );
+addNode( 'bitAnd', bitAnd );
+addNode( 'bitOr', bitOr );
+addNode( 'bitXor', bitXor );
+addNode( 'shiftLeft', shiftLeft );
+addNode( 'shiftRight', shiftRight );

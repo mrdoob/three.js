@@ -1,7 +1,9 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 import LightsNode from './LightsNode.js';
 import getDistanceAttenuation from '../functions/light/getDistanceAttenuation.js';
-import { uniform, positionView, objectViewPosition } from '../shadernode/ShaderNodeElements.js';
+import { uniform } from '../core/UniformNode.js';
+import { objectViewPosition } from '../accessors/Object3DNode.js';
+import { positionView } from '../accessors/PositionNode.js';
 
 import { PointLight } from 'three';
 

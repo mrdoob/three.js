@@ -1,5 +1,6 @@
 import Node from './Node.js';
 import NodeCache from './NodeCache.js';
+import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class CacheNode extends Node {
 
@@ -37,3 +38,7 @@ class CacheNode extends Node {
 }
 
 export default CacheNode;
+
+export const cache = nodeProxy( CacheNode );
+
+addNode( 'cache', cache );

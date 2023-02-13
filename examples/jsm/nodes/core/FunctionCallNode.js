@@ -1,4 +1,5 @@
 import TempNode from './TempNode.js';
+import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class FunctionCallNode extends TempNode {
 
@@ -80,3 +81,7 @@ class FunctionCallNode extends TempNode {
 }
 
 export default FunctionCallNode;
+
+export const call = nodeProxy( FunctionCallNode );
+
+addNode( 'call', call );

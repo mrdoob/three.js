@@ -32,9 +32,7 @@ class Node {
 
 	}
 
-	getChildren() {
-
-		const children = [];
+	* getChildren() {
 
 		for ( const property in this ) {
 
@@ -42,11 +40,13 @@ class Node {
 
 			if ( Array.isArray( object ) === true ) {
 
-				for ( const child of object ) {
+				for ( let i = 0; i < object.length; i++ ) {
+
+					const child = object[ i ];
 
 					if ( child && child.isNode === true ) {
 
-						children.push( child );
+						yield { childNode: child, replaceNode( node ) { object[ i ] = node; } };
 
 					}
 
@@ -54,7 +54,8 @@ class Node {
 
 			} else if ( object && object.isNode === true ) {
 
-				children.push( object );
+				const self = this;
+				yield { childNode: object, replaceNode( node ) { self[ property ] = node; } };
 
 			} else if ( typeof object === 'object' ) {
 
@@ -64,7 +65,7 @@ class Node {
 
 					if ( child && child.isNode === true ) {
 
-						children.push( child );
+						yield { childNode: child, replaceNode( node ) { object[ property ] = node; } };
 
 					}
 
@@ -74,7 +75,16 @@ class Node {
 
 		}
 
-		return children;
+	}
+
+	traverse( callback, replaceNode = null ) {
+
+		callback( this, replaceNode );
+		for ( const { childNode, replaceNode } of this.getChildren() ) {
+
+			childNode.traverse( callback, replaceNode );
+
+		}
 
 	}
 
@@ -115,7 +125,7 @@ class Node {
 
 		const nodeProperties = builder.getNodeProperties( this );
 
-		for ( const childNode of this.getChildren() ) {
+		for ( const { childNode } of this.getChildren() ) {
 
 			nodeProperties[ '_node' + childNode.id ] = childNode;
 

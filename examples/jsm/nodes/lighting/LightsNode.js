@@ -1,5 +1,6 @@
 import Node from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
+import { nodeObject, nodeProxy } from '../shadernode/ShaderNode.js';
 
 const references = new WeakMap();
 
@@ -94,7 +95,7 @@ class LightsNode extends Node {
 				const lightClass = light.constructor;
 				const lightNodeClass = references.has( lightClass ) ? references.get( lightClass ) : AnalyticLightNode;
 
-				lightNode = new lightNodeClass( light );
+				lightNode = nodeObject( new lightNodeClass( light ) );
 
 			}
 
@@ -118,3 +119,6 @@ class LightsNode extends Node {
 }
 
 export default LightsNode;
+
+export const lights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
+export const lightsWithoutWrap = nodeProxy( LightsNode );

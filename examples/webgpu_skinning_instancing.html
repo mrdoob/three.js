@@ -29,7 +29,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
-			import { mix, range, color, oscSine, timerLocal } from 'three/nodes';
+			import { mix, range, color, oscSine, timerLocal, toneMapping } from 'three/nodes';
 
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
@@ -133,7 +133,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, .17 );
+				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .17 );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

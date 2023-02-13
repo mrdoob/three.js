@@ -1,7 +1,7 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 import LightsNode from './LightsNode.js';
 import getDirectionVector from '../functions/light/getDirectionVector.js';
-import { uniform } from '../shadernode/ShaderNodeElements.js';
+import { uniform } from '../core/UniformNode.js';
 
 import { Vector3, DirectionalLight } from 'three';
 

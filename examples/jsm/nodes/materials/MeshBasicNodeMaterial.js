@@ -1,4 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
+
 import { MeshBasicMaterial } from 'three';
 
 const defaultValues = new MeshBasicMaterial();

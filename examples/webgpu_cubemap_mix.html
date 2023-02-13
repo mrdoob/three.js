@@ -33,7 +33,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
-			import { mix, oscSine, timerLocal, cubeTexture, context, float } from 'three/nodes';
+			import { mix, oscSine, timerLocal, cubeTexture, context, float, toneMapping } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -99,7 +99,7 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
+				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );

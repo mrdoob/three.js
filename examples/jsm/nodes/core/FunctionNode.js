@@ -1,5 +1,6 @@
 import CodeNode from './CodeNode.js';
-import FunctionCallNode from './FunctionCallNode.js';
+import { call } from './FunctionCallNode.js';
+import { addNode, nodeArray, nodeObject, nodeObjects } from '../shadernode/ShaderNode.js';
 
 class FunctionNode extends CodeNode {
 
@@ -43,7 +44,7 @@ class FunctionNode extends CodeNode {
 
 	call( parameters = {} ) {
 
-		return new FunctionCallNode( this, parameters );
+		return call( this, parameters );
 
 	}
 
@@ -103,3 +104,18 @@ class FunctionNode extends CodeNode {
 }
 
 export default FunctionNode;
+
+export const func = ( code, includes ) => {
+
+	const node = nodeObject( new FunctionNode( code, includes ) );
+
+	const call = node.call.bind( node );
+	node.call = ( ...params ) => nodeObject( call( params.length > 1 || ( params[ 0 ] && params[ 0 ].isNode === true ) ? nodeArray( params ) : nodeObjects( params[ 0 ] ) ) );
+
+	return node;
+
+};
+
+export const fn = ( code, includes ) => func( code, includes ).call;
+
+addNode( 'fn', fn );

@@ -1,15 +1,16 @@
 import TempNode from '../core/TempNode.js';
-import { ShaderNode, uv, add, mul, floor, mod, sign } from '../shadernode/ShaderNodeBaseElements.js';
+import { uv } from '../accessors/UVNode.js';
+import { addNode, ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 const checkerShaderNode = new ShaderNode( ( inputs ) => {
 
-	const uv = mul( inputs.uv, 2.0 );
+	const uv = inputs.uv.mul( 2.0 );
 
-	const cx = floor( uv.x );
-	const cy = floor( uv.y );
-	const result = mod( add( cx, cy ), 2.0 );
+	const cx = uv.x.floor();
+	const cy = uv.y.floor();
+	const result = cx.add( cy ).mod( 2.0 );
 
-	return sign( result );
+	return result.sign();
 
 } );
 
@@ -32,3 +33,7 @@ class CheckerNode extends TempNode {
 }
 
 export default CheckerNode;
+
+export const checker = nodeProxy( CheckerNode );
+
+addNode( 'checker', checker );

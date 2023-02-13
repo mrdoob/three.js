@@ -1,5 +1,7 @@
 import ContextNode from '../core/ContextNode.js';
-import { float, vec3, add, temp } from '../shadernode/ShaderNodeBaseElements.js';
+import { temp } from '../core/VarNode.js';
+import { add } from '../math/OperatorNode.js';
+import { addNode, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
 
 class LightingContextNode extends ContextNode {
 
@@ -73,3 +75,7 @@ class LightingContextNode extends ContextNode {
 }
 
 export default LightingContextNode;
+
+export const lightingContext = nodeProxy( LightingContextNode );
+
+addNode( 'lightingContext', lightingContext );

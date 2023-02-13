@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { add, sub, div, mul, clamp } from '../shadernode/ShaderNodeBaseElements.js';
+import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class RemapNode extends Node {
 
@@ -21,14 +21,20 @@ class RemapNode extends Node {
 
 		const { node, inLowNode, inHighNode, outLowNode, outHighNode, doClamp } = this;
 
-		let t = div( sub( node, inLowNode ), sub( inHighNode, inLowNode ) );
+		let t = node.sub( inLowNode ).div( inHighNode.sub( inLowNode ) );
 
-		if ( doClamp === true ) t = clamp( t );
+		if ( doClamp === true ) t = t.clamp();
 
-		return add( mul( sub( outHighNode, outLowNode ), t ), outLowNode );
+		return t.mul( outHighNode.sub( outLowNode ) ).add( outLowNode );
 
 	}
 
 }
 
 export default RemapNode;
+
+export const remap = nodeProxy( RemapNode, null, null, { doClamp: false } );
+export const remapClamp = nodeProxy( RemapNode );
+
+addNode( 'remap', remap );
+addNode( 'remapClamp', remapClamp );

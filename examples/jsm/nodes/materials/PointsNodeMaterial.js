@@ -1,4 +1,5 @@
 import NodeMaterial from './NodeMaterial.js';
+
 import { PointsMaterial } from 'three';
 
 const defaultValues = new PointsMaterial();

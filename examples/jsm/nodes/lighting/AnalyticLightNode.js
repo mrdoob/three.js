@@ -1,6 +1,6 @@
 import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../shadernode/ShaderNodeElements.js';
+import { uniform } from '../core/UniformNode.js';
 
 import { Color } from 'three';
 

@@ -1,5 +1,6 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { addNode, nodeObject } from '../shadernode/ShaderNode.js';
 
 class ComputeNode extends Node {
 
@@ -63,3 +64,7 @@ class ComputeNode extends Node {
 }
 
 export default ComputeNode;
+
+export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
+
+addNode( 'compute', compute );

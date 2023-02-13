@@ -1,4 +1,5 @@
 import Node from './Node.js';
+import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class BypassNode extends Node {
 
@@ -36,3 +37,7 @@ class BypassNode extends Node {
 }
 
 export default BypassNode;
+
+export const bypass = nodeProxy( BypassNode );
+
+addNode( 'bypass', bypass );

@@ -1,7 +1,9 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 import LightsNode from './LightsNode.js';
-import Object3DNode from '../accessors/Object3DNode.js';
-import { uniform, add, mul, dot, mix, normalize, normalView } from '../shadernode/ShaderNodeElements.js';
+import { uniform } from '../core/UniformNode.js';
+import { mix } from '../math/MathNode.js';
+import { normalView } from '../accessors/NormalNode.js';
+import { objectPosition } from '../accessors/Object3DNode.js';
 
 import { Color, HemisphereLight } from 'three';
 
@@ -11,8 +13,8 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		super( light );
 
-		this.lightPositionNode = new Object3DNode( Object3DNode.POSITION );
-		this.lightDirectionNode = normalize( this.lightPositionNode );
+		this.lightPositionNode = objectPosition;
+		this.lightDirectionNode = objectPosition.normalize();
 
 		this.groundColorNode = uniform( new Color() );
 
@@ -34,12 +36,12 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		const { colorNode, groundColorNode, lightDirectionNode } = this;
 
-		const dotNL = dot( normalView, lightDirectionNode );
-		const hemiDiffuseWeight = add( mul( 0.5, dotNL ), 0.5 );
+		const dotNL = normalView.dot( lightDirectionNode );
+		const hemiDiffuseWeight = dotNL.mul( 0.5 ).add( 0.5 );
 
 		const irradiance = mix( groundColorNode, colorNode, hemiDiffuseWeight );
 
-		builder.context.irradiance.add( irradiance );
+		builder.context.irradiance.addAssign( irradiance );
 
 	}
 
