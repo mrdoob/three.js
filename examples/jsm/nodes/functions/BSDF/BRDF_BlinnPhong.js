@@ -16,7 +16,6 @@ const BRDF_BlinnPhong = new ShaderNode( ( { lightDirection } ) => {
 
 	const halfDir = lightDirection.add( positionViewDirection ).normalize();
 
-	const dotNV = transformedNormalView.dot( positionViewDirection ).clamp();
 	const dotNH = transformedNormalView.dot( halfDir ).clamp();
 	const dotVH = positionViewDirection.dot( halfDir ).clamp();
 

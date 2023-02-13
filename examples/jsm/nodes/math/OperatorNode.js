@@ -39,7 +39,7 @@ class OperatorNode extends TempNode {
 		const op = this.op;
 
 		const aNode = this.aNode;
-		const bNode = this.bNode
+		const bNode = this.bNode;
 
 		const typeA = aNode.getNodeType( builder );
 		const typeB = bNode.getNodeType( builder );
