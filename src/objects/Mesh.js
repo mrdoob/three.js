@@ -334,6 +334,8 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 	const distance = raycaster.ray.origin.distanceTo( _intersectionPointWorld );
 
+	if ( distance < raycaster.near || distance > raycaster.far ) return null;
+
 	return {
 		distance: distance,
 		point: _intersectionPointWorld.clone(),
