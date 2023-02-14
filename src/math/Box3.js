@@ -404,9 +404,17 @@ class Box3 {
 
 	getBoundingSphere( target ) {
 
-		this.getCenter( target.center );
+		if ( this.isEmpty() ) {
 
-		target.radius = this.getSize( _vector ).length() * 0.5;
+			target.makeEmpty();
+
+		} else {
+
+			this.getCenter( target.center );
+
+			target.radius = this.getSize( _vector ).length() * 0.5;
+
+		}
 
 		return target;
 
