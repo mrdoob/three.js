@@ -177,9 +177,14 @@ class CSS3DRenderer {
 
 			}
 
+			const scaleByViewOffset =
+				! camera.view || ! camera.view.enabled ? 1 :
+					camera.isOrthographicCamera ? camera.view.height / camera.view.fullHeight :
+						camera.isPerspectiveCamera ? camera.view.height / _height : 1;
+
 			const cameraCSSMatrix = camera.isOrthographicCamera ?
-				'scale(' + fov + ')' + ` scale( ${ 1 / ( camera.view && camera.view.enabled ? camera.view.fullHeight / camera.view.height : 1 ) } )` + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
-				'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
+				'scale(' + fov + ')' + `scale( ${ scaleByViewOffset } )` + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
+				`scale( ${ scaleByViewOffset } )` + 'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
 			const style = cameraCSSMatrix +
 				'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
