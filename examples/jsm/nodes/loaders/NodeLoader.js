@@ -1,4 +1,4 @@
-import * as Nodes from '../Nodes.js';
+import { fromType as nodeFromType } from '../NodeLib.js';
 import { FileLoader, Loader } from 'three';
 
 class NodeLoader extends Loader {
@@ -53,7 +53,7 @@ class NodeLoader extends Loader {
 
 				const { uuid, type } = nodeJSON;
 
-				nodes[ uuid ] = Nodes.fromType( type );
+				nodes[ uuid ] = nodeFromType( type );
 				nodes[ uuid ].uuid = uuid;
 
 			}
@@ -79,7 +79,7 @@ class NodeLoader extends Loader {
 
 	parse( json ) {
 
-		const node = Nodes.fromType( json.type );
+		const node = nodeFromType( json.type );
 		node.uuid = json.uuid;
 
 		const nodes = this.parseNodes( json.inputNodes );

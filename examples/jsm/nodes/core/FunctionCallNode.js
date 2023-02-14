@@ -1,5 +1,5 @@
 import TempNode from './TempNode.js';
-import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNode, nodeArray, nodeObject, nodeObjects } from '../shadernode/ShaderNode.js';
 
 class FunctionCallNode extends TempNode {
 
@@ -82,6 +82,12 @@ class FunctionCallNode extends TempNode {
 
 export default FunctionCallNode;
 
-export const call = nodeProxy( FunctionCallNode );
+export const call = ( func, ...params ) => {
+
+	params = params.length > 1 || ( params[ 0 ] && params[ 0 ].isNode === true ) ? nodeArray( params ) : nodeObjects( params[ 0 ] );
+
+	return nodeObject( new FunctionCallNode( nodeObject( func ), params ) );
+
+};
 
 addNode( 'call', call );
