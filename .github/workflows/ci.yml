@@ -53,6 +53,7 @@ jobs:
   e2e:
     name: "E2E testing"
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
