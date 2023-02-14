@@ -543,6 +543,10 @@
 
 			iframe.classList.add( 'hide' );
 
+			jobs = 2;
+			oldIframe.removeEventListener( 'load', completeJob );
+			iframe.addEventListener( 'load', completeJob );
+
 			document.body.replaceChild( iframe, oldIframe );
 			document.title = subtitle + 'three.js docs';
 
@@ -577,11 +581,21 @@
 
 		//
 
+		let jobs = 0;
+
+		function completeJob() {
+
+			jobs --;
+
+			if ( jobs === 0 ) iframe.classList.remove( 'hide' );
+
+		}
+
 		window.addEventListener( 'message', ( ev ) => {
 
 			if ( ev.origin === window.location.origin && ev.data.type === 'done' ) {
 
-				iframe.classList.remove( 'hide' );
+				completeJob();
 
 			}
 
