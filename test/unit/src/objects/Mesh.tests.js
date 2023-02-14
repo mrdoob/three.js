@@ -4,9 +4,11 @@ import { Object3D } from '../../../../src/core/Object3D.js';
 import { Mesh } from '../../../../src/objects/Mesh.js';
 import { Raycaster } from '../../../../src/core/Raycaster.js';
 import { PlaneGeometry } from '../../../../src/geometries/PlaneGeometry.js';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
 import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
 import { Vector2 } from '../../../../src/math/Vector2.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
+import { DoubleSide } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -105,6 +107,64 @@ export default QUnit.module( 'Objects', () => {
 			assert.deepEqual( intersection.face, { a: 0, b: 2, c: 1 }, 'intersction vertex indices' );
 			assert.deepEqual( intersection.point, new Vector3( 0.25, 0.25, 0 ), 'intersction point' );
 			assert.deepEqual( intersection.uv, new Vector2( 0.75, 0.75 ), 'intersction uv' );
+
+		} );
+
+		QUnit.test( 'raycast/range', ( assert ) => {
+
+			const geometry = new BoxGeometry( 1, 1, 1 );
+			const material = new MeshBasicMaterial( { side: DoubleSide } );
+			const mesh = new Mesh( geometry, material );
+			const raycaster = new Raycaster();
+			const intersections = [];
+
+			raycaster.ray.origin.set( 0, 0, 0 );
+			raycaster.ray.direction.set( 1, 0, 0 );
+			raycaster.near = 100;
+			raycaster.far = 200;
+
+			mesh.matrixWorld.identity();
+			mesh.position.setX( 150 );
+			mesh.updateMatrixWorld( true );
+			intersections.length = 0;
+			mesh.raycast( raycaster, intersections );
+			assert.ok( intersections.length > 0, 'bounding sphere between near and far' );
+
+			mesh.matrixWorld.identity();
+			mesh.position.setX( raycaster.near );
+			mesh.updateMatrixWorld( true );
+			intersections.length = 0;
+			mesh.raycast( raycaster, intersections );
+			assert.ok( intersections.length > 0, 'bounding sphere across near' );
+
+			mesh.matrixWorld.identity();
+			mesh.position.setX( raycaster.far );
+			mesh.updateMatrixWorld( true );
+			intersections.length = 0;
+			mesh.raycast( raycaster, intersections );
+			assert.ok( intersections.length > 0, 'bounding sphere across far' );
+
+			mesh.matrixWorld.identity();
+			mesh.position.setX( 150 );
+			mesh.scale.setY( 9999 );
+			mesh.updateMatrixWorld( true );
+			intersections.length = 0;
+			mesh.raycast( raycaster, intersections );
+			assert.ok( intersections.length > 0, 'bounding sphere across near and far' );
+
+			mesh.matrixWorld.identity();
+			mesh.position.setX( - 9999 );
+			mesh.updateMatrixWorld( true );
+			intersections.length = 0;
+			mesh.raycast( raycaster, intersections );
+			assert.ok( intersections.length === 0, 'bounding sphere behind near' );
+
+			mesh.matrixWorld.identity();
+			mesh.position.setX( 9999 );
+			mesh.updateMatrixWorld( true );
+			intersections.length = 0;
+			mesh.raycast( raycaster, intersections );
+			assert.ok( intersections.length === 0, 'bounding sphere beyond far' );
 
 		} );
 
