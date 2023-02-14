@@ -268,7 +268,7 @@ async function main() {
 
 async function downloadLatestChromium() {
 
-	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium', useMacOSARMBinary: true } ); // ARM binary is experimental
+	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
 
 	const os = PLATFORMS[ browserFetcher.platform() ];
 
