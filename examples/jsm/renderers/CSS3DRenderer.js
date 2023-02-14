@@ -105,12 +105,16 @@ class CSS3DRenderer {
 
 		this.domElement = domElement;
 
+		const viewElement = document.createElement( 'div' );
+		viewElement.style.transformOrigin = '0 0';
+		viewElement.style.pointerEvents = 'none';
+		domElement.appendChild( viewElement );
+
 		const cameraElement = document.createElement( 'div' );
 
 		cameraElement.style.transformStyle = 'preserve-3d';
-		cameraElement.style.pointerEvents = 'none';
 
-		domElement.appendChild( cameraElement );
+		viewElement.appendChild( cameraElement );
 
 		this.getSize = function () {
 
@@ -127,8 +131,37 @@ class CSS3DRenderer {
 
 			if ( cache.camera.fov !== fov ) {
 
-				domElement.style.perspective = camera.isPerspectiveCamera ? fov + 'px' : '';
+				viewElement.style.perspective = camera.isPerspectiveCamera ? fov + 'px' : '';
 				cache.camera.fov = fov;
+
+			}
+
+			if ( camera.view && camera.view.enabled ) {
+
+				if ( camera.isPerspectiveCamera ) {
+
+					// view offset
+					viewElement.style.transform = `translate( ${ - camera.view.offsetX * ( _width / camera.view.width ) }px, ${ - camera.view.offsetY * ( _height / camera.view.height ) }px )`;
+
+					// view width and height
+					viewElement.style.transform += `scale( ${ _width / camera.view.width }, ${ _height / camera.view.height } )`;
+
+					// view fullWidth and fullHeight
+					viewElement.style.transform += `translate( ${ ( camera.view.fullWidth - _width ) * .5 }px, ${ ( camera.view.fullHeight - _height ) * .5 }px )`;
+
+				} else if ( camera.isOrthographicCamera ) {
+
+					// view offset
+					viewElement.style.transform = `translate( ${ - camera.view.offsetX * ( _width / camera.view.width ) }px, ${ - camera.view.offsetY * ( _height / camera.view.height ) }px )`;
+
+					// view fullWidth and fullHeight, view width and height
+					viewElement.style.transform += `scale( ${ camera.view.fullWidth / camera.view.width }, ${ camera.view.fullHeight / camera.view.height } )`;
+
+				}
+
+			} else {
+
+				viewElement.style.transform = '';
 
 			}
 
@@ -145,7 +178,7 @@ class CSS3DRenderer {
 			}
 
 			const cameraCSSMatrix = camera.isOrthographicCamera ?
-				'scale(' + fov + ')' + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
+				'scale(' + fov + ')' + ` scale( ${ 1 / ( camera.view && camera.view.enabled ? camera.view.fullHeight / camera.view.height : 1 ) } )` + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
 				'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
 			const style = cameraCSSMatrix +
@@ -172,6 +205,9 @@ class CSS3DRenderer {
 
 			domElement.style.width = width + 'px';
 			domElement.style.height = height + 'px';
+
+			viewElement.style.width = width + 'px';
+			viewElement.style.height = height + 'px';
 
 			cameraElement.style.width = width + 'px';
 			cameraElement.style.height = height + 'px';
