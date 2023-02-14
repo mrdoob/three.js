@@ -1210,7 +1210,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
 
-		if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, scene, camera );
+		if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
 
 		if ( viewport ) state.viewport( _currentViewport.copy( viewport ) );
 
@@ -1228,7 +1228,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	}
 
-	function renderTransmissionPass( opaqueObjects, scene, camera ) {
+	function renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera ) {
 
 		const isWebGL2 = capabilities.isWebGL2;
 
@@ -1256,12 +1256,38 @@ function WebGLRenderer( parameters = {} ) {
 
 		renderObjects( opaqueObjects, scene, camera );
 
-		_this.toneMapping = currentToneMapping;
+		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
+		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+
+		for ( let i = 0, l = transmissiveObjects.length; i < l; i ++ ) {
+
+			const renderItem = transmissiveObjects[ i ];
+
+			const object = renderItem.object;
+			const geometry = renderItem.geometry;
+			const material = renderItem.material;
+			const group = renderItem.group;
+
+			if ( object.layers.test( camera.layers ) ) {
+
+				const currentSide = material.side;
+
+				material.side = BackSide;
+
+				renderObject( object, scene, camera, geometry, material, group );
+
+				material.side = currentSide;
+
+			}
+
+		}
 
 		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
 
 		_this.setRenderTarget( currentRenderTarget );
+
+		_this.toneMapping = currentToneMapping;
 
 	}
 
