@@ -106,7 +106,7 @@ const PLATFORMS = {
 };
 const OMAHA_PROXY = 'https://omahaproxy.appspot.com/all.json';
 
-const chromiumChannel = 'stable'; // stable -> beta -> dev -> canary (Mac and Windows) -> canary_asan (Windows)
+const chromiumChannel = 'beta'; // stable -> beta -> dev -> canary (Mac and Windows) -> canary_asan (Windows)
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
@@ -275,12 +275,20 @@ async function downloadLatestChromium() {
 	const revisions = await ( await fetch( OMAHA_PROXY ) ).json();
 	const omahaRevisionInfo = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel );
 
-	let revision = omahaRevisionInfo.branch_base_position;
-	while ( ! ( await browserFetcher.canDownload( revision ) ) ) {
+	let revision = Number( omahaRevisionInfo.branch_base_position );
+	while ( ! ( await browserFetcher.canDownload( String( revision ) ) ) && revision > 0 ) {
 
-		revision = String( revision - 1 );
+		revision --;
 
 	}
+
+	if ( revision === 0 ) {
+
+		throw new Error( 'No Chromium snapshots available to download' );
+
+	}
+
+	revision = String( revision );
 
 	let revisionInfo = browserFetcher.revisionInfo( revision );
 	if ( revisionInfo.local === true ) {

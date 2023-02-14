@@ -726,15 +726,6 @@
 
 				}
 
-				if ( selectedGeometry === 'TextGeometry' ) {
-
-					return { fixed: true };
-
-				}
-
-				//No configuration options
-				return {};
-
 			}
 
 			//
@@ -787,7 +778,7 @@
 			group.add( new LineSegments( geometry, lineMaterial ) );
 			group.add( new Mesh( geometry, meshMaterial ) );
 
-			const options = chooseFromHash( group );
+			chooseFromHash( group );
 
 			scene.add( group );
 
@@ -795,12 +786,8 @@
 
 				requestAnimationFrame( render );
 
-				if ( ! options.fixed ) {
-
-					group.rotation.x += 0.005;
-					group.rotation.y += 0.005;
-
-				}
+				group.rotation.x += 0.005;
+				group.rotation.y += 0.005;
 
 				renderer.render( scene, camera );
 

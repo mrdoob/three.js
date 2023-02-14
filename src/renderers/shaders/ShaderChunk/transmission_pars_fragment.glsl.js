@@ -55,17 +55,8 @@ export default /* glsl */`
 
 	vec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {
 
-		float framebufferLod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );
-
-		#ifdef texture2DLodEXT
-
-			return texture2DLodEXT( transmissionSamplerMap, fragCoord.xy, framebufferLod );
-
-		#else
-
-			return texture2D( transmissionSamplerMap, fragCoord.xy, framebufferLod );
-
-		#endif
+		float lod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );
+		return textureBicubic( transmissionSamplerMap, fragCoord.xy, lod );
 
 	}
 
