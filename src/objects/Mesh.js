@@ -12,6 +12,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
+const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
 const _vA = /*@__PURE__*/ new Vector3();
 const _vB = /*@__PURE__*/ new Vector3();
@@ -26,10 +27,6 @@ const _uvC = /*@__PURE__*/ new Vector2();
 
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
-
-const _rayFromNear = /*@__PURE__*/ new Ray();
-const _rayNearAt = /*@__PURE__*/ new Vector3();
-const _raySphereHitAt = /*@__PURE__*/ new Vector3();
 
 class Mesh extends Object3D {
 
@@ -167,13 +164,15 @@ class Mesh extends Object3D {
 		_sphere.copy( geometry.boundingSphere );
 		_sphere.applyMatrix4( matrixWorld );
 
-		raycaster.ray.at( raycaster.near, _rayNearAt );
+		_ray.copy( raycaster.ray ).recast( raycaster.near );
 
-		_rayFromNear.set( _rayNearAt, raycaster.ray.direction );
+		if ( _sphere.containsPoint( _ray.origin ) === false ) {
 
-		if ( _rayFromNear.intersectSphere( _sphere, _raySphereHitAt ) === null ) return;
+			if ( _ray.intersectSphere( _sphere, _sphereHitAt ) === null ) return;
 
-		if ( _rayNearAt.distanceToSquared( _raySphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
+			if ( _ray.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
+
+		}
 
 		//
 
