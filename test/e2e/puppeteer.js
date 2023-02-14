@@ -275,12 +275,20 @@ async function downloadLatestChromium() {
 	const revisions = await ( await fetch( OMAHA_PROXY ) ).json();
 	const omahaRevisionInfo = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel );
 
-	let revision = omahaRevisionInfo.branch_base_position;
-	while ( ! ( await browserFetcher.canDownload( revision ) ) ) {
+	let revision = Number( omahaRevisionInfo.branch_base_position );
+	while ( ! ( await browserFetcher.canDownload( String( revision ) ) ) && revision > 0 ) {
 
-		revision = String( revision - 1 );
+		revision --;
 
 	}
+
+	if ( revision === 0 ) {
+
+		throw new Error( 'No Chromium snapshots available to download' );
+
+	}
+
+	revision = String( revision );
 
 	let revisionInfo = browserFetcher.revisionInfo( revision );
 	if ( revisionInfo.local === true ) {
