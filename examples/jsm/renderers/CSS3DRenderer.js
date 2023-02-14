@@ -138,26 +138,11 @@ class CSS3DRenderer {
 
 			if ( camera.view && camera.view.enabled ) {
 
-				if ( camera.isPerspectiveCamera ) {
+				// view offset
+				viewElement.style.transform = `translate( ${ - camera.view.offsetX * ( _width / camera.view.width ) }px, ${ - camera.view.offsetY * ( _height / camera.view.height ) }px )`;
 
-					// view offset
-					viewElement.style.transform = `translate( ${ - camera.view.offsetX * ( _width / camera.view.width ) }px, ${ - camera.view.offsetY * ( _height / camera.view.height ) }px )`;
-
-					// view width and height
-					viewElement.style.transform += `scale( ${ _width / camera.view.width }, ${ _height / camera.view.height } )`;
-
-					// view fullWidth and fullHeight
-					viewElement.style.transform += `translate( ${ ( camera.view.fullWidth - _width ) * .5 }px, ${ ( camera.view.fullHeight - _height ) * .5 }px )`;
-
-				} else if ( camera.isOrthographicCamera ) {
-
-					// view offset
-					viewElement.style.transform = `translate( ${ - camera.view.offsetX * ( _width / camera.view.width ) }px, ${ - camera.view.offsetY * ( _height / camera.view.height ) }px )`;
-
-					// view fullWidth and fullHeight, view width and height
-					viewElement.style.transform += `scale( ${ camera.view.fullWidth / camera.view.width }, ${ camera.view.fullHeight / camera.view.height } )`;
-
-				}
+				// view fullWidth and fullHeight, view width and height
+				viewElement.style.transform += `scale( ${ camera.view.fullWidth / camera.view.width }, ${ camera.view.fullHeight / camera.view.height } )`;
 
 			} else {
 
@@ -177,13 +162,9 @@ class CSS3DRenderer {
 
 			}
 
-			const scaleByViewOffset =
-				! camera.view || ! camera.view.enabled ? 1 :
-					camera.isOrthographicCamera ? camera.view.height / camera.view.fullHeight :
-						camera.isPerspectiveCamera ? camera.view.height / _height : 1;
-
+			const scaleByViewOffset = camera.view && camera.view.enabled ? camera.view.height / camera.view.fullHeight : 1;
 			const cameraCSSMatrix = camera.isOrthographicCamera ?
-				'scale(' + fov + ')' + `scale( ${ scaleByViewOffset } )` + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
+				`scale( ${ scaleByViewOffset } )` + 'scale(' + fov + ')' + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
 				`scale( ${ scaleByViewOffset } )` + 'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
 			const style = cameraCSSMatrix +
