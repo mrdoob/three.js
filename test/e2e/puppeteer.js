@@ -5,7 +5,6 @@ import path from 'path';
 import pixelmatch from 'pixelmatch';
 import jimp from 'jimp';
 import * as fs from 'fs/promises';
-import fetch from 'node-fetch';
 
 class PromiseQueue {
 
