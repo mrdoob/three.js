@@ -33,7 +33,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -43,10 +43,9 @@
 				punctualLightsEnabled: true
 			};
 
-			init();
-			render();
+			init().then( render );
 
-			function init() {
+			async function init() {
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -56,19 +55,22 @@
 
 				scene = new THREE.Scene();
 
-				const loader = new GLTFLoader().setPath( 'models/gltf/' );
-				loader.load( 'LightsPunctualLamp.glb', function ( gltf ) {
+				const rgbeLoader = new RGBELoader();
+				const envMap = await rgbeLoader.loadAsync( 'textures/equirectangular/moonless_golf_1k.hdr ' );
+				envMap.mapping = THREE.EquirectangularReflectionMapping;
 
-					scene.add( gltf.scene );
+				scene.background = envMap;
+				scene.environment = envMap;
 
-					const gui = new GUI();
+				const loader = new GLTFLoader();
+				const gltf = await loader.loadAsync( 'models/gltf/LightsPunctualLamp.glb' );
 
-					gui.add( params, 'punctualLightsEnabled' ).onChange( toggleLights );
-					gui.open();
+				scene.add( gltf.scene );
 
-					render();
+				const gui = new GUI();
 
-				} );
+				gui.add( params, 'punctualLightsEnabled' ).onChange( toggleLights );
+				gui.open();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -78,12 +80,6 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.useLegacyLights = false;
 				container.appendChild( renderer.domElement );
-
-				const environment = new RoomEnvironment();
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-
-				scene.background = new THREE.Color( 0xbbbbbb );
-				scene.environment = pmremGenerator.fromScene( environment ).texture;
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
