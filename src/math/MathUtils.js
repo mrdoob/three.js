@@ -291,7 +291,32 @@ function normalize( value, array ) {
 
 }
 
-
+const MathUtils = {
+	DEG2RAD: DEG2RAD,
+	RAD2DEG: RAD2DEG,
+	generateUUID: generateUUID,
+	clamp: clamp,
+	euclideanModulo: euclideanModulo,
+	mapLinear: mapLinear,
+	inverseLerp: inverseLerp,
+	lerp: lerp,
+	damp: damp,
+	pingpong: pingpong,
+	smoothstep: smoothstep,
+	smootherstep: smootherstep,
+	randInt: randInt,
+	randFloat: randFloat,
+	randFloatSpread: randFloatSpread,
+	seededRandom: seededRandom,
+	degToRad: degToRad,
+	radToDeg: radToDeg,
+	isPowerOfTwo: isPowerOfTwo,
+	ceilPowerOfTwo: ceilPowerOfTwo,
+	floorPowerOfTwo: floorPowerOfTwo,
+	setQuaternionFromProperEuler: setQuaternionFromProperEuler,
+	normalize: normalize,
+	denormalize: denormalize
+};
 
 export {
 	DEG2RAD,
@@ -318,4 +343,5 @@ export {
 	setQuaternionFromProperEuler,
 	normalize,
 	denormalize,
+	MathUtils
 };

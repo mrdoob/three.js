@@ -38,58 +38,6 @@
     "example": "examples",
     "test": "test"
   },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "mdcs",
-      "plugin:compat/recommended"
-    ],
-    "plugins": [
-      "html",
-      "import"
-    ],
-    "settings": {
-      "polyfills": [
-        "WebGL2RenderingContext"
-      ]
-    },
-    "globals": {
-      "__THREE_DEVTOOLS__": "readonly",
-      "potpack": "readonly",
-      "fflate": "readonly",
-      "OIMO": "readonly",
-      "Stats": "readonly",
-      "XRWebGLBinding": "readonly",
-      "XRWebGLLayer": "readonly",
-      "GPUShaderStage": "readonly",
-      "GPUBufferUsage": "readonly",
-      "GPUTextureUsage": "readonly",
-      "GPUMapMode": "readonly",
-      "QUnit": "readonly",
-      "Ammo": "readonly",
-      "XRRigidTransform": "readonly",
-      "XRMediaBinding": "readonly",
-      "CodeMirror": "readonly",
-      "esprima": "readonly",
-      "jsonlint": "readonly"
-    },
-    "rules": {
-      "no-throw-literal": [
-        "error"
-      ],
-      "quotes": [
-        "error",
-        "single"
-      ],
-      "prefer-const": [
-        "error",
-        {
-          "destructuring": "any",
-          "ignoreReadBeforeAssign": false
-        }
-      ]
-    }
-  },
   "browserslist": [
     "> 1%, not dead, not ie 11, not op_mini all"
   ],
@@ -149,9 +97,8 @@
     "eslint-plugin-import": "^2.27.5",
     "failonlyreporter": "^1.0.0",
     "jimp": "^0.16.0",
-    "node-fetch": "^3.2.6",
     "pixelmatch": "^5.3.0",
-    "puppeteer-core": "^19.6.2",
+    "puppeteer-core": "^19.7.0",
     "qunit": "^2.19.1",
     "rollup": "^3.12.0",
     "rollup-plugin-filesize": "^9.1.2",
