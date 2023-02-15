@@ -1241,6 +1241,16 @@ function WebGLRenderer( parameters = {} ) {
 				samples: ( isWebGL2 && _antialias === true ) ? 4 : 0
 			} );
 
+			// debug
+
+			/*
+			const geometry = new PlaneGeometry();
+			const material = new MeshBasicMaterial( { map: _transmissionRenderTarget.texture } );
+
+			const mesh = new Mesh( geometry, material );
+			scene.add( mesh );
+			*/
+
 		}
 
 		//
