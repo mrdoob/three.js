@@ -1268,7 +1268,7 @@ function WebGLRenderer( parameters = {} ) {
 			const material = renderItem.material;
 			const group = renderItem.group;
 
-			if ( object.layers.test( camera.layers ) ) {
+			if ( material.forceSinglePass === false && object.layers.test( camera.layers ) ) {
 
 				const currentSide = material.side;
 
