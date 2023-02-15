@@ -1,8 +1,9 @@
-import { Vector3 } from 'three';
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
+
+import { Vector3 } from 'three';
 
 class Object3DNode extends Node {
 
@@ -137,3 +138,5 @@ export const objectNormalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_M
 export const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
 export const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
 export const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
+
+addNodeClass( Object3DNode );

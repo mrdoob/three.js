@@ -1,5 +1,6 @@
 import TempNode from './TempNode.js';
-import { addNode, nodeArray, nodeObject, nodeObjects } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from './Node.js';
+import { addNodeElement, nodeArray, nodeObject, nodeObjects } from '../shadernode/ShaderNode.js';
 
 class FunctionCallNode extends TempNode {
 
@@ -90,4 +91,6 @@ export const call = ( func, ...params ) => {
 
 };
 
-addNode( 'call', call );
+addNodeElement( 'call', call );
+
+addNodeClass( FunctionCallNode );

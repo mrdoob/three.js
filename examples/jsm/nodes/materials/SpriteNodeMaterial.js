@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { uniform } from '../core/UniformNode.js';
 import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { materialRotation } from '../accessors/MaterialNode.js';
@@ -106,3 +106,5 @@ class SpriteNodeMaterial extends NodeMaterial {
 }
 
 export default SpriteNodeMaterial;
+
+addNodeMaterial( SpriteNodeMaterial );

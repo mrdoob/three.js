@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { addNodeClass } from './Node.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class InstanceIndexNode extends Node {
@@ -22,3 +22,5 @@ class InstanceIndexNode extends Node {
 export default InstanceIndexNode;
 
 export const instanceIndex = nodeImmutable( InstanceIndexNode );
+
+addNodeClass( InstanceIndexNode );

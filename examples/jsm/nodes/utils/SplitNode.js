@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { vectorComponents } from '../core/constants.js';
 
 const stringVectorComponents = vectorComponents.join( '' );
@@ -100,3 +100,5 @@ class SplitNode extends Node {
 }
 
 export default SplitNode;
+
+addNodeClass( SplitNode );

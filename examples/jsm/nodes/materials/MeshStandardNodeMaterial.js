@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { diffuseColor, metalness, roughness, specularColor } from '../core/PropertyNode.js';
 import { mix } from '../math/MathNode.js';
 import { materialRoughness, materialMetalness, materialColor } from '../accessors/MaterialNode.js';
@@ -10,7 +10,7 @@ import { MeshStandardMaterial } from 'three';
 
 const defaultValues = new MeshStandardMaterial();
 
-export default class MeshStandardNodeMaterial extends NodeMaterial {
+class MeshStandardNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
@@ -97,3 +97,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 	}
 
 }
+
+export default MeshStandardNodeMaterial;
+
+addNodeMaterial( MeshStandardNodeMaterial );

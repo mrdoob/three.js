@@ -1,5 +1,5 @@
-import Node from '../core/Node.js';
-import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class FogNode extends Node {
 
@@ -32,4 +32,6 @@ export default FogNode;
 
 export const fog = nodeProxy( FogNode );
 
-addNode( 'fog', fog );
+addNodeElement( 'fog', fog );
+
+addNodeClass( FogNode );

@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { addNodeClass } from './Node.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class ExpressionNode extends Node {
@@ -33,3 +33,5 @@ class ExpressionNode extends Node {
 export default ExpressionNode;
 
 export const expression = nodeProxy( ExpressionNode );
+
+addNodeClass( ExpressionNode );

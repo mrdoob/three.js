@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
 import { attribute } from '../core/AttributeNode.js';
@@ -108,3 +108,5 @@ class SkinningNode extends Node {
 export default SkinningNode;
 
 export const skinning = nodeProxy( SkinningNode );
+
+addNodeClass( SkinningNode );

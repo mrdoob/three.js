@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { cameraViewMatrix } from './CameraNode.js';
 import { transformedNormalView } from './NormalNode.js';
 import { positionViewDirection } from './PositionNode.js';
@@ -31,3 +31,5 @@ class ReflectVectorNode extends Node {
 export default ReflectVectorNode;
 
 export const reflectVector = nodeImmutable( ReflectVectorNode );
+
+addNodeClass( ReflectVectorNode );

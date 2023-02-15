@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { varying } from '../core/VaryingNode.js';
 import { normalize } from '../math/MathNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
@@ -85,3 +85,5 @@ export const bitangentView = nodeImmutable( BitangentNode, BitangentNode.VIEW );
 export const bitangentWorld = nodeImmutable( BitangentNode, BitangentNode.WORLD );
 export const transformedBitangentView = normalize( transformedNormalView.cross( transformedTangentView ).mul( tangentGeometry.w ) );
 export const transformedBitangentWorld = normalize( transformedBitangentView.transformDirection( cameraViewMatrix ) );
+
+addNodeClass( BitangentNode );

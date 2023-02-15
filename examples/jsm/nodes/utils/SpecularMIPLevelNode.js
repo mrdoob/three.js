@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { maxMipLevel } from './MaxMipLevelNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
@@ -33,3 +33,5 @@ class SpecularMIPLevelNode extends Node {
 export default SpecularMIPLevelNode;
 
 export const specularMIPLevel = nodeProxy( SpecularMIPLevelNode );
+
+addNodeClass( SpecularMIPLevelNode );

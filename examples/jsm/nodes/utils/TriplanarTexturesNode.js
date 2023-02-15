@@ -1,9 +1,9 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { add } from '../math/OperatorNode.js';
 import { normalWorld } from '../accessors/NormalNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { addNode, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
 
 class TriplanarTexturesNode extends Node {
 
@@ -57,4 +57,6 @@ export default TriplanarTexturesNode;
 export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
 export const triplanarTexture = ( texture, ...params ) => triplanarTextures( texture, texture, texture, ...params );
 
-addNode( 'triplanarTexture', triplanarTexture );
+addNodeElement( 'triplanarTexture', triplanarTexture );
+
+addNodeClass( TriplanarTexturesNode );

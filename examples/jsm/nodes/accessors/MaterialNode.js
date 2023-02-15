@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { uniform } from '../core/UniformNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { uv } from './UVNode.js';
@@ -265,3 +265,5 @@ export const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.RE
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
 export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
+
+addNodeClass( MaterialNode );

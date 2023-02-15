@@ -7,6 +7,7 @@ import { positionView } from '../accessors/PositionNode.js';
 import { tangentView } from '../accessors/TangentNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { faceDirection } from './FrontFacingNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { ShaderNode, nodeProxy, vec3, mat3 } from '../shadernode/ShaderNode.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
@@ -101,3 +102,5 @@ export default NormalMapNode;
 export const normalMap = nodeProxy( NormalMapNode );
 
 export const TBNViewMatrix = mat3( tangentView, bitangentView, normalView );
+
+addNodeClass( NormalMapNode );

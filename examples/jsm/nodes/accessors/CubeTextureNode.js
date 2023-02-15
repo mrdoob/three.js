@@ -1,7 +1,8 @@
 import TextureNode from './TextureNode.js';
 import UniformNode from '../core/UniformNode.js';
 import { reflectVector } from './ReflectVectorNode.js';
-import { addNode, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
 class CubeTextureNode extends TextureNode {
 
@@ -95,4 +96,6 @@ export default CubeTextureNode;
 
 export const cubeTexture = nodeProxy( CubeTextureNode );
 
-addNode( 'cubeTexture', cubeTexture );
+addNodeElement( 'cubeTexture', cubeTexture );
+
+addNodeClass( CubeTextureNode );

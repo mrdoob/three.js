@@ -19,6 +19,8 @@ import AONode from '../lighting/AONode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
+const NodeMaterials = new Map();
+
 class NodeMaterial extends ShaderMaterial {
 
 	constructor() {
@@ -364,8 +366,57 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	static fromMaterial( /*material*/ ) { }
+	static fromMaterial( material ) {
+
+		const type = material.type.replace( 'Material', 'NodeMaterial' );
+
+		const nodeMaterial = createNodeMaterialFromType( type );
+
+		if ( nodeMaterial === undefined ) {
+
+			if ( material.isNodeMaterial !== true ) {
+
+				throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
+
+			}
+
+			return material; // is already a node material
+
+		}
+
+		for ( const key in material ) {
+
+			nodeMaterial[ key ] = material[ key ];
+
+		}
+
+		return nodeMaterial;
+
+	}
 
 }
 
 export default NodeMaterial;
+
+export function addNodeMaterial( nodeMaterial ) {
+
+	if ( typeof nodeMaterial !== 'function' || ! nodeMaterial.name ) throw new Error( `Node material ${ nodeMaterial.name } is not a class` );
+	if ( NodeMaterials.has( nodeMaterial.name ) ) throw new Error( `Redefinition of node material ${ nodeMaterial.name }` );
+
+	NodeMaterials.set( nodeMaterial.name, nodeMaterial );
+
+}
+
+export function createNodeMaterialFromType( type ) {
+
+	const Material = NodeMaterials.get( type );
+
+	if ( Material !== undefined ) {
+
+		return new Material();
+
+	}
+
+};
+
+addNodeMaterial( NodeMaterial );

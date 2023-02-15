@@ -7,6 +7,7 @@ import { specularMIPLevel } from '../utils/SpecularMIPLevelNode.js';
 import { cameraViewMatrix } from '../accessors/CameraNode.js';
 import { transformedNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { float, vec2 } from '../shadernode/ShaderNode.js';
 
 class EnvironmentNode extends LightingNode {
@@ -132,3 +133,5 @@ class EnvironmentNode extends LightingNode {
 }
 
 export default EnvironmentNode;
+
+addNodeClass( EnvironmentNode );

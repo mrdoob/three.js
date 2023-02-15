@@ -164,7 +164,7 @@
 
 				// Custom WGSL ( desaturate filter )
 
-				const desaturateWGSLNode = new Nodes.FunctionNode( `
+				const desaturateWGSLNode = Nodes.func( `
 					fn desaturate( color:vec3<f32> ) -> vec3<f32> {
 
 						let lum = vec3<f32>( 0.299, 0.587, 0.114 );
@@ -180,7 +180,7 @@
 
 				// Custom WGSL ( get texture from keywords )
 
-				const getWGSLTextureSample = new Nodes.FunctionNode( `
+				const getWGSLTextureSample = Nodes.func( `
 					fn getWGSLTextureSample( tex: texture_2d<f32>, tex_sampler: sampler, uv:vec2<f32> ) -> vec4<f32> {
 
 						return textureSample( tex, tex_sampler, uv ) * vec4<f32>( 0.0, 1.0, 0.0, 1.0 );

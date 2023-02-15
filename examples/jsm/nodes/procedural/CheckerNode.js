@@ -1,6 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNode, ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
 const checkerShaderNode = new ShaderNode( ( inputs ) => {
 
@@ -36,4 +37,6 @@ export default CheckerNode;
 
 export const checker = nodeProxy( CheckerNode );
 
-addNode( 'checker', checker );
+addNodeElement( 'checker', checker );
+
+addNodeClass( CheckerNode );

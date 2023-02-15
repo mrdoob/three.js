@@ -1,4 +1,5 @@
 import InputNode from './InputNode.js';
+import { addNodeClass } from './Node.js';
 import { nodeObject, getConstNodeType } from '../shadernode/ShaderNode.js';
 
 class UniformNode extends InputNode {
@@ -56,3 +57,5 @@ export const uniform = ( arg1, arg2 ) => {
 	return nodeObject( new UniformNode( value, nodeType ) );
 
 };
+
+addNodeClass( UniformNode );

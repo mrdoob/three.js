@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
@@ -8,12 +8,12 @@ import { getValueFromType } from '../core/NodeUtils.js';
 
 const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
 
-export function addNode( name, func ) {
+export function addNodeElement( name, nodeElement ) {
 
-	if ( NodeElements.has( name ) ) throw new Error( `Redefinition of node ${ name }` );
-	if ( typeof func !== 'function' ) throw new Error( `Node ${ name } is not a function` );
+	if ( NodeElements.has( name ) ) throw new Error( `Redefinition of node element ${ name }` );
+	if ( typeof nodeElement !== 'function' ) throw new Error( `Node element ${ name } is not a function` );
 
-	NodeElements.set( name, func );
+	NodeElements.set( name, nodeElement );
 
 }
 
@@ -313,6 +313,8 @@ export const nodeArray = ( val ) => new ShaderNodeArray( val );
 export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
 export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
 
+addNodeClass( ShaderNode );
+
 // types
 // @TODO: Maybe export from ConstNode.js?
 
@@ -348,36 +350,36 @@ export const imat4 = new ConvertType( 'imat4' );
 export const umat4 = new ConvertType( 'umat4' );
 export const bmat4 = new ConvertType( 'bmat4' );
 
-addNode( 'color', color );
-addNode( 'float', float );
-addNode( 'int', int );
-addNode( 'uint', uint );
-addNode( 'bool', bool );
-addNode( 'vec2', vec2 );
-addNode( 'ivec2', ivec2 );
-addNode( 'uvec2', uvec2 );
-addNode( 'bvec2', bvec2 );
-addNode( 'vec3', vec3 );
-addNode( 'ivec3', ivec3 );
-addNode( 'uvec3', uvec3 );
-addNode( 'bvec3', bvec3 );
-addNode( 'vec4', vec4 );
-addNode( 'ivec4', ivec4 );
-addNode( 'uvec4', uvec4 );
-addNode( 'bvec4', bvec4 );
-addNode( 'mat3', mat3 );
-addNode( 'imat3', imat3 );
-addNode( 'umat3', umat3 );
-addNode( 'bmat3', bmat3 );
-addNode( 'mat4', mat4 );
-addNode( 'imat4', imat4 );
-addNode( 'umat4', umat4 );
-addNode( 'bmat4', bmat4 );
+addNodeElement( 'color', color );
+addNodeElement( 'float', float );
+addNodeElement( 'int', int );
+addNodeElement( 'uint', uint );
+addNodeElement( 'bool', bool );
+addNodeElement( 'vec2', vec2 );
+addNodeElement( 'ivec2', ivec2 );
+addNodeElement( 'uvec2', uvec2 );
+addNodeElement( 'bvec2', bvec2 );
+addNodeElement( 'vec3', vec3 );
+addNodeElement( 'ivec3', ivec3 );
+addNodeElement( 'uvec3', uvec3 );
+addNodeElement( 'bvec3', bvec3 );
+addNodeElement( 'vec4', vec4 );
+addNodeElement( 'ivec4', ivec4 );
+addNodeElement( 'uvec4', uvec4 );
+addNodeElement( 'bvec4', bvec4 );
+addNodeElement( 'mat3', mat3 );
+addNodeElement( 'imat3', imat3 );
+addNodeElement( 'umat3', umat3 );
+addNodeElement( 'bmat3', bmat3 );
+addNodeElement( 'mat4', mat4 );
+addNodeElement( 'imat4', imat4 );
+addNodeElement( 'umat4', umat4 );
+addNodeElement( 'bmat4', bmat4 );
 
 // basic nodes
 // HACK - we cannot export them from the corresponding files because of the cyclic dependency
 export const element = nodeProxy( ArrayElementNode );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 
-addNode( 'element', element );
-addNode( 'convert', convert );
+addNodeElement( 'element', element );
+addNodeElement( 'convert', convert );

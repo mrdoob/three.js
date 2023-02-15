@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
 import { label } from '../core/VarNode.js';
 import { varying } from '../core/VaryingNode.js';
@@ -91,3 +91,5 @@ export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
 export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
 export const transformedNormalView = label( normalView, 'TransformedNormalView' );
 export const transformedNormalWorld = transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
+
+addNodeClass( NormalNode );

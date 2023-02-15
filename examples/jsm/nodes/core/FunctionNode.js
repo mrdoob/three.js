@@ -1,4 +1,5 @@
 import CodeNode from './CodeNode.js';
+import { addNodeClass } from './Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 
 class FunctionNode extends CodeNode {
@@ -101,3 +102,5 @@ export default FunctionNode;
 export const func = ( code, includes ) => nodeObject( new FunctionNode( code, includes ) );
 
 export const fn = ( code, includes ) => func( code, includes ).call;
+
+addNodeClass( FunctionNode );

@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { normalize } from '../math/MathNode.js';
@@ -100,3 +100,5 @@ export const positionWorld = nodeImmutable( PositionNode, PositionNode.WORLD );
 export const positionWorldDirection = nodeImmutable( PositionNode, PositionNode.WORLD_DIRECTION );
 export const positionView = nodeImmutable( PositionNode, PositionNode.VIEW );
 export const positionViewDirection = nodeImmutable( PositionNode, PositionNode.VIEW_DIRECTION );
+
+addNodeClass( PositionNode );

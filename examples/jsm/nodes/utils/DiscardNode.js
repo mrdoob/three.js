@@ -1,6 +1,7 @@
 import CondNode from '../math/CondNode.js';
 import { expression } from '../core/ExpressionNode.js';
-import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 let discardExpression;
 
@@ -20,4 +21,6 @@ export default DiscardNode;
 
 export const discard = nodeProxy( DiscardNode );
 
-addNode( 'discard', discard );
+addNodeElement( 'discard', discard );
+
+addNodeClass( DiscardNode );

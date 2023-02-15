@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { instanceIndex } from '../core/InstanceIndexNode.js';
 import { temp } from '../core/VarNode.js';
 import { buffer } from './BufferNode.js';
@@ -50,3 +50,5 @@ class InstanceNode extends Node {
 export default InstanceNode;
 
 export const instance = nodeProxy( InstanceNode );
+
+addNodeClass( InstanceNode );

@@ -1,6 +1,7 @@
-import TempNode from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
 import { mix } from '../math/MathNode.js';
-import { addNode, ShaderNode, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, ShaderNode, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
 
 import { LinearEncoding, sRGBEncoding } from 'three';
 
@@ -79,4 +80,6 @@ export default ColorSpaceNode;
 
 export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
 
-addNode( 'colorSpace', colorSpace );
+addNodeElement( 'colorSpace', colorSpace );
+
+addNodeClass( ColorSpaceNode );

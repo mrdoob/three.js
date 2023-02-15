@@ -1,4 +1,5 @@
-import TempNode from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { ShaderNode, nodeObject, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
 
 import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping } from 'three';
@@ -127,3 +128,5 @@ class ToneMappingNode extends TempNode {
 export default ToneMappingNode;
 
 export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
+
+addNodeClass( ToneMappingNode );

@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
 import { materialShininess, materialSpecularColor } from '../accessors/MaterialNode.js';
 import phongLightingModel from '../functions/PhongLightingModel.js';
@@ -79,3 +79,5 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 }
 
 export default MeshPhongNodeMaterial;
+
+addNodeMaterial( MeshPhongNodeMaterial );

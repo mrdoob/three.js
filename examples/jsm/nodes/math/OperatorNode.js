@@ -1,5 +1,6 @@
 import TempNode from '../core/TempNode.js';
-import { addNode, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class OperatorNode extends TempNode {
 
@@ -245,22 +246,24 @@ export const bitXor = nodeProxy( OperatorNode, '^' );
 export const shiftLeft = nodeProxy( OperatorNode, '<<' );
 export const shiftRight = nodeProxy( OperatorNode, '>>' );
 
-addNode( 'add', add );
-addNode( 'sub', sub );
-addNode( 'mul', mul );
-addNode( 'div', div );
-addNode( 'remainder', remainder );
-addNode( 'equal', equal );
-addNode( 'assign', assign );
-addNode( 'lessThan', lessThan );
-addNode( 'greaterThan', greaterThan );
-addNode( 'lessThanEqual', lessThanEqual );
-addNode( 'greaterThanEqual', greaterThanEqual );
-addNode( 'and', and );
-addNode( 'or', or );
-addNode( 'xor', xor );
-addNode( 'bitAnd', bitAnd );
-addNode( 'bitOr', bitOr );
-addNode( 'bitXor', bitXor );
-addNode( 'shiftLeft', shiftLeft );
-addNode( 'shiftRight', shiftRight );
+addNodeElement( 'add', add );
+addNodeElement( 'sub', sub );
+addNodeElement( 'mul', mul );
+addNodeElement( 'div', div );
+addNodeElement( 'remainder', remainder );
+addNodeElement( 'equal', equal );
+addNodeElement( 'assign', assign );
+addNodeElement( 'lessThan', lessThan );
+addNodeElement( 'greaterThan', greaterThan );
+addNodeElement( 'lessThanEqual', lessThanEqual );
+addNodeElement( 'greaterThanEqual', greaterThanEqual );
+addNodeElement( 'and', and );
+addNodeElement( 'or', or );
+addNodeElement( 'xor', xor );
+addNodeElement( 'bitAnd', bitAnd );
+addNodeElement( 'bitOr', bitOr );
+addNodeElement( 'bitXor', bitXor );
+addNodeElement( 'shiftLeft', shiftLeft );
+addNodeElement( 'shiftRight', shiftRight );
+
+addNodeClass( OperatorNode );

@@ -2,6 +2,8 @@ import { NodeUpdateType } from './constants.js';
 import { getNodesKeys, getCacheKey } from './NodeUtils.js';
 import { MathUtils } from 'three';
 
+const NodeClasses = new Map();
+
 let _nodeId = 0;
 
 class Node {
@@ -376,3 +378,24 @@ class Node {
 }
 
 export default Node;
+
+export function addNodeClass( nodeClass ) {
+
+	if ( typeof nodeClass !== 'function' || ! nodeClass.name ) throw new Error( `Node class ${ nodeClass.name } is not a class` );
+	if ( NodeClasses.has( nodeClass.name ) ) throw new Error( `Redefinition of node class ${ nodeClass.name }` );
+
+	NodeClasses.set( nodeClass.name, nodeClass );
+
+}
+
+export function createNodeFromType( type ) {
+
+	const Class = NodeClasses.get( type );
+
+	if ( Class !== undefined ) {
+
+		return new Class();
+
+	}
+
+};

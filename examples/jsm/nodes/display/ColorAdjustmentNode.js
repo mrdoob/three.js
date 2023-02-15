@@ -1,7 +1,8 @@
 import TempNode from '../core/TempNode.js';
 import { dot, mix } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
-import { addNode, ShaderNode, nodeProxy, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, ShaderNode, nodeProxy, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
 
 const saturationNode = new ShaderNode( ( { color, adjustment } ) => {
 
@@ -92,6 +93,8 @@ export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 export const lumaCoeffs = vec3( 0.2125, 0.7154, 0.0721 );
 export const luminance = ( color, luma = lumaCoeffs ) => dot( color, luma );
 
-addNode( 'saturation', saturation );
-addNode( 'vibrance', vibrance );
-addNode( 'hue', hue );
+addNodeElement( 'saturation', saturation );
+addNodeElement( 'vibrance', vibrance );
+addNodeElement( 'hue', hue );
+
+addNodeClass( ColorAdjustmentNode );

@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
 import { nodeObject, float } from '../shadernode/ShaderNode.js';
 
@@ -110,3 +110,5 @@ class RangeNode extends Node {
 export default RangeNode;
 
 export const range = ( min, max ) => nodeObject( new RangeNode( min, max ) );
+
+addNodeClass( RangeNode );

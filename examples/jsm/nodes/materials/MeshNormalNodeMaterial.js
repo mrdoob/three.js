@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { directionToColor } from '../utils/PackingNode.js';
 import { materialOpacity } from '../accessors/MaterialNode.js';
@@ -48,3 +48,5 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 }
 
 export default MeshNormalNodeMaterial;
+
+addNodeMaterial( MeshNormalNodeMaterial );

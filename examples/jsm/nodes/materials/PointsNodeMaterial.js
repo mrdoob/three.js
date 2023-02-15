@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 
 import { PointsMaterial } from 'three';
 
@@ -54,3 +54,5 @@ class PointsNodeMaterial extends NodeMaterial {
 }
 
 export default PointsNodeMaterial;
+
+addNodeMaterial( PointsNodeMaterial );

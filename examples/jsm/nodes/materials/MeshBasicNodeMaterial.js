@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 
 import { MeshBasicMaterial } from 'three';
 
@@ -47,3 +47,5 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 }
 
 export default MeshBasicNodeMaterial;
+
+addNodeMaterial( MeshBasicNodeMaterial );

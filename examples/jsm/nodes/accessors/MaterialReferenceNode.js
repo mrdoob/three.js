@@ -1,4 +1,5 @@
 import ReferenceNode from './ReferenceNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { nodeObject, getConstNodeType } from '../shadernode/ShaderNode.js';
 
 class MaterialReferenceNode extends ReferenceNode {
@@ -34,3 +35,5 @@ class MaterialReferenceNode extends ReferenceNode {
 export default MaterialReferenceNode;
 
 export const materialReference = ( name, nodeOrType, material ) => nodeObject( new MaterialReferenceNode( name, getConstNodeType( nodeOrType ), material ) );
+
+addNodeClass( MaterialReferenceNode );

@@ -4,6 +4,7 @@ import MaterialNode from './MaterialNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { normalView } from './NormalNode.js';
 import { normalMap } from '../display/NormalMapNode.js';
+import { addNodeClass } from '../core/Node.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class ExtendedMaterialNode extends MaterialNode {
@@ -53,3 +54,5 @@ ExtendedMaterialNode.NORMAL = 'normal';
 export default ExtendedMaterialNode;
 
 export const materialNormal = nodeImmutable( ExtendedMaterialNode, ExtendedMaterialNode.NORMAL );
+
+addNodeClass( ExtendedMaterialNode );

@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { attribute } from '../core/AttributeNode.js';
 import { label } from '../core/VarNode.js';
 import { varying } from '../core/VaryingNode.js';
@@ -99,3 +99,5 @@ export const tangentView = nodeImmutable( TangentNode, TangentNode.VIEW );
 export const tangentWorld = nodeImmutable( TangentNode, TangentNode.WORLD );
 export const transformedTangentView = label( tangentView, 'TransformedTangentView' );
 export const transformedTangentWorld = normalize( transformedTangentView.transformDirection( cameraViewMatrix ) );
+
+addNodeClass( TangentNode );

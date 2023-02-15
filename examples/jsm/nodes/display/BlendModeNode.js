@@ -1,6 +1,7 @@
-import TempNode from '../core/Node.js';
+import TempNode from '../core/TempNode.js';
 import { EPSILON } from '../math/MathNode.js';
-import { addNode, ShaderNode, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, ShaderNode, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
 export const BurnNode = new ShaderNode( ( { base, blend } ) => {
 
@@ -90,7 +91,9 @@ export const dodge = nodeProxy( BlendModeNode, BlendModeNode.DODGE );
 export const overlay = nodeProxy( BlendModeNode, BlendModeNode.OVERLAY );
 export const screen = nodeProxy( BlendModeNode, BlendModeNode.SCREEN );
 
-addNode( 'burn', burn );
-addNode( 'dodge', dodge );
-addNode( 'overlay', overlay );
-addNode( 'screen', screen );
+addNodeElement( 'burn', burn );
+addNodeElement( 'dodge', dodge );
+addNodeElement( 'overlay', overlay );
+addNodeElement( 'screen', screen );
+
+addNodeClass( BlendModeNode );
