@@ -1273,10 +1273,12 @@ function WebGLRenderer( parameters = {} ) {
 				const currentSide = material.side;
 
 				material.side = BackSide;
+				material.needsUpdate = true;
 
 				renderObject( object, scene, camera, geometry, material, group );
 
 				material.side = currentSide;
+				material.needsUpdate = true;
 
 			}
 
