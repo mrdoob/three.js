@@ -1230,9 +1230,9 @@ function WebGLRenderer( parameters = {} ) {
 
 	function renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera ) {
 
-		const isWebGL2 = capabilities.isWebGL2;
-
 		if ( _transmissionRenderTarget === null ) {
+
+			const isWebGL2 = capabilities.isWebGL2;
 
 			_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
 				generateMipmaps: true,
