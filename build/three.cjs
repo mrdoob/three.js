@@ -14496,6 +14496,7 @@ function WebGLPrograms(renderer, cubemaps, cubeuvmaps, extensions, capabilities,
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
+		MeshNoTonePhongMaterial: 'phong',
 		MeshToonMaterial: 'toon',
 		MeshStandardMaterial: 'physical',
 		MeshPhysicalMaterial: 'physical',
@@ -16677,6 +16678,11 @@ function WebGLState(gl, extensions, capabilities) {
 		stencilBuffer.reset();
 	}
 
+	function clearTextureBindingState() {
+		currentTextureSlot = null;
+		currentBoundTextures = {};
+	}
+
 	return {
 		buffers: {
 			color: colorBuffer,
@@ -16708,7 +16714,8 @@ function WebGLState(gl, extensions, capabilities) {
 		compressedTexSubImage2D: compressedTexSubImage2D,
 		scissor: scissor,
 		viewport: viewport,
-		reset: reset
+		reset: reset,
+		clearTextureBindingState: clearTextureBindingState
 	};
 }
 
@@ -26916,6 +26923,20 @@ class MeshPhongMaterial extends Material {
 
 MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
+class MeshNoTonePhongMaterial extends MeshPhongMaterial {
+	constructor(parameters) {
+		super(parameters);
+		this.type = 'MeshNoTonePhongMaterial';
+		Object.defineProperty(this, 'toneMapped', {
+			get: function () {
+				return false;
+			},
+			set: function () {}
+		});
+	}
+
+}
+
 /**
  * parameters = {
  *	color: <hex>,
@@ -27508,6 +27529,7 @@ var Materials = /*#__PURE__*/Object.freeze({
 	MeshPhysicalMaterial: MeshPhysicalMaterial,
 	MeshStandardMaterial: MeshStandardMaterial,
 	MeshPhongMaterial: MeshPhongMaterial,
+	MeshNoTonePhongMaterial: MeshNoTonePhongMaterial,
 	MeshToonMaterial: MeshToonMaterial,
 	MeshNormalMaterial: MeshNormalMaterial,
 	MeshLambertMaterial: MeshLambertMaterial,
@@ -29013,7 +29035,7 @@ class FileLoader extends Loader {
 					console.warn('THREE.FileLoader: HTTP Status 0 received.');
 				}
 
-				if (typeof ReadableStream === 'undefined' || response.body.getReader === undefined) {
+				if (typeof ReadableStream === 'undefined' || response.body?.getReader === undefined) {
 					return response;
 				}
 
@@ -37212,6 +37234,7 @@ exports.MeshDistanceMaterial = MeshDistanceMaterial;
 exports.MeshFaceMaterial = MeshFaceMaterial;
 exports.MeshLambertMaterial = MeshLambertMaterial;
 exports.MeshMatcapMaterial = MeshMatcapMaterial;
+exports.MeshNoTonePhongMaterial = MeshNoTonePhongMaterial;
 exports.MeshNormalMaterial = MeshNormalMaterial;
 exports.MeshPhongMaterial = MeshPhongMaterial;
 exports.MeshPhysicalMaterial = MeshPhysicalMaterial;

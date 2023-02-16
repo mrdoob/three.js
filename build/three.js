@@ -14498,6 +14498,7 @@
 			MeshBasicMaterial: 'basic',
 			MeshLambertMaterial: 'lambert',
 			MeshPhongMaterial: 'phong',
+			MeshNoTonePhongMaterial: 'phong',
 			MeshToonMaterial: 'toon',
 			MeshStandardMaterial: 'physical',
 			MeshPhysicalMaterial: 'physical',
@@ -16679,6 +16680,11 @@
 			stencilBuffer.reset();
 		}
 
+		function clearTextureBindingState() {
+			currentTextureSlot = null;
+			currentBoundTextures = {};
+		}
+
 		return {
 			buffers: {
 				color: colorBuffer,
@@ -16710,7 +16716,8 @@
 			compressedTexSubImage2D: compressedTexSubImage2D,
 			scissor: scissor,
 			viewport: viewport,
-			reset: reset
+			reset: reset,
+			clearTextureBindingState: clearTextureBindingState
 		};
 	}
 
@@ -26918,6 +26925,20 @@
 
 	MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
+	class MeshNoTonePhongMaterial extends MeshPhongMaterial {
+		constructor(parameters) {
+			super(parameters);
+			this.type = 'MeshNoTonePhongMaterial';
+			Object.defineProperty(this, 'toneMapped', {
+				get: function () {
+					return false;
+				},
+				set: function () {}
+			});
+		}
+
+	}
+
 	/**
 	 * parameters = {
 	 *	color: <hex>,
@@ -27510,6 +27531,7 @@
 		MeshPhysicalMaterial: MeshPhysicalMaterial,
 		MeshStandardMaterial: MeshStandardMaterial,
 		MeshPhongMaterial: MeshPhongMaterial,
+		MeshNoTonePhongMaterial: MeshNoTonePhongMaterial,
 		MeshToonMaterial: MeshToonMaterial,
 		MeshNormalMaterial: MeshNormalMaterial,
 		MeshLambertMaterial: MeshLambertMaterial,
@@ -29015,7 +29037,7 @@
 						console.warn('THREE.FileLoader: HTTP Status 0 received.');
 					}
 
-					if (typeof ReadableStream === 'undefined' || response.body.getReader === undefined) {
+					if (typeof ReadableStream === 'undefined' || response.body?.getReader === undefined) {
 						return response;
 					}
 
@@ -37214,6 +37236,7 @@
 	exports.MeshFaceMaterial = MeshFaceMaterial;
 	exports.MeshLambertMaterial = MeshLambertMaterial;
 	exports.MeshMatcapMaterial = MeshMatcapMaterial;
+	exports.MeshNoTonePhongMaterial = MeshNoTonePhongMaterial;
 	exports.MeshNormalMaterial = MeshNormalMaterial;
 	exports.MeshPhongMaterial = MeshPhongMaterial;
 	exports.MeshPhysicalMaterial = MeshPhysicalMaterial;
