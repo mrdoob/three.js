@@ -593,6 +593,7 @@ class Float16BufferAttribute extends BufferAttribute {
 		return this;
 
 	}
+
 }
 
 
