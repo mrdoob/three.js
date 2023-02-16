@@ -13,8 +13,7 @@ export default QUnit.module( 'Maths', () => {
 			// INHERITANCE
 			QUnit.test( 'Extending', ( assert ) => {
 
-				var object = new CubicInterpolant( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
-
+				const object = new CubicInterpolant( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
 				assert.strictEqual(
 					object instanceof Interpolant, true,
 					'CubicInterpolant extends from Interpolant'

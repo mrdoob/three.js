@@ -1311,7 +1311,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'clone', ( assert ) => {
 
-			var a;
+			let a;
 			const b = new Object3D();
 
 			assert.strictEqual( a, undefined, 'Undefined pre-clone()' );

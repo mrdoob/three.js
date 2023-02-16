@@ -16,6 +16,17 @@
 
 		</p>
 
+		<h2>수입</h2>
+
+		<p>
+			[name] 는 애드온이며 명시적으로 가져와야 합니다.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		</code>
+
 		<h2>코드 예시</h2>
 
 		<code>
@@ -296,6 +307,11 @@ controls.touches = {
 		<h3>[method:undefined saveState] ()</h3>
 		<p>
 			컨트롤의 현재 상태를 저장합니다. 나중에 [page:.reset]을 이용하여 현재 상태로 복구할 수 있습니다.
+		</p>
+
+		<h3>[method:undefined stopListenToKeyEvents] ()</h3>
+		<p>
+			Removes the key event listener previously defined with [page:.listenToKeyEvents]().
 		</p>
 
 		<h3>[method:Boolean update] ()</h3>

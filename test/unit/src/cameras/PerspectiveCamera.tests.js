@@ -10,7 +10,7 @@ export default QUnit.module( 'Cameras', () => {
 	QUnit.module( 'PerspectiveCamera', () => {
 
 		// see e.g. math/Matrix4.js
-		var matrixEquals4 = function ( a, b, tolerance ) {
+		const matrixEquals4 = function ( a, b, tolerance ) {
 
 			tolerance = tolerance || 0.0001;
 			if ( a.elements.length != b.elements.length ) {
@@ -21,7 +21,7 @@ export default QUnit.module( 'Cameras', () => {
 
 			for ( let i = 0, il = a.elements.length; i < il; i ++ ) {
 
-				var delta = a.elements[ i ] - b.elements[ i ];
+				const delta = a.elements[ i ] - b.elements[ i ];
 				if ( delta > tolerance ) {
 
 					return false;

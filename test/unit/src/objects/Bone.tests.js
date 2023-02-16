@@ -10,9 +10,11 @@ export default QUnit.module( 'Objects', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var bone = new Bone();
-
-			assert.strictEqual( bone instanceof Object3D, true, 'Bone extends from Object3D' );
+			const bone = new Bone();
+			assert.strictEqual(
+				bone instanceof Object3D, true,
+				'Bone extends from Object3D'
+			);
 
 		} );
 

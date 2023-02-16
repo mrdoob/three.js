@@ -15,7 +15,7 @@ function SidebarGeometryBufferGeometry( editor ) {
 
 		const geometry = object.geometry;
 
-		if ( geometry && geometry.isBufferGeometry ) {
+		if ( geometry ) {
 
 			container.clear();
 			container.setDisplay( 'block' );

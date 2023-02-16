@@ -17,21 +17,16 @@
 			See the [page:FontLoader] page for additional details.
 		</p>
 
-		<script>
+		<h2>Import</h2>
 
-		// iOS iframe auto-resize workaround
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
 
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			const scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script>
+		<code>
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+		</code>
 
 		<h2>Code Example</h2>
 

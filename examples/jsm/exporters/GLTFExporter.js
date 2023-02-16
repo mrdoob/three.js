@@ -1095,6 +1095,7 @@ class GLTFWriter {
 			2: 'VEC2',
 			3: 'VEC3',
 			4: 'VEC4',
+			9: 'MAT3',
 			16: 'MAT4'
 
 		};
@@ -1887,7 +1888,7 @@ class GLTFWriter {
 
 		const attrNamePrefix = attributeName.split( '_', 1 )[ 0 ];
 
-		if ( KHR_mesh_quantization_ExtraAttrTypes[ attrNamePrefix ]?.includes( attrType ) ) {
+		if ( KHR_mesh_quantization_ExtraAttrTypes[ attrNamePrefix ] && KHR_mesh_quantization_ExtraAttrTypes[ attrNamePrefix ].includes( attrType ) ) {
 
 			this.extensionsUsed[ KHR_MESH_QUANTIZATION ] = true;
 			this.extensionsRequired[ KHR_MESH_QUANTIZATION ] = true;

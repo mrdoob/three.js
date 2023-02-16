@@ -13,7 +13,7 @@
 
 		<h2>시작하기에 앞서</h2>
 
-		<p>three.js를 사용하려면, 표시할 수 있는 공간이 필요합니다. 다음과 같이 HTML 파일을 만들고, js/ 디렉토리 안에 [link:https://threejs.org/build/three.js three.js] 파일을 만들고 연결시켜 웹 브라우저로 실행해주세요.</p>
+		<p>three.js를 사용하려면, 표시할 수 있는 공간이 필요합니다. Save the following HTML to a file on your computer and open it in your browser.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -27,8 +27,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+´
 					// Our Javascript will go here.
 				&lt;/script&gt;
 			&lt;/body&gt;
@@ -117,7 +118,7 @@
 		<h2>결과 화면</h2>
 		<p>축하합니다! 첫 three.js이 완성되었네요. 이제 본격적으로 시작해보면 됩니다.</p>
 
-		<p>전체 코드는 아래에 나와 있고 [link:https://jsfiddle.net/fxurzeb4/ live example]로도 확인해볼 수 있습니다. 잘 살펴보고 어떻게 구동되는지 확인해 보세요.</p>
+		<p>전체 코드는 아래에 나와 있고 [link:https://jsfiddle.net/em4j9hvu/ live example]로도 확인해볼 수 있습니다. 잘 살펴보고 어떻게 구동되는지 확인해 보세요.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -131,8 +132,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -154,7 +156,7 @@
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
-					};
+					}
 
 					animate();
 				&lt;/script&gt;

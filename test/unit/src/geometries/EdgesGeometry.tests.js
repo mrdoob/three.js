@@ -269,7 +269,7 @@ export default QUnit.module( 'Geometries', () => {
 
 		QUnit.test( 'two isolated triangles', ( assert ) => {
 
-			var vertList = [
+			const vertList = [
 				new Vector3( 0, 0, 0 ),
 				new Vector3( 1, 0, 0 ),
 				new Vector3( 1, 1, 0 ),

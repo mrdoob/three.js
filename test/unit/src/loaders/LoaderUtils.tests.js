@@ -9,10 +9,10 @@ export default QUnit.module( 'Loaders', () => {
 		// STATIC
 		QUnit.test( 'decodeText', ( assert ) => {
 
-			var jsonArray = new Uint8Array( [ 123, 34, 106, 115, 111, 110, 34, 58, 32, 116, 114, 117, 101, 125 ] );
+			const jsonArray = new Uint8Array( [ 123, 34, 106, 115, 111, 110, 34, 58, 32, 116, 114, 117, 101, 125 ] );
 			assert.equal( '{"json": true}', LoaderUtils.decodeText( jsonArray ) );
 
-			var multibyteArray = new Uint8Array( [ 230, 151, 165, 230, 156, 172, 229, 155, 189 ] );
+			const multibyteArray = new Uint8Array( [ 230, 151, 165, 230, 156, 172, 229, 155, 189 ] );
 			assert.equal( '日本国', LoaderUtils.decodeText( multibyteArray ) );
 
 		} );

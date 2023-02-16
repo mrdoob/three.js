@@ -86,16 +86,16 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getPointAt', ( assert ) => {
 
-				var curve = new LineCurve( _points[ 0 ], _points[ 3 ] );
+				const curve = new LineCurve( _points[ 0 ], _points[ 3 ] );
 
-				var expectedPoints = [
+				const expectedPoints = [
 					new Vector2( 0, 0 ),
 					new Vector2( - 2.4, 1.5 ),
 					new Vector2( - 4, 2.5 ),
 					new Vector2( - 8, 5 )
 				];
 
-				var points = [
+				const points = [
 					curve.getPointAt( 0, new Vector2() ),
 					curve.getPointAt( 0.3, new Vector2() ),
 					curve.getPointAt( 0.5, new Vector2() ),
@@ -108,11 +108,11 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getTangent', ( assert ) => {
 
-				var curve = _curve;
-				var tangent = new Vector2();
+				const curve = _curve;
+				const tangent = new Vector2();
 
 				curve.getTangent( 0, tangent );
-				var expectedTangent = Math.sqrt( 0.5 );
+				const expectedTangent = Math.sqrt( 0.5 );
 
 				assert.numEqual( tangent.x, expectedTangent, 'tangent.x correct' );
 				assert.numEqual( tangent.y, expectedTangent, 'tangent.y correct' );
@@ -140,9 +140,9 @@ export default QUnit.module( 'Extras', () => {
 			// OTHERS
 			QUnit.test( 'Simple curve', ( assert ) => {
 
-				var curve = _curve;
+				let curve = _curve;
 
-				var expectedPoints = [
+				let expectedPoints = [
 					new Vector2( 0, 0 ),
 					new Vector2( 2, 2 ),
 					new Vector2( 4, 4 ),
@@ -151,7 +151,7 @@ export default QUnit.module( 'Extras', () => {
 					new Vector2( 10, 10 )
 				];
 
-				var points = curve.getPoints();
+				let points = curve.getPoints();
 
 				assert.deepEqual( points, expectedPoints, 'Correct points for first curve' );
 
@@ -176,15 +176,15 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getLength/getLengths', ( assert ) => {
 
-				var curve = _curve;
+				const curve = _curve;
 
-				var length = curve.getLength();
-				var expectedLength = Math.sqrt( 200 );
+				const length = curve.getLength();
+				const expectedLength = Math.sqrt( 200 );
 
 				assert.numEqual( length, expectedLength, 'Correct length of curve' );
 
-				var lengths = curve.getLengths( 5 );
-				var expectedLengths = [
+				const lengths = curve.getLengths( 5 );
+				const expectedLengths = [
 					0.0,
 					Math.sqrt( 8 ),
 					Math.sqrt( 32 ),
@@ -205,11 +205,11 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getUtoTmapping', ( assert ) => {
 
-				var curve = _curve;
+				const curve = _curve;
 
-				var start = curve.getUtoTmapping( 0, 0 );
-				var end = curve.getUtoTmapping( 0, curve.getLength() );
-				var somewhere = curve.getUtoTmapping( 0.3, 0 );
+				const start = curve.getUtoTmapping( 0, 0 );
+				const end = curve.getUtoTmapping( 0, curve.getLength() );
+				const somewhere = curve.getUtoTmapping( 0.3, 0 );
 
 				assert.strictEqual( start, 0, 'getUtoTmapping( 0, 0 ) is the starting point' );
 				assert.strictEqual( end, 1, 'getUtoTmapping( 0, length ) is the ending point' );
@@ -219,9 +219,9 @@ export default QUnit.module( 'Extras', () => {
 
 			QUnit.test( 'getSpacedPoints', ( assert ) => {
 
-				var curve = _curve;
+				const curve = _curve;
 
-				var expectedPoints = [
+				const expectedPoints = [
 					new Vector2( 0, 0 ),
 					new Vector2( 2.5, 2.5 ),
 					new Vector2( 5, 5 ),
@@ -229,7 +229,7 @@ export default QUnit.module( 'Extras', () => {
 					new Vector2( 10, 10 )
 				];
 
-				var points = curve.getSpacedPoints( 4 );
+				const points = curve.getSpacedPoints( 4 );
 
 				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
 				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );

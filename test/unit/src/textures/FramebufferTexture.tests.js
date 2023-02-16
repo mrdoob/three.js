@@ -11,9 +11,11 @@ export default QUnit.module( 'Textures', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new FramebufferTexture();
-
-			assert.strictEqual( object instanceof Texture, true, 'FramebufferTexture extends from Texture' );
+			const object = new FramebufferTexture();
+			assert.strictEqual(
+				object instanceof Texture, true,
+				'FramebufferTexture extends from Texture'
+			);
 
 		} );
 

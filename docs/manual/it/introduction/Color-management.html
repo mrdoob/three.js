@@ -195,7 +195,7 @@
 			colori:
 		</p>
 
-		<code> THREE.ColorManagement.legacyMode = false; </code>
+		<code> THREE.ColorManagement.enabled = true; </code>
 
 		<ul>
 			<li>
@@ -297,6 +297,11 @@
 			</p>
 		</blockquote>
 
+		<p>
+			Custom materials based on [page:ShaderMaterial] and [page:RawShaderMaterial] have to implement their own output color space conversion.
+			For instances of `ShaderMaterial`, adding the `encodings_fragment` shader chunk to the fragment shader's `main()` function should be sufficient.
+		</p>
+
 		<h2>Lavorare con le istanze di THREE.Color</h2>
 
 		<p>
@@ -320,7 +325,7 @@
 		</code>
 
 		<p>
-			Con <i>ColorManagement.legacyMode = false</i> impostato (consigliato),
+			Con <i>ColorManagement.enabled = true</i> impostato (consigliato),
 			alcune conversioni vengono effettuate automaticamente. Poiché i colori
 			esadecimali e CSS sono generalmente sRGB, i metodi [page:Color]
 			convertiranno automaticamente questi input da sRGB a Linear-sRGB nei

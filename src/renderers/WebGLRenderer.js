@@ -11,10 +11,8 @@ import {
 	NoToneMapping,
 	LinearMipmapLinearFilter
 } from '../constants.js';
-import { floorPowerOfTwo } from '../math/MathUtils.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { WebGLAnimation } from './webgl/WebGLAnimation.js';
@@ -127,7 +125,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	// physical lights
 
-	this.physicallyCorrectLights = false;
+	this.useLegacyLights = true;
 
 	// tone mapping
 
@@ -183,7 +181,6 @@ function WebGLRenderer( parameters = {} ) {
 
 	const _projScreenMatrix = new Matrix4();
 
-	const _vector2 = new Vector2();
 	const _vector3 = new Vector3();
 
 	const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
@@ -392,7 +389,7 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
-	this.setSize = function ( width, height, updateStyle ) {
+	this.setSize = function ( width, height, updateStyle = true ) {
 
 		if ( xr.isPresenting ) {
 
@@ -407,7 +404,7 @@ function WebGLRenderer( parameters = {} ) {
 		_canvas.width = Math.floor( width * _pixelRatio );
 		_canvas.height = Math.floor( height * _pixelRatio );
 
-		if ( updateStyle !== false ) {
+		if ( updateStyle === true ) {
 
 			_canvas.style.width = width + 'px';
 			_canvas.style.height = height + 'px';
@@ -462,16 +459,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		_currentViewport.copy( _viewport )
-
-		// pixel ratio only applies to the canvas
-		if ( _currentRenderTarget === null ) {
-
-			_currentViewport.multiplyScalar( _pixelRatio );
-
-		}
-
-		state.viewport( _currentViewport.floor() );
+		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
 	};
 
@@ -493,16 +481,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		_currentScissor.copy( _scissor );
-
-		// pixel ratio only applies to the canvas
-		if ( _currentRenderTarget === null ) {
-
-			_currentScissor.multiplyScalar( _pixelRatio );
-
-		}
-
-		state.scissor( _currentScissor.floor() );
+		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
 
 	};
 
@@ -887,7 +866,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		} );
 
-		currentRenderState.setupLights( _this.physicallyCorrectLights );
+		currentRenderState.setupLights( _this.useLegacyLights );
 
 		scene.traverse( function ( object ) {
 
@@ -1037,7 +1016,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		// render scene
 
-		currentRenderState.setupLights( _this.physicallyCorrectLights );
+		currentRenderState.setupLights( _this.useLegacyLights );
 
 		if ( camera.isArrayCamera ) {
 
@@ -1255,24 +1234,12 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( _transmissionRenderTarget === null ) {
 
-			_transmissionRenderTarget = new WebGLRenderTarget( 1, 1, {
+			_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
 				generateMipmaps: true,
 				type: extensions.has( 'EXT_color_buffer_half_float' ) ? HalfFloatType : UnsignedByteType,
 				minFilter: LinearMipmapLinearFilter,
 				samples: ( isWebGL2 && _antialias === true ) ? 4 : 0
 			} );
-
-		}
-
-		_this.getDrawingBufferSize( _vector2 );
-
-		if ( isWebGL2 ) {
-
-			_transmissionRenderTarget.setSize( _vector2.x, _vector2.y );
-
-		} else {
-
-			_transmissionRenderTarget.setSize( floorPowerOfTwo( _vector2.x ), floorPowerOfTwo( _vector2.y ) );
 
 		}
 
@@ -2270,5 +2237,29 @@ function WebGLRenderer( parameters = {} ) {
 	}
 
 }
+
+Object.defineProperties( WebGLRenderer.prototype, {
+
+	// @deprecated since r150
+
+	physicallyCorrectLights: {
+
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
+			return ! this.useLegacyLights;
+
+		},
+
+		set: function ( value ) {
+
+			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
+			this.useLegacyLights = ! value;
+
+		}
+
+	}
+
+} );
 
 export { WebGLRenderer };

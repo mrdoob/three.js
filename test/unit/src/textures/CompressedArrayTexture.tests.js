@@ -2,7 +2,7 @@
 
 import { CompressedArrayTexture } from '../../../../src/textures/CompressedArrayTexture.js';
 
-import { Texture } from '../../../../src/textures/Texture.js';
+import { CompressedTexture } from '../../../../src/textures/CompressedTexture.js';
 
 export default QUnit.module( 'Textures', () => {
 
@@ -11,9 +11,11 @@ export default QUnit.module( 'Textures', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new CompressedArrayTexture();
-
-			assert.strictEqual( object instanceof Texture, true, 'CompressedArrayTexture extends from Texture' );
+			const object = new CompressedArrayTexture();
+			assert.strictEqual(
+				object instanceof CompressedTexture, true,
+				'CompressedArrayTexture extends from CompressedTexture'
+			);
 
 		} );
 
@@ -27,6 +29,7 @@ export default QUnit.module( 'Textures', () => {
 		// PROPERTIES
 		QUnit.todo( 'image.depth', ( assert ) => {
 
+			// { width: width, height: height, depth: depth }
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );

@@ -11,9 +11,11 @@ export default QUnit.module( 'Textures', () => {
 		// INHERITANCE
 		QUnit.test( 'Instancing', ( assert ) => {
 
-			var object = new Texture();
-
-			assert.strictEqual( object instanceof EventDispatcher, true, 'Texture extends from EventDispatcher' );
+			const object = new Texture();
+			assert.strictEqual(
+				object instanceof EventDispatcher, true,
+				'Texture extends from EventDispatcher'
+			);
 
 		} );
 

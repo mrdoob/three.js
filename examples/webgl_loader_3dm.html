@@ -34,7 +34,7 @@
 		<div id="loader"></div>
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -80,7 +80,7 @@
 				scene.add( directionalLight );
 
 				const loader = new Rhino3dmLoader();
-				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.11.1/' );
+				loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					scene.add( object );

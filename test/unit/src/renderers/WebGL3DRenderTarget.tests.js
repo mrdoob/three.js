@@ -11,16 +11,19 @@ export default QUnit.module( 'Renderers', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var object = new WebGL3DRenderTarget();
-
-			assert.strictEqual( object instanceof WebGLRenderTarget, true, 'WebGL3DRenderTarget extends from WebGLRenderTarget' );
+			const object = new WebGL3DRenderTarget();
+			assert.strictEqual(
+				object instanceof WebGLRenderTarget, true,
+				'WebGL3DRenderTarget extends from WebGLRenderTarget'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new WebGL3DRenderTarget();
+			assert.ok( object, 'Can instantiate a WebGL3DRenderTarget.' );
 
 		} );
 

@@ -10,9 +10,11 @@ export default QUnit.module( 'Objects', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var points = new Points();
-
-			assert.strictEqual( points instanceof Object3D, true, 'Points extends from Object3D' );
+			const points = new Points();
+			assert.strictEqual(
+				points instanceof Object3D, true,
+				'Points extends from Object3D'
+			);
 
 		} );
 

@@ -13,7 +13,7 @@
 
 		<h2>Before we start</h2>
 
-		<p>Before you can use three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of [link:https://threejs.org/build/three.js three.js] in the js/ directory, and open it in your browser.</p>
+		<p>Before you can use three.js, you need somewhere to display it. Save the following HTML to a file on your computer and open it in your browser.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -26,8 +26,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					// Our Javascript will go here.
 				&lt;/script&gt;
 			&lt;/body&gt;
@@ -59,9 +60,7 @@
 
 		<p>The next two attributes are the `near` and `far` clipping plane. What that means, is that objects further away from the camera than the value of `far` or closer than `near` won't be rendered. You don't have to worry about this now, but you may want to use other values in your apps to get better performance.</p>
 
-		<p>Next up is the renderer. This is where the magic happens. In addition to the WebGLRenderer we use here, three.js comes with a few others, often used as fallbacks for users with older browsers or for those who don't have WebGL support for some reason.</p>
-
-		<p>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give `setSize` smaller values, like `window.innerWidth/2` and `window.innerHeight/2`, which will make the app render at quarter size.</p>
+		<p>Next up is the renderer. In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give `setSize` smaller values, like `window.innerWidth/2` and `window.innerHeight/2`, which will make the app render at quarter size.</p>
 
 		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling `setSize` with false as `updateStyle` (the third argument). For example, `setSize(window.innerWidth/2, window.innerHeight/2, false)` will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
 
@@ -116,7 +115,7 @@
 		<h2>The result</h2>
 		<p>Congratulations! You have now completed your first three.js application. It's simple, but you have to start somewhere.</p>
 
-		<p>The full code is available below and as an editable [link:https://jsfiddle.net/fxurzeb4/ live example]. Play around with it to get a better understanding of how it works.</p>
+		<p>The full code is available below and as an editable [link:https://jsfiddle.net/em4j9hvu/ live example]. Play around with it to get a better understanding of how it works.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -129,8 +128,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -152,7 +152,7 @@
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
-					};
+					}
 
 					animate();
 				&lt;/script&gt;

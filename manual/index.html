@@ -8,7 +8,10 @@
 		<link rel="shortcut icon" href="../files/favicon.ico" media="(prefers-color-scheme: light)" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 		<!-- console sandbox -->
-		<script src="../build/three.min.js" async defer></script>
+		<script type="module">
+			import * as THREE from '../build/three.module.js';
+			window.THREE = THREE;
+		</script>
 	</head>
 	<body>
 		<div id="panel">
@@ -492,17 +495,21 @@
 				// We can have 2 hashes. One for the main page, one for the page it's referencing
 				// In other words
 				//	 #en/somePage#someSectionOfPage
-				const subHash = splitHash[0].indexOf('#');
+				const subHash = splitHash[ 0 ].indexOf( '#' );
 				let src;
-				if (subHash >= 0) {
-					const beforeSubHash = splitHash[0].slice(0, subHash);
-					const afterSubHash = splitHash[0].slice(subHash);
+				if ( subHash >= 0 ) {
+
+					const beforeSubHash = splitHash[ 0 ].slice( 0, subHash );
+					const afterSubHash = splitHash[ 0 ].slice( subHash );
 					src = `${beforeSubHash}.html${afterSubHash}${splitHash[ 1 ]}`;
+		
 				} else {
+
 					src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
+		
 				}
 
-				iframe.src = src;  // lgtm[js/client-side-unvalidated-url-redirection]
+				iframe.src = src; // lgtm[js/client-side-unvalidated-url-redirection]
 				iframe.style.display = 'unset';
 
 			} else {
