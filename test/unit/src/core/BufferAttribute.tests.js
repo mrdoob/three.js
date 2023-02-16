@@ -496,17 +496,17 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		const toHalfFloatArray = (f32Array) => {
-			const f16Array = new Uint16Array(f32Array.length);
-			for (let i = 0, n = f32Array.length; i < n; ++i) {
+		const toHalfFloatArray = ( f32Array ) => {
+			const f16Array = new Uint16Array( f32Array.length );
+			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
 				f16Array[i] = toHalfFloat( f32Array[i] );
 			}
 			return f16Array;
 		};
 
-		const fromHalfFloatArray = (f16Array) => {
-			const f32Array = new Float32Array(f16Array.length);
-			for (let i = 0, n = f16Array.length; i < n; ++i) {
+		const fromHalfFloatArray = ( f16Array ) => {
+			const f32Array = new Float32Array( f16Array.length );
+			for ( let i = 0, n = f16Array.length; i < n; ++i ) {
 				f32Array[i] = fromHalfFloat( f16Array[i] );
 			}
 			return f32Array;
