@@ -1,12 +1,22 @@
 /* global QUnit */
 
 import { Color } from '../../../../src/math/Color.js';
+import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 import { eps } from '../../utils/math-constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
+import { DisplayP3ColorSpace, SRGBColorSpace } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Color', () => {
+
+		const colorManagementEnabled = ColorManagement.enabled;
+
+		QUnit.testDone( () => {
+
+			ColorManagement.enabled = colorManagementEnabled;
+
+		} );
 
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
@@ -84,11 +94,33 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setRGB', ( assert ) => {
 
+			ColorManagement.enabled = true;
+
 			const c = new Color();
+
 			c.setRGB( 0.3, 0.5, 0.7 );
-			assert.ok( c.r == 0.3, 'Red: ' + c.r );
-			assert.ok( c.g == 0.5, 'Green: ' + c.g );
-			assert.ok( c.b == 0.7, 'Blue: ' + c.b );
+
+			assert.equal( c.r, 0.3, 'Red: ' + c.r + ' (srgb-linear)' );
+			assert.equal( c.g, 0.5, 'Green: ' + c.g + ' (srgb-linear)' );
+			assert.equal( c.b, 0.7, 'Blue: ' + c.b + ' (srgb-linear)' );
+
+			c.setRGB( 0.3, 0.5, 0.7, SRGBColorSpace );
+
+			assert.equal( c.r.toFixed( 3 ), 0.073, 'Red: ' + c.r + ' (srgb)' );
+			assert.equal( c.g.toFixed( 3 ), 0.214, 'Green: ' + c.g + ' (srgb)' );
+			assert.equal( c.b.toFixed( 3 ), 0.448, 'Blue: ' + c.b + ' (srgb)' );
+
+			c.setRGB( 0.614, 0.731, 0.843, DisplayP3ColorSpace );
+
+			assert.numEqual( c.r.toFixed( 2 ), 0.3, 'Red: ' + c.r + ' (display-p3, in gamut)' );
+			assert.numEqual( c.g.toFixed( 2 ), 0.5, 'Green: ' + c.g + ' (display-p3, in gamut)' );
+			assert.numEqual( c.b.toFixed( 2 ), 0.7, 'Blue: ' + c.b + ' (display-p3, in gamut)' );
+
+			c.setRGB( 1.0, 0.5, 0.0, DisplayP3ColorSpace );
+
+			assert.numEqual( c.r.toFixed( 3 ), 1.179, 'Red: ' + c.r + ' (display-p3, out of gamut)' );
+			assert.numEqual( c.g.toFixed( 3 ), 0.181, 'Green: ' + c.g + ' (display-p3, out of gamut)' );
+			assert.numEqual( c.b.toFixed( 3 ), - 0.036, 'Blue: ' + c.b + ' (display-p3, out of gamut)' );
 
 		} );
 
@@ -251,18 +283,41 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( 'getRGB', ( assert ) => {
+		QUnit.test( 'getRGB', ( assert ) => {
 
-			// getRGB( target, colorSpace = ColorManagement.workingColorSpace )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			ColorManagement.enabled = true;
+
+			const c = new Color( 'plum' );
+			const t = { r: 0, g: 0, b: 0 };
+
+			c.getRGB( t );
+
+			assert.equal( t.r.toFixed( 3 ), 0.723, 'r (srgb-linear)' );
+			assert.equal( t.g.toFixed( 3 ), 0.352, 'g (srgb-linear)' );
+			assert.equal( t.b.toFixed( 3 ), 0.723, 'b (srgb-linear)' );
+
+			c.getRGB( t, SRGBColorSpace );
+
+			assert.equal( t.r.toFixed( 3 ), ( 221 / 255 ).toFixed( 3 ), 'r (srgb)' );
+			assert.equal( t.g.toFixed( 3 ), ( 160 / 255 ).toFixed( 3 ), 'g (srgb)' );
+			assert.equal( t.b.toFixed( 3 ), ( 221 / 255 ).toFixed( 3 ), 'b (srgb)' );
+
+			c.getRGB( t, DisplayP3ColorSpace );
+
+			assert.equal( t.r.toFixed( 3 ), 0.831, 'r (display-p3)' );
+			assert.equal( t.g.toFixed( 3 ), 0.637, 'g (display-p3)' );
+			assert.equal( t.b.toFixed( 3 ), 0.852, 'b (display-p3)' );
 
 		} );
 
 		QUnit.test( 'getStyle', ( assert ) => {
 
+			ColorManagement.enabled = true;
+
 			const c = new Color( 'plum' );
-			const res = c.getStyle();
-			assert.ok( res == 'rgb(221,160,221)', 'style: ' + res );
+
+			assert.equal( c.getStyle(), 'rgb(221,160,221)', 'style: srgb' );
+			assert.equal( c.getStyle( DisplayP3ColorSpace ), 'color(display-p3 0.831 0.637 0.852)', 'style: display-p3' );
 
 		} );
 
