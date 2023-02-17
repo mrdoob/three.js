@@ -150,6 +150,7 @@ export const ObjectSpaceNormalMap = 1;
 export const NoColorSpace = '';
 export const SRGBColorSpace = 'srgb';
 export const LinearSRGBColorSpace = 'srgb-linear';
+export const DisplayP3ColorSpace = 'display-p3';
 
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;

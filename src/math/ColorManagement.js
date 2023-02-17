@@ -1,4 +1,6 @@
-import { SRGBColorSpace, LinearSRGBColorSpace } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, NoColorSpace, } from '../constants.js';
+import { Matrix3 } from './Matrix3.js';
+import { Vector3 } from './Vector3.js';
 
 export function SRGBToLinear( c ) {
 
@@ -12,11 +14,81 @@ export function LinearToSRGB( c ) {
 
 }
 
-// RGB-to-RGB transforms, defined as `FN[InputColorSpace][OutputColorSpace] → conversionFn`.
-const FN = {
-	[ SRGBColorSpace ]: { [ LinearSRGBColorSpace ]: SRGBToLinear },
-	[ LinearSRGBColorSpace ]: { [ SRGBColorSpace ]: LinearToSRGB },
+
+/**
+ * Matrices for sRGB and Display P3, based on the W3C specifications
+ * for sRGB and Display P3, and the ICC specification for the D50
+ * connection space.
+ *
+ * Reference:
+ * - http://www.russellcottrell.com/photo/matrixCalculator.htm
+ */
+
+const SRGB_TO_DISPLAY_P3 = new Matrix3().multiplyMatrices(
+	// XYZ to Display P3
+	new Matrix3().set(
+		2.4039840, -0.9899069, -0.3976415,
+		-0.8422229, 1.7988437, 0.0160354,
+		0.0482059, -0.0974068, 1.2740049,
+	),
+	// sRGB to XYZ
+	new Matrix3().set(
+		0.4360413, 0.3851129, 0.1430458,
+		0.2224845, 0.7169051, 0.0606104,
+		0.0139202, 0.0970672, 0.7139126,
+	),
+);
+
+const DISPLAY_P3_TO_SRGB = new Matrix3().multiplyMatrices(
+	// XYZ to sRGB
+	new Matrix3().set(
+		3.1341864, -1.6172090, -0.4906941,
+		-0.9787485, 1.9161301, 0.0334334,
+		0.0719639, -0.2289939, 1.4057537,
+	),
+	// Display P3 to XYZ
+	new Matrix3().set(
+		0.5151187, 0.2919778, 0.1571035,
+		0.2411892, 0.6922441, 0.0665668,
+		-0.0010505, 0.0418791, 0.7840713,
+	),
+);
+
+const _vector = new Vector3();
+
+function DisplayP3ToLinear( color ) {
+
+	_vector.set( color.r, color.g, color.b ).applyMatrix3( DISPLAY_P3_TO_SRGB );
+
+	color.setRGB( _vector.x, _vector.y, _vector.z );
+
+	return color.convertSRGBToLinear();
+
+}
+
+function LinearToDisplayP3( color ) {
+
+	color.convertLinearToSRGB();
+
+	_vector.set( color.r, color.g, color.b ).applyMatrix3( SRGB_TO_DISPLAY_P3 );
+
+	return color.setRGB( _vector.x, _vector.y, _vector.z );
+
+}
+
+// Conversions from <source> to Linear-sRGB reference space.
+const TO_LINEAR = {
+	[ LinearSRGBColorSpace ]: ( color ) => color,
+	[ SRGBColorSpace ]: ( color ) => color.convertSRGBToLinear(),
+	[ DisplayP3ColorSpace ]: DisplayP3ToLinear,
 };
+
+// Conversions to <target> from Linear-sRGB reference space.
+const FROM_LINEAR = {
+	[ LinearSRGBColorSpace ]: ( color ) => color,
+	[ SRGBColorSpace ]: ( color ) => color.convertLinearToSRGB(),
+	[ DisplayP3ColorSpace ]: LinearToDisplayP3,
+}
 
 export const ColorManagement = {
 
@@ -58,19 +130,16 @@ export const ColorManagement = {
 
 		}
 
-		if ( FN[ sourceColorSpace ] && FN[ sourceColorSpace ][ targetColorSpace ] !== undefined ) {
+		const sourceToLinear = TO_LINEAR[ sourceColorSpace ];
+		const targetFromLinear = FROM_LINEAR[ targetColorSpace ];
 
-			const fn = FN[ sourceColorSpace ][ targetColorSpace ];
+		if ( sourceToLinear === undefined || targetFromLinear === undefined ) {
 
-			color.r = fn( color.r );
-			color.g = fn( color.g );
-			color.b = fn( color.b );
-
-			return color;
+			throw new Error( `Unsupported color space conversion, "${ sourceColorSpace }" to "${ targetColorSpace }".` );
 
 		}
 
-		throw new Error( 'Unsupported color space conversion.' );
+		return targetFromLinear( sourceToLinear( color ) );
 
 	},
 
