@@ -56,7 +56,7 @@ const DISPLAY_P3_TO_SRGB = new Matrix3().multiplyMatrices(
 
 const _vector = new Vector3();
 
-function DisplayP3ToLinear( color ) {
+function DisplayP3ToLinearSRGB( color ) {
 
 	_vector.set( color.r, color.g, color.b ).applyMatrix3( DISPLAY_P3_TO_SRGB );
 
@@ -66,7 +66,7 @@ function DisplayP3ToLinear( color ) {
 
 }
 
-function LinearToDisplayP3( color ) {
+function LinearSRGBToDisplayP3( color ) {
 
 	color.convertLinearToSRGB();
 
@@ -80,14 +80,14 @@ function LinearToDisplayP3( color ) {
 const TO_LINEAR = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertSRGBToLinear(),
-	[ DisplayP3ColorSpace ]: DisplayP3ToLinear,
+	[ DisplayP3ColorSpace ]: DisplayP3ToLinearSRGB,
 };
 
 // Conversions to <target> from Linear-sRGB reference space.
 const FROM_LINEAR = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertLinearToSRGB(),
-	[ DisplayP3ColorSpace ]: LinearToDisplayP3,
+	[ DisplayP3ColorSpace ]: LinearSRGBToDisplayP3,
 }
 
 export const ColorManagement = {
