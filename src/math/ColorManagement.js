@@ -1,4 +1,4 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, NoColorSpace, } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 import { Vector3 } from './Vector3.js';
 
@@ -27,9 +27,9 @@ export function LinearToSRGB( c ) {
 const SRGB_TO_DISPLAY_P3 = new Matrix3().multiplyMatrices(
 	// XYZ to Display P3
 	new Matrix3().set(
-		2.4039840, -0.9899069, -0.3976415,
-		-0.8422229, 1.7988437, 0.0160354,
-		0.0482059, -0.0974068, 1.2740049,
+		2.4039840, - 0.9899069, - 0.3976415,
+		- 0.8422229, 1.7988437, 0.0160354,
+		0.0482059, - 0.0974068, 1.2740049,
 	),
 	// sRGB to XYZ
 	new Matrix3().set(
@@ -42,15 +42,15 @@ const SRGB_TO_DISPLAY_P3 = new Matrix3().multiplyMatrices(
 const DISPLAY_P3_TO_SRGB = new Matrix3().multiplyMatrices(
 	// XYZ to sRGB
 	new Matrix3().set(
-		3.1341864, -1.6172090, -0.4906941,
-		-0.9787485, 1.9161301, 0.0334334,
-		0.0719639, -0.2289939, 1.4057537,
+		3.1341864, - 1.6172090, - 0.4906941,
+		- 0.9787485, 1.9161301, 0.0334334,
+		0.0719639, - 0.2289939, 1.4057537,
 	),
 	// Display P3 to XYZ
 	new Matrix3().set(
 		0.5151187, 0.2919778, 0.1571035,
 		0.2411892, 0.6922441, 0.0665668,
-		-0.0010505, 0.0418791, 0.7840713,
+		- 0.0010505, 0.0418791, 0.7840713,
 	),
 );
 
