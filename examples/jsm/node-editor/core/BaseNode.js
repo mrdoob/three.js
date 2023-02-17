@@ -1,4 +1,4 @@
-import { ObjectNode } from '../../libs/flow.module.js';
+import { Node, ButtonInput, TitleElement, ContextMenu } from '../../libs/flow.module.js';
 
 export const onNodeValidElement = ( inputElement, outputElement ) => {
 
@@ -12,9 +12,11 @@ export const onNodeValidElement = ( inputElement, outputElement ) => {
 
 };
 
-export class BaseNode extends ObjectNode {
+export class BaseNode extends Node {
 
-	constructor( name, inputLength, value = null, width = 300 ) {
+	constructor( name, outputLength, value = null, width = 300 ) {
+
+		super();
 
 		const getObjectCallback = ( /*output = null*/ ) => {
 
@@ -22,7 +24,33 @@ export class BaseNode extends ObjectNode {
 
 		};
 
-		super( name, inputLength, getObjectCallback, width );
+		this.setWidth( width );
+
+		const title = new TitleElement( name )
+			.setObjectCallback( getObjectCallback )
+			.setSerializable( false )
+			.setOutput( outputLength );
+
+		const closeButton = new ButtonInput().onClick( () => {
+
+			context.open();
+
+		} ).setIcon( 'ti ti-dots' );
+
+		const context = new ContextMenu( this.dom );
+		context.add( new ButtonInput( 'Remove' ).setIcon( 'ti ti-trash' ).onClick( () => {
+
+			this.dispose();
+
+		} ) );
+
+		this.title = title;
+		this.closeButton = closeButton;
+		this.context = context;
+
+		title.addButton( closeButton );
+
+		this.add( title );
 
 		this.setOutputColor( this.getColorValueFromValue( value ) );
 
@@ -90,6 +118,72 @@ export class BaseNode extends ObjectNode {
 		element.onValid( ( source, target ) => this.onValidElement( source, target ) );
 
 		return super.add( element );
+
+	}
+
+	setName( value ) {
+
+		this.title.setTitle( value );
+
+		return this;
+
+	}
+
+	getName() {
+
+		return this.title.getTitle();
+
+	}
+
+	setObjectCallback( callback ) {
+
+		this.title.setObjectCallback( callback );
+
+		return this;
+
+	}
+
+	getObject( callback ) {
+
+		return this.title.getObject( callback );
+
+	}
+
+	setColor( color ) {
+
+		this.title.setColor( color );
+
+		return this;
+
+	}
+
+	setOutputLength( length ) {
+
+		this.title.setOutput( length );
+
+		return this;
+
+	}
+
+	setOutputColor( color ) {
+
+		this.title.setOutputColor( color );
+
+		return this;
+
+	}
+
+	invalidate() {
+
+		this.title.dispatchEvent( new Event( 'connect' ) );
+
+	}
+
+	dispose() {
+
+		this.context.hide();
+
+		super.dispose();
 
 	}
 

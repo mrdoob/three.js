@@ -164,7 +164,13 @@ function fromHalfFloat( val ) {
 
 }
 
+const DataUtils = {
+	toHalfFloat: toHalfFloat,
+	fromHalfFloat: fromHalfFloat,
+};
+
 export {
 	toHalfFloat,
-	fromHalfFloat
+	fromHalfFloat,
+	DataUtils
 };

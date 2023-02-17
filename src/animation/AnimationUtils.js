@@ -349,6 +349,17 @@ function makeClipAdditive( targetClip, referenceFrame = 0, referenceClip = targe
 
 }
 
+const AnimationUtils = {
+	arraySlice: arraySlice,
+	convertArray: convertArray,
+	isTypedArray: isTypedArray,
+	getKeyframeOrder: getKeyframeOrder,
+	sortedArray: sortedArray,
+	flattenJSON: flattenJSON,
+	subclip: subclip,
+	makeClipAdditive: makeClipAdditive
+};
+
 export {
 	arraySlice,
 	convertArray,
@@ -357,5 +368,6 @@ export {
 	sortedArray,
 	flattenJSON,
 	subclip,
-	makeClipAdditive
+	makeClipAdditive,
+	AnimationUtils
 };
