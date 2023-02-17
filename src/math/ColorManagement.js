@@ -88,7 +88,7 @@ const FROM_LINEAR = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertLinearToSRGB(),
 	[ DisplayP3ColorSpace ]: LinearSRGBToDisplayP3,
-}
+};
 
 export const ColorManagement = {
 
