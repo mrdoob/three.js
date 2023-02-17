@@ -228,14 +228,14 @@ class Ray {
 
 		const thc = Math.sqrt( radius2 - d2 );
 
-		// t0 = first intersect point - entrance on front of sphere
-		const t0 = tca - thc;
-
 		// t1 = second intersect point - exit point on back of sphere
 		const t1 = tca + thc;
 
 		// test to see if both t0 and t1 are behind the ray - if so, return null
-		if ( t0 < 0 && t1 < 0 ) return null;
+		if ( t1 < 0 ) return null;
+
+		// t0 = first intersect point - entrance on front of sphere
+		const t0 = tca - thc;
 
 		// test to see if t0 is behind the ray:
 		// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
