@@ -425,14 +425,16 @@ class Color {
 
 		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
 
+		const r = _color.r, g = _color.g, b = _color.b;
+
 		if ( colorSpace !== SRGBColorSpace ) {
 
 			// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
-			return `color(${ colorSpace } ${ _color.r } ${ _color.g } ${ _color.b })`;
+			return `color(${ colorSpace } ${ r.toFixed( 3 ) } ${ g.toFixed( 3 ) } ${ b.toFixed( 3 ) })`;
 
 		}
 
-		return `rgb(${( _color.r * 255 ) | 0},${( _color.g * 255 ) | 0},${( _color.b * 255 ) | 0})`;
+		return `rgb(${( r * 255 ) | 0},${( g * 255 ) | 0},${( b * 255 ) | 0})`;
 
 	}
 

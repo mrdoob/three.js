@@ -1,6 +1,7 @@
 /* global QUnit */
 
 import { Color } from '../../../../src/math/Color.js';
+import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 import { eps } from '../../utils/math-constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
 
@@ -260,9 +261,16 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'getStyle', ( assert ) => {
 
+			ColorManagement.enabled = true;
+
 			const c = new Color( 'plum' );
-			const res = c.getStyle();
-			assert.ok( res == 'rgb(221,160,221)', 'style: ' + res );
+
+			assert.equal( c.getStyle(), 'rgb(221,160,221)', 'style: srgb' );
+
+			// Close, but currently off by a few decimals...
+			// assert.equal( c.getStyle( 'display-p3' ), 'color(display-p3 0.831 0.637 0.852)', 'style: display-p3' );
+
+			ColorManagement.enabled = false;
 
 		} );
 
