@@ -574,33 +574,32 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	var MathUtils = /*#__PURE__*/Object.freeze({
-		__proto__: null,
+	const MathUtils = {
 		DEG2RAD: DEG2RAD,
 		RAD2DEG: RAD2DEG,
-		ceilPowerOfTwo: ceilPowerOfTwo,
-		clamp: clamp,
-		damp: damp,
-		degToRad: degToRad,
-		denormalize: denormalize,
-		euclideanModulo: euclideanModulo,
-		floorPowerOfTwo: floorPowerOfTwo,
 		generateUUID: generateUUID,
-		inverseLerp: inverseLerp,
-		isPowerOfTwo: isPowerOfTwo,
-		lerp: lerp,
+		clamp: clamp,
+		euclideanModulo: euclideanModulo,
 		mapLinear: mapLinear,
-		normalize: normalize,
+		inverseLerp: inverseLerp,
+		lerp: lerp,
+		damp: damp,
 		pingpong: pingpong,
-		radToDeg: radToDeg,
+		smoothstep: smoothstep,
+		smootherstep: smootherstep,
+		randInt: randInt,
 		randFloat: randFloat,
 		randFloatSpread: randFloatSpread,
-		randInt: randInt,
 		seededRandom: seededRandom,
+		degToRad: degToRad,
+		radToDeg: radToDeg,
+		isPowerOfTwo: isPowerOfTwo,
+		ceilPowerOfTwo: ceilPowerOfTwo,
+		floorPowerOfTwo: floorPowerOfTwo,
 		setQuaternionFromProperEuler: setQuaternionFromProperEuler,
-		smootherstep: smootherstep,
-		smoothstep: smoothstep
-	});
+		normalize: normalize,
+		denormalize: denormalize
+	};
 
 	class Vector2 {
 
@@ -5406,9 +5405,17 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		getBoundingSphere( target ) {
 
-			this.getCenter( target.center );
+			if ( this.isEmpty() ) {
 
-			target.radius = this.getSize( _vector$b ).length() * 0.5;
+				target.makeEmpty();
+
+			} else {
+
+				this.getCenter( target.center );
+
+				target.radius = this.getSize( _vector$b ).length() * 0.5;
+
+			}
 
 			return target;
 
@@ -13193,9 +13200,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	const fragment$3 = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <color_pars_fragment>\n#include <map_particle_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <logdepthbuf_fragment>\n\t#include <map_particle_fragment>\n\t#include <color_fragment>\n\t#include <alphatest_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\t#include <output_fragment>\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n}";
 
-	const vertex$2 = "#include <common>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
+	const vertex$2 = "#include <common>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <shadowmap_pars_vertex>\nvoid main() {\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <worldpos_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
-	const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}";
+	const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <logdepthbuf_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n}";
 
 	const vertex$1 = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );\n\tvec2 scale;\n\tscale.x = length( vec3( modelMatrix[ 0 ].x, modelMatrix[ 0 ].y, modelMatrix[ 0 ].z ) );\n\tscale.y = length( vec3( modelMatrix[ 1 ].x, modelMatrix[ 1 ].y, modelMatrix[ 1 ].z ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = isPerspectiveMatrix( projectionMatrix );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}";
 
@@ -27365,7 +27372,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		};
 
-		this.setSize = function ( width, height, updateStyle ) {
+		this.setSize = function ( width, height, updateStyle = true ) {
 
 			if ( xr.isPresenting ) {
 
@@ -27380,7 +27387,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			_canvas.width = Math.floor( width * _pixelRatio );
 			_canvas.height = Math.floor( height * _pixelRatio );
 
-			if ( updateStyle !== false ) {
+			if ( updateStyle === true ) {
 
 				_canvas.style.width = width + 'px';
 				_canvas.style.height = height + 'px';
@@ -38570,17 +38577,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	var AnimationUtils = /*#__PURE__*/Object.freeze({
-		__proto__: null,
+	const AnimationUtils = {
 		arraySlice: arraySlice,
 		convertArray: convertArray,
-		flattenJSON: flattenJSON,
-		getKeyframeOrder: getKeyframeOrder,
 		isTypedArray: isTypedArray,
-		makeClipAdditive: makeClipAdditive,
+		getKeyframeOrder: getKeyframeOrder,
 		sortedArray: sortedArray,
-		subclip: subclip
-	});
+		flattenJSON: flattenJSON,
+		subclip: subclip,
+		makeClipAdditive: makeClipAdditive
+	};
 
 	/**
 	 * Abstract base class of interpolants over parametric samples.
@@ -49951,11 +49957,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	var DataUtils = /*#__PURE__*/Object.freeze({
-		__proto__: null,
+	const DataUtils = {
+		toHalfFloat: toHalfFloat,
 		fromHalfFloat: fromHalfFloat,
-		toHalfFloat: toHalfFloat
-	});
+	};
 
 	// r144
 
