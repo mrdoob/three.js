@@ -58,21 +58,19 @@ const _vector = new Vector3();
 
 function DisplayP3ToLinearSRGB( color ) {
 
+	color.convertSRGBToLinear();
+
 	_vector.set( color.r, color.g, color.b ).applyMatrix3( DISPLAY_P3_TO_SRGB );
 
-	color.setRGB( _vector.x, _vector.y, _vector.z );
-
-	return color.convertSRGBToLinear();
+	return color.setRGB( _vector.x, _vector.y, _vector.z );
 
 }
 
 function LinearSRGBToDisplayP3( color ) {
 
-	color.convertLinearToSRGB();
-
 	_vector.set( color.r, color.g, color.b ).applyMatrix3( SRGB_TO_DISPLAY_P3 );
 
-	return color.setRGB( _vector.x, _vector.y, _vector.z );
+	return color.setRGB( _vector.x, _vector.y, _vector.z ).convertLinearToSRGB();
 
 }
 
