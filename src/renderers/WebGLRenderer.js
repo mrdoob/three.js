@@ -1149,7 +1149,7 @@ function WebGLRenderer( parameters = {} ) {
 
 				}
 
-				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+				if ( ! object.frustumCulled || object.intersectsFrustum( _frustum ) ) {
 
 					if ( sortObjects ) {
 

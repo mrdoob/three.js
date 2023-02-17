@@ -532,6 +532,12 @@ class Object3D extends EventDispatcher {
 
 	raycast( /* raycaster, intersects */ ) {}
 
+	intersectsFrustum( frustum ) {
+
+		return frustum.intersectsObject( this );
+
+	}
+
 	traverse( callback ) {
 
 		callback( this );

@@ -365,7 +365,7 @@ class Projector {
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
 				if ( object.material.visible === false ) return;
-				if ( object.frustumCulled === true && _frustum.intersectsObject( object ) === false ) return;
+				if ( object.frustumCulled === true && object.intersectsFrustum( _frustum ) === false ) return;
 
 				addObject( object );
 

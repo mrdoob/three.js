@@ -727,7 +727,7 @@ class WebGPURenderer {
 
 			} else if ( object.isMesh || object.isLine || object.isPoints ) {
 
-				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
+				if ( ! object.frustumCulled || object.intersectsFrustum( _frustum ) ) {
 
 					if ( this.sortObjects === true ) {
 
