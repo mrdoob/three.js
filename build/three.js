@@ -162,6 +162,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const NoColorSpace = '';
 	const SRGBColorSpace = 'srgb';
 	const LinearSRGBColorSpace = 'srgb-linear';
+	const DisplayP3ColorSpace = 'display-p3';
 
 	const ZeroStencilOp = 0;
 	const KeepStencilOp = 7680;
@@ -1469,6 +1470,1392 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	class Quaternion {
+
+		constructor( x = 0, y = 0, z = 0, w = 1 ) {
+
+			this.isQuaternion = true;
+
+			this._x = x;
+			this._y = y;
+			this._z = z;
+			this._w = w;
+
+		}
+
+		static slerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+
+			// fuzz-free, array-based Quaternion SLERP operation
+
+			let x0 = src0[ srcOffset0 + 0 ],
+				y0 = src0[ srcOffset0 + 1 ],
+				z0 = src0[ srcOffset0 + 2 ],
+				w0 = src0[ srcOffset0 + 3 ];
+
+			const x1 = src1[ srcOffset1 + 0 ],
+				y1 = src1[ srcOffset1 + 1 ],
+				z1 = src1[ srcOffset1 + 2 ],
+				w1 = src1[ srcOffset1 + 3 ];
+
+			if ( t === 0 ) {
+
+				dst[ dstOffset + 0 ] = x0;
+				dst[ dstOffset + 1 ] = y0;
+				dst[ dstOffset + 2 ] = z0;
+				dst[ dstOffset + 3 ] = w0;
+				return;
+
+			}
+
+			if ( t === 1 ) {
+
+				dst[ dstOffset + 0 ] = x1;
+				dst[ dstOffset + 1 ] = y1;
+				dst[ dstOffset + 2 ] = z1;
+				dst[ dstOffset + 3 ] = w1;
+				return;
+
+			}
+
+			if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
+
+				let s = 1 - t;
+				const cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
+					dir = ( cos >= 0 ? 1 : - 1 ),
+					sqrSin = 1 - cos * cos;
+
+				// Skip the Slerp for tiny steps to avoid numeric problems:
+				if ( sqrSin > Number.EPSILON ) {
+
+					const sin = Math.sqrt( sqrSin ),
+						len = Math.atan2( sin, cos * dir );
+
+					s = Math.sin( s * len ) / sin;
+					t = Math.sin( t * len ) / sin;
+
+				}
+
+				const tDir = t * dir;
+
+				x0 = x0 * s + x1 * tDir;
+				y0 = y0 * s + y1 * tDir;
+				z0 = z0 * s + z1 * tDir;
+				w0 = w0 * s + w1 * tDir;
+
+				// Normalize in case we just did a lerp:
+				if ( s === 1 - t ) {
+
+					const f = 1 / Math.sqrt( x0 * x0 + y0 * y0 + z0 * z0 + w0 * w0 );
+
+					x0 *= f;
+					y0 *= f;
+					z0 *= f;
+					w0 *= f;
+
+				}
+
+			}
+
+			dst[ dstOffset ] = x0;
+			dst[ dstOffset + 1 ] = y0;
+			dst[ dstOffset + 2 ] = z0;
+			dst[ dstOffset + 3 ] = w0;
+
+		}
+
+		static multiplyQuaternionsFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1 ) {
+
+			const x0 = src0[ srcOffset0 ];
+			const y0 = src0[ srcOffset0 + 1 ];
+			const z0 = src0[ srcOffset0 + 2 ];
+			const w0 = src0[ srcOffset0 + 3 ];
+
+			const x1 = src1[ srcOffset1 ];
+			const y1 = src1[ srcOffset1 + 1 ];
+			const z1 = src1[ srcOffset1 + 2 ];
+			const w1 = src1[ srcOffset1 + 3 ];
+
+			dst[ dstOffset ] = x0 * w1 + w0 * x1 + y0 * z1 - z0 * y1;
+			dst[ dstOffset + 1 ] = y0 * w1 + w0 * y1 + z0 * x1 - x0 * z1;
+			dst[ dstOffset + 2 ] = z0 * w1 + w0 * z1 + x0 * y1 - y0 * x1;
+			dst[ dstOffset + 3 ] = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1;
+
+			return dst;
+
+		}
+
+		get x() {
+
+			return this._x;
+
+		}
+
+		set x( value ) {
+
+			this._x = value;
+			this._onChangeCallback();
+
+		}
+
+		get y() {
+
+			return this._y;
+
+		}
+
+		set y( value ) {
+
+			this._y = value;
+			this._onChangeCallback();
+
+		}
+
+		get z() {
+
+			return this._z;
+
+		}
+
+		set z( value ) {
+
+			this._z = value;
+			this._onChangeCallback();
+
+		}
+
+		get w() {
+
+			return this._w;
+
+		}
+
+		set w( value ) {
+
+			this._w = value;
+			this._onChangeCallback();
+
+		}
+
+		set( x, y, z, w ) {
+
+			this._x = x;
+			this._y = y;
+			this._z = z;
+			this._w = w;
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		clone() {
+
+			return new this.constructor( this._x, this._y, this._z, this._w );
+
+		}
+
+		copy( quaternion ) {
+
+			this._x = quaternion.x;
+			this._y = quaternion.y;
+			this._z = quaternion.z;
+			this._w = quaternion.w;
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		setFromEuler( euler, update ) {
+
+			const x = euler._x, y = euler._y, z = euler._z, order = euler._order;
+
+			// http://www.mathworks.com/matlabcentral/fileexchange/
+			// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
+			//	content/SpinCalc.m
+
+			const cos = Math.cos;
+			const sin = Math.sin;
+
+			const c1 = cos( x / 2 );
+			const c2 = cos( y / 2 );
+			const c3 = cos( z / 2 );
+
+			const s1 = sin( x / 2 );
+			const s2 = sin( y / 2 );
+			const s3 = sin( z / 2 );
+
+			switch ( order ) {
+
+				case 'XYZ':
+					this._x = s1 * c2 * c3 + c1 * s2 * s3;
+					this._y = c1 * s2 * c3 - s1 * c2 * s3;
+					this._z = c1 * c2 * s3 + s1 * s2 * c3;
+					this._w = c1 * c2 * c3 - s1 * s2 * s3;
+					break;
+
+				case 'YXZ':
+					this._x = s1 * c2 * c3 + c1 * s2 * s3;
+					this._y = c1 * s2 * c3 - s1 * c2 * s3;
+					this._z = c1 * c2 * s3 - s1 * s2 * c3;
+					this._w = c1 * c2 * c3 + s1 * s2 * s3;
+					break;
+
+				case 'ZXY':
+					this._x = s1 * c2 * c3 - c1 * s2 * s3;
+					this._y = c1 * s2 * c3 + s1 * c2 * s3;
+					this._z = c1 * c2 * s3 + s1 * s2 * c3;
+					this._w = c1 * c2 * c3 - s1 * s2 * s3;
+					break;
+
+				case 'ZYX':
+					this._x = s1 * c2 * c3 - c1 * s2 * s3;
+					this._y = c1 * s2 * c3 + s1 * c2 * s3;
+					this._z = c1 * c2 * s3 - s1 * s2 * c3;
+					this._w = c1 * c2 * c3 + s1 * s2 * s3;
+					break;
+
+				case 'YZX':
+					this._x = s1 * c2 * c3 + c1 * s2 * s3;
+					this._y = c1 * s2 * c3 + s1 * c2 * s3;
+					this._z = c1 * c2 * s3 - s1 * s2 * c3;
+					this._w = c1 * c2 * c3 - s1 * s2 * s3;
+					break;
+
+				case 'XZY':
+					this._x = s1 * c2 * c3 - c1 * s2 * s3;
+					this._y = c1 * s2 * c3 - s1 * c2 * s3;
+					this._z = c1 * c2 * s3 + s1 * s2 * c3;
+					this._w = c1 * c2 * c3 + s1 * s2 * s3;
+					break;
+
+				default:
+					console.warn( 'THREE.Quaternion: .setFromEuler() encountered an unknown order: ' + order );
+
+			}
+
+			if ( update !== false ) this._onChangeCallback();
+
+			return this;
+
+		}
+
+		setFromAxisAngle( axis, angle ) {
+
+			// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
+
+			// assumes axis is normalized
+
+			const halfAngle = angle / 2, s = Math.sin( halfAngle );
+
+			this._x = axis.x * s;
+			this._y = axis.y * s;
+			this._z = axis.z * s;
+			this._w = Math.cos( halfAngle );
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		setFromRotationMatrix( m ) {
+
+			// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+
+			// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+
+			const te = m.elements,
+
+				m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ],
+				m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
+				m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ],
+
+				trace = m11 + m22 + m33;
+
+			if ( trace > 0 ) {
+
+				const s = 0.5 / Math.sqrt( trace + 1.0 );
+
+				this._w = 0.25 / s;
+				this._x = ( m32 - m23 ) * s;
+				this._y = ( m13 - m31 ) * s;
+				this._z = ( m21 - m12 ) * s;
+
+			} else if ( m11 > m22 && m11 > m33 ) {
+
+				const s = 2.0 * Math.sqrt( 1.0 + m11 - m22 - m33 );
+
+				this._w = ( m32 - m23 ) / s;
+				this._x = 0.25 * s;
+				this._y = ( m12 + m21 ) / s;
+				this._z = ( m13 + m31 ) / s;
+
+			} else if ( m22 > m33 ) {
+
+				const s = 2.0 * Math.sqrt( 1.0 + m22 - m11 - m33 );
+
+				this._w = ( m13 - m31 ) / s;
+				this._x = ( m12 + m21 ) / s;
+				this._y = 0.25 * s;
+				this._z = ( m23 + m32 ) / s;
+
+			} else {
+
+				const s = 2.0 * Math.sqrt( 1.0 + m33 - m11 - m22 );
+
+				this._w = ( m21 - m12 ) / s;
+				this._x = ( m13 + m31 ) / s;
+				this._y = ( m23 + m32 ) / s;
+				this._z = 0.25 * s;
+
+			}
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		setFromUnitVectors( vFrom, vTo ) {
+
+			// assumes direction vectors vFrom and vTo are normalized
+
+			let r = vFrom.dot( vTo ) + 1;
+
+			if ( r < Number.EPSILON ) {
+
+				// vFrom and vTo point in opposite directions
+
+				r = 0;
+
+				if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
+
+					this._x = - vFrom.y;
+					this._y = vFrom.x;
+					this._z = 0;
+					this._w = r;
+
+				} else {
+
+					this._x = 0;
+					this._y = - vFrom.z;
+					this._z = vFrom.y;
+					this._w = r;
+
+				}
+
+			} else {
+
+				// crossVectors( vFrom, vTo ); // inlined to avoid cyclic dependency on Vector3
+
+				this._x = vFrom.y * vTo.z - vFrom.z * vTo.y;
+				this._y = vFrom.z * vTo.x - vFrom.x * vTo.z;
+				this._z = vFrom.x * vTo.y - vFrom.y * vTo.x;
+				this._w = r;
+
+			}
+
+			return this.normalize();
+
+		}
+
+		angleTo( q ) {
+
+			return 2 * Math.acos( Math.abs( clamp( this.dot( q ), - 1, 1 ) ) );
+
+		}
+
+		rotateTowards( q, step ) {
+
+			const angle = this.angleTo( q );
+
+			if ( angle === 0 ) return this;
+
+			const t = Math.min( 1, step / angle );
+
+			this.slerp( q, t );
+
+			return this;
+
+		}
+
+		identity() {
+
+			return this.set( 0, 0, 0, 1 );
+
+		}
+
+		invert() {
+
+			// quaternion is assumed to have unit length
+
+			return this.conjugate();
+
+		}
+
+		conjugate() {
+
+			this._x *= - 1;
+			this._y *= - 1;
+			this._z *= - 1;
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		dot( v ) {
+
+			return this._x * v._x + this._y * v._y + this._z * v._z + this._w * v._w;
+
+		}
+
+		lengthSq() {
+
+			return this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w;
+
+		}
+
+		length() {
+
+			return Math.sqrt( this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w );
+
+		}
+
+		normalize() {
+
+			let l = this.length();
+
+			if ( l === 0 ) {
+
+				this._x = 0;
+				this._y = 0;
+				this._z = 0;
+				this._w = 1;
+
+			} else {
+
+				l = 1 / l;
+
+				this._x = this._x * l;
+				this._y = this._y * l;
+				this._z = this._z * l;
+				this._w = this._w * l;
+
+			}
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		multiply( q ) {
+
+			return this.multiplyQuaternions( this, q );
+
+		}
+
+		premultiply( q ) {
+
+			return this.multiplyQuaternions( q, this );
+
+		}
+
+		multiplyQuaternions( a, b ) {
+
+			// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
+
+			const qax = a._x, qay = a._y, qaz = a._z, qaw = a._w;
+			const qbx = b._x, qby = b._y, qbz = b._z, qbw = b._w;
+
+			this._x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
+			this._y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
+			this._z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
+			this._w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		slerp( qb, t ) {
+
+			if ( t === 0 ) return this;
+			if ( t === 1 ) return this.copy( qb );
+
+			const x = this._x, y = this._y, z = this._z, w = this._w;
+
+			// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
+
+			let cosHalfTheta = w * qb._w + x * qb._x + y * qb._y + z * qb._z;
+
+			if ( cosHalfTheta < 0 ) {
+
+				this._w = - qb._w;
+				this._x = - qb._x;
+				this._y = - qb._y;
+				this._z = - qb._z;
+
+				cosHalfTheta = - cosHalfTheta;
+
+			} else {
+
+				this.copy( qb );
+
+			}
+
+			if ( cosHalfTheta >= 1.0 ) {
+
+				this._w = w;
+				this._x = x;
+				this._y = y;
+				this._z = z;
+
+				return this;
+
+			}
+
+			const sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
+
+			if ( sqrSinHalfTheta <= Number.EPSILON ) {
+
+				const s = 1 - t;
+				this._w = s * w + t * this._w;
+				this._x = s * x + t * this._x;
+				this._y = s * y + t * this._y;
+				this._z = s * z + t * this._z;
+
+				this.normalize();
+				this._onChangeCallback();
+
+				return this;
+
+			}
+
+			const sinHalfTheta = Math.sqrt( sqrSinHalfTheta );
+			const halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
+			const ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
+				ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
+
+			this._w = ( w * ratioA + this._w * ratioB );
+			this._x = ( x * ratioA + this._x * ratioB );
+			this._y = ( y * ratioA + this._y * ratioB );
+			this._z = ( z * ratioA + this._z * ratioB );
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		slerpQuaternions( qa, qb, t ) {
+
+			return this.copy( qa ).slerp( qb, t );
+
+		}
+
+		random() {
+
+			// Derived from http://planning.cs.uiuc.edu/node198.html
+			// Note, this source uses w, x, y, z ordering,
+			// so we swap the order below.
+
+			const u1 = Math.random();
+			const sqrt1u1 = Math.sqrt( 1 - u1 );
+			const sqrtu1 = Math.sqrt( u1 );
+
+			const u2 = 2 * Math.PI * Math.random();
+
+			const u3 = 2 * Math.PI * Math.random();
+
+			return this.set(
+				sqrt1u1 * Math.cos( u2 ),
+				sqrtu1 * Math.sin( u3 ),
+				sqrtu1 * Math.cos( u3 ),
+				sqrt1u1 * Math.sin( u2 ),
+			);
+
+		}
+
+		equals( quaternion ) {
+
+			return ( quaternion._x === this._x ) && ( quaternion._y === this._y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
+
+		}
+
+		fromArray( array, offset = 0 ) {
+
+			this._x = array[ offset ];
+			this._y = array[ offset + 1 ];
+			this._z = array[ offset + 2 ];
+			this._w = array[ offset + 3 ];
+
+			this._onChangeCallback();
+
+			return this;
+
+		}
+
+		toArray( array = [], offset = 0 ) {
+
+			array[ offset ] = this._x;
+			array[ offset + 1 ] = this._y;
+			array[ offset + 2 ] = this._z;
+			array[ offset + 3 ] = this._w;
+
+			return array;
+
+		}
+
+		fromBufferAttribute( attribute, index ) {
+
+			this._x = attribute.getX( index );
+			this._y = attribute.getY( index );
+			this._z = attribute.getZ( index );
+			this._w = attribute.getW( index );
+
+			return this;
+
+		}
+
+		_onChange( callback ) {
+
+			this._onChangeCallback = callback;
+
+			return this;
+
+		}
+
+		_onChangeCallback() {}
+
+		*[ Symbol.iterator ]() {
+
+			yield this._x;
+			yield this._y;
+			yield this._z;
+			yield this._w;
+
+		}
+
+	}
+
+	class Vector3 {
+
+		constructor( x = 0, y = 0, z = 0 ) {
+
+			Vector3.prototype.isVector3 = true;
+
+			this.x = x;
+			this.y = y;
+			this.z = z;
+
+		}
+
+		set( x, y, z ) {
+
+			if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
+
+			this.x = x;
+			this.y = y;
+			this.z = z;
+
+			return this;
+
+		}
+
+		setScalar( scalar ) {
+
+			this.x = scalar;
+			this.y = scalar;
+			this.z = scalar;
+
+			return this;
+
+		}
+
+		setX( x ) {
+
+			this.x = x;
+
+			return this;
+
+		}
+
+		setY( y ) {
+
+			this.y = y;
+
+			return this;
+
+		}
+
+		setZ( z ) {
+
+			this.z = z;
+
+			return this;
+
+		}
+
+		setComponent( index, value ) {
+
+			switch ( index ) {
+
+				case 0: this.x = value; break;
+				case 1: this.y = value; break;
+				case 2: this.z = value; break;
+				default: throw new Error( 'index is out of range: ' + index );
+
+			}
+
+			return this;
+
+		}
+
+		getComponent( index ) {
+
+			switch ( index ) {
+
+				case 0: return this.x;
+				case 1: return this.y;
+				case 2: return this.z;
+				default: throw new Error( 'index is out of range: ' + index );
+
+			}
+
+		}
+
+		clone() {
+
+			return new this.constructor( this.x, this.y, this.z );
+
+		}
+
+		copy( v ) {
+
+			this.x = v.x;
+			this.y = v.y;
+			this.z = v.z;
+
+			return this;
+
+		}
+
+		add( v ) {
+
+			this.x += v.x;
+			this.y += v.y;
+			this.z += v.z;
+
+			return this;
+
+		}
+
+		addScalar( s ) {
+
+			this.x += s;
+			this.y += s;
+			this.z += s;
+
+			return this;
+
+		}
+
+		addVectors( a, b ) {
+
+			this.x = a.x + b.x;
+			this.y = a.y + b.y;
+			this.z = a.z + b.z;
+
+			return this;
+
+		}
+
+		addScaledVector( v, s ) {
+
+			this.x += v.x * s;
+			this.y += v.y * s;
+			this.z += v.z * s;
+
+			return this;
+
+		}
+
+		sub( v ) {
+
+			this.x -= v.x;
+			this.y -= v.y;
+			this.z -= v.z;
+
+			return this;
+
+		}
+
+		subScalar( s ) {
+
+			this.x -= s;
+			this.y -= s;
+			this.z -= s;
+
+			return this;
+
+		}
+
+		subVectors( a, b ) {
+
+			this.x = a.x - b.x;
+			this.y = a.y - b.y;
+			this.z = a.z - b.z;
+
+			return this;
+
+		}
+
+		multiply( v ) {
+
+			this.x *= v.x;
+			this.y *= v.y;
+			this.z *= v.z;
+
+			return this;
+
+		}
+
+		multiplyScalar( scalar ) {
+
+			this.x *= scalar;
+			this.y *= scalar;
+			this.z *= scalar;
+
+			return this;
+
+		}
+
+		multiplyVectors( a, b ) {
+
+			this.x = a.x * b.x;
+			this.y = a.y * b.y;
+			this.z = a.z * b.z;
+
+			return this;
+
+		}
+
+		applyEuler( euler ) {
+
+			return this.applyQuaternion( _quaternion$4.setFromEuler( euler ) );
+
+		}
+
+		applyAxisAngle( axis, angle ) {
+
+			return this.applyQuaternion( _quaternion$4.setFromAxisAngle( axis, angle ) );
+
+		}
+
+		applyMatrix3( m ) {
+
+			const x = this.x, y = this.y, z = this.z;
+			const e = m.elements;
+
+			this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
+			this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
+			this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
+
+			return this;
+
+		}
+
+		applyNormalMatrix( m ) {
+
+			return this.applyMatrix3( m ).normalize();
+
+		}
+
+		applyMatrix4( m ) {
+
+			const x = this.x, y = this.y, z = this.z;
+			const e = m.elements;
+
+			const w = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
+
+			this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] ) * w;
+			this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] ) * w;
+			this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * w;
+
+			return this;
+
+		}
+
+		applyQuaternion( q ) {
+
+			const x = this.x, y = this.y, z = this.z;
+			const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+
+			// calculate quat * vector
+
+			const ix = qw * x + qy * z - qz * y;
+			const iy = qw * y + qz * x - qx * z;
+			const iz = qw * z + qx * y - qy * x;
+			const iw = - qx * x - qy * y - qz * z;
+
+			// calculate result * inverse quat
+
+			this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+			this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+			this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+
+			return this;
+
+		}
+
+		project( camera ) {
+
+			return this.applyMatrix4( camera.matrixWorldInverse ).applyMatrix4( camera.projectionMatrix );
+
+		}
+
+		unproject( camera ) {
+
+			return this.applyMatrix4( camera.projectionMatrixInverse ).applyMatrix4( camera.matrixWorld );
+
+		}
+
+		transformDirection( m ) {
+
+			// input: THREE.Matrix4 affine matrix
+			// vector interpreted as a direction
+
+			const x = this.x, y = this.y, z = this.z;
+			const e = m.elements;
+
+			this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z;
+			this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z;
+			this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
+
+			return this.normalize();
+
+		}
+
+		divide( v ) {
+
+			this.x /= v.x;
+			this.y /= v.y;
+			this.z /= v.z;
+
+			return this;
+
+		}
+
+		divideScalar( scalar ) {
+
+			return this.multiplyScalar( 1 / scalar );
+
+		}
+
+		min( v ) {
+
+			this.x = Math.min( this.x, v.x );
+			this.y = Math.min( this.y, v.y );
+			this.z = Math.min( this.z, v.z );
+
+			return this;
+
+		}
+
+		max( v ) {
+
+			this.x = Math.max( this.x, v.x );
+			this.y = Math.max( this.y, v.y );
+			this.z = Math.max( this.z, v.z );
+
+			return this;
+
+		}
+
+		clamp( min, max ) {
+
+			// assumes min < max, componentwise
+
+			this.x = Math.max( min.x, Math.min( max.x, this.x ) );
+			this.y = Math.max( min.y, Math.min( max.y, this.y ) );
+			this.z = Math.max( min.z, Math.min( max.z, this.z ) );
+
+			return this;
+
+		}
+
+		clampScalar( minVal, maxVal ) {
+
+			this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
+			this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
+			this.z = Math.max( minVal, Math.min( maxVal, this.z ) );
+
+			return this;
+
+		}
+
+		clampLength( min, max ) {
+
+			const length = this.length();
+
+			return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
+
+		}
+
+		floor() {
+
+			this.x = Math.floor( this.x );
+			this.y = Math.floor( this.y );
+			this.z = Math.floor( this.z );
+
+			return this;
+
+		}
+
+		ceil() {
+
+			this.x = Math.ceil( this.x );
+			this.y = Math.ceil( this.y );
+			this.z = Math.ceil( this.z );
+
+			return this;
+
+		}
+
+		round() {
+
+			this.x = Math.round( this.x );
+			this.y = Math.round( this.y );
+			this.z = Math.round( this.z );
+
+			return this;
+
+		}
+
+		roundToZero() {
+
+			this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
+			this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+			this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+
+			return this;
+
+		}
+
+		negate() {
+
+			this.x = - this.x;
+			this.y = - this.y;
+			this.z = - this.z;
+
+			return this;
+
+		}
+
+		dot( v ) {
+
+			return this.x * v.x + this.y * v.y + this.z * v.z;
+
+		}
+
+		// TODO lengthSquared?
+
+		lengthSq() {
+
+			return this.x * this.x + this.y * this.y + this.z * this.z;
+
+		}
+
+		length() {
+
+			return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
+
+		}
+
+		manhattanLength() {
+
+			return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
+
+		}
+
+		normalize() {
+
+			return this.divideScalar( this.length() || 1 );
+
+		}
+
+		setLength( length ) {
+
+			return this.normalize().multiplyScalar( length );
+
+		}
+
+		lerp( v, alpha ) {
+
+			this.x += ( v.x - this.x ) * alpha;
+			this.y += ( v.y - this.y ) * alpha;
+			this.z += ( v.z - this.z ) * alpha;
+
+			return this;
+
+		}
+
+		lerpVectors( v1, v2, alpha ) {
+
+			this.x = v1.x + ( v2.x - v1.x ) * alpha;
+			this.y = v1.y + ( v2.y - v1.y ) * alpha;
+			this.z = v1.z + ( v2.z - v1.z ) * alpha;
+
+			return this;
+
+		}
+
+		cross( v ) {
+
+			return this.crossVectors( this, v );
+
+		}
+
+		crossVectors( a, b ) {
+
+			const ax = a.x, ay = a.y, az = a.z;
+			const bx = b.x, by = b.y, bz = b.z;
+
+			this.x = ay * bz - az * by;
+			this.y = az * bx - ax * bz;
+			this.z = ax * by - ay * bx;
+
+			return this;
+
+		}
+
+		projectOnVector( v ) {
+
+			const denominator = v.lengthSq();
+
+			if ( denominator === 0 ) return this.set( 0, 0, 0 );
+
+			const scalar = v.dot( this ) / denominator;
+
+			return this.copy( v ).multiplyScalar( scalar );
+
+		}
+
+		projectOnPlane( planeNormal ) {
+
+			_vector$d.copy( this ).projectOnVector( planeNormal );
+
+			return this.sub( _vector$d );
+
+		}
+
+		reflect( normal ) {
+
+			// reflect incident vector off plane orthogonal to normal
+			// normal is assumed to have unit length
+
+			return this.sub( _vector$d.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
+
+		}
+
+		angleTo( v ) {
+
+			const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
+
+			if ( denominator === 0 ) return Math.PI / 2;
+
+			const theta = this.dot( v ) / denominator;
+
+			// clamp, to handle numerical problems
+
+			return Math.acos( clamp( theta, - 1, 1 ) );
+
+		}
+
+		distanceTo( v ) {
+
+			return Math.sqrt( this.distanceToSquared( v ) );
+
+		}
+
+		distanceToSquared( v ) {
+
+			const dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
+
+			return dx * dx + dy * dy + dz * dz;
+
+		}
+
+		manhattanDistanceTo( v ) {
+
+			return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y ) + Math.abs( this.z - v.z );
+
+		}
+
+		setFromSpherical( s ) {
+
+			return this.setFromSphericalCoords( s.radius, s.phi, s.theta );
+
+		}
+
+		setFromSphericalCoords( radius, phi, theta ) {
+
+			const sinPhiRadius = Math.sin( phi ) * radius;
+
+			this.x = sinPhiRadius * Math.sin( theta );
+			this.y = Math.cos( phi ) * radius;
+			this.z = sinPhiRadius * Math.cos( theta );
+
+			return this;
+
+		}
+
+		setFromCylindrical( c ) {
+
+			return this.setFromCylindricalCoords( c.radius, c.theta, c.y );
+
+		}
+
+		setFromCylindricalCoords( radius, theta, y ) {
+
+			this.x = radius * Math.sin( theta );
+			this.y = y;
+			this.z = radius * Math.cos( theta );
+
+			return this;
+
+		}
+
+		setFromMatrixPosition( m ) {
+
+			const e = m.elements;
+
+			this.x = e[ 12 ];
+			this.y = e[ 13 ];
+			this.z = e[ 14 ];
+
+			return this;
+
+		}
+
+		setFromMatrixScale( m ) {
+
+			const sx = this.setFromMatrixColumn( m, 0 ).length();
+			const sy = this.setFromMatrixColumn( m, 1 ).length();
+			const sz = this.setFromMatrixColumn( m, 2 ).length();
+
+			this.x = sx;
+			this.y = sy;
+			this.z = sz;
+
+			return this;
+
+		}
+
+		setFromMatrixColumn( m, index ) {
+
+			return this.fromArray( m.elements, index * 4 );
+
+		}
+
+		setFromMatrix3Column( m, index ) {
+
+			return this.fromArray( m.elements, index * 3 );
+
+		}
+
+		setFromEuler( e ) {
+
+			this.x = e._x;
+			this.y = e._y;
+			this.z = e._z;
+
+			return this;
+
+		}
+
+		equals( v ) {
+
+			return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
+
+		}
+
+		fromArray( array, offset = 0 ) {
+
+			this.x = array[ offset ];
+			this.y = array[ offset + 1 ];
+			this.z = array[ offset + 2 ];
+
+			return this;
+
+		}
+
+		toArray( array = [], offset = 0 ) {
+
+			array[ offset ] = this.x;
+			array[ offset + 1 ] = this.y;
+			array[ offset + 2 ] = this.z;
+
+			return array;
+
+		}
+
+		fromBufferAttribute( attribute, index ) {
+
+			this.x = attribute.getX( index );
+			this.y = attribute.getY( index );
+			this.z = attribute.getZ( index );
+
+			return this;
+
+		}
+
+		random() {
+
+			this.x = Math.random();
+			this.y = Math.random();
+			this.z = Math.random();
+
+			return this;
+
+		}
+
+		randomDirection() {
+
+			// Derived from https://mathworld.wolfram.com/SpherePointPicking.html
+
+			const u = ( Math.random() - 0.5 ) * 2;
+			const t = Math.random() * Math.PI * 2;
+			const f = Math.sqrt( 1 - u ** 2 );
+
+			this.x = f * Math.cos( t );
+			this.y = f * Math.sin( t );
+			this.z = u;
+
+			return this;
+
+		}
+
+		*[ Symbol.iterator ]() {
+
+			yield this.x;
+			yield this.y;
+			yield this.z;
+
+		}
+
+	}
+
+	const _vector$d = /*@__PURE__*/ new Vector3();
+	const _quaternion$4 = /*@__PURE__*/ new Quaternion();
+
 	function SRGBToLinear( c ) {
 
 		return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
@@ -1481,10 +2868,78 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// RGB-to-RGB transforms, defined as `FN[InputColorSpace][OutputColorSpace] → conversionFn`.
-	const FN = {
-		[ SRGBColorSpace ]: { [ LinearSRGBColorSpace ]: SRGBToLinear },
-		[ LinearSRGBColorSpace ]: { [ SRGBColorSpace ]: LinearToSRGB },
+
+	/**
+	 * Matrices for sRGB and Display P3, based on the W3C specifications
+	 * for sRGB and Display P3, and the ICC specification for the D50
+	 * connection space.
+	 *
+	 * Reference:
+	 * - http://www.russellcottrell.com/photo/matrixCalculator.htm
+	 */
+
+	const SRGB_TO_DISPLAY_P3 = new Matrix3().multiplyMatrices(
+		// XYZ to Display P3
+		new Matrix3().set(
+			2.4039840, - 0.9899069, - 0.3976415,
+			- 0.8422229, 1.7988437, 0.0160354,
+			0.0482059, - 0.0974068, 1.2740049,
+		),
+		// sRGB to XYZ
+		new Matrix3().set(
+			0.4360413, 0.3851129, 0.1430458,
+			0.2224845, 0.7169051, 0.0606104,
+			0.0139202, 0.0970672, 0.7139126,
+		),
+	);
+
+	const DISPLAY_P3_TO_SRGB = new Matrix3().multiplyMatrices(
+		// XYZ to sRGB
+		new Matrix3().set(
+			3.1341864, - 1.6172090, - 0.4906941,
+			- 0.9787485, 1.9161301, 0.0334334,
+			0.0719639, - 0.2289939, 1.4057537,
+		),
+		// Display P3 to XYZ
+		new Matrix3().set(
+			0.5151187, 0.2919778, 0.1571035,
+			0.2411892, 0.6922441, 0.0665668,
+			- 0.0010505, 0.0418791, 0.7840713,
+		),
+	);
+
+	const _vector$c = new Vector3();
+
+	function DisplayP3ToLinearSRGB( color ) {
+
+		color.convertSRGBToLinear();
+
+		_vector$c.set( color.r, color.g, color.b ).applyMatrix3( DISPLAY_P3_TO_SRGB );
+
+		return color.setRGB( _vector$c.x, _vector$c.y, _vector$c.z );
+
+	}
+
+	function LinearSRGBToDisplayP3( color ) {
+
+		_vector$c.set( color.r, color.g, color.b ).applyMatrix3( SRGB_TO_DISPLAY_P3 );
+
+		return color.setRGB( _vector$c.x, _vector$c.y, _vector$c.z ).convertLinearToSRGB();
+
+	}
+
+	// Conversions from <source> to Linear-sRGB reference space.
+	const TO_LINEAR = {
+		[ LinearSRGBColorSpace ]: ( color ) => color,
+		[ SRGBColorSpace ]: ( color ) => color.convertSRGBToLinear(),
+		[ DisplayP3ColorSpace ]: DisplayP3ToLinearSRGB,
+	};
+
+	// Conversions to <target> from Linear-sRGB reference space.
+	const FROM_LINEAR = {
+		[ LinearSRGBColorSpace ]: ( color ) => color,
+		[ SRGBColorSpace ]: ( color ) => color.convertLinearToSRGB(),
+		[ DisplayP3ColorSpace ]: LinearSRGBToDisplayP3,
 	};
 
 	const ColorManagement = {
@@ -1527,19 +2982,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			if ( FN[ sourceColorSpace ] && FN[ sourceColorSpace ][ targetColorSpace ] !== undefined ) {
+			const sourceToLinear = TO_LINEAR[ sourceColorSpace ];
+			const targetFromLinear = FROM_LINEAR[ targetColorSpace ];
 
-				const fn = FN[ sourceColorSpace ][ targetColorSpace ];
+			if ( sourceToLinear === undefined || targetFromLinear === undefined ) {
 
-				color.r = fn( color.r );
-				color.g = fn( color.g );
-				color.b = fn( color.b );
-
-				return color;
+				throw new Error( `Unsupported color space conversion, "${ sourceColorSpace }" to "${ targetColorSpace }".` );
 
 			}
 
-			throw new Error( 'Unsupported color space conversion.' );
+			return targetFromLinear( sourceToLinear( color ) );
 
 		},
 
@@ -1556,612 +3008,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		},
 
 	};
-
-	const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
-		'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
-		'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
-		'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
-		'darkgoldenrod': 0xB8860B, 'darkgray': 0xA9A9A9, 'darkgreen': 0x006400, 'darkgrey': 0xA9A9A9, 'darkkhaki': 0xBDB76B, 'darkmagenta': 0x8B008B,
-		'darkolivegreen': 0x556B2F, 'darkorange': 0xFF8C00, 'darkorchid': 0x9932CC, 'darkred': 0x8B0000, 'darksalmon': 0xE9967A, 'darkseagreen': 0x8FBC8F,
-		'darkslateblue': 0x483D8B, 'darkslategray': 0x2F4F4F, 'darkslategrey': 0x2F4F4F, 'darkturquoise': 0x00CED1, 'darkviolet': 0x9400D3,
-		'deeppink': 0xFF1493, 'deepskyblue': 0x00BFFF, 'dimgray': 0x696969, 'dimgrey': 0x696969, 'dodgerblue': 0x1E90FF, 'firebrick': 0xB22222,
-		'floralwhite': 0xFFFAF0, 'forestgreen': 0x228B22, 'fuchsia': 0xFF00FF, 'gainsboro': 0xDCDCDC, 'ghostwhite': 0xF8F8FF, 'gold': 0xFFD700,
-		'goldenrod': 0xDAA520, 'gray': 0x808080, 'green': 0x008000, 'greenyellow': 0xADFF2F, 'grey': 0x808080, 'honeydew': 0xF0FFF0, 'hotpink': 0xFF69B4,
-		'indianred': 0xCD5C5C, 'indigo': 0x4B0082, 'ivory': 0xFFFFF0, 'khaki': 0xF0E68C, 'lavender': 0xE6E6FA, 'lavenderblush': 0xFFF0F5, 'lawngreen': 0x7CFC00,
-		'lemonchiffon': 0xFFFACD, 'lightblue': 0xADD8E6, 'lightcoral': 0xF08080, 'lightcyan': 0xE0FFFF, 'lightgoldenrodyellow': 0xFAFAD2, 'lightgray': 0xD3D3D3,
-		'lightgreen': 0x90EE90, 'lightgrey': 0xD3D3D3, 'lightpink': 0xFFB6C1, 'lightsalmon': 0xFFA07A, 'lightseagreen': 0x20B2AA, 'lightskyblue': 0x87CEFA,
-		'lightslategray': 0x778899, 'lightslategrey': 0x778899, 'lightsteelblue': 0xB0C4DE, 'lightyellow': 0xFFFFE0, 'lime': 0x00FF00, 'limegreen': 0x32CD32,
-		'linen': 0xFAF0E6, 'magenta': 0xFF00FF, 'maroon': 0x800000, 'mediumaquamarine': 0x66CDAA, 'mediumblue': 0x0000CD, 'mediumorchid': 0xBA55D3,
-		'mediumpurple': 0x9370DB, 'mediumseagreen': 0x3CB371, 'mediumslateblue': 0x7B68EE, 'mediumspringgreen': 0x00FA9A, 'mediumturquoise': 0x48D1CC,
-		'mediumvioletred': 0xC71585, 'midnightblue': 0x191970, 'mintcream': 0xF5FFFA, 'mistyrose': 0xFFE4E1, 'moccasin': 0xFFE4B5, 'navajowhite': 0xFFDEAD,
-		'navy': 0x000080, 'oldlace': 0xFDF5E6, 'olive': 0x808000, 'olivedrab': 0x6B8E23, 'orange': 0xFFA500, 'orangered': 0xFF4500, 'orchid': 0xDA70D6,
-		'palegoldenrod': 0xEEE8AA, 'palegreen': 0x98FB98, 'paleturquoise': 0xAFEEEE, 'palevioletred': 0xDB7093, 'papayawhip': 0xFFEFD5, 'peachpuff': 0xFFDAB9,
-		'peru': 0xCD853F, 'pink': 0xFFC0CB, 'plum': 0xDDA0DD, 'powderblue': 0xB0E0E6, 'purple': 0x800080, 'rebeccapurple': 0x663399, 'red': 0xFF0000, 'rosybrown': 0xBC8F8F,
-		'royalblue': 0x4169E1, 'saddlebrown': 0x8B4513, 'salmon': 0xFA8072, 'sandybrown': 0xF4A460, 'seagreen': 0x2E8B57, 'seashell': 0xFFF5EE,
-		'sienna': 0xA0522D, 'silver': 0xC0C0C0, 'skyblue': 0x87CEEB, 'slateblue': 0x6A5ACD, 'slategray': 0x708090, 'slategrey': 0x708090, 'snow': 0xFFFAFA,
-		'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
-		'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
-
-	const _rgb$1 = { r: 0, g: 0, b: 0 };
-	const _hslA = { h: 0, s: 0, l: 0 };
-	const _hslB = { h: 0, s: 0, l: 0 };
-
-	function hue2rgb( p, q, t ) {
-
-		if ( t < 0 ) t += 1;
-		if ( t > 1 ) t -= 1;
-		if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
-		if ( t < 1 / 2 ) return q;
-		if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
-		return p;
-
-	}
-
-	function toComponents( source, target ) {
-
-		target.r = source.r;
-		target.g = source.g;
-		target.b = source.b;
-
-		return target;
-
-	}
-
-	class Color {
-
-		constructor( r, g, b ) {
-
-			this.isColor = true;
-
-			this.r = 1;
-			this.g = 1;
-			this.b = 1;
-
-			if ( g === undefined && b === undefined ) {
-
-				// r is THREE.Color, hex or string
-				return this.set( r );
-
-			}
-
-			return this.setRGB( r, g, b );
-
-		}
-
-		set( value ) {
-
-			if ( value && value.isColor ) {
-
-				this.copy( value );
-
-			} else if ( typeof value === 'number' ) {
-
-				this.setHex( value );
-
-			} else if ( typeof value === 'string' ) {
-
-				this.setStyle( value );
-
-			}
-
-			return this;
-
-		}
-
-		setScalar( scalar ) {
-
-			this.r = scalar;
-			this.g = scalar;
-			this.b = scalar;
-
-			return this;
-
-		}
-
-		setHex( hex, colorSpace = SRGBColorSpace ) {
-
-			hex = Math.floor( hex );
-
-			this.r = ( hex >> 16 & 255 ) / 255;
-			this.g = ( hex >> 8 & 255 ) / 255;
-			this.b = ( hex & 255 ) / 255;
-
-			ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-			return this;
-
-		}
-
-		setRGB( r, g, b, colorSpace = ColorManagement.workingColorSpace ) {
-
-			this.r = r;
-			this.g = g;
-			this.b = b;
-
-			ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-			return this;
-
-		}
-
-		setHSL( h, s, l, colorSpace = ColorManagement.workingColorSpace ) {
-
-			// h,s,l ranges are in 0.0 - 1.0
-			h = euclideanModulo( h, 1 );
-			s = clamp( s, 0, 1 );
-			l = clamp( l, 0, 1 );
-
-			if ( s === 0 ) {
-
-				this.r = this.g = this.b = l;
-
-			} else {
-
-				const p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
-				const q = ( 2 * l ) - p;
-
-				this.r = hue2rgb( q, p, h + 1 / 3 );
-				this.g = hue2rgb( q, p, h );
-				this.b = hue2rgb( q, p, h - 1 / 3 );
-
-			}
-
-			ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-			return this;
-
-		}
-
-		setStyle( style, colorSpace = SRGBColorSpace ) {
-
-			function handleAlpha( string ) {
-
-				if ( string === undefined ) return;
-
-				if ( parseFloat( string ) < 1 ) {
-
-					console.warn( 'THREE.Color: Alpha component of ' + style + ' will be ignored.' );
-
-				}
-
-			}
-
-
-			let m;
-
-			if ( m = /^(\w+)\(([^\)]*)\)/.exec( style ) ) {
-
-				// rgb / hsl
-
-				let color;
-				const name = m[ 1 ];
-				const components = m[ 2 ];
-
-				switch ( name ) {
-
-					case 'rgb':
-					case 'rgba':
-
-						if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
-
-							// rgb(255,0,0) rgba(255,0,0,0.5)
-							this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
-							this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
-							this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
-
-							ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-							handleAlpha( color[ 4 ] );
-
-							return this;
-
-						}
-
-						if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
-
-							// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
-							this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
-							this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
-							this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
-
-							ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-							handleAlpha( color[ 4 ] );
-
-							return this;
-
-						}
-
-						break;
-
-					case 'hsl':
-					case 'hsla':
-
-						if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
-
-							// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
-							const h = parseFloat( color[ 1 ] ) / 360;
-							const s = parseFloat( color[ 2 ] ) / 100;
-							const l = parseFloat( color[ 3 ] ) / 100;
-
-							handleAlpha( color[ 4 ] );
-
-							return this.setHSL( h, s, l, colorSpace );
-
-						}
-
-						break;
-
-					default:
-
-						console.warn( 'THREE.Color: Unknown color model ' + style );
-
-				}
-
-			} else if ( m = /^\#([A-Fa-f\d]+)$/.exec( style ) ) {
-
-				// hex color
-
-				const hex = m[ 1 ];
-				const size = hex.length;
-
-				if ( size === 3 ) {
-
-					// #ff0
-					this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255;
-					this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
-					this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
-
-					ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-					return this;
-
-				} else if ( size === 6 ) {
-
-					// #ff0000
-					this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255;
-					this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
-					this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
-
-					ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-					return this;
-
-				} else {
-
-					console.warn( 'THREE.Color: Invalid hex color ' + style );
-
-				}
-
-			} else if ( style && style.length > 0 ) {
-
-				return this.setColorName( style, colorSpace );
-
-			}
-
-			return this;
-
-		}
-
-		setColorName( style, colorSpace = SRGBColorSpace ) {
-
-			// color keywords
-			const hex = _colorKeywords[ style.toLowerCase() ];
-
-			if ( hex !== undefined ) {
-
-				// red
-				this.setHex( hex, colorSpace );
-
-			} else {
-
-				// unknown color
-				console.warn( 'THREE.Color: Unknown color ' + style );
-
-			}
-
-			return this;
-
-		}
-
-		clone() {
-
-			return new this.constructor( this.r, this.g, this.b );
-
-		}
-
-		copy( color ) {
-
-			this.r = color.r;
-			this.g = color.g;
-			this.b = color.b;
-
-			return this;
-
-		}
-
-		copySRGBToLinear( color ) {
-
-			this.r = SRGBToLinear( color.r );
-			this.g = SRGBToLinear( color.g );
-			this.b = SRGBToLinear( color.b );
-
-			return this;
-
-		}
-
-		copyLinearToSRGB( color ) {
-
-			this.r = LinearToSRGB( color.r );
-			this.g = LinearToSRGB( color.g );
-			this.b = LinearToSRGB( color.b );
-
-			return this;
-
-		}
-
-		convertSRGBToLinear() {
-
-			this.copySRGBToLinear( this );
-
-			return this;
-
-		}
-
-		convertLinearToSRGB() {
-
-			this.copyLinearToSRGB( this );
-
-			return this;
-
-		}
-
-		getHex( colorSpace = SRGBColorSpace ) {
-
-			ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb$1 ), colorSpace );
-
-			return clamp( _rgb$1.r * 255, 0, 255 ) << 16 ^ clamp( _rgb$1.g * 255, 0, 255 ) << 8 ^ clamp( _rgb$1.b * 255, 0, 255 ) << 0;
-
-		}
-
-		getHexString( colorSpace = SRGBColorSpace ) {
-
-			return ( '000000' + this.getHex( colorSpace ).toString( 16 ) ).slice( - 6 );
-
-		}
-
-		getHSL( target, colorSpace = ColorManagement.workingColorSpace ) {
-
-			// h,s,l ranges are in 0.0 - 1.0
-
-			ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb$1 ), colorSpace );
-
-			const r = _rgb$1.r, g = _rgb$1.g, b = _rgb$1.b;
-
-			const max = Math.max( r, g, b );
-			const min = Math.min( r, g, b );
-
-			let hue, saturation;
-			const lightness = ( min + max ) / 2.0;
-
-			if ( min === max ) {
-
-				hue = 0;
-				saturation = 0;
-
-			} else {
-
-				const delta = max - min;
-
-				saturation = lightness <= 0.5 ? delta / ( max + min ) : delta / ( 2 - max - min );
-
-				switch ( max ) {
-
-					case r: hue = ( g - b ) / delta + ( g < b ? 6 : 0 ); break;
-					case g: hue = ( b - r ) / delta + 2; break;
-					case b: hue = ( r - g ) / delta + 4; break;
-
-				}
-
-				hue /= 6;
-
-			}
-
-			target.h = hue;
-			target.s = saturation;
-			target.l = lightness;
-
-			return target;
-
-		}
-
-		getRGB( target, colorSpace = ColorManagement.workingColorSpace ) {
-
-			ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb$1 ), colorSpace );
-
-			target.r = _rgb$1.r;
-			target.g = _rgb$1.g;
-			target.b = _rgb$1.b;
-
-			return target;
-
-		}
-
-		getStyle( colorSpace = SRGBColorSpace ) {
-
-			ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb$1 ), colorSpace );
-
-			if ( colorSpace !== SRGBColorSpace ) {
-
-				// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
-				return `color(${ colorSpace } ${ _rgb$1.r } ${ _rgb$1.g } ${ _rgb$1.b })`;
-
-			}
-
-			return `rgb(${( _rgb$1.r * 255 ) | 0},${( _rgb$1.g * 255 ) | 0},${( _rgb$1.b * 255 ) | 0})`;
-
-		}
-
-		offsetHSL( h, s, l ) {
-
-			this.getHSL( _hslA );
-
-			_hslA.h += h; _hslA.s += s; _hslA.l += l;
-
-			this.setHSL( _hslA.h, _hslA.s, _hslA.l );
-
-			return this;
-
-		}
-
-		add( color ) {
-
-			this.r += color.r;
-			this.g += color.g;
-			this.b += color.b;
-
-			return this;
-
-		}
-
-		addColors( color1, color2 ) {
-
-			this.r = color1.r + color2.r;
-			this.g = color1.g + color2.g;
-			this.b = color1.b + color2.b;
-
-			return this;
-
-		}
-
-		addScalar( s ) {
-
-			this.r += s;
-			this.g += s;
-			this.b += s;
-
-			return this;
-
-		}
-
-		sub( color ) {
-
-			this.r = Math.max( 0, this.r - color.r );
-			this.g = Math.max( 0, this.g - color.g );
-			this.b = Math.max( 0, this.b - color.b );
-
-			return this;
-
-		}
-
-		multiply( color ) {
-
-			this.r *= color.r;
-			this.g *= color.g;
-			this.b *= color.b;
-
-			return this;
-
-		}
-
-		multiplyScalar( s ) {
-
-			this.r *= s;
-			this.g *= s;
-			this.b *= s;
-
-			return this;
-
-		}
-
-		lerp( color, alpha ) {
-
-			this.r += ( color.r - this.r ) * alpha;
-			this.g += ( color.g - this.g ) * alpha;
-			this.b += ( color.b - this.b ) * alpha;
-
-			return this;
-
-		}
-
-		lerpColors( color1, color2, alpha ) {
-
-			this.r = color1.r + ( color2.r - color1.r ) * alpha;
-			this.g = color1.g + ( color2.g - color1.g ) * alpha;
-			this.b = color1.b + ( color2.b - color1.b ) * alpha;
-
-			return this;
-
-		}
-
-		lerpHSL( color, alpha ) {
-
-			this.getHSL( _hslA );
-			color.getHSL( _hslB );
-
-			const h = lerp( _hslA.h, _hslB.h, alpha );
-			const s = lerp( _hslA.s, _hslB.s, alpha );
-			const l = lerp( _hslA.l, _hslB.l, alpha );
-
-			this.setHSL( h, s, l );
-
-			return this;
-
-		}
-
-		equals( c ) {
-
-			return ( c.r === this.r ) && ( c.g === this.g ) && ( c.b === this.b );
-
-		}
-
-		fromArray( array, offset = 0 ) {
-
-			this.r = array[ offset ];
-			this.g = array[ offset + 1 ];
-			this.b = array[ offset + 2 ];
-
-			return this;
-
-		}
-
-		toArray( array = [], offset = 0 ) {
-
-			array[ offset ] = this.r;
-			array[ offset + 1 ] = this.g;
-			array[ offset + 2 ] = this.b;
-
-			return array;
-
-		}
-
-		fromBufferAttribute( attribute, index ) {
-
-			this.r = attribute.getX( index );
-			this.g = attribute.getY( index );
-			this.b = attribute.getZ( index );
-
-			return this;
-
-		}
-
-		toJSON() {
-
-			return this.getHex();
-
-		}
-
-		*[ Symbol.iterator ]() {
-
-			yield this.r;
-			yield this.g;
-			yield this.b;
-
-		}
-
-	}
-
-	Color.NAMES = _colorKeywords;
 
 	let _canvas;
 
@@ -3614,1392 +4460,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		}
 
 	}
-
-	class Quaternion {
-
-		constructor( x = 0, y = 0, z = 0, w = 1 ) {
-
-			this.isQuaternion = true;
-
-			this._x = x;
-			this._y = y;
-			this._z = z;
-			this._w = w;
-
-		}
-
-		static slerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
-
-			// fuzz-free, array-based Quaternion SLERP operation
-
-			let x0 = src0[ srcOffset0 + 0 ],
-				y0 = src0[ srcOffset0 + 1 ],
-				z0 = src0[ srcOffset0 + 2 ],
-				w0 = src0[ srcOffset0 + 3 ];
-
-			const x1 = src1[ srcOffset1 + 0 ],
-				y1 = src1[ srcOffset1 + 1 ],
-				z1 = src1[ srcOffset1 + 2 ],
-				w1 = src1[ srcOffset1 + 3 ];
-
-			if ( t === 0 ) {
-
-				dst[ dstOffset + 0 ] = x0;
-				dst[ dstOffset + 1 ] = y0;
-				dst[ dstOffset + 2 ] = z0;
-				dst[ dstOffset + 3 ] = w0;
-				return;
-
-			}
-
-			if ( t === 1 ) {
-
-				dst[ dstOffset + 0 ] = x1;
-				dst[ dstOffset + 1 ] = y1;
-				dst[ dstOffset + 2 ] = z1;
-				dst[ dstOffset + 3 ] = w1;
-				return;
-
-			}
-
-			if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
-
-				let s = 1 - t;
-				const cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
-					dir = ( cos >= 0 ? 1 : - 1 ),
-					sqrSin = 1 - cos * cos;
-
-				// Skip the Slerp for tiny steps to avoid numeric problems:
-				if ( sqrSin > Number.EPSILON ) {
-
-					const sin = Math.sqrt( sqrSin ),
-						len = Math.atan2( sin, cos * dir );
-
-					s = Math.sin( s * len ) / sin;
-					t = Math.sin( t * len ) / sin;
-
-				}
-
-				const tDir = t * dir;
-
-				x0 = x0 * s + x1 * tDir;
-				y0 = y0 * s + y1 * tDir;
-				z0 = z0 * s + z1 * tDir;
-				w0 = w0 * s + w1 * tDir;
-
-				// Normalize in case we just did a lerp:
-				if ( s === 1 - t ) {
-
-					const f = 1 / Math.sqrt( x0 * x0 + y0 * y0 + z0 * z0 + w0 * w0 );
-
-					x0 *= f;
-					y0 *= f;
-					z0 *= f;
-					w0 *= f;
-
-				}
-
-			}
-
-			dst[ dstOffset ] = x0;
-			dst[ dstOffset + 1 ] = y0;
-			dst[ dstOffset + 2 ] = z0;
-			dst[ dstOffset + 3 ] = w0;
-
-		}
-
-		static multiplyQuaternionsFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1 ) {
-
-			const x0 = src0[ srcOffset0 ];
-			const y0 = src0[ srcOffset0 + 1 ];
-			const z0 = src0[ srcOffset0 + 2 ];
-			const w0 = src0[ srcOffset0 + 3 ];
-
-			const x1 = src1[ srcOffset1 ];
-			const y1 = src1[ srcOffset1 + 1 ];
-			const z1 = src1[ srcOffset1 + 2 ];
-			const w1 = src1[ srcOffset1 + 3 ];
-
-			dst[ dstOffset ] = x0 * w1 + w0 * x1 + y0 * z1 - z0 * y1;
-			dst[ dstOffset + 1 ] = y0 * w1 + w0 * y1 + z0 * x1 - x0 * z1;
-			dst[ dstOffset + 2 ] = z0 * w1 + w0 * z1 + x0 * y1 - y0 * x1;
-			dst[ dstOffset + 3 ] = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1;
-
-			return dst;
-
-		}
-
-		get x() {
-
-			return this._x;
-
-		}
-
-		set x( value ) {
-
-			this._x = value;
-			this._onChangeCallback();
-
-		}
-
-		get y() {
-
-			return this._y;
-
-		}
-
-		set y( value ) {
-
-			this._y = value;
-			this._onChangeCallback();
-
-		}
-
-		get z() {
-
-			return this._z;
-
-		}
-
-		set z( value ) {
-
-			this._z = value;
-			this._onChangeCallback();
-
-		}
-
-		get w() {
-
-			return this._w;
-
-		}
-
-		set w( value ) {
-
-			this._w = value;
-			this._onChangeCallback();
-
-		}
-
-		set( x, y, z, w ) {
-
-			this._x = x;
-			this._y = y;
-			this._z = z;
-			this._w = w;
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		clone() {
-
-			return new this.constructor( this._x, this._y, this._z, this._w );
-
-		}
-
-		copy( quaternion ) {
-
-			this._x = quaternion.x;
-			this._y = quaternion.y;
-			this._z = quaternion.z;
-			this._w = quaternion.w;
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		setFromEuler( euler, update ) {
-
-			const x = euler._x, y = euler._y, z = euler._z, order = euler._order;
-
-			// http://www.mathworks.com/matlabcentral/fileexchange/
-			// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
-			//	content/SpinCalc.m
-
-			const cos = Math.cos;
-			const sin = Math.sin;
-
-			const c1 = cos( x / 2 );
-			const c2 = cos( y / 2 );
-			const c3 = cos( z / 2 );
-
-			const s1 = sin( x / 2 );
-			const s2 = sin( y / 2 );
-			const s3 = sin( z / 2 );
-
-			switch ( order ) {
-
-				case 'XYZ':
-					this._x = s1 * c2 * c3 + c1 * s2 * s3;
-					this._y = c1 * s2 * c3 - s1 * c2 * s3;
-					this._z = c1 * c2 * s3 + s1 * s2 * c3;
-					this._w = c1 * c2 * c3 - s1 * s2 * s3;
-					break;
-
-				case 'YXZ':
-					this._x = s1 * c2 * c3 + c1 * s2 * s3;
-					this._y = c1 * s2 * c3 - s1 * c2 * s3;
-					this._z = c1 * c2 * s3 - s1 * s2 * c3;
-					this._w = c1 * c2 * c3 + s1 * s2 * s3;
-					break;
-
-				case 'ZXY':
-					this._x = s1 * c2 * c3 - c1 * s2 * s3;
-					this._y = c1 * s2 * c3 + s1 * c2 * s3;
-					this._z = c1 * c2 * s3 + s1 * s2 * c3;
-					this._w = c1 * c2 * c3 - s1 * s2 * s3;
-					break;
-
-				case 'ZYX':
-					this._x = s1 * c2 * c3 - c1 * s2 * s3;
-					this._y = c1 * s2 * c3 + s1 * c2 * s3;
-					this._z = c1 * c2 * s3 - s1 * s2 * c3;
-					this._w = c1 * c2 * c3 + s1 * s2 * s3;
-					break;
-
-				case 'YZX':
-					this._x = s1 * c2 * c3 + c1 * s2 * s3;
-					this._y = c1 * s2 * c3 + s1 * c2 * s3;
-					this._z = c1 * c2 * s3 - s1 * s2 * c3;
-					this._w = c1 * c2 * c3 - s1 * s2 * s3;
-					break;
-
-				case 'XZY':
-					this._x = s1 * c2 * c3 - c1 * s2 * s3;
-					this._y = c1 * s2 * c3 - s1 * c2 * s3;
-					this._z = c1 * c2 * s3 + s1 * s2 * c3;
-					this._w = c1 * c2 * c3 + s1 * s2 * s3;
-					break;
-
-				default:
-					console.warn( 'THREE.Quaternion: .setFromEuler() encountered an unknown order: ' + order );
-
-			}
-
-			if ( update !== false ) this._onChangeCallback();
-
-			return this;
-
-		}
-
-		setFromAxisAngle( axis, angle ) {
-
-			// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
-
-			// assumes axis is normalized
-
-			const halfAngle = angle / 2, s = Math.sin( halfAngle );
-
-			this._x = axis.x * s;
-			this._y = axis.y * s;
-			this._z = axis.z * s;
-			this._w = Math.cos( halfAngle );
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		setFromRotationMatrix( m ) {
-
-			// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-
-			// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-
-			const te = m.elements,
-
-				m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ],
-				m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
-				m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ],
-
-				trace = m11 + m22 + m33;
-
-			if ( trace > 0 ) {
-
-				const s = 0.5 / Math.sqrt( trace + 1.0 );
-
-				this._w = 0.25 / s;
-				this._x = ( m32 - m23 ) * s;
-				this._y = ( m13 - m31 ) * s;
-				this._z = ( m21 - m12 ) * s;
-
-			} else if ( m11 > m22 && m11 > m33 ) {
-
-				const s = 2.0 * Math.sqrt( 1.0 + m11 - m22 - m33 );
-
-				this._w = ( m32 - m23 ) / s;
-				this._x = 0.25 * s;
-				this._y = ( m12 + m21 ) / s;
-				this._z = ( m13 + m31 ) / s;
-
-			} else if ( m22 > m33 ) {
-
-				const s = 2.0 * Math.sqrt( 1.0 + m22 - m11 - m33 );
-
-				this._w = ( m13 - m31 ) / s;
-				this._x = ( m12 + m21 ) / s;
-				this._y = 0.25 * s;
-				this._z = ( m23 + m32 ) / s;
-
-			} else {
-
-				const s = 2.0 * Math.sqrt( 1.0 + m33 - m11 - m22 );
-
-				this._w = ( m21 - m12 ) / s;
-				this._x = ( m13 + m31 ) / s;
-				this._y = ( m23 + m32 ) / s;
-				this._z = 0.25 * s;
-
-			}
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		setFromUnitVectors( vFrom, vTo ) {
-
-			// assumes direction vectors vFrom and vTo are normalized
-
-			let r = vFrom.dot( vTo ) + 1;
-
-			if ( r < Number.EPSILON ) {
-
-				// vFrom and vTo point in opposite directions
-
-				r = 0;
-
-				if ( Math.abs( vFrom.x ) > Math.abs( vFrom.z ) ) {
-
-					this._x = - vFrom.y;
-					this._y = vFrom.x;
-					this._z = 0;
-					this._w = r;
-
-				} else {
-
-					this._x = 0;
-					this._y = - vFrom.z;
-					this._z = vFrom.y;
-					this._w = r;
-
-				}
-
-			} else {
-
-				// crossVectors( vFrom, vTo ); // inlined to avoid cyclic dependency on Vector3
-
-				this._x = vFrom.y * vTo.z - vFrom.z * vTo.y;
-				this._y = vFrom.z * vTo.x - vFrom.x * vTo.z;
-				this._z = vFrom.x * vTo.y - vFrom.y * vTo.x;
-				this._w = r;
-
-			}
-
-			return this.normalize();
-
-		}
-
-		angleTo( q ) {
-
-			return 2 * Math.acos( Math.abs( clamp( this.dot( q ), - 1, 1 ) ) );
-
-		}
-
-		rotateTowards( q, step ) {
-
-			const angle = this.angleTo( q );
-
-			if ( angle === 0 ) return this;
-
-			const t = Math.min( 1, step / angle );
-
-			this.slerp( q, t );
-
-			return this;
-
-		}
-
-		identity() {
-
-			return this.set( 0, 0, 0, 1 );
-
-		}
-
-		invert() {
-
-			// quaternion is assumed to have unit length
-
-			return this.conjugate();
-
-		}
-
-		conjugate() {
-
-			this._x *= - 1;
-			this._y *= - 1;
-			this._z *= - 1;
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		dot( v ) {
-
-			return this._x * v._x + this._y * v._y + this._z * v._z + this._w * v._w;
-
-		}
-
-		lengthSq() {
-
-			return this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w;
-
-		}
-
-		length() {
-
-			return Math.sqrt( this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w );
-
-		}
-
-		normalize() {
-
-			let l = this.length();
-
-			if ( l === 0 ) {
-
-				this._x = 0;
-				this._y = 0;
-				this._z = 0;
-				this._w = 1;
-
-			} else {
-
-				l = 1 / l;
-
-				this._x = this._x * l;
-				this._y = this._y * l;
-				this._z = this._z * l;
-				this._w = this._w * l;
-
-			}
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		multiply( q ) {
-
-			return this.multiplyQuaternions( this, q );
-
-		}
-
-		premultiply( q ) {
-
-			return this.multiplyQuaternions( q, this );
-
-		}
-
-		multiplyQuaternions( a, b ) {
-
-			// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
-
-			const qax = a._x, qay = a._y, qaz = a._z, qaw = a._w;
-			const qbx = b._x, qby = b._y, qbz = b._z, qbw = b._w;
-
-			this._x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
-			this._y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
-			this._z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
-			this._w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		slerp( qb, t ) {
-
-			if ( t === 0 ) return this;
-			if ( t === 1 ) return this.copy( qb );
-
-			const x = this._x, y = this._y, z = this._z, w = this._w;
-
-			// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
-
-			let cosHalfTheta = w * qb._w + x * qb._x + y * qb._y + z * qb._z;
-
-			if ( cosHalfTheta < 0 ) {
-
-				this._w = - qb._w;
-				this._x = - qb._x;
-				this._y = - qb._y;
-				this._z = - qb._z;
-
-				cosHalfTheta = - cosHalfTheta;
-
-			} else {
-
-				this.copy( qb );
-
-			}
-
-			if ( cosHalfTheta >= 1.0 ) {
-
-				this._w = w;
-				this._x = x;
-				this._y = y;
-				this._z = z;
-
-				return this;
-
-			}
-
-			const sqrSinHalfTheta = 1.0 - cosHalfTheta * cosHalfTheta;
-
-			if ( sqrSinHalfTheta <= Number.EPSILON ) {
-
-				const s = 1 - t;
-				this._w = s * w + t * this._w;
-				this._x = s * x + t * this._x;
-				this._y = s * y + t * this._y;
-				this._z = s * z + t * this._z;
-
-				this.normalize();
-				this._onChangeCallback();
-
-				return this;
-
-			}
-
-			const sinHalfTheta = Math.sqrt( sqrSinHalfTheta );
-			const halfTheta = Math.atan2( sinHalfTheta, cosHalfTheta );
-			const ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
-				ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
-
-			this._w = ( w * ratioA + this._w * ratioB );
-			this._x = ( x * ratioA + this._x * ratioB );
-			this._y = ( y * ratioA + this._y * ratioB );
-			this._z = ( z * ratioA + this._z * ratioB );
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		slerpQuaternions( qa, qb, t ) {
-
-			return this.copy( qa ).slerp( qb, t );
-
-		}
-
-		random() {
-
-			// Derived from http://planning.cs.uiuc.edu/node198.html
-			// Note, this source uses w, x, y, z ordering,
-			// so we swap the order below.
-
-			const u1 = Math.random();
-			const sqrt1u1 = Math.sqrt( 1 - u1 );
-			const sqrtu1 = Math.sqrt( u1 );
-
-			const u2 = 2 * Math.PI * Math.random();
-
-			const u3 = 2 * Math.PI * Math.random();
-
-			return this.set(
-				sqrt1u1 * Math.cos( u2 ),
-				sqrtu1 * Math.sin( u3 ),
-				sqrtu1 * Math.cos( u3 ),
-				sqrt1u1 * Math.sin( u2 ),
-			);
-
-		}
-
-		equals( quaternion ) {
-
-			return ( quaternion._x === this._x ) && ( quaternion._y === this._y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
-
-		}
-
-		fromArray( array, offset = 0 ) {
-
-			this._x = array[ offset ];
-			this._y = array[ offset + 1 ];
-			this._z = array[ offset + 2 ];
-			this._w = array[ offset + 3 ];
-
-			this._onChangeCallback();
-
-			return this;
-
-		}
-
-		toArray( array = [], offset = 0 ) {
-
-			array[ offset ] = this._x;
-			array[ offset + 1 ] = this._y;
-			array[ offset + 2 ] = this._z;
-			array[ offset + 3 ] = this._w;
-
-			return array;
-
-		}
-
-		fromBufferAttribute( attribute, index ) {
-
-			this._x = attribute.getX( index );
-			this._y = attribute.getY( index );
-			this._z = attribute.getZ( index );
-			this._w = attribute.getW( index );
-
-			return this;
-
-		}
-
-		_onChange( callback ) {
-
-			this._onChangeCallback = callback;
-
-			return this;
-
-		}
-
-		_onChangeCallback() {}
-
-		*[ Symbol.iterator ]() {
-
-			yield this._x;
-			yield this._y;
-			yield this._z;
-			yield this._w;
-
-		}
-
-	}
-
-	class Vector3 {
-
-		constructor( x = 0, y = 0, z = 0 ) {
-
-			Vector3.prototype.isVector3 = true;
-
-			this.x = x;
-			this.y = y;
-			this.z = z;
-
-		}
-
-		set( x, y, z ) {
-
-			if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
-
-			this.x = x;
-			this.y = y;
-			this.z = z;
-
-			return this;
-
-		}
-
-		setScalar( scalar ) {
-
-			this.x = scalar;
-			this.y = scalar;
-			this.z = scalar;
-
-			return this;
-
-		}
-
-		setX( x ) {
-
-			this.x = x;
-
-			return this;
-
-		}
-
-		setY( y ) {
-
-			this.y = y;
-
-			return this;
-
-		}
-
-		setZ( z ) {
-
-			this.z = z;
-
-			return this;
-
-		}
-
-		setComponent( index, value ) {
-
-			switch ( index ) {
-
-				case 0: this.x = value; break;
-				case 1: this.y = value; break;
-				case 2: this.z = value; break;
-				default: throw new Error( 'index is out of range: ' + index );
-
-			}
-
-			return this;
-
-		}
-
-		getComponent( index ) {
-
-			switch ( index ) {
-
-				case 0: return this.x;
-				case 1: return this.y;
-				case 2: return this.z;
-				default: throw new Error( 'index is out of range: ' + index );
-
-			}
-
-		}
-
-		clone() {
-
-			return new this.constructor( this.x, this.y, this.z );
-
-		}
-
-		copy( v ) {
-
-			this.x = v.x;
-			this.y = v.y;
-			this.z = v.z;
-
-			return this;
-
-		}
-
-		add( v ) {
-
-			this.x += v.x;
-			this.y += v.y;
-			this.z += v.z;
-
-			return this;
-
-		}
-
-		addScalar( s ) {
-
-			this.x += s;
-			this.y += s;
-			this.z += s;
-
-			return this;
-
-		}
-
-		addVectors( a, b ) {
-
-			this.x = a.x + b.x;
-			this.y = a.y + b.y;
-			this.z = a.z + b.z;
-
-			return this;
-
-		}
-
-		addScaledVector( v, s ) {
-
-			this.x += v.x * s;
-			this.y += v.y * s;
-			this.z += v.z * s;
-
-			return this;
-
-		}
-
-		sub( v ) {
-
-			this.x -= v.x;
-			this.y -= v.y;
-			this.z -= v.z;
-
-			return this;
-
-		}
-
-		subScalar( s ) {
-
-			this.x -= s;
-			this.y -= s;
-			this.z -= s;
-
-			return this;
-
-		}
-
-		subVectors( a, b ) {
-
-			this.x = a.x - b.x;
-			this.y = a.y - b.y;
-			this.z = a.z - b.z;
-
-			return this;
-
-		}
-
-		multiply( v ) {
-
-			this.x *= v.x;
-			this.y *= v.y;
-			this.z *= v.z;
-
-			return this;
-
-		}
-
-		multiplyScalar( scalar ) {
-
-			this.x *= scalar;
-			this.y *= scalar;
-			this.z *= scalar;
-
-			return this;
-
-		}
-
-		multiplyVectors( a, b ) {
-
-			this.x = a.x * b.x;
-			this.y = a.y * b.y;
-			this.z = a.z * b.z;
-
-			return this;
-
-		}
-
-		applyEuler( euler ) {
-
-			return this.applyQuaternion( _quaternion$4.setFromEuler( euler ) );
-
-		}
-
-		applyAxisAngle( axis, angle ) {
-
-			return this.applyQuaternion( _quaternion$4.setFromAxisAngle( axis, angle ) );
-
-		}
-
-		applyMatrix3( m ) {
-
-			const x = this.x, y = this.y, z = this.z;
-			const e = m.elements;
-
-			this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
-			this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
-			this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
-
-			return this;
-
-		}
-
-		applyNormalMatrix( m ) {
-
-			return this.applyMatrix3( m ).normalize();
-
-		}
-
-		applyMatrix4( m ) {
-
-			const x = this.x, y = this.y, z = this.z;
-			const e = m.elements;
-
-			const w = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
-
-			this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] ) * w;
-			this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] ) * w;
-			this.z = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * w;
-
-			return this;
-
-		}
-
-		applyQuaternion( q ) {
-
-			const x = this.x, y = this.y, z = this.z;
-			const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
-
-			// calculate quat * vector
-
-			const ix = qw * x + qy * z - qz * y;
-			const iy = qw * y + qz * x - qx * z;
-			const iz = qw * z + qx * y - qy * x;
-			const iw = - qx * x - qy * y - qz * z;
-
-			// calculate result * inverse quat
-
-			this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
-			this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
-			this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
-
-			return this;
-
-		}
-
-		project( camera ) {
-
-			return this.applyMatrix4( camera.matrixWorldInverse ).applyMatrix4( camera.projectionMatrix );
-
-		}
-
-		unproject( camera ) {
-
-			return this.applyMatrix4( camera.projectionMatrixInverse ).applyMatrix4( camera.matrixWorld );
-
-		}
-
-		transformDirection( m ) {
-
-			// input: THREE.Matrix4 affine matrix
-			// vector interpreted as a direction
-
-			const x = this.x, y = this.y, z = this.z;
-			const e = m.elements;
-
-			this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z;
-			this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z;
-			this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z;
-
-			return this.normalize();
-
-		}
-
-		divide( v ) {
-
-			this.x /= v.x;
-			this.y /= v.y;
-			this.z /= v.z;
-
-			return this;
-
-		}
-
-		divideScalar( scalar ) {
-
-			return this.multiplyScalar( 1 / scalar );
-
-		}
-
-		min( v ) {
-
-			this.x = Math.min( this.x, v.x );
-			this.y = Math.min( this.y, v.y );
-			this.z = Math.min( this.z, v.z );
-
-			return this;
-
-		}
-
-		max( v ) {
-
-			this.x = Math.max( this.x, v.x );
-			this.y = Math.max( this.y, v.y );
-			this.z = Math.max( this.z, v.z );
-
-			return this;
-
-		}
-
-		clamp( min, max ) {
-
-			// assumes min < max, componentwise
-
-			this.x = Math.max( min.x, Math.min( max.x, this.x ) );
-			this.y = Math.max( min.y, Math.min( max.y, this.y ) );
-			this.z = Math.max( min.z, Math.min( max.z, this.z ) );
-
-			return this;
-
-		}
-
-		clampScalar( minVal, maxVal ) {
-
-			this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
-			this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
-			this.z = Math.max( minVal, Math.min( maxVal, this.z ) );
-
-			return this;
-
-		}
-
-		clampLength( min, max ) {
-
-			const length = this.length();
-
-			return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
-
-		}
-
-		floor() {
-
-			this.x = Math.floor( this.x );
-			this.y = Math.floor( this.y );
-			this.z = Math.floor( this.z );
-
-			return this;
-
-		}
-
-		ceil() {
-
-			this.x = Math.ceil( this.x );
-			this.y = Math.ceil( this.y );
-			this.z = Math.ceil( this.z );
-
-			return this;
-
-		}
-
-		round() {
-
-			this.x = Math.round( this.x );
-			this.y = Math.round( this.y );
-			this.z = Math.round( this.z );
-
-			return this;
-
-		}
-
-		roundToZero() {
-
-			this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
-			this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
-			this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
-
-			return this;
-
-		}
-
-		negate() {
-
-			this.x = - this.x;
-			this.y = - this.y;
-			this.z = - this.z;
-
-			return this;
-
-		}
-
-		dot( v ) {
-
-			return this.x * v.x + this.y * v.y + this.z * v.z;
-
-		}
-
-		// TODO lengthSquared?
-
-		lengthSq() {
-
-			return this.x * this.x + this.y * this.y + this.z * this.z;
-
-		}
-
-		length() {
-
-			return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
-
-		}
-
-		manhattanLength() {
-
-			return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
-
-		}
-
-		normalize() {
-
-			return this.divideScalar( this.length() || 1 );
-
-		}
-
-		setLength( length ) {
-
-			return this.normalize().multiplyScalar( length );
-
-		}
-
-		lerp( v, alpha ) {
-
-			this.x += ( v.x - this.x ) * alpha;
-			this.y += ( v.y - this.y ) * alpha;
-			this.z += ( v.z - this.z ) * alpha;
-
-			return this;
-
-		}
-
-		lerpVectors( v1, v2, alpha ) {
-
-			this.x = v1.x + ( v2.x - v1.x ) * alpha;
-			this.y = v1.y + ( v2.y - v1.y ) * alpha;
-			this.z = v1.z + ( v2.z - v1.z ) * alpha;
-
-			return this;
-
-		}
-
-		cross( v ) {
-
-			return this.crossVectors( this, v );
-
-		}
-
-		crossVectors( a, b ) {
-
-			const ax = a.x, ay = a.y, az = a.z;
-			const bx = b.x, by = b.y, bz = b.z;
-
-			this.x = ay * bz - az * by;
-			this.y = az * bx - ax * bz;
-			this.z = ax * by - ay * bx;
-
-			return this;
-
-		}
-
-		projectOnVector( v ) {
-
-			const denominator = v.lengthSq();
-
-			if ( denominator === 0 ) return this.set( 0, 0, 0 );
-
-			const scalar = v.dot( this ) / denominator;
-
-			return this.copy( v ).multiplyScalar( scalar );
-
-		}
-
-		projectOnPlane( planeNormal ) {
-
-			_vector$c.copy( this ).projectOnVector( planeNormal );
-
-			return this.sub( _vector$c );
-
-		}
-
-		reflect( normal ) {
-
-			// reflect incident vector off plane orthogonal to normal
-			// normal is assumed to have unit length
-
-			return this.sub( _vector$c.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
-
-		}
-
-		angleTo( v ) {
-
-			const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
-
-			if ( denominator === 0 ) return Math.PI / 2;
-
-			const theta = this.dot( v ) / denominator;
-
-			// clamp, to handle numerical problems
-
-			return Math.acos( clamp( theta, - 1, 1 ) );
-
-		}
-
-		distanceTo( v ) {
-
-			return Math.sqrt( this.distanceToSquared( v ) );
-
-		}
-
-		distanceToSquared( v ) {
-
-			const dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
-
-			return dx * dx + dy * dy + dz * dz;
-
-		}
-
-		manhattanDistanceTo( v ) {
-
-			return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y ) + Math.abs( this.z - v.z );
-
-		}
-
-		setFromSpherical( s ) {
-
-			return this.setFromSphericalCoords( s.radius, s.phi, s.theta );
-
-		}
-
-		setFromSphericalCoords( radius, phi, theta ) {
-
-			const sinPhiRadius = Math.sin( phi ) * radius;
-
-			this.x = sinPhiRadius * Math.sin( theta );
-			this.y = Math.cos( phi ) * radius;
-			this.z = sinPhiRadius * Math.cos( theta );
-
-			return this;
-
-		}
-
-		setFromCylindrical( c ) {
-
-			return this.setFromCylindricalCoords( c.radius, c.theta, c.y );
-
-		}
-
-		setFromCylindricalCoords( radius, theta, y ) {
-
-			this.x = radius * Math.sin( theta );
-			this.y = y;
-			this.z = radius * Math.cos( theta );
-
-			return this;
-
-		}
-
-		setFromMatrixPosition( m ) {
-
-			const e = m.elements;
-
-			this.x = e[ 12 ];
-			this.y = e[ 13 ];
-			this.z = e[ 14 ];
-
-			return this;
-
-		}
-
-		setFromMatrixScale( m ) {
-
-			const sx = this.setFromMatrixColumn( m, 0 ).length();
-			const sy = this.setFromMatrixColumn( m, 1 ).length();
-			const sz = this.setFromMatrixColumn( m, 2 ).length();
-
-			this.x = sx;
-			this.y = sy;
-			this.z = sz;
-
-			return this;
-
-		}
-
-		setFromMatrixColumn( m, index ) {
-
-			return this.fromArray( m.elements, index * 4 );
-
-		}
-
-		setFromMatrix3Column( m, index ) {
-
-			return this.fromArray( m.elements, index * 3 );
-
-		}
-
-		setFromEuler( e ) {
-
-			this.x = e._x;
-			this.y = e._y;
-			this.z = e._z;
-
-			return this;
-
-		}
-
-		equals( v ) {
-
-			return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
-
-		}
-
-		fromArray( array, offset = 0 ) {
-
-			this.x = array[ offset ];
-			this.y = array[ offset + 1 ];
-			this.z = array[ offset + 2 ];
-
-			return this;
-
-		}
-
-		toArray( array = [], offset = 0 ) {
-
-			array[ offset ] = this.x;
-			array[ offset + 1 ] = this.y;
-			array[ offset + 2 ] = this.z;
-
-			return array;
-
-		}
-
-		fromBufferAttribute( attribute, index ) {
-
-			this.x = attribute.getX( index );
-			this.y = attribute.getY( index );
-			this.z = attribute.getZ( index );
-
-			return this;
-
-		}
-
-		random() {
-
-			this.x = Math.random();
-			this.y = Math.random();
-			this.z = Math.random();
-
-			return this;
-
-		}
-
-		randomDirection() {
-
-			// Derived from https://mathworld.wolfram.com/SpherePointPicking.html
-
-			const u = ( Math.random() - 0.5 ) * 2;
-			const t = Math.random() * Math.PI * 2;
-			const f = Math.sqrt( 1 - u ** 2 );
-
-			this.x = f * Math.cos( t );
-			this.y = f * Math.sin( t );
-			this.z = u;
-
-			return this;
-
-		}
-
-		*[ Symbol.iterator ]() {
-
-			yield this.x;
-			yield this.y;
-			yield this.z;
-
-		}
-
-	}
-
-	const _vector$c = /*@__PURE__*/ new Vector3();
-	const _quaternion$4 = /*@__PURE__*/ new Quaternion();
 
 	class Box3 {
 
@@ -9239,6 +8699,605 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
+		'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
+		'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
+		'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
+		'darkgoldenrod': 0xB8860B, 'darkgray': 0xA9A9A9, 'darkgreen': 0x006400, 'darkgrey': 0xA9A9A9, 'darkkhaki': 0xBDB76B, 'darkmagenta': 0x8B008B,
+		'darkolivegreen': 0x556B2F, 'darkorange': 0xFF8C00, 'darkorchid': 0x9932CC, 'darkred': 0x8B0000, 'darksalmon': 0xE9967A, 'darkseagreen': 0x8FBC8F,
+		'darkslateblue': 0x483D8B, 'darkslategray': 0x2F4F4F, 'darkslategrey': 0x2F4F4F, 'darkturquoise': 0x00CED1, 'darkviolet': 0x9400D3,
+		'deeppink': 0xFF1493, 'deepskyblue': 0x00BFFF, 'dimgray': 0x696969, 'dimgrey': 0x696969, 'dodgerblue': 0x1E90FF, 'firebrick': 0xB22222,
+		'floralwhite': 0xFFFAF0, 'forestgreen': 0x228B22, 'fuchsia': 0xFF00FF, 'gainsboro': 0xDCDCDC, 'ghostwhite': 0xF8F8FF, 'gold': 0xFFD700,
+		'goldenrod': 0xDAA520, 'gray': 0x808080, 'green': 0x008000, 'greenyellow': 0xADFF2F, 'grey': 0x808080, 'honeydew': 0xF0FFF0, 'hotpink': 0xFF69B4,
+		'indianred': 0xCD5C5C, 'indigo': 0x4B0082, 'ivory': 0xFFFFF0, 'khaki': 0xF0E68C, 'lavender': 0xE6E6FA, 'lavenderblush': 0xFFF0F5, 'lawngreen': 0x7CFC00,
+		'lemonchiffon': 0xFFFACD, 'lightblue': 0xADD8E6, 'lightcoral': 0xF08080, 'lightcyan': 0xE0FFFF, 'lightgoldenrodyellow': 0xFAFAD2, 'lightgray': 0xD3D3D3,
+		'lightgreen': 0x90EE90, 'lightgrey': 0xD3D3D3, 'lightpink': 0xFFB6C1, 'lightsalmon': 0xFFA07A, 'lightseagreen': 0x20B2AA, 'lightskyblue': 0x87CEFA,
+		'lightslategray': 0x778899, 'lightslategrey': 0x778899, 'lightsteelblue': 0xB0C4DE, 'lightyellow': 0xFFFFE0, 'lime': 0x00FF00, 'limegreen': 0x32CD32,
+		'linen': 0xFAF0E6, 'magenta': 0xFF00FF, 'maroon': 0x800000, 'mediumaquamarine': 0x66CDAA, 'mediumblue': 0x0000CD, 'mediumorchid': 0xBA55D3,
+		'mediumpurple': 0x9370DB, 'mediumseagreen': 0x3CB371, 'mediumslateblue': 0x7B68EE, 'mediumspringgreen': 0x00FA9A, 'mediumturquoise': 0x48D1CC,
+		'mediumvioletred': 0xC71585, 'midnightblue': 0x191970, 'mintcream': 0xF5FFFA, 'mistyrose': 0xFFE4E1, 'moccasin': 0xFFE4B5, 'navajowhite': 0xFFDEAD,
+		'navy': 0x000080, 'oldlace': 0xFDF5E6, 'olive': 0x808000, 'olivedrab': 0x6B8E23, 'orange': 0xFFA500, 'orangered': 0xFF4500, 'orchid': 0xDA70D6,
+		'palegoldenrod': 0xEEE8AA, 'palegreen': 0x98FB98, 'paleturquoise': 0xAFEEEE, 'palevioletred': 0xDB7093, 'papayawhip': 0xFFEFD5, 'peachpuff': 0xFFDAB9,
+		'peru': 0xCD853F, 'pink': 0xFFC0CB, 'plum': 0xDDA0DD, 'powderblue': 0xB0E0E6, 'purple': 0x800080, 'rebeccapurple': 0x663399, 'red': 0xFF0000, 'rosybrown': 0xBC8F8F,
+		'royalblue': 0x4169E1, 'saddlebrown': 0x8B4513, 'salmon': 0xFA8072, 'sandybrown': 0xF4A460, 'seagreen': 0x2E8B57, 'seashell': 0xFFF5EE,
+		'sienna': 0xA0522D, 'silver': 0xC0C0C0, 'skyblue': 0x87CEEB, 'slateblue': 0x6A5ACD, 'slategray': 0x708090, 'slategrey': 0x708090, 'snow': 0xFFFAFA,
+		'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
+		'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
+
+	const _hslA = { h: 0, s: 0, l: 0 };
+	const _hslB = { h: 0, s: 0, l: 0 };
+
+	function hue2rgb( p, q, t ) {
+
+		if ( t < 0 ) t += 1;
+		if ( t > 1 ) t -= 1;
+		if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+		if ( t < 1 / 2 ) return q;
+		if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+		return p;
+
+	}
+
+	class Color {
+
+		constructor( r, g, b ) {
+
+			this.isColor = true;
+
+			this.r = 1;
+			this.g = 1;
+			this.b = 1;
+
+			if ( g === undefined && b === undefined ) {
+
+				// r is THREE.Color, hex or string
+				return this.set( r );
+
+			}
+
+			return this.setRGB( r, g, b );
+
+		}
+
+		set( value ) {
+
+			if ( value && value.isColor ) {
+
+				this.copy( value );
+
+			} else if ( typeof value === 'number' ) {
+
+				this.setHex( value );
+
+			} else if ( typeof value === 'string' ) {
+
+				this.setStyle( value );
+
+			}
+
+			return this;
+
+		}
+
+		setScalar( scalar ) {
+
+			this.r = scalar;
+			this.g = scalar;
+			this.b = scalar;
+
+			return this;
+
+		}
+
+		setHex( hex, colorSpace = SRGBColorSpace ) {
+
+			hex = Math.floor( hex );
+
+			this.r = ( hex >> 16 & 255 ) / 255;
+			this.g = ( hex >> 8 & 255 ) / 255;
+			this.b = ( hex & 255 ) / 255;
+
+			ColorManagement.toWorkingColorSpace( this, colorSpace );
+
+			return this;
+
+		}
+
+		setRGB( r, g, b, colorSpace = ColorManagement.workingColorSpace ) {
+
+			this.r = r;
+			this.g = g;
+			this.b = b;
+
+			ColorManagement.toWorkingColorSpace( this, colorSpace );
+
+			return this;
+
+		}
+
+		setHSL( h, s, l, colorSpace = ColorManagement.workingColorSpace ) {
+
+			// h,s,l ranges are in 0.0 - 1.0
+			h = euclideanModulo( h, 1 );
+			s = clamp( s, 0, 1 );
+			l = clamp( l, 0, 1 );
+
+			if ( s === 0 ) {
+
+				this.r = this.g = this.b = l;
+
+			} else {
+
+				const p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
+				const q = ( 2 * l ) - p;
+
+				this.r = hue2rgb( q, p, h + 1 / 3 );
+				this.g = hue2rgb( q, p, h );
+				this.b = hue2rgb( q, p, h - 1 / 3 );
+
+			}
+
+			ColorManagement.toWorkingColorSpace( this, colorSpace );
+
+			return this;
+
+		}
+
+		setStyle( style, colorSpace = SRGBColorSpace ) {
+
+			function handleAlpha( string ) {
+
+				if ( string === undefined ) return;
+
+				if ( parseFloat( string ) < 1 ) {
+
+					console.warn( 'THREE.Color: Alpha component of ' + style + ' will be ignored.' );
+
+				}
+
+			}
+
+
+			let m;
+
+			if ( m = /^(\w+)\(([^\)]*)\)/.exec( style ) ) {
+
+				// rgb / hsl
+
+				let color;
+				const name = m[ 1 ];
+				const components = m[ 2 ];
+
+				switch ( name ) {
+
+					case 'rgb':
+					case 'rgba':
+
+						if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+
+							// rgb(255,0,0) rgba(255,0,0,0.5)
+							this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
+							this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
+							this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
+
+							ColorManagement.toWorkingColorSpace( this, colorSpace );
+
+							handleAlpha( color[ 4 ] );
+
+							return this;
+
+						}
+
+						if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+
+							// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
+							this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
+							this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
+							this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+
+							ColorManagement.toWorkingColorSpace( this, colorSpace );
+
+							handleAlpha( color[ 4 ] );
+
+							return this;
+
+						}
+
+						break;
+
+					case 'hsl':
+					case 'hsla':
+
+						if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
+
+							// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
+							const h = parseFloat( color[ 1 ] ) / 360;
+							const s = parseFloat( color[ 2 ] ) / 100;
+							const l = parseFloat( color[ 3 ] ) / 100;
+
+							handleAlpha( color[ 4 ] );
+
+							return this.setHSL( h, s, l, colorSpace );
+
+						}
+
+						break;
+
+					default:
+
+						console.warn( 'THREE.Color: Unknown color model ' + style );
+
+				}
+
+			} else if ( m = /^\#([A-Fa-f\d]+)$/.exec( style ) ) {
+
+				// hex color
+
+				const hex = m[ 1 ];
+				const size = hex.length;
+
+				if ( size === 3 ) {
+
+					// #ff0
+					this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255;
+					this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
+					this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
+
+					ColorManagement.toWorkingColorSpace( this, colorSpace );
+
+					return this;
+
+				} else if ( size === 6 ) {
+
+					// #ff0000
+					this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255;
+					this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
+					this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
+
+					ColorManagement.toWorkingColorSpace( this, colorSpace );
+
+					return this;
+
+				} else {
+
+					console.warn( 'THREE.Color: Invalid hex color ' + style );
+
+				}
+
+			} else if ( style && style.length > 0 ) {
+
+				return this.setColorName( style, colorSpace );
+
+			}
+
+			return this;
+
+		}
+
+		setColorName( style, colorSpace = SRGBColorSpace ) {
+
+			// color keywords
+			const hex = _colorKeywords[ style.toLowerCase() ];
+
+			if ( hex !== undefined ) {
+
+				// red
+				this.setHex( hex, colorSpace );
+
+			} else {
+
+				// unknown color
+				console.warn( 'THREE.Color: Unknown color ' + style );
+
+			}
+
+			return this;
+
+		}
+
+		clone() {
+
+			return new this.constructor( this.r, this.g, this.b );
+
+		}
+
+		copy( color ) {
+
+			this.r = color.r;
+			this.g = color.g;
+			this.b = color.b;
+
+			return this;
+
+		}
+
+		copySRGBToLinear( color ) {
+
+			this.r = SRGBToLinear( color.r );
+			this.g = SRGBToLinear( color.g );
+			this.b = SRGBToLinear( color.b );
+
+			return this;
+
+		}
+
+		copyLinearToSRGB( color ) {
+
+			this.r = LinearToSRGB( color.r );
+			this.g = LinearToSRGB( color.g );
+			this.b = LinearToSRGB( color.b );
+
+			return this;
+
+		}
+
+		convertSRGBToLinear() {
+
+			this.copySRGBToLinear( this );
+
+			return this;
+
+		}
+
+		convertLinearToSRGB() {
+
+			this.copyLinearToSRGB( this );
+
+			return this;
+
+		}
+
+		getHex( colorSpace = SRGBColorSpace ) {
+
+			ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+
+			return clamp( _color.r * 255, 0, 255 ) << 16 ^ clamp( _color.g * 255, 0, 255 ) << 8 ^ clamp( _color.b * 255, 0, 255 ) << 0;
+
+		}
+
+		getHexString( colorSpace = SRGBColorSpace ) {
+
+			return ( '000000' + this.getHex( colorSpace ).toString( 16 ) ).slice( - 6 );
+
+		}
+
+		getHSL( target, colorSpace = ColorManagement.workingColorSpace ) {
+
+			// h,s,l ranges are in 0.0 - 1.0
+
+			ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+
+			const r = _color.r, g = _color.g, b = _color.b;
+
+			const max = Math.max( r, g, b );
+			const min = Math.min( r, g, b );
+
+			let hue, saturation;
+			const lightness = ( min + max ) / 2.0;
+
+			if ( min === max ) {
+
+				hue = 0;
+				saturation = 0;
+
+			} else {
+
+				const delta = max - min;
+
+				saturation = lightness <= 0.5 ? delta / ( max + min ) : delta / ( 2 - max - min );
+
+				switch ( max ) {
+
+					case r: hue = ( g - b ) / delta + ( g < b ? 6 : 0 ); break;
+					case g: hue = ( b - r ) / delta + 2; break;
+					case b: hue = ( r - g ) / delta + 4; break;
+
+				}
+
+				hue /= 6;
+
+			}
+
+			target.h = hue;
+			target.s = saturation;
+			target.l = lightness;
+
+			return target;
+
+		}
+
+		getRGB( target, colorSpace = ColorManagement.workingColorSpace ) {
+
+			ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+
+			target.r = _color.r;
+			target.g = _color.g;
+			target.b = _color.b;
+
+			return target;
+
+		}
+
+		getStyle( colorSpace = SRGBColorSpace ) {
+
+			ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+
+			const r = _color.r, g = _color.g, b = _color.b;
+
+			if ( colorSpace !== SRGBColorSpace ) {
+
+				// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
+				return `color(${ colorSpace } ${ r.toFixed( 3 ) } ${ g.toFixed( 3 ) } ${ b.toFixed( 3 ) })`;
+
+			}
+
+			return `rgb(${( r * 255 ) | 0},${( g * 255 ) | 0},${( b * 255 ) | 0})`;
+
+		}
+
+		offsetHSL( h, s, l ) {
+
+			this.getHSL( _hslA );
+
+			_hslA.h += h; _hslA.s += s; _hslA.l += l;
+
+			this.setHSL( _hslA.h, _hslA.s, _hslA.l );
+
+			return this;
+
+		}
+
+		add( color ) {
+
+			this.r += color.r;
+			this.g += color.g;
+			this.b += color.b;
+
+			return this;
+
+		}
+
+		addColors( color1, color2 ) {
+
+			this.r = color1.r + color2.r;
+			this.g = color1.g + color2.g;
+			this.b = color1.b + color2.b;
+
+			return this;
+
+		}
+
+		addScalar( s ) {
+
+			this.r += s;
+			this.g += s;
+			this.b += s;
+
+			return this;
+
+		}
+
+		sub( color ) {
+
+			this.r = Math.max( 0, this.r - color.r );
+			this.g = Math.max( 0, this.g - color.g );
+			this.b = Math.max( 0, this.b - color.b );
+
+			return this;
+
+		}
+
+		multiply( color ) {
+
+			this.r *= color.r;
+			this.g *= color.g;
+			this.b *= color.b;
+
+			return this;
+
+		}
+
+		multiplyScalar( s ) {
+
+			this.r *= s;
+			this.g *= s;
+			this.b *= s;
+
+			return this;
+
+		}
+
+		lerp( color, alpha ) {
+
+			this.r += ( color.r - this.r ) * alpha;
+			this.g += ( color.g - this.g ) * alpha;
+			this.b += ( color.b - this.b ) * alpha;
+
+			return this;
+
+		}
+
+		lerpColors( color1, color2, alpha ) {
+
+			this.r = color1.r + ( color2.r - color1.r ) * alpha;
+			this.g = color1.g + ( color2.g - color1.g ) * alpha;
+			this.b = color1.b + ( color2.b - color1.b ) * alpha;
+
+			return this;
+
+		}
+
+		lerpHSL( color, alpha ) {
+
+			this.getHSL( _hslA );
+			color.getHSL( _hslB );
+
+			const h = lerp( _hslA.h, _hslB.h, alpha );
+			const s = lerp( _hslA.s, _hslB.s, alpha );
+			const l = lerp( _hslA.l, _hslB.l, alpha );
+
+			this.setHSL( h, s, l );
+
+			return this;
+
+		}
+
+		equals( c ) {
+
+			return ( c.r === this.r ) && ( c.g === this.g ) && ( c.b === this.b );
+
+		}
+
+		fromArray( array, offset = 0 ) {
+
+			this.r = array[ offset ];
+			this.g = array[ offset + 1 ];
+			this.b = array[ offset + 2 ];
+
+			return this;
+
+		}
+
+		toArray( array = [], offset = 0 ) {
+
+			array[ offset ] = this.r;
+			array[ offset + 1 ] = this.g;
+			array[ offset + 2 ] = this.b;
+
+			return array;
+
+		}
+
+		fromBufferAttribute( attribute, index ) {
+
+			this.r = attribute.getX( index );
+			this.g = attribute.getY( index );
+			this.b = attribute.getZ( index );
+
+			return this;
+
+		}
+
+		toJSON() {
+
+			return this.getHex();
+
+		}
+
+		*[ Symbol.iterator ]() {
+
+			yield this.r;
+			yield this.g;
+			yield this.b;
+
+		}
+
+	}
+
+	const _color = new Color();
+
+	Color.NAMES = _colorKeywords;
+
 	class MeshBasicMaterial extends Material {
 
 		constructor( parameters ) {
@@ -10870,6 +10929,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 	const _ray$2 = /*@__PURE__*/ new Ray();
 	const _sphere$3 = /*@__PURE__*/ new Sphere();
+	const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
 	const _vA$1 = /*@__PURE__*/ new Vector3();
 	const _vB$1 = /*@__PURE__*/ new Vector3();
@@ -11021,7 +11081,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			_sphere$3.copy( geometry.boundingSphere );
 			_sphere$3.applyMatrix4( matrixWorld );
 
-			if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) return;
+			_ray$2.copy( raycaster.ray ).recast( raycaster.near );
+
+			if ( _sphere$3.containsPoint( _ray$2.origin ) === false ) {
+
+				if ( _ray$2.intersectSphere( _sphere$3, _sphereHitAt ) === null ) return;
+
+				if ( _ray$2.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
+
+			}
 
 			//
 
@@ -50325,6 +50393,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.DirectionalLight = DirectionalLight;
 	exports.DirectionalLightHelper = DirectionalLightHelper;
 	exports.DiscreteInterpolant = DiscreteInterpolant;
+	exports.DisplayP3ColorSpace = DisplayP3ColorSpace;
 	exports.DodecahedronBufferGeometry = DodecahedronBufferGeometry;
 	exports.DodecahedronGeometry = DodecahedronGeometry;
 	exports.DoubleSide = DoubleSide;
