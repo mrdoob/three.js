@@ -220,12 +220,13 @@ class Ray {
 	intersectSphere( sphere, target ) {
 
 		_vector.subVectors( sphere.center, this.origin );
-		const tca = _vector.dot( this.direction );
+
 		const d2 = _vector.dot( _vector ) - tca * tca;
 		const radius2 = sphere.radius * sphere.radius;
 
 		if ( d2 > radius2 ) return null;
 
+		const tca = _vector.dot( this.direction );
 		const thc = Math.sqrt( radius2 - d2 );
 
 		// t0 = first intersect point - entrance on front of sphere
