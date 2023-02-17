@@ -108,7 +108,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
+				renderer.toneMappingNode = Nodes.toneMapping( THREE.LinearToneMapping, 1 );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.domElement.className = 'renderer';

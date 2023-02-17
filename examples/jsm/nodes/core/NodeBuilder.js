@@ -5,16 +5,12 @@ import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
 import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
-import { NodeUpdateType } from './constants.js';
+import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'three';
 
-import { mul, maxMipLevel } from '../shadernode/ShaderNodeElements.js';
-
-export const defaultShaderStages = [ 'fragment', 'vertex' ];
-export const defaultBuildStages = [ 'construct', 'analyze', 'generate' ];
-export const shaderStages = [ ...defaultShaderStages, 'compute' ];
-export const vector = [ 'x', 'y', 'z', 'w' ];
+import { stack } from './StackNode.js';
+import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 
 const typeFromLength = new Map();
 typeFromLength.set( 2, 'vec2' );
@@ -66,7 +62,7 @@ class NodeBuilder {
 		this.context = {
 			keywords: new NodeKeywords(),
 			material: object.material,
-			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => mul( levelNode, maxMipLevel( textureNode ) )
+			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => levelNode.mul( maxMipLevel( textureNode ) )
 		};
 
 		this.cache = new NodeCache();
@@ -448,6 +444,12 @@ class NodeBuilder {
 		if ( componentType === 'int' || componentType === 'uint' ) return type;
 
 		return this.changeComponentType( type, 'int' );
+
+	}
+
+	createStack() {
+
+		return stack();
 
 	}
 

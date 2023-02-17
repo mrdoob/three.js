@@ -1,5 +1,6 @@
 import TempNode from '../core/TempNode.js';
-import { mul } from '../shadernode/ShaderNodeBaseElements.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class PackingNode extends TempNode {
 
@@ -26,11 +27,11 @@ class PackingNode extends TempNode {
 
 		if ( scope === PackingNode.DIRECTION_TO_COLOR ) {
 
-			result = mul( node, 0.5 ).add( 0.5 );
+			result = node.mul( 0.5 ).add( 0.5 );
 
 		} else if ( scope === PackingNode.COLOR_TO_DIRECTION ) {
 
-			result = mul( node, 2.0 ).sub( 1 );
+			result = node.mul( 2.0 ).sub( 1 );
 
 		}
 
@@ -44,3 +45,11 @@ PackingNode.DIRECTION_TO_COLOR = 'directionToColor';
 PackingNode.COLOR_TO_DIRECTION = 'colorToDirection';
 
 export default PackingNode;
+
+export const directionToColor = nodeProxy( PackingNode, PackingNode.DIRECTION_TO_COLOR );
+export const colorToDirection = nodeProxy( PackingNode, PackingNode.COLOR_TO_DIRECTION );
+
+addNodeElement( 'directionToColor', directionToColor );
+addNodeElement( 'colorToDirection', colorToDirection );
+
+addNodeClass( PackingNode );

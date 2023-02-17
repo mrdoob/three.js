@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { addNodeClass } from './Node.js';
 import { getValueType, getValueFromType } from './NodeUtils.js';
 
 class InputNode extends Node {
@@ -64,3 +64,5 @@ class InputNode extends Node {
 }
 
 export default InputNode;
+
+addNodeClass( InputNode );

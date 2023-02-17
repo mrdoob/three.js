@@ -104,11 +104,11 @@
 
 					const { lightColor, reflectedLight } = inputs;
 
-					reflectedLight.directDiffuse.add( lightColor );
+					reflectedLight.directDiffuse.addAssign( lightColor );
 
 				} );
 
-				const lightingModelContext = new Nodes.ContextNode( allLightsNode, { lightingModelNode: { direct: customLightingModel } } );
+				const lightingModelContext = Nodes.context( allLightsNode, { lightingModelNode: { direct: customLightingModel } } );
 
 				materialPoints.lightsNode = lightingModelContext;
 
@@ -123,7 +123,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
+				renderer.toneMappingNode = Nodes.toneMapping( THREE.LinearToneMapping, 1 );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
