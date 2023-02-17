@@ -105,12 +105,16 @@ class CSS3DRenderer {
 
 		this.domElement = domElement;
 
+		const viewElement = document.createElement( 'div' );
+		viewElement.style.transformOrigin = '0 0';
+		viewElement.style.pointerEvents = 'none';
+		domElement.appendChild( viewElement );
+
 		const cameraElement = document.createElement( 'div' );
 
 		cameraElement.style.transformStyle = 'preserve-3d';
-		cameraElement.style.pointerEvents = 'none';
 
-		domElement.appendChild( cameraElement );
+		viewElement.appendChild( cameraElement );
 
 		this.getSize = function () {
 
@@ -127,8 +131,22 @@ class CSS3DRenderer {
 
 			if ( cache.camera.fov !== fov ) {
 
-				domElement.style.perspective = camera.isPerspectiveCamera ? fov + 'px' : '';
+				viewElement.style.perspective = camera.isPerspectiveCamera ? fov + 'px' : '';
 				cache.camera.fov = fov;
+
+			}
+
+			if ( camera.view && camera.view.enabled ) {
+
+				// view offset
+				viewElement.style.transform = `translate( ${ - camera.view.offsetX * ( _width / camera.view.width ) }px, ${ - camera.view.offsetY * ( _height / camera.view.height ) }px )`;
+
+				// view fullWidth and fullHeight, view width and height
+				viewElement.style.transform += `scale( ${ camera.view.fullWidth / camera.view.width }, ${ camera.view.fullHeight / camera.view.height } )`;
+
+			} else {
+
+				viewElement.style.transform = '';
 
 			}
 
@@ -144,9 +162,10 @@ class CSS3DRenderer {
 
 			}
 
+			const scaleByViewOffset = camera.view && camera.view.enabled ? camera.view.height / camera.view.fullHeight : 1;
 			const cameraCSSMatrix = camera.isOrthographicCamera ?
-				'scale(' + fov + ')' + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
-				'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
+				`scale( ${ scaleByViewOffset } )` + 'scale(' + fov + ')' + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
+				`scale( ${ scaleByViewOffset } )` + 'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
 			const style = cameraCSSMatrix +
 				'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
@@ -172,6 +191,9 @@ class CSS3DRenderer {
 
 			domElement.style.width = width + 'px';
 			domElement.style.height = height + 'px';
+
+			viewElement.style.width = width + 'px';
+			viewElement.style.height = height + 'px';
 
 			cameraElement.style.width = width + 'px';
 			cameraElement.style.height = height + 'px';
