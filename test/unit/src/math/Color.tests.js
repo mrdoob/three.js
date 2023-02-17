@@ -9,6 +9,14 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Color', () => {
 
+		const colorManagementEnabled = ColorManagement.enabled;
+
+		QUnit.testDone( () => {
+
+			ColorManagement.enabled = colorManagementEnabled;
+
+		} );
+
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
@@ -269,8 +277,6 @@ export default QUnit.module( 'Maths', () => {
 
 			// Close, but currently off by a few decimals...
 			// assert.equal( c.getStyle( 'display-p3' ), 'color(display-p3 0.831 0.637 0.852)', 'style: display-p3' );
-
-			ColorManagement.enabled = false;
 
 		} );
 
