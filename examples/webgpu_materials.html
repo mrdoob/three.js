@@ -128,6 +128,12 @@
 				material.alphaTestNode = new Nodes.UniformNode( 0.5 );
 				materials.push( material );
 
+				// Normal
+				material = new THREE.MeshNormalMaterial();
+				material.opacity = .5;
+				material.transparent = true;
+				materials.push( material );
+
 				//
 				//	ADVANCED
 				//

@@ -5,7 +5,6 @@ import path from 'path';
 import pixelmatch from 'pixelmatch';
 import jimp from 'jimp';
 import * as fs from 'fs/promises';
-import fetch from 'node-fetch';
 
 class PromiseQueue {
 
@@ -97,16 +96,7 @@ const exceptionList = [
 
 /* CONFIG VARIABLES END */
 
-const PLATFORMS = {
-	linux: 'linux',
-	mac: 'mac',
-	mac_arm: 'mac_arm64',
-	win32: 'win',
-	win64: 'win64'
-};
-const OMAHA_PROXY = 'https://omahaproxy.appspot.com/all.json';
-
-const chromiumChannel = 'stable'; // stable -> beta -> dev -> canary (Mac and Windows) -> canary_asan (Windows)
+const chromiumRevision = '1095492'; // Chromium 111.0.5556.0, Puppeteer 19.7.0, https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-core-v19.7.0
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
@@ -268,21 +258,9 @@ async function main() {
 
 async function downloadLatestChromium() {
 
-	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium', useMacOSARMBinary: true } ); // ARM binary is experimental
+	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
 
-	const os = PLATFORMS[ browserFetcher.platform() ];
-
-	const revisions = await ( await fetch( OMAHA_PROXY ) ).json();
-	const omahaRevisionInfo = revisions.find( revs => revs.os === os ).versions.find( version => version.channel === chromiumChannel );
-
-	let revision = omahaRevisionInfo.branch_base_position;
-	while ( ! ( await browserFetcher.canDownload( revision ) ) ) {
-
-		revision = String( revision - 1 );
-
-	}
-
-	let revisionInfo = browserFetcher.revisionInfo( revision );
+	let revisionInfo = browserFetcher.revisionInfo( chromiumRevision );
 	if ( revisionInfo.local === true ) {
 
 		console.log( 'Latest Chromium has been already downloaded.' );
@@ -290,11 +268,11 @@ async function downloadLatestChromium() {
 	} else {
 
 		console.log( 'Downloading latest Chromium...' );
-		revisionInfo = await browserFetcher.download( revision );
+		revisionInfo = await browserFetcher.download( chromiumRevision );
 		console.log( 'Downloaded.' );
 
 	}
-	console.log( `Using Chromium ${ omahaRevisionInfo.current_version } (revision ${ revision }, ${ revisionInfo.url }), ${ chromiumChannel } channel on ${ os }` );
+	console.log( `Using Chromium r${ chromiumRevision } (${ revisionInfo.url }), stable channel on ${ browserFetcher.platform() }` );
 	return revisionInfo;
 
 }

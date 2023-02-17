@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">도넛 모양 형상을 생성하기 위한 클래스입니다.</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#TorusGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>코드 예제</h2>
+
+		<code>
+		const geometry = new THREE.TorusGeometry( 10, 3, 16, 100 );
+		const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		const torus = new THREE.Mesh( geometry, material );
+		scene.add( torus );
+		</code>
+
+		<h2>생성자</h2>
+
+		<h3>[name]([param:Float radius], [param:Float tube], [param:Integer radialSegments], [param:Integer tubularSegments], [param:Float arc])</h3>
+		<p>
+		radius -  도넛 모양 중심에서 튜브 중심까지의 도넛 모양 반경. 기본값은 1 입니다. <br />
+		tube — 튜브의 반경입니다. 기본값은 0.4 입니다. <br />
+		radialSegments — 기본값은 12 입니다. <br />
+		tubularSegments — 기본값은 48 입니다. <br />
+		arc — 중심 각도입니다.  기본값은 Math.PI * 2 입니다.
+		</p>
+
+		<h2>프로퍼티</h2>
+		<p>일반 프로퍼티는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		각 생성자 매개 변수에 대한 속성이 있는 개체입니다. 인스턴스화 후 수정해도 형상은 변경되지 않습니다.
+		</p>
+
+		<h2>메서드</h2>
+		<p>일반 메서드는 기본 [page:BufferGeometry] 클래스를 참조하십시오.</p>
+
+		<h2>소스 코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
