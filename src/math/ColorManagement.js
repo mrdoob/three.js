@@ -27,17 +27,17 @@ export function LinearToSRGB( c ) {
  * - http://www.russellcottrell.com/photo/matrixCalculator.htm
  */
 
-const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = new Matrix3().fromArray([
+const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = new Matrix3().fromArray( [
 	0.8224621, 0.0331941, 0.0170827,
 	0.1775380, 0.9668058, 0.0723974,
-	-0.0000001, 0.0000001, 0.9105199
-]);
+	- 0.0000001, 0.0000001, 0.9105199
+] );
 
-const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = new Matrix3().fromArray([
-	1.2249401, -0.0420569, -0.0196376,
-	-0.2249404, 1.0420571, -0.0786361,
+const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = new Matrix3().fromArray( [
+	1.2249401, - 0.0420569, - 0.0196376,
+	- 0.2249404, 1.0420571, - 0.0786361,
 	0.0000001, 0.0000000, 1.0982735
-]);
+] );
 
 const _vector = new Vector3();
 
