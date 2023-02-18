@@ -4,7 +4,7 @@ import { Color } from '../../../../src/math/Color.js';
 import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 import { eps } from '../../utils/math-constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
-import { DisplayP3ColorSpace, SRGBColorSpace } from '../../../../src/constants.js';
+import { DisplayP3ColorSpace, SRGBColorSpace, LinearP3ColorSpace } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -307,6 +307,12 @@ export default QUnit.module( 'Maths', () => {
 			assert.equal( t.r.toFixed( 3 ), 0.831, 'r (display-p3)' );
 			assert.equal( t.g.toFixed( 3 ), 0.637, 'g (display-p3)' );
 			assert.equal( t.b.toFixed( 3 ), 0.852, 'b (display-p3)' );
+
+			c.getRGB( t, LinearP3ColorSpace );
+
+			assert.equal( t.r.toFixed( 3 ), 0.657, 'r (p3-linear)' );
+			assert.equal( t.g.toFixed( 3 ), 0.364, 'g (p3-linear)' );
+			assert.equal( t.b.toFixed( 3 ), 0.696, 'b (p3-linear)' );
 
 		} );
 

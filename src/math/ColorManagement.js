@@ -1,4 +1,4 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearDisplayP3ColorSpace } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearP3ColorSpace } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 import { Vector3 } from './Vector3.js';
 
@@ -27,13 +27,13 @@ export function LinearToSRGB( c ) {
  * - http://www.russellcottrell.com/photo/matrixCalculator.htm
  */
 
-const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = new Matrix3().fromArray( [
+const LINEAR_REC709_TO_LINEAR_P3 = new Matrix3().fromArray( [
 	0.8224621, 0.0331941, 0.0170827,
 	0.1775380, 0.9668058, 0.0723974,
 	- 0.0000001, 0.0000001, 0.9105199
 ] );
 
-const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = new Matrix3().fromArray( [
+const LINEAR_P3_TO_LINEAR_REC709 = new Matrix3().fromArray( [
 	1.2249401, - 0.0420569, - 0.0196376,
 	- 0.2249404, 1.0420571, - 0.0786361,
 	0.0000001, 0.0000000, 1.0982735
@@ -41,17 +41,17 @@ const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = new Matrix3().fromArray( [
 
 const _vector = new Vector3();
 
-function LinearDisplayP3ToLinearSRGB( color ) {
+function LinearP3ToLinearRec709( color ) {
 
-	_vector.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB );
+	_vector.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_P3_TO_LINEAR_REC709 );
 
 	return color.setRGB( _vector.x, _vector.y, _vector.z );
 
 }
 
-function LinearSRGBToLinearDisplayP3( color ) {
+function LinearRec709ToLinearP3( color ) {
 
-	_vector.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 );
+	_vector.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_REC709_TO_LINEAR_P3 );
 
 	return color.setRGB( _vector.x, _vector.y, _vector.z );
 
@@ -61,16 +61,16 @@ function LinearSRGBToLinearDisplayP3( color ) {
 const TO_LINEAR = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertSRGBToLinear(),
-	[ LinearDisplayP3ColorSpace ]: ( color ) => LinearDisplayP3ToLinearSRGB( color ),
-	[ DisplayP3ColorSpace ]: ( color ) => LinearDisplayP3ToLinearSRGB( color.convertSRGBToLinear() ),
+	[ LinearP3ColorSpace ]: ( color ) => LinearP3ToLinearRec709( color ),
+	[ DisplayP3ColorSpace ]: ( color ) => LinearP3ToLinearRec709( color.convertSRGBToLinear() ),
 };
 
 // Conversions from Linear-sRGB reference space to <target>.
 const FROM_LINEAR = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertLinearToSRGB(),
-	[ LinearDisplayP3ColorSpace ]: ( color ) => LinearSRGBToLinearDisplayP3( color ),
-	[ DisplayP3ColorSpace ]: ( color ) => LinearSRGBToLinearDisplayP3( color ).convertLinearToSRGB(),
+	[ LinearP3ColorSpace ]: ( color ) => LinearRec709ToLinearP3( color ),
+	[ DisplayP3ColorSpace ]: ( color ) => LinearRec709ToLinearP3( color ).convertLinearToSRGB(),
 };
 
 export const ColorManagement = {
