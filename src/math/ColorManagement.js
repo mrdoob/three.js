@@ -58,7 +58,7 @@ function LinearRec709ToLinearP3( color ) {
 }
 
 // Conversions from <source> to Linear-sRGB reference space.
-const TO_LINEAR = {
+const TO_REFERENCE = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertSRGBToLinear(),
 	[ LinearP3ColorSpace ]: ( color ) => LinearP3ToLinearRec709( color ),
@@ -66,7 +66,7 @@ const TO_LINEAR = {
 };
 
 // Conversions from Linear-sRGB reference space to <target>.
-const FROM_LINEAR = {
+const FROM_REFERENCE = {
 	[ LinearSRGBColorSpace ]: ( color ) => color,
 	[ SRGBColorSpace ]: ( color ) => color.convertLinearToSRGB(),
 	[ LinearP3ColorSpace ]: ( color ) => LinearRec709ToLinearP3( color ),
@@ -113,16 +113,16 @@ export const ColorManagement = {
 
 		}
 
-		const sourceToLinear = TO_LINEAR[ sourceColorSpace ];
-		const targetFromLinear = FROM_LINEAR[ targetColorSpace ];
+		const sourceToReference = TO_REFERENCE[ sourceColorSpace ];
+		const referenceToTarget = FROM_REFERENCE[ targetColorSpace ];
 
-		if ( sourceToLinear === undefined || targetFromLinear === undefined ) {
+		if ( sourceToReference === undefined || referenceToTarget === undefined ) {
 
 			throw new Error( `Unsupported color space conversion, "${ sourceColorSpace }" to "${ targetColorSpace }".` );
 
 		}
 
-		return targetFromLinear( sourceToLinear( color ) );
+		return referenceToTarget( sourceToReference( color ) );
 
 	},
 
