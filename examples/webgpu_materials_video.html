@@ -74,6 +74,14 @@
 
 			function init() {
 
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU support' );
+
+				}
+
 				const overlay = document.getElementById( 'overlay' );
 				overlay.remove();
 
