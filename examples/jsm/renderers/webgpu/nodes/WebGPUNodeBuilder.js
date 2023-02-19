@@ -187,6 +187,20 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVideoTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleBaseClampToEdge( ${textureProperty}, ${textureProperty}_sampler, vec2<f32>( ${uvSnippet}.x, 1.0 - ${uvSnippet}.y ) )`;
+
+		} else {
+
+			console.error( 'WebGPURenderer: THREE.VideoTexture does not support vertex shader.' );
+
+		}
+
+	}
+
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
 		if ( node.isNodeVarying === true && node.needsInterpolation === true ) {
@@ -537,7 +551,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>;` );
+				const texture = uniform.node.value;
+
+				if ( texture.isVideoTexture === true ) {
+
+					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_external;` );
+
+				} else {
+
+					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>;` );
+
+				}
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 

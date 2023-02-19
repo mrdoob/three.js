@@ -235,7 +235,7 @@ class WebGPUBindings {
 
 				}
 
-				entries.push( { binding: bindingPoint, resource: binding.textureGPU.createView( { dimension: binding.dimension } ) } );
+				entries.push( { binding: bindingPoint, resource: binding.textureGPU } );
 
 			}
 

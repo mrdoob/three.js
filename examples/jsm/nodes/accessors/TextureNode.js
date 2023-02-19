@@ -106,7 +106,11 @@ class TextureNode extends UniformNode {
 
 				let snippet = null;
 
-				if ( levelNode && levelNode.isNode === true ) {
+				if ( texture.isVideoTexture === true ) {
+
+					snippet = builder.getVideoTexture( textureProperty, uvSnippet );
+
+				} else if ( levelNode && levelNode.isNode === true ) {
 
 					const levelSnippet = levelNode.build( builder, 'float' );
 

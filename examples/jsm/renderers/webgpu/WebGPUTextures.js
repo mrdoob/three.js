@@ -122,7 +122,15 @@ class WebGPUTextures {
 
 				//
 
-				needsUpdate = this._uploadTexture( texture );
+				if ( texture.isVideoTexture ) {
+
+					needsUpdate = this._uploadVideoTexture( texture );
+
+				} else {
+
+					needsUpdate = this._uploadTexture( texture );
+
+				}
 
 			}
 
@@ -296,6 +304,35 @@ class WebGPUTextures {
 
 	}
 
+	_uploadVideoTexture( texture ) {
+
+		let needsUpdate = false;
+
+		const device = this.device;
+
+		const textureProperties = this.properties.get( texture );
+
+		let textureGPU = textureProperties.textureGPU;
+
+		if ( textureGPU === undefined || textureGPU.expired ) {
+
+			textureGPU = device.importExternalTexture( {
+				source: texture.source.data
+			} );
+
+			needsUpdate = true;
+
+		}
+
+		//
+
+		textureProperties.textureGPU = textureGPU;
+		textureProperties.version = texture.version;
+
+		return needsUpdate;
+
+	}
+
 	_uploadTexture( texture ) {
 
 		let needsUpdate = false;
@@ -341,7 +378,6 @@ class WebGPUTextures {
 		if ( textureGPU === undefined ) {
 
 			textureGPU = device.createTexture( textureGPUDescriptor );
-			textureProperties.textureGPU = textureGPU;
 
 			needsUpdate = true;
 
@@ -367,24 +403,23 @@ class WebGPUTextures {
 
 			}
 
-		} else {
+		} else if ( image !== null ) {
 
-			if ( image !== null ) {
+			// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
 
-				// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
+			this._getImageBitmap( image, texture ).then( imageBitmap => {
 
-				this._getImageBitmap( image, texture ).then( imageBitmap => {
+				this._copyExternalImageToTexture( imageBitmap, textureGPU );
 
-					this._copyExternalImageToTexture( imageBitmap, textureGPU );
+				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
-					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
-
-				} );
-
-			}
+			} );
 
 		}
 
+		//
+
+		textureProperties.textureGPU = textureGPU.createView( { dimension } );
 		textureProperties.version = texture.version;
 
 		return needsUpdate;
