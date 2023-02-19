@@ -41,6 +41,9 @@
   "browserslist": [
     "> 1%, not dead, not ie 11, not op_mini all"
   ],
+  "engines": {
+    "node": ">=16.19.0"
+  },
   "scripts": {
     "start": "npm run dev",
     "test": "npm run lint && npm run test-unit",
