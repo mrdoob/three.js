@@ -1071,7 +1071,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// user data
 
-		this.userData = source.userData;
+		this.userData = typeof structuredClone === 'function' ? structuredClone( source.userData ) : JSON.parse( JSON.stringify( source.userData ) );
 
 		// geometry generator parameters
 

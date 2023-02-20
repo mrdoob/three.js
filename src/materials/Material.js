@@ -473,7 +473,7 @@ class Material extends EventDispatcher {
 
 		this.toneMapped = source.toneMapped;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = typeof structuredClone === 'function' ? structuredClone( source.userData ) : JSON.parse( JSON.stringify( source.userData ) );
 
 		return this;
 

@@ -136,7 +136,7 @@ class Texture extends EventDispatcher {
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = typeof structuredClone === 'function' ? structuredClone( source.userData ) : JSON.parse( JSON.stringify( source.userData ) );
 
 		this.needsUpdate = true;
 
