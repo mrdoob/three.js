@@ -68,4 +68,16 @@ function createElementNS( name ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS };
+function deepClone( value ) {
+
+	if ( typeof structuredClone === 'function' ) {
+
+		return structuredClone( value );
+
+	}
+
+	return JSON.parse( JSON.stringify( value ) );
+
+}
+
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, deepClone };
