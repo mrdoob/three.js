@@ -904,6 +904,8 @@ class OrbitControls extends EventDispatcher {
 
 			removePointer( event );
 
+			state = STATE.NONE;
+
 		}
 
 		function onMouseDown( event ) {
