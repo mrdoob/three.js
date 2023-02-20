@@ -1749,11 +1749,21 @@ class EXRLoader extends DataTextureLoader {
 
 		const parseInt64 = function ( dataView, offset ) {
 
-			const Int64 = Number( dataView.getBigInt64( offset.value, true ) );
+			let int;
+
+			if ( 'getBigInt64' in DataView.prototype ) {
+
+				int = Number( dataView.getBigInt64( offset.value, true ) );
+
+			} else {
+
+				int = dataView.getUint32( offset.value + 4, true ) + Number( dataView.getUint32( offset.value, true ) << 32 );
+
+			}
 
 			offset.value += ULONG_SIZE;
 
-			return Int64;
+			return int;
 
 		};
 
