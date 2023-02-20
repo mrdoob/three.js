@@ -944,7 +944,7 @@ class Object3D extends EventDispatcher {
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = typeof structuredClone === 'function' ? structuredClone( source.userData ) : JSON.parse( JSON.stringify( source.userData ) );
 
 		if ( recursive === true ) {
 
