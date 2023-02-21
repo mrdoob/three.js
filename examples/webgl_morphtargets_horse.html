@@ -43,6 +43,8 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let container, stats;
 			let camera, scene, renderer;
 			let mesh, mixer;
@@ -69,11 +71,11 @@
 
 				//
 
-				const light1 = new THREE.DirectionalLight( 0xefefff, 1.5 );
+				const light1 = new THREE.DirectionalLight( 0xefefff, 5 );
 				light1.position.set( 1, 1, 1 ).normalize();
 				scene.add( light1 );
 
-				const light2 = new THREE.DirectionalLight( 0xffefef, 1.5 );
+				const light2 = new THREE.DirectionalLight( 0xffefef, 5 );
 				light2.position.set( - 1, - 1, - 1 ).normalize();
 				scene.add( light2 );
 
@@ -97,6 +99,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.physicallyCorrectLights = true;
 
 				container.appendChild( renderer.domElement );
 
