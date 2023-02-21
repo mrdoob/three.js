@@ -1,5 +1,6 @@
 import babel from '@rollup/plugin-babel';
 import { terser } from 'rollup-plugin-terser';
+import esbuild from 'rollup-plugin-esbuild';
 import babelrc from './.babelrc.json';
 
 export function glconstants() {
@@ -211,6 +212,14 @@ function addons() {
 
 }
 
+function esbuildConfig() {
+
+	return esbuild( {
+		target: 'es2017',
+	} );
+
+}
+
 export function glsl() {
 
 	return {
@@ -290,6 +299,7 @@ let builds = [
 			addons(),
 			glconstants(),
 			glsl(),
+			esbuildConfig(),
 			header()
 		],
 		output: [
@@ -311,6 +321,7 @@ let builds = [
 				...babelrc
 			} ),
 			babelCleanup(),
+			esbuildConfig(),
 			header()
 		],
 		output: [
@@ -340,6 +351,7 @@ let builds = [
 				...babelrc
 			} ),
 			babelCleanup(),
+			esbuildConfig(),
 			terser(),
 			header()
 		],

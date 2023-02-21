@@ -45,6 +45,7 @@
     "extends": "mdcs",
     "parser": "@babel/eslint-parser",
     "parserOptions": {
+      "ecmaVersion": 2017,
       "babelOptions": {
         "configFile": "./utils/build/.babelrc.json"
       }
@@ -137,6 +138,7 @@
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.2.0",
     "rollup": "^2.57.0",
+    "rollup-plugin-esbuild": "^5.0.0",
     "rollup-plugin-filesize": "^9.1.1",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-visualizer": "^5.5.2",
