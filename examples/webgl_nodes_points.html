@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { attribute, timerLocal, spriteSheetUV, pointUV, vec2, texture, uniform, mix, PointsNodeMaterial } from 'three/nodes';
+			import { attribute, timerLocal, positionLocal, spritesheetUV, pointUV, vec2, texture, uniform, mix, PointsNodeMaterial } from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -103,7 +103,7 @@
 
 				const time = timerLocal();
 
-				const fireUV = spriteSheetUV(
+				const fireUV = spritesheetUV(
 					vec2( 6, 6 ), // count
 					pointUV, // uv
 					time.mul( particleSpeed ) // current frame

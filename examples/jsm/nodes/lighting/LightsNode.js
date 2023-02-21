@@ -80,7 +80,7 @@ class LightsNode extends Node {
 
 	}
 
-	fromLights( lights ) {
+	fromLights( lights = [] ) {
 
 		const lightNodes = [];
 

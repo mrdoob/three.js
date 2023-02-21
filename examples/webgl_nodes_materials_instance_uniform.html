@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshStandardNodeMaterial, Node, NodeUpdateType, uniform, cubeTexture } from 'three/nodes';
+			import { MeshStandardNodeMaterial, Node, NodeUpdateType, nodeObject, uniform, cubeTexture } from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -103,7 +103,7 @@
 
 				// Material
 
-				const instanceUniform = new InstanceUniformNode();
+				const instanceUniform = nodeObject( new InstanceUniformNode() );
 				const cubeTextureNode = cubeTexture( cubeMap );
 
 				const material = new MeshStandardNodeMaterial();

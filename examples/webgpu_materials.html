@@ -189,7 +189,7 @@
 				const textureNode = texture( uvTexture );
 				//getWGSLTextureSample.keywords = { tex: textureNode, tex_sampler: sampler( textureNode ) };
 
-				material = MeshBasicNodeMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.colorNode = getWGSLTextureSample.call( { tex: textureNode, tex_sampler: textureNode, uv: uv() } );
 				materials.push( material );
 

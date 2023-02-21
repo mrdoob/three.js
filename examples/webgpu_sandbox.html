@@ -113,7 +113,7 @@
 
 				const geometryPlane = new THREE.PlaneGeometry();
 				const materialPlane = new MeshBasicNodeMaterial();
-				materialPlane.colorNode = texture( createDataTexture() ).add( color( 0x0000FF ) ) );
+				materialPlane.colorNode = texture( createDataTexture() ).add( color( 0x0000FF ) );
 				materialPlane.opacityNode = texture( dxt5Texture ).a;
 				materialPlane.transparent = true;
 

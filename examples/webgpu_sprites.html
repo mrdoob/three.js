@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, uv, userData, rangeFog, SpriteNodeMaterial } from 'three/nodes';
+			import { texture, uv, userData, rangeFog, color, SpriteNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -58,7 +58,7 @@
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
-				scene.fogNode = rangeFog( new THREE.Color( 0x0000ff ), 1500, 2100 );
+				scene.fogNode = rangeFog( color( 0x0000ff ), 1500, 2100 );
 
 				// create sprites
 
