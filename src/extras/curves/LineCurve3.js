@@ -39,6 +39,19 @@ class LineCurve3 extends Curve {
 		return this.getPoint( u, optionalTarget );
 
 	}
+
+	getTangent( _t, optionalTarget = new Vector3() ) {
+
+		return optionalTarget.copy( this.v2 ).sub( this.v1 ).normalize();
+
+	}
+
+	getTangentAt( u, optionalTarget ) {
+
+		return this.getTangent( u, optionalTarget );
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );
