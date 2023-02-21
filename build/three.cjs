@@ -29035,7 +29035,7 @@ class FileLoader extends Loader {
 					console.warn('THREE.FileLoader: HTTP Status 0 received.');
 				}
 
-				if (typeof ReadableStream === 'undefined' || response.body?.getReader === undefined) {
+				if (typeof ReadableStream === 'undefined' || response.body === undefined || response.body.getReader === undefined) {
 					return response;
 				}
 

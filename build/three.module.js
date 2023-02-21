@@ -39922,7 +39922,7 @@ class FileLoader extends Loader {
 
 					}
 
-					if ( typeof ReadableStream === 'undefined' || response.body?.getReader === undefined ) {
+					if ( typeof ReadableStream === 'undefined' || response.body === undefined || response.body.getReader === undefined ) {
 
 						return response;
 
