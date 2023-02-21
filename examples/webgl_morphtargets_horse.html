@@ -99,7 +99,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.physicallyCorrectLights = true;
+				renderer.useLegacyLights = false;
 
 				container.appendChild( renderer.domElement );
 
