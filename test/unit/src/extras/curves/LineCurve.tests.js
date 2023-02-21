@@ -106,7 +106,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getTangent', ( assert ) => {
+			QUnit.test( 'getTangent/getTangentAt', ( assert ) => {
 
 				const curve = _curve;
 				const tangent = new Vector2();
@@ -116,6 +116,11 @@ export default QUnit.module( 'Extras', () => {
 
 				assert.numEqual( tangent.x, expectedTangent, 'tangent.x correct' );
 				assert.numEqual( tangent.y, expectedTangent, 'tangent.y correct' );
+
+				curve.getTangentAt( 0, tangent );
+
+				assert.numEqual( tangent.x, expectedTangent, 'tangentAt.x correct' );
+				assert.numEqual( tangent.y, expectedTangent, 'tangentAt.y correct' );
 
 			} );
 
