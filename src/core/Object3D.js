@@ -40,6 +40,7 @@ class Object3D extends EventDispatcher {
 
 		this.name = '';
 		this.type = 'Object3D';
+		this.shallowUserData = false;
 
 		this.parent = null;
 		this.children = [];
@@ -945,7 +946,7 @@ class Object3D extends EventDispatcher {
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
 
-		this.userData = deepClone( source.userData );
+		this.userData = this.shallowUserData ? Object.assign( {}, source.userData ) : deepClone( source.userData );
 
 		if ( recursive === true ) {
 

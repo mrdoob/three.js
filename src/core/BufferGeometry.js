@@ -33,6 +33,7 @@ class BufferGeometry extends EventDispatcher {
 
 		this.name = '';
 		this.type = 'BufferGeometry';
+		this.shallowUserData = false;
 
 		this.index = null;
 		this.attributes = {};
@@ -1071,7 +1072,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// user data
 
-		this.userData = deepClone( source.userData );
+		this.userData = this.shallowUserData ? Object.assign( {}, source.userData ) : deepClone( source.userData );
 
 		// geometry generator parameters
 

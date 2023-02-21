@@ -31,6 +31,7 @@ class Texture extends EventDispatcher {
 		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
+		this.shallowUserData = false;
 
 		this.source = new Source( image );
 		this.mipmaps = [];
@@ -137,7 +138,7 @@ class Texture extends EventDispatcher {
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
-		this.userData = deepClone( source.userData );
+		this.userData = this.shallowUserData ? Object.assign( {}, source.userData ) : deepClone( source.userData );
 
 		this.needsUpdate = true;
 

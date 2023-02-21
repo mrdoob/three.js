@@ -19,6 +19,7 @@ class Material extends EventDispatcher {
 
 		this.name = '';
 		this.type = 'Material';
+		this.shallowUserData = false;
 
 		this.blending = NormalBlending;
 		this.side = FrontSide;
@@ -474,7 +475,7 @@ class Material extends EventDispatcher {
 
 		this.toneMapped = source.toneMapped;
 
-		this.userData = deepClone( source.userData );
+		this.userData = this.shallowUserData ? Object.assign( {}, source.userData ) : deepClone( source.userData );
 
 		return this;
 
