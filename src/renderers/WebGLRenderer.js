@@ -1269,6 +1269,8 @@ function WebGLRenderer( parameters = {} ) {
 		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
 		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
 
+		let renderTargetNeedsUpdate = false;
+
 		for ( let i = 0, l = transmissiveObjects.length; i < l; i ++ ) {
 
 			const renderItem = transmissiveObjects[ i ];
@@ -1278,7 +1280,7 @@ function WebGLRenderer( parameters = {} ) {
 			const material = renderItem.material;
 			const group = renderItem.group;
 
-			if ( material.forceSinglePass === false && object.layers.test( camera.layers ) ) {
+			if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
 
 				const currentSide = material.side;
 
@@ -1290,12 +1292,18 @@ function WebGLRenderer( parameters = {} ) {
 				material.side = currentSide;
 				material.needsUpdate = true;
 
+				renderTargetNeedsUpdate = true;
+
 			}
 
 		}
 
-		textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
-		textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+		if ( renderTargetNeedsUpdate === true ) {
+
+			textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
+			textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+
+		}
 
 		_this.setRenderTarget( currentRenderTarget );
 
