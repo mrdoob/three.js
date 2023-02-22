@@ -218,6 +218,8 @@ class SVGLoader extends Loader {
 
 			const d = node.getAttribute( 'd' );
 
+			if ( d === '' || d === 'none' ) return null;
+
 			// console.log( d );
 
 			const commands = d.match( /[a-df-z][^a-df-z]*/ig );
