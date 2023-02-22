@@ -31,24 +31,33 @@ export class BaseNode extends Node {
 			.setSerializable( false )
 			.setOutput( outputLength );
 
-		const closeButton = new ButtonInput().onClick( () => {
+		const contextButton = new ButtonInput().onClick( () => {
 
 			context.open();
 
 		} ).setIcon( 'ti ti-dots' );
 
+		const onAddButtons = () => {
+
+			context.removeEventListener( 'show', onAddButtons );
+
+			context.add( new ButtonInput( 'Remove' ).setIcon( 'ti ti-trash' ).onClick( () => {
+
+				this.dispose();
+
+			} ) );
+
+		};
+
 		const context = new ContextMenu( this.dom );
-		context.add( new ButtonInput( 'Remove' ).setIcon( 'ti ti-trash' ).onClick( () => {
-
-			this.dispose();
-
-		} ) );
+		context.addEventListener( 'show', onAddButtons );
 
 		this.title = title;
-		this.closeButton = closeButton;
+
+		this.contextButton = contextButton;
 		this.context = context;
 
-		title.addButton( closeButton );
+		title.addButton( contextButton );
 
 		this.add( title );
 

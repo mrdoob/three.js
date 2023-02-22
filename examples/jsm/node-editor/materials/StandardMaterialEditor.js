@@ -1,14 +1,14 @@
 import { ColorInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
-import { BaseNode } from '../core/BaseNode.js';
+import { MaterialEditor } from './MaterialEditor.js';
 import { MeshStandardNodeMaterial } from 'three/nodes';
 
-export class StandardMaterialEditor extends BaseNode {
+export class StandardMaterialEditor extends MaterialEditor {
 
 	constructor() {
 
 		const material = new MeshStandardNodeMaterial();
 
-		super( 'Standard Material', 1, material );
+		super( 'Standard Material', material );
 
 		this.setWidth( 300 );
 
@@ -69,8 +69,6 @@ export class StandardMaterialEditor extends BaseNode {
 		this.emissive = emissive;
 		this.normal = normal;
 		this.position = position;
-
-		this.material = material;
 
 		this.update();
 
