@@ -75,7 +75,7 @@
 
 				const torusGeometry = new THREE.TorusKnotGeometry( ...Object.values( parameters ) );
 				const torusMaterial = new THREE.MeshPhysicalMaterial( {
-					transmission: 1.0, roughness: 0, metalness: 0.25, thickness: 0.5
+					transmission: 1.0, roughness: 0, metalness: 0.25, thickness: 0.5, side: THREE.DoubleSide
 				} );
 				const torus = new THREE.Mesh( torusGeometry, torusMaterial );
 				torus.name = 'torus';
