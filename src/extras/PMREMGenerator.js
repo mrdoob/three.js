@@ -7,7 +7,8 @@ import {
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
-	HalfFloatType
+	HalfFloatType,
+	BackSide
 } from '../constants.js';
 
 import { BufferAttribute } from '../core/BufferAttribute.js';
@@ -21,7 +22,6 @@ import { Color } from '../math/Color.js';
 import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BoxGeometry } from '../geometries/BoxGeometry.js';
-import { BackSide } from '../constants.js';
 
 const LOD_MIN = 4;
 
