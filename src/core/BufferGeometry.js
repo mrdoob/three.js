@@ -1074,10 +1074,6 @@ class BufferGeometry extends EventDispatcher {
 
 		this.userData = this.shallowUserData ? Object.assign( {}, source.userData ) : deepClone( source.userData );
 
-		// geometry generator parameters
-
-		if ( source.parameters !== undefined ) this.parameters = Object.assign( {}, source.parameters );
-
 		return this;
 
 	}

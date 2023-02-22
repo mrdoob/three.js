@@ -99,6 +99,16 @@ class TorusGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	static fromJSON( data ) {
 
 		return new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
