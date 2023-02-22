@@ -42,7 +42,7 @@ class LineCurve extends Curve {
 
 	}
 
-	getTangent( _t, optionalTarget = new Vector2() ) {
+	getTangent( t, optionalTarget = new Vector2() ) {
 
 		return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
 
