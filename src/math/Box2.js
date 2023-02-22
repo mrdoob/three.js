@@ -170,6 +170,8 @@ class Box2 {
 		this.min.max( box.min );
 		this.max.min( box.max );
 
+		if ( this.isEmpty() ) this.makeEmpty();
+
 		return this;
 
 	}
