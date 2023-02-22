@@ -213,12 +213,6 @@ class ShaderNodeInternal extends Node {
 
 }
 
-const ShaderNodeScript = function ( jsFunc ) {
-
-	return new ShaderNodeInternal( jsFunc );
-
-};
-
 const bools = [ false, true ];
 const uints = [ 0, 1, 2, 3 ];
 const ints = [ - 1, - 2 ];
@@ -305,7 +299,11 @@ export const getConstNodeType = ( value ) => ( value !== undefined && value !== 
 
 // shader node base
 
-export const ShaderNode = new Proxy( ShaderNodeScript, shaderNodeHandler );
+export function ShaderNode( jsFunc ) {
+
+	return new Proxy( new ShaderNodeInternal( jsFunc ), shaderNodeHandler );
+
+}
 
 export const nodeObject = ( val ) => /* new */ ShaderNodeObject( val );
 export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
