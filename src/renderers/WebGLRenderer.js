@@ -1711,7 +1711,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( morphAttributes.position !== undefined || morphAttributes.normal !== undefined || ( morphAttributes.color !== undefined && capabilities.isWebGL2 === true ) ) {
 
-			morphtargets.update( object, geometry, material, program );
+			morphtargets.update( object, geometry, program );
 
 		}
 
