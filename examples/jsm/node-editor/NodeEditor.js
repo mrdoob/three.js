@@ -857,10 +857,14 @@ export class NodeEditor extends EventDispatcher {
 
 			} else if ( key === 'Enter' ) {
 
-				nodeButtonsVisible[ nodeButtonsIndex ].dom.click();
+				if ( nodeButtonsVisible[ nodeButtonsIndex ] !== undefined ) {
 
-				e.preventDefault();
-				e.stopImmediatePropagation();
+					nodeButtonsVisible[ nodeButtonsIndex ].dom.click();
+
+					e.preventDefault();
+					e.stopImmediatePropagation();
+
+				}
 
 			}
 
@@ -905,7 +909,11 @@ export class NodeEditor extends EventDispatcher {
 
 			}
 
-			nodeButtonsVisible[ nodeButtonsIndex ].setSelected( true );
+			if ( nodeButtonsVisible[ nodeButtonsIndex ] !== undefined ) {
+
+				nodeButtonsVisible[ nodeButtonsIndex ].setSelected( true );
+
+			}
 
 		} );
 
