@@ -10,8 +10,6 @@ export class BasicMaterialEditor extends MaterialEditor {
 
 		super( 'Basic Material', material );
 
-		this.setWidth( 300 );
-
 		const color = new LabelElement( 'color' ).setInput( 3 );
 		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
 		const position = new LabelElement( 'position' ).setInput( 3 );

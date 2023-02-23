@@ -10,8 +10,6 @@ export class StandardMaterialEditor extends MaterialEditor {
 
 		super( 'Standard Material', material );
 
-		this.setWidth( 300 );
-
 		const color = new LabelElement( 'color' ).setInput( 3 );
 		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
 		const metalness = new LabelElement( 'metalness' ).setInput( 1 );

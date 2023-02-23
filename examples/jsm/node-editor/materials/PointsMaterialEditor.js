@@ -11,8 +11,6 @@ export class PointsMaterialEditor extends MaterialEditor {
 
 		super( 'Points Material', material );
 
-		this.setWidth( 300 );
-
 		const color = new LabelElement( 'color' ).setInput( 3 );
 		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
 		const size = new LabelElement( 'size' ).setInput( 1 );
