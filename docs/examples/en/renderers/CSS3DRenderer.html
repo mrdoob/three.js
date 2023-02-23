@@ -18,9 +18,21 @@
 			<ul>
 				<li>It's not possible to use the material system of *three.js*.</li>
 				<li>It's also not possible to use geometries.</li>
+				<li>`[name]` only supports 100% browser and display zoom.</li>
 			</ul>
 			So `[name]` is just focused on ordinary DOM elements. These elements are wrapped into special objects (`CSS3DObject` or `CSS3DSprite`) and then added to the scene graph.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { CSS3DRenderer } from 'three/addons/renderers/CSS3DRenderer.js';
+		</code>
 
 		<h2>Examples</h2>
 

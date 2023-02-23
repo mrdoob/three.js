@@ -11,23 +11,20 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">Generate geometry representing a parametric surface.</p>
+		<p class="desc">
+			Generate geometry representing a parametric surface.
+		</p>
 
-		<script>
+		<h2>Import</h2>
 
-		// iOS iframe auto-resize workaround
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
 
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			const scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script>
+		<code>
+			import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
+		</code>
 
 		<h2>Code Example</h2>
 

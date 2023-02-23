@@ -27,6 +27,17 @@
 			directory.
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+		</code>
+
 		<h2>Code Example</h2>
 
 		<code>
@@ -81,7 +92,7 @@
 
 		<h3>[method:CompressedTexture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
-		[page:String url] — A string containing the path/URL of the `.basis` file.<br />
+		[page:String url] — A string containing the path/URL of the `.ktx2` file.<br />
 		[page:Function onLoad] — A function to be called after the loading is successfully completed.<br />
 		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes. If the server does not set the Content-Length header; .[page:Integer total] will be 0.<br />
 		[page:Function onError] — (optional) A function to be called if an error occurs during loading. The function receives error as an argument.<br />

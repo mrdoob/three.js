@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 조명(Lights)">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -403,7 +403,7 @@ scene.add(helper);
 <p>모듈을 불러온 후 <code class="notranslate" translate="no">RectAreaLightUniformsLib.init</code> 메서드를 호출합니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  RectAreaLightUniformsLib.init();
 </pre>
 <p>데이터를 불러오지 않아도 에러는 발생하지 않지만, 이상하게 보일 것이므로
@@ -454,7 +454,7 @@ makeXYZGUI(gui, light.position, 'position');
 속성도 있습니다. 현실적인 조명을 위해서는 <code class="notranslate" translate="no">2</code> 정도가 적당하죠.</p>
 <p>한 번 예제를 만들어 테스트해봅시다.</p>
 <p>먼저 <code class="notranslate" translate="no">renderer</code>의 <code class="notranslate" translate="no">physicallyCorrectLights</code> 속성을 켭니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.physicallyCorrectLights = true;
 </pre>
 <p>그리고 <code class="notranslate" translate="no">power</code>를 800루멘으로, <code class="notranslate" translate="no">decay</code> 속성을 2로, <code class="notranslate" translate="no">distance</code>
@@ -489,8 +489,8 @@ gui.add(light, 'power', 0, 2000);
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

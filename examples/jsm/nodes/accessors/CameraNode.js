@@ -1,4 +1,6 @@
 import Object3DNode from './Object3DNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class CameraNode extends Object3DNode {
 
@@ -65,3 +67,11 @@ class CameraNode extends Object3DNode {
 CameraNode.PROJECTION_MATRIX = 'projectionMatrix';
 
 export default CameraNode;
+
+export const cameraProjectionMatrix = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX );
+export const cameraViewMatrix = nodeImmutable( CameraNode, CameraNode.VIEW_MATRIX );
+export const cameraNormalMatrix = nodeImmutable( CameraNode, CameraNode.NORMAL_MATRIX );
+export const cameraWorldMatrix = nodeImmutable( CameraNode, CameraNode.WORLD_MATRIX );
+export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
+
+addNodeClass( CameraNode );

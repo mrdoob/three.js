@@ -158,11 +158,11 @@
 		each have an associated color space. Those not already in the Linear-sRGB working color
 		space must be converted, and textures be given the correct <i>texture.encoding</i> assignment.
 		Certain conversions (for hexadecimal and CSS colors in sRGB) can be made automatically if
-		the legacy color management mode is disabled before initializing colors:
+		the THREE.ColorManagement API is enabled before initializing colors:
 	</p>
 
 	<code>
-THREE.ColorManagement.legacyMode = false;
+THREE.ColorManagement.enabled = true;
 	</code>
 
 	<ul>
@@ -242,6 +242,11 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		</p>
 	</blockquote>
 
+	<p>
+		Custom materials based on [page:ShaderMaterial] and [page:RawShaderMaterial] have to implement their own output color space conversion.
+		For instances of `ShaderMaterial`, adding the `encodings_fragment` shader chunk to the fragment shader's `main()` function should be sufficient.
+	</p>
+
 	<h2>Working with THREE.Color instances</h2>
 
 	<p>
@@ -264,7 +269,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 	</code>
 
 	<p>
-		With <i>ColorManagement.legacyMode = false</i> set (recommended), certain conversions
+		With <i>ColorManagement.enabled = true</i> set (recommended), certain conversions
 		are made automatically. Because hexadecimal and CSS colors are generally sRGB, [page:Color]
 		methods will automatically convert these inputs from sRGB to Linear-sRGB in setters, or
 		convert from Linear-sRGB to sRGB when returning hexadecimal or CSS output from getters.

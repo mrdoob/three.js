@@ -694,7 +694,7 @@ class UINumber extends UIElement {
 
 		this.dom.addEventListener( 'keydown', onKeyDown );
 		this.dom.addEventListener( 'mousedown', onMouseDown );
-		this.dom.addEventListener( 'touchstart', onTouchStart );
+		this.dom.addEventListener( 'touchstart', onTouchStart, { passive: false } );
 		this.dom.addEventListener( 'change', onChange );
 		this.dom.addEventListener( 'focus', onFocus );
 		this.dom.addEventListener( 'blur', onBlur );

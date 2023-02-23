@@ -16,7 +16,7 @@
 			<br>Click on screen to process the audio using WebGPU.
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -31,12 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import {
-				ShaderNode, compute,
-				uniform, element, storage, instanceIndex,
-				float, add, sub, div, mul, texture, viewportTopLeft, color
-			} from 'three/nodes';
+			import { ShaderNode, uniform, storage, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -148,26 +143,26 @@
 
 					// pitch
 
-					const time = mul( index, pitch );
+					const time = index.mul( pitch );
 
-					let wave = element( waveNode, time );
+					let wave = waveNode.element( time );
 
 
 					// delay
 
 					for ( let i = 1; i < 7; i ++ ) {
 
-						const waveOffset = element( waveNode, mul( sub( index, mul( mul( delayOffset, sampleRate ), i ) ), pitch ) );
-						const waveOffsetVolume = mul( waveOffset, div( delayVolume, i * i ) );
+						const waveOffset = waveNode.element( index.sub( delayOffset.mul( sampleRate ).mul( i ) ).mul( pitch ) );
+						const waveOffsetVolume = waveOffset.mul( delayVolume.div( i * i ) );
 
-						wave = add( wave, waveOffsetVolume );
+						wave = wave.add( waveOffsetVolume );
 
 					}
 
 
 					// store
 
-					const waveStorageElementNode = element( waveStorageNode, instanceIndex );
+					const waveStorageElementNode = waveStorageNode.element( instanceIndex );
 
 					stack.assign( waveStorageElementNode, wave );
 
@@ -176,7 +171,7 @@
 
 				// compute
 
-				computeNode = compute( computeShaderNode, waveBuffer.length );
+				computeNode = computeShaderNode.compute( waveBuffer.length );
 
 
 				// gui
@@ -200,8 +195,8 @@
 
 				analyserTexture = new THREE.DataTexture( analyserBuffer, analyserBuffer.length, 1, THREE.RedFormat );
 
-				const spectrum = mul( texture( analyserTexture, viewportTopLeft.x ).x, viewportTopLeft.y );
-				const backgroundNode = mul( color( 0x0000FF ), spectrum );
+				const spectrum = texture( analyserTexture, viewportTopLeft.x ).x.mul( viewportTopLeft.y );
+				const backgroundNode = color( 0x0000FF ).mul( spectrum );
 
 
 				// scene

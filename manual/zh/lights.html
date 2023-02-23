@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 光照">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -345,7 +345,7 @@ scene.add(helper);
 <p>我们需要先调用 <code class="notranslate" translate="no">RectAreaLightUniformsLib.init</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  RectAreaLightUniformsLib.init();
 </pre>
 <p>如果忘了引入和使用 <code class="notranslate" translate="no">RectAreaLightUniformsLib</code>，光照还是可以显示，但是会看起来很奇怪（译者注：在示例的简单场景中没有发现区别），所以要确保有使用。</p>
@@ -386,7 +386,7 @@ makeXYZGUI(gui, light.position, 'position');
 <p>在设置光照时，基本思路是不要设置 <code class="notranslate" translate="no">distance</code> 来表现光照的衰减，也不要设置 <code class="notranslate" translate="no">intensity</code>。而是设置光照的 <a href="/docs/#api/zh/lights/PointLight#power"><code class="notranslate" translate="no">power</code></a> 属性，以流明为单位，three.js 会进行物理计算，从而表现出接近真实的光照效果。在这种情况下 three.js 参与计算的长度单位是米，一个 60瓦 的灯泡大概是 800 流明强度。并且光源有一个 <a href="/docs/#api/zh/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a> 属性，为了模拟真实效果，应该被设置为 <code class="notranslate" translate="no">2</code>。</p>
 <p>下面让我们测试看看。</p>
 <p>首先开启 <code class="notranslate" translate="no">physicallyCorrectLights</code> 模式</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.physicallyCorrectLights = true;
 </pre>
 <p>然后我们设置光照的参数，<code class="notranslate" translate="no">power</code> 设置为 800 流明，<code class="notranslate" translate="no">decay</code> 设置为 2，<code class="notranslate" translate="no">distance</code> 设置为 <code class="notranslate" translate="no">Infinity</code>。</p>
@@ -418,8 +418,8 @@ gui.add(light, 'power', 0, 2000);
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

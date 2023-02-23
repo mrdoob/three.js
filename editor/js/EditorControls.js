@@ -258,7 +258,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 		domElement.addEventListener( 'contextmenu', contextmenu );
 		domElement.addEventListener( 'dblclick', onMouseUp );
-		domElement.addEventListener( 'wheel', onMouseWheel );
+		domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
 
 		domElement.addEventListener( 'pointerdown', onPointerDown );
 
@@ -347,8 +347,8 @@ class EditorControls extends THREE.EventDispatcher {
 
 		}
 
-		domElement.addEventListener( 'touchstart', touchStart );
-		domElement.addEventListener( 'touchmove', touchMove );
+		domElement.addEventListener( 'touchstart', touchStart, { passive: false } );
+		domElement.addEventListener( 'touchmove', touchMove, { passive: false } );
 
 	}
 

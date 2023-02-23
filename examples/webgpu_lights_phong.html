@@ -13,7 +13,7 @@
 			<b style="color:red">Left: Red lights</b> - <b>Center: All lights</b> - <b style="color:blue">Right: blue light</b>
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three/nodes';
+			import { color, rangeFog, checker, uv, mix, texture, lights, normalMap, MeshPhongNodeMaterial } from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -37,8 +37,6 @@
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
-			import { float, color, rangeFog, checker, uv, mix, texture } from 'three/nodes';
 
 			let camera, scene, renderer,
 				light1, light2, light3, light4,
@@ -80,7 +78,7 @@
 
 				const addLight = ( hexColor, power = 1700, distance = 100 ) => {
 
-					const material = new Nodes.MeshPhongNodeMaterial();
+					const material = new MeshPhongNodeMaterial();
 					material.colorNode = color( hexColor );
 					material.lights = false;
 
@@ -103,25 +101,25 @@
 
 				// light nodes ( selective lights )
 
-				const blueLightsNode = new Nodes.LightsNode().fromLights( [ light1 ] );
-				const whiteLightsNode = new Nodes.LightsNode().fromLights( [ light2 ] );
+				const blueLightsNode = lights( [ light1 ] );
+				const whiteLightsNode = lights( [ light2 ] );
 
 				// models
 
 				const geometryTeapot = new TeapotGeometry( .8, 18 );
 
-				const leftObject = new THREE.Mesh( geometryTeapot, new Nodes.MeshPhongNodeMaterial( { color: 0x555555 } ) );
+				const leftObject = new THREE.Mesh( geometryTeapot, new MeshPhongNodeMaterial( { color: 0x555555 } ) );
 				leftObject.material.lightsNode = blueLightsNode;
 				leftObject.material.specularNode = texture( alphaTexture );
 				leftObject.position.x = - 3;
 				scene.add( leftObject );
 
-				const centerObject = new THREE.Mesh( geometryTeapot, new Nodes.MeshPhongNodeMaterial( { color: 0x555555 } ) );
-				centerObject.material.normalNode = new Nodes.NormalMapNode( texture( normalMapTexture ) );
-				centerObject.material.shininessNode = float( 80 );
+				const centerObject = new THREE.Mesh( geometryTeapot, new MeshPhongNodeMaterial( { color: 0x555555 } ) );
+				centerObject.material.normalNode = normalMap( texture( normalMapTexture ) );
+				centerObject.material.shininess = 80;
 				scene.add( centerObject );
 
-				const rightObject = new THREE.Mesh( geometryTeapot, new Nodes.MeshPhongNodeMaterial( { color: 0x555555 } ) );
+				const rightObject = new THREE.Mesh( geometryTeapot, new MeshPhongNodeMaterial( { color: 0x555555 } ) );
 				rightObject.material.lightsNode = whiteLightsNode;
 				//rightObject.material.specular.setHex( 0xFF00FF );
 				rightObject.material.specularNode = mix( color( 0x0000FF ), color( 0xFF0000 ), checker( uv().mul( 5 ) ) );

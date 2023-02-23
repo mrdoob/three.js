@@ -13,7 +13,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshStandardNodeMaterial, Node, NodeUpdateType, uniform, cubeTexture, add, mul } from 'three/nodes';
+			import { MeshStandardNodeMaterial, Node, NodeUpdateType, nodeObject, uniform, cubeTexture } from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -103,12 +103,12 @@
 
 				// Material
 
-				const instanceUniform = new InstanceUniformNode();
+				const instanceUniform = nodeObject( new InstanceUniformNode() );
 				const cubeTextureNode = cubeTexture( cubeMap );
 
 				const material = new MeshStandardNodeMaterial();
-				material.colorNode = add( instanceUniform, cubeTextureNode );
-				material.emissiveNode = mul( instanceUniform, cubeTextureNode );
+				material.colorNode = instanceUniform.add( cubeTextureNode );
+				material.emissiveNode = instanceUniform.mul( cubeTextureNode );
 
 				// Spheres geometry
 

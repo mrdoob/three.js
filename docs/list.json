@@ -392,10 +392,12 @@
 
 			"Exporters": {
 				"ColladaExporter": "examples/en/exporters/ColladaExporter",
+				"DRACOExporter": "examples/en/exporters/DRACOExporter",
 				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"OBJExporter": "examples/en/exporters/OBJExporter",
-				"PLYExporter": "examples/en/exporters/PLYExporter"
+				"PLYExporter": "examples/en/exporters/PLYExporter",
+				"STLExporter": "examples/en/exporters/STLExporter"
 			},
 
 			"Math": {
@@ -831,12 +833,6 @@
 
 		"Addons": {
 
-			"动画": {
-				"CCDIKSolver": "examples/zh/animations/CCDIKSolver",
-				"MMDAnimationHelper": "examples/zh/animations/MMDAnimationHelper",
-				"MMDPhysics": "examples/zh/animations/MMDPhysics"
-			},
-
 			"控制": {
 				"DragControls": "examples/zh/controls/DragControls",
 				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
@@ -858,8 +854,7 @@
 				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/zh/helpers/PositionalAudioHelper",
 				"RectAreaLightHelper": "examples/zh/helpers/RectAreaLightHelper",
-				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper",
-				"VertexTangentsHelper": "examples/zh/helpers/VertexTangentsHelper"
+				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper"
 			},
 
 			"灯光": {
@@ -867,17 +862,12 @@
 			},
 
 			"加载器": {
-				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
 				"FontLoader": "examples/zh/loaders/FontLoader",
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
-				"PCDLoader": "examples/zh/loaders/PCDLoader",
-				"PDBLoader": "examples/zh/loaders/PDBLoader",
-				"PRWMLoader": "examples/zh/loaders/PRWMLoader",
-				"SVGLoader": "examples/zh/loaders/SVGLoader",
-				"TGALoader": "examples/zh/loaders/TGALoader"
+				"PCDLoader": "examples/zh/loaders/PCDLoader"
 			},
 
 			"物体": {
@@ -886,26 +876,6 @@
 
 			"后期处理": {
 				"EffectComposer": "examples/zh/postprocessing/EffectComposer"
-			},
-
-			"导出器": {
-				"ColladaExporter": "examples/zh/exporters/ColladaExporter",
-				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
-				"PLYExporter": "examples/zh/exporters/PLYExporter"
-			},
-
-			"数学库": {
-				"LookupTable": "examples/zh/math/Lut",
-				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
-				"OBB": "examples/en/math/OBB"
-			},
-
-			"QuickHull": {
-				"Face": "examples/zh/math/convexhull/Face",
-				"HalfEdge": "examples/zh/math/convexhull/HalfEdge",
-				"ConvexHull": "examples/zh/math/convexhull/ConvexHull",
-				"VertexNode": "examples/zh/math/convexhull/VertexNode",
-				"VertexList": "examples/zh/math/convexhull/VertexList"
 			},
 
 			"渲染器": {
@@ -1005,6 +975,7 @@
 
 			"상수": {
 				"Animation": "api/ko/constants/Animation",
+				"BufferAttributeUsage": "api/ko/constants/BufferAttributeUsage",
 				"Core": "api/ko/constants/Core",
 				"CustomBlendingEquation": "api/ko/constants/CustomBlendingEquations",
 				"Materials": "api/ko/constants/Materials",
@@ -1061,6 +1032,30 @@
 				"QuadraticBezierCurve": "api/ko/extras/curves/QuadraticBezierCurve",
 				"QuadraticBezierCurve3": "api/ko/extras/curves/QuadraticBezierCurve3",
 				"SplineCurve": "api/ko/extras/curves/SplineCurve"
+			},
+
+			"Geometries": {
+				"BoxGeometry": "api/ko/geometries/BoxGeometry",
+				"CapsuleGeometry": "api/ko/geometries/CapsuleGeometry",
+				"CircleGeometry": "api/ko/geometries/CircleGeometry",
+				"ConeGeometry": "api/ko/geometries/ConeGeometry",
+				"CylinderGeometry": "api/ko/geometries/CylinderGeometry",
+				"DodecahedronGeometry": "api/ko/geometries/DodecahedronGeometry",
+				"EdgesGeometry": "api/ko/geometries/EdgesGeometry",
+				"ExtrudeGeometry": "api/ko/geometries/ExtrudeGeometry",
+				"IcosahedronGeometry": "api/ko/geometries/IcosahedronGeometry",
+				"LatheGeometry": "api/ko/geometries/LatheGeometry",
+				"OctahedronGeometry": "api/ko/geometries/OctahedronGeometry",
+				"PlaneGeometry": "api/ko/geometries/PlaneGeometry",
+				"PolyhedronGeometry": "api/ko/geometries/PolyhedronGeometry",
+				"RingGeometry": "api/ko/geometries/RingGeometry",
+				"ShapeGeometry": "api/ko/geometries/ShapeGeometry",
+				"SphereGeometry": "api/ko/geometries/SphereGeometry",
+				"TetrahedronGeometry": "api/ko/geometries/TetrahedronGeometry",
+				"TorusGeometry": "api/ko/geometries/TorusGeometry",
+				"TorusKnotGeometry": "api/ko/geometries/TorusKnotGeometry",
+				"TubeGeometry": "api/ko/geometries/TubeGeometry",
+				"WireframeGeometry": "api/ko/geometries/WireframeGeometry"
 			}
 
 		},

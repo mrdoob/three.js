@@ -15,7 +15,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -312,14 +312,14 @@
 				controlsOrtho.update(); // must update both controls for damping to complete
 
 				// remember camera projection changes
-			
+
 				materialVelocity.uniforms.previousProjectionViewMatrix.value.copy( materialVelocity.uniforms.currentProjectionViewMatrix.value );
 				materialVelocity.uniforms.currentProjectionViewMatrix.value.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 
 				if ( mesh && mesh.userData.matrixWorldPrevious ) {
 
 					materialVelocity.uniforms.modelMatrixPrev.value.copy( mesh.userData.matrixWorldPrevious );
-			
+
 				}
 
 				renderer.render( scene, camera );
@@ -329,9 +329,9 @@
 					if ( object.isMesh ) {
 
 						object.userData.matrixWorldPrevious.copy( object.matrixWorld );
-			
+
 					}
-			
+
 				} );
 
 			}

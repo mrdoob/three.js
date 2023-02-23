@@ -162,7 +162,7 @@
 	</p>
 
 	<code>
-THREE.ColorManagement.legacyMode = false;
+THREE.ColorManagement.enabled = true;
 	</code>
 
 	<ul>
@@ -243,6 +243,11 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		</p>
 	</blockquote>
 
+	<p>
+		Custom materials based on [page:ShaderMaterial] and [page:RawShaderMaterial] have to implement their own output color space conversion.
+		For instances of `ShaderMaterial`, adding the `encodings_fragment` shader chunk to the fragment shader's `main()` function should be sufficient.
+	</p>
+
 	<h2>Trabalhando com instâncias THREE.Color</h2>
 
 	<p>
@@ -265,7 +270,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 	</code>
 
 	<p>
-		Com <i>ColorManagement.legacyMode = false</i> definido (recomendado), determinadas conversões
+		Com <i>ColorManagement.enabled = true</i> definido (recomendado), determinadas conversões
 		são feitas automaticamente. Como as cores hexadecimais e CSS geralmente são sRGB, métodos [page:Color]
 		irão converter automaticamente essas entradas de sRGB para Linear-sRGB em setters, ou
 		converter de Linear-sRGB para sRGB ao retornar hexadecimal ou CSS de getters.

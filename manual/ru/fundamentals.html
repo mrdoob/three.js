@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Основы ">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -32,7 +32,7 @@
         <div class="lesson-main">
           <p></p>
 <p>Это первая статья в серии статей о three.js.
-<a href="http://threejs.org">Three.js</a> это 3D-библиотека, которая максимально 
+<a href="https://threejs.org">Three.js</a> это 3D-библиотека, которая максимально 
 упрощает создание 3D-контента на веб-странице.</p>
 <p>Three.js часто путают с WebGL, поскольку чаще всего, 
 но не всегда, three.js использует WebGL для рисования 3D.
@@ -65,7 +65,7 @@ import * as THREE from 'three';
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
   ...
 &lt;/script&gt;
 </pre><p>Обратите внимание, что здесь есть некоторые не явные детали. 
@@ -78,11 +78,7 @@ function main() {
 и мне, вероятно, пришлось бы изменить этот код, если бы изменился мой вариант 
 использования.</p>
 <p>Когда канвас найден, мы создаем <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Renderer - это то, что отвечает 
-за фактическое получение всех предоставленных вами данных и их отрисовку 
-на холст. В прошлом были другие рендеры, такие как <code class="notranslate" translate="no">CSSRenderer</code>, 
-<code class="notranslate" translate="no">CanvasRenderer</code>, а в будущем могут быть
-<code class="notranslate" translate="no">WebGL2Renderer</code> или <code class="notranslate" translate="no">WebGPURenderer</code>. На данный момент есть <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>, 
-который использует WebGL для рисования 3D на холсте.</p>
+за фактическое получение всех предоставленных вами данных и их отрисовку на холст.</p>
 <p>Далее нам нужна камера.</p>
 <pre class="prettyprint showlinemods notranslate notranslate" translate="no">const fov = 75;
 const aspect = 2;  // значение для canvas по умолчанию
@@ -271,8 +267,8 @@ requestAnimationFrame(render);
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

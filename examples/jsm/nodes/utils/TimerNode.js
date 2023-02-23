@@ -1,5 +1,7 @@
 import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { nodeObject, nodeImmutable } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
 
 class TimerNode extends UniformNode {
 
@@ -82,3 +84,11 @@ TimerNode.DELTA = 'delta';
 TimerNode.FRAME = 'frame';
 
 export default TimerNode;
+
+// @TODO: add support to use node in timeScale
+export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
+export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
+export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
+export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME );
+
+addNodeClass( TimerNode );

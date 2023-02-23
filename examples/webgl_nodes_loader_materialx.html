@@ -19,7 +19,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -33,7 +33,7 @@
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			import { MaterialXLoader } from './jsm/loaders/MaterialXLoader.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
@@ -109,7 +109,7 @@
 						scene.background = texture;
 						scene.environment = texture;
 
-						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/MaterialX/shaderball.glb' ) ).scene;
+						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
 
 						for ( const sample of samples ) {
 

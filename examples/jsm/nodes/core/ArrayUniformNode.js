@@ -1,4 +1,5 @@
 import UniformNode from './UniformNode.js';
+import { addNodeClass } from './Node.js';
 
 class ArrayUniformNode extends UniformNode {
 
@@ -21,3 +22,5 @@ class ArrayUniformNode extends UniformNode {
 }
 
 export default ArrayUniformNode;
+
+addNodeClass( ArrayUniformNode );

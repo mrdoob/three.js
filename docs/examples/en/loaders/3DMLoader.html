@@ -17,6 +17,17 @@
 			The loader currently uses [link:https://www.npmjs.com/package/rhino3dm/v/0.15.0-beta rhino3dm.js 0.15.0-beta.]
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { 3DMLoader } from 'three/addons/loaders/3DMLoader.js';
+		</code>
+
 		<h2>Supported Conversions</h2>
 
 		<p>
@@ -110,7 +121,7 @@
 
 		// Specify path to a folder containing WASM/JS libraries or a CDN.
 		//loader.setLibraryPath( '/path_to_library/rhino3dm/' );
-		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
 
 		// Load a 3DM file
 		loader.load(
@@ -184,13 +195,13 @@
 		</p>
 
 		<code>
-		import rhino3dm from 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/rhino3dm.module.js'
+		import rhino3dm from 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/rhino3dm.module.js'
 
 		// Instantiate a loader
 		const loader = new Rhino3dmLoader();
 
 		// Specify path to a folder containing WASM/JS libraries or a CDN.
-		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
 
 		rhino3dm().then(async m => {
 
@@ -227,7 +238,7 @@
 		// Specify path to a folder containing the WASM/JS library:
 		loader.setLibraryPath( '/path_to_library/rhino3dm/' );
 		// or from a CDN:
-		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@0.15.0-beta/' );
+		loader.setLibraryPath( 'https://cdn.jsdelivr.net/npm/rhino3dm@7.15.0/' );
 		</code>
 
 		<h3>[method:this setWorkerLimit]( [param:Number workerLimit] )</h3>
