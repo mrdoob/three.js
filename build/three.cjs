@@ -4837,9 +4837,7 @@ class Box3 {
 
 	distanceToPoint( point ) {
 
-		const clampedPoint = _vector$b.copy( point ).clamp( this.min, this.max );
-
-		return clampedPoint.sub( point ).length();
+		return this.clampPoint( point, _vector$b ).distanceTo( point );
 
 	}
 
@@ -5255,7 +5253,7 @@ class Ray {
 
 	at( t, target ) {
 
-		return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
+		return target.copy( this.origin ).addScaledVector( this.direction, t );
 
 	}
 
@@ -5287,7 +5285,7 @@ class Ray {
 
 		}
 
-		return target.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+		return target.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
 	}
 
@@ -5309,7 +5307,7 @@ class Ray {
 
 		}
 
-		_vector$a.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+		_vector$a.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
 		return _vector$a.distanceToSquared( point );
 
@@ -5420,13 +5418,13 @@ class Ray {
 
 		if ( optionalPointOnRay ) {
 
-			optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
+			optionalPointOnRay.copy( this.origin ).addScaledVector( this.direction, s0 );
 
 		}
 
 		if ( optionalPointOnSegment ) {
 
-			optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
+			optionalPointOnSegment.copy( _segCenter ).addScaledVector( _segDir, s1 );
 
 		}
 
@@ -12396,7 +12394,7 @@ class Plane {
 
 	projectPoint( point, target ) {
 
-		return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
+		return target.copy( point ).addScaledVector( this.normal, - this.distanceToPoint( point ) );
 
 	}
 
@@ -12428,7 +12426,7 @@ class Plane {
 
 		}
 
-		return target.copy( direction ).multiplyScalar( t ).add( line.start );
+		return target.copy( line.start ).addScaledVector( direction, t );
 
 	}
 
@@ -16833,7 +16831,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 	}
 
-	function update( object, geometry, material, program ) {
+	function update( object, geometry, program ) {
 
 		const objectInfluences = object.morphTargetInfluences;
 
@@ -28758,7 +28756,7 @@ function WebGLRenderer( parameters = {} ) {
 
 		if ( morphAttributes.position !== undefined || morphAttributes.normal !== undefined || ( morphAttributes.color !== undefined && capabilities.isWebGL2 === true ) ) {
 
-			morphtargets.update( object, geometry, material, program );
+			morphtargets.update( object, geometry, program );
 
 		}
 
@@ -32698,13 +32696,15 @@ class LineCurve extends Curve {
 
 	}
 
-	getTangent( t, optionalTarget ) {
+	getTangent( t, optionalTarget = new Vector2() ) {
 
-		const tangent = optionalTarget || new Vector2();
+		return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
 
-		tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+	}
 
-		return tangent;
+	getTangentAt( u, optionalTarget ) {
+
+		return this.getTangent( u, optionalTarget );
 
 	}
 
@@ -32781,6 +32781,19 @@ class LineCurve3 extends Curve {
 		return this.getPoint( u, optionalTarget );
 
 	}
+
+	getTangent( t, optionalTarget = new Vector3() ) {
+
+		return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
+
+	}
+
+	getTangentAt( u, optionalTarget ) {
+
+		return this.getTangent( u, optionalTarget );
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -35761,7 +35774,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
-				return vec.clone().multiplyScalar( size ).add( pt );
+				return pt.clone().addScaledVector( vec, size );
 
 			}
 
@@ -48334,8 +48347,7 @@ class Box2 {
 
 	distanceToPoint( point ) {
 
-		const clampedPoint = _vector$4.copy( point ).clamp( this.min, this.max );
-		return clampedPoint.sub( point ).length();
+		return this.clampPoint( point, _vector$4 ).distanceTo( point );
 
 	}
 
@@ -48343,6 +48355,8 @@ class Box2 {
 
 		this.min.max( box.min );
 		this.max.min( box.max );
+
+		if ( this.isEmpty() ) this.makeEmpty();
 
 		return this;
 

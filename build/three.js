@@ -4842,9 +4842,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		distanceToPoint( point ) {
 
-			const clampedPoint = _vector$b.copy( point ).clamp( this.min, this.max );
-
-			return clampedPoint.sub( point ).length();
+			return this.clampPoint( point, _vector$b ).distanceTo( point );
 
 		}
 
@@ -5260,7 +5258,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		at( t, target ) {
 
-			return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
+			return target.copy( this.origin ).addScaledVector( this.direction, t );
 
 		}
 
@@ -5292,7 +5290,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			return target.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+			return target.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
 		}
 
@@ -5314,7 +5312,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			_vector$a.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+			_vector$a.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
 			return _vector$a.distanceToSquared( point );
 
@@ -5425,13 +5423,13 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( optionalPointOnRay ) {
 
-				optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
+				optionalPointOnRay.copy( this.origin ).addScaledVector( this.direction, s0 );
 
 			}
 
 			if ( optionalPointOnSegment ) {
 
-				optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
+				optionalPointOnSegment.copy( _segCenter ).addScaledVector( _segDir, s1 );
 
 			}
 
@@ -12401,7 +12399,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		projectPoint( point, target ) {
 
-			return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
+			return target.copy( point ).addScaledVector( this.normal, - this.distanceToPoint( point ) );
 
 		}
 
@@ -12433,7 +12431,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			return target.copy( direction ).multiplyScalar( t ).add( line.start );
+			return target.copy( line.start ).addScaledVector( direction, t );
 
 		}
 
@@ -16838,7 +16836,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		function update( object, geometry, material, program ) {
+		function update( object, geometry, program ) {
 
 			const objectInfluences = object.morphTargetInfluences;
 
@@ -28763,7 +28761,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( morphAttributes.position !== undefined || morphAttributes.normal !== undefined || ( morphAttributes.color !== undefined && capabilities.isWebGL2 === true ) ) {
 
-				morphtargets.update( object, geometry, material, program );
+				morphtargets.update( object, geometry, program );
 
 			}
 
@@ -32703,13 +32701,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		getTangent( t, optionalTarget ) {
+		getTangent( t, optionalTarget = new Vector2() ) {
 
-			const tangent = optionalTarget || new Vector2();
+			return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
 
-			tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+		}
 
-			return tangent;
+		getTangentAt( u, optionalTarget ) {
+
+			return this.getTangent( u, optionalTarget );
 
 		}
 
@@ -32786,6 +32786,19 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			return this.getPoint( u, optionalTarget );
 
 		}
+
+		getTangent( t, optionalTarget = new Vector3() ) {
+
+			return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
+
+		}
+
+		getTangentAt( u, optionalTarget ) {
+
+			return this.getTangent( u, optionalTarget );
+
+		}
+
 		copy( source ) {
 
 			super.copy( source );
@@ -35766,7 +35779,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
-					return vec.clone().multiplyScalar( size ).add( pt );
+					return pt.clone().addScaledVector( vec, size );
 
 				}
 
@@ -48339,8 +48352,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		distanceToPoint( point ) {
 
-			const clampedPoint = _vector$4.copy( point ).clamp( this.min, this.max );
-			return clampedPoint.sub( point ).length();
+			return this.clampPoint( point, _vector$4 ).distanceTo( point );
 
 		}
 
@@ -48348,6 +48360,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.min.max( box.min );
 			this.max.min( box.max );
+
+			if ( this.isEmpty() ) this.makeEmpty();
 
 			return this;
 
