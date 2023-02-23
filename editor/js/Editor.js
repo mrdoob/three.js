@@ -88,6 +88,7 @@ function Editor() {
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
+		viewportShadingChanged: new Signal(),
 
 		intersectionsDetected: new Signal(),
 
@@ -122,7 +123,9 @@ function Editor() {
 	this.helpers = {};
 
 	this.cameras = {};
+
 	this.viewportCamera = this.camera;
+	this.viewportShading = 'default';
 
 	this.addCamera( this.camera );
 
@@ -536,6 +539,13 @@ Editor.prototype = {
 
 		this.viewportCamera = this.cameras[ uuid ];
 		this.signals.viewportCameraChanged.dispatch();
+
+	},
+
+	setViewportShading: function( value ) {
+
+		this.viewportShading = value;
+		this.signals.viewportShadingChanged.dispatch();
 
 	},
 
