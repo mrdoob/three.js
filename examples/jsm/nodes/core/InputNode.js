@@ -10,6 +10,7 @@ class InputNode extends Node {
 		this.isInputNode = true;
 
 		this.value = value;
+		this.precision = 'medium';
 
 	}
 
@@ -31,6 +32,14 @@ class InputNode extends Node {
 
 	}
 
+	setPrecision( precision ) {
+
+		this.precision = precision;
+
+		return this;
+
+	}
+
 	serialize( data ) {
 
 		super.serialize( data );
@@ -42,6 +51,8 @@ class InputNode extends Node {
 		data.valueType = getValueType( this.value );
 		data.nodeType = this.nodeType;
 
+		data.precision = this.precision;
+
 	}
 
 	deserialize( data ) {
@@ -50,6 +61,8 @@ class InputNode extends Node {
 
 		this.nodeType = data.nodeType;
 		this.value = Array.isArray( data.value ) ? getValueFromType( data.valueType, ...data.value ) : data.value;
+
+		if ( data.precision !== undefined ) this.precision = data.precision;
 
 		if ( this.value && this.value.fromArray ) this.value = this.value.fromArray( data.value );
 
