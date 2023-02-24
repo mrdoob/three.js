@@ -1021,7 +1021,7 @@ function Strings( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/useLegacyLights': 'Use legacy lights',
+			'sidebar/project/useLegacyLights': '传统灯',
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
