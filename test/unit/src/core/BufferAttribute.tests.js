@@ -16,6 +16,7 @@ import {
 } from '../../../../src/core/BufferAttribute.js';
 
 import { DynamicDrawUsage } from '../../../../src/constants.js';
+import { toHalfFloat, fromHalfFloat } from '../../../../src/extras/DataUtils.js';
 
 export default QUnit.module( 'Core', () => {
 
@@ -495,6 +496,72 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		const toHalfFloatArray = ( f32Array ) => {
+			const f16Array = new Uint16Array( f32Array.length );
+			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
+				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
+			}
+			return f16Array;
+		};
+
+		const fromHalfFloatArray = ( f16Array ) => {
+			const f32Array = new Float32Array( f16Array.length );
+			for ( let i = 0, n = f16Array.length; i < n; ++i ) {
+				f32Array[ i ] = fromHalfFloat( f16Array[ i ] );
+			}
+			return f32Array;
+		};
+
+		QUnit.test( 'set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
+			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 4, false );
+			const expected = new Float32Array( [ 1, 2, - 3, - 4, - 5, - 6, 7, 8 ] );
+
+			a.setX( 1, a.getX( 1 ) * - 1 );
+			a.setY( 1, a.getY( 1 ) * - 1 );
+			a.setZ( 0, a.getZ( 0 ) * - 1 );
+			a.setW( 0, a.getW( 0 ) * - 1 );
+
+			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check all set* calls set the correct values' );
+
+		} );
+
+		QUnit.test( 'setXY', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 2, false );
+			const expected = new Float32Array( [ - 1, - 2, 3, 4 ] );
+
+			a.setXY( 0, - 1, - 2 );
+
+			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setXYZ', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
+			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 3, false );
+			const expected = new Float32Array( [ 1, 2, 3, - 4, - 5, - 6 ] );
+
+			a.setXYZ( 1, - 4, - 5, - 6 );
+
+			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+
+		} );
+
+		QUnit.test( 'setXYZW', ( assert ) => {
+
+			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
+			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 4, false );
+			const expected = new Float32Array( [ - 1, - 2, - 3, - 4 ] );
+
+			a.setXYZW( 0, - 1, - 2, - 3, - 4 );
+
+			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+
+		} );
 	} );
 
 	QUnit.module( 'Float32BufferAttribute', () => {
