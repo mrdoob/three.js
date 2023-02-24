@@ -22,11 +22,15 @@ export function cloneUniforms( src ) {
 				property.isTexture || property.isQuaternion ) ) {
 
 				if ( property.isRenderTargetTexture ) {
+
 					console.error(
-							'Render Target Textures cannot be cloned via UniformsUtils.cloneUniforms/mergeUniforms.' );
+						'Render Target Textures cannot be cloned via UniformsUtils.cloneUniforms/mergeUniforms.' );
 					dst[ u ][ p ] = null;
+
 				} else {
+
 					dst[ u ][ p ] = property.clone();
+
 				}
 
 			} else if ( Array.isArray( property ) ) {
