@@ -10,7 +10,7 @@ class InputNode extends Node {
 		this.isInputNode = true;
 
 		this.value = value;
-		this.precision = 'medium';
+		this.precision = null;
 
 	}
 
@@ -62,7 +62,7 @@ class InputNode extends Node {
 		this.nodeType = data.nodeType;
 		this.value = Array.isArray( data.value ) ? getValueFromType( data.valueType, ...data.value ) : data.value;
 
-		if ( data.precision !== undefined ) this.precision = data.precision;
+		this.precision = data.precision || null;
 
 		if ( this.value && this.value.fromArray ) this.value = this.value.fromArray( data.value );
 

@@ -490,7 +490,7 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 			const precision = uniform.node.precision;
 
-			if ( precision !== 'medium' ) {
+			if ( precision !== null ) {
 
 				snippet = 'uniform ' + precisionLib[ precision ] + ' ' + snippet;
 
