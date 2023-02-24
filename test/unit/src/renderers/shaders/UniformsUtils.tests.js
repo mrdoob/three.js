@@ -133,15 +133,15 @@ export default QUnit.module( 'Renderers', () => {
 
 				uniforms.textureValue.value.isRenderTargetTexture = true;
 
-				let errorLogged = false;
-				console.error = () => {
-					errorLogged = true;
+				let warningLogged = false;
+				console.warn = () => {
+					warningLogged = true;
 				};
 
 				const uniformClones = UniformsUtils.clone(uniforms);
 
 				assert.ok( uniformClones.textureValue.value === null );
-				assert.ok( errorLogged );
+				assert.ok( warningLogged );
 
 			} );
 
