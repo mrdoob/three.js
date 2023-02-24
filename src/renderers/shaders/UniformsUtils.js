@@ -23,8 +23,7 @@ export function cloneUniforms( src ) {
 
 				if ( property.isRenderTargetTexture ) {
 
-					console.error(
-						'Render Target Textures cannot be cloned via UniformsUtils.cloneUniforms/mergeUniforms.' );
+					console.warn( 'UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().' );
 					dst[ u ][ p ] = null;
 
 				} else {
