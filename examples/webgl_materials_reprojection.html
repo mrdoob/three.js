@@ -13,7 +13,10 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - reprojection</div>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - reprojection<br/>
+			Performing CAVE Reprojection on a Curved Display Surface
+		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
@@ -42,7 +45,7 @@
 			let camera, scene, renderer, stats;
 			let cube, curvedPanel, material;
 
-			let eyeCamera, eyeRenderTarget, eyeCameraHelper, params = { setFoVToCorners: false, panelCurvature: 20 };
+			let eyeCamera, eyeRenderTarget, eyeCameraHelper, params = { setFoVToCorners: true, panelCurvature: 20 };
 
 			let controls;
 
@@ -96,7 +99,7 @@
 				material.uniforms = {
 					eyeProjectionMatrix : { value: eyeCamera.projectionMatrix },
 					eyeViewMatrix       : { value: eyeCamera.matrixWorldInverse },
-					renderToScreen        : { value: false }
+					previewOnScreen        : { value: false }
 				};
 
 				material.onBeforeCompile = (shader) => {
@@ -104,12 +107,12 @@
 					// Vertex Shader: Set UVs to be eye-camera screen-space; Map positions to be main screen-space.
 					shader.vertexShader =
 						shader.vertexShader.slice( 0, 18 ) +
-						`uniform mat4 eyeProjectionMatrix; uniform mat4 eyeViewMatrix; uniform bool renderToScreen; \n` +
+						`uniform mat4 eyeProjectionMatrix; uniform mat4 eyeViewMatrix; uniform bool previewOnScreen; \n` +
 						shader.vertexShader.slice( 18, - 1 ) +
 						`	vec4 modelViewLocal = ( modelMatrix * eyeViewMatrix ) * vec4( position.xyz, 1.0 );
 							vec4    screenLocal = eyeProjectionMatrix * modelViewLocal;
 							vUv                 = ( ( screenLocal.xy / screenLocal.w ) + 1.0 ) * 0.5;
-							if ( renderToScreen ) { gl_Position = vec4( ( uv - 0.5 ) * 2.0, 0.0, 1.0 ); } }`;
+							if ( previewOnScreen ) { gl_Position = vec4( ( uv - 0.5 ) * 2.0, 0.0, 1.0 ); } }`;
 
 					// Fragment Shader: Set Colors outside the Eye Frustum to Black
 					shader.fragmentShader =
@@ -121,36 +124,21 @@
 					// Set the eye camera's view and projection matrices
 					shader.uniforms.eyeViewMatrix       = material.uniforms.eyeViewMatrix;
 					shader.uniforms.eyeProjectionMatrix = material.uniforms.eyeProjectionMatrix;
-					shader.uniforms.renderToScreen        = material.uniforms.renderToScreen;
+					shader.uniforms.previewOnScreen        = material.uniforms.previewOnScreen;
 
 				};
 
-				let curvedPanelGeometry = new THREE.PlaneGeometry(50, 20, 16, 16);
-				let vertices = curvedPanelGeometry.getAttribute("position").array;
-				let tempVec = new THREE.Vector3();
-				let radius = tempVec.set(-25, 0, params.panelCurvature).length();
-				for (let i = 0; i < vertices.length; i += 3) {
-					tempVec.set(vertices[i], 0, -params.panelCurvature).setLength(radius);
-					vertices[i] = tempVec.x; vertices[i + 2] = tempVec.z + params.panelCurvature;
-				}
-				curvedPanel = new THREE.Mesh(curvedPanelGeometry, material);
+				curvedPanel = new THREE.Mesh(createCurvedPanelGeometry(params.panelCurvature), material);
 				scene.add(curvedPanel);
 
 				const gui = new GUI();
 				gui.add(renderer, 'toneMappingExposure', 0, 2).name('exposure');
 				gui.add(eyeCamera, 'fov', 0, 60);
 				gui.add(params, 'panelCurvature', 10, 100).onChange(() => {
-					let newCurvedPanelGeometry = new THREE.PlaneGeometry(50, 20, 16, 16);
-					let newVertices = newCurvedPanelGeometry.getAttribute("position").array;
-					let newRadius = tempVec.set(-25, 0, params.panelCurvature).length();
-					for (let i = 0; i < newVertices.length; i += 3) {
-						tempVec.set(newVertices[i], 0, -params.panelCurvature).setLength(newRadius);
-						newVertices[i] = tempVec.x; newVertices[i + 2] = tempVec.z + params.panelCurvature;
-					}
-					curvedPanel.geometry = newCurvedPanelGeometry;
+					curvedPanel.geometry = createCurvedPanelGeometry(params.panelCurvature);
 				});
-				gui.add(params, 'setFoVToCorners', false);
-				gui.add(material.uniforms.renderToScreen, 'value', false).name('renderToScreen');
+				gui.add(params, 'setFoVToCorners', true);
+				gui.add(material.uniforms.previewOnScreen, 'value', false).name('previewOnScreen');
 
 				const material2 = new THREE.MeshStandardMaterial( {
 					roughness: 0.1,
@@ -166,6 +154,18 @@
 				//
 
 				controls = new OrbitControls( camera, renderer.domElement );
+			}
+
+			function createCurvedPanelGeometry( panelCurvature ) {
+				let curvedPanelGeometry = new THREE.PlaneGeometry(50, 20, 16, 16);
+				let vertices = curvedPanelGeometry.getAttribute("position").array;
+				let tempVec = new THREE.Vector3();
+				let radius = tempVec.set(-25, 0, panelCurvature).length();
+				for (let i = 0; i < vertices.length; i += 3) {
+					tempVec.set(vertices[i], 0, -panelCurvature).setLength(radius);
+					vertices[i] = tempVec.x; vertices[i + 2] = tempVec.z + panelCurvature;
+				}
+				return curvedPanelGeometry;
 			}
 
 			function onWindowResized() {
@@ -196,14 +196,18 @@
 
 				// set the eye camera's frustum
 				if (params.setFoVToCorners) {
+
 					// create an asymmetric/off-axis frustum that aligns to the corners of the curvedPanel
 					CameraUtils.frameCorners(eyeCamera,
 						new THREE.Vector3(-25, -10, 0),
 						new THREE.Vector3( 25, -10, 0),
 						new THREE.Vector3(-25,  10, 0), false);
+
 				} else {
+
 					// update the FoV of the eye camera
 					eyeCamera.updateProjectionMatrix();
+
 				}
 
 				// set up rendering from the eye's camera
