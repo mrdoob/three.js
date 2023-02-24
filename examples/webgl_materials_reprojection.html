@@ -132,13 +132,13 @@
 				scene.add(curvedPanel);
 
 				const gui = new GUI();
-				gui.add(renderer, 'toneMappingExposure', 0, 2).name('exposure');
-				gui.add(eyeCamera, 'fov', 0, 60);
+				gui.add(renderer, 'toneMappingExposure', 0, 2).name('Exposure');
+				gui.add(eyeCamera, 'fov', 0, 60).name('FoV');
 				gui.add(params, 'panelCurvature', 10, 100).onChange(() => {
 					curvedPanel.geometry = createCurvedPanelGeometry(params.panelCurvature);
-				});
-				gui.add(params, 'setFoVToCorners', true);
-				gui.add(material.uniforms.previewOnScreen, 'value', false).name('previewOnScreen');
+				}).name('Panel Curvature');
+				gui.add(params, 'setFoVToCorners', true).name('Set FoV to Corners');
+				gui.add(material.uniforms.previewOnScreen, 'value', false).name('Preview');
 
 				const material2 = new THREE.MeshStandardMaterial( {
 					roughness: 0.1,
