@@ -10,6 +10,7 @@ import { Matrix4 } from '../../../../../src/math/Matrix4.js';
 import { Quaternion } from '../../../../../src/math/Quaternion.js';
 import { Texture } from '../../../../../src/textures/Texture.js';
 import { CubeReflectionMapping, UVMapping } from '../../../../../src/constants.js';
+import { CONSOLE_LEVEL } from '../../../utils/console-wrapper.js';
 
 export default QUnit.module( 'Renderers', () => {
 
