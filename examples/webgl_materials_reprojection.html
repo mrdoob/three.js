@@ -61,6 +61,8 @@
 				gl_FragColor = outsideUV ? vec4(0.0, 0.0, 0.0, 1.0) : texture2D( map, vUv );
 
 				#include <tonemapping_fragment>
+				#include <encodings_fragment>
+				#include <dithering_fragment>
 
 			}
 
