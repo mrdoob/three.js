@@ -31,6 +31,42 @@
 			}
 		</script>
 
+		<script type="x-shader/x-vertex" id="vertexshader">
+
+			varying vec2 vUv;
+			uniform bool previewOnScreen;
+			uniform mat4 eyeProjectionMatrix, eyeViewMatrix; 
+
+			void main() {
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+				vec4 modelViewLocal = ( modelMatrix * eyeViewMatrix ) * vec4( position, 1.0 );
+				vec4    screenLocal = eyeProjectionMatrix * modelViewLocal;
+				vUv                 = ( ( screenLocal.xy / screenLocal.w ) + 1.0 ) * 0.5;
+				if ( previewOnScreen ) { gl_Position = vec4( ( uv - 0.5 ) * 2.0, 0.0, 1.0 ); }
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentshader">
+
+			varying vec2 vUv;
+			uniform sampler2D map;
+
+			void main() {
+
+				bool outsideUV =  max(vUv.x, vUv.y) > 1.0 || min(vUv.x, vUv.y) < 0.0;
+				gl_FragColor = outsideUV ? vec4(0.0, 0.0, 0.0, 1.0) : texture2D( map, vUv );
+
+				#include <tonemapping_fragment>
+
+			}
+
+		</script>
+
+
 		<script type="module" >
 
 			import * as THREE from 'three';
@@ -95,38 +131,18 @@
 
 				//
 
-				material = new THREE.MeshBasicMaterial({ map: eyeRenderTarget.texture });
-				material.uniforms = {
-					eyeProjectionMatrix : { value: eyeCamera.projectionMatrix },
-					eyeViewMatrix       : { value: eyeCamera.matrixWorldInverse },
-					previewOnScreen        : { value: false }
-				};
+				material = new THREE.ShaderMaterial( {
 
-				material.onBeforeCompile = (shader) => {
+					uniforms: {
+						map                 : { value: eyeRenderTarget.texture      },
+						eyeProjectionMatrix : { value: eyeCamera.projectionMatrix   },
+						eyeViewMatrix       : { value: eyeCamera.matrixWorldInverse },
+						previewOnScreen     : { value: false                        }
+					},
+					vertexShader  : document.getElementById(   'vertexshader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentshader' ).textContent
 
-					// Vertex Shader: Set UVs to be eye-camera screen-space; Map positions to be main screen-space.
-					shader.vertexShader =
-						shader.vertexShader.slice( 0, 18 ) +
-						`uniform mat4 eyeProjectionMatrix; uniform mat4 eyeViewMatrix; uniform bool previewOnScreen; \n` +
-						shader.vertexShader.slice( 18, - 1 ) +
-						`	vec4 modelViewLocal = ( modelMatrix * eyeViewMatrix ) * vec4( position.xyz, 1.0 );
-							vec4    screenLocal = eyeProjectionMatrix * modelViewLocal;
-							vUv                 = ( ( screenLocal.xy / screenLocal.w ) + 1.0 ) * 0.5;
-							if ( previewOnScreen ) { gl_Position = vec4( ( uv - 0.5 ) * 2.0, 0.0, 1.0 ); } }`;
-
-					// Fragment Shader: Set Colors outside the Eye Frustum to Black
-					shader.fragmentShader =
-						shader.fragmentShader.slice( 0, - 1 ) +
-						`\nbool outsideUV =  max(vUv.x, vUv.y) > 1.0 || min(vUv.x, vUv.y) < 0.0;
-						gl_FragColor.rgb = outsideUV ? vec3(0.0, 0.0, 0.0) : gl_FragColor.rgb;
-					}`;
-
-					// Set the eye camera's view and projection matrices
-					shader.uniforms.eyeViewMatrix       = material.uniforms.eyeViewMatrix;
-					shader.uniforms.eyeProjectionMatrix = material.uniforms.eyeProjectionMatrix;
-					shader.uniforms.previewOnScreen        = material.uniforms.previewOnScreen;
-
-				};
+				} );
 
 				curvedPanel = new THREE.Mesh(createCurvedPanelGeometry(params.panelCurvature), material);
 				scene.add(curvedPanel);
