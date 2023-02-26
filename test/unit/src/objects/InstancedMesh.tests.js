@@ -20,9 +20,10 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new InstancedMesh();
+			assert.ok( object, 'Can instantiate a InstancedMesh.' );
 
 		} );
 

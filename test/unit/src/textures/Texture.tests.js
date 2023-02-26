@@ -9,7 +9,7 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'Texture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
 			const object = new Texture();
 			assert.strictEqual(

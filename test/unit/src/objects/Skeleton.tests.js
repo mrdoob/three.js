@@ -1,15 +1,16 @@
 /* global QUnit */
 
-// import { Skeleton } from '../../../../src/objects/Skeleton.js';
+import { Skeleton } from '../../../../src/objects/Skeleton.js';
 
 export default QUnit.module( 'Objects', () => {
 
 	QUnit.module( 'Skeleton', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Skeleton();
+			assert.ok( object, 'Can instantiate a Skeleton.' );
 
 		} );
 

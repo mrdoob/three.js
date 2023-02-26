@@ -1,7 +1,8 @@
 /* global QUnit */
 
-import { Object3D } from '../../../../src/core/Object3D.js';
 import { Group } from '../../../../src/objects/Group.js';
+
+import { Object3D } from '../../../../src/core/Object3D.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -19,9 +20,10 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Group();
+			assert.ok( object, 'Can instantiate a Group.' );
 
 		} );
 
