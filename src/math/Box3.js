@@ -201,7 +201,7 @@ class Box3 {
 
 		if ( geometry !== undefined ) {
 
-			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
+			if ( precise && geometry.attributes !== undefined && geometry.attributes.position !== undefined ) {
 
 				const position = geometry.attributes.position;
 				for ( let i = 0, l = position.count; i < l; i ++ ) {
