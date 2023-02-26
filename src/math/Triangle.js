@@ -81,11 +81,11 @@ class Triangle {
 
 	}
 
-	static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
+	static getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target ) {
 
 		this.getBarycoord( point, p1, p2, p3, _v3 );
 
-		target.set( 0, 0 );
+		target.setScalar( 0 );
 		target.addScaledVector( uv1, _v3.x );
 		target.addScaledVector( uv2, _v3.y );
 		target.addScaledVector( uv3, _v3.z );
@@ -185,7 +185,7 @@ class Triangle {
 
 	getUV( point, uv1, uv2, uv3, target ) {
 
-		return Triangle.getUV( point, this.a, this.b, this.c, uv1, uv2, uv3, target );
+		return Triangle.getInterpolation( point, this.a, this.b, this.c, uv1, uv2, uv3, target );
 
 	}
 
