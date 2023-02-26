@@ -33,9 +33,10 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new CatmullRomCurve3();
+				assert.ok( object, 'Can instantiate a CatmullRomCurve3.' );
 
 			} );
 

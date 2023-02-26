@@ -24,9 +24,10 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new InterleavedBuffer();
+			assert.ok( object, 'Can instantiate an InterleavedBuffer.' );
 
 		} );
 

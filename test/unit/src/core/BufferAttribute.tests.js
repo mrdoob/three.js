@@ -362,7 +362,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const object = new Uint8BufferAttribute();
-			assert.ok( object, 'Can instantiate an Uint8BufferAttribute.' );
+			assert.ok( object, 'Can instantiate a Uint8BufferAttribute.' );
 
 		} );
 
@@ -385,7 +385,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const object = new Uint8ClampedBufferAttribute();
-			assert.ok( object, 'Can instantiate an Uint8ClampedBufferAttribute.' );
+			assert.ok( object, 'Can instantiate a Uint8ClampedBufferAttribute.' );
 
 		} );
 
@@ -431,7 +431,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const object = new Uint16BufferAttribute();
-			assert.ok( object, 'Can instantiate an Uint16BufferAttribute.' );
+			assert.ok( object, 'Can instantiate a Uint16BufferAttribute.' );
 
 		} );
 
@@ -477,7 +477,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const object = new Uint32BufferAttribute();
-			assert.ok( object, 'Can instantiate an Uint32BufferAttribute.' );
+			assert.ok( object, 'Can instantiate a Uint32BufferAttribute.' );
 
 		} );
 
@@ -500,7 +500,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const object = new Float16BufferAttribute();
-			assert.ok( object, 'Can instantiate an Float16BufferAttribute.' );
+			assert.ok( object, 'Can instantiate a Float16BufferAttribute.' );
 
 		} );
 
@@ -600,7 +600,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const object = new Float32BufferAttribute();
-			assert.ok( object, 'Can instantiate an Float32BufferAttribute.' );
+			assert.ok( object, 'Can instantiate a Float32BufferAttribute.' );
 
 		} );
 
@@ -623,7 +623,7 @@ export default QUnit.module( 'Core', () => {
 		QUnit.test( 'Instancing', ( assert ) => {
 
 			const object = new Float64BufferAttribute();
-			assert.ok( object, 'Can instantiate an Float64BufferAttribute.' );
+			assert.ok( object, 'Can instantiate a Float64BufferAttribute.' );
 
 		} );
 
