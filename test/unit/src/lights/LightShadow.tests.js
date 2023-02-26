@@ -1,6 +1,7 @@
 /* global QUnit */
 
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
+
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
 
 export default QUnit.module( 'Lights', () => {
@@ -112,9 +113,12 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const object = new LightShadow();
+			object.dispose();
 
 		} );
 

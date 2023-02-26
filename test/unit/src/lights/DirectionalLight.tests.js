@@ -83,10 +83,14 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			// dispose() is called on shadow
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const object = new DirectionalLight();
+			object.dispose();
+
+			// ensure calls dispose() on shadow
 
 		} );
 

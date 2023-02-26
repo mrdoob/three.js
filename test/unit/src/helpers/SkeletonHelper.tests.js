@@ -82,9 +82,13 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const bone = new Bone();
+			const object = new SkeletonHelper( bone );
+			object.dispose();
 
 		} );
 

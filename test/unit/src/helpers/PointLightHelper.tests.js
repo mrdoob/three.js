@@ -73,9 +73,13 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const light = new PointLight( parameters.color );
+			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			object.dispose();
 
 		} );
 

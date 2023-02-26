@@ -79,9 +79,13 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const light = new HemisphereLight( parameters.skyColor );
+			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
+			object.dispose();
 
 		} );
 

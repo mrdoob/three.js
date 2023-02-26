@@ -135,10 +135,14 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
+
+			assert.expect( 0 );
+
+			const object = new SpotLight();
+			object.dispose();
 
 			// ensure calls dispose() on shadow
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
