@@ -22,9 +22,11 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const bone = new Bone();
+			const object = new SkeletonHelper( bone );
+			assert.ok( object, 'Can instantiate a SkeletonHelper.' );
 
 		} );
 

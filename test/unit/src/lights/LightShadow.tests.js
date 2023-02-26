@@ -9,9 +9,11 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module( 'LightShadow', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const camera = new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 );
+			const object = new LightShadow( camera );
+			assert.ok( object, 'Can instantiate a LightShadow.' );
 
 		} );
 
