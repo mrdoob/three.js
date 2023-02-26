@@ -81,6 +81,12 @@ class Triangle {
 
 	}
 
+	static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
+
+		return getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target );
+
+	}
+
 	static getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target ) {
 
 		this.getBarycoord( point, p1, p2, p3, _v3 );
