@@ -83,7 +83,7 @@ class NodeLoader extends Loader {
 		const node = nodeObject( createNodeFromType( type ) );
 		node.uuid = json.uuid;
 
-		const nodes = this.parseNodes( json.inputNodes );
+		const nodes = this.parseNodes( json.nodes );
 		const meta = { nodes, textures: this.textures };
 
 		json.meta = meta;

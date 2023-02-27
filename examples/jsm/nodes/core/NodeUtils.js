@@ -12,7 +12,23 @@ export const getCacheKey = ( object ) => {
 
 	for ( const property of getNodesKeys( object ) ) {
 
-		cacheKey += `${ property }:${ object[ property ].getCacheKey() },`;
+		const node = object[ property ];
+
+		// @TODO: Think about implement NodeArray and NodeObject.
+
+		if ( Array.isArray( node ) ) {
+
+			for ( const subNode of node ) {
+
+				cacheKey += `${ property }:${ subNode.getCacheKey() },`;
+
+			}
+
+		} else {
+
+			cacheKey += `${ property }:${ node.getCacheKey() },`;
+
+		}
 
 	}
 
@@ -30,7 +46,15 @@ export const getNodesKeys = ( object ) => {
 
 		const value = object[ name ];
 
-		if ( value && value.isNode === true ) {
+		if ( Array.isArray( value ) ) {
+
+			if ( value[ 0 ] && value[ 0 ].isNode === true ) {
+
+				props.push( name );
+
+			}
+
+		} else if ( value && value.isNode === true ) {
 
 			props.push( name );
 
