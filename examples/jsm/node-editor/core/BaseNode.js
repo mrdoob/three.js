@@ -42,7 +42,7 @@ export class BaseNode extends Node {
 
 			context.removeEventListener( 'show', onAddButtons );
 
-			if ( this.value && this.value.toJSON !== undefined ) {
+			if ( this.value && typeof this.value.toJSON === 'function' ) {
 
 				this.context.add( new ButtonInput( 'Export' ).setIcon( 'ti ti-download' ).onClick( () => {
 
