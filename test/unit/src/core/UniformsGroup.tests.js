@@ -20,9 +20,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new UniformsGroup();
+			assert.ok( object, 'Can instantiate a UniformsGroup.' );
 
 		} );
 
@@ -86,9 +87,12 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const object = new UniformsGroup();
+			object.dispose();
 
 		} );
 

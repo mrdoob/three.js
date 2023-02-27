@@ -27,9 +27,16 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			// surpress the following console message when testing
+			// THREE.ImageBitmapLoader: createImageBitmap() not supported.
+
+			console.level = CONSOLE_LEVEL.OFF;
+			const object = new ImageBitmapLoader();
+			console.level = CONSOLE_LEVEL.DEFAULT;
+
+			assert.ok( object, 'Can instantiate an ImageBitmapLoader.' );
 
 		} );
 

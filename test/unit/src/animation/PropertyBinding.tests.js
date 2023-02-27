@@ -11,9 +11,27 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'PropertyBinding', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const geometry = new BoxGeometry();
+			const material = new MeshBasicMaterial();
+			const mesh = new Mesh( geometry, material );
+			const path = '.material.opacity';
+			const parsedPath = {
+				nodeName: '',
+				objectName: 'material',
+				objectIndex: undefined,
+				propertyName: 'opacity',
+				propertyIndex: undefined
+			  };
+
+			// mesh, path
+			const object = new PropertyBinding( mesh, path );
+			assert.ok( object, 'Can instantiate a PropertyBinding.' );
+
+			// mesh, path, parsedPath
+			const object_all = new PropertyBinding( mesh, path, parsedPath );
+			assert.ok( object_all, 'Can instantiate a PropertyBinding with mesh, path, and parsedPath.' );
 
 		} );
 

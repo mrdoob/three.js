@@ -31,9 +31,11 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const light = new SpotLight( parameters.color );
+			const object = new SpotLightHelper( light, parameters.color );
+			assert.ok( object, 'Can instantiate a SpotLightHelper.' );
 
 		} );
 
@@ -80,9 +82,13 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const light = new SpotLight( parameters.color );
+			const object = new SpotLightHelper( light, parameters.color );
+			object.dispose();
 
 		} );
 

@@ -9,9 +9,10 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'Curve', () => {
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new Curve();
+				assert.ok( object, 'Can instantiate a Curve.' );
 
 			} );
 

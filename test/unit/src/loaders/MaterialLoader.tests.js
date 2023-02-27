@@ -29,9 +29,10 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new MaterialLoader();
+			assert.ok( object, 'Can instantiate a MaterialLoader.' );
 
 		} );
 
