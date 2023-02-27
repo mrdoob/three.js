@@ -12,38 +12,6 @@
 		<p class="desc">Uniforms library for shared webgl shaders</p>
 
 
-		<h2>A Note on Usage</h2>
-		<p>
-			These methods perform deep copies of the uniform definitions. Attempting to clone or merge uniforms with a render target texture is an invalid operation.
-
-			The following code will fail:
-		<code>
-const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(128);
-
-const uniforms = THREE.UniformsUtils.merge([
-	{},
-	{
-		cubemap: { value: cubeRenderTarget.texture },
-	}]);
-
-		</code>
-
-		Instead, you are advised to set any render target textures AFTER merging or cloning uniforms:
-		<code>
-const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(128);
-
-const uniforms = THREE.UniformsUtils.merge([
-	{},
-	{
-		cubemap: { value: null },
-	}]);
-
-uniforms.cubemap.value = cubeRenderTarget.texture;
-
-		</code>
-
-	</p>
-
 
 		<h2>Properties</h2>
 
