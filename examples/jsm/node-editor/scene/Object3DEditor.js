@@ -1,7 +1,6 @@
-import { NumberInput, StringInput, LabelElement, ButtonInput } from '../../libs/flow.module.js';
+import { NumberInput, StringInput, LabelElement } from '../../libs/flow.module.js';
 import { BaseNode } from '../core/BaseNode.js';
 import { Group, MathUtils, Vector3 } from 'three';
-import { exportJSON } from '../NodeEditorUtils.js';
 
 export class Object3DEditor extends BaseNode {
 
@@ -23,12 +22,6 @@ export class Object3DEditor extends BaseNode {
 		this._initTransform();
 
 		this.onValidElement = () => {};
-
-		this.context.add( new ButtonInput( 'Export' ).setIcon( 'ti ti-download' ).onClick( () => {
-
-			exportJSON( this.object3d.toJSON(), 'object3d' );
-
-		} ) );
 
 	}
 

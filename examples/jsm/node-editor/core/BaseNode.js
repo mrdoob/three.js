@@ -1,4 +1,5 @@
 import { Node, ButtonInput, TitleElement, ContextMenu } from '../../libs/flow.module.js';
+import { exportJSON } from '../NodeEditorUtils.js';
 
 export const onNodeValidElement = ( inputElement, outputElement ) => {
 
@@ -40,6 +41,16 @@ export class BaseNode extends Node {
 		const onAddButtons = () => {
 
 			context.removeEventListener( 'show', onAddButtons );
+
+			if ( this.value && this.value.toJSON !== undefined ) {
+
+				this.context.add( new ButtonInput( 'Export' ).setIcon( 'ti ti-download' ).onClick( () => {
+
+					exportJSON( this.value.toJSON(), this.constructor.name );
+
+				} ) );
+
+			}
 
 			context.add( new ButtonInput( 'Remove' ).setIcon( 'ti ti-trash' ).onClick( () => {
 
