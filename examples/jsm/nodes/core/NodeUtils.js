@@ -30,7 +30,15 @@ export const getNodesKeys = ( object ) => {
 
 		const value = object[ name ];
 
-		if ( value && value.isNode === true ) {
+		if ( Array.isArray( value ) ) {
+
+			if ( value[ 0 ] && value[ 0 ].isNode === true ) {
+
+				props.push( name );
+
+			}
+
+		} else if ( value && value.isNode === true ) {
 
 			props.push( name );
 

@@ -273,7 +273,21 @@ class Node {
 
 			for ( const property of nodeKeys ) {
 
-				inputNodes[ property ] = this[ property ].toJSON( json.meta ).uuid;
+				if ( Array.isArray( this[ property ] ) ) {
+
+					inputNodes[ property ] = [];
+
+					for ( const node of this[ property ] ) {
+
+						inputNodes[ property ].push( node.toJSON( json.meta ).uuid );
+
+					}
+
+				} else {
+
+					inputNodes[ property ] = this[ property ].toJSON( json.meta ).uuid;
+
+				}
 
 			}
 
@@ -291,9 +305,25 @@ class Node {
 
 			for ( const property in json.inputNodes ) {
 
-				const uuid = json.inputNodes[ property ];
+				if ( Array.isArray( json.inputNodes[ property ] ) ) {
 
-				this[ property ] = nodes[ uuid ];
+					const inputArray = [];
+
+					for ( const uuid of json.inputNodes[ property ] ) {
+
+						inputArray.push( nodes[ uuid ] );
+
+					}
+
+					this[ property ] = inputArray;
+
+				} else {
+
+					const uuid = json.inputNodes[ property ];
+
+					this[ property ] = nodes[ uuid ];
+
+				}
 
 			}
 
@@ -333,7 +363,7 @@ class Node {
 				}
 			};
 
-			meta.nodes[ data.uuid ] = data;
+			if ( isRoot !== true ) meta.nodes[ data.uuid ] = data;
 
 			this.serialize( data );
 
