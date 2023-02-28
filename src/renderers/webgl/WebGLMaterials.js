@@ -633,6 +633,18 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
+		if ( material.anisotropy > 0 ) {
+
+			uniforms.anisotropyStrength.value = material.anisotropyStrength;
+
+			if ( material.anisotropyMap ) {
+
+				uniforms.anisotropyMap.value = material.anisotropyMap;
+
+			}
+
+		}
+
 		uniforms.specularIntensity.value = material.specularIntensity;
 		uniforms.specularColor.value.copy( material.specularColor );
 

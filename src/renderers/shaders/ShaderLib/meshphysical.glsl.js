@@ -114,6 +114,14 @@ uniform float opacity;
 	#endif
 #endif
 
+#ifdef USE_ANISOTROPY
+	uniform vec2 anisotropy;
+
+	#ifdef USE_ANISOTROPYMAP
+		uniform sampler2D anisotropyMap;
+	#endif
+#endif
+
 varying vec3 vViewPosition;
 
 #include <common>

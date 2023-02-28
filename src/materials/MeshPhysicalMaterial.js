@@ -63,10 +63,14 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularColor = new Color( 1, 1, 1 );
 		this.specularColorMap = null;
 
+		this.anisotropyStrength = 1.0;
+		this.anisotropyMap = null;
+
 		this._sheen = 0.0;
 		this._clearcoat = 0;
 		this._iridescence = 0;
 		this._transmission = 0;
+		this._anisotropy = 0;
 
 		this.setValues( parameters );
 
@@ -144,6 +148,24 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	}
 
+	get anisotropy() {
+
+		return this._anisotropy;
+
+	}
+
+	set anisotropy( value ) {
+
+		if ( this._anisotropy > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._anisotropy = value;
+
+	}
+
 	copy( source ) {
 
 		super.copy( source );
@@ -188,6 +210,10 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularIntensityMap = source.specularIntensityMap;
 		this.specularColor.copy( source.specularColor );
 		this.specularColorMap = source.specularColorMap;
+
+		this.anisotropy = source.anisotropy;
+		this.anisotropyStrength = source.anisotropyStrength;
+		this.anisotropyMap = source.anisotropyMap;
 
 		return this;
 

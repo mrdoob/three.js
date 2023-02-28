@@ -117,4 +117,16 @@ material.roughness = min( material.roughness, 1.0 );
 	#endif
 
 #endif
+
+#ifdef USE_ANISOTROPY
+
+	material.anisotropy = vec2( 1.0 ) * anisotropyStrength;
+
+	#ifdef USE_ANISOTROPYMAP
+
+		material.anisotropy *= texture2D( anisotropyMap, vUv ).rg;
+
+	#endif
+
+#endif
 `;

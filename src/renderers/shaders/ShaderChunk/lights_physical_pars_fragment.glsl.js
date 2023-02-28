@@ -38,6 +38,10 @@ struct PhysicalMaterial {
 		vec3 attenuationColor;
 	#endif
 
+	#ifdef USE_ANISOTROPY
+		vec2 anisotropy;
+	#endif
+
 };
 
 // temporary
