@@ -1,5 +1,5 @@
 import { Material, ShaderMaterial, NoToneMapping } from 'three';
-import { getNodesKeys, getCacheKey } from '../core/NodeUtils.js';
+import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { materialNormal } from '../accessors/ExtendedMaterialNode.js';
@@ -322,13 +322,13 @@ class NodeMaterial extends ShaderMaterial {
 		}
 
 		const data = Material.prototype.toJSON.call( this, meta );
-		const nodeKeys = getNodesKeys( this );
+		const nodeChildren = getNodeChildren( this );
 
 		data.inputNodes = {};
 
-		for ( const name of nodeKeys ) {
+		for ( const { prop, childNode } of nodeChildren ) {
 
-			data.inputNodes[ name ] = this[ name ].toJSON( meta ).uuid;
+			data.inputNodes[ prop ] = childNode.toJSON( meta ).uuid;
 
 		}
 
