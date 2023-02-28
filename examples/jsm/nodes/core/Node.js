@@ -1,5 +1,5 @@
 import { NodeUpdateType } from './constants.js';
-import { getNodesKeys, getCacheKey } from './NodeUtils.js';
+import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { MathUtils } from 'three';
 
 const NodeClasses = new Map();
@@ -36,42 +36,19 @@ class Node {
 
 	* getChildren() {
 
-		for ( const property in this ) {
+		const self = this;
 
-			const object = this[ property ];
+		for ( const { prop, childNode } of getNodeChildren( this ) ) {
 
-			if ( Array.isArray( object ) === true ) {
+			if ( prop.includes( '/' ) ) {
 
-				for ( let i = 0; i < object.length; i++ ) {
+				const prop1 = prop.slice( 0, prop.indexOf( '/' ) );
+				const prop2 = prop.slice( prop.indexOf( '/' ) + 1 );
+				yield { childNode, replaceNode( node ) { self[ prop1 ][ prop2 ] = node; } };
 
-					const child = object[ i ];
+			} else {
 
-					if ( child && child.isNode === true ) {
-
-						yield { childNode: child, replaceNode( node ) { object[ i ] = node; } };
-
-					}
-
-				}
-
-			} else if ( object && object.isNode === true ) {
-
-				const self = this;
-				yield { childNode: object, replaceNode( node ) { self[ property ] = node; } };
-
-			} else if ( typeof object === 'object' ) {
-
-				for ( const property in object ) {
-
-					const child = object[ property ];
-
-					if ( child && child.isNode === true ) {
-
-						yield { childNode: child, replaceNode( node ) { object[ property ] = node; } };
-
-					}
-
-				}
+				yield { childNode, replaceNode( node ) { self[ prop ] = node; } };
 
 			}
 
