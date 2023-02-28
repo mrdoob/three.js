@@ -124,9 +124,9 @@ class STLExporter {
 
 			if ( object.isSkinnedMesh === true ) {
 
-				object.boneTransform( a, vA );
-				object.boneTransform( b, vB );
-				object.boneTransform( c, vC );
+				object.applyBoneTransform( a, vA );
+				object.applyBoneTransform( b, vB );
+				object.applyBoneTransform( c, vC );
 
 			}
 

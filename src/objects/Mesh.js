@@ -141,7 +141,7 @@ class Mesh extends Object3D {
 
 		if ( this.isSkinnedMesh ) {
 
-			this.boneTransform( index, target );
+			this.applyBoneTransform( index, target );
 
 		}
 
