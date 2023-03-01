@@ -293,6 +293,20 @@ class Node {
 
 					this[ property ] = inputArray;
 
+				} else if ( typeof json.inputNodes[ property ] === 'object' ) {
+
+					const inputObject = {};
+
+					for ( const subProperty in json.inputNodes[ property ] ) {
+
+						const uuid = json.inputNodes[ property ][ subProperty ];
+					
+						inputObject[ subProperty ] = nodes[ uuid ];
+					
+					}
+
+					this[ property ] = inputObject;
+
 				} else {
 
 					const uuid = json.inputNodes[ property ];
