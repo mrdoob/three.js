@@ -242,31 +242,34 @@ class Node {
 
 	serialize( json ) {
 
-		const nodeKeys = getNodesKeys( this );
+		const nodeChildren = getNodeChildren( this );
 
-		if ( nodeKeys.length > 0 ) {
+		const inputNodes = {};
 
-			const inputNodes = {};
+		for ( const { prop, childNode } of nodeChildren ) {
 
-			for ( const property of nodeKeys ) {
+			if ( prop.includes( '/' ) ) {
 
-				if ( Array.isArray( this[ property ] ) ) {
+				const prop1 = prop.slice( 0, prop.indexOf( '/' ) );
+				const prop2 = prop.slice( prop.indexOf( '/' ) + 1 );
 
-					inputNodes[ property ] = [];
+				if ( inputNodes[ prop1 ] === undefined ) {
 
-					for ( const node of this[ property ] ) {
-
-						inputNodes[ property ].push( node.toJSON( json.meta ).uuid );
-
-					}
-
-				} else {
-
-					inputNodes[ property ] = this[ property ].toJSON( json.meta ).uuid;
+					inputNodes[ prop1 ] = prop2 === '0' ? [] : {};
 
 				}
 
+				inputNodes[ prop1 ][ prop2 ] = childNode.toJSON( json.meta ).uuid );
+
+			} else {
+
+				inputNodes[ prop ] = childNode.toJSON( json.meta ).uuid;
+
 			}
+
+		}
+
+		if ( Object.keys( inputNodes ).length > 0 ) {
 
 			json.inputNodes = inputNodes;
 
