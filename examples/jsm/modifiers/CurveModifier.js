@@ -270,6 +270,7 @@ export class InstancedFlow extends Flow {
 			count
 		);
 		mesh.instanceMatrix.setUsage( DynamicDrawUsage );
+		mesh.frustumCulled = false;
 		super( mesh, curveCount );
 
 		this.offsets = new Array( count ).fill( 0 );
@@ -292,7 +293,6 @@ export class InstancedFlow extends Flow {
 		);
 		this.object3D.setMatrixAt( index, matrix );
 		this.object3D.instanceMatrix.needsUpdate = true;
-		this.object3D.computeBoundingSphere();
 
 	}
 
