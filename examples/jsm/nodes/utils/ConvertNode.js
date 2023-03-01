@@ -1,4 +1,4 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 
 class ConvertNode extends Node {
 
@@ -45,5 +45,3 @@ class ConvertNode extends Node {
 }
 
 export default ConvertNode;
-
-addNodeClass( ConvertNode );

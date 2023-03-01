@@ -1,10 +1,10 @@
-import { lights } from 'three/nodes';
+import { LightsNode } from 'three/nodes';
 
 class WebGPURenderState {
 
 	constructor() {
 
-		this.lightsNode = lights( [] );
+		this.lightsNode = new LightsNode();
 
 		this.lightsArray = [];
 

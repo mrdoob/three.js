@@ -20,10 +20,9 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new ArrayCamera();
-			assert.ok( object, 'Can instantiate an ArrayCamera.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

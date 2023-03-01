@@ -22,13 +22,32 @@ class Box3 {
 
 	setFromArray( array ) {
 
-		this.makeEmpty();
+		let minX = + Infinity;
+		let minY = + Infinity;
+		let minZ = + Infinity;
 
-		for ( let i = 0, il = array.length; i < il; i += 3 ) {
+		let maxX = - Infinity;
+		let maxY = - Infinity;
+		let maxZ = - Infinity;
 
-			this.expandByPoint( _vector.fromArray( array, i ) );
+		for ( let i = 0, l = array.length; i < l; i += 3 ) {
+
+			const x = array[ i ];
+			const y = array[ i + 1 ];
+			const z = array[ i + 2 ];
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+			if ( z < minZ ) minZ = z;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+			if ( z > maxZ ) maxZ = z;
 
 		}
+
+		this.min.set( minX, minY, minZ );
+		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
@@ -36,13 +55,32 @@ class Box3 {
 
 	setFromBufferAttribute( attribute ) {
 
-		this.makeEmpty();
+		let minX = + Infinity;
+		let minY = + Infinity;
+		let minZ = + Infinity;
 
-		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
+		let maxX = - Infinity;
+		let maxY = - Infinity;
+		let maxZ = - Infinity;
 
-			this.expandByPoint( _vector.fromBufferAttribute( attribute, i ) );
+		for ( let i = 0, l = attribute.count; i < l; i ++ ) {
+
+			const x = attribute.getX( i );
+			const y = attribute.getY( i );
+			const z = attribute.getZ( i );
+
+			if ( x < minX ) minX = x;
+			if ( y < minY ) minY = y;
+			if ( z < minZ ) minZ = z;
+
+			if ( x > maxX ) maxX = x;
+			if ( y > maxY ) maxY = y;
+			if ( z > maxZ ) maxZ = z;
 
 		}
+
+		this.min.set( minX, minY, minZ );
+		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
@@ -163,7 +201,7 @@ class Box3 {
 
 		if ( geometry !== undefined ) {
 
-			if ( precise && geometry.attributes !== undefined && geometry.attributes.position !== undefined ) {
+			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
 
 				const position = geometry.attributes.position;
 				for ( let i = 0, l = position.count; i < l; i ++ ) {
@@ -358,7 +396,9 @@ class Box3 {
 
 	distanceToPoint( point ) {
 
-		return this.clampPoint( point, _vector ).distanceTo( point );
+		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
+
+		return clampedPoint.sub( point ).length();
 
 	}
 

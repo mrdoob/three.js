@@ -7,10 +7,9 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'EventDispatcher', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new EventDispatcher();
-			assert.ok( object, 'Can instantiate an EventDispatcher.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

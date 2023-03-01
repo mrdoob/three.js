@@ -1,8 +1,7 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { addLightNode } from './LightsNode.js';
+import LightsNode from './LightsNode.js';
 import getDirectionVector from '../functions/light/getDirectionVector.js';
-import { uniform } from '../core/UniformNode.js';
-import { addNodeClass } from '../core/Node.js';
+import { uniform } from '../shadernode/ShaderNodeElements.js';
 
 import { Vector3, DirectionalLight } from 'three';
 
@@ -46,8 +45,6 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 }
 
+LightsNode.setReference( DirectionalLight, DirectionalLightNode );
+
 export default DirectionalLightNode;
-
-addLightNode( DirectionalLight, DirectionalLightNode );
-
-addNodeClass( DirectionalLightNode );

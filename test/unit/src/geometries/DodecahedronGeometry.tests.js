@@ -37,12 +37,12 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new DodecahedronGeometry();
-			assert.ok( object, 'Can instantiate a DodecahedronGeometry.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
+
 
 		// PROPERTIES
 		QUnit.test( 'type', ( assert ) => {

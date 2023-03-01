@@ -170,7 +170,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
-				return pt.clone().addScaledVector( vec, size );
+				return vec.clone().multiplyScalar( size ).add( pt );
 
 			}
 
@@ -674,16 +674,6 @@ class ExtrudeGeometry extends BufferGeometry {
 			}
 
 		}
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.parameters = Object.assign( {}, source.parameters );
-
-		return this;
 
 	}
 

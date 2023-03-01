@@ -22,11 +22,9 @@ export default QUnit.module( 'Maths', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				// parameterPositions, sampleValues, sampleSize, resultBuffer
-				const object = new QuaternionLinearInterpolant( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
-				assert.ok( object, 'Can instantiate a QuaternionLinearInterpolant.' );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

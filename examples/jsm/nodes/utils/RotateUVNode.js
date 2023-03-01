@@ -1,10 +1,9 @@
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy, vec2 } from '../shadernode/ShaderNode.js';
+import { vec2, add, sub, mul, cos, sin } from '../shadernode/ShaderNodeBaseElements.js';
 
 class RotateUVNode extends TempNode {
 
-	constructor( uvNode, rotationNode, centerNode = vec2( 0.5 ) ) {
+	constructor( uvNode, rotationNode, centerNode = vec2( .5 ) ) {
 
 		super( 'vec2' );
 
@@ -18,26 +17,16 @@ class RotateUVNode extends TempNode {
 
 		const { uvNode, rotationNode, centerNode } = this;
 
-		const cosAngle = rotationNode.cos();
-		const sinAngle = rotationNode.sin();
+		const cosAngle = cos( rotationNode );
+		const sinAngle = sin( rotationNode );
 
-		const vector = uvNode.sub( centerNode );
-
-		const rotatedVector = vec2( // @TODO: Maybe we can create mat2 and write something like rotationMatrix.mul( vector )?
-			vec2( cosAngle, sinAngle ).dot( vector ),
-			vec2( sinAngle.negate(), cosAngle ).dot( vector )
+		return vec2(
+			add( add( mul( cosAngle, sub( uvNode.x, centerNode.x ) ), mul( sinAngle, sub( uvNode.y, centerNode.y ) ) ), centerNode.x ),
+			add( sub( mul( cosAngle, sub( uvNode.y, centerNode.y ) ), mul( sinAngle, sub( uvNode.x, centerNode.x ) ) ), centerNode.y )
 		);
-
-		return rotatedVector.add( centerNode );
 
 	}
 
 }
 
 export default RotateUVNode;
-
-export const rotateUV = nodeProxy( RotateUVNode );
-
-addNodeElement( 'rotateUV', rotateUV );
-
-addNodeClass( RotateUVNode );

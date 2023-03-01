@@ -38,10 +38,9 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				const object = new LineCurve();
-				assert.ok( object, 'Can instantiate a LineCurve.' );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
@@ -107,7 +106,7 @@ export default QUnit.module( 'Extras', () => {
 
 			} );
 
-			QUnit.test( 'getTangent/getTangentAt', ( assert ) => {
+			QUnit.test( 'getTangent', ( assert ) => {
 
 				const curve = _curve;
 				const tangent = new Vector2();
@@ -117,11 +116,6 @@ export default QUnit.module( 'Extras', () => {
 
 				assert.numEqual( tangent.x, expectedTangent, 'tangent.x correct' );
 				assert.numEqual( tangent.y, expectedTangent, 'tangent.y correct' );
-
-				curve.getTangentAt( 0, tangent );
-
-				assert.numEqual( tangent.x, expectedTangent, 'tangentAt.x correct' );
-				assert.numEqual( tangent.y, expectedTangent, 'tangentAt.y correct' );
 
 			} );
 

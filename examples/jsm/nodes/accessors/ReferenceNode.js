@@ -1,8 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
+import UniformNode from '../core/UniformNode.js';
+import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
-import { texture } from './TextureNode.js';
-import { nodeObject, getConstNodeType } from '../shadernode/ShaderNode.js';
 
 class ReferenceNode extends Node {
 
@@ -30,11 +29,11 @@ class ReferenceNode extends Node {
 
 		if ( uniformType === 'texture' ) {
 
-			node = texture( null );
+			node = new TextureNode( null );
 
 		} else {
 
-			node = uniform( uniformType );
+			node = new UniformNode( null, uniformType );
 
 		}
 
@@ -66,7 +65,3 @@ class ReferenceNode extends Node {
 }
 
 export default ReferenceNode;
-
-export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object ) );
-
-addNodeClass( ReferenceNode );

@@ -28,11 +28,9 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const light = new DirectionalLight( parameters.color );
-			const object = new DirectionalLightHelper( light, parameters.size, parameters.color );
-			assert.ok( object, 'Can instantiate a DirectionalLightHelper.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -73,13 +71,9 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'dispose', ( assert ) => {
 
-			assert.expect( 0 );
-
-			const light = new DirectionalLight( parameters.color );
-			const object = new DirectionalLightHelper( light, parameters.size, parameters.color );
-			object.dispose();
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

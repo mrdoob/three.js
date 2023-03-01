@@ -1,36 +1,35 @@
-import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { ShaderNode, nodeObject, float, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import TempNode from '../core/Node.js';
+import { ShaderNode, vec3, mat3, float, clamp, max, pow } from '../shadernode/ShaderNodeBaseElements.js';
 
 import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping } from 'three';
 
 // exposure only
-const LinearToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
+export const LinearToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 
 	return color.mul( exposure );
 
 } );
 
 // source: https://www.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf
-const ReinhardToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
+export const ReinhardToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 
 	color = color.mul( exposure );
 
-	return color.div( color.add( 1.0 ) ).clamp();
+	return clamp( color.div( vec3( 1.0 ).add( color ) ) );
 
 } );
 
 // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
-const OptimizedCineonToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
+export const OptimizedCineonToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 
 	// optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
 	color = color.mul( exposure );
-	color = color.sub( 0.004 ).max( 0.0 );
+	color = max( vec3( 0.0 ), color.sub( 0.004 ) );
 
 	const a = color.mul( color.mul( 6.2 ).add( 0.5 ) );
 	const b = color.mul( color.mul( 6.2 ).add( 1.7 ) ).add( 0.06 );
 
-	return a.div( b ).pow( 2.2 );
+	return pow( a.div( b ), vec3( 2.2 ) );
 
 } );
 
@@ -71,7 +70,7 @@ const ACESFilmicToneMappingNode = new ShaderNode( ( { color, exposure } ) => {
 	color = ACESOutputMat.mul( color );
 
 	// Clamp to [0, 1]
-	return color.clamp();
+	return clamp( color );
 
 } );
 
@@ -126,7 +125,3 @@ class ToneMappingNode extends TempNode {
 }
 
 export default ToneMappingNode;
-
-export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
-
-addNodeClass( ToneMappingNode );

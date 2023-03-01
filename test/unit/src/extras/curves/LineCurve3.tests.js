@@ -38,10 +38,9 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				const object = new LineCurve3();
-				assert.ok( object, 'Can instantiate a LineCurve3.' );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

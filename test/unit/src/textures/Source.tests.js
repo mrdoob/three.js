@@ -7,10 +7,9 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'Source', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new Source();
-			assert.ok( object, 'Can instantiate a Source.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

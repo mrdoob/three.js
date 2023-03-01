@@ -31,7 +31,12 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ShaderNode, uniform, storage, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
+
+			import {
+				ShaderNode, compute,
+				uniform, element, storage, instanceIndex,
+				float, add, sub, div, mul, texture, viewportTopLeft, color
+			} from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -143,26 +148,26 @@
 
 					// pitch
 
-					const time = index.mul( pitch );
+					const time = mul( index, pitch );
 
-					let wave = waveNode.element( time );
+					let wave = element( waveNode, time );
 
 
 					// delay
 
 					for ( let i = 1; i < 7; i ++ ) {
 
-						const waveOffset = waveNode.element( index.sub( delayOffset.mul( sampleRate ).mul( i ) ).mul( pitch ) );
-						const waveOffsetVolume = waveOffset.mul( delayVolume.div( i * i ) );
+						const waveOffset = element( waveNode, mul( sub( index, mul( mul( delayOffset, sampleRate ), i ) ), pitch ) );
+						const waveOffsetVolume = mul( waveOffset, div( delayVolume, i * i ) );
 
-						wave = wave.add( waveOffsetVolume );
+						wave = add( wave, waveOffsetVolume );
 
 					}
 
 
 					// store
 
-					const waveStorageElementNode = waveStorageNode.element( instanceIndex );
+					const waveStorageElementNode = element( waveStorageNode, instanceIndex );
 
 					stack.assign( waveStorageElementNode, wave );
 
@@ -171,7 +176,7 @@
 
 				// compute
 
-				computeNode = computeShaderNode.compute( waveBuffer.length );
+				computeNode = compute( computeShaderNode, waveBuffer.length );
 
 
 				// gui
@@ -195,8 +200,8 @@
 
 				analyserTexture = new THREE.DataTexture( analyserBuffer, analyserBuffer.length, 1, THREE.RedFormat );
 
-				const spectrum = texture( analyserTexture, viewportTopLeft.x ).x.mul( viewportTopLeft.y );
-				const backgroundNode = color( 0x0000FF ).mul( spectrum );
+				const spectrum = mul( texture( analyserTexture, viewportTopLeft.x ).x, viewportTopLeft.y );
+				const backgroundNode = mul( color( 0x0000FF ), spectrum );
 
 
 				// scene

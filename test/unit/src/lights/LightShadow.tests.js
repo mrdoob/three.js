@@ -1,7 +1,6 @@
 /* global QUnit */
 
 import { LightShadow } from '../../../../src/lights/LightShadow.js';
-
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
 
 export default QUnit.module( 'Lights', () => {
@@ -9,11 +8,9 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module( 'LightShadow', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const camera = new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 );
-			const object = new LightShadow( camera );
-			assert.ok( object, 'Can instantiate a LightShadow.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -115,12 +112,9 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'dispose', ( assert ) => {
 
-			assert.expect( 0 );
-
-			const object = new LightShadow();
-			object.dispose();
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

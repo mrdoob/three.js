@@ -1,8 +1,8 @@
-import { ShaderNode } from '../../shadernode/ShaderNode.js';
+import { ShaderNode, mul } from '../../shadernode/ShaderNodeBaseElements.js';
 
 const BRDF_Lambert = new ShaderNode( ( inputs ) => {
 
-	return inputs.diffuseColor.mul( 1 / Math.PI ); // punctual light
+	return mul( 1 / Math.PI, inputs.diffuseColor ); // punctual light
 
 } ); // validated
 

@@ -1073,6 +1073,10 @@ class BufferGeometry extends EventDispatcher {
 
 		this.userData = source.userData;
 
+		// geometry generator parameters
+
+		if ( source.parameters !== undefined ) this.parameters = Object.assign( {}, source.parameters );
+
 		return this;
 
 	}

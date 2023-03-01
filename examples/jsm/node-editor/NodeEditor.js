@@ -33,7 +33,6 @@ import { PointsEditor } from './scene/PointsEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
 import { FileEditor } from './core/FileEditor.js';
 import { FileURLEditor } from './core/FileURLEditor.js';
-import { exportJSON } from './NodeEditorUtils.js';
 import { EventDispatcher } from 'three';
 
 Styles.icons.unlink = 'ti ti-unlink';
@@ -541,7 +540,14 @@ export class NodeEditor extends EventDispatcher {
 
 		saveButton.onClick( () => {
 
-			exportJSON( this.canvas.toJSON(), 'node_editor' );
+			const json = JSON.stringify( this.canvas.toJSON() );
+
+			const a = document.createElement( 'a' );
+			const file = new Blob( [ json ], { type: 'text/plain' } );
+
+			a.href = URL.createObjectURL( file );
+			a.download = 'node_editor.json';
+			a.click();
 
 		} );
 
@@ -857,14 +863,10 @@ export class NodeEditor extends EventDispatcher {
 
 			} else if ( key === 'Enter' ) {
 
-				if ( nodeButtonsVisible[ nodeButtonsIndex ] !== undefined ) {
+				nodeButtonsVisible[ nodeButtonsIndex ].dom.click();
 
-					nodeButtonsVisible[ nodeButtonsIndex ].dom.click();
-
-					e.preventDefault();
-					e.stopImmediatePropagation();
-
-				}
+				e.preventDefault();
+				e.stopImmediatePropagation();
 
 			}
 
@@ -909,11 +911,7 @@ export class NodeEditor extends EventDispatcher {
 
 			}
 
-			if ( nodeButtonsVisible[ nodeButtonsIndex ] !== undefined ) {
-
-				nodeButtonsVisible[ nodeButtonsIndex ].setSelected( true );
-
-			}
+			nodeButtonsVisible[ nodeButtonsIndex ].setSelected( true );
 
 		} );
 

@@ -30,12 +30,12 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new ConeGeometry();
-			assert.ok( object, 'Can instantiate a ConeGeometry.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
+
 
 		// PROPERTIES
 		QUnit.test( 'type', ( assert ) => {

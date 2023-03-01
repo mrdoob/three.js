@@ -1,9 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
-import { nodeImmutable, vec2 } from '../shadernode/ShaderNode.js';
-
+import Node from '../core/Node.js';
+import { uniform, div, vec2, invert } from '../shadernode/ShaderNodeBaseElements.js';
 import { Vector2 } from 'three';
+import { NodeUpdateType } from '../core/constants.js';
 
 let resolution;
 
@@ -64,15 +62,15 @@ class ViewportNode extends Node {
 			const coordinateNode = vec2( new ViewportNode( ViewportNode.COORDINATE ) );
 			const resolutionNode = new ViewportNode( ViewportNode.RESOLUTION );
 
-			output = coordinateNode.div( resolutionNode );
+			output = div( coordinateNode, resolutionNode );
 
 			let outX = output.x;
 			let outY = output.y;
 
-			if ( /top/i.test( scope ) && builder.isFlipY() ) outY = outY.invert();
-			else if ( /bottom/i.test( scope ) && builder.isFlipY() === false ) outY = outY.invert();
+			if ( /top/i.test( scope ) && builder.isFlipY() ) outY = invert( outY );
+			else if ( /bottom/i.test( scope ) && builder.isFlipY() === false ) outY = invert( outY );
 
-			if ( /right/i.test( scope ) ) outX = outX.invert();
+			if ( /right/i.test( scope ) ) outX = invert( outX );
 
 			output = vec2( outX, outY );
 
@@ -104,12 +102,3 @@ ViewportNode.TOP_RIGHT = 'topRight';
 ViewportNode.BOTTOM_RIGHT = 'bottomRight';
 
 export default ViewportNode;
-
-export const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
-export const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
-export const viewportTopLeft = nodeImmutable( ViewportNode, ViewportNode.TOP_LEFT );
-export const viewportBottomLeft = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_LEFT );
-export const viewportTopRight = nodeImmutable( ViewportNode, ViewportNode.TOP_RIGHT );
-export const viewportBottomRight = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_RIGHT );
-
-addNodeClass( ViewportNode );

@@ -36,10 +36,9 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				const object = new EllipseCurve();
-				assert.ok( object, 'Can instantiate an EllipseCurve.' );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

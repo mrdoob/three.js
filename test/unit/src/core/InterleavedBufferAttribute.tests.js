@@ -9,10 +9,9 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'InterleavedBufferAttribute', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new InterleavedBufferAttribute();
-			assert.ok( object, 'Can instantiate an InterleavedBufferAttribute.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

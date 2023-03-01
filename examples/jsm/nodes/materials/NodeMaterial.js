@@ -1,25 +1,17 @@
 import { Material, ShaderMaterial, NoToneMapping } from 'three';
-import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
-import { attribute } from '../core/AttributeNode.js';
-import { diffuseColor } from '../core/PropertyNode.js';
-import { materialNormal } from '../accessors/ExtendedMaterialNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive } from '../accessors/MaterialNode.js';
-import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
-import { transformedNormalView } from '../accessors/NormalNode.js';
-import { instance } from '../accessors/InstanceNode.js';
-import { positionLocal } from '../accessors/PositionNode.js';
-import { reference } from '../accessors/ReferenceNode.js';
-import { skinning } from '../accessors/SkinningNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { toneMapping } from '../display/ToneMappingNode.js';
-import { rangeFog } from '../fog/FogRangeNode.js';
-import { densityFog } from '../fog/FogExp2Node.js';
-import { lightsWithoutWrap } from '../lighting/LightsNode.js';
-import AONode from '../lighting/AONode.js';
+import { getNodesKeys, getCacheKey } from '../core/NodeUtils.js';
+import StackNode from '../core/StackNode.js';
+import LightsNode from '../lighting/LightsNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
-
-const NodeMaterials = new Map();
+import ToneMappingNode from '../display/ToneMappingNode.js';
+import AONode from '../lighting/AONode.js';
+import {
+	float, vec3, vec4,
+	assign, mul, bypass, attribute, context, texture, lessThanEqual, discard,
+	positionLocal, diffuseColor, skinning, instance, modelViewProjection, lightingContext, colorSpace,
+	materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, transformedNormalView,
+	reference, rangeFog, densityFog
+} from '../shadernode/ShaderNodeElements.js';
 
 class NodeMaterial extends ShaderMaterial {
 
@@ -54,8 +46,8 @@ class NodeMaterial extends ShaderMaterial {
 
 		// < STACKS >
 
-		const vertexStack = builder.createStack();
-		const fragmentStack = builder.createStack();
+		const vertexStack = new StackNode();
+		const fragmentStack = new StackNode();
 
 		// < VERTEX STAGE >
 
@@ -87,19 +79,19 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( this.positionNode !== null ) {
 
-			vertex = vertex.bypass( positionLocal.assign( this.positionNode ) );
+			vertex = bypass( vertex, assign( positionLocal, this.positionNode ) );
 
 		}
 
 		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
 
-			vertex = vertex.bypass( instance( object ) );
+			vertex = bypass( vertex, instance( object ) );
 
 		}
 
 		if ( object.isSkinnedMesh === true ) {
 
-			vertex = vertex.bypass( skinning( object ) );
+			vertex = bypass( vertex, skinning( object ) );
 
 		}
 
@@ -111,13 +103,14 @@ class NodeMaterial extends ShaderMaterial {
 
 	constructDiffuseColor( builder, stack ) {
 
-		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
+		let colorNode = vec4( this.colorNode || materialColor );
+		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
 		// VERTEX COLORS
 
 		if ( this.vertexColors === true && builder.geometry.hasAttribute( 'color' ) ) {
 
-			colorNode = vec4( colorNode.xyz.mul( attribute( 'color' ) ), colorNode.a );
+			colorNode = vec4( mul( colorNode.xyz, attribute( 'color' ) ), colorNode.a );
 
 		}
 
@@ -127,7 +120,6 @@ class NodeMaterial extends ShaderMaterial {
 
 		// OPACITY
 
-		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 		stack.assign( diffuseColor.a, diffuseColor.a.mul( opacityNode ) );
 
 		// ALPHA TEST
@@ -136,7 +128,7 @@ class NodeMaterial extends ShaderMaterial {
 
 			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
 
-			stack.add( diffuseColor.a.lessThanEqual( alphaTestNode ).discard() );
+			stack.add( discard( lessThanEqual( diffuseColor.a, alphaTestNode ) ) );
 
 		}
 
@@ -181,7 +173,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( materialLightsNode.length > 0 ) {
 
-			lightsNode = lightsWithoutWrap( [ ...lightsNode.lightNodes, ...materialLightsNode ] );
+			lightsNode = new LightsNode( [ ...lightsNode.lightNodes, ...materialLightsNode ] );
 
 		}
 
@@ -201,16 +193,16 @@ class NodeMaterial extends ShaderMaterial {
 
 		// OUTGOING LIGHT
 
-		const lights = this.lights === true || this.lightsNode !== null;
+		const lights = ( this.lights === true ) || this.lightsNode !== null;
 
 		const lightsNode = lights ? this.constructLights( builder ) : null;
 		const lightingModelNode = lightsNode ? this.constructLightingModel( builder ) : null;
 
-		let outgoingLightNode = diffuseColor.rgb;
+		let outgoingLightNode = diffuseColor.xyz;
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
 
-			outgoingLightNode = lightsNode.lightingContext( lightingModelNode );
+			outgoingLightNode = lightingContext( lightsNode, lightingModelNode );
 
 		}
 
@@ -218,7 +210,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( ( this.emissiveNode && this.emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
-			outgoingLightNode = outgoingLightNode.add( this.emissiveNode ? vec3( this.emissiveNode ) : materialEmissive );
+			outgoingLightNode = outgoingLightNode.add( vec3( this.emissiveNode || materialEmissive ) );
 
 		}
 
@@ -236,13 +228,13 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( ! toneMappingNode && renderer.toneMapping !== NoToneMapping ) {
 
-			toneMappingNode = toneMapping( renderer.toneMapping, reference( 'toneMappingExposure', 'float', renderer ), outgoingLight );
+			toneMappingNode = new ToneMappingNode( renderer.toneMapping, reference( 'toneMappingExposure', 'float', renderer ), outgoingLight );
 
 		}
 
 		if ( toneMappingNode && toneMappingNode.isNode === true ) {
 
-			outgoingLight = toneMappingNode.context( { color: outgoingLight } );
+			outgoingLight = context( toneMappingNode, { color: outgoingLight } );
 
 		}
 
@@ -252,7 +244,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// ENCODING
 
-		outputNode = outputNode.colorSpace( renderer.outputEncoding );
+		outputNode = colorSpace( outputNode, renderer.outputEncoding );
 
 		// FOG
 
@@ -278,7 +270,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb ), outputNode.a );
+		if ( fogNode ) outputNode = vec4( vec3( fogNode.mix( outputNode ) ), outputNode.w );
 
 		return outputNode;
 
@@ -322,13 +314,13 @@ class NodeMaterial extends ShaderMaterial {
 		}
 
 		const data = Material.prototype.toJSON.call( this, meta );
-		const nodeChildren = getNodeChildren( this );
+		const nodeKeys = getNodesKeys( this );
 
 		data.inputNodes = {};
 
-		for ( const { prop, childNode } of nodeChildren ) {
+		for ( const name of nodeKeys ) {
 
-			data.inputNodes[ prop ] = childNode.toJSON( meta ).uuid;
+			data.inputNodes[ name ] = this[ name ].toJSON( meta ).uuid;
 
 		}
 
@@ -366,57 +358,8 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	static fromMaterial( material ) {
-
-		const type = material.type.replace( 'Material', 'NodeMaterial' );
-
-		const nodeMaterial = createNodeMaterialFromType( type );
-
-		if ( nodeMaterial === undefined ) {
-
-			if ( material.isNodeMaterial !== true ) {
-
-				throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
-
-			}
-
-			return material; // is already a node material
-
-		}
-
-		for ( const key in material ) {
-
-			nodeMaterial[ key ] = material[ key ];
-
-		}
-
-		return nodeMaterial;
-
-	}
+	static fromMaterial( /*material*/ ) { }
 
 }
 
 export default NodeMaterial;
-
-export function addNodeMaterial( nodeMaterial ) {
-
-	if ( typeof nodeMaterial !== 'function' || ! nodeMaterial.name ) throw new Error( `Node material ${ nodeMaterial.name } is not a class` );
-	if ( NodeMaterials.has( nodeMaterial.name ) ) throw new Error( `Redefinition of node material ${ nodeMaterial.name }` );
-
-	NodeMaterials.set( nodeMaterial.name, nodeMaterial );
-
-}
-
-export function createNodeMaterialFromType( type ) {
-
-	const Material = NodeMaterials.get( type );
-
-	if ( Material !== undefined ) {
-
-		return new Material();
-
-	}
-
-};
-
-addNodeMaterial( NodeMaterial );

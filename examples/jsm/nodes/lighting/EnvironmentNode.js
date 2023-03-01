@@ -1,14 +1,8 @@
 import LightingNode from './LightingNode.js';
-import { cache } from '../core/CacheNode.js';
-import { context } from '../core/ContextNode.js';
-import { roughness } from '../core/PropertyNode.js';
-import { equirectUV } from '../utils/EquirectUVNode.js';
-import { specularMIPLevel } from '../utils/SpecularMIPLevelNode.js';
-import { cameraViewMatrix } from '../accessors/CameraNode.js';
-import { transformedNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
-import { positionViewDirection } from '../accessors/PositionNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { float, vec2 } from '../shadernode/ShaderNode.js';
+import ContextNode from '../core/ContextNode.js';
+import CacheNode from '../core/CacheNode.js';
+import SpecularMIPLevelNode from '../utils/SpecularMIPLevelNode.js';
+import { float, mul, roughness, positionViewDirection, transformedNormalView, transformedNormalWorld, cameraViewMatrix, equirectUV, vec2 } from '../shadernode/ShaderNodeElements.js';
 
 class EnvironmentNode extends LightingNode {
 
@@ -29,7 +23,7 @@ class EnvironmentNode extends LightingNode {
 		let radianceTextureUVNode;
 		let irradianceTextureUVNode;
 
-		const radianceContext = context( envNode, {
+		const radianceContext = new ContextNode( envNode, {
 			getUVNode: ( textureNode ) => {
 
 				let node = null;
@@ -71,12 +65,12 @@ class EnvironmentNode extends LightingNode {
 			},
 			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
 
-				return specularMIPLevel( textureNode, levelNode );
+				return new SpecularMIPLevelNode( textureNode, levelNode );
 
 			}
 		} );
 
-		const irradianceContext = context( envNode, {
+		const irradianceContext = new ContextNode( envNode, {
 			getUVNode: ( textureNode ) => {
 
 				let node = null;
@@ -110,20 +104,20 @@ class EnvironmentNode extends LightingNode {
 			},
 			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
 
-				return specularMIPLevel( textureNode, levelNode );
+				return new SpecularMIPLevelNode( textureNode, levelNode );
 
 			}
 		} );
 
 		//
 
-		const isolateRadianceFlowContext = cache( radianceContext );
+		const isolateRadianceFlowContext = new CacheNode( radianceContext );
 
 		//
 
-		builder.context.radiance.addAssign( isolateRadianceFlowContext );
+		builder.context.radiance.add( isolateRadianceFlowContext );
 
-		builder.context.iblIrradiance.addAssign( irradianceContext.mul( Math.PI ) );
+		builder.context.iblIrradiance.add( mul( Math.PI, irradianceContext ) );
 
 		properties.radianceContext = isolateRadianceFlowContext;
 		properties.irradianceContext = irradianceContext;
@@ -133,5 +127,3 @@ class EnvironmentNode extends LightingNode {
 }
 
 export default EnvironmentNode;
-
-addNodeClass( EnvironmentNode );

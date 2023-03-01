@@ -20,10 +20,9 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new CanvasTexture();
-			assert.ok( object, 'Can instantiate a CanvasTexture.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

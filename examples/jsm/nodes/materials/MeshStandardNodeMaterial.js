@@ -1,16 +1,17 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { diffuseColor, metalness, roughness, specularColor } from '../core/PropertyNode.js';
-import { mix } from '../math/MathNode.js';
-import { materialRoughness, materialMetalness, materialColor } from '../accessors/MaterialNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import {
+	float, vec3, vec4, mix,
+	materialRoughness, materialMetalness, materialColor, diffuseColor,
+	metalness, roughness, specularColor
+} from '../shadernode/ShaderNodeElements.js';
 import getRoughness from '../functions/material/getRoughness.js';
 import physicalLightingModel from '../functions/PhysicalLightingModel.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { MeshStandardMaterial } from 'three';
 
 const defaultValues = new MeshStandardMaterial();
 
-class MeshStandardNodeMaterial extends NodeMaterial {
+export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
@@ -97,7 +98,3 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-export default MeshStandardNodeMaterial;
-
-addNodeMaterial( MeshStandardNodeMaterial );

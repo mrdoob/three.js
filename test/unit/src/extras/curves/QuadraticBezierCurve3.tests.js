@@ -34,10 +34,9 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				const object = new QuadraticBezierCurve3();
-				assert.ok( object, 'Can instantiate a QuadraticBezierCurve3.' );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

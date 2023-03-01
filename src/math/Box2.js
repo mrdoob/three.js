@@ -160,7 +160,8 @@ class Box2 {
 
 	distanceToPoint( point ) {
 
-		return this.clampPoint( point, _vector ).distanceTo( point );
+		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
+		return clampedPoint.sub( point ).length();
 
 	}
 
@@ -168,8 +169,6 @@ class Box2 {
 
 		this.min.max( box.min );
 		this.max.min( box.max );
-
-		if ( this.isEmpty() ) this.makeEmpty();
 
 		return this;
 

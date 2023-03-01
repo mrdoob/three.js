@@ -88,7 +88,6 @@ function Editor() {
 		historyChanged: new Signal(),
 
 		viewportCameraChanged: new Signal(),
-		viewportShadingChanged: new Signal(),
 
 		intersectionsDetected: new Signal(),
 
@@ -123,9 +122,7 @@ function Editor() {
 	this.helpers = {};
 
 	this.cameras = {};
-
 	this.viewportCamera = this.camera;
-	this.viewportShading = 'default';
 
 	this.addCamera( this.camera );
 
@@ -542,13 +539,6 @@ Editor.prototype = {
 
 	},
 
-	setViewportShading: function( value ) {
-
-		this.viewportShading = value;
-		this.signals.viewportShadingChanged.dispatch();
-
-	},
-
 	//
 
 	select: function ( object ) {
@@ -691,7 +681,7 @@ Editor.prototype = {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				shadowType: this.config.getKey( 'project/renderer/shadowType' ),
 				vr: this.config.getKey( 'project/vr' ),
-				useLegacyLights: this.config.getKey( 'project/renderer/useLegacyLights' ),
+				physicallyCorrectLights: this.config.getKey( 'project/renderer/physicallyCorrectLights' ),
 				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
 				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},

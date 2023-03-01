@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { attribute, timerLocal, positionLocal, spritesheetUV, pointUV, vec2, texture, uniform, mix, PointsNodeMaterial } from 'three/nodes';
+			import * as Nodes from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -96,29 +96,31 @@
 
 				// nodes
 
-				const targetPosition = attribute( 'targetPosition', 'vec3' );
-				const particleSpeed = attribute( 'particleSpeed', 'float' );
-				const particleIntensity = attribute( 'particleIntensity', 'float' );
-				const particleSize = attribute( 'particleSize', 'float' );
+				const targetPosition = new Nodes.AttributeNode( 'targetPosition', 'vec3' );
+				const particleSpeed = new Nodes.AttributeNode( 'particleSpeed', 'float' );
+				const particleIntensity = new Nodes.AttributeNode( 'particleIntensity', 'float' );
+				const particleSize = new Nodes.AttributeNode( 'particleSize', 'float' );
 
-				const time = timerLocal();
+				const time = new Nodes.TimerNode();
 
-				const fireUV = spritesheetUV(
-					vec2( 6, 6 ), // count
-					pointUV, // uv
-					time.mul( particleSpeed ) // current frame
+				const spriteSheetCount = new Nodes.ConstNode( new THREE.Vector2( 6, 6 ) );
+
+				const fireUV = new Nodes.SpriteSheetUVNode(
+					spriteSheetCount, // count
+					new Nodes.PointUVNode(), // uv
+					new Nodes.OperatorNode( '*', time, particleSpeed ) // current frame
 				);
 
-				const fireSprite = texture( fireMap, fireUV );
-				const fire = fireSprite.mul( particleIntensity );
+				const fireSprite = new Nodes.TextureNode( fireMap, fireUV );
+				const fire = new Nodes.OperatorNode( '*', fireSprite, particleIntensity );
 
-				const lerpPosition = uniform( 0 );
+				const lerpPosition = new Nodes.UniformNode( 0 );
 
-				const positionNode = mix( positionLocal, targetPosition, lerpPosition );
+				const positionNode = new Nodes.MathNode( Nodes.MathNode.MIX, new Nodes.PositionNode( Nodes.PositionNode.LOCAL ), targetPosition, lerpPosition );
 
 				// material
 
-				const material = new PointsNodeMaterial( {
+				const material = new Nodes.PointsNodeMaterial( {
 					depthWrite: false,
 					transparent: true,
 					sizeAttenuation: true,

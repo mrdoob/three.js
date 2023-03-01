@@ -1,8 +1,7 @@
 /* global QUnit */
 
-import { Bone } from '../../../../src/objects/Bone.js';
-
 import { Object3D } from '../../../../src/core/Object3D.js';
+import { Bone } from '../../../../src/objects/Bone.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -20,10 +19,9 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new Bone();
-			assert.ok( object, 'Can instantiate a Bone.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

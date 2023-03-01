@@ -38,7 +38,7 @@ class Ray {
 
 	at( t, target ) {
 
-		return target.copy( this.origin ).addScaledVector( this.direction, t );
+		return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
 	}
 
@@ -70,7 +70,7 @@ class Ray {
 
 		}
 
-		return target.copy( this.origin ).addScaledVector( this.direction, directionDistance );
+		return target.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 	}
 
@@ -92,7 +92,7 @@ class Ray {
 
 		}
 
-		_vector.copy( this.origin ).addScaledVector( this.direction, directionDistance );
+		_vector.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 		return _vector.distanceToSquared( point );
 
@@ -203,13 +203,13 @@ class Ray {
 
 		if ( optionalPointOnRay ) {
 
-			optionalPointOnRay.copy( this.origin ).addScaledVector( this.direction, s0 );
+			optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
 
 		}
 
 		if ( optionalPointOnSegment ) {
 
-			optionalPointOnSegment.copy( _segCenter ).addScaledVector( _segDir, s1 );
+			optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
 
 		}
 

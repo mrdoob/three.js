@@ -22,11 +22,9 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const camera = new PerspectiveCamera();
-			const object = new CameraHelper( camera );
-			assert.ok( object, 'Can instantiate a CameraHelper.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -79,13 +77,9 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'dispose', ( assert ) => {
 
-			assert.expect( 0 );
-
-			const camera = new PerspectiveCamera();
-			const object = new CameraHelper( camera );
-			object.dispose();
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

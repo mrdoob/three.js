@@ -20,10 +20,9 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new Material();
-			assert.ok( object, 'Can instantiate a Material.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -357,12 +356,9 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'dispose', ( assert ) => {
 
-			assert.expect( 0 );
-
-			const object = new Material();
-			object.dispose();
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

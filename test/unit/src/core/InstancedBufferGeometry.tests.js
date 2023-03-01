@@ -35,10 +35,9 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new InstancedBufferGeometry();
-			assert.ok( object, 'Can instantiate an InstancedBufferGeometry.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

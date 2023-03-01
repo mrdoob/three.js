@@ -6,11 +6,11 @@ function ViewportCamera( editor ) {
 
 	//
 
-	const select = new UISelect();
-	select.setPosition( 'absolute' );
-	select.setRight( '120px' );
-	select.setTop( '10px' );
-	select.onChange( function () {
+	const cameraSelect = new UISelect();
+	cameraSelect.setPosition( 'absolute' );
+	cameraSelect.setRight( '10px' );
+	cameraSelect.setTop( '10px' );
+	cameraSelect.onChange( function () {
 
 		editor.setViewportCamera( this.getValue() );
 
@@ -36,12 +36,12 @@ function ViewportCamera( editor ) {
 
 		}
 
-		select.setOptions( options );
-		select.setValue( editor.viewportCamera.uuid );
+		cameraSelect.setOptions( options );
+		cameraSelect.setValue( editor.viewportCamera.uuid );
 
 	}
 
-	return select;
+	return cameraSelect;
 
 }
 

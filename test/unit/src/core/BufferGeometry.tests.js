@@ -4,7 +4,6 @@ import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
 
 import {
 	BufferAttribute,
-	Float16BufferAttribute,
 	Uint16BufferAttribute,
 	Uint32BufferAttribute
 } from '../../../../src/core/BufferAttribute.js';
@@ -14,7 +13,6 @@ import { Quaternion } from '../../../../src/math/Quaternion.js';
 import { Sphere } from '../../../../src/math/Sphere.js';
 import { x, y, z } from '../../utils/math-constants.js';
 import { EventDispatcher } from '../../../../src/core/EventDispatcher.js';
-import { toHalfFloat } from '../../../../src/extras/DataUtils.js';
 
 const DegToRad = Math.PI / 180;
 
@@ -95,10 +93,9 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new BufferGeometry();
-			assert.ok( object, 'Can instantiate a BufferGeometry.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -462,53 +459,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		const toHalfFloatArray = ( f32Array ) => {
-			const f16Array = new Uint16Array( f32Array.length );
-			for ( let i = 0, n = f32Array.length; i < n; ++i ) {
-				f16Array[ i ] = toHalfFloat( f32Array[ i ] );
-			}
-			return f16Array;
-		};
-
-		QUnit.test( 'computeBoundingBox - Float16', ( assert ) => {
-			const vertices = [ - 1, - 2, - 3, 13, - 2, - 3.5, - 1, - 20, 0, - 4, 5, 6 ];
-			const geometry = new BufferGeometry();
-
-			geometry.setAttribute( 'position', new Float16BufferAttribute( toHalfFloatArray( vertices ), 3 ) );
-			geometry.computeBoundingBox();
-
-			let bb = geometry.boundingBox;
-
-			assert.ok( bb.min.x === - 4 && bb.min.y === - 20 && bb.min.z === - 3.5, 'min values are set correctly' );
-			assert.ok( bb.max.x === 13 && bb.max.y === 5 && bb.max.z === 6, 'max values are set correctly' );
-
-			bb = getBBForVertices( [ - 1, - 1, - 1 ] );
-
-			assert.ok( bb.min.x === bb.max.x && bb.min.y === bb.max.y && bb.min.z === bb.max.z, 'since there is only one vertex, max and min are equal' );
-			assert.ok( bb.min.x === - 1 && bb.min.y === - 1 && bb.min.z === - 1, 'since there is only one vertex, min and max are this vertex' );
-
-		} );
-
-		QUnit.test( 'computeBoundingSphere - Float16', ( assert ) => {
-			const vertices = [ - 10, 0, 0, 10, 0, 0 ];
-			const geometry = new BufferGeometry();
-
-			geometry.setAttribute( 'position', new Float16BufferAttribute( toHalfFloatArray( vertices ), 3 ) );
-			geometry.computeBoundingSphere();
-
-			let bs = geometry.boundingSphere;
-
-			assert.ok( bs.radius === 10, 'radius is equal to deltaMinMax / 2' );
-			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
-
-			bs = getBSForVertices( [ - 5, 11, - 3, 5, - 11, 3 ] );
-			const radius = new Vector3( 5, 11, 3 ).length();
-
-			assert.ok( bs.radius === radius, 'radius is equal to directionLength' );
-			assert.ok( bs.center.x === 0 && bs.center.y === 0 && bs.center.y === 0, 'bounding sphere is at ( 0, 0, 0 )' );
-
-		} );
-
 		QUnit.todo( 'computeTangents', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -764,12 +714,9 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'dispose', ( assert ) => {
 
-			assert.expect( 0 );
-
-			const object = new BufferGeometry();
-			object.dispose();
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

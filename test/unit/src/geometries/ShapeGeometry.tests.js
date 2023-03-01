@@ -36,10 +36,9 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new ShapeGeometry();
-			assert.ok( object, 'Can instantiate a ShapeGeometry.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

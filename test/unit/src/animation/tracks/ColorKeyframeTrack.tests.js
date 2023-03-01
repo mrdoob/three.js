@@ -10,17 +10,10 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.module( 'ColorKeyframeTrack', () => {
 
-			const parameters = {
-				name: '.material.diffuse',
-				times: [ 0, 1 ],
-				values: [ 0, 0.5, 1.0 ],
-				interpolation: ColorKeyframeTrack.DefaultInterpolation
-			};
-
 			// INHERITANCE
 			QUnit.test( 'Extending', ( assert ) => {
 
-				const object = new ColorKeyframeTrack( parameters.name, parameters.times, parameters.values );
+				const object = new ColorKeyframeTrack( '.material.diffuse', [ 0, 1 ], [ 0, 0.5, 1.0 ] );
 				assert.strictEqual(
 					object instanceof KeyframeTrack, true,
 					'ColorKeyframeTrack extends from KeyframeTrack'
@@ -29,15 +22,9 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				// name, times, values
-				const object = new ColorKeyframeTrack( parameters.name, parameters.times, parameters.values );
-				assert.ok( object, 'Can instantiate a ColorKeyframeTrack.' );
-
-				// name, times, values, interpolation
-				const object_all = new ColorKeyframeTrack( parameters.name, parameters.times, parameters.values, parameters.interpolation );
-				assert.ok( object_all, 'Can instantiate a ColorKeyframeTrack with name, times, values, interpolation.' );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

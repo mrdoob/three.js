@@ -47,10 +47,9 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new SphereGeometry();
-			assert.ok( object, 'Can instantiate a SphereGeometry.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

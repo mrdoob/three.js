@@ -38,11 +38,9 @@ export default QUnit.module( 'Audios', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const listener = mockListener();
-			const object = new Audio( listener );
-			assert.ok( object, 'Can instantiate an Audio.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

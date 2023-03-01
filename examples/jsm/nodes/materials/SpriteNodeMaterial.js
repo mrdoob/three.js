@@ -1,12 +1,11 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { uniform } from '../core/UniformNode.js';
-import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { materialRotation } from '../accessors/MaterialNode.js';
-import { modelViewMatrix, modelWorldMatrix } from '../accessors/ModelNode.js';
-import { positionLocal } from '../accessors/PositionNode.js';
-import { vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
-
+import NodeMaterial from './NodeMaterial.js';
 import { SpriteMaterial } from 'three';
+import {
+	vec2, vec3, vec4,
+	uniform, mul,
+	positionLocal, cos, sin,
+	modelViewMatrix, cameraProjectionMatrix, modelWorldMatrix, materialRotation
+} from '../shadernode/ShaderNodeElements.js';
 
 const defaultValues = new SpriteMaterial();
 
@@ -46,9 +45,12 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const vertex = positionLocal;
 
-		let mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
+		let mvPosition = mul( modelViewMatrix, positionNode ? vec4( positionNode.xyz, 1 ) : vec4( 0, 0, 0, 1 ) );
 
-		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
+		let scale = vec2(
+			vec3( modelWorldMatrix[ 0 ].x, modelWorldMatrix[ 0 ].y, modelWorldMatrix[ 0 ].z ).length(),
+			vec3( modelWorldMatrix[ 1 ].x, modelWorldMatrix[ 1 ].y, modelWorldMatrix[ 1 ].z ).length()
+		);
 
 		if ( scaleNode !== null ) {
 
@@ -60,23 +62,20 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		if ( object.center && object.center.isVector2 === true ) {
 
-			alignedPosition = alignedPosition.sub( uniform( object.center ).sub( 0.5 ) );
+			alignedPosition = alignedPosition.sub( uniform( object.center ).sub( vec2( 0.5 ) ) );
 
 		}
 
-		alignedPosition = alignedPosition.mul( scale );
+		alignedPosition = mul( alignedPosition, scale );
 
 		const rotation = rotationNode || materialRotation;
 
-		const cosAngle = rotation.cos();
-		const sinAngle = rotation.sin();
-
-		const rotatedPosition = vec2( // @TODO: Maybe we can create mat2 and write something like rotationMatrix.mul( alignedPosition )?
-			vec2( cosAngle, sinAngle.negate() ).dot( alignedPosition ),
-			vec2( sinAngle, cosAngle ).dot( alignedPosition )
+		const rotatedPosition = vec2(
+			cos( rotation ).mul( alignedPosition.x ).sub( sin( rotation ).mul( alignedPosition.y ) ),
+			sin( rotation ).mul( alignedPosition.x ).add( cos( rotation ).mul( alignedPosition.y ) )
 		);
 
-		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
+		mvPosition = vec4( mvPosition.xy.add( rotatedPosition.xy ), mvPosition.z, mvPosition.w );
 
 		const modelViewProjection = cameraProjectionMatrix.mul( mvPosition );
 
@@ -106,5 +105,3 @@ class SpriteNodeMaterial extends NodeMaterial {
 }
 
 export default SpriteNodeMaterial;
-
-addNodeMaterial( SpriteNodeMaterial );

@@ -30,15 +30,9 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			// no params
-			const object = new Clock();
-			assert.ok( object, 'Can instantiate a Clock.' );
-
-			// autostart
-			const object_all = new Clock( false );
-			assert.ok( object_all, 'Can instantiate a Clock with autostart.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

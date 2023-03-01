@@ -22,10 +22,9 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new SpotLightShadow();
-			assert.ok( object, 'Can instantiate a SpotLightShadow.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

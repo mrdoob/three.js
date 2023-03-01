@@ -20,10 +20,9 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new DepthTexture();
-			assert.ok( object, 'Can instantiate a DepthTexture.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

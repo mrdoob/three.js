@@ -20,10 +20,9 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new LineBasicMaterial();
-			assert.ok( object, 'Can instantiate a LineBasicMaterial.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

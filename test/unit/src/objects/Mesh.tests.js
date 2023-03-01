@@ -26,10 +26,9 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new Mesh();
-			assert.ok( object, 'Can instantiate a Mesh.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

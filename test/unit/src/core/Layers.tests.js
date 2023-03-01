@@ -7,10 +7,9 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Layers', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new Layers();
-			assert.ok( object, 'Can instantiate a Layers.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

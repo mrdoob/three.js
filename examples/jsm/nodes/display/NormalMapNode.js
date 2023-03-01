@@ -1,14 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { add } from '../math/OperatorNode.js';
-import { bitangentView } from '../accessors/BitangentNode.js';
-import { modelNormalMatrix } from '../accessors/ModelNode.js';
-import { normalView } from '../accessors/NormalNode.js';
-import { positionView } from '../accessors/PositionNode.js';
-import { tangentView } from '../accessors/TangentNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { faceDirection } from './FrontFacingNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { ShaderNode, nodeProxy, vec3, mat3 } from '../shadernode/ShaderNode.js';
+import { ShaderNode, positionView, normalView, uv, vec3, add, sub, mul, dFdx, dFdy, cross, max, dot, normalize, inversesqrt, faceDirection, modelNormalMatrix, TBNViewMatrix } from '../shadernode/ShaderNodeBaseElements.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from 'three';
 
@@ -19,23 +10,23 @@ const perturbNormal2ArbNode = new ShaderNode( ( inputs ) => {
 
 	const { eye_pos, surf_norm, mapN, uv } = inputs;
 
-	const q0 = eye_pos.dFdx();
-	const q1 = eye_pos.dFdy();
-	const st0 = uv.dFdx();
-	const st1 = uv.dFdy();
+	const q0 = dFdx( eye_pos.xyz );
+	const q1 = dFdy( eye_pos.xyz );
+	const st0 = dFdx( uv.st );
+	const st1 = dFdy( uv.st );
 
 	const N = surf_norm; // normalized
 
-	const q1perp = q1.cross( N );
-	const q0perp = N.cross( q0 );
+	const q1perp = cross( q1, N );
+	const q0perp = cross( N, q0 );
 
-	const T = q1perp.mul( st0.x ).add( q0perp.mul( st1.x ) );
-	const B = q1perp.mul( st0.y ).add( q0perp.mul( st1.y ) );
+	const T = add( mul( q1perp, st0.x ), mul( q0perp, st1.x ) );
+	const B = add( mul( q1perp, st0.y ), mul( q0perp, st1.y ) );
 
-	const det = T.dot( T ).max( B.dot( B ) );
-	const scale = faceDirection.mul( det.inversesqrt() );
+	const det = max( dot( T, T ), dot( B, B ) );
+	const scale = mul( faceDirection, inversesqrt( det ) );
 
-	return add( T.mul( mapN.x, scale ), B.mul( mapN.y, scale ), N.mul( mapN.z ) ).normalize();
+	return normalize( add( mul( T, mul( mapN.x, scale ) ), mul( B, mul( mapN.y, scale ) ), mul( N, mapN.z ) ) );
 
 } );
 
@@ -56,11 +47,13 @@ class NormalMapNode extends TempNode {
 
 		const { normalMapType, scaleNode } = this;
 
-		let normalMap = this.node.mul( 2.0 ).sub( 1.0 );
+		const normalOP = mul( this.node, 2.0 );
+		let normalMap = sub( normalOP, 1.0 );
 
 		if ( scaleNode !== null ) {
 
-			normalMap = vec3( normalMap.xy.mul( scaleNode ), normalMap.z );
+			const normalMapScale = mul( normalMap.xy, scaleNode );
+			normalMap = vec3( normalMapScale, normalMap.z );
 
 		}
 
@@ -68,7 +61,7 @@ class NormalMapNode extends TempNode {
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			outputNode = modelNormalMatrix.mul( normalMap ).normalize();
+			outputNode = normalize( mul( modelNormalMatrix, normalMap ) );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
@@ -76,7 +69,7 @@ class NormalMapNode extends TempNode {
 
 			if ( tangent === true ) {
 
-				outputNode = TBNViewMatrix.mul( normalMap ).normalize();
+				outputNode = normalize( mul( TBNViewMatrix, normalMap ) );
 
 			} else {
 
@@ -98,9 +91,3 @@ class NormalMapNode extends TempNode {
 }
 
 export default NormalMapNode;
-
-export const normalMap = nodeProxy( NormalMapNode );
-
-export const TBNViewMatrix = mat3( tangentView, bitangentView, normalView );
-
-addNodeClass( NormalMapNode );

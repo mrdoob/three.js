@@ -1,7 +1,5 @@
 import CondNode from '../math/CondNode.js';
-import { expression } from '../core/ExpressionNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import ExpressionNode from '../core/ExpressionNode.js';
 
 let discardExpression;
 
@@ -9,7 +7,7 @@ class DiscardNode extends CondNode {
 
 	constructor( condNode ) {
 
-		discardExpression = discardExpression || expression( 'discard' );
+		discardExpression = discardExpression || new ExpressionNode( 'discard' );
 
 		super( condNode, discardExpression );
 
@@ -18,9 +16,3 @@ class DiscardNode extends CondNode {
 }
 
 export default DiscardNode;
-
-export const discard = nodeProxy( DiscardNode );
-
-addNodeElement( 'discard', discard );
-
-addNodeClass( DiscardNode );

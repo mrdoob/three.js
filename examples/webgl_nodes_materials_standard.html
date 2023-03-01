@@ -30,7 +30,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, uniform, normalMap, MeshStandardNodeMaterial, NodeObjectLoader } from 'three/nodes';
+			import * as Nodes from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -77,7 +77,7 @@
 
 				// Test Extended Material
 
-				class MeshCustomNodeMaterial extends MeshStandardNodeMaterial {
+				class MeshCustomNodeMaterial extends Nodes.MeshStandardNodeMaterial {
 
 					constructor() {
 
@@ -127,18 +127,18 @@
 						const rmMap = loader.load( 'Cerberus_RM.jpg' );
 						rmMap.wrapS = THREE.RepeatWrapping;
 
-						const normalMapTexture = loader.load( 'Cerberus_N.jpg' );
-						normalMapTexture.wrapS = THREE.RepeatWrapping;
+						const normalMap = loader.load( 'Cerberus_N.jpg' );
+						normalMap.wrapS = THREE.RepeatWrapping;
 
-						const mgMapNode = texture( rmMap );
+						const mpMapNode = new Nodes.TextureNode( rmMap );
 
-						material.colorNode = texture( diffuseMap ).mul( uniform( material.color ) );
+						material.colorNode = new Nodes.OperatorNode( '*', new Nodes.TextureNode( diffuseMap ), new Nodes.UniformNode( material.color ) );
 
 						// roughness is in G channel, metalness is in B channel
-						material.roughnessNode = mgMapNode.g;
-						material.metalnessNode = mgMapNode.b;
+						material.roughnessNode = new Nodes.SplitNode( mpMapNode, 'g' );
+						material.metalnessNode = new Nodes.SplitNode( mpMapNode, 'b' );
 
-						material.normalNode = normalMap( texture( normalMapTexture ) );
+						material.normalNode = new Nodes.NormalMapNode( new Nodes.TextureNode( normalMap ) );
 
 						group.traverse( function ( child ) {
 
@@ -160,7 +160,7 @@
 
 							const groupJSON = JSON.stringify( group.toJSON() );
 
-							const objectLoader = new NodeObjectLoader();
+							const objectLoader = new Nodes.NodeObjectLoader();
 							objectLoader.parse( JSON.parse( groupJSON ), ( newGroup ) => {
 
 								//scene.remove( group );

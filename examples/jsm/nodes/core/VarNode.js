@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from './Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node from './Node.js';
+import OperatorNode from '../math/OperatorNode.js';
 
 class VarNode extends Node {
 
@@ -12,19 +12,41 @@ class VarNode extends Node {
 
 	}
 
-	assign( node ) {
+	op( op, ...params ) {
 
-		node.traverse( ( childNode, replaceNode ) => {
+		this.node = new OperatorNode( op, this.node, ...params );
 
-			if ( replaceNode && childNode.uuid === this.uuid ) {
-
-				replaceNode( this.node );
-
-			}
-
-		} );
-		this.node = node;
 		return this;
+
+	}
+
+	assign( ...params ) {
+
+		return this.op( '=', ...params );
+
+	}
+
+	add( ...params ) {
+
+		return this.op( '+', ...params );
+
+	}
+
+	sub( ...params ) {
+
+		return this.op( '-', ...params );
+
+	}
+
+	mul( ...params ) {
+
+		return this.op( '*', ...params );
+
+	}
+
+	div( ...params ) {
+
+		return this.op( '/', ...params );
 
 	}
 
@@ -79,11 +101,3 @@ class VarNode extends Node {
 }
 
 export default VarNode;
-
-export const label = nodeProxy( VarNode );
-export const temp = label;
-
-addNodeElement( 'label', label );
-addNodeElement( 'temp', temp );
-
-addNodeClass( VarNode );

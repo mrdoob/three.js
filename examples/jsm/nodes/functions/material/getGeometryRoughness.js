@@ -1,10 +1,9 @@
-import { normalGeometry } from '../../accessors/NormalNode.js';
-import { ShaderNode } from '../../shadernode/ShaderNode.js';
+import { ShaderNode, max, abs, dFdx, dFdy, normalGeometry } from '../../shadernode/ShaderNodeBaseElements.js';
 
 const getGeometryRoughness = new ShaderNode( () => {
 
-	const dxy = normalGeometry.dFdx().abs().max( normalGeometry.dFdy().abs() );
-	const geometryRoughness = dxy.x.max( dxy.y ).max( dxy.z );
+	const dxy = max( abs( dFdx( normalGeometry ) ), abs( dFdy( normalGeometry ) ) );
+	const geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );
 
 	return geometryRoughness;
 

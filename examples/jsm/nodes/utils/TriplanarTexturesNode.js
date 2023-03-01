@@ -1,9 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { add } from '../math/OperatorNode.js';
-import { normalWorld } from '../accessors/NormalNode.js';
-import { positionWorld } from '../accessors/PositionNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { addNodeElement, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
+import Node from '../core/Node.js';
+import { float, vec3, add, mul, div, dot, normalize, abs, texture, positionWorld, normalWorld } from '../shadernode/ShaderNodeBaseElements.js';
 
 class TriplanarTexturesNode extends Node {
 
@@ -29,22 +25,22 @@ class TriplanarTexturesNode extends Node {
 		// Ref: https://github.com/keijiro/StandardTriplanar
 
 		// Blending factor of triplanar mapping
-		let bf = normalNode.abs().normalize();
-		bf = bf.div( bf.dot( vec3( 1.0 ) ) );
+		let bf = normalize( abs( normalNode ) );
+		bf = div( bf, dot( bf, vec3( 1.0 ) ) );
 
 		// Triplanar mapping
-		const tx = positionNode.yz.mul( scaleNode );
-		const ty = positionNode.zx.mul( scaleNode );
-		const tz = positionNode.xy.mul( scaleNode );
+		const tx = mul( positionNode.yz, scaleNode );
+		const ty = mul( positionNode.zx, scaleNode );
+		const tz = mul( positionNode.xy, scaleNode );
 
 		// Base color
 		const textureX = textureXNode.value;
 		const textureY = textureYNode !== null ? textureYNode.value : textureX;
 		const textureZ = textureZNode !== null ? textureZNode.value : textureX;
 
-		const cx = texture( textureX, tx ).mul( bf.x );
-		const cy = texture( textureY, ty ).mul( bf.y );
-		const cz = texture( textureZ, tz ).mul( bf.z );
+		const cx = mul( texture( textureX, tx ), bf.x );
+		const cy = mul( texture( textureY, ty ), bf.y );
+		const cz = mul( texture( textureZ, tz ), bf.z );
 
 		return add( cx, cy, cz );
 
@@ -53,10 +49,3 @@ class TriplanarTexturesNode extends Node {
 }
 
 export default TriplanarTexturesNode;
-
-export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
-export const triplanarTexture = ( texture, ...params ) => triplanarTextures( texture, texture, texture, ...params );
-
-addNodeElement( 'triplanarTexture', triplanarTexture );
-
-addNodeClass( TriplanarTexturesNode );

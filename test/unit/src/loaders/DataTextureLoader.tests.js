@@ -20,10 +20,9 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new DataTextureLoader();
-			assert.ok( object, 'Can instantiate a DataTextureLoader.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

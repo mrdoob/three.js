@@ -17,12 +17,6 @@ const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan'
 };
 
-const precisionLib = {
-	low: 'lowp',
-	medium: 'mediump',
-	high: 'highp'
-};
-
 function getIncludeSnippet( name ) {
 
 	return `#include <${name}>`;
@@ -466,45 +460,29 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 		const uniforms = this.uniforms[ shaderStage ];
 
-		let output = '';
+		let snippet = '';
 
 		for ( const uniform of uniforms ) {
 
-			let snippet = null;
-
 			if ( uniform.type === 'texture' ) {
 
-				snippet = `sampler2D ${uniform.name}; `;
+				snippet += `uniform sampler2D ${uniform.name}; `;
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 
-				snippet = `samplerCube ${uniform.name}; `;
+				snippet += `uniform samplerCube ${uniform.name}; `;
 
 			} else {
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				snippet = `${vectorType} ${uniform.name}; `;
+				snippet += `uniform ${vectorType} ${uniform.name}; `;
 
 			}
-
-			const precision = uniform.node.precision;
-
-			if ( precision !== null ) {
-
-				snippet = 'uniform ' + precisionLib[ precision ] + ' ' + snippet;
-
-			} else {
-
-				snippet = 'uniform ' + snippet;
-
-			}
-
-			output += snippet;
 
 		}
 
-		return output;
+		return snippet;
 
 	}
 

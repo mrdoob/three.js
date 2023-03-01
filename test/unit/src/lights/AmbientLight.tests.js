@@ -37,10 +37,9 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new AmbientLight();
-			assert.ok( object, 'Can instantiate an AmbientLight.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

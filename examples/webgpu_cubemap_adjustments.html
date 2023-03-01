@@ -31,7 +31,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, mix, cubeTexture, reference, positionWorld, normalWorld, modelWorldMatrix, reflectVector, toneMapping } from 'three/nodes';
+			import * as Nodes from 'three/nodes';
+
+			import { uniform, mix, cubeTexture, mul, reference, add, positionWorld, normalWorld, modelWorldMatrix, transformDirection, clamp, saturation, hue, reflectVector, context } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -107,15 +109,15 @@
 
 				const getEnvironmentNode = ( reflectNode ) => {
 
-					const custom1UV = reflectNode.xyz.mul( uniform( rotateY1Matrix ) );
-					const custom2UV = reflectNode.xyz.mul( uniform( rotateY2Matrix ) );
-					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), positionWorld.y.add( mixNode ).clamp() );
+					const custom1UV = mul( reflectNode.xyz, uniform( rotateY1Matrix ) );
+					const custom2UV = mul( reflectNode.xyz, uniform( rotateY2Matrix ) );
 
+					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), clamp( add( positionWorld.y, mixNode ) ) );
 					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
+					const intensityFilter = mul( proceduralEnv, intensityNode );
+					const hueFilter = hue( intensityFilter, hueNode );
 
-					const intensityFilter = proceduralEnv.mul( intensityNode );
-					const hueFilter = intensityFilter.hue( hueNode );
-					return hueFilter.saturation( saturationNode );
+					return saturation( hueFilter, saturationNode );
 
 				};
 
@@ -123,7 +125,7 @@
 
 				scene.environmentNode = getEnvironmentNode( reflectVector );
 
-				scene.backgroundNode = getEnvironmentNode( positionWorld.transformDirection( modelWorldMatrix ) ).context( {
+				scene.backgroundNode = context( getEnvironmentNode( transformDirection( positionWorld, modelWorldMatrix ) ), {
 					getSamplerLevelNode: () => blurNode
 				} );
 
@@ -152,7 +154,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
+				renderer.toneMappingNode = new Nodes.ToneMappingNode( THREE.LinearToneMapping, 1 );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );

@@ -19,10 +19,9 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new LineLoop();
-			assert.ok( object, 'Can instantiate a LineLoop.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

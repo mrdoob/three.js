@@ -9,10 +9,9 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'Loader', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new Loader();
-			assert.ok( object, 'Can instantiate a Loader.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

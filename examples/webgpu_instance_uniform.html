@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshStandardNodeMaterial, NodeUpdateType, Node, nodeObject, uniform, attribute, cubeTexture } from 'three/nodes';
+			import { MeshStandardNodeMaterial, NodeUpdateType, Node, uniform, attribute, cubeTexture, add, mul } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -116,12 +116,12 @@
 
 				// Materials
 
-				const instanceUniform = nodeObject( new InstanceUniformNode() );
+				const instanceUniform = new InstanceUniformNode();
 				const cubeTextureNode = cubeTexture( cTexture );
 
 				const material = new MeshStandardNodeMaterial();
-				material.colorNode = instanceUniform.add( cubeTextureNode );
-				material.emissiveNode = instanceUniform.mul( cubeTextureNode );
+				material.colorNode = add( instanceUniform, cubeTextureNode );
+				material.emissiveNode = mul( instanceUniform, cubeTextureNode );
 
 				// Geometry
 

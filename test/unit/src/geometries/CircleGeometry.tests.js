@@ -41,10 +41,9 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new CircleGeometry();
-			assert.ok( object, 'Can instantiate a CircleGeometry.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -1,5 +1,4 @@
-import { addNodeClass } from '../core/Node.js';
-import TempNode from '../core/TempNode.js';
+import TempNode from '../core/Node.js';
 
 class JoinNode extends TempNode {
 
@@ -47,5 +46,3 @@ class JoinNode extends TempNode {
 }
 
 export default JoinNode;
-
-addNodeClass( JoinNode );

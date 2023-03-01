@@ -1,6 +1,6 @@
-import { transformedNormalView } from '../../accessors/NormalNode.js';
-import { positionViewDirection } from '../../accessors/PositionNode.js';
-import { ShaderNode, vec2, vec4 } from '../../shadernode/ShaderNode.js';
+import {
+	ShaderNode, dotNV, vec2, vec4, mul, min
+} from '../../shadernode/ShaderNodeElements.js';
 
 // Analytical approximation of the DFG LUT, one half of the
 // split-sum approximation used in indirect specular lighting.
@@ -16,9 +16,7 @@ const DFGApprox = new ShaderNode( ( inputs ) => {
 
 	const r = roughness.mul( c0 ).add( c1 );
 
-	const dotNV = transformedNormalView.dot( positionViewDirection ).clamp();
-
-	const a004 = r.x.mul( r.x ).min( dotNV.mul( - 9.28 ).exp2() ).mul( r.x ).add( r.y );
+	const a004 = min( mul( r.x, r.x ), dotNV.mul( - 9.28 ).exp2() ).mul( r.x ).add( r.y );
 
 	const fab = vec2( - 1.04, 1.04 ).mul( a004 ).add( r.zw );
 

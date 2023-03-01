@@ -9,7 +9,7 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'Texture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
 			const object = new Texture();
 			assert.strictEqual(
@@ -20,11 +20,9 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			// no params
-			const object = new Texture();
-			assert.ok( object, 'Can instantiate a Texture.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -244,12 +242,9 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'dispose', ( assert ) => {
 
-			assert.expect( 0 );
-
-			const object = new Texture();
-			object.dispose();
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

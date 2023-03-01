@@ -1,5 +1,5 @@
 import LightingNode from './LightingNode.js';
-import { addNodeClass } from '../core/Node.js';
+import { float, add, mul, sub } from '../shadernode/ShaderNodeElements.js';
 
 class AONode extends LightingNode {
 
@@ -14,14 +14,12 @@ class AONode extends LightingNode {
 	construct( builder ) {
 
 		const aoIntensity = 1;
-		const aoNode = this.aoNode.sub( 1.0 ).mul( aoIntensity ).add( 1.0 );
+		const aoNode = add( mul( sub( float( this.aoNode ), 1.0 ), aoIntensity ), 1.0 );
 
-		builder.context.ambientOcclusion.mulAssign( aoNode );
+		builder.context.ambientOcclusion.mul( aoNode );
 
 	}
 
 }
 
 export default AONode;
-
-addNodeClass( AONode );

@@ -1,7 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { attribute } from '../core/AttributeNode.js';
-import { nodeObject, float } from '../shadernode/ShaderNode.js';
-
+import Node from '../core/Node.js';
+import { attribute, float } from '../shadernode/ShaderNodeBaseElements.js';
 import { MathUtils, InstancedBufferAttribute } from 'three';
 
 class RangeNode extends Node {
@@ -22,8 +20,9 @@ class RangeNode extends Node {
 		let length = 1;
 
 		if ( min.isVector2 ) length = 2;
-		else if ( min.isVector3 || min.isColor ) length = 3;
+		else if ( min.isVector3 ) length = 3;
 		else if ( min.isVector4 ) length = 4;
+		else if ( min.isColor ) length = 3;
 
 		return length;
 
@@ -31,7 +30,7 @@ class RangeNode extends Node {
 
 	getNodeType( builder ) {
 
-		return builder.object.isInstancedMesh === true ? builder.getTypeFromLength( this.getVectorLength() ) : 'float';
+		return ( builder.object.isInstancedMesh === true ) ? builder.getTypeFromLength( this.getVectorLength() ) : 'float';
 
 	}
 
@@ -108,7 +107,3 @@ class RangeNode extends Node {
 }
 
 export default RangeNode;
-
-export const range = ( min, max ) => nodeObject( new RangeNode( min, max ) );
-
-addNodeClass( RangeNode );

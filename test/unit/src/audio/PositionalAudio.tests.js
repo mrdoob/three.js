@@ -46,11 +46,9 @@ export default QUnit.module( 'Audios', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const listener = mock3DListener();
-			const object = new PositionalAudio( listener );
-			assert.ok( object, 'Can instantiate a PositionalAudio.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

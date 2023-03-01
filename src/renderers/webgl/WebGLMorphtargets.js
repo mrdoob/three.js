@@ -30,7 +30,7 @@ function WebGLMorphtargets( gl, capabilities, textures ) {
 
 	}
 
-	function update( object, geometry, program ) {
+	function update( object, geometry, material, program ) {
 
 		const objectInfluences = object.morphTargetInfluences;
 

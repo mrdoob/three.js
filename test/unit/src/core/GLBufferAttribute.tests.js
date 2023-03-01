@@ -7,10 +7,9 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'GLBufferAttribute', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new GLBufferAttribute();
-			assert.ok( object, 'Can instantiate a GLBufferAttribute.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

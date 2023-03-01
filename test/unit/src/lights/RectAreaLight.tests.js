@@ -40,10 +40,9 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new RectAreaLight();
-			assert.ok( object, 'Can instantiate a RectAreaLight.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

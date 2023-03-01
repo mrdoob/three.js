@@ -1,7 +1,5 @@
 import UniformNode from '../core/UniformNode.js';
-import { uv } from './UVNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import UVNode from './UVNode.js';
 
 let defaultUV;
 
@@ -32,7 +30,7 @@ class TextureNode extends UniformNode {
 
 	getDefaultUV() {
 
-		return defaultUV || ( defaultUV = uv() );
+		return defaultUV || ( defaultUV = new UVNode() );
 
 	}
 
@@ -150,10 +148,3 @@ class TextureNode extends UniformNode {
 }
 
 export default TextureNode;
-
-export const texture = nodeProxy( TextureNode );
-export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : texture( aTexture ) ).convert( 'sampler' );
-
-addNodeElement( 'texture', texture );
-
-addNodeClass( TextureNode );

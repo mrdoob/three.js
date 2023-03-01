@@ -1,5 +1,4 @@
 import InputNode from './InputNode.js';
-import { addNodeClass } from './Node.js';
 
 class ConstNode extends InputNode {
 
@@ -28,5 +27,3 @@ class ConstNode extends InputNode {
 }
 
 export default ConstNode;
-
-addNodeClass( ConstNode );

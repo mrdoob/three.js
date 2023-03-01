@@ -1,5 +1,4 @@
-import Node, { addNodeClass } from './Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node from './Node.js';
 
 class BypassNode extends Node {
 
@@ -37,9 +36,3 @@ class BypassNode extends Node {
 }
 
 export default BypassNode;
-
-export const bypass = nodeProxy( BypassNode );
-
-addNodeElement( 'bypass', bypass );
-
-addNodeClass( BypassNode );

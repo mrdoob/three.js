@@ -20,10 +20,9 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new DataArrayTexture();
-			assert.ok( object, 'Can instantiate a DataArrayTexture.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

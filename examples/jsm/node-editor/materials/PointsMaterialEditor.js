@@ -1,15 +1,17 @@
 import { ColorInput, ToggleInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
-import { MaterialEditor } from './MaterialEditor.js';
+import { BaseNode } from '../core/BaseNode.js';
 import { PointsNodeMaterial } from 'three/nodes';
 import * as THREE from 'three';
 
-export class PointsMaterialEditor extends MaterialEditor {
+export class PointsMaterialEditor extends BaseNode {
 
 	constructor() {
 
 		const material = new PointsNodeMaterial();
 
-		super( 'Points Material', material );
+		super( 'Points Material', 1, material );
+
+		this.setWidth( 300 );
 
 		const color = new LabelElement( 'color' ).setInput( 3 );
 		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
@@ -54,6 +56,8 @@ export class PointsMaterialEditor extends MaterialEditor {
 		this.size = size;
 		this.position = position;
 		this.sizeAttenuation = sizeAttenuation;
+
+		this.material = material;
 
 		this.update();
 

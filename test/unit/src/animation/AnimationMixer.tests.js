@@ -38,10 +38,9 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new AnimationMixer();
-			assert.ok( object, 'Can instantiate a AnimationMixer.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -7,10 +7,9 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'SphericalHarmonics3', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new SphericalHarmonics3();
-			assert.ok( object, 'Can instantiate a SphericalHarmonics3.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

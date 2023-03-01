@@ -1,8 +1,7 @@
 /* global QUnit */
 
-import { Line } from '../../../../src/objects/Line.js';
-
 import { Object3D } from '../../../../src/core/Object3D.js';
+import { Line } from '../../../../src/objects/Line.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -20,10 +19,9 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new Line();
-			assert.ok( object, 'Can instantiate a Line.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

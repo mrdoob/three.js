@@ -29,18 +29,18 @@ function SidebarProjectRenderer( editor ) {
 
 	// Physically Correct lights
 
-	const useLegacyLightsRow = new UIRow();
-	container.add( useLegacyLightsRow );
+	const physicallyCorrectLightsRow = new UIRow();
+	container.add( physicallyCorrectLightsRow );
 
-	useLegacyLightsRow.add( new UIText( strings.getKey( 'sidebar/project/useLegacyLights' ) ).setWidth( '90px' ) );
+	physicallyCorrectLightsRow.add( new UIText( strings.getKey( 'sidebar/project/physicallyCorrectLights' ) ).setWidth( '90px' ) );
 
-	const useLegacyLightsBoolean = new UIBoolean( config.getKey( 'project/renderer/useLegacyLights' ) ).onChange( function () {
+	const physicallyCorrectLightsBoolean = new UIBoolean( config.getKey( 'project/renderer/physicallyCorrectLights' ) ).onChange( function () {
 
-		currentRenderer.useLegacyLights = this.getValue();
+		currentRenderer.physicallyCorrectLights = this.getValue();
 		signals.rendererUpdated.dispatch();
 
 	} );
-	useLegacyLightsRow.add( useLegacyLightsBoolean );
+	physicallyCorrectLightsRow.add( physicallyCorrectLightsBoolean );
 
 	// Shadows
 
@@ -110,7 +110,7 @@ function SidebarProjectRenderer( editor ) {
 
 		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue() } );
 		currentRenderer.outputEncoding = THREE.sRGBEncoding;
-		currentRenderer.useLegacyLights = useLegacyLightsBoolean.getValue();
+		currentRenderer.physicallyCorrectLights = physicallyCorrectLightsBoolean.getValue();
 		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
 		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
 		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
@@ -128,13 +128,13 @@ function SidebarProjectRenderer( editor ) {
 
 	signals.editorCleared.add( function () {
 
-		currentRenderer.useLegacyLights = false;
+		currentRenderer.physicallyCorrectLights = false;
 		currentRenderer.shadowMap.enabled = true;
 		currentRenderer.shadowMap.type = THREE.PCFShadowMap;
 		currentRenderer.toneMapping = THREE.NoToneMapping;
 		currentRenderer.toneMappingExposure = 1;
 
-		useLegacyLightsBoolean.setValue( currentRenderer.useLegacyLights );
+		physicallyCorrectLightsBoolean.setValue( currentRenderer.physicallyCorrectLights );
 		shadowsBoolean.setValue( currentRenderer.shadowMap.enabled );
 		shadowTypeSelect.setValue( currentRenderer.shadowMap.type );
 		toneMappingSelect.setValue( currentRenderer.toneMapping );
@@ -149,7 +149,7 @@ function SidebarProjectRenderer( editor ) {
 
 		config.setKey(
 			'project/renderer/antialias', antialiasBoolean.getValue(),
-			'project/renderer/useLegacyLights', useLegacyLightsBoolean.getValue(),
+			'project/renderer/physicallyCorrectLights', physicallyCorrectLightsBoolean.getValue(),
 			'project/renderer/shadows', shadowsBoolean.getValue(),
 			'project/renderer/shadowType', parseFloat( shadowTypeSelect.getValue() ),
 			'project/renderer/toneMapping', parseFloat( toneMappingSelect.getValue() ),

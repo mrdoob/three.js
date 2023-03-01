@@ -1,11 +1,10 @@
-import { addNodeMaterial } from './NodeMaterial.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
 
 import { MeshPhysicalMaterial } from 'three';
 
 const defaultValues = new MeshPhysicalMaterial();
 
-class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
+export default class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	constructor( parameters ) {
 
@@ -69,7 +68,3 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 	}
 
 }
-
-export default MeshPhysicalNodeMaterial;
-
-addNodeMaterial( MeshPhysicalNodeMaterial );

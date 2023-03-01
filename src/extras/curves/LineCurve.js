@@ -42,15 +42,13 @@ class LineCurve extends Curve {
 
 	}
 
-	getTangent( t, optionalTarget = new Vector2() ) {
+	getTangent( t, optionalTarget ) {
 
-		return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
+		const tangent = optionalTarget || new Vector2();
 
-	}
+		tangent.copy( this.v2 ).sub( this.v1 ).normalize();
 
-	getTangentAt( u, optionalTarget ) {
-
-		return this.getTangent( u, optionalTarget );
+		return tangent;
 
 	}
 

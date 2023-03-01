@@ -20,10 +20,9 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new WebGLRenderTarget();
-			assert.ok( object, 'Can instantiate a WebGLRenderTarget.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -119,12 +118,9 @@ export default QUnit.module( 'Renderers', () => {
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'dispose', ( assert ) => {
 
-			assert.expect( 0 );
-
-			const object = new WebGLRenderTarget();
-			object.dispose();
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

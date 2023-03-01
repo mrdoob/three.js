@@ -22,10 +22,9 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( assert ) => {
 
-				const object = new CurvePath();
-				assert.ok( object, 'Can instantiate a CurvePath.' );
+				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 

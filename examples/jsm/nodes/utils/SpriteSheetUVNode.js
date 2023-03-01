@@ -1,10 +1,14 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { uv } from '../accessors/UVNode.js';
-import { nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
+import Node from '../core/Node.js';
+import ConstNode from '../core/ConstNode.js';
+import UVNode from '../accessors/UVNode.js';
+import MathNode from '../math/MathNode.js';
+import OperatorNode from '../math/OperatorNode.js';
+import SplitNode from '../utils/SplitNode.js';
+import JoinNode from '../utils/JoinNode.js';
 
 class SpriteSheetUVNode extends Node {
 
-	constructor( countNode, uvNode = uv(), frameNode = float( 0 ) ) {
+	constructor( countNode, uvNode = new UVNode(), frameNode = new ConstNode( 0 ) ) {
 
 		super( 'vec2' );
 
@@ -18,24 +22,35 @@ class SpriteSheetUVNode extends Node {
 
 		const { frameNode, uvNode, countNode } = this;
 
-		const { width, height } = countNode;
+		const one = new ConstNode( 1 );
 
-		const frameNum = frameNode.mod( width.mul( height ) ).floor();
+		const width = new SplitNode( countNode, 'x' );
+		const height = new SplitNode( countNode, 'y' );
 
-		const column = frameNum.mod( width );
-		const row = height.sub( frameNum.add( 1 ).div( width ).ceil() );
+		const total = new OperatorNode( '*', width, height );
 
-		const scale = countNode.reciprocal();
-		const uvFrameOffset = vec2( column, row );
+		const roundFrame = new MathNode( MathNode.FLOOR, new MathNode( MathNode.MOD, frameNode, total ) );
 
-		return uvNode.add( uvFrameOffset ).mul( scale );
+		const frameNum = new OperatorNode( '+', roundFrame, one );
+
+		const cell = new MathNode( MathNode.MOD, roundFrame, width );
+		const row = new MathNode( MathNode.CEIL, new OperatorNode( '/', frameNum, width ) );
+		const rowInv = new OperatorNode( '-', height, row );
+
+		const scale = new OperatorNode( '/', one, countNode );
+
+		const uvFrameOffset = new JoinNode( [
+			new OperatorNode( '*', cell, new SplitNode( scale, 'x' ) ),
+			new OperatorNode( '*', rowInv, new SplitNode( scale, 'y' ) )
+		] );
+
+		const uvScale = new OperatorNode( '*', uvNode, scale );
+		const uvFrame = new OperatorNode( '+', uvScale, uvFrameOffset );
+
+		return uvFrame;
 
 	}
 
 }
 
 export default SpriteSheetUVNode;
-
-export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
-
-addNodeClass( SpriteSheetUVNode );

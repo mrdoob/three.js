@@ -1,8 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { transformedNormalView } from '../accessors/NormalNode.js';
-import { positionViewDirection } from '../accessors/PositionNode.js';
-import { nodeImmutable, vec2, vec3 } from '../shadernode/ShaderNode.js';
-import { addNodeClass } from '../core/Node.js';
+import { vec2, vec3, negate, normalize, cross, dot, mul, add, transformedNormalView, positionViewDirection } from '../shadernode/ShaderNodeBaseElements.js';
 
 class MatcapUVNode extends TempNode {
 
@@ -14,17 +11,13 @@ class MatcapUVNode extends TempNode {
 
 	construct() {
 
-		const x = vec3( positionViewDirection.z, 0, positionViewDirection.x.negate() ).normalize();
-		const y = positionViewDirection.cross( x );
+		const x = normalize( vec3( positionViewDirection.z, 0, negate( positionViewDirection.x ) ) );
+		const y = cross( positionViewDirection, x );
 
-		return vec2( x.dot( transformedNormalView ), y.dot( transformedNormalView ) ).mul( 0.495 ).add( 0.5 );
+		return add( mul( vec2( dot( x, transformedNormalView ), dot( y, transformedNormalView ) ), 0.495 ), 0.5 );
 
 	}
 
 }
 
 export default MatcapUVNode;
-
-export const matcapUV = nodeImmutable( MatcapUVNode );
-
-addNodeClass( MatcapUVNode );

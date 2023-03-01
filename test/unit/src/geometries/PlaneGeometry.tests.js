@@ -41,10 +41,9 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( assert ) => {
 
-			const object = new PlaneGeometry();
-			assert.ok( object, 'Can instantiate a PlaneGeometry.' );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

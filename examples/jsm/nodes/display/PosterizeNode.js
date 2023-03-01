@@ -1,6 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import TempNode from '../core/Node.js';
+import { mul, floor, reciprocal } from '../shadernode/ShaderNodeBaseElements.js';
 
 class PosterizeNode extends TempNode {
 
@@ -17,16 +16,10 @@ class PosterizeNode extends TempNode {
 
 		const { sourceNode, stepsNode } = this;
 
-		return sourceNode.mul( stepsNode ).floor().div( stepsNode );
+		return mul( floor( mul( sourceNode, stepsNode ) ), reciprocal( stepsNode ) );
 
 	}
 
 }
 
 export default PosterizeNode;
-
-export const posterize = nodeProxy( PosterizeNode );
-
-addNodeElement( 'posterize', posterize );
-
-addNodeClass( PosterizeNode );

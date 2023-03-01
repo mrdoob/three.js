@@ -1,7 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { vectorComponents } from '../core/constants.js';
+import Node from '../core/Node.js';
+import { vector } from '../core/NodeBuilder.js';
 
-const stringVectorComponents = vectorComponents.join( '' );
+const vectorComponents = 'xyzw';
 
 class SplitNode extends Node {
 
@@ -20,7 +20,7 @@ class SplitNode extends Node {
 
 		for ( const c of this.components ) {
 
-			vectorLength = Math.max( vectorComponents.indexOf( c ) + 1, vectorLength );
+			vectorLength = Math.max( vector.indexOf( c ) + 1, vectorLength );
 
 		}
 
@@ -57,7 +57,7 @@ class SplitNode extends Node {
 
 			const nodeSnippet = node.build( builder, type );
 
-			if ( this.components.length === nodeTypeLength && this.components === stringVectorComponents.slice( 0, this.components.length ) ) {
+			if ( this.components.length === nodeTypeLength && this.components === vectorComponents.slice( 0, this.components.length ) ) {
 
 				// unecessary swizzle
 
@@ -100,5 +100,3 @@ class SplitNode extends Node {
 }
 
 export default SplitNode;
-
-addNodeClass( SplitNode );

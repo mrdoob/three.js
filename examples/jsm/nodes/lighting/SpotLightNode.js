@@ -1,12 +1,8 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { addLightNode } from './LightsNode.js';
+import LightsNode from './LightsNode.js';
 import getDistanceAttenuation from '../functions/light/getDistanceAttenuation.js';
 import getDirectionVector from '../functions/light/getDirectionVector.js';
-import { uniform } from '../core/UniformNode.js';
-import { smoothstep } from '../math/MathNode.js';
-import { objectViewPosition } from '../accessors/Object3DNode.js';
-import { positionView } from '../accessors/PositionNode.js';
-import { addNodeClass } from '../core/Node.js';
+import { uniform, smoothstep, positionView, objectViewPosition } from '../shadernode/ShaderNodeElements.js';
 
 import { Vector3, SpotLight } from 'three';
 
@@ -89,8 +85,6 @@ class SpotLightNode extends AnalyticLightNode {
 
 }
 
+LightsNode.setReference( SpotLight, SpotLightNode );
+
 export default SpotLightNode;
-
-addLightNode( SpotLight, SpotLightNode );
-
-addNodeClass( SpotLightNode );

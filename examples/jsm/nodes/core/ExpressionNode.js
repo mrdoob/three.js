@@ -1,28 +1,27 @@
-import Node, { addNodeClass } from './Node.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import Node from './Node.js';
 
 class ExpressionNode extends Node {
 
-	constructor( snippet = '', nodeType = 'void' ) {
+	constructor( snipped = '', nodeType = 'void' ) {
 
 		super( nodeType );
 
-		this.snippet = snippet;
+		this.snipped = snipped;
 
 	}
 
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
-		const snippet = this.snippet;
+		const snipped = this.snipped;
 
 		if ( type === 'void' ) {
 
-			builder.addFlowCode( snippet );
+			builder.addFlowCode( snipped );
 
 		} else {
 
-			return builder.format( `( ${ snippet } )`, type, output );
+			return builder.format( `( ${ snipped } )`, type, output );
 
 		}
 
@@ -31,7 +30,3 @@ class ExpressionNode extends Node {
 }
 
 export default ExpressionNode;
-
-export const expression = nodeProxy( ExpressionNode );
-
-addNodeClass( ExpressionNode );
