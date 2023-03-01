@@ -42,5 +42,27 @@ export default /* glsl */`
 
 	}
 
+	#if defined( USE_ANISOTROPY )
+
+		vec3 getIBLAnisotropyRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness, const in vec3 bitangent, const in float anisotropy ) {
+
+			#if defined( ENVMAP_TYPE_CUBE_UV )
+
+				vec3 bentNormal = cross( bitangent, viewDir );
+				bentNormal = cross( bentNormal, bitangent );
+				bentNormal = normalize( mix( normal , bentNormal, anisotropy ) );
+
+				return getIBLRadiance( viewDir, bentNormal, roughness );
+
+			#else
+
+				return vec3( 0.0 );
+
+			#endif
+
+		}
+
+	#endif
+
 #endif
 `;

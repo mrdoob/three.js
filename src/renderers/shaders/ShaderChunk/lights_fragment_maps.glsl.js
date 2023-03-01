@@ -20,7 +20,17 @@ export default /* glsl */`
 
 #if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
 
-	radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
+	#if defined( USE_ANISOTROPY )
+
+		vec3 anisotropyBitangent = vTBN[ 0 ] * material.anisotropy.x + vTBN[ 1 ] * material.anisotropy.y;
+
+		radiance += getIBLRadianceAnisotropy( geometry.viewDir, geometry.normal, material.roughness, anisotropyBitangent, length( material.anisotropy ) );
+
+	#else
+
+		radiance += getIBLRadiance( geometry.viewDir, geometry.normal, material.roughness );
+
+	#endif
 
 	#ifdef USE_CLEARCOAT
 
