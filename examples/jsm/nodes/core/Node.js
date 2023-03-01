@@ -38,13 +38,11 @@ class Node {
 
 		const self = this;
 
-		for ( const { prop, childNode } of getNodeChildren( this ) ) {
+		for ( const { prop, prop2. childNode } of getNodeChildren( this ) ) {
 
-			if ( prop.includes( '/' ) ) {
+			if ( prop2 !== undefined ) {
 
-				const prop1 = prop.slice( 0, prop.indexOf( '/' ) );
-				const prop2 = prop.slice( prop.indexOf( '/' ) + 1 );
-				yield { childNode, replaceNode( node ) { self[ prop1 ][ prop2 ] = node; } };
+				yield { childNode, replaceNode( node ) { self[ prop ][ prop2 ] = node; } };
 
 			} else {
 
@@ -246,20 +244,17 @@ class Node {
 
 		const inputNodes = {};
 
-		for ( const { prop, childNode } of nodeChildren ) {
+		for ( const { prop, prop2, childNode } of nodeChildren ) {
 
-			if ( prop.includes( '/' ) ) {
+			if ( prop2 !== undefined ) {
 
-				const prop1 = prop.slice( 0, prop.indexOf( '/' ) );
-				const prop2 = prop.slice( prop.indexOf( '/' ) + 1 );
+				if ( inputNodes[ prop ] === undefined ) {
 
-				if ( inputNodes[ prop1 ] === undefined ) {
-
-					inputNodes[ prop1 ] = prop2 === '0' ? [] : {};
+					inputNodes[ prop ] = prop2 === '0' ? [] : {};
 
 				}
 
-				inputNodes[ prop1 ][ prop2 ] = childNode.toJSON( json.meta ).uuid );
+				inputNodes[ prop ][ prop2 ] = childNode.toJSON( json.meta ).uuid );
 
 			} else {
 
