@@ -10,13 +10,13 @@ export function getCacheKey( object )  {
 
 	}
 
-	for ( const { prop, childNode } of getNodeChildren( object ) ) {
+	for ( const { prop, prop2, childNode } of getNodeChildren( object ) ) {
 
 		// @TODO: Think about implement NodeArray and NodeObject.
 
 		let childCacheKey = getCacheKey( childNode );
 		if ( ! childCacheKey.includes( ',' ) ) childCacheKey = childCacheKey.slice( childCacheKey.indexOf( '"' ), childCacheKey.indexOf( '}' ) );
-		cacheKey += `,${ prop }:${ childCacheKey }`;
+		cacheKey += `,${ prop }${ prop2 !== undefined ? '/' + prop2 : '' }:${ childCacheKey }`;
 
 	}
 
@@ -40,7 +40,7 @@ export function* getNodeChildren( node ) {
 
 				if ( child && child.isNode === true ) {
 
-					yield { prop: property + '/' + i, childNode: child };
+					yield { prop: property, prop2: i, childNode: child };
 
 				}
 
@@ -58,7 +58,7 @@ export function* getNodeChildren( node ) {
 
 				if ( child && child.isNode === true ) {
 
-					yield { prop: property + '/' + property2, childNode: child };
+					yield { prop: property, prop2: property2, childNode: child };
 
 				}
 
