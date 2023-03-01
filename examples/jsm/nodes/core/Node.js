@@ -38,15 +38,15 @@ class Node {
 
 		const self = this;
 
-		for ( const { prop, prop2, childNode } of getNodeChildren( this ) ) {
+		for ( const { property, index, childNode } of getNodeChildren( this ) ) {
 
-			if ( prop2 !== undefined ) {
+			if ( index !== undefined ) {
 
-				yield { childNode, replaceNode( node ) { self[ prop ][ prop2 ] = node; } };
+				yield { childNode, replaceNode( node ) { self[ property ][ index ] = node; } };
 
 			} else {
 
-				yield { childNode, replaceNode( node ) { self[ prop ] = node; } };
+				yield { childNode, replaceNode( node ) { self[ property ] = node; } };
 
 			}
 
@@ -57,6 +57,7 @@ class Node {
 	traverse( callback, replaceNode = null ) {
 
 		callback( this, replaceNode );
+
 		for ( const { childNode, replaceNode } of this.getChildren() ) {
 
 			childNode.traverse( callback, replaceNode );
@@ -169,7 +170,7 @@ class Node {
 		builder.addNode( this );
 		builder.addStack( this );
 
-		/* expected return:
+		/* Build stages expected results:
 			- "construct"	-> Node
 			- "analyze"		-> null
 			- "generate"	-> String
@@ -244,21 +245,21 @@ class Node {
 
 		const inputNodes = {};
 
-		for ( const { prop, prop2, childNode } of nodeChildren ) {
+		for ( const { property, index, childNode } of nodeChildren ) {
 
-			if ( prop2 !== undefined ) {
+			if ( index !== undefined ) {
 
-				if ( inputNodes[ prop ] === undefined ) {
+				if ( inputNodes[ property ] === undefined ) {
 
-					inputNodes[ prop ] = prop2 === '0' ? [] : {};
+					inputNodes[ property ] = Number.isInteger( index ) ? [] : {};
 
 				}
 
-				inputNodes[ prop ][ prop2 ] = childNode.toJSON( json.meta ).uuid;
+				inputNodes[ property ][ index ] = childNode.toJSON( json.meta ).uuid;
 
 			} else {
 
-				inputNodes[ prop ] = childNode.toJSON( json.meta ).uuid;
+				inputNodes[ property ] = childNode.toJSON( json.meta ).uuid;
 
 			}
 

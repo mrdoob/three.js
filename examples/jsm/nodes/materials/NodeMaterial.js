@@ -326,9 +326,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		data.inputNodes = {};
 
-		for ( const { prop, childNode } of nodeChildren ) {
+		for ( const { property, childNode } of nodeChildren ) {
 
-			data.inputNodes[ prop ] = childNode.toJSON( meta ).uuid;
+			data.inputNodes[ property ] = childNode.toJSON( meta ).uuid;
 
 		}
 
