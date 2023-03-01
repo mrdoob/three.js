@@ -38,7 +38,7 @@ class Node {
 
 		const self = this;
 
-		for ( const { prop, prop2. childNode } of getNodeChildren( this ) ) {
+		for ( const { prop, prop2, childNode } of getNodeChildren( this ) ) {
 
 			if ( prop2 !== undefined ) {
 
