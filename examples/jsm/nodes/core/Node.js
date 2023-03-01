@@ -254,7 +254,7 @@ class Node {
 
 				}
 
-				inputNodes[ prop ][ prop2 ] = childNode.toJSON( json.meta ).uuid );
+				inputNodes[ prop ][ prop2 ] = childNode.toJSON( json.meta ).uuid;
 
 			} else {
 
