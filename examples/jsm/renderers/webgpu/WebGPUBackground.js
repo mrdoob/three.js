@@ -165,8 +165,13 @@ class WebGPUBackground {
 		} else {
 
 			colorAttachment.loadOp = GPULoadOp.Load;
+			colorAttachment.storeOp = GPUStoreOp.Store;
+
 			depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
 			depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 		}
 

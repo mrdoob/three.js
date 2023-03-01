@@ -22,11 +22,16 @@ export default QUnit.module( 'Core', () => {
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
+			// array, itemSize
 			let instance = new InstancedBufferAttribute( new Float32Array( 10 ), 2 );
-			assert.ok( instance.meshPerAttribute === 1, 'ok' );
+			assert.ok( instance.meshPerAttribute === 1, 'Can instantiate an InstancedBufferGeometry.' );
 
+			// array, itemSize, normalized, meshPerAttribute
 			instance = new InstancedBufferAttribute( new Float32Array( 10 ), 2, false, 123 );
-			assert.ok( instance.meshPerAttribute === 123, 'ok' );
+			assert.ok(
+				instance.meshPerAttribute === 123,
+				'Can instantiate an InstancedBufferGeometry with array, itemSize, normalized, and meshPerAttribute.'
+			);
 
 		} );
 

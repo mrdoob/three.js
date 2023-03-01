@@ -30,9 +30,11 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const light = new PointLight( parameters.color );
+			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			assert.ok( object, 'Can instantiate a PointLightHelper.' );
 
 		} );
 
@@ -73,9 +75,13 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const light = new PointLight( parameters.color );
+			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			object.dispose();
 
 		} );
 

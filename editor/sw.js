@@ -190,6 +190,7 @@ const assets = [
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
+	'./js/Viewport.Shading.js',
 	'./js/Viewport.Info.js',
 	'./js/Viewport.Selector.js',
 	'./js/Viewport.ViewHelper.js',

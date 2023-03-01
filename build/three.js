@@ -10,7 +10,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.THREE = {}));
 })(this, (function (exports) { 'use strict';
 
-	const REVISION = '150dev';
+	const REVISION = '151dev';
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 	const CullFaceNone = 0;
@@ -2870,43 +2870,28 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 
 	/**
-	 * Matrices for sRGB and Display P3, based on the W3C specifications
-	 * for sRGB and Display P3, and the ICC specification for the D50
-	 * connection space.
+	 * Matrices converting P3 <-> Rec. 709 primaries, without gamut mapping
+	 * or clipping. Based on W3C specifications for sRGB and Display P3,
+	 * and ICC specifications for the D50 connection space. Values in/out
+	 * are _linear_ sRGB and _linear_ Display P3.
+	 *
+	 * Note that both sRGB and Display P3 use the sRGB transfer functions.
 	 *
 	 * Reference:
 	 * - http://www.russellcottrell.com/photo/matrixCalculator.htm
 	 */
 
-	const SRGB_TO_DISPLAY_P3 = new Matrix3().multiplyMatrices(
-		// XYZ to Display P3
-		new Matrix3().set(
-			2.4039840, - 0.9899069, - 0.3976415,
-			- 0.8422229, 1.7988437, 0.0160354,
-			0.0482059, - 0.0974068, 1.2740049,
-		),
-		// sRGB to XYZ
-		new Matrix3().set(
-			0.4360413, 0.3851129, 0.1430458,
-			0.2224845, 0.7169051, 0.0606104,
-			0.0139202, 0.0970672, 0.7139126,
-		),
-	);
+	const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = new Matrix3().fromArray( [
+		0.8224621, 0.0331941, 0.0170827,
+		0.1775380, 0.9668058, 0.0723974,
+		- 0.0000001, 0.0000001, 0.9105199
+	] );
 
-	const DISPLAY_P3_TO_SRGB = new Matrix3().multiplyMatrices(
-		// XYZ to sRGB
-		new Matrix3().set(
-			3.1341864, - 1.6172090, - 0.4906941,
-			- 0.9787485, 1.9161301, 0.0334334,
-			0.0719639, - 0.2289939, 1.4057537,
-		),
-		// Display P3 to XYZ
-		new Matrix3().set(
-			0.5151187, 0.2919778, 0.1571035,
-			0.2411892, 0.6922441, 0.0665668,
-			- 0.0010505, 0.0418791, 0.7840713,
-		),
-	);
+	const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = new Matrix3().fromArray( [
+		1.2249401, - 0.0420569, - 0.0196376,
+		- 0.2249404, 1.0420571, - 0.0786361,
+		0.0000001, 0.0000000, 1.0982735
+	] );
 
 	const _vector$c = new Vector3();
 
@@ -2914,7 +2899,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		color.convertSRGBToLinear();
 
-		_vector$c.set( color.r, color.g, color.b ).applyMatrix3( DISPLAY_P3_TO_SRGB );
+		_vector$c.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB );
 
 		return color.setRGB( _vector$c.x, _vector$c.y, _vector$c.z );
 
@@ -2922,7 +2907,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	function LinearSRGBToDisplayP3( color ) {
 
-		_vector$c.set( color.r, color.g, color.b ).applyMatrix3( SRGB_TO_DISPLAY_P3 );
+		_vector$c.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 );
 
 		return color.setRGB( _vector$c.x, _vector$c.y, _vector$c.z ).convertLinearToSRGB();
 
@@ -3321,7 +3306,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		set image( value ) {
+		set image( value = null ) {
 
 			this.source.data = value;
 
@@ -4857,9 +4842,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		distanceToPoint( point ) {
 
-			const clampedPoint = _vector$b.copy( point ).clamp( this.min, this.max );
-
-			return clampedPoint.sub( point ).length();
+			return this.clampPoint( point, _vector$b ).distanceTo( point );
 
 		}
 
@@ -5275,7 +5258,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		at( t, target ) {
 
-			return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
+			return target.copy( this.origin ).addScaledVector( this.direction, t );
 
 		}
 
@@ -5307,7 +5290,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			return target.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+			return target.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
 		}
 
@@ -5329,7 +5312,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			_vector$a.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+			_vector$a.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
 			return _vector$a.distanceToSquared( point );
 
@@ -5440,13 +5423,13 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( optionalPointOnRay ) {
 
-				optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
+				optionalPointOnRay.copy( this.origin ).addScaledVector( this.direction, s0 );
 
 			}
 
 			if ( optionalPointOnSegment ) {
 
-				optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
+				optionalPointOnSegment.copy( _segCenter ).addScaledVector( _segDir, s1 );
 
 			}
 
@@ -5471,8 +5454,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			// t1 = second intersect point - exit point on back of sphere
 			const t1 = tca + thc;
 
-			// test to see if both t0 and t1 are behind the ray - if so, return null
-			if ( t0 < 0 && t1 < 0 ) return null;
+			// test to see if t1 is behind the ray - if so, return null
+			if ( t1 < 0 ) return null;
 
 			// test to see if t0 is behind the ray:
 			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
@@ -9374,6 +9357,175 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	// Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
+
+	const _tables = /*@__PURE__*/ _generateTables();
+
+	function _generateTables() {
+
+		// float32 to float16 helpers
+
+		const buffer = new ArrayBuffer( 4 );
+		const floatView = new Float32Array( buffer );
+		const uint32View = new Uint32Array( buffer );
+
+		const baseTable = new Uint32Array( 512 );
+		const shiftTable = new Uint32Array( 512 );
+
+		for ( let i = 0; i < 256; ++ i ) {
+
+			const e = i - 127;
+
+			// very small number (0, -0)
+
+			if ( e < - 27 ) {
+
+				baseTable[ i ] = 0x0000;
+				baseTable[ i | 0x100 ] = 0x8000;
+				shiftTable[ i ] = 24;
+				shiftTable[ i | 0x100 ] = 24;
+
+				// small number (denorm)
+
+			} else if ( e < - 14 ) {
+
+				baseTable[ i ] = 0x0400 >> ( - e - 14 );
+				baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
+				shiftTable[ i ] = - e - 1;
+				shiftTable[ i | 0x100 ] = - e - 1;
+
+				// normal number
+
+			} else if ( e <= 15 ) {
+
+				baseTable[ i ] = ( e + 15 ) << 10;
+				baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
+				shiftTable[ i ] = 13;
+				shiftTable[ i | 0x100 ] = 13;
+
+				// large number (Infinity, -Infinity)
+
+			} else if ( e < 128 ) {
+
+				baseTable[ i ] = 0x7c00;
+				baseTable[ i | 0x100 ] = 0xfc00;
+				shiftTable[ i ] = 24;
+				shiftTable[ i | 0x100 ] = 24;
+
+				// stay (NaN, Infinity, -Infinity)
+
+			} else {
+
+				baseTable[ i ] = 0x7c00;
+				baseTable[ i | 0x100 ] = 0xfc00;
+				shiftTable[ i ] = 13;
+				shiftTable[ i | 0x100 ] = 13;
+
+			}
+
+		}
+
+		// float16 to float32 helpers
+
+		const mantissaTable = new Uint32Array( 2048 );
+		const exponentTable = new Uint32Array( 64 );
+		const offsetTable = new Uint32Array( 64 );
+
+		for ( let i = 1; i < 1024; ++ i ) {
+
+			let m = i << 13; // zero pad mantissa bits
+			let e = 0; // zero exponent
+
+			// normalized
+			while ( ( m & 0x00800000 ) === 0 ) {
+
+				m <<= 1;
+				e -= 0x00800000; // decrement exponent
+
+			}
+
+			m &= ~ 0x00800000; // clear leading 1 bit
+			e += 0x38800000; // adjust bias
+
+			mantissaTable[ i ] = m | e;
+
+		}
+
+		for ( let i = 1024; i < 2048; ++ i ) {
+
+			mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
+
+		}
+
+		for ( let i = 1; i < 31; ++ i ) {
+
+			exponentTable[ i ] = i << 23;
+
+		}
+
+		exponentTable[ 31 ] = 0x47800000;
+		exponentTable[ 32 ] = 0x80000000;
+
+		for ( let i = 33; i < 63; ++ i ) {
+
+			exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
+
+		}
+
+		exponentTable[ 63 ] = 0xc7800000;
+
+		for ( let i = 1; i < 64; ++ i ) {
+
+			if ( i !== 32 ) {
+
+				offsetTable[ i ] = 1024;
+
+			}
+
+		}
+
+		return {
+			floatView: floatView,
+			uint32View: uint32View,
+			baseTable: baseTable,
+			shiftTable: shiftTable,
+			mantissaTable: mantissaTable,
+			exponentTable: exponentTable,
+			offsetTable: offsetTable
+		};
+
+	}
+
+	// float32 to float16
+
+	function toHalfFloat( val ) {
+
+		if ( Math.abs( val ) > 65504 ) console.warn( 'THREE.DataUtils.toHalfFloat(): Value out of range.' );
+
+		val = clamp( val, - 65504, 65504 );
+
+		_tables.floatView[ 0 ] = val;
+		const f = _tables.uint32View[ 0 ];
+		const e = ( f >> 23 ) & 0x1ff;
+		return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
+
+	}
+
+	// float16 to float32
+
+	function fromHalfFloat( val ) {
+
+		const m = val >> 10;
+		_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
+		return _tables.floatView[ 0 ];
+
+	}
+
+	const DataUtils = {
+		toHalfFloat: toHalfFloat,
+		fromHalfFloat: fromHalfFloat,
+	};
+
 	const _vector$9 = /*@__PURE__*/ new Vector3();
 	const _vector2$1 = /*@__PURE__*/ new Vector2();
 
@@ -9821,6 +9973,146 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			super( new Uint16Array( array ), itemSize, normalized );
 
 			this.isFloat16BufferAttribute = true;
+
+		}
+
+		getX( index ) {
+
+			let x = fromHalfFloat( this.array[ index * this.itemSize ] );
+
+			if ( this.normalized ) x = denormalize( x, this.array );
+
+			return x;
+
+		}
+
+		setX( index, x ) {
+
+			if ( this.normalized ) x = normalize( x, this.array );
+
+			this.array[ index * this.itemSize ] = toHalfFloat( x );
+
+			return this;
+
+		}
+
+		getY( index ) {
+
+			let y = fromHalfFloat( this.array[ index * this.itemSize + 1 ] );
+
+			if ( this.normalized ) y = denormalize( y, this.array );
+
+			return y;
+
+		}
+
+		setY( index, y ) {
+
+			if ( this.normalized ) y = normalize( y, this.array );
+
+			this.array[ index * this.itemSize + 1 ] = toHalfFloat( y );
+
+			return this;
+
+		}
+
+		getZ( index ) {
+
+			let z = fromHalfFloat( this.array[ index * this.itemSize + 2 ] );
+
+			if ( this.normalized ) z = denormalize( z, this.array );
+
+			return z;
+
+		}
+
+		setZ( index, z ) {
+
+			if ( this.normalized ) z = normalize( z, this.array );
+
+			this.array[ index * this.itemSize + 2 ] = toHalfFloat( z );
+
+			return this;
+
+		}
+
+		getW( index ) {
+
+			let w = fromHalfFloat( this.array[ index * this.itemSize + 3 ] );
+
+			if ( this.normalized ) w = denormalize( w, this.array );
+
+			return w;
+
+		}
+
+		setW( index, w ) {
+
+			if ( this.normalized ) w = normalize( w, this.array );
+
+			this.array[ index * this.itemSize + 3 ] = toHalfFloat( w );
+
+			return this;
+
+		}
+
+		setXY( index, x, y ) {
+
+			index *= this.itemSize;
+
+			if ( this.normalized ) {
+
+				x = normalize( x, this.array );
+				y = normalize( y, this.array );
+
+			}
+
+			this.array[ index + 0 ] = toHalfFloat( x );
+			this.array[ index + 1 ] = toHalfFloat( y );
+
+			return this;
+
+		}
+
+		setXYZ( index, x, y, z ) {
+
+			index *= this.itemSize;
+
+			if ( this.normalized ) {
+
+				x = normalize( x, this.array );
+				y = normalize( y, this.array );
+				z = normalize( z, this.array );
+
+			}
+
+			this.array[ index + 0 ] = toHalfFloat( x );
+			this.array[ index + 1 ] = toHalfFloat( y );
+			this.array[ index + 2 ] = toHalfFloat( z );
+
+			return this;
+
+		}
+
+		setXYZW( index, x, y, z, w ) {
+
+			index *= this.itemSize;
+
+			if ( this.normalized ) {
+
+				x = normalize( x, this.array );
+				y = normalize( y, this.array );
+				z = normalize( z, this.array );
+				w = normalize( w, this.array );
+
+			}
+
+			this.array[ index + 0 ] = toHalfFloat( x );
+			this.array[ index + 1 ] = toHalfFloat( y );
+			this.array[ index + 2 ] = toHalfFloat( z );
+			this.array[ index + 3 ] = toHalfFloat( w );
+
+			return this;
 
 		}
 
@@ -10910,10 +11202,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.userData = source.userData;
 
-			// geometry generator parameters
-
-			if ( source.parameters !== undefined ) this.parameters = Object.assign( {}, source.parameters );
-
 			return this;
 
 		}
@@ -11468,6 +11756,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				numberOfVertices += vertexCounter;
 
 			}
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
 
 		}
 
@@ -12410,7 +12708,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		projectPoint( point, target ) {
 
-			return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
+			return target.copy( point ).addScaledVector( this.normal, - this.distanceToPoint( point ) );
 
 		}
 
@@ -12442,7 +12740,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			return target.copy( direction ).multiplyScalar( t ).add( line.start );
+			return target.copy( line.start ).addScaledVector( direction, t );
 
 		}
 
@@ -12988,6 +13286,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
+
+		}
+
 		static fromJSON( data ) {
 
 			return new PlaneGeometry( data.width, data.height, data.widthSegments, data.heightSegments );
@@ -13034,7 +13342,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var color_vertex = "#if defined( USE_COLOR_ALPHA )\n\tvColor = vec4( 1.0 );\n#elif defined( USE_COLOR ) || defined( USE_INSTANCING_COLOR )\n\tvColor = vec3( 1.0 );\n#endif\n#ifdef USE_COLOR\n\tvColor *= color;\n#endif\n#ifdef USE_INSTANCING_COLOR\n\tvColor.xyz *= instanceColor.xyz;\n#endif";
 
-	var common = "#define PI 3.141592653589793\n#define PI2 6.283185307179586\n#define PI_HALF 1.5707963267948966\n#define RECIPROCAL_PI 0.3183098861837907\n#define RECIPROCAL_PI2 0.15915494309189535\n#define EPSILON 1e-6\n#ifndef saturate\n#define saturate( a ) clamp( a, 0.0, 1.0 )\n#endif\n#define whiteComplement( a ) ( 1.0 - saturate( a ) )\nfloat pow2( const in float x ) { return x*x; }\nvec3 pow2( const in vec3 x ) { return x*x; }\nfloat pow3( const in float x ) { return x*x*x; }\nfloat pow4( const in float x ) { float x2 = x*x; return x2*x2; }\nfloat max3( const in vec3 v ) { return max( max( v.x, v.y ), v.z ); }\nfloat average( const in vec3 v ) { return dot( v, vec3( 0.3333333 ) ); }\nhighp float rand( const in vec2 uv ) {\n\tconst highp float a = 12.9898, b = 78.233, c = 43758.5453;\n\thighp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );\n\treturn fract( sin( sn ) * c );\n}\n#ifdef HIGH_PRECISION\n\tfloat precisionSafeLength( vec3 v ) { return length( v ); }\n#else\n\tfloat precisionSafeLength( vec3 v ) {\n\t\tfloat maxComponent = max3( abs( v ) );\n\t\treturn length( v / maxComponent ) * maxComponent;\n\t}\n#endif\nstruct IncidentLight {\n\tvec3 color;\n\tvec3 direction;\n\tbool visible;\n};\nstruct ReflectedLight {\n\tvec3 directDiffuse;\n\tvec3 directSpecular;\n\tvec3 indirectDiffuse;\n\tvec3 indirectSpecular;\n};\nstruct GeometricContext {\n\tvec3 position;\n\tvec3 normal;\n\tvec3 viewDir;\n#ifdef USE_CLEARCOAT\n\tvec3 clearcoatNormal;\n#endif\n};\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nmat3 transposeMat3( const in mat3 m ) {\n\tmat3 tmp;\n\ttmp[ 0 ] = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x );\n\ttmp[ 1 ] = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y );\n\ttmp[ 2 ] = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z );\n\treturn tmp;\n}\nfloat luminance( const in vec3 rgb ) {\n\tconst vec3 weights = vec3( 0.2126729, 0.7151522, 0.0721750 );\n\treturn dot( weights, rgb );\n}\nbool isPerspectiveMatrix( mat4 m ) {\n\treturn m[ 2 ][ 3 ] == - 1.0;\n}\nvec2 equirectUv( in vec3 dir ) {\n\tfloat u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;\n\tfloat v = asin( clamp( dir.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\treturn vec2( u, v );\n}\nfloat w0( float a ) {\n\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - a + 3.0 ) - 3.0 ) + 1.0 );\n}\nfloat w1( float a ) {\n\treturn ( 1.0 / 6.0 ) * ( a *  a * ( 3.0 * a - 6.0 ) + 4.0 );\n}\nfloat w2( float a ){\n    return ( 1.0 / 6.0 ) * ( a * ( a * ( - 3.0 * a + 3.0 ) + 3.0 ) + 1.0 );\n}\nfloat w3( float a ) {\n\treturn ( 1.0 / 6.0 ) * ( a * a * a );\n}\nfloat g0( float a ) {\n\treturn w0( a ) + w1( a );\n}\nfloat g1( float a ) {\n\treturn w2( a ) + w3( a );\n}\nfloat h0( float a ) {\n\treturn - 1.0 + w1( a ) / ( w0( a ) + w1( a ) );\n}\nfloat h1( float a ) {\n    return 1.0 + w3( a ) / ( w2( a ) + w3( a ) );\n}\nvec4 bicubic( sampler2D tex, vec2 uv, vec4 texelSize, vec2 fullSize, float lod ) {\n\tuv = uv * texelSize.zw + 0.5;\n\tvec2 iuv = floor( uv );\n    vec2 fuv = fract( uv );\n    float g0x = g0( fuv.x );\n    float g1x = g1( fuv.x );\n    float h0x = h0( fuv.x );\n    float h1x = h1( fuv.x );\n    float h0y = h0( fuv.y );\n    float h1y = h1( fuv.y );\n    vec2 p0 = ( vec2( iuv.x + h0x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n    vec2 p1 = ( vec2( iuv.x + h1x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n    vec2 p2 = ( vec2( iuv.x + h0x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n    vec2 p3 = ( vec2( iuv.x + h1x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n    \n    vec2 lodFudge = pow( 1.95, lod ) / fullSize;\n\treturn g0( fuv.y ) * ( g0x * textureLod( tex, p0, lod ) + g1x * textureLod( tex, p1, lod ) ) +\n\t\t   g1( fuv.y ) * ( g0x * textureLod( tex, p2, lod ) + g1x * textureLod( tex, p3, lod ) );\n}\nvec4 textureBicubic( sampler2D sampler, vec2 uv, float lod ) {\n\tvec2 fLodSize = vec2( textureSize( sampler, int( lod ) ) );\n\tvec2 cLodSize = vec2( textureSize( sampler, int( lod + 1.0 ) ) );\n\tvec2 fLodSizeInv = 1.0 / fLodSize;\n\tvec2 cLodSizeInv = 1.0 / cLodSize;\n\tvec2 fullSize = vec2( textureSize( sampler, 0 ) );\n\tvec4 fSample = bicubic( sampler, uv, vec4( fLodSizeInv, fLodSize ), fullSize, floor( lod ) );\n\tvec4 cSample = bicubic( sampler, uv, vec4( cLodSizeInv, cLodSize ), fullSize, ceil( lod ) );\n\treturn mix( fSample, cSample, fract( lod ) );\n}";
+	var common = "#define PI 3.141592653589793\n#define PI2 6.283185307179586\n#define PI_HALF 1.5707963267948966\n#define RECIPROCAL_PI 0.3183098861837907\n#define RECIPROCAL_PI2 0.15915494309189535\n#define EPSILON 1e-6\n#ifndef saturate\n#define saturate( a ) clamp( a, 0.0, 1.0 )\n#endif\n#define whiteComplement( a ) ( 1.0 - saturate( a ) )\nfloat pow2( const in float x ) { return x*x; }\nvec3 pow2( const in vec3 x ) { return x*x; }\nfloat pow3( const in float x ) { return x*x*x; }\nfloat pow4( const in float x ) { float x2 = x*x; return x2*x2; }\nfloat max3( const in vec3 v ) { return max( max( v.x, v.y ), v.z ); }\nfloat average( const in vec3 v ) { return dot( v, vec3( 0.3333333 ) ); }\nhighp float rand( const in vec2 uv ) {\n\tconst highp float a = 12.9898, b = 78.233, c = 43758.5453;\n\thighp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );\n\treturn fract( sin( sn ) * c );\n}\n#ifdef HIGH_PRECISION\n\tfloat precisionSafeLength( vec3 v ) { return length( v ); }\n#else\n\tfloat precisionSafeLength( vec3 v ) {\n\t\tfloat maxComponent = max3( abs( v ) );\n\t\treturn length( v / maxComponent ) * maxComponent;\n\t}\n#endif\nstruct IncidentLight {\n\tvec3 color;\n\tvec3 direction;\n\tbool visible;\n};\nstruct ReflectedLight {\n\tvec3 directDiffuse;\n\tvec3 directSpecular;\n\tvec3 indirectDiffuse;\n\tvec3 indirectSpecular;\n};\nstruct GeometricContext {\n\tvec3 position;\n\tvec3 normal;\n\tvec3 viewDir;\n#ifdef USE_CLEARCOAT\n\tvec3 clearcoatNormal;\n#endif\n};\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nmat3 transposeMat3( const in mat3 m ) {\n\tmat3 tmp;\n\ttmp[ 0 ] = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x );\n\ttmp[ 1 ] = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y );\n\ttmp[ 2 ] = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z );\n\treturn tmp;\n}\nfloat luminance( const in vec3 rgb ) {\n\tconst vec3 weights = vec3( 0.2126729, 0.7151522, 0.0721750 );\n\treturn dot( weights, rgb );\n}\nbool isPerspectiveMatrix( mat4 m ) {\n\treturn m[ 2 ][ 3 ] == - 1.0;\n}\nvec2 equirectUv( in vec3 dir ) {\n\tfloat u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;\n\tfloat v = asin( clamp( dir.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\treturn vec2( u, v );\n}";
 
 	var cube_uv_reflection_fragment = "#ifdef ENVMAP_TYPE_CUBE_UV\n\t#define cubeUV_minMipLevel 4.0\n\t#define cubeUV_minTileSize 16.0\n\tfloat getFace( vec3 direction ) {\n\t\tvec3 absDirection = abs( direction );\n\t\tfloat face = - 1.0;\n\t\tif ( absDirection.x > absDirection.z ) {\n\t\t\tif ( absDirection.x > absDirection.y )\n\t\t\t\tface = direction.x > 0.0 ? 0.0 : 3.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t} else {\n\t\t\tif ( absDirection.z > absDirection.y )\n\t\t\t\tface = direction.z > 0.0 ? 2.0 : 5.0;\n\t\t\telse\n\t\t\t\tface = direction.y > 0.0 ? 1.0 : 4.0;\n\t\t}\n\t\treturn face;\n\t}\n\tvec2 getUV( vec3 direction, float face ) {\n\t\tvec2 uv;\n\t\tif ( face == 0.0 ) {\n\t\t\tuv = vec2( direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 1.0 ) {\n\t\t\tuv = vec2( - direction.x, - direction.z ) / abs( direction.y );\n\t\t} else if ( face == 2.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.y ) / abs( direction.z );\n\t\t} else if ( face == 3.0 ) {\n\t\t\tuv = vec2( - direction.z, direction.y ) / abs( direction.x );\n\t\t} else if ( face == 4.0 ) {\n\t\t\tuv = vec2( - direction.x, direction.z ) / abs( direction.y );\n\t\t} else {\n\t\t\tuv = vec2( direction.x, direction.y ) / abs( direction.z );\n\t\t}\n\t\treturn 0.5 * ( uv + 1.0 );\n\t}\n\tvec3 bilinearCubeUV( sampler2D envMap, vec3 direction, float mipInt ) {\n\t\tfloat face = getFace( direction );\n\t\tfloat filterInt = max( cubeUV_minMipLevel - mipInt, 0.0 );\n\t\tmipInt = max( mipInt, cubeUV_minMipLevel );\n\t\tfloat faceSize = exp2( mipInt );\n\t\thighp vec2 uv = getUV( direction, face ) * ( faceSize - 2.0 ) + 1.0;\n\t\tif ( face > 2.0 ) {\n\t\t\tuv.y += faceSize;\n\t\t\tface -= 3.0;\n\t\t}\n\t\tuv.x += face * faceSize;\n\t\tuv.x += filterInt * 3.0 * cubeUV_minTileSize;\n\t\tuv.y += 4.0 * ( exp2( CUBEUV_MAX_MIP ) - faceSize );\n\t\tuv.x *= CUBEUV_TEXEL_WIDTH;\n\t\tuv.y *= CUBEUV_TEXEL_HEIGHT;\n\t\t#ifdef texture2DGradEXT\n\t\t\treturn texture2DGradEXT( envMap, uv, vec2( 0.0 ), vec2( 0.0 ) ).rgb;\n\t\t#else\n\t\t\treturn texture2D( envMap, uv ).rgb;\n\t\t#endif\n\t}\n\t#define cubeUV_r0 1.0\n\t#define cubeUV_v0 0.339\n\t#define cubeUV_m0 - 2.0\n\t#define cubeUV_r1 0.8\n\t#define cubeUV_v1 0.276\n\t#define cubeUV_m1 - 1.0\n\t#define cubeUV_r4 0.4\n\t#define cubeUV_v4 0.046\n\t#define cubeUV_m4 2.0\n\t#define cubeUV_r5 0.305\n\t#define cubeUV_v5 0.016\n\t#define cubeUV_m5 3.0\n\t#define cubeUV_r6 0.21\n\t#define cubeUV_v6 0.0038\n\t#define cubeUV_m6 4.0\n\tfloat roughnessToMip( float roughness ) {\n\t\tfloat mip = 0.0;\n\t\tif ( roughness >= cubeUV_r1 ) {\n\t\t\tmip = ( cubeUV_r0 - roughness ) * ( cubeUV_m1 - cubeUV_m0 ) / ( cubeUV_r0 - cubeUV_r1 ) + cubeUV_m0;\n\t\t} else if ( roughness >= cubeUV_r4 ) {\n\t\t\tmip = ( cubeUV_r1 - roughness ) * ( cubeUV_m4 - cubeUV_m1 ) / ( cubeUV_r1 - cubeUV_r4 ) + cubeUV_m1;\n\t\t} else if ( roughness >= cubeUV_r5 ) {\n\t\t\tmip = ( cubeUV_r4 - roughness ) * ( cubeUV_m5 - cubeUV_m4 ) / ( cubeUV_r4 - cubeUV_r5 ) + cubeUV_m4;\n\t\t} else if ( roughness >= cubeUV_r6 ) {\n\t\t\tmip = ( cubeUV_r5 - roughness ) * ( cubeUV_m6 - cubeUV_m5 ) / ( cubeUV_r5 - cubeUV_r6 ) + cubeUV_m5;\n\t\t} else {\n\t\t\tmip = - 2.0 * log2( 1.16 * roughness );\t\t}\n\t\treturn mip;\n\t}\n\tvec4 textureCubeUV( sampler2D envMap, vec3 sampleDir, float roughness ) {\n\t\tfloat mip = clamp( roughnessToMip( roughness ), cubeUV_m0, CUBEUV_MAX_MIP );\n\t\tfloat mipF = fract( mip );\n\t\tfloat mipInt = floor( mip );\n\t\tvec3 color0 = bilinearCubeUV( envMap, sampleDir, mipInt );\n\t\tif ( mipF == 0.0 ) {\n\t\t\treturn vec4( color0, 1.0 );\n\t\t} else {\n\t\t\tvec3 color1 = bilinearCubeUV( envMap, sampleDir, mipInt + 1.0 );\n\t\t\treturn vec4( mix( color0, color1, mipF ), 1.0 );\n\t\t}\n\t}\n#endif";
 
@@ -13192,7 +13500,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var transmission_fragment = "#ifdef USE_TRANSMISSION\n\tmaterial.transmission = transmission;\n\tmaterial.transmissionAlpha = 1.0;\n\tmaterial.thickness = thickness;\n\tmaterial.attenuationDistance = attenuationDistance;\n\tmaterial.attenuationColor = attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tmaterial.transmission *= texture2D( transmissionMap, vUv ).r;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tmaterial.thickness *= texture2D( thicknessMap, vUv ).g;\n\t#endif\n\tvec3 pos = vWorldPosition;\n\tvec3 v = normalize( cameraPosition - pos );\n\tvec3 n = inverseTransformDirection( normal, viewMatrix );\n\tvec4 transmission = getIBLVolumeRefraction(\n\t\tn, v, material.roughness, material.diffuseColor, material.specularColor, material.specularF90,\n\t\tpos, modelMatrix, viewMatrix, projectionMatrix, material.ior, material.thickness,\n\t\tmaterial.attenuationColor, material.attenuationDistance );\n\tmaterial.transmissionAlpha = mix( material.transmissionAlpha, transmission.a, material.transmission );\n\ttotalDiffuse = mix( totalDiffuse, transmission.rgb, material.transmission );\n#endif";
 
-	var transmission_pars_fragment = "#ifdef USE_TRANSMISSION\n\tuniform float transmission;\n\tuniform float thickness;\n\tuniform float attenuationDistance;\n\tuniform vec3 attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tuniform sampler2D transmissionMap;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tuniform sampler2D thicknessMap;\n\t#endif\n\tuniform vec2 transmissionSamplerSize;\n\tuniform sampler2D transmissionSamplerMap;\n\tuniform mat4 modelMatrix;\n\tuniform mat4 projectionMatrix;\n\tvarying vec3 vWorldPosition;\n\tvec3 getVolumeTransmissionRay( const in vec3 n, const in vec3 v, const in float thickness, const in float ior, const in mat4 modelMatrix ) {\n\t\tvec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );\n\t\tvec3 modelScale;\n\t\tmodelScale.x = length( vec3( modelMatrix[ 0 ].xyz ) );\n\t\tmodelScale.y = length( vec3( modelMatrix[ 1 ].xyz ) );\n\t\tmodelScale.z = length( vec3( modelMatrix[ 2 ].xyz ) );\n\t\treturn normalize( refractionVector ) * thickness * modelScale;\n\t}\n\tfloat applyIorToRoughness( const in float roughness, const in float ior ) {\n\t\treturn roughness * clamp( ior * 2.0 - 2.0, 0.0, 1.0 );\n\t}\n\tvec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {\n\t\tfloat lod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );\n\t\treturn textureBicubic( transmissionSamplerMap, fragCoord.xy, lod );\n\t}\n\tvec3 applyVolumeAttenuation( const in vec3 radiance, const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tif ( isinf( attenuationDistance ) ) {\n\t\t\treturn radiance;\n\t\t} else {\n\t\t\tvec3 attenuationCoefficient = -log( attenuationColor ) / attenuationDistance;\n\t\t\tvec3 transmittance = exp( - attenuationCoefficient * transmissionDistance );\t\t\treturn transmittance * radiance;\n\t\t}\n\t}\n\tvec4 getIBLVolumeRefraction( const in vec3 n, const in vec3 v, const in float roughness, const in vec3 diffuseColor,\n\t\tconst in vec3 specularColor, const in float specularF90, const in vec3 position, const in mat4 modelMatrix,\n\t\tconst in mat4 viewMatrix, const in mat4 projMatrix, const in float ior, const in float thickness,\n\t\tconst in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tvec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );\n\t\tvec3 refractedRayExit = position + transmissionRay;\n\t\tvec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );\n\t\tvec2 refractionCoords = ndcPos.xy / ndcPos.w;\n\t\trefractionCoords += 1.0;\n\t\trefractionCoords /= 2.0;\n\t\tvec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );\n\t\tvec3 attenuatedColor = applyVolumeAttenuation( transmittedLight.rgb, length( transmissionRay ), attenuationColor, attenuationDistance );\n\t\tvec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );\n\t\treturn vec4( ( 1.0 - F ) * attenuatedColor * diffuseColor, transmittedLight.a );\n\t}\n#endif";
+	var transmission_pars_fragment = "#ifdef USE_TRANSMISSION\n\tuniform float transmission;\n\tuniform float thickness;\n\tuniform float attenuationDistance;\n\tuniform vec3 attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tuniform sampler2D transmissionMap;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tuniform sampler2D thicknessMap;\n\t#endif\n\tuniform vec2 transmissionSamplerSize;\n\tuniform sampler2D transmissionSamplerMap;\n\tuniform mat4 modelMatrix;\n\tuniform mat4 projectionMatrix;\n\tvarying vec3 vWorldPosition;\n\tfloat w0( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - a + 3.0 ) - 3.0 ) + 1.0 );\n\t}\n\tfloat w1( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a *  a * ( 3.0 * a - 6.0 ) + 4.0 );\n\t}\n\tfloat w2( float a ){\n\t\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - 3.0 * a + 3.0 ) + 3.0 ) + 1.0 );\n\t}\n\tfloat w3( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a * a * a );\n\t}\n\tfloat g0( float a ) {\n\t\treturn w0( a ) + w1( a );\n\t}\n\tfloat g1( float a ) {\n\t\treturn w2( a ) + w3( a );\n\t}\n\tfloat h0( float a ) {\n\t\treturn - 1.0 + w1( a ) / ( w0( a ) + w1( a ) );\n\t}\n\tfloat h1( float a ) {\n\t\treturn 1.0 + w3( a ) / ( w2( a ) + w3( a ) );\n\t}\n\tvec4 bicubic( sampler2D tex, vec2 uv, vec4 texelSize, vec2 fullSize, float lod ) {\n\t\tuv = uv * texelSize.zw + 0.5;\n\t\tvec2 iuv = floor( uv );\n\t\tvec2 fuv = fract( uv );\n\t\tfloat g0x = g0( fuv.x );\n\t\tfloat g1x = g1( fuv.x );\n\t\tfloat h0x = h0( fuv.x );\n\t\tfloat h1x = h1( fuv.x );\n\t\tfloat h0y = h0( fuv.y );\n\t\tfloat h1y = h1( fuv.y );\n\t\tvec2 p0 = ( vec2( iuv.x + h0x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p1 = ( vec2( iuv.x + h1x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p2 = ( vec2( iuv.x + h0x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p3 = ( vec2( iuv.x + h1x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n\t\t\n\t\tvec2 lodFudge = pow( 1.95, lod ) / fullSize;\n\t\treturn g0( fuv.y ) * ( g0x * textureLod( tex, p0, lod ) + g1x * textureLod( tex, p1, lod ) ) +\n\t\t\tg1( fuv.y ) * ( g0x * textureLod( tex, p2, lod ) + g1x * textureLod( tex, p3, lod ) );\n\t}\n\tvec4 textureBicubic( sampler2D sampler, vec2 uv, float lod ) {\n\t\tvec2 fLodSize = vec2( textureSize( sampler, int( lod ) ) );\n\t\tvec2 cLodSize = vec2( textureSize( sampler, int( lod + 1.0 ) ) );\n\t\tvec2 fLodSizeInv = 1.0 / fLodSize;\n\t\tvec2 cLodSizeInv = 1.0 / cLodSize;\n\t\tvec2 fullSize = vec2( textureSize( sampler, 0 ) );\n\t\tvec4 fSample = bicubic( sampler, uv, vec4( fLodSizeInv, fLodSize ), fullSize, floor( lod ) );\n\t\tvec4 cSample = bicubic( sampler, uv, vec4( cLodSizeInv, cLodSize ), fullSize, ceil( lod ) );\n\t\treturn mix( fSample, cSample, fract( lod ) );\n\t}\n\tvec3 getVolumeTransmissionRay( const in vec3 n, const in vec3 v, const in float thickness, const in float ior, const in mat4 modelMatrix ) {\n\t\tvec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );\n\t\tvec3 modelScale;\n\t\tmodelScale.x = length( vec3( modelMatrix[ 0 ].xyz ) );\n\t\tmodelScale.y = length( vec3( modelMatrix[ 1 ].xyz ) );\n\t\tmodelScale.z = length( vec3( modelMatrix[ 2 ].xyz ) );\n\t\treturn normalize( refractionVector ) * thickness * modelScale;\n\t}\n\tfloat applyIorToRoughness( const in float roughness, const in float ior ) {\n\t\treturn roughness * clamp( ior * 2.0 - 2.0, 0.0, 1.0 );\n\t}\n\tvec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {\n\t\tfloat lod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );\n\t\treturn textureBicubic( transmissionSamplerMap, fragCoord.xy, lod );\n\t}\n\tvec3 applyVolumeAttenuation( const in vec3 radiance, const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tif ( isinf( attenuationDistance ) ) {\n\t\t\treturn radiance;\n\t\t} else {\n\t\t\tvec3 attenuationCoefficient = -log( attenuationColor ) / attenuationDistance;\n\t\t\tvec3 transmittance = exp( - attenuationCoefficient * transmissionDistance );\t\t\treturn transmittance * radiance;\n\t\t}\n\t}\n\tvec4 getIBLVolumeRefraction( const in vec3 n, const in vec3 v, const in float roughness, const in vec3 diffuseColor,\n\t\tconst in vec3 specularColor, const in float specularF90, const in vec3 position, const in mat4 modelMatrix,\n\t\tconst in mat4 viewMatrix, const in mat4 projMatrix, const in float ior, const in float thickness,\n\t\tconst in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tvec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );\n\t\tvec3 refractedRayExit = position + transmissionRay;\n\t\tvec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );\n\t\tvec2 refractionCoords = ndcPos.xy / ndcPos.w;\n\t\trefractionCoords += 1.0;\n\t\trefractionCoords /= 2.0;\n\t\tvec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );\n\t\tvec3 attenuatedColor = applyVolumeAttenuation( transmittedLight.rgb, length( transmissionRay ), attenuationColor, attenuationDistance );\n\t\tvec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );\n\t\treturn vec4( ( 1.0 - F ) * attenuatedColor * diffuseColor, transmittedLight.a );\n\t}\n#endif";
 
 	var uv_pars_fragment = "#if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )\n\tvarying vec2 vUv;\n#endif";
 
@@ -16837,7 +17145,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		function update( object, geometry, material, program ) {
+		function update( object, geometry, program ) {
 
 			const objectInfluences = object.morphTargetInfluences;
 
@@ -28261,7 +28569,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( _clippingEnabled === true ) clipping.setGlobalState( _this.clippingPlanes, camera );
 
-			if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, scene, camera );
+			if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
 
 			if ( viewport ) state.viewport( _currentViewport.copy( viewport ) );
 
@@ -28279,11 +28587,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		function renderTransmissionPass( opaqueObjects, scene, camera ) {
-
-			const isWebGL2 = capabilities.isWebGL2;
+		function renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera ) {
 
 			if ( _transmissionRenderTarget === null ) {
+
+				const isWebGL2 = capabilities.isWebGL2;
 
 				_transmissionRenderTarget = new WebGLRenderTarget( 1024, 1024, {
 					generateMipmaps: true,
@@ -28291,6 +28599,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 					minFilter: LinearMipmapLinearFilter,
 					samples: ( isWebGL2 && _antialias === true ) ? 4 : 0
 				} );
+
+				// debug
+
+				/*
+				const geometry = new PlaneGeometry();
+				const material = new MeshBasicMaterial( { map: _transmissionRenderTarget.texture } );
+
+				const mesh = new Mesh( geometry, material );
+				scene.add( mesh );
+				*/
 
 			}
 
@@ -28307,12 +28625,48 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			renderObjects( opaqueObjects, scene, camera );
 
-			_this.toneMapping = currentToneMapping;
-
 			textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
 			textures.updateRenderTargetMipmap( _transmissionRenderTarget );
 
+			let renderTargetNeedsUpdate = false;
+
+			for ( let i = 0, l = transmissiveObjects.length; i < l; i ++ ) {
+
+				const renderItem = transmissiveObjects[ i ];
+
+				const object = renderItem.object;
+				const geometry = renderItem.geometry;
+				const material = renderItem.material;
+				const group = renderItem.group;
+
+				if ( material.side === DoubleSide && object.layers.test( camera.layers ) ) {
+
+					const currentSide = material.side;
+
+					material.side = BackSide;
+					material.needsUpdate = true;
+
+					renderObject( object, scene, camera, geometry, material, group );
+
+					material.side = currentSide;
+					material.needsUpdate = true;
+
+					renderTargetNeedsUpdate = true;
+
+				}
+
+			}
+
+			if ( renderTargetNeedsUpdate === true ) {
+
+				textures.updateMultisampleRenderTarget( _transmissionRenderTarget );
+				textures.updateRenderTargetMipmap( _transmissionRenderTarget );
+
+			}
+
 			_this.setRenderTarget( currentRenderTarget );
+
+			_this.toneMapping = currentToneMapping;
 
 		}
 
@@ -28762,7 +29116,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( morphAttributes.position !== undefined || morphAttributes.normal !== undefined || ( morphAttributes.color !== undefined && capabilities.isWebGL2 === true ) ) {
 
-				morphtargets.update( object, geometry, material, program );
+				morphtargets.update( object, geometry, program );
 
 			}
 
@@ -32702,13 +33056,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		getTangent( t, optionalTarget ) {
+		getTangent( t, optionalTarget = new Vector2() ) {
 
-			const tangent = optionalTarget || new Vector2();
+			return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
 
-			tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+		}
 
-			return tangent;
+		getTangentAt( u, optionalTarget ) {
+
+			return this.getTangent( u, optionalTarget );
 
 		}
 
@@ -32785,6 +33141,19 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			return this.getPoint( u, optionalTarget );
 
 		}
+
+		getTangent( t, optionalTarget = new Vector3() ) {
+
+			return optionalTarget.subVectors( this.v2, this.v1 ).normalize();
+
+		}
+
+		getTangentAt( u, optionalTarget ) {
+
+			return this.getTangent( u, optionalTarget );
+
+		}
+
 		copy( source ) {
 
 			super.copy( source );
@@ -33659,6 +34028,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
+
+		}
+
 		static fromJSON( data ) {
 
 			return new LatheGeometry( data.points, data.segments, data.phiStart, data.phiLength );
@@ -33769,6 +34148,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 			this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 			this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
 
 		}
 
@@ -34038,6 +34427,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				groupStart += groupCount;
 
 			}
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
 
 		}
 
@@ -34372,6 +34771,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
+
+		}
+
 		static fromJSON( data ) {
 
 			return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.details );
@@ -34572,6 +34981,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 			}
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
 
 		}
 
@@ -35715,7 +36134,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
-					return vec.clone().multiplyScalar( size ).add( pt );
+					return pt.clone().addScaledVector( vec, size );
 
 				}
 
@@ -36222,6 +36641,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
+
+		}
+
 		toJSON() {
 
 			const data = super.toJSON();
@@ -36520,6 +36949,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
+
+		}
+
 		static fromJSON( data ) {
 
 			return new RingGeometry( data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength );
@@ -36651,6 +37090,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				}
 
 			}
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
 
 		}
 
@@ -36820,6 +37269,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
+
+		}
+
 		static fromJSON( data ) {
 
 			return new SphereGeometry( data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength );
@@ -36953,6 +37412,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 			this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 			this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
 
 		}
 
@@ -37105,6 +37574,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				position.z = radius * Math.sin( quOverP ) * 0.5;
 
 			}
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
 
 		}
 
@@ -37275,6 +37754,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
+
+		}
+
 		toJSON() {
 
 			const data = super.toJSON();
@@ -37408,6 +37897,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 			}
+
+		}
+
+		copy( source ) {
+
+			super.copy( source );
+
+			this.parameters = Object.assign( {}, source.parameters );
+
+			return this;
 
 		}
 
@@ -48208,8 +48707,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		distanceToPoint( point ) {
 
-			const clampedPoint = _vector$4.copy( point ).clamp( this.min, this.max );
-			return clampedPoint.sub( point ).length();
+			return this.clampPoint( point, _vector$4 ).distanceTo( point );
 
 		}
 
@@ -48217,6 +48715,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.min.max( box.min );
 			this.max.min( box.max );
+
+			if ( this.isEmpty() ) this.makeEmpty();
 
 			return this;
 
@@ -49860,175 +50360,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		}
 
 	}
-
-	// Fast Half Float Conversions, http://www.fox-toolkit.org/ftp/fasthalffloatconversion.pdf
-
-	const _tables = /*@__PURE__*/ _generateTables();
-
-	function _generateTables() {
-
-		// float32 to float16 helpers
-
-		const buffer = new ArrayBuffer( 4 );
-		const floatView = new Float32Array( buffer );
-		const uint32View = new Uint32Array( buffer );
-
-		const baseTable = new Uint32Array( 512 );
-		const shiftTable = new Uint32Array( 512 );
-
-		for ( let i = 0; i < 256; ++ i ) {
-
-			const e = i - 127;
-
-			// very small number (0, -0)
-
-			if ( e < - 27 ) {
-
-				baseTable[ i ] = 0x0000;
-				baseTable[ i | 0x100 ] = 0x8000;
-				shiftTable[ i ] = 24;
-				shiftTable[ i | 0x100 ] = 24;
-
-				// small number (denorm)
-
-			} else if ( e < - 14 ) {
-
-				baseTable[ i ] = 0x0400 >> ( - e - 14 );
-				baseTable[ i | 0x100 ] = ( 0x0400 >> ( - e - 14 ) ) | 0x8000;
-				shiftTable[ i ] = - e - 1;
-				shiftTable[ i | 0x100 ] = - e - 1;
-
-				// normal number
-
-			} else if ( e <= 15 ) {
-
-				baseTable[ i ] = ( e + 15 ) << 10;
-				baseTable[ i | 0x100 ] = ( ( e + 15 ) << 10 ) | 0x8000;
-				shiftTable[ i ] = 13;
-				shiftTable[ i | 0x100 ] = 13;
-
-				// large number (Infinity, -Infinity)
-
-			} else if ( e < 128 ) {
-
-				baseTable[ i ] = 0x7c00;
-				baseTable[ i | 0x100 ] = 0xfc00;
-				shiftTable[ i ] = 24;
-				shiftTable[ i | 0x100 ] = 24;
-
-				// stay (NaN, Infinity, -Infinity)
-
-			} else {
-
-				baseTable[ i ] = 0x7c00;
-				baseTable[ i | 0x100 ] = 0xfc00;
-				shiftTable[ i ] = 13;
-				shiftTable[ i | 0x100 ] = 13;
-
-			}
-
-		}
-
-		// float16 to float32 helpers
-
-		const mantissaTable = new Uint32Array( 2048 );
-		const exponentTable = new Uint32Array( 64 );
-		const offsetTable = new Uint32Array( 64 );
-
-		for ( let i = 1; i < 1024; ++ i ) {
-
-			let m = i << 13; // zero pad mantissa bits
-			let e = 0; // zero exponent
-
-			// normalized
-			while ( ( m & 0x00800000 ) === 0 ) {
-
-				m <<= 1;
-				e -= 0x00800000; // decrement exponent
-
-			}
-
-			m &= ~ 0x00800000; // clear leading 1 bit
-			e += 0x38800000; // adjust bias
-
-			mantissaTable[ i ] = m | e;
-
-		}
-
-		for ( let i = 1024; i < 2048; ++ i ) {
-
-			mantissaTable[ i ] = 0x38000000 + ( ( i - 1024 ) << 13 );
-
-		}
-
-		for ( let i = 1; i < 31; ++ i ) {
-
-			exponentTable[ i ] = i << 23;
-
-		}
-
-		exponentTable[ 31 ] = 0x47800000;
-		exponentTable[ 32 ] = 0x80000000;
-
-		for ( let i = 33; i < 63; ++ i ) {
-
-			exponentTable[ i ] = 0x80000000 + ( ( i - 32 ) << 23 );
-
-		}
-
-		exponentTable[ 63 ] = 0xc7800000;
-
-		for ( let i = 1; i < 64; ++ i ) {
-
-			if ( i !== 32 ) {
-
-				offsetTable[ i ] = 1024;
-
-			}
-
-		}
-
-		return {
-			floatView: floatView,
-			uint32View: uint32View,
-			baseTable: baseTable,
-			shiftTable: shiftTable,
-			mantissaTable: mantissaTable,
-			exponentTable: exponentTable,
-			offsetTable: offsetTable
-		};
-
-	}
-
-	// float32 to float16
-
-	function toHalfFloat( val ) {
-
-		if ( Math.abs( val ) > 65504 ) console.warn( 'THREE.DataUtils.toHalfFloat(): Value out of range.' );
-
-		val = clamp( val, - 65504, 65504 );
-
-		_tables.floatView[ 0 ] = val;
-		const f = _tables.uint32View[ 0 ];
-		const e = ( f >> 23 ) & 0x1ff;
-		return _tables.baseTable[ e ] + ( ( f & 0x007fffff ) >> _tables.shiftTable[ e ] );
-
-	}
-
-	// float16 to float32
-
-	function fromHalfFloat( val ) {
-
-		const m = val >> 10;
-		_tables.uint32View[ 0 ] = _tables.mantissaTable[ _tables.offsetTable[ m ] + ( val & 0x3ff ) ] + _tables.exponentTable[ m ];
-		return _tables.floatView[ 0 ];
-
-	}
-
-	const DataUtils = {
-		toHalfFloat: toHalfFloat,
-		fromHalfFloat: fromHalfFloat,
-	};
 
 	// r144
 

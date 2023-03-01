@@ -9,9 +9,10 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'ShapePath', () => {
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new ShapePath();
+				assert.ok( object, 'Can instantiate a ShapePath.' );
 
 			} );
 

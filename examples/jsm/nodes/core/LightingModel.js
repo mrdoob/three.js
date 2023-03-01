@@ -12,3 +12,5 @@ class LightingModel {
 }
 
 export default LightingModel;
+
+export const lightingModel = ( ...params ) => new LightingModel( ...params );

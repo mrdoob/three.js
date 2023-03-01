@@ -1,11 +1,11 @@
-import Node from '../core/Node.js';
-import AttributeNode from '../core/AttributeNode.js';
-import VaryingNode from '../core/VaryingNode.js';
-import ModelNode from '../accessors/ModelNode.js';
-import CameraNode from '../accessors/CameraNode.js';
-import OperatorNode from '../math/OperatorNode.js';
-import MathNode from '../math/MathNode.js';
-import SplitNode from '../utils/SplitNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { attribute } from '../core/AttributeNode.js';
+import { label } from '../core/VarNode.js';
+import { varying } from '../core/VaryingNode.js';
+import { normalize } from '../math/MathNode.js';
+import { cameraViewMatrix } from './CameraNode.js';
+import { modelViewMatrix } from './ModelNode.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class TangentNode extends Node {
 
@@ -46,22 +46,21 @@ class TangentNode extends Node {
 
 		if ( scope === TangentNode.GEOMETRY ) {
 
-			outputNode = new AttributeNode( 'tangent', 'vec4' );
+			outputNode = attribute( 'tangent', 'vec4' );
 
 		} else if ( scope === TangentNode.LOCAL ) {
 
-			outputNode = new VaryingNode( new SplitNode( new TangentNode( TangentNode.GEOMETRY ), 'xyz' ) );
+			outputNode = varying( tangentGeometry.xyz );
 
 		} else if ( scope === TangentNode.VIEW ) {
 
-			const vertexNode = new SplitNode( new OperatorNode( '*', new ModelNode( ModelNode.VIEW_MATRIX ), new TangentNode( TangentNode.LOCAL ) ), 'xyz' );
-
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNode ) );
+			const vertexNode = modelViewMatrix.mul( tangentLocal ).xyz;
+			outputNode = normalize( varying( vertexNode ) );
 
 		} else if ( scope === TangentNode.WORLD ) {
 
-			const vertexNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new TangentNode( TangentNode.VIEW ), new CameraNode( CameraNode.VIEW_MATRIX ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNode ) );
+			const vertexNode = tangentView.transformDirection( cameraViewMatrix );
+			outputNode = normalize( varying( vertexNode ) );
 
 		}
 
@@ -93,3 +92,12 @@ TangentNode.VIEW = 'view';
 TangentNode.WORLD = 'world';
 
 export default TangentNode;
+
+export const tangentGeometry = nodeImmutable( TangentNode, TangentNode.GEOMETRY );
+export const tangentLocal = nodeImmutable( TangentNode, TangentNode.LOCAL );
+export const tangentView = nodeImmutable( TangentNode, TangentNode.VIEW );
+export const tangentWorld = nodeImmutable( TangentNode, TangentNode.WORLD );
+export const transformedTangentView = label( tangentView, 'TransformedTangentView' );
+export const transformedTangentWorld = normalize( transformedTangentView.transformDirection( cameraViewMatrix ) );
+
+addNodeClass( TangentNode );

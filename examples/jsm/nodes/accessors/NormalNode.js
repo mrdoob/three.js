@@ -1,10 +1,11 @@
-import Node from '../core/Node.js';
-import AttributeNode from '../core/AttributeNode.js';
-import VaryingNode from '../core/VaryingNode.js';
-import ModelNode from '../accessors/ModelNode.js';
-import CameraNode from '../accessors/CameraNode.js';
-import OperatorNode from '../math/OperatorNode.js';
-import MathNode from '../math/MathNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { attribute } from '../core/AttributeNode.js';
+import { label } from '../core/VarNode.js';
+import { varying } from '../core/VaryingNode.js';
+import { normalize } from '../math/MathNode.js';
+import { cameraViewMatrix } from './CameraNode.js';
+import { modelNormalMatrix } from './ModelNode.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
 class NormalNode extends Node {
 
@@ -36,22 +37,22 @@ class NormalNode extends Node {
 
 		if ( scope === NormalNode.GEOMETRY ) {
 
-			outputNode = new AttributeNode( 'normal', 'vec3' );
+			outputNode = attribute( 'normal', 'vec3' );
 
 		} else if ( scope === NormalNode.LOCAL ) {
 
-			outputNode = new VaryingNode( new NormalNode( NormalNode.GEOMETRY ) );
+			outputNode = varying( normalGeometry );
 
 		} else if ( scope === NormalNode.VIEW ) {
 
-			const vertexNode = new OperatorNode( '*', new ModelNode( ModelNode.NORMAL_MATRIX ), new NormalNode( NormalNode.LOCAL ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNode ) );
+			const vertexNode = modelNormalMatrix.mul( normalLocal );
+			outputNode = normalize( varying( vertexNode ) );
 
 		} else if ( scope === NormalNode.WORLD ) {
 
-			// To use INVERSE_TRANSFORM_DIRECTION only inverse the param order like this: MathNode( ..., Vector, Matrix );
-			const vertexNode = new MathNode( MathNode.TRANSFORM_DIRECTION, new NormalNode( NormalNode.VIEW ), new CameraNode( CameraNode.VIEW_MATRIX ) );
-			outputNode = new MathNode( MathNode.NORMALIZE, new VaryingNode( vertexNode ) );
+			// To use inverseTransformDirection only inverse the param order like this: cameraViewMatrix.transformDirection( normalView )
+			const vertexNode = normalView.transformDirection( cameraViewMatrix );
+			outputNode = normalize( varying( vertexNode ) );
 
 		}
 
@@ -83,3 +84,12 @@ NormalNode.VIEW = 'view';
 NormalNode.WORLD = 'world';
 
 export default NormalNode;
+
+export const normalGeometry = nodeImmutable( NormalNode, NormalNode.GEOMETRY );
+export const normalLocal = nodeImmutable( NormalNode, NormalNode.LOCAL );
+export const normalView = nodeImmutable( NormalNode, NormalNode.VIEW );
+export const normalWorld = nodeImmutable( NormalNode, NormalNode.WORLD );
+export const transformedNormalView = label( normalView, 'TransformedNormalView' );
+export const transformedNormalWorld = transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
+
+addNodeClass( NormalNode );

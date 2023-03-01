@@ -22,9 +22,10 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new Path();
+				assert.ok( object, 'Can instantiate a Path.' );
 
 			} );
 
