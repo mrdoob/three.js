@@ -349,6 +349,11 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.clone().intersect( c ).equals( b ), 'Passed!' );
 			assert.ok( c.clone().intersect( c ).equals( c ), 'Passed!' );
 
+			const d = new Box2( one2.clone().negate(), zero2.clone() );
+			const e = new Box2( one2.clone(), two2.clone() ).intersect( d );
+
+			assert.ok( e.min.equals( posInf2 ) && e.max.equals( negInf2 ), 'Infinite empty' );
+
 		} );
 
 		QUnit.test( 'union', ( assert ) => {

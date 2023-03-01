@@ -39,9 +39,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new HemisphereLight();
+			assert.ok( object, 'Can instantiate a HemisphereLight.' );
 
 		} );
 

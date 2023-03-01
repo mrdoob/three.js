@@ -31,12 +31,12 @@ import {
  * } );
  *
  * Custom properties outside of the defaults for position, uv, normal
- * and color attributes can be added using the setCustomPropertyMapping method.
+ * and color attributes can be added using the setCustomPropertyNameMapping method.
  * For example, the following maps the element properties “custom_property_a”
  * and “custom_property_b” to an attribute “customAttribute” with an item size of 2.
  * Attribute item sizes are set from the number of element properties in the property array.
  *
- * loader.setCustomPropertyMapping( {
+ * loader.setCustomPropertyNameMapping( {
  *	customAttribute: ['custom_property_a', 'custom_property_b'],
  * } );
  *

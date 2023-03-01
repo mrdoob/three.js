@@ -44,9 +44,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new SpotLight();
+			assert.ok( object, 'Can instantiate a SpotLight.' );
 
 		} );
 
@@ -135,10 +136,14 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
+
+			assert.expect( 0 );
+
+			const object = new SpotLight();
+			object.dispose();
 
 			// ensure calls dispose() on shadow
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

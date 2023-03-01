@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { addNodeClass } from './Node.js';
 
 class TempNode extends Node {
 
@@ -29,7 +29,7 @@ class TempNode extends Node {
 
 				return builder.format( nodeData.propertyName, type, output );
 
-			} else if ( builder.context.tempWrite !== false && type !== 'void ' && output !== 'void' && this.hasDependencies( builder ) ) {
+			} else if ( builder.context.tempWrite !== false && type !== 'void' && output !== 'void' && this.hasDependencies( builder ) ) {
 
 				const snippet = super.build( builder, type );
 
@@ -54,3 +54,5 @@ class TempNode extends Node {
 }
 
 export default TempNode;
+
+addNodeClass( TempNode );

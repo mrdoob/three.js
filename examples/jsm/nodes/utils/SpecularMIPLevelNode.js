@@ -1,5 +1,6 @@
-import Node from '../core/Node.js';
-import { add, mul, div, log2, clamp, maxMipLevel } from '../shadernode/ShaderNodeBaseElements.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { maxMipLevel } from './MaxMipLevelNode.js';
+import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class SpecularMIPLevelNode extends Node {
 
@@ -20,13 +21,17 @@ class SpecularMIPLevelNode extends Node {
 
 		const maxMIPLevelScalar = maxMipLevel( textureNode );
 
-		const sigma = div( mul( Math.PI, mul( roughnessNode, roughnessNode ) ), add( 1.0, roughnessNode ) );
-		const desiredMIPLevel = add( maxMIPLevelScalar, log2( sigma ) );
+		const sigma = roughnessNode.mul( roughnessNode ).mul( Math.PI ).div( roughnessNode.add( 1.0 ) );
+		const desiredMIPLevel = maxMIPLevelScalar.add( sigma.log2() );
 
-		return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
+		return desiredMIPLevel.clamp( 0.0, maxMIPLevelScalar );
 
 	}
 
 }
 
 export default SpecularMIPLevelNode;
+
+export const specularMIPLevel = nodeProxy( SpecularMIPLevelNode );
+
+addNodeClass( SpecularMIPLevelNode );

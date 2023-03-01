@@ -1,6 +1,11 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
+import { diffuseColor } from '../core/PropertyNode.js';
+import { directionToColor } from '../utils/PackingNode.js';
+import { materialOpacity } from '../accessors/MaterialNode.js';
+import { transformedNormalView } from '../accessors/NormalNode.js';
+import { float, vec4 } from '../shadernode/ShaderNode.js';
+
 import { MeshNormalMaterial } from 'three';
-import { vec4, diffuseColor, materialOpacity, transformedNormalView, directionToColor } from '../shadernode/ShaderNodeElements.js';
 
 const defaultValues = new MeshNormalMaterial();
 
@@ -43,3 +48,5 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 }
 
 export default MeshNormalNodeMaterial;
+
+addNodeMaterial( MeshNormalNodeMaterial );

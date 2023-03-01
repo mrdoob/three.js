@@ -7,9 +7,10 @@ export default QUnit.module( 'Cameras', () => {
 	QUnit.module( 'StereoCamera', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new StereoCamera();
+			assert.ok( object, 'Can instantiate a StereoCamera.' );
 
 		} );
 

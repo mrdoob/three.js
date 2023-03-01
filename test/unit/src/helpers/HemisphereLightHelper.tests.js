@@ -30,9 +30,11 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const light = new HemisphereLight( parameters.skyColor );
+			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
+			assert.ok( object, 'Can instantiate a HemisphereLightHelper.' );
 
 		} );
 
@@ -79,9 +81,13 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const light = new HemisphereLight( parameters.skyColor );
+			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
+			object.dispose();
 
 		} );
 

@@ -73,9 +73,11 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Raycaster', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			// no params
+			const object = new Raycaster();
+			assert.ok( object, 'Can instantiate a Raycaster.' );
 
 		} );
 

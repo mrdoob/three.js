@@ -1,7 +1,8 @@
 import Node from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
+import { nodeObject, nodeProxy } from '../shadernode/ShaderNode.js';
 
-const references = new WeakMap();
+const LightNodes = new WeakMap();
 
 const sortLights = ( lights ) => {
 
@@ -79,7 +80,7 @@ class LightsNode extends Node {
 
 	}
 
-	fromLights( lights ) {
+	fromLights( lights = [] ) {
 
 		const lightNodes = [];
 
@@ -92,9 +93,9 @@ class LightsNode extends Node {
 			if ( lightNode === null ) {
 
 				const lightClass = light.constructor;
-				const lightNodeClass = references.has( lightClass ) ? references.get( lightClass ) : AnalyticLightNode;
+				const lightNodeClass = LightNodes.has( lightClass ) ? LightNodes.get( lightClass ) : AnalyticLightNode;
 
-				lightNode = new lightNodeClass( light );
+				lightNode = nodeObject( new lightNodeClass( light ) );
 
 			}
 
@@ -109,12 +110,19 @@ class LightsNode extends Node {
 
 	}
 
-	static setReference( lightClass, lightNodeClass ) {
-
-		references.set( lightClass, lightNodeClass );
-
-	}
-
 }
 
 export default LightsNode;
+
+export const lights = ( lights ) => nodeObject( new LightsNode().fromLights( lights ) );
+export const lightsWithoutWrap = nodeProxy( LightsNode );
+
+export function addLightNode( lightClass, lightNodeClass ) {
+
+	if ( LightNodes.has( lightClass ) ) throw new Error( `Redefinition of light node ${ lightNodeClass.name }` );
+	if ( typeof lightClass !== 'function' || ! lightClass.name ) throw new Error( `Light ${ lightClass.name } is not a class` );
+	if ( typeof lightNodeClass !== 'function' || ! lightNodeClass.name ) throw new Error( `Light node ${ lightNodeClass.name } is not a class` );
+
+	LightNodes.set( lightClass, lightNodeClass );
+
+}

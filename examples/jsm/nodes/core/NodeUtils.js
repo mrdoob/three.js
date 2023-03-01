@@ -1,18 +1,22 @@
 import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
 
-export const getCacheKey = ( object ) => {
+export function getCacheKey( object )  {
 
 	let cacheKey = '{';
 
 	if ( object.isNode === true ) {
 
-		cacheKey += `uuid:"${ object.uuid }",`;
+		cacheKey += `uuid:"${ object.uuid }"`;
 
 	}
 
-	for ( const property of getNodesKeys( object ) ) {
+	for ( const { prop, childNode } of getNodeChildren( object ) ) {
 
-		cacheKey += `${ property }:${ object[ property ].getCacheKey() },`;
+		// @TODO: Think about implement NodeArray and NodeObject.
+
+		let childCacheKey = getCacheKey( childNode );
+		if ( ! childCacheKey.includes( ',' ) ) childCacheKey = childCacheKey.slice( childCacheKey.indexOf( '"' ), childCacheKey.indexOf( '}' ) );
+		cacheKey += `,${ prop }:${ childCacheKey }`;
 
 	}
 
@@ -20,29 +24,53 @@ export const getCacheKey = ( object ) => {
 
 	return cacheKey;
 
-};
+}
 
-export const getNodesKeys = ( object ) => {
+export function* getNodeChildren( node ) {
 
-	const props = [];
+	for ( const property in node ) {
 
-	for ( const name in object ) {
+		const object = node[ property ];
 
-		const value = object[ name ];
+		if ( Array.isArray( object ) === true ) {
 
-		if ( value && value.isNode === true ) {
+			for ( let i = 0; i < object.length; i++ ) {
 
-			props.push( name );
+				const child = object[ i ];
+
+				if ( child && child.isNode === true ) {
+
+					yield { prop: property + '/' + i, childNode: child };
+
+				}
+
+			}
+
+		} else if ( object && object.isNode === true ) {
+
+			yield { prop: property, childNode: object };
+
+		} else if ( typeof object === 'object' ) {
+
+			for ( const property2 in object ) {
+
+				const child = object[ property2 ];
+
+				if ( child && child.isNode === true ) {
+
+					yield { prop: property + '/' + property2, childNode: child };
+
+				}
+
+			}
 
 		}
 
 	}
 
-	return props;
+}
 
-};
-
-export const getValueType = ( value ) => {
+export function getValueType( value ) {
 
 	if ( typeof value === 'number' ) {
 
@@ -80,9 +108,9 @@ export const getValueType = ( value ) => {
 
 	return null;
 
-};
+}
 
-export const getValueFromType = ( type, ...params ) => {
+export function getValueFromType( type, ...params ) {
 
 	const last4 = type ? type.slice( - 4 ) : undefined;
 
@@ -122,4 +150,4 @@ export const getValueFromType = ( type, ...params ) => {
 
 	return null;
 
-};
+}

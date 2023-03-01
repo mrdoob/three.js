@@ -1,18 +1,10 @@
-import Node from '../core/Node.js';
-import {
-	vec3,
-	mat3,
-	mul,
-	assign,
-	buffer,
-	element,
-	dot,
-	div,
-	temp,
-	instanceIndex,
-	positionLocal,
-	normalLocal
-} from '../shadernode/ShaderNodeBaseElements.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { instanceIndex } from '../core/InstanceIndexNode.js';
+import { temp } from '../core/VarNode.js';
+import { buffer } from './BufferNode.js';
+import { normalLocal } from './NormalNode.js';
+import { positionLocal } from './PositionNode.js';
+import { nodeProxy, vec3, mat3 } from '../shadernode/ShaderNode.js';
 
 class InstanceNode extends Node {
 
@@ -26,7 +18,7 @@ class InstanceNode extends Node {
 
 		const instanceBufferNode = buffer( instanceMesh.instanceMatrix.array, 'mat4', instanceMesh.count );
 
-		this.instanceMatrixNode = temp( element( instanceBufferNode, instanceIndex ) ); // @TODO: a possible caching issue here?
+		this.instanceMatrixNode = temp( instanceBufferNode.element( instanceIndex ) ); // @TODO: a possible caching issue here?
 
 	}
 
@@ -36,23 +28,27 @@ class InstanceNode extends Node {
 
 		// POSITION
 
-		const instancePosition = mul( instanceMatrixNode, positionLocal ).xyz;
+		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
 
 		// NORMAL
 
 		const m = mat3( instanceMatrixNode[ 0 ].xyz, instanceMatrixNode[ 1 ].xyz, instanceMatrixNode[ 2 ].xyz );
 
-		const transformedNormal = div( normalLocal, vec3( dot( m[ 0 ], m[ 0 ] ), dot( m[ 1 ], m[ 1 ] ), dot( m[ 2 ], m[ 2 ] ) ) );
+		const transformedNormal = normalLocal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
 
-		const instanceNormal = mul( m, transformedNormal ).xyz;
+		const instanceNormal = m.mul( transformedNormal ).xyz;
 
 		// ASSIGNS
 
-		assign( positionLocal, instancePosition ).build( builder );
-		assign( normalLocal, instanceNormal ).build( builder );
+		positionLocal.assign( instancePosition ).build( builder );
+		normalLocal.assign( instanceNormal ).build( builder );
 
 	}
 
 }
 
 export default InstanceNode;
+
+export const instance = nodeProxy( InstanceNode );
+
+addNodeClass( InstanceNode );
