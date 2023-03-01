@@ -40,7 +40,7 @@ export function* getNodeChildren( node ) {
 
 				if ( child && child.isNode === true ) {
 
-					yield { prop: property, prop2: i, childNode: child };
+					yield { prop: property, prop2: String( i ), childNode: child };
 
 				}
 
