@@ -44,6 +44,9 @@ class TrackballControls extends EventDispatcher {
 		this.minDistance = 0;
 		this.maxDistance = Infinity;
 
+		this.minZoom = 0;
+		this.maxZoom = Infinity;
+
 		this.keys = [ 'KeyA' /*A*/, 'KeyS' /*S*/, 'KeyD' /*D*/ ];
 
 		this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
@@ -206,7 +209,7 @@ class TrackballControls extends EventDispatcher {
 
 				} else if ( scope.object.isOrthographicCamera ) {
 
-						scope.object.zoom = MathUtils.clamp(scope.object.zoom / factor, scope.minDistance, scope.maxDistance);
+						scope.object.zoom = MathUtils.clamp(scope.object.zoom / factor, scope.minZoom, scope.maxZoom);
 						
 						if (lastZoom != scope.object.zoom) {
 
@@ -232,7 +235,7 @@ class TrackballControls extends EventDispatcher {
 
 					} else if ( scope.object.isOrthographicCamera ) {
 
-						scope.object.zoom = MathUtils.clamp(scope.object.zoom / factor, scope.minDistance, scope.maxDistance);
+						scope.object.zoom = MathUtils.clamp(scope.object.zoom / factor, scope.minZoom, scope.maxZoom);
 						
 						if (lastZoom != scope.object.zoom) {
 
