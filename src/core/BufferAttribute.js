@@ -96,8 +96,7 @@ class BufferAttribute {
 
 		}
 
-		// copy twice the amount of previosu iteration
-		for ( let i = end, il = this.array.length; i < il; i <<= 1 ) {
+		for ( let i = end, il = this.array.length; i < il; i *= 2 ) {
 
 			this.array.copyWithin( i, 0, i );
 
