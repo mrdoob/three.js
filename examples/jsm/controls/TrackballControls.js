@@ -1,5 +1,6 @@
 import {
 	EventDispatcher,
+	MathUtils,
 	MOUSE,
 	Quaternion,
 	Vector2,
@@ -205,8 +206,13 @@ class TrackballControls extends EventDispatcher {
 
 				} else if ( scope.object.isOrthographicCamera ) {
 
-					scope.object.zoom /= factor;
-					scope.object.updateProjectionMatrix();
+						scope.object.zoom = MathUtils.clamp(scope.object.zoom / factor, scope.minDistance, scope.maxDistance);
+						
+						if (lastZoom != scope.object.zoom) {
+
+							scope.object.updateProjectionMatrix();
+							
+						}
 
 				} else {
 
@@ -226,8 +232,13 @@ class TrackballControls extends EventDispatcher {
 
 					} else if ( scope.object.isOrthographicCamera ) {
 
-						scope.object.zoom /= factor;
-						scope.object.updateProjectionMatrix();
+						scope.object.zoom = MathUtils.clamp(scope.object.zoom / factor, scope.minDistance, scope.maxDistance);
+						
+						if (lastZoom != scope.object.zoom) {
+
+							scope.object.updateProjectionMatrix();
+							
+						}
 
 					} else {
 
