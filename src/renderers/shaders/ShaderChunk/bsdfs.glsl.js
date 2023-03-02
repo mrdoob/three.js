@@ -91,31 +91,35 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 
 #endif
 
-// GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-vec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {
+#ifdef USE_CLEARCOAT
 
-	vec3 f0 = material.clearcoatF0;
-	float f90 = material.clearcoatF90;
-	float roughness = material.clearcoatRoughness;
+	// GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
+	vec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {
 
-	float alpha = pow2( roughness ); // UE4's roughness
+		vec3 f0 = material.clearcoatF0;
+		float f90 = material.clearcoatF90;
+		float roughness = material.clearcoatRoughness;
 
-	vec3 halfDir = normalize( lightDir + viewDir );
+		float alpha = pow2( roughness ); // UE4's roughness
 
-	float dotNL = saturate( dot( normal, lightDir ) );
-	float dotNV = saturate( dot( normal, viewDir ) );
-	float dotNH = saturate( dot( normal, halfDir ) );
-	float dotVH = saturate( dot( viewDir, halfDir ) );
+		vec3 halfDir = normalize( lightDir + viewDir );
 
-	vec3 F = F_Schlick( f0, f90, dotVH );
+		float dotNL = saturate( dot( normal, lightDir ) );
+		float dotNV = saturate( dot( normal, viewDir ) );
+		float dotNH = saturate( dot( normal, halfDir ) );
+		float dotVH = saturate( dot( viewDir, halfDir ) );
 
-	float V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );
+		vec3 F = F_Schlick( f0, f90, dotVH );
 
-	float D = D_GGX( alpha, dotNH );
+		float V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
-	return F * ( V * D );
+		float D = D_GGX( alpha, dotNH );
 
-}
+		return F * ( V * D );
+
+	}
+
+#endif
 
 vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {
 
