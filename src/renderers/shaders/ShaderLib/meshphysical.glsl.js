@@ -136,6 +136,7 @@ varying vec3 vViewPosition;
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
+#include <physical_pars_fragment>
 #include <bsdfs>
 #include <iridescence_fragment>
 #include <cube_uv_reflection_fragment>
