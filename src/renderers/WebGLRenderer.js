@@ -58,7 +58,6 @@ class WebGLRenderer {
 	constructor( parameters = {} ) {
 
 		const {
-			isWebGL1Renderer,
 			canvas = createCanvasElement(),
 			context = null,
 			depth = true,
@@ -72,13 +71,6 @@ class WebGLRenderer {
 		} = parameters;
 
 		this.isWebGLRenderer = true;
-
-		if ( isWebGL1Renderer ) {
-
-			this.isWebGL1Renderer = true;
-
-		}
-
 
 		let _alpha;
 
