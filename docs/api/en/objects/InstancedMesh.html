@@ -37,6 +37,16 @@
 		<h2>Properties</h2>
 		<p>See the base [page:Mesh] class for common properties.</p>
 
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			This bounding box encloses all instances of the [name]. Can be calculated with [page:.computeBoundingBox](). Default is `null`.
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			This bounding sphere encloses all instances of the [name]. Can be calculated with [page:.computeBoundingSphere](). Default is `null`.
+		</p>
+
 		<h3>[property:Integer count]</h3>
 		<p>
 			The number of instances. The `count` value passed into the constructor represents the maximum number of
@@ -66,6 +76,18 @@
 
 		<h2>Methods</h2>
 		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:undefined computeBoundingBox]()</h3>
+		<p>
+		Computes the bounding box, updating [page:.boundingBox] attribute.<br />
+		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are `null`.
+		</p>
+
+		<h3>[method:undefined computeBoundingSphere]()</h3>
+		<p>
+		Computes the bounding sphere, updating [page:.boundingSphere] attribute.<br />
+		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are `null`.
+		</p>
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>

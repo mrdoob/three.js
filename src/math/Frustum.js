@@ -64,11 +64,21 @@ class Frustum {
 
 	intersectsObject( object ) {
 
-		const geometry = object.geometry;
+		if ( object.boundingSphere !== undefined ) {
 
-		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+			if ( object.boundingSphere === null ) object.computeBoundingSphere();
 
-		_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+			_sphere.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
+
+		} else {
+
+			const geometry = object.geometry;
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			_sphere.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+
+		}
 
 		return this.intersectsSphere( _sphere );
 
