@@ -597,7 +597,7 @@ class Color {
 
 }
 
-const _color = new Color();
+const _color = /*@__PURE__*/ new Color();
 
 Color.NAMES = _colorKeywords;
 
