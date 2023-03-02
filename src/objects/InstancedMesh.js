@@ -18,7 +18,10 @@ class InstancedMesh extends Mesh {
 
 		this.isInstancedMesh = true;
 
-		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 ).fill( _identity.elements );
+		this.instanceMatrix = fillBufferAttribute(
+			new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 ),
+			_identity.elements
+		);
 		this.instanceColor = null;
 
 		this.count = count;
@@ -121,6 +124,28 @@ class InstancedMesh extends Mesh {
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
+
+}
+
+
+// Fast fill algorithm, see #25579
+function fillBufferAttribute( bufferAttribute, arrayLike ) {
+
+	const end = Math.min( arrayLike.length, bufferAttribute.array.length );
+
+	for ( let i = 0; i < end; i ++ ) {
+
+		bufferAttribute.array[ i ] = arrayLike[ i ];
+
+	}
+
+	for ( let i = end, il = bufferAttribute.array.length; i < il; i *= 2 ) {
+
+		bufferAttribute.array.copyWithin( i, 0, i );
+
+	}
+
+	return bufferAttribute;
 
 }
 

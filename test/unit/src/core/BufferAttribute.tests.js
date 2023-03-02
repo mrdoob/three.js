@@ -166,22 +166,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'fill', ( assert ) => {
-
-			const ba = new BufferAttribute( new Float32Array( 6 ), 3 );
-			const expected = new Float32Array( 6 );
-
-			ba.fill( [ 1, 2, 3 ] );
-			expected.set( [ 1, 2, 3, 1, 2, 3 ] );
-			assert.deepEqual( ba.array, expected, 'fill' );
-
-			ba.array.fill( 0 ); // reset (TypedArray API)
-			ba.fill( [ 1, 2, 3, 4, 5, 6, 7, 8 ] ); 
-			expected.set( [ 1, 2, 3, 4, 5, 6 ] );
-			assert.deepEqual( ba.array, expected, 'fill: insufficient capacity' );
-
-		} );
-
 		QUnit.todo( 'applyMatrix3', ( assert ) => {
 
 			// applyMatrix3( m )
