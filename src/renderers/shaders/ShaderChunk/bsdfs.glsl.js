@@ -169,8 +169,6 @@ vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 norm
 
 }
 
-#endif
-
 // Rect Area Light
 
 // Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
