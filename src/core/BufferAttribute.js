@@ -86,6 +86,27 @@ class BufferAttribute {
 
 	}
 
+	fill( arrayLike ) {
+
+		const end = Math.min( arrayLike.length, this.array.length );
+
+		for ( let i = 0; i < end; i ++ ) {
+
+			this.array[ i ] = arrayLike[ i ];
+
+		}
+
+		// copy twice the amount of previosu iteration
+		for ( let i = end, il = this.array.length; i < il; i <<= 1 ) {
+
+			this.array.copyWithin( i, 0, i );
+
+		}
+
+		return this;
+
+	}
+
 	applyMatrix3( m ) {
 
 		if ( this.itemSize === 2 ) {

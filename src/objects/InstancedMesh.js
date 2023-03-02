@@ -18,22 +18,14 @@ class InstancedMesh extends Mesh {
 
 		this.isInstancedMesh = true;
 
-		const array = new Float32Array( count * 16 );
-
-		if ( array.length >= 16 ) array.set( _identity.elements );
-
-		for ( let i = 16, il = array.length; i < il; i <<= 1 ) {
-
-			array.copyWithin( i, 0, i );
-
-		}
-
-		this.instanceMatrix = new InstancedBufferAttribute( array, 16 );
+		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
 		this.instanceColor = null;
 
 		this.count = count;
 
 		this.frustumCulled = false;
+
+		this.instanceMatrix.fill( _identity.elements );
 
 	}
 
