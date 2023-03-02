@@ -209,9 +209,9 @@ class TrackballControls extends EventDispatcher {
 
 				} else if ( scope.object.isOrthographicCamera ) {
 
-						scope.object.zoom = MathUtils.clamp(scope.object.zoom / factor, scope.minZoom, scope.maxZoom);
+						scope.object.zoom = MathUtils.clamp( scope.object.zoom / factor, scope.minZoom, scope.maxZoom );
 						
-						if (lastZoom != scope.object.zoom) {
+						if ( lastZoom !== scope.object.zoom ) {
 
 							scope.object.updateProjectionMatrix();
 							
@@ -235,9 +235,9 @@ class TrackballControls extends EventDispatcher {
 
 					} else if ( scope.object.isOrthographicCamera ) {
 
-						scope.object.zoom = MathUtils.clamp(scope.object.zoom / factor, scope.minZoom, scope.maxZoom);
+						scope.object.zoom = MathUtils.clamp( scope.object.zoom / factor, scope.minZoom, scope.maxZoom );
 						
-						if (lastZoom != scope.object.zoom) {
+						if ( lastZoom !== scope.object.zoom ) {
 
 							scope.object.updateProjectionMatrix();
 							
