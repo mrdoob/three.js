@@ -66,8 +66,37 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 
 }
 
+#ifdef USE_ANISOTROPY
+
+	float V_GGX_SmithCorrelated_Anisotropic( const in float alphaT, const in float alphaB, const in float dotTV, const in float dotBV, const in float dotTL, const in float dotBL, const in float dotNV, const in float dotNL ) {
+
+		float lambdaV = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );
+		float lambdaL = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );
+		float v = 0.5 / ( lambdaV + lambdaL );
+
+		return saturate(v);
+
+	}
+
+	float D_GGX_Anisotropic( const in float alphaT, const in float alphaB, const in float dotNH, const in float dotTH, const in float dotBH ) {
+
+		float a2 = alphaT * alphaB;
+		highp vec3 v = vec3( alphaB * dotTH, alphaT * dotBH, a2 * dotNH );
+		highp float v2 = dot( v, v );
+		float w2 = a2 / v2;
+
+		return a2 * w2 * w2 * ( 1.0 * RECIPROCAL_PI );
+
+	}
+
+#endif
+
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in float f90, const in float roughness ) {
+vec3 BRDF_GGX_Clearcoat( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material) {
+
+	vec3 f0 = material.clearcoatF0;
+	float f90 = material.clearcoatF90;
+	float roughness = material.clearcoatRoughness;
 
 	float alpha = pow2( roughness ); // UE4's roughness
 
@@ -88,28 +117,53 @@ vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 norm
 
 }
 
-#ifdef USE_IRIDESCENCE
+vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in PhysicalMaterial material ) {
 
-	vec3 BRDF_GGX_Iridescence( const in vec3 lightDir, const in vec3 viewDir, const in vec3 normal, const in vec3 f0, const in float f90, const in float iridescence, const in vec3 iridescenceFresnel, const in float roughness ) {
+	vec3 f0 = material.specularColor;
+	float f90 = material.specularF90;
+	float roughness = material.roughness;
 
-		float alpha = pow2( roughness ); // UE4's roughness
+	float alpha = pow2( roughness ); // UE4's roughness
 
-		vec3 halfDir = normalize( lightDir + viewDir );
+	vec3 halfDir = normalize( lightDir + viewDir );
 
-		float dotNL = saturate( dot( normal, lightDir ) );
-		float dotNV = saturate( dot( normal, viewDir ) );
-		float dotNH = saturate( dot( normal, halfDir ) );
-		float dotVH = saturate( dot( viewDir, halfDir ) );
+	float dotNL = saturate( dot( normal, lightDir ) );
+	float dotNV = saturate( dot( normal, viewDir ) );
+	float dotNH = saturate( dot( normal, halfDir ) );
+	float dotVH = saturate( dot( viewDir, halfDir ) );
 
-		vec3 F = mix( F_Schlick( f0, f90, dotVH ), iridescenceFresnel, iridescence );
+	vec3 F = F_Schlick( f0, f90, dotVH );
+
+	#ifdef USE_IRIDESCENCE
+
+		F = mix( F, material.iridescenceFresnel, material.iridescence );
+
+	#endif
+
+	#ifdef USE_ANISOTROPY
+
+		float dotTL = saturate( dot( material.anisotropyT, lightDir ) );
+		float dotTV = saturate( dot( material.anisotropyT, viewDir ) );
+		float dotTH = saturate( dot( material.anisotropyT, halfDir ) );
+		float dotBL = saturate( dot( material.anisotropyB, lightDir ) );
+		float dotBV = saturate( dot( material.anisotropyB, viewDir ) );
+		float dotBH = saturate( dot( material.anisotropyB, halfDir ) );
+
+		float V = V_GGX_SmithCorrelated_Anisotropic( alpha, material.alphaB, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );
+
+		float D = D_GGX_Anisotropic( alpha, material.alphaB, dotNH, dotTH, dotBH );
+
+	#else
 
 		float V = V_GGX_SmithCorrelated( alpha, dotNL, dotNV );
 
 		float D = D_GGX( alpha, dotNH );
 
-		return F * ( V * D );
+	#endif
 
-	}
+	return F * ( V * D );
+
+}
 
 #endif
 

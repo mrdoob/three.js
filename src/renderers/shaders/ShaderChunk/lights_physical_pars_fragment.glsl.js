@@ -39,7 +39,10 @@ struct PhysicalMaterial {
 	#endif
 
 	#ifdef USE_ANISOTROPY
-		vec2 anisotropy;
+		float anisotropy;
+		float alphaB;
+		vec3 anisotropyT;
+		vec3 anisotropyB;
 	#endif
 
 };
@@ -185,7 +188,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 		vec3 ccIrradiance = dotNLcc * directLight.color;
 
-		clearcoatSpecular += ccIrradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.clearcoatNormal, material.clearcoatF0, material.clearcoatF90, material.clearcoatRoughness );
+		clearcoatSpecular += ccIrradiance * BRDF_GGX_Clearcoat( directLight.direction, geometry.viewDir, geometry.clearcoatNormal, material );
 
 	#endif
 
@@ -195,15 +198,7 @@ void RE_Direct_Physical( const in IncidentLight directLight, const in GeometricC
 
 	#endif
 
-	#ifdef USE_IRIDESCENCE
-
-		reflectedLight.directSpecular += irradiance * BRDF_GGX_Iridescence( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.iridescence, material.iridescenceFresnel, material.roughness );
-
-	#else
-
-		reflectedLight.directSpecular += irradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.normal, material.specularColor, material.specularF90, material.roughness );
-
-	#endif
+	reflectedLight.directSpecular += irradiance * BRDF_GGX( directLight.direction, geometry.viewDir, geometry.normal, material );
 
 	reflectedLight.directDiffuse += irradiance * BRDF_Lambert( material.diffuseColor );
 }

@@ -1,9 +1,9 @@
 export default /* glsl */`
-#if defined( USE_ENVMAP )
+#ifdef USE_ENVMAP
 
 	vec3 getIBLIrradiance( const in vec3 normal ) {
 
-		#if defined( ENVMAP_TYPE_CUBE_UV )
+		#ifdef ENVMAP_TYPE_CUBE_UV
 
 			vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );
 
@@ -21,7 +21,7 @@ export default /* glsl */`
 
 	vec3 getIBLRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness ) {
 
-		#if defined( ENVMAP_TYPE_CUBE_UV )
+		#ifdef ENVMAP_TYPE_CUBE_UV
 
 			vec3 reflectVec = reflect( - viewDir, normal );
 
@@ -42,11 +42,11 @@ export default /* glsl */`
 
 	}
 
-	#if defined( USE_ANISOTROPY )
+	#ifdef USE_ANISOTROPY
 
 		vec3 getIBLAnisotropyRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness, const in vec3 bitangent, const in float anisotropy ) {
 
-			#if defined( ENVMAP_TYPE_CUBE_UV )
+			#ifdef ENVMAP_TYPE_CUBE_UV
 
 				vec3 bentNormal = cross( bitangent, viewDir );
 				bentNormal = cross( bentNormal, bitangent );
