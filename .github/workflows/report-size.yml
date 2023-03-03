@@ -15,8 +15,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  treeshaking:
-    name: Tree-shaking
+  report-size:
+    name: Comment on PR
     runs-on: ubuntu-latest
     if: github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
@@ -66,22 +66,36 @@ jobs:
       - name: Read tree-shaken size
         id: read-size
         run: |
-          FILESIZE_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
+          FILESIZE_BASE=$(stat --format=%s test/treeshake/three.module.min.js)
+          TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
           echo "FILESIZE_BASE=$FILESIZE_BASE" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE" >> $GITHUB_OUTPUT
 
       - name: Format sizes
         id: format
+        # It's important these are passed as env variables.
+        # https://securitylab.github.com/research/github-actions-untrusted-input/
         env:
           FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize }}
           FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip }}
           FILESIZE_BASE: ${{ steps.read-size.outputs.FILESIZE_BASE }}
+          TREESHAKEN: ${{ fromJSON(steps.download-artifact.outputs.result).treeshaken }}
+          TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip }}
+          TREESHAKEN_BASE: ${{ steps.read-size.outputs.TREESHAKEN_BASE }}
         run: |
           FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE")
           FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_GZIP")
           FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$FILESIZE" "$FILESIZE_BASE")
+          TREESHAKEN_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN")
+          TREESHAKEN_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_GZIP")
+          TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$TREESHAKEN" "$TREESHAKEN_BASE")
+
           echo "FILESIZE=$FILESIZE_FORM" >> $GITHUB_OUTPUT
           echo "FILESIZE_GZIP=$FILESIZE_GZIP_FORM" >> $GITHUB_OUTPUT
           echo "FILESIZE_DIFF=$FILESIZE_DIFF" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN=$TREESHAKEN_FORM" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_GZIP=$TREESHAKEN_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_DIFF=$TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
 
       - name: Find existing comment
         uses: peter-evans/find-comment@v2
@@ -97,7 +111,12 @@ jobs:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           edit-mode: replace
           body: |
-            ### 📦 Bundle size after tree-shaking
+            ### 📦 Bundle size
             | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
             |----------|---------|------|
             | ${{ steps.format.outputs.FILESIZE }} | ${{ steps.format.outputs.FILESIZE_GZIP }} | ${{ steps.format.outputs.FILESIZE_DIFF }} |
+
+            ### 🌳 Bundle size after tree-shaking
+            | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
+            |----------|---------|------|
+            | ${{ steps.format.outputs.TREESHAKEN }} | ${{ steps.format.outputs.TREESHAKEN_GZIP }} | ${{ steps.format.outputs.TREESHAKEN_DIFF }} |
