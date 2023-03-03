@@ -15,6 +15,7 @@ class Scene extends Object3D {
 		this.fog = null;
 
 		this.backgroundBlurriness = 0;
+		this.backgroundIntensity = 1;
 
 		this.overrideMaterial = null;
 
@@ -35,6 +36,7 @@ class Scene extends Object3D {
 		if ( source.fog !== null ) this.fog = source.fog.clone();
 
 		this.backgroundBlurriness = source.backgroundBlurriness;
+		this.backgroundIntensity = source.backgroundIntensity;
 
 		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
@@ -49,7 +51,8 @@ class Scene extends Object3D {
 		const data = super.toJSON( meta );
 
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
-		if ( this.backgroundBlurriness > 0 ) data.backgroundBlurriness = this.backgroundBlurriness;
+		if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
+		if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
 
 		return data;
 

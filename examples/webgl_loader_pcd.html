@@ -10,13 +10,11 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			<a href="https://pointclouds.org/documentation/tutorials/pcd_file_format.html" target="_blank" rel="noopener">PCD File format</a>
-			<div>+/-: Increase/Decrease point size</div>
-			<div>c: Change color</div>
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -33,6 +31,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
 
@@ -67,13 +66,21 @@
 					points.name = 'Zaghetto.pcd';
 					scene.add( points );
 
+					//
+
+					const gui = new GUI();
+
+					gui.add( points.material, 'size', 0.001, 0.01 ).onChange( render );
+					gui.addColor( points.material, 'color' ).onChange( render );
+					gui.open();
+
+					//
+
 					render();
 
 				} );
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				window.addEventListener( 'keypress', keyboard );
 
 			}
 
@@ -83,28 +90,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function keyboard( ev ) {
-
-				const points = scene.getObjectByName( 'Zaghetto.pcd' );
-
-				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
-
-					case '+':
-						points.material.size *= 1.2;
-						break;
-
-					case '-':
-						points.material.size /= 1.2;
-						break;
-
-					case 'c':
-						points.material.color.setHex( Math.random() * 0xffffff );
-						break;
-
-				}
 
 				render();
 

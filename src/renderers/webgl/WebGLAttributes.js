@@ -112,6 +112,8 @@ function WebGLAttributes( gl, capabilities ) {
 
 		}
 
+		attribute.onUploadCallback();
+
 	}
 
 	//

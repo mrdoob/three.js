@@ -12,11 +12,22 @@
 		<p class="desc">
 		An exporter for `PLY`.
 		<br /><br />
-		<a href="https://en.wikipedia.org/wiki/PLY_(file_format)" target="_blank">PLY</a> (Polygon or Stanford Triangle Format) is a
+		[link:https://en.wikipedia.org/wiki/PLY_(file_format) PLY] (Polygon or Stanford Triangle Format) is a
 		file format for efficient delivery and loading of simple, static 3D content in a dense format.
 		Both binary and ascii formats are supported. PLY can store vertex positions, colors, normals and
 		uv coordinates. No textures or texture references are saved.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';
+		</code>
 
 		<h2>Code Example</h2>
 

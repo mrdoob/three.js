@@ -1,4 +1,4 @@
-import { Styles, Canvas, CircleMenu, ButtonInput, ContextMenu, Tips, Search, Loader } from '../libs/flow.module.js';
+import { Styles, Canvas, CircleMenu, ButtonInput, StringInput, ContextMenu, Tips, Search, Loader, Node, TreeViewNode, TreeViewInput, Element } from '../libs/flow.module.js';
 import { BasicMaterialEditor } from './materials/BasicMaterialEditor.js';
 import { StandardMaterialEditor } from './materials/StandardMaterialEditor.js';
 import { PointsMaterialEditor } from './materials/PointsMaterialEditor.js';
@@ -33,6 +33,7 @@ import { PointsEditor } from './scene/PointsEditor.js';
 import { MeshEditor } from './scene/MeshEditor.js';
 import { FileEditor } from './core/FileEditor.js';
 import { FileURLEditor } from './core/FileURLEditor.js';
+import { exportJSON } from './NodeEditorUtils.js';
 import { EventDispatcher } from 'three';
 
 Styles.icons.unlink = 'ti ti-unlink';
@@ -540,14 +541,7 @@ export class NodeEditor extends EventDispatcher {
 
 		saveButton.onClick( () => {
 
-			const json = JSON.stringify( this.canvas.toJSON() );
-
-			const a = document.createElement( 'a' );
-			const file = new Blob( [ json ], { type: 'text/plain' } );
-
-			a.href = URL.createObjectURL( file );
-			a.download = 'node_editor.json';
-			a.click();
+			exportJSON( this.canvas.toJSON(), 'node_editor' );
 
 		} );
 
@@ -759,7 +753,7 @@ export class NodeEditor extends EventDispatcher {
 
 	_initNodesContext() {
 
-		const context = new ContextMenu( this.domElement );
+		const context = new ContextMenu( this.canvas.canvas ).setWidth( 300 );
 
 		let isContext = false;
 		const contextPosition = {};
@@ -801,16 +795,136 @@ export class NodeEditor extends EventDispatcher {
 
 		} );
 
+		context.addEventListener( 'show', () => {
+
+			reset();
+			focus();
+
+		} );
+
 		//**************//
 		// INPUTS
 		//**************//
 
+		const nodeButtons = [];
+
+		let nodeButtonsVisible = [];
+		let nodeButtonsIndex = - 1;
+
+		const focus = () => requestAnimationFrame( () => search.inputDOM.focus() );
+		const reset = () => {
+
+			search.setValue( '' );
+
+			for ( const button of nodeButtons ) {
+
+				button.setOpened( false ).setVisible( true ).setSelected( false );
+
+			}
+
+		};
+
+		const node = new Node();
+		context.add( node );
+
+		const search = new StringInput().setPlaceHolder( 'Search...' ).setIcon( 'ti ti-list-search' );
+
+		search.inputDOM.addEventListener( 'keydown', e => {
+
+			const key = e.key;
+
+			if ( key === 'ArrowDown' ) {
+
+				const previous = nodeButtonsVisible[ nodeButtonsIndex ];
+				if ( previous ) previous.setSelected( false );
+
+				const current = nodeButtonsVisible[ nodeButtonsIndex = ( nodeButtonsIndex + 1 ) % nodeButtonsVisible.length ];
+				if ( current ) current.setSelected( true );
+
+				e.preventDefault();
+				e.stopImmediatePropagation();
+
+			} else if ( key === 'ArrowUp' ) {
+
+				const previous = nodeButtonsVisible[ nodeButtonsIndex ];
+				if ( previous ) previous.setSelected( false );
+
+				const current = nodeButtonsVisible[ nodeButtonsIndex > 0 ? -- nodeButtonsIndex : ( nodeButtonsIndex = nodeButtonsVisible.length - 1 ) ];
+				if ( current ) current.setSelected( true );
+
+				e.preventDefault();
+				e.stopImmediatePropagation();
+
+			} else if ( key === 'Enter' ) {
+
+				if ( nodeButtonsVisible[ nodeButtonsIndex ] !== undefined ) {
+
+					nodeButtonsVisible[ nodeButtonsIndex ].dom.click();
+
+					e.preventDefault();
+					e.stopImmediatePropagation();
+
+				}
+
+			}
+
+		} );
+
+		search.onChange( () => {
+
+			const value = search.getValue().toLowerCase();
+
+			if ( value.length === 0 ) return reset();
+
+			nodeButtonsVisible = [];
+			nodeButtonsIndex = 0;
+
+			for ( const button of nodeButtons ) {
+
+				const buttonLabel = button.getLabel().toLowerCase();
+
+				button.setVisible( false ).setSelected( false );
+
+				let visible = buttonLabel.indexOf( value ) !== - 1;
+
+				if ( visible && button.parent !== null ) {
+
+					nodeButtonsVisible.push( button );
+
+				}
+
+			}
+
+			for ( const button of nodeButtonsVisible ) {
+
+				let parent = button;
+
+				while ( parent !== null ) {
+
+					parent.setOpened( true ).setVisible( true );
+
+					parent = parent.parent;
+
+				}
+
+			}
+
+			if ( nodeButtonsVisible[ nodeButtonsIndex ] !== undefined ) {
+
+				nodeButtonsVisible[ nodeButtonsIndex ].setSelected( true );
+
+			}
+
+		} );
+
+		const treeView = new TreeViewInput();
+		node.add( new Element().setHeight( 30 ).add( search ) );
+		node.add( new Element().setHeight( 200 ).add( treeView ) );
+
 		const createButtonMenu = ( item ) => {
 
-			const button = new ButtonInput( item.name );
+			const button = new TreeViewNode( item.name );
 			button.setIcon( `ti ti-${item.icon}` );
-
-			let context = null;
 
 			if ( item.nodeClass ) {
 
@@ -820,33 +934,33 @@ export class NodeEditor extends EventDispatcher {
 
 			if ( item.tip ) {
 
-				button.setToolTip( item.tip );
+				//button.setToolTip( item.tip );
 
 			}
 
-			if ( item.children ) {
+			nodeButtons.push( button );
 
-				context = new ContextMenu();
+			if ( item.children ) {
 
 				for ( const subItem of item.children ) {
 
-					const buttonMenu = createButtonMenu( subItem );
+					const subButton = createButtonMenu( subItem );
 
-					context.add( buttonMenu.button, buttonMenu.context );
+					button.add( subButton );
 
 				}
 
 			}
 
-			return { button, context };
+			return button;
 
 		};
 
 		for ( const item of NodeList ) {
 
-			const buttonMenu = createButtonMenu( item );
+			const button = createButtonMenu( item );
 
-			context.add( buttonMenu.button, buttonMenu.context );
+			treeView.add( button );
 
 		}
 

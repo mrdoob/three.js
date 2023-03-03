@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Constantes de texture</h1>
+
+		<h2>Modes de mappage</h2>
+		<code>
+		THREE.UVMapping
+		THREE.CubeReflectionMapping
+		THREE.CubeRefractionMapping
+		THREE.EquirectangularReflectionMapping
+		THREE.EquirectangularRefractionMapping
+		THREE.CubeUVReflectionMapping
+		</code>
+
+		<p>
+		Ces constantes définissent le mode de mappage des textures.<br />
+		[page:Constant UVMapping] est la valeur par défaut et mappe la texture en utilisant les coordonnées UV du maillage.<br /><br />
+
+		Les autres définissent les types de mappage d'environnement.<br /><br />
+
+		[page:Constant CubeReflectionMapping] et [page:Constant CubeRefractionMapping] sont à utiliser avec
+		une [page:CubeTexture CubeTexture], qui est composée de six textures, une pour chaque face du cube.
+		[page:Constant CubeReflectionMapping] est la valeur par défaut pour une [page:CubeTexture CubeTexture]. <br /><br />
+
+		[page:Constant EquirectangularReflectionMapping] et [page:Constant EquirectangularRefractionMapping]
+		sont à utiliser avec une carte d'environnement équirectangulaire.  Aussi appelée carte lat-long, une texture équirectangulaire représente une vue à 360 degrés le long de la ligne médiane horizontale et une vue à 180 degrés le long de la
+		axe vertical, avec les bords supérieur et inférieur de l'image correspondant aux pôles nord et sud
+		d'une sphère cartographiée.<br /><br />
+
+		Voir l'exemple [example:webgl_materials_envmaps materials / envmaps].
+		</p>
+
+
+		<h2>Modes d'emballage</h2>
+		<code>
+		THREE.RepeatWrapping
+		THREE.ClampToEdgeWrapping
+		THREE.MirroredRepeatWrapping
+		</code>
+		<p>
+		Ces constantes définissent les propriétés des textures [page:Texture.wrapS wrapS] et [page:Texture.wrapT wrapT],
+		qui définissent l'emballage de texture horizontal et vertical.<br /><br />
+
+		Avec [page:constant RepeatWrapping] la texure se répetera simplement à l'infini.<br /><br />
+
+		[page:constant ClampToEdgeWrapping] est la valeur par défaut.
+		Le dernier pixel de la texture s'étend jusqu'au bord du maillage.<br /><br />
+
+		Avec [page:constant MirroredRepeatWrapping] la texure se répetera à l'infini avec un effet mirroir à chaque répétition.
+		</p>
+
+		<h2>Filtres de grossissement</h2>
+		<code>
+		THREE.NearestFilter
+		THREE.LinearFilter
+		</code>
+
+		<p>
+		À utiliser avec une propriété de texture [page:Texture.magFilter magFilter],
+		Ces constantes définissent la fonction de grossissement de texture à utiliser lorsque le pixel texturé correspond à une
+		surface inférieure ou égale à un élément de texture (texel).<br /><br />
+
+		[page:constant NearestFilter] renvoie la valeur de l'élément de texture le plus proche
+		(en distance de Manhattan) aux coordonnées de texture spécifiées.<br /><br />
+
+		[page:constant LinearFilter] est la valeur par défaut et renvoie la moyenne pondérée
+		des quatre éléments de texture les plus proches des coordonnées de texture spécifiées,
+		et peut inclure des éléments enveloppés ou répétés à partir d'autres parties d'une texture,
+		en fonction des valeurs de [page:Texture.wrapS wrapS], [page:Texture.wrapT wrapT], et de la cartographie exacte.
+		</p>
+
+		<h2>Filtres de réduction</h2>
+		<code>
+		THREE.NearestFilter
+		THREE.NearestMipmapNearestFilter
+		THREE.NearestMipmapLinearFilter
+		THREE.LinearFilter
+		THREE.LinearMipmapNearestFilter
+		THREE.LinearMipmapLinearFilter
+		</code>
+
+		<p>
+		Pour une utilisation avec la propriété [page:Texture.minFilter minFilter] d'une texture, ces constantes définissent
+		la fonction de minimisation de texture qui est utilisée chaque fois que le pixel texturé est mappé
+		à une zone supérieure à un élément de texture (texel).
+		<br /><br />
+
+		En plus de [page:constant NearestFilter] et [page:constant LinearFilter],
+		les quatre fonctions suivantes peuvent être utilisées pour la minification :<br /><br />
+
+		[page:constant NearestMipmapNearestFilter] choisit le mipmap le plus proche qui
+		correspond à la taille du pixel texturé
+		et utilise le critère [page:constant NearestFilter] (le texel le plus proche du
+		centre du pixel) pour produire une valeur de texture.<br /><br />
+
+		[page:constant NearestMipmapLinearFilter] choisit les deux mipmaps les plus proches
+		qui correspondent à la taille du pixel texturé et utilise le critère [page:constant NearestFilter] pour produire
+		une valeur de texture pour chaque mipmap. La valeur de texture finale est une moyenne pondérée de ces deux valeurs.<br /><br />
+
+		[page:constant LinearMipmapNearestFilter] choisit le mipmap qui correspond le mieux
+		la taille du pixel texturé et utilise le critère [page:constant LinearFilter]
+		(une moyenne pondérée des quatre texels les plus proches du centre du pixel)
+		pour produire une valeur de texture.<br /><br />
+
+		[page:constant LinearMipmapLinearFilter] est la valeur par défaut et choisit les deux mipmaps
+		qui correspondent le mieux à la taille du pixel texturé et utilise le critère [page:constant LinearFilter]
+		pour produire une valeur de texture à partir de chaque mipmap. La valeur de texture finale est une moyenne pondérée de ces deux valeurs.<br /><br />
+
+		Voir l'exemple [example:webgl_materials_texture_filters materials / texture / filters].
+		</p>
+
+		<h2>Types</h2>
+		<code>
+		THREE.UnsignedByteType
+		THREE.ByteType
+		THREE.ShortType
+		THREE.UnsignedShortType
+		THREE.IntType
+		THREE.UnsignedIntType
+		THREE.FloatType
+		THREE.HalfFloatType
+		THREE.UnsignedShort4444Type
+		THREE.UnsignedShort5551Type
+		THREE.UnsignedInt248Type
+		</code>
+		<p>
+		À utiliser avec la propriété [page:Texture.type type] d'une texture, qui doit correspondre au format correct. Voir ci-dessous pour plus de détails.<br /><br />
+
+		[page:constant UnsignedByteType] est la valeur par défaut.
+		</p>
+
+		<h2>Formats</h2>
+		<code>
+		THREE.AlphaFormat
+		THREE.RedFormat
+		THREE.RedIntegerFormat
+		THREE.RGFormat
+		THREE.RGIntegerFormat
+		THREE.RGBAFormat
+		THREE.RGBAIntegerFormat
+		THREE.LuminanceFormat
+		THREE.LuminanceAlphaFormat
+		THREE.DepthFormat
+		THREE.DepthStencilFormat
+		</code>
+		<p>
+		À utiliser avec la propriété [page:Texture.format format] d'une texture, ceux-ci définissent
+		comment les éléments d'une texture 2d, ou `texels`, sont lus par les shaders.<br /><br />
+
+		[page:constant AlphaFormat] supprime les composants rouge, vert et bleu et lit uniquement le composant alpha.<br /><br />
+
+		[page:constant RedFormat] supprime les composants vert et bleu et lit uniquement le composant rouge.<br /><br />
+
+		[page:constant RedIntegerFormat] supprime les composants vert et bleu et lit uniquement le composant rouge.
+		Les texels sont lus comme des entiers au lieu de points flottants.
+		(ne peut être utilisé qu'avec un contexte de rendu WebGL 2).
+		<br /><br />
+
+		[page:constant RGFormat] supprime les composants alpha et bleu et lit les composants rouge et vert.
+		(ne peut être utilisé qu'avec un contexte de rendu WebGL 2).
+		<br /><br />
+
+		[page:constant RGIntegerFormat] supprime les composants alpha et bleu et lit les composants rouge et vert.
+		Les texels sont lus comme des entiers au lieu de points flottants.
+		(ne peut être utilisé qu'avec un contexte de rendu WebGL 2).
+		<br /><br />
+
+		[page:constant RGBAFormat] est la valeur par défaut et lit les composants rouge, vert, bleu et alpha.<br /><br />
+
+		[page:constant RGBAIntegerFormat] est la valeur par défaut et lit les composants rouge, vert, bleu et alpha.
+		Les texels sont lus comme des entiers au lieu de points flottants.
+		(ne peut être utilisé qu'avec un contexte de rendu WebGL 2).
+		<br /><br />
+
+		[page:constant LuminanceFormat] lit chaque élément comme une seule composante de luminance.
+		Celui-ci est ensuite converti en point flottant, fixé dans l'intervalle [0,1], puis assemblé
+		dans un élément RGBA en plaçant la valeur de luminance dans les canaux rouge, vert et bleu,
+		et en assignant 1.0 au canal alpha.<br /><br />
+
+		[page:constant LuminanceAlphaFormat] lit chaque élément comme une composante de luminance/double alpha.
+		Il s'agit du même procédé que pour [page:constant LuminanceFormat], sauf que le canal alpha peut avoir une autre valeur que `1.0`.<br /><br />
+
+		[page:constant DepthFormat] lit chaque élément comme une seule valeur de profondeur, les converti en point flottant, fixé dans l'intervalle [0,1].
+		C'est la valeur par défaut pour [page:DepthTexture DepthTexture].<br /><br />
+
+		[page:constant DepthStencilFormat] lit chaque élément comme une paire de valeurs de profondeur et de gabarit.
+		Le composant de profondeur de la paire est interprété comme dans [page:constant DepthFormat].
+		Le composant de gabarit est interprété en fonction du format interne profondeur + gabarit.
+		<br /><br />
+
+		Notez que la texture doit avoir le bon [page:Texture.type type] défini, comme décrit ci-dessus.
+		Voir [link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D] pour plus de détails.
+		</p>
+
+		<h2>Formats de Textures Compressées DDS et ST3C </h2>
+		<code>
+		THREE.RGB_S3TC_DXT1_Format
+		THREE.RGBA_S3TC_DXT1_Format
+		THREE.RGBA_S3TC_DXT3_Format
+		THREE.RGBA_S3TC_DXT5_Format
+		</code>
+		<p>
+		À utiliser avec la propriété [page:Texture.format format] d'une [page:CompressedTexture CompressedTexture],
+		ceux-ci doivent supporter l'extension 
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc] <br /><br />
+
+		Il existe 4 formats [link:https://en.wikipedia.org/wiki/S3_Texture_Compression S3TC] disponibles avec cette extension. Ce sont :<br />
+		[page:constant RGB_S3TC_DXT1_Format] : une image compressée DXT1 dans un format d'image RVB.<br />
+		[page:constant RGBA_S3TC_DXT1_Format] : une image compressée DXT1 dans un format d'image RVB avec une simple valeur alpha activée/désactivée.<br />
+		[page:constant RGBA_S3TC_DXT3_Format] : une image compressée DXT3 dans un format d'image RGBA. Comparé à une texture RGBA 32 bits, il offre une compression 4:1.<br />
+		[page:constant RGBA_S3TC_DXT5_Format] : une image compressée DXT5 dans un format d'image RGBA. Il fournit également une compression 4:1, mais diffère de la compression DXT3 dans la façon dont la compression alpha est effectuée.<br />
+		</p>
+
+		<h2>Formats de Textures Compressées PVRTC</h2>
+		<code>
+		THREE.RGB_PVRTC_4BPPV1_Format
+		THREE.RGB_PVRTC_2BPPV1_Format
+		THREE.RGBA_PVRTC_4BPPV1_Format
+		THREE.RGBA_PVRTC_2BPPV1_Format
+		</code>
+		<p>
+		À utiliser avec la propriété [page:Texture.format format] d'une [page:CompressedTexture CompressedTexture],
+		ceux-ci doivent supporter l'extension  [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]. <br />
+		Le PVRTC n'est généralement disponible que sur les appareils mobiles équipés de chipsets PowerVR, qui sont principalement des appareils Apple.<br /><br />
+
+		Il existe 4 formats [link:https://en.wikipedia.org/wiki/PVRTC PVRTC] disponibles avec cette extension. Ce sont :<br />
+		[page:constant RGB_PVRTC_4BPPV1_Format] : Compression RVB en mode 4 bits. Un bloc pour chaque 4×4 pixels.<br />
+		[page:constant RGB_PVRTC_2BPPV1_Format] : Compression RVB en mode 2 bits. Un bloc pour chaque 8×4 pixels.<br />
+		[page:constant RGBA_PVRTC_4BPPV1_Format] : Compression RGBA en mode 4 bits. Un bloc pour chaque 4×4 pixels.<br />
+		[page:constant RGBA_PVRTC_2BPPV1_Format] : Compression RGBA en mode 2 bits. Un bloc pour chaque 8×4 pixels.<br />
+		</p>
+
+		<h2>Formats de Textures Compressées PVRTC</h2>
+		<code>
+		THREE.RGB_ETC1_Format
+		THREE.RGB_ETC2_Format
+		THREE.RGBA_ETC2_EAC_Format
+		</code>
+		<p>
+		À utiliser avec la propriété [page:Texture.format format] d'une [page:CompressedTexture CompressedTexture],
+		ceux-ci doivent supporter les extensions [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
+		(ETC1) ou [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc]
+		(ETC2). <br /><br />
+		</p>
+
+		<h2>Formats de Textures Compressées ASTC</h2>
+		<code>
+		THREE.RGBA_ASTC_4x4_Format
+		THREE.RGBA_ASTC_5x4_Format
+		THREE.RGBA_ASTC_5x5_Format
+		THREE.RGBA_ASTC_6x5_Format
+		THREE.RGBA_ASTC_6x6_Format
+		THREE.RGBA_ASTC_8x5_Format
+		THREE.RGBA_ASTC_8x6_Format
+		THREE.RGBA_ASTC_8x8_Format
+		THREE.RGBA_ASTC_10x5_Format
+		THREE.RGBA_ASTC_10x6_Format
+		THREE.RGBA_ASTC_10x8_Format
+		THREE.RGBA_ASTC_10x10_Format
+		THREE.RGBA_ASTC_12x10_Format
+		THREE.RGBA_ASTC_12x12_Format
+		</code>
+		<p>
+		À utiliser avec la propriété [page:Texture.format format] d'une [page:CompressedTexture CompressedTexture],
+		ceux-ci doivent supporter les extensions [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc]. <br /><br />
+		</p>
+
+		<h2>Formats de Textures Compressées BPTC</h2>
+		<code>
+		THREE.RGBA_BPTC_Format
+		</code>
+		<p>
+		À utiliser avec la propriété [page:Texture.format format] d'une [page:CompressedTexture CompressedTexture],
+		ceux-ci doivent supporter les extensions [link:https://www.khronos.org/registry/webgl/extensions/EXT_texture_compression_bptc/ EXT_texture_compression_bptc]. <br /><br />
+		</p>
+
+		<h2>Formats Internes</h2>
+		<code>
+		'ALPHA'
+		'RGB'
+		'RGBA'
+		'LUMINANCE'
+		'LUMINANCE_ALPHA'
+		'RED_INTEGER'
+		'R8'
+		'R8_SNORM'
+		'R8I'
+		'R8UI'
+		'R16I'
+		'R16UI'
+		'R16F'
+		'R32I'
+		'R32UI'
+		'R32F'
+		'RG8'
+		'RG8_SNORM'
+		'RG8I'
+		'RG8UI'
+		'RG16I'
+		'RG16UI'
+		'RG16F'
+		'RG32I'
+		'RG32UI'
+		'RG32F'
+		'RGB565'
+		'RGB8'
+		'RGB8_SNORM'
+		'RGB8I'
+		'RGB8UI'
+		'RGB16I'
+		'RGB16UI'
+		'RGB16F'
+		'RGB32I'
+		'RGB32UI'
+		'RGB32F'
+		'RGB9_E5'
+		'SRGB8'
+		'R11F_G11F_B10F'
+		'RGBA4'
+		'RGBA8'
+		'RGBA8_SNORM'
+		'RGBA8I'
+		'RGBA8UI'
+		'RGBA16I'
+		'RGBA16UI'
+		'RGBA16F'
+		'RGBA32I'
+		'RGBA32UI'
+		'RGBA32F'
+		'RGB5_A1'
+		'RGB10_A2'
+		'RGB10_A2UI'
+		'SRGB8_ALPHA8'
+		'DEPTH_COMPONENT16'
+		'DEPTH_COMPONENT24'
+		'DEPTH_COMPONENT32F'
+		'DEPTH24_STENCIL8'
+		'DEPTH32F_STENCIL8'
+		</code>
+
+		<p>
+
+		Attention : changer le format interne d'une texture n'affectera que le
+		texture lors de l'utilisation d'un contexte de rendu WebGL 2.<br /><br />
+
+		À utiliser avec la propriété de texture [page:Texture.internalFormat internalFormat],
+		ceux-ci définissent comment les éléments d'une texture, ou "texels", sont stockés sur le GPU.<br /><br />
+
+		[page:constante R8] stocke la composante rouge sur 8 bits.<br /><br />
+
+		[page:constant R8_SNORM] stocke la composante rouge sur 8 bits. Le composant est stocké comme normalisé. <br /><br />
+		
+		[page:constant R8I] stocke la composante rouge sur 8 bits. Le composant est stocké sous la forme d'un entier. <br /><br />
+		
+		[page:constant R8UI] stocke la composante rouge sur 8 bits. Le composant est stocké sous la forme d'un entier non signé. <br /><br />
+		
+		[page:constant R16I] stocke la composante rouge sur 16 bits. Le composant est stocké sous la forme d'un entier. <br /><br />
+		
+		[page:constant R16UI] stocke la composante rouge sur 16 bits. Le composant est stocké sous la forme d'un entier non signé. <br /><br />
+		
+		[page:constant R16F] stocke la composante rouge sur 16 bits. Le composant est stocké en point flottant. <br /><br />
+		
+		[page:constant R32I] stocke la composante rouge sur 32 bits. Le composant est stocké sous la forme d'un entier. <br /><br />
+		
+		[page:constant R32UI] stocke la composante rouge sur 32 bits. Le composant est stocké sous la forme d'un entier non signé. <br /><br />
+		
+		[page:constant R32F] stocke la composante rouge sur 32 bits. Le composant est stocké en point flottant. <br /><br />
+		
+		[page:constante RG8] stocke les composantes rouge et verte sur 8 bits chacune.<br /><br />
+
+		[page:constant RG8_SNORM] stocke les composantes rouge et verte sur 8 bits chacune.
+		Chaque composant est stocké comme normalisé.
+		<br /><br />
+
+		[page:constant RG8I] stocke les composantes rouge et verte sur 8 bits chacune.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RG8UI] stocke les composantes rouge et verte sur 8 bits chacune.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant RG16I] stocke les composantes rouge et verte sur 16 bits chacune.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RG16UI] stocke les composantes rouge et verte sur 16 bits chacune.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant RG16F] stocke les composantes rouge et verte sur 16 bits chacune.
+		Chaque composant est stocké en point flottant.
+		<br /><br />
+
+		[page:constant RG32I] stocke les composantes rouge et verte sur 32 bits chacune.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RG32UI] stocke les composantes rouge et verte sur 32 bits.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constante RG32F] stocke les composantes rouge et verte sur 32 bits.
+		Chaque composant est stocké en point flottant.
+		<br /><br />
+
+		[page:constant RGB8] stocke les composants rouge, vert et bleu sur 8 bits chacun.
+
+		[page:constant RGB8_SNORM] stocke les composants rouge, vert et bleu sur 8 bits chacun.
+		Chaque composant est stocké comme normalisé.
+		<br /><br />
+
+		[page:constant RGB8I] stocke les composants rouge, vert et bleu sur 8 bits chacun.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RGB8UI] stocke les composants rouge, vert et bleu sur 8 bits chacun.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant RGB16I] stocke les composants rouge, vert et bleu sur 16 bits chacun.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RGB16UI] stocke les composants rouge, vert et bleu sur 16 bits chacun.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant RGB16F] stocke les composants rouge, vert et bleu sur 16 bits chacun.
+		Chaque composant est stocké en point flottant
+		<br /><br />
+
+		[page:constant RGB32I] stocke les composants rouge, vert et bleu sur 32 bits chacun.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RGB32UI] stocke les composants rouge, vert et bleu sur 32 bits chacun.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant RGB32F] stocke les composants rouge, vert et bleu sur 32 bits chacun.
+		Chaque composant est stocké en point flottant
+		<br /><br />
+
+		[page:constante R11F_G11F_B10F] stocke les composantes rouge, verte et bleue respectivement sur 11 bits, 11 bits et 10 bits.
+		Chaque composant est stocké en point flottant.
+		<br /><br />
+
+		[page:constant RGB565] stocke les composantes rouge, verte et bleue respectivement sur 5 bits, 6 bits et 5 bits.<br /><br />
+
+		[page:constant RGB9_E5] stocke les composantes rouge, verte et bleue sur 9 bits chacune.<br /><br />
+
+		[page:constant RGBA8] stocke les composants rouge, vert, bleu et alpha sur 8 bits chacun.<br /><br />
+
+		[page:constant RGBA8_SNORM] stocke les composantes rouge, verte, bleue et alpha sur 8 bits.
+		Chaque composant est stocké comme normalisé.
+		<br /><br />
+
+		[page:constant RGBA8I] stocke les composants rouge, vert, bleu et alpha sur 8 bits chacun.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RGBA8UI] stocke les composants rouge, vert, bleu et alpha sur 8 bits.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant RGBA16I] stocke les composantes rouge, verte, bleue et alpha sur 16 bits.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RGBA16UI] stocke les composants rouge, vert, bleu et alpha sur 16 bits.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant RGBA16F] stocke les composantes rouge, verte, bleue et alpha sur 16 bits.
+		Chaque composant est stocké en point flottant.
+		<br /><br />
+
+		[page:constant RGBA32I] stocke les composantes rouge, verte, bleue et alpha sur 32 bits.
+		Chaque composant est stocké sous la forme d'un entier.
+		<br /><br />
+
+		[page:constant RGBA32UI] stocke les composants rouge, vert, bleu et alpha sur 32 bits.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant RGBA32F] stocke les composantes rouge, verte, bleue et alpha sur 32 bits.
+		Chaque composant est stocké en point flottant.
+		<br /><br />
+
+		[page:constant RGB5_A1] stocke les composantes rouge, verte, bleue et alpha respectivement sur 5 bits, 5 bits, 5 bits et 1 bit.<br /><br />
+
+		[page:constant RGB10_A2] stocke les composantes rouge, verte, bleue et alpha respectivement sur 10 bits, 10 bits, 10 bits et 2 bits.<br /><br />
+
+		[page:constant RGB10_A2UI] stocke les composantes rouge, verte, bleue et alpha respectivement sur 10 bits, 10 bits, 10 bits et 2 bits.
+		Chaque composant est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant SRGB8] stocke les composants rouge, vert et bleu sur 8 bits chacun.<br /><br />
+
+		[page:constant SRGB8_ALPHA8] stocke les composants rouge, vert, bleu et alpha sur 8 bits chacun.<br /><br />
+
+		[page : constante DEPTH_COMPONENT16] stocke la composante de profondeur sur 16 bits.<br /><br />
+
+		[page : constante DEPTH_COMPONENT24] stocke la composante de profondeur sur 24 bits.<br /><br />
+
+		[page:constant DEPTH_COMPONENT32F] stocke la composante de profondeur sur 32 bits. Le composant est stocké en point flottant.<br /><br />
+
+		[page:constant DEPTH24_STENCIL8] stocke les composants profondeur et stencil respectivement sur 24 bits et 8 bits.
+		Le composant de gabarit est stocké sous la forme d'un entier non signé.
+		<br /><br />
+
+		[page:constant DEPTH32F_STENCIL8] stocke les composants profondeur et stencil respectivement sur 32 bits et 8 bits.
+		Le composant de profondeur est stocké sous forme de point flottant et le composant de gabarit sous forme d'entier non signé.
+		<br /><br />
+
+		Notez que la texture doit avoir le bon [page:Texture.type type] défini,
+		ainsi que le bon format [page:Texture.format].
+
+		Voir [link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D], et
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texImage3D WebGL2RenderingContext.texImage3D],
+		pour plus de détails sur une combinaison possible de [page:Texture.format format], [page:Texture.internalFormat internalFormat],
+		et [page:Texture.type type].<br /><br />
+
+		Pour plus d'informations sur les formats internes, vous pouvez également vous référer directement à la
+		[link:https://www.khronos.org/registry/webgl/specs/latest/2.0/ WebGL2 Specification] et
+		à la [link:https://www.khronos.org/registry/OpenGL/specs/es/3.0/es_spec_3.0.pdf OpenGL ES 3.0 Specification].
+		</p>
+
+		<h2>Encodage</h2>
+		<code>
+		THREE.LinearEncoding
+		THREE.sRGBEncoding
+		THREE.BasicDepthPacking
+		THREE.RGBADepthPacking
+		</code>
+		<p>
+		À utiliser avec une propriété de texture [page:Texture.encoding encoding].<br /><br />
+
+		Si le type d'encodage est modifié après que la texture ait été utilisée par un matériau,
+		vous devrez définir [page:Material.needsUpdate Material.needsUpdate] sur "true" pour que le matériau soit recompilé.<br /><br />
+
+		La valeur par défaut est [page:constant LinearEncoding].
+		Les valeurs autres que celle-ci ne sont valides que pour la carte, envMap et emissiveMap d'un matériau.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+</html>

@@ -84,7 +84,7 @@
 			of achromatic values (like white or grey) depend on human perception, which in turn depends
 			heavily on the context of the observer. A color space specifies its "white point" to balance
 			these needs. The white point defined by the sRGB color space is
-			<a href="https://en.wikipedia.org/wiki/Illuminant_D65" target="_blank">D65</a>.
+			[link:https://en.wikipedia.org/wiki/Illuminant_D65 D65].
 		</li>
 		<li>
 			<b>Transfer functions:</b> After choosing the color gamut and a color model, we still need to
@@ -158,11 +158,11 @@
 		each have an associated color space. Those not already in the Linear-sRGB working color
 		space must be converted, and textures be given the correct <i>texture.encoding</i> assignment.
 		Certain conversions (for hexadecimal and CSS colors in sRGB) can be made automatically if
-		the legacy color management mode is disabled before initializing colors:
+		the THREE.ColorManagement API is enabled before initializing colors:
 	</p>
 
 	<code>
-THREE.ColorManagement.legacyMode = false;
+THREE.ColorManagement.enabled = true;
 	</code>
 
 	<ul>
@@ -188,14 +188,6 @@ THREE.ColorManagement.legacyMode = false;
 			may be represented with other nonlinear encodings for technical reasons.
 		</li>
 	</ul>
-
-	<blockquote>
-		<p>
-			⚠️ <i><b>WARNING:</b> [page:Scene.fog], [page:Scene.background], and [page:WebGLRenderer.setClearColor]
-			are exceptions to the rule. These properties are unaffected by [page:WebGLRenderer.outputEncoding]
-			and so must store RGB components in the renderer's <u>output</u> color space.</i>
-		</p>
-	</blockquote>
 
 	<blockquote>
 		<p>
@@ -250,6 +242,11 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 		</p>
 	</blockquote>
 
+	<p>
+		Custom materials based on [page:ShaderMaterial] and [page:RawShaderMaterial] have to implement their own output color space conversion.
+		For instances of `ShaderMaterial`, adding the `encodings_fragment` shader chunk to the fragment shader's `main()` function should be sufficient.
+	</p>
+
 	<h2>Working with THREE.Color instances</h2>
 
 	<p>
@@ -272,7 +269,7 @@ renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
 	</code>
 
 	<p>
-		With <i>ColorManagement.legacyMode = false</i> set (recommended), certain conversions
+		With <i>ColorManagement.enabled = true</i> set (recommended), certain conversions
 		are made automatically. Because hexadecimal and CSS colors are generally sRGB, [page:Color]
 		methods will automatically convert these inputs from sRGB to Linear-sRGB in setters, or
 		convert from Linear-sRGB to sRGB when returning hexadecimal or CSS output from getters.

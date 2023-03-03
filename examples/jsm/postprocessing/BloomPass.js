@@ -39,8 +39,6 @@ class BloomPass extends Pass {
 
 		// convolution material
 
-		if ( ConvolutionShader === undefined ) console.error( 'THREE.BloomPass relies on ConvolutionShader' );
-
 		const convolutionShader = ConvolutionShader;
 
 		this.convolutionUniforms = UniformsUtils.clone( convolutionShader.uniforms );

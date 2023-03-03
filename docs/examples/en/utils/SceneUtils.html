@@ -9,8 +9,20 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">A class containing useful utility functions for scene manipulation.</p>
+		<p class="desc">
+			A class containing useful utility functions for scene manipulation.
+		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { SceneUtils } from 'three/addons/utils/SceneUtils.js';
+		</code>
 
 		<h2>Methods</h2>
 
@@ -38,6 +50,20 @@
 		<p>
 		Creates a new Group that contains a new mesh for each material defined in materials. Beware that this is not the same as an array of materials which defines multiple materials for 1 mesh.<br />
 		This is mostly useful for objects that need both a material and a wireframe implementation.
+		</p>
+
+    <h3>[method:T reduceVertices]( [param:Object3D object], [param:function func], [param:T initialValue] )</h3>
+		<p>
+		object -- The object to traverse (uses [page:Object3D.traverseVisible traverseVisible] internally). <br />
+		func -- The binary function applied for the reduction. Must have the signature: (value: T, vertex: Vector3): T. <br />
+    initialValue -- The value to initialize the reduction with. This is required
+    as it also sets the reduction type, which is not required to be Vector3.
+		</p>
+		<p>
+		Akin to Array.prototype.reduce(), but operating on the vertices of all the
+		visible descendant objects, in world space. Additionally, it can operate as a
+		transform-reduce, returning a different type T than the Vector3 input. This
+		can be useful for e.g. fitting a viewing frustum to the scene.
 		</p>
 
 		<h3>[method:undefined sortInstancedMesh]( [param:InstancedMesh mesh], [param:Function compareFn] )</h3>

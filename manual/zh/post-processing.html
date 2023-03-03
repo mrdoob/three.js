@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 后期处理">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -77,10 +77,10 @@ composer.addPass(filmPass);
 </pre>
 <p>由于filmPass是最后一次传递，我们将其renderToScreen属性设置为true来告诉它渲染到画布。如果不设置它，它将渲染到下一个渲染目标。</p>
 <p>为了使用这些类,我们需要导入一些js模块</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from '/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from '/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from '/examples/jsm/postprocessing/BloomPass.js';
-import {FilmPass} from '/examples/jsm/postprocessing/FilmPass.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
+import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
 </pre>
 <p>对于几乎所有的后期处理EffectComposer.js，RenderPass.js 都是必需的。</p>
 <p>们需要做的最后一件事是使用EffectComposer.render 替代 WebGLRenderer.render 并告诉EffectComposer来匹配画布的大小</p>
@@ -135,7 +135,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 </pre>
 <p>这样就很清楚如何设置它们。</p>
 <p>让我们快速创建一个GUI来设置这些值</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>和</p>
 <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">const gui = new GUI();
@@ -213,15 +213,15 @@ gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
 </div>
 
 <p></p>
-<p>如前所述，对于这些文章来说，要讲述如何编写GLSL和自定义着色器的所有细节太多了。如果您真的想知道WebGL本身是如何工作的，请查看<a href="https://webglfundamentals.org">这些文章</a>。另一个很棒的资源是<a href="https://github.com/mrdoob/three.js/tree/master/examples/js/shaders">read through the existing post processing shaders in the THREE.js repo</a>。有些是较为复杂的，但是如果你从简单开始，你会大概率能够了解它们是如何工作的。</p>
-<p>不幸的是，THREE.js存储库中的大多数后期处理效果都没有记录在案，因此要使用它们，你必须通读<a href="https://github.com/mrdoob/three.js/tree/master/examples">示例</a>或者<a href="https://github.com/mrdoob/three.js/tree/master/examples/js/postprocessing">源码</a>。希望这些简单的示例以及有关<a href="notion://www.notion.so/threejs-rendertargets.html">render targets</a>的文章 提供足够的上下文来帮助你开始</p>
+<p>如前所述，对于这些文章来说，要讲述如何编写GLSL和自定义着色器的所有细节太多了。如果您真的想知道WebGL本身是如何工作的，请查看<a href="https://webglfundamentals.org">这些文章</a>。另一个很棒的资源是<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/shaders">read through the existing post processing shaders in the THREE.js repo</a>。有些是较为复杂的，但是如果你从简单开始，你会大概率能够了解它们是如何工作的。</p>
+<p>不幸的是，THREE.js存储库中的大多数后期处理效果都没有记录在案，因此要使用它们，你必须通读<a href="https://github.com/mrdoob/three.js/tree/master/examples">示例</a>或者<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/postprocessing">源码</a>。希望这些简单的示例以及有关<a href="notion://www.notion.so/threejs-rendertargets.html">render targets</a>的文章 提供足够的上下文来帮助你开始</p>
 
         </div>
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

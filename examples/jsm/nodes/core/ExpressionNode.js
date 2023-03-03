@@ -1,27 +1,28 @@
-import TempNode from './TempNode.js';
+import Node, { addNodeClass } from './Node.js';
+import { nodeProxy } from '../shadernode/ShaderNode.js';
 
-class ExpressionNode extends TempNode {
+class ExpressionNode extends Node {
 
-	constructor( snipped = '', nodeType = 'void' ) {
+	constructor( snippet = '', nodeType = 'void' ) {
 
 		super( nodeType );
 
-		this.snipped = snipped;
+		this.snippet = snippet;
 
 	}
 
-	generate( builder ) {
+	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
-		const snipped = this.snipped;
+		const snippet = this.snippet;
 
 		if ( type === 'void' ) {
 
-			builder.addFlowCode( snipped );
+			builder.addFlowCode( snippet );
 
 		} else {
 
-			return `( ${ snipped } )`;
+			return builder.format( `( ${ snippet } )`, type, output );
 
 		}
 
@@ -30,3 +31,7 @@ class ExpressionNode extends TempNode {
 }
 
 export default ExpressionNode;
+
+export const expression = nodeProxy( ExpressionNode );
+
+addNodeClass( ExpressionNode );

@@ -1,6 +1,6 @@
 import { clamp, euclideanModulo, lerp } from './MathUtils.js';
 import { ColorManagement, SRGBToLinear, LinearToSRGB } from './ColorManagement.js';
-import { SRGBColorSpace, LinearSRGBColorSpace } from '../constants.js';
+import { SRGBColorSpace } from '../constants.js';
 
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -27,7 +27,6 @@ const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua'
 	'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
 	'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32 };
 
-const _rgb = { r: 0, g: 0, b: 0 };
 const _hslA = { h: 0, s: 0, l: 0 };
 const _hslB = { h: 0, s: 0, l: 0 };
 
@@ -39,16 +38,6 @@ function hue2rgb( p, q, t ) {
 	if ( t < 1 / 2 ) return q;
 	if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
 	return p;
-
-}
-
-function toComponents( source, target ) {
-
-	target.r = source.r;
-	target.g = source.g;
-	target.b = source.b;
-
-	return target;
 
 }
 
@@ -117,7 +106,7 @@ class Color {
 
 	}
 
-	setRGB( r, g, b, colorSpace = LinearSRGBColorSpace ) {
+	setRGB( r, g, b, colorSpace = ColorManagement.workingColorSpace ) {
 
 		this.r = r;
 		this.g = g;
@@ -129,7 +118,7 @@ class Color {
 
 	}
 
-	setHSL( h, s, l, colorSpace = LinearSRGBColorSpace ) {
+	setHSL( h, s, l, colorSpace = ColorManagement.workingColorSpace ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 		h = euclideanModulo( h, 1 );
@@ -174,7 +163,7 @@ class Color {
 
 		let m;
 
-		if ( m = /^((?:rgb|hsl)a?)\(([^\)]*)\)/.exec( style ) ) {
+		if ( m = /^(\w+)\(([^\)]*)\)/.exec( style ) ) {
 
 			// rgb / hsl
 
@@ -237,6 +226,10 @@ class Color {
 
 					break;
 
+				default:
+
+					console.warn( 'THREE.Color: Unknown color model ' + style );
+
 			}
 
 		} else if ( m = /^\#([A-Fa-f\d]+)$/.exec( style ) ) {
@@ -268,11 +261,13 @@ class Color {
 
 				return this;
 
+			} else {
+
+				console.warn( 'THREE.Color: Invalid hex color ' + style );
+
 			}
 
-		}
-
-		if ( style && style.length > 0 ) {
+		} else if ( style && style.length > 0 ) {
 
 			return this.setColorName( style, colorSpace );
 
@@ -357,9 +352,9 @@ class Color {
 
 	getHex( colorSpace = SRGBColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
+		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
 
-		return clamp( _rgb.r * 255, 0, 255 ) << 16 ^ clamp( _rgb.g * 255, 0, 255 ) << 8 ^ clamp( _rgb.b * 255, 0, 255 ) << 0;
+		return clamp( _color.r * 255, 0, 255 ) << 16 ^ clamp( _color.g * 255, 0, 255 ) << 8 ^ clamp( _color.b * 255, 0, 255 ) << 0;
 
 	}
 
@@ -369,13 +364,13 @@ class Color {
 
 	}
 
-	getHSL( target, colorSpace = LinearSRGBColorSpace ) {
+	getHSL( target, colorSpace = ColorManagement.workingColorSpace ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
+		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
 
-		const r = _rgb.r, g = _rgb.g, b = _rgb.b;
+		const r = _color.r, g = _color.g, b = _color.b;
 
 		const max = Math.max( r, g, b );
 		const min = Math.min( r, g, b );
@@ -414,13 +409,13 @@ class Color {
 
 	}
 
-	getRGB( target, colorSpace = LinearSRGBColorSpace ) {
+	getRGB( target, colorSpace = ColorManagement.workingColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
+		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
 
-		target.r = _rgb.r;
-		target.g = _rgb.g;
-		target.b = _rgb.b;
+		target.r = _color.r;
+		target.g = _color.g;
+		target.b = _color.b;
 
 		return target;
 
@@ -428,16 +423,18 @@ class Color {
 
 	getStyle( colorSpace = SRGBColorSpace ) {
 
-		ColorManagement.fromWorkingColorSpace( toComponents( this, _rgb ), colorSpace );
+		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
+
+		const r = _color.r, g = _color.g, b = _color.b;
 
 		if ( colorSpace !== SRGBColorSpace ) {
 
 			// Requires CSS Color Module Level 4 (https://www.w3.org/TR/css-color-4/).
-			return `color(${ colorSpace } ${ _rgb.r } ${ _rgb.g } ${ _rgb.b })`;
+			return `color(${ colorSpace } ${ r.toFixed( 3 ) } ${ g.toFixed( 3 ) } ${ b.toFixed( 3 ) })`;
 
 		}
 
-		return `rgb(${( _rgb.r * 255 ) | 0},${( _rgb.g * 255 ) | 0},${( _rgb.b * 255 ) | 0})`;
+		return `rgb(${( r * 255 ) | 0},${( g * 255 ) | 0},${( b * 255 ) | 0})`;
 
 	}
 
@@ -600,6 +597,8 @@ class Color {
 
 }
 
+const _color = /*@__PURE__*/ new Color();
+
 Color.NAMES = _colorKeywords;
 
-export { Color, SRGBToLinear };
+export { Color };

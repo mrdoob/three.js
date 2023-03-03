@@ -154,15 +154,9 @@
 			Questo metodo imposta la skinned mesh nella posa di riposo (reimposta la posa).
 		</p>
 
-		<h3>[method:Vector3 boneTransform]( [param:Integer index], [param:Vector3 target] )</h3>
+		<h3>[method:Vector3 applyBoneTransform]( [param:Integer index], [param:Vector3 vector] )</h3>
 		<p>
-			Calcola la posizione del vertice in corrispondenza dell'indice specificato rispetto alle attuali trasformazioni ossee.
-			Il vettore target deve essere inizializzato con le coordinate del vertice prima della trasformazione:
-		<code>
-const target = new THREE.Vector3();
-target.fromBufferAttribute( mesh.geometry.attributes.position, index );
-mesh.boneTransform( index, target );
-		</code>
+		Applies the bone transform associated with the given index to the given position vector. Returns the updated vector.
 		</p>
 
 		<h2>Source</h2>

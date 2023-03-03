@@ -7,7 +7,7 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
 
 class Euler {
 
-	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
+	constructor( x = 0, y = 0, z = 0, order = Euler.DEFAULT_ORDER ) {
 
 		this.isEuler = true;
 
@@ -308,17 +308,8 @@ class Euler {
 
 	}
 
-	// @deprecated since r138, 02cf0df1cb4575d5842fef9c85bb5a89fe020d53
-
-	toVector3() {
-
-		console.error( 'THREE.Euler: .toVector3() has been removed. Use Vector3.setFromEuler() instead' );
-
-	}
-
 }
 
-Euler.DefaultOrder = 'XYZ';
-Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+Euler.DEFAULT_ORDER = 'XYZ';
 
 export { Euler };

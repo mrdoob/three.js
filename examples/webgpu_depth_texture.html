@@ -11,7 +11,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Depth Texture
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -26,13 +26,11 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three/nodes';
+			import { smoothstep, positionView, texture, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import WebGPUTextureRenderer from 'three/addons/renderers/webgpu/WebGPUTextureRenderer.js';
-
-			import { smoothstep, negate, positionView, invert } from 'three/nodes';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -62,8 +60,8 @@
 
 				// depth material
 
-				const material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = invert( smoothstep( camera.near, camera.far, negate( positionView.z ) ) );
+				const material = new MeshBasicNodeMaterial();
+				material.colorNode = smoothstep( camera.near, camera.far, positionView.z.negate() ).invert();
 
 				//
 
@@ -111,8 +109,8 @@
 
 				//
 
-				const materialFX = new Nodes.MeshBasicNodeMaterial();
-				materialFX.colorNode = new Nodes.TextureNode( textureRenderer.getTexture() );
+				const materialFX = new MeshBasicNodeMaterial();
+				materialFX.colorNode = texture( textureRenderer.getTexture() );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );

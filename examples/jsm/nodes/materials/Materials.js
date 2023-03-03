@@ -1,53 +1,11 @@
-import NodeMaterial from './NodeMaterial.js';
-import LineBasicNodeMaterial from './LineBasicNodeMaterial.js';
-import MeshBasicNodeMaterial from './MeshBasicNodeMaterial.js';
-import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
-import MeshPhysicalNodeMaterial from './MeshPhysicalNodeMaterial.js';
-import PointsNodeMaterial from './PointsNodeMaterial.js';
-import SpriteNodeMaterial from './SpriteNodeMaterial.js';
+// @TODO: We can simplify "export { default as SomeNode, other, exports } from '...'" to just "export * from '...'" if we will use only named exports
 
-export {
-	NodeMaterial,
-	LineBasicNodeMaterial,
-	MeshBasicNodeMaterial,
-	MeshStandardNodeMaterial,
-	MeshPhysicalNodeMaterial,
-	PointsNodeMaterial,
-	SpriteNodeMaterial
-};
-
-NodeMaterial.fromMaterial = function ( material ) {
-
-	const materialLib = {
-		NodeMaterial,
-		LineBasicNodeMaterial,
-		MeshBasicNodeMaterial,
-		MeshStandardNodeMaterial,
-		MeshPhysicalNodeMaterial,
-		PointsNodeMaterial,
-		SpriteNodeMaterial
-	};
-
-	const type = material.type.replace( 'Material', 'NodeMaterial' );
-
-	if ( materialLib[ type ] === undefined ) {
-
-		return material; // is already a node material or cannot be converted
-
-	}
-
-	const nodeMaterial = new materialLib[ type ]( material );
-
-	for ( const key in material ) {
-
-		if ( nodeMaterial[ key ] === undefined ) {
-
-			nodeMaterial[ key ] = material[ key ]; // currently this is needed only for material.alphaTest
-
-		}
-
-	}
-
-	return nodeMaterial;
-
-};
+export { default as NodeMaterial, addNodeMaterial, createNodeMaterialFromType } from './NodeMaterial.js';
+export { default as LineBasicNodeMaterial } from './LineBasicNodeMaterial.js';
+export { default as MeshNormalNodeMaterial } from './MeshNormalNodeMaterial.js';
+export { default as MeshBasicNodeMaterial } from './MeshBasicNodeMaterial.js';
+export { default as MeshPhongNodeMaterial } from './MeshPhongNodeMaterial.js';
+export { default as MeshStandardNodeMaterial } from './MeshStandardNodeMaterial.js';
+export { default as MeshPhysicalNodeMaterial } from './MeshPhysicalNodeMaterial.js';
+export { default as PointsNodeMaterial } from './PointsNodeMaterial.js';
+export { default as SpriteNodeMaterial } from './SpriteNodeMaterial.js';

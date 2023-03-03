@@ -38,7 +38,7 @@
   </body>
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -58,7 +58,7 @@ function main() {
   const canvas = document.querySelector('#c');
   const view1Elem = document.querySelector('#view1');
   const view2Elem = document.querySelector('#view2');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
   const fov = 45;
   const aspect = 2;  // the canvas default

@@ -1,6 +1,6 @@
 /* global QUnit */
 
-// import { Curve } from '../../../../../src/extras/core/Curve.js';
+import { Curve } from '../../../../../src/extras/core/Curve.js';
 
 export default QUnit.module( 'Extras', () => {
 
@@ -9,13 +9,31 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'Curve', () => {
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( assert ) => {
+
+				const object = new Curve();
+				assert.ok( object, 'Can instantiate a Curve.' );
+
+			} );
+
+			// PROPERTIES
+			QUnit.test( 'type', ( assert ) => {
+
+				const object = new Curve();
+				assert.ok(
+					object.type === 'Curve',
+					'Curve.type should be Curve'
+				);
+
+			} );
+
+			QUnit.todo( 'arcLengthDivisions', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			// PUBLIC STUFF
+			// PUBLIC
 			QUnit.todo( 'getPoint', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
@@ -77,6 +95,30 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			QUnit.todo( 'computeFrenetFrames', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'clone', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'copy', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'toJSON', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'fromJSON', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 

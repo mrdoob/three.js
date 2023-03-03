@@ -19,3 +19,8 @@ export const NodeType = {
 	MATRIX3: 'mat3',
 	MATRIX4: 'mat4'
 };
+
+export const defaultShaderStages = [ 'fragment', 'vertex' ];
+export const defaultBuildStages = [ 'construct', 'analyze', 'generate' ];
+export const shaderStages = [ ...defaultShaderStages, 'compute' ];
+export const vectorComponents = [ 'x', 'y', 'z', 'w' ];

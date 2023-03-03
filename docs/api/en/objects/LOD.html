@@ -70,18 +70,20 @@
 		<p>
 		An array of [page:Object level] objects<br /><br />
 
-		Each level is an object with two properties:<br />
+		Each level is an object with the following properties:<br />
 		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
-		[page:Float distance] - The distance at which to display this level of detail.
+		[page:Float distance] - The distance at which to display this level of detail.<br />
+		[page:Float hysteresis] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.
 		</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
 
-		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance] )</h3>
+		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance], [param:Float hysteresis] )</h3>
 		<p>
 		[page:Object3D object] - The [page:Object3D] to display at this level.<br />
-		[page:Float distance] - The distance at which to display this level of detail.<br /><br />
+		[page:Float distance] - The distance at which to display this level of detail. Default 0.0.<br />
+		[page:Float hysteresis] - Threshold used to avoid flickering at LOD boundaries, as a fraction of distance. Default 0.0.<br /><br />
 
 		Adds a mesh that will display at a certain distance and greater. Typically the further away the distance,
 		the lower the detail on the mesh.
@@ -89,7 +91,7 @@
 
 		<h3>[method:LOD clone]()</h3>
 		<p>
-		Returns a clone of this LOD object and its associated distance specific objects.
+		Returns a clone of this LOD object with its associated levels.
 		</p>
 
 

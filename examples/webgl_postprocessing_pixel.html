@@ -1,180 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js webgl - postprocessing - pixel shader</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-	</head>
-	<body>
 
-		<div id="container"></div>
+<head>
+	<title>three.js webgl - post processing - pixelation</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
 
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - pixel shader by <a href="http://wongbryan.github.io">wongbryan</a>
-		</div>
+<body>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Pixelation pass with optional single pixel outlines by
+		<a href="https://github.com/KodyJKing" target="_blank" rel="noopener">Kody King</a><br /><br />
+	</div>
 
-		<!-- Import maps polyfill -->
-		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+	<div id="container"></div>
 
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
-				}
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
 			}
-		</script>
+		}
+	</script>
 
-		<script type="module">
+	<script type="module">
 
-			import * as THREE from 'three';
+		import * as THREE from 'three';
 
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { PixelShader } from 'three/addons/shaders/PixelShader.js';
+		let camera, scene, renderer, composer, crystalMesh, clock;
+		let gui, params;
 
-			let camera, scene, renderer, gui, composer, controls;
-			let pixelPass, params;
+		init();
+		animate();
 
-			let group;
+		function init() {
 
-			init();
-			animate();
+			const aspectRatio = window.innerWidth / window.innerHeight;
 
-			function updateGUI() {
+			camera = new THREE.OrthographicCamera( - aspectRatio, aspectRatio, 1, - 1, 0.1, 10 );
+			camera.position.y = 2 * Math.tan( Math.PI / 6 );
+			camera.position.z = 2;
 
-				pixelPass.uniforms[ 'pixelSize' ].value = params.pixelSize;
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x151729 );
 
-			}
+			clock = new THREE.Clock();
 
-			function init() {
+			renderer = new THREE.WebGLRenderer();
+			renderer.shadowMap.enabled = true;
+			//renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
 
-				const container = document.getElementById( 'container' );
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+			composer = new EffectComposer( renderer );
+			const renderPixelatedPass = new RenderPixelatedPass( 6, scene, camera );
+			composer.addPass( renderPixelatedPass );
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, 0, 30 );
-				controls = new TrackballControls( camera, renderer.domElement );
-				controls.rotateSpeed = 2.0;
-				controls.panSpeed = 0.8;
-				controls.zoomSpeed = 1.5;
+			window.addEventListener( 'resize', onWindowResize );
 
-				scene = new THREE.Scene();
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.maxZoom = 2;
 
-				const hemisphereLight = new THREE.HemisphereLight( 0xfceafc, 0x000000, .8 );
-				scene.add( hemisphereLight );
+			// gui
 
-				const dirLight = new THREE.DirectionalLight( 0xffffff, .5 );
-				dirLight.position.set( 150, 75, 150 );
-				scene.add( dirLight );
+			gui = new GUI();
+			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true };
+			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
+				.onChange( () => {
 
-				const dirLight2 = new THREE.DirectionalLight( 0xffffff, .2 );
-				dirLight2.position.set( - 150, 75, - 150 );
-				scene.add( dirLight2 );
+					renderPixelatedPass.setPixelSize( params.pixelSize );
 
-				const dirLight3 = new THREE.DirectionalLight( 0xffffff, .1 );
-				dirLight3.position.set( 0, 125, 0 );
-				scene.add( dirLight3 );
+				} );
+			gui.add( renderPixelatedPass, 'normalEdgeStrength' ).min( 0 ).max( 2 ).step( .05 );
+			gui.add( renderPixelatedPass, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
+			gui.add( params, 'pixelAlignedPanning' );
 
-				const geometries = [
-					new THREE.SphereGeometry( 1, 64, 64 ),
-					new THREE.BoxGeometry( 1, 1, 1 ),
-					new THREE.ConeGeometry( 1, 1, 32 ),
-					new THREE.TetrahedronGeometry( 1 ),
-					new THREE.TorusKnotGeometry( 1, .4 )
-				];
+			// textures
 
-				group = new THREE.Group();
+			const loader = new THREE.TextureLoader();
+			const texChecker = pixelTexture( loader.load( 'textures/checker.png' ) );
+			const texChecker2 = pixelTexture( loader.load( 'textures/checker.png' ) );
+			texChecker.repeat.set( 3, 3 );
+			texChecker2.repeat.set( 1.5, 1.5 );
 
-				for ( let i = 0; i < 25; i ++ ) {
+			// meshes
 
-					const geom = geometries[ Math.floor( Math.random() * geometries.length ) ];
+			const boxMaterial = new THREE.MeshPhongMaterial( { map: texChecker2 } );
 
-					const color = new THREE.Color();
-					color.setHSL( Math.random(), .7 + .2 * Math.random(), .5 + .1 * Math.random() );
+			function addBox( boxSideLength, x, z, rotation ) {
 
-					const mat = new THREE.MeshPhongMaterial( { color: color, shininess: 200 } );
-
-					const mesh = new THREE.Mesh( geom, mat );
-
-					const s = 4 + Math.random() * 10;
-					mesh.scale.set( s, s, s );
-					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
-					mesh.position.multiplyScalar( Math.random() * 200 );
-					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
-					group.add( mesh );
-
-				}
-
-				scene.add( group );
-
-				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
-
-				pixelPass = new ShaderPass( PixelShader );
-				pixelPass.uniforms[ 'resolution' ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
-				pixelPass.uniforms[ 'resolution' ].value.multiplyScalar( window.devicePixelRatio );
-				composer.addPass( pixelPass );
-
-				window.addEventListener( 'resize', onWindowResize );
-
-				params = {
-					pixelSize: 16,
-					postprocessing: true
-				};
-				gui = new GUI();
-				gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
-				gui.add( params, 'postprocessing' );
+				const mesh = new THREE.Mesh( new THREE.BoxGeometry( boxSideLength, boxSideLength, boxSideLength ), boxMaterial );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				mesh.rotation.y = rotation;
+				mesh.position.y = boxSideLength / 2;
+				mesh.position.set( x, boxSideLength / 2 + .0001, z );
+				scene.add( mesh );
+				return mesh;
 
 			}
 
-			function onWindowResize() {
+			addBox( .4, 0, 0, Math.PI / 4 );
+			addBox( .5, - .5, - .5, Math.PI / 4 );
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+			const planeSideLength = 2;
+			const planeMesh = new THREE.Mesh(
+				new THREE.PlaneGeometry( planeSideLength, planeSideLength ),
+				new THREE.MeshPhongMaterial( { map: texChecker } )
+			);
+			planeMesh.receiveShadow = true;
+			planeMesh.rotation.x = - Math.PI / 2;
+			scene.add( planeMesh );
+
+			const radius = .2;
+			const geometry = new THREE.IcosahedronGeometry( radius );
+			crystalMesh = new THREE.Mesh(
+				geometry,
+				new THREE.MeshPhongMaterial( {
+					color: 0x2379cf,
+					emissive: 0x143542,
+					shininess: 10,
+					specular: 0xffffff
+				} )
+			);
+			crystalMesh.receiveShadow = true;
+			crystalMesh.castShadow = true;
+			scene.add( crystalMesh );
+
+			// lights
+
+			scene.add( new THREE.AmbientLight( 0x2d3645, 1.5 ) );
+
+			const directionalLight = new THREE.DirectionalLight( 0xfffc9c, .5 );
+			directionalLight.position.set( 100, 100, 100 );
+			directionalLight.castShadow = true;
+			directionalLight.shadow.mapSize.set( 2048, 2048 );
+			scene.add( directionalLight );
+
+			const spotLight = new THREE.SpotLight( 0xff8800, 1, 10, Math.PI / 16, .02, 2 );
+			spotLight.position.set( 2, 2, 0 );
+			const target = spotLight.target;
+			scene.add( target );
+			target.position.set( 0, 0, 0 );
+			spotLight.castShadow = true;
+			scene.add( spotLight );
+
+		}
+
+		function onWindowResize() {
+
+			const aspectRatio = window.innerWidth / window.innerHeight;
+			camera.left = - aspectRatio;
+			camera.right = aspectRatio;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			composer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			const t = clock.getElapsedTime();
+
+			crystalMesh.material.emissiveIntensity = Math.sin( t * 3 ) * .5 + .5;
+			crystalMesh.position.y = .7 + Math.sin( t * 2 ) * .05;
+			crystalMesh.rotation.y = stopGoEased( t, 2, 4 ) * 2 * Math.PI;
+
+			const rendererSize = renderer.getSize( new THREE.Vector2() );
+			const aspectRatio = rendererSize.x / rendererSize.y;
+			if ( params[ 'pixelAlignedPanning' ] ) {
+
+				pixelAlignFrustum( camera, aspectRatio, Math.floor( rendererSize.x / params[ 'pixelSize' ] ),
+					Math.floor( rendererSize.y / params[ 'pixelSize' ] ) );
+
+			} else if ( camera.left != - aspectRatio || camera.top != 1.0 ) {
+
+				// Reset the Camera Frustum if it has been modified
+				camera.left = - aspectRatio;
+				camera.right = aspectRatio;
+				camera.top = 1.0;
+				camera.bottom = - 1.0;
 				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				pixelPass.uniforms[ 'resolution' ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
 
 			}
 
-			function update() {
+			composer.render();
 
-				controls.update();
-				updateGUI();
+		}
 
-				group.rotation.y += .0015;
-				group.rotation.z += .001;
+		// Helper functions
 
-			}
+		function pixelTexture( texture ) {
 
-			function animate() {
+			texture.minFilter = THREE.NearestFilter;
+			texture.magFilter = THREE.NearestFilter;
+			texture.generateMipmaps = false;
+			texture.wrapS = THREE.RepeatWrapping;
+			texture.wrapT = THREE.RepeatWrapping;
+			return texture;
 
-				update();
+		}
 
-				if ( params.postprocessing ) {
+		function easeInOutCubic( x ) {
 
-					composer.render();
+			return x ** 2 * 3 - x ** 3 * 2;
 
-				} else {
+		}
 
-					renderer.render( scene, camera );
+		function linearStep( x, edge0, edge1 ) {
 
-				}
+			const w = edge1 - edge0;
+			const m = 1 / w;
+			const y0 = - m * edge0;
+			return THREE.MathUtils.clamp( y0 + m * x, 0, 1 );
 
-				window.requestAnimationFrame( animate );
+		}
 
-			}
+		function stopGoEased( x, downtime, period ) {
 
-		</script>
-	</body>
+			const cycle = ( x / period ) | 0;
+			const tween = x - cycle * period;
+			const linStep = easeInOutCubic( linearStep( tween, downtime, period ) );
+			return cycle + linStep;
+
+		}
+
+		function pixelAlignFrustum( camera, aspectRatio, pixelsPerScreenWidth, pixelsPerScreenHeight ) {
+
+			// 0. Get Pixel Grid Units
+			const worldScreenWidth = ( ( camera.right - camera.left ) / camera.zoom );
+			const worldScreenHeight = ( ( camera.top - camera.bottom ) / camera.zoom );
+			const pixelWidth = worldScreenWidth / pixelsPerScreenWidth;
+			const pixelHeight = worldScreenHeight / pixelsPerScreenHeight;
+
+			// 1. Project the current camera position along its local rotation bases
+			const camPos = new THREE.Vector3(); camera.getWorldPosition( camPos );
+			const camRot = new THREE.Quaternion(); camera.getWorldQuaternion( camRot );
+			const camRight = new THREE.Vector3( 1.0, 0.0, 0.0 ).applyQuaternion( camRot );
+			const camUp = new THREE.Vector3( 0.0, 1.0, 0.0 ).applyQuaternion( camRot );
+			const camPosRight = camPos.dot( camRight );
+			const camPosUp = camPos.dot( camUp );
+
+			// 2. Find how far along its position is along these bases in pixel units
+			const camPosRightPx = camPosRight / pixelWidth;
+			const camPosUpPx = camPosUp / pixelHeight;
+
+			// 3. Find the fractional pixel units and convert to world units
+			const fractX = camPosRightPx - Math.round( camPosRightPx );
+			const fractY = camPosUpPx - Math.round( camPosUpPx );
+
+			// 4. Add fractional world units to the left/right top/bottom to align with the pixel grid
+			camera.left = - aspectRatio - ( fractX * pixelWidth );
+			camera.right = aspectRatio - ( fractX * pixelWidth );
+			camera.top = 1.0 - ( fractY * pixelHeight );
+			camera.bottom = - 1.0 - ( fractY * pixelHeight );
+			camera.updateProjectionMatrix();
+
+		}
+
+	</script>
+</body>
+
 </html>

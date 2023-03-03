@@ -205,14 +205,7 @@ class TTFLoader extends Loader {
 
 		}
 
-		if ( typeof opentype === 'undefined' ) {
-
-			console.warn( 'THREE.TTFLoader: The loader requires opentype.js. Make sure it\'s included before using the loader.' );
-			return null;
-
-		}
-
-		return convert( opentype.parse( arraybuffer ), this.reversed ); // eslint-disable-line no-undef
+		return convert( opentype.parse( arraybuffer ), this.reversed );
 
 	}
 

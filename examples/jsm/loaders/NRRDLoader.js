@@ -50,6 +50,16 @@ class NRRDLoader extends Loader {
 
 	}
 
+	/**
+	 *
+	 * @param {boolean} segmentation is a option for user to choose
+   	 */
+	setSegmentation( segmentation ) {
+
+	    this.segmentation = segmentation;
+
+	}
+
 	parse( data ) {
 
 		// this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
@@ -327,7 +337,7 @@ class NRRDLoader extends Loader {
 
 			// we need to decompress the datastream
 			// here we start the unzipping and get a typed Uint8Array back
-			_data = fflate.gunzipSync( new Uint8Array( _data ) );// eslint-disable-line no-undef
+			_data = fflate.gunzipSync( new Uint8Array( _data ) );
 
 		} else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
 
@@ -378,10 +388,22 @@ class NRRDLoader extends Loader {
 			const yIndex = headerObject.vectors.findIndex( vector => vector[ 1 ] !== 0 );
 			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
-			const axisOrder = [];
-			axisOrder[ xIndex ] = 'x';
-			axisOrder[ yIndex ] = 'y';
-			axisOrder[ zIndex ] = 'z';
+			let axisOrder = [];
+
+			if ( xIndex !== yIndex && xIndex !== zIndex && yIndex !== zIndex ) {
+
+				axisOrder[ xIndex ] = 'x';
+				axisOrder[ yIndex ] = 'y';
+				axisOrder[ zIndex ] = 'z';
+
+			} else {
+
+				axisOrder[ 0 ] = 'x';
+				axisOrder[ 1 ] = 'y';
+				axisOrder[ 2 ] = 'z';
+
+			}
+
 			volume.axisOrder = axisOrder;
 
 		} else {
@@ -423,7 +445,7 @@ class NRRDLoader extends Loader {
 		}
 
 
-		if ( ! headerObject.vectors ) {
+		if ( ! headerObject.vectors || this.segmentation ) {
 
 			volume.matrix.set(
 				1, 0, 0, 0,

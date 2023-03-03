@@ -1,15 +1,10 @@
-import Node from '../core/Node.js';
-import TimerNode from './TimerNode.js';
-import { abs, fract, round, sin, add, sub, mul } from '../shadernode/ShaderNodeBaseElements.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { timerLocal } from './TimerNode.js';
+import { nodeObject, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class OscNode extends Node {
 
-	static SINE = 'sine';
-	static SQUARE = 'square';
-	static TRIANGLE = 'triangle';
-	static SAWTOOTH = 'sawtooth';
-
-	constructor( method = OscNode.SINE, timeNode = new TimerNode() ) {
+	constructor( method = OscNode.SINE, timeNode = timerLocal() ) {
 
 		super();
 
@@ -27,25 +22,25 @@ class OscNode extends Node {
 	construct() {
 
 		const method = this.method;
-		const timeNode = this.timeNode;
+		const timeNode = nodeObject( this.timeNode );
 
 		let outputNode = null;
 
 		if ( method === OscNode.SINE ) {
 
-			outputNode = add( mul( sin( mul( add( timeNode, .75 ), Math.PI * 2 ) ), .5 ), .5 );
+			outputNode = timeNode.add( 0.75 ).mul( Math.PI * 2 ).sin().mul( 0.5 ).add( 0.5 );
 
 		} else if ( method === OscNode.SQUARE ) {
 
-			outputNode = round( fract( timeNode ) );
+			outputNode = timeNode.fract().round();
 
 		} else if ( method === OscNode.TRIANGLE ) {
 
-			outputNode = abs( sub( 1, mul( fract( add( timeNode, .5 ) ), 2 ) ) );
+			outputNode = timeNode.add( 0.5 ).fract().mul( 2 ).sub( 1 ).abs();
 
 		} else if ( method === OscNode.SAWTOOTH ) {
 
-			outputNode = fract( timeNode );
+			outputNode = timeNode.fract();
 
 		}
 
@@ -71,4 +66,16 @@ class OscNode extends Node {
 
 }
 
+OscNode.SINE = 'sine';
+OscNode.SQUARE = 'square';
+OscNode.TRIANGLE = 'triangle';
+OscNode.SAWTOOTH = 'sawtooth';
+
 export default OscNode;
+
+export const oscSine = nodeProxy( OscNode, OscNode.SINE );
+export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
+export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
+export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
+
+addNodeClass( OscNode );

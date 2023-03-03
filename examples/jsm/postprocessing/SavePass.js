@@ -12,8 +12,6 @@ class SavePass extends Pass {
 
 		super();
 
-		if ( CopyShader === undefined ) console.error( 'THREE.SavePass relies on CopyShader' );
-
 		const shader = CopyShader;
 
 		this.textureID = 'tDiffuse';

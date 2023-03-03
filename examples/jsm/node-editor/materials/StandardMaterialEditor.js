@@ -1,16 +1,14 @@
 import { ColorInput, SliderInput, LabelElement } from '../../libs/flow.module.js';
-import { BaseNode } from '../core/BaseNode.js';
+import { MaterialEditor } from './MaterialEditor.js';
 import { MeshStandardNodeMaterial } from 'three/nodes';
 
-export class StandardMaterialEditor extends BaseNode {
+export class StandardMaterialEditor extends MaterialEditor {
 
 	constructor() {
 
 		const material = new MeshStandardNodeMaterial();
 
-		super( 'Standard Material', 1, material );
-
-		this.setWidth( 300 );
+		super( 'Standard Material', material );
 
 		const color = new LabelElement( 'color' ).setInput( 3 );
 		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
@@ -69,8 +67,6 @@ export class StandardMaterialEditor extends BaseNode {
 		this.emissive = emissive;
 		this.normal = normal;
 		this.position = position;
-
-		this.material = material;
 
 		this.update();
 

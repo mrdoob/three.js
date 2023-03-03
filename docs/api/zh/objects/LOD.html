@@ -70,16 +70,18 @@
 
 			每一个层级都是一个对象，具有以下两个属性：
 			[page:Object3D object] —— 在这个层次中将要显示的[page:Object3D]。<br />
-			[page:Float distance] —— 将显示这一细节层次的距离。
+			[page:Float distance] —— 将显示这一细节层次的距离。<br />
+			[page:Float hysteresis] —— Threshold used to avoid flickering at LOD boundaries, as a fraction of distance.
 		</p>
 
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Object3D]。</p>
 
-		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance] )</h3>
+		<h3>[method:this addLevel]( [param:Object3D object], [param:Float distance], [param:Float hysteresis] )</h3>
 		<p>
 		[page:Object3D object] —— 在这个层次中将要显示的[page:Object3D]。<br />
-		[page:Float distance] —— 将显示这一细节层次的距离。<br /><br />
+		[page:Float distance] —— 将显示这一细节层次的距离。<br />
+		[page:Float hysteresis] —— Threshold used to avoid flickering at LOD boundaries, as a fraction of distance. Default 0.0.<br /><br />
 
 		添加在一定距离和更大范围内显示的网格。通常来说，距离越远，网格中的细节就越少。
 		</p>

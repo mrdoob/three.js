@@ -25,6 +25,4 @@ void RE_IndirectDiffuse_Lambert( const in vec3 irradiance, const in GeometricCon
 
 #define RE_Direct				RE_Direct_Lambert
 #define RE_IndirectDiffuse		RE_IndirectDiffuse_Lambert
-
-#define Material_LightProbeLOD( material )	(0)
 `;

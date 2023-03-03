@@ -1,13 +1,15 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils.js';
 import { Light } from '../../../../src/lights/Light.js';
+
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'Light', ( hooks ) => {
 
-		var lights = undefined;
+		let lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -24,23 +26,65 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Light();
+			assert.strictEqual(
+				object instanceof Object3D, true,
+				'Light extends from Object3D'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new Light();
+			assert.ok( object, 'Can instantiate a Light.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new Light();
+			assert.ok(
+				object.type === 'Light',
+				'Light.type should be Light'
+			);
+
+		} );
+
+		QUnit.todo( 'color', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isLight', ( assert ) => {
+		QUnit.todo( 'intensity', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isLight', ( assert ) => {
+
+			const object = new Light();
+			assert.ok(
+				object.isLight,
+				'Light.isLight should be true'
+			);
+
+		} );
+
+		QUnit.test( 'dispose', ( assert ) => {
+
+			assert.expect( 0 );
+
+			// empty, test exists
+			const object = new Light();
+			object.dispose();
 
 		} );
 

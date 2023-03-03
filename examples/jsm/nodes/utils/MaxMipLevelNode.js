@@ -1,24 +1,33 @@
 import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
 
 class MaxMipLevelNode extends UniformNode {
 
-	constructor( texture ) {
+	constructor( textureNode ) {
 
 		super( 0 );
 
-		this.texture = texture;
+		this.textureNode = textureNode;
 
 		this.updateType = NodeUpdateType.FRAME;
 
 	}
 
+	get texture() {
+
+		return this.textureNode.value;
+
+	}
+
 	update() {
 
-		const images = this.texture.images;
-		const image = ( images && images.length > 0 ) ? ( images[ 0 ]?.image || images[ 0 ] ) : this.texture.image;
+		const texture = this.texture;
+		const images = texture.images;
+		const image = ( images && images.length > 0 ) ? ( ( images[ 0 ] && images[ 0 ].image ) || images[ 0 ] ) : texture.image;
 
-		if ( image?.width !== undefined ) {
+		if ( image && image.width !== undefined ) {
 
 			const { width, height } = image;
 
@@ -31,3 +40,7 @@ class MaxMipLevelNode extends UniformNode {
 }
 
 export default MaxMipLevelNode;
+
+export const maxMipLevel = nodeProxy( MaxMipLevelNode );
+
+addNodeClass( MaxMipLevelNode );

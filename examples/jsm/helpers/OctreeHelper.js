@@ -67,6 +67,7 @@ class OctreeHelper extends LineSegments {
 		this.material.dispose();
 
 	}
+
 }
 
 export { OctreeHelper };

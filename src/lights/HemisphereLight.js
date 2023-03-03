@@ -12,7 +12,7 @@ class HemisphereLight extends Light {
 
 		this.type = 'HemisphereLight';
 
-		this.position.copy( Object3D.DefaultUp );
+		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
 		this.groundColor = new Color( groundColor );

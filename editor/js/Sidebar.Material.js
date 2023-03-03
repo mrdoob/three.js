@@ -351,6 +351,11 @@ function SidebarMaterial( editor ) {
 	const materialTransparent = new SidebarMaterialBooleanProperty( editor, 'transparent', strings.getKey( 'sidebar/material/transparent' ) );
 	container.add( materialTransparent );
 
+	// forceSinglePass
+
+	const materialForceSinglePass = new SidebarMaterialBooleanProperty( editor, 'forceSinglePass', strings.getKey( 'sidebar/material/forcesinglepass' ) );
+	container.add( materialForceSinglePass );
+
 	// alpha test
 
 	const materialAlphaTest = new SidebarMaterialNumberProperty( editor, 'alphaTest', strings.getKey( 'sidebar/material/alphatest' ), [ 0, 1 ] );

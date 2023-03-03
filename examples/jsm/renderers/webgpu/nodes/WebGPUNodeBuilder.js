@@ -27,6 +27,7 @@ const wgslTypeLib = {
 	int: 'i32',
 	uint: 'u32',
 	bool: 'bool',
+	color: 'vec3<f32>',
 
 	vec2: 'vec2<f32>',
 	ivec2: 'vec2<i32>',
@@ -78,9 +79,9 @@ fn threejs_mod( x : f32, y : f32 ) -> f32 {
 }
 ` ),
 	repeatWrapping: new CodeNode( `
-fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<i32> ) -> vec2<i32> {
+fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> {
 
-	let uvScaled = vec2<i32>( uv * vec2<f32>( dimension ) );
+	let uvScaled = vec2<u32>( uv * vec2<f32>( dimension ) );
 
 	return ( ( uvScaled % dimension ) + dimension ) % dimension;
 
@@ -123,18 +124,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		}
 
 		return super.build();
-
-	}
-
-	addFlowCode( code ) {
-
-		if ( ! /;\s*$/.test( code ) ) {
-
-			code += ';';
-
-		}
-
-		super.addFlowCode( code + '\n\t' );
 
 	}
 
@@ -396,6 +385,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 	getFrontFacing() {
 
 		return this.getBuiltin( 'front_facing', 'isFront', 'bool' );
+
+	}
+
+	getFragCoord() {
+
+		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>', 'fragment' );
+
+	}
+
+	isFlipY() {
+
+		return false;
 
 	}
 

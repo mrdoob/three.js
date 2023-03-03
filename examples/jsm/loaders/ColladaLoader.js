@@ -7,7 +7,6 @@ import {
 	Color,
 	DirectionalLight,
 	DoubleSide,
-	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	FrontSide,
@@ -3764,6 +3763,34 @@ class ColladaLoader extends Loader {
 
 				}
 
+				// Collada allows to use phong and lambert materials with lines. Replacing these cases with LineBasicMaterial.
+
+				if ( type === 'lines' || type === 'linestrips' ) {
+
+					for ( let i = 0, l = materials.length; i < l; i ++ ) {
+
+						const material = materials[ i ];
+
+						if ( material.isMeshPhongMaterial === true || material.isMeshLambertMaterial === true ) {
+
+							const lineMaterial = new LineBasicMaterial();
+
+							// copy compatible properties
+
+							lineMaterial.color.copy( material.color );
+							lineMaterial.opacity = material.opacity;
+							lineMaterial.transparent = material.transparent;
+
+							// replace material
+
+							materials[ i ] = lineMaterial;
+
+						}
+
+					}
+
+				}
+
 				// regard skinning
 
 				const skinning = ( geometry.data.attributes.skinIndex !== undefined );
@@ -3991,7 +4018,7 @@ class ColladaLoader extends Loader {
 		// metadata
 
 		const version = collada.getAttribute( 'version' );
-		console.log( 'THREE.ColladaLoader: File version', version );
+		console.debug( 'THREE.ColladaLoader: File version', version );
 
 		const asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 		const textureLoader = new TextureLoader( this.manager );
@@ -4067,7 +4094,7 @@ class ColladaLoader extends Loader {
 		if ( asset.upAxis === 'Z_UP' ) {
 
 			console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
-			scene.quaternion.setFromEuler( new Euler( - Math.PI / 2, 0, 0 ) );
+			scene.rotation.set( - Math.PI / 2, 0, 0 );
 
 		}
 

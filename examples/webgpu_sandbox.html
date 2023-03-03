@@ -11,7 +11,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sandbox
 		</div>
 
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three/nodes';
+			import { timerLocal, vec2, uv, texture, mix, checker, normalLocal, positionLocal, color, oscSine, attribute, MeshBasicNodeMaterial, PointsNodeMaterial, LineBasicNodeMaterial } from 'three/nodes';
 
 			import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
 
@@ -58,10 +58,10 @@
 				// textures
 
 				const textureLoader = new THREE.TextureLoader();
-				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
-				texture.wrapS = THREE.RepeatWrapping;
-				texture.wrapT = THREE.RepeatWrapping;
-				texture.name = 'uv_grid';
+				const uvTexture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
+				uvTexture.wrapS = THREE.RepeatWrapping;
+				uvTexture.wrapT = THREE.RepeatWrapping;
+				uvTexture.name = 'uv_grid';
 
 				const textureDisplace = textureLoader.load( './textures/transition/transition1.png' );
 				textureDisplace.wrapS = THREE.RepeatWrapping;
@@ -75,21 +75,19 @@
 				// box mesh
 
 				const geometryBox = new THREE.BoxGeometry();
-				const materialBox = new Nodes.MeshBasicNodeMaterial();
-
-				const timerNode = new Nodes.TimerNode();
+				const materialBox = new MeshBasicNodeMaterial();
 
 				// birection speed
-				const timerScaleNode = new Nodes.OperatorNode( '*', timerNode, new Nodes.ConstNode( new THREE.Vector2( - 0.5, 0.1 ) ) );
-				const animateUV = new Nodes.OperatorNode( '+', new Nodes.UVNode(), timerScaleNode );
+				const timerScaleNode = timerLocal().mul( vec2( - 0.5, 0.1 ) );
+				const animateUV = uv().add( timerScaleNode );
 
-				const textureNode = new Nodes.TextureNode( texture, animateUV );
+				const textureNode = texture( uvTexture, animateUV );
 
-				materialBox.colorNode = new Nodes.MathNode( 'mix', textureNode, new Nodes.CheckerNode( animateUV ), new Nodes.UniformNode( .5 ) );
+				materialBox.colorNode = mix( textureNode, checker( animateUV ), 0.5 );
 
 				// test uv 2
 				//geometryBox.setAttribute( 'uv2', geometryBox.getAttribute( 'uv' ) );
-				//materialBox.colorNode = new TextureNode( texture, new UVNode( 1 ) );
+				//materialBox.colorNode = texture( uvTexture, uv( 1 ) );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				box.position.set( 0, 1, 0 );
@@ -98,15 +96,14 @@
 				// displace example
 
 				const geometrySphere = new THREE.SphereGeometry( .5, 64, 64 );
-				const materialSphere = new Nodes.MeshBasicNodeMaterial();
+				const materialSphere = new MeshBasicNodeMaterial();
 
-				const displaceAnimated = new Nodes.SplitNode( new Nodes.TextureNode( textureDisplace ), 'x' );
-				const displaceY = new Nodes.OperatorNode( '*', displaceAnimated, new Nodes.ConstNode( .25 ) );
+				const displaceY = texture( textureDisplace ).x.mul( 0.25 );
 
-				const displace = new Nodes.OperatorNode( '*', new Nodes.NormalNode( Nodes.NormalNode.LOCAL ), displaceY );
+				const displace = normalLocal.mul( displaceY );
 
 				materialSphere.colorNode = displaceY;
-				materialSphere.positionNode = new Nodes.OperatorNode( '+', new Nodes.PositionNode( Nodes.PositionNode.LOCAL ), displace );
+				materialSphere.positionNode = positionLocal.add( displace );
 
 				const sphere = new THREE.Mesh( geometrySphere, materialSphere );
 				sphere.position.set( - 2, - 1, 0 );
@@ -115,9 +112,9 @@
 				// data texture
 
 				const geometryPlane = new THREE.PlaneGeometry();
-				const materialPlane = new Nodes.MeshBasicNodeMaterial();
-				materialPlane.colorNode = new Nodes.OperatorNode( '+', new Nodes.TextureNode( createDataTexture() ), new Nodes.UniformNode( new THREE.Color( 0x0000FF ) ) );
-				materialPlane.opacityNode = new Nodes.SplitNode( new Nodes.TextureNode( dxt5Texture ), 'a' );
+				const materialPlane = new MeshBasicNodeMaterial();
+				materialPlane.colorNode = texture( createDataTexture() ).add( color( 0x0000FF ) );
+				materialPlane.opacityNode = texture( dxt5Texture ).a;
 				materialPlane.transparent = true;
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
@@ -126,10 +123,10 @@
 
 				// compressed texture
 
-				const materialCompressed = new Nodes.MeshBasicNodeMaterial();
-				materialCompressed.colorNode = new Nodes.TextureNode( dxt5Texture );
-				materialCompressed.emissiveNode = new Nodes.UniformNode( new THREE.Color( 0x663300 ) );
-				materialCompressed.alphaTestNode = new Nodes.OscNode();
+				const materialCompressed = new MeshBasicNodeMaterial();
+				materialCompressed.colorNode = texture( dxt5Texture );
+				materialCompressed.emissiveNode = color( 0x663300 );
+				materialCompressed.alphaTestNode = oscSine();
 				materialCompressed.transparent = true;
 
 				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
@@ -148,9 +145,9 @@
 				}
 
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-				const materialPoints = new Nodes.PointsNodeMaterial();
+				const materialPoints = new PointsNodeMaterial();
 
-				materialPoints.colorNode = new Nodes.OperatorNode( '*', new Nodes.PositionNode(), new Nodes.ConstNode( 3 ) );
+				materialPoints.colorNode = positionLocal.mul( 3 );
 
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );
@@ -167,8 +164,8 @@
 
 				geometryLine.setAttribute( 'color', geometryLine.getAttribute( 'position' ) );
 
-				const materialLine = new Nodes.LineBasicNodeMaterial();
-				materialLine.colorNode = new Nodes.AttributeNode( 'color' );
+				const materialLine = new LineBasicNodeMaterial();
+				materialLine.colorNode = attribute( 'color' );
 
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 2, 1, 0 );

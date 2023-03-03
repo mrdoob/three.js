@@ -19,7 +19,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -78,7 +78,7 @@
 				const loader = new ThreeMFLoader( manager );
 				loader.load( './models/3mf/truck.3mf', function ( object ) {
 
-					object.quaternion.setFromEuler( new THREE.Euler( - Math.PI / 2, 0, 0 ) ); 	// z-up conversion
+					object.rotation.set( - Math.PI / 2, 0, 0 ); // z-up conversion
 
 					object.traverse( function ( child ) {
 

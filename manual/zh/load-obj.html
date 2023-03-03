@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 加载 .OBJ 文件">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -49,7 +49,7 @@
 <p>让我们一起来尝试将它展示出来。</p>
 <p>基于<a href="lights.html">光线文章</a>中的定向光线（<a href="/docs/#api/zh/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a>）示例，结合半球光线（<a href="/docs/#api/zh/lights/HemisphereLight"><code class="notranslate" translate="no">HemisphereLight</code></a>）示例。相对于示例，我删除了所有与调整灯光相关的GUI内容，还删除了添加到场景中的立方体和球体。</p>
 <p>第一件要做的事就是将<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>添加到代码中。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 </pre>
 <p>然后创建<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>的实例并通过URL加载我们的.OBJ文件，并在回调函数中将已加载完的模型添加到场景（scene）里。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
@@ -115,10 +115,10 @@ map_Ns windmill_001_base_SPEC.jpg
 
 <p>现在.MTL文件就能加载到这些纹理。</p>
 <p>首先要引用 <a href="/docs/#examples/loaders/MTLLoader"><code class="notranslate" translate="no">MTLLoader</code></a>;</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from '/build/three.module.js';
-import {OrbitControls} from '/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader} from '/examples/jsm/loaders/OBJLoader.js';
-+import {MTLLoader} from '/examples/jsm/loaders/MTLLoader.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
++import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
 </pre>
 <p></p>
 <p>然后我们先加载.MTL文件，在它加载完材质后利用<code class="notranslate" translate="no">MtlObjBridge</code>将材质传给<a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>，再加载.OBJ文件。</p>
@@ -491,8 +491,8 @@ Three.js一般是以Y为上（up）。有些建模包默认是Z为上，有些�
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

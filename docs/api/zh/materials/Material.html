@@ -28,7 +28,7 @@
 <p>设置运行alphaTest时要使用的alpha值。如果不透明度低于此值，则不会渲染材质。默认值为*0*。
 </p>
 
-<h3>[property:Float alphaToCoverage]</h3>
+<h3>[property:Boolean alphaToCoverage]</h3>
 <p>
 启用alpha to coverage. 只能在开启了MSAA的渲染环境中使用 (当渲染器创建的时候*antialias* 属性要*true*才能使用).
 默认为 *false*.
@@ -107,10 +107,19 @@
 	在绘制2D叠加时，将多个事物分层在一起而不创建z-index时，禁用深度写入会很有用。
 </p>
 
-		<h3>[property:Boolean isMaterial]</h3>
-		<p>
-			检查这个对象是否为材质[name]的只读标记.
-		</p>
+<h3>[property:Boolean forceSinglePass]</h3>
+<p>
+Whether double-sided, transparent objects should be rendered with a single pass or not. Default is `false`.<br /><br />
+
+The engine renders double-sided, transparent objects with two draw calls (back faces first, then front faces) to mitigate transparency artifacts.
+There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grass sprites. 
+In these cases, set the `forceSinglePass` flag to `false` to disable the two pass rendering to avoid performance issues.
+</p>
+
+<h3>[property:Boolean isMaterial]</h3>
+<p>
+	检查这个对象是否为材质[name]的只读标记.
+</p>
 
 <h3>[property:Boolean stencilWrite]</h3>
 <p>
@@ -226,7 +235,7 @@
 
 <h3>[property:Integer side]</h3>
 <p> 定义将要渲染哪一面 - 正面，背面或两者。
-	默认为[page:Materials THREE.FrontSide]。其他选项有[page:Materials THREE.BackSide]和[page:Materials THREE.DoubleSide]。
+	默认为[page:Materials THREE.FrontSide]。其他选项有[page:Materials THREE.BackSide] 和 [page:Materials THREE.DoubleSide]。
 </p>
 
 <h3>[property:Boolean toneMapped]</h3>
@@ -258,6 +267,7 @@
 <h3>[property:Boolean vertexColors]</h3>
 <p>
 是否使用顶点着色。默认值为false。
+The engine supports RGB and RGBA vertex colors depending on whether a three (RGB) or four (RGBA) component color buffer attribute is used.
 </p>
 
 <h3>[property:Boolean visible]</h3>

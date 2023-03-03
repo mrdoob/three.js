@@ -7,7 +7,9 @@ import { UIPanel } from './libs/ui.js';
 import { EditorControls } from './EditorControls.js';
 
 import { ViewportCamera } from './Viewport.Camera.js';
+import { ViewportShading } from './Viewport.Shading.js';
 import { ViewportInfo } from './Viewport.Info.js';
+
 import { ViewHelper } from './Viewport.ViewHelper.js';
 import { VR } from './Viewport.VR.js';
 
@@ -26,6 +28,7 @@ function Viewport( editor ) {
 	container.setPosition( 'absolute' );
 
 	container.add( new ViewportCamera( editor ) );
+	container.add( new ViewportShading( editor ) );
 	container.add( new ViewportInfo( editor ) );
 
 	//
@@ -41,6 +44,7 @@ function Viewport( editor ) {
 	// helpers
 
 	const grid = new THREE.Group();
+	sceneHelpers.add( grid );
 
 	const grid1 = new THREE.GridHelper( 30, 30, 0x888888 );
 	grid1.material.color.setHex( 0x888888 );
@@ -49,7 +53,6 @@ function Viewport( editor ) {
 
 	const grid2 = new THREE.GridHelper( 30, 6, 0x222222 );
 	grid2.material.color.setHex( 0x222222 );
-	grid2.material.depthFunc = THREE.AlwaysDepth;
 	grid2.material.vertexColors = false;
 	grid.add( grid2 );
 
@@ -219,6 +222,8 @@ function Viewport( editor ) {
 
 		// event.preventDefault();
 
+		if ( event.target !== renderer.domElement ) return;
+
 		const array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onDownPosition.fromArray( array );
 
@@ -279,7 +284,7 @@ function Viewport( editor ) {
 	}
 
 	container.dom.addEventListener( 'mousedown', onMouseDown );
-	container.dom.addEventListener( 'touchstart', onTouchStart );
+	container.dom.addEventListener( 'touchstart', onTouchStart, { passive: false } );
 	container.dom.addEventListener( 'dblclick', onDoubleClick );
 
 	// controls need to be added *after* main logic,
@@ -292,7 +297,7 @@ function Viewport( editor ) {
 		signals.refreshSidebarObject3D.dispatch( camera );
 
 	} );
-	viewHelper.controls = controls;
+	viewHelper.center = controls.center;
 
 	// signals
 
@@ -481,7 +486,7 @@ function Viewport( editor ) {
 
 	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, backgroundBlurriness, backgroundIntensity ) {
 
 		switch ( backgroundType ) {
 
@@ -514,6 +519,7 @@ function Viewport( editor ) {
 					backgroundEquirectangularTexture.mapping = THREE.EquirectangularReflectionMapping;
 					scene.background = backgroundEquirectangularTexture;
 					scene.backgroundBlurriness = backgroundBlurriness;
+					scene.backgroundIntensity = backgroundIntensity;
 
 				}
 
@@ -627,6 +633,30 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.viewportShadingChanged.add( function () {
+
+		const viewportShading = editor.viewportShading;
+
+		switch ( viewportShading ) {
+
+			case 'default':
+				scene.overrideMaterial = null;
+				break;
+
+			case 'normals':
+				scene.overrideMaterial = new THREE.MeshNormalMaterial();
+				break;
+
+			case 'wireframe':
+				scene.overrideMaterial = new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } );
+				break;
+
+		}
+
+		render();
+
+	} );
+
 	signals.exitedVR.add( render );
 
 	//
@@ -713,13 +743,8 @@ function Viewport( editor ) {
 
 		startTime = performance.now();
 
-		// Adding/removing grid to scene so materials with depthWrite false
-		// don't render under the grid.
-
-		scene.add( grid );
 		renderer.setViewport( 0, 0, container.dom.offsetWidth, container.dom.offsetHeight );
 		renderer.render( scene, editor.viewportCamera );
-		scene.remove( grid );
 
 		if ( camera === editor.viewportCamera ) {
 

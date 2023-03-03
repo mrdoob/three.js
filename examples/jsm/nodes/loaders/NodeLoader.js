@@ -1,4 +1,5 @@
-import * as Nodes from '../Nodes.js';
+import { createNodeFromType } from '../core/Node.js';
+import { nodeObject } from '../shadernode/ShaderNode.js';
 import { FileLoader, Loader } from 'three';
 
 class NodeLoader extends Loader {
@@ -53,7 +54,7 @@ class NodeLoader extends Loader {
 
 				const { uuid, type } = nodeJSON;
 
-				nodes[ uuid ] = Nodes.fromType( type );
+				nodes[ uuid ] = nodeObject( createNodeFromType( type ) ); // @TODO: Maybe nodeObjectify the node in createNodeFromType?
 				nodes[ uuid ].uuid = uuid;
 
 			}
@@ -79,10 +80,10 @@ class NodeLoader extends Loader {
 
 	parse( json ) {
 
-		const node = Nodes.fromType( json.type );
+		const node = nodeObject( createNodeFromType( json.type ) );
 		node.uuid = json.uuid;
 
-		const nodes = this.parseNodes( json.inputNodes );
+		const nodes = this.parseNodes( json.nodes );
 		const meta = { nodes, textures: this.textures };
 
 		json.meta = meta;

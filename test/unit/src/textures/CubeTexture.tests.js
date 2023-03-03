@@ -1,22 +1,29 @@
 /* global QUnit */
 
-// import { CubeTexture } from '../../../../src/textures/CubeTexture.js';
+import { CubeTexture } from '../../../../src/textures/CubeTexture.js';
+
+import { Texture } from '../../../../src/textures/Texture.js';
 
 export default QUnit.module( 'Textures', () => {
 
 	QUnit.module( 'CubeTexture', () => {
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new CubeTexture();
+			assert.strictEqual(
+				object instanceof Texture, true,
+				'CubeTexture extends from Texture'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new CubeTexture();
+			assert.ok( object, 'Can instantiate a CubeTexture.' );
 
 		} );
 
@@ -27,10 +34,20 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isCubeTexture', ( assert ) => {
+		QUnit.todo( 'flipY', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isCubeTexture', ( assert ) => {
+
+			const object = new CubeTexture();
+			assert.ok(
+				object.isCubeTexture,
+				'CubeTexture.isCubeTexture should be true'
+			);
 
 		} );
 

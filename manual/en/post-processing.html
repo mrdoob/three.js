@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Post Processing">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -103,10 +103,10 @@ composer.addPass(filmPass);
 true to tell it to render to the canvas. Without setting this it would instead
 render to the next render target.</p>
 <p>To use these classes we need to import a bunch of scripts.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from '/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from '/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from '/examples/jsm/postprocessing/BloomPass.js';
-import {FilmPass} from '/examples/jsm/postprocessing/FilmPass.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
+import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
 </pre>
 <p>For pretty much any post processing <code class="notranslate" translate="no">EffectComposer.js</code>, and <code class="notranslate" translate="no">RenderPass.js</code>
 are required.</p>
@@ -156,7 +156,7 @@ Let's add a gui to adjust some of the parameters. Figuring out which values you
 can easily adjust and how to adjust them requires digging through the code for
 that effect.</p>
 <p>Looking inside
-<a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>
+<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>
 I found this line:</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
 </pre>
@@ -164,7 +164,7 @@ I found this line:</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
 </pre>
 <p>Similarly looking in
-<a href="https://github.com/mrdoob/three.js/blob/master/examples/js/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>
+<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>
 I found these lines:</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
 if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
@@ -173,7 +173,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 </pre>
 <p>So which makes it pretty clear how to set them.</p>
 <p>Let's make a quick GUI to set those values</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from '/examples/jsm/libs/lil-gui.module.min.js';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>and</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
@@ -272,12 +272,12 @@ gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
 too much for these articles. If you really want to know how WebGL itself works
 then check out <a href="https://webglfundamentals.org">these articles</a>. Another great
 resources is just to 
-<a href="https://github.com/mrdoob/three.js/tree/master/examples/js/shaders">read through the existing post processing shaders in the THREE.js repo</a>. Some
+<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/shaders">read through the existing post processing shaders in the THREE.js repo</a>. Some
 are more complicated than others but if you start with the smaller ones you can
 hopefully get an idea of how they work.</p>
 <p>Most of the post processing effects in the THREE.js repo are unfortunately
 undocumented so to use them you'll have to <a href="https://github.com/mrdoob/three.js/tree/master/examples">read through the examples</a> or 
-<a href="https://github.com/mrdoob/three.js/tree/master/examples/js/postprocessing">the code for the effects themselves</a>.
+<a href="https://github.com/mrdoob/three.js/tree/master/examples/jsm/postprocessing">the code for the effects themselves</a>.
 Hopefully these simple example and the article on 
 <a href="rendertargets.html">render targets</a> provide enough context to get started.</p>
 
@@ -285,8 +285,8 @@ Hopefully these simple example and the article on
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

@@ -59,8 +59,8 @@ class AsciiEffect {
 
 		function initAsciiSize() {
 
-			iWidth = Math.round( width * fResolution );
-			iHeight = Math.round( height * fResolution );
+			iWidth = Math.floor( width * fResolution );
+			iHeight = Math.floor( height * fResolution );
 
 			oCanvas.width = iWidth;
 			oCanvas.height = iHeight;
@@ -81,9 +81,6 @@ class AsciiEffect {
 			oAscii.cellPadding = 0;
 
 			const oStyle = oAscii.style;
-			oStyle.display = 'inline';
-			oStyle.width = Math.round( iWidth / fResolution * iScale ) + 'px';
-			oStyle.height = Math.round( iHeight / fResolution * iScale ) + 'px';
 			oStyle.whiteSpace = 'pre';
 			oStyle.margin = '0px';
 			oStyle.padding = '0px';
@@ -251,7 +248,7 @@ class AsciiEffect {
 
 			}
 
-			oAscii.innerHTML = '<tr><td>' + strChars + '</td></tr>';
+			oAscii.innerHTML = `<tr><td style="display:block;width:${width}px;height:${height}px;overflow:hidden">${strChars}</td></tr>`;
 
 			// console.timeEnd('rendering');
 

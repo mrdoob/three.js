@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 
 class ConvertNode extends Node {
 
@@ -31,6 +31,22 @@ class ConvertNode extends Node {
 
 	}
 
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.convertTo = this.convertTo;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.convertTo = data.convertTo;
+
+	}
+
 	generate( builder, output ) {
 
 		const node = this.node;
@@ -45,3 +61,5 @@ class ConvertNode extends Node {
 }
 
 export default ConvertNode;
+
+addNodeClass( ConvertNode );

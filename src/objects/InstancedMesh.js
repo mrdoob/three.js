@@ -1,14 +1,18 @@
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { Mesh } from './Mesh.js';
+import { Box3 } from '../math/Box3.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Sphere } from '../math/Sphere.js';
 
 const _instanceLocalMatrix = /*@__PURE__*/ new Matrix4();
 const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
 
 const _instanceIntersects = [];
 
+const _box3 = /*@__PURE__*/ new Box3();
 const _identity = /*@__PURE__*/ new Matrix4();
 const _mesh = /*@__PURE__*/ new Mesh();
+const _sphere = /*@__PURE__*/ new Sphere();
 
 class InstancedMesh extends Mesh {
 
@@ -23,11 +27,74 @@ class InstancedMesh extends Mesh {
 
 		this.count = count;
 
-		this.frustumCulled = false;
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
 		for ( let i = 0; i < count; i ++ ) {
 
 			this.setMatrixAt( i, _identity );
+
+		}
+
+	}
+
+	computeBoundingBox() {
+
+		const geometry = this.geometry;
+		const count = this.count;
+
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new Box3();
+
+		}
+
+		if ( geometry.boundingBox === null ) {
+
+			geometry.computeBoundingBox();
+
+		}
+
+		this.boundingBox.makeEmpty();
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.getMatrixAt( i, _instanceLocalMatrix );
+
+			_box3.copy( geometry.boundingBox ).applyMatrix4( _instanceLocalMatrix );
+
+			this.boundingBox.union( _box3 );
+
+		}
+
+	}
+
+	computeBoundingSphere() {
+
+		const geometry = this.geometry;
+		const count = this.count;
+
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new Sphere();
+
+		}
+
+		if ( geometry.boundingSphere === null ) {
+
+			geometry.computeBoundingSphere();
+
+		}
+
+		this.boundingSphere.makeEmpty();
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.getMatrixAt( i, _instanceLocalMatrix );
+
+			_sphere.copy( geometry.boundingSphere ).applyMatrix4( _instanceLocalMatrix );
+
+			this.boundingSphere.union( _sphere );
 
 		}
 
@@ -68,6 +135,17 @@ class InstancedMesh extends Mesh {
 		_mesh.material = this.material;
 
 		if ( _mesh.material === undefined ) return;
+
+		// test with bounding sphere first
+
+		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+
+		_sphere.copy( this.boundingSphere );
+		_sphere.applyMatrix4( matrixWorld );
+
+		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+
+		// now test each instance
 
 		for ( let instanceId = 0; instanceId < raycastTimes; instanceId ++ ) {
 

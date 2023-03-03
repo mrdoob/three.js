@@ -968,7 +968,7 @@ class BufferGeometry extends EventDispatcher {
 
 	clone() {
 
-		 return new this.constructor().copy( this );
+		return new this.constructor().copy( this );
 
 	}
 
@@ -1072,10 +1072,6 @@ class BufferGeometry extends EventDispatcher {
 		// user data
 
 		this.userData = source.userData;
-
-		// geometry generator parameters
-
-		if ( source.parameters !== undefined ) this.parameters = Object.assign( {}, source.parameters );
 
 		return this;
 

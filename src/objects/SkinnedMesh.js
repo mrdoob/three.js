@@ -8,8 +8,8 @@ const _basePosition = /*@__PURE__*/ new Vector3();
 const _skinIndex = /*@__PURE__*/ new Vector4();
 const _skinWeight = /*@__PURE__*/ new Vector4();
 
-const _vector = /*@__PURE__*/ new Vector3();
-const _matrix = /*@__PURE__*/ new Matrix4();
+const _vector3 = /*@__PURE__*/ new Vector3();
+const _matrix4 = /*@__PURE__*/ new Matrix4();
 
 class SkinnedMesh extends Mesh {
 
@@ -114,7 +114,7 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	boneTransform( index, target ) {
+	applyBoneTransform( index, vector ) {
 
 		const skeleton = this.skeleton;
 		const geometry = this.geometry;
@@ -122,9 +122,9 @@ class SkinnedMesh extends Mesh {
 		_skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
 		_skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
 
-		_basePosition.copy( target ).applyMatrix4( this.bindMatrix );
+		_basePosition.copy( vector ).applyMatrix4( this.bindMatrix );
 
-		target.set( 0, 0, 0 );
+		vector.set( 0, 0, 0 );
 
 		for ( let i = 0; i < 4; i ++ ) {
 
@@ -134,17 +134,27 @@ class SkinnedMesh extends Mesh {
 
 				const boneIndex = _skinIndex.getComponent( i );
 
-				_matrix.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
+				_matrix4.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
 
-				target.addScaledVector( _vector.copy( _basePosition ).applyMatrix4( _matrix ), weight );
+				vector.addScaledVector( _vector3.copy( _basePosition ).applyMatrix4( _matrix4 ), weight );
 
 			}
 
 		}
 
-		return target.applyMatrix4( this.bindMatrixInverse );
+		return vector.applyMatrix4( this.bindMatrixInverse );
 
 	}
+
+	// @deprecated
+
+	boneTransform( index, vector ) {
+
+		console.warn( 'THREE.SkinnedMesh: .boneTransform() was renamed to .applyBoneTransform() in r151.' );
+		return this.applyBoneTransform( index, vector );
+
+	}
+
 
 }
 

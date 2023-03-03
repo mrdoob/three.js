@@ -1,12 +1,12 @@
-import Node from '../core/Node.js';
-import CameraNode from '../accessors/CameraNode.js';
-import ModelNode from '../accessors/ModelNode.js';
-import OperatorNode from '../math/OperatorNode.js';
-import PositionNode from '../accessors/PositionNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { cameraProjectionMatrix } from './CameraNode.js';
+import { modelViewMatrix } from './ModelNode.js';
+import { positionLocal } from './PositionNode.js';
+import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class ModelViewProjectionNode extends Node {
 
-	constructor( position = new PositionNode() ) {
+	constructor( position = positionLocal ) {
 
 		super( 'vec4' );
 
@@ -18,8 +18,8 @@ class ModelViewProjectionNode extends Node {
 
 		const position = this.position;
 
-		const mvpMatrix = new OperatorNode( '*', new CameraNode( CameraNode.PROJECTION_MATRIX ), new ModelNode( ModelNode.VIEW_MATRIX ) );
-		const mvpNode = new OperatorNode( '*', mvpMatrix, position );
+		const mvpMatrix = cameraProjectionMatrix.mul( modelViewMatrix );
+		const mvpNode = mvpMatrix.mul( position );
 
 		return mvpNode.build( builder );
 
@@ -28,3 +28,7 @@ class ModelViewProjectionNode extends Node {
 }
 
 export default ModelViewProjectionNode;
+
+export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
+
+addNodeClass( ModelViewProjectionNode );

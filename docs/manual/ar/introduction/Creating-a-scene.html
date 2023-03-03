@@ -13,10 +13,7 @@
 
 		<h2>قبل أن نبدأ</h2>
 
-		<p>
-			قبل أن يمكنك إستعمال المكتبة, يجب أن توفر مكان لإظهار المشهد. قم بإنشاء ملف HTML يحتوي الشفرة البرمجية التالية
-        	بصحبة نسخة من المكتبة [link:https://threejs.org/build/three.js three.js] في مجلد سمه js و من ثم فم بفتح الصفحة في المتصفح.
-		</p>
+		<p>Before you can use three.js, you need somewhere to display it. Save the following HTML to a file on your computer and open it in your browser.</p>
 
 		<code>
 		&lt;!DOCTYPE html&gt;
@@ -29,8 +26,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					// Our Javascript will go here.
 				&lt;/script&gt;
 			&lt;/body&gt;
@@ -218,7 +216,7 @@
 		</p>
 
 		<p>
-			الشفرة البرمجية الكاملة في الأسفل إلى جانب محرر مباشر [link:https://jsfiddle.net/fxurzeb4/ live example].
+			الشفرة البرمجية الكاملة في الأسفل إلى جانب محرر مباشر [link:https://jsfiddle.net/em4j9hvu/ live example].
 			أنت
 			مدعو للعب بالأوامر البرمجية لكي تصبح صورة كيفية عملها أوضح من قبل.
 		</p>
@@ -233,8 +231,9 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script src="js/three.js"&gt;&lt;/script&gt;
-				&lt;script&gt;
+				&lt;script type="module"&gt;
+					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -256,7 +255,7 @@
 						cube.rotation.y += 0.01;
 
 						renderer.render( scene, camera );
-					};
+					}
 
 					animate();
 				&lt;/script&gt;

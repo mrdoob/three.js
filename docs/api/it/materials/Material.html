@@ -36,7 +36,7 @@
 			Il valore predefinito è `0`.
 		</p>
 
-		<h3>[property:Float alphaToCoverage]</h3>
+		<h3>[property:Boolean alphaToCoverage]</h3>
 		<p>
 			Abilita l'alfa alla copertura. Può essere utilizzato solo con contesti abilitati per MSAA (ovvero quando il renderer è stato creato con 
 			il parametro `antialias` impostato a `true`).
@@ -135,6 +135,15 @@
 
 			Quando si disegnano sovrapposizioni 2D può essere utile disabilitare la scrittura di profondità per sovrapporre più
 			cose insieme senza creare artefatti z.index.
+		</p>
+
+		<h3>[property:Boolean forceSinglePass]</h3>
+		<p>
+		Whether double-sided, transparent objects should be rendered with a single pass or not. Default is `false`.<br /><br />
+
+		The engine renders double-sided, transparent objects with two draw calls (back faces first, then front faces) to mitigate transparency artifacts.
+		There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grass sprites. 
+		In these cases, set the `forceSinglePass` flag to `false` to disable the two pass rendering to avoid performance issues.
 		</p>
 
 		<h3>[property:Boolean isMaterial]</h3>
@@ -315,6 +324,7 @@
 		<h3>[property:Boolean vertexColors]</h3>
 		<p>
 			Definisce se viene utilizzata la colorazione dei vertici. Il valore predefinito è `false`.
+			The engine supports RGB and RGBA vertex colors depending on whether a three (RGB) or four (RGBA) component color buffer attribute is used.
 		</p>
 
 		<h3>[property:Boolean visible]</h3>

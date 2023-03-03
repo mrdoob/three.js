@@ -7,7 +7,7 @@ import {
 	x,
 	y,
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -16,11 +16,11 @@ export default QUnit.module( 'Maths', () => {
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
-			var a = new Vector2();
+			let a = new Vector2();
 			assert.ok( a.x == 0, 'Passed!' );
 			assert.ok( a.y == 0, 'Passed!' );
 
-			var a = new Vector2( x, y );
+			a = new Vector2( x, y );
 			assert.ok( a.x === x, 'Passed!' );
 			assert.ok( a.y === y, 'Passed!' );
 
@@ -29,9 +29,9 @@ export default QUnit.module( 'Maths', () => {
 		// PROPERTIES // ( [Itee] WHAT ??? o_O )
 		QUnit.test( 'properties', ( assert ) => {
 
-			var a = new Vector2( 0, 0 );
-			var width = 100;
-			var height = 200;
+			const a = new Vector2( 0, 0 );
+			const width = 100;
+			const height = 200;
 
 			assert.ok( a.width = width, 'Set width' );
 			assert.ok( a.height = height, 'Set height' );
@@ -55,15 +55,16 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( 'isVector2', ( assert ) => {
+		QUnit.test( 'isVector2', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Vector2();
+			assert.ok( object.isVector2, 'Vector2.isVector2 should be true' );
 
 		} );
 
 		QUnit.test( 'set', ( assert ) => {
 
-			var a = new Vector2();
+			const a = new Vector2();
 			assert.ok( a.x == 0, 'Passed!' );
 			assert.ok( a.y == 0, 'Passed!' );
 
@@ -111,8 +112,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'copy', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2().copy( a );
+			const a = new Vector2( x, y );
+			const b = new Vector2().copy( a );
 			assert.ok( b.x == x, 'Passed!' );
 			assert.ok( b.y == y, 'Passed!' );
 
@@ -126,14 +127,14 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'add', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2( - x, - y );
+			const a = new Vector2( x, y );
+			const b = new Vector2( - x, - y );
 
 			a.add( b );
 			assert.ok( a.x == 0, 'Passed!' );
 			assert.ok( a.y == 0, 'Passed!' );
 
-			var c = new Vector2().addVectors( b, b );
+			const c = new Vector2().addVectors( b, b );
 			assert.ok( c.x == - 2 * x, 'Passed!' );
 			assert.ok( c.y == - 2 * y, 'Passed!' );
 
@@ -153,9 +154,9 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'addScaledVector', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2( 2, 3 );
-			var s = 3;
+			const a = new Vector2( x, y );
+			const b = new Vector2( 2, 3 );
+			const s = 3;
 
 			a.addScaledVector( b, s );
 			assert.strictEqual( a.x, x + b.x * s, 'Check x' );
@@ -165,14 +166,14 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'sub', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2( - x, - y );
+			const a = new Vector2( x, y );
+			const b = new Vector2( - x, - y );
 
 			a.sub( b );
 			assert.ok( a.x == 2 * x, 'Passed!' );
 			assert.ok( a.y == 2 * y, 'Passed!' );
 
-			var c = new Vector2().subVectors( a, a );
+			const c = new Vector2().subVectors( a, a );
 			assert.ok( c.x == 0, 'Passed!' );
 			assert.ok( c.y == 0, 'Passed!' );
 
@@ -216,8 +217,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'applyMatrix3', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var m = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
+			const a = new Vector2( x, y );
+			const m = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
 
 			a.applyMatrix3( m );
 			assert.strictEqual( a.x, 18, 'Check x' );
@@ -281,7 +282,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'negate', ( assert ) => {
 
-			var a = new Vector2( x, y );
+			const a = new Vector2( x, y );
 
 			a.negate();
 			assert.ok( a.x == - x, 'Passed!' );
@@ -291,24 +292,24 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'dot', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2( - x, - y );
-			var c = new Vector2();
+			const a = new Vector2( x, y );
+			const b = new Vector2( - x, - y );
+			const c = new Vector2();
 
-			var result = a.dot( b );
+			let result = a.dot( b );
 			assert.ok( result == ( - x * x - y * y ), 'Passed!' );
 
-			var result = a.dot( c );
+			result = a.dot( c );
 			assert.ok( result == 0, 'Passed!' );
 
 		} );
 
 		QUnit.test( 'cross', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2( 2 * x, - y );
-			var answer = - 18;
-			var crossed = a.cross( b );
+			const a = new Vector2( x, y );
+			const b = new Vector2( 2 * x, - y );
+			const answer = - 18;
+			const crossed = a.cross( b );
 
 			assert.ok( Math.abs( answer - crossed ) <= eps, 'Check cross' );
 
@@ -328,9 +329,9 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'manhattanLength', ( assert ) => {
 
-			var a = new Vector2( x, 0 );
-			var b = new Vector2( 0, - y );
-			var c = new Vector2();
+			const a = new Vector2( x, 0 );
+			const b = new Vector2( 0, - y );
+			const c = new Vector2();
 
 			assert.strictEqual( a.manhattanLength(), x, 'Positive component' );
 			assert.strictEqual( b.manhattanLength(), y, 'Negative component' );
@@ -343,8 +344,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'normalize', ( assert ) => {
 
-			var a = new Vector2( x, 0 );
-			var b = new Vector2( 0, - y );
+			const a = new Vector2( x, 0 );
+			const b = new Vector2( 0, - y );
 
 			a.normalize();
 			assert.ok( a.length() == 1, 'Passed!' );
@@ -382,13 +383,13 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setLength', ( assert ) => {
 
-			var a = new Vector2( x, 0 );
+			let a = new Vector2( x, 0 );
 
 			assert.ok( a.length() == x, 'Passed!' );
 			a.setLength( y );
 			assert.ok( a.length() == y, 'Passed!' );
 
-			var a = new Vector2( 0, 0 );
+			a = new Vector2( 0, 0 );
 			assert.ok( a.length() == 0, 'Passed!' );
 			a.setLength( y );
 			assert.ok( a.length() == 0, 'Passed!' );
@@ -411,8 +412,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'equals', ( assert ) => {
 
-			var a = new Vector2( x, 0 );
-			var b = new Vector2( 0, - y );
+			const a = new Vector2( x, 0 );
+			const b = new Vector2( 0, - y );
 
 			assert.ok( a.x != b.x, 'Passed!' );
 			assert.ok( a.y != b.y, 'Passed!' );
@@ -431,8 +432,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'fromArray', ( assert ) => {
 
-			var a = new Vector2();
-			var array = [ 1, 2, 3, 4 ];
+			const a = new Vector2();
+			const array = [ 1, 2, 3, 4 ];
 
 			a.fromArray( array );
 			assert.strictEqual( a.x, 1, 'No offset: check x' );
@@ -446,18 +447,18 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'toArray', ( assert ) => {
 
-			var a = new Vector2( x, y );
+			const a = new Vector2( x, y );
 
-			var array = a.toArray();
+			let array = a.toArray();
 			assert.strictEqual( array[ 0 ], x, 'No array, no offset: check x' );
 			assert.strictEqual( array[ 1 ], y, 'No array, no offset: check y' );
 
-			var array = [];
+			array = [];
 			a.toArray( array );
 			assert.strictEqual( array[ 0 ], x, 'With array, no offset: check x' );
 			assert.strictEqual( array[ 1 ], y, 'With array, no offset: check y' );
 
-			var array = [];
+			array = [];
 			a.toArray( array, 1 );
 			assert.strictEqual( array[ 0 ], undefined, 'With array and offset: check [0]' );
 			assert.strictEqual( array[ 1 ], x, 'With array and offset: check x' );
@@ -467,8 +468,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'fromBufferAttribute', ( assert ) => {
 
-			var a = new Vector2();
-			var attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2 );
+			const a = new Vector2();
+			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2 );
 
 			a.fromBufferAttribute( attr, 0 );
 			assert.strictEqual( a.x, 1, 'Offset 0: check x' );
@@ -486,11 +487,10 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-
 		// TODO (Itee) refactor/split
 		QUnit.test( 'setX,setY', ( assert ) => {
 
-			var a = new Vector2();
+			const a = new Vector2();
 			assert.ok( a.x == 0, 'Passed!' );
 			assert.ok( a.y == 0, 'Passed!' );
 
@@ -500,9 +500,10 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.y == y, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'setComponent,getComponent', ( assert ) => {
 
-			var a = new Vector2();
+			const a = new Vector2();
 			assert.ok( a.x == 0, 'Passed!' );
 			assert.ok( a.y == 0, 'Passed!' );
 
@@ -512,10 +513,11 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.getComponent( 1 ) == 2, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'multiply/divide', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2( - x, - y );
+			const a = new Vector2( x, y );
+			const b = new Vector2( - x, - y );
 
 			a.multiplyScalar( - 2 );
 			assert.ok( a.x == x * - 2, 'Passed!' );
@@ -534,11 +536,12 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.y == - y, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'min/max/clamp', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2( - x, - y );
-			var c = new Vector2();
+			const a = new Vector2( x, y );
+			const b = new Vector2( - x, - y );
+			const c = new Vector2();
 
 			c.copy( a ).min( b );
 			assert.ok( c.x == - x, 'Passed!' );
@@ -559,6 +562,7 @@ export default QUnit.module( 'Maths', () => {
 			assert.equal( c.y, x, 'scalar clamp y' );
 
 		} );
+
 		QUnit.test( 'rounding', ( assert ) => {
 
 			assert.deepEqual( new Vector2( - 0.1, 0.1 ).floor(), new Vector2( - 1, 0 ), 'floor .1' );
@@ -581,11 +585,12 @@ export default QUnit.module( 'Maths', () => {
 			assert.deepEqual( new Vector2( - 1.9, 1.9 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.9' );
 
 		} );
+
 		QUnit.test( 'length/lengthSq', ( assert ) => {
 
-			var a = new Vector2( x, 0 );
-			var b = new Vector2( 0, - y );
-			var c = new Vector2();
+			const a = new Vector2( x, 0 );
+			const b = new Vector2( 0, - y );
+			const c = new Vector2();
 
 			assert.ok( a.length() == x, 'Passed!' );
 			assert.ok( a.lengthSq() == x * x, 'Passed!' );
@@ -599,11 +604,12 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.lengthSq() == ( x * x + y * y ), 'Passed!' );
 
 		} );
+
 		QUnit.test( 'distanceTo/distanceToSquared', ( assert ) => {
 
-			var a = new Vector2( x, 0 );
-			var b = new Vector2( 0, - y );
-			var c = new Vector2();
+			const a = new Vector2( x, 0 );
+			const b = new Vector2( 0, - y );
+			const c = new Vector2();
 
 			assert.ok( a.distanceTo( c ) == x, 'Passed!' );
 			assert.ok( a.distanceToSquared( c ) == x * x, 'Passed!' );
@@ -612,10 +618,11 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( b.distanceToSquared( c ) == y * y, 'Passed!' );
 
 		} );
+
 		QUnit.test( 'lerp/clone', ( assert ) => {
 
-			var a = new Vector2( x, 0 );
-			var b = new Vector2( 0, - y );
+			const a = new Vector2( x, 0 );
+			const b = new Vector2( 0, - y );
 
 			assert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 0.5 ) ), 'Passed!' );
 			assert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 1 ) ), 'Passed!' );
@@ -628,9 +635,10 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.clone().lerp( b, 1 ).equals( b ), 'Passed!' );
 
 		} );
+
 		QUnit.test( 'setComponent/getComponent exceptions', ( assert ) => {
 
-			var a = new Vector2( 0, 0 );
+			const a = new Vector2( 0, 0 );
 
 			assert.throws(
 				function () {
@@ -652,10 +660,11 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 		} );
+
 		QUnit.test( 'setScalar/addScalar/subScalar', ( assert ) => {
 
-			var a = new Vector2( 1, 1 );
-			var s = 3;
+			const a = new Vector2( 1, 1 );
+			const s = 3;
 
 			a.setScalar( s );
 			assert.strictEqual( a.x, s, 'setScalar: check x' );
@@ -670,11 +679,12 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.y, 0, 'subScalar: check y' );
 
 		} );
+
 		QUnit.test( 'multiply/divide', ( assert ) => {
 
-			var a = new Vector2( x, y );
-			var b = new Vector2( 2 * x, 2 * y );
-			var c = new Vector2( 4 * x, 4 * y );
+			const a = new Vector2( x, y );
+			const b = new Vector2( 2 * x, 2 * y );
+			const c = new Vector2( 4 * x, 4 * y );
 
 			a.multiply( b );
 			assert.strictEqual( a.x, x * b.x, 'multiply: check x' );
@@ -686,10 +696,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		// OTHERS
 		QUnit.test( 'iterable', ( assert ) => {
 
-			var v = new Vector2( 0, 1 );
-			var array = [ ...v ];
+			const v = new Vector2( 0, 1 );
+			const array = [ ...v ];
 			assert.strictEqual( array[ 0 ], 0, 'Vector2 is iterable.' );
 			assert.strictEqual( array[ 1 ], 1, 'Vector2 is iterable.' );
 

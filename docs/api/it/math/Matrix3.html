@@ -129,6 +129,45 @@ zAxis = (c, f, i)
 
 		</p>
 
+		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
+		<p>
+		[page:Float theta] — Angolo di rotazione in radianti. I valori positivi ruotano in senso antiorario.<br /><br />
+
+		Imposta questa matrice come una trasformazione rotazionale 2D di [page:Float teta] radianti.
+		La matrice risultante sarà:
+		<code>
+cos(&theta;) -sin(&theta;) 0
+sin(&theta;) cos(&theta;)  0
+0      0       1
+		</code>
+		</p>
+
+		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Float x] - la quantità da scalare sull'asse X.<br />
+		[page:Float y] - la quantità da scalare sull'asse Y.<br />
+
+		Imposta questa matrice come una trasformazione di scala 2D:
+		<code>
+x, 0, 0,
+0, y, 0,
+0, 0, 1
+		</code>
+		</p>
+
+		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Float x] - la quantità da translare sull'asse X.<br />
+		[page:Float y] - la quantità da translare sull'asse Y.<br />
+
+		Imposta questa matrice come una trasformazione di traslazione 2D:
+		<code>
+1, 0, x,
+0, 1, y,
+0, 0, 1
+		</code>
+		</p>
+
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
 		<p>Post-moltiplica questa matrice per [page:Matrix3 m].</p>
 
@@ -169,7 +208,7 @@ zAxis = (c, f, i)
 		[page:Float ty] - offset y<br />
 		[page:Float sx] - repeat x<br />
 		[page:Float sy] - repeat y<br />
-		[page:Float rotation] - rotazione (in radianti)<br />
+		[page:Float rotation] - rotazione, in radianti. I valori positivi ruotano in senso antiorario<br />
 		[page:Float cx] - centro x di rotazione<br />
 		[page:Float cy] - centro y di rotazione<br /><br />
 

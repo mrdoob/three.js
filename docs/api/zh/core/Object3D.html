@@ -71,7 +71,7 @@
 
 	<h3>[property:Boolean matrixAutoUpdate]</h3>
 	<p>
-		当这个属性设置了之后，它将计算每一帧的位移、旋转（四元变换）和缩放矩阵，并重新计算matrixWorld属性。默认值是[page:Object3D.DefaultMatrixAutoUpdate] (true)。
+		当这个属性设置了之后，它将计算每一帧的位移、旋转（四元变换）和缩放矩阵，并重新计算matrixWorld属性。默认值是[page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE] (true)。
 	</p>
 
 	<h3>[property:Matrix4 matrixWorld]</h3>
@@ -159,7 +159,7 @@
 	<h3>[property:Vector3 up]</h3>
 	<p>
 		这个属性由[page:.lookAt lookAt]方法所使用，例如，来决定结果的朝向。
-		默认值是[page:Object3D.DefaultUp]，即( 0, 1, 0 )。
+		默认值是[page:Object3D.DEFAULT_UP]，即( 0, 1, 0 )。
 	</p>
 
 	<h3>[property:Object userData]</h3>
@@ -183,22 +183,26 @@
 	<h2>静态属性</h2>
 	<p>
 		静态属性和方法由每个类所定义，并非由每个类的实例所定义。
-		也就是说，改变[page:Object3D.DefaultUp]或[page:Object3D.DefaultMatrixAutoUpdate]的值，
+		也就是说，改变[page:Object3D.DEFAULT_UP]或[page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE]的值，
 		将改变<b>每个在此之后</b>由Object3D类（或派生类）创建的实例中的[page:.up up]和[page:.matrixAutoUpdate matrixAutoUpdate]的值。（已经创建好的Object3D不会受到影响）。
 	</p>
 
-	<h3>[property:Vector3 DefaultUp]</h3>
+	<h3>[property:Vector3 DEFAULT_UP]</h3>
 	<p>
 		默认的物体的[page:.up up]方向，同时也作为[page:DirectionalLight]、[page:HemisphereLight]和[page:Spotlight]（自顶向下创建的灯光）的默认方向。
 		默认设为( 0, 1, 0 )。
 	</p>
 
-	<h3>[property:Boolean DefaultMatrixAutoUpdate]</h3>
+	<h3>[property:Boolean DEFAULT_MATRIX_AUTO_UPDATE]</h3>
 	<p>
-			[page:.matrixAutoUpdate matrixAutoUpdate]的默认设置，用于新创建的Object3D。<br />
+		[page:.matrixAutoUpdate matrixAutoUpdate]的默认设置，用于新创建的Object3D。<br />
 
 	</p>
 
+	<h3>[property:Boolean DEFAULT_MATRIX_WORLD_AUTO_UPDATE]</h3>
+	<p>
+		[page:.matrixWorldAutoUpdate matrixWorldAutoUpdate]的默认设置，用于新创建的Object3D。<br />
+	</p>
 
 	<h2>方法</h2>
 
@@ -258,6 +262,13 @@
 		name —— 将要用于查找的属性的名称。<br />
 		value —— 给定的属性的值。 <br /><br />
 		从该对象开始，搜索一个对象及其子级，返回第一个给定的属性中包含有匹配的值的子对象。
+	</p>
+
+	<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value] )</h3>
+	<p>
+		name —— 将要用于查找的属性的名称。<br />
+		value —— 给定的属性的值。 <br /><br />
+		从此对象开始，搜索一个对象及其子对象，返回包含给定属性的匹配值的所有子对象。
 	</p>
 
 	<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>

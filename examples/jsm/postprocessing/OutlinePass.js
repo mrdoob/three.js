@@ -91,7 +91,6 @@ class OutlinePass extends Pass {
 		this.overlayMaterial = this.getOverlayMaterial();
 
 		// copy material
-		if ( CopyShader === undefined ) console.error( 'THREE.OutlinePass relies on CopyShader' );
 
 		const copyShader = CopyShader;
 

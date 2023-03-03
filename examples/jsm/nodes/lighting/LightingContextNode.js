@@ -1,5 +1,8 @@
 import ContextNode from '../core/ContextNode.js';
-import { float, vec3, add, temp } from '../shadernode/ShaderNodeBaseElements.js';
+import { temp } from '../core/VarNode.js';
+import { add } from '../math/OperatorNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
 
 class LightingContextNode extends ContextNode {
 
@@ -51,9 +54,9 @@ class LightingContextNode extends ContextNode {
 		context.reflectedLight = reflectedLight;
 		context.lightingModelNode = lightingModelNode || context.lightingModelNode;
 
-		if ( lightingModelNode?.indirectDiffuse ) lightingModelNode.indirectDiffuse.call( context );
-		if ( lightingModelNode?.indirectSpecular ) lightingModelNode.indirectSpecular.call( context );
-		if ( lightingModelNode?.ambientOcclusion ) lightingModelNode.ambientOcclusion.call( context );
+		if ( lightingModelNode && lightingModelNode.indirectDiffuse ) lightingModelNode.indirectDiffuse.call( context );
+		if ( lightingModelNode && lightingModelNode.indirectSpecular ) lightingModelNode.indirectSpecular.call( context );
+		if ( lightingModelNode && lightingModelNode.ambientOcclusion ) lightingModelNode.ambientOcclusion.call( context );
 
 		return super.construct( builder );
 
@@ -73,3 +76,9 @@ class LightingContextNode extends ContextNode {
 }
 
 export default LightingContextNode;
+
+export const lightingContext = nodeProxy( LightingContextNode );
+
+addNodeElement( 'lightingContext', lightingContext );
+
+addNodeClass( LightingContextNode );

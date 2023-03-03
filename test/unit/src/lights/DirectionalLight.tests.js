@@ -1,13 +1,15 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils.js';
 import { DirectionalLight } from '../../../../src/lights/DirectionalLight.js';
+
+import { Light } from '../../../../src/lights/Light.js';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'DirectionalLight', ( hooks ) => {
 
-		var lights = undefined;
+		let lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -24,23 +26,72 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new DirectionalLight();
+			assert.strictEqual(
+				object instanceof Light, true,
+				'DirectionalLight extends from Light'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new DirectionalLight();
+			assert.ok( object, 'Can instantiate a DirectionalLight.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new DirectionalLight();
+			assert.ok(
+				object.type === 'DirectionalLight',
+				'DirectionalLight.type should be DirectionalLight'
+			);
+
+		} );
+
+		QUnit.todo( 'position', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isDirectionalLight', ( assert ) => {
+		QUnit.todo( 'target', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'shadow', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isDirectionalLight', ( assert ) => {
+
+			const object = new DirectionalLight();
+			assert.ok(
+				object.isDirectionalLight,
+				'DirectionalLight.isDirectionalLight should be true'
+			);
+
+		} );
+
+		QUnit.test( 'dispose', ( assert ) => {
+
+			assert.expect( 0 );
+
+			const object = new DirectionalLight();
+			object.dispose();
+
+			// ensure calls dispose() on shadow
 
 		} );
 

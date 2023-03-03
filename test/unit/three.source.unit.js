@@ -47,6 +47,7 @@ import './src/core/BufferAttribute.tests.js';
 import './src/core/BufferGeometry.tests.js';
 import './src/core/Clock.tests.js';
 import './src/core/EventDispatcher.tests.js';
+import './src/core/GLBufferAttribute.tests.js';
 import './src/core/InstancedBufferAttribute.tests.js';
 import './src/core/InstancedBufferGeometry.tests.js';
 import './src/core/InstancedInterleavedBuffer.tests.js';
@@ -56,10 +57,14 @@ import './src/core/Layers.tests.js';
 import './src/core/Object3D.tests.js';
 import './src/core/Raycaster.tests.js';
 import './src/core/Uniform.tests.js';
+import './src/core/UniformsGroup.tests.js';
 
 
 //src/extras
 import './src/extras/DataUtils.tests.js';
+import './src/extras/Earcut.tests.js';
+import './src/extras/ImageUtils.tests.js';
+import './src/extras/PMREMGenerator.tests.js';
 import './src/extras/ShapeUtils.tests.js';
 
 //src/extras/core
@@ -124,12 +129,16 @@ import './src/helpers/SpotLightHelper.tests.js';
 
 //src/lights
 import './src/lights/AmbientLight.tests.js';
+import './src/lights/AmbientLightProbe.tests.js';
 import './src/lights/DirectionalLight.tests.js';
 import './src/lights/DirectionalLightShadow.tests.js';
 import './src/lights/HemisphereLight.tests.js';
+import './src/lights/HemisphereLightProbe.tests.js';
 import './src/lights/Light.tests.js';
+import './src/lights/LightProbe.tests.js';
 import './src/lights/LightShadow.tests.js';
 import './src/lights/PointLight.tests.js';
+import './src/lights/PointLightShadow.tests.js';
 import './src/lights/RectAreaLight.tests.js';
 import './src/lights/SpotLight.tests.js';
 import './src/lights/SpotLightShadow.tests.js';
@@ -144,6 +153,7 @@ import './src/loaders/CompressedTextureLoader.tests.js';
 import './src/loaders/CubeTextureLoader.tests.js';
 import './src/loaders/DataTextureLoader.tests.js';
 import './src/loaders/FileLoader.tests.js';
+import './src/loaders/ImageBitmapLoader.tests.js';
 import './src/loaders/ImageLoader.tests.js';
 import './src/loaders/Loader.tests.js';
 import './src/loaders/LoaderUtils.tests.js';
@@ -161,6 +171,7 @@ import './src/materials/MeshBasicMaterial.tests.js';
 import './src/materials/MeshDepthMaterial.tests.js';
 import './src/materials/MeshDistanceMaterial.tests.js';
 import './src/materials/MeshLambertMaterial.tests.js';
+import './src/materials/MeshMatcapMaterial.tests.js';
 import './src/materials/MeshNormalMaterial.tests.js';
 import './src/materials/MeshPhongMaterial.tests.js';
 import './src/materials/MeshPhysicalMaterial.tests.js';
@@ -177,6 +188,7 @@ import './src/materials/SpriteMaterial.tests.js';
 import './src/math/Box2.tests.js';
 import './src/math/Box3.tests.js';
 import './src/math/Color.tests.js';
+import './src/math/ColorManagement.tests.js';
 import './src/math/Cylindrical.tests.js';
 import './src/math/Euler.tests.js';
 import './src/math/Frustum.tests.js';
@@ -190,6 +202,7 @@ import './src/math/Quaternion.tests.js';
 import './src/math/Ray.tests.js';
 import './src/math/Sphere.tests.js';
 import './src/math/Spherical.tests.js';
+import './src/math/SphericalHarmonics3.tests.js';
 import './src/math/Triangle.tests.js';
 import './src/math/Vector2.tests.js';
 import './src/math/Vector3.tests.js';
@@ -205,6 +218,7 @@ import './src/math/interpolants/QuaternionLinearInterpolant.tests.js';
 //src/objects
 import './src/objects/Bone.tests.js';
 import './src/objects/Group.tests.js';
+import './src/objects/InstancedMesh.tests.js';
 import './src/objects/Line.tests.js';
 import './src/objects/LineLoop.tests.js';
 import './src/objects/LineSegments.tests.js';
@@ -217,9 +231,13 @@ import './src/objects/Sprite.tests.js';
 
 
 //src/renderers
+import './src/renderers/WebGL1Renderer.tests.js';
+import './src/renderers/WebGL3DRenderTarget.tests.js';
+import './src/renderers/WebGLArrayRenderTarget.tests.js';
+import './src/renderers/WebGLCubeRenderTarget.tests.js';
+import './src/renderers/WebGLMultipleRenderTargets.tests.js';
 import './src/renderers/WebGLRenderer.tests.js';
 import './src/renderers/WebGLRenderTarget.tests.js';
-import './src/renderers/WebGLCubeRenderTarget.tests.js';
 
 //src/renderers/shaders
 import './src/renderers/shaders/ShaderChunk.tests.js';
@@ -259,9 +277,14 @@ import './src/scenes/Scene.tests.js';
 
 //src/textures
 import './src/textures/CanvasTexture.tests.js';
+import './src/textures/CompressedArrayTexture.tests.js';
 import './src/textures/CompressedTexture.tests.js';
 import './src/textures/CubeTexture.tests.js';
+import './src/textures/Data3DTexture.tests.js';
+import './src/textures/DataArrayTexture.tests.js';
 import './src/textures/DataTexture.tests.js';
 import './src/textures/DepthTexture.tests.js';
+import './src/textures/FramebufferTexture.tests.js';
+import './src/textures/Source.tests.js';
 import './src/textures/Texture.tests.js';
 import './src/textures/VideoTexture.tests.js';

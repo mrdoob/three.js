@@ -46,12 +46,6 @@ class BokehPass extends Pass {
 
 		// bokeh material
 
-		if ( BokehShader === undefined ) {
-
-			console.error( 'THREE.BokehPass relies on BokehShader' );
-
-		}
-
 		const bokehShader = BokehShader;
 		const bokehUniforms = UniformsUtils.clone( bokehShader.uniforms );
 

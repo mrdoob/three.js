@@ -4,7 +4,6 @@ import {
 	Float32BufferAttribute,
 	Int32BufferAttribute,
 	Loader,
-	LoaderUtils,
 	Points,
 	PointsMaterial
 } from 'three';
@@ -123,7 +122,7 @@ class PCDLoader extends Loader {
 
 			// remove comments
 
-			PCDheader.str = PCDheader.str.replace( /\#.*/gi, '' );
+			PCDheader.str = PCDheader.str.replace( /#.*/gi, '' );
 
 			// parse
 
@@ -219,7 +218,7 @@ class PCDLoader extends Loader {
 
 		}
 
-		const textData = LoaderUtils.decodeText( new Uint8Array( data ) );
+		const textData = new TextDecoder().decode( data );
 
 		// parse header (always ascii format)
 

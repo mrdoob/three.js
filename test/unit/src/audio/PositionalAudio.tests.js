@@ -1,26 +1,73 @@
 /* global QUnit */
 
-// import { PositionalAudio } from '../../../../src/audio/PositionalAudio.js';
+import { PositionalAudio } from '../../../../src/audio/PositionalAudio.js';
+
+import { Audio } from '../../../../src/audio/Audio.js';
 
 export default QUnit.module( 'Audios', () => {
 
 	QUnit.module( 'PositionalAudio', () => {
 
-		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		function mock3DListener() {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			return {
+				context: {
+					createGain: () => {
+
+						return {
+							connect: () => {},
+						};
+
+					},
+					createPanner: () => {
+
+						return {
+							connect: () => {},
+						};
+
+					}
+
+				},
+				getInput: () => {},
+			};
+
+		}
+
+		// INHERITANCE
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const listener = mock3DListener();
+			const object = new PositionalAudio( listener );
+			assert.strictEqual(
+				object instanceof Audio, true,
+				'PositionalAudio extends from Audio'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const listener = mock3DListener();
+			const object = new PositionalAudio( listener );
+			assert.ok( object, 'Can instantiate a PositionalAudio.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.todo( 'panner', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
+		// PUBLIC
+		QUnit.todo( 'disconnect', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.todo( 'getOutput', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
@@ -75,12 +122,17 @@ export default QUnit.module( 'Audios', () => {
 
 		} );
 
-		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
+		QUnit.todo( 'setDirectionalCone', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
+		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
 
 	} );
 

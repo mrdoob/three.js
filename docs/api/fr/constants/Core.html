@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Constantes de base</h1>
+
+		<h2>Numéro de révision</h2>
+
+		<code>
+THREE.REVISION
+		</code>
+
+		<div id="rev">
+			Le [link:https://github.com/mrdoob/three.js/releases revision number] courant de three.js.
+		</div>
+
+		<h2>Espaces colorimétriques</h2>
+		<code>
+THREE.NoColorSpace			
+THREE.SRGBColorSpace
+THREE.LinearSRGBColorSpace
+		</code>
+		<p>
+			[page:NoColorSpace] ne définit aucun espace colorimétrique spécifique. 
+		</p>
+		<p>
+			[page:SRGBColorSpace] (“sRGB”) fait référence à l'espace colorimétrique défini par la Rec. 709 primaires, D65
+			point blanc et fonctions de transfert sRGB non linéaires. sRGB est l'espace colorimétrique par défaut dans
+			CSS, et se trouve souvent dans les palettes de couleurs et les sélecteurs de couleurs. Les couleurs exprimées en
+			notation hexadécimale ou en CSS sont généralement dans l'espace colorimétrique sRGB.
+		</p>
+
+		<p>
+			[page:LinearSRGBColorSpace] (“Linear-sRGB”)  fait référence à l'espace colorimétrique sRGB (ci-dessus) avec
+			fonctions de transfert linéaires. Linear-sRGB est l'espace colorimétrique de travail dans three.js, utilisé
+			pendant la majeure partie du processus de rendu. Les composants RVB trouvés dans les matériaux three.js
+			et dans les shaders sont dans l'espace colorimétrique Linear-sRGB.
+		</p>
+
+		<p>
+			Pour plus d'informations d'utilisation, voir <i>Color management</i>.
+		</p>
+
+		<h2>Boutons de la souris</h2>
+		<code>
+THREE.MOUSE.LEFT
+THREE.MOUSE.MIDDLE
+THREE.MOUSE.RIGHT
+THREE.MOUSE.ROTATE
+THREE.MOUSE.DOLLY
+THREE.MOUSE.PAN
+		</code>
+		<p>
+			Les constantes LEFT et ROTATE ont la même valeur sous-jacente.
+			Les constantes MIDDLE et DOLLY ont la même valeur sous-jacente.
+			Les constantes RIGHT et PAN ont la même valeur sous-jacente.
+		</p>
+
+		<h2>Actions tactiles</h2>
+		<code>
+THREE.TOUCH.ROTATE
+THREE.TOUCH.PAN
+THREE.TOUCH.DOLLY_PAN
+THREE.TOUCH.DOLLY_ROTATE
+		</code>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+
+
+</html>

@@ -1,13 +1,13 @@
 export default /* glsl */`
 #if NUM_SPOT_LIGHT_COORDS > 0
 
-  varying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];
+	varying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];
 
 #endif
 
 #if NUM_SPOT_LIGHT_MAPS > 0
 
-  uniform sampler2D spotLightMap[ NUM_SPOT_LIGHT_MAPS ];
+	uniform sampler2D spotLightMap[ NUM_SPOT_LIGHT_MAPS ];
 
 #endif
 
@@ -110,15 +110,8 @@ export default /* glsl */`
 		shadowCoord.xyz /= shadowCoord.w;
 		shadowCoord.z += shadowBias;
 
-		// if ( something && something ) breaks ATI OpenGL shader compiler
-		// if ( all( something, something ) ) using this instead
-
-		bvec4 inFrustumVec = bvec4 ( shadowCoord.x >= 0.0, shadowCoord.x <= 1.0, shadowCoord.y >= 0.0, shadowCoord.y <= 1.0 );
-		bool inFrustum = all( inFrustumVec );
-
-		bvec2 frustumTestVec = bvec2( inFrustum, shadowCoord.z <= 1.0 );
-
-		bool frustumTest = all( frustumTestVec );
+		bool inFrustum = shadowCoord.x >= 0.0 && shadowCoord.x <= 1.0 && shadowCoord.y >= 0.0 && shadowCoord.y <= 1.0;
+		bool frustumTest = inFrustum && shadowCoord.z <= 1.0;
 
 		if ( frustumTest ) {
 

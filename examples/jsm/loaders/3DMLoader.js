@@ -15,7 +15,6 @@ import {
 	PointLight,
 	SpotLight,
 	RectAreaLight,
-	Vector3,
 	Sprite,
 	SpriteMaterial,
 	CanvasTexture,
@@ -625,7 +624,7 @@ class Rhino3dmLoader extends Loader {
 						light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
 						light.height = height;
 						light.width = width;
-						light.lookAt( new Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+						light.lookAt( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
 
 						break;
 
