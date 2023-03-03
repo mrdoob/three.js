@@ -2841,7 +2841,7 @@ class GLTFMaterialsAnisotropyExtension {
 
 		}
 
-		extensionDef.anisotropyStrength = material.anisotropyStrength;
+		extensionDef.anisotropyStrength = material.anisotropy;
 
 		materialDef.extensions = materialDef.extensions || {};
 		materialDef.extensions[ this.name ] = extensionDef;

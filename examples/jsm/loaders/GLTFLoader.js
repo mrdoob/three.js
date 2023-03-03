@@ -1234,7 +1234,11 @@ class GLTFMaterialsAnisotropyExtension {
 
 		const extension = materialDef.extensions[ this.name ];
 
-		materialParams.anisotropyStrength = extension.anisotropyStrength !== undefined ? extension.anisotropyStrength : 1.0;
+		if ( extension.anisotropyStrength !== undefined ) {
+
+			materialParams.anisotropy = extension.anisotropyStrength;
+
+		}
 
 		if ( extension.anisotropyTexture !== undefined ) {
 

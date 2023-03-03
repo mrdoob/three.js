@@ -334,7 +334,6 @@ ShaderLib.physical = {
 			specularColor: { value: /*@__PURE__*/ new Color( 1, 1, 1 ) },
 			specularColorMap: { value: null },
 			anisotropy: { value: 0 },
-			anisotropyStrength: { value: 1 },
 			anisotropyMap: { value: null },
 		}
 	] ),

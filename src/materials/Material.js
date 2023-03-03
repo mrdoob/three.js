@@ -231,7 +231,6 @@ class Material extends EventDispatcher {
 		}
 
 		if ( this.anisotropy !== undefined ) data.anisotropy = this.anisotropy;
-		if ( this.anisotropyStrength !== undefined ) data.anisotropyStrength = this.anisotropyStrength;
 
 		if ( this.anisotropyMap && this.anisotropyMap.isTexture ) {
 

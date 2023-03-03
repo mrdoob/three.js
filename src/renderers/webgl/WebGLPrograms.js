@@ -443,6 +443,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 23 );
 		if ( parameters.opaque )
 			_programLayers.enable( 24 );
+		if ( parameters.anisotropy )
+			_programLayers.enable( 25 );
+		if ( parameters.anisotropyMap )
+			_programLayers.enable( 26 );
 
 		array.push( _programLayers.mask );
 

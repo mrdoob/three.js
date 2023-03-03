@@ -635,7 +635,7 @@ function WebGLMaterials( renderer, properties ) {
 
 		if ( material.anisotropy > 0 ) {
 
-			uniforms.anisotropyStrength.value = material.anisotropyStrength;
+			uniforms.anisotropy.value = material.anisotropy;
 
 			if ( material.anisotropyMap ) {
 

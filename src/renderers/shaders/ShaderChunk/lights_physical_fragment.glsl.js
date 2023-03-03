@@ -120,7 +120,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 #ifdef USE_ANISOTROPY
 
-	vec2 anisotropyV = vec2( 1.0 ) * anisotropyStrength;
+	vec2 anisotropyV = vec2( 1.0 ) * anisotropy;
 
 	#ifdef USE_ANISOTROPYMAP
 
