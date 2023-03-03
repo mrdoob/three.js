@@ -143,7 +143,7 @@
 
 		The engine renders double-sided, transparent objects with two draw calls (back faces first, then front faces) to mitigate transparency artifacts.
 		There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grass sprites. 
-		In these cases, set the `forceSinglePass` flag to `false` to disable the two pass rendering to avoid performance issues.
+		In these cases, set the `forceSinglePass` flag to `true` to disable the two pass rendering to avoid performance issues.
 		</p>
 
 		<h3>[property:Boolean isMaterial]</h3>
