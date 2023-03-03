@@ -52,7 +52,6 @@ struct PhysicalMaterial {
 vec3 clearcoatSpecular = vec3( 0.0 );
 vec3 sheenSpecular = vec3( 0.0 );
 
-
 vec3 F_Schlick( const in vec3 f0, const in float f90, const in float dotVH ) {
 
 	// Original approximation by Christophe Schlick '94
