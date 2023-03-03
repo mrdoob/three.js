@@ -115,4 +115,10 @@ vec2 equirectUv( in vec3 dir ) {
 	return vec2( u, v );
 
 }
+
+vec3 BRDF_Lambert( const in vec3 diffuseColor ) {
+
+	return RECIPROCAL_PI * diffuseColor;
+
+} // validated
 `;
