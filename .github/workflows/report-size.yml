@@ -30,6 +30,7 @@ jobs:
           result-encoding: string
           script: |
             const fs = require('fs/promises');
+
             const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
                owner: context.repo.owner,
                repo: context.repo.repo,
@@ -42,9 +43,10 @@ jobs:
                artifact_id: matchArtifact.id,
                archive_format: 'zip',
             });
+
             await fs.writeFile('sizes.zip', Buffer.from(download.data));
             await exec.exec('unzip sizes.zip');
-            const json = fs.readFile('sizes.json', 'utf8');
+            const json = await fs.readFile('sizes.json', 'utf8');
             return json;
 
       # This runs on the base branch of the PR, meaning "dev"
