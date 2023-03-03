@@ -1,0 +1,101 @@
+name: Report size
+
+on:
+  workflow_run:
+    workflows: ["Read size"]
+    types:
+      - completed
+
+# This workflow needs to be run with "pull-requests: write" permissions to
+# be able to comment on the pull request. We can't checkout the PR code
+# in this workflow.
+# Reference:
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+permissions:
+  pull-requests: write
+
+jobs:
+  treeshaking:
+    name: Tree-shaking
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      # Using actions/download-artifact doesn't work here
+      # https://github.com/actions/download-artifact/issues/60
+      - name: Download artifact
+        uses: actions/github-script@v6
+        id: download-artifact
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs/promises');
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            const matchArtifact = artifacts.data.artifacts.find((artifact) => artifact.name === 'sizes');
+            const download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            await fs.writeFile('sizes.zip', Buffer.from(download.data));
+            await exec.exec('unzip sizes.zip');
+            const json = fs.readFile('sizes.json', 'utf8');
+            return json;
+
+      # This runs on the base branch of the PR, meaning "dev"
+      - name: Git checkout
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build-module
+      - name: === Test tree-shaking ===
+        run: npm run test-treeshake
+      - name: Read tree-shaken size
+        id: read-size
+        run: |
+          FILESIZE_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
+          echo "FILESIZE_BASE=$FILESIZE_BASE" >> $GITHUB_OUTPUT
+
+      - name: Format sizes
+        id: format
+        env:
+          FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize }}
+          FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip }}
+          FILESIZE_BASE: ${{ steps.read-size.outputs.FILESIZE_BASE }}
+        run: |
+          FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE")
+          FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_GZIP")
+          FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$FILESIZE" "$FILESIZE_BASE")
+          echo "FILESIZE=$FILESIZE_FORM" >> $GITHUB_OUTPUT
+          echo "FILESIZE_GZIP=$FILESIZE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "FILESIZE_DIFF=$FILESIZE_DIFF" >> $GITHUB_OUTPUT
+
+      - name: Find existing comment
+        uses: peter-evans/find-comment@v2
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: Bundle size
+      - name: Comment on PR
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            ### 📦 Bundle size after tree-shaking
+            | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
+            |----------|---------|------|
+            | ${{ steps.format.outputs.FILESIZE }} | ${{ steps.format.outputs.FILESIZE_GZIP }} | ${{ steps.format.outputs.FILESIZE_DIFF }} |

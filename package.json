@@ -98,6 +98,7 @@
     "failonlyreporter": "^1.0.0",
     "jimp": "^0.22.5",
     "pixelmatch": "^5.3.0",
+    "pretty-bytes": "^6.1.0",
     "puppeteer-core": "^19.7.2",
     "qunit": "^2.19.4",
     "rollup": "^3.17.2",
