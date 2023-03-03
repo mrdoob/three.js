@@ -49,7 +49,7 @@ export default /* glsl */`
 			#ifdef ENVMAP_TYPE_CUBE_UV
 
 				vec3 bentNormal = cross( bitangent, viewDir );
-				bentNormal = cross( bentNormal, bitangent );
+				bentNormal = normalize( cross( bentNormal, bitangent ) );
 				bentNormal = normalize( mix( normal , bentNormal, anisotropy ) );
 
 				return getIBLRadiance( viewDir, bentNormal, roughness );
