@@ -2645,9 +2645,9 @@ class Vector3 {
 
 	projectOnPlane( planeNormal ) {
 
-		_vector$d.copy( this ).projectOnVector( planeNormal );
+		_vector$c.copy( this ).projectOnVector( planeNormal );
 
-		return this.sub( _vector$d );
+		return this.sub( _vector$c );
 
 	}
 
@@ -2656,7 +2656,7 @@ class Vector3 {
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 
-		return this.sub( _vector$d.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
+		return this.sub( _vector$c.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
 	}
 
@@ -2848,7 +2848,7 @@ class Vector3 {
 
 }
 
-const _vector$d = /*@__PURE__*/ new Vector3();
+const _vector$c = /*@__PURE__*/ new Vector3();
 const _quaternion$4 = /*@__PURE__*/ new Quaternion();
 
 function SRGBToLinear( c ) {
@@ -2876,35 +2876,35 @@ function LinearToSRGB( c ) {
  * - http://www.russellcottrell.com/photo/matrixCalculator.htm
  */
 
-const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = new Matrix3().fromArray( [
+const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = /*@__PURE__*/ new Matrix3().fromArray( [
 	0.8224621, 0.0331941, 0.0170827,
 	0.1775380, 0.9668058, 0.0723974,
 	- 0.0000001, 0.0000001, 0.9105199
 ] );
 
-const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = new Matrix3().fromArray( [
+const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = /*@__PURE__*/ new Matrix3().fromArray( [
 	1.2249401, - 0.0420569, - 0.0196376,
 	- 0.2249404, 1.0420571, - 0.0786361,
 	0.0000001, 0.0000000, 1.0982735
 ] );
 
-const _vector$c = new Vector3();
+const _vector$b = /*@__PURE__*/ new Vector3();
 
 function DisplayP3ToLinearSRGB( color ) {
 
 	color.convertSRGBToLinear();
 
-	_vector$c.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB );
+	_vector$b.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB );
 
-	return color.setRGB( _vector$c.x, _vector$c.y, _vector$c.z );
+	return color.setRGB( _vector$b.x, _vector$b.y, _vector$b.z );
 
 }
 
 function LinearSRGBToDisplayP3( color ) {
 
-	_vector$c.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 );
+	_vector$b.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 );
 
-	return color.setRGB( _vector$c.x, _vector$c.y, _vector$c.z ).convertLinearToSRGB();
+	return color.setRGB( _vector$b.x, _vector$b.y, _vector$b.z ).convertLinearToSRGB();
 
 }
 
@@ -3001,7 +3001,7 @@ class ImageUtils {
 
 		}
 
-		if ( typeof HTMLCanvasElement == 'undefined' ) {
+		if ( typeof HTMLCanvasElement === 'undefined' ) {
 
 			return image.src;
 
@@ -4463,32 +4463,13 @@ class Box3 {
 
 	setFromArray( array ) {
 
-		let minX = + Infinity;
-		let minY = + Infinity;
-		let minZ = + Infinity;
+		this.makeEmpty();
 
-		let maxX = - Infinity;
-		let maxY = - Infinity;
-		let maxZ = - Infinity;
+		for ( let i = 0, il = array.length; i < il; i += 3 ) {
 
-		for ( let i = 0, l = array.length; i < l; i += 3 ) {
-
-			const x = array[ i ];
-			const y = array[ i + 1 ];
-			const z = array[ i + 2 ];
-
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
-
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+			this.expandByPoint( _vector$a.fromArray( array, i ) );
 
 		}
-
-		this.min.set( minX, minY, minZ );
-		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
@@ -4496,32 +4477,13 @@ class Box3 {
 
 	setFromBufferAttribute( attribute ) {
 
-		let minX = + Infinity;
-		let minY = + Infinity;
-		let minZ = + Infinity;
+		this.makeEmpty();
 
-		let maxX = - Infinity;
-		let maxY = - Infinity;
-		let maxZ = - Infinity;
+		for ( let i = 0, il = attribute.count; i < il; i ++ ) {
 
-		for ( let i = 0, l = attribute.count; i < l; i ++ ) {
-
-			const x = attribute.getX( i );
-			const y = attribute.getY( i );
-			const z = attribute.getZ( i );
-
-			if ( x < minX ) minX = x;
-			if ( y < minY ) minY = y;
-			if ( z < minZ ) minZ = z;
-
-			if ( x > maxX ) maxX = x;
-			if ( y > maxY ) maxY = y;
-			if ( z > maxZ ) maxZ = z;
+			this.expandByPoint( _vector$a.fromBufferAttribute( attribute, i ) );
 
 		}
-
-		this.min.set( minX, minY, minZ );
-		this.max.set( maxX, maxY, maxZ );
 
 		return this;
 
@@ -4543,7 +4505,7 @@ class Box3 {
 
 	setFromCenterAndSize( center, size ) {
 
-		const halfSize = _vector$b.copy( size ).multiplyScalar( 0.5 );
+		const halfSize = _vector$a.copy( size ).multiplyScalar( 0.5 );
 
 		this.min.copy( center ).sub( halfSize );
 		this.max.copy( center ).add( halfSize );
@@ -4638,32 +4600,49 @@ class Box3 {
 
 		object.updateWorldMatrix( false, false );
 
-		const geometry = object.geometry;
+		if ( object.boundingBox !== undefined ) {
 
-		if ( geometry !== undefined ) {
+			if ( object.boundingBox === null ) {
 
-			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
+				object.computeBoundingBox();
 
-				const position = geometry.attributes.position;
-				for ( let i = 0, l = position.count; i < l; i ++ ) {
+			}
 
-					_vector$b.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
-					this.expandByPoint( _vector$b );
+			_box$3.copy( object.boundingBox );
+			_box$3.applyMatrix4( object.matrixWorld );
+
+			this.union( _box$3 );
+
+		} else {
+
+			const geometry = object.geometry;
+
+			if ( geometry !== undefined ) {
+
+				if ( precise && geometry.attributes !== undefined && geometry.attributes.position !== undefined ) {
+
+					const position = geometry.attributes.position;
+					for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+						_vector$a.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
+						this.expandByPoint( _vector$a );
+
+					}
+
+				} else {
+
+					if ( geometry.boundingBox === null ) {
+
+						geometry.computeBoundingBox();
+
+					}
+
+					_box$3.copy( geometry.boundingBox );
+					_box$3.applyMatrix4( object.matrixWorld );
+
+					this.union( _box$3 );
 
 				}
-
-			} else {
-
-				if ( geometry.boundingBox === null ) {
-
-					geometry.computeBoundingBox();
-
-				}
-
-				_box$3.copy( geometry.boundingBox );
-				_box$3.applyMatrix4( object.matrixWorld );
-
-				this.union( _box$3 );
 
 			}
 
@@ -4722,10 +4701,10 @@ class Box3 {
 	intersectsSphere( sphere ) {
 
 		// Find the point on the AABB closest to the sphere center.
-		this.clampPoint( sphere.center, _vector$b );
+		this.clampPoint( sphere.center, _vector$a );
 
 		// If that point is inside the sphere, the AABB and sphere intersect.
-		return _vector$b.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+		return _vector$a.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
 
 	}
 
@@ -4837,7 +4816,7 @@ class Box3 {
 
 	distanceToPoint( point ) {
 
-		return this.clampPoint( point, _vector$b ).distanceTo( point );
+		return this.clampPoint( point, _vector$a ).distanceTo( point );
 
 	}
 
@@ -4851,7 +4830,7 @@ class Box3 {
 
 			this.getCenter( target.center );
 
-			target.radius = this.getSize( _vector$b ).length() * 0.5;
+			target.radius = this.getSize( _vector$a ).length() * 0.5;
 
 		}
 
@@ -4929,7 +4908,7 @@ const _points = [
 	/*@__PURE__*/ new Vector3()
 ];
 
-const _vector$b = /*@__PURE__*/ new Vector3();
+const _vector$a = /*@__PURE__*/ new Vector3();
 
 const _box$3 = /*@__PURE__*/ new Box3();
 
@@ -5215,7 +5194,7 @@ class Sphere {
 
 }
 
-const _vector$a = /*@__PURE__*/ new Vector3();
+const _vector$9 = /*@__PURE__*/ new Vector3();
 const _segCenter = /*@__PURE__*/ new Vector3();
 const _segDir = /*@__PURE__*/ new Vector3();
 const _diff = /*@__PURE__*/ new Vector3();
@@ -5267,7 +5246,7 @@ class Ray {
 
 	recast( t ) {
 
-		this.origin.copy( this.at( t, _vector$a ) );
+		this.origin.copy( this.at( t, _vector$9 ) );
 
 		return this;
 
@@ -5297,7 +5276,7 @@ class Ray {
 
 	distanceSqToPoint( point ) {
 
-		const directionDistance = _vector$a.subVectors( point, this.origin ).dot( this.direction );
+		const directionDistance = _vector$9.subVectors( point, this.origin ).dot( this.direction );
 
 		// point behind the ray
 
@@ -5307,9 +5286,9 @@ class Ray {
 
 		}
 
-		_vector$a.copy( this.origin ).addScaledVector( this.direction, directionDistance );
+		_vector$9.copy( this.origin ).addScaledVector( this.direction, directionDistance );
 
-		return _vector$a.distanceToSquared( point );
+		return _vector$9.distanceToSquared( point );
 
 	}
 
@@ -5434,9 +5413,9 @@ class Ray {
 
 	intersectSphere( sphere, target ) {
 
-		_vector$a.subVectors( sphere.center, this.origin );
-		const tca = _vector$a.dot( this.direction );
-		const d2 = _vector$a.dot( _vector$a ) - tca * tca;
+		_vector$9.subVectors( sphere.center, this.origin );
+		const tca = _vector$9.dot( this.direction );
+		const d2 = _vector$9.dot( _vector$9 ) - tca * tca;
 		const radius2 = sphere.radius * sphere.radius;
 
 		if ( d2 > radius2 ) return null;
@@ -5603,7 +5582,7 @@ class Ray {
 
 	intersectsBox( box ) {
 
-		return this.intersectBox( box, _vector$a ) !== null;
+		return this.intersectBox( box, _vector$9 ) !== null;
 
 	}
 
@@ -6562,7 +6541,7 @@ const _x = /*@__PURE__*/ new Vector3();
 const _y = /*@__PURE__*/ new Vector3();
 const _z = /*@__PURE__*/ new Vector3();
 
-const _matrix$1 = /*@__PURE__*/ new Matrix4();
+const _matrix = /*@__PURE__*/ new Matrix4();
 const _quaternion$3 = /*@__PURE__*/ new Quaternion();
 
 class Euler {
@@ -6797,9 +6776,9 @@ class Euler {
 
 	setFromQuaternion( q, order, update ) {
 
-		_matrix$1.makeRotationFromQuaternion( q );
+		_matrix.makeRotationFromQuaternion( q );
 
-		return this.setFromRotationMatrix( _matrix$1, order, update );
+		return this.setFromRotationMatrix( _matrix, order, update );
 
 	}
 
@@ -8302,7 +8281,7 @@ class Material extends EventDispatcher {
 
 			if ( newValue === undefined ) {
 
-				console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
+				console.warn( `THREE.Material: parameter '${ key }' has value of undefined.` );
 				continue;
 
 			}
@@ -8311,7 +8290,7 @@ class Material extends EventDispatcher {
 
 			if ( currentValue === undefined ) {
 
-				console.warn( 'THREE.' + this.type + ': \'' + key + '\' is not a property of this material.' );
+				console.warn( `THREE.Material: '${ key }' is not a property of THREE.${ this.type }.` );
 				continue;
 
 			}
@@ -9272,7 +9251,7 @@ class Color {
 
 }
 
-const _color = new Color();
+const _color = /*@__PURE__*/ new Color();
 
 Color.NAMES = _colorKeywords;
 
@@ -9521,7 +9500,7 @@ const DataUtils = {
 	fromHalfFloat: fromHalfFloat,
 };
 
-const _vector$9 = /*@__PURE__*/ new Vector3();
+const _vector$8 = /*@__PURE__*/ new Vector3();
 const _vector2$1 = /*@__PURE__*/ new Vector2();
 
 class BufferAttribute {
@@ -9620,10 +9599,10 @@ class BufferAttribute {
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$9.fromBufferAttribute( this, i );
-				_vector$9.applyMatrix3( m );
+				_vector$8.fromBufferAttribute( this, i );
+				_vector$8.applyMatrix3( m );
 
-				this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
+				this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
 
 			}
 
@@ -9637,11 +9616,11 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$9.fromBufferAttribute( this, i );
+			_vector$8.fromBufferAttribute( this, i );
 
-			_vector$9.applyMatrix4( m );
+			_vector$8.applyMatrix4( m );
 
-			this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
+			this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
 
 		}
 
@@ -9653,11 +9632,11 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$9.fromBufferAttribute( this, i );
+			_vector$8.fromBufferAttribute( this, i );
 
-			_vector$9.applyNormalMatrix( m );
+			_vector$8.applyNormalMatrix( m );
 
-			this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
+			this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
 
 		}
 
@@ -9669,11 +9648,11 @@ class BufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$9.fromBufferAttribute( this, i );
+			_vector$8.fromBufferAttribute( this, i );
 
-			_vector$9.transformDirection( m );
+			_vector$8.transformDirection( m );
 
-			this.setXYZ( i, _vector$9.x, _vector$9.y, _vector$9.z );
+			this.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
 
 		}
 
@@ -10141,7 +10120,7 @@ const _obj = /*@__PURE__*/ new Object3D();
 const _offset = /*@__PURE__*/ new Vector3();
 const _box$1 = /*@__PURE__*/ new Box3();
 const _boxMorphTargets = /*@__PURE__*/ new Box3();
-const _vector$8 = /*@__PURE__*/ new Vector3();
+const _vector$7 = /*@__PURE__*/ new Vector3();
 
 class BufferGeometry extends EventDispatcher {
 
@@ -10450,11 +10429,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$8.addVectors( this.boundingBox.min, _box$1.min );
-						this.boundingBox.expandByPoint( _vector$8 );
+						_vector$7.addVectors( this.boundingBox.min, _box$1.min );
+						this.boundingBox.expandByPoint( _vector$7 );
 
-						_vector$8.addVectors( this.boundingBox.max, _box$1.max );
-						this.boundingBox.expandByPoint( _vector$8 );
+						_vector$7.addVectors( this.boundingBox.max, _box$1.max );
+						this.boundingBox.expandByPoint( _vector$7 );
 
 					} else {
 
@@ -10521,11 +10500,11 @@ class BufferGeometry extends EventDispatcher {
 
 					if ( this.morphTargetsRelative ) {
 
-						_vector$8.addVectors( _box$1.min, _boxMorphTargets.min );
-						_box$1.expandByPoint( _vector$8 );
+						_vector$7.addVectors( _box$1.min, _boxMorphTargets.min );
+						_box$1.expandByPoint( _vector$7 );
 
-						_vector$8.addVectors( _box$1.max, _boxMorphTargets.max );
-						_box$1.expandByPoint( _vector$8 );
+						_vector$7.addVectors( _box$1.max, _boxMorphTargets.max );
+						_box$1.expandByPoint( _vector$7 );
 
 					} else {
 
@@ -10547,9 +10526,9 @@ class BufferGeometry extends EventDispatcher {
 
 			for ( let i = 0, il = position.count; i < il; i ++ ) {
 
-				_vector$8.fromBufferAttribute( position, i );
+				_vector$7.fromBufferAttribute( position, i );
 
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$8 ) );
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$7 ) );
 
 			}
 
@@ -10564,16 +10543,16 @@ class BufferGeometry extends EventDispatcher {
 
 					for ( let j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
 
-						_vector$8.fromBufferAttribute( morphAttribute, j );
+						_vector$7.fromBufferAttribute( morphAttribute, j );
 
 						if ( morphTargetsRelative ) {
 
 							_offset.fromBufferAttribute( position, j );
-							_vector$8.add( _offset );
+							_vector$7.add( _offset );
 
 						}
 
-						maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$8 ) );
+						maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$7 ) );
 
 					}
 
@@ -10865,11 +10844,11 @@ class BufferGeometry extends EventDispatcher {
 
 		for ( let i = 0, il = normals.count; i < il; i ++ ) {
 
-			_vector$8.fromBufferAttribute( normals, i );
+			_vector$7.fromBufferAttribute( normals, i );
 
-			_vector$8.normalize();
+			_vector$7.normalize();
 
-			normals.setXYZ( i, _vector$8.x, _vector$8.y, _vector$8.z );
+			normals.setXYZ( i, _vector$7.x, _vector$7.y, _vector$7.z );
 
 		}
 
@@ -11211,7 +11190,7 @@ class BufferGeometry extends EventDispatcher {
 
 const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 const _ray$2 = /*@__PURE__*/ new Ray();
-const _sphere$3 = /*@__PURE__*/ new Sphere();
+const _sphere$4 = /*@__PURE__*/ new Sphere();
 const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
 const _vA$1 = /*@__PURE__*/ new Vector3();
@@ -11341,7 +11320,7 @@ class Mesh extends Object3D {
 
 		if ( this.isSkinnedMesh ) {
 
-			this.boneTransform( index, target );
+			this.applyBoneTransform( index, target );
 
 		}
 
@@ -11361,14 +11340,14 @@ class Mesh extends Object3D {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		_sphere$3.copy( geometry.boundingSphere );
-		_sphere$3.applyMatrix4( matrixWorld );
+		_sphere$4.copy( geometry.boundingSphere );
+		_sphere$4.applyMatrix4( matrixWorld );
 
 		_ray$2.copy( raycaster.ray ).recast( raycaster.near );
 
-		if ( _sphere$3.containsPoint( _ray$2.origin ) === false ) {
+		if ( _sphere$4.containsPoint( _ray$2.origin ) === false ) {
 
-			if ( _ray$2.intersectSphere( _sphere$3, _sphereHitAt ) === null ) return;
+			if ( _ray$2.intersectSphere( _sphere$4, _sphereHitAt ) === null ) return;
 
 			if ( _ray$2.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
 
@@ -11793,7 +11772,16 @@ function cloneUniforms( src ) {
 				property.isVector2 || property.isVector3 || property.isVector4 ||
 				property.isTexture || property.isQuaternion ) ) {
 
-				dst[ u ][ p ] = property.clone();
+				if ( property.isRenderTargetTexture ) {
+
+					console.warn( 'UniformsUtils: Textures of render targets cannot be cloned via cloneUniforms() or mergeUniforms().' );
+					dst[ u ][ p ] = null;
+
+				} else {
+
+					dst[ u ][ p ] = property.clone();
+
+				}
 
 			} else if ( Array.isArray( property ) ) {
 
@@ -12804,8 +12792,8 @@ class Plane {
 
 }
 
-const _sphere$2 = /*@__PURE__*/ new Sphere();
-const _vector$7 = /*@__PURE__*/ new Vector3();
+const _sphere$3 = /*@__PURE__*/ new Sphere();
+const _vector$6 = /*@__PURE__*/ new Vector3();
 
 class Frustum {
 
@@ -12866,23 +12854,33 @@ class Frustum {
 
 	intersectsObject( object ) {
 
-		const geometry = object.geometry;
+		if ( object.boundingSphere !== undefined ) {
 
-		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+			if ( object.boundingSphere === null ) object.computeBoundingSphere();
 
-		_sphere$2.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+			_sphere$3.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
 
-		return this.intersectsSphere( _sphere$2 );
+		} else {
+
+			const geometry = object.geometry;
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			_sphere$3.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+
+		}
+
+		return this.intersectsSphere( _sphere$3 );
 
 	}
 
 	intersectsSprite( sprite ) {
 
-		_sphere$2.center.set( 0, 0, 0 );
-		_sphere$2.radius = 0.7071067811865476;
-		_sphere$2.applyMatrix4( sprite.matrixWorld );
+		_sphere$3.center.set( 0, 0, 0 );
+		_sphere$3.radius = 0.7071067811865476;
+		_sphere$3.applyMatrix4( sprite.matrixWorld );
 
-		return this.intersectsSphere( _sphere$2 );
+		return this.intersectsSphere( _sphere$3 );
 
 	}
 
@@ -12918,11 +12916,11 @@ class Frustum {
 
 			// corner at max distance
 
-			_vector$7.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-			_vector$7.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-			_vector$7.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+			_vector$6.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+			_vector$6.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+			_vector$6.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-			if ( plane.distanceToPoint( _vector$7 ) < 0 ) {
+			if ( plane.distanceToPoint( _vector$6 ) < 0 ) {
 
 				return false;
 
@@ -13455,7 +13453,7 @@ var iridescence_pars_fragment = "#ifdef USE_IRIDESCENCEMAP\n\tuniform sampler2D 
 
 var output_fragment = "#ifdef OPAQUE\ndiffuseColor.a = 1.0;\n#endif\n#ifdef USE_TRANSMISSION\ndiffuseColor.a *= material.transmissionAlpha + 0.1;\n#endif\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );";
 
-var packing = "vec3 packNormalToRGB( const in vec3 normal ) {\n\treturn normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n\treturn 2.0 * rgb.xyz - 1.0;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\nconst float ShiftRight8 = 1. / 256.;\nvec4 packDepthToRGBA( const in float v ) {\n\tvec4 r = vec4( fract( v * PackFactors ), v );\n\tr.yzw -= r.xyz * ShiftRight8;\treturn r * PackUpscale;\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n\treturn dot( v, UnpackFactors );\n}\nvec2 packDepthToRG( in highp float v ) {\n\treturn packDepthToRGBA( v ).yx;\n}\nfloat unpackRGToDepth( const in highp vec2 v ) {\n\treturn unpackRGBAToDepth( vec4( v.xy, 0.0, 0.0 ) );\n}\nvec4 pack2HalfToRGBA( vec2 v ) {\n\tvec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ) );\n\treturn vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w );\n}\nvec2 unpackRGBATo2Half( vec4 v ) {\n\treturn vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );\n}\nfloat viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( viewZ + near ) / ( near - far );\n}\nfloat orthographicDepthToViewZ( const in float linearClipZ, const in float near, const in float far ) {\n\treturn linearClipZ * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( ( near + viewZ ) * far ) / ( ( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float invClipZ, const in float near, const in float far ) {\n\treturn ( near * far ) / ( ( far - near ) * invClipZ - far );\n}";
+var packing = "vec3 packNormalToRGB( const in vec3 normal ) {\n\treturn normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n\treturn 2.0 * rgb.xyz - 1.0;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\nconst float ShiftRight8 = 1. / 256.;\nvec4 packDepthToRGBA( const in float v ) {\n\tvec4 r = vec4( fract( v * PackFactors ), v );\n\tr.yzw -= r.xyz * ShiftRight8;\treturn r * PackUpscale;\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n\treturn dot( v, UnpackFactors );\n}\nvec2 packDepthToRG( in highp float v ) {\n\treturn packDepthToRGBA( v ).yx;\n}\nfloat unpackRGToDepth( const in highp vec2 v ) {\n\treturn unpackRGBAToDepth( vec4( v.xy, 0.0, 0.0 ) );\n}\nvec4 pack2HalfToRGBA( vec2 v ) {\n\tvec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ) );\n\treturn vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w );\n}\nvec2 unpackRGBATo2Half( vec4 v ) {\n\treturn vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );\n}\nfloat viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( viewZ + near ) / ( near - far );\n}\nfloat orthographicDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\treturn depth * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( ( near + viewZ ) * far ) / ( ( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\treturn ( near * far ) / ( ( far - near ) * depth - far );\n}";
 
 var premultiplied_alpha_fragment = "#ifdef PREMULTIPLIED_ALPHA\n\tgl_FragColor.rgb *= gl_FragColor.a;\n#endif";
 
@@ -29948,7 +29946,7 @@ class InterleavedBuffer {
 
 }
 
-const _vector$6 = /*@__PURE__*/ new Vector3();
+const _vector$5 = /*@__PURE__*/ new Vector3();
 
 class InterleavedBufferAttribute {
 
@@ -29988,11 +29986,11 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
 
-			_vector$6.fromBufferAttribute( this, i );
+			_vector$5.fromBufferAttribute( this, i );
 
-			_vector$6.applyMatrix4( m );
+			_vector$5.applyMatrix4( m );
 
-			this.setXYZ( i, _vector$6.x, _vector$6.y, _vector$6.z );
+			this.setXYZ( i, _vector$5.x, _vector$5.y, _vector$5.z );
 
 		}
 
@@ -30004,11 +30002,11 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$6.fromBufferAttribute( this, i );
+			_vector$5.fromBufferAttribute( this, i );
 
-			_vector$6.applyNormalMatrix( m );
+			_vector$5.applyNormalMatrix( m );
 
-			this.setXYZ( i, _vector$6.x, _vector$6.y, _vector$6.z );
+			this.setXYZ( i, _vector$5.x, _vector$5.y, _vector$5.z );
 
 		}
 
@@ -30020,11 +30018,11 @@ class InterleavedBufferAttribute {
 
 		for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector$6.fromBufferAttribute( this, i );
+			_vector$5.fromBufferAttribute( this, i );
 
-			_vector$6.transformDirection( m );
+			_vector$5.transformDirection( m );
 
-			this.setXYZ( i, _vector$6.x, _vector$6.y, _vector$6.z );
+			this.setXYZ( i, _vector$5.x, _vector$5.y, _vector$5.z );
 
 		}
 
@@ -30707,8 +30705,8 @@ const _basePosition = /*@__PURE__*/ new Vector3();
 const _skinIndex = /*@__PURE__*/ new Vector4();
 const _skinWeight = /*@__PURE__*/ new Vector4();
 
-const _vector$5 = /*@__PURE__*/ new Vector3();
-const _matrix = /*@__PURE__*/ new Matrix4();
+const _vector3 = /*@__PURE__*/ new Vector3();
+const _matrix4 = /*@__PURE__*/ new Matrix4();
 
 class SkinnedMesh extends Mesh {
 
@@ -30813,7 +30811,7 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	boneTransform( index, target ) {
+	applyBoneTransform( index, vector ) {
 
 		const skeleton = this.skeleton;
 		const geometry = this.geometry;
@@ -30821,9 +30819,9 @@ class SkinnedMesh extends Mesh {
 		_skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
 		_skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
 
-		_basePosition.copy( target ).applyMatrix4( this.bindMatrix );
+		_basePosition.copy( vector ).applyMatrix4( this.bindMatrix );
 
-		target.set( 0, 0, 0 );
+		vector.set( 0, 0, 0 );
 
 		for ( let i = 0; i < 4; i ++ ) {
 
@@ -30833,17 +30831,27 @@ class SkinnedMesh extends Mesh {
 
 				const boneIndex = _skinIndex.getComponent( i );
 
-				_matrix.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
+				_matrix4.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
 
-				target.addScaledVector( _vector$5.copy( _basePosition ).applyMatrix4( _matrix ), weight );
+				vector.addScaledVector( _vector3.copy( _basePosition ).applyMatrix4( _matrix4 ), weight );
 
 			}
 
 		}
 
-		return target.applyMatrix4( this.bindMatrixInverse );
+		return vector.applyMatrix4( this.bindMatrixInverse );
 
 	}
+
+	// @deprecated
+
+	boneTransform( index, vector ) {
+
+		console.warn( 'THREE.SkinnedMesh: .boneTransform() was renamed to .applyBoneTransform() in r151.' );
+		return this.applyBoneTransform( index, vector );
+
+	}
+
 
 }
 
@@ -31191,8 +31199,10 @@ const _instanceWorldMatrix = /*@__PURE__*/ new Matrix4();
 
 const _instanceIntersects = [];
 
+const _box3 = /*@__PURE__*/ new Box3();
 const _identity = /*@__PURE__*/ new Matrix4();
 const _mesh = /*@__PURE__*/ new Mesh();
+const _sphere$2 = /*@__PURE__*/ new Sphere();
 
 class InstancedMesh extends Mesh {
 
@@ -31207,11 +31217,74 @@ class InstancedMesh extends Mesh {
 
 		this.count = count;
 
-		this.frustumCulled = false;
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
 		for ( let i = 0; i < count; i ++ ) {
 
 			this.setMatrixAt( i, _identity );
+
+		}
+
+	}
+
+	computeBoundingBox() {
+
+		const geometry = this.geometry;
+		const count = this.count;
+
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new Box3();
+
+		}
+
+		if ( geometry.boundingBox === null ) {
+
+			geometry.computeBoundingBox();
+
+		}
+
+		this.boundingBox.makeEmpty();
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.getMatrixAt( i, _instanceLocalMatrix );
+
+			_box3.copy( geometry.boundingBox ).applyMatrix4( _instanceLocalMatrix );
+
+			this.boundingBox.union( _box3 );
+
+		}
+
+	}
+
+	computeBoundingSphere() {
+
+		const geometry = this.geometry;
+		const count = this.count;
+
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new Sphere();
+
+		}
+
+		if ( geometry.boundingSphere === null ) {
+
+			geometry.computeBoundingSphere();
+
+		}
+
+		this.boundingSphere.makeEmpty();
+
+		for ( let i = 0; i < count; i ++ ) {
+
+			this.getMatrixAt( i, _instanceLocalMatrix );
+
+			_sphere$2.copy( geometry.boundingSphere ).applyMatrix4( _instanceLocalMatrix );
+
+			this.boundingSphere.union( _sphere$2 );
 
 		}
 
@@ -37198,11 +37271,11 @@ class SphereGeometry extends BufferGeometry {
 
 			let uOffset = 0;
 
-			if ( iy == 0 && thetaStart == 0 ) {
+			if ( iy === 0 && thetaStart === 0 ) {
 
 				uOffset = 0.5 / widthSegments;
 
-			} else if ( iy == heightSegments && thetaEnd == Math.PI ) {
+			} else if ( iy === heightSegments && thetaEnd === Math.PI ) {
 
 				uOffset = - 0.5 / widthSegments;
 

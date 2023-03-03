@@ -100,7 +100,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'boneTransform', ( assert ) => {
+		QUnit.todo( 'applyBoneTransform', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

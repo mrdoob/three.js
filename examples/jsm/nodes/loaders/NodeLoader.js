@@ -80,7 +80,7 @@ class NodeLoader extends Loader {
 
 	parse( json ) {
 
-		const node = nodeObject( createNodeFromType( type ) );
+		const node = nodeObject( createNodeFromType( json.type ) );
 		node.uuid = json.uuid;
 
 		const nodes = this.parseNodes( json.nodes );

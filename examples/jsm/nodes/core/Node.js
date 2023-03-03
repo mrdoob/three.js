@@ -1,5 +1,5 @@
 import { NodeUpdateType } from './constants.js';
-import { getNodesKeys, getCacheKey } from './NodeUtils.js';
+import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { MathUtils } from 'three';
 
 const NodeClasses = new Map();
@@ -36,42 +36,17 @@ class Node {
 
 	* getChildren() {
 
-		for ( const property in this ) {
+		const self = this;
 
-			const object = this[ property ];
+		for ( const { property, index, childNode } of getNodeChildren( this ) ) {
 
-			if ( Array.isArray( object ) === true ) {
+			if ( index !== undefined ) {
 
-				for ( let i = 0; i < object.length; i++ ) {
+				yield { childNode, replaceNode( node ) { self[ property ][ index ] = node; } };
 
-					const child = object[ i ];
+			} else {
 
-					if ( child && child.isNode === true ) {
-
-						yield { childNode: child, replaceNode( node ) { object[ i ] = node; } };
-
-					}
-
-				}
-
-			} else if ( object && object.isNode === true ) {
-
-				const self = this;
-				yield { childNode: object, replaceNode( node ) { self[ property ] = node; } };
-
-			} else if ( typeof object === 'object' ) {
-
-				for ( const property in object ) {
-
-					const child = object[ property ];
-
-					if ( child && child.isNode === true ) {
-
-						yield { childNode: child, replaceNode( node ) { object[ property ] = node; } };
-
-					}
-
-				}
+				yield { childNode, replaceNode( node ) { self[ property ] = node; } };
 
 			}
 
@@ -82,6 +57,7 @@ class Node {
 	traverse( callback, replaceNode = null ) {
 
 		callback( this, replaceNode );
+
 		for ( const { childNode, replaceNode } of this.getChildren() ) {
 
 			childNode.traverse( callback, replaceNode );
@@ -194,7 +170,7 @@ class Node {
 		builder.addNode( this );
 		builder.addStack( this );
 
-		/* expected return:
+		/* Build stages expected results:
 			- "construct"	-> Node
 			- "analyze"		-> null
 			- "generate"	-> String
@@ -265,31 +241,31 @@ class Node {
 
 	serialize( json ) {
 
-		const nodeKeys = getNodesKeys( this );
+		const nodeChildren = getNodeChildren( this );
 
-		if ( nodeKeys.length > 0 ) {
+		const inputNodes = {};
 
-			const inputNodes = {};
+		for ( const { property, index, childNode } of nodeChildren ) {
 
-			for ( const property of nodeKeys ) {
+			if ( index !== undefined ) {
 
-				if ( Array.isArray( this[ property ] ) ) {
+				if ( inputNodes[ property ] === undefined ) {
 
-					inputNodes[ property ] = [];
-
-					for ( const node of this[ property ] ) {
-
-						inputNodes[ property ].push( node.toJSON( json.meta ).uuid );
-
-					}
-
-				} else {
-
-					inputNodes[ property ] = this[ property ].toJSON( json.meta ).uuid;
+					inputNodes[ property ] = Number.isInteger( index ) ? [] : {};
 
 				}
 
+				inputNodes[ property ][ index ] = childNode.toJSON( json.meta ).uuid;
+
+			} else {
+
+				inputNodes[ property ] = childNode.toJSON( json.meta ).uuid;
+
 			}
+
+		}
+
+		if ( Object.keys( inputNodes ).length > 0 ) {
 
 			json.inputNodes = inputNodes;
 
@@ -316,6 +292,20 @@ class Node {
 					}
 
 					this[ property ] = inputArray;
+
+				} else if ( typeof json.inputNodes[ property ] === 'object' ) {
+
+					const inputObject = {};
+
+					for ( const subProperty in json.inputNodes[ property ] ) {
+
+						const uuid = json.inputNodes[ property ][ subProperty ];
+					
+						inputObject[ subProperty ] = nodes[ uuid ];
+					
+					}
+
+					this[ property ] = inputObject;
 
 				} else {
 
