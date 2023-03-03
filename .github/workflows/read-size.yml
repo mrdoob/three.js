@@ -31,7 +31,7 @@ jobs:
         run: npm run build-module
       - name: === Test tree-shaking ===
         run: npm run test-treeshake
-      - name: Read tree-shaken size
+      - name: Read bundle sizes
         id: read-size
         run: |
           FILESIZE=$(stat --format=%s test/treeshake/three.module.min.js)
