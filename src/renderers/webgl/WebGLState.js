@@ -26,6 +26,12 @@ function WebGLState( gl, extensions, capabilities ) {
 
 			},
 
+			getMask: function () {
+
+				return currentColorMask;
+
+			},
+
 			setLocked: function ( lock ) {
 
 				locked = lock;
@@ -71,20 +77,33 @@ function WebGLState( gl, extensions, capabilities ) {
 		let currentDepthMask = null;
 		let currentDepthFunc = null;
 		let currentDepthClear = null;
+		let currentDepthTest = null;
 
 		return {
 
 			setTest: function ( depthTest ) {
 
-				if ( depthTest ) {
+				if ( depthTest !== currentDepthTest ) {
 
-					enable( gl.DEPTH_TEST );
+					if ( depthTest ) {
 
-				} else {
+						enable( gl.DEPTH_TEST );
 
-					disable( gl.DEPTH_TEST );
+					} else {
+
+						disable( gl.DEPTH_TEST );
+
+					}
+
+					currentDepthTest = depthTest;
 
 				}
+
+			},
+
+			getTest: function () {
+
+				return currentDepthTest;
 
 			},
 

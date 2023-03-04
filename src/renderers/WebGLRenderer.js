@@ -800,6 +800,34 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
+		if ( material.depthPrepass && material.transparent ) {
+
+			const originalDepthTest = state.buffers.depth.getTest();
+			const originalColorMask = state.buffers.color.getMask();
+			state.buffers.depth.setTest( true );
+			state.buffers.color.setMask( 0 );
+
+			if ( object.isInstancedMesh ) {
+
+				renderer.renderInstances( drawStart, drawCount, object.count );
+
+			} else if ( geometry.isInstancedBufferGeometry ) {
+
+				const instanceCount = Math.min( geometry.instanceCount, geometry._maxInstanceCount );
+
+				renderer.renderInstances( drawStart, drawCount, instanceCount );
+
+			} else {
+
+				renderer.render( drawStart, drawCount );
+
+			}
+
+			state.buffers.depth.setTest( originalDepthTest );
+			state.buffers.color.setMask( originalColorMask );
+
+		}
+
 		if ( object.isInstancedMesh ) {
 
 			renderer.renderInstances( drawStart, drawCount, object.count );
