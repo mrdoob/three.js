@@ -92,6 +92,10 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.color.value.copy( material.color );
 			uniforms.opacity.value = material.opacity;
 
+		} else if ( material.isVelocityMaterial ) {
+
+			refreshUniformsVelocity( uniforms, material );
+
 		} else if ( material.isShaderMaterial ) {
 
 			material.uniformsNeedUpdate = false; // #15581
@@ -366,6 +370,14 @@ function WebGLMaterials( renderer, properties ) {
 
 		uniforms.diffuse.value.copy( material.color );
 		uniforms.opacity.value = material.opacity;
+
+	}
+
+	function refreshUniformsVelocity( uniforms, material ) {
+
+		uniforms.previousViewMatrices.value[ 0 ].copy( material.previousViewMatrices[ 0 ] );
+		uniforms.previousViewMatrices.value[ 1 ].copy( material.previousViewMatrices[ 1 ] );
+		uniforms.previousModelMatrix.value.copy( material.previousModelMatrix );
 
 	}
 

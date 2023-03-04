@@ -24,6 +24,7 @@ class InstancedMesh extends Mesh {
 
 		this.instanceMatrix = new InstancedBufferAttribute( new Float32Array( count * 16 ), 16 );
 		this.instanceColor = null;
+		this.previousInstanceMatrix = null;
 
 		this.count = count;
 

@@ -15,6 +15,7 @@ import { MeshBasicMaterial } from './MeshBasicMaterial.js';
 import { MeshMatcapMaterial } from './MeshMatcapMaterial.js';
 import { LineDashedMaterial } from './LineDashedMaterial.js';
 import { LineBasicMaterial } from './LineBasicMaterial.js';
+import { VelocityMaterial } from './VelocityMaterial.js';
 import { Material } from './Material.js';
 
 export {
@@ -35,5 +36,6 @@ export {
 	MeshMatcapMaterial,
 	LineDashedMaterial,
 	LineBasicMaterial,
+	VelocityMaterial,
 	Material
 };
