@@ -459,7 +459,16 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
+		_currentViewport.copy( _viewport );
+
+		// pixel ratio only applies to the canvas
+		if ( _currentRenderTarget === null ) {
+
+			_currentViewport.multiplyScalar( _pixelRatio );
+
+		}
+
+		state.viewport( _currentViewport.floor() );
 
 	};
 
@@ -481,7 +490,16 @@ function WebGLRenderer( parameters = {} ) {
 
 		}
 
-		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
+		_currentScissor.copy( _scissor );
+
+		// pixel ratio only applies to the canvas
+		if ( _currentRenderTarget === null ) {
+
+			_currentScissor.multiplyScalar( _pixelRatio );
+
+		}
+
+		state.scissor( _currentScissor.floor() );
 
 	};
 
