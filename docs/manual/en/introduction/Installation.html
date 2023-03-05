@@ -9,20 +9,6 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p>
-			Most web developers install JavaScript libraries like three.js from the [link:https://www.npmjs.com/ npm package registry], then develop their project using [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC build tools] like Vite or Webpack. Because three.js is also popular with many communities that may not be as familiar with these tools, this guide also describes a simplified "static" installation using a [link:https://developer.mozilla.org/en-US/docs/Glossary/CDN CDN] instead of a build tool.
-		</p>
-
-		<h2>Quickstart</h2>
-
-		<p>
-			If you already know how to set up a project and install npm dependencies, you can skip the rest of this <i>Installation</i>  guide and install three.js with the line below. Otherwise, continue to <i>Project structure</i> section.
-		</p>
-
-		<code>
-			npm install --save three
-		</code>
-
 		<h2>Project structure</h2>
 
 		<p>
@@ -67,15 +53,15 @@ import * as THREE from 'three';
 		</ul>
 
 		<p>
-			Now that we've set up the basic project structure, we need a way to run the project locally and access it through a web browser.
+			Now that we've set up the basic project structure, we need a way to run the project locally and access it through a web browser. Installation and local development can be accomplished with npm and a build tool, or by importing three.js from a CDN. Both options are explained in the sections below.
 		</p>
 
-		<h2>Option 1: Installing with a build tool</h2>
+		<h2>Option 1: Install with NPM and a build tool</h2>
 
 		<h3>Development</h3>
 
 		<p>
-			Installing from npm and using a build tool is the recommended approach for most users — the more dependencies your project needs, the more likely you are to run into problems that the static hosting cannot easily resolve. With a build tool, importing local JavaScript files and npm packages should work out of the box, without import maps.
+			Installing from the [link:https://www.npmjs.com/ npm package registry] and using a [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC build tool] is the recommended approach for most users — the more dependencies your project needs, the more likely you are to run into problems that the static hosting cannot easily resolve. With a build tool, importing local JavaScript files and npm packages should work out of the box, without import maps.
 		</p>
 
 
@@ -151,7 +137,7 @@ npm install --save-dev vite
 			Later, when you're ready to deploy your web application, you'll just need to tell Vite to run a production build — <i>npx vite build</i>. Everything used by the application will be compiled, optimized, and copied into the <i>dist/</i> folder. The contents of that folder are ready to be hosted on your website.
 		</p>
 
-		<h2>Option 2: Importing from a CDN</h2>
+		<h2>Option 2: Import from a CDN</h2>
 
 		<h3>Development</h3>
 
@@ -270,6 +256,12 @@ const loader = new GLTFLoader();
 
 		<p>
 			Some excellent third-party projects are available for three.js, too. These need to be installed separately — see [link:#manual/introduction/Libraries-and-Plugins Libraries and Plugins].
+		</p>
+
+		<h2>Next Steps</h2>
+
+		<p>
+			You're now ready to [link:#manual/introduction/Creating-a-scene create a scene].
 		</p>
 
 	</body>
