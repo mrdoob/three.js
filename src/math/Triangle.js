@@ -83,18 +83,20 @@ class Triangle {
 
 	static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
 
+		console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
+
 		return this.getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target );
 
 	}
 
-	static getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target ) {
+	static getInterpolation( point, p1, p2, p3, v1, v2, v3, target ) {
 
 		this.getBarycoord( point, p1, p2, p3, _v3 );
 
 		target.setScalar( 0 );
-		target.addScaledVector( uv1, _v3.x );
-		target.addScaledVector( uv2, _v3.y );
-		target.addScaledVector( uv3, _v3.z );
+		target.addScaledVector( v1, _v3.x );
+		target.addScaledVector( v2, _v3.y );
+		target.addScaledVector( v3, _v3.z );
 
 		return target;
 
@@ -191,7 +193,15 @@ class Triangle {
 
 	getUV( point, uv1, uv2, uv3, target ) {
 
+		console.warn( 'Triangle.getUV() has been renamed to Triangle.getInterpolation().' );
+
 		return Triangle.getInterpolation( point, this.a, this.b, this.c, uv1, uv2, uv3, target );
+
+	}
+
+	getInterpolation( point, v1, v2, v3, target ) {
+
+		return Triangle.getInterpolation( point, this.a, this.b, this.c, v1, v2, v3, target );
 
 	}
 
