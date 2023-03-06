@@ -1086,6 +1086,47 @@ function WebGLRenderer( parameters = {} ) {
 
 	};
 
+	this.renderShadowMap = function ( lightsWithShadows, scene, camera ) {
+
+		// update scene graph
+
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
+
+		// update camera matrices and frustum
+
+		if ( camera.parent === null ) camera.updateMatrixWorld();
+
+		currentRenderState = renderStates.get( scene, renderStateStack.length );
+		currentRenderState.init();
+
+		renderStateStack.push( currentRenderState );
+
+		// We don't need a full init of currentRenderState - we're just updating the lights specified in lightsWithShadows.
+
+		_localClippingEnabled = this.localClippingEnabled;
+		_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
+
+		if ( _clippingEnabled === true ) clipping.beginShadows();
+
+		shadowMap.needsUpdate = true;
+		shadowMap.render( lightsWithShadows, scene, camera, clipping );
+
+		if ( _clippingEnabled === true ) clipping.endShadows( camera );
+
+		renderStateStack.pop();
+
+		if ( renderStateStack.length > 0 ) {
+
+			currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
+
+		} else {
+
+			currentRenderState = null;
+
+		}
+
+	};
+
 	function projectObject( object, camera, groupOrder, sortObjects ) {
 
 		if ( object.visible === false ) return;

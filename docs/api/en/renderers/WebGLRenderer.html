@@ -412,6 +412,13 @@
 			[page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false. To forcibly clear one or more buffers call [page:WebGLRenderer.clear .clear].
 		</p>
 
+		<h3>[method:undefined renderShadowMap]( [param:Array lightsWithShadows], [param:Object3D scene], [param:Camera camera] )</h3>
+		<p>
+			Update the shadow maps of the lights in lightsWithShadows without doing any other rendering. The [page:Camera camera] passed in should be the regular camera, not a shadow camera.<br />
+
+			All lights passed in should have shadow maps enabled. [page:WebGLRenderer.shadowMap shadowMap.autoUpdate] should typically be set to false in case you want to update shadow maps manually with this function.
+		</p>
+
 		<h3>[method:undefined resetState]()</h3>
 		<p>Can be used to reset the internal WebGL state. This method is mostly relevant for applications which share a single WebGL context across multiple WebGL libraries.</p>
 

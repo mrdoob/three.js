@@ -220,6 +220,7 @@
 		"webgl_shaders_tonemapping",
 		"webgl_shadow_contact",
 		"webgl_shadowmap",
+		"webgl_shadowmap_manual_update",
 		"webgl_shadowmap_performance",
 		"webgl_shadowmap_pointlight",
 		"webgl_shadowmap_viewer",
