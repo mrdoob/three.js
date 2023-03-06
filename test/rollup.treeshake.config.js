@@ -70,4 +70,17 @@ export default [
 			}
 		]
 	},
+	// esm bundle size minified, used in read-size.yml
+	{
+		input: 'build/three.module.js',
+		plugins: [
+			terser(),
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/three.module.min.js'
+			}
+		]
+	},
 ];
