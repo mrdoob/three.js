@@ -21,6 +21,11 @@ jobs:
     if: github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
     steps:
+      - name: Log GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
       # Using actions/download-artifact doesn't work here
       # https://github.com/actions/download-artifact/issues/60
       - name: Download artifact
@@ -101,13 +106,13 @@ jobs:
         uses: peter-evans/find-comment@v2
         id: find-comment
         with:
-          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-author: 'github-actions[bot]'
           body-includes: Bundle size
       - name: Comment on PR
         uses: peter-evans/create-or-update-comment@v2
         with:
-          issue-number: ${{ github.event.workflow_run.pull_requests[0].number }}
+          issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           edit-mode: replace
           body: |
