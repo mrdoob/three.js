@@ -117,6 +117,9 @@ jobs:
             | ${{ steps.format.outputs.FILESIZE }} | ${{ steps.format.outputs.FILESIZE_GZIP }} | ${{ steps.format.outputs.FILESIZE_DIFF }} |
 
             ### 🌳 Bundle size after tree-shaking
+
+            _Includes a renderer, camera, and empty scene._
+
             | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
             |----------|---------|------|
             | ${{ steps.format.outputs.TREESHAKEN }} | ${{ steps.format.outputs.TREESHAKEN_GZIP }} | ${{ steps.format.outputs.TREESHAKEN_DIFF }} |
