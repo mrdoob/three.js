@@ -340,6 +340,7 @@
 				"DragControls": "examples/en/controls/DragControls",
 				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
 				"FlyControls": "examples/en/controls/FlyControls",
+				"MapControls": "examples/en/controls/MapControls",
 				"OrbitControls": "examples/en/controls/OrbitControls",
 				"PointerLockControls": "examples/en/controls/PointerLockControls",
 				"TrackballControls": "examples/en/controls/TrackballControls",
