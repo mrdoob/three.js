@@ -1,7 +1,4 @@
-import {
-	MOUSE,
-	TOUCH,
-} from 'three';
+import { MOUSE, TOUCH } from 'three';
 
 import { OrbitControls } from './OrbitControls.js';
 
@@ -20,11 +17,9 @@ class MapControls extends OrbitControls {
 
 		this.screenSpacePanning = false; // pan orthogonal to world-space direction camera.up
 
-		this.mouseButtons.LEFT = MOUSE.PAN;
-		this.mouseButtons.RIGHT = MOUSE.ROTATE;
+		this.mouseButtons = { LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE };
 
-		this.touches.ONE = TOUCH.PAN;
-		this.touches.TWO = TOUCH.DOLLY_ROTATE;
+		this.touches = { ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_ROTATE };
 
 	}
 
