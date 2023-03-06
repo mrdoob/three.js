@@ -117,13 +117,16 @@ jobs:
           edit-mode: replace
           body: |
             ### 📦 Bundle size
+            
+            _Full ESM build, minified and gzipped._
+            
             | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
             |----------|---------|------|
             | ${{ steps.format.outputs.FILESIZE }} | ${{ steps.format.outputs.FILESIZE_GZIP }} | ${{ steps.format.outputs.FILESIZE_DIFF }} |
 
             ### 🌳 Bundle size after tree-shaking
 
-            _Includes a renderer, camera, and empty scene._
+            _Minimal build including a renderer, camera, empty scene, and dependencies._
 
             | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
             |----------|---------|------|
