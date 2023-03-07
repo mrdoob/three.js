@@ -125,20 +125,19 @@
 
 		<h3>[property:Boolean isBufferGeometry]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			用于判断对象是否为[name]的只读标记.
 		</p>
 
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
 			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 morph targets 的细节信息。<br />
-			Note: Once the geometry has been rendered, the morph attribute data cannot be changed. You will have to call [page:.dispose](), and create a new instance of [name].
+			注意：当这个geometry渲染之后，morph attribute 数据无法更改。你需要调用[page:.dispose]()，并重新创建一个新的[name]实例。
 		</p>
 
 		<h3>[property:Boolean morphTargetsRelative]</h3>
 		<p>
-			Used to control the morph target behavior; when set to true, the morph target data is treated as relative offsets, rather than as absolute positions/normals.
-
-			Default is *false*.
+			用于控制morph target的行为，如果设置为 `true`，morph target数据作为相对的偏移量，而非绝对的位置/法向。
+			默认为*false*。
 		</p>
 
 		<h3>[property:String name]</h3>
