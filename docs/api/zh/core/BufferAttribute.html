@@ -16,11 +16,10 @@
 			在 BufferAttribute 中，数据被存储为任意长度的矢量（通过[page:BufferAttribute.itemSize itemSize]进行定义），下列函数如无特别说明，
 			函数参数中的index会自动乘以矢量长度进行计算。
 
-			When working with vector-like data, the <i>.fromBufferAttribute( attribute, index )</i>
-			helper methods on [page:Vector2.fromBufferAttribute Vector2],
-			[page:Vector3.fromBufferAttribute Vector3],
-			[page:Vector4.fromBufferAttribute Vector4], and
-			[page:Color.fromBufferAttribute Color] classes may be helpful.
+			当想要处理类似向量的数据时，
+			可以使用在[page:Vector2.fromBufferAttribute Vector2]，[page:Vector3.fromBufferAttribute Vector3]，
+			[page:Vector4.fromBufferAttribute Vector4]以及[page:Color.fromBufferAttribute Color]这些类中的<i>.fromBufferAttribute( attribute, index )</i>
+			方法来更为便捷地处理。
 		</p>
 
 		<h2>构造函数</h2>
@@ -59,7 +58,7 @@
 
 		<h3>[property:Boolean isBufferAttribute]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			用于判断对象是否为[name]类型的只读标记.
 		</p>
 
 		<h3>[property:Integer itemSize]</h3>
@@ -96,9 +95,8 @@
 
 		<h3>[property:Usage usage]</h3>
 		<p>
-			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
-			Default is [page:BufferAttributeUsage StaticDrawUsage]. See usage [page:BufferAttributeUsage constants] for all possible values.
+			为输入的数据定义最优的预估使用方式。等同于在[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]()
+			中的*usage*参数。默认为[page:BufferAttributeUsage StaticDrawUsage]。在usage [page:BufferAttributeUsage constants]中查看可用值。
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -108,16 +106,16 @@
 		<h2>方法</h2>
 
 		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
-		<p>Applies matrix [page:Matrix3 m] to every Vector3 element of this BufferAttribute.</p>
+		<p>将矩阵[page:Matrix3 m]应用此BufferAttribute中的每一个Vector3元素中。</p>
 
 		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
-		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this BufferAttribute.</p>
+		<p>将矩阵[page:Matrix4 m]应用到此BufferAttribute的每一个Vector3元素中</p>
 
 		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
-		<p>Applies normal matrix [page:Matrix3 m] to every Vector3 element of this BufferAttribute.</p>
+		<p>将正规矩阵[page:Matrix3 m]应用到此BufferAttribute的每一个Vector3元素中</p>
 
 		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
-		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this BufferAttribute, interpreting the elements as a direction vectors.</p>
+		<p>将矩阵[page:Matrix4 m]应用到此BufferAttribute的每一个Vector3元素中，并将所有元素解释为方向向量。</p>
 
 		<h3>[method:BufferAttribute clone]() </h3>
 		<p>返回该 BufferAttribute 的拷贝。</p>
