@@ -30705,6 +30705,7 @@ const _skinWeight = /*@__PURE__*/ new Vector4();
 
 const _vector3 = /*@__PURE__*/ new Vector3();
 const _matrix4 = /*@__PURE__*/ new Matrix4();
+const _vertex = /*@__PURE__*/ new Vector3();
 
 class SkinnedMesh extends Mesh {
 
@@ -30719,6 +30720,57 @@ class SkinnedMesh extends Mesh {
 		this.bindMode = 'attached';
 		this.bindMatrix = new Matrix4();
 		this.bindMatrixInverse = new Matrix4();
+
+		this.boundingBox = null;
+		this.boundingSphere = null;
+
+	}
+
+	computeBoundingBox() {
+
+		const geometry = this.geometry;
+
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new Box3();
+
+		}
+
+		this.boundingBox.makeEmpty();
+
+		const positionAttribute = geometry.getAttribute( 'position' );
+
+		for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+			_vertex.fromBufferAttribute( positionAttribute, i );
+			this.applyBoneTransform( i, _vertex );
+			this.boundingBox.expandByPoint( _vertex );
+
+		}
+
+	}
+
+	computeBoundingSphere() {
+
+		const geometry = this.geometry;
+
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new Sphere();
+
+		}
+
+		this.boundingSphere.makeEmpty();
+
+		const positionAttribute = geometry.getAttribute( 'position' );
+
+		for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+			_vertex.fromBufferAttribute( positionAttribute, i );
+			this.applyBoneTransform( i, _vertex );
+			this.boundingSphere.expandByPoint( _vertex );
+
+		}
 
 	}
 
@@ -31323,6 +31375,17 @@ class InstancedMesh extends Mesh {
 		_mesh.material = this.material;
 
 		if ( _mesh.material === undefined ) return;
+
+		// test with bounding sphere first
+
+		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+
+		_sphere$2.copy( this.boundingSphere );
+		_sphere$2.applyMatrix4( matrixWorld );
+
+		if ( raycaster.ray.intersectsSphere( _sphere$2 ) === false ) return;
+
+		// now test each instance
 
 		for ( let instanceId = 0; instanceId < raycastTimes; instanceId ++ ) {
 
