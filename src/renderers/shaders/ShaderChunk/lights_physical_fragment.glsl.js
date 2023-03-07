@@ -128,7 +128,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#else
 
-		vec2 anisotropyV = vec2( 1.0 , 0.0 );
+		vec2 anisotropyV = vec2( 0.0 , 1.0 );
 		material.anisotropy = anisotropy;
 
 	#endif

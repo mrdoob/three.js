@@ -22,7 +22,7 @@ export default /* glsl */`
 
 	#ifdef USE_ANISOTROPY
 
-		radiance += getIBLAnisotropyRadiance( geometry.viewDir, geometry.normal, material.roughness, material.anisotropyB, material.anisotropy );
+		radiance += getIBLAnisotropyRadiance( geometry.viewDir, geometry.normal, material.roughness, material.anisotropyT, material.anisotropy );
 
 	#else
 

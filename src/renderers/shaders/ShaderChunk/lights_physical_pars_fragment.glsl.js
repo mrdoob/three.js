@@ -90,9 +90,9 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 
 	float V_GGX_SmithCorrelated_Anisotropic( const in float alphaT, const in float alphaB, const in float dotTV, const in float dotBV, const in float dotTL, const in float dotBL, const in float dotNV, const in float dotNL ) {
 
-		float lambdaV = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );
-		float lambdaL = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );
-		float v = 0.5 / ( lambdaV + lambdaL );
+		float gv = dotNL * length( vec3( alphaT * dotTV, alphaB * dotBV, dotNV ) );
+		float gl = dotNV * length( vec3( alphaT * dotTL, alphaB * dotBL, dotNL ) );
+		float v = 0.5 / ( gv + gl );
 
 		return saturate(v);
 
@@ -105,7 +105,7 @@ float D_GGX( const in float alpha, const in float dotNH ) {
 		highp float v2 = dot( v, v );
 		float w2 = a2 / v2;
 
-		return a2 * w2 * w2 * ( 1.0 * RECIPROCAL_PI );
+		return RECIPROCAL_PI * a2 * pow2 ( w2 );
 
 	}
 
@@ -166,12 +166,12 @@ vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 norm
 
 	#ifdef USE_ANISOTROPY
 
-		float dotTL = saturate( dot( material.anisotropyT, lightDir ) );
-		float dotTV = saturate( dot( material.anisotropyT, viewDir ) );
-		float dotTH = saturate( dot( material.anisotropyT, halfDir ) );
-		float dotBL = saturate( dot( material.anisotropyB, lightDir ) );
-		float dotBV = saturate( dot( material.anisotropyB, viewDir ) );
-		float dotBH = saturate( dot( material.anisotropyB, halfDir ) );
+		float dotTL = dot( material.anisotropyT, lightDir );
+		float dotTV = dot( material.anisotropyT, viewDir );
+		float dotTH = dot( material.anisotropyT, halfDir );
+		float dotBL = dot( material.anisotropyB, lightDir );
+		float dotBV = dot( material.anisotropyB, viewDir );
+		float dotBH = dot( material.anisotropyB, halfDir );
 
 		float V = V_GGX_SmithCorrelated_Anisotropic( alpha, material.alphaB, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );
 

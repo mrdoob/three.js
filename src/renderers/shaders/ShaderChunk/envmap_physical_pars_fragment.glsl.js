@@ -44,12 +44,12 @@ export default /* glsl */`
 
 	#ifdef USE_ANISOTROPY
 
-		vec3 getIBLAnisotropyRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness, const in vec3 bitangent, const in float anisotropy ) {
+		vec3 getIBLAnisotropyRadiance( const in vec3 viewDir, const in vec3 normal, const in float roughness, const in vec3 tangent, const in float anisotropy ) {
 
 			#ifdef ENVMAP_TYPE_CUBE_UV
 
-				vec3 bentNormal = cross( bitangent, viewDir );
-				bentNormal = normalize( cross( bentNormal, bitangent ) );
+				vec3 bentNormal = cross( tangent, viewDir );
+				bentNormal = normalize( cross( bentNormal, tangent ) );
 				bentNormal = normalize( mix( normal , bentNormal, anisotropy * ( 1.0 - roughness * roughness ) ) );
 
 				return getIBLRadiance( viewDir, bentNormal, roughness );
