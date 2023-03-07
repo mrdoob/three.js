@@ -95,10 +95,6 @@
 	[page:Material material] —— （可选）一个[page:Material]实例，默认值是一个新的[page:MeshBasicMaterial]。
 		</p>
 
-
-
-
-
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Mesh]。</p>
 
@@ -119,6 +115,16 @@
 			该基础矩阵用于重置绑定骨骼的变换。
 		</p>
 
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			The bounding box of the [name]. Can be calculated with [page:.computeBoundingBox](). Default is `null`.
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			The bounding sphere of the [name]. Can be calculated with [page:.computeBoundingSphere](). Default is `null`.
+		</p>
+
 		<h3>[property:Boolean isSkinnedMesh]</h3>
 		<p>
 			Read-only flag to check if a given object is of type [name].
@@ -129,10 +135,13 @@
 			用于表示蒙皮网格中骨骼的层次结构的[page:Skeleton]（骨架）。
 		</p>
 
-
-
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Mesh]。</p>
+
+		<h3>[method:Vector3 applyBoneTransform]( [param:Integer index], [param:Vector3 vector] )</h3>
+		<p>
+		Applies the bone transform associated with the given index to the given position vector. Returns the updated vector.
+		</p>
 
 		<h3>[method:undefined bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
 		<p>
@@ -144,6 +153,20 @@
 		<h3>[method:SkinnedMesh clone]()</h3>
 		<p>
 		This method does currently not clone an instance of [name] correctly. Please use [page:SkeletonUtils.clone]() in the meanwhile.
+		</p>
+
+		<h3>[method:undefined computeBoundingBox]()</h3>
+		<p>
+		Computes the bounding box, updating [page:.boundingBox] attribute.<br />
+		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are `null`.
+		If an instance of [name] is animated, this method should be called per frame to compute a correct bounding box.
+		</p>
+
+		<h3>[method:undefined computeBoundingSphere]()</h3>
+		<p>
+		Computes the bounding sphere, updating [page:.boundingSphere] attribute.<br />
+		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are `null`.
+		If an instance of [name] is animated, this method should be called per frame to compute a correct bounding sphere.
 		</p>
 
 		<h3>[method:undefined normalizeSkinWeights]()</h3>
