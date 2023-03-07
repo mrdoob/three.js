@@ -47,6 +47,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.legacyMode = false;
+
 			// Add the extension functions
 			THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
 			THREE.BufferGeometry.prototype.disposeBoundsTree = disposeBoundsTree;
@@ -97,6 +99,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
