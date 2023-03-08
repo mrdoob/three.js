@@ -101,7 +101,7 @@
     "puppeteer-core": "^19.7.2",
     "qunit": "^2.19.4",
     "rollup": "^3.17.2",
-    "rollup-plugin-filesize": "^9.1.2",
+    "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
     "servez": "^1.14.1"
   },
