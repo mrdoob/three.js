@@ -60,6 +60,7 @@
 				followSphere: false,
 				turnHead: true,
 				ik_solver: true,
+				update: updateIK
 			};
 
 			scene = new THREE.Scene();
@@ -84,7 +85,7 @@
 			document.body.appendChild( stats.dom );
 
 			orbitControls = new OrbitControls( camera, renderer.domElement );
-			orbitControls.minDistance = .2;
+			orbitControls.minDistance = 0.2;
 			orbitControls.maxDistance = 1.5;
 			orbitControls.enableDamping = true;
 
@@ -105,8 +106,6 @@
 				if ( n.name === 'boule' ) OOI.sphere = n;
 				if ( n.name === 'Kira_Shirt_left' ) OOI.kira = n;
 
-				if ( n.isMesh ) n.frustumCulled = false;
-
 			} );
 			scene.add( gltf.scene );
 
@@ -121,11 +120,12 @@
 			OOI.sphere.material = mirrorSphereMaterial;
 
 			transformControls = new TransformControls( camera, renderer.domElement );
-			transformControls.size = .75;
+			transformControls.size = 0.75;
 			transformControls.showX = false;
 			transformControls.space = 'world';
 			transformControls.attach( OOI.target_hand_l );
 			scene.add( transformControls );
+		
 			// disable orbitControls while using transformControls
 			transformControls.addEventListener( 'mouseDown', () => orbitControls.enabled = false );
 			transformControls.addEventListener( 'mouseUp', () => orbitControls.enabled = true );
@@ -157,7 +157,7 @@
 			gui.add( conf, 'followSphere' ).name( 'follow sphere' );
 			gui.add( conf, 'turnHead' ).name( 'turn head' );
 			gui.add( conf, 'ik_solver' ).name( 'IK auto update' );
-			gui.add( IKSolver, 'update' ).name( 'IK manual update()' );
+			gui.add( conf, 'update' ).name( 'IK manual update()' );
 			gui.open();
 
 			window.addEventListener( 'resize', onWindowResize, false );
@@ -179,7 +179,7 @@
 
 				// orbitControls follows the sphere
 				OOI.sphere.getWorldPosition( v0 );
-				orbitControls.target.lerp( v0, .1 );
+				orbitControls.target.lerp( v0, 0.1 );
 
 			}
 
@@ -194,7 +194,7 @@
 
 			if ( conf.ik_solver ) {
 
-				if ( IKSolver ) IKSolver.update();
+				updateIK();
 
 			}
 
@@ -204,6 +204,18 @@
 			stats.update(); // fps stats
 
 			requestAnimationFrame( animate );
+
+		}
+
+		function updateIK() {
+
+			if ( IKSolver ) IKSolver.update();
+
+			scene.traverse( function ( object ) {
+
+				if ( object.isSkinnedMesh ) object.computeBoundingSphere();
+
+			} );
 
 		}
 
