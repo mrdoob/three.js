@@ -1683,8 +1683,6 @@ class GLTFMeshGpuInstancing {
 				// Just in case
 				Object3D.prototype.copy.call( instancedMesh, mesh );
 
-				// https://github.com/mrdoob/three.js/issues/18334
-				instancedMesh.frustumCulled = false;
 				this.parser.assignFinalMaterial( instancedMesh );
 
 				instancedMeshes.push( instancedMesh );
