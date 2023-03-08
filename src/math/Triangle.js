@@ -83,7 +83,7 @@ class Triangle {
 
 	static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
 
-		console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
+		console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // r151
 
 		return this.getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target );
 
@@ -193,7 +193,7 @@ class Triangle {
 
 	getUV( point, uv1, uv2, uv3, target ) {
 
-		console.warn( 'Triangle.getUV() has been renamed to Triangle.getInterpolation().' );
+		console.warn( 'Triangle.getUV() has been renamed to Triangle.getInterpolation().' ); // r151
 
 		return Triangle.getInterpolation( point, this.a, this.b, this.c, uv1, uv2, uv3, target );
 
