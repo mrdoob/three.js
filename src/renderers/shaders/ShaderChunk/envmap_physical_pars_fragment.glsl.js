@@ -48,6 +48,7 @@ export default /* glsl */`
 
 			#ifdef ENVMAP_TYPE_CUBE_UV
 
+			  // https://google.github.io/filament/Filament.md.html#lighting/imagebasedlights/anisotropy
 				vec3 bentNormal = cross( tangent, viewDir );
 				bentNormal = normalize( cross( bentNormal, tangent ) );
 				bentNormal = normalize( mix( bentNormal, normal, pow2( pow2( 1.0 - anisotropy * ( 1.0 - roughness ) ) ) ) );
