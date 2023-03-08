@@ -50,7 +50,7 @@ export default /* glsl */`
 
 				vec3 bentNormal = cross( tangent, viewDir );
 				bentNormal = normalize( cross( bentNormal, tangent ) );
-				bentNormal = normalize( mix( normal , bentNormal, anisotropy * ( 1.0 - roughness * roughness ) ) );
+				bentNormal = normalize( mix( bentNormal, normal, pow2( pow2( 1.0 - anisotropy * ( 1.0 - roughness ) ) ) ) );
 
 				return getIBLRadiance( viewDir, bentNormal, roughness );
 
