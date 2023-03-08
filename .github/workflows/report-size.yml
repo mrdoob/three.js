@@ -73,6 +73,11 @@ jobs:
         run: |
           FILESIZE_BASE=$(stat --format=%s test/treeshake/three.module.min.js)
           TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
+
+          # log to console
+          echo "FILESIZE_BASE=$FILESIZE_BASE"
+          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE"
+
           echo "FILESIZE_BASE=$FILESIZE_BASE" >> $GITHUB_OUTPUT
           echo "TREESHAKEN_BASE=$TREESHAKEN_BASE" >> $GITHUB_OUTPUT
 
@@ -117,9 +122,9 @@ jobs:
           edit-mode: replace
           body: |
             ### 📦 Bundle size
-            
+
             _Full ESM build, minified and gzipped._
-            
+
             | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
             |----------|---------|------|
             | ${{ steps.format.outputs.FILESIZE }} | ${{ steps.format.outputs.FILESIZE_GZIP }} | ${{ steps.format.outputs.FILESIZE_DIFF }} |
