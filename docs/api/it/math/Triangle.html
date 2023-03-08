@@ -111,15 +111,15 @@
 		Calcola il [page:Plane piano] in base al triangolo.
 		</p>
 
-		<h3>[method:Vector2 getUV]( [param:Vector3 point], [param:Vector2 uv1], [param:Vector2 uv2], [param:Vector2 uv3], [param:Vector2 target] )</h3>
+		<h3>[method:Vector2 getInterpolation]( [param:Vector3 point], [param:Vector2 v1] | [param:Vector3 v1] | [param:Vector4 v1], [param:Vector2 v2] | [param:Vector3 v2] | [param:Vector4 v3], [param:Vector2 v3] | [param:Vector3 v3] | [param:Vector4 v3], [param:Vector2 target] )</h3>
 		<p>
 		[page:Vector3 point] - Il punto sul triangolo.<br />
-		[page:Vector2 uv1] - La coordinata uv del primo vertice del triangolo.<br />
-		[page:Vector2 uv2] - La coordinata uv del secondo vertice del triangolo.<br />
-		[page:Vector2 uv3] - La coordinata uv del terzo vertice del triangolo.<br />
-		[page:Vector2 target] — il risultato sarà copiato in questo Vector2.<br /><br />
+		[page:Vector2 v1] - La valore del primo vertice del triangolo.<br />
+		[page:Vector2 v2] - La valore del secondo vertice del triangolo.<br />
+		[page:Vector2 v3] - La valore del terzo vertice del triangolo.<br />
+		[page:Vector2 target] — il risultato sarà copiato in questo Vector.<br /><br />
 
-		Restituisce le coordinate uv per il punto specificato sul triangolo.
+		Restituisce le valore interpolato baricentricamente per il punto specificato sul triangolo.
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
