@@ -1240,6 +1240,12 @@ class GLTFMaterialsAnisotropyExtension {
 
 		}
 
+		if ( extension.anisotropyDirection !== undefined ) {
+
+			materialParams.anisotropyAngle = extension.anisotropyDirection;
+
+		}
+
 		if ( extension.anisotropyTexture !== undefined ) {
 
 			pending.push( parser.assignTexture( materialParams, 'anisotropyMap', extension.anisotropyTexture ) );

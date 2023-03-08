@@ -122,16 +122,20 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#ifdef USE_ANISOTROPYMAP
 
-		vec2 anisotropyV = texture2D( anisotropyMap, vUv ).rg * anisotropy;
-		material.anisotropy = length( anisotropyV );
-		anisotropyV /= material.anisotropy;
+		mat2 anisotropyMap;
+		anisotropyMap[ 0 ] = anisotropyVector;
+		anisotropyMap[ 1 ] = vec2( anisotropyVector.y, -1.0 * anisotropyVector.x );
+		vec2 anisotropyV = anisotropyMap * texture2D( anisotropyMap, vUv ).rg;
 
 	#else
 
-		vec2 anisotropyV = vec2( 0.0 , 1.0 );
-		material.anisotropy = anisotropy;
+		vec2 anisotropyV = anisotropyVector;
 
 	#endif
+
+	material.anisotropy = length( anisotropyV );
+	anisotropyV /= material.anisotropy;
+	material.anisotropy = saturate( material.anisotropy );
 
 	// Roughness along the anisotropy tangent is the material roughness, while the bitangent roughness increases with anisotropy.
 	material.alphaB = pow2( mix( material.roughness, 1.0, pow2( material.anisotropy ) ) );

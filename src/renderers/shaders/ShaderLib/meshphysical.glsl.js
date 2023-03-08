@@ -115,7 +115,7 @@ uniform float opacity;
 #endif
 
 #ifdef USE_ANISOTROPY
-	uniform float anisotropy;
+	uniform vec2 anisotropyVector;
 
 	#ifdef USE_ANISOTROPYMAP
 		uniform sampler2D anisotropyMap;
