@@ -2129,6 +2129,12 @@ class Quaternion {
 
 	}
 
+	toJSON() {
+
+		return this.toArray();
+
+	}
+
 	_onChange( callback ) {
 
 		this._onChangeCallback = callback;
@@ -2781,6 +2787,16 @@ class Vector3 {
 		this.x = e._x;
 		this.y = e._y;
 		this.z = e._z;
+
+		return this;
+
+	}
+
+	setFromColor( c ) {
+
+		this.x = c.r;
+		this.y = c.g;
+		this.z = c.b;
 
 		return this;
 
@@ -7891,6 +7907,8 @@ const _vap = /*@__PURE__*/ new Vector3();
 const _vbp = /*@__PURE__*/ new Vector3();
 const _vcp = /*@__PURE__*/ new Vector3();
 
+let warnedGetUV = false;
+
 class Triangle {
 
 	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
@@ -7962,7 +7980,13 @@ class Triangle {
 
 	static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
 
-		console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
+		if ( warnedGetUV === false ) {
+
+			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // @deprecated since r151
+
+			warnedGetUV = true;
+
+		}
 
 		return this.getInterpolation( point, p1, p2, p3, uv1, uv2, uv3, target );
 
@@ -8072,7 +8096,13 @@ class Triangle {
 
 	getUV( point, uv1, uv2, uv3, target ) {
 
-		console.warn( 'Triangle.getUV() has been renamed to Triangle.getInterpolation().' );
+		if ( warnedGetUV === false ) {
+
+			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // @deprecated since r151
+
+			warnedGetUV = true;
+
+		}
 
 		return Triangle.getInterpolation( point, this.a, this.b, this.c, uv1, uv2, uv3, target );
 
@@ -8922,24 +8952,17 @@ class Color {
 			if ( size === 3 ) {
 
 				// #ff0
-				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 0 ), 16 ) / 255;
-				this.g = parseInt( hex.charAt( 1 ) + hex.charAt( 1 ), 16 ) / 255;
-				this.b = parseInt( hex.charAt( 2 ) + hex.charAt( 2 ), 16 ) / 255;
-
-				ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-				return this;
+				return this.setRGB(
+					parseInt( hex.charAt( 0 ), 16 ) / 15,
+					parseInt( hex.charAt( 1 ), 16 ) / 15,
+					parseInt( hex.charAt( 2 ), 16 ) / 15,
+					colorSpace
+				);
 
 			} else if ( size === 6 ) {
 
 				// #ff0000
-				this.r = parseInt( hex.charAt( 0 ) + hex.charAt( 1 ), 16 ) / 255;
-				this.g = parseInt( hex.charAt( 2 ) + hex.charAt( 3 ), 16 ) / 255;
-				this.b = parseInt( hex.charAt( 4 ) + hex.charAt( 5 ), 16 ) / 255;
-
-				ColorManagement.toWorkingColorSpace( this, colorSpace );
-
-				return this;
+				return this.setHex( parseInt( hex, 16 ), colorSpace );
 
 			} else {
 
@@ -9220,6 +9243,29 @@ class Color {
 		const l = lerp( _hslA.l, _hslB.l, alpha );
 
 		this.setHSL( h, s, l );
+
+		return this;
+
+	}
+
+	setFromVector3( v ) {
+
+		this.r = v.x;
+		this.g = v.y;
+		this.b = v.z;
+
+		return this;
+
+	}
+
+	applyMatrix3( m ) {
+
+		const r = this.r, g = this.g, b = this.b;
+		const e = m.elements;
+
+		this.r = e[ 0 ] * r + e[ 3 ] * g + e[ 6 ] * b;
+		this.g = e[ 1 ] * r + e[ 4 ] * g + e[ 7 ] * b;
+		this.b = e[ 2 ] * r + e[ 5 ] * g + e[ 8 ] * b;
 
 		return this;
 
