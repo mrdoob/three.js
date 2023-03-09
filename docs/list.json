@@ -1629,6 +1629,26 @@
 				"TorusKnotGeometry": "api/fr/geometries/TorusKnotGeometry",
 				"TubeGeometry": "api/fr/geometries/TubeGeometry",
 				"WireframeGeometry": "api/fr/geometries/WireframeGeometry"
+			},
+			"Matériaux": {
+				"LineBasicMaterial": "api/fr/materials/LineBasicMaterial",
+				"LineDashedMaterial": "api/fr/materials/LineDashedMaterial",
+				"Material": "api/fr/materials/Material",
+				"MeshBasicMaterial": "api/fr/materials/MeshBasicMaterial",
+				"MeshDepthMaterial": "api/fr/materials/MeshDepthMaterial",
+				"MeshDistanceMaterial": "api/fr/materials/MeshDistanceMaterial",
+				"MeshLambertMaterial": "api/fr/materials/MeshLambertMaterial",
+				"MeshMatcapMaterial": "api/fr/materials/MeshMatcapMaterial",
+				"MeshNormalMaterial": "api/fr/materials/MeshNormalMaterial",
+				"MeshPhongMaterial": "api/fr/materials/MeshPhongMaterial",
+				"MeshPhysicalMaterial": "api/fr/materials/MeshPhysicalMaterial",
+				"MeshStandardMaterial": "api/fr/materials/MeshStandardMaterial",
+				"MeshToonMaterial": "api/fr/materials/MeshToonMaterial",
+				"PointsMaterial": "api/fr/materials/PointsMaterial",
+				"RawShaderMaterial": "api/fr/materials/RawShaderMaterial",
+				"ShaderMaterial": "api/fr/materials/ShaderMaterial",
+				"ShadowMaterial": "api/fr/materials/ShadowMaterial",
+				"SpriteMaterial": "api/fr/materials/SpriteMaterial"
 			}
 
 		}

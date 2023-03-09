@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Un matériau pour dessiner des géométries de manière simple et ombrée (à plat ou filaire).<br /><br />
+
+			Ce matériau n'est pas affecté par les lumières.
+		</p>
+
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshBasicMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			const scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Constructeur</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+			[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
+		Toute propriété du matériau (y compris toute proprioété héritée de [page:Material]) peut être passée dans l'objet.<br /><br />
+
+			L'exception est la propriété [page:Hexadecimal color], qui peut être passée comme une chaine de caractères hexadécimale,
+		 ayant la valeur `0xffffff` (blanc) par défaut. [page:Color.set]( color ) est appelée en interne.
+		</p>
+
+		<h2>Propriétés</h2>
+		<p>Voir la classe [page:Material] pour les propriétés communes.</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>La carte alpha est une texture en niveaux de gris qui contrôle l'opacité sur la surface
+			(noir : entièrement transparent ; blanc : entièrement opaque). La valeur par défaut est nulle.<br /><br />
+			
+			Seule la couleur de la texture est utilisée, en ignorant le canal alpha s'il en existe un.
+			Pour les textures RGB et RGBA, le moteur de rendu [page:WebGLRenderer WebGL] utilisera le
+			canal vert lors de l'échantillonnage de cette texture en raison du peu de précision supplémentaire fourni
+			pour le vert dans les formats RVB 565 compressés DXT et non compressés. 
+			Les textures avec uniquement de la luminance ou les textures luminance/alpha fonctionneront également comme prévu.
+		</p>
+
+		<h3>[property:Texture aoMap]</h3>
+		<p>Le canal rouge de cette texture est utilisé comme carte d'occlusion ambiante. La valeur par défaut est nulle.
+		L'aoMap nécessite un deuxième ensemble d'UVs.</p>
+
+		<h3>[property:Float aoMapIntensity]</h3>
+		<p>Intensité de l'effet d'occlusion ambiante. La valeur par défaut est 1. Zéro signifie qu'il n'y a pas d'effet d'occlusion.</p>
+
+		<h3>[property:Color color]</h3>
+		<p>[page:Color], couleur du matériau, par défaut en blanc (0xffffff).</p>
+
+		<h3>[property:Integer combine]</h3>
+		<p>
+			Comment combiner le résultat de la couleur de la surface avec la carte d'environnement, le cas échéant.<br /><br />
+
+		Les options sont [page:Materials THREE.MultiplyOperation] (par défaut), [page:Materials THREE.MixOperation],
+		[page :Matériaux TROIS.AddOperation]. Si mix est choisi, la [page:.reflectivity] est utilisée pour
+		mélanger les deux couleurs.
+		</p>
+
+		<h3>[property:Texture envMap]</h3>
+		<p>La carte de l'environnement. La valeur par défaut est nulle.</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p>Si le matériau est affecté par le brouillard (fog) La valeur par défaut est `true`.</p>
+
+		<h3>[property:Texture lightMap]</h3>
+		<p>La carte des lumières (light map).  La valeur par défaut est null. La lightMap nécessite un deuxième ensemble d'UVs.</p>
+
+		<h3>[property:Float lightMapIntensity]</h3>
+		<p>Intensité de la lumière préparée. La valeur par défaut est 1.</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>
+			La carte des couleurs. Peut éventuellement inclure un canal alpha, généralement combiné avec
+			[page:Material.transparent .transparent] ou [page:Material.alphaTest .alphaTest]. La valeur par défaut est null.
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p>
+			Dans quelle mesure la carte d'environnement affecte la surface ; voir aussi [page:.combine].
+			La valeur par défaut est 1 et la plage valide est comprise entre 0 (aucune réflexion) et 1 (réflexions complètes).
+		</p>
+
+		<h3>[property:Float refractionRatio]</h3>
+		<p>
+			L'indice de réfraction (IOR) de l'air (environ 1) divisé par l'indice de réfraction du matériau.
+			Il est utilisé avec les modes de mapping d'environnement [page:Textures THREE.CubeRefractionMapping] et [page:Textures THREE.EquirectangularRefractionMapping].
+			Le rapport de réfraction ne doit pas dépasser 1. La valeur par défaut est `0.98`.
+		</p>
+
+		<h3>[property:Texture specularMap]</h3>
+		<p>Texture spéculaire utilisée par le matériau. La valeur par défaut est null.</p>
+
+		<h3>[property:Boolean wireframe]</h3>
+		<p>Rendre la géométrie en fil de fer. La valeur par défaut est "false" (c'est-à-dire rendre sous forme de polygones plats).</p>
+
+		<h3>[property:String wireframeLinecap]</h3>
+		<p>
+			Définit l'apparence de la fin de la ligne. les valeurs possibles sont 'butt', 'round' et 'square'.
+			La valeur par défaut est 'round'.<br /><br />
+
+			Cela correspond à la propriété [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
+			et est ignorée par le moteur de rendu [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:String wireframeLinejoin]</h3>
+		<p>
+			Définit l'apparence des jointures de lignes. Les valeurs possibles sont 'round', 'bevel' et 'miter'. La valeur par défaut est 'round'. <br /><br />
+
+			Cela correspond à la propriété [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineJoin 2D Canvas lineJoin]
+			et est ignorée par le moteur de rendu [page:WebGLRenderer WebGL].
+		</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>Contrôle l'épaisseur du filaire. La valeur par défaut est 1.<br /><br />
+
+			A cause des limitations de [link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+			avec le moteur de rendu [page:WebGLRenderer WebGL] sur la plupârt des plateformes, l'épaisseur de ligne (linewidth) sera toujours 
+			à 1, indépendamment de la valeur définie.
+		</p>
+
+		<h2>Méthodes</h2>
+		<p>Voir la classe [page:Material] pour les méthodes communes.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
