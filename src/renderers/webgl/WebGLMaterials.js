@@ -635,7 +635,7 @@ function WebGLMaterials( renderer, properties ) {
 
 		if ( material.anisotropy > 0 ) {
 
-			uniforms.anisotropyVector.value.set( material.anisotropy * Math.cos( material.anisotropyAngle ), material.anisotropy * Math.sin( material.anisotropyAngle ) );
+			uniforms.anisotropyVector.value.set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ) );
 
 			if ( material.anisotropyMap ) {
 

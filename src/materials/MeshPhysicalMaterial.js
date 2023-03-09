@@ -63,7 +63,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularColor = new Color( 1, 1, 1 );
 		this.specularColorMap = null;
 
-		this.anisotropyAngle = 0;
+		this.anisotropyRotation = 0;
 		this.anisotropyMap = null;
 
 		this._sheen = 0.0;
@@ -212,7 +212,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularColorMap = source.specularColorMap;
 
 		this.anisotropy = source.anisotropy;
-		this.anisotropyAngle = source.anisotropyAngle;
+		this.anisotropyRotation = source.anisotropyRotation;
 		this.anisotropyMap = source.anisotropyMap;
 
 		return this;

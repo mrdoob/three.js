@@ -165,7 +165,7 @@ const materials = [
 			'attenuationDistance',
 			'attenuationColor',
 			'anisotropy',
-			'anisotropyAngle',
+			'anisotropyRotation',
 			'anisotropyMap',
 			'specularIntensity',
 			'specularIntensityMap',
