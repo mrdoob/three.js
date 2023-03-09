@@ -83,11 +83,11 @@ class Triangle {
 
 	}
 
-	static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
+	static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) { // @deprecated, r151
 
 		if ( warnedGetUV === false ) {
 
-			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // @deprecated since r151
+			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
 
 			warnedGetUV = true;
 
@@ -199,11 +199,11 @@ class Triangle {
 
 	}
 
-	getUV( point, uv1, uv2, uv3, target ) {
+	getUV( point, uv1, uv2, uv3, target ) { // @deprecated, r151
 
 		if ( warnedGetUV === false ) {
 
-			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // @deprecated since r151
+			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
 
 			warnedGetUV = true;
 
