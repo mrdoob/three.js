@@ -87,7 +87,7 @@ class Triangle {
 
 		if ( warnedGetUV === false ) {
 
-			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // r151
+			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // @deprecated since r151
 
 			warnedGetUV = true;
 
@@ -203,7 +203,7 @@ class Triangle {
 
 		if ( warnedGetUV === false ) {
 
-			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // r151
+			console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // @deprecated since r151
 
 			warnedGetUV = true;
 
