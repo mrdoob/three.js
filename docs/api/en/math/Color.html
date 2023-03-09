@@ -98,11 +98,6 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Blue channel value between 0 and 1. Default is 1.
 		</p>
 
-
-
-
-
-
 		<h2>Methods</h2>
 
 		<h3>[method:this add]( [param:Color color] ) </h3>
@@ -113,6 +108,9 @@ const color7 = new THREE.Color( 1, 0, 0 );
 
 		<h3>[method:this addScalar]( [param:Number s] ) </h3>
 		<p>Adds [page:Number s] to the RGB values of this color.</p>
+
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>Applies the transform [page:Matrix3 m] to this color's RGB components.</p>
 
 		<h3>[method:Color clone]() </h3>
 		<p>Returns a new Color with the same [page:.r r], [page:.g g] and [page:.b b] values as this one.</p>
@@ -246,6 +244,11 @@ const color7 = new THREE.Color( 1, 0, 0 );
 
 		See the Constructor above for full details of what [page:Color_Hex_or_String value] can be.
 		Delegates to [page:.copy], [page:.setStyle], or [page:.setHex] depending on input type.
+		</p>
+
+		<h3>[method:this setFromVector3]( [param:Vector3 vector] )</h3>
+		<p>
+		Sets this colors's [page:.r r], [page:.g g] and [page:.b b] components from the x, y, and z components of the specified [page:Vector3 vector].
 		</p>
 
 		<h3>[method:this setHex]( [param:Integer hex], [param:string colorSpace] = SRGBColorSpace ) </h3>
