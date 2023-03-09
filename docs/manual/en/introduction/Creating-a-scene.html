@@ -13,35 +13,19 @@
 
 		<h2>Before we start</h2>
 
-		<p>Before you can use three.js, you need somewhere to display it. Save the following HTML to a file on your computer and open it in your browser.</p>
-
-		<code>
-		&lt;!DOCTYPE html&gt;
-		&lt;html&gt;
-			&lt;head&gt;
-				&lt;meta charset="utf-8"&gt;
-				&lt;title&gt;My first three.js app&lt;/title&gt;
-				&lt;style&gt;
-					body { margin: 0; }
-				&lt;/style&gt;
-			&lt;/head&gt;
-			&lt;body&gt;
-				&lt;script type="module"&gt;
-					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
-
-					// Our Javascript will go here.
-				&lt;/script&gt;
-			&lt;/body&gt;
-		&lt;/html&gt;
-		</code>
-
-		<p>That's all. All the code below goes into the empty &lt;script&gt; tag.</p>
+		<p>
+			If you haven't yet, go through the [link:#manual/introduction/Installation Installation] guide. We'll assume you've already set up the same project structure (including <i>index.html</i> and <i>main.js</i>), have installed three.js, and are either running a build tool, or using a local server with a CDN and import maps.
+		</p>
 
 		<h2>Creating the scene</h2>
 
 		<p>To actually be able to display anything with three.js, we need three things: scene, camera and renderer, so that we can render the scene with camera.</p>
 
+		<p><i>main.js —</i></p>
+
 		<code>
+		import * as THREE from 'three';
+
 		const scene = new THREE.Scene();
 		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -117,10 +101,12 @@
 
 		<p>The full code is available below and as an editable [link:https://jsfiddle.net/em4j9hvu/ live example]. Play around with it to get a better understanding of how it works.</p>
 
+		<p><i>index.html —</i></p>
+
 		<code>
 		&lt;!DOCTYPE html&gt;
 		&lt;html&gt;
-			&lt;head&gt;
+			&lt;head lang="en"&gt;
 				&lt;meta charset="utf-8"&gt;
 				&lt;title&gt;My first three.js app&lt;/title&gt;
 				&lt;style&gt;
@@ -128,36 +114,40 @@
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
-				&lt;script type="module"&gt;
-					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
-
-					const scene = new THREE.Scene();
-					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-					const renderer = new THREE.WebGLRenderer();
-					renderer.setSize( window.innerWidth, window.innerHeight );
-					document.body.appendChild( renderer.domElement );
-
-					const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-					const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-					const cube = new THREE.Mesh( geometry, material );
-					scene.add( cube );
-
-					camera.position.z = 5;
-
-					function animate() {
-						requestAnimationFrame( animate );
-
-						cube.rotation.x += 0.01;
-						cube.rotation.y += 0.01;
-
-						renderer.render( scene, camera );
-					}
-
-					animate();
-				&lt;/script&gt;
+				&lt;script type="module" src="/main.js"&gt;&lt;/script&gt;
 			&lt;/body&gt;
 		&lt;/html&gt;
+		</code>
+
+		<p><i>main.js —</i></p>
+
+		<code>
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+
+		camera.position.z = 5;
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			cube.rotation.x += 0.01;
+			cube.rotation.y += 0.01;
+
+			renderer.render( scene, camera );
+		}
+
+		animate();
 		</code>
 	</body>
 </html>
