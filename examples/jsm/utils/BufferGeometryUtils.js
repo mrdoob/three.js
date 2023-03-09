@@ -11,12 +11,6 @@ import {
 	Vector3,
 } from 'three';
 
-function computeTangents() { // @deprecated, r140
-
-	throw new Error( 'BufferGeometryUtils: computeTangents renamed to computeMikkTSpaceTangents.' );
-
-}
-
 function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 	if ( ! MikkTSpace || ! MikkTSpace.isReady ) {
@@ -1325,7 +1319,6 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 }
 
 export {
-	computeTangents,
 	computeMikkTSpaceTangents,
 	mergeBufferGeometries,
 	mergeBufferAttributes,
