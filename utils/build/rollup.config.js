@@ -310,7 +310,7 @@ const builds = [
 			}
 		]
 	},
-	{
+	{ // @deprecated, r150
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
@@ -327,7 +327,7 @@ const builds = [
 			}
 		]
 	},
-	{
+	{ // @deprecated, r150
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
