@@ -234,7 +234,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -242,7 +242,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>

@@ -150,10 +150,10 @@
 
 				}
 
-				const objects = new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesDrawn ), defaultMaterial );
+				const objects = new THREE.Mesh( BufferGeometryUtils.mergeGeometries( geometriesDrawn ), defaultMaterial );
 				scene.add( objects );
 
-				pickingScene.add( new THREE.Mesh( BufferGeometryUtils.mergeBufferGeometries( geometriesPicking ), pickingMaterial ) );
+				pickingScene.add( new THREE.Mesh( BufferGeometryUtils.mergeGeometries( geometriesPicking ), pickingMaterial ) );
 
 				highlightBox = new THREE.Mesh(
 					new THREE.BoxGeometry(),

@@ -81,7 +81,7 @@ function main() {
     }
   }
 
-  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
         geometries, false);
   const material = new THREE.MeshPhongMaterial({color: 'green'});
   const mesh = new THREE.Mesh(mergedGeometry, material);
