@@ -1320,14 +1320,14 @@ function toCreasedNormals( geometry, creaseAngle = Math.PI / 3 /* 60 degrees */ 
 
 function mergeBufferGeometries( geometries, useGroups = false ) {
 
-	console.warn( 'THREE.BufferGeometryUtils: mergeBufferGeometries() has been renamed to mergeGeometries().' ); // // @deprecated, r151
+	console.warn( 'THREE.BufferGeometryUtils: mergeBufferGeometries() has been renamed to mergeGeometries().' ); // @deprecated, r151
 	return mergeGeometries( geometries, useGroups );
 
 }
 
 function mergeBufferAttributes( attributes ) {
 
-	console.warn( 'THREE.BufferGeometryUtils: mergeBufferAttributes() has been renamed to mergeAttributes().' ); // // @deprecated, r151
+	console.warn( 'THREE.BufferGeometryUtils: mergeBufferAttributes() has been renamed to mergeAttributes().' ); // @deprecated, r151
 	return mergeAttributes( attributes );
 
 }
