@@ -7,7 +7,7 @@ import {
 	Mesh
 } from 'three';
 
-import { mergeBufferGeometries } from './BufferGeometryUtils.js';
+import { mergeGeometries } from './BufferGeometryUtils.js';
 
 class LDrawUtils {
 
@@ -165,7 +165,7 @@ class LDrawUtils {
 		for ( const meshMaterialsId of meshMaterialsIds ) {
 
 			const meshGeometry = meshGeometries[ meshMaterialsId ];
-			const mergedGeometry = mergeBufferGeometries( meshGeometry.arr );
+			const mergedGeometry = mergeGeometries( meshGeometry.arr );
 			mergedObject.add( new Mesh( mergedGeometry, meshGeometry.mat ) );
 
 		}
@@ -174,7 +174,7 @@ class LDrawUtils {
 		for ( const linesMaterialsId of linesMaterialsIds ) {
 
 			const lineGeometry = linesGeometries[ linesMaterialsId ];
-			const mergedGeometry = mergeBufferGeometries( lineGeometry.arr );
+			const mergedGeometry = mergeGeometries( lineGeometry.arr );
 			mergedObject.add( new LineSegments( mergedGeometry, lineGeometry.mat ) );
 
 		}
@@ -183,7 +183,7 @@ class LDrawUtils {
 		for ( const condLinesMaterialsId of condLinesMaterialsIds ) {
 
 			const condLineGeometry = condLinesGeometries[ condLinesMaterialsId ];
-			const mergedGeometry = mergeBufferGeometries( condLineGeometry.arr );
+			const mergedGeometry = mergeGeometries( condLineGeometry.arr );
 			const condLines = new LineSegments( mergedGeometry, condLineGeometry.mat );
 			condLines.isConditionalLine = true;
 			mergedObject.add( condLines );

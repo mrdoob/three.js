@@ -353,7 +353,7 @@ renderが必要なのは連続的なレンダリングでなく、<a href="rende
     });
   });
 
-+  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
++  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 +      geometries, false);
 +  const material = new THREE.MeshBasicMaterial({color:'red'});
 +  const mesh = new THREE.Mesh(mergedGeometry, material);
@@ -364,7 +364,7 @@ renderが必要なのは連続的なレンダリングでなく、<a href="rende
 <p>上記ではボックスジオメトリの中心点を変更していたコードを削除し、代わりに <code class="notranslate" translate="no">originHelper</code> を追加しています。
 前は同じジオメトリを19000回も使っていました。
 今回は1つ1つのジオメトリを新しく作成し、各ボックスジオメトリの頂点を移動するために <code class="notranslate" translate="no">applyMatrix</code> を使用するので、2回ではなく1回にした方が良いかもしれません。</p>
-<p>最後に全てのジオメトリの配列を <code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code> に渡します。
+<p>最後に全てのジオメトリの配列を <code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code> に渡します。
 また <code class="notranslate" translate="no">BufferGeometryUtils</code> も含める必要があります。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
@@ -434,7 +434,7 @@ data.forEach((row, latNdx) =&gt; {
 <p>上記のコードではジオメトリから <code class="notranslate" translate="no">position</code> を取得して必要な頂点の数を調べています。
 次に色を入れるための変数を <code class="notranslate" translate="no">Uint8Array</code> で作成します。その後に <code class="notranslate" translate="no">geometry.setAttribute</code> を呼び出して属性として追加します。</p>
 <p>最後に頂点カラーを扱うようにthree.jsで指定する必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({
