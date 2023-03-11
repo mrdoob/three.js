@@ -387,7 +387,7 @@ geometry we'd remove 18999 operations.</p>
     });
   });
 
-+  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
++  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 +      geometries, false);
 +  const material = new THREE.MeshBasicMaterial({color:'red'});
 +  const mesh = new THREE.Mesh(mergedGeometry, material);
@@ -401,7 +401,7 @@ geometry 19000 times. This time we are creating new geometry for every single
 box and since we are going to use <code class="notranslate" translate="no">applyMatrix</code> to move the vertices of each box
 geometry we might as well do it once instead of twice.</p>
 <p>At the end we pass an array of all the geometries to
-<code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code> which will combined all of
+<code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code> which will combined all of
 them into a single mesh.</p>
 <p>We also need to include the <code class="notranslate" translate="no">BufferGeometryUtils</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
@@ -475,7 +475,7 @@ data.forEach((row, latNdx) =&gt; {
 attribute from the geometry. We then create a <code class="notranslate" translate="no">Uint8Array</code> to put the colors in.
 It then adds that as an attribute by calling <code class="notranslate" translate="no">geometry.setAttribute</code>.</p>
 <p>Lastly we need to tell three.js to use the vertex colors. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({

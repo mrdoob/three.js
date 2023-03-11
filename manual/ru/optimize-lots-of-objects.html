@@ -365,7 +365,7 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
     });
   });
 
-+  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
++  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 +      geometries, false);
 +  const material = new THREE.MeshBasicMaterial({color:'red'});
 +  const mesh = new THREE.Mesh(mergedGeometry, material);
@@ -378,7 +378,7 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 одну и ту же геометрию 19000 раз. На этот раз мы создаем новую геометрию
 для каждого отдельного блока, и, поскольку мы будем использовать <code class="notranslate" translate="no">applyMatrix</code> 
 для перемещения вершин каждой геометрии блока, мы могли бы сделать это один раз, а не два. </p>
-<p>В конце мы передаем массив всех геометрий в <code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code>, который объединит их все в одну сетку. </p>
+<p>В конце мы передаем массив всех геометрий в <code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code>, который объединит их все в одну сетку. </p>
 <p>Нам также нужно включить <code class="notranslate" translate="no">BufferGeometryUtils</code> </p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
@@ -452,7 +452,7 @@ data.forEach((row, latNdx) =&gt; {
 Затем мы создаем <code class="notranslate" translate="no">Uint8Array</code> для размещения цветов.
 Затем он добавляет это как атрибут, вызывая <code class="notranslate" translate="no">geometry.setAttribute</code>. </p>
 <p>Наконец, нам нужно указать three.js использовать цвета вершин. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({

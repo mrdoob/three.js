@@ -339,7 +339,7 @@ function hsl(h, s, l) {
   });
 
 +  // 생성한 geometry를 전부 합칩니다.
-+  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
++  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 +      geometries, false);
 +  const material = new THREE.MeshBasicMaterial({ color:'red' });
 +  const mesh = new THREE.Mesh(mergedGeometry, material);
@@ -348,7 +348,7 @@ function hsl(h, s, l) {
 }
 </pre>
 <p>위 코드에서는 육면체의 중심을 옮기는 대신 <code class="notranslate" translate="no">originHelper</code>를 새로 만들어 중심축을 옮겼습니다. 이전에는 같은 geometry를 19000번 재활용했지만, 이번에는 데이터마다 geometry를 새로 생성했죠. 또한 <code class="notranslate" translate="no">applyMatrix</code>를 이용해 육면체 자체의 정점을 이동시키므로 메서드를 두 번 쓰는 대신 한 번만 썼습니다.</p>
-<p>그리고 생성한 육면체를 전부 배열에 저장한 뒤 이 배열을 <code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code>에 넘겨 하나의 geometry로 합쳤습니다.</p>
+<p>그리고 생성한 육면체를 전부 배열에 저장한 뒤 이 배열을 <code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code>에 넘겨 하나의 geometry로 합쳤습니다.</p>
 <p>물론 <code class="notranslate" translate="no">BufferGeometryUtils</code>을 불러와야죠.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import { BufferGeometryUtils } from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
@@ -415,7 +415,7 @@ data.forEach((row, latNdx) =&gt; {
 </pre>
 <p>추가한 코드에서는 먼저 geometry의 <code class="notranslate" translate="no">position</code> 속성을 가져와 정점의 개수를 파악했습니다. 그런 다음 색상을 지정하기 위해 <code class="notranslate" translate="no">Uint8Array</code>로 변환한 뒤, 이를 <code class="notranslate" translate="no">geometry.setAttribute</code> 메서드로 geometry의 <code class="notranslate" translate="no">color</code> 속성에 지정했죠.</p>
 <p>마지막으로 재질(material)이 정점 색상을 사용하도록 설정합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({
