@@ -205,9 +205,11 @@ class ShaderNodeInternal extends Node {
 
 	construct( builder ) {
 
-		const stackNode = builder.createStack();
-		stackNode.outputNode = this.call( {}, stackNode, builder );
-		return stackNode;
+		builder.addStack();
+
+		builder.stack.outputNode = nodeObject( this._jsFunc( builder.stack, builder ) );
+
+		return builder.removeStack();
 
 	}
 
@@ -310,6 +312,8 @@ export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
 export const nodeArray = ( val ) => new ShaderNodeArray( val );
 export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
 export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
+
+export const shader = ( ...val ) => new ShaderNode( ...val );
 
 addNodeClass( ShaderNode );
 

@@ -168,7 +168,7 @@ class Node {
 		}
 
 		builder.addNode( this );
-		builder.addStack( this );
+		builder.addChain( this );
 
 		/* Build stages expected results:
 			- "construct"	-> Node
@@ -233,7 +233,7 @@ class Node {
 
 		}
 
-		builder.removeStack( this );
+		builder.removeChain( this );
 
 		return result;
 

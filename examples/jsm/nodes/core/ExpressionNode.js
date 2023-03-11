@@ -18,7 +18,7 @@ class ExpressionNode extends Node {
 
 		if ( type === 'void' ) {
 
-			builder.addFlowCode( snippet );
+			builder.addLineFlowCode( snippet );
 
 		} else {
 

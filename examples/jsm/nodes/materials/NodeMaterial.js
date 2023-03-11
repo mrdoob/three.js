@@ -52,30 +52,28 @@ class NodeMaterial extends ShaderMaterial {
 
 	construct( builder ) {
 
-		// < STACKS >
-
-		const vertexStack = builder.createStack();
-		const fragmentStack = builder.createStack();
-
 		// < VERTEX STAGE >
 
-		vertexStack.outputNode = this.constructPosition( builder, vertexStack );
+		builder.addStack();
+
+		builder.stack.outputNode = this.constructPosition( builder );
+
+		builder.addFlow( 'vertex', builder.removeStack() );
 
 		// < FRAGMENT STAGE >
 
-		if ( this.normals === true ) this.constructNormal( builder, fragmentStack );
+		builder.addStack();
 
-		this.constructDiffuseColor( builder, fragmentStack );
-		this.constructVariants( builder, fragmentStack );
+		if ( this.normals === true ) this.constructNormal( builder );
 
-		const outgoingLightNode = this.constructLighting( builder, fragmentStack );
+		this.constructDiffuseColor( builder );
+		this.constructVariants( builder );
 
-		fragmentStack.outputNode = this.constructOutput( builder, fragmentStack, outgoingLightNode, diffuseColor.a );
+		const outgoingLightNode = this.constructLighting( builder );
 
-		// < FLOW >
+		builder.stack.outputNode = this.constructOutput( builder, outgoingLightNode, diffuseColor.a );
 
-		builder.addFlow( 'vertex', vertexStack );
-		builder.addFlow( 'fragment', fragmentStack );
+		builder.addFlow( 'fragment', builder.removeStack() );
 
 	}
 
@@ -109,13 +107,13 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	constructDiffuseColor( builder, stack ) {
+	constructDiffuseColor( { stack, geometry } ) {
 
 		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
 
 		// VERTEX COLORS
 
-		if ( this.vertexColors === true && builder.geometry.hasAttribute( 'color' ) ) {
+		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
 
 			colorNode = vec4( colorNode.xyz.mul( attribute( 'color' ) ), colorNode.a );
 
@@ -148,7 +146,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	constructNormal( builder, stack ) {
+	constructNormal( { stack } ) {
 
 		// NORMAL VIEW
 
@@ -226,7 +224,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	constructOutput( builder, stack, outgoingLight, opacity ) {
+	constructOutput( builder, outgoingLight, opacity ) {
 
 		const renderer = builder.renderer;
 
@@ -417,6 +415,6 @@ export function createNodeMaterialFromType( type ) {
 
 	}
 
-};
+}
 
 addNodeMaterial( NodeMaterial );
