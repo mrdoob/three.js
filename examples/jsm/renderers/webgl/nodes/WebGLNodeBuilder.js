@@ -64,18 +64,6 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	addFlowCode( code ) {
-
-		if ( ! /;\s*$/.test( code ) ) {
-
-			code += ';';
-
-		}
-
-		super.addFlowCode( code + '\n\t' );
-
-	}
-
 	_parseShaderLib() {
 
 		const material = this.material;
