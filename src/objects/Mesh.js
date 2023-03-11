@@ -221,7 +221,7 @@ class Mesh extends Object3D {
 						const b = index.getX( j + 1 );
 						const c = index.getX( j + 2 );
 
-						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, uv, uv2, normal, a, b, c );
+						intersection = checkGeometryIntersection( this, groupMaterial, raycaster, _ray, uv, uv2, normal, a, b, c );
 
 						if ( intersection ) {
 
@@ -246,7 +246,7 @@ class Mesh extends Object3D {
 					const b = index.getX( i + 1 );
 					const c = index.getX( i + 2 );
 
-					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, uv, uv2, normal, a, b, c );
+					intersection = checkGeometryIntersection( this, material, raycaster, _ray, uv, uv2, normal, a, b, c );
 
 					if ( intersection ) {
 
@@ -279,7 +279,7 @@ class Mesh extends Object3D {
 						const b = j + 1;
 						const c = j + 2;
 
-						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, uv, uv2, normal, a, b, c );
+						intersection = checkGeometryIntersection( this, groupMaterial, raycaster, _ray, uv, uv2, normal, a, b, c );
 
 						if ( intersection ) {
 
@@ -304,7 +304,7 @@ class Mesh extends Object3D {
 					const b = i + 1;
 					const c = i + 2;
 
-					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, uv, uv2, normal, a, b, c );
+					intersection = checkGeometryIntersection( this, material, raycaster, _ray, uv, uv2, normal, a, b, c );
 
 					if ( intersection ) {
 
@@ -354,7 +354,7 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 }
 
-function checkBufferGeometryIntersection( object, material, raycaster, ray, uv, uv2, normal, a, b, c ) {
+function checkGeometryIntersection( object, material, raycaster, ray, uv, uv2, normal, a, b, c ) {
 
 	object.getVertexPosition( a, _vA );
 	object.getVertexPosition( b, _vB );
