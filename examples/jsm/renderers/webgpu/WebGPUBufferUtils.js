@@ -1,10 +1,11 @@
 import { GPUChunkSize } from './constants.js';
+import { MathUtils } from 'three';
 
 function getFloatLength( floatLength ) {
 
 	// ensure chunk size alignment (STD140 layout)
 
-	return floatLength + ( - floatLength ) % GPUChunkSize;
+	return floatLength + MathUtils.euclideanModulo( - floatLength, GPUChunkSize );
 
 }
 
@@ -22,7 +23,7 @@ function getStrideLength( vectorLength ) {
 
 	const strideLength = 4;
 
-	return vectorLength + ( - vectorLength ) % strideLength;
+	return vectorLength + MathUtils.euclideanModulo( - vectorLength, strideLength );
 
 }
 
