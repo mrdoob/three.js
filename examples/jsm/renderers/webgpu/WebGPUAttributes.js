@@ -1,3 +1,5 @@
+import { MathUtils } from 'three';
+
 class WebGPUAttributes {
 
 	constructor( device ) {
@@ -117,7 +119,7 @@ class WebGPUAttributes {
 	_createBuffer( attribute, usage ) {
 
 		const array = attribute.array;
-		const size = array.byteLength + ( - array.byteLength ) % 4; // ensure 4 byte alignment
+		const size = array.byteLength + MathUtils.euclideanModulo( - array.byteLength, 4 ); // ensure 4 byte alignment
 
 		const buffer = this.device.createBuffer( {
 			size,
