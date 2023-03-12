@@ -270,7 +270,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				// check for chunk overflow
 
-				if ( remainingSizeInChunk < infos.boundary ) {
+				if ( remainingSizeInChunk !== 0 && remainingSizeInChunk < infos.boundary ) {
 
 					// add padding and adjust offset
 
