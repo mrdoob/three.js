@@ -42,7 +42,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructVariants( builder, stack ) {
+	constructVariants( { stack } ) {
 
 		// SHININESS
 

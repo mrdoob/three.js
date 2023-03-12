@@ -118,7 +118,7 @@ class TextureNode extends UniformNode {
 
 				}
 
-				builder.addFlowCode( `${propertyName} = ${snippet}` );
+				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
 				nodeData.snippet = snippet;
 				nodeData.propertyName = propertyName;
