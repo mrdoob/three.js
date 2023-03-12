@@ -266,7 +266,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			if ( i > 0 ) {
 
-				const remainingSizeInChunk = ( - offset ) % chunkSizs;
+				const remainingSizeInChunk = ( - offset ) % chunkSize;
 
 				// check for chunk overflow
 
