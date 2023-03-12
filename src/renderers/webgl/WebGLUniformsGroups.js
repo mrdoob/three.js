@@ -1,3 +1,5 @@
+import { euclideanModulo } from '../../math/MathUtils.js';
+
 function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 	let buffers = {};
@@ -257,29 +259,24 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			}
 
-			// the following two properties will be used for partial buffer updates
-
-			uniform.__data = new Float32Array( infos.storage / Float32Array.BYTES_PER_ELEMENT );
-			uniform.__offset = offset;
-
-			//
+			// add padding to offset
 
 			if ( i > 0 ) {
 
-				const remainingSizeInChunk = ( - offset ) % chunkSize;
+				const remainingSizeInChunk = euclideanModulo( - offset, chunkSize );
 
-				// check for chunk overflow
-
-				if ( remainingSizeInChunk !== 0 && ( remainingSizeInChunk - infos.boundary ) < 0 ) {
-
-					// add padding and adjust offset
+				if ( remainingSizeInChunk < infos.boundary ) {
 
 					offset += remainingSizeInChunk;
-					uniform.__offset = offset;
 
 				}
 
 			}
+
+			// the following two properties will be used for partial buffer updates
+
+			uniform.__data = new Float32Array( infos.storage / Float32Array.BYTES_PER_ELEMENT );
+			uniform.__offset = offset;
 
 			offset += infos.storage;
 
@@ -287,7 +284,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		// ensure correct final padding
 
-		offset += ( - offset ) % chunkSize;
+		offset += euclideanModulo( - offset, chunkSize );
 
 		//
 
