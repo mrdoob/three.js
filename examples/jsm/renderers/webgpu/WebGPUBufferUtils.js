@@ -4,7 +4,7 @@ function getFloatLength( floatLength ) {
 
 	// ensure chunk size alignment (STD140 layout)
 
-	return floatLength + ( ( GPUChunkSize - ( floatLength % GPUChunkSize ) ) % GPUChunkSize );
+	return floatLength + ( - floatLength ) % GPUChunkSize;
 
 }
 
@@ -22,7 +22,7 @@ function getStrideLength( vectorLength ) {
 
 	const strideLength = 4;
 
-	return vectorLength + ( ( strideLength - ( vectorLength % strideLength ) ) % strideLength );
+	return vectorLength + ( - vectorLength ) % strideLength;
 
 }
 
