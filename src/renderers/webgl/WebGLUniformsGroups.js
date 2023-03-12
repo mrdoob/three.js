@@ -234,7 +234,6 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		let offset = 0; // global buffer offset in bytes
 		const chunkSize = 16; // size of a chunk in bytes
-		let chunkOffset = 0; // offset within a single chunk in bytes
 
 		for ( let i = 0, l = uniforms.length; i < l; i ++ ) {
 
@@ -267,17 +266,15 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			if ( i > 0 ) {
 
-				chunkOffset = offset % chunkSize;
-
-				const remainingSizeInChunk = chunkSize - chunkOffset;
+				const remainingSizeInChunk = ( - offset ) % chunkSizs;
 
 				// check for chunk overflow
 
-				if ( chunkOffset !== 0 && ( remainingSizeInChunk - infos.boundary ) < 0 ) {
+				if ( remainingSizeInChunk < infos.boundary ) {
 
 					// add padding and adjust offset
 
-					offset += ( chunkSize - chunkOffset );
+					offset += remainingSizeInChunk;
 					uniform.__offset = offset;
 
 				}
@@ -290,9 +287,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		// ensure correct final padding
 
-		chunkOffset = offset % chunkSize;
-
-		if ( chunkOffset > 0 ) offset += ( chunkSize - chunkOffset );
+		offset += ( - offset ) % chunkSize;
 
 		//
 
