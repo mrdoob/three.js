@@ -2988,7 +2988,7 @@ class GLTFParser {
 
 			texture.flipY = false;
 
-			texture.name = textureDef.name || sourceDef.name || '';
+			texture.name = textureDef.name || sourceDef.name || sourceDef.uri || '';
 
 			const samplers = json.samplers || {};
 			const sampler = samplers[ textureDef.sampler ] || {};
