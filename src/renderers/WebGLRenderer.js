@@ -577,7 +577,7 @@ class WebGLRenderer {
 			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
 
-			// Allow webgl contexts to be GC'd sooner in Chrome.
+			// Allow webgl contexts to be GC'd sooner in some browsers.
 
 			if ( forceContextLoss ) this.forceContextLoss();
 
