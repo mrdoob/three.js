@@ -309,9 +309,12 @@
 		<h3>[method:undefined copyTextureToTexture3D]( [param:Box3 sourceBox], [param:Vector3 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
 		<p>Copies the pixels of a texture in the bounds '[page:Box3 sourceBox]' in the destination texture starting from the given position. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].</p>
 
-		<h3>[method:undefined dispose]( )</h3>
+		<h3>[method:undefined dispose]( [param:boolean forceContextLoss] )</h3>
 		<p>
 		Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
+
+		[page:boolean forceContextLoss] — When `true` forces the webgl context to be lost without calling event handlers. When `false` it will not force webgl context loss, which is useful if the context still needs to be used separately after the renderer is disposed (for example with other WebGL rendering libs). Default is `true`.<br /><br />
+
 		</p>
 
 		<h3>[method:undefined forceContextLoss]()</h3>
