@@ -571,11 +571,17 @@ class WebGLRenderer {
 
 		//
 
-		this.dispose = function () {
+		this.dispose = function ( forceContextLoss = true ) {
 
 			canvas.removeEventListener( 'webglcontextlost', onContextLost, false );
 			canvas.removeEventListener( 'webglcontextrestored', onContextRestore, false );
 			canvas.removeEventListener( 'webglcontextcreationerror', onContextCreationError, false );
+
+			// Allow webgl contexts to be GC'd sooner in Chrome.
+
+			if ( forceContextLoss ) this.forceContextLoss();
+
+			//
 
 			renderLists.dispose();
 			renderStates.dispose();
