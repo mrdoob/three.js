@@ -1,6 +1,7 @@
 import {
 	Matrix4,
 	Object3D,
+	Vector2,
 	Vector3
 } from 'three';
 
@@ -18,6 +19,8 @@ class CSS2DObject extends Object3D {
 		this.element.style.userSelect = 'none';
 
 		this.element.setAttribute( 'draggable', false );
+
+		this.center = new Vector2( 0.5, 0.5 ); // ( 0, 0 ) is the lower left; ( 1, 1 ) is the top right
 
 		this.addEventListener( 'removed', function () {
 
@@ -40,6 +43,8 @@ class CSS2DObject extends Object3D {
 		super.copy( source, recursive );
 
 		this.element = source.element.cloneNode( true );
+
+		this.center = source.center;
 
 		return this;
 
@@ -125,7 +130,7 @@ class CSS2DRenderer {
 
 					const element = object.element;
 
-					element.style.transform = 'translate(-50%,-50%) translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+					element.style.transform = 'translate(' + ( - 100 * object.center.x ) + '%,' + ( - 100 * object.center.y ) + '%)' +  'translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
 
 					if ( element.parentNode !== domElement ) {
 
