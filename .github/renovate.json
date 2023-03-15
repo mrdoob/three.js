@@ -3,7 +3,7 @@
     "config:base",
     ":disableDependencyDashboard"
   ],
-  "timezone": "America/Los_Angeles",
+  "timezone": "Asia/Tokyo",
   "schedule": ["after 1am and before 7am every monday"],
   "packageRules": [
     {
