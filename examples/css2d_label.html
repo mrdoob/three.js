@@ -225,14 +225,14 @@
 
 				gui = new GUI();
 
-				const folder = gui.addFolder( 'Camera Layers' );
+				gui.title( 'Camera Layers' );
 
-				folder.add( layers, 'Toggle Name' );
-				folder.add( layers, 'Toggle Mass' );
-				folder.add( layers, 'Enable All' );
-				folder.add( layers, 'Disable All' );
+				gui.add( layers, 'Toggle Name' );
+				gui.add( layers, 'Toggle Mass' );
+				gui.add( layers, 'Enable All' );
+				gui.add( layers, 'Disable All' );
 
-				folder.open();
+				gui.open();
 
 			}
 
