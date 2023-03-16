@@ -9,7 +9,7 @@ export { default as ArrayUniformNode /* @TODO: arrayUniform */ } from './core/Ar
 export { default as AttributeNode, attribute } from './core/AttributeNode.js';
 export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
-export { default as CodeNode, code } from './core/CodeNode.js';
+export { default as CodeNode, code, js } from './core/CodeNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode, context } from './core/ContextNode.js';
 export { default as ExpressionNode, expression } from './core/ExpressionNode.js';
@@ -35,8 +35,10 @@ export { default as UniformNode, uniform } from './core/UniformNode.js';
 export { default as VarNode, label, temp } from './core/VarNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 
+export * as NodeUtils from './core/NodeUtils.js';
+
 // math
-export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inversesqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, invert, dFdx, dFdy, round, reciprocal, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, refract, smoothstep, faceforward } from './math/MathNode.js';
+export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, invert, dFdx, dFdy, round, reciprocal, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward } from './math/MathNode.js';
 export { default as OperatorNode, add, sub, mul, div, remainder, equal, assign, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, xor, bitAnd, bitOr, bitXor, shiftLeft, shiftRight } from './math/OperatorNode.js';
 export { default as CondNode, cond } from './math/CondNode.js';
 
