@@ -298,6 +298,9 @@ export const refract = nodeProxy( MathNode, MathNode.REFRACT );
 export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
 export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 
+export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
+export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
+
 addNodeElement( 'radians', radians );
 addNodeElement( 'degrees', degrees );
 addNodeElement( 'exp', exp );
@@ -339,10 +342,10 @@ addNodeElement( 'pow2', pow2 );
 addNodeElement( 'pow3', pow3 );
 addNodeElement( 'pow4', pow4 );
 addNodeElement( 'transformDirection', transformDirection );
-addNodeElement( 'mix', mix );
+addNodeElement( 'mix', mixElement );
 addNodeElement( 'clamp', clamp );
 addNodeElement( 'refract', refract );
-addNodeElement( 'smoothstep', smoothstep );
+addNodeElement( 'smoothstep', smoothstepElement );
 addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
