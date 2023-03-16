@@ -293,6 +293,7 @@ export const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECT
 
 export const mix = nodeProxy( MathNode, MathNode.MIX );
 export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
+export const saturate = ( value ) => clamp( value );
 export const refract = nodeProxy( MathNode, MathNode.REFRACT );
 export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
 export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
@@ -344,5 +345,6 @@ addNodeElement( 'refract', refract );
 addNodeElement( 'smoothstep', smoothstep );
 addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
+addNodeElement( 'saturate', saturate );
 
 addNodeClass( MathNode );
