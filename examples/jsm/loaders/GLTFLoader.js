@@ -2992,7 +2992,7 @@ class GLTFParser {
 
 			if ( texture.name === '' && sourceDef.uri && sourceDef.uri.startsWith( 'data:image/' ) === false ) {
 
-				texture.name = sourceDef.uri;
+				texture.name = sourceDef.uri || '';
 
 			}
 
