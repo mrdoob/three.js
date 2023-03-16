@@ -2988,7 +2988,13 @@ class GLTFParser {
 
 			texture.flipY = false;
 
-			texture.name = textureDef.name || sourceDef.name || sourceDef.uri || '';
+			texture.name = textureDef.name || sourceDef.name || '';
+
+			if ( texture.name === '' && sourceDef.uri.length > 0 && sourceDef.uri.startsWith( 'data:image/' ) === false ) {
+
+				texture.name = sourceDef.uri;
+
+			}
 
 			const samplers = json.samplers || {};
 			const sampler = samplers[ textureDef.sampler ] || {};
