@@ -352,6 +352,9 @@ export const imat4 = new ConvertType( 'imat4' );
 export const umat4 = new ConvertType( 'umat4' );
 export const bmat4 = new ConvertType( 'bmat4' );
 
+export const string = ( value = '' ) => nodeObject( new ConstNode( value, 'string' ) );
+export const arrayBuffer = ( value ) => nodeObject( new ConstNode( value, 'ArrayBuffer' ) );
+
 addNodeElement( 'color', color );
 addNodeElement( 'float', float );
 addNodeElement( 'int', int );
@@ -377,6 +380,8 @@ addNodeElement( 'mat4', mat4 );
 addNodeElement( 'imat4', imat4 );
 addNodeElement( 'umat4', umat4 );
 addNodeElement( 'bmat4', bmat4 );
+addNodeElement( 'string', string );
+addNodeElement( 'arrayBuffer', arrayBuffer );
 
 // basic nodes
 // HACK - we cannot export them from the corresponding files because of the cyclic dependency
