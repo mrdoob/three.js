@@ -30,6 +30,9 @@ export function* getNodeChildren( node ) {
 
 	for ( const property in node ) {
 
+		// Ignore private properties.
+		if ( property.startsWith( '_' ) === true ) continue;
+
 		const object = node[ property ];
 
 		if ( Array.isArray( object ) === true ) {
