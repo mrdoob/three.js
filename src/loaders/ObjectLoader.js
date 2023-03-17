@@ -963,6 +963,8 @@ class ObjectLoader extends Loader {
 
 		}
 
+		if ( data.up !== undefined ) object.up.fromArray( data.up );
+
 		if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 		if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
 
