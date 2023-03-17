@@ -205,7 +205,7 @@
 
 				// Scriptable
 
-				const scriptableNode = scriptable( js( `
+				const scriptableNode = js( `
 					layout = {
 						elements: [
 							{ name: 'source', inputType: 'node' },
@@ -230,7 +230,7 @@
 						return mul( saturation( source, oscSine() ), contrast );
 
 					}
-				` ) );
+				` ).scriptable();
 
 				scriptableNode.setParameter( 'source', texture( uvTexture ).xyz );
 				scriptableNode.setParameter( 'contrast', 1 );
