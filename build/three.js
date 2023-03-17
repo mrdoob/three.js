@@ -957,6 +957,20 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
+		angleTo( v ) {
+
+			const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
+
+			if ( denominator === 0 ) return Math.PI / 2;
+
+			const theta = this.dot( v ) / denominator;
+
+			// clamp, to handle numerical problems
+
+			return Math.acos( clamp( theta, - 1, 1 ) );
+
+		}
+
 		distanceTo( v ) {
 
 			return Math.sqrt( this.distanceToSquared( v ) );
@@ -7652,6 +7666,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			object.layers = this.layers.mask;
 			object.matrix = this.matrix.toArray();
+			object.up = this.up.toArray();
 
 			if ( this.matrixAutoUpdate === false ) object.matrixAutoUpdate = false;
 
@@ -7985,11 +8000,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) {
+		static getUV( point, p1, p2, p3, uv1, uv2, uv3, target ) { // @deprecated, r151
 
 			if ( warnedGetUV === false ) {
 
-				console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // @deprecated since r151
+				console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
 
 				warnedGetUV = true;
 
@@ -8101,11 +8116,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		getUV( point, uv1, uv2, uv3, target ) {
+		getUV( point, uv1, uv2, uv3, target ) { // @deprecated, r151
 
 			if ( warnedGetUV === false ) {
 
-				console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' ); // @deprecated since r151
+				console.warn( 'THREE.Triangle.getUV() has been renamed to THREE.Triangle.getInterpolation().' );
 
 				warnedGetUV = true;
 
@@ -9919,27 +9934,25 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		// @deprecated
-
-		copyColorsArray() {
+		copyColorsArray() { // @deprecated, r144
 
 			console.error( 'THREE.BufferAttribute: copyColorsArray() was removed in r144.' );
 
 		}
 
-		copyVector2sArray() {
+		copyVector2sArray() { // @deprecated, r144
 
 			console.error( 'THREE.BufferAttribute: copyVector2sArray() was removed in r144.' );
 
 		}
 
-		copyVector3sArray() {
+		copyVector3sArray() { // @deprecated, r144
 
 			console.error( 'THREE.BufferAttribute: copyVector3sArray() was removed in r144.' );
 
 		}
 
-		copyVector4sArray() {
+		copyVector4sArray() { // @deprecated, r144
 
 			console.error( 'THREE.BufferAttribute: copyVector4sArray() was removed in r144.' );
 
@@ -10908,11 +10921,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		// @deprecated since r144
+		merge() { // @deprecated, r144
 
-		merge() {
-
-			console.error( 'THREE.BufferGeometry.merge() has been removed. Use THREE.BufferGeometryUtils.mergeBufferGeometries() instead.' );
+			console.error( 'THREE.BufferGeometry.merge() has been removed. Use THREE.BufferGeometryUtils.mergeGeometries() instead.' );
 			return this;
 
 		}
@@ -11479,7 +11490,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 							const b = index.getX( j + 1 );
 							const c = index.getX( j + 2 );
 
-							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray$2, uv, uv2, normal, a, b, c );
+							intersection = checkGeometryIntersection( this, groupMaterial, raycaster, _ray$2, uv, uv2, normal, a, b, c );
 
 							if ( intersection ) {
 
@@ -11504,7 +11515,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						const b = index.getX( i + 1 );
 						const c = index.getX( i + 2 );
 
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray$2, uv, uv2, normal, a, b, c );
+						intersection = checkGeometryIntersection( this, material, raycaster, _ray$2, uv, uv2, normal, a, b, c );
 
 						if ( intersection ) {
 
@@ -11537,7 +11548,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 							const b = j + 1;
 							const c = j + 2;
 
-							intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray$2, uv, uv2, normal, a, b, c );
+							intersection = checkGeometryIntersection( this, groupMaterial, raycaster, _ray$2, uv, uv2, normal, a, b, c );
 
 							if ( intersection ) {
 
@@ -11562,7 +11573,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						const b = i + 1;
 						const c = i + 2;
 
-						intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray$2, uv, uv2, normal, a, b, c );
+						intersection = checkGeometryIntersection( this, material, raycaster, _ray$2, uv, uv2, normal, a, b, c );
 
 						if ( intersection ) {
 
@@ -11612,7 +11623,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	function checkBufferGeometryIntersection( object, material, raycaster, ray, uv, uv2, normal, a, b, c ) {
+	function checkGeometryIntersection( object, material, raycaster, ray, uv, uv2, normal, a, b, c ) {
 
 		object.getVertexPosition( a, _vA$1 );
 		object.getVertexPosition( b, _vB$1 );
@@ -19505,16 +19516,26 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				runnable = false;
 
-				const vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
-				const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
+				if ( typeof renderer.debug.onShaderError === 'function' ) {
 
-				console.error(
-					'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
-					'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
-					'Program Info Log: ' + programLog + '\n' +
-					vertexErrors + '\n' +
-					fragmentErrors
-				);
+					renderer.debug.onShaderError( gl, program, glVertexShader, glFragmentShader );
+
+				} else {
+
+					// default error reporting
+
+					const vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
+					const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
+
+					console.error(
+						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+						'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
+						'Program Info Log: ' + programLog + '\n' +
+						vertexErrors + '\n' +
+						fragmentErrors
+					);
+
+				}
 
 			} else if ( programLog !== '' ) {
 
@@ -27556,7 +27577,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				 * Enables error checking and reporting when shader programs are being compiled
 				 * @type {boolean}
 				 */
-				checkShaderErrors: true
+				checkShaderErrors: true,
+				/**
+				 * Callback for custom error reporting.
+				 * @type {?Function}
+				 */
+				onShaderError: null
 			};
 
 			// clearing
@@ -29740,18 +29766,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		// @deprecated since r150
-
-		get physicallyCorrectLights() {
+		get physicallyCorrectLights() { // @deprecated, r150
 
 			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 			return ! this.useLegacyLights;
 
 		}
 
-		// @deprecated since r150
-
-		set physicallyCorrectLights( value ) {
+		set physicallyCorrectLights( value ) { // @deprecated, r150
 
 			console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 			this.useLegacyLights = ! value;
@@ -29887,16 +29909,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		// @deprecated
-
-		get autoUpdate() {
+		get autoUpdate() { // @deprecated, r144
 
 			console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
 			return this.matrixWorldAutoUpdate;
 
 		}
 
-		set autoUpdate( value ) {
+		set autoUpdate( value ) { // @deprecated, r144
 
 			console.warn( 'THREE.Scene: autoUpdate was renamed to matrixWorldAutoUpdate in r144.' );
 			this.matrixWorldAutoUpdate = value;
@@ -30995,9 +31015,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		// @deprecated
-
-		boneTransform( index, vector ) {
+		boneTransform( index, vector ) { // @deprecated, r151
 
 			console.warn( 'THREE.SkinnedMesh: .boneTransform() was renamed to .applyBoneTransform() in r151.' );
 			return this.applyBoneTransform( index, vector );
@@ -44252,6 +44270,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
+			if ( data.up !== undefined ) object.up.fromArray( data.up );
+
 			if ( data.castShadow !== undefined ) object.castShadow = data.castShadow;
 			if ( data.receiveShadow !== undefined ) object.receiveShadow = data.receiveShadow;
 
@@ -50592,9 +50612,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class BoxBufferGeometry extends BoxGeometry {
+	class BoxBufferGeometry extends BoxGeometry { // @deprecated, r144
 
 		constructor( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
@@ -50606,9 +50624,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class CapsuleBufferGeometry extends CapsuleGeometry {
+	class CapsuleBufferGeometry extends CapsuleGeometry { // @deprecated, r144
 
 		constructor( radius, length, capSegments, radialSegments ) {
 
@@ -50619,9 +50635,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class CircleBufferGeometry extends CircleGeometry {
+	class CircleBufferGeometry extends CircleGeometry { // @deprecated, r144
 
 		constructor( radius, segments, thetaStart, thetaLength ) {
 
@@ -50632,9 +50646,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class ConeBufferGeometry extends ConeGeometry {
+	class ConeBufferGeometry extends ConeGeometry { // @deprecated, r144
 
 		constructor( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -50645,9 +50657,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class CylinderBufferGeometry extends CylinderGeometry {
+	class CylinderBufferGeometry extends CylinderGeometry { // @deprecated, r144
 
 		constructor( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -50658,9 +50668,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class DodecahedronBufferGeometry extends DodecahedronGeometry {
+	class DodecahedronBufferGeometry extends DodecahedronGeometry { // @deprecated, r144
 
 		constructor( radius, detail ) {
 
@@ -50671,9 +50679,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class ExtrudeBufferGeometry extends ExtrudeGeometry {
+	class ExtrudeBufferGeometry extends ExtrudeGeometry { // @deprecated, r144
 
 		constructor( shapes, options ) {
 
@@ -50684,9 +50690,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class IcosahedronBufferGeometry extends IcosahedronGeometry {
+	class IcosahedronBufferGeometry extends IcosahedronGeometry { // @deprecated, r144
 
 		constructor( radius, detail ) {
 
@@ -50697,9 +50701,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class LatheBufferGeometry extends LatheGeometry {
+	class LatheBufferGeometry extends LatheGeometry { // @deprecated, r144
 
 		constructor( points, segments, phiStart, phiLength ) {
 
@@ -50710,9 +50712,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class OctahedronBufferGeometry extends OctahedronGeometry {
+	class OctahedronBufferGeometry extends OctahedronGeometry { // @deprecated, r144
 
 		constructor( radius, detail ) {
 
@@ -50723,9 +50723,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class PlaneBufferGeometry extends PlaneGeometry {
+	class PlaneBufferGeometry extends PlaneGeometry { // @deprecated, r144
 
 		constructor( width, height, widthSegments, heightSegments ) {
 
@@ -50736,9 +50734,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class PolyhedronBufferGeometry extends PolyhedronGeometry {
+	class PolyhedronBufferGeometry extends PolyhedronGeometry { // @deprecated, r144
 
 		constructor( vertices, indices, radius, detail ) {
 
@@ -50749,9 +50745,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class RingBufferGeometry extends RingGeometry {
+	class RingBufferGeometry extends RingGeometry { // @deprecated, r144
 
 		constructor( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
@@ -50762,9 +50756,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class ShapeBufferGeometry extends ShapeGeometry {
+	class ShapeBufferGeometry extends ShapeGeometry { // @deprecated, r144
 
 		constructor( shapes, curveSegments ) {
 
@@ -50775,9 +50767,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class SphereBufferGeometry extends SphereGeometry {
+	class SphereBufferGeometry extends SphereGeometry { // @deprecated, r144
 
 		constructor( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
@@ -50788,9 +50778,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class TetrahedronBufferGeometry extends TetrahedronGeometry {
+	class TetrahedronBufferGeometry extends TetrahedronGeometry { // @deprecated, r144
 
 		constructor( radius, detail ) {
 
@@ -50801,9 +50789,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class TorusBufferGeometry extends TorusGeometry {
+	class TorusBufferGeometry extends TorusGeometry { // @deprecated, r144
 
 		constructor( radius, tube, radialSegments, tubularSegments, arc ) {
 
@@ -50814,9 +50800,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class TorusKnotBufferGeometry extends TorusKnotGeometry {
+	class TorusKnotBufferGeometry extends TorusKnotGeometry { // @deprecated, r144
 
 		constructor( radius, tube, tubularSegments, radialSegments, p, q ) {
 
@@ -50827,9 +50811,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	// r144
-
-	class TubeBufferGeometry extends TubeGeometry {
+	class TubeBufferGeometry extends TubeGeometry { // @deprecated, r144
 
 		constructor( path, tubularSegments, radius, radialSegments, closed ) {
 
@@ -50872,6 +50854,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	exports.AlwaysStencilFunc = AlwaysStencilFunc;
 	exports.AmbientLight = AmbientLight;
 	exports.AmbientLightProbe = AmbientLightProbe;
+	exports.AnimationAction = AnimationAction;
 	exports.AnimationClip = AnimationClip;
 	exports.AnimationLoader = AnimationLoader;
 	exports.AnimationMixer = AnimationMixer;
