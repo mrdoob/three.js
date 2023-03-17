@@ -3,7 +3,6 @@ import * as Nodes from 'three/nodes';
 
 import Node, { addNodeClass } from '../core/Node.js';
 import { scriptableValue } from './ScriptableValueNode.js';
-import { getNodeChildren } from '../core/NodeUtils.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class Resources extends Map {
@@ -184,12 +183,6 @@ class ScriptableNode extends Node {
 		}
 
 		return this;
-
-	}
-
-	getParameter( name ) {
-
-		return this.parameters[ name ];
 
 	}
 
