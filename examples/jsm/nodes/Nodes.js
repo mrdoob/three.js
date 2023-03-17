@@ -97,6 +97,10 @@ export { default as PosterizeNode, posterize } from './display/PosterizeNode.js'
 export { default as ToneMappingNode, toneMapping } from './display/ToneMappingNode.js';
 export { default as ViewportNode, viewportCoordinate, viewportResolution, viewportTopLeft, viewportBottomLeft, viewportTopRight, viewportBottomRight } from './display/ViewportNode.js';
 
+// scriptable
+export { default as ScriptableNode, scriptable } from './scriptable/ScriptableNode.js';
+export { default as ScriptableValueNode, scriptableValue } from './scriptable/ScriptableValueNode.js';
+
 // fog
 export { default as FogNode, fog } from './fog/FogNode.js';
 export { default as FogRangeNode, rangeFog } from './fog/FogRangeNode.js';
