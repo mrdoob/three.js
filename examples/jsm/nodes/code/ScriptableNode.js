@@ -70,8 +70,8 @@ class ScriptableNode extends Node {
 
 		this.codeNode = codeNode;
 		this.parameters = parameters;
-		this.local = new Resources();
 
+		this._local = new Resources();
 		this._output = scriptableValue();
 		this._outputs = {};
 		this._source = this.source;
@@ -94,11 +94,21 @@ class ScriptableNode extends Node {
 
 	}
 
+	setLocal( name, value ) {
+
+		return this._local.set( name, value );
+
+	}
+
+	getLocal( name ) {
+
+		return this._local.get( name );
+
+	}
+
 	onRefresh() {
 
-		this.needsUpdate = true;
-
-		this.getDefaultOutput();
+		this._refresh();
 
 	}
 
@@ -164,7 +174,14 @@ class ScriptableNode extends Node {
 
 		const parameters = this.parameters;
 
-		if ( value && value.isScriptableValueNode ) {
+		if ( value && value.isScriptableNode ) {
+
+			this.deleteParameter( name );
+
+			parameters[ name ] = value;
+			parameters[ name ].getDefaultOutput().events.addEventListener( 'refresh', this.onRefresh );
+
+		} else if ( value && value.isScriptableValueNode ) {
 
 			this.deleteParameter( name );
 
@@ -186,13 +203,21 @@ class ScriptableNode extends Node {
 
 	}
 
+	getValue() {
+
+		return this.getDefaultOutput().getValue();
+
+	}
+
 	deleteParameter( name ) {
 
-		if ( this.parameters[ name ] ) {
+		let valueNode = this.parameters[ name ];
 
-			this.parameters[ name ].events.removeEventListener( 'refresh', this.onRefresh );
+		if ( valueNode ) {
 
-			delete this.parameters[ name ];
+			if ( valueNode.isScriptableNode ) valueNode = valueNode.getDefaultOutput();
+
+			valueNode.events.removeEventListener( 'refresh', this.onRefresh );
 
 		}
 
@@ -254,7 +279,7 @@ class ScriptableNode extends Node {
 
 		} else {
 
-			this._output.refresh();
+			this._refresh();
 
 		}
 
@@ -273,7 +298,7 @@ class ScriptableNode extends Node {
 		const parameters = new Parameters( this );
 
 		const method = this.getMethod( this.codeNode );
-		const params = [ parameters, this.local, global, refresh, setOutput, THREE, Nodes, this.editor ];
+		const params = [ parameters, this._local, global, refresh, setOutput, THREE, Nodes, this.editor ];
 
 		this._object = method( ...params );
 
@@ -283,30 +308,34 @@ class ScriptableNode extends Node {
 
 			if ( layout.cache === false ) {
 
-				this.local.clear();
+				this._local.clear();
 
 			}
 
 			// default output
 			this._output.outputType = layout.outputType || null;
 
-			for ( const element of layout.elements ) {
+			if ( Array.isArray( layout.elements ) ) {
 
-				const id = element.id || element.name;
+				for ( const element of layout.elements ) {
 
-				if ( element.inputType ) {
+					const id = element.id || element.name;
 
-					if ( this.getParameter( id ) === undefined ) this.setParameter( id, null );
+					if ( element.inputType ) {
 
-					this.getParameter( id ).inputType = element.inputType;
+						if ( this.getParameter( id ) === undefined ) this.setParameter( id, null );
 
-				}
+						this.getParameter( id ).inputType = element.inputType;
 
-				if ( element.outputType ) {
+					}
 
-					if ( this.getOutput( id ) === undefined ) this.setOutput( id, null );
+					if ( element.outputType ) {
 
-					this.getOutput( id ).outputType = element.outputType;
+						if ( this.getOutput( id ) === undefined ) this.setOutput( id, null );
+
+						this.getOutput( id ).outputType = element.outputType;
+
+					}
 
 				}
 
@@ -315,6 +344,22 @@ class ScriptableNode extends Node {
 		}
 
 		return this._object;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		for ( const name in this.parameters ) {
+
+			let valueNode = this.parameters[ name ];
+
+			if ( valueNode.isScriptableNode ) valueNode = valueNode.getDefaultOutput();
+
+			valueNode.events.addEventListener( 'refresh', this.onRefresh );
+
+		}
 
 	}
 
@@ -340,17 +385,7 @@ class ScriptableNode extends Node {
 
 	getDefaultOutput()	{
 
-		if ( this._needsOutputUpdate === true ) {
-
-			this._value = this.call( 'main' );
-
-			this._needsOutputUpdate = false;
-
-		}
-
-		this._output.value = this._value;
-
-		return this._output;
+		return this._exec()._output;
 
 	}
 
@@ -413,6 +448,34 @@ class ScriptableNode extends Node {
 	get needsUpdate() {
 
 		return this.source !== this._source;
+
+	}
+
+	_exec()	{
+
+		if ( this.codeNode === null ) return this;
+
+		if ( this._needsOutputUpdate === true ) {
+
+			this._value = this.call( 'main' );
+
+			this._needsOutputUpdate = false;
+
+		}
+
+		this._output.value = this._value;
+
+		return this;
+
+	}
+
+	_refresh() {
+
+		this.needsUpdate = true;
+
+		this._exec();
+
+		this._output.refresh();
 
 	}
 
