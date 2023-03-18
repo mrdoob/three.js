@@ -9,12 +9,8 @@ export { default as ArrayUniformNode /* @TODO: arrayUniform */ } from './core/Ar
 export { default as AttributeNode, attribute } from './core/AttributeNode.js';
 export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
-export { default as CodeNode, code, js } from './core/CodeNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode, context } from './core/ContextNode.js';
-export { default as ExpressionNode, expression } from './core/ExpressionNode.js';
-export { default as FunctionCallNode, call } from './core/FunctionCallNode.js';
-export { default as FunctionNode, func, fn } from './core/FunctionNode.js';
 export { default as InstanceIndexNode, instanceIndex } from './core/InstanceIndexNode.js';
 export { default as LightingModel, lightingModel } from './core/LightingModel.js';
 export { default as Node, addNodeClass, createNodeFromType } from './core/Node.js';
@@ -97,9 +93,13 @@ export { default as PosterizeNode, posterize } from './display/PosterizeNode.js'
 export { default as ToneMappingNode, toneMapping } from './display/ToneMappingNode.js';
 export { default as ViewportNode, viewportCoordinate, viewportResolution, viewportTopLeft, viewportBottomLeft, viewportTopRight, viewportBottomRight } from './display/ViewportNode.js';
 
-// scriptable
-export { default as ScriptableNode, scriptable } from './scriptable/ScriptableNode.js';
-export { default as ScriptableValueNode, scriptableValue } from './scriptable/ScriptableValueNode.js';
+// code
+export { default as ExpressionNode, expression } from './code/ExpressionNode.js';
+export { default as CodeNode, code, js } from './code/CodeNode.js';
+export { default as FunctionCallNode, call } from './code/FunctionCallNode.js';
+export { default as FunctionNode, func, fn } from './code/FunctionNode.js';
+export { default as ScriptableNode, scriptable, global } from './code/ScriptableNode.js';
+export { default as ScriptableValueNode, scriptableValue } from './code/ScriptableValueNode.js';
 
 // fog
 export { default as FogNode, fog } from './fog/FogNode.js';

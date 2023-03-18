@@ -1,4 +1,4 @@
-import Node, { addNodeClass } from './Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class CodeNode extends Node {
