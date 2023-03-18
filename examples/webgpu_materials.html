@@ -255,6 +255,12 @@
 
 					const { saturation, float, oscSine, mul } = TSL;
 
+					function helloWorld() {
+
+						console.log( "Hello World!" );
+
+					}
+
 					function main() {
 
 						const source = parameters.get( 'source' ) || float();
@@ -278,6 +284,8 @@
 
 					}
 
+					output = { helloWorld };
+
 				` ).scriptable();
 
 				scriptableNode.setParameter( 'source', texture( uvTexture ).xyz );
@@ -285,6 +293,8 @@
 				scriptableNode.setParameter( 'message', string( 'Hello World!' ) );
 				scriptableNode.setParameter( 'binary', new ArrayBuffer( 4 ) );
 				scriptableNode.setParameter( 'object3d', new THREE.Group() );
+
+				scriptableNode.call( 'helloWorld' );
 
 				material = new MeshBasicNodeMaterial();
 				material.colorNode = scriptableNode;
