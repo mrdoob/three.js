@@ -400,8 +400,8 @@ class ScriptableNode extends Node {
 		const interfaceProps = [ 'layout', 'init', 'main', 'dispose' ];
 
 		const properties = interfaceProps.join( ', ' );
-		const declarations = 'var ' + properties + ';\n';
-		const returns = '\nreturn { ' + properties + ' };';
+		const declarations = 'var ' + properties + '; var output = {};\n';
+		const returns = '\nreturn { ...output, ' + properties + ' };';
 
 		const code = declarations + this.codeNode.code + returns;
 
