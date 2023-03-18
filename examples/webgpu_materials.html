@@ -205,14 +205,51 @@
 
 				// Scriptable
 
-				const scriptableNode = js( `
+				const asyncNode = js( `
+
 					layout = {
+						outputType: 'node'
+					};
+
+					const { float } = TSL;
+
+					function init() {
+
+						setTimeout( () => {
+
+							local.set( 'result', float( 1.0 ) );
+
+							refresh(); // refresh the node
+
+						}, 1000 );
+
+						return float( 0.0 );
+
+					}
+
+					function main() {
+
+						const result = local.get( 'result', init );
+
+						//console.log( 'result', result );
+
+						return result;
+
+					}
+
+				` ).scriptable();
+
+				const scriptableNode = js( `
+
+					layout = {
+						outputType: 'node',
 						elements: [
 							{ name: 'source', inputType: 'node' },
 							{ name: 'contrast', inputType: 'node' },
 							{ name: 'message', inputType: 'string' },
 							{ name: 'binary', inputType: 'ArrayBuffer' },
-							{ name: 'myObj', inputType: 'Object3D' },
+							{ name: 'object3d', inputType: 'Object3D' },
+							{ name: 'execFrom', inputType: 'string' }
 						]
 					};
 
@@ -223,24 +260,37 @@
 						const source = parameters.get( 'source' ) || float();
 						const contrast = parameters.get( 'contrast' ) || float();
 
-						console.log( parameters.get( 'message' ).value );
-						console.log( parameters.get( 'binary' ) );
-						console.log( parameters.get( 'myObj' ) ); // unserializable yet
+						const material = local.get( 'material' );
+
+						if ( parameters.get( 'execFrom' ) === 'serialized' ) {
+
+							//console.log( 'message', parameters.get( 'message' ).value );
+							//console.log( 'binary', parameters.get( 'binary' ) );
+							//console.log( 'object3d', parameters.get( 'object3d' ) ); // unserializable yet
+
+							//console.log( global.get( 'renderer' ) );
+
+						}
+
+						if ( material ) material.needsUpdate = true;
 
 						return mul( saturation( source, oscSine() ), contrast );
 
 					}
+
 				` ).scriptable();
 
 				scriptableNode.setParameter( 'source', texture( uvTexture ).xyz );
-				scriptableNode.setParameter( 'contrast', 1 );
+				scriptableNode.setParameter( 'contrast', asyncNode );
 				scriptableNode.setParameter( 'message', string( 'Hello World!' ) );
 				scriptableNode.setParameter( 'binary', new ArrayBuffer( 4 ) );
-				scriptableNode.setParameter( 'myObj', new THREE.Group() );
+				scriptableNode.setParameter( 'object3d', new THREE.Group() );
 
 				material = new MeshBasicNodeMaterial();
 				material.colorNode = scriptableNode;
 				materials.push( material );
+
+				scriptableNode.setLocal( 'material', material );
 
 				//
 				// Geometry
@@ -253,6 +303,8 @@
 					addMesh( geometry, materials[ i ] );
 
 				}
+
+				const serializeMesh = scene.children[ scene.children.length - 1 ];
 
 				//
 
@@ -273,7 +325,7 @@
 
 				//
 
-				setTimeout( () => testSerialization( scene.children[ scene.children.length - 1 ] ), 1000 );
+				setTimeout( () => testSerialization( serializeMesh ), 1000 );
 
 			}
 
@@ -300,12 +352,18 @@
 				const loader = new NodeObjectLoader();
 				const serializedMesh = loader.parse( json );
 
-				scene.add( serializedMesh );
+				serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;
+				serializedMesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
 
-				mesh.position.x = ( objects.length % 4 ) * 200 - 400;
-				mesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+				const scriptableNode = serializedMesh.material.colorNode;
+
+				// it's because local.get( 'material' ) is used in the example ( local/global is unserializable )
+				scriptableNode.setLocal( 'material', serializedMesh.material );
+				scriptableNode.setParameter( 'execFrom', 'serialized' );
 
 				objects.push( serializedMesh );
+
+				scene.add( serializedMesh );
 
 			}
 
