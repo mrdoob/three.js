@@ -1,6 +1,3 @@
-import * as THREE from 'three';
-import * as Nodes from 'three/nodes';
-
 import Node, { addNodeClass } from '../core/Node.js';
 import { scriptableValue } from './ScriptableValueNode.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
@@ -295,8 +292,11 @@ class ScriptableNode extends Node {
 
 		const parameters = new Parameters( this );
 
+		const THREE = global.get( 'THREE' );
+		const TSL = global.get( 'TSL' );
+
 		const method = this.getMethod( this.codeNode );
-		const params = [ parameters, this._local, global, refresh, setOutput, THREE, Nodes ];
+		const params = [ parameters, this._local, global, refresh, setOutput, THREE, TSL ];
 
 		this._object = method( ...params );
 
