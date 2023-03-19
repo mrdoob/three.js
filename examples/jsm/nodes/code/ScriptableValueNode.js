@@ -67,7 +67,16 @@ class ScriptableValueNode extends Node {
 
 			this._cache = URL.createObjectURL( new Blob( [ value.value ] ) );
 
-		} else if ( value && this.inputType === 'URL' && typeof value.value === 'string' ) {
+		} else if ( value && value.value !== null && value.value !== undefined && (
+			( ( this.inputType === 'URL' || this.inputType === 'String' ) && typeof value.value === 'string' ) ||
+			( this.inputType === 'Number' && typeof value.value === 'number' ) ||
+			( this.inputType === 'Vector2' && value.value.isVector2 ) ||
+			( this.inputType === 'Vector3' && value.value.isVector3 ) ||
+			( this.inputType === 'Vector4' && value.value.isVector4 ) ||
+			( this.inputType === 'Color' && value.value.isColor ) ||
+			( this.inputType === 'Matrix3' && value.value.isMatrix3 ) ||
+			( this.inputType === 'Matrix4' && value.value.isMatrix4 )
+		) ) {
 
 			return value.value;
 
