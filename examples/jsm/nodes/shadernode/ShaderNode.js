@@ -255,6 +255,20 @@ const getAutoTypedConstNode = ( value ) => {
 
 };
 
+const getTypeFromInputNode = ( node ) => {
+
+	if ( node.isInputNode !== true || node.value === null ) return;
+
+	const value = node.value;
+
+	if ( value.isVector3 === true ) return 'vec3';
+	if ( value.isVector4 === true ) return 'vec4';
+	if ( value.isColor === true ) return 'color';
+	if ( value.isMatrix3 === true ) return 'mat3';
+	if ( value.isMatrix4 === true ) return 'mat4';
+
+};
+
 const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
@@ -281,7 +295,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( nodes.length === 1 ) {
 
-				return nodeObject( nodes[ 0 ].nodeType === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
+				return nodeObject( nodes[ 0 ].nodeType === type || getTypeFromInputNode( nodes[ 0 ] ) === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
 
 			}
 
