@@ -80,8 +80,6 @@ class ScriptableNode extends Node {
 		this._value = null;
 		this._needsOutputUpdate = true;
 
-		this.editor = null; // defined by editor
-
 		this.onRefresh = this.onRefresh.bind( this );
 
 		this.isScriptableNode = true;
@@ -298,7 +296,7 @@ class ScriptableNode extends Node {
 		const parameters = new Parameters( this );
 
 		const method = this.getMethod( this.codeNode );
-		const params = [ parameters, this._local, global, refresh, setOutput, THREE, Nodes, this.editor ];
+		const params = [ parameters, this._local, global, refresh, setOutput, THREE, Nodes ];
 
 		this._object = method( ...params );
 
@@ -396,7 +394,7 @@ class ScriptableNode extends Node {
 
 		//
 
-		const parametersProps = [ 'parameters', 'local', 'global', 'refresh', 'setOutput', 'THREE', 'TSL', 'editor' ];
+		const parametersProps = [ 'parameters', 'local', 'global', 'refresh', 'setOutput', 'THREE', 'TSL' ];
 		const interfaceProps = [ 'layout', 'init', 'main', 'dispose' ];
 
 		const properties = interfaceProps.join( ', ' );
