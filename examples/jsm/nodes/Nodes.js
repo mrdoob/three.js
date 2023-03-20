@@ -9,6 +9,7 @@ export { default as ArrayUniformNode /* @TODO: arrayUniform */ } from './core/Ar
 export { default as AttributeNode, attribute } from './core/AttributeNode.js';
 export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
+export { default as CodeNode, code, js } from './core/CodeNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode, context } from './core/ContextNode.js';
 export { default as InstanceIndexNode, instanceIndex } from './core/InstanceIndexNode.js';
