@@ -33,7 +33,7 @@ const perturbNormal2ArbNode = new ShaderNode( ( inputs ) => {
 	const B = q1perp.mul( st0.y ).add( q0perp.mul( st1.y ) );
 
 	const det = T.dot( T ).max( B.dot( B ) );
-	const scale = faceDirection.mul( det.inversesqrt() );
+	const scale = faceDirection.mul( det.inverseSqrt() );
 
 	return add( T.mul( mapN.x, scale ), B.mul( mapN.y, scale ), N.mul( mapN.z ) ).normalize();
 
