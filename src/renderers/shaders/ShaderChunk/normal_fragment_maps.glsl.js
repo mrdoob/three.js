@@ -23,7 +23,7 @@ export default /* glsl */`
 	vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
 	mapN.xy *= normalScale;
 
-	normal = normalize( vTBN * mapN );
+	normal = normalize( tbn * mapN );
 
 #elif defined( USE_BUMPMAP )
 

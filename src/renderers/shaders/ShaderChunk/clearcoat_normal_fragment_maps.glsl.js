@@ -4,7 +4,7 @@ export default /* glsl */`
 	vec3 clearcoatMapN = texture2D( clearcoatNormalMap, vUv ).xyz * 2.0 - 1.0;
 	clearcoatMapN.xy *= clearcoatNormalScale;
 
-	clearcoatNormal = normalize( vTBN * clearcoatMapN );
+	clearcoatNormal = normalize( tbn * clearcoatMapN );
 
 #endif
 `;

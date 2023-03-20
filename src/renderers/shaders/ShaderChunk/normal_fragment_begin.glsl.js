@@ -21,18 +21,18 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 		#ifdef USE_TANGENT
 
-			mat3 vTBN = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
+			mat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
 
 		#else
 
-			mat3 vTBN = getTangentSpace( - vViewPosition, normal );
+			mat3 tbn = getTangentSpace( - vViewPosition, normal );
 
 		#endif
 
 		#ifdef DOUBLE_SIDED
 
-			vTBN[0] *= faceDirection;
-			vTBN[1] *= faceDirection;
+			tbn[0] *= faceDirection;
+			tbn[1] *= faceDirection;
 
 		#endif
 
