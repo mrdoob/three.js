@@ -1240,9 +1240,9 @@ class GLTFMaterialsAnisotropyExtension {
 
 		}
 
-		if ( extension.anisotropyDirection !== undefined ) {
+		if ( extension.anisotropyRotation !== undefined ) {
 
-			materialParams.anisotropyRotation = extension.anisotropyDirection;
+			materialParams.anisotropyRotation = extension.anisotropyRotation;
 
 		}
 
