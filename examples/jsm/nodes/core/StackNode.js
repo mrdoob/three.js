@@ -1,7 +1,7 @@
 import Node, { addNodeClass } from './Node.js';
 import { assign } from '../math/OperatorNode.js';
 import { bypass } from '../core/BypassNode.js';
-import { expression } from '../core/ExpressionNode.js';
+import { expression } from '../code/ExpressionNode.js';
 import { cond } from '../math/CondNode.js';
 import { nodeProxy, shader } from '../shadernode/ShaderNode.js';
 

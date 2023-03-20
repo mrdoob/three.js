@@ -239,9 +239,15 @@ class Node {
 
 	}
 
+	getSerializeChildren() {
+
+		return getNodeChildren( this );
+
+	}
+
 	serialize( json ) {
 
-		const nodeChildren = getNodeChildren( this );
+		const nodeChildren = this.getSerializeChildren();
 
 		const inputNodes = {};
 
