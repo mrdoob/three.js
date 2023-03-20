@@ -12,7 +12,7 @@ export default /* glsl */`
 
 #endif
 
-#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) || defined( USE_ANISOTROPY ) )
+#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )
 
 	// Normal Mapping Without Precomputed Tangents
 	// http://www.thetenthplanet.de/archives/1180
