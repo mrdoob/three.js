@@ -41,7 +41,7 @@ struct PhysicalMaterial {
 
 	#ifdef USE_ANISOTROPY
 		float anisotropy;
-		float alphaB;
+		float alphaT;
 		vec3 anisotropyT;
 		vec3 anisotropyB;
 	#endif
@@ -174,9 +174,9 @@ vec3 BRDF_GGX( const in vec3 lightDir, const in vec3 viewDir, const in vec3 norm
 		float dotBV = dot( material.anisotropyB, viewDir );
 		float dotBH = dot( material.anisotropyB, halfDir );
 
-		float V = V_GGX_SmithCorrelated_Anisotropic( alpha, material.alphaB, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );
+		float V = V_GGX_SmithCorrelated_Anisotropic( material.alphaT, alpha, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL );
 
-		float D = D_GGX_Anisotropic( alpha, material.alphaB, dotNH, dotTH, dotBH );
+		float D = D_GGX_Anisotropic( material.alphaT, alpha, dotNH, dotTH, dotBH );
 
 	#else
 
