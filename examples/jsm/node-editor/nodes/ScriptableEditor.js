@@ -1,6 +1,6 @@
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { CodeEditorElement } from '../elements/CodeEditorElement.js';
-import { disposeScene, getColorFromValue, getColorFromType, createElementFromJSON, isGPUNode, onValidType, getTypeFromValue } from '../NodeEditorUtils.js';
+import { disposeScene, getColorFromType, createElementFromJSON, isGPUNode, onValidType } from '../NodeEditorUtils.js';
 import { global, scriptable, js, scriptableValue } from 'three/nodes';
 
 const defaultTitle = 'Scriptable';
