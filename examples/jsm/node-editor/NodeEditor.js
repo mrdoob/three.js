@@ -1,301 +1,17 @@
-import { Styles, Canvas, CircleMenu, ButtonInput, StringInput, ContextMenu, Tips, Search, Loader, Node, TreeViewNode, TreeViewInput, Element } from '../libs/flow.module.js';
-import { BasicMaterialEditor } from './materials/BasicMaterialEditor.js';
-import { StandardMaterialEditor } from './materials/StandardMaterialEditor.js';
-import { PointsMaterialEditor } from './materials/PointsMaterialEditor.js';
-import { OperatorEditor } from './math/OperatorEditor.js';
-import { NormalizeEditor } from './math/NormalizeEditor.js';
-import { InvertEditor } from './math/InvertEditor.js';
-import { LimiterEditor } from './math/LimiterEditor.js';
-import { DotEditor } from './math/DotEditor.js';
-import { PowerEditor } from './math/PowerEditor.js';
-import { AngleEditor } from './math/AngleEditor.js';
-import { TrigonometryEditor } from './math/TrigonometryEditor.js';
-import { FloatEditor } from './inputs/FloatEditor.js';
-import { Vector2Editor } from './inputs/Vector2Editor.js';
-import { Vector3Editor } from './inputs/Vector3Editor.js';
-import { Vector4Editor } from './inputs/Vector4Editor.js';
-import { SliderEditor } from './inputs/SliderEditor.js';
-import { ColorEditor } from './inputs/ColorEditor.js';
-import { TextureEditor } from './inputs/TextureEditor.js';
-import { BlendEditor } from './display/BlendEditor.js';
-import { NormalMapEditor } from './display/NormalMapEditor.js';
-import { UVEditor } from './accessors/UVEditor.js';
-import { MatcapUVEditor } from './accessors/MatcapUVEditor.js';
-import { PositionEditor } from './accessors/PositionEditor.js';
-import { NormalEditor } from './accessors/NormalEditor.js';
-import { PreviewEditor } from './utils/PreviewEditor.js';
-import { TimerEditor } from './utils/TimerEditor.js';
-import { OscillatorEditor } from './utils/OscillatorEditor.js';
-import { SplitEditor } from './utils/SplitEditor.js';
-import { JoinEditor } from './utils/JoinEditor.js';
-import { CheckerEditor } from './procedural/CheckerEditor.js';
-import { PointsEditor } from './scene/PointsEditor.js';
-import { MeshEditor } from './scene/MeshEditor.js';
-import { FileEditor } from './core/FileEditor.js';
-import { FileURLEditor } from './core/FileURLEditor.js';
+import * as THREE from 'three';
+import * as Nodes from 'three/nodes';
+import { Canvas, CircleMenu, ButtonInput, StringInput, ContextMenu, Tips, Search, Loader, Node, TreeViewNode, TreeViewInput, Element } from '../libs/flow.module.js';
+import { FileEditor } from './nodes/FileEditor.js';
 import { exportJSON } from './NodeEditorUtils.js';
-import { EventDispatcher } from 'three';
+import { init, ClassLib, getNodeEditorClass, getNodeList } from './NodeEditorLib.js';
 
-Styles.icons.unlink = 'ti ti-unlink';
+init();
 
-export const NodeList = [
-	{
-		name: 'Inputs',
-		icon: 'forms',
-		children: [
-			{
-				name: 'Slider',
-				icon: 'adjustments-horizontal',
-				tags: 'number',
-				nodeClass: SliderEditor
-			},
-			{
-				name: 'Float',
-				icon: 'box-multiple-1',
-				nodeClass: FloatEditor
-			},
-			{
-				name: 'Vector 2',
-				icon: 'box-multiple-2',
-				nodeClass: Vector2Editor
-			},
-			{
-				name: 'Vector 3',
-				icon: 'box-multiple-3',
-				nodeClass: Vector3Editor
-			},
-			{
-				name: 'Vector 4',
-				icon: 'box-multiple-4',
-				nodeClass: Vector4Editor
-			},
-			{
-				name: 'Color',
-				icon: 'palette',
-				nodeClass: ColorEditor
-			},
-			{
-				name: 'Texture',
-				icon: 'photo',
-				nodeClass: TextureEditor
-			},
-			{
-				name: 'File URL',
-				icon: 'cloud-download',
-				nodeClass: FileURLEditor
-			}
-		]
-	},
-	{
-		name: 'Accessors',
-		icon: 'vector-triangle',
-		children: [
-			{
-				name: 'UV',
-				icon: 'details',
-				nodeClass: UVEditor
-			},
-			{
-				name: 'Position',
-				icon: 'hierarchy',
-				nodeClass: PositionEditor
-			},
-			{
-				name: 'Normal',
-				icon: 'fold-up',
-				nodeClass: NormalEditor
-			},
-			{
-				name: 'Matcap UV',
-				icon: 'circle',
-				nodeClass: MatcapUVEditor
-			}
-		]
-	},
-	{
-		name: 'Display',
-		icon: 'brightness',
-		children: [
-			{
-				name: 'Blend',
-				icon: 'layers-subtract',
-				tags: 'mix',
-				nodeClass: BlendEditor
-			},
-			{
-				name: 'Normal Map',
-				icon: 'chart-line',
-				nodeClass: NormalMapEditor
-			}
-		]
-	},
-	{
-		name: 'Math',
-		icon: 'calculator',
-		children: [
-			{
-				name: 'Operator',
-				icon: 'math-symbols',
-				tags: 'addition, subtration, multiplication, division',
-				nodeClass: OperatorEditor
-			},
-			{
-				name: 'Invert',
-				icon: 'flip-vertical',
-				tip: 'Negate',
-				nodeClass: InvertEditor
-			},
-			{
-				name: 'Limiter',
-				icon: 'arrow-bar-to-up',
-				tip: 'Min / Max',
-				nodeClass: LimiterEditor
-			},
-			{
-				name: 'Dot Product',
-				icon: 'arrows-up-left',
-				nodeClass: DotEditor
-			},
-			{
-				name: 'Power',
-				icon: 'arrow-up-right',
-				nodeClass: PowerEditor
-			},
-			{
-				name: 'Trigonometry',
-				icon: 'wave-sine',
-				tip: 'Sin / Cos / Tan / ...',
-				tags: 'sin, cos, tan, asin, acos, atan, sine, cosine, tangent, arcsine, arccosine, arctangent',
-				nodeClass: TrigonometryEditor
-			},
-			{
-				name: 'Angle',
-				icon: 'angle',
-				tip: 'Degress / Radians',
-				tags: 'degress, radians',
-				nodeClass: AngleEditor
-			},
-			{
-				name: 'Normalize',
-				icon: 'fold',
-				nodeClass: NormalizeEditor
-			}
-		]
-	},
-	{
-		name: 'Procedural',
-		icon: 'infinity',
-		children: [
-			{
-				name: 'Checker',
-				icon: 'border-outer',
-				nodeClass: CheckerEditor
-			}
-		]
-	},
-	{
-		name: 'Utils',
-		icon: 'apps',
-		children: [
-			{
-				name: 'Preview',
-				icon: 'square-check',
-				nodeClass: PreviewEditor
-			},
-			{
-				name: 'Timer',
-				icon: 'clock',
-				nodeClass: TimerEditor
-			},
-			{
-				name: 'Oscillator',
-				icon: 'wave-sine',
-				nodeClass: OscillatorEditor
-			},
-			{
-				name: 'Split',
-				icon: 'arrows-split-2',
-				nodeClass: SplitEditor
-			},
-			{
-				name: 'Join',
-				icon: 'arrows-join-2',
-				nodeClass: JoinEditor
-			}
-		]
-	},
-	/*{
-		name: 'Scene',
-		icon: '3d-cube-sphere',
-		children: [
-			{
-				name: 'Mesh',
-				icon: '3d-cube-sphere',
-				nodeClass: MeshEditor
-			}
-		]
-	},*/
-	{
-		name: 'Material',
-		icon: 'circles',
-		children: [
-			{
-				name: 'Basic Material',
-				icon: 'circle',
-				nodeClass: BasicMaterialEditor
-			},
-			{
-				name: 'Standard Material',
-				icon: 'circle',
-				nodeClass: StandardMaterialEditor
-			},
-			{
-				name: 'Points Material',
-				icon: 'circle-dotted',
-				nodeClass: PointsMaterialEditor
-			}
-		]
-	}
-];
+Element.icons.unlink = 'ti ti-unlink';
 
-export const ClassLib = {
-	BasicMaterialEditor,
-	StandardMaterialEditor,
-	PointsMaterialEditor,
-	PointsEditor,
-	MeshEditor,
-	OperatorEditor,
-	NormalizeEditor,
-	InvertEditor,
-	LimiterEditor,
-	DotEditor,
-	PowerEditor,
-	AngleEditor,
-	TrigonometryEditor,
-	FloatEditor,
-	Vector2Editor,
-	Vector3Editor,
-	Vector4Editor,
-	SliderEditor,
-	ColorEditor,
-	TextureEditor,
-	BlendEditor,
-	NormalMapEditor,
-	UVEditor,
-	MatcapUVEditor,
-	PositionEditor,
-	NormalEditor,
-	TimerEditor,
-	OscillatorEditor,
-	SplitEditor,
-	JoinEditor,
-	CheckerEditor,
-	FileURLEditor
-};
+export class NodeEditor extends THREE.EventDispatcher {
 
-export class NodeEditor extends EventDispatcher {
-
-	constructor( scene = null ) {
+	constructor( scene = null, renderer = null, composer = null ) {
 
 		super();
 
@@ -305,7 +21,19 @@ export class NodeEditor extends EventDispatcher {
 		domElement.append( canvas.dom );
 
 		this.scene = scene;
+		this.renderer = renderer;
+		
+		const { global } = Nodes;
 
+		global.set( 'THREE', THREE );
+		global.set( 'TSL', Nodes );
+
+		global.set( 'scene', scene );
+		global.set( 'renderer', renderer );
+		global.set( 'composer', composer );
+
+		this.nodeClasses = [];
+	
 		this.canvas = canvas;
 		this.domElement = domElement;
 
@@ -325,6 +53,7 @@ export class NodeEditor extends EventDispatcher {
 		this._initSearch();
 		this._initNodesContext();
 		this._initExamplesContext();
+		this._initParams();
 
 	}
 
@@ -423,6 +152,15 @@ export class NodeEditor extends EventDispatcher {
 
 	}
 
+	async loadURL( url ) {
+
+		const loader = new Loader( Loader.OBJECTS );
+		const json = await loader.load( url, ClassLib );
+
+		this.loadJSON( json );
+		
+	}
+
 	loadJSON( json ) {
 
 		const canvas = this.canvas;
@@ -449,12 +187,14 @@ export class NodeEditor extends EventDispatcher {
 
 			for ( const item of canvas.droppedItems ) {
 
-				if ( /^image\//.test( item.type ) === true ) {
+				const { relativeClientX, relativeClientY } = canvas;
 
-					const { relativeClientX, relativeClientY } = canvas;
+				const file = item.getAsFile();
+				const reader = new FileReader();
 
-					const file = item.getAsFile();
-					const fileEditor = new FileEditor( file );
+				reader.onload = () => {
+
+					const fileEditor = new FileEditor( reader.result, file.name );
 
 					fileEditor.setPosition(
 						relativeClientX - ( fileEditor.getWidth() / 2 ),
@@ -463,7 +203,9 @@ export class NodeEditor extends EventDispatcher {
 
 					this.add( fileEditor );
 
-				}
+				};
+
+				reader.readAsArrayBuffer( file );
 
 			}
 
@@ -487,7 +229,7 @@ export class NodeEditor extends EventDispatcher {
 		menu.setAlign( 'top left' );
 		previewMenu.setAlign( 'top left' );
 
-		const previewButton = new ButtonInput().setIcon( 'ti ti-3d-cube-sphere' ).setToolTip( 'Preview' );
+		const previewButton = new ButtonInput().setIcon( 'ti ti-brand-threejs' ).setToolTip( 'Preview' );
 		const menuButton = new ButtonInput().setIcon( 'ti ti-apps' ).setToolTip( 'Add' );
 		const examplesButton = new ButtonInput().setIcon( 'ti ti-file-symlink' ).setToolTip( 'Examples' );
 		const newButton = new ButtonInput().setIcon( 'ti ti-file' ).setToolTip( 'New' );
@@ -575,22 +317,29 @@ export class NodeEditor extends EventDispatcher {
 
 			const filename = button.getExtra();
 
-			const loader = new Loader( Loader.OBJECTS );
-			const json = await loader.load( `./jsm/node-editor/examples/${filename}.json`, ClassLib );
-
-			this.loadJSON( json );
+			this.loadURL( `./jsm/node-editor/examples/${filename}.json` );
 
 		};
 
-		const addExample = ( context, name, filename = null ) => {
+		const addExamples = ( category, names ) => {
 
-			filename = filename || name.replaceAll( ' ', '-' ).toLowerCase();
+			const subContext = new ContextMenu()
 
-			context.add( new ButtonInput( name )
-				.setIcon( 'ti ti-file-symlink' )
-				.onClick( onClickExample )
-				.setExtra( filename )
-			);
+			for( const name of names ) {
+					
+				const filename = name.replaceAll( ' ', '-' ).toLowerCase();
+
+				subContext.add( new ButtonInput( name )
+					.setIcon( 'ti ti-file-symlink' )
+					.onClick( onClickExample )
+					.setExtra( filename )
+				);
+
+			}
+
+			context.add( new ButtonInput( category ), subContext );
+
+			return subContext;
 
 		};
 
@@ -598,23 +347,69 @@ export class NodeEditor extends EventDispatcher {
 		// EXAMPLES
 		//**************//
 
-		const basicContext = new ContextMenu();
-		const advancedContext = new ContextMenu();
+		addExamples( 'Universal', [
+			'Animate UV',
+			'Fake top light'
+		] );
 
-		addExample( basicContext, 'Animate UV' );
-		addExample( basicContext, 'Fake top light' );
-		addExample( basicContext, 'Oscillator color' );
+		if ( this.renderer.isWebGLRenderer ) {
 
-		addExample( advancedContext, 'Rim' );
+			addExamples( 'WebGL', [
+				'Animate UV',
+				'Fake top light'
+			] );
 
-		//**************//
-		// MAIN
-		//**************//
+		} else if( this.renderer.isWebGPURenderer ) {
 
-		context.add( new ButtonInput( 'Basic' ), basicContext );
-		context.add( new ButtonInput( 'Advanced' ), advancedContext );
+			addExamples( 'WebGPU', [
+				'Animate UV',
+				'Fake top light'
+			] );
+
+		}
 
 		this.examplesContext = context;
+
+	}
+
+	_initParams() {
+
+		const urlParams = new URLSearchParams( window.location.search );
+		const example = urlParams.get( 'example' );
+
+		if ( example ) {
+ 
+			this.loadURL( `./jsm/node-editor/examples/${example}.json` )
+
+		}
+
+	}
+
+	addClass( nodeData ) {
+
+		this.removeClass( nodeData );
+
+		this.nodeClasses.push( nodeData );
+
+		ClassLib[ nodeData.name ] = nodeData.nodeClass;
+
+		return this;
+
+	}
+
+	removeClass( nodeData ) {
+
+		const index = this.nodeClasses.indexOf( nodeData );
+
+		if ( index !== -1 ) {
+
+			this.nodeClasses.splice( index, 1 );
+
+			delete ClassLib[ nodeData.name ];
+
+		}
+
+		return this;
 
 	}
 
@@ -662,74 +457,21 @@ export class NodeEditor extends EventDispatcher {
 		const search = new Search();
 		search.forceAutoComplete = true;
 
-		search.onFilter( () => {
+		search.onFilter( async () => {
 
 			search.clear();
 
-			for ( const item of NodeList ) {
+			const nodeList = await getNodeList();
+
+			for ( const item of nodeList.nodes ) {
 
 				traverseNodeEditors( item );
 
 			}
 
-			const object3d = this.scene;
+			for ( const item of this.nodeClasses ) {
 
-			if ( object3d !== null ) {
-
-				object3d.traverse( ( obj3d ) => {
-
-					if ( obj3d.isMesh === true || obj3d.isPoints === true ) {
-
-						let prefix = null;
-						let icon = null;
-						let editorClass = null;
-
-						if ( obj3d.isMesh === true ) {
-
-							prefix = 'Mesh';
-							icon = 'ti ti-3d-cube-sphere';
-							editorClass = MeshEditor;
-
-						} else if ( obj3d.isPoints === true ) {
-
-							prefix = 'Points';
-							icon = 'ti ti-border-none';
-							editorClass = PointsEditor;
-
-						}
-
-						const button = new ButtonInput( `${prefix} - ${obj3d.name}` );
-						button.setIcon( icon );
-						button.addEventListener( 'complete', () => {
-
-							for ( const node of this.canvas.nodes ) {
-
-								if ( node.value === obj3d ) {
-
-									// prevent duplicated node
-
-									this.canvas.select( node );
-
-									return;
-
-								}
-
-							}
-
-							const node = new editorClass( obj3d );
-
-							this.add( node );
-
-							this.centralizeNode( node );
-							this.canvas.select( node );
-
-						} );
-
-						search.add( button );
-
-					}
-
-				} );
+				traverseNodeEditors( item );
 
 			}
 
@@ -745,13 +487,32 @@ export class NodeEditor extends EventDispatcher {
 
 		} );
 
+		document.addEventListener('keydown', ( e ) => {
+			
+			if ( e.target === document.body ) {
+
+				const key = e.key;
+
+				if ( key === 'Tab' ) {
+
+					search.inputDOM.focus();
+
+					e.preventDefault();
+					e.stopImmediatePropagation();
+
+				}
+
+			}
+
+		} );
+
 		this.search = search;
 
 		this.domElement.append( search.dom );
 
 	}
 
-	_initNodesContext() {
+	async _initNodesContext() {
 
 		const context = new ContextMenu( this.canvas.canvas ).setWidth( 300 );
 
@@ -814,7 +575,7 @@ export class NodeEditor extends EventDispatcher {
 		const focus = () => requestAnimationFrame( () => search.inputDOM.focus() );
 		const reset = () => {
 
-			search.setValue( '' );
+			search.setValue( '', false );
 
 			for ( const button of nodeButtons ) {
 
@@ -865,6 +626,10 @@ export class NodeEditor extends EventDispatcher {
 					e.stopImmediatePropagation();
 
 				}
+
+			} else if ( key === 'Escape' ) {
+
+				context.hide();
 
 			}
 
@@ -921,18 +686,25 @@ export class NodeEditor extends EventDispatcher {
 		node.add( new Element().setHeight( 30 ).add( search ) );
 		node.add( new Element().setHeight( 200 ).add( treeView ) );
 
-		const createButtonMenu = ( item ) => {
+		const addNodeEditorElement = ( nodeData ) => {
 
-			const button = new TreeViewNode( item.name );
-			button.setIcon( `ti ti-${item.icon}` );
+			const button = new TreeViewNode( nodeData.name );
+			button.setIcon( `ti ti-${nodeData.icon}` );
 
-			if ( item.nodeClass ) {
+			if ( nodeData.children === undefined ) {
 
-				button.onClick( () => add( new item.nodeClass() ) );
+				button.isNodeClass = true;
+				button.onClick( async () => {
+
+					const nodeClass = await getNodeEditorClass( nodeData );
+
+					add( new nodeClass() );
+
+				} );
 
 			}
 
-			if ( item.tip ) {
+			if ( nodeData.tip ) {
 
 				//button.setToolTip( item.tip );
 
@@ -940,11 +712,11 @@ export class NodeEditor extends EventDispatcher {
 
 			nodeButtons.push( button );
 
-			if ( item.children ) {
+			if ( nodeData.children ) {
 
-				for ( const subItem of item.children ) {
+				for ( const subItem of nodeData.children ) {
 
-					const subButton = createButtonMenu( subItem );
+					const subButton = addNodeEditorElement( subItem );
 
 					button.add( subButton );
 
@@ -956,9 +728,13 @@ export class NodeEditor extends EventDispatcher {
 
 		};
 
-		for ( const item of NodeList ) {
+		//
 
-			const button = createButtonMenu( item );
+		const nodeList = await getNodeList();
+
+		for ( const node of nodeList.nodes ) {
+
+			const button = addNodeEditorElement( node );
 
 			treeView.add( button );
 
