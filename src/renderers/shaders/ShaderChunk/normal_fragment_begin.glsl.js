@@ -11,30 +11,30 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	vec3 normal = normalize( vNormal );
 
-	#ifdef DOUBLE_SIDED
+#endif
 
-		normal *= faceDirection;
+#ifdef DOUBLE_SIDED
+
+	normal *= faceDirection;
+
+#endif
+
+#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+
+	#ifdef USE_TANGENT
+
+		mat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
+
+	#else
+
+		mat3 tbn = getTangentSpace( - vViewPosition, normal );
 
 	#endif
 
-	#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+	#ifdef DOUBLE_SIDED
 
-		#ifdef USE_TANGENT
-
-			mat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
-
-		#else
-
-			mat3 tbn = getTangentSpace( - vViewPosition, normal );
-
-		#endif
-
-		#ifdef DOUBLE_SIDED
-
-			tbn[0] *= faceDirection;
-			tbn[1] *= faceDirection;
-
-		#endif
+		tbn[0] *= faceDirection;
+		tbn[1] *= faceDirection;
 
 	#endif
 
