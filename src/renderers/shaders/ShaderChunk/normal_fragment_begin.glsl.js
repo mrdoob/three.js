@@ -27,7 +27,7 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	#else
 
-		mat3 tbn = getTangentSpace( - vViewPosition, normal );
+		mat3 tbn = getTangentFrame( - vViewPosition, normal );
 
 	#endif
 
