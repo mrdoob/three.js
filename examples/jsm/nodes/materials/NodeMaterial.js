@@ -11,6 +11,7 @@ import { positionLocal } from '../accessors/PositionNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { skinning } from '../accessors/SkinningNode.js';
 import { texture } from '../accessors/TextureNode.js';
+import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { toneMapping } from '../display/ToneMappingNode.js';
 import { rangeFog } from '../fog/FogRangeNode.js';
 import { densityFog } from '../fog/FogExp2Node.js';
@@ -161,8 +162,28 @@ class NodeMaterial extends ShaderMaterial {
 	constructLights( builder ) {
 
 		let lightsNode = this.lightsNode || builder.lightsNode;
+		let envNode = this.envNode || builder.scene.environmentNode;
 
-		const envNode = this.envNode || builder.scene.environmentNode;
+		if ( envNode === undefined && builder.scene.environment ) {
+
+			const environment = builder.scene.environment;
+
+			if ( environment.isCubeTexture === true ) {
+
+				envNode = cubeTexture( environment );
+
+			} else if ( environment.isTexture === true ) {
+
+				envNode = texture( environment );
+
+			} else {
+
+				console.error( 'NodeMaterial: Unsupported environment configuration.', environment );
+
+			}
+
+		}
+
 		const materialLightsNode = [];
 
 		if ( envNode ) {
