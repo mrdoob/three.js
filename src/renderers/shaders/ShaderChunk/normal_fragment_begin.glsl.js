@@ -11,11 +11,11 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	vec3 normal = normalize( vNormal );
 
-#endif
+	#ifdef DOUBLE_SIDED
 
-#ifdef DOUBLE_SIDED
+		normal *= faceDirection;
 
-	normal *= faceDirection;
+	#endif
 
 #endif
 
@@ -31,7 +31,7 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	#endif
 
-	#ifdef DOUBLE_SIDED
+	#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )
 
 		tbn[0] *= faceDirection;
 		tbn[1] *= faceDirection;
