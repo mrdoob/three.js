@@ -245,7 +245,6 @@
 		"webgl_nodes_materials_physical_clearcoat",
 		"webgl_nodes_materials_standard",
 		"webgl_nodes_materialx_noise",
-		"webgl_nodes_playground",
 		"webgl_nodes_points"
 	],
 	"webgl / postprocessing": [
@@ -341,7 +340,6 @@
 		"webgpu_lights_selective",
 		"webgpu_loader_gltf",
 		"webgpu_materials",
-		"webgpu_nodes_playground",
 		"webgpu_particles",
 		"webgpu_rtt",
 		"webgpu_sandbox",
