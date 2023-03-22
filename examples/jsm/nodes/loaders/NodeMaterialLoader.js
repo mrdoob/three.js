@@ -5,7 +5,7 @@ const superFromTypeFunction = MaterialLoader.createMaterialFromType;
 
 MaterialLoader.createMaterialFromType = function ( type ) {
 
-	const material = createNodeMaterialFromType( type )
+	const material = createNodeMaterialFromType( type );
 
 	if ( material !== undefined ) {
 

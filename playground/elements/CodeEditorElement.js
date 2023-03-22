@@ -35,7 +35,7 @@ export class CodeEditorElement extends Element {
 
 			let timeout = null;
 
-			this.editor.getModel().onDidChangeContent( ( e ) => {
+			this.editor.getModel().onDidChangeContent( () => {
 
 				this._source = this.editor.getValue();
 

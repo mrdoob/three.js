@@ -325,7 +325,7 @@ export function onValidType( types = 'node', node = null ) {
 
 				const name = target.node.getName();
 
-				node.editor.tips.error( `"${name}" is not a "${type}".` );
+				node.editor.tips.error( `"${name}" is not a "${types}".` );
 
 			}
 
