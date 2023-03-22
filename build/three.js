@@ -21304,10 +21304,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			this.type = 'MeshDistanceMaterial';
 
-			this.referencePosition = new Vector3();
-			this.nearDistance = 1;
-			this.farDistance = 1000;
-
 			this.map = null;
 
 			this.alphaMap = null;
@@ -21323,10 +21319,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		copy( source ) {
 
 			super.copy( source );
-
-			this.referencePosition.copy( source.referencePosition );
-			this.nearDistance = source.nearDistance;
-			this.farDistance = source.farDistance;
 
 			this.map = source.map;
 
@@ -21560,7 +21552,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		function getDepthMaterial( object, material, light, shadowCameraNear, shadowCameraFar, type ) {
+		function getDepthMaterial( object, material, light, type ) {
 
 			let result = null;
 
@@ -21638,9 +21630,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( light.isPointLight === true && result.isMeshDistanceMaterial === true ) {
 
-				result.referencePosition.setFromMatrixPosition( light.matrixWorld );
-				result.nearDistance = shadowCameraNear;
-				result.farDistance = shadowCameraFar;
+				const materialProperties = _renderer.properties.get( result );
+				materialProperties.light = light;
 
 			}
 
@@ -21674,7 +21665,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								const depthMaterial = getDepthMaterial( object, groupMaterial, light, shadowCamera.near, shadowCamera.far, type );
+								const depthMaterial = getDepthMaterial( object, groupMaterial, light, type );
 
 								_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
 
@@ -21684,7 +21675,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					} else if ( material.visible ) {
 
-						const depthMaterial = getDepthMaterial( object, material, light, shadowCamera.near, shadowCamera.far, type );
+						const depthMaterial = getDepthMaterial( object, material, light, type );
 
 						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
@@ -27094,9 +27085,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		function refreshUniformsDistance( uniforms, material ) {
 
-			uniforms.referencePosition.value.copy( material.referencePosition );
-			uniforms.nearDistance.value = material.nearDistance;
-			uniforms.farDistance.value = material.farDistance;
+			const light = properties.get( material ).light;
+
+			uniforms.referencePosition.value.setFromMatrixPosition( light.matrixWorld );
+			uniforms.nearDistance.value = light.shadow.camera.near;
+			uniforms.farDistance.value = light.shadow.camera.far;
 
 		}
 
