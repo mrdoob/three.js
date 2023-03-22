@@ -975,8 +975,6 @@ class Element extends Serializer {
 
 	serialize( data ) {
 
-		const height = this.getHeight();
-
 		const inputs = [];
 		const properties = [];
 		const links = [];
@@ -1019,11 +1017,7 @@ class Element extends Serializer {
 
 		}
 
-		if ( height !== '' ) {
-
-			data.height = height;
-
-		}
+		data.height = this.getHeight();
 
 	}
 
