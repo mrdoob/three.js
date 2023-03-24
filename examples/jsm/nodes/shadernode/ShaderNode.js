@@ -4,7 +4,7 @@ import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import ConstNode from '../core/ConstNode.js';
-import { getValueFromType } from '../core/NodeUtils.js';
+import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
 const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
 
@@ -205,9 +205,11 @@ class ShaderNodeInternal extends Node {
 
 	construct( builder ) {
 
-		const stackNode = builder.createStack();
-		stackNode.outputNode = this.call( {}, stackNode, builder );
-		return stackNode;
+		builder.addStack();
+
+		builder.stack.outputNode = nodeObject( this._jsFunc( builder.stack, builder ) );
+
+		return builder.removeStack();
 
 	}
 
@@ -279,7 +281,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( nodes.length === 1 ) {
 
-				return nodeObject( nodes[ 0 ].nodeType === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
+				return nodeObject( nodes[ 0 ].nodeType === type || getValueType( nodes[ 0 ].value ) === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
 
 			}
 
@@ -310,6 +312,8 @@ export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
 export const nodeArray = ( val ) => new ShaderNodeArray( val );
 export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
 export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
+
+export const shader = ( ...val ) => new ShaderNode( ...val );
 
 addNodeClass( ShaderNode );
 
@@ -348,6 +352,9 @@ export const imat4 = new ConvertType( 'imat4' );
 export const umat4 = new ConvertType( 'umat4' );
 export const bmat4 = new ConvertType( 'bmat4' );
 
+export const string = ( value = '' ) => nodeObject( new ConstNode( value, 'string' ) );
+export const arrayBuffer = ( value ) => nodeObject( new ConstNode( value, 'ArrayBuffer' ) );
+
 addNodeElement( 'color', color );
 addNodeElement( 'float', float );
 addNodeElement( 'int', int );
@@ -373,6 +380,8 @@ addNodeElement( 'mat4', mat4 );
 addNodeElement( 'imat4', imat4 );
 addNodeElement( 'umat4', umat4 );
 addNodeElement( 'bmat4', bmat4 );
+addNodeElement( 'string', string );
+addNodeElement( 'arrayBuffer', arrayBuffer );
 
 // basic nodes
 // HACK - we cannot export them from the corresponding files because of the cyclic dependency

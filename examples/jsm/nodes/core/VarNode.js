@@ -70,7 +70,7 @@ class VarNode extends Node {
 
 		const propertyName = builder.getPropertyName( nodeVar );
 
-		builder.addFlowCode( `${propertyName} = ${snippet}` );
+		builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
 		return propertyName;
 

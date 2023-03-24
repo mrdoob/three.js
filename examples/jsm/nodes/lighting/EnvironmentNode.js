@@ -37,7 +37,7 @@ class EnvironmentNode extends LightingNode {
 				if ( reflectVec === undefined ) {
 
 					reflectVec = positionViewDirection.negate().reflect( transformedNormalView );
-					reflectVec = reflectVec.mix( transformedNormalView, roughness.mul( roughness ) ).normalize();
+					reflectVec = roughness.mul( roughness ).mix( reflectVec, transformedNormalView ).normalize();
 					reflectVec = reflectVec.transformDirection( cameraViewMatrix );
 
 				}

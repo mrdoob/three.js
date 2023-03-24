@@ -273,6 +273,12 @@ function html2canvas( element ) {
 			context.drawImage( element, 0, 0 );
 			context.restore();
 
+		} else if ( element instanceof HTMLImageElement ) {
+
+			if ( element.style.display === 'none' ) return;
+
+			context.drawImage( element, 0, 0, element.width, element.height );
+
 		} else {
 
 			if ( element.style.display === 'none' ) return;

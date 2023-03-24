@@ -53,7 +53,7 @@ class ComputeNode extends Node {
 
 			if ( snippet !== '' ) {
 
-				builder.addFlowCode( snippet );
+				builder.addLineFlowCode( snippet );
 
 			}
 

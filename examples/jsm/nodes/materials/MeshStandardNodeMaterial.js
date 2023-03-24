@@ -1,7 +1,7 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { diffuseColor, metalness, roughness, specularColor } from '../core/PropertyNode.js';
 import { mix } from '../math/MathNode.js';
-import { materialRoughness, materialMetalness, materialColor } from '../accessors/MaterialNode.js';
+import { materialRoughness, materialMetalness } from '../accessors/MaterialNode.js';
 import getRoughness from '../functions/material/getRoughness.js';
 import physicalLightingModel from '../functions/PhysicalLightingModel.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
@@ -48,14 +48,13 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructVariants( builder, stack ) {
+	constructVariants( { stack } ) {
 
 		// METALNESS
 
 		const metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
 
 		stack.assign( metalness, metalnessNode );
-		stack.assign( diffuseColor, vec4( diffuseColor.rgb.mul( metalnessNode.invert() ), diffuseColor.a ) );
 
 		// ROUGHNESS
 
@@ -66,9 +65,13 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// SPECULAR COLOR
 
-		const specularColorNode = mix( vec3( 0.04 ), materialColor.rgb, metalnessNode );
+		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessNode );
 
 		stack.assign( specularColor, specularColorNode );
+
+		// DIFFUSE COLOR
+
+		stack.assign( diffuseColor, vec4( diffuseColor.rgb.mul( metalnessNode.invert() ), diffuseColor.a ) );
 
 	}
 

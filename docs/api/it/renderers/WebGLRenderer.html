@@ -103,7 +103,11 @@
 			Può essere utile disabilitare questo controllo in produzione per aumentare le prestazioni.
 			È fortemente raccomandato mantenere questi controlli attivi durante lo sviluppo.
 			Se lo shader non si compila e non si collega - non funzionerà e il materiale associato non verrà visualizzato.
-			Il valore predefinito è `true`.
+			Il valore predefinito è `true`.</br>
+		- [page:Function onShaderError]( gl, program, glVertexShader, glFragmentShader ):
+			A callback function that can be used for custom error reporting. The callback receives the WebGL context, an instance of WebGLProgram as well 
+			two instances of WebGLShader representing the vertex and fragment shader. Assigning a custom function disables the default error reporting. 
+			Default is `null`.
 		</p>
 
 		<h3>[property:Object capabilities]</h3>

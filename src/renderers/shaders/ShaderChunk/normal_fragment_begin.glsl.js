@@ -17,24 +17,24 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	#endif
 
-	#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( USE_ANISOTROPY )
+#endif
 
-		#ifdef USE_TANGENT
+#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( USE_ANISOTROPY )
 
-			mat3 vTBN = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
+	#ifdef USE_TANGENT
 
-		#else
+		mat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
 
-			mat3 vTBN = getTangentSpace( - vViewPosition, normal );
+	#else
 
-		#endif
+		mat3 tbn = getTangentFrame( - vViewPosition, normal );
 
-		#ifdef DOUBLE_SIDED
+	#endif
 
-			vTBN[0] *= faceDirection;
-			vTBN[1] *= faceDirection;
+	#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )
 
-		#endif
+		tbn[0] *= faceDirection;
+		tbn[1] *= faceDirection;
 
 	#endif
 

@@ -90,6 +90,7 @@ export { AnimationUtils } from './animation/AnimationUtils.js';
 export { AnimationObjectGroup } from './animation/AnimationObjectGroup.js';
 export { AnimationMixer } from './animation/AnimationMixer.js';
 export { AnimationClip } from './animation/AnimationClip.js';
+export { AnimationAction } from './animation/AnimationAction.js';
 export { Uniform } from './core/Uniform.js';
 export { UniformsGroup } from './core/UniformsGroup.js';
 export { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';

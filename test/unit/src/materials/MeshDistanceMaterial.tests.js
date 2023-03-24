@@ -38,24 +38,6 @@ export default QUnit.module( 'Materials', () => {
 
 		} );
 
-		QUnit.todo( 'referencePosition', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'nearDistance', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'farDistance', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.todo( 'map', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );

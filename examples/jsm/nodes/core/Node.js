@@ -168,7 +168,7 @@ class Node {
 		}
 
 		builder.addNode( this );
-		builder.addStack( this );
+		builder.addChain( this );
 
 		/* Build stages expected results:
 			- "construct"	-> Node
@@ -233,15 +233,21 @@ class Node {
 
 		}
 
-		builder.removeStack( this );
+		builder.removeChain( this );
 
 		return result;
 
 	}
 
+	getSerializeChildren() {
+
+		return getNodeChildren( this );
+
+	}
+
 	serialize( json ) {
 
-		const nodeChildren = getNodeChildren( this );
+		const nodeChildren = this.getSerializeChildren();
 
 		const inputNodes = {};
 

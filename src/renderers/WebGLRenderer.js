@@ -104,7 +104,12 @@ class WebGLRenderer {
 			 * Enables error checking and reporting when shader programs are being compiled
 			 * @type {boolean}
 			 */
-			checkShaderErrors: true
+			checkShaderErrors: true,
+			/**
+			 * Callback for custom error reporting.
+			 * @type {?Function}
+			 */
+			onShaderError: null
 		};
 
 		// clearing
@@ -2288,18 +2293,14 @@ class WebGLRenderer {
 
 	}
 
-	// @deprecated since r150
-
-	get physicallyCorrectLights() {
+	get physicallyCorrectLights() { // @deprecated, r150
 
 		console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 		return ! this.useLegacyLights;
 
 	}
 
-	// @deprecated since r150
-
-	set physicallyCorrectLights( value ) {
+	set physicallyCorrectLights( value ) { // @deprecated, r150
 
 		console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 		this.useLegacyLights = ! value;

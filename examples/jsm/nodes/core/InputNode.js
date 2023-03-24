@@ -1,5 +1,5 @@
 import Node, { addNodeClass } from './Node.js';
-import { getValueType, getValueFromType } from './NodeUtils.js';
+import { getValueType, getValueFromType, arrayBufferToBase64 } from './NodeUtils.js';
 
 class InputNode extends Node {
 
@@ -50,6 +50,8 @@ class InputNode extends Node {
 
 		data.valueType = getValueType( this.value );
 		data.nodeType = this.nodeType;
+
+		if ( data.valueType === 'ArrayBuffer' ) data.value = arrayBufferToBase64( data.value );
 
 		data.precision = this.precision;
 

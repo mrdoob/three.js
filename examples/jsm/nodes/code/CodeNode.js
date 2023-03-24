@@ -1,15 +1,16 @@
-import Node, { addNodeClass } from './Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class CodeNode extends Node {
 
-	constructor( code = '', includes = [] ) {
+	constructor( code = '', includes = [], language = '' ) {
 
 		super( 'code' );
 
 		this.isCodeNode = true;
 
 		this.code = code;
+		this.language = language;
 
 		this._includes = includes;
 
@@ -46,10 +47,29 @@ class CodeNode extends Node {
 
 	}
 
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.code = this.code;
+		data.language = this.language;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.code = data.code;
+		this.language = data.language;
+
+	}
+
 }
 
 export default CodeNode;
 
 export const code = nodeProxy( CodeNode );
+export const js = ( src, includes ) => code( src, includes, 'js' );
 
 addNodeClass( CodeNode );

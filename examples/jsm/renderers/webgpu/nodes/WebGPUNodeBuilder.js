@@ -600,9 +600,8 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		for ( const shaderStage in shadersData ) {
 
-			let flow = '// code\n';
-			flow += `\t${ this.flowCode[ shaderStage ] }`;
-			flow += '\n\t';
+			let flow = '// code\n\n';
+			flow += this.flowCode[ shaderStage ];
 
 			const flowNodes = this.flowNodes[ shaderStage ];
 			const mainNode = flowNodes[ flowNodes.length - 1 ];
@@ -616,7 +615,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					if ( flow.length > 0 ) flow += '\n';
 
-					flow += `\t// FLOW -> ${ slotName }\n\t`;
+					flow += `\t// flow -> ${ slotName }\n\t`;
 
 				}
 
@@ -624,7 +623,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( node === mainNode && shaderStage !== 'compute' ) {
 
-					flow += '// FLOW RESULT\n\t';
+					flow += '// result\n\t';
 
 					if ( shaderStage === 'vertex' ) {
 
