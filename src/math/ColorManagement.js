@@ -1,6 +1,5 @@
 import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
-import { Vector3 } from './Vector3.js';
 
 export function SRGBToLinear( c ) {
 
@@ -13,7 +12,6 @@ export function LinearToSRGB( c ) {
 	return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
 
 }
-
 
 /**
  * Matrices converting P3 <-> Rec. 709 primaries, without gamut mapping
@@ -38,8 +36,6 @@ const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = /*@__PURE__*/ new Matrix3().fromArray( 
 	- 0.2249404, 1.0420571, - 0.0786361,
 	0.0000001, 0.0000000, 1.0982735
 ] );
-
-const _vector = /*@__PURE__*/ new Vector3();
 
 function DisplayP3ToLinearSRGB( color ) {
 
