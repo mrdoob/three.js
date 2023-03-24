@@ -34,13 +34,35 @@
 
 			void main() {
 
+				// WebGLRenderer renders double-sided, transparent objects in two passes -- first as back-sided only, then as front-sided only.
+				// See #25149 for an explanation as to why the following code block is necessary.
+
+				const vec3 frontFaceColor = vec3( 0.9, 0.9, 1.0 );
+
+				const vec3 backFaceColor = vec3( 0.4, 0.4, 0.5 );
+
+				#ifdef FLIP_SIDED
+
+				    gl_FragColor.rgb = backFaceColor;
+
+				#elif defined( DOUBLE_SIDED )
+
+				    gl_FragColor.rgb = ( gl_FrontFacing ) ? frontFaceColor : backFaceColor;
+
+				#else
+
+				    gl_FragColor.rgb = frontFaceColor;
+
+				#endif
+
+				//
+
 				vec3 afwidth = fwidth( vCenter.xyz );
 
 				vec3 edge3 = smoothstep( ( thickness - 1.0 ) * afwidth, thickness * afwidth, vCenter.xyz );
 
 				float edge = 1.0 - min( min( edge3.x, edge3.y ), edge3.z );
 
-				gl_FragColor.rgb = gl_FrontFacing ? vec3( 0.9, 0.9, 1.0 ) : vec3( 0.4, 0.4, 0.5 );
 				gl_FragColor.a = edge;
 
 			}
@@ -121,11 +143,17 @@
 						uniforms: { 'thickness': { value: API.thickness } },
 						vertexShader: document.getElementById( 'vertexShader' ).textContent,
 						fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+
 						side: THREE.DoubleSide,
-						alphaToCoverage: true // only works when WebGLRenderer's "antialias" is set to "true"
+
+						alphaToCoverage: true, // only works when WebGLRenderer's "antialias" is set to "true"
+
+						// as an alternative to enabling alphaToCoverage, you can set transparent to true
+						//transparent: true
 
 					} );
-					material2.extensions.derivatives = true;
+
+					material2.extensions.derivatives = true; // required for WebGL1Renderer
 
 					mesh2 = new THREE.Mesh( geometry, material2 );
 					mesh2.position.set( 40, 0, 0 );
