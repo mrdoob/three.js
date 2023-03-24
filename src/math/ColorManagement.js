@@ -19,7 +19,7 @@ export function LinearToSRGB( c ) {
  * and ICC specifications for the D50 connection space. Values in/out
  * are _linear_ sRGB and _linear_ Display P3.
  *
- * Note that both sRGB and Display P3 use the sRGB transfer function.
+ * Note that both sRGB and Display P3 use the sRGB transfer functions.
  *
  * Reference:
  * - http://www.russellcottrell.com/photo/matrixCalculator.htm
@@ -39,14 +39,14 @@ const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = /*@__PURE__*/ new Matrix3().fromArray( 
 
 function DisplayP3ToLinearSRGB( color ) {
 
-	// Display P3 uses the sRGB transfer function
+	// Display P3 uses the sRGB transfer functions
 	return color.convertSRGBToLinear().applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB );
 
 }
 
 function LinearSRGBToDisplayP3( color ) {
 
-	// Display P3 uses the sRGB transfer function
+	// Display P3 uses the sRGB transfer functions
 	return color.applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 ).convertLinearToSRGB();
 
 }
