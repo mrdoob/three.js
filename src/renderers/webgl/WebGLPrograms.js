@@ -179,6 +179,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.iridescenceMap || !! material.iridescenceThicknessMap || !! material.displacementMap || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || !! material.sheenColorMap || !! material.sheenRoughnessMap,
 			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || !! material.iridescenceMap || !! material.iridescenceThicknessMap || material.transmission > 0 || !! material.transmissionMap || !! material.thicknessMap || !! material.specularIntensityMap || !! material.specularColorMap || material.sheen > 0 || !! material.sheenColorMap || !! material.sheenRoughnessMap ) && !! material.displacementMap,
 
+			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( !! material.map || !! material.alphaMap ),
+
 			fog: !! fog,
 			useFog: material.fog === true,
 			fogExp2: ( fog && fog.isFogExp2 ),
@@ -440,6 +442,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 23 );
 		if ( parameters.opaque )
 			_programLayers.enable( 24 );
+		if ( parameters.pointsUvs )
+			_programLayers.enable( 25 );
 
 		array.push( _programLayers.mask );
 

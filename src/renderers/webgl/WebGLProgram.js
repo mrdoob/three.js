@@ -500,6 +500,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
+			parameters.pointsUvs ? '#define USE_POINTS_UV' : '',
+
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 			parameters.skinning ? '#define USE_SKINNING' : '',
@@ -660,6 +662,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
+
+			parameters.pointsUvs ? '#define USE_POINTS_UV' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
