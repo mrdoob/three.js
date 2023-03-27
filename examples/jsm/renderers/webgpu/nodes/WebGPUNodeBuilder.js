@@ -195,7 +195,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			console.error( 'WebGPURenderer: THREE.VideoTexture does not support vertex shader.' );
+			console.error( `WebGPURenderer: THREE.VideoTexture does not support ${ shaderStage } shader.` );
 
 		}
 
