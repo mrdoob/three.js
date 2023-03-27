@@ -144,6 +144,7 @@ class WebGPUBindings {
 				const texture = binding.getTexture();
 
 				const needsTextureRefresh = textures.updateTexture( texture );
+
 				const textureGPU = textures.getTextureGPU( texture );
 
 				if ( textureGPU !== undefined && binding.textureGPU !== textureGPU || needsTextureRefresh === true ) {
@@ -226,6 +227,10 @@ class WebGPUBindings {
 					if ( binding.isSampledCubeTexture ) {
 
 						binding.textureGPU = this.textures.getDefaultCubeTexture();
+
+					} else if ( binding.texture.isVideoTexture ) {
+
+						binding.textureGPU = this.textures.getVideoDefaultTexture();
 
 					} else {
 
