@@ -298,6 +298,22 @@ const builds = [
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
+			glconstants(),
+			glsl(),
+			terser(),
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
 			glsl(),
 			header()
 		],
@@ -306,6 +322,24 @@ const builds = [
 				format: 'cjs',
 				name: 'THREE',
 				file: 'build/three.cjs',
+				indent: '\t'
+			}
+		]
+	},
+
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
+			glsl(),
+			terser(),
+			header()
+		],
+		output: [
+			{
+				format: 'cjs',
+				name: 'THREE',
+				file: 'build/three.min.cjs',
 				indent: '\t'
 			}
 		]
