@@ -31,7 +31,7 @@ const VelocityShader = {
 
 #include <common>
 #include <packing>
-#include <uv_pars_vertex>
+#include <uvs_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <normal_pars_vertex>
 #include <morphtarget_pars_vertex>
@@ -50,7 +50,7 @@ varying vec4 clipPositionPrevious;
 void main() {
 
 
-	#include <uv_vertex>
+	#include <uvs_vertex>
 
 	#include <beginnormal_vertex>
 	#include <morphnormal_vertex>
@@ -91,7 +91,7 @@ void main() {
 uniform float opacity;
 
 #include <packing>
-#include <uv_pars_fragment>
+#include <uvs_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>

@@ -36,6 +36,7 @@ class Texture extends EventDispatcher {
 		this.mipmaps = [];
 
 		this.mapping = mapping;
+		this.uvChannel = 0;
 
 		this.wrapS = wrapS;
 		this.wrapT = wrapT;

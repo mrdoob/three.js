@@ -4,7 +4,7 @@ export const vertex = /* glsl */`
 varying vec3 vWorldPosition;
 
 #include <common>
-#include <uv_pars_vertex>
+#include <uvs_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
@@ -12,7 +12,7 @@ varying vec3 vWorldPosition;
 
 void main() {
 
-	#include <uv_vertex>
+	#include <uvs_vertex>
 
 	#include <skinbase_vertex>
 
@@ -47,7 +47,7 @@ varying vec3 vWorldPosition;
 
 #include <common>
 #include <packing>
-#include <uv_pars_fragment>
+#include <uvs_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>

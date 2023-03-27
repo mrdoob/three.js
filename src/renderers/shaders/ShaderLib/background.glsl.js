@@ -4,7 +4,7 @@ uniform mat3 uvTransform;
 
 void main() {
 
-	vUv = ( uvTransform * vec3( uv, 1 ) ).xy;
+	vUv[ 0 ] = ( uvTransform * vec3( uv, 1 ) ).xy;
 
 	gl_Position = vec4( position.xy, 1.0, 1.0 );
 
@@ -19,7 +19,7 @@ varying vec2 vUv;
 
 void main() {
 
-	vec4 texColor = texture2D( t2D, vUv );
+	vec4 texColor = texture2D( t2D, vUv[ 0 ] );
 
 	#ifdef DECODE_VIDEO_TEXTURE
 

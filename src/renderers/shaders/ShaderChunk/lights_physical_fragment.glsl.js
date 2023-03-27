@@ -20,13 +20,13 @@ material.roughness = min( material.roughness, 1.0 );
 
 		#ifdef USE_SPECULARINTENSITYMAP
 
-			specularIntensityFactor *= texture2D( specularIntensityMap, vUv ).a;
+			specularIntensityFactor *= texture2D( specularIntensityMap, vUv[ 0 ] ).a;
 
 		#endif
 
 		#ifdef USE_SPECULARCOLORMAP
 
-			specularColorFactor *= texture2D( specularColorMap, vUv ).rgb;
+			specularColorFactor *= texture2D( specularColorMap, vUv[ 0 ] ).rgb;
 
 		#endif
 
@@ -58,13 +58,13 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#ifdef USE_CLEARCOATMAP
 
-		material.clearcoat *= texture2D( clearcoatMap, vUv ).x;
+		material.clearcoat *= texture2D( clearcoatMap, vUv[ 0 ] ).x;
 
 	#endif
 
 	#ifdef USE_CLEARCOAT_ROUGHNESSMAP
 
-		material.clearcoatRoughness *= texture2D( clearcoatRoughnessMap, vUv ).y;
+		material.clearcoatRoughness *= texture2D( clearcoatRoughnessMap, vUv[ 0 ] ).y;
 
 	#endif
 
@@ -82,13 +82,13 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#ifdef USE_IRIDESCENCEMAP
 
-		material.iridescence *= texture2D( iridescenceMap, vUv ).r;
+		material.iridescence *= texture2D( iridescenceMap, vUv[ 0 ] ).r;
 
 	#endif
 
 	#ifdef USE_IRIDESCENCE_THICKNESSMAP
 
-		material.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vUv ).g + iridescenceThicknessMinimum;
+		material.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vUv[ 0 ] ).g + iridescenceThicknessMinimum;
 
 	#else
 
@@ -104,7 +104,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#ifdef USE_SHEENCOLORMAP
 
-		material.sheenColor *= texture2D( sheenColorMap, vUv ).rgb;
+		material.sheenColor *= texture2D( sheenColorMap, vUv[ 0 ] ).rgb;
 
 	#endif
 
@@ -112,7 +112,7 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#ifdef USE_SHEENROUGHNESSMAP
 
-		material.sheenRoughness *= texture2D( sheenRoughnessMap, vUv ).a;
+		material.sheenRoughness *= texture2D( sheenRoughnessMap, vUv[ 0 ] ).a;
 
 	#endif
 

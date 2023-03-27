@@ -1814,7 +1814,7 @@ class GLTFTextureTransformExtension {
 
 		if ( transform.texCoord !== undefined ) {
 
-			console.warn( 'THREE.GLTFLoader: Custom UV sets in "' + this.name + '" extension not yet supported.' );
+			texture.uvChannel = transform.texCoord;
 
 		}
 
@@ -3122,13 +3122,7 @@ class GLTFParser {
 
 			if ( ! texture ) return null;
 
-			// Materials sample aoMap from UV set 1 and other maps from UV set 0 - this can't be configured
-			// However, we will copy UV set 0 to UV set 1 on demand for aoMap
-			if ( mapDef.texCoord !== undefined && mapDef.texCoord != 0 && ! ( mapName === 'aoMap' && mapDef.texCoord == 1 ) ) {
-
-				console.warn( 'THREE.GLTFLoader: Custom UV set ' + mapDef.texCoord + ' for texture ' + mapName + ' not yet supported.' );
-
-			}
+			texture.uvChannel = mapDef.texCoord;
 
 			if ( parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] ) {
 

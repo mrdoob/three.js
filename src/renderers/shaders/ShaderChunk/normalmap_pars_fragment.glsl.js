@@ -21,8 +21,8 @@ export default /* glsl */`
 
 		vec3 q0 = dFdx( eye_pos.xyz );
 		vec3 q1 = dFdy( eye_pos.xyz );
-		vec2 st0 = dFdx( vUv.st );
-		vec2 st1 = dFdy( vUv.st );
+		vec2 st0 = dFdx( vUv[ 0 ].st );
+		vec2 st1 = dFdy( vUv[ 0 ].st );
 
 		vec3 N = surf_norm; // normalized
 
