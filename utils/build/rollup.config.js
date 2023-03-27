@@ -327,23 +327,6 @@ const builds = [
 		]
 	},
 
-	{
-		input: 'src/Three.js',
-		plugins: [
-			addons(),
-			glsl(),
-			terser(),
-			header()
-		],
-		output: [
-			{
-				format: 'cjs',
-				name: 'THREE',
-				file: 'build/three.min.cjs',
-				indent: '\t'
-			}
-		]
-	},
 	{ // @deprecated, r150
 		input: 'src/Three.js',
 		plugins: [
