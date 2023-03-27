@@ -117,7 +117,7 @@ class NodeBuilder {
 
 		if ( this.nodes.indexOf( node ) === - 1 ) {
 
-			const updateType = node.getUpdateType( this );
+			const updateType = node.getUpdateType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
