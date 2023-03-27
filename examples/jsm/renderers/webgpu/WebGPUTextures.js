@@ -428,7 +428,7 @@ class WebGPUTextures {
 
 		//
 
-		textureProperties.textureGPU = textureGPU.createView( { dimension } );
+		textureProperties.textureGPU = textureGPU;
 		textureProperties.version = texture.version;
 
 		return needsUpdate;

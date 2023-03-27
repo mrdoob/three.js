@@ -240,7 +240,9 @@ class WebGPUBindings {
 
 				}
 
-				entries.push( { binding: bindingPoint, resource: binding.textureGPU } );
+				const resource = binding.textureGPU instanceof GPUTexture ? binding.textureGPU.createView( { dimension: binding.dimension } ) : binding.textureGPU;
+
+				entries.push( { binding: bindingPoint, resource } );
 
 			}
 
