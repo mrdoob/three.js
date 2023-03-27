@@ -18,6 +18,12 @@ export class FileEditor extends BaseNodeEditor {
 
 	set buffer( arrayBuffer ) {
 
+		if ( this.url !== null ) {
+
+			URL.revokeObjectUR( this.url );
+
+		}
+
 		this.value.value = arrayBuffer;
 		this.url = null;
 
@@ -60,4 +66,5 @@ export class FileEditor extends BaseNodeEditor {
 		this.nameInput.setValue( data.name );
 
 	}
+
 }

@@ -22,7 +22,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		this.scene = scene;
 		this.renderer = renderer;
-		
+
 		const { global } = Nodes;
 
 		global.set( 'THREE', THREE );
@@ -33,7 +33,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		global.set( 'composer', composer );
 
 		this.nodeClasses = [];
-	
+
 		this.canvas = canvas;
 		this.domElement = domElement;
 
@@ -53,6 +53,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this._initSearch();
 		this._initNodesContext();
 		this._initExamplesContext();
+		this._initShortcuts();
 		this._initParams();
 
 	}
@@ -158,7 +159,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		const json = await loader.load( url, ClassLib );
 
 		this.loadJSON( json );
-		
+
 	}
 
 	loadJSON( json ) {
@@ -323,10 +324,10 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		const addExamples = ( category, names ) => {
 
-			const subContext = new ContextMenu()
+			const subContext = new ContextMenu();
 
-			for( const name of names ) {
-					
+			for ( const name of names ) {
+
 				const filename = name.replaceAll( ' ', '-' ).toLowerCase();
 
 				subContext.add( new ButtonInput( name )
@@ -348,7 +349,8 @@ export class NodeEditor extends THREE.EventDispatcher {
 		//**************//
 
 		addExamples( 'Universal', [
-			'Teapot'
+			'Teapot',
+			'Matcap'
 		] );
 
 		if ( this.renderer.isWebGLRenderer ) {
@@ -357,14 +359,62 @@ export class NodeEditor extends THREE.EventDispatcher {
 				'Car'
 			] );
 
-		} else if( this.renderer.isWebGPURenderer ) {
+			context.add( new ButtonInput( 'WebGPU Version' ).onClick( () => {
+
+				if ( confirm( 'Are you sure?' ) === true ) {
+
+					window.location.search = '?backend=webgpu';
+
+				}
+
+			} ) );
+
+		} else if ( this.renderer.isWebGPURenderer ) {
 
 			addExamples( 'WebGPU', [
+				'Particle'
 			] );
+
+			context.add( new ButtonInput( 'WebGL Version' ).onClick( () => {
+
+				if ( confirm( 'Are you sure?' ) === true ) {
+
+					window.location.search = '';
+
+				}
+
+			} ) );
 
 		}
 
 		this.examplesContext = context;
+
+	}
+
+	_initShortcuts() {
+
+		document.addEventListener( 'keydown', ( e ) => {
+
+			if ( e.target === document.body ) {
+
+				const key = e.key;
+
+				if ( key === 'Tab' ) {
+
+					this.search.inputDOM.focus();
+
+					e.preventDefault();
+					e.stopImmediatePropagation();
+
+				} else if ( key === ' ' ) {
+
+					this.preview = ! this.preview;
+
+				}
+
+			}
+
+		} );
 
 	}
 
@@ -394,7 +444,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		const index = this.nodeClasses.indexOf( nodeData );
 
-		if ( index !== -1 ) {
+		if ( index !== - 1 ) {
 
 			this.nodeClasses.splice( index, 1 );
 
@@ -410,13 +460,23 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		const traverseNodeEditors = ( item ) => {
 
-			if ( item.nodeClass ) {
+			if ( item.children ) {
+
+				for ( const subItem of item.children ) {
+
+					traverseNodeEditors( subItem );
+
+				}
+
+			} else {
 
 				const button = new ButtonInput( item.name );
 				button.setIcon( `ti ti-${item.icon}` );
-				button.addEventListener( 'complete', () => {
+				button.addEventListener( 'complete', async () => {
 
-					const node = new item.nodeClass();
+					const nodeClass = await getNodeEditorClass( item );
+
+					const node = new nodeClass();
 
 					this.add( node );
 
@@ -435,15 +495,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 			}
 
-			if ( item.children ) {
 
-				for ( const subItem of item.children ) {
-
-					traverseNodeEditors( subItem );
-
-				}
-
-			}
 
 		};
 
@@ -480,25 +532,6 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		} );
 
-		document.addEventListener('keydown', ( e ) => {
-			
-			if ( e.target === document.body ) {
-
-				const key = e.key;
-
-				if ( key === 'Tab' ) {
-
-					search.inputDOM.focus();
-
-					e.preventDefault();
-					e.stopImmediatePropagation();
-
-				}
-
-			}
-
-		} );
-
 		this.search = search;
 
 		this.domElement.append( search.dom );
@@ -514,6 +547,10 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		const add = ( node ) => {
 
+			context.hide();
+
+			this.add( node );
+
 			if ( isContext ) {
 
 				node.setPosition(
@@ -524,13 +561,8 @@ export class NodeEditor extends THREE.EventDispatcher {
 			} else {
 
 				this.centralizeNode( node );
-				this.canvas.select( node );
 
 			}
-
-			context.hide();
-
-			this.add( node );
 
 			this.canvas.select( node );
 
@@ -615,10 +647,14 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 					nodeButtonsVisible[ nodeButtonsIndex ].dom.click();
 
-					e.preventDefault();
-					e.stopImmediatePropagation();
+				} else {
+
+					context.hide();
 
 				}
+
+				e.preventDefault();
+				e.stopImmediatePropagation();
 
 			} else if ( key === 'Escape' ) {
 
@@ -643,7 +679,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 				button.setVisible( false ).setSelected( false );
 
-				let visible = buttonLabel.indexOf( value ) !== - 1;
+				const visible = buttonLabel.indexOf( value ) !== - 1;
 
 				if ( visible && button.parent !== null ) {
 

@@ -1,12 +1,12 @@
 import { NumberInput, LabelElement, Element, ButtonInput } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { TimerNode } from 'three/nodes';
+import { timerLocal } from 'three/nodes';
 
 export class TimerEditor extends BaseNodeEditor {
 
 	constructor() {
 
-		const node = new TimerNode();
+		const node = timerLocal();
 
 		super( 'Timer', node, 200 );
 

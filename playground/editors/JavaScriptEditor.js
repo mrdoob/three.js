@@ -8,7 +8,7 @@ export class JavaScriptEditor extends BaseNodeEditor {
 
 		const codeNode = js( source );
 
-		super( 'Java Script', codeNode, 500 );
+		super( 'JavaScript', codeNode, 500 );
 
 		this.setResizable( true );
 
@@ -38,7 +38,7 @@ export class JavaScriptEditor extends BaseNodeEditor {
 	get source() {
 
 		return this.codeNode.code;
-		
+
 	}
 
 	get codeNode() {

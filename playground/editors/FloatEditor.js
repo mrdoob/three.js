@@ -1,24 +1,22 @@
-import { NumberInput, Element } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { UniformNode } from 'three/nodes';
+import { createElementFromJSON } from '../NodeEditorUtils.js';
 
 export class FloatEditor extends BaseNodeEditor {
 
 	constructor() {
 
-		const node = new UniformNode( 0 );
-
-		super( 'Float', node, 150 );
-
-		const field = new NumberInput().onChange( () => {
-
-			node.value = field.getValue();
-
-			this.invalidate(); // it's important to scriptable nodes ( cpu nodes needs update )
-
+		const { element, inputNode } = createElementFromJSON( {
+			inputType: 'float',
+			inputConnection: false
 		} );
 
-		this.add( new Element().add( field ) );
+		super( 'Float', inputNode, 150 );
+
+		this.setOutputLength( 1 );
+
+		element.addEventListener( 'changeInput', () => this.invalidate() );
+
+		this.add( element );
 
 	}
 

@@ -1,30 +1,22 @@
-import { StringInput, Element } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { string } from 'three/nodes';
+import { createElementFromJSON } from '../NodeEditorUtils.js';
 
 export class StringEditor extends BaseNodeEditor {
 
 	constructor() {
 
-		const stringNode = string();
-
-		super( 'String', stringNode, 350 );
-
-		const stringInput = new StringInput().onChange( () => {
-
-			const input = stringInput.getValue();
-
-			if ( input !== stringNode.value ) {
-
-				stringNode.value = input;
-
-				this.invalidate();
-
-			}
-
+		const { element, inputNode } = createElementFromJSON( {
+			inputType: 'string',
+			inputConnection: false
 		} );
 
-		this.add( new Element().add( stringInput ) );
+		super( 'String', inputNode, 350 );
+
+		this.setOutputLength( 1 );
+
+		element.addEventListener( 'changeInput', () => this.invalidate() );
+
+		this.add( element );
 
 	}
 

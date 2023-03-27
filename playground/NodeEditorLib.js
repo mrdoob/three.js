@@ -14,6 +14,7 @@ import { UVEditor } from './editors/UVEditor.js';
 import { PreviewEditor } from './editors/PreviewEditor.js';
 import { TimerEditor } from './editors/TimerEditor.js';
 import { SplitEditor } from './editors/SplitEditor.js';
+import { SwizzleEditor } from './editors/SwizzleEditor.js';
 import { JoinEditor } from './editors/JoinEditor.js';
 import { StringEditor } from './editors/StringEditor.js';
 import { FileEditor } from './editors/FileEditor.js';
@@ -33,6 +34,7 @@ export const ClassLib = {
 	UVEditor,
 	TimerEditor,
 	SplitEditor,
+	SwizzleEditor,
 	JoinEditor,
 	StringEditor,
 	FileEditor,
@@ -54,7 +56,7 @@ export const getNodeList = async () => {
 
 	return nodeList;
 
-}
+};
 
 export const init = async () => {
 
@@ -62,14 +64,14 @@ export const init = async () => {
 
 	const traverseNodeEditors = ( list ) => {
 
-		for( const node of list ) {
+		for ( const node of list ) {
 
 			getNodeEditorClass( node );
 
 			if ( Array.isArray( node.children ) ) {
 
 				traverseNodeEditors( node.children );
-	
+
 			}
 
 		}
@@ -78,17 +80,29 @@ export const init = async () => {
 
 	traverseNodeEditors( nodeList.nodes );
 
-}
+};
 
 export const getNodeEditorClass = async ( nodeData ) => {
 
 	const editorClass = nodeData.editorClass || nodeData.name.replace( / /g, '' );
 
-	if ( ClassLib[ editorClass ] !== undefined ) return ClassLib[ editorClass ];
-
 	//
 
-	let nodeClass = null;
+	let nodeClass = ClassLib[ editorClass ];
+
+	if ( nodeClass !== undefined ) {
+
+		if ( nodeData.editorClass !== undefined ) {
+
+			nodeClass.prototype.icon = nodeData.icon;
+
+		}
+
+		return nodeClass;
+
+	}
+
+	//
 
 	if ( nodeData.editorURL ) {
 
@@ -123,7 +137,7 @@ export const getNodeEditorClass = async ( nodeData ) => {
 
 	}
 
-	if ( nodeClass !== null) {
+	if ( nodeClass !== null ) {
 
 		ClassLib[ editorClass ] = nodeClass;
 

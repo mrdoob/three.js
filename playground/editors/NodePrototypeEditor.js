@@ -11,7 +11,7 @@ layout = {
 	name: "Custom Addition",
 	outputType: 'node',
 	icon: 'heart-plus',
-	width: 200,	
+	width: 200,
 	elements: [
 		{ name: 'A', inputType: 'node' },
 		{ name: 'B', inputType: 'node' }
@@ -81,7 +81,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 		this.source = data.source;
 
 		const nodePrototype = this.createPrototype();
-		lib[ nodePrototype.name] = nodePrototype.nodeClass;
+		lib[ nodePrototype.name ] = nodePrototype.nodeClass;
 
 	}
 
@@ -91,7 +91,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 		if ( editor === null ) {
 
-			for( const proto of [ ...this.instances ] ) {
+			for ( const proto of [ ...this.instances ] ) {
 
 				proto.dispose();
 
@@ -116,10 +116,10 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 		const nodeClass = class extends ScriptableEditor {
 
 			constructor() {
-	
+
 				super( scriptableNode.codeNode, false );
-	
-				this.serializePriority = -1;
+
+				this.serializePriority = - 1;
 
 				this.onCode = this.onCode.bind( this );
 
@@ -135,15 +135,17 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 				super.setEditor( editor );
 
+				const index = nodePrototype.instances.indexOf( this );
+
 				if ( editor ) {
 
-					if ( nodePrototype.instances.indexOf( this ) === - 1 ) nodePrototype.instances.push( this );
+					if ( index === - 1 ) nodePrototype.instances.push( this );
 
 					editorElement.addEventListener( 'change', this.onCode );
 
 				} else {
 
-					if ( nodePrototype.instances.indexOf( this ) !== - 1 ) nodePrototype.instances.splice( nodePrototype.instances.indexOf( this ), 1 );
+					if ( index !== - 1 ) nodePrototype.instances.splice( index, 1 );
 
 					editorElement.removeEventListener( 'change', this.onCode );
 
@@ -151,25 +153,25 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 			}
 
-			deserialize( data ) {
-
-				super.deserialize( data );
-
-				//console.log( data );
-
-			}
-	
 			get className() {
-	
+
 				return scriptableNode.getLayout().name;
-	
+
 			}
 
-		}
+		};
 
 		this._prototype = {
-			get name() { return scriptableNode.getLayout().name; },
-			get icon() { return scriptableNode.getLayout().icon; },
+			get name() {
+
+				return scriptableNode.getLayout().name;
+
+			},
+			get icon() {
+
+				return scriptableNode.getLayout().icon;
+
+			},
 			nodeClass,
 			reference: this,
 			editor: this.editor

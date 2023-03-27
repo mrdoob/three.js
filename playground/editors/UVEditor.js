@@ -1,12 +1,12 @@
 import { SelectInput, LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { UVNode } from 'three/nodes';
+import { uv } from 'three/nodes';
 
 export class UVEditor extends BaseNodeEditor {
 
 	constructor() {
 
-		const node = new UVNode();
+		const node = uv();
 
 		super( 'UV', node, 200 );
 

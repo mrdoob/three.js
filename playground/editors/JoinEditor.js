@@ -1,6 +1,6 @@
 import { LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { JoinNode, UniformNode } from 'three/nodes';
+import { JoinNode, UniformNode, float } from 'three/nodes';
 
 const NULL_VALUE = new UniformNode( 0 );
 
@@ -31,7 +31,7 @@ export class JoinEditor extends BaseNodeEditor {
 
 			for ( let i = 0; i < length; i ++ ) {
 
-				nodes.push( values[ i ] || NULL_VALUE );
+				nodes.push( float( values[ i ] || NULL_VALUE ) );
 
 			}
 
@@ -41,10 +41,10 @@ export class JoinEditor extends BaseNodeEditor {
 
 		};
 
-		const xElement = new LabelElement( 'X | R' ).setInput( 1 ).onConnect( update );
-		const yElement = new LabelElement( 'Y | G' ).setInput( 1 ).onConnect( update );
-		const zElement = new LabelElement( 'Z | B' ).setInput( 1 ).onConnect( update );
-		const wElement = new LabelElement( 'W | A' ).setInput( 1 ).onConnect( update );
+		const xElement = new LabelElement( 'x | r' ).setInput( 1 ).onConnect( update );
+		const yElement = new LabelElement( 'y | g' ).setInput( 1 ).onConnect( update );
+		const zElement = new LabelElement( 'z | b' ).setInput( 1 ).onConnect( update );
+		const wElement = new LabelElement( 'w | a' ).setInput( 1 ).onConnect( update );
 
 		this.add( xElement )
 			.add( yElement )

@@ -1,12 +1,12 @@
 import { LabelElement, ToggleInput, SelectInput } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { onValidNode, onValidType, getColorFromType } from '../NodeEditorUtils.js';
-import { TextureNode, UVNode } from 'three/nodes';
+import { texture, uv } from 'three/nodes';
 import { Texture, TextureLoader, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from 'three';
 
 const textureLoader = new TextureLoader();
 const defaultTexture = new Texture();
-const defaultUV = new UVNode();
+const defaultUV = null;
 
 const getTexture = ( url ) => {
 
@@ -18,7 +18,7 @@ export class TextureEditor extends BaseNodeEditor {
 
 	constructor() {
 
-		const node = new TextureNode( defaultTexture );
+		const node = texture( defaultTexture );
 
 		super( 'Texture', node, 250 );
 
@@ -62,7 +62,7 @@ export class TextureEditor extends BaseNodeEditor {
 
 			const node = this.value;
 
-			node.uvNode = uvField.getLinkedObject() || defaultUV;
+			node.uvNode = uvField.getLinkedObject() || defaultUV || ( defaultUV = uv() );
 
 		} );
 

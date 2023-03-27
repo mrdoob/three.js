@@ -66,7 +66,7 @@ const typeToValue = {
 const createElementFromProperty = ( node, property ) => {
 
 	const nodeType = property.nodeType;
-	const defaultValue = uniform( typeToValue[ nodeType ] ? new typeToValue[ nodeType ] : 0 );
+	const defaultValue = uniform( typeToValue[ nodeType ] ? new typeToValue[ nodeType ]() : 0 );
 
 	let label = property.label;
 

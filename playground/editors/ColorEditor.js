@@ -12,17 +12,8 @@ export class ColorEditor extends BaseNodeEditor {
 
 		super( 'Color', node );
 
-		Object.defineProperty(node, 'value', {
-			set() {
-				console.log("break");
-			},
-			get() {
-			  return v;
-			},
-		  });
-
 		this.setOutputLength( 3 );
-		
+
 		const updateFields = ( editing ) => {
 
 			const value = node.value;
@@ -52,6 +43,8 @@ export class ColorEditor extends BaseNodeEditor {
 			fieldR.setTagColor( `#${hexString.slice( 0, 2 )}0000` );
 			fieldG.setTagColor( `#00${hexString.slice( 2, 4 )}00` );
 			fieldB.setTagColor( `#0000${hexString.slice( 4, 6 )}` );
+
+			this.invalidate(); // it's important to scriptable nodes ( cpu nodes needs update )
 
 		};
 

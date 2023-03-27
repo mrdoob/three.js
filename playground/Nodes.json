@@ -355,8 +355,8 @@
 							"shaderNode": "objectDirection",
 							"properties": [
 								{
-									"name": "aNode",
-									"nodeType": "mat4"
+									"name": "object3d",
+									"nodeType": "Object3D"
 								}
 							]
 						},
@@ -366,8 +366,8 @@
 							"shaderNode": "objectNormalMatrix",
 							"properties": [
 								{
-									"name": "aNode",
-									"nodeType": "mat3"
+									"name": "object3d",
+									"nodeType": "Object3D"
 								}
 							]
 						},
@@ -377,8 +377,8 @@
 							"shaderNode": "objectPosition",
 							"properties": [
 								{
-									"name": "aNode",
-									"nodeType": "mat4"
+									"name": "object3d",
+									"nodeType": "Object3D"
 								}
 							]
 						},
@@ -388,8 +388,8 @@
 							"shaderNode": "objectViewMatrix",
 							"properties": [
 								{
-									"name": "aNode",
-									"nodeType": "mat4"
+									"name": "object3d",
+									"nodeType": "Object3D"
 								}
 							]
 						},
@@ -399,8 +399,8 @@
 							"shaderNode": "objectViewPosition",
 							"properties": [
 								{
-									"name": "aNode",
-									"nodeType": "mat4"
+									"name": "object3d",
+									"nodeType": "Object3D"
 								}
 							]
 						},
@@ -410,8 +410,8 @@
 							"shaderNode": "objectWorldMatrix",
 							"properties": [
 								{
-									"name": "aNode",
-									"nodeType": "mat4"
+									"name": "object3d",
+									"nodeType": "Object3D"
 								}
 							]
 						}
@@ -1371,7 +1371,7 @@
 							]
 						},
 						{
-							"name": "Mod",
+							"name": "Modulo",
 							"icon": "math-function",
 							"description": "Returns the value of x modulo y.",
 							"shaderNode": "mod",
@@ -1381,6 +1381,12 @@
 									"name": "aNode",
 									"nodeType": "node",
 									"label": "x",
+									"description": "Specify the value to evaluate."
+								},
+								{
+									"name": "bNode",
+									"nodeType": "float",
+									"label": "y",
 									"description": "Specify the value to evaluate."
 								}
 							]
@@ -1569,7 +1575,7 @@
 								}
 							]
 						},
-                        {
+						{
 							"name": "Saturate",
 							"icon": "math-function",
 							"shaderNode": "saturate",
@@ -1947,14 +1953,20 @@
 						{
 							"name": "Join",
 							"icon": "arrows-join",
-							"nodeType": "float",
-							"shaderNode": "Join"
+							"nodeType": "node",
+							"editorClass": "JoinEditor"
 						},
 						{
 							"name": "Split",
 							"icon": "arrows-split",
-							"nodeType": "float",
-							"shaderNode": "Split"
+							"nodeType": "node",
+							"editorClass": "SplitEditor"
+						},
+						{
+							"name": "Swizzle",
+							"icon": "switch-3",
+							"nodeType": "node",
+							"editorClass": "SwizzleEditor"
 						}
 					]
 				},
@@ -1970,13 +1982,13 @@
 						}
 					]
 				},
-                {
+				{
 					"name": "Preview",
 					"icon": "square-check",
 					"nodeType": "float",
 					"editorClass": "PreviewEditor"
 				},
-                {
+				{
 					"name": "Timer",
 					"icon": "clock",
 					"editorClass": "TimerEditor"
@@ -2020,12 +2032,22 @@
 				{
 					"name": "Range",
 					"icon": "sort-ascending-2",
-					"nodeType": "float",
-					"shaderNode": "range"
+					"nodeType": "node",
+					"shaderNode": "range",
+					"properties": [
+						{
+							"name": "minNode",
+							"nodeType": "InputNode"
+						},
+						{
+							"name": "maxNode",
+							"nodeType": "InputNode"
+						}
+					]
 				}
 			]
 		},
-        {
+		{
 			"name": "Prototype",
 			"icon": "code",
 			"children": [
@@ -2034,7 +2056,7 @@
 					"icon": "components",
 					"editorClass": "NodePrototypeEditor"
 				},
-                {
+				{
 					"name": "Scriptable",
 					"icon": "variable",
 					"editorClass": "ScriptableEditor"

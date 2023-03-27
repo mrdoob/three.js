@@ -24,7 +24,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 		}
 
 		scriptableNode = scriptable( codeNode );
-		
+
 		super( defaultTitle, scriptableNode, defaultWidth );
 
 		this.scriptableNode = scriptableNode;
@@ -131,7 +131,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 						this.update();
 
-						if ( this.editor ) this.editor.tips.message( 'ScriptEditor: Initied.' );
+						if ( this.editor ) this.editor.tips.message( 'ScriptEditor: Initialized.' );
 
 					}
 
@@ -184,7 +184,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 	updateOutputInEditor() {
 
 		const { editor, editorOutput, editorOutputAdded } = this;
-		
+
 		if ( editor && editorOutput === editorOutputAdded ) return;
 
 		const scene = global.get( 'scene' );
@@ -336,7 +336,7 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 				}
 
-				
+
 				if ( layout.icon ) {
 
 					this.setIcon( layout.icon );

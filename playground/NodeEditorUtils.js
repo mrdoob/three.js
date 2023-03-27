@@ -1,5 +1,5 @@
-import { StringInput, NumberInput, Element, LabelElement } from 'flow';
-import { float, string } from 'three/nodes';
+import { StringInput, NumberInput, ColorInput, Element, LabelElement } from 'flow';
+import { string, float, vec2, vec3, vec4, color } from 'three/nodes';
 
 export function exportJSON( object, name ) {
 
@@ -100,6 +100,20 @@ export function getColorFromValue( value ) {
 
 }
 
+export const createColorInput = ( node, element ) => {
+
+	const input = new ColorInput().onChange( () => {
+
+		node.value.setHex( input.getValue() );
+
+		element.dispatchEvent( new Event( 'changeInput' ) );
+
+	} );
+
+	element.add( input );
+
+};
+
 export const createFloatInput = ( node, element ) => {
 
 	const input = new NumberInput().onChange( () => {
@@ -118,7 +132,12 @@ export const createStringInput = ( node, element, settings = {} ) => {
 
 	const input = new StringInput().onChange( () => {
 
-		node.value = input.getValue();
+		let value = input.getValue();
+
+		if ( settings.transform === 'lowercase' ) value = value.toLowerCase();
+		else if ( settings.transform === 'uppercase' ) value = value.toUpperCase();
+
+		node.value = value;
 
 		element.dispatchEvent( new Event( 'changeInput' ) );
 
@@ -136,25 +155,107 @@ export const createStringInput = ( node, element, settings = {} ) => {
 
 	}
 
+	const field = input.getInput();
+
+	if ( settings.allows ) field.addEventListener( 'input', () => field.value = field.value.replace( new RegExp( '[^\\s' + settings.allows + ']', 'gi' ), '' ) );
+	if ( settings.maxLength ) field.maxLength = settings.maxLength;
+	if ( settings.transform ) field.style[ 'text-transform' ] = settings.transform;
+
 };
+
+export const createVector2Input = ( node, element ) => {
+
+	const onUpdate = () => {
+
+		node.value.x = fieldX.getValue();
+		node.value.y = fieldY.getValue();
+
+		element.dispatchEvent( new Event( 'changeInput' ) );
+
+	};
+
+	const fieldX = new NumberInput().setTagColor( 'red' ).onChange( onUpdate );
+	const fieldY = new NumberInput().setTagColor( 'green' ).onChange( onUpdate );
+
+	element.add( fieldX ).add( fieldY );
+
+};
+
+export const createVector3Input = ( node, element ) => {
+
+	const onUpdate = () => {
+
+		node.value.x = fieldX.getValue();
+		node.value.y = fieldY.getValue();
+		node.value.z = fieldZ.getValue();
+
+		element.dispatchEvent( new Event( 'changeInput' ) );
+
+	};
+
+	const fieldX = new NumberInput().setTagColor( 'red' ).onChange( onUpdate );
+	const fieldY = new NumberInput().setTagColor( 'green' ).onChange( onUpdate );
+	const fieldZ = new NumberInput().setTagColor( 'blue' ).onChange( onUpdate );
+
+	element.add( fieldX ).add( fieldY ).add( fieldZ );
+
+};
+
+export const createVector4Input = ( node, element ) => {
+
+	const onUpdate = () => {
+
+		node.value.x = fieldX.getValue();
+		node.value.y = fieldY.getValue();
+		node.value.z = fieldZ.getValue();
+		node.value.w = fieldZ.getValue();
+
+		element.dispatchEvent( new Event( 'changeInput' ) );
+
+	};
+
+	const fieldX = new NumberInput().setTagColor( 'red' ).onChange( onUpdate );
+	const fieldY = new NumberInput().setTagColor( 'green' ).onChange( onUpdate );
+	const fieldZ = new NumberInput().setTagColor( 'blue' ).onChange( onUpdate );
+	const fieldW = new NumberInput( 1 ).setTagColor( 'white' ).onChange( onUpdate );
+
+	element.add( fieldX ).add( fieldY ).add( fieldZ ).add( fieldW );
+
+};
+
 
 export const createInputLib = {
 	// gpu
 	string: createStringInput,
 	float: createFloatInput,
+	vec2: createVector2Input,
+	vec3: createVector3Input,
+	vec4: createVector4Input,
+	color: createColorInput,
 	// cpu
 	Number: createFloatInput,
-	String: createStringInput
+	String: createStringInput,
+	Vector2: createVector2Input,
+	Vector3: createVector3Input,
+	Vector4: createVector4Input,
+	Color: createColorInput
 };
 
 export const inputNodeLib = {
 	// gpu
-	node: float,
-	float,
 	string,
+	float,
+	vec2,
+	vec3,
+	vec4,
+	color,
 	// cpu
 	Number: float,
-	String: string
+	String: string,
+	Vector2: vec2,
+	Vector3: vec3,
+	Vector4: vec4,
+	Color: color
 };
 
 export function createElementFromJSON( json ) {
@@ -203,7 +304,7 @@ export function createElementFromJSON( json ) {
 
 	//
 
-	if ( inputType ) {
+	if ( inputType && json.inputConnection !== false ) {
 
 		element.setInputColor( getColorFromType( inputType ) );
 		//element.setInputStyle( 'dotted' ); // 'border-style: dotted;'
@@ -224,20 +325,6 @@ export function createElementFromJSON( json ) {
 	return { id, element, inputNode, inputType, outputType };
 
 }
-
-/*
-export function onValidNode( source, target ) {
-
-	const object = target.getObject();
-
-	if ( ! object || ! object.isNode || object.isCodeNode ) {
-
-		return false;
-
-	}
-
-}
-*/
 
 export function isGPUNode( object ) {
 
@@ -280,10 +367,6 @@ export function onValidType( types = 'node', node = null ) {
 					}
 
 					object = object.value;
-
-				} else {
-
-					//console.log( object );
 
 				}
 
@@ -336,4 +419,3 @@ export function onValidType( types = 'node', node = null ) {
 	};
 
 }
-

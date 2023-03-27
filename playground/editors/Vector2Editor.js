@@ -1,29 +1,23 @@
-import { NumberInput, LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { Vector2 } from 'three';
-import { UniformNode } from 'three/nodes';
+import { createElementFromJSON } from '../NodeEditorUtils.js';
 
 export class Vector2Editor extends BaseNodeEditor {
 
 	constructor() {
 
-		const node = new UniformNode( new Vector2() );
+		const { element, inputNode } = createElementFromJSON( {
+			inputType: 'vec2',
+			inputConnection: false
+		} );
 
-		super( 'Vector 2', node );
+		super( 'Vector 2', inputNode );
 
 		this.setOutputLength( 2 );
 
-		const onUpdate = () => {
+		element.addEventListener( 'changeInput', () => this.invalidate() );
 
-			node.value.x = fieldX.getValue();
-			node.value.y = fieldY.getValue();
+		this.add( element );
 
-		};
-
-		const fieldX = new NumberInput().setTagColor( 'red' ).onChange( onUpdate );
-		const fieldY = new NumberInput().setTagColor( 'green' ).onChange( onUpdate );
-
-		this.add( new LabelElement( 'XY' ).add( fieldX ).add( fieldY ) );
 
 	}
 

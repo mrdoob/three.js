@@ -63,6 +63,8 @@ export class BaseNodeEditor extends Node {
 
 		this.title = title;
 
+		if ( this.icon ) this.setIcon( 'ti ti-' + this.icon );
+
 		this.contextButton = contextButton;
 		this.context = context;
 
@@ -82,7 +84,7 @@ export class BaseNodeEditor extends Node {
 
 	getOutputType() {
 
-		return getTypeFromValue( this.value ) ;
+		return getTypeFromValue( this.value );
 
 	}
 
@@ -124,7 +126,7 @@ export class BaseNodeEditor extends Node {
 
 		this.editor = value;
 
-		this.dispatchEvent( new Event( 'editor' ) );		
+		this.dispatchEvent( new Event( 'editor' ) );
 
 		return this;
 
