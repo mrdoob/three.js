@@ -1,64 +1,13 @@
-import { LabelElement, NumberInput } from 'flow';
-import { Vector3, Vector4 } from 'three';
+import { LabelElement } from 'flow';
+import { Color, Vector2, Vector3, Vector4 } from 'three';
 import * as Nodes from 'three/nodes';
 import { uniform } from 'three/nodes';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-
-const createFloatInput = ( node, element ) => {
-
-	element.add( new NumberInput().onChange( ( field ) => {
-
-		node.value = field.getValue();
-
-	} ) );
-
-};
-
-const createVector3Inputs = ( node, element ) => {
-
-	const onUpdate = () => {
-
-		node.value.x = fieldX.getValue();
-		node.value.y = fieldY.getValue();
-		node.value.z = fieldZ.getValue();
-
-	};
-
-	const fieldX = new NumberInput().setTagColor( 'red' ).onChange( onUpdate );
-	const fieldY = new NumberInput().setTagColor( 'green' ).onChange( onUpdate );
-	const fieldZ = new NumberInput().setTagColor( 'blue' ).onChange( onUpdate );
-
-	element.add( fieldX ).add( fieldY ).add( fieldZ );
-
-};
-
-const createVector4Inputs = ( node, element ) => {
-
-	const onUpdate = () => {
-
-		node.value.x = fieldX.getValue();
-		node.value.y = fieldY.getValue();
-		node.value.z = fieldZ.getValue();
-		node.value.w = fieldW.getValue();
-
-	};
-
-	const fieldX = new NumberInput().setTagColor( 'red' ).onChange( onUpdate );
-	const fieldY = new NumberInput().setTagColor( 'green' ).onChange( onUpdate );
-	const fieldZ = new NumberInput().setTagColor( 'blue' ).onChange( onUpdate );
-	const fieldW = new NumberInput().setTagColor( 'white' ).onChange( onUpdate );
-
-	element.add( fieldX ).add( fieldY ).add( fieldZ ).add( fieldW );
-
-};
-
-const valueToInputs = {
-	'vec3': createVector3Inputs,
-	'vec4': createVector4Inputs,
-	'float': createFloatInput
-};
+import { createInputLib } from '../NodeEditorUtils.js';
 
 const typeToValue = {
+	'color': Color,
+	'vec2': Vector2,
 	'vec3': Vector3,
 	'vec4': Vector4
 };
@@ -86,9 +35,9 @@ const createElementFromProperty = ( node, property ) => {
 
 	const element = new LabelElement( label ).setInput( property.defaultLength || 1 );
 
-	if ( valueToInputs[ nodeType ] !== undefined ) {
+	if ( createInputLib[ nodeType ] !== undefined ) {
 
-		valueToInputs[ nodeType ]( defaultValue, element );
+		createInputLib[ nodeType ]( defaultValue, element );
 
 	}
 
