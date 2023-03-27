@@ -333,7 +333,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 				subContext.add( new ButtonInput( name )
 					.setIcon( 'ti ti-file-symlink' )
 					.onClick( onClickExample )
-					.setExtra( category + '/' + filename )
+					.setExtra( category.toLowerCase() + '/' + filename )
 				);
 
 			}
