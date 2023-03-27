@@ -1,5 +1,5 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
-import { CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
+import { VideoTexture, CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
 	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
 } from 'three';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
@@ -13,6 +13,7 @@ class WebGPUTextures {
 		this.info = info;
 
 		this.defaultTexture = null;
+		this.defaultVideoTexture = null;
 		this.defaultCubeTexture = null;
 		this.defaultSampler = null;
 
@@ -48,6 +49,26 @@ class WebGPUTextures {
 		}
 
 		return this.defaultTexture;
+
+	}
+
+	getVideoDefaultTexture() {
+
+		if ( this.defaultVideoTexture === null ) {
+
+			const video = document.getElementById( 'video' );
+
+			const texture = new VideoTexture( video );
+			texture.minFilter = NearestFilter;
+			texture.magFilter = NearestFilter;
+
+			this._uploadVideoTexture( texture );
+
+			this.defaultVideoTexture = this.getTextureGPU( texture );
+
+		}
+
+		return this.defaultVideoTexture;
 
 	}
 
@@ -122,7 +143,15 @@ class WebGPUTextures {
 
 				//
 
-				needsUpdate = this._uploadTexture( texture );
+				if ( texture.isVideoTexture ) {
+
+					needsUpdate = this._uploadVideoTexture( texture );
+
+				} else {
+
+					needsUpdate = this._uploadTexture( texture );
+
+				}
 
 			}
 
@@ -296,6 +325,23 @@ class WebGPUTextures {
 
 	}
 
+	_uploadVideoTexture( texture ) {
+
+		const device = this.device;
+
+		const textureProperties = this.properties.get( texture );
+
+		const textureGPU = device.importExternalTexture( {
+			source: texture.source.data
+		} );
+
+		textureProperties.textureGPU = textureGPU;
+		//textureProperties.version = texture.version; // @TODO: Force update for now, study a better solution soon using native VideoTexture.update() to fix warns
+
+		return true;
+
+	}
+
 	_uploadTexture( texture ) {
 
 		let needsUpdate = false;
@@ -341,7 +387,6 @@ class WebGPUTextures {
 		if ( textureGPU === undefined ) {
 
 			textureGPU = device.createTexture( textureGPUDescriptor );
-			textureProperties.textureGPU = textureGPU;
 
 			needsUpdate = true;
 
@@ -367,24 +412,23 @@ class WebGPUTextures {
 
 			}
 
-		} else {
+		} else if ( image !== null ) {
 
-			if ( image !== null ) {
+			// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
 
-				// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
+			this._getImageBitmap( image, texture ).then( imageBitmap => {
 
-				this._getImageBitmap( image, texture ).then( imageBitmap => {
+				this._copyExternalImageToTexture( imageBitmap, textureGPU );
 
-					this._copyExternalImageToTexture( imageBitmap, textureGPU );
+				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
-					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
-
-				} );
-
-			}
+			} );
 
 		}
 
+		//
+
+		textureProperties.textureGPU = textureGPU;
 		textureProperties.version = texture.version;
 
 		return needsUpdate;

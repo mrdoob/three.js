@@ -341,6 +341,7 @@
 		"webgpu_lights_selective",
 		"webgpu_loader_gltf",
 		"webgpu_materials",
+		"webgpu_materials_video",
 		"webgpu_nodes_playground",
 		"webgpu_particles",
 		"webgpu_rtt",
