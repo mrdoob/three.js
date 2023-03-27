@@ -6,7 +6,8 @@ import { Texture, TextureLoader, RepeatWrapping, ClampToEdgeWrapping, MirroredRe
 
 const textureLoader = new TextureLoader();
 const defaultTexture = new Texture();
-const defaultUV = null;
+
+let defaultUV = null;
 
 const getTexture = ( url ) => {
 
