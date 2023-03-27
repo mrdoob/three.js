@@ -44,13 +44,42 @@ export const ClassLib = {
 };
 
 let nodeList = null;
+let nodeListLoading = false;
 
 export const getNodeList = async () => {
 
 	if ( nodeList === null ) {
 
-		const response = await fetch( './Nodes.json' );
-		nodeList = await response.json();
+		if ( nodeListLoading === false ) {
+
+			nodeListLoading = true;
+
+			const response = await fetch( './Nodes.json' );
+			nodeList = await response.json();
+
+		} else {
+
+			await new Promise( res => {
+
+				const verifyNodeList = () => {
+
+					if ( nodeList !== null ) {
+
+						res();
+
+					} else {
+
+						window.requestAnimationFrame( verifyNodeList );
+
+					}
+
+				};
+
+				verifyNodeList();
+
+			} );
+
+		}
 
 	}
 
