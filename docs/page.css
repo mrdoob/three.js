@@ -115,7 +115,8 @@ p,
 div,
 table,
 ol,
-ul {
+ul,
+summary {
 	margin-top: 16px;
 	margin-bottom: 16px;
 }

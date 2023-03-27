@@ -1618,8 +1618,6 @@ class GLTFMeshGpuInstancing {
 				// Just in case
 				Object3D.prototype.copy.call( instancedMesh, mesh );
 
-				// https://github.com/mrdoob/three.js/issues/18334
-				instancedMesh.frustumCulled = false;
 				this.parser.assignFinalMaterial( instancedMesh );
 
 				instancedMeshes.push( instancedMesh );
@@ -2991,6 +2989,12 @@ class GLTFParser {
 			texture.flipY = false;
 
 			texture.name = textureDef.name || sourceDef.name || '';
+
+			if ( texture.name === '' && typeof sourceDef.uri === 'string' && sourceDef.uri.startsWith( 'data:image/' ) === false ) {
+
+				texture.name = sourceDef.uri;
+
+			}
 
 			const samplers = json.samplers || {};
 			const sampler = samplers[ textureDef.sampler ] || {};

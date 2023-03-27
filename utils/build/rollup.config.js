@@ -298,6 +298,22 @@ const builds = [
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
+			glconstants(),
+			glsl(),
+			terser(),
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.module.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
 			glsl(),
 			header()
 		],
@@ -310,7 +326,8 @@ const builds = [
 			}
 		]
 	},
-	{
+
+	{ // @deprecated, r150
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
@@ -327,7 +344,7 @@ const builds = [
 			}
 		]
 	},
-	{
+	{ // @deprecated, r150
 		input: 'src/Three.js',
 		plugins: [
 			addons(),

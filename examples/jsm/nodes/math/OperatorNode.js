@@ -172,7 +172,7 @@ class OperatorNode extends TempNode {
 
 			if ( op === '=' ) {
 
-				builder.addFlowCode( `${a} ${this.op} ${b}` );
+				builder.addLineFlowCode( `${a} ${this.op} ${b}` );
 
 				return a;
 

@@ -224,7 +224,7 @@ depth関数とブレンディングを使い修正できる可能性がありま
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -232,7 +232,7 @@ depth関数とブレンディングを使い修正できる可能性がありま
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -324,7 +324,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-+import {TWEEN} from 'three/addons/libs/tween.min.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>そして、影響を与えるアニメーションの <code class="notranslate" translate="no">Tween</code> を作成します。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest

@@ -262,9 +262,12 @@ export default QUnit.module( 'Renderers', () => {
 
 		} );
 
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.expect( 0 );
+
+			const object = new WebGLRenderer();
+			object.dispose();
 
 		} );
 

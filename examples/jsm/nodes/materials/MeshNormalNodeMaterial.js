@@ -27,7 +27,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructDiffuseColor( builder, stack ) {
+	constructDiffuseColor( { stack } ) {
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 

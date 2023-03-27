@@ -181,6 +181,13 @@ const color7 = new THREE.Color( 1, 0, 0 );
 
 		</p>
 
+		<h3>[method:Color getRGB]( [param:Color target], [param:string colorSpace] = SRGBColorSpace )</h3>
+		<p>
+			[page:Color target] - questo risultato sarà copiato in questo oggetto.<br /><br />
+
+			Returns the RGB values of this color as an instance of [page:Color].
+		</p>
+
 		<h3>[method:String getStyle]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>Restituisce il valore di questo colore come una stringa CSS style. Esempio: `rgb(255,0,0)`.</p>
 
@@ -310,6 +317,11 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		[page:Integer offset] - Un offset opzionale nell'array.<br /><br />
 
 		Restituisce un array della forma [ r, g, b ].
+		</p>
+
+		<h3>[method:Number toJSON]()</h3>
+		<p>
+		This methods defines the serialization result of [name]. Returns the color as a hexadecimal value.
 		</p>
 
 		<h2>Source</h2>

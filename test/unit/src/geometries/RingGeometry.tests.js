@@ -45,9 +45,10 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new RingGeometry();
+			assert.ok( object, 'Can instantiate a RingGeometry.' );
 
 		} );
 

@@ -40,7 +40,7 @@ import { threejsLessonUtils } from './threejs-lesson-utils.js';
 
 				}
 
-				const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries( geometries, false );
+				const mergedGeometry = BufferGeometryUtils.mergeGeometries( geometries, false );
 				const material = new THREE.MeshBasicMaterial( {
 					color: colors.wire,
 					wireframe: true,

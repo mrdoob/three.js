@@ -13,7 +13,7 @@ class ImageUtils {
 
 		}
 
-		if ( typeof HTMLCanvasElement == 'undefined' ) {
+		if ( typeof HTMLCanvasElement === 'undefined' ) {
 
 			return image.src;
 

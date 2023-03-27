@@ -10,10 +10,17 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.module( 'StringKeyframeTrack', () => {
 
+			const parameters = {
+				name: '.name',
+				times: [ 0, 1 ],
+				values: [ 'foo', 'bar' ],
+				interpolation: StringKeyframeTrack.DefaultInterpolation
+			};
+
 			// INHERITANCE
 			QUnit.test( 'Extending', ( assert ) => {
 
-				const object = new StringKeyframeTrack( '.name', [ 0, 1 ], [ 'foo', 'bar' ] );
+				const object = new StringKeyframeTrack( parameters.name, parameters.times, parameters.values );
 				assert.strictEqual(
 					object instanceof KeyframeTrack, true,
 					'StringKeyframeTrack extends from KeyframeTrack'
@@ -22,9 +29,15 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				// name, times, values
+				const object = new StringKeyframeTrack( parameters.name, parameters.times, parameters.values );
+				assert.ok( object, 'Can instantiate a StringKeyframeTrack.' );
+
+				// name, times, values, interpolation
+				const object_all = new StringKeyframeTrack( parameters.name, parameters.times, parameters.values, parameters.interpolation );
+				assert.ok( object_all, 'Can instantiate a StringKeyframeTrack with name, times, values, interpolation.' );
 
 			} );
 

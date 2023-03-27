@@ -1,6 +1,5 @@
 import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
-import { Vector3 } from './Vector3.js';
 
 export function SRGBToLinear( c ) {
 
@@ -14,7 +13,6 @@ export function LinearToSRGB( c ) {
 
 }
 
-
 /**
  * Matrices converting P3 <-> Rec. 709 primaries, without gamut mapping
  * or clipping. Based on W3C specifications for sRGB and Display P3,
@@ -27,35 +25,29 @@ export function LinearToSRGB( c ) {
  * - http://www.russellcottrell.com/photo/matrixCalculator.htm
  */
 
-const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = new Matrix3().fromArray( [
+const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = /*@__PURE__*/ new Matrix3().fromArray( [
 	0.8224621, 0.0331941, 0.0170827,
 	0.1775380, 0.9668058, 0.0723974,
 	- 0.0000001, 0.0000001, 0.9105199
 ] );
 
-const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = new Matrix3().fromArray( [
+const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = /*@__PURE__*/ new Matrix3().fromArray( [
 	1.2249401, - 0.0420569, - 0.0196376,
 	- 0.2249404, 1.0420571, - 0.0786361,
 	0.0000001, 0.0000000, 1.0982735
 ] );
 
-const _vector = new Vector3();
-
 function DisplayP3ToLinearSRGB( color ) {
 
-	color.convertSRGBToLinear();
-
-	_vector.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB );
-
-	return color.setRGB( _vector.x, _vector.y, _vector.z );
+	// Display P3 uses the sRGB transfer functions
+	return color.convertSRGBToLinear().applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB );
 
 }
 
 function LinearSRGBToDisplayP3( color ) {
 
-	_vector.set( color.r, color.g, color.b ).applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 );
-
-	return color.setRGB( _vector.x, _vector.y, _vector.z ).convertLinearToSRGB();
+	// Display P3 uses the sRGB transfer functions
+	return color.applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 ).convertLinearToSRGB();
 
 }
 

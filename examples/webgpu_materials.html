@@ -29,12 +29,12 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
+			import { attribute, positionLocal, normalLocal, normalWorld, normalView, color, texture, ShaderNode, func, uv, vec3, triplanarTexture, viewportBottomLeft, js, string, global, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
+
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
-
-			import { ShaderNode, vec3, dot, triplanarTexture, viewportBottomLeft } from 'three/nodes';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -67,7 +67,7 @@
 				// Grid
 
 				const helper = new THREE.GridHelper( 1000, 40, 0x303030, 0x303030 );
-				helper.material.colorNode = new Nodes.AttributeNode( 'color' );
+				helper.material.colorNode = attribute( 'color' );
 				helper.position.y = - 75;
 				scene.add( helper );
 
@@ -75,9 +75,9 @@
 
 				const textureLoader = new THREE.TextureLoader();
 
-				const texture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
-				texture.wrapS = THREE.RepeatWrapping;
-				texture.wrapT = THREE.RepeatWrapping;
+				const uvTexture = textureLoader.load( './textures/uv_grid_opengl.jpg' );
+				uvTexture.wrapS = THREE.RepeatWrapping;
+				uvTexture.wrapT = THREE.RepeatWrapping;
 
 				const opacityTexture = textureLoader.load( './textures/alphaMap.jpg' );
 				opacityTexture.wrapS = THREE.RepeatWrapping;
@@ -89,43 +89,43 @@
 				//	BASIC
 				//
 
-				// PositionNode.LOCAL
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = new Nodes.PositionNode( Nodes.PositionNode.LOCAL );
+				// PositionLocal
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = positionLocal;
 				materials.push( material );
 
-				// NormalNode.LOCAL
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = new Nodes.NormalNode( Nodes.NormalNode.LOCAL );
+				// NormalLocal
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = normalLocal;
 				materials.push( material );
 
-				// NormalNode.WORLD
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = new Nodes.NormalNode( Nodes.NormalNode.WORLD );
+				// NormalWorld
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = normalWorld;
 				materials.push( material );
 
-				// NormalNode.VIEW
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = new Nodes.NormalNode( Nodes.NormalNode.VIEW );
+				// NormalView
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = normalView;
 				materials.push( material );
 
-				// TextureNode
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = new Nodes.TextureNode( texture );
+				// Texture
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = texture( uvTexture );
 				materials.push( material );
 
 				// Opacity
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = new Nodes.UniformNode( new THREE.Color( 0x0099FF ) );
-				material.opacityNode = new Nodes.TextureNode( texture );
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = color( 0x0099FF );
+				material.opacityNode = texture( uvTexture );
 				material.transparent = true;
 				materials.push( material );
 
 				// AlphaTest
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = new Nodes.TextureNode( texture );
-				material.opacityNode = new Nodes.TextureNode( opacityTexture );
-				material.alphaTestNode = new Nodes.UniformNode( 0.5 );
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = texture( uvTexture );
+				material.opacityNode = texture( opacityTexture );
+				material.alphaTestNode = 0.5;
 				materials.push( material );
 
 				// Normal
@@ -142,29 +142,29 @@
 
 				const desaturateShaderNode = new ShaderNode( ( input ) => {
 
-					return dot( vec3( 0.299, 0.587, 0.114 ), input.color.xyz );
+					return vec3( 0.299, 0.587, 0.114 ).dot( input.color.xyz );
 
 				} );
 
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = desaturateShaderNode.call( { color: new Nodes.TextureNode( texture ) } );
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = desaturateShaderNode.call( { color: texture( uvTexture ) } );
 				materials.push( material );
 
 				// Custom ShaderNode(no inputs) > Approach 2
 
 				const desaturateNoInputsShaderNode = new ShaderNode( () => {
 
-					return dot( vec3( 0.299, 0.587, 0.114 ), Nodes.texture( texture ).xyz );
+					return vec3( 0.299, 0.587, 0.114 ).dot( texture( uvTexture ).xyz );
 
 				} );
 
-				material = new Nodes.MeshBasicNodeMaterial();
+				material = new MeshBasicNodeMaterial();
 				material.colorNode = desaturateNoInputsShaderNode;
 				materials.push( material );
 
 				// Custom WGSL ( desaturate filter )
 
-				const desaturateWGSLNode = Nodes.func( `
+				const desaturateWGSLNode = func( `
 					fn desaturate( color:vec3<f32> ) -> vec3<f32> {
 
 						let lum = vec3<f32>( 0.299, 0.587, 0.114 );
@@ -174,13 +174,13 @@
 					}
 				` );
 
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = desaturateWGSLNode.call( { color: new Nodes.TextureNode( texture ) } );
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = desaturateWGSLNode.call( { color: texture( uvTexture ) } );
 				materials.push( material );
 
 				// Custom WGSL ( get texture from keywords )
 
-				const getWGSLTextureSample = Nodes.func( `
+				const getWGSLTextureSample = func( `
 					fn getWGSLTextureSample( tex: texture_2d<f32>, tex_sampler: sampler, uv:vec2<f32> ) -> vec4<f32> {
 
 						return textureSample( tex, tex_sampler, uv ) * vec4<f32>( 0.0, 1.0, 0.0, 1.0 );
@@ -188,22 +188,128 @@
 					}
 				` );
 
-				const textureNode = new Nodes.TextureNode( texture );
+				const textureNode = texture( uvTexture );
 				//getWGSLTextureSample.keywords = { tex: textureNode, tex_sampler: sampler( textureNode ) };
 
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = getWGSLTextureSample.call( { tex: textureNode, tex_sampler: textureNode, uv: new Nodes.UVNode() } );
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = getWGSLTextureSample.call( { tex: textureNode, tex_sampler: textureNode, uv: uv() } );
 				materials.push( material );
 
 				// Triplanar Texture Mapping
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = triplanarTexture( new Nodes.TextureNode( texture ) );
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = triplanarTexture( texture( uvTexture ) );
 				materials.push( material );
 
 				// Screen Projection Texture
-				material = new Nodes.MeshBasicNodeMaterial();
-				material.colorNode = Nodes.texture( texture, viewportBottomLeft );
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = texture( uvTexture, viewportBottomLeft );
 				materials.push( material );
+
+				// Scriptable
+
+				global.set( 'THREE', THREE );
+				global.set( 'TSL', Nodes );
+
+				const asyncNode = js( `
+
+					layout = {
+						outputType: 'node'
+					};
+
+					const { float } = TSL;
+
+					function init() {
+
+						setTimeout( () => {
+
+							local.set( 'result', float( 1.0 ) );
+
+							refresh(); // refresh the node
+
+						}, 1000 );
+
+						return float( 0.0 );
+
+					}
+
+					function main() {
+
+						const result = local.get( 'result', init );
+
+						//console.log( 'result', result );
+
+						return result;
+
+					}
+
+				` ).scriptable();
+
+				const scriptableNode = js( `
+
+					layout = {
+						outputType: 'node',
+						elements: [
+							{ name: 'source', inputType: 'node' },
+							{ name: 'contrast', inputType: 'node' },
+							{ name: 'vector3', inputType: 'Vector3' },
+							{ name: 'message', inputType: 'string' },
+							{ name: 'binary', inputType: 'ArrayBuffer' },
+							{ name: 'object3d', inputType: 'Object3D' },
+							{ name: 'execFrom', inputType: 'string' }
+						]
+					};
+
+					const { saturation, float, oscSine, mul } = TSL;
+
+					function helloWorld() {
+
+						console.log( "Hello World!" );
+
+					}
+
+					function main() {
+
+						const source = parameters.get( 'source' ) || float();
+						const contrast = parameters.get( 'contrast' ) || float();
+
+						const material = local.get( 'material' );
+
+						//console.log( 'vector3', parameters.get( 'vector3' ) );
+
+						if ( parameters.get( 'execFrom' ) === 'serialized' ) {
+
+							//console.log( 'message', parameters.get( 'message' ).value );
+							//console.log( 'binary', parameters.get( 'binary' ) );
+							//console.log( 'object3d', parameters.get( 'object3d' ) ); // unserializable yet
+
+							//console.log( global.get( 'renderer' ) );
+
+						}
+
+						if ( material ) material.needsUpdate = true;
+
+						return mul( saturation( source, oscSine() ), contrast );
+
+					}
+
+					output = { helloWorld };
+
+				` ).scriptable();
+
+				scriptableNode.setParameter( 'source', texture( uvTexture ).xyz );
+				scriptableNode.setParameter( 'contrast', asyncNode );
+				scriptableNode.setParameter( 'vector3', vec3( new THREE.Vector3( 1, 1, 1 ) ) );
+				scriptableNode.setParameter( 'message', string( 'Hello World!' ) );
+				scriptableNode.setParameter( 'binary', new ArrayBuffer( 4 ) );
+				scriptableNode.setParameter( 'object3d', new THREE.Group() );
+
+				scriptableNode.call( 'helloWorld' );
+
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = scriptableNode;
+				materials.push( material );
+
+				scriptableNode.setLocal( 'material', material );
 
 				//
 				// Geometry
@@ -216,6 +322,8 @@
 					addMesh( geometry, materials[ i ] );
 
 				}
+
+				const serializeMesh = scene.children[ scene.children.length - 1 ];
 
 				//
 
@@ -234,6 +342,10 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				//
+
+				setTimeout( () => testSerialization( serializeMesh ), 1000 );
+
 			}
 
 			function addMesh( geometry, material ) {
@@ -250,6 +362,27 @@
 				objects.push( mesh );
 
 				scene.add( mesh );
+
+			}
+
+			function testSerialization( mesh ) {
+
+				const json = mesh.toJSON();
+				const loader = new NodeObjectLoader();
+				const serializedMesh = loader.parse( json );
+
+				serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;
+				serializedMesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+
+				const scriptableNode = serializedMesh.material.colorNode;
+
+				// it's because local.get( 'material' ) is used in the example ( local/global is unserializable )
+				scriptableNode.setLocal( 'material', serializedMesh.material );
+				scriptableNode.setParameter( 'execFrom', 'serialized' );
+
+				objects.push( serializedMesh );
+
+				scene.add( serializedMesh );
 
 			}
 

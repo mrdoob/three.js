@@ -111,7 +111,7 @@
 
 		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
 		<p>
-		Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective.
+		Multiplies this vector (with an implicit 1 in the 4th dimension) by m, and divides by perspective.
 		</p>
 
 		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
@@ -352,6 +352,11 @@
 		If index equals 0 set [page:.x x] to [page:Float value].<br />
 		If index equals 1 set [page:.y y] to [page:Float value].<br />
 		If index equals 2 set [page:.z z] to [page:Float value]
+		</p>
+
+		<h3>[method:this setFromColor]( [param:Color color] )</h3>
+		<p>
+		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] components from the r, g, and b components of the specified [page:Color color].
 		</p>
 
 		<h3>[method:this setFromCylindrical]( [param:Cylindrical c] )</h3>

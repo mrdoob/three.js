@@ -75,7 +75,7 @@
 
 				const torusGeometry = new THREE.TorusKnotGeometry( ...Object.values( parameters ) );
 				const torusMaterial = new THREE.MeshPhysicalMaterial( {
-					transmission: 1.0, roughness: 0, metalness: 0.25, thickness: 0.5
+					transmission: 1.0, roughness: 0, metalness: 0.25, thickness: 0.5, side: THREE.DoubleSide
 				} );
 				const torus = new THREE.Mesh( torusGeometry, torusMaterial );
 				torus.name = 'torus';
@@ -232,8 +232,8 @@
 
 				const time = performance.now() * 0.0002;
 				const torus = scene.getObjectByName( 'torus' );
-				torus.rotation.x = time * 2;
-				torus.rotation.y = time * 5;
+				torus.rotation.x = time * 0.4;
+				torus.rotation.y = time;
 
 				renderer.render( scene, camera );
 				stats.update();

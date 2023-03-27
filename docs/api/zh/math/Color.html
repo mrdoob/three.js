@@ -182,6 +182,13 @@
 
 		</p>
 
+		<h3>[method:Color getRGB]( [param:Color target], [param:string colorSpace] = SRGBColorSpace )</h3>
+		<p>
+			[page:Color target] - 结果将复制到这个对象中.<br /><br />
+
+			Returns the RGB values of this color as an instance of [page:Color].
+		</p>
+
 		<h3>[method:String getStyle]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>以CSS样式字符串的形式返回该颜色的值。例如:“rgb(255,0,0)”。</p>
 
@@ -306,6 +313,11 @@
 		[page:Integer offset] - 数组的可选偏移量<br /><br />
 
 		返回一个格式为[ r, g, b ] 数组。
+		</p>
+
+		<h3>[method:Number toJSON]()</h3>
+		<p>
+		This methods defines the serialization result of [name]. Returns the color as a hexadecimal value.
 		</p>
 
 		<h2>源码（Source）</h2>

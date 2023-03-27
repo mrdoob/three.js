@@ -1,5 +1,7 @@
 import { Mesh } from './Mesh.js';
+import { Box3 } from '../math/Box3.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Sphere } from '../math/Sphere.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 
@@ -8,8 +10,9 @@ const _basePosition = /*@__PURE__*/ new Vector3();
 const _skinIndex = /*@__PURE__*/ new Vector4();
 const _skinWeight = /*@__PURE__*/ new Vector4();
 
-const _vector = /*@__PURE__*/ new Vector3();
-const _matrix = /*@__PURE__*/ new Matrix4();
+const _vector3 = /*@__PURE__*/ new Vector3();
+const _matrix4 = /*@__PURE__*/ new Matrix4();
+const _vertex = /*@__PURE__*/ new Vector3();
 
 class SkinnedMesh extends Mesh {
 
@@ -24,6 +27,57 @@ class SkinnedMesh extends Mesh {
 		this.bindMode = 'attached';
 		this.bindMatrix = new Matrix4();
 		this.bindMatrixInverse = new Matrix4();
+
+		this.boundingBox = null;
+		this.boundingSphere = null;
+
+	}
+
+	computeBoundingBox() {
+
+		const geometry = this.geometry;
+
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new Box3();
+
+		}
+
+		this.boundingBox.makeEmpty();
+
+		const positionAttribute = geometry.getAttribute( 'position' );
+
+		for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+			_vertex.fromBufferAttribute( positionAttribute, i );
+			this.applyBoneTransform( i, _vertex );
+			this.boundingBox.expandByPoint( _vertex );
+
+		}
+
+	}
+
+	computeBoundingSphere() {
+
+		const geometry = this.geometry;
+
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new Sphere();
+
+		}
+
+		this.boundingSphere.makeEmpty();
+
+		const positionAttribute = geometry.getAttribute( 'position' );
+
+		for ( let i = 0; i < positionAttribute.count; i ++ ) {
+
+			_vertex.fromBufferAttribute( positionAttribute, i );
+			this.applyBoneTransform( i, _vertex );
+			this.boundingSphere.expandByPoint( _vertex );
+
+		}
 
 	}
 
@@ -114,7 +168,7 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	boneTransform( index, target ) {
+	applyBoneTransform( index, vector ) {
 
 		const skeleton = this.skeleton;
 		const geometry = this.geometry;
@@ -122,9 +176,9 @@ class SkinnedMesh extends Mesh {
 		_skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
 		_skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
 
-		_basePosition.copy( target ).applyMatrix4( this.bindMatrix );
+		_basePosition.copy( vector ).applyMatrix4( this.bindMatrix );
 
-		target.set( 0, 0, 0 );
+		vector.set( 0, 0, 0 );
 
 		for ( let i = 0; i < 4; i ++ ) {
 
@@ -134,17 +188,25 @@ class SkinnedMesh extends Mesh {
 
 				const boneIndex = _skinIndex.getComponent( i );
 
-				_matrix.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
+				_matrix4.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
 
-				target.addScaledVector( _vector.copy( _basePosition ).applyMatrix4( _matrix ), weight );
+				vector.addScaledVector( _vector3.copy( _basePosition ).applyMatrix4( _matrix4 ), weight );
 
 			}
 
 		}
 
-		return target.applyMatrix4( this.bindMatrixInverse );
+		return vector.applyMatrix4( this.bindMatrixInverse );
 
 	}
+
+	boneTransform( index, vector ) { // @deprecated, r151
+
+		console.warn( 'THREE.SkinnedMesh: .boneTransform() was renamed to .applyBoneTransform() in r151.' );
+		return this.applyBoneTransform( index, vector );
+
+	}
+
 
 }
 

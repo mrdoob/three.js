@@ -37,9 +37,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Light();
+			assert.ok( object, 'Can instantiate a Light.' );
 
 		} );
 
@@ -77,10 +78,13 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( assert ) => {
+
+			assert.expect( 0 );
 
 			// empty, test exists
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Light();
+			object.dispose();
 
 		} );
 

@@ -19,9 +19,10 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new SkinnedMesh();
+			assert.ok( object, 'Can instantiate a SkinnedMesh.' );
 
 		} );
 
@@ -99,7 +100,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'boneTransform', ( assert ) => {
+		QUnit.todo( 'applyBoneTransform', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

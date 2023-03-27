@@ -82,7 +82,7 @@ class USDZExporter {
 			const color = id.split( '_' )[ 1 ];
 			const isRGBA = texture.format === 1023;
 
-			const canvas = imageToCanvas( texture.image, color );
+			const canvas = imageToCanvas( texture.image, color, texture.flipY );
 			const blob = await new Promise( resolve => canvas.toBlob( resolve, isRGBA ? 'image/png' : 'image/jpeg', 1 ) );
 
 			files[ `textures/Texture_${ id }.${ isRGBA ? 'png' : 'jpg' }` ] = new Uint8Array( await blob.arrayBuffer() );
@@ -122,7 +122,7 @@ class USDZExporter {
 
 }
 
-function imageToCanvas( image, color ) {
+function imageToCanvas( image, color, flipY ) {
 
 	if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 		( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
@@ -136,6 +136,14 @@ function imageToCanvas( image, color ) {
 		canvas.height = image.height * Math.min( 1, scale );
 
 		const context = canvas.getContext( '2d' );
+
+		if ( flipY === true ) {
+
+			context.translate( 0, canvas.height );
+			context.scale( 1, - 1 );
+
+		}
+
 		context.drawImage( image, 0, 0, canvas.width, canvas.height );
 
 		if ( color !== undefined ) {

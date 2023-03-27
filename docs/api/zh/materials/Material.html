@@ -109,11 +109,11 @@
 
 <h3>[property:Boolean forceSinglePass]</h3>
 <p>
-Whether double-sided, transparent objects should be rendered with a single pass or not. Default is `false`.<br /><br />
+决定双面透明的东西是否强制使用单通道渲染，默认为`false`。<br /><br />
 
-The engine renders double-sided, transparent objects with two draw calls (back faces first, then front faces) to mitigate transparency artifacts.
-There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grass sprites. 
-In these cases, set the `forceSinglePass` flag to `false` to disable the two pass rendering to avoid performance issues.
+为了减少一些半透明物体的渲染错误，此引擎调用两次绘制来渲染渲染双面透明的东西。
+但是此方案可能会导致在某些情况下使绘制调用次数翻倍，例如渲染一些平面的植物例如草精灵之类的。
+在这些情况下，将`forceSinglePass`设置为`true`来使用单通道渲染来避免性能问题。
 </p>
 
 <h3>[property:Boolean isMaterial]</h3>
@@ -267,7 +267,7 @@ In these cases, set the `forceSinglePass` flag to `false` to disable the two pas
 <h3>[property:Boolean vertexColors]</h3>
 <p>
 是否使用顶点着色。默认值为false。
-The engine supports RGB and RGBA vertex colors depending on whether a three (RGB) or four (RGBA) component color buffer attribute is used.
+此引擎支持RGB或者RGBA两种顶点颜色，取决于缓冲 attribute 使用的是三分量（RGB）还是四分量（RGBA）。
 </p>
 
 <h3>[property:Boolean visible]</h3>
@@ -301,7 +301,7 @@ The engine supports RGB and RGBA vertex colors depending on whether a three (RGB
 
 <h3>[method:String customProgramCacheKey]()</h3>
 <p>
-当用到onBeforeCompile回调的时候，这个回调函数可以用来定义在onBeforeCompile中使用的配置项，这样three.js就可以根据这个回调返回的字符串来判定使用一个缓存的编译好的着色器代码还是根据需求重新编译一个新的着色器代码。
+当用到onBeforeCompile回调的时候，这个回调函数可以用来定义在onBeforeCompile中使用的配置项，这样three.js就可以根据这个回调返回的字符串来判定使用一个缓存的编译好的着色器代码还是根据需求重新编译一段新的着色器代码。
 </p>
 
 <p>

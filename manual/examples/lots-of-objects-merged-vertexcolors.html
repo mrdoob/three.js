@@ -174,7 +174,7 @@ function main() {
       });
     });
 
-    const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+    const mergedGeometry = BufferGeometryUtils.mergeGeometries(
         geometries, false);
     const material = new THREE.MeshBasicMaterial({
       vertexColors: true,

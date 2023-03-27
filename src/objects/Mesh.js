@@ -25,6 +25,10 @@ const _uvA = /*@__PURE__*/ new Vector2();
 const _uvB = /*@__PURE__*/ new Vector2();
 const _uvC = /*@__PURE__*/ new Vector2();
 
+const _normalA = /*@__PURE__*/ new Vector3();
+const _normalB = /*@__PURE__*/ new Vector3();
+const _normalC = /*@__PURE__*/ new Vector3();
+
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
@@ -141,7 +145,7 @@ class Mesh extends Object3D {
 
 		if ( this.isSkinnedMesh ) {
 
-			this.boneTransform( index, target );
+			this.applyBoneTransform( index, target );
 
 		}
 
@@ -193,6 +197,7 @@ class Mesh extends Object3D {
 		const position = geometry.attributes.position;
 		const uv = geometry.attributes.uv;
 		const uv2 = geometry.attributes.uv2;
+		const normal = geometry.attributes.normal;
 		const groups = geometry.groups;
 		const drawRange = geometry.drawRange;
 
@@ -216,7 +221,7 @@ class Mesh extends Object3D {
 						const b = index.getX( j + 1 );
 						const c = index.getX( j + 2 );
 
-						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, uv, uv2, a, b, c );
+						intersection = checkGeometryIntersection( this, groupMaterial, raycaster, _ray, uv, uv2, normal, a, b, c );
 
 						if ( intersection ) {
 
@@ -241,7 +246,7 @@ class Mesh extends Object3D {
 					const b = index.getX( i + 1 );
 					const c = index.getX( i + 2 );
 
-					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, uv, uv2, a, b, c );
+					intersection = checkGeometryIntersection( this, material, raycaster, _ray, uv, uv2, normal, a, b, c );
 
 					if ( intersection ) {
 
@@ -274,7 +279,7 @@ class Mesh extends Object3D {
 						const b = j + 1;
 						const c = j + 2;
 
-						intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, uv, uv2, a, b, c );
+						intersection = checkGeometryIntersection( this, groupMaterial, raycaster, _ray, uv, uv2, normal, a, b, c );
 
 						if ( intersection ) {
 
@@ -299,7 +304,7 @@ class Mesh extends Object3D {
 					const b = i + 1;
 					const c = i + 2;
 
-					intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, uv, uv2, a, b, c );
+					intersection = checkGeometryIntersection( this, material, raycaster, _ray, uv, uv2, normal, a, b, c );
 
 					if ( intersection ) {
 
@@ -349,7 +354,7 @@ function checkIntersection( object, material, raycaster, ray, pA, pB, pC, point 
 
 }
 
-function checkBufferGeometryIntersection( object, material, raycaster, ray, uv, uv2, a, b, c ) {
+function checkGeometryIntersection( object, material, raycaster, ray, uv, uv2, normal, a, b, c ) {
 
 	object.getVertexPosition( a, _vA );
 	object.getVertexPosition( b, _vB );
@@ -365,7 +370,7 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, uv, 
 			_uvB.fromBufferAttribute( uv, b );
 			_uvC.fromBufferAttribute( uv, c );
 
-			intersection.uv = Triangle.getUV( _intersectionPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() );
+			intersection.uv = Triangle.getInterpolation( _intersectionPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() );
 
 		}
 
@@ -375,7 +380,23 @@ function checkBufferGeometryIntersection( object, material, raycaster, ray, uv, 
 			_uvB.fromBufferAttribute( uv2, b );
 			_uvC.fromBufferAttribute( uv2, c );
 
-			intersection.uv2 = Triangle.getUV( _intersectionPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() );
+			intersection.uv2 = Triangle.getInterpolation( _intersectionPoint, _vA, _vB, _vC, _uvA, _uvB, _uvC, new Vector2() );
+
+		}
+
+		if ( normal ) {
+
+			_normalA.fromBufferAttribute( normal, a );
+			_normalB.fromBufferAttribute( normal, b );
+			_normalC.fromBufferAttribute( normal, c );
+
+			intersection.normal = Triangle.getInterpolation( _intersectionPoint, _vA, _vB, _vC, _normalA, _normalB, _normalC, new Vector3() );
+
+			if ( intersection.normal.dot( ray.direction ) > 0 ) {
+
+				intersection.normal.multiplyScalar( - 1 );
+
+			}
 
 		}
 

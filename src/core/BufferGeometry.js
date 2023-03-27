@@ -8,7 +8,7 @@ import { Object3D } from './Object3D.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import * as MathUtils from '../math/MathUtils.js';
-import { arrayNeedsUint32 } from '../utils.js';
+import { arrayNeedsUint32, deepClone } from '../utils.js';
 
 let _id = 0;
 
@@ -726,11 +726,9 @@ class BufferGeometry extends EventDispatcher {
 
 	}
 
-	// @deprecated since r144
+	merge() { // @deprecated, r144
 
-	merge() {
-
-		console.error( 'THREE.BufferGeometry.merge() has been removed. Use THREE.BufferGeometryUtils.mergeBufferGeometries() instead.' );
+		console.error( 'THREE.BufferGeometry.merge() has been removed. Use THREE.BufferGeometryUtils.mergeGeometries() instead.' );
 		return this;
 
 	}
@@ -1071,11 +1069,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// user data
 
-		this.userData = source.userData;
-
-		// geometry generator parameters
-
-		if ( source.parameters !== undefined ) this.parameters = Object.assign( {}, source.parameters );
+		this.userData = deepClone( source.userData );
 
 		return this;
 

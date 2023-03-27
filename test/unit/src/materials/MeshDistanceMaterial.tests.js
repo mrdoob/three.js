@@ -20,9 +20,10 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new MeshDistanceMaterial();
+			assert.ok( object, 'Can instantiate a MeshDistanceMaterial.' );
 
 		} );
 
@@ -34,24 +35,6 @@ export default QUnit.module( 'Materials', () => {
 				object.type === 'MeshDistanceMaterial',
 				'MeshDistanceMaterial.type should be MeshDistanceMaterial'
 			);
-
-		} );
-
-		QUnit.todo( 'referencePosition', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'nearDistance', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'farDistance', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

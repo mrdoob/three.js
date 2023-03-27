@@ -298,6 +298,16 @@ class PolyhedronGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	static fromJSON( data ) {
 
 		return new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.details );

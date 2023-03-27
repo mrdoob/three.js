@@ -9,10 +9,13 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'LoadingManager', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			// constructor( onLoad, onProgress, onError )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			// no params
+			const object = new LoadingManager();
+			assert.ok( object, 'Can instantiate a LoadingManager.' );
+
+			// onLoad, onProgress, onError
 
 		} );
 

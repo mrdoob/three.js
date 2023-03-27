@@ -150,7 +150,7 @@ function main() {
       });
     });
 
-    const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+    const mergedGeometry = BufferGeometryUtils.mergeGeometries(
         geometries, false);
     const material = new THREE.MeshBasicMaterial({color:'red'});
     const mesh = new THREE.Mesh(mergedGeometry, material);

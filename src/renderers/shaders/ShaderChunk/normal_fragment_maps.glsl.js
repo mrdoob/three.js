@@ -23,15 +23,7 @@ export default /* glsl */`
 	vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
 	mapN.xy *= normalScale;
 
-	#ifdef USE_TANGENT
-
-		normal = normalize( vTBN * mapN );
-
-	#else
-
-		normal = perturbNormal2Arb( - vViewPosition, normal, mapN, faceDirection );
-
-	#endif
+	normal = normalize( tbn * mapN );
 
 #elif defined( USE_BUMPMAP )
 

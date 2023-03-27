@@ -43,9 +43,10 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new TorusGeometry();
+			assert.ok( object, 'Can instantiate a TorusGeometry.' );
 
 		} );
 

@@ -6,7 +6,7 @@ import { addNodeElement, ShaderNode, nodeProxy, float, vec3, mat3 } from '../sha
 
 const saturationNode = new ShaderNode( ( { color, adjustment } ) => {
 
-	return luminance( color ).mix( color, adjustment );
+	return adjustment.mix( luminance( color ), color );
 
 } );
 
