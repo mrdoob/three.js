@@ -270,8 +270,8 @@ import './src/renderers/webgl/WebGLUtils.tests.js';
 
 
 //src/scenes
-import './src/scenes/Fog.tests.js';
-import './src/scenes/FogExp2.tests.js';
+import './src/scenes/RangeFog.tests.js';
+import './src/scenes/DensityFog.tests.js';
 import './src/scenes/Scene.tests.js';
 
 

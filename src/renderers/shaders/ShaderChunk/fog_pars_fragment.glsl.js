@@ -2,9 +2,9 @@ export default /* glsl */`
 #ifdef USE_FOG
 
 	uniform vec3 fogColor;
-	varying float vFogDepth;
+	varying vec3 vFogPosition;
 
-	#ifdef FOG_EXP2
+	#if defined( FOG_EXP ) || defined( FOG_EXP2 )
 
 		uniform float fogDensity;
 

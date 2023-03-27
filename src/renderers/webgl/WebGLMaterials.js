@@ -19,12 +19,12 @@ function WebGLMaterials( renderer, properties ) {
 
 		fog.color.getRGB( uniforms.fogColor.value, getUnlitUniformColorSpace( renderer ) );
 
-		if ( fog.isFog ) {
+		if ( fog.isRangeFog ) {
 
 			uniforms.fogNear.value = fog.near;
 			uniforms.fogFar.value = fog.far;
 
-		} else if ( fog.isFogExp2 ) {
+		} else if ( fog.isDensityFog ) {
 
 			uniforms.fogDensity.value = fog.density;
 

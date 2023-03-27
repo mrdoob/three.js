@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - fog types</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #efd1b5;
+				color: #61443e;
+			}
+			body, #container {
+				overflow: hidden;
+			}
+			a {
+				color: #a06851;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain + fog types<br /></div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+		
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from './jsm/libs/lil-gui.module.min.js';
+
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+
+			let container, stats;
+			let camera, controls, scene, renderer;
+			let mesh, texture;
+
+			const worldWidth = 256, worldDepth = 256;
+			const clock = new THREE.Clock();
+
+			var fogs, fogGuis;
+
+			var params = {
+				"Fog type": "DensityFog",
+				"Fog color": "#b7dc50",
+			}
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color();
+
+				fogs = {
+					"RangeFog": new THREE.RangeFog(),
+					"DensityFog": new THREE.DensityFog(undefined, 0.001, false),
+				};
+				
+				setFogColor( params[ "Fog color" ] );
+
+				var data = generateHeight( worldWidth, worldDepth );
+
+				camera.position.y = data[ 0.5 * worldWidth + 0.5 * worldDepth * worldWidth ] * 10 + 300;
+
+				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				geometry.rotateX( - Math.PI / 2 );
+
+				var vertices = geometry.attributes.position.array;
+
+				for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+
+					vertices[ j + 1 ] = data[ i ] * 10;
+
+				}
+
+				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
+				texture.wrapS = THREE.ClampToEdgeWrapping;
+				texture.wrapT = THREE.ClampToEdgeWrapping;
+
+				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
+				scene.add( mesh );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 100;
+				controls.lookSpeed = 0.03;
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				
+				//
+				
+				var gui = new GUI();
+				
+				gui.add( params, "Fog type", Object.keys( fogs ) ).onChange( setFogType );
+				
+				gui.addColor( params, "Fog color" ).onChange( setFogColor );
+				
+				fogGuis = {
+					"RangeFog": gui.addFolder( "RangeFog" ),
+					"DensityFog": gui.addFolder( "DensityFog" )
+				};
+				
+				setFogType( params[ "Fog type" ] );
+				
+				fogGuis.RangeFog.add( fogs.RangeFog, "near", 0., 1000 );
+				fogGuis.RangeFog.add( fogs.RangeFog, "far", 1000., 5000 );
+
+				fogGuis.DensityFog.add( fogs.DensityFog, "density", 0., 0.002 );
+				fogGuis.DensityFog.add( fogs.DensityFog, "squared" );
+
+			}
+
+			function setFogType( type ) {
+
+				scene.fog = fogs[ type ];
+				
+				for (let fogGui of Object.values(fogGuis)) {
+
+					fogGui.close();
+
+				}
+
+				fogGuis[ type ].open();
+
+			}
+
+			function setFogColor( css_string ) {
+
+				document.body.style[ "background-color" ] = css_string;
+				scene.background.set( css_string );
+				
+				for (let fog of Object.values( fogs )) {
+
+					fog.color.set( css_string );
+
+				}
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+			}
+
+			function generateHeight( width, height ) {
+
+				var size = width * height, data = new Uint8Array( size ),
+					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
+
+				for ( var j = 0; j < 4; j ++ ) {
+
+					for ( var i = 0; i < size; i ++ ) {
+
+						var x = i % width, y = ~ ~ ( i / width );
+						data[ i ] += Math.abs( perlin.noise( x / quality, y / quality, z ) * quality * 1.75 );
+
+					}
+
+					quality *= 5;
+
+				}
+
+				return data;
+
+			}
+
+			function generateTexture( data, width, height ) {
+
+				var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
+
+				vector3 = new THREE.Vector3( 0, 0, 0 );
+
+				sun = new THREE.Vector3( 1, 1, 1 );
+				sun.normalize();
+
+				canvas = document.createElement( 'canvas' );
+				canvas.width = width;
+				canvas.height = height;
+
+				context = canvas.getContext( '2d' );
+				context.fillStyle = '#000';
+				context.fillRect( 0, 0, width, height );
+
+				image = context.getImageData( 0, 0, canvas.width, canvas.height );
+				imageData = image.data;
+
+				for ( var i = 0, j = 0, l = imageData.length; i < l; i += 4, j ++ ) {
+
+					vector3.x = data[ j - 2 ] - data[ j + 2 ];
+					vector3.y = 2;
+					vector3.z = data[ j - width * 2 ] - data[ j + width * 2 ];
+					vector3.normalize();
+
+					shade = vector3.dot( sun );
+
+					imageData[ i ] = ( 96 + shade * 128 ) * ( 0.5 + data[ j ] * 0.007 );
+					imageData[ i + 1 ] = ( 32 + shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
+					imageData[ i + 2 ] = ( shade * 96 ) * ( 0.5 + data[ j ] * 0.007 );
+
+				}
+
+				context.putImageData( image, 0, 0 );
+
+				// Scaled 4x
+
+				canvasScaled = document.createElement( 'canvas' );
+				canvasScaled.width = width * 4;
+				canvasScaled.height = height * 4;
+
+				context = canvasScaled.getContext( '2d' );
+				context.scale( 4, 4 );
+				context.drawImage( canvas, 0, 0 );
+
+				image = context.getImageData( 0, 0, canvasScaled.width, canvasScaled.height );
+				imageData = image.data;
+
+				for ( var i = 0, l = imageData.length; i < l; i += 4 ) {
+
+					var v = ~ ~ ( Math.random() * 5 );
+
+					imageData[ i ] += v;
+					imageData[ i + 1 ] += v;
+					imageData[ i + 2 ] += v;
+
+				}
+
+				context.putImageData( image, 0, 0 );
+
+				return canvasScaled;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+
+			function render() {
+
+				controls.update( clock.getDelta() );
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

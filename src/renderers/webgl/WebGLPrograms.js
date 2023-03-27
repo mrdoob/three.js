@@ -269,7 +269,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			fog: !! fog,
 			useFog: material.fog === true,
-			fogExp2: ( fog && fog.isFogExp2 ),
+			fogExp: ( ( !! fog ) && fog.isDensityFog && ! fog.squared ),
+			fogExp2: ( ( !! fog ) && fog.isDensityFog && fog.squared ),
 
 			flatShading: material.flatShading === true,
 
@@ -403,6 +404,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.transmissionMapUv );
 		array.push( parameters.thicknessMapUv );
 		array.push( parameters.combine );
+		array.push( parameters.fogExp );
 		array.push( parameters.fogExp2 );
 		array.push( parameters.sizeAttenuation );
 		array.push( parameters.morphTargetsCount );
