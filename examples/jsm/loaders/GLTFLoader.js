@@ -2399,48 +2399,6 @@ function getNormalizedComponentScale( constructor ) {
 
 }
 
-function getArrayFromAccessor( accessor ) {
-
-	let outputArray = accessor.array;
-
-	if ( accessor.normalized ) {
-
-		const scale = getNormalizedComponentScale( outputArray.constructor );
-		const scaled = new Float32Array( outputArray.length );
-
-		for ( let j = 0, jl = outputArray.length; j < jl; j ++ ) {
-
-			scaled[ j ] = outputArray[ j ] * scale;
-
-		}
-
-		outputArray = scaled;
-
-	}
-
-	return outputArray;
-
-}
-
-function createCubicSplineTrackInterpolant( track ) {
-
-	track.createInterpolant = function InterpolantFactoryMethodGLTFCubicSpline( result ) {
-
-		// A CUBICSPLINE keyframe in glTF has three output values for each input value,
-		// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
-		// must be divided by three to get the interpolant's sampleSize argument.
-
-		const interpolantType = ( this instanceof QuaternionKeyframeTrack ) ? GLTFCubicSplineQuaternionInterpolant : GLTFCubicSplineInterpolant;
-
-		return new interpolantType( this.times, this.values, this.getValueSize() / 3, result );
-
-	};
-
-	// Mark as CUBICSPLINE. `track.getInterpolation()` doesn't support custom interpolants.
-	track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
-
-}
-
 function getImageURIMimeType( uri ) {
 
 	if ( uri.search( /\.jpe?g($|\?)/i ) > 0 || uri.search( /^data\:image\/jpeg/ ) === 0 ) return 'image/jpeg';
@@ -4384,7 +4342,7 @@ class GLTFParser {
 
 		const interpolation = sampler.interpolation !== undefined ? INTERPOLATION[ sampler.interpolation ] : InterpolateLinear;
 
-		const outputArray = getArrayFromAccessor( outputAccessor );
+		const outputArray = this.getArrayFromAccessor( outputAccessor );
 
 		for ( let j = 0, jl = targetNames.length; j < jl; j ++ ) {
 
@@ -4398,7 +4356,7 @@ class GLTFParser {
 			// Override interpolation with custom factory method.
 			if ( interpolation === 'CUBICSPLINE' ) {
 
-				createCubicSplineTrackInterpolant( track );
+				this.createCubicSplineTrackInterpolant( track );
 
 			}
 
@@ -4407,6 +4365,48 @@ class GLTFParser {
 		}
 
 		return tracks;
+
+	}
+
+	getArrayFromAccessor( accessor ) {
+
+		let outputArray = accessor.array;
+
+		if ( accessor.normalized ) {
+
+			const scale = getNormalizedComponentScale( outputArray.constructor );
+			const scaled = new Float32Array( outputArray.length );
+
+			for ( let j = 0, jl = outputArray.length; j < jl; j ++ ) {
+
+				scaled[ j ] = outputArray[ j ] * scale;
+
+			}
+
+			outputArray = scaled;
+
+		}
+
+		return outputArray;
+
+	}
+
+	createCubicSplineTrackInterpolant( track ) {
+
+		track.createInterpolant = function InterpolantFactoryMethodGLTFCubicSpline( result ) {
+
+			// A CUBICSPLINE keyframe in glTF has three output values for each input value,
+			// representing inTangent, splineVertex, and outTangent. As a result, track.getValueSize()
+			// must be divided by three to get the interpolant's sampleSize argument.
+
+			const interpolantType = ( this instanceof QuaternionKeyframeTrack ) ? GLTFCubicSplineQuaternionInterpolant : GLTFCubicSplineInterpolant;
+
+			return new interpolantType( this.times, this.values, this.getValueSize() / 3, result );
+
+		};
+
+		// Mark as CUBICSPLINE. `track.getInterpolation()` doesn't support custom interpolants.
+		track.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline = true;
 
 	}
 
