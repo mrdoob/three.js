@@ -350,7 +350,8 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 		addExamples( 'Universal', [
 			'Teapot',
-			'Matcap'
+			'Matcap',
+			'Fresnel'
 		] );
 
 		if ( this.renderer.isWebGLRenderer ) {
