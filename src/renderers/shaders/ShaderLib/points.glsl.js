@@ -20,7 +20,7 @@ void main() {
 
 	#ifdef USE_POINTS_UV
 
-		vUv[ 0 ]= ( uvTransform * vec3( uv, 1 ) ).xy;
+		vUv = ( uvTransform * vec3( uv, 1 ) ).xy;
 
 	#endif
 

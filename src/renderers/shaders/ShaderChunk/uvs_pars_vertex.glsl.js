@@ -1,15 +1,7 @@
 export default /* glsl */`
 #ifdef USE_UV
 
-	#ifdef UVS_VERTEX_ONLY
-
-		vec2 vUv[ 2 ];
-
-	#else
-
-		varying vec2 vUv[ 2 ];
-
-	#endif
+	varying vec2 vUv;
 
 	uniform mat3 uvTransform;
 
@@ -17,6 +9,8 @@ export default /* glsl */`
 #ifdef USE_UV2
 
 	attribute vec2 uv2;
+
+	varying vec2 vUv2;
 
 	uniform mat3 uv2Transform;
 

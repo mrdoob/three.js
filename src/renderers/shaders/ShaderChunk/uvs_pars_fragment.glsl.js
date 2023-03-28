@@ -1,7 +1,12 @@
 export default /* glsl */`
-#if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )
+#ifdef USE_UV
 
-	varying vec2 vUv[ 2 ];
+	varying vec2 vUv;
+
+#endif
+#ifdef USE_UV2
+
+	varying vec2 vUv2;
 
 #endif
 `;

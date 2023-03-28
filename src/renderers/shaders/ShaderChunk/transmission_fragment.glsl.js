@@ -9,13 +9,13 @@ export default /* glsl */`
 
 	#ifdef USE_TRANSMISSIONMAP
 
-		material.transmission *= texture2D( transmissionMap, vUv[ 0 ] ).r;
+		material.transmission *= texture2D( transmissionMap, vUv ).r;
 
 	#endif
 
 	#ifdef USE_THICKNESSMAP
 
-		material.thickness *= texture2D( thicknessMap, vUv[ 0 ] ).g;
+		material.thickness *= texture2D( thicknessMap, vUv ).g;
 
 	#endif
 
