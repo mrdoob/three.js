@@ -18,6 +18,12 @@ class VideoTexture extends Texture {
 
 	}
 
+	get image() {
+
+		return this.source.data;
+
+	}
+
 	set image( video = null ) {
 
 		this.source.data = video;
