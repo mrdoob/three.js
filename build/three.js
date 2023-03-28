@@ -11986,6 +11986,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.lights = false; // set to use scene lights
 			this.clipping = false; // set to use user-defined clipping planes
 
+			this.forceSinglePass = true;
+
 			this.extensions = {
 				derivatives: false, // set to use derivatives
 				fragDepth: false, // set to use fragment depth values
@@ -26111,6 +26113,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				const bottom2 = bottomFov * far / far2 * near2;
 
 				camera.projectionMatrix.makePerspective( left2, right2, top2, bottom2, near2, far2 );
+				camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
 
 			}
 
@@ -26162,21 +26165,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				}
 
-				cameraVR.matrixWorld.decompose( cameraVR.position, cameraVR.quaternion, cameraVR.scale );
-
-				// update user camera and its children
-
-				camera.matrix.copy( cameraVR.matrix );
-				camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
-
-				const children = camera.children;
-
-				for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-					children[ i ].updateMatrixWorld( true );
-
-				}
-
 				// update projection matrix for proper view frustum culling
 
 				if ( cameras.length === 2 ) {
@@ -26191,7 +26179,48 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				}
 
+				// update user camera and its children
+
+				updateUserCamera( camera, cameraVR, parent );
+
 			};
+
+			function updateUserCamera( camera, cameraVR, parent ) {
+
+				if ( parent === null ) {
+
+					camera.matrix.copy( cameraVR.matrixWorld );
+
+				} else {
+
+					camera.matrix.copy( parent.matrixWorld );
+					camera.matrix.invert();
+					camera.matrix.multiply( cameraVR.matrixWorld );
+
+				}
+
+				camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
+				camera.updateMatrixWorld( true );
+
+				const children = camera.children;
+
+				for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+					children[ i ].updateMatrixWorld( true );
+
+				}
+
+				camera.projectionMatrix.copy( cameraVR.projectionMatrix );
+				camera.projectionMatrixInverse.copy( cameraVR.projectionMatrixInverse );
+
+				if ( camera.isPerspectiveCamera ) {
+
+					camera.fov = RAD2DEG * 2 * Math.atan( 1 / camera.projectionMatrix.elements[ 5 ] );
+					camera.zoom = 1;
+
+				}
+
+			}
 
 			this.getCamera = function () {
 
@@ -26310,12 +26339,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						}
 
 						camera.matrix.fromArray( view.transform.matrix );
+						camera.matrix.decompose( camera.position, camera.quaternion, camera.scale );
 						camera.projectionMatrix.fromArray( view.projectionMatrix );
+						camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
 						camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
 						if ( i === 0 ) {
 
 							cameraVR.matrix.copy( camera.matrix );
+							cameraVR.matrix.decompose( cameraVR.position, cameraVR.quaternion, cameraVR.scale );
 
 						}
 
