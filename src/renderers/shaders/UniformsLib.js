@@ -213,9 +213,9 @@ const UniformsLib = {
 		center: { value: /*@__PURE__*/ new Vector2( 0.5, 0.5 ) },
 		rotation: { value: 0.0 },
 		map: { value: null },
+		mapTransform: { value: /*@__PURE__*/ new Matrix3() },
 		alphaMap: { value: null },
-		alphaTest: { value: 0 },
-		uvTransform: { value: /*@__PURE__*/ new Matrix3() }
+		alphaTest: { value: 0 }
 
 	}
 
