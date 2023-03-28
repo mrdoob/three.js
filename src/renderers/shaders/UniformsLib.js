@@ -14,8 +14,7 @@ const UniformsLib = {
 		opacity: { value: 1.0 },
 
 		map: { value: null },
-		uvTransform: { value: /*@__PURE__*/ new Matrix3() },
-		uv2Transform: { value: /*@__PURE__*/ new Matrix3() },
+		mapTransform: { value: /*@__PURE__*/ new Matrix3() },
 
 		alphaMap: { value: null },
 		alphaTest: { value: 0 }
@@ -41,7 +40,8 @@ const UniformsLib = {
 	aomap: {
 
 		aoMap: { value: null },
-		aoMapIntensity: { value: 1 }
+		aoMapIntensity: { value: 1 },
+		aoMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 
@@ -54,7 +54,8 @@ const UniformsLib = {
 
 	emissivemap: {
 
-		emissiveMap: { value: null }
+		emissiveMap: { value: null },
+		emissiveMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 
@@ -68,6 +69,7 @@ const UniformsLib = {
 	normalmap: {
 
 		normalMap: { value: null },
+		normalMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 		normalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) }
 
 	},
@@ -82,13 +84,15 @@ const UniformsLib = {
 
 	roughnessmap: {
 
-		roughnessMap: { value: null }
+		roughnessMap: { value: null },
+		roughnessMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 
 	metalnessmap: {
 
-		metalnessMap: { value: null }
+		metalnessMap: { value: null },
+		metalnessMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 

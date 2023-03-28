@@ -36,9 +36,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	function getUVSetVar( value ) {
 
-		if ( value === 1 ) return 'vUv2';
+		if ( value === 1 ) return 'uv2';
 
-		return 'vUv';
+		return 'uv';
 
 	}
 
@@ -147,6 +147,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
+			normalMapUv: !! material.normalMap && getUVSetVar( material.normalMap.uvSet ),
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
 			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
 
@@ -163,7 +164,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
+			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
 			metalnessMap: !! material.metalnessMap,
+			metalnessMapUv: !! material.metalnessMap && getUVSetVar( material.metalnessMap.uvSet ),
 			specularMap: !! material.specularMap,
 			specularIntensityMap: !! material.specularIntensityMap,
 			specularColorMap: !! material.specularColorMap,
@@ -308,6 +311,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.lightMapUv );
 		array.push( parameters.aoMapUv );
 		array.push( parameters.emissiveMapUv );
+		array.push( parameters.normalMapUv );
+		array.push( parameters.roughnessMapUv );
+		array.push( parameters.metalnessMapUv );
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.combine );
