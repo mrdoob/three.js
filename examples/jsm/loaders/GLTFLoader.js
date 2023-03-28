@@ -3777,6 +3777,7 @@ class GLTFParser {
 		const json = this.json;
 
 		const animationDef = json.animations[ animationIndex ];
+		const animationName = animationDef.name ? animationDef.name : 'animation_' + animationIndex;
 
 		const pendingNodes = [];
 		const pendingInputAccessors = [];
@@ -3792,6 +3793,8 @@ class GLTFParser {
 			const name = target.node;
 			const input = animationDef.parameters !== undefined ? animationDef.parameters[ sampler.input ] : sampler.input;
 			const output = animationDef.parameters !== undefined ? animationDef.parameters[ sampler.output ] : sampler.output;
+
+			if ( target.node === undefined ) continue;
 
 			pendingNodes.push( this.getDependency( 'node', name ) );
 			pendingInputAccessors.push( this.getDependency( 'accessor', input ) );
@@ -3930,9 +3933,7 @@ class GLTFParser {
 
 			}
 
-			const name = animationDef.name ? animationDef.name : 'animation_' + animationIndex;
-
-			return new AnimationClip( name, undefined, tracks );
+			return new AnimationClip( animationName, undefined, tracks );
 
 		} );
 
