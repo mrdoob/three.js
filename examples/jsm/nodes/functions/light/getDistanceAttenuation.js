@@ -10,7 +10,7 @@ const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
 	const distanceFalloff = lightDistance.pow( decayExponent ).max( 0.01 ).reciprocal();
 
 	return cutoffDistance.greaterThan( 0 ).cond(
-		distanceFalloff.mul( lightDistance.div( cutoffDistance ).pow4().invert().clamp().pow2() ),
+		distanceFalloff.mul( lightDistance.div( cutoffDistance ).pow4().oneMinus().clamp().pow2() ),
 		distanceFalloff
 	);
 

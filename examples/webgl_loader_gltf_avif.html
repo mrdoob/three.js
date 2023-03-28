@@ -52,7 +52,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 8, 12 );
+				camera.position.set( 1.5, 4, 9 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf6eedc );
@@ -66,9 +66,6 @@
 				loader.setDRACOLoader( dracoLoader );
 				loader.setPath( 'models/gltf/AVIFTest/' );
 				loader.load( 'forest_house.glb', function ( gltf ) {
-
-					gltf.scene.scale.multiplyScalar( 40 );
-					gltf.scene.rotation.y = Math.PI * 0.5;
 
 					scene.add( gltf.scene );
 

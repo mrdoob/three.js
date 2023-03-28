@@ -98,8 +98,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const currentRenderTarget = renderer.getRenderTarget();
 
 		const useAlphaTest = material.alphaTest > 0;
+		const useAnisotropy = material.anisotropy > 0;
 		const useClearcoat = material.clearcoat > 0;
 		const useIridescence = material.iridescence > 0;
+		const useSheen = material.sheen > 0;
+		const useTransmission = material.transmission > 0;
 
 		const parameters = {
 
@@ -140,6 +143,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			decodeVideoTexture: !! material.map && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
 
+			anisotropy: useAnisotropy,
+			anisotropyMap: useAnisotropy && !! material.anisotropyMap,
+
 			clearcoat: useClearcoat,
 			clearcoatMap: useClearcoat && !! material.clearcoatMap,
 			clearcoatRoughnessMap: useClearcoat && !! material.clearcoatRoughnessMap,
@@ -148,6 +154,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			iridescence: useIridescence,
 			iridescenceMap: useIridescence && !! material.iridescenceMap,
 			iridescenceThicknessMap: useIridescence && !! material.iridescenceThicknessMap,
+
+			sheen: useSheen,
+			sheenColorMap: useSheen && !! material.sheenColorMap,
+			sheenRoughnessMap: useSheen && !! material.sheenRoughnessMap,
+
+			transmission: useTransmission,
+			transmissionMap: useTransmission && !! material.transmissionMap,
+			thicknessMap: useTransmission && !! material.thicknessMap,
 
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
@@ -162,17 +176,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			alphaTest: useAlphaTest,
 
 			gradientMap: !! material.gradientMap,
-
-			sheen: material.sheen > 0,
-			sheenColorMap: !! material.sheenColorMap,
-			sheenRoughnessMap: !! material.sheenRoughnessMap,
-
-			transmission: material.transmission > 0,
-			transmissionMap: !! material.transmissionMap,
-			thicknessMap: !! material.thicknessMap,
-
-			anisotropy: material.anisotropy > 0,
-			anisotropyMap: !! material.anisotropyMap,
 
 			combine: material.combine,
 

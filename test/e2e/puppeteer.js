@@ -195,7 +195,8 @@ async function main() {
 		headless: ! process.env.VISIBLE,
 		args: flags,
 		defaultViewport: viewport,
-		handleSIGINT: false
+		handleSIGINT: false,
+		protocolTimeout: 0
 	} );
 
 	// this line is intended to stop the script if the browser (in headful mode) is closed by user (while debugging)

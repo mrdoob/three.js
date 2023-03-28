@@ -367,6 +367,20 @@ function WebGLMaterials( renderer, properties ) {
 		uniforms.diffuse.value.copy( material.color );
 		uniforms.opacity.value = material.opacity;
 
+		if ( material.map ) {
+
+			uniforms.map.value = material.map;
+
+			if ( material.map.matrixAutoUpdate === true ) {
+
+				material.map.updateMatrix();
+
+			}
+
+			uniforms.uvTransform.value.copy( material.map.matrix );
+
+		}
+
 	}
 
 	function refreshUniformsDash( uniforms, material ) {
