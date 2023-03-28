@@ -9,7 +9,7 @@ const D_GGX = new ShaderNode( ( inputs ) => {
 
 	const a2 = alpha.pow2();
 
-	const denom = dotNH.pow2().mul( a2.invert() ).invert(); // avoid alpha = 0 with dotNH = 1
+	const denom = dotNH.pow2().mul( a2.oneMinus() ).oneMinus(); // avoid alpha = 0 with dotNH = 1
 
 	return a2.div( denom.pow2() ).mul( 1 / Math.PI );
 

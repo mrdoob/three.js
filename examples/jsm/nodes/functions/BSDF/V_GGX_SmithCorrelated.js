@@ -10,8 +10,8 @@ const V_GGX_SmithCorrelated = new ShaderNode( ( inputs ) => {
 
 	const a2 = alpha.pow2();
 
-	const gv = dotNL.mul( a2.add( a2.invert().mul( dotNV.pow2() ) ).sqrt() );
-	const gl = dotNV.mul( a2.add( a2.invert().mul( dotNL.pow2() ) ).sqrt() );
+	const gv = dotNL.mul( a2.add( a2.oneMinus().mul( dotNV.pow2() ) ).sqrt() );
+	const gl = dotNV.mul( a2.add( a2.oneMinus().mul( dotNL.pow2() ) ).sqrt() );
 
 	return div( 0.5, gv.add( gl ).max( EPSILON ) );
 

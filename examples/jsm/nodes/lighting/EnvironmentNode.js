@@ -53,7 +53,7 @@ class EnvironmentNode extends LightingNode {
 						// @TODO: Needed PMREM
 
 						radianceTextureUVNode = equirectUV( reflectVec );
-						radianceTextureUVNode = vec2( radianceTextureUVNode.x, radianceTextureUVNode.y.invert() );
+						radianceTextureUVNode = vec2( radianceTextureUVNode.x, radianceTextureUVNode.y.oneMinus() );
 
 					}
 
@@ -92,7 +92,7 @@ class EnvironmentNode extends LightingNode {
 						// @TODO: Needed PMREM
 
 						irradianceTextureUVNode = equirectUV( transformedNormalWorld );
-						irradianceTextureUVNode = vec2( irradianceTextureUVNode.x, irradianceTextureUVNode.y.invert() );
+						irradianceTextureUVNode = vec2( irradianceTextureUVNode.x, irradianceTextureUVNode.y.oneMinus() );
 
 					}
 

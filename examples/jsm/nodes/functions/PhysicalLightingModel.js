@@ -18,10 +18,10 @@ const computeMultiscattering = ( singleScatter, multiScatter, specularF90 = floa
 	const FssEss = specularColor.mul( fab.x ).add( specularF90.mul( fab.y ) );
 
 	const Ess = fab.x.add( fab.y );
-	const Ems = Ess.invert();
+	const Ems = Ess.oneMinus();
 
-	const Favg = specularColor.add( specularColor.invert().mul( 0.047619 ) ); // 1/21
-	const Fms = FssEss.mul( Favg ).div( Ems.mul( Favg ).invert() );
+	const Favg = specularColor.add( specularColor.oneMinus().mul( 0.047619 ) ); // 1/21
+	const Fms = FssEss.mul( Favg ).div( Ems.mul( Favg ).oneMinus() );
 
 	singleScatter.addAssign( FssEss );
 	multiScatter.addAssign( Fms.mul( Ems ) );
@@ -40,7 +40,7 @@ const RE_IndirectSpecular_Physical = new ShaderNode( ( inputs ) => {
 
 	computeMultiscattering( singleScattering, multiScattering );
 
-	const diffuse = diffuseColor.mul( singleScattering.add( multiScattering ).invert() );
+	const diffuse = diffuseColor.mul( singleScattering.add( multiScattering ).oneMinus() );
 
 	reflectedLight.indirectSpecular.addAssign( radiance.mul( singleScattering ) );
 	reflectedLight.indirectSpecular.addAssign( multiScattering.mul( cosineWeightedIrradiance ) );
@@ -75,9 +75,9 @@ const RE_AmbientOcclusion_Physical = new ShaderNode( ( { ambientOcclusion, refle
 	const dotNV = transformedNormalView.dot( positionViewDirection ).clamp();
 
 	const aoNV = dotNV.add( ambientOcclusion );
-	const aoExp = roughness.mul( - 16.0 ).invert().negate().exp2();
+	const aoExp = roughness.mul( - 16.0 ).oneMinus().negate().exp2();
 
-	const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).invert() ).clamp();
+	const aoNode = ambientOcclusion.sub( aoNV.pow( aoExp ).oneMinus() ).clamp();
 
 	reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
 

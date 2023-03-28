@@ -69,10 +69,10 @@ class ViewportNode extends Node {
 			let outX = output.x;
 			let outY = output.y;
 
-			if ( /top/i.test( scope ) && builder.isFlipY() ) outY = outY.invert();
-			else if ( /bottom/i.test( scope ) && builder.isFlipY() === false ) outY = outY.invert();
+			if ( /top/i.test( scope ) && builder.isFlipY() ) outY = outY.oneMinus();
+			else if ( /bottom/i.test( scope ) && builder.isFlipY() === false ) outY = outY.oneMinus();
 
-			if ( /right/i.test( scope ) ) outX = outX.invert();
+			if ( /right/i.test( scope ) ) outX = outX.oneMinus();
 
 			output = vec2( outX, outY );
 
