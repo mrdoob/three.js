@@ -23,7 +23,7 @@ class VideoTexture extends Texture {
 
 		}
 
-		if ( 'requestVideoFrameCallback' in video ) {
+		if ( ( video !== undefined ) && ( video !== null ) && ( video.requestVideoFrameCallback !== undefined ) ) {
 
 			video.requestVideoFrameCallback( updateVideo );
 
