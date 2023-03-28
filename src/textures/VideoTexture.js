@@ -14,6 +14,14 @@ class VideoTexture extends Texture {
 
 		this.generateMipmaps = false;
 
+		this.image = video;
+
+	}
+
+	set image( video = null ) {
+
+		this.source.data = video;
+
 		const scope = this;
 
 		function updateVideo() {
@@ -23,7 +31,7 @@ class VideoTexture extends Texture {
 
 		}
 
-		if ( ( video !== undefined ) && ( video !== null ) && ( video.requestVideoFrameCallback !== undefined ) ) {
+		if ( ( video !== null ) && ( video.requestVideoFrameCallback !== undefined ) ) {
 
 			video.requestVideoFrameCallback( updateVideo );
 
@@ -41,7 +49,7 @@ class VideoTexture extends Texture {
 
 		const video = this.image;
 
-		if ( video === undefined || video === null ) return;
+		if ( video === null ) return;
 
 		if ( video.requestVideoFrameCallback === undefined && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
