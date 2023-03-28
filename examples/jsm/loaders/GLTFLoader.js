@@ -3122,7 +3122,11 @@ class GLTFParser {
 
 			if ( ! texture ) return null;
 
-			texture.uvSet = mapDef.texCoord;
+			if ( mapDef.texCoord !== undefined ) {
+
+				texture.uvSet = mapDef.texCoord;
+
+			}
 
 			if ( parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] ) {
 

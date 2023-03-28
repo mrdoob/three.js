@@ -34,6 +34,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		SpriteMaterial: 'sprite'
 	};
 
+	function getUVSetVar( value ) {
+
+		if ( value === 1 ) return 'vUv2';
+
+		return 'vUv';
+
+	}
+
 	function getParameters( material, lights, shadows, scene, object ) {
 
 		const fog = scene.fog;
@@ -126,6 +134,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			supportsVertexTextures: vertexTextures,
 			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.encoding : LinearEncoding ),
 			map: !! material.map,
+			mapUv: !! material.map && getUVSetVar( material.map.uvSet ),
 			matcap: !! material.matcap,
 			envMap: !! envMap,
 			envMapMode: envMap && envMap.mapping,
@@ -133,6 +142,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			lightMap: !! material.lightMap,
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,
+			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
@@ -292,6 +302,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		array.push( parameters.precision );
 		array.push( parameters.outputEncoding );
+		array.push( parameters.mapUv );
+		array.push( parameters.emissiveMapUv );
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.combine );

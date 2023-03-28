@@ -613,6 +613,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
 
 			parameters.map ? '#define USE_MAP' : '',
+			parameters.mapUv ? '#define MAP_UV ' + parameters.mapUv : '',
 			parameters.matcap ? '#define USE_MATCAP' : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',
 			parameters.envMap ? '#define ' + envMapTypeDefine : '',
@@ -624,6 +625,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.lightMap ? '#define USE_LIGHTMAP' : '',
 			parameters.vertexUvs && parameters.aoMap ? '#define USE_AOMAP' : '',
 			parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
+			parameters.emissiveMapUv ? '#define EMMISSIVEMAP_UV ' + parameters.emissiveMapUv : '',
 			parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 			parameters.normalMap ? '#define USE_NORMALMAP' : '',
 			( parameters.normalMap && parameters.objectSpaceNormalMap ) ? '#define OBJECTSPACE_NORMALMAP' : '',
