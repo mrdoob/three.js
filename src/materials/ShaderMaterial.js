@@ -30,6 +30,8 @@ class ShaderMaterial extends Material {
 		this.lights = false; // set to use scene lights
 		this.clipping = false; // set to use user-defined clipping planes
 
+		this.forceSinglePass = true;
+
 		this.extensions = {
 			derivatives: false, // set to use derivatives
 			fragDepth: false, // set to use fragment depth values
