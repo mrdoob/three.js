@@ -17,7 +17,9 @@ const UniformsLib = {
 		mapTransform: { value: /*@__PURE__*/ new Matrix3() },
 
 		alphaMap: { value: null },
-		alphaTest: { value: 0 }
+		alphaTest: { value: 0 },
+
+		uvTransform: { value: /*@__PURE__*/ new Matrix3() } // TODO Remove
 
 	},
 
