@@ -3245,14 +3245,6 @@ class GLTFParser {
 
 		}
 
-		// workarounds for mesh and geometry
-
-		if ( material.aoMap && geometry.attributes.uv2 === undefined && geometry.attributes.uv !== undefined ) {
-
-			geometry.setAttribute( 'uv2', geometry.attributes.uv );
-
-		}
-
 		mesh.material = material;
 
 	}
