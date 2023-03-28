@@ -61,7 +61,7 @@
 				// depth material
 
 				const material = new MeshBasicNodeMaterial();
-				material.colorNode = smoothstep( camera.near, camera.far, positionView.z.negate() ).invert();
+				material.colorNode = smoothstep( camera.near, camera.far, positionView.z.negate() ).oneMinus();
 
 				//
 
