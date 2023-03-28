@@ -111,6 +111,7 @@ class Texture extends EventDispatcher {
 		this.mipmaps = source.mipmaps.slice( 0 );
 
 		this.mapping = source.mapping;
+		this.uvSet = source.uvSet;
 
 		this.wrapS = source.wrapS;
 		this.wrapT = source.wrapT;
@@ -170,6 +171,7 @@ class Texture extends EventDispatcher {
 			image: this.source.toJSON( meta ).uuid,
 
 			mapping: this.mapping,
+			uvSet: this.uvSet,
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],
