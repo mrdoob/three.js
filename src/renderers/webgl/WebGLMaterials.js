@@ -217,6 +217,14 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
+			if ( material.lightMap.matrixAutoUpdate === true ) {
+
+				material.lightMap.updateMatrix();
+
+			}
+
+			uniforms.lightMapTransform.value.copy( material.lightMap.matrix );
+
 		}
 
 		if ( material.aoMap ) {

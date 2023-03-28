@@ -14,6 +14,11 @@ export default /* glsl */`
 	vMapUv = ( mapTransform * vec3( MAP_UV, 1 ) ).xy;
 
 #endif
+#ifdef USE_LIGHTMAP
+
+	vLightMapUv = ( lightMapTransform * vec3( LIGHTMAP_UV, 1 ) ).xy;
+
+#endif
 #ifdef USE_AOMAP
 
 	vAoMapUv = ( aoMapTransform * vec3( AOMAP_UV, 1 ) ).xy;

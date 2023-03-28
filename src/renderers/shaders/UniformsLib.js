@@ -50,7 +50,8 @@ const UniformsLib = {
 	lightmap: {
 
 		lightMap: { value: null },
-		lightMapIntensity: { value: 1 }
+		lightMapIntensity: { value: 1 },
+		lightMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 
