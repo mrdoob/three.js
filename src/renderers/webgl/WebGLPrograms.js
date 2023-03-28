@@ -140,7 +140,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			envMapMode: envMap && envMap.mapping,
 			envMapCubeUVHeight: envMapCubeUVHeight,
 			lightMap: !! material.lightMap,
+			lightMapUv: !! material.lightMap && getUVSetVar( material.lightMap.uvSet ),
 			aoMap: !! material.aoMap,
+			aoMapUv: !! material.aoMap && getUVSetVar( material.aoMap.uvSet ),
 			emissiveMap: !! material.emissiveMap,
 			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
 			bumpMap: !! material.bumpMap,
@@ -303,6 +305,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.precision );
 		array.push( parameters.outputEncoding );
 		array.push( parameters.mapUv );
+		array.push( parameters.lightMapUv );
+		array.push( parameters.aoMapUv );
 		array.push( parameters.emissiveMapUv );
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapCubeUVHeight );
