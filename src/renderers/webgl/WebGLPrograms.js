@@ -98,8 +98,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const currentRenderTarget = renderer.getRenderTarget();
 
 		const useAlphaTest = material.alphaTest > 0;
+
 		const useClearcoat = material.clearcoat > 0;
 		const useIridescence = material.iridescence > 0;
+		const useSheen = material.sheen > 0;
+		const useTransmission = material.transmission > 0;
 
 		const parameters = {
 
@@ -149,6 +152,14 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			iridescenceMap: useIridescence && !! material.iridescenceMap,
 			iridescenceThicknessMap: useIridescence && !! material.iridescenceThicknessMap,
 
+			sheen: useSheen,
+			sheenColorMap: useSheen && !! material.sheenColorMap,
+			sheenRoughnessMap: useSheen && !! material.sheenRoughnessMap,
+
+			transmission: useTransmission,
+			transmissionMap: useTransmission && !! material.transmissionMap,
+			thicknessMap: useTransmission && !! material.thicknessMap,
+
 			displacementMap: !! material.displacementMap,
 			roughnessMap: !! material.roughnessMap,
 			metalnessMap: !! material.metalnessMap,
@@ -162,14 +173,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			alphaTest: useAlphaTest,
 
 			gradientMap: !! material.gradientMap,
-
-			sheen: material.sheen > 0,
-			sheenColorMap: !! material.sheenColorMap,
-			sheenRoughnessMap: !! material.sheenRoughnessMap,
-
-			transmission: material.transmission > 0,
-			transmissionMap: !! material.transmissionMap,
-			thicknessMap: !! material.thicknessMap,
 
 			combine: material.combine,
 
