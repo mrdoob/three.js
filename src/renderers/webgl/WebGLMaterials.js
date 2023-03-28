@@ -3,6 +3,18 @@ import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
 function WebGLMaterials( renderer, properties ) {
 
+	function refreshTransformUniform( map, uniform ) {
+
+		if ( map.matrixAutoUpdate === true ) {
+
+			map.updateMatrix();
+
+		}
+
+		uniform.value.copy( map.matrix );
+
+	}
+
 	function refreshFogUniforms( uniforms, fog ) {
 
 		fog.color.getRGB( uniforms.fogColor.value, getUnlitUniformColorSpace( renderer ) );
@@ -120,13 +132,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.map.value = material.map;
 
-			if ( material.map.matrixAutoUpdate === true ) {
-
-				material.map.updateMatrix();
-
-			}
-
-			uniforms.mapTransform.value.copy( material.map.matrix );
+			refreshTransformUniform( material.map, uniforms.mapTransform );
 
 		}
 
@@ -156,13 +162,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.emissiveMap.value = material.emissiveMap;
 
-			if ( material.emissiveMap.matrixAutoUpdate === true ) {
-
-				material.emissiveMap.updateMatrix();
-
-			}
-
-			uniforms.emissiveMapTransform.value.copy( material.emissiveMap.matrix );
+			refreshTransformUniform( material.emissiveMap, uniforms.emissiveMapTransform );
 
 		}
 
@@ -172,13 +172,7 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.normalScale.value.copy( material.normalScale );
 			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
-			if ( material.normalMap.matrixAutoUpdate === true ) {
-
-				material.normalMap.updateMatrix();
-
-			}
-
-			uniforms.normalMapTransform.value.copy( material.normalMap.matrix );
+			refreshTransformUniform( material.normalMap, uniforms.normalMapTransform );
 
 		}
 
@@ -217,13 +211,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.lightMapIntensity.value = material.lightMapIntensity * scaleFactor;
 
-			if ( material.lightMap.matrixAutoUpdate === true ) {
-
-				material.lightMap.updateMatrix();
-
-			}
-
-			uniforms.lightMapTransform.value.copy( material.lightMap.matrix );
+			refreshTransformUniform( material.lightMap, uniforms.lightMapTransform );
 
 		}
 
@@ -232,13 +220,7 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.aoMap.value = material.aoMap;
 			uniforms.aoMapIntensity.value = material.aoMapIntensity;
 
-			if ( material.aoMap.matrixAutoUpdate === true ) {
-
-				material.aoMap.updateMatrix();
-
-			}
-
-			uniforms.aoMapTransform.value.copy( material.aoMap.matrix );
+			refreshTransformUniform( material.aoMap, uniforms.aoMapTransform );
 
 		}
 
@@ -253,13 +235,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.map.value = material.map;
 
-			if ( material.map.matrixAutoUpdate === true ) {
-
-				material.map.updateMatrix();
-
-			}
-
-			uniforms.uvTransform.value.copy( material.map.matrix );
+			refreshTransformUniform( material.map, uniforms.uvTransform );
 
 		}
 
@@ -316,13 +292,7 @@ function WebGLMaterials( renderer, properties ) {
 
 		if ( uvScaleMap !== undefined ) {
 
-			if ( uvScaleMap.matrixAutoUpdate === true ) {
-
-				uvScaleMap.updateMatrix();
-
-			}
-
-			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+			refreshTransformUniform( uvScaleMap, uniforms.uvTransform );
 
 		}
 
@@ -338,13 +308,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.map.value = material.map;
 
-			if ( material.map.matrixAutoUpdate === true ) {
-
-				material.map.updateMatrix();
-
-			}
-
-			uniforms.mapTransform.value.copy( material.map.matrix );
+			refreshTransformUniform( material.map, uniforms.mapTransform );
 
 		}
 
@@ -388,13 +352,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.roughnessMap.value = material.roughnessMap;
 
-			if ( material.roughnessMap.matrixAutoUpdate === true ) {
-
-				material.roughnessMap.updateMatrix();
-
-			}
-
-			uniforms.roughnessMapTransform.value.copy( material.roughnessMap.matrix );
+			refreshTransformUniform( material.roughnessMap, uniforms.roughnessMapTransform );
 
 		}
 
@@ -402,13 +360,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.metalnessMap.value = material.metalnessMap;
 
-			if ( material.metalnessMap.matrixAutoUpdate === true ) {
-
-				material.metalnessMap.updateMatrix();
-
-			}
-
-			uniforms.metalnessMapTransform.value.copy( material.metalnessMap.matrix );
+			refreshTransformUniform( material.metalnessMap, uniforms.metalnessMapTransform );
 
 		}
 
