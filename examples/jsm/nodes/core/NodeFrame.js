@@ -22,7 +22,9 @@ class NodeFrame {
 
 	updateNode( node ) {
 
-		if ( node.updateType === NodeUpdateType.FRAME ) {
+		const updateType = node.getUpdateType();
+
+		if ( updateType === NodeUpdateType.FRAME ) {
 
 			if ( this.updateMap.get( node ) !== this.frameId ) {
 
@@ -32,7 +34,7 @@ class NodeFrame {
 
 			}
 
-		} else if ( node.updateType === NodeUpdateType.OBJECT ) {
+		} else if ( updateType === NodeUpdateType.OBJECT ) {
 
 			node.update( this );
 

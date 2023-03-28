@@ -367,6 +367,20 @@ function WebGLMaterials( renderer, properties ) {
 		uniforms.diffuse.value.copy( material.color );
 		uniforms.opacity.value = material.opacity;
 
+		if ( material.map ) {
+
+			uniforms.map.value = material.map;
+
+			if ( material.map.matrixAutoUpdate === true ) {
+
+				material.map.updateMatrix();
+
+			}
+
+			uniforms.uvTransform.value.copy( material.map.matrix );
+
+		}
+
 	}
 
 	function refreshUniformsDash( uniforms, material ) {
@@ -662,9 +676,11 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshUniformsDistance( uniforms, material ) {
 
-		uniforms.referencePosition.value.copy( material.referencePosition );
-		uniforms.nearDistance.value = material.nearDistance;
-		uniforms.farDistance.value = material.farDistance;
+		const light = properties.get( material ).light;
+
+		uniforms.referencePosition.value.setFromMatrixPosition( light.matrixWorld );
+		uniforms.nearDistance.value = light.shadow.camera.near;
+		uniforms.farDistance.value = light.shadow.camera.far;
 
 	}
 

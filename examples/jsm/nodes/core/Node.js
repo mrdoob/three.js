@@ -86,7 +86,7 @@ class Node {
 
 	}
 
-	getUpdateType( /*builder*/ ) {
+	getUpdateType() {
 
 		return this.updateType;
 
