@@ -1,9 +1,4 @@
 export default /* glsl */`
-#ifdef USE_UV
-
-	varying vec2 vUv; /* TODO Remove */
-
-#endif
 #ifdef USE_MAP
 
 	varying vec2 vMapUv;
