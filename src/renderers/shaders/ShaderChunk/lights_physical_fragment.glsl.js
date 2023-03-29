@@ -13,20 +13,20 @@ material.roughness = min( material.roughness, 1.0 );
 
 	material.ior = ior;
 
-	#ifdef SPECULAR
+	#ifdef USE_SPECULAR
 
 		float specularIntensityFactor = specularIntensity;
 		vec3 specularColorFactor = specularColor;
 
-		#ifdef USE_SPECULARINTENSITYMAP
+		#ifdef USE_SPECULAR_COLORMAP
 
-			specularIntensityFactor *= texture2D( specularIntensityMap, vUv ).a;
+			specularColorFactor *= texture2D( specularColorMap, vSpecularColorMapUv ).rgb;
 
 		#endif
 
-		#ifdef USE_SPECULARCOLORMAP
+		#ifdef USE_SPECULAR_INTENSITYMAP
 
-			specularColorFactor *= texture2D( specularColorMap, vUv ).rgb;
+			specularIntensityFactor *= texture2D( specularIntensityMap, vSpecularIntensityMapUv ).a;
 
 		#endif
 

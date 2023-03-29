@@ -332,10 +332,12 @@ ShaderLib.physical = {
 			thicknessMap: { value: null },
 			attenuationDistance: { value: 0 },
 			attenuationColor: { value: /*@__PURE__*/ new Color( 0x000000 ) },
-			specularIntensity: { value: 1 },
-			specularIntensityMap: { value: null },
 			specularColor: { value: /*@__PURE__*/ new Color( 1, 1, 1 ) },
 			specularColorMap: { value: null },
+			specularColorMapTransform: { value: /*@__PURE__*/ new Matrix3() },
+			specularIntensity: { value: 1 },
+			specularIntensityMap: { value: null },
+			specularIntensityMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 		}
 	] ),
 

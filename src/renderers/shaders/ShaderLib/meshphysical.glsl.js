@@ -61,7 +61,7 @@ export const fragment = /* glsl */`
 
 #ifdef PHYSICAL
 	#define IOR
-	#define SPECULAR
+	#define USE_SPECULAR
 #endif
 
 uniform vec3 diffuse;
@@ -74,16 +74,16 @@ uniform float opacity;
 	uniform float ior;
 #endif
 
-#ifdef SPECULAR
+#ifdef USE_SPECULAR
 	uniform float specularIntensity;
 	uniform vec3 specularColor;
 
-	#ifdef USE_SPECULARINTENSITYMAP
-		uniform sampler2D specularIntensityMap;
+	#ifdef USE_SPECULAR_COLORMAP
+		uniform sampler2D specularColorMap;
 	#endif
 
-	#ifdef USE_SPECULARCOLORMAP
-		uniform sampler2D specularColorMap;
+	#ifdef USE_SPECULAR_INTENSITYMAP
+		uniform sampler2D specularIntensityMap;
 	#endif
 #endif
 

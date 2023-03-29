@@ -27,6 +27,7 @@ const UniformsLib = {
 	specularmap: {
 
 		specularMap: { value: null },
+		specularMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 

@@ -69,4 +69,19 @@ export default /* glsl */`
 	vClearcoatRoughnessMapUv = ( clearcoatRoughnessMapTransform * vec3( CLEARCOAT_ROUGHNESSMAP_UV, 1 ) ).xy;
 
 #endif
+#ifdef USE_SPECULARMAP
+
+	vSpecularMapUv = ( specularMapTransform * vec3( SPECULARMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_SPECULAR_COLORMAP
+
+	vSpecularColorMapUv = ( specularColorMapTransform * vec3( SPECULAR_COLORMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_SPECULAR_INTENSITYMAP
+
+	vSpecularIntensityMapUv = ( specularIntensityMapTransform * vec3( SPECULAR_INTENSITYMAP_UV, 1 ) ).xy;
+
+#endif
 `;

@@ -199,6 +199,8 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.specularMap.value = material.specularMap;
 
+			refreshTransformUniform( material.specularMap, uniforms.specularMapTransform );
+
 		}
 
 		if ( material.alphaTest > 0 ) {
@@ -487,15 +489,19 @@ function WebGLMaterials( renderer, properties ) {
 		uniforms.specularIntensity.value = material.specularIntensity;
 		uniforms.specularColor.value.copy( material.specularColor );
 
+		if ( material.specularColorMap ) {
+
+			uniforms.specularColorMap.value = material.specularColorMap;
+
+			refreshTransformUniform( material.specularColorMap, uniforms.specularColorMapTransform );
+
+		}
+
 		if ( material.specularIntensityMap ) {
 
 			uniforms.specularIntensityMap.value = material.specularIntensityMap;
 
-		}
-
-		if ( material.specularColorMap ) {
-
-			uniforms.specularColorMap.value = material.specularColorMap;
+			refreshTransformUniform( material.specularIntensityMap, uniforms.specularIntensityMapTransform );
 
 		}
 

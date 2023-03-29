@@ -132,8 +132,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_THICKNESSMAP = HAS_TRANSMISSION && !! material.thicknessMap;
 
 		const HAS_SPECULARMAP = !! material.specularMap;
-		const HAS_SPECULARCOLORMAP = !! material.specularColorMap;
-		const HAS_SPECULARINTENSITYMAP = !! material.specularIntensityMap;
+		const HAS_SPECULAR_COLORMAP = !! material.specularColorMap;
+		const HAS_SPECULAR_INTENSITYMAP = !! material.specularIntensityMap;
 
 		const HAS_GRADIENTMAP = !! material.gradientMap;
 
@@ -221,8 +221,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			thicknessMap: HAS_THICKNESSMAP,
 
 			specularMap: HAS_SPECULARMAP,
-			specularColorMap: HAS_SPECULARCOLORMAP,
-			specularIntensityMap: HAS_SPECULARINTENSITYMAP,
+			specularColorMap: HAS_SPECULAR_COLORMAP,
+			specularIntensityMap: HAS_SPECULAR_INTENSITYMAP,
 
 			gradientMap: HAS_GRADIENTMAP,
 
@@ -249,6 +249,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			clearcoatMapUv: HAS_CLEARCOATMAP && getUVSetVar( material.clearcoatMap.uvSet ),
 			clearcoatNormalMapUv: HAS_CLEARCOATNORMALMAP && getUVSetVar( material.clearcoatNormalMap.uvSet ),
 			clearcoatRoughnessMapUv: HAS_CLEARCOATROUGHNESSMAP && getUVSetVar( material.clearcoatRoughnessMap.uvSet ),
+
+			specularMapUv: HAS_SPECULARMAP && getUVSetVar( material.specularMap.uvSet ),
+			specularColorMapUv: HAS_SPECULAR_COLORMAP && getUVSetVar( material.specularColorMap.uvSet ),
+			specularIntensityMapUv: HAS_SPECULAR_INTENSITYMAP && getUVSetVar( material.specularIntensityMap.uvSet ),
 
 			alphaMapUv: HAS_ALPHAMAP && getUVSetVar( material.alphaMap.uvSet ),
 

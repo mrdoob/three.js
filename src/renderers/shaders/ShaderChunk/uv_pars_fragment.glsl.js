@@ -64,4 +64,19 @@ export default /* glsl */`
 	varying vec2 vClearcoatRoughnessMapUv;
 
 #endif
+#ifdef USE_SPECULARMAP
+
+	varying vec2 vSpecularMapUv;
+
+#endif
+#ifdef USE_SPECULAR_COLORMAP
+
+	varying vec2 vSpecularColorMapUv;
+
+#endif
+#ifdef USE_SPECULAR_INTENSITYMAP
+
+	varying vec2 vSpecularIntensityMapUv;
+
+#endif
 `;
