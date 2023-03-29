@@ -117,7 +117,7 @@ export const getNodeEditorClass = async ( nodeData ) => {
 
 	//
 
-	let nodeClass = ClassLib[ editorClass ];
+	let nodeClass = nodeData.nodeClass || ClassLib[ editorClass ];
 
 	if ( nodeClass !== undefined ) {
 
