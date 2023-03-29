@@ -319,6 +319,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		array.push( parameters.precision );
 		array.push( parameters.outputEncoding );
+		array.push( parameters.envMapMode );
+		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.mapUv );
 		array.push( parameters.lightMapUv );
 		array.push( parameters.aoMapUv );
@@ -330,8 +332,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.clearcoatMapUv );
 		array.push( parameters.clearcoatNormalMapUv );
 		array.push( parameters.clearcoatRoughnessMapUv );
-		array.push( parameters.envMapMode );
-		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.combine );
 		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );
