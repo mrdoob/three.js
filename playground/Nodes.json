@@ -1423,8 +1423,8 @@
 						{
 							"name": "One Minus",
 							"icon": "math-function",
-							"description": "Returns the result of input In subtracted from 1.",
-							"shaderNode": "invert",
+							"description": "Returns the result of input `a` subtracted from 1.",
+							"shaderNode": "oneMinus",
 							"nodeType": "node",
 							"properties": [
 								{
