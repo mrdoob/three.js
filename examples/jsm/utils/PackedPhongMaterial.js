@@ -36,7 +36,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 			'varying vec3 vViewPosition;',
 
 			ShaderChunk.common,
-			ShaderChunk.uvs_pars_vertex,
+			ShaderChunk.uv_pars_vertex,
 			ShaderChunk.displacementmap_pars_vertex,
 			ShaderChunk.envmap_pars_vertex,
 			ShaderChunk.color_pars_vertex,
@@ -113,7 +113,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			'void main() {',
 
-			ShaderChunk.uvs_vertex,
+			ShaderChunk.uv_vertex,
 
 			`#ifdef USE_UV
 					#ifdef USE_PACKED_UV

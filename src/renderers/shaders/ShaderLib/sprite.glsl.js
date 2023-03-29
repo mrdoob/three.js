@@ -3,14 +3,14 @@ uniform float rotation;
 uniform vec2 center;
 
 #include <common>
-#include <uvs_pars_vertex>
+#include <uv_pars_vertex>
 #include <fog_pars_vertex>
 #include <logdepthbuf_pars_vertex>
 #include <clipping_planes_pars_vertex>
 
 void main() {
 
-	#include <uvs_vertex>
+	#include <uv_vertex>
 
 	vec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );
 
@@ -48,7 +48,7 @@ uniform vec3 diffuse;
 uniform float opacity;
 
 #include <common>
-#include <uvs_pars_fragment>
+#include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>

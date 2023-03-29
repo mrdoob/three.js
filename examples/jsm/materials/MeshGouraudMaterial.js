@@ -36,7 +36,7 @@ const GouraudShader = {
 		#endif
 
 		#include <common>
-		#include <uvs_pars_vertex>
+		#include <uv_pars_vertex>
 		#include <envmap_pars_vertex>
 		#include <bsdfs>
 		#include <lights_pars_begin>
@@ -50,7 +50,7 @@ const GouraudShader = {
 
 		void main() {
 
-			#include <uvs_vertex>
+			#include <uv_vertex>
 			#include <color_vertex>
 			#include <morphcolor_vertex>
 
@@ -218,7 +218,7 @@ const GouraudShader = {
 		#include <packing>
 		#include <dithering_pars_fragment>
 		#include <color_pars_fragment>
-		#include <uvs_pars_fragment>
+		#include <uv_pars_fragment>
 		#include <map_pars_fragment>
 		#include <alphamap_pars_fragment>
 		#include <alphatest_pars_fragment>

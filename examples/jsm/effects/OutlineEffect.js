@@ -101,7 +101,7 @@ class OutlineEffect {
 
 		const vertexShader = [
 			'#include <common>',
-			'#include <uvs_pars_vertex>',
+			'#include <uv_pars_vertex>',
 			'#include <displacementmap_pars_vertex>',
 			'#include <fog_pars_vertex>',
 			'#include <morphtarget_pars_vertex>',
@@ -122,7 +122,7 @@ class OutlineEffect {
 
 			'void main() {',
 
-			'	#include <uvs_vertex>',
+			'	#include <uv_vertex>',
 
 			'	#include <beginnormal_vertex>',
 			'	#include <morphnormal_vertex>',

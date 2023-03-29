@@ -4,7 +4,7 @@ export const vertex = /* glsl */`
 varying vec3 vViewPosition;
 
 #include <common>
-#include <uvs_pars_vertex>
+#include <uv_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <envmap_pars_vertex>
 #include <color_pars_vertex>
@@ -18,7 +18,7 @@ varying vec3 vViewPosition;
 
 void main() {
 
-	#include <uvs_vertex>
+	#include <uv_vertex>
 	#include <color_vertex>
 	#include <morphcolor_vertex>
 
@@ -58,7 +58,7 @@ uniform float opacity;
 #include <packing>
 #include <dithering_pars_fragment>
 #include <color_pars_fragment>
-#include <uvs_pars_fragment>
+#include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <alphatest_pars_fragment>
