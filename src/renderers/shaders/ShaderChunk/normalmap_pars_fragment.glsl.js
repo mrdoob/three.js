@@ -6,13 +6,13 @@ export default /* glsl */`
 
 #endif
 
-#ifdef OBJECTSPACE_NORMALMAP
+#ifdef USE_NORMALMAP_OBJECTSPACE
 
 	uniform mat3 normalMatrix;
 
 #endif
 
-#if ! defined ( USE_TANGENT ) && ( defined ( TANGENTSPACE_NORMALMAP ) || defined ( USE_CLEARCOAT_NORMALMAP ) )
+#if ! defined ( USE_TANGENT ) && ( defined ( USE_NORMALMAP_TANGENTSPACE ) || defined ( USE_CLEARCOAT_NORMALMAP ) )
 
 	// Normal Mapping Without Precomputed Tangents
 	// http://www.thetenthplanet.de/archives/1180

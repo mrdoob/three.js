@@ -1,6 +1,6 @@
 export default /* glsl */`
 
-#ifdef OBJECTSPACE_NORMALMAP
+#ifdef USE_NORMALMAP_OBJECTSPACE
 
 	normal = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0; // overrides both flatShading and attribute normals
 
@@ -18,7 +18,7 @@ export default /* glsl */`
 
 	normal = normalize( normalMatrix * normal );
 
-#elif defined( TANGENTSPACE_NORMALMAP )
+#elif defined( USE_NORMALMAP_TANGENTSPACE )
 
 	vec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;
 	mapN.xy *= normalScale;

@@ -19,7 +19,7 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 #endif
 
-#ifdef TANGENTSPACE_NORMALMAP
+#ifdef USE_NORMALMAP_TANGENTSPACE
 
 	#ifdef USE_TANGENT
 

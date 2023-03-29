@@ -183,8 +183,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			displacementMap: HAS_DISPLACEMENTMAP,
 			emissiveMap: HAS_EMISSIVEMAP,
 
-			objectSpaceNormalMap: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
-			tangentSpaceNormalMap: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
+			normalMapObjectSpace: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
+			normalMapTangentSpace: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
 
 			decodeVideoTexture: HAS_MAP && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
 
@@ -426,9 +426,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 9 );
 		if ( parameters.normalMap )
 			_programLayers.enable( 10 );
-		if ( parameters.objectSpaceNormalMap )
+		if ( parameters.normalMapObjectSpace )
 			_programLayers.enable( 11 );
-		if ( parameters.tangentSpaceNormalMap )
+		if ( parameters.normalMapTangentSpace )
 			_programLayers.enable( 12 );
 		if ( parameters.emissiveMap )
 			_programLayers.enable( 13 );
