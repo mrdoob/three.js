@@ -137,20 +137,15 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			supportsVertexTextures: vertexTextures,
 			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.encoding : LinearEncoding ),
 			map: !! material.map,
-			mapUv: !! material.map && getUVSetVar( material.map.uvSet ),
 			matcap: !! material.matcap,
 			envMap: !! envMap,
 			envMapMode: envMap && envMap.mapping,
 			envMapCubeUVHeight: envMapCubeUVHeight,
-			lightMap: !! material.lightMap,
-			lightMapUv: !! material.lightMap && getUVSetVar( material.lightMap.uvSet ),
 			aoMap: !! material.aoMap,
-			aoMapUv: !! material.aoMap && getUVSetVar( material.aoMap.uvSet ),
+			lightMap: !! material.lightMap,
 			emissiveMap: !! material.emissiveMap,
-			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
-			normalMapUv: !! material.normalMap && getUVSetVar( material.normalMap.uvSet ),
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
 			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
 
@@ -175,9 +170,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			displacementMap: !! material.displacementMap,
 			metalnessMap: !! material.metalnessMap,
-			metalnessMapUv: !! material.metalnessMap && getUVSetVar( material.metalnessMap.uvSet ),
 			roughnessMap: !! material.roughnessMap,
-			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
 			specularMap: !! material.specularMap,
 			specularIntensityMap: !! material.specularIntensityMap,
 			specularColorMap: !! material.specularColorMap,
@@ -190,6 +183,18 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			gradientMap: !! material.gradientMap,
 
 			combine: material.combine,
+
+			//
+
+			mapUv: !! material.map && getUVSetVar( material.map.uvSet ),
+			aoMapUv: !! material.aoMap && getUVSetVar( material.aoMap.uvSet ),
+			lightMapUv: !! material.lightMap && getUVSetVar( material.lightMap.uvSet ),
+			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
+			normalMapUv: !! material.normalMap && getUVSetVar( material.normalMap.uvSet ),
+			metalnessMapUv: !! material.metalnessMap && getUVSetVar( material.metalnessMap.uvSet ),
+			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
+
+			//
 
 			vertexTangents: ( !! material.normalMap && !! geometry.attributes.tangent ),
 			vertexColors: material.vertexColors,
