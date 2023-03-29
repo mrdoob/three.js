@@ -250,6 +250,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			clearcoatNormalMapUv: HAS_CLEARCOAT_NORMALMAP && getUVSetVar( material.clearcoatNormalMap.uvSet ),
 			clearcoatRoughnessMapUv: HAS_CLEARCOAT_ROUGHNESSMAP && getUVSetVar( material.clearcoatRoughnessMap.uvSet ),
 
+			iridescenceMapUv: HAS_IRIDESCENCEMAP && getUVSetVar( material.iridescenceMap.uvSet ),
+			iridescenceThicknessMapUv: HAS_IRIDESCENCE_THICKNESSMAP && getUVSetVar( material.iridescenceThicknessMap.uvSet ),
+
 			sheenColorMapUv: HAS_SHEEN_COLORMAP && getUVSetVar( material.sheenColorMap.uvSet ),
 			sheenRoughnessMapUv: HAS_SHEEN_ROUGHNESSMAP && getUVSetVar( material.sheenRoughnessMap.uvSet ),
 
@@ -395,6 +398,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.clearcoatMapUv );
 		array.push( parameters.clearcoatNormalMapUv );
 		array.push( parameters.clearcoatRoughnessMapUv );
+		array.push( parameters.iridescenceMapUv );
+		array.push( parameters.iridescenceThicknessMapUv );
 		array.push( parameters.sheenColorMapUv );
 		array.push( parameters.sheenRoughnessMapUv );
 		array.push( parameters.specularMapUv );

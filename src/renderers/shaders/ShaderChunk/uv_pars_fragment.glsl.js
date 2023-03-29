@@ -64,6 +64,16 @@ export default /* glsl */`
 	varying vec2 vClearcoatRoughnessMapUv;
 
 #endif
+#ifdef USE_IRIDESCENCEMAP
+
+	varying vec2 vIridescenceMapUv;
+
+#endif
+#ifdef USE_IRIDESCENCE_THICKNESSMAP
+
+	varying vec2 vIridescenceThicknessMapUv;
+
+#endif
 #ifdef USE_SHEEN_COLORMAP
 
 	varying vec2 vSheenColorMapUv;

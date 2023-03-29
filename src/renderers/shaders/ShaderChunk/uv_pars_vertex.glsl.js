@@ -100,6 +100,18 @@ export default /* glsl */`
 	varying vec2 vSheenRoughnessMapUv;
 
 #endif
+#ifdef USE_IRIDESCENCEMAP
+
+	uniform mat3 iridescenceMapTransform;
+	varying vec2 vIridescenceMapUv;
+
+#endif
+#ifdef USE_IRIDESCENCE_THICKNESSMAP
+
+	uniform mat3 iridescenceThicknessMapTransform;
+	varying vec2 vIridescenceThicknessMapUv;
+
+#endif
 #ifdef USE_SPECULARMAP
 
 	uniform mat3 specularMapTransform;

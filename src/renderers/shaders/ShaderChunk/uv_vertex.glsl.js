@@ -69,6 +69,16 @@ export default /* glsl */`
 	vClearcoatRoughnessMapUv = ( clearcoatRoughnessMapTransform * vec3( CLEARCOAT_ROUGHNESSMAP_UV, 1 ) ).xy;
 
 #endif
+#ifdef USE_IRIDESCENCEMAP
+
+	vIridescenceMapUv = ( iridescenceMapTransform * vec3( IRIDESCENCEMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_IRIDESCENCE_THICKNESSMAP
+
+	vIridescenceThicknessMapUv = ( iridescenceThicknessMapTransform * vec3( IRIDESCENCE_THICKNESSMAP_UV, 1 ) ).xy;
+
+#endif
 #ifdef USE_SHEEN_COLORMAP
 
 	vSheenColorMapUv = ( sheenColorMapTransform * vec3( SHEEN_COLORMAP_UV, 1 ) ).xy;

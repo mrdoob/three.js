@@ -82,13 +82,13 @@ material.roughness = min( material.roughness, 1.0 );
 
 	#ifdef USE_IRIDESCENCEMAP
 
-		material.iridescence *= texture2D( iridescenceMap, vUv ).r;
+		material.iridescence *= texture2D( iridescenceMap, vIridescenceMapUv ).r;
 
 	#endif
 
 	#ifdef USE_IRIDESCENCE_THICKNESSMAP
 
-		material.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vUv ).g + iridescenceThicknessMinimum;
+		material.iridescenceThickness = (iridescenceThicknessMaximum - iridescenceThicknessMinimum) * texture2D( iridescenceThicknessMap, vIridescenceThicknessMapUv ).g + iridescenceThicknessMinimum;
 
 	#else
 
