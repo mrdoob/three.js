@@ -174,10 +174,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			thicknessMap: useTransmission && !! material.thicknessMap,
 
 			displacementMap: !! material.displacementMap,
-			roughnessMap: !! material.roughnessMap,
-			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
 			metalnessMap: !! material.metalnessMap,
 			metalnessMapUv: !! material.metalnessMap && getUVSetVar( material.metalnessMap.uvSet ),
+			roughnessMap: !! material.roughnessMap,
+			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
 			specularMap: !! material.specularMap,
 			specularIntensityMap: !! material.specularIntensityMap,
 			specularColorMap: !! material.specularColorMap,
@@ -315,8 +315,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.aoMapUv );
 		array.push( parameters.emissiveMapUv );
 		array.push( parameters.normalMapUv );
-		array.push( parameters.roughnessMapUv );
 		array.push( parameters.metalnessMapUv );
+		array.push( parameters.roughnessMapUv );
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.combine );

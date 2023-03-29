@@ -85,17 +85,17 @@ const UniformsLib = {
 
 	},
 
-	roughnessmap: {
-
-		roughnessMap: { value: null },
-		roughnessMapTransform: { value: /*@__PURE__*/ new Matrix3() }
-
-	},
-
 	metalnessmap: {
 
 		metalnessMap: { value: null },
 		metalnessMapTransform: { value: /*@__PURE__*/ new Matrix3() }
+
+	},
+
+	roughnessmap: {
+
+		roughnessMap: { value: null },
+		roughnessMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 

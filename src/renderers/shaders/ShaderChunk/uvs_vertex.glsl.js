@@ -34,14 +34,14 @@ export default /* glsl */`
 	vNormalMapUv = ( normalMapTransform * vec3( NORMALMAP_UV, 1 ) ).xy;
 
 #endif
-#ifdef USE_ROUGHNESSMAP
-
-	vRoughnessMapUv = ( roughnessMapTransform * vec3( ROUGHNESSMAP_UV, 1 ) ).xy;
-
-#endif
 #ifdef USE_METALNESSMAP
 
 	vMetalnessMapUv = ( metalnessMapTransform * vec3( METALNESSMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_ROUGHNESSMAP
+
+	vRoughnessMapUv = ( roughnessMapTransform * vec3( ROUGHNESSMAP_UV, 1 ) ).xy;
 
 #endif
 `;

@@ -501,8 +501,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.aoMapUv ? '#define AOMAP_UV ' + parameters.aoMapUv : '',
 			parameters.emissiveMapUv ? '#define EMISSIVEMAP_UV ' + parameters.emissiveMapUv : '',
 			parameters.normalMapUv ? '#define NORMALMAP_UV ' + parameters.normalMapUv : '',
-			parameters.roughnessMapUv ? '#define ROUGHNESSMAP_UV ' + parameters.roughnessMapUv : '',
 			parameters.metalnessMapUv ? '#define METALNESSMAP_UV ' + parameters.metalnessMapUv : '',
+			parameters.roughnessMapUv ? '#define ROUGHNESSMAP_UV ' + parameters.roughnessMapUv : '',
 
 			//
 

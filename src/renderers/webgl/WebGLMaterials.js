@@ -345,22 +345,23 @@ function WebGLMaterials( renderer, properties ) {
 
 	function refreshUniformsStandard( uniforms, material ) {
 
-		uniforms.roughness.value = material.roughness;
 		uniforms.metalness.value = material.metalness;
-
-		if ( material.roughnessMap ) {
-
-			uniforms.roughnessMap.value = material.roughnessMap;
-
-			refreshTransformUniform( material.roughnessMap, uniforms.roughnessMapTransform );
-
-		}
 
 		if ( material.metalnessMap ) {
 
 			uniforms.metalnessMap.value = material.metalnessMap;
 
 			refreshTransformUniform( material.metalnessMap, uniforms.metalnessMapTransform );
+
+		}
+
+		uniforms.roughness.value = material.roughness;
+
+		if ( material.roughnessMap ) {
+
+			uniforms.roughnessMap.value = material.roughnessMap;
+
+			refreshTransformUniform( material.roughnessMap, uniforms.roughnessMapTransform );
 
 		}
 
