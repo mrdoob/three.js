@@ -36,6 +36,12 @@ export default /* glsl */`
 	varying vec2 vEmissiveMapUv;
 
 #endif
+#ifdef USE_BUMPMAP
+
+	uniform mat3 bumpMapTransform;
+	varying vec2 vBumpMapUv;
+
+#endif
 #ifdef USE_NORMALMAP
 
 	uniform mat3 normalMapTransform;

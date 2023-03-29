@@ -65,6 +65,7 @@ const UniformsLib = {
 	bumpmap: {
 
 		bumpMap: { value: null },
+		bumpMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 		bumpScale: { value: 1 }
 
 	},
