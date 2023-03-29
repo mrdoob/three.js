@@ -4,7 +4,7 @@ import { Texture } from './Texture.js';
 function updateVideo() {
 
 	this.needsUpdate = true;
-	this.image.requestVideoFrameCallback( this._videoFrameCallback );
+	this._callbackHandle = this.image.requestVideoFrameCallback( this._videoFrameCallback );
 
 }
 
@@ -47,7 +47,7 @@ class VideoTexture extends Texture {
 
 		if ( video !== null && video.requestVideoFrameCallback !== undefined ) {
 
-			this._callbackHandle = video.requestVideoFrameCallback( this._videoFrameCallback );
+			this._videoFrameCallback();
 
 		}
 
