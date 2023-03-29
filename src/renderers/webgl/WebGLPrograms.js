@@ -35,14 +35,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		SpriteMaterial: 'sprite'
 	};
 
-	function getUVSetVar( value ) {
-
-		if ( value === 1 ) return 'uv2';
-
-		return 'uv';
-
-	}
-
 	function getParameters( material, lights, shadows, scene, object ) {
 
 		const fog = scene.fog;
@@ -147,6 +139,21 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_ALPHATEST = material.alphaTest > 0;
 
+		const HAS_ATTRIBUTE_UV = !! geometry.attributes.uv;
+		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
+
+		function getUVSetVar( value ) {
+
+			if ( value === 1 && HAS_ATTRIBUTE_UV2 ) {
+
+				return 'uv2';
+
+			}
+
+			return 'uv';
+
+		}
+
 		const parameters = {
 
 			isWebGL2: isWebGL2,
@@ -246,8 +253,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: HAS_NORMALMAP && !! geometry.attributes.tangent,
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
-			vertexUvs: !! geometry.attributes.uv,
-			vertexUvs2: !! geometry.attributes.uv2,
+			vertexUvs: HAS_ATTRIBUTE_UV,
+			vertexUvs2: HAS_ATTRIBUTE_UV2,
 
 			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( HAS_MAP || HAS_ALPHAMAP ),
 
