@@ -125,8 +125,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_IRIDESCENCEMAP = HAS_IRIDESCENCE && !! material.iridescenceMap;
 		const HAS_IRIDESCENCE_THICKNESSMAP = HAS_IRIDESCENCE && !! material.iridescenceThicknessMap;
 
-		const HAS_SHEENCOLORMAP = HAS_SHEEN && !! material.sheenColorMap;
-		const HAS_SHEENROUGHNESSMAP = HAS_SHEEN && !! material.sheenRoughnessMap;
+		const HAS_SHEEN_COLORMAP = HAS_SHEEN && !! material.sheenColorMap;
+		const HAS_SHEEN_ROUGHNESSMAP = HAS_SHEEN && !! material.sheenRoughnessMap;
 
 		const HAS_TRANSMISSIONMAP = HAS_TRANSMISSION && !! material.transmissionMap;
 		const HAS_THICKNESSMAP = HAS_TRANSMISSION && !! material.thicknessMap;
@@ -213,8 +213,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			iridescenceThicknessMap: HAS_IRIDESCENCE_THICKNESSMAP,
 
 			sheen: HAS_SHEEN,
-			sheenColorMap: HAS_SHEENCOLORMAP,
-			sheenRoughnessMap: HAS_SHEENROUGHNESSMAP,
+			sheenColorMap: HAS_SHEEN_COLORMAP,
+			sheenRoughnessMap: HAS_SHEEN_ROUGHNESSMAP,
 
 			transmission: HAS_TRANSMISSION,
 			transmissionMap: HAS_TRANSMISSIONMAP,
@@ -249,6 +249,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			clearcoatMapUv: HAS_CLEARCOATMAP && getUVSetVar( material.clearcoatMap.uvSet ),
 			clearcoatNormalMapUv: HAS_CLEARCOAT_NORMALMAP && getUVSetVar( material.clearcoatNormalMap.uvSet ),
 			clearcoatRoughnessMapUv: HAS_CLEARCOAT_ROUGHNESSMAP && getUVSetVar( material.clearcoatRoughnessMap.uvSet ),
+
+			sheenColorMapUv: HAS_SHEEN_COLORMAP && getUVSetVar( material.sheenColorMap.uvSet ),
+			sheenRoughnessMapUv: HAS_SHEEN_ROUGHNESSMAP && getUVSetVar( material.sheenRoughnessMap.uvSet ),
 
 			specularMapUv: HAS_SPECULARMAP && getUVSetVar( material.specularMap.uvSet ),
 			specularColorMapUv: HAS_SPECULAR_COLORMAP && getUVSetVar( material.specularColorMap.uvSet ),
@@ -392,6 +395,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.clearcoatMapUv );
 		array.push( parameters.clearcoatNormalMapUv );
 		array.push( parameters.clearcoatRoughnessMapUv );
+		array.push( parameters.sheenColorMapUv );
+		array.push( parameters.sheenRoughnessMapUv );
 		array.push( parameters.specularMapUv );
 		array.push( parameters.specularColorMapUv );
 		array.push( parameters.specularIntensityMapUv );

@@ -88,6 +88,18 @@ export default /* glsl */`
 	varying vec2 vClearcoatRoughnessMapUv;
 
 #endif
+#ifdef USE_SHEEN_COLORMAP
+
+	uniform mat3 sheenColorMapTransform;
+	varying vec2 vSheenColorMapUv;
+
+#endif
+#ifdef USE_SHEEN_ROUGHNESSMAP
+
+	uniform mat3 sheenRoughnessMapTransform;
+	varying vec2 vSheenRoughnessMapUv;
+
+#endif
 #ifdef USE_SPECULARMAP
 
 	uniform mat3 specularMapTransform;

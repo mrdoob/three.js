@@ -391,11 +391,15 @@ function WebGLMaterials( renderer, properties ) {
 
 				uniforms.sheenColorMap.value = material.sheenColorMap;
 
+				refreshTransformUniform( material.sheenColorMap, uniforms.sheenColorMapTransform );
+
 			}
 
 			if ( material.sheenRoughnessMap ) {
 
 				uniforms.sheenRoughnessMap.value = material.sheenRoughnessMap;
+
+				refreshTransformUniform( material.sheenRoughnessMap, uniforms.sheenRoughnessMapTransform );
 
 			}
 

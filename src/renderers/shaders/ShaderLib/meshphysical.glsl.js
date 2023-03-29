@@ -103,11 +103,11 @@ uniform float opacity;
 	uniform vec3 sheenColor;
 	uniform float sheenRoughness;
 
-	#ifdef USE_SHEENCOLORMAP
+	#ifdef USE_SHEEN_COLORMAP
 		uniform sampler2D sheenColorMap;
 	#endif
 
-	#ifdef USE_SHEENROUGHNESSMAP
+	#ifdef USE_SHEEN_ROUGHNESSMAP
 		uniform sampler2D sheenRoughnessMap;
 	#endif
 #endif

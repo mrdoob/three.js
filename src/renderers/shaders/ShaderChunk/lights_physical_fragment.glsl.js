@@ -102,17 +102,17 @@ material.roughness = min( material.roughness, 1.0 );
 
 	material.sheenColor = sheenColor;
 
-	#ifdef USE_SHEENCOLORMAP
+	#ifdef USE_SHEEN_COLORMAP
 
-		material.sheenColor *= texture2D( sheenColorMap, vUv ).rgb;
+		material.sheenColor *= texture2D( sheenColorMap, vSheenColorMapUv ).rgb;
 
 	#endif
 
 	material.sheenRoughness = clamp( sheenRoughness, 0.07, 1.0 );
 
-	#ifdef USE_SHEENROUGHNESSMAP
+	#ifdef USE_SHEEN_ROUGHNESSMAP
 
-		material.sheenRoughness *= texture2D( sheenRoughnessMap, vUv ).a;
+		material.sheenRoughness *= texture2D( sheenRoughnessMap, vSheenRoughnessMapUv ).a;
 
 	#endif
 
