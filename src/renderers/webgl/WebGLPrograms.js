@@ -119,11 +119,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_TRANSMISSION = material.transmission > 0;
 
 		const HAS_CLEARCOATMAP = HAS_CLEARCOAT && !! material.clearcoatMap;
-		const HAS_CLEARCOATNORMALMAP = HAS_CLEARCOAT && !! material.clearcoatNormalMap;
-		const HAS_CLEARCOATROUGHNESSMAP = HAS_CLEARCOAT && !! material.clearcoatRoughnessMap;
+		const HAS_CLEARCOAT_NORMALMAP = HAS_CLEARCOAT && !! material.clearcoatNormalMap;
+		const HAS_CLEARCOAT_ROUGHNESSMAP = HAS_CLEARCOAT && !! material.clearcoatRoughnessMap;
 
 		const HAS_IRIDESCENCEMAP = HAS_IRIDESCENCE && !! material.iridescenceMap;
-		const HAS_IRIDESCENCETHICKNESSMAP = HAS_IRIDESCENCE && !! material.iridescenceThicknessMap;
+		const HAS_IRIDESCENCE_THICKNESSMAP = HAS_IRIDESCENCE && !! material.iridescenceThicknessMap;
 
 		const HAS_SHEENCOLORMAP = HAS_SHEEN && !! material.sheenColorMap;
 		const HAS_SHEENROUGHNESSMAP = HAS_SHEEN && !! material.sheenRoughnessMap;
@@ -205,12 +205,12 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			clearcoat: HAS_CLEARCOAT,
 			clearcoatMap: HAS_CLEARCOATMAP,
-			clearcoatNormalMap: HAS_CLEARCOATNORMALMAP,
-			clearcoatRoughnessMap: HAS_CLEARCOATROUGHNESSMAP,
+			clearcoatNormalMap: HAS_CLEARCOAT_NORMALMAP,
+			clearcoatRoughnessMap: HAS_CLEARCOAT_ROUGHNESSMAP,
 
 			iridescence: HAS_IRIDESCENCE,
 			iridescenceMap: HAS_IRIDESCENCEMAP,
-			iridescenceThicknessMap: HAS_IRIDESCENCETHICKNESSMAP,
+			iridescenceThicknessMap: HAS_IRIDESCENCE_THICKNESSMAP,
 
 			sheen: HAS_SHEEN,
 			sheenColorMap: HAS_SHEENCOLORMAP,
@@ -247,8 +247,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			roughnessMapUv: HAS_ROUGHNESSMAP && getUVSetVar( material.roughnessMap.uvSet ),
 
 			clearcoatMapUv: HAS_CLEARCOATMAP && getUVSetVar( material.clearcoatMap.uvSet ),
-			clearcoatNormalMapUv: HAS_CLEARCOATNORMALMAP && getUVSetVar( material.clearcoatNormalMap.uvSet ),
-			clearcoatRoughnessMapUv: HAS_CLEARCOATROUGHNESSMAP && getUVSetVar( material.clearcoatRoughnessMap.uvSet ),
+			clearcoatNormalMapUv: HAS_CLEARCOAT_NORMALMAP && getUVSetVar( material.clearcoatNormalMap.uvSet ),
+			clearcoatRoughnessMapUv: HAS_CLEARCOAT_ROUGHNESSMAP && getUVSetVar( material.clearcoatRoughnessMap.uvSet ),
 
 			specularMapUv: HAS_SPECULARMAP && getUVSetVar( material.specularMap.uvSet ),
 			specularColorMapUv: HAS_SPECULAR_COLORMAP && getUVSetVar( material.specularColorMap.uvSet ),
