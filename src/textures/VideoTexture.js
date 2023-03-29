@@ -21,10 +21,10 @@ class VideoTexture extends Texture {
 
 		this.generateMipmaps = false;
 
-		this.image = video;
-
 		this._videoFrameCallback = updateVideo.bind( this );
 		this._callbackHandle = null;
+
+		this.image = video;
 
 	}
 
