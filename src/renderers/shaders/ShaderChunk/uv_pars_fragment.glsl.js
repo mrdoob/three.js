@@ -4,11 +4,6 @@ export default /* glsl */`
 	varying vec2 vUv; /* TODO Remove */
 
 #endif
-#ifdef USE_UV2
-
-	varying vec2 vUv2; /* TODO Remove */
-
-#endif
 #ifdef USE_MAP
 
 	varying vec2 vMapUv;
