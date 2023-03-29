@@ -392,6 +392,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.clearcoatMapUv );
 		array.push( parameters.clearcoatNormalMapUv );
 		array.push( parameters.clearcoatRoughnessMapUv );
+		array.push( parameters.specularMapUv );
+		array.push( parameters.specularColorMapUv );
+		array.push( parameters.specularIntensityMapUv );
 		array.push( parameters.combine );
 		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );
