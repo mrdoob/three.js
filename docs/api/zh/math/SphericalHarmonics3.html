@@ -9,131 +9,129 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Represents a third-order spherical harmonics (SH). Light probes use this class to encode lighting information.</p>
+		<p class="desc">表示三次球面谐波(SH)。光照探测器使用此类来编码光照信息。</p>
 
-		<h2>Constructor</h2>
+		<h2>构造函数(Constructor)</h2>
 		<h3>[name]()</h3>
 		<p>
-		Creates a new instance of [name].
+			创建[name]的新实例。
 		</p>
 
-		<h2>Properties</h2>
+		<h2>特性(Properties)</h2>
 
 		<h3>[property:Array coefficients]</h3>
-		<p>An array holding the (9) SH coefficients. A single coefficient is represented as an instance of [page:Vector3].</p>
+		<p>包含(9)个SH系数的数组。单个系数表示为[page:Vector3 Vector3]的实例。</p>
 
 		<h3>[property:Boolean isSphericalHarmonics3]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			用于检查给定对象是否为SphericalHarmonics3类型的只读标志。
 		</p>
 
 		<h2>Methods</h2>
 
 		<h3>[method:SphericalHarmonics3 add]( [param:SphericalHarmonics3 sh] )</h3>
 		<p>
-			[page:SphericalHarmonics3 sh] - The SH to add.<br /><br />
+			[page:SphericalHarmonics3 sh] - 要添加的SH。<br /><br />
 
-			Adds the given SH to this instance.
+			将给定的 SH 添加到此实例。
 		</p>
 
 		<h3>[method:SphericalHarmonics3 addScaledSH]( [param:SphericalHarmonics3 sh], [param:Number scale] )</h3>
 		<p>
-			[page:SphericalHarmonics3 sh] - The SH to add.<br />
-			[page:Number scale] - The scale factor.<br /><br />
-
-			A convenience method for performing [page:.add]() and [page:.scale]() at once.
+			[page:SphericalHarmonics3 sh] - 要添加的SH。<br />
+			[page:Number scale] - 比例因子。<br /><br />
+			一次 执行[page:.add]()和[page:.scale]()的便捷方法。
 		</p>
 
 		<h3>[method:SphericalHarmonics3 clone]()</h3>
 		<p>
-			Returns a new instance of [name] with equal coefficients.
+			返回具有相等系数的[name]的新实例。
 		</p>
 
 		<h3>[method:SphericalHarmonics3 copy]( [param:SphericalHarmonics3 sh] )</h3>
 		<p>
-			[page:SphericalHarmonics3 sh] - The SH to copy.<br /><br />
+			[page:SphericalHarmonics3 sh] - 要复制的SH。<br /><br />
 
-			Copies the given SH to this instance.
+			将给定的SH复制到此实例。
 		</p>
 
 		<h3>[method:Boolean equals]( [param:SphericalHarmonics3 sh] )</h3>
 		<p>
-			[page:SphericalHarmonics3 sh] - The SH to compare with.<br /><br />
+			[page:SphericalHarmonics3 sh] - 要与之比较的 SH。<br /><br />
 
-			Returns true if the given SH and this instance have equal coefficients.
+			如果给定的SH和此实例具有相等的系数，则返回true。
 		</p>
 
 		<h3>[method:SphericalHarmonics3 fromArray]( [param:Array array], [param:Number offset] )</h3>
 		<p>
-			[page:Array array] - The array holding the numbers of the SH coefficients.<br />
-			[page:Number offset] - (optional) The array offset.<br /><br />
+			[page:Array array] - 保存SH系数数的数组。<br />
+			[page:Number offset] - （可选）数组偏移量。<br /><br />
 
-			Sets the coefficients of this instance from the given array.
+			从给定数组设置此实例的系数。
 		</p>
 
 		<h3>[method:Vector3 getAt]( [param:Vector3 normal], [param:Vector3 target] )</h3>
 		<p>
-			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
-			[page:Vector3 target] - The result vector.<br /><br />
+			[page:Vector3 normal] - 法向量（假定为单位长度）。<br />
+			[page:Vector3 target] - 结果向量。<br /><br />
 
-			Returns the radiance in the direction of the given normal.
+			返回给定法线方向的辐射度。
 		</p>
 
 		<h3>[method:Vector3 getIrradianceAt]( [param:Vector3 normal], [param:Vector3 target] )</h3>
 		<p>
-			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
-			[page:Vector3 target] - The result vector.<br /><br />
+			[page:Vector3 normal] - 法向量（假定为单位长度）。<br />
+			[page:Vector3 target] - 结果向量。<br /><br />
 
-			Returns the irradiance (radiance convolved with cosine lobe) in the direction of the given normal.
+			返回给定法线方向的辐照度（辐射度与余弦波瓣卷积）。
 		</p>
 
 		<h3>[method:SphericalHarmonics3 lerp]( [param:SphericalHarmonics3 sh], [param:Number alpha] )</h3>
 		<p>
-			[page:SphericalHarmonics3 sh] - The SH to interpolate with.<br />
-			[page:Number alpha] - The alpha factor.<br /><br />
+			[page:SphericalHarmonics3 sh] - 要插入的SH。<br />
+			[page:Number alpha] - alpha因子。<br /><br />
 
-			Linear interpolates between the given SH and this instance by the given alpha factor.
+			通过给定的alpha因子在给定的SH和此实例之间进行线性插值。
 		</p>
 
 		<h3>[method:SphericalHarmonics3 scale]( [param:Number scale] )</h3>
 		<p>
-			[page:Number sh] - The scale factor.<br /><br />
+			[page:Number sh] - 比例因子。<br /><br />
 
-			Scales this SH by the given scale factor.
+			按给定的比例因子缩放此SH。
 		</p>
 
 		<h3>[method:SphericalHarmonics3 set]( [param:Array coefficients] )</h3>
 		<p>
-			[page:Array coefficients] - An array of SH coefficients.<br /><br />
+			[page:Array coefficients] - 一组SH系数。<br /><br />
 
-			Sets the given SH coefficients to this instance.
+			将给定的SH系数设置为此实例。
 		</p>
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Number offset] )</h3>
 		<p>
-			[page:Array array] - (optional) The target array.<br />
-			[page:Number offset] - (optional) The array offset.<br /><br />
+			[page:Array array] - （可选）目标数组。<br />
+			[page:Number offset] - （可选）数组偏移量。<br /><br />
 
-			Returns an array with the coefficients, or copies them into the provided array. The coefficients
-			are represented as numbers.
+			返回包含系数的数组，或将它们复制到提供的数组中。系数表示为数字。
 		</p>
 
 		<h3>[method:SphericalHarmonics3 zero]()</h3>
 		<p>
-			Sets all SH coefficients to 0.
+			将所有SH系数设置为0。
 		</p>
 
-		<h2>Static Methods</h2>
+		<h2>静态方法(Static Methods)</h2>
 
 		<h3>[method:undefined getBasisAt]( [param:Vector3 normal], [param:Array shBasis] )</h3>
 		<p>
-			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
-			[page:Array shBasis] - The resulting SH basis.<br /><br />
+			[page:Vector3 normal] - 法向量（假定为单位长度）。<br />
+			[page:Array shBasis] - 生成的SH基础。<br /><br />
 
-			Computes the SH basis for the given normal vector.
+			计算给定法向量的 SH 基础。
 		</p>
 
-		<h2>Source</h2>
+		<h2>源代码(Source)</h2>
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
