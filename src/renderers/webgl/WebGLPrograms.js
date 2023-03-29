@@ -411,7 +411,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.transmissionMapUv );
 		array.push( parameters.thicknessMapUv );
 		array.push( parameters.combine );
-		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );
 		array.push( parameters.sizeAttenuation );
 		array.push( parameters.morphTargetsCount );
@@ -446,62 +445,30 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 2 );
 		if ( parameters.instancingColor )
 			_programLayers.enable( 3 );
-		if ( parameters.map )
-			_programLayers.enable( 4 );
 		if ( parameters.matcap )
-			_programLayers.enable( 5 );
+			_programLayers.enable( 4 );
 		if ( parameters.envMap )
-			_programLayers.enable( 6 );
-		if ( parameters.lightMap )
-			_programLayers.enable( 7 );
-		if ( parameters.aoMap )
-			_programLayers.enable( 8 );
-		if ( parameters.bumpMap )
-			_programLayers.enable( 9 );
-		if ( parameters.normalMap )
-			_programLayers.enable( 10 );
+			_programLayers.enable( 5 );
 		if ( parameters.normalMapObjectSpace )
-			_programLayers.enable( 11 );
+			_programLayers.enable( 6 );
 		if ( parameters.normalMapTangentSpace )
-			_programLayers.enable( 12 );
-		if ( parameters.emissiveMap )
-			_programLayers.enable( 13 );
+			_programLayers.enable( 7 );
 		if ( parameters.clearcoat )
-			_programLayers.enable( 14 );
-		if ( parameters.clearcoatMap )
-			_programLayers.enable( 15 );
-		if ( parameters.clearcoatRoughnessMap )
-			_programLayers.enable( 16 );
-		if ( parameters.clearcoatNormalMap )
-			_programLayers.enable( 17 );
+			_programLayers.enable( 8 );
 		if ( parameters.iridescence )
-			_programLayers.enable( 18 );
-		if ( parameters.iridescenceMap )
-			_programLayers.enable( 19 );
-		if ( parameters.iridescenceThicknessMap )
-			_programLayers.enable( 20 );
-		if ( parameters.displacementMap )
-			_programLayers.enable( 21 );
-		if ( parameters.specularMap )
-			_programLayers.enable( 22 );
-		if ( parameters.metalnessMap )
-			_programLayers.enable( 23 );
-		if ( parameters.roughnessMap )
-			_programLayers.enable( 24 );
-		if ( parameters.gradientMap )
-			_programLayers.enable( 25 );
-		if ( parameters.alphaMap )
-			_programLayers.enable( 26 );
+			_programLayers.enable( 9 );
 		if ( parameters.alphaTest )
-			_programLayers.enable( 27 );
+			_programLayers.enable( 10 );
 		if ( parameters.vertexColors )
-			_programLayers.enable( 28 );
+			_programLayers.enable( 11 );
 		if ( parameters.vertexAlphas )
-			_programLayers.enable( 29 );
+			_programLayers.enable( 12 );
 		if ( parameters.vertexUvs )
-			_programLayers.enable( 30 );
+			_programLayers.enable( 13 );
+		if ( parameters.vertexUvs2 )
+			_programLayers.enable( 14 );
 		if ( parameters.vertexTangents )
-			_programLayers.enable( 31 );
+			_programLayers.enable( 15 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();
@@ -536,28 +503,16 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 13 );
 		if ( parameters.dithering )
 			_programLayers.enable( 14 );
-		if ( parameters.specularIntensityMap )
-			_programLayers.enable( 15 );
-		if ( parameters.specularColorMap )
-			_programLayers.enable( 16 );
 		if ( parameters.transmission )
-			_programLayers.enable( 17 );
-		if ( parameters.transmissionMap )
-			_programLayers.enable( 18 );
-		if ( parameters.thicknessMap )
-			_programLayers.enable( 19 );
+			_programLayers.enable( 15 );
 		if ( parameters.sheen )
-			_programLayers.enable( 20 );
-		if ( parameters.sheenColorMap )
-			_programLayers.enable( 21 );
-		if ( parameters.sheenRoughnessMap )
-			_programLayers.enable( 22 );
+			_programLayers.enable( 16 );
 		if ( parameters.decodeVideoTexture )
-			_programLayers.enable( 23 );
+			_programLayers.enable( 17 );
 		if ( parameters.opaque )
-			_programLayers.enable( 24 );
+			_programLayers.enable( 18 );
 		if ( parameters.pointsUvs )
-			_programLayers.enable( 25 );
+			_programLayers.enable( 19 );
 
 		array.push( _programLayers.mask );
 
