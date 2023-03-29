@@ -266,7 +266,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			useFog: material.fog === true,
 			fogExp2: ( fog && fog.isFogExp2 ),
 
-			flatShading: !! material.flatShading,
+			flatShading: material.flatShading === true,
 
 			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
@@ -307,7 +307,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
 
-			useDepthPacking: !! material.depthPacking,
+			useDepthPacking: material.depthPacking === true,
 			depthPacking: material.depthPacking || 0,
 
 			index0AttributeName: material.index0AttributeName,
