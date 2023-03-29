@@ -81,29 +81,29 @@ const nodeObjectsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj ) {
 
-	const type = typeof obj;
+	const type = getValueType( obj );
 
-	if ( ( type === 'number' ) || ( type === 'boolean' ) ) {
+	if ( type === 'node' ) {
+
+		let nodeObject = nodeObjectsCacheMap.get( obj );
+
+		if ( nodeObject === undefined ) {
+
+			nodeObject = new Proxy( obj, shaderNodeHandler );
+			nodeObjectsCacheMap.set( obj, nodeObject );
+			nodeObjectsCacheMap.set( nodeObject, nodeObject );
+
+		}
+
+		return nodeObject;
+
+	} else if ( ( type === 'float' ) || ( type === 'boolean' ) ) {
 
 		return nodeObject( getAutoTypedConstNode( obj ) );
 
-	} else if ( type === 'object' ) {
+	} else if ( type && type !== 'string' ) {
 
-		if ( obj && obj.isNode === true ) {
-
-			let nodeObject = nodeObjectsCacheMap.get( obj );
-
-			if ( nodeObject === undefined ) {
-
-				nodeObject = new Proxy( obj, shaderNodeHandler );
-				nodeObjectsCacheMap.set( obj, nodeObject );
-				nodeObjectsCacheMap.set( nodeObject, nodeObject );
-
-			}
-
-			return nodeObject;
-
-		}
+		return nodeObject( new ConstNode( obj ) );
 
 	}
 
