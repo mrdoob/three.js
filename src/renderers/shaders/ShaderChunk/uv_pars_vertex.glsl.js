@@ -46,6 +46,12 @@ export default /* glsl */`
 	varying vec2 vNormalMapUv;
 
 #endif
+#ifdef USE_DISPLACEMENTMAP
+
+	uniform mat3 displacementMapTransform;
+	varying vec2 vDisplacementMapUv;
+
+#endif
 #ifdef USE_EMISSIVEMAP
 
 	uniform mat3 emissiveMapTransform;

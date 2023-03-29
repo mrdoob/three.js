@@ -34,6 +34,11 @@ export default /* glsl */`
 	vNormalMapUv = ( normalMapTransform * vec3( NORMALMAP_UV, 1 ) ).xy;
 
 #endif
+#ifdef USE_DISPLACEMENTMAP
+
+	vDisplacementMapUv = ( displacementMapTransform * vec3( DISPLACEMENTMAP_UV, 1 ) ).xy;
+
+#endif
 #ifdef USE_EMISSIVEMAP
 
 	vEmissiveMapUv = ( emissiveMapTransform * vec3( EMISSIVEMAP_UV, 1 ) ).xy;

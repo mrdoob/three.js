@@ -160,14 +160,6 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
-		if ( material.displacementMap ) {
-
-			uniforms.displacementMap.value = material.displacementMap;
-			uniforms.displacementScale.value = material.displacementScale;
-			uniforms.displacementBias.value = material.displacementBias;
-
-		}
-
 		if ( material.normalMap ) {
 
 			uniforms.normalMap.value = material.normalMap;
@@ -181,6 +173,17 @@ function WebGLMaterials( renderer, properties ) {
 				uniforms.normalScale.value.negate();
 
 			}
+
+		}
+
+		if ( material.displacementMap ) {
+
+			uniforms.displacementMap.value = material.displacementMap;
+
+			refreshTransformUniform( material.displacementMap, uniforms.displacementMapTransform );
+
+			uniforms.displacementScale.value = material.displacementScale;
+			uniforms.displacementBias.value = material.displacementBias;
 
 		}
 

@@ -147,6 +147,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			normalMap: !! material.normalMap,
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
 			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
+			displacementMap: !! material.displacementMap,
 			emissiveMap: !! material.emissiveMap,
 
 			decodeVideoTexture: !! material.map && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
@@ -168,7 +169,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			transmissionMap: useTransmission && !! material.transmissionMap,
 			thicknessMap: useTransmission && !! material.thicknessMap,
 
-			displacementMap: !! material.displacementMap,
 			metalnessMap: !! material.metalnessMap,
 			roughnessMap: !! material.roughnessMap,
 			specularMap: !! material.specularMap,
@@ -192,6 +192,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			lightMapUv: !! material.lightMap && getUVSetVar( material.lightMap.uvSet ),
 			bumpMapUv: !! material.bumpMap && getUVSetVar( material.bumpMap.uvSet ),
 			normalMapUv: !! material.normalMap && getUVSetVar( material.normalMap.uvSet ),
+			displacementMapUv: !! material.displacementMap && getUVSetVar( material.displacementMap.uvSet ),
 			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
 			metalnessMapUv: !! material.metalnessMap && getUVSetVar( material.metalnessMap.uvSet ),
 			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
@@ -328,6 +329,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.aoMapUv );
 		array.push( parameters.bumpMapUv );
 		array.push( parameters.normalMapUv );
+		array.push( parameters.displacementMapUv );
 		array.push( parameters.emissiveMapUv );
 		array.push( parameters.metalnessMapUv );
 		array.push( parameters.roughnessMapUv );
