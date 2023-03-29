@@ -14,6 +14,11 @@ export default /* glsl */`
 	varying vec2 vMapUv;
 
 #endif
+#ifdef USE_ALPHAMAP
+
+	varying vec2 vAlphaMapUv;
+
+#endif
 #ifdef USE_LIGHTMAP
 
 	varying vec2 vLightMapUv;

@@ -140,6 +140,8 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.alphaMap.value = material.alphaMap;
 
+			refreshTransformUniform( material.alphaMap, uniforms.alphaMapTransform );
+
 		}
 
 		if ( material.bumpMap ) {
@@ -275,7 +277,6 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.map.value = material.map;
 
 			refreshTransformUniform( material.map, uniforms.uvTransform );
-
 
 		}
 

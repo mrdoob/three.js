@@ -187,6 +187,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			//
 
 			mapUv: !! material.map && getUVSetVar( material.map.uvSet ),
+			alphaMapUv: !! material.alphaMap && getUVSetVar( material.alphaMap.uvSet ),
 			aoMapUv: !! material.aoMap && getUVSetVar( material.aoMap.uvSet ),
 			lightMapUv: !! material.lightMap && getUVSetVar( material.lightMap.uvSet ),
 			bumpMapUv: !! material.bumpMap && getUVSetVar( material.bumpMap.uvSet ),
@@ -322,6 +323,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.mapUv );
+		array.push( parameters.alphaMapUv );
 		array.push( parameters.lightMapUv );
 		array.push( parameters.aoMapUv );
 		array.push( parameters.bumpMapUv );

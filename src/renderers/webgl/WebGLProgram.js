@@ -497,6 +497,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			//
 
 			parameters.mapUv ? '#define MAP_UV ' + parameters.mapUv : '',
+			parameters.alphaMapUv ? '#define ALPHAMAP_UV ' + parameters.alphaMapUv : '',
 			parameters.lightMapUv ? '#define LIGHTMAP_UV ' + parameters.lightMapUv : '',
 			parameters.aoMapUv ? '#define AOMAP_UV ' + parameters.aoMapUv : '',
 			parameters.emissiveMapUv ? '#define EMISSIVEMAP_UV ' + parameters.emissiveMapUv : '',
