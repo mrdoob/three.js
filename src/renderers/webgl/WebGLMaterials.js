@@ -406,8 +406,9 @@ function WebGLMaterials( renderer, properties ) {
 
 			if ( material.clearcoatNormalMap ) {
 
-				uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
 				uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
+
+				uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
 
 				if ( material.side === BackSide ) {
 
