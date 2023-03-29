@@ -1812,13 +1812,10 @@ class GLTFTextureTransformExtension {
 
 	extendTexture( texture, transform ) {
 
-		if ( transform.texCoord !== undefined ) {
-
-			texture.uvSet = transform.texCoord;
-
-		}
-
-		if ( transform.offset === undefined && transform.rotation === undefined && transform.scale === undefined ) {
+		if ( ( transform.texCoord === undefined || transform.texCoord === texture.uvSet )
+			&& transform.offset === undefined
+			&& transform.rotation === undefined
+			&& transform.scale === undefined ) {
 
 			// See https://github.com/mrdoob/three.js/issues/21819.
 			return texture;
@@ -1826,6 +1823,12 @@ class GLTFTextureTransformExtension {
 		}
 
 		texture = texture.clone();
+
+		if ( transform.texCoord !== undefined ) {
+
+			texture.uvSet = transform.texCoord;
+
+		}
 
 		if ( transform.offset !== undefined ) {
 
@@ -3122,8 +3125,9 @@ class GLTFParser {
 
 			if ( ! texture ) return null;
 
-			if ( mapDef.texCoord !== undefined ) {
+			if ( mapDef.texCoord !== undefined && mapDef.texCoord > 0 ) {
 
+				texture = texture.clone();
 				texture.uvSet = mapDef.texCoord;
 
 			}
