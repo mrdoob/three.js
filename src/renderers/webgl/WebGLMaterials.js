@@ -166,14 +166,6 @@ function WebGLMaterials( renderer, properties ) {
 
 		}
 
-		if ( material.emissiveMap ) {
-
-			uniforms.emissiveMap.value = material.emissiveMap;
-
-			refreshTransformUniform( material.emissiveMap, uniforms.emissiveMapTransform );
-
-		}
-
 		if ( material.normalMap ) {
 
 			uniforms.normalMap.value = material.normalMap;
@@ -187,6 +179,14 @@ function WebGLMaterials( renderer, properties ) {
 				uniforms.normalScale.value.negate();
 
 			}
+
+		}
+
+		if ( material.emissiveMap ) {
+
+			uniforms.emissiveMap.value = material.emissiveMap;
+
+			refreshTransformUniform( material.emissiveMap, uniforms.emissiveMapTransform );
 
 		}
 

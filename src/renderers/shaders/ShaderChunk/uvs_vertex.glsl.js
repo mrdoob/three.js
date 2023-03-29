@@ -24,11 +24,6 @@ export default /* glsl */`
 	vAoMapUv = ( aoMapTransform * vec3( AOMAP_UV, 1 ) ).xy;
 
 #endif
-#ifdef USE_EMISSIVEMAP
-
-	vEmissiveMapUv = ( emissiveMapTransform * vec3( EMISSIVEMAP_UV, 1 ) ).xy;
-
-#endif
 #ifdef USE_BUMPMAP
 
 	vBumpMapUv = ( bumpMapTransform * vec3( BUMPMAP_UV, 1 ) ).xy;
@@ -37,6 +32,11 @@ export default /* glsl */`
 #ifdef USE_NORMALMAP
 
 	vNormalMapUv = ( normalMapTransform * vec3( NORMALMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_EMISSIVEMAP
+
+	vEmissiveMapUv = ( emissiveMapTransform * vec3( EMISSIVEMAP_UV, 1 ) ).xy;
 
 #endif
 #ifdef USE_METALNESSMAP

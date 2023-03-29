@@ -24,11 +24,6 @@ export default /* glsl */`
 	varying vec2 vAoMapUv;
 
 #endif
-#ifdef USE_EMISSIVEMAP
-
-	varying vec2 vEmissiveMapUv;
-
-#endif
 #ifdef USE_BUMPMAP
 
 	varying vec2 vBumpMapUv;
@@ -37,6 +32,11 @@ export default /* glsl */`
 #ifdef USE_NORMALMAP
 
 	varying vec2 vNormalMapUv;
+
+#endif
+#ifdef USE_EMISSIVEMAP
+
+	varying vec2 vEmissiveMapUv;
 
 #endif
 #ifdef USE_METALNESSMAP

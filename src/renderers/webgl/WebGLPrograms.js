@@ -143,11 +143,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			envMapCubeUVHeight: envMapCubeUVHeight,
 			aoMap: !! material.aoMap,
 			lightMap: !! material.lightMap,
-			emissiveMap: !! material.emissiveMap,
 			bumpMap: !! material.bumpMap,
 			normalMap: !! material.normalMap,
 			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
 			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
+			emissiveMap: !! material.emissiveMap,
 
 			decodeVideoTexture: !! material.map && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
 
@@ -189,9 +189,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			mapUv: !! material.map && getUVSetVar( material.map.uvSet ),
 			aoMapUv: !! material.aoMap && getUVSetVar( material.aoMap.uvSet ),
 			lightMapUv: !! material.lightMap && getUVSetVar( material.lightMap.uvSet ),
-			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
 			bumpMapUv: !! material.bumpMap && getUVSetVar( material.bumpMap.uvSet ),
 			normalMapUv: !! material.normalMap && getUVSetVar( material.normalMap.uvSet ),
+			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
 			metalnessMapUv: !! material.metalnessMap && getUVSetVar( material.metalnessMap.uvSet ),
 			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
 			clearcoatMapUv: !! material.clearcoatMap && getUVSetVar( material.clearcoatMap.uvSet ),
@@ -322,9 +322,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.mapUv );
 		array.push( parameters.lightMapUv );
 		array.push( parameters.aoMapUv );
-		array.push( parameters.emissiveMapUv );
 		array.push( parameters.bumpMapUv );
 		array.push( parameters.normalMapUv );
+		array.push( parameters.emissiveMapUv );
 		array.push( parameters.metalnessMapUv );
 		array.push( parameters.roughnessMapUv );
 		array.push( parameters.clearcoatMapUv );
@@ -378,15 +378,15 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 7 );
 		if ( parameters.aoMap )
 			_programLayers.enable( 8 );
-		if ( parameters.emissiveMap )
-			_programLayers.enable( 9 );
 		if ( parameters.bumpMap )
-			_programLayers.enable( 10 );
+			_programLayers.enable( 9 );
 		if ( parameters.normalMap )
-			_programLayers.enable( 11 );
+			_programLayers.enable( 10 );
 		if ( parameters.objectSpaceNormalMap )
-			_programLayers.enable( 12 );
+			_programLayers.enable( 11 );
 		if ( parameters.tangentSpaceNormalMap )
+			_programLayers.enable( 12 );
+		if ( parameters.emissiveMap )
 			_programLayers.enable( 13 );
 		if ( parameters.clearcoat )
 			_programLayers.enable( 14 );
@@ -406,9 +406,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 21 );
 		if ( parameters.specularMap )
 			_programLayers.enable( 22 );
-		if ( parameters.roughnessMap )
-			_programLayers.enable( 23 );
 		if ( parameters.metalnessMap )
+			_programLayers.enable( 23 );
+		if ( parameters.roughnessMap )
 			_programLayers.enable( 24 );
 		if ( parameters.gradientMap )
 			_programLayers.enable( 25 );

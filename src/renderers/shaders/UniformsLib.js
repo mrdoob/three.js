@@ -55,13 +55,6 @@ const UniformsLib = {
 
 	},
 
-	emissivemap: {
-
-		emissiveMap: { value: null },
-		emissiveMapTransform: { value: /*@__PURE__*/ new Matrix3() }
-
-	},
-
 	bumpmap: {
 
 		bumpMap: { value: null },
@@ -83,6 +76,13 @@ const UniformsLib = {
 		displacementMap: { value: null },
 		displacementScale: { value: 1 },
 		displacementBias: { value: 0 }
+
+	},
+
+	emissivemap: {
+
+		emissiveMap: { value: null },
+		emissiveMapTransform: { value: /*@__PURE__*/ new Matrix3() }
 
 	},
 
