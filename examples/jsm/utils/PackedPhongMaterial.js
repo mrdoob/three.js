@@ -32,6 +32,8 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 		this.vertexShader = [
 			'#define PHONG',
+			'#define USE_MAP',
+			'#define MAP_UV uv',
 
 			'varying vec3 vViewPosition;',
 
@@ -115,10 +117,8 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			ShaderChunk.uv_vertex,
 
-			`#ifdef USE_UV
-					#ifdef USE_PACKED_UV
-						vUv = decodeUV(vUv);
-					#endif
+			`#ifdef USE_PACKED_UV
+					vMapUv = decodeUV(vMapUv);
 				#endif`,
 
 			ShaderChunk.color_vertex,
