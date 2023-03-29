@@ -306,10 +306,10 @@ ShaderLib.physical = {
 		{
 			clearcoat: { value: 0 },
 			clearcoatMap: { value: null },
+			clearcoatNormalMap: { value: null },
+			clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
 			clearcoatRoughness: { value: 0 },
 			clearcoatRoughnessMap: { value: null },
-			clearcoatNormalScale: { value: /*@__PURE__*/ new Vector2( 1, 1 ) },
-			clearcoatNormalMap: { value: null },
 			iridescence: { value: 0 },
 			iridescenceMap: { value: null },
 			iridescenceIOR: { value: 1.3 },
