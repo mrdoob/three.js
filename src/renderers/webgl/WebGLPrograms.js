@@ -105,12 +105,44 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
-		const useAlphaTest = material.alphaTest > 0;
+		const HAS_MAP = !! material.map;
+		const HAS_MATCAP = !! material.matcap;
+		const HAS_ENVMAP = !! envMap;
+		const HAS_AOMAP = !! material.aoMap;
+		const HAS_LIGHTMAP = !! material.lightMap;
+		const HAS_BUMPMAP = !! material.bumpMap;
+		const HAS_NORMALMAP = !! material.normalMap;
+		const HAS_DISPLACEMENTMAP = !! material.displacementMap;
+		const HAS_EMISSIVEMAP = !! material.emissiveMap;
 
-		const useClearcoat = material.clearcoat > 0;
-		const useIridescence = material.iridescence > 0;
-		const useSheen = material.sheen > 0;
-		const useTransmission = material.transmission > 0;
+		const HAS_METALNESSMAP = !! material.metalnessMap;
+		const HAS_ROUGHNESSMAP = !! material.roughnessMap;
+
+		const HAS_CLEARCOAT = material.clearcoat > 0;
+		const HAS_IRIDESCENCE = material.iridescence > 0;
+		const HAS_SHEEN = material.sheen > 0;
+		const HAS_TRANSMISSION = material.transmission > 0;
+
+		const HAS_CLEARCOATMAP = HAS_CLEARCOAT && !! material.clearcoatMap;
+		const HAS_CLEARCOATNORMALMAP = HAS_CLEARCOAT && !! material.clearcoatNormalMap;
+		const HAS_CLEARCOATROUGHNESSMAP = HAS_CLEARCOAT && !! material.clearcoatRoughnessMap;
+
+		const HAS_IRIDESCENCEMAP = HAS_IRIDESCENCE && !! material.iridescenceMap;
+		const HAS_IRIDESCENCETHICKNESSMAP = HAS_IRIDESCENCE && !! material.iridescenceThicknessMap;
+
+		const HAS_SHEENCOLORMAP = HAS_SHEEN && !! material.sheenColorMap;
+		const HAS_SHEENROUGHNESSMAP = HAS_SHEEN && !! material.sheenRoughnessMap;
+
+		const HAS_TRANSMISSIONMAP = HAS_TRANSMISSION && !! material.transmissionMap;
+		const HAS_THICKNESSMAP = HAS_TRANSMISSION && !! material.thicknessMap;
+
+		const HAS_SPECULARMAP = !! material.specularMap;
+		const HAS_SPECULARCOLORMAP = !! material.specularColorMap;
+		const HAS_SPECULARINTENSITYMAP = !! material.specularIntensityMap;
+
+		const HAS_ALPHAMAP = !! material.alphaMap;
+
+		const HAS_ALPHATEST = material.alphaTest > 0;
 
 		const parameters = {
 
@@ -136,49 +168,52 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			supportsVertexTextures: vertexTextures,
 			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.encoding : LinearEncoding ),
-			map: !! material.map,
-			matcap: !! material.matcap,
-			envMap: !! envMap,
-			envMapMode: envMap && envMap.mapping,
+
+			map: HAS_MAP,
+			matcap: HAS_MATCAP,
+			envMap: HAS_ENVMAP,
+			envMapMode: HAS_ENVMAP && envMap.mapping,
 			envMapCubeUVHeight: envMapCubeUVHeight,
-			aoMap: !! material.aoMap,
-			lightMap: !! material.lightMap,
-			bumpMap: !! material.bumpMap,
-			normalMap: !! material.normalMap,
-			objectSpaceNormalMap: material.normalMapType === ObjectSpaceNormalMap,
-			tangentSpaceNormalMap: material.normalMapType === TangentSpaceNormalMap,
-			displacementMap: !! material.displacementMap,
-			emissiveMap: !! material.emissiveMap,
+			aoMap: HAS_AOMAP,
+			lightMap: HAS_LIGHTMAP,
+			bumpMap: HAS_BUMPMAP,
+			normalMap: HAS_NORMALMAP,
+			displacementMap: HAS_DISPLACEMENTMAP,
+			emissiveMap: HAS_EMISSIVEMAP,
 
-			decodeVideoTexture: !! material.map && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
+			objectSpaceNormalMap: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
+			tangentSpaceNormalMap: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
 
-			clearcoat: useClearcoat,
-			clearcoatMap: useClearcoat && !! material.clearcoatMap,
-			clearcoatRoughnessMap: useClearcoat && !! material.clearcoatRoughnessMap,
-			clearcoatNormalMap: useClearcoat && !! material.clearcoatNormalMap,
+			decodeVideoTexture: HAS_MAP && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
 
-			iridescence: useIridescence,
-			iridescenceMap: useIridescence && !! material.iridescenceMap,
-			iridescenceThicknessMap: useIridescence && !! material.iridescenceThicknessMap,
+			metalnessMap: HAS_METALNESSMAP,
+			roughnessMap: HAS_ROUGHNESSMAP,
 
-			sheen: useSheen,
-			sheenColorMap: useSheen && !! material.sheenColorMap,
-			sheenRoughnessMap: useSheen && !! material.sheenRoughnessMap,
+			clearcoat: HAS_CLEARCOAT,
+			clearcoatMap: HAS_CLEARCOATMAP,
+			clearcoatNormalMap: HAS_CLEARCOATNORMALMAP,
+			clearcoatRoughnessMap: HAS_CLEARCOATROUGHNESSMAP,
 
-			transmission: useTransmission,
-			transmissionMap: useTransmission && !! material.transmissionMap,
-			thicknessMap: useTransmission && !! material.thicknessMap,
+			iridescence: HAS_IRIDESCENCE,
+			iridescenceMap: HAS_IRIDESCENCEMAP,
+			iridescenceThicknessMap: HAS_IRIDESCENCETHICKNESSMAP,
 
-			metalnessMap: !! material.metalnessMap,
-			roughnessMap: !! material.roughnessMap,
-			specularMap: !! material.specularMap,
-			specularIntensityMap: !! material.specularIntensityMap,
-			specularColorMap: !! material.specularColorMap,
+			sheen: HAS_SHEEN,
+			sheenColorMap: HAS_SHEENCOLORMAP,
+			sheenRoughnessMap: HAS_SHEENROUGHNESSMAP,
+
+			transmission: HAS_TRANSMISSION,
+			transmissionMap: HAS_TRANSMISSIONMAP,
+			thicknessMap: HAS_THICKNESSMAP,
+
+			specularMap: HAS_SPECULARMAP,
+			specularColorMap: HAS_SPECULARCOLORMAP,
+			specularIntensityMap: HAS_SPECULARINTENSITYMAP,
 
 			opaque: material.transparent === false && material.blending === NormalBlending,
 
-			alphaMap: !! material.alphaMap,
-			alphaTest: useAlphaTest,
+			alphaMap: HAS_ALPHAMAP,
+			alphaTest: HAS_ALPHATEST,
 
 			gradientMap: !! material.gradientMap,
 
@@ -186,19 +221,22 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			//
 
-			mapUv: !! material.map && getUVSetVar( material.map.uvSet ),
-			alphaMapUv: !! material.alphaMap && getUVSetVar( material.alphaMap.uvSet ),
-			aoMapUv: !! material.aoMap && getUVSetVar( material.aoMap.uvSet ),
-			lightMapUv: !! material.lightMap && getUVSetVar( material.lightMap.uvSet ),
-			bumpMapUv: !! material.bumpMap && getUVSetVar( material.bumpMap.uvSet ),
-			normalMapUv: !! material.normalMap && getUVSetVar( material.normalMap.uvSet ),
-			displacementMapUv: !! material.displacementMap && getUVSetVar( material.displacementMap.uvSet ),
-			emissiveMapUv: !! material.emissiveMap && getUVSetVar( material.emissiveMap.uvSet ),
-			metalnessMapUv: !! material.metalnessMap && getUVSetVar( material.metalnessMap.uvSet ),
-			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
-			clearcoatMapUv: !! material.clearcoatMap && getUVSetVar( material.clearcoatMap.uvSet ),
-			clearcoatNormalMapUv: !! material.clearcoatNormalMap && getUVSetVar( material.clearcoatNormalMap.uvSet ),
-			clearcoatRoughnessMapUv: !! material.clearcoatRoughnessMap && getUVSetVar( material.clearcoatRoughnessMap.uvSet ),
+			mapUv: HAS_MAP && getUVSetVar( material.map.uvSet ),
+			aoMapUv: HAS_AOMAP && getUVSetVar( material.aoMap.uvSet ),
+			lightMapUv: HAS_LIGHTMAP && getUVSetVar( material.lightMap.uvSet ),
+			bumpMapUv: HAS_BUMPMAP && getUVSetVar( material.bumpMap.uvSet ),
+			normalMapUv: HAS_NORMALMAP && getUVSetVar( material.normalMap.uvSet ),
+			displacementMapUv: HAS_DISPLACEMENTMAP && getUVSetVar( material.displacementMap.uvSet ),
+			emissiveMapUv: HAS_EMISSIVEMAP && getUVSetVar( material.emissiveMap.uvSet ),
+
+			metalnessMapUv: HAS_METALNESSMAP && getUVSetVar( material.metalnessMap.uvSet ),
+			roughnessMapUv: HAS_ROUGHNESSMAP && getUVSetVar( material.roughnessMap.uvSet ),
+
+			clearcoatMapUv: HAS_CLEARCOATMAP && getUVSetVar( material.clearcoatMap.uvSet ),
+			clearcoatNormalMapUv: HAS_CLEARCOATNORMALMAP && getUVSetVar( material.clearcoatNormalMap.uvSet ),
+			clearcoatRoughnessMapUv: HAS_CLEARCOATROUGHNESSMAP && getUVSetVar( material.clearcoatRoughnessMap.uvSet ),
+
+			alphaMapUv: HAS_ALPHAMAP && getUVSetVar( material.alphaMap.uvSet ),
 
 			//
 
