@@ -450,7 +450,17 @@ class FBXTreeParser {
 
 		} else {
 
-			texture = this.textureLoader.load( fileName );
+			let loader = this.manager.getHandler( fileName );
+
+			if ( loader === null ) {
+
+				loader = this.textureLoader;
+
+			}
+
+			loader.setPath( currentPath );
+			loader.setCrossOrigin( this.crossOrigin );
+			texture = loader.load( fileName );
 
 		}
 
