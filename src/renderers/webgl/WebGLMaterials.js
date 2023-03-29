@@ -169,10 +169,16 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.normalMap ) {
 
 			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
 
 			refreshTransformUniform( material.normalMap, uniforms.normalMapTransform );
+
+			uniforms.normalScale.value.copy( material.normalScale );
+
+			if ( material.side === BackSide ) {
+
+				uniforms.normalScale.value.negate();
+
+			}
 
 		}
 
@@ -260,6 +266,9 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.map.value = material.map;
 
+			refreshTransformUniform( material.map, uniforms.uvTransform );
+
+
 		}
 
 		if ( material.alphaMap ) {
@@ -271,28 +280,6 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.alphaTest > 0 ) {
 
 			uniforms.alphaTest.value = material.alphaTest;
-
-		}
-
-		// uv repeat and offset setting priorities
-		// 1. color map
-		// 2. alpha map
-
-		let uvScaleMap;
-
-		if ( material.map ) {
-
-			uvScaleMap = material.map;
-
-		} else if ( material.alphaMap ) {
-
-			uvScaleMap = material.alphaMap;
-
-		}
-
-		if ( uvScaleMap !== undefined ) {
-
-			refreshTransformUniform( uvScaleMap, uniforms.uvTransform );
 
 		}
 
