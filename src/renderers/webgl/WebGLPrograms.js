@@ -140,6 +140,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_SPECULARCOLORMAP = !! material.specularColorMap;
 		const HAS_SPECULARINTENSITYMAP = !! material.specularIntensityMap;
 
+		const HAS_GRADIENTMAP = !! material.gradientMap;
+
 		const HAS_ALPHAMAP = !! material.alphaMap;
 
 		const HAS_ALPHATEST = material.alphaTest > 0;
@@ -210,12 +212,12 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			specularColorMap: HAS_SPECULARCOLORMAP,
 			specularIntensityMap: HAS_SPECULARINTENSITYMAP,
 
+			gradientMap: HAS_GRADIENTMAP,
+
 			opaque: material.transparent === false && material.blending === NormalBlending,
 
 			alphaMap: HAS_ALPHAMAP,
 			alphaTest: HAS_ALPHATEST,
-
-			gradientMap: !! material.gradientMap,
 
 			combine: material.combine,
 
@@ -240,13 +242,13 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			//
 
-			vertexTangents: ( !! material.normalMap && !! geometry.attributes.tangent ),
+			vertexTangents: HAS_NORMALMAP && !! geometry.attributes.tangent,
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
 			vertexUvs: !! geometry.attributes.uv,
 			vertexUvs2: !! geometry.attributes.uv2,
 
-			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( !! material.map || !! material.alphaMap ),
+			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( HAS_MAP || HAS_ALPHAMAP ),
 
 			fog: !! fog,
 			useFog: material.fog === true,
