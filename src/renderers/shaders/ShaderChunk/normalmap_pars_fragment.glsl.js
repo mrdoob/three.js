@@ -17,12 +17,12 @@ export default /* glsl */`
 	// Normal Mapping Without Precomputed Tangents
 	// http://www.thetenthplanet.de/archives/1180
 
-	mat3 getTangentFrame( vec3 eye_pos, vec3 surf_norm ) {
+	mat3 getTangentFrame( vec3 eye_pos, vec3 surf_norm, vec2 uv ) {
 
 		vec3 q0 = dFdx( eye_pos.xyz );
 		vec3 q1 = dFdy( eye_pos.xyz );
-		vec2 st0 = dFdx( vUv.st );
-		vec2 st1 = dFdy( vUv.st );
+		vec2 st0 = dFdx( uv.st );
+		vec2 st1 = dFdy( uv.st );
 
 		vec3 N = surf_norm; // normalized
 
