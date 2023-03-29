@@ -193,6 +193,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			normalMapUv: !! material.normalMap && getUVSetVar( material.normalMap.uvSet ),
 			metalnessMapUv: !! material.metalnessMap && getUVSetVar( material.metalnessMap.uvSet ),
 			roughnessMapUv: !! material.roughnessMap && getUVSetVar( material.roughnessMap.uvSet ),
+			clearcoatMapUv: !! material.clearcoatMap && getUVSetVar( material.clearcoatMap.uvSet ),
+			clearcoatNormalMapUv: !! material.clearcoatNormalMap && getUVSetVar( material.clearcoatNormalMap.uvSet ),
+			clearcoatRoughnessMapUv: !! material.clearcoatRoughnessMap && getUVSetVar( material.clearcoatRoughnessMap.uvSet ),
 
 			//
 
@@ -322,6 +325,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.normalMapUv );
 		array.push( parameters.metalnessMapUv );
 		array.push( parameters.roughnessMapUv );
+		array.push( parameters.clearcoatMapUv );
+		array.push( parameters.clearcoatNormalMapUv );
+		array.push( parameters.clearcoatRoughnessMapUv );
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.combine );

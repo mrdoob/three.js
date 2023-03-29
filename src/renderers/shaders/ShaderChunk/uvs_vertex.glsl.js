@@ -44,4 +44,19 @@ export default /* glsl */`
 	vRoughnessMapUv = ( roughnessMapTransform * vec3( ROUGHNESSMAP_UV, 1 ) ).xy;
 
 #endif
+#ifdef USE_CLEARCOATMAP
+
+	vClearcoatMapUv = ( clearcoatMapTransform * vec3( CLEARCOATMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_CLEARCOAT_NORMALMAP
+
+	vClearcoatNormalMapUv = ( clearcoatNormalMapTransform * vec3( CLEARCOAT_NORMALMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_CLEARCOAT_ROUGHNESSMAP
+
+	vClearcoatRoughnessMapUv = ( clearcoatRoughnessMapTransform * vec3( CLEARCOAT_ROUGHNESSMAP_UV, 1 ) ).xy;
+
+#endif
 `;

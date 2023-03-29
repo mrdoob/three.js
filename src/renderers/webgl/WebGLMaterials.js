@@ -396,17 +396,23 @@ function WebGLMaterials( renderer, properties ) {
 
 				uniforms.clearcoatMap.value = material.clearcoatMap;
 
+				refreshTransformUniform( material.clearcoatMap, uniforms.clearcoatMapTransform );
+
 			}
 
 			if ( material.clearcoatRoughnessMap ) {
 
 				uniforms.clearcoatRoughnessMap.value = material.clearcoatRoughnessMap;
 
+				refreshTransformUniform( material.clearcoatRoughnessMap, uniforms.clearcoatRoughnessMapTransform );
+
 			}
 
 			if ( material.clearcoatNormalMap ) {
 
 				uniforms.clearcoatNormalMap.value = material.clearcoatNormalMap;
+
+				refreshTransformUniform( material.clearcoatNormalMap, uniforms.clearcoatNormalMapTransform );
 
 				uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
 

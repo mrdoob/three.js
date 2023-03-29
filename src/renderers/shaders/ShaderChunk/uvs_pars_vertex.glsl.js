@@ -54,4 +54,22 @@ export default /* glsl */`
 	varying vec2 vRoughnessMapUv;
 
 #endif
+#ifdef USE_CLEARCOATMAP
+
+	uniform mat3 clearcoatMapTransform;
+	varying vec2 vClearcoatMapUv;
+
+#endif
+#ifdef USE_CLEARCOAT_NORMALMAP
+
+	uniform mat3 clearcoatNormalMapTransform;
+	varying vec2 vClearcoatNormalMapUv;
+
+#endif
+#ifdef USE_CLEARCOAT_ROUGHNESSMAP
+
+	uniform mat3 clearcoatRoughnessMapTransform;
+	varying vec2 vClearcoatRoughnessMapUv;
+
+#endif
 `;
