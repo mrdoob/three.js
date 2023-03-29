@@ -99,4 +99,16 @@ export default /* glsl */`
 	varying vec2 vSpecularIntensityMapUv;
 
 #endif
+#ifdef USE_TRANSMISSIONMAP
+
+	uniform mat3 transmissionMapTransform;
+	varying vec2 vTransmissionMapUv;
+
+#endif
+#ifdef USE_THICKNESSMAP
+
+	uniform mat3 thicknessMapTransform;
+	varying vec2 vThicknessMapUv;
+
+#endif
 `;

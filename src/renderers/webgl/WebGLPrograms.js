@@ -128,12 +128,12 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		const HAS_SHEEN_COLORMAP = HAS_SHEEN && !! material.sheenColorMap;
 		const HAS_SHEEN_ROUGHNESSMAP = HAS_SHEEN && !! material.sheenRoughnessMap;
 
-		const HAS_TRANSMISSIONMAP = HAS_TRANSMISSION && !! material.transmissionMap;
-		const HAS_THICKNESSMAP = HAS_TRANSMISSION && !! material.thicknessMap;
-
 		const HAS_SPECULARMAP = !! material.specularMap;
 		const HAS_SPECULAR_COLORMAP = !! material.specularColorMap;
 		const HAS_SPECULAR_INTENSITYMAP = !! material.specularIntensityMap;
+
+		const HAS_TRANSMISSIONMAP = HAS_TRANSMISSION && !! material.transmissionMap;
+		const HAS_THICKNESSMAP = HAS_TRANSMISSION && !! material.thicknessMap;
 
 		const HAS_GRADIENTMAP = !! material.gradientMap;
 
@@ -216,13 +216,13 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			sheenColorMap: HAS_SHEEN_COLORMAP,
 			sheenRoughnessMap: HAS_SHEEN_ROUGHNESSMAP,
 
-			transmission: HAS_TRANSMISSION,
-			transmissionMap: HAS_TRANSMISSIONMAP,
-			thicknessMap: HAS_THICKNESSMAP,
-
 			specularMap: HAS_SPECULARMAP,
 			specularColorMap: HAS_SPECULAR_COLORMAP,
 			specularIntensityMap: HAS_SPECULAR_INTENSITYMAP,
+
+			transmission: HAS_TRANSMISSION,
+			transmissionMap: HAS_TRANSMISSIONMAP,
+			thicknessMap: HAS_THICKNESSMAP,
 
 			gradientMap: HAS_GRADIENTMAP,
 
@@ -259,6 +259,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			specularMapUv: HAS_SPECULARMAP && getUVSetVar( material.specularMap.uvSet ),
 			specularColorMapUv: HAS_SPECULAR_COLORMAP && getUVSetVar( material.specularColorMap.uvSet ),
 			specularIntensityMapUv: HAS_SPECULAR_INTENSITYMAP && getUVSetVar( material.specularIntensityMap.uvSet ),
+
+			transmissionMapUv: HAS_TRANSMISSIONMAP && getUVSetVar( material.transmissionMap.uvSet ),
+			thicknessMapUv: HAS_THICKNESSMAP && getUVSetVar( material.thicknessMap.uvSet ),
 
 			alphaMapUv: HAS_ALPHAMAP && getUVSetVar( material.alphaMap.uvSet ),
 
@@ -405,6 +408,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		array.push( parameters.specularMapUv );
 		array.push( parameters.specularColorMapUv );
 		array.push( parameters.specularIntensityMapUv );
+		array.push( parameters.transmissionMapUv );
+		array.push( parameters.thicknessMapUv );
 		array.push( parameters.combine );
 		array.push( parameters.vertexUvs );
 		array.push( parameters.fogExp2 );

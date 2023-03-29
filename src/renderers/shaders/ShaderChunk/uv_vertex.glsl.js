@@ -104,4 +104,14 @@ export default /* glsl */`
 	vSpecularIntensityMapUv = ( specularIntensityMapTransform * vec3( SPECULAR_INTENSITYMAP_UV, 1 ) ).xy;
 
 #endif
+#ifdef USE_TRANSMISSIONMAP
+
+	vTransmissionMapUv = ( transmissionMapTransform * vec3( TRANSMISSIONMAP_UV, 1 ) ).xy;
+
+#endif
+#ifdef USE_THICKNESSMAP
+
+	vThicknessMapUv = ( thicknessMapTransform * vec3( THICKNESSMAP_UV, 1 ) ).xy;
+
+#endif
 `;
