@@ -256,7 +256,7 @@ function WebGLMaterials( renderer, properties ) {
 
 			uniforms.map.value = material.map;
 
-			refreshTransformUniform( material.map, uniforms.uvTransform );
+			refreshTransformUniform( material.map, uniforms.mapTransform );
 
 		}
 
