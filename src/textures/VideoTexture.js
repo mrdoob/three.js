@@ -1,6 +1,13 @@
 import { LinearFilter } from '../constants.js';
 import { Texture } from './Texture.js';
 
+function updateVideo() {
+
+	this.needsUpdate = true;
+	this.image.requestVideoFrameCallback( this._videoFrameCallback );
+
+}
+
 class VideoTexture extends Texture {
 
 	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
@@ -16,6 +23,9 @@ class VideoTexture extends Texture {
 
 		this.image = video;
 
+		this._videoFrameCallback = updateVideo.bind( this );
+		this._callbackHandle = null;
+
 	}
 
 	get image() {
@@ -26,20 +36,18 @@ class VideoTexture extends Texture {
 
 	set image( video = null ) {
 
-		this.source.data = video;
+		if ( this._callbackHandle !== null ) {
 
-		const scope = this;
-
-		function updateVideo() {
-
-			scope.needsUpdate = true;
-			video.requestVideoFrameCallback( updateVideo );
+			this.image.cancelVideoFrameCallback( this._callbackHandle );
+			this._callbackHandle = null;
 
 		}
 
-		if ( ( video !== null ) && ( video.requestVideoFrameCallback !== undefined ) ) {
+		this.source.data = video;
 
-			video.requestVideoFrameCallback( updateVideo );
+		if ( video !== null && video.requestVideoFrameCallback !== undefined ) {
+
+			this._callbackHandle = video.requestVideoFrameCallback( this._videoFrameCallback );
 
 		}
 
@@ -55,9 +63,7 @@ class VideoTexture extends Texture {
 
 		const video = this.image;
 
-		if ( video === null ) return;
-
-		if ( video.requestVideoFrameCallback === undefined && video.readyState >= video.HAVE_CURRENT_DATA ) {
+		if ( video !== null && this._callbackHandle === null && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 			this.needsUpdate = true;
 
