@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { scriptableValue } from './ScriptableValueNode.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeProxy, float } from '../shadernode/ShaderNode.js';
 
 class Resources extends Map {
 

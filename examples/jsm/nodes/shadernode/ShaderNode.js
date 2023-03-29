@@ -387,6 +387,7 @@ addNodeElement( 'arrayBuffer', arrayBuffer );
 // HACK - we cannot export them from the corresponding files because of the cyclic dependency
 export const element = nodeProxy( ArrayElementNode );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
+export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
 addNodeElement( 'element', element );
 addNodeElement( 'convert', convert );
