@@ -460,18 +460,13 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			( parameters.useFog && parameters.fogExp2 ) ? '#define FOG_EXP2' : '',
 
 			parameters.map ? '#define USE_MAP' : '',
-			parameters.mapUv ? '#define MAP_UV ' + parameters.mapUv : '',
 			parameters.envMap ? '#define USE_ENVMAP' : '',
 			parameters.envMap ? '#define ' + envMapModeDefine : '',
 			parameters.lightMap ? '#define USE_LIGHTMAP' : '',
-			parameters.lightMapUv ? '#define LIGHTMAP_UV ' + parameters.lightMapUv : '',
 			parameters.aoMap ? '#define USE_AOMAP' : '',
-			parameters.aoMapUv ? '#define AOMAP_UV ' + parameters.aoMapUv : '',
 			parameters.emissiveMap ? '#define USE_EMISSIVEMAP' : '',
-			parameters.emissiveMapUv ? '#define EMISSIVEMAP_UV ' + parameters.emissiveMapUv : '',
 			parameters.bumpMap ? '#define USE_BUMPMAP' : '',
 			parameters.normalMap ? '#define USE_NORMALMAP' : '',
-			parameters.normalMapUv ? '#define NORMALMAP_UV ' + parameters.normalMapUv : '',
 			( parameters.normalMap && parameters.objectSpaceNormalMap ) ? '#define OBJECTSPACE_NORMALMAP' : '',
 			( parameters.normalMap && parameters.tangentSpaceNormalMap ) ? '#define TANGENTSPACE_NORMALMAP' : '',
 
@@ -489,9 +484,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.specularColorMap ? '#define USE_SPECULARCOLORMAP' : '',
 
 			parameters.roughnessMap ? '#define USE_ROUGHNESSMAP' : '',
-			parameters.roughnessMapUv ? '#define ROUGHNESSMAP_UV ' + parameters.roughnessMapUv : '',
 			parameters.metalnessMap ? '#define USE_METALNESSMAP' : '',
-			parameters.metalnessMapUv ? '#define METALNESSMAP_UV ' + parameters.metalnessMapUv : '',
 			parameters.alphaMap ? '#define USE_ALPHAMAP' : '',
 
 			parameters.transmission ? '#define USE_TRANSMISSION' : '',
@@ -500,6 +493,18 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.sheenColorMap ? '#define USE_SHEENCOLORMAP' : '',
 			parameters.sheenRoughnessMap ? '#define USE_SHEENROUGHNESSMAP' : '',
+
+			//
+
+			parameters.mapUv ? '#define MAP_UV ' + parameters.mapUv : '',
+			parameters.lightMapUv ? '#define LIGHTMAP_UV ' + parameters.lightMapUv : '',
+			parameters.aoMapUv ? '#define AOMAP_UV ' + parameters.aoMapUv : '',
+			parameters.emissiveMapUv ? '#define EMISSIVEMAP_UV ' + parameters.emissiveMapUv : '',
+			parameters.normalMapUv ? '#define NORMALMAP_UV ' + parameters.normalMapUv : '',
+			parameters.roughnessMapUv ? '#define ROUGHNESSMAP_UV ' + parameters.roughnessMapUv : '',
+			parameters.metalnessMapUv ? '#define METALNESSMAP_UV ' + parameters.metalnessMapUv : '',
+
+			//
 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
