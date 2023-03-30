@@ -146,38 +146,12 @@
 		贴图单次重复中的起始偏移量，分别表示U和V。
 		一般范围是由`0.0`到`1.0`。
 		</p>
-		<p>
-			在此引擎中下列纹理共享`第一套`uv通道。
-			偏移量（以及重复次数）的设置项按照下列纹理进行优先级排列并共享:
-			<ol>
-				<li>color map</li>
-				<li>specular map</li>
-				<li>displacement map</li>
-				<li>normal map</li>
-				<li>bump map</li>
-				<li>roughness map</li>
-				<li>metalness map</li>
-				<li>alpha map</li>
-				<li>emissive map</li>
-				<li>clearcoat map</li>
-				<li>clearcoat normal map</li>
-				<li>clearcoat roughnessMap map</li>
-			</ol>
-		</p>
-		<p>
-			在此引擎中下列纹理类型共享`第二套`uv通道。
-			偏移量（以及重复次数）的设置项按照下列纹理进行优先级排列并共享:
-			<ol>
-				<li>ao map</li>
-				<li>light map</li>
-			</ol>
-		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
 		决定纹理在表面的重复次数，两个方向分别表示U和V，如果重复次数在任何方向上设置了超过1的数值，
 		对应的Wrap需要设置为[page:Textures THREE.RepeatWrapping]或者[page:Textures THREE.MirroredRepeatWrapping]来
-		达到想要的平铺效果。此项设置有和[page:.offset]一样的限制。
+		达到想要的平铺效果。
 		</p>
 
 		<h3>[property:number rotation]</h3>
