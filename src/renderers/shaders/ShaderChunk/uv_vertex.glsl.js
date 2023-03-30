@@ -1,7 +1,7 @@
 export default /* glsl */`
 #ifdef USE_UV
 
-	vUv = ( uvTransform * vec3( uv, 1 ) ).xy;
+	vUv = vec3( uv, 1 ).xy;
 
 #endif
 #ifdef USE_MAP
