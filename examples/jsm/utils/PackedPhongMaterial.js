@@ -115,9 +115,9 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			ShaderChunk.uv_vertex,
 
-			`#ifdef USE_UV
+			`#ifdef USE_MAP
 					#ifdef USE_PACKED_UV
-						vUv = decodeUV(vUv);
+						vMapUv = decodeUV(vMapUv);
 					#endif
 				#endif`,
 
