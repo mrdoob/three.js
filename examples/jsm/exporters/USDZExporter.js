@@ -766,7 +766,7 @@ export function buildXform( model, writer, context ) {
 
 	if ( matrix.determinant() < 0 ) {
 
-		console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', path );
+		console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', name );
 
 	}
 
