@@ -7503,7 +7503,7 @@ class Object3D extends EventDispatcher {
 		this.parent = null;
 		this.children = [];
 
-		this.up = Object3D.DefaultUp.clone();
+		this.up = Object3D.DEFAULT_UP.clone();
 
 		const position = new Vector3();
 		const rotation = new Euler();
@@ -7557,10 +7557,10 @@ class Object3D extends EventDispatcher {
 		this.matrix = new Matrix4();
 		this.matrixWorld = new Matrix4();
 
-		this.matrixAutoUpdate = Object3D.DefaultMatrixAutoUpdate;
+		this.matrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
 		this.matrixWorldNeedsUpdate = false;
 
-		this.matrixWorldAutoUpdate = Object3D.DefaultMatrixWorldAutoUpdate; // checked by the renderer
+		this.matrixWorldAutoUpdate = Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE; // checked by the renderer
 
 		this.layers = new Layers();
 		this.visible = true;
@@ -8423,9 +8423,9 @@ class Object3D extends EventDispatcher {
 
 }
 
-Object3D.DefaultUp = /*@__PURE__*/ new Vector3( 0, 1, 0 );
-Object3D.DefaultMatrixAutoUpdate = true;
-Object3D.DefaultMatrixWorldAutoUpdate = true;
+Object3D.DEFAULT_UP = /*@__PURE__*/ new Vector3( 0, 1, 0 );
+Object3D.DEFAULT_MATRIX_AUTO_UPDATE = true;
+Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true;
 
 const _v0$1 = /*@__PURE__*/ new Vector3();
 const _v1$3 = /*@__PURE__*/ new Vector3();
@@ -26616,10 +26616,15 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 	function update( uniformsGroup, program ) {
 
 		let buffer = buffers[ uniformsGroup.id ];
+		const size = uniformsGroup.__size;
 
-		if ( buffer === undefined ) {
+		if ( uniformsGroup.uniforms.length !== uniformsGroup.__cacheCount ) {
 
 			prepareUniformsGroup( uniformsGroup );
+
+		}
+
+		if ( buffer === undefined ) {
 
 			buffer = createBuffer( uniformsGroup );
 			buffers[ uniformsGroup.id ] = buffer;
@@ -26637,7 +26642,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		const frame = info.render.frame;
 
-		if ( updateList[ uniformsGroup.id ] !== frame ) {
+		if ( updateList[ uniformsGroup.id ] !== frame && size > 0 ) {
 
 			updateBufferData( uniformsGroup );
 
@@ -26655,7 +26660,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		uniformsGroup.__bindingPointIndex = bindingPointIndex;
 
 		const buffer = gl.createBuffer();
-		const size = uniformsGroup.__size;
+		const size = uniformsGroup.__size * uniformsGroup.count;
 		const usage = uniformsGroup.usage;
 
 		gl.bindBuffer( gl.UNIFORM_BUFFER, buffer );
@@ -26680,7 +26685,9 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		}
 
-		console.error( 'THREE.WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.' );
+		console.error(
+			'THREE.WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.'
+		);
 
 		return 0;
 
@@ -26699,12 +26706,14 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 			const uniform = uniforms[ i ];
 
 			// partly update the buffer if necessary
+			if (
+				hasUniformChanged( uniform, i, cache ) === true ||
+				uniformsGroup.__sizeChanged === true
+			) {
 
-			if ( hasUniformChanged( uniform, i, cache ) === true ) {
-
-				const offset = uniform.__offset;
-
-				const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
+				const values = Array.isArray( uniform.value )
+					? uniform.value
+					: [ uniform.value ];
 
 				let arrayOffset = 0;
 
@@ -26714,10 +26723,10 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					const info = getUniformSize( value );
 
-					if ( typeof value === 'number' ) {
+					if ( typeof value === 'number' || value instanceof Boolean ) {
 
 						uniform.__data[ 0 ] = value;
-						gl.bufferSubData( gl.UNIFORM_BUFFER, offset + arrayOffset, uniform.__data );
+						gl.bufferSubData( gl.UNIFORM_BUFFER, arrayOffset, uniform.__data );
 
 					} else if ( value.isMatrix3 ) {
 
@@ -26726,7 +26735,10 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 						uniform.__data[ 0 ] = value.elements[ 0 ];
 						uniform.__data[ 1 ] = value.elements[ 1 ];
 						uniform.__data[ 2 ] = value.elements[ 2 ];
-						uniform.__data[ 3 ] = value.elements[ 0 ];
+
+						// Conversion to 3x4 matrix
+						uniform.__data[ 3 ] = 0;
+
 						uniform.__data[ 4 ] = value.elements[ 3 ];
 						uniform.__data[ 5 ] = value.elements[ 4 ];
 						uniform.__data[ 6 ] = value.elements[ 5 ];
@@ -26746,11 +26758,31 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				}
 
-				gl.bufferSubData( gl.UNIFORM_BUFFER, offset, uniform.__data );
+				if ( uniform.__data && uniform.__data.length >= 0 ) {
+
+					uniformsGroup.__offsetNeedsUpdate.push( [
+						uniform.__offset,
+						uniform.__data,
+					] );
+
+				}
 
 			}
 
 		}
+
+		for ( let i = uniformsGroup.__offsetNeedsUpdate.length - 1; i >= 0; i -- ) {
+
+			const uniform = uniformsGroup.__offsetNeedsUpdate[ i ];
+			// 0 is offset, 1 is data
+
+			gl.bufferSubData( gl.UNIFORM_BUFFER, uniform[ 0 ], uniform[ 1 ] );
+
+			uniformsGroup.__offsetNeedsUpdate.pop();
+
+		}
+
+		uniformsGroup.__sizeChanged = false;
 
 		gl.bindBuffer( gl.UNIFORM_BUFFER, null );
 
@@ -26764,7 +26796,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// cache entry does not exist so far
 
-			if ( typeof value === 'number' ) {
+			if ( typeof value === 'number' || value instanceof Boolean ) {
 
 				cache[ index ] = value;
 
@@ -26790,7 +26822,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// compare current value with cached entry
 
-			if ( typeof value === 'number' ) {
+			if ( typeof value === 'number' || value instanceof Boolean ) {
 
 				if ( cache[ index ] !== value ) {
 
@@ -26801,7 +26833,9 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			} else {
 
-				const cachedObjects = Array.isArray( cache[ index ] ) ? cache[ index ] : [ cache[ index ] ];
+				const cachedObjects = Array.isArray( cache[ index ] )
+					? cache[ index ]
+					: [ cache[ index ] ];
 				const values = Array.isArray( value ) ? value : [ value ];
 
 				for ( let i = 0; i < cachedObjects.length; i ++ ) {
@@ -26842,10 +26876,12 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			const infos = {
 				boundary: 0, // bytes
-				storage: 0 // bytes
+				storage: 0, // bytes
 			};
 
-			const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
+			const values = Array.isArray( uniform.value )
+				? uniform.value
+				: [ uniform.value ];
 
 			for ( let j = 0, jl = values.length; j < jl; j ++ ) {
 
@@ -26860,9 +26896,14 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// the following two properties will be used for partial buffer updates
 
-			uniform.__data = new Float32Array( infos.storage / Float32Array.BYTES_PER_ELEMENT );
-			uniform.__offset = offset;
+			if ( ! uniform.__data ) {
 
+				uniform.__data = new Float32Array(
+					infos.storage / Float32Array.BYTES_PER_ELEMENT
+				);
+				uniform.__offset = offset;
+
+			}
 			//
 
 			if ( i > 0 ) {
@@ -26873,11 +26914,11 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				// check for chunk overflow
 
-				if ( chunkOffset !== 0 && ( remainingSizeInChunk - infos.boundary ) < 0 ) {
+				if ( chunkOffset !== 0 && remainingSizeInChunk - infos.boundary < 0 ) {
 
 					// add padding and adjust offset
 
-					offset += ( chunkSize - chunkOffset );
+					offset += chunkSize - chunkOffset;
 					uniform.__offset = offset;
 
 				}
@@ -26892,12 +26933,21 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		chunkOffset = offset % chunkSize;
 
-		if ( chunkOffset > 0 ) offset += ( chunkSize - chunkOffset );
+		if ( chunkOffset > 0 ) offset += chunkSize - chunkOffset;
 
 		//
 
 		uniformsGroup.__size = offset;
-		uniformsGroup.__cache = {};
+
+		if ( ! uniformsGroup.__cache ) {
+
+			uniformsGroup.__cache = {};
+
+		}
+
+		const count = uniformsGroup.uniforms.length;
+		uniformsGroup.__cacheCount = count;
+		uniformsGroup.__sizeChanged = true;
 
 		return this;
 
@@ -26907,14 +26957,14 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		const info = {
 			boundary: 0, // bytes
-			storage: 0 // bytes
+			storage: 0, // bytes
 		};
 
 		// determine sizes according to STD140
 
-		if ( typeof value === 'number' ) {
+		if ( typeof value === 'number' || value instanceof Boolean ) {
 
-			// float/int
+			// float/int/bool
 
 			info.boundary = 4;
 			info.storage = 4;
@@ -41061,7 +41111,7 @@ class HemisphereLight extends Light {
 
 		this.type = 'HemisphereLight';
 
-		this.position.copy( Object3D.DefaultUp );
+		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
 		this.groundColor = new Color( groundColor );
@@ -41275,7 +41325,7 @@ class SpotLight extends Light {
 
 		this.type = 'SpotLight';
 
-		this.position.copy( Object3D.DefaultUp );
+		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
 		this.target = new Object3D();
@@ -41494,7 +41544,7 @@ class DirectionalLight extends Light {
 
 		this.type = 'DirectionalLight';
 
-		this.position.copy( Object3D.DefaultUp );
+		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
 		this.target = new Object3D();
@@ -47505,7 +47555,7 @@ let id = 0;
 
 class UniformsGroup extends EventDispatcher {
 
-	constructor() {
+	constructor( count ) {
 
 		super();
 
@@ -47517,6 +47567,8 @@ class UniformsGroup extends EventDispatcher {
 
 		this.usage = StaticDrawUsage;
 		this.uniforms = [];
+		this.__offsetNeedsUpdate = [];
+		this.count = count !== undefined ? count : 1;
 
 	}
 
@@ -47530,9 +47582,26 @@ class UniformsGroup extends EventDispatcher {
 
 	remove( uniform ) {
 
+
+		// Handle promise subdata update for dynamic uniforms
+		if ( this.count > 0 && uniform && uniform.__offset !== undefined && uniform.__data.length >= 0 ) {
+
+			this.__offsetNeedsUpdate.push( [ uniform.__offset, uniform.__data.slice().fill( 0 ) ] );
+
+		}
+
+		// Cannot remove the last uniform or UBO will break (use a uniform buffer that is too small)
+		if ( this.uniforms.length === 1 ) {
+
+			return;
+
+		}
+
 		const index = this.uniforms.indexOf( uniform );
 
 		if ( index !== - 1 ) this.uniforms.splice( index, 1 );
+
+
 
 		return this;
 
@@ -50655,3 +50724,4 @@ exports.ZeroSlopeEnding = ZeroSlopeEnding;
 exports.ZeroStencilOp = ZeroStencilOp;
 exports._SRGBAFormat = _SRGBAFormat;
 exports.sRGBEncoding = sRGBEncoding;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuY2pzIiwic291cmNlcyI6W10sInNvdXJjZXNDb250ZW50IjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9

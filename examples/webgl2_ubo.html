@@ -10,7 +10,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Uniform Buffer Objects
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Uniform Buffer Objects
 		</div>
 		<div id="container"></div>
 
@@ -34,8 +34,8 @@
 
 				vec4 vertexPositionEye = viewMatrix * modelMatrix * vec4( position, 1.0 );
 
-				vPositionEye = vertexPositionEye.xyz;
-				vNormalEye = normalMatrix * normal;
+				vPositionEye = (modelMatrix * vec4( position, 1.0 )).xyz;
+				vNormalEye = normal;
 
 				gl_Position = projectionMatrix * vertexPositionEye;
 
@@ -47,14 +47,33 @@
 
 			precision highp float;
 
-			uniform LightingData {
-				vec3 position;
-				vec3 ambientColor;
-				vec3 diffuseColor;
-				vec3 specularColor;
-				float shininess;
-			} Light;
 
+			struct PointLight {
+				vec4 position;
+				vec4 color;
+			};
+
+			layout(std140) uniform LightingData {
+				PointLight pointLight[LIGHTS_POINT_MAX];
+			};
+
+			#include <common>
+			float getDistanceAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
+
+				float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
+		
+				if ( cutoffDistance > 0.0 ) {
+		
+					distanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
+		
+				}
+		
+				return distanceFalloff;
+			
+			}
+
+			
+			uniform float lightIndex;
 			uniform vec3 color;
 
 			in vec3 vPositionEye;
@@ -64,23 +83,21 @@
 
 			void main()	{
 
-				// a very basic lighting equation (Phong reflection model) for testing
+				fragColor.rgb = color * vNormalEye.bbb * .3;
+				for (int x = 0; x < LIGHTS_POINT_MAX; x++) {
+					vec3 offset = pointLight[x].position.xyz - vPositionEye;
+					vec3 dirToLight = normalize( offset );
+					float distance = length( offset );
 
-				vec3 l = normalize( Light.position - vPositionEye );
-				vec3 n = normalize( vNormalEye );
-				vec3 e = - normalize( vPositionEye );
-				vec3 r = normalize( reflect( - l, n ) );
+					float diffuse = max(0.0, dot(vNormalEye, dirToLight));
+					float attenuation = 1.0 / (distance * distance);
 
-				float diffuseLightWeighting = max( dot( n, l ), 0.0 );
-				float specularLightWeighting = max( dot( r, e ), 0.0 );
+					//vec3 lightWeighting = pointLight[x].colorAndRadius.xyz * attenuation;
+					vec3 lightWeighting = pointLight[x].color.xyz * diffuse * getDistanceAttenuation( distance, 6., .5 );
+					fragColor.rgb += color.rgb * lightWeighting * 10.;
 
-				specularLightWeighting = pow( specularLightWeighting, Light.shininess );
-
-				vec3 lightWeighting = Light.ambientColor +
-					Light.diffuseColor * diffuseLightWeighting +
-					Light.specularColor * specularLightWeighting;
-
-				fragColor = vec4( color.rgb * lightWeighting.rgb, 1.0 );
+				}
+				fragColor.a = 1.;
 
 			}
 
@@ -88,7 +105,7 @@
 
 		<script id="vertexShader2" type="x-shader/x-vertex">
 
-			layout(std140) uniform ViewData {
+			uniform ViewData {
 				mat4 projectionMatrix;
 				mat4 viewMatrix;
 			};
@@ -99,18 +116,20 @@
 			in vec3 position;
 			in vec3 normal;
 			in vec2 uv;
+			out vec2 vUv;
 
 			out vec3 vPositionEye;
 			out vec3 vNormalEye;
-			out vec2 vUv;
 
 			void main()	{
 
 				vec4 vertexPositionEye = viewMatrix * modelMatrix * vec4( position, 1.0 );
 
-				vPositionEye = vertexPositionEye.xyz;
-				vNormalEye = normalMatrix * normal;
+				vPositionEye = (modelMatrix * vec4( position, 1.0 )).xyz;
+				vNormalEye = (vec4(normal , 1.)).xyz;
+
 				vUv = uv;
+
 				gl_Position = projectionMatrix * vertexPositionEye;
 
 			}
@@ -123,39 +142,57 @@
 
 			uniform sampler2D diffuseMap;
 
+			struct PointLight {
+				vec4 position;
+				vec4 color;
+			};
+
+			layout(std140) uniform LightingData {
+				PointLight pointLight[40];
+			};
+
+			
+			#include <common>
+			float getDistanceAttenuation( const in float lightDistance, const in float cutoffDistance, const in float decayExponent ) {
+		
+				float distanceFalloff = 1.0 / max( pow( lightDistance, decayExponent ), 0.01 );
+		
+				if ( cutoffDistance > 0.0 ) {
+		
+					distanceFalloff *= pow2( saturate( 1.0 - pow4( lightDistance / cutoffDistance ) ) );
+		
+				}
+		
+				return distanceFalloff;
+			
+			}
+
+			
+			uniform float lightIndex;
+
+
 			in vec2 vUv;
 			in vec3 vPositionEye;
 			in vec3 vNormalEye;
 			out vec4 fragColor;
 
-			uniform LightingData {
-				vec3 position;
-				vec3 ambientColor;
-				vec3 diffuseColor;
-				vec3 specularColor;
-				float shininess;
-			} Light;
-
 			void main()	{
 
+				vec4 color = vec4(1.);
+				color.rgb *= texture( diffuseMap, vUv ).rgb;
+				color.rgb += vNormalEye.b * .2;
+				for (int x = 0; x < 40; x++) {
+					vec3 offset = pointLight[x].position.xyz - vPositionEye;
+					vec3 dirToLight = normalize( offset );
+					float distance = length( offset );
 
-				// a very basic lighting equation (Phong reflection model) for testing
+					float diffuse = max(0.0, dot(vNormalEye, dirToLight));
+					float attenuation = 1.0 / (distance * distance);
 
-				vec3 l = normalize( Light.position - vPositionEye );
-				vec3 n = normalize( vNormalEye );
-				vec3 e = - normalize( vPositionEye );
-				vec3 r = normalize( reflect( - l, n ) );
-
-				float diffuseLightWeighting = max( dot( n, l ), 0.0 );
-				float specularLightWeighting = max( dot( r, e ), 0.0 );
-
-				specularLightWeighting = pow( specularLightWeighting, Light.shininess );
-
-				vec3 lightWeighting = Light.ambientColor +
-					Light.diffuseColor * diffuseLightWeighting +
-					Light.specularColor * specularLightWeighting;
-
-				fragColor = vec4( texture( diffuseMap, vUv ).rgb * lightWeighting.rgb, 1.0 );
+					vec3 lightWeighting = pointLight[x].color.xyz * 1. * getDistanceAttenuation( distance, 4., .5 );
+					color.rgb += lightWeighting;
+				}
+				fragColor = color;
 
 			}
 
@@ -163,7 +200,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -183,11 +220,45 @@
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			let camera, scene, renderer, clock;
+			let lightIndex = 0;
+
+			const container = document.getElementById( 'container' );
+
+			const lightingUniformsGroup = new THREE.UniformsGroup( 40 );
+			lightingUniformsGroup.setName( 'LightingData' );
+			const col = new THREE.Color( 0xffffff * Math.random() ).toArray();
+
+			lightingUniformsGroup.add( new THREE.Uniform( [ new THREE.Vector4( Math.random() * 40 - 20, 1, Math.random() * 40 - 20, 0 ), new THREE.Vector4( col[ 0 ], col[ 40 ], col[ 2 ], 0 ) ] ) ); // light position
 
 			init();
+
 			animate();
 
+			function dispose() {
+			
+				scene?.traverse( function ( object ) {
+
+					if ( object.isMesh ) {
+
+						object.geometry.dispose();
+						object.material.dispose();
+
+					}
+
+				} );
+
+				if ( renderer?.domElement ) {
+
+					container.removeChild( renderer.domElement );
+					console.log( 'removedom' );
+			
+	}
+
+			}
+
 			function init() {
+
+				dispose();
 
 				if ( WebGL.isWebGL2Available() === false ) {
 
@@ -196,10 +267,9 @@
 
 				}
 
-				const container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 0, 25 );
+				camera.position.set( 0, 25, 25 );
 
 				scene = new THREE.Scene();
 				camera.lookAt( scene.position );
@@ -209,7 +279,7 @@
 				// geometry
 
 				const geometry1 = new THREE.TetrahedronGeometry();
-				const geometry2 = new THREE.BoxGeometry();
+				const geometry2 = new THREE.BoxGeometry( 1.35, 1.35, 1.35 );
 
 				// texture
 
@@ -225,22 +295,17 @@
 				cameraUniformsGroup.add( new THREE.Uniform( camera.projectionMatrix ) ); // projection matrix
 				cameraUniformsGroup.add( new THREE.Uniform( camera.matrixWorldInverse ) ); // view matrix
 
-				const lightingUniformsGroup = new THREE.UniformsGroup();
-				lightingUniformsGroup.setName( 'LightingData' );
-				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Vector3( 0, 0, 10 ) ) ); // light position
-				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0x333333 ) ) ); // ambient color
-				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0xaaaaaa ) ) ); // diffuse color
-				lightingUniformsGroup.add( new THREE.Uniform( new THREE.Color( 0xcccccc ) ) ); // specular color
-				lightingUniformsGroup.add( new THREE.Uniform( 64 ) ); // shininess
-
-				// materials
-
 				const material1 = new THREE.RawShaderMaterial( {
 					uniforms: {
 						modelMatrix: { value: null },
 						normalMatrix: { value: null },
-						color: { value: null }
+						color: { value: null },
+						lightIndex: { value: 0 }
 					},
+					defines: {
+						LIGHTS_POINT_MAX: 40
+					},
+					name: 'Tetrahedron',
 					vertexShader: document.getElementById( 'vertexShader1' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader1' ).textContent,
 					glslVersion: THREE.GLSL3
@@ -249,54 +314,99 @@
 				const material2 = new THREE.RawShaderMaterial( {
 					uniforms: {
 						modelMatrix: { value: null },
+						normalMatrix: { value: null },
 						diffuseMap: { value: null },
+						lightIndex: { value: 0 }
 					},
+					name: 'Box',
 					vertexShader: document.getElementById( 'vertexShader2' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader2' ).textContent,
 					glslVersion: THREE.GLSL3
 				} );
 
-				// meshes
 
-				for ( let i = 0; i < 200; i ++ ) {
 
-					let mesh;
+				let value = 0;
+				const maxValue = 40;
+				let incrementing = true;
 
-					if ( i % 2 === 0 ) {
+				function loop() {
 
-						mesh = new THREE.Mesh( geometry1, material1.clone() );
+					if ( incrementing ) {
 
-						mesh.material.uniformsGroups = [ cameraUniformsGroup, lightingUniformsGroup ];
-						mesh.material.uniforms.modelMatrix.value = mesh.matrixWorld;
-						mesh.material.uniforms.normalMatrix.value = mesh.normalMatrix;
-						mesh.material.uniforms.color.value = new THREE.Color( 0xffffff * Math.random() );
+						value ++;
+						const col = new THREE.Color( 0xffffff * Math.random() ).toArray();
+						lightingUniformsGroup.add( new THREE.Uniform( [ new THREE.Vector4( Math.random() * 40 - 20, 1, Math.random() * 40 - 20, 0 ), new THREE.Vector4( col[ 0 ], col[ 40 ], col[ 2 ], 0 ) ] ) ); // light position
 
 					} else {
 
-						mesh = new THREE.Mesh( geometry2, material2.clone() );
+						value --;
+						lightingUniformsGroup.remove( lightingUniformsGroup.uniforms[ 0 ] );
+			
+		}
 
-						mesh.material.uniformsGroups = [ cameraUniformsGroup, lightingUniformsGroup ];
-						mesh.material.uniforms.modelMatrix.value = mesh.matrixWorld;
-						mesh.material.uniforms.diffuseMap.value = texture;
+					if ( value === maxValue ) {
+
+						incrementing = false;
+			
+		} else if ( value === 0 ) {
+
+						incrementing = true;
+			
+		}
+
+					setTimeout( loop, 100 );
+			
+	}
+
+				loop();
+			
+				// meshes
+				const gridSize = { x: 10, y: 1, z: 10 };
+				const spacing = 3;
+
+				for ( let i = 0; i < gridSize.x; i ++ ) {
+
+					for ( let j = 0; j < gridSize.y; j ++ ) {
+
+						for ( let k = 0; k < gridSize.z; k ++ ) {
+
+							const index = i * gridSize.y * gridSize.z + j * gridSize.z + k;
+
+							const mesh = new THREE.Mesh( index % 2 === 0 ? geometry1 : geometry2, index % 2 === 0 ? material2.clone() : material1.clone() );
+							mesh.name = 'Sphere';
+							mesh.material.uniformsGroups = [ cameraUniformsGroup, lightingUniformsGroup ];
+							mesh.material.uniforms.modelMatrix.value = mesh.matrixWorld;
+							mesh.material.uniforms.normalMatrix.value = mesh.normalMatrix;
+							if ( index % 2 === 0 ) {
+
+								mesh.material.uniforms.diffuseMap.value = texture;
+			
+							} else {
+
+								mesh.material.uniforms.color.value = new THREE.Color( 0xffffff * Math.random() );
+			
+							}
+
+							scene.add( mesh );
+
+							const s = 1 + Math.random() * 0.5;
+							mesh.scale.x = s;
+							mesh.scale.y = s;
+							mesh.scale.z = s;
+
+							mesh.rotation.x = Math.random() * Math.PI;
+							mesh.rotation.y = Math.random() * Math.PI;
+							mesh.rotation.z = Math.random() * Math.PI;
+
+							mesh.position.x = i * spacing - ( gridSize.x * spacing ) / 2;
+							mesh.position.y = 0;
+							mesh.position.z = k * spacing - ( gridSize.z * spacing ) / 2;
+			
+						}
 
 					}
-
-					scene.add( mesh );
-
-					const s = 1 + Math.random() * 0.5;
-
-					mesh.scale.x = s;
-					mesh.scale.y = s;
-					mesh.scale.z = s;
-
-					mesh.rotation.x = Math.random() * Math.PI;
-					mesh.rotation.y = Math.random() * Math.PI;
-					mesh.rotation.z = Math.random() * Math.PI;
-
-					mesh.position.x = Math.random() * 40 - 20;
-					mesh.position.y = Math.random() * 40 - 20;
-					mesh.position.z = Math.random() * 20 - 10;
-
+			
 				}
 
 				//
@@ -325,7 +435,9 @@
 
 				requestAnimationFrame( animate );
 
+				renderer.clear();
 				const delta = clock.getDelta();
+				lightIndex += delta * 10;
 
 				scene.traverse( function ( child ) {
 
@@ -333,8 +445,8 @@
 
 						child.rotation.x += delta * 0.5;
 						child.rotation.y += delta * 0.3;
-
-					}
+			
+		}
 
 				} );
 
