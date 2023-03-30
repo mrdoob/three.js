@@ -15351,7 +15351,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		const isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl instanceof WebGL2RenderingContext;
+		const isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl.constructor.name === 'WebGL2RenderingContext';
 
 		let precision = parameters.precision !== undefined ? parameters.precision : 'highp';
 		const maxPrecision = getMaxPrecision( precision );
