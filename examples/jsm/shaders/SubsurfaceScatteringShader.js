@@ -39,13 +39,14 @@ const SubsurfaceScatteringShader = {
 	] ),
 
 	vertexShader: [
-		'#define USE_MAP',
-		'#define MAP_UV uv',
-		ShaderChunk[ 'meshphong_vert' ]
+		'#define USE_UV',
+		ShaderChunk[ 'meshphong_vert' ],
 	].join( '\n' ),
 
 	fragmentShader: [
-		'#define USE_MAP',
+		'#define USE_UV',
+		'#define SUBSURFACE',
+
 		meshphong_frag_head,
 
 		'uniform sampler2D thicknessMap;',
@@ -71,7 +72,10 @@ const SubsurfaceScatteringShader = {
 				'RE_Direct( directLight, geometry, material, reflectedLight );',
 				[
 					'RE_Direct( directLight, geometry, material, reflectedLight );',
-					'RE_Direct_Scattering(directLight, vMapUv, geometry, reflectedLight);',
+
+					'#if defined( SUBSURFACE ) && defined( USE_UV )',
+					' RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);',
+					'#endif',
 				].join( '\n' )
 			),
 
