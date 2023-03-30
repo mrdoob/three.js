@@ -527,7 +527,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
-			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.vertexUvs2 ? '#define USE_UV2' : '',
 
 			parameters.pointsUvs ? '#define USE_POINTS_UV' : '',
