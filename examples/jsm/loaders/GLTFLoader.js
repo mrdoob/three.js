@@ -1812,7 +1812,7 @@ class GLTFTextureTransformExtension {
 
 	extendTexture( texture, transform ) {
 
-		if ( ( transform.texCoord === undefined || transform.texCoord === texture.uvSet )
+		if ( ( transform.texCoord === undefined || transform.texCoord === texture.channel )
 			&& transform.offset === undefined
 			&& transform.rotation === undefined
 			&& transform.scale === undefined ) {
@@ -1826,7 +1826,7 @@ class GLTFTextureTransformExtension {
 
 		if ( transform.texCoord !== undefined ) {
 
-			texture.uvSet = transform.texCoord;
+			texture.channel = transform.texCoord;
 
 		}
 
@@ -3128,7 +3128,7 @@ class GLTFParser {
 			if ( mapDef.texCoord !== undefined && mapDef.texCoord > 0 ) {
 
 				texture = texture.clone();
-				texture.uvSet = mapDef.texCoord;
+				texture.channel = mapDef.texCoord;
 
 			}
 

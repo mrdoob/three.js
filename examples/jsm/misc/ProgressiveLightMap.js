@@ -36,7 +36,7 @@ class ProgressiveLightMap {
 		const format = /(Android|iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
 		this.progressiveLightMap1 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
 		this.progressiveLightMap2 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
-		this.progressiveLightMap2.texture.uvSet = 1;
+		this.progressiveLightMap2.texture.channel = 1;
 
 		// Inject some spicy new logic into a standard phong material
 		this.uvMat = new THREE.MeshPhongMaterial();
