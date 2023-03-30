@@ -248,8 +248,8 @@ function retargetClip( target, source, clip, options = {} ) {
 					if ( ! boneData.pos ) {
 
 						boneData.pos = {
-							times: new Float32Array( numFrames ),
-							values: new Float32Array( numFrames * 3 )
+							times: new Float32Array( numFrames + 1 ),
+							values: new Float32Array( ( numFrames + 1 ) * 3 )
 						};
 
 					}
@@ -274,9 +274,10 @@ function retargetClip( target, source, clip, options = {} ) {
 
 				if ( ! boneData.quat ) {
 
+					// `numFrames + 1` accomodate final keyframe
 					boneData.quat = {
-						times: new Float32Array( numFrames ),
-						values: new Float32Array( numFrames * 4 )
+						times: new Float32Array( numFrames + 1 ),
+						values: new Float32Array( ( numFrames + 1 ) * 4 )
 					};
 
 				}
@@ -289,11 +290,50 @@ function retargetClip( target, source, clip, options = {} ) {
 
 		}
 
-		mixer.update( delta );
+		// check for final keyframe
+		if ( i === numFrames - 1 ) {
+
+			mixer.update( Math.max( clip.duration - mixer.time, 0 ) );
+
+		} else {
+
+			mixer.update( delta );
+
+		}
 
 		source.updateMatrixWorld();
 
 	}
+
+	retarget( target, source, options );
+
+	// add boneData at final keyframe
+	for ( let j = 0; j < boneDatas.length; ++ j ) {
+
+		boneData = boneDatas[ j ];
+
+		if ( boneData ) {
+
+			if ( boneData.pos ) {
+
+				boneData.pos.times[ numFrames ] = clip.duration;
+
+				bone.position.toArray( boneData.pos.values, numFrames * 3 );
+
+			}
+
+			if ( boneData.quat ) {
+
+				boneData.quat.times[ numFrames ] = clip.duration;
+
+				bone.position.toArray( boneData.quat.values, numFrames * 4 );
+
+			}
+
+		}
+
+	}
+
 
 	for ( let i = 0; i < boneDatas.length; ++ i ) {
 

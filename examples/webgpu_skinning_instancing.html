@@ -29,7 +29,7 @@
 			import * as THREE from 'three';
 			import { mix, range, color, oscSine, timerLocal, toneMapping, MeshStandardNodeMaterial } from 'three/nodes';
 
-			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -71,14 +71,14 @@
 				camera.add( cameraLight );
 				scene.add( camera );
 
-				const loader = new FBXLoader();
-				loader.load( 'models/fbx/Samba Dancing.fbx', ( object ) => {
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
 
-					object.scale.setScalar( .01 );
+					const object = gltf.scene;
 
 					mixer = new THREE.AnimationMixer( object );
 
-					const action = mixer.clipAction( object.animations[ 0 ] );
+					const action = mixer.clipAction( gltf.animations[ 0 ] );
 					action.play();
 
 					const instanceCount = 30;
@@ -108,7 +108,7 @@
 							for ( let i = 0; i < instanceCount; i ++ ) {
 
 								dummy.position.x = - 200 + ( ( i % 5 ) * 70 );
-								dummy.position.z = Math.floor( i / 5 ) * - 200;
+								dummy.position.y = Math.floor( i / 5 ) * - 200;
 
 								dummy.updateMatrix();
 

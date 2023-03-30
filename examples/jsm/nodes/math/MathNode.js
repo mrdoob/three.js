@@ -104,7 +104,7 @@ class MathNode extends TempNode {
 
 			return builder.format( '-' + a.build( builder, inputType ), type, output );
 
-		} else if ( method === MathNode.INVERT ) {
+		} else if ( method === MathNode.ONE_MINUS ) {
 
 			return sub( 1.0, a ).build( builder, output );
 
@@ -213,7 +213,7 @@ MathNode.ABS = 'abs';
 MathNode.SIGN = 'sign';
 MathNode.LENGTH = 'length';
 MathNode.NEGATE = 'negate';
-MathNode.INVERT = 'invert';
+MathNode.ONE_MINUS = 'oneMinus';
 MathNode.DFDX = 'dFdx';
 MathNode.DFDY = 'dFdy';
 MathNode.ROUND = 'round';
@@ -254,7 +254,7 @@ export const exp2 = nodeProxy( MathNode, MathNode.EXP2 );
 export const log = nodeProxy( MathNode, MathNode.LOG );
 export const log2 = nodeProxy( MathNode, MathNode.LOG2 );
 export const sqrt = nodeProxy( MathNode, MathNode.SQRT );
-export const inversesqrt = nodeProxy( MathNode, MathNode.INVERSE_SQRT );
+export const inverseSqrt = nodeProxy( MathNode, MathNode.INVERSE_SQRT );
 export const floor = nodeProxy( MathNode, MathNode.FLOOR );
 export const ceil = nodeProxy( MathNode, MathNode.CEIL );
 export const normalize = nodeProxy( MathNode, MathNode.NORMALIZE );
@@ -269,7 +269,7 @@ export const abs = nodeProxy( MathNode, MathNode.ABS );
 export const sign = nodeProxy( MathNode, MathNode.SIGN );
 export const length = nodeProxy( MathNode, MathNode.LENGTH );
 export const negate = nodeProxy( MathNode, MathNode.NEGATE );
-export const invert = nodeProxy( MathNode, MathNode.INVERT );
+export const oneMinus = nodeProxy( MathNode, MathNode.ONE_MINUS );
 export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
 export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
 export const round = nodeProxy( MathNode, MathNode.ROUND );
@@ -293,9 +293,13 @@ export const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECT
 
 export const mix = nodeProxy( MathNode, MathNode.MIX );
 export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
+export const saturate = ( value ) => clamp( value );
 export const refract = nodeProxy( MathNode, MathNode.REFRACT );
 export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
-export const faceforward = nodeProxy( MathNode, MathNode.FACEFORWARD );
+export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
+
+export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
+export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
 
 addNodeElement( 'radians', radians );
 addNodeElement( 'degrees', degrees );
@@ -304,7 +308,7 @@ addNodeElement( 'exp2', exp2 );
 addNodeElement( 'log', log );
 addNodeElement( 'log2', log2 );
 addNodeElement( 'sqrt', sqrt );
-addNodeElement( 'inversesqrt', inversesqrt );
+addNodeElement( 'inverseSqrt', inverseSqrt );
 addNodeElement( 'floor', floor );
 addNodeElement( 'ceil', ceil );
 addNodeElement( 'normalize', normalize );
@@ -319,7 +323,7 @@ addNodeElement( 'abs', abs );
 addNodeElement( 'sign', sign );
 addNodeElement( 'length', length );
 addNodeElement( 'negate', negate );
-addNodeElement( 'invert', invert );
+addNodeElement( 'oneMinus', oneMinus );
 addNodeElement( 'dFdx', dFdx );
 addNodeElement( 'dFdy', dFdy );
 addNodeElement( 'round', round );
@@ -338,11 +342,12 @@ addNodeElement( 'pow2', pow2 );
 addNodeElement( 'pow3', pow3 );
 addNodeElement( 'pow4', pow4 );
 addNodeElement( 'transformDirection', transformDirection );
-addNodeElement( 'mix', mix );
+addNodeElement( 'mix', mixElement );
 addNodeElement( 'clamp', clamp );
 addNodeElement( 'refract', refract );
-addNodeElement( 'smoothstep', smoothstep );
-addNodeElement( 'faceforward', faceforward );
+addNodeElement( 'smoothstep', smoothstepElement );
+addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
+addNodeElement( 'saturate', saturate );
 
 addNodeClass( MathNode );

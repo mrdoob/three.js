@@ -209,7 +209,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -217,7 +217,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -297,7 +297,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import {BufferGeometryUtils} from 'three/addons/utils/BufferGeometryUtils.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-+import {TWEEN} from 'three/addons/libs/tween.min.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>然后创建一个<code class="notranslate" translate="no">Tween</code>来使influence变化</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest

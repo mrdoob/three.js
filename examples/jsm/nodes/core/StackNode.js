@@ -1,17 +1,22 @@
 import Node, { addNodeClass } from './Node.js';
 import { assign } from '../math/OperatorNode.js';
 import { bypass } from '../core/BypassNode.js';
-import { expression } from '../core/ExpressionNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { expression } from '../code/ExpressionNode.js';
+import { cond } from '../math/CondNode.js';
+import { nodeProxy, shader } from '../shadernode/ShaderNode.js';
 
 class StackNode extends Node {
 
-	constructor() {
+	constructor( parent = null ) {
 
 		super();
 
 		this.nodes = [];
 		this.outputNode = null;
+
+		this.parent = parent;
+
+		this._currentCond = null;
 
 		this.isStackNode = true;
 
@@ -26,6 +31,35 @@ class StackNode extends Node {
 	add( node ) {
 
 		this.nodes.push( bypass( expression(), node ) );
+
+		return this;
+
+	}
+
+	if( boolNode, method ) {
+
+		const methodNode = shader( method );
+		this._currentCond = cond( boolNode, methodNode );
+
+		return this.add( this._currentCond );
+
+	}
+
+	elseif( boolNode, method ) {
+
+		const methodNode = shader( method );
+		const ifNode = cond( boolNode, methodNode );
+
+		this._currentCond.elseNode = ifNode;
+		this._currentCond = ifNode;
+
+		return this;
+
+	}
+
+	else( method ) {
+
+		this._currentCond.elseNode = shader( method );
 
 		return this;
 

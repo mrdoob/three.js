@@ -335,7 +335,7 @@ function hsl(h, s, l) {
     });
   });
 
-+  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
++  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 +      geometries, false);
 +  const material = new THREE.MeshBasicMaterial({color:'red'});
 +  const mesh = new THREE.Mesh(mergedGeometry, material);
@@ -344,7 +344,7 @@ function hsl(h, s, l) {
 }
 </pre>
 <p>我们移除了之前用来改变盒子几何中心的代码, 取而代之的是<code class="notranslate" translate="no">originHelper</code>. 这次我们要为每个长方体创建新的几何体, 因为我们要使用“applyMatrix”来移动每个长方体几何体的顶点, 所以我们最好只移动一次, 而不是两次.</p>
-<p>最后, 我们将所有几何体的数组传入<code class="notranslate" translate="no">BufferGeometryUtils.mergeBufferGeometries</code>, 这个方法将会将其合并到一个mesh中</p>
+<p>最后, 我们将所有几何体的数组传入<code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code>, 这个方法将会将其合并到一个mesh中</p>
 <p>别忘了引入<code class="notranslate" translate="no">BufferGeometryUtils</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
@@ -409,7 +409,7 @@ data.forEach((row, latNdx) =&gt; {
 </pre>
 <p>上面的代码中, 我们查找几何体中的<code class="notranslate" translate="no">position</code>属性来获取所需的数量和顶点. 然后创建一个<code class="notranslate" translate="no">Uint8Array</code>来输入颜色. 接下来通过调用<code class="notranslate" translate="no">geometry.setAttribute</code>来将其设定为一个属性. </p>
 <p>最后告诉three.js使用顶点上色. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({

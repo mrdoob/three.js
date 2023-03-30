@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { timerLocal } from './TimerNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeObject, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class OscNode extends Node {
 
@@ -22,7 +22,7 @@ class OscNode extends Node {
 	construct() {
 
 		const method = this.method;
-		const timeNode = this.timeNode;
+		const timeNode = nodeObject( this.timeNode );
 
 		let outputNode = null;
 

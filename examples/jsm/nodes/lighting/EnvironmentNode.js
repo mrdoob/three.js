@@ -37,7 +37,7 @@ class EnvironmentNode extends LightingNode {
 				if ( reflectVec === undefined ) {
 
 					reflectVec = positionViewDirection.negate().reflect( transformedNormalView );
-					reflectVec = reflectVec.mix( transformedNormalView, roughness.mul( roughness ) ).normalize();
+					reflectVec = roughness.mul( roughness ).mix( reflectVec, transformedNormalView ).normalize();
 					reflectVec = reflectVec.transformDirection( cameraViewMatrix );
 
 				}
@@ -53,7 +53,7 @@ class EnvironmentNode extends LightingNode {
 						// @TODO: Needed PMREM
 
 						radianceTextureUVNode = equirectUV( reflectVec );
-						radianceTextureUVNode = vec2( radianceTextureUVNode.x, radianceTextureUVNode.y.invert() );
+						radianceTextureUVNode = vec2( radianceTextureUVNode.x, radianceTextureUVNode.y.oneMinus() );
 
 					}
 
@@ -92,7 +92,7 @@ class EnvironmentNode extends LightingNode {
 						// @TODO: Needed PMREM
 
 						irradianceTextureUVNode = equirectUV( transformedNormalWorld );
-						irradianceTextureUVNode = vec2( irradianceTextureUVNode.x, irradianceTextureUVNode.y.invert() );
+						irradianceTextureUVNode = vec2( irradianceTextureUVNode.x, irradianceTextureUVNode.y.oneMinus() );
 
 					}
 

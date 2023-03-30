@@ -27,9 +27,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { toneMapping, MeshStandardNodeMaterial } from 'three/nodes';
+			import { toneMapping } from 'three/nodes';
 
-			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -54,6 +54,7 @@
 				camera.position.set( 1, 2, 3 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 'lightblue' );
 				camera.lookAt( 0, 1, 0 );
 
 				clock = new THREE.Clock();
@@ -61,30 +62,18 @@
 				//lights
 
 				const light = new THREE.PointLight( 0xffffff, 1, 100 );
-				light.power = 1700; // 100W
+				light.power = 2500;
 				camera.add( light );
 				scene.add( camera );
 
-				const loader = new FBXLoader();
-				loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
 
-					object.scale.setScalar( .01 );
-
+					const object = gltf.scene;
 					mixer = new THREE.AnimationMixer( object );
 
-					const action = mixer.clipAction( object.animations[ 0 ] );
+					const action = mixer.clipAction( gltf.animations[ 0 ] );
 					action.play();
-
-					object.traverse( function ( child ) {
-
-						if ( child.isMesh ) {
-
-							child.material = new MeshStandardNodeMaterial();
-							child.material.roughness = .1;
-
-						}
-
-					} );
 
 					scene.add( object );
 

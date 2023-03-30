@@ -58,7 +58,7 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {TWEEN} from 'three/addons/libs/tween.module.min.js';
+import TWEEN from 'three/addons/libs/tween.module.js';
 
 class TweenManger {
   constructor() {
@@ -237,7 +237,7 @@ function main() {
       });
     });
 
-    return BufferGeometryUtils.mergeBufferGeometries(
+    return BufferGeometryUtils.mergeGeometries(
        geometries, false);
   }
 

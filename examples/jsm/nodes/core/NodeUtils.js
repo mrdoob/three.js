@@ -1,18 +1,22 @@
 import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
 
-export const getCacheKey = ( object ) => {
+export function getCacheKey( object ) {
 
 	let cacheKey = '{';
 
 	if ( object.isNode === true ) {
 
-		cacheKey += `uuid:"${ object.uuid }",`;
+		cacheKey += `uuid:"${ object.uuid }"`;
 
 	}
 
-	for ( const property of getNodesKeys( object ) ) {
+	for ( const { property, index, childNode } of getNodeChildren( object ) ) {
 
-		cacheKey += `${ property }:${ object[ property ].getCacheKey() },`;
+		// @TODO: Think about implement NodeArray and NodeObject.
+
+		let childCacheKey = getCacheKey( childNode );
+		if ( ! childCacheKey.includes( ',' ) ) childCacheKey = childCacheKey.slice( childCacheKey.indexOf( '"' ), childCacheKey.indexOf( '}' ) );
+		cacheKey += `,${ property }${ index !== undefined ? '/' + index : '' }:${ childCacheKey }`;
 
 	}
 
@@ -20,69 +24,112 @@ export const getCacheKey = ( object ) => {
 
 	return cacheKey;
 
-};
+}
 
-export const getNodesKeys = ( object ) => {
+export function* getNodeChildren( node, toJSON = false ) {
 
-	const props = [];
+	for ( const property in node ) {
 
-	for ( const name in object ) {
+		// Ignore private properties.
+		if ( property.startsWith( '_' ) === true ) continue;
 
-		const value = object[ name ];
+		const object = node[ property ];
 
-		if ( value && value.isNode === true ) {
+		if ( Array.isArray( object ) === true ) {
 
-			props.push( name );
+			for ( let i = 0; i < object.length; i ++ ) {
+
+				const child = object[ i ];
+
+				if ( child && ( child.isNode === true || toJSON && typeof child.toJSON === 'function' ) ) {
+
+					yield { property, index: i, childNode: child };
+
+				}
+
+			}
+
+		} else if ( object && object.isNode === true ) {
+
+			yield { property, childNode: object };
+
+		} else if ( typeof object === 'object' ) {
+
+			for ( const subProperty in object ) {
+
+				const child = object[ subProperty ];
+
+				if ( child && ( child.isNode === true || toJSON && typeof child.toJSON === 'function' ) ) {
+
+					yield { property, index: subProperty, childNode: child };
+
+				}
+
+			}
 
 		}
 
 	}
 
-	return props;
+}
 
-};
+export function getValueType( value ) {
 
-export const getValueType = ( value ) => {
+	if ( value === undefined || value === null ) return null;
 
-	if ( typeof value === 'number' ) {
+	const typeOf = typeof value;
+
+	if ( value.isNode === true ) {
+
+		return 'node';
+
+	} else if ( typeOf === 'number' ) {
 
 		return 'float';
 
-	} else if ( typeof value === 'boolean' ) {
+	} else if ( typeOf === 'boolean' ) {
 
 		return 'bool';
 
-	} else if ( value && value.isVector2 === true ) {
+	} else if ( typeOf === 'string' ) {
+
+		return 'string';
+
+	} else if ( value.isVector2 === true ) {
 
 		return 'vec2';
 
-	} else if ( value && value.isVector3 === true ) {
+	} else if ( value.isVector3 === true ) {
 
 		return 'vec3';
 
-	} else if ( value && value.isVector4 === true ) {
+	} else if ( value.isVector4 === true ) {
 
 		return 'vec4';
 
-	} else if ( value && value.isMatrix3 === true ) {
+	} else if ( value.isMatrix3 === true ) {
 
 		return 'mat3';
 
-	} else if ( value && value.isMatrix4 === true ) {
+	} else if ( value.isMatrix4 === true ) {
 
 		return 'mat4';
 
-	} else if ( value && value.isColor === true ) {
+	} else if ( value.isColor === true ) {
 
 		return 'color';
+
+	} else if ( value instanceof ArrayBuffer ) {
+
+		return 'ArrayBuffer';
 
 	}
 
 	return null;
 
-};
+}
 
-export const getValueFromType = ( type, ...params ) => {
+export function getValueFromType( type, ...params ) {
 
 	const last4 = type ? type.slice( - 4 ) : undefined;
 
@@ -118,8 +165,38 @@ export const getValueFromType = ( type, ...params ) => {
 
 		return params[ 0 ] || 0;
 
+	} else if ( type === 'string' ) {
+
+		return params[ 0 ] || '';
+
+	} else if ( type === 'ArrayBuffer' ) {
+
+		return base64ToArrayBuffer( params[ 0 ] );
+
 	}
 
 	return null;
 
-};
+}
+
+export function arrayBufferToBase64( arrayBuffer ) {
+
+	let chars = '';
+
+	const array = new Uint8Array( arrayBuffer );
+
+	for ( let i = 0; i < array.length; i ++ ) {
+
+		chars += String.fromCharCode( array[ i ] );
+
+	}
+
+	return btoa( chars );
+
+}
+
+export function base64ToArrayBuffer( base64 ) {
+
+	return Uint8Array.from( atob( base64 ), c => c.charCodeAt( 0 ) ).buffer;
+
+}

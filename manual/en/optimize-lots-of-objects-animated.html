@@ -250,7 +250,7 @@ the <code class="notranslate" translate="no">position</code> attribute from each
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -258,7 +258,7 @@ the <code class="notranslate" translate="no">position</code> attribute from each
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -357,7 +357,7 @@ because the original webgl globe uses
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-+import {TWEEN} from 'three/addons/libs/tween.min.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>And then create a <code class="notranslate" translate="no">Tween</code> to animate the influences.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest

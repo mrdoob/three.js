@@ -187,6 +187,20 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVideoTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleBaseClampToEdge( ${textureProperty}, ${textureProperty}_sampler, vec2<f32>( ${uvSnippet}.x, 1.0 - ${uvSnippet}.y ) )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.VideoTexture does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
 		if ( node.isNodeVarying === true && node.needsInterpolation === true ) {
@@ -537,7 +551,17 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				}
 
-				bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>;` );
+				const texture = uniform.node.value;
+
+				if ( texture.isVideoTexture === true ) {
+
+					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_external;` );
+
+				} else {
+
+					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>;` );
+
+				}
 
 			} else if ( uniform.type === 'cubeTexture' ) {
 
@@ -600,9 +624,8 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		for ( const shaderStage in shadersData ) {
 
-			let flow = '// code\n';
-			flow += `\t${ this.flowCode[ shaderStage ] }`;
-			flow += '\n\t';
+			let flow = '// code\n\n';
+			flow += this.flowCode[ shaderStage ];
 
 			const flowNodes = this.flowNodes[ shaderStage ];
 			const mainNode = flowNodes[ flowNodes.length - 1 ];
@@ -616,7 +639,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 					if ( flow.length > 0 ) flow += '\n';
 
-					flow += `\t// FLOW -> ${ slotName }\n\t`;
+					flow += `\t// flow -> ${ slotName }\n\t`;
 
 				}
 
@@ -624,7 +647,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				if ( node === mainNode && shaderStage !== 'compute' ) {
 
-					flow += '// FLOW RESULT\n\t';
+					flow += '// result\n\t';
 
 					if ( shaderStage === 'vertex' ) {
 

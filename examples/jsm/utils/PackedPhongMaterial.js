@@ -37,7 +37,6 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			ShaderChunk.common,
 			ShaderChunk.uv_pars_vertex,
-			ShaderChunk.uv2_pars_vertex,
 			ShaderChunk.displacementmap_pars_vertex,
 			ShaderChunk.envmap_pars_vertex,
 			ShaderChunk.color_pars_vertex,
@@ -116,13 +115,12 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			ShaderChunk.uv_vertex,
 
-			`#ifdef USE_UV
+			`#ifdef USE_MAP
 					#ifdef USE_PACKED_UV
-						vUv = decodeUV(vUv);
+						vMapUv = decodeUV(vMapUv);
 					#endif
 				#endif`,
 
-			ShaderChunk.uv2_vertex,
 			ShaderChunk.color_vertex,
 			ShaderChunk.morphcolor_vertex,
 

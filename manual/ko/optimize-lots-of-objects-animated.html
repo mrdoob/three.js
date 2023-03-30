@@ -208,7 +208,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 
   ...
 
--  const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
 -      geometries, false);
 -  const material = new THREE.MeshBasicMaterial({
 -    vertexColors: true,
@@ -216,7 +216,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 -  const mesh = new THREE.Mesh(mergedGeometry, material);
 -  scene.add(mesh);
 -  return mesh;
-+  return BufferGeometryUtils.mergeBufferGeometries(
++  return BufferGeometryUtils.mergeGeometries(
 +     geometries, false);
 }
 </pre>
@@ -297,7 +297,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import { BufferGeometryUtils } from 'three/addons/utils/BufferGeometryUtils.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-+import { TWEEN } from 'three/addons/libs/tween.min.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
 <p>그리고 <code class="notranslate" translate="no">Tween</code>으로 influence 속성에 애니메이션을 줍니다.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 선택한 데이터를 보여주고 나머지는 숨깁니다.

@@ -36,6 +36,16 @@
 		<h2>属性</h2>
 		<p>See the base [page:Mesh] class for common properties.</p>
 
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			当前 [name] 的外边界矩形。可以通过 [page:.computeBoundingBox]() 计算。默认值是 *null*。
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			当前 [name] 的外边界球形。可以通过 [page:.computeBoundingSphere]() 计算。默认值是 *null*。
+		</p>
+
 		<h3>[property:Integer count]</h3>
 		<p>
 			实例的数量。被传入到构造函数中的*count*表示mesh实例数量的最大值。
@@ -65,6 +75,18 @@
 
 		<h2>方法</h2>
 		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:undefined computeBoundingBox]()</h3>
+		<p>
+			计算当前几何体的的边界矩形，该操作会更新已有 [param:.boundingBox]。<br />
+			边界矩形不会默认计算，需要调用该接口指定计算边界矩形，否则保持默认值 *null*。
+		</p>
+
+		<h3>[method:undefined computeBoundingSphere]()</h3>
+		<p>
+			计算当前几何体的的边界球形，该操作会更新已有 [param:.boundingSphere]。<br />
+			边界球形不会默认计算，需要调用该接口指定计算边界球形，否则保持默认值 *null*。
+		</p>
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>

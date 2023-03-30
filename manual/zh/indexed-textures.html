@@ -265,7 +265,6 @@ const palette = [
         <pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
 #include &lt;color_pars_fragment&gt;
 #include &lt;uv_pars_fragment&gt;
-#include &lt;uv2_pars_fragment&gt;
 #include &lt;map_pars_fragment&gt;
 #include &lt;alphamap_pars_fragment&gt;
 #include &lt;aomap_pars_fragment&gt;
@@ -286,7 +285,7 @@ void main() {
     #include &lt;specularmap_fragment&gt;
     ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
     #ifdef USE_LIGHTMAP
-        reflectedLight.indirectDiffuse += texture2D( lightMap, vUv2 ).xyz * lightMapIntensity;
+        reflectedLight.indirectDiffuse += texture2D( lightMap, vLightMapUv ).xyz * lightMapIntensity;
     #else
         reflectedLight.indirectDiffuse += vec3( 1.0 );
     #endif

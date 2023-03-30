@@ -102,7 +102,7 @@
 				sphereGeometry = BufferGeometryUtils.mergeVertices( sphereGeometry );
 				boxGeometry = BufferGeometryUtils.mergeVertices( boxGeometry );
 
-				const combinedGeometry = BufferGeometryUtils.mergeBufferGeometries( [ sphereGeometry, boxGeometry ] );
+				const combinedGeometry = BufferGeometryUtils.mergeGeometries( [ sphereGeometry, boxGeometry ] );
 				const positionAttribute = combinedGeometry.getAttribute( 'position' );
 
 				const colors = [];
