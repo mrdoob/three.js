@@ -42,11 +42,19 @@ class Node {
 
 			if ( index !== undefined ) {
 
-				yield { childNode, replaceNode( node ) { self[ property ][ index ] = node; } };
+				yield { childNode, replaceNode( node ) {
+
+					self[ property ][ index ] = node;
+
+				} };
 
 			} else {
 
-				yield { childNode, replaceNode( node ) { self[ property ] = node; } };
+				yield { childNode, replaceNode( node ) {
+
+					self[ property ] = node;
+
+				} };
 
 			}
 
@@ -306,9 +314,9 @@ class Node {
 					for ( const subProperty in json.inputNodes[ property ] ) {
 
 						const uuid = json.inputNodes[ property ][ subProperty ];
-					
+
 						inputObject[ subProperty ] = nodes[ uuid ];
-					
+
 					}
 
 					this[ property ] = inputObject;

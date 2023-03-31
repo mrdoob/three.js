@@ -14,7 +14,6 @@ import * as MathUtils from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { Source } from './Source.js';
-import { deepClone } from '../utils.js';
 
 let textureId = 0;
 
@@ -36,6 +35,7 @@ class Texture extends EventDispatcher {
 		this.mipmaps = [];
 
 		this.mapping = mapping;
+		this.channel = 0;
 
 		this.wrapS = wrapS;
 		this.wrapT = wrapT;
@@ -110,6 +110,7 @@ class Texture extends EventDispatcher {
 		this.mipmaps = source.mipmaps.slice( 0 );
 
 		this.mapping = source.mapping;
+		this.channel = source.channel;
 
 		this.wrapS = source.wrapS;
 		this.wrapT = source.wrapT;
@@ -137,7 +138,7 @@ class Texture extends EventDispatcher {
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
-		this.userData = deepClone( source.userData );
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		this.needsUpdate = true;
 
@@ -169,6 +170,7 @@ class Texture extends EventDispatcher {
 			image: this.source.toJSON( meta ).uuid,
 
 			mapping: this.mapping,
+			channel: this.channel,
 
 			repeat: [ this.repeat.x, this.repeat.y ],
 			offset: [ this.offset.x, this.offset.y ],

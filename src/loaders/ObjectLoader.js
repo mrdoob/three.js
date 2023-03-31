@@ -638,6 +638,7 @@ class ObjectLoader extends Loader {
 				if ( data.name !== undefined ) texture.name = data.name;
 
 				if ( data.mapping !== undefined ) texture.mapping = parseConstant( data.mapping, TEXTURE_MAPPING );
+				if ( data.channel !== undefined ) texture.channel = data.channel;
 
 				if ( data.offset !== undefined ) texture.offset.fromArray( data.offset );
 				if ( data.repeat !== undefined ) texture.repeat.fromArray( data.repeat );

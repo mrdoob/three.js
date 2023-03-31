@@ -79,7 +79,11 @@ export function getValueType( value ) {
 
 	const typeOf = typeof value;
 
-	if ( typeOf === 'number' ) {
+	if ( value.isNode === true ) {
+
+		return 'node';
+
+	} else if ( typeOf === 'number' ) {
 
 		return 'float';
 
