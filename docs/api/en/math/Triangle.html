@@ -113,13 +113,16 @@
 		Calculate a [page:Plane plane] based on the triangle. .
 		</p>
 
-		<h3>[method:Vector2 getInterpolation]( [param:Vector3 point], [param:Vector2 v1] | [param:Vector3 v1] | [param:Vector4 v1], [param:Vector2 v2] | [param:Vector3 v2] | [param:Vector4 v3], [param:Vector2 v3] | [param:Vector3 v3] | [param:Vector4 v3], [param:Vector2 target] )</h3>
+		<h3>[method:Vector getInterpolation]( [param:Vector3 point], [param:Vector3 p1], [param:Vector3 p2], [param:Vector3 p3], [param:Vector v1], [param:Vector v2], [param:Vector v3], [param:Vector target] )</h3>
 		<p>
-		[page:Vector3 point] - The point on the triangle.<br />
-		[page:Vector2 v1] - The value of the triangle's first vertex.<br />
-		[page:Vector2 v2] - The value of the triangle's second vertex.<br />
-		[page:Vector2 v3] - The value of the triangle's third vertex.<br />
-		[page:Vector2 target] — the result will be copied into this Vector.<br /><br />
+		[page:Vector3 point] - Position of interpolated point.<br />
+		[page:Vector3 p1] - Position of first vertex.<br />
+		[page:Vector3 p2] - Position of second vertex.<br />
+		[page:Vector3 p3] - Position of third vertex.<br />
+		[page:Vector v1] - Value of first vertex.<br />
+		[page:Vector v2] - Value of second vertex.<br />
+		[page:Vector v3] - Value of third vertex.<br />
+		[page:Vector target] — Result will be copied into this Vector.<br /><br />
 
 		Returns the value barycentrically interpolated for the given point on the triangle.
 		</p>
