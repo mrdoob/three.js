@@ -1477,18 +1477,6 @@ function createElementNS( name ) {
 
 }
 
-function deepClone( value ) {
-
-	if ( typeof structuredClone === 'function' ) {
-
-		return structuredClone( value );
-
-	}
-
-	return JSON.parse( JSON.stringify( value ) );
-
-}
-
 function SRGBToLinear( c ) {
 
 	return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
@@ -1987,7 +1975,7 @@ class Texture extends EventDispatcher {
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
-		this.userData = deepClone( source.userData );
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		this.needsUpdate = true;
 
@@ -7883,7 +7871,7 @@ class Object3D extends EventDispatcher {
 		this.frustumCulled = source.frustumCulled;
 		this.renderOrder = source.renderOrder;
 
-		this.userData = deepClone( source.userData );
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		if ( recursive === true ) {
 
@@ -8703,7 +8691,7 @@ class Material extends EventDispatcher {
 
 		this.toneMapped = source.toneMapped;
 
-		this.userData = deepClone( source.userData );
+		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
 		return this;
 
@@ -11253,7 +11241,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// user data
 
-		this.userData = deepClone( source.userData );
+		this.userData = source.userData;
 
 		return this;
 
