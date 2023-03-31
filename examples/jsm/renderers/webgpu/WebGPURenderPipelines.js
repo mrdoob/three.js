@@ -12,7 +12,7 @@ class WebGPURenderPipelines {
 		this.bindings = null;
 
 		this.pipelines = [];
-		this.objectCache = new WeakMap();
+		this.cache = new WeakMap();
 
 		this.stages = {
 			vertex: new Map(),
@@ -21,29 +21,23 @@ class WebGPURenderPipelines {
 
 	}
 
-	get( object ) {
+	get( renderObject ) {
 
 		const device = this.device;
 
-		const cache = this._getCache( object );
+		const cache = this._getCache( renderObject );
 
 		let currentPipeline;
 
-		if ( this._needsUpdate( object, cache ) ) {
-
-			const material = object.material;
+		if ( this._needsUpdate( renderObject, cache ) ) {
 
 			// release previous cache
 
-			if ( cache.currentPipeline !== undefined ) {
-
-				this._releaseObject( object );
-
-			}
+			this._releasePipeline( renderObject );
 
 			// get shader
 
-			const nodeBuilder = this.nodes.get( object );
+			const nodeBuilder = this.nodes.get( renderObject );
 
 			// programmable stages
 
@@ -67,7 +61,7 @@ class WebGPURenderPipelines {
 
 			// determine render pipeline
 
-			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, object, nodeBuilder );
+			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, renderObject.object, nodeBuilder );
 			cache.currentPipeline = currentPipeline;
 
 			// keep track of all used times
@@ -75,10 +69,6 @@ class WebGPURenderPipelines {
 			currentPipeline.usedTimes ++;
 			stageVertex.usedTimes ++;
 			stageFragment.usedTimes ++;
-
-			// events
-
-			material.addEventListener( 'dispose', cache.dispose );
 
 		} else {
 
@@ -90,10 +80,16 @@ class WebGPURenderPipelines {
 
 	}
 
+	remove( renderObject ) {
+
+		this._releasePipeline( renderObject );
+
+	}
+
 	dispose() {
 
 		this.pipelines = [];
-		this.objectCache = new WeakMap();
+		this.cache = new WeakMap();
 		this.shaderModules = {
 			vertex: new Map(),
 			fragment: new Map()
@@ -161,27 +157,14 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getCache( object ) {
+	_getCache( renderObject ) {
 
-		let cache = this.objectCache.get( object );
+		let cache = this.cache.get( renderObject );
 
 		if ( cache === undefined ) {
 
-			cache = {
-
-				dispose: () => {
-
-					this._releaseObject( object );
-
-					this.objectCache.delete( object );
-
-					object.material.removeEventListener( 'dispose', cache.dispose );
-
-				}
-
-			};
-
-			this.objectCache.set( object, cache );
+			cache = {};
+			this.cache.set( renderObject, cache );
 
 		}
 
@@ -189,21 +172,13 @@ class WebGPURenderPipelines {
 
 	}
 
-	_releaseObject( object ) {
+	_releasePipeline( renderObject ) {
+		
+		const cache = this._getCache( renderObject );
 
-		const cache = this.objectCache.get( object );
+		const pipeline = cache.currentPipeline;
 
-		this._releasePipeline( cache.currentPipeline );
-		delete cache.currentPipeline;
-
-		this.nodes.remove( object );
-		this.bindings.remove( object );
-
-	}
-
-	_releasePipeline( pipeline ) {
-
-		if ( -- pipeline.usedTimes === 0 ) {
+		if ( pipeline && -- pipeline.usedTimes === 0 ) {
 
 			const pipelines = this.pipelines;
 
@@ -213,6 +188,8 @@ class WebGPURenderPipelines {
 
 			this._releaseStage( pipeline.stageVertex );
 			this._releaseStage( pipeline.stageFragment );
+
+			this.cache.delete( renderObject );
 
 		}
 
@@ -231,9 +208,7 @@ class WebGPURenderPipelines {
 
 	}
 
-	_needsUpdate( object, cache ) {
-
-		const material = object.material;
+	_needsUpdate( { material }, cache ) {
 
 		let needsUpdate = false;
 

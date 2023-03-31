@@ -1,17 +1,19 @@
 import { GPULoadOp, GPUStoreOp } from './constants.js';
-import { Color, Mesh, BoxGeometry, BackSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { context, vec2, oneMinus, texture, cubeTexture, transformDirection, positionWorld, modelWorldMatrix, viewportBottomLeft, equirectUV, MeshBasicNodeMaterial } from 'three/nodes';
+import { Color, Mesh, BoxGeometry, BackSide } from 'three';
+import { context, transformDirection, positionWorld, modelWorldMatrix, MeshBasicNodeMaterial } from 'three/nodes';
 
 let _clearAlpha;
 const _clearColor = new Color();
 
 class WebGPUBackground {
 
-	constructor( renderer ) {
+	constructor( renderer, properties ) {
 
 		this.renderer = renderer;
+		this.properties = properties;
 
 		this.boxMesh = null;
+		this.boxMeshNode = null;
 
 		this.forceClear = false;
 
@@ -26,7 +28,7 @@ class WebGPUBackground {
 	update( renderList, scene ) {
 
 		const renderer = this.renderer;
-		const background = ( scene.isScene === true ) ? scene.backgroundNode || scene.background : null;
+		const background = ( scene.isScene === true ) ? scene.backgroundNode || this.properties.get( scene ).backgroundNode || scene.background : null;
 
 		let forceClear = this.forceClear;
 
@@ -45,7 +47,10 @@ class WebGPUBackground {
 			_clearAlpha = 1;
 			forceClear = true;
 
-		} else if ( background.isNode === true || background.isTexture === true ) {
+		} else if ( background.isNode === true ) {
+
+			const sceneProperties = this.properties.get( scene );
+			const backgroundNode = background;
 
 			_clearColor.copy( renderer._clearColor );
 			_clearAlpha = renderer._clearAlpha;
@@ -54,42 +59,13 @@ class WebGPUBackground {
 
 			if ( boxMesh === null ) {
 
-				let node = null;
-
-				if ( background.isCubeTexture === true ) {
-
-					node = cubeTexture( background, transformDirection( positionWorld, modelWorldMatrix ) );
-
-				} else if ( background.isTexture === true ) {
-
-					let nodeUV = null;
-
-					if ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
-
-						const dirNode = transformDirection( positionWorld, modelWorldMatrix );
-
-						nodeUV = equirectUV( dirNode );
-						nodeUV = vec2( nodeUV.x, oneMinus( nodeUV.y ) );
-
-					} else {
-
-						nodeUV = viewportBottomLeft;
-
-					}
-
-					node = texture( background, nodeUV );
-
-				} else /*if ( background.isNode === true )*/ {
-
-					node = context( background, {
-						// @TODO: Add Texture2D support using node context
-						getUVNode: () => transformDirection( positionWorld, modelWorldMatrix )
-					} );
-
-				}
+				this.boxMeshNode = context( backgroundNode, {
+					// @TODO: Add Texture2D support using node context
+					getUVNode: () => transformDirection( positionWorld, modelWorldMatrix )
+				} );
 
 				const nodeMaterial = new MeshBasicNodeMaterial();
-				nodeMaterial.colorNode = node;
+				nodeMaterial.colorNode = this.boxMeshNode;
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
@@ -102,6 +78,18 @@ class WebGPUBackground {
 					this.matrixWorld.copyPosition( camera.matrixWorld );
 
 				};
+
+			}
+
+			const backgroundCacheKey = backgroundNode.getCacheKey();
+
+			if ( sceneProperties.backgroundMeshCacheKey !== backgroundCacheKey ) {
+
+				this.boxMeshNode.node = backgroundNode;
+
+				boxMesh.material.needsUpdate = true;
+
+				sceneProperties.backgroundMeshCacheKey = backgroundCacheKey;
 
 			}
 

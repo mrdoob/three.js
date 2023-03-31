@@ -27,6 +27,12 @@ class WebGPUProperties {
 
 	}
 
+	has( object ) {
+
+		this.properties.has( object );
+
+	}
+
 	dispose() {
 
 		this.properties = new WeakMap();
