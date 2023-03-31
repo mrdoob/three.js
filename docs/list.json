@@ -300,8 +300,8 @@
 			},
 
 			"Scenes": {
-				"Fog": "api/en/scenes/Fog",
-				"FogExp2": "api/en/scenes/FogExp2",
+				"RangeFog": "api/en/scenes/RangeFog",
+				"DensityFog": "api/en/scenes/DensityFog",
 				"Scene": "api/en/scenes/Scene"
 			},
 
