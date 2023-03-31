@@ -570,18 +570,18 @@ function Viewport( editor ) {
 
 	// fog
 
-	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
+	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity, fogSquared ) {
 
 		switch ( fogType ) {
 
 			case 'None':
 				scene.fog = null;
 				break;
-			case 'Fog':
-				scene.fog = new THREE.Fog( fogColor, fogNear, fogFar );
+			case 'RangeFog':
+				scene.fog = new THREE.RangeFog( fogColor, fogNear, fogFar );
 				break;
-			case 'FogExp2':
-				scene.fog = new THREE.FogExp2( fogColor, fogDensity );
+			case 'DensityFog':
+				scene.fog = new THREE.DensityFog( fogColor, fogDensity, fogSquared );
 				break;
 
 		}
@@ -590,18 +590,19 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.sceneFogSettingsChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
+	signals.sceneFogSettingsChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity, fogSquared ) {
 
 		switch ( fogType ) {
 
-			case 'Fog':
+			case 'RangeFog':
 				scene.fog.color.setHex( fogColor );
 				scene.fog.near = fogNear;
 				scene.fog.far = fogFar;
 				break;
-			case 'FogExp2':
+			case 'DensityFog':
 				scene.fog.color.setHex( fogColor );
 				scene.fog.density = fogDensity;
+				scene.fog.squared = fogSquared;
 				break;
 
 		}
