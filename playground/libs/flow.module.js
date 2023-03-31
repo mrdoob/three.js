@@ -3074,7 +3074,7 @@ class ContextMenu extends Menu {
 
 	constructor( target = null ) {
 
-		super( 'context', target );
+		super( 'context' );
 
 		this.events.context = [];
 
@@ -3264,9 +3264,9 @@ class ContextMenu extends Menu {
 
 class CircleMenu extends Menu {
 
-	constructor( target = null ) {
+	constructor() {
 
-		super( 'circle', target );
+		super( 'circle' );
 
 	}
 
