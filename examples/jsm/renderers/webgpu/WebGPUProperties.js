@@ -29,7 +29,7 @@ class WebGPUProperties {
 
 	has( object ) {
 
-		this.properties.has( object );
+		return this.properties.has( object );
 
 	}
 

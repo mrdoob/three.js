@@ -189,8 +189,6 @@ class WebGPURenderPipelines {
 			this._releaseStage( pipeline.stageVertex );
 			this._releaseStage( pipeline.stageFragment );
 
-			this.cache.delete( renderObject );
-
 		}
 
 	}

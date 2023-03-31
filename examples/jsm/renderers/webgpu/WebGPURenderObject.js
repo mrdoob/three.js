@@ -52,7 +52,6 @@ export default class WebGPURenderObject {
 
 		let cacheKey = '{';
 
-		cacheKey += 'version:' + material.version + ',';
 		cacheKey += 'material:' + this._materialCacheKey + ',';
 
 		if ( lightsNode ) cacheKey += 'lightsNode:' + lightsNode.getCacheKey() + ',';

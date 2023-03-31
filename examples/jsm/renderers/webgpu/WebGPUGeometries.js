@@ -79,7 +79,9 @@ class WebGPUGeometries {
 
 	has( renderObject ) {
 
-		return this.properties.has( renderObject ) && this.properties.get( renderObject ).initialized === true;
+		const geometry = renderObject.geometry;
+
+		return this.properties.has( geometry ) && this.properties.get( geometry ).initialized === true;
 
 	}
 
@@ -93,8 +95,7 @@ class WebGPUGeometries {
 
 	initGeometry( renderObject ) {
 
-		const { geometry } = renderObject;
-
+		const geometry = renderObject.geometry;
 		const geometryProperties = this.properties.get( geometry );
 
 		geometryProperties.initialized = true;
@@ -139,12 +140,13 @@ class WebGPUGeometries {
 	updateFrameAttributes( renderObject ) {
 
 		const frame = this.info.render.frame;
+		const geometry = renderObject.geometry;
 
-		if ( this.geometryFrame.get( renderObject ) !== frame ) {
+		if ( this.geometryFrame.get( geometry ) !== frame ) {
 
 			this.updateAttributes( renderObject );
 
-			this.geometryFrame.set( renderObject, frame );
+			this.geometryFrame.set( geometry, frame );
 
 		}
 
@@ -152,8 +154,7 @@ class WebGPUGeometries {
 
 	updateAttributes( renderObject ) {
 
-		const { geometry } = renderObject;
-
+		const geometry = renderObject.geometry;
 		const geometryAttributes = geometry.attributes;
 
 		for ( const name in geometryAttributes ) {

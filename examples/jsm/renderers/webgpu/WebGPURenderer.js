@@ -934,12 +934,11 @@ class WebGPURenderer {
 
 		}
 
-		if ( renderObjectProperties.cacheKey !== renderObject.getCacheKey() ) {
+		const cacheKey = renderObject.getCacheKey();
 
-			renderObject.material.needsUpdate = true;
+		if ( renderObjectProperties.cacheKey !== cacheKey ) {
 
-			// update cache key after needsUpdate
-			renderObjectProperties.cacheKey = renderObject.getCacheKey();
+			renderObjectProperties.cacheKey = cacheKey;
 
 			this._renderPipelines.remove( renderObject );
 			this._nodes.remove( renderObject );
