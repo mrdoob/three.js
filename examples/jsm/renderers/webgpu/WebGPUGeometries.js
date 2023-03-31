@@ -93,9 +93,9 @@ class WebGPUGeometries {
 
 	initGeometry( renderObject ) {
 
-		const geometryProperties = this.properties.get( geometry );
-
 		const { geometry } = renderObject;
+
+		const geometryProperties = this.properties.get( geometry );
 
 		geometryProperties.initialized = true;
 
