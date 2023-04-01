@@ -99,7 +99,7 @@ class WebGPURenderPipelines {
 
 		// check for existing pipeline
 
-		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, object, nodeBuilder );
+		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, object );
 
 		for ( let i = 0, il = pipelines.length; i < il; i ++ ) {
 
@@ -127,7 +127,7 @@ class WebGPURenderPipelines {
 
 	}
 
-	_computeCacheKey( stageVertex, stageFragment, object, nodeBuilder ) {
+	_computeCacheKey( stageVertex, stageFragment, object ) {
 
 		const material = object.material;
 		const utils = this.utils;
