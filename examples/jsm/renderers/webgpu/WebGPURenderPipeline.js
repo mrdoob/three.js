@@ -26,8 +26,7 @@ class WebGPURenderPipeline {
 
 	init( cacheKey, stageVertex, stageFragment, object, nodeBuilder ) {
 
-		const material = object.material;
-		const geometry = object.geometry;
+		const { material, geometry } = object;
 
 		// determine shader attributes
 

@@ -920,8 +920,6 @@ class WebGPURenderer {
 			const dispose = () => {
 
 				this._renderPipelines.remove( renderObject );
-				this._nodes.remove( renderObject );
-				this._bindings.remove( renderObject );
 				this._properties.remove( renderObject );
 
 				this._objects.remove( object, material, scene, camera, lightsNode );
@@ -941,8 +939,6 @@ class WebGPURenderer {
 			renderObjectProperties.cacheKey = cacheKey;
 
 			this._renderPipelines.remove( renderObject );
-			this._nodes.remove( renderObject );
-			this._bindings.remove( renderObject );
 
 		}
 

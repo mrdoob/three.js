@@ -24,12 +24,11 @@ class WebGPURenderPipelines {
 	get( renderObject ) {
 
 		const device = this.device;
-
 		const cache = this._getCache( renderObject );
 
-		let currentPipeline;
+		let currentPipeline = cache.currentPipeline;
 
-		if ( this._needsUpdate( renderObject, cache ) ) {
+		if ( this._needsUpdate( renderObject ) ) {
 
 			// release previous cache
 
@@ -70,10 +69,6 @@ class WebGPURenderPipelines {
 			stageVertex.usedTimes ++;
 			stageFragment.usedTimes ++;
 
-		} else {
-
-			currentPipeline = cache.currentPipeline;
-
 		}
 
 		return currentPipeline;
@@ -104,7 +99,7 @@ class WebGPURenderPipelines {
 
 		// check for existing pipeline
 
-		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, object );
+		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, object, nodeBuilder );
 
 		for ( let i = 0, il = pipelines.length; i < il; i ++ ) {
 
@@ -132,7 +127,7 @@ class WebGPURenderPipelines {
 
 	}
 
-	_computeCacheKey( stageVertex, stageFragment, object ) {
+	_computeCacheKey( stageVertex, stageFragment, object, nodeBuilder ) {
 
 		const material = object.material;
 		const utils = this.utils;
@@ -173,10 +168,14 @@ class WebGPURenderPipelines {
 	}
 
 	_releasePipeline( renderObject ) {
-		
+
 		const cache = this._getCache( renderObject );
 
 		const pipeline = cache.currentPipeline;
+		delete cache.currentPipeline;
+
+		this.nodes.remove( renderObject );
+		this.bindings.remove( renderObject );
 
 		if ( pipeline && -- pipeline.usedTimes === 0 ) {
 
@@ -206,9 +205,16 @@ class WebGPURenderPipelines {
 
 	}
 
-	_needsUpdate( { material }, cache ) {
+	_needsUpdate( renderObject ) {
+
+		const cache = this._getCache( renderObject );
+		const material = renderObject.material;
 
 		let needsUpdate = false;
+
+		// check pipeline state
+
+		if ( cache.currentPipeline === undefined ) needsUpdate = true;
 
 		// check material state
 
