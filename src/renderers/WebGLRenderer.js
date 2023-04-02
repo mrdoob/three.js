@@ -133,7 +133,7 @@ class WebGLRenderer {
 
 		// physically based shading
 
-		this.outputColorSpace = LinearSRGBColorSpace;
+		this.outputColorSpace = SRGBColorSpace;
 
 		// physical lights
 
