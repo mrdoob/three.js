@@ -88,7 +88,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.toneMappingExposure = .5;
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 

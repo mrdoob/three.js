@@ -141,7 +141,7 @@ import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const fov = 45;
   const aspect = 2;  // the canvas default
