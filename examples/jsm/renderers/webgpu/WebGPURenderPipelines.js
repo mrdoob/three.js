@@ -60,7 +60,7 @@ class WebGPURenderPipelines {
 
 			// determine render pipeline
 
-			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, renderObject.object, nodeBuilder );
+			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, renderObject );
 			cache.currentPipeline = currentPipeline;
 
 			// keep track of all used times
@@ -92,14 +92,14 @@ class WebGPURenderPipelines {
 
 	}
 
-	_acquirePipeline( stageVertex, stageFragment, object, nodeBuilder ) {
+	_acquirePipeline( stageVertex, stageFragment, renderObject ) {
 
 		let pipeline;
 		const pipelines = this.pipelines;
 
 		// check for existing pipeline
 
-		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, object );
+		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, renderObject );
 
 		for ( let i = 0, il = pipelines.length; i < il; i ++ ) {
 
@@ -117,7 +117,7 @@ class WebGPURenderPipelines {
 		if ( pipeline === undefined ) {
 
 			pipeline = new WebGPURenderPipeline( this.device, this.utils );
-			pipeline.init( cacheKey, stageVertex, stageFragment, object, nodeBuilder );
+			pipeline.init( cacheKey, stageVertex, stageFragment, renderObject, this.nodes.get( renderObject ) );
 
 			pipelines.push( pipeline );
 
@@ -127,9 +127,9 @@ class WebGPURenderPipelines {
 
 	}
 
-	_computeCacheKey( stageVertex, stageFragment, object ) {
+	_computeCacheKey( stageVertex, stageFragment, renderObject ) {
 
-		const material = object.material;
+		const { object, material } = renderObject;
 		const utils = this.utils;
 
 		const parameters = [
@@ -145,7 +145,7 @@ class WebGPURenderPipelines {
 			material.side,
 			utils.getSampleCount(),
 			utils.getCurrentEncoding(), utils.getCurrentColorFormat(), utils.getCurrentDepthStencilFormat(),
-			utils.getPrimitiveTopology( object )
+			utils.getPrimitiveTopology( object, material )
 		];
 
 		return parameters.join();
