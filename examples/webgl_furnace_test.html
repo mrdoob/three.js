@@ -122,7 +122,7 @@
 
 				const envScene = new THREE.Scene();
 				envScene.background = new THREE.Color( COLOR );
-				if ( renderer.outputEncoding === THREE.sRGBEncoding ) envScene.background.convertSRGBToLinear();
+				if ( renderer.outputColorSpace === THREE.SRGBColorSpace ) envScene.background.convertSRGBToLinear();
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				radianceMap = pmremGenerator.fromScene( envScene ).texture;
