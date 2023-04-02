@@ -15,6 +15,9 @@ import {
 	UnsignedByteType,
 	UnsignedIntType,
 	UnsignedInt248Type,
+	SRGBColorSpace,
+	sRGBEncoding,
+	LinearEncoding,
 } from '../../constants.js';
 
 class WebXRManager extends EventDispatcher {
@@ -291,7 +294,7 @@ class WebXRManager extends EventDispatcher {
 						{
 							format: RGBAFormat,
 							type: UnsignedByteType,
-							encoding: renderer.outputEncoding,
+							encoding: renderer.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding,
 							stencilBuffer: attributes.stencil
 						}
 					);
@@ -330,7 +333,7 @@ class WebXRManager extends EventDispatcher {
 							type: UnsignedByteType,
 							depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 							stencilBuffer: attributes.stencil,
-							encoding: renderer.outputEncoding,
+							encoding: renderer.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding,
 							samples: attributes.antialias ? 4 : 0
 						} );
 
