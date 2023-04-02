@@ -962,7 +962,7 @@ class ColladaLoader extends Loader {
 
 			let i, j, l;
 
-			// procces skin data for each vertex
+			// process skin data for each vertex
 
 			for ( i = 0, l = vcount.length; i < l; i ++ ) {
 
