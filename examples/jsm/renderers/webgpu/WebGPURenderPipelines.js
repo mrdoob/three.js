@@ -174,7 +174,6 @@ class WebGPURenderPipelines {
 		const pipeline = cache.currentPipeline;
 		delete cache.currentPipeline;
 
-		this.nodes.remove( renderObject );
 		this.bindings.remove( renderObject );
 
 		if ( pipeline && -- pipeline.usedTimes === 0 ) {
