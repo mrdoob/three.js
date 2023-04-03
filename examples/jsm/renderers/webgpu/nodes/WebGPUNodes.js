@@ -24,9 +24,9 @@ class WebGPUNodes {
 			nodeBuilder = new WebGPUNodeBuilder( renderObject.object, this.renderer );
 			nodeBuilder.material = renderObject.material;
 			nodeBuilder.lightsNode = renderObject.lightsNode;
-			nodeBuilder.environmentNode = renderObject.getEnvironmentNode();
-			nodeBuilder.fogNode = renderObject.getFogNode();
-			nodeBuilder.toneMappingNode = renderObject.getToneMappingNode();
+			nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
+			nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
+			nodeBuilder.toneMappingNode = this.getToneMappingNode();
 			nodeBuilder.build();
 
 			renderObjectProperties.nodeBuilder = nodeBuilder;
@@ -67,6 +67,42 @@ class WebGPUNodes {
 	updateFrame() {
 
 		this.nodeFrame.update();
+
+	}
+
+	getEnvironmentNode( scene ) {
+
+		return scene.environmentNode || this.properties.get( scene ).environmentNode || null;
+
+	}
+
+	getFogNode( scene ) {
+
+		return scene.fogNode || this.properties.get( scene ).fogNode || null;
+
+	}
+
+	getToneMappingNode() {
+
+		return this.renderer.toneMappingNode || this.properties.get( this.renderer ).toneMappingNode || null;
+
+	}
+
+
+	getCacheKey( scene, lightsNode ) {
+
+		const environmentNode = this.getEnvironmentNode( scene );
+		const fogNode = this.getFogNode( scene );
+		const toneMappingNode = this.getToneMappingNode();
+
+		const cacheKey = [];
+
+		if ( lightsNode ) cacheKey.push( 'lightsNode:' + lightsNode.getCacheKey() );
+		if ( environmentNode ) cacheKey.push( 'environmentNode:' + environmentNode.getCacheKey() );
+		if ( fogNode ) cacheKey.push( 'fogNode:' + fogNode.getCacheKey() );
+		if ( toneMappingNode ) cacheKey.push( 'toneMappingNode:' + toneMappingNode.getCacheKey() );
+
+		return '{' + cacheKey.join( ',' ) + '}';
 
 	}
 

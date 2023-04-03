@@ -220,9 +220,9 @@ class WebGPURenderer {
 		this._attributes = new WebGPUAttributes( device );
 		this._geometries = new WebGPUGeometries( this._attributes, this._properties, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info );
-		this._objects = new WebGPURenderObjects( this, this._properties, this._geometries, this._info );
 		this._utils = new WebGPUUtils( this );
 		this._nodes = new WebGPUNodes( this, this._properties );
+		this._objects = new WebGPURenderObjects( this, this._nodes, this._geometries, this._info );
 		this._computePipelines = new WebGPUComputePipelines( device, this._nodes );
 		this._renderPipelines = new WebGPURenderPipelines( device, this._nodes, this._utils );
 		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );

@@ -16,10 +16,10 @@ function getChainKeys( object, material, scene, camera, lightsNode ) {
 
 class WebGPURenderObjects {
 
-	constructor( renderer, properties, geometries, info ) {
+	constructor( renderer, nodes, geometries, info ) {
 
 		this.renderer = renderer;
-		this.properties = properties;
+		this.nodes = nodes;
 		this.geometries = geometries;
 		this.info = info;
 
@@ -35,7 +35,7 @@ class WebGPURenderObjects {
 
 		if ( renderObject === undefined ) {
 
-			renderObject = new WebGPURenderObject( this.renderer, this.properties, object, material, scene, camera, lightsNode );
+			renderObject = new WebGPURenderObject( this.renderer, this.nodes, object, material, scene, camera, lightsNode );
 
 			this.cache.set( chainKey, renderObject );
 

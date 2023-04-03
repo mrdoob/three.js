@@ -1,9 +1,9 @@
 export default class WebGPURenderObject {
 
-	constructor( renderer, properties, object, material, scene, camera, lightsNode ) {
+	constructor( renderer, nodes, object, material, scene, camera, lightsNode ) {
 
 		this.renderer = renderer;
-		this.properties = properties;
+		this.nodes = nodes;
 		this.object = object;
 		this.material = material;
 		this.scene = scene;
@@ -17,31 +17,9 @@ export default class WebGPURenderObject {
 
 	}
 
-	getEnvironmentNode() {
-
-		return this.scene.environmentNode || this.properties.get( this.scene ).environmentNode || null;
-
-	}
-
-	getFogNode() {
-
-		return this.scene.fogNode || this.properties.get( this.scene ).fogNode || null;
-
-	}
-
-	getToneMappingNode() {
-
-		return this.renderer.toneMappingNode || this.properties.get( this.renderer ).toneMappingNode || null;
-
-	}
-
 	getCacheKey() {
 
-		const material = this.material;
-		const lightsNode = this.lightsNode;
-		const environmentNode = this.getEnvironmentNode();
-		const fogNode = this.getFogNode();
-		const toneMappingNode = this.getToneMappingNode();
+		const { material, scene, lightsNode } = this;
 
 		if ( material.version !== this._materialVersion ) {
 
@@ -50,18 +28,12 @@ export default class WebGPURenderObject {
 
 		}
 
-		let cacheKey = '{';
+		const cacheKey = [];
 
-		cacheKey += 'material:' + this._materialCacheKey + ',';
+		cacheKey.push( 'material:' + this._materialCacheKey );
+		cacheKey.push( 'nodes:' + this.nodes.getCacheKey( scene, lightsNode ) );
 
-		if ( lightsNode ) cacheKey += 'lightsNode:' + lightsNode.getCacheKey() + ',';
-		if ( environmentNode ) cacheKey += 'environmentNode:' + environmentNode.getCacheKey() + ',';
-		if ( fogNode ) cacheKey += 'fogNode:' + fogNode.getCacheKey() + ',';
-		if ( toneMappingNode ) cacheKey += 'toneMappingNode:' + toneMappingNode.getCacheKey() + ',';
-
-		cacheKey += '}';
-
-		return cacheKey;
+		return '{' + cacheKey.join( ',' ) + '}';
 
 	}
 
