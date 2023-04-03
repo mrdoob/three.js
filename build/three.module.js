@@ -13501,7 +13501,7 @@ var logdepthbuf_pars_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_
 
 var logdepthbuf_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_EXT\n\t\tvFragDepth = 1.0 + gl_Position.w;\n\t\tvIsPerspective = float( isPerspectiveMatrix( projectionMatrix ) );\n\t#else\n\t\tif ( isPerspectiveMatrix( projectionMatrix ) ) {\n\t\t\tgl_Position.z = log2( max( EPSILON, gl_Position.w + 1.0 ) ) * logDepthBufFC - 1.0;\n\t\t\tgl_Position.z *= gl_Position.w;\n\t\t}\n\t#endif\n#endif";
 
-var map_fragment = "#ifdef USE_MAP\n\tvec4 sampledDiffuseColor = texture2D( map, vMapUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\tsampledDiffuseColor = vec4( mix( pow( sampledDiffuseColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), sampledDiffuseColor.rgb * 0.0773993808, vec3( lessThanEqual( sampledDiffuseColor.rgb, vec3( 0.04045 ) ) ) ), sampledDiffuseColor.w );\n\t#endif\n\tdiffuseColor *= sampledDiffuseColor;\n#endif";
+var map_fragment = "#ifdef USE_MAP\n\tdiffuseColor *= texture2D( map, vMapUv );\n#endif";
 
 var map_pars_fragment = "#ifdef USE_MAP\n\tuniform sampler2D map;\n#endif";
 
@@ -13595,7 +13595,7 @@ var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defin
 
 const vertex$h = "varying vec2 vUv;\nuniform mat3 uvTransform;\nvoid main() {\n\tvUv = ( uvTransform * vec3( uv, 1 ) ).xy;\n\tgl_Position = vec4( position.xy, 1.0, 1.0 );\n}";
 
-const fragment$h = "uniform sampler2D t2D;\nuniform float backgroundIntensity;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\ttexColor = vec4( mix( pow( texColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), texColor.rgb * 0.0773993808, vec3( lessThanEqual( texColor.rgb, vec3( 0.04045 ) ) ) ), texColor.w );\n\t#endif\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
+const fragment$h = "uniform sampler2D t2D;\nuniform float backgroundIntensity;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
 
 const vertex$g = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}";
 
@@ -19409,8 +19409,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
 
-			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
-
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
@@ -19976,8 +19974,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			normalMapObjectSpace: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
 			normalMapTangentSpace: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
 
-			decodeVideoTexture: HAS_MAP && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
-
 			metalnessMap: HAS_METALNESSMAP,
 			roughnessMap: HAS_ROUGHNESSMAP,
 
@@ -20282,12 +20278,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 15 );
 		if ( parameters.sheen )
 			_programLayers.enable( 16 );
-		if ( parameters.decodeVideoTexture )
-			_programLayers.enable( 17 );
 		if ( parameters.opaque )
-			_programLayers.enable( 18 );
+			_programLayers.enable( 17 );
 		if ( parameters.pointsUvs )
-			_programLayers.enable( 19 );
+			_programLayers.enable( 18 );
 
 		array.push( _programLayers.mask );
 
@@ -23772,7 +23766,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				glFormat = utils.convert( texture.format, texture.encoding );
 
 			let glType = utils.convert( texture.type ),
-				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding, texture.isVideoTexture );
+				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 			setTextureParameters( textureType, texture, supportsMips );
 
@@ -24995,7 +24989,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const format = texture.format;
 		const type = texture.type;
 
-		if ( texture.isCompressedTexture === true || texture.isVideoTexture === true || texture.format === _SRGBAFormat ) return image;
+		if ( texture.isCompressedTexture === true || texture.format === _SRGBAFormat ) return image;
 
 		if ( encoding !== LinearEncoding ) {
 
@@ -27106,10 +27100,15 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 	function update( uniformsGroup, program ) {
 
 		let buffer = buffers[ uniformsGroup.id ];
+		const size = uniformsGroup.__size;
 
-		if ( buffer === undefined ) {
+		if ( uniformsGroup.uniforms.length !== uniformsGroup.__cacheCount ) {
 
 			prepareUniformsGroup( uniformsGroup );
+
+		}
+
+		if ( buffer === undefined ) {
 
 			buffer = createBuffer( uniformsGroup );
 			buffers[ uniformsGroup.id ] = buffer;
@@ -27127,7 +27126,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		const frame = info.render.frame;
 
-		if ( updateList[ uniformsGroup.id ] !== frame ) {
+		if ( updateList[ uniformsGroup.id ] !== frame && size > 0 ) {
 
 			updateBufferData( uniformsGroup );
 
@@ -27145,7 +27144,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 		uniformsGroup.__bindingPointIndex = bindingPointIndex;
 
 		const buffer = gl.createBuffer();
-		const size = uniformsGroup.__size;
+		const size = uniformsGroup.__size * uniformsGroup.count;
 		const usage = uniformsGroup.usage;
 
 		gl.bindBuffer( 35345, buffer );
@@ -27170,7 +27169,9 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		}
 
-		console.error( 'THREE.WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.' );
+		console.error(
+			'THREE.WebGLRenderer: Maximum number of simultaneously usable uniforms groups reached.'
+		);
 
 		return 0;
 
@@ -27189,12 +27190,14 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 			const uniform = uniforms[ i ];
 
 			// partly update the buffer if necessary
+			if (
+				hasUniformChanged( uniform, i, cache ) === true ||
+				uniformsGroup.__sizeChanged === true
+			) {
 
-			if ( hasUniformChanged( uniform, i, cache ) === true ) {
-
-				const offset = uniform.__offset;
-
-				const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
+				const values = Array.isArray( uniform.value )
+					? uniform.value
+					: [ uniform.value ];
 
 				let arrayOffset = 0;
 
@@ -27204,10 +27207,10 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 					const info = getUniformSize( value );
 
-					if ( typeof value === 'number' ) {
+					if ( typeof value === 'number' || value instanceof Boolean ) {
 
 						uniform.__data[ 0 ] = value;
-						gl.bufferSubData( 35345, offset + arrayOffset, uniform.__data );
+						gl.bufferSubData( 35345, arrayOffset, uniform.__data );
 
 					} else if ( value.isMatrix3 ) {
 
@@ -27216,7 +27219,10 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 						uniform.__data[ 0 ] = value.elements[ 0 ];
 						uniform.__data[ 1 ] = value.elements[ 1 ];
 						uniform.__data[ 2 ] = value.elements[ 2 ];
-						uniform.__data[ 3 ] = value.elements[ 0 ];
+
+						// Conversion to 3x4 matrix
+						uniform.__data[ 3 ] = 0;
+
 						uniform.__data[ 4 ] = value.elements[ 3 ];
 						uniform.__data[ 5 ] = value.elements[ 4 ];
 						uniform.__data[ 6 ] = value.elements[ 5 ];
@@ -27236,11 +27242,31 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				}
 
-				gl.bufferSubData( 35345, offset, uniform.__data );
+				if ( uniform.__data && uniform.__data.length >= 0 ) {
+
+					uniformsGroup.__offsetNeedsUpdate.push( [
+						uniform.__offset,
+						uniform.__data,
+					] );
+
+				}
 
 			}
 
 		}
+
+		for ( let i = uniformsGroup.__offsetNeedsUpdate.length - 1; i >= 0; i -- ) {
+
+			const uniform = uniformsGroup.__offsetNeedsUpdate[ i ];
+			// 0 is offset, 1 is data
+
+			gl.bufferSubData( 35345, uniform[ 0 ], uniform[ 1 ] );
+
+			uniformsGroup.__offsetNeedsUpdate.pop();
+
+		}
+
+		uniformsGroup.__sizeChanged = false;
 
 		gl.bindBuffer( 35345, null );
 
@@ -27254,7 +27280,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// cache entry does not exist so far
 
-			if ( typeof value === 'number' ) {
+			if ( typeof value === 'number' || value instanceof Boolean ) {
 
 				cache[ index ] = value;
 
@@ -27280,7 +27306,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// compare current value with cached entry
 
-			if ( typeof value === 'number' ) {
+			if ( typeof value === 'number' || value instanceof Boolean ) {
 
 				if ( cache[ index ] !== value ) {
 
@@ -27291,7 +27317,9 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			} else {
 
-				const cachedObjects = Array.isArray( cache[ index ] ) ? cache[ index ] : [ cache[ index ] ];
+				const cachedObjects = Array.isArray( cache[ index ] )
+					? cache[ index ]
+					: [ cache[ index ] ];
 				const values = Array.isArray( value ) ? value : [ value ];
 
 				for ( let i = 0; i < cachedObjects.length; i ++ ) {
@@ -27332,10 +27360,12 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			const infos = {
 				boundary: 0, // bytes
-				storage: 0 // bytes
+				storage: 0, // bytes
 			};
 
-			const values = Array.isArray( uniform.value ) ? uniform.value : [ uniform.value ];
+			const values = Array.isArray( uniform.value )
+				? uniform.value
+				: [ uniform.value ];
 
 			for ( let j = 0, jl = values.length; j < jl; j ++ ) {
 
@@ -27350,9 +27380,14 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 			// the following two properties will be used for partial buffer updates
 
-			uniform.__data = new Float32Array( infos.storage / Float32Array.BYTES_PER_ELEMENT );
-			uniform.__offset = offset;
+			if ( ! uniform.__data ) {
 
+				uniform.__data = new Float32Array(
+					infos.storage / Float32Array.BYTES_PER_ELEMENT
+				);
+				uniform.__offset = offset;
+
+			}
 			//
 
 			if ( i > 0 ) {
@@ -27363,11 +27398,11 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 				// check for chunk overflow
 
-				if ( chunkOffset !== 0 && ( remainingSizeInChunk - infos.boundary ) < 0 ) {
+				if ( chunkOffset !== 0 && remainingSizeInChunk - infos.boundary < 0 ) {
 
 					// add padding and adjust offset
 
-					offset += ( chunkSize - chunkOffset );
+					offset += chunkSize - chunkOffset;
 					uniform.__offset = offset;
 
 				}
@@ -27382,12 +27417,21 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		chunkOffset = offset % chunkSize;
 
-		if ( chunkOffset > 0 ) offset += ( chunkSize - chunkOffset );
+		if ( chunkOffset > 0 ) offset += chunkSize - chunkOffset;
 
 		//
 
 		uniformsGroup.__size = offset;
-		uniformsGroup.__cache = {};
+
+		if ( ! uniformsGroup.__cache ) {
+
+			uniformsGroup.__cache = {};
+
+		}
+
+		const count = uniformsGroup.uniforms.length;
+		uniformsGroup.__cacheCount = count;
+		uniformsGroup.__sizeChanged = true;
 
 		return this;
 
@@ -27397,14 +27441,14 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 		const info = {
 			boundary: 0, // bytes
-			storage: 0 // bytes
+			storage: 0, // bytes
 		};
 
 		// determine sizes according to STD140
 
-		if ( typeof value === 'number' ) {
+		if ( typeof value === 'number' || value instanceof Boolean ) {
 
-			// float/int
+			// float/int/bool
 
 			info.boundary = 4;
 			info.storage = 4;
@@ -48347,7 +48391,7 @@ let id = 0;
 
 class UniformsGroup extends EventDispatcher {
 
-	constructor() {
+	constructor( count ) {
 
 		super();
 
@@ -48359,6 +48403,8 @@ class UniformsGroup extends EventDispatcher {
 
 		this.usage = StaticDrawUsage;
 		this.uniforms = [];
+		this.__offsetNeedsUpdate = [];
+		this.count = count !== undefined ? count : 1;
 
 	}
 
@@ -48372,9 +48418,26 @@ class UniformsGroup extends EventDispatcher {
 
 	remove( uniform ) {
 
+
+		// Handle promise subdata update for dynamic uniforms
+		if ( this.count > 0 && uniform && uniform.__offset !== undefined && uniform.__data.length >= 0 ) {
+
+			this.__offsetNeedsUpdate.push( [ uniform.__offset, uniform.__data.slice().fill( 0 ) ] );
+
+		}
+
+		// Cannot remove the last uniform or UBO will break (use a uniform buffer that is too small)
+		if ( this.uniforms.length === 1 ) {
+
+			return;
+
+		}
+
 		const index = this.uniforms.indexOf( uniform );
 
 		if ( index !== - 1 ) this.uniforms.splice( index, 1 );
+
+
 
 		return this;
 
