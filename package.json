@@ -90,7 +90,7 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
-    "concurrently": "^7.6.0",
+    "concurrently": "^8.0.0",
     "eslint": "^8.34.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.1.2",
