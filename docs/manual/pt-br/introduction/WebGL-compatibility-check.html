@@ -10,14 +10,14 @@
 		<h1>Compatibilidade WebGL</h1>
 		
 		<p>
-			Mesmo que isso esteja se tornando um problema cada vez menor, alguns dispositivos ou navegadores podem ainda não suportar WebGL. O método a seguir permite verificar se há suporte e exibe uma mensagem para o usuário se não existir.
-		</p>
-
-		<p>
-			Adicione [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js] ao seu JavaScript e execute o seguinte código antes de tentar renderizar qualquer coisa.
+			Mesmo que isso esteja se tornando um problema cada vez menor, alguns dispositivos ou navegadores podem ainda não suportar WebGL. 
+			O método a seguir permite verificar se há suporte e exibe uma mensagem para o usuário se não existir.
+			Importe o módulo de detecção de suporte WebGL e execute o seguinte antes de tentar renderizar qualquer coisa.
 		</p>
 
 		<code>
+		import WebGL from 'three/addons/capabilities/WebGL.js';
+
 		if ( WebGL.isWebGLAvailable() ) {
 
 			// Initiate function or other initializations here

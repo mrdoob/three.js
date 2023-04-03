@@ -11,13 +11,12 @@
 		<p>
 			아마 거의 문제가 되지 않을테지만, 몇몇 디바이스나 브라우저는 아직 WebGL을 지원하지 않습니다.
 			아래 메서드는 지원 여부를 체크해 가능한지 아닌지 메세지를 띄워줄 것입니다.
-		</p>
-
-		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js]를 스크립트에 추가하고 무언가를 렌더링하기 전에 아래 코드를 실행해보세요.
+			WebGL 지원 감지 모듈을 가져오고 렌더링을 시도하기 전에 다음을 실행하십시오.
 		</p>
 
 		<code>
+		import WebGL from 'three/addons/capabilities/WebGL.js';
+
 		if ( WebGL.isWebGLAvailable() ) {
 
 			// Initiate function or other initializations here
