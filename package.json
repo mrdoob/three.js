@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.151.2",
+  "version": "0.152.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.js",
@@ -90,21 +90,21 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
-    "concurrently": "^8.0.0",
-    "eslint": "^8.34.0",
+    "concurrently": "^8.0.1",
+    "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.1.2",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.27.5",
     "failonlyreporter": "^1.0.0",
-    "jimp": "^0.22.5",
+    "jimp": "^0.22.7",
     "pixelmatch": "^5.3.0",
-    "puppeteer-core": "^19.7.2",
+    "puppeteer-core": "^19.8.1",
     "qunit": "^2.19.4",
-    "rollup": "^3.17.2",
+    "rollup": "^3.20.2",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
-    "servez": "^1.14.1"
+    "servez": "^1.14.2"
   },
   "overrides": {
     "jpeg-js": "^0.4.4"
