@@ -8,17 +8,16 @@
 	</head>
 	<body>
 		<h1>Controllo compatibilità WebGL ([name])</h1>
-    <p>
-      Anche se questo sta diventano sempre meno un problema, alcuni dispositivi o browser potrebbero ancora non supportare WebGL.
-      Il seguente codice è utile per controllare se WebGL è supportato, infatti se non lo fosse viene mostrato un messaggio di errore all'utente.
+		<p>
+		Anche se questo sta diventano sempre meno un problema, alcuni dispositivi o browser potrebbero ancora non supportare WebGL.
+		Il seguente codice è utile per controllare se WebGL è supportato, infatti se non lo fosse viene mostrato un messaggio di errore all'utente.
+		Importa il modulo di rilevamento del supporto WebGL ed esegui quanto segue prima di tentare di eseguire il rendering di qualsiasi cosa.
 		</p>
 
-    <p>
-			Aggiungere il seguente link [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js]
-			al file javascript ed inserire il seguente codice prima di provare a renderizzare qualsiasi cosa:
-		</p>
 
 		<code>
+		import WebGL from 'three/addons/capabilities/WebGL.js';
+
 		if ( WebGL.isWebGLAvailable() ) {
 
 			// Avviare qui la funzione o altre inizializzazioni

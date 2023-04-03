@@ -701,7 +701,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				glFormat = utils.convert( texture.format, texture.encoding );
 
 			let glType = utils.convert( texture.type ),
-				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding, texture.isVideoTexture );
+				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 			setTextureParameters( textureType, texture, supportsMips );
 
@@ -1924,7 +1924,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const format = texture.format;
 		const type = texture.type;
 
-		if ( texture.isCompressedTexture === true || texture.isVideoTexture === true || texture.format === _SRGBAFormat ) return image;
+		if ( texture.isCompressedTexture === true || texture.format === _SRGBAFormat ) return image;
 
 		if ( encoding !== LinearEncoding ) {
 

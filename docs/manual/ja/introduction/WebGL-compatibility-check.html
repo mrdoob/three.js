@@ -10,13 +10,12 @@
 		<h1>[name]</h1>
 		<p>
 			問題が少なくなってきたとはいえ、端末やブラウザによってはWebGLに対応していない場合があります。以下の方法で、ブラウザがWebGLをサポートしているかどうかを確認し、サポートされていない場合はユーザーにメッセージを表示することができます。
-		</p>
-
-		<p>
-			javascriptのコードに[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js]を付け加えて、何かを描画する前に以下のコードを実行してください。
+			WebGL サポート検出モジュールをインポートし、レンダリングを試みる前に以下を実行します。
 		</p>
 
 		<code>
+		import WebGL from 'three/addons/capabilities/WebGL.js';
+
 		if ( WebGL.isWebGLAvailable() ) {
 
 			// Initiate function or other initializations here

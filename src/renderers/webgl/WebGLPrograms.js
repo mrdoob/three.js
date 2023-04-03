@@ -1,4 +1,4 @@
-import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, sRGBEncoding, NormalBlending } from '../../constants.js';
+import { BackSide, DoubleSide, CubeUVReflectionMapping, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping, LinearEncoding, NormalBlending } from '../../constants.js';
 import { Layers } from '../../core/Layers.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { WebGLShaderCache } from './WebGLShaderCache.js';
@@ -195,8 +195,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			normalMapObjectSpace: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
 			normalMapTangentSpace: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
-
-			decodeVideoTexture: HAS_MAP && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
 
 			metalnessMap: HAS_METALNESSMAP,
 			roughnessMap: HAS_ROUGHNESSMAP,
@@ -510,12 +508,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 15 );
 		if ( parameters.sheen )
 			_programLayers.enable( 16 );
-		if ( parameters.decodeVideoTexture )
-			_programLayers.enable( 17 );
 		if ( parameters.opaque )
-			_programLayers.enable( 18 );
+			_programLayers.enable( 17 );
 		if ( parameters.pointsUvs )
-			_programLayers.enable( 19 );
+			_programLayers.enable( 18 );
 
 		array.push( _programLayers.mask );
 
