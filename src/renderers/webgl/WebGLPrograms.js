@@ -270,7 +270,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			//
 
-			vertexTangents: !! geometry.attributes.tangent && ( HAS_NORMALMAP && HAS_ANISOTROPY ),
+			vertexTangents: !! geometry.attributes.tangent && ( HAS_NORMALMAP || HAS_ANISOTROPY ),
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
 			vertexUvs2: HAS_ATTRIBUTE_UV2,
