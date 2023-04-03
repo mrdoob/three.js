@@ -67,7 +67,7 @@ class WebGPUGeometries {
 	}
 
 	getIndex( geometry, wireframe = false ) {
- 
+
 		let index = geometry.index;
 
 		if ( wireframe ) {

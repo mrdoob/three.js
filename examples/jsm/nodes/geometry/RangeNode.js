@@ -1,49 +1,58 @@
-import Node from '../core/Node.js';
-import { attribute, float } from '../shadernode/ShaderNodeBaseElements.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { getValueType } from '../core/NodeUtils.js';
+import { attribute } from '../core/AttributeNode.js';
+import { nodeProxy, float } from '../shadernode/ShaderNode.js';
+
 import { MathUtils, InstancedBufferAttribute } from 'three';
 
 class RangeNode extends Node {
 
-	constructor( min, max ) {
+	constructor( minNode = float(), maxNode = float() ) {
 
 		super();
 
-		this.min = min;
-		this.max = max;
+		this.minNode = minNode;
+		this.maxNode = maxNode;
 
 	}
 
-	getVectorLength() {
+	getVectorLength( builder ) {
 
-		const min = this.min;
+		const minLength = builder.getTypeLength( getValueType( this.minNode.value ) );
+		const maxLength = builder.getTypeLength( getValueType( this.maxNode.value ) );
 
-		let length = 1;
-
-		if ( min.isVector2 ) length = 2;
-		else if ( min.isVector3 ) length = 3;
-		else if ( min.isVector4 ) length = 4;
-		else if ( min.isColor ) length = 3;
-
-		return length;
+		return minLength > maxLength ? minLength : maxLength;
 
 	}
 
 	getNodeType( builder ) {
 
-		return ( builder.object.isInstancedMesh === true ) ? builder.getTypeFromLength( this.getVectorLength() ) : 'float';
+		return builder.object.isInstancedMesh === true ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
 
 	}
 
 	construct( builder ) {
 
-		const { min, max } = this;
-		const { object, geometry } = builder;
+		const object = builder.object;
 
 		let output = null;
 
 		if ( object.isInstancedMesh === true ) {
 
-			const vectorLength = this.getVectorLength();
+			const geometry = builder.geometry;
+
+			let min = this.minNode.value;
+			let max = this.maxNode.value;
+
+			const minLength = builder.getTypeLength( getValueType( min ) );
+			const maxLength = builder.getTypeLength( getValueType( max ) );
+
+				 if ( minLength > maxLength && maxLength > 1 ) max = new min.constructor().fromArray( min.toArray() );
+			else if ( minLength > maxLength && maxLength === 1 ) max = new min.constructor().setScalar( max );
+			else if ( maxLength > minLength && minLength > 1 ) min = new max.constructor().fromArray( min.toArray() );
+			else if ( maxLength > minLength && minLength === 1 ) min = new max.constructor().setScalar( min );
+
+			const vectorLength = this.getVectorLength( builder );
 			const attributeName = 'node' + this.id;
 
 			const length = vectorLength * object.count;
@@ -107,3 +116,7 @@ class RangeNode extends Node {
 }
 
 export default RangeNode;
+
+export const range = nodeProxy( RangeNode );
+
+addNodeClass( RangeNode );

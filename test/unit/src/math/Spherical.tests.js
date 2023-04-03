@@ -4,7 +4,7 @@ import { Spherical } from '../../../../src/math/Spherical.js';
 import { Vector3 } from '../../../../src/math/Vector3.js';
 import {
 	eps
-} from './Constants.tests.js';
+} from '../../utils/math-constants.js';
 
 export default QUnit.module( 'Maths', () => {
 
@@ -13,16 +13,16 @@ export default QUnit.module( 'Maths', () => {
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
-			var a = new Spherical();
-			var radius = 10.0;
-			var phi = Math.acos( - 0.5 );
-			var theta = Math.sqrt( Math.PI ) * phi;
+			let a = new Spherical();
+			const radius = 10.0;
+			const phi = Math.acos( - 0.5 );
+			const theta = Math.sqrt( Math.PI ) * phi;
 
 			assert.strictEqual( a.radius, 1.0, 'Default values: check radius' );
 			assert.strictEqual( a.phi, 0, 'Default values: check phi' );
 			assert.strictEqual( a.theta, 0, 'Default values: check theta' );
 
-			var a = new Spherical( radius, phi, theta );
+			a = new Spherical( radius, phi, theta );
 			assert.strictEqual( a.radius, radius, 'Custom values: check radius' );
 			assert.strictEqual( a.phi, phi, 'Custom values: check phi' );
 			assert.strictEqual( a.theta, theta, 'Custom values: check theta' );
@@ -30,18 +30,12 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( 'isSpherical', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
 		QUnit.test( 'set', ( assert ) => {
 
-			var a = new Spherical();
-			var radius = 10.0;
-			var phi = Math.acos( - 0.5 );
-			var theta = Math.sqrt( Math.PI ) * phi;
+			const a = new Spherical();
+			const radius = 10.0;
+			const phi = Math.acos( - 0.5 );
+			const theta = Math.sqrt( Math.PI ) * phi;
 
 			a.set( radius, phi, theta );
 			assert.strictEqual( a.radius, radius, 'Check radius' );
@@ -52,11 +46,11 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'clone', ( assert ) => {
 
-			var radius = 10.0;
-			var phi = Math.acos( - 0.5 );
-			var theta = Math.sqrt( Math.PI ) * phi;
-			var a = new Spherical( radius, phi, theta );
-			var b = a.clone();
+			const radius = 10.0;
+			const phi = Math.acos( - 0.5 );
+			const theta = Math.sqrt( Math.PI ) * phi;
+			const a = new Spherical( radius, phi, theta );
+			const b = a.clone();
 
 			assert.propEqual( a, b, 'Check a and b are equal after clone()' );
 
@@ -67,11 +61,11 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'copy', ( assert ) => {
 
-			var radius = 10.0;
-			var phi = Math.acos( - 0.5 );
-			var theta = Math.sqrt( Math.PI ) * phi;
-			var a = new Spherical( radius, phi, theta );
-			var b = new Spherical().copy( a );
+			const radius = 10.0;
+			const phi = Math.acos( - 0.5 );
+			const theta = Math.sqrt( Math.PI ) * phi;
+			const a = new Spherical( radius, phi, theta );
+			const b = new Spherical().copy( a );
 
 			assert.propEqual( a, b, 'Check a and b are equal after copy()' );
 
@@ -82,11 +76,11 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'makeSafe', ( assert ) => {
 
-			var EPS = 0.000001; // from source
-			var tooLow = 0.0;
-			var tooHigh = Math.PI;
-			var justRight = 1.5;
-			var a = new Spherical( 1, tooLow, 0 );
+			const EPS = 0.000001; // from source
+			const tooLow = 0.0;
+			const tooHigh = Math.PI;
+			const justRight = 1.5;
+			const a = new Spherical( 1, tooLow, 0 );
 
 			a.makeSafe();
 			assert.strictEqual( a.phi, EPS, 'Check if small values are set to EPS' );
@@ -103,10 +97,10 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setFromVector3', ( assert ) => {
 
-			var a = new Spherical( 1, 1, 1 );
-			var b = new Vector3( 0, 0, 0 );
-			var c = new Vector3( Math.PI, 1, - Math.PI );
-			var expected = new Spherical( 4.554032147688322, 1.3494066171539107, 2.356194490192345 );
+			const a = new Spherical( 1, 1, 1 );
+			const b = new Vector3( 0, 0, 0 );
+			const c = new Vector3( Math.PI, 1, - Math.PI );
+			const expected = new Spherical( 4.554032147688322, 1.3494066171539107, 2.356194490192345 );
 
 			a.setFromVector3( b );
 			assert.strictEqual( a.radius, 0, 'Zero-length vector: check radius' );
@@ -114,6 +108,23 @@ export default QUnit.module( 'Maths', () => {
 			assert.strictEqual( a.theta, 0, 'Zero-length vector: check theta' );
 
 			a.setFromVector3( c );
+			assert.ok( Math.abs( a.radius - expected.radius ) <= eps, 'Normal vector: check radius' );
+			assert.ok( Math.abs( a.phi - expected.phi ) <= eps, 'Normal vector: check phi' );
+			assert.ok( Math.abs( a.theta - expected.theta ) <= eps, 'Normal vector: check theta' );
+
+		} );
+
+		QUnit.test( 'setFromCartesianCoords', ( assert ) => {
+
+			const a = new Spherical( 1, 1, 1 );
+			const expected = new Spherical( 4.554032147688322, 1.3494066171539107, 2.356194490192345 );
+
+			a.setFromCartesianCoords( 0, 0, 0 );
+			assert.strictEqual( a.radius, 0, 'Zero-length vector: check radius' );
+			assert.strictEqual( a.phi, 0, 'Zero-length vector: check phi' );
+			assert.strictEqual( a.theta, 0, 'Zero-length vector: check theta' );
+
+			a.setFromCartesianCoords( Math.PI, 1, - Math.PI );
 			assert.ok( Math.abs( a.radius - expected.radius ) <= eps, 'Normal vector: check radius' );
 			assert.ok( Math.abs( a.phi - expected.phi ) <= eps, 'Normal vector: check phi' );
 			assert.ok( Math.abs( a.theta - expected.theta ) <= eps, 'Normal vector: check theta' );

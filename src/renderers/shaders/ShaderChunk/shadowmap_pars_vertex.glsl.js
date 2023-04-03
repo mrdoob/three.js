@@ -2,8 +2,8 @@ export default /* glsl */`
 
 #if NUM_SPOT_LIGHT_COORDS > 0
 
-  uniform mat4 spotLightMatrix[ NUM_SPOT_LIGHT_COORDS ];
-  varying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];
+	uniform mat4 spotLightMatrix[ NUM_SPOT_LIGHT_COORDS ];
+	varying vec4 vSpotLightCoord[ NUM_SPOT_LIGHT_COORDS ];
 
 #endif
 

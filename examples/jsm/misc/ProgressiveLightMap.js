@@ -36,6 +36,7 @@ class ProgressiveLightMap {
 		const format = /(Android|iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
 		this.progressiveLightMap1 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
 		this.progressiveLightMap2 = new THREE.WebGLRenderTarget( this.res, this.res, { type: format } );
+		this.progressiveLightMap2.texture.channel = 1;
 
 		// Inject some spicy new logic into a standard phong material
 		this.uvMat = new THREE.MeshPhongMaterial();
@@ -45,17 +46,18 @@ class ProgressiveLightMap {
 			// Vertex Shader: Set Vertex Positions to the Unwrapped UV Positions
 			shader.vertexShader =
 				'#define USE_LIGHTMAP\n' +
+				'#define LIGHTMAP_UV uv2\n' +
 				shader.vertexShader.slice( 0, - 1 ) +
-				'	gl_Position = vec4((uv2 - 0.5) * 2.0, 1.0, 1.0); }';
+				'	gl_Position = vec4((LIGHTMAP_UV - 0.5) * 2.0, 1.0, 1.0); }';
 
 			// Fragment Shader: Set Pixels to average in the Previous frame's Shadows
 			const bodyStart = shader.fragmentShader.indexOf( 'void main() {' );
 			shader.fragmentShader =
-				'varying vec2 vUv2;\n' +
+				'#define USE_LIGHTMAP\n' +
 				shader.fragmentShader.slice( 0, bodyStart ) +
 				'	uniform sampler2D previousShadowMap;\n	uniform float averagingWindow;\n' +
 				shader.fragmentShader.slice( bodyStart - 1, - 1 ) +
-				`\nvec3 texelOld = texture2D(previousShadowMap, vUv2).rgb;
+				`\nvec3 texelOld = texture2D(previousShadowMap, vLightMapUv).rgb;
 				gl_FragColor.rgb = mix(texelOld, gl_FragColor.rgb, 1.0/averagingWindow);
 			}`;
 

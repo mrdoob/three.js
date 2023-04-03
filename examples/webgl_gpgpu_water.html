@@ -187,7 +187,6 @@
 
 			#include <common>
 			#include <uv_pars_vertex>
-			#include <uv2_pars_vertex>
 			#include <displacementmap_pars_vertex>
 			#include <envmap_pars_vertex>
 			#include <color_pars_vertex>
@@ -202,7 +201,6 @@
 				vec2 cellSize = vec2( 1.0 / WIDTH, 1.0 / WIDTH );
 
 				#include <uv_vertex>
-				#include <uv2_vertex>
 				#include <color_vertex>
 
 				// # include <beginnormal_vertex>
@@ -248,7 +246,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{

@@ -218,6 +218,8 @@ class SVGLoader extends Loader {
 
 			const d = node.getAttribute( 'd' );
 
+			if ( d === '' || d === 'none' ) return null;
+
 			// console.log( d );
 
 			const commands = d.match( /[a-df-z][^a-df-z]*/ig );
@@ -2382,7 +2384,7 @@ class SVGLoader extends Loader {
 
 	static pointsToStroke( points, style, arcDivisions, minDistance ) {
 
-		// Generates a stroke with some witdh around the given path.
+		// Generates a stroke with some width around the given path.
 		// The path can be open or closed (last point equals to first point)
 		// Param points: Array of Vector2D (the path). Minimum 2 points.
 		// Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.parse() in the path.userData.style object

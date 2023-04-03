@@ -23,9 +23,9 @@ class ShadowMesh extends Mesh {
 			opacity: 0.6,
 			depthWrite: false,
 			stencilWrite: true,
-            		stencilFunc: EqualStencilFunc,
-            		stencilRef: 0,
-            		stencilZPass: IncrementStencilOp
+			stencilFunc: EqualStencilFunc,
+			stencilRef: 0,
+			stencilZPass: IncrementStencilOp
 
 		} );
 

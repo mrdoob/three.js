@@ -13,27 +13,49 @@ float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;
 
 	#ifdef DOUBLE_SIDED
 
-		normal = normal * faceDirection;
+		normal *= faceDirection;
 
 	#endif
 
+#endif
+
+#ifdef USE_NORMALMAP_TANGENTSPACE
+
 	#ifdef USE_TANGENT
 
-		vec3 tangent = normalize( vTangent );
-		vec3 bitangent = normalize( vBitangent );
+		mat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
 
-		#ifdef DOUBLE_SIDED
+	#else
 
-			tangent = tangent * faceDirection;
-			bitangent = bitangent * faceDirection;
+		mat3 tbn = getTangentFrame( - vViewPosition, normal, vNormalMapUv );
 
-		#endif
+	#endif
 
-		#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+	#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )
 
-			mat3 vTBN = mat3( tangent, bitangent, normal );
+		tbn[0] *= faceDirection;
+		tbn[1] *= faceDirection;
 
-		#endif
+	#endif
+
+#endif
+
+#ifdef USE_CLEARCOAT_NORMALMAP
+
+	#ifdef USE_TANGENT
+
+		mat3 tbn2 = mat3( normalize( vTangent ), normalize( vBitangent ), normal );
+
+	#else
+
+		mat3 tbn2 = getTangentFrame( - vViewPosition, normal, vClearcoatNormalMapUv );
+
+	#endif
+
+	#if defined( DOUBLE_SIDED ) && ! defined( FLAT_SHADED )
+
+		tbn2[0] *= faceDirection;
+		tbn2[1] *= faceDirection;
 
 	#endif
 

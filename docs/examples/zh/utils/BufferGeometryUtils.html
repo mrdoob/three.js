@@ -13,6 +13,16 @@
 		一个包含 [page:BufferGeometry BufferGeometry] 实例的实用方法的类。
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { BufferGeometryUtils } from 'three/addons/utils/BufferGeometryUtils.js';
+		</code>
 
 		<h2>方法</h2>
 
@@ -74,7 +84,7 @@
 
 		</p>
 
-		<h3>[method:BufferAttribute mergeBufferAttributes]( [param:Array attributes] )</h3>
+		<h3>[method:BufferAttribute mergeAttributes]( [param:Array attributes] )</h3>
 		<p>
 		attributes -- 由 [page:BufferAttribute BufferAttribute] 实例组成的数组。<br /><br />
 
@@ -83,7 +93,7 @@
 
 		</p>
 
-		<h3>[method:BufferGeometry mergeBufferGeometries]( [param:Array geometries], [param:Boolean useGroups] )</h3>
+		<h3>[method:BufferGeometry mergeGeometries]( [param:Array geometries], [param:Boolean useGroups] )</h3>
 		<p>
 		geometries -- 由 [page:BufferGeometry BufferGeometry] 实例的数组。<br />
 		useGroups -- 是否要为了合并几何体而产生组。<br /><br />

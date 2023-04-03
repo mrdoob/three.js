@@ -1,7 +1,8 @@
 /* global QUnit */
 
-import { Object3D } from '../../../../src/core/Object3D.js';
 import { Bone } from '../../../../src/objects/Bone.js';
+
+import { Object3D } from '../../../../src/core/Object3D.js';
 
 export default QUnit.module( 'Objects', () => {
 
@@ -10,23 +11,41 @@ export default QUnit.module( 'Objects', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var bone = new Bone();
-
-			assert.strictEqual( bone instanceof Object3D, true, 'Bone extends from Object3D' );
+			const bone = new Bone();
+			assert.strictEqual(
+				bone instanceof Object3D, true,
+				'Bone extends from Object3D'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Bone();
+			assert.ok( object, 'Can instantiate a Bone.' );
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isBone', ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new Bone();
+			assert.ok(
+				object.type === 'Bone',
+				'Bone.type should be Bone'
+			);
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isBone', ( assert ) => {
+
+			const object = new Bone();
+			assert.ok(
+				object.isBone,
+				'Bone.isBone should be true'
+			);
 
 		} );
 

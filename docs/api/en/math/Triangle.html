@@ -113,15 +113,18 @@
 		Calculate a [page:Plane plane] based on the triangle. .
 		</p>
 
-		<h3>[method:Vector2 getUV]( [param:Vector3 point], [param:Vector2 uv1], [param:Vector2 uv2], [param:Vector2 uv3], [param:Vector2 target] )</h3>
+		<h3>[method:Vector getInterpolation]( [param:Vector3 point], [param:Vector3 p1], [param:Vector3 p2], [param:Vector3 p3], [param:Vector v1], [param:Vector v2], [param:Vector v3], [param:Vector target] )</h3>
 		<p>
-		[page:Vector3 point] - The point on the triangle.<br />
-		[page:Vector2 uv1] - The uv coordinate of the triangle's first vertex.<br />
-		[page:Vector2 uv2] - The uv coordinate of the triangle's second vertex.<br />
-		[page:Vector2 uv3] - The uv coordinate of the triangle's third vertex.<br />
-		[page:Vector2 target] — the result will be copied into this Vector2.<br /><br />
+		[page:Vector3 point] - Position of interpolated point.<br />
+		[page:Vector3 p1] - Position of first vertex.<br />
+		[page:Vector3 p2] - Position of second vertex.<br />
+		[page:Vector3 p3] - Position of third vertex.<br />
+		[page:Vector v1] - Value of first vertex.<br />
+		[page:Vector v2] - Value of second vertex.<br />
+		[page:Vector v3] - Value of third vertex.<br />
+		[page:Vector target] — Result will be copied into this Vector.<br /><br />
 
-		Returns the uv coordinates for the given point on the triangle.
+		Returns the value barycentrically interpolated for the given point on the triangle.
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>

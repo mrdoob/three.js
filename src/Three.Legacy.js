@@ -1,6 +1,3 @@
-import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
-import { DataArrayTexture } from './textures/DataArrayTexture.js';
-import { Data3DTexture } from './textures/Data3DTexture.js';
 import { BoxGeometry } from './geometries/BoxGeometry.js';
 import { CapsuleGeometry } from './geometries/CapsuleGeometry.js';
 import { CircleGeometry } from './geometries/CircleGeometry.js';
@@ -21,57 +18,7 @@ import { TorusGeometry } from './geometries/TorusGeometry.js';
 import { TorusKnotGeometry } from './geometries/TorusKnotGeometry.js';
 import { TubeGeometry } from './geometries/TubeGeometry.js';
 
-// r134, d65e0af06644fe5a84a6fc0e372f4318f95a04c0
-
-export function ImmediateRenderObject() {
-
-	console.error( 'THREE.ImmediateRenderObject has been removed.' );
-
-}
-
-// r138, 48b05d3500acc084df50be9b4c90781ad9b8cb17
-
-export class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
-
-	constructor( width, height, options ) {
-
-		console.error( 'THREE.WebGLMultisampleRenderTarget has been removed. Use a normal render target and set the "samples" property to greater 0 to enable multisampling.' );
-		super( width, height, options );
-		this.samples = 4;
-
-	}
-
-}
-
-// r138, f9cd9cab03b7b64244e304900a3a2eeaa3a588ce
-
-export class DataTexture2DArray extends DataArrayTexture {
-
-	constructor( data, width, height, depth ) {
-
-		console.warn( 'THREE.DataTexture2DArray has been renamed to DataArrayTexture.' );
-		super( data, width, height, depth );
-
-	}
-
-}
-
-// r138, f9cd9cab03b7b64244e304900a3a2eeaa3a588ce
-
-export class DataTexture3D extends Data3DTexture {
-
-	constructor( data, width, height, depth ) {
-
-		console.warn( 'THREE.DataTexture3D has been renamed to Data3DTexture.' );
-		super( data, width, height, depth );
-
-	}
-
-}
-
-// r144
-
-export class BoxBufferGeometry extends BoxGeometry {
+export class BoxBufferGeometry extends BoxGeometry { // @deprecated, r144
 
 	constructor( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
@@ -83,9 +30,7 @@ export class BoxBufferGeometry extends BoxGeometry {
 
 }
 
-// r144
-
-export class CapsuleBufferGeometry extends CapsuleGeometry {
+export class CapsuleBufferGeometry extends CapsuleGeometry { // @deprecated, r144
 
 	constructor( radius, length, capSegments, radialSegments ) {
 
@@ -96,9 +41,7 @@ export class CapsuleBufferGeometry extends CapsuleGeometry {
 
 }
 
-// r144
-
-export class CircleBufferGeometry extends CircleGeometry {
+export class CircleBufferGeometry extends CircleGeometry { // @deprecated, r144
 
 	constructor( radius, segments, thetaStart, thetaLength ) {
 
@@ -109,9 +52,7 @@ export class CircleBufferGeometry extends CircleGeometry {
 
 }
 
-// r144
-
-export class ConeBufferGeometry extends ConeGeometry {
+export class ConeBufferGeometry extends ConeGeometry { // @deprecated, r144
 
 	constructor( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -122,9 +63,7 @@ export class ConeBufferGeometry extends ConeGeometry {
 
 }
 
-// r144
-
-export class CylinderBufferGeometry extends CylinderGeometry {
+export class CylinderBufferGeometry extends CylinderGeometry { // @deprecated, r144
 
 	constructor( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
 
@@ -135,9 +74,7 @@ export class CylinderBufferGeometry extends CylinderGeometry {
 
 }
 
-// r144
-
-export class DodecahedronBufferGeometry extends DodecahedronGeometry {
+export class DodecahedronBufferGeometry extends DodecahedronGeometry { // @deprecated, r144
 
 	constructor( radius, detail ) {
 
@@ -148,9 +85,7 @@ export class DodecahedronBufferGeometry extends DodecahedronGeometry {
 
 }
 
-// r144
-
-export class ExtrudeBufferGeometry extends ExtrudeGeometry {
+export class ExtrudeBufferGeometry extends ExtrudeGeometry { // @deprecated, r144
 
 	constructor( shapes, options ) {
 
@@ -161,9 +96,7 @@ export class ExtrudeBufferGeometry extends ExtrudeGeometry {
 
 }
 
-// r144
-
-export class IcosahedronBufferGeometry extends IcosahedronGeometry {
+export class IcosahedronBufferGeometry extends IcosahedronGeometry { // @deprecated, r144
 
 	constructor( radius, detail ) {
 
@@ -174,9 +107,7 @@ export class IcosahedronBufferGeometry extends IcosahedronGeometry {
 
 }
 
-// r144
-
-export class LatheBufferGeometry extends LatheGeometry {
+export class LatheBufferGeometry extends LatheGeometry { // @deprecated, r144
 
 	constructor( points, segments, phiStart, phiLength ) {
 
@@ -187,9 +118,7 @@ export class LatheBufferGeometry extends LatheGeometry {
 
 }
 
-// r144
-
-export class OctahedronBufferGeometry extends OctahedronGeometry {
+export class OctahedronBufferGeometry extends OctahedronGeometry { // @deprecated, r144
 
 	constructor( radius, detail ) {
 
@@ -200,9 +129,7 @@ export class OctahedronBufferGeometry extends OctahedronGeometry {
 
 }
 
-// r144
-
-export class PlaneBufferGeometry extends PlaneGeometry {
+export class PlaneBufferGeometry extends PlaneGeometry { // @deprecated, r144
 
 	constructor( width, height, widthSegments, heightSegments ) {
 
@@ -213,9 +140,7 @@ export class PlaneBufferGeometry extends PlaneGeometry {
 
 }
 
-// r144
-
-export class PolyhedronBufferGeometry extends PolyhedronGeometry {
+export class PolyhedronBufferGeometry extends PolyhedronGeometry { // @deprecated, r144
 
 	constructor( vertices, indices, radius, detail ) {
 
@@ -226,9 +151,7 @@ export class PolyhedronBufferGeometry extends PolyhedronGeometry {
 
 }
 
-// r144
-
-export class RingBufferGeometry extends RingGeometry {
+export class RingBufferGeometry extends RingGeometry { // @deprecated, r144
 
 	constructor( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
 
@@ -239,9 +162,7 @@ export class RingBufferGeometry extends RingGeometry {
 
 }
 
-// r144
-
-export class ShapeBufferGeometry extends ShapeGeometry {
+export class ShapeBufferGeometry extends ShapeGeometry { // @deprecated, r144
 
 	constructor( shapes, curveSegments ) {
 
@@ -252,9 +173,7 @@ export class ShapeBufferGeometry extends ShapeGeometry {
 
 }
 
-// r144
-
-export class SphereBufferGeometry extends SphereGeometry {
+export class SphereBufferGeometry extends SphereGeometry { // @deprecated, r144
 
 	constructor( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
@@ -265,9 +184,7 @@ export class SphereBufferGeometry extends SphereGeometry {
 
 }
 
-// r144
-
-export class TetrahedronBufferGeometry extends TetrahedronGeometry {
+export class TetrahedronBufferGeometry extends TetrahedronGeometry { // @deprecated, r144
 
 	constructor( radius, detail ) {
 
@@ -278,9 +195,7 @@ export class TetrahedronBufferGeometry extends TetrahedronGeometry {
 
 }
 
-// r144
-
-export class TorusBufferGeometry extends TorusGeometry {
+export class TorusBufferGeometry extends TorusGeometry { // @deprecated, r144
 
 	constructor( radius, tube, radialSegments, tubularSegments, arc ) {
 
@@ -291,9 +206,7 @@ export class TorusBufferGeometry extends TorusGeometry {
 
 }
 
-// r144
-
-export class TorusKnotBufferGeometry extends TorusKnotGeometry {
+export class TorusKnotBufferGeometry extends TorusKnotGeometry { // @deprecated, r144
 
 	constructor( radius, tube, tubularSegments, radialSegments, p, q ) {
 
@@ -304,9 +217,7 @@ export class TorusKnotBufferGeometry extends TorusKnotGeometry {
 
 }
 
-// r144
-
-export class TubeBufferGeometry extends TubeGeometry {
+export class TubeBufferGeometry extends TubeGeometry { // @deprecated, r144
 
 	constructor( path, tubularSegments, radius, radialSegments, closed ) {
 
@@ -316,5 +227,3 @@ export class TubeBufferGeometry extends TubeGeometry {
 	}
 
 }
-
-

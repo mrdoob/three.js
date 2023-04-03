@@ -117,6 +117,16 @@
 			La matrice di base che viene utilizzata per reimpostare le trasformazioni ossee vincolate.
 		</p>
 
+		<h3>[property:Box3 boundingBox]</h3>
+		<p>
+			Bounding box per la [name], che può essere calcolato con [page:.computeBoundingBox](). Il valore predefinito è `null`.
+		</p>
+
+		<h3>[property:Sphere boundingSphere]</h3>
+		<p>
+			Bounding sphere per la [name], che può essere calcolato con [page:.computeBoundingSphere](). Il valore predefinito è `null`.
+		</p>
+
 		<h3>[property:Boolean isSkinnedMesh]</h3>
 		<p>
 			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
@@ -144,6 +154,20 @@
 			Questo metodo attualmente non clona correttamente un'istanza di [name]. Si prega di utilizzare [page:SkeletonUtils.clone]() nel frattempo.
 		</p>
 
+		<h3>[method:undefined computeBoundingBox]()</h3>
+		<p>
+		Computes the bounding box, updating [page:.boundingBox] attribute.<br />
+		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are `null`.
+		If an instance of [name] is animated, this method should be called per frame to compute a correct bounding box.
+		</p>
+
+		<h3>[method:undefined computeBoundingSphere]()</h3>
+		<p>
+		Computes the bounding sphere, updating [page:.boundingSphere] attribute.<br />
+		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are `null`.
+		If an instance of [name] is animated, this method should be called per frame to compute a correct bounding sphere.
+		</p>
+
 		<h3>[method:undefined normalizeSkinWeights]()</h3>
 		<p>
 			Normalizza i pesi della skin.
@@ -154,15 +178,9 @@
 			Questo metodo imposta la skinned mesh nella posa di riposo (reimposta la posa).
 		</p>
 
-		<h3>[method:Vector3 boneTransform]( [param:Integer index], [param:Vector3 target] )</h3>
+		<h3>[method:Vector3 applyBoneTransform]( [param:Integer index], [param:Vector3 vector] )</h3>
 		<p>
-			Calcola la posizione del vertice in corrispondenza dell'indice specificato rispetto alle attuali trasformazioni ossee.
-			Il vettore target deve essere inizializzato con le coordinate del vertice prima della trasformazione:
-		<code>
-const target = new THREE.Vector3();
-target.fromBufferAttribute( mesh.geometry.attributes.position, index );
-mesh.boneTransform( index, target );
-		</code>
+		Applies the bone transform associated with the given index to the given position vector. Returns the updated vector.
 		</p>
 
 		<h2>Source</h2>

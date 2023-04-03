@@ -1134,7 +1134,7 @@ class MaterialBuilder {
 
 			if ( data.metadata.format === 'pmd' ) {
 
-				// map, envMap
+				// map, matcap
 
 				if ( material.fileName ) {
 
@@ -1142,7 +1142,7 @@ class MaterialBuilder {
 					const fileNames = fileName.split( '*' );
 
 					// fileNames[ 0 ]: mapFileName
-					// fileNames[ 1 ]: envMapFileName( optional )
+					// fileNames[ 1 ]: matcapFileName( optional )
 
 					params.map = this._loadTexture( fileNames[ 0 ], textures );
 
@@ -1150,12 +1150,12 @@ class MaterialBuilder {
 
 						const extension = fileNames[ 1 ].slice( - 4 ).toLowerCase();
 
-						params.envMap = this._loadTexture(
+						params.matcap = this._loadTexture(
 							fileNames[ 1 ],
 							textures
 						);
 
-						params.combine = extension === '.sph'
+						params.matcapCombine = extension === '.sph'
 							? MultiplyOperation
 							: AddOperation;
 
@@ -1202,7 +1202,7 @@ class MaterialBuilder {
 
 				}
 
-				// envMap TODO: support m.envFlag === 3
+				// matcap TODO: support m.envFlag === 3
 
 				if ( material.envTextureIndex !== - 1 && ( material.envFlag === 1 || material.envFlag == 2 ) ) {
 
@@ -2161,7 +2161,6 @@ class MMDToonMaterial extends ShaderMaterial {
 
 			'alphaMap',
 
-			'envMap',
 			'reflectivity',
 			'refractionRatio',
 		];

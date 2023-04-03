@@ -7,18 +7,26 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Layers', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new Layers();
+			assert.ok( object, 'Can instantiate a Layers.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.todo( 'mask', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
+		// PUBLIC
 		QUnit.test( 'set', ( assert ) => {
 
-			var a = new Layers();
+			const a = new Layers();
 
-			for ( var i = 0; i < 31; i ++ ) {
+			for ( let i = 0; i < 31; i ++ ) {
 
 				a.set( i );
 				assert.strictEqual( a.mask, Math.pow( 2, i ), 'Mask has the expected value for channel: ' + i );
@@ -29,7 +37,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'enable', ( assert ) => {
 
-			var a = new Layers();
+			const a = new Layers();
 
 			a.set( 0 );
 			a.enable( 0 );
@@ -49,9 +57,15 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.todo( 'enableAll', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'toggle', ( assert ) => {
 
-			var a = new Layers();
+			const a = new Layers();
 
 			a.set( 0 );
 			a.toggle( 0 );
@@ -73,7 +87,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'disable', ( assert ) => {
 
-			var a = new Layers();
+			const a = new Layers();
 
 			a.set( 0 );
 			a.disable( 0 );
@@ -93,10 +107,16 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.todo( 'disableAll', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'test', ( assert ) => {
 
-			var a = new Layers();
-			var b = new Layers();
+			const a = new Layers();
+			const b = new Layers();
 
 			assert.ok( a.test( b ), 'Start out true' );
 
@@ -110,7 +130,7 @@ export default QUnit.module( 'Core', () => {
 
 		QUnit.test( 'isEnabled', ( assert ) => {
 
-			var a = new Layers();
+			const a = new Layers();
 
 			a.enable( 1 );
 			assert.ok( a.isEnabled( 1 ), 'Enable channel 1 and pass the QUnit.test' );

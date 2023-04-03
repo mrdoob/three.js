@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – OffscreenCanvas">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -107,7 +107,7 @@ event data.</p>
 -  const canvas = document.querySelector('#c');
 +function main(data) {
 +  const {canvas} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
   ...
 </pre>
@@ -269,7 +269,7 @@ HTML file and we need to export <code class="notranslate" translate="no">init</c
 -function main(data) {
 +export function init(data) {
   const {canvas} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 </pre>
 <p>and cut out the just the non three.js relates parts</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
@@ -689,7 +689,7 @@ self.onmessage = function(e) {
 export function init(data) {
 -  const {canvas} = data;
 +  const {canvas, inputElement} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
 +  const controls = new OrbitControls(camera, inputElement);
 +  controls.target.set(0, 0, 0);
@@ -1083,8 +1083,8 @@ useful examples of working with three.js, OffscreenCanvas and web workers.</p>
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

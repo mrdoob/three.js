@@ -110,7 +110,7 @@ class WebGPUAttributes {
 
 		const arrayBuffer = gpuReadBuffer.getMappedRange();
 
-		return new Float32Array( arrayBuffer );
+		return arrayBuffer;
 
 	}
 

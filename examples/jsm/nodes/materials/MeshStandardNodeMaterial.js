@@ -1,17 +1,16 @@
-import NodeMaterial from './NodeMaterial.js';
-import {
-	float, vec3, vec4, mix,
-	materialRoughness, materialMetalness, materialColor, diffuseColor,
-	metalness, roughness, specularColor
-} from '../shadernode/ShaderNodeElements.js';
+import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
+import { diffuseColor, metalness, roughness, specularColor } from '../core/PropertyNode.js';
+import { mix } from '../math/MathNode.js';
+import { materialRoughness, materialMetalness } from '../accessors/MaterialNode.js';
 import getRoughness from '../functions/material/getRoughness.js';
 import physicalLightingModel from '../functions/PhysicalLightingModel.js';
+import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { MeshStandardMaterial } from 'three';
 
 const defaultValues = new MeshStandardMaterial();
 
-export default class MeshStandardNodeMaterial extends NodeMaterial {
+class MeshStandardNodeMaterial extends NodeMaterial {
 
 	constructor( parameters ) {
 
@@ -49,14 +48,13 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 	}
 
-	constructVariants( builder, stack ) {
+	constructVariants( { stack } ) {
 
 		// METALNESS
 
 		const metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
 
 		stack.assign( metalness, metalnessNode );
-		stack.assign( diffuseColor, vec4( diffuseColor.rgb.mul( metalnessNode.invert() ), diffuseColor.a ) );
 
 		// ROUGHNESS
 
@@ -67,9 +65,13 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// SPECULAR COLOR
 
-		const specularColorNode = mix( vec3( 0.04 ), materialColor.rgb, metalnessNode );
+		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalnessNode );
 
 		stack.assign( specularColor, specularColorNode );
+
+		// DIFFUSE COLOR
+
+		stack.assign( diffuseColor, vec4( diffuseColor.rgb.mul( metalnessNode.oneMinus() ), diffuseColor.a ) );
 
 	}
 
@@ -98,3 +100,7 @@ export default class MeshStandardNodeMaterial extends NodeMaterial {
 	}
 
 }
+
+export default MeshStandardNodeMaterial;
+
+addNodeMaterial( MeshStandardNodeMaterial );

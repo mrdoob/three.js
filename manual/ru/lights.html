@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – - Освещение">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -420,7 +420,7 @@ scene.add(helper);
 </pre>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  RectAreaLightUniformsLib.init();
 </pre>
 <p>Если вы забудете RectAreaLightUniformsLib, индикатор все равно будет работать, 
@@ -472,7 +472,7 @@ makeXYZGUI(gui, light.position, 'position');
 Там также есть распад <a href="/docs/#api/en/lights/PointLight#decay"><code class="notranslate" translate="no">decay</code></a>, он должен быть установлен в <code class="notranslate" translate="no">2</code> для реализма.</p>
 <p>Давайте проверим это.</p>
 <p>Сначала мы включим физически правильное освещение</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({canvas});
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +renderer.physicallyCorrectLights = true;
 </pre>
 <p>Затем мы установим <code class="notranslate" translate="no">power</code> = 800 lumens,  <code class="notranslate" translate="no">decay</code> = 2 и <code class="notranslate" translate="no">distance</code> до <code class="notranslate" translate="no">Infinity</code>.</p>
@@ -506,8 +506,8 @@ gui.add(light, 'power', 0, 2000);
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

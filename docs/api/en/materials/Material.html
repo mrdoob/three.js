@@ -128,6 +128,15 @@
 		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
 		</p>
 
+		<h3>[property:Boolean forceSinglePass]</h3>
+		<p>
+		Whether double-sided, transparent objects should be rendered with a single pass or not. Default is `false`.<br /><br />
+
+		The engine renders double-sided, transparent objects with two draw calls (back faces first, then front faces) to mitigate transparency artifacts.
+		There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grass sprites. 
+		In these cases, set the `forceSinglePass` flag to `true` to disable the two pass rendering to avoid performance issues.
+		</p>
+
 		<h3>[property:Boolean isMaterial]</h3>
 		<p>
 			Read-only flag to check if a given object is of type [name].
@@ -260,7 +269,7 @@
 		<p>
 		Defines which side of faces will be rendered - front, back or both.
 		Default is [page:Materials THREE.FrontSide].
-		Other options are [page:Materials THREE.BackSide], [page:Materials THREE.DoubleSide] or [page:Materials THREE.TwoPassDoubleSide].
+		Other options are [page:Materials THREE.BackSide] or [page:Materials THREE.DoubleSide].
 		</p>
 
 		<h3>[property:Boolean toneMapped]</h3>
@@ -298,6 +307,7 @@
 		<h3>[property:Boolean vertexColors]</h3>
 		<p>
 		Defines whether vertex coloring is used. Default is `false`.
+		The engine supports RGB and RGBA vertex colors depending on whether a three (RGB) or four (RGBA) component color buffer attribute is used.
 		</p>
 
 		<h3>[property:Boolean visible]</h3>

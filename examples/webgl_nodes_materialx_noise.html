@@ -13,7 +13,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshPhysicalNodeMaterial, add, mul, normalWorld, timerLocal, mx_noise_vec3, mx_worley_noise_vec3, mx_cell_noise_float, mx_fractal_noise_vec3 } from 'three/nodes';
+			import { MeshPhysicalNodeMaterial, normalWorld, timerLocal, mx_noise_vec3, mx_worley_noise_vec3, mx_cell_noise_float, mx_fractal_noise_vec3 } from 'three/nodes';
 
 			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
@@ -68,7 +68,7 @@
 							const geometry = new THREE.SphereGeometry( 80, 64, 32 );
 
 							const offsetNode = timerLocal();
-							const customUV = add( mul( normalWorld, 10 ), offsetNode );
+							const customUV = normalWorld.mul( 10 ).add( offsetNode );
 
 							// left top
 
@@ -103,7 +103,7 @@
 							// right bottom
 
 							material = new MeshPhysicalNodeMaterial();
-							material.colorNode = mx_fractal_noise_vec3( mul( customUV, .2 ) );
+							material.colorNode = mx_fractal_noise_vec3( customUV.mul( .2 ) );
 
 							mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = 100;

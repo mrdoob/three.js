@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – の基礎知識">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -56,7 +56,7 @@ import * as THREE from 'three';
 
 function main() {
   const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
   ...
 &lt;/script&gt;
 </pre>
@@ -72,8 +72,7 @@ canvasを追加する場所は、ユースケースに応じて変わる可能�
 canvasをどこにでも配置でき、コードを見つける事ができます。
 canvasをdocumentに挿入するコードがあるかのように、ユースケースが変更された場合、そのコードを変更する必要があります。</p>
 <p>canvasを検索した後、<a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> を作成します。
-rendererは提供された全てのデータを取得し、canvasにレンダリングします。
-過去に <code class="notranslate" translate="no">CSSRenderer</code> や <code class="notranslate" translate="no">CanvasRenderer</code> のような他のレンダラーがありましたが、将来的には <code class="notranslate" translate="no">WebGL2Renderer</code> または <code class="notranslate" translate="no">WebGPURenderer</code> があるかもしれません。</p>
+rendererは提供された全てのデータを取得し、canvasにレンダリングします。</p>
 <p>今はWebGLを使用して3Dをcanvasにレンダリングする <a href="/docs/#api/ja/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a> があります。</p>
 <p>次はカメラが必要です。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
@@ -306,8 +305,8 @@ three.jsの場合、すべてのexamplesを正しいフォルダ階層に入れ�
 import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>これにはCDNを使用する場合も含まれます。 <code class="notranslate" translate="no">three.modules.js</code> のパスが <code class="notranslate" translate="no">/build/three.modules.js</code> のようになってる事を確認して下さい。例えば</p>
-<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
+<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@&lt;version&gt;/<b>build/three.module.js</b>';
+import {OrbitControls} from 'https://unpkg.com/three@&lt;version&gt;/addons/controls/OrbitControls.js';
 </pre>
 </div>
 
@@ -315,8 +314,8 @@ import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/Orb
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

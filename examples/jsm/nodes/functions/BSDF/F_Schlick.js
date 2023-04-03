@@ -1,4 +1,4 @@
-import { ShaderNode, sub } from '../../shadernode/ShaderNodeBaseElements.js';
+import { ShaderNode } from '../../shadernode/ShaderNode.js';
 
 const F_Schlick = new ShaderNode( ( inputs ) => {
 
@@ -11,7 +11,7 @@ const F_Schlick = new ShaderNode( ( inputs ) => {
 	// https://cdn2.unrealengine.com/Resources/files/2013SiggraphPresentationsNotes-26915738.pdf
 	const fresnel = dotVH.mul( - 5.55473 ).sub( 6.98316 ).mul( dotVH ).exp2();
 
-	return f0.mul( sub( 1.0, fresnel ) ).add( f90.mul( fresnel ) );
+	return f0.mul( fresnel.oneMinus() ).add( f90.mul( fresnel ) );
 
 } ); // validated
 

@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – Three.js란?">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -125,16 +125,12 @@ import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
-+  const renderer = new THREE.WebGLRenderer({canvas});
++  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  ...
 &lt;/script&gt;
 </pre>
 <p>canvas 요소(element)를 참조한 이후 <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를 생성했습니다.
-이 렌더러(renderer)는 여러분이 입력한 데이터를 실제로 canvas에 그려주는
-역할을 맡습니다. 렌더러의 종류로 과거 <code class="notranslate" translate="no">CSSRenderer</code>, <code class="notranslate" translate="no">CanvasRenderer</code>가
-있었고, 나중에는 아마 <code class="notranslate" translate="no">WebGL2Renderer</code>, <code class="notranslate" translate="no">WebGPURenderer</code>가 이 자리를
-대신할 겁니다. 지금은 3차원 세상을 canvas에 그려줄 WebGL, <a href="/docs/#api/ko/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>를
-사용하도록 하죠.</p>
+이 렌더러(renderer)는 여러분이 입력한 데이터를 실제로 canvas에 그려주는</p>
 <p>만약 Three.js에 canvas 요소를 넘겨주지 않으면, Three.js는 canvas 요소를
 자동으로 생성합니다. 그리고 여러분이 직접 이 canvas 요소를 문서(document)
 에 삽입해야 하죠. 어디에 canvas 요소를 넣을지는 경우에 따라 다를 테니,
@@ -397,16 +393,16 @@ import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>아래는 CDN을 사용하는 예시입니다. <code class="notranslate" translate="no">three.modules.js</code>의 경로가 <code class="notranslate" translate="no">/build/three.modules.js</code>
 로 끝나야 한다는 것을 명심하세요.</p>
-<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
+<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@&lt;version&gt;/<b>build/three.module.js</b>';
+import {OrbitControls} from 'https://unpkg.com/three@&lt;version&gt;/addons/controls/OrbitControls.js';
 </pre>
 </div>
         </div>
       </div>
     </div>
 
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

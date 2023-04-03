@@ -475,8 +475,8 @@ KTX2Loader.BasisWorker = function () {
 			for ( let layer = 0; layer < layers; layer ++ ) {
 
 				const levelInfo = ktx2File.getImageLevelInfo( mip, layer, 0 );
-				mipWidth = levelInfo.origWidth;
-				mipHeight = levelInfo.origHeight;
+				mipWidth = levelInfo.origWidth < 4 ? levelInfo.origWidth : levelInfo.width;
+				mipHeight = levelInfo.origHeight < 4 ? levelInfo.origHeight : levelInfo.height;
 				const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, layer, 0, transcoderFormat ) );
 				const status = ktx2File.transcodeImage(
 					dst,

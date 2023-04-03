@@ -17,21 +17,16 @@
 				请参阅[page:FontLoader]页面来查看更多详细信息。
 			</p>
 
-		<script>
+		<h2>进口</h2>
 
-		// iOS iframe auto-resize workaround
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
 
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			const scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script>
+		<code>
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+		</code>
 
 		<h2>代码示例</h2>
 

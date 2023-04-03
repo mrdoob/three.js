@@ -247,7 +247,7 @@ function checkLightCopyClone( assert, light ) {
 	);
 
 	// Clone
-	const clone = light.clone(); // better get a new var
+	const clone = light.clone(); // better get a new clone
 	QUnit.assert.notEqual( clone.uuid, light.uuid, 'Cloned light\'s UUID differs from original' );
 	QUnit.assert.notEqual( clone.id, light.id, 'Clone light\'s id differs from original' );
 	QUnit.assert.smartEqual( clone, light, 'Clone light is equal to original' );

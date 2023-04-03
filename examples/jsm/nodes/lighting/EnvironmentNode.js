@@ -1,8 +1,14 @@
 import LightingNode from './LightingNode.js';
-import ContextNode from '../core/ContextNode.js';
-import CacheNode from '../core/CacheNode.js';
-import SpecularMIPLevelNode from '../utils/SpecularMIPLevelNode.js';
-import { float, mul, roughness, positionViewDirection, transformedNormalView, transformedNormalWorld, cameraViewMatrix, equirectUV, vec2 } from '../shadernode/ShaderNodeElements.js';
+import { cache } from '../core/CacheNode.js';
+import { context } from '../core/ContextNode.js';
+import { roughness } from '../core/PropertyNode.js';
+import { equirectUV } from '../utils/EquirectUVNode.js';
+import { specularMIPLevel } from '../utils/SpecularMIPLevelNode.js';
+import { cameraViewMatrix } from '../accessors/CameraNode.js';
+import { transformedNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
+import { positionViewDirection } from '../accessors/PositionNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { float, vec2 } from '../shadernode/ShaderNode.js';
 
 class EnvironmentNode extends LightingNode {
 
@@ -23,7 +29,7 @@ class EnvironmentNode extends LightingNode {
 		let radianceTextureUVNode;
 		let irradianceTextureUVNode;
 
-		const radianceContext = new ContextNode( envNode, {
+		const radianceContext = context( envNode, {
 			getUVNode: ( textureNode ) => {
 
 				let node = null;
@@ -31,7 +37,7 @@ class EnvironmentNode extends LightingNode {
 				if ( reflectVec === undefined ) {
 
 					reflectVec = positionViewDirection.negate().reflect( transformedNormalView );
-					reflectVec = reflectVec.mix( transformedNormalView, roughness.mul( roughness ) ).normalize();
+					reflectVec = roughness.mul( roughness ).mix( reflectVec, transformedNormalView ).normalize();
 					reflectVec = reflectVec.transformDirection( cameraViewMatrix );
 
 				}
@@ -47,7 +53,7 @@ class EnvironmentNode extends LightingNode {
 						// @TODO: Needed PMREM
 
 						radianceTextureUVNode = equirectUV( reflectVec );
-						radianceTextureUVNode = vec2( radianceTextureUVNode.x, radianceTextureUVNode.y.invert() );
+						radianceTextureUVNode = vec2( radianceTextureUVNode.x, radianceTextureUVNode.y.oneMinus() );
 
 					}
 
@@ -65,12 +71,12 @@ class EnvironmentNode extends LightingNode {
 			},
 			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
 
-				return new SpecularMIPLevelNode( textureNode, levelNode );
+				return specularMIPLevel( textureNode, levelNode );
 
 			}
 		} );
 
-		const irradianceContext = new ContextNode( envNode, {
+		const irradianceContext = context( envNode, {
 			getUVNode: ( textureNode ) => {
 
 				let node = null;
@@ -86,7 +92,7 @@ class EnvironmentNode extends LightingNode {
 						// @TODO: Needed PMREM
 
 						irradianceTextureUVNode = equirectUV( transformedNormalWorld );
-						irradianceTextureUVNode = vec2( irradianceTextureUVNode.x, irradianceTextureUVNode.y.invert() );
+						irradianceTextureUVNode = vec2( irradianceTextureUVNode.x, irradianceTextureUVNode.y.oneMinus() );
 
 					}
 
@@ -104,20 +110,20 @@ class EnvironmentNode extends LightingNode {
 			},
 			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => {
 
-				return new SpecularMIPLevelNode( textureNode, levelNode );
+				return specularMIPLevel( textureNode, levelNode );
 
 			}
 		} );
 
 		//
 
-		const isolateRadianceFlowContext = new CacheNode( radianceContext );
+		const isolateRadianceFlowContext = cache( radianceContext );
 
 		//
 
-		builder.context.radiance.add( isolateRadianceFlowContext );
+		builder.context.radiance.addAssign( isolateRadianceFlowContext );
 
-		builder.context.iblIrradiance.add( mul( Math.PI, irradianceContext ) );
+		builder.context.iblIrradiance.addAssign( irradianceContext.mul( Math.PI ) );
 
 		properties.radianceContext = isolateRadianceFlowContext;
 		properties.irradianceContext = irradianceContext;
@@ -127,3 +133,5 @@ class EnvironmentNode extends LightingNode {
 }
 
 export default EnvironmentNode;
+
+addNodeClass( EnvironmentNode );

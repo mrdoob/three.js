@@ -1,5 +1,5 @@
 import { createElementNS } from '../utils.js';
-import { SRGBToLinear } from '../math/Color.js';
+import { SRGBToLinear } from '../math/ColorManagement.js';
 
 let _canvas;
 
@@ -13,7 +13,7 @@ class ImageUtils {
 
 		}
 
-		if ( typeof HTMLCanvasElement == 'undefined' ) {
+		if ( typeof HTMLCanvasElement === 'undefined' ) {
 
 			return image.src;
 

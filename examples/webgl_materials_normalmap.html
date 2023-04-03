@@ -15,7 +15,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -133,8 +133,8 @@
 
 				const effectBleach = new ShaderPass( BleachBypassShader );
 				const effectColor = new ShaderPass( ColorCorrectionShader );
-				effectFXAA = new ShaderPass( FXAAShader );
 				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
+				effectFXAA = new ShaderPass( FXAAShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
@@ -148,10 +148,10 @@
 				composer = new EffectComposer( renderer, renderTarget );
 
 				composer.addPass( renderModel );
-				composer.addPass( effectFXAA );
 				composer.addPass( effectBleach );
 				composer.addPass( effectColor );
 				composer.addPass( gammaCorrection );
+				composer.addPass( effectFXAA );
 
 				// EVENTS
 

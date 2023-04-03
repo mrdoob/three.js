@@ -190,6 +190,7 @@ const assets = [
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
+	'./js/Viewport.Shading.js',
 	'./js/Viewport.Info.js',
 	'./js/Viewport.Selector.js',
 	'./js/Viewport.ViewHelper.js',
@@ -268,8 +269,8 @@ async function networkFirst( request ) {
 		if ( request.url.endsWith( 'editor/' ) || request.url.endsWith( 'editor/index.html' ) ) { // copied from coi-serviceworker
 
 			const newHeaders = new Headers( response.headers );
-			newHeaders.set( "Cross-Origin-Embedder-Policy", "require-corp" );
-			newHeaders.set( "Cross-Origin-Opener-Policy", "same-origin" );
+			newHeaders.set( 'Cross-Origin-Embedder-Policy', 'require-corp' );
+			newHeaders.set( 'Cross-Origin-Opener-Policy', 'same-origin' );
 
 			response = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
 

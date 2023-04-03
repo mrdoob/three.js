@@ -1,106 +1,130 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.136.0/build/three.module.js';
 
 const state = {
-  width: 300,   // canvas default
-  height: 150,  // canvas default
+	width: 300, // canvas default
+	height: 150, // canvas default
 };
 
-function main(data) {
-  const {canvas} = data;
-  const renderer = new THREE.WebGLRenderer({canvas});
+function main( data ) {
 
-  state.width = canvas.width;
-  state.height = canvas.height;
+	const { canvas } = data;
+	const renderer = new THREE.WebGLRenderer( { canvas } );
 
-  const fov = 75;
-  const aspect = 2; // the canvas default
-  const near = 0.1;
-  const far = 100;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 4;
+	state.width = canvas.width;
+	state.height = canvas.height;
 
-  const scene = new THREE.Scene();
+	const fov = 75;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 100;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.z = 4;
 
-  {
-    const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
-    scene.add(light);
-  }
+	const scene = new THREE.Scene();
 
-  const boxWidth = 1;
-  const boxHeight = 1;
-  const boxDepth = 1;
-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+	{
 
-  function makeInstance(geometry, color, x) {
-    const material = new THREE.MeshPhongMaterial({
-      color,
-    });
+		const color = 0xFFFFFF;
+		const intensity = 1;
+		const light = new THREE.DirectionalLight( color, intensity );
+		light.position.set( - 1, 2, 4 );
+		scene.add( light );
 
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+	}
 
-    cube.position.x = x;
+	const boxWidth = 1;
+	const boxHeight = 1;
+	const boxDepth = 1;
+	const geometry = new THREE.BoxGeometry( boxWidth, boxHeight, boxDepth );
 
-    return cube;
-  }
+	function makeInstance( geometry, color, x ) {
 
-  const cubes = [
-    makeInstance(geometry, 0x44aa88, 0),
-    makeInstance(geometry, 0x8844aa, -2),
-    makeInstance(geometry, 0xaa8844, 2),
-  ];
+		const material = new THREE.MeshPhongMaterial( {
+			color,
+		} );
 
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = state.width;
-    const height = state.height;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
+		const cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
 
-  function render(time) {
-    time *= 0.001;
+		cube.position.x = x;
 
-    if (resizeRendererToDisplaySize(renderer)) {
-      camera.aspect = state.width / state.height;
-      camera.updateProjectionMatrix();
-    }
+		return cube;
 
-    cubes.forEach((cube, ndx) => {
-      const speed = 1 + ndx * .1;
-      const rot = time * speed;
-      cube.rotation.x = rot;
-      cube.rotation.y = rot;
-    });
+	}
 
-    renderer.render(scene, camera);
+	const cubes = [
+		makeInstance( geometry, 0x44aa88, 0 ),
+		makeInstance( geometry, 0x8844aa, - 2 ),
+		makeInstance( geometry, 0xaa8844, 2 ),
+	];
 
-    requestAnimationFrame(render);
-  }
+	function resizeRendererToDisplaySize( renderer ) {
 
-  requestAnimationFrame(render);
+		const canvas = renderer.domElement;
+		const width = state.width;
+		const height = state.height;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function render( time ) {
+
+		time *= 0.001;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			camera.aspect = state.width / state.height;
+			camera.updateProjectionMatrix();
+
+		}
+
+		cubes.forEach( ( cube, ndx ) => {
+
+			const speed = 1 + ndx * .1;
+			const rot = time * speed;
+			cube.rotation.x = rot;
+			cube.rotation.y = rot;
+
+		} );
+
+		renderer.render( scene, camera );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
+
 }
 
-function size(data) {
-  state.width = data.width;
-  state.height = data.height;
+function size( data ) {
+
+	state.width = data.width;
+	state.height = data.height;
+
 }
 
 const handlers = {
-  main,
-  size,
+	main,
+	size,
 };
 
-self.onmessage = function(e) {
-  const fn = handlers[e.data.type];
-  if (typeof fn !== 'function') {
-    throw new Error('no handler for type: ' + e.data.type);
-  }
-  fn(e.data);
+self.onmessage = function ( e ) {
+
+	const fn = handlers[ e.data.type ];
+	if ( typeof fn !== 'function' ) {
+
+		throw new Error( 'no handler for type: ' + e.data.type );
+
+	}
+
+	fn( e.data );
+
 };

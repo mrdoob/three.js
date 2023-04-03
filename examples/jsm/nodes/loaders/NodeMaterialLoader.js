@@ -1,31 +1,15 @@
 import { MaterialLoader } from 'three';
-import {
-	NodeMaterial,
-	LineBasicNodeMaterial,
-	MeshBasicNodeMaterial,
-	MeshStandardNodeMaterial,
-	MeshPhysicalNodeMaterial,
-	PointsNodeMaterial,
-	SpriteNodeMaterial
-} from '../materials/Materials.js';
+import { createNodeMaterialFromType } from '../materials/Materials.js';
 
 const superFromTypeFunction = MaterialLoader.createMaterialFromType;
 
 MaterialLoader.createMaterialFromType = function ( type ) {
 
-	const materialLib = {
-		NodeMaterial,
-		LineBasicNodeMaterial,
-		MeshBasicNodeMaterial,
-		MeshStandardNodeMaterial,
-		MeshPhysicalNodeMaterial,
-		PointsNodeMaterial,
-		SpriteNodeMaterial
-	};
+	const material = createNodeMaterialFromType( type );
 
-	if ( materialLib[ type ] !== undefined ) {
+	if ( material !== undefined ) {
 
-		return new materialLib[ type ]();
+		return material;
 
 	}
 

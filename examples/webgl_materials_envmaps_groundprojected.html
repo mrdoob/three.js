@@ -21,10 +21,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script
-			async
-			src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"
-		></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -40,7 +37,7 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { GroundProjectedEnv } from 'three/addons/objects/GroundProjectedEnv.js';
+			import { GroundProjectedSkybox } from 'three/addons/objects/GroundProjectedSkybox.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
@@ -50,7 +47,7 @@
 				radius: 440
 			};
 
-			let camera, scene, renderer, env;
+			let camera, scene, renderer, skybox;
 
 			init().then( render );
 
@@ -71,9 +68,9 @@
 				const envMap = await hdrLoader.loadAsync( 'textures/equirectangular/blouberg_sunrise_2_1k.hdr' );
 				envMap.mapping = THREE.EquirectangularReflectionMapping;
 
-				env = new GroundProjectedEnv( envMap );
-				env.scale.setScalar( 100 );
-				scene.add( env );
+				skybox = new GroundProjectedSkybox( envMap );
+				skybox.scale.setScalar( 100 );
+				scene.add( skybox );
 
 				scene.environment = envMap;
 
@@ -151,8 +148,8 @@
 				controls.update();
 
 				const gui = new GUI();
-				gui.add( params, 'height', 20, 50, 0.1 ).onChange( render );
-				gui.add( params, 'radius', 200, 600, 0.1 ).onChange( render );
+				gui.add( params, 'height', 20, 50, 0.1 ).name( 'Skybox height' ).onChange( render );
+				gui.add( params, 'radius', 200, 600, 0.1 ).name( 'Skybox radius' ).onChange( render );
 
 				//
 
@@ -168,14 +165,16 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
 			function render() {
 
 				renderer.render( scene, camera );
 
-				env.radius = params.radius;
-				env.height = params.height;
+				skybox.radius = params.radius;
+				skybox.height = params.height;
 
 			}
 		</script>

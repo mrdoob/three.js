@@ -77,6 +77,11 @@
 		See the [page:Textures texture constants] page for other mapping types.
 		</p>
 
+		<h3>[property:Integer channel]</h3>
+		<p>
+		Lets you select the uv attribute to map the texture to. `0` for `uv` and `1` for `uv2`.
+		</p>
+
 		<h3>[property:number wrapS]</h3>
 		<p>
 		This defines how the texture is wrapped horizontally and corresponds to *U* in UV mapping.<br />
@@ -151,39 +156,13 @@
 		How much a single repetition of the texture is offset from the beginning, in each direction U and V.
 		Typical range is `0.0` to `1.0`.
 		</p>
-		<p>
-			The below texture types share the `first` uv channel in the engine. The offset (and repeat) setting is evaluated according to
-			the following priorities and then shared by those textures:
-			<ol>
-				<li>color map</li>
-				<li>specular map</li>
-				<li>displacement map</li>
-				<li>normal map</li>
-				<li>bump map</li>
-				<li>roughness map</li>
-				<li>metalness map</li>
-				<li>alpha map</li>
-				<li>emissive map</li>
-				<li>clearcoat map</li>
-				<li>clearcoat normal map</li>
-				<li>clearcoat roughnessMap map</li>
-			</ol>
-		</p>
-		<p>
-			The below texture types share the `second` uv channel in the engine. The offset (and repeat) setting is evaluated according to
-			the following priorities and then shared by those textures:
-			<ol>
-				<li>ao map</li>
-				<li>light map</li>
-			</ol>
-		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
 		How many times the texture is repeated across the surface, in each direction U and V.  If repeat is set
 		greater than 1 in either direction, the corresponding Wrap parameter should also be set to
 		[page:Textures THREE.RepeatWrapping] or [page:Textures THREE.MirroredRepeatWrapping] to achieve the desired
-		tiling effect. Setting different repeat values for textures is restricted in the same way like [page:.offset].
+		tiling effect.
 		</p>
 
 		<h3>[property:number rotation]</h3>

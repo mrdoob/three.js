@@ -10,12 +10,22 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		Orbit controls allow the camera to orbit around a target.<br>
+			Orbit controls allow the camera to orbit around a target.<br>
 
-		To use this, as with all files in the /examples directory, you will have to
-		include the file separately in your HTML.
-
+			To use this, as with all files in the /examples directory, you will have to
+			include the file separately in your HTML.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -228,7 +238,7 @@ controls.mouseButtons = {
 		<p>
 		Defines how the camera's position is translated when panning. If true, the camera pans in screen space.
 		Otherwise, the camera pans in the plane orthogonal to the camera's up direction.
-		Default is true for OrbitControls; false for MapControls.
+		Default is `true`.
 		</p>
 
 		<h3>[property:Vector3 target0]</h3>
@@ -300,6 +310,11 @@ controls.touches = {
 		<h3>[method:undefined saveState] ()</h3>
 		<p>
 			Save the current state of the controls. This can later be recovered with [page:.reset].
+		</p>
+
+		<h3>[method:undefined stopListenToKeyEvents] ()</h3>
+		<p>
+			Removes the key event listener previously defined with [page:.listenToKeyEvents]().
 		</p>
 
 		<h3>[method:Boolean update] ()</h3>

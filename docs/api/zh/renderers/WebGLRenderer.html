@@ -89,7 +89,11 @@
 			编译和链接过程中的错误。 禁用此检查生产以获得性能增益可能很有用。
 			强烈建议在开发期间保持启用这些检查。
 			如果着色器没有编译和链接 - 它将无法工作，并且相关材料将不会呈现。
-			默认是*true*
+			默认是*true*</br>
+		- [page:Function onShaderError]( gl, program, glVertexShader, glFragmentShader ):
+			A callback function that can be used for custom error reporting. The callback receives the WebGL context, an instance of WebGLProgram as well 
+			two instances of WebGLShader representing the vertex and fragment shader. Assigning a custom function disables the default error reporting. 
+			Default is `null`.
 		</p>
 
 		<h3>[property:Object capabilities]</h3>
@@ -188,10 +192,9 @@
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<p>定义渲染器是否考虑对象级剪切平面。 默认为*false*.</p>
 
-		<h3>[property:Boolean physicallyCorrectLights]</h3>
+		<h3>[property:Boolean useLegacyLights]</h3>
 		<p>
-		是否使用物理上正确的光照模式。 默认是*false*。
-		示例：[example:webgl_lights_physical lights / physical]
+		Whether to use the legacy lighting mode or not. 默认是*true*。
 		</p>
 
 		<h3>[property:Object properties]</h3>

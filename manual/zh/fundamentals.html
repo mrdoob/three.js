@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – 基础">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -32,7 +32,7 @@
       <div class="lesson">
         <div class="lesson-main">
           <p>这是Three.js系列文章的第一篇。
-<a href="http://threejs.org">Three.js</a>是一个尽可能简化在网页端获取3D
+<a href="https://threejs.org">Three.js</a>是一个尽可能简化在网页端获取3D
 内容的库。</p>
 <p>Three.js经常会和WebGL混淆，
 但也并不总是，three.js其实是使用WebGL来绘制三维效果的。
@@ -89,11 +89,11 @@ import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
-+  const renderer = new THREE.WebGLRenderer({canvas});
++  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  ...
 &lt;/script&gt;
 </pre>
-<p>拿到canvas后我们需要创建一个<a href="/docs/#api/zh/renderers/WebGLRenderer">WebGL渲染器(<code class="notranslate" translate="no">WebGLRenderer</code>)</a>。渲染器负责将你提供的所有数据渲染绘制到canvas上。之前还有其他渲染器，比如CSS渲染器(<code class="notranslate" translate="no">CSSRenderer</code>)、Canvas渲染器(<code class="notranslate" translate="no">CanvasRenderer</code>)。将来也可能会有WebGL2渲染器(<code class="notranslate" translate="no">WebGL2Renderer</code>)或WebGPU渲染器(<code class="notranslate" translate="no">WebGPURenderer</code>)。目前的话是<a href="/docs/#api/zh/renderers/WebGLRenderer">WebGL渲染器(<code class="notranslate" translate="no">WebGLRenderer</code>)</a>，它通过WebGL将三维空间渲染到canvas上。</p>
+<p>拿到canvas后我们需要创建一个<a href="/docs/#api/zh/renderers/WebGLRenderer">WebGL渲染器(<code class="notranslate" translate="no">WebGLRenderer</code>)</a>。渲染器负责将你提供的所有数据渲染绘制到canvas上。</p>
 <p>注意这里有一些细节。如果你没有给three.js传canvas，three.js会自己创建一个 ，但是你必须手动把它添加到文档中。在哪里添加可能会不一样这取决你怎么使用， 我发现给three.js传一个canvas会更灵活一些。我可以将canvas放到任何地方， 代码都会找到它，假如我有一段代码是将canvas插入到文档中，那么当需求变化时， 我很可能必须去修改这段代码。</p>
 <p>接下来我们需要一个<a href="/docs/#api/zh/cameras/PerspectiveCamera">透视摄像机(<code class="notranslate" translate="no">PerspectiveCamera</code>)</a>。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
@@ -306,16 +306,16 @@ import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>在使用CDN时，是同样的道理。确保<code class="notranslate" translate="no">three.modules.js</code>的路径以
 <code class="notranslate" translate="no">/build/three.modules.js</code>结尾，比如</p>
-<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
+<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@&lt;version&gt;/<b>build/three.module.js</b>';
+import {OrbitControls} from 'https://unpkg.com/three@&lt;version&gt;/addons/controls/OrbitControls.js';
 </pre>
 </div>
         </div>
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

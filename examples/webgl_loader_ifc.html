@@ -14,18 +14,22 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			-
-			<a href="https://www.buildingsmart.org/standards/bsi-standards/industry-foundation-classes/" target="_blank" rel="noopener">IFCLoader</a>
+			See <a href="https://github.com/ifcjs/" target="_blank" rel="noopener">main project repository</a> for more information and BIM tools.
 		</div>
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
 				"imports": {
 					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
+					"three/addons/": "./jsm/",
+					"three/examples/jsm/utils/BufferGeometryUtils": "./jsm/utils/BufferGeometryUtils.js",
+					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.5.23/build/index.module.js",
+					"web-ifc": "https://unpkg.com/web-ifc@0.0.36/web-ifc-api.js",
+					"web-ifc-three": "https://unpkg.com/web-ifc-three@0.0.122/IFCLoader.js"
 				}
 			}
 		</script>
@@ -35,13 +39,12 @@
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			import { IFCLoader } from 'three/addons/loaders/IFCLoader.js';
+			import { IFCLoader } from 'web-ifc-three';
+			import { IFCSPACE } from 'web-ifc';
 
 			let scene, camera, renderer;
 
-			init();
-
-			function init() {
+			async function init() {
 
 				//Scene
 				scene = new THREE.Scene();
@@ -73,7 +76,16 @@
 
 				//Setup IFC Loader
 				const ifcLoader = new IFCLoader();
-				ifcLoader.ifcManager.setWasmPath( 'jsm/loaders/ifc/' );
+				await ifcLoader.ifcManager.setWasmPath( 'https://unpkg.com/web-ifc@0.0.36/', true );
+
+				await ifcLoader.ifcManager.parser.setupOptionalCategories( {
+					[ IFCSPACE ]: false,
+				} );
+
+				await ifcLoader.ifcManager.applyWebIfcConfig( {
+					USE_FAST_BOOLS: true
+				} );
+
 				ifcLoader.load( 'models/ifc/rac_advanced_sample_project.ifc', function ( model ) {
 
 					scene.add( model.mesh );
@@ -81,41 +93,8 @@
 
 				} );
 
-				const highlightMaterial = new THREE.MeshPhongMaterial( { color: 0xff00ff, depthTest: false, transparent: true, opacity: 0.3 } );
-
-				function selectObject( event ) {
-
-					if ( event.button != 0 ) return;
-
-					const mouse = new THREE.Vector2();
-					mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-					mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-					const raycaster = new THREE.Raycaster();
-					raycaster.setFromCamera( mouse, camera );
-
-					const intersected = raycaster.intersectObjects( scene.children, false );
-					if ( intersected.length ) {
-
-						const found = intersected[ 0 ];
-						const faceIndex = found.faceIndex;
-						const geometry = found.object.geometry;
-						const id = ifcLoader.ifcManager.getExpressId( geometry, faceIndex );
-
-						const modelID = found.object.modelID;
-						ifcLoader.ifcManager.createSubset( { modelID, ids: [ id ], scene, removePrevious: true, material: highlightMaterial } );
-						const props = ifcLoader.ifcManager.getItemProperties( modelID, id, true );
-						console.log( props );
-						renderer.render( scene, camera );
-
-		}
-
-	}
-
-				window.onpointerdown = selectObject;
-
 				//Renderer
-				renderer = new THREE.WebGLRenderer( { antialias: true	} );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
@@ -145,6 +124,8 @@
 				renderer.render( scene, camera );
 
 			}
+
+			init();
 
 		</script>
 	</body>

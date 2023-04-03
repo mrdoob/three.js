@@ -39,7 +39,6 @@
 
 		[page:Constant type] -- Default is [page:Textures THREE.UnsignedByteType].
 		See [page:Textures type constants] for other choices.<br />
-
 		</p>
 
 
@@ -49,10 +48,15 @@
 
 		<h3>[property:number wrapR]</h3>
 		<p>
-		This defines how the texture is wrapped in the depth direction.<br />
-		The default is [page:Textures THREE.ClampToEdgeWrapping], where the edge is clamped to the outer edge texels.
-		The other two choices are [page:Textures THREE.RepeatWrapping] and [page:Textures THREE.MirroredRepeatWrapping].
-		See the [page:Textures texture constants] page for details.
+			This defines how the texture is wrapped in the depth direction.<br />
+			The default is [page:Textures THREE.ClampToEdgeWrapping], where the edge is clamped to the outer edge texels.
+			The other two choices are [page:Textures THREE.RepeatWrapping] and [page:Textures THREE.MirroredRepeatWrapping].
+			See the [page:Textures texture constants] page for details.
+		</p>
+
+		<h3>[property:Object image]</h3>
+		<p>
+			Overridden with a object containing width, height, and depth.
 		</p>
 
 		<h3>[property:Boolean isCompressedArrayTexture]</h3>
@@ -63,7 +67,7 @@
 		<h2>Methods</h2>
 
 		<p>
-		See the base [page:CompressedTexture CompressedTexture] class for common methods.
+			See the base [page:CompressedTexture CompressedTexture] class for common methods.
 		</p>
 
 		<h2>Source</h2>

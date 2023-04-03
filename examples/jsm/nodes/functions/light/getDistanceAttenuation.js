@@ -1,6 +1,4 @@
-import {
-	ShaderNode, div, max, sub, mul, clamp, pow, pow2, pow4, cond, greaterThan
-} from '../../shadernode/ShaderNodeBaseElements.js';
+import { ShaderNode } from '../../shadernode/ShaderNode.js';
 
 const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
 
@@ -9,11 +7,10 @@ const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
 	// based upon Frostbite 3 Moving to Physically-based Rendering
 	// page 32, equation 26: E[window1]
 	// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-	const distanceFalloff = div( 1.0, max( pow( lightDistance, decayExponent ), 0.01 ) );
+	const distanceFalloff = lightDistance.pow( decayExponent ).max( 0.01 ).reciprocal();
 
-	return cond(
-		greaterThan( cutoffDistance, 0 ),
-		mul( distanceFalloff, pow2( clamp( sub( 1.0, pow4( div( lightDistance, cutoffDistance ) ) ) ) ) ),
+	return cutoffDistance.greaterThan( 0 ).cond(
+		distanceFalloff.mul( lightDistance.div( cutoffDistance ).pow4().oneMinus().clamp().pow2() ),
 		distanceFalloff
 	);
 

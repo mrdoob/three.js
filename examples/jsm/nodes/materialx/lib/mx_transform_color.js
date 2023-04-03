@@ -1,4 +1,5 @@
-import { code, fn } from '../../Nodes.js';
+import { code } from '../../code/CodeNode.js';
+import { fn } from '../../code/FunctionNode.js';
 
 // Original shader code from:
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_transform_color.glsl

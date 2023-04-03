@@ -1,13 +1,15 @@
 /* global QUnit */
 
-import { runStdLightTests } from '../../utils/qunit-utils.js';
 import { SpotLight } from '../../../../src/lights/SpotLight.js';
+
+import { Light } from '../../../../src/lights/Light.js';
+import { runStdLightTests } from '../../utils/qunit-utils.js';
 
 export default QUnit.module( 'Lights', () => {
 
 	QUnit.module( 'SpotLight', ( hooks ) => {
 
-		var lights = undefined;
+		let lights = undefined;
 		hooks.beforeEach( function () {
 
 			const parameters = {
@@ -31,23 +33,86 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.todo( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new SpotLight();
+			assert.strictEqual(
+				object instanceof Light, true,
+				'SpotLight extends from Light'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new SpotLight();
+			assert.ok( object, 'Can instantiate a SpotLight.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new SpotLight();
+			assert.ok(
+				object.type === 'SpotLight',
+				'SpotLight.type should be SpotLight'
+			);
+
+		} );
+
+		QUnit.todo( 'position', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PROPERTIES
+		QUnit.todo( 'target', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'distance', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'angle', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'penumbra', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'decay', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'map', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'shadow', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
 		QUnit.test( 'power', ( assert ) => {
 
-			var a = new SpotLight( 0xaaaaaa );
+			const a = new SpotLight( 0xaaaaaa );
 
 			a.intensity = 100;
 			assert.numEqual( a.power, 100 * Math.PI, 'Correct power for an intensity of 100' );
@@ -60,10 +125,25 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isSpotLight', ( assert ) => {
+		// PUBLIC
+		QUnit.test( 'isSpotLight', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const object = new SpotLight();
+			assert.ok(
+				object.isSpotLight,
+				'SpotLight.isSpotLight should be true'
+			);
+
+		} );
+
+		QUnit.test( 'dispose', ( assert ) => {
+
+			assert.expect( 0 );
+
+			const object = new SpotLight();
+			object.dispose();
+
+			// ensure calls dispose() on shadow
 
 		} );
 
@@ -79,8 +159,6 @@ export default QUnit.module( 'Lights', () => {
 			runStdLightTests( assert, lights );
 
 		} );
-
-
 
 	} );
 

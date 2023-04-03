@@ -1,6 +1,6 @@
 import { GPULoadOp, GPUStoreOp } from './constants.js';
 import { Color, Mesh, BoxGeometry, BackSide, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { context, vec2, invert, texture, cubeTexture, transformDirection, positionWorld, modelWorldMatrix, viewportBottomLeft, equirectUV, MeshBasicNodeMaterial } from 'three/nodes';
+import { context, vec2, oneMinus, texture, cubeTexture, transformDirection, positionWorld, modelWorldMatrix, viewportBottomLeft, equirectUV, MeshBasicNodeMaterial } from 'three/nodes';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -69,7 +69,7 @@ class WebGPUBackground {
 						const dirNode = transformDirection( positionWorld, modelWorldMatrix );
 
 						nodeUV = equirectUV( dirNode );
-						nodeUV = vec2( nodeUV.x, invert( nodeUV.y ) );
+						nodeUV = vec2( nodeUV.x, oneMinus( nodeUV.y ) );
 
 					} else {
 
@@ -165,8 +165,13 @@ class WebGPUBackground {
 		} else {
 
 			colorAttachment.loadOp = GPULoadOp.Load;
+			colorAttachment.storeOp = GPUStoreOp.Store;
+
 			depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+			depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
+
 			depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+			depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;
 
 		}
 

@@ -1,6 +1,8 @@
-import Node from '../core/Node.js';
-import UniformNode from '../core/UniformNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { uniform } from '../core/UniformNode.js';
+import { texture } from './TextureNode.js';
+import { nodeObject, getConstNodeType } from '../shadernode/ShaderNode.js';
 
 class ReferenceNode extends Node {
 
@@ -24,42 +26,47 @@ class ReferenceNode extends Node {
 
 	setNodeType( uniformType ) {
 
-		this.node = new UniformNode( null, uniformType );
-		this.nodeType = uniformType;
+		let node = null;
 
-		if ( uniformType === 'color' ) {
+		if ( uniformType === 'texture' ) {
 
-			this.nodeType = 'vec3';
+			node = texture( null );
 
-		} else if ( uniformType === 'texture' ) {
+		} else {
 
-			this.nodeType = 'vec4';
+			node = uniform( uniformType );
 
 		}
 
+		this.node = node;
+
 	}
 
-	getNodeType() {
+	getNodeType( builder ) {
 
-		return this.uniformType;
+		return this.node.getNodeType( builder );
 
 	}
 
 	update( frame ) {
 
 		const object = this.object !== null ? this.object : frame.object;
-		const value = object[ this.property ];
+		const property = this.property;
 
-		this.node.value = value;
+		this.node.value = object[ property ];
 
 	}
 
-	generate( builder ) {
+	construct( /*builder*/ ) {
 
-		return this.node.build( builder, this.getNodeType( builder ) );
+		return this.node;
 
 	}
 
 }
 
 export default ReferenceNode;
+
+export const reference = ( name, nodeOrType, object ) => nodeObject( new ReferenceNode( name, getConstNodeType( nodeOrType ), object ) );
+
+addNodeClass( ReferenceNode );

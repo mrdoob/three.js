@@ -1,13 +1,21 @@
-import Node from '../core/Node.js';
+import Node, { addNodeClass } from '../core/Node.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import ConstNode from '../core/ConstNode.js';
-import StackNode from '../core/StackNode.js';
-import { getValueFromType } from '../core/NodeUtils.js';
+import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
-import * as NodeElements from './ShaderNodeElements.js';
+const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
+
+export function addNodeElement( name, nodeElement ) {
+
+	if ( NodeElements.has( name ) ) throw new Error( `Redefinition of node element ${ name }` );
+	if ( typeof nodeElement !== 'function' ) throw new Error( `Node element ${ name } is not a function` );
+
+	NodeElements.set( name, nodeElement );
+
+}
 
 const shaderNodeHandler = {
 
@@ -23,7 +31,19 @@ const shaderNodeHandler = {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
-			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
+			if ( NodeElements.has( prop ) ) {
+
+				const nodeElement = NodeElements.get( prop );
+
+				return ( ...params ) => nodeElement( nodeObj, ...params );
+
+			} else if ( prop.endsWith( 'Assign' ) && NodeElements.has( prop.slice( 0, prop.length - 'Assign'.length ) ) ) {
+
+				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
+
+				return ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
+
+			} else if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
 
 				// accessing properties ( swizzle )
 
@@ -35,17 +55,17 @@ const shaderNodeHandler = {
 
 				return nodeObject( new SplitNode( node, prop ) );
 
+			} else if ( prop === 'width' || prop === 'height' ) {
+
+				// accessing property
+
+				return nodeObject( new SplitNode( node, prop === 'width' ? 'x' : 'y' ) );
+
 			} else if ( /^\d+$/.test( prop ) === true ) {
 
 				// accessing array
 
 				return nodeObject( new ArrayElementNode( node, new ConstNode( Number( prop ), 'uint' ) ) );
-
-			} else if ( NodeElements[ prop ] ) {
-
-				const nodeElement = NodeElements[ prop ];
-
-				return ( ...params ) => nodeElement( nodeObj, ...params );
 
 			}
 
@@ -61,29 +81,29 @@ const nodeObjectsCacheMap = new WeakMap();
 
 const ShaderNodeObject = function ( obj ) {
 
-	const type = typeof obj;
+	const type = getValueType( obj );
 
-	if ( ( type === 'number' ) || ( type === 'boolean' ) ) {
+	if ( type === 'node' ) {
+
+		let nodeObject = nodeObjectsCacheMap.get( obj );
+
+		if ( nodeObject === undefined ) {
+
+			nodeObject = new Proxy( obj, shaderNodeHandler );
+			nodeObjectsCacheMap.set( obj, nodeObject );
+			nodeObjectsCacheMap.set( nodeObject, nodeObject );
+
+		}
+
+		return nodeObject;
+
+	} else if ( ( type === 'float' ) || ( type === 'boolean' ) ) {
 
 		return nodeObject( getAutoTypedConstNode( obj ) );
 
-	} else if ( type === 'object' ) {
+	} else if ( type && type !== 'string' ) {
 
-		if ( obj && obj.isNode === true ) {
-
-			let nodeObject = nodeObjectsCacheMap.get( obj );
-
-			if ( nodeObject === undefined ) {
-
-				nodeObject = new Proxy( obj, shaderNodeHandler );
-				nodeObjectsCacheMap.set( obj, nodeObject );
-				nodeObjectsCacheMap.set( nodeObject, nodeObject );
-
-			}
-
-			return nodeObject;
-
-		}
+		return nodeObject( new ConstNode( obj ) );
 
 	}
 
@@ -167,11 +187,11 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	call( inputs, builder ) {
+	call( inputs, stack, builder ) {
 
 		inputs = nodeObjects( inputs );
 
-		return nodeObject( this._jsFunc( inputs, builder ) );
+		return nodeObject( this._jsFunc( inputs, stack, builder ) );
 
 	}
 
@@ -185,28 +205,15 @@ class ShaderNodeInternal extends Node {
 
 	construct( builder ) {
 
-		const stackNode = new StackNode();
-		stackNode.outputNode = this.call( {}, stackNode, builder );
+		builder.addStack();
 
-		return stackNode;
+		builder.stack.outputNode = nodeObject( this._jsFunc( builder.stack, builder ) );
+
+		return builder.removeStack();
 
 	}
 
 }
-
-const ShaderNodeScript = function ( jsFunc ) {
-
-	return new ShaderNodeInternal( jsFunc );
-
-};
-
-export const ShaderNode = new Proxy( ShaderNodeScript, shaderNodeHandler );
-
-export const nodeObject = ( val ) => /* new */ ShaderNodeObject( val );
-export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
-export const nodeArray = ( val ) => new ShaderNodeArray( val );
-export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
-export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
 
 const bools = [ false, true ];
 const uints = [ 0, 1, 2, 3 ];
@@ -226,7 +233,7 @@ const floatsCacheMap = new Map( [ ...intsCacheMap ].map( el => new ConstNode( el
 for ( const float of floats ) floatsCacheMap.set( float, new ConstNode( float ) );
 for ( const float of floats ) floatsCacheMap.set( - float, new ConstNode( - float ) );
 
-export const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
+const cacheMaps = { bool: boolsCacheMap, uint: uintsCacheMap, ints: intsCacheMap, float: floatsCacheMap };
 
 const constNodesCacheMap = new Map( [ ...boolsCacheMap, ...floatsCacheMap ] );
 
@@ -248,7 +255,7 @@ const getAutoTypedConstNode = ( value ) => {
 
 };
 
-export const ConvertType = function ( type, cacheMap = null ) {
+const ConvertType = function ( type, cacheMap = null ) {
 
 	return ( ...params ) => {
 
@@ -274,7 +281,7 @@ export const ConvertType = function ( type, cacheMap = null ) {
 
 			if ( nodes.length === 1 ) {
 
-				return nodeObject( nodes[ 0 ].nodeType === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
+				return nodeObject( nodes[ 0 ].nodeType === type || getValueType( nodes[ 0 ].value ) === type ? nodes[ 0 ] : new ConvertNode( nodes[ 0 ], type ) );
 
 			}
 
@@ -286,4 +293,101 @@ export const ConvertType = function ( type, cacheMap = null ) {
 
 };
 
-export const getConstNodeType = ( value ) => value.nodeType || value.convertTo || ( typeof value === 'string' ? value : null );
+// exports
+
+// utils
+
+export const getConstNodeType = ( value ) => ( value !== undefined && value !== null ) ? ( value.nodeType || value.convertTo || ( typeof value === 'string' ? value : null ) ) : null;
+
+// shader node base
+
+export function ShaderNode( jsFunc ) {
+
+	return new Proxy( new ShaderNodeInternal( jsFunc ), shaderNodeHandler );
+
+}
+
+export const nodeObject = ( val ) => /* new */ ShaderNodeObject( val );
+export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
+export const nodeArray = ( val ) => new ShaderNodeArray( val );
+export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
+export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
+
+export const shader = ( ...val ) => new ShaderNode( ...val );
+
+addNodeClass( ShaderNode );
+
+// types
+// @TODO: Maybe export from ConstNode.js?
+
+export const color = new ConvertType( 'color' );
+
+export const float = new ConvertType( 'float', cacheMaps.float );
+export const int = new ConvertType( 'int', cacheMaps.int );
+export const uint = new ConvertType( 'uint', cacheMaps.uint );
+export const bool = new ConvertType( 'bool', cacheMaps.bool );
+
+export const vec2 = new ConvertType( 'vec2' );
+export const ivec2 = new ConvertType( 'ivec2' );
+export const uvec2 = new ConvertType( 'uvec2' );
+export const bvec2 = new ConvertType( 'bvec2' );
+
+export const vec3 = new ConvertType( 'vec3' );
+export const ivec3 = new ConvertType( 'ivec3' );
+export const uvec3 = new ConvertType( 'uvec3' );
+export const bvec3 = new ConvertType( 'bvec3' );
+
+export const vec4 = new ConvertType( 'vec4' );
+export const ivec4 = new ConvertType( 'ivec4' );
+export const uvec4 = new ConvertType( 'uvec4' );
+export const bvec4 = new ConvertType( 'bvec4' );
+
+export const mat3 = new ConvertType( 'mat3' );
+export const imat3 = new ConvertType( 'imat3' );
+export const umat3 = new ConvertType( 'umat3' );
+export const bmat3 = new ConvertType( 'bmat3' );
+
+export const mat4 = new ConvertType( 'mat4' );
+export const imat4 = new ConvertType( 'imat4' );
+export const umat4 = new ConvertType( 'umat4' );
+export const bmat4 = new ConvertType( 'bmat4' );
+
+export const string = ( value = '' ) => nodeObject( new ConstNode( value, 'string' ) );
+export const arrayBuffer = ( value ) => nodeObject( new ConstNode( value, 'ArrayBuffer' ) );
+
+addNodeElement( 'color', color );
+addNodeElement( 'float', float );
+addNodeElement( 'int', int );
+addNodeElement( 'uint', uint );
+addNodeElement( 'bool', bool );
+addNodeElement( 'vec2', vec2 );
+addNodeElement( 'ivec2', ivec2 );
+addNodeElement( 'uvec2', uvec2 );
+addNodeElement( 'bvec2', bvec2 );
+addNodeElement( 'vec3', vec3 );
+addNodeElement( 'ivec3', ivec3 );
+addNodeElement( 'uvec3', uvec3 );
+addNodeElement( 'bvec3', bvec3 );
+addNodeElement( 'vec4', vec4 );
+addNodeElement( 'ivec4', ivec4 );
+addNodeElement( 'uvec4', uvec4 );
+addNodeElement( 'bvec4', bvec4 );
+addNodeElement( 'mat3', mat3 );
+addNodeElement( 'imat3', imat3 );
+addNodeElement( 'umat3', umat3 );
+addNodeElement( 'bmat3', bmat3 );
+addNodeElement( 'mat4', mat4 );
+addNodeElement( 'imat4', imat4 );
+addNodeElement( 'umat4', umat4 );
+addNodeElement( 'bmat4', bmat4 );
+addNodeElement( 'string', string );
+addNodeElement( 'arrayBuffer', arrayBuffer );
+
+// basic nodes
+// HACK - we cannot export them from the corresponding files because of the cyclic dependency
+export const element = nodeProxy( ArrayElementNode );
+export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
+export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
+
+addNodeElement( 'element', element );
+addNodeElement( 'convert', convert );

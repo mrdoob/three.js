@@ -1,5 +1,6 @@
-import Node from './Node.js';
-import VaryingNode from './VaryingNode.js';
+import Node, { addNodeClass } from './Node.js';
+import { varying } from './VaryingNode.js';
+import { nodeObject } from '../shadernode/ShaderNode.js';
 
 class AttributeNode extends Node {
 
@@ -73,7 +74,7 @@ class AttributeNode extends Node {
 
 			} else {
 
-				const nodeVarying = new VaryingNode( this );
+				const nodeVarying = varying( this );
 
 				return nodeVarying.build( builder, nodeAttribute.type );
 
@@ -92,3 +93,7 @@ class AttributeNode extends Node {
 }
 
 export default AttributeNode;
+
+export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
+
+addNodeClass( AttributeNode );

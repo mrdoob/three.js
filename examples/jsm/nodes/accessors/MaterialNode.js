@@ -1,12 +1,8 @@
-import Node from '../core/Node.js';
-import UniformNode from '../core/UniformNode.js';
-import UVNode from '../accessors/UVNode.js';
-import ConstNode from '../core/ConstNode.js';
-import OperatorNode from '../math/OperatorNode.js';
-import JoinNode from '../utils/JoinNode.js';
-import MaterialReferenceNode from './MaterialReferenceNode.js';
-import TextureNode from './TextureNode.js';
-import SplitNode from '../utils/SplitNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { uniform } from '../core/UniformNode.js';
+import { materialReference } from './MaterialReferenceNode.js';
+import { uv } from './UVNode.js';
+import { nodeImmutable, vec3 } from '../shadernode/ShaderNode.js';
 
 class MaterialNode extends Node {
 
@@ -47,6 +43,33 @@ class MaterialNode extends Node {
 
 	}
 
+	getFloat( property ) {
+
+		//@TODO: Check if it can be cached by property name.
+
+		return materialReference( property, 'float' );
+
+	}
+
+	getColor( property ) {
+
+		//@TODO: Check if it can be cached by property name.
+
+		return materialReference( property, 'color' );
+
+	}
+
+	getTexture( property ) {
+
+		//@TODO: Check if it can be cached by property name.
+
+		const textureRefNode = materialReference( property, 'texture' );
+		textureRefNode.node.uvNode = materialUV;
+
+		return textureRefNode;
+
+	}
+
 	construct( builder ) {
 
 		const material = builder.context.material;
@@ -56,18 +79,15 @@ class MaterialNode extends Node {
 
 		if ( scope === MaterialNode.ALPHA_TEST ) {
 
-			node = new MaterialReferenceNode( 'alphaTest', 'float' );
+			node = this.getFloat( 'alphaTest' );
 
 		} else if ( scope === MaterialNode.COLOR ) {
 
-			const colorNode = new MaterialReferenceNode( 'color', 'color' );
+			const colorNode = this.getColor( 'color' );
 
 			if ( material.map && material.map.isTexture === true ) {
 
-				//const map = new MaterialReferenceNode( 'map', 'texture' );
-				const map = new TextureNode( material.map, new MaterialNode( MaterialNode.UV ) );
-
-				node = new OperatorNode( '*', colorNode, map );
+				node = colorNode.mul( this.getTexture( 'map' ) );
 
 			} else {
 
@@ -77,11 +97,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.OPACITY ) {
 
-			const opacityNode = new MaterialReferenceNode( 'opacity', 'float' );
+			const opacityNode = this.getFloat( 'opacity' );
 
 			if ( material.alphaMap && material.alphaMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', opacityNode, new MaterialReferenceNode( 'alphaMap', 'texture' ) );
+				node = opacityNode.mul( this.getTexture( 'alphaMap' ) );
 
 			} else {
 
@@ -91,19 +111,19 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.SHININESS ) {
 
-			return new MaterialReferenceNode( 'shininess', 'float' );
+			node = this.getFloat( 'shininess' );
 
 		} else if ( scope === MaterialNode.SPECULAR_COLOR ) {
 
-			node = new MaterialReferenceNode( 'specular', 'color' );
+			node = this.getColor( 'specular' );
 
 		} else if ( scope === MaterialNode.REFLECTIVITY ) {
 
-			const reflectivityNode = new MaterialReferenceNode( 'reflectivity', 'float' );
+			const reflectivityNode = this.getFloat( 'reflectivity' );
 
 			if ( material.specularMap && material.specularMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', reflectivityNode, new SplitNode( new TextureNode( material.specularMap ), 'r' ) );
+				node = reflectivityNode.mul( this.getTexture( 'specularMap' ).r );
 
 			} else {
 
@@ -113,11 +133,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.ROUGHNESS ) {
 
-			const roughnessNode = new MaterialReferenceNode( 'roughness', 'float' );
+			const roughnessNode = this.getFloat( 'roughness' );
 
 			if ( material.roughnessMap && material.roughnessMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', roughnessNode, new SplitNode( new TextureNode( material.roughnessMap ), 'g' ) );
+				node = roughnessNode.mul( this.getTexture( 'roughnessMap' ).g );
 
 			} else {
 
@@ -127,11 +147,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.METALNESS ) {
 
-			const metalnessNode = new MaterialReferenceNode( 'metalness', 'float' );
+			const metalnessNode = this.getFloat( 'metalness' );
 
 			if ( material.metalnessMap && material.metalnessMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', metalnessNode, new SplitNode( new TextureNode( material.metalnessMap ), 'b' ) );
+				node = metalnessNode.mul( this.getTexture( 'metalnessMap' ).b );
 
 			} else {
 
@@ -141,11 +161,11 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.EMISSIVE ) {
 
-			const emissiveNode = new MaterialReferenceNode( 'emissive', 'color' );
+			const emissiveNode = this.getColor( 'emissive' );
 
 			if ( material.emissiveMap && material.emissiveMap.isTexture === true ) {
 
-				node = new OperatorNode( '*', emissiveNode, new TextureNode( material.emissiveMap ) );
+				node = emissiveNode.mul( this.getTexture( 'emissiveMap' ) );
 
 			} else {
 
@@ -155,13 +175,12 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.ROTATION ) {
 
-			node = new MaterialReferenceNode( 'rotation', 'float' );
+			node = this.getFloat( 'rotation' );
 
 		} else if ( scope === MaterialNode.UV ) {
 
 			// uv repeat and offset setting priorities
 
-			let uvNode;
 			let uvScaleMap =
 				material.map ||
 				material.specularMap ||
@@ -199,17 +218,19 @@ class MaterialNode extends Node {
 
 				}
 
-				uvNode = new OperatorNode( '*', new UniformNode( uvScaleMap.matrix ), new JoinNode( [ new UVNode(), new ConstNode( 1 ) ] ) );
+				node = uniform( uvScaleMap.matrix ).mul( vec3( uv(), 1 ) );
+
+			} else {
+
+				node = uv();
 
 			}
-
-			return uvNode || new UVNode();
 
 		} else {
 
 			const outputType = this.getNodeType( builder );
 
-			node = new MaterialReferenceNode( scope, outputType );
+			node = materialReference( scope, outputType );
 
 		}
 
@@ -232,3 +253,17 @@ MaterialNode.ROTATION = 'rotation';
 MaterialNode.UV = 'uv';
 
 export default MaterialNode;
+
+export const materialUV = nodeImmutable( MaterialNode, MaterialNode.UV );
+export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
+export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
+export const materialShininess = nodeImmutable( MaterialNode, MaterialNode.SHININESS );
+export const materialEmissive = nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
+export const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
+export const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
+export const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
+export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
+export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
+export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
+
+addNodeClass( MaterialNode );

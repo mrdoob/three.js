@@ -14,6 +14,17 @@
 		<p class="desc">[name] 可被用于为传入的一组点生成凸包。
 			该任务的平均时间复杂度被认为是O(nlog(n))。</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
+		</code>
+
 		<h2>代码示例</h2>
 
 		<code>const geometry = new ConvexGeometry( points );

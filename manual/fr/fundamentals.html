@@ -6,14 +6,14 @@
     <meta name="twitter:site" content="@threejs">
     <meta name="twitter:title" content="Three.js – principes de base">
     <meta property="og:image" content="https://threejs.org/files/share.png">
-    <link rel="shortcut icon" href="/files/favicon_white.ico" media="(prefers-color-scheme: dark)">
-    <link rel="shortcut icon" href="/files/favicon.ico" media="(prefers-color-scheme: light)">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
 
-    <link rel="stylesheet" href="/manual/resources/lesson.css">
-    <link rel="stylesheet" href="/manual/resources/lang.css">
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
 <!-- Import maps polyfill -->
 <!-- Remove this when import maps will be widely supported -->
-<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 <script type="importmap">
 {
@@ -137,16 +137,13 @@ import * as THREE from 'three';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
-+  const renderer = new THREE.WebGLRenderer({canvas});
++  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  ...
 &lt;/script&gt;
 </pre>
 <p>Après la recherche du canevas, nous créons un <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Le <em>renderer</em>
 a pour mission de charger les données fournies et d'en effectuer le rendu
-dans le canevas. Par le passé, il y a eu aussi d'autre <em>renderers</em> tels que
-<code class="notranslate" translate="no">CSSRenderer</code> ou <code class="notranslate" translate="no">CanvasRenderer</code> et, dans le futur, il pourrait y avoir un
-<code class="notranslate" translate="no">WebGL2Renderer</code> ou <code class="notranslate" translate="no">WebGPURenderer</code>. Pour le moment, il y a un <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>
-qui utiliser WebGL pour effectuer une rendu 3D dans le canevas.</p>
+dans le canevas.</p>
 <p>Notez qu'il y a quelques détails ésotériques ici. Si vous ne passez pas un
 canevas à Three.js, il va en créer un pour vous mais vous aurez à l'ajouter
 au document. Où l'ajouter peut dépendre du contexte d'utilisation et vous aurez
@@ -425,8 +422,8 @@ import {OrbitControls} from './someFolder/addons/controls/OrbitControls.js';
 </pre>
 <p>Cela est valable aussi lors de l'utilisation d'un CDN. Assurez vous que vos chemins versThis includes when using a CDN. Be  <code class="notranslate" translate="no">three.modules.js</code> terminent par
 <code class="notranslate" translate="no">/build/three.modules.js</code>. Par exemple :</p>
-<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@0.108.0/<b>build/three.module.js</b>';
-import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/OrbitControls.js';
+<pre class="prettyprint">import * as THREE from 'https://unpkg.com/three@&lt;version&gt;/<b>build/three.module.js</b>';
+import {OrbitControls} from 'https://unpkg.com/three@&lt;version&gt;/addons/controls/OrbitControls.js';
 </pre>
 </div>
 
@@ -434,8 +431,8 @@ import {OrbitControls} from 'https://unpkg.com/three@0.108.0/addons/controls/Orb
       </div>
     </div>
   
-  <script src="/manual/resources/prettify.js"></script>
-  <script src="/manual/resources/lesson.js"></script>
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
 
 
 

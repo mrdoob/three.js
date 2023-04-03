@@ -103,7 +103,11 @@
 			Può essere utile disabilitare questo controllo in produzione per aumentare le prestazioni.
 			È fortemente raccomandato mantenere questi controlli attivi durante lo sviluppo.
 			Se lo shader non si compila e non si collega - non funzionerà e il materiale associato non verrà visualizzato.
-			Il valore predefinito è `true`.
+			Il valore predefinito è `true`.</br>
+		- [page:Function onShaderError]( gl, program, glVertexShader, glFragmentShader ):
+			A callback function that can be used for custom error reporting. The callback receives the WebGL context, an instance of WebGLProgram as well 
+			two instances of WebGLShader representing the vertex and fragment shader. Assigning a custom function disables the default error reporting. 
+			Default is `null`.
 		</p>
 
 		<h3>[property:Object capabilities]</h3>
@@ -219,10 +223,9 @@
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<p>Definisce se il render rispetta i piani di taglio a livello di oggetto. Il valore predefinito è `false`.</p>
 
-		<h3>[property:Boolean physicallyCorrectLights]</h3>
+		<h3>[property:Boolean useLegacyLights]</h3>
 		<p>
-			Indica se utilizzare la modalità di illuminazione fisicamente corretta. Il valore predefinito è `false`.
-			Vedi l'esempio [example:webgl_lights_physical lights / physical].
+		Whether to use the legacy lighting mode or not. Il valore predefinito è `true`.
 		</p>
 
 		<h3>[property:Object properties]</h3>

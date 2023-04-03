@@ -1,12 +1,14 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
-import LightsNode from './LightsNode.js';
+import { addLightNode } from './LightsNode.js';
 import getDistanceAttenuation from '../functions/light/getDistanceAttenuation.js';
 import getDirectionVector from '../functions/light/getDirectionVector.js';
-import { uniform, smoothstep, positionView, objectViewPosition } from '../shadernode/ShaderNodeElements.js';
+import { uniform } from '../core/UniformNode.js';
+import { smoothstep } from '../math/MathNode.js';
+import { objectViewPosition } from '../accessors/Object3DNode.js';
+import { positionView } from '../accessors/PositionNode.js';
+import { addNodeClass } from '../core/Node.js';
 
 import { Vector3, SpotLight } from 'three';
-
-const getSpotAttenuation = ( coneCosine, penumbraCosine, angleCosine ) => smoothstep( coneCosine, penumbraCosine, angleCosine );
 
 class SpotLightNode extends AnalyticLightNode {
 
@@ -40,6 +42,14 @@ class SpotLightNode extends AnalyticLightNode {
 
 	}
 
+	getSpotAttenuation( angleCosine ) {
+
+		const { coneCosNode, penumbraCosNode } = this;
+
+		return smoothstep( coneCosNode, penumbraCosNode, angleCosine );
+
+	}
+
 	construct( builder ) {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
@@ -48,7 +58,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 		const lightDirection = lVector.normalize();
 		const angleCos = lightDirection.dot( this.directionNode );
-		const spotAttenuation = getSpotAttenuation( this.coneCosNode, this.penumbraCosNode, angleCos );
+		const spotAttenuation = this.getSpotAttenuation( angleCos );
 
 		const lightDistance = lVector.length();
 
@@ -79,6 +89,8 @@ class SpotLightNode extends AnalyticLightNode {
 
 }
 
-LightsNode.setReference( SpotLight, SpotLightNode );
-
 export default SpotLightNode;
+
+addLightNode( SpotLight, SpotLightNode );
+
+addNodeClass( SpotLightNode );

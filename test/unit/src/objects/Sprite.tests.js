@@ -10,23 +10,59 @@ export default QUnit.module( 'Objects', () => {
 		// INHERITANCE
 		QUnit.test( 'Extending', ( assert ) => {
 
-			var sprite = new Sprite();
-	
-			assert.strictEqual( sprite instanceof Object3D, true, 'Sprite extends from Object3D' );
+			const sprite = new Sprite();
+			assert.strictEqual(
+				sprite instanceof Object3D, true,
+				'Sprite extends from Object3D'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
+
+			const object = new Sprite();
+			assert.ok( object, 'Can instantiate a Sprite.' );
+
+		} );
+
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
+
+			const object = new Sprite();
+			assert.ok(
+				object.type === 'Sprite',
+				'Sprite.type should be Sprite'
+			);
+
+		} );
+
+		QUnit.todo( 'geometry', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		// PUBLIC STUFF
-		QUnit.todo( 'isSprite', ( assert ) => {
+		QUnit.todo( 'material', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'center', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'isSprite', ( assert ) => {
+
+			const object = new Sprite();
+			assert.ok(
+				object.isSprite,
+				'Sprite.isSprite should be true'
+			);
 
 		} );
 
@@ -36,7 +72,7 @@ export default QUnit.module( 'Objects', () => {
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'copy', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

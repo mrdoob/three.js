@@ -86,8 +86,9 @@
 
 		<h3>[property:Boolean matrixWorldAutoUpdate]</h3>
 		<p>
-		Default is true. If set, then the renderer checks every frame if the object and its children need matrix updates.
+		If set, then the renderer checks every frame if the object and its children need matrix updates.
 		When it isn't, then you have to maintain all matrices in the object and its children yourself.
+		Default is [page:Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE] (true).
 		</p>
 
 		<h3>[property:Boolean matrixWorldNeedsUpdate]</h3>
@@ -212,6 +213,10 @@
 
 		</p>
 
+		<h3>[property:Boolean DEFAULT_MATRIX_WORLD_AUTO_UPDATE]</h3>
+		<p>
+			The default setting for [page:.matrixWorldAutoUpdate matrixWorldAutoUpdate] for newly created Object3Ds.<br />
+		</p>
 
 		<h2>Methods</h2>
 

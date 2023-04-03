@@ -18,6 +18,17 @@
 			</p>
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+		</code>
+
 		<h2>例子</h2>
 
 		<p>[example:misc_controls_trackball misc / controls / trackball ]</p>
@@ -84,12 +95,22 @@
 
 		<h3>[property:Number maxDistance]</h3>
 		<p>
-			你能够将相机向外移动多少，其默认值为*Infinity*。
+			你能够将相机向外移动多少（仅适用于[page:PerspectiveCamera]），其默认值为*Infinity*。
 		</p>
 
 		<h3>[property:Number minDistance]</h3>
 		<p>
-			你能够将相机向内移动多少，其默认值为*0*。
+			你能够将相机向内移动多少（仅适用于[page:PerspectiveCamera]），其默认值为*0*。
+		</p>
+
+		<h3>[property:Float maxZoom]</h3>
+		<p>
+			你能够将相机缩小多少（仅适用于[page:OrthographicCamera]），其默认值为*Infinity*。
+		</p>
+
+		<h3>[property:Float minZoom]</h3>
+		<p>
+			你能够将相机放大多少（仅适用于[page:OrthographicCamera]），其默认值为*0*。
 		</p>
 
 		<h3>

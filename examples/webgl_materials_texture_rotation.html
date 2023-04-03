@@ -14,7 +14,7 @@
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
-		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
 		<script type="importmap">
 			{
@@ -41,7 +41,7 @@
 				offsetY: 0,
 				repeatX: 0.25,
 				repeatY: 0.25,
-				rotation: Math.PI / 4, // positive is counter-clockwise
+				rotation: Math.PI / 4, // positive is counterclockwise
 				centerX: 0.5,
 				centerY: 0.5
 			};
@@ -120,11 +120,11 @@
 					texture.offset.set( API.offsetX, API.offsetY );
 					texture.repeat.set( API.repeatX, API.repeatY );
 					texture.center.set( API.centerX, API.centerY );
-					texture.rotation = API.rotation; // rotation is around [ 0.5, 0.5 ]
+					texture.rotation = API.rotation; // rotation is around center
 
 				} else {
 
-					// one way...
+					// setting the matrix uv transform directly
 					//texture.matrix.setUvTransform( API.offsetX, API.offsetY, API.repeatX, API.repeatY, API.rotation, API.centerX, API.centerY );
 
 					// another way...

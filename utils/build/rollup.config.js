@@ -252,9 +252,24 @@ function header() {
 
 			return `/**
  * @license
- * Copyright 2010-2022 Three.js Authors
+ * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
+${ code }`;
+
+		}
+
+	};
+
+}
+
+function deprecationWarning() {
+
+	return {
+
+		renderChunk( code ) {
+
+			return `console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );
 ${ code }`;
 
 		}
@@ -283,16 +298,26 @@ const builds = [
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
+			glconstants(),
 			glsl(),
+			terser(),
 			header()
 		],
 		output: [
 			{
-				format: 'umd',
-				name: 'THREE',
-				file: 'build/three.js',
-				indent: '\t'
-			},
+				format: 'esm',
+				file: 'build/three.module.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
+			glsl(),
+			header()
+		],
+		output: [
 			{
 				format: 'cjs',
 				name: 'THREE',
@@ -301,14 +326,33 @@ const builds = [
 			}
 		]
 	},
-	{
+
+	{ // @deprecated, r150
+		input: 'src/Three.js',
+		plugins: [
+			addons(),
+			glsl(),
+			header(),
+			deprecationWarning()
+		],
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.js',
+				indent: '\t'
+			}
+		]
+	},
+	{ // @deprecated, r150
 		input: 'src/Three.js',
 		plugins: [
 			addons(),
 			glconstants(),
 			glsl(),
 			terser(),
-			header()
+			header(),
+			deprecationWarning()
 		],
 		output: [
 			{

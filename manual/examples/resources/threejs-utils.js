@@ -32,21 +32,29 @@
 /* global define */
 
 (function(root, factory) {  // eslint-disable-line
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define([], function() {
-      return factory.call(root);
-    });
-  } else {
-    // Browser globals
-    root.threejsUtils = factory.call(root);
-  }
-}(this, function() {
+	if ( typeof define === 'function' && define.amd ) {
+
+		// AMD. Register as an anonymous module.
+		define( [], function () {
+
+			return factory.call( root );
+
+		} );
+
+	} else {
+
+		// Browser globals
+		root.threejsUtils = factory.call( root );
+
+	}
+
+}( this, function () {
+
   'use strict';  // eslint-disable-line
 
-  /** @module threejs-utils */
+	/** @module threejs-utils */
 
-  /**
+	/**
    * Resize a canvas to match the size its displayed.
    * @param {HTMLCanvasElement} canvas The canvas to resize.
    * @param {number} [multiplier] amount to multiply by.
@@ -54,21 +62,26 @@
    * @return {boolean} true if the canvas was resized.
    * @memberOf module:webgl-utils
    */
-  function resizeCanvasToDisplaySize(canvas, multiplier) {
-    multiplier = multiplier || 1;
-    const width  = canvas.clientWidth  * multiplier | 0;
-    const height = canvas.clientHeight * multiplier | 0;
-    if (canvas.width !== width ||  canvas.height !== height) {
-      canvas.width  = width;
-      canvas.height = height;
-      return true;
-    }
-    return false;
-  }
+	function resizeCanvasToDisplaySize( canvas, multiplier ) {
 
-  return {
-    resizeCanvasToDisplaySize: resizeCanvasToDisplaySize,
-  };
+		multiplier = multiplier || 1;
+		const width = canvas.clientWidth * multiplier | 0;
+		const height = canvas.clientHeight * multiplier | 0;
+		if ( canvas.width !== width || canvas.height !== height ) {
 
-}));
+			canvas.width = width;
+			canvas.height = height;
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	return {
+		resizeCanvasToDisplaySize: resizeCanvasToDisplaySize,
+	};
+
+} ) );
 

@@ -97,11 +97,15 @@
 		<h3>[property:Object debug]</h3>
 		<p>
 		- [page:Boolean checkShaderErrors]:
-		  If it is true, defines whether material shader programs are checked
+			If it is true, defines whether material shader programs are checked
 			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
 			It is strongly recommended to keep these checks enabled during development.
 			If the shader does not compile and link - it will not work and associated material will not render.
-			Default is `true`.
+			Default is `true`.</br>
+		- [page:Function onShaderError]( gl, program, glVertexShader, glFragmentShader ):
+			A callback function that can be used for custom error reporting. The callback receives the WebGL context, an instance of WebGLProgram as well 
+			two instances of WebGLShader representing the vertex and fragment shader. Assigning a custom function disables the default error reporting. 
+			Default is `null`.
 		</p>
 
 		<h3>[property:Object capabilities]</h3>
@@ -210,10 +214,9 @@
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<p>Defines whether the renderer respects object-level clipping planes. Default is `false`.</p>
 
-		<h3>[property:Boolean physicallyCorrectLights]</h3>
+		<h3>[property:Boolean useLegacyLights]</h3>
 		<p>
-		Whether to use physically correct lighting mode. Default is `false`.
-		See the [example:webgl_lights_physical lights / physical] example.
+		Whether to use the legacy lighting mode or not. Default is `true`.
 		</p>
 
 		<h3>[property:Object properties]</h3>

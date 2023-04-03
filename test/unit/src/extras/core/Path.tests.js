@@ -1,6 +1,8 @@
 /* global QUnit */
 
-// import { Path } from '../../../../../src/extras/core/Path.js';
+import { Path } from '../../../../../src/extras/core/Path.js';
+
+import { CurvePath } from '../../../../../src/extras/core/CurvePath.js';
 
 export default QUnit.module( 'Extras', () => {
 
@@ -9,21 +11,43 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'Path', () => {
 
 			// INHERITANCE
-			QUnit.todo( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( assert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				const object = new Path();
+				assert.strictEqual(
+					object instanceof CurvePath, true,
+					'Path extends from CurvePath'
+				);
 
 			} );
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( assert ) => {
+
+				const object = new Path();
+				assert.ok( object, 'Can instantiate a Path.' );
+
+			} );
+
+			// PROPERTIES
+			QUnit.test( 'type', ( assert ) => {
+
+				const object = new Path();
+				assert.ok(
+					object.type === 'Path',
+					'Path.type should be Path'
+				);
+
+			} );
+
+			QUnit.todo( 'currentPoint', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			// PUBLIC STUFF
-			QUnit.todo( 'fromPoints', ( assert ) => {
+			// PUBLIC
+			QUnit.todo( 'setFromPoints', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 
@@ -78,6 +102,24 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			QUnit.todo( 'absellipse', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'copy', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'toJSON', ( assert ) => {
+
+				assert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'fromJSON', ( assert ) => {
 
 				assert.ok( false, 'everything\'s gonna be alright' );
 
