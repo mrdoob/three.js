@@ -363,6 +363,7 @@ class NRRDLoader extends Loader {
 
 		const volume = new Volume();
 		volume.header = headerObject;
+		volume.segmentation = this.segmentation;
 		//
 		// parse the (unzipped) data to a datastream of the correct type
 		//
@@ -445,7 +446,7 @@ class NRRDLoader extends Loader {
 		}
 
 
-		if ( ! headerObject.vectors || this.segmentation ) {
+		if ( ! headerObject.vectors ) {
 
 			volume.matrix.set(
 				1, 0, 0, 0,
@@ -472,7 +473,12 @@ class NRRDLoader extends Loader {
 
 		volume.inverseMatrix = new Matrix4();
 		volume.inverseMatrix.copy( volume.matrix ).invert();
-		volume.RASDimensions = new Vector3( volume.xLength, volume.yLength, volume.zLength ).applyMatrix4( volume.matrix ).round().toArray().map( Math.abs );
+		
+		volume.RASDimensions = [
+			Math.floor( volume.xLength * spacingX ), 
+			Math.floor( volume.yLength * spacingY ), 
+			Math.floor( volume.zLength * spacingZ )
+		];
 
 		// .. and set the default threshold
 		// only if the threshold was not already set
