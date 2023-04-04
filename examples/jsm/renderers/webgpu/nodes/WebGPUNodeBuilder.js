@@ -418,13 +418,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		const snippets = [];
 
+		if ( shaderStage === 'compute' ) {
+
+			this.getBuiltin( 'global_invocation_id', 'id', 'vec3<u32>', 'attribute' );
+
+		}
+
 		if ( shaderStage === 'vertex' || shaderStage === 'compute' ) {
-
-			if ( shaderStage === 'compute' ) {
-
-				this.getBuiltin( 'global_invocation_id', 'id', 'vec3<u32>', 'attribute' );
-
-			}
 
 			for ( const { name, property, type } of this.builtins.attribute.values() ) {
 
@@ -477,26 +477,9 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 			this.getBuiltin( 'position', 'Vertex', 'vec4<f32>', 'vertex' );
 
-			const varyings = this.varyings;
-			const vars = this.vars[ shaderStage ];
+		}
 
-			for ( let index = 0; index < varyings.length; index ++ ) {
-
-				const varying = varyings[ index ];
-
-				if ( varying.needsInterpolation ) {
-
-					snippets.push( `@location( ${index} ) ${ varying.name } : ${ this.getType( varying.type ) }` );
-
-				} else if ( vars.includes( varying ) === false ) {
-
-					vars.push( varying );
-
-				}
-
-			}
-
-		} else if ( shaderStage === 'fragment' ) {
+		if ( shaderStage === 'vertex' || shaderStage === 'fragment' ) {
 
 			const varyings = this.varyings;
 			const vars = this.vars[ shaderStage ];
@@ -555,7 +538,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				let textureType;
 
-				if ( uniform.type === 'cubeTexture' ) {
+				if ( texture.isCubeTexture === true ) {
 
 					textureType = 'texture_cube<f32>';
 
