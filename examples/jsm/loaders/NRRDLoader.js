@@ -389,7 +389,7 @@ class NRRDLoader extends Loader {
 			const yIndex = headerObject.vectors.findIndex( vector => vector[ 1 ] !== 0 );
 			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
-			let axisOrder = [];
+			const axisOrder = [];
 
 			if ( xIndex !== yIndex && xIndex !== zIndex && yIndex !== zIndex ) {
 
@@ -473,6 +473,7 @@ class NRRDLoader extends Loader {
 
 		volume.inverseMatrix = new Matrix4();
 		volume.inverseMatrix.copy( volume.matrix ).invert();
+		
 		volume.RASDimensions = [
 			Math.floor( volume.xLength * spacingX ), 
 			Math.floor( volume.yLength * spacingY ), 

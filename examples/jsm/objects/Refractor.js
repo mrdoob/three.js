@@ -10,7 +10,7 @@ import {
 	Vector3,
 	Vector4,
 	WebGLRenderTarget,
-	LinearEncoding,
+	LinearSRGBColorSpace,
 	NoToneMapping,
 	HalfFloatType
 } from 'three';
@@ -194,12 +194,12 @@ class Refractor extends Mesh {
 			const currentRenderTarget = renderer.getRenderTarget();
 			const currentXrEnabled = renderer.xr.enabled;
 			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
-			const currentOutputEncoding = renderer.outputEncoding;
+			const currentOutputColorSpace = renderer.outputColorSpace;
 			const currentToneMapping = renderer.toneMapping;
 
 			renderer.xr.enabled = false; // avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
-			renderer.outputEncoding = LinearEncoding;
+			renderer.outputColorSpace = LinearSRGBColorSpace;
 			renderer.toneMapping = NoToneMapping;
 
 			renderer.setRenderTarget( renderTarget );
@@ -208,7 +208,7 @@ class Refractor extends Mesh {
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
-			renderer.outputEncoding = currentOutputEncoding;
+			renderer.outputColorSpace = currentOutputColorSpace;
 			renderer.toneMapping = currentToneMapping;
 			renderer.setRenderTarget( currentRenderTarget );
 

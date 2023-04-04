@@ -20,9 +20,9 @@ class FogNode extends Node {
 
 	}
 
-	generate( builder ) {
+	construct() {
 
-		return this.factorNode.build( builder, 'float' );
+		return this.factorNode;
 
 	}
 

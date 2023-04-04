@@ -1,3 +1,5 @@
+import WebGPUWeakMap from './WebGPUWeakMap.js';
+
 function painterSortStable( a, b ) {
 
 	if ( a.groupOrder !== b.groupOrder ) {
@@ -156,31 +158,22 @@ class WebGPURenderLists {
 	constructor() {
 
 		this.lists = new WeakMap();
+		this.lists = new WebGPUWeakMap();
 
 	}
 
 	get( scene, camera ) {
 
 		const lists = this.lists;
+		const keys = [ scene, camera ];
 
-		const cameras = lists.get( scene );
-		let list;
+		let list = lists.get( keys );
 
-		if ( cameras === undefined ) {
+		if ( list === undefined ) {
 
 			list = new WebGPURenderList();
-			lists.set( scene, new WeakMap() );
-			lists.get( scene ).set( camera, list );
+			lists.set( keys, list );
 
-		} else {
-
-			list = cameras.get( camera );
-			if ( list === undefined ) {
-
-				list = new WebGPURenderList();
-				cameras.set( camera, list );
-
-			}
 
 		}
 

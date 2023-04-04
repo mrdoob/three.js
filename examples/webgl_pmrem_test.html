@@ -54,7 +54,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.useLegacyLights = false;
 
 				// tonemapping

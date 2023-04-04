@@ -3,7 +3,7 @@
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '151';
+const REVISION = '152dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -11928,7 +11928,7 @@ function getUnlitUniformColorSpace( renderer ) {
 	if ( renderer.getRenderTarget() === null ) {
 
 		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
-		return renderer.outputEncoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
+		return renderer.outputColorSpace;
 
 	}
 
@@ -13501,7 +13501,7 @@ var logdepthbuf_pars_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_
 
 var logdepthbuf_vertex = "#ifdef USE_LOGDEPTHBUF\n\t#ifdef USE_LOGDEPTHBUF_EXT\n\t\tvFragDepth = 1.0 + gl_Position.w;\n\t\tvIsPerspective = float( isPerspectiveMatrix( projectionMatrix ) );\n\t#else\n\t\tif ( isPerspectiveMatrix( projectionMatrix ) ) {\n\t\t\tgl_Position.z = log2( max( EPSILON, gl_Position.w + 1.0 ) ) * logDepthBufFC - 1.0;\n\t\t\tgl_Position.z *= gl_Position.w;\n\t\t}\n\t#endif\n#endif";
 
-var map_fragment = "#ifdef USE_MAP\n\tvec4 sampledDiffuseColor = texture2D( map, vMapUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\tsampledDiffuseColor = vec4( mix( pow( sampledDiffuseColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), sampledDiffuseColor.rgb * 0.0773993808, vec3( lessThanEqual( sampledDiffuseColor.rgb, vec3( 0.04045 ) ) ) ), sampledDiffuseColor.w );\n\t#endif\n\tdiffuseColor *= sampledDiffuseColor;\n#endif";
+var map_fragment = "#ifdef USE_MAP\n\tdiffuseColor *= texture2D( map, vMapUv );\n#endif";
 
 var map_pars_fragment = "#ifdef USE_MAP\n\tuniform sampler2D map;\n#endif";
 
@@ -13595,7 +13595,7 @@ var worldpos_vertex = "#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defin
 
 const vertex$h = "varying vec2 vUv;\nuniform mat3 uvTransform;\nvoid main() {\n\tvUv = ( uvTransform * vec3( uv, 1 ) ).xy;\n\tgl_Position = vec4( position.xy, 1.0, 1.0 );\n}";
 
-const fragment$h = "uniform sampler2D t2D;\nuniform float backgroundIntensity;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\t#ifdef DECODE_VIDEO_TEXTURE\n\t\ttexColor = vec4( mix( pow( texColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), texColor.rgb * 0.0773993808, vec3( lessThanEqual( texColor.rgb, vec3( 0.04045 ) ) ) ), texColor.w );\n\t#endif\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
+const fragment$h = "uniform sampler2D t2D;\nuniform float backgroundIntensity;\nvarying vec2 vUv;\nvoid main() {\n\tvec4 texColor = texture2D( t2D, vUv );\n\ttexColor.rgb *= backgroundIntensity;\n\tgl_FragColor = texColor;\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n}";
 
 const vertex$g = "varying vec3 vWorldDirection;\n#include <common>\nvoid main() {\n\tvWorldDirection = transformDirection( position, modelMatrix );\n\t#include <begin_vertex>\n\t#include <project_vertex>\n\tgl_Position.z = gl_Position.w;\n}";
 
@@ -18748,16 +18748,16 @@ function handleSource( string, errorLine ) {
 
 }
 
-function getEncodingComponents( encoding ) {
+function getEncodingComponents( colorSpace ) {
 
-	switch ( encoding ) {
+	switch ( colorSpace ) {
 
-		case LinearEncoding:
+		case LinearSRGBColorSpace:
 			return [ 'Linear', '( value )' ];
-		case sRGBEncoding:
+		case SRGBColorSpace:
 			return [ 'sRGB', '( value )' ];
 		default:
-			console.warn( 'THREE.WebGLProgram: Unsupported encoding:', encoding );
+			console.warn( 'THREE.WebGLProgram: Unsupported color space:', colorSpace );
 			return [ 'Linear', '( value )' ];
 
 	}
@@ -18788,9 +18788,9 @@ function getShaderErrors( gl, shader, type ) {
 
 }
 
-function getTexelEncodingFunction( functionName, encoding ) {
+function getTexelEncodingFunction( functionName, colorSpace ) {
 
-	const components = getEncodingComponents( encoding );
+	const components = getEncodingComponents( colorSpace );
 	return 'vec4 ' + functionName + '( vec4 value ) { return LinearTo' + components[ 0 ] + components[ 1 ] + '; }';
 
 }
@@ -19409,8 +19409,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
 
-			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
-
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
@@ -19447,7 +19445,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.opaque ? '#define OPAQUE' : '',
 
 			ShaderChunk[ 'encodings_pars_fragment' ], // this code is required here because it is used by the various encoding/decoding function defined below
-			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ),
+			getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputColorSpace ),
 
 			parameters.useDepthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '',
 
@@ -19959,7 +19957,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 
 			supportsVertexTextures: SUPPORTS_VERTEX_TEXTURES,
-			outputEncoding: ( currentRenderTarget === null ) ? renderer.outputEncoding : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.encoding : LinearEncoding ),
+			outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? ( currentRenderTarget.texture.encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace ) : LinearSRGBColorSpace ),
 
 			map: HAS_MAP,
 			matcap: HAS_MATCAP,
@@ -19975,8 +19973,6 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			normalMapObjectSpace: HAS_NORMALMAP && material.normalMapType === ObjectSpaceNormalMap,
 			normalMapTangentSpace: HAS_NORMALMAP && material.normalMapType === TangentSpaceNormalMap,
-
-			decodeVideoTexture: HAS_MAP && ( material.map.isVideoTexture === true ) && ( material.map.encoding === sRGBEncoding ),
 
 			metalnessMap: HAS_METALNESSMAP,
 			roughnessMap: HAS_ROUGHNESSMAP,
@@ -20149,7 +20145,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			getProgramCacheKeyParameters( array, parameters );
 			getProgramCacheKeyBooleans( array, parameters );
-			array.push( renderer.outputEncoding );
+			array.push( renderer.outputColorSpace );
 
 		}
 
@@ -20162,7 +20158,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	function getProgramCacheKeyParameters( array, parameters ) {
 
 		array.push( parameters.precision );
-		array.push( parameters.outputEncoding );
+		array.push( parameters.outputColorSpace );
 		array.push( parameters.envMapMode );
 		array.push( parameters.envMapCubeUVHeight );
 		array.push( parameters.mapUv );
@@ -20282,12 +20278,10 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 15 );
 		if ( parameters.sheen )
 			_programLayers.enable( 16 );
-		if ( parameters.decodeVideoTexture )
-			_programLayers.enable( 17 );
 		if ( parameters.opaque )
-			_programLayers.enable( 18 );
+			_programLayers.enable( 17 );
 		if ( parameters.pointsUvs )
-			_programLayers.enable( 19 );
+			_programLayers.enable( 18 );
 
 		array.push( _programLayers.mask );
 
@@ -22147,7 +22141,7 @@ function WebGLState( gl, extensions, capabilities ) {
 	const currentScissor = new Vector4().fromArray( scissorParam );
 	const currentViewport = new Vector4().fromArray( viewportParam );
 
-	function createTexture( type, target, count ) {
+	function createTexture( type, target, count, dimensions ) {
 
 		const data = new Uint8Array( 4 ); // 4 is required to match default unpack alignment of 4.
 		const texture = gl.createTexture();
@@ -22158,7 +22152,15 @@ function WebGLState( gl, extensions, capabilities ) {
 
 		for ( let i = 0; i < count; i ++ ) {
 
-			gl.texImage2D( target + i, 0, 6408, 1, 1, 0, 6408, 5121, data );
+			if ( isWebGL2 && ( type === 32879 || type === 35866 ) ) {
+
+				gl.texImage3D( target, 0, 6408, 1, 1, dimensions, 0, 6408, 5121, data );
+
+			} else {
+
+				gl.texImage2D( target + i, 0, 6408, 1, 1, 0, 6408, 5121, data );
+
+			}
 
 		}
 
@@ -22169,6 +22171,13 @@ function WebGLState( gl, extensions, capabilities ) {
 	const emptyTextures = {};
 	emptyTextures[ 3553 ] = createTexture( 3553, 3553, 1 );
 	emptyTextures[ 34067 ] = createTexture( 34067, 34069, 6 );
+
+	if ( isWebGL2 ) {
+
+		emptyTextures[ 35866 ] = createTexture( 35866, 35866, 1, 1 );
+		emptyTextures[ 32879 ] = createTexture( 32879, 32879, 1, 1 );
+
+	}
 
 	// init
 
@@ -23772,7 +23781,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				glFormat = utils.convert( texture.format, texture.encoding );
 
 			let glType = utils.convert( texture.type ),
-				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding, texture.isVideoTexture );
+				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
 
 			setTextureParameters( textureType, texture, supportsMips );
 
@@ -24995,7 +25004,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const format = texture.format;
 		const type = texture.type;
 
-		if ( texture.isCompressedTexture === true || texture.isVideoTexture === true || texture.format === _SRGBAFormat ) return image;
+		if ( texture.isCompressedTexture === true || texture.format === _SRGBAFormat ) return image;
 
 		if ( encoding !== LinearEncoding ) {
 
@@ -26010,7 +26019,7 @@ class WebXRManager extends EventDispatcher {
 						{
 							format: RGBAFormat,
 							type: UnsignedByteType,
-							encoding: renderer.outputEncoding,
+							encoding: renderer.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding,
 							stencilBuffer: attributes.stencil
 						}
 					);
@@ -26049,7 +26058,7 @@ class WebXRManager extends EventDispatcher {
 							type: UnsignedByteType,
 							depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 							stencilBuffer: attributes.stencil,
-							encoding: renderer.outputEncoding,
+							encoding: renderer.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding,
 							samples: attributes.antialias ? 4 : 0
 						} );
 
@@ -27584,7 +27593,7 @@ class WebGLRenderer {
 
 		// physically based shading
 
-		this.outputEncoding = LinearEncoding;
+		this.outputColorSpace = LinearSRGBColorSpace;
 
 		// physical lights
 
@@ -28947,7 +28956,7 @@ class WebGLRenderer {
 
 			const materialProperties = properties.get( material );
 
-			materialProperties.outputEncoding = parameters.outputEncoding;
+			materialProperties.outputColorSpace = parameters.outputColorSpace;
 			materialProperties.instancing = parameters.instancing;
 			materialProperties.skinning = parameters.skinning;
 			materialProperties.morphTargets = parameters.morphTargets;
@@ -28970,7 +28979,7 @@ class WebGLRenderer {
 
 			const fog = scene.fog;
 			const environment = material.isMeshStandardMaterial ? scene.environment : null;
-			const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.encoding : LinearEncoding );
+			const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? ( _currentRenderTarget.texture.encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace ) : LinearSRGBColorSpace );
 			const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 			const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 			const vertexTangents = !! material.normalMap && !! geometry.attributes.tangent;
@@ -29012,7 +29021,7 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( materialProperties.outputEncoding !== encoding ) {
+				} else if ( materialProperties.outputColorSpace !== colorSpace ) {
 
 					needsProgramChange = true;
 
@@ -29758,6 +29767,20 @@ class WebGLRenderer {
 
 		console.warn( 'THREE.WebGLRenderer: the property .physicallyCorrectLights has been removed. Set renderer.useLegacyLights instead.' );
 		this.useLegacyLights = ! value;
+
+	}
+
+	get outputEncoding() { // @deprecated, r152
+
+		console.warn( 'THREE.WebGLRenderer: Property .outputEncoding has been removed. Use .outputColorSpace instead.' );
+		return this.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
+
+	}
+
+	set outputEncoding( encoding ) { // @deprecated, r152
+
+		console.warn( 'THREE.WebGLRenderer: Property .outputEncoding has been removed. Use .outputColorSpace instead.' );
+		this.outputColorSpace = encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
 
 	}
 
