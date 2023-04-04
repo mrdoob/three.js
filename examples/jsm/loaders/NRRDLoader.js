@@ -473,11 +473,11 @@ class NRRDLoader extends Loader {
 
 		volume.inverseMatrix = new Matrix4();
 		volume.inverseMatrix.copy( volume.matrix ).invert();
-		volume.RASDimensions = new Vector3( 
-			Math.floor(volume.xLength * spacingX), 
-			Math.floor(volume.yLength * spacingY), 
-			Math.floor(volume.zLength * spacingZ), 
-		).toArray();
+		volume.RASDimensions = [
+			Math.floor( volume.xLength * spacingX ), 
+			Math.floor( volume.yLength * spacingY ), 
+			Math.floor( volume.zLength * spacingZ )
+		];
 
 		// .. and set the default threshold
 		// only if the threshold was not already set
