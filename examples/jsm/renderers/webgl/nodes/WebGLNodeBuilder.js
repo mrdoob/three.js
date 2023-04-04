@@ -422,13 +422,13 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet ) {
+	getTexture( texture, textureProperty, uvSnippet ) {
 
 		return `texture2D( ${textureProperty}, ${uvSnippet} )`;
 
 	}
 
-	getTextureBias( textureProperty, uvSnippet, biasSnippet ) {
+	getTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
 
 		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
 
@@ -436,13 +436,13 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getCubeTexture( textureProperty, uvSnippet ) {
+	getCubeTexture( texture, textureProperty, uvSnippet ) {
 
 		return `textureCube( ${textureProperty}, ${uvSnippet} )`;
 
 	}
 
-	getCubeTextureBias( textureProperty, uvSnippet, biasSnippet ) {
+	getCubeTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
 
 		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
 

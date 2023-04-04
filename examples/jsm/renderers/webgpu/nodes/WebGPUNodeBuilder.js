@@ -213,13 +213,13 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getCubeTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+	getCubeTexture( texture, textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
 		return this.getSampler( textureProperty, uvSnippet, shaderStage );
 
 	}
 
-	getCubeTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getCubeTextureLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
 

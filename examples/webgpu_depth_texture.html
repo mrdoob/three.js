@@ -94,7 +94,7 @@
 				const depthTexture = new THREE.DepthTexture();
 
 				textureRenderer = new WebGPUTextureRenderer( renderer );
-				textureRenderer.renderTarget.depthTexture = depthTexture
+				textureRenderer.renderTarget.depthTexture = depthTexture;
 				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 				window.addEventListener( 'resize', onWindowResize );
