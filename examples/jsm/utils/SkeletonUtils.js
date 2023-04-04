@@ -367,12 +367,100 @@ function retargetClip( target, source, clip, options = {} ) {
 
 }
 
+function clone( source ) {
+
+	const sourceLookup = new Map();
+	const cloneLookup = new Map();
+
+	const clone = source.clone();
+
+	parallelTraverse( source, clone, function ( sourceNode, clonedNode ) {
+
+		sourceLookup.set( clonedNode, sourceNode );
+		cloneLookup.set( sourceNode, clonedNode );
+
+	} );
+
+	clone.traverse( function ( node ) {
+
+		if ( ! node.isSkinnedMesh ) return;
+
+		const clonedMesh = node;
+		const sourceMesh = sourceLookup.get( node );
+		const sourceBones = sourceMesh.skeleton.bones;
+
+		clonedMesh.skeleton = sourceMesh.skeleton.clone();
+		clonedMesh.bindMatrix.copy( sourceMesh.bindMatrix );
+
+		clonedMesh.skeleton.bones = sourceBones.map( function ( bone ) {
+
+			return cloneLookup.get( bone );
+
+		} );
+
+		clonedMesh.bind( clonedMesh.skeleton, clonedMesh.bindMatrix );
+
+	} );
+
+	return clone;
+
+}
+
+// internal helper
+
+function getBoneByName( name, skeleton ) {
+
+	for ( let i = 0, bones = getBones( skeleton ); i < bones.length; i ++ ) {
+
+		if ( name === bones[ i ].name )
+
+			return bones[ i ];
+
+	}
+
+}
+
+function getBones( skeleton ) {
+
+	return Array.isArray( skeleton ) ? skeleton : skeleton.bones;
+
+}
+
+
 function getHelperFromSkeleton( skeleton ) {
 
 	const source = new SkeletonHelper( skeleton.bones[ 0 ] );
 	source.skeleton = skeleton;
 
 	return source;
+
+}
+
+function getNearestBone( bone, names ) {
+
+	while ( bone.isBone ) {
+
+		if ( names.indexOf( bone.name ) !== - 1 ) {
+
+			return bone;
+
+		}
+
+		bone = bone.parent;
+
+	}
+
+}
+
+function parallelTraverse( a, b, callback ) {
+
+	callback( a, b );
+
+	for ( let i = 0; i < a.children.length; i ++ ) {
+
+		parallelTraverse( a.children[ i ], b.children[ i ], callback );
+
+	}
 
 }
 
@@ -462,175 +550,8 @@ function getSkeletonOffsets( target, source, options = {} ) {
 
 }
 
-function renameBones( skeleton, names ) {
-
-	const bones = getBones( skeleton );
-
-	for ( let i = 0; i < bones.length; ++ i ) {
-
-		const bone = bones[ i ];
-
-		if ( names[ bone.name ] ) {
-
-			bone.name = names[ bone.name ];
-
-		}
-
-	}
-
-	return this;
-
-}
-
-function getBones( skeleton ) {
-
-	return Array.isArray( skeleton ) ? skeleton : skeleton.bones;
-
-}
-
-function getBoneByName( name, skeleton ) {
-
-	for ( let i = 0, bones = getBones( skeleton ); i < bones.length; i ++ ) {
-
-		if ( name === bones[ i ].name )
-
-			return bones[ i ];
-
-	}
-
-}
-
-function getNearestBone( bone, names ) {
-
-	while ( bone.isBone ) {
-
-		if ( names.indexOf( bone.name ) !== - 1 ) {
-
-			return bone;
-
-		}
-
-		bone = bone.parent;
-
-	}
-
-}
-
-function findBoneTrackData( name, tracks ) {
-
-	const regexp = /\[(.*)\]\.(.*)/,
-		result = { name: name };
-
-	for ( let i = 0; i < tracks.length; ++ i ) {
-
-		// 1 is track name
-		// 2 is track type
-		const trackData = regexp.exec( tracks[ i ].name );
-
-		if ( trackData && name === trackData[ 1 ] ) {
-
-			result[ trackData[ 2 ] ] = i;
-
-		}
-
-	}
-
-	return result;
-
-}
-
-function getEqualsBonesNames( skeleton, targetSkeleton ) {
-
-	const sourceBones = getBones( skeleton ),
-		targetBones = getBones( targetSkeleton ),
-		bones = [];
-
-	search : for ( let i = 0; i < sourceBones.length; i ++ ) {
-
-		const boneName = sourceBones[ i ].name;
-
-		for ( let j = 0; j < targetBones.length; j ++ ) {
-
-			if ( boneName === targetBones[ j ].name ) {
-
-				bones.push( boneName );
-
-				continue search;
-
-			}
-
-		}
-
-	}
-
-	return bones;
-
-}
-
-function clone( source ) {
-
-	const sourceLookup = new Map();
-	const cloneLookup = new Map();
-
-	const clone = source.clone();
-
-	parallelTraverse( source, clone, function ( sourceNode, clonedNode ) {
-
-		sourceLookup.set( clonedNode, sourceNode );
-		cloneLookup.set( sourceNode, clonedNode );
-
-	} );
-
-	clone.traverse( function ( node ) {
-
-		if ( ! node.isSkinnedMesh ) return;
-
-		const clonedMesh = node;
-		const sourceMesh = sourceLookup.get( node );
-		const sourceBones = sourceMesh.skeleton.bones;
-
-		clonedMesh.skeleton = sourceMesh.skeleton.clone();
-		clonedMesh.bindMatrix.copy( sourceMesh.bindMatrix );
-
-		clonedMesh.skeleton.bones = sourceBones.map( function ( bone ) {
-
-			return cloneLookup.get( bone );
-
-		} );
-
-		clonedMesh.bind( clonedMesh.skeleton, clonedMesh.bindMatrix );
-
-	} );
-
-	return clone;
-
-}
-
-
-
-
-function parallelTraverse( a, b, callback ) {
-
-	callback( a, b );
-
-	for ( let i = 0; i < a.children.length; i ++ ) {
-
-		parallelTraverse( a.children[ i ], b.children[ i ], callback );
-
-	}
-
-}
-
 export {
 	retarget,
 	retargetClip,
-	getHelperFromSkeleton,
-	getSkeletonOffsets,
-	renameBones,
-	getBones,
-	getBoneByName,
-	getNearestBone,
-	findBoneTrackData,
-	getEqualsBonesNames,
 	clone,
 };
