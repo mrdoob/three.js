@@ -73,7 +73,7 @@ class Texture extends EventDispatcher {
 		} else { // @deprecated, r152
 
 			warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-			this.colorSpace = encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+			this.colorSpace = colorSpace === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
 
 		}
 
