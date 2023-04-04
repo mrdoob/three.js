@@ -388,7 +388,7 @@ class NRRDLoader extends Loader {
 			const yIndex = headerObject.vectors.findIndex( vector => vector[ 1 ] !== 0 );
 			const zIndex = headerObject.vectors.findIndex( vector => vector[ 2 ] !== 0 );
 
-			let axisOrder = [];
+			const axisOrder = [];
 
 			if ( xIndex !== yIndex && xIndex !== zIndex && yIndex !== zIndex ) {
 

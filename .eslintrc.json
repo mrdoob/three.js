@@ -33,6 +33,7 @@
     "GPUShaderStage": "readonly",
     "GPUBufferUsage": "readonly",
     "GPUTextureUsage": "readonly",
+    "GPUTexture": "readonly",
     "GPUMapMode": "readonly",
     "QUnit": "readonly",
     "Ammo": "readonly",
