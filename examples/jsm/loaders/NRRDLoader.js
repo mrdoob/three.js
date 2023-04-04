@@ -458,12 +458,12 @@ class NRRDLoader extends Loader {
 
 			const v = headerObject.vectors;
 
-			const ijk_to_transition = new Matrix4().fromArray([
+			const ijk_to_transition = new Matrix4().set(
 				v[ 0 ][ 0 ], v[ 1 ][ 0 ], v[ 2 ][ 0 ], 0,
 				v[ 0 ][ 1 ], v[ 1 ][ 1 ], v[ 2 ][ 1 ], 0,
 				v[ 0 ][ 2 ], v[ 1 ][ 2 ], v[ 2 ][ 2 ], 0,
 				0, 0, 0, 1
-			]);
+			);
 
 			const transition_to_ras = new Matrix4().multiplyMatrices( ijk_to_transition, transitionMatrix );
 
