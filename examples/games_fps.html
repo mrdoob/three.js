@@ -77,7 +77,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.VSMShadowMap;
-			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.outputColorSpace = THREE.SRGBColorSpace;
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			container.appendChild( renderer.domElement );
 

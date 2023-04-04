@@ -32,8 +32,8 @@ class NodeBuilder {
 	constructor( object, renderer, parser ) {
 
 		this.object = object;
-		this.material = object.material || null;
-		this.geometry = object.geometry || null;
+		this.material = object && ( object.material || null );
+		this.geometry = object && ( object.geometry || null );
 		this.renderer = renderer;
 		this.parser = parser;
 
@@ -41,9 +41,10 @@ class NodeBuilder {
 		this.updateNodes = [];
 		this.hashNodes = {};
 
-		this.scene = null;
 		this.lightsNode = null;
+		this.environmentNode = null;
 		this.fogNode = null;
+		this.toneMappingNode = null;
 
 		this.vertexShader = null;
 		this.fragmentShader = null;
@@ -63,7 +64,7 @@ class NodeBuilder {
 
 		this.context = {
 			keywords: new NodeKeywords(),
-			material: object.material,
+			material: this.material,
 			getMIPLevelAlgorithmNode: ( textureNode, levelNode ) => levelNode.mul( maxMipLevel( textureNode ) )
 		};
 
