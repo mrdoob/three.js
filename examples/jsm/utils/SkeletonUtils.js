@@ -1,12 +1,10 @@
 import {
 	AnimationClip,
 	AnimationMixer,
-	Euler,
 	Matrix4,
 	Quaternion,
 	QuaternionKeyframeTrack,
 	SkeletonHelper,
-	Vector2,
 	Vector3,
 	VectorKeyframeTrack
 } from 'three';
@@ -436,22 +434,6 @@ function getHelperFromSkeleton( skeleton ) {
 
 }
 
-function getNearestBone( bone, names ) {
-
-	while ( bone.isBone ) {
-
-		if ( names.indexOf( bone.name ) !== - 1 ) {
-
-			return bone;
-
-		}
-
-		bone = bone.parent;
-
-	}
-
-}
-
 function parallelTraverse( a, b, callback ) {
 
 	callback( a, b );
@@ -461,92 +443,6 @@ function parallelTraverse( a, b, callback ) {
 		parallelTraverse( a.children[ i ], b.children[ i ], callback );
 
 	}
-
-}
-
-function getSkeletonOffsets( target, source, options = {} ) {
-
-	const targetParentPos = new Vector3(),
-		targetPos = new Vector3(),
-		sourceParentPos = new Vector3(),
-		sourcePos = new Vector3(),
-		targetDir = new Vector2(),
-		sourceDir = new Vector2();
-
-	options.hip = options.hip !== undefined ? options.hip : 'hip';
-	options.names = options.names || {};
-
-	if ( ! source.isObject3D ) {
-
-		source = getHelperFromSkeleton( source );
-
-	}
-
-	const nameKeys = Object.keys( options.names ),
-		nameValues = Object.values( options.names ),
-		sourceBones = source.isObject3D ? source.skeleton.bones : getBones( source ),
-		bones = target.isObject3D ? target.skeleton.bones : getBones( target ),
-		offsets = [];
-
-	let bone, boneTo,
-		name, i;
-
-	target.skeleton.pose();
-
-	for ( i = 0; i < bones.length; ++ i ) {
-
-		bone = bones[ i ];
-		name = options.names[ bone.name ] || bone.name;
-
-		boneTo = getBoneByName( name, sourceBones );
-
-		if ( boneTo && name !== options.hip ) {
-
-			const boneParent = getNearestBone( bone.parent, nameKeys ),
-				boneToParent = getNearestBone( boneTo.parent, nameValues );
-
-			boneParent.updateMatrixWorld();
-			boneToParent.updateMatrixWorld();
-
-			targetParentPos.setFromMatrixPosition( boneParent.matrixWorld );
-			targetPos.setFromMatrixPosition( bone.matrixWorld );
-
-			sourceParentPos.setFromMatrixPosition( boneToParent.matrixWorld );
-			sourcePos.setFromMatrixPosition( boneTo.matrixWorld );
-
-			targetDir.subVectors(
-				new Vector2( targetPos.x, targetPos.y ),
-				new Vector2( targetParentPos.x, targetParentPos.y )
-			).normalize();
-
-			sourceDir.subVectors(
-				new Vector2( sourcePos.x, sourcePos.y ),
-				new Vector2( sourceParentPos.x, sourceParentPos.y )
-			).normalize();
-
-			const laterialAngle = targetDir.angle() - sourceDir.angle();
-
-			const offset = new Matrix4().makeRotationFromEuler(
-				new Euler(
-					0,
-					0,
-					laterialAngle
-				)
-			);
-
-			bone.matrix.multiply( offset );
-
-			bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
-
-			bone.updateMatrixWorld();
-
-			offsets[ name ] = offset;
-
-		}
-
-	}
-
-	return offsets;
 
 }
 
