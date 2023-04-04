@@ -8,7 +8,7 @@ import { Object3D } from './Object3D.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import * as MathUtils from '../math/MathUtils.js';
-import { arrayNeedsUint32, deepClone } from '../utils.js';
+import { arrayNeedsUint32 } from '../utils.js';
 
 let _id = 0;
 
@@ -1069,7 +1069,7 @@ class BufferGeometry extends EventDispatcher {
 
 		// user data
 
-		this.userData = deepClone( source.userData );
+		this.userData = source.userData;
 
 		return this;
 
