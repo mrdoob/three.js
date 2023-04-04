@@ -235,6 +235,10 @@ class WebGPUBindings {
 
 						binding.textureGPU = this.textures.getVideoDefaultTexture();
 
+					} else if ( binding.texture.isDepthTexture ) {
+
+						binding.textureGPU = this.textures.getDepthDefaultTexture();
+
 					} else {
 
 						binding.textureGPU = this.textures.getDefaultTexture();

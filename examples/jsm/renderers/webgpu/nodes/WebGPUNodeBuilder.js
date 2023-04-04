@@ -145,6 +145,20 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVideoSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleBaseClampToEdge( ${textureProperty}, ${textureProperty}_sampler, vec2<f32>( ${uvSnippet}.x, 1.0 - ${uvSnippet}.y ) )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.VideoTexture does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -163,15 +177,39 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+	getTexture( texture, textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSampler( textureProperty, uvSnippet, shaderStage );
+		let snippet = null;
+
+		if ( texture.isVideoTexture === true ) {
+
+			snippet = this.getVideoSampler( textureProperty, uvSnippet, shaderStage );
+
+		} else {
+
+			snippet = this.getSampler( textureProperty, uvSnippet, shaderStage );
+
+		}
+
+		return snippet;
 
 	}
 
-	getTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+	getTextureLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
+		let snippet = null;
+
+		if ( texture.isVideoTexture === true ) {
+
+			snippet = this.getVideoSampler( textureProperty, uvSnippet, shaderStage );
+
+		} else {
+
+			snippet = this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
+
+		}
+
+		return snippet;
 
 	}
 
@@ -184,20 +222,6 @@ class WebGPUNodeBuilder extends NodeBuilder {
 	getCubeTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
-
-	}
-
-	getVideoTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
-
-		if ( shaderStage === 'fragment' ) {
-
-			return `textureSampleBaseClampToEdge( ${textureProperty}, ${textureProperty}_sampler, vec2<f32>( ${uvSnippet}.x, 1.0 - ${uvSnippet}.y ) )`;
-
-		} else {
-
-			console.error( `WebGPURenderer: THREE.VideoTexture does not support ${ shaderStage } shader.` );
-
-		}
 
 	}
 
@@ -553,7 +577,11 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const texture = uniform.node.value;
 
-				if ( texture.isVideoTexture === true ) {
+				if ( texture.isDepthTexture === true ) {
+
+					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_depth_2d;` );
+
+				} else if ( texture.isVideoTexture === true ) {
 
 					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_external;` );
 
