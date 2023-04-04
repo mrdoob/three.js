@@ -1,3 +1,4 @@
+import { LinearSRGBColorSpace, SRGBColorSpace, sRGBEncoding } from 'three';
 import { GPUPrimitiveTopology, GPUTextureFormat } from './constants.js';
 
 class WebGPUUtils {
@@ -8,12 +9,19 @@ class WebGPUUtils {
 
 	}
 
-	getCurrentEncoding() {
+	getCurrentColorSpace() {
 
 		const renderer = this.renderer;
 
 		const renderTarget = renderer.getRenderTarget();
-		return ( renderTarget !== null ) ? renderTarget.texture.encoding : renderer.outputEncoding;
+
+		if ( renderTarget !== null ) {
+
+			return renderTarget.texture.encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
+
+		}
+
+		return renderer.outputColorSpace;
 
 	}
 

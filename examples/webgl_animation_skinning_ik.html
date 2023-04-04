@@ -77,7 +77,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.outputEncoding = THREE.sRGBEncoding;
+			renderer.outputColorSpace = THREE.SRGBColorSpace;
 			renderer.useLegacyLights = false;
 			document.body.appendChild( renderer.domElement );
 

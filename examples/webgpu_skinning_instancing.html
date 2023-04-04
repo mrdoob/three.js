@@ -130,7 +130,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, .17 );
 				document.body.appendChild( renderer.domElement );
 

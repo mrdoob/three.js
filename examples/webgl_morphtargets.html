@@ -72,7 +72,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.useLegacyLights = false;
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.setAnimationLoop( function () {
 
 					renderer.render( scene, camera );
