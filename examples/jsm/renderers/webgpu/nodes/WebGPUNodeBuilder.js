@@ -543,7 +543,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 		for ( const uniform of uniforms ) {
 
-			if ( uniform.type === 'texture' ) {
+			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' ) {
 
 				if ( shaderStage === 'fragment' ) {
 
@@ -553,25 +553,23 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 				const texture = uniform.node.value;
 
-				if ( texture.isVideoTexture === true ) {
+				let textureType;
 
-					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_external;` );
+				if ( uniform.type === 'cubeTexture' ) {
+
+					textureType = 'texture_cube<f32>';
+
+				} else if ( texture.isVideoTexture === true ) {
+
+					textureType = 'texture_external';
 
 				} else {
 
-					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_2d<f32>;` );
+					textureType = 'texture_2d<f32>';
 
 				}
 
-			} else if ( uniform.type === 'cubeTexture' ) {
-
-				if ( shaderStage === 'fragment' ) {
-
-					bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name}_sampler : sampler;` );
-
-				}
-
-				bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : texture_cube<f32>;` );
+				bindingSnippets.push( `@group( 0 ) @binding( ${index ++} ) var ${uniform.name} : ${textureType};` );
 
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
 
