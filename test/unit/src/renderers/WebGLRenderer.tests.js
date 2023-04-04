@@ -69,7 +69,7 @@ export default QUnit.module( 'Renderers', () => {
 
 		} );
 
-		QUnit.todo( 'outputEncoding', ( assert ) => {
+		QUnit.todo( 'outputColorSpace', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

@@ -144,7 +144,7 @@ class WebGPURenderPipelines {
 			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
 			utils.getSampleCount(),
-			utils.getCurrentEncoding(), utils.getCurrentColorFormat(), utils.getCurrentDepthStencilFormat(),
+			utils.getCurrentColorSpace(), utils.getCurrentColorFormat(), utils.getCurrentDepthStencilFormat(),
 			utils.getPrimitiveTopology( object, material )
 		];
 
@@ -249,15 +249,15 @@ class WebGPURenderPipelines {
 		const utils = this.utils;
 
 		const sampleCount = utils.getSampleCount();
-		const encoding = utils.getCurrentEncoding();
+		const colorSpace = utils.getCurrentColorSpace();
 		const colorFormat = utils.getCurrentColorFormat();
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat();
 
-		if ( cache.sampleCount !== sampleCount || cache.encoding !== encoding ||
+		if ( cache.sampleCount !== sampleCount || cache.colorSpace !== colorSpace ||
 			cache.colorFormat !== colorFormat || cache.depthStencilFormat !== depthStencilFormat ) {
 
 			cache.sampleCount = sampleCount;
-			cache.encoding = encoding;
+			cache.colorSpace = colorSpace;
 			cache.colorFormat = colorFormat;
 			cache.depthStencilFormat = depthStencilFormat;
 

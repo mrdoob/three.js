@@ -98,7 +98,7 @@ class WebGPURenderer {
 		this.autoClearDepth = true;
 		this.autoClearStencil = true;
 
-		this.outputEncoding = LinearEncoding;
+		this.outputColorSpace = LinearSRGBColorSpace;
 
 		this.toneMapping = NoToneMapping;
 		this.toneMappingExposure = 1.0;

@@ -241,7 +241,7 @@ class NodeMaterial extends ShaderMaterial {
 
 		// ENCODING
 
-		outputNode = outputNode.colorSpace( renderer.outputEncoding );
+		outputNode = outputNode.colorSpace( renderer.outputColorSpace );
 
 		// FOG
 

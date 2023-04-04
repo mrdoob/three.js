@@ -94,7 +94,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

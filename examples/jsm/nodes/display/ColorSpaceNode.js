@@ -3,7 +3,7 @@ import { mix } from '../math/MathNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, ShaderNode, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
 
-import { LinearEncoding, sRGBEncoding } from 'three';
+import { LinearEncoding, LinearSRGBColorSpace, sRGBEncoding, SRGBColorSpace } from 'three';
 
 export const LinearToLinear = new ShaderNode( ( inputs ) => {
 
@@ -43,7 +43,29 @@ class ColorSpaceNode extends TempNode {
 
 	}
 
-	fromEncoding( encoding ) {
+	fromColorSpace( colorSpace ) {
+
+		let method = null;
+
+		if ( colorSpace === LinearSRGBColorSpace ) {
+
+			method = 'Linear';
+
+		} else if ( colorSpace === SRGBColorSpace ) {
+
+			method = 'sRGB';
+
+		}
+
+		this.method = 'LinearTo' + method;
+
+		return this;
+
+	}
+
+	fromEncoding( encoding ) { // @deprecated, r152
+
+		console.warn( 'THREE.ColorSpaceNode: Method .fromEncoding renamed to .fromColorSpace.' );
 
 		let method = null;
 
@@ -78,7 +100,7 @@ ColorSpaceNode.LINEAR_TO_SRGB = 'LinearTosRGB';
 
 export default ColorSpaceNode;
 
-export const colorSpace = ( node, encoding ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromEncoding( encoding ) );
+export const colorSpace = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( null, nodeObject( node ) ).fromColorSpace( colorSpace ) );
 
 addNodeElement( 'colorSpace', colorSpace );
 
