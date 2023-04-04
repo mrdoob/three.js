@@ -11,13 +11,12 @@
 		<p>
 			على الرغم من أن هذه المشكلة أصبحت أقل وأقل ، إلا أن بعض الأجهزة أو المتصفحات قد لا تدعم WebGL.
 			تتيح لك الطريقة التالية التحقق مما إذا كانت مدعومة وعرض رسالة للمستخدم إذا لم تكن مدعومة.
-		</p>
-
-		<p>
-			أضف [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/capabilities/WebGL.js] إلى جافا سكريبت الخاص بك وقم بتشغيل ما يلي قبل محاولة تقديم أي شيء.
+			قم باستيراد وحدة الكشف عن دعم WebGL ، وقم بتشغيل ما يلي قبل محاولة عرض أي شيء.
 		</p>
 
 		<code>
+		import WebGL from 'three/addons/capabilities/WebGL.js';
+
 		if ( WebGL.isWebGLAvailable() ) {
 
 			// Initiate function or other initializations here
