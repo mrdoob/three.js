@@ -429,7 +429,7 @@
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.mapping = THREE.CubeReflectionMapping;
-				textureCube.encoding = THREE.sRGBEncoding;
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				const sphereMaterial = new THREE.MeshPhysicalMaterial( {
 					transparent: true,

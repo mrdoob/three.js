@@ -196,7 +196,7 @@
 				CameraUtils.frameCorners( portalCamera, bottomLeftCorner, bottomRightCorner, topLeftCorner, false );
 
 				// render the portal
-				thisPortalTexture.texture.encoding = renderer.outputColorSpace === THREE.SRGBColorSpace ? THREE.sRGBEncoding : THREE.LinearEncoding;
+				thisPortalTexture.texture.colorSpace = renderer.outputColorSpace;
 				renderer.setRenderTarget( thisPortalTexture );
 				renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 				if ( renderer.autoClear === false ) renderer.clear();

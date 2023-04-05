@@ -7,7 +7,7 @@ import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
-import { REVISION, LinearEncoding, Color, Vector2, Vector3, Vector4 } from 'three';
+import { REVISION, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4 } from 'three';
 
 import { stack } from './StackNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
@@ -356,25 +356,33 @@ class NodeBuilder {
 
 	}
 
+	/** @deprecated, r152 */
 	getTextureEncodingFromMap( map ) {
 
-		let encoding;
+		console.warn( 'THREE.NodeBuilder: Method .getTextureEncodingFromMap replaced by .getTextureColorSpaceFromMap in r152+.' );
+		return this.getTextureColorSpaceFromMap( map ) === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
+
+	}
+
+	getTextureColorSpaceFromMap( map ) {
+
+		let colorSpace;
 
 		if ( map && map.isTexture ) {
 
-			encoding = map.encoding;
+			colorSpace = map.colorSpace;
 
 		} else if ( map && map.isWebGLRenderTarget ) {
 
-			encoding = map.texture.encoding;
+			colorSpace = map.texture.colorSpace;
 
 		} else {
 
-			encoding = LinearEncoding;
+			colorSpace = NoColorSpace;
 
 		}
 
-		return encoding;
+		return colorSpace;
 
 	}
 

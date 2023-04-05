@@ -122,7 +122,7 @@
 
 						const diffuseMap = loader.load( 'Cerberus_A.jpg' );
 						diffuseMap.wrapS = THREE.RepeatWrapping;
-						diffuseMap.encoding = THREE.sRGBEncoding;
+						diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 						const rmMap = loader.load( 'Cerberus_RM.jpg' );
 						rmMap.wrapS = THREE.RepeatWrapping;
