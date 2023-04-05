@@ -81,6 +81,7 @@ class WebGPUAttributes {
 		if ( gpuReadBuffer === null ) {
 
 			gpuReadBuffer = device.createBuffer( {
+				label: attribute.name,
 				size,
 				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
 			} );
@@ -120,6 +121,7 @@ class WebGPUAttributes {
 		const size = array.byteLength + ( ( 4 - ( array.byteLength % 4 ) ) % 4 ); // ensure 4 byte alignment, see #20441
 
 		const buffer = this.device.createBuffer( {
+			label: attribute.name,
 			size,
 			usage: usage | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
 			mappedAtCreation: true
