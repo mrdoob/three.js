@@ -940,6 +940,7 @@ class WebGPURenderer {
 			if ( this._colorBuffer ) this._colorBuffer.destroy();
 
 			this._colorBuffer = this._device.createTexture( {
+				label: 'colorBuffer',
 				size: {
 					width: Math.floor( this._width * this._pixelRatio ),
 					height: Math.floor( this._height * this._pixelRatio ),
@@ -963,6 +964,7 @@ class WebGPURenderer {
 			if ( this._depthBuffer ) this._depthBuffer.destroy();
 
 			this._depthBuffer = this._device.createTexture( {
+				label: 'depthBuffer',
 				size: {
 					width: Math.floor( this._width * this._pixelRatio ),
 					height: Math.floor( this._height * this._pixelRatio ),
