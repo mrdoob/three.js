@@ -623,6 +623,12 @@ class WebGLRenderer {
 
 		}
 
+		//Append
+		this.appendToDom = function (container = document.body) {
+			container.appendChild(this.domElement);
+ 		};
+
+		
 		function onContextRestore( /* event */ ) {
 
 			console.log( 'THREE.WebGLRenderer: Context Restored.' );
