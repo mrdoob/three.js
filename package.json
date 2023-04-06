@@ -26,6 +26,7 @@
     "build/three.cjs",
     "build/three.min.js",
     "build/three.module.js",
+    "build/three.module.min.js",
     "examples/jsm",
     "examples/fonts",
     "LICENSE",
