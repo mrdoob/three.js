@@ -14,6 +14,8 @@ class XRButton {
 
 				await renderer.xr.setSession( session );
 
+				renderer.xr.setSessionMode( mode );
+
 				button.textContent = 'STOP XR';
 
 				currentSession = session;
