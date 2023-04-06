@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js vr - ball shooter</title>
+		<title>three.js xr - ball shooter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -30,7 +30,7 @@
 			import * as THREE from 'three';
 
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
-			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
 			let camera, scene, renderer;
@@ -100,7 +100,7 @@
 
 				//
 
-				document.body.appendChild( VRButton.createButton( renderer ) );
+				document.body.appendChild( XRButton.createButton( renderer ) );
 
 				// controllers
 
