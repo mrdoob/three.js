@@ -115,7 +115,7 @@ function main() {
   {
     const loader = new THREE.TextureLoader();
     bgTexture = loader.load('resources/images/beach.jpg');
-    bgTexture.encoding = THREE.sRGBEncoding;
+    bgTexture.colorSpace = THREE.SRGBColorSpace;
     const planeGeo = new THREE.PlaneGeometry(2, 2);
     const planeMat = new THREE.MeshBasicMaterial({
       map: bgTexture,

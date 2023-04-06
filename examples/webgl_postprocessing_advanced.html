@@ -105,7 +105,7 @@
 				//
 
 				const diffuseMap = new THREE.TextureLoader().load( 'textures/cube/SwedishRoyalCastle/pz.jpg' );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const materialColor = new THREE.MeshBasicMaterial( {
 					map: diffuseMap,
@@ -295,7 +295,7 @@
 			function createMesh( geometry, scene, scale ) {
 
 				const diffuseMap = new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const mat2 = new THREE.MeshPhongMaterial( {
 

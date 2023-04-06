@@ -68,4 +68,16 @@ function createElementNS( name ) {
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS };
+const _cache = {};
+
+function warnOnce( message ) {
+
+	if ( message in _cache ) return;
+
+	_cache[ message ] = true;
+
+	console.warn( message );
+
+}
+
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, warnOnce };

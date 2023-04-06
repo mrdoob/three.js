@@ -101,7 +101,7 @@
 
 				new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
 
-					cubeTexture.encoding = THREE.sRGBEncoding;
+					cubeTexture.colorSpace = THREE.SRGBColorSpace;
 
 					scene.background = cubeTexture;
 
