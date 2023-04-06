@@ -34,6 +34,8 @@
 			import { ParametricGeometry } from 'three/addons/geometries/ParametricGeometry.js';
 			import { ParametricGeometries } from 'three/addons/geometries/ParametricGeometries.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let camera, scene, renderer, stats;
 
 			init();
@@ -62,6 +64,7 @@
 				const map = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
+				map.colorSpace = THREE.SRGBColorSpace;
 
 				const material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
 

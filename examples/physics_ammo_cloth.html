@@ -37,6 +37,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			// Graphics variables
 			let container, stats;
 			let camera, controls, scene, renderer;
@@ -159,6 +161,7 @@
 				ground.receiveShadow = true;
 				textureLoader.load( 'textures/grid.png', function ( texture ) {
 
+					texture.colorSpace = THREE.SRGBColorSpace;
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.wrapT = THREE.RepeatWrapping;
 					texture.repeat.set( 40, 40 );
@@ -242,6 +245,7 @@
 				scene.add( cloth );
 				textureLoader.load( 'textures/grid.png', function ( texture ) {
 
+					texture.colorSpace = THREE.SRGBColorSpace;
 					texture.wrapS = THREE.RepeatWrapping;
 					texture.wrapT = THREE.RepeatWrapping;
 					texture.repeat.set( clothNumSegmentsZ, clothNumSegmentsY );

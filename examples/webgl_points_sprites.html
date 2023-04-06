@@ -64,6 +64,8 @@
 				const sprite4 = textureLoader.load( 'textures/sprites/snowflake4.png' );
 				const sprite5 = textureLoader.load( 'textures/sprites/snowflake5.png' );
 
+				sprite1.encoding = sprite2.encoding = sprite3.encoding = sprite4.encoding = sprite5.colorSpace = THREE.SRGBColorSpace;
+
 				for ( let i = 0; i < 10000; i ++ ) {
 
 					const x = Math.random() * 2000 - 1000;
@@ -91,7 +93,7 @@
 					const size = parameters[ i ][ 2 ];
 
 					materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
-					materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ] );
+					materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ], THREE.SRGBColorSpace );
 
 					const particles = new THREE.Points( geometry, materials[ i ] );
 
@@ -108,6 +110,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -203,7 +206,7 @@
 					const color = parameters[ i ][ 0 ];
 
 					const h = ( 360 * ( color[ 0 ] + time ) % 360 ) / 360;
-					materials[ i ].color.setHSL( h, color[ 1 ], color[ 2 ] );
+					materials[ i ].color.setHSL( h, color[ 1 ], color[ 2 ], THREE.SRGBColorSpace );
 
 				}
 

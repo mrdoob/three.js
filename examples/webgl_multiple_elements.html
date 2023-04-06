@@ -82,6 +82,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let canvas, renderer;
 
 			const scenes = [];
@@ -137,7 +139,7 @@
 
 					const material = new THREE.MeshStandardMaterial( {
 
-						color: new THREE.Color().setHSL( Math.random(), 1, 0.75 ),
+						color: new THREE.Color().setHSL( Math.random(), 1, 0.75, THREE.SRGBColorSpace ),
 						roughness: 0.5,
 						metalness: 0,
 						flatShading: true

@@ -25,6 +25,8 @@
 
 			import * as THREE from 'three';
 
+			THREE.ColorManagement.enabled = true;
+
 			let camera, scene, renderer;
 			let mesh;
 
@@ -39,6 +41,7 @@
 				scene = new THREE.Scene();
 
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const geometry = new THREE.BoxGeometry( 200, 200, 200 );
 				const material = new THREE.MeshBasicMaterial( { map: texture } );
