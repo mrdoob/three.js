@@ -1,30 +1,5 @@
 import terser from '@rollup/plugin-terser';
 
-export function glconstants() {
-
-	return {
-
-		transform( code ) {
-
-			code = code.replace( /_?gl\.([A-Z0-9_]+)/g, function ( match, p1 ) {
-
-				if ( p1 in constants ) return constants[ p1 ];
-				console.log( '* Unhandled GL Constant:', p1 );
-				return match;
-
-			} );
-
-			return {
-				code: code,
-				map: null
-			};
-
-		}
-
-	};
-
-}
-
 function addons() {
 
 	return {
