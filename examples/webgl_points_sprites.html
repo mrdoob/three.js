@@ -91,7 +91,7 @@
 					const size = parameters[ i ][ 2 ];
 
 					materials[ i ] = new THREE.PointsMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
-					materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ]  );
+					materials[ i ].color.setHSL( color[ 0 ], color[ 1 ], color[ 2 ] );
 
 					const particles = new THREE.Points( geometry, materials[ i ] );
 
