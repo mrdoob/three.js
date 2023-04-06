@@ -139,7 +139,9 @@ export const AdditiveAnimationBlendMode = 2501;
 export const TrianglesDrawMode = 0;
 export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
+/** @deprecated Use LinearSRGBColorSpace or NoColorSpace in three.js r152+. */
 export const LinearEncoding = 3000;
+/** @deprecated Use SRGBColorSpace in three.js r152+. */
 export const sRGBEncoding = 3001;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;

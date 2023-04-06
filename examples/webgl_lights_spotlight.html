@@ -84,7 +84,7 @@
 					const texture = loader.load( filename );
 					texture.minFilter = THREE.LinearFilter;
 					texture.magFilter = THREE.LinearFilter;
-					texture.encoding = THREE.sRGBEncoding;
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					textures[ filename ] = texture;
 
