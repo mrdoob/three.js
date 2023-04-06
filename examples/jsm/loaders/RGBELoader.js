@@ -3,7 +3,7 @@ import {
 	DataUtils,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
+	NoColorSpace,
 	LinearFilter
 } from 'three';
 
@@ -445,7 +445,7 @@ class RGBELoader extends DataTextureLoader {
 				case FloatType:
 				case HalfFloatType:
 
-					texture.encoding = LinearEncoding;
+					texture.colorSpace = NoColorSpace;
 					texture.minFilter = LinearFilter;
 					texture.magFilter = LinearFilter;
 					texture.generateMipmaps = false;

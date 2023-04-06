@@ -8,17 +8,7 @@ import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { WebXRController } from './WebXRController.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import {
-	DepthFormat,
-	DepthStencilFormat,
-	RGBAFormat,
-	UnsignedByteType,
-	UnsignedIntType,
-	UnsignedInt248Type,
-	SRGBColorSpace,
-	sRGBEncoding,
-	LinearEncoding,
-} from '../../constants.js';
+import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
 
 class WebXRManager extends EventDispatcher {
 
@@ -294,7 +284,7 @@ class WebXRManager extends EventDispatcher {
 						{
 							format: RGBAFormat,
 							type: UnsignedByteType,
-							encoding: renderer.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding,
+							colorSpace: renderer.outputColorSpace,
 							stencilBuffer: attributes.stencil
 						}
 					);
@@ -333,7 +323,7 @@ class WebXRManager extends EventDispatcher {
 							type: UnsignedByteType,
 							depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 							stencilBuffer: attributes.stencil,
-							encoding: renderer.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding,
+							colorSpace: renderer.outputColorSpace,
 							samples: attributes.antialias ? 4 : 0
 						} );
 

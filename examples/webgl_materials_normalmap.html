@@ -91,10 +91,10 @@
 				const textureLoader = new THREE.TextureLoader();
 
 				const diffuseMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const specularMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' );
-				specularMap.encoding = THREE.sRGBEncoding;
+				specularMap.colorSpace = THREE.SRGBColorSpace;
 
 				const normalMap = textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
