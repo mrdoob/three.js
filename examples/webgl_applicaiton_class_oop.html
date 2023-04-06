@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - application class idea</title>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script
+			async
+			src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"
+		></script>
+
+		<!-- 
+            The idea of this page is to show a new concept added by me (/src/user/Application.js)
+         -->
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../src/Three.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import * as THREE from "three";
+
+			import Stats from "three/addons/libs/stats.module.js";
+			import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+			import * as GeometryCompressionUtils from "three/addons/utils/GeometryCompressionUtils.js";
+			import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
+			import { TeapotGeometry } from "three/addons/geometries/TeapotGeometry.js";
+			import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+
+			class Application extends THREE.Application {
+				constructor() {
+					super();
+
+					const mesh = new THREE.Mesh(
+						new THREE.BoxGeometry(0.2, 0.2, 0.2),
+						new THREE.MeshNormalMaterial()
+					);
+
+					this.scene.add(mesh);
+
+					this.camera.position.z = 1;
+
+					this.useOrbitControls();
+					this.setFullscreen();
+				}
+			}
+
+			new Application().run();
+		</script>
+	</body>
+</html>
