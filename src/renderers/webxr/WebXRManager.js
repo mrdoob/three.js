@@ -20,7 +20,7 @@ class WebXRManager extends EventDispatcher {
 
 		let session = null;
 		let sessionMode = null;
-		
+
 		let framebufferScaleFactor = 1.0;
 
 		let referenceSpace = null;
