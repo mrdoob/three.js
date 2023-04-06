@@ -128,7 +128,7 @@
 						material.metalness = 1;
 
 						const diffuseMap = textureLoader.load( 'Cerberus_A.jpg', render );
-						diffuseMap.encoding = THREE.sRGBEncoding;
+						diffuseMap.colorSpace = THREE.SRGBColorSpace;
 						material.map = diffuseMap;
 
 						material.metalnessMap = material.roughnessMap = textureLoader.load( 'Cerberus_RM.jpg', render );

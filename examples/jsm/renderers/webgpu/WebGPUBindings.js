@@ -192,6 +192,7 @@ class WebGPUBindings {
 					const byteLength = binding.getByteLength();
 
 					binding.bufferGPU = this.device.createBuffer( {
+						label: 'bindingBuffer',
 						size: byteLength,
 						usage: binding.usage
 					} );

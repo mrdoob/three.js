@@ -5,7 +5,7 @@ import {
 	DoubleSide,
 	InterpolateDiscrete,
 	InterpolateLinear,
-	LinearEncoding,
+	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
@@ -20,7 +20,7 @@ import {
 	RepeatWrapping,
 	Scene,
 	Source,
-	sRGBEncoding,
+	SRGBColorSpace,
 	Vector3
 } from 'three';
 
@@ -801,7 +801,7 @@ class GLTFWriter {
 
 		function getEncodingConversion( map ) {
 
-			if ( map.encoding === sRGBEncoding ) {
+			if ( map.colorSpace === SRGBColorSpace ) {
 
 				return function SRGBToLinear( c ) {
 
@@ -876,7 +876,7 @@ class GLTFWriter {
 		const texture = reference.clone();
 
 		texture.source = new Source( canvas );
-		texture.encoding = LinearEncoding;
+		texture.colorSpace = NoColorSpace;
 
 		return texture;
 

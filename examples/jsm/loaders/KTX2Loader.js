@@ -19,7 +19,7 @@ import {
 	FileLoader,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
+	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Loader,
@@ -35,7 +35,7 @@ import {
 	RGBA_S3TC_DXT5_Format,
 	RGBAFormat,
 	RGFormat,
-	sRGBEncoding,
+	SRGBColorSpace,
 	UnsignedByteType,
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
@@ -253,7 +253,8 @@ class KTX2Loader extends Loader {
 		texture.generateMipmaps = false;
 
 		texture.needsUpdate = true;
-		texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? sRGBEncoding : LinearEncoding;
+		// TODO: Detect NoColorSpace vs. LinearSRGBColorSpace based on primaries.
+		texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : NoColorSpace;
 		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 
 		return texture;
@@ -697,11 +698,11 @@ const TYPE_MAP = {
 
 };
 
-const ENCODING_MAP = {
+const COLOR_SPACE_MAP = {
 
-	[ VK_FORMAT_R8G8B8A8_SRGB ]: sRGBEncoding,
-	[ VK_FORMAT_R8G8_SRGB ]: sRGBEncoding,
-	[ VK_FORMAT_R8_SRGB ]: sRGBEncoding,
+	[ VK_FORMAT_R8G8B8A8_SRGB ]: SRGBColorSpace,
+	[ VK_FORMAT_R8G8_SRGB ]: SRGBColorSpace,
+	[ VK_FORMAT_R8_SRGB ]: SRGBColorSpace,
 
 };
 
@@ -779,7 +780,7 @@ async function createDataTexture( container ) {
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
-	texture.encoding = ENCODING_MAP[ vkFormat ] || LinearEncoding;
+	texture.colorSpace = COLOR_SPACE_MAP[ vkFormat ] || NoColorSpace;
 
 	texture.needsUpdate = true;
 

@@ -17,7 +17,7 @@ import {
 	NearestFilter,
 	RepeatWrapping,
 	TextureLoader,
-	sRGBEncoding
+	SRGBColorSpace
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
@@ -789,7 +789,7 @@ class ThreeMFLoader extends Loader {
 
 				} );
 
-				texture.encoding = sRGBEncoding;
+				texture.colorSpace = SRGBColorSpace;
 
 				// texture parameters
 

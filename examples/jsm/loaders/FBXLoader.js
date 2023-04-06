@@ -39,7 +39,7 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	sRGBEncoding
+	SRGBColorSpace
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
@@ -629,7 +629,7 @@ class FBXTreeParser {
 					parameters.map = scope.getTexture( textureMap, child.ID );
 					if ( parameters.map !== undefined ) {
 
-						parameters.map.encoding = sRGBEncoding;
+						parameters.map.colorSpace = SRGBColorSpace;
 
 					}
 
@@ -643,7 +643,7 @@ class FBXTreeParser {
 					parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
 					if ( parameters.emissiveMap !== undefined ) {
 
-						parameters.emissiveMap.encoding = sRGBEncoding;
+						parameters.emissiveMap.colorSpace = SRGBColorSpace;
 
 					}
 
@@ -659,7 +659,7 @@ class FBXTreeParser {
 					if ( parameters.envMap !== undefined ) {
 
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
-						parameters.envMap.encoding = sRGBEncoding;
+						parameters.envMap.colorSpace = SRGBColorSpace;
 
 					}
 
@@ -669,7 +669,7 @@ class FBXTreeParser {
 					parameters.specularMap = scope.getTexture( textureMap, child.ID );
 					if ( parameters.specularMap !== undefined ) {
 
-						parameters.specularMap.encoding = sRGBEncoding;
+						parameters.specularMap.colorSpace = SRGBColorSpace;
 
 					}
 
