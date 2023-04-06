@@ -98,7 +98,7 @@ class XRButton {
 		function showXRNotSupported() {
 
 			disableButton();
-x
+
 			button.textContent = 'XR NOT SUPPORTED';
 
 		}
