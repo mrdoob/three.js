@@ -361,19 +361,31 @@
 
 		<h3>[method:this rotateOnAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
-		axis -- A normalized vector in object space. <br />
+		axis -- A normalized vector in object space.<br />
 		angle -- The angle in radians.<br /><br />
 
-		Rotate an object along an axis in object space. The axis is assumed to be normalized.
+		Rotate the object on an axis in object space. The axis is assumed to be normalized.
 		</p>
 
 		<h3>[method:this rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
-		axis -- A normalized vector in world space. <br />
+		axis -- A normalized vector in world space.<br />
 		angle -- The angle in radians.<br /><br />
 
-		Rotate an object along an axis in world space. The axis is assumed to be normalized.
-		Method Assumes no rotated parent.
+		Rotate the object on an axis in world space. The axis is assumed to be normalized.<br /><br />
+
+		This method does not support objects having rotated parent(s).
+		</p>
+
+		<h3>[method:this rotateAroundWorldAxis]( [param:Vector3 point], [param:Vector3 axis], [param:Float angle] )</h3>
+		<p>
+		point -- The point to rotate around.<br />
+		axis -- A normalized vector in world space.<br />
+		angle -- The angle in radians.<br /><br />
+
+		Rotate the object around an axis in world space. (The axis passes through point.) The axis is assumed to be normalized.<br /><br/ >
+
+		This method does not support objects having rotated parent(s).
 		</p>
 
 		<h3>[method:this rotateX]( [param:Float rad] )</h3>

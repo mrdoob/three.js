@@ -196,6 +196,20 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	rotateAroundWorldAxis( point, axis, angle ) {
+
+		_q1.setFromAxisAngle( axis, angle );
+
+		this.applyQuaternion( _q1 );
+
+		this.position.sub( point );
+		this.position.applyQuaternion( _q1 );
+		this.position.add( point );
+
+		return this;
+
+	}
+
 	rotateX( angle ) {
 
 		return this.rotateOnAxis( _xAxis, angle );

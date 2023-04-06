@@ -331,7 +331,7 @@
 	<p>
 		axis —— 一个在局部空间中的标准化向量。<br />
 		angle —— 角度，以弧度来表示。<br /><br />
-		在局部空间中绕着该物体的轴来旋转一个物体，假设这个轴已被标准化。
+		Rotate the object on an axis in object space. The axis is assumed to be normalized.
 	</p>
 
 	<h3>[method:this rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
@@ -339,8 +339,20 @@
 		axis -- 一个在世界空间中的标准化向量。<br />
 		angle -- 角度，以弧度来表示。<br /><br />
 
-		在世界空间中绕着该物体的轴来旋转一个物体，假设这个轴已被标准化。
-		方法假设该物体没有旋转过的父级。
+		Rotate the object on an axis in world space. The axis is assumed to be normalized.<br /><br />
+
+		This method does not support objects having rotated parent(s).
+	</p>
+
+	<h3>[method:this rotateAroundWorldAxis]( [param:Vector3 point], [param:Vector3 axis], [param:Float angle] )</h3>
+	<p>
+		point -- The point to rotate around.<br />
+		axis -- A normalized vector in world space.<br />
+		angle -- The angle in radians.<br /><br />
+
+		Rotate the object around an axis in world space. (The axis passes through point.) The axis is assumed to be normalized.<br /><br/ >
+
+		This method does not support objects having rotated parent(s).
 	</p>
 
 	<h3>[method:this rotateX]( [param:Float rad] )</h3>
