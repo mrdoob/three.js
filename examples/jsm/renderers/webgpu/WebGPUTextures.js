@@ -218,8 +218,10 @@ class WebGPUTextures {
 			const width = renderTarget.width;
 			const height = renderTarget.height;
 			const colorTextureFormat = this._getFormat( renderTarget.texture );
+			const label = renderTarget.texture.name ? '_' + renderTarget.texture.name : '';
 
 			const colorTextureGPU = device.createTexture( {
+				label: 'renderTarget' + label,
 				size: {
 					width: width,
 					height: height,
@@ -248,6 +250,7 @@ class WebGPUTextures {
 				const depthTextureFormat = GPUTextureFormat.Depth24PlusStencil8; // @TODO: Make configurable
 
 				const depthTextureGPU = device.createTexture( {
+					label: 'renderTarget' + label + '_depthBuffer',
 					size: {
 						width: width,
 						height: height,
@@ -368,6 +371,7 @@ class WebGPUTextures {
 		}
 
 		const textureGPUDescriptor = {
+			label: texture.name,
 			size: {
 				width: width,
 				height: height,
