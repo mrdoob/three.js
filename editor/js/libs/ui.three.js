@@ -178,13 +178,13 @@ class UITexture extends UISpan {
 
 	}
 
-	setEncoding( encoding ) {
+	setColorSpace( colorSpace ) {
 
 		const texture = this.getValue();
 
 		if ( texture !== null ) {
 
-			texture.encoding = encoding;
+			texture.colorSpace = colorSpace;
 
 		}
 
@@ -275,12 +275,12 @@ class UICubeTexture extends UIElement {
 
 	}
 
-	setEncoding( encoding ) {
+	setColorSpace( colorSpace ) {
 
 		const cubeTexture = this.getValue();
 		if ( cubeTexture !== null ) {
 
-			cubeTexture.encoding = encoding;
+			cubeTexture.colorSpace = colorSpace;
 
 		}
 
@@ -926,7 +926,6 @@ function renderToCanvas( texture ) {
 	if ( renderer === undefined ) {
 
 		renderer = new THREE.WebGLRenderer();
-		renderer.outputEncoding = THREE.sRGBEncoding;
 
 	}
 
