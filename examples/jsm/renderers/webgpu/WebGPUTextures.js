@@ -1,6 +1,6 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
 import { VideoTexture, CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
-	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace
+	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthTexture
 } from 'three';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
@@ -13,6 +13,7 @@ class WebGPUTextures {
 		this.info = info;
 
 		this.defaultTexture = null;
+		this.depthDefaultTexture = null;
 		this.defaultVideoTexture = null;
 		this.defaultCubeTexture = null;
 		this.defaultSampler = null;
@@ -31,6 +32,26 @@ class WebGPUTextures {
 		}
 
 		return this.defaultSampler;
+
+	}
+
+	getDepthDefaultTexture() {
+
+		if ( this.depthDefaultTexture === null ) {
+
+			const depthTexture = new DepthTexture();
+			depthTexture.minFilter = NearestFilter;
+			depthTexture.magFilter = NearestFilter;
+			depthTexture.image.width = 1;
+			depthTexture.image.height = 1;
+
+			this._uploadTexture( depthTexture );
+
+			this.depthDefaultTexture = this.getTextureGPU( depthTexture );
+
+		}
+
+		return this.depthDefaultTexture;
 
 	}
 
@@ -245,7 +266,7 @@ class WebGPUTextures {
 
 			if ( renderTarget.depthBuffer === true ) {
 
-				const depthTextureFormat = GPUTextureFormat.Depth24PlusStencil8; // @TODO: Make configurable
+				const depthTextureFormat = renderTarget.depthTexture !== null ? this._getFormat( renderTarget.depthTexture ) : GPUTextureFormat.Depth24PlusStencil8;
 
 				const depthTextureGPU = device.createTexture( {
 					size: {
@@ -254,7 +275,7 @@ class WebGPUTextures {
 						depthOrArrayLayers: 1
 					},
 					format: depthTextureFormat,
-					usage: GPUTextureUsage.RENDER_ATTACHMENT
+					usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
 				} );
 
 				this.info.memory.textures ++;
@@ -412,7 +433,7 @@ class WebGPUTextures {
 
 			}
 
-		} else if ( image !== null ) {
+		} else if ( texture.isDepthTexture !== true && image !== null ) {
 
 			// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
 
@@ -623,6 +644,10 @@ class WebGPUTextures {
 
 			case RGBA_S3TC_DXT5_Format:
 				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
+				break;
+
+			case DepthFormat:
+				formatGPU = GPUTextureFormat.Depth32Float;
 				break;
 
 			case RGBAFormat:
