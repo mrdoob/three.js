@@ -36,6 +36,8 @@
 
 			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			class InstanceUniformNode extends Node {
 
 				constructor() {
@@ -100,6 +102,7 @@
 				];
 
 				const cubeMap = new THREE.CubeTextureLoader().load( urls );
+				cubeMap.colorSpace = THREE.SRGBColorSpace;
 
 				// Material
 

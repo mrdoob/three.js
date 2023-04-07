@@ -100,6 +100,7 @@
 				perpCamera.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );

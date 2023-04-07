@@ -38,6 +38,8 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			class InstanceUniformNode extends Node {
 
 				constructor() {
@@ -113,6 +115,7 @@
 				];
 
 				const cTexture = new THREE.CubeTextureLoader().load( urls );
+				cTexture.colorSpace = THREE.SRGBColorSpace;
 
 				// Materials
 

@@ -39,6 +39,8 @@
 
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let camera, controls, scene, renderer, stats;
 
 			let mesh, geometry, material, clock;
@@ -75,6 +77,7 @@
 				const texture = new THREE.TextureLoader().load( 'textures/water.jpg' );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 5, 5 );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				material = new THREE.MeshBasicMaterial( { color: 0x0044ff, map: texture } );
 

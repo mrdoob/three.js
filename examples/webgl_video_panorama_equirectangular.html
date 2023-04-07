@@ -71,6 +71,7 @@
 				video.play();
 
 				const texture = new THREE.VideoTexture( video );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 				const mesh = new THREE.Mesh( geometry, material );

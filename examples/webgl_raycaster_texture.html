@@ -205,6 +205,7 @@
 
 				// A cube, in the middle.
 				cubeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+				cubeTexture.colorSpace = THREE.SRGBColorSpace;
 				canvas = new CanvasTexture( cubeTexture );
 				const cubeMaterial = new THREE.MeshBasicMaterial( { map: cubeTexture } );
 				const cubeGeometry = new THREE.BoxGeometry( 20, 20, 20 );
@@ -225,6 +226,7 @@
 				// A plane on the left
 
 				planeTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.MirroredRepeatWrapping, THREE.MirroredRepeatWrapping );
+				planeTexture.colorSpace = THREE.SRGBColorSpace;
 				canvas.addParent( planeTexture );
 				const planeMaterial = new THREE.MeshBasicMaterial( { map: planeTexture } );
 				const planeGeometry = new THREE.PlaneGeometry( 25, 25, 1, 1 );
@@ -247,6 +249,7 @@
 				// A circle on the right.
 
 				circleTexture = new THREE.Texture( undefined, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+				circleTexture.colorSpace = THREE.SRGBColorSpace;
 				canvas.addParent( circleTexture );
 				const circleMaterial = new THREE.MeshBasicMaterial( { map: circleTexture } );
 				const circleGeometry = new THREE.CircleGeometry( 25, 40, 0, Math.PI * 2 );

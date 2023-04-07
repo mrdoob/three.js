@@ -39,6 +39,8 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let gui;
 
 			let camera, scene, renderer, labelRenderer;
@@ -108,6 +110,7 @@
 					normalMap: textureLoader.load( 'textures/planets/earth_normal_2048.jpg' ),
 					normalScale: new THREE.Vector2( 0.85, 0.85 )
 				} );
+				earthMaterial.map.colorSpace = THREE.SRGBColorSpace;
 				const earth = new THREE.Mesh( earthGeometry, earthMaterial );
 				scene.add( earth );
 
@@ -116,6 +119,7 @@
 					shininess: 5,
 					map: textureLoader.load( 'textures/planets/moon_1024.jpg' )
 				} );
+				moonMaterial.map.colorSpace = THREE.SRGBColorSpace;
 				moon = new THREE.Mesh( moonGeometry, moonMaterial );
 				scene.add( moon );
 

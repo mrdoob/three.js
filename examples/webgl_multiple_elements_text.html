@@ -119,6 +119,7 @@
 				canvas = document.getElementById( 'c' );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 
 				views = document.querySelectorAll( '.view' );
