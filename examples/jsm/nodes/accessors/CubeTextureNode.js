@@ -69,11 +69,11 @@ class CubeTextureNode extends TextureNode {
 
 					const levelSnippet = levelNode.build( builder, 'float' );
 
-					snippet = builder.getCubeTextureLevel( this, textureProperty, uvSnippet, levelSnippet );
+					snippet = builder.getTextureLevel( this, textureProperty, uvSnippet, levelSnippet );
 
 				} else {
 
-					snippet = builder.getCubeTexture( this, textureProperty, uvSnippet );
+					snippet = builder.getTexture( this, textureProperty, uvSnippet );
 
 				}
 

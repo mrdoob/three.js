@@ -222,18 +222,6 @@ class NodeBuilder {
 
 	}
 
-	getCubeTexture( /* texture, textureProperty, uvSnippet */ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getCubeTextureLevel( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
 	// @TODO: rename to .generateConst()
 	getConst( type, value = null ) {
 
