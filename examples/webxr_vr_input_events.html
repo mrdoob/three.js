@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - input events</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - input events
+
+			<p> This example demonstrates the use of <a href="https://www.npmjs.com/package/@webxr-input-profiles/motion-controllers">Motion Controllers library</a> to create dynamic WebXR input mappings. Controls for the demo:<br />
+			Thumbstick and touchpad forward/backward to smoothly slide<br />
+			and left/right to snap-turn in 45-degree steps<br />
+			Trigger to pull the cube closer<br />
+			Squeeze to make the cube smaller<br />
+			Any of the buttons to randomize the cube's color
+			</p>
+			<p><i>See the comments in the code for more information.</i></p>
+
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRInputEventsDispatcher } from 'three/addons/webxr/XRInputEventsDispatcher.js';
+
+			let camera, scene, renderer;
+			let controller1, controller2;
+			let inputEventsDispatcher;
+			let player;
+
+			let demoCube;
+
+			const trackedButtonValues = {};
+			let previousButtonStates;
+
+			const trackedAxisValues = {};
+			let newAxisVector2;
+			let shouldSnapTurn = false;
+			const snapTurnAngle = Math.PI / 4;
+			let snapTurnAxis;
+			const playerMoveSpeed = 0.01;
+
+			const trackedTriggerValues = {};
+			let newTriggerFloat;
+
+			const trackedSqueezeValues = {};
+			let newSqueezeFloat;
+
+			init();
+			animate();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x222222 );
+
+				camera = new THREE.PerspectiveCamera(
+					50,
+					window.innerWidth / window.innerHeight,
+					0.01,
+					50
+				);
+				camera.position.set( 0, 1.6, 3 );
+
+				player = new THREE.Group();
+				player.add( camera );
+				scene.add( player );
+
+				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
+
+				const light = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light.position.set( 0, 4, 0 );
+				scene.add( light );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.xr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
+				const floorMaterial = new THREE.MeshPhongMaterial( { color: 0x222222 } );
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+				floor.rotation.x = - Math.PI / 2;
+				floor.receiveShadow = true;
+				scene.add( floor );
+
+				const geometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
+				const material = new THREE.MeshPhongMaterial( { color: 0x888888 } );
+				demoCube = new THREE.Mesh( geometry, material );
+				demoCube.castShadow = true;
+				scene.add( demoCube );
+				demoCube.position.set( 0, 0.8, - 1 );
+
+				controller1 = renderer.xr.getController( 0 );
+				player.add( controller1 );
+
+				controller2 = renderer.xr.getController( 1 );
+				player.add( controller2 );
+
+				const controllerGeometry = new THREE.CylinderGeometry( 0.01, 0.02, 0.08, 5 );
+				controllerGeometry.rotateX( - Math.PI / 2 );
+				const controllerMaterial = new THREE.MeshStandardMaterial( { flatShading: true } );
+				const mesh = new THREE.Mesh( controllerGeometry, controllerMaterial );
+
+				const pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 3 ) );
+				pivot.name = 'pivot';
+				pivot.position.z = - 0.05;
+				mesh.add( pivot );
+
+				controller1.add( mesh.clone() );
+				controller2.add( mesh.clone() );
+
+				inputEventsDispatcher = new XRInputEventsDispatcher( renderer.xr, [ 0, 1 ] );
+				scene.add( inputEventsDispatcher );
+				snapTurnAxis = new THREE.Vector3( 0, 1, 0 );
+
+				const buttonPairs = [
+					[ 'left', 'button' ],
+					[ 'right', 'button' ]
+				];
+				const axisPairs = [
+					[ 'left', 'thumbstick' ],
+					[ 'left', 'touchpad' ],
+					[ 'right', 'thumbstick' ],
+					[ 'right', 'touchpad' ],
+				];
+				const triggerPairs = [
+					[ 'left', 'trigger' ],
+					[ 'right', 'trigger' ]
+				];
+				const squeezePairs = [
+					[ 'left', 'squeeze' ],
+					[ 'right', 'squeeze' ]
+				];
+
+				// Register all handedness-partialId pairs of interest
+				inputEventsDispatcher.registerInputForEvents( [
+					...buttonPairs, ...axisPairs, ...triggerPairs, ...squeezePairs
+				] );
+
+				// registerInputForEvents can also take two parameters instead of an array
+				// inputEventsDispatcher.registerInputForEvents( 'right', 'a-button' );
+
+				// Each event is of type `${handedness}-${partialId}` corresponding to registered pairs
+				const buttonEvents = buttonPairs.map( ( pair ) => getEventType( pair ) );
+				const axisEvents = axisPairs.map( ( pair ) => getEventType( pair ) );
+				const triggerEvents = triggerPairs.map( ( pair ) => getEventType( pair ) );
+				const squeezeEvents = squeezePairs.map( ( pair ) => getEventType( pair ) );
+
+				// Listen for all 'button' components on left or right controllers
+				// For example with oculus-touch-v3 this matches X, Y buttons on left, A, B buttons on right
+				addInputListeners( buttonEvents, onAnyButton );
+
+				// Listen for all 'thumbsticks' and 'touchpad' components on left or right controllers
+				addInputListeners( axisEvents, onAnyAxis );
+
+				// Listen for all 'trigger' components on left or right controllers
+				addInputListeners( triggerEvents, onAnyTrigger );
+
+				// Listen for all 'squeeze' components on left or right controllers
+				addInputListeners( squeezeEvents, onAnySqueeze );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function getEventType( [ handedness, partialId ] ) {
+
+				return `${handedness}-${partialId}`;
+
+			}
+
+			function addInputListeners( events, eventHandler ) {
+
+				for ( const event of events ) {
+
+					inputEventsDispatcher.addEventListener( event, eventHandler );
+
+				}
+
+			}
+
+			function onAnyButton( event ) {
+
+				for ( const component of event.components ) {
+
+					console.log( `${event.handedness} ${component.id}` );
+					if ( ! trackedButtonValues[ event.handedness ] ) trackedButtonValues[ event.handedness ] = {};
+					trackedButtonValues[ event.handedness ][ component.id ] = component.values;
+
+				}
+
+			}
+
+			function onAnyAxis( event ) {
+
+				for ( const component of event.components ) {
+
+					console.log( `${event.handedness} ${component.id}` );
+					if ( ! trackedAxisValues[ event.handedness ] ) trackedAxisValues[ event.handedness ] = {};
+					trackedAxisValues[ event.handedness ][ component.id ] = component.values;
+
+				}
+
+			}
+
+			function onAnyTrigger( event ) {
+
+				for ( const component of event.components ) {
+
+					console.log( `${event.handedness} ${component.id}` );
+					if ( ! trackedTriggerValues[ event.handedness ] ) trackedTriggerValues[ event.handedness ] = {};
+					trackedTriggerValues[ event.handedness ][ component.id ] = component.values;
+
+				}
+
+			}
+
+			function onAnySqueeze( event ) {
+
+				for ( const component of event.components ) {
+
+					console.log( `${event.handedness} ${component.id}` );
+					if ( ! trackedSqueezeValues[ event.handedness ] ) trackedSqueezeValues[ event.handedness ] = {};
+					trackedSqueezeValues[ event.handedness ][ component.id ] = component.values;
+
+				}
+
+			}
+
+			function createRandomColor() {
+
+				return Math.floor( Math.random() * ( 1 << 24 ) );
+
+			}
+
+			// Change color of the cube to a random color when button pressed
+			function handleButtons() {
+
+				for ( const [ handedness, trackedInput ] of Object.entries( trackedButtonValues ) ) {
+
+					for ( const [ id, value ] of Object.entries( trackedInput ) ) {
+
+						// Each component value object holds 4 pieces of data
+						const { state, button, xAxis, yAxis } = value;
+						if ( state !== 'default' ) {
+
+							console.log( `${handedness}-${id}: ${state}, ${button}, ${xAxis}, ${yAxis}` );
+
+						}
+
+						if ( previousButtonStates
+							&& previousButtonStates[ handedness ]
+							&& previousButtonStates[ handedness ][ id ]
+							&& state !== previousButtonStates[ handedness ][ id ]
+							&& state === 'pressed' ) {
+
+							// Button presed in this frame
+							demoCube.material.color.set( createRandomColor() );
+
+						}
+
+						// Cache state for comparing states in the next frame
+						if ( ! previousButtonStates ) previousButtonStates = {};
+						if ( ! previousButtonStates[ handedness ] ) previousButtonStates[ handedness ] = {};
+						previousButtonStates[ handedness ][ id ] = state;
+
+					}
+
+				}
+
+			}
+
+			// Smoothly move in the direction of camera and snap-turn
+			function handleAxes() {
+
+				if ( ! newAxisVector2 ) newAxisVector2 = new THREE.Vector2();
+				newAxisVector2.x = 0;
+				newAxisVector2.y = 0;
+
+				for ( const trackedAxisValue of Object.values( trackedAxisValues ) ) {
+
+					for ( const value of Object.values( trackedAxisValue ) ) {
+
+						// Thumbsticks only go from 'default' to 'touched' with axis movements
+						// oculus-touch-v3 also has a button below each thumbstick
+						// So this component also tracks the thumbstick button state
+
+						const { xAxis, yAxis } = value;
+						if ( xAxis !== undefined && yAxis !== undefined ) {
+
+							newAxisVector2.x = ( Math.abs( xAxis ) > Math.abs( newAxisVector2.x ) ) ? xAxis : newAxisVector2.x;
+							newAxisVector2.y = ( Math.abs( yAxis ) > Math.abs( newAxisVector2.y ) ) ? yAxis : newAxisVector2.y;
+
+						}
+
+					}
+
+				}
+
+				if ( Math.abs( newAxisVector2.y ) > 0.1 ) {
+
+					const dirVec = new THREE.Vector3();
+					const prevHeight = player.position.y;
+					camera.getWorldDirection( dirVec );
+					const newPosition = player.position.add( dirVec.multiplyScalar( playerMoveSpeed * - newAxisVector2.y ) );
+					newPosition.y = prevHeight;
+					player.position.copy( newPosition );
+
+				}
+
+				if ( shouldSnapTurn ) {
+
+					if ( newAxisVector2.x > 0.6 ) {
+
+						player.rotateOnWorldAxis( snapTurnAxis, - snapTurnAngle );
+						shouldSnapTurn = false;
+
+					} else if ( newAxisVector2.x < - 0.6 ) {
+
+						player.rotateOnWorldAxis( snapTurnAxis, snapTurnAngle );
+						shouldSnapTurn = false;
+
+					}
+
+				} else {
+
+					if ( Math.abs( newAxisVector2.x ) < 0.2 ) {
+
+						shouldSnapTurn = true;
+
+					}
+
+				}
+
+			}
+
+			// Pull the cube towards the user
+			function handleTriggerButtons() {
+
+				newTriggerFloat = 0;
+
+				for ( const trackedTriggerValue of Object.values( trackedTriggerValues ) ) {
+
+					for ( const value of Object.values( trackedTriggerValue ) ) {
+
+						const { button } = value;
+						if ( button !== undefined ) {
+
+							newTriggerFloat = ( button > newTriggerFloat ) ? button : newTriggerFloat;
+
+						}
+
+					}
+
+				}
+
+				demoCube.position.set( demoCube.position.x, demoCube.position.y, - 1 + newTriggerFloat * 0.2 );
+
+			}
+
+			// Make the cube smaller
+			function handleSqueezeButtons() {
+
+				newSqueezeFloat = 0;
+
+				for ( const trackedSqueezeValue of Object.values( trackedSqueezeValues ) ) {
+
+					for ( const value of Object.values( trackedSqueezeValue ) ) {
+
+						const { button } = value;
+						if ( button !== undefined ) {
+
+							newSqueezeFloat = ( button > newSqueezeFloat ) ? button : newSqueezeFloat;
+
+						}
+
+					}
+
+				}
+
+				demoCube.scale.set( 1 - newSqueezeFloat * 0.5, 1 - newSqueezeFloat * 0.5, 1 - newSqueezeFloat * 0.5 );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				handleButtons();
+
+				handleAxes();
+
+				handleTriggerButtons();
+
+				handleSqueezeButtons();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
