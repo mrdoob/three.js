@@ -22,7 +22,7 @@
 		<h2>Costruttore</h2>
 
 
-		<h3>[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy] )</h3>
+		<h3>[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], [param:Constant colorSpace] )</h3>
 		<p>
 		[page:Array mipmaps] -- L'array mipmap dovrebbe contenere oggetti con dati, larghezza e altezza. Le mipmap dovrebbero essere del formato e del tipo corretti.<br />
 
@@ -56,7 +56,10 @@
 		[page:Number anisotropy] -- Il numero di campioni prelevati lungo l'asse attravero il pixel che ha la densità di texel più alta.
 		Per impostazione predefinita, questo valore è 1. Un valore più alto fornisce un risultato meno sfuocato rispetto ad una mipmap di base, 
 		a costo di utilizzare più campioni di texture. Usa [page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 
-		per trovare il valore di anisotropia massimo valido per la GPU; questo valore è solitamente una potenza di 2.<br /><br />
+		per trovare il valore di anisotropia massimo valido per la GPU; questo valore è solitamente una potenza di 2.<br />
+
+		[page:Constant colorSpace] -- The default is [page:Textures THREE.NoColorSpace].
+		See [page:Textures color space constants] for other choices.<br /><br />
 		</p>
 
 

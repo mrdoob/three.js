@@ -156,7 +156,7 @@
 	<p>
 		Colors supplied to three.js — from color pickers, textures, 3D models, and other sources —
 		each have an associated color space. Those not already in the Linear-sRGB working color
-		space must be converted, and textures be given the correct <i>texture.encoding</i> assignment.
+		space must be converted, and textures be given the correct <i>texture.colorSpace</i> assignment.
 		Certain conversions (for hexadecimal and CSS colors in sRGB) can be made automatically if
 		the THREE.ColorManagement API is enabled before initializing colors:
 	</p>
@@ -177,14 +177,14 @@ THREE.ColorManagement.enabled = true;
 		<li>
 			<b>Color textures:</b> PNG or JPEG [page:Texture Textures] containing color information
 			(like .map or .emissiveMap) use the closed domain sRGB color space, and must be annotated with
-			<i>texture.encoding = sRGBEncoding</i>. Formats like OpenEXR (sometimes used for .envMap or
-			.lightMap) use the Linear-sRGB color space indicated with <i>texture.encoding = LinearEncoding</i>,
+			<i>texture.colorSpace = SRGBColorSpace</i>. Formats like OpenEXR (sometimes used for .envMap or
+			.lightMap) use the Linear-sRGB color space indicated with <i>texture.colorSpace = LinearSRGBColorSpace</i>,
 			and may contain values in the open domain [0,∞].
 		</li>
 		<li>
 			<b>Non-color textures:</b> Textures that do not store color information (like .normalMap
 			or .roughnessMap) do not have an associated color space, and generally use the (default) texture
-			annotation of <i>texture.encoding = LinearEncoding</i>. In rare cases, non-color data
+			annotation of <i>texture.colorSpace = NoColorSpace</i>. In rare cases, non-color data
 			may be represented with other nonlinear encodings for technical reasons.
 		</li>
 	</ul>
@@ -211,11 +211,11 @@ THREE.ColorManagement.enabled = true;
 	<p>
 		Output to a display device, image, or video may involve conversion from the open domain
 		Linear-sRGB working color space to another color space. This conversion may be performed in
-		the main render pass ([page:WebGLRenderer.outputEncoding]), or during post-processing.
+		the main render pass ([page:WebGLRenderer.outputColorSpace]), or during post-processing.
 	</p>
 
 	<code>
-renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
+renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processing
 	</code>
 
 	<ul>

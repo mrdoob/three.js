@@ -189,7 +189,7 @@
 			3D e da altre risorse - hanno ciascuno uno spazio colore associato. Quelli
 			che non sono già nello spazio colore di lavoro Linear-sRGB devono essere
 			convertiti e alle texture deve essere assegnata la corretta assegnazione
-			<i>texture.encoding</i>. Alcune conversioni (per i colori esadecimali e
+			<i>texture.colorSpace</i>. Alcune conversioni (per i colori esadecimali e
 			CSS in sRGB) possono essere effettuate automaticamente se la modalità di
 			gestione del colore legacy è disabilitata prima dell'inizializzazione dei
 			colori:
@@ -212,16 +212,16 @@
 				<b>Colori delle texture:</b> Le [page:Texture Texture] PNG o JPEG
 				contenti informazioni sul colore (come .map o .emissiveMap) usano lo
 				spazio colore sRGB a dominio chiuso, e devono essere annotate con
-				<i>texture.encoding = sRGBEncoding</i>. I formati come OpenEXR (a volte
+				<i>texture.colorSpace = SRGBColorSpace</i>. I formati come OpenEXR (a volte
 				usati per .envMap o .lightMap) utilizzano lo spazio colore Linear-sRGB
-				indicato con <i>texture.encoding = LinearEncoding</i>, e possono
+				indicato con <i>texture.colorSpace = LinearSRGBColorSpace</i>, e possono
 				contenere valori nel dominio aperto [0,∞].
 			</li>
 			<li>
 				<b>Texture non a colori:</b> Le texture che non memorizzano informazioni
 				relative ai colori (come .normalMap o .roughnessMap) non hanno associato
 				uno spazio colore, e generalmente usano l'annotazione (predefinita)
-				<i>texture.encoding = LinearEncoding</i>. In rari casi, i dati non a
+				<i>texture.colorSpace = NoColorSpace</i>. In rari casi, i dati non a
 				colori possono essere rappresentati con altre codifiche non lineari per
 				motivi tecnici.
 			</li>
@@ -259,11 +259,11 @@
 			può comportare la conversione dallo spazio colore di lavoro Linear-sRGB di
 			dominio aperto a un altro spazio di colore. Questa conversione può essere
 			eseguita nel passaggio di rendering principale
-			([page:WebGLRenderer.outputEncoding]), o durante il post-processing.
+			([page:WebGLRenderer.outputColorSpace]), o durante il post-processing.
 		</p>
 
 		<code>
-			renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
+			renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processing
 		</code>
 
 		<ul>

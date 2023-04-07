@@ -22,7 +22,7 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy] )</h3>
+		<h3>[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], [param:Constant colorSpace] )</h3>
 		<p>
 		[page:Array mipmaps] -- The mipmaps array should contain objects with data, width and height. The mipmaps should be of the correct format and type.<br />
 
@@ -55,7 +55,10 @@
 
 		[page:Number anisotropy] -- The number of samples taken along the axis through the pixel that has the highest density of texels.
 		By default, this value is 1. A higher value gives a less blurry result than a basic mipmap, at the cost of more texture samples being used.
-		Use renderer.getMaxAnisotropy() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.<br /><br />
+		Use renderer.getMaxAnisotropy() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.<br />
+		
+		[page:Constant colorSpace] -- The default is [page:Textures THREE.NoColorSpace].
+		See [page:Textures color space constants] for other choices.<br /><br />
 		</p>
 
 
