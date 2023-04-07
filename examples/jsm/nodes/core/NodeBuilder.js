@@ -210,25 +210,13 @@ class NodeBuilder {
 
 	}
 
-	getTexture( /* textureProperty, uvSnippet */ ) {
+	getTexture( /* texture, textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
 	}
 
-	getTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getCubeTexture( /* textureProperty, uvSnippet */ ) {
-
-		console.warn( 'Abstract function.' );
-
-	}
-
-	getCubeTextureLevel( /* textureProperty, uvSnippet, levelSnippet */ ) {
+	getTextureLevel( /* texture, textureProperty, uvSnippet, levelSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
 
