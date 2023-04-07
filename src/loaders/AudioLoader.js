@@ -36,13 +36,13 @@ class AudioLoader extends Loader {
 
 			} catch ( e ) {
 
-				handleError ( e );
+				handleError( e );
 
 			}
 
 		}, onProgress, onError );
 
-		function handleError ( e ) {
+		function handleError( e ) {
 
 			if ( onError ) {
 
