@@ -14,7 +14,7 @@ class WebGPU {
 
 	static getErrorMessage() {
 
-		let message = 'Your browser does not support <a href="https://gpuweb.github.io/gpuweb/" style="color:blue">WebGPU</a>';
+		const message = 'Your browser does not support <a href="https://gpuweb.github.io/gpuweb/" style="color:blue">WebGPU</a> yet.';
 
 		const element = document.createElement( 'div' );
 		element.id = 'webgpumessage';
