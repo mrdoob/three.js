@@ -14,7 +14,7 @@
 
 		<h2>构造函数</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
 		<h2>代码示例</h2>
 
@@ -209,9 +209,9 @@
 			请参阅[link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]来了解详细信息。
 		</p>
 
-		<h3>[property:number encoding]</h3>
+		<h3>[property:number colorSpace]</h3>
 		<p>
-		默认值为[page:Textures THREE.LinearEncoding]。
+		默认值为[page:Textures THREE.NoColorSpace]。
 		请参阅[page:Textures texture constants]来了解其他格式的详细信息。<br /><br />
 
 		请注意，如果在材质被使用之后，纹理贴图中这个值发生了改变，

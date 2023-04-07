@@ -22,7 +22,7 @@
 		<h2>构造函数</h2>
 
 
-		<h3>[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy] )</h3>
+		<h3>[name]( [param:Array mipmaps], [param:Number width], [param:Number height], [param:Constant format], [param:Constant type], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], , [param:Constant colorSpace] )</h3>
 		<p>
 		[page:Array mipmaps] -- mipmaps数组中需要包含具有数据、宽、高的对象。mipmaps应当具有正确的格式与类型。<br />
 
@@ -55,7 +55,10 @@
 
 		[page:Number anisotropy] -- 沿着轴，通过具有最高纹素密度的像素的样本数。
 		默认情况下，这个值为1。设置一个较高的值将会产生比基本的mipmap更清晰的效果，代价是需要使用更多纹理样本。
-		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。<br /><br />
+		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。<br />
+
+		[page:Constant colorSpace] -- The default is [page:Textures THREE.NoColorSpace].
+		See [page:Textures color space constants] for other choices.<br /><br />
 		</p>
 
 

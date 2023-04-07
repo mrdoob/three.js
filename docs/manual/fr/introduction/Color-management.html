@@ -156,7 +156,7 @@
 	<p>
 		Les couleurs fournies à three.js — par les sélecteurs de couleurs, les textures, les modèles 3D, et d'autres sources —
 		ont toutes un espace colorimétrique associé. Celles qui ne sont pas déjà dans l'espace colorimétrique sRGB-Linéaire
-		doivent-être converties, et les textures doivent recevoir les bonnes consignes de <i>texture.encoding</i>.
+		doivent-être converties, et les textures doivent recevoir les bonnes consignes de <i>texture.colorSpace</i>.
 		Certaines conversions (pour l'héxadecimal et les couleurs CSS en sRGB) peuvent être automatisées si
 		l'héritage de la gestion des couleurs est désactivé avant l'initialisation des couleurs:
 	</p>
@@ -177,14 +177,14 @@ THREE.ColorManagement.enabled = true;
 		<li>
 			<b>Textures colorées:</b> PNG ou JPEG [page:Texture Textures] contiennent des informations de couleurs
 			(comme .map ou .emissiveMap) utilisant le domaine fermé de l'espace colorimétrique sRGB, et doivent être annotés avec
-			<i>texture.encoding = sRGBEncoding</i>. Des formats comme OpenEXR (parfois utilisés par .envMap pi
-			.lightMap) utilisent l'espace colorimétrique sRGB-Linéaire indiqué par <i>texture.encoding = LinearEncoding</i>,
+			<i>texture.colorSpace = SRGBColorSpace</i>. Des formats comme OpenEXR (parfois utilisés par .envMap pi
+			.lightMap) utilisent l'espace colorimétrique sRGB-Linéaire indiqué par <i>texture.colorSpace = LinearSRGBColorSpace</i>,
 			et peuvent contenir des valeurs du domaine ouvert [0,∞].
 		</li>
 		<li>
 			<b>Textures non-colorées:</b> Les textures qui ne stockent aucune information de couleur (comme .normalMap
 			ou .roughnessMap) n'ont pas d'espace colorimétrique associé, et utilisent généralement l'annotation de texture (par défaut)
-			<i>texture.encoding = LinearEncoding</i>. Dans de rares cas, les données ne concernant pas la couleur
+			<i>texture.colorSpace = NoColorSpace</i>. Dans de rares cas, les données ne concernant pas la couleur
 			peuvent être représentées par d'autres encodages non-linéaires pour des raisons techniques.
 		</li>
 	</ul>
@@ -211,11 +211,11 @@ THREE.ColorManagement.enabled = true;
 	<p>
 		La sortie d'un écran, d'une image, ou d'une vidéo peut impliquer la conversion depuis un espace colorimétrique
 		sRGB-Linéaire au domaine ouvert vers un autre espace colorimétrique. Cette conversion peut être effectuée dans
-		le pass principal du moteur de rendu ([page:WebGLRenderer.outputEncoding]), ou durant le post-processing.
+		le pass principal du moteur de rendu ([page:WebGLRenderer.outputColorSpace]), ou durant le post-processing.
 	</p>
 
 	<code>
-renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
+renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processing
 	</code>
 
 	<ul>
