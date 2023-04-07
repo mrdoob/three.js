@@ -42,6 +42,8 @@
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let container, stats;
 			let camera, controls, scene, renderer;
 			let mesh, texture;
@@ -81,6 +83,7 @@
 				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
 				texture.wrapS = THREE.ClampToEdgeWrapping;
 				texture.wrapT = THREE.ClampToEdgeWrapping;
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );

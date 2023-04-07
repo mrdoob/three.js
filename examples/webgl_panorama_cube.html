@@ -99,6 +99,7 @@
 							canvas.height = tileWidth;
 							canvas.width = tileWidth;
 							context.drawImage( image, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+							textures[ i ].colorSpace = THREE.SRGBColorSpace;
 							textures[ i ].image = canvas;
 							textures[ i ].needsUpdate = true;
 
