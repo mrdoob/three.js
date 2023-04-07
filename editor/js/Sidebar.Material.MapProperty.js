@@ -111,9 +111,9 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 
 		if ( texture !== null ) {
 
-			if ( texture.isDataTexture !== true && texture.encoding !== THREE.sRGBEncoding ) {
+			if ( texture.isDataTexture !== true && texture.colorSpace !== THREE.SRGBColorSpace ) {
 
-				texture.encoding = THREE.sRGBEncoding;
+				texture.colorSpace = THREE.SRGBColorSpace;
 				material.needsUpdate = true;
 
 			}
