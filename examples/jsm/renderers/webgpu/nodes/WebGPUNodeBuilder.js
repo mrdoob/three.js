@@ -145,6 +145,20 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
+	getVideoSampler( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleBaseClampToEdge( ${textureProperty}, ${textureProperty}_sampler, vec2<f32>( ${uvSnippet}.x, 1.0 - ${uvSnippet}.y ) )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.VideoTexture does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -163,41 +177,39 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
+	getTexture( texture, textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
 
-		return this.getSampler( textureProperty, uvSnippet, shaderStage );
+		let snippet = null;
 
-	}
+		if ( texture.isVideoTexture === true ) {
 
-	getTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
-
-		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
-
-	}
-
-	getCubeTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
-
-		return this.getSampler( textureProperty, uvSnippet, shaderStage );
-
-	}
-
-	getCubeTextureLevel( textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
-
-		return this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
-
-	}
-
-	getVideoTexture( textureProperty, uvSnippet, shaderStage = this.shaderStage ) {
-
-		if ( shaderStage === 'fragment' ) {
-
-			return `textureSampleBaseClampToEdge( ${textureProperty}, ${textureProperty}_sampler, vec2<f32>( ${uvSnippet}.x, 1.0 - ${uvSnippet}.y ) )`;
+			snippet = this.getVideoSampler( textureProperty, uvSnippet, shaderStage );
 
 		} else {
 
-			console.error( `WebGPURenderer: THREE.VideoTexture does not support ${ shaderStage } shader.` );
+			snippet = this.getSampler( textureProperty, uvSnippet, shaderStage );
 
 		}
+
+		return snippet;
+
+	}
+
+	getTextureLevel( texture, textureProperty, uvSnippet, biasSnippet, shaderStage = this.shaderStage ) {
+
+		let snippet = null;
+
+		if ( texture.isVideoTexture === true ) {
+
+			snippet = this.getVideoSampler( textureProperty, uvSnippet, shaderStage );
+
+		} else {
+
+			snippet = this.getSamplerLevel( textureProperty, uvSnippet, biasSnippet, shaderStage );
+
+		}
+
+		return snippet;
 
 	}
 
@@ -541,6 +553,10 @@ class WebGPUNodeBuilder extends NodeBuilder {
 				if ( texture.isCubeTexture === true ) {
 
 					textureType = 'texture_cube<f32>';
+
+				} else if ( texture.isDepthTexture === true ) {
+
+					textureType = 'texture_depth_2d';
 
 				} else if ( texture.isVideoTexture === true ) {
 
