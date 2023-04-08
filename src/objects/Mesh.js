@@ -143,12 +143,6 @@ class Mesh extends Object3D {
 
 		}
 
-		if ( this.isSkinnedMesh ) {
-
-			this.applyBoneTransform( index, target );
-
-		}
-
 		return target;
 
 	}
@@ -191,7 +185,16 @@ class Mesh extends Object3D {
 
 		}
 
+		this._computeIntersections( raycaster, intersects );
+
+	}
+
+	_computeIntersections( raycaster, intersects ) {
+
 		let intersection;
+
+		const geometry = this.geometry;
+		const material = this.material;
 
 		const index = geometry.index;
 		const position = geometry.attributes.position;
