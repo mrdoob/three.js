@@ -11,7 +11,7 @@ class WebGPUProgrammableStage {
 		this.usedTimes = 0;
 
 		this.stage = {
-			module: device.createShaderModule( { code } ),
+			module: device.createShaderModule( { code, label: type } ),
 			entryPoint: 'main'
 		};
 
