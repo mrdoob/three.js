@@ -87,6 +87,9 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.height = source.height;
 		this.depth = source.depth;
 
+		this.scissor.copy( source.scissor );
+		this.scissorTest = source.scissorTest;
+
 		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
