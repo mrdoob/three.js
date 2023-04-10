@@ -7,36 +7,30 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-
 		[page:KeyframeTrack] &rarr;
 
 		<h1>[name]</h1>
 
-		<p class="desc">
-			A Track of quaternion keyframe values.
-		</p>
-
+		<p class="desc">A Track of quaternion keyframe values.</p>
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
+		<h3>
+			[name]( [param:String name], [param:Array times], [param:Array values] )
+		</h3>
 		<p>
 			[page:String name] (required) identifier for the KeyframeTrack.<br />
 			[page:Array times] (required) array of keyframe times.<br />
-			[page:Array values] values for the keyframes at the times specified, a flat array of quaternion components.<br />
+			[page:Array values] values for the keyframes at the times specified, a
+			flat array of quaternion components.<br />
 			[page:Constant interpolation] the type of interpolation to use. See
 			[page:Animation Animation Constants] for possible values. Default is
 			[page:Animation InterpolateLinear].
 		</p>
 
-
 		<h2>Properties</h2>
 
-
-		<p class="desc">
-			See [page:KeyframeTrack] for inherited properties.
-		</p>
+		<p class="desc">See [page:KeyframeTrack] for inherited properties.</p>
 
 		<h3>[property:Constant DefaultInterpolation]</h3>
 		<p>
@@ -44,28 +38,21 @@
 		</p>
 
 		<h3>[property:String ValueTypeName]</h3>
-		<p>
-			String 'quaternion'.
-		</p>
-
+		<p>String 'quaternion'.</p>
 
 		<h2>Methods</h2>
 
+		<p class="desc">See [page:KeyframeTrack] for inherited methods.</p>
 
-		<p class="desc">
-			See [page:KeyframeTrack] for inherited methods.
-		</p>
-
-		<h3>[method:QuaternionLinearInterpolant InterpolantFactoryMethodLinear]()</h3>
+		<h3>
+			[method:QuaternionLinearInterpolant InterpolantFactoryMethodLinear]()
+		</h3>
 		<p>
-			Returns a new [page:QuaternionLinearInterpolant QuaternionLinearInterpolant] based on the
-			[page:KeyframeTrack.values values], [page:KeyframeTrack.times times] and
+			Returns a new [page:QuaternionLinearInterpolant QuaternionLinearInterpolant] based on the [page:KeyframeTrack.values values], [page:KeyframeTrack.times times] and
 			[page:KeyframeTrack.valueSize valueSize] of the keyframes.
 		</p>
 
-
 		<h2>Source</h2>
-
 
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
