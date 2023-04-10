@@ -211,7 +211,8 @@
 		</p>
 
 		<h3>[method:undefined computeVertexNormals]()</h3>
-		<p>Computes vertex normals by averaging face normals.</p>
+		<p>Computes vertex normals for the given vertex data. For indexed geometries, the method sets each vertex normal to be the average of the face normals of the faces that share that vertex.
+		For non-indexed geometries, vertices are not shared, and the method sets each vertex normal to be the same as the face normal.</p>
 
 		<h3>[method:this copy]( [param:BufferGeometry bufferGeometry] )</h3>
 		<p>Copies another BufferGeometry to this BufferGeometry.</p>
