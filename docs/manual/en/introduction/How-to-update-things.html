@@ -80,16 +80,13 @@ scene.add( line );
 				Next we'll randomly add points to the line using a pattern like:
 			</p>
 			<code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+	positionAttribute.setXYZ( i, x, y, z );
 
     x += ( Math.random() - 0.5 ) * 30;
     y += ( Math.random() - 0.5 ) * 30;
@@ -108,7 +105,7 @@ line.geometry.setDrawRange( 0, newValue );
 				set the needsUpdate flag like so:
 			</p>
 			<code>
-line.geometry.attributes.position.needsUpdate = true; // required after the first render
+positionAttribute.needsUpdate = true; // required after the first render
 			</code>
 
 			<p>
