@@ -2908,6 +2908,9 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.height = source.height;
 		this.depth = source.depth;
 
+		this.scissor.copy( source.scissor );
+		this.scissorTest = source.scissorTest;
+
 		this.viewport.copy( source.viewport );
 
 		this.texture = source.texture.clone();
@@ -3083,8 +3086,10 @@ class WebGLMultipleRenderTargets extends WebGLRenderTarget {
 		this.height = source.height;
 		this.depth = source.depth;
 
-		this.viewport.set( 0, 0, this.width, this.height );
-		this.scissor.set( 0, 0, this.width, this.height );
+		this.scissor.copy( source.scissor );
+		this.scissorTest = source.scissorTest;
+
+		this.viewport.copy( source.viewport );
 
 		this.depthBuffer = source.depthBuffer;
 		this.stencilBuffer = source.stencilBuffer;
@@ -11300,7 +11305,7 @@ class BufferGeometry extends EventDispatcher {
 
 const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 const _ray$2 = /*@__PURE__*/ new Ray();
-const _sphere$4 = /*@__PURE__*/ new Sphere();
+const _sphere$5 = /*@__PURE__*/ new Sphere();
 const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
 const _vA$1 = /*@__PURE__*/ new Vector3();
@@ -11432,12 +11437,6 @@ class Mesh extends Object3D {
 
 		}
 
-		if ( this.isSkinnedMesh ) {
-
-			this.applyBoneTransform( index, target );
-
-		}
-
 		return target;
 
 	}
@@ -11454,14 +11453,14 @@ class Mesh extends Object3D {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		_sphere$4.copy( geometry.boundingSphere );
-		_sphere$4.applyMatrix4( matrixWorld );
+		_sphere$5.copy( geometry.boundingSphere );
+		_sphere$5.applyMatrix4( matrixWorld );
 
 		_ray$2.copy( raycaster.ray ).recast( raycaster.near );
 
-		if ( _sphere$4.containsPoint( _ray$2.origin ) === false ) {
+		if ( _sphere$5.containsPoint( _ray$2.origin ) === false ) {
 
-			if ( _ray$2.intersectSphere( _sphere$4, _sphereHitAt ) === null ) return;
+			if ( _ray$2.intersectSphere( _sphere$5, _sphereHitAt ) === null ) return;
 
 			if ( _ray$2.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
 
@@ -11480,7 +11479,16 @@ class Mesh extends Object3D {
 
 		}
 
+		this._computeIntersections( raycaster, intersects );
+
+	}
+
+	_computeIntersections( raycaster, intersects ) {
+
 		let intersection;
+
+		const geometry = this.geometry;
+		const material = this.material;
 
 		const index = geometry.index;
 		const position = geometry.attributes.position;
@@ -12933,7 +12941,7 @@ class Plane {
 
 }
 
-const _sphere$3 = /*@__PURE__*/ new Sphere();
+const _sphere$4 = /*@__PURE__*/ new Sphere();
 const _vector$6 = /*@__PURE__*/ new Vector3();
 
 class Frustum {
@@ -12999,7 +13007,7 @@ class Frustum {
 
 			if ( object.boundingSphere === null ) object.computeBoundingSphere();
 
-			_sphere$3.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
+			_sphere$4.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 		} else {
 
@@ -13007,21 +13015,21 @@ class Frustum {
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			_sphere$3.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+			_sphere$4.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 		}
 
-		return this.intersectsSphere( _sphere$3 );
+		return this.intersectsSphere( _sphere$4 );
 
 	}
 
 	intersectsSprite( sprite ) {
 
-		_sphere$3.center.set( 0, 0, 0 );
-		_sphere$3.radius = 0.7071067811865476;
-		_sphere$3.applyMatrix4( sprite.matrixWorld );
+		_sphere$4.center.set( 0, 0, 0 );
+		_sphere$4.radius = 0.7071067811865476;
+		_sphere$4.applyMatrix4( sprite.matrixWorld );
 
-		return this.intersectsSphere( _sphere$3 );
+		return this.intersectsSphere( _sphere$4 );
 
 	}
 
@@ -14448,18 +14456,6 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 		}
 
-		// Ignore background in AR
-		// TODO: Reconsider this.
-
-		const xr = renderer.xr;
-		const session = xr.getSession && xr.getSession();
-
-		if ( session && session.environmentBlendMode === 'additive' ) {
-
-			background = null;
-
-		}
-
 		if ( background === null ) {
 
 			setClear( clearColor, clearAlpha );
@@ -14467,6 +14463,31 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 		} else if ( background && background.isColor ) {
 
 			setClear( background, 1 );
+			forceClear = true;
+
+		}
+
+		const xr = renderer.xr;
+		const session = xr.getSession();
+
+		if ( session !== null ) {
+
+			switch ( session.environmentBlendMode ) {
+
+				case 'additive':
+
+					state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
+
+					break;
+
+				case 'alpha-blend':
+
+					state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
+
+					break;
+
+			}
+
 			forceClear = true;
 
 		}
@@ -25805,6 +25826,7 @@ class WebXRManager extends EventDispatcher {
 		const scope = this;
 
 		let session = null;
+
 		let framebufferScaleFactor = 1.0;
 
 		let referenceSpace = null;
@@ -26054,7 +26076,7 @@ class WebXRManager extends EventDispatcher {
 
 					const layerInit = {
 						antialias: ( session.renderState.layers === undefined ) ? attributes.antialias : true,
-						alpha: attributes.alpha,
+						alpha: true,
 						depth: attributes.depth,
 						stencil: attributes.stencil,
 						framebufferScaleFactor: framebufferScaleFactor
@@ -30884,6 +30906,8 @@ const _vector3 = /*@__PURE__*/ new Vector3();
 const _matrix4 = /*@__PURE__*/ new Matrix4();
 const _vertex = /*@__PURE__*/ new Vector3();
 
+const _sphere$3 = /*@__PURE__*/ new Sphere();
+
 class SkinnedMesh extends Mesh {
 
 	constructor( geometry, material ) {
@@ -30962,6 +30986,29 @@ class SkinnedMesh extends Mesh {
 		this.skeleton = source.skeleton;
 
 		return this;
+
+	}
+
+	raycast( raycaster, intersects ) {
+
+		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+
+		_sphere$3.copy( this.boundingSphere );
+		_sphere$3.applyMatrix4( this.matrixWorld );
+
+		if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) return;
+
+		this._computeIntersections( raycaster, intersects );
+
+	}
+
+	getVertexPosition( index, target ) {
+
+		super.getVertexPosition( index, target );
+
+		this.applyBoneTransform( index, target );
+
+		return target;
 
 	}
 
@@ -44608,25 +44655,31 @@ class AudioLoader extends Loader {
 
 					onLoad( audioBuffer );
 
-				} );
+				}, handleError );
 
 			} catch ( e ) {
 
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
-				}
-
-				scope.manager.itemError( url );
+				handleError( e );
 
 			}
 
 		}, onProgress, onError );
+
+		function handleError( e ) {
+
+			if ( onError ) {
+
+				onError( e );
+
+			} else {
+
+				console.error( e );
+
+			}
+
+			scope.manager.itemError( url );
+
+		}
 
 	}
 
