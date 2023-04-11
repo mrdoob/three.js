@@ -4,7 +4,7 @@ class XRButton {
 
 		const button = document.createElement( 'button' );
 
-		function showStartXR( mode ) {
+		function showStartXR() {
 
 			let currentSession = null;
 
@@ -13,8 +13,6 @@ class XRButton {
 				session.addEventListener( 'end', onSessionEnded );
 
 				await renderer.xr.setSession( session );
-
-				renderer.xr.setSessionMode( mode );
 
 				button.textContent = 'STOP XR';
 
@@ -142,7 +140,7 @@ class XRButton {
 
 					if ( supported ) {
 
-						showStartXR( 'immersive-ar' );
+						showStartXR();
 
 					} else {
 
@@ -151,7 +149,7 @@ class XRButton {
 
 								if ( supported ) {
 
-									showStartXR( 'immersive-vr' );
+									showStartXR();
 
 								} else {
 
@@ -163,7 +161,7 @@ class XRButton {
 
 					}
 
-			} ).catch( showXRNotAllowed );
+				} ).catch( showXRNotAllowed );
 
 			return button;
 

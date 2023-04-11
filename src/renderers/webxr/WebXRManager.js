@@ -19,7 +19,6 @@ class WebXRManager extends EventDispatcher {
 		const scope = this;
 
 		let session = null;
-		let sessionMode = null;
 
 		let framebufferScaleFactor = 1.0;
 
@@ -349,18 +348,6 @@ class WebXRManager extends EventDispatcher {
 				scope.dispatchEvent( { type: 'sessionstart' } );
 
 			}
-
-		};
-
-		this.getSessionMode = function () {
-
-			return sessionMode;
-
-		};
-
-		this.setSessionMode = function ( value ) {
-
-			sessionMode = value;
 
 		};
 
