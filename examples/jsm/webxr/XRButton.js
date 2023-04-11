@@ -4,7 +4,7 @@ class XRButton {
 
 		const button = document.createElement( 'button' );
 
-		function showStartXR() {
+		function showStartXR( mode ) {
 
 			let currentSession = null;
 
@@ -140,7 +140,7 @@ class XRButton {
 
 					if ( supported ) {
 
-						showStartXR();
+						showStartXR( 'immersive-ar' );
 
 					} else {
 
@@ -149,7 +149,7 @@ class XRButton {
 
 								if ( supported ) {
 
-									showStartXR();
+									showStartXR( 'immersive-vr' );
 
 								} else {
 
