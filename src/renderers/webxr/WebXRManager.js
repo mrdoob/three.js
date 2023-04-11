@@ -19,6 +19,7 @@ class WebXRManager extends EventDispatcher {
 		const scope = this;
 
 		let session = null;
+
 		let framebufferScaleFactor = 1.0;
 
 		let referenceSpace = null;
@@ -268,7 +269,7 @@ class WebXRManager extends EventDispatcher {
 
 					const layerInit = {
 						antialias: ( session.renderState.layers === undefined ) ? attributes.antialias : true,
-						alpha: attributes.alpha,
+						alpha: true,
 						depth: attributes.depth,
 						stencil: attributes.stencil,
 						framebufferScaleFactor: framebufferScaleFactor
