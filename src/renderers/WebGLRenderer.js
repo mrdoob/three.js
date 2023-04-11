@@ -1024,17 +1024,7 @@ class WebGLRenderer {
 
 			//
 
-			if ( xr.getSessionMode() !== 'immersive-ar' ) {
-
-				background.render( currentRenderList, scene );
-
-			} else {
-
-				 state.buffers.color.setClear( 0, 0, 0, 0, true );
-				_this.clear( true, true, true );
-
-			}
-
+			background.render( currentRenderList, scene );
 
 			// render scene
 
