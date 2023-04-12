@@ -64,12 +64,6 @@ class WebGPUNodes {
 
 	}
 
-	updateFrame() {
-
-		this.nodeFrame.update();
-
-	}
-
 	getEnvironmentNode( scene ) {
 
 		return scene.environmentNode || this.properties.get( scene ).environmentNode || null;
@@ -114,17 +108,17 @@ class WebGPUNodes {
 
 		if ( rendererToneMapping !== NoToneMapping ) {
 
-			if ( rendererProperties.toneMappingCacheKey !== rendererToneMapping ) {
+			if ( rendererProperties.toneMapping !== rendererToneMapping ) {
 
-				rendererProperties.toneMappingNode = toneMapping( renderer.toneMapping, reference( 'toneMappingExposure', 'float', renderer ) );
-				rendererProperties.toneMappingCacheKey = rendererToneMapping;
+				rendererProperties.toneMappingNode = toneMapping( rendererToneMapping, reference( 'toneMappingExposure', 'float', renderer ) );
+				rendererProperties.toneMapping = rendererToneMapping;
 
 			}
 
 		} else {
 
 			delete rendererProperties.toneMappingNode;
-			delete rendererProperties.toneMappingCacheKey;
+			delete rendererProperties.toneMapping;
 
 		}
 
@@ -137,7 +131,7 @@ class WebGPUNodes {
 
 		if ( background ) {
 
-			if ( sceneProperties.backgroundCacheKey !== background.uuid ) {
+			if ( sceneProperties.background !== background ) {
 
 				let backgroundNode = null;
 
@@ -164,17 +158,21 @@ class WebGPUNodes {
 
 					backgroundNode = texture( background, nodeUV );
 
+				} else if ( background.isColor !== true ) {
+
+					console.error( 'WebGPUNodes: Unsupported background configuration.', background );
+
 				}
 
 				sceneProperties.backgroundNode = backgroundNode;
-				sceneProperties.backgroundCacheKey = background.uuid;
+				sceneProperties.background = background;
 
 			}
 
 		} else if ( sceneProperties.backgroundNode ) {
 
 			delete sceneProperties.backgroundNode;
-			delete sceneProperties.backgroundCacheKey;
+			delete sceneProperties.background;
 
 		}
 
@@ -187,7 +185,7 @@ class WebGPUNodes {
 
 		if ( fog ) {
 
-			if ( sceneProperties.fogCacheKey !== fog.uuid ) {
+			if ( sceneProperties.fog !== fog ) {
 
 				let fogNode = null;
 
@@ -206,14 +204,14 @@ class WebGPUNodes {
 				}
 
 				sceneProperties.fogNode = fogNode;
-				sceneProperties.fogCacheKey = fog.uuid;
+				sceneProperties.fog = fog;
 
 			}
 
 		} else {
 
 			delete sceneProperties.fogNode;
-			delete sceneProperties.fogCacheKey;
+			delete sceneProperties.fog;
 
 		}
 
@@ -226,7 +224,7 @@ class WebGPUNodes {
 
 		if ( environment ) {
 
-			if ( sceneProperties.environmentCacheKey !== environment.uuid ) {
+			if ( sceneProperties.environment !== environment ) {
 
 				let environmentNode = null;
 
@@ -245,14 +243,41 @@ class WebGPUNodes {
 				}
 
 				sceneProperties.environmentNode = environmentNode;
-				sceneProperties.environmentCacheKey = environment.uuid;
+				sceneProperties.environment = environment;
 
 			}
 
 		} else if ( sceneProperties.environmentNode ) {
 
 			delete sceneProperties.environmentNode;
-			delete sceneProperties.environmentCacheKey;
+			delete sceneProperties.environment;
+
+		}
+
+	}
+
+	getUpdateNodes( renderObject ) {
+
+		const nodeBuilder = this.get( renderObject );
+		const nodeFrame = this.nodeFrame;
+
+		nodeFrame.scene = renderObject.scene;
+		nodeFrame.object = renderObject.object;
+		nodeFrame.camera = renderObject.camera;
+		nodeFrame.renderer = renderObject.renderer;
+		nodeFrame.material = renderObject.material;
+
+		return nodeBuilder.updateNodes;
+
+	}
+
+	updateBefore( renderObject ) {
+
+		const nodeFrame = this.nodeFrame;
+
+		for ( const node of this.getUpdateNodes( renderObject ) ) {
+
+			nodeFrame.updateBeforeNode( node );
 
 		}
 
@@ -260,15 +285,9 @@ class WebGPUNodes {
 
 	update( renderObject ) {
 
-		const nodeBuilder = this.get( renderObject );
 		const nodeFrame = this.nodeFrame;
 
-		nodeFrame.object = renderObject.object;
-		nodeFrame.camera = renderObject.camera;
-		nodeFrame.renderer = renderObject.renderer;
-		nodeFrame.material = renderObject.material;
-
-		for ( const node of nodeBuilder.updateNodes ) {
+		for ( const node of this.getUpdateNodes( renderObject ) ) {
 
 			nodeFrame.updateNode( node );
 
