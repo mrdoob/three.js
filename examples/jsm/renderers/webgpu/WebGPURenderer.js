@@ -855,6 +855,10 @@ class WebGPURenderer {
 
 		//
 
+		this._nodes.updateBefore( renderObject );
+
+		//
+
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 

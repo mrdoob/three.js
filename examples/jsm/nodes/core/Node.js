@@ -15,6 +15,7 @@ class Node {
 		this.nodeType = nodeType;
 
 		this.updateType = NodeUpdateType.NONE;
+		this.updateBeforeType = NodeUpdateType.NONE;
 
 		this.uuid = MathUtils.generateUUID();
 
@@ -92,6 +93,12 @@ class Node {
 
 	}
 
+	getUpdateBeforeType() {
+
+		return this.updateBeforeType;
+
+	}
+
 	getNodeType( /*builder*/ ) {
 
 		return this.nodeType;
@@ -156,6 +163,12 @@ class Node {
 			return outputNode.build( builder, output );
 
 		}
+
+	}
+
+	updateBefore( /*frame*/ ) {
+
+		console.warn( 'Abstract function.' );
 
 	}
 

@@ -8,15 +8,53 @@ class NodeFrame {
 		this.deltaTime = 0;
 
 		this.frameId = 0;
+		this.renderId = 0;
 
 		this.startTime = null;
 
 		this.updateMap = new WeakMap();
+		this.updateBeforeMap = new WeakMap();
+		this.rendererMap = new WeakMap();
+		this.rendererBeforeMap = new WeakMap();
 
 		this.renderer = null;
 		this.material = null;
 		this.camera = null;
 		this.object = null;
+		this.scene = null;
+
+	}
+
+	updateBeforeNode( node ) {
+
+		const updateType = node.getUpdateBeforeType();
+
+		if ( updateType === NodeUpdateType.FRAME ) {
+
+			if ( this.updateBeforeMap.get( node ) !== this.frameId ) {
+
+				this.updateBeforeMap.set( node, this.frameId );
+
+				node.updateBefore( this );
+
+			}
+
+		} else if ( updateType === NodeUpdateType.RENDER ) {
+
+			if ( this.rendererBeforeMap.get( node ) !== this.renderId || this.updateBeforeMap.get( node ) !== this.frameId ) {
+
+				this.rendererBeforeMap.set( node, this.renderId );
+				this.updateBeforeMap.set( node, this.frameId );
+
+				node.updateBefore( this );
+
+			}
+
+		} else if ( updateType === NodeUpdateType.OBJECT ) {
+
+			node.updateBefore( this );
+
+		}
 
 	}
 
