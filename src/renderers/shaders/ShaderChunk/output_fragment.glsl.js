@@ -8,5 +8,5 @@ diffuseColor.a = 1.0;
 diffuseColor.a *= material.transmissionAlpha;
 #endif
 
-gl_FragColor = vec4( outgoingLight, diffuseColor.a );
+gl_FragColor = vec4( outgoingLight * diffuseColor.a, diffuseColor.a );
 `;

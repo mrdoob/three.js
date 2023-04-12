@@ -185,7 +185,7 @@ export default /* glsl */`
 		vec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
 
 		vec3 transmittance = diffuseColor * volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance );
-		vec3 attenuatedColor = transmittedLight.rgb * transmittance;
+		vec3 attenuatedColor = transmittance * mix( vec3( 0.5 ), transmittedLight.rgb, transmittedLight.a );
 
 		// Get the specular component.
 		vec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );
