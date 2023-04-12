@@ -12,14 +12,16 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			A polyhedron is a solid in three dimensions with flat faces. This class will take an array of vertices,
-			project them onto a sphere, and then divide them up to the desired level of detail. This class is used
-			by [page:DodecahedronGeometry], [page:IcosahedronGeometry], [page:OctahedronGeometry],
-			and [page:TetrahedronGeometry] to generate their respective geometries.
+			A polyhedron is a solid in three dimensions with flat faces. This class
+			will take an array of vertices, project them onto a sphere, and then
+			divide them up to the desired level of detail. This class is used by
+			[page:DodecahedronGeometry], [page:IcosahedronGeometry],
+			[page:OctahedronGeometry], and [page:TetrahedronGeometry] to generate
+			their respective geometries.
 		</p>
 
 		<h2>Code Example</h2>
-<code>
+		<code>
 const verticesOfCube = [
     -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
     -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
@@ -39,13 +41,17 @@ const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]([param:Array vertices], [param:Array indices], [param:Float radius], [param:Integer detail])</h3>
+		<h3>
+			[name]([param:Array vertices], [param:Array indices], [param:Float radius], [param:Integer detail])
+		</h3>
 		<p>
-		vertices — [page:Array] of points of the form [1,1,1, -1,-1,-1, ... ] <br />
-		indices — [page:Array] of indices that make up the faces of the form [0,1,2, 2,3,0, ... ] <br />
-		radius — [page:Float] - The radius of the final shape <br />
-		detail — [page:Integer] - How many levels to subdivide the geometry. The more detail, the smoother the shape.
+			vertices — [page:Array] of points of the form [1,1,1, -1,-1,-1, ... ]
+			<br />
+			indices — [page:Array] of indices that make up the faces of the form
+			[0,1,2, 2,3,0, ... ] <br />
+			radius — [page:Float] - The radius of the final shape <br />
+			detail — [page:Integer] - How many levels to subdivide the geometry. The
+			more detail, the smoother the shape.
 		</p>
 
 		<h2>Properties</h2>
@@ -53,7 +59,8 @@ const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>
