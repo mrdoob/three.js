@@ -1,4 +1,4 @@
-import { WebGLRenderTarget } from 'three';
+import WebGPURenderTarget from './WebGPURenderTarget.js';
 
 class WebGPUTextureRenderer {
 
@@ -6,9 +6,7 @@ class WebGPUTextureRenderer {
 
 		this.renderer = renderer;
 
-		// @TODO: Consider to introduce WebGPURenderTarget or rename WebGLRenderTarget to just RenderTarget
-
-		this.renderTarget = new WebGLRenderTarget( options );
+		this.renderTarget = new WebGPURenderTarget( 1, 1, options );
 
 	}
 
