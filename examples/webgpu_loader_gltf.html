@@ -114,7 +114,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
