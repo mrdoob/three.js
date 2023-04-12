@@ -246,7 +246,12 @@ class WebGPURenderer {
 
 		//
 
-		if ( this._animation.isAnimating === false ) this._nodes.updateFrame();
+		const nodeFrame = this._nodes.nodeFrame;
+
+		let previousRenderId = nodeFrame.renderId;
+		nodeFrame.renderId ++;
+
+		if ( this._animation.isAnimating === false ) nodeFrame.update();
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
@@ -382,6 +387,8 @@ class WebGPURenderer {
 
 		passEncoder.end();
 		device.queue.submit( [ cmdEncoder.finish() ] );
+
+		nodeFrame.renderId = previousRenderId;
 
 	}
 

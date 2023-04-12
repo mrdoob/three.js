@@ -34,6 +34,17 @@ class NodeFrame {
 
 			}
 
+		} else if ( updateType === NodeUpdateType.RENDER ) {
+
+			if ( this.rendererMap.get( node ) !== this.renderId || this.updateMap.get( node ) !== this.frameId ) {
+
+				this.rendererMap.set( node, this.renderId );
+				this.updateMap.set( node, this.frameId );
+
+				node.update( this );
+
+			}
+
 		} else if ( updateType === NodeUpdateType.OBJECT ) {
 
 			node.update( this );
