@@ -43,7 +43,7 @@ class PositionNode extends Node {
 
 		} else if ( scope === PositionNode.WORLD ) {
 
-			const vertexPositionNode = modelWorldMatrix.transformDirection( positionLocal );
+			const vertexPositionNode = modelWorldMatrix.mul( positionLocal );
 			outputNode = varying( vertexPositionNode );
 
 		} else if ( scope === PositionNode.VIEW ) {
@@ -58,7 +58,7 @@ class PositionNode extends Node {
 
 		} else if ( scope === PositionNode.WORLD_DIRECTION ) {
 
-			const vertexPositionNode = positionWorld.negate();
+			const vertexPositionNode = positionLocal.transformDirection( modelWorldMatrix );
 			outputNode = normalize( varying( vertexPositionNode ) );
 
 		}
