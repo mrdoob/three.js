@@ -501,7 +501,7 @@ class WebGPUTextures {
 
 	}
 
-	_copyExternalImageToTexture( image, textureGPU, originDepth ) {
+	_copyExternalImageToTexture( image, textureGPU, textureGPUDescriptor, needsMipmaps, originDepth = 0 ) {
 
 		this.device.queue.copyExternalImageToTexture(
 			{
@@ -516,6 +516,8 @@ class WebGPUTextures {
 				depthOrArrayLayers: 1
 			}
 		);
+
+		if ( needsMipmaps ) this._generateMipmaps( textureGPU, textureGPUDescriptor, originDepth );
 
 	}
 
@@ -728,9 +730,7 @@ class WebGPUTextures {
 
 			this._getImageBitmapFromHTML( image, texture ).then( imageBitmap => {
 
-				this._copyExternalImageToTexture( imageBitmap, textureGPU, originDepth );
-
-				if ( needsMipmaps ) this._generateMipmaps( textureGPU, textureGPUDescriptor, originDepth );
+				this._copyExternalImageToTexture( imageBitmap, textureGPU, textureGPUDescriptor, needsMipmaps, originDepth );
 
 			} );
 
@@ -738,9 +738,7 @@ class WebGPUTextures {
 
 			// assume ImageBitmap
 
-			this._copyExternalImageToTexture( image, textureGPU, originDepth );
-
-			if ( needsMipmaps ) this._generateMipmaps( textureGPU, textureGPUDescriptor, originDepth );
+			this._copyExternalImageToTexture( image, textureGPU, textureGPUDescriptor, needsMipmaps, originDepth );
 
 		}
 
