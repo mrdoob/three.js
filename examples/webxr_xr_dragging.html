@@ -132,6 +132,11 @@
 
 				document.body.appendChild( XRButton.createButton( renderer ) );
 
+				// clipping
+
+				const floorClipping = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ) );
+				renderer.clippingPlanes = [ floorClipping ];
+
 				// controllers
 
 				controller1 = renderer.xr.getController( 0 );
