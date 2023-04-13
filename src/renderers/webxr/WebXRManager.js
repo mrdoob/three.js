@@ -351,6 +351,16 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getEnvironmentBlendMode = function () {
+
+			if ( session !== null ) { 
+
+				return session.environmentBlendMode;
+
+			}
+
+		};
+
 		function onInputSourcesChange( event ) {
 
 			// Notify disconnected
