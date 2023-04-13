@@ -347,7 +347,7 @@ class Color {
 
 		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
 
-		return Math.round( clamp( _color.r * 255, 0, 255 ) ) << 16 + Math.round( clamp( _color.g * 255, 0, 255 ) ) << 8 + Math.round( clamp( _color.b * 255, 0, 255 ) );
+		return Math.round( clamp( _color.r * 255, 0, 255 ) ) * 65536 + Math.round( clamp( _color.g * 255, 0, 255 ) ) * 256 + Math.round( clamp( _color.b * 255, 0, 255 ) );
 
 	}
 
