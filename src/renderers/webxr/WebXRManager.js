@@ -353,7 +353,7 @@ class WebXRManager extends EventDispatcher {
 
 		this.getEnvironmentBlendMode = function () {
 
-			if ( session !== null ) { 
+			if ( session !== null ) {
 
 				return session.environmentBlendMode;
 
