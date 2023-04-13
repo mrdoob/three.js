@@ -94,7 +94,7 @@ class Color {
 
 	setHex( hex, colorSpace = SRGBColorSpace ) {
 
-		hex = Math.floor( hex );
+		hex = Math.round( hex );
 
 		this.r = ( hex >> 16 & 255 ) / 255;
 		this.g = ( hex >> 8 & 255 ) / 255;
