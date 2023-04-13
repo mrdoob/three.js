@@ -1,18 +1,5 @@
 import WebGPUWeakMap from './WebGPUWeakMap.js';
 import WebGPURenderObject from './WebGPURenderObject.js';
-import { PerspectiveCamera, OrthographicCamera } from 'three';
-
-const dummyCameras = {
-	PerspectiveCamera: new PerspectiveCamera(),
-	OrthographicCamera: new OrthographicCamera()
-};
-
-function getChainKeys( object, material, scene, camera, lightsNode ) {
-
-	// use dummy camera for optimize cache in case of use others cameras with the same type
-	return [ object, material, scene, dummyCameras[ camera.type ], lightsNode ];
-
-}
 
 class WebGPURenderObjects {
 
@@ -29,7 +16,7 @@ class WebGPURenderObjects {
 
 	get( object, material, scene, camera, lightsNode ) {
 
-		const chainKey = getChainKeys( object, material, scene, camera, lightsNode );
+		const chainKey = [ object, material, scene, camera, lightsNode ];
 
 		let renderObject = this.cache.get( chainKey );
 
@@ -47,9 +34,7 @@ class WebGPURenderObjects {
 
 	remove( object, material, scene, camera, lightsNode ) {
 
-		const chainKey = getChainKeys( object, material, scene, camera, lightsNode );
-
-		this.cache.delete( chainKey );
+		this.cache.delete( [ object, material, scene, camera, lightsNode ] );
 
 	}
 

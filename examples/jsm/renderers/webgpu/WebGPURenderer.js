@@ -170,6 +170,12 @@ class WebGPURenderer {
 		this._parameters.requiredFeatures = ( parameters.requiredFeatures === undefined ) ? [] : parameters.requiredFeatures;
 		this._parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
+		// backwards compatibility
+
+		this.shadow = {
+			shadowMap: {}
+		};
+
 	}
 
 	async init() {
@@ -246,7 +252,12 @@ class WebGPURenderer {
 
 		//
 
-		if ( this._animation.isAnimating === false ) this._nodes.updateFrame();
+		const nodeFrame = this._nodes.nodeFrame;
+
+		let previousRenderId = nodeFrame.renderId;
+		nodeFrame.renderId ++;
+
+		if ( this._animation.isAnimating === false ) nodeFrame.update();
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
@@ -260,7 +271,7 @@ class WebGPURenderer {
 		this._currentRenderList = this._renderLists.get( scene, camera );
 		this._currentRenderList.init();
 
-		this._currentRenderState = this._renderStates.get( scene );
+		this._currentRenderState = this._renderStates.get( scene, camera );
 		this._currentRenderState.init();
 
 		this._projectObject( scene, camera, 0 );
@@ -382,6 +393,8 @@ class WebGPURenderer {
 
 		passEncoder.end();
 		device.queue.submit( [ cmdEncoder.finish() ] );
+
+		nodeFrame.renderId = previousRenderId;
 
 	}
 
@@ -845,6 +858,10 @@ class WebGPURenderer {
 		//
 
 		const renderObject = this._getRenderObject( object, material, scene, camera, lightsNode );
+
+		//
+
+		this._nodes.updateBefore( renderObject );
 
 		//
 
