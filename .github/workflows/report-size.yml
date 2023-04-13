@@ -71,7 +71,7 @@ jobs:
       - name: Read sizes
         id: read-size
         run: |
-          FILESIZE_BASE=$(stat --format=%s test/treeshake/three.module.min.js)
+          FILESIZE_BASE=$(stat --format=%s build/three.module.min.js)
           TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
 
           # log to console
