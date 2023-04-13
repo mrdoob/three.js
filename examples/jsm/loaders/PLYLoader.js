@@ -346,10 +346,15 @@ class PLYLoader extends Loader {
 			const patternBody = /end_header\s+(\S[\s\S]*\S|\S)\s*$/;
 			let body, matches;
 
-			if ( ( matches = patternBody.exec( data ) ) !== null )
+			if ( ( matches = patternBody.exec( data ) ) !== null ) {
+
 				body = matches[ 1 ].split( /\s+/ );
-			else
+
+			} else {
+
 				body = [ ];
+
+			}
 
 			const tokens = new ArrayStream( body );
 
