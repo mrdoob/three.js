@@ -5,6 +5,7 @@ on:
     paths:
       - 'src/**'
       - 'package.json'
+      - 'utils/build/**'
 
 # This workflow runs in a read-only environment. We can safely checkout
 # the PR code here.
