@@ -19,19 +19,22 @@
 			[page:BufferAttribute] documentation.
 		</p>
 
+		<iframe id="scene" src="scenes/buffergeometry-browser.html"></iframe>
+
 		<h2>Code Example</h2>
+
 		<code>
 		const geometry = new THREE.BufferGeometry();
 		// create a simple square shape. We duplicate the top left and bottom right
 		// vertices because each vertex needs to appear once per triangle.
 		const vertices = new Float32Array( [
-			-1.0, -1.0,  1.0,
-			 1.0, -1.0,  1.0,
-			 1.0,  1.0,  1.0,
+			-1.0, -1.0,  1.0, // v0
+			 1.0, -1.0,  1.0, // v1
+			 1.0,  1.0,  1.0, // v2
 
-			 1.0,  1.0,  1.0,
-			-1.0,  1.0,  1.0,
-			-1.0, -1.0,  1.0
+			 1.0,  1.0,  1.0, // v3
+			-1.0,  1.0,  1.0, // v4
+			-1.0, -1.0,  1.0  // v5
 		] );
 
 		// itemSize = 3 because there are 3 values (components) per vertex
@@ -40,22 +43,36 @@
 		const mesh = new THREE.Mesh( geometry, material );
 		</code>
 
-		or if "indexed" version:
+		<p>Each three contiguous `vertices` positions represent a single triangle. Therefore, a same vertex can appears in multiple triangles, like: `1.0,  1.0,  1.0` (`v2`, `v3`) and `-1.0, -1.0,  1.0` (`v0`, `v5`).</p>
+
+		<h3>Indexed version</h3>
+
+		<p>Here, "triangles" are defined using vertices `indices` (see [link:#api/core/BufferGeometry.index .index]).</p>
 
 		<code>
+		const geometry = new THREE.BufferGeometry();
+
 		const vertices = new Float32Array( [
 			-1.0, -1.0,  1.0, // 0
 			 1.0, -1.0,  1.0, // 1
 			 1.0,  1.0,  1.0, // 2
 			-1.0,  1.0,  1.0, // 3
 		] );
+		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
-		const indices = new Uint32Array( [
+		const indices = [
 			0, 1, 2, // triangle 1: "0, 1, 2"
 			2, 3, 0, // triangle 2: "2, 3, 0"
-		] );
-		geometry.setIndex(new THREE.BufferAttribute( indices, 1 ));
+		];
+		geometry.setIndex( indices );
+
+		const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		const mesh = new THREE.Mesh( geometry, material );
 		</code>
+
+		<p></p>
+
+		<iframe id="scene" src="scenes/buffergeometry-indexed-browser.html"></iframe>
 
 		<h2>Examples</h2>
 		<p>
