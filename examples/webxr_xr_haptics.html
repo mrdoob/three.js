@@ -117,9 +117,9 @@
 
 					const intensity = ( i + 1 ) / BOXES;
 					const w = 0.1;
-					const h = 0.1;
-					const minH = 1;
-					const geometry = new THREE.BoxGeometry( w, h * i + minH, w );
+					const h = 0.05 * i + 0.5;
+					const geometry = new THREE.BoxGeometry( w, h, w );
+					geometry.translate( 0, h / 2, 0 );
 					const material = new THREE.MeshStandardMaterial( {
 						color: new THREE.Color( intensity, 0.1, 0.1 ),
 						roughness: 0.7,
