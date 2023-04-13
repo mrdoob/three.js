@@ -65,7 +65,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build-module
+        run: npm run build
       - name: === Test tree-shaking ===
         run: npm run test-treeshake
       - name: Read sizes
