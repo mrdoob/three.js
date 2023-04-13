@@ -94,7 +94,7 @@ class Color {
 
 	setHex( hex, colorSpace = SRGBColorSpace ) {
 
-		hex = Math.round( hex );
+		hex = Math.floor( hex );
 
 		this.r = ( hex >> 16 & 255 ) / 255;
 		this.g = ( hex >> 8 & 255 ) / 255;
@@ -347,7 +347,7 @@ class Color {
 
 		ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
 
-		return clamp( _color.r * 255, 0, 255 ) << 16 ^ clamp( _color.g * 255, 0, 255 ) << 8 ^ clamp( _color.b * 255, 0, 255 ) << 0;
+		return Math.round( clamp( _color.r * 255, 0, 255 ) ) << 16 + Math.round( clamp( _color.g * 255, 0, 255 ) ) << 8 + Math.round( clamp( _color.b * 255, 0, 255 ) );
 
 	}
 
