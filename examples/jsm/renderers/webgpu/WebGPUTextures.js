@@ -383,7 +383,7 @@ class WebGPUTextures {
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
 
-		if ( needsMipmaps === true ) {
+		if ( needsMipmaps ) {
 
 			// current mipmap generation requires RENDER_ATTACHMENT
 
@@ -421,33 +421,23 @@ class WebGPUTextures {
 
 		if ( texture.isDataTexture || texture.isDataArrayTexture || texture.isData3DTexture ) {
 
-			this._copyBufferToTexture( image, format, textureGPU );
-
-			if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
+			this._copyBufferToTexture( image, textureGPU, textureGPUDescriptor, needsMipmaps );
 
 		} else if ( texture.isCompressedTexture ) {
 
-			this._copyCompressedBufferToTexture( texture.mipmaps, format, textureGPU );
+			this._copyCompressedBufferToTexture( texture.mipmaps, textureGPU, textureGPUDescriptor );
 
 		} else if ( texture.isCubeTexture ) {
 
 			if ( image.length === 6 ) {
 
-				this._copyCubeMapToTexture( image, format, texture, textureGPU, textureGPUDescriptor, needsMipmaps );
+				this._copyCubeMapToTexture( image, texture, textureGPU, textureGPUDescriptor, needsMipmaps );
 
 			}
 
 		} else if ( texture.isDepthTexture !== true && image !== null ) {
 
-			// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
-
-			this._getImageBitmap( image, texture ).then( imageBitmap => {
-
-				this._copyExternalImageToTexture( imageBitmap, textureGPU );
-
-				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
-
-			} );
+			this._copyImageToTexture( image, texture, textureGPU, textureGPUDescriptor, needsMipmaps );
 
 		}
 
@@ -460,21 +450,21 @@ class WebGPUTextures {
 
 	}
 
-	_copyBufferToTexture( image, format, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
+	_copyBufferToTexture( image, textureGPU, textureGPUDescriptor, needsMipmaps, originDepth = 0 ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
 
 		const data = image.data;
 
-		const bytesPerTexel = this._getBytesPerTexel( format );
+		const bytesPerTexel = this._getBytesPerTexel( textureGPUDescriptor.format );
 		const bytesPerRow = image.width * bytesPerTexel;
 
 		this.device.queue.writeTexture(
 			{
 				texture: textureGPU,
 				mipLevel: 0,
-				origin
+				origin: { x: 0, y: 0, z: originDepth }
 			},
 			data,
 			{
@@ -487,9 +477,11 @@ class WebGPUTextures {
 				depthOrArrayLayers: ( image.depth !== undefined ) ? image.depth : 1
 			} );
 
+		if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, originDepth );
+
 	}
 
-	_copyCubeMapToTexture( images, format, texture, textureGPU, textureGPUDescriptor, needsMipmaps ) {
+	_copyCubeMapToTexture( images, texture, textureGPU, textureGPUDescriptor, needsMipmaps ) {
 
 		for ( let i = 0; i < 6; i ++ ) {
 
@@ -497,19 +489,11 @@ class WebGPUTextures {
 
 			if ( image.isDataTexture ) {
 
-				this._copyBufferToTexture( image.image, format, textureGPU, { z: i } );
-
-				if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i );
+				this._copyBufferToTexture( image.image, textureGPU, textureGPUDescriptor, needsMipmaps, i );
 
 			} else {
 
-				this._getImageBitmap( image, texture ).then( imageBitmap => {
-
-					this._copyExternalImageToTexture( imageBitmap, textureGPU, { z: i } );
-
-					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor, i );
-
-				} );
+				this._copyImageToTexture( image, texture, textureGPU, textureGPUDescriptor, needsMipmaps, i );
 
 			}
 
@@ -517,7 +501,7 @@ class WebGPUTextures {
 
 	}
 
-	_copyExternalImageToTexture( image, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
+	_copyExternalImageToTexture( image, textureGPU, textureGPUDescriptor, needsMipmaps, originDepth = 0 ) {
 
 		this.device.queue.copyExternalImageToTexture(
 			{
@@ -525,7 +509,7 @@ class WebGPUTextures {
 			}, {
 				texture: textureGPU,
 				mipLevel: 0,
-				origin
+				origin: { x: 0, y: 0, z: originDepth }
 			}, {
 				width: image.width,
 				height: image.height,
@@ -533,13 +517,15 @@ class WebGPUTextures {
 			}
 		);
 
+		if ( needsMipmaps ) this._generateMipmaps( textureGPU, textureGPUDescriptor, originDepth );
+
 	}
 
-	_copyCompressedBufferToTexture( mipmaps, format, textureGPU ) {
+	_copyCompressedBufferToTexture( mipmaps, textureGPU, textureGPUDescriptor ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 
-		const blockData = this._getBlockData( format );
+		const blockData = this._getBlockData( textureGPUDescriptor.format );
 
 		for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -732,6 +718,46 @@ class WebGPUTextures {
 
 	}
 
+	_isHTMLImage( image ) {
+
+		return ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) || ( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement );
+
+	}
+
+	_copyImageToTexture( image, texture, textureGPU, textureGPUDescriptor, needsMipmaps, originDepth ) {
+
+		if ( this._isHTMLImage( image ) ) {
+
+			this._getImageBitmapFromHTML( image, texture ).then( imageBitmap => {
+
+				this._copyExternalImageToTexture( imageBitmap, textureGPU, textureGPUDescriptor, needsMipmaps, originDepth );
+
+			} );
+
+		} else {
+
+			// assume ImageBitmap
+
+			this._copyExternalImageToTexture( image, textureGPU, textureGPUDescriptor, needsMipmaps, originDepth );
+
+		}
+
+	}
+
+	_getImageBitmapFromHTML( image, texture ) {
+
+		const width = image.width;
+		const height = image.height;
+
+		const options = {};
+
+		options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
+		options.premultiplyAlpha = ( texture.premultiplyAlpha === true ) ? 'premultiply' : 'default';
+
+		return createImageBitmap( image, 0, 0, width, height, options );
+
+	}
+
 	_getImageBitmap( image, texture ) {
 
 		const width = image.width;
@@ -765,7 +791,7 @@ class WebGPUTextures {
 
 			mipLevelCount = texture.mipmaps.length;
 
-		} else if ( needsMipmaps === true ) {
+		} else if ( needsMipmaps ) {
 
 			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
 
