@@ -14470,27 +14470,23 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 		}
 
 		const xr = renderer.xr;
-		const session = xr.getSession();
+		const environmentBlendMode = xr.getEnvironmentBlendMode();
 
-		if ( session !== null ) {
+		switch ( environmentBlendMode ) {
 
-			switch ( session.environmentBlendMode ) {
+			case 'opaque':
+				forceClear = true;
+				break;
 
-				case 'additive':
+			case 'additive':
+				state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
+				forceClear = true;
+				break;
 
-					state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
-
-					break;
-
-				case 'alpha-blend':
-
-					state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
-
-					break;
-
-			}
-
-			forceClear = true;
+			case 'alpha-blend':
+				state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
+				forceClear = true;
+				break;
 
 		}
 
@@ -26155,6 +26151,16 @@ class WebXRManager extends EventDispatcher {
 				scope.isPresenting = true;
 
 				scope.dispatchEvent( { type: 'sessionstart' } );
+
+			}
+
+		};
+
+		this.getEnvironmentBlendMode = function () {
+
+			if ( session !== null ) {
+
+				return session.environmentBlendMode;
 
 			}
 
