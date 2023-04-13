@@ -40,6 +40,23 @@
 		const mesh = new THREE.Mesh( geometry, material );
 		</code>
 
+		or if "indexed" version:
+
+		<code>
+		const vertices = new Float32Array( [
+			-1.0, -1.0,  1.0, // 0
+			 1.0, -1.0,  1.0, // 1
+			 1.0,  1.0,  1.0, // 2
+			-1.0,  1.0,  1.0, // 3
+		] );
+
+		const indices = new Uint32Array( [
+			0, 1, 2, // triangle 1: "0, 1, 2"
+			2, 3, 0, // triangle 2: "2, 3, 0"
+		] );
+		geometry.setIndex(new THREE.BufferAttribute( indices, 1 ));
+		</code>
+
 		<h2>Examples</h2>
 		<p>
 			[example:webgl_buffergeometry Mesh with non-indexed faces]<br />
