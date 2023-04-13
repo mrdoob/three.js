@@ -42,11 +42,11 @@
 		const mesh = new THREE.Mesh( geometry, material );
 		</code>
 
-		<p>Each three contiguous `vertices` positions represent a single triangle. Therefore, a same vertex can appears in multiple triangles, like: `1.0,  1.0,  1.0` (`v2`, `v3`) and `-1.0, -1.0,  1.0` (`v0`, `v5`).</p>
+		<p>Each three contiguous `vertices` positions form a triangle. Together, `vertices` form a "soup" of independent triangles.</p>
 
 		<h3>Indexed version</h3>
 
-		<p>Here, "triangles" are defined using vertices `indices` (see [link:#api/core/BufferGeometry.index .index]).</p>
+		<p>Here, "triangles" are defined using vertices `indices` (see [link:#api/core/BufferGeometry.index .index]). A vertex can be shared between multiple triangles, like vertex `0` or `2`. If a such shared vertex, eg. `0` is updated, triangle1 and triangle2 shapes will be both affected.</p>
 
 		<code>
 		const geometry = new THREE.BufferGeometry();
@@ -60,8 +60,8 @@
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 		const indices = [
-			0, 1, 2, // triangle 1: "0, 1, 2"
-			2, 3, 0, // triangle 2: "2, 3, 0"
+			0, 1, 2, // triangle1: "0, 1, 2"
+			2, 3, 0, // triangle2: "2, 3, 0"
 		];
 		geometry.setIndex( indices );
 
