@@ -54,6 +54,7 @@
 				const vertices = [];
 
 				const sprite = new THREE.TextureLoader().load( 'textures/sprites/disc.png' );
+				sprite.colorSpace = THREE.SRGBColorSpace;
 
 				for ( let i = 0; i < 10000; i ++ ) {
 
@@ -78,7 +79,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				//

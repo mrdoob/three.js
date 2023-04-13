@@ -43,6 +43,8 @@
 			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let scene, renderer, composer;
 			let clearPass, texturePass, renderPass;
 			let cameraP, cubeTexturePassP;
@@ -100,6 +102,7 @@
 				const devicePixelRatio = window.devicePixelRatio || 1;
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
 				document.body.appendChild( renderer.domElement );

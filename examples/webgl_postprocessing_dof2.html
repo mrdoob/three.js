@@ -34,6 +34,8 @@
 
 			import { BokehShader, BokehDepthShader } from 'three/addons/shaders/BokehShader2.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let container, stats;
 			let camera, scene, renderer, materialDepth;
 
@@ -73,6 +75,7 @@
 				scene.add( camera );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;

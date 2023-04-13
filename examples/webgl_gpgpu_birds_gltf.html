@@ -228,6 +228,8 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			/* TEXTURE WIDTH FOR SIMULATION */
 			const WIDTH = 64;
 			const BIRDS = WIDTH * WIDTH;

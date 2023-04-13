@@ -42,6 +42,8 @@
 			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
 			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let camera, scene, renderer, composer, copyPass, taaRenderPass, renderPass;
 			let gui, stats;
 			let index = 0;
@@ -101,6 +103,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();

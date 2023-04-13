@@ -35,6 +35,8 @@
 			import { VRMLLoader } from 'three/addons/loaders/VRMLLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let camera, scene, renderer, stats, controls, loader;
 
 			const params = {

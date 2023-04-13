@@ -155,6 +155,7 @@
 				geometry.computeBoundingSphere();
 
 				const texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.magFilter = THREE.NearestFilter;
 
 				const mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
@@ -170,7 +171,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				controls = new FirstPersonControls( camera, renderer.domElement );

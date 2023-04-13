@@ -65,6 +65,8 @@
 				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
 				const refractionCube = new THREE.CubeTextureLoader().load( urls );
 				refractionCube.mapping = THREE.CubeRefractionMapping;
+				reflectionCube.colorSpace = THREE.SRGBColorSpace;
+				refractionCube.colorSpace = THREE.SRGBColorSpace;
 
 				scene = new THREE.Scene();
 				scene.background = reflectionCube;
@@ -107,7 +109,6 @@
 
 				//renderer
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

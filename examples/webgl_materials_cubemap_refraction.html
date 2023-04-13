@@ -69,6 +69,7 @@
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.mapping = THREE.CubeRefractionMapping;
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				scene = new THREE.Scene();
 				scene.background = textureCube;
@@ -98,7 +99,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

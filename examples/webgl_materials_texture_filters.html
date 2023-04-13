@@ -110,10 +110,12 @@
 				textureCanvas.repeat.set( 1000, 1000 );
 				textureCanvas.wrapS = THREE.RepeatWrapping;
 				textureCanvas.wrapT = THREE.RepeatWrapping;
+				textureCanvas.colorSpace = THREE.SRGBColorSpace;
 
 				const textureCanvas2 = textureCanvas.clone();
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestFilter;
+				textureCanvas2.colorSpace = THREE.SRGBColorSpace;
 
 				const	materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
 				const materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
@@ -186,9 +188,10 @@
 				texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
 				texturePainting.mapping = THREE.UVMapping;
 
+				texturePainting2.colorSpace = THREE.SRGBColorSpace;
+				texturePainting.colorSpace = THREE.SRGBColorSpace;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;

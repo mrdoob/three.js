@@ -39,6 +39,8 @@
 			import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
 			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let container, stats;
 			let camera, scene, renderer, controls;
 			let composer, effectFXAA, outlinePass;
@@ -129,6 +131,7 @@
 				const height = window.innerHeight;
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.shadowMap.enabled = true;
 				// todo - support pixelRatio in this demo
 				renderer.setSize( width, height );

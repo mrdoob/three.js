@@ -35,6 +35,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GodRaysFakeSunShader, GodRaysDepthMaskShader, GodRaysCombineShader, GodRaysGenerateShader } from 'three/addons/shaders/GodRaysShader.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let container, stats;
 			let camera, scene, renderer, materialDepth;
 
@@ -97,6 +99,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

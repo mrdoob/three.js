@@ -32,6 +32,8 @@
 			import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let scene, camera, renderer, exporter, mesh;
 
 			const params = {

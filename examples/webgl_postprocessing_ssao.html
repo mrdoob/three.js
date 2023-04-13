@@ -39,6 +39,8 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let container, stats;
 			let camera, scene, renderer;
 			let composer;
@@ -54,6 +56,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );

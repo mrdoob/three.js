@@ -34,6 +34,8 @@
 			import { MaskPass, ClearMaskPass } from 'three/addons/postprocessing/MaskPass.js';
 			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let camera, composer, renderer;
 			let box, torus;
 
@@ -55,6 +57,7 @@
 				scene2.add( torus );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setClearColor( 0xe0e0e0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

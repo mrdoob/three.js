@@ -40,6 +40,8 @@
 			import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
 			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let scene, renderer, composer, copyPass;
 			let cameraP, ssaaRenderPassP;
 			let cameraO, ssaaRenderPassO;
@@ -100,6 +102,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();

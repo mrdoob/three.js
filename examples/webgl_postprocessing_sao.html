@@ -36,6 +36,8 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let container, stats;
 			let camera, scene, renderer;
 			let composer, renderPass, saoPass;
@@ -57,6 +59,7 @@
 				renderer.setClearColor( 0x000000 );
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );

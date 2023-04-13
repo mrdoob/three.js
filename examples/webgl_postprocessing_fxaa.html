@@ -56,6 +56,8 @@
 			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
 			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let camera, scene, renderer, clock, group, container;
 
 			let composer1, composer2, fxaaPass;
@@ -114,6 +116,7 @@
 				//
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );

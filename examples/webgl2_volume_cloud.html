@@ -33,6 +33,8 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			if ( WebGL.isWebGL2Available() === false ) {
 
 				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );

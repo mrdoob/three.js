@@ -34,6 +34,8 @@
 			import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let scene, camera, renderer, exporter, mesh;
 
 			const params = {

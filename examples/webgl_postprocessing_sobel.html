@@ -41,6 +41,8 @@
 			import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 			import { SobelOperatorShader } from 'three/addons/shaders/SobelOperatorShader.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			let camera, scene, renderer, composer;
 
 			let effectSobel;
@@ -84,6 +86,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				// postprocessing

@@ -66,6 +66,8 @@
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
 
 			const bloomLayer = new THREE.Layers();

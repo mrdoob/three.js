@@ -35,6 +35,8 @@
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
+			THREE.ColorManagement.enabled = false;
+
 			const ACTION_SELECT = 1, ACTION_NONE = 0;
 			const curveHandles = [];
 			const mouse = new THREE.Vector2();
