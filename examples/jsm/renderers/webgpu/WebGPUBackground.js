@@ -1,6 +1,6 @@
 import { GPULoadOp, GPUStoreOp } from './constants.js';
 import { Color, Mesh, BoxGeometry, BackSide } from 'three';
-import { context, transformDirection, positionWorld, modelWorldMatrix, MeshBasicNodeMaterial } from 'three/nodes';
+import { context, positionWorldDirection, MeshBasicNodeMaterial } from 'three/nodes';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -61,7 +61,7 @@ class WebGPUBackground {
 
 				this.boxMeshNode = context( backgroundNode, {
 					// @TODO: Add Texture2D support using node context
-					getUVNode: () => transformDirection( positionWorld, modelWorldMatrix )
+					getUVNode: () => positionWorldDirection
 				} );
 
 				const nodeMaterial = new MeshBasicNodeMaterial();

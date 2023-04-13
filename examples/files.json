@@ -344,6 +344,7 @@
 		"webgpu_particles",
 		"webgpu_rtt",
 		"webgpu_sandbox",
+		"webgpu_shadowmap",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
 		"webgpu_skinning_points",
