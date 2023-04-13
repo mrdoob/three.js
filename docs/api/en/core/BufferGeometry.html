@@ -19,12 +19,11 @@
 			[page:BufferAttribute] documentation.
 		</p>
 
-		<iframe id="scene" src="scenes/buffergeometry-browser.html"></iframe>
-
 		<h2>Code Example</h2>
 
 		<code>
 		const geometry = new THREE.BufferGeometry();
+
 		// create a simple square shape. We duplicate the top left and bottom right
 		// vertices because each vertex needs to appear once per triangle.
 		const vertices = new Float32Array( [
@@ -69,10 +68,6 @@
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ffff } );
 		const mesh = new THREE.Mesh( geometry, material );
 		</code>
-
-		<p></p>
-
-		<iframe id="scene" src="scenes/buffergeometry-indexed-browser.html"></iframe>
 
 		<h2>Examples</h2>
 		<p>
