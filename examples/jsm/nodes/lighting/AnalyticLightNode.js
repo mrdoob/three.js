@@ -43,7 +43,7 @@ class AnalyticLightNode extends LightingNode {
 
 		if ( shadowNode === null ) {
 
-			depthMaterial !== null || ( depthMaterial = new MeshBasicNodeMaterial() );
+			if ( depthMaterial === null ) depthMaterial = new MeshBasicNodeMaterial();
 
 			const shadow = this.light.shadow;
 			const rtt = builder.getRenderTarget( shadow.mapSize.width, shadow.mapSize.height );
