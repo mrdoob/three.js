@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - paint
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - paint
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -57,29 +57,7 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				const tableGeometry = new THREE.BoxGeometry( 0.5, 0.8, 0.5 );
-				const tableMaterial = new THREE.MeshStandardMaterial( {
-					color: 0x444444,
-					roughness: 1.0,
-					metalness: 0.0
-				} );
-				const table = new THREE.Mesh( tableGeometry, tableMaterial );
-				table.position.y = 0.35;
-				table.position.z = 0.85;
-				scene.add( table );
-
-				const floorGometry = new THREE.PlaneGeometry( 4, 4 );
-				const floorMaterial = new THREE.MeshStandardMaterial( {
-					color: 0x222222,
-					roughness: 1.0,
-					metalness: 0.0
-				} );
-				const floor = new THREE.Mesh( floorGometry, floorMaterial );
-				floor.rotation.x = - Math.PI / 2;
-				scene.add( floor );
-
-				const grid = new THREE.GridHelper( 10, 20, 0x111111, 0x111111 );
-				// grid.material.depthTest = false; // avoid z-fighting
+				const grid = new THREE.GridHelper( 4, 1, 0x111111, 0x111111 );
 				scene.add( grid );
 
 				scene.add( new THREE.HemisphereLight( 0x888877, 0x777788 ) );
@@ -101,7 +79,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -153,18 +130,15 @@
 
 				//
 
-				const geometry = new THREE.CylinderGeometry( 0.01, 0.02, 0.08, 5 );
-				geometry.rotateX( - Math.PI / 2 );
-				const material = new THREE.MeshStandardMaterial( { flatShading: true } );
-				const mesh = new THREE.Mesh( geometry, material );
-
 				const pivot = new THREE.Mesh( new THREE.IcosahedronGeometry( 0.01, 3 ) );
 				pivot.name = 'pivot';
 				pivot.position.z = - 0.05;
-				mesh.add( pivot );
 
-				controller1.add( mesh.clone() );
-				controller2.add( mesh.clone() );
+				const group = new THREE.Group();
+				group.add( pivot );
+
+				controller1.add( group.clone() );
+				controller2.add( group.clone() );
 
 				//
 

@@ -11,29 +11,28 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">Creates an one-sided polygonal geometry from one or more path shapes.</p>
+		<p class="desc">
+			Creates an one-sided polygonal geometry from one or more path shapes.
+		</p>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#ShapeGeometry"></iframe>
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#ShapeGeometry"
+		></iframe>
 
 		<script>
+			// iOS iframe auto-resize workaround
 
-		// iOS iframe auto-resize workaround
+			if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
+				const scene = document.getElementById("scene");
 
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			const scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
+				scene.style.width = getComputedStyle(scene).width;
+				scene.style.height = getComputedStyle(scene).height;
+				scene.setAttribute("scrolling", "no");
+			}
 		</script>
 
-
 		<h2>Code Example</h2>
-
 
 		<code>
 		const x = 0, y = 0;
@@ -56,11 +55,12 @@
 
 		<h2>Constructor</h2>
 
-
 		<h3>[name]([param:Array shapes], [param:Integer curveSegments])</h3>
 		<p>
-		shapes — [page:Array] of shapes or a single [page:Shape shape]. Default is a single triangle shape.<br />
-		curveSegments - [page:Integer] - Number of segments per shape. Default is 12.
+			shapes — [page:Array] of shapes or a single [page:Shape shape]. Default is
+			a single triangle shape.<br />
+			curveSegments - [page:Integer] - Number of segments per shape. Default is
+			12.
 		</p>
 
 		<h2>Properties</h2>
@@ -68,7 +68,8 @@
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>

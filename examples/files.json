@@ -344,6 +344,7 @@
 		"webgpu_particles",
 		"webgpu_rtt",
 		"webgpu_sandbox",
+		"webgpu_shadowmap",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
 		"webgpu_skinning_points",
@@ -366,7 +367,6 @@
 		"webxr_vr_handinput_pointerclick",
 		"webxr_vr_handinput_pointerdrag",
 		"webxr_vr_handinput_pressbutton",
-		"webxr_vr_haptics",
 		"webxr_vr_layers",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
@@ -377,6 +377,7 @@
 		"webxr_xr_ballshooter",
 		"webxr_xr_cubes",
 		"webxr_xr_dragging",
+		"webxr_xr_haptics",
 		"webxr_xr_paint",
 		"webxr_xr_sculpt"
 	],
