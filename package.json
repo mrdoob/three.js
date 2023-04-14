@@ -22,11 +22,7 @@
   },
   "sideEffects": false,
   "files": [
-    "build/three.js",
-    "build/three.cjs",
-    "build/three.min.js",
-    "build/three.module.js",
-    "build/three.module.min.js",
+    "build",
     "examples/jsm",
     "examples/fonts",
     "LICENSE",
