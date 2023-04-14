@@ -42,7 +42,7 @@
 		const mesh = new THREE.Mesh( geometry, material );
 		</code>
 
-		<h3>Indexed version</h3>
+		<h2>Code Example (Index)</h2>
 
 		<code>
 		const geometry = new THREE.BufferGeometry();
@@ -53,15 +53,16 @@
 			 1.0,  1.0,  1.0, // v2
 			-1.0,  1.0,  1.0, // v3
 		] );
-		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 		const indices = [
 			0, 1, 2,
 			2, 3, 0,
 		];
-		geometry.setIndex( indices );
 
-		const material = new THREE.MeshBasicMaterial( { color: 0x00ffff } );
+		geometry.setIndex( indices );
+		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+
+		const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		const mesh = new THREE.Mesh( geometry, material );
 		</code>
 
