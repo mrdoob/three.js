@@ -21,12 +21,14 @@
 		<script>
 			// iOS iframe auto-resize workaround
 
-			if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
-				const scene = document.getElementById("scene");
+			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-				scene.style.width = getComputedStyle(scene).width;
-				scene.style.height = getComputedStyle(scene).height;
-				scene.setAttribute("scrolling", "no");
+				const scene = document.getElementById( 'scene' );
+
+				scene.style.width = getComputedStyle( scene ).width;
+				scene.style.height = getComputedStyle( scene ).height;
+				scene.setAttribute( 'scrolling', 'no' );
+
 			}
 		</script>
 
