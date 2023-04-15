@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
+import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber, UICheckbox } from './libs/ui.js';
 import { UIOutliner, UITexture } from './libs/ui.three.js';
 
 function SidebarScene( editor ) {
@@ -277,7 +277,8 @@ function SidebarScene( editor ) {
 			fogColor.getHexValue(),
 			fogNear.getValue(),
 			fogFar.getValue(),
-			fogDensity.getValue()
+			fogDensity.getValue(),
+			fogSquared.getValue()
 		);
 
 	}
@@ -289,7 +290,8 @@ function SidebarScene( editor ) {
 			fogColor.getHexValue(),
 			fogNear.getValue(),
 			fogFar.getValue(),
-			fogDensity.getValue()
+			fogDensity.getValue(),
+			fogSquared.getValue()
 		);
 
 	}
@@ -298,8 +300,8 @@ function SidebarScene( editor ) {
 	const fogType = new UISelect().setOptions( {
 
 		'None': '',
-		'Fog': 'Linear',
-		'FogExp2': 'Exponential'
+		'RangeFog': 'RangeFog',
+		'DensityFog': 'DensityFog'
 
 	} ).setWidth( '150px' );
 	fogType.onChange( function () {
@@ -339,6 +341,11 @@ function SidebarScene( editor ) {
 
 	const fogDensity = new UINumber( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogSettingsChanged );
 	fogPropertiesRow.add( fogDensity );
+	
+	// fog squared
+
+	const fogSquared = new UICheckbox( true ).onChange( onFogSettingsChanged );
+	fogPropertiesRow.add( fogSquared );
 
 	//
 
@@ -436,16 +443,17 @@ function SidebarScene( editor ) {
 
 			fogColor.setHexValue( scene.fog.color.getHex() );
 
-			if ( scene.fog.isFog ) {
+			if ( scene.fog.isRangeFog ) {
 
-				fogType.setValue( 'Fog' );
+				fogType.setValue( 'RangeFog' );
 				fogNear.setValue( scene.fog.near );
 				fogFar.setValue( scene.fog.far );
 
-			} else if ( scene.fog.isFogExp2 ) {
+			} else if ( scene.fog.isDensityFog ) {
 
-				fogType.setValue( 'FogExp2' );
+				fogType.setValue( 'DensityFog' );
 				fogDensity.setValue( scene.fog.density );
+				fogSquared.setValue( scene.fog.squared );
 
 			}
 
@@ -466,9 +474,10 @@ function SidebarScene( editor ) {
 		const type = fogType.getValue();
 
 		fogPropertiesRow.setDisplay( type === 'None' ? 'none' : '' );
-		fogNear.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogFar.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogDensity.setDisplay( type === 'FogExp2' ? '' : 'none' );
+		fogNear.setDisplay( type === 'RangeFog' ? '' : 'none' );
+		fogFar.setDisplay( type === 'RangeFog' ? '' : 'none' );
+		fogDensity.setDisplay( type === 'DensityFog' ? '' : 'none' );
+		fogSquared.setDisplay( type === 'DensityFog' ? '' : 'none' );
 
 	}
 

@@ -1,10 +1,10 @@
 import { Color } from '../math/Color.js';
 
-class Fog {
+class RangeFog {
 
 	constructor( color, near = 1, far = 1000 ) {
 
-		this.isFog = true;
+		this.isRangeFog = true;
 
 		this.name = '';
 
@@ -17,14 +17,14 @@ class Fog {
 
 	clone() {
 
-		return new Fog( this.color, this.near, this.far );
+		return new RangeFog( this.color, this.near, this.far );
 
 	}
 
 	toJSON( /* meta */ ) {
 
 		return {
-			type: 'Fog',
+			type: 'RangeFog',
 			color: this.color.getHex(),
 			near: this.near,
 			far: this.far
@@ -34,4 +34,4 @@ class Fog {
 
 }
 
-export { Fog };
+export { RangeFog };

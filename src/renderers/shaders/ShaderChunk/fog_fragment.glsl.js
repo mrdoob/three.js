@@ -2,12 +2,23 @@ export default /* glsl */`
 #ifdef USE_FOG
 
 	#ifdef FOG_EXP2
+	
+		vec3 scaledFogPosition = fogDensity * vFogPosition;
+		float fogFactor = 1.0 - exp( - dot( scaledFogPosition, scaledFogPosition ) );
 
-		float fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
+	#endif
+	
+	#ifdef FOG_EXP
 
-	#else
+		float fogDepth = precisionSafeLength( fogDensity * vFogPosition );
+		float fogFactor = 1.0 - exp( - fogDepth );
 
-		float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );
+	#endif
+
+	#if ( ( ! defined FOG_EXP ) && ! defined FOG_EXP2 )
+
+			float fogDepth = precisionSafeLength( vFogPosition );
+			float fogFactor = smoothstep( fogNear, fogFar, fogDepth );
 
 	#endif
 

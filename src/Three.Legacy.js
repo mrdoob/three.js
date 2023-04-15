@@ -18,6 +18,9 @@ import { TorusGeometry } from './geometries/TorusGeometry.js';
 import { TorusKnotGeometry } from './geometries/TorusKnotGeometry.js';
 import { TubeGeometry } from './geometries/TubeGeometry.js';
 
+import { RangeFog } from './scenes/RangeFog.js';
+import { DensityFog } from './scenes/DensityFog.js';
+
 export class BoxBufferGeometry extends BoxGeometry { // @deprecated, r144
 
 	constructor( width, height, depth, widthSegments, heightSegments, depthSegments ) {
@@ -223,6 +226,28 @@ export class TubeBufferGeometry extends TubeGeometry { // @deprecated, r144
 
 		console.warn( 'THREE.TubeBufferGeometry has been renamed to THREE.TubeGeometry.' );
 		super( path, tubularSegments, radius, radialSegments, closed );
+
+	}
+
+}
+
+export class Fog extends RangeFog {
+
+	constructor( color, near, far ) {
+
+		console.warn( 'THREE.Fog has been renamed to THREE.RangeFog.' );
+		super( color, near, far );
+
+	}
+
+}
+
+export class FogExp2 extends DensityFog {
+
+	constructor( color, near ) {
+
+		console.warn( 'THREE.FogExp2 has been deprecated. Use THREE.DensityFog( color, near, true ) instead.' );
+		super( color, near, true );
 
 	}
 

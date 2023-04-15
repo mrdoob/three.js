@@ -455,6 +455,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
 
 			parameters.useFog && parameters.fog ? '#define USE_FOG' : '',
+			parameters.useFog && parameters.fogExp2 ? '#define FOG_EXP' : '',
 			parameters.useFog && parameters.fogExp2 ? '#define FOG_EXP2' : '',
 
 			parameters.map ? '#define USE_MAP' : '',
@@ -639,6 +640,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			customDefines,
 
 			parameters.useFog && parameters.fog ? '#define USE_FOG' : '',
+			parameters.useFog && parameters.fogExp ? '#define FOG_EXP' : '',
 			parameters.useFog && parameters.fogExp2 ? '#define FOG_EXP2' : '',
 
 			parameters.map ? '#define USE_MAP' : '',

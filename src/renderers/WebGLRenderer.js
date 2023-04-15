@@ -1397,6 +1397,7 @@ class WebGLRenderer {
 
 			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 			materialProperties.fog = scene.fog;
+			materialProperties.fogSquared = ( scene.fog && scene.fog.squared ) || null;
 			materialProperties.envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || materialProperties.environment );
 
 			if ( programs === undefined ) {
@@ -1585,7 +1586,7 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( material.fog === true && materialProperties.fog !== fog ) {
+				} else if ( material.fog === true && ( materialProperties.fog !== fog || ( fog && ( materialProperties.fogSquared !== fog.squared ) ) ) ) {
 
 					needsProgramChange = true;
 

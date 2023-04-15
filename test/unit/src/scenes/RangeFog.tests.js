@@ -1,27 +1,27 @@
 /* global QUnit */
 
-import { Fog } from '../../../../src/scenes/Fog.js';
+import { RangeFog } from '../../../../src/scenes/RangeFog.js';
 
 export default QUnit.module( 'Scenes', () => {
 
-	QUnit.module( 'Fog', () => {
+	QUnit.module( 'RangeFog', () => {
 
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
-			// Fog( color, near = 1, far = 1000 )
+			// RangeFog( color, near = 1, far = 1000 )
 
 			// no params
-			const object = new Fog();
-			assert.ok( object, 'Can instantiate a Fog.' );
+			const object = new RangeFog();
+			assert.ok( object, 'Can instantiate a RangeFog.' );
 
 			// color
-			const object_color = new Fog( 0xffffff );
-			assert.ok( object_color, 'Can instantiate a Fog with color.' );
+			const object_color = new RangeFog( 0xffffff );
+			assert.ok( object_color, 'Can instantiate a RangeFog with color.' );
 
 			// color, near, far
-			const object_all = new Fog( 0xffffff, 0.015, 100 );
-			assert.ok( object_all, 'Can instantiate a Fog with color, near, far.' );
+			const object_all = new RangeFog( 0xffffff, 0.015, 100 );
+			assert.ok( object_all, 'Can instantiate a RangeFog with color, near, far.' );
 
 		} );
 
@@ -51,12 +51,12 @@ export default QUnit.module( 'Scenes', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isFog', ( assert ) => {
+		QUnit.test( 'isRangeFog', ( assert ) => {
 
-			const object = new Fog();
+			const object = new RangeFog();
 			assert.ok(
-				object.isFog,
-				'Fog.isFog should be true'
+				object.isRangeFog,
+				'RangeFog.isRangeFog should be true'
 			);
 
 		} );

@@ -33,8 +33,8 @@ import { SkinnedMesh } from '../objects/SkinnedMesh.js';
 import { Bone } from '../objects/Bone.js';
 import { Skeleton } from '../objects/Skeleton.js';
 import { Shape } from '../extras/core/Shape.js';
-import { Fog } from '../scenes/Fog.js';
-import { FogExp2 } from '../scenes/FogExp2.js';
+import { RangeFog } from '../scenes/RangeFog.js';
+import { DensityFog } from '../scenes/DensityFog.js';
 import { HemisphereLight } from '../lights/HemisphereLight.js';
 import { SpotLight } from '../lights/SpotLight.js';
 import { PointLight } from '../lights/PointLight.js';
@@ -774,13 +774,14 @@ class ObjectLoader extends Loader {
 
 				if ( data.fog !== undefined ) {
 
-					if ( data.fog.type === 'Fog' ) {
+					if ( data.fog.type === 'RangeFog' || data.fog.type === 'Fog' ) {
 
-						object.fog = new Fog( data.fog.color, data.fog.near, data.fog.far );
+						object.fog = new RangeFog( data.fog.color, data.fog.near, data.fog.far );
 
-					} else if ( data.fog.type === 'FogExp2' ) {
+					} else if ( data.fog.type === 'DensityFog' || data.fog.type === 'FogExp2' ) {
 
-						object.fog = new FogExp2( data.fog.color, data.fog.density );
+						const squared = ( data.fog.type === 'FogExp2' ) || !! data.fog.squared;
+						object.fog = new DensityFog( data.fog.color, data.fog.density, squared );
 
 					}
 
