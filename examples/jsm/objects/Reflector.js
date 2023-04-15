@@ -66,6 +66,7 @@ class Reflector extends Mesh {
 
 		const effectHBlur = new ShaderPass( HorizontalBlurShader );
 		const effectVBlur = new ShaderPass( VerticalBlurShader );
+		const depthMaterial = new MeshDepthMaterial();
 
 		const material = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( shader.uniforms ),
@@ -186,7 +187,7 @@ class Reflector extends Mesh {
 				effectVBlur.render( renderer, renderTargetBlur, renderTargetDepth );
 
 				const overrideMaterial = scene.overrideMaterial;
-				scene.overrideMaterial = new MeshDepthMaterial();
+				scene.overrideMaterial = depthMaterial;
 				renderer.setRenderTarget( renderTargetDepth );
 				renderer.render( scene, virtualCamera );
 				scene.overrideMaterial = overrideMaterial;
