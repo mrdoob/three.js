@@ -572,7 +572,7 @@ export default QUnit.module( 'Maths', () => {
 			const d = new Color( 1.0, 1.0, 1.0 );
 
 			assert.strictEqual( a.toJSON(), 0x000000, 'Check black' );
-			assert.strictEqual( b.toJSON(), 0x007F00, 'Check half-blue' );
+			assert.strictEqual( b.toJSON(), 0x008000, 'Check half-blue' );
 			assert.strictEqual( c.toJSON(), 0xFF0000, 'Check red' );
 			assert.strictEqual( d.toJSON(), 0xFFFFFF, 'Check white' );
 
