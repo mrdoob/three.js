@@ -2,6 +2,7 @@ import {
 	Color,
 	Matrix4,
 	Mesh,
+	MeshDepthMaterial,
 	PerspectiveCamera,
 	Plane,
 	ShaderMaterial,
@@ -13,6 +14,10 @@ import {
 	NoToneMapping,
 	LinearSRGBColorSpace
 } from 'three';
+
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js';
+import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js';
 
 class Reflector extends Mesh {
 
@@ -34,6 +39,10 @@ class Reflector extends Mesh {
 		const shader = options.shader || Reflector.ReflectorShader;
 		const multisample = ( options.multisample !== undefined ) ? options.multisample : 4;
 
+		this.blurX = options.blurX || 2;
+		this.blurY = options.blurY || this.blurX;
+		this.depthScale = ( options.depthScale !== undefined ) ? options.depthScale : 3;
+
 		//
 
 		const reflectorPlane = new Plane();
@@ -52,6 +61,11 @@ class Reflector extends Mesh {
 		const virtualCamera = this.camera;
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
+		const renderTargetBlur = renderTarget.clone();
+		const renderTargetDepth = renderTarget.clone();
+
+		const effectHBlur = new ShaderPass( HorizontalBlurShader );
+		const effectVBlur = new ShaderPass( VerticalBlurShader );
 
 		const material = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( shader.uniforms ),
@@ -60,6 +74,8 @@ class Reflector extends Mesh {
 		} );
 
 		material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+		material.uniforms[ 'tBlurred' ].value = renderTargetBlur.texture;
+		material.uniforms[ 'tDepth' ].value = renderTargetDepth.texture;
 		material.uniforms[ 'color' ].value = color;
 		material.uniforms[ 'textureMatrix' ].value = textureMatrix;
 
@@ -161,6 +177,22 @@ class Reflector extends Mesh {
 			if ( renderer.autoClear === false ) renderer.clear();
 			renderer.render( scene, virtualCamera );
 
+			if ( scope.depthScale > 0 ) {
+
+				effectHBlur.uniforms[ 'h' ].value = scope.blurX / renderTarget.width;
+				effectVBlur.uniforms[ 'v' ].value = scope.blurY / renderTarget.height;
+
+				effectHBlur.render( renderer, renderTargetDepth, renderTarget );
+				effectVBlur.render( renderer, renderTargetBlur, renderTargetDepth );
+
+				const overrideMaterial = scene.overrideMaterial;
+				scene.overrideMaterial = new MeshDepthMaterial();
+				renderer.setRenderTarget( renderTargetDepth );
+				renderer.render( scene, virtualCamera );
+				scene.overrideMaterial = overrideMaterial;
+
+			}
+
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 			renderer.outputColorSpace = currentOutputColorSpace;
@@ -179,6 +211,8 @@ class Reflector extends Mesh {
 			}
 
 			scope.visible = true;
+
+			material.uniforms[ 'depthScale' ].value = scope.depthScale;
 
 		};
 
@@ -211,6 +245,18 @@ Reflector.ReflectorShader = {
 			value: null
 		},
 
+		'tBlurred': {
+			value: null
+		},
+
+		'tDepth': {
+			value: null
+		},
+
+		'depthScale': {
+			value: 0
+		},
+
 		'textureMatrix': {
 			value: null
 		}
@@ -237,6 +283,9 @@ Reflector.ReflectorShader = {
 	fragmentShader: /* glsl */`
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
+		uniform sampler2D tBlurred;
+		uniform sampler2D tDepth;
+		uniform float depthScale;
 		varying vec4 vUv;
 
 		#include <logdepthbuf_pars_fragment>
@@ -258,7 +307,9 @@ Reflector.ReflectorShader = {
 			#include <logdepthbuf_fragment>
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
-			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+			vec4 blur = texture2DProj( tBlurred, vUv );
+			float blurStrength = depthScale * ( 1.0 - texture2DProj( tDepth, vUv ).r );
+			gl_FragColor = vec4( blendOverlay( mix( base, blur, min( blurStrength, 1.0 ) ).rgb, color ), 1.0 );
 
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>

@@ -39,6 +39,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Reflector } from 'three/addons/objects/Reflector.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
 
@@ -88,6 +89,7 @@
 				geometry = new THREE.CircleGeometry( 40, 64 );
 				groundMirror = new Reflector( geometry, {
 					clipBias: 0.003,
+					depthScale: 0,
 					textureWidth: window.innerWidth * window.devicePixelRatio,
 					textureHeight: window.innerHeight * window.devicePixelRatio,
 					color: 0xb5b5b5
@@ -106,6 +108,12 @@
 				verticalMirror.position.y = 50;
 				verticalMirror.position.z = - 50;
 				scene.add( verticalMirror );
+
+
+				const gui = new GUI();
+				gui.add( verticalMirror, 'blurX' ).min( 1 ).max( 3 );
+				gui.add( verticalMirror, 'blurY' ).min( 1 ).max( 3 );
+				gui.add( verticalMirror, 'depthScale' ).min( 0 ).max( 6 );
 
 
 				sphereGroup = new THREE.Object3D();
