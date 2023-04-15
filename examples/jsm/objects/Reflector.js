@@ -226,6 +226,11 @@ class Reflector extends Mesh {
 		this.dispose = function () {
 
 			renderTarget.dispose();
+			renderTargetBlur.dispose();
+			renderTargetDepth.dispose();
+			depthMaterial.dispose();
+			effectHBlur.dispose();
+			effectVBlur.dispose();
 			scope.material.dispose();
 
 		};
