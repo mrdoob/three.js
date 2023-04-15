@@ -35,24 +35,23 @@
 
 		<h2>Constructor</h2>
 
-
 		<h3>[name]( [param:Vector3 min], [param:Vector3 max] )</h3>
 		<p>
-		[page:Vector3 min] - (optional) [page:Vector3] representing the lower (x, y, z) boundary of the box.
-		Default is ( + Infinity, + Infinity, + Infinity ).<br>
+			[page:Vector3 min] - (optional) [page:Vector3] representing the lower (x,
+			y, z) boundary of the box. Default is ( + Infinity, + Infinity, + Infinity
+			).<br />
 
-		[page:Vector3 max] - (optional) [page:Vector3] representing the upper (x, y, z) boundary of the box.
-		Default is ( - Infinity, - Infinity, - Infinity ).<br /><br />
+			[page:Vector3 max] - (optional) [page:Vector3] representing the upper (x,
+			y, z) boundary of the box. Default is ( - Infinity, - Infinity, - Infinity
+			).<br /><br />
 
-		Creates a [name] bounded by min and max.
+			Creates a [name] bounded by min and max.
 		</p>
 
 		<h2>Properties</h2>
 
 		<h3>[property:Boolean isBox3]</h3>
-		<p>
-			Read-only flag to check if a given object is of type [name].
-		</p>
+		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:Vector3 min]</h3>
 		<p>
@@ -66,173 +65,188 @@
 			Default is ( - Infinity, - Infinity, - Infinity ).
 		</p>
 
-
-
 		<h2>Methods</h2>
 
 		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>
-		[page:Matrix4 matrix] - The [page:Matrix4] to apply<br /><br />
+			[page:Matrix4 matrix] - The [page:Matrix4] to apply<br /><br />
 
-		Transforms this Box3 with the supplied matrix.
+			Transforms this Box3 with the supplied matrix.
 		</p>
 
-		<h3>[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<h3>
+			[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )
+		</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] to clamp. <br>
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+			[page:Vector3 point] - [page:Vector3] to clamp. <br />
+			[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Clamping_(graphics) Clamps] the [page:Vector3 point] within the bounds of this box.<br />
+			[link:https://en.wikipedia.org/wiki/Clamping_(graphics) Clamps] the
+			[page:Vector3 point] within the bounds of this box.<br />
 		</p>
 
 		<h3>[method:Box3 clone]()</h3>
-		<p>Returns a new [page:Box3] with the same [page:.min min] and [page:.max max] as this one.</p>
+		<p>
+			Returns a new [page:Box3] with the same [page:.min min] and [page:.max max] as this one.
+		</p>
 
 		<h3>[method:Boolean containsBox]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box] - [page:Box3 Box3] to test for inclusion.<br /><br />
+			[page:Box3 box] - [page:Box3 Box3] to test for inclusion.<br /><br />
 
-		Returns true if this box includes the entirety of [page:Box3 box]. If this and [page:Box3 box] are identical, <br>
-		this function also returns true.
+			Returns true if this box includes the entirety of [page:Box3 box]. If this
+			and [page:Box3 box] are identical, <br />
+			this function also returns true.
 		</p>
 
 		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] to check for inclusion.<br /><br />
+			[page:Vector3 point] - [page:Vector3] to check for inclusion.<br /><br />
 
-		Returns true if the specified [page:Vector3 point] lies within or on the boundaries of this box.
+			Returns true if the specified [page:Vector3 point] lies within or on the
+			boundaries of this box.
 		</p>
 
 		<h3>[method:this copy]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box]  - [page:Box3] to copy.<br /><br />
+			[page:Box3 box] - [page:Box3] to copy.<br /><br />
 
-		Copies the [page:.min min] and [page:.max max] from [page:Box3 box] to this box.
+			Copies the [page:.min min] and [page:.max max] from [page:Box3 box] to
+			this box.
 		</p>
 
 		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] to measure distance to.<br /><br />
+			[page:Vector3 point] - [page:Vector3] to measure distance to.<br /><br />
 
-		Returns the distance from any edge of this box to the specified point.
-		If the [page:Vector3 point] lies inside of this box, the distance will be 0.
+			Returns the distance from any edge of this box to the specified point. If
+			the [page:Vector3 point] lies inside of this box, the distance will be 0.
 		</p>
-
 
 		<h3>[method:Boolean equals]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box] - Box to compare with this one.<br /><br />
+			[page:Box3 box] - Box to compare with this one.<br /><br />
 
-		Returns true if this box and [page:Box3 box] share the same lower and upper bounds.
+			Returns true if this box and [page:Box3 box] share the same lower and
+			upper bounds.
 		</p>
 
-		<h3>[method:this expandByObject]( [param:Object3D object], [param:Boolean precise] )</h3>
+		<h3>
+			[method:this expandByObject]( [param:Object3D object], [param:Boolean precise] )
+		</h3>
 		<p>
-		[page:Object3D object] - [page:Object3D] to expand the box by.<br />
-		precise - (optional) expand the bounding box as little as necessary at the expense of more computation. Default is false.<br /><br />
+			[page:Object3D object] - [page:Object3D] to expand the box by.<br />
+			precise - (optional) expand the bounding box as little as necessary at the
+			expense of more computation. Default is false.<br /><br />
 
-		Expands the boundaries of this box to include [page:Object3D object] and its children,
-		accounting for the object's, and children's, world transforms.
-		The function may result in a larger box than strictly necessary (unless the precise parameter is set to true).
-
+			Expands the boundaries of this box to include [page:Object3D object] and
+			its children, accounting for the object's, and children's, world
+			transforms. The function may result in a larger box than strictly
+			necessary (unless the precise parameter is set to true).
 		</p>
 
 		<h3>[method:this expandByPoint]( [param:Vector3 point] )</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3] that should be included in the box.<br /><br />
+			[page:Vector3 point] - [page:Vector3] that should be included in the
+			box.<br /><br />
 
-		Expands the boundaries of this box to include [page:Vector3 point].
+			Expands the boundaries of this box to include [page:Vector3 point].
 		</p>
 
 		<h3>[method:this expandByScalar]( [param:Float scalar] )</h3>
 		<p>
-		[page:Float scalar] - Distance to expand the box by.<br /><br />
+			[page:Float scalar] - Distance to expand the box by.<br /><br />
 
-		Expands each dimension of the box by [page:Float scalar]. If negative, the dimensions of the box
-		will be contracted.
+			Expands each dimension of the box by [page:Float scalar]. If negative, the
+			dimensions of the box will be contracted.
 		</p>
 
 		<h3>[method:this expandByVector]( [param:Vector3 vector] )</h3>
 		<p>
-		[page:Vector3 vector] - [page:Vector3] to expand the box by.<br /><br />
+			[page:Vector3 vector] - [page:Vector3] to expand the box by.<br /><br />
 
-		Expands this box equilaterally by [page:Vector3 vector]. The width of this box will be
-		expanded by the x component of [page:Vector3 vector] in both directions. The height of
-		this box will be expanded by the y component of [page:Vector3 vector] in both directions.
-		The depth of this box will be expanded by the z component of `vector` in both directions.
+			Expands this box equilaterally by [page:Vector3 vector]. The width of this
+			box will be expanded by the x component of [page:Vector3 vector] in both
+			directions. The height of this box will be expanded by the y component of
+			[page:Vector3 vector] in both directions. The depth of this box will be
+			expanded by the z component of `vector` in both directions.
 		</p>
 
 		<h3>[method:Sphere getBoundingSphere]( [param:Sphere target] )</h3>
 		<p>
-		[page:Sphere target] — the result will be copied into this Sphere.<br /><br />
+			[page:Sphere target] — the result will be copied into this Sphere.<br /><br />
 
-		Gets a [page:Sphere] that bounds the box.
+			Gets a [page:Sphere] that bounds the box.
 		</p>
 
 		<h3>[method:Vector3 getCenter]( [param:Vector3 target] )</h3>
 		<p>
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+			[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		Returns the center point of the box as a [page:Vector3].
+			Returns the center point of the box as a [page:Vector3].
 		</p>
 
-		<h3>[method:Vector3 getParameter]( [param:Vector3 point], [param:Vector3 target] ) </h3>
+		<h3>
+			[method:Vector3 getParameter]( [param:Vector3 point], [param:Vector3 target] )
+		</h3>
 		<p>
-		[page:Vector3 point] - [page:Vector3].<br/>
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+			[page:Vector3 point] - [page:Vector3].<br />
+			[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		Returns a point as a proportion of this box's width, height and depth.
+			Returns a point as a proportion of this box's width, height and depth.
 		</p>
 
 		<h3>[method:Vector3 getSize]( [param:Vector3 target] )</h3>
 		<p>
-		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
+			[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		Returns the width, height and depth of this box.
+			Returns the width, height and depth of this box.
 		</p>
 
 		<h3>[method:this intersect]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box] - Box to intersect with.<br /><br />
+			[page:Box3 box] - Box to intersect with.<br /><br />
 
-		Computes the intersection of this and [page:Box3 box], setting the upper bound of this box to the lesser
-		of the two boxes' upper bounds and the lower bound of this box to the greater of the two boxes'
-		lower bounds. If there's no overlap, makes this box empty.
+			Computes the intersection of this and [page:Box3 box], setting the upper
+			bound of this box to the lesser of the two boxes' upper bounds and the
+			lower bound of this box to the greater of the two boxes' lower bounds. If
+			there's no overlap, makes this box empty.
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box] - Box to check for intersection against.<br /><br />
+			[page:Box3 box] - Box to check for intersection against.<br /><br />
 
-		Determines whether or not this box intersects [page:Box3 box].
+			Determines whether or not this box intersects [page:Box3 box].
 		</p>
 
 		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
 		<p>
-		[page:Plane plane] - [page:Plane] to check for intersection against.<br /><br />
+			[page:Plane plane] - [page:Plane] to check for intersection against.<br /><br />
 
-		Determines whether or not this box intersects [page:Plane plane].
+			Determines whether or not this box intersects [page:Plane plane].
 		</p>
 
 		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
 		<p>
-		[page:Sphere sphere] - [page:Sphere] to check for intersection against.<br /><br />
+			[page:Sphere sphere] - [page:Sphere] to check for intersection against.<br /><br />
 
-		Determines whether or not this box intersects [page:Sphere sphere].
+			Determines whether or not this box intersects [page:Sphere sphere].
 		</p>
 
 		<h3>[method:Boolean intersectsTriangle]( [param:Triangle triangle] )</h3>
 		<p>
-		[page:Triangle triangle] - [page:Triangle] to check for intersection against.<br /><br />
+			[page:Triangle triangle] - [page:Triangle] to check for intersection
+			against.<br /><br />
 
-		Determines whether or not this box intersects [page:Triangle triangle].
+			Determines whether or not this box intersects [page:Triangle triangle].
 		</p>
 
 		<h3>[method:Boolean isEmpty]()</h3>
 		<p>
-		Returns true if this box includes zero points within its bounds.<br>
-		Note that a box with equal lower and upper bounds still includes one point,
-		the one both bounds share.
+			Returns true if this box includes zero points within its bounds.<br />
+			Note that a box with equal lower and upper bounds still includes one
+			point, the one both bounds share.
 		</p>
 
 		<h3>[method:this makeEmpty]()</h3>
@@ -240,69 +254,86 @@
 
 		<h3>[method:this set]( [param:Vector3 min], [param:Vector3 max] )</h3>
 		<p>
-		[page:Vector3 min] - [page:Vector3] representing the lower (x, y, z) boundary of the box.<br />
-		[page:Vector3 max] - [page:Vector3] representing the upper (x, y, z) boundary of the box.<br /><br />
+			[page:Vector3 min] - [page:Vector3] representing the lower (x, y, z)
+			boundary of the box.<br />
+			[page:Vector3 max] - [page:Vector3] representing the upper (x, y, z)
+			boundary of the box.<br /><br />
 
-		Sets the lower and upper (x, y, z) boundaries of this box.<br>
-		Please note that this method only copies the values from the given objects.
+			Sets the lower and upper (x, y, z) boundaries of this box.<br />
+			Please note that this method only copies the values from the given
+			objects.
 		</p>
 
 		<h3>[method:this setFromArray]( [param:Array array] )</h3>
 		<p>
-		array -- An array of position data that the resulting box will envelop.<br /><br />
+			array -- An array of position data that the resulting box will envelop.<br /><br />
 
-		Sets the upper and lower bounds of this box to include all of the data in `array`.
+			Sets the upper and lower bounds of this box to include all of the data in
+			`array`.
 		</p>
 
-		<h3>[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] )</h3>
+		<h3>
+			[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] )
+		</h3>
 		<p>
-		[page:BufferAttribute attribute] - A buffer attribute of position data that the resulting box will envelop.<br /><br />
+			[page:BufferAttribute attribute] - A buffer attribute of position data
+			that the resulting box will envelop.<br /><br />
 
-		Sets the upper and lower bounds of this box to include all of the data in [page:BufferAttribute attribute].
+			Sets the upper and lower bounds of this box to include all of the data in
+			[page:BufferAttribute attribute].
 		</p>
 
-		<h3>[method:this setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] )</h3>
+		<h3>
+			[method:this setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] )
+		</h3>
 		<p>
-		[page:Vector3 center], - Desired center position of the box. <br>
-		[page:Vector3 size] - Desired x, y and z dimensions of the box.<br /><br />
+			[page:Vector3 center], - Desired center position of the box. <br />
+			[page:Vector3 size] - Desired x, y and z dimensions of the box.<br /><br />
 
-		Centers this box on [page:Vector3 center] and sets this box's width, height and depth to the values specified <br>
-		in [page:Vector3 size]
+			Centers this box on [page:Vector3 center] and sets this box's width,
+			height and depth to the values specified <br />
+			in [page:Vector3 size]
 		</p>
 
-		<h3>[method:this setFromObject]( [param:Object3D object], [param:Boolean precise] )</h3>
+		<h3>
+			[method:this setFromObject]( [param:Object3D object], [param:Boolean precise] )
+		</h3>
 		<p>
-		[page:Object3D object] - [page:Object3D] to compute the bounding box of.<br />
-		precise - (optional) compute the smallest world-axis-aligned bounding box at the expense of more computation. Default is false.<br /><br />
+			[page:Object3D object] - [page:Object3D] to compute the bounding box
+			of.<br />
+			precise - (optional) compute the smallest world-axis-aligned bounding box
+			at the expense of more computation. Default is false.<br /><br />
 
-		Computes the world-axis-aligned bounding box of an [page:Object3D] (including its children),
-		accounting for the object's, and children's, world transforms.
-		The function may result in a larger box than strictly necessary.
-
+			Computes the world-axis-aligned bounding box of an [page:Object3D]
+			(including its children), accounting for the object's, and children's,
+			world transforms. The function may result in a larger box than strictly
+			necessary.
 		</p>
 
 		<h3>[method:this setFromPoints]( [param:Array points] )</h3>
 		<p>
-		[page:Array points] - Array of [page:Vector3 Vector3s] that the resulting box will contain.<br /><br />
+			[page:Array points] - Array of [page:Vector3 Vector3s] that the resulting
+			box will contain.<br /><br />
 
-		Sets the upper and lower bounds of this box to include all of the points in [page:Array points].
+			Sets the upper and lower bounds of this box to include all of the points
+			in [page:Array points].
 		</p>
 
 		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
 		<p>
-		[page:Vector3 offset] - Direction and distance of offset.<br /><br />
+			[page:Vector3 offset] - Direction and distance of offset.<br /><br />
 
-		Adds [page:Vector3 offset] to both the upper and lower bounds of this box, effectively moving this box
-		[page:Vector3 offset] units in 3D space.
+			Adds [page:Vector3 offset] to both the upper and lower bounds of this box,
+			effectively moving this box [page:Vector3 offset] units in 3D space.
 		</p>
 
 		<h3>[method:this union]( [param:Box3 box] )</h3>
 		<p>
-		[page:Box3 box] - Box that will be unioned with this box.<br /><br />
+			[page:Box3 box] - Box that will be unioned with this box.<br /><br />
 
-		Computes the union of this box and [page:Box3 box], setting the upper bound of this box to the greater of the
-		two boxes' upper bounds and the lower bound of this box to the lesser of the two boxes'
-		lower bounds.
+			Computes the union of this box and [page:Box3 box], setting the upper
+			bound of this box to the greater of the two boxes' upper bounds and the
+			lower bound of this box to the lesser of the two boxes' lower bounds.
 		</p>
 
 		<h2>Source</h2>
