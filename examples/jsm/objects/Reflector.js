@@ -41,7 +41,7 @@ class Reflector extends Mesh {
 
 		this.blurX = options.blurX || 2;
 		this.blurY = options.blurY || this.blurX;
-		this.depthScale = ( options.depthScale !== undefined ) ? options.depthScale : 3;
+		this.depthScale = ( options.depthScale !== undefined ) ? options.depthScale : 0;
 
 		//
 
@@ -61,8 +61,8 @@ class Reflector extends Mesh {
 		const virtualCamera = this.camera;
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
-		const renderTargetBlur = renderTarget.clone();
-		const renderTargetDepth = renderTarget.clone();
+		const renderTargetBlur = new WebGLRenderTarget( Math.min( textureWidth >> 1, 1024 ), Math.min( textureHeight >> 1, 1024 ) );
+		const renderTargetDepth = renderTargetBlur.clone();
 
 		const effectHBlur = new ShaderPass( HorizontalBlurShader );
 		const effectVBlur = new ShaderPass( VerticalBlurShader );
