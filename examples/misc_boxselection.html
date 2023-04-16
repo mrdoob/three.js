@@ -51,6 +51,8 @@
 			import { SelectionBox } from 'three/addons/interactive/SelectionBox.js';
 			import { SelectionHelper } from 'three/addons/interactive/SelectionHelper.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let container, stats;
 			let camera, scene, renderer;
 
@@ -111,7 +113,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFShadowMap;
 
