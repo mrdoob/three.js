@@ -32,6 +32,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { VOXLoader, VOXMesh } from 'three/addons/loaders/VOXLoader.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let camera, controls, scene, renderer;
 
 			init();
@@ -47,7 +49,7 @@
 
 				// light
 
-				const hemiLight = new THREE.HemisphereLight( 0x888888, 0x444444, 1 );
+				const hemiLight = new THREE.HemisphereLight( 0xcccccc, 0x444444, 1 );
 				scene.add( hemiLight );
 
 				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
@@ -78,7 +80,6 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
