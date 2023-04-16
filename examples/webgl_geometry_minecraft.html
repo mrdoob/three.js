@@ -43,6 +43,8 @@
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let container, stats;
 
 			let camera, controls, scene, renderer;
