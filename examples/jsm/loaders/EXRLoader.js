@@ -5,6 +5,7 @@ import {
 	HalfFloatType,
 	NoColorSpace,
 	LinearFilter,
+	LinearSRGBColorSpace,
 	RedFormat,
 	RGBAFormat
 } from 'three';
@@ -2072,7 +2073,7 @@ class EXRLoader extends DataTextureLoader {
 				uncompress: null,
 				getter: null,
 				format: null,
-				colorSpace: NoColorSpace,
+				colorSpace: LinearSRGBColorSpace,
 			};
 
 			switch ( EXRHeader.compression ) {
@@ -2204,7 +2205,7 @@ class EXRLoader extends DataTextureLoader {
 			if ( EXRDecoder.outputChannels == 4 ) {
 
 				EXRDecoder.format = RGBAFormat;
-				EXRDecoder.colorSpace = NoColorSpace;
+				EXRDecoder.colorSpace = LinearSRGBColorSpace;
 
 			} else {
 
