@@ -1,6 +1,6 @@
 import WebGPUNodeBuilder from './WebGPUNodeBuilder.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { NodeFrame, vec2, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, positionWorld, modelWorldMatrix, transformDirection, equirectUV, oneMinus, viewportBottomLeft } from 'three/nodes';
+import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, positionWorld, modelWorldMatrix, transformDirection, equirectUV, viewportBottomLeft } from 'three/nodes';
 
 class WebGPUNodes {
 
@@ -145,10 +145,7 @@ class WebGPUNodes {
 
 					if ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) {
 
-						const dirNode = transformDirection( positionWorld, modelWorldMatrix );
-
-						nodeUV = equirectUV( dirNode );
-						nodeUV = vec2( nodeUV.x, oneMinus( nodeUV.y ) );
+						nodeUV = equirectUV();
 
 					} else {
 
