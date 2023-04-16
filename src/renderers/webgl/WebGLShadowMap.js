@@ -67,6 +67,7 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 	this.needsUpdate = false;
 
 	this.type = PCFShadowMap;
+	let _previousType = this.type;
 
 	this.render = function ( lights, scene, camera ) {
 
@@ -131,9 +132,18 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			}
 
-			if ( shadow.map === null ) {
+			const switchedToVSM = _previousType !== VSMShadowMap && this.type === VSMShadowMap;
+			const switchedFromVSM = _previousType === VSMShadowMap && this.type !== VSMShadowMap;
+
+			if ( shadow.map === null || switchedToVSM || switchedFromVSM ) {
 
 				const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
+
+				if ( shadow.map !== null ) {
+
+					shadow.map.dispose();
+
+				}
 
 				shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 				shadow.map.texture.name = light.name + '.shadowMap';
@@ -141,6 +151,8 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 				shadow.camera.updateProjectionMatrix();
 
 			}
+
+			_previousType = this.type;
 
 			_renderer.setRenderTarget( shadow.map );
 			_renderer.clear();
