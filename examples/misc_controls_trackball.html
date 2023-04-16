@@ -44,6 +44,8 @@
 
 			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
 			const params = {
@@ -104,7 +106,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
