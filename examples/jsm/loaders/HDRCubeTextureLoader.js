@@ -4,8 +4,8 @@ import {
 	FileLoader,
 	FloatType,
 	HalfFloatType,
-	NoColorSpace,
 	LinearFilter,
+	LinearSRGBColorSpace,
 	Loader
 } from 'three';
 import { RGBELoader } from '../loaders/RGBELoader.js';
@@ -31,7 +31,7 @@ class HDRCubeTextureLoader extends Loader {
 
 			case FloatType:
 
-				texture.colorSpace = NoColorSpace;
+				texture.colorSpace = LinearSRGBColorSpace;
 				texture.minFilter = LinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
@@ -39,7 +39,7 @@ class HDRCubeTextureLoader extends Loader {
 
 			case HalfFloatType:
 
-				texture.colorSpace = NoColorSpace;
+				texture.colorSpace = LinearSRGBColorSpace;
 				texture.minFilter = LinearFilter;
 				texture.magFilter = LinearFilter;
 				texture.generateMipmaps = false;
