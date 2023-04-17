@@ -1,6 +1,8 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
 import { VideoTexture, CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping, RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
-	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthTexture
+	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthTexture,
+	RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format,
+	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format
 } from 'three';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
@@ -622,103 +624,172 @@ class WebGPUTextures {
 
 		let formatGPU;
 
-		switch ( format ) {
+		if ( texture.isCompressedTexture === true ) {
 
-			case RGBA_S3TC_DXT1_Format:
-				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm;
-				break;
+			switch ( format ) {
 
-			case RGBA_S3TC_DXT3_Format:
-				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm;
-				break;
+				case RGBA_S3TC_DXT1_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm;
+					break;
 
-			case RGBA_S3TC_DXT5_Format:
-				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
-				break;
+				case RGBA_S3TC_DXT3_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm;
+					break;
 
-			case RGB_ETC2_Format:
-				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ETC2RGB8UnormSRGB : GPUTextureFormat.ETC2RGB8Unorm;
-				break;
+				case RGBA_S3TC_DXT5_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
+					break;
 
-			case RGBA_ETC2_EAC_Format:
-				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ETC2RGBA8UnormSRGB : GPUTextureFormat.ETC2RGBA8Unorm;
-				break;
+				case RGB_ETC2_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ETC2RGB8UnormSRGB : GPUTextureFormat.ETC2RGB8Unorm;
+					break;
 
-			case DepthFormat:
-				formatGPU = GPUTextureFormat.Depth32Float;
-				break;
+				case RGBA_ETC2_EAC_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ETC2RGBA8UnormSRGB : GPUTextureFormat.ETC2RGBA8Unorm;
+					break;
 
-			case RGBAFormat:
+				case RGBA_ASTC_4x4_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC4x4UnormSRGB : GPUTextureFormat.ASTC4x4Unorm;
+					break;
 
-				switch ( type ) {
+				case RGBA_ASTC_5x4_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC5x4UnormSRGB : GPUTextureFormat.ASTC5x4Unorm;
+					break;
 
-					case UnsignedByteType:
-						formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
-						break;
+				case RGBA_ASTC_5x5_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC5x5UnormSRGB : GPUTextureFormat.ASTC5x5Unorm;
+					break;
 
-					case HalfFloatType:
-						formatGPU = GPUTextureFormat.RGBA16Float;
-						break;
+				case RGBA_ASTC_6x5_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC6x5UnormSRGB : GPUTextureFormat.ASTC6x5Unorm;
+					break;
 
-					case FloatType:
-						formatGPU = GPUTextureFormat.RGBA32Float;
-						break;
+				case RGBA_ASTC_6x6_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC6x6UnormSRGB : GPUTextureFormat.ASTC6x6Unorm;
+					break;
 
-					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
+				case RGBA_ASTC_8x5_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x5UnormSRGB : GPUTextureFormat.ASTC8x5Unorm;
+					break;
 
-				}
+				case RGBA_ASTC_8x6_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x6UnormSRGB : GPUTextureFormat.ASTC8x6Unorm;
+					break;
 
-				break;
+				case RGBA_ASTC_8x8_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC8x8UnormSRGB : GPUTextureFormat.ASTC8x8Unorm;
+					break;
 
-			case RedFormat:
+				case RGBA_ASTC_10x5_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x5UnormSRGB : GPUTextureFormat.ASTC10x5Unorm;
+					break;
 
-				switch ( type ) {
+				case RGBA_ASTC_10x6_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x6UnormSRGB : GPUTextureFormat.ASTC10x6Unorm;
+					break;
 
-					case UnsignedByteType:
-						formatGPU = GPUTextureFormat.R8Unorm;
-						break;
+				case RGBA_ASTC_10x8_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x8UnormSRGB : GPUTextureFormat.ASTC10x8Unorm;
+					break;
 
-					case HalfFloatType:
-						formatGPU = GPUTextureFormat.R16Float;
-						break;
+				case RGBA_ASTC_10x10_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC10x10UnormSRGB : GPUTextureFormat.ASTC10x10Unorm;
+					break;
 
-					case FloatType:
-						formatGPU = GPUTextureFormat.R32Float;
-						break;
+				case RGBA_ASTC_12x10_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x10UnormSRGB : GPUTextureFormat.ASTC12x10Unorm;
+					break;
 
-					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
+				case RGBA_ASTC_12x12_Format:
+					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x12UnormSRGB : GPUTextureFormat.ASTC12x12Unorm;
+					break;
 
-				}
+				case DepthFormat:
+					formatGPU = GPUTextureFormat.Depth32Float;
+					break;
 
-				break;
+				default:
+					console.error( 'WebGPURenderer: Unsupported texture format.', format );
 
-			case RGFormat:
+			}
 
-				switch ( type ) {
+		} else {
 
-					case UnsignedByteType:
-						formatGPU = GPUTextureFormat.RG8Unorm;
-						break;
+			switch ( format ) {
 
-					case HalfFloatType:
-						formatGPU = GPUTextureFormat.RG16Float;
-						break;
+				case RGBAFormat:
 
-					case FloatType:
-						formatGPU = GPUTextureFormat.RG32Float;
-						break;
+					switch ( type ) {
 
-					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
+						case UnsignedByteType:
+							formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
+							break;
 
-				}
+						case HalfFloatType:
+							formatGPU = GPUTextureFormat.RGBA16Float;
+							break;
 
-				break;
+						case FloatType:
+							formatGPU = GPUTextureFormat.RGBA32Float;
+							break;
 
-			default:
-				console.error( 'WebGPURenderer: Unsupported texture format.', format );
+						default:
+							console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
+
+					}
+
+					break;
+
+				case RedFormat:
+
+					switch ( type ) {
+
+						case UnsignedByteType:
+							formatGPU = GPUTextureFormat.R8Unorm;
+							break;
+
+						case HalfFloatType:
+							formatGPU = GPUTextureFormat.R16Float;
+							break;
+
+						case FloatType:
+							formatGPU = GPUTextureFormat.R32Float;
+							break;
+
+						default:
+							console.error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
+
+					}
+
+					break;
+
+				case RGFormat:
+
+					switch ( type ) {
+
+						case UnsignedByteType:
+							formatGPU = GPUTextureFormat.RG8Unorm;
+							break;
+
+						case HalfFloatType:
+							formatGPU = GPUTextureFormat.RG16Float;
+							break;
+
+						case FloatType:
+							formatGPU = GPUTextureFormat.RG32Float;
+							break;
+
+						default:
+							console.error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
+
+					}
+
+					break;
+
+				default:
+					console.error( 'WebGPURenderer: Unsupported texture format.', format );
+
+			}
 
 		}
 

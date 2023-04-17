@@ -170,6 +170,38 @@ export const GPUTextureFormat = {
 	EACRG11Unorm: 'eac-rg11unorm',
 	EACRG11Snorm: 'eac-rg11snorm',
 
+	// ASTC compressed formats usable if 'texture-compression-astc' is both
+	// supported by the device/user agent and enabled in requestDevice.
+
+	ASTC4x4Unorm: 'astc-4x4-unorm',
+	ASTC4x4UnormSRGB: 'astc-4x4-unorm-srgb',
+	ASTC5x4Unorm: 'astc-5x4-unorm',
+	ASTC5x4UnormSRGB: 'astc-5x4-unorm-srgb',
+	ASTC5x5Unorm: 'astc-5x5-unorm',
+	ASTC5x5UnormSRGB: 'astc-5x5-unorm-srgb',
+	ASTC6x5Unorm: 'astc-6x5-unorm',
+	ASTC6x5UnormSRGB: 'astc-6x5-unorm-srgb',
+	ASTC6x6Unorm: 'astc-6x6-unorm',
+	ASTC6x6UnormSRGB: 'astc-6x6-unorm-srgb',
+	ASTC8x5Unorm: 'astc-8x5-unorm',
+	ASTC8x5UnormSRGB: 'astc-8x5-unorm-srgb',
+	ASTC8x6Unorm: 'astc-8x6-unorm',
+	ASTC8x6UnormSRGB: 'astc-8x6-unorm-srgb',
+	ASTC8x8Unorm: 'astc-8x8-unorm',
+	ASTC8x8UnormSRGB: 'astc-8x8-unorm-srgb',
+	ASTC10x5Unorm: 'astc-10x5-unorm',
+	ASTC10x5UnormSRGB: 'astc-10x5-unorm-srgb',
+	ASTC10x6Unorm: 'astc-10x6-unorm',
+	ASTC10x6UnormSRGB: 'astc-10x6-unorm-srgb',
+	ASTC10x8Unorm: 'astc-10x8-unorm',
+	ASTC10x8UnormSRGB: 'astc-10x8-unorm-srgb',
+	ASTC10x10Unorm: 'astc-10x10-unorm',
+	ASTC10x10UnormSRGB: 'astc-10x10-unorm-srgb',
+	ASTC12x10Unorm: 'astc-12x10-unorm',
+	ASTC12x10UnormSRGB: 'astc-12x10-unorm-srgb',
+	ASTC12x12Unorm: 'astc-12x12-unorm',
+	ASTC12x12UnormSRGB: 'astc-12x12-unorm-srgb',
+
 	// 'depth24unorm-stencil8' extension
 
 	Depth24UnormStencil8: 'depth24unorm-stencil8',
