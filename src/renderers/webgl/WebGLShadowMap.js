@@ -88,6 +88,11 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 		_state.buffers.depth.setTest( true );
 		_state.setScissorTest( false );
 
+		// check for shadow map type changes
+
+		const toVSM = ( _previousType !== VSMShadowMap && this.type === VSMShadowMap );
+		const fromVSM = ( _previousType === VSMShadowMap && this.type !== VSMShadowMap );
+
 		// render depth map
 
 		for ( let i = 0, il = lights.length; i < il; i ++ ) {
@@ -132,9 +137,6 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			}
 
-			const toVSM = ( _previousType !== VSMShadowMap && this.type === VSMShadowMap );
-			const fromVSM = ( _previousType === VSMShadowMap && this.type !== VSMShadowMap );
-
 			if ( shadow.map === null || toVSM === true || fromVSM === true ) {
 
 				const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
@@ -151,8 +153,6 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 				shadow.camera.updateProjectionMatrix();
 
 			}
-
-			_previousType = this.type;
 
 			_renderer.setRenderTarget( shadow.map );
 			_renderer.clear();
@@ -191,6 +191,8 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 			shadow.needsUpdate = false;
 
 		}
+
+		_previousType = this.type;
 
 		scope.needsUpdate = false;
 
