@@ -45,7 +45,6 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( width, height );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );

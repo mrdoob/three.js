@@ -63,7 +63,7 @@ function main() {
 
     const loader = new THREE.TextureLoader();
     const texture = loader.load('resources/images/checker.png');
-    texture.encoding = THREE.sRGBEncoding;
+    texture.colorSpace = THREE.SRGBColorSpace;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.magFilter = THREE.NearestFilter;

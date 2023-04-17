@@ -32,6 +32,8 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			function exportGLTF( input ) {
 
 				const gltfExporter = new GLTFExporter();
@@ -442,7 +444,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 

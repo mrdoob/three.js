@@ -36,6 +36,8 @@
 
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			// Simple form of tiled forward lighting
 			// using texels as bitmasks of 32 lights
 
@@ -200,6 +202,7 @@
 			scene.background = new THREE.Color( 0x111111 );
 
 			const renderer = new THREE.WebGLRenderer();
+			renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 			renderer.toneMapping = THREE.NoToneMapping;
 			container.appendChild( renderer.domElement );
 

@@ -41,6 +41,8 @@
 			import { Line2 } from 'three/addons/lines/Line2.js';
 			import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let line, thresholdLine, segments, thresholdSegments;
 			let renderer, scene, camera, controls;
 			let sphereInter, sphereOnLine;
@@ -155,7 +157,7 @@
 					spline.getPoint( t, point );
 					positions.push( point.x, point.y, point.z );
 
-					color.setHSL( t, 1.0, 0.5 );
+					color.setHSL( t, 1.0, 0.5, THREE.SRGBColorSpace );
 					colors.push( color.r, color.g, color.b );
 
 				}

@@ -36,6 +36,8 @@
 			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container, stats, clock, controls;
 			let camera, scene, renderer, mixer;
 
@@ -85,7 +87,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

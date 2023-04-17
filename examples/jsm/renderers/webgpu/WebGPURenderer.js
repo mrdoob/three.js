@@ -1,4 +1,4 @@
-import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp } from './constants.js';
+import { GPUIndexFormat, GPUTextureFormat } from './constants.js';
 import WebGPUAnimation from './WebGPUAnimation.js';
 import WebGPURenderObjects from './WebGPURenderObjects.js';
 import WebGPUAttributes from './WebGPUAttributes.js';
@@ -15,7 +15,7 @@ import WebGPUBackground from './WebGPUBackground.js';
 import WebGPUNodes from './nodes/WebGPUNodes.js';
 import WebGPUUtils from './WebGPUUtils.js';
 
-import { Frustum, Matrix4, Vector3, Color, NoToneMapping, LinearSRGBColorSpace } from 'three';
+import { Frustum, Matrix4, Vector3, Color, SRGBColorSpace, NoToneMapping, DepthFormat } from 'three';
 
 console.info( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
@@ -98,7 +98,7 @@ class WebGPURenderer {
 		this.autoClearDepth = true;
 		this.autoClearStencil = true;
 
-		this.outputColorSpace = LinearSRGBColorSpace;
+		this.outputColorSpace = SRGBColorSpace;
 
 		this.toneMapping = NoToneMapping;
 		this.toneMappingExposure = 1.0;
@@ -138,8 +138,6 @@ class WebGPURenderer {
 
 		this._animation = new WebGPUAnimation();
 
-		this._renderPassDescriptor = null;
-
 		this._currentRenderState = null;
 
 		this._currentRenderList = null;
@@ -171,6 +169,12 @@ class WebGPURenderer {
 
 		this._parameters.requiredFeatures = ( parameters.requiredFeatures === undefined ) ? [] : parameters.requiredFeatures;
 		this._parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
+
+		// backwards compatibility
+
+		this.shadow = {
+			shadowMap: {}
+		};
 
 	}
 
@@ -232,17 +236,6 @@ class WebGPURenderer {
 
 		//
 
-		this._renderPassDescriptor = {
-			colorAttachments: [ {
-				view: null
-			} ],
-			depthStencilAttachment: {
-				view: null,
-				depthStoreOp: GPUStoreOp.Store,
-				stencilStoreOp: GPUStoreOp.Store
-			}
-		};
-
 		this._setupColorBuffer();
 		this._setupDepthBuffer();
 
@@ -259,7 +252,12 @@ class WebGPURenderer {
 
 		//
 
-		if ( this._animation.isAnimating === false ) this._nodes.updateFrame();
+		const nodeFrame = this._nodes.nodeFrame;
+
+		let previousRenderId = nodeFrame.renderId;
+		nodeFrame.renderId ++;
+
+		if ( this._animation.isAnimating === false ) nodeFrame.update();
 
 		if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
@@ -273,7 +271,7 @@ class WebGPURenderer {
 		this._currentRenderList = this._renderLists.get( scene, camera );
 		this._currentRenderList.init();
 
-		this._currentRenderState = this._renderStates.get( scene );
+		this._currentRenderState = this._renderStates.get( scene, camera );
 		this._currentRenderState.init();
 
 		this._projectObject( scene, camera, 0 );
@@ -288,8 +286,22 @@ class WebGPURenderer {
 
 		// prepare render pass descriptor
 
-		const colorAttachment = this._renderPassDescriptor.colorAttachments[ 0 ];
-		const depthStencilAttachment = this._renderPassDescriptor.depthStencilAttachment;
+		const renderPassDescriptor = {
+			colorAttachments: [ {
+				view: null
+			} ],
+			depthStencilAttachment: {
+				view: null
+			}
+		};
+
+		const renderAttachments = {
+			depth: true,
+			stencil: true
+		};
+
+		const colorAttachment = renderPassDescriptor.colorAttachments[ 0 ];
+		const depthStencilAttachment = renderPassDescriptor.depthStencilAttachment;
 
 		const renderTarget = this._renderTarget;
 
@@ -303,6 +315,8 @@ class WebGPURenderer {
 
 			colorAttachment.view = renderTargetProperties.colorTextureGPU.createView();
 			depthStencilAttachment.view = renderTargetProperties.depthTextureGPU.createView();
+
+			renderAttachments.stencil = renderTarget.depthTexture ? renderTarget.depthTexture.format !== DepthFormat : true;
 
 		} else {
 
@@ -331,13 +345,13 @@ class WebGPURenderer {
 
 		//
 
-		this._background.update( this._currentRenderList, scene );
+		this._background.update( this._currentRenderList, scene, renderPassDescriptor, renderAttachments );
 
 		// start render pass
 
 		const device = this._device;
 		const cmdEncoder = device.createCommandEncoder( {} );
-		const passEncoder = cmdEncoder.beginRenderPass( this._renderPassDescriptor );
+		const passEncoder = cmdEncoder.beginRenderPass( renderPassDescriptor );
 
 		// global rasterization settings for all renderable objects
 
@@ -379,6 +393,8 @@ class WebGPURenderer {
 
 		passEncoder.end();
 		device.queue.submit( [ cmdEncoder.finish() ] );
+
+		nodeFrame.renderId = previousRenderId;
 
 	}
 
@@ -845,6 +861,10 @@ class WebGPURenderer {
 
 		//
 
+		this._nodes.updateBefore( renderObject );
+
+		//
+
 		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
@@ -988,6 +1008,7 @@ class WebGPURenderer {
 			if ( this._colorBuffer ) this._colorBuffer.destroy();
 
 			this._colorBuffer = this._device.createTexture( {
+				label: 'colorBuffer',
 				size: {
 					width: Math.floor( this._width * this._pixelRatio ),
 					height: Math.floor( this._height * this._pixelRatio ),
@@ -1011,6 +1032,7 @@ class WebGPURenderer {
 			if ( this._depthBuffer ) this._depthBuffer.destroy();
 
 			this._depthBuffer = this._device.createTexture( {
+				label: 'depthBuffer',
 				size: {
 					width: Math.floor( this._width * this._pixelRatio ),
 					height: Math.floor( this._height * this._pixelRatio ),

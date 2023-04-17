@@ -32,6 +32,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { KMZLoader } from 'three/addons/loaders/KMZLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let camera, scene, renderer;
 
 			init();
@@ -57,7 +59,6 @@
 				scene.add( grid );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );

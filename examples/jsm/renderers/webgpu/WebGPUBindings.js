@@ -192,6 +192,7 @@ class WebGPUBindings {
 					const byteLength = binding.getByteLength();
 
 					binding.bufferGPU = this.device.createBuffer( {
+						label: 'bindingBuffer',
 						size: byteLength,
 						usage: binding.usage
 					} );
@@ -234,6 +235,10 @@ class WebGPUBindings {
 					} else if ( binding.texture.isVideoTexture ) {
 
 						binding.textureGPU = this.textures.getVideoDefaultTexture();
+
+					} else if ( binding.texture.isDepthTexture ) {
+
+						binding.textureGPU = this.textures.getDepthDefaultTexture();
 
 					} else {
 

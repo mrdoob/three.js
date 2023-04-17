@@ -34,6 +34,8 @@
 
 			import * as THREE from 'three';
 
+			THREE.ColorManagement.enabled = true;
+
 			let scene, camera, renderer, radianceMap;
 
 			const COLOR = 0xcccccc;
@@ -50,8 +52,6 @@
 				renderer.setSize( width, height );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
-
-				//renderer.outputColorSpace = THREE.SRGBColorSpace; // optional
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -122,7 +122,6 @@
 
 				const envScene = new THREE.Scene();
 				envScene.background = new THREE.Color( COLOR );
-				if ( renderer.outputColorSpace === THREE.SRGBColorSpace ) envScene.background.convertSRGBToLinear();
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				radianceMap = pmremGenerator.fromScene( envScene ).texture;

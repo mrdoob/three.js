@@ -60,6 +60,7 @@
 				video.play();
 
 				const texture = new THREE.VideoTexture( video );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );

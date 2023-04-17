@@ -9,7 +9,7 @@ import {
 	MeshStandardMaterial,
 	MirroredRepeatWrapping,
 	RepeatWrapping,
-	sRGBEncoding,
+	SRGBColorSpace,
 	TextureLoader,
 	Object3D,
 } from 'three';
@@ -457,7 +457,7 @@ class USDZLoader extends Loader {
 						const sampler = findTexture( root, /(\w+).output/.exec( path )[ 1 ] );
 
 						material.map = buildTexture( sampler );
-						material.map.encoding = sRGBEncoding;
+						material.map.colorSpace = SRGBColorSpace;
 
 					} else if ( 'color3f inputs:diffuseColor' in surface ) {
 
@@ -494,7 +494,7 @@ class USDZLoader extends Loader {
 					const sampler = data[ 'def Shader "diffuseColor_texture"' ];
 
 					material.map = buildTexture( sampler );
-					material.map.encoding = sRGBEncoding;
+					material.map.colorSpace = SRGBColorSpace;
 
 				}
 

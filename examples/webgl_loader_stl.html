@@ -34,6 +34,8 @@
 
 			import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container, stats;
 
 			let camera, cameraTarget, scene, renderer;
@@ -158,7 +160,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 				renderer.shadowMap.enabled = true;
 

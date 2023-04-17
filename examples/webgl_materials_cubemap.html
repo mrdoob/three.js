@@ -36,6 +36,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let container, stats;
 
 			let camera, scene, renderer;
@@ -107,6 +109,7 @@
 
 				//renderer
 				renderer = new THREE.WebGLRenderer();
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

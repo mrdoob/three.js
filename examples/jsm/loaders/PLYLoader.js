@@ -243,22 +243,24 @@ class PLYLoader extends Loader {
 
 		}
 
-		function parseASCIIElement( properties, line ) {
-
-			const values = line.split( /\s+/ );
+		function parseASCIIElement( properties, tokens ) {
 
 			const element = {};
 
 			for ( let i = 0; i < properties.length; i ++ ) {
 
+				if ( tokens.empty() ) return null;
+
 				if ( properties[ i ].type === 'list' ) {
 
 					const list = [];
-					const n = parseASCIINumber( values.shift(), properties[ i ].countType );
+					const n = parseASCIINumber( tokens.next(), properties[ i ].countType );
 
 					for ( let j = 0; j < n; j ++ ) {
 
-						list.push( parseASCIINumber( values.shift(), properties[ i ].itemType ) );
+						if ( tokens.empty() ) return null;
+
+						list.push( parseASCIINumber( tokens.next(), properties[ i ].itemType ) );
 
 					}
 
@@ -266,7 +268,7 @@ class PLYLoader extends Loader {
 
 				} else {
 
-					element[ properties[ i ].name ] = parseASCIINumber( values.shift(), properties[ i ].type );
+					element[ properties[ i ].name ] = parseASCIINumber( tokens.next(), properties[ i ].type );
 
 				}
 
@@ -341,47 +343,35 @@ class PLYLoader extends Loader {
 
 			const buffer = createBuffer();
 
-			let result;
+			const patternBody = /end_header\s+(\S[\s\S]*\S|\S)\s*$/;
+			let body, matches;
 
-			const patternBody = /end_header\s([\s\S]*)$/;
-			let body = '';
-			if ( ( result = patternBody.exec( data ) ) !== null ) {
+			if ( ( matches = patternBody.exec( data ) ) !== null ) {
 
-				body = result[ 1 ];
+				body = matches[ 1 ].split( /\s+/ );
+
+			} else {
+
+				body = [ ];
 
 			}
 
-			const lines = body.split( /\r\n|\r|\n/ );
-			let currentElement = 0;
-			let currentElementCount = 0;
-			let elementDesc = header.elements[ currentElement ];
-			let attributeMap = mapElementAttributes( elementDesc.properties );
+			const tokens = new ArrayStream( body );
 
-			for ( let i = 0; i < lines.length; i ++ ) {
+			loop: for ( let i = 0; i < header.elements.length; i ++ ) {
 
-				let line = lines[ i ];
-				line = line.trim();
-				if ( line === '' ) {
+				const elementDesc = header.elements[ i ];
+				const attributeMap = mapElementAttributes( elementDesc.properties );
 
-					continue;
+				for ( let j = 0; j < elementDesc.count; j ++ ) {
 
-				}
+					const element = parseASCIIElement( elementDesc.properties, tokens );
 
-				if ( currentElementCount >= elementDesc.count ) {
+					if ( ! element ) break loop;
 
-					currentElement ++;
-					currentElementCount = 0;
-					elementDesc = header.elements[ currentElement ];
-
-					attributeMap = mapElementAttributes( elementDesc.properties );
+					handleElement( buffer, elementDesc.name, element, attributeMap );
 
 				}
-
-				const element = parseASCIIElement( elementDesc.properties, line );
-
-				handleElement( buffer, elementDesc.name, element, attributeMap );
-
-				currentElementCount ++;
 
 			}
 
@@ -728,6 +718,29 @@ class PLYLoader extends Loader {
 		}
 
 		return geometry;
+
+	}
+
+}
+
+class ArrayStream {
+
+	constructor( arr ) {
+
+		this.arr = arr;
+		this.i = 0;
+
+	}
+
+	empty() {
+
+		return this.i >= this.arr.length;
+
+	}
+
+	next() {
+
+		return this.arr[ this.i ++ ];
 
 	}
 

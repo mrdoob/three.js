@@ -40,6 +40,8 @@
 			import * as CameraUtils from 'three/addons/utils/CameraUtils.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let camera, scene, renderer;
 
 			let cameraControls;
@@ -58,6 +60,7 @@
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -196,7 +199,7 @@
 				CameraUtils.frameCorners( portalCamera, bottomLeftCorner, bottomRightCorner, topLeftCorner, false );
 
 				// render the portal
-				thisPortalTexture.texture.encoding = renderer.outputColorSpace === THREE.SRGBColorSpace ? THREE.sRGBEncoding : THREE.LinearEncoding;
+				thisPortalTexture.texture.colorSpace = renderer.outputColorSpace;
 				renderer.setRenderTarget( thisPortalTexture );
 				renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 				if ( renderer.autoClear === false ) renderer.clear();

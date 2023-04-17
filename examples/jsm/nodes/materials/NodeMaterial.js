@@ -337,19 +337,19 @@ class NodeMaterial extends ShaderMaterial {
 
 	static fromMaterial( material ) {
 
+		if ( material.isNodeMaterial === true ) { // is already a node material
+
+			return material;
+
+		}
+
 		const type = material.type.replace( 'Material', 'NodeMaterial' );
 
 		const nodeMaterial = createNodeMaterialFromType( type );
 
 		if ( nodeMaterial === undefined ) {
 
-			if ( material.isNodeMaterial !== true ) {
-
-				throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
-
-			}
-
-			return material; // is already a node material
+			throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
 
 		}
 

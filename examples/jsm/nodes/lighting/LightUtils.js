@@ -1,6 +1,6 @@
-import { ShaderNode } from '../../shadernode/ShaderNode.js';
+import { ShaderNode } from '../shadernode/ShaderNode.js';
 
-const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
+export const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
 
 	const { lightDistance, cutoffDistance, decayExponent } = inputs;
 
@@ -15,5 +15,3 @@ const getDistanceAttenuation = new ShaderNode( ( inputs ) => {
 	);
 
 } ); // validated
-
-export default getDistanceAttenuation;

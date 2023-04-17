@@ -12,10 +12,10 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			<p>
+			
 				[name] is similar to [page:OrbitControls]. However, it does not maintain a constant camera [page:Object3D.up up] vector.
 				That means if the camera orbits over the “north” and “south” poles, it does not flip to stay "right side up".
-			</p>
+			
 		</p>
 
 		<h2>Import</h2>
@@ -36,7 +36,7 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
-		<p>
+		
 			<p>
 				[page:Camera camera]: The camera of the rendered scene.
 			</p>
@@ -46,7 +46,7 @@
 			<p>
 				Creates a new instance of [name].
 			</p>
-		</p>
+		
 
 		<h2>Events</h2>
 
@@ -84,7 +84,7 @@
 		</p>
 
 		<h3>[property:Array keys]</h3>
-		<p>
+	
 			This array holds keycodes for controlling interactions.
 			<ul>
 				<li>When the first defined key is pressed, all mouse interactions (left, middle, right) performs orbiting.</li>
@@ -92,7 +92,7 @@
 				<li>When the third defined key is pressed, all mouse interactions (left, middle, right) performs panning.</li>
 			</ul>
 			Default is *KeyA, KeyS, KeyD* which represents A, S, D.
-		</p>
+	
 
 		<h3>[property:Number maxDistance]</h3>
 		<p>
@@ -116,14 +116,14 @@
 
 		<h3>
 			[property:Object mouseButtons]</h3>
-		<p>
+		
 			This object contains references to the mouse actions used by the controls.
 			<ul>
 				<li>.LEFT is assigned with `THREE.MOUSE.ROTATE`</li>
 				<li>.MIDDLE is assigned with `THREE.MOUSE.ZOOM`</li>
 				<li>.RIGHT is assigned with `THREE.MOUSE.PAN`</li>
 			</ul>
-		</p>
+		
 
 		<h3>[property:Boolean noPan]</h3>
 		<p>
@@ -156,7 +156,7 @@
 		</p>
 
 		<h3>[property:Object screen]</h3>
-		<p>
+		
 			Represents the properties of the screen. Automatically set when [page:.handleResize handleResize]() is called.
 			<ul>
 				<li>left: Represents the offset in pixels to the screen's left boundary.</li>
@@ -164,7 +164,7 @@
 				<li>width: Represents the screen width in pixels.</li>
 				<li>height: Represents the screen height in pixels.</li>
 			</ul>
-		</p>
+		
 
 		<h3>[property:Boolean staticMoving]</h3>
 		<p>

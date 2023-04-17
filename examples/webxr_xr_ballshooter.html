@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js vr - ball shooter</title>
+		<title>three.js xr - ball shooter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - ball shooter
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - ball shooter
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -30,8 +30,10 @@
 			import * as THREE from 'three';
 
 			import { BoxLineGeometry } from 'three/addons/geometries/BoxLineGeometry.js';
-			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let camera, scene, renderer;
 			let controller1, controller2;
@@ -94,13 +96,12 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.xr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				document.body.appendChild( VRButton.createButton( renderer ) );
+				document.body.appendChild( XRButton.createButton( renderer ) );
 
 				// controllers
 

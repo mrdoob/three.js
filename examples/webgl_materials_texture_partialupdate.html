@@ -30,6 +30,8 @@
 
 			import * as THREE from 'three';
 
+			THREE.ColorManagement.enabled = true;
+
 			let camera, scene, renderer, clock, dataTexture, diffuseMap;
 
 			let last = 0;
@@ -49,6 +51,7 @@
 
 				const loader = new THREE.TextureLoader();
 				diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg', animate );
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 				diffuseMap.minFilter = THREE.LinearFilter;
 				diffuseMap.generateMipmaps = false;
 

@@ -41,6 +41,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { BVHLoader } from 'three/addons/loaders/BVHLoader.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			const clock = new THREE.Clock();
 
 			let camera, controls, scene, renderer;
@@ -52,19 +54,13 @@
 			const loader = new BVHLoader();
 			loader.load( 'models/bvh/pirouette.bvh', function ( result ) {
 
-				const skinnedMesh = new THREE.SkinnedMesh();
-				skinnedMesh.visible = false; // dummy skinned mesh for animating the skeleton
+				const skeletonHelper = new THREE.SkeletonHelper( result.skeleton.bones[ 0 ] );
 
-				skinnedMesh.add( result.skeleton.bones[ 0 ] );
-				skinnedMesh.bind( result.skeleton );
-
-				const skeletonHelper = new THREE.SkeletonHelper( skinnedMesh );
-
-				scene.add( skinnedMesh );
+				scene.add( result.skeleton.bones[ 0 ] );
 				scene.add( skeletonHelper );
 
 				// play animation
-				mixer = new THREE.AnimationMixer( skinnedMesh );
+				mixer = new THREE.AnimationMixer( result.skeleton.bones[ 0 ] );
 				mixer.clipAction( result.clip ).play();
 
 			} );

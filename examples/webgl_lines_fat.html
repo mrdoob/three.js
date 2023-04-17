@@ -40,6 +40,8 @@
 			import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 			import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let line, renderer, scene, camera, camera2, controls;
 			let line1;
 			let matLine, matLineBasic, matLineDashed;
@@ -93,7 +95,7 @@
 					spline.getPoint( t, point );
 					positions.push( point.x, point.y, point.z );
 
-					color.setHSL( t, 1.0, 0.5 );
+					color.setHSL( t, 1.0, 0.5, THREE.SRGBColorSpace );
 					colors.push( color.r, color.g, color.b );
 
 				}

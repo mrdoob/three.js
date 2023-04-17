@@ -35,6 +35,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { LWOLoader } from 'three/addons/loaders/LWOLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let camera, scene, renderer;
 
 			init();
@@ -82,7 +84,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animation );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 

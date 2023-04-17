@@ -1,3 +1,4 @@
+import WebGPUWeakMap from './WebGPUWeakMap.js';
 import { lights } from 'three/nodes';
 
 class WebGPURenderState {
@@ -34,20 +35,21 @@ class WebGPURenderStates {
 
 	constructor() {
 
-		this.renderStates = new WeakMap();
+		this.renderStates = new WebGPUWeakMap();
 
 	}
 
-	get( scene, /* camera */ ) {
+	get( scene, camera ) {
 
-		const renderStates = this.renderStates;
+		const chainKey = [ scene, camera ];
 
-		let renderState = renderStates.get( scene );
+		let renderState = this.renderStates.get( chainKey );
 
 		if ( renderState === undefined ) {
 
 			renderState = new WebGPURenderState();
-			renderStates.set( scene, renderState );
+
+			this.renderStates.set( chainKey, renderState );
 
 		}
 
@@ -57,7 +59,7 @@ class WebGPURenderStates {
 
 	dispose() {
 
-		this.renderStates = new WeakMap();
+		this.renderStates = new WebGPUWeakMap();
 
 	}
 

@@ -11,28 +11,33 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">This can be used as a helper object to view the edges of a [page:BufferGeometry geometry].</p>
+		<p class="desc">
+			This can be used as a helper object to view the edges of a
+			[page:BufferGeometry geometry].
+		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-const geometry = new THREE.BoxGeometry( 100, 100, 100 );
-const edges = new THREE.EdgesGeometry( geometry );
-const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+const geometry = new THREE.BoxGeometry( 100, 100, 100 ); 
+const edges = new THREE.EdgesGeometry( geometry ); 
+const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) ); 
 scene.add( line );
 		</code>
 
 		<h2>Examples</h2>
-		<p>
-			[example:webgl_helpers helpers]
-		</p>
+		<p>[example:webgl_helpers helpers]</p>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:BufferGeometry geometry], [param:Integer thresholdAngle] )</h3>
+		<h3>
+			[name]( [param:BufferGeometry geometry], [param:Integer thresholdAngle] )
+		</h3>
 		<p>
-		geometry — Any geometry object.<br />
-		thresholdAngle — An edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
+			geometry — Any geometry object.<br />
+			thresholdAngle — An edge is only rendered if the angle (in degrees)
+			between the face normals of the adjoining faces exceeds this value.
+			default = 1 degree.
 		</p>
 
 		<h2>Properties</h2>
@@ -40,7 +45,8 @@ scene.add( line );
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>

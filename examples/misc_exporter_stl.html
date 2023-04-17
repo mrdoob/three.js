@@ -32,6 +32,8 @@
 			import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let scene, camera, renderer, exporter, mesh;
 
 			const params = {
@@ -70,7 +72,7 @@
 
 				// ground
 
-				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0xbbbbbb, depthWrite: false } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
 				scene.add( ground );

@@ -30,7 +30,7 @@
 
 		<h2>Costruttore</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
 		<h2>Proprietà</h2>
 
@@ -225,9 +225,9 @@
 			Vedi [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei] per maggiori informazioni.
 		</p>
 
-		<h3>[property:number encoding]</h3>
+		<h3>[property:number colorSpace]</h3>
 		<p>
-		[page:Textures THREE.LinearEncoding] è l'impostazione predefinita.
+		[page:Textures THREE.NoColorSpace] è l'impostazione predefinita.
 		Vedi la pagina [page:Textures texture constants] per i dettagli su altri formati.<br /><br />
 
 		Si noti che questo valore viene modificato su una texture dopo che il materiale è stato utilizzato, 

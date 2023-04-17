@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js vr - haptics</title>
+		<title>three.js xr - haptics</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - haptics
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> xr - haptics
 		</div>
 
 		<!-- Import maps polyfill -->
@@ -29,8 +29,10 @@
 
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let container;
 			let camera, scene, renderer;
@@ -90,11 +92,7 @@
 				controls.update();
 
 				const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
-				const floorMaterial = new THREE.MeshStandardMaterial( {
-					color: 0xeeeeee,
-					roughness: 1.0,
-					metalness: 0.0
-				} );
+				const floorMaterial = new THREE.ShadowMaterial( { opacity: 0.25 } );
 				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
@@ -121,9 +119,9 @@
 
 					const intensity = ( i + 1 ) / BOXES;
 					const w = 0.1;
-					const h = 0.1;
-					const minH = 1;
-					const geometry = new THREE.BoxGeometry( w, h * i + minH, w );
+					const h = 0.05 * i + 0.5;
+					const geometry = new THREE.BoxGeometry( w, h, w );
+					geometry.translate( 0, h / 2, 0 );
 					const material = new THREE.MeshStandardMaterial( {
 						color: new THREE.Color( intensity, 0.1, 0.1 ),
 						roughness: 0.7,
@@ -148,18 +146,13 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( VRButton.createButton( renderer ) );
+				document.body.appendChild( XRButton.createButton( renderer ) );
 
-				document.getElementById( 'VRButton' ).addEventListener( 'click', () => {
-
-					initAudio();
-
-				} );
+				document.getElementById( 'XRButton' ).addEventListener( 'click', initAudio );
 
 				// controllers
 

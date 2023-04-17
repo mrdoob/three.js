@@ -32,6 +32,8 @@
 			import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let scene, camera, renderer, exporter, mesh;
 
 			const params = {
@@ -105,7 +107,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;

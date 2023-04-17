@@ -11,6 +11,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 })(this, (function (exports) { 'use strict';
 
 	const REVISION = '152dev';
+
 	const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 	const CullFaceNone = 0;
@@ -151,7 +152,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const TrianglesDrawMode = 0;
 	const TriangleStripDrawMode = 1;
 	const TriangleFanDrawMode = 2;
+	/** @deprecated Use LinearSRGBColorSpace or NoColorSpace in three.js r152+. */
 	const LinearEncoding = 3000;
+	/** @deprecated Use SRGBColorSpace in three.js r152+. */
 	const sRGBEncoding = 3001;
 	const BasicDepthPacking = 3200;
 	const RGBADepthPacking = 3201;
@@ -1484,6 +1487,18 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
+	const _cache = {};
+
+	function warnOnce( message ) {
+
+		if ( message in _cache ) return;
+
+		_cache[ message ] = true;
+
+		console.warn( message );
+
+	}
+
 	function SRGBToLinear( c ) {
 
 		return ( c < 0.04045 ) ? c * 0.0773993808 : Math.pow( c * 0.9478672986 + 0.0521327014, 2.4 );
@@ -1863,7 +1878,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	class Texture extends EventDispatcher {
 
-		constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = Texture.DEFAULT_ANISOTROPY, encoding = LinearEncoding ) {
+		constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = Texture.DEFAULT_ANISOTROPY, colorSpace = NoColorSpace ) {
 
 			super();
 
@@ -1906,11 +1921,17 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.flipY = true;
 			this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-			// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
-			//
-			// Also changing the encoding after already used by a Material will not automatically make the Material
-			// update. You need to explicitly call Material.needsUpdate to trigger it to recompile.
-			this.encoding = encoding;
+			if ( typeof colorSpace === 'string' ) {
+
+				this.colorSpace = colorSpace;
+
+			} else { // @deprecated, r152
+
+				warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
+				this.colorSpace = colorSpace === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+
+			}
+
 
 			this.userData = {};
 
@@ -1980,7 +2001,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.premultiplyAlpha = source.premultiplyAlpha;
 			this.flipY = source.flipY;
 			this.unpackAlignment = source.unpackAlignment;
-			this.encoding = source.encoding;
+			this.colorSpace = source.colorSpace;
 
 			this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
@@ -2026,7 +2047,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				format: this.format,
 				internalFormat: this.internalFormat,
 				type: this.type,
-				encoding: this.encoding,
+				colorSpace: this.colorSpace,
 
 				minFilter: this.minFilter,
 				magFilter: this.magFilter,
@@ -2146,6 +2167,20 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				this.source.needsUpdate = true;
 
 			}
+
+		}
+
+		get encoding() { // @deprecated, r152
+
+			warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
+			return this.colorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding;
+
+		}
+
+		set encoding( encoding ) { // @deprecated, r152
+
+			warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
+			this.colorSpace = encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
 
 		}
 
@@ -2822,7 +2857,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			const image = { width: width, height: height, depth: 1 };
 
-			this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+			if ( options.encoding !== undefined ) {
+
+				// @deprecated, r152
+				warnOnce( 'THREE.WebGLRenderTarget: option.encoding has been replaced by option.colorSpace.' );
+				options.colorSpace = options.encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+
+			}
+
+			this.texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 			this.texture.isRenderTargetTexture = true;
 
 			this.texture.flipY = false;
@@ -2871,6 +2914,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.width = source.width;
 			this.height = source.height;
 			this.depth = source.depth;
+
+			this.scissor.copy( source.scissor );
+			this.scissorTest = source.scissorTest;
 
 			this.viewport.copy( source.viewport );
 
@@ -3047,8 +3093,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.height = source.height;
 			this.depth = source.depth;
 
-			this.viewport.set( 0, 0, this.width, this.height );
-			this.scissor.set( 0, 0, this.width, this.height );
+			this.scissor.copy( source.scissor );
+			this.scissorTest = source.scissorTest;
+
+			this.viewport.copy( source.viewport );
 
 			this.depthBuffer = source.depthBuffer;
 			this.stencilBuffer = source.stencilBuffer;
@@ -8895,30 +8943,30 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 							// rgb(255,0,0) rgba(255,0,0,0.5)
-							this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
-							this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
-							this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
-
-							ColorManagement.toWorkingColorSpace( this, colorSpace );
 
 							handleAlpha( color[ 4 ] );
 
-							return this;
+							return this.setRGB(
+								Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255,
+								Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255,
+								Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255,
+								colorSpace
+							);
 
 						}
 
 						if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 							// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
-							this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
-							this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
-							this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
-
-							ColorManagement.toWorkingColorSpace( this, colorSpace );
 
 							handleAlpha( color[ 4 ] );
 
-							return this;
+							return this.setRGB(
+								Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100,
+								Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100,
+								Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100,
+								colorSpace
+							);
 
 						}
 
@@ -8930,13 +8978,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 							// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
-							const h = parseFloat( color[ 1 ] ) / 360;
-							const s = parseFloat( color[ 2 ] ) / 100;
-							const l = parseFloat( color[ 3 ] ) / 100;
 
 							handleAlpha( color[ 4 ] );
 
-							return this.setHSL( h, s, l, colorSpace );
+							return this.setHSL(
+								parseFloat( color[ 1 ] ) / 360,
+								parseFloat( color[ 2 ] ) / 100,
+								parseFloat( color[ 3 ] ) / 100,
+								colorSpace
+							);
 
 						}
 
@@ -9063,7 +9113,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
 
-			return clamp( _color.r * 255, 0, 255 ) << 16 ^ clamp( _color.g * 255, 0, 255 ) << 8 ^ clamp( _color.b * 255, 0, 255 ) << 0;
+			return Math.round( clamp( _color.r * 255, 0, 255 ) ) * 65536 + Math.round( clamp( _color.g * 255, 0, 255 ) ) * 256 + Math.round( clamp( _color.b * 255, 0, 255 ) );
 
 		}
 
@@ -9143,7 +9193,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			return `rgb(${( r * 255 ) | 0},${( g * 255 ) | 0},${( b * 255 ) | 0})`;
+			return `rgb(${ Math.round( r * 255 ) },${ Math.round( g * 255 ) },${ Math.round( b * 255 ) })`;
 
 		}
 
@@ -11264,7 +11314,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 	const _ray$2 = /*@__PURE__*/ new Ray();
-	const _sphere$4 = /*@__PURE__*/ new Sphere();
+	const _sphere$5 = /*@__PURE__*/ new Sphere();
 	const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
 	const _vA$1 = /*@__PURE__*/ new Vector3();
@@ -11396,12 +11446,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			if ( this.isSkinnedMesh ) {
-
-				this.applyBoneTransform( index, target );
-
-			}
-
 			return target;
 
 		}
@@ -11418,14 +11462,14 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			_sphere$4.copy( geometry.boundingSphere );
-			_sphere$4.applyMatrix4( matrixWorld );
+			_sphere$5.copy( geometry.boundingSphere );
+			_sphere$5.applyMatrix4( matrixWorld );
 
 			_ray$2.copy( raycaster.ray ).recast( raycaster.near );
 
-			if ( _sphere$4.containsPoint( _ray$2.origin ) === false ) {
+			if ( _sphere$5.containsPoint( _ray$2.origin ) === false ) {
 
-				if ( _ray$2.intersectSphere( _sphere$4, _sphereHitAt ) === null ) return;
+				if ( _ray$2.intersectSphere( _sphere$5, _sphereHitAt ) === null ) return;
 
 				if ( _ray$2.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
 
@@ -11444,7 +11488,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
+			this._computeIntersections( raycaster, intersects );
+
+		}
+
+		_computeIntersections( raycaster, intersects ) {
+
 			let intersection;
+
+			const geometry = this.geometry;
+			const material = this.material;
 
 			const index = geometry.index;
 			const position = geometry.attributes.position;
@@ -12525,12 +12578,12 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	class CubeTexture extends Texture {
 
-		constructor( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
+		constructor( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace ) {
 
 			images = images !== undefined ? images : [];
 			mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
 
-			super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+			super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
 
 			this.isCubeTexture = true;
 
@@ -12563,7 +12616,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const image = { width: size, height: size, depth: 1 };
 			const images = [ image, image, image, image, image, image ];
 
-			this.texture = new CubeTexture( images, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+			if ( options.encoding !== undefined ) {
+
+				// @deprecated, r152
+				warnOnce( 'THREE.WebGLCubeRenderTarget: option.encoding has been replaced by option.colorSpace.' );
+				options.colorSpace = options.encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+
+			}
+
+			this.texture = new CubeTexture( images, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
 
 			// By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
 			// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
@@ -12583,7 +12644,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		fromEquirectangularTexture( renderer, texture ) {
 
 			this.texture.type = texture.type;
-			this.texture.encoding = texture.encoding;
+			this.texture.colorSpace = texture.colorSpace;
 
 			this.texture.generateMipmaps = texture.generateMipmaps;
 			this.texture.minFilter = texture.minFilter;
@@ -12889,7 +12950,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	}
 
-	const _sphere$3 = /*@__PURE__*/ new Sphere();
+	const _sphere$4 = /*@__PURE__*/ new Sphere();
 	const _vector$6 = /*@__PURE__*/ new Vector3();
 
 	class Frustum {
@@ -12955,7 +13016,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( object.boundingSphere === null ) object.computeBoundingSphere();
 
-				_sphere$3.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
+				_sphere$4.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 			} else {
 
@@ -12963,21 +13024,21 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-				_sphere$3.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+				_sphere$4.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 			}
 
-			return this.intersectsSphere( _sphere$3 );
+			return this.intersectsSphere( _sphere$4 );
 
 		}
 
 		intersectsSprite( sprite ) {
 
-			_sphere$3.center.set( 0, 0, 0 );
-			_sphere$3.radius = 0.7071067811865476;
-			_sphere$3.applyMatrix4( sprite.matrixWorld );
+			_sphere$4.center.set( 0, 0, 0 );
+			_sphere$4.radius = 0.7071067811865476;
+			_sphere$4.applyMatrix4( sprite.matrixWorld );
 
-			return this.intersectsSphere( _sphere$3 );
+			return this.intersectsSphere( _sphere$4 );
 
 		}
 
@@ -13590,7 +13651,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var transmission_fragment = "#ifdef USE_TRANSMISSION\n\tmaterial.transmission = transmission;\n\tmaterial.transmissionAlpha = 1.0;\n\tmaterial.thickness = thickness;\n\tmaterial.attenuationDistance = attenuationDistance;\n\tmaterial.attenuationColor = attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tmaterial.transmission *= texture2D( transmissionMap, vTransmissionMapUv ).r;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tmaterial.thickness *= texture2D( thicknessMap, vThicknessMapUv ).g;\n\t#endif\n\tvec3 pos = vWorldPosition;\n\tvec3 v = normalize( cameraPosition - pos );\n\tvec3 n = inverseTransformDirection( normal, viewMatrix );\n\tvec4 transmission = getIBLVolumeRefraction(\n\t\tn, v, material.roughness, material.diffuseColor, material.specularColor, material.specularF90,\n\t\tpos, modelMatrix, viewMatrix, projectionMatrix, material.ior, material.thickness,\n\t\tmaterial.attenuationColor, material.attenuationDistance );\n\tmaterial.transmissionAlpha = mix( material.transmissionAlpha, transmission.a, material.transmission );\n\ttotalDiffuse = mix( totalDiffuse, transmission.rgb, material.transmission );\n#endif";
 
-	var transmission_pars_fragment = "#ifdef USE_TRANSMISSION\n\tuniform float transmission;\n\tuniform float thickness;\n\tuniform float attenuationDistance;\n\tuniform vec3 attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tuniform sampler2D transmissionMap;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tuniform sampler2D thicknessMap;\n\t#endif\n\tuniform vec2 transmissionSamplerSize;\n\tuniform sampler2D transmissionSamplerMap;\n\tuniform mat4 modelMatrix;\n\tuniform mat4 projectionMatrix;\n\tvarying vec3 vWorldPosition;\n\tfloat w0( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - a + 3.0 ) - 3.0 ) + 1.0 );\n\t}\n\tfloat w1( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a *  a * ( 3.0 * a - 6.0 ) + 4.0 );\n\t}\n\tfloat w2( float a ){\n\t\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - 3.0 * a + 3.0 ) + 3.0 ) + 1.0 );\n\t}\n\tfloat w3( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a * a * a );\n\t}\n\tfloat g0( float a ) {\n\t\treturn w0( a ) + w1( a );\n\t}\n\tfloat g1( float a ) {\n\t\treturn w2( a ) + w3( a );\n\t}\n\tfloat h0( float a ) {\n\t\treturn - 1.0 + w1( a ) / ( w0( a ) + w1( a ) );\n\t}\n\tfloat h1( float a ) {\n\t\treturn 1.0 + w3( a ) / ( w2( a ) + w3( a ) );\n\t}\n\tvec4 bicubic( sampler2D tex, vec2 uv, vec4 texelSize, vec2 fullSize, float lod ) {\n\t\tuv = uv * texelSize.zw + 0.5;\n\t\tvec2 iuv = floor( uv );\n\t\tvec2 fuv = fract( uv );\n\t\tfloat g0x = g0( fuv.x );\n\t\tfloat g1x = g1( fuv.x );\n\t\tfloat h0x = h0( fuv.x );\n\t\tfloat h1x = h1( fuv.x );\n\t\tfloat h0y = h0( fuv.y );\n\t\tfloat h1y = h1( fuv.y );\n\t\tvec2 p0 = ( vec2( iuv.x + h0x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p1 = ( vec2( iuv.x + h1x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p2 = ( vec2( iuv.x + h0x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p3 = ( vec2( iuv.x + h1x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n\t\t\n\t\tvec2 lodFudge = pow( 1.95, lod ) / fullSize;\n\t\treturn g0( fuv.y ) * ( g0x * textureLod( tex, p0, lod ) + g1x * textureLod( tex, p1, lod ) ) +\n\t\t\tg1( fuv.y ) * ( g0x * textureLod( tex, p2, lod ) + g1x * textureLod( tex, p3, lod ) );\n\t}\n\tvec4 textureBicubic( sampler2D sampler, vec2 uv, float lod ) {\n\t\tvec2 fLodSize = vec2( textureSize( sampler, int( lod ) ) );\n\t\tvec2 cLodSize = vec2( textureSize( sampler, int( lod + 1.0 ) ) );\n\t\tvec2 fLodSizeInv = 1.0 / fLodSize;\n\t\tvec2 cLodSizeInv = 1.0 / cLodSize;\n\t\tvec2 fullSize = vec2( textureSize( sampler, 0 ) );\n\t\tvec4 fSample = bicubic( sampler, uv, vec4( fLodSizeInv, fLodSize ), fullSize, floor( lod ) );\n\t\tvec4 cSample = bicubic( sampler, uv, vec4( cLodSizeInv, cLodSize ), fullSize, ceil( lod ) );\n\t\treturn mix( fSample, cSample, fract( lod ) );\n\t}\n\tvec3 getVolumeTransmissionRay( const in vec3 n, const in vec3 v, const in float thickness, const in float ior, const in mat4 modelMatrix ) {\n\t\tvec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );\n\t\tvec3 modelScale;\n\t\tmodelScale.x = length( vec3( modelMatrix[ 0 ].xyz ) );\n\t\tmodelScale.y = length( vec3( modelMatrix[ 1 ].xyz ) );\n\t\tmodelScale.z = length( vec3( modelMatrix[ 2 ].xyz ) );\n\t\treturn normalize( refractionVector ) * thickness * modelScale;\n\t}\n\tfloat applyIorToRoughness( const in float roughness, const in float ior ) {\n\t\treturn roughness * clamp( ior * 2.0 - 2.0, 0.0, 1.0 );\n\t}\n\tvec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {\n\t\tfloat lod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );\n\t\treturn textureBicubic( transmissionSamplerMap, fragCoord.xy, lod );\n\t}\n\tvec3 applyVolumeAttenuation( const in vec3 radiance, const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tif ( isinf( attenuationDistance ) ) {\n\t\t\treturn radiance;\n\t\t} else {\n\t\t\tvec3 attenuationCoefficient = -log( attenuationColor ) / attenuationDistance;\n\t\t\tvec3 transmittance = exp( - attenuationCoefficient * transmissionDistance );\t\t\treturn transmittance * radiance;\n\t\t}\n\t}\n\tvec4 getIBLVolumeRefraction( const in vec3 n, const in vec3 v, const in float roughness, const in vec3 diffuseColor,\n\t\tconst in vec3 specularColor, const in float specularF90, const in vec3 position, const in mat4 modelMatrix,\n\t\tconst in mat4 viewMatrix, const in mat4 projMatrix, const in float ior, const in float thickness,\n\t\tconst in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tvec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );\n\t\tvec3 refractedRayExit = position + transmissionRay;\n\t\tvec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );\n\t\tvec2 refractionCoords = ndcPos.xy / ndcPos.w;\n\t\trefractionCoords += 1.0;\n\t\trefractionCoords /= 2.0;\n\t\tvec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );\n\t\tvec3 attenuatedColor = applyVolumeAttenuation( transmittedLight.rgb, length( transmissionRay ), attenuationColor, attenuationDistance );\n\t\tvec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );\n\t\treturn vec4( ( 1.0 - F ) * attenuatedColor * diffuseColor, transmittedLight.a );\n\t}\n#endif";
+	var transmission_pars_fragment = "#ifdef USE_TRANSMISSION\n\tuniform float transmission;\n\tuniform float thickness;\n\tuniform float attenuationDistance;\n\tuniform vec3 attenuationColor;\n\t#ifdef USE_TRANSMISSIONMAP\n\t\tuniform sampler2D transmissionMap;\n\t#endif\n\t#ifdef USE_THICKNESSMAP\n\t\tuniform sampler2D thicknessMap;\n\t#endif\n\tuniform vec2 transmissionSamplerSize;\n\tuniform sampler2D transmissionSamplerMap;\n\tuniform mat4 modelMatrix;\n\tuniform mat4 projectionMatrix;\n\tvarying vec3 vWorldPosition;\n\tfloat w0( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - a + 3.0 ) - 3.0 ) + 1.0 );\n\t}\n\tfloat w1( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a *  a * ( 3.0 * a - 6.0 ) + 4.0 );\n\t}\n\tfloat w2( float a ){\n\t\treturn ( 1.0 / 6.0 ) * ( a * ( a * ( - 3.0 * a + 3.0 ) + 3.0 ) + 1.0 );\n\t}\n\tfloat w3( float a ) {\n\t\treturn ( 1.0 / 6.0 ) * ( a * a * a );\n\t}\n\tfloat g0( float a ) {\n\t\treturn w0( a ) + w1( a );\n\t}\n\tfloat g1( float a ) {\n\t\treturn w2( a ) + w3( a );\n\t}\n\tfloat h0( float a ) {\n\t\treturn - 1.0 + w1( a ) / ( w0( a ) + w1( a ) );\n\t}\n\tfloat h1( float a ) {\n\t\treturn 1.0 + w3( a ) / ( w2( a ) + w3( a ) );\n\t}\n\tvec4 bicubic( sampler2D tex, vec2 uv, vec4 texelSize, float lod ) {\n\t\tuv = uv * texelSize.zw + 0.5;\n\t\tvec2 iuv = floor( uv );\n\t\tvec2 fuv = fract( uv );\n\t\tfloat g0x = g0( fuv.x );\n\t\tfloat g1x = g1( fuv.x );\n\t\tfloat h0x = h0( fuv.x );\n\t\tfloat h1x = h1( fuv.x );\n\t\tfloat h0y = h0( fuv.y );\n\t\tfloat h1y = h1( fuv.y );\n\t\tvec2 p0 = ( vec2( iuv.x + h0x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p1 = ( vec2( iuv.x + h1x, iuv.y + h0y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p2 = ( vec2( iuv.x + h0x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n\t\tvec2 p3 = ( vec2( iuv.x + h1x, iuv.y + h1y ) - 0.5 ) * texelSize.xy;\n\t\treturn g0( fuv.y ) * ( g0x * textureLod( tex, p0, lod ) + g1x * textureLod( tex, p1, lod ) ) +\n\t\t\tg1( fuv.y ) * ( g0x * textureLod( tex, p2, lod ) + g1x * textureLod( tex, p3, lod ) );\n\t}\n\tvec4 textureBicubic( sampler2D sampler, vec2 uv, float lod ) {\n\t\tvec2 fLodSize = vec2( textureSize( sampler, int( lod ) ) );\n\t\tvec2 cLodSize = vec2( textureSize( sampler, int( lod + 1.0 ) ) );\n\t\tvec2 fLodSizeInv = 1.0 / fLodSize;\n\t\tvec2 cLodSizeInv = 1.0 / cLodSize;\n\t\tvec4 fSample = bicubic( sampler, uv, vec4( fLodSizeInv, fLodSize ), floor( lod ) );\n\t\tvec4 cSample = bicubic( sampler, uv, vec4( cLodSizeInv, cLodSize ), ceil( lod ) );\n\t\treturn mix( fSample, cSample, fract( lod ) );\n\t}\n\tvec3 getVolumeTransmissionRay( const in vec3 n, const in vec3 v, const in float thickness, const in float ior, const in mat4 modelMatrix ) {\n\t\tvec3 refractionVector = refract( - v, normalize( n ), 1.0 / ior );\n\t\tvec3 modelScale;\n\t\tmodelScale.x = length( vec3( modelMatrix[ 0 ].xyz ) );\n\t\tmodelScale.y = length( vec3( modelMatrix[ 1 ].xyz ) );\n\t\tmodelScale.z = length( vec3( modelMatrix[ 2 ].xyz ) );\n\t\treturn normalize( refractionVector ) * thickness * modelScale;\n\t}\n\tfloat applyIorToRoughness( const in float roughness, const in float ior ) {\n\t\treturn roughness * clamp( ior * 2.0 - 2.0, 0.0, 1.0 );\n\t}\n\tvec4 getTransmissionSample( const in vec2 fragCoord, const in float roughness, const in float ior ) {\n\t\tfloat lod = log2( transmissionSamplerSize.x ) * applyIorToRoughness( roughness, ior );\n\t\treturn textureBicubic( transmissionSamplerMap, fragCoord.xy, lod );\n\t}\n\tvec3 applyVolumeAttenuation( const in vec3 radiance, const in float transmissionDistance, const in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tif ( isinf( attenuationDistance ) ) {\n\t\t\treturn radiance;\n\t\t} else {\n\t\t\tvec3 attenuationCoefficient = -log( attenuationColor ) / attenuationDistance;\n\t\t\tvec3 transmittance = exp( - attenuationCoefficient * transmissionDistance );\t\t\treturn transmittance * radiance;\n\t\t}\n\t}\n\tvec4 getIBLVolumeRefraction( const in vec3 n, const in vec3 v, const in float roughness, const in vec3 diffuseColor,\n\t\tconst in vec3 specularColor, const in float specularF90, const in vec3 position, const in mat4 modelMatrix,\n\t\tconst in mat4 viewMatrix, const in mat4 projMatrix, const in float ior, const in float thickness,\n\t\tconst in vec3 attenuationColor, const in float attenuationDistance ) {\n\t\tvec3 transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );\n\t\tvec3 refractedRayExit = position + transmissionRay;\n\t\tvec4 ndcPos = projMatrix * viewMatrix * vec4( refractedRayExit, 1.0 );\n\t\tvec2 refractionCoords = ndcPos.xy / ndcPos.w;\n\t\trefractionCoords += 1.0;\n\t\trefractionCoords /= 2.0;\n\t\tvec4 transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );\n\t\tvec3 attenuatedColor = applyVolumeAttenuation( transmittedLight.rgb, length( transmissionRay ), attenuationColor, attenuationDistance );\n\t\tvec3 F = EnvironmentBRDF( n, v, specularColor, specularF90, roughness );\n\t\treturn vec4( ( 1.0 - F ) * attenuatedColor * diffuseColor, transmittedLight.a );\n\t}\n#endif";
 
 	var uv_pars_fragment = "#ifdef USE_UV\n\tvarying vec2 vUv;\n#endif\n#ifdef USE_MAP\n\tvarying vec2 vMapUv;\n#endif\n#ifdef USE_ALPHAMAP\n\tvarying vec2 vAlphaMapUv;\n#endif\n#ifdef USE_LIGHTMAP\n\tvarying vec2 vLightMapUv;\n#endif\n#ifdef USE_AOMAP\n\tvarying vec2 vAoMapUv;\n#endif\n#ifdef USE_BUMPMAP\n\tvarying vec2 vBumpMapUv;\n#endif\n#ifdef USE_NORMALMAP\n\tvarying vec2 vNormalMapUv;\n#endif\n#ifdef USE_EMISSIVEMAP\n\tvarying vec2 vEmissiveMapUv;\n#endif\n#ifdef USE_METALNESSMAP\n\tvarying vec2 vMetalnessMapUv;\n#endif\n#ifdef USE_ROUGHNESSMAP\n\tvarying vec2 vRoughnessMapUv;\n#endif\n#ifdef USE_CLEARCOATMAP\n\tvarying vec2 vClearcoatMapUv;\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\tvarying vec2 vClearcoatNormalMapUv;\n#endif\n#ifdef USE_CLEARCOAT_ROUGHNESSMAP\n\tvarying vec2 vClearcoatRoughnessMapUv;\n#endif\n#ifdef USE_IRIDESCENCEMAP\n\tvarying vec2 vIridescenceMapUv;\n#endif\n#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\tvarying vec2 vIridescenceThicknessMapUv;\n#endif\n#ifdef USE_SHEEN_COLORMAP\n\tvarying vec2 vSheenColorMapUv;\n#endif\n#ifdef USE_SHEEN_ROUGHNESSMAP\n\tvarying vec2 vSheenRoughnessMapUv;\n#endif\n#ifdef USE_SPECULARMAP\n\tvarying vec2 vSpecularMapUv;\n#endif\n#ifdef USE_SPECULAR_COLORMAP\n\tvarying vec2 vSpecularColorMapUv;\n#endif\n#ifdef USE_SPECULAR_INTENSITYMAP\n\tvarying vec2 vSpecularIntensityMapUv;\n#endif\n#ifdef USE_TRANSMISSIONMAP\n\tuniform mat3 transmissionMapTransform;\n\tvarying vec2 vTransmissionMapUv;\n#endif\n#ifdef USE_THICKNESSMAP\n\tuniform mat3 thicknessMapTransform;\n\tvarying vec2 vThicknessMapUv;\n#endif";
 
@@ -14404,18 +14465,6 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			// Ignore background in AR
-			// TODO: Reconsider this.
-
-			const xr = renderer.xr;
-			const session = xr.getSession && xr.getSession();
-
-			if ( session && session.environmentBlendMode === 'additive' ) {
-
-				background = null;
-
-			}
-
 			if ( background === null ) {
 
 				setClear( clearColor, clearAlpha );
@@ -14424,6 +14473,27 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				setClear( background, 1 );
 				forceClear = true;
+
+			}
+
+			const xr = renderer.xr;
+			const environmentBlendMode = xr.getEnvironmentBlendMode();
+
+			switch ( environmentBlendMode ) {
+
+				case 'opaque':
+					forceClear = true;
+					break;
+
+				case 'additive':
+					state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
+					forceClear = true;
+					break;
+
+				case 'alpha-blend':
+					state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
+					forceClear = true;
+					break;
 
 			}
 
@@ -14479,7 +14549,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background.isRenderTargetTexture === false ) ? - 1 : 1;
 				boxMesh.material.uniforms.backgroundBlurriness.value = scene.backgroundBlurriness;
 				boxMesh.material.uniforms.backgroundIntensity.value = scene.backgroundIntensity;
-				boxMesh.material.toneMapped = ( background.encoding === sRGBEncoding ) ? false : true;
+				boxMesh.material.toneMapped = ( background.colorSpace === SRGBColorSpace ) ? false : true;
 
 				if ( currentBackground !== background ||
 					currentBackgroundVersion !== background.version ||
@@ -14535,7 +14605,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				planeMesh.material.uniforms.t2D.value = background;
 				planeMesh.material.uniforms.backgroundIntensity.value = scene.backgroundIntensity;
-				planeMesh.material.toneMapped = ( background.encoding === sRGBEncoding ) ? false : true;
+				planeMesh.material.toneMapped = ( background.colorSpace === SRGBColorSpace ) ? false : true;
 
 				if ( background.matrixAutoUpdate === true ) {
 
@@ -16029,7 +16099,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				generateMipmaps: false,
 				type: HalfFloatType,
 				format: RGBAFormat,
-				encoding: LinearEncoding,
+				colorSpace: LinearSRGBColorSpace,
 				depthBuffer: false
 			};
 
@@ -19964,7 +20034,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 
 				supportsVertexTextures: SUPPORTS_VERTEX_TEXTURES,
-				outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? ( currentRenderTarget.texture.encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace ) : LinearSRGBColorSpace ),
+				outputColorSpace: ( currentRenderTarget === null ) ? renderer.outputColorSpace : ( currentRenderTarget.isXRRenderTarget === true ? currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace ),
 
 				map: HAS_MAP,
 				matcap: HAS_MATCAP,
@@ -21483,6 +21553,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		this.needsUpdate = false;
 
 		this.type = PCFShadowMap;
+		let _previousType = this.type;
 
 		this.render = function ( lights, scene, camera ) {
 
@@ -21502,6 +21573,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			_state.buffers.color.setClear( 1, 1, 1, 1 );
 			_state.buffers.depth.setTest( true );
 			_state.setScissorTest( false );
+
+			// check for shadow map type changes
+
+			const toVSM = ( _previousType !== VSMShadowMap && this.type === VSMShadowMap );
+			const fromVSM = ( _previousType === VSMShadowMap && this.type !== VSMShadowMap );
 
 			// render depth map
 
@@ -21547,9 +21623,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				}
 
-				if ( shadow.map === null ) {
+				if ( shadow.map === null || toVSM === true || fromVSM === true ) {
 
 					const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
+
+					if ( shadow.map !== null ) {
+
+						shadow.map.dispose();
+
+					}
 
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 					shadow.map.texture.name = light.name + '.shadowMap';
@@ -21595,6 +21677,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				shadow.needsUpdate = false;
 
 			}
+
+			_previousType = this.type;
 
 			scope.needsUpdate = false;
 
@@ -23222,7 +23306,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		}
 
-		function getInternalFormat( internalFormatName, glFormat, glType, encoding, forceLinearEncoding = false ) {
+		function getInternalFormat( internalFormatName, glFormat, glType, colorSpace, forceLinearTransfer = false ) {
 
 			if ( isWebGL2 === false ) return glFormat;
 
@@ -23256,7 +23340,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( glType === _gl.FLOAT ) internalFormat = _gl.RGBA32F;
 				if ( glType === _gl.HALF_FLOAT ) internalFormat = _gl.RGBA16F;
-				if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( encoding === sRGBEncoding && forceLinearEncoding === false ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
+				if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = ( colorSpace === SRGBColorSpace && forceLinearTransfer === false ) ? _gl.SRGB8_ALPHA8 : _gl.RGBA8;
 				if ( glType === _gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = _gl.RGBA4;
 				if ( glType === _gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = _gl.RGB5_A1;
 
@@ -23513,7 +23597,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			array.push( texture.premultiplyAlpha );
 			array.push( texture.flipY );
 			array.push( texture.unpackAlignment );
-			array.push( texture.encoding );
+			array.push( texture.colorSpace );
 
 			return array.join();
 
@@ -23785,10 +23869,10 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				image = verifyColorSpace( texture, image );
 
 				const supportsMips = isPowerOfTwo$1( image ) || isWebGL2,
-					glFormat = utils.convert( texture.format, texture.encoding );
+					glFormat = utils.convert( texture.format, texture.colorSpace );
 
 				let glType = utils.convert( texture.type ),
-					glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+					glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
 
 				setTextureParameters( textureType, texture, supportsMips );
 
@@ -24217,9 +24301,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				const image = cubeImage[ 0 ],
 					supportsMips = isPowerOfTwo$1( image ) || isWebGL2,
-					glFormat = utils.convert( texture.format, texture.encoding ),
+					glFormat = utils.convert( texture.format, texture.colorSpace ),
 					glType = utils.convert( texture.type ),
-					glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+					glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
 
 				const useTexStorage = ( isWebGL2 && texture.isVideoTexture !== true );
 				const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
@@ -24386,9 +24470,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		// Setup storage for target texture and bind it to correct framebuffer
 		function setupFrameBufferTexture( framebuffer, renderTarget, texture, attachment, textureTarget ) {
 
-			const glFormat = utils.convert( texture.format, texture.encoding );
+			const glFormat = utils.convert( texture.format, texture.colorSpace );
 			const glType = utils.convert( texture.type );
-			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+			const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
 			const renderTargetProperties = properties.get( renderTarget );
 
 			if ( ! renderTargetProperties.__hasExternalTextures ) {
@@ -24498,9 +24582,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 					const texture = textures[ i ];
 
-					const glFormat = utils.convert( texture.format, texture.encoding );
+					const glFormat = utils.convert( texture.format, texture.colorSpace );
 					const glType = utils.convert( texture.type );
-					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding );
+					const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
 					const samples = getRenderTargetSamples( renderTarget );
 
 					if ( isMultisample && useMultisampledRTT( renderTarget ) === false ) {
@@ -24733,9 +24817,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer[ i ] );
 
-						const glFormat = utils.convert( texture.format, texture.encoding );
+						const glFormat = utils.convert( texture.format, texture.colorSpace );
 						const glType = utils.convert( texture.type );
-						const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.encoding, renderTarget.isXRRenderTarget === true );
+						const glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace, renderTarget.isXRRenderTarget === true );
 						const samples = getRenderTargetSamples( renderTarget );
 						_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
@@ -25007,17 +25091,17 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		function verifyColorSpace( texture, image ) {
 
-			const encoding = texture.encoding;
+			const colorSpace = texture.colorSpace;
 			const format = texture.format;
 			const type = texture.type;
 
 			if ( texture.isCompressedTexture === true || texture.format === _SRGBAFormat ) return image;
 
-			if ( encoding !== LinearEncoding ) {
+			if ( colorSpace !== LinearSRGBColorSpace && colorSpace !== NoColorSpace ) {
 
 				// sRGB
 
-				if ( encoding === sRGBEncoding ) {
+				if ( colorSpace === SRGBColorSpace ) {
 
 					if ( isWebGL2 === false ) {
 
@@ -25054,7 +25138,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				} else {
 
-					console.error( 'THREE.WebGLTextures: Unsupported texture encoding:', encoding );
+					console.error( 'THREE.WebGLTextures: Unsupported texture color space:', colorSpace );
 
 				}
 
@@ -25087,7 +25171,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 		const isWebGL2 = capabilities.isWebGL2;
 
-		function convert( p, encoding = null ) {
+		function convert( p, colorSpace = NoColorSpace ) {
 
 			let extension;
 
@@ -25157,7 +25241,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format || p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
 
-				if ( encoding === sRGBEncoding ) {
+				if ( colorSpace === SRGBColorSpace ) {
 
 					extension = extensions.get( 'WEBGL_compressed_texture_s3tc_srgb' );
 
@@ -25242,8 +25326,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( extension !== null ) {
 
-					if ( p === RGB_ETC2_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ETC2 : extension.COMPRESSED_RGB8_ETC2;
-					if ( p === RGBA_ETC2_EAC_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : extension.COMPRESSED_RGBA8_ETC2_EAC;
+					if ( p === RGB_ETC2_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ETC2 : extension.COMPRESSED_RGB8_ETC2;
+					if ( p === RGBA_ETC2_EAC_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ETC2_EAC : extension.COMPRESSED_RGBA8_ETC2_EAC;
 
 				} else {
 
@@ -25265,20 +25349,20 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( extension !== null ) {
 
-					if ( p === RGBA_ASTC_4x4_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR : extension.COMPRESSED_RGBA_ASTC_4x4_KHR;
-					if ( p === RGBA_ASTC_5x4_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR : extension.COMPRESSED_RGBA_ASTC_5x4_KHR;
-					if ( p === RGBA_ASTC_5x5_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR : extension.COMPRESSED_RGBA_ASTC_5x5_KHR;
-					if ( p === RGBA_ASTC_6x5_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR : extension.COMPRESSED_RGBA_ASTC_6x5_KHR;
-					if ( p === RGBA_ASTC_6x6_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR : extension.COMPRESSED_RGBA_ASTC_6x6_KHR;
-					if ( p === RGBA_ASTC_8x5_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR : extension.COMPRESSED_RGBA_ASTC_8x5_KHR;
-					if ( p === RGBA_ASTC_8x6_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR : extension.COMPRESSED_RGBA_ASTC_8x6_KHR;
-					if ( p === RGBA_ASTC_8x8_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR : extension.COMPRESSED_RGBA_ASTC_8x8_KHR;
-					if ( p === RGBA_ASTC_10x5_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR : extension.COMPRESSED_RGBA_ASTC_10x5_KHR;
-					if ( p === RGBA_ASTC_10x6_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR : extension.COMPRESSED_RGBA_ASTC_10x6_KHR;
-					if ( p === RGBA_ASTC_10x8_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR : extension.COMPRESSED_RGBA_ASTC_10x8_KHR;
-					if ( p === RGBA_ASTC_10x10_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR : extension.COMPRESSED_RGBA_ASTC_10x10_KHR;
-					if ( p === RGBA_ASTC_12x10_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR : extension.COMPRESSED_RGBA_ASTC_12x10_KHR;
-					if ( p === RGBA_ASTC_12x12_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR : extension.COMPRESSED_RGBA_ASTC_12x12_KHR;
+					if ( p === RGBA_ASTC_4x4_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR : extension.COMPRESSED_RGBA_ASTC_4x4_KHR;
+					if ( p === RGBA_ASTC_5x4_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR : extension.COMPRESSED_RGBA_ASTC_5x4_KHR;
+					if ( p === RGBA_ASTC_5x5_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR : extension.COMPRESSED_RGBA_ASTC_5x5_KHR;
+					if ( p === RGBA_ASTC_6x5_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR : extension.COMPRESSED_RGBA_ASTC_6x5_KHR;
+					if ( p === RGBA_ASTC_6x6_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR : extension.COMPRESSED_RGBA_ASTC_6x6_KHR;
+					if ( p === RGBA_ASTC_8x5_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR : extension.COMPRESSED_RGBA_ASTC_8x5_KHR;
+					if ( p === RGBA_ASTC_8x6_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR : extension.COMPRESSED_RGBA_ASTC_8x6_KHR;
+					if ( p === RGBA_ASTC_8x8_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR : extension.COMPRESSED_RGBA_ASTC_8x8_KHR;
+					if ( p === RGBA_ASTC_10x5_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR : extension.COMPRESSED_RGBA_ASTC_10x5_KHR;
+					if ( p === RGBA_ASTC_10x6_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR : extension.COMPRESSED_RGBA_ASTC_10x6_KHR;
+					if ( p === RGBA_ASTC_10x8_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR : extension.COMPRESSED_RGBA_ASTC_10x8_KHR;
+					if ( p === RGBA_ASTC_10x10_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR : extension.COMPRESSED_RGBA_ASTC_10x10_KHR;
+					if ( p === RGBA_ASTC_12x10_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR : extension.COMPRESSED_RGBA_ASTC_12x10_KHR;
+					if ( p === RGBA_ASTC_12x12_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR : extension.COMPRESSED_RGBA_ASTC_12x12_KHR;
 
 				} else {
 
@@ -25296,7 +25380,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( extension !== null ) {
 
-					if ( p === RGBA_BPTC_Format ) return ( encoding === sRGBEncoding ) ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
+					if ( p === RGBA_BPTC_Format ) return ( colorSpace === SRGBColorSpace ) ? extension.COMPRESSED_SRGB_ALPHA_BPTC_UNORM_EXT : extension.COMPRESSED_RGBA_BPTC_UNORM_EXT;
 
 				} else {
 
@@ -25761,6 +25845,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const scope = this;
 
 			let session = null;
+
 			let framebufferScaleFactor = 1.0;
 
 			let referenceSpace = null;
@@ -26010,7 +26095,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						const layerInit = {
 							antialias: ( session.renderState.layers === undefined ) ? attributes.antialias : true,
-							alpha: attributes.alpha,
+							alpha: true,
 							depth: attributes.depth,
 							stencil: attributes.stencil,
 							framebufferScaleFactor: framebufferScaleFactor
@@ -26026,7 +26111,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 							{
 								format: RGBAFormat,
 								type: UnsignedByteType,
-								encoding: renderer.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding,
+								colorSpace: renderer.outputColorSpace,
 								stencilBuffer: attributes.stencil
 							}
 						);
@@ -26065,7 +26150,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 								type: UnsignedByteType,
 								depthTexture: new DepthTexture( glProjLayer.textureWidth, glProjLayer.textureHeight, depthType, undefined, undefined, undefined, undefined, undefined, undefined, depthFormat ),
 								stencilBuffer: attributes.stencil,
-								encoding: renderer.outputColorSpace === SRGBColorSpace ? sRGBEncoding : LinearEncoding,
+								colorSpace: renderer.outputColorSpace,
 								samples: attributes.antialias ? 4 : 0
 							} );
 
@@ -26087,6 +26172,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 					scope.isPresenting = true;
 
 					scope.dispatchEvent( { type: 'sessionstart' } );
+
+				}
+
+			};
+
+			this.getEnvironmentBlendMode = function () {
+
+				if ( session !== null ) {
+
+					return session.environmentBlendMode;
 
 				}
 
@@ -27600,7 +27695,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			// physically based shading
 
-			this.outputColorSpace = LinearSRGBColorSpace;
+			this.outputColorSpace = SRGBColorSpace;
 
 			// physical lights
 
@@ -28986,7 +29081,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				const fog = scene.fog;
 				const environment = material.isMeshStandardMaterial ? scene.environment : null;
-				const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? ( _currentRenderTarget.texture.encoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace ) : LinearSRGBColorSpace );
+				const colorSpace = ( _currentRenderTarget === null ) ? _this.outputColorSpace : ( _currentRenderTarget.isXRRenderTarget === true ? _currentRenderTarget.texture.colorSpace : LinearSRGBColorSpace );
 				const envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || environment );
 				const vertexAlphas = material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4;
 				const vertexTangents = !! material.normalMap && !! geometry.attributes.tangent;
@@ -30840,6 +30935,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 	const _matrix4 = /*@__PURE__*/ new Matrix4();
 	const _vertex = /*@__PURE__*/ new Vector3();
 
+	const _sphere$3 = /*@__PURE__*/ new Sphere();
+
 	class SkinnedMesh extends Mesh {
 
 		constructor( geometry, material ) {
@@ -30918,6 +31015,29 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			this.skeleton = source.skeleton;
 
 			return this;
+
+		}
+
+		raycast( raycaster, intersects ) {
+
+			if ( this.boundingSphere === null ) this.computeBoundingSphere();
+
+			_sphere$3.copy( this.boundingSphere );
+			_sphere$3.applyMatrix4( this.matrixWorld );
+
+			if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) return;
+
+			this._computeIntersections( raycaster, intersects );
+
+		}
+
+		getVertexPosition( index, target ) {
+
+			super.getVertexPosition( index, target );
+
+			this.applyBoneTransform( index, target );
+
+			return target;
 
 		}
 
@@ -31052,9 +31172,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	class DataTexture extends Texture {
 
-		constructor( data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, encoding ) {
+		constructor( data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, colorSpace ) {
 
-			super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+			super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
 
 			this.isDataTexture = true;
 
@@ -32177,9 +32297,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	class CompressedTexture extends Texture {
 
-		constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
+		constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, colorSpace ) {
 
-			super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+			super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace );
 
 			this.isCompressedTexture = true;
 
@@ -41768,7 +41888,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
 
-				if ( texData.encoding !== undefined ) {
+				if ( texData.colorSpace !== undefined ) {
+
+					texture.colorSpace = texData.colorSpace;
+
+				} else if ( texData.encoding !== undefined ) { // @deprecated, r152
 
 					texture.encoding = texData.encoding;
 
@@ -43977,7 +44101,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 					if ( data.format !== undefined ) texture.format = data.format;
 					if ( data.internalFormat !== undefined ) texture.internalFormat = data.internalFormat;
 					if ( data.type !== undefined ) texture.type = data.type;
-					if ( data.encoding !== undefined ) texture.encoding = data.encoding;
+					if ( data.colorSpace !== undefined ) texture.colorSpace = data.colorSpace;
+					if ( data.encoding !== undefined ) texture.encoding = data.encoding; // @deprecated, r152
 
 					if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 					if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
@@ -44559,25 +44684,31 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						onLoad( audioBuffer );
 
-					} );
+					}, handleError );
 
 				} catch ( e ) {
 
-					if ( onError ) {
-
-						onError( e );
-
-					} else {
-
-						console.error( e );
-
-					}
-
-					scope.manager.itemError( url );
+					handleError( e );
 
 				}
 
 			}, onProgress, onError );
+
+			function handleError( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}
 

@@ -45,6 +45,8 @@
 			import { MD2CharacterComplex } from 'three/addons/misc/MD2CharacterComplex.js';
 			import { Gyroscope } from 'three/addons/misc/Gyroscope.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let SCREEN_WIDTH = window.innerWidth;
 			let SCREEN_HEIGHT = window.innerHeight;
 
@@ -123,7 +125,7 @@
 				ground.material.map.repeat.set( 64, 64 );
 				ground.material.map.wrapS = THREE.RepeatWrapping;
 				ground.material.map.wrapT = THREE.RepeatWrapping;
-				ground.material.map.encoding = THREE.sRGBEncoding;
+				ground.material.map.colorSpace = THREE.SRGBColorSpace;
 				// note that because the ground does not cast a shadow, .castShadow is left false
 				ground.receiveShadow = true;
 
@@ -138,7 +140,6 @@
 
 				//
 
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
