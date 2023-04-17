@@ -253,14 +253,14 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setDefaultValues( values ) {
+	setDefaultValues( material ) {
 
 		// This approach is to reuse the native refreshUniforms*
 		// and turn available the use of features like transmission and environment in core
 
-		for ( const property in values ) {
+		for ( const property in material ) {
 
-			const value = values[ property ];
+			const value = material[ property ];
 
 			if ( this[ property ] === undefined ) {
 
@@ -272,7 +272,20 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		Object.assign( this.defines, values.defines );
+		Object.assign( this.defines, material.defines );
+
+		const descriptors = Object.getOwnPropertyDescriptors( material.constructor.prototype );
+
+		for ( const key in descriptors ) {
+
+			if ( Object.getOwnPropertyDescriptor( this.constructor.prototype, key ) === undefined &&
+			     descriptors[ key ].get !== undefined ) ) {
+
+				Object.defineProperty( this.constructor.prototype, key, descriptors[ key ] );
+
+			}
+
+		}
 
 	}
 
