@@ -128,7 +128,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace; // TODO: Investigate use of FramebufferTexture.
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 

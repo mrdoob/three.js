@@ -48,6 +48,8 @@
 
 			import { PRWMLoader } from 'three/addons/loaders/PRWMLoader.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			let camera, scene, renderer;
 
 			let mouseX = 0, mouseY = 0;
@@ -146,7 +148,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove );
