@@ -155,7 +155,7 @@ class Material extends EventDispatcher {
 		// Infers color space of a texture already known to contain only color data. This method
 		// should _not_ be passed non-color textures.
 
-		if ( texture.colorSpace !== NoColorSpace ) return;
+		if ( ! texture || texture.colorSpace !== NoColorSpace ) return;
 
 		texture.colorSpace = texture.type === UnsignedByteType ? SRGBColorSpace : LinearSRGBColorSpace;
 
