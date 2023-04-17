@@ -1,4 +1,4 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, NoColorSpace } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, NoColorSpace, UnsignedByteType } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 
 export function SRGBToLinear( c ) {
@@ -135,9 +135,11 @@ export const ColorManagement = {
 		// Infers color space of a texture already known to contain only color
 		// data. This method should _not_ be passed non-color textures.
 
-		if ( this.enabled === false || ! texture || texture.colorSpace !== NoColorSpace ) return;
+		if ( this.enabled && texture && texture.colorSpace === NoColorSpace ) {
 
-		texture.colorSpace = texture.type === UnsignedByteType ? SRGBColorSpace : LinearSRGBColorSpace;
+			texture.colorSpace = texture.type === UnsignedByteType ? SRGBColorSpace : LinearSRGBColorSpace;
+
+		}
 
 	},
 

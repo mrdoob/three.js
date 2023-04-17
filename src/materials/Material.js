@@ -1,7 +1,6 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp, UnsignedByteType, SRGBColorSpace, NoColorSpace, LinearSRGBColorSpace } from '../constants.js';
+import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
-import { ColorManagement } from '../math/ColorManagement.js';
 
 let materialId = 0;
 
