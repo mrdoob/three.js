@@ -139,9 +139,9 @@
 				materialCompressed.transparent = true;
 
 				const geo = flipY( new THREE.PlaneGeometry() );
-				const boxCompressed = new THREE.Mesh( geo, materialCompressed );
-				boxCompressed.position.set( - 2, 1, 0 );
-				scene.add( boxCompressed );
+				const planeCompressed = new THREE.Mesh( geo, materialCompressed );
+				planeCompressed.position.set( - 2, 1, 0 );
+				scene.add( planeCompressed );
 
 				// points
 
