@@ -38,6 +38,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			THREE.ColorManagement.enabled = true;
+
 			// Heightfield parameters
 			const terrainWidthExtents = 100;
 			const terrainDepthExtents = 100;
@@ -97,7 +99,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
