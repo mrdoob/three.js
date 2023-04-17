@@ -272,7 +272,24 @@ class KTX2Loader extends Loader {
 
 		if ( container.vkFormat !== VK_FORMAT_UNDEFINED ) {
 
-			return createDataTexture( container );
+			const mipmaps = [];
+			const pendings = [];
+
+			for ( let levelIndex = 0; levelIndex < container.levels.length; levelIndex ++ ) {
+
+				pendings.push( createDataTexture( container, levelIndex ).then( function ( dataTexture ) {
+
+					mipmaps[ levelIndex ] = dataTexture;
+
+				} ) );
+
+			}
+
+			await Promise.all( pendings );
+
+			const texture = mipmaps.shift();
+			texture.mipmaps = mipmaps;
+			return texture;
 
 		}
 
@@ -706,9 +723,11 @@ const COLOR_SPACE_MAP = {
 
 };
 
-async function createDataTexture( container ) {
+async function createDataTexture( container, levelIndex = 0 ) {
 
-	const { vkFormat, pixelWidth, pixelHeight, pixelDepth } = container;
+	const { vkFormat, pixelDepth } = container;
+	const pixelWidth = container.pixelWidth / ( 2 ** levelIndex );
+	const pixelHeight = container.pixelHeight / ( 2 ** levelIndex );
 
 	if ( FORMAT_MAP[ vkFormat ] === undefined ) {
 
@@ -716,7 +735,7 @@ async function createDataTexture( container ) {
 
 	}
 
-	const level = container.levels[ 0 ];
+	const level = container.levels[ levelIndex ];
 
 	let levelData;
 	let view;
