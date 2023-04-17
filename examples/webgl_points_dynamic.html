@@ -42,6 +42,8 @@
 			import { FocusShader } from 'three/addons/shaders/FocusShader.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let camera, scene, renderer, mesh;
 
 			let parent;
