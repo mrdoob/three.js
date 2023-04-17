@@ -132,10 +132,10 @@ function WebGLShadowMap( _renderer, _objects, _capabilities ) {
 
 			}
 
-			const switchedToVSM = _previousType !== VSMShadowMap && this.type === VSMShadowMap;
-			const switchedFromVSM = _previousType === VSMShadowMap && this.type !== VSMShadowMap;
+			const toVSM = ( _previousType !== VSMShadowMap && this.type === VSMShadowMap );
+			const fromVSM = ( _previousType === VSMShadowMap && this.type !== VSMShadowMap );
 
-			if ( shadow.map === null || switchedToVSM || switchedFromVSM ) {
+			if ( shadow.map === null || toVSM === true || fromVSM === true ) {
 
 				const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
 
