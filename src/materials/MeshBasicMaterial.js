@@ -14,7 +14,7 @@ class MeshBasicMaterial extends Material {
 
 		this.color = new Color( 0xffffff ); // emissive
 
-		this.map = null;
+		this._map = null;
 
 		this.lightMap = null;
 		this.lightMapIntensity = 1.0;
@@ -39,6 +39,20 @@ class MeshBasicMaterial extends Material {
 		this.fog = true;
 
 		this.setValues( parameters );
+
+	}
+
+	get map() {
+
+		return this._map;
+
+	}
+
+	set map( map ) {
+
+		this.assignTextureColorSpace( map );
+
+		this._map = map;
 
 	}
 

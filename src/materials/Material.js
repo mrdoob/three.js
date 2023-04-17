@@ -1,5 +1,5 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
-import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
+import { FrontSide, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp, UnsignedByteType, SRGBColorSpace, NoColorSpace, LinearSRGBColorSpace } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
 
 let materialId = 0;
@@ -147,6 +147,17 @@ class Material extends EventDispatcher {
 			}
 
 		}
+
+	}
+
+	assignTextureColorSpace( texture ) {
+
+		// Infers color space of a texture already known to contain only color data. This method
+		// should _not_ be passed non-color textures.
+
+		if ( texture.colorSpace !== NoColorSpace ) return;
+
+		texture.colorSpace = texture.type === UnsignedByteType ? SRGBColorSpace : LinearSRGBColorSpace;
 
 	}
 

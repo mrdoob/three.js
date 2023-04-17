@@ -19,7 +19,7 @@ class MeshStandardMaterial extends Material {
 		this.roughness = 1.0;
 		this.metalness = 0.0;
 
-		this.map = null;
+		this._map = null;
 
 		this.lightMap = null;
 		this.lightMapIntensity = 1.0;
@@ -29,7 +29,7 @@ class MeshStandardMaterial extends Material {
 
 		this.emissive = new Color( 0x000000 );
 		this.emissiveIntensity = 1.0;
-		this.emissiveMap = null;
+		this._emissiveMap = null;
 
 		this.bumpMap = null;
 		this.bumpScale = 1;
@@ -61,6 +61,34 @@ class MeshStandardMaterial extends Material {
 		this.fog = true;
 
 		this.setValues( parameters );
+
+	}
+
+	get map() {
+
+		return this._map;
+
+	}
+
+	set map( map ) {
+
+		this.assignTextureColorSpace( map );
+
+		this._map = map;
+
+	}
+
+	get emissiveMap() {
+
+		return this._emissiveMap;
+
+	}
+
+	set emissiveMap( emissiveMap ) {
+
+		this.assignTextureColorSpace( emissiveMap );
+
+		this._emissiveMap = emissiveMap;
 
 	}
 
