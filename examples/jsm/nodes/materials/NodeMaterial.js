@@ -279,7 +279,7 @@ class NodeMaterial extends ShaderMaterial {
 		for ( const key in descriptors ) {
 
 			if ( Object.getOwnPropertyDescriptor( this.constructor.prototype, key ) === undefined &&
-			     descriptors[ key ].get !== undefined ) ) {
+			     descriptors[ key ].get !== undefined ) {
 
 				Object.defineProperty( this.constructor.prototype, key, descriptors[ key ] );
 
