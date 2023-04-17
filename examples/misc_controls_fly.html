@@ -51,8 +51,6 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			const radius = 6371;
 			const tilt = 0.41;
 			const rotationSpeed = 0.02;
@@ -94,7 +92,7 @@
 
 				const materialNormalMap = new THREE.MeshPhongMaterial( {
 
-					specular: 0x333333,
+					specular: 0x7c7c7c,
 					shininess: 15,
 					map: textureLoader.load( 'textures/planets/earth_atmos_2048.jpg' ),
 					specularMap: textureLoader.load( 'textures/planets/earth_specular_2048.jpg' ),
@@ -176,12 +174,12 @@
 				starsGeometry[ 1 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
 
 				const starsMaterials = [
-					new THREE.PointsMaterial( { color: 0x555555, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x555555, size: 1, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x333333, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x3a3a3a, size: 1, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 2, sizeAttenuation: false } ),
-					new THREE.PointsMaterial( { color: 0x1a1a1a, size: 1, sizeAttenuation: false } )
+					new THREE.PointsMaterial( { color: 0x9c9c9c, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x9c9c9c, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x7c7c7c, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x838383, size: 1, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x5a5a5a, size: 2, sizeAttenuation: false } ),
+					new THREE.PointsMaterial( { color: 0x5a5a5a, size: 1, sizeAttenuation: false } )
 				];
 
 				for ( let i = 10; i < 30; i ++ ) {
