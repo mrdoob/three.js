@@ -5,6 +5,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { UniformsLib } from './UniformsLib.js';
 import { Color } from '../../math/Color.js';
 import { Matrix3 } from '../../math/Matrix3.js';
+import { LinearSRGBColorSpace } from '../../constants.js';
 
 const ShaderLib = {
 
@@ -64,7 +65,8 @@ const ShaderLib = {
 			UniformsLib.lights,
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
-				specular: { value: /*@__PURE__*/ new Color( 0x111111 ) },
+				// Preserve original hexadecimal value if ColorManagement is disabled.
+				specular: { value: /*@__PURE__*/ new Color().setHex( 0x111111, LinearSRGBColorSpace ) },
 				shininess: { value: 30 }
 			}
 		] ),

@@ -1,4 +1,4 @@
-import { MultiplyOperation, TangentSpaceNormalMap } from '../constants.js';
+import { LinearSRGBColorSpace, MultiplyOperation, TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
@@ -14,7 +14,10 @@ class MeshPhongMaterial extends Material {
 		this.type = 'MeshPhongMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
-		this.specular = new Color( 0x111111 );
+
+		// Preserve original hexadecimal value if ColorManagement is disabled.
+		this.specular = new Color().setHex( 0x111111, LinearSRGBColorSpace );
+
 		this.shininess = 30;
 
 		this.map = null;
