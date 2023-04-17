@@ -1,7 +1,5 @@
 import * as THREE from '../../../build/three.module.js';
 
-THREE.ColorManagement.enabled = true;
-
 let camera, scene, renderer, group;
 
 function init( canvas, width, height, pixelRatio, path ) {
