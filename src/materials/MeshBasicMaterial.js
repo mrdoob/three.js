@@ -1,6 +1,7 @@
 import { Material } from './Material.js';
 import { MultiplyOperation } from '../constants.js';
 import { Color } from '../math/Color.js';
+import { ColorManagement } from '../math/ColorManagement.js';
 
 class MeshBasicMaterial extends Material {
 
@@ -50,7 +51,7 @@ class MeshBasicMaterial extends Material {
 
 	set map( map ) {
 
-		this.assignTextureColorSpace( map );
+		ColorManagement.assignTextureColorSpace( map );
 
 		this._map = map;
 

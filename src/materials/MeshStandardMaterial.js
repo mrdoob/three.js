@@ -2,6 +2,7 @@ import { TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
+import { ColorManagement } from '../math/ColorManagement.js';
 
 class MeshStandardMaterial extends Material {
 
@@ -72,7 +73,7 @@ class MeshStandardMaterial extends Material {
 
 	set map( map ) {
 
-		this.assignTextureColorSpace( map );
+		ColorManagement.assignTextureColorSpace( map );
 
 		this._map = map;
 
@@ -86,7 +87,7 @@ class MeshStandardMaterial extends Material {
 
 	set emissiveMap( emissiveMap ) {
 
-		this.assignTextureColorSpace( emissiveMap );
+		ColorManagement.assignTextureColorSpace( emissiveMap );
 
 		this._emissiveMap = emissiveMap;
 
