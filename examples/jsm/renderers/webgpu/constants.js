@@ -148,13 +148,27 @@ export const GPUTextureFormat = {
 	BC3RGBAUnorm: 'bc3-rgba-unorm',
 	BC3RGBAUnormSRGB: 'bc3-rgba-unorm-srgb',
 	BC4RUnorm: 'bc4-r-unorm',
-	BC4RSNorm: 'bc4-r-snorm',
+	BC4RSnorm: 'bc4-r-snorm',
 	BC5RGUnorm: 'bc5-rg-unorm',
 	BC5RGSnorm: 'bc5-rg-snorm',
 	BC6HRGBUFloat: 'bc6h-rgb-ufloat',
 	BC6HRGBFloat: 'bc6h-rgb-float',
 	BC7RGBAUnorm: 'bc7-rgba-unorm',
 	BC7RGBAUnormSRGB: 'bc7-rgba-srgb',
+
+	// ETC2 compressed formats usable if 'texture-compression-etc2' is both
+	// supported by the device/user agent and enabled in requestDevice.
+
+	ETC2RGB8Unorm: 'etc2-rgb8unorm',
+	ETC2RGB8UnormSRGB: 'etc2-rgb8unorm-srgb',
+	ETC2RGB8A1Unorm: 'etc2-rgb8a1unorm',
+	ETC2RGB8A1UnormSRGB: 'etc2-rgb8a1unorm-srgb',
+	ETC2RGBA8Unorm: 'etc2-rgba8unorm',
+	ETC2RGBA8UnormSRGB: 'etc2-rgba8unorm-srgb',
+	EACR11Unorm: 'eac-r11unorm',
+	EACR11Snorm: 'eac-r11snorm',
+	EACRG11Unorm: 'eac-rg11unorm',
+	EACRG11Snorm: 'eac-rg11snorm',
 
 	// 'depth24unorm-stencil8' extension
 
