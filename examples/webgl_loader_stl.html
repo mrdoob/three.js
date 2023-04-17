@@ -34,6 +34,8 @@
 
 			import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container, stats;
 
 			let camera, cameraTarget, scene, renderer;

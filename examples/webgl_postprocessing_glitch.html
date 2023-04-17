@@ -41,6 +41,8 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let camera, scene, renderer, composer;
 			let object, light;
 
