@@ -359,8 +359,7 @@ class ThreeMFLoader extends Loader {
 				const colorNode = colorNodes[ i ];
 				const color = colorNode.getAttribute( 'color' );
 
-				colorObject.setStyle( color.substring( 0, 7 ) );
-				colorObject.convertSRGBToLinear(); // color is in sRGB
+				colorObject.setStyle( color.substring( 0, 7 ), SRGBColorSpace );
 
 				colors.push( colorObject.r, colorObject.g, colorObject.b );
 
@@ -1281,8 +1280,7 @@ class ThreeMFLoader extends Loader {
 			const displaycolor = materialData.displaycolor;
 
 			const color = displaycolor.substring( 0, 7 );
-			material.color.setStyle( color );
-			material.color.convertSRGBToLinear(); // displaycolor is in sRGB
+			material.color.setStyle( color, SRGBColorSpace );
 
 			// process alpha if set
 
