@@ -721,6 +721,31 @@ class WebGPURenderer {
 
 	}
 
+	hasFeature( name ) {
+
+		if ( this._initialized === false ) {
+
+			console.warn( 'THREE.WebGPURenderer: Renderer must be initialized before testing features.' );
+			return false;
+
+		}
+
+		//
+
+		const features = Object.values( GPUFeatureName );
+
+		if ( features.includes( name ) === false ) {
+
+			throw new Error( 'THREE.WebGPURenderer: Unknown WebGPU GPU feature: ' + name );
+
+		}
+
+		//
+
+		return this._adapter.features.has( name );
+
+	}
+
 	_projectObject( object, camera, groupOrder ) {
 
 		const currentRenderList = this._currentRenderList;
