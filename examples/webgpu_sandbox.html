@@ -57,7 +57,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { requiredFeatures: [ 'texture-compression-bc', 'texture-compression-astc' ] } );
+				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
