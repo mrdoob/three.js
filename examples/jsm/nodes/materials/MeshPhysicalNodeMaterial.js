@@ -32,11 +32,6 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 		this.attenuationDistanceNode = null;
 		this.attenuationColorNode = null;
 
-		this.sheen = 0;
-		this.clearcoat = 0;
-		this.iridescence = 0;
-		this.transmission = 0;
-
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
