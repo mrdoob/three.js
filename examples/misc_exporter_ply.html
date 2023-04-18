@@ -32,8 +32,6 @@
 			import { PLYExporter } from 'three/addons/exporters/PLYExporter.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let scene, camera, renderer, exporter, mesh;
 
 			const params = {
@@ -58,7 +56,7 @@
 
 				//
 
-				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d );
 				hemiLight.position.set( 0, 200, 0 );
 				scene.add( hemiLight );
 
@@ -73,7 +71,7 @@
 
 				// ground
 
-				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+				const ground = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0xcbcbcb, depthWrite: false } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.receiveShadow = true;
 				scene.add( ground );
