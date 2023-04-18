@@ -2355,7 +2355,6 @@ class LDrawLoader extends Loader {
 		material.premultipliedAlpha = true;
 		material.opacity = alpha;
 		material.depthWrite = ! isTransparent;
-		material.color.convertSRGBToLinear();
 
 		material.polygonOffset = true;
 		material.polygonOffsetFactor = 1;
@@ -2377,7 +2376,6 @@ class LDrawLoader extends Loader {
 			} );
 			edgeMaterial.userData.code = code;
 			edgeMaterial.name = name + ' - Edge';
-			edgeMaterial.color.convertSRGBToLinear();
 
 			// This is the material used for conditional edges
 			edgeMaterial.userData.conditionalEdgeMaterial = new LDrawConditionalLineMaterial( {
@@ -2389,7 +2387,6 @@ class LDrawLoader extends Loader {
 				opacity: alpha,
 
 			} );
-			edgeMaterial.userData.conditionalEdgeMaterial.color.convertSRGBToLinear();
 			edgeMaterial.userData.conditionalEdgeMaterial.userData.code = code;
 			edgeMaterial.userData.conditionalEdgeMaterial.name = name + ' - Conditional Edge';
 
