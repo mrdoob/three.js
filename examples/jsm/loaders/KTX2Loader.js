@@ -112,21 +112,37 @@ class KTX2Loader extends Loader {
 
 	detectSupport( renderer ) {
 
-		this.workerConfig = {
-			astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
-			etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
-			etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
-			dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
-			bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
-			pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
-				|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
-		};
+		if ( renderer.isWebGPURenderer === true ) {
 
+			const adapter = renderer._adapter;
 
-		if ( renderer.capabilities.isWebGL2 ) {
+			this.workerConfig = {
+				astcSupported: adapter.features.has( 'texture-compression-astc' ),
+				etc1Supported: false,
+				etc2Supported: adapter.features.has( 'texture-compression-etc2' ),
+				dxtSupported: adapter.features.has( 'texture-compression-bc' ),
+				bptcSupported: false,
+				pvrtcSupported: false
+			};
 
-			// https://github.com/mrdoob/three.js/pull/22928
-			this.workerConfig.etc1Supported = false;
+		} else {
+
+			this.workerConfig = {
+				astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
+				etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
+				etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
+				dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+				bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
+				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
+					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
+			};
+
+			if ( renderer.capabilities.isWebGL2 ) {
+
+				// https://github.com/mrdoob/three.js/pull/22928
+				this.workerConfig.etc1Supported = false;
+
+			}
 
 		}
 
