@@ -725,8 +725,7 @@ class WebGPURenderer {
 
 		if ( this._initialized === false ) {
 
-			console.warn( 'THREE.WebGPURenderer: Renderer must be initialized before testing features.' );
-			return false;
+			throw new Error( 'THREE.WebGPURenderer: Renderer must be initialized before testing features.' );
 
 		}
 
