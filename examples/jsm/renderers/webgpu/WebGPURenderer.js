@@ -1,4 +1,4 @@
-import { GPUIndexFormat, GPUTextureFormat } from './constants.js';
+import { GPUIndexFormat, GPUTextureFormat, GPUFeatureName } from './constants.js';
 import WebGPUAnimation from './WebGPUAnimation.js';
 import WebGPURenderObjects from './WebGPURenderObjects.js';
 import WebGPUAttributes from './WebGPUAttributes.js';
@@ -167,7 +167,6 @@ class WebGPURenderer {
 
 		}
 
-		this._parameters.requiredFeatures = ( parameters.requiredFeatures === undefined ) ? [] : parameters.requiredFeatures;
 		this._parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
 
 		// backwards compatibility
@@ -200,8 +199,36 @@ class WebGPURenderer {
 
 		}
 
+		// feature support
+
+		const features = [
+			GPUFeatureName.DepthClipControl,
+			GPUFeatureName.Depth32FloatStencil8,
+			GPUFeatureName.TextureCompressionBC,
+			GPUFeatureName.TextureCompressionETC2,
+			GPUFeatureName.TextureCompressionASTC,
+			GPUFeatureName.TimestampQuery,
+			GPUFeatureName.IndirectFirstInstance,
+			GPUFeatureName.ShaderF16,
+			GPUFeatureName.RG11B10UFloat,
+			GPUFeatureName.BGRA8UNormStorage,
+			GPUFeatureName.Float32Filterable
+		];
+
+		const supportedFeatures = [];
+
+		for ( const name of features ) {
+
+			if ( adapter.features.has( name ) ) {
+
+				supportedFeatures.push( name );
+
+			}
+
+		}
+
 		const deviceDescriptor = {
-			requiredFeatures: parameters.requiredFeatures,
+			requiredFeatures: supportedFeatures,
 			requiredLimits: parameters.requiredLimits
 		};
 
@@ -254,7 +281,7 @@ class WebGPURenderer {
 
 		const nodeFrame = this._nodes.nodeFrame;
 
-		let previousRenderId = nodeFrame.renderId;
+		const previousRenderId = nodeFrame.renderId;
 		nodeFrame.renderId ++;
 
 		if ( this._animation.isAnimating === false ) nodeFrame.update();

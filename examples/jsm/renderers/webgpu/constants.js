@@ -299,6 +299,20 @@ export const GPUInputStepMode = {
 	Instance: 'instance'
 };
 
+export const GPUFeatureName = {
+	DepthClipControl: 'depth-clip-control',
+	Depth32FloatStencil8: 'depth32float-stencil8',
+	TextureCompressionBC: 'texture-compression-bc',
+	TextureCompressionETC2: 'texture-compression-etc2',
+	TextureCompressionASTC: 'texture-compression-astc',
+	TimestampQuery: 'timestamp-query',
+	IndirectFirstInstance: 'indirect-first-instance',
+	ShaderF16: 'shader-f16',
+	RG11B10UFloat: 'rg11b10ufloat-renderable',
+	BGRA8UNormStorage: 'bgra8unorm-storage',
+	Float32Filterable: 'float32-filterable'
+};
+
 export const GPUChunkSize = 16; // size of a chunk in bytes (STD140 layout)
 
 // @TODO: Move to src/constants.js
