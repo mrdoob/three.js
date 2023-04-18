@@ -1064,7 +1064,7 @@ class GLTFWriter {
 		return new Promise( function ( resolve ) {
 
 			const reader = new FileReader();
-			reader.readAsArrayBuffer( blob );
+			reader.readAsArrayBuffer( blob || new Blob() );
 			reader.onloadend = function () {
 
 				const buffer = getPaddedArrayBuffer( reader.result );
@@ -1190,122 +1190,122 @@ class GLTFWriter {
 	 * @param  {String} mimeType export format
 	 * @return {Integer}     Index of the processed texture in the "images" array
 	 */
-	processImage( image, format, flipY, mimeType = 'image/png' ) {
+	processImage( _image, format, flipY, mimeType = 'image/png' ) {
 
-		if ( image !== null ) {
+		let image = _image;
+		if ( ! image ) {
 
-			const writer = this;
-			const cache = writer.cache;
-			const json = writer.json;
-			const options = writer.options;
-			const pending = writer.pending;
+			image = new Image();
+			console.warn( 'THREE.GLTFExporter: No valid image data found.' );
 
-			if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
+		}
 
-			const cachedImages = cache.images.get( image );
+		const writer = this;
+		const cache = writer.cache;
+		const json = writer.json;
+		const options = writer.options;
+		const pending = writer.pending;
 
-			const key = mimeType + ':flipY/' + flipY.toString();
+		if ( ! cache.images.has( image ) ) cache.images.set( image, {} );
 
-			if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
+		const cachedImages = cache.images.get( image );
 
-			if ( ! json.images ) json.images = [];
+		const key = mimeType + ':flipY/' + flipY.toString();
 
-			const imageDef = { mimeType: mimeType };
+		if ( cachedImages[ key ] !== undefined ) return cachedImages[ key ];
 
-			const canvas = getCanvas();
+		if ( ! json.images ) json.images = [];
 
-			canvas.width = Math.min( image.width, options.maxTextureSize );
-			canvas.height = Math.min( image.height, options.maxTextureSize );
+		const imageDef = { mimeType: mimeType };
 
-			const ctx = canvas.getContext( '2d' );
+		const canvas = getCanvas();
 
-			if ( flipY === true ) {
+		canvas.width = Math.min( image.width, options.maxTextureSize );
+		canvas.height = Math.min( image.height, options.maxTextureSize );
 
-				ctx.translate( 0, canvas.height );
-				ctx.scale( 1, - 1 );
+		const ctx = canvas.getContext( '2d' );
+
+		if ( flipY === true ) {
+
+			ctx.translate( 0, canvas.height );
+			ctx.scale( 1, - 1 );
+
+		}
+
+		if ( image.data !== undefined ) { // THREE.DataTexture
+
+			if ( format !== RGBAFormat ) {
+
+				console.error( 'GLTFExporter: Only RGBAFormat is supported.' );
 
 			}
 
-			if ( image.data !== undefined ) { // THREE.DataTexture
+			if ( image.width > options.maxTextureSize || image.height > options.maxTextureSize ) {
 
-				if ( format !== RGBAFormat ) {
+				console.warn( 'GLTFExporter: Image size is bigger than maxTextureSize', image );
 
-					console.error( 'GLTFExporter: Only RGBAFormat is supported.' );
+			}
 
-				}
+			const data = new Uint8ClampedArray( image.height * image.width * 4 );
 
-				if ( image.width > options.maxTextureSize || image.height > options.maxTextureSize ) {
+			for ( let i = 0; i < data.length; i += 4 ) {
 
-					console.warn( 'GLTFExporter: Image size is bigger than maxTextureSize', image );
+				data[ i + 0 ] = image.data[ i + 0 ];
+				data[ i + 1 ] = image.data[ i + 1 ];
+				data[ i + 2 ] = image.data[ i + 2 ];
+				data[ i + 3 ] = image.data[ i + 3 ];
 
-				}
+			}
 
-				const data = new Uint8ClampedArray( image.height * image.width * 4 );
+			ctx.putImageData( new ImageData( data, image.width, image.height ), 0, 0 );
 
-				for ( let i = 0; i < data.length; i += 4 ) {
+		} else {
 
-					data[ i + 0 ] = image.data[ i + 0 ];
-					data[ i + 1 ] = image.data[ i + 1 ];
-					data[ i + 2 ] = image.data[ i + 2 ];
-					data[ i + 3 ] = image.data[ i + 3 ];
+			ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
 
-				}
+		}
 
-				ctx.putImageData( new ImageData( data, image.width, image.height ), 0, 0 );
+		if ( options.binary === true ) {
+
+			pending.push(
+
+				getToBlobPromise( canvas, mimeType )
+					.then( blob => writer.processBufferViewImage( blob ) )
+					.then( bufferViewIndex => {
+
+						imageDef.bufferView = bufferViewIndex;
+
+					} )
+
+			);
+
+		} else {
+
+			if ( canvas.toDataURL !== undefined ) {
+
+				imageDef.uri = canvas.toDataURL( mimeType );
 
 			} else {
-
-				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
-
-			}
-
-			if ( options.binary === true ) {
 
 				pending.push(
 
 					getToBlobPromise( canvas, mimeType )
-						.then( blob => writer.processBufferViewImage( blob ) )
-						.then( bufferViewIndex => {
+						.then( blob => new FileReader().readAsDataURL( blob ) )
+						.then( dataURL => {
 
-							imageDef.bufferView = bufferViewIndex;
+							imageDef.uri = dataURL;
 
 						} )
 
 				);
 
-			} else {
-
-				if ( canvas.toDataURL !== undefined ) {
-
-					imageDef.uri = canvas.toDataURL( mimeType );
-
-				} else {
-
-					pending.push(
-
-						getToBlobPromise( canvas, mimeType )
-							.then( blob => new FileReader().readAsDataURL( blob ) )
-							.then( dataURL => {
-
-								imageDef.uri = dataURL;
-
-							} )
-
-					);
-
-				}
-
 			}
 
-			const index = json.images.push( imageDef ) - 1;
-			cachedImages[ key ] = index;
-			return index;
-
-		} else {
-
-			throw new Error( 'THREE.GLTFExporter: No valid image data found. Unable to process texture.' );
-
 		}
+
+		const index = json.images.push( imageDef ) - 1;
+		cachedImages[ key ] = index;
+		return index;
 
 	}
 
