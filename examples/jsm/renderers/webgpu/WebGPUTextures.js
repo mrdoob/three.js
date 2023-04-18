@@ -605,9 +605,6 @@ class WebGPUTextures {
 		if ( format === GPUTextureFormat.ASTC12x10Unorm || format === GPUTextureFormat.ASTC12x10UnormSRGB ) return { byteLength: 16, width: 12, height: 10 };
 		if ( format === GPUTextureFormat.ASTC12x12Unorm || format === GPUTextureFormat.ASTC12x12UnormSRGB ) return { byteLength: 16, width: 12, height: 12 };
 
-
-
-
 	}
 
 	_getBytesPerTexel( format ) {
@@ -730,10 +727,6 @@ class WebGPUTextures {
 					formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x12UnormSRGB : GPUTextureFormat.ASTC12x12Unorm;
 					break;
 
-				case DepthFormat:
-					formatGPU = GPUTextureFormat.Depth32Float;
-					break;
-
 				default:
 					console.error( 'WebGPURenderer: Unsupported texture format.', format );
 
@@ -810,6 +803,10 @@ class WebGPUTextures {
 
 					}
 
+					break;
+
+				case DepthFormat:
+					formatGPU = GPUTextureFormat.Depth32Float;
 					break;
 
 				default:
