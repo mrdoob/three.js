@@ -34,6 +34,8 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let camera, scene, renderer, stats, parameters;
 			let mouseX = 0, mouseY = 0;
 
@@ -108,6 +110,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				//

@@ -5,6 +5,7 @@ on:
     paths:
       - 'src/**'
       - 'package.json'
+      - 'utils/build/**'
 
 # This workflow runs in a read-only environment. We can safely checkout
 # the PR code here.
@@ -28,15 +29,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build-module
+        run: npm run build
       - name: === Test tree-shaking ===
         run: npm run test-treeshake
       - name: Read bundle sizes
         id: read-size
         run: |
-          FILESIZE=$(stat --format=%s test/treeshake/three.module.min.js)
-          gzip -k test/treeshake/three.module.min.js
-          FILESIZE_GZIP=$(stat --format=%s test/treeshake/three.module.min.js.gz)
+          FILESIZE=$(stat --format=%s build/three.module.min.js)
+          gzip -k build/three.module.min.js
+          FILESIZE_GZIP=$(stat --format=%s build/three.module.min.js.gz)
           TREESHAKEN=$(stat --format=%s test/treeshake/index.bundle.min.js)
           gzip -k test/treeshake/index.bundle.min.js
           TREESHAKEN_GZIP=$(stat --format=%s test/treeshake/index.bundle.min.js.gz)

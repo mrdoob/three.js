@@ -77,20 +77,17 @@ scene.add( line );
 				그 다음, 아래와 같은 패턴으로 무작위로 선에 점을 생성해 줄 것입니다:
 			</p>
 			<code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+	positionAttribute.setXYZ( i, x, y, z );
 
-    x += ( Math.random() - 0.5 ) * 30;
-    y += ( Math.random() - 0.5 ) * 30;
-    z += ( Math.random() - 0.5 ) * 30;
+	x += ( Math.random() - 0.5 ) * 30;
+	y += ( Math.random() - 0.5 ) * 30;
+	z += ( Math.random() - 0.5 ) * 30;
 
 }
 			</code>
@@ -104,7 +101,7 @@ line.geometry.setDrawRange( 0, newValue );
 				첫 렌더링 이후에 position 데이터 수치를 변경하고 싶다면, needsUpdate 플래그를 다음과 같이 설정해야 합니다:
 			</p>
 			<code>
-line.geometry.attributes.position.needsUpdate = true; // required after the first render
+positionAttribute.needsUpdate = true; // required after the first render
 			</code>
 
 			<p>

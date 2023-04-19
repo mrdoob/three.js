@@ -53,6 +53,8 @@
 			import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 			import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let mesh, camera, scene, renderer, effect;
 			let helper;
 
@@ -105,6 +107,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				effect = new OutlineEffect( renderer );

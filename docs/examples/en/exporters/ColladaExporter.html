@@ -55,6 +55,7 @@
 		[page:Object input] — Object3D to be exported<br />
 		[page:Function onCompleted] — Will be called when the export completes. Optional. The same data is immediately returned from the function.<br />
 		[page:Options options] — Export options<br />
+		</p>
 		<ul>
 			<li>version - string. Which version of Collada to export. The options are "1.4.1" or "1.5.0". Defaults to "1.4.1".</li>
 			<li>author - string. The name to include in the author field. Author field is excluded by default.</li>
@@ -63,7 +64,6 @@
 			<li>unitName - string. Name of the unit. Can be any string, but could be for example "meter", "inch", or "parsec".</li>
 			<li>unitMeter - number. Length of the unit in meters.</li>
 		</ul>
-		</p>
 		<p>
 		Generates an object with Collada file and texture data. This object is returned from the function and passed into the "onCompleted" callback.
 		<code>

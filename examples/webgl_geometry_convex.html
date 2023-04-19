@@ -75,6 +75,7 @@
 
 				const loader = new THREE.TextureLoader();
 				const texture = loader.load( 'textures/sprites/disc.png' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				group = new THREE.Group();
 				scene.add( group );

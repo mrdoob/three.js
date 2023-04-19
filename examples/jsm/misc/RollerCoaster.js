@@ -1,8 +1,10 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	Color,
 	Quaternion,
 	Raycaster,
+	SRGBColorSpace,
 	Vector3
 } from 'three';
 
@@ -513,6 +515,8 @@ class TreesGeometry extends BufferGeometry {
 		const raycaster = new Raycaster();
 		raycaster.ray.direction.set( 0, - 1, 0 );
 
+		const _color = new Color();
+
 		for ( let i = 0; i < 2000; i ++ ) {
 
 			const x = Math.random() * 500 - 250;
@@ -544,7 +548,9 @@ class TreesGeometry extends BufferGeometry {
 
 			for ( let j = 0; j < 6; j ++ ) {
 
-				colors.push( 0.2 + random, 0.4 + random, 0 );
+				_color.setRGB( 0.2 + random, 0.4 + random, 0, SRGBColorSpace );
+
+				colors.push( _color.r, _color.g, _color.b );
 
 			}
 

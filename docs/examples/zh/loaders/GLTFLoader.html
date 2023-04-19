@@ -141,7 +141,7 @@
 		颜色空间并显示在屏幕上。除非你需要使用线性颜色空间进行后期处理，否则请在使用glTF的时候将[page:WebGLRenderer]进行如下配置：</p>
 
 		<code>
-		renderer.outputEncoding = THREE.sRGBEncoding;
+		renderer.outputColorSpace = THREE.SRGBColorSpace;
 		</code>
 
 		<p>假设渲染器的配置如上所示，则GLTFLoader将可以正确地自动配置从.gltf或.glb文件中引用的纹理。
@@ -149,7 +149,7 @@
 
 		<code>
 		// If texture is used for color information, set colorspace.
-		texture.encoding = THREE.sRGBEncoding;
+		texture.colorSpace = THREE.SRGBColorSpace;
 
 		// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
 		texture.flipY = false;

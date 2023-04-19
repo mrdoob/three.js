@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { range, texture, mix, uv, color, positionWorld, timerLocal, attribute, SpriteNodeMaterial } from 'three/nodes';
+			import { range, texture, mix, uv, color, positionLocal, timerLocal, attribute, SpriteNodeMaterial } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -76,13 +76,13 @@
 
 				const life = lifeTime.div( lifeRange );
 
-				const fakeLightEffect = positionWorld.y.invert().max( 0.2 );
+				const fakeLightEffect = positionLocal.y.oneMinus().max( 0.2 );
 
 				const textureNode = texture( map, uv().rotateUV( timer.mul( rotateRange ) ) );
 
-				const opacityNode = textureNode.a.mul( life.invert() );
+				const opacityNode = textureNode.a.mul( life.oneMinus() );
 
-				const smokeColor = mix( color( 0x2c1501 ), color( 0x222222 ), positionWorld.y.mul( 3 ).clamp() );
+				const smokeColor = mix( color( 0x2c1501 ), color( 0x222222 ), positionLocal.y.mul( 3 ).clamp() );
 
 				// create particles
 

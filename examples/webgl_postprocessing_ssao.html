@@ -39,6 +39,8 @@
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 			import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container, stats;
 			let camera, scene, renderer;
 			let composer;

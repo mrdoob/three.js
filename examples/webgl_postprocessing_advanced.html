@@ -53,6 +53,8 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container, stats;
 
 			let composerScene, composer1, composer2, composer3, composer4;
@@ -105,7 +107,7 @@
 				//
 
 				const diffuseMap = new THREE.TextureLoader().load( 'textures/cube/SwedishRoyalCastle/pz.jpg' );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const materialColor = new THREE.MeshBasicMaterial( {
 					map: diffuseMap,
@@ -295,7 +297,7 @@
 			function createMesh( geometry, scene, scale ) {
 
 				const diffuseMap = new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const mat2 = new THREE.MeshPhongMaterial( {
 

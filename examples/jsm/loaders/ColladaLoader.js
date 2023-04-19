@@ -36,7 +36,7 @@ import {
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack,
-	sRGBEncoding
+	SRGBColorSpace
 } from 'three';
 import { TGALoader } from '../loaders/TGALoader.js';
 
@@ -962,7 +962,7 @@ class ColladaLoader extends Loader {
 
 			let i, j, l;
 
-			// procces skin data for each vertex
+			// process skin data for each vertex
 
 			for ( i = 0, l = vcount.length; i < l; i ++ ) {
 
@@ -1579,7 +1579,7 @@ class ColladaLoader extends Loader {
 
 			material.name = data.name || '';
 
-			function getTexture( textureObject, encoding = null ) {
+			function getTexture( textureObject, colorSpace = null ) {
 
 				const sampler = effect.profile.samplers[ textureObject.id ];
 				let image = null;
@@ -1627,9 +1627,9 @@ class ColladaLoader extends Loader {
 
 						}
 
-						if ( encoding !== null ) {
+						if ( colorSpace !== null ) {
 
-							texture.encoding = encoding;
+							texture.colorSpace = colorSpace;
 
 						}
 
@@ -1663,7 +1663,7 @@ class ColladaLoader extends Loader {
 
 					case 'diffuse':
 						if ( parameter.color ) material.color.fromArray( parameter.color );
-						if ( parameter.texture ) material.map = getTexture( parameter.texture, sRGBEncoding );
+						if ( parameter.texture ) material.map = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 					case 'specular':
 						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
@@ -1673,14 +1673,14 @@ class ColladaLoader extends Loader {
 						if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
 						break;
 					case 'ambient':
-						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, sRGBEncoding );
+						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
 						break;
 					case 'emission':
 						if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
-						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, sRGBEncoding );
+						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 
 				}

@@ -37,6 +37,8 @@
 		import { SubsurfaceScatteringShader } from 'three/addons/shaders/SubsurfaceScatteringShader.js';
 		import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
+		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 		let container, stats;
 		let camera, scene, renderer;
 		let model;
@@ -80,7 +82,6 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
-			renderer.outputEncoding = THREE.sRGBEncoding;
 
 			//
 

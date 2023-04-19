@@ -29,7 +29,7 @@
 			import * as THREE from 'three';
 			import * as Nodes from 'three/nodes';
 
-			import { attribute, positionLocal, normalLocal, normalWorld, normalView, color, texture, ShaderNode, func, uv, vec3, triplanarTexture, viewportBottomLeft, js, string, global, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
+			import { attribute, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, ShaderNode, func, uv, vec3, triplanarTexture, viewportBottomLeft, js, string, global, MeshBasicNodeMaterial, NodeObjectLoader } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -92,6 +92,11 @@
 				// PositionLocal
 				material = new MeshBasicNodeMaterial();
 				material.colorNode = positionLocal;
+				materials.push( material );
+
+				// PositionWorld
+				material = new MeshBasicNodeMaterial();
+				material.colorNode = positionWorld;
 				materials.push( material );
 
 				// NormalLocal

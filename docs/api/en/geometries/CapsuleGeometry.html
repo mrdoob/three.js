@@ -12,11 +12,14 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			[name] is a geometry class for a capsule with given radii and height.
-			It is constructed using a lathe.
+			[name] is a geometry class for a capsule with given radii and height. It
+			is constructed using a lathe.
 		</p>
 
-		<iframe id="scene" src="scenes/geometry-browser.html#CapsuleGeometry"></iframe>
+		<iframe
+			id="scene"
+			src="scenes/geometry-browser.html#CapsuleGeometry"
+		></iframe>
 
 		<script>
 
@@ -36,21 +39,24 @@
 
 		<h2>Code Example</h2>
 
-		<code>const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8 );
-		const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-		const capsule = new THREE.Mesh( geometry, material );
-		scene.add( capsule );
+		<code>
+const geometry = new THREE.CapsuleGeometry( 1, 1, 4, 8 ); 
+const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} ); 
+const capsule = new THREE.Mesh( geometry, material ); scene.add( capsule );
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]([param:Float radius], [param:Float length], [param:Integer capSubdivisions], [param:Integer radialSegments])</h3>
+		<h3>
+			[name]([param:Float radius], [param:Float length], [param:Integer capSubdivisions], [param:Integer radialSegments])
+		</h3>
 		<p>
-
-		radius — Radius of the capsule. Optional; defaults to 1.<br />
-		length — Length of the middle section. Optional; defaults to 1.<br />
-		capSegments — Number of curve segments used to build the caps. Optional; defaults to 4.<br />
-		radialSegments — Number of segmented faces around the circumference of the capsule. Optional; defaults to 8.<br />
+			radius — Radius of the capsule. Optional; defaults to 1.<br />
+			length — Length of the middle section. Optional; defaults to 1.<br />
+			capSegments — Number of curve segments used to build the caps. Optional;
+			defaults to 4.<br />
+			radialSegments — Number of segmented faces around the circumference of the
+			capsule. Optional; defaults to 8.<br />
 		</p>
 
 		<h2>Properties</h2>
@@ -58,7 +64,8 @@
 
 		<h3>[property:Object parameters]</h3>
 		<p>
-		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+			An object with a property for each of the constructor parameters. Any
+			modification after instantiation does not change the geometry.
 		</p>
 
 		<h2>Methods</h2>

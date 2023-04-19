@@ -42,6 +42,8 @@
 		import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
 		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
+		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 		let scene, camera, renderer;
 
 		const startButton = document.getElementById( 'startButton' );
@@ -154,7 +156,6 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 

@@ -31,7 +31,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, mix, cubeTexture, reference, positionWorld, normalWorld, modelWorldMatrix, reflectVector, toneMapping } from 'three/nodes';
+			import { uniform, mix, cubeTexture, reference, positionLocal, positionWorld, normalWorld, positionWorldDirection, reflectVector, toneMapping } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -105,11 +105,11 @@
 				const rotateY1Matrix = new THREE.Matrix4();
 				const rotateY2Matrix = new THREE.Matrix4();
 
-				const getEnvironmentNode = ( reflectNode ) => {
+				const getEnvironmentNode = ( reflectNode, positionNode ) => {
 
 					const custom1UV = reflectNode.xyz.mul( uniform( rotateY1Matrix ) );
 					const custom2UV = reflectNode.xyz.mul( uniform( rotateY2Matrix ) );
-					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), positionWorld.y.add( mixNode ).clamp() );
+					const mixCubeMaps = mix( cubeTexture( cube1Texture, custom1UV ), cubeTexture( cube2Texture, custom2UV ), positionNode.y.add( mixNode ).clamp() );
 
 					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
 
@@ -121,9 +121,9 @@
 
 				const blurNode = uniform( 0 );
 
-				scene.environmentNode = getEnvironmentNode( reflectVector );
+				scene.environmentNode = getEnvironmentNode( reflectVector, positionWorld );
 
-				scene.backgroundNode = getEnvironmentNode( positionWorld.transformDirection( modelWorldMatrix ) ).context( {
+				scene.backgroundNode = getEnvironmentNode( positionWorldDirection, positionLocal ).context( {
 					getSamplerLevelNode: () => blurNode
 				} );
 
@@ -153,7 +153,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 

@@ -34,8 +34,6 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			THREE.ColorManagement.enabled = true;
-
 			let container, camera, scene, renderer, mesh;
 
 			init();
@@ -72,7 +70,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.useLegacyLights = false;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setAnimationLoop( function () {
 
 					renderer.render( scene, camera );

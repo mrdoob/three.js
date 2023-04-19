@@ -64,7 +64,7 @@ function main() {
     controls.update();
   }
 
-  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = true;
 
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);

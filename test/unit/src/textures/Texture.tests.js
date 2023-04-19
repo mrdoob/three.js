@@ -179,7 +179,7 @@ export default QUnit.module( 'Textures', () => {
 
 		} );
 
-		QUnit.todo( 'encoding', ( assert ) => {
+		QUnit.todo( 'colorSpace', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );
 

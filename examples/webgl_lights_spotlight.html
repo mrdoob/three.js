@@ -34,6 +34,8 @@
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let renderer, scene, camera;
 
 			let spotLight, lightHelper;
@@ -50,7 +52,6 @@
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
@@ -84,7 +85,7 @@
 					const texture = loader.load( filename );
 					texture.minFilter = THREE.LinearFilter;
 					texture.magFilter = THREE.LinearFilter;
-					texture.encoding = THREE.sRGBEncoding;
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					textures[ filename ] = texture;
 

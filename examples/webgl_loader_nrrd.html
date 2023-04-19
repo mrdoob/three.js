@@ -38,6 +38,8 @@
 			import { NRRDLoader } from 'three/addons/loaders/NRRDLoader.js';
 			import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let container,
 				stats,
 				camera,
@@ -155,6 +157,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );

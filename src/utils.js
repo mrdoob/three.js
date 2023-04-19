@@ -68,16 +68,16 @@ function createElementNS( name ) {
 
 }
 
-function deepClone( value ) {
+const _cache = {};
 
-	if ( typeof structuredClone === 'function' ) {
+function warnOnce( message ) {
 
-		return structuredClone( value );
+	if ( message in _cache ) return;
 
-	}
+	_cache[ message ] = true;
 
-	return JSON.parse( JSON.stringify( value ) );
+	console.warn( message );
 
 }
 
-export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, deepClone };
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, warnOnce };

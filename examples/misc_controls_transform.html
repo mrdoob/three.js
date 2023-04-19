@@ -66,6 +66,7 @@
 				scene.add( light );
 
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif', render );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 				const geometry = new THREE.BoxGeometry( 200, 200, 200 );

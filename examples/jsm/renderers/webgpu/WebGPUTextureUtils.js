@@ -82,10 +82,12 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		this.pipelines = {};
 
 		this.mipmapVertexShaderModule = device.createShaderModule( {
+			label: 'mipmapVertex',
 			code: mipmapVertexSource
 		} );
 
 		this.mipmapFragmentShaderModule = device.createShaderModule( {
+			label: 'mipmapFragment',
 			code: mipmapFragmentSource
 		} );
 

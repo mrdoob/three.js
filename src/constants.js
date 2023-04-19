@@ -1,4 +1,5 @@
-export const REVISION = '151dev';
+export const REVISION = '152dev';
+
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export const CullFaceNone = 0;
@@ -139,7 +140,9 @@ export const AdditiveAnimationBlendMode = 2501;
 export const TrianglesDrawMode = 0;
 export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
+/** @deprecated Use LinearSRGBColorSpace or NoColorSpace in three.js r152+. */
 export const LinearEncoding = 3000;
+/** @deprecated Use SRGBColorSpace in three.js r152+. */
 export const sRGBEncoding = 3001;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;

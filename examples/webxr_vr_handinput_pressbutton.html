@@ -38,6 +38,8 @@
 
 		import { World, System, Component, TagComponent, Types } from 'three/addons/libs/ecsy.module.js';
 
+		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 		class Object3D extends Component { }
 
 		Object3D.schema = {
@@ -378,7 +380,6 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.shadowMap.enabled = true;
 			renderer.xr.enabled = true;
 			renderer.xr.cameraAutoUpdate = false;

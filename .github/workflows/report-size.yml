@@ -65,21 +65,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm run build-module
+        run: npm run build
       - name: === Test tree-shaking ===
         run: npm run test-treeshake
       - name: Read sizes
         id: read-size
         run: |
-          FILESIZE_BASE=$(stat --format=%s test/treeshake/three.module.min.js)
+          FILESIZE_BASE=$(stat --format=%s build/three.module.min.js)
+          gzip -k build/three.module.min.js
+          FILESIZE_BASE_GZIP=$(stat --format=%s build/three.module.min.js.gz)
           TREESHAKEN_BASE=$(stat --format=%s test/treeshake/index.bundle.min.js)
+          gzip -k test/treeshake/index.bundle.min.js
+          TREESHAKEN_BASE_GZIP=$(stat --format=%s test/treeshake/index.bundle.min.js.gz)
 
           # log to console
           echo "FILESIZE_BASE=$FILESIZE_BASE"
+          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP"
           echo "TREESHAKEN_BASE=$TREESHAKEN_BASE"
+          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP"
 
           echo "FILESIZE_BASE=$FILESIZE_BASE" >> $GITHUB_OUTPUT
+          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP" >> $GITHUB_OUTPUT
           echo "TREESHAKEN_BASE=$TREESHAKEN_BASE" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP" >> $GITHUB_OUTPUT
 
       - name: Format sizes
         id: format
@@ -89,22 +97,32 @@ jobs:
           FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize }}
           FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip }}
           FILESIZE_BASE: ${{ steps.read-size.outputs.FILESIZE_BASE }}
+          FILESIZE_BASE_GZIP: ${{ steps.read-size.outputs.FILESIZE_BASE_GZIP }}
           TREESHAKEN: ${{ fromJSON(steps.download-artifact.outputs.result).treeshaken }}
           TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip }}
           TREESHAKEN_BASE: ${{ steps.read-size.outputs.TREESHAKEN_BASE }}
+          TREESHAKEN_BASE_GZIP: ${{ steps.read-size.outputs.TREESHAKEN_BASE_GZIP }}
         run: |
           FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE")
           FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_GZIP")
+          FILESIZE_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_BASE")
+          FILESIZE_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$FILESIZE_BASE_GZIP")
           FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$FILESIZE" "$FILESIZE_BASE")
           TREESHAKEN_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN")
           TREESHAKEN_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_GZIP")
+          TREESHAKEN_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_BASE")
+          TREESHAKEN_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$TREESHAKEN_BASE_GZIP")
           TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$TREESHAKEN" "$TREESHAKEN_BASE")
 
           echo "FILESIZE=$FILESIZE_FORM" >> $GITHUB_OUTPUT
           echo "FILESIZE_GZIP=$FILESIZE_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "FILESIZE_BASE=$FILESIZE_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "FILESIZE_BASE_GZIP=$FILESIZE_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
           echo "FILESIZE_DIFF=$FILESIZE_DIFF" >> $GITHUB_OUTPUT
           echo "TREESHAKEN=$TREESHAKEN_FORM" >> $GITHUB_OUTPUT
           echo "TREESHAKEN_GZIP=$TREESHAKEN_GZIP_FORM" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_BASE=$TREESHAKEN_BASE_FORM" >> $GITHUB_OUTPUT
+          echo "TREESHAKEN_BASE_GZIP=$TREESHAKEN_BASE_GZIP_FORM" >> $GITHUB_OUTPUT
           echo "TREESHAKEN_DIFF=$TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
 
       - name: Find existing comment
@@ -115,7 +133,7 @@ jobs:
           comment-author: 'github-actions[bot]'
           body-includes: Bundle size
       - name: Comment on PR
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@v3
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
@@ -125,14 +143,14 @@ jobs:
 
             _Full ESM build, minified and gzipped._
 
-            | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
+            | Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
             |----------|---------|------|
-            | ${{ steps.format.outputs.FILESIZE }} | ${{ steps.format.outputs.FILESIZE_GZIP }} | ${{ steps.format.outputs.FILESIZE_DIFF }} |
+            | ${{ steps.format.outputs.FILESIZE_BASE }} (${{ steps.format.outputs.FILESIZE_BASE_GZIP }}) | ${{ steps.format.outputs.FILESIZE }} (${{ steps.format.outputs.FILESIZE_GZIP }}) | ${{ steps.format.outputs.FILESIZE_DIFF }} |
 
             ### 🌳 Bundle size after tree-shaking
 
             _Minimal build including a renderer, camera, empty scene, and dependencies._
 
-            | Filesize | Gzipped | Diff from `${{ github.ref_name }}` |
+            | Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
             |----------|---------|------|
-            | ${{ steps.format.outputs.TREESHAKEN }} | ${{ steps.format.outputs.TREESHAKEN_GZIP }} | ${{ steps.format.outputs.TREESHAKEN_DIFF }} |
+            | ${{ steps.format.outputs.TREESHAKEN_BASE }} (${{ steps.format.outputs.TREESHAKEN_BASE_GZIP }}) | ${{ steps.format.outputs.TREESHAKEN }} (${{ steps.format.outputs.TREESHAKEN_GZIP }}) | ${{ steps.format.outputs.TREESHAKEN_DIFF }} |

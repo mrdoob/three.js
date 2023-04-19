@@ -14,7 +14,7 @@
 
 		<h2>构造函数</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
 		<h2>代码示例</h2>
 
@@ -69,6 +69,11 @@
 		即UV坐标将被用于纹理映射。<br />
 
 		请参阅[page:Textures texture constants]（映射模式常量）来了解其他映射类型。
+		</p>
+
+		<h3>[property:Integer channel]</h3>
+		<p>
+		Lets you select the uv attribute to map the texture to. `0` for `uv` and `1` for `uv2`.
 		</p>
 
 		<h3>[property:number wrapS]</h3>
@@ -141,38 +146,12 @@
 		贴图单次重复中的起始偏移量，分别表示U和V。
 		一般范围是由`0.0`到`1.0`。
 		</p>
-		<p>
-			在此引擎中下列纹理共享`第一套`uv通道。
-			偏移量（以及重复次数）的设置项按照下列纹理进行优先级排列并共享:
-			<ol>
-				<li>color map</li>
-				<li>specular map</li>
-				<li>displacement map</li>
-				<li>normal map</li>
-				<li>bump map</li>
-				<li>roughness map</li>
-				<li>metalness map</li>
-				<li>alpha map</li>
-				<li>emissive map</li>
-				<li>clearcoat map</li>
-				<li>clearcoat normal map</li>
-				<li>clearcoat roughnessMap map</li>
-			</ol>
-		</p>
-		<p>
-			在此引擎中下列纹理类型共享`第二套`uv通道。
-			偏移量（以及重复次数）的设置项按照下列纹理进行优先级排列并共享:
-			<ol>
-				<li>ao map</li>
-				<li>light map</li>
-			</ol>
-		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
 		决定纹理在表面的重复次数，两个方向分别表示U和V，如果重复次数在任何方向上设置了超过1的数值，
 		对应的Wrap需要设置为[page:Textures THREE.RepeatWrapping]或者[page:Textures THREE.MirroredRepeatWrapping]来
-		达到想要的平铺效果。此项设置有和[page:.offset]一样的限制。
+		达到想要的平铺效果。
 		</p>
 
 		<h3>[property:number rotation]</h3>
@@ -230,9 +209,9 @@
 			请参阅[link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]来了解详细信息。
 		</p>
 
-		<h3>[property:number encoding]</h3>
+		<h3>[property:number colorSpace]</h3>
 		<p>
-		默认值为[page:Textures THREE.LinearEncoding]。
+		默认值为[page:Textures THREE.NoColorSpace]。
 		请参阅[page:Textures texture constants]来了解其他格式的详细信息。<br /><br />
 
 		请注意，如果在材质被使用之后，纹理贴图中这个值发生了改变，

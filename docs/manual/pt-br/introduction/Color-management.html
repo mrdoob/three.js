@@ -156,7 +156,7 @@
 	<p>
 		Cores fornecidas ao three.js — de seletores de cores, texturas, modelos 3D e outras fontes —
 		cada um tem um espaço de cor associado. Aqueles que ainda não estão na cor de trabalho Linear-sRGB,
-        devem ser convertidos e as texturas devem receber a atribuição <i>texture.encoding</i> correta.
+        devem ser convertidos e as texturas devem receber a atribuição <i>texture.colorSpace</i> correta.
 		Certas conversões (para cores hexadecimais e CSS em sRGB) podem ser feitas automaticamente se
 		o modo de gerenciamento de cores herdado é desabilitado antes de inicializar as cores:
 	</p>
@@ -177,14 +177,14 @@ THREE.ColorManagement.enabled = true;
 		<li>
 			<b>Texturas de cores:</b> PNG ou JPEG [page:Texture Textures] contendo informações de cores
 			(como .map ou .emissiveMap) usam o espaço de cores sRGB de domínio fechado e devem ser anotados com
-			<i>texture.encoding = sRGBEncoding</i>. Formatos como OpenEXR (às vezes usado para .envMap ou
-			.lightMap) usam o espaço de cores Linear-sRGB indicado com <i>texture.encoding = LinearEncoding</i>,
+			<i>texture.colorSpace = SRGBColorSpace</i>. Formatos como OpenEXR (às vezes usado para .envMap ou
+			.lightMap) usam o espaço de cores Linear-sRGB indicado com <i>texture.colorSpace = LinearSRGBColorSpace</i>,
 			e podem conter valores no domínio aberto [0,∞].
 		</li>
 		<li>
 			<b>Texturas não coloridas:</b> Texturas que não armazenam informações de cores (como .normalMap
 			ou .roughnessMap) não têm um espaço de cores associado e geralmente usam a textura (padrão)
-			como <i>texture.encoding = LinearEncoding</i>. Em casos raros, dados sem cor
+			como <i>texture.colorSpace = NoColorSpace</i>. Em casos raros, dados sem cor
 			podem ser representados com outras codificações não lineares por motivos técnicos.
 		</li>
 	</ul>
@@ -211,11 +211,11 @@ THREE.ColorManagement.enabled = true;
 	<p>
 		A saída para um dispositivo de exibição, imagem ou vídeo pode envolver a conversão do domínio aberto
 		do espaço de cores de trabalho linear-sRGB para outro espaço de cores. Essa conversão pode ser feita em
-		uma passagem de renderização principal ([page:WebGLRenderer.outputEncoding]), ou durante o pós-processamento.
+		uma passagem de renderização principal ([page:WebGLRenderer.outputColorSpace]), ou durante o pós-processamento.
 	</p>
 
 	<code>
-renderer.outputEncoding = THREE.sRGBEncoding; // optional with post-processing
+renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processing
 	</code>
 
 	<ul>

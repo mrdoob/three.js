@@ -26,6 +26,8 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let stats;
 
 			let camera, scene, renderer, clock;
@@ -71,6 +73,7 @@
 				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.autoClearColor = false;
 				container.appendChild( renderer.domElement );
 

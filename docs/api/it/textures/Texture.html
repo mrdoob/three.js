@@ -30,7 +30,7 @@
 
 		<h2>Costruttore</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
 		<h2>Proprietà</h2>
 
@@ -77,6 +77,11 @@
 			dove le coordinate U,V vengono utilizzate per applicare la mappa.<br />
 
 			Vedi la pagina [page:Textures texture constants] per altri tipi di mapping.
+		</p>
+
+		<h3>[property:Integer channel]</h3>
+		<p>
+			Lets you select the uv attribute to map the texture to. `0` for `uv` and `1` for `uv2`.
 		</p>
 
 		<h3>[property:number wrapS]</h3>
@@ -152,32 +157,6 @@
 			Di quanto una singola ripetizione della texture è sfalsata dall'inizio, in ciascuna direzione U e V.
 			L'intervallo tipico è compreso tra `0.0` e `1.0`.
 		</p>
-		<p>
-			I tipi di texture seguenti condividono il `primo` canale uv nel motore. L'impostazione dell'offset (e della ripetizione) viene valutata
-			in base alle seguenti priorità e quindi condivisa da tali texture:
-			<ol>
-				<li>color map</li>
-				<li>specular map</li>
-				<li>displacement map</li>
-				<li>normal map</li>
-				<li>bump map</li>
-				<li>roughness map</li>
-				<li>metalness map</li>
-				<li>alpha map</li>
-				<li>emissive map</li>
-				<li>clearcoat map</li>
-				<li>clearcoat normal map</li>
-				<li>clearcoat roughnessMap map</li>
-			</ol>
-		</p>
-		<p>
-			I tipi di texture seguenti condividono il `secondo` canale uv nel motore. L'impostazione dell'offset (e della ripetizione) viene valutata
-			in base alle seguenti priorità e quindi condivisa da tali texture:
-			<ol>
-				<li>ao map</li>
-				<li>light map</li>
-			</ol>
-		</p>
 
 		<h3>[property:Vector2 repeat]</h3>
 		<p>
@@ -185,7 +164,6 @@
 			impostata su un valore maggiore di 1 in entrambe le direzioni, anche il parametro Wrap corrispondente
 			deve essere impostato su [page:Textures THREE.RepeatWrapping] o [page:Textures THREE.MirroredRepeatWrapping] per ottenere l'effetto
 			di piastrellatura desiderato.
-			L'impostazione di diversi valori di ripetizione per le texture è limitata allo stesso modo di [page:.offset].
 		</p>
 
 		<h3>[property:number rotation]</h3>
@@ -247,9 +225,9 @@
 			Vedi [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei] per maggiori informazioni.
 		</p>
 
-		<h3>[property:number encoding]</h3>
+		<h3>[property:number colorSpace]</h3>
 		<p>
-		[page:Textures THREE.LinearEncoding] è l'impostazione predefinita.
+		[page:Textures THREE.NoColorSpace] è l'impostazione predefinita.
 		Vedi la pagina [page:Textures texture constants] per i dettagli su altri formati.<br /><br />
 
 		Si noti che questo valore viene modificato su una texture dopo che il materiale è stato utilizzato, 
