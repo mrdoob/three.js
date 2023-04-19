@@ -180,31 +180,32 @@
 							legoGroup = LDrawUtils.mergeObject( legoGroup );
 							legoGroup.rotation.x = Math.PI;
 
+							// adjust the materials to use transmission, be a bit shinier
 							legoGroup.traverse( c => {
 
 								if ( c.material ) {
 
 									c.material.roughness *= 0.25;
 
-								}
+									if ( c.material.opacity < 1.0 ) {
 
-								if ( c.material && c.material.opacity < 1.0 ) {
+										const oldMaterial = c.material;
+										const newMaterial = new THREE.MeshPhysicalMaterial();
 
-									const oldMaterial = c.material;
-									const newMaterial = new THREE.MeshPhysicalMaterial();
+										newMaterial.opacity = 1.0;
+										newMaterial.transmission = 1.0;
+										newMaterial.ior = 1.4;
+										newMaterial.roughness = oldMaterial.roughness;
+										newMaterial.metalness = 0.0;
 
-									newMaterial.opacity = 1.0;
-									newMaterial.transmission = 1.0;
-									newMaterial.ior = 1.4;
-									newMaterial.roughness = oldMaterial.roughness;
-									newMaterial.metalness = 0.0;
+										const hsl = {};
+										oldMaterial.color.getHSL( hsl );
+										hsl.l = Math.max( hsl.l, 0.35 );
+										newMaterial.color.setHSL( hsl.h, hsl.s, hsl.l );
 
-									const hsl = {};
-									oldMaterial.color.getHSL( hsl );
-									hsl.l = Math.max( hsl.l, 0.35 );
-									newMaterial.color.setHSL( hsl.h, hsl.s, hsl.l );
+										c.material = newMaterial;
 
-									c.material = newMaterial;
+									}
 
 								}
 
