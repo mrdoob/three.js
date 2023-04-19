@@ -201,19 +201,7 @@ class WebGPURenderer {
 
 		// feature support
 
-		const features = [
-			GPUFeatureName.DepthClipControl,
-			GPUFeatureName.Depth32FloatStencil8,
-			GPUFeatureName.TextureCompressionBC,
-			GPUFeatureName.TextureCompressionETC2,
-			GPUFeatureName.TextureCompressionASTC,
-			GPUFeatureName.TimestampQuery,
-			GPUFeatureName.IndirectFirstInstance,
-			GPUFeatureName.ShaderF16,
-			GPUFeatureName.RG11B10UFloat,
-			GPUFeatureName.BGRA8UNormStorage,
-			GPUFeatureName.Float32Filterable
-		];
+		const features = Object.values( GPUFeatureName );
 
 		const supportedFeatures = [];
 
