@@ -2,7 +2,7 @@ import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } 
 import { VideoTexture, CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping, RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
 	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthTexture,
 	RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format,
-	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format
+	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, UnsignedIntType, UnsignedShortType
 } from 'three';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
@@ -806,7 +806,26 @@ class WebGPUTextures {
 					break;
 
 				case DepthFormat:
-					formatGPU = GPUTextureFormat.Depth32Float;
+
+					switch ( type ) {
+
+						case UnsignedShortType:
+							formatGPU = GPUTextureFormat.Depth16Unorm;
+							break;
+
+						case UnsignedIntType:
+							formatGPU = GPUTextureFormat.Depth24Plus;
+							break;
+
+						case FloatType:
+							formatGPU = GPUTextureFormat.Depth32Float;
+							break;
+
+						default:
+							console.error( 'WebGPURenderer: Unsupported texture type with DepthFormat.', type );
+
+					}
+
 					break;
 
 				default:
