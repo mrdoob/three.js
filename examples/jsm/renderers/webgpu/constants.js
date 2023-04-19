@@ -138,6 +138,10 @@ export const GPUTextureFormat = {
 	Depth24PlusStencil8: 'depth24plus-stencil8',
 	Depth32Float: 'depth32float',
 
+	// 'depth32float-stencil8' extension
+
+	Depth32FloatStencil8: 'depth32float-stencil8',
+
 	// BC compressed formats usable if 'texture-compression-bc' is both
 	// supported by the device/user agent and enabled in requestDevice.
 
@@ -201,14 +205,6 @@ export const GPUTextureFormat = {
 	ASTC12x10UnormSRGB: 'astc-12x10-unorm-srgb',
 	ASTC12x12Unorm: 'astc-12x12-unorm',
 	ASTC12x12UnormSRGB: 'astc-12x12-unorm-srgb',
-
-	// 'depth24unorm-stencil8' extension
-
-	Depth24UnormStencil8: 'depth24unorm-stencil8',
-
-	// 'depth32float-stencil8' extension
-
-	Depth32FloatStencil8: 'depth32float-stencil8',
 
 };
 
