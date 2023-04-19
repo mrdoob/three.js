@@ -29,9 +29,9 @@ function computeMikkTSpaceTangents( geometry, MikkTSpace, negateSign = true ) {
 
 		if ( attribute.normalized || attribute.isInterleavedBufferAttribute ) {
 
-			const dstArray = new Float32Array( attribute.getCount() * attribute.itemSize );
+			const dstArray = new Float32Array( attribute.count * attribute.itemSize );
 
-			for ( let i = 0, j = 0; i < attribute.getCount(); i ++ ) {
+			for ( let i = 0, j = 0; i < attribute.count; i ++ ) {
 
 				dstArray[ j ++ ] = attribute.getX( i );
 				dstArray[ j ++ ] = attribute.getY( i );
