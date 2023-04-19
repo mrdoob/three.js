@@ -75,7 +75,7 @@ class FileLoader extends Loader {
 
 		// create request
 		const req = new Request( url, {
-			headers: new Headers( this.requestHeader ),
+			headers: this.requestHeader,
 			credentials: this.withCredentials ? 'include' : 'same-origin',
 			// An abort controller could be added within a future PR
 		} );
