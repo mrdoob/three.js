@@ -11,6 +11,7 @@ import {
 	Mesh,
 	MeshStandardMaterial,
 	ShaderMaterial,
+	SRGBColorSpace,
 	UniformsLib,
 	UniformsUtils,
 	Vector3,
@@ -38,6 +39,8 @@ const FILE_LOCATION_NOT_FOUND = 6;
 
 const MAIN_COLOUR_CODE = '16';
 const MAIN_EDGE_COLOUR_CODE = '24';
+
+const COLOR_SPACE_LDRAW = SRGBColorSpace;
 
 const _tempVec0 = new Vector3();
 const _tempVec1 = new Vector3();
@@ -2312,37 +2315,37 @@ class LDrawLoader extends Loader {
 
 			case FINISH_TYPE_DEFAULT:
 
-				material = new MeshStandardMaterial( { color: color, roughness: 0.3, metalness: 0 } );
+				material = new MeshStandardMaterial( { roughness: 0.3, metalness: 0 } );
 				break;
 
 			case FINISH_TYPE_PEARLESCENT:
 
 				// Try to imitate pearlescency by making the surface glossy
-				material = new MeshStandardMaterial( { color: color, roughness: 0.3, metalness: 0.25 } );
+				material = new MeshStandardMaterial( { roughness: 0.3, metalness: 0.25 } );
 				break;
 
 			case FINISH_TYPE_CHROME:
 
 				// Mirror finish surface
-				material = new MeshStandardMaterial( { color: color, roughness: 0, metalness: 1 } );
+				material = new MeshStandardMaterial( { roughness: 0, metalness: 1 } );
 				break;
 
 			case FINISH_TYPE_RUBBER:
 
 				// Rubber finish
-				material = new MeshStandardMaterial( { color: color, roughness: 0.9, metalness: 0 } );
+				material = new MeshStandardMaterial( { roughness: 0.9, metalness: 0 } );
 				break;
 
 			case FINISH_TYPE_MATTE_METALLIC:
 
 				// Brushed metal finish
-				material = new MeshStandardMaterial( { color: color, roughness: 0.8, metalness: 0.4 } );
+				material = new MeshStandardMaterial( { roughness: 0.8, metalness: 0.4 } );
 				break;
 
 			case FINISH_TYPE_METAL:
 
 				// Average metal finish
-				material = new MeshStandardMaterial( { color: color, roughness: 0.2, metalness: 0.85 } );
+				material = new MeshStandardMaterial( { roughness: 0.2, metalness: 0.85 } );
 				break;
 
 			default:
@@ -2351,6 +2354,7 @@ class LDrawLoader extends Loader {
 
 		}
 
+		material.color.setStyle( color, COLOR_SPACE_LDRAW );
 		material.transparent = isTransparent;
 		material.premultipliedAlpha = true;
 		material.opacity = alpha;
@@ -2361,7 +2365,7 @@ class LDrawLoader extends Loader {
 
 		if ( luminance !== 0 ) {
 
-			material.emissive.set( material.color ).multiplyScalar( luminance );
+			material.emissive.setStyle( material.color, COLOR_SPACE_LDRAW ).multiplyScalar( luminance );
 
 		}
 
@@ -2369,11 +2373,12 @@ class LDrawLoader extends Loader {
 
 			// This is the material used for edges
 			edgeMaterial = new LineBasicMaterial( {
-				color: edgeColor,
+				color: new Color().setStyle( edgeColor, COLOR_SPACE_LDRAW ),
 				transparent: isTransparent,
 				opacity: alpha,
 				depthWrite: ! isTransparent
 			} );
+			edgeMaterial.color;
 			edgeMaterial.userData.code = code;
 			edgeMaterial.name = name + ' - Edge';
 
@@ -2383,7 +2388,7 @@ class LDrawLoader extends Loader {
 				fog: true,
 				transparent: isTransparent,
 				depthWrite: ! isTransparent,
-				color: edgeColor,
+				color: new Color().setStyle( edgeColor, COLOR_SPACE_LDRAW ),
 				opacity: alpha,
 
 			} );
