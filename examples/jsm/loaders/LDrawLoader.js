@@ -2165,7 +2165,7 @@ class LDrawLoader extends Loader {
 		let code = null;
 
 		// Triangle and line colors
-		let color = 0xFF00FF;
+		let fillColor = 0xFF00FF;
 		let edgeColor = 0xFF00FF;
 
 		// Transparency
@@ -2208,12 +2208,12 @@ class LDrawLoader extends Loader {
 
 					case 'VALUE':
 
-						color = lineParser.getToken();
-						if ( color.startsWith( '0x' ) ) {
+						fillColor = lineParser.getToken();
+						if ( fillColor.startsWith( '0x' ) ) {
 
-							color = '#' + color.substring( 2 );
+							fillColor = '#' + fillColor.substring( 2 );
 
-						} else if ( ! color.startsWith( '#' ) ) {
+						} else if ( ! fillColor.startsWith( '#' ) ) {
 
 							throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
 
@@ -2354,7 +2354,7 @@ class LDrawLoader extends Loader {
 
 		}
 
-		material.color.setStyle( color, COLOR_SPACE_LDRAW );
+		material.color.setStyle( fillColor, COLOR_SPACE_LDRAW );
 		material.transparent = isTransparent;
 		material.premultipliedAlpha = true;
 		material.opacity = alpha;
@@ -2365,7 +2365,7 @@ class LDrawLoader extends Loader {
 
 		if ( luminance !== 0 ) {
 
-			material.emissive.setStyle( material.color, COLOR_SPACE_LDRAW ).multiplyScalar( luminance );
+			material.emissive.setStyle( fillColor, COLOR_SPACE_LDRAW ).multiplyScalar( luminance );
 
 		}
 
