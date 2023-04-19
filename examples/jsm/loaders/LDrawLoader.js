@@ -2165,8 +2165,8 @@ class LDrawLoader extends Loader {
 		let code = null;
 
 		// Triangle and line colors
-		let fillColor = 0xFF00FF;
-		let edgeColor = 0xFF00FF;
+		let fillColor = '#FF00FF';
+		let edgeColor = '#FF00FF';
 
 		// Transparency
 		let alpha = 1;
