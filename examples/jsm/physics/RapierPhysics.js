@@ -43,11 +43,12 @@ async function RapierPhysics( path ) {
 	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
 		const shape = getCollider( mesh.geometry );
-		shape.setMass( mass );
-		shape.setRestitution( restitution );
 
 		if ( shape !== null ) {
 
+			shape.setMass( mass );
+			shape.setRestitution( restitution );
+	
 			if ( mesh.isInstancedMesh ) {
 
 				handleInstancedMesh( mesh, mass, shape );
