@@ -238,6 +238,9 @@ class MaterialLoader extends Loader {
 
 		}
 
+		if ( json.lights !== undefined ) material.lights = json.lights;
+		if ( json.clipping !== undefined ) material.clipping = json.clipping;
+
 		// for PointsMaterial
 
 		if ( json.size !== undefined ) material.size = json.size;
