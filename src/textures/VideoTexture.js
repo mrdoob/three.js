@@ -1,13 +1,6 @@
 import { LinearFilter } from '../constants.js';
 import { Texture } from './Texture.js';
 
-function updateVideo() {
-
-	this.needsUpdate = true;
-	this._callbackHandle = this.image.requestVideoFrameCallback( this._videoFrameCallback );
-
-}
-
 class VideoTexture extends Texture {
 
 	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
@@ -21,7 +14,13 @@ class VideoTexture extends Texture {
 
 		this.generateMipmaps = false;
 
-		this._videoFrameCallback = updateVideo.bind( this );
+		this._videoFrameCallback = () => {
+
+			this.needsUpdate = true;
+			this._callbackHandle = this.image.requestVideoFrameCallback( this._videoFrameCallback );
+
+		};
+
 		this._callbackHandle = null;
 
 		this.image = video;
