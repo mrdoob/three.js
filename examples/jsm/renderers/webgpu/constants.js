@@ -290,6 +290,12 @@ export const GPUTextureViewDimension = {
 	ThreeD: '3d'
 };
 
+export const GPUTextureAspect = {
+	All: 'all',
+	StencilOnly: 'stencil-only',
+	DepthOnly: 'depth-only'
+};
+
 export const GPUInputStepMode = {
 	Vertex: 'vertex',
 	Instance: 'instance'

@@ -1,5 +1,5 @@
 import WebGPUBinding from './WebGPUBinding.js';
-import { GPUBindingType, GPUTextureViewDimension } from './constants.js';
+import { GPUBindingType, GPUTextureViewDimension, GPUTextureAspect } from './constants.js';
 
 class WebGPUSampledTexture extends WebGPUBinding {
 
@@ -15,6 +15,8 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 		this.type = GPUBindingType.SampledTexture;
 		this.visibility = GPUShaderStage.FRAGMENT;
+
+		this.aspect = texture.isDepthTexture ? GPUTextureAspect.DepthOnly : GPUTextureAspect.All;
 
 		this.textureGPU = null; // set by the renderer
 
