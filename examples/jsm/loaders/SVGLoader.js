@@ -9,9 +9,12 @@ import {
 	Shape,
 	ShapePath,
 	ShapeUtils,
+	SRGBColorSpace,
 	Vector2,
 	Vector3
 } from 'three';
+
+const COLOR_SPACE_SVG = SRGBColorSpace;
 
 class SVGLoader extends Loader {
 
@@ -155,7 +158,7 @@ class SVGLoader extends Loader {
 
 				if ( style.fill !== undefined && style.fill !== 'none' ) {
 
-					path.color.setStyle( style.fill );
+					path.color.setStyle( style.fill, COLOR_SPACE_SVG );
 
 				}
 
