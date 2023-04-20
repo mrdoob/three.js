@@ -18,7 +18,6 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
-	ColorManagement,
 	DoubleSide,
 	EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping,
