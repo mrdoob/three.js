@@ -140,43 +140,56 @@ async function RapierPhysics( path ) {
 
 	//
 
+	let lastTime = 0;
+
 	function step() {
 
-		world.step();
+		const time = performance.now();
 
-		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+		if ( lastTime > 0 ) {
 
-			const mesh = meshes[ i ];
+			const delta = ( time - lastTime ) / 1000;
 
-			if ( mesh.isInstancedMesh ) {
+			world.timestep = delta;
+			world.step();
 
-				const array = mesh.instanceMatrix.array;
-				const bodies = meshMap.get( mesh );
+			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
-				for ( let j = 0; j < bodies.length; j ++ ) {
+				const mesh = meshes[ i ];
 
-					const body = bodies[ j ];
+				if ( mesh.isInstancedMesh ) {
 
-					const position = body.translation();
-					const quaternion = body.rotation();
+					const array = mesh.instanceMatrix.array;
+					const bodies = meshMap.get( mesh );
 
-					compose( position, quaternion, array, j * 16 );
+					for ( let j = 0; j < bodies.length; j ++ ) {
+
+						const body = bodies[ j ];
+
+						const position = body.translation();
+						const quaternion = body.rotation();
+
+						compose( position, quaternion, array, j * 16 );
+
+					}
+
+					mesh.instanceMatrix.needsUpdate = true;
+					mesh.computeBoundingSphere();
+
+				} else if ( mesh.isMesh ) {
+
+					const body = meshMap.get( mesh );
+
+					mesh.position.copy( body.translation() );
+					mesh.quaternion.copy( body.rotation() );
 
 				}
-
-				mesh.instanceMatrix.needsUpdate = true;
-				mesh.computeBoundingSphere();
-
-			} else if ( mesh.isMesh ) {
-
-				const body = meshMap.get( mesh );
-
-				mesh.position.copy( body.translation() );
-				mesh.quaternion.copy( body.rotation() );
 
 			}
 
 		}
+
+		lastTime = time;
 
 	}
 
