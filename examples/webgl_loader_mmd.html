@@ -52,8 +52,6 @@
 			import { MMDLoader } from 'three/addons/loaders/MMDLoader.js';
 			import { MMDAnimationHelper } from 'three/addons/animation/MMDAnimationHelper.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let stats;
 
 			let mesh, camera, scene, renderer, effect;
@@ -88,10 +86,10 @@
 				gridHelper.position.y = - 10;
 				scene.add( gridHelper );
 
-				const ambient = new THREE.AmbientLight( 0x666666 );
+				const ambient = new THREE.AmbientLight( 0x666666, 3 );
 				scene.add( ambient );
 
-				const directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0x887766, 3 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
@@ -100,7 +98,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				effect = new OutlineEffect( renderer );
