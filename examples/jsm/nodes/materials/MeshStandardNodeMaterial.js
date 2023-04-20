@@ -71,7 +71,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// DIFFUSE COLOR
 
-		stack.assign( diffuseColor, vec4( diffuseColor.rgb.mul( metalnessNode.invert() ), diffuseColor.a ) );
+		stack.assign( diffuseColor, vec4( diffuseColor.rgb.mul( metalnessNode.oneMinus() ), diffuseColor.a ) );
 
 	}
 

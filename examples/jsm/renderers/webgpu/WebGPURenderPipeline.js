@@ -24,10 +24,9 @@ class WebGPURenderPipeline {
 
 	}
 
-	init( cacheKey, stageVertex, stageFragment, object, nodeBuilder ) {
+	init( cacheKey, stageVertex, stageFragment, renderObject, nodeBuilder ) {
 
-		const material = object.material;
-		const geometry = object.geometry;
+		const { object, material, geometry } = renderObject;
 
 		// determine shader attributes
 
@@ -85,7 +84,7 @@ class WebGPURenderPipeline {
 
 		//
 
-		const primitiveState = this._getPrimitiveState( object, material );
+		const primitiveState = this._getPrimitiveState( object, geometry, material );
 		const colorWriteMask = this._getColorWriteMask( material );
 		const depthCompare = this._getDepthCompare( material );
 		const colorFormat = this._utils.getCurrentColorFormat();
@@ -426,15 +425,14 @@ class WebGPURenderPipeline {
 
 	}
 
-	_getPrimitiveState( object, material ) {
+	_getPrimitiveState( object, geometry, material ) {
 
 		const descriptor = {};
 
-		descriptor.topology = this._utils.getPrimitiveTopology( object );
+		descriptor.topology = this._utils.getPrimitiveTopology( object, material );
 
 		if ( object.isLine === true && object.isLineSegments !== true ) {
 
-			const geometry = object.geometry;
 			const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
 			descriptor.stripIndexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
 

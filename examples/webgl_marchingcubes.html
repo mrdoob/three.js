@@ -39,6 +39,8 @@
 		import { MarchingCubes } from 'three/addons/objects/MarchingCubes.js';
 		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from 'three/addons/shaders/ToonShader.js';
 
+		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 		let container, stats;
 
 		let camera, scene, renderer;
@@ -106,7 +108,6 @@
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );

@@ -18,25 +18,16 @@
 
 		<code>
 		// Adding events to a custom object
-
 		class Car extends EventDispatcher {
-
 			start() {
-
 				this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
-
 			}
-
 		};
 
 		// Using events with the custom object
-
 		const car = new Car();
-
 		car.addEventListener( 'start', function ( event ) {
-
 			alert( event.message );
-
 		} );
 
 		car.start();
@@ -45,48 +36,34 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]()</h3>
-		<p>
-		Creates EventDispatcher object.
-		</p>
-
+		<p>Creates EventDispatcher object.</p>
 
 		<h2>Methods</h2>
 
 		<h3>[method:undefined addEventListener]( [param:String type], [param:Function listener] )</h3>
 		<p>
-		type - The type of event to listen to.<br />
-		listener - The function that gets called when the event is fired.
+			type - The type of event to listen to.<br />
+			listener - The function that gets called when the event is fired.
 		</p>
-		<p>
-		Adds a listener to an event type.
-		</p>
+		<p>Adds a listener to an event type.</p>
 
 		<h3>[method:Boolean hasEventListener]( [param:String type], [param:Function listener] )</h3>
 		<p>
-		type - The type of event to listen to.<br />
-		listener - The function that gets called when the event is fired.
+			type - The type of event to listen to.<br />
+			listener - The function that gets called when the event is fired.
 		</p>
-		<p>
-		Checks if listener is added to an event type.
-		</p>
+		<p>Checks if listener is added to an event type.</p>
 
 		<h3>[method:undefined removeEventListener]( [param:String type], [param:Function listener] )</h3>
 		<p>
-		type - The type of the listener that gets removed.<br />
-		listener - The listener function that gets removed.
+			type - The type of the listener that gets removed.<br />
+			listener - The listener function that gets removed.
 		</p>
-		<p>
-		Removes a listener from an event type.
-		</p>
+		<p>Removes a listener from an event type.</p>
 
 		<h3>[method:undefined dispatchEvent]( [param:Object event] )</h3>
-		<p>
-		event - The event that gets fired.
-		</p>
-		<p>
-		Fire an event type.
-		</p>
-
+		<p>event - The event that gets fired.</p>
+		<p>Fire an event type.</p>
 
 		<h2>Source</h2>
 

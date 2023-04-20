@@ -82,12 +82,14 @@
 			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_PVR2bpp.ktx' )
 			} );
+			material1.map.colorSpace = THREE.SRGBColorSpace;
 			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_PVR4bpp.ktx' ),
 				depthTest: false,
 				transparent: true,
 				side: THREE.DoubleSide
 			} );
+			material2.map.colorSpace = THREE.SRGBColorSpace;
 
 			meshes.push( new THREE.Mesh( geometry, material1 ) );
 			meshes.push( new THREE.Mesh( geometry, material2 ) );
@@ -99,12 +101,14 @@
 			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_BC1.ktx' )
 			} );
+			material1.map.colorSpace = THREE.SRGBColorSpace;
 			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_BC3.ktx' ),
 				depthTest: false,
 				transparent: true,
 				side: THREE.DoubleSide
 			} );
+			material2.map.colorSpace = THREE.SRGBColorSpace;
 
 			meshes.push( new THREE.Mesh( geometry, material1 ) );
 			meshes.push( new THREE.Mesh( geometry, material2 ) );
@@ -126,12 +130,14 @@
 			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_ASTC4x4.ktx' )
 			} );
+			material1.map.colorSpace = THREE.SRGBColorSpace;
 			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_ASTC8x8.ktx' ),
 				depthTest: false,
 				transparent: true,
 				side: THREE.DoubleSide
 			} );
+			material2.map.colorSpace = THREE.SRGBColorSpace;
 
 			meshes.push( new THREE.Mesh( geometry, material1 ) );
 			meshes.push( new THREE.Mesh( geometry, material2 ) );

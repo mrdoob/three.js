@@ -159,6 +159,7 @@
 				const map = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
+				map.colorSpace = THREE.SRGBColorSpace;
 
 				function getSurfacePoint( u, v, target ) {
 

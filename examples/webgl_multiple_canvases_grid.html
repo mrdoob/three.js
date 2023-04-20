@@ -82,6 +82,8 @@
 
 			import * as THREE from 'three';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			const views = [];
 
 			let scene, renderer;
@@ -246,6 +248,7 @@
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( 300, 200 );
 

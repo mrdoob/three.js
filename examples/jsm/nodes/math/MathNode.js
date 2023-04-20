@@ -104,7 +104,7 @@ class MathNode extends TempNode {
 
 			return builder.format( '-' + a.build( builder, inputType ), type, output );
 
-		} else if ( method === MathNode.INVERT ) {
+		} else if ( method === MathNode.ONE_MINUS ) {
 
 			return sub( 1.0, a ).build( builder, output );
 
@@ -213,7 +213,7 @@ MathNode.ABS = 'abs';
 MathNode.SIGN = 'sign';
 MathNode.LENGTH = 'length';
 MathNode.NEGATE = 'negate';
-MathNode.INVERT = 'invert';
+MathNode.ONE_MINUS = 'oneMinus';
 MathNode.DFDX = 'dFdx';
 MathNode.DFDY = 'dFdy';
 MathNode.ROUND = 'round';
@@ -269,7 +269,7 @@ export const abs = nodeProxy( MathNode, MathNode.ABS );
 export const sign = nodeProxy( MathNode, MathNode.SIGN );
 export const length = nodeProxy( MathNode, MathNode.LENGTH );
 export const negate = nodeProxy( MathNode, MathNode.NEGATE );
-export const invert = nodeProxy( MathNode, MathNode.INVERT );
+export const oneMinus = nodeProxy( MathNode, MathNode.ONE_MINUS );
 export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
 export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
 export const round = nodeProxy( MathNode, MathNode.ROUND );
@@ -323,7 +323,7 @@ addNodeElement( 'abs', abs );
 addNodeElement( 'sign', sign );
 addNodeElement( 'length', length );
 addNodeElement( 'negate', negate );
-addNodeElement( 'invert', invert );
+addNodeElement( 'oneMinus', oneMinus );
 addNodeElement( 'dFdx', dFdx );
 addNodeElement( 'dFdy', dFdy );
 addNodeElement( 'round', round );

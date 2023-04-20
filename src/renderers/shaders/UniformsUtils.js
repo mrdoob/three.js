@@ -1,4 +1,4 @@
-import { sRGBEncoding, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { LinearSRGBColorSpace } from '../../constants.js';
 
 /**
  * Uniform Utilities
@@ -89,7 +89,7 @@ export function getUnlitUniformColorSpace( renderer ) {
 	if ( renderer.getRenderTarget() === null ) {
 
 		// https://github.com/mrdoob/three.js/pull/23937#issuecomment-1111067398
-		return renderer.outputEncoding === sRGBEncoding ? SRGBColorSpace : LinearSRGBColorSpace;
+		return renderer.outputColorSpace;
 
 	}
 

@@ -32,7 +32,7 @@ class WebGPUComputePipelines {
 
 			// get shader
 
-			const nodeBuilder = this.nodes.get( computeNode );
+			const nodeBuilder = this.nodes.getForCompute( computeNode );
 			const computeShader = nodeBuilder.computeShader;
 
 			const shader = {

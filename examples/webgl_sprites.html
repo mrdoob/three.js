@@ -29,6 +29,8 @@
 
 			import * as THREE from 'three';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let camera, scene, renderer;
 			let cameraOrtho, sceneOrtho;
 
@@ -111,6 +113,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
 
 				document.body.appendChild( renderer.domElement );

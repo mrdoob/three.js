@@ -66,6 +66,8 @@
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
 
 			const bloomLayer = new THREE.Layers();
@@ -85,6 +87,7 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 			renderer.toneMapping = THREE.ReinhardToneMapping;
 			document.body.appendChild( renderer.domElement );
 

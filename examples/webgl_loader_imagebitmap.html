@@ -40,6 +40,7 @@
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( imageBitmap ) {
 
 						const texture = new THREE.CanvasTexture( imageBitmap );
+						texture.colorSpace = THREE.SRGBColorSpace;
 						const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 						/* ImageBitmap should be disposed when done with it
@@ -68,6 +69,7 @@
 					.load( 'textures/planets/earth_atmos_2048.jpg?' + performance.now(), function ( image ) {
 
 						const texture = new THREE.CanvasTexture( image );
+						texture.colorSpace = THREE.SRGBColorSpace;
 						const material = new THREE.MeshBasicMaterial( { color: 0xff8888, map: texture } );
 						addCube( material );
 

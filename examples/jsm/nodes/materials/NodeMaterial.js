@@ -1,4 +1,4 @@
-import { Material, ShaderMaterial, NoToneMapping } from 'three';
+import { Material, ShaderMaterial } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { diffuseColor } from '../core/PropertyNode.js';
@@ -8,13 +8,8 @@ import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
 import { positionLocal } from '../accessors/PositionNode.js';
-import { reference } from '../accessors/ReferenceNode.js';
 import { skinning } from '../accessors/SkinningNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { cubeTexture } from '../accessors/CubeTextureNode.js';
-import { toneMapping } from '../display/ToneMappingNode.js';
-import { rangeFog } from '../fog/FogRangeNode.js';
-import { densityFog } from '../fog/FogExp2Node.js';
 import { lightsWithoutWrap } from '../lighting/LightsNode.js';
 import AONode from '../lighting/AONode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
@@ -161,28 +156,7 @@ class NodeMaterial extends ShaderMaterial {
 
 	constructLights( builder ) {
 
-		let lightsNode = this.lightsNode || builder.lightsNode;
-		let envNode = this.envNode || builder.scene.environmentNode;
-
-		if ( envNode === undefined && builder.scene.environment ) {
-
-			const environment = builder.scene.environment;
-
-			if ( environment.isCubeTexture === true ) {
-
-				envNode = cubeTexture( environment );
-
-			} else if ( environment.isTexture === true ) {
-
-				envNode = texture( environment );
-
-			} else {
-
-				console.error( 'NodeMaterial: Unsupported environment configuration.', environment );
-
-			}
-
-		}
+		const envNode = this.envNode || builder.environmentNode;
 
 		const materialLightsNode = [];
 
@@ -197,6 +171,8 @@ class NodeMaterial extends ShaderMaterial {
 			materialLightsNode.push( new AONode( texture( builder.material.aoMap ) ) );
 
 		}
+
+		let lightsNode = this.lightsNode || builder.lightsNode;
 
 		if ( materialLightsNode.length > 0 ) {
 
@@ -251,15 +227,9 @@ class NodeMaterial extends ShaderMaterial {
 
 		// TONE MAPPING
 
-		let toneMappingNode = renderer.toneMappingNode;
+		const toneMappingNode = builder.toneMappingNode;
 
-		if ( ! toneMappingNode && renderer.toneMapping !== NoToneMapping ) {
-
-			toneMappingNode = toneMapping( renderer.toneMapping, reference( 'toneMappingExposure', 'float', renderer ), outgoingLight );
-
-		}
-
-		if ( toneMappingNode && toneMappingNode.isNode === true ) {
+		if ( toneMappingNode ) {
 
 			outgoingLight = toneMappingNode.context( { color: outgoingLight } );
 
@@ -271,31 +241,11 @@ class NodeMaterial extends ShaderMaterial {
 
 		// ENCODING
 
-		outputNode = outputNode.colorSpace( renderer.outputEncoding );
+		outputNode = outputNode.colorSpace( renderer.outputColorSpace );
 
 		// FOG
 
-		let fogNode = builder.fogNode;
-
-		if ( ( fogNode && fogNode.isNode !== true ) && builder.scene.fog ) {
-
-			const fog = builder.scene.fog;
-
-			if ( fog.isFogExp2 ) {
-
-				fogNode = densityFog( reference( 'color', 'color', fog ), reference( 'density', 'float', fog ) );
-
-			} else if ( fog.isFog ) {
-
-				fogNode = rangeFog( reference( 'color', 'color', fog ), reference( 'near', 'float', fog ), reference( 'far', 'float', fog ) );
-
-			} else {
-
-				console.error( 'NodeMaterial: Unsupported fog configuration.', fog );
-
-			}
-
-		}
+		const fogNode = builder.fogNode;
 
 		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
 
@@ -303,14 +253,14 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setDefaultValues( values ) {
+	setDefaultValues( material ) {
 
 		// This approach is to reuse the native refreshUniforms*
 		// and turn available the use of features like transmission and environment in core
 
-		for ( const property in values ) {
+		for ( const property in material ) {
 
-			const value = values[ property ];
+			const value = material[ property ];
 
 			if ( this[ property ] === undefined ) {
 
@@ -322,7 +272,20 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		Object.assign( this.defines, values.defines );
+		Object.assign( this.defines, material.defines );
+
+		const descriptors = Object.getOwnPropertyDescriptors( material.constructor.prototype );
+
+		for ( const key in descriptors ) {
+
+			if ( Object.getOwnPropertyDescriptor( this.constructor.prototype, key ) === undefined &&
+			     descriptors[ key ].get !== undefined ) {
+
+				Object.defineProperty( this.constructor.prototype, key, descriptors[ key ] );
+
+			}
+
+		}
 
 	}
 
@@ -387,19 +350,19 @@ class NodeMaterial extends ShaderMaterial {
 
 	static fromMaterial( material ) {
 
+		if ( material.isNodeMaterial === true ) { // is already a node material
+
+			return material;
+
+		}
+
 		const type = material.type.replace( 'Material', 'NodeMaterial' );
 
 		const nodeMaterial = createNodeMaterialFromType( type );
 
 		if ( nodeMaterial === undefined ) {
 
-			if ( material.isNodeMaterial !== true ) {
-
-				throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
-
-			}
-
-			return material; // is already a node material
+			throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
 
 		}
 

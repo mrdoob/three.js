@@ -44,7 +44,7 @@
 					bottom: 0,
 					width: 0.5,
 					height: 1.0,
-					background: new THREE.Color( 0.5, 0.5, 0.7 ),
+					background: new THREE.Color().setRGB( 0.5, 0.5, 0.7, THREE.SRGBColorSpace ),
 					eye: [ 0, 300, 1800 ],
 					up: [ 0, 1, 0 ],
 					fov: 30,
@@ -61,7 +61,7 @@
 					bottom: 0,
 					width: 0.5,
 					height: 0.5,
-					background: new THREE.Color( 0.7, 0.5, 0.5 ),
+					background: new THREE.Color().setRGB( 0.7, 0.5, 0.5, THREE.SRGBColorSpace ),
 					eye: [ 0, 1800, 0 ],
 					up: [ 0, 0, 1 ],
 					fov: 45,
@@ -78,7 +78,7 @@
 					bottom: 0.5,
 					width: 0.5,
 					height: 0.5,
-					background: new THREE.Color( 0.5, 0.7, 0.7 ),
+					background: new THREE.Color().setRGB( 0.5, 0.7, 0.7, THREE.SRGBColorSpace ),
 					eye: [ 1400, 800, 1400 ],
 					up: [ 0, 1, 0 ],
 					fov: 60,
@@ -173,13 +173,13 @@
 
 				for ( let i = 0; i < count; i ++ ) {
 
-					color.setHSL( ( positions1.getY( i ) / radius + 1 ) / 2, 1.0, 0.5 );
+					color.setHSL( ( positions1.getY( i ) / radius + 1 ) / 2, 1.0, 0.5, THREE.SRGBColorSpace );
 					colors1.setXYZ( i, color.r, color.g, color.b );
 
-					color.setHSL( 0, ( positions2.getY( i ) / radius + 1 ) / 2, 0.5 );
+					color.setHSL( 0, ( positions2.getY( i ) / radius + 1 ) / 2, 0.5, THREE.SRGBColorSpace );
 					colors2.setXYZ( i, color.r, color.g, color.b );
 
-					color.setRGB( 1, 0.8 - ( positions3.getY( i ) / radius + 1 ) / 2, 0 );
+					color.setRGB( 1, 0.8 - ( positions3.getY( i ) / radius + 1 ) / 2, 0, THREE.SRGBColorSpace );
 					colors3.setXYZ( i, color.r, color.g, color.b );
 
 				}

@@ -116,7 +116,7 @@
 					.setPath( './textures/cube/pisa/' )
 					.load( ldrUrls, function () {
 
-						ldrCubeMap.encoding = THREE.sRGBEncoding;
+						ldrCubeMap.colorSpace = THREE.SRGBColorSpace;
 
 						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
 
@@ -143,7 +143,6 @@
 				container.appendChild( renderer.domElement );
 
 				//renderer.toneMapping = ReinhardToneMapping;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

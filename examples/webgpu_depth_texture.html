@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { smoothstep, positionView, texture, MeshBasicNodeMaterial } from 'three/nodes';
+			import { texture, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -52,16 +52,12 @@
 
 				}
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 30 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 20 );
 				camera.position.z = 4;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
-
-				// depth material
-
-				const material = new MeshBasicNodeMaterial();
-				material.colorNode = smoothstep( camera.near, camera.far, positionView.z.negate() ).invert();
+				scene.overrideMaterial = new MeshBasicNodeMaterial();
 
 				//
 
@@ -76,7 +72,7 @@
 					const z = ( Math.random() * 2.0 ) - 1.0;
 					const zScale = Math.sqrt( 1.0 - z * z ) * scale;
 
-					const mesh = new THREE.Mesh( geometry, material );
+					const mesh = new THREE.Mesh( geometry );
 					mesh.position.set(
 						Math.cos( r ) * zScale,
 						Math.sin( r ) * zScale,
@@ -95,7 +91,10 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				const depthTexture = new THREE.DepthTexture();
+
 				textureRenderer = new WebGPUTextureRenderer( renderer );
+				textureRenderer.renderTarget.depthTexture = depthTexture;
 				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -110,7 +109,7 @@
 				//
 
 				const materialFX = new MeshBasicNodeMaterial();
-				materialFX.colorNode = texture( textureRenderer.getTexture() );
+				materialFX.colorNode = texture( depthTexture );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );

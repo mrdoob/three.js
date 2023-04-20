@@ -54,6 +54,8 @@
 
 				loader.load( 'textures/tiff/crate_uncompressed.tif', function ( texture ) {
 
+					texture.colorSpace = THREE.SRGBColorSpace;
+
 					const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 					const mesh = new THREE.Mesh( geometry, material );
@@ -69,6 +71,8 @@
 
 				loader.load( 'textures/tiff/crate_lzw.tif', function ( texture ) {
 
+					texture.colorSpace = THREE.SRGBColorSpace;
+
 					const material = new THREE.MeshBasicMaterial( { map: texture } );
 
 					const mesh = new THREE.Mesh( geometry, material );
@@ -83,6 +87,8 @@
 				// JPEG
 
 				loader.load( 'textures/tiff/crate_jpeg.tif', function ( texture ) {
+
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					const material = new THREE.MeshBasicMaterial( { map: texture } );
 

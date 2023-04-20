@@ -43,8 +43,6 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			THREE.ColorManagement.enabled = true;
-
 			let container, stats;
 			let camera, scene, renderer;
 			let mesh, mixer;
@@ -98,7 +96,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.useLegacyLights = false;
 
 				container.appendChild( renderer.domElement );

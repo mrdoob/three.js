@@ -187,7 +187,6 @@
 
 			#include <common>
 			#include <uv_pars_vertex>
-			#include <uv2_pars_vertex>
 			#include <displacementmap_pars_vertex>
 			#include <envmap_pars_vertex>
 			#include <color_pars_vertex>
@@ -202,7 +201,6 @@
 				vec2 cellSize = vec2( 1.0 / WIDTH, 1.0 / WIDTH );
 
 				#include <uv_vertex>
-				#include <uv2_vertex>
 				#include <color_vertex>
 
 				// # include <beginnormal_vertex>
@@ -269,6 +267,8 @@
 			import { GPUComputationRenderer } from 'three/addons/misc/GPUComputationRenderer.js';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			// Texture width for simulation
 			const WIDTH = 128;
 
@@ -324,6 +324,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();

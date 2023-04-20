@@ -34,6 +34,8 @@
 			import { MeshBasicNodeMaterial, vec4, color, positionLocal, mix } from 'three/nodes';
 			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container, stats;
 			let camera, scene, renderer;
 
@@ -85,7 +87,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( innerWidth, innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// CONTROLS
 

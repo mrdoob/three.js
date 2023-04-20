@@ -214,14 +214,14 @@
 				textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function ( tex ) {
 
 					earthMat.map = tex;
-					earthMat.map.encoding = THREE.sRGBEncoding;
+					earthMat.map.colorSpace = THREE.SRGBColorSpace;
 					earthMat.needsUpdate = true;
 
 				} );
 				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function ( tex ) {
 
 					earthMat.specularMap = tex;
-					earthMat.specularMap.encoding = THREE.sRGBEncoding;
+					earthMat.specularMap.colorSpace = THREE.SRGBColorSpace;
 					earthMat.needsUpdate = true;
 
 				} );
@@ -232,7 +232,7 @@
 				// } );
 
 				const earthLights = textureLoader.load( 'textures/planets/earth_lights_2048.png' );
-				earthLights.encoding = THREE.sRGBEncoding;
+				earthLights.colorSpace = THREE.SRGBColorSpace;
 
 				const earthLightsMat = new THREE.MeshBasicMaterial( {
 					color: 0xffffff,
@@ -244,7 +244,7 @@
 				} );
 
 				const clouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png' );
-				clouds.encoding = THREE.sRGBEncoding;
+				clouds.colorSpace = THREE.SRGBColorSpace;
 
 				const earthCloudsMat = new THREE.MeshLambertMaterial( {
 					color: 0xffffff,
@@ -336,7 +336,7 @@
 							 r + 'dark-s_pz.jpg', r + 'dark-s_nz.jpg' ];
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.encoding = THREE.sRGBEncoding;
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				sceneCube.background = textureCube;
 

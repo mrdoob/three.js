@@ -86,7 +86,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -102,7 +101,7 @@
 				const textureMap = loader.load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
-				textureMap.encoding = THREE.sRGBEncoding;
+				textureMap.colorSpace = THREE.SRGBColorSpace;
 
 				// NORMAL MAP
 
@@ -118,7 +117,7 @@
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.encoding = THREE.sRGBEncoding;
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				// MATERIALS
 				const materialColor = new THREE.Color();

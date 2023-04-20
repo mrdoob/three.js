@@ -68,7 +68,7 @@
 							const textureLoader = new THREE.TextureLoader();
 
 							const diffuse = textureLoader.load( 'textures/carbon/Carbon.png' );
-							diffuse.encoding = THREE.sRGBEncoding;
+							diffuse.colorSpace = THREE.SRGBColorSpace;
 							diffuse.wrapS = THREE.RepeatWrapping;
 							diffuse.wrapT = THREE.RepeatWrapping;
 							diffuse.repeat.x = 10;
@@ -77,6 +77,8 @@
 							const normalMap = textureLoader.load( 'textures/carbon/Carbon_Normal.png' );
 							normalMap.wrapS = THREE.RepeatWrapping;
 							normalMap.wrapT = THREE.RepeatWrapping;
+							normalMap.repeat.x = 10;
+							normalMap.repeat.y = 10;
 
 							const normalMap2 = textureLoader.load( 'textures/water/Water_1_M_Normal.jpg' );
 
@@ -188,7 +190,6 @@
 
 				//
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

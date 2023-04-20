@@ -55,7 +55,7 @@
 			<li>KHR_mesh_quantization</li>
 			<li>KHR_lights_punctual<sup>1</sup></li>
 			<li>KHR_texture_basisu</li>
-			<li>KHR_texture_transform<sup>2</sup></li>
+			<li>KHR_texture_transform</li>
 			<li>EXT_texture_webp</li>
 			<li>EXT_meshopt_compression</li>
 			<li>EXT_mesh_gpu_instancing</li>
@@ -66,24 +66,16 @@
 		</p>
 
 		<ul>
-			<li>[link:https://github.com/takahirox/three-gltf-extensions KHR_materials_variants]<sup>3</sup></li>
+			<li>[link:https://github.com/takahirox/three-gltf-extensions KHR_materials_variants]<sup>2</sup></li>
 			<li>[link:https://github.com/takahirox/three-gltf-extensions MSFT_texture_dds]</li>
 		</ul>
 
 		<p><i>
 			<sup>1</sup>Requires [link:https://threejs.org/docs/#api/en/renderers/WebGLRenderer.physicallyCorrectLights physicallyCorrectLights] to be enabled.
 		</i></p>
-		<p><i>
-			<sup>2</sup>UV transforms are supported, with several key limitations. Transforms applied to
-			a texture using the first UV slot (all textures except aoMap and lightMap) must share the same
-			transform, or no transform at all. The aoMap and lightMap textures cannot be transformed. No
-			more than one transform may be used per material. See
-			#[link:https://github.com/mrdoob/three.js/pull/13831 13831] and
-			#[link:https://github.com/mrdoob/three.js/issues/12788 12788].
-		</i></p>
 
 		<p><i>
-			<sup>3</sup>You can also manually process the extension after loading in your application. See [link:https://threejs.org/examples/#webgl_loader_gltf_variants Three.js glTF materials variants example].
+			<sup>2</sup>You can also manually process the extension after loading in your application. See [link:https://threejs.org/examples/#webgl_loader_gltf_variants Three.js glTF materials variants example].
 		</i></p>
 
 		<h2>Code Example</h2>
@@ -143,7 +135,7 @@
 		in linear colorspace, always configure [page:WebGLRenderer] as follows when using glTF:</p>
 
 		<code>
-		renderer.outputEncoding = THREE.sRGBEncoding;
+		renderer.outputColorSpace = THREE.SRGBColorSpace;
 		</code>
 
 		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
@@ -152,7 +144,7 @@
 
 		<code>
 		// If texture is used for color information, set colorspace.
-		texture.encoding = THREE.sRGBEncoding;
+		texture.colorSpace = THREE.SRGBColorSpace;
 
 		// UVs use the convention that (0, 0) corresponds to the upper left corner of a texture.
 		texture.flipY = false;

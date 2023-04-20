@@ -60,6 +60,8 @@
 
 			import * as THREE from 'three';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			const SCREEN_WIDTH = window.innerWidth;
 			const SCREEN_HEIGHT = window.innerHeight;
 
@@ -188,6 +190,7 @@
 
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;

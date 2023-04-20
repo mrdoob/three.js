@@ -24,10 +24,6 @@
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
 				"Animation system": "manual/en/introduction/Animation-system",
 				"Color management": "manual/en/introduction/Color-management"
-			},
-
-			"Build Tools": {
-				"Testing with NPM": "manual/en/buildTools/Testing-with-NPM"
 			}
 
 		},
@@ -462,10 +458,6 @@
 				"كيفية استخدام المعالجة اللاحقة (post-processing)": "manual/ar/introduction/How-to-use-post-processing",
 				"تحولات المصفوفة (Matrix transformations)": "manual/ar/introduction/Matrix-transformations",
 				"نظام الحركات": "manual/ar/introduction/Animation-system"
-			},
-
-			"أدوات البناء": {
-				"الاختبار مع NPM": "manual/ar/buildTools/Testing-with-NPM"
 			}
 
 		},
@@ -532,10 +524,6 @@
 				"如何使用后期处理": "manual/zh/introduction/How-to-use-post-processing",
 				"矩阵变换": "manual/zh/introduction/Matrix-transformations",
 				"动画系统": "manual/zh/introduction/Animation-system"
-			},
-
-			"构建工具": {
-				"使用NPM进行测试": "manual/zh/buildTools/Testing-with-NPM"
 			}
 
 		},
@@ -922,11 +910,6 @@
 				"후처리 사용 방법": "manual/ko/introduction/How-to-use-post-processing",
 				"행렬 변환": "manual/ko/introduction/Matrix-transformations",
 				"애니메이션 시스템": "manual/ko/introduction/Animation-system"
-			},
-
-			"빌드 도구": {
-				"NPM 테스트": "manual/ko/buildTools/Testing-with-NPM"
-
 			}
 
 		},
@@ -1096,10 +1079,6 @@
 				"post-processingの使い方": "manual/ja/introduction/How-to-use-post-processing",
 				"行列の変換": "manual/ja/introduction/Matrix-transformations",
 				"アニメーションシステム": "manual/ja/introduction/Animation-system"
-			},
-
-			"ビルドツール": {
-				"NPMでテストを実行する": "manual/ja/buildTools/Testing-with-NPM"
 			}
 
 		}
@@ -1130,10 +1109,6 @@
 				"Trasformazioni di matrici": "manual/it/introduction/Matrix-transformations",
 				"Sistema di animazione": "manual/it/introduction/Animation-system",
 				"Gestione del colore": "manual/it/introduction/Color-management"
-			},
-
-			"Strumenti di build": {
-				"Testare con NPM": "manual/it/buildTools/Testing-with-NPM"
 			}
 
 		},
@@ -1455,10 +1430,6 @@
 				"Transformações de matriz": "manual/pt-br/introduction/Matrix-transformations",
 				"Sistema de animação": "manual/pt-br/introduction/Animation-system",
 				"Gerenciamento de cor": "manual/pt-br/introduction/Color-management"
-			},
-
-			"Ferramentas de Build": {
-				"Testando com NPM": "manual/pt-br/buildTools/Testing-with-NPM"
 			}
 
 		},
@@ -1540,16 +1511,7 @@
 				"Matrices de transformation": "manual/fr/introduction/Matrix-transformations",
 				"Système d'animation": "manual/fr/introduction/Animation-system",
 				"Gestion des couleurs": "manual/fr/introduction/Color-management"
-			},
-
-			"Outils de build": {
-				"Tests avec NPM": "manual/fr/buildTools/Testing-with-NPM"
-			},
-			"Noyau": {
-				"BufferAttribute": "api/fr/core/BufferAttribute",
-				"BufferGeometry": "api/fr/core/BufferGeometry"
 			}
-
 
 		},
 
@@ -1642,6 +1604,11 @@
 				"ShaderMaterial": "api/fr/materials/ShaderMaterial",
 				"ShadowMaterial": "api/fr/materials/ShadowMaterial",
 				"SpriteMaterial": "api/fr/materials/SpriteMaterial"
+			},
+
+			"Noyau": {
+				"BufferAttribute": "api/fr/core/BufferAttribute",
+				"BufferGeometry": "api/fr/core/BufferGeometry"
 			}
 
 		}
@@ -1672,10 +1639,6 @@
 				"Matrix transformations": "manual/en/introduction/Matrix-transformations",
 				"Animation system": "manual/en/introduction/Animation-system",
 				"Color management": "manual/en/introduction/Color-management"
-			},
-
-			"Build Tools": {
-				"Testing with NPM": "manual/en/buildTools/Testing-with-NPM"
 			}
 
 		},

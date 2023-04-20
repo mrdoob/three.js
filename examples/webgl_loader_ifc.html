@@ -42,6 +42,8 @@
 			import { IFCLoader } from 'web-ifc-three';
 			import { IFCSPACE } from 'web-ifc';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let scene, camera, renderer;
 
 			async function init() {
@@ -97,6 +99,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				//Controls

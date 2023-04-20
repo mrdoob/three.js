@@ -41,6 +41,8 @@
 			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container, stats, loader;
 
 			let camera, scene, renderer;
@@ -91,10 +93,10 @@
 				const textureLoader = new THREE.TextureLoader();
 
 				const diffuseMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const specularMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' );
-				specularMap.encoding = THREE.sRGBEncoding;
+				specularMap.colorSpace = THREE.SRGBColorSpace;
 
 				const normalMap = textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 

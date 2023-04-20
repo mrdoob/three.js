@@ -2,13 +2,13 @@ import {
 	CubeReflectionMapping,
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
-	LinearEncoding,
 	LinearFilter,
 	NoToneMapping,
 	NoBlending,
 	RGBAFormat,
 	HalfFloatType,
-	BackSide
+	BackSide,
+	LinearSRGBColorSpace
 } from '../constants.js';
 
 import { BufferAttribute } from '../core/BufferAttribute.js';
@@ -255,7 +255,7 @@ class PMREMGenerator {
 			generateMipmaps: false,
 			type: HalfFloatType,
 			format: RGBAFormat,
-			encoding: LinearEncoding,
+			colorSpace: LinearSRGBColorSpace,
 			depthBuffer: false
 		};
 

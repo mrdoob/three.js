@@ -3,8 +3,9 @@ import {
 	DataUtils,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
+	NoColorSpace,
 	LinearFilter,
+	LinearSRGBColorSpace,
 	RedFormat,
 	RGBAFormat
 } from 'three';
@@ -2072,7 +2073,7 @@ class EXRLoader extends DataTextureLoader {
 				uncompress: null,
 				getter: null,
 				format: null,
-				encoding: null,
+				colorSpace: LinearSRGBColorSpace,
 			};
 
 			switch ( EXRHeader.compression ) {
@@ -2204,12 +2205,12 @@ class EXRLoader extends DataTextureLoader {
 			if ( EXRDecoder.outputChannels == 4 ) {
 
 				EXRDecoder.format = RGBAFormat;
-				EXRDecoder.encoding = LinearEncoding;
+				EXRDecoder.colorSpace = LinearSRGBColorSpace;
 
 			} else {
 
 				EXRDecoder.format = RedFormat;
-				EXRDecoder.encoding = LinearEncoding;
+				EXRDecoder.colorSpace = NoColorSpace;
 
 			}
 
@@ -2272,7 +2273,7 @@ class EXRLoader extends DataTextureLoader {
 			height: EXRDecoder.height,
 			data: EXRDecoder.byteArray,
 			format: EXRDecoder.format,
-			encoding: EXRDecoder.encoding,
+			colorSpace: EXRDecoder.colorSpace,
 			type: this.type,
 		};
 
@@ -2289,7 +2290,7 @@ class EXRLoader extends DataTextureLoader {
 
 		function onLoadCallback( texture, texData ) {
 
-			texture.encoding = texData.encoding;
+			texture.colorSpace = texData.colorSpace;
 			texture.minFilter = LinearFilter;
 			texture.magFilter = LinearFilter;
 			texture.generateMipmaps = false;

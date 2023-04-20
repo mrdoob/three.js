@@ -43,6 +43,8 @@
 
 			import { CinematicCamera } from 'three/addons/cameras/CinematicCamera.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let camera, scene, raycaster, renderer, stats;
 
 			const mouse = new THREE.Vector2();
@@ -153,8 +155,6 @@
 				gui.add( effectController, 'showFocus', true ).onChange( matChanger );
 
 				matChanger();
-
-				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

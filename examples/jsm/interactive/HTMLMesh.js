@@ -4,7 +4,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	PlaneGeometry,
-	sRGBEncoding,
+	SRGBColorSpace,
 	Color
 } from 'three';
 
@@ -59,7 +59,7 @@ class HTMLTexture extends CanvasTexture {
 		this.dom = dom;
 
 		this.anisotropy = 16;
-		this.encoding = sRGBEncoding;
+		this.colorSpace = SRGBColorSpace;
 		this.minFilter = LinearFilter;
 		this.magFilter = LinearFilter;
 
