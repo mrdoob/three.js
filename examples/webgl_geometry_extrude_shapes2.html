@@ -38,8 +38,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			// From d3-threeD.js
 			/* This Source Code Form is subject to the terms of the Mozilla Public
 			 * License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -443,7 +441,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				//
