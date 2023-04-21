@@ -1,4 +1,4 @@
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, UnsignedByteType, _SRGBAFormat, NoColorSpace, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, UnsignedByteType, _SRGBAFormat, LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
 import * as MathUtils from '../../math/MathUtils.js';
 import { ImageUtils } from '../../extras/ImageUtils.js';
 import { createElementNS } from '../../utils.js';
@@ -1926,7 +1926,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.isCompressedTexture === true || texture.format === _SRGBAFormat ) return image;
 
-		if ( colorSpace !== LinearSRGBColorSpace && colorSpace !== NoColorSpace ) {
+		if ( colorSpace !== LinearSRGBColorSpace && colorSpace !== null ) {
 
 			// sRGB
 

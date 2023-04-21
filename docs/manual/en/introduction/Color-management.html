@@ -119,8 +119,8 @@
 	</ul>
 
 	<p>
-		Consider two very common color spaces: [page:SRGBColorSpace] ("sRGB") and
-		[page:LinearSRGBColorSpace] ("Linear-sRGB"). Both use the same primaries and white point,
+		Consider two very common color spaces: [page:SRGBColorSpace] ("srgb") and
+		[page:LinearSRGBColorSpace] ("srgb-linear"). Both use the same primaries and white point,
 		and therefore have the same color gamut. Both use the RGB color model. They differ only in
 		the transfer functions — Linear-sRGB is linear with respect to physical light intensity.
 		sRGB uses the nonlinear sRGB transfer functions, and more closely resembles the way that
@@ -184,8 +184,7 @@ THREE.ColorManagement.enabled = true;
 		<li>
 			<b>Non-color textures:</b> Textures that do not store color information (like .normalMap
 			or .roughnessMap) do not have an associated color space, and generally use the (default) texture
-			annotation of <i>texture.colorSpace = NoColorSpace</i>. In rare cases, non-color data
-			may be represented with other nonlinear encodings for technical reasons.
+			annotation of <i>texture.colorSpace = null</i>.
 		</li>
 	</ul>
 

@@ -165,7 +165,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.TangentSpaceNormalMap, 0, 'TangentSpaceNormalMap is equal to 0' );
 		assert.equal( Constants.ObjectSpaceNormalMap, 1, 'ObjectSpaceNormalMap is equal to 1' );
 
-		assert.equal( Constants.NoColorSpace, '', 'NoColorSpace is equal to ""' );
 		assert.equal( Constants.SRGBColorSpace, 'srgb', 'SRGBColorSpace is equal to srgb' );
 		assert.equal( Constants.LinearSRGBColorSpace, 'srgb-linear', 'LinearSRGBColorSpace is equal to srgb-linear' );
 		assert.equal( Constants.DisplayP3ColorSpace, 'display-p3', 'DisplayP3ColorSpace is equal to display-p3' );

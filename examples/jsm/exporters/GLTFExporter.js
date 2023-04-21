@@ -5,7 +5,6 @@ import {
 	DoubleSide,
 	InterpolateDiscrete,
 	InterpolateLinear,
-	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
@@ -876,7 +875,7 @@ class GLTFWriter {
 		const texture = reference.clone();
 
 		texture.source = new Source( canvas );
-		texture.colorSpace = NoColorSpace;
+		texture.colorSpace = null;
 		texture.channel = ( metalnessMap || roughnessMap ).channel;
 
 		if ( metalnessMap && roughnessMap && metalnessMap.channel !== roughnessMap.channel ) {

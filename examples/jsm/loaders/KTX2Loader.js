@@ -19,7 +19,6 @@ import {
 	FileLoader,
 	FloatType,
 	HalfFloatType,
-	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Loader,
@@ -267,8 +266,8 @@ class KTX2Loader extends Loader {
 		texture.generateMipmaps = false;
 
 		texture.needsUpdate = true;
-		// TODO: Detect NoColorSpace vs. LinearSRGBColorSpace based on primaries.
-		texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : NoColorSpace;
+		// TODO: Detect null vs. LinearSRGBColorSpace based on primaries.
+		texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : null;
 		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 
 		return texture;
@@ -794,7 +793,7 @@ async function createDataTexture( container ) {
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
-	texture.colorSpace = COLOR_SPACE_MAP[ vkFormat ] || NoColorSpace;
+	texture.colorSpace = COLOR_SPACE_MAP[ vkFormat ] || null;
 
 	texture.needsUpdate = true;
 

@@ -7,7 +7,7 @@ import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
-import { REVISION, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4 } from 'three';
+import { REVISION, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4 } from 'three';
 
 import { stack } from './StackNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
@@ -374,7 +374,7 @@ class NodeBuilder {
 
 		} else {
 
-			colorSpace = NoColorSpace;
+			colorSpace = null;
 
 		}
 

@@ -10,7 +10,6 @@ import {
 	UVMapping,
 	sRGBEncoding,
 	SRGBColorSpace,
-	NoColorSpace,
 	LinearEncoding
 } from '../constants.js';
 import * as MathUtils from '../math/MathUtils.js';
@@ -23,7 +22,7 @@ let textureId = 0;
 
 class Texture extends EventDispatcher {
 
-	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = Texture.DEFAULT_ANISOTROPY, colorSpace = NoColorSpace ) {
+	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = Texture.DEFAULT_ANISOTROPY, colorSpace = null ) {
 
 		super();
 
@@ -66,14 +65,14 @@ class Texture extends EventDispatcher {
 		this.flipY = true;
 		this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-		if ( typeof colorSpace === 'string' ) {
+		if ( typeof colorSpace === 'string' || colorSpace === null ) {
 
 			this.colorSpace = colorSpace;
 
 		} else { // @deprecated, r152
 
 			warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-			this.colorSpace = colorSpace === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+			this.colorSpace = colorSpace === sRGBEncoding ? SRGBColorSpace : null;
 
 		}
 
@@ -325,7 +324,7 @@ class Texture extends EventDispatcher {
 	set encoding( encoding ) { // @deprecated, r152
 
 		warnOnce( 'THREE.Texture: Property .encoding has been replaced by .colorSpace.' );
-		this.colorSpace = encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+		this.colorSpace = encoding === sRGBEncoding ? SRGBColorSpace : null;
 
 	}
 

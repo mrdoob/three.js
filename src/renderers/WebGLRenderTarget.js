@@ -1,6 +1,6 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
-import { LinearFilter, NoColorSpace, SRGBColorSpace, sRGBEncoding } from '../constants.js';
+import { LinearFilter, SRGBColorSpace, sRGBEncoding } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Source } from '../textures/Source.js';
 import { warnOnce } from '../utils.js';
@@ -33,7 +33,7 @@ class WebGLRenderTarget extends EventDispatcher {
 
 			// @deprecated, r152
 			warnOnce( 'THREE.WebGLRenderTarget: option.encoding has been replaced by option.colorSpace.' );
-			options.colorSpace = options.encoding === sRGBEncoding ? SRGBColorSpace : NoColorSpace;
+			options.colorSpace = options.encoding === sRGBEncoding ? SRGBColorSpace : null;
 
 		}
 

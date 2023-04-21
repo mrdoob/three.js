@@ -7,7 +7,6 @@ import {
 	RGIntegerFormat,
 	RedFormat,
 	RedIntegerFormat,
-	NoColorSpace,
 	LinearSRGBColorSpace,
 	SRGBColorSpace,
 	DataTexture,
@@ -47,15 +46,15 @@ const VK_FORMAT_MAP = {
 
 	[ RGBAFormat ]: {
 		[ FloatType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R32G32B32A32_SFLOAT,
+			[ null ]: VK_FORMAT_R32G32B32A32_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R32G32B32A32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R16G16B16A16_SFLOAT,
+			[ null ]: VK_FORMAT_R16G16B16A16_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R16G16B16A16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R8G8B8A8_UNORM,
+			[ null ]: VK_FORMAT_R8G8B8A8_UNORM,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R8G8B8A8_UNORM,
 			[ SRGBColorSpace ]: VK_FORMAT_R8G8B8A8_SRGB,
 		},
@@ -63,15 +62,15 @@ const VK_FORMAT_MAP = {
 
 	[ RGFormat ]: {
 		[ FloatType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R32G32_SFLOAT,
+			[ null ]: VK_FORMAT_R32G32_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R32G32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R16G16_SFLOAT,
+			[ null ]: VK_FORMAT_R16G16_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R16G16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R8G8_UNORM,
+			[ null ]: VK_FORMAT_R8G8_UNORM,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R8G8_UNORM,
 			[ SRGBColorSpace ]: VK_FORMAT_R8G8_SRGB,
 		},
@@ -79,15 +78,15 @@ const VK_FORMAT_MAP = {
 
 	[ RedFormat ]: {
 		[ FloatType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R32_SFLOAT,
+			[ null ]: VK_FORMAT_R32_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R16_SFLOAT,
+			[ null ]: VK_FORMAT_R16_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ NoColorSpace ]: VK_FORMAT_R8_UNORM,
+			[ null ]: VK_FORMAT_R8_UNORM,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R8_UNORM,
 			[ SRGBColorSpace ]: VK_FORMAT_R8_SRGB,
 		},
@@ -107,7 +106,7 @@ const KHR_DF_CHANNEL_MAP = {
 const ERROR_INPUT = 'THREE.KTX2Exporter: Supported inputs are DataTexture, Data3DTexture, or WebGLRenderer and WebGLRenderTarget.';
 const ERROR_FORMAT = 'THREE.KTX2Exporter: Supported formats are RGBAFormat, RGFormat, or RedFormat.';
 const ERROR_TYPE = 'THREE.KTX2Exporter: Supported types are FloatType, HalfFloatType, or UnsignedByteType."';
-const ERROR_COLOR_SPACE = 'THREE.KTX2Exporter: Supported color spaces are SRGBColorSpace (UnsignedByteType only), LinearSRGBColorSpace, or NoColorSpace.';
+const ERROR_COLOR_SPACE = 'THREE.KTX2Exporter: Supported color spaces are SRGBColorSpace (UnsignedByteType only), LinearSRGBColorSpace, or null.';
 
 export class KTX2Exporter {
 
@@ -169,7 +168,7 @@ export class KTX2Exporter {
 		const basicDesc = container.dataFormatDescriptor[ 0 ];
 
 		basicDesc.colorModel = KHR_DF_MODEL_RGBSDA;
-		basicDesc.colorPrimaries = texture.colorSpace === NoColorSpace
+		basicDesc.colorPrimaries = texture.colorSpace === null
 			? KHR_DF_PRIMARIES_UNSPECIFIED
 			: KHR_DF_PRIMARIES_BT709;
 		basicDesc.transferFunction = texture.colorSpace === SRGBColorSpace
@@ -188,7 +187,7 @@ export class KTX2Exporter {
 
 			let channelType = KHR_DF_CHANNEL_MAP[ i ];
 
-			if ( texture.colorSpace === LinearSRGBColorSpace || texture.colorSpace === NoColorSpace ) {
+			if ( texture.colorSpace === LinearSRGBColorSpace || texture.colorSpace === null ) {
 
 				channelType |= KHR_DF_SAMPLE_DATATYPE_LINEAR;
 

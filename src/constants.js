@@ -140,7 +140,7 @@ export const AdditiveAnimationBlendMode = 2501;
 export const TrianglesDrawMode = 0;
 export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
-/** @deprecated Use LinearSRGBColorSpace or NoColorSpace in three.js r152+. */
+/** @deprecated Use LinearSRGBColorSpace or *null* in three.js r152+. */
 export const LinearEncoding = 3000;
 /** @deprecated Use SRGBColorSpace in three.js r152+. */
 export const sRGBEncoding = 3001;
@@ -150,7 +150,8 @@ export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
 
 // Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
-export const NoColorSpace = '';
+/** @deprecated Use *null* in three.js r152+. */
+export const NoColorSpace = null;
 export const SRGBColorSpace = 'srgb';
 export const LinearSRGBColorSpace = 'srgb-linear';
 export const DisplayP3ColorSpace = 'display-p3';

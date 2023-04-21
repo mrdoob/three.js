@@ -4,8 +4,7 @@ import {
 	LinearSRGBColorSpace,
 	SphericalHarmonics3,
 	Vector3,
-	SRGBColorSpace,
-	NoColorSpace
+	SRGBColorSpace
 } from 'three';
 
 class LightProbeGenerator {
@@ -234,7 +233,7 @@ function convertColorToLinear( color, colorSpace ) {
 			break;
 
 		case LinearSRGBColorSpace:
-		case NoColorSpace:
+		case null:
 
 			break;
 

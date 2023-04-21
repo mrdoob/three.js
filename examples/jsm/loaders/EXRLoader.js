@@ -3,7 +3,6 @@ import {
 	DataUtils,
 	FloatType,
 	HalfFloatType,
-	NoColorSpace,
 	LinearFilter,
 	LinearSRGBColorSpace,
 	RedFormat,
@@ -2210,7 +2209,7 @@ class EXRLoader extends DataTextureLoader {
 			} else {
 
 				EXRDecoder.format = RedFormat;
-				EXRDecoder.colorSpace = NoColorSpace;
+				EXRDecoder.colorSpace = null;
 
 			}
 
