@@ -279,7 +279,11 @@ class KTX2Loader extends Loader {
 
 				pendings.push( createDataTexture( container, levelIndex ).then( function ( dataTexture ) {
 
-					mipmaps[ levelIndex ] = dataTexture;
+					mipmaps[ levelIndex ] = {
+						data: dataTexture.image.data,
+						width: dataTexture.image.width,
+						height: dataTexture.image.height
+					};
 
 				} ) );
 
