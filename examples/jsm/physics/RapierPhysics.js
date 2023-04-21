@@ -1,6 +1,6 @@
-async function RapierPhysics( path ) {
+async function RapierPhysics() {
 
-	const RAPIER = await import( path );
+	const RAPIER = await import( 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.11.2' );
 	
 	await RAPIER.init();
 
