@@ -1548,7 +1548,9 @@ class GeometryParser {
 
 			return fbxTree.Objects.Model[ parent.ID ];
 
-		} );
+		} ).filter( i => i !== undefined );
+		// filter items such as [undefined], it will cause error when using modelNodes[0] later
+		// eg: if('some property' in modelNode) will cause error
 
 		// don't create geometry if it is not associated with any models
 		if ( modelNodes.length === 0 ) return;
