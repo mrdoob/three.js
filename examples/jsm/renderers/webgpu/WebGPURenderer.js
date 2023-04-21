@@ -543,6 +543,42 @@ class WebGPURenderer {
 
 	}
 
+	copyFramebufferToRenderTarget( renderTarget ) {
+
+		const renderState = this._currentRenderState;
+		const { encoderGPU, descriptorGPU } = renderState;
+
+		const texture = renderTarget.texture;
+		texture.internalFormat = GPUTextureFormat.BGRA8Unorm;
+
+		this._textures.initRenderTarget( renderTarget );
+
+		const sourceGPU = this._context.getCurrentTexture();
+		const destinationGPU = this._textures.getTextureGPU( texture );
+
+		renderState.currentPassGPU.end();
+
+		encoderGPU.copyTextureToTexture(
+			{
+			  texture: sourceGPU
+			},
+			{
+			  texture: destinationGPU
+			},
+			[
+				texture.image.width,
+				texture.image.height
+			]
+		);
+
+		descriptorGPU.colorAttachments[ 0 ].loadOp = GPULoadOp.Load;
+		if ( renderState.depth ) descriptorGPU.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+		if ( renderState.stencil ) descriptorGPU.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+
+		renderState.currentPassGPU = encoderGPU.beginRenderPass( descriptorGPU );
+
+	}
+
 	getViewport( target ) {
 
 		const viewport = this._viewport;
