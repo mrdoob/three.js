@@ -1560,7 +1560,7 @@ const FROM_LINEAR = {
 
 const ColorManagement = {
 
-	enabled: false,
+	enabled: true,
 
 	get legacyMode() {
 
@@ -12160,6 +12160,9 @@ class ShaderMaterial extends Material {
 		data.vertexShader = this.vertexShader;
 		data.fragmentShader = this.fragmentShader;
 
+		data.lights = this.lights;
+		data.clipping = this.clipping;
+
 		const extensions = {};
 
 		for ( const key in this.extensions ) {
@@ -13630,9 +13633,9 @@ var shadowmask_pars_fragment = "float getShadowMask() {\n\tfloat shadow = 1.0;\n
 
 var skinbase_vertex = "#ifdef USE_SKINNING\n\tmat4 boneMatX = getBoneMatrix( skinIndex.x );\n\tmat4 boneMatY = getBoneMatrix( skinIndex.y );\n\tmat4 boneMatZ = getBoneMatrix( skinIndex.z );\n\tmat4 boneMatW = getBoneMatrix( skinIndex.w );\n#endif";
 
-var skinning_pars_vertex = "#ifdef USE_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\tuniform highp sampler2D boneTexture;\n\tuniform int boneTextureSize;\n\tmat4 getBoneMatrix( const in float i ) {\n\t\tfloat j = i * 4.0;\n\t\tfloat x = mod( j, float( boneTextureSize ) );\n\t\tfloat y = floor( j / float( boneTextureSize ) );\n\t\tfloat dx = 1.0 / float( boneTextureSize );\n\t\tfloat dy = 1.0 / float( boneTextureSize );\n\t\ty = dy * ( y + 0.5 );\n\t\tvec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );\n\t\tvec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );\n\t\tvec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );\n\t\tvec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );\n\t\tmat4 bone = mat4( v1, v2, v3, v4 );\n\t\treturn bone;\n\t}\n#endif";
+var skinning_pars_vertex = "#ifdef USE_SKINNING\n\tuniform mat4 bindMatrix;\n\tuniform mat4 bindMatrixInverse;\n\tuniform highp sampler2D boneTexture;\n\tuniform int boneTextureSize;\n\tmat4 getBoneMatrix( const in float i ) {\n\t\tfloat j = i * 4.0;\n\t\tfloat x = mod( j, float( boneTextureSize ) );\n\t\tfloat y = floor( j / float( boneTextureSize ) );\n\t\tfloat dx = 1.0 / float( boneTextureSize );\n\t\tfloat dy = 1.0 / float( boneTextureSize );\n\t\ty = dy * ( y + 0.5 );\n\t\tvec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );\n\t\tvec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );\n\t\tvec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );\n\t\tvec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );\n\t\tmat4 bone = mat4( v1, v2, v3, v4 );\n\t\treturn bone;\n\t}\n\t#ifdef DUAL_QUATERNION_SKINNING\n\tvec4 getQuaternionFromMatrix( const in mat4 m ) {\n\t\tfloat trace = m[0][0] + m[1][1] + m[2][2];\n\t\tfloat root;\n\t\tvec4 q;\n\t\tif ( trace > 0.0 ) {\n\t\t\troot = sqrt( trace + 1.0 );\n\t\t\tq.w = 0.5 * root;\n\t\t\troot = 0.5 / root;\n\t\t\tq.x = ( m[2][1] - m[1][2] ) * root;\n\t\t\tq.y = ( m[0][2] - m[2][0] ) * root;\n\t\t\tq.z = ( m[1][0] - m[0][1] ) * root;\n\t\t} else {\n\t\t\tint i = 0;\n\t\t\tif ( m[1][1] > m[0][0] ) {\n\t\t\t\ti = 1;\n\t\t\t} \n\t\t\tif ( m[2][2] > m[i][i] ) {\n\t\t\t\ti = 2;\n\t\t\t}\n\t\t\tint j = ( i + 1 ) % 3;\n\t\t\tint k = ( i + 2 ) % 3;\n\t\t\troot = sqrt( m[i][i] - m[j][j] - m[k][k] + 1.0 );\n\t\t\tq[i] = 0.5 * root;\n\t\t\troot = 0.5 / root;\n\t\t\tq[3] = ( m[k][j] - m[j][k] ) * root;\n\t\t\tq[j] = ( m[j][i] + m[i][j] ) * root;\n\t\t\tq[k] = ( m[k][i] + m[i][k] ) * root;\n\t\t}\n\t\t\n\t\tq = normalize( q );\n\t\tq[3] = -q[3];\n\t\t\n\t\treturn q;\n\t}\n\tmat2x4 getDualQuaternionFromMatrix( const in mat4 m ) {\n\t\tvec3 t = m[3].xyz;\n\t\tvec4 q = normalize( getQuaternionFromMatrix( m ) );\n\t\tfloat i =   0.5f * ( t.x * q.w + t.y * q.z - t.z * q.y );\n\t\tfloat j =   0.5f * ( t.y * q.w + t.z * q.x - t.x * q.z );\n\t\tfloat k =   0.5f * ( t.z * q.w + t.x * q.y - t.y * q.x );\n\t\tfloat w =  -0.5f * ( t.x * q.x + t.y * q.y + t.z * q.z );\n\t\tvec4 q2 = vec4( i, j, k, w );\n\t\treturn mat2x4( q, q2 );\n\t}\n\tvec4 mulitplyVectorWithDualQuaternion( mat2x4 dq, vec4 v ) {\n\t\tvec4 qr = dq[0];\n\t\tvec4 qd = dq[1];\n\t\tvec3 pos = v.xyz + 2.0 * cross( qr.xyz, cross( qr.xyz, v.xyz ) + qr.w * v.xyz );\t\tvec3 tran = 2.0 * ( qr.w * qd.xyz - qd.w * qr.xyz + cross( qr.xyz, qd.xyz ));\t\treturn vec4(pos + tran, 0.0);\n\t}\n\t#endif\n#endif";
 
-var skinning_vertex = "#ifdef USE_SKINNING\n\tvec4 skinVertex = bindMatrix * vec4( transformed, 1.0 );\n\tvec4 skinned = vec4( 0.0 );\n\tskinned += boneMatX * skinVertex * skinWeight.x;\n\tskinned += boneMatY * skinVertex * skinWeight.y;\n\tskinned += boneMatZ * skinVertex * skinWeight.z;\n\tskinned += boneMatW * skinVertex * skinWeight.w;\n\ttransformed = ( bindMatrixInverse * skinned ).xyz;\n#endif";
+var skinning_vertex = "#ifdef USE_SKINNING\n\tvec4 skinVertex = bindMatrix * vec4( transformed, 1.0 );\n\t#ifdef DUAL_QUATERNION_SKINNING\n\tmat2x4 boneDualQuatX = getDualQuaternionFromMatrix( boneMatX );\n\tmat2x4 boneDualQuatY = getDualQuaternionFromMatrix( boneMatY );\n\tmat2x4 boneDualQuatZ = getDualQuaternionFromMatrix( boneMatZ );\n\tmat2x4 boneDualQuatW = getDualQuaternionFromMatrix( boneMatW );\n\tvec4 normalizedSkinWeight = normalize( skinWeight );\n\tmat2x4 dq = boneDualQuatX * normalizedSkinWeight.x\n\t\t\t  + boneDualQuatY * normalizedSkinWeight.y \n\t\t\t  + boneDualQuatZ * normalizedSkinWeight.z \n\t\t\t  + boneDualQuatW * normalizedSkinWeight.w;\n\tdq /= length( dq[ 0 ] );\n\tvec4 skinned = mulitplyVectorWithDualQuaternion( dq, skinVertex );\n\t#else\n\tvec4 skinned = vec4( 0.0 );\n\tskinned += boneMatX * skinVertex * skinWeight.x;\n\tskinned += boneMatY * skinVertex * skinWeight.y;\n\tskinned += boneMatZ * skinVertex * skinWeight.z;\n\tskinned += boneMatW * skinVertex * skinWeight.w;\n\t#endif\n\ttransformed = ( bindMatrixInverse * skinned ).xyz;\n#endif";
 
 var skinnormal_vertex = "#ifdef USE_SKINNING\n\tmat4 skinMatrix = mat4( 0.0 );\n\tskinMatrix += skinWeight.x * boneMatX;\n\tskinMatrix += skinWeight.y * boneMatY;\n\tskinMatrix += skinWeight.z * boneMatZ;\n\tskinMatrix += skinWeight.w * boneMatW;\n\tskinMatrix = bindMatrixInverse * skinMatrix * bindMatrix;\n\tobjectNormal = vec4( skinMatrix * vec4( objectNormal, 0.0 ) ).xyz;\n\t#ifdef USE_TANGENT\n\t\tobjectTangent = vec4( skinMatrix * vec4( objectTangent, 0.0 ) ).xyz;\n\t#endif\n#endif";
 
@@ -19330,6 +19333,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
 			parameters.skinning ? '#define USE_SKINNING' : '',
+			parameters.dualQuaternionSkinning ? '#define DUAL_QUATERNION_SKINNING' : '',
 
 			parameters.morphTargets ? '#define USE_MORPHTARGETS' : '',
 			parameters.morphNormals && parameters.flatShading === false ? '#define USE_MORPHNORMALS' : '',
@@ -20130,6 +20134,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
+			dualQuaternionSkinning: object.isSkinnedMesh === true && object.useDualQuaternionSkinning === true,
 
 			morphTargets: geometry.morphAttributes.position !== undefined,
 			morphNormals: geometry.morphAttributes.normal !== undefined,
@@ -30948,6 +30953,8 @@ class SkinnedMesh extends Mesh {
 
 		this.boundingBox = null;
 		this.boundingSphere = null;
+
+		this.useDualQuaternionSkinning = false;
 
 	}
 
@@ -43064,6 +43071,9 @@ class MaterialLoader extends Loader {
 
 		}
 
+		if ( json.lights !== undefined ) material.lights = json.lights;
+		if ( json.clipping !== undefined ) material.clipping = json.clipping;
+
 		// for PointsMaterial
 
 		if ( json.size !== undefined ) material.size = json.size;
@@ -51395,3 +51405,4 @@ exports.ZeroSlopeEnding = ZeroSlopeEnding;
 exports.ZeroStencilOp = ZeroStencilOp;
 exports._SRGBAFormat = _SRGBAFormat;
 exports.sRGBEncoding = sRGBEncoding;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWUuY2pzIiwic291cmNlcyI6W10sInNvdXJjZXNDb250ZW50IjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9
