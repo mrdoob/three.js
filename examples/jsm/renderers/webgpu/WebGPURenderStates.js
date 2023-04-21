@@ -1,31 +1,17 @@
 import WebGPUWeakMap from './WebGPUWeakMap.js';
-import { lights } from 'three/nodes';
 
 class WebGPURenderState {
 
 	constructor() {
 
-		this.lightsNode = lights( [] );
+		this.depth = true;
+		this.stencil = true;
 
-		this.lightsArray = [];
+		// defined by renderer(backend)
 
-	}
-
-	init() {
-
-		this.lightsArray.length = 0;
-
-	}
-
-	pushLight( light ) {
-
-		this.lightsArray.push( light );
-
-	}
-
-	getLightsNode() {
-
-		return this.lightsNode.fromLights( this.lightsArray );
+		this.descriptorGPU = null;
+		this.encoderGPU = null;
+		this.currentPassGPU = null;
 
 	}
 
