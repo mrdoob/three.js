@@ -31,6 +31,16 @@ class NodeMaterial extends ShaderMaterial {
 		this.normals = true;
 
 		this.lightsNode = null;
+		this.envNode = null;
+
+		this.colorNode = null;
+		this.normalNode = null;
+		this.opacityNode = null;
+		this.backdropNode = null;
+		this.backdropAlphaNode = null;
+		this.alphaTestNode = null;
+
+		this.positionNode = null;
 
 	}
 
