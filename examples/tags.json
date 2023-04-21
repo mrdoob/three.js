@@ -73,6 +73,7 @@
 	"webgl_shadow_contact": [ "onBeforeCompile", "soft" ],
 	"webgl_shadowmap_viewer": [ "directional", "spot" ],
 	"webgl_skinning_simple": [ "animation" ],
+	"webgl_skinning_dualquaternion": [ "animation" ],
 	"webgl_tonemapping": [ "gltf" ],
 	"webgl_postprocessing_afterimage": [ "trails" ],
 	"webgl_postprocessing_dof": [ "bokeh" ],
