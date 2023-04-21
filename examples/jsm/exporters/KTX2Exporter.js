@@ -46,49 +46,49 @@ const VK_FORMAT_MAP = {
 
 	[ RGBAFormat ]: {
 		[ FloatType ]: {
-			[ null ]: VK_FORMAT_R32G32B32A32_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R32G32B32A32_SFLOAT,
+			null: VK_FORMAT_R32G32B32A32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ null ]: VK_FORMAT_R16G16B16A16_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R16G16B16A16_SFLOAT,
+			null: VK_FORMAT_R16G16B16A16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ null ]: VK_FORMAT_R8G8B8A8_UNORM,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R8G8B8A8_UNORM,
 			[ SRGBColorSpace ]: VK_FORMAT_R8G8B8A8_SRGB,
+			null: VK_FORMAT_R8G8B8A8_UNORM,
 		},
 	},
 
 	[ RGFormat ]: {
 		[ FloatType ]: {
-			[ null ]: VK_FORMAT_R32G32_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R32G32_SFLOAT,
+			null: VK_FORMAT_R32G32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ null ]: VK_FORMAT_R16G16_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R16G16_SFLOAT,
+			null: VK_FORMAT_R16G16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ null ]: VK_FORMAT_R8G8_UNORM,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R8G8_UNORM,
 			[ SRGBColorSpace ]: VK_FORMAT_R8G8_SRGB,
+			null: VK_FORMAT_R8G8_UNORM,
 		},
 	},
 
 	[ RedFormat ]: {
 		[ FloatType ]: {
-			[ null ]: VK_FORMAT_R32_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R32_SFLOAT,
+			null: VK_FORMAT_R32_SFLOAT,
 		},
 		[ HalfFloatType ]: {
-			[ null ]: VK_FORMAT_R16_SFLOAT,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R16_SFLOAT,
+			null: VK_FORMAT_R16_SFLOAT,
 		},
 		[ UnsignedByteType ]: {
-			[ null ]: VK_FORMAT_R8_UNORM,
 			[ LinearSRGBColorSpace ]: VK_FORMAT_R8_UNORM,
 			[ SRGBColorSpace ]: VK_FORMAT_R8_SRGB,
+			null: VK_FORMAT_R8_UNORM,
 		},
 	},
 
