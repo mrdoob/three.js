@@ -1,4 +1,5 @@
 import terser from '@rollup/plugin-terser';
+import MagicString from 'magic-string';
 
 function addons() {
 
@@ -8,11 +9,13 @@ function addons() {
 
 			if ( /\/examples\/jsm\//.test( id ) === false ) return;
 
-			code = code.replace( 'build/three.module.js', 'src/Three.js' );
+			code = new MagicString( code );
+
+			code.replace( 'build/three.module.js', 'src/Three.js' );
 
 			return {
-				code: code,
-				map: null
+				code: code.toString(),
+				map: code.generateMap().toString()
 			};
 
 		}
@@ -29,7 +32,9 @@ export function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`(.*?)\`/sg, function ( match, p1 ) {
+			code = new MagicString( code );
+
+			code.replace( /\/\* glsl \*\/\`(.*?)\`/sg, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -43,8 +48,8 @@ export function glsl() {
 			} );
 
 			return {
-				code: code,
-				map: null
+				code: code.toString(),
+				map: code.generateMap().toString()
 			};
 
 		}
@@ -59,12 +64,18 @@ function header() {
 
 		renderChunk( code ) {
 
-			return `/**
+			code = new MagicString( code );
+
+			code.prepend(`/**
  * @license
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
- */
-${ code }`;
+ */\n`);
+
+			return {
+				code: code.toString(),
+				map: code.generateMap().toString()
+			};
 
 		}
 
@@ -78,8 +89,14 @@ function deprecationWarning() {
 
 		renderChunk( code ) {
 
-			return `console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );
-${ code }`;
+			code = new MagicString( code );
+
+			code.prepend(`console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated with r150+, and will be removed with r160. Please use ES Modules or alternatives: https://threejs.org/docs/index.html#manual/en/introduction/Installation' );\n`);
+
+			return {
+				code: code.toString(),
+				map: code.generateMap().toString()
+			};
 
 		}
 
