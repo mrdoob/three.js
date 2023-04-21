@@ -32,8 +32,6 @@
 			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
-
 			let camera, scene, renderer, stats;
 			let physics, position;
 
@@ -83,8 +81,8 @@
 
 				// Boxes
 
-				const geometryBox = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
-				boxes = new THREE.InstancedMesh( geometryBox, material, 100 );
+				const geometryBox = new THREE.BoxGeometry( 0.075, 0.075, 0.075 );
+				boxes = new THREE.InstancedMesh( geometryBox, material, 400 );
 				boxes.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				boxes.castShadow = true;
 				boxes.receiveShadow = true;
@@ -102,8 +100,8 @@
 
 				// Spheres
 
-				const geometrySphere = new THREE.IcosahedronGeometry( 0.075, 3 );
-				spheres = new THREE.InstancedMesh( geometrySphere, material, 100 );
+				const geometrySphere = new THREE.IcosahedronGeometry( 0.05, 4 );
+				spheres = new THREE.InstancedMesh( geometrySphere, material, 400 );
 				spheres.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				spheres.castShadow = true;
 				spheres.receiveShadow = true;

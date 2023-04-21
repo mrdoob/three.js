@@ -153,6 +153,8 @@ async function RapierPhysics() {
 			world.timestep = delta;
 			world.step();
 
+			//
+
 			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
 				const mesh = meshes[ i ];
