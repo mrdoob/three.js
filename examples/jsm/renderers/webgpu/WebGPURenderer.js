@@ -224,15 +224,11 @@ class WebGPURenderer {
 
 		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
 
-		context.configure( {
-			device,
-			format: GPUTextureFormat.BGRA8Unorm, // this is the only valid context format right now (r121)
-			alphaMode: 'premultiplied'
-		} );
-
 		this._adapter = adapter;
 		this._device = device;
 		this._context = context;
+
+		this._configureContext();
 
 		this._info = new WebGPUInfo();
 		this._properties = new WebGPUProperties();
