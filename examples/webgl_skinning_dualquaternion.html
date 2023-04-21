@@ -95,19 +95,15 @@
 					gltf.scene.traverse( function ( child ) {
 
 						if ( child.name === "sphere002") {
-							const material = new THREE.MeshStandardMaterial( { color: 0x333333, skinning: true } );
-							child.material.copy( material );
+							const material = new THREE.MeshStandardMaterial( { color: 0x333333 } );
 							child.material = material;
 							child.useDualQuaternionSkinning = true;
 						}
 
-						if ( child.isSkinnedMesh ) child.castShadow = true;
-
-						if ( child.name.startsWith("sphere")) {
+						if ( child.name.startsWith("sphere") ) {
 							child.material.side = THREE.DoubleSide;
+							child.castShadow = true;
 						}
-
-						
 
 					} );
 
