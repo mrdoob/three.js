@@ -238,8 +238,13 @@ class WebGPUTextures {
 
 			const width = renderTarget.width;
 			const height = renderTarget.height;
-			const colorTextureFormat = this._getFormat( renderTarget.texture );
-			const label = renderTarget.texture.name ? '_' + renderTarget.texture.name : '';
+
+			const texture = renderTarget.texture;
+
+			const colorTextureFormat = texture.internalFormat || this._getFormat( texture );
+			const label = texture.name ? '_' + texture.name : '';
+			const needsMipmaps = this._needsMipmaps( texture );
+			const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 
 			const colorTextureGPU = device.createTexture( {
 				label: 'renderTarget' + label,
@@ -248,8 +253,9 @@ class WebGPUTextures {
 					height: height,
 					depthOrArrayLayers: 1
 				},
+				mipLevelCount: mipLevelCount,
 				format: colorTextureFormat,
-				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
 			} );
 
 			this.info.memory.textures ++;
@@ -262,7 +268,7 @@ class WebGPUTextures {
 			// Since it's not possible to see just from a texture object whether it belongs to a render
 			// target or not, we need the initializedRTT flag.
 
-			const textureProperties = properties.get( renderTarget.texture );
+			const textureProperties = properties.get( texture );
 			textureProperties.textureGPU = colorTextureGPU;
 			textureProperties.initializedRTT = false;
 
@@ -278,7 +284,7 @@ class WebGPUTextures {
 						depthOrArrayLayers: 1
 					},
 					format: depthTextureFormat,
-					usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+					usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
 				} );
 
 				this.info.memory.textures ++;
@@ -379,7 +385,7 @@ class WebGPUTextures {
 		const needsMipmaps = this._needsMipmaps( texture );
 		const dimension = this._getDimension( texture );
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
-		const format = this._getFormat( texture );
+		const format = texture.internalFormat || this._getFormat( texture );
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
 
@@ -434,6 +440,10 @@ class WebGPUTextures {
 				this._copyCubeMapToTexture( image, texture, textureGPU, textureGPUDescriptor, needsMipmaps );
 
 			}
+
+		} else if ( texture.isRenderTargetTexture ) {
+
+			if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
 		} else if ( texture.isDepthTexture !== true && image !== null ) {
 
@@ -550,7 +560,8 @@ class WebGPUTextures {
 					width: Math.ceil( width / blockData.width ) * blockData.width,
 					height: Math.ceil( height / blockData.width ) * blockData.width,
 					depthOrArrayLayers: 1
-				} );
+				}
+			);
 
 		}
 

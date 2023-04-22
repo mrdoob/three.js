@@ -15,15 +15,6 @@ class LineBasicNodeMaterial extends NodeMaterial {
 		this.lights = false;
 		this.normals = false;
 
-		this.colorNode = null;
-		this.opacityNode = null;
-
-		this.alphaTestNode = null;
-
-		this.lightNode = null;
-
-		this.positionNode = null;
-
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );

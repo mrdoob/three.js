@@ -1,4 +1,5 @@
 import WebGPUWeakMap from './WebGPUWeakMap.js';
+import { lights } from '../../nodes/Nodes.js';
 
 function painterSortStable( a, b ) {
 
@@ -58,6 +59,9 @@ class WebGPURenderList {
 		this.opaque = [];
 		this.transparent = [];
 
+		this.lightsNode = lights( [] );
+		this.lightsArray = [];
+
 	}
 
 	init() {
@@ -66,6 +70,9 @@ class WebGPURenderList {
 
 		this.opaque.length = 0;
 		this.transparent.length = 0;
+		this.lightsArray.length = 0;
+
+		return this;
 
 	}
 
@@ -123,6 +130,18 @@ class WebGPURenderList {
 
 	}
 
+	pushLight( light ) {
+
+		this.lightsArray.push( light );
+
+	}
+
+	getLightsNode() {
+
+		return this.lightsNode.fromLights( this.lightsArray );
+
+	}
+
 	sort( customOpaqueSort, customTransparentSort ) {
 
 		if ( this.opaque.length > 1 ) this.opaque.sort( customOpaqueSort || painterSortStable );
@@ -131,6 +150,10 @@ class WebGPURenderList {
 	}
 
 	finish() {
+
+		// update lights
+
+		this.lightsNode.fromLights( this.lightsArray );
 
 		// Clear references from inactive renderItems in the list
 

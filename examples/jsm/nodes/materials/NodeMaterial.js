@@ -11,9 +11,10 @@ import { positionLocal } from '../accessors/PositionNode.js';
 import { skinning } from '../accessors/SkinningNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { lightsWithoutWrap } from '../lighting/LightsNode.js';
+import { mix } from '../math/MathNode.js';
+import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 const NodeMaterials = new Map();
 
@@ -31,6 +32,16 @@ class NodeMaterial extends ShaderMaterial {
 		this.normals = true;
 
 		this.lightsNode = null;
+		this.envNode = null;
+
+		this.colorNode = null;
+		this.normalNode = null;
+		this.opacityNode = null;
+		this.backdropNode = null;
+		this.backdropAlphaNode = null;
+		this.alphaTestNode = null;
+
+		this.positionNode = null;
 
 	}
 
@@ -193,6 +204,7 @@ class NodeMaterial extends ShaderMaterial {
 	constructLighting( builder ) {
 
 		const { material } = builder;
+		const { backdropNode, backdropAlphaNode, emissiveNode } = this;
 
 		// OUTGOING LIGHT
 
@@ -205,15 +217,19 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
 
-			outgoingLightNode = lightsNode.lightingContext( lightingModelNode );
+			outgoingLightNode = lightsNode.lightingContext( lightingModelNode, backdropNode, backdropAlphaNode );
+
+		} else if ( backdropNode !== null ) {
+
+			outgoingLightNode = vec3( backdropAlphaNode !== null ? mix( outgoingLightNode, backdropNode, backdropAlphaNode ) : backdropNode );
 
 		}
 
 		// EMISSIVE
 
-		if ( ( this.emissiveNode && this.emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
+		if ( ( emissiveNode && emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
-			outgoingLightNode = outgoingLightNode.add( this.emissiveNode ? vec3( this.emissiveNode ) : materialEmissive );
+			outgoingLightNode = outgoingLightNode.add( emissiveNode ? vec3( emissiveNode ) : materialEmissive );
 
 		}
 
