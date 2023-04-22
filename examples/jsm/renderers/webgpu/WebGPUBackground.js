@@ -1,6 +1,6 @@
 import { GPULoadOp, GPUStoreOp } from './constants.js';
 import { Color, Mesh, BoxGeometry, BackSide } from 'three';
-import { context, positionWorldDirection, MeshBasicNodeMaterial } from 'three/nodes';
+import { context, positionWorldDirection, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
 
 let _clearAlpha;
 const _clearColor = new Color();

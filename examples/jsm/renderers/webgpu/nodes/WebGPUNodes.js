@@ -1,6 +1,6 @@
 import WebGPUNodeBuilder from './WebGPUNodeBuilder.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, positionWorld, modelWorldMatrix, transformDirection, equirectUV, viewportBottomLeft } from 'three/nodes';
+import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, positionWorld, modelWorldMatrix, transformDirection, equirectUV, viewportBottomLeft } from '../../../nodes/Nodes.js';
 
 class WebGPUNodes {
 
