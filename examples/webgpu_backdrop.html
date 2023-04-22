@@ -37,7 +37,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, scene, renderer;
-			let portals;
+			let portals, rotate = true;
 			let mixer, clock;
 
 			init();
@@ -132,6 +132,8 @@
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 1, 0 );
+				controls.addEventListener( 'start', () => rotate = false );
+				controls.addEventListener( 'end', () => rotate = true );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -153,7 +155,7 @@
 
 				if ( mixer ) mixer.update( delta );
 
-				portals.rotation.y += delta * 0.5;
+				if ( rotate ) portals.rotation.y += delta * 0.5;
 
 				renderer.render( scene, camera );
 
