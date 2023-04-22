@@ -27,8 +27,8 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - USDZ exporter<br />
-			Battle Damaged Sci-fi Helmet by
-			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
+			Carbon Frame Bike by
+			<a href="https://sketchfab.com/prefrontalcortex" target="_blank" rel="noopener">prefrontal cortex</a><br />
 			<a id="desktop-link" href="" download="asset.usdz"><button>Download Converted USDZ</button></a>
 		</div>
 
@@ -74,8 +74,8 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 2.5, 0.6, 3.0 );
+				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 2.5, 1.6, 3.0 );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 
@@ -88,24 +88,35 @@
 				const ktx2loader = new KTX2Loader().setTranscoderPath( 'jsm/libs/basis/' ).detectSupport( renderer );
 				const dracoLoader = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/' );
 				loader.setDRACOLoader( dracoLoader ).setKTX2Loader( ktx2loader );
-				loader.load( 'CarbonFrameBike (2).glb', async function ( gltf ) {
+				loader.load( 'CarbonFrameBike.etc1s+draco.glb', async function ( gltf ) {
 
 					scene.add( gltf.scene );
 
-					const shadowMesh = createSpotShadowMesh();
-					shadowMesh.position.y = - 1.1;
-					shadowMesh.position.z = - 0.25;
-					shadowMesh.scale.setScalar( 2 );
-					scene.add( shadowMesh );
+					if ( gltf.animations.length > 0 ) {
+
+						mixer = new THREE.AnimationMixer( gltf.scene );
+						const action = mixer.clipAction( gltf.animations[ 0 ] );
+						action.setLoop( THREE.LoopRepeat, Infinity );
+						action.play();
+
+					}
 
 					render();
 
 					// USDZ
 
-					const animationExtension = new USDAnimationExtension();
-					animationExtension.registerAnimation( gltf.scene, gltf.animations[ 0 ] );
 					const exporter = new USDZExporter();
-					const arraybuffer = await exporter.parse( scene, { extensions: [ animationExtension ] } );
+					const options = {};
+
+					if ( gltf.animations.length > 0 ) {
+
+						const animationExtension = new USDAnimationExtension();
+						animationExtension.registerAnimation( gltf.scene, gltf.animations[ 0 ] );
+						options.extensions = [ animationExtension ];
+
+					}
+
+					const arraybuffer = await exporter.parse( scene, options );
 					const blob = new Blob( [ arraybuffer ], { type: 'application/octet-stream' } );
 
 					const url = URL.createObjectURL( blob );
@@ -120,10 +131,19 @@
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
-				controls.target.set( 0, - 0.15, - 0.2 );
+				controls.target.set( 0, 0.7, 0 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				requestAnimationFrame( function update() {
+
+					if ( mixer ) mixer.update( 0.01 );
+					render();
+
+					requestAnimationFrame( update );
+
+				} );
 
 			}
 

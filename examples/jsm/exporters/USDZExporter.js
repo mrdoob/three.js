@@ -1,5 +1,5 @@
 import {
-	PlaneBufferGeometry,
+	PlaneGeometry,
 	Texture,
 	Uniform,
 	PerspectiveCamera,
@@ -628,7 +628,7 @@ function invokeAll( context, name, writer = null ) {
 
 function copyTexture( texture ) {
 
-	const geometry = new PlaneBufferGeometry( 2, 2, 1, 1 );
+	const geometry = new PlaneGeometry( 2, 2, 1, 1 );
 	const material = new ShaderMaterial( {
 		uniforms: { blitTexture: new Uniform( texture ) },
 		vertexShader: `
@@ -1363,6 +1363,7 @@ class USDAnimationExtension {
 		return longestStartTime;
 
 	}
+
 	registerAnimation( root, clip ) {
 
 		if ( ! clip || ! root )
