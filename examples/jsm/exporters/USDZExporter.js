@@ -24,7 +24,7 @@ function makeNameSafe( str ) {
 
 }
 
-class USDZDocument {
+class USDDocument {
 
 	get isDocumentRoot() {
 
@@ -132,7 +132,7 @@ class USDZDocument {
 
 }
 
-const USDObject_export_id = 0;
+let USDObject_export_id = 0;
 
 class USDObject {
 
@@ -341,7 +341,7 @@ class USDZExporterContext {
 		this.materials = {};
 		this.textures = {};
 		this.files = {};
-		this.document = new USDZDocument();
+		this.document = new USDDocument();
 		this.output = '';
 
 	}
@@ -835,7 +835,7 @@ function fn( num ) {
 
 }
 
-export function buildMatrix( matrix ) {
+function buildMatrix( matrix ) {
 
 	const array = matrix.elements;
 
