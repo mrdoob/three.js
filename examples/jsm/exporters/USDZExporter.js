@@ -11,7 +11,10 @@ import {
 	Matrix4, 
 	RepeatWrapping, 
 	MirroredRepeatWrapping, 
-	DoubleSide
+	DoubleSide,
+	PropertyBinding,
+	Vector3,
+	Quaternion,
 } from 'three';
 import * as fflate from 'three/addons/libs/fflate.module.js';
 
@@ -58,7 +61,6 @@ class USDZDocument {
 		}
 
 	}
-
 
 	traverse( callback, current = null ) {
 
@@ -128,13 +130,12 @@ class USDZDocument {
 
 }
 
+let USDZObject_export_id = 0;
 export class USDZObject {
-
-	static _id;
 
 	static createEmptyParent( object ) {
 
-		const emptyParent = new USDZObject( MathUtils.generateUUID(), object.name + '_empty_' + ( this._id ++ ), object.matrix );
+		const emptyParent = new USDZObject( MathUtils.generateUUID(), object.name + '_empty_' + ( this.USDZObject_export_id ++ ), object.matrix );
 		const parent = object.parent;
 		parent.add( emptyParent );
 		emptyParent.add( object );
@@ -241,14 +242,16 @@ export class USDZObject {
 
 	onSerialize( writer, context ) {
 
-		this._eventListeners[ 'serialize' ]?.forEach( listener => listener( writer, context ) );
+		const listeners = this._eventListeners[ 'serialize' ];
+		if (listeners) listeners.forEach( listener => listener( writer, context ) );
 
 	}
 
 }
 
 const newLine = '\n';
-export class CodeWriter {
+
+class USDWriter {
 
 	constructor() {
 
@@ -464,7 +467,7 @@ function traverseVisible( object, parentModel, context ) {
 	const geometry = object.geometry;
 	const material = object.material;
 
-	if ( object.isMesh && material?.isMeshStandardMaterial && ! object.isSkinnedMesh ) {
+	if ( object.isMesh && material && material.isMeshStandardMaterial && ! object.isSkinnedMesh ) {
 
 		const name = getObjectId( object );
 		model = new USDZObject( object.uuid, name, object.matrix, geometry, material );
@@ -495,7 +498,7 @@ function traverseVisible( object, parentModel, context ) {
 
 			for ( const ext of context.extensions ) {
 
-				ext.onExportObject?.call( ext, object, model, context );
+				if ( ext.onExportObject ) ext.onExportObject.call( ext, object, model, context );
 
 			}
 
@@ -531,10 +534,10 @@ function parseDocument( context ) {
 
 	}
 
-	const writer = new CodeWriter();
+	const writer = new USDWriter();
 
 	writer.beginBlock( `def Xform "${context.document.name}"` );
-	
+
 	writer.beginBlock( `def Scope "Scenes" (
 			kind = "sceneLibrary"
 		)`);
@@ -1217,7 +1220,6 @@ function buildVector2( vector ) {
 
 }
 
-
 function buildCamera( camera ) {
 
 	const name = camera.name ? camera.name : 'Camera_' + camera.id;
@@ -1267,3 +1269,238 @@ function buildCamera( camera ) {
 }
 
 export { USDZExporter };
+
+class RegisteredAnimationInfo {
+
+    get start() { return this.ext.getStartTime01(this.root, this.clip); }
+    get duration() { return this.clip.duration; }
+
+    constructor(ext, root, clip) {
+        this.ext = ext;
+        this.root = root;
+        this.clip = clip;
+    }
+}
+
+
+class TransformData {
+
+    get frameRate() { return 60; }
+
+	constructor(ext, root, target, clip) {
+
+		this.ext = ext;
+        this.root = root;
+        this.target = target;
+        this.clip = clip;
+
+	}
+
+	addTrack(track) {
+
+		if (track.name.endsWith("position"))
+            this.pos = track;
+
+		if (track.name.endsWith("quaternion"))
+            this.rot = track;
+
+		if (track.name.endsWith("scale"))
+            this.scale = track;
+    }
+
+    getFrames() {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        return Math.max((_c = (_b = (_a = this.pos) === null || _a === void 0 ? void 0 : _a.times) === null || _b === void 0 ? void 0 : _b.length) !== null && _c !== void 0 ? _c : 0, (_f = (_e = (_d = this.rot) === null || _d === void 0 ? void 0 : _d.times) === null || _e === void 0 ? void 0 : _e.length) !== null && _f !== void 0 ? _f : 0, (_j = (_h = (_g = this.scale) === null || _g === void 0 ? void 0 : _g.times) === null || _h === void 0 ? void 0 : _h.length) !== null && _j !== void 0 ? _j : 0);
+    }
+    getDuration() {
+        var _a, _b, _c, _d, _e;
+        const times = (_d = (_b = (_a = this.pos) === null || _a === void 0 ? void 0 : _a.times) !== null && _b !== void 0 ? _b : (_c = this.rot) === null || _c === void 0 ? void 0 : _c.times) !== null && _d !== void 0 ? _d : (_e = this.scale) === null || _e === void 0 ? void 0 : _e.times;
+        if (!times)
+            return 0;
+        return times[times.length - 1];
+    }
+    getStartTime(arr) {
+        let sum = 0;
+        for (let i = 0; i < arr.length; i++) {
+            const entry = arr[i];
+            if (entry === this) {
+                return sum;
+            }
+            else
+                sum += entry.getDuration();
+        }
+        return sum;
+    }
+}
+
+export class AnimationExtension {
+    constructor() {
+        this.dict = new Map();
+        this.rootTargetMap = new Map();
+        this.serializers = [];
+    }
+    get extensionName() { return "animation"; }
+    getStartTime01(root, clip) {
+        const targets = this.rootTargetMap.get(root);
+        if (!targets)
+            return Infinity;
+        let longestStartTime = -1;
+        for (const target of targets) {
+            const data = this.dict.get(target);
+            let startTimeInSeconds = 0;
+            if (data === null || data === void 0 ? void 0 : data.length) {
+                for (const entry of data) {
+                    if (entry.clip === clip) {
+                        break;
+                    }
+                    startTimeInSeconds += entry.getDuration();
+                }
+                longestStartTime = Math.max(longestStartTime, startTimeInSeconds);
+            }
+            else {
+                console.warn("No animation found on root", root, clip, data);
+            }
+        }
+        return longestStartTime;
+    }
+    registerAnimation(root, clip) {
+        if (!clip || !root)
+            return null;
+        if (!this.rootTargetMap.has(root))
+            this.rootTargetMap.set(root, []);
+
+		console.log("registerAnimation", root, clip)
+
+        for (const track of clip.tracks) {
+			
+			const trackBinding = PropertyBinding.parseTrackName( track.name );
+			let animationTarget = PropertyBinding.findNode( root, trackBinding.nodeName );
+            if (!animationTarget) {
+                console.warn("no object found for track", track.name, "using " + root.name + " instead");
+                continue;
+            }
+            if (!this.dict.has(animationTarget)) {
+                this.dict.set(animationTarget, []);
+            }
+            const arr = this.dict.get(animationTarget);
+            if (!arr)
+                continue;
+            let model = arr.find(x => x.clip === clip);
+            if (!model) {
+                model = new TransformData(this, root, animationTarget, clip);
+                arr.push(model);
+            }
+            model.addTrack(track);
+            const targets = this.rootTargetMap.get(root);
+            if (!(targets === null || targets === void 0 ? void 0 : targets.includes(animationTarget)))
+                targets === null || targets === void 0 ? void 0 : targets.push(animationTarget);
+        }
+        const info = new RegisteredAnimationInfo(this, root, clip);
+        return info;
+    }
+    onAfterHierarchy(_context) {
+    }
+    onAfterBuildDocument(_context) {
+		console.log("onAfterBuildDocument")
+        var _a, _b;
+        for (const ser of this.serializers) {
+            const parent = (_a = ser.model) === null || _a === void 0 ? void 0 : _a.parent;
+            const isEmptyParent = (parent === null || parent === void 0 ? void 0 : parent.isDynamic) === true;
+            if (isEmptyParent) {
+                ser.registerCallback(parent);
+            }
+        }
+    }
+    onExportObject(object, model, _context) {
+		console.log("onExportObject")
+        // we need to be able to retarget serialization to empty parents before actually serializing (we do that in another callback)
+        const ser = new SerializeAnimation(object, this.dict);
+        this.serializers.push(ser);
+        ser.registerCallback(model);
+    }
+}
+class SerializeAnimation {
+    constructor(object, dict) {
+        this.object = object;
+        this.dict = dict;
+    }
+    registerCallback(model) {
+        if (this.model && this.callback) {
+            this.model.removeEventListener("serialize", this.callback);
+        }
+        if (!this.callback)
+            this.callback = this.onSerialize.bind(this);
+        this.model = model;
+        this.model.addEventListener("serialize", this.callback);
+    }
+    onSerialize(writer, _context) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        // do we have a track for this?
+        const object = this.object;
+        const arr = this.dict.get(object);
+		console.log("onSerialize SerializeAnimation", object, arr)
+        if (!arr)
+            return;
+        // console.log("found data for", object, "exporting animation now");
+        // assumption: all tracks have the same time values
+        // TODO collect all time values and then use the interpolator to access
+        const composedTransform = new Matrix4();
+        const translation = new Vector3();
+        const rotation = new Quaternion();
+        const scale = new Vector3(1, 1, 1);
+        // TODO doesn't support individual time arrays right now
+        // could use these in case we don't have time values that are identical
+        /*
+        const translationInterpolant = o.pos?.createInterpolant() as THREE.Interpolant;
+        const rotationInterpolant = o.rot?.createInterpolant() as THREE.Interpolant;
+        const scaleInterpolant = o.scale?.createInterpolant() as THREE.Interpolant;
+        */
+        writer.appendLine("matrix4d xformOp:transform.timeSamples = {");
+        writer.indent++;
+        for (const transformData of arr) {
+            let timesArray = (_a = transformData.pos) === null || _a === void 0 ? void 0 : _a.times;
+            if (!timesArray || transformData.rot && ((_b = transformData.rot.times) === null || _b === void 0 ? void 0 : _b.length) > (timesArray === null || timesArray === void 0 ? void 0 : timesArray.length))
+                timesArray = (_c = transformData.rot) === null || _c === void 0 ? void 0 : _c.times;
+            if (!timesArray || transformData.scale && ((_d = transformData.scale.times) === null || _d === void 0 ? void 0 : _d.length) > (timesArray === null || timesArray === void 0 ? void 0 : timesArray.length))
+                timesArray = (_e = transformData.scale) === null || _e === void 0 ? void 0 : _e.times;
+            if (!timesArray) {
+                console.error("got an animated object but no time values??", object, transformData);
+                continue;
+            }
+            const startTime = transformData.getStartTime(arr);
+            // ignore until https://github.com/three-types/three-ts-types/pull/293 gets merged
+            //@ts-ignore
+            const positionInterpolant = (_f = transformData.pos) === null || _f === void 0 ? void 0 : _f.createInterpolant();
+            //@ts-ignore
+            const rotationInterpolant = (_g = transformData.rot) === null || _g === void 0 ? void 0 : _g.createInterpolant();
+            //@ts-ignore
+            const scaleInterpolant = (_h = transformData.scale) === null || _h === void 0 ? void 0 : _h.createInterpolant();
+            if (!positionInterpolant)
+                translation.set(object.position.x, object.position.y, object.position.z);
+            if (!rotationInterpolant)
+                rotation.set(object.quaternion.x, object.quaternion.y, object.quaternion.z, object.quaternion.w);
+            if (!scaleInterpolant)
+                scale.set(object.scale.x, object.scale.y, object.scale.z);
+            for (let index = 0; index < timesArray.length; index++) {
+                const time = timesArray[index];
+                if (positionInterpolant) {
+                    const pos = positionInterpolant.evaluate(time);
+                    translation.set(pos[0], pos[1], pos[2]);
+                }
+                if (rotationInterpolant) {
+                    const quat = rotationInterpolant.evaluate(time);
+                    rotation.set(quat[0], quat[1], quat[2], quat[3]);
+                }
+                if (scaleInterpolant) {
+                    const scale = scaleInterpolant.evaluate(time);
+                    scale.set(scale[0], scale[1], scale[2]);
+                }
+                composedTransform.compose(translation, rotation, scale);
+                let line = `${(startTime + time) * transformData.frameRate}: ${buildMatrix(composedTransform)},`;
+                writer.appendLine(line);
+            }
+        }
+        writer.indent--;
+        writer.appendLine("}");
+    }
+}

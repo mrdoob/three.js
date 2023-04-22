@@ -57,7 +57,9 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
+			import { USDZExporter, AnimationExtension } from 'three/addons/exporters/USDZExporter.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
 			let camera, scene, renderer;
 
@@ -81,8 +83,12 @@
 				scene.background = new THREE.Color( 0xf0f0f0 );
 				scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
 
-				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-				loader.load( 'DamagedHelmet.gltf', async function ( gltf ) {
+				let mixer;
+				const loader = new GLTFLoader().setPath( 'models/gltf/' );
+				const ktx2loader = new KTX2Loader().setTranscoderPath( 'jsm/libs/basis/' ).detectSupport( renderer );
+				const dracoLoader = new DRACOLoader().setDecoderPath( 'jsm/libs/draco/' );
+				loader.setDRACOLoader( dracoLoader ).setKTX2Loader( ktx2loader );
+				loader.load( 'CarbonFrameBike (2).glb', async function ( gltf ) {
 
 					scene.add( gltf.scene );
 
@@ -96,8 +102,10 @@
 
 					// USDZ
 
+					const animationExtension = new AnimationExtension();
+					animationExtension.registerAnimation( gltf.scene, gltf.animations[ 0 ] );
 					const exporter = new USDZExporter();
-					const arraybuffer = await exporter.parse( scene );
+					const arraybuffer = await exporter.parse( scene, { extensions: [ animationExtension ] } );
 					const blob = new Blob( [ arraybuffer ], { type: 'application/octet-stream' } );
 
 					const url = URL.createObjectURL( blob );
