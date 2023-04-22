@@ -12,7 +12,7 @@ import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
 import WebGPURenderTarget from '../WebGPURenderTarget.js';
 
-import { NodeBuilder, WGSLNodeParser, CodeNode, NodeMaterial } from 'three/nodes';
+import { NodeBuilder, WGSLNodeParser, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage.VERTEX,

@@ -9,7 +9,7 @@ async function RapierPhysics() {
 	// Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/	
 
 	const gravity = { x: 0.0, y: - 9.81, z: 0.0 };
-    const world = new RAPIER.World( gravity );
+	const world = new RAPIER.World( gravity );
 
 	function getCollider( geometry ) {
 
