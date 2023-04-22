@@ -132,13 +132,13 @@ class USDZDocument {
 
 }
 
-const USDZObject_export_id = 0;
+const USDObject_export_id = 0;
 
-export class USDZObject {
+class USDObject {
 
 	static createEmptyParent( object ) {
 
-		const emptyParent = new USDZObject( MathUtils.generateUUID(), object.name + '_empty_' + ( USDZObject_export_id ++ ), object.matrix );
+		const emptyParent = new USDObject( MathUtils.generateUUID(), object.name + '_empty_' + ( USDObject_export_id ++ ), object.matrix );
 		const parent = object.parent;
 		parent.add( emptyParent );
 		emptyParent.add( object );
@@ -178,7 +178,7 @@ export class USDZObject {
 
 	clone() {
 
-		const clone = new USDZObject( MathUtils.generateUUID(), this.name, this.matrix, this.mesh, this.material );
+		const clone = new USDObject( MathUtils.generateUUID(), this.name, this.matrix, this.mesh, this.material );
 		clone.isDynamic = this.isDynamic;
 		return clone;
 
@@ -394,9 +394,6 @@ class USDZExporter {
 		const header = context.document.buildHeader();
 		const final = header + '\n' + context.output;
 
-		// temporarily for debugging
-		this.lastUsda = final;
-
 		// full output file
 		if ( this.debug )
 			console.log( final );
@@ -474,17 +471,17 @@ function traverseVisible( object, parentModel, context ) {
 	if ( object.isMesh && material && material.isMeshStandardMaterial && ! object.isSkinnedMesh ) {
 
 		const name = getObjectId( object );
-		model = new USDZObject( object.uuid, name, object.matrix, geometry, material );
+		model = new USDObject( object.uuid, name, object.matrix, geometry, material );
 
 	} else if ( object.isCamera ) {
 
 		const name = getObjectId( object );
-		model = new USDZObject( object.uuid, name, object.matrix, undefined, undefined, object );
+		model = new USDObject( object.uuid, name, object.matrix, undefined, undefined, object );
 
 	} else {
 
 		const name = getObjectId( object );
-		model = new USDZObject( object.uuid, name, object.matrix );
+		model = new USDObject( object.uuid, name, object.matrix );
 
 	}
 
@@ -511,7 +508,7 @@ function traverseVisible( object, parentModel, context ) {
 	} else {
 
 		const name = getObjectId( object );
-		const empty = new USDZObject( object.uuid, name, object.matrix );
+		const empty = new USDObject( object.uuid, name, object.matrix );
 		if ( parentModel ) {
 
 			parentModel.add( empty );
@@ -1226,56 +1223,6 @@ function buildVector2( vector ) {
 
 }
 
-function buildCamera( camera ) {
-
-	const name = camera.name ? camera.name : 'Camera_' + camera.id;
-
-	const transform = buildMatrix( camera.matrixWorld );
-
-	if ( camera.matrixWorld.determinant() < 0 ) {
-
-		console.warn( 'THREE.USDZExporter: USDZ does not support negative scales', camera );
-
-	}
-
-	if ( camera.isOrthographicCamera ) {
-
-		return `def Camera "${name}"
-		{
-			matrix4d xformOp:transform = ${ transform }
-			uniform token[] xformOpOrder = ["xformOp:transform"]
-	
-			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
-			float horizontalAperture = ${ ( ( Math.abs( camera.left ) + Math.abs( camera.right ) ) * 10 ).toPrecision( PRECISION ) }
-			float verticalAperture = ${ ( ( Math.abs( camera.top ) + Math.abs( camera.bottom ) ) * 10 ).toPrecision( PRECISION ) }
-			token projection = "orthographic"
-		}
-	
-	`;
-
-	} else {
-
-		return `def Camera "${name}"
-		{
-			matrix4d xformOp:transform = ${ transform }
-			uniform token[] xformOpOrder = ["xformOp:transform"]
-	
-			float2 clippingRange = (${ camera.near.toPrecision( PRECISION ) }, ${ camera.far.toPrecision( PRECISION ) })
-			float focalLength = ${ camera.getFocalLength().toPrecision( PRECISION ) }
-			float focusDistance = ${ camera.focus.toPrecision( PRECISION ) }
-			float horizontalAperture = ${ camera.getFilmWidth().toPrecision( PRECISION ) }
-			token projection = "perspective"
-			float verticalAperture = ${ camera.getFilmHeight().toPrecision( PRECISION ) }
-		}
-	
-	`;
-
-	}
-
-}
-
-export { USDZExporter };
-
 class RegisteredAnimationInfo {
 
 	get start() {
@@ -1298,7 +1245,6 @@ class RegisteredAnimationInfo {
 	}
 
 }
-
 
 class TransformData {
 
@@ -1366,7 +1312,7 @@ class TransformData {
 
 }
 
-export class AnimationExtension {
+class USDAnimationExtension {
 
 	constructor() {
 
@@ -1423,8 +1369,6 @@ export class AnimationExtension {
 			return null;
 		if ( ! this.rootTargetMap.has( root ) )
 			this.rootTargetMap.set( root, [] );
-
-		console.log( 'registerAnimation', root, clip );
 
 		for ( const track of clip.tracks ) {
 
@@ -1519,26 +1463,25 @@ class SerializeAnimation {
 	onSerialize( writer ) {
 
 		var _a, _b, _c, _d, _e, _f, _g, _h;
-		// do we have a track for this?
 		const object = this.object;
 		const arr = this.dict.get( object );
-		console.log( 'onSerialize SerializeAnimation', object, arr );
+
 		if ( ! arr )
 			return;
-		// console.log("found data for", object, "exporting animation now");
-		// assumption: all tracks have the same time values
-		// TODO collect all time values and then use the interpolator to access
+
 		const composedTransform = new Matrix4();
 		const translation = new Vector3();
 		const rotation = new Quaternion();
 		const scale = new Vector3( 1, 1, 1 );
+
 		// TODO doesn't support individual time arrays right now
 		// could use these in case we don't have time values that are identical
 		/*
-        const translationInterpolant = o.pos?.createInterpolant() as THREE.Interpolant;
-        const rotationInterpolant = o.rot?.createInterpolant() as THREE.Interpolant;
-        const scaleInterpolant = o.scale?.createInterpolant() as THREE.Interpolant;
+        const translationInterpolant = o.pos?.createInterpolant();
+        const rotationInterpolant = o.rot?.createInterpolant();
+        const scaleInterpolant = o.scale?.createInterpolant();
         */
+
 		writer.appendLine( 'matrix4d xformOp:transform.timeSamples = {' );
 		writer.indent ++;
 		for ( const transformData of arr ) {
@@ -1556,19 +1499,20 @@ class SerializeAnimation {
 			}
 
 			const startTime = transformData.getStartTime( arr );
-			// ignore until https://github.com/three-types/three-ts-types/pull/293 gets merged
-			//@ts-ignore
+
 			const positionInterpolant = ( _f = transformData.pos ) === null || _f === void 0 ? void 0 : _f.createInterpolant();
-			//@ts-ignore
 			const rotationInterpolant = ( _g = transformData.rot ) === null || _g === void 0 ? void 0 : _g.createInterpolant();
-			//@ts-ignore
 			const scaleInterpolant = ( _h = transformData.scale ) === null || _h === void 0 ? void 0 : _h.createInterpolant();
+
 			if ( ! positionInterpolant )
 				translation.set( object.position.x, object.position.y, object.position.z );
+
 			if ( ! rotationInterpolant )
 				rotation.set( object.quaternion.x, object.quaternion.y, object.quaternion.z, object.quaternion.w );
+
 			if ( ! scaleInterpolant )
 				scale.set( object.scale.x, object.scale.y, object.scale.z );
+
 			for ( let index = 0; index < timesArray.length; index ++ ) {
 
 				const time = timesArray[ index ];
@@ -1607,3 +1551,5 @@ class SerializeAnimation {
 	}
 
 }
+
+export { USDZExporter, USDAnimationExtension, USDObject };

@@ -57,9 +57,9 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { USDZExporter, AnimationExtension } from 'three/addons/exporters/USDZExporter.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { USDZExporter, USDAnimationExtension } from 'three/addons/exporters/USDZExporter.js';
 
 			let camera, scene, renderer;
 
@@ -102,7 +102,7 @@
 
 					// USDZ
 
-					const animationExtension = new AnimationExtension();
+					const animationExtension = new USDAnimationExtension();
 					animationExtension.registerAnimation( gltf.scene, gltf.animations[ 0 ] );
 					const exporter = new USDZExporter();
 					const arraybuffer = await exporter.parse( scene, { extensions: [ animationExtension ] } );
