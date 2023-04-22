@@ -1,6 +1,6 @@
 import WebGPUNodeBuilder from './WebGPUNodeBuilder.js';
 import { NoToneMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from 'three';
-import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, positionWorld, modelWorldMatrix, transformDirection, equirectUV, viewportBottomLeft } from 'three/nodes';
+import { NodeFrame, cubeTexture, texture, rangeFog, densityFog, reference, toneMapping, positionWorld, modelWorldMatrix, transformDirection, equirectUV, viewportBottomLeft } from '../../../nodes/Nodes.js';
 
 class WebGPUNodes {
 
@@ -81,7 +81,6 @@ class WebGPUNodes {
 		return this.renderer.toneMappingNode || this.properties.get( this.renderer ).toneMappingNode || null;
 
 	}
-
 
 	getCacheKey( scene, lightsNode ) {
 
@@ -253,26 +252,25 @@ class WebGPUNodes {
 
 	}
 
-	getUpdateNodes( renderObject ) {
+	getNodeFrame( renderObject ) {
 
-		const nodeBuilder = this.get( renderObject );
 		const nodeFrame = this.nodeFrame;
-
 		nodeFrame.scene = renderObject.scene;
 		nodeFrame.object = renderObject.object;
 		nodeFrame.camera = renderObject.camera;
 		nodeFrame.renderer = renderObject.renderer;
 		nodeFrame.material = renderObject.material;
 
-		return nodeBuilder.updateNodes;
+		return nodeFrame;
 
 	}
 
 	updateBefore( renderObject ) {
 
-		const nodeFrame = this.nodeFrame;
+		const nodeFrame = this.getNodeFrame( renderObject );
+		const nodeBuilder = this.get( renderObject );
 
-		for ( const node of this.getUpdateNodes( renderObject ) ) {
+		for ( const node of nodeBuilder.updateBeforeNodes ) {
 
 			nodeFrame.updateBeforeNode( node );
 
@@ -282,9 +280,10 @@ class WebGPUNodes {
 
 	update( renderObject ) {
 
-		const nodeFrame = this.nodeFrame;
+		const nodeFrame = this.getNodeFrame( renderObject );
+		const nodeBuilder = this.get( renderObject );
 
-		for ( const node of this.getUpdateNodes( renderObject ) ) {
+		for ( const node of nodeBuilder.updateNodes ) {
 
 			nodeFrame.updateNode( node );
 

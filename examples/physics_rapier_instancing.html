@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js physics - OimoPhysics instancing</title>
+		<title>three.js physics - rapier3d instancing</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,9 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - OimoPhysics instancing
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - rapier3d instancing
 		</div>
-
 
 		<!-- Import maps polyfill -->
 		<!-- Remove this when import maps will be widely supported -->
@@ -30,10 +29,8 @@
 
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { OimoPhysics } from 'three/addons/physics/OimoPhysics.js';
+			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
 			import Stats from 'three/addons/libs/stats.module.js';
-
-			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let camera, scene, renderer, stats;
 			let physics, position;
@@ -44,7 +41,7 @@
 
 			async function init() {
 
-				physics = await OimoPhysics();
+				physics = await RapierPhysics();
 				position = new THREE.Vector3();
 
 				//
@@ -57,7 +54,7 @@
 				scene.background = new THREE.Color( 0x666666 );
 
 				const hemiLight = new THREE.HemisphereLight();
-				hemiLight.intensity = 0.35;
+				hemiLight.intensity = 0.3;
 				scene.add( hemiLight );
 
 				const dirLight = new THREE.DirectionalLight();
@@ -68,7 +65,7 @@
 
 				const floor = new THREE.Mesh(
 					new THREE.BoxGeometry( 10, 5, 10 ),
-					new THREE.ShadowMaterial( { color: 0x111111 } )
+					new THREE.ShadowMaterial( { color: 0x444444 } )
 				);
 				floor.position.y = - 2.5;
 				floor.receiveShadow = true;
@@ -84,8 +81,8 @@
 
 				// Boxes
 
-				const geometryBox = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
-				boxes = new THREE.InstancedMesh( geometryBox, material, 100 );
+				const geometryBox = new THREE.BoxGeometry( 0.075, 0.075, 0.075 );
+				boxes = new THREE.InstancedMesh( geometryBox, material, 400 );
 				boxes.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				boxes.castShadow = true;
 				boxes.receiveShadow = true;
@@ -103,8 +100,8 @@
 
 				// Spheres
 
-				const geometrySphere = new THREE.IcosahedronGeometry( 0.075, 3 );
-				spheres = new THREE.InstancedMesh( geometrySphere, material, 100 );
+				const geometrySphere = new THREE.IcosahedronGeometry( 0.05, 4 );
+				spheres = new THREE.InstancedMesh( geometrySphere, material, 400 );
 				spheres.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				spheres.castShadow = true;
 				spheres.receiveShadow = true;
@@ -139,25 +136,27 @@
 
 				animate();
 
+				setInterval( () => {
+
+					let index = Math.floor( Math.random() * boxes.count );
+
+					position.set( 0, Math.random() + 1, 0 );
+					physics.setMeshPosition( boxes, position, index );
+
+					//
+
+					index = Math.floor( Math.random() * spheres.count );
+
+					position.set( 0, Math.random() + 1, 0 );
+					physics.setMeshPosition( spheres, position, index );
+
+				}, 1000 / 60 );
+
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				//
-
-				let index = Math.floor( Math.random() * boxes.count );
-
-				position.set( 0, Math.random() + 1, 0 );
-				physics.setMeshPosition( boxes, position, index );
-
-				//
-
-				index = Math.floor( Math.random() * spheres.count );
-
-				position.set( 0, Math.random() + 1, 0 );
-				physics.setMeshPosition( spheres, position, index );
 
 				renderer.render( scene, camera );
 

@@ -12158,6 +12158,9 @@ class ShaderMaterial extends Material {
 		data.vertexShader = this.vertexShader;
 		data.fragmentShader = this.fragmentShader;
 
+		data.lights = this.lights;
+		data.clipping = this.clipping;
+
 		const extensions = {};
 
 		for ( const key in this.extensions ) {
@@ -43071,6 +43074,9 @@ class MaterialLoader extends Loader {
 			}
 
 		}
+
+		if ( json.lights !== undefined ) material.lights = json.lights;
+		if ( json.clipping !== undefined ) material.clipping = json.clipping;
 
 		// for PointsMaterial
 

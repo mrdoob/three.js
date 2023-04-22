@@ -1,8 +1,8 @@
-import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
+import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension, GPUFeatureName } from './constants.js';
 import { VideoTexture, CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping, RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
-	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthTexture,
+	RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, SRGBColorSpace, DepthFormat, DepthStencilFormat, DepthTexture,
 	RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format,
-	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format
+	RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, UnsignedIntType, UnsignedShortType, UnsignedInt248Type
 } from 'three';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
@@ -37,13 +37,11 @@ class WebGPUTextures {
 
 	}
 
-	getDepthDefaultTexture() {
+	getDefaultDepthTexture() {
 
 		if ( this.depthDefaultTexture === null ) {
 
 			const depthTexture = new DepthTexture();
-			depthTexture.minFilter = NearestFilter;
-			depthTexture.magFilter = NearestFilter;
 			depthTexture.image.width = 1;
 			depthTexture.image.height = 1;
 
@@ -75,7 +73,7 @@ class WebGPUTextures {
 
 	}
 
-	getVideoDefaultTexture() {
+	getDefaultVideoTexture() {
 
 		if ( this.defaultVideoTexture === null ) {
 
@@ -240,8 +238,13 @@ class WebGPUTextures {
 
 			const width = renderTarget.width;
 			const height = renderTarget.height;
-			const colorTextureFormat = this._getFormat( renderTarget.texture );
-			const label = renderTarget.texture.name ? '_' + renderTarget.texture.name : '';
+
+			const texture = renderTarget.texture;
+
+			const colorTextureFormat = texture.internalFormat || this._getFormat( texture );
+			const label = texture.name ? '_' + texture.name : '';
+			const needsMipmaps = this._needsMipmaps( texture );
+			const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 
 			const colorTextureGPU = device.createTexture( {
 				label: 'renderTarget' + label,
@@ -250,8 +253,9 @@ class WebGPUTextures {
 					height: height,
 					depthOrArrayLayers: 1
 				},
+				mipLevelCount: mipLevelCount,
 				format: colorTextureFormat,
-				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+				usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
 			} );
 
 			this.info.memory.textures ++;
@@ -264,7 +268,7 @@ class WebGPUTextures {
 			// Since it's not possible to see just from a texture object whether it belongs to a render
 			// target or not, we need the initializedRTT flag.
 
-			const textureProperties = properties.get( renderTarget.texture );
+			const textureProperties = properties.get( texture );
 			textureProperties.textureGPU = colorTextureGPU;
 			textureProperties.initializedRTT = false;
 
@@ -280,7 +284,7 @@ class WebGPUTextures {
 						depthOrArrayLayers: 1
 					},
 					format: depthTextureFormat,
-					usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+					usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST
 				} );
 
 				this.info.memory.textures ++;
@@ -381,7 +385,7 @@ class WebGPUTextures {
 		const needsMipmaps = this._needsMipmaps( texture );
 		const dimension = this._getDimension( texture );
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
-		const format = this._getFormat( texture );
+		const format = texture.internalFormat || this._getFormat( texture );
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
 
@@ -436,6 +440,10 @@ class WebGPUTextures {
 				this._copyCubeMapToTexture( image, texture, textureGPU, textureGPUDescriptor, needsMipmaps );
 
 			}
+
+		} else if ( texture.isRenderTargetTexture ) {
+
+			if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
 		} else if ( texture.isDepthTexture !== true && image !== null ) {
 
@@ -552,7 +560,8 @@ class WebGPUTextures {
 					width: Math.ceil( width / blockData.width ) * blockData.width,
 					height: Math.ceil( height / blockData.width ) * blockData.width,
 					depthOrArrayLayers: 1
-				} );
+				}
+			);
 
 		}
 
@@ -806,7 +815,53 @@ class WebGPUTextures {
 					break;
 
 				case DepthFormat:
-					formatGPU = GPUTextureFormat.Depth32Float;
+
+					switch ( type ) {
+
+						case UnsignedShortType:
+							formatGPU = GPUTextureFormat.Depth16Unorm;
+							break;
+
+						case UnsignedIntType:
+							formatGPU = GPUTextureFormat.Depth24Plus;
+							break;
+
+						case FloatType:
+							formatGPU = GPUTextureFormat.Depth32Float;
+							break;
+
+						default:
+							console.error( 'WebGPURenderer: Unsupported texture type with DepthFormat.', type );
+
+					}
+
+					break;
+
+				case DepthStencilFormat:
+
+					switch ( type ) {
+
+						case UnsignedInt248Type:
+							formatGPU = GPUTextureFormat.Depth24PlusStencil8;
+							break;
+
+						case FloatType:
+
+							if ( this.device.features.has( GPUFeatureName.Depth32FloatStencil8 ) === false ) {
+
+								console.error( 'WebGPURenderer: Depth textures with DepthStencilFormat + FloatType can only be used with the "depth32float-stencil8" GPU feature.' );
+
+							}
+
+							formatGPU = GPUTextureFormat.Depth32FloatStencil8;
+
+							break;
+
+						default:
+							console.error( 'WebGPURenderer: Unsupported texture type with DepthStencilFormat.', type );
+
+					}
+
 					break;
 
 				default:

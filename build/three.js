@@ -12165,6 +12165,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			data.vertexShader = this.vertexShader;
 			data.fragmentShader = this.fragmentShader;
 
+			data.lights = this.lights;
+			data.clipping = this.clipping;
+
 			const extensions = {};
 
 			for ( const key in this.extensions ) {
@@ -43078,6 +43081,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				}
 
 			}
+
+			if ( json.lights !== undefined ) material.lights = json.lights;
+			if ( json.clipping !== undefined ) material.clipping = json.clipping;
 
 			// for PointsMaterial
 

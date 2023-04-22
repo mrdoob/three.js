@@ -43,7 +43,7 @@ class ViewportNode extends Node {
 
 	update( { renderer } ) {
 
-		renderer.getSize( resolution );
+		renderer.getDrawingBufferSize( resolution );
 
 	}
 

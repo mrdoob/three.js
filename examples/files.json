@@ -327,6 +327,7 @@
 	],
 	"webgpu": [
 		"webgpu_audio_processing",
+		"webgpu_backdrop",
 		"webgpu_compute",
 		"webgpu_cubemap_adjustments",
 		"webgpu_cubemap_mix",
@@ -391,7 +392,7 @@
 		"physics_ammo_rope",
 		"physics_ammo_terrain",
 		"physics_ammo_volume",
-		"physics_oimo_instancing"
+		"physics_rapier_instancing"
 	],
 	"misc": [
 		"misc_animation_groups",

@@ -114,13 +114,11 @@ class KTX2Loader extends Loader {
 
 		if ( renderer.isWebGPURenderer === true ) {
 
-			const adapter = renderer._adapter;
-
 			this.workerConfig = {
-				astcSupported: adapter.features.has( 'texture-compression-astc' ),
+				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
 				etc1Supported: false,
-				etc2Supported: adapter.features.has( 'texture-compression-etc2' ),
-				dxtSupported: adapter.features.has( 'texture-compression-bc' ),
+				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
+				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
 				bptcSupported: false,
 				pvrtcSupported: false
 			};

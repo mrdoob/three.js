@@ -1,14 +1,17 @@
-import * as OIMO from '../libs/OimoPhysics/index.js';
+async function RapierPhysics() {
 
-async function OimoPhysics() {
+	const RAPIER = await import( 'https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.11.2' );
+	
+	await RAPIER.init();
 
 	const frameRate = 60;
 
-	const world = new OIMO.World( 2, new OIMO.Vec3( 0, - 9.8, 0 ) );
+	// Docs: https://rapier.rs/docs/api/javascript/JavaScript3D/	
 
-	//
+	const gravity = { x: 0.0, y: - 9.81, z: 0.0 };
+	const world = new RAPIER.World( gravity );
 
-	function getShape( geometry ) {
+	function getCollider( geometry ) {
 
 		const parameters = geometry.parameters;
 
@@ -20,13 +23,13 @@ async function OimoPhysics() {
 			const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
 			const sz = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
 
-			return new OIMO.OBoxGeometry( new OIMO.Vec3( sx, sy, sz ) );
+			return RAPIER.ColliderDesc.cuboid( sx, sy, sz );
 
 		} else if ( geometry.type === 'SphereGeometry' || geometry.type === 'IcosahedronGeometry' ) {
 
 			const radius = parameters.radius !== undefined ? parameters.radius : 1;
 
-			return new OIMO.OSphereGeometry( radius );
+			return RAPIER.ColliderDesc.ball( radius );
 
 		}
 
@@ -37,12 +40,15 @@ async function OimoPhysics() {
 	const meshes = [];
 	const meshMap = new WeakMap();
 
-	function addMesh( mesh, mass = 0 ) {
+	function addMesh( mesh, mass = 0, restitution = 0 ) {
 
-		const shape = getShape( mesh.geometry );
+		const shape = getCollider( mesh.geometry );
 
 		if ( shape !== null ) {
 
+			shape.setMass( mass );
+			shape.setRestitution( restitution );
+	
 			if ( mesh.isInstancedMesh ) {
 
 				handleInstancedMesh( mesh, mass, shape );
@@ -59,16 +65,15 @@ async function OimoPhysics() {
 
 	function handleMesh( mesh, mass, shape ) {
 
-		const shapeConfig = new OIMO.ShapeConfig();
-		shapeConfig.geometry = shape;
+		const position = mesh.position;
+		const quaternion = mesh.quaternion;
 
-		const bodyConfig = new OIMO.RigidBodyConfig();
-		bodyConfig.type = mass === 0 ? OIMO.RigidBodyType.STATIC : OIMO.RigidBodyType.DYNAMIC;
-		bodyConfig.position = new OIMO.Vec3( mesh.position.x, mesh.position.y, mesh.position.z );
+		const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
+		desc.setTranslation( position.x, position.y, position.z );
+		desc.setRotation( quaternion );
 
-		const body = new OIMO.RigidBody( bodyConfig );
-		body.addShape( new OIMO.Shape( shapeConfig ) );
-		world.addRigidBody( body );
+		const body = world.createRigidBody( desc );
+		world.createCollider( shape, body );
 
 		if ( mass > 0 ) {
 
@@ -89,16 +94,11 @@ async function OimoPhysics() {
 
 			const index = i * 16;
 
-			const shapeConfig = new OIMO.ShapeConfig();
-			shapeConfig.geometry = shape;
+			const desc = mass > 0 ? RAPIER.RigidBodyDesc.dynamic() : RAPIER.RigidBodyDesc.fixed();
+			desc.setTranslation( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
 
-			const bodyConfig = new OIMO.RigidBodyConfig();
-			bodyConfig.type = mass === 0 ? OIMO.RigidBodyType.STATIC : OIMO.RigidBodyType.DYNAMIC;
-			bodyConfig.position = new OIMO.Vec3( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
-
-			const body = new OIMO.RigidBody( bodyConfig );
-			body.addShape( new OIMO.Shape( shapeConfig ) );
-			world.addRigidBody( body );
+			const body = world.createRigidBody( desc );
+			world.createCollider( shape, body );
 
 			bodies.push( body );
 
@@ -113,7 +113,7 @@ async function OimoPhysics() {
 
 	}
 
-	//
+	const vector = { x: 0, y: 0, z: 0 };
 
 	function setMeshPosition( mesh, position, index = 0 ) {
 
@@ -122,13 +122,17 @@ async function OimoPhysics() {
 			const bodies = meshMap.get( mesh );
 			const body = bodies[ index ];
 
-			body.setPosition( new OIMO.Vec3( position.x, position.y, position.z ) );
+			body.setAngvel( vector );
+			body.setLinvel( vector );
+			body.setTranslation( position );
 
 		} else if ( mesh.isMesh ) {
 
 			const body = meshMap.get( mesh );
 
-			body.setPosition( new OIMO.Vec3( position.x, position.y, position.z ) );
+			body.setAngvel( vector );
+			body.setLinvel( vector );
+			body.setTranslation( position );
 
 		}
 
@@ -144,46 +148,50 @@ async function OimoPhysics() {
 
 		if ( lastTime > 0 ) {
 
-			// console.time( 'world.step' );
-			world.step( 1 / frameRate );
-			// console.timeEnd( 'world.step' );
+			const delta = ( time - lastTime ) / 1000;
 
-		}
+			world.timestep = delta;
+			world.step();
 
-		lastTime = time;
+			//
 
-		//
+			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
-		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+				const mesh = meshes[ i ];
 
-			const mesh = meshes[ i ];
+				if ( mesh.isInstancedMesh ) {
 
-			if ( mesh.isInstancedMesh ) {
+					const array = mesh.instanceMatrix.array;
+					const bodies = meshMap.get( mesh );
 
-				const array = mesh.instanceMatrix.array;
-				const bodies = meshMap.get( mesh );
+					for ( let j = 0; j < bodies.length; j ++ ) {
 
-				for ( let j = 0; j < bodies.length; j ++ ) {
+						const body = bodies[ j ];
 
-					const body = bodies[ j ];
+						const position = body.translation();
+						const quaternion = body.rotation();
 
-					compose( body.getPosition(), body.getOrientation(), array, j * 16 );
+						compose( position, quaternion, array, j * 16 );
+
+					}
+
+					mesh.instanceMatrix.needsUpdate = true;
+					mesh.computeBoundingSphere();
+
+				} else if ( mesh.isMesh ) {
+
+					const body = meshMap.get( mesh );
+
+					mesh.position.copy( body.translation() );
+					mesh.quaternion.copy( body.rotation() );
 
 				}
-
-				mesh.instanceMatrix.needsUpdate = true;
-				mesh.computeBoundingSphere();
-
-			} else if ( mesh.isMesh ) {
-
-				const body = meshMap.get( mesh );
-
-				mesh.position.copy( body.getPosition() );
-				mesh.quaternion.copy( body.getOrientation() );
 
 			}
 
 		}
+
+		lastTime = time;
 
 	}
 
@@ -194,7 +202,6 @@ async function OimoPhysics() {
 	return {
 		addMesh: addMesh,
 		setMeshPosition: setMeshPosition
-		// addCompoundMesh
 	};
 
 }
@@ -229,4 +236,4 @@ function compose( position, quaternion, array, index ) {
 
 }
 
-export { OimoPhysics };
+export { RapierPhysics };

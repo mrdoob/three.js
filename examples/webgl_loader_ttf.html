@@ -33,8 +33,6 @@
 			import { Font } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let container;
 			let camera, cameraTarget, scene, renderer;
 			let group, textMesh1, textMesh2, textGeo, material;
@@ -88,7 +86,7 @@
 
 				const pointLight = new THREE.PointLight( 0xffffff, 1.5 );
 				pointLight.position.set( 0, 100, 90 );
-				pointLight.color.setHSL( Math.random(), 1, 0.5 );
+				pointLight.color.setHSL( Math.random(), 1, 0.5, THREE.SRGBColorSpace );
 				scene.add( pointLight );
 
 				material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
@@ -120,7 +118,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
