@@ -1,5 +1,5 @@
 import WebGPUWeakMap from './WebGPUWeakMap.js';
-import { lights } from 'three/nodes';
+import { lights } from '../../nodes/Nodes.js';
 
 class WebGPURenderState {
 
