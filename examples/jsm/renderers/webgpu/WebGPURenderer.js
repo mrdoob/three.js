@@ -265,7 +265,6 @@ class WebGPURenderer {
 
 		const previousRenderId = nodeFrame.renderId;
 		const previousRenderState = this._currentRenderState;
-		const previousRenderTarget = this._renderTarget;
 
 		//
 
@@ -408,7 +407,6 @@ class WebGPURenderer {
 
 		nodeFrame.renderId = previousRenderId;
 		this._currentRenderState = previousRenderState;
-		this._renderTarget = previousRenderTarget;
 
 	}
 
