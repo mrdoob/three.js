@@ -27,8 +27,6 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let camera, scene, renderer;
 
 			let mapBg;
@@ -71,6 +69,7 @@
 				ctx.fillRect( 96, 96, 32, 32 );
 
 				mapBg = new THREE.CanvasTexture( canvas );
+				mapBg.colorSpace = THREE.SRGBColorSpace;
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 64, 32 );
 
@@ -109,6 +108,7 @@
 				const geo2 = new THREE.PlaneGeometry( 100, 25 );
 
 				const texture = new THREE.TextureLoader().load( 'textures/lensflare/lensflare0_alpha.png' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				for ( let i = 0; i < dst.length; i ++ ) {
 
@@ -177,7 +177,6 @@
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -224,6 +223,7 @@
 				ctx.fillText( text, 8, 22 );
 
 				const map = new THREE.CanvasTexture( canvas );
+				map.colorSpace = THREE.SRGBColorSpace;
 
 				const material = new THREE.MeshBasicMaterial( { map: map, transparent: true } );
 				return material;

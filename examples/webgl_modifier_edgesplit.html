@@ -32,8 +32,6 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let renderer, scene, camera;
 			let modifier, mesh, baseGeometry;
 			let map;
@@ -59,7 +57,6 @@
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -112,6 +109,7 @@
 				new THREE.TextureLoader().load( './models/obj/cerberus/Cerberus_A.jpg', function ( texture ) {
 
 					map = texture;
+					map.colorSpace = THREE.SRGBColorSpace;
 
 					if ( mesh !== undefined && params.showMap ) {
 

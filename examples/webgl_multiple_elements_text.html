@@ -98,8 +98,6 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			const scenes = [];
 
 			const clock = new THREE.Clock();
@@ -121,7 +119,6 @@
 				canvas = document.getElementById( 'c' );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 
 				views = document.querySelectorAll( '.view' );
@@ -180,6 +177,7 @@
 					context.fillStyle = colors[ index ];
 					context.fill();
 					const texture = new THREE.CanvasTexture( canvas2 );
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					const material = new THREE.PointsMaterial( { size: size, map: texture, transparent: true, alphaTest: 0.1 } );
 
