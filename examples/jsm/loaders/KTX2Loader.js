@@ -253,16 +253,30 @@ class KTX2Loader extends Loader {
 
 	_createTextureFrom( transcodeResult, container ) {
 
-		const { mipmaps, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
+		const { faces, width, height, format, type, error, dfdTransferFn, dfdFlags } = transcodeResult;
 
 		if ( type === 'error' ) return Promise.reject( error );
 
-		const texture = container.layerCount > 1
-			? new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, UnsignedByteType )
-			: new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
+		let texture;
 
+		if ( container.faceCount === 6 ) {
 
-		texture.minFilter = mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
+			texture = new CompressedTexture();
+			texture.image = faces;
+			texture.format = format;
+			texture.type = UnsignedByteType;
+
+		} else {
+
+			const mipmaps = faces[ 0 ].mipmaps;
+
+			texture = container.layerCount > 1
+				? new CompressedArrayTexture( mipmaps, width, height, container.layerCount, format, UnsignedByteType )
+				: new CompressedTexture( mipmaps, width, height, format, UnsignedByteType );
+
+		}
+
+		texture.minFilter = faces[ 0 ].mipmaps.length === 1 ? LinearFilter : LinearMipmapLinearFilter;
 		texture.magFilter = LinearFilter;
 		texture.generateMipmaps = false;
 
@@ -388,17 +402,9 @@ KTX2Loader.BasisWorker = function () {
 
 					try {
 
-						const { width, height, hasAlpha, mipmaps, format, dfdTransferFn, dfdFlags } = transcode( message.buffer );
+						const { faces, buffers, width, height, hasAlpha, format, dfdTransferFn, dfdFlags } = transcode( message.buffer );
 
-						const buffers = [];
-
-						for ( let i = 0; i < mipmaps.length; ++ i ) {
-
-							buffers.push( mipmaps[ i ].data.buffer );
-
-						}
-
-						self.postMessage( { type: 'transcode', id: message.id, width, height, hasAlpha, mipmaps, format, dfdTransferFn, dfdFlags }, buffers );
+						self.postMessage( { type: 'transcode', id: message.id, faces, width, height, hasAlpha, format, dfdTransferFn, dfdFlags }, buffers );
 
 					} catch ( error ) {
 
@@ -457,15 +463,16 @@ KTX2Loader.BasisWorker = function () {
 		const basisFormat = ktx2File.isUASTC() ? BasisFormat.UASTC_4x4 : BasisFormat.ETC1S;
 		const width = ktx2File.getWidth();
 		const height = ktx2File.getHeight();
-		const layers = ktx2File.getLayers() || 1;
-		const levels = ktx2File.getLevels();
+		const layerCount = ktx2File.getLayers() || 1;
+		const levelCount = ktx2File.getLevels();
+		const faceCount = ktx2File.getFaces();
 		const hasAlpha = ktx2File.getHasAlpha();
 		const dfdTransferFn = ktx2File.getDFDTransferFunc();
 		const dfdFlags = ktx2File.getDFDFlags();
 
 		const { transcoderFormat, engineFormat } = getTranscoderFormat( basisFormat, width, height, hasAlpha );
 
-		if ( ! width || ! height || ! levels ) {
+		if ( ! width || ! height || ! levelCount ) {
 
 			cleanup();
 			throw new Error( 'THREE.KTX2Loader:	Invalid texture' );
@@ -479,49 +486,52 @@ KTX2Loader.BasisWorker = function () {
 
 		}
 
-		const mipmaps = [];
+		const faces = [];
+		const buffers = [];
 
-		for ( let mip = 0; mip < levels; mip ++ ) {
+		for ( let face = 0; face < faceCount; face ++ ) {
 
-			const layerMips = [];
+			const mipmaps = [];
 
-			let mipWidth, mipHeight;
+			for ( let mip = 0; mip < levelCount; mip ++ ) {
 
-			for ( let layer = 0; layer < layers; layer ++ ) {
+				const layerMips = [];
 
-				const levelInfo = ktx2File.getImageLevelInfo( mip, layer, 0 );
-				mipWidth = levelInfo.origWidth < 4 ? levelInfo.origWidth : levelInfo.width;
-				mipHeight = levelInfo.origHeight < 4 ? levelInfo.origHeight : levelInfo.height;
-				const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, layer, 0, transcoderFormat ) );
-				const status = ktx2File.transcodeImage(
-					dst,
-					mip,
-					layer,
-					0,
-					transcoderFormat,
-					0,
-					- 1,
-					- 1,
-				);
+				let mipWidth, mipHeight;
 
-				if ( ! status ) {
+				for ( let layer = 0; layer < layerCount; layer ++ ) {
 
-					cleanup();
-					throw new Error( 'THREE.KTX2Loader: .transcodeImage failed.' );
+					const levelInfo = ktx2File.getImageLevelInfo( mip, layer, face );
+					mipWidth = levelInfo.origWidth < 4 ? levelInfo.origWidth : levelInfo.width;
+					mipHeight = levelInfo.origHeight < 4 ? levelInfo.origHeight : levelInfo.height;
+					const dst = new Uint8Array( ktx2File.getImageTranscodedSizeInBytes( mip, layer, 0, transcoderFormat ) );
+					const status = ktx2File.transcodeImage( dst, mip, layer, face, transcoderFormat, 0, - 1, - 1 );
+
+					if ( ! status ) {
+
+						cleanup();
+						throw new Error( 'THREE.KTX2Loader: .transcodeImage failed.' );
+
+					}
+
+					layerMips.push( dst );
 
 				}
 
-				layerMips.push( dst );
+				const mipData = concat( layerMips );
+
+				mipmaps.push( { data: mipData, width: mipWidth, height: mipHeight } );
+				buffers.push( mipData.buffer );
 
 			}
 
-			mipmaps.push( { data: concat( layerMips ), width: mipWidth, height: mipHeight } );
+			faces.push( { mipmaps, width, height, format: engineFormat } );
 
 		}
 
 		cleanup();
 
-		return { width, height, hasAlpha, mipmaps, format: engineFormat, dfdTransferFn, dfdFlags };
+		return { faces, buffers, width, height, hasAlpha, format: engineFormat, dfdTransferFn, dfdFlags };
 
 	}
 
@@ -644,6 +654,8 @@ KTX2Loader.BasisWorker = function () {
 
 	/** Concatenates N byte arrays. */
 	function concat( arrays ) {
+
+		if ( arrays.length === 1 ) return arrays[ 0 ];
 
 		let totalByteLength = 0;
 
