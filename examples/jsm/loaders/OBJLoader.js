@@ -488,27 +488,9 @@ class OBJLoader extends Loader {
 	parse( text ) {
 
 		const state = new ParserState();
-
-		if ( text.indexOf( '\r\n' ) !== - 1 ) {
-
-			// This is faster than String.split with regex that splits on both
-			text = text.replace( /\r\n/g, '\n' );
-
-		}
-
-		if ( text.indexOf( '\\\n' ) !== - 1 ) {
-
-			// join lines separated by a line continuation character (\)
-			text = text.replace( /\\\n/g, '' );
-
-		}
-
-		const lines = text.split( '\n' );
 		let result = [];
 
-		for ( let i = 0, l = lines.length; i < l; i ++ ) {
-
-			const line = lines[ i ].trimStart();
+		for ( const line of lines( text ) ) {
 
 			if ( line.length === 0 ) continue;
 
@@ -899,6 +881,26 @@ class OBJLoader extends Loader {
 		return container;
 
 	}
+
+}
+
+function* lines( text ) {
+
+	let beginI = 0;
+
+	for ( let currentI = 0, textLength = text.length; currentI < textLength; currentI ++ ) {
+
+		if ( text.charAt( currentI ) === '\n' ) {
+
+			yield text.substring( beginI, currentI ).trim();
+
+			beginI = currentI + 1; // + 1 because of current newline
+
+		}
+
+	}
+
+	yield text.substring( beginI ).trim(); // Last line
 
 }
 
