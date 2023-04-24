@@ -548,13 +548,12 @@ class OBJLoader extends Loader {
 
 			} else if ( lineFirstChar === 'f' ) {
 
-				const lineData = line.slice( 1 ).trim();
-				const vertexData = lineData.split( _face_vertex_data_separator_pattern );
+				const vertexData = line.split( _face_vertex_data_separator_pattern );
 				const faceVertices = [];
 
 				// Parse the face vertex data into an easy to work with format
 
-				for ( let j = 0, jl = vertexData.length; j < jl; j ++ ) {
+				for ( let j = 1, jl = vertexData.length; j < jl; j ++ ) {
 
 					const vertex = vertexData[ j ];
 
