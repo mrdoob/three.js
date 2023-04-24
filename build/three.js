@@ -1565,7 +1565,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	const ColorManagement = {
 
-		enabled: false,
+		enabled: true,
 
 		get legacyMode() {
 
@@ -8943,30 +8943,30 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						if ( color = /^\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 							// rgb(255,0,0) rgba(255,0,0,0.5)
-							this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
-							this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
-							this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
-
-							ColorManagement.toWorkingColorSpace( this, colorSpace );
 
 							handleAlpha( color[ 4 ] );
 
-							return this;
+							return this.setRGB(
+								Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255,
+								Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255,
+								Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255,
+								colorSpace
+							);
 
 						}
 
 						if ( color = /^\s*(\d+)\%\s*,\s*(\d+)\%\s*,\s*(\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 							// rgb(100%,0%,0%) rgba(100%,0%,0%,0.5)
-							this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
-							this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
-							this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
-
-							ColorManagement.toWorkingColorSpace( this, colorSpace );
 
 							handleAlpha( color[ 4 ] );
 
-							return this;
+							return this.setRGB(
+								Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100,
+								Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100,
+								Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100,
+								colorSpace
+							);
 
 						}
 
@@ -8978,13 +8978,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 						if ( color = /^\s*(\d*\.?\d+)\s*,\s*(\d*\.?\d+)\%\s*,\s*(\d*\.?\d+)\%\s*(?:,\s*(\d*\.?\d+)\s*)?$/.exec( components ) ) {
 
 							// hsl(120,50%,50%) hsla(120,50%,50%,0.5)
-							const h = parseFloat( color[ 1 ] ) / 360;
-							const s = parseFloat( color[ 2 ] ) / 100;
-							const l = parseFloat( color[ 3 ] ) / 100;
 
 							handleAlpha( color[ 4 ] );
 
-							return this.setHSL( h, s, l, colorSpace );
+							return this.setHSL(
+								parseFloat( color[ 1 ] ) / 360,
+								parseFloat( color[ 2 ] ) / 100,
+								parseFloat( color[ 3 ] ) / 100,
+								colorSpace
+							);
 
 						}
 
@@ -9111,7 +9113,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			ColorManagement.fromWorkingColorSpace( _color.copy( this ), colorSpace );
 
-			return clamp( _color.r * 255, 0, 255 ) << 16 ^ clamp( _color.g * 255, 0, 255 ) << 8 ^ clamp( _color.b * 255, 0, 255 ) << 0;
+			return Math.round( clamp( _color.r * 255, 0, 255 ) ) * 65536 + Math.round( clamp( _color.g * 255, 0, 255 ) ) * 256 + Math.round( clamp( _color.b * 255, 0, 255 ) );
 
 		}
 
@@ -9191,7 +9193,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			}
 
-			return `rgb(${( r * 255 ) | 0},${( g * 255 ) | 0},${( b * 255 ) | 0})`;
+			return `rgb(${ Math.round( r * 255 ) },${ Math.round( g * 255 ) },${ Math.round( b * 255 ) })`;
 
 		}
 
@@ -12163,6 +12165,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			data.vertexShader = this.vertexShader;
 			data.fragmentShader = this.fragmentShader;
 
+			data.lights = this.lights;
+			data.clipping = this.clipping;
+
 			const extensions = {};
 
 			for ( const key in this.extensions ) {
@@ -13607,7 +13612,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 	var iridescence_pars_fragment = "#ifdef USE_IRIDESCENCEMAP\n\tuniform sampler2D iridescenceMap;\n#endif\n#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\tuniform sampler2D iridescenceThicknessMap;\n#endif";
 
-	var output_fragment = "#ifdef OPAQUE\ndiffuseColor.a = 1.0;\n#endif\n#ifdef USE_TRANSMISSION\ndiffuseColor.a *= material.transmissionAlpha + 0.1;\n#endif\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );";
+	var output_fragment = "#ifdef OPAQUE\ndiffuseColor.a = 1.0;\n#endif\n#ifdef USE_TRANSMISSION\ndiffuseColor.a *= material.transmissionAlpha;\n#endif\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );";
 
 	var packing = "vec3 packNormalToRGB( const in vec3 normal ) {\n\treturn normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n\treturn 2.0 * rgb.xyz - 1.0;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;\nconst vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );\nconst vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );\nconst float ShiftRight8 = 1. / 256.;\nvec4 packDepthToRGBA( const in float v ) {\n\tvec4 r = vec4( fract( v * PackFactors ), v );\n\tr.yzw -= r.xyz * ShiftRight8;\treturn r * PackUpscale;\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n\treturn dot( v, UnpackFactors );\n}\nvec2 packDepthToRG( in highp float v ) {\n\treturn packDepthToRGBA( v ).yx;\n}\nfloat unpackRGToDepth( const in highp vec2 v ) {\n\treturn unpackRGBAToDepth( vec4( v.xy, 0.0, 0.0 ) );\n}\nvec4 pack2HalfToRGBA( vec2 v ) {\n\tvec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ) );\n\treturn vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w );\n}\nvec2 unpackRGBATo2Half( vec4 v ) {\n\treturn vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );\n}\nfloat viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( viewZ + near ) / ( near - far );\n}\nfloat orthographicDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\treturn depth * ( near - far ) - near;\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( ( near + viewZ ) * far ) / ( ( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\treturn ( near * far ) / ( ( far - near ) * depth - far );\n}";
 
@@ -14475,27 +14480,23 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			}
 
 			const xr = renderer.xr;
-			const session = xr.getSession();
+			const environmentBlendMode = xr.getEnvironmentBlendMode();
 
-			if ( session !== null ) {
+			switch ( environmentBlendMode ) {
 
-				switch ( session.environmentBlendMode ) {
+				case 'opaque':
+					forceClear = true;
+					break;
 
-					case 'additive':
+				case 'additive':
+					state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
+					forceClear = true;
+					break;
 
-						state.buffers.color.setClear( 0, 0, 0, 1, premultipliedAlpha );
-
-						break;
-
-					case 'alpha-blend':
-
-						state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
-
-						break;
-
-				}
-
-				forceClear = true;
+				case 'alpha-blend':
+					state.buffers.color.setClear( 0, 0, 0, 0, premultipliedAlpha );
+					forceClear = true;
+					break;
 
 			}
 
@@ -21555,6 +21556,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 		this.needsUpdate = false;
 
 		this.type = PCFShadowMap;
+		let _previousType = this.type;
 
 		this.render = function ( lights, scene, camera ) {
 
@@ -21574,6 +21576,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			_state.buffers.color.setClear( 1, 1, 1, 1 );
 			_state.buffers.depth.setTest( true );
 			_state.setScissorTest( false );
+
+			// check for shadow map type changes
+
+			const toVSM = ( _previousType !== VSMShadowMap && this.type === VSMShadowMap );
+			const fromVSM = ( _previousType === VSMShadowMap && this.type !== VSMShadowMap );
 
 			// render depth map
 
@@ -21619,9 +21626,15 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				}
 
-				if ( shadow.map === null ) {
+				if ( shadow.map === null || toVSM === true || fromVSM === true ) {
 
 					const pars = ( this.type !== VSMShadowMap ) ? { minFilter: NearestFilter, magFilter: NearestFilter } : {};
+
+					if ( shadow.map !== null ) {
+
+						shadow.map.dispose();
+
+					}
 
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 					shadow.map.texture.name = light.name + '.shadowMap';
@@ -21667,6 +21680,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				shadow.needsUpdate = false;
 
 			}
+
+			_previousType = this.type;
 
 			scope.needsUpdate = false;
 
@@ -26165,6 +26180,16 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 			};
 
+			this.getEnvironmentBlendMode = function () {
+
+				if ( session !== null ) {
+
+					return session.environmentBlendMode;
+
+				}
+
+			};
+
 			function onInputSourcesChange( event ) {
 
 				// Notify disconnected
@@ -27703,6 +27728,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 			const _currentScissor = new Vector4();
 			let _currentScissorTest = null;
 
+			const _currentClearColor = new Color( 0x000000 );
+			let _currentClearAlpha = 0;
+
 			//
 
 			let _width = canvas.width;
@@ -28809,6 +28837,11 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				const currentRenderTarget = _this.getRenderTarget();
 				_this.setRenderTarget( _transmissionRenderTarget );
+
+				_this.getClearColor( _currentClearColor );
+				_currentClearAlpha = _this.getClearAlpha();
+				if ( _currentClearAlpha < 1 ) _this.setClearColor( 0x7f7f7f, 0.8 );
+
 				_this.clear();
 
 				// Turn off the features which can affect the frag color for opaque objects pass.
@@ -28858,6 +28891,8 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				}
 
 				_this.setRenderTarget( currentRenderTarget );
+
+				_this.setClearColor( _currentClearColor, _currentClearAlpha );
 
 				_this.toneMapping = currentToneMapping;
 
@@ -43046,6 +43081,9 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 				}
 
 			}
+
+			if ( json.lights !== undefined ) material.lights = json.lights;
+			if ( json.clipping !== undefined ) material.clipping = json.clipping;
 
 			// for PointsMaterial
 

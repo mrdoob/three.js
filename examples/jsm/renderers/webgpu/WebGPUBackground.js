@@ -1,6 +1,6 @@
 import { GPULoadOp, GPUStoreOp } from './constants.js';
 import { Color, Mesh, BoxGeometry, BackSide } from 'three';
-import { context, transformDirection, positionWorld, modelWorldMatrix, MeshBasicNodeMaterial } from 'three/nodes';
+import { context, positionWorldDirection, MeshBasicNodeMaterial } from '../../nodes/Nodes.js';
 
 let _clearAlpha;
 const _clearColor = new Color();
@@ -25,7 +25,7 @@ class WebGPUBackground {
 
 	}
 
-	update( renderList, scene, renderPassDescriptor, renderAttachments ) {
+	update( scene, renderList, renderState ) {
 
 		const renderer = this.renderer;
 		const background = ( scene.isScene === true ) ? scene.backgroundNode || this.properties.get( scene ).backgroundNode || scene.background : null;
@@ -61,7 +61,7 @@ class WebGPUBackground {
 
 				this.boxMeshNode = context( backgroundNode, {
 					// @TODO: Add Texture2D support using node context
-					getUVNode: () => transformDirection( positionWorld, modelWorldMatrix )
+					getUVNode: () => positionWorldDirection
 				} );
 
 				const nodeMaterial = new MeshBasicNodeMaterial();
@@ -103,8 +103,8 @@ class WebGPUBackground {
 
 		// configure render pass descriptor
 
-		const colorAttachment = renderPassDescriptor.colorAttachments[ 0 ];
-		const depthStencilAttachment = renderPassDescriptor.depthStencilAttachment;
+		const colorAttachment = renderState.descriptorGPU.colorAttachments[ 0 ];
+		const depthStencilAttachment = renderState.descriptorGPU.depthStencilAttachment;
 
 		if ( renderer.autoClear === true || forceClear === true ) {
 
@@ -123,7 +123,7 @@ class WebGPUBackground {
 
 			}
 
-			if ( renderAttachments.depth ) {
+			if ( renderState.depth ) {
 
 				if ( renderer.autoClearDepth === true ) {
 
@@ -140,7 +140,7 @@ class WebGPUBackground {
 
 			}
 
-			if ( renderAttachments.stencil ) {
+			if ( renderState.stencil ) {
 
 				if ( renderer.autoClearStencil === true ) {
 
@@ -162,14 +162,14 @@ class WebGPUBackground {
 			colorAttachment.loadOp = GPULoadOp.Load;
 			colorAttachment.storeOp = GPUStoreOp.Store;
 
-			if ( renderAttachments.depth ) {
+			if ( renderState.depth ) {
 
 				depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 				depthStencilAttachment.depthStoreOp = GPUStoreOp.Store;
 
 			}
 
-			if ( renderAttachments.stencil ) {
+			if ( renderState.stencil ) {
 
 				depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 				depthStencilAttachment.stencilStoreOp = GPUStoreOp.Store;

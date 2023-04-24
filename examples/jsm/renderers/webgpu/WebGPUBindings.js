@@ -234,11 +234,11 @@ class WebGPUBindings {
 
 					} else if ( binding.texture.isVideoTexture ) {
 
-						binding.textureGPU = this.textures.getVideoDefaultTexture();
+						binding.textureGPU = this.textures.getDefaultVideoTexture();
 
 					} else if ( binding.texture.isDepthTexture ) {
 
-						binding.textureGPU = this.textures.getDepthDefaultTexture();
+						binding.textureGPU = this.textures.getDefaultDepthTexture();
 
 					} else {
 
@@ -248,7 +248,7 @@ class WebGPUBindings {
 
 				}
 
-				const resource = binding.textureGPU instanceof GPUTexture ? binding.textureGPU.createView( { dimension: binding.dimension } ) : binding.textureGPU;
+				const resource = binding.textureGPU instanceof GPUTexture ? binding.textureGPU.createView( { aspect: binding.aspect, dimension: binding.dimension } ) : binding.textureGPU;
 
 				entries.push( { binding: bindingPoint, resource } );
 

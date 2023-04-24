@@ -35,6 +35,7 @@ import {
 	Points,
 	PointsMaterial,
 	RepeatWrapping,
+	SRGBColorSpace,
 	TextureLoader,
 	Vector2
 } from 'three';
@@ -464,6 +465,7 @@ class MaterialParser {
 
 				case 'Color':
 					maps.map = texture;
+					maps.map.colorSpace = SRGBColorSpace;
 					break;
 				case 'Roughness':
 					maps.roughnessMap = texture;
@@ -471,10 +473,12 @@ class MaterialParser {
 					break;
 				case 'Specular':
 					maps.specularMap = texture;
+					maps.specularMap.colorSpace = SRGBColorSpace;
 					maps.specular = 0xffffff;
 					break;
 				case 'Luminous':
 					maps.emissiveMap = texture;
+					maps.emissiveMap.colorSpace = SRGBColorSpace;
 					maps.emissive = 0x808080;
 					break;
 				case 'Luminous Color':
@@ -532,6 +536,7 @@ class MaterialParser {
 
 					case 'Color':
 						maps.map = texture;
+						maps.map.colorSpace = SRGBColorSpace;
 						break;
 					case 'Diffuse':
 						maps.aoMap = texture;
@@ -542,10 +547,12 @@ class MaterialParser {
 						break;
 					case 'Specular':
 						maps.specularMap = texture;
+						maps.specularMap.colorSpace = SRGBColorSpace;
 						maps.specular = 0xffffff;
 						break;
 					case 'Luminosity':
 						maps.emissiveMap = texture;
+						maps.emissiveMap.colorSpace = SRGBColorSpace;
 						maps.emissive = 0x808080;
 						break;
 					case 'Metallic':
@@ -581,7 +588,11 @@ class MaterialParser {
 
 			params.color = new Color().fromArray( attributes.Color.value );
 
-		} else params.color = new Color();
+		} else {
+
+			params.color = new Color();
+
+		}
 
 
 		if ( attributes.Transparency && attributes.Transparency.value !== 0 ) {

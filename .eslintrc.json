@@ -26,7 +26,6 @@
     "__THREE_DEVTOOLS__": "readonly",
     "potpack": "readonly",
     "fflate": "readonly",
-    "OIMO": "readonly",
     "Stats": "readonly",
     "XRWebGLBinding": "readonly",
     "XRWebGLLayer": "readonly",

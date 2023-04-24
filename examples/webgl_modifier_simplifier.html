@@ -29,6 +29,8 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { SimplifyModifier } from 'three/addons/modifiers/SimplifyModifier.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let renderer, scene, camera;
 
 			init();

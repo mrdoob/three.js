@@ -11,9 +11,10 @@ import { positionLocal } from '../accessors/PositionNode.js';
 import { skinning } from '../accessors/SkinningNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { lightsWithoutWrap } from '../lighting/LightsNode.js';
+import { mix } from '../math/MathNode.js';
+import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 const NodeMaterials = new Map();
 
@@ -31,6 +32,16 @@ class NodeMaterial extends ShaderMaterial {
 		this.normals = true;
 
 		this.lightsNode = null;
+		this.envNode = null;
+
+		this.colorNode = null;
+		this.normalNode = null;
+		this.opacityNode = null;
+		this.backdropNode = null;
+		this.backdropAlphaNode = null;
+		this.alphaTestNode = null;
+
+		this.positionNode = null;
 
 	}
 
@@ -193,6 +204,7 @@ class NodeMaterial extends ShaderMaterial {
 	constructLighting( builder ) {
 
 		const { material } = builder;
+		const { backdropNode, backdropAlphaNode, emissiveNode } = this;
 
 		// OUTGOING LIGHT
 
@@ -205,15 +217,19 @@ class NodeMaterial extends ShaderMaterial {
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
 
-			outgoingLightNode = lightsNode.lightingContext( lightingModelNode );
+			outgoingLightNode = lightsNode.lightingContext( lightingModelNode, backdropNode, backdropAlphaNode );
+
+		} else if ( backdropNode !== null ) {
+
+			outgoingLightNode = vec3( backdropAlphaNode !== null ? mix( outgoingLightNode, backdropNode, backdropAlphaNode ) : backdropNode );
 
 		}
 
 		// EMISSIVE
 
-		if ( ( this.emissiveNode && this.emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
+		if ( ( emissiveNode && emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
-			outgoingLightNode = outgoingLightNode.add( this.emissiveNode ? vec3( this.emissiveNode ) : materialEmissive );
+			outgoingLightNode = outgoingLightNode.add( emissiveNode ? vec3( emissiveNode ) : materialEmissive );
 
 		}
 
@@ -253,14 +269,14 @@ class NodeMaterial extends ShaderMaterial {
 
 	}
 
-	setDefaultValues( values ) {
+	setDefaultValues( material ) {
 
 		// This approach is to reuse the native refreshUniforms*
 		// and turn available the use of features like transmission and environment in core
 
-		for ( const property in values ) {
+		for ( const property in material ) {
 
-			const value = values[ property ];
+			const value = material[ property ];
 
 			if ( this[ property ] === undefined ) {
 
@@ -272,7 +288,20 @@ class NodeMaterial extends ShaderMaterial {
 
 		}
 
-		Object.assign( this.defines, values.defines );
+		Object.assign( this.defines, material.defines );
+
+		const descriptors = Object.getOwnPropertyDescriptors( material.constructor.prototype );
+
+		for ( const key in descriptors ) {
+
+			if ( Object.getOwnPropertyDescriptor( this.constructor.prototype, key ) === undefined &&
+			     descriptors[ key ].get !== undefined ) {
+
+				Object.defineProperty( this.constructor.prototype, key, descriptors[ key ] );
+
+			}
+
+		}
 
 	}
 
@@ -337,19 +366,19 @@ class NodeMaterial extends ShaderMaterial {
 
 	static fromMaterial( material ) {
 
+		if ( material.isNodeMaterial === true ) { // is already a node material
+
+			return material;
+
+		}
+
 		const type = material.type.replace( 'Material', 'NodeMaterial' );
 
 		const nodeMaterial = createNodeMaterialFromType( type );
 
 		if ( nodeMaterial === undefined ) {
 
-			if ( material.isNodeMaterial !== true ) {
-
-				throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
-
-			}
-
-			return material; // is already a node material
+			throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
 
 		}
 

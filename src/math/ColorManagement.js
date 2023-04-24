@@ -67,7 +67,7 @@ const FROM_LINEAR = {
 
 export const ColorManagement = {
 
-	enabled: false,
+	enabled: true,
 
 	get legacyMode() {
 

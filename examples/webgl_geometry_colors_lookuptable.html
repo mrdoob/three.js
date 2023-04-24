@@ -46,6 +46,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Lut } from 'three/addons/math/Lut.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let container;
 
 			let perpCamera, orthoCamera, renderer, lut;

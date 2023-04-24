@@ -94,7 +94,7 @@ const exceptionList = [
 
 /* CONFIG VARIABLES END */
 
-const chromiumRevision = '1095492'; // Chromium 111.0.5556.0, Puppeteer 19.7.0, https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-core-v19.7.0
+const chromiumRevision = '1108766'; // Chromium 112.0.5614.0, Puppeteer 19.8.0, https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-core-v19.8.0
 
 const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel

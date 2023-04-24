@@ -12,8 +12,8 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( 'enabled', ( assert ) => {
 
 			assert.strictEqual(
-				ColorManagement.enabled, false,
-				'ColorManagement.enabled is false by default.'
+				ColorManagement.enabled, true,
+				'ColorManagement.enabled is true by default.'
 			);
 
 		} );
@@ -24,12 +24,12 @@ export default QUnit.module( 'Maths', () => {
 			// THREE.ColorManagement: .legacyMode=false renamed to .enabled=true in r150.
 
 			console.level = CONSOLE_LEVEL.OFF;
-			const expected = ColorManagement.legacyMode === true;
+			const expected = ColorManagement.legacyMode === false;
 			console.level = CONSOLE_LEVEL.DEFAULT;
 
 			assert.ok(
 				expected,
-				'ColorManagement.legacyMode is true by default.'
+				'ColorManagement.legacyMode is false by default.'
 			);
 
 		} );

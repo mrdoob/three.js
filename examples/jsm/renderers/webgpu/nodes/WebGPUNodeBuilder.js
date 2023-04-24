@@ -10,7 +10,9 @@ import WebGPUUniformBuffer from '../WebGPUUniformBuffer.js';
 import WebGPUStorageBuffer from '../WebGPUStorageBuffer.js';
 import { getVectorLength, getStrideLength } from '../WebGPUBufferUtils.js';
 
-import { NodeBuilder, WGSLNodeParser, CodeNode, NodeMaterial } from 'three/nodes';
+import WebGPURenderTarget from '../WebGPURenderTarget.js';
+
+import { NodeBuilder, WGSLNodeParser, CodeNode, NodeMaterial } from '../../../nodes/Nodes.js';
 
 const gpuShaderStageLib = {
 	'vertex': GPUShaderStage.VERTEX,
@@ -683,6 +685,12 @@ class WebGPUNodeBuilder extends NodeBuilder {
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
 
 		}
+
+	}
+
+	getRenderTarget( width, height, options ) {
+
+		return new WebGPURenderTarget( width, height, options );
 
 	}
 

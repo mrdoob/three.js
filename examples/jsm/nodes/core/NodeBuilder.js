@@ -39,6 +39,7 @@ class NodeBuilder {
 
 		this.nodes = [];
 		this.updateNodes = [];
+		this.updateBeforeNodes = [];
 		this.hashNodes = {};
 
 		this.lightsNode = null;
@@ -89,10 +90,17 @@ class NodeBuilder {
 		if ( this.nodes.indexOf( node ) === - 1 ) {
 
 			const updateType = node.getUpdateType();
+			const updateBeforeType = node.getUpdateBeforeType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
 				this.updateNodes.push( node );
+
+			}
+
+			if ( updateBeforeType !== NodeUpdateType.NONE ) {
+
+				this.updateBeforeNodes.push( node );
 
 			}
 

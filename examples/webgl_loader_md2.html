@@ -129,7 +129,6 @@
 
 				//
 
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.shadowMap.enabled = true;
 
 				// STATS
@@ -247,6 +246,7 @@
 					return function () {
 
 						character.setWeapon( index );
+						character.setWireframe( playbackConfig.wireframe );
 
 					};
 

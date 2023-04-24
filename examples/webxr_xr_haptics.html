@@ -32,6 +32,8 @@
 			import { XRButton } from 'three/addons/webxr/XRButton.js';
 			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container;
 			let camera, scene, renderer;
 			let controller1, controller2;
@@ -117,9 +119,9 @@
 
 					const intensity = ( i + 1 ) / BOXES;
 					const w = 0.1;
-					const h = 0.1;
-					const minH = 1;
-					const geometry = new THREE.BoxGeometry( w, h * i + minH, w );
+					const h = 0.05 * i + 0.5;
+					const geometry = new THREE.BoxGeometry( w, h, w );
+					geometry.translate( 0, h / 2, 0 );
 					const material = new THREE.MeshStandardMaterial( {
 						color: new THREE.Color( intensity, 0.1, 0.1 ),
 						roughness: 0.7,
@@ -144,7 +146,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.SRGBColorSpace;
 				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );

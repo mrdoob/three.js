@@ -21,6 +21,8 @@ export default QUnit.module( 'Maths', () => {
 		// INSTANCING
 		QUnit.test( 'Instancing', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			// default ctor
 			let c = new Color();
 			assert.ok( c.r, 'Red: ' + c.r );
@@ -38,12 +40,17 @@ export default QUnit.module( 'Maths', () => {
 		// EXPOSED CONSTANTS
 		QUnit.test( 'Color.NAMES', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
+
 			assert.ok( Color.NAMES.aliceblue == 0xF0F8FF, 'Exposed Color.NAMES' );
 
 		} );
 
 		// PUBLIC STUFF
 		QUnit.test( 'isColor', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const a = new Color();
 			assert.ok( a.isColor === true, 'Passed!' );
@@ -54,6 +61,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'set', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const a = new Color();
 			const b = new Color( 0.5, 0, 0 );
@@ -73,6 +82,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setScalar', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setScalar( 0.5 );
 			assert.ok( c.r == 0.5, 'Red: ' + c.r );
@@ -82,6 +93,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setHex', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			c.setHex( 0xFA8072 );
@@ -126,6 +139,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setHSL', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			const hsl = { h: 0, s: 0, l: 0 };
 			c.setHSL( 0.75, 1.0, 0.25 );
@@ -138,6 +153,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyle', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const a = new Color();
 
@@ -182,6 +199,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setColorName', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			const res = c.setColorName( 'aliceblue' );
 
@@ -192,6 +211,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'clone', ( assert ) => {
 
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 			const c = new Color( 'teal' );
 			const c2 = c.clone();
 			assert.ok( c2.getHex() == 0x008080, 'Hex c2: ' + c2.getHex() );
@@ -199,6 +220,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'copy', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const a = new Color( 'teal' );
 			const b = new Color();
@@ -210,6 +233,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'copySRGBToLinear', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			const c2 = new Color();
@@ -223,6 +248,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'copyLinearToSRGB', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			const c2 = new Color();
 			c2.setRGB( 0.09, 0.25, 0.81 );
@@ -235,6 +262,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'convertSRGBToLinear', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setRGB( 0.3, 0.5, 0.9 );
 			c.convertSRGBToLinear();
@@ -245,6 +274,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'convertLinearToSRGB', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			c.setRGB( 4, 9, 16 );
@@ -257,6 +288,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'getHex', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color( 'red' );
 			const res = c.getHex();
 			assert.ok( res == 0xFF0000, 'Hex: ' + res );
@@ -265,6 +298,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'getHexString', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color( 'tomato' );
 			const res = c.getHexString();
 			assert.ok( res == 'ff6347', 'Hex: ' + res );
@@ -272,6 +307,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'getHSL', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color( 0x80ffff );
 			const hsl = { h: 0, s: 0, l: 0 };
@@ -323,6 +360,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'offsetHSL', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const a = new Color( 'hsl(120,50%,50%)' );
 			const b = new Color( 0.36, 0.84, 0.648 );
 
@@ -336,6 +375,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'add', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const a = new Color( 0x0000FF );
 			const b = new Color( 0xFF0000 );
 			const c = new Color( 0xFF00FF );
@@ -347,6 +388,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'addColors', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const a = new Color( 0x0000FF );
 			const b = new Color( 0xFF0000 );
@@ -362,6 +405,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'addScalar', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const a = new Color( 0.1, 0.0, 0.0 );
 			const b = new Color( 0.6, 0.5, 0.5 );
 
@@ -372,6 +417,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'sub', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const a = new Color( 0x0000CC );
 			const b = new Color( 0xFF0000 );
@@ -387,6 +434,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'multiply', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const a = new Color( 1, 0, 0.5 );
 			const b = new Color( 0.5, 1, 0.5 );
 			const c = new Color( 0.5, 0, 0.25 );
@@ -398,6 +447,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'multiplyScalar', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const a = new Color( 0.25, 0, 0.5 );
 			const b = new Color( 0.5, 0, 1 );
 
@@ -407,6 +458,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'lerp', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			const c2 = new Color();
@@ -434,6 +487,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'equals', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const a = new Color( 0.5, 0.0, 1.0 );
 			const b = new Color( 0.5, 1.0, 0.0 );
 
@@ -456,6 +511,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'fromArray', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const a = new Color();
 			const array = [ 0.5, 0.6, 0.7, 0, 1, 0 ];
 
@@ -472,6 +529,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'toArray', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const r = 0.5, g = 1.0, b = 0.0;
 			const a = new Color( r, g, b );
@@ -505,13 +564,15 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'toJSON', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const a = new Color( 0.0, 0.0, 0.0 );
 			const b = new Color( 0.0, 0.5, 0.0 );
 			const c = new Color( 1.0, 0.0, 0.0 );
 			const d = new Color( 1.0, 1.0, 1.0 );
 
 			assert.strictEqual( a.toJSON(), 0x000000, 'Check black' );
-			assert.strictEqual( b.toJSON(), 0x007F00, 'Check half-blue' );
+			assert.strictEqual( b.toJSON(), 0x008000, 'Check half-blue' );
 			assert.strictEqual( c.toJSON(), 0xFF0000, 'Check red' );
 			assert.strictEqual( d.toJSON(), 0xFFFFFF, 'Check white' );
 
@@ -519,6 +580,8 @@ export default QUnit.module( 'Maths', () => {
 
 		// OTHERS - FUNCTIONAL
 		QUnit.test( 'copyHex', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			const c2 = new Color( 0xF5FFFA );
@@ -529,6 +592,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'copyColorString', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			const c2 = new Color( 'ivory' );
 			c.copy( c2 );
@@ -537,6 +602,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setWithNum', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			c.set( 0xFF0000 );
@@ -548,6 +615,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setWithString', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.set( 'silver' );
 			assert.ok( c.getHex() == 0xC0C0C0, 'Hex c: ' + c.getHex() );
@@ -555,6 +624,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleRGBRed', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			c.setStyle( 'rgb(255,0,0)' );
@@ -565,6 +636,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleRGBARed', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 
@@ -580,6 +653,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleRGBRedWithSpaces', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( 'rgb( 255 , 0,   0 )' );
 			assert.ok( c.r == 1, 'Red: ' + c.r );
@@ -589,6 +664,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleRGBARedWithSpaces', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			c.setStyle( 'rgba( 255,  0,  0  , 1 )' );
@@ -600,6 +677,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleRGBPercent', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( 'rgb(100%,50%,10%)' );
 			assert.ok( c.r == 1, 'Red: ' + c.r );
@@ -609,6 +688,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleRGBAPercent', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 
@@ -624,6 +705,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleRGBPercentWithSpaces', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( 'rgb( 100% ,50%  , 10% )' );
 			assert.ok( c.r == 1, 'Red: ' + c.r );
@@ -633,6 +716,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleRGBAPercentWithSpaces', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 
@@ -648,6 +733,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleHSLRed', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( 'hsl(360,100%,50%)' );
 			assert.ok( c.r == 1, 'Red: ' + c.r );
@@ -657,6 +744,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleHSLARed', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 
@@ -672,6 +761,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleHSLRedWithSpaces', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( 'hsl(360,  100% , 50% )' );
 			assert.ok( c.r == 1, 'Red: ' + c.r );
@@ -681,6 +772,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleHSLARedWithSpaces', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 
@@ -696,6 +789,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleHSLRedWithDecimals', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( 'hsl(360,100.0%,50.0%)' );
 			assert.ok( c.r == 1, 'Red: ' + c.r );
@@ -705,6 +800,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleHSLARedWithDecimals', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 
@@ -720,6 +817,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleHexSkyBlue', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( '#87CEEB' );
 			assert.ok( c.getHex() == 0x87CEEB, 'Hex c: ' + c.getHex() );
@@ -727,6 +826,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleHexSkyBlueMixed', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			c.setStyle( '#87cEeB' );
@@ -736,6 +837,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleHex2Olive', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( '#F00' );
 			assert.ok( c.getHex() == 0xFF0000, 'Hex c: ' + c.getHex() );
@@ -743,6 +846,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'setStyleHex2OliveMixed', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color();
 			c.setStyle( '#f00' );
@@ -752,6 +857,8 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( 'setStyleColorName', ( assert ) => {
 
+			ColorManagement.enabled = false; // TODO: Update and enable.
+
 			const c = new Color();
 			c.setStyle( 'powderblue' );
 			assert.ok( c.getHex() == 0xB0E0E6, 'Hex c: ' + c.getHex() );
@@ -759,6 +866,8 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		QUnit.test( 'iterable', ( assert ) => {
+
+			ColorManagement.enabled = false; // TODO: Update and enable.
 
 			const c = new Color( 0.5, 0.75, 1 );
 			const array = [ ...c ];

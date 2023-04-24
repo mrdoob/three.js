@@ -58,7 +58,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -84,7 +83,7 @@
 
 				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 				geometry.translate( 0, 0.5, 0 );
-				const material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				const material = new THREE.MeshPhongMaterial( { color: 0xeeeeee, flatShading: true } );
 
 				for ( let i = 0; i < 500; i ++ ) {
 
