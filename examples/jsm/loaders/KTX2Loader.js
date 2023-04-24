@@ -279,11 +279,7 @@ class KTX2Loader extends Loader {
 
 				pendings.push( createDataTexture( container, levelIndex ).then( function ( dataTexture ) {
 
-					mipmaps[ levelIndex ] = {
-						data: dataTexture.image.data,
-						width: dataTexture.image.width,
-						height: dataTexture.image.height
-					};
+					mipmaps[ levelIndex ] = dataTexture;
 
 				} ) );
 
@@ -291,8 +287,14 @@ class KTX2Loader extends Loader {
 
 			await Promise.all( pendings );
 
-			const texture = mipmaps.shift();
-			texture.mipmaps = mipmaps;
+			const texture = mipmaps[0];
+			texture.mipmaps = mipmaps.map(dt => {
+				return {
+					data: dt.source.data,
+					width: dt.source.width,
+					height: dt.source.height
+				};
+			});
 			return texture;
 
 		}
