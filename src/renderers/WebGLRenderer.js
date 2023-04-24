@@ -1163,15 +1163,19 @@ class WebGLRenderer {
 
 					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
+						const geometry = objects.update( object );
+						const material = object.material;
+
 						if ( sortObjects ) {
 
-							_vector3.setFromMatrixPosition( object.matrixWorld )
+							if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+							_vector3
+								.copy( geometry.boundingSphere.center )
+								.applyMatrix4( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
 
 						}
-
-						const geometry = objects.update( object );
-						const material = object.material;
 
 						if ( Array.isArray( material ) ) {
 
