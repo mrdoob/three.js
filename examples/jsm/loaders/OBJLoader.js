@@ -488,6 +488,14 @@ class OBJLoader extends Loader {
 	parse( text ) {
 
 		const state = new ParserState();
+
+		if ( text.indexOf( '\\\n' ) !== - 1 ) {
+
+			// join lines separated by a line continuation character (\)
+			text = text.replace( /\\\r?\n/g, '' );
+
+		}
+
 		let result = [];
 
 		for ( const line of lines( text ) ) {
