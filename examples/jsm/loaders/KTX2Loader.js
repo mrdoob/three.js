@@ -731,9 +731,10 @@ const COLOR_SPACE_MAP = {
 
 async function createDataTexture( container, levelIndex = 0 ) {
 
-	const { vkFormat, pixelDepth } = container;
+	const { vkFormat } = container;
 	const pixelWidth = Math.max( 1, container.pixelWidth >> levelIndex );
 	const pixelHeight = Math.max( 1, container.pixelHeight >> levelIndex );
+	const pixelDepth = Math.max( 1, container.pixelDepth >> levelIndex );
 
 	if ( FORMAT_MAP[ vkFormat ] === undefined ) {
 
