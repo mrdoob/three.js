@@ -41,8 +41,6 @@
 
 			import { nodeFrame } from 'three/addons/renderers/webgl/nodes/WebGLNodes.js';
 
-			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
-
 			let camera, scene, renderer, stats;
 
 			init();
@@ -78,7 +76,7 @@
 
 					speed.push( 20 + Math.random() * 50 );
 
-					intensity.push( Math.random() * .15 );
+					intensity.push( Math.random() * .04 );
 
 					size.push( 30 + Math.random() * 230 );
 
@@ -95,6 +93,7 @@
 				// Forked from: https://answers.unrealengine.com/questions/143267/emergency-need-help-with-fire-fx-weird-loop.html
 
 				const fireMap = new THREE.TextureLoader().load( 'textures/sprites/firetorch_1.jpg' );
+				fireMap.colorSpace = THREE.SRGBColorSpace;
 
 				// nodes
 
@@ -139,7 +138,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				document.body.appendChild( renderer.domElement );
 
 				// stats
