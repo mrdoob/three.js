@@ -509,7 +509,7 @@ class OBJLoader extends Loader {
 		for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
 			/**
-			 * @type {string} This is the currernt line in the text we're parsing.
+			 * @type {string} This is the current line in the text we're parsing.
 			 */
 			const line = lines[ i ].trimStart();
 
