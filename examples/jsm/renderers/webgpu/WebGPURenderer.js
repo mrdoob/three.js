@@ -815,14 +815,19 @@ class WebGPURenderer {
 
 				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
-					if ( this.sortObjects === true ) {
-
-						_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
-
-					}
-
 					const geometry = object.geometry;
 					const material = object.material;
+
+					if ( this.sortObjects === true ) {
+
+						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+						_vector3
+							.copy( geometry.boundingSphere.center )
+							.applyMatrix4( object.matrixWorld )
+							.applyMatrix4( _projScreenMatrix );
+
+					}
 
 					if ( Array.isArray( material ) ) {
 

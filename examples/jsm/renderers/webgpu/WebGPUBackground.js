@@ -69,13 +69,16 @@ class WebGPUBackground {
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
+				nodeMaterial.frustumCulled = false;
 				nodeMaterial.fog = false;
 
 				this.boxMesh = boxMesh = new Mesh( new BoxGeometry( 1, 1, 1 ), nodeMaterial );
 
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
-					this.matrixWorld.copyPosition( camera.matrixWorld );
+					const scale = camera.far;
+
+					this.matrixWorld.makeScale( scale, scale, scale ).copyPosition( camera.matrixWorld );
 
 				};
 
