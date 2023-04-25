@@ -515,12 +515,10 @@ class OBJLoader extends Loader {
 
 			if ( line.length === 0 ) continue;
 
-			const lineFirstChar = line.charAt( 0 );
-
 			// @todo invoke passed in handler if any
-			if ( lineFirstChar === '#' ) continue; // skip comments
+			if ( line.startsWith( '#' ) ) continue; // skip comments
 
-			if ( lineFirstChar === 'v' ) {
+			if ( line.startsWith( 'v' ) ) {
 
 				const data = line.split( _face_vertex_data_separator_pattern );
 
@@ -567,7 +565,7 @@ class OBJLoader extends Loader {
 
 				}
 
-			} else if ( lineFirstChar === 'f' ) {
+			} else if ( line.startsWith( 'f' ) ) {
 
 				const lineData = line.slice( 1 ).trim();
 				const vertexData = lineData.split( _face_vertex_data_separator_pattern );
@@ -605,7 +603,7 @@ class OBJLoader extends Loader {
 
 				}
 
-			} else if ( lineFirstChar === 'l' ) {
+			} else if ( line.startsWith( 'l' ) ) {
 
 				const lineParts = line.substring( 1 ).trim().split( ' ' );
 				let lineVertices = [];
@@ -630,7 +628,7 @@ class OBJLoader extends Loader {
 
 				state.addLineGeometry( lineVertices, lineUVs );
 
-			} else if ( lineFirstChar === 'p' ) {
+			} else if ( line.startsWith( 'p' ) ) {
 
 				const lineData = line.slice( 1 ).trim();
 				const pointData = lineData.split( ' ' );
@@ -668,7 +666,7 @@ class OBJLoader extends Loader {
 
 				console.warn( 'THREE.OBJLoader: Rendering identifier "usemap" not supported. Textures must be defined in MTL files.' );
 
-			} else if ( lineFirstChar === 's' ) {
+			} else if ( line.startsWith( 's' ) ) {
 
 				result = line.split( ' ' );
 
