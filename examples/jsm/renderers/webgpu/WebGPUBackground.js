@@ -69,10 +69,10 @@ class WebGPUBackground {
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
-				nodeMaterial.frustumCulled = false;
 				nodeMaterial.fog = false;
 
 				this.boxMesh = boxMesh = new Mesh( new BoxGeometry( 1, 1, 1 ), nodeMaterial );
+				boxMesh.frustumCulled = false;
 
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
@@ -86,13 +86,13 @@ class WebGPUBackground {
 
 			const backgroundCacheKey = backgroundNode.getCacheKey();
 
-			if ( sceneProperties.backgroundMeshCacheKey !== backgroundCacheKey ) {
+			if ( sceneProperties.backgroundCacheKey !== backgroundCacheKey ) {
 
 				this.boxMeshNode.node = backgroundNode;
 
 				boxMesh.material.needsUpdate = true;
 
-				sceneProperties.backgroundMeshCacheKey = backgroundCacheKey;
+				sceneProperties.backgroundCacheKey = backgroundCacheKey;
 
 			}
 
