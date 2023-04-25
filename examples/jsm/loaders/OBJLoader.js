@@ -1,5 +1,6 @@
 import {
 	BufferGeometry,
+	Color,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
@@ -11,8 +12,7 @@ import {
 	MeshPhongMaterial,
 	Points,
 	PointsMaterial,
-	Vector3,
-	Color
+	Vector3
 } from 'three';
 
 // o object_name | g group_name
@@ -508,6 +508,9 @@ class OBJLoader extends Loader {
 
 		for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
+			/**
+			 * @type {string} This is the currernt line in the text we're parsing.
+			 */
 			const line = lines[ i ].trimStart();
 
 			if ( line.length === 0 ) continue;
