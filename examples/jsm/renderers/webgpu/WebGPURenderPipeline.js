@@ -598,7 +598,7 @@ class WebGPURenderPipeline {
 
 			const prefixOptions = typedAttributeToVertexFormatPrefix.get( AttributeType ) || typedArraysToVertexFormatPrefix.get( ArrayType );
 			const prefix = prefixOptions[ normalized ? 1 : 0 ];
-console.log( prefix );
+
 			if ( prefix ) {
 
 				const bytesPerUnit = ArrayType.BYTES_PER_ELEMENT * itemSize;
@@ -607,7 +607,7 @@ console.log( prefix );
 
 				if ( paddedItemSize % 1 ) {
 
-					throw new Error( `bad item size ` );
+					throw new Error( 'THREE.WebGPURenderer: Bad vertex format item size.' );
 
 				}
 
@@ -619,7 +619,7 @@ console.log( prefix );
 
 		if ( ! format ) {
 
-			console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.' );
+			console.error( 'THREE.WebGPURenderer: Vertex format not supported yet.' );
 
 		}
 
