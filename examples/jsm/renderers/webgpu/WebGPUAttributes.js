@@ -9,7 +9,7 @@ class WebGPUAttributes {
 
 	get( attribute ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		attribute = this._getAttribute( attribute );
 
 		return this.buffers.get( attribute );
 
@@ -17,7 +17,7 @@ class WebGPUAttributes {
 
 	remove( attribute ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		attribute = this._getAttribute( attribute );
 
 		const data = this.buffers.get( attribute );
 
@@ -33,7 +33,7 @@ class WebGPUAttributes {
 
 	update( attribute, isIndex = false, usage = null ) {
 
-		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+		attribute = this._getAttribute( attribute );
 
 		let data = this.buffers.get( attribute );
 
@@ -112,6 +112,14 @@ class WebGPUAttributes {
 		const arrayBuffer = gpuReadBuffer.getMappedRange();
 
 		return arrayBuffer;
+
+	}
+
+	_getAttribute( attribute ) {
+
+		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
+
+		return attribute;
 
 	}
 
