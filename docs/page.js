@@ -66,8 +66,8 @@ function onDocumentLoad() {
 	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
 	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, '[$1:$2 $2]' ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gim, replaceMember ); // [member:name title] ( ...params )
-	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, replaceParam ); // [param:name title]
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\(.*\))?/gi, `<a class='permalink links' data-fragment='${name}.$2' target='_parent' title='${name}.$2'>#</a> .<a class='links' data-fragment='${name}.$2' id='$2'>$2</a> $3 : <a class='param links' data-fragment='$1'>$1</a>` );
+	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a class=\'param links\' data-fragment=\'$1\'>$1</a>' ); // [param:name title]
 
 	text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+)\]/gi, '<a href="$1" target="_blank">$1</a>' ); // [link:url]
 	text = text.replace( /\[link:([\w:/.\-_()?#=!~]+) ([\w\p{L}:/.\-_'\s]+)\]/giu, '<a href="$1" target="_blank">$2</a>' ); // [link:url title]
@@ -170,40 +170,6 @@ function onDocumentLoad() {
 	};
 
 	document.head.appendChild( prettify );
-
-	// Links
-
-	function replaceMember( _, name, title, params ) {
-
-		const fragment = getFragment( name );
-
-		return `<a class='permalink links' data-fragment='${fragment}.${title}' target='_parent' title='${name}.${title}'>#</a> .<a class='links' data-fragment='${fragment}.${title}' id='${title}'>${title}</a> ${params || ''} : <a class='param links' data-fragment='${fragment}'>${name}</a>`;
-
-	}
-
-	function replaceParam( _, name, type ) {
-
-		const fragment = getFragment( name );
-
-		return `${type} : <a class=\'param links\' data-fragment=\'${fragment}\'>${name}</a>`;
-
-	}
-
-	function getFragment( id ) {
-
-		switch (id) {
-
-			case 'ColorSpace':
-
-				return 'Core';
-
-			default:
-
-				return id;
-
-		}
-
-	}
 
 }
 

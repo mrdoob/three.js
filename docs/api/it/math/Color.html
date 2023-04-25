@@ -162,13 +162,13 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Imposta i componenti del colore dall'[page:BufferAttribute attributo].
 		</p>
 
-		<h3>[method:Integer getHex]( [param:ColorSpace colorSpace] = SRGBColorSpace )</h3>
+		<h3>[method:Integer getHex]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>Restituisce il valore esadecimale di questo colore.</p>
 
-		<h3>[method:String getHexString]( [param:ColorSpace colorSpace] = SRGBColorSpace )</h3>
+		<h3>[method:String getHexString]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>Restituisce il valore esadecimale di questo colore come una stringa (per esempio, 'FFFFFF').</p>
 
-		<h3>[method:Object getHSL]( [param:Object target], [param:ColorSpace colorSpace] = LinearSRGBColorSpace )</h3>
+		<h3>[method:Object getHSL]( [param:Object target], [param:string colorSpace] = LinearSRGBColorSpace )</h3>
 		<p>
 			[page:Object target] - questo risultato sarà copiato in questo Oggetto. Aggiunge le chiavi h, s e l all'oggetto (se non è già presente).<br /><br />
 
@@ -181,14 +181,14 @@ const color7 = new THREE.Color( 1, 0, 0 );
 
 		</p>
 
-		<h3>[method:Color getRGB]( [param:Color target], [param:ColorSpace colorSpace] = SRGBColorSpace )</h3>
+		<h3>[method:Color getRGB]( [param:Color target], [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>
 			[page:Color target] - questo risultato sarà copiato in questo oggetto.<br /><br />
 
 			Returns the RGB values of this color as an instance of [page:Color].
 		</p>
 
-		<h3>[method:String getStyle]( [param:ColorSpace colorSpace] = SRGBColorSpace )</h3>
+		<h3>[method:String getStyle]( [param:string colorSpace] = SRGBColorSpace )</h3>
 		<p>Restituisce il valore di questo colore come una stringa CSS style. Esempio: `rgb(255,0,0)`.</p>
 
 		<h3>[method:this lerp]( [param:Color color], [param:Float alpha] ) </h3>
@@ -245,14 +245,14 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Delega a [page:.copy], [page:.setStyle], o [page:.setHex] a seconda del tipo di input.
 		</p>
 
-		<h3>[method:this setHex]( [param:Integer hex], [param:ColorSpace colorSpace] = SRGBColorSpace ) </h3>
+		<h3>[method:this setHex]( [param:Integer hex], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:Integer hex] - formato [link:https://en.wikipedia.org/wiki/Web_colors#Hex_triplet tripletta esadecimale].<br /><br />
 
 		Imposta questo colore da un valore esadecimale.
 		</p>
 
-		<h3>[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l], [param:ColorSpace colorSpace] = LinearSRGBColorSpace ) </h3>
+		<h3>[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l], [param:string colorSpace] = LinearSRGBColorSpace ) </h3>
 		<p>
 		[page:Float h] - Valore di tonalità compreso tra 0.0 e 1.0 <br />
 		[page:Float s] - Valore di saturazione compreso tra 0.0 e 1.0 <br />
@@ -261,7 +261,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Imposta il colore dai valori HSL.
 		</p>
 
-		<h3>[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b], [param:ColorSpace colorSpace] = LinearSRGBColorSpace ) </h3>
+		<h3>[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b], [param:string colorSpace] = LinearSRGBColorSpace ) </h3>
 		<p>
 		[page:Float r] - Valore del canale rosso tra 0.0 e 1.0.<br />
 		[page:Float g] - Valore del canale verde tra 0.0 e 1.0.<br />
@@ -277,7 +277,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Imposta tutti e tre i componenti del colore al valore [page:Float scalare].
 		</p>
 
-		<h3>[method:this setStyle]( [param:String style], [param:ColorSpace colorSpace] = SRGBColorSpace ) </h3>
+		<h3>[method:this setStyle]( [param:String style], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:String style] - colore come una stringa CSS-style.<br /><br />
 
@@ -296,7 +296,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		Si noti che per i nomi dei colori X11, più parole come Dark Orange diventano la stringa 'darkorange'.
 		</p>
 
-		<h3>[method:this setColorName]( [param:String style], [param:ColorSpace colorSpace] = SRGBColorSpace ) </h3>
+		<h3>[method:this setColorName]( [param:String style], [param:string colorSpace] = SRGBColorSpace ) </h3>
 		<p>
 		[page:String style] - nome del colore ( dai [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart nomi dei colori X11] ).<br /><br />
 

@@ -185,12 +185,12 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:Integer getHex]( [param:ColorSpace colorSpace] = SRGBColorSpace )
+			[method:Integer getHex]( [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>Returns the hexadecimal value of this color.</p>
 
 		<h3>
-			[method:String getHexString]( [param:ColorSpace colorSpace] = SRGBColorSpace )
+			[method:String getHexString]( [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>
 			Returns the hexadecimal value of this color as a string (for example,
@@ -198,7 +198,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:Object getHSL]( [param:Object target], [param:ColorSpace colorSpace] =
+			[method:Object getHSL]( [param:Object target], [param:string colorSpace] =
 			LinearSRGBColorSpace )
 		</h3>
 		<p>
@@ -219,7 +219,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:Color getRGB]( [param:Color target], [param:ColorSpace colorSpace] =
+			[method:Color getRGB]( [param:Color target], [param:string colorSpace] =
 			SRGBColorSpace )
 		</h3>
 		<p>
@@ -229,7 +229,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:String getStyle]( [param:ColorSpace colorSpace] = SRGBColorSpace )
+			[method:String getStyle]( [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>
 			Returns the value of this color as a CSS style string. Example:
@@ -312,7 +312,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:this setHex]( [param:Integer hex], [param:ColorSpace colorSpace] =
+			[method:this setHex]( [param:Integer hex], [param:string colorSpace] =
 			SRGBColorSpace )
 		</h3>
 		<p>
@@ -324,7 +324,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 
 		<h3>
 			[method:this setHSL]( [param:Float h], [param:Float s], [param:Float l],
-			[param:ColorSpace colorSpace] = LinearSRGBColorSpace )
+			[param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
 			[page:Float h] — hue value between 0.0 and 1.0 <br />
@@ -336,7 +336,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 
 		<h3>
 			[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b],
-			[param:ColorSpace colorSpace] = LinearSRGBColorSpace )
+			[param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
 			[page:Float r] — Red channel value between 0.0 and 1.0.<br />
@@ -354,7 +354,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:this setStyle]( [param:String style], [param:ColorSpace colorSpace] =
+			[method:this setStyle]( [param:String style], [param:string colorSpace] =
 			SRGBColorSpace )
 		</h3>
 		<p>
@@ -374,7 +374,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h3>
-			[method:this setColorName]( [param:String style], [param:ColorSpace colorSpace] = SRGBColorSpace )
+			[method:this setColorName]( [param:String style], [param:string colorSpace] = SRGBColorSpace )
 		</h3>
 		<p>
 			[page:String style] — color name ( from
