@@ -279,10 +279,10 @@ function html2canvas( element ) {
 
 			const rect = element.getBoundingClientRect();
 
-			x = rect.left - offset.left - 0.5;
-			y = rect.top - offset.top - 0.5;
-			width = rect.width + 0.5;
-			height = rect.height + 0.5;
+			x = rect.left - offset.left;
+			y = rect.top - offset.top;
+			width = rect.width;
+			height = rect.height;
 
 			context.drawImage( element, x, y, width, height );
 
