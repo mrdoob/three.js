@@ -168,7 +168,7 @@
 				//scene.add( light );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0, 0, 10 );
+				camera.position.set( -10, 2, 0 );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
