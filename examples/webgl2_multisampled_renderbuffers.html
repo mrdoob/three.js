@@ -138,12 +138,14 @@
 				//
 
 				composer1 = new EffectComposer( renderer );
+				composer1.setPixelRatio( window.devicePixelRatio );
 				composer1.addPass( renderPass );
 				composer1.addPass( copyPass );
 
 				//
 
 				composer2 = new EffectComposer( renderer, renderTarget );
+				composer2.setPixelRatio( window.devicePixelRatio );
 				composer2.addPass( renderPass );
 				composer2.addPass( copyPass );
 
