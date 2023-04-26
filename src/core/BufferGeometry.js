@@ -37,6 +37,41 @@ class BufferGeometry extends EventDispatcher {
 		this.index = null;
 		this.attributes = {};
 
+		// Backwards compatibilty
+
+		Object.defineProperties( this.attributes, {
+			'uv': {
+				get: function () {
+
+					console.warn( 'THREE.BufferGeometry: The attribute uv has been renamed to uv_0.' );
+					return this.uv_0;
+
+				},
+				set: function ( value ) {
+
+					console.warn( 'THREE.BufferGeometry: The attribute uv has been renamed to uv_0.' );
+					return this.uv_0 = value;
+
+				},
+				configurable: true
+			},
+			'uv2': {
+				get: function () {
+
+					console.warn( 'THREE.BufferGeometry: The attribute uv2 has been renamed to uv_1.' );
+					return this.uv_1;
+
+				},
+				set: function ( value ) {
+
+					console.warn( 'THREE.BufferGeometry: The attribute uv2 has been renamed to uv_1.' );
+					return this.uv_1 = value;
+
+				},
+				configurable: true
+			}
+		} );
+
 		this.morphAttributes = {};
 		this.morphTargetsRelative = false;
 
@@ -80,6 +115,15 @@ class BufferGeometry extends EventDispatcher {
 	}
 
 	setAttribute( name, attribute ) {
+
+		/*
+		if ( name === 'uv' ) {
+
+			console.warn( 'THREE.BufferGeometry.setAttribute(): The attribute uv has been renamed to uv0.' );
+			name = 'uv0';
+
+		}
+		*/
 
 		this.attributes[ name ] = attribute;
 
