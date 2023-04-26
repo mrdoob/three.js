@@ -116,15 +116,6 @@ class BufferGeometry extends EventDispatcher {
 
 	setAttribute( name, attribute ) {
 
-		/*
-		if ( name === 'uv' ) {
-
-			console.warn( 'THREE.BufferGeometry.setAttribute(): The attribute uv has been renamed to uv0.' );
-			name = 'uv0';
-
-		}
-		*/
-
 		this.attributes[ name ] = attribute;
 
 		return this;
