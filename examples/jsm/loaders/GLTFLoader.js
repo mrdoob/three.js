@@ -2032,6 +2032,8 @@ const ATTRIBUTES = {
 	TANGENT: 'tangent',
 	TEXCOORD_0: 'uv',
 	TEXCOORD_1: 'uv2',
+	TEXCOORD_2: 'uv3',
+	TEXCOORD_3: 'uv4',
 	COLOR_0: 'color',
 	WEIGHTS_0: 'skinWeight',
 	JOINTS_0: 'skinIndex',

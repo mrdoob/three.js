@@ -528,6 +528,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUvs2 ? '#define USE_UV2' : '',
+			parameters.vertexUvs3 ? '#define USE_UV3' : '',
+			parameters.vertexUvs4 ? '#define USE_UV4' : '',
 
 			parameters.pointsUvs ? '#define USE_POINTS_UV' : '',
 
@@ -575,6 +577,24 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
 			'attribute vec2 uv;',
+
+			'#ifdef USE_UV2',
+
+			'	attribute vec2 uv2;',
+
+			'#endif',
+
+			'#ifdef USE_UV3',
+
+			'	attribute vec2 uv3;',
+
+			'#endif',
+
+			'#ifdef USE_UV4',
+
+			'	attribute vec2 uv4;',
+
+			'#endif',
 
 			'#ifdef USE_TANGENT',
 
@@ -689,6 +709,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUvs2 ? '#define USE_UV2' : '',
+			parameters.vertexUvs3 ? '#define USE_UV3' : '',
+			parameters.vertexUvs4 ? '#define USE_UV4' : '',
 
 			parameters.pointsUvs ? '#define USE_POINTS_UV' : '',
 
