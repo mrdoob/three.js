@@ -8,7 +8,7 @@
 
 		<style>
 			body {
-				background-color: #000000;
+				background-color: #ffffff;
 			}
 
 			#table {
@@ -30,9 +30,7 @@
 			#block-ff0000 { background-color: #ff0000; color: white; }
 			#block-00ff00 { background-color: #00ff00; color: black; }
 			#block-0000ff { background-color: #0000ff; color: white; }
-			#block-ffffff { background-color: #ffffff; color: black; }
-
-		}
+			#block-000000 { background-color: #000000; color: black; }
 		</style>
 
 	</head>
@@ -44,7 +42,7 @@
 				<td id="block-ff0000">ff0000</td>
 				<td id="block-00ff00">00ff00</td>
 				<td id="block-0000ff">0000ff</td>
-				<td id="block-ffffff">ffffff</td>
+				<td id="block-000000">000000</td>
 				</tr>
 			</tbody>
 		</table>
@@ -111,8 +109,6 @@
 
 									mesh = child;
 									material = mesh.material;
-
-									material.transparent = true; // required only for testing opacity
 
 									let color = new THREE.Color();
 
@@ -205,6 +201,11 @@
 					.onChange( function () {
 
 						material.opacity = params.opacity;
+						const transparent = params.opacity < 1;
+						if(transparent !== material.transparent) {
+							material.transparent = transparent;
+							material.needsUpdate = true;
+						}
 						render();
 
 					} );

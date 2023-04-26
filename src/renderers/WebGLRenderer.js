@@ -1276,7 +1276,7 @@ class WebGLRenderer {
 
 			_this.getClearColor( _currentClearColor );
 			_currentClearAlpha = _this.getClearAlpha();
-			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0x7f7f7f, 0.8 );
+			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.8 );
 
 			_this.clear();
 
