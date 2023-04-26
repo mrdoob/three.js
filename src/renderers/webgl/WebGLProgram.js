@@ -578,13 +578,9 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'attribute vec3 normal;',
 			'attribute vec2 uv_0;',
 
-			'#define uv uv_0', // Backwards compatibilty
-
 			'#ifdef USE_UV1',
 
 			'	attribute vec2 uv_1;',
-
-			'	#define uv2 uv_1', // Backwards compatibilty
 
 			'#endif',
 
@@ -605,6 +601,11 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'	attribute vec4 tangent;',
 
 			'#endif',
+
+			// Backwards compatibilty
+
+			'#define uv uv_0',
+			'#define uv2 uv_1',
 
 			'#if defined( USE_COLOR_ALPHA )',
 
