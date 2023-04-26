@@ -72,10 +72,13 @@ class WebGPUBackground {
 				nodeMaterial.fog = false;
 
 				this.boxMesh = boxMesh = new Mesh( new BoxGeometry( 1, 1, 1 ), nodeMaterial );
+				boxMesh.frustumCulled = false;
 
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
-					this.matrixWorld.copyPosition( camera.matrixWorld );
+					const scale = camera.far;
+
+					this.matrixWorld.makeScale( scale, scale, scale ).copyPosition( camera.matrixWorld );
 
 				};
 
@@ -83,13 +86,13 @@ class WebGPUBackground {
 
 			const backgroundCacheKey = backgroundNode.getCacheKey();
 
-			if ( sceneProperties.backgroundMeshCacheKey !== backgroundCacheKey ) {
+			if ( sceneProperties.backgroundCacheKey !== backgroundCacheKey ) {
 
 				this.boxMeshNode.node = backgroundNode;
 
 				boxMesh.material.needsUpdate = true;
 
-				sceneProperties.backgroundMeshCacheKey = backgroundCacheKey;
+				sceneProperties.backgroundCacheKey = backgroundCacheKey;
 
 			}
 

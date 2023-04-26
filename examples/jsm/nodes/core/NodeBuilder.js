@@ -7,17 +7,30 @@ import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
-import { REVISION, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4 } from 'three';
+import { REVISION, NoColorSpace, LinearEncoding, sRGBEncoding, SRGBColorSpace, Color, Vector2, Vector3, Vector4, Float16BufferAttribute } from 'three';
 
 import { stack } from './StackNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 
-const typeFromLength = new Map();
-typeFromLength.set( 2, 'vec2' );
-typeFromLength.set( 3, 'vec3' );
-typeFromLength.set( 4, 'vec4' );
-typeFromLength.set( 9, 'mat3' );
-typeFromLength.set( 16, 'mat4' );
+const typeFromLength = new Map( [
+	[ 2, 'vec2' ],
+	[ 3, 'vec3' ],
+	[ 4, 'vec4' ],
+	[ 9, 'mat3' ],
+	[ 16, 'mat4' ]
+] );
+
+const typeFromArray = new Map( [
+	[ Int8Array, 'int' ],
+	[ Int16Array, 'int' ],
+	[ Int32Array, 'int' ],
+	[ Uint8Array, 'uint' ],
+	[ Uint16Array, 'uint' ],
+	[ Uint32Array, 'uint' ],
+	[ Float32Array, 'float' ]
+] );
+
+const isNonPaddingElementArray = new Set( [ Int32Array, Uint32Array, Float32Array ] );
 
 const toFloat = ( value ) => {
 
@@ -412,9 +425,39 @@ class NodeBuilder {
 	getTypeFromLength( length, componentType = 'float' ) {
 
 		if ( length === 1 ) return componentType;
+
 		const baseType = typeFromLength.get( length );
 		const prefix = componentType === 'float' ? '' : componentType[ 0 ];
+
 		return prefix + baseType;
+
+	}
+
+	getTypeFromArray( array ) {
+
+		return typeFromArray.get( array.constructor );
+
+	}
+
+	getTypeFromAttribute( attribute ) {
+
+		let dataAttribute = attribute;
+
+		if ( attribute.isInterleavedBufferAttribute ) dataAttribute = attribute.data;
+
+		const array = dataAttribute.array;
+		const itemSize = isNonPaddingElementArray.has( array.constructor ) ? attribute.itemSize : dataAttribute.stride || attribute.itemSize;
+		const normalized = attribute.normalized;
+
+		let arrayType;
+
+		if ( ! ( attribute instanceof Float16BufferAttribute ) && normalized !== true ) {
+
+			arrayType = this.getTypeFromArray( array );
+
+		}
+
+		return this.getTypeFromLength( itemSize, arrayType );
 
 	}
 
@@ -677,7 +720,7 @@ class NodeBuilder {
 
 		if ( propertyName !== null ) {
 
-			flowData.code += `${propertyName} = ${flowData.result};\n` + this.tab;
+			flowData.code += `${ this.tab + propertyName } = ${ flowData.result };\n`;
 
 		}
 
@@ -864,7 +907,7 @@ class NodeBuilder {
 
 		if ( fromTypeLength > toTypeLength ) {
 
-			return this.format( `${ snippet }.${ 'xyz'.slice( 0, toTypeLength ) }`, this.getTypeFromLength( toTypeLength ), toType );
+			return this.format( `${ snippet }.${ 'xyz'.slice( 0, toTypeLength ) }`, this.getTypeFromLength( toTypeLength, this.getComponentType( fromType ) ), toType );
 
 		}
 
