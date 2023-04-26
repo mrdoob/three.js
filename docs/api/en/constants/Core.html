@@ -21,11 +21,15 @@ THREE.REVISION
 
 		<h2>Color Spaces</h2>
 		<code>
-THREE.NoColorSpace 
-THREE.SRGBColorSpace 
-THREE.LinearSRGBColorSpace
+THREE.NoColorSpace = ""
+THREE.SRGBColorSpace = "srgb"
+THREE.LinearSRGBColorSpace = "srgb-linear"
 		</code>
-		<p>[page:NoColorSpace] defines no specific color space.</p>
+		<p>
+			[page:NoColorSpace] defines no specific color space. It is commonly used
+			for textures including normal maps, roughness maps, metalness maps,
+			ambient occlusion maps, and other non-color data.
+		</p>
 		<p>
 			[page:SRGBColorSpace] (“srgb”) refers to the color space defined by the
 			Rec. 709 primaries, D65 white point, and nonlinear sRGB transfer
