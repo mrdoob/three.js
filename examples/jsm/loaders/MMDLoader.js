@@ -992,7 +992,7 @@ class GeometryBuilder {
 
 		geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 		geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-		geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+		geometry.setAttribute( 'uv0', new Float32BufferAttribute( uvs, 2 ) );
 		geometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
 		geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
 		geometry.setIndex( indices );
@@ -1569,7 +1569,7 @@ class MaterialBuilder {
 
 			if ( detectImageTransparency(
 				imageData,
-				geometry.attributes.uv.array,
+				geometry.attributes.uv0.array,
 				geometry.index.array.slice( group.start, group.start + group.count ) ) ) {
 
 				map.transparent = true;
