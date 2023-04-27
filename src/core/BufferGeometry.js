@@ -37,26 +37,6 @@ class BufferGeometry extends EventDispatcher {
 		this.index = null;
 		this.attributes = {};
 
-		// Backwards compatibilty
-
-		Object.defineProperties( this.attributes, {
-			'uv2': {
-				set: function ( value ) {
-
-					if ( this.uv1 === undefined ) {
-
-						console.warn( 'THREE.BufferGeometry: The attribute uv2 has been renamed to uv1.' );
-						this.uv1 = value;
-
-					}
-
-					delete this.uv2;
-
-				},
-				configurable: true
-			}
-		} );
-
 		this.morphAttributes = {};
 		this.morphTargetsRelative = false;
 
