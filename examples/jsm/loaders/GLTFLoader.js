@@ -3620,6 +3620,8 @@ class GLTFParser {
 
 				if ( primitive.extensions ) addUnknownExtensionsToUserData( extensions, mesh, primitive );
 
+				if ( meshDef.extensions ) addUnknownExtensionsToUserData( extensions, mesh, meshDef );
+
 				parser.assignFinalMaterial( mesh );
 
 				meshes.push( mesh );
