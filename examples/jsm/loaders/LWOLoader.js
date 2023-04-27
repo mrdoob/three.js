@@ -14,7 +14,6 @@
 import {
 	AddOperation,
 	BackSide,
-	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
