@@ -576,23 +576,25 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
-			'attribute vec2 uv_0;',
+			'attribute vec2 uv0;',
+
+			'#define uv uv0', // Backwards compatibilty
 
 			'#ifdef USE_UV1',
 
-			'	attribute vec2 uv_1;',
+			'	attribute vec2 uv1;',
 
 			'#endif',
 
 			'#ifdef USE_UV2',
 
-			'	attribute vec2 uv_2;',
+			'	attribute vec2 uv2;',
 
 			'#endif',
 
 			'#ifdef USE_UV3',
 
-			'	attribute vec2 uv_3;',
+			'	attribute vec2 uv3;',
 
 			'#endif',
 
@@ -601,11 +603,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			'	attribute vec4 tangent;',
 
 			'#endif',
-
-			// Backwards compatibilty
-
-			'#define uv uv_0',
-			'#define uv2 uv_1',
 
 			'#if defined( USE_COLOR_ALPHA )',
 

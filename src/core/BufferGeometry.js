@@ -43,29 +43,30 @@ class BufferGeometry extends EventDispatcher {
 			'uv': {
 				get: function () {
 
-					console.warn( 'THREE.BufferGeometry: The attribute uv has been renamed to uv_0.' );
-					return this.uv_0;
+					console.warn( 'THREE.BufferGeometry: The attribute uv has been renamed to uv0.' );
+					return this.uv0;
 
 				},
 				set: function ( value ) {
 
-					console.warn( 'THREE.BufferGeometry: The attribute uv has been renamed to uv_0.' );
-					this.uv_0 = value;
+					console.warn( 'THREE.BufferGeometry: The attribute uv has been renamed to uv0.' );
+					this.uv0 = value;
 
 				},
 				configurable: true
 			},
 			'uv2': {
-				get: function () {
-
-					console.warn( 'THREE.BufferGeometry: The attribute uv2 has been renamed to uv_1.' );
-					return this.uv_1;
-
-				},
 				set: function ( value ) {
 
-					console.warn( 'THREE.BufferGeometry: The attribute uv2 has been renamed to uv_1.' );
-					this.uv_1 = value;
+					if ( this.uv1 === undefined ) {
+
+						console.warn( 'THREE.BufferGeometry: The attribute uv2 has been renamed to uv1.' );
+						this.uv1 = value;
+
+					}
+
+					delete this.uv2;
+					this.uv2 = value;
 
 				},
 				configurable: true

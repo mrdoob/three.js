@@ -143,9 +143,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_EXTENSIONS = !! material.extensions;
 
-		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv_1;
-		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv_2;
-		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv_3;
+		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
+		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
+		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
 
 		const parameters = {
 
@@ -222,35 +222,35 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			//
 
-			mapUv: HAS_MAP && `uv_${ material.map.channel }`,
-			aoMapUv: HAS_AOMAP && `uv_${ material.aoMap.channel }`,
-			lightMapUv: HAS_LIGHTMAP && `uv_${ material.lightMap.channel }`,
-			bumpMapUv: HAS_BUMPMAP && `uv_${ material.bumpMap.channel }`,
-			normalMapUv: HAS_NORMALMAP && `uv_${ material.normalMap.channel }`,
-			displacementMapUv: HAS_DISPLACEMENTMAP && `uv_${ material.displacementMap.channel }`,
-			emissiveMapUv: HAS_EMISSIVEMAP && `uv_${ material.emissiveMap.channel }`,
+			mapUv: HAS_MAP && `uv${ material.map.channel }`,
+			aoMapUv: HAS_AOMAP && `uv${ material.aoMap.channel }`,
+			lightMapUv: HAS_LIGHTMAP && `uv${ material.lightMap.channel }`,
+			bumpMapUv: HAS_BUMPMAP && `uv${ material.bumpMap.channel }`,
+			normalMapUv: HAS_NORMALMAP && `uv${ material.normalMap.channel }`,
+			displacementMapUv: HAS_DISPLACEMENTMAP && `uv${ material.displacementMap.channel }`,
+			emissiveMapUv: HAS_EMISSIVEMAP && `uv${ material.emissiveMap.channel }`,
 
-			metalnessMapUv: HAS_METALNESSMAP && `uv_${ material.metalnessMap.channel }`,
-			roughnessMapUv: HAS_ROUGHNESSMAP && `uv_${ material.roughnessMap.channel }`,
+			metalnessMapUv: HAS_METALNESSMAP && `uv${ material.metalnessMap.channel }`,
+			roughnessMapUv: HAS_ROUGHNESSMAP && `uv${ material.roughnessMap.channel }`,
 
-			clearcoatMapUv: HAS_CLEARCOATMAP && `uv_${ material.clearcoatMap.channel }`,
-			clearcoatNormalMapUv: HAS_CLEARCOAT_NORMALMAP && `uv_${ material.clearcoatNormalMap.channel }`,
-			clearcoatRoughnessMapUv: HAS_CLEARCOAT_ROUGHNESSMAP && `uv_${ material.clearcoatRoughnessMap.channel }`,
+			clearcoatMapUv: HAS_CLEARCOATMAP && `uv${ material.clearcoatMap.channel }`,
+			clearcoatNormalMapUv: HAS_CLEARCOAT_NORMALMAP && `uv${ material.clearcoatNormalMap.channel }`,
+			clearcoatRoughnessMapUv: HAS_CLEARCOAT_ROUGHNESSMAP && `uv${ material.clearcoatRoughnessMap.channel }`,
 
-			iridescenceMapUv: HAS_IRIDESCENCEMAP && `uv_${ material.iridescenceMap.channel }`,
-			iridescenceThicknessMapUv: HAS_IRIDESCENCE_THICKNESSMAP && `uv_${ material.iridescenceThicknessMap.channel }`,
+			iridescenceMapUv: HAS_IRIDESCENCEMAP && `uv${ material.iridescenceMap.channel }`,
+			iridescenceThicknessMapUv: HAS_IRIDESCENCE_THICKNESSMAP && `uv${ material.iridescenceThicknessMap.channel }`,
 
-			sheenColorMapUv: HAS_SHEEN_COLORMAP && `uv_${ material.sheenColorMap.channel }`,
-			sheenRoughnessMapUv: HAS_SHEEN_ROUGHNESSMAP && `uv_${ material.sheenRoughnessMap.channel }`,
+			sheenColorMapUv: HAS_SHEEN_COLORMAP && `uv${ material.sheenColorMap.channel }`,
+			sheenRoughnessMapUv: HAS_SHEEN_ROUGHNESSMAP && `uv${ material.sheenRoughnessMap.channel }`,
 
-			specularMapUv: HAS_SPECULARMAP && `uv_${ material.specularMap.channel }`,
-			specularColorMapUv: HAS_SPECULAR_COLORMAP && `uv_${ material.specularColorMap.channel }`,
-			specularIntensityMapUv: HAS_SPECULAR_INTENSITYMAP && `uv_${ material.specularIntensityMap.channel }`,
+			specularMapUv: HAS_SPECULARMAP && `uv${ material.specularMap.channel }`,
+			specularColorMapUv: HAS_SPECULAR_COLORMAP && `uv${ material.specularColorMap.channel }`,
+			specularIntensityMapUv: HAS_SPECULAR_INTENSITYMAP && `uv${ material.specularIntensityMap.channel }`,
 
-			transmissionMapUv: HAS_TRANSMISSIONMAP && `uv_${ material.transmissionMap.channel }`,
-			thicknessMapUv: HAS_THICKNESSMAP && `uv_${ material.thicknessMap.channel }`,
+			transmissionMapUv: HAS_TRANSMISSIONMAP && `uv${ material.transmissionMap.channel }`,
+			thicknessMapUv: HAS_THICKNESSMAP && `uv${ material.thicknessMap.channel }`,
 
-			alphaMapUv: HAS_ALPHAMAP && `uv_${ material.alphaMap.channel }`,
+			alphaMapUv: HAS_ALPHAMAP && `uv${ material.alphaMap.channel }`,
 
 			//
 
@@ -261,7 +261,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexUv2s: HAS_ATTRIBUTE_UV2,
 			vertexUv3s: HAS_ATTRIBUTE_UV3,
 
-			pointsUvs: object.isPoints === true && !! geometry.attributes.uv_0 && ( HAS_MAP || HAS_ALPHAMAP ),
+			pointsUvs: object.isPoints === true && !! geometry.attributes.uv0 && ( HAS_MAP || HAS_ALPHAMAP ),
 
 			fog: !! fog,
 			useFog: material.fog === true,
