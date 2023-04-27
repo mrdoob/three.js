@@ -37,9 +37,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 	function getChannel( value ) {
 
-		if ( value === 1 ) return 'uv2';
-		if ( value === 2 ) return 'uv3';
-		if ( value === 3 ) return 'uv4';
+		if ( value === 1 ) return 'uv1';
+		if ( value === 2 ) return 'uv2';
+		if ( value === 3 ) return 'uv3';
 
 		return 'uv';
 
@@ -153,9 +153,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 		const HAS_EXTENSIONS = !! material.extensions;
 
+		const HAS_ATTRIBUTE_UV1 = !! geometry.attributes.uv1;
 		const HAS_ATTRIBUTE_UV2 = !! geometry.attributes.uv2;
 		const HAS_ATTRIBUTE_UV3 = !! geometry.attributes.uv3;
-		const HAS_ATTRIBUTE_UV4 = !! geometry.attributes.uv4;
 
 		const parameters = {
 
@@ -267,9 +267,9 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			vertexTangents: HAS_NORMALMAP && !! geometry.attributes.tangent,
 			vertexColors: material.vertexColors,
 			vertexAlphas: material.vertexColors === true && !! geometry.attributes.color && geometry.attributes.color.itemSize === 4,
-			vertexUvs2: HAS_ATTRIBUTE_UV2,
-			vertexUvs3: HAS_ATTRIBUTE_UV3,
-			vertexUvs4: HAS_ATTRIBUTE_UV4,
+			vertexUv1s: HAS_ATTRIBUTE_UV1,
+			vertexUv2s: HAS_ATTRIBUTE_UV2,
+			vertexUv3s: HAS_ATTRIBUTE_UV3,
 
 			pointsUvs: object.isPoints === true && !! geometry.attributes.uv && ( HAS_MAP || HAS_ALPHAMAP ),
 
@@ -461,11 +461,11 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 11 );
 		if ( parameters.vertexAlphas )
 			_programLayers.enable( 12 );
-		if ( parameters.vertexUvs2 )
+		if ( parameters.vertexUv1s )
 			_programLayers.enable( 13 );
-		if ( parameters.vertexUvs3 )
+		if ( parameters.vertexUv2s )
 			_programLayers.enable( 14 );
-		if ( parameters.vertexUvs4 )
+		if ( parameters.vertexUv3s )
 			_programLayers.enable( 15 );
 		if ( parameters.vertexTangents )
 			_programLayers.enable( 16 );

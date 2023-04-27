@@ -307,10 +307,10 @@ class ColladaExporter {
 				}
 
 				// serialize lightmap uvs
-				if ( 'uv2' in bufferGeometry.attributes ) {
+				if ( 'uv1' in bufferGeometry.attributes ) {
 
 					const uvName = `${ meshid }-texcoord2`;
-					gnode += getAttribute( bufferGeometry.attributes.uv2, uvName, [ 'S', 'T' ], 'float' );
+					gnode += getAttribute( bufferGeometry.attributes.uv1, uvName, [ 'S', 'T' ], 'float' );
 					triangleInputs += `<input semantic="TEXCOORD" source="#${ uvName }" offset="0" set="1" />`;
 
 				}

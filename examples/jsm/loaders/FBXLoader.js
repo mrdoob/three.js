@@ -1635,15 +1635,7 @@ class GeometryParser {
 
 		buffers.uvs.forEach( function ( uvBuffer, i ) {
 
-			// subsequent uv buffers are called 'uv1', 'uv2', ...
-			let name = 'uv' + ( i + 1 ).toString();
-
-			// the first uv buffer is just called 'uv'
-			if ( i === 0 ) {
-
-				name = 'uv';
-
-			}
+			const name = i === 0 ? 'uv' : `uv${ i }`;
 
 			geo.setAttribute( name, new Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
 
