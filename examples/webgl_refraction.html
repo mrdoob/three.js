@@ -42,6 +42,8 @@
 			import { Refractor } from 'three/addons/objects/Refractor.js';
 			import { WaterRefractionShader } from 'three/addons/shaders/WaterRefractionShader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let camera, scene, renderer, clock;
 
 			let refractor, smallSphere;
@@ -56,6 +58,7 @@
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

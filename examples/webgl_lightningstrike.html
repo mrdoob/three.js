@@ -38,6 +38,8 @@
 			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 			import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
 			let container, stats;
 
 			let scene, renderer, composer, gui;
@@ -67,7 +69,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 
@@ -429,7 +430,7 @@
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.mapping = THREE.CubeReflectionMapping;
-				textureCube.encoding = THREE.sRGBEncoding;
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				const sphereMaterial = new THREE.MeshPhysicalMaterial( {
 					transparent: true,

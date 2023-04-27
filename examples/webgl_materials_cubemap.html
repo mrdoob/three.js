@@ -36,6 +36,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
+
 			let container, stats;
 
 			let camera, scene, renderer;
@@ -63,7 +65,9 @@
 				];
 
 				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				reflectionCube.colorSpace = THREE.SRGBColorSpace;
 				const refractionCube = new THREE.CubeTextureLoader().load( urls );
+				refractionCube.colorSpace = THREE.SRGBColorSpace;
 				refractionCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();

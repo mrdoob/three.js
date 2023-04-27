@@ -53,6 +53,7 @@
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
+					texture.colorSpace = THREE.SRGBColorSpace;
 					material6.needsUpdate = true;
 
 				};
@@ -63,6 +64,7 @@
 					// texture.minFilter = LinearMipmapNearestFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
+					texture.colorSpace = THREE.SRGBColorSpace;
 					material8.needsUpdate = true;
 
 				};
@@ -90,6 +92,12 @@
 				disturb_4bpp_rgb_v3.magFilter =
 				flare_2bpp_rgba.minFilter =
 				flare_2bpp_rgba.magFilter = THREE.LinearFilter;
+
+				disturb_2bpp_rgb.encoding =
+				flare_4bpp_rgba.encoding =
+				disturb_4bpp_rgb.encoding =
+				disturb_4bpp_rgb_v3.encoding =
+				flare_2bpp_rgba.colorSpace = THREE.SRGBColorSpace;
 
 				const material1 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb } );
 				const material2 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_mips } );

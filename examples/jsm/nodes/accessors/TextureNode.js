@@ -9,7 +9,7 @@ class TextureNode extends UniformNode {
 
 	constructor( value, uvNode = null, levelNode = null ) {
 
-		super( value, 'vec4' );
+		super( value );
 
 		this.isTextureNode = true;
 
@@ -21,6 +21,14 @@ class TextureNode extends UniformNode {
 	getUniformHash( /*builder*/ ) {
 
 		return this.value.uuid;
+
+	}
+
+	getNodeType( /*builder*/ ) {
+
+		if ( this.value.isDepthTexture === true ) return 'float';
+
+		return 'vec4';
 
 	}
 
@@ -81,7 +89,7 @@ class TextureNode extends UniformNode {
 
 		}
 
-		const textureProperty = super.generate( builder, 'texture' );
+		const textureProperty = super.generate( builder, 'property' );
 
 		if ( output === 'sampler' ) {
 
@@ -93,6 +101,7 @@ class TextureNode extends UniformNode {
 
 		} else {
 
+			const nodeType = this.getNodeType( builder );
 			const nodeData = builder.getDataFromNode( this );
 
 			let propertyName = nodeData.propertyName;
@@ -100,25 +109,21 @@ class TextureNode extends UniformNode {
 			if ( propertyName === undefined ) {
 
 				const uvSnippet = uvNode.build( builder, 'vec2' );
-				const nodeVar = builder.getVarFromNode( this, 'vec4' );
+				const nodeVar = builder.getVarFromNode( this, nodeType );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
 				let snippet = null;
 
-				if ( texture.isVideoTexture === true ) {
-
-					snippet = builder.getVideoTexture( textureProperty, uvSnippet );
-
-				} else if ( levelNode && levelNode.isNode === true ) {
+				if ( levelNode && levelNode.isNode === true ) {
 
 					const levelSnippet = levelNode.build( builder, 'float' );
 
-					snippet = builder.getTextureLevel( textureProperty, uvSnippet, levelSnippet );
+					snippet = builder.getTextureLevel( texture, textureProperty, uvSnippet, levelSnippet );
 
 				} else {
 
-					snippet = builder.getTexture( textureProperty, uvSnippet );
+					snippet = builder.getTexture( texture, textureProperty, uvSnippet );
 
 				}
 
@@ -129,7 +134,7 @@ class TextureNode extends UniformNode {
 
 			}
 
-			return builder.format( propertyName, 'vec4', output );
+			return builder.format( propertyName, nodeType, output );
 
 		}
 

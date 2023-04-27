@@ -31,7 +31,8 @@ export { default as UniformNode, uniform } from './core/UniformNode.js';
 export { default as VarNode, label, temp } from './core/VarNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 
-export * as NodeUtils from './core/NodeUtils.js';
+import * as NodeUtils from './core/NodeUtils.js';
+export { NodeUtils };
 
 // math
 export { default as MathNode, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, negate, oneMinus, dFdx, dFdy, round, reciprocal, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward } from './math/MathNode.js';
@@ -92,6 +93,8 @@ export { default as NormalMapNode, normalMap, TBNViewMatrix } from './display/No
 export { default as PosterizeNode, posterize } from './display/PosterizeNode.js';
 export { default as ToneMappingNode, toneMapping } from './display/ToneMappingNode.js';
 export { default as ViewportNode, viewportCoordinate, viewportResolution, viewportTopLeft, viewportBottomLeft, viewportTopRight, viewportBottomRight } from './display/ViewportNode.js';
+export { default as ViewportTextureNode, viewportTexture } from './display/ViewportTextureNode.js';
+export { default as ViewportSharedTextureNode, viewportSharedTexture } from './display/ViewportSharedTextureNode.js';
 
 // code
 export { default as ExpressionNode, expression } from './code/ExpressionNode.js';
@@ -113,6 +116,7 @@ export { default as RangeNode, range } from './geometry/RangeNode.js';
 export { default as ComputeNode, compute } from './gpgpu/ComputeNode.js';
 
 // lighting
+export { default as LightNode, lightTargetDirection } from './lighting/LightNode.js';
 export { default as PointLightNode } from './lighting/PointLightNode.js';
 export { default as DirectionalLightNode } from './lighting/DirectionalLightNode.js';
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';
@@ -153,7 +157,7 @@ export { default as DFGApprox } from './functions/BSDF/DFGApprox.js';
 export { default as F_Schlick } from './functions/BSDF/F_Schlick.js';
 export { default as V_GGX_SmithCorrelated } from './functions/BSDF/V_GGX_SmithCorrelated.js';
 
-export { default as getDistanceAttenuation } from './functions/light/getDistanceAttenuation.js';
+export { getDistanceAttenuation } from './lighting/LightUtils.js';
 
 export { default as getGeometryRoughness } from './functions/material/getGeometryRoughness.js';
 export { default as getRoughness } from './functions/material/getRoughness.js';

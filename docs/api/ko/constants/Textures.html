@@ -522,21 +522,26 @@
 		[link:https://www.khronos.org/registry/OpenGL/specs/es/3.0/es_spec_3.0.pdf OpenGL ES 3.0 Specification]를 확인해보세요.
 		</p>
 
-		<h2>인코딩</h2>
+		<h2>Depth Packing</h2>
 		<code>
-		THREE.LinearEncoding
-		THREE.sRGBEncoding
 		THREE.BasicDepthPacking
 		THREE.RGBADepthPacking
 		</code>
 		<p>
-		텍스쳐의 [page:Texture.encoding encoding] 프로퍼티와 함께 사용됩니다.<br /><br />
+			For use with the [page:MeshDepthMaterial.depthPacking depthPacking] property of `MeshDepthMaterial`.
+		</p>
 
-		텍스쳐가 재질을 통해 이미 변경된 후에 인코딩 타입이 변경되면,
-		[page:Material.needsUpdate Material.needsUpdate]을 *true*로 설정해 재질을 리컴파일해야합니다.<br /><br />
+		<h2>Color Space</h2>
+		<code>
+		THREE.NoColorSpace = ""
+		THREE.SRGBColorSpace = "srgb"
+		THREE.LinearSRGBColorSpace = "srgb-linear"
+		</code>
+		<p>
+		Used to define the color space of textures (and the output color space of the renderer).<br /><br />
 
-		[page:constant LinearEncoding]이 기본값입니다.
-		이 값으로는 재질의 map, envMap 및 emissiveMap 값만 유효합니다.
+		If the color space type is changed after the texture has already been used by a material,
+		you will need to set [page:Material.needsUpdate Material.needsUpdate] to `true` to make the material recompile.<br /><br />
 		</p>
 
 		<h2>소스 코드</h2>

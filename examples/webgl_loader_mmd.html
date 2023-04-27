@@ -86,10 +86,10 @@
 				gridHelper.position.y = - 10;
 				scene.add( gridHelper );
 
-				const ambient = new THREE.AmbientLight( 0x666666 );
+				const ambient = new THREE.AmbientLight( 0xaaaaaa, 1 );
 				scene.add( ambient );
 
-				const directionalLight = new THREE.DirectionalLight( 0x887766 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
 				directionalLight.position.set( - 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 

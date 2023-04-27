@@ -163,6 +163,7 @@
 			ground.receiveShadow = true;
 			textureLoader.load( 'textures/grid.png', function ( texture ) {
 
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 40, 40 );

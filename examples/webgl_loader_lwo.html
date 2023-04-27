@@ -50,10 +50,10 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 
-				const ambientLight = new THREE.AmbientLight( 0x222222 );
+				const ambientLight = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambientLight );
 
-				const light1 = new THREE.DirectionalLight( 0x888888 );
+				const light1 = new THREE.DirectionalLight( 0xc1c1c1 );
 				light1.position.set( 0, 200, 100 );
 				scene.add( light1 );
 
@@ -82,7 +82,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animation );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 

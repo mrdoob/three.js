@@ -99,6 +99,7 @@
 	"webgl2_multiple_rendertargets": [ "mrt" ],
 	"webgl2_multisampled_renderbuffers": [ "msaa" ],
 	"physics_ammo_cloth": [ "integration" ],
+	"physics_rapier_instancing": [ "external" ],
 	"misc_controls_arcball": [ "rotation" ],
 	"misc_controls_drag": [ "translate" ],
 	"misc_controls_map": [ "drag" ],

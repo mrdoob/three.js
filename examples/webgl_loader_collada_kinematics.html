@@ -82,7 +82,7 @@
 
 				// Grid
 
-				const grid = new THREE.GridHelper( 20, 20, 0x888888, 0x444444 );
+				const grid = new THREE.GridHelper( 20, 20, 0xc1c1c1, 0x8d8d8d );
 				scene.add( grid );
 
 				// Add the COLLADA
@@ -94,14 +94,13 @@
 
 				// Lights
 
-				const light = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
+				const light = new THREE.HemisphereLight( 0xfff7f7, 0x494966 );
 				scene.add( light );
 
 				const pointLight = new THREE.PointLight( 0xffffff, 0.3 );
 				particleLight.add( pointLight );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

@@ -53,20 +53,19 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xeeeeee );
 
-				scene.add( new THREE.GridHelper( 2, 4 ) );
+				scene.add( new THREE.GridHelper( 2, 4, 0xc1c1c1, 0x8d8d8d ) );
 
 				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				const light2 = new THREE.HemisphereLight( 0xffffff, 0x888888 );
+				const light2 = new THREE.HemisphereLight( 0xffffff, 0xc1c1c1 );
 				scene.add( light2 );
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );

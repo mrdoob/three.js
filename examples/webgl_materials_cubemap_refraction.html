@@ -68,6 +68,7 @@
 				];
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 				textureCube.mapping = THREE.CubeRefractionMapping;
 
 				scene = new THREE.Scene();

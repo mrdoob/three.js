@@ -36,9 +36,12 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-			let stats;
 
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
+
+			let stats;
 			let camera, scene, renderer, controls;
+
 			const settings = {
 				metalness: 1.0,
 				roughness: 0.4,
@@ -119,7 +122,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -162,7 +164,7 @@
 				];
 
 				const reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.encoding = THREE.sRGBEncoding;
+				reflectionCube.colorSpace = THREE.SRGBColorSpace;
 
 				// textures
 
@@ -202,7 +204,6 @@
 				loader.load( 'models/obj/ninja/ninjaHead_Low.obj', function ( group ) {
 
 					const geometry = group.children[ 0 ].geometry;
-					geometry.attributes.uv2 = geometry.attributes.uv;
 					geometry.center();
 
 					mesh = new THREE.Mesh( geometry, material );

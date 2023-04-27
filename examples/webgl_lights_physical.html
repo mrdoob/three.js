@@ -124,7 +124,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 10, 24 );
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					floorMat.map = map;
 					floorMat.needsUpdate = true;
 
@@ -162,7 +162,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 1, 1 );
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					cubeMat.map = map;
 					cubeMat.needsUpdate = true;
 
@@ -186,7 +186,7 @@
 				textureLoader.load( 'textures/planets/earth_atmos_2048.jpg', function ( map ) {
 
 					map.anisotropy = 4;
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					ballMat.map = map;
 					ballMat.needsUpdate = true;
 
@@ -194,7 +194,7 @@
 				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function ( map ) {
 
 					map.anisotropy = 4;
-					map.encoding = THREE.sRGBEncoding;
+					map.colorSpace = THREE.SRGBColorSpace;
 					ballMat.metalnessMap = map;
 					ballMat.needsUpdate = true;
 
@@ -232,7 +232,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.useLegacyLights = false;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );

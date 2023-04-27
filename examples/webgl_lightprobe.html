@@ -61,7 +61,6 @@
 				// tone mapping
 				renderer.toneMapping = THREE.NoToneMapping;
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// scene
 				scene = new THREE.Scene();
@@ -101,7 +100,7 @@
 
 				new THREE.CubeTextureLoader().load( urls, function ( cubeTexture ) {
 
-					cubeTexture.encoding = THREE.sRGBEncoding;
+					cubeTexture.colorSpace = THREE.SRGBColorSpace;
 
 					scene.background = cubeTexture;
 

@@ -58,6 +58,7 @@
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -196,7 +197,7 @@
 				CameraUtils.frameCorners( portalCamera, bottomLeftCorner, bottomRightCorner, topLeftCorner, false );
 
 				// render the portal
-				thisPortalTexture.texture.encoding = renderer.outputEncoding;
+				thisPortalTexture.texture.colorSpace = renderer.outputColorSpace;
 				renderer.setRenderTarget( thisPortalTexture );
 				renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
 				if ( renderer.autoClear === false ) renderer.clear();

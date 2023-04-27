@@ -155,15 +155,16 @@
 				geometry.computeBoundingSphere();
 
 				const texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.magFilter = THREE.NearestFilter;
 
 				const mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
 				scene.add( mesh );
 
-				const ambientLight = new THREE.AmbientLight( 0xcccccc );
+				const ambientLight = new THREE.AmbientLight( 0xeeeeee );
 				scene.add( ambientLight );
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 4 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 

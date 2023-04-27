@@ -515,7 +515,7 @@ class OBJLoader extends Loader {
 			const lineFirstChar = line.charAt( 0 );
 
 			// @todo invoke passed in handler if any
-			if ( lineFirstChar === '#' ) continue;
+			if ( lineFirstChar === '#' ) continue; // skip comments
 
 			if ( lineFirstChar === 'v' ) {
 

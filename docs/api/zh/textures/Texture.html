@@ -14,7 +14,7 @@
 
 		<h2>构造函数</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
 		<h2>代码示例</h2>
 
@@ -73,7 +73,7 @@
 
 		<h3>[property:Integer channel]</h3>
 		<p>
-		Lets you select the uv attribute to map the texture to. `0` for `uv` and `1` for `uv2`.
+		Lets you select the uv attribute to map the texture to. `0` for `uv`, `1` for `uv1`, `2` for `uv2` and `3` for `uv3`.
 		</p>
 
 		<h3>[property:number wrapS]</h3>
@@ -209,13 +209,10 @@
 			请参阅[link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei]来了解详细信息。
 		</p>
 
-		<h3>[property:number encoding]</h3>
+		<h3>[property:string colorSpace]</h3>
 		<p>
-		默认值为[page:Textures THREE.LinearEncoding]。
-		请参阅[page:Textures texture constants]来了解其他格式的详细信息。<br /><br />
-
-		请注意，如果在材质被使用之后，纹理贴图中这个值发生了改变，
-		需要触发Material.needsUpdate，来使得这个值在着色器中实现。
+		默认值为[page:Textures THREE.NoColorSpace]。
+		请参阅[page:Textures texture constants]来了解其他格式的详细信息。
 		</p>
 
 		<h3>[property:Integer version]</h3>

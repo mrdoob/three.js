@@ -86,6 +86,7 @@
 
 				const textureLoader = new THREE.TextureLoader( manager );
 				const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				// model
 

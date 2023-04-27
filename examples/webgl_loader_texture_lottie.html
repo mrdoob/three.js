@@ -54,6 +54,7 @@
 					setupControls( texture.animation );
 
 					// texture = new THREE.TextureLoader().load( 'textures/uv_grid_directx.jpg' );
+					// texture.colorSpace = THREE.SRGBColorSpace;
 
 					const geometry = new RoundedBoxGeometry( 1, 1, 1, 7, 0.2 );
 					const material = new THREE.MeshStandardMaterial( { roughness: 0.1, map: texture } );

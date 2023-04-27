@@ -42,7 +42,7 @@ import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
-  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.shadowMap.enabled = true;
 
   const fov = 45;

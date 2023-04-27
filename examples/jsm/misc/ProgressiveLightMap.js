@@ -46,7 +46,7 @@ class ProgressiveLightMap {
 			// Vertex Shader: Set Vertex Positions to the Unwrapped UV Positions
 			shader.vertexShader =
 				'#define USE_LIGHTMAP\n' +
-				'#define LIGHTMAP_UV uv2\n' +
+				'#define LIGHTMAP_UV uv1\n' +
 				shader.vertexShader.slice( 0, - 1 ) +
 				'	gl_Position = vec4((LIGHTMAP_UV - 0.5) * 2.0, 1.0, 1.0); }';
 
@@ -77,7 +77,7 @@ class ProgressiveLightMap {
 	}
 
 	/**
-	 * Sets these objects' materials' lightmaps and modifies their uv2's.
+	 * Sets these objects' materials' lightmaps and modifies their uv1's.
 	 * @param {Object3D} objects An array of objects and lights to set up your lightmap.
 	 */
 	addObjectsToLightMap( objects ) {
@@ -130,16 +130,16 @@ class ProgressiveLightMap {
 		const dimensions = potpack( this.uv_boxes );
 		this.uv_boxes.forEach( ( box ) => {
 
-			const uv2 = objects[ box.index ].geometry.getAttribute( 'uv' ).clone();
-			for ( let i = 0; i < uv2.array.length; i += uv2.itemSize ) {
+			const uv1 = objects[ box.index ].geometry.getAttribute( 'uv' ).clone();
+			for ( let i = 0; i < uv1.array.length; i += uv1.itemSize ) {
 
-				uv2.array[ i ] = ( uv2.array[ i ] + box.x + padding ) / dimensions.w;
-				uv2.array[ i + 1 ] = ( uv2.array[ i + 1 ] + box.y + padding ) / dimensions.h;
+				uv1.array[ i ] = ( uv1.array[ i ] + box.x + padding ) / dimensions.w;
+				uv1.array[ i + 1 ] = ( uv1.array[ i + 1 ] + box.y + padding ) / dimensions.h;
 
 			}
 
-			objects[ box.index ].geometry.setAttribute( 'uv2', uv2 );
-			objects[ box.index ].geometry.getAttribute( 'uv2' ).needsUpdate = true;
+			objects[ box.index ].geometry.setAttribute( 'uv1', uv1 );
+			objects[ box.index ].geometry.getAttribute( 'uv1' ).needsUpdate = true;
 
 		} );
 

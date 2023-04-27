@@ -9,9 +9,12 @@ import {
 	Shape,
 	ShapePath,
 	ShapeUtils,
+	SRGBColorSpace,
 	Vector2,
 	Vector3
 } from 'three';
+
+const COLOR_SPACE_SVG = SRGBColorSpace;
 
 class SVGLoader extends Loader {
 
@@ -155,7 +158,7 @@ class SVGLoader extends Loader {
 
 				if ( style.fill !== undefined && style.fill !== 'none' ) {
 
-					path.color.setStyle( style.fill );
+					path.color.setStyle( style.fill, COLOR_SPACE_SVG );
 
 				}
 
@@ -2384,7 +2387,7 @@ class SVGLoader extends Loader {
 
 	static pointsToStroke( points, style, arcDivisions, minDistance ) {
 
-		// Generates a stroke with some witdh around the given path.
+		// Generates a stroke with some width around the given path.
 		// The path can be open or closed (last point equals to first point)
 		// Param points: Array of Vector2D (the path). Minimum 2 points.
 		// Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.parse() in the path.userData.style object

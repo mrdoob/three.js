@@ -202,7 +202,7 @@ function MenubarEdit( editor ) {
 
 			if ( map ) {
 
-				map.encoding = THREE.sRGBEncoding;
+				map.colorSpace = THREE.SRGBColorSpace;
 				needsUpdate = true;
 
 			}

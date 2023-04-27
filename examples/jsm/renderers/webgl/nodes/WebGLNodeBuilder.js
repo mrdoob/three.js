@@ -422,27 +422,21 @@ class WebGLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getTexture( textureProperty, uvSnippet ) {
+	getTexture( texture, textureProperty, uvSnippet ) {
 
-		return `texture2D( ${textureProperty}, ${uvSnippet} )`;
+		if ( texture.isTextureCube ) {
 
-	}
+			return `textureCube( ${textureProperty}, ${uvSnippet} )`;
 
-	getTextureBias( textureProperty, uvSnippet, biasSnippet ) {
+		} else {
 
-		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
+			return `texture2D( ${textureProperty}, ${uvSnippet} )`;
 
-		return `textureLod( ${textureProperty}, ${uvSnippet}, ${biasSnippet} )`;
-
-	}
-
-	getCubeTexture( textureProperty, uvSnippet ) {
-
-		return `textureCube( ${textureProperty}, ${uvSnippet} )`;
+		}
 
 	}
 
-	getCubeTextureBias( textureProperty, uvSnippet, biasSnippet ) {
+	getTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
 
 		if ( this.material.extensions !== undefined ) this.material.extensions.shaderTextureLOD = true;
 

@@ -72,7 +72,7 @@
 							const textureLoader = new THREE.TextureLoader();
 
 							const diffuse = textureLoader.load( 'textures/carbon/Carbon.png' );
-							diffuse.encoding = THREE.sRGBEncoding;
+							diffuse.colorSpace = THREE.SRGBColorSpace;
 							diffuse.wrapS = THREE.RepeatWrapping;
 							diffuse.wrapT = THREE.RepeatWrapping;
 
@@ -188,7 +188,6 @@
 
 				//
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

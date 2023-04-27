@@ -58,7 +58,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 3;
 
@@ -122,7 +121,7 @@
 
 						const diffuseMap = loader.load( 'Cerberus_A.jpg' );
 						diffuseMap.wrapS = THREE.RepeatWrapping;
-						diffuseMap.encoding = THREE.sRGBEncoding;
+						diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 						const rmMap = loader.load( 'Cerberus_RM.jpg' );
 						rmMap.wrapS = THREE.RepeatWrapping;

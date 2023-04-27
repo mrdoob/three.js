@@ -107,6 +107,7 @@
 				context.fillRect( 64, 64, 64, 64 );
 
 				const textureCanvas = new THREE.CanvasTexture( imageCanvas );
+				textureCanvas.colorSpace = THREE.SRGBColorSpace;
 				textureCanvas.repeat.set( 1000, 1000 );
 				textureCanvas.wrapS = THREE.RepeatWrapping;
 				textureCanvas.wrapT = THREE.RepeatWrapping;
@@ -115,7 +116,7 @@
 				textureCanvas2.magFilter = THREE.NearestFilter;
 				textureCanvas2.minFilter = THREE.NearestFilter;
 
-				const	materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
+				const materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
 				const materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				const geometry = new THREE.PlaneGeometry( 100, 100 );
@@ -179,9 +180,12 @@
 
 				const texturePainting = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg', callbackPainting );
 				const texturePainting2 = new THREE.Texture();
+
 				const materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } );
 				const materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
 
+				texturePainting.colorSpace = THREE.SRGBColorSpace;
+				texturePainting2.colorSpace = THREE.SRGBColorSpace;
 				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
 				texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
 				texturePainting.mapping = THREE.UVMapping;

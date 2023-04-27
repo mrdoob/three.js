@@ -23,9 +23,9 @@ class WebGPUAnimation {
 
 			this.requestId = self.requestAnimationFrame( update );
 
-			this.animationLoop( time, frame );
+			this.nodes.nodeFrame.update();
 
-			this.nodes.updateFrame();
+			this.animationLoop( time, frame );
 
 		};
 

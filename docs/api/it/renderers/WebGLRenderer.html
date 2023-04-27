@@ -175,10 +175,10 @@
 		</ul>
 		</p>
 
-		<h3>[property:number outputEncoding]</h3>
-		<p>Definisce la codifica di output del renderer. Il valore predefinito è [page:Textures THREE.LinearEncoding].</p>
+		<h3>[property:string outputColorSpace]</h3>
+		<p>Definisce la codifica di output del renderer. Il valore predefinito è [page:Textures THREE.SRGBColorSpace].</p>
 		<p>Se il target render è stato impostato utilizzando [page:WebGLRenderer.setRenderTarget .setRenderTarget],
-			verrà invece utilizzato renderTarget.texture.encoding.</p>
+			verrà invece utilizzato renderTarget.texture.colorSpace.</p>
 		<p>Vedi la pagina [page:Textures texture constants] per i dettagli su altri formati.</p>
 
 		<h3>[property:Object info]</h3>
@@ -223,10 +223,9 @@
 		<h3>[property:Boolean localClippingEnabled]</h3>
 		<p>Definisce se il render rispetta i piani di taglio a livello di oggetto. Il valore predefinito è `false`.</p>
 
-		<h3>[property:Boolean physicallyCorrectLights]</h3>
+		<h3>[property:Boolean useLegacyLights]</h3>
 		<p>
-			Indica se utilizzare la modalità di illuminazione fisicamente corretta. Il valore predefinito è `false`.
-			Vedi l'esempio [example:webgl_lights_physical lights / physical].
+		Whether to use the legacy lighting mode or not. Il valore predefinito è `true`.
 		</p>
 
 		<h3>[property:Object properties]</h3>

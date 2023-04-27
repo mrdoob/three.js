@@ -177,6 +177,7 @@
 					context.fillStyle = colors[ index ];
 					context.fill();
 					const texture = new THREE.CanvasTexture( canvas2 );
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					const material = new THREE.PointsMaterial( { size: size, map: texture, transparent: true, alphaTest: 0.1 } );
 

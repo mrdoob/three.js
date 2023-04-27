@@ -12,11 +12,12 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			This is used internally by [page:DirectionalLight DirectionalLights] for calculating shadows.<br /><br />
+			This is used internally by [page:DirectionalLight DirectionalLights] for
+			calculating shadows.<br /><br />
 
-			Unlike the other shadow classes, this uses an [page:OrthographicCamera] to calculate the shadows,
-			rather than a [page:PerspectiveCamera]. This is because light rays from a [page:DirectionalLight]
-			are parallel.
+			Unlike the other shadow classes, this uses an [page:OrthographicCamera] to
+			calculate the shadows, rather than a [page:PerspectiveCamera]. This is
+			because light rays from a [page:DirectionalLight] are parallel.
 		</p>
 
 		<h2>Code Example</h2>
@@ -62,8 +63,8 @@
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
 		<p>
-			Creates a new [name]. This is not intended to be called directly - it is called
-			internally by [page:DirectionalLight].
+			Creates a new [name]. This is not intended to be called directly - it is
+			called internally by [page:DirectionalLight].
 		</p>
 
 		<h2>Properties</h2>
@@ -73,25 +74,23 @@
 
 		<h3>[property:Camera camera]</h3>
 		<p>
-			The light's view of the world. This is used to generate a depth map of the scene; objects behind
-			other objects from the light's perspective will be in shadow.<br /><br />
+			The light's view of the world. This is used to generate a depth map of the
+			scene; objects behind other objects from the light's perspective will be
+			in shadow.<br /><br />
 
-			The default is an [page:OrthographicCamera] with [page:OrthographicCamera.left left] and
-			[page:OrthographicCamera.bottom bottom] set to -5,  [page:OrthographicCamera.right right]
-			and [page:OrthographicCamera.top top] set to 5, the [page:OrthographicCamera.near near]
-			clipping plane at 0.5 and the [page:OrthographicCamera.far far] clipping plane at 500.
+			The default is an [page:OrthographicCamera] with
+			[page:OrthographicCamera.left left] and [page:OrthographicCamera.bottom bottom]
+			set to -5, [page:OrthographicCamera.right right] and
+			[page:OrthographicCamera.top top] set to 5, the
+			[page:OrthographicCamera.near near] clipping plane at 0.5 and the
+			[page:OrthographicCamera.far far] clipping plane at 500.
 		</p>
 
 		<h3>[property:Boolean isDirectionalLightShadow]</h3>
-		<p>
-			Read-only flag to check if a given object is of type [name].
-		</p>
-
+		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h2>Methods</h2>
-		<p>
-			See the base [page:LightShadow LightShadow] class for common methods.
-		</p>
+		<p>See the base [page:LightShadow LightShadow] class for common methods.</p>
 
 		<h2>Source</h2>
 

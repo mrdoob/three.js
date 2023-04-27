@@ -70,7 +70,7 @@
 
 				//
 
-				const gridHelper = new THREE.GridHelper( 10, 20, 0x888888, 0x444444 );
+				const gridHelper = new THREE.GridHelper( 10, 20, 0xc1c1c1, 0x8d8d8d );
 				scene.add( gridHelper );
 
 				//
@@ -85,7 +85,6 @@
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );

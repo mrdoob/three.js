@@ -5,7 +5,7 @@ import {
 	DoubleSide,
 	InterpolateDiscrete,
 	InterpolateLinear,
-	LinearEncoding,
+	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
@@ -20,7 +20,7 @@ import {
 	RepeatWrapping,
 	Scene,
 	Source,
-	sRGBEncoding,
+	SRGBColorSpace,
 	Vector3
 } from 'three';
 
@@ -801,7 +801,7 @@ class GLTFWriter {
 
 		function getEncodingConversion( map ) {
 
-			if ( map.encoding === sRGBEncoding ) {
+			if ( map.colorSpace === SRGBColorSpace ) {
 
 				return function SRGBToLinear( c ) {
 
@@ -876,7 +876,14 @@ class GLTFWriter {
 		const texture = reference.clone();
 
 		texture.source = new Source( canvas );
-		texture.encoding = LinearEncoding;
+		texture.colorSpace = NoColorSpace;
+		texture.channel = ( metalnessMap || roughnessMap ).channel;
+
+		if ( metalnessMap && roughnessMap && metalnessMap.channel !== roughnessMap.channel ) {
+
+			console.warn( 'THREE.GLTFExporter: UV channels for metalnessMap and roughnessMap textures must match.' );
+
+		}
 
 		return texture;
 
@@ -1417,7 +1424,10 @@ class GLTFWriter {
 
 			const metalRoughTexture = this.buildMetalRoughTexture( material.metalnessMap, material.roughnessMap );
 
-			const metalRoughMapDef = { index: this.processTexture( metalRoughTexture ) };
+			const metalRoughMapDef = {
+				index: this.processTexture( metalRoughTexture ),
+				channel: metalRoughTexture.channel
+			};
 			this.applyTextureTransform( metalRoughMapDef, metalRoughTexture );
 			materialDef.pbrMetallicRoughness.metallicRoughnessTexture = metalRoughMapDef;
 
@@ -1426,7 +1436,10 @@ class GLTFWriter {
 		// pbrMetallicRoughness.baseColorTexture
 		if ( material.map ) {
 
-			const baseColorMapDef = { index: this.processTexture( material.map ) };
+			const baseColorMapDef = {
+				index: this.processTexture( material.map ),
+				texCoord: material.map.channel
+			};
 			this.applyTextureTransform( baseColorMapDef, material.map );
 			materialDef.pbrMetallicRoughness.baseColorTexture = baseColorMapDef;
 
@@ -1446,7 +1459,10 @@ class GLTFWriter {
 			// emissiveTexture
 			if ( material.emissiveMap ) {
 
-				const emissiveMapDef = { index: this.processTexture( material.emissiveMap ) };
+				const emissiveMapDef = {
+					index: this.processTexture( material.emissiveMap ),
+					texCoord: material.emissiveMap.channel
+				};
 				this.applyTextureTransform( emissiveMapDef, material.emissiveMap );
 				materialDef.emissiveTexture = emissiveMapDef;
 
@@ -1457,7 +1473,10 @@ class GLTFWriter {
 		// normalTexture
 		if ( material.normalMap ) {
 
-			const normalMapDef = { index: this.processTexture( material.normalMap ) };
+			const normalMapDef = {
+				index: this.processTexture( material.normalMap ),
+				texCoord: material.normalMap.channel
+			};
 
 			if ( material.normalScale && material.normalScale.x !== 1 ) {
 
@@ -1477,7 +1496,7 @@ class GLTFWriter {
 
 			const occlusionMapDef = {
 				index: this.processTexture( material.aoMap ),
-				texCoord: 1
+				texCoord: material.aoMap.channel
 			};
 
 			if ( material.aoMapIntensity !== 1.0 ) {
@@ -1590,7 +1609,7 @@ class GLTFWriter {
 		// Conversion between attributes names in threejs and gltf spec
 		const nameConversion = {
 			uv: 'TEXCOORD_0',
-			uv2: 'TEXCOORD_1',
+			uv1: 'TEXCOORD_1',
 			color: 'COLOR_0',
 			skinWeight: 'WEIGHTS_0',
 			skinIndex: 'JOINTS_0'
@@ -2491,7 +2510,10 @@ class GLTFMaterialsClearcoatExtension {
 
 		if ( material.clearcoatMap ) {
 
-			const clearcoatMapDef = { index: writer.processTexture( material.clearcoatMap ) };
+			const clearcoatMapDef = {
+				index: writer.processTexture( material.clearcoatMap ),
+				texCoord: material.clearcoatMap.channel
+			};
 			writer.applyTextureTransform( clearcoatMapDef, material.clearcoatMap );
 			extensionDef.clearcoatTexture = clearcoatMapDef;
 
@@ -2501,7 +2523,10 @@ class GLTFMaterialsClearcoatExtension {
 
 		if ( material.clearcoatRoughnessMap ) {
 
-			const clearcoatRoughnessMapDef = { index: writer.processTexture( material.clearcoatRoughnessMap ) };
+			const clearcoatRoughnessMapDef = {
+				index: writer.processTexture( material.clearcoatRoughnessMap ),
+				texCoord: material.clearcoatRoughnessMap.channel
+			};
 			writer.applyTextureTransform( clearcoatRoughnessMapDef, material.clearcoatRoughnessMap );
 			extensionDef.clearcoatRoughnessTexture = clearcoatRoughnessMapDef;
 
@@ -2509,7 +2534,10 @@ class GLTFMaterialsClearcoatExtension {
 
 		if ( material.clearcoatNormalMap ) {
 
-			const clearcoatNormalMapDef = { index: writer.processTexture( material.clearcoatNormalMap ) };
+			const clearcoatNormalMapDef = {
+				index: writer.processTexture( material.clearcoatNormalMap ),
+				texCoord: material.clearcoatNormalMap.channel
+			};
 			writer.applyTextureTransform( clearcoatNormalMapDef, material.clearcoatNormalMap );
 			extensionDef.clearcoatNormalTexture = clearcoatNormalMapDef;
 
@@ -2552,7 +2580,10 @@ class GLTFMaterialsIridescenceExtension {
 
 		if ( material.iridescenceMap ) {
 
-			const iridescenceMapDef = { index: writer.processTexture( material.iridescenceMap ) };
+			const iridescenceMapDef = {
+				index: writer.processTexture( material.iridescenceMap ),
+				texCoord: material.iridescenceMap.channel
+			};
 			writer.applyTextureTransform( iridescenceMapDef, material.iridescenceMap );
 			extensionDef.iridescenceTexture = iridescenceMapDef;
 
@@ -2564,7 +2595,10 @@ class GLTFMaterialsIridescenceExtension {
 
 		if ( material.iridescenceThicknessMap ) {
 
-			const iridescenceThicknessMapDef = { index: writer.processTexture( material.iridescenceThicknessMap ) };
+			const iridescenceThicknessMapDef = {
+				index: writer.processTexture( material.iridescenceThicknessMap ),
+				texCoord: material.iridescenceThicknessMap.channel
+			};
 			writer.applyTextureTransform( iridescenceThicknessMapDef, material.iridescenceThicknessMap );
 			extensionDef.iridescenceThicknessTexture = iridescenceThicknessMapDef;
 
@@ -2606,7 +2640,10 @@ class GLTFMaterialsTransmissionExtension {
 
 		if ( material.transmissionMap ) {
 
-			const transmissionMapDef = { index: writer.processTexture( material.transmissionMap ) };
+			const transmissionMapDef = {
+				index: writer.processTexture( material.transmissionMap ),
+				texCoord: material.transmissionMap.channel
+			};
 			writer.applyTextureTransform( transmissionMapDef, material.transmissionMap );
 			extensionDef.transmissionTexture = transmissionMapDef;
 
@@ -2648,7 +2685,10 @@ class GLTFMaterialsVolumeExtension {
 
 		if ( material.thicknessMap ) {
 
-			const thicknessMapDef = { index: writer.processTexture( material.thicknessMap ) };
+			const thicknessMapDef = {
+				index: writer.processTexture( material.thicknessMap ),
+				texCoord: material.thicknessMap.channel
+			};
 			writer.applyTextureTransform( thicknessMapDef, material.thicknessMap );
 			extensionDef.thicknessTexture = thicknessMapDef;
 
@@ -2727,7 +2767,10 @@ class GLTFMaterialsSpecularExtension {
 
 		if ( material.specularIntensityMap ) {
 
-			const specularIntensityMapDef = { index: writer.processTexture( material.specularIntensityMap ) };
+			const specularIntensityMapDef = {
+				index: writer.processTexture( material.specularIntensityMap ),
+				texCoord: material.specularIntensityMap.channel
+			};
 			writer.applyTextureTransform( specularIntensityMapDef, material.specularIntensityMap );
 			extensionDef.specularTexture = specularIntensityMapDef;
 
@@ -2735,7 +2778,10 @@ class GLTFMaterialsSpecularExtension {
 
 		if ( material.specularColorMap ) {
 
-			const specularColorMapDef = { index: writer.processTexture( material.specularColorMap ) };
+			const specularColorMapDef = {
+				index: writer.processTexture( material.specularColorMap ),
+				texCoord: material.specularColorMap.channel
+			};
 			writer.applyTextureTransform( specularColorMapDef, material.specularColorMap );
 			extensionDef.specularColorTexture = specularColorMapDef;
 
@@ -2778,7 +2824,10 @@ class GLTFMaterialsSheenExtension {
 
 		if ( material.sheenRoughnessMap ) {
 
-			const sheenRoughnessMapDef = { index: writer.processTexture( material.sheenRoughnessMap ) };
+			const sheenRoughnessMapDef = {
+				index: writer.processTexture( material.sheenRoughnessMap ),
+				texCoord: material.sheenRoughnessMap.channel
+			};
 			writer.applyTextureTransform( sheenRoughnessMapDef, material.sheenRoughnessMap );
 			extensionDef.sheenRoughnessTexture = sheenRoughnessMapDef;
 
@@ -2786,7 +2835,10 @@ class GLTFMaterialsSheenExtension {
 
 		if ( material.sheenColorMap ) {
 
-			const sheenColorMapDef = { index: writer.processTexture( material.sheenColorMap ) };
+			const sheenColorMapDef = {
+				index: writer.processTexture( material.sheenColorMap ),
+				texCoord: material.sheenColorMap.channel
+			};
 			writer.applyTextureTransform( sheenColorMapDef, material.sheenColorMap );
 			extensionDef.sheenColorTexture = sheenColorMapDef;
 

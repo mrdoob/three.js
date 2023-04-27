@@ -30,7 +30,7 @@
 
 		<h2>Costruttore</h2>
 
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace )</h3>
 
 		<h2>Proprietà</h2>
 
@@ -81,7 +81,7 @@
 
 		<h3>[property:Integer channel]</h3>
 		<p>
-			Lets you select the uv attribute to map the texture to. `0` for `uv` and `1` for `uv2`.
+			Lets you select the uv attribute to map the texture to. `0` for `uv`, `1` for `uv1`, `2` for `uv2` and `3` for `uv3`.
 		</p>
 
 		<h3>[property:number wrapS]</h3>
@@ -225,13 +225,10 @@
 			Vedi [link:http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml glPixelStorei] per maggiori informazioni.
 		</p>
 
-		<h3>[property:number encoding]</h3>
+		<h3>[property:string colorSpace]</h3>
 		<p>
-		[page:Textures THREE.LinearEncoding] è l'impostazione predefinita.
-		Vedi la pagina [page:Textures texture constants] per i dettagli su altri formati.<br /><br />
-
-		Si noti che questo valore viene modificato su una texture dopo che il materiale è stato utilizzato, 
-		è necessario attivare un Material.needsUpdate affinché questo valore venga realizzato nello shader.
+		[page:Textures THREE.NoColorSpace] è l'impostazione predefinita.
+		Vedi la pagina [page:Textures texture constants] per i dettagli su altri formati.
 		</p>
 
 		<h3>[property:Integer version]</h3>

@@ -327,6 +327,7 @@
 	],
 	"webgpu": [
 		"webgpu_audio_processing",
+		"webgpu_backdrop",
 		"webgpu_compute",
 		"webgpu_cubemap_adjustments",
 		"webgpu_cubemap_mix",
@@ -339,11 +340,13 @@
 		"webgpu_lights_phong",
 		"webgpu_lights_selective",
 		"webgpu_loader_gltf",
+		"webgpu_loader_gltf_compressed",
 		"webgpu_materials",
 		"webgpu_materials_video",
 		"webgpu_particles",
 		"webgpu_rtt",
 		"webgpu_sandbox",
+		"webgpu_shadowmap",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
 		"webgpu_skinning_points",
@@ -357,30 +360,28 @@
 	],
 	"webxr": [
 		"webxr_ar_cones",
-		"webxr_ar_dragging",
 		"webxr_ar_hittest",
 		"webxr_ar_lighting",
-		"webxr_ar_paint",
 		"webxr_ar_plane_detection",
-		"webxr_vr_ballshooter",
-		"webxr_vr_cubes",
-		"webxr_vr_dragging",
 		"webxr_vr_handinput",
 		"webxr_vr_handinput_cubes",
 		"webxr_vr_handinput_profiles",
 		"webxr_vr_handinput_pointerclick",
 		"webxr_vr_handinput_pointerdrag",
 		"webxr_vr_handinput_pressbutton",
-		"webxr_vr_haptics",
 		"webxr_vr_layers",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
-		"webxr_vr_paint",
 		"webxr_vr_rollercoaster",
 		"webxr_vr_sandbox",
-		"webxr_vr_sculpt",
 		"webxr_vr_teleport",
-		"webxr_vr_video"
+		"webxr_vr_video",
+		"webxr_xr_ballshooter",
+		"webxr_xr_cubes",
+		"webxr_xr_dragging",
+		"webxr_xr_haptics",
+		"webxr_xr_paint",
+		"webxr_xr_sculpt"
 	],
 	"games": [
 		"games_fps"
@@ -392,7 +393,7 @@
 		"physics_ammo_rope",
 		"physics_ammo_terrain",
 		"physics_ammo_volume",
-		"physics_oimo_instancing"
+		"physics_rapier_instancing"
 	],
 	"misc": [
 		"misc_animation_groups",

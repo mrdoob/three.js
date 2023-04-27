@@ -12,17 +12,17 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Class for loading a [page:Texture texture].
-			This uses the [page:ImageLoader] internally for loading files.
+			Class for loading a [page:Texture texture]. This uses the
+			[page:ImageLoader] internally for loading files.
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
-		const texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
-
-		// immediately use the texture for material creation
-		const material = new THREE.MeshBasicMaterial( { map: texture } );
+		const texture = new THREE.TextureLoader().load('textures/land_ocean_ice_cloud_2048.jpg' ); 
+		// immediately use the texture for material creation 
+		
+		const material = new THREE.MeshBasicMaterial( { map:texture } );
 		</code>
 
 		<h2>Code Example with Callbacks</h2>
@@ -55,24 +55,22 @@
 		</code>
 
 		<p>
-			Please note three.js r84 dropped support for TextureLoader progress events. For a TextureLoader that supports progress events, see [link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread].
+			Please note three.js r84 dropped support for TextureLoader progress
+			events. For a TextureLoader that supports progress events, see
+			[link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread].
 		</p>
 
 		<h2>Examples</h2>
-
-		<p>
-			[example:webgl_geometry_cube geometry / cube]
-		</p>
+		<p>[example:webgl_geometry_cube geometry / cube]</p>
 
 		<h2>Constructor</h2>
-
 		<h3>[name]( [param:LoadingManager manager] )</h3>
 		<p>
-		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+			[page:LoadingManager manager] — The [page:LoadingManager loadingManager]
+			for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
 
-		Creates a new [name].
+			Creates a new [name].
 		</p>
-
 
 		<h2>Properties</h2>
 		<p>See the base [page:Loader] class for common properties.</p>
@@ -80,20 +78,25 @@
 		<h2>Methods</h2>
 		<p>See the base [page:Loader] class for common methods.</p>
 
-		<h3>[method:Texture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>
+			[method:Texture load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )
+		</h3>
 		<p>
-		[page:String url] — the path or URL to the file. This can also be a
+			[page:String url] — the path or URL to the file. This can also be a
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
-		[page:Function onLoad] (optional) — Will be called when load completes. The argument will be the loaded [page:Texture texture].<br />
-		[page:Function onProgress] (optional) — This callback function is currently not supported.<br />
-		[page:Function onError] (optional) — Will be called when load errors.<br /><br />
+			[page:Function onLoad] (optional) — Will be called when load completes.
+			The argument will be the loaded [page:Texture texture].<br />
+			[page:Function onProgress] (optional) — This callback function is
+			currently not supported.<br />
+			[page:Function onError] (optional) — Will be called when load errors.<br /><br />
 
-		Begin loading from the given URL and pass the fully loaded [page:Texture texture] to onLoad. The method also returns a new texture object which can directly be used for material creation.
-		If you do it this way, the texture may pop up in your scene once the respective loading process is finished.
+			Begin loading from the given URL and pass the fully loaded [page:Texture texture] 
+			to onLoad. The method also returns a new texture object which can
+			directly be used for material creation. If you do it this way, the texture
+			may pop up in your scene once the respective loading process is finished.
 		</p>
 
 		<h2>Source</h2>
-
 		<p>
 			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
 		</p>

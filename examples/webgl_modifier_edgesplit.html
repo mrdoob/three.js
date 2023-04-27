@@ -109,6 +109,7 @@
 				new THREE.TextureLoader().load( './models/obj/cerberus/Cerberus_A.jpg', function ( texture ) {
 
 					map = texture;
+					map.colorSpace = THREE.SRGBColorSpace;
 
 					if ( mesh !== undefined && params.showMap ) {
 

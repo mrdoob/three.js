@@ -19,7 +19,7 @@ import {
 	FileLoader,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
+	NoColorSpace,
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	Loader,
@@ -35,7 +35,7 @@ import {
 	RGBA_S3TC_DXT5_Format,
 	RGBAFormat,
 	RGFormat,
-	sRGBEncoding,
+	SRGBColorSpace,
 	UnsignedByteType,
 } from 'three';
 import { WorkerPool } from '../utils/WorkerPool.js';
@@ -112,21 +112,35 @@ class KTX2Loader extends Loader {
 
 	detectSupport( renderer ) {
 
-		this.workerConfig = {
-			astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
-			etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
-			etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
-			dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
-			bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
-			pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
-				|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
-		};
+		if ( renderer.isWebGPURenderer === true ) {
 
+			this.workerConfig = {
+				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
+				etc1Supported: false,
+				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
+				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
+				bptcSupported: false,
+				pvrtcSupported: false
+			};
 
-		if ( renderer.capabilities.isWebGL2 ) {
+		} else {
 
-			// https://github.com/mrdoob/three.js/pull/22928
-			this.workerConfig.etc1Supported = false;
+			this.workerConfig = {
+				astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
+				etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
+				etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
+				dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+				bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
+				pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
+					|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
+			};
+
+			if ( renderer.capabilities.isWebGL2 ) {
+
+				// https://github.com/mrdoob/three.js/pull/22928
+				this.workerConfig.etc1Supported = false;
+
+			}
 
 		}
 
@@ -253,7 +267,8 @@ class KTX2Loader extends Loader {
 		texture.generateMipmaps = false;
 
 		texture.needsUpdate = true;
-		texture.encoding = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? sRGBEncoding : LinearEncoding;
+		// TODO: Detect NoColorSpace vs. LinearSRGBColorSpace based on primaries.
+		texture.colorSpace = dfdTransferFn === KHR_DF_TRANSFER_SRGB ? SRGBColorSpace : NoColorSpace;
 		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 
 		return texture;
@@ -632,8 +647,9 @@ KTX2Loader.BasisWorker = function () {
 
 		let totalByteLength = 0;
 
-		for ( const array of arrays ) {
+		for ( let i = 0; i < arrays.length; i ++ ) {
 
+			const array = arrays[ i ];
 			totalByteLength += array.byteLength;
 
 		}
@@ -642,8 +658,9 @@ KTX2Loader.BasisWorker = function () {
 
 		let byteOffset = 0;
 
-		for ( const array of arrays ) {
+		for ( let i = 0; i < arrays.length; i ++ ) {
 
+			const array = arrays[ i ];
 			result.set( array, byteOffset );
 
 			byteOffset += array.byteLength;
@@ -697,11 +714,11 @@ const TYPE_MAP = {
 
 };
 
-const ENCODING_MAP = {
+const COLOR_SPACE_MAP = {
 
-	[ VK_FORMAT_R8G8B8A8_SRGB ]: sRGBEncoding,
-	[ VK_FORMAT_R8G8_SRGB ]: sRGBEncoding,
-	[ VK_FORMAT_R8_SRGB ]: sRGBEncoding,
+	[ VK_FORMAT_R8G8B8A8_SRGB ]: SRGBColorSpace,
+	[ VK_FORMAT_R8G8_SRGB ]: SRGBColorSpace,
+	[ VK_FORMAT_R8_SRGB ]: SRGBColorSpace,
 
 };
 
@@ -779,7 +796,7 @@ async function createDataTexture( container ) {
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
-	texture.encoding = ENCODING_MAP[ vkFormat ] || LinearEncoding;
+	texture.colorSpace = COLOR_SPACE_MAP[ vkFormat ] || NoColorSpace;
 
 	texture.needsUpdate = true;
 
