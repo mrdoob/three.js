@@ -291,7 +291,7 @@ class LWOTreeParser {
 
 		if ( ! duplicateUVs ) return;
 
-		geometry.setAttribute( 'uv2', new BufferAttribute( geometry.attributes.uv.array, 2 ) );
+		geometry.setAttribute( 'uv1', new BufferAttribute( geometry.attributes.uv.array, 2 ) );
 
 	}
 
