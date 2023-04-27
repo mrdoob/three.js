@@ -171,8 +171,6 @@ class LWOTreeParser {
 
 		const materials = this.getMaterials( geometry.userData.matNames, layer.geometry.type );
 
-		this.duplicateUVs( geometry, materials );
-
 		if ( layer.geometry.type === 'points' ) mesh = new Points( geometry, materials );
 		else if ( layer.geometry.type === 'lines' ) mesh = new LineSegments( geometry, materials );
 		else mesh = new Mesh( geometry, materials );
@@ -267,31 +265,6 @@ class LWOTreeParser {
 			return m.name === name;
 
 		} )[ 0 ];
-
-	}
-
-	// If the material has an aoMap, duplicate UVs
-	duplicateUVs( geometry, materials ) {
-
-		let duplicateUVs = false;
-
-		if ( ! Array.isArray( materials ) ) {
-
-			if ( materials.aoMap ) duplicateUVs = true;
-
-		} else {
-
-			materials.forEach( function ( material ) {
-
-				if ( material.aoMap ) duplicateUVs = true;
-
-			} );
-
-		}
-
-		if ( ! duplicateUVs ) return;
-
-		geometry.setAttribute( 'uv1', new BufferAttribute( geometry.attributes.uv.array, 2 ) );
 
 	}
 
