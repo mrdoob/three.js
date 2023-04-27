@@ -40,19 +40,6 @@ class BufferGeometry extends EventDispatcher {
 		// Backwards compatibilty
 
 		Object.defineProperties( this.attributes, {
-			'uv': {
-				get: function () {
-
-					return this.uv0;
-
-				},
-				set: function ( value ) {
-
-					this.uv0 = value;
-
-				},
-				configurable: true
-			},
 			'uv2': {
 				set: function ( value ) {
 
@@ -109,15 +96,11 @@ class BufferGeometry extends EventDispatcher {
 
 	getAttribute( name ) {
 
-		if ( name === 'uv' ) name = 'uv0';
-
 		return this.attributes[ name ];
 
 	}
 
 	setAttribute( name, attribute ) {
-
-		if ( name === 'uv' ) name = 'uv0';
 
 		this.attributes[ name ] = attribute;
 
@@ -127,8 +110,6 @@ class BufferGeometry extends EventDispatcher {
 
 	deleteAttribute( name ) {
 
-		if ( name === 'uv' ) name = 'uv0';
-
 		delete this.attributes[ name ];
 
 		return this;
@@ -136,8 +117,6 @@ class BufferGeometry extends EventDispatcher {
 	}
 
 	hasAttribute( name ) {
-
-		if ( name === 'uv' ) name = 'uv0';
 
 		return this.attributes[ name ] !== undefined;
 

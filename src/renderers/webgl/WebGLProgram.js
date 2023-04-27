@@ -576,9 +576,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
-			'attribute vec2 uv0;',
-
-			'#define uv uv0', // Backwards compatibilty
+			'attribute vec2 uv;',
 
 			'#ifdef USE_UV1',
 

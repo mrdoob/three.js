@@ -2030,7 +2030,7 @@ const ATTRIBUTES = {
 	POSITION: 'position',
 	NORMAL: 'normal',
 	TANGENT: 'tangent',
-	TEXCOORD_0: 'uv0',
+	TEXCOORD_0: 'uv',
 	TEXCOORD_1: 'uv1',
 	TEXCOORD_2: 'uv2',
 	TEXCOORD_3: 'uv3',
