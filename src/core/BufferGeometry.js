@@ -51,7 +51,6 @@ class BufferGeometry extends EventDispatcher {
 					}
 
 					delete this.uv2;
-					this.uv2 = value;
 
 				},
 				configurable: true
