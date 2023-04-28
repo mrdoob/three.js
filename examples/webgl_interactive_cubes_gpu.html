@@ -69,7 +69,7 @@
 				scene.background = new THREE.Color( 0xffffff );
 
 				pickingScene = new THREE.Scene();
-				pickingTexture = new THREE.WebGLRenderTarget( 1, 1 );
+				pickingTexture = new THREE.WebGLRenderTarget( 1, 1, { colorSpace: THREE.SRGBColorSpace } );
 
 				scene.add( new THREE.AmbientLight( 0x555555 ) );
 
