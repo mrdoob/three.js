@@ -291,8 +291,9 @@ class KTX2Loader extends Loader {
 			texture.mipmaps = mipmaps.map(dt => {
 				return {
 					data: dt.source.data,
-					width: dt.source.width,
-					height: dt.source.height
+					width: dt.source.data.width,
+					height: dt.source.data.height,
+					depth: dt.source.data.depth
 				};
 			});
 			return texture;
