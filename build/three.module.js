@@ -11309,7 +11309,7 @@ class BufferGeometry extends EventDispatcher {
 
 const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 const _ray$2 = /*@__PURE__*/ new Ray();
-const _sphere$5 = /*@__PURE__*/ new Sphere();
+const _sphere$4 = /*@__PURE__*/ new Sphere();
 const _sphereHitAt = /*@__PURE__*/ new Vector3();
 
 const _vA$1 = /*@__PURE__*/ new Vector3();
@@ -11457,14 +11457,14 @@ class Mesh extends Object3D {
 
 		if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-		_sphere$5.copy( geometry.boundingSphere );
-		_sphere$5.applyMatrix4( matrixWorld );
+		_sphere$4.copy( geometry.boundingSphere );
+		_sphere$4.applyMatrix4( matrixWorld );
 
 		_ray$2.copy( raycaster.ray ).recast( raycaster.near );
 
-		if ( _sphere$5.containsPoint( _ray$2.origin ) === false ) {
+		if ( _sphere$4.containsPoint( _ray$2.origin ) === false ) {
 
-			if ( _ray$2.intersectSphere( _sphere$5, _sphereHitAt ) === null ) return;
+			if ( _ray$2.intersectSphere( _sphere$4, _sphereHitAt ) === null ) return;
 
 			if ( _ray$2.origin.distanceToSquared( _sphereHitAt ) > ( raycaster.far - raycaster.near ) ** 2 ) return;
 
@@ -12949,7 +12949,7 @@ class Plane {
 
 }
 
-const _sphere$4 = /*@__PURE__*/ new Sphere();
+const _sphere$3 = /*@__PURE__*/ new Sphere();
 const _vector$6 = /*@__PURE__*/ new Vector3();
 
 class Frustum {
@@ -13015,7 +13015,7 @@ class Frustum {
 
 			if ( object.boundingSphere === null ) object.computeBoundingSphere();
 
-			_sphere$4.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
+			_sphere$3.copy( object.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 		} else {
 
@@ -13023,21 +13023,21 @@ class Frustum {
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			_sphere$4.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
+			_sphere$3.copy( geometry.boundingSphere ).applyMatrix4( object.matrixWorld );
 
 		}
 
-		return this.intersectsSphere( _sphere$4 );
+		return this.intersectsSphere( _sphere$3 );
 
 	}
 
 	intersectsSprite( sprite ) {
 
-		_sphere$4.center.set( 0, 0, 0 );
-		_sphere$4.radius = 0.7071067811865476;
-		_sphere$4.applyMatrix4( sprite.matrixWorld );
+		_sphere$3.center.set( 0, 0, 0 );
+		_sphere$3.radius = 0.7071067811865476;
+		_sphere$3.applyMatrix4( sprite.matrixWorld );
 
-		return this.intersectsSphere( _sphere$4 );
+		return this.intersectsSphere( _sphere$3 );
 
 	}
 
@@ -30974,7 +30974,7 @@ const _vector3 = /*@__PURE__*/ new Vector3();
 const _matrix4 = /*@__PURE__*/ new Matrix4();
 const _vertex = /*@__PURE__*/ new Vector3();
 
-const _sphere$3 = /*@__PURE__*/ new Sphere();
+
 
 class SkinnedMesh extends Mesh {
 
@@ -31057,18 +31057,18 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	raycast( raycaster, intersects ) {
+	// raycast( raycaster, intersects ) {
 
-		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+	// 	if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
-		_sphere$3.copy( this.boundingSphere );
-		_sphere$3.applyMatrix4( this.matrixWorld );
+	// 	_sphere.copy( this.boundingSphere );
+	// 	_sphere.applyMatrix4( this.matrixWorld );
 
-		if ( raycaster.ray.intersectsSphere( _sphere$3 ) === false ) return;
+	// 	if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
-		this._computeIntersections( raycaster, intersects );
+	// 	this._computeIntersections( raycaster, intersects );
 
-	}
+	// }
 
 	getVertexPosition( index, target ) {
 
