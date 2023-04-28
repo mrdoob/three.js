@@ -998,7 +998,20 @@ class WebGLRenderer {
 
 			renderListStack.push( currentRenderList );
 
-			projectObject( scene, camera, 0, _this.sortObjects );
+			if ( scene.overrideChildrens !== undefined ) {
+
+				const objects = Array.isArray( scene.overrideChildrens ) ? scene.overrideChildrens : [ scene.overrideChildrens ];
+				for ( let i = 0, l = objects.length; i < l; i ++ ) {
+
+					projectObject( objects[ i ], camera, 0, _this.sortObjects );
+
+				}
+
+			} else {
+
+				projectObject( scene, camera, 0, _this.sortObjects );
+
+			}
 
 			currentRenderList.finish();
 
