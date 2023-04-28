@@ -25675,6 +25675,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 							joint.matrix.fromArray( jointPose.transform.matrix );
 							joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
+							joint.matrixWorldNeedsUpdate = true;
 							joint.jointRadius = jointPose.radius;
 
 						}
@@ -25723,6 +25724,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 							grip.matrix.fromArray( gripPose.transform.matrix );
 							grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+							grip.matrixWorldNeedsUpdate = true;
 
 							if ( gripPose.linearVelocity ) {
 
@@ -25767,6 +25769,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 						targetRay.matrix.fromArray( inputPose.transform.matrix );
 						targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+						targetRay.matrixWorldNeedsUpdate = true;
 
 						if ( inputPose.linearVelocity ) {
 
@@ -25994,6 +25997,7 @@ console.warn( 'Scripts "build/three.js" and "build/three.min.js" are deprecated 
 
 				if ( controller !== undefined ) {
 
+					controller.update( event.inputSource, event.frame, customReferenceSpace || referenceSpace );
 					controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
 				}
