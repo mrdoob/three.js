@@ -14,7 +14,7 @@ const _vector3 = /*@__PURE__*/ new Vector3();
 const _matrix4 = /*@__PURE__*/ new Matrix4();
 const _vertex = /*@__PURE__*/ new Vector3();
 
-const _sphere = /*@__PURE__*/ new Sphere();
+//const _sphere = /*@__PURE__*/ new Sphere();
 
 class SkinnedMesh extends Mesh {
 
@@ -97,18 +97,18 @@ class SkinnedMesh extends Mesh {
 
 	}
 
-	raycast( raycaster, intersects ) {
+	// raycast( raycaster, intersects ) {
 
-		if ( this.boundingSphere === null ) this.computeBoundingSphere();
+	// 	if ( this.boundingSphere === null ) this.computeBoundingSphere();
 
-		_sphere.copy( this.boundingSphere );
-		_sphere.applyMatrix4( this.matrixWorld );
+	// 	_sphere.copy( this.boundingSphere );
+	// 	_sphere.applyMatrix4( this.matrixWorld );
 
-		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
+	// 	if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
-		this._computeIntersections( raycaster, intersects );
+	// 	this._computeIntersections( raycaster, intersects );
 
-	}
+	// }
 
 	getVertexPosition( index, target ) {
 
