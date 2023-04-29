@@ -191,7 +191,7 @@ function onDocumentLoad() {
 
 	function getFragment( id ) {
 
-		switch (id) {
+		switch ( id ) {
 
 			case 'ColorSpace':
 
