@@ -150,6 +150,7 @@ class WebGPURenderer {
 		this._renderTarget = null;
 
 		this._initialized = false;
+		this._initPromise = null;
 
 		// some parameters require default values other than "undefined"
 
@@ -183,75 +184,90 @@ class WebGPURenderer {
 
 		}
 
-		const parameters = this._parameters;
+		if ( this._initPromise !== null ) {
 
-		const adapterOptions = {
-			powerPreference: parameters.powerPreference
-		};
-
-		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
-
-		if ( adapter === null ) {
-
-			throw new Error( 'WebGPURenderer: Unable to create WebGPU adapter.' );
+			return this._initPromise;
 
 		}
 
-		// feature support
+		this._initPromise = new Promise( async ( resolve, reject ) => {
 
-		const features = Object.values( GPUFeatureName );
+			const parameters = this._parameters;
 
-		const supportedFeatures = [];
+			const adapterOptions = {
+				powerPreference: parameters.powerPreference
+			};
 
-		for ( const name of features ) {
+			const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
-			if ( adapter.features.has( name ) ) {
+			if ( adapter === null ) {
 
-				supportedFeatures.push( name );
+				reject( new Error( 'WebGPURenderer: Unable to create WebGPU adapter.' ) );
+				return;
 
 			}
 
-		}
+			// feature support
 
-		const deviceDescriptor = {
-			requiredFeatures: supportedFeatures,
-			requiredLimits: parameters.requiredLimits
-		};
+			const features = Object.values( GPUFeatureName );
 
-		const device = await adapter.requestDevice( deviceDescriptor );
+			const supportedFeatures = [];
 
-		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
+			for ( const name of features ) {
 
-		this._adapter = adapter;
-		this._device = device;
-		this._context = context;
+				if ( adapter.features.has( name ) ) {
 
-		this._configureContext();
+					supportedFeatures.push( name );
 
-		this._info = new WebGPUInfo();
-		this._properties = new WebGPUProperties();
-		this._attributes = new WebGPUAttributes( device );
-		this._geometries = new WebGPUGeometries( this._attributes, this._properties, this._info );
-		this._textures = new WebGPUTextures( device, this._properties, this._info );
-		this._utils = new WebGPUUtils( this );
-		this._nodes = new WebGPUNodes( this, this._properties );
-		this._objects = new WebGPURenderObjects( this, this._nodes, this._geometries, this._info );
-		this._computePipelines = new WebGPUComputePipelines( device, this._nodes );
-		this._renderPipelines = new WebGPURenderPipelines( device, this._nodes, this._utils );
-		this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
-		this._renderLists = new WebGPURenderLists();
-		this._renderStates = new WebGPURenderStates();
-		this._background = new WebGPUBackground( this, this._properties );
+				}
 
-		//
+			}
 
-		this._setupColorBuffer();
-		this._setupDepthBuffer();
+			const deviceDescriptor = {
+				requiredFeatures: supportedFeatures,
+				requiredLimits: parameters.requiredLimits
+			};
 
-		this._animation.setNodes( this._nodes );
-		this._animation.start();
+			const device = await adapter.requestDevice( deviceDescriptor );
 
-		this._initialized = true;
+			const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'webgpu' );
+
+			this._adapter = adapter;
+			this._device = device;
+			this._context = context;
+
+			this._configureContext();
+
+			this._info = new WebGPUInfo();
+			this._properties = new WebGPUProperties();
+			this._attributes = new WebGPUAttributes( device );
+			this._geometries = new WebGPUGeometries( this._attributes, this._properties, this._info );
+			this._textures = new WebGPUTextures( device, this._properties, this._info );
+			this._utils = new WebGPUUtils( this );
+			this._nodes = new WebGPUNodes( this, this._properties );
+			this._objects = new WebGPURenderObjects( this, this._nodes, this._geometries, this._info );
+			this._computePipelines = new WebGPUComputePipelines( device, this._nodes );
+			this._renderPipelines = new WebGPURenderPipelines( device, this._nodes, this._utils );
+			this._bindings = this._renderPipelines.bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes, this._nodes );
+			this._renderLists = new WebGPURenderLists();
+			this._renderStates = new WebGPURenderStates();
+			this._background = new WebGPUBackground( this, this._properties );
+
+			//
+
+			this._setupColorBuffer();
+			this._setupDepthBuffer();
+
+			this._animation.setNodes( this._nodes );
+			this._animation.start();
+
+			this._initialized = true;
+
+			resolve();
+
+		} );
+
+		return this._initPromise;
 
 	}
 
