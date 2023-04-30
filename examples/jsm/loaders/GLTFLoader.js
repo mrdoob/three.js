@@ -3428,18 +3428,20 @@ class GLTFParser {
 	createUniqueName( originalName ) {
 
 		const sanitizedName = PropertyBinding.sanitizeNodeName( originalName || '' );
-
-		let name = sanitizedName;
-
-		for ( let i = 1; this.nodeNamesUsed[ name ]; ++ i ) {
-
-			name = sanitizedName + '_' + i;
-
+		
+		if (sanitizedName in this.nodeNamesUsed) {
+			
+			const num = ++this.nodeNamesUsed[ sanitizedName ];
+			
+			return sanitizedName + "_" + num;
+			
+		} else {
+			
+			nodeNamesUsed[ sanitizedName ] = 0;
+			
+			return sanitizedName;
+			
 		}
-
-		this.nodeNamesUsed[ name ] = true;
-
-		return name;
 
 	}
 
