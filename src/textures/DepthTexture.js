@@ -35,9 +35,9 @@ class DepthTexture extends Texture {
 
 	copy( source ) {
 
-		this.compareFunction = source.compareFunction;
-
 		super.copy( source );
+
+		this.compareFunction = source.compareFunction;
 
 		return this;
 
