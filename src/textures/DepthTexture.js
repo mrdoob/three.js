@@ -28,8 +28,30 @@ class DepthTexture extends Texture {
 		this.flipY = false;
 		this.generateMipmaps = false;
 
+		this.compareFunction = null;
+
 	}
 
+
+	copy( source ) {
+
+		this.compareFunction = source.compareFunction;
+
+		super.copy( source );
+
+		return this;
+
+	}
+
+	toJSON( meta ) {
+
+		const data = super.toJSON( meta );
+
+		if ( this.compareFunction !== null ) data.compareFunction = this.compareFunction;
+
+		return data;
+
+	}
 
 }
 
