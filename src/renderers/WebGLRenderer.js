@@ -270,6 +270,12 @@ class WebGLRenderer {
 
 			}
 
+			if ( _gl instanceof WebGLRenderingContext ) { // @deprecated, r153
+
+				console.warn( 'THREE.WebGLRenderer: WebGL 1 support is deprecated with r153+, and will be removed with r163.' );
+
+			}
+
 			// Some experimental-webgl implementations do not have getShaderPrecisionFormat
 
 			if ( _gl.getShaderPrecisionFormat === undefined ) {
