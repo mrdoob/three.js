@@ -744,6 +744,12 @@ class NodeBuilder {
 
 	}
 
+	getVar( type, name ) {
+
+		return `${type} ${name}`;
+
+	}
+
 	getVars( shaderStage ) {
 
 		let snippet = '';
@@ -752,7 +758,7 @@ class NodeBuilder {
 
 		for ( const variable of vars ) {
 
-			snippet += `${variable.type} ${variable.name}; `;
+			snippet += `${ this.getVar( variable.type, variable.name ) }; `;
 
 		}
 

@@ -79,7 +79,7 @@ const shaderNodeHandler = {
 
 const nodeObjectsCacheMap = new WeakMap();
 
-const ShaderNodeObject = function ( obj ) {
+const ShaderNodeObject = function ( obj, altType = null ) {
 
 	const type = getValueType( obj );
 
@@ -97,13 +97,17 @@ const ShaderNodeObject = function ( obj ) {
 
 		return nodeObject;
 
-	} else if ( ( type === 'float' ) || ( type === 'boolean' ) ) {
+	} else if ( ( altType === null ) && ( ( type === 'float' ) || ( type === 'boolean' ) ) ) {
 
 		return nodeObject( getAutoTypedConstNode( obj ) );
 
+	} else if ( type === 'shader' ) {
+
+		return shader( obj );
+
 	} else if ( type && type !== 'string' ) {
 
-		return nodeObject( new ConstNode( obj ) );
+		return nodeObject( new ConstNode( obj, altType ) );
 
 	}
 
@@ -111,11 +115,11 @@ const ShaderNodeObject = function ( obj ) {
 
 };
 
-const ShaderNodeObjects = function ( objects ) {
+const ShaderNodeObjects = function ( objects, altType = null ) {
 
 	for ( const name in objects ) {
 
-		objects[ name ] = nodeObject( objects[ name ] );
+		objects[ name ] = nodeObject( objects[ name ], altType );
 
 	}
 
@@ -123,13 +127,13 @@ const ShaderNodeObjects = function ( objects ) {
 
 };
 
-const ShaderNodeArray = function ( array ) {
+const ShaderNodeArray = function ( array, altType = null ) {
 
 	const len = array.length;
 
 	for ( let i = 0; i < len; i ++ ) {
 
-		array[ i ] = nodeObject( array[ i ] );
+		array[ i ] = nodeObject( array[ i ], altType );
 
 	}
 
@@ -307,9 +311,9 @@ export function ShaderNode( jsFunc ) {
 
 }
 
-export const nodeObject = ( val ) => /* new */ ShaderNodeObject( val );
-export const nodeObjects = ( val ) => new ShaderNodeObjects( val );
-export const nodeArray = ( val ) => new ShaderNodeArray( val );
+export const nodeObject = ( val, altType = null ) => /* new */ ShaderNodeObject( val, altType );
+export const nodeObjects = ( val, altType = null ) => new ShaderNodeObjects( val, altType );
+export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, altType );
 export const nodeProxy = ( ...val ) => new ShaderNodeProxy( ...val );
 export const nodeImmutable = ( ...val ) => new ShaderNodeImmutable( ...val );
 
