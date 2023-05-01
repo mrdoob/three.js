@@ -221,7 +221,7 @@
 					const scale = oscSine().mul( .09 ); // just a value to test
 
 					const scaleI = scale.mul( i );
-					const scaleINeg = scale.mul( i ).negate();
+					const scaleINeg = scaleI.negate();
 
 					const leftUV = uv().add( vec2( scaleI, 0 ) );
 					const rightUV = uv().add( vec2( scaleINeg, 0 ) );
