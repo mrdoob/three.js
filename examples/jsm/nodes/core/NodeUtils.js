@@ -95,6 +95,10 @@ export function getValueType( value ) {
 
 		return 'string';
 
+	} else if ( typeOf === 'function' ) {
+
+		return 'shader';
+
 	} else if ( value.isVector2 === true ) {
 
 		return 'vec2';

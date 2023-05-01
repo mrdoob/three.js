@@ -101,7 +101,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 		return nodeObject( getAutoTypedConstNode( obj ) );
 
-	} else if ( type === 'function' ) {
+	} else if ( type === 'shader' ) {
 
 		return shader( obj );
 
