@@ -173,6 +173,15 @@ export const NotEqualStencilFunc = 517;
 export const GreaterEqualStencilFunc = 518;
 export const AlwaysStencilFunc = 519;
 
+export const NeverCompare = 512;
+export const LessCompare = 513;
+export const EqualCompare = 514;
+export const LessEqualCompare = 515;
+export const GreaterCompare = 516;
+export const NotEqualCompare = 517;
+export const GreaterEqualCompare = 518;
+export const AlwaysCompare = 519;
+
 export const StaticDrawUsage = 35044;
 export const DynamicDrawUsage = 35048;
 export const StreamDrawUsage = 35040;
