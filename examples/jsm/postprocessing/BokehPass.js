@@ -7,8 +7,8 @@ import {
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { BokehShader } from '../shaders/BokehShader.js';
 
 /**
@@ -31,10 +31,7 @@ class BokehPass extends Pass {
 
 		// render targets
 
-		const width = params.width || window.innerWidth || 1;
-		const height = params.height || window.innerHeight || 1;
-
-		this.renderTargetDepth = new WebGLRenderTarget( width, height, {
+		this.renderTargetDepth = new WebGLRenderTarget( 1, 1, { // will be resized later
 			minFilter: NearestFilter,
 			magFilter: NearestFilter
 		} );
@@ -48,12 +45,6 @@ class BokehPass extends Pass {
 		this.materialDepth.blending = NoBlending;
 
 		// bokeh material
-
-		if ( BokehShader === undefined ) {
-
-			console.error( 'THREE.BokehPass relies on BokehShader' );
-
-		}
 
 		const bokehShader = BokehShader;
 		const bokehUniforms = UniformsUtils.clone( bokehShader.uniforms );
@@ -123,6 +114,23 @@ class BokehPass extends Pass {
 		renderer.setClearColor( this._oldClearColor );
 		renderer.setClearAlpha( oldClearAlpha );
 		renderer.autoClear = oldAutoClear;
+
+	}
+
+	setSize( width, height ) {
+
+		this.renderTargetDepth.setSize( width, height );
+
+	}
+
+	dispose() {
+
+		this.renderTargetDepth.dispose();
+
+		this.materialDepth.dispose();
+		this.materialBokeh.dispose();
+
+		this.fsQuad.dispose();
 
 	}
 

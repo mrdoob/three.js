@@ -6,30 +6,6 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			#menu {
-				position: absolute;
-				bottom: 20px;
-				width: 100%;
-				text-align: center;
-				padding: 0;
-				margin: 0;
-			}
-
-			button {
-				color: rgb(255,255,255);
-				background: transparent;
-				border: 0px;
-				padding: 5px 10px;
-				cursor: pointer;
-			}
-			button:hover {
-				background-color: rgba(0,255,255,0.5);
-			}
-			button:active {
-				color: #000000;
-				background-color: rgba(0,255,255,1);
-			}
-
 			.label {
 				text-shadow: -1px 1px 1px rgb(0,0,0);
 				margin-left: 25px;
@@ -40,15 +16,28 @@
 	<body>
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - molecules</div>
-		<div id="menu"></div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { PDBLoader } from './jsm/loaders/PDBLoader.js';
-			import { CSS2DRenderer, CSS2DObject } from './jsm/renderers/CSS2DRenderer.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { PDBLoader } from 'three/addons/loaders/PDBLoader.js';
+			import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, labelRenderer;
 			let controls;
@@ -56,29 +45,31 @@
 			let root;
 
 			const MOLECULES = {
-				"Ethanol": "ethanol.pdb",
-				"Aspirin": "aspirin.pdb",
-				"Caffeine": "caffeine.pdb",
-				"Nicotine": "nicotine.pdb",
-				"LSD": "lsd.pdb",
-				"Cocaine": "cocaine.pdb",
-				"Cholesterol": "cholesterol.pdb",
-				"Lycopene": "lycopene.pdb",
-				"Glucose": "glucose.pdb",
-				"Aluminium oxide": "Al2O3.pdb",
-				"Cubane": "cubane.pdb",
-				"Copper": "cu.pdb",
-				"Fluorite": "caf2.pdb",
-				"Salt": "nacl.pdb",
-				"YBCO superconductor": "ybco.pdb",
-				"Buckyball": "buckyball.pdb",
-				"Graphite": "graphite.pdb"
+				'Ethanol': 'ethanol.pdb',
+				'Aspirin': 'aspirin.pdb',
+				'Caffeine': 'caffeine.pdb',
+				'Nicotine': 'nicotine.pdb',
+				'LSD': 'lsd.pdb',
+				'Cocaine': 'cocaine.pdb',
+				'Cholesterol': 'cholesterol.pdb',
+				'Lycopene': 'lycopene.pdb',
+				'Glucose': 'glucose.pdb',
+				'Aluminium oxide': 'Al2O3.pdb',
+				'Cubane': 'cubane.pdb',
+				'Copper': 'cu.pdb',
+				'Fluorite': 'caf2.pdb',
+				'Salt': 'nacl.pdb',
+				'YBCO superconductor': 'ybco.pdb',
+				'Buckyball': 'buckyball.pdb',
+				'Graphite': 'graphite.pdb'
+			};
+
+			const params = {
+				molecule: 'caffeine.pdb'
 			};
 
 			const loader = new PDBLoader();
 			const offset = new THREE.Vector3();
-
-			const menu = document.getElementById( 'menu' );
 
 			init();
 			animate();
@@ -125,46 +116,26 @@
 
 				//
 
-				loadMolecule( 'models/pdb/caffeine.pdb' );
-				createMenu();
+				loadMolecule( params.molecule );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
-			}
+				//
 
-			//
+				const gui = new GUI();
 
-			function generateButtonCallback( url ) {
-
-				return function () {
-
-					loadMolecule( url );
-
-				};
-
-			}
-
-			function createMenu() {
-
-				for ( const m in MOLECULES ) {
-
-					const button = document.createElement( 'button' );
-					button.innerHTML = m;
-					menu.appendChild( button );
-
-					const url = 'models/pdb/' + MOLECULES[ m ];
-
-					button.addEventListener( 'click', generateButtonCallback( url ) );
-
-				}
+				gui.add( params, 'molecule', MOLECULES ).onChange( loadMolecule );
+				gui.open();
 
 			}
 
 			//
 
-			function loadMolecule( url ) {
+			function loadMolecule( model ) {
+
+				const url = 'models/pdb/' + model;
 
 				while ( root.children.length > 0 ) {
 

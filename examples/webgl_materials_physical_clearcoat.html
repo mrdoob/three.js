@@ -11,16 +11,29 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - materials - clearcoat
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 
-			import { FlakesTexture } from './jsm/textures/FlakesTexture.js';
+			import { FlakesTexture } from 'three/addons/textures/FlakesTexture.js';
 
 			let container, stats;
 
@@ -55,7 +68,7 @@
 							const textureLoader = new THREE.TextureLoader();
 
 							const diffuse = textureLoader.load( 'textures/carbon/Carbon.png' );
-							diffuse.encoding = THREE.sRGBEncoding;
+							diffuse.colorSpace = THREE.SRGBColorSpace;
 							diffuse.wrapS = THREE.RepeatWrapping;
 							diffuse.wrapT = THREE.RepeatWrapping;
 							diffuse.repeat.x = 10;
@@ -64,6 +77,8 @@
 							const normalMap = textureLoader.load( 'textures/carbon/Carbon_Normal.png' );
 							normalMap.wrapS = THREE.RepeatWrapping;
 							normalMap.wrapT = THREE.RepeatWrapping;
+							normalMap.repeat.x = 10;
+							normalMap.repeat.y = 10;
 
 							const normalMap2 = textureLoader.load( 'textures/water/Water_1_M_Normal.jpg' );
 
@@ -76,7 +91,7 @@
 
 							const normalMap4 = textureLoader.load( 'textures/golfball.jpg' );
 
-							const clearcoatNormaMap = textureLoader.load( 'textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png' );
+							const clearcoatNormalMap = textureLoader.load( 'textures/pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png' );
 
 							// car paint
 
@@ -116,7 +131,7 @@
 								roughness: 0.1,
 								clearcoat: 1.0,
 								normalMap: normalMap4,
-								clearcoatNormalMap: clearcoatNormaMap,
+								clearcoatNormalMap: clearcoatNormalMap,
 
 								// y scale is negated to compensate for normal map handedness.
 								clearcoatNormalScale: new THREE.Vector2( 2.0, - 2.0 )
@@ -134,7 +149,7 @@
 								color: 0xff0000,
 								normalMap: normalMap2,
 								normalScale: new THREE.Vector2( 0.15, 0.15 ),
-								clearcoatNormalMap: clearcoatNormaMap,
+								clearcoatNormalMap: clearcoatNormalMap,
 
 								// y scale is negated to compensate for normal map handedness.
 								clearcoatNormalScale: new THREE.Vector2( 2.0, - 2.0 )
@@ -175,7 +190,6 @@
 
 				//
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

@@ -1,66 +1,89 @@
-import { Node } from './Node.js';
+import Node, { addNodeClass } from './Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class VarNode extends Node {
 
-	constructor( type, value ) {
+	constructor( node, name = null ) {
 
-		super( type );
+		super();
 
-		this.value = value;
-
-	}
-
-	getType( builder ) {
-
-		return builder.getTypeByFormat( this.type );
+		this.node = node;
+		this.name = name;
 
 	}
 
-	generate( builder, output ) {
+	assign( node ) {
 
-		const varying = builder.getVar( this.uuid, this.type );
+		node.traverse( ( childNode, replaceNode ) => {
 
-		if ( this.value && builder.isShader( 'vertex' ) ) {
+			if ( replaceNode && childNode.uuid === this.uuid ) {
 
-			builder.addNodeCode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
+				replaceNode( this.node );
 
-		}
+			}
 
-		return builder.format( varying.name, this.getType( builder ), output );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.type = source.type;
-		this.value = source.value;
-
+		} );
+		this.node = node;
 		return this;
 
 	}
 
-	toJSON( meta ) {
+	isGlobal() {
 
-		let data = this.getJSONNode( meta );
+		return true;
 
-		if ( ! data ) {
+	}
 
-			data = this.createJSONNode( meta );
+	getHash( builder ) {
 
-			data.type = this.type;
+		return this.name || super.getHash( builder );
 
-			if ( this.value ) data.value = this.value.toJSON( meta ).uuid;
+	}
+
+	getNodeType( builder ) {
+
+		return this.node.getNodeType( builder );
+
+	}
+
+	generate( builder ) {
+
+		const node = this.node;
+		const name = this.name;
+
+		if ( name === null && node.isTempNode === true ) {
+
+			return node.build( builder );
 
 		}
 
-		return data;
+		const type = builder.getVectorType( this.getNodeType( builder ) );
+
+		const snippet = node.build( builder, type );
+		const nodeVar = builder.getVarFromNode( this, type );
+
+		if ( name !== null ) {
+
+			nodeVar.name = name;
+
+		}
+
+		const propertyName = builder.getPropertyName( nodeVar );
+
+		builder.addLineFlowCode( `${propertyName} = ${snippet}` );
+
+		return propertyName;
 
 	}
 
 }
 
-VarNode.prototype.nodeType = 'Var';
+export default VarNode;
 
-export { VarNode };
+export const label = nodeProxy( VarNode );
+export const temp = label;
+
+addNodeElement( 'label', label );
+addNodeElement( 'temp', temp );
+
+addNodeClass( VarNode );

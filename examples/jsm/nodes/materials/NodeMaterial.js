@@ -1,214 +1,420 @@
-import {
-	FrontSide,
-	LessEqualDepth,
-	NoColors,
-	NormalBlending,
-	ShaderMaterial
-} from '../../../../build/three.module.js';
+import { Material, ShaderMaterial } from 'three';
+import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
+import { attribute } from '../core/AttributeNode.js';
+import { diffuseColor } from '../core/PropertyNode.js';
+import { materialNormal } from '../accessors/ExtendedMaterialNode.js';
+import { materialAlphaTest, materialColor, materialOpacity, materialEmissive } from '../accessors/MaterialNode.js';
+import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
+import { transformedNormalView } from '../accessors/NormalNode.js';
+import { instance } from '../accessors/InstanceNode.js';
+import { positionLocal } from '../accessors/PositionNode.js';
+import { skinning } from '../accessors/SkinningNode.js';
+import { texture } from '../accessors/TextureNode.js';
+import { lightsWithoutWrap } from '../lighting/LightsNode.js';
+import { mix } from '../math/MathNode.js';
+import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import AONode from '../lighting/AONode.js';
+import EnvironmentNode from '../lighting/EnvironmentNode.js';
 
-import { NodeBuilder } from '../core/NodeBuilder.js';
-import { ColorNode } from '../inputs/ColorNode.js';
-import { PositionNode } from '../accessors/PositionNode.js';
-import { RawNode } from './nodes/RawNode.js';
+const NodeMaterials = new Map();
 
 class NodeMaterial extends ShaderMaterial {
 
-	constructor( vertex, fragment ) {
+	constructor() {
 
 		super();
 
-		this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
-		this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
+		this.isNodeMaterial = true;
 
-		this.updaters = [];
+		this.type = this.constructor.name;
 
-		this.type = 'NodeMaterial';
+		this.lights = true;
+		this.normals = true;
 
-	}
+		this.lightsNode = null;
+		this.envNode = null;
 
-	get properties() {
+		this.colorNode = null;
+		this.normalNode = null;
+		this.opacityNode = null;
+		this.backdropNode = null;
+		this.backdropAlphaNode = null;
+		this.alphaTestNode = null;
 
-		return this.fragment.properties;
-
-	}
-
-	get needsUpdate() {
-
-		return this.needsCompile;
-
-	}
-
-	set needsUpdate( value ) {
-
-		if ( value === true ) this.version ++;
-		this.needsCompile = value;
-
-	}
-
-	onBeforeCompile( shader, renderer ) {
-
-		this.build( { renderer: renderer } );
-
-		shader.defines = this.defines;
-		shader.uniforms = this.uniforms;
-		shader.vertexShader = this.vertexShader;
-		shader.fragmentShader = this.fragmentShader;
-
-		shader.extensionDerivatives = ( this.extensions.derivatives === true );
-		shader.extensionFragDepth = ( this.extensions.fragDepth === true );
-		shader.extensionDrawBuffers = ( this.extensions.drawBuffers === true );
-		shader.extensionShaderTextureLOD = ( this.extensions.shaderTextureLOD === true );
+		this.positionNode = null;
 
 	}
 
 	customProgramCacheKey() {
 
-		const hash = this.getHash();
-
-		return hash;
+		return getCacheKey( this );
 
 	}
 
-	getHash() {
+	build( builder ) {
 
-		let hash = '{';
-
-		hash += '"vertex":' + this.vertex.getHash() + ',';
-		hash += '"fragment":' + this.fragment.getHash();
-
-		hash += '}';
-
-		return hash;
+		this.construct( builder );
 
 	}
 
-	updateFrame( frame ) {
+	construct( builder ) {
 
-		for ( let i = 0; i < this.updaters.length; ++ i ) {
+		// < VERTEX STAGE >
 
-			frame.updateNode( this.updaters[ i ] );
+		builder.addStack();
+
+		builder.stack.outputNode = this.constructPosition( builder );
+
+		builder.addFlow( 'vertex', builder.removeStack() );
+
+		// < FRAGMENT STAGE >
+
+		builder.addStack();
+
+		if ( this.normals === true ) this.constructNormal( builder );
+
+		this.constructDiffuseColor( builder );
+		this.constructVariants( builder );
+
+		const outgoingLightNode = this.constructLighting( builder );
+
+		builder.stack.outputNode = this.constructOutput( builder, outgoingLightNode, diffuseColor.a );
+
+		builder.addFlow( 'fragment', builder.removeStack() );
+
+	}
+
+	constructPosition( builder ) {
+
+		const object = builder.object;
+
+		let vertex = positionLocal;
+
+		if ( this.positionNode !== null ) {
+
+			vertex = vertex.bypass( positionLocal.assign( this.positionNode ) );
+
+		}
+
+		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
+
+			vertex = vertex.bypass( instance( object ) );
+
+		}
+
+		if ( object.isSkinnedMesh === true ) {
+
+			vertex = vertex.bypass( skinning( object ) );
+
+		}
+
+		builder.context.vertex = vertex;
+
+		return modelViewProjection();
+
+	}
+
+	constructDiffuseColor( { stack, geometry } ) {
+
+		let colorNode = this.colorNode ? vec4( this.colorNode ) : materialColor;
+
+		// VERTEX COLORS
+
+		if ( this.vertexColors === true && geometry.hasAttribute( 'color' ) ) {
+
+			colorNode = vec4( colorNode.xyz.mul( attribute( 'color' ) ), colorNode.a );
+
+		}
+
+		// COLOR
+
+		stack.assign( diffuseColor, colorNode );
+
+		// OPACITY
+
+		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
+		stack.assign( diffuseColor.a, diffuseColor.a.mul( opacityNode ) );
+
+		// ALPHA TEST
+
+		if ( this.alphaTestNode || this.alphaTest > 0 ) {
+
+			const alphaTestNode = this.alphaTestNode ? float( this.alphaTestNode ) : materialAlphaTest;
+
+			stack.add( diffuseColor.a.lessThanEqual( alphaTestNode ).discard() );
 
 		}
 
 	}
 
-	build( params = {} ) {
+	constructVariants( /*builder*/ ) {
 
-		const builder = params.builder || new NodeBuilder();
-
-		builder.setMaterial( this, params.renderer );
-		builder.build( this.vertex, this.fragment );
-
-		this.vertexShader = builder.getCode( 'vertex' );
-		this.fragmentShader = builder.getCode( 'fragment' );
-
-		this.defines = builder.defines;
-		this.uniforms = builder.uniforms;
-		this.extensions = builder.extensions;
-		this.updaters = builder.updaters;
-
-		this.fog = builder.requires.fog;
-		this.lights = builder.requires.lights;
-
-		this.transparent = builder.requires.transparent || this.blending > NormalBlending;
-
-		return this;
+		// Interface function.
 
 	}
 
-	copy( source ) {
+	constructNormal( { stack } ) {
 
-		const uuid = this.uuid;
+		// NORMAL VIEW
 
-		for ( const name in source ) {
+		const normalNode = this.normalNode ? vec3( this.normalNode ) : materialNormal;
 
-			this[ name ] = source[ name ];
+		stack.assign( transformedNormalView, normalNode );
+
+		return normalNode;
+
+	}
+
+	constructLights( builder ) {
+
+		const envNode = this.envNode || builder.environmentNode;
+
+		const materialLightsNode = [];
+
+		if ( envNode ) {
+
+			materialLightsNode.push( new EnvironmentNode( envNode ) );
 
 		}
 
-		this.uuid = uuid;
+		if ( builder.material.aoMap ) {
 
-		if ( source.userData !== undefined ) {
-
-			this.userData = JSON.parse( JSON.stringify( source.userData ) );
+			materialLightsNode.push( new AONode( texture( builder.material.aoMap ) ) );
 
 		}
 
-		return this;
+		let lightsNode = this.lightsNode || builder.lightsNode;
+
+		if ( materialLightsNode.length > 0 ) {
+
+			lightsNode = lightsWithoutWrap( [ ...lightsNode.lightNodes, ...materialLightsNode ] );
+
+		}
+
+		return lightsNode;
+
+	}
+
+	constructLightingModel( /*builder*/ ) {
+
+		// Interface function.
+
+	}
+
+	constructLighting( builder ) {
+
+		const { material } = builder;
+		const { backdropNode, backdropAlphaNode, emissiveNode } = this;
+
+		// OUTGOING LIGHT
+
+		const lights = this.lights === true || this.lightsNode !== null;
+
+		const lightsNode = lights ? this.constructLights( builder ) : null;
+		const lightingModelNode = lightsNode ? this.constructLightingModel( builder ) : null;
+
+		let outgoingLightNode = diffuseColor.rgb;
+
+		if ( lightsNode && lightsNode.hasLight !== false ) {
+
+			outgoingLightNode = lightsNode.lightingContext( lightingModelNode, backdropNode, backdropAlphaNode );
+
+		} else if ( backdropNode !== null ) {
+
+			outgoingLightNode = vec3( backdropAlphaNode !== null ? mix( outgoingLightNode, backdropNode, backdropAlphaNode ) : backdropNode );
+
+		}
+
+		// EMISSIVE
+
+		if ( ( emissiveNode && emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
+
+			outgoingLightNode = outgoingLightNode.add( emissiveNode ? vec3( emissiveNode ) : materialEmissive );
+
+		}
+
+		return outgoingLightNode;
+
+	}
+
+	constructOutput( builder, outgoingLight, opacity ) {
+
+		const renderer = builder.renderer;
+
+		// TONE MAPPING
+
+		const toneMappingNode = builder.toneMappingNode;
+
+		if ( toneMappingNode ) {
+
+			outgoingLight = toneMappingNode.context( { color: outgoingLight } );
+
+		}
+
+		// @TODO: Optimize outputNode to vec3.
+
+		let outputNode = vec4( outgoingLight, opacity );
+
+		// ENCODING
+
+		outputNode = outputNode.colorSpace( renderer.outputColorSpace );
+
+		// FOG
+
+		const fogNode = builder.fogNode;
+
+		if ( fogNode ) outputNode = vec4( fogNode.mixAssign( outputNode.rgb ), outputNode.a );
+
+		return outputNode;
+
+	}
+
+	setDefaultValues( material ) {
+
+		// This approach is to reuse the native refreshUniforms*
+		// and turn available the use of features like transmission and environment in core
+
+		for ( const property in material ) {
+
+			const value = material[ property ];
+
+			if ( this[ property ] === undefined ) {
+
+				this[ property ] = value;
+
+				if ( value && value.clone ) this[ property ] = value.clone();
+
+			}
+
+		}
+
+		Object.assign( this.defines, material.defines );
+
+		const descriptors = Object.getOwnPropertyDescriptors( material.constructor.prototype );
+
+		for ( const key in descriptors ) {
+
+			if ( Object.getOwnPropertyDescriptor( this.constructor.prototype, key ) === undefined &&
+			     descriptors[ key ].get !== undefined ) {
+
+				Object.defineProperty( this.constructor.prototype, key, descriptors[ key ] );
+
+			}
+
+		}
 
 	}
 
 	toJSON( meta ) {
 
-		const isRootObject = ( meta === undefined || typeof meta === 'string' );
+		const isRoot = ( meta === undefined || typeof meta === 'string' );
 
-		if ( isRootObject ) {
+		if ( isRoot ) {
 
 			meta = {
+				textures: {},
+				images: {},
 				nodes: {}
 			};
 
 		}
 
-		if ( meta && ! meta.materials ) meta.materials = {};
+		const data = Material.prototype.toJSON.call( this, meta );
+		const nodeChildren = getNodeChildren( this );
 
-		if ( ! meta.materials[ this.uuid ] ) {
+		data.inputNodes = {};
 
-			const data = {};
+		for ( const { property, childNode } of nodeChildren ) {
 
-			data.uuid = this.uuid;
-			data.type = this.type;
-
-			meta.materials[ data.uuid ] = data;
-
-			if ( this.name !== '' ) data.name = this.name;
-
-			if ( this.size !== undefined ) data.size = this.size;
-			if ( this.sizeAttenuation !== undefined ) data.sizeAttenuation = this.sizeAttenuation;
-
-			if ( this.blending !== NormalBlending ) data.blending = this.blending;
-			if ( this.flatShading === true ) data.flatShading = this.flatShading;
-			if ( this.side !== FrontSide ) data.side = this.side;
-			if ( this.vertexColors !== NoColors ) data.vertexColors = this.vertexColors;
-
-			if ( this.depthFunc !== LessEqualDepth ) data.depthFunc = this.depthFunc;
-			if ( this.depthTest === false ) data.depthTest = this.depthTest;
-			if ( this.depthWrite === false ) data.depthWrite = this.depthWrite;
-
-			if ( this.linewidth !== 1 ) data.linewidth = this.linewidth;
-			if ( this.dashSize !== undefined ) data.dashSize = this.dashSize;
-			if ( this.gapSize !== undefined ) data.gapSize = this.gapSize;
-			if ( this.scale !== undefined ) data.scale = this.scale;
-
-			if ( this.dithering === true ) data.dithering = true;
-
-			if ( this.wireframe === true ) data.wireframe = this.wireframe;
-			if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
-			if ( this.wireframeLinecap !== 'round' ) data.wireframeLinecap = this.wireframeLinecap;
-			if ( this.wireframeLinejoin !== 'round' ) data.wireframeLinejoin = this.wireframeLinejoin;
-
-			if ( this.alphaTest > 0 ) data.alphaTest = this.alphaTest;
-			if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = this.premultipliedAlpha;
-
-			if ( this.visible === false ) data.visible = false;
-			if ( JSON.stringify( this.userData ) !== '{}' ) data.userData = this.userData;
-
-			data.fog = this.fog;
-			data.lights = this.lights;
-
-			data.vertex = this.vertex.toJSON( meta ).uuid;
-			data.fragment = this.fragment.toJSON( meta ).uuid;
+			data.inputNodes[ property ] = childNode.toJSON( meta ).uuid;
 
 		}
 
-		meta.material = this.uuid;
+		// TODO: Copied from Object3D.toJSON
 
-		return meta;
+		function extractFromCache( cache ) {
+
+			const values = [];
+
+			for ( const key in cache ) {
+
+				const data = cache[ key ];
+				delete data.metadata;
+				values.push( data );
+
+			}
+
+			return values;
+
+		}
+
+		if ( isRoot ) {
+
+			const textures = extractFromCache( meta.textures );
+			const images = extractFromCache( meta.images );
+			const nodes = extractFromCache( meta.nodes );
+
+			if ( textures.length > 0 ) data.textures = textures;
+			if ( images.length > 0 ) data.images = images;
+			if ( nodes.length > 0 ) data.nodes = nodes;
+
+		}
+
+		return data;
+
+	}
+
+	static fromMaterial( material ) {
+
+		if ( material.isNodeMaterial === true ) { // is already a node material
+
+			return material;
+
+		}
+
+		const type = material.type.replace( 'Material', 'NodeMaterial' );
+
+		const nodeMaterial = createNodeMaterialFromType( type );
+
+		if ( nodeMaterial === undefined ) {
+
+			throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
+
+		}
+
+		for ( const key in material ) {
+
+			nodeMaterial[ key ] = material[ key ];
+
+		}
+
+		return nodeMaterial;
 
 	}
 
 }
 
-NodeMaterial.prototype.isNodeMaterial = true;
+export default NodeMaterial;
 
-export { NodeMaterial };
+export function addNodeMaterial( nodeMaterial ) {
+
+	if ( typeof nodeMaterial !== 'function' || ! nodeMaterial.name ) throw new Error( `Node material ${ nodeMaterial.name } is not a class` );
+	if ( NodeMaterials.has( nodeMaterial.name ) ) throw new Error( `Redefinition of node material ${ nodeMaterial.name }` );
+
+	NodeMaterials.set( nodeMaterial.name, nodeMaterial );
+
+}
+
+export function createNodeMaterialFromType( type ) {
+
+	const Material = NodeMaterials.get( type );
+
+	if ( Material !== undefined ) {
+
+		return new Material();
+
+	}
+
+}
+
+addNodeMaterial( NodeMaterial );

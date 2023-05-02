@@ -4,13 +4,15 @@ import { Object3D } from '../core/Object3D.js';
 
 class SpotLight extends Light {
 
-	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
+	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 2 ) {
 
 		super( color, intensity );
 
+		this.isSpotLight = true;
+
 		this.type = 'SpotLight';
 
-		this.position.copy( Object3D.DefaultUp );
+		this.position.copy( Object3D.DEFAULT_UP );
 		this.updateMatrix();
 
 		this.target = new Object3D();
@@ -18,7 +20,9 @@ class SpotLight extends Light {
 		this.distance = distance;
 		this.angle = angle;
 		this.penumbra = penumbra;
-		this.decay = decay; // for physically correct lights, should be 2.
+		this.decay = decay;
+
+		this.map = null;
 
 		this.shadow = new SpotLightShadow();
 
@@ -45,9 +49,9 @@ class SpotLight extends Light {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.distance = source.distance;
 		this.angle = source.angle;
@@ -63,7 +67,5 @@ class SpotLight extends Light {
 	}
 
 }
-
-SpotLight.prototype.isSpotLight = true;
 
 export { SpotLight };

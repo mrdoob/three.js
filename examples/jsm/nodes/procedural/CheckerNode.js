@@ -1,75 +1,42 @@
-import { TempNode } from '../core/TempNode.js';
-import { FunctionNode } from '../core/FunctionNode.js';
-import { UVNode } from '../accessors/UVNode.js';
+import TempNode from '../core/TempNode.js';
+import { uv } from '../accessors/UVNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
+
+const checkerShaderNode = new ShaderNode( ( inputs ) => {
+
+	const uv = inputs.uv.mul( 2.0 );
+
+	const cx = uv.x.floor();
+	const cy = uv.y.floor();
+	const result = cx.add( cy ).mod( 2.0 );
+
+	return result.sign();
+
+} );
 
 class CheckerNode extends TempNode {
 
-	constructor( uv ) {
+	constructor( uvNode = uv() ) {
 
-		super( 'f' );
+		super( 'float' );
 
-		this.uv = uv || new UVNode();
-
-	}
-
-	generate( builder, output ) {
-
-		const snoise = builder.include( CheckerNode.Nodes.checker );
-
-		return builder.format( snoise + '( ' + this.uv.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
+		this.uvNode = uvNode;
 
 	}
 
-	copy( source ) {
+	generate( builder ) {
 
-		super.copy( source );
-
-		this.uv = source.uv;
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		let data = this.getJSONNode( meta );
-
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			data.uv = this.uv.toJSON( meta ).uuid;
-
-		}
-
-		return data;
+		return checkerShaderNode.call( { uv: this.uvNode } ).build( builder );
 
 	}
 
 }
 
-CheckerNode.Nodes = ( function () {
+export default CheckerNode;
 
-	// https://github.com/mattdesl/glsl-checker/blob/master/index.glsl
+export const checker = nodeProxy( CheckerNode );
 
-	const checker = new FunctionNode( /* glsl */`
-		float checker( vec2 uv ) {
+addNodeElement( 'checker', checker );
 
-			float cx = floor( uv.x );
-			float cy = floor( uv.y );
-			float result = mod( cx + cy, 2.0 );
-
-			return sign( result );
-
-		}`
-	);
-
-	return {
-		checker: checker
-	};
-
-} )();
-
-CheckerNode.prototype.nodeType = 'Noise';
-
-export { CheckerNode };
+addNodeClass( CheckerNode );

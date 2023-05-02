@@ -13,19 +13,32 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GPUStatsPanel } from './jsm/utils/GPUStatsPanel.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GPUStatsPanel } from 'three/addons/utils/GPUStatsPanel.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { Line2 } from './jsm/lines/Line2.js';
-			import { LineMaterial } from './jsm/lines/LineMaterial.js';
-			import { LineGeometry } from './jsm/lines/LineGeometry.js';
-			import * as GeometryUtils from './jsm/utils/GeometryUtils.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Line2 } from 'three/addons/lines/Line2.js';
+			import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+			import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+			import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
 
 			let line, renderer, scene, camera, camera2, controls;
 			let line1;
@@ -80,7 +93,7 @@
 					spline.getPoint( t, point );
 					positions.push( point.x, point.y, point.z );
 
-					color.setHSL( t, 1.0, 0.5 );
+					color.setHSL( t, 1.0, 0.5, THREE.SRGBColorSpace );
 					colors.push( color.r, color.g, color.b );
 
 				}
@@ -95,8 +108,9 @@
 				matLine = new LineMaterial( {
 
 					color: 0xffffff,
-					linewidth: 5, // in pixels
+					linewidth: 5, // in world units with size attenuation, pixels otherwise
 					vertexColors: true,
+
 					//resolution:  // to be set by renderer, eventually
 					dashed: false,
 					alphaToCoverage: true,
@@ -205,7 +219,8 @@
 
 				const param = {
 					'line type': 0,
-					'width (px)': 5,
+					'world units': false,
+					'width': 5,
 					'alphaToCoverage': true,
 					'dashed': false,
 					'dash scale': 1,
@@ -216,14 +231,14 @@
 
 					switch ( val ) {
 
-						case '0':
+						case 0:
 							line.visible = true;
 
 							line1.visible = false;
 
 							break;
 
-						case '1':
+						case 1:
 							line.visible = false;
 
 							line1.visible = true;
@@ -234,13 +249,20 @@
 
 				} );
 
-				gui.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
+				gui.add( param, 'world units' ).onChange( function ( val ) {
+
+					matLine.worldUnits = val;
+					matLine.needsUpdate = true;
+
+				} );
+
+				gui.add( param, 'width', 1, 10 ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
 
 				} );
 
-				gui.add( param, 'alphaToCoverage' ).onChange( function ( val ) { 
+				gui.add( param, 'alphaToCoverage' ).onChange( function ( val ) {
 
 					matLine.alphaToCoverage = val;
 
@@ -264,7 +286,7 @@
 
 					switch ( val ) {
 
-						case '0':
+						case 0:
 							matLine.dashSize = 2;
 							matLine.gapSize = 1;
 
@@ -273,7 +295,7 @@
 
 							break;
 
-						case '1':
+						case 1:
 							matLine.dashSize = 1;
 							matLine.gapSize = 1;
 
@@ -282,7 +304,7 @@
 
 							break;
 
-						case '2':
+						case 2:
 							matLine.dashSize = 1;
 							matLine.gapSize = 2;
 

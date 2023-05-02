@@ -7,9 +7,9 @@ import {
 	Color,
 	DirectionalLight,
 	DoubleSide,
-	Euler,
 	FileLoader,
 	Float32BufferAttribute,
+	FrontSide,
 	Group,
 	Line,
 	LineBasicMaterial,
@@ -33,9 +33,11 @@ import {
 	SkinnedMesh,
 	SpotLight,
 	TextureLoader,
+	Vector2,
 	Vector3,
-	VectorKeyframeTrack
-} from '../../../build/three.module.js';
+	VectorKeyframeTrack,
+	SRGBColorSpace
+} from 'three';
 import { TGALoader } from '../loaders/TGALoader.js';
 
 class ColladaLoader extends Loader {
@@ -960,7 +962,7 @@ class ColladaLoader extends Loader {
 
 			let i, j, l;
 
-			// procces skin data for each vertex
+			// process skin data for each vertex
 
 			for ( i = 0, l = vcount.length; i < l; i ++ ) {
 
@@ -1239,6 +1241,10 @@ class ColladaLoader extends Loader {
 						data.parameters = parseEffectParameters( child );
 						break;
 
+					case 'extra':
+						data.extra = parseEffectExtra( child );
+						break;
+
 				}
 
 			}
@@ -1270,7 +1276,7 @@ class ColladaLoader extends Loader {
 						break;
 					case 'transparent':
 						data[ child.nodeName ] = {
-							opaque: child.getAttribute( 'opaque' ),
+							opaque: child.hasAttribute( 'opaque' ) ? child.getAttribute( 'opaque' ) : 'A_ONE',
 							data: parseEffectParameter( child )
 						};
 						break;
@@ -1399,6 +1405,10 @@ class ColladaLoader extends Loader {
 
 						break;
 
+					case 'bump':
+						data[ child.nodeName ] = parseEffectExtraTechniqueBump( child );
+						break;
+
 				}
 
 			}
@@ -1443,6 +1453,34 @@ class ColladaLoader extends Loader {
 
 					case 'double_sided':
 						data[ child.nodeName ] = parseInt( child.textContent );
+						break;
+
+					case 'bump':
+						data[ child.nodeName ] = parseEffectExtraTechniqueBump( child );
+						break;
+
+				}
+
+			}
+
+			return data;
+
+		}
+
+		function parseEffectExtraTechniqueBump( xml ) {
+
+			const data = {};
+
+			for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
+
+				const child = xml.childNodes[ i ];
+
+				if ( child.nodeType !== 1 ) continue;
+
+				switch ( child.nodeName ) {
+
+					case 'texture':
+						data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), texcoord: child.getAttribute( 'texcoord' ), extra: parseEffectParameterTexture( child ) };
 						break;
 
 				}
@@ -1519,7 +1557,6 @@ class ColladaLoader extends Loader {
 
 			const effect = getEffect( data.url );
 			const technique = effect.profile.technique;
-			const extra = effect.profile.extra;
 
 			let material;
 
@@ -1542,7 +1579,7 @@ class ColladaLoader extends Loader {
 
 			material.name = data.name || '';
 
-			function getTexture( textureObject ) {
+			function getTexture( textureObject, colorSpace = null ) {
 
 				const sampler = effect.profile.samplers[ textureObject.id ];
 				let image = null;
@@ -1590,6 +1627,12 @@ class ColladaLoader extends Loader {
 
 						}
 
+						if ( colorSpace !== null ) {
+
+							texture.colorSpace = colorSpace;
+
+						}
+
 						return texture;
 
 					} else {
@@ -1620,7 +1663,7 @@ class ColladaLoader extends Loader {
 
 					case 'diffuse':
 						if ( parameter.color ) material.color.fromArray( parameter.color );
-						if ( parameter.texture ) material.map = getTexture( parameter.texture );
+						if ( parameter.texture ) material.map = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 					case 'specular':
 						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
@@ -1630,19 +1673,23 @@ class ColladaLoader extends Loader {
 						if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
 						break;
 					case 'ambient':
-						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture );
+						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 					case 'shininess':
 						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
 						break;
 					case 'emission':
 						if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
-						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture );
+						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture, SRGBColorSpace );
 						break;
 
 				}
 
 			}
+
+			material.color.convertSRGBToLinear();
+			if ( material.specular ) material.specular.convertSRGBToLinear();
+			if ( material.emissive ) material.emissive.convertSRGBToLinear();
 
 			//
 
@@ -1712,9 +1759,29 @@ class ColladaLoader extends Loader {
 
 			//
 
-			if ( extra !== undefined && extra.technique !== undefined && extra.technique.double_sided === 1 ) {
 
-				material.side = DoubleSide;
+			if ( technique.extra !== undefined && technique.extra.technique !== undefined ) {
+
+				const techniques = technique.extra.technique;
+
+				for ( const k in techniques ) {
+
+					const v = techniques[ k ];
+
+					switch ( k ) {
+
+						case 'double_sided':
+							material.side = ( v === 1 ? DoubleSide : FrontSide );
+							break;
+
+						case 'bump':
+							material.normalMap = getTexture( v.texture );
+							material.normalScale = new Vector2( 1, 1 );
+							break;
+
+					}
+
+				}
 
 			}
 
@@ -1958,7 +2025,7 @@ class ColladaLoader extends Loader {
 
 					case 'color':
 						const array = parseFloats( child.textContent );
-						data.color = new Color().fromArray( array );
+						data.color = new Color().fromArray( array ).convertSRGBToLinear();
 						break;
 
 					case 'falloff_angle':
@@ -2270,7 +2337,7 @@ class ColladaLoader extends Loader {
 			const position = { array: [], stride: 0 };
 			const normal = { array: [], stride: 0 };
 			const uv = { array: [], stride: 0 };
-			const uv2 = { array: [], stride: 0 };
+			const uv1 = { array: [], stride: 0 };
 			const color = { array: [], stride: 0 };
 
 			const skinIndex = { array: [], stride: 4 };
@@ -2405,7 +2472,7 @@ class ColladaLoader extends Loader {
 										break;
 
 									case 'TEXCOORD1':
-										buildGeometryData( primitive, sources[ id ], input.offset, uv2.array );
+										buildGeometryData( primitive, sources[ id ], input.offset, uv1.array );
 										uv.stride = sources[ id ].stride;
 										break;
 
@@ -2424,7 +2491,7 @@ class ColladaLoader extends Loader {
 							break;
 
 						case 'COLOR':
-							buildGeometryData( primitive, sources[ input.id ], input.offset, color.array );
+							buildGeometryData( primitive, sources[ input.id ], input.offset, color.array, true );
 							color.stride = sources[ input.id ].stride;
 							break;
 
@@ -2434,8 +2501,8 @@ class ColladaLoader extends Loader {
 							break;
 
 						case 'TEXCOORD1':
-							buildGeometryData( primitive, sources[ input.id ], input.offset, uv2.array );
-							uv2.stride = sources[ input.id ].stride;
+							buildGeometryData( primitive, sources[ input.id ], input.offset, uv1.array );
+							uv1.stride = sources[ input.id ].stride;
 							break;
 
 					}
@@ -2450,7 +2517,7 @@ class ColladaLoader extends Loader {
 			if ( normal.array.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal.array, normal.stride ) );
 			if ( color.array.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color.array, color.stride ) );
 			if ( uv.array.length > 0 ) geometry.setAttribute( 'uv', new Float32BufferAttribute( uv.array, uv.stride ) );
-			if ( uv2.array.length > 0 ) geometry.setAttribute( 'uv2', new Float32BufferAttribute( uv2.array, uv2.stride ) );
+			if ( uv1.array.length > 0 ) geometry.setAttribute( 'uv1', new Float32BufferAttribute( uv1.array, uv1.stride ) );
 
 			if ( skinIndex.array.length > 0 ) geometry.setAttribute( 'skinIndex', new Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
 			if ( skinWeight.array.length > 0 ) geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
@@ -2463,7 +2530,7 @@ class ColladaLoader extends Loader {
 
 		}
 
-		function buildGeometryData( primitive, source, offset, array ) {
+		function buildGeometryData( primitive, source, offset, array, isColor = false ) {
 
 			const indices = primitive.p;
 			const stride = primitive.stride;
@@ -2477,6 +2544,22 @@ class ColladaLoader extends Loader {
 				for ( ; index < length; index ++ ) {
 
 					array.push( sourceArray[ index ] );
+
+				}
+
+				if ( isColor ) {
+
+					// convert the vertex colors from srgb to linear if present
+					const startIndex = array.length - sourceStride - 1;
+					tempColor.setRGB(
+						array[ startIndex + 0 ],
+						array[ startIndex + 1 ],
+						array[ startIndex + 2 ]
+					).convertSRGBToLinear();
+
+					array[ startIndex + 0 ] = tempColor.r;
+					array[ startIndex + 1 ] = tempColor.g;
+					array[ startIndex + 2 ] = tempColor.b;
 
 				}
 
@@ -2917,7 +3000,7 @@ class ColladaLoader extends Loader {
 						const param = child.getElementsByTagName( 'param' )[ 0 ];
 						data.axis = param.textContent;
 						const tmpJointIndex = data.axis.split( 'inst_' ).pop().split( 'axis' )[ 0 ];
-						data.jointIndex = tmpJointIndex.substr( 0, tmpJointIndex.length - 1 );
+						data.jointIndex = tmpJointIndex.substring( 0, tmpJointIndex.length - 1 );
 						break;
 
 				}
@@ -3680,6 +3763,34 @@ class ColladaLoader extends Loader {
 
 				}
 
+				// Collada allows to use phong and lambert materials with lines. Replacing these cases with LineBasicMaterial.
+
+				if ( type === 'lines' || type === 'linestrips' ) {
+
+					for ( let i = 0, l = materials.length; i < l; i ++ ) {
+
+						const material = materials[ i ];
+
+						if ( material.isMeshPhongMaterial === true || material.isMeshLambertMaterial === true ) {
+
+							const lineMaterial = new LineBasicMaterial();
+
+							// copy compatible properties
+
+							lineMaterial.color.copy( material.color );
+							lineMaterial.opacity = material.opacity;
+							lineMaterial.transparent = material.transparent;
+
+							// replace material
+
+							materials[ i ] = lineMaterial;
+
+						}
+
+					}
+
+				}
+
 				// regard skinning
 
 				const skinning = ( geometry.data.attributes.skinIndex !== undefined );
@@ -3907,7 +4018,7 @@ class ColladaLoader extends Loader {
 		// metadata
 
 		const version = collada.getAttribute( 'version' );
-		console.log( 'THREE.ColladaLoader: File version', version );
+		console.debug( 'THREE.ColladaLoader: File version', version );
 
 		const asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
 		const textureLoader = new TextureLoader( this.manager );
@@ -3924,6 +4035,7 @@ class ColladaLoader extends Loader {
 
 		//
 
+		const tempColor = new Color();
 		const animations = [];
 		let kinematics = {};
 		let count = 0;
@@ -3981,7 +4093,8 @@ class ColladaLoader extends Loader {
 
 		if ( asset.upAxis === 'Z_UP' ) {
 
-			scene.quaternion.setFromEuler( new Euler( - Math.PI / 2, 0, 0 ) );
+			console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
+			scene.rotation.set( - Math.PI / 2, 0, 0 );
 
 		}
 

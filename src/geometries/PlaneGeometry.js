@@ -6,6 +6,7 @@ class PlaneGeometry extends BufferGeometry {
 	constructor( width = 1, height = 1, widthSegments = 1, heightSegments = 1 ) {
 
 		super();
+
 		this.type = 'PlaneGeometry';
 
 		this.parameters = {
@@ -76,6 +77,16 @@ class PlaneGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	static fromJSON( data ) {
 
 		return new PlaneGeometry( data.width, data.height, data.widthSegments, data.heightSegments );
@@ -84,4 +95,4 @@ class PlaneGeometry extends BufferGeometry {
 
 }
 
-export { PlaneGeometry, PlaneGeometry as PlaneBufferGeometry };
+export { PlaneGeometry };

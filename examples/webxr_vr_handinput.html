@@ -13,13 +13,28 @@
 			(Oculus Browser 15.1+)
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { VRButton } from './jsm/webxr/VRButton.js';
-			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
-			import { XRHandModelFactory } from './jsm/webxr/XRHandModelFactory.js';
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
+			import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+			import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let container;
 			let camera, scene, renderer;
@@ -71,7 +86,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 

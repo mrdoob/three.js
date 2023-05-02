@@ -79,7 +79,6 @@ class BoxHelper extends LineSegments {
 
 		this.geometry.computeBoundingSphere();
 
-
 	}
 
 	setFromObject( object ) {
@@ -91,13 +90,20 @@ class BoxHelper extends LineSegments {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		LineSegments.prototype.copy.call( this, source );
+		super.copy( source, recursive );
 
 		this.object = source.object;
 
 		return this;
+
+	}
+
+	dispose() {
+
+		this.geometry.dispose();
+		this.material.dispose();
 
 	}
 

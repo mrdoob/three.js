@@ -6,6 +6,10 @@ import { PropertyMixer } from './PropertyMixer.js';
 import { AnimationClip } from './AnimationClip.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
+
+const _controlInterpolantsResultBuffer = new Float32Array( 1 );
+
+
 class AnimationMixer extends EventDispatcher {
 
 	constructor( root ) {
@@ -48,6 +52,7 @@ class AnimationMixer extends EventDispatcher {
 
 			if ( binding !== undefined ) {
 
+				++ binding.referenceCount;
 				bindings[ i ] = binding;
 
 			} else {
@@ -477,7 +482,7 @@ class AnimationMixer extends EventDispatcher {
 
 			interpolant = new LinearInterpolant(
 				new Float32Array( 2 ), new Float32Array( 2 ),
-				1, this._controlInterpolantsResultBuffer );
+				1, _controlInterpolantsResultBuffer );
 
 			interpolant.__cacheIndex = lastActiveIndex;
 			interpolants[ lastActiveIndex ] = interpolant;
@@ -761,7 +766,5 @@ class AnimationMixer extends EventDispatcher {
 	}
 
 }
-
-AnimationMixer.prototype._controlInterpolantsResultBuffer = new Float32Array( 1 );
 
 export { AnimationMixer };

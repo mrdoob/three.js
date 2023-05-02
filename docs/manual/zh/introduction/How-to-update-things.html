@@ -27,7 +27,7 @@ scene.add( object1 ); //object1 和 object2 会自动更新它们的矩阵
 		<p>但是，如果你知道对象将是静态的，则可以禁用此选项并在需要时手动更新转换矩阵。</p>
 
 		<code>
-object.matrixAutoUpdate  = false;
+object.matrixAutoUpdate = false;
 object.updateMatrix();
 		</code>
 
@@ -69,27 +69,24 @@ geometry.setDrawRange( 0, drawCount );
 const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-const line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry, material );
 scene.add( line );
 			</code>
 		 	<p>
 				然后我们随机增加顶点到line中，以这样的一种方式：
 			</p>
 			<code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+	positionAttribute.setXYZ( i, x, y, z );
 
-    x += ( Math.random() - 0.5 ) * 30;
-    y += ( Math.random() - 0.5 ) * 30;
-    z += ( Math.random() - 0.5 ) * 30;
+	x += ( Math.random() - 0.5 ) * 30;
+	y += ( Math.random() - 0.5 ) * 30;
+	z += ( Math.random() - 0.5 ) * 30;
 
 }
 			</code>
@@ -103,11 +100,11 @@ line.geometry.setDrawRange( 0, newValue );
 				如果要在第一次渲染后更改position数值，则需要像这样设置needsUpdate标志：
 			</p>
 			<code>
-line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次渲染之后
+positionAttribute.needsUpdate = true; // 需要加在第一次渲染之后
 			</code>
 
 			<p>
-				<a href="https://jsfiddle.net/xvnctbL0/2/">这个fiddle</a>展示了一个你可以参考的运动的line。
+				[link:https://jsfiddle.net/t4m85pLr/1/ 这个fiddle]展示了一个你可以参考的运动的line。
 			</p>
 
 			<h3>例子</h3>
@@ -135,6 +132,7 @@ line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次�
 						<li>morphing</li>
 						<li>shadow map</li>
 						<li>alpha test</li>
+						<li>transparent</li>
 					</ul>
 				</li>
 			</ul>

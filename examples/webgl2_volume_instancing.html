@@ -12,16 +12,29 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl2 - volume - instancing
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
-			import * as THREE from '../build/three.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { VOXLoader, VOXDataTexture3D } from './jsm/loaders/VOXLoader.js';
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { VOXLoader, VOXData3DTexture } from 'three/addons/loaders/VOXLoader.js';
 
-			import { WEBGL } from './jsm/WebGL.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
 
-			if ( WEBGL.isWebGL2Available() === false ) {
+			if ( WebGL.isWebGL2Available() === false ) {
 
-				document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
+				document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
 
 			}
 
@@ -159,10 +172,10 @@
 					}
 				`;
 
-				var loader = new VOXLoader();
+				const loader = new VOXLoader();
 				loader.load( 'models/vox/menger.vox', function ( chunks ) {
 
-					for ( var i = 0; i < chunks.length; i ++ ) {
+					for ( let i = 0; i < chunks.length; i ++ ) {
 
 						const chunk = chunks[ i ];
 
@@ -170,7 +183,7 @@
 						const material = new THREE.RawShaderMaterial( {
 							glslVersion: THREE.GLSL3,
 							uniforms: {
-								map: { value: new VOXDataTexture3D( chunk ) },
+								map: { value: new VOXData3DTexture( chunk ) },
 								cameraPos: { value: new THREE.Vector3() }
 							},
 							vertexShader,

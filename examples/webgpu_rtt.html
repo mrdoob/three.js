@@ -6,28 +6,31 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - RTT<br/>(Chrome Canary with flag: --enable-unsafe-webgpu)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - RTT
 		</div>
 
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
 		<script type="importmap">
-		{
-			"imports": {
-				"three": "../build/three.module.js"
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
 			}
-		}
 		</script>
+
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { texture, uniform, vec2, MeshBasicNodeMaterial } from 'three/nodes';
 
-			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
-			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
-			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
-
-			import TextureNode from './jsm/renderers/nodes/inputs/TextureNode.js';
-			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
-			import Vector2Node from './jsm/renderers/nodes/inputs/Vector2Node.js';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import WebGPUTextureRenderer from 'three/addons/renderers/webgpu/WebGPUTextureRenderer.js';
 
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
@@ -38,15 +41,15 @@
 
 			const dpr = window.devicePixelRatio;
 
-			init().then( animate ).catch( error );
+			init();
 
-			async function init() {
+			function init() {
 
 				if ( WebGPU.isAvailable() === false ) {
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw 'No WebGPU support';
+					throw new Error( 'No WebGPU support' );
 
 				}
 
@@ -59,11 +62,11 @@
 				// textured mesh
 
 				const loader = new THREE.TextureLoader();
-				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
+				const uvTexture = loader.load( './textures/uv_grid_opengl.jpg' );
 
 				const geometryBox = new THREE.BoxGeometry();
-				const materialBox = new THREE.MeshBasicMaterial();
-				materialBox.colorNode = new TextureNode( texture );
+				const materialBox = new MeshBasicNodeMaterial();
+				materialBox.colorNode = texture( uvTexture );
 
 				//
 
@@ -75,6 +78,7 @@
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				textureRenderer = new WebGPUTextureRenderer( renderer );
@@ -92,17 +96,13 @@
 
 				// modulate the final color based on the mouse position
 
-				const screenFXNode = new OperatorNode( '+', new Vector2Node( mouse ), new Vector2Node( new THREE.Vector2( 0.5, 0.5 ) ).setConst( true ) );
+				const screenFXNode = uniform( mouse ).add( vec2( 0.5, 0.5 ) );
 
-				const materialFX = new THREE.MeshBasicMaterial();
-				materialFX.colorNode = new OperatorNode( '*', new TextureNode( textureRenderer.getTexture() ), screenFXNode );
+				const materialFX = new MeshBasicNodeMaterial();
+				materialFX.colorNode = texture( textureRenderer.getTexture() ).mul( screenFXNode );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
-
-				//
-
-				return renderer.init();
 
 			}
 
@@ -125,19 +125,11 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;
 
 				textureRenderer.render( scene, camera );
 				renderer.render( sceneFX, cameraFX );
-
-			}
-
-			function error( error ) {
-
-				console.error( error );
 
 			}
 

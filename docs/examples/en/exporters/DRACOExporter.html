@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			An exporter to compress geometry with the Draco library. <br /><br />
+			[link:https://google.github.io/draco/ Draco] is an open source library for compressing and
+			decompressing 3D meshes and point clouds. Compressed geometry can be significantly smaller,
+			at the cost of additional decoding time on the client device.
+		</p>
+
+		<p>
+			Standalone Draco files have a `.drc` extension, and contain vertex positions,
+			normals, colors, and other attributes. Draco files *do not* contain materials,
+			textures, animation, or node hierarchies – to use these features, embed Draco geometry
+			inside of a glTF file. A normal glTF file can be converted to a Draco-compressed glTF file
+			using [link:https://github.com/AnalyticalGraphicsInc/gltf-pipeline glTF-Pipeline].
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { DRACOExporter } from 'three/addons/exporters/DRACOExporter.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+		// Instantiate a exporter
+		const exporter = new DRACOExporter();
+
+		// Parse the input and generate the DRACO encoded output
+		const binaryData = exporter.parse( mesh, options );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:misc_exporter_draco]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Int8Array parse]( [param:Mesh object] | [param:Points object], [param:Object options] )</h3>
+
+		<p>
+		[page:Mesh object] | [page:Points object] — Mesh or Points to encode.<br />
+		[page:Options options] — Optional export options<br />
+		<ul>
+			<li>decodeSpeed - int. Indicates how to tune the encoder regarding decode speed (0 gives better speed but worst quality). Default is 5</li>
+			<li>encodeSpeed - int. Indicates how to tune the encoder parameters (0 gives better speed but worst quality). Default is 5.</li>
+			<li>encoderMethod - int. Either sequential (very little compression) or Edgebreaker. Edgebreaker traverses the triangles of the mesh in a deterministic, spiral-like way which provides most of the benefits of this data format. Default is DRACOExporter.MESH_EDGEBREAKER_ENCODING.</li>
+			<li>quantization - Array of int. Indicates the presision of each type of data stored in the draco file in the order (POSITION, NORMAL, COLOR, TEX_COORD, GENERIC). Default is [ 16, 8, 8, 8, 8 ]</li>
+			<li>exportUvs - bool. Default is true.</li>
+			<li>exportNormals - bool. Default is true.</li>
+			<li>exportColor - bool. Default is false.</li>
+		</ul>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/DRACOExporter.js examples/jsm/exporters/DRACOExporter.js]
+		</p>
+	</body>
+</html>

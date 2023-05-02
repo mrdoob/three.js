@@ -32,25 +32,31 @@ class AudioLoader extends Loader {
 
 					onLoad( audioBuffer );
 
-				} );
+				}, handleError );
 
 			} catch ( e ) {
 
-				if ( onError ) {
-
-					onError( e );
-
-				} else {
-
-					console.error( e );
-
-				}
-
-				scope.manager.itemError( url );
+				handleError( e );
 
 			}
 
 		}, onProgress, onError );
+
+		function handleError( e ) {
+
+			if ( onError ) {
+
+				onError( e );
+
+			} else {
+
+				console.error( e );
+
+			}
+
+			scope.manager.itemError( url );
+
+		}
 
 	}
 

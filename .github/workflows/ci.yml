@@ -12,78 +12,91 @@ on:
       - 'docs/**'
       - 'files/**'
 
-jobs:
+permissions:
+  contents: read
 
+jobs:
   lint:
-    name: "Linting"
+    name: Lint testing
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
-      - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 12
-      - name: Install packages
+          node-version: 18
+          cache: 'npm'
+      - name: Install dependencies
         run: npm ci
 
-      - name: === Linting ===
+      - name: === Lint testing ===
         run: npm run lint
 
   unit:
-    name: "Unit testing"
+    name: Unit testing
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
-      - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 12
-      - name: Install packages
-        run: npm ci && npm ci --prefix test
-      - name: Build
-        run: npm run build
+          node-version: 18
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
 
       - name: === Unit testing ===
         run: npm run test-unit
 
   e2e:
-    name: "E2E testing"
-    runs-on: ubuntu-latest
+    name: E2E testing
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
         CI: [ 0, 1, 2, 3 ]
     env:
       CI: ${{ matrix.CI }}
-      FORCE_COLOR: 1
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
-      - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 12
-      - name: Install packages
-        run: npm ci && npm ci --prefix test && sudo apt-get install xvfb
+          node-version: 18
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
       - name: Build
         run: npm run build
 
       - name: === E2E testing ===
-        run: xvfb-run --auto-servernum npm run test-e2e
+        run: npm run test-e2e
+      - name: Upload output screenshots
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: Output screenshots
+          path: test/e2e/output-screenshots
+          if-no-files-found: ignore
 
   e2e-cov:
-    name: "Ready for release"
+    name: Examples ready for release
     runs-on: ubuntu-latest
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
-      - name: Install node
-        uses: actions/setup-node@v1
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 12
-      - name: Install packages
+          node-version: 18
+          cache: 'npm'
+      - name: Install dependencies
         run: npm ci
 
-      - name: === Ready for release ===
+      - name: === Examples ready for release ===
         run: npm run test-e2e-cov

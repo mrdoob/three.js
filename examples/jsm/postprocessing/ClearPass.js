@@ -1,7 +1,7 @@
 import {
 	Color
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass } from './Pass.js';
 
 class ClearPass extends Pass {
 

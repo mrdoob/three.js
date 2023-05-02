@@ -3,14 +3,16 @@ import {
 	ClampToEdgeWrapping,
 	DataTexture,
 	FloatType,
+	LinearSRGBColorSpace,
 	Mesh,
 	NearestFilter,
+	NoToneMapping,
 	PlaneGeometry,
 	RGBAFormat,
 	Scene,
 	ShaderMaterial,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
+} from 'three';
 
 /**
  * GPUComputationRenderer, based on SimulationRenderer by zz85
@@ -288,6 +290,32 @@ class GPUComputationRenderer {
 
 		};
 
+		this.dispose = function () {
+
+			mesh.geometry.dispose();
+			mesh.material.dispose();
+
+			const variables = this.variables;
+
+			for ( let i = 0; i < variables.length; i ++ ) {
+
+				const variable = variables[ i ];
+
+				if ( variable.initialValueTexture ) variable.initialValueTexture.dispose();
+
+				const renderTargets = variable.renderTargets;
+
+				for ( let j = 0; j < renderTargets.length; j ++ ) {
+
+					const renderTarget = renderTargets[ j ];
+					renderTarget.dispose();
+
+				}
+
+			}
+
+		};
+
 		function addResolutionDefine( materialShader ) {
 
 			materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + ' )';
@@ -345,7 +373,9 @@ class GPUComputationRenderer {
 		this.createTexture = function () {
 
 			const data = new Float32Array( sizeX * sizeY * 4 );
-			return new DataTexture( data, sizeX, sizeY, RGBAFormat, FloatType );
+			const texture = new DataTexture( data, sizeX, sizeY, RGBAFormat, FloatType );
+			texture.needsUpdate = true;
+			return texture;
 
 		};
 
@@ -367,10 +397,25 @@ class GPUComputationRenderer {
 
 			const currentRenderTarget = renderer.getRenderTarget();
 
+			const currentXrEnabled = renderer.xr.enabled;
+			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+			const currentOutputColorSpace = renderer.outputColorSpace;
+			const currentToneMapping = renderer.toneMapping;
+
+			renderer.xr.enabled = false; // Avoid camera modification
+			renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+			renderer.outputColorSpace = LinearSRGBColorSpace;
+			renderer.toneMapping = NoToneMapping;
+
 			mesh.material = material;
 			renderer.setRenderTarget( output );
 			renderer.render( scene, camera );
 			mesh.material = passThruShader;
+
+			renderer.xr.enabled = currentXrEnabled;
+			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+			renderer.outputColorSpace = currentOutputColorSpace;
+			renderer.toneMapping = currentToneMapping;
 
 			renderer.setRenderTarget( currentRenderTarget );
 

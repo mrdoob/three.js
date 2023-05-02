@@ -17,6 +17,8 @@ class Points extends Object3D {
 
 		super();
 
+		this.isPoints = true;
+
 		this.type = 'Points';
 
 		this.geometry = geometry;
@@ -26,9 +28,9 @@ class Points extends Object3D {
 
 	}
 
-	copy( source ) {
+	copy( source, recursive ) {
 
-		super.copy( source );
+		super.copy( source, recursive );
 
 		this.material = source.material;
 		this.geometry = source.geometry;
@@ -62,45 +64,37 @@ class Points extends Object3D {
 		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
 		const localThresholdSq = localThreshold * localThreshold;
 
-		if ( geometry.isBufferGeometry ) {
+		const index = geometry.index;
+		const attributes = geometry.attributes;
+		const positionAttribute = attributes.position;
 
-			const index = geometry.index;
-			const attributes = geometry.attributes;
-			const positionAttribute = attributes.position;
+		if ( index !== null ) {
 
-			if ( index !== null ) {
+			const start = Math.max( 0, drawRange.start );
+			const end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
 
-				const start = Math.max( 0, drawRange.start );
-				const end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
+			for ( let i = start, il = end; i < il; i ++ ) {
 
-				for ( let i = start, il = end; i < il; i ++ ) {
+				const a = index.getX( i );
 
-					const a = index.getX( i );
+				_position.fromBufferAttribute( positionAttribute, a );
 
-					_position.fromBufferAttribute( positionAttribute, a );
-
-					testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
-
-				}
-
-			} else {
-
-				const start = Math.max( 0, drawRange.start );
-				const end = Math.min( positionAttribute.count, ( drawRange.start + drawRange.count ) );
-
-				for ( let i = start, l = end; i < l; i ++ ) {
-
-					_position.fromBufferAttribute( positionAttribute, i );
-
-					testPoint( _position, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
-
-				}
+				testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
 			}
 
 		} else {
 
-			console.error( 'THREE.Points.raycast() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.' );
+			const start = Math.max( 0, drawRange.start );
+			const end = Math.min( positionAttribute.count, ( drawRange.start + drawRange.count ) );
+
+			for ( let i = start, l = end; i < l; i ++ ) {
+
+				_position.fromBufferAttribute( positionAttribute, i );
+
+				testPoint( _position, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
+
+			}
 
 		}
 
@@ -110,40 +104,26 @@ class Points extends Object3D {
 
 		const geometry = this.geometry;
 
-		if ( geometry.isBufferGeometry ) {
+		const morphAttributes = geometry.morphAttributes;
+		const keys = Object.keys( morphAttributes );
 
-			const morphAttributes = geometry.morphAttributes;
-			const keys = Object.keys( morphAttributes );
+		if ( keys.length > 0 ) {
 
-			if ( keys.length > 0 ) {
+			const morphAttribute = morphAttributes[ keys[ 0 ] ];
 
-				const morphAttribute = morphAttributes[ keys[ 0 ] ];
+			if ( morphAttribute !== undefined ) {
 
-				if ( morphAttribute !== undefined ) {
+				this.morphTargetInfluences = [];
+				this.morphTargetDictionary = {};
 
-					this.morphTargetInfluences = [];
-					this.morphTargetDictionary = {};
+				for ( let m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
 
-					for ( let m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+					const name = morphAttribute[ m ].name || String( m );
 
-						const name = morphAttribute[ m ].name || String( m );
-
-						this.morphTargetInfluences.push( 0 );
-						this.morphTargetDictionary[ name ] = m;
-
-					}
+					this.morphTargetInfluences.push( 0 );
+					this.morphTargetDictionary[ name ] = m;
 
 				}
-
-			}
-
-		} else {
-
-			const morphTargets = geometry.morphTargets;
-
-			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
-
-				console.error( 'THREE.Points.updateMorphTargets() does not support THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 			}
 
@@ -152,8 +132,6 @@ class Points extends Object3D {
 	}
 
 }
-
-Points.prototype.isPoints = true;
 
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 

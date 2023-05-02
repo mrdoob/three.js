@@ -1,39 +1,26 @@
-
 ( function () {
 
+	/* Remove start screen (or press some button ) */
 
-	/* Remove start screen ( or press some button ) */
+	const button = document.getElementById( 'startButton' );
+	if ( button ) button.click();
 
-	let button = document.getElementById( 'startButton' );
-	if ( button ) {
+	/* Remove gui and fonts */
 
-		button.click();
-
-	}
-
-
-	/* Remove dat.gui and fonts */
-
-	let style = document.createElement( 'style' );
+	const style = document.createElement( 'style' );
 	style.type = 'text/css';
-	style.innerHTML = `body { font size: 0 !important; }
-      #info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
-	let head = document.getElementsByTagName( 'head' );
-	if ( head.length > 0 ) {
+	style.innerHTML = '#info, button, input, body > div.lil-gui, body > div.lbl { display: none !important; }';
 
-		head[ 0 ].appendChild( style );
+	document.querySelector( 'head' ).appendChild( style );
 
-	}
+	/* Remove Stats.js */
 
+	for ( const element of document.querySelectorAll( 'div' ) ) {
 
-	/* Remove stats.js */
+		if ( getComputedStyle( element ).zIndex === '10000' ) {
 
-	let canvas = document.getElementsByTagName( 'canvas' );
-	for ( let i = 0; i < canvas.length; ++ i ) {
-
-		if ( canvas[ i ].height === 48 ) {
-
-			canvas[ i ].style.display = 'none';
+			element.remove();
+			break;
 
 		}
 

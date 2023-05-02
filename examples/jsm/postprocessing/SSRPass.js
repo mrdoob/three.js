@@ -9,14 +9,13 @@ import {
 	MeshBasicMaterial,
 	NearestFilter,
 	NoBlending,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	UnsignedShortType,
 	WebGLRenderTarget,
 	HalfFloatType,
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { SSRShader } from '../shaders/SSRShader.js';
 import { SSRBlurShader } from '../shaders/SSRShader.js';
 import { SSRDepthShader } from '../shaders/SSRShader.js';
@@ -24,7 +23,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSRPass extends Pass {
 
-	constructor( { renderer, scene, camera, width, height, selects, encoding, bouncing = false, groundReflector } ) {
+	constructor( { renderer, scene, camera, width, height, selects, bouncing = false, groundReflector } ) {
 
 		super();
 
@@ -43,8 +42,6 @@ class SSRPass extends Pass {
 
 		this.maxDistance = SSRShader.uniforms.maxDistance.value;
 		this.thickness = SSRShader.uniforms.thickness.value;
-
-		this.encoding = encoding;
 
 		this.tempColor = new Color();
 
@@ -165,7 +162,6 @@ class SSRPass extends Pass {
 		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
-			format: RGBAFormat,
 			depthTexture: depthTexture,
 			depthBuffer: true
 		} );
@@ -173,8 +169,7 @@ class SSRPass extends Pass {
 		//for bouncing
 		this.prevRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat,
+			magFilter: NearestFilter
 		} );
 
 		// normal render target
@@ -182,7 +177,6 @@ class SSRPass extends Pass {
 		this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
 			magFilter: NearestFilter,
-			format: RGBAFormat,
 			type: HalfFloatType,
 		} );
 
@@ -190,8 +184,7 @@ class SSRPass extends Pass {
 
 		this.metalnessRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat
+			magFilter: NearestFilter
 		} );
 
 
@@ -200,8 +193,7 @@ class SSRPass extends Pass {
 
 		this.ssrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 			minFilter: NearestFilter,
-			magFilter: NearestFilter,
-			format: RGBAFormat
+			magFilter: NearestFilter
 		} );
 
 		this.blurRenderTarget = this.ssrRenderTarget.clone();
@@ -209,12 +201,6 @@ class SSRPass extends Pass {
 		// this.blurRenderTarget3 = this.ssrRenderTarget.clone();
 
 		// ssr material
-
-		if ( SSRShader === undefined ) {
-
-			console.error( 'THREE.SSRPass: The pass relies on SSRShader.' );
-
-		}
 
 		this.ssrMaterial = new ShaderMaterial( {
 			defines: Object.assign( {}, SSRShader.defines, {
@@ -359,7 +345,6 @@ class SSRPass extends Pass {
 
 		// render beauty and depth
 
-		if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 		if ( this.groundReflector ) {

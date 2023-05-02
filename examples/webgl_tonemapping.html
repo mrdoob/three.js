@@ -12,24 +12,38 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Tone Mapping<br />
 			Battle Damaged Sci-fi Helmet by
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://hdrihaven.com/hdri/?h=venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			let mesh, renderer, scene, camera, controls;
 			let gui, guiExposure = null;
 
 			const params = {
 				exposure: 1.0,
-				toneMapping: 'ACESFilmic'
+				toneMapping: 'ACESFilmic',
+				blurriness: 0.3
 			};
 
 			const toneMappingOptions = {
@@ -57,7 +71,6 @@
 				renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// Set CustomToneMapping to Uncharted2
 				// source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
@@ -73,6 +86,7 @@
 				);
 
 				scene = new THREE.Scene();
+				scene.backgroundBlurriness = params.blurriness;
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( - 1.8, 0.6, 2.7 );
@@ -103,16 +117,8 @@
 
 				// model
 
-				gltf.scene.traverse( function ( child ) {
-
-					if ( child.isMesh ) {
-
-						mesh = child;
-						scene.add( mesh );
-
-					}
-
-				} );
+				mesh = gltf.scene.getObjectByName( 'node_damagedHelmet_-6514' );
+				scene.add( mesh );
 
 				render();
 
@@ -127,7 +133,15 @@
 						updateGUI();
 
 						renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-						mesh.material.needsUpdate = true;
+						render();
+
+					} );
+
+				gui.add( params, 'blurriness', 0, 1 )
+
+					.onChange( function ( value ) {
+
+						scene.backgroundBlurriness = value;
 						render();
 
 					} );
@@ -142,7 +156,7 @@
 
 				if ( guiExposure !== null ) {
 
-					gui.remove( guiExposure );
+					guiExposure.destroy();
 					guiExposure = null;
 
 				}

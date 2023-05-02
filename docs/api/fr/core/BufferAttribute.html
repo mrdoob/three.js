@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		Cette classe stocke les données d'un attribut (telles que les positions des sommets, les indices de face, les normales,
+		couleurs, UV et tout attribut personnalisé) associé à une [page:BufferGeometry], qui permet
+		une transmission plus efficace des données au GPU. Voir cette page pour plus de détails et un exemple d'utilisation.
+		Lorsque vous travaillez avec des données de type vecteur, les méthodes d'assistance <i>.fromBufferAttribute( attribute, index )</i>
+		des classes [page:Vector2.fromBufferAttribute Vector2],
+		[page:Vector3.fromBufferAttribute Vector3],
+		[page:Vector4.fromBufferAttribute Vector4], et
+		[page:Color.fromBufferAttribute Color] peuvent être utiles.
+		</p>
+
+		<h2>Constructeur</h2>
+		<h3>[name]( [param:TypedArray array], [param:Integer itemSize], [param:Boolean normalized] )</h3>
+		<p>
+		[page:TypedArray array] -- Doit être un [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/TypedArray TypedArray].
+		Utilisé pour instancier un tampon (buffer). <br />
+		Ce tableau devrait avoir
+	 	<code>itemSize * numVertices</code>
+		éléments, où numVertices est le nombre de sommets dans le [page:BufferGeometry BufferGeometry].<br /><br />
+		[page:Integer itemSize] -- Le nombre de valeurs du tableau qui doivent être associées à
+		un sommet particulier. Par exemple, si l'attribut stocke un vecteur à 3 composants (tel qu'une position, une normale ou une couleur), alors itemSize doit être 3.
+		<br /><br />
+
+		[page:Boolean normalized] -- (optionnel) S'applique uniquement aux données entières. Indique comment les données sous-jacentes
+		dans le tampon correspond aux valeurs du code GLSL. Par exemple, si [page:TypedArray array] est une instance de
+		UInt16Array, et [page:Boolean normalized] est `true`, les valeurs `0 - +65535` dans le tableau
+		de données seront mappées à 0.0f - +1.0f dans l'attribut GLSL. Un Int16Array (signé) mapperait
+		de -32768 - +32767 à -1.0f - +1.0f. Si [page:Boolean normalized]  est faux, les valeurs
+		sera converti en flottants non modifiés, c'est-à-dire que 32767 devient 32767.0f.
+		</p>
+
+		<h2>Propriétés</h2>
+
+		<h3>[property:TypedArray array]</h3>
+		<p>
+		Le tableau [page:TypedArray array] contenant les données stockées dans le tampon.
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+		Stocke la longueur du tableau [page:BufferAttribute.array array] divisée par [page:BufferAttribute.itemSize itemSize].<br /><br />
+
+		Si le tampon stocke un vecteur à 3 composants (tel qu'une position, une normale ou une couleur),
+		cela comptera alors le nombre de ces vecteurs stockés.
+		</p>
+
+		<h3>[property:Boolean isBufferAttribute]</h3>
+		<p>
+		Booléen en lecture seule pour vérifier si un objet donné est de type[name].
+		</p>
+
+		<h3>[property:Integer itemSize]</h3>
+		<p>La longueur des vecteurs qui sont stockés dans le [page:BufferAttribute.array array].</p>
+
+		<h3>[property:String name]</h3>
+		<p>
+		Nom optionnel pour cette instance d'attribut. La valeur par défaut est une chaîne vide.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+		Booléen indiquant que cet attribut a changé et doit être renvoyé au GPU.
+		Définissez-le sur true lorsque vous modifiez la valeur du tableau.<br /><br />
+
+		Le définir sur 'true' revient à incrémenter la [page:BufferAttribute.version version].
+		</p>
+
+		<h3>[property:Boolean normalized]</h3>
+		<p>
+		Indique comment les données sous-jacentes dans la mémoire tampon sont mappées aux valeurs du code de nuanceur GLSL.
+		Voir le constructeur ci-dessus pour plus de détails.
+		</p>
+
+		<h3>[property:Function onUploadCallback]</h3>
+		<p>
+		Une fonction de rappel qui est exécutée après que le Renderer a transféré les données du tableau d'attributs au GPU.
+		</p>
+
+		<h3>[property:Object updateRange]</h3>
+		<p>Object contenant:<br />
+			[page:Integer offset]: La valeur par défaut est `0`. Position à laquelle commencer la mise à jour.<br />
+			[page:Integer count]: La valeur par défaut est `-1`, ce qui signifie ne pas utiliser les plages de mise à jour. <br /><br />
+
+			Cela peut être utilisé pour mettre à jour uniquement certains composants de vecteurs stockés (par exemple, seul le composant
+			lié à la couleur).
+		</p>
+
+		<h3>[property:Usage usage]</h3>
+		<p>
+			Définit le modèle d'utilisation prévu du magasin de données à des fins d'optimisation. Correspond au paramètre `usage` de
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+			La valeur par défaut est [page:BufferAttributeUsage StaticDrawUsage]. Voir les [page:BufferAttributeUsage constants] d'utilisation pour toutes les valeurs possibles. <br /><br />
+			
+			Remarque : Après la première utilisation d'un tampon, son utilisation ne peut pas être modifiée. Au lieu de cela, instanciez-en un nouveau et définissez l'utilisation souhaitée avant le prochain rendu.
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>Un numéro de version incrémenté à chaque fois que la propriété [page:BufferAttribute.needsUpdate needsUpdate] est définie sur `true`.</p>
+
+		<h2>Méthodes</h2>
+
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>Applique la matrice [page:Matrix3 m] à chaque élément Vector3 de ce BufferAttribute.</p>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
+		<p>Applique la matrice [page:Matrix4 m] à chaque élément Vector3 de ce BufferAttribute.</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Applique la matrice de normales [page:Matrix3 m] à chaque élément Vector3 de ce BufferAttribute.</p>
+
+		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
+		<p>Applique la matrice [page:Matrix4 m] à chaque élément Vector3 de ce BufferAttribute, en interprétant les éléments comme des vecteurs directionnels.</p>
+
+		<h3>[method:BufferAttribute clone]() </h3>
+		<p>Renvoie une copie de ce bufferAttribute.</p>
+
+		<h3>[method:this copy]( [param:BufferAttribute bufferAttribute] )</h3>
+		<p>Copie un autre BufferAttribute à ce BufferAttribute.</p>
+
+		<h3>[method:this copyArray]( array ) </h3>
+		<p>Copie le tableau donné ici (qui peut être un tableau classique ou un TypedArray) vers un
+			[page:BufferAttribute.array array].<br /><br />
+
+			Consulter [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]
+			pour lire les exigences en cas de copie d'un TypedArray.
+		</p>
+
+		<h3>[method:this copyAt] ( [param:Integer index1], [param:BufferAttribute bufferAttribute], [param:Integer index2] ) </h3>
+		<p>Copie un vecteur de bufferAttribute[index2] à [page:BufferAttribute.array array][index1].</p>
+
+		<h3>[method:Number getX]( [param:Integer index] ) </h3>
+		<p>Renvoie le composant x d'un vecteur à l'index donné.</p>
+
+		<h3>[method:Number getY]( [param:Integer index] ) </h3>
+		<p>Renvoie le composant y d'un vecteur à l'index donné.</p>
+
+		<h3>[method:Number getZ]( [param:Integer index] ) </h3>
+		<p>Renvoie le composant z d'un vecteur à l'index donné.</p>
+
+		<h3>[method:Number getW]( [param:Integer index] ) </h3>
+		<p>Renvoie le composant w d'un vecteur à l'index donné.</p>
+
+		<h3>[method:this onUpload]( [param:Function callback] ) </h3>
+		<p>
+		Définit la valeur d'une propriété onUploadCallback.<br /><br />
+
+		Dans l'exemple [example:webgl_buffergeometry WebGL / Buffergeometry] ceci est utilisé pour libérer de la mémoire
+		après le transfert du tampon vers le GPU.
+		</p>
+
+		<h3>[method:this set] ( [param:Array value], [param:Integer offset] ) </h3>
+		<p>
+		value -- un [page:Array] ou [page:TypedArray] depuis lequel copier les valeurs <br />
+		offset -- (optionnel) index du [page:BufferAttribute.array array] depuis lequel commencer la copie.<br /><br />
+
+		Appelle	[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray/set TypedArray.set]( [page:Array value], [page:Integer offset] )
+		sur le [page:BufferAttribute.array array].<br /><br />
+
+		En particulier, consultez cette page pour les exigences relatives à la valeur [page:Array value]
+		en tant que [page:TypedArray].
+		</p>
+
+		<h3>[method:this setUsage] ( [param:Usage value] ) </h3>
+		<p>
+			Définit [page:BufferAttribute.usage usage] sur la valeur. Voir les [page:BufferAttributeUsage constants] pour toutes les valeurs d'entrée possibles.  <br /><br />
+
+			Remarque : Après la première utilisation d'un tampon, son utilisation ne peut pas être modifiée. Au lieu de cela, instanciez-en un nouveau et définissez l'utilisation souhaitée avant le prochain rendu.
+		</p>
+
+		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
+		<p>Définit la composante x du vecteur à l'indice donné.</p>
+
+		<h3>[method:this setY]( [param:Integer index], [param:Float y] ) </h3>
+		<p>Définit la composante y du vecteur à l'indice donné.</p>
+
+		<h3>[method:this setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<p>Définit la composante z du vecteur à l'indice donné.</p>
+
+		<h3>[method:this setW]( [param:Integer index], [param:Float w] ) </h3>
+		<p>Définit la composante w du vecteur à l'indice donné.</p>
+
+		<h3>[method:this setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<p>Définit les composantes x et y du vecteur à l'indice donné.</p>
+
+		<h3>[method:this setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<p>Définit les composantes x, y et z du vecteur à l'indice donné.</p>
+
+		<h3>[method:this setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<p>Définit les composantes x, y, z et w du vecteur à l'indice donné.</p>
+
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

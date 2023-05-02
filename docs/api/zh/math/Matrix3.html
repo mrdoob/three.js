@@ -123,6 +123,45 @@ zAxis = (c, f, i)
 
 		</p>
 
+		<h3>[method:this makeRotation]( [param:Float theta] )</h3>
+		<p>
+		[page:Float theta] — Rotation angle in radians. Positive values rotate counterclockwise.<br /><br />
+
+		Sets this matrix as a 2D rotational transformation by [page:Float theta] radians.
+		The resulting matrix will be:
+		<code>
+cos(&theta;) -sin(&theta;) 0
+sin(&theta;) cos(&theta;)  0
+0      0       1
+		</code>
+		</p>
+
+		<h3>[method:this makeScale]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Float x] - the amount to scale in the X axis.<br />
+		[page:Float y] - the amount to scale in the Y axis.<br />
+
+		Sets this matrix as a 2D scale transform:
+		<code>
+x, 0, 0,
+0, y, 0,
+0, 0, 1
+		</code>
+		</p>
+
+		<h3>[method:this makeTranslation]( [param:Float x], [param:Float y] )</h3>
+		<p>
+		[page:Float x] - the amount to translate in the X axis.<br />
+		[page:Float y] - the amount to translate in the Y axis.<br />
+
+		Sets this matrix as a 2D translation transform:
+		<code>
+1, 0, x,
+0, 1, y,
+0, 0, 1
+		</code>
+		</p>
+
 		<h3>[method:this multiply]( [param:Matrix3 m] )</h3>
 		<p>将当前矩阵乘以矩阵[page:Matrix3 m]。</p>
 
@@ -156,7 +195,7 @@ zAxis = (c, f, i)
 		[page:Float ty] - y偏移量<br />
 		[page:Float sx] - x方向的重复比例<br />
 		[page:Float sy] - y方向的重复比例<br />
-		[page:Float rotation] - 旋转（弧度）<br />
+		[page:Float rotation] - 旋转, 弧度。Positive values rotate counterclockwise<br />
 		[page:Float cx] - 旋转中心x<br />
 		[page:Float cy] - 旋转中心y<br /><br />
 

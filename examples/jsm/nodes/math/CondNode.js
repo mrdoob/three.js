@@ -1,27 +1,28 @@
-import { TempNode } from '../core/TempNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { property } from '../core/PropertyNode.js';
+import { context as contextNode } from '../core/ContextNode.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
-class CondNode extends TempNode {
+class CondNode extends Node {
 
-	constructor( a, b, op, ifNode, elseNode ) {
+	constructor( condNode, ifNode, elseNode = null ) {
 
 		super();
 
-		this.a = a;
-		this.b = b;
-
-		this.op = op;
+		this.condNode = condNode;
 
 		this.ifNode = ifNode;
 		this.elseNode = elseNode;
 
 	}
 
-	getType( builder ) {
+	getNodeType( builder ) {
 
-		if ( this.ifNode ) {
+		const ifType = this.ifNode.getNodeType( builder );
 
-			const ifType = this.ifNode.getType( builder );
-			const elseType = this.elseNode.getType( builder );
+		if ( this.elseNode !== null ) {
+
+			const elseType = this.elseNode.getNodeType( builder );
 
 			if ( builder.getTypeLength( elseType ) > builder.getTypeLength( ifType ) ) {
 
@@ -29,101 +30,57 @@ class CondNode extends TempNode {
 
 			}
 
-			return ifType;
-
 		}
 
-		return 'b';
+		return ifType;
 
 	}
 
-	getCondType( builder ) {
+	generate( builder ) {
 
-		if ( builder.getTypeLength( this.b.getType( builder ) ) > builder.getTypeLength( this.a.getType( builder ) ) ) {
+		const type = this.getNodeType( builder );
+		const context = { tempWrite: false };
 
-			return this.b.getType( builder );
+		const { ifNode, elseNode } = this;
 
-		}
+		const needsProperty = ifNode.getNodeType( builder ) !== 'void' || ( elseNode && elseNode.getNodeType( builder ) !== 'void' );
+		const nodeProperty = needsProperty ? property( type ).build( builder ) : '';
 
-		return this.a.getType( builder );
+		const nodeSnippet = contextNode( this.condNode/*, context*/ ).build( builder, 'bool' );
 
-	}
+		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
-	generate( builder, output ) {
+		let ifSnippet = contextNode( this.ifNode, context ).build( builder, type );
 
-		const type = this.getType( builder ),
-			condType = this.getCondType( builder ),
-			a = this.a.build( builder, condType ),
-			b = this.b.build( builder, condType );
+		ifSnippet = needsProperty ? nodeProperty + ' = ' + ifSnippet + ';' : ifSnippet;
 
-		let code;
+		builder.removeFlowTab().addFlowCode( builder.tab + '\t' + ifSnippet + '\n\n' + builder.tab + '}' );
 
-		if ( this.ifNode ) {
+		if ( elseNode !== null ) {
 
-			const ifCode = this.ifNode.build( builder, type ),
-				elseCode = this.elseNode.build( builder, type );
+			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
-			code = '( ' + [ a, this.op, b, '?', ifCode, ':', elseCode ].join( ' ' ) + ' )';
+			let elseSnippet = contextNode( elseNode, context ).build( builder, type );
+			elseSnippet = nodeProperty ? nodeProperty + ' = ' + elseSnippet + ';' : elseSnippet;
+
+			builder.removeFlowTab().addFlowCode( builder.tab + '\t' + elseSnippet + '\n\n' + builder.tab + '}\n\n' );
 
 		} else {
 
-			code = '( ' + a + ' ' + this.op + ' ' + b + ' )';
+			builder.addFlowCode( '\n\n' );
 
 		}
 
-		return builder.format( code, this.getType( builder ), output );
-
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.a = source.a;
-		this.b = source.b;
-
-		this.op = source.op;
-
-		this.ifNode = source.ifNode;
-		this.elseNode = source.elseNode;
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		let data = this.getJSONNode( meta );
-
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			data.a = this.a.toJSON( meta ).uuid;
-			data.b = this.b.toJSON( meta ).uuid;
-
-			data.op = this.op;
-
-			if ( data.ifNode ) data.ifNode = this.ifNode.toJSON( meta ).uuid;
-			if ( data.elseNode ) data.elseNode = this.elseNode.toJSON( meta ).uuid;
-
-		}
-
-		return data;
+		return nodeProperty;
 
 	}
 
 }
 
-CondNode.EQUAL = '==';
-CondNode.NOT_EQUAL = '!=';
-CondNode.GREATER = '>';
-CondNode.GREATER_EQUAL = '>=';
-CondNode.LESS = '<';
-CondNode.LESS_EQUAL = '<=';
-CondNode.AND = '&&';
-CondNode.OR = '||';
+export default CondNode;
 
-CondNode.prototype.nodeType = 'Cond';
+export const cond = nodeProxy( CondNode );
 
-export { CondNode };
+addNodeElement( 'cond', cond );
+
+addNodeClass( CondNode );

@@ -15,15 +15,30 @@
 		t: toggle HUD
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { ShadowMapViewer } from './jsm/utils/ShadowMapViewer.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+			import { ShadowMapViewer } from 'three/addons/utils/ShadowMapViewer.js';
 
 			const SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 1024;
 
@@ -96,7 +111,6 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.autoClear = false;
 
 				//
@@ -184,10 +198,10 @@
 
 				// TEXT
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-					const textGeo = new THREE.TextGeometry( "THREE.JS", {
+					const textGeo = new TextGeometry( 'THREE.JS', {
 
 						font: font,
 
@@ -276,7 +290,7 @@
 
 				const gltfloader = new GLTFLoader();
 
-				gltfloader.load( "models/gltf/Horse.glb", function ( gltf ) {
+				gltfloader.load( 'models/gltf/Horse.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 
@@ -292,7 +306,7 @@
 
 				} );
 
-				gltfloader.load( "models/gltf/Flamingo.glb", function ( gltf ) {
+				gltfloader.load( 'models/gltf/Flamingo.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 					const clip = gltf.animations[ 0 ];
@@ -301,7 +315,7 @@
 
 				} );
 
-				gltfloader.load( "models/gltf/Stork.glb", function ( gltf ) {
+				gltfloader.load( 'models/gltf/Stork.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 					const clip = gltf.animations[ 0 ];
@@ -310,7 +324,7 @@
 
 				} );
 
-				gltfloader.load( "models/gltf/Parrot.glb", function ( gltf ) {
+				gltfloader.load( 'models/gltf/Parrot.glb', function ( gltf ) {
 
 					const mesh = gltf.scene.children[ 0 ];
 					const clip = gltf.animations[ 0 ];

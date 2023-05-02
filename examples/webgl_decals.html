@@ -14,16 +14,29 @@
 			click to shoot
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { DecalGeometry } from './jsm/geometries/DecalGeometry.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
 
 			const container = document.getElementById( 'container' );
 
@@ -42,6 +55,7 @@
 
 			const textureLoader = new THREE.TextureLoader();
 			const decalDiffuse = textureLoader.load( 'textures/decal/decal-diffuse.png' );
+			decalDiffuse.colorSpace = THREE.SRGBColorSpace;
 			const decalNormal = textureLoader.load( 'textures/decal/decal-normal.jpg' );
 
 			const decalMaterial = new THREE.MeshPhongMaterial( {
@@ -75,7 +89,8 @@
 				}
 			};
 
-			window.addEventListener( 'load', init );
+			init();
+			animate();
 
 			function init() {
 
@@ -209,12 +224,14 @@
 				gui.add( params, 'clear' );
 				gui.open();
 
-				onWindowResize();
-				animate();
-
 			}
 
 			function loadLeePerrySmith() {
+
+				const map = textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
+				map.colorSpace = THREE.SRGBColorSpace;
+				const specularMap = textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' );
+				const normalMap = textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
 				const loader = new GLTFLoader();
 
@@ -223,9 +240,9 @@
 					mesh = gltf.scene.children[ 0 ];
 					mesh.material = new THREE.MeshPhongMaterial( {
 						specular: 0x111111,
-						map: textureLoader.load( 'models/gltf/LeePerrySmith/Map-COL.jpg' ),
-						specularMap: textureLoader.load( 'models/gltf/LeePerrySmith/Map-SPEC.jpg' ),
-						normalMap: textureLoader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+						map: map,
+						specularMap: specularMap,
+						normalMap: normalMap,
 						shininess: 25
 					} );
 

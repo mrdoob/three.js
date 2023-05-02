@@ -1,0 +1,131 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Voxel Geometry - Merged</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+
+  const cellSize = 256;
+
+  const fov = 75;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 1000;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(cellSize / 2, 60, cellSize);
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.target.set(cellSize / 2, 60, cellSize / 2);
+  controls.update();
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('lightblue');
+
+  {
+    const color = 0xFFFFFF;
+    const intensity = 1;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
+  }
+
+  const geometries = [];
+  for (let y = 0; y < cellSize; ++y) {
+    for (let z = 0; z < cellSize; ++z) {
+      for (let x = 0; x < cellSize; ++x) {
+        const height = (Math.sin(x / cellSize * Math.PI * 4) + Math.sin(z / cellSize * Math.PI * 6)) * 20 + 60;
+        //if (y < height) {
+        if (height > y && height < y + 1) {
+          const geometry = new THREE.BoxGeometry(1, 1, 1);
+          geometry.applyMatrix4((new THREE.Matrix4()).makeTranslation(x, y, z));
+          geometries.push(geometry);
+        }
+      }
+    }
+  }
+
+  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
+        geometries, false);
+  const material = new THREE.MeshPhongMaterial({color: 'green'});
+  const mesh = new THREE.Mesh(mergedGeometry, material);
+  scene.add(mesh);
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  let renderRequested = false;
+
+  function render() {
+    renderRequested = undefined;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  render();
+
+  function requestRenderIfNotRequested() {
+    if (!renderRequested) {
+      renderRequested = true;
+      requestAnimationFrame(render);
+    }
+  }
+
+  controls.addEventListener('change', requestRenderIfNotRequested);
+  window.addEventListener('resize', requestRenderIfNotRequested);
+}
+
+main();
+</script>
+</html>
+

@@ -1,19 +1,19 @@
 import {
 	Color,
-	LinearFilter,
-	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
 	Plane,
 	Quaternion,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector3,
 	Vector4,
-	WebGLRenderTarget
-} from '../../../build/three.module.js';
+	WebGLRenderTarget,
+	LinearSRGBColorSpace,
+	NoToneMapping,
+	HalfFloatType
+} from 'three';
 
 class Refractor extends Mesh {
 
@@ -21,7 +21,10 @@ class Refractor extends Mesh {
 
 		super( geometry );
 
+		this.isRefractor = true;
+
 		this.type = 'Refractor';
+		this.camera = new PerspectiveCamera();
 
 		const scope = this;
 
@@ -30,10 +33,11 @@ class Refractor extends Mesh {
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
 		const shader = options.shader || Refractor.RefractorShader;
+		const multisample = ( options.multisample !== undefined ) ? options.multisample : 4;
 
 		//
 
-		const virtualCamera = new PerspectiveCamera();
+		const virtualCamera = this.camera;
 		virtualCamera.matrixAutoUpdate = false;
 		virtualCamera.userData.refractor = true;
 
@@ -44,19 +48,7 @@ class Refractor extends Mesh {
 
 		// render target
 
-		const parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBFormat
-		};
-
-		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-			renderTarget.texture.generateMipmaps = false;
-
-		}
+		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, { samples: multisample, type: HalfFloatType } );
 
 		// material
 
@@ -202,9 +194,13 @@ class Refractor extends Mesh {
 			const currentRenderTarget = renderer.getRenderTarget();
 			const currentXrEnabled = renderer.xr.enabled;
 			const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+			const currentOutputColorSpace = renderer.outputColorSpace;
+			const currentToneMapping = renderer.toneMapping;
 
 			renderer.xr.enabled = false; // avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
+			renderer.outputColorSpace = LinearSRGBColorSpace;
+			renderer.toneMapping = NoToneMapping;
 
 			renderer.setRenderTarget( renderTarget );
 			if ( renderer.autoClear === false ) renderer.clear();
@@ -212,6 +208,8 @@ class Refractor extends Mesh {
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+			renderer.outputColorSpace = currentOutputColorSpace;
+			renderer.toneMapping = currentToneMapping;
 			renderer.setRenderTarget( currentRenderTarget );
 
 			// restore viewport
@@ -231,10 +229,6 @@ class Refractor extends Mesh {
 		//
 
 		this.onBeforeRender = function ( renderer, scene, camera ) {
-
-			// Render
-
-			renderTarget.texture.encoding = renderer.outputEncoding;
 
 			// ensure refractors are rendered only once per frame
 
@@ -262,11 +256,16 @@ class Refractor extends Mesh {
 
 		};
 
+		this.dispose = function () {
+
+			renderTarget.dispose();
+			scope.material.dispose();
+
+		};
+
 	}
 
 }
-
-Refractor.prototype.isRefractor = true;
 
 Refractor.RefractorShader = {
 
@@ -322,6 +321,9 @@ Refractor.RefractorShader = {
 
 			vec4 base = texture2DProj( tDiffuse, vUv );
 			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+			#include <tonemapping_fragment>
+			#include <encodings_fragment>
 
 		}`
 

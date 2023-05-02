@@ -3,7 +3,7 @@ import {
 	Matrix4,
 	Raycaster,
 	Vector2
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _pointer = new Vector2();
 const _event = { type: '', data: _pointer };
@@ -27,12 +27,14 @@ class InteractiveGroup extends Group {
 
 			event.stopPropagation();
 
-			_pointer.x = ( event.clientX / element.clientWidth ) * 2 - 1;
-			_pointer.y = - ( event.clientY / element.clientHeight ) * 2 + 1;
+			const rect = renderer.domElement.getBoundingClientRect();
+
+			_pointer.x = ( event.clientX - rect.left ) / rect.width * 2 - 1;
+			_pointer.y = - ( event.clientY - rect.top ) / rect.height * 2 + 1;
 
 			raycaster.setFromCamera( _pointer, camera );
 
-			const intersects = raycaster.intersectObjects( scope.children );
+			const intersects = raycaster.intersectObjects( scope.children, false );
 
 			if ( intersects.length > 0 ) {
 
@@ -77,7 +79,7 @@ class InteractiveGroup extends Group {
 			raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
 			raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
-			const intersections = raycaster.intersectObjects( scope.children );
+			const intersections = raycaster.intersectObjects( scope.children, false );
 
 			if ( intersections.length > 0 ) {
 

@@ -39,21 +39,21 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:null disable]( [param:Integer layer] )</h3>
+		<h3>[method:undefined disable]( [param:Integer layer] )</h3>
 		<p>
 			layer - 一个 0 - 31 的整数。<br /><br />
 
 			删除图层对象与参数指定图层的对应关系。
 		</p>
 
-		<h3>[method:null enable]( [param:Integer layer] )</h3>
+		<h3>[method:undefined enable]( [param:Integer layer] )</h3>
 		<p>
 			layer - 一个 0 - 31 的整数。<br /><br />
 
 			增加图层对象与参数指定图层的对应关系。
 		</p>
 
-		<h3>[method:null set]( [param:Integer layer] )</h3>
+		<h3>[method:undefined set]( [param:Integer layer] )</h3>
 		<p>
 			layer - 一个 0 - 31 的整数。<br /><br />
 
@@ -67,19 +67,26 @@
 			如果传入图层对象与当前对象属于相同的一组图层，则返回 true，否则返回 false。
 		</p>
 
-		<h3>[method:null toggle]( [param:Integer layer] )</h3>
+		<h3>[method:Boolean isEnabled]( [param:Integer layer] )</h3>
+		<p>
+			layer - an integer from 0 to 31.<br /><br />
+
+			Returns true if the given layer is enabled.
+		</p>
+
+		<h3>[method:undefined toggle]( [param:Integer layer] )</h3>
 		<p>
 			layer - 一个 0 - 31 的整数。<br /><br />
 
 			根据参数切换对象所属图层。
 		</p>
 
-		<h3>[method:null enableAll]()</h3>
+		<h3>[method:undefined enableAll]()</h3>
 		<p>
 			Add membership to all layers.
 		</p>
 
- 		<h3>[method:null disableAll]()</h3>
+ 		<h3>[method:undefined disableAll]()</h3>
 		<p>
 			Remove membership from all layers.
 		</p>

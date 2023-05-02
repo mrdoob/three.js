@@ -1,31 +1,50 @@
 /* global QUnit */
 
-import { PropertyBinding } from '../../../../src/animation/PropertyBinding';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
-import { Mesh } from '../../../../src/objects/Mesh';
-import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial';
+import { PropertyBinding } from '../../../../src/animation/PropertyBinding.js';
+
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { MeshBasicMaterial } from '../../../../src/materials/MeshBasicMaterial.js';
 
 export default QUnit.module( 'Animation', () => {
 
 	QUnit.module( 'PropertyBinding', () => {
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const geometry = new BoxGeometry();
+			const material = new MeshBasicMaterial();
+			const mesh = new Mesh( geometry, material );
+			const path = '.material.opacity';
+			const parsedPath = {
+				nodeName: '',
+				objectName: 'material',
+				objectIndex: undefined,
+				propertyName: 'opacity',
+				propertyIndex: undefined
+			  };
+
+			// mesh, path
+			const object = new PropertyBinding( mesh, path );
+			assert.ok( object, 'Can instantiate a PropertyBinding.' );
+
+			// mesh, path, parsedPath
+			const object_all = new PropertyBinding( mesh, path, parsedPath );
+			assert.ok( object_all, 'Can instantiate a PropertyBinding with mesh, path, and parsedPath.' );
 
 		} );
 
-		// STATIC STUFF
-		QUnit.todo( "Composite", ( assert ) => {
+		// STATIC
+		QUnit.todo( 'Composite', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "create", ( assert ) => {
+		QUnit.todo( 'create', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
@@ -65,7 +84,7 @@ export default QUnit.module( 'Animation', () => {
 
 		QUnit.test( 'parseTrackName', ( assert ) => {
 
-			var paths = [
+			const paths = [
 
 				[
 					'.property',
@@ -282,61 +301,61 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "findNode", ( assert ) => {
+		QUnit.todo( 'findNode', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "BindingType", ( assert ) => {
+		QUnit.todo( 'BindingType', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "Versioning", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "GetterByBindingType", ( assert ) => {
+		QUnit.todo( 'Versioning', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "SetterByBindingTypeAndVersioning", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "getValue", ( assert ) => {
+		QUnit.todo( 'GetterByBindingType', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'SetterByBindingTypeAndVersioning', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getValue', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		QUnit.test( 'setValue', ( assert ) => {
 
-			var paths = [
+			const paths = [
 				'.material.opacity',
 				'.material[opacity]'
 			];
 
 			paths.forEach( function ( path ) {
 
-				var originalValue = 0;
-				var expectedValue = 1;
+				const originalValue = 0;
+				const expectedValue = 1;
 
-				var geometry = new BoxGeometry();
-				var material = new MeshBasicMaterial();
+				const geometry = new BoxGeometry();
+				const material = new MeshBasicMaterial();
 				material.opacity = originalValue;
-				var mesh = new Mesh( geometry, material );
+				const mesh = new Mesh( geometry, material );
 
-				var binding = new PropertyBinding( mesh, path, null );
+				const binding = new PropertyBinding( mesh, path, null );
 				binding.bind();
 
 				assert.equal(
@@ -356,15 +375,15 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "bind", ( assert ) => {
+		QUnit.todo( 'bind', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "unbind", ( assert ) => {
+		QUnit.todo( 'unbind', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

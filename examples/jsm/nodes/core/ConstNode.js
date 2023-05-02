@@ -1,125 +1,32 @@
-import { TempNode } from './TempNode.js';
+import InputNode from './InputNode.js';
+import { addNodeClass } from './Node.js';
 
-const declarationRegexp = /^([a-z_0-9]+)\s([a-z_0-9]+)\s?\=?\s?(.*?)(\;|$)/i;
+class ConstNode extends InputNode {
 
-class ConstNode extends TempNode {
+	constructor( value, nodeType = null ) {
 
-	constructor( src, useDefine ) {
+		super( value, nodeType );
 
-		super();
-
-		this.parse( src || ConstNode.PI, useDefine );
-
-	}
-
-	getType( builder ) {
-
-		return builder.getTypeByFormat( this.type );
+		this.isConstNode = true;
 
 	}
 
-	parse( src, useDefine ) {
+	generateConst( builder ) {
 
-		this.src = src || '';
-
-		let name, type, value = '';
-
-		const match = this.src.match( declarationRegexp );
-
-		this.useDefine = useDefine || this.src.charAt( 0 ) === '#';
-
-		if ( match && match.length > 1 ) {
-
-			type = match[ 1 ];
-			name = match[ 2 ];
-			value = match[ 3 ];
-
-		} else {
-
-			name = this.src;
-			type = 'f';
-
-		}
-
-		this.name = name;
-		this.type = type;
-		this.value = value;
-
-	}
-
-	build( builder, output ) {
-
-		if ( output === 'source' ) {
-
-			if ( this.value ) {
-
-				if ( this.useDefine ) {
-
-					return '#define ' + this.name + ' ' + this.value;
-
-				}
-
-				return 'const ' + this.type + ' ' + this.name + ' = ' + this.value + ';';
-
-			} else if ( this.useDefine ) {
-
-				return this.src;
-
-			}
-
-		} else {
-
-			builder.include( this );
-
-			return builder.format( this.name, this.getType( builder ), output );
-
-		}
+		return builder.getConst( this.getNodeType( builder ), this.value );
 
 	}
 
 	generate( builder, output ) {
 
-		return builder.format( this.name, this.getType( builder ), output );
+		const type = this.getNodeType( builder );
 
-	}
-
-	copy( source ) {
-
-		super.copy( source );
-
-		this.parse( source.src, source.useDefine );
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		let data = this.getJSONNode( meta );
-
-		if ( ! data ) {
-
-			data = this.createJSONNode( meta );
-
-			data.src = this.src;
-
-			if ( data.useDefine === true ) data.useDefine = true;
-
-		}
-
-		return data;
+		return builder.format( this.generateConst( builder ), type, output );
 
 	}
 
 }
 
-ConstNode.prototype.nodeType = 'Const';
+export default ConstNode;
 
-ConstNode.PI = 'PI';
-ConstNode.PI2 = 'PI2';
-ConstNode.RECIPROCAL_PI = 'RECIPROCAL_PI';
-ConstNode.RECIPROCAL_PI2 = 'RECIPROCAL_PI2';
-ConstNode.LOG2 = 'LOG2';
-ConstNode.EPSILON = 'EPSILON';
-
-export { ConstNode };
+addNodeClass( ConstNode );

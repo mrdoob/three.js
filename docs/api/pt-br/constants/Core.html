@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Constantes do Core</h1>
+
+		<h2>Número de Revisão</h2>
+
+		<code>
+THREE.REVISION
+		</code>
+
+		<div id="rev">
+			O [link:https://github.com/mrdoob/three.js/releases revision number] (número de revisão) atual do three.js.
+		</div>
+
+		<h2>Espaço de Cores</h2>
+		<code>
+THREE.NoColorSpace = ""
+THREE.SRGBColorSpace = "srgb"
+THREE.LinearSRGBColorSpace = "srgb-linear"
+		</code>
+		<p>
+			[page:NoColorSpace] não define nenhum espaço de cor específico.
+		</p>
+		<p>
+			[page:SRGBColorSpace] (“srgb”) refere-se ao espaço de cores definido pelo Rec. 709 primárias, D65
+			ponto branco e funções de transferência sRGB não lineares. sRGB é o espaço de cor padrão em
+			CSS, e é frequentemente encontrado em paletas e seletores de cores. Cores expressas em
+			notação hexadecimal ou CSS estão normalmente no espaço de cores sRGB.
+		</p>
+
+		<p>
+			[page:LinearSRGBColorSpace] (“srgb-linear”) refere-se ao espaço de cores sRGB (acima) com
+			funções de transferência lineares. Linear-sRGB é o espaço de cores de trabalho em three.js, usado
+			durante a maior parte do processo de renderização. Componentes RGB encontrados em materiais three.js
+			e os shaders estão no espaço de cores Linear-sRGB.
+		</p>
+
+		<p>
+			Para mais informações e uso, consulte <i>Gerenciamento de cor</i>.
+		</p>
+
+		<h2>Botões do Mouse</h2>
+		<code>
+THREE.MOUSE.LEFT
+THREE.MOUSE.MIDDLE
+THREE.MOUSE.RIGHT
+THREE.MOUSE.ROTATE
+THREE.MOUSE.DOLLY
+THREE.MOUSE.PAN
+		</code>
+		<p>
+			As constantes LEFT e ROTATE têm o mesmo valor subjacente.
+			As constantes MIDDLE e DOLLY têm o mesmo valor subjacente.
+			As constantes RIGHT e PAN têm o mesmo valor subjacente.
+		</p>
+
+		<h2>Ações de Toque</h2>
+		<code>
+THREE.TOUCH.ROTATE
+THREE.TOUCH.PAN
+THREE.TOUCH.DOLLY_PAN
+THREE.TOUCH.DOLLY_ROTATE
+		</code>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/constants.js src/constants.js]
+		</p>
+	</body>
+
+
+</html>

@@ -4,25 +4,25 @@ import { UIBoolean, UIOutliner } from './libs/ui.three.js';
 
 function SidebarSettingsHistory( editor ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
-	var config = editor.config;
+	const config = editor.config;
 
-	var history = editor.history;
+	const history = editor.history;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 
 	container.add( new UIText( strings.getKey( 'sidebar/history' ).toUpperCase() ) );
 
 	//
 
-	var persistent = new UIBoolean( config.getKey( 'settings/history' ), strings.getKey( 'sidebar/history/persistent' ) );
+	const persistent = new UIBoolean( config.getKey( 'settings/history' ), strings.getKey( 'sidebar/history/persistent' ) );
 	persistent.setPosition( 'absolute' ).setRight( '8px' );
 	persistent.onChange( function () {
 
-		var value = this.getValue();
+		const value = this.getValue();
 
 		config.setKey( 'settings/history', value );
 
@@ -30,8 +30,8 @@ function SidebarSettingsHistory( editor ) {
 
 			alert( 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.' );
 
-			var lastUndoCmd = history.undos[ history.undos.length - 1 ];
-			var lastUndoId = ( lastUndoCmd !== undefined ) ? lastUndoCmd.id : 0;
+			const lastUndoCmd = history.undos[ history.undos.length - 1 ];
+			const lastUndoId = ( lastUndoCmd !== undefined ) ? lastUndoCmd.id : 0;
 			editor.history.enableSerialization( lastUndoId );
 
 		} else {
@@ -45,9 +45,9 @@ function SidebarSettingsHistory( editor ) {
 
 	container.add( new UIBreak(), new UIBreak() );
 
-	var ignoreObjectSelectedSignal = false;
+	let ignoreObjectSelectedSignal = false;
 
-	var outliner = new UIOutliner( editor );
+	const outliner = new UIOutliner( editor );
 	outliner.onChange( function () {
 
 		ignoreObjectSelectedSignal = true;
@@ -61,13 +61,13 @@ function SidebarSettingsHistory( editor ) {
 
 	//
 
-	var refreshUI = function () {
+	const refreshUI = function () {
 
-		var options = [];
+		const options = [];
 
 		function buildOption( object ) {
 
-			var option = document.createElement( 'div' );
+			const option = document.createElement( 'div' );
 			option.value = object.id;
 
 			return option;
@@ -76,11 +76,11 @@ function SidebarSettingsHistory( editor ) {
 
 		( function addObjects( objects ) {
 
-			for ( var i = 0, l = objects.length; i < l; i ++ ) {
+			for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
-				var object = objects[ i ];
+				const object = objects[ i ];
 
-				var option = buildOption( object );
+				const option = buildOption( object );
 				option.innerHTML = '&nbsp;' + object.name;
 
 				options.push( option );
@@ -92,11 +92,11 @@ function SidebarSettingsHistory( editor ) {
 
 		( function addObjects( objects ) {
 
-			for ( var i = objects.length - 1; i >= 0; i -- ) {
+			for ( let i = objects.length - 1; i >= 0; i -- ) {
 
-				var object = objects[ i ];
+				const object = objects[ i ];
 
-				var option = buildOption( object );
+				const option = buildOption( object );
 				option.innerHTML = '&nbsp;' + object.name;
 				option.style.opacity = 0.3;
 

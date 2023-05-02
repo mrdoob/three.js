@@ -6,9 +6,10 @@ import { Vector3 } from '../math/Vector3.js';
 
 class TubeGeometry extends BufferGeometry {
 
-	constructor( path, tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
+	constructor( path = new Curves[ 'QuadraticBezierCurve3' ]( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
 		super();
+
 		this.type = 'TubeGeometry';
 
 		this.parameters = {
@@ -162,6 +163,16 @@ class TubeGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -189,4 +200,4 @@ class TubeGeometry extends BufferGeometry {
 }
 
 
-export { TubeGeometry, TubeGeometry as TubeBufferGeometry };
+export { TubeGeometry };

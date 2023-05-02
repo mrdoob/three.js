@@ -20,14 +20,27 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl terrain raycasting demo</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
 			let container, stats;
 
@@ -86,13 +99,12 @@
 
 				}
 
-				geometry.computeFaceNormals(); // needed for helper
-
 				//
 
 				texture = new THREE.CanvasTexture( generateTexture( data, worldWidth, worldDepth ) );
 				texture.wrapS = THREE.ClampToEdgeWrapping;
 				texture.wrapT = THREE.ClampToEdgeWrapping;
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );

@@ -22,17 +22,29 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - geometry - catmull spline editor
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TransformControls } from './jsm/controls/TransformControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
 
-			let container, stats;
+			let container;
 			let camera, scene, renderer;
 			const splineHelperObjects = [];
 			let splinePointsLength = 4;
@@ -62,7 +74,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -89,7 +100,7 @@
 
 				const planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
 				planeGeometry.rotateX( - Math.PI / 2 );
-				const planeMaterial = new THREE.ShadowMaterial( { opacity: 0.2 } );
+				const planeMaterial = new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.2 } );
 
 				const plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.position.y = - 200;
@@ -108,20 +119,18 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				const gui = new GUI();
 
-				gui.add( params, 'uniform' );
+				gui.add( params, 'uniform' ).onChange( render );
 				gui.add( params, 'tension', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
 
 					splines.uniform.tension = value;
 					updateSplineOutline();
+					render();
 
 				} );
-				gui.add( params, 'centripetal' );
-				gui.add( params, 'chordal' );
+				gui.add( params, 'centripetal' ).onChange( render );
+				gui.add( params, 'chordal' ).onChange( render );
 				gui.add( params, 'addPoint' );
 				gui.add( params, 'removePoint' );
 				gui.add( params, 'exportSpline' );
@@ -150,6 +159,7 @@
 				document.addEventListener( 'pointerdown', onPointerDown );
 				document.addEventListener( 'pointerup', onPointerUp );
 				document.addEventListener( 'pointermove', onPointerMove );
+				window.addEventListener( 'resize', onWindowResize );
 
 				/*******
 				 * Curves
@@ -211,6 +221,8 @@
 					new THREE.Vector3( - 91.40118730204415, 176.4306956436485, - 6.958271935582161 ),
 					new THREE.Vector3( - 383.785318791128, 491.1365363371675, 47.869296953772746 ) ] );
 
+				render();
+
 			}
 
 			function addSplineObject( position ) {
@@ -246,6 +258,8 @@
 
 				updateSplineOutline();
 
+				render();
+
 			}
 
 			function removePoint() {
@@ -264,6 +278,8 @@
 				scene.remove( point );
 
 				updateSplineOutline();
+
+				render();
 
 			}
 
@@ -331,14 +347,6 @@
 
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-				render();
-				stats.update();
-
-			}
-
 			function render() {
 
 				splines.uniform.mesh.visible = params.uniform;
@@ -355,12 +363,17 @@
 
 			}
 
-			function onPointerUp() {
+			function onPointerUp( event ) {
 
 				onUpPosition.x = event.clientX;
 				onUpPosition.y = event.clientY;
 
-				if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) transformControl.detach();
+				if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
+
+					transformControl.detach();
+					render();
+
+				}
 
 			}
 
@@ -371,7 +384,7 @@
 
 				raycaster.setFromCamera( pointer, camera );
 
-				const intersects = raycaster.intersectObjects( splineHelperObjects );
+				const intersects = raycaster.intersectObjects( splineHelperObjects, false );
 
 				if ( intersects.length > 0 ) {
 
@@ -387,6 +400,16 @@
 
 			}
 
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
 
 		</script>
 

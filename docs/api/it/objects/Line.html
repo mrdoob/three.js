@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Una linea continua.<br /><br />
+
+			Questo è quasi lo stesso di [page:LineSegments]; l'unica differenza è che questo viene renderizzato utilizzando
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINE_STRIP]
+			invece di [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements gl.LINES]
+
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const material = new THREE.LineBasicMaterial({
+			color: 0x0000ff
+		});
+
+		const points = [];
+		points.push( new THREE.Vector3( - 10, 0, 0 ) );
+		points.push( new THREE.Vector3( 0, 10, 0 ) );
+		points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+		const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+		const line = new THREE.Line( geometry, material );
+		scene.add( line );
+		</code>
+
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
+
+		<p>
+		[page:BufferGeometry geometry] — vertici che rappresentano il segmento(i) di linea. Il valore predefinito è una nuova [page:BufferGeometry].<br />
+		[page:Material material] — materiale per la linea. Il valore predefinito è una nuova [page:LineBasicMaterial].<br />
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Object3D] per le proprietà comuni.</p>
+
+		<h3>[property:BufferGeometry geometry]</h3>
+		<p>Vertici che rappresentano il segmento(i) di linea.</p>
+
+		<h3>[property:Boolean isLine]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Material material]</h3>
+		<p>Materiale per la linea.</p>
+
+		<h3>[property:Array morphTargetInfluences]</h3>
+		<p>
+			Un array di pesi solitamente da 0 a 1 che specifica la quantità di morph applicata.
+			Non definito per impostazione predefinita, ma reimpostato su un array vuoto da [page:.updateMorphTargets]().
+		</p>
+
+		<h3>[property:Object morphTargetDictionary]</h3>
+		<p>
+			Un dizionario di morphTargets basato sulla proprietà morphTarget.name.
+			Non definito per impostazione predefinita, ma ricompilato [page:.updateMorphTargets]().
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Object3D] per i metodi comuni.</p>
+
+		<h3>[method:this computeLineDistances]()</h3>
+		<p>
+			Calcola un array di valori di distanza necessari per [page:LineDashedMaterial]. 
+			Per ogni vertice nella geometria, il metodo calcola la lunghezza cumulativa dal punto
+			corrente fino all'inizio della linea.
+		</p>
+
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<p>
+			Ottiene le intersezioni tra un [page:Ray] lanciato e questa linea.
+			[page:Raycaster.intersectObject] chiamerà questo metodo.
+		</p>
+
+		<h3>[method:Line clone]()</h3>
+		<p>
+			Restituisce un clone di questo oggetto Line e i suoi discendenti.
+		</p>
+
+		<h3>[method:undefined updateMorphTargets]()</h3>
+		<p>
+			Aggiorna i morphTargets in modo che non abbiano alcuna influenza sull'oggetto. 
+			Reimposta le proprietà [page:.morphTargetInfluences] e [page:.morphTargetDictionary].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

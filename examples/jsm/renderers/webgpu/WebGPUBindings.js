@@ -17,22 +17,22 @@ class WebGPUBindings {
 
 	}
 
-	get( object ) {
+	get( renderObject ) {
 
-		let data = this.uniformsData.get( object );
+		let data = this.uniformsData.get( renderObject );
 
 		if ( data === undefined ) {
 
 			// each object defines an array of bindings (ubos, textures, samplers etc.)
 
-			const nodeBuilder = this.nodes.get( object );
+			const nodeBuilder = this.nodes.get( renderObject );
 			const bindings = nodeBuilder.getBindings();
 
 			// setup (static) binding layout and (dynamic) binding group
 
-			const renderPipeline = this.renderPipelines.get( object );
+			const pipeline = this.renderPipelines.get( renderObject ).pipeline;
 
-			const bindLayout = renderPipeline.pipeline.getBindGroupLayout( 0 );
+			const bindLayout = pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
@@ -41,7 +41,7 @@ class WebGPUBindings {
 				bindings: bindings
 			};
 
-			this.uniformsData.set( object, data );
+			this.uniformsData.set( renderObject, data );
 
 		}
 
@@ -49,19 +49,22 @@ class WebGPUBindings {
 
 	}
 
-	getForCompute( param ) {
+	getForCompute( computeNode ) {
 
-		let data = this.uniformsData.get( param );
+		let data = this.uniformsData.get( computeNode );
 
 		if ( data === undefined ) {
 
-			// bindings are not yet retrieved via node material
+			// each object defines an array of bindings (ubos, textures, samplers etc.)
 
-			const bindings = param.bindings !== undefined ? param.bindings.slice() : [];
+			const nodeBuilder = this.nodes.getForCompute( computeNode );
+			const bindings = nodeBuilder.getBindings();
 
-			const computePipeline = this.computePipelines.get( param );
+			// setup (static) binding layout and (dynamic) binding group
 
-			const bindLayout = computePipeline.getBindGroupLayout( 0 );
+			const pipeline = this.computePipelines.get( computeNode );
+
+			const bindLayout = pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
@@ -70,7 +73,7 @@ class WebGPUBindings {
 				bindings: bindings
 			};
 
-			this.uniformsData.set( param, data );
+			this.uniformsData.set( computeNode, data );
 
 		}
 
@@ -78,7 +81,13 @@ class WebGPUBindings {
 
 	}
 
-	update( object, camera ) {
+	remove( object ) {
+
+		this.uniformsData.delete( object );
+
+	}
+
+	update( object ) {
 
 		const textures = this.textures;
 
@@ -99,29 +108,23 @@ class WebGPUBindings {
 
 			if ( isShared && isUpdated ) continue;
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformBuffer ) {
 
-				const array = binding.array;
-				const bufferGPU = binding.bufferGPU;
-
-				binding.onBeforeUpdate( object, camera );
-
+				const buffer = binding.getBuffer();
 				const needsBufferWrite = binding.update();
 
 				if ( needsBufferWrite === true ) {
 
-					this.device.queue.writeBuffer(
-						bufferGPU,
-						0,
-						array,
-						0
-					);
+					const bufferGPU = binding.bufferGPU;
+
+					this.device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
 
 				}
 
 			} else if ( binding.isStorageBuffer ) {
 
 				const attribute = binding.attribute;
+
 				this.attributes.update( attribute, false, binding.usage );
 
 			} else if ( binding.isSampler ) {
@@ -143,10 +146,11 @@ class WebGPUBindings {
 
 				const texture = binding.getTexture();
 
-				const forceUpdate = textures.updateTexture( texture );
+				const needsTextureRefresh = textures.updateTexture( texture );
+
 				const textureGPU = textures.getTextureGPU( texture );
 
-				if ( binding.textureGPU !== textureGPU || forceUpdate === true ) {
+				if ( textureGPU !== undefined && binding.textureGPU !== textureGPU || needsTextureRefresh === true ) {
 
 					binding.textureGPU = textureGPU;
 					needsBindGroupRefresh = true;
@@ -181,17 +185,16 @@ class WebGPUBindings {
 
 		for ( const binding of bindings ) {
 
-			if ( binding.isUniformsGroup ) {
+			if ( binding.isUniformBuffer ) {
 
 				if ( binding.bufferGPU === null ) {
 
 					const byteLength = binding.getByteLength();
 
-					binding.array = new Float32Array( new ArrayBuffer( byteLength ) );
-
 					binding.bufferGPU = this.device.createBuffer( {
+						label: 'bindingBuffer',
 						size: byteLength,
-						usage: binding.usage,
+						usage: binding.usage
 					} );
 
 				}
@@ -229,6 +232,14 @@ class WebGPUBindings {
 
 						binding.textureGPU = this.textures.getDefaultCubeTexture();
 
+					} else if ( binding.texture.isVideoTexture ) {
+
+						binding.textureGPU = this.textures.getDefaultVideoTexture();
+
+					} else if ( binding.texture.isDepthTexture ) {
+
+						binding.textureGPU = this.textures.getDefaultDepthTexture();
+
 					} else {
 
 						binding.textureGPU = this.textures.getDefaultTexture();
@@ -237,7 +248,9 @@ class WebGPUBindings {
 
 				}
 
-				entries.push( { binding: bindingPoint, resource: binding.textureGPU.createView( { dimension: binding.dimension } ) } );
+				const resource = binding.textureGPU instanceof GPUTexture ? binding.textureGPU.createView( { aspect: binding.aspect, dimension: binding.dimension } ) : binding.textureGPU;
+
+				entries.push( { binding: bindingPoint, resource } );
 
 			}
 
@@ -246,8 +259,8 @@ class WebGPUBindings {
 		}
 
 		return this.device.createBindGroup( {
-			layout: layout,
-			entries: entries
+			layout,
+			entries
 		} );
 
 	}

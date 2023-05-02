@@ -15,13 +15,15 @@ class HemisphereLightHelper extends Object3D {
 	constructor( light, size, color ) {
 
 		super();
+
 		this.light = light;
-		this.light.updateMatrixWorld();
 
 		this.matrix = light.matrixWorld;
 		this.matrixAutoUpdate = false;
 
 		this.color = color;
+
+		this.type = 'HemisphereLightHelper';
 
 		const geometry = new OctahedronGeometry( size );
 		geometry.rotateY( Math.PI * 0.5 );
@@ -73,6 +75,8 @@ class HemisphereLightHelper extends Object3D {
 			colors.needsUpdate = true;
 
 		}
+
+		this.light.updateWorldMatrix( true, false );
 
 		mesh.lookAt( _vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 

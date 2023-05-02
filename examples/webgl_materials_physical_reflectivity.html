@@ -14,16 +14,29 @@
 			example by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			let container, stats;
 			const params = {
@@ -80,14 +93,7 @@
 					premultipliedAlpha: true
 				} );
 
-				const manager = new THREE.LoadingManager();
-				manager.onProgress = function ( item, loaded, total ) {
-
-					console.log( item, loaded, total );
-
-				};
-
-				const loader = new OBJLoader( manager );
+				const loader = new OBJLoader();
 				loader.load( 'models/obj/emerald.obj', function ( object ) {
 
 					object.traverse( function ( child ) {
@@ -150,7 +156,6 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

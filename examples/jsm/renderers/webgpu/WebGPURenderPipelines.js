@@ -3,17 +3,16 @@ import WebGPUProgrammableStage from './WebGPUProgrammableStage.js';
 
 class WebGPURenderPipelines {
 
-	constructor( renderer, properties, device, glslang, sampleCount, nodes ) {
+	constructor( device, nodes, utils ) {
 
-		this.renderer = renderer;
-		this.properties = properties;
 		this.device = device;
-		this.glslang = glslang;
-		this.sampleCount = sampleCount;
 		this.nodes = nodes;
+		this.utils = utils;
+
+		this.bindings = null;
 
 		this.pipelines = [];
-		this.objectCache = new WeakMap();
+		this.cache = new WeakMap();
 
 		this.stages = {
 			vertex: new Map(),
@@ -22,24 +21,22 @@ class WebGPURenderPipelines {
 
 	}
 
-	get( object ) {
+	get( renderObject ) {
 
 		const device = this.device;
-		const glslang = this.glslang;
-		const properties = this.properties;
+		const cache = this._getCache( renderObject );
 
-		const material = object.material;
-		const materialProperties = properties.get( material );
+		let currentPipeline = cache.currentPipeline;
 
-		const cache = this._getCache( object );
+		if ( this._needsUpdate( renderObject ) ) {
 
-		let currentPipeline;
+			// release previous cache
 
-		if ( this._needsUpdate( object, cache ) ) {
+			this._releasePipeline( renderObject );
 
 			// get shader
 
-			const nodeBuilder = this.nodes.get( object );
+			const nodeBuilder = this.nodes.get( renderObject );
 
 			// programmable stages
 
@@ -47,7 +44,7 @@ class WebGPURenderPipelines {
 
 			if ( stageVertex === undefined ) {
 
-				stageVertex = new WebGPUProgrammableStage( device, glslang, nodeBuilder.vertexShader, 'vertex' );
+				stageVertex = new WebGPUProgrammableStage( device, nodeBuilder.vertexShader, 'vertex' );
 				this.stages.vertex.set( nodeBuilder.vertexShader, stageVertex );
 
 			}
@@ -56,51 +53,21 @@ class WebGPURenderPipelines {
 
 			if ( stageFragment === undefined ) {
 
-				stageFragment = new WebGPUProgrammableStage( device, glslang, nodeBuilder.fragmentShader, 'fragment' );
+				stageFragment = new WebGPUProgrammableStage( device, nodeBuilder.fragmentShader, 'fragment' );
 				this.stages.fragment.set( nodeBuilder.fragmentShader, stageFragment );
 
 			}
 
 			// determine render pipeline
 
-			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, object, nodeBuilder );
+			currentPipeline = this._acquirePipeline( stageVertex, stageFragment, renderObject );
 			cache.currentPipeline = currentPipeline;
 
-			// keep track of all pipelines which are used by a material
+			// keep track of all used times
 
-			let materialPipelines = materialProperties.pipelines;
-
-			if ( materialPipelines === undefined ) {
-
-				materialPipelines = new Set();
-				materialProperties.pipelines = materialPipelines;
-
-			}
-
-			if ( materialPipelines.has( currentPipeline ) === false ) {
-
-				materialPipelines.add( currentPipeline );
-
-				currentPipeline.usedTimes ++;
-				stageVertex.usedTimes ++;
-				stageFragment.usedTimes ++;
-
-			}
-
-			// dispose
-
-			if ( materialProperties.disposeCallback === undefined ) {
-
-				const disposeCallback = onMaterialDispose.bind( this );
-				materialProperties.disposeCallback = disposeCallback;
-
-				material.addEventListener( 'dispose', disposeCallback );
-
-			}
-
-		} else {
-
-			currentPipeline = cache.currentPipeline;
+			currentPipeline.usedTimes ++;
+			stageVertex.usedTimes ++;
+			stageFragment.usedTimes ++;
 
 		}
 
@@ -108,10 +75,16 @@ class WebGPURenderPipelines {
 
 	}
 
+	remove( renderObject ) {
+
+		this._releasePipeline( renderObject );
+
+	}
+
 	dispose() {
 
 		this.pipelines = [];
-		this.objectCache = new WeakMap();
+		this.cache = new WeakMap();
 		this.shaderModules = {
 			vertex: new Map(),
 			fragment: new Map()
@@ -119,14 +92,14 @@ class WebGPURenderPipelines {
 
 	}
 
-	_acquirePipeline( stageVertex, stageFragment, object, nodeBuilder ) {
+	_acquirePipeline( stageVertex, stageFragment, renderObject ) {
 
 		let pipeline;
 		const pipelines = this.pipelines;
 
 		// check for existing pipeline
 
-		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, object );
+		const cacheKey = this._computeCacheKey( stageVertex, stageFragment, renderObject );
 
 		for ( let i = 0, il = pipelines.length; i < il; i ++ ) {
 
@@ -143,8 +116,8 @@ class WebGPURenderPipelines {
 
 		if ( pipeline === undefined ) {
 
-			pipeline = new WebGPURenderPipeline( this.device, this.renderer, this.sampleCount );
-			pipeline.init( cacheKey, stageVertex, stageFragment, object, nodeBuilder );
+			pipeline = new WebGPURenderPipeline( this.device, this.utils );
+			pipeline.init( cacheKey, stageVertex, stageFragment, renderObject, this.nodes.get( renderObject ) );
 
 			pipelines.push( pipeline );
 
@@ -154,10 +127,10 @@ class WebGPURenderPipelines {
 
 	}
 
-	_computeCacheKey( stageVertex, stageFragment, object ) {
+	_computeCacheKey( stageVertex, stageFragment, renderObject ) {
 
-		const material = object.material;
-		const renderer = this.renderer;
+		const { object, material } = renderObject;
+		const utils = this.utils;
 
 		const parameters = [
 			stageVertex.id, stageFragment.id,
@@ -170,22 +143,23 @@ class WebGPURenderPipelines {
 			material.stencilFail, material.stencilZFail, material.stencilZPass,
 			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
-			this.sampleCount,
-			renderer.getCurrentEncoding(), renderer.getCurrentColorFormat(), renderer.getCurrentDepthStencilFormat()
+			utils.getSampleCount(),
+			utils.getCurrentColorSpace(), utils.getCurrentColorFormat(), utils.getCurrentDepthStencilFormat(),
+			utils.getPrimitiveTopology( object, material )
 		];
 
 		return parameters.join();
 
 	}
 
-	_getCache( object ) {
+	_getCache( renderObject ) {
 
-		let cache = this.objectCache.get( object );
+		let cache = this.cache.get( renderObject );
 
 		if ( cache === undefined ) {
 
 			cache = {};
-			this.objectCache.set( object, cache );
+			this.cache.set( renderObject, cache );
 
 		}
 
@@ -193,9 +167,16 @@ class WebGPURenderPipelines {
 
 	}
 
-	_releasePipeline( pipeline ) {
+	_releasePipeline( renderObject ) {
 
-		if ( -- pipeline.usedTimes === 0 ) {
+		const cache = this._getCache( renderObject );
+
+		const pipeline = cache.currentPipeline;
+		delete cache.currentPipeline;
+
+		this.bindings.remove( renderObject );
+
+		if ( pipeline && -- pipeline.usedTimes === 0 ) {
 
 			const pipelines = this.pipelines;
 
@@ -223,11 +204,16 @@ class WebGPURenderPipelines {
 
 	}
 
-	_needsUpdate( object, cache ) {
+	_needsUpdate( renderObject ) {
 
-		const material = object.material;
+		const cache = this._getCache( renderObject );
+		const material = renderObject.material;
 
 		let needsUpdate = false;
+
+		// check pipeline state
+
+		if ( cache.currentPipeline === undefined ) needsUpdate = true;
 
 		// check material state
 
@@ -260,17 +246,18 @@ class WebGPURenderPipelines {
 
 		// check renderer state
 
-		const renderer = this.renderer;
+		const utils = this.utils;
 
-		const encoding = renderer.getCurrentEncoding();
-		const colorFormat = renderer.getCurrentColorFormat();
-		const depthStencilFormat = renderer.getCurrentDepthStencilFormat();
+		const sampleCount = utils.getSampleCount();
+		const colorSpace = utils.getCurrentColorSpace();
+		const colorFormat = utils.getCurrentColorFormat();
+		const depthStencilFormat = utils.getCurrentDepthStencilFormat();
 
-		if ( cache.sampleCount !== this.sampleCount || cache.encoding !== encoding ||
+		if ( cache.sampleCount !== sampleCount || cache.colorSpace !== colorSpace ||
 			cache.colorFormat !== colorFormat || cache.depthStencilFormat !== depthStencilFormat ) {
 
-			cache.sampleCount = this.sampleCount;
-			cache.encoding = encoding;
+			cache.sampleCount = sampleCount;
+			cache.colorSpace = colorSpace;
 			cache.colorFormat = colorFormat;
 			cache.depthStencilFormat = depthStencilFormat;
 
@@ -279,33 +266,6 @@ class WebGPURenderPipelines {
 		}
 
 		return needsUpdate;
-
-	}
-
-}
-
-function onMaterialDispose( event ) {
-
-	const properties = this.properties;
-
-	const material = event.target;
-	const materialProperties = properties.get( material );
-
-	material.removeEventListener( 'dispose', materialProperties.disposeCallback );
-
-	properties.remove( material );
-
-	// remove references to pipelines
-
-	const pipelines = materialProperties.pipelines;
-
-	if ( pipelines !== undefined ) {
-
-		for ( const pipeline of pipelines ) {
-
-			this._releasePipeline( pipeline );
-
-		}
 
 	}
 

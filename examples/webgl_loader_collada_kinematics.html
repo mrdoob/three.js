@@ -12,14 +12,27 @@
 			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { TWEEN } from './jsm/libs/tween.module.min.js';
-			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
+			import TWEEN from 'three/addons/libs/tween.module.js';
+			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
 
 			let container, stats;
 
@@ -32,7 +45,6 @@
 			const tweenParameters = {};
 
 			const loader = new ColladaLoader();
-			// loader.load( './models/collada/kawada-hironx.dae', function ( collada ) {
 			loader.load( './models/collada/abb_irb52_7_120.dae', function ( collada ) {
 
 				dae = collada.scene;
@@ -70,7 +82,7 @@
 
 				// Grid
 
-				const grid = new THREE.GridHelper( 20, 20, 0x888888, 0x444444 );
+				const grid = new THREE.GridHelper( 20, 20, 0xc1c1c1, 0x8d8d8d );
 				scene.add( grid );
 
 				// Add the COLLADA
@@ -82,7 +94,7 @@
 
 				// Lights
 
-				const light = new THREE.HemisphereLight( 0xffeeee, 0x111122 );
+				const light = new THREE.HemisphereLight( 0xfff7f7, 0x494966 );
 				scene.add( light );
 
 				const pointLight = new THREE.PointLight( 0xffffff, 0.3 );

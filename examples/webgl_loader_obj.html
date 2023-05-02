@@ -12,11 +12,24 @@
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader test
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 			let container;
 
@@ -69,16 +82,11 @@
 
 				const manager = new THREE.LoadingManager( loadModel );
 
-				manager.onProgress = function ( item, loaded, total ) {
-
-					console.log( item, loaded, total );
-
-				};
-
 				// texture
 
 				const textureLoader = new THREE.TextureLoader( manager );
 				const texture = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				// model
 

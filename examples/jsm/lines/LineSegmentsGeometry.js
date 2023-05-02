@@ -7,7 +7,7 @@ import {
 	Sphere,
 	Vector3,
 	WireframeGeometry
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _box = new Box3();
 const _vector = new Vector3();
@@ -17,6 +17,8 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	constructor() {
 
 		super();
+
+		this.isLineSegmentsGeometry = true;
 
 		this.type = 'LineSegmentsGeometry';
 
@@ -142,16 +144,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		const geometry = lineSegments.geometry;
 
-		if ( geometry.isGeometry ) {
-
-			console.error( 'THREE.LineSegmentsGeometry no longer supports Geometry. Use THREE.BufferGeometry instead.' );
-			return;
-
-		} else if ( geometry.isBufferGeometry ) {
-
-			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
-
-		}
+		this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
 
 		// set colors, maybe
 
@@ -244,7 +237,5 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	}
 
 }
-
-LineSegmentsGeometry.prototype.isLineSegmentsGeometry = true;
 
 export { LineSegmentsGeometry };

@@ -82,14 +82,14 @@
 
 		<h3>[property:String name]</h3>
 		<p>
-			트랙의 이름은 morph targets 혹은 [page:SkinnedMesh bones] 및 
+			트랙의 이름은 morph targets 혹은 [page:SkinnedMesh bones] 및
 			다른 애니메이션 오브젝트에 들어있는 값들을 참조할 수 있습니다. See
 			프로퍼티로 파싱될 수 있는 문자열 폼에 대해서는 [page:PropertyBinding.parseTrackName] 를 참고하세요.
 		</p>
 
 		<p>
 			트랙의 이름은 노드의 이름을 사용하거나 노드의 uuid(믹서에 전달된 씬 그래프 노드의 서브트리 안에 있어야 하지만)를 사용해서 노드를 특정할 수 있습니다.
-			혹은 만약 트랙 이름이 .으로 시작한다면, 트랙은  믹서에 전달된 루트 노드를 적용할 것입니다.
+			혹은 만약 트랙 이름이 .으로 시작한다면, 트랙은 믹서에 전달된 루트 노드를 적용할 것입니다.
 		</p>
 
 		<p>
@@ -148,13 +148,13 @@
 			트랙의 복사본을 리턴합니다.
 		</p>
 
-		<h3>[method:null createInterpolant]()</h3>
+		<h3>[method:Interpolant createInterpolant]()</h3>
 		<p>
 			생성자에서 넘어온 보간법 파라미터 값에 기반한 [page:LinearInterpolant LinearInterpolant], [page:CubicInterpolant CubicInterpolant]
 			혹은 [page:DiscreteInterpolant DiscreteInterpolant]를 생성합니다.
 		</p>
 
-		<h3>[method:null getInterpolation]()</h3>
+		<h3>[method:Interpolant getInterpolation]()</h3>
 		<p>
 			보간법 타입을 리턴합니다.
 		</p>
@@ -172,7 +172,7 @@
 			그렇지 않다면 적당한 크기가 자동으로 생성될 것입니다.
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:LinearInterpolant InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			[page:KeyframeTrack.times times] 와 [page:KeyframeTrack.times values]를 통해
 			새 [page:LinearInterpolant LinearInterpolant]를 만듭니다.
@@ -180,7 +180,7 @@
 			그렇지 않다면 적당한 크기가 자동으로 생성될 것입니다.
 		</p>
 
-		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<h3>[method:CubicInterpolant InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
 		<p>
 			[page:KeyframeTrack.times times] 와 [page:KeyframeTrack.times values]를 통해
 			새 [page:CubicInterpolant CubicInterpolant]를 만듭니다.

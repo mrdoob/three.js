@@ -1,4 +1,4 @@
-import * as THREE from '../../../build/three.module.js';
+import * as THREE from 'three';
 
 const PINCH_MAX = 0.05;
 const PINCH_THRESHOLD = 0.02;
@@ -46,12 +46,17 @@ class OculusHandPointerModel extends THREE.Object3D {
 		hand.addEventListener( 'connected', ( event ) => {
 
 			const xrInputSource = event.data;
+
 			if ( xrInputSource.hand ) {
 
 				this.visible = true;
 				this.xrInputSource = xrInputSource;
 
-				this.createPointer();
+				if ( this.pointerObject === null ) {
+
+					this.createPointer();
+
+				}
 
 			}
 
@@ -62,7 +67,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 	_drawVerticesRing( vertices, baseVector, ringIndex ) {
 
 		const segmentVector = baseVector.clone();
-		for ( var i = 0; i < POINTER_SEGMENTS; i ++ ) {
+		for ( let i = 0; i < POINTER_SEGMENTS; i ++ ) {
 
 			segmentVector.applyAxisAngle( ZAXIS, ( Math.PI * 2 ) / POINTER_SEGMENTS );
 			const vid = ringIndex * POINTER_SEGMENTS + i;
@@ -91,7 +96,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 			Math.cos( ( Math.PI * POINTER_HEMISPHERE_ANGLE ) / 180 ) * rearRadius,
 			0
 		);
-		for ( var i = 0; i < POINTER_RINGS; i ++ ) {
+		for ( let i = 0; i < POINTER_RINGS; i ++ ) {
 
 			this._drawVerticesRing( vertices, rearBase, i + 1 );
 			rearBase.applyAxisAngle(
@@ -127,7 +132,7 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	createPointer() {
 
-		var i, j;
+		let i, j;
 		const vertices = new Array(
 			( ( POINTER_RINGS + 1 ) * POINTER_SEGMENTS + 2 ) * 3
 		).fill( 0 );
@@ -329,31 +334,31 @@ class OculusHandPointerModel extends THREE.Object3D {
 
 	}
 
-	intersectObject( object ) {
+	intersectObject( object, recursive = true ) {
 
 		if ( this.raycaster ) {
 
-			return this.raycaster.intersectObject( object );
+			return this.raycaster.intersectObject( object, recursive );
 
 		}
 
 	}
 
-	intersectObjects( objects ) {
+	intersectObjects( objects, recursive = true ) {
 
 		if ( this.raycaster ) {
 
-			return this.raycaster.intersectObjects( objects );
+			return this.raycaster.intersectObjects( objects, recursive );
 
 		}
 
 	}
 
-	checkIntersections( objects ) {
+	checkIntersections( objects, recursive = false ) {
 
 		if ( this.raycaster && ! this.attached ) {
 
-			const intersections = this.raycaster.intersectObjects( objects );
+			const intersections = this.raycaster.intersectObjects( objects, recursive );
 			const direction = new THREE.Vector3( 0, 0, - 1 );
 			if ( intersections.length > 0 ) {
 

@@ -18,6 +18,17 @@
 			</p>
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+		</code>
+
 		<h2>例子</h2>
 
 		<p>[example:misc_controls_trackball misc / controls / trackball ]</p>
@@ -84,12 +95,22 @@
 
 		<h3>[property:Number maxDistance]</h3>
 		<p>
-			你能够将相机向外移动多少，其默认值为*Infinity*。
+			你能够将相机向外移动多少（仅适用于[page:PerspectiveCamera]），其默认值为*Infinity*。
 		</p>
 
 		<h3>[property:Number minDistance]</h3>
 		<p>
-			你能够将相机向内移动多少，其默认值为*0*。
+			你能够将相机向内移动多少（仅适用于[page:PerspectiveCamera]），其默认值为*0*。
+		</p>
+
+		<h3>[property:Float maxZoom]</h3>
+		<p>
+			你能够将相机缩小多少（仅适用于[page:OrthographicCamera]），其默认值为*Infinity*。
+		</p>
+
+		<h3>[property:Float minZoom]</h3>
+		<p>
+			你能够将相机放大多少（仅适用于[page:OrthographicCamera]），其默认值为*0*。
 		</p>
 
 		<h3>
@@ -156,42 +177,42 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:null checkDistances] ()</h3>
+		<h3>[method:undefined checkDistances] ()</h3>
 		<p>
 			确保控制器位于 [minDistance, maxDistance] 范围内。由[page:.update update]()调用。
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			若不再需要该控制器，则应当调用此函数。
 		</p>
 
-		<h3>[method:null handleResize] ()</h3>
+		<h3>[method:undefined handleResize] ()</h3>
 		<p>
 			若应用程序窗口大小发生改变，则应当调用此函数。
 		</p>
 
-		<h3>[method:null panCamera] ()</h3>
+		<h3>[method:undefined panCamera] ()</h3>
 		<p>
 			如有必要，执行平移。由[page:.update update]()调用。
 		</p>
 
-		<h3>[method:null reset] ()</h3>
+		<h3>[method:undefined reset] ()</h3>
 		<p>
 			重置控制器到初始状态。
 		</p>
 
-		<h3>[method:null rotateCamera] ()</h3>
+		<h3>[method:undefined rotateCamera] ()</h3>
 		<p>
 			如有必要，旋转相机。由[page:.update update]()调用。
 		</p>
 
-		<h3>[method:null update] ()</h3>
+		<h3>[method:undefined update] ()</h3>
 		<p>
 			更新控制器，常被用在动画循环中。
 		</p>
 
-		<h3>[method:null zoomCamera] ()</h3>
+		<h3>[method:undefined zoomCamera] ()</h3>
 		<p>
 			如有必要，执行缩放。由[page:.update update]()调用。
 		</p>

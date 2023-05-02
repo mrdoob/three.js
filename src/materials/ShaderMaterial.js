@@ -1,23 +1,8 @@
 import { Material } from './Material.js';
-import { cloneUniforms } from '../renderers/shaders/UniformsUtils.js';
+import { cloneUniforms, cloneUniformsGroups } from '../renderers/shaders/UniformsUtils.js';
 
 import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
 import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
-
-/**
- * parameters = {
- *  defines: { "label" : "value" },
- *  uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
- *
- *  fragmentShader: <string>,
- *  vertexShader: <string>,
- *
- *  wireframe: <boolean>,
- *  wireframeLinewidth: <float>,
- *
- *  lights: <bool>
- * }
- */
 
 class ShaderMaterial extends Material {
 
@@ -25,10 +10,13 @@ class ShaderMaterial extends Material {
 
 		super();
 
+		this.isShaderMaterial = true;
+
 		this.type = 'ShaderMaterial';
 
 		this.defines = {};
 		this.uniforms = {};
+		this.uniformsGroups = [];
 
 		this.vertexShader = default_vertex;
 		this.fragmentShader = default_fragment;
@@ -42,6 +30,8 @@ class ShaderMaterial extends Material {
 		this.lights = false; // set to use scene lights
 		this.clipping = false; // set to use user-defined clipping planes
 
+		this.forceSinglePass = true;
+
 		this.extensions = {
 			derivatives: false, // set to use derivatives
 			fragDepth: false, // set to use fragment depth values
@@ -54,7 +44,7 @@ class ShaderMaterial extends Material {
 		this.defaultAttributeValues = {
 			'color': [ 1, 1, 1 ],
 			'uv': [ 0, 0 ],
-			'uv2': [ 0, 0 ]
+			'uv1': [ 0, 0 ]
 		};
 
 		this.index0AttributeName = undefined;
@@ -63,12 +53,6 @@ class ShaderMaterial extends Material {
 		this.glslVersion = null;
 
 		if ( parameters !== undefined ) {
-
-			if ( parameters.attributes !== undefined ) {
-
-				console.error( 'THREE.ShaderMaterial: attributes should now be defined in THREE.BufferGeometry instead.' );
-
-			}
 
 			this.setValues( parameters );
 
@@ -84,12 +68,14 @@ class ShaderMaterial extends Material {
 		this.vertexShader = source.vertexShader;
 
 		this.uniforms = cloneUniforms( source.uniforms );
+		this.uniformsGroups = cloneUniformsGroups( source.uniformsGroups );
 
 		this.defines = Object.assign( {}, source.defines );
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
 
+		this.fog = source.fog;
 		this.lights = source.lights;
 		this.clipping = source.clipping;
 
@@ -179,6 +165,9 @@ class ShaderMaterial extends Material {
 		data.vertexShader = this.vertexShader;
 		data.fragmentShader = this.fragmentShader;
 
+		data.lights = this.lights;
+		data.clipping = this.clipping;
+
 		const extensions = {};
 
 		for ( const key in this.extensions ) {
@@ -194,7 +183,5 @@ class ShaderMaterial extends Material {
 	}
 
 }
-
-ShaderMaterial.prototype.isShaderMaterial = true;
 
 export { ShaderMaterial };

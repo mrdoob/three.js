@@ -1,4 +1,4 @@
-import { Object3D, Sphere, Box3 } from '../../../build/three.module.js';
+import { Object3D, Sphere, Box3 } from 'three';
 import { XRHandMeshModel } from './XRHandMeshModel.js';
 
 const TOUCH_RADIUS = 0.01;
@@ -6,13 +6,14 @@ const POINTING_JOINT = 'index-finger-tip';
 
 class OculusHandModel extends Object3D {
 
-	constructor( controller ) {
+	constructor( controller, loader = null ) {
 
 		super();
 
 		this.controller = controller;
 		this.motionController = null;
 		this.envMap = null;
+		this.loader = loader;
 
 		this.mesh = null;
 
@@ -24,7 +25,7 @@ class OculusHandModel extends Object3D {
 
 				this.xrInputSource = xrInputSource;
 
-				this.motionController = new XRHandMeshModel( this, controller, this.path, xrInputSource.handedness );
+				this.motionController = new XRHandMeshModel( this, controller, this.path, xrInputSource.handedness, this.loader );
 
 			}
 

@@ -1,12 +1,15 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
+import { Vector2 } from '../math/Vector2.js';
 
 class ShapeGeometry extends BufferGeometry {
 
-	constructor( shapes, curveSegments = 12 ) {
+	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
 
 		super();
+
 		this.type = 'ShapeGeometry';
 
 		this.parameters = {
@@ -108,7 +111,7 @@ class ShapeGeometry extends BufferGeometry {
 
 			}
 
-			// incides
+			// indices
 
 			for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
@@ -124,6 +127,16 @@ class ShapeGeometry extends BufferGeometry {
 			}
 
 		}
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
 
 	}
 
@@ -179,4 +192,4 @@ function toJSON( shapes, data ) {
 
 }
 
-export { ShapeGeometry, ShapeGeometry as ShapeBufferGeometry };
+export { ShapeGeometry };

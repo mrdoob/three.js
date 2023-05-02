@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Un poliedro è un solido in tre dimensioni con le facce piatte. Questa classe prende un array di vertici,
+      li proietta su una sfera, e li dividerà fino al livello di dettaglio desiderato. Questa classe è utilizzata
+      da [page:DodecahedronGeometry], [page:IcosahedronGeometry], [page:OctahedronGeometry],
+			e [page:TetrahedronGeometry] per generare queste rispettive geometrie.
+		</p>
+
+		<h2>Codice id Esempio</h2>
+<code>
+const verticesOfCube = [
+    -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
+    -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
+];
+
+const indicesOfFaces = [
+    2,1,0,    0,3,2,
+    0,4,7,    7,3,0,
+    0,1,5,    5,4,0,
+    1,2,6,    6,5,1,
+    2,3,7,    7,6,2,
+    4,5,6,    6,7,4
+];
+
+const geometry = new THREE.PolyhedronGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+</code>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]([param:Array vertices], [param:Array indices], [param:Float radius], [param:Integer detail])</h3>
+		<p>
+		vertices — [page:Array] di punti della forma [1,1,1, -1,-1,-1, ... ] <br />
+		indices — [page:Array] di indici che compongono le facce della forma [0,1,2, 2,3,0, ... ] <br />
+		radius — [page:Float] - Il raggio della forma finale <br />
+		detail — [page:Integer] - In quanti livelli suddividere la geometria. Più dettagli, più liscia è la forma.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:BufferGeometry] per le proprietà comuni.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+      Un oggetto con una proprietà per ognuno dei parametri del costruttore. Qualsiasi modifica dopo l'istanziazione non cambia la geometria.
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:BufferGeometry] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

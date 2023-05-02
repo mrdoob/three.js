@@ -77,6 +77,11 @@
 
 		</p>
 
+		<h3>[property:Boolean isOrthographicCamera]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Float left]</h3>
 		<p>摄像机视锥体左侧面。</p>
 
@@ -105,7 +110,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Camera]。</p>
 
-		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
 		fullWidth — 多视图的全宽设置<br />
 		fullHeight — 多视图的全高设置<br />
@@ -119,12 +124,12 @@
 
 		</p>
 
-		<h3>[method:null clearViewOffset]()</h3>
+		<h3>[method:undefined clearViewOffset]()</h3>
 		<p>
 		清除任何由.setViewOffset设置的偏移量。
 		</p>
 
-		<h3>[method:null updateProjectionMatrix]()</h3>
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
 		<p>
 		更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
 		</p>

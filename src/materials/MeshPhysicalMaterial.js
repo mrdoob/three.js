@@ -3,40 +3,13 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 import { Color } from '../math/Color.js';
 import * as MathUtils from '../math/MathUtils.js';
 
-/**
- * parameters = {
- *  clearcoat: <float>,
- *  clearcoatMap: new THREE.Texture( <Image> ),
- *  clearcoatRoughness: <float>,
- *  clearcoatRoughnessMap: new THREE.Texture( <Image> ),
- *  clearcoatNormalScale: <Vector2>,
- *  clearcoatNormalMap: new THREE.Texture( <Image> ),
- *
- *  ior: <float>,
- *  reflectivity: <float>,
- *
- *  sheen: <Color>,
- *
- *  transmission: <float>,
- *  transmissionMap: new THREE.Texture( <Image> ),
- *
- *  thickness: <float>,
- *  thicknessMap: new THREE.Texture( <Image> ),
- *  attenuationDistance: <float>,
- *  attenuationTint: <Color>,
- *
- *  specularIntensity: <float>,
- *  specularIntensityhMap: new THREE.Texture( <Image> ),
- *  specularTint: <Color>,
- *  specularTintMap: new THREE.Texture( <Image> )
- * }
- */
-
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	constructor( parameters ) {
 
 		super();
+
+		this.isMeshPhysicalMaterial = true;
 
 		this.defines = {
 
@@ -47,7 +20,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.type = 'MeshPhysicalMaterial';
 
-		this.clearcoat = 0.0;
 		this.clearcoatMap = null;
 		this.clearcoatRoughness = 0.0;
 		this.clearcoatRoughnessMap = null;
@@ -69,22 +41,106 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			}
 		} );
 
-		this.sheen = null; // null will disable sheen bsdf
+		this.iridescenceMap = null;
+		this.iridescenceIOR = 1.3;
+		this.iridescenceThicknessRange = [ 100, 400 ];
+		this.iridescenceThicknessMap = null;
 
-		this.transmission = 0.0;
+		this.sheenColor = new Color( 0x000000 );
+		this.sheenColorMap = null;
+		this.sheenRoughness = 1.0;
+		this.sheenRoughnessMap = null;
+
 		this.transmissionMap = null;
 
-		this.thickness = 0.01;
+		this.thickness = 0;
 		this.thicknessMap = null;
-		this.attenuationDistance = 0.0;
-		this.attenuationTint = new Color( 1, 1, 1 );
+		this.attenuationDistance = Infinity;
+		this.attenuationColor = new Color( 1, 1, 1 );
 
 		this.specularIntensity = 1.0;
 		this.specularIntensityMap = null;
-		this.specularTint = new Color( 1, 1, 1 );
-		this.specularTintMap = null;
+		this.specularColor = new Color( 1, 1, 1 );
+		this.specularColorMap = null;
+
+		this._sheen = 0.0;
+		this._clearcoat = 0;
+		this._iridescence = 0;
+		this._transmission = 0;
 
 		this.setValues( parameters );
+
+	}
+
+	get sheen() {
+
+		return this._sheen;
+
+	}
+
+	set sheen( value ) {
+
+		if ( this._sheen > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._sheen = value;
+
+	}
+
+	get clearcoat() {
+
+		return this._clearcoat;
+
+	}
+
+	set clearcoat( value ) {
+
+		if ( this._clearcoat > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._clearcoat = value;
+
+	}
+
+	get iridescence() {
+
+		return this._iridescence;
+
+	}
+
+	set iridescence( value ) {
+
+		if ( this._iridescence > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._iridescence = value;
+
+	}
+
+	get transmission() {
+
+		return this._transmission;
+
+	}
+
+	set transmission( value ) {
+
+		if ( this._transmission > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._transmission = value;
 
 	}
 
@@ -108,15 +164,17 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.ior = source.ior;
 
-		if ( source.sheen ) {
+		this.iridescence = source.iridescence;
+		this.iridescenceMap = source.iridescenceMap;
+		this.iridescenceIOR = source.iridescenceIOR;
+		this.iridescenceThicknessRange = [ ...source.iridescenceThicknessRange ];
+		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
 
-			this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
-
-		} else {
-
-			this.sheen = null;
-
-		}
+		this.sheen = source.sheen;
+		this.sheenColor.copy( source.sheenColor );
+		this.sheenColorMap = source.sheenColorMap;
+		this.sheenRoughness = source.sheenRoughness;
+		this.sheenRoughnessMap = source.sheenRoughnessMap;
 
 		this.transmission = source.transmission;
 		this.transmissionMap = source.transmissionMap;
@@ -124,19 +182,17 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.thickness = source.thickness;
 		this.thicknessMap = source.thicknessMap;
 		this.attenuationDistance = source.attenuationDistance;
-		this.attenuationTint.copy( source.attenuationTint );
+		this.attenuationColor.copy( source.attenuationColor );
 
 		this.specularIntensity = source.specularIntensity;
 		this.specularIntensityMap = source.specularIntensityMap;
-		this.specularTint.copy( source.specularTint );
-		this.specularTintMap = source.specularTintMap;
+		this.specularColor.copy( source.specularColor );
+		this.specularColorMap = source.specularColorMap;
 
 		return this;
 
 	}
 
 }
-
-MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
 export { MeshPhysicalMaterial };

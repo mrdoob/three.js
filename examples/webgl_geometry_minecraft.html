@@ -20,15 +20,28 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { FirstPersonControls } from './jsm/controls/FirstPersonControls.js';
-			import { ImprovedNoise } from './jsm/math/ImprovedNoise.js';
-			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
+			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
 			let container, stats;
 
@@ -138,19 +151,20 @@
 
 				}
 
-				const geometry = BufferGeometryUtils.mergeBufferGeometries( geometries );
+				const geometry = BufferGeometryUtils.mergeGeometries( geometries );
 				geometry.computeBoundingSphere();
 
 				const texture = new THREE.TextureLoader().load( 'textures/minecraft/atlas.png' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 				texture.magFilter = THREE.NearestFilter;
 
 				const mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, side: THREE.DoubleSide } ) );
 				scene.add( mesh );
 
-				const ambientLight = new THREE.AmbientLight( 0xcccccc );
+				const ambientLight = new THREE.AmbientLight( 0xeeeeee );
 				scene.add( ambientLight );
 
-				const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+				const directionalLight = new THREE.DirectionalLight( 0xffffff, 4 );
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
@@ -214,7 +228,7 @@
 
 			function getY( x, z ) {
 
-				return ( data[ x + z * worldWidth ] * 0.2 ) | 0;
+				return ( data[ x + z * worldWidth ] * 0.15 ) | 0;
 
 			}
 

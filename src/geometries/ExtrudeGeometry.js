@@ -25,11 +25,12 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import * as Curves from '../extras/curves/Curves.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
 
 class ExtrudeGeometry extends BufferGeometry {
 
-	constructor( shapes, options ) {
+	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {
 
 		super();
 
@@ -71,26 +72,17 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 			const steps = options.steps !== undefined ? options.steps : 1;
-			let depth = options.depth !== undefined ? options.depth : 100;
+			const depth = options.depth !== undefined ? options.depth : 1;
 
 			let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
-			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
-			let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
+			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
+			let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 0.1;
 			let bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
 			let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
 			const extrudePath = options.extrudePath;
 
 			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
-
-			// deprecated options
-
-			if ( options.amount !== undefined ) {
-
-				console.warn( 'THREE.ExtrudeBufferGeometry: amount has been renamed to depth.' );
-				depth = options.amount;
-
-			}
 
 			//
 
@@ -178,7 +170,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 				if ( ! vec ) console.error( 'THREE.ExtrudeGeometry: vec does not exist' );
 
-				return vec.clone().multiplyScalar( size ).add( pt );
+				return pt.clone().addScaledVector( vec, size );
 
 			}
 
@@ -685,6 +677,16 @@ class ExtrudeGeometry extends BufferGeometry {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.parameters = Object.assign( {}, source.parameters );
+
+		return this;
+
+	}
+
 	toJSON() {
 
 		const data = super.toJSON();
@@ -800,6 +802,8 @@ function toJSON( shapes, options, data ) {
 
 	}
 
+	data.options = Object.assign( {}, options );
+
 	if ( options.extrudePath !== undefined ) data.options.extrudePath = options.extrudePath.toJSON();
 
 	return data;
@@ -807,4 +811,4 @@ function toJSON( shapes, options, data ) {
 }
 
 
-export { ExtrudeGeometry, ExtrudeGeometry as ExtrudeBufferGeometry };
+export { ExtrudeGeometry };

@@ -11,19 +11,34 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lightning strike</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { LightningStrike } from './jsm/geometries/LightningStrike.js';
-			import { LightningStorm } from './jsm/objects/LightningStorm.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { OutlinePass } from './jsm/postprocessing/OutlinePass.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { LightningStrike } from 'three/addons/geometries/LightningStrike.js';
+			import { LightningStorm } from 'three/addons/objects/LightningStorm.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let container, stats;
 
@@ -54,7 +69,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 
@@ -98,13 +112,13 @@
 
 				}
 
-				gui = new GUI( { width: 350 } );
+				gui = new GUI( { width: 315 } );
 
-				const sceneFolder = gui.addFolder( "Scene" );
+				const sceneFolder = gui.addFolder( 'Scene' );
 
 				scene.userData.sceneIndex = currentSceneIndex;
 
-				sceneFolder.add( scene.userData, 'sceneIndex', { "Electric Cones": 0, "Plasma Ball": 1, "Storm": 2 } ).name( 'Scene' ).onChange( function ( value ) {
+				sceneFolder.add( scene.userData, 'sceneIndex', { 'Electric Cones': 0, 'Plasma Ball': 1, 'Storm': 2 } ).name( 'Scene' ).onChange( function ( value ) {
 
 					currentSceneIndex = value;
 
@@ -117,9 +131,9 @@
 
 				sceneFolder.open();
 
-				const graphicsFolder = gui.addFolder( "Graphics" );
+				const graphicsFolder = gui.addFolder( 'Graphics' );
 
-				graphicsFolder.add( scene.userData, "outlineEnabled" ).name( "Glow enabled" );
+				graphicsFolder.add( scene.userData, 'outlineEnabled' ).name( 'Glow enabled' );
 
 				scene.userData.lightningColorRGB = [
 					scene.userData.lightningColor.r * 255,
@@ -144,7 +158,7 @@
 
 				graphicsFolder.open();
 
-				const rayFolder = gui.addFolder( "Ray parameters" );
+				const rayFolder = gui.addFolder( 'Ray parameters' );
 
 				rayFolder.add( scene.userData.rayParams, 'straightness', 0, 1 ).name( 'Straightness' );
 				rayFolder.add( scene.userData.rayParams, 'roughness', 0, 1 ).name( 'Roughness' );
@@ -160,7 +174,7 @@
 
 					// Parameters which need to recreate the ray after modification
 
-					const raySlowFolder = gui.addFolder( "Ray parameters (slow)" );
+					const raySlowFolder = gui.addFolder( 'Ray parameters (slow)' );
 
 					raySlowFolder.add( scene.userData.rayParams, 'ramification', 0, 15 ).step( 1 ).name( 'Ramification' ).onFinishChange( function () {
 
@@ -409,14 +423,14 @@
 
 				scene.userData.lightningMaterial = new THREE.MeshBasicMaterial( { color: scene.userData.lightningColor, side: THREE.DoubleSide } );
 
-				const r = "textures/cube/Bridge2/";
-				const urls = [ r + "posx.jpg", r + "negx.jpg",
-							 r + "posy.jpg", r + "negy.jpg",
-							 r + "posz.jpg", r + "negz.jpg" ];
+				const r = 'textures/cube/Bridge2/';
+				const urls = [ r + 'posx.jpg', r + 'negx.jpg',
+							 r + 'posy.jpg', r + 'negy.jpg',
+							 r + 'posz.jpg', r + 'negz.jpg' ];
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.mapping = THREE.CubeReflectionMapping;
-				textureCube.encoding = THREE.sRGBEncoding;
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				const sphereMaterial = new THREE.MeshPhysicalMaterial( {
 					transparent: true,

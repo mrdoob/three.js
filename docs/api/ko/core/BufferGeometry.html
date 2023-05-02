@@ -10,7 +10,7 @@
 		<h1>[name]</h1>
 
 		<p>
-		메쉬, 선, 점 기하학의 표현입니다. 꼭짓점의 위치, 면 순서, 법선, 색상, UV, 버퍼에 있는 커스텀 속성을 포함하고 있으며, 데이터를 GPU에 전달하는 
+		메쉬, 선, 점 기하학의 표현입니다. 꼭짓점의 위치, 면 순서, 법선, 색상, UV, 버퍼에 있는 커스텀 속성을 포함하고 있으며, 데이터를 GPU에 전달하는
 		자원을 줄여줍니다.
 		</p>
 		<p>
@@ -67,19 +67,19 @@
 
 		<h3>[property:Box3 boundingBox]</h3>
 		<p>
-			bufferGeometry의 바운딩 박스이며 [page:.computeBoundingBox]()로 계산할 수 있습니다. 
+			bufferGeometry의 바운딩 박스이며 [page:.computeBoundingBox]()로 계산할 수 있습니다.
 			기본값은 *null*입니다.
 		</p>
 
 		<h3>[property:Sphere boundingSphere]</h3>
 		<p>
-			bufferGeometry의 바운딩 스피어이며 [page:.computeBoundingSphere]()로 계산할 수 있습니다. 
+			bufferGeometry의 바운딩 스피어이며 [page:.computeBoundingSphere]()로 계산할 수 있습니다.
 			기본값은 *null*입니다.
 		</p>
 
 		<h3>[property:Object drawRange]</h3>
 		<p>
-			렌더링할 기하학의 부분을 정의합니다. 직접 설정하면 안되며 [page:.setDrawRange]를 사용해야 합니다. 
+			렌더링할 기하학의 부분을 정의합니다. 직접 설정하면 안되며 [page:.setDrawRange]를 사용해야 합니다.
 			기본 값은 다음과 같습니다.
 			<code>
 				{ start: 0, count: Infinity }
@@ -96,7 +96,7 @@
 			각자의 그룹은 형태의 객체입니다:
 			<code>{ start: Integer, count: Integer, materialIndex: Integer }</code>
 			start는 이 드리기 요청에서 첫 번째 엘레먼드를 지정하지만 – 첫 번째 인덱스가 없는 기하학이기때문이지만,
-			다른 경우는 첫 번째 삼각형 인덱스입니다. Count는 몇 개의 꼭짓점(혹은 인덱스)가 포함되었는지, 
+			다른 경우는 첫 번째 삼각형 인덱스입니다. Count는 몇 개의 꼭짓점(혹은 인덱스)가 포함되었는지,
 			materialIndex는 사용할 재질 배열 인덱스를 지정합니다.
 
 			배열을 직접 수정하기보다는 [page:.addGroup]를 사용해 그룹을 추가합니다.
@@ -123,13 +123,19 @@
 			각각의 삼각형은 세 꼭짓점의 인덱스와 연관되어 있습니다. 이 속성은 따라서 각 삼각형 면의 각 꼭짓점의 인덱스를 저장하고 있습니다.
 
 			이 속성이 설정되어 있지 않다면, [page:WebGLRenderer renderer]는 세 연속된 위치가 단일 삼각형을 나타낸다고 추정합니다.
-			
+
 			기본값은 *null* 입니다.
+		</p>
+
+		<h3>[property:Boolean isBufferGeometry]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
-			[page:BufferAttribute]의 해쉬맵은 기하학의 모프 타겟에 대한 세부정보를 담고 있습니다.
+			[page:BufferAttribute]의 해쉬맵은 기하학의 모프 타겟에 대한 세부정보를 담고 있습니다.<br />
+			Note: Once the geometry has been rendered, the morph attribute data cannot be changed. You will have to call [page:.dispose](), and create a new instance of [name].
 		</p>
 
 		<h3>[property:Boolean morphTargetsRelative]</h3>
@@ -158,57 +164,59 @@
 
 		<h2>메서드</h2>
 
-		<h3>이 클래스에서는 [page:EventDispatcher EventDispatcher] 메서드들이 활용 가능합니다.</h3>
+		<p>이 클래스에서는 [page:EventDispatcher EventDispatcher] 메서드들이 활용 가능합니다.</p>
 
-		<h3>[method:BufferGeometry setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
+		<h3>[method:this setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
-		기하학에 대한 속성을 설정합니다. [page:.attributes]의 내부 해시맵은 속성들의 반복 속도 증가를 위해 유지되기 때문에, 
+		기하학에 대한 속성을 설정합니다. [page:.attributes]의 내부 해시맵은 속성들의 반복 속도 증가를 위해 유지되기 때문에,
 		속성 프로퍼티 대신 이 메서드를 사용하세요.
 		</p>
 
-		<h3>[method:null addGroup]( [param:Integer start], [param:Integer count], [param:Integer materialIndex] )</h3>
+		<h3>[method:undefined addGroup]( [param:Integer start], [param:Integer count], [param:Integer materialIndex] )</h3>
 		<p>
 			기하학에 그룹을 추가합니다; 프로퍼티 상세에 대해서는 [page:BufferGeometry.groups groups] 페이지를 참고하세요.
 		</p>
 
 
-		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>꼭짓점 좌표로 직접 매트릭스 변형을 합니다.</p>
 
-		<h3>[method:BufferGeometry center] ()</h3>
+		<h3>[method:this center] ()</h3>
 		<p>바운딩 박스를 기준으로 기하학을 중앙정렬합니다.</p>
 
 		<h3>[method:BufferGeometry clone]()</h3>
 		<p>BufferGeometry의 사본을 만듭니다.</p>
 
-		<h3>[method:BufferGeometry copy]( [param:BufferGeometry bufferGeometry] )</h3>
+		<h3>[method:this copy]( [param:BufferGeometry bufferGeometry] )</h3>
 		<p>다른 BufferGeometry를 이 BufferGeometry에 복사합니다.</p>
 
-		<h3>[method:null clearGroups]( )</h3>
+		<h3>[method:undefined clearGroups]( )</h3>
 		<p>모든 그룹을 제거합니다.</p>
 
-		<h3>[method:null computeBoundingBox]()</h3>
+		<h3>[method:undefined computeBoundingBox]()</h3>
 		<p>
 		기하학의 바운딩 박스를 계산하고 [page:.boundingBox] 속성을 업데이트합니다.<br />
 		바운딩 박스는 자동으로 계산되지 않습니다. 명시적으로 계산되어야하며 그렇지 않으면 *null* 값입니다.
 		</p>
 
-		<h3>[method:null computeBoundingSphere]()</h3>
+		<h3>[method:undefined computeBoundingSphere]()</h3>
 		<p>
 		기하학의 바운딩 스피어를 계산하고 [page:.boundingSphere] 속성을 업데이트합니다.<br />
 		바운딩 스피어는 자동으로 계산되지 않습니다. 명시적으로 계산되어야하며 그렇지 않으면 *null* 값입니다.
 		</p>
 
-		<h3>[method:null computeTangents]()</h3>
+		<h3>[method:undefined computeTangents]()</h3>
 		<p>
 		기하학에 탄젠트 속성을 계산하고 추가합니다.<br />
 		이 계산은 인덱스가 있는 기하학에만 지원되며 위치, 법선, uv 속성이 정의되어야 합니다.
+		When using a tangent space normal map, prefer the MikkTSpace algorithm provided by
+		[page:BufferGeometryUtils.computeMikkTSpaceTangents] instead.
 		</p>
 
-		<h3>[method:null computeVertexNormals]()</h3>
+		<h3>[method:undefined computeVertexNormals]()</h3>
 		<p>면의 법선 평균값을 통해 꼭짓점 법선을 계산합니다.</p>
 
-		<h3>[method:null dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
 		메모리에서 객체를 정리합니다. <br />
 		앱이 동작중인데 BufferGeometry를 삭제하고 싶을 때 호출합니다.
@@ -223,7 +231,7 @@
 		<h3>[method:Boolean hasAttribute]( [param:String name] )</h3>
 		<p>특정 이름의 속성이 존재하면 *true*를 리턴합니다.</p>
 
-		<h3>[method:BufferGeometry lookAt] ( [param:Vector3 vector] )</h3>
+		<h3>[method:this lookAt] ( [param:Vector3 vector] )</h3>
 		<p>
 		vector - 바라보는 시점의 월드 벡터 입니다.<br /><br />
 
@@ -231,10 +239,7 @@
 		일반적인 리얼타임 메쉬 사용은 [page:Object3D.lookAt] 을 사용하세요.
 		</p>
 
-		<h3>[method:null merge]( [param:BufferGeometry bufferGeometry], [param:Integer offset] )</h3>
-		<p>병합을 시작할 지점인 임의의 오프셋으로 다른 BufferGeometry에 병합합니다.</p>
-
-		<h3>[method:null normalizeNormals]()</h3>
+		<h3>[method:undefined normalizeNormals]()</h3>
 		<p>
 		기하학의 모든 법선 벡터는 1의 크기를 갖습니다.
 		기하학 표면의 광도를 수정합니다.
@@ -243,38 +248,38 @@
 		<h3>[method:BufferAttribute deleteAttribute]( [param:String name] )</h3>
 		<p>특정 이름의 [page:BufferAttribute attribute]를 전부 삭제합니다.</p>
 
-		<h3>[method:BufferGeometry rotateX] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateX] ( [param:Float radians] )</h3>
 		<p>
 		X 축의 기하학을 회전합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 회전은 [page:Object3D.rotation] 를 사용하세요.
 		</p>
 
-		<h3>[method:BufferGeometry rotateY] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateY] ( [param:Float radians] )</h3>
 		<p>
 		Y 축의 기하학을 회전합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 회전은 [page:Object3D.rotation] 를 사용하세요.
 		</p>
 
-		<h3>[method:BufferGeometry rotateZ] ( [param:Float radians] )</h3>
+		<h3>[method:this rotateZ] ( [param:Float radians] )</h3>
 		<p>
 		Z 축의 기하학을 회전합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 회전은 [page:Object3D.rotation] 를 사용하세요.
 		</p>
 
-		<h3>[method:BufferGeometry scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this scale] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		기하학 데이터를 확대/축소합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 확대/축소는 [page:Object3D.scale] 를 사용하세요.
 		</p>
 
-		<h3>[method:BufferGeometry setIndex] ( [param:BufferAttribute index] )</h3>
+		<h3>[method:this setIndex] ( [param:BufferAttribute index] )</h3>
 		<p>[page:.index] 버퍼를 설정합니다.</p>
 
-		<h3>[method:null setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
+		<h3>[method:undefined setDrawRange] ( [param:Integer start], [param:Integer count] )</h3>
 		<p>[page:.drawRange] 프로퍼티를 설정합니다. 인덱스가 없는 BufferGeometry에서, count는 렌더링할 꼭짓점의 수입니다.
 		인덱스가 있는 BufferGeometry에서 count는 렌더링할 인덱스의 수입니다.</p>
 
-		<h3>[method:BufferGeometry setFromPoints] ( [param:Array points] )</h3>
+		<h3>[method:this setFromPoints] ( [param:Array points] )</h3>
 		<p>점 배열로부터 BufferGeometry의 속성을 설정합니다. from an array of points.</p>
 
 		<h3>[method:Object toJSON]()</h3>
@@ -283,7 +288,7 @@
 		<h3>[method:BufferGeometry toNonIndexed]()</h3>
 		<p>인덱스가 있는 BufferGeometry의 인덱스가 없는 버전을 리턴합니다.</p>
 
-		<h3>[method:BufferGeometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<h3>[method:this translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
 		기하학을 이동합니다. 일반적으로 한 구간에서만 사용되며 루프 구간에서 사용되지 않습니다.
 		일반적인 리얼타임 메쉬 이동은 [page:Object3D.position] 를 사용하세요.

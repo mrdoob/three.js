@@ -33,7 +33,6 @@ textarea {
 	tab-size: 4;
 	white-space: pre;
 	word-wrap: normal;
-	vertical-align: middle;
 }
 
 	textarea.success {
@@ -68,6 +67,7 @@ textarea, input { outline: none; } /* osx */
 	position: relative;
 	display: block;
 	width: 100%;
+	min-width: 260px;
 }
 
 .TabbedPanel .Tabs {
@@ -76,17 +76,16 @@ textarea, input { outline: none; } /* osx */
 	width: 100%;
 }
 
-.TabbedPanel .Tabs .Tab {
-	padding: 10px;
-	text-transform: uppercase;
-}
+	.TabbedPanel .Tabs .Tab {
+		padding: 10px;
+		text-transform: uppercase;
+	}
 
-.TabbedPanel .Tabs .Panels {
-	position: relative;
-	display: block;
-	width: 100%;
-	height: 100%;
-}
+	.TabbedPanel .Panels {
+		position: relative;
+		display: block;
+		width: 100%;
+	}
 
 /* Listbox */
 .Listbox {
@@ -250,6 +249,7 @@ button {
 	border: 0px;
 	margin: 0px; /* GNOME Web */
 	padding: 5px 8px;
+	font-size: 12px;
 	text-transform: uppercase;
 	cursor: pointer;
 	outline: none;
@@ -425,12 +425,10 @@ select {
 	}
 
 	#sidebar .Row {
-		min-height: 20px;
+		display: flex;
+		align-items: center;
+		min-height: 24px;
 		margin-bottom: 10px;
-	}
-
-	#sidebar canvas {
-		vertical-align: middle;
 	}
 
 #tabs {
@@ -697,4 +695,11 @@ select {
 		background-color: rgba(21,60,94,1);
 	}
 
+}
+
+/* Temporary Chrome fix (#24794) */
+
+[draggable="true"] {
+	transform: translate(0, 0);
+	z-index: 0;
 }

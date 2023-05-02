@@ -16,6 +16,17 @@
 		对于第一人称3D游戏来说， [name] 是一个非常完美的选择。
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+		</code>
+
 		<h2>代码示例</h2>
 
 		<code>
@@ -99,12 +110,12 @@
 
 		<p>共有方法请参见其基类[page:EventDispatcher]。</p>
 
-		<h3>[method:null connect] ()</h3>
+		<h3>[method:undefined connect] ()</h3>
 		<p>
 			添加控制器的事件监听。
 		</p>
 
-		<h3>[method:null disconnect] ()</h3>
+		<h3>[method:undefined disconnect] ()</h3>
 		<p>
 			移除控制器的事件监听。
 		</p>
@@ -119,12 +130,12 @@
 			</p>
 		</p>
 
-		<h3>[method:null lock] ()</h3>
+		<h3>[method:undefined lock] ()</h3>
 		<p>
 			激活指针锁定。
 		</p>
 
-		<h3>[method:null moveForward] ( [param:Number distance] )</h3>
+		<h3>[method:undefined moveForward] ( [param:Number distance] )</h3>
 		<p>
 			<p>
 				[page:Number distance]: 距离（区分正负）。
@@ -134,7 +145,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null moveRight] ( [param:Number distance] )</h3>
+		<h3>[method:undefined moveRight] ( [param:Number distance] )</h3>
 		<p>
 			<p>
 				[page:Number distance]: 距离（区分正负）。
@@ -144,7 +155,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null unlock] ()</h3>
+		<h3>[method:undefined unlock] ()</h3>
 		<p>
 			退出指针锁定。
 		</p>

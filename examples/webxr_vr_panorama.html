@@ -7,10 +7,23 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
-			import { VRButton } from './jsm/webxr/VRButton.js';
+			import * as THREE from 'three';
+			import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 			let camera;
 			let renderer;
@@ -40,7 +53,7 @@
 				const geometry = new THREE.BoxGeometry( 100, 100, 100 );
 				geometry.scale( 1, 1, - 1 );
 
-				const textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe_stereo.jpg", 12 );
+				const textures = getTexturesFromAtlasFile( 'textures/cube/sun_temple_stripe_stereo.jpg', 12 );
 
 				const materials = [];
 
@@ -94,6 +107,7 @@
 						canvas.height = tileWidth;
 						canvas.width = tileWidth;
 						context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+						textures[ i ].colorSpace = THREE.SRGBColorSpace;
 						textures[ i ].image = canvas;
 						textures[ i ].needsUpdate = true;
 

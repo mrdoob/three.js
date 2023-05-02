@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Rappresenta un bounding box (rettangolo di selezione) allineato all'asse (AABB) nello spazio 3D.
+		</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const box = new THREE.Box3();
+
+		const mesh = new THREE.Mesh(
+			new THREE.SphereGeometry(),
+			new THREE.MeshBasicMaterial()
+		);
+
+		// assicurarsi che il bounding box sia calcolato per la sua geometria
+		// questo dovrebbe essere fatto una sola volta (supponendo geometrie statiche)
+		mesh.geometry.computeBoundingBox();
+
+		// ...
+
+		// nel ciclo di animazione, calcola il bounding box corrente con la matrice world
+		box.copy( mesh.geometry.boundingBox ).applyMatrix4( mesh.matrixWorld );
+		</code>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Vector3 min], [param:Vector3 max] )</h3>
+		<p>
+		[page:Vector3 min] - (opzionale) [page:Vector3] che rappresenta il limite inferiore (x, y, z) del box.
+		Il valore predefinito è ( + Infinito, + Infinito, + Infinito ).<br>
+
+		[page:Vector3 max] - (opzionale) [page:Vector3] che rappresenta il limite superiore (x, y, z) del box.
+		Il valore predefinito è ( - Infinito, - Infinito, - Infinito ).<br /><br />
+
+		Crea un [name] delimitato da min e max.
+		</p>
+
+		<h2>Proprietà</h2>
+
+		<h3>[property:Boolean isBox3]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+		<h3>[property:Vector3 min]</h3>
+		<p>
+			[page:Vector3] rappresenta il limite inferiore (x, y, z) del box.<br />
+			Il valore predefinito è ( + Infinito, + Infinito, + Infinito ).
+		</p>
+
+		<h3>[property:Vector3 max]</h3>
+		<p>
+			[page:Vector3] che rappresenta il limite superiore (x, y, z) del box.<br />
+			Il valore predefinito è ( - Infinito, - Infinito, - Infinito ).
+		</p>
+
+
+
+		<h2>Metodi</h2>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<p>
+		[page:Matrix4 matrix] - La [page:Matrix4] da applicare<br /><br />
+
+		Trasforma questo Box3 con la matrice fornita.
+		</p>
+
+		<h3>[method:Vector3 clampPoint]( [param:Vector3 point], [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] da bloccare. <br>
+		[page:Vector3 target] - il risultato sarà copiato in questo Vector3.<br /><br />
+
+		[link:https://en.wikipedia.org/wiki/Clamping_(graphics) Blocca] il [page:Vector3 punto] entro i limiti di questo box.<br />
+		</p>
+
+		<h3>[method:Box3 clone]()</h3>
+		<p>Restituisce un nuovo [page:Box3] con lo stesso [page:.min min] e [page:.max max] di questo.</p>
+
+		<h3>[method:Boolean containsBox]( [param:Box3 box] )</h3>
+		<p>
+			[page:Box3 box] - [page:Box3 Box3] per testare l'inclusione.<br /><br />
+
+			Restituisce true se questo box include la totalità del [page:Box3 box]. Se questo e il [page:Box3 box] sono identici, 
+			questa fuonzione tornerà comunque true.
+		</p>
+
+		<h3>[method:Boolean containsPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] per verificare l'inclusione.<br /><br />
+
+		Restituisce true se il [page:Vector3 punto] specificato si trova all'interno o sui limiti di questo box.
+		</p>
+
+		<h3>[method:this copy]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box]  - [page:Box3] da copiare.<br /><br />
+
+		Copia il [page:.min min] e il [page:.max max] da [page:Box3 box] a questo box.
+		</p>
+
+		<h3>[method:Float distanceToPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] per misurare la distanza.<br /><br />
+
+		Restituisce la distanza da qualsiasi arco di questo box al punto specificato.
+		Se il [page:Vector3 punto] si trova all'interno di questo box, la distanza sarà 0.
+		</p>
+
+
+		<h3>[method:Boolean equals]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - Box da confrontare con questo.<br /><br />
+
+		Restituisce true se questo box e il [page:Box3 box] condividono gli stessi limiti inferiore e superiore.
+		</p>
+
+		<h3>[method:this expandByObject]( [param:Object3D object], [param:Boolean precise] )</h3>
+		<p>
+			[page:Object3D object] - [page:Object3D] per espandere il box.<br />
+			precise - (opzionale) espande il bounding box il meno possibile a scapito di ulteriori calcoli. L'impostazione predefinita è `false`.<br /><br />
+
+			Espande i limiti di questo box per includere l'[page:Object3D oggetto] e i suoi figli,
+			tenendo conto delle trasformazioni del mondo dell'oggetto e dei figli.
+			La funzione può risultare in un box più grande del necessario (a meno che il parametro non sia impostato su true).
+		</p>
+
+		<h3>[method:this expandByPoint]( [param:Vector3 point] )</h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3] che dovrebbe essere incluso nel box.<br /><br />
+
+		Espande i limiti di questo box in modo da includere il [page:Vector3 punto].
+		</p>
+
+		<h3>[method:this expandByScalar]( [param:Float scalar] )</h3>
+		<p>
+		[page:Float scalar] - Distanza di cui espandere il box.<br /><br />
+
+		Espande ogni dimensione del box per lo [page:Float scalare]. Se negativo, le dimensioni del box saranno contratte.
+		</p>
+
+		<h3>[method:this expandByVector]( [param:Vector3 vector] )</h3>
+		<p>
+		[page:Vector3 vector] - [page:Vector3] per il quale espandere il box.<br /><br />
+
+		Espande questo box in modo equilatero per [page:Vector3 vettore]. La larghezza di questo box sarà estesa
+		dal componente x del [page:Vector3 vettore] in entrambe le direzioni. L'altezza di questo box 
+		sarà estesa dal componente y del [page:Vector3 vettore] in entrambe le direzioni.
+		La profondità di questo box sarà estesa dal componente z del [page:Vector3 vettore] in entrambe le direzioni.
+		</p>
+
+		<h3>[method:Sphere getBoundingSphere]( [param:Sphere target] )</h3>
+		<p>
+		[page:Sphere target] - il risultato sarà copiato in questa sfera.<br /><br />
+
+		Ottiene una [page:Sphere Sfera] che delimita il box.
+		</p>
+
+		<h3>[method:Vector3 getCenter]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] - il risultato sarà copiato in questo Vector3.<br /><br />
+
+		Restituisce il punto centrale del box come un [page:Vector3]. 
+		</p>
+
+		<h3>[method:Vector3 getParameter]( [param:Vector3 point], [param:Vector3 target] ) </h3>
+		<p>
+		[page:Vector3 point] - [page:Vector3].<br/>
+		[page:Vector3 target] - il risultato sarà copiato in questo Vector3.<br /><br />
+
+		Restituisce un punto come proporzione della larghezza, dell'altezza e della profondità di questo box.
+		</p>
+
+		<h3>[method:Vector3 getSize]( [param:Vector3 target] )</h3>
+		<p>
+		[page:Vector3 target] - il risultato sarà copiato in questo Vector3.<br /><br />
+
+		Restituisce la larghezza, l'altezza e la profondità di questo box.
+		</p>
+
+		<h3>[method:this intersect]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - Box con cui intersecare.<br /><br />
+
+		Restituisce l'intersezione di questo box e [page:Box3 box], impostando il limite superiore di questo box al minore
+		dei limiti superiori dei due box e il limite inferiore di questo box al maggiore dei limiti inferiori dei due box.
+		Se non ci sono sovrapposizioni, rende il box vuoto.
+		</p>
+
+		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - Box per il controllo dell'intersezione.<br /><br />
+
+		Determina se questo box interseca [page:Box3 box] oppure no.
+		</p>
+
+		<h3>[method:Boolean intersectsPlane]( [param:Plane plane] )</h3>
+		<p>
+		[page:Plane plane] - [page:Plane] per il controllo dell'intersezione.<br /><br />
+
+		Determina se questo box interseca il [page:Plane plane] oppure no.
+		</p>
+
+		<h3>[method:Boolean intersectsSphere]( [param:Sphere sphere] )</h3>
+		<p>
+		[page:Sphere sphere] - [page:Sphere] per il controllo dell'intersezione.<br /><br />
+
+		Determina se questo box interseca la [page:Sphere sphere] oppure no.
+		</p>
+
+		<h3>[method:Boolean intersectsTriangle]( [param:Triangle triangle] )</h3>
+		<p>
+		[page:Triangle triangle] - [page:Triangle] per il controllo dell'intersezione.<br /><br />
+
+		Determina se questo box interseca il [page:Triangle triangle] oppure no.
+		</p>
+
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+			Restituisce true se questo box include zero punti entro i suoi limiti.<br>
+			Si noti che un box con i limiti superiore e inferiore uguali include ancora un punto,
+			quello condiviso da entrambi i limiti.
+		</p>
+
+		<h3>[method:this makeEmpty]()</h3>
+		<p>Rende questo box vuoto.</p>
+
+		<h3>[method:this set]( [param:Vector3 min], [param:Vector3 max] )</h3>
+		<p>
+		[page:Vector3 min] - [page:Vector3] rappresenta il limite inferiore (x, y, z) del box.<br />
+		[page:Vector3 max] - [page:Vector3] rappresenta il limite superiore (x, y, z) del box.<br /><br />
+
+		Imposta i limiti inferiore e superiore (x, y, z) di questo box.<br>
+		Si noti che questo metodo copia solo i valori dagli oggetti dati.
+		</p>
+
+		<h3>[method:this setFromArray]( [param:Array array] )</h3>
+		<p>
+		array -- Un array di dati di posizione che il box risultante avvolgerà.<br /><br />
+
+		Imposta i limiti inferiore e superiore di questo box per includere tutti i dati nell'`array`.
+		</p>
+
+		<h3>[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] )</h3>
+		<p>
+		[page:BufferAttribute attribute] - Un attributo buffer di dati di posizione che il box risultante avvolgerà.<br /><br />
+
+		Imposta i limiti inferiore e superiore di questo box per includere tutti i dati nell'[page:BufferAttribute attribute].
+		</p>
+
+		<h3>[method:this setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] )</h3>
+		<p>
+		[page:Vector3 center] - Posizione centrale desiderata del box.<br>
+		[page:Vector3 size] - Dimensioni x, y e z desiderati per il box.<br /><br />
+
+		Centra questo box nel [page:Vector3 centro] e imposta la larghezza e l'altezza di questo box ai valori 
+		specificati in [page:Vector3 size].
+		</p>
+
+		<h3>[method:this setFromObject]( [param:Object3D object], [param:Boolean precise] )</h3>
+		<p>
+		[page:Object3D object] - [page:Object3D] di cui calcolare il bounding box.<br />
+		precise - (opzionale) calcola il più piccolo bounding box all'asse world a scapito di più calcoli. L'impostazione predefinita è `false`.<br /><br />
+
+		Calcola il bounding box allineato all'asse world di un [page:Object3D] (inclusi i suoi figli),
+		tenendo conto delle trasformazioni del mondo dell'oggetto e dei bambini. La funzione
+		può comportare un box più grande del necessario.
+		</p>
+
+		<h3>[method:this setFromPoints]( [param:Array points] )</h3>
+		<p>
+		[page:Array points] - Array di [page:Vector3 Vector3] che conterrà il box risultante.<br /><br /> 
+
+		Imposta i limiti inferiore e superiore di questo box per includere tutti i punti in [page:Array points].
+		</p>
+
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
+		<p>
+		[page:Vector3 offset] - Direzione e distanza dell'offset.<br /><br />
+
+		Aggiunge l'[page:Vector3 offset] ad entrambi i limiti inferiore e superiore di questo box, spostando efficacemente
+		le unità di page:Vector3 offset] di questo box nello spazio 3D.
+		</p>
+
+		<h3>[method:this union]( [param:Box3 box] )</h3>
+		<p>
+		[page:Box3 box] - Box che verrà unito con questo box.<br /><br />
+
+		Calcola l'unione di questo box con [page:Box3 box], impostando il limite superiore di questo box al maggiore dei limiti superiori 
+		di entrambi i box e il limite inferiore di questo box al minore dei limiti inferiori di entrambi i box.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

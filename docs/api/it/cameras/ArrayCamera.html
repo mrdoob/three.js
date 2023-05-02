@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr; [page:PerspectiveCamera] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      [name] può essere usato per renderizzare in modo efficiente una scena con un set predefinito di telecamere. 
+      Questo è un aspetto importante delle prestazioni per il rendering delle scene VR.<br />
+      Un'istanza di [name] ha sempre un array di telecamere secondarie. È obbligatorio definire per ogni telecamera secondaria la
+      proprietà `viewport` la quale determina la parte della finestra (viewport) che viene renderizzata con questa telecamera.
+		</p>
+
+		<h2>Esempi</h2>
+
+		<p>[example:webgl_camera_array camera / array ]</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Array array] )</h3>
+		<p>
+      Un array di telecamere.
+		</p>
+
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:PerspectiveCamera] per le proprietà comuni.</p>
+
+		<h3>[property:Array cameras]</h3>
+		<p>
+			Un array di telecamere.
+		</p>
+
+		<h3>[property:Boolean isArrayCamera]</h3>
+		<p>
+      Flag di sola lettura per verificare se un dato oggetto è di tipo [name].
+		</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:PerspectiveCamera] per i metodi comuni</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -11,7 +11,7 @@
 
 		<p class="desc">
 			이 클래스는 큐브맵 환경 텍스처로부터 사전 필터링된 Mipmap Radiance Environment Map(PMREM)을 생성합니다.
-이를 통해 재질의 거칠기에 따라 다양한 수준의 블러를 빠르게 적용할 수 있습니다. RGBE와 같은 비선형 형식을 지원할 수 있도록 사용자 지정 보간을 수행할 수 있는 특수 CubeUV 형식으로 포장되어 있습니다. 
+이를 통해 재질의 거칠기에 따라 다양한 수준의 블러를 빠르게 적용할 수 있습니다. RGBE와 같은 비선형 형식을 지원할 수 있도록 사용자 지정 보간을 수행할 수 있는 특수 CubeUV 형식으로 포장되어 있습니다.
 기존의 mipmap 체인과는 달리, LOD_MIN 수준까지만 내려가며(위), 더 높은 거칠기 수준과 연관된 동일한 LOD_MIN 해상도에서 훨씬 더 많은 필터링된 'mips'를 생성합니다.
 이러한 방법으로 샘플링 계산을 제한하면서 확산 조명을 부드럽게 보간하기 위한 해상도를 유지합니다.
 		</p>
@@ -40,7 +40,7 @@
 		<p>
 			[page:Texture equirectangular] - 등장방형 텍스쳐입니다.<br /><br />
 
-			LDR(RGBFormat) 또는 HDR(RGBEFormat)일 수 있는 등장방형 텍스처로부터 PMREM을 생성합니다.
+			LDR 또는 HDR일 수 있는 등장방형 텍스처로부터 PMREM을 생성합니다.
 			이상적인 입력 이미지 크기는 1k(1024 x 512)로, 256 x 256 큐브 맵 출력과 가장 잘 일치합니다.
 		</p>
 
@@ -48,24 +48,24 @@
 		<p>
 			[page:CubeTexture cubemap] - 큐브맵 텍스쳐입니다.<br /><br />
 
-			LDR(RGBFormat) 또는 HDR(RGBEFormat)일 수 있는 큐브맵 텍스처로부터 PMREM을 생성합니다.
+			LDR 또는 HDR일 수 있는 큐브맵 텍스처로부터 PMREM을 생성합니다.
 			이상적인 입력 이미지 크기는 1k(1024 x 512)로, 256 x 256 큐브 맵 출력과 가장 잘 일치합니다.
 		</p>
 
-		<h3>[method:void compileCubemapShader]()</h3>
+		<h3>[method:undefined compileCubemapShader]()</h3>
 		<p>
 			큐브 맵 셰이더를 미리 컴파일합니다. 동시성을 높이기 위해 텍스쳐의 네트워크 로딩 중에 이 메서드를 호출하여 더 빨리 시작할 수 있습니다.
 		</p>
 
-		<h3>[method:void compileEquirectangularShader]()</h3>
+		<h3>[method:undefined compileEquirectangularShader]()</h3>
 		<p>
 			등장방형 셰이더를 미리 컴파일합니다. 동시성을 높이기 위해 텍스쳐의 네트워크 로딩 중에 이 메서드를 호출하여 더 빨리 시작할 수 있습니다.
 		</p>
 
-		<h3>[method:void dispose]()</h3>
+		<h3>[method:undefined dispose]()</h3>
 		<p>
-			PMREM 제너레이터의 내장 메모리를 폐기합니다. 
-			PMREMGenerator는 정적 클래스이므로 두 개 이상의 PMREMGenerator 개체가 필요하지 않습니다. 
+			PMREM 제너레이터의 내장 메모리를 폐기합니다.
+			PMREMGenerator는 정적 클래스이므로 두 개 이상의 PMREMGenerator 개체가 필요하지 않습니다.
 			이 경우 둘 중 하나에 대해 dispose()를 호출하면 다른 항목도 사용할 수 없게 됩니다.
 		</p>
 

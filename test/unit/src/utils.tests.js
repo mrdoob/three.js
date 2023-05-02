@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { arrayMin, arrayMax } from '../../../src/utils';
+import { arrayMin, arrayMax, getTypedArray } from '../../../src/utils.js';
 
 QUnit.module( 'utils', () => {
 
@@ -28,5 +28,19 @@ QUnit.module( 'utils', () => {
 
 	} );
 
+
+	QUnit.test( 'getTypedArray', ( assert ) => {
+
+		assert.ok( getTypedArray( 'Int8Array', new ArrayBuffer() ) instanceof Int8Array, 'Int8Array' );
+		assert.ok( getTypedArray( 'Uint8Array', new ArrayBuffer() ) instanceof Uint8Array, 'Uint8Array' );
+		assert.ok( getTypedArray( 'Uint8ClampedArray', new ArrayBuffer() ) instanceof Uint8ClampedArray, 'Uint8ClampedArray' );
+		assert.ok( getTypedArray( 'Int16Array', new ArrayBuffer() ) instanceof Int16Array, 'Int16Array' );
+		assert.ok( getTypedArray( 'Uint16Array', new ArrayBuffer() ) instanceof Uint16Array, 'Uint16Array' );
+		assert.ok( getTypedArray( 'Int32Array', new ArrayBuffer() ) instanceof Int32Array, 'Int32Array' );
+		assert.ok( getTypedArray( 'Uint32Array', new ArrayBuffer() ) instanceof Uint32Array, 'Uint32Array' );
+		assert.ok( getTypedArray( 'Float32Array', new ArrayBuffer() ) instanceof Float32Array, 'Float32Array' );
+		assert.ok( getTypedArray( 'Float64Array', new ArrayBuffer() ) instanceof Float64Array, 'Float64Array' );
+
+	} );
 
 } );

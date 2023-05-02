@@ -15,6 +15,17 @@
 			3D space without any limitations (e.g. focus on a specific target).
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { FlyControls } from 'three/addons/controls/FlyControls.js';
+		</code>
+
 		<h2>Examples</h2>
 
 		<p>[example:misc_controls_fly misc / controls / fly ]</p>
@@ -22,7 +33,7 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
-		<p>
+		
 			<p>
 				[page:Camera object]: The camera to be controlled.
 			</p>
@@ -32,7 +43,7 @@
 			<p>
 				Creates a new instance of [name].
 			</p>
-		</p>
+		
 
 		<h2>Events</h2>
 
@@ -45,7 +56,7 @@
 
 		<h3>[property:Boolean autoForward]</h3>
 		<p>
-			If set to *true*, the camera automatically moves forward (and does not stop) when initially translated. Default is *false*.
+			If set to `true`, the camera automatically moves forward (and does not stop) when initially translated. Default is `false`.
 		</p>
 
 		<h3>[property:HTMLDOMElement domElement]</h3>
@@ -56,7 +67,7 @@
 
 		<h3>[property:Boolean dragToLook]</h3>
 		<p>
-			If set to *true*, you can only look around by performing a drag interaction. Default is *false*.
+			If set to `true`, you can only look around by performing a drag interaction. Default is `false`.
 		</p>
 
 		<h3>[property:Number movementSpeed]</h3>
@@ -71,17 +82,17 @@
 
 		<h3>[property:Number rollSpeed]</h3>
 		<p>
-			The rotation speed. Default is *0.005*.
+			The rotation speed. Default is `0.005`.
 		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			Should be called if the controls is no longer required.
 		</p>
 
-		<h3>[method:null update] ( [param:Number delta] )</h3>
+		<h3>[method:undefined update] ( [param:Number delta] )</h3>
 		<p>
 			<p>
 				[page:Number delta]: Time delta value.

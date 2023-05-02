@@ -1,68 +1,102 @@
-import { Node } from './Node.js';
+import Node, { addNodeClass } from './Node.js';
+import { varying } from './VaryingNode.js';
+import { nodeObject } from '../shadernode/ShaderNode.js';
 
 class AttributeNode extends Node {
 
-	constructor( name, type ) {
+	constructor( attributeName, nodeType = null ) {
 
-		super( type );
+		super( nodeType );
 
-		this.name = name;
-
-	}
-
-	getAttributeType( builder ) {
-
-		return typeof this.type === 'number' ? builder.getConstructorFromLength( this.type ) : this.type;
+		this._attributeName = attributeName;
 
 	}
 
-	getType( builder ) {
+	getHash( builder ) {
 
-		const type = this.getAttributeType( builder );
-
-		return builder.getTypeByFormat( type );
+		return this.getAttributeName( builder );
 
 	}
 
-	generate( builder, output ) {
+	getNodeType( builder ) {
 
-		const type = this.getAttributeType( builder );
+		const attributeName = this.getAttributeName( builder );
 
-		const attribute = builder.getAttribute( this.name, type ),
-			name = builder.isShader( 'vertex' ) ? this.name : attribute.varying.name;
+		let nodeType = super.getNodeType( builder );
 
-		return builder.format( name, this.getType( builder ), output );
+		if ( nodeType === null ) {
+
+			if ( builder.hasGeometryAttribute( attributeName ) ) {
+
+				const attribute = builder.geometry.getAttribute( attributeName );
+
+				nodeType = builder.getTypeFromAttribute( attribute );
+
+			} else {
+
+				nodeType = 'float';
+
+			}
+
+		}
+
+		return nodeType;
 
 	}
 
-	copy( source ) {
+	setAttributeName( attributeName ) {
 
-		super.copy( source );
-
-		this.type = source.type;
+		this._attributeName = attributeName;
 
 		return this;
 
 	}
 
-	toJSON( meta ) {
+	getAttributeName( /*builder*/ ) {
 
-		let data = this.getJSONNode( meta );
+		return this._attributeName;
 
-		if ( ! data ) {
+	}
 
-			data = this.createJSONNode( meta );
+	generate( builder ) {
 
-			data.type = this.type;
+		const attributeName = this.getAttributeName( builder );
+		const nodeType = this.getNodeType( builder );
+		const geometryAttribute = builder.hasGeometryAttribute( attributeName );
+
+		if ( geometryAttribute === true ) {
+
+			const attribute = builder.geometry.getAttribute( attributeName );
+			const attributeType = builder.getTypeFromAttribute( attribute );
+
+			const nodeAttribute = builder.getAttribute( attributeName, attributeType );
+
+			if ( builder.isShaderStage( 'vertex' ) ) {
+
+				return builder.format( nodeAttribute.name, attributeType, nodeType );
+
+			} else {
+
+				const nodeVarying = varying( this );
+
+				return nodeVarying.build( builder, nodeType );
+
+			}
+
+		} else {
+
+			console.warn( `AttributeNode: Attribute "${ attributeName }" not found.` );
+
+			return builder.getConst( nodeType );
 
 		}
-
-		return data;
 
 	}
 
 }
 
-AttributeNode.prototype.nodeType = 'Attribute';
+export default AttributeNode;
 
-export { AttributeNode };
+export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
+
+addNodeClass( AttributeNode );

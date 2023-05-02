@@ -1,0 +1,52 @@
+name: Read size
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'utils/build/**'
+
+# This workflow runs in a read-only environment. We can safely checkout
+# the PR code here.
+# Reference:
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+permissions:
+  contents: read
+
+jobs:
+  read-size:
+    name: Tree-shaking
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: === Test tree-shaking ===
+        run: npm run test-treeshake
+      - name: Read bundle sizes
+        id: read-size
+        run: |
+          FILESIZE=$(stat --format=%s build/three.module.min.js)
+          gzip -k build/three.module.min.js
+          FILESIZE_GZIP=$(stat --format=%s build/three.module.min.js.gz)
+          TREESHAKEN=$(stat --format=%s test/treeshake/index.bundle.min.js)
+          gzip -k test/treeshake/index.bundle.min.js
+          TREESHAKEN_GZIP=$(stat --format=%s test/treeshake/index.bundle.min.js.gz)
+          PR=${{ github.event.pull_request.number }}
+
+          # write the output in a json file to upload it as artifact
+          node -pe "JSON.stringify({ filesize: $FILESIZE, gzip: $FILESIZE_GZIP, treeshaken: $TREESHAKEN, treeshakenGzip: $TREESHAKEN_GZIP, pr: $PR })" > sizes.json
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: sizes
+          path: sizes.json

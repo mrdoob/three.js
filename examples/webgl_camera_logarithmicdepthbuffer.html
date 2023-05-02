@@ -62,11 +62,27 @@
 			mousewheel to dolly out
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			// 1 micrometer to 100 billion light years in one scene, with 1 unit = 1 meter?  preposterous!  and yet...
 			const NEAR = 1e-6, FAR = 1e27;
@@ -84,21 +100,21 @@
 			// Try to use some descriptive real-world examples of objects at each scale
 
 			const labeldata = [
-				{ size: .01, scale: 0.0001, label: "microscopic (1µm)" }, // FIXME - triangulating text fails at this size, so we scale instead
-				{ size: .01, scale: 0.1, label: "minuscule (1mm)" },
-				{ size: .01, scale: 1.0, label: "tiny (1cm)" },
-				{ size: 1, scale: 1.0, label: "child-sized (1m)" },
-				{ size: 10, scale: 1.0, label: "tree-sized (10m)" },
-				{ size: 100, scale: 1.0, label: "building-sized (100m)" },
-				{ size: 1000, scale: 1.0, label: "medium (1km)" },
-				{ size: 10000, scale: 1.0, label: "city-sized (10km)" },
-				{ size: 3400000, scale: 1.0, label: "moon-sized (3,400 Km)" },
-				{ size: 12000000, scale: 1.0, label: "planet-sized (12,000 km)" },
-				{ size: 1400000000, scale: 1.0, label: "sun-sized (1,400,000 km)" },
-				{ size: 7.47e12, scale: 1.0, label: "solar system-sized (50Au)" },
-				{ size: 9.4605284e15, scale: 1.0, label: "gargantuan (1 light year)" },
-				{ size: 3.08567758e16, scale: 1.0, label: "ludicrous (1 parsec)" },
-				{ size: 1e19, scale: 1.0, label: "mind boggling (1000 light years)" }
+				{ size: .01, scale: 0.0001, label: 'microscopic (1µm)' }, // FIXME - triangulating text fails at this size, so we scale instead
+				{ size: .01, scale: 0.1, label: 'minuscule (1mm)' },
+				{ size: .01, scale: 1.0, label: 'tiny (1cm)' },
+				{ size: 1, scale: 1.0, label: 'child-sized (1m)' },
+				{ size: 10, scale: 1.0, label: 'tree-sized (10m)' },
+				{ size: 100, scale: 1.0, label: 'building-sized (100m)' },
+				{ size: 1000, scale: 1.0, label: 'medium (1km)' },
+				{ size: 10000, scale: 1.0, label: 'city-sized (10km)' },
+				{ size: 3400000, scale: 1.0, label: 'moon-sized (3,400 Km)' },
+				{ size: 12000000, scale: 1.0, label: 'planet-sized (12,000 km)' },
+				{ size: 1400000000, scale: 1.0, label: 'sun-sized (1,400,000 km)' },
+				{ size: 7.47e12, scale: 1.0, label: 'solar system-sized (50Au)' },
+				{ size: 9.4605284e15, scale: 1.0, label: 'gargantuan (1 light year)' },
+				{ size: 3.08567758e16, scale: 1.0, label: 'ludicrous (1 parsec)' },
+				{ size: 1e19, scale: 1.0, label: 'mind boggling (1000 light years)' }
 			];
 
 			init();
@@ -107,7 +123,7 @@
 
 				container = document.getElementById( 'container' );
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
 				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
 					const scene = initScene( font );
@@ -143,7 +159,7 @@
 				const renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: logDepthBuf } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH / 2, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
+				renderer.domElement.style.position = 'relative';
 				renderer.domElement.id = 'renderer_' + name;
 				framecontainer.appendChild( renderer.domElement );
 
@@ -174,7 +190,7 @@
 
 					const scale = labeldata[ i ].scale || 1;
 
-					const labelgeo = new THREE.TextGeometry( labeldata[ i ].label, {
+					const labelgeo = new TextGeometry( labeldata[ i ].label, {
 						font: font,
 						size: labeldata[ i ].size,
 						height: labeldata[ i ].size / 2
@@ -231,7 +247,7 @@
 				objects.logzbuf.camera.setViewOffset( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH * screensplit, 0, SCREEN_WIDTH * screensplit_right, SCREEN_HEIGHT );
 				objects.logzbuf.container.style.width = ( screensplit_right * 100 ) + '%';
 
-				border.style.left = ( screensplit * 100 ) + "%";
+				border.style.left = ( screensplit * 100 ) + '%';
 
 			}
 
@@ -295,8 +311,8 @@
 			function onBorderPointerDown() {
 
 				// activate draggable window resizing bar
-				window.addEventListener( "pointermove", onBorderPointerMove );
-				window.addEventListener( "pointerup", onBorderPointerUp );
+				window.addEventListener( 'pointermove', onBorderPointerMove );
+				window.addEventListener( 'pointerup', onBorderPointerUp );
 
 			}
 
@@ -308,8 +324,8 @@
 
 			function onBorderPointerUp() {
 
-				window.removeEventListener( "pointermove", onBorderPointerMove );
-				window.removeEventListener( "pointerup", onBorderPointerUp );
+				window.removeEventListener( 'pointermove', onBorderPointerMove );
+				window.removeEventListener( 'pointerup', onBorderPointerUp );
 
 			}
 

@@ -1,0 +1,456 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>でアニメーションする多くのオブジェクトを最適化</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – でアニメーションする多くのオブジェクトを最適化">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>でアニメーションする多くのオブジェクトを最適化</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>この記事は<a href="optimize-lots-of-objects.html">多くのオブジェクトを最適化</a>の続きです。まだ読んでいない場合は先に読んでみて下さい。</p>
+<p>前回の記事では約19000個のキューブを単体のジオメトリにマージしました。
+19000個のキューブの描画を最適化する利点がありましたが、個々のキューブを動かすのが難しくなる欠点がありました。</p>
+<p>何を達成するかによって様々な解決策があります。
+今回は複数のデータセットをグラフ化し、そのデータセットでクロスフェードアニメーションさせてみましょう。</p>
+<p>まず、複数のデータセットを取得する必要があります。
+オフラインでデータの前処理をするのが理想的ですが、今回は2つのデータセットをロードしてさらに2つのデータを生成してみましょう。</p>
+<p>以下は古いデータロードのコードです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+  .then(parseData)
+  .then(addBoxes)
+  .then(render);
+</pre>
+<p>このような感じに変更してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadData(info) {
+  const text = await loadFile(info.url);
+  info.file = parseData(text);
+}
+
+async function loadAll() {
+  const fileInfos = [
+    {name: 'men',   hueRange: [0.7, 0.3], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc' },
+    {name: 'women', hueRange: [0.9, 1.1], url: 'resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014ft_2010_cntm_1_deg.asc' },
+  ];
+
+  await Promise.all(fileInfos.map(loadData));
+
+  ...
+}
+loadAll();
+</pre>
+<p>上記のコードでは <code class="notranslate" translate="no">fileInfos</code> 内の各オブジェクトがローティングされたファイルを <code class="notranslate" translate="no">file</code> プロパティに持ち、Promise.allで全てのファイルをロードします。
+<code class="notranslate" translate="no">name</code> と <code class="notranslate" translate="no">hueRange</code> プロパティはあとで使います。<code class="notranslate" translate="no">name</code> はUIフィールドです。<code class="notranslate" translate="no">hueRange</code> は色相の範囲をマップし選択するために使います。</p>
+<p>上記2ファイルは2010年時点でのエリア別の男性数と女性数を示しています。</p>
+<p>注：このデータが正しいかわかりませんが、それは重要ではありません。
+重要なのは異なるデータセットを示す事です。</p>
+<p>さらに2つのデータセットを生成してみましょう。
+1つは女性数よりも男性数が多い場所、逆にもう1つは男性数より女性数が多い場所です。</p>
+<p>まず先ほどのデータで新しい2次元配列をマップする前に、2次元配列を生成する関数を書いてみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function mapValues(data, fn) {
+  return data.map((row, rowNdx) =&gt; {
+    return row.map((value, colNdx) =&gt; {
+      return fn(value, rowNdx, colNdx);
+    });
+  });
+}
+</pre>
+<p>通常の <code class="notranslate" translate="no">Array.map</code> 関数と同様に <code class="notranslate" translate="no">mapValues</code> 関数は配列の各値に対して関数 <code class="notranslate" translate="no">fn</code> を呼び出します。
+fnには値と行と列のインデックスを渡します。</p>
+<p>2つのファイルを比較した新しいファイルを生成するコードを作成します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDiffFile(baseFile, otherFile, compareFn) {
+  let min;
+  let max;
+  const baseData = baseFile.data;
+  const otherData = otherFile.data;
+  const data = mapValues(baseData, (base, rowNdx, colNdx) =&gt; {
+    const other = otherData[rowNdx][colNdx];
+      if (base === undefined || other === undefined) {
+        return undefined;
+      }
+      const value = compareFn(base, other);
+      min = Math.min(min === undefined ? value : min, value);
+      max = Math.max(max === undefined ? value : max, value);
+      return value;
+  });
+  // make a copy of baseFile and replace min, max, and data
+  // with the new data
+  return {...baseFile, min, max, data};
+}
+</pre>
+<p>上記のコードは <code class="notranslate" translate="no">compareFn</code> 関数で比較された値を元に <code class="notranslate" translate="no">mapValues</code> 関数で新しいデータセットを生成しています。また <code class="notranslate" translate="no">min</code> と <code class="notranslate" translate="no">max</code> の比較結果も持っています。
+最後のreturnで新しく <code class="notranslate" translate="no">min</code>、<code class="notranslate" translate="no">max</code>、<code class="notranslate" translate="no">data</code> を追加した以外は <code class="notranslate" translate="no">baseFile</code> と同じプロパティを持つ新しいファイルを作成します。</p>
+<p>それを使って2つの新しいデータセットを作りましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const menInfo = fileInfos[0];
+  const womenInfo = fileInfos[1];
+  const menFile = menInfo.file;
+  const womenFile = womenInfo.file;
+
+  function amountGreaterThan(a, b) {
+    return Math.max(a - b, 0);
+  }
+  fileInfos.push({
+    name: '&gt;50%men',
+    hueRange: [0.6, 1.1],
+    file: makeDiffFile(menFile, womenFile, (men, women) =&gt; {
+      return amountGreaterThan(men, women);
+    }),
+  });
+  fileInfos.push({
+    name: '&gt;50% women', 
+    hueRange: [0.0, 0.4],
+    file: makeDiffFile(womenFile, menFile, (women, men) =&gt; {
+      return amountGreaterThan(women, men);
+    }),
+  });
+}
+</pre>
+<p>これらのデータセットを選択するUIを生成しましょう。まず、いくつかのhtmlのUIが必要です。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="ui"&gt;&lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>次に左上のエリアに表示するためにCSSを追加しました。</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
+  position: absolute;
+  left: 1em;
+  top: 1em;
+}
+#ui&gt;div {
+  font-size: 20pt;
+  padding: 1em;
+  display: inline-block;
+}
+#ui&gt;div.selected {
+  color: red;
+}
+</pre>
+<p>各ファイルを調べてデータセットごとにマージされたボックスのセットを生成します。
+これでラベル上にマウスカーソルを置くとそのデータセットを表示し、他の全てのデータセットを非表示にするラベルUIを生成できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+function showFileInfo(fileInfos, fileInfo) {
+  fileInfos.forEach((info) =&gt; {
+    const visible = fileInfo === info;
+    info.root.visible = visible;
+    info.elem.className = visible ? 'selected' : '';
+  });
+  requestRenderIfNotRequested();
+}
+
+const uiElem = document.querySelector('#ui');
+fileInfos.forEach((info) =&gt; {
+  const boxes = addBoxes(info.file, info.hueRange);
+  info.root = boxes;
+  const div = document.createElement('div');
+  info.elem = div;
+  div.textContent = info.name;
+  uiElem.appendChild(div);
+  div.addEventListener('mouseover', () =&gt; {
+    showFileInfo(fileInfos, info);
+  });
+});
+// show the first set of data
+showFileInfo(fileInfos, fileInfos[0]);
+</pre>
+<p>もう1つ変更が必要で <code class="notranslate" translate="no">addBoxes</code> の引数に <code class="notranslate" translate="no">hueRange</code> があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file) {
++function addBoxes(file, hueRange) {
+
+  ...
+
+    // compute a color
+-    const hue = THREE.MathUtils.lerp(0.7, 0.3, amount);
++    const hue = THREE.MathUtils.lerp(...hueRange, amount);
+
+  ...
+</pre>
+<p>これで4つのデータセットを表示できるようになるはずです。ラベルの上にマウスを置いたり、タッチしてデータセットを切り替える事ができます。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-multiple-data-sets.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-multiple-data-sets.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>注意してほしいのは突出したいくつかの奇妙なデータポイントがあります。</p>
+<p>これは何が起きてるのでしょう！？</p>
+<p>いずれにしてもこの4つのデータセットをラベルから切り替えた際にクロスフェードアニメーションさせるにはどうすればいいのでしょうか。</p>
+<p>たくさんのアイデアがあります。</p>
+<ul>
+<li><p><a href="/docs/#api/ja/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a> でクロスフェードアニメーションする</p>
+<p>この解決策の問題点はキューブが完全に重なっているため、Z軸の戦いの問題を意味します。
+depth関数とブレンディングを使い修正できる可能性があります。調べてみた方が良さそうですね。</p>
+</li>
+<li><p>見たいデータセットをスケールアップして他のデータセットをスケールダウンする</p>
+<p>全てのボックスは惑星の中心に位置しているので、1.0以下に縮小すると惑星の中に沈んでしまいます。
+最初は良いアイデアのように聞こえますが、高さの低いボックスはほとんどすぐに消えてしまい、新しいデータセットが1.0までスケールアップするまで置き換えできません。
+このため、アニメーション遷移があまり気持ち良くありません。派手なカスタムシェーダーで修正できるかもしれません。</p>
+</li>
+<li><p>モーフターゲットを使用する</p>
+<p>モーフターゲットはジオメトリ内の各頂点に複数の値を与え、それらの中間を <em>モーフ</em> または lerp (線形補間) する方法です。
+モーフターゲットは3Dキャラクターの表情アニメーションに最も一般的に使用されていますがそれだけではありません。</p>
+</li>
+</ul>
+<p>モーフターゲットを使ってみましょう。</p>
+<p>これまで通りにデータセットごとにジオメトリを作成しますが、それぞれのデータから <code class="notranslate" translate="no">position</code> を抜き出してモーフターゲットとして使用します。</p>
+<p>まず <code class="notranslate" translate="no">addBoxes</code> を変更してマージされたジオメトリを返すだけに変更してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file, hueRange) {
++function makeBoxes(file, hueRange) {
+  const {min, max, data} = file;
+  const range = max - min;
+
+  ...
+
+-  const mergedGeometry = BufferGeometryUtils.mergeGeometries(
+-      geometries, false);
+-  const material = new THREE.MeshBasicMaterial({
+-    vertexColors: true,
+-  });
+-  const mesh = new THREE.Mesh(mergedGeometry, material);
+-  scene.add(mesh);
+-  return mesh;
++  return BufferGeometryUtils.mergeGeometries(
++     geometries, false);
+}
+</pre>
+<p>ここでもう1つやるべき事があります。モーフターゲットは全ての頂点数が全く同じである必要があります。
+あるターゲットの頂点#123は、他の全てのターゲットに対応する頂点#123を持つ必要があります。
+しかし、異なるデータセットにはデータのないデータポイントがあるかもしれないので、
+そのポイントに対してはボックスが生成されず、別のデータセットに対応する頂点も生成されません。</p>
+<p>そこで全てのデータセットをチェックし、どのセットにもデータがある場合は常に何かを生成するか、
+またはどのセットにもデータがない場合は何も生成しないかのどちらかを選択する必要があります。後者をやってみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dataMissingInAnySet(fileInfos, latNdx, lonNdx) {
++  for (const fileInfo of fileInfos) {
++    if (fileInfo.file.data[latNdx][lonNdx] === undefined) {
++      return true;
++    }
++  }
++  return false;
++}
+
+-function makeBoxes(file, hueRange) {
++function makeBoxes(file, hueRange, fileInfos) {
+  const {min, max, data} = file;
+  const range = max - min;
+
+  ...
+
+  const geometries = [];
+  data.forEach((row, latNdx) =&gt; {
+    row.forEach((value, lonNdx) =&gt; {
++      if (dataMissingInAnySet(fileInfos, latNdx, lonNdx)) {
++        return;
++      }
+      const amount = (value - min) / range;
+
+  ...
+</pre>
+<p><code class="notranslate" translate="no">addBoxes</code> を呼び出していたコードを <code class="notranslate" translate="no">makeBoxes</code> に変更し、モーフターゲットを設定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+// make geometry for each data set
++const geometries = fileInfos.map((info) =&gt; {
++  return makeBoxes(info.file, info.hueRange, fileInfos);
++});
++
++// use the first geometry as the base
++// and add all the geometries as morphtargets
++const baseGeometry = geometries[0];
++baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('position');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
++baseGeometry.morphAttributes.color = geometries.map((geometry, ndx) =&gt; {
++  const attribute = geometry.getAttribute('color');
++  const name = `target${ndx}`;
++  attribute.name = name;
++  return attribute;
++});
++const material = new THREE.MeshBasicMaterial({
++  vertexColors: true,
++});
++const mesh = new THREE.Mesh(baseGeometry, material);
++scene.add(mesh);
+
+const uiElem = document.querySelector('#ui');
+fileInfos.forEach((info) =&gt; {
+-  const boxes = addBoxes(info.file, info.hueRange);
+-  info.root = boxes;
+  const div = document.createElement('div');
+  info.elem = div;
+  div.textContent = info.name;
+  uiElem.appendChild(div);
+  function show() {
+    showFileInfo(fileInfos, info);
+  }
+  div.addEventListener('mouseover', show);
+  div.addEventListener('touchstart', show);
+});
+// show the first set of data
+showFileInfo(fileInfos, fileInfos[0]);
+</pre>
+<p>上記では最初のデータセットをベースとしたジオメトリを作成し、各ジオメトリから <code class="notranslate" translate="no">position</code> を取得し、
+それを <code class="notranslate" translate="no">position</code> のベースジオメトリにモーフターゲットとして追加します。
+あとはデータセットの表示・非表示の仕方を変える必要があります。
+メッシュを表示・非表示するのではなく、モーフターゲットの影響を変える必要があります。
+見たいデータセットは1の影響を持つ必要があり、見たくないデータセットは0の影響を持つ必要があります。</p>
+<p>直接0か1にすれば良いのですがそうするとクロスフェードアニメーションが見られなくなり、すでに持っている値に変更がなくスナップします。
+または簡単にカスタムアニメーションのコードを書く事ができますが、
+オリジナルのwebgl globeでは<a href="https://github.com/tweenjs/tween.js/">アニメーションライブラリ</a>を使っているので合わせましょう。</p>
+<p>アニメーションライブラリをimportする必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import TWEEN from 'three/addons/libs/tween.module.js';
+</pre>
+<p>そして、影響を与えるアニメーションの <code class="notranslate" translate="no">Tween</code> を作成します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+function showFileInfo(fileInfos, fileInfo) {
+  fileInfos.forEach((info) =&gt; {
+    const visible = fileInfo === info;
+-    info.root.visible = visible;
+    info.elem.className = visible ? 'selected' : '';
++    const targets = {};
++    fileInfos.forEach((info, i) =&gt; {
++      targets[i] = info === fileInfo ? 1 : 0;
++    });
++    const durationInMs = 1000;
++    new TWEEN.Tween(mesh.morphTargetInfluences)
++      .to(targets, durationInMs)
++      .start();
+  });
+  requestRenderIfNotRequested();
+}
+</pre>
+<p>レンダリングループ内でフレームごとに <code class="notranslate" translate="no">TWEEN.update</code> を呼び出しますが問題があります。
+"tween.js"は連続的なレンダリング用に設計されていますが、ここでは<a href="rendering-on-demand.html">要求されたレンダリング</a>をしています。
+連続的なレンダリングに切り替えれますが、何も起きていない時にはレンダリングコストを下げた方が良いため、要求されたレンダリングだけにするのもいいかもしれません。
+これを助けるために <code class="notranslate" translate="no">TweenManager</code> を作ります。
+TweenManagerは <code class="notranslate" translate="no">update</code> メソッドを持ち、再度呼び出す必要がある場合は <code class="notranslate" translate="no">true</code> を返し、全てのアニメーションが終了した場合は <code class="notranslate" translate="no">false</code> を返します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class TweenManger {
+  constructor() {
+    this.numTweensRunning = 0;
+  }
+  _handleComplete() {
+    --this.numTweensRunning;
+    console.assert(this.numTweensRunning &gt;= 0);
+  }
+  createTween(targetObject) {
+    const self = this;
+    ++this.numTweensRunning;
+    let userCompleteFn = () =&gt; {};
+    // create a new tween and install our own onComplete callback
+    const tween = new TWEEN.Tween(targetObject).onComplete(function(...args) {
+      self._handleComplete();
+      userCompleteFn.call(this, ...args);
+    });
+    // replace the tween's onComplete function with our own
+    // so we can call the user's callback if they supply one.
+    tween.onComplete = (fn) =&gt; {
+      userCompleteFn = fn;
+      return tween;
+    };
+    return tween;
+  }
+  update() {
+    TWEEN.update();
+    return this.numTweensRunning &gt; 0;
+  }
+}
+</pre>
+<p>TweenMangerを使用するために次のようなコードにします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
++  const tweenManager = new TweenManger();
+
+  ...
+</pre>
+<p>TweenMangerを使って <code class="notranslate" translate="no">Tween</code> を作成します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+function showFileInfo(fileInfos, fileInfo) {
+  fileInfos.forEach((info) =&gt; {
+    const visible = fileInfo === info;
+    info.elem.className = visible ? 'selected' : '';
+    const targets = {};
+    fileInfos.forEach((info, i) =&gt; {
+      targets[i] = info === fileInfo ? 1 : 0;
+    });
+    const durationInMs = 1000;
+-    new TWEEN.Tween(mesh.morphTargetInfluences)
++    tweenManager.createTween(mesh.morphTargetInfluences)
+      .to(targets, durationInMs)
+      .start();
+  });
+  requestRenderIfNotRequested();
+}
+</pre>
+<p>次にtweenManagerを更新するためにレンダーループを修正し、アニメーションが実行されている場合はレンダリングを継続します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+  renderRequested = false;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
++  if (tweenManager.update()) {
++    requestRenderIfNotRequested();
++  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+render();
+</pre>
+<p>そして、データセットでクロスフェードアニメーションを行う必要があります。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/lots-of-objects-morphtargets.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>これがお役に立てれば幸いです。
+three.jsが提供するサービスを利用するか、カスタムシェーダーを使ってモーフターゲットを使うのは多くのオブジェクトを移動させるための一般的なテクニックです。
+例として全てのキューブに別の目標を設定し、そこから地球上での最初の位置へと変化します。
+地球儀を紹介するにはかっこいいかもしれません。</p>
+<p>次は<a href="align-html-elements-to-3d.html">HTML要素を3Dに整列させる</a>で説明している地球儀にラベルを追加します。</p>
+<p>注: 男性や女性の割合、または正の差をグラフ化する事もできますが、情報を表示する方法に基づいて地表から成長するキューブはほとんどのキューブが低い方が良いでしょう。
+これらの他の比較を使用した場合、ほとんどのキューブは最大高さの約1/2の大きさになり可視化として良くありません。
+<code class="notranslate" translate="no">amountGreaterThan</code> を変えたように感じますが、このような場合は <a href="/docs/#api/ja/math/Math.max(a - b, 0)"><code class="notranslate" translate="no">Math.max(a - b, 0)</code></a> を <code class="notranslate" translate="no">(a - b)</code> "正の差" や <code class="notranslate" translate="no">a / (a +b)</code> "パーセント" のようなものに変えると何を言っているのかわかるでしょう。</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

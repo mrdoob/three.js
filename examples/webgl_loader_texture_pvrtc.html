@@ -12,11 +12,24 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - PVR compressed textures
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { PVRLoader } from './jsm/loaders/PVRLoader.js';
+			import { PVRLoader } from 'three/addons/loaders/PVRLoader.js';
 
 			let camera, scene, renderer;
 			const meshes = [];
@@ -40,6 +53,7 @@
 					texture.magFilter = THREE.LinearFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
+					texture.colorSpace = THREE.SRGBColorSpace;
 					material6.needsUpdate = true;
 
 				};
@@ -50,6 +64,7 @@
 					// texture.minFilter = LinearMipmapNearestFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
+					texture.colorSpace = THREE.SRGBColorSpace;
 					material8.needsUpdate = true;
 
 				};
@@ -77,6 +92,12 @@
 				disturb_4bpp_rgb_v3.magFilter =
 				flare_2bpp_rgba.minFilter =
 				flare_2bpp_rgba.magFilter = THREE.LinearFilter;
+
+				disturb_2bpp_rgb.encoding =
+				flare_4bpp_rgba.encoding =
+				disturb_4bpp_rgb.encoding =
+				disturb_4bpp_rgb_v3.encoding =
+				flare_2bpp_rgba.colorSpace = THREE.SRGBColorSpace;
 
 				const material1 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb } );
 				const material2 = new THREE.MeshBasicMaterial( { map: disturb_4bpp_rgb_mips } );

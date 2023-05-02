@@ -35,7 +35,7 @@ const LuminosityShader = {
 
 			vec4 texel = texture2D( tDiffuse, vUv );
 
-			float l = linearToRelativeLuminance( texel.rgb );
+			float l = luminance( texel.rgb );
 
 			gl_FragColor = vec4( l, l, l, texel.w );
 

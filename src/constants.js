@@ -1,4 +1,5 @@
-export const REVISION = '132dev';
+export const REVISION = '152';
+
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export const CullFaceNone = 0;
@@ -12,8 +13,7 @@ export const VSMShadowMap = 3;
 export const FrontSide = 0;
 export const BackSide = 1;
 export const DoubleSide = 2;
-export const FlatShading = 1;
-export const SmoothShading = 2;
+export const TwoPassDoubleSide = 2; // r149
 export const NoBlending = 0;
 export const NormalBlending = 1;
 export const AdditiveBlending = 2;
@@ -60,7 +60,6 @@ export const CubeRefractionMapping = 302;
 export const EquirectangularReflectionMapping = 303;
 export const EquirectangularRefractionMapping = 304;
 export const CubeUVReflectionMapping = 306;
-export const CubeUVRefractionMapping = 307;
 export const RepeatWrapping = 1000;
 export const ClampToEdgeWrapping = 1001;
 export const MirroredRepeatWrapping = 1002;
@@ -84,21 +83,17 @@ export const FloatType = 1015;
 export const HalfFloatType = 1016;
 export const UnsignedShort4444Type = 1017;
 export const UnsignedShort5551Type = 1018;
-export const UnsignedShort565Type = 1019;
 export const UnsignedInt248Type = 1020;
 export const AlphaFormat = 1021;
-export const RGBFormat = 1022;
 export const RGBAFormat = 1023;
 export const LuminanceFormat = 1024;
 export const LuminanceAlphaFormat = 1025;
-export const RGBEFormat = RGBAFormat;
 export const DepthFormat = 1026;
 export const DepthStencilFormat = 1027;
 export const RedFormat = 1028;
 export const RedIntegerFormat = 1029;
 export const RGFormat = 1030;
 export const RGIntegerFormat = 1031;
-export const RGBIntegerFormat = 1032;
 export const RGBAIntegerFormat = 1033;
 
 export const RGB_S3TC_DXT1_Format = 33776;
@@ -127,20 +122,10 @@ export const RGBA_ASTC_10x10_Format = 37819;
 export const RGBA_ASTC_12x10_Format = 37820;
 export const RGBA_ASTC_12x12_Format = 37821;
 export const RGBA_BPTC_Format = 36492;
-export const SRGB8_ALPHA8_ASTC_4x4_Format = 37840;
-export const SRGB8_ALPHA8_ASTC_5x4_Format = 37841;
-export const SRGB8_ALPHA8_ASTC_5x5_Format = 37842;
-export const SRGB8_ALPHA8_ASTC_6x5_Format = 37843;
-export const SRGB8_ALPHA8_ASTC_6x6_Format = 37844;
-export const SRGB8_ALPHA8_ASTC_8x5_Format = 37845;
-export const SRGB8_ALPHA8_ASTC_8x6_Format = 37846;
-export const SRGB8_ALPHA8_ASTC_8x8_Format = 37847;
-export const SRGB8_ALPHA8_ASTC_10x5_Format = 37848;
-export const SRGB8_ALPHA8_ASTC_10x6_Format = 37849;
-export const SRGB8_ALPHA8_ASTC_10x8_Format = 37850;
-export const SRGB8_ALPHA8_ASTC_10x10_Format = 37851;
-export const SRGB8_ALPHA8_ASTC_12x10_Format = 37852;
-export const SRGB8_ALPHA8_ASTC_12x12_Format = 37853;
+export const RED_RGTC1_Format = 36283;
+export const SIGNED_RED_RGTC1_Format = 36284;
+export const RED_GREEN_RGTC2_Format = 36285;
+export const SIGNED_RED_GREEN_RGTC2_Format = 36286;
 export const LoopOnce = 2200;
 export const LoopRepeat = 2201;
 export const LoopPingPong = 2202;
@@ -155,18 +140,20 @@ export const AdditiveAnimationBlendMode = 2501;
 export const TrianglesDrawMode = 0;
 export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
+/** @deprecated Use LinearSRGBColorSpace or NoColorSpace in three.js r152+. */
 export const LinearEncoding = 3000;
+/** @deprecated Use SRGBColorSpace in three.js r152+. */
 export const sRGBEncoding = 3001;
-export const GammaEncoding = 3007;
-export const RGBEEncoding = 3002;
-export const LogLuvEncoding = 3003;
-export const RGBM7Encoding = 3004;
-export const RGBM16Encoding = 3005;
-export const RGBDEncoding = 3006;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
 export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
+
+// Color space string identifiers, matching CSS Color Module Level 4 and WebGPU names where available.
+export const NoColorSpace = '';
+export const SRGBColorSpace = 'srgb';
+export const LinearSRGBColorSpace = 'srgb-linear';
+export const DisplayP3ColorSpace = 'display-p3';
 
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;
@@ -198,3 +185,5 @@ export const StreamCopyUsage = 35042;
 
 export const GLSL1 = '100';
 export const GLSL3 = '300 es';
+
+export const _SRGBAFormat = 1035; // fallback for WebGL 1

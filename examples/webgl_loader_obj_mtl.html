@@ -12,13 +12,25 @@
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader + MTLLoader
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
-			import { MTLLoader } from './jsm/loaders/MTLLoader.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 			let camera, scene, renderer;
 
@@ -64,21 +76,13 @@
 
 				};
 
-				const onError = function () { };
-
-				const manager = new THREE.LoadingManager();
-				manager.addHandler( /\.dds$/i, new DDSLoader() );
-
-				// comment in the following line and import TGALoader if your asset uses TGA textures
-				// manager.addHandler( /\.tga$/i, new TGALoader() );
-
-				new MTLLoader( manager )
+				new MTLLoader()
 					.setPath( 'models/obj/male02/' )
-					.load( 'male02_dds.mtl', function ( materials ) {
+					.load( 'male02.mtl', function ( materials ) {
 
 						materials.preload();
 
-						new OBJLoader( manager )
+						new OBJLoader()
 							.setMaterials( materials )
 							.setPath( 'models/obj/male02/' )
 							.load( 'male02.obj', function ( object ) {
@@ -86,7 +90,7 @@
 								object.position.y = - 95;
 								scene.add( object );
 
-							}, onProgress, onError );
+							}, onProgress );
 
 					} );
 

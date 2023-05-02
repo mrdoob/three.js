@@ -1,0 +1,229 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Fundamentals</title>
+    <link href="resources/threejs-tutorials.css" rel="stylesheet" />
+    <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+  </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js",
+    "three/addons/": "../../examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+  const scene = new THREE.Scene();
+
+  const aspect = 2;  // the canvas default
+  const fov = 35;
+  const near = 0.1;
+  const far = 5000;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(-580, 55, 390);
+
+  const maxFovX = 40;
+  const numBirds = 40;
+  const minMax = 700;
+  const birdSpeed = 100;
+  const useFog = true;
+  const useOrbitCamera = true;
+  const showHelpers = false;
+
+  if (useOrbitCamera) {
+    const controls = new OrbitControls(camera, canvas);
+    controls.target.set(0, 0, 0);
+    controls.update();
+  }
+
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.shadowMap.enabled = true;
+
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+  hemiLight.color.setHSL(0.6, 1, 0.5);
+  hemiLight.groundColor.setHSL(0.095, 1, 0.5);
+  hemiLight.position.set(0, 50, 0);
+  scene.add(hemiLight);
+
+  if (showHelpers) {
+    const hemiLightHelper = new THREE.HemisphereLightHelper(hemiLight, 10);
+    scene.add(hemiLightHelper);
+  }
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+  dirLight.color.setHSL(0.1, 1, 0.95);
+  dirLight.position.set(-300, 220, 245);
+  scene.add(dirLight);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 2048;
+  dirLight.shadow.mapSize.height = 2048;
+  const d = 350;
+  dirLight.shadow.camera.left = -d;
+  dirLight.shadow.camera.right = d;
+  dirLight.shadow.camera.top = d;
+  dirLight.shadow.camera.bottom = -d;
+  dirLight.shadow.camera.near = 100;
+  dirLight.shadow.camera.far = 950;
+  dirLight.shadow.bias = -0.005;
+
+  if (showHelpers) {
+    const dirLightHeper = new THREE.DirectionalLightHelper(dirLight, 10);
+    scene.add(dirLightHeper);
+  }
+
+  const birds = [];
+  const loader = new GLTFLoader();
+  const fogNear = 1350;
+  const fogFar = 1500;
+
+  function rand(min, max) {
+    if (min === undefined) {
+      min = 0;
+      max = 1;
+    } else if (max === undefined) {
+      max = min;
+      min = 0;
+    }
+    return min + Math.random() * (max - min);
+  }
+
+  loader.load( 'resources/models/flamingo/Flamingo.glb', (gltf) => {
+    const orig = gltf.scene.children[0];
+    orig.castShadow = true;
+    orig.receiveShadow = true;
+
+    for (let i = 0; i < numBirds; ++i) {
+      const u = i / (numBirds - 1);
+      const mesh = orig.clone();
+      mesh.position.set(
+        rand(-150, 150),
+        (u * 2 - 1) * 200,
+        (minMax * 2 * i * 1.7) % (minMax * 2) - minMax / 2,
+      );
+      scene.add(mesh);
+      mesh.material = mesh.material.clone();
+      mesh.material.color.setHSL(rand(), 1, 0.8);
+
+      const mixer = new THREE.AnimationMixer(mesh);
+      mixer.clipAction(gltf.animations[0]).setDuration(1).play();
+      mixer.update(rand(10));
+      mixer.timeScale = rand(0.9, 1.1);
+      birds.push({
+        mixer,
+        mesh,
+      });
+    }
+  });
+
+  window.s = scene;
+
+  if (useFog) {
+    const vertexShader = `
+    varying vec3 vWorldPosition;
+    void main() {
+      vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+      vWorldPosition = worldPosition.xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+    `;
+
+    const fragmentShader = `
+    uniform vec3 topColor;
+    uniform vec3 bottomColor;
+    uniform float offset;
+    uniform float exponent;
+    varying vec3 vWorldPosition;
+    void main() {
+      float h = normalize( vWorldPosition + offset ).y;
+      gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
+    }
+    `;
+
+    const uniforms = {
+      topColor:    { value: new THREE.Color(0x88AABB) },
+      bottomColor: { value: new THREE.Color(0xEFCB7F) },
+      offset:      { value: 730 },
+      exponent:    { value: 0.3 },
+    };
+    uniforms.topColor.value.copy(hemiLight.color);
+    scene.fog = new THREE.Fog(scene.background, fogNear, fogFar);
+    scene.fog.color.copy(uniforms.bottomColor.value);
+    const skyGeo = new THREE.SphereGeometry(3000, 32, 15);
+    const skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
+    const sky = new THREE.Mesh( skyGeo, skyMat );
+    scene.add(sky);
+  }
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    if (width === canvas.width && height === canvas.height) {
+      return false;
+    }
+
+    renderer.setSize(width, height, false);
+    return true;
+  }
+
+  let then = 0;
+  function render(now) {
+    now *= 0.001;
+    const deltaTime = now - then;
+    then = now;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const aspect = canvas.clientWidth / canvas.clientHeight;
+      const fovX = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(fov) * 0.5) * aspect));
+      const newFovY = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(maxFovX) * .5) / aspect));
+      camera.fov = fovX > maxFovX ? newFovY : fov;
+      camera.aspect = aspect;
+      camera.updateProjectionMatrix();
+    }
+
+    for (const {mesh, mixer} of birds) {
+      mixer.update(deltaTime);
+      mesh.position.z = (mesh.position.z + minMax + mixer.timeScale * birdSpeed * deltaTime) % (minMax * 2) - minMax;
+    }
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</script>
+</html>
+

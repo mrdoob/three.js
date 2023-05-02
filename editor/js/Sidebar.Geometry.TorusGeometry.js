@@ -1,22 +1,22 @@
-import * as THREE from '../../build/three.module.js';
+import * as THREE from 'three';
 
-import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
+import { UIDiv, UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
 function GeometryParametersPanel( editor, object ) {
 
-	var strings = editor.strings;
+	const strings = editor.strings;
 
-	var container = new UIRow();
+	const container = new UIDiv();
 
-	var geometry = object.geometry;
-	var parameters = geometry.parameters;
+	const geometry = object.geometry;
+	const parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new UIRow();
-	var radius = new UINumber( parameters.radius ).onChange( update );
+	const radiusRow = new UIRow();
+	const radius = new UINumber( parameters.radius ).onChange( update );
 
 	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/radius' ) ).setWidth( '90px' ) );
 	radiusRow.add( radius );
@@ -25,8 +25,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// tube
 
-	var tubeRow = new UIRow();
-	var tube = new UINumber( parameters.tube ).onChange( update );
+	const tubeRow = new UIRow();
+	const tube = new UINumber( parameters.tube ).onChange( update );
 
 	tubeRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tube' ) ).setWidth( '90px' ) );
 	tubeRow.add( tube );
@@ -35,8 +35,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// radialSegments
 
-	var radialSegmentsRow = new UIRow();
-	var radialSegments = new UIInteger( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
+	const radialSegmentsRow = new UIRow();
+	const radialSegments = new UIInteger( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/radialsegments' ) ).setWidth( '90px' ) );
 	radialSegmentsRow.add( radialSegments );
@@ -45,8 +45,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// tubularSegments
 
-	var tubularSegmentsRow = new UIRow();
-	var tubularSegments = new UIInteger( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
+	const tubularSegmentsRow = new UIRow();
+	const tubularSegments = new UIInteger( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
 	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tubularsegments' ) ).setWidth( '90px' ) );
 	tubularSegmentsRow.add( tubularSegments );
@@ -55,8 +55,8 @@ function GeometryParametersPanel( editor, object ) {
 
 	// arc
 
-	var arcRow = new UIRow();
-	var arc = new UINumber( parameters.arc * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
+	const arcRow = new UIRow();
+	const arc = new UINumber( parameters.arc * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	arcRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/arc' ) ).setWidth( '90px' ) );
 	arcRow.add( arc );

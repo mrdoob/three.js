@@ -10,13 +10,26 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - convex geometry</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { ConvexGeometry } from './jsm/geometries/ConvexGeometry.js';
-			import * as BufferGeometryUtils from './jsm/utils/BufferGeometryUtils.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
 			let group, camera, scene, renderer;
 
@@ -62,6 +75,7 @@
 
 				const loader = new THREE.TextureLoader();
 				const texture = loader.load( 'textures/sprites/disc.png' );
+				texture.colorSpace = THREE.SRGBColorSpace;
 
 				group = new THREE.Group();
 				scene.add( group );
@@ -89,12 +103,10 @@
 				}
 
 				const pointsMaterial = new THREE.PointsMaterial( {
-
 					color: 0x0080ff,
 					map: texture,
 					size: 1,
 					alphaTest: 0.5
-
 				} );
 
 				const pointsGeometry = new THREE.BufferGeometry().setFromPoints( vertices );
@@ -107,20 +119,14 @@
 				const meshMaterial = new THREE.MeshLambertMaterial( {
 					color: 0xffffff,
 					opacity: 0.5,
+					side: THREE.DoubleSide,
 					transparent: true
 				} );
 
 				const meshGeometry = new ConvexGeometry( vertices );
 
-				const mesh1 = new THREE.Mesh( meshGeometry, meshMaterial );
-				mesh1.material.side = THREE.BackSide; // back faces
-				mesh1.renderOrder = 0;
-				group.add( mesh1 );
-
-				const mesh2 = new THREE.Mesh( meshGeometry, meshMaterial.clone() );
-				mesh2.material.side = THREE.FrontSide; // front faces
-				mesh2.renderOrder = 1;
-				group.add( mesh2 );
+				const mesh = new THREE.Mesh( meshGeometry, meshMaterial );
+				group.add( mesh );
 
 				//
 

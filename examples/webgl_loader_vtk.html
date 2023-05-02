@@ -14,14 +14,27 @@
 		Legacy vtk model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank" rel="noopener">The GeorgiaTech Lagre Geometric Model Archive</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { VTKLoader } from './jsm/loaders/VTKLoader.js';
+			import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+			import { VTKLoader } from 'three/addons/loaders/VTKLoader.js';
 
 			let container, stats;
 
@@ -49,7 +62,7 @@
 				scene.add( dirLight );
 
 				const loader = new VTKLoader();
-				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
+				loader.load( 'models/vtk/bunny.vtk', function ( geometry ) {
 
 					geometry.center();
 					geometry.computeVertexNormals();

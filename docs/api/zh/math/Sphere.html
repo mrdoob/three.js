@@ -33,7 +33,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:Sphere applyMatrix4]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>
 			[page:Matrix4 matrix] - 将被应用的[Page:Matrix4]矩阵。<br /><br />
 
@@ -58,7 +58,7 @@
 		检查球体中是否包含所传入的[page:Vector3 point]点，包括球的表面。
 		</p>
 
-		<h3>[method:Sphere copy]( [param:Sphere sphere] )</h3>
+		<h3>[method:this copy]( [param:Sphere sphere] )</h3>
 		<p>
 		复制所传入的球的[page:.center center]和[page:.radius radius]到这个球上。
 		</p>
@@ -81,7 +81,7 @@
 		检查球是否为空(球半径为负值)。半径为 0 的球体仅包含其中心点，并不会被视为空。
 		</p>
 
-		<h3>[method:Sphere makeEmpty]()</h3>
+		<h3>[method:this makeEmpty]()</h3>
 		<p>将该球修改为空，即中心点 [page:.center center] 为 (0,0,0)，半径 [page:.radius radius] 为 -1。</p>
 
 		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
@@ -117,7 +117,7 @@
 		检测两球之间是否有交集。
 		</p>
 
-		<h3>[method:Sphere set]( [param:Vector3 center], [param:Float radius] )</h3>
+		<h3>[method:this set]( [param:Vector3 center], [param:Float radius] )</h3>
 		<p>
 			[page:Vector3 center] - 球心位置。<br />
 			[page:Float radius] - 球的半径。<br /><br />
@@ -126,7 +126,7 @@
 		请注意此，方法使用复制的方式来设置中心值。
 		</p>
 
-		<h3>[method:Sphere setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
+		<h3>[method:this setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>
 		<p>
 		[page:Array points] - 一个包含有[page:Vector3]位置的[page:Array]。<br />
 		[page:Vector3 optionalCenter] - 可选， [page:Vector3] 球心位置。<br /><br />
@@ -135,7 +135,7 @@
 		否则，环绕[page:Array points]的包围盒的轴心将通过计算来得到。
 		</p>
 
-		<h3>[method:Sphere translate]( [param:Vector3 offset] )</h3>
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
 		<p>
 		使用所给定[page:Vector3] offset（偏移量）平移球心。
 		</p>

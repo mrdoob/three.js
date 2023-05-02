@@ -14,6 +14,8 @@ class SphericalHarmonics3 {
 
 	constructor() {
 
+		this.isSphericalHarmonics3 = true;
+
 		this.coefficients = [];
 
 		for ( let i = 0; i < 9; i ++ ) {
@@ -237,7 +239,5 @@ class SphericalHarmonics3 {
 	}
 
 }
-
-SphericalHarmonics3.prototype.isSphericalHarmonics3 = true;
 
 export { SphericalHarmonics3 };

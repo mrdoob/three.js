@@ -10,16 +10,28 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl environment mapping example<br/>
-			Equirectangular Map by <a href="http://gl.ict.usc.edu/Data/HighResProbes/">University of Southern California</a><br/>
-			Spherical Map by <a href="http://www.pauldebevec.com/Probes/">Paul Debevec</a>
+			Equirectangular Map by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let controls, camera, scene, renderer;
 			let textureEquirec, textureCube;
@@ -39,31 +51,26 @@
 
 				scene = new THREE.Scene();
 
-				// Lights
-
-				const ambient = new THREE.AmbientLight( 0xffffff );
-				scene.add( ambient );
-
 				// Textures
 
 				const loader = new THREE.CubeTextureLoader();
 				loader.setPath( 'textures/cube/Bridge2/' );
 
 				textureCube = loader.load( [ 'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg' ] );
-				textureCube.encoding = THREE.sRGBEncoding;
+				textureCube.colorSpace = THREE.SRGBColorSpace;
 
 				const textureLoader = new THREE.TextureLoader();
 
 				textureEquirec = textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
-				textureEquirec.encoding = THREE.sRGBEncoding;
+				textureEquirec.colorSpace = THREE.SRGBColorSpace;
 
 				scene.background = textureCube;
 
 				//
 
 				const geometry = new THREE.IcosahedronGeometry( 400, 15 );
-				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
+				sphereMaterial = new THREE.MeshBasicMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 				scene.add( sphereMesh );
 
@@ -72,7 +79,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
 				//

@@ -30,6 +30,20 @@ function arrayMax( array ) {
 
 }
 
+function arrayNeedsUint32( array ) {
+
+	// assumes larger values usually on last
+
+	for ( let i = array.length - 1; i >= 0; -- i ) {
+
+		if ( array[ i ] >= 65535 ) return true; // account for PRIMITIVE_RESTART_FIXED_INDEX, #24565
+
+	}
+
+	return false;
+
+}
+
 const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
 	Uint8Array: Uint8Array,
@@ -48,4 +62,22 @@ function getTypedArray( type, buffer ) {
 
 }
 
-export { arrayMin, arrayMax, getTypedArray };
+function createElementNS( name ) {
+
+	return document.createElementNS( 'http://www.w3.org/1999/xhtml', name );
+
+}
+
+const _cache = {};
+
+function warnOnce( message ) {
+
+	if ( message in _cache ) return;
+
+	_cache[ message ] = true;
+
+	console.warn( message );
+
+}
+
+export { arrayMin, arrayMax, arrayNeedsUint32, getTypedArray, createElementNS, warnOnce };

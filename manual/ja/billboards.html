@@ -1,0 +1,286 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>のビルボード</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – のビルボード">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>のビルボード</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><a href="canvas-textures.html">前回のページでは</a> <a href="/docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>を使ってラベルとバッジを作りました。バッジなどが常にカメラの方向を向いて文字が読める状態になっているという効果が欲しい時があります（訳註：ビルボード効果と言います）。Three.jsは<a href="/docs/#api/ja/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>と<a href="/docs/#api/ja/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a> を使ってビルボード効果を実現できます。</p>
+<p>In <a href="canvas-textures.html">a previous article</a> we used a <a href="/docs/#api/ja/textures/CanvasTexture"><code class="notranslate" translate="no">CanvasTexture</code></a>
+to make labels / badges on characters. Sometimes we'd like to make labels or
+other things that always face the camera. Three.js provides the <a href="/docs/#api/ja/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a> and
+<a href="/docs/#api/ja/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a> to make this happen.</p>
+<p><a href="canvas-textures.html">この記事</a>からサンプルを拝借して<a href="/docs/#api/ja/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>と<a href="/docs/#api/ja/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a>を使ってみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makePerson(x, labelWidth, size, name, color) {
+  const canvas = makeLabelCanvas(labelWidth, size, name);
+  const texture = new THREE.CanvasTexture(canvas);
+  // because our canvas is likely not a power of 2
+  // in both dimensions set the filtering appropriately.
+  texture.minFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+
+-  const labelMaterial = new THREE.MeshBasicMaterial({
++  const labelMaterial = new THREE.SpriteMaterial({
+    map: texture,
+-    side: THREE.DoubleSide,
+    transparent: true,
+  });
+
+  const root = new THREE.Object3D();
+  root.position.x = x;
+
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  root.add(body);
+  body.position.y = bodyHeight / 2;
+
+  const head = new THREE.Mesh(headGeometry, bodyMaterial);
+  root.add(head);
+  head.position.y = bodyHeight + headRadius * 1.1;
+
+-  const label = new THREE.Mesh(labelGeometry, labelMaterial);
++  const label = new THREE.Sprite(labelMaterial);
+  root.add(label);
+  label.position.y = bodyHeight * 4 / 5;
+  label.position.z = bodyRadiusTop * 1.01;
+</pre>
+<p>はい、常にラベルがカメラの方を向くようになりました。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-labels-w-sprites.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/billboard-labels-w-sprites.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>しかし角度によってはラベルがオブジェクトに食い込んでしまうことがあります。</p>
+<div class="threejs_center"><img src="../resources/images/billboard-label-z-issue.png" style="width: 455px;"></div>
+
+<p>ラベルの位置を動かしましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+// if units are meters then 0.01 here makes size
++// of the label into centimeters.
++const labelBaseScale = 0.01;
+const label = new THREE.Sprite(labelMaterial);
+root.add(label);
+-label.position.y = bodyHeight * 4 / 5;
+-label.position.z = bodyRadiusTop * 1.01;
++label.position.y = head.position.y + headRadius + size * labelBaseScale;
+
+-// if units are meters then 0.01 here makes size
+-// of the label into centimeters.
+-const labelBaseScale = 0.01;
+label.scale.x = canvas.width  * labelBaseScale;
+label.scale.y = canvas.height * labelBaseScale;
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-labels-w-sprites-adjust-height.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/billboard-labels-w-sprites-adjust-height.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>ビルボード効果を使ってファケード（訳註：ハリボテのようなもの）を作ることもできます。</p>
+<p>つまり３Dオブジェクトは重いので３Dオブジェクトを描画する代わりに同じ絵を描いた板を用意するということです。</p>
+<p>さっそくやってみます。たくさんの木があるシーンを作ってみます。１つの木はシリンダーとコーンでできています。</p>
+<p>まずはファケードを使わずに単純に３Dオブジェクトを並べてみます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const trunkRadius = .2;
+const trunkHeight = 1;
+const trunkRadialSegments = 12;
+const trunkGeometry = new THREE.CylinderGeometry(
+    trunkRadius, trunkRadius, trunkHeight, trunkRadialSegments);
+
+const topRadius = trunkRadius * 4;
+const topHeight = trunkHeight * 2;
+const topSegments = 12;
+const topGeometry = new THREE.ConeGeometry(
+    topRadius, topHeight, topSegments);
+
+const trunkMaterial = new THREE.MeshPhongMaterial({color: 'brown'});
+const topMaterial = new THREE.MeshPhongMaterial({color: 'green'});
+</pre>
+<p>草の部分と幹の部分をそれぞれ<a href="/docs/#api/ja/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>で作り親オブジェクト<a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>に加えます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeTree(x, z) {
+  const root = new THREE.Object3D();
+  const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+  trunk.position.y = trunkHeight / 2;
+  root.add(trunk);
+
+  const top = new THREE.Mesh(topGeometry, topMaterial);
+  top.position.y = trunkHeight + topHeight / 2;
+  root.add(top);
+
+  root.position.set(x, 0, z);
+  scene.add(root);
+
+  return root;
+}
+</pre>
+<p>たくさん作ってみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let z = -50; z &lt;= 50; z += 10) {
+  for (let x = -50; x &lt;= 50; x += 10) {
+    makeTree(x, z);
+  }
+}
+</pre>
+<p>地面も一応作ります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// add ground
+{
+  const size = 400;
+  const geometry = new THREE.PlaneGeometry(size, size);
+  const material = new THREE.MeshPhongMaterial({color: 'gray'});
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = Math.PI * -0.5;
+  scene.add(mesh);
+}
+</pre>
+<p>空の色は青にします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+-scene.background = new THREE.Color('white');
++scene.background = new THREE.Color('lightblue');
+</pre>
+<p>はい、木がたくさんできました。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-trees-no-billboards.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/billboard-trees-no-billboards.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>１２１個の木があります。１つにつき１２ポリゴンのコーンと４８ポリゴンのシリンダーがあるので１つの木は６０ポリゴンです。
+これが１２１個あるので７２６０ポリゴンです。このシンプルな木ならそれほど問題ありませんが、リアルな木を作ろうとしたら１つの木につき１０００から３０００のポリゴンがあるのが普通です。ということは１２１個表示するには３６万３千ポリゴン必要です。木を表示するだけで動作が重くなるかもしれません。</p>
+<p>そこでファケードを使ってポリゴン数を落とします。</p>
+<p>ペイントソフトで描いた絵をPlaneにはってもいいのですがここは学んだことを使いましょう。</p>
+<p><code class="notranslate" translate="no">RenderTarget</code>を使ってThree.js内で絵を描き、Planeに貼ってみます。
+<a href="rendertargets.html">この記事</a>が参考になります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
+  const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
+  const halfFovY = THREE.MathUtils.degToRad(camera.fov * .5);
+  const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
+
+  camera.position.copy(boxCenter);
+  camera.position.z += distance;
+
+  // pick some near and far values for the frustum that
+  // will contain the box.
+  camera.near = boxSize / 100;
+  camera.far = boxSize * 100;
+
+  camera.updateProjectionMatrix();
+}
+
+function makeSpriteTexture(textureSize, obj) {
+  const rt = new THREE.WebGLRenderTarget(textureSize, textureSize);
+
+  const aspect = 1;  // because the render target is square
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+
+  scene.add(obj);
+
+  // compute the box that contains obj
+  const box = new THREE.Box3().setFromObject(obj);
+
+  const boxSize = box.getSize(new THREE.Vector3());
+  const boxCenter = box.getCenter(new THREE.Vector3());
+
+  // set the camera to frame the box
+  const fudge = 1.1;
+  const size = Math.max(...boxSize.toArray()) * fudge;
+  frameArea(size, size, boxCenter, camera);
+
+  renderer.autoClear = false;
+  renderer.setRenderTarget(rt);
+  renderer.render(scene, camera);
+  renderer.setRenderTarget(null);
+  renderer.autoClear = true;
+
+  scene.remove(obj);
+
+  return {
+    position: boxCenter.multiplyScalar(fudge),
+    scale: size,
+    texture: rt.texture,
+  };
+}
+</pre>
+<p>まずフィールドオブビュー（<code class="notranslate" translate="no">fov</code>）を設定しています。カメラの視野範囲におさまる木を<a href="load-obj.html">この記事</a>と同じ方法で計算しています。</p>
+<p>さらに<code class="notranslate" translate="no">frameArea</code>を使っています。これは木を表示する最も近いカメラの位置を計算してカメラに設定しています。仮想的なスタジオで木の写真をとっているような状態です。</p>
+<p>レンダーターゲットに木がおさまるようにサイズを1.1倍（<code class="notranslate" translate="no">fudge</code>倍)しています。ここで注意が必要なのはカメラで撮影した木の映像がレンダーターゲットをはみ出したり逆に小さすぎたりする場合です。もちろんこうした状態は事前に精緻な計算をしておけば良いのですがここでは<code class="notranslate" translate="no">fudge</code>で調整しています。</p>
+<p>木の撮影ができたのでレンダーターゲットにレンダリングして元の３Dオブジェクトは消しておきます。</p>
+<p>シーンにはライトだけがある状態です。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+-scene.background = new THREE.Color('lightblue');
+</pre>
+<p>最後にテクスチャを作って位置とサイズを調整します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// make billboard texture
+const tree = makeTree(0, 0);
+const facadeSize = 64;
+const treeSpriteInfo = makeSpriteTexture(facadeSize, tree);
+</pre>
+<p>これで重い３Dモデルの木の代わりにファケードを使った木ができました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function makeSprite(spriteInfo, x, z) {
++  const {texture, offset, scale} = spriteInfo;
++  const mat = new THREE.SpriteMaterial({
++    map: texture,
++    transparent: true,
++  });
++  const sprite = new THREE.Sprite(mat);
++  scene.add(sprite);
++  sprite.position.set(
++      offset.x + x,
++      offset.y,
++      offset.z + z);
++  sprite.scale.set(scale, scale, scale);
++}
+
+for (let z = -50; z &lt;= 50; z += 10) {
+  for (let x = -50; x &lt;= 50; x += 10) {
+-    makeTree(x, z);
++    makeSprite(treeSpriteInfo, x, z);
+  }
+}
+</pre>
+<p>背景も変えてみます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">scene.background = new THREE.Color('lightblue');
+</pre>
+<p>完成です。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/billboard-trees-static-billboards.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/billboard-trees-static-billboards.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>３Dモデルと違って近づくとハリボテであることがバレてしまいます。今回は64x64ピクセルで作りましたがもちろん高解像にすることもできます。しかしそれでも３Dモデルのように近づいてもエッジが綺麗というわけにはいかないので、通常はカメラが近づくことがない遠く離れた木や山に使います。</p>
+<p>他にはカメラの向きを変えても同じように見える問題がありますが、これは８個のファケードを用意して別の角度から見たときに別のファケードが見えるようにすればいいでしょう。</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

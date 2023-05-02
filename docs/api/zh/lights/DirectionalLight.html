@@ -26,8 +26,7 @@
 			这意味着它的方向是从一个平行光的位置 [page:Object3D.position position] 到 [page:.target target]的位置。
 			(而不是一个只有旋转分量的'自由平行光')。<br /><br />
 
-			这样做的原因是为了让光线投射阴影。 - the [page:.shadow shadow]
-			摄像机需要一个位置来计算阴影。<br /><br />
+			这样做的原因是为了让光线投射阴影。[page:.shadow shadow]摄像机需要一个位置来计算阴影。<br /><br />
 
 			有关更新目标的详细信息，请参阅 [page:.target target] 下面的目标属性。
 		</p>
@@ -69,10 +68,15 @@
 			查看 [page:DirectionalLightShadow] 了解详细信息。该属性默认为 *false*。
 		</p>
 
+		<h3>[property:Boolean isDirectionalLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 
 		<h3>[property:Vector3 position]</h3>
 		<p>
-			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0),那么光线将会从上往下照射。
+			假如这个值设置等于 [page:Object3D.DEFAULT_UP] (0, 1, 0),那么光线将会从上往下照射。
 		</p>
 
 		<h3>[property:DirectionalLightShadow shadow]</h3>
@@ -110,7 +114,7 @@
 
 		<p>公共方法请查看基类 [page:Light Light]。</p>
 
-		<h3>[method:DirectionalLight copy]( [param:DirectionalLight source] )</h3>
+		<h3>[method:this copy]( [param:DirectionalLight source] )</h3>
 		<p>
 			复制 source 的值到这个平行光源对象。
 		</p>

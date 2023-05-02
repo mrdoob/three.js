@@ -26,13 +26,18 @@
 
 		<h2>属性（Properties）</h2>
 
+		<h3>[property:Boolean isPlane]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Vector3 normal]</h3>
 
 		<h3>[property:Float constant]</h3>
 
 		<h2>方法（Methods）</h2>
 
-		<h3>[method:Plane applyMatrix4]( [param:Matrix4 matrix], [param:Matrix3 optionalNormalMatrix] )</h3>
+		<h3>[method:this applyMatrix4]( [param:Matrix4 matrix], [param:Matrix3 optionalNormalMatrix] )</h3>
 		<p>
 		[page:Matrix4 matrix] - 要应用的四位矩阵（[Page:Matrix4]）。<br />
 		[page:Matrix3 optionalNormalMatrix] - (可选参数) 预先计算好的上述Matrix4参数的法线矩阵 [Page:Matrix3]。<br /><br />
@@ -54,7 +59,7 @@
 		返回一个共面点，通过原点的法向量在平面上投影算得。
 		</p>
 
-		<h3>[method:Plane copy]( [param:Plane plane] )</h3>
+		<h3>[method:this copy]( [param:Plane plane] )</h3>
 		<p>
 			拷贝给定平面，将其中的法线 [page:.normal normal]，距离常量 [page:.constant constant]属性拷贝给该对象。
 		</p>
@@ -99,12 +104,12 @@
 		确定该平面是否与给定球体 [page:Sphere] 相交。
 		</p>
 
-		<h3>[method:Plane negate]()</h3>
+		<h3>[method:this negate]()</h3>
 		<p>
 			将法向量与常量求反（乘以-1）。
 		</p>
 
-		<h3>[method:Plane normalize]()</h3>
+		<h3>[method:this normalize]()</h3>
 		<p>
 			归一化法向量 [page:.normal normal] ，并相应的调整常量 [page:.constant constant]数值。
 		</p>
@@ -117,7 +122,7 @@
 		将一个点[page:Vector3 point]投射到该平面上。
 		</p>
 
-		<h3>[method:Plane set]( [param:Vector3 normal], [param:Float constant] )</h3>
+		<h3>[method:this set]( [param:Vector3 normal], [param:Float constant] )</h3>
 		<p>
 			[page:Vector3 normal] - 单位长度的向量表示平面的法向量。<br />
 			[page:Float constant] - 原点到平面有符号距离。默认值为 *0*。<br /><br />
@@ -125,7 +130,7 @@
 			设置平面 [page:.normal normal] 的法线和常量 [page:.constant constant] 属性值。
 		</p>
 
-		<h3>[method:Plane setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
+		<h3>[method:this setComponents]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>
 		[page:Float x] - 单位长度法向量的x值。<br />
 		[page:Float y] - 单位长度法向量的y值。<br />
@@ -135,7 +140,7 @@
 		设置定义平面的各个变量。
 		</p>
 
-		<h3>[method:Plane setFromCoplanarPoints]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
+		<h3>[method:this setFromCoplanarPoints]( [param:Vector3 a], [param:Vector3 b], [param:Vector3 c] )</h3>
 		<p>
 		 [page:Vector3 a] - 用于确定平面的第一个点。<br />
 		 [page:Vector3 b] - 用于确定平面的第二个点。<br />
@@ -144,7 +149,7 @@
 		 根据给定的三个点确定平面。如果三个点共线将会抛出错误。通过右手螺旋规则确定（向量叉乘）法向量 [page:.normal normal]。
 		</p>
 
-		<h3>[method:Plane setFromNormalAndCoplanarPoint]( [param:Vector3 normal], [param:Vector3 point] )</h3>
+		<h3>[method:this setFromNormalAndCoplanarPoint]( [param:Vector3 normal], [param:Vector3 point] )</h3>
 		<p>
 		[page:Vector3 normal] - 平面单位法向量<br />
 		[page:Vector3 point] - 平面上的点<br /><br />
@@ -152,7 +157,7 @@
 		通过参数提供的法线 normal 和 平面上的一个点 point 来设置该平面。
 		</p>
 
-		<h3>[method:Plane translate]( [param:Vector3 offset] )</h3>
+		<h3>[method:this translate]( [param:Vector3 offset] )</h3>
 		<p>
 		[page:Vector3 offset] - 平移量<br /><br />
 

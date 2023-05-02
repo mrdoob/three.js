@@ -33,7 +33,7 @@
 		rectLight.lookAt( 0, 0, 0 );
 		scene.add( rectLight )
 
-		rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+		rectLightHelper = new RectAreaLightHelper( rectLight );
 		scene.add( rectLightHelper );
 		</code>
 
@@ -61,13 +61,18 @@
 			公共属性请查看基类[page:Light Light]。
 		</p>
 
+		<h3>[property:Boolean isRectAreaLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h2>方法（Methods）</h2>
 		<p>
 			公共方法请查看基类 [page:Light Light]。
 		</p>
 
 
-		<h3>[method:RectAreaLight copy]( [param:RectAreaLight source] )</h3>
+		<h3>[method:this copy]( [param:RectAreaLight source] )</h3>
 		<p>
 			将所有属性的值从源 [page:RectAreaLight source] 复制到此平面光光源对象。
 		</p>

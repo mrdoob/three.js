@@ -34,7 +34,7 @@
 		</p>
 
 		<code>
-		npm install --save three
+		npm install three
 		</code>
 
 		<p>
@@ -85,26 +85,29 @@
 		</p>
 
 		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+			{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js"
+			}
+			}
+		&lt;/script>
+
 		&lt;script type="module">
 
-		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+			import * as THREE from 'three';
 
-		  import * as THREE from 'https://cdn.skypack.dev/three@&lt;version&gt;';
-
-		  const scene = new THREE.Scene();
+			const scene = new THREE.Scene();
 
 		&lt;/script>
 		</code>
 
-		<p>
-			ليست كل المزايا يمكن الوصول لها عبر وحدة <em>build/three.module.js</em>. بعض المكونات الأخرى من المكتبة - مثل الضوابط (controls) وعناصر التحميل (loaders) وتأثيرات ما بعد المعالجة (post-processing effects) - يجب إستدعائهم من الملفات الثانوية [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm].
-		</p>
-
-
 		<h2>أمثلة</h2>
 
 		<p>
-			يركز جوهر three.js على أهم المكونات المكونة لمحرك ثلاثي الأبعاد.  العديد من المكونات المفيدة الأخرى - مثل الضوابط ، عناصر التحميل ، وتأثيرات ما بعد المعالجة - هي جزء من المجلد [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. .يشار إليها باسم "أمثلة" ، لأنه بينما يمكنك استخدامها ببساطة، من المفترض أيضًا إعادة دمجها وتخصيصها. هذه المكونات تضل  متزامنة مع المكتبة الأساسية
+			يركز جوهر three.js على أهم المكونات المكونة لمحرك ثلاثي الأبعاد.  العديد من المكونات المفيدة الأخرى - مثل الضوابط ، عناصر التحميل ، وتأثيرات ما بعد المعالجة - هي جزء من المجلد [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. .يشار إليها باسم "أمثلة" ، لأنه بينما يمكنك استخدامها ببساطة، من المفترض أيضًا إعادة دمجها وتخصيصها. هذه المكونات تضل متزامنة مع المكتبة الأساسية
 			بينما يتم الاحتفاظ بحزم الجهات الخارجية المماثلة على npm بواسطة أشخاص مختلفين وقد لا تكون محدثة.
 		</p>
 
@@ -113,9 +116,9 @@
 		</p>
 
 		<code>
-		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		const controls = new OrbitControls();
+		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
 
 		<p>
@@ -123,13 +126,23 @@
 		</p>
 
 		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+			{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+			}
+			}
+		&lt;/script>
+
 		&lt;script type="module">
 
-		  // Find the latest version by visiting https://cdn.skypack.dev/three.
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		  import { OrbitControls } from 'https://cdn.skypack.dev/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
-
-		  const controls = new OrbitControls();
+			const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 		</code>
@@ -163,16 +176,11 @@
 		<h3>Node.js</h3>
 
 		<p>
-			قد يكون استخدام three.js في Node.js أمرًا صعبًا ، وذلك لسببين:
+			Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
 		</p>
 
 		<p>
-			أولاً ، نظرًا لأن three.js مصممة للويب ، فإنها تعتمد على المتصفح وواجهات برمجة تطبيقات DOM التي لا تتواجد دائمًا في Node.js. يمكن حل بعض هذه المشكلات باستخدام (shims) مثل [link:https://github.com/stackgl/headless-gl headless-gl]، أو عن طريق استبدال مكونات مثل [page: TextureLoader] ببدائل مخصصة. قد تتشابك واجهات برمجة تطبيقات DOM الأخرى بعمق مع الكود الذي يستخدمها ، وسيكون من الصعب حلها. نرحب بطلبات السحب البسيطة والقابلة للصيانة لتحسين دعم Node.js ، لكننا نوصي بفتح مشكلة لمناقشة التحسينات التي أجريتها أولاً.
-		</p>
-
-		<p>
-			ثانيًا ، دعم Node.js لوحدات ES ... معقد. بدءًا من الإصدار 12 من Node.js ، يمكن استيراد المكتبة الأساسية كوحدة نمطية CommonJS ، مع <em>require('three')</em>. ومع ذلك ، فإن معظم أمثلة المكونات في <em>examples/jsm</em> لا يمكنها ذلك.
-			قد تحل الإصدارات المستقبلية من Node.js هذه المشكلة ، ولكن في هذه الأثناء قد تحتاج إلى استخدام حلول بديلة مثل [link:https://github.com/standard-things/esm esm] لتمكين تطبيق Node.js الخاص بك من التعرف على وحدات ES.
+			Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
 		</p>
 
 	</body>

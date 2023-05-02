@@ -11,14 +11,27 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - TGA texture example by <a href="https://github.com/DaoshengMu/" target="_blank" rel="noopener">Daosheng Mu</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { TGALoader } from './jsm/loaders/TGALoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
 			let camera, scene, renderer, stats;
 
@@ -43,6 +56,7 @@
 				// add box 1 - grey8 texture
 
 				const texture1 = loader.load( 'textures/crate_grey8.tga' );
+				texture1.colorSpace = THREE.SRGBColorSpace;
 				const material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
 				const mesh1 = new THREE.Mesh( geometry, material1 );
@@ -53,6 +67,7 @@
 				// add box 2 - tga texture
 
 				const texture2 = loader.load( 'textures/crate_color8.tga' );
+				texture2.colorSpace = THREE.SRGBColorSpace;
 				const material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
 				const mesh2 = new THREE.Mesh( geometry, material2 );

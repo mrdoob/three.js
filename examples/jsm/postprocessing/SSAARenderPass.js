@@ -1,13 +1,14 @@
 import {
-	AdditiveBlending,
+	CustomBlending,
+	OneFactor,
+	AddEquation,
+	SrcAlphaFactor,
 	Color,
-	LinearFilter,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
-import { Pass, FullScreenQuad } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
@@ -37,8 +38,6 @@ class SSAARenderPass extends Pass {
 		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 		this._oldClearColor = new Color();
 
-		if ( CopyShader === undefined ) console.error( 'THREE.SSAARenderPass relies on CopyShader' );
-
 		const copyShader = CopyShader;
 		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
 
@@ -46,11 +45,17 @@ class SSAARenderPass extends Pass {
 			uniforms: this.copyUniforms,
 			vertexShader: copyShader.vertexShader,
 			fragmentShader: copyShader.fragmentShader,
-			premultipliedAlpha: true,
 			transparent: true,
-			blending: AdditiveBlending,
 			depthTest: false,
-			depthWrite: false
+			depthWrite: false,
+
+			// do not use AdditiveBlending because it mixes the alpha channel instead of adding
+			blending: CustomBlending,
+			blendEquation: AddEquation,
+			blendDst: OneFactor,
+			blendDstAlpha: OneFactor,
+			blendSrc: SrcAlphaFactor,
+			blendSrcAlpha: OneFactor
 		} );
 
 		this.fsQuad = new FullScreenQuad( this.copyMaterial );
@@ -66,6 +71,10 @@ class SSAARenderPass extends Pass {
 
 		}
 
+		this.copyMaterial.dispose();
+
+		this.fsQuad.dispose();
+
 	}
 
 	setSize( width, height ) {
@@ -78,7 +87,7 @@ class SSAARenderPass extends Pass {
 
 		if ( ! this.sampleRenderTarget ) {
 
-			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat } );
+			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height );
 			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}

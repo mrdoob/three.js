@@ -1,0 +1,161 @@
+<!-- Licensed under a BSD license. See license.html for license -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Three.js - Debug - Clearing Logger</title>
+    <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    #c {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    #debug {
+      position: absolute;
+      left: 1em;
+      top: 1em;
+      padding: 1em;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      font-family: monospace;
+      pointer-events: none;
+    }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="debug">
+      <pre></pre>
+    </div>
+  </body>
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+class ClearingLogger {
+  constructor(elem) {
+    this.elem = elem;
+    this.lines = [];
+  }
+  log(...args) {
+    this.lines.push([...args].join(' '));
+  }
+  render() {
+    this.elem.textContent = this.lines.join('\n');
+    this.lines = [];
+  }
+}
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+
+  const fov = 75;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 50;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.z = 20;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('cyan');
+
+  const geometry = new THREE.SphereGeometry();
+  const material = new THREE.MeshBasicMaterial({color: 'red'});
+
+  const things = [];
+
+  function rand(min, max) {
+    if (max === undefined) {
+      max = min;
+      min = 0;
+    }
+    return Math.random() * (max - min) + min;
+  }
+
+  function createThing() {
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    things.push({
+      mesh,
+      timer: 2,
+      velocity: new THREE.Vector3(rand(-5, 5), rand(-5, 5), rand(-5, 5)),
+    });
+  }
+
+  canvas.addEventListener('click', createThing);
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  const logger = new ClearingLogger(document.querySelector('#debug pre'));
+
+  let then = 0;
+  function render(now) {
+    now *= 0.001;  // convert to seconds
+    const deltaTime = now - then;
+    then = now;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    logger.log('fps:', (1 / deltaTime).toFixed(1));
+    logger.log('num things:', things.length);
+    for (let i = 0; i < things.length;) {
+      const thing = things[i];
+      const mesh = thing.mesh;
+      const pos = mesh.position;
+      logger.log(
+          'timer:', thing.timer.toFixed(3),
+          'pos:', pos.x.toFixed(3), pos.y.toFixed(3), pos.z.toFixed(3));
+      thing.timer -= deltaTime;
+      if (thing.timer <= 0) {
+        // remove this thing. Note we don't advance `i`
+        things.splice(i, 1);
+        scene.remove(mesh);
+      } else {
+        mesh.position.addScaledVector(thing.velocity, deltaTime);
+        ++i;
+      }
+    }
+
+    renderer.render(scene, camera);
+    logger.render();
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</script>
+</html>
+

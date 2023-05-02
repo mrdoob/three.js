@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr; [page:LightProbe]
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+      Le sonde luminose sono un modo alternativo di aggiungere luce alla scena 3D. HemisphereLightProbe è i dati di stima della
+      luce di un singolo emisfero luminoso nella scena. Per ulteriori informazioni sulle sonde di luce, consultare [page:LightProbe]. 
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]( [param:Color skyColor], [param:Color groundColor], [param:Float intensity] )</h3>
+		<p>
+			[page:Color skyColor] - (opzionale) Un'istanza di Color, stringa che rappresenta un colore o un numero che rappresenta un colore.<br />
+			[page:Color groundColor] - (opzionale) Un'istanza di Color, stringa che rappresenta un colore o un numero che rappresenta un colore.<br />
+			[page:Float intensity] - (opzionale) Valore numerico dell'intesità della sonda di luce. Il valore predefinito è 1.<br /><br />
+
+      Crea una nuova [name].
+		</p>
+
+    <h2>Proprietà</h2>
+		<p>
+      Vedi la classe base [page:LightProbe LightProbe] per le proprietà comuni.
+		</p>
+
+
+		<h3>[property:Boolean isHemisphereLightProbe]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è del tipo [name].
+		</p>
+
+		<h2>Metodi</h2>
+		<p>
+      Vedi la classe base [page:LightProbe LightProbe] per i metodi comuni.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

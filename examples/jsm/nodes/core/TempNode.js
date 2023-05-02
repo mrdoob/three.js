@@ -1,142 +1,58 @@
-import { MathUtils } from '../../../../build/three.module.js';
-import { Node } from './Node.js';
+import Node, { addNodeClass } from './Node.js';
 
 class TempNode extends Node {
 
-	constructor( type, params = {} ) {
+	constructor( type ) {
 
 		super( type );
 
-		this.shared = params.shared !== undefined ? params.shared : true;
-		this.unique = params.unique !== undefined ? params.unique : false;
+		this.isTempNode = true;
 
 	}
 
-	build( builder, output, uuid, ns ) {
+	hasDependencies( builder ) {
 
-		output = output || this.getType( builder );
+		return builder.getDataFromNode( this ).dependenciesCount > 1;
 
-		if ( this.getShared( builder, output ) ) {
+	}
 
-			const isUnique = this.getUnique( builder, output );
+	build( builder, output ) {
 
-			if ( isUnique && this.constructor.uuid === undefined ) {
+		const buildStage = builder.getBuildStage();
 
-				this.constructor.uuid = MathUtils.generateUUID();
+		if ( buildStage === 'generate' ) {
 
-			}
+			const type = builder.getVectorType( this.getNodeType( builder, output ) );
+			const nodeData = builder.getDataFromNode( this );
 
-			uuid = builder.getUuid( uuid || this.getUuid(), ! isUnique );
+			if ( builder.context.tempRead !== false && nodeData.propertyName !== undefined ) {
 
-			const data = builder.getNodeData( uuid ),
-				type = data.output || this.getType( builder );
+				return builder.format( nodeData.propertyName, type, output );
 
-			if ( builder.analyzing ) {
+			} else if ( builder.context.tempWrite !== false && type !== 'void' && output !== 'void' && this.hasDependencies( builder ) ) {
 
-				if ( ( data.deps || 0 ) > 0 || this.getLabel() ) {
+				const snippet = super.build( builder, type );
 
-					this.appendDepsNode( builder, data, output );
+				const nodeVar = builder.getVarFromNode( this, type );
+				const propertyName = builder.getPropertyName( nodeVar );
 
-					return this.generate( builder, output, uuid );
+				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
-				}
+				nodeData.snippet = snippet;
+				nodeData.propertyName = propertyName;
 
-				return super.build( builder, output, uuid );
-
-			} else if ( isUnique ) {
-
-				data.name = data.name || super.build( builder, output, uuid );
-
-				return data.name;
-
-			} else if ( ! this.getLabel() && ( ! this.getShared( builder, type ) || ( builder.context.ignoreCache || data.deps === 1 ) ) ) {
-
-				return super.build( builder, output, uuid );
-
-			}
-
-			uuid = this.getUuid( false );
-
-			let name = this.getTemp( builder, uuid );
-
-			if ( name ) {
-
-				return builder.format( name, type, output );
-
-			} else {
-
-				name = TempNode.prototype.generate.call( this, builder, output, uuid, data.output, ns );
-
-				const code = this.generate( builder, type, uuid );
-
-				builder.addNodeCode( name + ' = ' + code + ';' );
-
-				return builder.format( name, type, output );
+				return builder.format( nodeData.propertyName, type, output );
 
 			}
 
 		}
 
-		return super.build( builder, output, uuid );
-
-	}
-
-	getShared( builder, output ) {
-
-		return output !== 'sampler2D' && output !== 'samplerCube' && this.shared;
-
-	}
-
-	getUnique( /* builder, output */ ) {
-
-		return this.unique;
-
-	}
-
-	setLabel( name ) {
-
-		this.label = name;
-
-		return this;
-
-	}
-
-	getLabel( /* builder */ ) {
-
-		return this.label;
-
-	}
-
-	getUuid( unique ) {
-
-		let uuid = unique || unique == undefined ? this.constructor.uuid || this.uuid : this.uuid;
-
-		if ( typeof this.scope === 'string' ) uuid = this.scope + '-' + uuid;
-
-		return uuid;
-
-	}
-
-	getTemp( builder, uuid ) {
-
-		uuid = uuid || this.uuid;
-
-		const tempVar = builder.getVars()[ uuid ];
-
-		return tempVar ? tempVar.name : undefined;
-
-	}
-
-	generate( builder, output, uuid, type, ns ) {
-
-		if ( ! this.getShared( builder, output ) ) console.error( 'THREE.TempNode is not shared!' );
-
-		uuid = uuid || this.uuid;
-
-		return builder.getTempVar( uuid, type || this.getType( builder ), ns, this.getLabel() ).name;
+		return super.build( builder, output );
 
 	}
 
 }
 
-export { TempNode };
+export default TempNode;
+
+addNodeClass( TempNode );

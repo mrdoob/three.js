@@ -1,44 +1,49 @@
 import { WebGLNodeBuilder } from './WebGLNodeBuilder.js';
+import { NodeFrame } from 'three/nodes';
 
-import { Material } from '../../../../../build/three.module.js';
+import { Material } from 'three';
 
-function addCodeAfterSnippet( source, snippet, code ) {
+const builders = new WeakMap();
+export const nodeFrame = new NodeFrame();
 
-	const index = source.indexOf( snippet );
+Material.prototype.onBuild = function ( object, parameters, renderer ) {
 
-	if ( index !== - 1 ) {
+	if ( object.material.isNodeMaterial === true ) {
 
-		const start = source.substring( 0, index + snippet.length );
-		const end = source.substring( index + snippet.length );
-
-		return `${start}\n${code}\n${end}`;
+		builders.set( this, new WebGLNodeBuilder( object, renderer, parameters ).build() );
 
 	}
 
-	return source;
+};
 
-}
+Material.prototype.onBeforeRender = function ( renderer, scene, camera, geometry, object ) {
 
-Material.prototype.onBuild = function ( parameters, renderer ) {
+	const nodeBuilder = builders.get( this );
 
-	new WebGLNodeBuilder( this, renderer, parameters ).build();
+	if ( nodeBuilder !== undefined ) {
 
-	let fragmentShader = parameters.fragmentShader;
+		nodeFrame.material = this;
+		nodeFrame.camera = camera;
+		nodeFrame.object = object;
+		nodeFrame.renderer = renderer;
 
-	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_pars_fragment>',
-		`#ifdef NODE_HEADER_UNIFORMS
+		const updateNodes = nodeBuilder.updateNodes;
 
-			NODE_HEADER_UNIFORMS
+		if ( updateNodes.length > 0 ) {
 
-		#endif` );
+			// force refresh material uniforms
+			renderer.state.useProgram( null );
 
-	fragmentShader = addCodeAfterSnippet( fragmentShader, '#include <color_fragment>',
-		`#ifdef NODE_COLOR
+			//this.uniformsNeedUpdate = true;
 
-			diffuseColor = NODE_COLOR;
+			for ( const node of updateNodes ) {
 
-		#endif` );
+				nodeFrame.updateNode( node );
 
-	parameters.fragmentShader = fragmentShader;
+			}
+
+		}
+
+	}
 
 };

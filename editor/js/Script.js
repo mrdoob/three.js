@@ -5,27 +5,27 @@ import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 
 function Script( editor ) {
 
-	var signals = editor.signals;
+	const signals = editor.signals;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 	container.setId( 'script' );
 	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#272822' );
 	container.setDisplay( 'none' );
 
-	var header = new UIPanel();
+	const header = new UIPanel();
 	header.setPadding( '10px' );
 	container.add( header );
 
-	var title = new UIText().setColor( '#fff' );
+	const title = new UIText().setColor( '#fff' );
 	header.add( title );
 
-	var buttonSVG = ( function () {
+	const buttonSVG = ( function () {
 
-		var svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
+		const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 		svg.setAttribute( 'width', 32 );
 		svg.setAttribute( 'height', 32 );
-		var path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+		const path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 		path.setAttribute( 'd', 'M 12,12 L 22,22 M 22,12 12,22' );
 		path.setAttribute( 'stroke', '#fff' );
 		svg.appendChild( path );
@@ -33,7 +33,7 @@ function Script( editor ) {
 
 	} )();
 
-	var close = new UIElement( buttonSVG );
+	const close = new UIElement( buttonSVG );
 	close.setPosition( 'absolute' );
 	close.setTop( '3px' );
 	close.setRight( '1px' );
@@ -46,7 +46,7 @@ function Script( editor ) {
 	header.add( close );
 
 
-	var renderer;
+	let renderer;
 
 	signals.rendererCreated.add( function ( newRenderer ) {
 
@@ -55,12 +55,12 @@ function Script( editor ) {
 	} );
 
 
-	var delay;
-	var currentMode;
-	var currentScript;
-	var currentObject;
+	let delay;
+	let currentMode;
+	let currentScript;
+	let currentObject;
 
-	var codemirror = CodeMirror( container.dom, {
+	const codemirror = CodeMirror( container.dom, {
 		value: '',
 		lineNumbers: true,
 		matchBrackets: true,
@@ -79,7 +79,7 @@ function Script( editor ) {
 		clearTimeout( delay );
 		delay = setTimeout( function () {
 
-			var value = codemirror.getValue();
+			const value = codemirror.getValue();
 
 			if ( ! validate( value ) ) return;
 
@@ -97,11 +97,11 @@ function Script( editor ) {
 
 			if ( currentScript !== 'programInfo' ) return;
 
-			var json = JSON.parse( value );
+			const json = JSON.parse( value );
 
 			if ( JSON.stringify( currentObject.material.defines ) !== JSON.stringify( json.defines ) ) {
 
-				var cmd = new SetMaterialValueCommand( editor, currentObject, 'defines', json.defines );
+				const cmd = new SetMaterialValueCommand( editor, currentObject, 'defines', json.defines );
 				cmd.updatable = false;
 				editor.execute( cmd );
 
@@ -109,7 +109,7 @@ function Script( editor ) {
 
 			if ( JSON.stringify( currentObject.material.uniforms ) !== JSON.stringify( json.uniforms ) ) {
 
-				var cmd = new SetMaterialValueCommand( editor, currentObject, 'uniforms', json.uniforms );
+				const cmd = new SetMaterialValueCommand( editor, currentObject, 'uniforms', json.uniforms );
 				cmd.updatable = false;
 				editor.execute( cmd );
 
@@ -117,7 +117,7 @@ function Script( editor ) {
 
 			if ( JSON.stringify( currentObject.material.attributes ) !== JSON.stringify( json.attributes ) ) {
 
-				var cmd = new SetMaterialValueCommand( editor, currentObject, 'attributes', json.attributes );
+				const cmd = new SetMaterialValueCommand( editor, currentObject, 'attributes', json.attributes );
 				cmd.updatable = false;
 				editor.execute( cmd );
 
@@ -128,7 +128,7 @@ function Script( editor ) {
 	} );
 
 	// prevent backspace from deleting objects
-	var wrapper = codemirror.getWrapperElement();
+	const wrapper = codemirror.getWrapperElement();
 	wrapper.addEventListener( 'keydown', function ( event ) {
 
 		event.stopPropagation();
@@ -137,13 +137,13 @@ function Script( editor ) {
 
 	// validate
 
-	var errorLines = [];
-	var widgets = [];
+	const errorLines = [];
+	const widgets = [];
 
-	var validate = function ( string ) {
+	const validate = function ( string ) {
 
-		var valid;
-		var errors = [];
+		let valid;
+		let errors = [];
 
 		return codemirror.operation( function () {
 
@@ -167,7 +167,7 @@ function Script( editor ) {
 
 					try {
 
-						var syntax = esprima.parse( string, { tolerant: true } );
+						const syntax = esprima.parse( string, { tolerant: true } );
 						errors = syntax.errors;
 
 					} catch ( error ) {
@@ -181,9 +181,9 @@ function Script( editor ) {
 
 					}
 
-					for ( var i = 0; i < errors.length; i ++ ) {
+					for ( let i = 0; i < errors.length; i ++ ) {
 
-						var error = errors[ i ];
+						const error = errors[ i ];
 						error.message = error.message.replace( /Line [0-9]+: /, '' );
 
 					}
@@ -225,26 +225,26 @@ function Script( editor ) {
 					currentObject.material.needsUpdate = true;
 					signals.materialChanged.dispatch( currentObject.material );
 
-					var programs = renderer.info.programs;
+					const programs = renderer.info.programs;
 
 					valid = true;
-					var parseMessage = /^(?:ERROR|WARNING): \d+:(\d+): (.*)/g;
+					const parseMessage = /^(?:ERROR|WARNING): \d+:(\d+): (.*)/g;
 
-					for ( var i = 0, n = programs.length; i !== n; ++ i ) {
+					for ( let i = 0, n = programs.length; i !== n; ++ i ) {
 
-						var diagnostics = programs[ i ].diagnostics;
+						const diagnostics = programs[ i ].diagnostics;
 
 						if ( diagnostics === undefined ||
 								diagnostics.material !== currentObject.material ) continue;
 
 						if ( ! diagnostics.runnable ) valid = false;
 
-						var shaderInfo = diagnostics[ currentScript ];
-						var lineOffset = shaderInfo.prefix.split( /\r\n|\r|\n/ ).length;
+						const shaderInfo = diagnostics[ currentScript ];
+						const lineOffset = shaderInfo.prefix.split( /\r\n|\r|\n/ ).length;
 
 						while ( true ) {
 
-							var parseResult = parseMessage.exec( shaderInfo.log );
+							const parseResult = parseMessage.exec( shaderInfo.log );
 							if ( parseResult === null ) break;
 
 							errors.push( {
@@ -262,20 +262,20 @@ function Script( editor ) {
 
 			} // mode switch
 
-			for ( var i = 0; i < errors.length; i ++ ) {
+			for ( let i = 0; i < errors.length; i ++ ) {
 
-				var error = errors[ i ];
+				const error = errors[ i ];
 
-				var message = document.createElement( 'div' );
+				const message = document.createElement( 'div' );
 				message.className = 'esprima-error';
 				message.textContent = error.message;
 
-				var lineNumber = Math.max( error.lineNumber, 0 );
+				const lineNumber = Math.max( error.lineNumber, 0 );
 				errorLines.push( lineNumber );
 
 				codemirror.addLineClass( lineNumber, 'background', 'errorLine' );
 
-				var widget = codemirror.addLineWidget( lineNumber, message );
+				const widget = codemirror.addLineWidget( lineNumber, message );
 
 				widgets.push( widget );
 
@@ -289,7 +289,7 @@ function Script( editor ) {
 
 	// tern js autocomplete
 
-	var server = new CodeMirror.TernServer( {
+	const server = new CodeMirror.TernServer( {
 		caseInsensitive: true,
 		plugins: { threejs: null }
 	} );
@@ -342,7 +342,7 @@ function Script( editor ) {
 	codemirror.on( 'keypress', function ( cm, kb ) {
 
 		if ( currentMode !== 'javascript' ) return;
-		var typed = String.fromCharCode( kb.which || kb.keyCode );
+		const typed = String.fromCharCode( kb.which || kb.keyCode );
 		if ( /[\w\.]/.exec( typed ) ) {
 
 			server.complete( cm );
@@ -362,7 +362,7 @@ function Script( editor ) {
 
 	signals.editScript.add( function ( object, script ) {
 
-		var mode, name, source;
+		let mode, name, source;
 
 		if ( typeof ( script ) === 'object' ) {
 
@@ -395,7 +395,7 @@ function Script( editor ) {
 
 					mode = 'json';
 					name = 'Program Properties';
-					var json = {
+					const json = {
 						defines: object.material.defines,
 						uniforms: object.material.uniforms,
 						attributes: object.material.attributes

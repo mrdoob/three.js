@@ -1,99 +1,94 @@
-import { FloatNode } from '../inputs/FloatNode.js';
-import { NodeLib } from '../core/NodeLib.js';
+import UniformNode from '../core/UniformNode.js';
+import { NodeUpdateType } from '../core/constants.js';
+import { nodeObject, nodeImmutable } from '../shadernode/ShaderNode.js';
+import { addNodeClass } from '../core/Node.js';
 
-class TimerNode extends FloatNode {
+class TimerNode extends UniformNode {
 
-	constructor( scale, scope, timeScale ) {
+	constructor( scope = TimerNode.LOCAL, scale = 1, value = 0 ) {
 
-		super();
+		super( value );
 
-		this.scale = scale !== undefined ? scale : 1;
-		this.scope = scope || TimerNode.GLOBAL;
+		this.scope = scope;
+		this.scale = scale;
 
-		this.timeScale = timeScale !== undefined ? timeScale : scale !== undefined;
-
-	}
-
-	getReadonly() {
-
-		// never use TimerNode as readonly but aways as "uniform"
-
-		return false;
+		this.updateType = NodeUpdateType.FRAME;
 
 	}
+	/*
+	@TODO:
+	getNodeType( builder ) {
 
-	getUnique() {
+		const scope = this.scope;
 
-		// share TimerNode "uniform" input if is used on more time with others TimerNode
+		if ( scope === TimerNode.FRAME ) {
 
-		return this.timeScale && ( this.scope === TimerNode.GLOBAL || this.scope === TimerNode.DELTA );
+			return 'uint';
+
+		}
+
+		return 'float';
 
 	}
+*/
+	update( frame ) {
 
-	updateFrame( frame ) {
+		const scope = this.scope;
+		const scale = this.scale;
 
-		const scale = this.timeScale ? this.scale : 1;
+		if ( scope === TimerNode.LOCAL ) {
 
-		switch ( this.scope ) {
+			this.value += frame.deltaTime * scale;
 
-			case TimerNode.LOCAL:
+		} else if ( scope === TimerNode.DELTA ) {
 
-				this.value += frame.delta * scale;
+			this.value = frame.deltaTime * scale;
 
-				break;
+		} else if ( scope === TimerNode.FRAME ) {
 
-			case TimerNode.DELTA:
+			this.value = frame.frameId;
 
-				this.value = frame.delta * scale;
+		} else {
 
-				break;
+			// global
 
-			default:
-
-				this.value = frame.time * scale;
+			this.value = frame.time * scale;
 
 		}
 
 	}
 
-	copy( source ) {
+	serialize( data ) {
 
-		super.copy( source );
-
-		this.scope = source.scope;
-		this.scale = source.scale;
-
-		this.timeScale = source.timeScale;
-
-		return this;
-
-	}
-
-	toJSON( meta ) {
-
-		const data = super.toJSON( meta );
+		super.serialize( data );
 
 		data.scope = this.scope;
 		data.scale = this.scale;
 
-		data.timeScale = this.timeScale;
+	}
 
-		return data;
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.scope = data.scope;
+		this.scale = data.scale;
 
 	}
 
 }
 
-TimerNode.GLOBAL = 'global';
 TimerNode.LOCAL = 'local';
+TimerNode.GLOBAL = 'global';
 TimerNode.DELTA = 'delta';
+TimerNode.FRAME = 'frame';
 
-TimerNode.prototype.nodeType = 'Timer';
+export default TimerNode;
 
-NodeLib.addKeyword( 'time', function () {
+// @TODO: add support to use node in timeScale
+export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
+export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
+export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
+export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME );
 
-	return new TimerNode();
-
-} );
-
-export { TimerNode };
+addNodeClass( TimerNode );

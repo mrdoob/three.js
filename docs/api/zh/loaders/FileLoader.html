@@ -80,7 +80,7 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Loader]。</p>
 
-		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
 			[page:String url] — 文件的URL或者路径，也可以为
 				[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
@@ -92,20 +92,13 @@
 			加载URL并将响应传递给onLoad函数。
 		</p>
 
-		<h3>[method:FileLoader setMimeType]( [param:String mimeType] )</h3>
+		<h3>[method:this setMimeType]( [param:String mimeType] )</h3>
 		<p>
 			设置正在加载的文件预期类型 [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
 			。请注意，在许多情况下，这将自动确定，因此默认情况下它是 *undefined* 。
 		</p>
 
-		<h3>[method:FileLoader setRequestHeader]( [param:Object requestHeader] )</h3>
-		<p>
-			[page:Object requestHeader] - key: 要设置header的名称。 value：要设置header的值。<br /><br />
-
-			请参考在HTTP 请求中的 [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header]。
-		</p>
-
-		<h3>[method:FileLoader setResponseType]( [param:String responseType] )</h3>
+		<h3>[method:this setResponseType]( [param:String responseType] )</h3>
 		<p>
 			改变响应的类型，其类型有效值如下:<br />
 			[page:String text] 或者空 string (默认) - 返回的数据类型为 [page:String string].<br />
@@ -114,13 +107,6 @@
 			[page:String document] - 使用 [link:https://developer.mozilla.org/en-US/docs/Web/API/DOMParser DOMParser] 解析文件。<br />
 			[page:String json] - 将文件解析为 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse JSON.parse].<br />
 		</p>
-
-		<h3>[method:FileLoader setWithCredentials]( [param:Boolean value] )</h3>
-		<p>
-			XMLHttpRequest是否使用cookie、授权头或TLS客户端证书等凭据。 请参考 [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
-			请注意，当您在本地或从同一域加载文件，则该方法无效。
-		</p>
-
 
 		<h2>源</h2>
 

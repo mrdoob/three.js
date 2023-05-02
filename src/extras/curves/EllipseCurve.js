@@ -7,6 +7,8 @@ class EllipseCurve extends Curve {
 
 		super();
 
+		this.isEllipseCurve = true;
+
 		this.type = 'EllipseCurve';
 
 		this.aX = aX;
@@ -150,7 +152,5 @@ class EllipseCurve extends Curve {
 	}
 
 }
-
-EllipseCurve.prototype.isEllipseCurve = true;
 
 export { EllipseCurve };

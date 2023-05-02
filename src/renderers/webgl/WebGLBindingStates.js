@@ -9,6 +9,7 @@
 
 	const defaultState = createBindingState( null );
 	let currentState = defaultState;
+	let forceUpdate = false;
 
 	function setup( object, material, program, geometry, index ) {
 
@@ -25,9 +26,9 @@
 
 			}
 
-			updateBuffers = needsUpdate( geometry, index );
+			updateBuffers = needsUpdate( object, geometry, program, index );
 
-			if ( updateBuffers ) saveCache( geometry, index );
+			if ( updateBuffers ) saveCache( object, geometry, program, index );
 
 		} else {
 
@@ -47,19 +48,15 @@
 
 		}
 
-		if ( object.isInstancedMesh === true ) {
-
-			updateBuffers = true;
-
-		}
-
 		if ( index !== null ) {
 
 			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
 
 		}
 
-		if ( updateBuffers ) {
+		if ( updateBuffers || forceUpdate ) {
+
+			forceUpdate = false;
 
 			setupVertexAttributes( object, material, program, geometry );
 
@@ -164,25 +161,40 @@
 
 	}
 
-	function needsUpdate( geometry, index ) {
+	function needsUpdate( object, geometry, program, index ) {
 
 		const cachedAttributes = currentState.attributes;
 		const geometryAttributes = geometry.attributes;
 
 		let attributesNum = 0;
 
-		for ( const key in geometryAttributes ) {
+		const programAttributes = program.getAttributes();
 
-			const cachedAttribute = cachedAttributes[ key ];
-			const geometryAttribute = geometryAttributes[ key ];
+		for ( const name in programAttributes ) {
 
-			if ( cachedAttribute === undefined ) return true;
+			const programAttribute = programAttributes[ name ];
 
-			if ( cachedAttribute.attribute !== geometryAttribute ) return true;
+			if ( programAttribute.location >= 0 ) {
 
-			if ( cachedAttribute.data !== geometryAttribute.data ) return true;
+				const cachedAttribute = cachedAttributes[ name ];
+				let geometryAttribute = geometryAttributes[ name ];
 
-			attributesNum ++;
+				if ( geometryAttribute === undefined ) {
+
+					if ( name === 'instanceMatrix' && object.instanceMatrix ) geometryAttribute = object.instanceMatrix;
+					if ( name === 'instanceColor' && object.instanceColor ) geometryAttribute = object.instanceColor;
+
+				}
+
+				if ( cachedAttribute === undefined ) return true;
+
+				if ( cachedAttribute.attribute !== geometryAttribute ) return true;
+
+				if ( geometryAttribute && cachedAttribute.data !== geometryAttribute.data ) return true;
+
+				attributesNum ++;
+
+			}
 
 		}
 
@@ -194,28 +206,43 @@
 
 	}
 
-	function saveCache( geometry, index ) {
+	function saveCache( object, geometry, program, index ) {
 
 		const cache = {};
 		const attributes = geometry.attributes;
 		let attributesNum = 0;
 
-		for ( const key in attributes ) {
+		const programAttributes = program.getAttributes();
 
-			const attribute = attributes[ key ];
+		for ( const name in programAttributes ) {
 
-			const data = {};
-			data.attribute = attribute;
+			const programAttribute = programAttributes[ name ];
 
-			if ( attribute.data ) {
+			if ( programAttribute.location >= 0 ) {
 
-				data.data = attribute.data;
+				let attribute = attributes[ name ];
+
+				if ( attribute === undefined ) {
+
+					if ( name === 'instanceMatrix' && object.instanceMatrix ) attribute = object.instanceMatrix;
+					if ( name === 'instanceColor' && object.instanceColor ) attribute = object.instanceColor;
+
+				}
+
+				const data = {};
+				data.attribute = attribute;
+
+				if ( attribute && attribute.data ) {
+
+					data.data = attribute.data;
+
+				}
+
+				cache[ name ] = data;
+
+				attributesNum ++;
 
 			}
-
-			cache[ key ] = data;
-
-			attributesNum ++;
 
 		}
 
@@ -322,9 +349,16 @@
 
 			const programAttribute = programAttributes[ name ];
 
-			if ( programAttribute >= 0 ) {
+			if ( programAttribute.location >= 0 ) {
 
-				const geometryAttribute = geometryAttributes[ name ];
+				let geometryAttribute = geometryAttributes[ name ];
+
+				if ( geometryAttribute === undefined ) {
+
+					if ( name === 'instanceMatrix' && object.instanceMatrix ) geometryAttribute = object.instanceMatrix;
+					if ( name === 'instanceColor' && object.instanceColor ) geometryAttribute = object.instanceColor;
+
+				}
 
 				if ( geometryAttribute !== undefined ) {
 
@@ -347,11 +381,15 @@
 						const stride = data.stride;
 						const offset = geometryAttribute.offset;
 
-						if ( data && data.isInstancedInterleavedBuffer ) {
+						if ( data.isInstancedInterleavedBuffer ) {
 
-							enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
+							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
 
-							if ( geometry._maxInstanceCount === undefined ) {
+								enableAttributeAndDivisor( programAttribute.location + i, data.meshPerAttribute );
+
+							}
+
+							if ( object.isInstancedMesh !== true && geometry._maxInstanceCount === undefined ) {
 
 								geometry._maxInstanceCount = data.meshPerAttribute * data.count;
 
@@ -359,20 +397,40 @@
 
 						} else {
 
-							enableAttribute( programAttribute );
+							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+								enableAttribute( programAttribute.location + i );
+
+							}
 
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+
+						for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+							vertexAttribPointer(
+								programAttribute.location + i,
+								size / programAttribute.locationSize,
+								type,
+								normalized,
+								stride * bytesPerElement,
+								( offset + ( size / programAttribute.locationSize ) * i ) * bytesPerElement
+							);
+
+						}
 
 					} else {
 
 						if ( geometryAttribute.isInstancedBufferAttribute ) {
 
-							enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
+							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
 
-							if ( geometry._maxInstanceCount === undefined ) {
+								enableAttributeAndDivisor( programAttribute.location + i, geometryAttribute.meshPerAttribute );
+
+							}
+
+							if ( object.isInstancedMesh !== true && geometry._maxInstanceCount === undefined ) {
 
 								geometry._maxInstanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
@@ -380,54 +438,30 @@
 
 						} else {
 
-							enableAttribute( programAttribute );
+							for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+								enableAttribute( programAttribute.location + i );
+
+							}
 
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+
+						for ( let i = 0; i < programAttribute.locationSize; i ++ ) {
+
+							vertexAttribPointer(
+								programAttribute.location + i,
+								size / programAttribute.locationSize,
+								type,
+								normalized,
+								size * bytesPerElement,
+								( size / programAttribute.locationSize ) * i * bytesPerElement
+							);
+
+						}
 
 					}
-
-				} else if ( name === 'instanceMatrix' ) {
-
-					const attribute = attributes.get( object.instanceMatrix );
-
-					// TODO Attribute may not be available on context restore
-
-					if ( attribute === undefined ) continue;
-
-					const buffer = attribute.buffer;
-					const type = attribute.type;
-
-					enableAttributeAndDivisor( programAttribute + 0, 1 );
-					enableAttributeAndDivisor( programAttribute + 1, 1 );
-					enableAttributeAndDivisor( programAttribute + 2, 1 );
-					enableAttributeAndDivisor( programAttribute + 3, 1 );
-
-					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-
-					gl.vertexAttribPointer( programAttribute + 0, 4, type, false, 64, 0 );
-					gl.vertexAttribPointer( programAttribute + 1, 4, type, false, 64, 16 );
-					gl.vertexAttribPointer( programAttribute + 2, 4, type, false, 64, 32 );
-					gl.vertexAttribPointer( programAttribute + 3, 4, type, false, 64, 48 );
-
-				} else if ( name === 'instanceColor' ) {
-
-					const attribute = attributes.get( object.instanceColor );
-
-					// TODO Attribute may not be available on context restore
-
-					if ( attribute === undefined ) continue;
-
-					const buffer = attribute.buffer;
-					const type = attribute.type;
-
-					enableAttributeAndDivisor( programAttribute, 1 );
-
-					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-
-					gl.vertexAttribPointer( programAttribute, 3, type, false, 12, 0 );
 
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
@@ -438,19 +472,19 @@
 						switch ( value.length ) {
 
 							case 2:
-								gl.vertexAttrib2fv( programAttribute, value );
+								gl.vertexAttrib2fv( programAttribute.location, value );
 								break;
 
 							case 3:
-								gl.vertexAttrib3fv( programAttribute, value );
+								gl.vertexAttrib3fv( programAttribute.location, value );
 								break;
 
 							case 4:
-								gl.vertexAttrib4fv( programAttribute, value );
+								gl.vertexAttrib4fv( programAttribute.location, value );
 								break;
 
 							default:
-								gl.vertexAttrib1fv( programAttribute, value );
+								gl.vertexAttrib1fv( programAttribute.location, value );
 
 						}
 
@@ -549,6 +583,7 @@
 	function reset() {
 
 		resetDefaultState();
+		forceUpdate = true;
 
 		if ( currentState === defaultState ) return;
 
@@ -557,7 +592,7 @@
 
 	}
 
-	// for backward-compatilibity
+	// for backward-compatibility
 
 	function resetDefaultState() {
 

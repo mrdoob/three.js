@@ -10,7 +10,7 @@ import {
  	MeshStandardMaterial,
  	PointLight,
  	Scene,
-} from '../../../build/three.module.js';
+} from 'three';
 
 class RoomEnvironment extends Scene {
 
@@ -105,6 +105,29 @@ class RoomEnvironment extends Scene {
 		light6.position.set( 0.0, 20.0, 0.0 );
 		light6.scale.set( 1.0, 0.1, 1.0 );
 		this.add( light6 );
+
+	}
+
+	dispose() {
+
+		const resources = new Set();
+
+		this.traverse( ( object ) => {
+
+			if ( object.isMesh ) {
+
+				resources.add( object.geometry );
+				resources.add( object.material );
+
+			}
+
+		} );
+
+		for ( const resource of resources ) {
+
+			resource.dispose();
+
+		}
 
 	}
 
