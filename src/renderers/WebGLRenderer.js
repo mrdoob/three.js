@@ -272,7 +272,7 @@ class WebGLRenderer {
 
 			if ( _gl instanceof WebGLRenderingContext ) { // @deprecated, r153
 
-				console.warn( 'THREE.WebGLRenderer: WebGL 1 support is deprecated with r153+, and will be removed with r163.' );
+				console.warn( 'THREE.WebGLRenderer: WebGL 1 support was deprecated in r153 and will be removed in r163.' );
 
 			}
 
