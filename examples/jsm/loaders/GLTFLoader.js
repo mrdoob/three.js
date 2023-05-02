@@ -3429,11 +3429,9 @@ class GLTFParser {
 
 		const sanitizedName = PropertyBinding.sanitizeNodeName( originalName || '' );
 
-		if (sanitizedName in this.nodeNamesUsed) {
+		if ( sanitizedName in this.nodeNamesUsed ) {
 
-			const num = ++this.nodeNamesUsed[ sanitizedName ];
-
-			return sanitizedName + "_" + num;
+			return sanitizedName + '_' + ( ++ this.nodeNamesUsed[ sanitizedName ] );
 
 		} else {
 
