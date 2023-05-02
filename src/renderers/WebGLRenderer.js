@@ -14,13 +14,11 @@ import {
 	sRGBEncoding,
 	LinearEncoding,
 	RGBAIntegerFormat,
-	RGBIntegerFormat,
 	RGIntegerFormat,
 	RedIntegerFormat,
 	UnsignedIntType,
 	UnsignedShortType,
 	UnsignedInt248Type,
-	UnsignedShort565Type,
 	UnsignedShort4444Type,
 	UnsignedShort5551Type
 } from '../constants.js';
@@ -572,7 +570,6 @@ class WebGLRenderer {
 
 					const targetFormat = _currentRenderTarget.texture.format;
 					isIntegerFormat = targetFormat === RGBAIntegerFormat ||
-						targetFormat === RGBIntegerFormat ||
 						targetFormat === RGIntegerFormat ||
 						targetFormat === RedIntegerFormat;
 
@@ -587,7 +584,6 @@ class WebGLRenderer {
 						targetType === UnsignedIntType ||
 						targetType === UnsignedShortType ||
 						targetType === UnsignedInt248Type ||
-						targetType === UnsignedShort565Type ||
 						targetType === UnsignedShort4444Type ||
 						targetType === UnsignedShort5551Type;
 
