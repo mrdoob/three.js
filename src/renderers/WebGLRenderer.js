@@ -562,7 +562,7 @@ class WebGLRenderer {
 
 			let bits = 0;
 
-			if ( color === undefined || color ) {
+			if ( color ) {
 
 				// check if we're trying to clear an integer target
 				let isIntegerFormat = false;
