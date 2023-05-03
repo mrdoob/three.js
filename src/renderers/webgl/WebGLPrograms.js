@@ -38,6 +38,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	function getChannel( value ) {
 
 		if ( value === 0 ) return 'uv';
+
 		return `uv${ value }`;
 
 	}
