@@ -53,6 +53,11 @@
 		<h3>[property:BufferGeometry geometry]</h3>
 		<p>表示线段的顶点。</p>
 
+		<h3>[property:Boolean isLine]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Material material]</h3>
 		<p>线的材质。</p>
 
@@ -71,13 +76,13 @@
 		<h2>方法</h2>
 		<p>共有方法请参见其基类 [page:Object3D]。</p>
 
-		<h3>[method:Line computeLineDistances]()</h3>
+		<h3>[method:this computeLineDistances]()</h3>
 		<p>
 			计算[page:LineDashedMaterial]所需的距离的值的数组。
 			对于几何体中的每一个顶点，这个方法计算出了当前点到线的起始点的累积长度。
 		</p>
 
-		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 			在一条投射出去的[page:Ray]（射线）和这条线之间产生交互。
 			[page:Raycaster.intersectObject]将会调用这个方法。
@@ -88,7 +93,7 @@
 			返回这条线及其子集的一个克隆对象。
 		</p>
 
-		<h3>[method:null updateMorphTargets]()</h3>
+		<h3>[method:undefined updateMorphTargets]()</h3>
 		<p>
 		Updates the morphTargets to have no influence on the object. Resets the
 		[page:.morphTargetInfluences] and [page:.morphTargetDictionary] properties.

@@ -1,42 +1,30 @@
 import { BufferAttribute } from './BufferAttribute.js';
 
-function InstancedBufferAttribute( array, itemSize, normalized, meshPerAttribute ) {
+class InstancedBufferAttribute extends BufferAttribute {
 
-	if ( typeof ( normalized ) === 'number' ) {
+	constructor( array, itemSize, normalized, meshPerAttribute = 1 ) {
 
-		meshPerAttribute = normalized;
+		super( array, itemSize, normalized );
 
-		normalized = false;
+		this.isInstancedBufferAttribute = true;
 
-		console.error( 'THREE.InstancedBufferAttribute: The constructor now expects normalized as the third argument.' );
+		this.meshPerAttribute = meshPerAttribute;
 
 	}
 
-	BufferAttribute.call( this, array, itemSize, normalized );
+	copy( source ) {
 
-	this.meshPerAttribute = meshPerAttribute || 1;
-
-}
-
-InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribute.prototype ), {
-
-	constructor: InstancedBufferAttribute,
-
-	isInstancedBufferAttribute: true,
-
-	copy: function ( source ) {
-
-		BufferAttribute.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.meshPerAttribute = source.meshPerAttribute;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ()	{
+	toJSON() {
 
-		const data = BufferAttribute.prototype.toJSON.call( this );
+		const data = super.toJSON();
 
 		data.meshPerAttribute = this.meshPerAttribute;
 
@@ -46,8 +34,6 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 	}
 
-} );
-
-
+}
 
 export { InstancedBufferAttribute };

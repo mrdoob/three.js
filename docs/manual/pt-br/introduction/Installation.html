@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>Instalação</h1>
+
+		<p>Você pode instalar o three.js através do [link:https://www.npmjs.com/ npm] e modernas ferramentas de build ou começar rapidamente apenas com hospedagem estática ou um CDN. Para a maioria dos usuários, instalar pelo npm é a melhor opção.</p>
+
+		<p>Seja qual for a maneira que escolher, seja consistente e importe todos os arquivos na mesma versão da biblioteca. A mistura de arquivos de versões diferentes pode causar a inclusão de código duplicado ou até mesmo quebrar a aplicação de maneiras inesperadas.</p>
+
+		<p>Todos os métodos de instalação do three.js dependem dos ES modules (veja [link:https://eloquentjavascript.net/10_modules.html#h_hF2FmOVxw7 Eloquent JavaScript: ECMAScript Modules]), que permitem incluir somente as partes necessárias da biblioteca no projeto final.</p>
+
+		<h2>Instalar pelo npm</h2>
+
+		<p>
+			Para instalar o módulo do npm do [link:https://www.npmjs.com/package/three three], abra uma janela do terminal na sua pasta do projeto e execute:
+		</p>
+
+		<code>
+		npm install three
+		</code>
+
+		<p>
+			O pacote será baixado e instalado. Então você estará pronto para importar no seu código:
+		</p>
+
+		<code>
+		// Option 1: Import the entire three.js core library.
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+
+
+		// Option 2: Import just the parts you need.
+		import { Scene } from 'three';
+
+		const scene = new Scene();
+		</code>
+
+		<p>Ao instalar a partir do npm, você quase sempre usará algum tipo de [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC ferramenta de build] para combinar todos os pacotes que seu projeto precisa em um único arquivo JavaScript. Embora alguns modernos empacotadores JavaScript possam ser usados com o three.js, a escolha mais popular é o [link:https://webpack.js.org/ webpack].</p>
+
+		<p>Nem todos os recursos são acessados diretamente pelo módulo <em>three</em>. Outras partes populares da biblioteca - tais como controls, loaders e post-processing effects - devem ser importados da subpasta [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. Para aprender mais, veja o <em>Exemplo</em> abaixo.</p>
+
+		<p>Aprenda mais sobre módulos do npm em [link:https://eloquentjavascript.net/20_node.html#h_J6hW/SmL/a Eloquent JavaScript: Installing with npm].</p>
+
+		<h2>Instalar através de CDN ou hospedagem estática</h2>
+
+		<p>A biblioteca three.js pode ser utilizada sem nenhum sistema de build, seja fazendo o upload dos arquivos para seu próprio servidor web ou usando um CDN existente. Como a biblioteca depende dos ES modules, qualquer script que faça referência a eles deve usar <em>type="module"</em> como mostrado abaixo. Também é necessário definir um mapa de importação que resolva a importação direta do `three`.</p>
+
+		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+		  {
+		    "imports": {
+		      "three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js"
+		    }
+		  }
+		&lt;/script>
+
+		&lt;script type="module">
+
+		  import * as THREE from 'three';
+
+		  const scene = new THREE.Scene();
+
+		&lt;/script>
+		</code>
+
+		<p>
+			Nem todos os recursos disponíveis são acessados diretamente através do módulo <em>three</em>. Outras partes populares da biblioteca - tais como controls, loaders e post-processing effects - devem ser importados da subpasta [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. Para aprender mais, veja o <em>Exemplo</em> abaixo.
+		</p>
+
+		<p>
+			Como os mapas de importação ainda não são suportados por todos os navegadores, é necessário adicionar o polyfill *es-module-shims.js*.
+		</p>
+
+		<h2>Addons</h2>
+
+		<p>
+			O núcleo do three.js está focado nos componentes mais importantes de uma engine 3D. Muitos outros componentes úteis - como controls, loaders e post-processing effects - fazem parte da pasta [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. Eles são chamados de "exemplos" porque embora você possa usá-los diretamente, eles também podem ser remixados e personalizados. Esses componentes são sempre mantidos em sincronia com a biblioteca principal, enquanto pacotes semelhantes de terceiros no npm são mantidos por pessoas diferentes e podem estar desatualizados.
+		</p>
+
+		<p>
+			Os addons não precisam ser <em>instalados</em> separadamente, mas precisam ser <em>importados</em> separadamente. Se o three.js foi instalado com npm, você pode carregar o componente [page:OrbitControls] com:
+		</p>
+
+		<code>
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+		const controls = new OrbitControls( camera, renderer.domElement );
+		</code>
+
+		<p>Se o three.js foi instalado de um CDN, use o mesmo CDN para instalar outros componentes:</p>
+
+		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+			{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+			}
+			}
+		&lt;/script>
+
+		&lt;script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+
+		&lt;/script>
+		</code>
+
+		<p>
+			É importante que todos os arquivos utilizem a mesma versão. Não importe diferentes addons de diferentes versões, ou use addons de uma versão diferente que a própria biblioteca three.js.
+		</p>
+
+		<h2>Compatibilidade</h2>
+
+		<h3>Importação CommonJS</h3>
+
+		<p>
+			Embora a maioria dos bundlers JavaScript modernos atualmente suportem os ES modules por padrão, algumas ferramentas de build mais antigas podem não suportar. Nesses casos você provavelmente pode configurar o bundler para entender os ES modules: [link:http://browserify.org/ Browserify] precisa apenas do plugin [link:https://github.com/babel/babelify babelify], por exemplo.
+		</p>
+
+		<h3>Node.js</h3>
+
+		<p>
+			Como o three.js foi desenvolvido para a web, ele depende do navegador e das APIs DOM que nem sempre existem no Node.js. Alguns desses problemas podem ser resolvidos usando ferramentas como [link:https://github.com/stackgl/headless-gl headless-gl], ou substituindo componentes como [page:TextureLoader] por alternativas personalizadas. Outras APIs DOM podem ser profundamente entrelaçadas com o código que as utiliza, e serão mais difíceis de contornar. Aceitamos solicitações de pull simples e fáceis de manter para melhorar o suporte ao Node.js, mas recomendo abrir uma issue para discutir suas melhorias primeiro.
+		</p>
+
+		<p>
+			Certifique-se de adicionar `{ "type": "module" }` ao seu `package.json` para habilitar os ES6 modules em seu projeto Node.js.
+		</p>
+
+	</body>
+</html>

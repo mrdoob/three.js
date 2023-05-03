@@ -122,7 +122,7 @@
 			有如下参数：<br />
 			[page:String url] — 被加载的项的url。<br />
 			[page:Integer itemsLoaded] — 目前已加载项的个数。<br />
-			[page:Iteger itemsTotal] — 总共所需要加载项的个数。<br /><br />
+			[page:Integer itemsTotal] — 总共所需要加载项的个数。<br /><br />
 
 			该函数默认为undefined。
 		</p>
@@ -138,7 +138,7 @@
 			有如下参数：<br />
 		[page:String url] — 被加载的项的url。<br />
 		[page:Integer itemsLoaded] — 目前已加载项的个数。<br />
-		[page:Iteger itemsTotal] — 总共所需要加载项的个数。<br /><br />
+		[page:Integer itemsTotal] — 总共所需要加载项的个数。<br /><br />
 
 			默认情况下，该函数为undefined，除非在构造函数中传入。
 		</p>
@@ -155,7 +155,7 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:LoadingManager addHandler]( [param:Object regex], [param:Loader loader] )</h3>
+		<h3>[method:this addHandler]( [param:Object regex], [param:Loader loader] )</h3>
 		<p>
 		[page:Object regex] — A regular expression.<br />
 		[page:Loader loader] — The loader.
@@ -168,14 +168,14 @@
 manager.addHandler( /\.tga$/i, new TGALoader() );
 		</code>
 
-		<h3>[method:null getHandler]( [param:String file] )</h3>
+		<h3>[method:Loader getHandler]( [param:String file] )</h3>
 		<p>
 		[page:String file] — The file path.
 		<p>
 		Can be used to retrieve the registered loader for the given file path.
 		</p>
 
-		<h3>[method:LoadingManager removeHandler]( [param:Object regex] )</h3>
+		<h3>[method:this removeHandler]( [param:Object regex] )</h3>
 		<p>
 		[page:Object regex] — A regular expression.
 		<p>
@@ -189,7 +189,7 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 		给定URL，使用URL修饰符回调（如果有）并返回已解析的URL。如果未设置URL修饰符，则返回原始URL。
 		</p>
 
-		<h3>[method:null setURLModifier]( [param:Function callback] )</h3>
+		<h3>[method:this setURLModifier]( [param:Function callback] )</h3>
 		<p>
 		[page:Function callback] — 设置URL修饰符成功时回调。使用url参数进行回调，并且必须返回 [page:String resolvedURL] 。<br /><br />
 
@@ -204,21 +204,21 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 			them directly.</em>
 		</p>
 
-		<h3>[method:null itemStart]( [param:String url] )</h3>
+		<h3>[method:undefined itemStart]( [param:String url] )</h3>
 		<p>
 		[page:String url] — 所要加载的url<br /><br />
 
 		任何使用管理器的加载器都会调用此方法， 当加载器需要开始加载URL时。
 		</p>
 
-		<h3>[method:null itemEnd]( [param:String url] )</h3>
+		<h3>[method:undefined itemEnd]( [param:String url] )</h3>
 		<p>
 		[page:String url] — 所要加载的url<br /><br />
 
 		任何使用管理器的加载器都会调用此方法， 当加载器需要加载URL结束时。
 		</p>
 
-		<h3>[method:null itemError]( [param:String url] )</h3>
+		<h3>[method:undefined itemError]( [param:String url] )</h3>
 		<p>
 		[page:String url] — 所要加载的url<br /><br />
 

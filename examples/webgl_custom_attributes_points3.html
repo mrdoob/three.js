@@ -57,13 +57,26 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
 			let renderer, scene, camera, stats;
 
@@ -132,7 +145,7 @@
 
 					const positionAttribute = geo.getAttribute( 'position' );
 
-					for ( var i = 0, l = positionAttribute.count; i < l; i ++ ) {
+					for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
 						vertex.fromBufferAttribute( positionAttribute, i );
 						vertex.applyMatrix4( matrix );

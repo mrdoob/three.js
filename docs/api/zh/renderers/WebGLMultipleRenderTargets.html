@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:WebGLRenderTarget] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			一个特殊的渲染目标，使片段着色器能够写入多个纹理。这种方法对于高级渲染技术很有用，例如后处理或延迟渲染。
+			
+			注意：[name]只能与 WebGL 2 渲染上下文一起使用。
+		</p>
+
+		<h2>例子(Examples)</h2>
+
+		<p>
+			[example:webgl2_multiple_rendertargets webgl2 / multiple / rendertargets ]
+		</p>
+
+		<h2>构造器(Constructor)</h2>
+
+
+		<h3>[name]([param:Number width], [param:Number height], [param:Number count])</h3>
+
+		<p>
+		[page:Number width] - 渲染目标的宽度。默认为`1`。<br />
+		[page:Number height] - 渲染目标的高度。默认为`1`。<br />
+		[page:Number count] - 渲染目标的数量。默认为`1`。
+		</p>
+
+		<h2>特性(Properties)</h2>
+
+		<h3>[property:Boolean isWebGLMultipleRenderTargets]</h3>
+		<p>
+			只读标志，用于检查给定对象是否属于[name]类型。
+		</p>
+
+		<h3>[property:Array texture]</h3>
+		<p>
+			纹理属性在[name]中被覆盖并替换为数组。该数组包含各个渲染目标的[page:WebGLRenderTarget.texture 纹理]引用。
+		</p>
+
+		<p>[page:WebGLRenderTarget WebGLRenderTarget]属性在此类上可用。</p>
+
+		<h2>方法(Methods)</h2>
+
+		<p>[page:WebGLRenderTarget WebGLRenderTarget]方法在此类上可用。</p>
+
+		<h2>源代码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

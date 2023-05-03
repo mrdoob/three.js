@@ -14,10 +14,23 @@
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
-	<script type="module">
-		import * as THREE from '../build/three.module.js';
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
-		import Stats from './jsm/libs/stats.module.js';
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
+			}
+		}
+	</script>
+
+	<script type="module">
+		import * as THREE from 'three';
+
+		import Stats from 'three/addons/libs/stats.module.js';
 
 		let container, stats;
 		let camera, scene, renderer, mesh;
@@ -109,6 +122,7 @@
 
 			const material = new THREE.MeshBasicMaterial();
 			material.map = new THREE.TextureLoader().load( 'textures/crate.gif' );
+			material.map.colorSpace = THREE.SRGBColorSpace;
 			material.map.flipY = false;
 
 			// per instance data
@@ -208,6 +222,7 @@
 			}
 
 			mesh.instanceMatrix.needsUpdate = true;
+			mesh.computeBoundingSphere();
 
 			lastTime = time;
 

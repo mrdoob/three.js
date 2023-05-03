@@ -1,93 +1,83 @@
-import { TempNode } from './TempNode.js';
+import Node, { addNodeClass } from './Node.js';
+import { getValueType, getValueFromType, arrayBufferToBase64 } from './NodeUtils.js';
 
-function InputNode( type, params ) {
+class InputNode extends Node {
 
-	params = params || {};
-	params.shared = params.shared !== undefined ? params.shared : false;
+	constructor( value, nodeType = null ) {
 
-	TempNode.call( this, type, params );
+		super( nodeType );
 
-	this.readonly = false;
+		this.isInputNode = true;
 
-}
-
-InputNode.prototype = Object.create( TempNode.prototype );
-InputNode.prototype.constructor = InputNode;
-
-InputNode.prototype.setReadonly = function ( value ) {
-
-	this.readonly = value;
-
-	this.hashProperties = this.readonly ? [ 'value' ] : undefined;
-
-	return this;
-
-};
-
-InputNode.prototype.getReadonly = function ( /* builder */ ) {
-
-	return this.readonly;
-
-};
-
-InputNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	if ( source.readonly !== undefined ) this.readonly = source.readonly;
-
-	return this;
-
-};
-
-InputNode.prototype.createJSONNode = function ( meta ) {
-
-	var data = TempNode.prototype.createJSONNode.call( this, meta );
-
-	if ( this.readonly === true ) data.readonly = this.readonly;
-
-	return data;
-
-};
-
-InputNode.prototype.generate = function ( builder, output, uuid, type, ns, needsUpdate ) {
-
-	uuid = builder.getUuid( uuid || this.getUuid() );
-	type = type || this.getType( builder );
-
-	var data = builder.getNodeData( uuid ),
-		readonly = this.getReadonly( builder ) && this.generateReadonly !== undefined;
-
-	if ( readonly ) {
-
-		return this.generateReadonly( builder, output, uuid, type, ns, needsUpdate );
-
-	} else {
-
-		if ( builder.isShader( 'vertex' ) ) {
-
-			if ( ! data.vertex ) {
-
-				data.vertex = builder.createVertexUniform( type, this, ns, needsUpdate, this.getLabel() );
-
-			}
-
-			return builder.format( data.vertex.name, type, output );
-
-		} else {
-
-			if ( ! data.fragment ) {
-
-				data.fragment = builder.createFragmentUniform( type, this, ns, needsUpdate, this.getLabel() );
-
-			}
-
-			return builder.format( data.fragment.name, type, output );
-
-		}
+		this.value = value;
+		this.precision = null;
 
 	}
 
-};
+	getNodeType( /*builder*/ ) {
 
-export { InputNode };
+		if ( this.nodeType === null ) {
+
+			return getValueType( this.value );
+
+		}
+
+		return this.nodeType;
+
+	}
+
+	getInputType( builder ) {
+
+		return this.getNodeType( builder );
+
+	}
+
+	setPrecision( precision ) {
+
+		this.precision = precision;
+
+		return this;
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
+
+		data.value = this.value;
+
+		if ( this.value && this.value.toArray ) data.value = this.value.toArray();
+
+		data.valueType = getValueType( this.value );
+		data.nodeType = this.nodeType;
+
+		if ( data.valueType === 'ArrayBuffer' ) data.value = arrayBufferToBase64( data.value );
+
+		data.precision = this.precision;
+
+	}
+
+	deserialize( data ) {
+
+		super.deserialize( data );
+
+		this.nodeType = data.nodeType;
+		this.value = Array.isArray( data.value ) ? getValueFromType( data.valueType, ...data.value ) : data.value;
+
+		this.precision = data.precision || null;
+
+		if ( this.value && this.value.fromArray ) this.value = this.value.fromArray( data.value );
+
+	}
+
+	generate( /*builder, output*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+}
+
+export default InputNode;
+
+addNodeClass( InputNode );

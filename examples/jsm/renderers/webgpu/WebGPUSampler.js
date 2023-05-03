@@ -7,6 +7,8 @@ class WebGPUSampler extends WebGPUBinding {
 
 		super( name );
 
+		this.isSampler = true;
+
 		this.texture = texture;
 
 		this.type = GPUBindingType.Sampler;
@@ -16,8 +18,12 @@ class WebGPUSampler extends WebGPUBinding {
 
 	}
 
-}
+	getTexture() {
 
-WebGPUSampler.prototype.isSampler = true;
+		return this.texture;
+
+	}
+
+}
 
 export default WebGPUSampler;

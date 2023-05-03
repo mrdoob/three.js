@@ -19,10 +19,11 @@
 
 		<h2>代码示例</h2>
 		<code>
-		// white spotlight shining from the side, casting a shadow
+		// white spotlight shining from the side, modulated by a texture, casting a shadow
 
 		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 100, 1000, 100 );
+		spotLight.map = new THREE.TextureLoader().load( url );
 
 		spotLight.castShadow = true;
 
@@ -49,7 +50,7 @@
 		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float distance], [param:Radians angle], [param:Float penumbra], [param:Float decay] )</h3>
 		<p>
 			[page:Integer color] - (可选参数) 十六进制光照颜色。 缺省值 0xffffff (白色)。<br />
-			[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
+			[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br />
 			[page:Float distance] - 从光源发出光的最大距离，其强度根据光源的距离线性衰减。 <br />
 			[page:Radians angle] - 光线散射角度，最大为Math.PI/2。<br />
 			[page:Float penumbra] - 聚光锥的半影衰减百分比。在0和1之间的值。默认为0。<br />
@@ -77,15 +78,19 @@
 
 		<h3>[property:Float decay]</h3>
 		<p>
-			沿着光照距离的衰减量<br />
-			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式下，decay 设置为等于2将实现现实世界的光衰减。<br/>
-			缺省值为 *1*。
+			The amount the light dims along the distance of the light. Default is `2`.<br />
+			In context of physically-correct rendering the default value should not be changed.
 		</p>
 
 		<h3>[property:Float distance]</h3>
 		<p>
 			如果非零，那么光强度将会从最大值当前灯光位置处按照距离线性衰减到0。
 			缺省值为 *0.0*。
+		</p>
+
+		<h3>[property:Boolean isSpotLight]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
 		</p>
 
 		<h3>[property:Float penumbra]</h3>
@@ -96,7 +101,7 @@
 
 		<h3>[property:Vector3 position]</h3>
 		<p>
-			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0)，那么光线将会从上往下照射。
+			假如这个值设置等于 [page:Object3D.DEFAULT_UP] (0, 1, 0)，那么光线将会从上往下照射。
 		</p>
 
 		<h3>[property:Float power]</h3>
@@ -120,7 +125,7 @@
 
 		<h3>[property:Object3D target]</h3>
 		<p>
-				平行光的方向是从它的位置到目标位置.默认的目标位置为原点 *(0,0,0)*。<br />
+				聚光灯的方向是从它的位置到目标位置.默认的目标位置为原点 *(0,0,0)*。<br />
 				注意: 对于目标的位置，要将其更改为除缺省值之外的任何位置，它必须被添加到 [page:Scene scene]
 				场景中去。
 			<code>
@@ -139,12 +144,20 @@ light.target = targetObject;
 			完成上述操作后，聚光灯现在就可以追踪到目标对像了。
 		</p>
 
+		<h3>[property:Texture map]</h3>
+		<p>
+			A [page:Texture] used to modulate the color of the light. The spot light color is mixed
+			with the RGB value of this texture, with a ratio corresponding to its
+			alpha value. The cookie-like masking effect is reproduced using pixel values (0, 0, 0, 1-cookie_value).
+			*Warning*: [param:SpotLight map] is disabled if [param:SpotLight castShadow] is *false*.
+		</p>
+
 
 		<h2>方法（Methods）</h2>
 
 		<p>公共方法请查看基类 [page:Light Light]。</p>
 
-		<h3>[method:SpotLight copy]( [param:SpotLight source] )</h3>
+		<h3>[method:this copy]( [param:SpotLight source] )</h3>
 		<p>
 			将所有属性的值从源 [page:SpotLight source] 复制到此聚光灯光源对象。
 		</p>

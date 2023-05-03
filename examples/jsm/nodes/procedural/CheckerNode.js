@@ -1,73 +1,42 @@
-import { TempNode } from '../core/TempNode.js';
-import { FunctionNode } from '../core/FunctionNode.js';
-import { UVNode } from '../accessors/UVNode.js';
+import TempNode from '../core/TempNode.js';
+import { uv } from '../accessors/UVNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { addNodeElement, ShaderNode, nodeProxy } from '../shadernode/ShaderNode.js';
 
-function CheckerNode( uv ) {
+const checkerShaderNode = new ShaderNode( ( inputs ) => {
 
-	TempNode.call( this, 'f' );
+	const uv = inputs.uv.mul( 2.0 );
 
-	this.uv = uv || new UVNode();
+	const cx = uv.x.floor();
+	const cy = uv.y.floor();
+	const result = cx.add( cy ).mod( 2.0 );
 
-}
+	return result.sign();
 
-CheckerNode.prototype = Object.create( TempNode.prototype );
-CheckerNode.prototype.constructor = CheckerNode;
-CheckerNode.prototype.nodeType = 'Noise';
+} );
 
-CheckerNode.Nodes = ( function () {
+class CheckerNode extends TempNode {
 
-	// https://github.com/mattdesl/glsl-checker/blob/master/index.glsl
+	constructor( uvNode = uv() ) {
 
-	var checker = new FunctionNode( [
-		'float checker( vec2 uv ) {',
+		super( 'float' );
 
-		'	float cx = floor( uv.x );',
-		'	float cy = floor( uv.y ); ',
-		'	float result = mod( cx + cy, 2.0 );',
-
-		'	return sign( result );',
-
-		'}'
-	].join( '\n' ) );
-
-	return {
-		checker: checker
-	};
-
-} )();
-
-CheckerNode.prototype.generate = function ( builder, output ) {
-
-	var snoise = builder.include( CheckerNode.Nodes.checker );
-
-	return builder.format( snoise + '( ' + this.uv.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
-
-};
-
-CheckerNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.uv = source.uv;
-
-	return this;
-
-};
-
-CheckerNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.uv = this.uv.toJSON( meta ).uuid;
+		this.uvNode = uvNode;
 
 	}
 
-	return data;
+	generate( builder ) {
 
-};
+		return checkerShaderNode.call( { uv: this.uvNode } ).build( builder );
 
-export { CheckerNode };
+	}
+
+}
+
+export default CheckerNode;
+
+export const checker = nodeProxy( CheckerNode );
+
+addNodeElement( 'checker', checker );
+
+addNodeClass( CheckerNode );

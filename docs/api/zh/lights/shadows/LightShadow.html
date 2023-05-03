@@ -43,6 +43,11 @@
 			默认值为0.此处非常小的调整（大约0.0001）可能有助于减少阴影中的伪影
 		</p>
 
+		<h3>[property:Integer blurSamples]</h3>
+		<p>
+			The amount of samples to use when blurring a VSM shadow map.
+		</p>
+
 		<h3>[property:WebGLRenderTarget map]</h3>
 		<p>
 			使用内置摄像头生成的深度图;超出像素深度的位置在阴影中。在渲染期间内部计算。
@@ -100,7 +105,7 @@
 		Used internally by the renderer to extend the shadow map to contain all viewports
 		</p>
 
-		<h3>[method:null updateMatrices]( [param:Light light] )</h3>
+		<h3>[method:undefined updateMatrices]( [param:Light light] )</h3>
 		<p>
 		Update the matrices for the camera and shadow, used internally by the renderer.<br /><br />
 
@@ -117,7 +122,7 @@
 		Used internally by the renderer to get the number of viewports that need to be rendered for this shadow.
 		</p>
 
-		<h3>[method:LightShadow copy]( [param:LightShadow source] )</h3>
+		<h3>[method:this copy]( [param:LightShadow source] )</h3>
 		<p>
 			将[page:LightShadow source]中的所有属性的值复制到该Light。
 		</p>

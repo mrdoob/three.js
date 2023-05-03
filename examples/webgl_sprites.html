@@ -12,9 +12,24 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - sprites
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
+
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			let camera, scene, renderer;
 			let cameraOrtho, sceneOrtho;
@@ -51,9 +66,9 @@
 
 				const textureLoader = new THREE.TextureLoader();
 
-				textureLoader.load( "textures/sprite0.png", createHUDSprites );
-				const mapB = textureLoader.load( "textures/sprite1.png" );
-				mapC = textureLoader.load( "textures/sprite2.png" );
+				textureLoader.load( 'textures/sprite0.png', createHUDSprites );
+				const mapB = textureLoader.load( 'textures/sprite1.png' );
+				mapC = textureLoader.load( 'textures/sprite2.png' );
 
 				group = new THREE.Group();
 
@@ -98,6 +113,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
 
 				document.body.appendChild( renderer.domElement );

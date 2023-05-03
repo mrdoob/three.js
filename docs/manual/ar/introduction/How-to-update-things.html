@@ -27,7 +27,7 @@ scene.add( object1 ); //object1 and object2 will automatically update their matr
 		<p>ومع ذلك ، إذا كنت تعلم أن الكائن سيكون ثابتًا ، فيمكنك تعطيل هذا وتحديث وضيفة التحديث يدويًا عند الحاجة فقط.</p>
 
 		<code>
-object.matrixAutoUpdate  = false;
+object.matrixAutoUpdate = false;
 object.updateMatrix();
 		</code>
 
@@ -65,27 +65,24 @@ geometry.setDrawRange( 0, drawCount );
 const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-const line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry, material );
 scene.add( line );
 			</code>
 		 	<p>
 				بعد ذلك سنضيف نقاطًا بشكل عشوائي إلى الخط باستخدام نمط مثل:
 			</p>
 			<code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+	positionAttribute.setXYZ( i, x, y, z );
 
-    x += ( Math.random() - 0.5 ) * 30;
-    y += ( Math.random() - 0.5 ) * 30;
-    z += ( Math.random() - 0.5 ) * 30;
+	x += ( Math.random() - 0.5 ) * 30;
+	y += ( Math.random() - 0.5 ) * 30;
+	z += ( Math.random() - 0.5 ) * 30;
 
 }
 			</code>
@@ -99,7 +96,7 @@ line.geometry.setDrawRange( 0, newValue );
 				إذا كنت تريد تغيير قيم بيانات الموضع بعد العرض الأول ، فأنت بحاجة إلى تعيين علامة needsUpdate على النحو التالي:
 			</p>
 			<code>
-line.geometry.attributes.position.needsUpdate = true; // required after the first render
+positionAttribute.needsUpdate = true; // required after the first render
 			</code>
 
 			<p>
@@ -111,7 +108,7 @@ line.geometry.computeBoundingSphere();
 
 			<p>
 				هنا مثال يعرض خطًا متحركًا يمكن تكييفه مع حالة الاستخدام الخاصة بك.
-				[link:https://jsfiddle.net/xvnctbL0/2/ Here is a fiddle]
+				[link:https://jsfiddle.net/t4m85pLr/1/ Here is a fiddle]
 			</p>
 
 			<h3>أمثلة</h3>
@@ -137,10 +134,10 @@ line.geometry.computeBoundingSphere();
 						<li>texture</li>
 						<li>fog</li>
 						<li>vertex colors</li>
-						<li>skinning</li>
 						<li>morphing</li>
 						<li>shadow map</li>
 						<li>alpha test</li>
+						<li>transparent</li>
 					</ul>
 				</li>
 			</ul>

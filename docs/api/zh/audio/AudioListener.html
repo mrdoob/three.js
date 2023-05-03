@@ -12,7 +12,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			[name] 用一个虚拟的[link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener]表示在场景中所有的位置和非位置相关的音效.<br />
+			[name] 用一个虚拟的[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioListener listener]表示在场景中所有的位置和非位置相关的音效.<br />
 			一个three.js程序通常创建一个[name]. 它是音频实体构造函数的必须参数，比如 [page:Audio Audio] and [page:PositionalAudio PositionalAudio].<br />
 			大多数情况下, listener对象是camera的子对象. Camera的3D变换表示了listener的3D变换.
 		</p>
@@ -66,7 +66,7 @@
 		<p>默认为*null*.</p>
 
 		<h3>[property:Number timeDelta]</h3>
-		<p>Time delta value for audio entities. Use in context of [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/linearRampToValueAtTime AudioParam.linearRampToValueAtTimeDefault](). Default is *0*.</p>
+		<p>audio 实体的时间差值。在 [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/linearRampToValueAtTime AudioParam.linearRampToValueAtTimeDefault]() 上下文中使用。默认是 *0*。</p>
 
 		<h2>方法</h2>
 
@@ -76,7 +76,7 @@
 		返回[page:AudioListener.gain gainNode].
 		</p>
 
-		<h3>[method:AudioListener removeFilter]()</h3>
+		<h3>[method:this removeFilter]()</h3>
 		<p>
 		设置[page:AudioListener.filter filter]属性为*null*.
 		</p>
@@ -86,7 +86,7 @@
 		返回[page:AudioListener.filter filter]属性的值.
 		</p>
 
-		<h3>[method:AudioListener setFilter]( [param:AudioNode value] )</h3>
+		<h3>[method:this setFilter]( [param:AudioNode value] )</h3>
 		<p>
 		设置[page:AudioListener.filter filter] 属性的值.
 		</p>
@@ -96,7 +96,7 @@
 		返回音量.
 		</p>
 
-		<h3>[method:AudioListener setMasterVolume]( [param:Number value] )</h3>
+		<h3>[method:this setMasterVolume]( [param:Number value] )</h3>
 		<p>
 		设置音量.
 		</p>

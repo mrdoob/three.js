@@ -9,7 +9,7 @@
 			a {
 				color: blue;
 			}
-			.control-inactive {
+			.control-inactive button {
 				color: #888;
 			}
 		</style>
@@ -21,14 +21,29 @@
 			(model from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">mixamo.com</a>)<br/>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let scene, renderer, camera, stats;
 			let model, skeleton, mixer, clock;
@@ -146,7 +161,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -191,7 +205,11 @@
 						const currentAction = currentSettings ? currentSettings.action : null;
 						const action = settings ? settings.action : null;
 
-						prepareCrossFade( currentAction, action, 0.35 );
+						if ( currentAction !== action ) {
+
+							prepareCrossFade( currentAction, action, 0.35 );
+
+						}
 
 					};
 
@@ -221,18 +239,15 @@
 
 				crossFadeControls.forEach( function ( control ) {
 
-					control.classList1 = control.domElement.parentElement.parentElement.classList;
-					control.classList2 = control.domElement.previousElementSibling.classList;
-
 					control.setInactive = function () {
 
-						control.classList2.add( 'control-inactive' );
+						control.domElement.classList.add( 'control-inactive' );
 
 					};
 
 					control.setActive = function () {
 
-						control.classList2.remove( 'control-inactive' );
+						control.domElement.classList.remove( 'control-inactive' );
 
 					};
 

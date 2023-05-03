@@ -35,6 +35,10 @@
 		但以上这些是它在three.js中的常用用途。
 		</p>
 
+		<p>
+			对 [name] 实例进行遍历将按相应的顺序生成它的分量 (x, y, z)。
+		</p>
+
 		<h2>代码示例</h2>
 
 		<code>
@@ -45,7 +49,6 @@
 
 		const d = a.distanceTo( b );
 		</code>
-
 
 		<h2>构造函数</h2>
 
@@ -60,6 +63,11 @@
 
 
 		<h2>属性</h2>
+
+		<h3>[property:Boolean isVector3]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -101,11 +109,11 @@
 
 		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
 		<p>
-			将该向量乘以四阶矩阵m（第四个维度隐式地为1），and divides by perspective.
+			将该向量乘以四阶矩阵m（第四个维度隐式地为1），并按角度进行划分。
 		</p>
 
 		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
-		<p>Multiplies this vector by normal matrix [page:Matrix3 m] and normalizes the result.</p>
+		<p>将该向量乘以正规矩阵 [page:Matrix3 m]，并将结果进行归一化。</p>
 
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>
@@ -190,8 +198,7 @@
 
 		<h3>[method:this divideScalar]( [param:Float s] )</h3>
 		<p>
-		将该向量除以标量[page:Float s]。<br />
-		如果传入的[page:Float s] = 0，则向量将被设置为*( 0, 0, 0 )*。
+		将该向量除以标量[page:Float s]。
 		</p>
 
 		<h3>[method:Float dot]( [param:Vector3 v] )</h3>
@@ -302,15 +309,14 @@
 		<p>
 		[page:Camera camera] — 在投影中使用的摄像机。<br /><br />
 
-		Projects this vector from world space into the camera's normalized device coordinate (NDC) space.
+		将此向量(坐标)从世界空间投影到相机的标准化设备坐标 (NDC) 空间。
 		</p>
 
 		<h3>[method:this projectOnPlane]( [param:Vector3 planeNormal] )</h3>
 		<p>
-		[page:Vector3 planeNormal] - A vector representing a plane normal.<br /><br />
+		[page:Vector3 planeNormal] - 表示平面法线的向量<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Vector_projection Projects] this vector onto a plane by subtracting this vector projected onto the plane's
-		normal from this vector.
+		[link:https://en.wikipedia.org/wiki/Vector_projection Projects] 通过从该向量减去投影到平面法线上的向量，将该向量投影到平面上。
 		</p>
 
 		<h3>[method:this projectOnVector]( [param:Vector3 v] )</h3>
@@ -318,14 +324,13 @@
 
 		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
 		<p>
-		[page:Vector3 normal] - the normal to the reflecting plane<br /><br />
+		[page:Vector3 normal] - 反射面法线<br /><br />
 
-		Reflect this vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
-		have unit length.
+		将该向量设置为对指定 normal 法线的表面的反射向量。假设法线具有单位长度。
 		</p>
 
 		<h3>[method:this round]()</h3>
-		<p>	向量中的分量四舍五入取整为最接近的整数值。</p>
+		<p>向量中的分量四舍五入取整为最接近的整数值。</p>
 
 		<h3>[method:this roundToZero]()</h3>
 		<p>
@@ -335,7 +340,7 @@
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>设置该向量的[page:.x x]、[page:.y y] 和 [page:.z z] 分量。</p>
 
-		<h3>[method:null setComponent]( [param:Integer index], [param:Float value] )</h3>
+		<h3>[method:this setComponent]( [param:Integer index], [param:Float value] )</h3>
 		<p>
 		[page:Integer index] - 0、1 或 2。<br />
 		[page:Float value] - [page:Float]<br /><br />
@@ -353,6 +358,11 @@
 		<h3>[method:this setFromCylindricalCoords]( [param:Float radius], [param:Float theta], [param:Float y] )</h3>
 		<p>从圆柱坐标中的[page:Cylindrical radius]、[page:Cylindrical theta]和[page:Cylindrical y]设置该向量。</p>
 
+		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
+		<p>
+		根据指定的[page:Euler Euler Angle]的x、y、z分量来设置该向量的[page:.x x]、[page:.y y]、[page:.z z]分量。
+		</p>
+		
 		<h3>[method:this setFromMatrixColumn]( [param:Matrix4 matrix], [param:Integer index] )</h3>
 		<p>
 		从传入的四阶矩阵[page:Matrix4 matrix]由[page:Integer index]指定的列中，
@@ -361,7 +371,7 @@
 
 		<h3>[method:this setFromMatrix3Column]( [param:Matrix3 matrix], [param:Integer index] )</h3>
 		<p>
-		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] components from [page:Integer index] column of [page:Matrix3 matrix].
+		从传入的三阶矩阵 [page:Matrix3 matrix] 由 [page:Integer index] 指定的列中，设置该向量的 [page:.x x] 值、[page:.y y] 值和 [page:.z z] 值。
 		</p>
 
 		<h3>[method:this setFromMatrixPosition]( [param:Matrix4 m] )</h3>
@@ -430,12 +440,12 @@
 		<p>
 		[page:Camera camera] — 在投影中使用的摄像机。<br /><br />
 
-		Projects this vector from the camera's normalized device coordinate (NDC) space into world space.
+		将此向量(坐标)从相机的标准化设备坐标 (NDC) 空间投影到世界空间。
 		</p>
 
 		<h3>[method:this random]()</h3>
 		<p>
-			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		将该向量的每个分量(x、y、z)设置为介于 0 和 1 之间的伪随机数，不包括 1。
 		</p>
 
 		<h2>源代码</h2>

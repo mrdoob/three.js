@@ -18,6 +18,17 @@
 			[name] expects that its attached 3D object is part of the scene graph.
 		</p>
 
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
+		</code>
+
 		<h2>Examples</h2>
 
 		<p>[example:misc_controls_transform misc / controls / transform ]</p>
@@ -25,7 +36,7 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
-		<p>
+		
 			<p>
 				[page:Camera camera]: The camera of the rendered scene.
 			</p>
@@ -35,7 +46,7 @@
 			<p>
 				Creates a new instance of [name].
 			</p>
-		</p>
+		
 
 		<h2>Events</h2>
 
@@ -92,7 +103,7 @@
 
 		<h3>[property:String mode]</h3>
 		<p>
-			The current transformation mode. Possible values are "translate", "rotate" and "scale". Default is *translate*.
+			The current transformation mode. Possible values are "translate", "rotate" and "scale". Default is `translate`.
 		</p>
 
 		<h3>[property:Object3D object]</h3>
@@ -103,22 +114,22 @@
 		<h3>[property:Number rotationSnap]</h3>
 		<p>
 			By default, 3D objects are continuously rotated. If you set this property to a numeric value (radians), you can define in which
-			steps the 3D object should be rotated. Deault is *null*.
+			steps the 3D object should be rotated. Default is `null`.
 		</p>
 
 		<h3>[property:Boolean showX]</h3>
 		<p>
-			Whether or not the x-axis helper should be visible. Default is *true*.
+			Whether or not the x-axis helper should be visible. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean showY]</h3>
 		<p>
-			Whether or not the y-axis helper should be visible. Default is *true*.
+			Whether or not the y-axis helper should be visible. Default is `true`.
 		</p>
 
 		<h3>[property:Boolean showZ]</h3>
 		<p>
-			Whether or not the z-axis helper should be visible. Default is *true*.
+			Whether or not the z-axis helper should be visible. Default is `true`.
 		</p>
 
 		<h3>[property:Number size]</h3>
@@ -128,13 +139,13 @@
 
 		<h3>[property:String space]</h3>
 		<p>
-			Defines in which coordinate space transformations should be performed. Possible values are "world" and "local". Default is *world*.
+			Defines in which coordinate space transformations should be performed. Possible values are "world" and "local". Default is `world`.
 		</p>
 
 		<h3>[property:Number translationSnap]</h3>
 		<p>
 			By default, 3D objects are continuously translated. If you set this property to a numeric value (world units), you can define in which
-			steps the 3D object should be translated. Deault is *null*.
+			steps the 3D object should be translated. Default is `null`.
 		</p>
 
 		<h2>Methods</h2>
@@ -153,12 +164,20 @@
 
 		<h3>[method:TransformControls detach] ()</h3>
 		<p>
-			Removes the current 3D object from the controls and makes the helper UI is invisible.
+			Removes the current 3D object from the controls and makes the helper UI invisible.
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			Returns the [page:Raycaster] object that is used for user interaction. This object is shared between all instances of
+			TransformControls. If you set the [page:Object3D.layers .layers] property of the [name], you will also want to
+			set the [page:Raycaster.layers .layers] property on the [page:Raycaster] with a matching value, or else the [name]
+			won't work as expected.
 		</p>
 
 		<h3>[method:String getMode] ()</h3>
@@ -166,7 +185,12 @@
 			Returns the transformation mode.
 		</p>
 
-		<h3>[method:null setMode] ( [param:String mode] )</h3>
+		<h3>[method:undefined reset] ()</h3>
+		<p>
+			Resets the object's position, rotation and scale to when the current transform began.
+		</p>
+
+		<h3>[method:undefined setMode] ( [param:String mode] )</h3>
 		<p>
 			<p>
 				[page:String mode]: The transformation mode.
@@ -176,7 +200,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setRotationSnap] ( [param:Number rotationSnap] )</h3>
+		<h3>[method:undefined setRotationSnap] ( [param:Number rotationSnap] )</h3>
 		<p>
 			<p>
 				[page:Number rotationSnap]: The rotation snap.
@@ -186,7 +210,17 @@
 			</p>
 		</p>
 
-		<h3>[method:null setSize] ( [param:Number size] )</h3>
+		<h3>[method:undefined setScaleSnap] ( [param:Number scaleSnap] )</h3>
+		<p>
+			<p>
+				[page:Number scaleSnap]: The scale snap.
+			</p>
+			<p>
+				Sets the scale snap.
+			</p>
+		</p>
+
+		<h3>[method:undefined setSize] ( [param:Number size] )</h3>
 		<p>
 			<p>
 				[page:Number size]: The size of the helper UI.
@@ -196,7 +230,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setSpace] ( [param:String space] )</h3>
+		<h3>[method:undefined setSpace] ( [param:String space] )</h3>
 		<p>
 			<p>
 				[page:String space]: The coordinate space in which transformations are applied.
@@ -206,7 +240,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null setTranslationSnap] ( [param:Number translationSnap] )</h3>
+		<h3>[method:undefined setTranslationSnap] ( [param:Number translationSnap] )</h3>
 		<p>
 			<p>
 				[page:Number translationSnap]: The translation snap.

@@ -38,6 +38,11 @@
 		一个[page:BufferGeometry]的实例（或者派生类），定义了物体的结构。
 	</p>
 
+		<h3>[property:Boolean isPoints]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 	<h3>[property:Material material]</h3>
 	<p>
 		[page:Material]的实例。定义了物体的外观。默认值是一个的[page:PointsMaterial]。
@@ -58,7 +63,7 @@
 	<h2>方法</h2>
 	<p>共有方法请参见其基类[page:Object3D]。</p>
 
-	<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+	<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 	<p>
 		在一条投射出去的[page:Ray]（射线）和点之间产生交互。
 		[page:Raycaster.intersectObject]将会调用这个方法。
@@ -69,7 +74,7 @@
 		返回这个点及其子集的一个克隆对象。
 	</p>
 
-	<h3>[method:null updateMorphTargets]()</h3>
+	<h3>[method:undefined updateMorphTargets]()</h3>
 	<p>
 		更新morphTargets，使其不对对象产生影响，重置[page:Points.morphTargetInfluences morphTargetInfluences] 和
 		[page:Points.morphTargetDictionary morphTargetDictionary]属性。

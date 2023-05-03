@@ -1,11 +1,8 @@
 import {
 	Color,
-	LinearFilter,
-	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	Vector2,
@@ -14,14 +11,17 @@ import {
 	DepthTexture,
 	UnsignedShortType,
 	NearestFilter,
-	Plane
-} from '../../../build/three.module.js';
+	Plane,
+	HalfFloatType
+} from 'three';
 
 class ReflectorForSSRPass extends Mesh {
 
 	constructor( geometry, options = {} ) {
 
 		super( geometry );
+
+		this.isReflectorForSSRPass = true;
 
 		this.type = 'ReflectorForSSRPass';
 
@@ -104,19 +104,11 @@ class ReflectorForSSRPass extends Mesh {
 		}
 
 		const parameters = {
-			minFilter: LinearFilter,
-			magFilter: LinearFilter,
-			format: RGBFormat,
 			depthTexture: useDepthTexture ? depthTexture : null,
+			type: HalfFloatType
 		};
 
 		const renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
-
-		if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
-
-			renderTarget.texture.generateMipmaps = false;
-
-		}
 
 		const material = new ShaderMaterial( {
 			transparent: useDepthTexture,
@@ -208,10 +200,6 @@ class ReflectorForSSRPass extends Mesh {
 			textureMatrix.multiply( virtualCamera.matrixWorldInverse );
 			textureMatrix.multiply( scope.matrixWorld );
 
-			// Render
-
-			renderTarget.texture.encoding = renderer.outputEncoding;
-
 			// scope.visible = false;
 
 			const currentRenderTarget = renderer.getRenderTarget();
@@ -261,8 +249,6 @@ class ReflectorForSSRPass extends Mesh {
 
 }
 
-ReflectorForSSRPass.prototype.isReflectorForSSRPass = true;
-
 ReflectorForSSRPass.ReflectorShader = {
 
 	defines: {
@@ -288,20 +274,19 @@ ReflectorForSSRPass.ReflectorShader = {
 
 	},
 
-	vertexShader: [
-		'uniform mat4 textureMatrix;',
-		'varying vec4 vUv;',
+	vertexShader: /* glsl */`
+		uniform mat4 textureMatrix;
+		varying vec4 vUv;
 
-		'void main() {',
+		void main() {
 
-		'	vUv = textureMatrix * vec4( position, 1.0 );',
+			vUv = textureMatrix * vec4( position, 1.0 );
 
-		'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		'}'
-	].join( '\n' ),
+		}`,
 
-	fragmentShader: `
+	fragmentShader: /* glsl */`
 		uniform vec3 color;
 		uniform sampler2D tDiffuse;
 		uniform sampler2D tDepth;

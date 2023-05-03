@@ -12,16 +12,31 @@
 			Created by <a href="https://github.com/wizgrav" target="_blank" rel="noopener">wizgrav</a>.
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
-			import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
+			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			// Simple form of tiled forward lighting
 			// using texels as bitmasks of 32 lights
@@ -59,7 +74,7 @@
 				'  		pointlight.distance = lightData.w;',
 				'  		pointlight.color = lightColor.rgb;',
 				'  		pointlight.decay = lightColor.a;',
-				'  		getPointDirectLightIrradiance( pointlight, geometry, directLight );',
+				'  		getPointLightInfo( pointlight, geometry, directLight );',
 				'		RE_Direct( directLight, geometry, material, reflectedLight );',
 				'	}',
 				'}',
@@ -187,6 +202,7 @@
 			scene.background = new THREE.Color( 0x111111 );
 
 			const renderer = new THREE.WebGLRenderer();
+			renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 			renderer.toneMapping = THREE.NoToneMapping;
 			container.appendChild( renderer.domElement );
 
@@ -209,10 +225,10 @@
 			const materials = [];
 
 			const Heads = [
-				{ type: 'physical', uniforms: { "diffuse": 0x888888, "metalness": 1.0, "roughness": 0.66 }, defines: {} },
-				{ type: 'standard', uniforms: { "diffuse": 0x666666, "metalness": 0.1, "roughness": 0.33 }, defines: {} },
-				{ type: 'phong', uniforms: { "diffuse": 0x777777, "shininess": 20 }, defines: {} },
-				{ type: 'phong', uniforms: { "diffuse": 0x555555, "shininess": 10 }, defines: { TOON: 1 } }
+				{ type: 'physical', uniforms: { 'diffuse': 0x888888, 'metalness': 1.0, 'roughness': 0.66 }, defines: {} },
+				{ type: 'standard', uniforms: { 'diffuse': 0x666666, 'metalness': 0.1, 'roughness': 0.33 }, defines: {} },
+				{ type: 'phong', uniforms: { 'diffuse': 0x777777, 'shininess': 20 }, defines: {} },
+				{ type: 'phong', uniforms: { 'diffuse': 0x555555, 'shininess': 10 }, defines: { TOON: 1 } }
 			];
 
 			function init( geom ) {
@@ -222,7 +238,7 @@
 
 				Object.keys( Heads ).forEach( function ( t, index ) {
 
-					let g = new THREE.Group();
+					const g = new THREE.Group();
 					const conf = Heads[ t ];
 					const ml = THREE.ShaderLib[ conf.type ];
 					const mtl = new THREE.ShaderMaterial( {
@@ -236,10 +252,10 @@
 
 					mtl.extensions.derivatives = true;
 
-					mtl.uniforms[ "opacity" ].value = tIndex === index ? 0.9 : 1;
-					mtl.uniforms[ "tileData" ] = State.tileData;
-					mtl.uniforms[ "tileTexture" ] = State.tileTexture;
-					mtl.uniforms[ "lightTexture" ] = State.lightTexture;
+					mtl.uniforms[ 'opacity' ].value = tIndex === index ? 0.9 : 1;
+					mtl.uniforms[ 'tileData' ] = State.tileData;
+					mtl.uniforms[ 'tileTexture' ] = State.tileTexture;
+					mtl.uniforms[ 'lightTexture' ] = State.lightTexture;
 
 					for ( const u in conf.uniforms ) {
 

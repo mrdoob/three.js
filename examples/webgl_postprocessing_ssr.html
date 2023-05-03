@@ -17,19 +17,36 @@
 		SSRPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 	</div>
 
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
+			}
+		}
+	</script>
+
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
-		import Stats from './jsm/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats.module.js';
 
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		import { GUI } from './jsm/libs/dat.gui.module.js';
-		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
-		import { ReflectorForSSRPass } from './jsm/objects/ReflectorForSSRPass.js';
+		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+		import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
 
-		import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+		THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 		const params = {
 			enableSSR: true,
@@ -51,7 +68,7 @@
 
 		// Configure and create Draco decoder.
 		const dracoLoader = new DRACOLoader();
-		dracoLoader.setDecoderPath( 'js/libs/draco/' );
+		dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
 		dracoLoader.setDecoderConfig( { type: 'js' } );
 
 		init();
@@ -104,7 +121,7 @@
 
 			let geometry, material, mesh;
 
-			geometry = new THREE.BoxBufferGeometry( .05, .05, .05 );
+			geometry = new THREE.BoxGeometry( .05, .05, .05 );
 			material = new THREE.MeshStandardMaterial( { color: 'green' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .12, .025, .015 );
@@ -112,7 +129,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.IcosahedronBufferGeometry( .025, 4 );
+			geometry = new THREE.IcosahedronGeometry( .025, 4 );
 			material = new THREE.MeshStandardMaterial( { color: 'cyan' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, .08 );
@@ -120,7 +137,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.ConeBufferGeometry( .025, .05, 64 );
+			geometry = new THREE.ConeGeometry( .025, .05, 64 );
 			material = new THREE.MeshStandardMaterial( { color: 'yellow' } );
 			mesh = new THREE.Mesh( geometry, material );
 			mesh.position.set( - .05, .025, - .055 );
@@ -128,7 +145,7 @@
 			otherMeshes.push( mesh );
 			selects.push( mesh );
 
-			geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+			geometry = new THREE.PlaneGeometry( 1, 1 );
 			groundReflector = new ReflectorForSSRPass( geometry, {
 				clipBias: 0.0003,
 				textureWidth: window.innerWidth,
@@ -144,7 +161,6 @@
 			// renderer
 			renderer = new THREE.WebGLRenderer( { antialias: false } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.outputEncoding = THREE.sRGBEncoding;
 			container.appendChild( renderer.domElement );
 
 			//
@@ -160,7 +176,7 @@
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener( 'resize', onWindowResize );
 
 			// composer
 
@@ -171,12 +187,12 @@
 				camera,
 				width: innerWidth,
 				height: innerHeight,
-				encoding: THREE.sRGBEncoding,
 				groundReflector: params.groundReflector ? groundReflector : null,
 				selects: params.groundReflector ? selects : null
 			} );
 
 			composer.addPass( ssrPass );
+			composer.addPass( new ShaderPass( GammaCorrectionShader ) );
 
 			// GUI
 
@@ -197,6 +213,10 @@
 				}
 
 			} );
+			ssrPass.thickness = 0.018;
+			gui.add( ssrPass, 'thickness' ).min( 0 ).max( .1 ).step( .0001 );
+			ssrPass.infiniteThick = false;
+			gui.add( ssrPass, 'infiniteThick' );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;
@@ -254,11 +274,8 @@
 				groundReflector.opacity = ssrPass.opacity;
 
 			} );
-			ssrPass.surfDist = 0.0015;
-			folder.add( ssrPass, 'surfDist' ).min( 0 ).max( .005 ).step( .0001 );
-			folder.add( ssrPass, 'infiniteThick' );
-			folder.add( ssrPass, 'thickTolerance' ).min( 0 ).max( .05 ).step( .0001 );
 			folder.add( ssrPass, 'blur' );
+			// folder.open()
 			// gui.close()
 
 		}

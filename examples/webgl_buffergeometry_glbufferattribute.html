@@ -11,11 +11,24 @@
 		<div id="container"></div>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - custom VBOs</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			let container, stats;
 
@@ -79,7 +92,7 @@
 					const vy = ( y / n ) + 0.5;
 					const vz = ( z / n ) + 0.5;
 
-					color.setRGB( vx, vy, vz );
+					color.setRGB( vx, vy, vz, THREE.SRGBColorSpace );
 
 					colors.push( color.r, color.g, color.b );
 
@@ -115,7 +128,7 @@
 
 				//
 
-				const material = new THREE.PointsMaterial( { size: 15, vertexColors: THREE.VertexColors } );
+				const material = new THREE.PointsMaterial( { size: 15, vertexColors: true } );
 
 				points = new THREE.Points( geometry, material );
 

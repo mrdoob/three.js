@@ -1,234 +1,77 @@
-import { TempNode } from '../core/TempNode.js';
-import { FunctionNode } from '../core/FunctionNode.js';
-import { FloatNode } from '../inputs/FloatNode.js';
-import { PositionNode } from '../accessors/PositionNode.js';
+import Object3DNode from './Object3DNode.js';
+import { addNodeClass } from '../core/Node.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
-function CameraNode( scope, camera ) {
+class CameraNode extends Object3DNode {
 
-	TempNode.call( this, 'v3' );
+	constructor( scope = CameraNode.POSITION ) {
 
-	this.setScope( scope || CameraNode.POSITION );
-	this.setCamera( camera );
-
-}
-
-CameraNode.Nodes = ( function () {
-
-	var depthColor = new FunctionNode( [
-		'float depthColor( float mNear, float mFar ) {',
-
-		'	#ifdef USE_LOGDEPTHBUF_EXT',
-
-		'		float depth = gl_FragDepthEXT / gl_FragCoord.w;',
-
-		'	#else',
-
-		'		float depth = gl_FragCoord.z / gl_FragCoord.w;',
-
-		'	#endif',
-
-		'	return 1.0 - smoothstep( mNear, mFar, depth );',
-
-		'}'
-	].join( '\n' ) );
-
-	return {
-		depthColor: depthColor
-	};
-
-} )();
-
-CameraNode.POSITION = 'position';
-CameraNode.DEPTH = 'depth';
-CameraNode.TO_VERTEX = 'toVertex';
-
-CameraNode.prototype = Object.create( TempNode.prototype );
-CameraNode.prototype.constructor = CameraNode;
-CameraNode.prototype.nodeType = 'Camera';
-
-CameraNode.prototype.setCamera = function ( camera ) {
-
-	this.camera = camera;
-	this.updateFrame = camera !== undefined ? this.onUpdateFrame : undefined;
-
-};
-
-CameraNode.prototype.setScope = function ( scope ) {
-
-	switch ( this.scope ) {
-
-		case CameraNode.DEPTH:
-
-			delete this.near;
-			delete this.far;
-
-			break;
+		super( scope );
 
 	}
 
-	this.scope = scope;
+	getNodeType( builder ) {
 
-	switch ( scope ) {
+		const scope = this.scope;
 
-		case CameraNode.DEPTH:
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-			var camera = this.camera;
+			return 'mat4';
 
-			this.near = new FloatNode( camera ? camera.near : 1 );
-			this.far = new FloatNode( camera ? camera.far : 1200 );
+		}
 
-			break;
-
-	}
-
-};
-
-CameraNode.prototype.getType = function ( /* builder */ ) {
-
-	switch ( this.scope ) {
-
-		case CameraNode.DEPTH:
-
-			return 'f';
+		return super.getNodeType( builder );
 
 	}
 
-	return this.type;
+	update( frame ) {
 
-};
+		const camera = frame.camera;
+		const uniformNode = this._uniformNode;
+		const scope = this.scope;
 
-CameraNode.prototype.getUnique = function ( /* builder */ ) {
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
 
-	switch ( this.scope ) {
+			uniformNode.value = camera.projectionMatrix;
 
-		case CameraNode.DEPTH:
-		case CameraNode.TO_VERTEX:
+		} else if ( scope === CameraNode.VIEW_MATRIX ) {
 
-			return true;
+			uniformNode.value = camera.matrixWorldInverse;
 
-	}
+		} else {
 
-	return false;
+			this.object3d = camera;
 
-};
-
-CameraNode.prototype.getShared = function ( /* builder */ ) {
-
-	switch ( this.scope ) {
-
-		case CameraNode.POSITION:
-
-			return false;
-
-	}
-
-	return true;
-
-};
-
-CameraNode.prototype.generate = function ( builder, output ) {
-
-	var result;
-
-	switch ( this.scope ) {
-
-		case CameraNode.POSITION:
-
-			result = 'cameraPosition';
-
-			break;
-
-		case CameraNode.DEPTH:
-
-			var depthColor = builder.include( CameraNode.Nodes.depthColor );
-
-			result = depthColor + '( ' + this.near.build( builder, 'f' ) + ', ' + this.far.build( builder, 'f' ) + ' )';
-
-			break;
-
-		case CameraNode.TO_VERTEX:
-
-			result = 'normalize( ' + new PositionNode( PositionNode.WORLD ).build( builder, 'v3' ) + ' - cameraPosition )';
-
-			break;
-
-	}
-
-	return builder.format( result, this.getType( builder ), output );
-
-};
-
-CameraNode.prototype.onUpdateFrame = function ( /* frame */ ) {
-
-	switch ( this.scope ) {
-
-		case CameraNode.DEPTH:
-
-			var camera = this.camera;
-
-			this.near.value = camera.near;
-			this.far.value = camera.far;
-
-			break;
-
-	}
-
-};
-
-CameraNode.prototype.copy = function ( source ) {
-
-	TempNode.prototype.copy.call( this, source );
-
-	this.setScope( source.scope );
-
-	if ( source.camera ) {
-
-		this.setCamera( source.camera );
-
-	}
-
-	switch ( source.scope ) {
-
-		case CameraNode.DEPTH:
-
-			this.near.number = source.near;
-			this.far.number = source.far;
-
-			break;
-
-	}
-
-	return this;
-
-};
-
-CameraNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.scope = this.scope;
-
-		if ( this.camera ) data.camera = this.camera.uuid;
-
-		switch ( this.scope ) {
-
-			case CameraNode.DEPTH:
-
-				data.near = this.near.value;
-				data.far = this.far.value;
-
-				break;
+			super.update( frame );
 
 		}
 
 	}
 
-	return data;
+	generate( builder ) {
 
-};
+		const scope = this.scope;
 
-export { CameraNode };
+		if ( scope === CameraNode.PROJECTION_MATRIX ) {
+
+			this._uniformNode.nodeType = 'mat4';
+
+		}
+
+		return super.generate( builder );
+
+	}
+
+}
+
+CameraNode.PROJECTION_MATRIX = 'projectionMatrix';
+
+export default CameraNode;
+
+export const cameraProjectionMatrix = nodeImmutable( CameraNode, CameraNode.PROJECTION_MATRIX );
+export const cameraViewMatrix = nodeImmutable( CameraNode, CameraNode.VIEW_MATRIX );
+export const cameraNormalMatrix = nodeImmutable( CameraNode, CameraNode.NORMAL_MATRIX );
+export const cameraWorldMatrix = nodeImmutable( CameraNode, CameraNode.WORLD_MATRIX );
+export const cameraPosition = nodeImmutable( CameraNode, CameraNode.POSITION );
+
+addNodeClass( CameraNode );

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>FAQ ([name])</h1>
+
+		<h2>Qual è il formato per i modelli 3D meglio supportato?</h2>
+		<div>
+			<p>
+        Il formato raccomandato per importare ed esportare modelli 3D è il glTF (GL Transmission Format). 
+        Poiché è focalizzato sulla distribuzione di risorse in runtime, è compatto da trasmettere e veloce da caricare. 
+			</p>
+			<p>
+        Three.js mette a disposizione loader per molti altri formati popolari come FBX, Collada o OBJ.
+        Tuttavia, si dovrebbe, nei propri progetti, sempre cercare di stabilire prima un flusso di lavoro basato su glTF.
+        Per maggiori informazioni consultare la guida sul [link:#manual/introduction/Loading-3D-models caricamento dei modelli 3D].
+			</p>
+		</div>
+
+		<h2>Perché negli esempi sono presenti meta tag viewport?</h2>
+		<div>
+				<code>&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</code>
+
+				<p>Questi tag controllano le dimensioni e la scala del viewport per i browser su mobile (dove il contenuto della pagina può essere visualizzato con dimensioni diverse rispetto al viewport).</p>
+
+				<p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Usare il Viewport]</p>
+
+				<p>[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag MDN: Usare il meta tag viewport]</p>
+		</div>
+
+		<h2>Come si può conservare la scala della scena durante il ridimensionamento?</h2>
+		<p>
+      Vogliamo che tutti gli oggetti indipendentemente dalla loro distanza dalla camera, siano visualizzati con le stesse dimensioni anche se la finestra viene ridimensionata.
+
+      L'equazione chiave per risolvere questo problema è data da questa formula per l'altezza visibile ad una data distanza:
+
+			<code>
+visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+			</code>
+      Se aumentiamo l'altezza della finestra di una certa percentuale, vogliamo che l'altezza visibile a tutte le distanze aumenti della stessa percentuale.
+
+      Questo non può essere fatto cambiando la posizione della camera. È invece necessario modificare il valore del campo visivo (fov) della camera.
+			[link:http://jsfiddle.net/Q4Jpu/ Esempio].
+		</p>
+
+		<h2>Perché una parte del mio oggetto è invisibile?</h2>
+		<p>
+      Questo comportamento può essere causato dal "face culling" (eliminazione delle facce). Le facce hanno un orientamento che decide quale lato è quello giusto.
+      E il culling (eliminazione) rimuove il lato posteriore in circostanze normali. Per verificare se il problema è questo cambia la proprietà side del materiale con THREE.DoubleSide.
+
+			<code>material.side = THREE.DoubleSide</code>
+		</p>
+
+		<h2>Perché three.js a volte restituisce strani risultati per input non validi?</h2>
+		<p>
+      Per ragioni di performance three.js nella maggior parte dei casi non convalida gli input. È responsabilità della tua applicazione di controllare i dati che vengono passati a three.js.
+		</p>
+	</body>
+</html>

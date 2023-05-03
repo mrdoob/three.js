@@ -1,0 +1,167 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Цели рендеринга</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Цели рендеринга">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Цели рендеринга</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Цель рендеринга в three.js - это в основном текстура, которую вы можете рендерить. После рендеринга вы можете использовать эту текстуру как любую другую текстуру. </p>
+<p>Давайте сделаем простой пример. Начнем с примера <a href="responsive.html">статьи об отзывчивости</a>.</p>
+<p>Рендеринг к цели рендеринга практически идентичен обычному рендерингу. Сначала мы создаем <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.  </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
+const rtHeight = 512;
+const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+</pre>
+<p>Затем нам нужна <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> и <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
+const rtAspect = rtWidth / rtHeight;
+const rtNear = 0.1;
+const rtFar = 5;
+const rtCamera = new THREE.PerspectiveCamera(rtFov, rtAspect, rtNear, rtFar);
+rtCamera.position.z = 2;
+
+const rtScene = new THREE.Scene();
+rtScene.background = new THREE.Color('red');
+</pre>
+<p>Обратите внимание, что мы устанавливаем aspect  для aspect  рендеринга, а не для canvas. Правильный aspect  зависит от того, для чего мы выполняем рендеринг. 
+В этом случае мы будем использовать текстуру цели рендеринга на стороне куба. Поскольку грани куба являются квадратными, мы хотим, чтобы aspect = 1.0. </p>
+<p>Мы заполняем сцену материалом.  В этом случае мы используем свет и 3 куба <a href="responsive.html">из предыдущей статьи</a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(-1, 2, 4);
+*  rtScene.add(light);
+}
+
+const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+function makeInstance(geometry, color, x) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+*  rtScene.add(cube);
+
+  cube.position.x = x;
+
+  return cube;
+}
+
+*const rtCubes = [
+  makeInstance(geometry, 0x44aa88,  0),
+  makeInstance(geometry, 0x8844aa, -2),
+  makeInstance(geometry, 0xaa8844,  2),
+];
+</pre>
+<p><a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> и <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> из предыдущей статьи все еще там. Мы будем использовать их для рендеринга на холст. Нам просто нужно добавить материал для рендеринга. </p>
+<p>Давайте добавим куб, который использует текстуру цели рендеринга.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+  map: renderTarget.texture,
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+</pre>
+<p>Теперь во время рендеринга сначала мы рендерим целевую сцену рендеринга в цель рендеринга. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  ...
+
+  // rotate all the cubes in the render target scene
+  rtCubes.forEach((cube, ndx) =&gt; {
+    const speed = 1 + ndx * .1;
+    const rot = time * speed;
+    cube.rotation.x = rot;
+    cube.rotation.y = rot;
+  });
+
+  // draw render target scene to render target
+  renderer.setRenderTarget(renderTarget);
+  renderer.render(rtScene, rtCamera);
+  renderer.setRenderTarget(null);
+</pre>
+<p>Затем мы визуализируем сцену с помощью одного куба, который использует текстуру цели рендеринга для холста. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  // rotate the cube in the scene
+  cube.rotation.x = time;
+  cube.rotation.y = time * 1.1;
+
+  // render the scene to the canvas
+  renderer.render(scene, camera);
+</pre>
+<p>И вуаля </p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-target.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/render-target.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Куб красный, потому что мы установили <code class="notranslate" translate="no">background</code>  <code class="notranslate" translate="no">rtScene</code> на красный, чтобы текстура цели рендеринга была очищена до красного. </p>
+<p>Цели рендеринга используются для всех видов вещей. <a href="shadows.html">Тени</a> используют цели рендеринга. 
+<a href="picking.html">Сбор может использовать цель рендеринга</a>. Различные виды
+<a href="post-processing.html">эффектов постобработки</a> требуют целей рендеринга.
+Для рендеринга зеркала заднего вида в автомобиле или просмотра в реальном времени на мониторе в 3D-сцене может использоваться цель рендеринга. </p>
+<p>Несколько замечаний по использованию <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>. </p>
+<ul>
+<li><p>По умолчанию <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> создает 2 текстуры. Цветная текстура и текстура глубины / трафарета. Если вам не нужны текстуры глубины или трафарета, вы можете попросить не создавать их, передав параметры. Пример: </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
+    depthBuffer: false,
+    stencilBuffer: false,
+  });
+</pre>
+</li>
+<li><p>Возможно, вам придется изменить размер цели рендеринга </p>
+<p>В приведенном выше примере мы делаем цель рендеринга фиксированного размера, 512x512. Для таких вещей, как постобработка, вам обычно нужно сделать цель рендеринга того же размера, что и ваш холст. В нашем коде это означало бы, что при изменении размера холста мы также обновляли бы и размер цели рендеринга, и камеру, которую мы используем при рендеринге, цели рендеринга. Пример: </p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+    const canvas = renderer.domElement;
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+
++    renderTarget.setSize(canvas.width, canvas.height);
++    rtCamera.aspect = camera.aspect;
++    rtCamera.updateProjectionMatrix();
+}
+</pre></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

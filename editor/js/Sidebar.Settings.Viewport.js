@@ -4,22 +4,22 @@ import { UIBoolean } from './libs/ui.three.js';
 
 function SidebarSettingsViewport( editor ) {
 
-	var signals = editor.signals;
-	var strings = editor.strings;
+	const signals = editor.signals;
+	const strings = editor.strings;
 
-	var container = new UIPanel();
+	const container = new UIPanel();
 
-	var headerRow = new UIRow();
+	const headerRow = new UIRow();
 	headerRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport' ).toUpperCase() ) );
 	container.add( headerRow );
 
 	// grid
 
-	var showGridRow = new UIRow();
+	const showGridRow = new UIRow();
 
 	showGridRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport/grid' ) ).setWidth( '90px' ) );
 
-	var showGrid = new UIBoolean( true ).onChange( function () {
+	const showGrid = new UIBoolean( true ).onChange( function () {
 
 		signals.showGridChanged.dispatch( showGrid.getValue() );
 
@@ -29,11 +29,11 @@ function SidebarSettingsViewport( editor ) {
 
 	// helpers
 
-	var showHelpersRow = new UIRow();
+	const showHelpersRow = new UIRow();
 
 	showHelpersRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport/helpers' ) ).setWidth( '90px' ) );
 
-	var showHelpers = new UIBoolean( true ).onChange( function () {
+	const showHelpers = new UIBoolean( true ).onChange( function () {
 
 		signals.showHelpersChanged.dispatch( showHelpers.getValue() );
 

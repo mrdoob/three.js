@@ -1,14 +1,12 @@
 import {
-	LinearFilter,
 	LinearMipmapLinearFilter,
 	MeshBasicMaterial,
 	NoBlending,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 import { LuminosityShader } from '../shaders/LuminosityShader.js';
 import { ToneMapShader } from '../shaders/ToneMapShader.js';
@@ -21,125 +19,114 @@ import { ToneMapShader } from '../shaders/ToneMapShader.js';
  * Full-screen tone-mapping shader based on http://www.graphics.cornell.edu/~jaf/publications/sig02_paper.pdf
  */
 
-var AdaptiveToneMappingPass = function ( adaptive, resolution ) {
+class AdaptiveToneMappingPass extends Pass {
 
-	Pass.call( this );
+	constructor( adaptive, resolution ) {
 
-	this.resolution = ( resolution !== undefined ) ? resolution : 256;
-	this.needsInit = true;
-	this.adaptive = adaptive !== undefined ? !! adaptive : true;
+		super();
 
-	this.luminanceRT = null;
-	this.previousLuminanceRT = null;
-	this.currentLuminanceRT = null;
+		this.resolution = ( resolution !== undefined ) ? resolution : 256;
+		this.needsInit = true;
+		this.adaptive = adaptive !== undefined ? !! adaptive : true;
 
-	if ( CopyShader === undefined )
-		console.error( 'THREE.AdaptiveToneMappingPass relies on CopyShader' );
+		this.luminanceRT = null;
+		this.previousLuminanceRT = null;
+		this.currentLuminanceRT = null;
 
-	var copyShader = CopyShader;
+		const copyShader = CopyShader;
 
-	this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
+		this.copyUniforms = UniformsUtils.clone( copyShader.uniforms );
 
-	this.materialCopy = new ShaderMaterial( {
+		this.materialCopy = new ShaderMaterial( {
 
-		uniforms: this.copyUniforms,
-		vertexShader: copyShader.vertexShader,
-		fragmentShader: copyShader.fragmentShader,
-		blending: NoBlending,
-		depthTest: false
+			uniforms: this.copyUniforms,
+			vertexShader: copyShader.vertexShader,
+			fragmentShader: copyShader.fragmentShader,
+			blending: NoBlending,
+			depthTest: false
 
-	} );
+		} );
 
-	if ( LuminosityShader === undefined )
-		console.error( 'THREE.AdaptiveToneMappingPass relies on LuminosityShader' );
+		this.materialLuminance = new ShaderMaterial( {
 
-	this.materialLuminance = new ShaderMaterial( {
+			uniforms: UniformsUtils.clone( LuminosityShader.uniforms ),
+			vertexShader: LuminosityShader.vertexShader,
+			fragmentShader: LuminosityShader.fragmentShader,
+			blending: NoBlending
+		} );
 
-		uniforms: UniformsUtils.clone( LuminosityShader.uniforms ),
-		vertexShader: LuminosityShader.vertexShader,
-		fragmentShader: LuminosityShader.fragmentShader,
-		blending: NoBlending
-	} );
+		this.adaptLuminanceShader = {
+			defines: {
+				'MIP_LEVEL_1X1': ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 )
+			},
+			uniforms: {
+				'lastLum': { value: null },
+				'currentLum': { value: null },
+				'minLuminance': { value: 0.01 },
+				'delta': { value: 0.016 },
+				'tau': { value: 1.0 }
+			},
+			vertexShader:
+				`varying vec2 vUv;
 
-	this.adaptLuminanceShader = {
-		defines: {
-			'MIP_LEVEL_1X1': ( Math.log( this.resolution ) / Math.log( 2.0 ) ).toFixed( 1 )
-		},
-		uniforms: {
-			'lastLum': { value: null },
-			'currentLum': { value: null },
-			'minLuminance': { value: 0.01 },
-			'delta': { value: 0.016 },
-			'tau': { value: 1.0 }
-		},
-		vertexShader: [
-			'varying vec2 vUv;',
+				void main() {
 
-			'void main() {',
+					vUv = uv;
+					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			'	vUv = uv;',
-			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+				}`,
 
-			'}'
-		].join( '\n' ),
-		fragmentShader: [
-			'varying vec2 vUv;',
+			fragmentShader:
+				`varying vec2 vUv;
 
-			'uniform sampler2D lastLum;',
-			'uniform sampler2D currentLum;',
-			'uniform float minLuminance;',
-			'uniform float delta;',
-			'uniform float tau;',
+				uniform sampler2D lastLum;
+				uniform sampler2D currentLum;
+				uniform float minLuminance;
+				uniform float delta;
+				uniform float tau;
 
-			'void main() {',
+				void main() {
 
-			'	vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );',
-			'	vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );',
+					vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );
+					vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );
 
-			'	float fLastLum = max( minLuminance, lastLum.r );',
-			'	float fCurrentLum = max( minLuminance, currentLum.r );',
+					float fLastLum = max( minLuminance, lastLum.r );
+					float fCurrentLum = max( minLuminance, currentLum.r );
 
-			//The adaption seems to work better in extreme lighting differences
-			//if the input luminance is squared.
-			'	fCurrentLum *= fCurrentLum;',
+					//The adaption seems to work better in extreme lighting differences
+					//if the input luminance is squared.
+					fCurrentLum *= fCurrentLum;
 
-			// Adapt the luminance using Pattanaik's technique
-			'	float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));',
-			// "fAdaptedLum = sqrt(fAdaptedLum);",
-			'	gl_FragColor.r = fAdaptedLum;',
-			'}'
-		].join( '\n' )
-	};
+					// Adapt the luminance using Pattanaik's technique
+					float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));
+					// "fAdaptedLum = sqrt(fAdaptedLum);
+					gl_FragColor.r = fAdaptedLum;
+				}`
 
-	this.materialAdaptiveLum = new ShaderMaterial( {
+		};
 
-		uniforms: UniformsUtils.clone( this.adaptLuminanceShader.uniforms ),
-		vertexShader: this.adaptLuminanceShader.vertexShader,
-		fragmentShader: this.adaptLuminanceShader.fragmentShader,
-		defines: Object.assign( {}, this.adaptLuminanceShader.defines ),
-		blending: NoBlending
-	} );
+		this.materialAdaptiveLum = new ShaderMaterial( {
 
-	if ( ToneMapShader === undefined )
-		console.error( 'THREE.AdaptiveToneMappingPass relies on ToneMapShader' );
+			uniforms: UniformsUtils.clone( this.adaptLuminanceShader.uniforms ),
+			vertexShader: this.adaptLuminanceShader.vertexShader,
+			fragmentShader: this.adaptLuminanceShader.fragmentShader,
+			defines: Object.assign( {}, this.adaptLuminanceShader.defines ),
+			blending: NoBlending
+		} );
 
-	this.materialToneMap = new ShaderMaterial( {
+		this.materialToneMap = new ShaderMaterial( {
 
-		uniforms: UniformsUtils.clone( ToneMapShader.uniforms ),
-		vertexShader: ToneMapShader.vertexShader,
-		fragmentShader: ToneMapShader.fragmentShader,
-		blending: NoBlending
-	} );
+			uniforms: UniformsUtils.clone( ToneMapShader.uniforms ),
+			vertexShader: ToneMapShader.vertexShader,
+			fragmentShader: ToneMapShader.fragmentShader,
+			blending: NoBlending
+		} );
 
-	this.fsQuad = new Pass.FullScreenQuad( null );
+		this.fsQuad = new FullScreenQuad( null );
 
-};
+	}
 
-AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype ), {
-
-	constructor: AdaptiveToneMappingPass,
-
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime/*, maskActive*/ ) {
+	render( renderer, writeBuffer, readBuffer, deltaTime/*, maskActive*/ ) {
 
 		if ( this.needsInit ) {
 
@@ -195,9 +182,9 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 		}
 
-	},
+	}
 
-	reset: function () {
+	reset() {
 
 		// render targets
 		if ( this.luminanceRT ) {
@@ -218,19 +205,19 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 		}
 
-		var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat }; // was RGB format. changed to RGBA format. see discussion in #8415 / #8450
 
-		this.luminanceRT = new WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.luminanceRT = new WebGLRenderTarget( this.resolution, this.resolution );
 		this.luminanceRT.texture.name = 'AdaptiveToneMappingPass.l';
 		this.luminanceRT.texture.generateMipmaps = false;
 
-		this.previousLuminanceRT = new WebGLRenderTarget( this.resolution, this.resolution, pars );
+		this.previousLuminanceRT = new WebGLRenderTarget( this.resolution, this.resolution );
 		this.previousLuminanceRT.texture.name = 'AdaptiveToneMappingPass.pl';
 		this.previousLuminanceRT.texture.generateMipmaps = false;
 
 		// We only need mipmapping for the current luminosity because we want a down-sampled version to sample in our adaptive shader
-		pars.minFilter = LinearMipmapLinearFilter;
-		pars.generateMipmaps = true;
+
+		const pars = { minFilter: LinearMipmapLinearFilter, generateMipmaps: true };
+
 		this.currentLuminanceRT = new WebGLRenderTarget( this.resolution, this.resolution, pars );
 		this.currentLuminanceRT.texture.name = 'AdaptiveToneMappingPass.cl';
 
@@ -250,9 +237,9 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 		// renderer.render( this.scene, this.camera, this.previousLuminanceRT );
 		// renderer.render( this.scene, this.camera, this.currentLuminanceRT );
 
-	},
+	}
 
-	setAdaptive: function ( adaptive ) {
+	setAdaptive( adaptive ) {
 
 		if ( adaptive ) {
 
@@ -270,9 +257,9 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 		this.materialToneMap.needsUpdate = true;
 
-	},
+	}
 
-	setAdaptionRate: function ( rate ) {
+	setAdaptionRate( rate ) {
 
 		if ( rate ) {
 
@@ -280,9 +267,9 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 		}
 
-	},
+	}
 
-	setMinLuminance: function ( minLum ) {
+	setMinLuminance( minLum ) {
 
 		if ( minLum ) {
 
@@ -291,9 +278,9 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 		}
 
-	},
+	}
 
-	setMaxLuminance: function ( maxLum ) {
+	setMaxLuminance( maxLum ) {
 
 		if ( maxLum ) {
 
@@ -301,9 +288,9 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 		}
 
-	},
+	}
 
-	setAverageLuminance: function ( avgLum ) {
+	setAverageLuminance( avgLum ) {
 
 		if ( avgLum ) {
 
@@ -311,9 +298,9 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 		}
 
-	},
+	}
 
-	setMiddleGrey: function ( middleGrey ) {
+	setMiddleGrey( middleGrey ) {
 
 		if ( middleGrey ) {
 
@@ -321,9 +308,9 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 		}
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		if ( this.luminanceRT ) {
 
@@ -369,6 +356,6 @@ AdaptiveToneMappingPass.prototype = Object.assign( Object.create( Pass.prototype
 
 	}
 
-} );
+}
 
 export { AdaptiveToneMappingPass };

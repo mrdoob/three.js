@@ -12,11 +12,24 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - cube panorama demo
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let camera, controls;
 			let renderer;
@@ -45,7 +58,7 @@
 				controls.enableDamping = true;
 				controls.rotateSpeed = - 0.25;
 
-				const textures = getTexturesFromAtlasFile( "textures/cube/sun_temple_stripe.jpg", 6 );
+				const textures = getTexturesFromAtlasFile( 'textures/cube/sun_temple_stripe.jpg', 6 );
 
 				const materials = [];
 
@@ -73,28 +86,26 @@
 
 				}
 
-				const imageObj = new Image();
+				new THREE.ImageLoader()
+					.load( atlasImgUrl, ( image ) => {
 
-				imageObj.onload = function () {
+						let canvas, context;
+						const tileWidth = image.height;
 
-					let canvas, context;
-					const tileWidth = imageObj.height;
+						for ( let i = 0; i < textures.length; i ++ ) {
 
-					for ( let i = 0; i < textures.length; i ++ ) {
+							canvas = document.createElement( 'canvas' );
+							context = canvas.getContext( '2d' );
+							canvas.height = tileWidth;
+							canvas.width = tileWidth;
+							context.drawImage( image, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
+							textures[ i ].colorSpace = THREE.SRGBColorSpace;
+							textures[ i ].image = canvas;
+							textures[ i ].needsUpdate = true;
 
-						canvas = document.createElement( 'canvas' );
-						context = canvas.getContext( '2d' );
-						canvas.height = tileWidth;
-						canvas.width = tileWidth;
-						context.drawImage( imageObj, tileWidth * i, 0, tileWidth, tileWidth, 0, 0, tileWidth, tileWidth );
-						textures[ i ].image = canvas;
-						textures[ i ].needsUpdate = true;
+						}
 
-					}
-
-				};
-
-				imageObj.src = atlasImgUrl;
+					} );
 
 				return textures;
 

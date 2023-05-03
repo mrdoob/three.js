@@ -17,7 +17,7 @@
 		<h2>사용:</h2>
 
 		<p class="desc">
-			'root'로 생성자에 넘기거나 'root'로 오브젝트를 넘기는 대신 
+			'root'로 생성자에 넘기거나 'root'로 오브젝트를 넘기는 대신
 			[page:AnimationMixer AnimationMixer]의 [page:AnimationMixer.clipAction clipAction]메서드를 통해 넘긴
 			오브젝트들을 추가합니다.
 			<br /><br />
@@ -44,6 +44,11 @@
 
 		<h2>프로퍼티</h2>
 
+		<h3>[property:Boolean isAnimationObjectGroup]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 
 		<h3>[property:Object stats]</h3>
 		<p>
@@ -52,7 +57,7 @@
 
 		<h3>[property:String uuid]</h3>
 		<p>
-			*AnimationObjectGroup*의 [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]. 
+			*AnimationObjectGroup*의 [link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID].
 			자동으로 할당괴며 수정이 불가능합니다.
 		</p>
 
@@ -60,17 +65,17 @@
 		<h2>메서드</h2>
 
 
-		<h3>[method:null add]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<h3>[method:undefined add]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
 		<p>
 			*AnimationObjectGroup*에 임의 갯수만큼의 오브젝트를 추가합니다.
 		</p>
 
-		<h3>[method:null remove]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<h3>[method:undefined remove]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
 		<p>
 			*AnimationObjectGroup*의 임의 갯수만큼의 오브젝트를 제거합니다.
 		</p>
 
-		<h3>[method:null uncache]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
+		<h3>[method:undefined uncache]( [param:Object obj1], [param:Object obj2], [param:Object obj3], ... )</h3>
 		<p>
 			*AnimationObjectGroup*의 전달받은 오브젝트들의 모든 메모리 리소스를 할당 해제합니다.
 		</p>

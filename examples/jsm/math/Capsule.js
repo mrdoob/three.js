@@ -1,6 +1,6 @@
 import {
 	Vector3
-} from '../../../build/three.module.js';
+} from 'three';
 
 const _v1 = new Vector3();
 const _v2 = new Vector3();

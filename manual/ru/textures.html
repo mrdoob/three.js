@@ -1,0 +1,561 @@
+<!DOCTYPE html><html lang="ru"><head>
+    <meta charset="utf-8">
+    <title>Текстуры</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Текстуры">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Текстуры</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Эта статья является частью серии статей о three.js. 
+Первая статья - <a href="fundamentals.html">основы Three.js</a>.
+<a href="setup.html">Предыдущая статья</a> была о настройках окружения для этой статьи.
+Если вы их еще не читали, советую вам сделать это.</p>
+<p>Текстуры - это своего рода большая тема в Three.js, и я не уверен на 100%, на каком 
+уровне их объяснить, но я постараюсь. По ним есть много тем, и многие из них взаимосвязаны, 
+поэтому трудно объяснить все сразу. Вот краткое содержание этой статьи.</p>
+<ul>
+<li><a href="#hello">Hello Texture</a></li>
+<li><a href="#six">6 текстур, разные на каждой грани куба</a></li>
+<li><a href="#loading">Загрузка текстур</a></li>
+<ul>
+  <li><a href="#easy">Легкий путь</a></li>
+  <li><a href="#wait1">Ожидание загрузки текстуры</a></li>
+  <li><a href="#waitmany">Ожидание загрузки нескольких текстур</a></li>
+  <li><a href="#cors">Загрузка текстур из других доменов Cross-origin</a></li>
+</ul>
+<li><a href="#memory">Использование памяти</a></li>
+<li><a href="#format">JPG против PNG</a></li>
+<li><a href="#filtering-and-mips">Фильтрация и Mips</a></li>
+<li><a href="#uvmanipulation">Повторение, сдвиг, вращение, наложение</a></li>
+</ul>
+
+<h2 id="-a-name-hello-a-hello-texture"><a name="hello"></a> Hello Texture</h2>
+<p>Текстуры, <em>как правило</em> представляют собой изображения, которые чаще всего создаются в 
+какой-либо сторонней программе, такой как Photoshop или GIMP. Например, 
+давайте поместим это изображение на куб.</p>
+<div class="threejs_center">
+  <img src="../examples/resources/images/wall.jpg" style="width: 600px;" class="border">
+</div>
+
+<p>Мы изменим один из наших первых примеров. Все, что нам нужно сделать, это создать <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>. Вызовите 
+<a href="/docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> метод с URL-адресом изображения и установите для
+изображения и установите его возвращаемое значение для <code class="notranslate" translate="no">map</code> свойства материала, вместо установки <code class="notranslate" translate="no">color</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
+
+const material = new THREE.MeshBasicMaterial({
+-  color: 0xFF8844,
++  map: loader.load('../resources/images/wall.jpg'),
+});
+</pre>
+<p>Обратите внимание, что мы используем <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> поэтому не нужно никаких источников света.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<h2 id="-a-name-six-a-6-"><a name="six"></a> 6 текстур, разные для каждой грани куба</h2>
+<p>Как насчет 6 текстур, по одной на каждой грани куба?</p>
+<div class="threejs_center">
+  <div>
+    <img src="../examples/resources/images/flower-1.jpg" style="width: 100px;" class="border">
+    <img src="../examples/resources/images/flower-2.jpg" style="width: 100px;" class="border">
+    <img src="../examples/resources/images/flower-3.jpg" style="width: 100px;" class="border">
+  </div>
+  <div>
+    <img src="../examples/resources/images/flower-4.jpg" style="width: 100px;" class="border">
+    <img src="../examples/resources/images/flower-5.jpg" style="width: 100px;" class="border">
+    <img src="../examples/resources/images/flower-6.jpg" style="width: 100px;" class="border">
+  </div>
+</div>
+
+<p>Мы просто создадим 6 материалов и передаем их в виде массива при создании <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+
+-const material = new THREE.MeshBasicMaterial({
+-  map: loader.load('../resources/images/wall.jpg'),
+-});
++const materials = [
++  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-1.jpg')}),
++  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-2.jpg')}),
++  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-3.jpg')}),
++  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-4.jpg')}),
++  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-5.jpg')}),
++  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-6.jpg')}),
++];
+-const cube = new THREE.Mesh(geometry, material);
++const cube = new THREE.Mesh(geometry, materials);
+</pre>
+<p>Оно работает!</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-6-textures.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube-6-textures.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Однако следует отметить, что по умолчанию единственной геометрией, которая поддерживает 
+несколько материалов, является <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> и <a href="/docs/#api/en/geometries/ConeGeometry"><code class="notranslate" translate="no">ConeGeometry</code></a>. В других случаях вам 
+нужно будет создать или загрузить пользовательскую геометрию и/или изменить координаты 
+текстуры. Гораздо более распространенным является использование 
+<a href="https://ru.wikipedia.org/wiki/Текстурный_атлас">Текстурного атласа</a> 
+когда вы хотите разрешить несколько изображений для одной геометрии.</p>
+<p>Что такое координаты текстуры? Это данные, добавленные к каждой вершине 
+геометрического фрагмента, которые определяют, какая часть текстуры 
+соответствует этой конкретной вершине. Мы рассмотрим их, когда 
+начнем создавать собственную геометрию.</p>
+<h2 id="-a-name-loading-a-"><a name="loading"></a> Загрузка текстур</h2>
+<h3 id="-a-name-easy-a-"><a name="easy"></a> Легкий путь</h3>
+<p>Большая часть кода на этом сайте использует самый простой способ загрузки текстур. 
+Мы создаем <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a> и затем вызываем <a href="/docs/#api/en/loaders/TextureLoader#load"><code class="notranslate" translate="no">load</code></a> метод. 
+Возвращающий объект <a href="/docs/#api/en/textures/Texture"><code class="notranslate" translate="no">Texture</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const texture = loader.load('../resources/images/flower-1.jpg');
+</pre>
+<p>Важно отметить, что при использовании этого метода наша текстура будет прозрачной, 
+пока изображение не будет загружено асинхронно с помощью three.js, 
+после чего он обновит текстуру загруженным изображением.</p>
+<p>Это имеет большое преимущество в том, что нам не нужно ждать загрузки текстуры, 
+и наша страница начнет отрисовку немедленно. Это, вероятно, хорошо для очень 
+многих случаев использования, но если мы хотим, мы можем попросить three.js 
+сообщить нам, когда текстура закончила загрузку.</p>
+<h3 id="-a-name-wait1-a-"><a name="wait1"></a> Ожидание загрузки текстуры</h3>
+<p>Чтобы дождаться загрузки текстуры, <code class="notranslate" translate="no">load</code> метод загрузчика текстуры принимает 
+обратный вызов, который будет вызван после завершения загрузки текстуры. 
+Возвращаясь к нашему верхнему примеру, мы можем дождаться загрузки текстуры, 
+прежде чем создавать нашу <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> и добавлять ее в сцену следующим образом.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loader = new THREE.TextureLoader();
+loader.load('../resources/images/wall.jpg', (texture) =&gt; {
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+  });
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+  cubes.push(cube);  // добавляем в наш список кубиков для вращения  
+});
+</pre>
+<p>Если вы не очистите кеш вашего браузера и у вас не будет медленного соединения, 
+вы вряд ли увидите разницу, но будьте уверены, что она ожидает загрузки текстуры.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-wait-for-texture.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube-wait-for-texture.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<h3 id="-a-name-waitmany-a-"><a name="waitmany"></a> Ожидание загрузки нескольких текстур</h3>
+<p>Чтобы дождаться загрузки всех текстур, вы можете использовать <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a>. 
+Создайте его и передайте его в <a href="/docs/#api/en/loaders/TextureLoader"><code class="notranslate" translate="no">TextureLoader</code></a>, а затем установите его <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> 
+свойство для обратного вызова.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadManager = new THREE.LoadingManager();
+*const loader = new THREE.TextureLoader(loadManager);
+
+const materials = [
+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-1.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-2.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-3.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-4.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-5.jpg')}),
+  new THREE.MeshBasicMaterial({map: loader.load('../resources/images/flower-6.jpg')}),
+];
+
++loadManager.onLoad = () =&gt; {
++  const cube = new THREE.Mesh(geometry, materials);
++  scene.add(cube);
++  cubes.push(cube);  // add to our list of cubes to rotate
++};
+</pre>
+<p><a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> также имеет <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> свойство и его 
+можно установить в другой функции обратного вызова, чтобы показать индикатор прогресса.</p>
+<p>Сначала мы добавим индикатор выполнения (progress bar) в HTML</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="loading"&gt;
++    &lt;div class="progress"&gt;&lt;div class="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>и CSS для этого</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#loading .progress {
+    margin: 1.5em;
+    border: 1px solid white;
+    width: 50vw;
+}
+#loading .progressbar {
+    margin: 2px;
+    background: white;
+    height: 1em;
+    transform-origin: top left;
+    transform: scaleX(0);
+}
+</pre>
+<p>Затем в коде мы обновим масштаб (scale) <code class="notranslate" translate="no">progressbar</code> в <code class="notranslate" translate="no">onProgress</code>. 
+Он вызывается с URL-адресом последнего загруженного элемента, количества загруженных 
+элементов и общего количества загруженных элементов.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loadingElem = document.querySelector('#loading');
++const progressBarElem = loadingElem.querySelector('.progressbar');
+
+loadManager.onLoad = () =&gt; {
++  loadingElem.style.display = 'none';
+  const cube = new THREE.Mesh(geometry, materials);
+  scene.add(cube);
+  cubes.push(cube);  // добавляем в наш список кубиков для вращения 
+};
+
++loadManager.onProgress = (urlOfLastItemLoaded, itemsLoaded, itemsTotal) =&gt; {
++  const progress = itemsLoaded / itemsTotal;
++  progressBarElem.style.transform = `scaleX(${progress})`;
++};
+</pre>
+<p>Если вы не очистите свой кеш и у вас медленное соединение, вы можете не увидеть полосу загрузки.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-wait-for-all-textures.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube-wait-for-all-textures.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<h2 id="-a-name-cors-a-cros"><a name="cors"></a> Загрузка текстур из других источников. CROS</h2>
+<p>Чтобы использовать изображения с других серверов, эти сервера должны отправлять правильные заголовки. 
+Если этого не произойдет, вы не сможете использовать изображения в three.js и получите ошибку. 
+Если вы запускаете сервер, предоставляющий изображения, убедитесь, что он
+<a href="https://developer.mozilla.org/ru/docs/Web/HTTP/CORS"> отправляет правильные заголовки</a>.
+Если вы не управляете сервером, на котором размещены изображения, и он не отправляет заголовки разрешений, 
+вы не сможете использовать изображения с этого сервера.</p>
+<p>Например <a href="https://imgur.com">imgur</a>, <a href="https://flickr.com">flickr</a> и
+<a href="https://github.com">github</a> - все заголовки отправки, позволяющие вам использовать изображения, 
+размещенные на их серверах в three.js. Большинство других сайтов этого не делают.</p>
+<h2 id="-a-name-memory-a-"><a name="memory"></a> Использование памяти</h2>
+<p>Текстуры часто являются частью приложения three.js, которое использует больше всего памяти. 
+Важно понимать, что <em>обычно</em>, текстуры занимают <code class="notranslate" translate="no">width * height * 4 * 1.33</code> байт в памяти. </p>
+<p>Обратите внимание, что никто не говорит о сжатии. Я могу сделать изображение в формате 
+.jpg и установить его компрессию очень высокой. Например, допустим, я делал сцену из дома. 
+Внутри дома есть стол, и я решил положить эту текстуру дерева на верхнюю поверхность стола.</p>
+<div class="threejs_center"><img class="border" src="../resources/images/compressed-but-large-wood-texture.jpg" align="center" style="width: 300px"></div>
+
+<p>Это изображение всего 157 Кб, поэтому оно будет загружаться относительно быстро, но на 
+<a href="resources/images/compressed-but-large-wood-texture.jpg">самом деле оно имеет размер 3024 x 3761 пикселей</a>. 
+Следуя приведенному выше уравнению, это</p>
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no">3024 * 3761 * 4 * 1.33 = 60505764.5
+</pre><p>Это изображение займет <strong>60 Мб ПАМЯТИ!</strong> в three.js. 
+Несколько таких текстур, и вам не хватит памяти.</p>
+<p>Я поднял этот вопрос, потому что важно знать, что использование текстур имеет скрытую стоимость. 
+Для того чтобы three.js использовал текстуру, он должен передать ее в графический процессор, 
+а графический процессор <em>обычно</em> требует, чтобы данные текстуры были несжатыми.</p>
+<p>Мораль этой истории: делайте ваши текстуры небольшими по размеру, а не просто 
+маленькими по размеру файла. Небольшой размер файла = быстрая загрузка. 
+Маленький в размер = занимает меньше памяти. 
+Насколько маленькими вы должны сделать их? 
+Настолько, насколько это возможно! И при этом выглядящими так хорошо, как вам нужно.</p>
+<h2 id="-a-name-format-a-jpg-png"><a name="format"></a> JPG против PNG</h2>
+<p>Это почти то же самое, что и обычный HTML, поскольку JPG-файлы имеют сжатие с потерями, 
+PNG-файлы имеют сжатие без потерь, поэтому PNG-файлы обычно загружаются медленнее. 
+Но PNG поддерживают прозрачность. PNG также, вероятно, является подходящим форматом 
+для данных без реалистичных изображений, таких как карты нормалей, и других видов карт без реалистичных изображений, 
+которые мы рассмотрим позже.</p>
+<p>Важно помнить, что JPG не использует меньше памяти, чем PNG в WebGL. Смотри выше.</p>
+<h2 id="-a-name-filtering-and-mips-a-mips"><a name="filtering-and-mips"></a> Фильтрация и Mips</h2>
+<p>Давайте применим эту текстуру 16x16</p>
+<div class="threejs_center"><img src="../resources/images/mip-low-res-enlarged.png" class="border" align="center"></div>
+
+<p>Это куб</p>
+<div class="spread"><div data-diagram="filterCube"></div></div>
+
+<p>Давайте нарисуем этот кубик действительно маленьким</p>
+<div class="spread"><div data-diagram="filterCubeSmall"></div></div>
+
+<p>Хммм, я думаю, это трудно увидеть. Давайте увеличим этот крошечный куб</p>
+<div class="spread"><div data-diagram="filterCubeSmallLowRes"></div></div>
+
+<p>Как GPU узнает, какие цвета нужно сделать для каждого пикселя, который он рисует для крошечного куба? 
+Что если куб был настолько мал, что его размер составлял всего 1 или 2 пикселя?</p>
+<p>Вот что такое фильтрация.</p>
+<p>Если бы это был Photoshop, Photoshop усреднил бы почти все пиксели вместе, 
+чтобы выяснить, какой цвет сделать эти 1 или 2 пикселя. 
+Это было бы очень медленной операцией. 
+Графические процессоры решают эту проблему с помощью mipmaps.</p>
+<p>Mips - это копии текстуры, каждая из которых в два раза меньше ширины и в два раза меньше, чем предыдущий мип, 
+где пиксели были смешаны, чтобы сделать следующий меньший мип. 
+Мипы создаются до тех пор, пока мы не доберемся до 1 х 1 пикселя. 
+Поскольку изображение выше всех мипов в конечном итоге будет что-то вроде этого</p>
+<div class="threejs_center"><img src="../resources/images/mipmap-low-res-enlarged.png" class="nobg" align="center"></div>
+
+<p>Теперь, когда куб нарисован настолько маленьким, что его размер составляет всего 1 или 2 пикселя, 
+графический процессор может использовать только наименьший или почти минимальный уровень мипа, 
+чтобы решить, какой цвет создать крошечный куб.</p>
+<p>В three вы можете выбрать, что будет происходить, когда текстура рисуется больше, 
+чем ее исходный размер, и что происходит, когда она рисуется меньше, чем ее исходный размер.</p>
+<p>Для установки фильтра, когда текстура рисуется больше исходного размера, 
+вы устанавливаете <a href="/docs/#api/en/textures/Texture#magFilter"><code class="notranslate" translate="no">texture.magFilter</code></a> свойство либо на <code class="notranslate" translate="no">THREE.NearestFilter</code> либо на 
+<code class="notranslate" translate="no">THREE.LinearFilter</code>.  <code class="notranslate" translate="no">NearestFilter</code> просто выбрает один пиксель из оригинальной текстуры. 
+С текстурой низкого разрешения это дает вам очень пиксельный вид как Minecraft.</p>
+<p><code class="notranslate" translate="no">LinearFilter</code> выбрает 4 пикселя из текстуры, которые находятся ближе всего к тому месту, 
+где мы должны выбирать цвет, и смешает их в соответствующих пропорциях относительно того, 
+как далеко фактическая точка находится от каждого из 4 пикселей.</p>
+<div class="spread">
+  <div>
+    <div data-diagram="filterCubeMagNearest" style="height: 250px;"></div>
+    <div class="code">Nearest</div>
+  </div>
+  <div>
+    <div data-diagram="filterCubeMagLinear" style="height: 250px;"></div>
+    <div class="code">Linear</div>
+  </div>
+</div>
+
+<p>Для настройки фильтра, когда текстура нарисована меньше исходного размера, 
+вы устанавливаете для свойства <a href="/docs/#api/en/textures/Texture#minFilter"><code class="notranslate" translate="no">texture.minFilter</code></a> одно из 6 значений.</p>
+<ul>
+<li><p><code class="notranslate" translate="no">THREE.NearestFilter</code></p>
+<p> так же, как и выше. Выбирает ближайший пиксель в текстуре</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.LinearFilter</code></p>
+<p> Как и выше, выбирает 4 пикселя из текстуры и смешает их</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.NearestMipmapNearestFilter</code></p>
+<p> выбирает соответствующий mip, затем выбирает один пиксель.</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.NearestMipmapLinearFilter</code></p>
+<p> выбирает 2 mips, выбирает один пиксель из каждого, смешает 2 пикселя.</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.LinearMipmapNearestFilter</code></p>
+<p> выбирает подходящий mip, затем выбирает 4 пикселя и смешает их.</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.LinearMipmapLinearFilter</code></p>
+<p>выбирает 2 mips, выбирает 4 пикселя от каждого и смешает все 8 в 1 пиксель.</p>
+</li>
+</ul>
+<p>Вот пример, показывающий все 6 настроек</p>
+<div class="spread">
+  <div data-diagram="filterModes" style="
+    height: 450px; 
+    position: relative;
+  ">
+    <div style="
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    ">
+      <div style="
+        background: rgba(255,0,0,.8);
+        color: white;
+        padding: .5em;
+        margin: 1em;
+        font-size: small;
+        border-radius: .5em;
+        line-height: 1.2;
+        user-select: none;">click to<br>change<br>texture</div>
+    </div>
+    <div class="filter-caption" style="left: 0.5em; top: 0.5em;">nearest</div>
+    <div class="filter-caption" style="width: 100%; text-align: center; top: 0.5em;">linear</div>
+    <div class="filter-caption" style="right: 0.5em; text-align: right; top: 0.5em;">nearest<br>mipmap<br>nearest</div>
+    <div class="filter-caption" style="left: 0.5em; text-align: left; bottom: 0.5em;">nearest<br>mipmap<br>linear</div>
+    <div class="filter-caption" style="width: 100%; text-align: center; bottom: 0.5em;">linear<br>mipmap<br>nearest</div>
+    <div class="filter-caption" style="right: 0.5em; text-align: right; bottom: 0.5em;">linear<br>mipmap<br>linear</div>
+  </div>
+</div>
+
+<p>Одна вещь, на которую нужно обратить внимание - это использование левого верхнего и верхнего среднего 
+<code class="notranslate" translate="no">NearestFilter</code> и <code class="notranslate" translate="no">LinearFilter</code>
+не использует mips. Из-за этого они мерцают на расстоянии, потому что графический процессор выбирает 
+пиксели из исходной текстуры. Слева выбран только один пиксель, а в середине 4 выбраны и смешаны, 
+но этого недостаточно, чтобы придумать хороший представительный цвет. Другие 4 полоски лучше с нижним правым, 
+<code class="notranslate" translate="no">LinearMipmapLinearFilter</code> лучший.</p>
+<p>Если вы нажмете на картинку выше, она переключится между текстурой, которую мы использовали выше, 
+и текстурой, где каждый уровень мипа имеет свой цвет.</p>
+<div class="threejs_center">
+  <div data-texture-diagram="differentColoredMips"></div>
+</div>
+
+<p>Это делает более понятным, что происходит. 
+Вы можете видеть в верхнем левом и верхнем середине первый мип, используемый на всем пути. 
+Справа вверху и внизу посередине видно, где используется другой мип.</p>
+<p>Возвращаясь к исходной текстуре, вы можете видеть, что нижний правый угол является самым плавным 
+и с высочайшим качеством. Вы можете спросить, почему не всегда использовать этот режим. 
+Самая очевидная причина - иногда вы хотите, чтобы вещи были пикселированы в стиле ретро 
+или по какой-то другой причине. Следующая наиболее распространенная причина заключается в том, 
+что чтение 8 пикселей и их смешивание медленнее, чем чтение 1 пикселя и смешивание. 
+Хотя маловероятно, что для одной и той же текстуры будет видна разница в скорости по мере нашего 
+углубления в эти статьи, в конечном итоге у нас будут материалы, 
+которые используют 4 или 5 текстур одновременно. 4 текстуры * 8 пикселей на текстуру - 
+это поиск 32 пикселей для каждого пикселя. Это может быть особенно важно учитывать на мобильных устройствах.</p>
+<h2 id="-a-name-uvmanipulation-a-"><a name="uvmanipulation"></a> Повторение, смещение, вращение, наложение текстуры</h2>
+<p>Текстуры имеют настройки для повторения, смещения и поворота текстуры.</p>
+<p>По умолчанию текстуры в three.js не повторяются. Чтобы установить, повторяется или нет текстура, 
+есть 2 свойства: <a href="/docs/#api/en/textures/Texture#wrapS"><code class="notranslate" translate="no">wrapS</code></a> для горизонтального и 
+и <a href="/docs/#api/en/textures/Texture#wrapT"><code class="notranslate" translate="no">wrapT</code></a> вертикального повторения.</p>
+<p>They can be set to one of:</p>
+<ul>
+<li><p><code class="notranslate" translate="no">THREE.ClampToEdgeWrapping</code></p>
+<p>Последний пиксель на каждом ребре повторяется всегда</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.RepeatWrapping</code></p>
+<p> Текстура повторяется</p>
+</li>
+<li><p><code class="notranslate" translate="no">THREE.MirroredRepeatWrapping</code></p>
+<p> Текстура зеркально повторяется.</p>
+</li>
+</ul>
+<p>Например, чтобы включить повтор в обоих направлениях:</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">someTexture.wrapS = THREE.RepeatWrapping;
+someTexture.wrapT = THREE.RepeatWrapping;
+</pre>
+<p>Повторение устанавливается с помощью свойства [repeat].</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const timesToRepeatHorizontally = 4;
+const timesToRepeatVertically = 2;
+someTexture.repeat.set(timesToRepeatHorizontally, timesToRepeatVertically);
+</pre>
+<p>Смещение текстуры может быть сделано путем установки <code class="notranslate" translate="no">offset</code>. 
+Текстуры смещены в единицах, где 1 единица = 1 размер текстуры. 
+Другими словами, 0 = без смещения и 1 = смещение на одну полную величину текстуры. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const xOffset = .5;   // cмещение на половину текстуры 
+const yOffset = .25;
+someTexture.offset.set(xOffset, yOffset);`
+</pre>
+<p>Вращение текстуры может быть установлено через свойство <code class="notranslate" translate="no">rotation</code> в радианах, а также свойство
+<code class="notranslate" translate="no">center</code> для выбора центра вращения. По умолчанию используется значение 0,0, которое 
+вращается из нижнего левого угла. Подобно смещению, эти единицы имеют размер текстуры, 
+поэтому установка их <code class="notranslate" translate="no">.5, .5</code> будет вращаться вокруг центра текстуры.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">someTexture.center.set(.5, .5);
+someTexture.rotation = THREE.MathUtils.degToRad(45);
+</pre>
+<p>Давайте изменим верхний пример выше, чтобы играть с этими значениями</p>
+<p>Сначала мы сохраним ссылку на текстуру, чтобы мы могли манипулировать ею</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const texture = loader.load('../resources/images/wall.jpg');
+const material = new THREE.MeshBasicMaterial({
+-  map: loader.load('../resources/images/wall.jpg');
++  map: texture,
+});
+</pre>
+<p>Затем мы снова будем использовать <a href="https://github.com/georgealways/lil-gui">lil-gui</a> 
+для обеспечения простого интерфейса.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+</pre>
+<p>Как мы делали в предыдущих примерах lil-gui, мы будем использовать простой класс, 
+чтобы дать lil-gui объект, которым он может манипулировать в градусах, 
+но установит свойство в радианах.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class DegRadHelper {
+  constructor(obj, prop) {
+    this.obj = obj;
+    this.prop = prop;
+  }
+  get value() {
+    return THREE.MathUtils.radToDeg(this.obj[this.prop]);
+  }
+  set value(v) {
+    this.obj[this.prop] = THREE.MathUtils.degToRad(v);
+  }
+}
+</pre>
+<p>Нам также нужен класс, который будет конвертировать из строки, например, <code class="notranslate" translate="no">"123"</code> 
+в число <code class="notranslate" translate="no">123</code>, так как для Three.js требуются числа для настроек перечисления, 
+например, <code class="notranslate" translate="no">wrapS</code> и <code class="notranslate" translate="no">wrapT</code>, а lil-gui использует только строки для перечислений.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class StringToNumberHelper {
+  constructor(obj, prop) {
+    this.obj = obj;
+    this.prop = prop;
+  }
+  get value() {
+    return this.obj[this.prop];
+  }
+  set value(v) {
+    this.obj[this.prop] = parseFloat(v);
+  }
+}
+</pre>
+<p>Используя эти классы, мы можем настроить простой графический интерфейс для настроек выше</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const wrapModes = {
+  'ClampToEdgeWrapping': THREE.ClampToEdgeWrapping,
+  'RepeatWrapping': THREE.RepeatWrapping,
+  'MirroredRepeatWrapping': THREE.MirroredRepeatWrapping,
+};
+
+function updateTexture() {
+  texture.needsUpdate = true;
+}
+
+const gui = new GUI();
+gui.add(new StringToNumberHelper(texture, 'wrapS'), 'value', wrapModes)
+  .name('texture.wrapS')
+  .onChange(updateTexture);
+gui.add(new StringToNumberHelper(texture, 'wrapT'), 'value', wrapModes)
+  .name('texture.wrapT')
+  .onChange(updateTexture);
+gui.add(texture.repeat, 'x', 0, 5, .01).name('texture.repeat.x');
+gui.add(texture.repeat, 'y', 0, 5, .01).name('texture.repeat.y');
+gui.add(texture.offset, 'x', -2, 2, .01).name('texture.offset.x');
+gui.add(texture.offset, 'y', -2, 2, .01).name('texture.offset.y');
+gui.add(texture.center, 'x', -.5, 1.5, .01).name('texture.center.x');
+gui.add(texture.center, 'y', -.5, 1.5, .01).name('texture.center.y');
+gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
+  .name('texture.rotation');
+</pre>
+<p>Последнее, что следует отметить в этом примере, это то, что если вы измените <code class="notranslate" translate="no">wrapS</code> или
+<code class="notranslate" translate="no">wrapT</code> на текстуре, вы также должны установить <a href="/docs/#api/en/textures/Texture#needsUpdate"><code class="notranslate" translate="no">texture.needsUpdate</code></a> 
+так, чтобы Three.js знал, чтобы применить эти настройки. Другие настройки применяются автоматически.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/textured-cube-adjust.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/textured-cube-adjust.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+</div>
+
+<p></p>
+<p>Это только один шаг в тему текстур. В какой-то момент мы рассмотрим текстурные координаты, 
+а также 9 других типов текстур, которые можно применить к материалам.</p>
+<p>А пока давайте перейдем к <a href="lights.html">свету</a>.</p>
+<!--
+alpha 
+ao
+env
+light
+specular
+bumpmap ?
+normalmap ?
+metalness
+roughness
+-->
+<p><script type="module" src="../resources/threejs-textures.js"></script></p>
+<link rel="stylesheet" href="../resources/threejs-textures.css">
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

@@ -11,13 +11,26 @@
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sky + sun shader
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { Sky } from './jsm/objects/Sky.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Sky } from 'three/addons/objects/Sky.js';
 
 			let camera, scene, renderer;
 
@@ -42,27 +55,25 @@
 					rayleigh: 3,
 					mieCoefficient: 0.005,
 					mieDirectionalG: 0.7,
-					inclination: 0.49, // elevation / inclination
-					azimuth: 0.25, // Facing front,
+					elevation: 2,
+					azimuth: 180,
 					exposure: renderer.toneMappingExposure
 				};
 
 				function guiChanged() {
 
 					const uniforms = sky.material.uniforms;
-					uniforms[ "turbidity" ].value = effectController.turbidity;
-					uniforms[ "rayleigh" ].value = effectController.rayleigh;
-					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
-					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
+					uniforms[ 'turbidity' ].value = effectController.turbidity;
+					uniforms[ 'rayleigh' ].value = effectController.rayleigh;
+					uniforms[ 'mieCoefficient' ].value = effectController.mieCoefficient;
+					uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
 
-					const theta = Math.PI * ( effectController.inclination - 0.5 );
-					const phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+					const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
+					const theta = THREE.MathUtils.degToRad( effectController.azimuth );
 
-					sun.x = Math.cos( phi );
-					sun.y = Math.sin( phi ) * Math.sin( theta );
-					sun.z = Math.sin( phi ) * Math.cos( theta );
+					sun.setFromSphericalCoords( 1, phi, theta );
 
-					uniforms[ "sunPosition" ].value.copy( sun );
+					uniforms[ 'sunPosition' ].value.copy( sun );
 
 					renderer.toneMappingExposure = effectController.exposure;
 					renderer.render( scene, camera );
@@ -71,13 +82,13 @@
 
 				const gui = new GUI();
 
-				gui.add( effectController, "turbidity", 0.0, 20.0, 0.1 ).onChange( guiChanged );
-				gui.add( effectController, "rayleigh", 0.0, 4, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "mieCoefficient", 0.0, 0.1, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "mieDirectionalG", 0.0, 1, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "inclination", 0, 1, 0.0001 ).onChange( guiChanged );
-				gui.add( effectController, "azimuth", 0, 1, 0.0001 ).onChange( guiChanged );
-				gui.add( effectController, "exposure", 0, 1, 0.0001 ).onChange( guiChanged );
+				gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
+				gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
 
 				guiChanged();
 
@@ -96,7 +107,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 0.5;
 				document.body.appendChild( renderer.domElement );

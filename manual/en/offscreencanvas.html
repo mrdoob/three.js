@@ -1,0 +1,1092 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>OffscreenCanvas</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – OffscreenCanvas">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>OffscreenCanvas</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code class="notranslate" translate="no">OffscreenCanvas</code></a>
+is a relatively new browser feature currently only available in Chrome but apparently
+coming to other browsers. <code class="notranslate" translate="no">OffscreenCanvas</code> allows a web worker to render
+to a canvas. This is a way to offload heavy work, like rendering a complex 3D scene,
+to a web worker so as not to slow down the responsiveness of the browser. It
+also means data is loaded and parsed in the worker so possibly less jank while
+the page loads.</p>
+<p>Getting <em>started</em> using it is pretty straight forward. Let's port the 3 spinning cube
+example from <a href="responsive.html">the article on responsiveness</a>.</p>
+<p>Workers generally have their code separated
+into another script file whereas most of the examples on this site have had
+their scripts embedded into the HTML file of the page they are on.</p>
+<p>In our case we'll make a file called <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> and
+copy all the JavaScript from <a href="responsive.html">the responsive example</a> into it. We'll then
+make the changes needed for it to run in a worker.</p>
+<p>We still need some JavaScript in our HTML file. The first thing
+we need to do there is look up the canvas and then transfer control of that
+canvas to be offscreen by calling <code class="notranslate" translate="no">canvas.transferControlToOffscreen</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const offscreen = canvas.transferControlToOffscreen();
+
+  ...
+</pre>
+<p>We can then start our worker with <code class="notranslate" translate="no">new Worker(pathToScript, {type: 'module'})</code>.
+and pass the <code class="notranslate" translate="no">offscreen</code> object to it.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+}
+main();
+</pre>
+<p>It's important to note that workers can't access the <code class="notranslate" translate="no">DOM</code>. They
+can't look at HTML elements nor can they receive mouse events or
+keyboard events. The only thing they can generally do is respond
+to messages sent to them and send messages back to the page.</p>
+<p>To send a message to a worker we call <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code class="notranslate" translate="no">worker.postMessage</code></a> and
+pass it 1 or 2 arguments. The first argument is a JavaScript object
+that will be <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">cloned</a> 
+and sent to the worker. The second argument is an optional array
+of objects that are part of the first object that we want <em>transferred</em>
+to the worker. These objects will not be cloned. Instead they will be <em>transferred</em>
+and will cease to exist in the main page. Cease to exist is the probably
+the wrong description, rather they are neutered. Only certain types of
+objects can be transferred instead of cloned. They include <code class="notranslate" translate="no">OffscreenCanvas</code>
+so once transferred the <code class="notranslate" translate="no">offscreen</code> object back in the main page is useless.</p>
+<p>Workers receive messages from their <code class="notranslate" translate="no">onmessage</code> handler. The object
+we passed to <code class="notranslate" translate="no">postMessage</code> arrives on <code class="notranslate" translate="no">event.data</code> passed to the <code class="notranslate" translate="no">onmessage</code>
+handler on the worker. The code above declares a <code class="notranslate" translate="no">type: 'main'</code> in the object it passes
+to the worker. This object has no meaning to the browser. It's entirely for
+our own usage. We'll make a handler that based on <code class="notranslate" translate="no">type</code> calls
+a different function in the worker. Then we can add functions as
+needed and easily call them from the main page.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const handlers = {
+  main,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>You can see above we just look up the handler based on the <code class="notranslate" translate="no">type</code> pass it the <code class="notranslate" translate="no">data</code>
+that was sent from the main page.</p>
+<p>So now we just need to start changing the <code class="notranslate" translate="no">main</code> we pasted into 
+<code class="notranslate" translate="no">offscreencanvas-cubes.js</code> from <a href="responsive.html">the responsive article</a>.</p>
+<p>Instead of looking up the canvas from the DOM we'll receive it from the
+event data.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function main() {
+-  const canvas = document.querySelector('#c');
++function main(data) {
++  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+
+  ...
+</pre>
+<p>Remembering that workers can't see the DOM at all the first problem
+we run into is <code class="notranslate" translate="no">resizeRendererToDisplaySize</code> can't look at <code class="notranslate" translate="no">canvas.clientWidth</code>
+and <code class="notranslate" translate="no">canvas.clientHeight</code> as those are DOM values. Here's the original code</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+</pre>
+<p>Instead we'll need to send sizes as they change to the worker. 
+So, let's add some global state and keep the width and height there.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const state = {
+  width: 300,  // canvas default
+  height: 150,  // canvas default
+};
+</pre>
+<p>Then let's add a <code class="notranslate" translate="no">'size'</code> handler to update those values. </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function size(data) {
++  state.width = data.width;
++  state.height = data.height;
++}
+
+const handlers = {
+  main,
++  size,
+};
+</pre>
+<p>Now we can change <code class="notranslate" translate="no">resizeRendererToDisplaySize</code> to use <code class="notranslate" translate="no">state.width</code> and <code class="notranslate" translate="no">state.height</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+-  const width = canvas.clientWidth;
+-  const height = canvas.clientHeight;
++  const width = state.width;
++  const height = state.height;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+</pre>
+<p>and where we compute the aspect we need similar changes</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
++    camera.aspect = state.width / state.height;
+    camera.updateProjectionMatrix();
+  }
+
+  ...
+</pre>
+<p>Back in the main page we'll send a <code class="notranslate" translate="no">size</code> event anytime the page changes size.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
++function sendSize() {
++  worker.postMessage({
++    type: 'size',
++    width: canvas.clientWidth,
++    height: canvas.clientHeight,
++  });
++}
++
++window.addEventListener('resize', sendSize);
++sendSize();
+</pre>
+<p>We also call it once to send the initial size.</p>
+<p>And with just those few changes, assuming your browser fully supports <code class="notranslate" translate="no">OffscreenCanvas</code>
+it should work. Before we run it though let's check if the browser actually supports
+<code class="notranslate" translate="no">OffscreenCanvas</code> and if not display an error. First let's add some HTML to display the error.</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
++  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
++    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
++  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>and some CSS for that</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#noOffscreenCanvas {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: red;
+    color: white;
+}
+</pre>
+<p>and then we can check for the existence of <code class="notranslate" translate="no">transferControlToOffscreen</code> to see
+if the browser supports <code class="notranslate" translate="no">OffscreenCanvas</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
++  if (!canvas.transferControlToOffscreen) {
++    canvas.style.display = 'none';
++    document.querySelector('#noOffscreenCanvas').style.display = '';
++    return;
++  }
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-picking.js', {type: 'module});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  ...
+</pre>
+<p>and with that, if your browser supports <code class="notranslate" translate="no">OffscreenCanvas</code> this example should work</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>So that's great but since not every browser supports <code class="notranslate" translate="no">OffscreenCanvas</code> at the moment
+let's change the code to work with both <code class="notranslate" translate="no">OffscreenCanvas</code> and if not then fallback to using
+the canvas in the main page like normal.</p>
+<blockquote>
+<p>As an aside, if you need OffscreenCanvas to make your page responsive then
+it's not clear what the point of having a fallback is. Maybe based on if
+you end up running on the main page or in a worker you might adjust the amount
+of work done so that when running in a worker you can do more than when
+running in the main page. What you do is really up to you.</p>
+</blockquote>
+<p>The first thing we should probably do is separate out the three.js
+code from the code that is specific to the worker. That way we can
+use the same code on both the main page and the worker. In other words
+we will now have 3 files</p>
+<ol>
+<li><p>our html file.</p>
+<p><code class="notranslate" translate="no">threejs-offscreencanvas-w-fallback.html</code></p>
+</li>
+<li><p>a JavaScript that contains our three.js code.</p>
+<p><code class="notranslate" translate="no">shared-cubes.js</code></p>
+</li>
+<li><p>our worker support code</p>
+<p><code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code></p>
+</li>
+</ol>
+<p><code class="notranslate" translate="no">shared-cubes.js</code> and <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> are basically
+the split of our previous <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> file. First we
+copy all of <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> to <code class="notranslate" translate="no">shared-cube.js</code>. Then
+we rename <code class="notranslate" translate="no">main</code> to <code class="notranslate" translate="no">init</code> since we already have a <code class="notranslate" translate="no">main</code> in our
+HTML file and we need to export <code class="notranslate" translate="no">init</code> and <code class="notranslate" translate="no">state</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+
+-const state = {
++export const state = {
+  width: 300,   // canvas default
+  height: 150,  // canvas default
+};
+
+-function main(data) {
++export function init(data) {
+  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+</pre>
+<p>and cut out the just the non three.js relates parts</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
+-  state.width = data.width;
+-  state.height = data.height;
+-}
+-
+-const handlers = {
+-  main,
+-  size,
+-};
+-
+-self.onmessage = function(e) {
+-  const fn = handlers[e.data.type];
+-  if (typeof fn !== 'function') {
+-    throw new Error('no handler for type: ' + e.data.type);
+-  }
+-  fn(e.data);
+-};
+</pre>
+<p>Then we copy those parts we just deleted to <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code>
+and import <code class="notranslate" translate="no">shared-cubes.js</code> as well as call <code class="notranslate" translate="no">init</code> instead of <code class="notranslate" translate="no">main</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {init, state} from './shared-cubes.js';
+
+function size(data) {
+  state.width = data.width;
+  state.height = data.height;
+}
+
+const handlers = {
+-  main,
++  init,
+  size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>Similarly we need to include <code class="notranslate" translate="no">shared-cubes.js</code> in the main page</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
++import {init, state} from './shared-cubes.js';
+</pre>
+<p>We can remove the HTML and CSS we added previously</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+  &lt;canvas id="c"&gt;&lt;/canvas&gt;
+-  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
+-    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
+-  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<p>and some CSS for that</p>
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">-#noOffscreenCanvas {
+-    display: flex;
+-    width: 100%;
+-    height: 100%;
+-    align-items: center;
+-    justify-content: center;
+-    background: red;
+-    color: white;
+-}
+</pre>
+<p>Then let's change the code in the main page to call one start
+function or another depending on if the browser supports <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+-  if (!canvas.transferControlToOffscreen) {
+-    canvas.style.display = 'none';
+-    document.querySelector('#noOffscreenCanvas').style.display = '';
+-    return;
+-  }
+-  const offscreen = canvas.transferControlToOffscreen();
+-  const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  if (canvas.transferControlToOffscreen) {
++    startWorker(canvas);
++  } else {
++    startMainPage(canvas);
++  }
+  ...
+</pre>
+<p>We'll move all the code we had to setup the worker inside <code class="notranslate" translate="no">startWorker</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');
+}
+</pre>
+<p>and send <code class="notranslate" translate="no">init</code> instead of <code class="notranslate" translate="no">main</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+</pre>
+<p>for starting in the main page we can do this</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+  init({canvas});
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');
+}
+</pre>
+<p>and with that our example will run either in an OffscreenCanvas or
+fallback to running in the main page.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-fallback.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-fallback.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>So that was relatively easy. Let's try picking. We'll take some code from
+the <code class="notranslate" translate="no">RayCaster</code> example from <a href="picking.html">the article on picking</a>
+and make it work offscreen.</p>
+<p>Let's copy the <code class="notranslate" translate="no">shared-cube.js</code> to <code class="notranslate" translate="no">shared-picking.js</code> and add the
+picking parts. We copy in the <code class="notranslate" translate="no">PickHelper</code> </p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+  constructor() {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
+    // cast a ray through the frustum
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // get the list of objects the ray intersected
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // pick the first object. It's the closest one
+      this.pickedObject = intersectedObjects[0].object;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+
+const pickPosition = {x: 0, y: 0};
+const pickHelper = new PickHelper();
+</pre>
+<p>We updated <code class="notranslate" translate="no">pickPosition</code> from the mouse like this</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+  pickPosition.x = (pos.x / canvas.width ) *  2 - 1;
+  pickPosition.y = (pos.y / canvas.height) * -2 + 1;  // note we flip Y
+}
+window.addEventListener('mousemove', setPickPosition);
+</pre>
+<p>A worker can't read the mouse position directly so just like the size code
+let's send a message with the mouse position. Like the size code we'll
+send the mouse position and update <code class="notranslate" translate="no">pickPosition</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function size(data) {
+  state.width = data.width;
+  state.height = data.height;
+}
+
++function mouse(data) {
++  pickPosition.x = data.x;
++  pickPosition.y = data.y;
++}
+
+const handlers = {
+  init,
++  mouse,
+  size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>Back in our main page we need to add code to pass the mouse
+to the worker or the main page.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let sendMouse;
+
+function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-picking.js', {type: 'module'});
+  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+
++  sendMouse = (x, y) =&gt; {
++    worker.postMessage({
++      type: 'mouse',
++      x,
++      y,
++    });
++  };
+
+  function sendSize() {
+    worker.postMessage({
+      type: 'size',
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    });
+  }
+
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}
+
+function startMainPage(canvas) {
+  init({canvas});
+
++  sendMouse = (x, y) =&gt; {
++    pickPosition.x = x;
++    pickPosition.y = y;
++  };
+
+  function sendSize() {
+    state.width = canvas.clientWidth;
+    state.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', sendSize);
+  sendSize();
+
+  console.log('using regular canvas');  /* eslint-disable-line no-console */
+}
+</pre>
+<p>Then we can copy in all the mouse handling code to the main page and 
+make just minor changes to use <code class="notranslate" translate="no">sendMouse</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+-  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
++  sendMouse(
++      (pos.x / canvas.clientWidth ) *  2 - 1,
++      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
+}
+
+function clearPickPosition() {
+  // unlike the mouse which always has a position
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+-  pickPosition.x = -100000;
+-  pickPosition.y = -100000;
++  sendMouse(-100000, -100000);
+}
+window.addEventListener('mousemove', setPickPosition);
+window.addEventListener('mouseout', clearPickPosition);
+window.addEventListener('mouseleave', clearPickPosition);
+
+window.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+window.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+window.addEventListener('touchend', clearPickPosition);
+</pre>
+<p>and with that picking should be working with <code class="notranslate" translate="no">OffscreenCanvas</code>.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-picking.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-picking.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Let's take it one more step and add in the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>.
+This will be little more involved. The <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> use
+the DOM pretty extensively checking the mouse, touch events,
+and the keyboard.</p>
+<p>Unlike our code so far we can't really use a global <code class="notranslate" translate="no">state</code> object
+without re-writing all the OrbitControls code to work with it.
+The OrbitControls take an <code class="notranslate" translate="no">HTMLElement</code> to which they attach most
+of the DOM events they use. Maybe we could pass in our own
+object that has the same API surface as a DOM element. 
+We only need to support the features the OrbitControls need.</p>
+<p>Digging through the <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js">OrbitControls source code</a>
+it looks like we need to handle the following events.</p>
+<ul>
+<li>contextmenu</li>
+<li>pointerdown</li>
+<li>pointermove</li>
+<li>pointerup</li>
+<li>touchstart</li>
+<li>touchmove</li>
+<li>touchend</li>
+<li>wheel</li>
+<li>keydown</li>
+</ul>
+<p>For the pointer events we need the <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, 
+<code class="notranslate" translate="no">button</code>, <code class="notranslate" translate="no">pointerType</code>, <code class="notranslate" translate="no">clientX</code>, <code class="notranslate" translate="no">clientY</code>, <code class="notranslate" translate="no">pageX</code>, and <code class="notranslate" translate="no">pageY</code>, properties.</p>
+<p>For the keydown events we need the <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, 
+and <code class="notranslate" translate="no">keyCode</code> properties.</p>
+<p>For the wheel event we only need the <code class="notranslate" translate="no">deltaY</code> property.</p>
+<p>And for the touch events we only need <code class="notranslate" translate="no">pageX</code> and <code class="notranslate" translate="no">pageY</code> from
+the <code class="notranslate" translate="no">touches</code> property.</p>
+<p>So, let's make a proxy object pair. One part will run in the main page,
+get all those events, and pass on the relevant property values
+to the worker. The other part will run in the worker, receive those
+events and pass them on using events that have the same structure
+as the original DOM events so the OrbitControls won't be able to
+tell the difference.</p>
+<p>Here's the code for the worker part.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EventDispatcher} from 'three';
+
+class ElementProxyReceiver extends EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
+    this.dispatchEvent(data);
+  }
+}
+</pre>
+<p>All it does is if it receives a message it dispatches it.
+It inherits from <a href="/docs/#api/en/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> which provides methods like
+<code class="notranslate" translate="no">addEventListener</code> and <code class="notranslate" translate="no">removeEventListener</code> just like a DOM
+element so if we pass it to the OrbitControls it should work.</p>
+<p><code class="notranslate" translate="no">ElementProxyReceiver</code> handles 1 element. In our case we only need
+one but it's best to think head so lets make a manager to manage
+more than one of them.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ProxyManager {
+  constructor() {
+    this.targets = {};
+    this.handleEvent = this.handleEvent.bind(this);
+  }
+  makeProxy(data) {
+    const {id} = data;
+    const proxy = new ElementProxyReceiver();
+    this.targets[id] = proxy;
+  }
+  getProxy(id) {
+    return this.targets[id];
+  }
+  handleEvent(data) {
+    this.targets[data.id].handleEvent(data.data);
+  }
+}
+</pre>
+<p>We can make a instance of <code class="notranslate" translate="no">ProxyManager</code> and call its <code class="notranslate" translate="no">makeProxy</code>
+method with an id which will make an <code class="notranslate" translate="no">ElementProxyReceiver</code> that
+responds to messages with that id.</p>
+<p>Let's hook it up to our worker's message handler.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const proxyManager = new ProxyManager();
+
+function start(data) {
+  const proxy = proxyManager.getProxy(data.canvasId);
+  init({
+    canvas: data.canvas,
+    inputElement: proxy,
+  });
+}
+
+function makeProxy(data) {
+  proxyManager.makeProxy(data);
+}
+
+...
+
+const handlers = {
+-  init,
+-  mouse,
++  start,
++  makeProxy,
++  event: proxyManager.handleEvent,
+   size,
+};
+
+self.onmessage = function(e) {
+  const fn = handlers[e.data.type];
+  if (typeof fn !== 'function') {
+    throw new Error('no handler for type: ' + e.data.type);
+  }
+  fn(e.data);
+};
+</pre>
+<p>In our shared three.js code we need to import the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> and set them up.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
++import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+export function init(data) {
+-  const {canvas} = data;
++  const {canvas, inputElement} = data;
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+
++  const controls = new OrbitControls(camera, inputElement);
++  controls.target.set(0, 0, 0);
++  controls.update();
+</pre>
+<p>Notice we're passing the OrbitControls our proxy via <code class="notranslate" translate="no">inputElement</code>
+instead of passing in the canvas like we do in other non-OffscreenCanvas
+examples.</p>
+<p>Next we can move all the picking event code from the HTML file
+to the shared three.js code as well while changing
+<code class="notranslate" translate="no">canvas</code> to <code class="notranslate" translate="no">inputElement</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+-  const rect = canvas.getBoundingClientRect();
++  const rect = inputElement.getBoundingClientRect();
+  return {
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  sendMouse(
+-      (pos.x / canvas.clientWidth ) *  2 - 1,
+-      (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
++  pickPosition.x = (pos.x / inputElement.clientWidth ) *  2 - 1;
++  pickPosition.y = (pos.y / inputElement.clientHeight) * -2 + 1;  // note we flip Y
+}
+
+function clearPickPosition() {
+  // unlike the mouse which always has a position
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+-  sendMouse(-100000, -100000);
++  pickPosition.x = -100000;
++  pickPosition.y = -100000;
+}
+
+*inputElement.addEventListener('mousemove', setPickPosition);
+*inputElement.addEventListener('mouseout', clearPickPosition);
+*inputElement.addEventListener('mouseleave', clearPickPosition);
+
+*inputElement.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+*inputElement.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+*inputElement.addEventListener('touchend', clearPickPosition);
+</pre>
+<p>Back in the main page we need code to send messages for
+all the events we enumerated above.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let nextProxyId = 0;
+class ElementProxy {
+  constructor(element, worker, eventHandlers) {
+    this.id = nextProxyId++;
+    this.worker = worker;
+    const sendEvent = (data) =&gt; {
+      this.worker.postMessage({
+        type: 'event',
+        id: this.id,
+        data,
+      });
+    };
+
+    // register an id
+    worker.postMessage({
+      type: 'makeProxy',
+      id: this.id,
+    });
+    for (const [eventName, handler] of Object.entries(eventHandlers)) {
+      element.addEventListener(eventName, function(event) {
+        handler(event, sendEvent);
+      });
+    }
+  }
+}
+</pre>
+<p><code class="notranslate" translate="no">ElementProxy</code> takes the element who's events we want to proxy. It
+then registers an id with the worker by picking one and sending it
+via the <code class="notranslate" translate="no">makeProxy</code> message we setup earlier. The worker will make
+an <code class="notranslate" translate="no">ElementProxyReceiver</code> and register it to that id.</p>
+<p>We then have an object of event handlers to register. This way
+we can pass handlers only for these events we want to forward to
+the worker.</p>
+<p>When we start the worker we first make a proxy and pass in our event handlers.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+  const offscreen = canvas.transferControlToOffscreen();
+  const worker = new Worker('offscreencanvas-worker-orbitcontrols.js', {type: 'module'});
+
++  const eventHandlers = {
++    contextmenu: preventDefaultHandler,
++    mousedown: mouseEventHandler,
++    mousemove: mouseEventHandler,
++    mouseup: mouseEventHandler,
++    pointerdown: mouseEventHandler,
++    pointermove: mouseEventHandler,
++    pointerup: mouseEventHandler,
++    touchstart: touchEventHandler,
++    touchmove: touchEventHandler,
++    touchend: touchEventHandler,
++    wheel: wheelEventHandler,
++    keydown: filteredKeydownEventHandler,
++  };
++  const proxy = new ElementProxy(canvas, worker, eventHandlers);
+  worker.postMessage({
+    type: 'start',
+    canvas: offscreen,
++    canvasId: proxy.id,
+  }, [offscreen]);
+  console.log('using OffscreenCanvas');  /* eslint-disable-line no-console */
+}
+</pre>
+<p>And here are the event handlers. All they do is copy a list of properties
+from the event they receive. They are passed a <code class="notranslate" translate="no">sendEvent</code> function to which they pass the data
+they make. That function will add the correct id and send it to the worker.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mouseEventHandler = makeSendPropertiesHandler([
+  'ctrlKey',
+  'metaKey',
+  'shiftKey',
+  'button',
+  'pointerType',
+  'clientX',
+  'clientY',
+  'pageX',
+  'pageY',
+]);
+const wheelEventHandlerImpl = makeSendPropertiesHandler([
+  'deltaX',
+  'deltaY',
+]);
+const keydownEventHandler = makeSendPropertiesHandler([
+  'ctrlKey',
+  'metaKey',
+  'shiftKey',
+  'keyCode',
+]);
+
+function wheelEventHandler(event, sendFn) {
+  event.preventDefault();
+  wheelEventHandlerImpl(event, sendFn);
+}
+
+function preventDefaultHandler(event) {
+  event.preventDefault();
+}
+
+function copyProperties(src, properties, dst) {
+  for (const name of properties) {
+      dst[name] = src[name];
+  }
+}
+
+function makeSendPropertiesHandler(properties) {
+  return function sendProperties(event, sendFn) {
+    const data = {type: event.type};
+    copyProperties(event, properties, data);
+    sendFn(data);
+  };
+}
+
+function touchEventHandler(event, sendFn) {
+  const touches = [];
+  const data = {type: event.type, touches};
+  for (let i = 0; i &lt; event.touches.length; ++i) {
+    const touch = event.touches[i];
+    touches.push({
+      pageX: touch.pageX,
+      pageY: touch.pageY,
+    });
+  }
+  sendFn(data);
+}
+
+// The four arrow keys
+const orbitKeys = {
+  '37': true,  // left
+  '38': true,  // up
+  '39': true,  // right
+  '40': true,  // down
+};
+function filteredKeydownEventHandler(event, sendFn) {
+  const {keyCode} = event;
+  if (orbitKeys[keyCode]) {
+    event.preventDefault();
+    keydownEventHandler(event, sendFn);
+  }
+}
+</pre>
+<p>This seems close to running but if we actually try it we'll see
+that the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> need a few more things.</p>
+<p>One is they call <code class="notranslate" translate="no">element.focus</code>. We don't need that to happen
+in the worker so let's just add a stub.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
+    this.dispatchEvent(data);
+  }
++  focus() {
++    // no-op
++  }
+}
+</pre>
+<p>Another is they call <code class="notranslate" translate="no">event.preventDefault</code> and <code class="notranslate" translate="no">event.stopPropagation</code>.
+We're already handling that in the main page so those can also be a noop.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function noop() {
++}
+
+class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
+  handleEvent(data) {
++    data.preventDefault = noop;
++    data.stopPropagation = noop;
+    this.dispatchEvent(data);
+  }
+  focus() {
+    // no-op
+  }
+}
+</pre>
+<p>Another is they look at <code class="notranslate" translate="no">clientWidth</code> and <code class="notranslate" translate="no">clientHeight</code>. We
+were passing the size before but we can update the proxy pair
+to pass that as well.</p>
+<p>In the worker...</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
+  constructor() {
+    super();
+  }
++  get clientWidth() {
++    return this.width;
++  }
++  get clientHeight() {
++    return this.height;
++  }
++  getBoundingClientRect() {
++    return {
++      left: this.left,
++      top: this.top,
++      width: this.width,
++      height: this.height,
++      right: this.left + this.width,
++      bottom: this.top + this.height,
++    };
++  }
+  handleEvent(data) {
++    if (data.type === 'size') {
++      this.left = data.left;
++      this.top = data.top;
++      this.width = data.width;
++      this.height = data.height;
++      return;
++    }
+    data.preventDefault = noop;
+    data.stopPropagation = noop;
+    this.dispatchEvent(data);
+  }
+  focus() {
+    // no-op
+  }
+}
+</pre>
+<p>back in the main page we need to send the size and the left and top positions as well.
+Note that as is we don't handle if the canvas moves, only if it resizes. If you wanted
+to handle moving you'd need to call <code class="notranslate" translate="no">sendSize</code> anytime something moved the canvas.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxy {
+  constructor(element, worker, eventHandlers) {
+    this.id = nextProxyId++;
+    this.worker = worker;
+    const sendEvent = (data) =&gt; {
+      this.worker.postMessage({
+        type: 'event',
+        id: this.id,
+        data,
+      });
+    };
+
+    // register an id
+    worker.postMessage({
+      type: 'makeProxy',
+      id: this.id,
+    });
++    sendSize();
+    for (const [eventName, handler] of Object.entries(eventHandlers)) {
+      element.addEventListener(eventName, function(event) {
+        handler(event, sendEvent);
+      });
+    }
+
++    function sendSize() {
++      const rect = element.getBoundingClientRect();
++      sendEvent({
++        type: 'size',
++        left: rect.left,
++        top: rect.top,
++        width: element.clientWidth,
++        height: element.clientHeight,
++      });
++    }
++
++    window.addEventListener('resize', sendSize);
+  }
+}
+</pre>
+<p>and in our shared three.js code we no longer need <code class="notranslate" translate="no">state</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-export const state = {
+-  width: 300,   // canvas default
+-  height: 150,  // canvas default
+-};
+
+...
+
+function resizeRendererToDisplaySize(renderer) {
+  const canvas = renderer.domElement;
+-  const width = state.width;
+-  const height = state.height;
++  const width = inputElement.clientWidth;
++  const height = inputElement.clientHeight;
+  const needResize = canvas.width !== width || canvas.height !== height;
+  if (needResize) {
+    renderer.setSize(width, height, false);
+  }
+  return needResize;
+}
+
+function render(time) {
+  time *= 0.001;
+
+  if (resizeRendererToDisplaySize(renderer)) {
+-    camera.aspect = state.width / state.height;
++    camera.aspect = inputElement.clientWidth / inputElement.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+
+  ...
+</pre>
+<p>A few more hacks. The OrbitControls add <code class="notranslate" translate="no">pointermove</code> and <code class="notranslate" translate="no">pointerup</code> events to the
+<code class="notranslate" translate="no">ownerDocument</code> of the element to handle mouse capture (when the mouse goes
+outside the window).</p>
+<p>Further the code references the global <code class="notranslate" translate="no">document</code> but there is no global document
+in a worker. </p>
+<p>We can solve all of these with a 2 quick hacks. In our worker
+code we'll re-use our proxy for both problems.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function start(data) {
+  const proxy = proxyManager.getProxy(data.canvasId);
++  proxy.ownerDocument = proxy; // HACK!
++  self.document = {} // HACK!
+  init({
+    canvas: data.canvas,
+    inputElement: proxy,
+  });
+}
+</pre>
+<p>This will give the <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> something to inspect which
+matches their expectations.</p>
+<p>I know that was kind of hard to follow. The short version is:
+<code class="notranslate" translate="no">ElementProxy</code> runs on the main page and forwards DOM events 
+to <code class="notranslate" translate="no">ElementProxyReceiver</code> in the worker which
+masquerades as an <code class="notranslate" translate="no">HTMLElement</code> that we can use both with the
+<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> and with our own code.</p>
+<p>The final thing is our fallback when we are not using OffscreenCanvas.
+All we have to do is pass the canvas itself as our <code class="notranslate" translate="no">inputElement</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+-  init({canvas});
++  init({canvas, inputElement: canvas});
+  console.log('using regular canvas');
+}
+</pre>
+<p>and now we should have OrbitControls working with OffscreenCanvas</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-orbitcontrols.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-orbitcontrols.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>This is probably the most complicated example on this site. It's a
+little hard to follow because there are 3 files involved for each
+sample. The HTML file, the worker file, the shared three.js code.</p>
+<p>I hope it wasn't too difficult to understand and that it provided some 
+useful examples of working with three.js, OffscreenCanvas and web workers.</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

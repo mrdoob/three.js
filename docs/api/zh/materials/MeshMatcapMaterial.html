@@ -84,18 +84,18 @@
 		<p> 定义材质是否使用平面着色进行渲染。默认值为false。
 		</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认为*true*。</p>
+
 		<h3>[property:Texture map]</h3>
-		<p>颜色贴图。默认为null。纹理贴图颜色由漫反射颜色[page:.color]调节。</p>
+		<p>
+			颜色贴图。可以选择包括一个alpha通道，通常与[page:Material.transparent .transparent]
+			或[page:Material.alphaTest .alphaTest]。默认为null。
+			纹理贴图颜色由漫反射颜色[page:.color]调节。
+		</p>
 
 		<h3>[property:Texture matcap]</h3>
 		<p>matcap贴图，默认为null。</p>
-
-		<h3>[property:Boolean morphNormals]</h3>
-		<p> 定义是否使用morphNormals。设置为true可将morphNormal属性从geometry传递到shader。默认值为*false*。
-		</p>
-
-		<h3>[property:Boolean morphTargets]</h3>
-		<p>定义材质是否使用morphTargets。默认值为false。</p>
 
 		<h3>[property:Texture normalMap]</h3>
 		<p> 用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
@@ -111,9 +111,6 @@
 		<h3>[property:Vector2 normalScale]</h3>
 		<p> 法线贴图对材质的影响程度。典型范围是0-1。默认值是[page:Vector2]设置为（1,1）。
 		</p>
-
-		<h3>[property:Boolean skinning]</h3>
-		<p>材质是否使用蒙皮。默认值为false。</p>
 
 		<h2>方法(Methods)</h2>
 		<p>共有方法请参见其基类[page:Material]。</p>

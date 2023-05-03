@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - glTF 2.0 - compressed</title>
+		<title>three.js webgl - GLTFloader + compressed</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -14,16 +14,29 @@
 			<a href="https://sketchfab.com/OFFcours1" target="_blank" rel="noopener">Roman Red</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import { KTX2Loader } from './jsm/loaders/KTX2Loader.js';
-			import { MeshoptDecoder } from './jsm/libs/meshopt_decoder.module.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 
 			let camera, scene, renderer;
 
@@ -40,7 +53,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -52,6 +64,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbbbbbb );
 				scene.environment = pmremGenerator.fromScene( environment ).texture;
+				environment.dispose();
 
 				const grid = new THREE.GridHelper( 500, 10, 0xffffff, 0xffffff );
 				grid.material.opacity = 0.5;
@@ -60,7 +73,7 @@
 				scene.add( grid );
 
 				const ktx2Loader = new KTX2Loader()
-					.setTranscoderPath( 'js/libs/basis/' )
+					.setTranscoderPath( 'jsm/libs/basis/' )
 					.detectSupport( renderer );
 
 				const loader = new GLTFLoader().setPath( 'models/gltf/' );
@@ -87,7 +100,7 @@
 				controls.target.set( 10, 90, - 16 );
 				controls.update();
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 

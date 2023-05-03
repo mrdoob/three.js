@@ -15,6 +15,17 @@
 		该类被用于提供一个拖放交互。
 		</p>
 
+		<h2>进口</h2>
+
+		<p>
+			[name] 是一个附加组件，必须显式导入。
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { DragControls } from 'three/addons/controls/DragControls.js';
+		</code>
+
 		<h2>代码示例</h2>
 
 		<code>
@@ -101,17 +112,17 @@
 
 		<p>共有方法请参见其基类[page:EventDispatcher]。</p>
 
-		<h3>[method:null activate] ()</h3>
+		<h3>[method:undefined activate] ()</h3>
 		<p>
 			添加控制器的事件监听。
 		</p>
 
-		<h3>[method:null deactivate] ()</h3>
+		<h3>[method:undefined deactivate] ()</h3>
 		<p>
 			移除控制器的事件监听。
 		</p>
 
-		<h3>[method:null dispose] ()</h3>
+		<h3>[method:undefined dispose] ()</h3>
 		<p>
 			若不再需要该控制器，则应当调用此函数。
 		</p>
@@ -119,6 +130,11 @@
 		<h3>[method:Array getObjects] ()</h3>
 		<p>
 			Returns the array of draggable objects.
+		</p>
+
+		<h3>[method:Raycaster getRaycaster] ()</h3>
+		<p>
+			Returns the internal [page:Raycaster] instance that is used for intersection tests.
 		</p>
 
 		<h2>Source</h2>

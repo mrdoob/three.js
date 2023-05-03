@@ -12,9 +12,20 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		The implementation of this class is based on the [link:https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API Pointer Lock API].
-		[name] is a perfect choice for first person 3D games.
+			The implementation of this class is based on the [link:https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API Pointer Lock API].
+			[name] is a perfect choice for first person 3D games.
 		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+		</code>
 
 		<h2>Code Example</h2>
 
@@ -43,7 +54,7 @@
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
-		<p>
+		
 			<p>
 			[page:Camera camera]: The camera of the rendered scene.
 			</p>
@@ -53,7 +64,7 @@
 			<p>
 				Creates a new instance of [name].
 			</p>
-		</p>
+		
 
 		<h2>Events</h2>
 
@@ -96,16 +107,21 @@
 			Camera pitch, lower limit. Range is 0 to Math.PI radians. Default is 0.
 		</p>
 
+		<h3>[property:Float pointerSpeed]</h3>
+		<p>
+			Multiplier for how much the pointer movement influences the camera rotation. Default is 1.
+		</p>
+
 		<h2>Methods</h2>
 
 		<p>See the base [page:EventDispatcher] class for common methods.</p>
 
-		<h3>[method:null connect] ()</h3>
+		<h3>[method:undefined connect] ()</h3>
 		<p>
 			Adds the event listeners of the controls.
 		</p>
 
-		<h3>[method:null disconnect] ()</h3>
+		<h3>[method:undefined disconnect] ()</h3>
 		<p>
 			Removes the event listeners of the controls.
 		</p>
@@ -120,12 +136,12 @@
 			</p>
 		</p>
 
-		<h3>[method:null lock] ()</h3>
+		<h3>[method:undefined lock] ()</h3>
 		<p>
 			Activates the pointer lock.
 		</p>
 
-		<h3>[method:null moveForward] ( [param:Number distance] )</h3>
+		<h3>[method:undefined moveForward] ( [param:Number distance] )</h3>
 		<p>
 			<p>
 				[page:Number distance]: The signed distance.
@@ -135,7 +151,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null moveRight] ( [param:Number distance] )</h3>
+		<h3>[method:undefined moveRight] ( [param:Number distance] )</h3>
 		<p>
 			<p>
 				[page:Number distance]: The signed distance.
@@ -145,7 +161,7 @@
 			</p>
 		</p>
 
-		<h3>[method:null unlock] ()</h3>
+		<h3>[method:undefined unlock] ()</h3>
 		<p>
 			Exits the pointer lock.
 		</p>

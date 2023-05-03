@@ -72,6 +72,11 @@
 		[page:.near near](근평면)의 현재 값보다 항상 더 커야합니다.
 		</p>
 
+		<h3>[property:Boolean isOrthographicCamera]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Float left]</h3>
 		<p>카메라 절두체 좌평면.</p>
 
@@ -98,7 +103,7 @@
 		<h2>메서드</h2>
 		<p>일반적인 메서드는 기본 [page:Camera] 클래스를 참고하세요.</p>
 
-		<h3>[method:null setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
+		<h3>[method:undefined setViewOffset]( [param:Float fullWidth], [param:Float fullHeight], [param:Float x], [param:Float y], [param:Float width], [param:Float height] )</h3>
 		<p>
 		fullWidth — 멀티뷰 설정 최대 너비<br />
 		fullHeight — 멀티뷰 설정 최대 높이<br />
@@ -112,12 +117,12 @@
 			사용 예제는 [page:PerspectiveCamera.setViewOffset PerspectiveCamera]를 참고하세요.
 		</p>
 
-		<h3>[method:null clearViewOffset]()</h3>
+		<h3>[method:undefined clearViewOffset]()</h3>
 		<p>
 		.setViewOffset 메서드로 설정된 오프셋을 모두 제거합니다.
 		</p>
 
-		<h3>[method:null updateProjectionMatrix]()</h3>
+		<h3>[method:undefined updateProjectionMatrix]()</h3>
 		<p>
 		카메라 투영 매트릭스를 업데이트합니다. 파라미터 변경 후에 반드시 호출해야 합니다.
 		</p>

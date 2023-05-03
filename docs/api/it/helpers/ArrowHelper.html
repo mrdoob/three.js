@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Un oggetto freccia 3D per visualizzare le direzioni.</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const dir = new THREE.Vector3( 1, 2, 0 );
+
+		// normalizza il vettore direzione (converte il vettore di lunghezza 1)
+		dir.normalize();
+
+		const origin = new THREE.Vector3( 0, 0, 0 );
+		const length = 1;
+		const hex = 0xffff00;
+
+		const arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+		scene.add( arrowHelper );
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_shadowmesh WebGL / shadowmesh]
+		</p>
+
+		<h2>Costruttore</h2>
+
+		<h3>[name]([param:Vector3 dir], [param:Vector3 origin], [param:Number length], [param:Number hex], [param:Number headLength], [param:Number headWidth] )</h3>
+		<p>
+		[page:Vector3 dir] -- Direzione dall'origine. Deve essere un vettore unitario. <br />
+		[page:Vector3 origin] -- Punto in cui inizia la freccia.<br />
+		[page:Number length] -- Lunghezza della freccia. Il valore predefinito è `1`.<br />
+		[page:Number hex] -- Valore esadecimale per definire il colore. Il valore predefinito è 0xffff00.<br />
+		[page:Number headLength] -- Lunghezza della punta della freccia. Il valore predefinito è 0.2 * length.<br />
+		[page:Number headWidth] -- Larghezza della punta della fraccia. Il valore predefinito è 0.2 * headLength.<br />
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:Object3D] per le proprietà in comune.</p>
+
+		<h3>[property:Line line]</h3>
+		<p>Contiene la parte della linea di arrowHelper.</p>
+
+		<h3>[property:Mesh cone]</h3>
+		<p>Contiene la prte conica dell'arrowHelper.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:Object3D] per i metodi comuni.</p>
+
+		<h3>[method:undefined setColor]([param:Color color])</h3>
+		<p>
+		  color -- Il colore desiderato.<br /><br />
+
+		  Imposta il colore dell'arrowHelper.
+		</p>
+
+		<h3>[method:undefined setLength]([param:Number length], [param:Number headLength], [param:Number headWidth])</h3>
+		<p>
+		  length -- La lunghezza desiderata.<br />
+		  headLength -- La lunghezza della punta della freccia.<br />
+		  headWidth -- La larghezza della punta della freccia.<br /><br />
+
+      Imposta la lunghezza dell'arrowHelper
+		</p>
+
+		<h3>[method:undefined setDirection]([param:Vector3 dir])</h3>
+		<p>
+		  dir -- La direzione desiderata. Deve essere un vettore unitario.<br /><br />
+
+		  Imposta la direzione dell'arrowHelper.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

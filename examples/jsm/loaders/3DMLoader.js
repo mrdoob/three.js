@@ -15,61 +15,61 @@ import {
 	PointLight,
 	SpotLight,
 	RectAreaLight,
-	Vector3,
 	Sprite,
 	SpriteMaterial,
 	CanvasTexture,
 	LinearFilter,
 	ClampToEdgeWrapping,
-	TextureLoader
-} from '../../../build/three.module.js';
+	RepeatWrapping,
+	TextureLoader,
+	DoubleSide
+} from 'three';
 
-var Rhino3dmLoader = function ( manager ) {
+const _taskCache = new WeakMap();
 
-	Loader.call( this, manager );
+class Rhino3dmLoader extends Loader {
 
-	this.libraryPath = '';
-	this.libraryPending = null;
-	this.libraryBinary = null;
-	this.libraryConfig = {};
+	constructor( manager ) {
 
-	this.url = '';
+		super( manager );
 
-	this.workerLimit = 4;
-	this.workerPool = [];
-	this.workerNextTaskID = 1;
-	this.workerSourceURL = '';
-	this.workerConfig = {};
+		this.libraryPath = '';
+		this.libraryPending = null;
+		this.libraryBinary = null;
+		this.libraryConfig = {};
 
-	this.materials = [];
+		this.url = '';
 
-};
+		this.workerLimit = 4;
+		this.workerPool = [];
+		this.workerNextTaskID = 1;
+		this.workerSourceURL = '';
+		this.workerConfig = {};
 
-Rhino3dmLoader.taskCache = new WeakMap();
+		this.materials = [];
+		this.warnings = [];
 
-Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: Rhino3dmLoader,
-
-	setLibraryPath: function ( path ) {
+	setLibraryPath( path ) {
 
 		this.libraryPath = path;
 
 		return this;
 
-	},
+	}
 
-	setWorkerLimit: function ( workerLimit ) {
+	setWorkerLimit( workerLimit ) {
 
 		this.workerLimit = workerLimit;
 
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
@@ -81,41 +81,45 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
 			// again from this thread.
-			if ( Rhino3dmLoader.taskCache.has( buffer ) ) {
+			if ( _taskCache.has( buffer ) ) {
 
-				var cachedTask = Rhino3dmLoader.taskCache.get( buffer );
+				const cachedTask = _taskCache.get( buffer );
 
 				return cachedTask.promise.then( onLoad ).catch( onError );
 
 			}
 
 			this.decodeObjects( buffer, url )
-				.then( onLoad )
-				.catch( onError );
+				.then( result => {
+
+					result.userData.warnings = this.warnings;
+					onLoad( result );
+
+				 } )
+				.catch( e => onError( e ) );
 
 		}, onProgress, onError );
 
+	}
 
-	},
-
-	debug: function () {
+	debug() {
 
 		console.log( 'Task load: ', this.workerPool.map( ( worker ) => worker._taskLoad ) );
 
-	},
+	}
 
-	decodeObjects: function ( buffer, url ) {
+	decodeObjects( buffer, url ) {
 
-		var worker;
-		var taskID;
+		let worker;
+		let taskID;
 
-		var taskCost = buffer.byteLength;
+		const taskCost = buffer.byteLength;
 
-		var objectPending = this._getWorker( taskCost )
+		const objectPending = this._getWorker( taskCost )
 			.then( ( _worker ) => {
 
 				worker = _worker;
-				taskID = this.workerNextTaskID ++; //hmmm
+				taskID = this.workerNextTaskID ++;
 
 				return new Promise( ( resolve, reject ) => {
 
@@ -123,12 +127,17 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					worker.postMessage( { type: 'decode', id: taskID, buffer }, [ buffer ] );
 
-					//this.debug();
+					// this.debug();
 
 				} );
 
 			} )
-			.then( ( message ) => this._createGeometry( message.data ) );
+			.then( ( message ) => this._createGeometry( message.data ) )
+			.catch( e => {
+
+				throw e;
+
+			} );
 
 		// Remove task from the task list.
 		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
@@ -147,7 +156,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			} );
 
 		// Cache the task result.
-		Rhino3dmLoader.taskCache.set( buffer, {
+		_taskCache.set( buffer, {
 
 			url: url,
 			promise: objectPending
@@ -156,19 +165,24 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return objectPending;
 
-	},
+	}
 
-	parse: function ( data, onLoad, onError ) {
+	parse( data, onLoad, onError ) {
 
 		this.decodeObjects( data, '' )
-			.then( onLoad )
-			.catch( onError );
+			.then( result => {
 
-	},
+				result.userData.warnings = this.warnings;
+				onLoad( result );
 
-	_compareMaterials: function ( material ) {
+			} )
+			.catch( e => onError( e ) );
 
-		var mat = {};
+	}
+
+	_compareMaterials( material ) {
+
+		const mat = {};
 		mat.name = material.name;
 		mat.color = {};
 		mat.color.r = material.color.r;
@@ -176,10 +190,12 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		mat.color.b = material.color.b;
 		mat.type = material.type;
 
-		for ( var i = 0; i < this.materials.length; i ++ ) {
+		const json = JSON.stringify( mat );
 
-			var m = this.materials[ i ];
-			var _mat = {};
+		for ( let i = 0; i < this.materials.length; i ++ ) {
+
+			const m = this.materials[ i ];
+			const _mat = {};
 			_mat.name = m.name;
 			_mat.color = {};
 			_mat.color.r = m.color.r;
@@ -187,7 +203,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			_mat.color.b = m.color.b;
 			_mat.type = m.type;
 
-			if ( JSON.stringify( mat ) === JSON.stringify( _mat ) ) {
+			if ( JSON.stringify( _mat ) === json ) {
 
 				return m;
 
@@ -199,9 +215,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return material;
 
-	},
+	}
 
-	_createMaterial: function ( material ) {
+	_createMaterial( material ) {
 
 		if ( material === undefined ) {
 
@@ -209,14 +225,14 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				color: new Color( 1, 1, 1 ),
 				metalness: 0.8,
 				name: 'default',
-				side: 2
+				side: DoubleSide
 			} );
 
 		}
 
-		var _diffuseColor = material.diffuseColor;
+		const _diffuseColor = material.diffuseColor;
 
-		var diffusecolor = new Color( _diffuseColor.r / 255.0, _diffuseColor.g / 255.0, _diffuseColor.b / 255.0 );
+		const diffusecolor = new Color( _diffuseColor.r / 255.0, _diffuseColor.g / 255.0, _diffuseColor.b / 255.0 );
 
 		if ( _diffuseColor.r === 0 && _diffuseColor.g === 0 && _diffuseColor.b === 0 ) {
 
@@ -228,23 +244,23 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		// console.log( material );
 
-		var mat = new MeshStandardMaterial( {
+		const mat = new MeshStandardMaterial( {
 			color: diffusecolor,
 			name: material.name,
-			side: 2,
+			side: DoubleSide,
 			transparent: material.transparency > 0 ? true : false,
 			opacity: 1.0 - material.transparency
 		} );
 
-		var textureLoader = new TextureLoader();
+		const textureLoader = new TextureLoader();
 
-		for ( var i = 0; i < material.textures.length; i ++ ) {
+		for ( let i = 0; i < material.textures.length; i ++ ) {
 
-			var texture = material.textures[ i ];
+			const texture = material.textures[ i ];
 
 			if ( texture.image !== null ) {
 
-				var map = textureLoader.load( texture.image );
+				const map = textureLoader.load( texture.image );
 
 				switch ( texture.type ) {
 
@@ -275,22 +291,26 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
+				map.wrapS = texture.wrapU === 0 ? RepeatWrapping : ClampToEdgeWrapping;
+				map.wrapT = texture.wrapV === 0 ? RepeatWrapping : ClampToEdgeWrapping;
+				map.repeat.set( texture.repeat[ 0 ], texture.repeat[ 1 ] );
+
 			}
 
 		}
 
 		return mat;
 
-	},
+	}
 
-	_createGeometry: function ( data ) {
+	_createGeometry( data ) {
 
 		// console.log(data);
 
-		var object = new Object3D();
-		var instanceDefinitionObjects = [];
-		var instanceDefinitions = [];
-		var instanceReferences = [];
+		const object = new Object3D();
+		const instanceDefinitionObjects = [];
+		const instanceDefinitions = [];
+		const instanceReferences = [];
 
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
@@ -299,13 +319,13 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		object.userData[ 'materials' ] = null;
 		object.name = this.url;
 
-		var objects = data.objects;
-		var materials = data.materials;
+		let objects = data.objects;
+		const materials = data.materials;
 
-		for ( var i = 0; i < objects.length; i ++ ) {
+		for ( let i = 0; i < objects.length; i ++ ) {
 
-			var obj = objects[ i ];
-			var attributes = obj.attributes;
+			const obj = objects[ i ];
+			const attributes = obj.attributes;
 
 			switch ( obj.objectType ) {
 
@@ -323,17 +343,19 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				default:
 
+					let _object;
+
 					if ( attributes.materialIndex >= 0 ) {
 
-						var rMaterial = materials[ attributes.materialIndex ];
-						var material = this._createMaterial( rMaterial );
+						const rMaterial = materials[ attributes.materialIndex ];
+						let material = this._createMaterial( rMaterial );
 						material = this._compareMaterials( material );
-						var _object = this._createObject( obj, material );
+						_object = this._createObject( obj, material );
 
 					} else {
 
-						var material = this._createMaterial( );
-						var _object = this._createObject( obj, material );
+						const material = this._createMaterial();
+						_object = this._createObject( obj, material );
 
 					}
 
@@ -343,7 +365,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					}
 
-					var layer = data.layers[ attributes.layerIndex ];
+					const layer = data.layers[ attributes.layerIndex ];
 
 					_object.visible = layer ? data.layers[ attributes.layerIndex ].visible : true;
 
@@ -363,19 +385,19 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		for ( var i = 0; i < instanceDefinitions.length; i ++ ) {
+		for ( let i = 0; i < instanceDefinitions.length; i ++ ) {
 
-			var iDef = instanceDefinitions[ i ];
+			const iDef = instanceDefinitions[ i ];
 
-			var objects = [];
+			objects = [];
 
-			for ( var j = 0; j < iDef.attributes.objectIds.length; j ++ ) {
+			for ( let j = 0; j < iDef.attributes.objectIds.length; j ++ ) {
 
-				var objId = iDef.attributes.objectIds[ j ];
+				const objId = iDef.attributes.objectIds[ j ];
 
-				for ( var p = 0; p < instanceDefinitionObjects.length; p ++ ) {
+				for ( let p = 0; p < instanceDefinitionObjects.length; p ++ ) {
 
-					var idoId = instanceDefinitionObjects[ p ].userData.attributes.id;
+					const idoId = instanceDefinitionObjects[ p ].userData.attributes.id;
 
 					if ( objId === idoId ) {
 
@@ -389,21 +411,21 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// Currently clones geometry and does not take advantage of instancing
 
-			for ( var j = 0; j < instanceReferences.length; j ++ ) {
+			for ( let j = 0; j < instanceReferences.length; j ++ ) {
 
-				var iRef = instanceReferences[ j ];
+				const iRef = instanceReferences[ j ];
 
 				if ( iRef.geometry.parentIdefId === iDef.attributes.id ) {
 
-					var iRefObject = new Object3D();
-					var xf = iRef.geometry.xform.array;
+					const iRefObject = new Object3D();
+					const xf = iRef.geometry.xform.array;
 
-					var matrix = new Matrix4();
-          			matrix.set( xf[ 0 ], xf[ 1 ], xf[ 2 ], xf[ 3 ], xf[ 4 ], xf[ 5 ], xf[ 6 ], xf[ 7 ], xf[ 8 ], xf[ 9 ], xf[ 10 ], xf[ 11 ], xf[ 12 ], xf[ 13 ], xf[ 14 ], xf[ 15 ] );
+					const matrix = new Matrix4();
+					matrix.set( ...xf );
 
 					iRefObject.applyMatrix4( matrix );
 
-					for ( var p = 0; p < objects.length; p ++ ) {
+					for ( let p = 0; p < objects.length; p ++ ) {
 
 						iRefObject.add( objects[ p ].clone( true ) );
 
@@ -420,37 +442,38 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		object.userData[ 'materials' ] = this.materials;
 		return object;
 
-	},
+	}
 
-	_createObject: function ( obj, mat ) {
+	_createObject( obj, mat ) {
 
-		var loader = new BufferGeometryLoader();
+		const loader = new BufferGeometryLoader();
 
-		var attributes = obj.attributes;
+		const attributes = obj.attributes;
+
+		let geometry, material, _color, color;
 
 		switch ( obj.objectType ) {
 
 			case 'Point':
 			case 'PointSet':
 
-				var geometry = loader.parse( obj.geometry );
+				geometry = loader.parse( obj.geometry );
 
-				var material = null;
 				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
 
 					material = new PointsMaterial( { vertexColors: true, sizeAttenuation: false, size: 2 } );
 
 				} else {
 
-					var _color = attributes.drawColor;
-					var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+					_color = attributes.drawColor;
+					color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
 					material = new PointsMaterial( { color: color, sizeAttenuation: false, size: 2 } );
 
 				}
 
 				material = this._compareMaterials( material );
 
-				var points = new Points( geometry, material );
+				const points = new Points( geometry, material );
 				points.userData[ 'attributes' ] = attributes;
 				points.userData[ 'objectType' ] = obj.objectType;
 
@@ -469,7 +492,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( obj.geometry === null ) return;
 
-				var geometry = loader.parse( obj.geometry );
+				geometry = loader.parse( obj.geometry );
 
 				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
 
@@ -484,7 +507,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
-				var mesh = new Mesh( geometry, mat );
+				const mesh = new Mesh( geometry, mat );
 				mesh.castShadow = attributes.castsShadows;
 				mesh.receiveShadow = attributes.receivesShadows;
 				mesh.userData[ 'attributes' ] = attributes;
@@ -502,13 +525,13 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				geometry = loader.parse( obj.geometry );
 
-				var _color = attributes.drawColor;
-				var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+				_color = attributes.drawColor;
+				color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
 
-				var material = new LineBasicMaterial( { color: color } );
+				material = new LineBasicMaterial( { color: color } );
 				material = this._compareMaterials( material );
 
-				var lines = new Line( geometry, material );
+				const lines = new Line( geometry, material );
 				lines.userData[ 'attributes' ] = attributes;
 				lines.userData[ 'objectType' ] = obj.objectType;
 
@@ -524,13 +547,13 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				geometry = obj.geometry;
 
-				var ctx = document.createElement( 'canvas' ).getContext( '2d' );
-				var font = `${geometry.fontHeight}px ${geometry.fontFace}`;
+				const ctx = document.createElement( 'canvas' ).getContext( '2d' );
+				const font = `${geometry.fontHeight}px ${geometry.fontFace}`;
 				ctx.font = font;
-				var width = ctx.measureText( geometry.text ).width + 10;
-				var height = geometry.fontHeight + 10;
+				const width = ctx.measureText( geometry.text ).width + 10;
+				const height = geometry.fontHeight + 10;
 
-				var r = window.devicePixelRatio;
+				const r = window.devicePixelRatio;
 
 				ctx.canvas.width = width * r;
 				ctx.canvas.height = height * r;
@@ -541,19 +564,19 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				ctx.font = font;
 				ctx.textBaseline = 'middle';
 				ctx.textAlign = 'center';
-				var color = attributes.drawColor;
+				color = attributes.drawColor;
 				ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
 				ctx.fillRect( 0, 0, width, height );
 				ctx.fillStyle = 'white';
 				ctx.fillText( geometry.text, width / 2, height / 2 );
 
-				var texture = new CanvasTexture( ctx.canvas );
+				const texture = new CanvasTexture( ctx.canvas );
 				texture.minFilter = LinearFilter;
 				texture.wrapS = ClampToEdgeWrapping;
 				texture.wrapT = ClampToEdgeWrapping;
 
-				var material = new SpriteMaterial( { map: texture, depthTest: false } );
-				var sprite = new Sprite( material );
+				material = new SpriteMaterial( { map: texture, depthTest: false } );
+				const sprite = new Sprite( material );
 				sprite.position.set( geometry.point[ 0 ], geometry.point[ 1 ], geometry.point[ 2 ] );
 				sprite.scale.set( width / 10, height / 10, 1.0 );
 
@@ -572,59 +595,66 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				geometry = obj.geometry;
 
-				var light;
+				let light;
 
-				if ( geometry.isDirectionalLight ) {
+				switch ( geometry.lightStyle.name ) {
 
-					light = new DirectionalLight();
-					light.castShadow = attributes.castsShadows;
-					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
-					light.shadow.normalBias = 0.1;
+					case 'LightStyle_WorldPoint':
 
-				} else if ( geometry.isPointLight ) {
+						light = new PointLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.shadow.normalBias = 0.1;
 
-					light = new PointLight();
-					light.castShadow = attributes.castsShadows;
-					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-					light.shadow.normalBias = 0.1;
+						break;
 
-				} else if ( geometry.isRectangularLight ) {
+					case 'LightStyle_WorldSpot':
 
-					light = new RectAreaLight();
+						light = new SpotLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+						light.angle = geometry.spotAngleRadians;
+						light.shadow.normalBias = 0.1;
 
-					var width = Math.abs( geometry.width[ 2 ] );
-					var height = Math.abs( geometry.length[ 0 ] );
+						break;
 
-					light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
+					case 'LightStyle_WorldRectangular':
 
-					light.height = height;
-					light.width = width;
+						light = new RectAreaLight();
+						const width = Math.abs( geometry.width[ 2 ] );
+						const height = Math.abs( geometry.length[ 0 ] );
+						light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
+						light.height = height;
+						light.width = width;
+						light.lookAt( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
 
-					light.lookAt( new Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+						break;
 
-				} else if ( geometry.isSpotLight ) {
+					case 'LightStyle_WorldDirectional':
 
-					light = new SpotLight();
-					light.castShadow = attributes.castsShadows;
-					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
-					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
-					light.angle = geometry.spotAngleRadians;
-					light.shadow.normalBias = 0.1;
+						light = new DirectionalLight();
+						light.castShadow = attributes.castsShadows;
+						light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+						light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+						light.shadow.normalBias = 0.1;
 
-				} else if ( geometry.isLinearLight ) {
+						break;
 
-					console.warn( 'THREE.3DMLoader:  No conversion exists for linear lights.' );
+					case 'LightStyle_WorldLinear':
+						// not conversion exists, warning has already been printed to the console
+						break;
 
-					return;
+					default:
+						break;
 
 				}
 
 				if ( light ) {
 
 					light.intensity = geometry.intensity;
-					var _color = geometry.diffuse;
-					var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+					_color = geometry.diffuse;
+					color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
 					light.color = color;
 					light.userData[ 'attributes' ] = attributes;
 					light.userData[ 'objectType' ] = obj.objectType;
@@ -635,26 +665,26 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-	},
+	}
 
-	_initLibrary: function () {
+	_initLibrary() {
 
 		if ( ! this.libraryPending ) {
 
 			// Load rhino3dm wrapper.
-			var jsLoader = new FileLoader( this.manager );
+			const jsLoader = new FileLoader( this.manager );
 			jsLoader.setPath( this.libraryPath );
-			var jsContent = new Promise( ( resolve, reject ) => {
+			const jsContent = new Promise( ( resolve, reject ) => {
 
 				jsLoader.load( 'rhino3dm.js', resolve, undefined, reject );
 
 			} );
 
 			// Load rhino3dm WASM binary.
-			var binaryLoader = new FileLoader( this.manager );
+			const binaryLoader = new FileLoader( this.manager );
 			binaryLoader.setPath( this.libraryPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
-			var binaryContent = new Promise( ( resolve, reject ) => {
+			const binaryContent = new Promise( ( resolve, reject ) => {
 
 				binaryLoader.load( 'rhino3dm.wasm', resolve, undefined, reject );
 
@@ -666,9 +696,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					//this.libraryBinary = binaryContent;
 					this.libraryConfig.wasmBinary = binaryContent;
 
-					var fn = Rhino3dmLoader.Rhino3dmWorker.toString();
+					const fn = Rhino3dmWorker.toString();
 
-					var body = [
+					const body = [
 						'/* rhino3dm.js */',
 						jsContent,
 						'/* worker */',
@@ -683,15 +713,15 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return this.libraryPending;
 
-	},
+	}
 
-	_getWorker: function ( taskCost ) {
+	_getWorker( taskCost ) {
 
 		return this._initLibrary().then( () => {
 
 			if ( this.workerPool.length < this.workerLimit ) {
 
-				var worker = new Worker( this.workerSourceURL );
+				const worker = new Worker( this.workerSourceURL );
 
 				worker._callbacks = {};
 				worker._taskCosts = {};
@@ -702,11 +732,16 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					libraryConfig: this.libraryConfig
 				} );
 
-				worker.onmessage = function ( e ) {
+				worker.onmessage = e => {
 
-					var message = e.data;
+					const message = e.data;
 
 					switch ( message.type ) {
+
+						case 'warning':
+							this.warnings.push( message.data );
+							console.warn( message.data );
+							break;
 
 						case 'decode':
 							worker._callbacks[ message.id ].resolve( message );
@@ -735,7 +770,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			var worker = this.workerPool[ this.workerPool.length - 1 ];
+			const worker = this.workerPool[ this.workerPool.length - 1 ];
 
 			worker._taskLoad += taskCost;
 
@@ -743,19 +778,19 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		} );
 
-	},
+	}
 
-	_releaseTask: function ( worker, taskID ) {
+	_releaseTask( worker, taskID ) {
 
 		worker._taskLoad -= worker._taskCosts[ taskID ];
 		delete worker._callbacks[ taskID ];
 		delete worker._taskCosts[ taskID ];
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
-		for ( var i = 0; i < this.workerPool.length; ++ i ) {
+		for ( let i = 0; i < this.workerPool.length; ++ i ) {
 
 			this.workerPool[ i ].terminate();
 
@@ -767,27 +802,29 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	}
 
-} );
+}
 
 /* WEB WORKER */
 
-Rhino3dmLoader.Rhino3dmWorker = function () {
+function Rhino3dmWorker() {
 
-	var libraryPending;
-	var libraryConfig;
-	var rhino;
+	let libraryPending;
+	let libraryConfig;
+	let rhino;
+	let taskID;
 
 	onmessage = function ( e ) {
 
-		var message = e.data;
+		const message = e.data;
 
 		switch ( message.type ) {
 
 			case 'init':
 
+				// console.log(message)
 				libraryConfig = message.libraryConfig;
-				var wasmBinary = libraryConfig.wasmBinary;
-				var RhinoModule;
+				const wasmBinary = libraryConfig.wasmBinary;
+				let RhinoModule;
 				libraryPending = new Promise( function ( resolve ) {
 
 					/* Like Basis Loader */
@@ -805,12 +842,20 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			case 'decode':
 
-				var buffer = message.buffer;
+				taskID = message.id;
+				const buffer = message.buffer;
 				libraryPending.then( () => {
 
-					var data = decodeObjects( rhino, buffer );
+					try {
 
-					self.postMessage( { type: 'decode', id: message.id, data } );
+						const data = decodeObjects( rhino, buffer );
+						self.postMessage( { type: 'decode', id: message.id, data } );
+
+					} catch ( error ) {
+
+						self.postMessage( { type: 'error', id: message.id, error } );
+
+					}
 
 				} );
 
@@ -822,26 +867,27 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 	function decodeObjects( rhino, buffer ) {
 
-		var arr = new Uint8Array( buffer );
-		var doc = rhino.File3dm.fromByteArray( arr );
+		const arr = new Uint8Array( buffer );
+		const doc = rhino.File3dm.fromByteArray( arr );
 
-		var objects = [];
-		var materials = [];
-		var layers = [];
-		var views = [];
-		var namedViews = [];
-		var groups = [];
+		const objects = [];
+		const materials = [];
+		const layers = [];
+		const views = [];
+		const namedViews = [];
+		const groups = [];
+		const strings = [];
 
 		//Handle objects
 
-		var objs = doc.objects();
-		var cnt = objs.count;
+		const objs = doc.objects();
+		const cnt = objs.count;
 
-		for ( var i = 0; i < cnt; i ++ ) {
+		for ( let i = 0; i < cnt; i ++ ) {
 
-			var _object = objs.get( i );
+			const _object = objs.get( i );
 
-			var object = extractObjectData( _object, doc );
+			const object = extractObjectData( _object, doc );
 
 			_object.delete();
 
@@ -856,10 +902,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		// Handle instance definitions
 		// console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
-		for ( var i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
+		for ( let i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
 
-			var idef = doc.instanceDefinitions().get( i );
-			var idefAttributes = extractProperties( idef );
+			const idef = doc.instanceDefinitions().get( i );
+			const idefAttributes = extractProperties( idef );
 			idefAttributes.objectIds = idef.getObjectIds();
 
 			objects.push( { geometry: null, attributes: idefAttributes, objectType: 'InstanceDefinition' } );
@@ -868,7 +914,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle materials
 
-		var textureTypes = [
+		const textureTypes = [
 			// rhino.TextureType.Bitmap,
 			rhino.TextureType.Diffuse,
 			rhino.TextureType.Bump,
@@ -877,7 +923,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			rhino.TextureType.Emap
 		];
 
-		var pbrTextureTypes = [
+		const pbrTextureTypes = [
 			rhino.TextureType.PBR_BaseColor,
 			rhino.TextureType.PBR_Subsurface,
 			rhino.TextureType.PBR_SubsurfaceScattering,
@@ -900,25 +946,31 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			rhino.TextureType.PBR_Displacement
 		];
 
-		for ( var i = 0; i < doc.materials().count(); i ++ ) {
+		for ( let i = 0; i < doc.materials().count(); i ++ ) {
 
-			var _material = doc.materials().get( i );
-			var _pbrMaterial = _material.physicallyBased();
+			const _material = doc.materials().get( i );
+			const _pbrMaterial = _material.physicallyBased();
 
-			var material = extractProperties( _material );
+			let material = extractProperties( _material );
 
-			var textures = [];
+			const textures = [];
 
-			for ( var j = 0; j < textureTypes.length; j ++ ) {
+			for ( let j = 0; j < textureTypes.length; j ++ ) {
 
-				var _texture = _material.getTexture( textureTypes[ j ] );
+				const _texture = _material.getTexture( textureTypes[ j ] );
 				if ( _texture ) {
 
-					var textureType = textureTypes[ j ].constructor.name;
+					let textureType = textureTypes[ j ].constructor.name;
 					textureType = textureType.substring( 12, textureType.length );
-					var texture = { type: textureType };
+					const texture = { type: textureType };
 
-					var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+					const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+
+					texture.wrapU = _texture.wrapU;
+					texture.wrapV = _texture.wrapV;
+					texture.wrapW = _texture.wrapW;
+					const uvw = _texture.uvwTransform.toFloatArray( true );
+					texture.repeat = [ uvw[ 0 ], uvw[ 5 ] ];
 
 					if ( image ) {
 
@@ -926,7 +978,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 					} else {
 
-						console.warn( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
+						self.postMessage( { type: 'warning', id: taskID, data: {
+							message: `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.`,
+							type: 'missing resource'
+						}
+
+						} );
+
 						texture.image = null;
 
 					}
@@ -943,17 +1001,15 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			if ( _pbrMaterial.supported ) {
 
-				console.log( 'pbr true' );
+				for ( let j = 0; j < pbrTextureTypes.length; j ++ ) {
 
-				for ( var j = 0; j < pbrTextureTypes.length; j ++ ) {
-
-					var _texture = _material.getTexture( textureTypes[ j ] );
+					const _texture = _material.getTexture( pbrTextureTypes[ j ] );
 					if ( _texture ) {
 
-						var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
-						var textureType = textureTypes[ j ].constructor.name;
+						const image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+						let textureType = pbrTextureTypes[ j ].constructor.name;
 						textureType = textureType.substring( 12, textureType.length );
-						var texture = { type: textureType, image: 'data:image/png;base64,' + image };
+						const texture = { type: textureType, image: 'data:image/png;base64,' + image };
 						textures.push( texture );
 
 						_texture.delete();
@@ -962,7 +1018,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				}
 
-				var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+				const pbMaterialProperties = extractProperties( _material.physicallyBased() );
 
 				material = Object.assign( pbMaterialProperties, material );
 
@@ -977,10 +1033,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle layers
 
-		for ( var i = 0; i < doc.layers().count(); i ++ ) {
+		for ( let i = 0; i < doc.layers().count(); i ++ ) {
 
-			var _layer = doc.layers().get( i );
-			var layer = extractProperties( _layer );
+			const _layer = doc.layers().get( i );
+			const layer = extractProperties( _layer );
 
 			layers.push( layer );
 
@@ -990,10 +1046,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle views
 
-		for ( var i = 0; i < doc.views().count(); i ++ ) {
+		for ( let i = 0; i < doc.views().count(); i ++ ) {
 
-			var _view = doc.views().get( i );
-			var view = extractProperties( _view );
+			const _view = doc.views().get( i );
+			const view = extractProperties( _view );
 
 			views.push( view );
 
@@ -1003,10 +1059,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle named views
 
-		for ( var i = 0; i < doc.namedViews().count(); i ++ ) {
+		for ( let i = 0; i < doc.namedViews().count(); i ++ ) {
 
-			var _namedView = doc.namedViews().get( i );
-			var namedView = extractProperties( _namedView );
+			const _namedView = doc.namedViews().get( i );
+			const namedView = extractProperties( _namedView );
 
 			namedViews.push( namedView );
 
@@ -1016,10 +1072,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle groups
 
-		for ( var i = 0; i < doc.groups().count(); i ++ ) {
+		for ( let i = 0; i < doc.groups().count(); i ++ ) {
 
-			var _group = doc.groups().get( i );
-			var group = extractProperties( _group );
+			const _group = doc.groups().get( i );
+			const group = extractProperties( _group );
 
 			groups.push( group );
 
@@ -1029,7 +1085,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle settings
 
-		var settings = extractProperties( doc.settings() );
+		const settings = extractProperties( doc.settings() );
 
 		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 
@@ -1039,37 +1095,31 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		// Handle bitmaps
 		// console.log( `Bitmap Count: ${doc.bitmaps().count()}` );
 
-		// Handle strings -- this seems to be broken at the moment in rhino3dm
+		// Handle strings
 		// console.log( `Document Strings Count: ${doc.strings().count()}` );
+		// Note: doc.strings().documentUserTextCount() counts any doc.strings defined in a section
+		//console.log( `Document User Text Count: ${doc.strings().documentUserTextCount()}` );
 
-		/*
-		for( var i = 0; i < doc.strings().count(); i++ ){
+		const strings_count = doc.strings().count();
 
-			var _string= doc.strings().get( i );
+		for ( let i = 0; i < strings_count; i ++ ) {
 
-			console.log(_string);
-			var string = extractProperties( _group );
-
-			strings.push( string );
-
-			_string.delete();
+			strings.push( doc.strings().get( i ) );
 
 		}
-		*/
 
 		doc.delete();
 
-		return { objects, materials, layers, views, namedViews, groups, settings };
+		return { objects, materials, layers, views, namedViews, groups, strings, settings };
 
 	}
 
 	function extractObjectData( object, doc ) {
 
-		var _geometry = object.geometry();
-		var _attributes = object.attributes();
-		var objectType = _geometry.objectType;
-		var geometry = null;
-		var attributes = null;
+		const _geometry = object.geometry();
+		const _attributes = object.attributes();
+		let objectType = _geometry.objectType;
+		let geometry, attributes, position, data, mesh;
 
 		// skip instance definition objects
 		//if( _attributes.isInstanceDefinitionObject ) { continue; }
@@ -1079,17 +1129,17 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			case rhino.ObjectType.Curve:
 
-				var pts = curveToPoints( _geometry, 100 );
+				const pts = curveToPoints( _geometry, 100 );
 
-				var position = {};
-				var attributes = {};
-				var data = {};
+				position = {};
+				attributes = {};
+				data = {};
 
 				position.itemSize = 3;
 				position.type = 'Float32Array';
 				position.array = [];
 
-				for ( var j = 0; j < pts.length; j ++ ) {
+				for ( let j = 0; j < pts.length; j ++ ) {
 
 					position.array.push( pts[ j ][ 0 ] );
 					position.array.push( pts[ j ][ 1 ] );
@@ -1106,18 +1156,18 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			case rhino.ObjectType.Point:
 
-				var pt = _geometry.location;
+				const pt = _geometry.location;
 
-				var position = {};
-				var color = {};
-				var attributes = {};
-				var data = {};
+				position = {};
+				const color = {};
+				attributes = {};
+				data = {};
 
 				position.itemSize = 3;
 				position.type = 'Float32Array';
 				position.array = [ pt[ 0 ], pt[ 1 ], pt[ 2 ] ];
 
-				var _color = _attributes.drawColor( doc );
+				const _color = _attributes.drawColor( doc );
 
 				color.itemSize = 3;
 				color.type = 'Float32Array';
@@ -1140,13 +1190,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			case rhino.ObjectType.Brep:
 
-				var faces = _geometry.faces();
-				var mesh = new rhino.Mesh();
+				const faces = _geometry.faces();
+				mesh = new rhino.Mesh();
 
-				for ( var faceIndex = 0; faceIndex < faces.count; faceIndex ++ ) {
+				for ( let faceIndex = 0; faceIndex < faces.count; faceIndex ++ ) {
 
-					var face = faces.get( faceIndex );
-					var _mesh = face.getMesh( rhino.MeshType.Any );
+					const face = faces.get( faceIndex );
+					const _mesh = face.getMesh( rhino.MeshType.Any );
 
 					if ( _mesh ) {
 
@@ -1173,7 +1223,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			case rhino.ObjectType.Extrusion:
 
-				var mesh = _geometry.getMesh( rhino.MeshType.Any );
+				mesh = _geometry.getMesh( rhino.MeshType.Any );
 
 				if ( mesh ) {
 
@@ -1194,6 +1244,18 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				geometry = extractProperties( _geometry );
 
+				if ( geometry.lightStyle.name === 'LightStyle_WorldLinear' ) {
+
+					self.postMessage( { type: 'warning', id: taskID, data: {
+						message: `THREE.3DMLoader: No conversion exists for ${objectType.constructor.name} ${geometry.lightStyle.name}`,
+						type: 'no conversion',
+						guid: _attributes.id
+					}
+
+					} );
+
+				}
+
 				break;
 
 			case rhino.ObjectType.InstanceReference:
@@ -1208,7 +1270,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				// TODO: precalculate resulting vertices and faces and warn on excessive results
 				_geometry.subdivide( 3 );
-				var mesh = rhino.Mesh.createFromSubDControlNet( _geometry );
+				mesh = rhino.Mesh.createFromSubDControlNet( _geometry );
 				if ( mesh ) {
 
 					geometry = mesh.toThreejsJSON();
@@ -1225,14 +1287,22 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				*/
 
 			default:
-				console.warn( `THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}` );
+
+				self.postMessage( { type: 'warning', id: taskID, data: {
+					message: `THREE.3DMLoader: Conversion not implemented for ${objectType.constructor.name}`,
+					type: 'not implemented',
+					guid: _attributes.id
+				}
+
+				} );
+
 				break;
 
 		}
 
 		if ( geometry ) {
 
-			var attributes = extractProperties( _attributes );
+			attributes = extractProperties( _attributes );
 			attributes.geometry = extractProperties( _geometry );
 
 			if ( _attributes.groupCount > 0 ) {
@@ -1262,7 +1332,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		} else {
 
-			console.warn( `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.` );
+			self.postMessage( { type: 'warning', id: taskID, data: {
+				message: `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`,
+				type: 'missing mesh',
+				guid: _attributes.id
+			}
+
+			} );
 
 		}
 
@@ -1270,11 +1346,11 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 	function extractProperties( object ) {
 
-		var result = {};
+		const result = {};
 
-		for ( var property in object ) {
+		for ( const property in object ) {
 
-			var value = object[ property ];
+			const value = object[ property ];
 
 			if ( typeof value !== 'function' ) {
 
@@ -1303,9 +1379,9 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 	function curveToPoints( curve, pointLimit ) {
 
-		var pointCount = pointLimit;
-		var rc = [];
-		var ts = [];
+		let pointCount = pointLimit;
+		let rc = [];
+		const ts = [];
 
 		if ( curve instanceof rhino.LineCurve ) {
 
@@ -1316,7 +1392,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		if ( curve instanceof rhino.PolylineCurve ) {
 
 			pointCount = curve.pointCount;
-			for ( var i = 0; i < pointCount; i ++ ) {
+			for ( let i = 0; i < pointCount; i ++ ) {
 
 				rc.push( curve.point( i ) );
 
@@ -1328,12 +1404,12 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		if ( curve instanceof rhino.PolyCurve ) {
 
-			var segmentCount = curve.segmentCount;
+			const segmentCount = curve.segmentCount;
 
-			for ( var i = 0; i < segmentCount; i ++ ) {
+			for ( let i = 0; i < segmentCount; i ++ ) {
 
-				var segment = curve.segmentCurve( i );
-				var segmentArray = curveToPoints( segment, pointCount );
+				const segment = curve.segmentCurve( i );
+				const segmentArray = curveToPoints( segment, pointCount );
 				rc = rc.concat( segmentArray );
 				segment.delete();
 
@@ -1355,7 +1431,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			const pLine = curve.tryGetPolyline();
 
-			for ( var i = 0; i < pLine.count; i ++ ) {
+			for ( let i = 0; i < pLine.count; i ++ ) {
 
 				rc.push( pLine.get( i ) );
 
@@ -1367,12 +1443,12 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
-		var domain = curve.domain;
-		var divisions = pointCount - 1.0;
+		const domain = curve.domain;
+		const divisions = pointCount - 1.0;
 
-		for ( var j = 0; j < pointCount; j ++ ) {
+		for ( let j = 0; j < pointCount; j ++ ) {
 
-			var t = domain[ 0 ] + ( j / divisions ) * ( domain[ 1 ] - domain[ 0 ] );
+			const t = domain[ 0 ] + ( j / divisions ) * ( domain[ 1 ] - domain[ 0 ] );
 
 			if ( t === domain[ 0 ] || t === domain[ 1 ] ) {
 
@@ -1381,18 +1457,18 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			}
 
-			var tan = curve.tangentAt( t );
-			var prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] );
+			const tan = curve.tangentAt( t );
+			const prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] );
 
 			// Duplicated from THREE.Vector3
 			// How to pass imports to worker?
 
-			var tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
-			var ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
+			const tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
+			const ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
 
-			var denominator = Math.sqrt( tS * ptS );
+			const denominator = Math.sqrt( tS * ptS );
 
-			var angle;
+			let angle;
 
 			if ( denominator === 0 ) {
 
@@ -1400,7 +1476,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			} else {
 
-				var theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
+				const theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
 				angle = Math.acos( Math.max( - 1, Math.min( 1, theta ) ) );
 
 			}
@@ -1416,6 +1492,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 	}
 
-};
+}
 
 export { Rhino3dmLoader };

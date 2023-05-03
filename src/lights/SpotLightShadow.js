@@ -1,5 +1,5 @@
 import { LightShadow } from './LightShadow.js';
-import { MathUtils } from '../math/MathUtils.js';
+import * as MathUtils from '../math/MathUtils.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 
 class SpotLightShadow extends LightShadow {
@@ -7,6 +7,8 @@ class SpotLightShadow extends LightShadow {
 	constructor() {
 
 		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
+
+		this.isSpotLightShadow = true;
 
 		this.focus = 1;
 
@@ -44,7 +46,5 @@ class SpotLightShadow extends LightShadow {
 	}
 
 }
-
-SpotLightShadow.prototype.isSpotLightShadow = true;
 
 export { SpotLightShadow };

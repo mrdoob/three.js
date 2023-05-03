@@ -9,6 +9,8 @@ class Plane {
 
 	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
 
+		this.isPlane = true;
+
 		// normal is assumed to be normalized
 
 		this.normal = normal;
@@ -99,25 +101,11 @@ class Plane {
 
 	projectPoint( point, target ) {
 
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .projectPoint() target is now required' );
-			target = new Vector3();
-
-		}
-
-		return target.copy( this.normal ).multiplyScalar( - this.distanceToPoint( point ) ).add( point );
+		return target.copy( point ).addScaledVector( this.normal, - this.distanceToPoint( point ) );
 
 	}
 
 	intersectLine( line, target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .intersectLine() target is now required' );
-			target = new Vector3();
-
-		}
 
 		const direction = line.delta( _vector1 );
 
@@ -145,7 +133,7 @@ class Plane {
 
 		}
 
-		return target.copy( direction ).multiplyScalar( t ).add( line.start );
+		return target.copy( line.start ).addScaledVector( direction, t );
 
 	}
 
@@ -173,13 +161,6 @@ class Plane {
 	}
 
 	coplanarPoint( target ) {
-
-		if ( target === undefined ) {
-
-			console.warn( 'THREE.Plane: .coplanarPoint() target is now required' );
-			target = new Vector3();
-
-		}
 
 		return target.copy( this.normal ).multiplyScalar( - this.constant );
 
@@ -220,7 +201,5 @@ class Plane {
 	}
 
 }
-
-Plane.prototype.isPlane = true;
 
 export { Plane };

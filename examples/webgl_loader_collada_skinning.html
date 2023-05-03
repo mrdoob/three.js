@@ -14,14 +14,27 @@
 			Dancing Stormtrooper by <a href="https://sketchfab.com/strykerdoesgames" target="_blank" rel="noopener">StrykerDoesAnimation</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC Attribution</a>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { ColladaLoader } from './jsm/loaders/ColladaLoader.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let container, stats, clock, controls;
 			let camera, scene, renderer, mixer;
@@ -48,16 +61,6 @@
 					const avatar = collada.scene;
 					const animations = avatar.animations;
 
-					avatar.traverse( function ( node ) {
-
-						if ( node.isSkinnedMesh ) {
-
-							node.frustumCulled = false;
-
-						}
-
-					} );
-
 					mixer = new THREE.AnimationMixer( avatar );
 					mixer.clipAction( animations[ 0 ] ).play();
 
@@ -67,7 +70,7 @@
 
 				//
 
-				const gridHelper = new THREE.GridHelper( 10, 20, 0x888888, 0x444444 );
+				const gridHelper = new THREE.GridHelper( 10, 20, 0xc1c1c1, 0x8d8d8d );
 				scene.add( gridHelper );
 
 				//

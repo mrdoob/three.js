@@ -1,150 +1,104 @@
-import { TempNode } from '../core/TempNode.js';
-import { NodeLib } from '../core/NodeLib.js';
+import Node, { addNodeClass } from '../core/Node.js';
+import { attribute } from '../core/AttributeNode.js';
+import { varying } from '../core/VaryingNode.js';
+import { normalize } from '../math/MathNode.js';
+import { modelWorldMatrix, modelViewMatrix } from './ModelNode.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 
-function PositionNode( scope ) {
+class PositionNode extends Node {
 
-	TempNode.call( this, 'v3' );
+	constructor( scope = PositionNode.LOCAL ) {
 
-	this.scope = scope || PositionNode.LOCAL;
+		super( 'vec3' );
 
-}
-
-PositionNode.LOCAL = 'local';
-PositionNode.WORLD = 'world';
-PositionNode.VIEW = 'view';
-PositionNode.PROJECTION = 'projection';
-
-PositionNode.prototype = Object.create( TempNode.prototype );
-PositionNode.prototype.constructor = PositionNode;
-PositionNode.prototype.nodeType = 'Position';
-
-PositionNode.prototype.getType = function ( ) {
-
-	switch ( this.scope ) {
-
-		case PositionNode.PROJECTION:
-
-			return 'v4';
+		this.scope = scope;
 
 	}
 
-	return this.type;
+	isGlobal() {
 
-};
-
-PositionNode.prototype.getShared = function ( /* builder */ ) {
-
-	switch ( this.scope ) {
-
-		case PositionNode.LOCAL:
-		case PositionNode.WORLD:
-
-			return false;
+		return true;
 
 	}
 
-	return true;
+	getHash( /*builder*/ ) {
 
-};
-
-PositionNode.prototype.generate = function ( builder, output ) {
-
-	var result;
-
-	switch ( this.scope ) {
-
-		case PositionNode.LOCAL:
-
-			if ( builder.isShader( 'vertex' ) ) {
-
-				result = 'transformed';
-
-			} else {
-
-				builder.requires.position = true;
-
-				result = 'vPosition';
-
-			}
-
-			break;
-
-		case PositionNode.WORLD:
-
-			if ( builder.isShader( 'vertex' ) ) {
-
-				return '( modelMatrix * vec4( transformed, 1.0 ) ).xyz';
-
-			} else {
-
-				builder.requires.worldPosition = true;
-
-				result = 'vWPosition';
-
-			}
-
-			break;
-
-		case PositionNode.VIEW:
-
-			result = builder.isShader( 'vertex' ) ? '-mvPosition.xyz' : 'vViewPosition';
-
-			break;
-
-		case PositionNode.PROJECTION:
-
-			result = builder.isShader( 'vertex' ) ? '( projectionMatrix * modelViewMatrix * vec4( position, 1.0 ) )' : 'vec4( 0.0 )';
-
-			break;
+		return `position-${this.scope}`;
 
 	}
 
-	return builder.format( result, this.getType( builder ), output );
+	generate( builder ) {
 
-};
+		const scope = this.scope;
 
-PositionNode.prototype.copy = function ( source ) {
+		let outputNode = null;
 
-	TempNode.prototype.copy.call( this, source );
+		if ( scope === PositionNode.GEOMETRY ) {
 
-	this.scope = source.scope;
+			outputNode = attribute( 'position', 'vec3' );
 
-	return this;
+		} else if ( scope === PositionNode.LOCAL ) {
 
-};
+			outputNode = varying( positionGeometry );
 
-PositionNode.prototype.toJSON = function ( meta ) {
+		} else if ( scope === PositionNode.WORLD ) {
 
-	var data = this.getJSONNode( meta );
+			const vertexPositionNode = modelWorldMatrix.mul( positionLocal );
+			outputNode = varying( vertexPositionNode );
 
-	if ( ! data ) {
+		} else if ( scope === PositionNode.VIEW ) {
 
-		data = this.createJSONNode( meta );
+			const vertexPositionNode = modelViewMatrix.mul( positionLocal );
+			outputNode = varying( vertexPositionNode );
+
+		} else if ( scope === PositionNode.VIEW_DIRECTION ) {
+
+			const vertexPositionNode = positionView.negate();
+			outputNode = normalize( varying( vertexPositionNode ) );
+
+		} else if ( scope === PositionNode.WORLD_DIRECTION ) {
+
+			const vertexPositionNode = positionLocal.transformDirection( modelWorldMatrix );
+			outputNode = normalize( varying( vertexPositionNode ) );
+
+		}
+
+		return outputNode.build( builder, this.getNodeType( builder ) );
+
+	}
+
+	serialize( data ) {
+
+		super.serialize( data );
 
 		data.scope = this.scope;
 
 	}
 
-	return data;
+	deserialize( data ) {
 
-};
+		super.deserialize( data );
 
-NodeLib.addKeyword( 'position', function () {
+		this.scope = data.scope;
 
-	return new PositionNode();
+	}
 
-} );
+}
 
-NodeLib.addKeyword( 'worldPosition', function () {
+PositionNode.GEOMETRY = 'geometry';
+PositionNode.LOCAL = 'local';
+PositionNode.WORLD = 'world';
+PositionNode.WORLD_DIRECTION = 'worldDirection';
+PositionNode.VIEW = 'view';
+PositionNode.VIEW_DIRECTION = 'viewDirection';
 
-	return new PositionNode( PositionNode.WORLD );
+export default PositionNode;
 
-} );
+export const positionGeometry = nodeImmutable( PositionNode, PositionNode.GEOMETRY );
+export const positionLocal = nodeImmutable( PositionNode, PositionNode.LOCAL );
+export const positionWorld = nodeImmutable( PositionNode, PositionNode.WORLD );
+export const positionWorldDirection = nodeImmutable( PositionNode, PositionNode.WORLD_DIRECTION );
+export const positionView = nodeImmutable( PositionNode, PositionNode.VIEW );
+export const positionViewDirection = nodeImmutable( PositionNode, PositionNode.VIEW_DIRECTION );
 
-NodeLib.addKeyword( 'viewPosition', function () {
-
-	return new PositionNode( PositionNode.VIEW );
-
-} );
-
-export { PositionNode };
+addNodeClass( PositionNode );

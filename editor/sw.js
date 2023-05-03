@@ -1,4 +1,4 @@
-const cacheName = 'threejs-editor-r127';
+const cacheName = 'threejs-editor';
 
 const assets = [
 	'./',
@@ -13,16 +13,16 @@ const assets = [
 	'../examples/jsm/controls/TransformControls.js',
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
-	'../examples/jsm/libs/fflate.module.min.js',
+	'../examples/jsm/libs/fflate.module.js',
 
-	'../examples/js/libs/draco/draco_decoder.js',
-	'../examples/js/libs/draco/draco_decoder.wasm',
-	'../examples/js/libs/draco/draco_encoder.js',
-	'../examples/js/libs/draco/draco_wasm_wrapper.js',
+	'../examples/jsm/libs/draco/draco_decoder.js',
+	'../examples/jsm/libs/draco/draco_decoder.wasm',
+	'../examples/jsm/libs/draco/draco_encoder.js',
+	'../examples/jsm/libs/draco/draco_wasm_wrapper.js',
 
-	'../examples/js/libs/draco/gltf/draco_decoder.js',
-	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
-	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
+	'../examples/jsm/libs/draco/gltf/draco_decoder.js',
+	'../examples/jsm/libs/draco/gltf/draco_decoder.wasm',
+	'../examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js',
 
 	'../examples/jsm/libs/motion-controllers.module.js',
 
@@ -43,12 +43,14 @@ const assets = [
 	'../examples/jsm/loaders/MD2Loader.js',
 	'../examples/jsm/loaders/OBJLoader.js',
 	'../examples/jsm/loaders/MTLLoader.js',
+	'../examples/jsm/loaders/PCDLoader.js',
 	'../examples/jsm/loaders/PLYLoader.js',
 	'../examples/jsm/loaders/RGBELoader.js',
 	'../examples/jsm/loaders/STLLoader.js',
 	'../examples/jsm/loaders/SVGLoader.js',
 	'../examples/jsm/loaders/TGALoader.js',
 	'../examples/jsm/loaders/TDSLoader.js',
+	'../examples/jsm/loaders/USDZLoader.js',
 	'../examples/jsm/loaders/VOXLoader.js',
 	'../examples/jsm/loaders/VRMLLoader.js',
 	'../examples/jsm/loaders/VTKLoader.js',
@@ -56,6 +58,9 @@ const assets = [
 
 	'../examples/jsm/curves/NURBSCurve.js',
 	'../examples/jsm/curves/NURBSUtils.js',
+
+	'../examples/jsm/interactive/HTMLMesh.js',
+	'../examples/jsm/interactive/InteractiveGroup.js',
 
 	'../examples/jsm/environments/RoomEnvironment.js',
 
@@ -85,7 +90,9 @@ const assets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
+	'./js/libs/es-module-shims.js',
 	'./js/libs/esprima.js',
+	'./js/libs/ffmpeg.min.js',
 	'./js/libs/jsonlint.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
@@ -108,7 +115,6 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
-	'./js/libs/three.html.js',
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 
@@ -154,6 +160,7 @@ const assets = [
 	'./js/Sidebar.Geometry.BufferGeometry.js',
 	'./js/Sidebar.Geometry.Modifiers.js',
 	'./js/Sidebar.Geometry.BoxGeometry.js',
+	'./js/Sidebar.Geometry.CapsuleGeometry.js',
 	'./js/Sidebar.Geometry.CircleGeometry.js',
 	'./js/Sidebar.Geometry.CylinderGeometry.js',
 	'./js/Sidebar.Geometry.DodecahedronGeometry.js',
@@ -171,13 +178,21 @@ const assets = [
 	'./js/Sidebar.Geometry.TubeGeometry.js',
 	'./js/Sidebar.Geometry.TeapotGeometry.js',
 	'./js/Sidebar.Material.js',
+	'./js/Sidebar.Material.BooleanProperty.js',
+	'./js/Sidebar.Material.ColorProperty.js',
+	'./js/Sidebar.Material.ConstantProperty.js',
+	'./js/Sidebar.Material.MapProperty.js',
+	'./js/Sidebar.Material.NumberProperty.js',
+	'./js/Sidebar.Material.Program.js',
 	'./js/Sidebar.Animation.js',
 	'./js/Sidebar.Script.js',
 	'./js/Strings.js',
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
+	'./js/Viewport.Shading.js',
 	'./js/Viewport.Info.js',
+	'./js/Viewport.Selector.js',
 	'./js/Viewport.ViewHelper.js',
 	'./js/Viewport.VR.js',
 
@@ -219,13 +234,17 @@ self.addEventListener( 'install', async function () {
 
 	const cache = await caches.open( cacheName );
 
-	assets.forEach( function ( asset ) {
+	assets.forEach( async function ( asset ) {
 
-		cache.add( asset ).catch( function () {
+		try {
+
+			await cache.add( asset );
+
+		} catch {
 
 			console.warn( '[SW] Cound\'t cache:', asset );
 
-		} );
+		}
 
 	} );
 
@@ -234,21 +253,45 @@ self.addEventListener( 'install', async function () {
 self.addEventListener( 'fetch', async function ( event ) {
 
 	const request = event.request;
-	event.respondWith( cacheFirst( request ) );
+
+	if ( request.url.startsWith( 'chrome-extension' ) ) return;
+
+	event.respondWith( networkFirst( request ) );
 
 } );
 
-async function cacheFirst( request ) {
+async function networkFirst( request ) {
 
-	const cachedResponse = await caches.match( request );
+	try {
 
-	if ( cachedResponse === undefined ) {
+		let response = await fetch( request );
 
-		console.warn( '[SW] Not cached:', request.url );
-		return fetch( request );
+		if ( request.url.endsWith( 'editor/' ) || request.url.endsWith( 'editor/index.html' ) ) { // copied from coi-serviceworker
+
+			const newHeaders = new Headers( response.headers );
+			newHeaders.set( 'Cross-Origin-Embedder-Policy', 'require-corp' );
+			newHeaders.set( 'Cross-Origin-Opener-Policy', 'same-origin' );
+
+			response = new Response( response.body, { status: response.status, statusText: response.statusText, headers: newHeaders } );
+
+		}
+
+		const cache = await caches.open( cacheName );
+		cache.put( request, response.clone() );
+		return response;
+
+	} catch {
+
+		const cachedResponse = await caches.match( request );
+
+		if ( cachedResponse === undefined ) {
+
+			console.warn( '[SW] Not cached:', request.url );
+
+		}
+
+		return cachedResponse;
 
 	}
-
-	return cachedResponse;
 
 }

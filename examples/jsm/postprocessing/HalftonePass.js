@@ -1,54 +1,46 @@
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { HalftoneShader } from '../shaders/HalftoneShader.js';
 
 /**
  * RGB Halftone pass for three.js effects composer. Requires HalftoneShader.
  */
 
-var HalftonePass = function ( width, height, params ) {
+class HalftonePass extends Pass {
 
-	Pass.call( this );
+	constructor( width, height, params ) {
 
- 	if ( HalftoneShader === undefined ) {
+		super();
 
- 		console.error( 'THREE.HalftonePass requires HalftoneShader' );
+	 	this.uniforms = UniformsUtils.clone( HalftoneShader.uniforms );
+	 	this.material = new ShaderMaterial( {
+	 		uniforms: this.uniforms,
+	 		fragmentShader: HalftoneShader.fragmentShader,
+	 		vertexShader: HalftoneShader.vertexShader
+	 	} );
 
- 	}
+		// set params
+		this.uniforms.width.value = width;
+		this.uniforms.height.value = height;
 
- 	this.uniforms = UniformsUtils.clone( HalftoneShader.uniforms );
- 	this.material = new ShaderMaterial( {
- 		uniforms: this.uniforms,
- 		fragmentShader: HalftoneShader.fragmentShader,
- 		vertexShader: HalftoneShader.vertexShader
- 	} );
+		for ( const key in params ) {
 
-	// set params
-	this.uniforms.width.value = width;
-	this.uniforms.height.value = height;
+			if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
 
-	for ( var key in params ) {
+				this.uniforms[ key ].value = params[ key ];
 
-		if ( params.hasOwnProperty( key ) && this.uniforms.hasOwnProperty( key ) ) {
-
-			this.uniforms[ key ].value = params[ key ];
+			}
 
 		}
 
+		this.fsQuad = new FullScreenQuad( this.material );
+
 	}
 
-	this.fsQuad = new Pass.FullScreenQuad( this.material );
-
-};
-
-HalftonePass.prototype = Object.assign( Object.create( Pass.prototype ), {
-
-	constructor: HalftonePass,
-
-	render: function ( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
+	render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
  		this.material.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 
@@ -65,14 +57,23 @@ HalftonePass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
- 	},
+ 	}
 
- 	setSize: function ( width, height ) {
+ 	setSize( width, height ) {
 
  		this.uniforms.width.value = width;
  		this.uniforms.height.value = height;
 
  	}
-} );
+
+	dispose() {
+
+		this.material.dispose();
+
+		this.fsQuad.dispose();
+
+	}
+
+}
 
 export { HalftonePass };

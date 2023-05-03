@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			An exporter for the [link:https://en.wikipedia.org/wiki/Wavefront_.obj_file OBJ] file format.
+			<br/><br/>
+			[name] is not able to export material data into MTL files so only geometry data are supported.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { OBJExporter } from 'three/addons/exporters/OBJExporter.js';
+		</code>
+
+		<h2>Code Example</h2>
+
+		<code>
+		// Instantiate an exporter
+		const exporter = new OBJExporter();
+
+		// Parse the input and generate the OBJ output
+		const data = exporter.parse( scene );
+		downloadFile( data );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:String parse]( [param:Object3D object] )</h3>
+		<p>
+		[page:Object object] — Object3D to be exported.
+		</p>
+		<p>
+		Generates a string holding the OBJ data.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/OBJExporter.js examples/jsm/exporters/OBJExporter.js]
+		</p>
+	</body>
+</html>

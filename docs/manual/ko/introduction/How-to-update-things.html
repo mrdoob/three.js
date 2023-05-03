@@ -27,7 +27,7 @@ scene.add( object1 ); //object1과 object2는 자동으로 자신들의 행렬�
 		<p>하지만 오브젝트가 고정되어야 한다면, 이 설정을 풀고 수동으로 행렬구조를 갱신할 수 있습니다.</p>
 
 		<code>
-object.matrixAutoUpdate  = false;
+object.matrixAutoUpdate = false;
 object.updateMatrix();
 		</code>
 
@@ -70,27 +70,24 @@ geometry.setDrawRange( 0, drawCount );
 const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-const line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry, material );
 scene.add( line );
 			</code>
 		 	<p>
 				그 다음, 아래와 같은 패턴으로 무작위로 선에 점을 생성해 줄 것입니다:
 			</p>
 			<code>
-const positions = line.geometry.attributes.position.array;
+const positionAttribute = line.geometry.getAttribute( 'position' );
 
-let x, y, z, index;
-x = y = z = index = 0;
+let x = 0, y = 0, z = 0;
 
-for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
-    positions[ index ++ ] = x;
-    positions[ index ++ ] = y;
-    positions[ index ++ ] = z;
+	positionAttribute.setXYZ( i, x, y, z );
 
-    x += ( Math.random() - 0.5 ) * 30;
-    y += ( Math.random() - 0.5 ) * 30;
-    z += ( Math.random() - 0.5 ) * 30;
+	x += ( Math.random() - 0.5 ) * 30;
+	y += ( Math.random() - 0.5 ) * 30;
+	z += ( Math.random() - 0.5 ) * 30;
 
 }
 			</code>
@@ -104,7 +101,7 @@ line.geometry.setDrawRange( 0, newValue );
 				첫 렌더링 이후에 position 데이터 수치를 변경하고 싶다면, needsUpdate 플래그를 다음과 같이 설정해야 합니다:
 			</p>
 			<code>
-line.geometry.attributes.position.needsUpdate = true; // required after the first render
+positionAttribute.needsUpdate = true; // required after the first render
 			</code>
 
 			<p>
@@ -117,7 +114,7 @@ line.geometry.computeBoundingSphere();
 			</code>
 
 			<p>
-				[link:https://jsfiddle.net/xvnctbL0/2/ Here is a fiddle] showing an animated line which you can adapt to your use case.
+				[link:https://jsfiddle.net/t4m85pLr/1/ Here is a fiddle] showing an animated line which you can adapt to your use case.
 			</p>
 
 			<h3>Examples</h3>
@@ -143,10 +140,10 @@ line.geometry.computeBoundingSphere();
 						<li>texture</li>
 						<li>fog</li>
 						<li>vertex colors</li>
-						<li>skinning</li>
 						<li>morphing</li>
 						<li>shadow map</li>
 						<li>alpha test</li>
+						<li>transparent</li>
 					</ul>
 				</li>
 			</ul>

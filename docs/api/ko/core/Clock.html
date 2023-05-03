@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		시간을 파악하는 객체입니다. [link:https://developer.mozilla.org/en-US/docs/Web/API/Performance/now performance.now]를 우선적으로 사용하며, 사용이 불가능할 때는 덜 정확한 [link:https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Date/now Date.now]를 사용합니다.
+		</p>
+
+
+		<h2>생성자</h2>
+
+
+		<h3>[name]( [param:Boolean autoStart] )</h3>
+		<p>
+		autoStart — (생략 가능) 자동으로 시계를 시작시킬지 설정합니다. 기본값은 true 입니다.
+		</p>
+
+		<h2>프로퍼티</h2>
+
+		<h3>[property:Boolean autoStart]</h3>
+		<p>
+		업데이트가 최초로 호출되면 자동으로 시계를 시작시킵니다. 기본값은 true 입니다.
+		</p>
+
+		<h3>[property:Float startTime]</h3>
+		<p>
+		시계의 [page:Clock.start start] 메서드가 호출되면 시간을 멈춥니다.
+ 		</p>
+
+
+		<h3>[property:Float oldTime]</h3>
+		<p>
+		시계의 [page:Clock.start start], [page:Clock.getElapsedTime getElapsedTime] 혹은 [page:Clock.getDelta getDelta]
+		메서드가 호출되면 시간을 멈춥니다.
+ 		</p>
+
+		<h3>[property:Float elapsedTime]</h3>
+		<p>
+		시계가 작동한 총 시간을 가지고 있습니다.
+ 		</p>
+
+		<h3>[property:Boolean running]</h3>
+		<p>
+		시계가 동작중인지 아닌지를 나타냅니다.
+ 		</p>
+
+
+		<h2>메서드</h2>
+
+		<h3>[method:undefined start]()</h3>
+		<p>
+		시계를 시작시킵니다. 또한 [page:Clock.startTime startTime] 및 [page:Clock.oldTime oldTime]을 현재 시간으로 업데이트하고
+		[page:Clock.elapsedTime elapsedTime] 를 *0*으로, [page:Clock.running running] *true*로 설정합니다.
+		</p>
+
+		<h3>[method:undefined stop]()</h3>
+		<p>
+		시계를 멈추고 [page:Clock.oldTime oldTime]을 현재 시간으로 설정합니다.
+		</p>
+
+		<h3>[method:Float getElapsedTime]()</h3>
+		<p>
+		시계가 시작한 이후로부터의 초를 가져오며 [page:Clock.oldTime oldTime]을 현재 시간으로 설정합니다.<br />
+		[page:Clock.autoStart autoStart]가 *true* 이고 시계가 멈춰있는 상태라면, 시계를 시작시킵니다.
+		</p>
+
+		<h3>[method:Float getDelta]()</h3>
+		<p>
+		[page:Clock.oldTime oldTime]이 설정된 이후로부터 지난 초를 가져오며 [page:Clock.oldTime oldTime]을 현재 시간으로 설정합니다.<br />
+		[page:Clock.autoStart autoStart]가 *true* 이고 시계가 멈춰있는 상태라면, 시계를 시작시킵니다.
+		</p>
+
+
+		<h2>소스코드</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

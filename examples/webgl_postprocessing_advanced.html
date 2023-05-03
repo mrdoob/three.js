@@ -10,35 +10,50 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example<br/>
-			<a href="http://g3d.cs.williams.edu/g3d/data10/index.html#mesh19" target="_blank" rel="noopener">Lee Perry-Smith</a> head
+			<a href="https://casual-effects.com/data/" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
 		<div id="container"></div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { BloomPass } from './jsm/postprocessing/BloomPass.js';
-			import { FilmPass } from './jsm/postprocessing/FilmPass.js';
-			import { DotScreenPass } from './jsm/postprocessing/DotScreenPass.js';
-			import { MaskPass, ClearMaskPass } from './jsm/postprocessing/MaskPass.js';
-			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
+			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+			import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';
+			import { MaskPass, ClearMaskPass } from 'three/addons/postprocessing/MaskPass.js';
+			import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
 
-			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
-			import { ColorifyShader } from './jsm/shaders/ColorifyShader.js';
-			import { HorizontalBlurShader } from './jsm/shaders/HorizontalBlurShader.js';
-			import { VerticalBlurShader } from './jsm/shaders/VerticalBlurShader.js';
-			import { SepiaShader } from './jsm/shaders/SepiaShader.js';
-			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
-			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
+			import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js';
+			import { ColorifyShader } from 'three/addons/shaders/ColorifyShader.js';
+			import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js';
+			import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js';
+			import { SepiaShader } from 'three/addons/shaders/SepiaShader.js';
+			import { VignetteShader } from 'three/addons/shaders/VignetteShader.js';
+			import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let container, stats;
 
@@ -83,7 +98,7 @@
 				sceneModel.add( directionalLight );
 
 				const loader = new GLTFLoader();
-				loader.load( "models/gltf/LeePerrySmith/LeePerrySmith.glb", function ( gltf ) {
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					createMesh( gltf.scene.children[ 0 ].geometry, sceneModel, 100 );
 
@@ -91,8 +106,8 @@
 
 				//
 
-				const diffuseMap = new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				const diffuseMap = new THREE.TextureLoader().load( 'textures/cube/SwedishRoyalCastle/pz.jpg' );
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const materialColor = new THREE.MeshBasicMaterial( {
 					map: diffuseMap,
@@ -140,12 +155,12 @@
 				const effectVignette = new ShaderPass( shaderVignette );
 				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
 
-				effectBleach.uniforms[ "opacity" ].value = 0.95;
+				effectBleach.uniforms[ 'opacity' ].value = 0.95;
 
-				effectSepia.uniforms[ "amount" ].value = 0.9;
+				effectSepia.uniforms[ 'amount' ].value = 0.9;
 
-				effectVignette.uniforms[ "offset" ].value = 0.95;
-				effectVignette.uniforms[ "darkness" ].value = 1.6;
+				effectVignette.uniforms[ 'offset' ].value = 0.95;
+				effectVignette.uniforms[ 'darkness' ].value = 1.6;
 
 				const effectBloom = new BloomPass( 0.5 );
 				const effectFilm = new FilmPass( 0.35, 0.025, 648, false );
@@ -171,9 +186,6 @@
 				//
 
 				const rtParameters = {
-					minFilter: THREE.LinearFilter,
-					magFilter: THREE.LinearFilter,
-					format: THREE.RGBFormat,
 					stencilBuffer: true
 				};
 
@@ -245,7 +257,7 @@
 				composer4.addPass( effectBleach );
 				composer4.addPass( effectVignette );
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
+				renderScene.uniforms[ 'tDiffuse' ].value = composerScene.renderTarget2.texture;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -275,7 +287,7 @@
 				composer3.setSize( halfWidth, halfHeight );
 				composer4.setSize( halfWidth, halfHeight );
 
-				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2.texture;
+				renderScene.uniforms[ 'tDiffuse' ].value = composerScene.renderTarget2.texture;
 
 				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
 				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
@@ -284,8 +296,8 @@
 
 			function createMesh( geometry, scene, scale ) {
 
-				const diffuseMap = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
-				diffuseMap.encoding = THREE.sRGBEncoding;
+				const diffuseMap = new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
 
 				const mat2 = new THREE.MeshPhongMaterial( {
 
@@ -293,7 +305,7 @@
 					specular: 0x080808,
 					shininess: 20,
 					map: diffuseMap,
-					normalMap: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					normalMap: new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 
 				} );

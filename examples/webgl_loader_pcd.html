@@ -9,74 +9,78 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<a href="http://pointclouds.org/documentation/tutorials/pcd_file_format.php#pcd-file-format" target="_blank" rel="noopener">PCD File format</a>
-			<div>PCD loader test by <a href="http://filipecaixeta.com.br" target="_blank" rel="noopener">Filipe Caixeta</a></div>
-			<div>+/-: Increase/Decrease point size</div>
-			<div>c: Change color</div>
+			<a href="https://pointclouds.org/documentation/tutorials/pcd_file_format.html" target="_blank" rel="noopener">PCD File format</a>
 		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { PCDLoader } from 'three/addons/loaders/PCDLoader.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
-			import { PCDLoader } from './jsm/loaders/PCDLoader.js';
-
-			let container, stats;
-			let camera, controls, scene, renderer;
+			let camera, scene, renderer;
 
 			init();
-			animate();
+			render();
+
 			function init() {
-
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x000000 );
-
-				camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
-				camera.position.x = 0.4;
-				camera.position.z = - 2;
-				camera.up.set( 0, 0, 1 );
-
-				scene.add( camera );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.01, 40 );
+				camera.position.set( 0, 0, 1 );
+				scene.add( camera );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 0.5;
+				controls.maxDistance = 10;
+
+				//scene.add( new THREE.AxesHelper( 1 ) );
+
 				const loader = new PCDLoader();
 				loader.load( './models/pcd/binary/Zaghetto.pcd', function ( points ) {
 
+					points.geometry.center();
+					points.geometry.rotateX( Math.PI );
+					points.name = 'Zaghetto.pcd';
 					scene.add( points );
-					const center = points.geometry.boundingSphere.center;
-					controls.target.set( center.x, center.y, center.z );
-					controls.update();
+
+					//
+
+					const gui = new GUI();
+
+					gui.add( points.material, 'size', 0.001, 0.01 ).onChange( render );
+					gui.addColor( points.material, 'color' ).onChange( render );
+					gui.open();
+
+					//
+
+					render();
 
 				} );
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
-
-				controls = new TrackballControls( camera, renderer.domElement );
-
-				controls.rotateSpeed = 2.0;
-				controls.zoomSpeed = 0.3;
-				controls.panSpeed = 0.2;
-
-				controls.staticMoving = true;
-
-				controls.minDistance = 0.3;
-				controls.maxDistance = 0.3 * 100;
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
 				window.addEventListener( 'resize', onWindowResize );
-
-				window.addEventListener( 'keypress', keyboard );
 
 			}
 
@@ -84,42 +88,16 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				controls.handleResize();
+
+				render();
 
 			}
 
-			function keyboard( ev ) {
+			function render() {
 
-				const points = scene.getObjectByName( 'Zaghetto.pcd' );
-
-				switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
-
-					case '+':
-						points.material.size *= 1.2;
-						points.material.needsUpdate = true;
-						break;
-
-					case '-':
-						points.material.size /= 1.2;
-						points.material.needsUpdate = true;
-						break;
-
-					case 'c':
-						points.material.color.setHex( Math.random() * 0xffffff );
-						points.material.needsUpdate = true;
-						break;
-
-				}
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				controls.update();
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

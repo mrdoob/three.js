@@ -81,7 +81,6 @@
 		<h2>例子</h2>
 
 		<p>
-			[example:webgl_animation_cloth webgl / animation / cloth ]<br />
 			[example:webgl_buffergeometry_custom_attributes_particles webgl / buffergeometry / custom / attributes / particles]<br />
 			[example:webgl_buffergeometry_selective_draw webgl / buffergeometry / selective / draw]<br />
 			[example:webgl_custom_attributes webgl / custom / attributes]<br />
@@ -99,8 +98,6 @@
 			[example:webgl_marchingcubes webgl / marchingcubes]<br />
 			[example:webgl_materials_envmaps webgl / materials / envmaps]<br />
 			[example:webgl_materials_lightmap webgl / materials / lightmap]<br />
-			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
-			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
 			[example:webgl_postprocessing_dof2 webgl / postprocessing / dof2]<br />
@@ -161,8 +158,8 @@
 		<div>
 			<p>
 				自定义attributes和uniforms必须在GLSL着色器代码中声明（在 *vertexShader* 和/或 *fragmentShader* 中)。
-				自定义uniforms必须定义为 *ShaderMaterial* 的  *uniforms* 属性，
-				而任何自定义attribtes必须通过[page:BufferAttribute]实例来定义。
+				自定义uniforms必须定义为 *ShaderMaterial* 的 *uniforms* 属性，
+				而任何自定义attributes必须通过[page:BufferAttribute]实例来定义。
 				注意 *varying*s 只需要在shader代码中声明（而不必在材质中）。
 			</p>
 			<p> 要声明一个自定义属性，更多细节请参考[page:BufferGeometry]页面，
@@ -257,7 +254,7 @@
 this.defaultAttributeValues = {
 	'color': [ 1, 1, 1 ],
 	'uv': [ 0, 0 ],
-	'uv2': [ 0, 0 ]
+	'uv1': [ 0, 0 ]
 };
 			</code>
 
@@ -316,6 +313,11 @@ this.extensions = {
 
 		</p>
 
+		<h3>[property:Boolean isShaderMaterial]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Boolean lights]</h3>
 		<p> 材质是否受到光照的影响。默认值为 *false*。如果传递与光照相关的uniform数据到这个材质，则为true。默认是false。
 		</p>
@@ -325,21 +327,8 @@ this.extensions = {
 			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与大多数平台上[page:WebGLRenderer WebGL]渲染器的限制，无论如何设置该值，线宽始终为1。
 		</p>
 
-		<h3>[property:Boolean morphTargets]</h3>
-		<p> When set to true, morph target attributes are available in the vertex shader. Default is *false*.
-		</p>
-
-		<h3>[property:Boolean morphNormals]</h3>
-		<p> When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
-		</p>
-
 		<h3>[property:Boolean flatShading]</h3>
 		<p> 定义材质是否使用平面着色进行渲染。默认值为false。
-		</p>
-
-
-		<h3>[property:Boolean skinning]</h3>
-		<p> 定义材质是否使用蒙皮; 如果将蒙皮属性传递给shader，则为true。默认值为false。
 		</p>
 
 		<h3>[property:Object uniforms]</h3>

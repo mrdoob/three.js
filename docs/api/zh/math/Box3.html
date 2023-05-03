@@ -49,10 +49,15 @@
 
 		<h2>属性（Properties）</h2>
 
+		<h3>[property:Boolean isBox3]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Vector3 min]</h3>
 		<p>
 			[page:Vector3] 表示包围盒的下边界。<br />
-			默认值是（ - Infinity, - Infinity, - Infinity ）。
+			默认值是（ + Infinity, + Infinity, + Infinity ）。
 		</p>
 
 		<h3>[property:Vector3 max]</h3>
@@ -77,7 +82,7 @@
 		[page:Vector3 point] - 需要做clamp 的坐标 [page:Vector3]。 <br>
 		[page:Vector3 target] — 结果将会被拷贝到这个对象中<br /><br />
 
-		是这个点[page:Vector3 point] [link:https://en.wikipedia.org/wiki/Clamping_(graphics) Clamps](处于范围内) 处于包围盒边界范围内。<br />
+		使这个点[page:Vector3 point] [link:https://en.wikipedia.org/wiki/Clamping_(graphics) Clamps](处于范围内) 处于包围盒边界范围内。<br />
 		</p>
 
 		<h3>[method:Box3 clone]()</h3>
@@ -123,7 +128,7 @@
 		[page:Object3D object] - 包裹在包围盒中的3d对象 [page:Object3D]。<br /><br />
 
 		扩展此包围盒的边界，使得对象及其子对象在包围盒内，包括对象和子对象的世界坐标的变换。
-		The function may result in a larger box than strictly necessary.
+		该方法可能会导致一个比严格需要的更大的框。
 
 		</p>
 
@@ -171,7 +176,7 @@
 		[page:Vector3 point] - [page:Vector3].<br/>
 		[page:Vector3 target] — 如果指定了target ，结果将会被拷贝到target。<br /><br />
 
-		返回一个点为这个盒子的宽度和高度的比例。
+		返回一个点为这个盒子的宽度、高度和深度的比例。
 		</p>
 
 		<h3>[method:Vector3 getSize]( [param:Vector3 target] )</h3>
@@ -186,7 +191,7 @@
 		[page:Box3 box] - 与包围盒的交集<br /><br />
 
 		计算此包围盒和 [page:Box3 box] 的交集，将此框的上界设置为两个框的max的较小部分，
-		将此包围盒的下界设置为两个包围盒的min的较大部分。If there's no overlap, makes this box empty.
+		将此包围盒的下界设置为两个包围盒的min的较大部分。如果两个包围盒不相交，则清空此包围盒。
 		</p>
 
 		<h3>[method:Boolean intersectsBox]( [param:Box3 box] )</h3>
@@ -232,24 +237,24 @@
 		[page:Vector3 max] - [page:Vector3] 表示上边界每个纬度（x,y,z）的值。<br /><br />
 
 		设置包围盒上下边界每个纬度（x,y,z)的值。<br>
-		Please note that this method only copies the values from the given objects.
+		请注意，此方法仅复制给定对象的值。
 		</p>
 
-		<h3>[method:this setFromArray]( [param:Array array] ) [param:Box3 this]</h3>
+		<h3>[method:this setFromArray]( [param:Array array] )</h3>
 		<p>
-		array -- 数组当中的所有的点都将被包围盒包裹。<br /><br />
+		array - 数组当中的所有的点都将被包围盒包裹。<br /><br />
 
 		设置包围盒的上下边界使得数组 *array* 中的所有点的点都被包含在内。
 		</p>
 
-		<h3>[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] ) [param:Box3 this]</h3>
+		<h3>[method:this setFromBufferAttribute]( [param:BufferAttribute attribute] )</h3>
 		<p>
 		[page:BufferAttribute attribute] - 位置的缓冲数据，包含在返回的包围盒内。<br /><br />
 
 		设置此包围盒的上边界和下边界，以包含 [page:BufferAttribute attribute] 中的所有位置数据。
 		</p>
 
-		<h3>[method:this setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] ) [param:Box3 this]</h3>
+		<h3>[method:this setFromCenterAndSize]( [param:Vector3 center], [param:Vector3 size] )</h3>
 		<p>
 		[page:Vector3 center], - 包围盒所要设置的中心位置。 <br>
 		[page:Vector3 size] - 包围盒所要设置的x、y和z尺寸（宽/高/长）。<br /><br />
@@ -262,7 +267,7 @@
 		[page:Object3D object] - 用来计算包围盒的3D对象 [page:Object3D]。<br /><br />
 
 		计算和世界轴对齐的一个对象 [page:Object3D] （含其子对象）的包围盒，计算对象和子对象的世界坐标变换。
-		The function may result in a larger box than strictly necessary.
+		该方法可能会导致一个比严格需要的更大的框。
 
 		</p>
 

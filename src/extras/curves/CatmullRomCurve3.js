@@ -78,14 +78,18 @@ function CubicPoly() {
 
 //
 
-const tmp = new Vector3();
-const px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
+const tmp = /*@__PURE__*/ new Vector3();
+const px = /*@__PURE__*/ new CubicPoly();
+const py = /*@__PURE__*/ new CubicPoly();
+const pz = /*@__PURE__*/ new CubicPoly();
 
 class CatmullRomCurve3 extends Curve {
 
 	constructor( points = [], closed = false, curveType = 'centripetal', tension = 0.5 ) {
 
 		super();
+
+		this.isCatmullRomCurve3 = true;
 
 		this.type = 'CatmullRomCurve3';
 
@@ -247,7 +251,5 @@ class CatmullRomCurve3 extends Curve {
 	}
 
 }
-
-CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
 
 export { CatmullRomCurve3 };

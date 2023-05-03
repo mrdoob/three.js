@@ -1,0 +1,285 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Fog</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Fog">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Fog</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>This article is part of a series of articles about three.js. The
+first article is <a href="fundamentals.html">three.js fundamentals</a>. If
+you haven't read that yet and you're new to three.js you might want to
+consider starting there. If you haven't read about cameras you might
+want to start with <a href="cameras.html">this article</a>.</p>
+<p>Fog in a 3D engine is generally a way of fading to a specific color
+based on the distance from the camera. In three.js you add fog by
+creating <a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> or <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> object and setting it on the scene's
+<a href="/docs/#api/en/scenes/Scene#fog"><code class="notranslate" translate="no">fog</code></a> property.</p>
+<p><a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> lets you choose <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> settings which are distances
+from the camera. Anything closer than <code class="notranslate" translate="no">near</code> is unaffected by fog.
+Anything further than <code class="notranslate" translate="no">far</code> is completely the fog color. Parts between
+<code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> fade from their material color to the fog color.</p>
+<p>There's also <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> which grows exponentially with distance from the camera.</p>
+<p>To use either type of fog you create one and and assign it to the scene as in</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+{
+  const color = 0xFFFFFF;  // white
+  const near = 10;
+  const far = 100;
+  scene.fog = new THREE.Fog(color, near, far);
+}
+</pre>
+<p>or for <a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> it would be</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+{
+  const color = 0xFFFFFF;
+  const density = 0.1;
+  scene.fog = new THREE.FogExp2(color, density);
+}
+</pre>
+<p><a href="/docs/#api/en/scenes/FogExp2"><code class="notranslate" translate="no">FogExp2</code></a> is closer to reality but <a href="/docs/#api/en/scenes/Fog"><code class="notranslate" translate="no">Fog</code></a> is used
+more commonly since it lets you choose a place to apply
+the fog so you can decide to show a clear scene
+up to a certain distance and then fade out to some color
+past that distance.</p>
+<div class="spread">
+  <div>
+    <div data-diagram="fog" style="height: 300px;"></div>
+    <div class="code">THREE.Fog</div>
+  </div>
+  <div>
+    <div data-diagram="fogExp2" style="height: 300px;"></div>
+    <div class="code">THREE.FogExp2</div>
+  </div>
+</div>
+
+<p>It's important to note that the fog is applied to <em>things that are rendered</em>.
+It is part of the calculation of each pixel of the color of the object.
+What that means is if you want your scene to fade to a certain color you
+need to set the fog <strong>and</strong> the background color to the same color.
+The background color is set using the
+<a href="/docs/#api/en/scenes/Scene#background"><code class="notranslate" translate="no">scene.background</code></a>
+property. To pick a background color you attach a <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a> to it. For example</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">scene.background = new THREE.Color('#F00');  // red
+</pre>
+<div class="spread">
+  <div>
+    <div data-diagram="fogBlueBackgroundRed" style="height: 300px;" class="border"></div>
+    <div class="code">fog blue, background red</div>
+  </div>
+  <div>
+    <div data-diagram="fogBlueBackgroundBlue" style="height: 300px;" class="border"></div>
+    <div class="code">fog blue, background blue</div>
+  </div>
+</div>
+
+<p>Here is one of our previous examples with fog added. The only addition
+is right after setting up the scene we add the fog and set the scene's
+background color</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+
++{
++  const near = 1;
++  const far = 2;
++  const color = 'lightblue';
++  scene.fog = new THREE.Fog(color, near, far);
++  scene.background = new THREE.Color(color);
++}
+</pre>
+<p>In the example below the camera's <code class="notranslate" translate="no">near</code> is 0.1 and its <code class="notranslate" translate="no">far</code> is 5.
+The camera is at <code class="notranslate" translate="no">z = 2</code>. The cubes are 1 unit large and at Z = 0.
+This means with a fog setting of <code class="notranslate" translate="no">near = 1</code> and <code class="notranslate" translate="no">far = 2</code> the cubes
+will fade out right around their center.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fog.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/fog.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Let's add an interface so we can adjust the fog. Again we'll use
+<a href="https://github.com/georgealways/lil-gui">lil-gui</a>. lil-gui takes
+an object and a property and automagically makes an interface
+for that type of property. We could just simply let it manipulate
+the fog's <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> properties but it's invalid to have
+<code class="notranslate" translate="no">near</code> be greater than <code class="notranslate" translate="no">far</code> so let's make a helper so lil-gui
+can manipulate a <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> property but we'll make sure <code class="notranslate" translate="no">near</code>
+is less than or equal to <code class="notranslate" translate="no">far</code> and <code class="notranslate" translate="no">far</code> is greater than or equal <code class="notranslate" translate="no">near</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// We use this class to pass to lil-gui
+// so when it manipulates near or far
+// near is never &gt; far and far is never &lt; near
+class FogGUIHelper {
+  constructor(fog) {
+    this.fog = fog;
+  }
+  get near() {
+    return this.fog.near;
+  }
+  set near(v) {
+    this.fog.near = v;
+    this.fog.far = Math.max(this.fog.far, v);
+  }
+  get far() {
+    return this.fog.far;
+  }
+  set far(v) {
+    this.fog.far = v;
+    this.fog.near = Math.min(this.fog.near, v);
+  }
+}
+</pre>
+<p>We can then add it like this</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const near = 1;
+  const far = 2;
+  const color = 'lightblue';
+  scene.fog = new THREE.Fog(color, near, far);
+  scene.background = new THREE.Color(color);
++
++  const fogGUIHelper = new FogGUIHelper(scene.fog);
++  gui.add(fogGUIHelper, 'near', near, far).listen();
++  gui.add(fogGUIHelper, 'far', near, far).listen();
+}
+</pre>
+<p>The <code class="notranslate" translate="no">near</code> and <code class="notranslate" translate="no">far</code> parameters set the minimum and maximum values
+for adjusting the fog. They are set when we setup the camera.</p>
+<p>The <code class="notranslate" translate="no">.listen()</code> at the end of the last 2 lines tells lil-gui to <em>listen</em>
+for changes. That way when we change <code class="notranslate" translate="no">near</code> because of an edit to <code class="notranslate" translate="no">far</code>
+or we change <code class="notranslate" translate="no">far</code> in response to an edit to <code class="notranslate" translate="no">near</code> lil-gui will update
+the other property's UI for us.</p>
+<p>It might also be nice to be able to change the fog color but like was
+mentioned above we need to keep both the fog color and the background
+color in sync. So, let's add another <em>virtual</em> property to our helper
+that will set both colors when lil-gui manipulates it.</p>
+<p>lil-gui can manipulate colors in 4 ways, as a CSS 6 digit hex string (eg: <code class="notranslate" translate="no">#112233</code>). As an hue, saturation, value, object (eg: <code class="notranslate" translate="no">{h: 60, s: 1, v: }</code>).
+As an RGB array (eg: <code class="notranslate" translate="no">[255, 128, 64]</code>). Or, as an RGBA array (eg: <code class="notranslate" translate="no">[127, 200, 75, 0.3]</code>).</p>
+<p>It's easiest for our purpose to use the hex string version since that way
+lil-gui is only manipulating a single value. Fortunately <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">THREE.Color</code></a>
+as a <a href="/docs/#api/en/math/Color#getHexString"><code class="notranslate" translate="no">getHexString</code></a> method
+we get use to easily get such a string, we just have to prepend a '#' to the front.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// We use this class to pass to lil-gui
+// so when it manipulates near or far
+// near is never &gt; far and far is never &lt; near
++// Also when lil-gui manipulates color we'll
++// update both the fog and background colors.
+class FogGUIHelper {
+*  constructor(fog, backgroundColor) {
+    this.fog = fog;
++    this.backgroundColor = backgroundColor;
+  }
+  get near() {
+    return this.fog.near;
+  }
+  set near(v) {
+    this.fog.near = v;
+    this.fog.far = Math.max(this.fog.far, v);
+  }
+  get far() {
+    return this.fog.far;
+  }
+  set far(v) {
+    this.fog.far = v;
+    this.fog.near = Math.min(this.fog.near, v);
+  }
++  get color() {
++    return `#${this.fog.color.getHexString()}`;
++  }
++  set color(hexString) {
++    this.fog.color.set(hexString);
++    this.backgroundColor.set(hexString);
++  }
+}
+</pre>
+<p>We then call <code class="notranslate" translate="no">gui.addColor</code> to add a color UI for our helper's virtual property.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+  const near = 1;
+  const far = 2;
+  const color = 'lightblue';
+  scene.fog = new THREE.Fog(color, near, far);
+  scene.background = new THREE.Color(color);
+
+*  const fogGUIHelper = new FogGUIHelper(scene.fog, scene.background);
+  gui.add(fogGUIHelper, 'near', near, far).listen();
+  gui.add(fogGUIHelper, 'far', near, far).listen();
++  gui.addColor(fogGUIHelper, 'color');
+}
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fog-gui.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/fog-gui.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>You can see setting <code class="notranslate" translate="no">near</code> to like 1.9 and <code class="notranslate" translate="no">far</code> to 2.0 gives
+a very sharp transition between un-fogged and completely fogged.
+where as <code class="notranslate" translate="no">near</code> = 1.1 and <code class="notranslate" translate="no">far</code> = 2.9 should just about be
+the smoothest given our cubes are spinning 2 units away from the camera.</p>
+<p>One last thing, there is a boolean <a href="/docs/#api/en/materials/Material#fog"><code class="notranslate" translate="no">fog</code></a>
+property on a material for whether or not objects rendered
+with that material are affected by fog. It defaults to <code class="notranslate" translate="no">true</code>
+for most materials. As an example of why you might want
+to turn the fog off, imagine you're making a 3D vehicle
+simulator with a view from the driver's seat or cockpit.
+You probably want the fog off for everything inside the vehicle when
+viewing from inside the vehicle.</p>
+<p>A better example might be a house
+and thick fog outside house. Let's say the fog is set to start
+2 meters away (near = 2) and completely fogged out at 4 meters (far = 4).
+Rooms are longer than 2 meters and the house is probably longer
+than 4 meters so you need to set the materials for the inside
+of the house to not apply fog otherwise when standing inside the
+house looking outside the wall at the far end of the room will look
+like it's in the fog.</p>
+<div class="spread">
+  <div>
+    <div data-diagram="fogHouseAll" style="height: 300px;" class="border"></div>
+    <div class="code">fog: true, all</div>
+  </div>
+</div>
+
+<p>Notice the walls and ceiling at the far end of the room are getting fog applied.
+By turning fog off on the materials for the house we can fix that issue.</p>
+<div class="spread">
+  <div>
+    <div data-diagram="fogHouseInsideNoFog" style="height: 300px;" class="border"></div>
+    <div class="code">fog: true, only outside materials</div>
+  </div>
+</div>
+
+<p><canvas id="c"></canvas></p>
+<script type="module" src="../resources/threejs-fog.js"></script>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

@@ -13,17 +13,30 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank">three.js</a> - fat lines</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { LineMaterial } from './jsm/lines/LineMaterial.js';
-			import { Wireframe } from './jsm/lines/Wireframe.js';
-			import { WireframeGeometry2 } from './jsm/lines/WireframeGeometry2.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+			import { Wireframe } from 'three/addons/lines/Wireframe.js';
+			import { WireframeGeometry2 } from 'three/addons/lines/WireframeGeometry2.js';
 
 			let wireframe, renderer, scene, camera, camera2, controls;
 			let wireframe1;
@@ -179,14 +192,14 @@
 
 					switch ( val ) {
 
-						case '0':
+						case 0:
 							wireframe.visible = true;
 
 							wireframe1.visible = false;
 
 							break;
 
-						case '1':
+						case 1:
 							wireframe.visible = false;
 
 							wireframe1.visible = true;
@@ -210,7 +223,7 @@
 					// dashed is implemented as a defines -- not as a uniform. this could be changed.
 					// ... or THREE.LineDashedMaterial could be implemented as a separate material
 					// temporary hack - renderer should do this eventually
-					if ( val ) matLine.defines.USE_DASH = ""; else delete matLine.defines.USE_DASH;
+					if ( val ) matLine.defines.USE_DASH = ''; else delete matLine.defines.USE_DASH;
 					matLine.needsUpdate = true;
 
 					wireframe1.material = val ? matLineDashed : matLineBasic;
@@ -228,7 +241,7 @@
 
 					switch ( val ) {
 
-						case '0':
+						case 0:
 							matLine.dashSize = 2;
 							matLine.gapSize = 1;
 
@@ -237,7 +250,7 @@
 
 							break;
 
-						case '1':
+						case 1:
 							matLine.dashSize = 1;
 							matLine.gapSize = 1;
 
@@ -246,7 +259,7 @@
 
 							break;
 
-						case '2':
+						case 2:
 							matLine.dashSize = 1;
 							matLine.gapSize = 2;
 

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:LineBasicMaterial] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">Un materiale per disegnare geometrie in stile wireframe con linee tratteggiate.</p>
+
+		<h2>Codice di Esempio</h2>
+
+		<code>
+		const material = new THREE.LineDashedMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			scale: 1,
+			dashSize: 3,
+			gapSize: 1,
+		} );
+		</code>
+
+		<h2>Esempi</h2>
+
+		<p>
+			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
+		</p>
+
+		<h2>Costruttore</h2>
+
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
+		Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:LineBasicMaterial LineBasicMaterial]) può essere passata qui.
+		</p>
+
+		<h2>Proprietà</h2>
+		<p>Vedi la classe base [page:LineBasicMaterial] per le proprietà comuni.</p>
+
+		<h3>[property:number dashSize]</h3>
+		<p>La dimensione del trattino. Si tratta sia dello spazio che del tratto. Il valore predefinito è `3`.</p>
+
+		<h3>[property:number gapSize]</h3>
+		<p>La dimensione dello spazio tra i trattini. Il valore predefinito è `1`.</p>
+
+		<h3>[property:Boolean isLineDashedMaterial]</h3>
+		<p>
+			Flag di sola lettura per verificare se l'oggetto dato è di tipo [name].
+		</p>
+
+
+		<h3>[property:number scale]</h3>
+		<p>La scala della parte tratteggiata di una linea. Il valore predefinito è `1`.</p>
+
+		<h2>Metodi</h2>
+		<p>Vedi la classe base [page:LineBasicMaterial] per i metodi comuni.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

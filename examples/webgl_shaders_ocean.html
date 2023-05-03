@@ -13,16 +13,31 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
-			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { Water } from './jsm/objects/Water.js';
-			import { Sky } from './jsm/objects/Sky.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Water } from 'three/addons/objects/Water.js';
+			import { Sky } from 'three/addons/objects/Sky.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Confirm correct color management.
 
 			let container, stats;
 			let camera, scene, renderer;
@@ -40,6 +55,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
@@ -94,25 +110,28 @@
 				skyUniforms[ 'mieDirectionalG' ].value = 0.8;
 
 				const parameters = {
-					inclination: 0.49,
-					azimuth: 0.205
+					elevation: 2,
+					azimuth: 180
 				};
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				let renderTarget;
 
 				function updateSun() {
 
-					const theta = Math.PI * ( parameters.inclination - 0.5 );
-					const phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
+					const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+					const theta = THREE.MathUtils.degToRad( parameters.azimuth );
 
-					sun.x = Math.cos( phi );
-					sun.y = Math.sin( phi ) * Math.sin( theta );
-					sun.z = Math.sin( phi ) * Math.cos( theta );
+					sun.setFromSphericalCoords( 1, phi, theta );
 
 					sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
 					water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
 
-					scene.environment = pmremGenerator.fromScene( sky ).texture;
+					if ( renderTarget !== undefined ) renderTarget.dispose();
+
+					renderTarget = pmremGenerator.fromScene( sky );
+
+					scene.environment = renderTarget.texture;
 
 				}
 
@@ -145,8 +164,8 @@
 				const gui = new GUI();
 
 				const folderSky = gui.addFolder( 'Sky' );
-				folderSky.add( parameters, 'inclination', 0, 0.5, 0.0001 ).onChange( updateSun );
-				folderSky.add( parameters, 'azimuth', 0, 1, 0.0001 ).onChange( updateSun );
+				folderSky.add( parameters, 'elevation', 0, 90, 0.1 ).onChange( updateSun );
+				folderSky.add( parameters, 'azimuth', - 180, 180, 0.1 ).onChange( updateSun );
 				folderSky.open();
 
 				const waterUniforms = water.material.uniforms;

@@ -1,3 +1,6 @@
+import WebGPUWeakMap from './WebGPUWeakMap.js';
+import { lights } from '../../nodes/Nodes.js';
+
 function painterSortStable( a, b ) {
 
 	if ( a.groupOrder !== b.groupOrder ) {
@@ -56,6 +59,9 @@ class WebGPURenderList {
 		this.opaque = [];
 		this.transparent = [];
 
+		this.lightsNode = lights( [] );
+		this.lightsArray = [];
+
 	}
 
 	init() {
@@ -64,6 +70,9 @@ class WebGPURenderList {
 
 		this.opaque.length = 0;
 		this.transparent.length = 0;
+		this.lightsArray.length = 0;
+
+		return this;
 
 	}
 
@@ -121,6 +130,18 @@ class WebGPURenderList {
 
 	}
 
+	pushLight( light ) {
+
+		this.lightsArray.push( light );
+
+	}
+
+	getLightsNode() {
+
+		return this.lightsNode.fromLights( this.lightsArray );
+
+	}
+
 	sort( customOpaqueSort, customTransparentSort ) {
 
 		if ( this.opaque.length > 1 ) this.opaque.sort( customOpaqueSort || painterSortStable );
@@ -129,6 +150,10 @@ class WebGPURenderList {
 	}
 
 	finish() {
+
+		// update lights
+
+		this.lightsNode.fromLights( this.lightsArray );
 
 		// Clear references from inactive renderItems in the list
 
@@ -156,31 +181,22 @@ class WebGPURenderLists {
 	constructor() {
 
 		this.lists = new WeakMap();
+		this.lists = new WebGPUWeakMap();
 
 	}
 
 	get( scene, camera ) {
 
 		const lists = this.lists;
+		const keys = [ scene, camera ];
 
-		const cameras = lists.get( scene );
-		let list;
+		let list = lists.get( keys );
 
-		if ( cameras === undefined ) {
+		if ( list === undefined ) {
 
 			list = new WebGPURenderList();
-			lists.set( scene, new WeakMap() );
-			lists.get( scene ).set( camera, list );
+			lists.set( keys, list );
 
-		} else {
-
-			list = cameras.get( camera );
-			if ( list === undefined ) {
-
-				list = new WebGPURenderList();
-				cameras.set( camera, list );
-
-			}
 
 		}
 

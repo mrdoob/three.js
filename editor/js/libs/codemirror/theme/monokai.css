@@ -14,6 +14,11 @@
 .cm-s-monokai span.cm-atom { color: #ae81ff; }
 .cm-s-monokai span.cm-number { color: #ae81ff; }
 
+.cm-s-monokai span.cm-comment.cm-attribute { color: #97b757; }
+.cm-s-monokai span.cm-comment.cm-def { color: #bc9262; }
+.cm-s-monokai span.cm-comment.cm-tag { color: #bc6283; }
+.cm-s-monokai span.cm-comment.cm-type { color: #5998a6; }
+
 .cm-s-monokai span.cm-property, .cm-s-monokai span.cm-attribute { color: #a6e22e; }
 .cm-s-monokai span.cm-keyword { color: #f92672; }
 .cm-s-monokai span.cm-builtin { color: #66d9ef; }
@@ -21,7 +26,7 @@
 
 .cm-s-monokai span.cm-variable { color: #f8f8f2; }
 .cm-s-monokai span.cm-variable-2 { color: #9effff; }
-.cm-s-monokai span.cm-variable-3 { color: #66d9ef; }
+.cm-s-monokai span.cm-variable-3, .cm-s-monokai span.cm-type { color: #66d9ef; }
 .cm-s-monokai span.cm-def { color: #fd971f; }
 .cm-s-monokai span.cm-bracket { color: #f8f8f2; }
 .cm-s-monokai span.cm-tag { color: #f92672; }

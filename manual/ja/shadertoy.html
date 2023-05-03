@@ -1,0 +1,393 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>とShadertoy</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – とShadertoy">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>とShadertoy</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><a href="https://shadertoy.com">Shadertoy</a>は凄いシェーダーの実験場で有名なサイトです。よく聞かれるのがThree.jsでShadertoyのシェーダーを使う方法です。</p>
+<p>シェーダーの<strong>おもちゃ</strong>と呼ばれている理由を認識する事が大切です。
+一般的にshadertoyのシェーダーはベストプラクティスではありません。
+むしろ、<a href="https://dwitter.net">dwitter</a> (140文字でコードを書く)や<a href="https://js13kgames.com">js13kGames</a> (13k以下でゲームを作る)のような楽しいチャレンジです。</p>
+<p>Shadertoyの場合のパズルは、<em>ピクセルに何か面白いものを描画する関数を書く事です</em>。
+それは楽しいチャレンジで、多くの投稿は凄いシェーダーです。
+しかし、それはベストプラクティスではありません。</p>
+<p><a href="https://www.shadertoy.com/view/XtsSWs">街全体を描く凄いshadertoyシェーダー</a>で比較してみましょう。</p>
+<div class="threejs_center"><img src="../resources/images/shadertoy-skyline.png"></div>
+
+<p>上記のシェーダーは私のPCではフルスクリーンだと1秒間に約5フレームで動作します。
+<a href="https://store.steampowered.com/app/255710/Cities_Skylines/">Citiesのようなゲーム: スカイライン</a>とは対照的です。</p>
+<div class="threejs_center"><img src="../resources/images/cities-skylines.jpg" style="width: 600px;"></div>
+
+<p>このゲームはテクスチャと三角形の建物を描画する伝統的な技術を使用しており、同じマシンで1秒間に30～60フレーム動作します。</p>
+<p>それでもthree.jsでShadertoyのシェーダーを使ってみましょう。</p>
+<p>以下は2019年1月現在で<a href="https://www.shadertoy.com/new">shadertoy.comで"New"を選ぶ</a>した時のデフォルトのshadertoyシェーダーです。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By iq: https://www.shadertoy.com/user/iq  
+// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+    // Time varying pixel color
+    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+
+    // Output to screen
+    fragColor = vec4(col,1.0);
+}
+</pre>
+<p>シェーダーを理解する上で重要な事の1つは、特殊な型を含む3D数学用に設計されたGLSL (Graphics Library Shading Language)と呼ばれる言語で書かれている事です。
+上記コードでは <code class="notranslate" translate="no">vec4</code>、<code class="notranslate" translate="no">vec2</code>、<code class="notranslate" translate="no">vec3</code> のような特殊な型があります。
+<code class="notranslate" translate="no">vec2</code> は2つの値を持ち <code class="notranslate" translate="no">vec3</code> は3つ、<code class="notranslate" translate="no">vec4</code> は4つの値を持ちます。
+たくさんの方法で引数を指定できます。
+例えば以下のように <code class="notranslate" translate="no">x</code>、<code class="notranslate" translate="no">y</code>、<code class="notranslate" translate="no">z</code>、<code class="notranslate" translate="no">w</code> を使うのが最も一般的です。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">vec4 v1 = vec4(1.0, 2.0, 3.0, 4.0);
+float v2 = v1.x + v1.y;  // adds 1.0 + 2.0
+</pre>
+<p>JavaScriptとは異なり、GLSLはC/C++のように変数の型を宣言しなければなりません。
+<code class="notranslate" translate="no">var v = 1.2;</code> ではなく <code class="notranslate" translate="no">float v = 1.2;</code> となり <code class="notranslate" translate="no">v</code> は浮動小数点数です。</p>
+<p>GLSLを詳しく解説するとこの記事で紹介している以上の事ができます。
+GLSLの簡単な概要は<a href="https://webglfundamentals.org/webgl/lessons/webgl-shaders-and-glsl.html">この記事</a>を参照して下さい。
+<a href="https://thebookofshaders.com/">The Book of Shaders</a>の連載記事の後に続くかもしれません。</p>
+<p>2019年1月現在では<a href="https://shadertoy.com">shadertoy.com</a>は <em>フラグメントシェーダー</em> のみ使えます。
+フラグメントシェーダーの役割は、ピクセルの位置が与えられた時にそのピクセルの色を出力します。</p>
+<p>上記の関数ではシェーダーに <code class="notranslate" translate="no">fragColor</code> という <code class="notranslate" translate="no">out</code> パラメーターがあります。
+<code class="notranslate" translate="no">out</code> は <code class="notranslate" translate="no">output</code> の略です。
+outは関数が値を提供する事を意味するパラメーターです。
+これを何か他の色に設定します。</p>
+<p>また、<code class="notranslate" translate="no">in</code> (入力用) パラメーターとして <code class="notranslate" translate="no">fragCoord</code> があります。
+これは描画しようとしているピクセル座標です。座標によって色を決めます。
+描画先のキャンバスが400 x 300ピクセルの場合、この関数は400 x 300回つまり12万回呼ばれます。
+毎回 <code class="notranslate" translate="no">fragCoord</code> は別のピクセル座標になります。</p>
+<p>コードに未定義の変数が2つ使用されています。
+1つは <code class="notranslate" translate="no">iResolution</code> です。これはキャンバスの解像度です。
+キャンバスが400 x 300の場合、<code class="notranslate" translate="no">iResolution</code> は400, 300になります。
+ピクセル座標が変化すると <code class="notranslate" translate="no">uv</code> はテクスチャ全体で0.0 〜 1.0の間で変化します。
+<em>正規化された</em>値を使い動作させると物事が単純になる事が多く、shadertoyのシェーダーの大部分は正規化したものから始まります。</p>
+<p>コードに定義されていないもう1つの変数は <code class="notranslate" translate="no">iTime</code> です。
+これはページが読み込まれてからの時間を秒単位で表します。</p>
+<p>シェーダの専門用語では、これらのグローバル変数は <em>ユニフォーム（uniform）</em> 変数と呼ばれています。
+この変数は変更されないため <em>ユニフォーム</em> と呼ばれ、シェーダーの1回のイテレーションから次のイテレーションまで同じ状態を保ちます。
+ここで注意したいのはそれらは全てshadertoy特有のものです。
+これらは <em>オフィシャルな</em> GLSL変数ではありません。
+それらはshadertoy側で作った変数です。</p>
+<p><a href="https://www.shadertoy.com/howto">Shadertoyのドキュメントを見ると、さらにいくつか特有の定義があります</a>。
+とりあえず、上記のシェーダーで使われている2つを処理するコードを書いてみましょう。</p>
+<p>まずはキャンバスを塗りつぶす1枚の平面を作ってみましょう。
+まだ読んでいない方は<a href="backgrounds.html">背景とスカイボックスの記事</a>でこのようにしましたので、その例を参考に立方体を削除してみましょう。
+かなり短いコードなので全体を紹介します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
+  renderer.autoClearColor = false;
+
+  const camera = new THREE.OrthographicCamera(
+    -1, // left
+     1, // right
+     1, // top
+    -1, // bottom
+    -1, // near,
+     1, // far
+  );
+  const scene = new THREE.Scene();
+  const plane = new THREE.PlaneGeometry(2, 2);
+  const material = new THREE.MeshBasicMaterial({
+      color: 'red',
+  });
+  scene.add(new THREE.Mesh(plane, material));
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  function render() {
+    resizeRendererToDisplaySize(renderer);
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+</pre>
+<p><a href="backgrounds.html">背景とスカイボックスの記事で説明したように</a>、これらのパラメーターを持つ <a href="/docs/#api/ja/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a> と2の長さの平面がキャンバスを塗り潰します。
+平面は赤の <a href="/docs/#api/ja/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> を使用しているため、赤いキャンバスが表示されます。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-prep.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/shadertoy-prep.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>これで動作するようになったので、shadertoyシェーダーを追加してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fragmentShader = `
+#include &lt;common&gt;
+
+uniform vec3 iResolution;
+uniform float iTime;
+
+// By iq: https://www.shadertoy.com/user/iq  
+// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+    // Time varying pixel color
+    vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+
+    // Output to screen
+    fragColor = vec4(col,1.0);
+}
+
+void main() {
+  mainImage(gl_FragColor, gl_FragCoord.xy);
+}
+`;
+</pre>
+<p>上記では2つのユニフォーム変数を宣言しました。
+そして、shadertoyからGLSLのシェーダーコードを追加しました。
+最後に <code class="notranslate" translate="no">mainImage</code> を呼び出し、<code class="notranslate" translate="no">gl_FragColor</code> と <code class="notranslate" translate="no">gl_FragCoord.xy</code> を渡します。
+<code class="notranslate" translate="no">gl_FragColor</code> はオフィシャルのグローバル変数でシェーダーが現在のピクセルに設定する色を指定します。
+<code class="notranslate" translate="no">gl_FragCoord</code> は現在の色を選択しているピクセルの座標を教えてくれる、もう1つのオフィシャルなグローバル変数です。</p>
+<p>次にシェーダーに値を設定できるようにThree.jsのユニフォームを設定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const uniforms = {
+  iTime: { value: 0 },
+  iResolution:  { value: new THREE.Vector3() },
+};
+</pre>
+<p>Three.jsの各ユニフォームには <code class="notranslate" translate="no">value</code> パラメータがあります。
+この値はユニフォームの型と一致してなければなりません。</p>
+<p>フラグメントシェーダーとユニフォームの両方を <a href="/docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a> に渡します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const material = new THREE.MeshBasicMaterial({
+-    color: 'red',
+-});
++const material = new THREE.ShaderMaterial({
++  fragmentShader,
++  uniforms,
++});
+</pre>
+<p>レンダリングする前にユニフォームの値を設定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render() {
++function render(time) {
++  time *= 0.001;  // convert to seconds
+
+  resizeRendererToDisplaySize(renderer);
+
++  const canvas = renderer.domElement;
++  uniforms.iResolution.value.set(canvas.width, canvas.height, 1);
++  uniforms.iTime.value = time;
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+</pre>
+<blockquote>
+<p>注意点： なぜ <code class="notranslate" translate="no">iResolution</code> が <code class="notranslate" translate="no">vec3</code> なのか、 3番目の値に何が入っているのか 
+<a href="https://www.shadertoy.com/howto">shadertoy.comには文書化されてない</a> のでさっぱりわかりません。
+上記では使わないのでとりあえず1にしておきます。 ¯\_(ツ)_/¯</p>
+</blockquote>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-basic.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/shadertoy-basic.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>これは<a href="https://www.shadertoy.com/new">新しいシェーダーでShadertoyで見たものと一致します</a>。
+少なくとも2019年1月の時点では😉。上記のシェーダーは何をしているのでしょうか？</p>
+<ul>
+<li><code class="notranslate" translate="no">uv</code> は0 〜 1です。</li>
+<li><code class="notranslate" translate="no">cos(uv.xyx)</code> は3つのコサイン値を <code class="notranslate" translate="no">vec3</code> としてます。</li>
+<li>3つとは <code class="notranslate" translate="no">uv.x</code>、<code class="notranslate" translate="no">uv.y</code>、<code class="notranslate" translate="no">uv.z</code> です。</li>
+<li>時間を加えて、<code class="notranslate" translate="no">cos(iTime+uv.xyx)</code> でアニメーションさせます。</li>
+<li><code class="notranslate" translate="no">cos(iTime+uv.xyx+vec3(0,2,4))</code> のように <code class="notranslate" translate="no">vec3(0,2,4)</code> を加えると、コサイン波の <code class="notranslate" translate="no">cos</code> が-1 〜 1にオフセットされます。</li>
+<li>そのため <code class="notranslate" translate="no">0.5 * 0.5 + cos(....)</code> は -1 &lt;-&gt; 1 〜 0.0 &lt;-&gt; 1.0 に変換され、その結果が現在のピクセルのRGB色として利用されます。</li>
+</ul>
+<p>わずかな変更でコサイン波が見やすくなります。
+<code class="notranslate" translate="no">uv</code> は0 〜 1までの間だけです。
+コサインは2πで繰り返すので、0 〜 40.0を掛けて40にしてみましょう。
+これで6.3回くらいリピートするはずです。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">-vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
++vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx*40.0+vec3(0,2,4));
+</pre>
+<p>以下を数えてみると6.3回くらいリピートしています。
+<code class="notranslate" translate="no">+vec3(0,2,4)</code> で4だけオフセットされているので赤の間に青が見えます。
+それがないと青と赤が完全に重なり、紫になってしまいます。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-basic-x40.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/shadertoy-basic-x40.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>シンプルな入力でshadertoyにある
+<a href="https://www.shadertoy.com/view/MdXGW2">a city canal</a>や
+<a href="https://www.shadertoy.com/view/4ttSWf">a forest</a>、
+<a href="https://www.shadertoy.com/view/ld3Gz2">a snail</a>や
+<a href="https://www.shadertoy.com/view/4tBXR1">a mushroom</a>
+をより印象的なものにして見る事ができます。
+上手くいけば三角形からシーンを作る伝統的な方法と比較して、一般的に正しいアプローチではない理由も明確になるでしょう。
+全てのピクセルの色を計算するために多くの計算をしなければならないので、これらの例は非常に遅く実行されます。</p>
+<p>いくつかのshadertoyシェーダーは、<a href="https://www.shadertoy.com/view/MsXSzM">これ</a>のようにテクスチャを入力として受け取るものがあります。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">// By Daedelus: https://www.shadertoy.com/user/Daedelus
+// license: Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+#define TIMESCALE 0.25 
+#define TILES 8
+#define COLOR 0.7, 1.6, 2.8
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 uv = fragCoord.xy / iResolution.xy;
+    uv.x *= iResolution.x / iResolution.y;
+
+    vec4 noise = texture2D(iChannel0, floor(uv * float(TILES)) / float(TILES));
+    float p = 1.0 - mod(noise.r + noise.g + noise.b + iTime * float(TIMESCALE), 1.0);
+    p = min(max(p * 3.0 - 1.8, 0.1), 2.0);
+
+    vec2 r = mod(uv * float(TILES), 1.0);
+    r = vec2(pow(r.x - 0.5, 2.0), pow(r.y - 0.5, 2.0));
+    p *= 1.0 - pow(min(1.0, 12.0 * dot(r, r)), 2.0);
+
+    fragColor = vec4(COLOR, 1.0) * p;
+}
+</pre>
+<p>シェーダーにテクスチャを渡すのは<a href="textures.html">通常のマテリアルにテクスチャを渡す</a>のと似ていますが、ユニフォームにテクスチャを設定する必要があります。</p>
+<p>まず、シェーダーにテクスチャのユニフォームを追加します。
+GLSLでは <code class="notranslate" translate="no">sampler2D</code> と呼ばれています。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fragmentShader = `
+#include &lt;common&gt;
+
+uniform vec3 iResolution;
+uniform float iTime;
++uniform sampler2D iChannel0;
+
+...
+</pre>
+<p>ここで取り上げた<a href="textures.html">これ</a>のようなテクスチャをロードし、ユニフォームの値を設定します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
++const texture = loader.load('resources/images/bayer.png');
++texture.minFilter = THREE.NearestFilter;
++texture.magFilter = THREE.NearestFilter;
++texture.wrapS = THREE.RepeatWrapping;
++texture.wrapT = THREE.RepeatWrapping;
+const uniforms = {
+  iTime: { value: 0 },
+  iResolution:  { value: new THREE.Vector3() },
++  iChannel0: { value: texture },
+};
+</pre>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-bleepy-blocks.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/shadertoy-bleepy-blocks.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>これまでは<a href="https://shadertoy.com">Shadertoy.com</a>で使われているShadertoyシェーダーをそのまま使っていましたが、キャンバスを塗りつぶすように描画しています。
+しかし、そのユースケースだけに限定する必要はありません。
+覚えておくべき重要な事は、shadertoy上で書かれている関数は <code class="notranslate" translate="no">fragCoord</code> の入力と <code class="notranslate" translate="no">iResolution</code> を受け取るだけです。
+代わりにテクスチャ座標のような他のものを使えば、他のテクスチャと同じように使えます。
+関数を使ってテクスチャを生成するこの手法は、<a href="https://www.google.com/search?q=procedural+texture"><em>プロシージャルテクスチャ</em></a>と呼ばれています。</p>
+<p>上記のシェーダーを変更してみましょう。
+最も簡単なのはthree.jsが通常提供しているテクスチャ座標を取得し、それに <code class="notranslate" translate="no">iResolution</code> を掛けて <code class="notranslate" translate="no">fragCoords</code> に渡す事かもしれません。</p>
+<p>そのためには <em>ヴァリイング(varying)</em> を追加します。
+ヴァリイングとは頂点シェーダーからフラグメントシェーダーに渡される値で、頂点間で補間される値（または変化する値）の事です。
+フラグメントシェーダーで使用するために宣言します。
+Three.jsのテクスチャ座標は <code class="notranslate" translate="no">uv</code> で前にある <code class="notranslate" translate="no">v</code> は <em>ヴァリイング</em> を意味します。</p>
+<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">...
+
++varying vec2 vUv;
+
+void main() {
+-  mainImage(gl_FragColor, gl_FragCoord.xy);
++  mainImage(gl_FragColor, vUv * iResolution.xy);
+}
+</pre>
+<p>次に独自の頂点シェーダーも用意する必要があります。
+ここでは最小限のthree.jsの頂点シェーダーを紹介します。
+Three.jsは <code class="notranslate" translate="no">uv</code>、<code class="notranslate" translate="no">projectionMatrix</code>、<code class="notranslate" translate="no">modelViewMatrix</code>、<code class="notranslate" translate="no">position</code> を宣言し、その値を提供します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const vertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+  }
+`;
+</pre>
+<p>頂点シェーダーを <a href="/docs/#api/ja/materials/ShaderMaterial"><code class="notranslate" translate="no">ShaderMaterial</code></a> に渡します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.ShaderMaterial({
+  vertexShader,
+  fragmentShader,
+  uniforms,
+});
+</pre>
+<p><code class="notranslate" translate="no">iResolution</code> の値は初期化時には変化しないので、<code class="notranslate" translate="no">iResolution</code> の値をユニフォームに設定できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const uniforms = {
+  iTime: { value: 0 },
+-  iResolution:  { value: new THREE.Vector3() },
++  iResolution:  { value: new THREE.Vector3(1, 1, 1) },
+  iChannel0: { value: texture },
+};
+</pre>
+<p>レンダリング時に設定する必要がなくなりました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const canvas = renderer.domElement;
+-uniforms.iResolution.value.set(canvas.width, canvas.height, 1);
+uniforms.iTime.value = time;
+</pre>
+<p>元のカメラと<a href="responsive.html">レスポンシブデザインの記事</a>から3つの回転する立方体を設定するコードでコピーバックしました。
+その結果です。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/shadertoy-as-texture.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/shadertoy-as-texture.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>これで少しでもthree.jsを使ったshadertoyシェーダーの使い方を知ってもらえればと思います。
+繰り返しになりますが、ほとんどのshadertoyシェーダーは実際にパフォーマンスの高い方法で描画する推奨された方法ではなく、
+面白いチャレンジ（単一の機能で全てを描画する）と覚えておく事が重要です。
+それでもshadertoyのシェーダー達は素晴らしく、印象的で、美しく、どのように機能するかコードを見て学ぶ事ができます。</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

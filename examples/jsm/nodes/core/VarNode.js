@@ -1,64 +1,89 @@
-import { Node } from './Node.js';
+import Node, { addNodeClass } from './Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
-function VarNode( type, value ) {
+class VarNode extends Node {
 
-	Node.call( this, type );
+	constructor( node, name = null ) {
 
-	this.value = value;
+		super();
+
+		this.node = node;
+		this.name = name;
+
+	}
+
+	assign( node ) {
+
+		node.traverse( ( childNode, replaceNode ) => {
+
+			if ( replaceNode && childNode.uuid === this.uuid ) {
+
+				replaceNode( this.node );
+
+			}
+
+		} );
+		this.node = node;
+		return this;
+
+	}
+
+	isGlobal() {
+
+		return true;
+
+	}
+
+	getHash( builder ) {
+
+		return this.name || super.getHash( builder );
+
+	}
+
+	getNodeType( builder ) {
+
+		return this.node.getNodeType( builder );
+
+	}
+
+	generate( builder ) {
+
+		const node = this.node;
+		const name = this.name;
+
+		if ( name === null && node.isTempNode === true ) {
+
+			return node.build( builder );
+
+		}
+
+		const type = builder.getVectorType( this.getNodeType( builder ) );
+
+		const snippet = node.build( builder, type );
+		const nodeVar = builder.getVarFromNode( this, type );
+
+		if ( name !== null ) {
+
+			nodeVar.name = name;
+
+		}
+
+		const propertyName = builder.getPropertyName( nodeVar );
+
+		builder.addLineFlowCode( `${propertyName} = ${snippet}` );
+
+		return propertyName;
+
+	}
 
 }
 
-VarNode.prototype = Object.create( Node.prototype );
-VarNode.prototype.constructor = VarNode;
-VarNode.prototype.nodeType = 'Var';
+export default VarNode;
 
-VarNode.prototype.getType = function ( builder ) {
+export const label = nodeProxy( VarNode );
+export const temp = label;
 
-	return builder.getTypeByFormat( this.type );
+addNodeElement( 'label', label );
+addNodeElement( 'temp', temp );
 
-};
-
-VarNode.prototype.generate = function ( builder, output ) {
-
-	var varying = builder.getVar( this.uuid, this.type );
-
-	if ( this.value && builder.isShader( 'vertex' ) ) {
-
-		builder.addNodeCode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
-
-	}
-
-	return builder.format( varying.name, this.getType( builder ), output );
-
-};
-
-VarNode.prototype.copy = function ( source ) {
-
-	Node.prototype.copy.call( this, source );
-
-	this.type = source.type;
-	this.value = source.value;
-
-	return this;
-
-};
-
-VarNode.prototype.toJSON = function ( meta ) {
-
-	var data = this.getJSONNode( meta );
-
-	if ( ! data ) {
-
-		data = this.createJSONNode( meta );
-
-		data.type = this.type;
-
-		if ( this.value ) data.value = this.value.toJSON( meta ).uuid;
-
-	}
-
-	return data;
-
-};
-
-export { VarNode };
+addNodeClass( VarNode );

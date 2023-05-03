@@ -1,0 +1,448 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>Cleanup</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – Cleanup">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>Cleanup</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p>Three.js apps often use lots of memory. A 3D model
+might be 1 to 20 meg memory for all of its vertices.
+A model might use many textures that even if they are
+compressed into jpg files they have to be expanded
+to their uncompressed form to use. Each 1024x1024
+texture takes 4 to 6meg of memory.</p>
+<p>Most three.js apps load resources at init time and
+then use those resources forever until the page is
+closed. But, what if you want to load and change resources
+over time?</p>
+<p>Unlike most JavaScript, three.js can not automatically
+clean these resources up. The browser will clean them
+up if you switch pages but otherwise it's up to you
+to manage them. This is an issue of how WebGL is designed
+and so three.js has no recourse but to pass on the
+responsibility to free resources back to you.</p>
+<p>You free three.js resource this by calling the <code class="notranslate" translate="no">dispose</code> function on
+<a href="textures.html">textures</a>, 
+<a href="primitives.html">geometries</a>, and
+<a href="materials.html">materials</a>.</p>
+<p>You could do this manually. At the start you might create
+some of these resources</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxGeometry = new THREE.BoxGeometry(...);
+const boxTexture = textureLoader.load(...);
+const boxMaterial = new THREE.MeshPhongMaterial({map: texture});
+</pre>
+<p>and then when you're done with them you'd free them</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">boxGeometry.dispose();
+boxTexture.dispose();
+boxMaterial.dispose();
+</pre>
+<p>As you use more and more resources that would get more and
+more tedious.</p>
+<p>To help remove some of the tedium let's make a class to track
+the resources. We'll then ask that class to do the cleanup
+for us.</p>
+<p>Here's a first pass at such a class</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+    if (resource.dispose) {
+      this.resources.add(resource);
+    }
+    return resource;
+  }
+  untrack(resource) {
+    this.resources.delete(resource);
+  }
+  dispose() {
+    for (const resource of this.resources) {
+      resource.dispose();
+    }
+    this.resources.clear();
+  }
+}
+</pre>
+<p>Let's use this class with the first example from <a href="textures.html">the article on textures</a>.
+We can create an instance of this class</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const resTracker = new ResourceTracker();
+</pre>
+<p>and then just to make it easier to use let's create a bound function for the <code class="notranslate" translate="no">track</code> method</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const resTracker = new ResourceTracker();
++const track = resTracker.track.bind(resTracker);
+</pre>
+<p>Now to use it we just need to call <code class="notranslate" translate="no">track</code> with for each geometry, texture, and material
+we create</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+-const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
++const geometry = track(new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth));
+
+const cubes = [];  // an array we can use to rotate the cubes
+const loader = new THREE.TextureLoader();
+
+-const material = new THREE.MeshBasicMaterial({
+-  map: loader.load('resources/images/wall.jpg'),
+-});
++const material = track(new THREE.MeshBasicMaterial({
++  map: track(loader.load('resources/images/wall.jpg')),
++}));
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+cubes.push(cube);  // add to our list of cubes to rotate
+</pre>
+<p>And then to free them we'd want to remove the cubes from the scene
+and then call <code class="notranslate" translate="no">resTracker.dispose</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const cube of cubes) {
+  scene.remove(cube);
+}
+cubes.length = 0;  // clears the cubes array
+resTracker.dispose();
+</pre>
+<p>That would work but I find having to remove the cubes from the
+scene kind of tedious. Let's add that functionality to the <code class="notranslate" translate="no">ResourceTracker</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+-    if (resource.dispose) {
++    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
+    return resource;
+  }
+  untrack(resource) {
+    this.resources.delete(resource);
+  }
+  dispose() {
+    for (const resource of this.resources) {
+-      resource.dispose();
++      if (resource instanceof THREE.Object3D) {
++        if (resource.parent) {
++          resource.parent.remove(resource);
++        }
++      }
++      if (resource.dispose) {
++        resource.dispose();
++      }
++    }
+    this.resources.clear();
+  }
+}
+</pre>
+<p>And now we can track the cubes</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = track(new THREE.MeshBasicMaterial({
+  map: track(loader.load('resources/images/wall.jpg')),
+}));
+const cube = track(new THREE.Mesh(geometry, material));
+scene.add(cube);
+cubes.push(cube);  // add to our list of cubes to rotate
+</pre>
+<p>We no longer need the code to remove the cubes from the scene.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-for (const cube of cubes) {
+-  scene.remove(cube);
+-}
+cubes.length = 0;  // clears the cube array
+resTracker.dispose();
+</pre>
+<p>Let's arrange this code so that we can re-add the cube,
+texture, and material.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+*const cubes = [];  // just an array we can use to rotate the cubes
+
++function addStuffToScene() {
+  const resTracker = new ResourceTracker();
+  const track = resTracker.track.bind(resTracker);
+
+  const boxWidth = 1;
+  const boxHeight = 1;
+  const boxDepth = 1;
+  const geometry = track(new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth));
+
+  const loader = new THREE.TextureLoader();
+
+  const material = track(new THREE.MeshBasicMaterial({
+    map: track(loader.load('resources/images/wall.jpg')),
+  }));
+  const cube = track(new THREE.Mesh(geometry, material));
+  scene.add(cube);
+  cubes.push(cube);  // add to our list of cubes to rotate
++  return resTracker;
++}
+</pre>
+<p>And then let's write some code to add and remove things over time.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function waitSeconds(seconds = 0) {
+  return new Promise(resolve =&gt; setTimeout(resolve, seconds * 1000));
+}
+
+async function process() {
+  for (;;) {
+    const resTracker = addStuffToScene();
+    await wait(2);
+    cubes.length = 0;  // remove the cubes
+    resTracker.dispose();
+    await wait(1);
+  }
+}
+process();
+</pre>
+<p>This code will create the cube, texture and material, wait for 2 seconds, then dispose of them and wait for 1 second
+and repeat.</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cleanup-simple.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cleanup-simple.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>So that seems to work.</p>
+<p>For a loaded file though it's a little more work. Most loaders only return an <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
+as a root of the hierarchy of objects they load so we need to discover what all the resources
+are.</p>
+<p>Let's update our <code class="notranslate" translate="no">ResourceTracker</code> to try to do that.</p>
+<p>First we'll check if the object is an <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> then track its geometry, material, and children</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
++    if (resource instanceof THREE.Object3D) {
++      this.track(resource.geometry);
++      this.track(resource.material);
++      this.track(resource.children);
++    }
+    return resource;
+  }
+  ...
+}
+</pre>
+<p>Now, because any of <code class="notranslate" translate="no">resource.geometry</code>, <code class="notranslate" translate="no">resource.material</code>, and <code class="notranslate" translate="no">resource.children</code>
+might be null or undefined we'll check at the top of <code class="notranslate" translate="no">track</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
++    if (!resource) {
++      return resource;
++    }
+
+    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
+    if (resource instanceof THREE.Object3D) {
+      this.track(resource.geometry);
+      this.track(resource.material);
+      this.track(resource.children);
+    }
+    return resource;
+  }
+  ...
+}
+</pre>
+<p>Also because <code class="notranslate" translate="no">resource.children</code> is an array and because <code class="notranslate" translate="no">resource.material</code> can be
+an array let's check for arrays</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+    if (!resource) {
+      return resource;
+    }
+
++    // handle children and when material is an array of materials.
++    if (Array.isArray(resource)) {
++      resource.forEach(resource =&gt; this.track(resource));
++      return resource;
++    }
+
+    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
+    if (resource instanceof THREE.Object3D) {
+      this.track(resource.geometry);
+      this.track(resource.material);
+      this.track(resource.children);
+    }
+    return resource;
+  }
+  ...
+}
+</pre>
+<p>And finally we need to walk the properties and uniforms
+of a material looking for textures.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ResourceTracker {
+  constructor() {
+    this.resources = new Set();
+  }
+  track(resource) {
+    if (!resource) {
+      return resource;
+    }
+
+*    // handle children and when material is an array of materials or
+*    // uniform is array of textures
+    if (Array.isArray(resource)) {
+      resource.forEach(resource =&gt; this.track(resource));
+      return resource;
+    }
+
+    if (resource.dispose || resource instanceof THREE.Object3D) {
+      this.resources.add(resource);
+    }
+    if (resource instanceof THREE.Object3D) {
+      this.track(resource.geometry);
+      this.track(resource.material);
+      this.track(resource.children);
+-    }
++    } else if (resource instanceof THREE.Material) {
++      // We have to check if there are any textures on the material
++      for (const value of Object.values(resource)) {
++        if (value instanceof THREE.Texture) {
++          this.track(value);
++        }
++      }
++      // We also have to check if any uniforms reference textures or arrays of textures
++      if (resource.uniforms) {
++        for (const value of Object.values(resource.uniforms)) {
++          if (value) {
++            const uniformValue = value.value;
++            if (uniformValue instanceof THREE.Texture ||
++                Array.isArray(uniformValue)) {
++              this.track(uniformValue);
++            }
++          }
++        }
++      }
++    }
+    return resource;
+  }
+  ...
+}
+</pre>
+<p>And with that let's take an example from <a href="load-gltf.html">the article on loading gltf files</a>
+and make it load and free files.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
+function loadGLTF(url) {
+  return new Promise((resolve, reject) =&gt; {
+    gltfLoader.load(url, resolve, undefined, reject);
+  });
+}
+
+function waitSeconds(seconds = 0) {
+  return new Promise(resolve =&gt; setTimeout(resolve, seconds * 1000));
+}
+
+const fileURLs = [
+  'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf',
+  'resources/models/3dbustchallange_submission/scene.gltf',
+  'resources/models/mountain_landscape/scene.gltf',
+  'resources/models/simple_house_scene/scene.gltf',
+];
+
+async function loadFiles() {
+  for (;;) {
+    for (const url of fileURLs) {
+      const resMgr = new ResourceTracker();
+      const track = resMgr.track.bind(resMgr);
+      const gltf = await loadGLTF(url);
+      const root = track(gltf.scene);
+      scene.add(root);
+
+      // compute the box that contains all the stuff
+      // from root and below
+      const box = new THREE.Box3().setFromObject(root);
+
+      const boxSize = box.getSize(new THREE.Vector3()).length();
+      const boxCenter = box.getCenter(new THREE.Vector3());
+
+      // set the camera to frame the box
+      frameArea(boxSize * 1.1, boxSize, boxCenter, camera);
+
+      await waitSeconds(2);
+      renderer.render(scene, camera);
+
+      resMgr.dispose();
+
+      await waitSeconds(1);
+
+    }
+  }
+}
+loadFiles();
+</pre>
+<p>and we get</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/cleanup-loaded-files.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/cleanup-loaded-files.html" target="_blank">click here to open in a separate window</a>
+</div>
+
+<p></p>
+<p>Some notes about the code.</p>
+<p>If we wanted to load 2 or more files at once and free them at
+anytime we would use one <code class="notranslate" translate="no">ResourceTracker</code> per file.</p>
+<p>Above we are only tracking <code class="notranslate" translate="no">gltf.scene</code> right after loading.
+Based on our current implementation of <code class="notranslate" translate="no">ResourceTracker</code> that 
+will track all the resources just loaded. If we added more
+things to the scene we need to decide whether or not to track them.</p>
+<p>For example let's say after we loaded a character we put a tool
+in their hand by making the tool a child of their hand. As it is
+that tool will not be freed. I'm guessing more often than not
+this is what we want. </p>
+<p>That brings up a point. Originally when I first wrote the <code class="notranslate" translate="no">ResourceTracker</code>
+above I walked through everything inside the <code class="notranslate" translate="no">dispose</code> method instead of <code class="notranslate" translate="no">track</code>.
+It was only later as I thought about the tool as a child of hand case above
+that it became clear that tracking exactly what to free in <code class="notranslate" translate="no">track</code> was more
+flexible and arguably more correct since we could then track what was loaded
+from the file rather than just freeing the state of the scene graph later.</p>
+<p>I honestly am not 100% happy with <code class="notranslate" translate="no">ResourceTracker</code>. Doing things this
+way is not common in 3D engines. We shouldn't have to guess what
+resources were loaded, we should know. It would be nice if three.js
+changed so that all file loaders returned some standard object with
+references to all the resources loaded. At least at the moment,
+three.js doesn't give us any more info when loading a scene so this
+solution seems to work.</p>
+<p>I hope you find this example useful or at least a good reference for what is
+required to free resources in three.js</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

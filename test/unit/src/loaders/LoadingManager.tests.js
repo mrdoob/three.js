@@ -1,63 +1,105 @@
 /* global QUnit */
 
-import { LoadingManager } from '../../../../src/loaders/LoadingManager';
-import { Loader } from '../../../../src/loaders/Loader';
+import { LoadingManager } from '../../../../src/loaders/LoadingManager.js';
+
+import { Loader } from '../../../../src/loaders/Loader.js';
 
 export default QUnit.module( 'Loaders', () => {
 
 	QUnit.module( 'LoadingManager', () => {
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			// no params
+			const object = new LoadingManager();
+			assert.ok( object, 'Can instantiate a LoadingManager.' );
 
-		} );
-
-		// PUBLIC STUFF
-		QUnit.todo( "onStart", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			// onLoad, onProgress, onError
 
 		} );
 
-		QUnit.todo( "onLoad", ( assert ) => {
+		// PUBLIC
+		QUnit.todo( 'onStart', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "onProgress", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			// Refer to #5689 for the reason why we don't set .onStart
+			// in the constructor
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "onError", ( assert ) => {
+		QUnit.todo( 'onLoad', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "itemStart", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "itemEnd", ( assert ) => {
+		QUnit.todo( 'onProgress', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "itemError", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( "getHandler", ( assert ) => {
+		QUnit.todo( 'onError', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'itemStart', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'itemEnd', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'itemError', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'resolveURL', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setURLModifier', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'addHandler', ( assert ) => {
+
+			// addHandler( regex, loader )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'removeHandler', ( assert ) => {
+
+			// removeHandler( regex )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+
+		QUnit.todo( 'getHandler', ( assert ) => {
+
+			// getHandler( file )
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// OTHERS
+		QUnit.test( 'addHandler/getHandler/removeHandler', ( assert ) => {
 
 			const loadingManager = new LoadingManager();
 			const loader = new Loader();

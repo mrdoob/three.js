@@ -79,13 +79,28 @@
 
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements with text - webgl</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			const scenes = [];
+
+			const clock = new THREE.Clock();
 
 			let views, t, canvas, renderer;
 
@@ -162,6 +177,7 @@
 					context.fillStyle = colors[ index ];
 					context.fill();
 					const texture = new THREE.CanvasTexture( canvas2 );
+					texture.colorSpace = THREE.SRGBColorSpace;
 
 					const material = new THREE.PointsMaterial( { size: size, map: texture, transparent: true, alphaTest: 0.1 } );
 
@@ -262,7 +278,7 @@
 
 				} );
 
-				t ++;
+				t += clock.getDelta() * 60;
 
 			}
 
@@ -323,6 +339,7 @@
 
 		<script>
 
+			/* eslint-disable prefer-const*/
 			let parent = document.scripts[ document.scripts.length - 1 ].parentNode;
 
 			parent.displacement = function ( x, y, z, t, target ) {

@@ -5,332 +5,314 @@ import {
 	DepthTexture,
 	SrcAlphaFactor,
 	OneMinusSrcAlphaFactor,
-	LinearFilter,
 	MeshNormalMaterial,
 	MeshBasicMaterial,
 	NearestFilter,
 	NoBlending,
-	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	UnsignedShortType,
 	WebGLRenderTarget,
 	HalfFloatType,
-} from '../../../build/three.module.js';
-import { Pass } from '../postprocessing/Pass.js';
+} from 'three';
+import { Pass, FullScreenQuad } from './Pass.js';
 import { SSRShader } from '../shaders/SSRShader.js';
 import { SSRBlurShader } from '../shaders/SSRShader.js';
 import { SSRDepthShader } from '../shaders/SSRShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-var SSRPass = function ( { renderer, scene, camera, width, height, selects, encoding, bouncing = false, morphTargets = false, groundReflector } ) {
+class SSRPass extends Pass {
 
-	Pass.call( this );
+	constructor( { renderer, scene, camera, width, height, selects, bouncing = false, groundReflector } ) {
 
-	this.width = ( width !== undefined ) ? width : 512;
-	this.height = ( height !== undefined ) ? height : 512;
+		super();
 
-	this.clear = true;
+		this.width = ( width !== undefined ) ? width : 512;
+		this.height = ( height !== undefined ) ? height : 512;
 
-	this.renderer = renderer;
-	this.scene = scene;
-	this.camera = camera;
-	this.groundReflector = groundReflector;
+		this.clear = true;
 
-	this.opacity = SSRShader.uniforms.opacity.value;
-	this.output = 0;
+		this.renderer = renderer;
+		this.scene = scene;
+		this.camera = camera;
+		this.groundReflector = groundReflector;
 
-	this.maxDistance = SSRShader.uniforms.maxDistance.value;
-	this.surfDist = SSRShader.uniforms.surfDist.value;
+		this.opacity = SSRShader.uniforms.opacity.value;
+		this.output = 0;
 
-	this.encoding = encoding;
+		this.maxDistance = SSRShader.uniforms.maxDistance.value;
+		this.thickness = SSRShader.uniforms.thickness.value;
 
-	this.tempColor = new Color();
+		this.tempColor = new Color();
 
-	this._selects = selects;
-	this.selective = Array.isArray( this._selects );
-	Object.defineProperty( this, 'selects', {
-		get() {
+		this._selects = selects;
+		this.selective = Array.isArray( this._selects );
+		Object.defineProperty( this, 'selects', {
+			get() {
 
-			return this._selects;
+				return this._selects;
 
-		},
-		set( val ) {
+			},
+			set( val ) {
 
-			if ( this._selects === val ) return;
-			this._selects = val;
-			if ( Array.isArray( val ) ) {
+				if ( this._selects === val ) return;
+				this._selects = val;
+				if ( Array.isArray( val ) ) {
 
-				this.selective = true;
-				this.ssrMaterial.defines.SELECTIVE = true;
-				this.ssrMaterial.needsUpdate = true;
+					this.selective = true;
+					this.ssrMaterial.defines.SELECTIVE = true;
+					this.ssrMaterial.needsUpdate = true;
 
-			} else {
+				} else {
 
-				this.selective = false;
-				this.ssrMaterial.defines.SELECTIVE = false;
+					this.selective = false;
+					this.ssrMaterial.defines.SELECTIVE = false;
+					this.ssrMaterial.needsUpdate = true;
+
+				}
+
+			}
+		} );
+
+		this._bouncing = bouncing;
+		Object.defineProperty( this, 'bouncing', {
+			get() {
+
+				return this._bouncing;
+
+			},
+			set( val ) {
+
+				if ( this._bouncing === val ) return;
+				this._bouncing = val;
+				if ( val ) {
+
+					this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.prevRenderTarget.texture;
+
+				} else {
+
+					this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+
+				}
+
+			}
+		} );
+
+		this.blur = true;
+
+		this._distanceAttenuation = SSRShader.defines.DISTANCE_ATTENUATION;
+		Object.defineProperty( this, 'distanceAttenuation', {
+			get() {
+
+				return this._distanceAttenuation;
+
+			},
+			set( val ) {
+
+				if ( this._distanceAttenuation === val ) return;
+				this._distanceAttenuation = val;
+				this.ssrMaterial.defines.DISTANCE_ATTENUATION = val;
 				this.ssrMaterial.needsUpdate = true;
 
 			}
+		} );
 
-		}
-	} );
 
-	this._bouncing = bouncing;
-	Object.defineProperty( this, 'bouncing', {
-		get() {
+		this._fresnel = SSRShader.defines.FRESNEL;
+		Object.defineProperty( this, 'fresnel', {
+			get() {
 
-			return this._bouncing;
+				return this._fresnel;
 
-		},
-		set( val ) {
+			},
+			set( val ) {
 
-			if ( this._bouncing === val ) return;
-			this._bouncing = val;
-			if ( val ) {
-
-				this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.prevRenderTarget.texture;
-
-			} else {
-
-				this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+				if ( this._fresnel === val ) return;
+				this._fresnel = val;
+				this.ssrMaterial.defines.FRESNEL = val;
+				this.ssrMaterial.needsUpdate = true;
 
 			}
+		} );
 
-		}
-	} );
+		this._infiniteThick = SSRShader.defines.INFINITE_THICK;
+		Object.defineProperty( this, 'infiniteThick', {
+			get() {
 
-	this.blur = true;
+				return this._infiniteThick;
 
-	this._distanceAttenuation = SSRShader.defines.DISTANCE_ATTENUATION;
-	Object.defineProperty( this, 'distanceAttenuation', {
-		get() {
+			},
+			set( val ) {
 
-			return this._distanceAttenuation;
+				if ( this._infiniteThick === val ) return;
+				this._infiniteThick = val;
+				this.ssrMaterial.defines.INFINITE_THICK = val;
+				this.ssrMaterial.needsUpdate = true;
 
-		},
-		set( val ) {
+			}
+		} );
 
-			if ( this._distanceAttenuation === val ) return;
-			this._distanceAttenuation = val;
-			this.ssrMaterial.defines.DISTANCE_ATTENUATION = val;
-			this.ssrMaterial.needsUpdate = true;
+		// beauty render target with depth buffer
 
-		}
-	} );
+		const depthTexture = new DepthTexture();
+		depthTexture.type = UnsignedShortType;
+		depthTexture.minFilter = NearestFilter;
+		depthTexture.magFilter = NearestFilter;
 
+		this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			depthTexture: depthTexture,
+			depthBuffer: true
+		} );
 
-	this._fresnel = SSRShader.defines.FRESNEL;
-	Object.defineProperty( this, 'fresnel', {
-		get() {
+		//for bouncing
+		this.prevRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter
+		} );
 
-			return this._fresnel;
+		// normal render target
 
-		},
-		set( val ) {
+		this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter,
+			type: HalfFloatType,
+		} );
 
-			if ( this._fresnel === val ) return;
-			this._fresnel = val;
-			this.ssrMaterial.defines.FRESNEL = val;
-			this.ssrMaterial.needsUpdate = true;
+		// metalness render target
 
-		}
-	} );
-
-	this._infiniteThick = SSRShader.defines.INFINITE_THICK;
-	Object.defineProperty( this, 'infiniteThick', {
-		get() {
-
-			return this._infiniteThick;
-
-		},
-		set( val ) {
-
-			if ( this._infiniteThick === val ) return;
-			this._infiniteThick = val;
-			this.ssrMaterial.defines.INFINITE_THICK = val;
-			this.ssrMaterial.needsUpdate = true;
-
-		}
-	} );
-	this.thickTolerance = SSRShader.uniforms.thickTolerance.value;
-
-	// beauty render target with depth buffer
-
-	var depthTexture = new DepthTexture();
-	depthTexture.type = UnsignedShortType;
-	depthTexture.minFilter = NearestFilter;
-	depthTexture.magFilter = NearestFilter;
-
-	this.beautyRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
-		format: RGBAFormat,
-		depthTexture: depthTexture,
-		depthBuffer: true
-	} );
-
-	//for bouncing
-	this.prevRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
-		format: RGBAFormat,
-	} );
-
-	// normal render target
-
-	this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		format: RGBAFormat,
-		type: HalfFloatType,
-	} );
-
-	// metalness render target
-
-	this.metalnessRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		format: RGBAFormat
-	} );
+		this.metalnessRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter
+		} );
 
 
 
-	// ssr render target
+		// ssr render target
 
-	this.ssrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
-		format: RGBAFormat
-	} );
+		this.ssrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+			minFilter: NearestFilter,
+			magFilter: NearestFilter
+		} );
 
-	this.blurRenderTarget = this.ssrRenderTarget.clone();
-	this.blurRenderTarget2 = this.ssrRenderTarget.clone();
-	// this.blurRenderTarget3 = this.ssrRenderTarget.clone();
+		this.blurRenderTarget = this.ssrRenderTarget.clone();
+		this.blurRenderTarget2 = this.ssrRenderTarget.clone();
+		// this.blurRenderTarget3 = this.ssrRenderTarget.clone();
 
-	// ssr material
+		// ssr material
 
-	if ( SSRShader === undefined ) {
+		this.ssrMaterial = new ShaderMaterial( {
+			defines: Object.assign( {}, SSRShader.defines, {
+				MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
+			} ),
+			uniforms: UniformsUtils.clone( SSRShader.uniforms ),
+			vertexShader: SSRShader.vertexShader,
+			fragmentShader: SSRShader.fragmentShader,
+			blending: NoBlending
+		} );
 
-		console.error( 'THREE.SSRPass: The pass relies on SSRShader.' );
+		this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+		this.ssrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
+		this.ssrMaterial.defines.SELECTIVE = this.selective;
+		this.ssrMaterial.needsUpdate = true;
+		this.ssrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
+		this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+		this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+		this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+		this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
+		this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+		this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+		this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
+
+		// normal material
+
+		this.normalMaterial = new MeshNormalMaterial();
+		this.normalMaterial.blending = NoBlending;
+
+		// metalnessOn material
+
+		this.metalnessOnMaterial = new MeshBasicMaterial( {
+			color: 'white'
+		} );
+
+		// metalnessOff material
+
+		this.metalnessOffMaterial = new MeshBasicMaterial( {
+			color: 'black'
+		} );
+
+		// blur material
+
+		this.blurMaterial = new ShaderMaterial( {
+			defines: Object.assign( {}, SSRBlurShader.defines ),
+			uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
+			vertexShader: SSRBlurShader.vertexShader,
+			fragmentShader: SSRBlurShader.fragmentShader
+		} );
+		this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
+		this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+
+		// blur material 2
+
+		this.blurMaterial2 = new ShaderMaterial( {
+			defines: Object.assign( {}, SSRBlurShader.defines ),
+			uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
+			vertexShader: SSRBlurShader.vertexShader,
+			fragmentShader: SSRBlurShader.fragmentShader
+		} );
+		this.blurMaterial2.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
+		this.blurMaterial2.uniforms[ 'resolution' ].value.set( this.width, this.height );
+
+		// // blur material 3
+
+		// this.blurMaterial3 = new ShaderMaterial({
+		//   defines: Object.assign({}, SSRBlurShader.defines),
+		//   uniforms: UniformsUtils.clone(SSRBlurShader.uniforms),
+		//   vertexShader: SSRBlurShader.vertexShader,
+		//   fragmentShader: SSRBlurShader.fragmentShader
+		// });
+		// this.blurMaterial3.uniforms['tDiffuse'].value = this.blurRenderTarget2.texture;
+		// this.blurMaterial3.uniforms['resolution'].value.set(this.width, this.height);
+
+		// material for rendering the depth
+
+		this.depthRenderMaterial = new ShaderMaterial( {
+			defines: Object.assign( {}, SSRDepthShader.defines ),
+			uniforms: UniformsUtils.clone( SSRDepthShader.uniforms ),
+			vertexShader: SSRDepthShader.vertexShader,
+			fragmentShader: SSRDepthShader.fragmentShader,
+			blending: NoBlending
+		} );
+		this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+		this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+		this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+
+		// material for rendering the content of a render target
+
+		this.copyMaterial = new ShaderMaterial( {
+			uniforms: UniformsUtils.clone( CopyShader.uniforms ),
+			vertexShader: CopyShader.vertexShader,
+			fragmentShader: CopyShader.fragmentShader,
+			transparent: true,
+			depthTest: false,
+			depthWrite: false,
+			blendSrc: SrcAlphaFactor,
+			blendDst: OneMinusSrcAlphaFactor,
+			blendEquation: AddEquation,
+			blendSrcAlpha: SrcAlphaFactor,
+			blendDstAlpha: OneMinusSrcAlphaFactor,
+			blendEquationAlpha: AddEquation,
+			// premultipliedAlpha:true,
+		} );
+
+		this.fsQuad = new FullScreenQuad( null );
+
+		this.originalClearColor = new Color();
 
 	}
 
-	this.ssrMaterial = new ShaderMaterial( {
-		defines: Object.assign( {}, SSRShader.defines, {
-			MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
-		} ),
-		uniforms: UniformsUtils.clone( SSRShader.uniforms ),
-		vertexShader: SSRShader.vertexShader,
-		fragmentShader: SSRShader.fragmentShader,
-		blending: NoBlending
-	} );
-
-	this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-	this.ssrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-	this.ssrMaterial.defines.SELECTIVE = this.selective;
-	this.ssrMaterial.needsUpdate = true;
-	this.ssrMaterial.uniforms[ 'tMetalness' ].value = this.metalnessRenderTarget.texture;
-	this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-	this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-	this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-	this.ssrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-	this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-	this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-	this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
-
-	// normal material
-
-	this.normalMaterial = new MeshNormalMaterial( { morphTargets } );
-	this.normalMaterial.blending = NoBlending;
-
-	// metalnessOn material
-
-	this.metalnessOnMaterial = new MeshBasicMaterial( {
-		color: 'white'
-	} );
-
-	// metalnessOff material
-
-	this.metalnessOffMaterial = new MeshBasicMaterial( {
-		color: 'black'
-	} );
-
-	// blur material
-
-	this.blurMaterial = new ShaderMaterial( {
-		defines: Object.assign( {}, SSRBlurShader.defines ),
-		uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
-		vertexShader: SSRBlurShader.vertexShader,
-		fragmentShader: SSRBlurShader.fragmentShader
-	} );
-	this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
-	this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-
-	// blur material 2
-
-	this.blurMaterial2 = new ShaderMaterial( {
-		defines: Object.assign( {}, SSRBlurShader.defines ),
-		uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
-		vertexShader: SSRBlurShader.vertexShader,
-		fragmentShader: SSRBlurShader.fragmentShader
-	} );
-	this.blurMaterial2.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
-	this.blurMaterial2.uniforms[ 'resolution' ].value.set( this.width, this.height );
-
-	// // blur material 3
-
-	// this.blurMaterial3 = new ShaderMaterial({
-	//   defines: Object.assign({}, SSRBlurShader.defines),
-	//   uniforms: UniformsUtils.clone(SSRBlurShader.uniforms),
-	//   vertexShader: SSRBlurShader.vertexShader,
-	//   fragmentShader: SSRBlurShader.fragmentShader
-	// });
-	// this.blurMaterial3.uniforms['tDiffuse'].value = this.blurRenderTarget2.texture;
-	// this.blurMaterial3.uniforms['resolution'].value.set(this.width, this.height);
-
-	// material for rendering the depth
-
-	this.depthRenderMaterial = new ShaderMaterial( {
-		defines: Object.assign( {}, SSRDepthShader.defines ),
-		uniforms: UniformsUtils.clone( SSRDepthShader.uniforms ),
-		vertexShader: SSRDepthShader.vertexShader,
-		fragmentShader: SSRDepthShader.fragmentShader,
-		blending: NoBlending
-	} );
-	this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-	this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-	this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-
-	// material for rendering the content of a render target
-
-	this.copyMaterial = new ShaderMaterial( {
-		uniforms: UniformsUtils.clone( CopyShader.uniforms ),
-		vertexShader: CopyShader.vertexShader,
-		fragmentShader: CopyShader.fragmentShader,
-		transparent: true,
-		depthTest: false,
-		depthWrite: false,
-		blendSrc: SrcAlphaFactor,
-		blendDst: OneMinusSrcAlphaFactor,
-		blendEquation: AddEquation,
-		blendSrcAlpha: SrcAlphaFactor,
-		blendDstAlpha: OneMinusSrcAlphaFactor,
-		blendEquationAlpha: AddEquation,
-		// premultipliedAlpha:true,
-	} );
-
-	this.fsQuad = new Pass.FullScreenQuad( null );
-
-	this.originalClearColor = new Color();
-
-};
-
-SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
-
-	constructor: SSRPass,
-
-	dispose: function () {
+	dispose() {
 
 		// dispose render targets
 
@@ -357,13 +339,12 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.fsQuad.dispose();
 
-	},
+	}
 
-	render: function ( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
+	render( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
 
 		// render beauty and depth
 
-		if ( this.encoding ) this.beautyRenderTarget.texture.encoding = this.encoding;
 		renderer.setRenderTarget( this.beautyRenderTarget );
 		renderer.clear();
 		if ( this.groundReflector ) {
@@ -393,8 +374,7 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.ssrMaterial.uniforms[ 'opacity' ].value = this.opacity;
 		this.ssrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
-		this.ssrMaterial.uniforms[ 'surfDist' ].value = this.surfDist;
-		this.ssrMaterial.uniforms[ 'thickTolerance' ].value = this.thickTolerance;
+		this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
 		this.renderPass( renderer, this.ssrMaterial, this.ssrRenderTarget );
 
 
@@ -508,14 +488,14 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		}
 
-	},
+	}
 
-	renderPass: function ( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
 		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-		var originalAutoClear = renderer.autoClear;
+		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+		const originalAutoClear = renderer.autoClear;
 
 		renderer.setRenderTarget( renderTarget );
 
@@ -537,13 +517,13 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
-	},
+	}
 
-	renderOverride: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderOverride( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-		var originalAutoClear = renderer.autoClear;
+		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+		const originalAutoClear = renderer.autoClear;
 
 		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = false;
@@ -569,13 +549,13 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
-	},
+	}
 
-	renderMetalness: function ( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderMetalness( renderer, overrideMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
-		var originalClearAlpha = renderer.getClearAlpha( this.tempColor );
-		var originalAutoClear = renderer.autoClear;
+		const originalClearAlpha = renderer.getClearAlpha( this.tempColor );
+		const originalAutoClear = renderer.autoClear;
 
 		renderer.setRenderTarget( renderTarget );
 		renderer.autoClear = false;
@@ -618,9 +598,9 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		renderer.setClearColor( this.originalClearColor );
 		renderer.setClearAlpha( originalClearAlpha );
 
-	},
+	}
 
-	setSize: function ( width, height ) {
+	setSize( width, height ) {
 
 		this.width = width;
 		this.height = height;
@@ -643,9 +623,9 @@ SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
 		this.blurMaterial2.uniforms[ 'resolution' ].value.set( width, height );
 
-	},
+	}
 
-} );
+}
 
 SSRPass.OUTPUT = {
 	'Default': 0,

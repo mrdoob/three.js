@@ -1,0 +1,434 @@
+<!DOCTYPE html><html lang="ja"><head>
+    <meta charset="utf-8">
+    <title>でピッキング</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@threejs">
+    <meta name="twitter:title" content="Three.js – でピッキング">
+    <meta property="og:image" content="https://threejs.org/files/share.png">
+    <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+    <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+    <link rel="stylesheet" href="../resources/lesson.css">
+    <link rel="stylesheet" href="../resources/lang.css">
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="lesson-title">
+        <h1>でピッキング</h1>
+      </div>
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><em>ピッキング</em>とはユーザーがどのオブジェクトをクリックしたか、またはタッチしたかを把握するプロセスの事です。
+ピッキングする方法のそれぞれにトレードオフがありますが、実装の仕方はたくさんあります。最も一般的な2つの方法を見てみましょう。</p>
+<p>おそらく、最も一般的な<em>ピッキング</em>はレイキャスティングでマウスからシーンの錐台を通して光線を<em>キャスト</em>し、その光線が交差するオブジェクトを計算する方法です。
+概念的には非常にシンプルです。</p>
+<p>まずはマウスの位置を決めます。
+それをカメラの投影と向きをワールド座標に変換します。
+カメラの錐台の近くの面から遠くの面までの光線を計算します。
+そして、シーン内の全ての三角形オブジェクトで光線と交差するかチェックします。
+もしシーンに1000個のオブジェクトがあり、各オブジェクトに1000個の三角形がある場合、100万個の三角形をチェックする必要があります。</p>
+<p>光線がオブジェクトのバウンディングスフィアやバウンディングボックス、つまりオブジェクト全体を含む球やボックスと交差するかを最初にチェックする事は最適化になります。
+もし光線がオブジェクトと交差しなければ、そのオブジェクトの三角形をチェックする必要はありません。</p>
+<p>Three.jsにはこれを行う <code class="notranslate" translate="no">RayCaster</code> クラスを提供しています。</p>
+<p>100個のオブジェクトがあるシーンを作ってピッキングしてみましょう。
+<a href="responsive.html">レスポンシブデザインの記事</a>のコード例から始めてみます。</p>
+<p>いくつかの変更点</p>
+<p>カメラを別のオブジェクトの親にして、そのオブジェクトを回転させるとカメラが自撮り棒のようにシーンの周りを動き回るようになります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">*const fov = 60;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+*const far = 200;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+*camera.position.z = 30;
+
+const scene = new THREE.Scene();
++scene.background = new THREE.Color('white');
+
++// put the camera on a pole (parent it to an object)
++// so we can spin the pole to move the camera around the scene
++const cameraPole = new THREE.Object3D();
++scene.add(cameraPole);
++cameraPole.add(camera);
+</pre>
+<p>そして、<code class="notranslate" translate="no">render</code> 関数でcameraPoleを回転させます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">cameraPole.rotation.y = time * .1;
+</pre>
+<p>カメラにライトを追加し、ライトが動くようにしましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-scene.add(light);
++camera.add(light);
+</pre>
+<p>ランダムな色、位置、向き、スケールの100個のキューブを生成してみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
+const boxHeight = 1;
+const boxDepth = 1;
+const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+
+function rand(min, max) {
+  if (max === undefined) {
+    max = min;
+    min = 0;
+  }
+  return min + (max - min) * Math.random();
+}
+
+function randomColor() {
+  return `hsl(${rand(360) | 0}, ${rand(50, 100) | 0}%, 50%)`;
+}
+
+const numObjects = 100;
+for (let i = 0; i &lt; numObjects; ++i) {
+  const material = new THREE.MeshPhongMaterial({
+    color: randomColor(),
+  });
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  cube.position.set(rand(-20, 20), rand(-20, 20), rand(-20, 20));
+  cube.rotation.set(rand(Math.PI), rand(Math.PI), 0);
+  cube.scale.set(rand(3, 6), rand(3, 6), rand(3, 6));
+}
+</pre>
+<p>最後にピックします。</p>
+<p>ピッキングを管理する簡単なクラスを作ってみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+  constructor() {
+    this.raycaster = new THREE.Raycaster();
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(normalizedPosition, scene, camera, time) {
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
+    // cast a ray through the frustum
+    this.raycaster.setFromCamera(normalizedPosition, camera);
+    // get the list of objects the ray intersected
+    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+    if (intersectedObjects.length) {
+      // pick the first object. It's the closest one
+      this.pickedObject = intersectedObjects[0].object;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+</pre>
+<p><code class="notranslate" translate="no">RayCaster</code> を作成し、<code class="notranslate" translate="no">pick</code> 関数を呼び出してシーンに光線をキャストできます。
+光線が何かに当たった場合、最初に当たったオブジェクトの色を変更します。</p>
+<p>もちろん、マウスを <em>down</em> した時だけこの関数を呼べますが、今回は全てのフレームでマウスの下に何かあるかピックします。
+そのためにはまずマウスがどこにあるかを追跡する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickPosition = {x: 0, y: 0};
+clearPickPosition();
+
+...
+
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width  / rect.width,
+    y: (event.clientY - rect.top ) * canvas.height / rect.height,
+  };
+}
+
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+  pickPosition.x = (pos.x / canvas.width ) *  2 - 1;
+  pickPosition.y = (pos.y / canvas.height) * -2 + 1;  // note we flip Y
+}
+
+function clearPickPosition() {
+  // unlike the mouse which always has a position
+  // if the user stops touching the screen we want
+  // to stop picking. For now we just pick a value
+  // unlikely to pick something
+  pickPosition.x = -100000;
+  pickPosition.y = -100000;
+}
+
+window.addEventListener('mousemove', setPickPosition);
+window.addEventListener('mouseout', clearPickPosition);
+window.addEventListener('mouseleave', clearPickPosition);
+</pre>
+<p>正規化されたマウスの位置を記録している事に注意して下さい。
+キャンバスの大きさに関わらず、leftの-1からrightの+1までの値が必要です。
+同様にbottomが-1からtopが+1になるような値が必要です。</p>
+<p>これでモバイル端末もサポートできます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('touchstart', (event) =&gt; {
+  // prevent the window from scrolling
+  event.preventDefault();
+  setPickPosition(event.touches[0]);
+}, {passive: false});
+
+window.addEventListener('touchmove', (event) =&gt; {
+  setPickPosition(event.touches[0]);
+});
+
+window.addEventListener('touchend', clearPickPosition);
+</pre>
+<p>最後に <code class="notranslate" translate="no">render</code> 関数で <code class="notranslate" translate="no">PickHelper</code> の <code class="notranslate" translate="no">pick</code> 関数を呼び出します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const pickHelper = new PickHelper();
+
+function render(time) {
+  time *= 0.001;  // convert to seconds;
+
+  ...
+
++  pickHelper.pick(pickPosition, scene, camera, time);
+
+  renderer.render(scene, camera);
+
+  ...
+</pre>
+<p>その結果がこれです。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-raycaster.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/picking-raycaster.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>望んだ動作でおそらく多くのユースケースに対応できますが、いくつか問題点があります。</p>
+<ol>
+<li><p>CPUベース</p>
+<p>JavaScriptは各オブジェクトを通過し、光線がそのオブジェクトのバウンディングボックス、またはバウンディングスフィアと交差するかをチェックしています。
+そのオブジェクト内の各三角形を通過し、光線が三角形と交差するかチェックしなければなりません。</p>
+<p>これの良い点はJavaScriptが簡単に光線が三角形と交差する場所を正確に計算し、その結果が分かります。
+例えば交差する点があった場所に目印をつけたい場合などです。</p>
+<p>悪い点はCPUの負担が大きい所ですね。
+三角形がたくさんあるオブジェクトを持っている場合は遅いかもしれません。</p>
+</li>
+<li><p>変なシェーダーやズレを処理しません</p>
+<p>ジオメトリを変形またはモーフィングするシェーダーがある場合、JavaScriptはその変形を認識できなく、間違った答えを返してしまいます。
+例えばAFAIKのように、メソッドはスキニングされたオブジェクトでは使えません。</p>
+</li>
+<li><p>透明な穴には対応しません</p>
+</li>
+</ol>
+<p>例として、このテクスチャをキューブに適用してみましょう。</p>
+<div class="threejs_center"><img class="checkerboard" src="../examples/resources/images/frame.png"></div>
+
+<p>以下のように変更します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
++const texture = loader.load('resources/images/frame.png');
+
+const numObjects = 100;
+for (let i = 0; i &lt; numObjects; ++i) {
+  const material = new THREE.MeshPhongMaterial({
+    color: randomColor(),
+    +map: texture,
+    +transparent: true,
+    +side: THREE.DoubleSide,
+    +alphaTest: 0.1,
+  });
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  ...
+</pre>
+<p>以下の例で動作確認をすると、すぐにこの問題が分かると思います。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-raycaster-transparency.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/picking-raycaster-transparency.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>ボックスの穴の部分でピックしてみて下さい。</p>
+<div class="threejs_center"><img src="../resources/images/picking-transparent-issue.jpg" style="width: 635px;"></div>
+
+<p>この原因は、JavaScriptがテクスチャやマテリアルを調べて、オブジェクトの一部が本当に透明か判断できないからです。</p>
+<p>これらの問題を全て解決するのが、GPUベースのピッキングです。
+概念的には簡単ですが、残念ながら上記のレイキャスティングよりも使用方法が複雑になっています。</p>
+<p>GPUピッキングを行うには、各オブジェクトをオフスクリーンでユニークな色でレンダリングします。
+次にマウスの位置に対応するピクセルの色を調べます。
+色でどのオブジェクトが選ばれたか分かります。</p>
+<p>これで上記の2と3の問題を解決できます。問題1は速度に依存しています。
+全てのオブジェクトは2回描画されなければなりません。
+1回は見るための描画、もう1回はピッキングの描画です。
+洗練された解決策は、その両方を同時に行う事ですが今回はそれを試しません。</p>
+<p>1つのやり方としては、1つのピクセルしか読まないのでそのピクセルだけ描画されるようにカメラを設定します。
+これを行うには <a href="/docs/#api/ja/cameras/PerspectiveCamera.setViewOffset"><code class="notranslate" translate="no">PerspectiveCamera.setViewOffset</code></a> を使用します。
+これでカメラを計算できます。
+これで時間を節約できるはずです。</p>
+<p>現時点ではこのピッキングを行うには、2つのシーンを作成する必要があります。
+1つは通常のメッシュで埋めます。
+もう1つはピッキングマテリアルを使用したメッシュで埋めます。</p>
+<p>そこでまず2つ目のシーンを作り黒でクリアします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+scene.background = new THREE.Color('white');
+const pickingScene = new THREE.Scene();
+pickingScene.background = new THREE.Color(0);
+</pre>
+<p>次にメインシーンに配置する各キューブでオリジナルのキューブと同じ位置に対応する"ピッキングキューブ"を作成し、<code class="notranslate" translate="no">pickingScene</code> に配置します。
+オブジェクトのidを色として描画するようにマテリアルを設定します。
+また、idとオブジェクトのマップがあるので、後でidを調べた時に対応するオブジェクトにマップを戻す事ができます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const idToObject = {};
++const numObjects = 100;
+for (let i = 0; i &lt; numObjects; ++i) {
++  const id = i + 1;
+  const material = new THREE.MeshPhongMaterial({
+    color: randomColor(),
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide,
+    alphaTest: 0.1,
+  });
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
++  idToObject[id] = cube;
+
+  cube.position.set(rand(-20, 20), rand(-20, 20), rand(-20, 20));
+  cube.rotation.set(rand(Math.PI), rand(Math.PI), 0);
+  cube.scale.set(rand(3, 6), rand(3, 6), rand(3, 6));
+
++  const pickingMaterial = new THREE.MeshPhongMaterial({
++    emissive: new THREE.Color(id),
++    color: new THREE.Color(0, 0, 0),
++    specular: new THREE.Color(0, 0, 0),
++    map: texture,
++    transparent: true,
++    side: THREE.DoubleSide,
++    alphaTest: 0.5,
++    blending: THREE.NoBlending,
++  });
++  const pickingCube = new THREE.Mesh(geometry, pickingMaterial);
++  pickingScene.add(pickingCube);
++  pickingCube.position.copy(cube.position);
++  pickingCube.rotation.copy(cube.rotation);
++  pickingCube.scale.copy(cube.scale);
+}
+</pre>
+<p>ここでは <a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> を悪用している事に注意して下さい。
+<code class="notranslate" translate="no">emissive</code> をidにし、<code class="notranslate" translate="no">color</code> と <code class="notranslate" translate="no">specular</code> を0に設定しテクスチャのアルファ値が <code class="notranslate" translate="no">alphaTest</code> よりも大きい場合にのみ、idをレンダリングできます。
+また、<code class="notranslate" translate="no">blending</code> を <code class="notranslate" translate="no">NoBlending</code> に設定し、idにアルファが乗算しないようにする必要があります。</p>
+<p><a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>を悪用する事は、最良の解決策でない事に注意して下さい。
+さらに最適化された解決策は、テクスチャのアルファ値が <code class="notranslate" translate="no">alphaTest</code> よりも大きい場合にidを書き込むカスタムシェーダーを作成する事です。</p>
+<p>レイキャスティングではなくピクセルからピックしているので、ピック位置を設定するコードを変更してピクセルだけを使用できます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+-  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
+-  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
++  pickPosition.x = pos.x;
++  pickPosition.y = pos.y;
+}
+</pre>
+<p><code class="notranslate" translate="no">PickHelper</code> を <code class="notranslate" translate="no">GPUPickHelper</code> に変更してみましょう。
+<a href="rendertargets.html">レンダーターゲットの記事</a>で説明したように <a href="/docs/#api/ja/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> を使います。
+ここでのレンダーターゲットは1 x 1の1ピクセルのサイズしかありません。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-class PickHelper {
++class GPUPickHelper {
+  constructor() {
+-    this.raycaster = new THREE.Raycaster();
++    // create a 1x1 pixel render target
++    this.pickingTexture = new THREE.WebGLRenderTarget(1, 1);
++    this.pixelBuffer = new Uint8Array(4);
+    this.pickedObject = null;
+    this.pickedObjectSavedColor = 0;
+  }
+  pick(cssPosition, scene, camera, time) {
++    const {pickingTexture, pixelBuffer} = this;
+
+    // restore the color if there is a picked object
+    if (this.pickedObject) {
+      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
+      this.pickedObject = undefined;
+    }
+
++    // set the view offset to represent just a single pixel under the mouse
++    const pixelRatio = renderer.getPixelRatio();
++    camera.setViewOffset(
++        renderer.getContext().drawingBufferWidth,   // full width
++        renderer.getContext().drawingBufferHeight,  // full top
++        cssPosition.x * pixelRatio | 0,             // rect x
++        cssPosition.y * pixelRatio | 0,             // rect y
++        1,                                          // rect width
++        1,                                          // rect height
++    );
++    // render the scene
++    renderer.setRenderTarget(pickingTexture)
++    renderer.render(scene, camera);
++    renderer.setRenderTarget(null);
++
++    // clear the view offset so rendering returns to normal
++    camera.clearViewOffset();
++    //read the pixel
++    renderer.readRenderTargetPixels(
++        pickingTexture,
++        0,   // x
++        0,   // y
++        1,   // width
++        1,   // height
++        pixelBuffer);
++
++    const id =
++        (pixelBuffer[0] &lt;&lt; 16) |
++        (pixelBuffer[1] &lt;&lt;  8) |
++        (pixelBuffer[2]      );
+
+-    // cast a ray through the frustum
+-    this.raycaster.setFromCamera(normalizedPosition, camera);
+-    // get the list of objects the ray intersected
+-    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
+-    if (intersectedObjects.length) {
+-      // pick the first object. It's the closest one
+-      this.pickedObject = intersectedObjects[0].object;
+
++    const intersectedObject = idToObject[id];
++    if (intersectedObject) {
++      // pick the first object. It's the closest one
++      this.pickedObject = intersectedObject;
+      // save its color
+      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
+      // set its emissive color to flashing red/yellow
+      this.pickedObject.material.emissive.setHex((time * 8) % 2 &gt; 1 ? 0xFFFF00 : 0xFF0000);
+    }
+  }
+}
+</pre>
+<p>それならば、それを使えばいいだけです。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const pickHelper = new PickHelper();
++const pickHelper = new GPUPickHelper();
+</pre>
+<p>これを指定し <code class="notranslate" translate="no">scene</code> の代わりに <code class="notranslate" translate="no">pickScene</code> を渡します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  pickHelper.pick(pickPosition, scene, camera, time);
++  pickHelper.pick(pickPosition, pickScene, camera, time);
+</pre>
+<p>そして、透明な部分を選択するようにする必要があります。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-gpu.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/picking-gpu.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+</div>
+
+<p></p>
+<p>ピッキングを実装する方法のアイデアをいくつか得られたと思います。
+今後の記事ではマウスを使ってオブジェクトを操作する方法を取り上げるかもしれません。</p>
+
+        </div>
+      </div>
+    </div>
+  
+  <script src="../resources/prettify.js"></script>
+  <script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

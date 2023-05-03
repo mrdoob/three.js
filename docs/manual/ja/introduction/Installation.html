@@ -30,7 +30,7 @@
     </p>
 
     <code>
-		npm install --save three
+		npm install three
 		</code>
 
     <p>
@@ -69,37 +69,40 @@
     </p>
 
     <code>
-		&lt;script type="module">
+&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
 
-		  // Find the latest version by visiting https://unpkg.com/three. The URL will
-		  // redirect to the newest stable release.
-		  import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+&lt;script type="importmap">
+    {
+    "imports": {
+        "three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js"
+    }
+    }
+&lt;/script>
 
-		  const scene = new THREE.Scene();
+&lt;script type="module">
 
-		&lt;/script>
-		</code>
+    import * as THREE from 'three';
 
-    <p>
-        すべての機能が <em>build/three.module.js</em> モジュールからアクセスできるわけではありません。コントロール、ローダー、エフェクトの前処理など、ライブラリの他の一般的な部分は、[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] サブフォルダからインポートする必要があります。詳細については、以下の<em>Examples</em>を参照してください。
-    </p>
+    const scene = new THREE.Scene();
 
+&lt;/script>
+</code>
 
-    <h2>Examples</h2>
+    <h2>Addons</h2>
 
     <p>
         three.jsのコアは、3Dエンジンの最も重要なコンポーネントに焦点を当てています。コントロール、ローダー、エフェクトの前処理といった、他の多くの便利なコンポーネントは [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] ディレクトリの一部です。これらは「examples」と呼ばれています。その理由としては、ユーザーが既製品を使用でき、リミックスやカスタマイズも可能だからです。これらのコンポーネントは常にコアライブラリと同期していますが、npm上の同様のサードパーティ製パッケージは別の人によってメンテナンスされており、最新ではないかもしれません。
     </p>
 
     <p>
-        Examplesはそれだけ別でインストールする必要はありませんが、importは分けて行う必要があります。 three.jsをnpmでインストールしている場合、以下のようにして[page:OrbitControls]コンポーネントを読み込むことができます。
+        Addonsはそれだけ別でインストールする必要はありませんが、importは分けて行う必要があります。 three.jsをnpmでインストールしている場合、以下のようにして[page:OrbitControls]コンポーネントを読み込むことができます。
     </p>
 
 
     <code>
-		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		const controls = new OrbitControls();
+		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
 
     <p>
@@ -107,19 +110,29 @@
     </p>
 
     <code>
-		&lt;script type="module">
+&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
 
-		  // Find the latest version by visiting https://unpkg.com/three. The URL will
-		  // redirect to the newest stable release.
-		  import { OrbitControls } from 'https://unpkg.com/three/examples/jsm/controls/OrbitControls.js';
+&lt;script type="importmap">
+    {
+    "imports": {
+        "three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+    }
+    }
+&lt;/script>
 
-		  const controls = new OrbitControls();
+&lt;script type="module">
 
-		&lt;/script>
-		</code>
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const controls = new OrbitControls( camera, renderer.domElement );
+
+&lt;/script>
+</code>
 
     <p>
-        重要なのは、すべてのファイルで同じバージョンを使用することです。異なるバージョンの異なるExamplesをインポートしたり、three.jsライブラリ自体とは異なるバージョンのExamplesを使用したりしないでください。
+        重要なのは、すべてのファイルで同じバージョンを使用することです。異なるバージョンの異なるAddonsをインポートしたり、three.jsライブラリ自体とは異なるバージョンのAddonsを使用したりしないでください。
     </p>
 
     <h2>互換性について</h2>
@@ -144,17 +157,11 @@
     <h3>Node.js</h3>
 
     <p>
-        以下の2つの理由からnode.jsでthree.jsを使用するのは難しくなりがちです。
+        Because three.js is built for the web, it depends on browser and DOM APIs that don't always exist in Node.js. Some of these issues can be resolved by using shims like [link:https://github.com/stackgl/headless-gl headless-gl], or by replacing components like [page:TextureLoader] with custom alternatives. Other DOM APIs may be deeply intertwined with the code that uses them, and will be harder to work around. We welcome simple and maintainable pull requests to improve Node.js support, but recommend opening an issue to discuss your improvements first.
     </p>
 
     <p>
-        まず、three.jsはWeb用に作られているので、Node.jsには必ずしも存在しないブラウザやDOM APIに依存します。これらの問題のいくつかは、[link:https://github.com/stackgl/headless-gl headless-gl] のような補正ツールを使用したり、[page:TextureLoader] のようなコンポーネントをカスタムの代替品で置き換えることで解決できます。他の DOM APIは、それらを使用するコードと深く絡み合っている可能性があり、回避するのが難しくなります。Node.js
-        のサポートを改善するためのシンプルで保守性の高いプルリクエストを歓迎しますが、まず問題を開いて改善点を議論することをお勧めします。
-    </p>
-
-    <p>
-        第二に、Node.jsによるESモジュールのサポートは...複雑です。Node.js v12の時点では、three.jsのコアライブラリは<em>require('three')</em>でCommonJSモジュールとしてインポートすることができます。しかし、<em>examples/jsm</em>にあるほとんどのサンプルコンポーネントはインポートできません。Node.jsの将来のバージョンで解決されるかもしれませんが、それまでの間は、[link:https://github.com/standard-things/esm
-        esm]のような回避策を使用して、Node.jsアプリケーションがESモジュールを認識できるようにする必要があるでしょう。
+        Make sure to add `{ "type": "module" }` to your `package.json` to enable ES6 modules in your node project.
     </p>
 
 </body>

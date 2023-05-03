@@ -2,30 +2,27 @@ import {
 	BufferGeometry,
 	FileLoader,
 	Float32BufferAttribute,
+	Int32BufferAttribute,
 	Loader,
-	LoaderUtils,
 	Points,
 	PointsMaterial
-} from '../../../build/three.module.js';
+} from 'three';
 
-var PCDLoader = function ( manager ) {
+class PCDLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.littleEndian = true;
+		super( manager );
 
-};
+		this.littleEndian = true;
 
+	}
 
-PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	load( url, onLoad, onProgress, onError ) {
 
-	constructor: PCDLoader,
+		const scope = this;
 
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
@@ -34,7 +31,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			try {
 
-				onLoad( scope.parse( data, url ) );
+				onLoad( scope.parse( data ) );
 
 			} catch ( e ) {
 
@@ -54,21 +51,21 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data, url ) {
+	parse( data ) {
 
 		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
 
 		function decompressLZF( inData, outLength ) {
 
-			var inLength = inData.length;
-			var outData = new Uint8Array( outLength );
-			var inPtr = 0;
-			var outPtr = 0;
-			var ctrl;
-			var len;
-			var ref;
+			const inLength = inData.length;
+			const outData = new Uint8Array( outLength );
+			let inPtr = 0;
+			let outPtr = 0;
+			let ctrl;
+			let len;
+			let ref;
 			do {
 
 				ctrl = inData[ inPtr ++ ];
@@ -115,17 +112,17 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseHeader( data ) {
 
-			var PCDheader = {};
-			var result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
-			var result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.substr( result1 - 1 ) );
+			const PCDheader = {};
+			const result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
+			const result2 = /[\r\n]DATA\s(\S*)\s/i.exec( data.slice( result1 - 1 ) );
 
 			PCDheader.data = result2[ 1 ];
 			PCDheader.headerLen = result2[ 0 ].length + result1;
-			PCDheader.str = data.substr( 0, PCDheader.headerLen );
+			PCDheader.str = data.slice( 0, PCDheader.headerLen );
 
 			// remove comments
 
-			PCDheader.str = PCDheader.str.replace( /\#.*/gi, '' );
+			PCDheader.str = PCDheader.str.replace( /#.*/gi, '' );
 
 			// parse
 
@@ -144,8 +141,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			if ( PCDheader.version !== null )
 				PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
 
-			if ( PCDheader.fields !== null )
-				PCDheader.fields = PCDheader.fields[ 1 ].split( ' ' );
+			PCDheader.fields = ( PCDheader.fields !== null ) ? PCDheader.fields[ 1 ].split( ' ' ) : [];
 
 			if ( PCDheader.type !== null )
 				PCDheader.type = PCDheader.type[ 1 ].split( ' ' );
@@ -187,7 +183,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				PCDheader.count = [];
 
-				for ( var i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+				for ( let i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
 
 					PCDheader.count.push( 1 );
 
@@ -197,9 +193,9 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			PCDheader.offset = {};
 
-			var sizeSum = 0;
+			let sizeSum = 0;
 
-			for ( var i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
+			for ( let i = 0, l = PCDheader.fields.length; i < l; i ++ ) {
 
 				if ( PCDheader.data === 'ascii' ) {
 
@@ -222,31 +218,33 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var textData = LoaderUtils.decodeText( new Uint8Array( data ) );
+		const textData = new TextDecoder().decode( data );
 
 		// parse header (always ascii format)
 
-		var PCDheader = parseHeader( textData );
+		const PCDheader = parseHeader( textData );
 
 		// parse data
 
-		var position = [];
-		var normal = [];
-		var color = [];
+		const position = [];
+		const normal = [];
+		const color = [];
+		const intensity = [];
+		const label = [];
 
 		// ascii
 
 		if ( PCDheader.data === 'ascii' ) {
 
-			var offset = PCDheader.offset;
-			var pcdData = textData.substr( PCDheader.headerLen );
-			var lines = pcdData.split( '\n' );
+			const offset = PCDheader.offset;
+			const pcdData = textData.slice( PCDheader.headerLen );
+			const lines = pcdData.split( '\n' );
 
-			for ( var i = 0, l = lines.length; i < l; i ++ ) {
+			for ( let i = 0, l = lines.length; i < l; i ++ ) {
 
 				if ( lines[ i ] === '' ) continue;
 
-				var line = lines[ i ].split( ' ' );
+				const line = lines[ i ].split( ' ' );
 
 				if ( offset.x !== undefined ) {
 
@@ -258,10 +256,25 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( offset.rgb !== undefined ) {
 
-					var rgb = parseFloat( line[ offset.rgb ] );
-					var r = ( rgb >> 16 ) & 0x0000ff;
-					var g = ( rgb >> 8 ) & 0x0000ff;
-					var b = ( rgb >> 0 ) & 0x0000ff;
+					const rgb_field_index = PCDheader.fields.findIndex( ( field ) => field === 'rgb' );
+					const rgb_type = PCDheader.type[ rgb_field_index ];
+
+					const float = parseFloat( line[ offset.rgb ] );
+					let rgb = float;
+
+					if ( rgb_type === 'F' ) {
+
+						// treat float values as int
+						// https://github.com/daavoo/pyntcloud/pull/204/commits/7b4205e64d5ed09abe708b2e91b615690c24d518
+						const farr = new Float32Array( 1 );
+						farr[ 0 ] = float;
+						rgb = new Int32Array( farr.buffer )[ 0 ];
+
+					}
+
+					const r = ( rgb >> 16 ) & 0x0000ff;
+					const g = ( rgb >> 8 ) & 0x0000ff;
+					const b = ( rgb >> 0 ) & 0x0000ff;
 					color.push( r / 255, g / 255, b / 255 );
 
 				}
@@ -271,6 +284,18 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					normal.push( parseFloat( line[ offset.normal_x ] ) );
 					normal.push( parseFloat( line[ offset.normal_y ] ) );
 					normal.push( parseFloat( line[ offset.normal_z ] ) );
+
+				}
+
+				if ( offset.intensity !== undefined ) {
+
+					intensity.push( parseFloat( line[ offset.intensity ] ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					label.push( parseInt( line[ offset.label ] ) );
 
 				}
 
@@ -286,37 +311,58 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( PCDheader.data === 'binary_compressed' ) {
 
-			var sizes = new Uint32Array( data.slice( PCDheader.headerLen, PCDheader.headerLen + 8 ) );
-			var compressedSize = sizes[ 0 ];
-			var decompressedSize = sizes[ 1 ];
-			var decompressed = decompressLZF( new Uint8Array( data, PCDheader.headerLen + 8, compressedSize ), decompressedSize );
-			var dataview = new DataView( decompressed.buffer );
+			const sizes = new Uint32Array( data.slice( PCDheader.headerLen, PCDheader.headerLen + 8 ) );
+			const compressedSize = sizes[ 0 ];
+			const decompressedSize = sizes[ 1 ];
+			const decompressed = decompressLZF( new Uint8Array( data, PCDheader.headerLen + 8, compressedSize ), decompressedSize );
+			const dataview = new DataView( decompressed.buffer );
 
-			var offset = PCDheader.offset;
+			const offset = PCDheader.offset;
 
-			for ( var i = 0; i < PCDheader.points; i ++ ) {
+			for ( let i = 0; i < PCDheader.points; i ++ ) {
 
 				if ( offset.x !== undefined ) {
 
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ 0 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ 1 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ 2 ] * i, this.littleEndian ) );
+					const xIndex = PCDheader.fields.indexOf( 'x' );
+					const yIndex = PCDheader.fields.indexOf( 'y' );
+					const zIndex = PCDheader.fields.indexOf( 'z' );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ xIndex ] * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ yIndex ] * i, this.littleEndian ) );
+					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ zIndex ] * i, this.littleEndian ) );
 
 				}
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
-					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
+					const rgbIndex = PCDheader.fields.indexOf( 'rgb' );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 2 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 1 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ rgbIndex ] * i + 0 ) / 255.0 );
 
 				}
 
 				if ( offset.normal_x !== undefined ) {
 
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + PCDheader.size[ 4 ] * i, this.littleEndian ) );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_y ) + PCDheader.size[ 5 ] * i, this.littleEndian ) );
-					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_z ) + PCDheader.size[ 6 ] * i, this.littleEndian ) );
+					const xIndex = PCDheader.fields.indexOf( 'normal_x' );
+					const yIndex = PCDheader.fields.indexOf( 'normal_y' );
+					const zIndex = PCDheader.fields.indexOf( 'normal_z' );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_x ) + PCDheader.size[ xIndex ] * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_y ) + PCDheader.size[ yIndex ] * i, this.littleEndian ) );
+					normal.push( dataview.getFloat32( ( PCDheader.points * offset.normal_z ) + PCDheader.size[ zIndex ] * i, this.littleEndian ) );
+
+				}
+
+				if ( offset.intensity !== undefined ) {
+
+					const intensityIndex = PCDheader.fields.indexOf( 'intensity' );
+					intensity.push( dataview.getFloat32( ( PCDheader.points * offset.intensity ) + PCDheader.size[ intensityIndex ] * i, this.littleEndian ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					const labelIndex = PCDheader.fields.indexOf( 'label' );
+					label.push( dataview.getInt32( ( PCDheader.points * offset.label ) + PCDheader.size[ labelIndex ] * i, this.littleEndian ) );
 
 				}
 
@@ -328,10 +374,10 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( PCDheader.data === 'binary' ) {
 
-			var dataview = new DataView( data, PCDheader.headerLen );
-			var offset = PCDheader.offset;
+			const dataview = new DataView( data, PCDheader.headerLen );
+			const offset = PCDheader.offset;
 
-			for ( var i = 0, row = 0; i < PCDheader.points; i ++, row += PCDheader.rowSize ) {
+			for ( let i = 0, row = 0; i < PCDheader.points; i ++, row += PCDheader.rowSize ) {
 
 				if ( offset.x !== undefined ) {
 
@@ -357,46 +403,50 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
+				if ( offset.intensity !== undefined ) {
+
+					intensity.push( dataview.getFloat32( row + offset.intensity, this.littleEndian ) );
+
+				}
+
+				if ( offset.label !== undefined ) {
+
+					label.push( dataview.getInt32( row + offset.label, this.littleEndian ) );
+
+				}
+
 			}
 
 		}
 
 		// build geometry
 
-		var geometry = new BufferGeometry();
+		const geometry = new BufferGeometry();
 
 		if ( position.length > 0 ) geometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 		if ( normal.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal, 3 ) );
 		if ( color.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+		if ( intensity.length > 0 ) geometry.setAttribute( 'intensity', new Float32BufferAttribute( intensity, 1 ) );
+		if ( label.length > 0 ) geometry.setAttribute( 'label', new Int32BufferAttribute( label, 1 ) );
 
 		geometry.computeBoundingSphere();
 
 		// build material
 
-		var material = new PointsMaterial( { size: 0.005 } );
+		const material = new PointsMaterial( { size: 0.005 } );
 
 		if ( color.length > 0 ) {
 
 			material.vertexColors = true;
 
-		} else {
-
-			material.color.setHex( Math.random() * 0xffffff );
-
 		}
 
 		// build point cloud
 
-		var mesh = new Points( geometry, material );
-		var name = url.split( '' ).reverse().join( '' );
-		name = /([^\/]*)/.exec( name );
-		name = name[ 1 ].split( '' ).reverse().join( '' );
-		mesh.name = name;
-
-		return mesh;
+		return new Points( geometry, material );
 
 	}
 
-} );
+}
 
 export { PCDLoader };

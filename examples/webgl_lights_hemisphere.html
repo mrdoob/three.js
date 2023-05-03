@@ -19,9 +19,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl hemisphere light example<br/>
-			flamingo by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a><br/><br/>
-			<button id="hemisphereButton">toggle hemisphere light</button>
-			<button id="directionalButton">toggle directional light</button>
+			flamingo by <a href="https://mirada.com/" target="_blank" rel="noopener">mirada</a> from <a href="http://www.ro.me" target="_blank" rel="noopener">ro.me</a>
 		</div>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
@@ -57,14 +55,27 @@
 
 		</script>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import Stats from './jsm/libs/stats.module.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			let camera, scene, renderer;
 			const mixers = [];
@@ -140,14 +151,14 @@
 				const vertexShader = document.getElementById( 'vertexShader' ).textContent;
 				const fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
 				const uniforms = {
-					"topColor": { value: new THREE.Color( 0x0077ff ) },
-					"bottomColor": { value: new THREE.Color( 0xffffff ) },
-					"offset": { value: 33 },
-					"exponent": { value: 0.6 }
+					'topColor': { value: new THREE.Color( 0x0077ff ) },
+					'bottomColor': { value: new THREE.Color( 0xffffff ) },
+					'offset': { value: 33 },
+					'exponent': { value: 0.6 }
 				};
-				uniforms[ "topColor" ].value.copy( hemiLight.color );
+				uniforms[ 'topColor' ].value.copy( hemiLight.color );
 
-				scene.fog.color.copy( uniforms[ "bottomColor" ].value );
+				scene.fog.color.copy( uniforms[ 'bottomColor' ].value );
 
 				const skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
 				const skyMat = new THREE.ShaderMaterial( {
@@ -190,7 +201,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 
 				// STATS
@@ -200,23 +210,30 @@
 
 				//
 
+				const params = {
+					toggleHemisphereLight: function () {
+
+						hemiLight.visible = ! hemiLight.visible;
+						hemiLightHelper.visible = ! hemiLightHelper.visible;
+
+					},
+					toggleDirectionalLight: function () {
+
+						dirLight.visible = ! dirLight.visible;
+						dirLightHelper.visible = ! dirLightHelper.visible;
+
+					}
+				};
+
+				const gui = new GUI();
+
+				gui.add( params, 'toggleHemisphereLight' ).name( 'toggle hemisphere light' );
+				gui.add( params, 'toggleDirectionalLight' ).name( 'toggle directional light' );
+				gui.open();
+
+				//
+
 				window.addEventListener( 'resize', onWindowResize );
-
-				const hemisphereButton = document.getElementById( 'hemisphereButton' );
-				hemisphereButton.addEventListener( 'click', function () {
-
-					hemiLight.visible = ! hemiLight.visible;
-					hemiLightHelper.visible = ! hemiLightHelper.visible;
-
-				} );
-
-				const directionalButton = document.getElementById( 'directionalButton' );
-				directionalButton.addEventListener( 'click', function () {
-
-					dirLight.visible = ! dirLight.visible;
-					dirLightHelper.visible = ! dirLightHelper.visible;
-
-				} );
 
 			}
 

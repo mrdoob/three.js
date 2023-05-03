@@ -52,11 +52,11 @@
 		<h3>[property:Object requestHeader]</h3>
 		<p>
 			[link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] 在 HTTP 请求中使用。 请参考 [page:.setRequestHeader]。 默认为 *undefined*。
-		</p>	
+		</p>
 
 		<h2>方法</h2>
 
-		<h3>[method:void load]()</h3>
+		<h3>[method:undefined load]()</h3>
 		<p>
 			该方法需要被所有具体的加载器来实现。它包含了从后端加载资产的逻辑。
 		</p>
@@ -73,27 +73,27 @@
 		[page:Function onLoad] 由 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve Promise.resolve] 处理，而 [page:Function onError] 则由 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject Promise.reject] 处理。
 		</p>
 
-		<h3>[method:void parse]()</h3>
+		<h3>[method:undefined parse]()</h3>
 		<p>
 			该方法需要被所有具体的加载器来实现。它包含了解析资产到 three.js 实体的逻辑。
 		</p>
 
-		<h3>[method:Loader setCrossOrigin]( [param:String crossOrigin] )</h3>
+		<h3>[method:this setCrossOrigin]( [param:String crossOrigin] )</h3>
 		<p>
 			[page:String crossOrigin] — crossOrigin字符串用于实现CORS，以从允许CORS的其它域加载url。
 		</p>
 
-		<h3>[method:Loader setPath]( [param:String path] )</h3>
+		<h3>[method:this setPath]( [param:String path] )</h3>
 		<p>
 			[page:String path] — 设置资产的基本路径。
 		</p>
 
-		<h3>[method:Loader setResourcePath]( [param:String resourcePath] )</h3>
+		<h3>[method:this setResourcePath]( [param:String resourcePath] )</h3>
 		<p>
 			[page:String resourcePath] — 设置独立资源（如纹理贴图）的基本路径。
 		</p>
 
-		<h3>[method:Loader setRequestHeader]( [param:Object requestHeader] )</h3>
+		<h3>[method:this setRequestHeader]( [param:Object requestHeader] )</h3>
 		<p>
 			[page:Object requestHeader] - key: 要设置header的名称。 value：要设置header的值。<br /><br />
 

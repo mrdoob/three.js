@@ -58,6 +58,9 @@
 		<h3>[property:Color color]</h3>
 		<p>材质的颜色([page:Color])，默认值为白色 (0xffffff)。</p>
 
+		<h3>[property:Boolean fog]</h3>
+		<p>材质是否受雾影响。默认为*true*。</p>
+
 		<h3>[property:Float linewidth]</h3>
 		<p> 控制线宽。默认值为 *1*。<br /><br />
 			由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]与
@@ -76,8 +79,10 @@
 			并且会被[page:WebGLRenderer WebGL]渲染器忽略。
 		</p>
 
-		<h3>[property:Boolean morphTargets]</h3>
-		<p>Define whether the material uses morphTargets. Default is false.</p>
+		<h3>[property:Texture map]</h3>
+		<p>
+			Sets the color of the lines using data from a [page:Texture].
+		</p>
 
 		<h2>方法(Methods)</h2>
 		<p>共有方法请参见其基类[page:Material]。</p>

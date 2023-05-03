@@ -4,17 +4,16 @@
  * @desc Load files in LWO3 and LWO2 format on Three.js
  *
  * LWO3 format specification:
- * 	http://static.lightwave3d.com/sdk/2018/html/filefmts/lwo3.html
+ *  https://static.lightwave3d.com/sdk/2019/html/filefmts/lwo3.html
  *
  * LWO2 format specification:
- * 	http://static.lightwave3d.com/sdk/2018/html/filefmts/lwo2.html
+ *  https://static.lightwave3d.com/sdk/2019/html/filefmts/lwo2.html
  *
  **/
 
 import {
 	AddOperation,
 	BackSide,
-	BufferAttribute,
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
@@ -35,38 +34,35 @@ import {
 	Points,
 	PointsMaterial,
 	RepeatWrapping,
+	SRGBColorSpace,
 	TextureLoader,
 	Vector2
-} from '../../../build/three.module.js';
+} from 'three';
 
 import { IFFParser } from './lwo/IFFParser.js';
 
-var lwoTree;
+let _lwoTree;
 
-var LWOLoader = function ( manager, parameters ) {
+class LWOLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager, parameters = {} ) {
 
-	parameters = parameters || {};
+		super( manager );
 
-	this.resourcePath = ( parameters.resourcePath !== undefined ) ? parameters.resourcePath : '';
+		this.resourcePath = ( parameters.resourcePath !== undefined ) ? parameters.resourcePath : '';
 
-};
+	}
 
-LWOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	load( url, onLoad, onProgress, onError ) {
 
-	constructor: LWOLoader,
+		const scope = this;
 
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-
-		var path = ( scope.path === '' ) ? extractParentUrl( url, 'Objects' ) : scope.path;
+		const path = ( scope.path === '' ) ? extractParentUrl( url, 'Objects' ) : scope.path;
 
 		// give the mesh a default name based on the filename
-		var modelName = url.split( path ).pop().split( '.' )[ 0 ];
+		const modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
@@ -98,34 +94,32 @@ LWOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( iffBuffer, path, modelName ) {
+	parse( iffBuffer, path, modelName ) {
 
-		lwoTree = new IFFParser().parse( iffBuffer );
+		_lwoTree = new IFFParser().parse( iffBuffer );
 
 		// console.log( 'lwoTree', lwoTree );
 
-		var textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
+		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
 		return new LWOTreeParser( textureLoader ).parse( modelName );
 
 	}
 
-} );
-
-// Parse the lwoTree object
-function LWOTreeParser( textureLoader ) {
-
-	this.textureLoader = textureLoader;
-
 }
 
-LWOTreeParser.prototype = {
+// Parse the lwoTree object
+class LWOTreeParser {
 
-	constructor: LWOTreeParser,
+	constructor( textureLoader ) {
 
-	parse: function ( modelName ) {
+		this.textureLoader = textureLoader;
+
+	}
+
+	parse( modelName ) {
 
 		this.materials = new MaterialParser( this.textureLoader ).parse();
 		this.defaultLayerName = modelName;
@@ -137,24 +131,24 @@ LWOTreeParser.prototype = {
 			meshes: this.meshes,
 		};
 
-	},
+	}
 
 	parseLayers() {
 
 		// array of all meshes for building hierarchy
-		var meshes = [];
+		const meshes = [];
 
 		// final array containing meshes with scene graph hierarchy set up
-		var finalMeshes = [];
+		const finalMeshes = [];
 
-		var geometryParser = new GeometryParser();
+		const geometryParser = new GeometryParser();
 
-		var scope = this;
-		lwoTree.layers.forEach( function ( layer ) {
+		const scope = this;
+		_lwoTree.layers.forEach( function ( layer ) {
 
-			var geometry = geometryParser.parse( layer.geometry, layer );
+			const geometry = geometryParser.parse( layer.geometry, layer );
 
-			var mesh = scope.parseMesh( geometry, layer );
+			const mesh = scope.parseMesh( geometry, layer );
 
 			meshes[ layer.number ] = mesh;
 
@@ -168,15 +162,13 @@ LWOTreeParser.prototype = {
 
 		return finalMeshes;
 
-	},
+	}
 
 	parseMesh( geometry, layer ) {
 
-		var mesh;
+		let mesh;
 
-		var materials = this.getMaterials( geometry.userData.matNames, layer.geometry.type );
-
-		this.duplicateUVs( geometry, materials );
+		const materials = this.getMaterials( geometry.userData.matNames, layer.geometry.type );
 
 		if ( layer.geometry.type === 'points' ) mesh = new Points( geometry, materials );
 		else if ( layer.geometry.type === 'lines' ) mesh = new LineSegments( geometry, materials );
@@ -189,7 +181,7 @@ LWOTreeParser.prototype = {
 
 		return mesh;
 
-	},
+	}
 
 	// TODO: may need to be reversed in z to convert LWO to three.js coordinates
 	applyPivots( meshes ) {
@@ -198,7 +190,7 @@ LWOTreeParser.prototype = {
 
 			mesh.traverse( function ( child ) {
 
-				var pivot = child.userData.pivot;
+				const pivot = child.userData.pivot;
 
 				child.position.x += pivot[ 0 ];
 				child.position.y += pivot[ 1 ];
@@ -206,7 +198,7 @@ LWOTreeParser.prototype = {
 
 				if ( child.parent ) {
 
-					var parentPivot = child.parent.userData.pivot;
+					const parentPivot = child.parent.userData.pivot;
 
 					child.position.x -= parentPivot[ 0 ];
 					child.position.y -= parentPivot[ 1 ];
@@ -218,13 +210,13 @@ LWOTreeParser.prototype = {
 
 		} );
 
-	},
+	}
 
 	getMaterials( namesArray, type ) {
 
-		var materials = [];
+		const materials = [];
 
-		var scope = this;
+		const scope = this;
 
 		namesArray.forEach( function ( name, i ) {
 
@@ -237,7 +229,7 @@ LWOTreeParser.prototype = {
 
 			materials.forEach( function ( mat, i ) {
 
-				var spec = {
+				const spec = {
 					color: mat.color,
 				};
 
@@ -245,7 +237,6 @@ LWOTreeParser.prototype = {
 
 					spec.size = 0.1;
 					spec.map = mat.map;
-					spec.morphTargets = mat.morphTargets;
 					materials[ i ] = new PointsMaterial( spec );
 
 				} else if ( type === 'lines' ) {
@@ -259,12 +250,12 @@ LWOTreeParser.prototype = {
 		}
 
 		// if there is only one material, return that directly instead of array
-		var filtered = materials.filter( Boolean );
+		const filtered = materials.filter( Boolean );
 		if ( filtered.length === 1 ) return filtered[ 0 ];
 
 		return materials;
 
-	},
+	}
 
 	getMaterialByName( name ) {
 
@@ -274,59 +265,32 @@ LWOTreeParser.prototype = {
 
 		} )[ 0 ];
 
-	},
-
-	// If the material has an aoMap, duplicate UVs
-	duplicateUVs( geometry, materials ) {
-
-		var duplicateUVs = false;
-
-		if ( ! Array.isArray( materials ) ) {
-
-			if ( materials.aoMap ) duplicateUVs = true;
-
-		} else {
-
-			materials.forEach( function ( material ) {
-
-				if ( material.aoMap ) duplicateUVs = true;
-
-			} );
-
-		}
-
-		if ( ! duplicateUVs ) return;
-
-		geometry.setAttribute( 'uv2', new BufferAttribute( geometry.attributes.uv.array, 2 ) );
-
-	},
-
-};
-
-function MaterialParser( textureLoader ) {
-
-	this.textureLoader = textureLoader;
+	}
 
 }
 
-MaterialParser.prototype = {
+class MaterialParser {
 
-	constructor: MaterialParser,
+	constructor( textureLoader ) {
 
-	parse: function () {
+		this.textureLoader = textureLoader;
 
-		var materials = [];
+	}
+
+	parse() {
+
+		const materials = [];
 		this.textures = {};
 
-		for ( var name in lwoTree.materials ) {
+		for ( const name in _lwoTree.materials ) {
 
-			if ( lwoTree.format === 'LWO3' ) {
+			if ( _lwoTree.format === 'LWO3' ) {
 
-				materials.push( this.parseMaterial( lwoTree.materials[ name ], name, lwoTree.textures ) );
+				materials.push( this.parseMaterial( _lwoTree.materials[ name ], name, _lwoTree.textures ) );
 
-			} else if ( lwoTree.format === 'LWO2' ) {
+			} else if ( _lwoTree.format === 'LWO2' ) {
 
-				materials.push( this.parseMaterialLwo2( lwoTree.materials[ name ], name, lwoTree.textures ) );
+				materials.push( this.parseMaterialLwo2( _lwoTree.materials[ name ], name, _lwoTree.textures ) );
 
 			}
 
@@ -334,48 +298,50 @@ MaterialParser.prototype = {
 
 		return materials;
 
-	},
+	}
 
 	parseMaterial( materialData, name, textures ) {
 
-		var params = {
+		let params = {
 			name: name,
 			side: this.getSide( materialData.attributes ),
 			flatShading: this.getSmooth( materialData.attributes ),
 		};
 
-		var connections = this.parseConnections( materialData.connections, materialData.nodes );
+		const connections = this.parseConnections( materialData.connections, materialData.nodes );
 
-		var maps = this.parseTextureNodes( connections.maps );
+		const maps = this.parseTextureNodes( connections.maps );
 
 		this.parseAttributeImageMaps( connections.attributes, textures, maps, materialData.maps );
 
-		var attributes = this.parseAttributes( connections.attributes, maps );
+		const attributes = this.parseAttributes( connections.attributes, maps );
 
 		this.parseEnvMap( connections, maps, attributes );
 
 		params = Object.assign( maps, params );
 		params = Object.assign( params, attributes );
 
-		var materialType = this.getMaterialType( connections.attributes );
+		const materialType = this.getMaterialType( connections.attributes );
+
+		if ( materialType !== MeshPhongMaterial ) delete params.refractionRatio; // PBR materials do not support "refractionRatio"
 
 		return new materialType( params );
 
-	},
+	}
 
 	parseMaterialLwo2( materialData, name/*, textures*/ ) {
 
-		var params = {
+		let params = {
 			name: name,
 			side: this.getSide( materialData.attributes ),
 			flatShading: this.getSmooth( materialData.attributes ),
 		};
 
-		var attributes = this.parseAttributes( materialData.attributes, {} );
+		const attributes = this.parseAttributes( materialData.attributes, {} );
 		params = Object.assign( params, attributes );
 		return new MeshPhongMaterial( params );
 
-	},
+	}
 
 	// Note: converting from left to right handed coords by switching x -> -x in vertices, and
 	// then switching mat FrontSide -> BackSide
@@ -394,31 +360,31 @@ MaterialParser.prototype = {
 
 		}
 
-	},
+	}
 
 	getSmooth( attributes ) {
 
 		if ( ! attributes.smooth ) return true;
 		return ! attributes.smooth;
 
-	},
+	}
 
 	parseConnections( connections, nodes ) {
 
-		var materialConnections = {
+		const materialConnections = {
 			maps: {}
 		};
 
-		var inputName = connections.inputName;
-		var inputNodeName = connections.inputNodeName;
-		var nodeName = connections.nodeName;
+		const inputName = connections.inputName;
+		const inputNodeName = connections.inputNodeName;
+		const nodeName = connections.nodeName;
 
-		var scope = this;
+		const scope = this;
 		inputName.forEach( function ( name, index ) {
 
 			if ( name === 'Material' ) {
 
-				var matNode = scope.getNodeByRefName( inputNodeName[ index ], nodes );
+				const matNode = scope.getNodeByRefName( inputNodeName[ index ], nodes );
 				materialConnections.attributes = matNode.attributes;
 				materialConnections.envMap = matNode.fileName;
 				materialConnections.name = inputNodeName[ index ];
@@ -439,30 +405,30 @@ MaterialParser.prototype = {
 
 		return materialConnections;
 
-	},
+	}
 
 	getNodeByRefName( refName, nodes ) {
 
-		for ( var name in nodes ) {
+		for ( const name in nodes ) {
 
 			if ( nodes[ name ].refName === refName ) return nodes[ name ];
 
 		}
 
-	},
+	}
 
 	parseTextureNodes( textureNodes ) {
 
-		var maps = {};
+		const maps = {};
 
-		for ( var name in textureNodes ) {
+		for ( const name in textureNodes ) {
 
-			var node = textureNodes[ name ];
-			var path = node.fileName;
+			const node = textureNodes[ name ];
+			const path = node.fileName;
 
 			if ( ! path ) return;
 
-			var texture = this.loadTexture( path );
+			const texture = this.loadTexture( path );
 
 			if ( node.widthWrappingMode !== undefined ) texture.wrapS = this.getWrappingType( node.widthWrappingMode );
 			if ( node.heightWrappingMode !== undefined ) texture.wrapT = this.getWrappingType( node.heightWrappingMode );
@@ -471,17 +437,20 @@ MaterialParser.prototype = {
 
 				case 'Color':
 					maps.map = texture;
+					maps.map.colorSpace = SRGBColorSpace;
 					break;
 				case 'Roughness':
 					maps.roughnessMap = texture;
-					maps.roughness = 0.5;
+					maps.roughness = 1;
 					break;
 				case 'Specular':
 					maps.specularMap = texture;
+					maps.specularMap.colorSpace = SRGBColorSpace;
 					maps.specular = 0xffffff;
 					break;
 				case 'Luminous':
 					maps.emissiveMap = texture;
+					maps.emissiveMap.colorSpace = SRGBColorSpace;
 					maps.emissive = 0x808080;
 					break;
 				case 'Luminous Color':
@@ -489,7 +458,7 @@ MaterialParser.prototype = {
 					break;
 				case 'Metallic':
 					maps.metalnessMap = texture;
-					maps.metalness = 0.5;
+					maps.metalness = 1;
 					break;
 				case 'Transparency':
 				case 'Alpha':
@@ -513,24 +482,24 @@ MaterialParser.prototype = {
 
 		return maps;
 
-	},
+	}
 
 	// maps can also be defined on individual material attributes, parse those here
 	// This occurs on Standard (Phong) surfaces
 	parseAttributeImageMaps( attributes, textures, maps ) {
 
-		for ( var name in attributes ) {
+		for ( const name in attributes ) {
 
-			var attribute = attributes[ name ];
+			const attribute = attributes[ name ];
 
 			if ( attribute.maps ) {
 
-				var mapData = attribute.maps[ 0 ];
+				const mapData = attribute.maps[ 0 ];
 
-				var path = this.getTexturePathByIndex( mapData.imageIndex, textures );
+				const path = this.getTexturePathByIndex( mapData.imageIndex, textures );
 				if ( ! path ) return;
 
-				var texture = this.loadTexture( path );
+				const texture = this.loadTexture( path );
 
 				if ( mapData.wrap !== undefined ) texture.wrapS = this.getWrappingType( mapData.wrap.w );
 				if ( mapData.wrap !== undefined ) texture.wrapT = this.getWrappingType( mapData.wrap.h );
@@ -539,6 +508,7 @@ MaterialParser.prototype = {
 
 					case 'Color':
 						maps.map = texture;
+						maps.map.colorSpace = SRGBColorSpace;
 						break;
 					case 'Diffuse':
 						maps.aoMap = texture;
@@ -549,10 +519,12 @@ MaterialParser.prototype = {
 						break;
 					case 'Specular':
 						maps.specularMap = texture;
+						maps.specularMap.colorSpace = SRGBColorSpace;
 						maps.specular = 0xffffff;
 						break;
 					case 'Luminosity':
 						maps.emissiveMap = texture;
+						maps.emissiveMap.colorSpace = SRGBColorSpace;
 						maps.emissive = 0x808080;
 						break;
 					case 'Metallic':
@@ -577,18 +549,22 @@ MaterialParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseAttributes( attributes, maps ) {
 
-		var params = {};
+		const params = {};
 
 		// don't use color data if color map is present
 		if ( attributes.Color && ! maps.map ) {
 
 			params.color = new Color().fromArray( attributes.Color.value );
 
-		} else params.color = new Color();
+		} else {
+
+			params.color = new Color();
+
+		}
 
 
 		if ( attributes.Transparency && attributes.Transparency.value !== 0 ) {
@@ -600,15 +576,13 @@ MaterialParser.prototype = {
 
 		if ( attributes[ 'Bump Height' ] ) params.bumpScale = attributes[ 'Bump Height' ].value * 0.1;
 
-		if ( attributes[ 'Refraction Index' ] ) params.refractionRatio = 1 / attributes[ 'Refraction Index' ].value;
-
 		this.parsePhysicalAttributes( params, attributes, maps );
 		this.parseStandardAttributes( params, attributes, maps );
 		this.parsePhongAttributes( params, attributes, maps );
 
 		return params;
 
-	},
+	}
 
 	parsePhysicalAttributes( params, attributes/*, maps*/ ) {
 
@@ -624,7 +598,7 @@ MaterialParser.prototype = {
 
 		}
 
-	},
+	}
 
 	parseStandardAttributes( params, attributes, maps ) {
 
@@ -648,9 +622,11 @@ MaterialParser.prototype = {
 		if ( attributes.Roughness && ! maps.roughnessMap ) params.roughness = attributes.Roughness.value;
 		if ( attributes.Metallic && ! maps.metalnessMap ) params.metalness = attributes.Metallic.value;
 
-	},
+	}
 
 	parsePhongAttributes( params, attributes, maps ) {
+
+		if ( attributes[ 'Refraction Index' ] ) params.refractionRatio = 0.98 / attributes[ 'Refraction Index' ].value;
 
 		if ( attributes.Diffuse ) params.color.multiplyScalar( attributes.Diffuse.value );
 
@@ -694,13 +670,13 @@ MaterialParser.prototype = {
 
 		if ( params.specular && attributes.Glossiness ) params.shininess = 7 + Math.pow( 2, attributes.Glossiness.value * 12 + 2 );
 
-	},
+	}
 
 	parseEnvMap( connections, maps, attributes ) {
 
 		if ( connections.envMap ) {
 
-			var envMap = this.loadTexture( connections.envMap );
+			const envMap = this.loadTexture( connections.envMap );
 
 			if ( attributes.transparent && attributes.opacity < 0.999 ) {
 
@@ -716,9 +692,11 @@ MaterialParser.prototype = {
 
 				if ( attributes.metalness !== undefined ) {
 
-					delete attributes.metalness;
+					attributes.metalness = 1; // For most transparent materials metalness should be set to 1 if not otherwise defined. If set to 0 no refraction will be visible
 
 				}
+
+				attributes.opacity = 1; // transparency fades out refraction, forcing opacity to 1 ensures a closer visual match to the material in Lightwave.
 
 			} else envMap.mapping = EquirectangularReflectionMapping;
 
@@ -726,16 +704,16 @@ MaterialParser.prototype = {
 
 		}
 
-	},
+	}
 
 	// get texture defined at top level by its index
 	getTexturePathByIndex( index ) {
 
-		var fileName = '';
+		let fileName = '';
 
-		if ( ! lwoTree.textures ) return fileName;
+		if ( ! _lwoTree.textures ) return fileName;
 
-		lwoTree.textures.forEach( function ( texture ) {
+		_lwoTree.textures.forEach( function ( texture ) {
 
 			if ( texture.index === index ) fileName = texture.fileName;
 
@@ -743,15 +721,13 @@ MaterialParser.prototype = {
 
 		return fileName;
 
-	},
+	}
 
 	loadTexture( path ) {
 
 		if ( ! path ) return null;
 
-		var texture;
-
-		texture = this.textureLoader.load(
+		const texture = this.textureLoader.load(
 			path,
 			undefined,
 			undefined,
@@ -764,7 +740,7 @@ MaterialParser.prototype = {
 
 		return texture;
 
-	},
+	}
 
 	// 0 = Reset, 1 = Repeat, 2 = Mirror, 3 = Edge
 	getWrappingType( num ) {
@@ -780,7 +756,7 @@ MaterialParser.prototype = {
 
 		}
 
-	},
+	}
 
 	getMaterialType( nodeData ) {
 
@@ -790,21 +766,17 @@ MaterialParser.prototype = {
 
 	}
 
-};
+}
 
-function GeometryParser() {}
-
-GeometryParser.prototype = {
-
-	constructor: GeometryParser,
+class GeometryParser {
 
 	parse( geoData, layer ) {
 
-		var geometry = new BufferGeometry();
+		const geometry = new BufferGeometry();
 
 		geometry.setAttribute( 'position', new Float32BufferAttribute( geoData.points, 3 ) );
 
-		var indices = this.splitIndices( geoData.vertexIndices, geoData.polygonDimensions );
+		const indices = this.splitIndices( geoData.vertexIndices, geoData.polygonDimensions );
 		geometry.setIndex( indices );
 
 		this.parseGroups( geometry, geoData );
@@ -817,25 +789,25 @@ GeometryParser.prototype = {
 		// TODO: z may need to be reversed to account for coordinate system change
 		geometry.translate( - layer.pivot[ 0 ], - layer.pivot[ 1 ], - layer.pivot[ 2 ] );
 
-		// var userData = geometry.userData;
+		// let userData = geometry.userData;
 		// geometry = geometry.toNonIndexed()
 		// geometry.userData = userData;
 
 		return geometry;
 
-	},
+	}
 
 	// split quads into tris
 	splitIndices( indices, polygonDimensions ) {
 
-		var remappedIndices = [];
+		const remappedIndices = [];
 
-		var i = 0;
+		let i = 0;
 		polygonDimensions.forEach( function ( dim ) {
 
 			if ( dim < 4 ) {
 
-				for ( var k = 0; k < dim; k ++ ) remappedIndices.push( indices[ i + k ] );
+				for ( let k = 0; k < dim; k ++ ) remappedIndices.push( indices[ i + k ] );
 
 			} else if ( dim === 4 ) {
 
@@ -852,7 +824,7 @@ GeometryParser.prototype = {
 
 			} else if ( dim > 4 ) {
 
-				for ( var k = 1; k < dim - 1; k ++ ) {
+				for ( let k = 1; k < dim - 1; k ++ ) {
 
 					remappedIndices.push( indices[ i ], indices[ i + k ], indices[ i + k + 1 ] );
 
@@ -868,31 +840,32 @@ GeometryParser.prototype = {
 
 		return remappedIndices;
 
-	},
+	}
 
 	// NOTE: currently ignoring poly indices and assuming that they are intelligently ordered
 	parseGroups( geometry, geoData ) {
 
-		var tags = lwoTree.tags;
-		var matNames = [];
+		const tags = _lwoTree.tags;
+		const matNames = [];
 
-		var elemSize = 3;
+		let elemSize = 3;
 		if ( geoData.type === 'lines' ) elemSize = 2;
 		if ( geoData.type === 'points' ) elemSize = 1;
 
-		var remappedIndices = this.splitMaterialIndices( geoData.polygonDimensions, geoData.materialIndices );
+		const remappedIndices = this.splitMaterialIndices( geoData.polygonDimensions, geoData.materialIndices );
 
-		var indexNum = 0; // create new indices in numerical order
-		var indexPairs = {}; // original indices mapped to numerical indices
+		let indexNum = 0; // create new indices in numerical order
+		const indexPairs = {}; // original indices mapped to numerical indices
 
-		var prevMaterialIndex;
+		let prevMaterialIndex;
+		let materialIndex;
 
-		var prevStart = 0;
-		var currentCount = 0;
+		let prevStart = 0;
+		let currentCount = 0;
 
-		for ( var i = 0; i < remappedIndices.length; i += 2 ) {
+		for ( let i = 0; i < remappedIndices.length; i += 2 ) {
 
-			var materialIndex = remappedIndices[ i + 1 ];
+			materialIndex = remappedIndices[ i + 1 ];
 
 			if ( i === 0 ) matNames[ indexNum ] = tags[ materialIndex ];
 
@@ -900,7 +873,7 @@ GeometryParser.prototype = {
 
 			if ( materialIndex !== prevMaterialIndex ) {
 
-				var currentIndex;
+				let currentIndex;
 				if ( indexPairs[ tags[ prevMaterialIndex ] ] ) {
 
 					currentIndex = indexPairs[ tags[ prevMaterialIndex ] ];
@@ -930,7 +903,7 @@ GeometryParser.prototype = {
 		// the loop above doesn't add the last group, do that here.
 		if ( geometry.groups.length > 0 ) {
 
-			var currentIndex;
+			let currentIndex;
 			if ( indexPairs[ tags[ materialIndex ] ] ) {
 
 				currentIndex = indexPairs[ tags[ materialIndex ] ];
@@ -950,11 +923,11 @@ GeometryParser.prototype = {
 		// Mat names from TAGS chunk, used to build up an array of materials for this geometry
 		geometry.userData.matNames = matNames;
 
-	},
+	}
 
 	splitMaterialIndices( polygonDimensions, indices ) {
 
-		var remappedIndices = [];
+		const remappedIndices = [];
 
 		polygonDimensions.forEach( function ( dim, i ) {
 
@@ -969,7 +942,7 @@ GeometryParser.prototype = {
 			} else {
 
 				 // ignore > 4 for now
-				for ( var k = 0; k < dim - 2; k ++ ) {
+				for ( let k = 0; k < dim - 2; k ++ ) {
 
 					remappedIndices.push( indices[ i * 2 ], indices[ i * 2 + 1 ] );
 
@@ -981,7 +954,7 @@ GeometryParser.prototype = {
 
 		return remappedIndices;
 
-	},
+	}
 
 	// UV maps:
 	// 1: are defined via index into an array of points, not into a geometry
@@ -995,16 +968,16 @@ GeometryParser.prototype = {
 	parseUVs( geometry, layer ) {
 
 		// start by creating a UV map set to zero for the whole geometry
-		var remappedUVs = Array.from( Array( geometry.attributes.position.count * 2 ), function () {
+		const remappedUVs = Array.from( Array( geometry.attributes.position.count * 2 ), function () {
 
 			return 0;
 
 		} );
 
-		for ( var name in layer.uvs ) {
+		for ( const name in layer.uvs ) {
 
-			var uvs = layer.uvs[ name ].uvs;
-			var uvIndices = layer.uvs[ name ].uvIndices;
+			const uvs = layer.uvs[ name ].uvs;
+			const uvIndices = layer.uvs[ name ].uvIndices;
 
 			uvIndices.forEach( function ( i, j ) {
 
@@ -1017,20 +990,20 @@ GeometryParser.prototype = {
 
 		geometry.setAttribute( 'uv', new Float32BufferAttribute( remappedUVs, 2 ) );
 
-	},
+	}
 
 	parseMorphTargets( geometry, layer ) {
 
-		var num = 0;
-		for ( var name in layer.morphTargets ) {
+		let num = 0;
+		for ( const name in layer.morphTargets ) {
 
-			var remappedPoints = geometry.attributes.position.array.slice();
+			const remappedPoints = geometry.attributes.position.array.slice();
 
 			if ( ! geometry.morphAttributes.position ) geometry.morphAttributes.position = [];
 
-			var morphPoints = layer.morphTargets[ name ].points;
-			var morphIndices = layer.morphTargets[ name ].indices;
-			var type = layer.morphTargets[ name ].type;
+			const morphPoints = layer.morphTargets[ name ].points;
+			const morphIndices = layer.morphTargets[ name ].indices;
+			const type = layer.morphTargets[ name ].type;
 
 			morphIndices.forEach( function ( i, j ) {
 
@@ -1059,20 +1032,20 @@ GeometryParser.prototype = {
 
 		geometry.morphTargetsRelative = false;
 
-	},
+	}
 
-};
+}
 
 
 // ************** UTILITY FUNCTIONS **************
 
 function extractParentUrl( url, dir ) {
 
-	var index = url.indexOf( dir );
+	const index = url.indexOf( dir );
 
 	if ( index === - 1 ) return './';
 
-	return url.substr( 0, index );
+	return url.slice( 0, index );
 
 }
 

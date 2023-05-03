@@ -44,6 +44,11 @@
 			[page:BufferGeometry] 的实例或者派生类，定义了物体的结构。
 		</p>
 
+		<h3>[property:Boolean isMesh]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Material material]</h3>
 		<p>
 			由[page:Material]基类或者一个包含材质的数组派生而来的材质实例，定义了物体的外观。默认值是一个[page:MeshBasicMaterial]。
@@ -68,13 +73,13 @@
 		<h3>[method:Mesh clone]()</h3>
 		<p>返回这个[name]对象及其子级的克隆。</p>
 
-		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
+		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 			在一条投射出去的[page:Ray]（射线）和这个网格之间产生交互。
 			[page:Raycaster.intersectObject]将会调用这个方法。
 		</p>
 
-		<h3>[method:null updateMorphTargets]()</h3>
+		<h3>[method:undefined updateMorphTargets]()</h3>
 		<p>
 			更新morphTargets，使其不对对象产生影响，重置[page:Mesh.morphTargetInfluences morphTargetInfluences] and
 			[page:Mesh.morphTargetDictionary morphTargetDictionary]属性。

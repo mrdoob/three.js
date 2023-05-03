@@ -15,16 +15,29 @@
 	<div id="info">Physics threejs demo with convex objects breaking in real time<br />Press mouse to throw balls and move the camera.</div>
 	<div id="container"></div>
 
-	<script src="js/libs/ammo.wasm.js"></script>
+	<script src="jsm/libs/ammo.wasm.js"></script>
+
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "../build/three.module.js",
+				"three/addons/": "./jsm/"
+			}
+		}
+	</script>
 
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from 'three';
 
-		import Stats from './jsm/libs/stats.module.js';
+		import Stats from 'three/addons/libs/stats.module.js';
 
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { ConvexObjectBreaker } from './jsm/misc/ConvexObjectBreaker.js';
-		import { ConvexGeometry } from './jsm/geometries/ConvexGeometry.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+		import { ConvexObjectBreaker } from 'three/addons/misc/ConvexObjectBreaker.js';
+		import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
 
 		// - Global variables -
 
@@ -183,7 +196,7 @@
 			quat.set( 0, 0, 0, 1 );
 			const ground = createParalellepipedWithPhysics( 40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial( { color: 0xFFFFFF } ) );
 			ground.receiveShadow = true;
-			textureLoader.load( "textures/grid.png", function ( texture ) {
+			textureLoader.load( 'textures/grid.png', function ( texture ) {
 
 				texture.wrapS = THREE.RepeatWrapping;
 				texture.wrapT = THREE.RepeatWrapping;

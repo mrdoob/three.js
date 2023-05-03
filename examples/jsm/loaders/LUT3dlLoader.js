@@ -1,15 +1,15 @@
 // http://download.autodesk.com/us/systemdocs/help/2011/lustre/index.html?url=./files/WSc4e151a45a3b785a24c3d9a411df9298473-7ffd.htm,topicNumber=d0e9492
-
+// https://community.foundry.com/discuss/topic/103636/format-spec-for-3dl?mode=Post&postID=895258
 import {
 	Loader,
 	FileLoader,
 	DataTexture,
-	DataTexture3D,
-	RGBFormat,
+	Data3DTexture,
+	RGBAFormat,
 	UnsignedByteType,
 	ClampToEdgeWrapping,
 	LinearFilter,
-} from '../../../build/three.module.js';
+} from 'three';
 
 export class LUT3dlLoader extends Loader {
 
@@ -69,7 +69,7 @@ export class LUT3dlLoader extends Loader {
 
 		}
 
-		const dataArray = new Array( size * size * size * 3 );
+		const dataArray = new Array( size * size * size * 4 );
 		let index = 0;
 		let maxOutputValue = 0.0;
 		for ( let i = 1, l = lines.length; i < l; i ++ ) {
@@ -88,21 +88,26 @@ export class LUT3dlLoader extends Loader {
 
 			// b grows first, then g, then r
 			const pixelIndex = bLayer * size * size + gLayer * size + rLayer;
-			dataArray[ 3 * pixelIndex + 0 ] = r;
-			dataArray[ 3 * pixelIndex + 1 ] = g;
-			dataArray[ 3 * pixelIndex + 2 ] = b;
+			dataArray[ 4 * pixelIndex + 0 ] = r;
+			dataArray[ 4 * pixelIndex + 1 ] = g;
+			dataArray[ 4 * pixelIndex + 2 ] = b;
+			dataArray[ 4 * pixelIndex + 3 ] = 1.0;
 			index += 1;
 
 		}
 
-		// Find the apparent bit depth of the stored RGB values and scale the
+		// Find the apparent bit depth of the stored RGB values and map the
 		// values to [ 0, 255 ].
 		const bits = Math.ceil( Math.log2( maxOutputValue ) );
 		const maxBitValue = Math.pow( 2.0, bits );
-		for ( let i = 0, l = dataArray.length; i < l; i ++ ) {
+		for ( let i = 0, l = dataArray.length; i < l; i += 4 ) {
 
-			const val = dataArray[ i ];
-			dataArray[ i ] = 255 * val / maxBitValue;
+			const r = dataArray[ i + 0 ];
+			const g = dataArray[ i + 1 ];
+			const b = dataArray[ i + 2 ];
+			dataArray[ i + 0 ] = 255 * r / maxBitValue; // r
+			dataArray[ i + 1 ] = 255 * g / maxBitValue; // g
+			dataArray[ i + 2 ] = 255 * b / maxBitValue; // b
 
 		}
 
@@ -111,20 +116,21 @@ export class LUT3dlLoader extends Loader {
 		texture.image.data = data;
 		texture.image.width = size;
 		texture.image.height = size * size;
-		texture.format = RGBFormat;
+		texture.format = RGBAFormat;
 		texture.type = UnsignedByteType;
 		texture.magFilter = LinearFilter;
 		texture.minFilter = LinearFilter;
 		texture.wrapS = ClampToEdgeWrapping;
 		texture.wrapT = ClampToEdgeWrapping;
 		texture.generateMipmaps = false;
+		texture.needsUpdate = true;
 
-		const texture3D = new DataTexture3D();
+		const texture3D = new Data3DTexture();
 		texture3D.image.data = data;
 		texture3D.image.width = size;
 		texture3D.image.height = size;
 		texture3D.image.depth = size;
-		texture3D.format = RGBFormat;
+		texture3D.format = RGBAFormat;
 		texture3D.type = UnsignedByteType;
 		texture3D.magFilter = LinearFilter;
 		texture3D.minFilter = LinearFilter;
@@ -132,6 +138,7 @@ export class LUT3dlLoader extends Loader {
 		texture3D.wrapT = ClampToEdgeWrapping;
 		texture3D.wrapR = ClampToEdgeWrapping;
 		texture3D.generateMipmaps = false;
+		texture3D.needsUpdate = true;
 
 		return {
 			size,

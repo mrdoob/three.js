@@ -43,9 +43,22 @@
 		min: <span class="c">Nearest</span>
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
 			const SCREEN_WIDTH = window.innerWidth;
 			const SCREEN_HEIGHT = window.innerHeight;
@@ -83,12 +96,12 @@
 
 				function mipmap( size, color ) {
 
-					const imageCanvas = document.createElement( "canvas" );
-					const context = imageCanvas.getContext( "2d" );
+					const imageCanvas = document.createElement( 'canvas' );
+					const context = imageCanvas.getContext( '2d' );
 
 					imageCanvas.width = imageCanvas.height = size;
 
-					context.fillStyle = "#444";
+					context.fillStyle = '#444';
 					context.fillRect( 0, 0, size, size );
 
 					context.fillStyle = color;
@@ -108,6 +121,7 @@
 				textureCanvas1.mipmaps[ 5 ] = mipmap( 4, '#004' );
 				textureCanvas1.mipmaps[ 6 ] = mipmap( 2, '#044' );
 				textureCanvas1.mipmaps[ 7 ] = mipmap( 1, '#404' );
+				textureCanvas1.colorSpace = THREE.SRGBColorSpace;
 				textureCanvas1.repeat.set( 1000, 1000 );
 				textureCanvas1.wrapS = THREE.RepeatWrapping;
 				textureCanvas1.wrapT = THREE.RepeatWrapping;
@@ -178,11 +192,13 @@
 
 				};
 
-				const texturePainting1 = new THREE.TextureLoader().load( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", callbackPainting );
+				const texturePainting1 = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg', callbackPainting );
 				const texturePainting2 = new THREE.Texture();
 				const materialPainting1 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting1 } );
 				const materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
 
+				texturePainting1.colorSpace = THREE.SRGBColorSpace;
+				texturePainting2.colorSpace = THREE.SRGBColorSpace;
 				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
 				texturePainting1.minFilter = texturePainting1.magFilter = THREE.LinearFilter;
 				texturePainting1.mapping = THREE.UVMapping;
@@ -192,7 +208,7 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.autoClear = false;
 
-				renderer.domElement.style.position = "relative";
+				renderer.domElement.style.position = 'relative';
 				container.appendChild( renderer.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove );

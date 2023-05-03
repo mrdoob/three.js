@@ -1,0 +1,367 @@
+<!DOCTYPE html><html lang="zh"><head>
+	<meta charset="utf-8">
+	<title>Transparency</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@threejs">
+	<meta name="twitter:title" content="Three.js – Transparency">
+	<meta property="og:image" content="https://threejs.org/files/share.png">
+	<link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
+	<link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
+
+	<link rel="stylesheet" href="../resources/lesson.css">
+	<link rel="stylesheet" href="../resources/lang.css">
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+	<script type="importmap">
+{
+  "imports": {
+    "three": "../../build/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<div class="container">
+	<div class="lesson-title">
+		<h1>透明</h1>
+	</div>
+	<div class="lesson">
+		<div class="lesson-main">
+			<p>在three.js中，透明很简单，也很困难。</p>
+			<p>首先，我们来看简单的部分。让我们来制作一个包含8个立方体的场景，它们呈2 * 2 * 2网格排布。</p>
+			<p>我们从<a href="rendering-on-demand.html">按需渲染文章</a>中的例子开始。例子中原来有3个方格，现在修改到8个。
+				首先改变<code class="notranslate" translate="no">makeInstance</code>函数，接收x、y、z参数。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makeInstance(geometry, color) {
++function makeInstance(geometry, color, x, y, z) {
+  const material = new THREE.MeshPhongMaterial({color});
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+-  cube.position.x = x;
++  cube.position.set(x, y, z);
+
+  return cube;
+}
+</pre>
+			<p>然后我们来创建8个立方体。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function hsl(h, s, l) {
++  return (new THREE.Color()).setHSL(h, s, l);
++}
+
+-makeInstance(geometry, 0x44aa88,  0);
+-makeInstance(geometry, 0x8844aa, -2);
+-makeInstance(geometry, 0xaa8844,  2);
+
++{
++  const d = 0.8;
++  makeInstance(geometry, hsl(0 / 8, 1, .5), -d, -d, -d);
++  makeInstance(geometry, hsl(1 / 8, 1, .5),  d, -d, -d);
++  makeInstance(geometry, hsl(2 / 8, 1, .5), -d,  d, -d);
++  makeInstance(geometry, hsl(3 / 8, 1, .5),  d,  d, -d);
++  makeInstance(geometry, hsl(4 / 8, 1, .5), -d, -d,  d);
++  makeInstance(geometry, hsl(5 / 8, 1, .5),  d, -d,  d);
++  makeInstance(geometry, hsl(6 / 8, 1, .5), -d,  d,  d);
++  makeInstance(geometry, hsl(7 / 8, 1, .5),  d,  d,  d);
++}
+</pre>
+			<p>我也调整了摄像机。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+const aspect = 2;  // the canvas default
+const near = 0.1;
+-const far = 5;
++const far = 25;
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+-camera.position.z = 4;
++camera.position.z = 2;
+</pre>
+			<p>将背景色调整为白色。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
++scene.background = new THREE.Color('white');
+</pre>
+			<p>还添加了第二个灯光，这样立方体的所有面都可以被照亮。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-{
++function addLight(...pos) {
+  const color = 0xFFFFFF;
+  const intensity = 1;
+  const light = new THREE.DirectionalLight(color, intensity);
+-  light.position.set(-1, 2, 4);
++  light.position.set(...pos);
+  scene.add(light);
+}
++addLight(-1, 2, 4);
++addLight( 1, -1, -2);
+</pre>
+			<p>让立方体变得透明，我们只需要设置<a href="/docs/#api/en/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a>和
+				<a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a>。opacity为1，物体完全不透明，opacity为0，物体将完全透明。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
+-  const material = new THREE.MeshPhongMaterial({color});
++  const material = new THREE.MeshPhongMaterial({
++    color,
++    opacity: 0.5,
++    transparent: true,
++  });
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+  cube.position.set(x, y, z);
+
+  return cube;
+}
+</pre>
+			<p>然后，我们就得到了8个透明的立方体。</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/transparency.html" target="_blank">点击此处在独立窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>在例子中拖拉，来旋转视图。</p>
+			<p>这好像很简单，但是拉近一些看。立方体背后的面好像消失了。</p>
+			<div class="threejs_center"><img src="../resources/images/transparency-cubes-no-backs.png" style="width: 416px;"></div>
+			<div class="threejs_center">没有后面的面</div>
+
+			<p>我们在<a href="materials.html">材质文章</a>中学习了<a href="/docs/#api/en/materials/Material#side"><code class="notranslate" translate="no">side</code></a>材质属性。
+				那么，让我们将side属性设置为<code class="notranslate" translate="no">THREE.DoubleSide</code>来让每个立方体的所有面都被绘制。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+  color,
+  map: loader.load(url),
+  opacity: 0.5,
+  transparent: true,
++  side: THREE.DoubleSide,
+});
+</pre>
+			<p>然后我们得到了</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-doubleside.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/transparency-doubleside.html" target="_blank">点击此处在独立窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>试试看，看起来好像起作用了，我们能看到后面的那些面。不过在更近距离的查看中，有些时候还是看不到。</p>
+			<div class="threejs_center"><img src="../resources/images/transparency-cubes-some-backs.png" style="width: 368px;"></div>
+			<div class="threejs_center">每个立方体的左后面都消失了</div>
+
+			<p>这种情况之所以会发生，是因为3d物体的一般性绘制方式。对于每个几何体，一次绘制一个三角形。
+				当三角形的一个像素在被绘制的时候，会记录两件事情。一是像素的颜色，二是像素的深度。当下一个三角形被绘制的时候，对于深度大于先前被记录的深度的像素，将不会被绘制。</p>
+			<p>这种方式，对于不透明的物体工作得很好。不过，对于透明的物体不能正常工作。</p>
+			<p>这个问题的解决方案是将透明的物体进行排序，排在后面的物体比排在前面的物体先绘制。
+				THREE.js对于物体，比如<a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>就是这样做的，
+			否则上面第一个关于立方体的例子将会失败，因为一些立方体遮挡住了其它的立方体。不幸的是，为一个个的三角形进行排序将会十分的慢。</p>
+			<p>每个立方体有12个三角形，每个面有2个。三角形绘制的顺序和在<a href="custom-buffergeometry.html">几何体中构建的顺序</a>是一致的，
+				取决于我们从哪个方向看向这些三角形，距离摄像机近一些的先被绘制。因此，在后面的那些三角形不会被绘制。这就是我们看不到后面的面的原因。</p>
+			<p>对于一个凸状物体，比如球体或是立方体，一种解决方案是将每一个立方体添加到场景中两次。一次带有仅绘制后面三角形的材质，另外一次带有仅绘制前面三角形的材质。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
++  [THREE.BackSide, THREE.FrontSide].forEach((side) =&gt; {
+    const material = new THREE.MeshPhongMaterial({
+      color,
+      opacity: 0.5,
+      transparent: true,
++      side,
+    });
+
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    cube.position.set(x, y, z);
++  });
+}
+</pre>
+			<p>上面的办法<em>好像</em>可以工作。</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-doubleside-hack.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/transparency-doubleside-hack.html" target="_blank">点击此处在独立窗口中打开</a>
+		</div>
+
+			<p></p>
+			它假定了three.js的排序是稳定的，意味着因为我们先添加了<code class="notranslate" translate="no">side: THREE.BackSide</code>  的物体，还因为两个物体在同样的位置，这个物体将会在
+			<code class="notranslate" translate="no">side: THREE.FrontSide</code> 的物体之前被绘制。
+			<p>让我们制作2个相交的平面（删除了所有和立方体相关的代码）。
+				我们将会给每个平面<a href="textures.html">添加纹理</a>。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeWidth = 1;
+const planeHeight = 1;
+const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
+
+const loader = new THREE.TextureLoader();
+
+function makeInstance(geometry, color, rotY, url) {
+  const texture = loader.load(url, render);
+  const material = new THREE.MeshPhongMaterial({
+    color,
+    map: texture,
+    opacity: 0.5,
+    transparent: true,
+    side: THREE.DoubleSide,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  mesh.rotation.y = rotY;
+}
+
+makeInstance(geometry, 'pink',       0,             'resources/images/happyface.png');
+makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.png');
+</pre>
+			这次我们可以使用<code class="notranslate" translate="no">side: THREE.DoubleSide</code>因为同一时间我们只能看到一个平面的一个面。也请注意到我们将<code class="notranslate" translate="no">render</code>
+			函数传递到了纹理加载函数中这样当纹理加载完成的时候，可以重新渲染场景。这是因为这个例子是使用 <a href="rendering-on-demand.html">按需渲染</a>代替了持续渲染。
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/transparency-intersecting-planes.html" target="_blank">点击此处在独立窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>我们又一次的看到了类似的问题。</p>
+			<div class="threejs_center"><img src="../resources/images/transparency-planes.png" style="width: 408px;"></div>
+			<div class="threejs_center">一半的脸消失不见了</div>
+
+			<p>这里的解决方案是手动的将每个平面分割为2个，这样它们实际上就没有了交集。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
++  const base = new THREE.Object3D();
++  scene.add(base);
++  base.rotation.y = rotY;
+
++  [-1, 1].forEach((x) =&gt; {
+    const texture = loader.load(url, render);
++    texture.offset.x = x &lt; 0 ? 0 : 0.5;
++    texture.repeat.x = .5;
+    const material = new THREE.MeshPhongMaterial({
+      color,
+      map: texture,
+      opacity: 0.5,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+-    scene.add(mesh);
++    base.add(mesh);
+
+-    mesh.rotation.y = rotY;
++    mesh.position.x = x * .25;
+  });
+}
+</pre>
+			<p>你如何完成取决于你。如果我在使用的是<a href="https://blender.org">Blender</a>这样的模型包，我可能会手动的调整纹理的坐标。这里我们使用的是<a href="/docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a>，默认情况下会将纹理拉伸到整个平面。像我们<a href="textures.html">前面讲到过的</a>，
+				通过设置 <a href="/docs/#api/en/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a>和<a href="/docs/#api/en/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a>，我们可以放缩和移动纹理，在每个平面上得到正确的一半脸的纹理。</p>
+			<p>上面的代码生成了一个<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>对象，并且设置为2个平面的parent。旋转一个父级
+				<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> 所需要的数学要比没有它时简单一些。 </p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes-fixed.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/transparency-intersecting-planes-fixed.html" target="_blank">点击此处在独立窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>这种解决方案真的只能用于像2个不会改变相交位置的简单物体。</p>
+			<p>对于添加了纹理的物体，还有一种解决方案是设置alpha测试。</p>
+			<p>Alpha测试是指像素的<em>alpha</em>值低于某个水平的时候，three.js就不会绘制它。如果我们根本就不绘制某个像素，那么上面提到的深度问题就消失了。
+				对于具有相对尖锐边缘的纹理，这种方式工作得很好。例子中包含了树或植物上的叶子纹理或者一片草地。</p>
+			<p>让我们在两个平面上试一下。首先我们使用不同的纹理。上面的纹理都是100%不透明。现在2个纹理是透明的。</p>
+			<div class="spread">
+				<div><img class="checkerboard" src="../examples/resources/images/tree-01.png"></div>
+				<div><img class="checkerboard" src="../examples/resources/images/tree-02.png"></div>
+			</div>
+
+			<p>回到那两个相交的平面（我们分割之前），让我们使用纹理并且设置<a href="/docs/#api/en/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a>。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
+  const texture = loader.load(url, render);
+  const material = new THREE.MeshPhongMaterial({
+    color,
+    map: texture,
+-    opacity: 0.5,
+    transparent: true,
++    alphaTest: 0.5,
+    side: THREE.DoubleSide,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  mesh.rotation.y = rotY;
+}
+
+-makeInstance(geometry, 'pink',       0,             'resources/images/happyface.png');
+-makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.png');
++makeInstance(geometry, 'white', 0,             'resources/images/tree-01.png');
++makeInstance(geometry, 'white', Math.PI * 0.5, 'resources/images/tree-02.png');
+</pre>
+			<p>在我们运行之前，让我们添加一点UI，这样我们可以更简单的测试<code class="notranslate" translate="no">alphaTest</code>
+				和 <code class="notranslate" translate="no">transparent</code> 选项。我们将会使用在
+				<a href="scenegraph.html">three'js中的场景图文章</a>中介绍过的lil-gui。</p>
+			<p>首先我们为lil-gui创建一个辅助类来为场景中的每种材质设置值。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class AllMaterialPropertyGUIHelper {
+  constructor(prop, scene) {
+    this.prop = prop;
+    this.scene = scene;
+  }
+  get value() {
+    const {scene, prop} = this;
+    let v;
+    scene.traverse((obj) =&gt; {
+      if (obj.material &amp;&amp; obj.material[prop] !== undefined) {
+        v = obj.material[prop];
+      }
+    });
+    return v;
+  }
+  set value(v) {
+    const {scene, prop} = this;
+    scene.traverse((obj) =&gt; {
+      if (obj.material &amp;&amp; obj.material[prop] !== undefined) {
+        obj.material[prop] = v;
+        obj.material.needsUpdate = true;
+      }
+    });
+  }
+}
+</pre>
+			<p>然后我们来添加窗口。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.add(new AllMaterialPropertyGUIHelper('alphaTest', scene), 'value', 0, 1)
+    .name('alphaTest')
+    .onChange(requestRenderIfNotRequested);
+gui.add(new AllMaterialPropertyGUIHelper('transparent', scene), 'value')
+    .name('transparent')
+    .onChange(requestRenderIfNotRequested);
+</pre>
+			<p>当然我们需要引用lil-gui。</p>
+			<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
++import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+</pre>
+			<p>下面是结果。</p>
+			<p></p><div translate="no" class="threejs_example_container notranslate">
+			<div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes-alphatest.html"></iframe></div>
+			<a class="threejs_center" href="/manual/examples/transparency-intersecting-planes-alphatest.html" target="_blank">点击此处在独立窗口中打开</a>
+		</div>
+
+			<p></p>
+			<p>可以看到起作用了，但是当放大看的时候，你可以看到一个平面有白色的线条。</p>
+			<div class="threejs_center"><img src="../resources/images/transparency-alphatest-issues.png" style="width: 532px;"></div>
+
+			<p>这也是我们上面提到的深度问题。那个平面先被绘制，因此后面的平面将不会被绘制。
+				没有完美的解决方案。调整<code class="notranslate" translate="no">alphaTest</code>并且打开或关闭
+				<code class="notranslate" translate="no">transparent</code>来为你的场景寻找一个合适的解决方案。
+				</p>
+			<p>从文章中可以知道，完美的透明是困难的，有着各种问题、取舍和变通方法。</p>
+			<p>举例来说，你有一辆车。汽车通常会在4个面上有挡风玻璃。如果你想要避免上面提到的排序问题，
+				你可能不得不将每一扇窗户成为它自己的物体，以便three.js可以排序这些窗户并以正确的顺序绘制它们。
+				</p>
+			<p>如果你在制作一些植物或是草地，alpha测试是常用的解决方案。</p>
+			<p>采用那种方案取决于你的需求。</p>
+
+		</div>
+	</div>
+</div>
+
+<script src="../resources/prettify.js"></script>
+<script src="../resources/lesson.js"></script>
+
+
+
+
+</body></html>

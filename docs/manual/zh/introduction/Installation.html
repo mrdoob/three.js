@@ -28,7 +28,7 @@
 		</p>
 
 		<code>
-		npm install --save three
+		npm install three
 		</code>
 
 		<p>
@@ -67,23 +67,26 @@
 		</p>
 
 		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+			{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js"
+			}
+			}
+		&lt;/script>
+
 		&lt;script type="module">
 
-		  // 通过访问 https://unpkg.com/three 来查找最新版本。
+			import * as THREE from 'three';
 
-		  import * as THREE from 'https://unpkg.com/three@&lt;version&gt;/build/three.module.js';
-
-		  const scene = new THREE.Scene();
+			const scene = new THREE.Scene();
 
 		&lt;/script>
 		</code>
 
-		<p>
-			并非所有功能都可以通过 <em>build/three.module.js</em> 模块来直接访问。three.js 中其它较为流行的部分 —— 如控制器（control）、加载器（loader）以及后期处理效果（post-processing effect） —— 必须从 [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 子目录下导入。了解更多信息，请参阅下方的<em>示例</em>。
-		</p>
-
-
-		<h2>示例</h2>
+		<h2>Addons</h2>
 
 		<p>
 			three.js的核心专注于3D引擎最重要的组件。其它很多有用的组件 —— 如控制器（control）、加载器（loader）以及后期处理效果（post-processing effect） —— 是 [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm] 目录的一部分。它们被称为“示例”，虽然你可以直接将它们拿来使用，但它们也需要重新混合以及定制。这些组件和 three.js 的核心保持同步，而 npm 上类似的第三方包则由不同的作者进行维护，可能不是最新的。
@@ -95,9 +98,9 @@
 
 
 		<code>
-		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		const controls = new OrbitControls();
+		const controls = new OrbitControls( camera, renderer.domElement );
 		</code>
 
 		<p>
@@ -105,13 +108,23 @@
 		</p>
 
 		<code>
+		&lt;script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js">&lt;/script>
+
+		&lt;script type="importmap">
+			{
+			"imports": {
+				"three": "https://unpkg.com/three@&lt;version&gt;/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@&lt;version&gt;/examples/jsm/"
+			}
+			}
+		&lt;/script>
+
 		&lt;script type="module">
 
-		  // 通过访问 https://unpkg.com/three 来查找最新版本。
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-		  import { OrbitControls } from 'https://unpkg.com/three@&lt;version&gt;/examples/jsm/controls/OrbitControls.js';
-
-		  const controls = new OrbitControls();
+			const controls = new OrbitControls( camera, renderer.domElement );
 
 		&lt;/script>
 		</code>
@@ -141,15 +154,11 @@
 		<h3>Node.js</h3>
 
 		<p>
-			在 [link:https://eloquentjavascript.net/20_node.html Node.js] 下使用 three.js 较为困难，原因有2条：
+			由于 three.js 是为 Web 构建的, 因此它依赖于浏览器和 DOM 的 API ，但这些 API 在 Node.js 里不一定存在。这些问题中有的可以使用 [link:https://github.com/stackgl/headless-gl headless-gl] 等 shims 来解决，或者用自定义的替代方案来替换像 [page:TextureLoader] 这样的组件。其他 DOM API 可能与使用它们的代码强相关，因此将更难以解决。我们欢迎简单且易于维护的 pull request 来改进对 Node.js 的支持，但建议先打开问题来讨论您的改进。
 		</p>
 
 		<p>
-			首先， three.js 是为 web 而构建的，其依赖于浏览器，以及并不总是存在于 Node.js 中的 DOM API。其中的一些问题可使用类似 [link:https://github.com/stackgl/headless-gl headless-gl] 的 shim ，或使用定制的替代品来替换掉一些组件（例如 [page:TextureLoader] ）来进行解决。其他的 DOM API 或许和使用它们的代码紧密相连在一起，并且很难解决。我们欢迎简单且可维护的 pull request，以改善对 Node.js 的支持。但建议您首先提出一个 issue 来讨论您的改进。
-		</p>
-
-		<p>
-			第二，Node.js 对于 ES module 的支持可以说……很复杂。在 Node.js v12 中， three.js 的核心库可使用 <em>require('three')</em> 来作为 CommonJS module 进行导入。然而，大多数在 <em>examples/jsm</em> 中的示例组件并不能够这样。未来版本的 Node.js 或许可以解决这个问题，但同时你可能需要一些类似 [link:https://github.com/standard-things/esm esm] 的解决方案，来使得你的 Node.js 应用程序识别 ES module。
+			确保在您的 package.json 文件中添加 { "type": "module" }，以在您的 Node.js 项目中启用 ES6 模块。
 		</p>
 
 	</body>

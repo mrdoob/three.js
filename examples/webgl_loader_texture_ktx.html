@@ -13,10 +13,23 @@
 	<a href="https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">Khronos Texture</a> is a lightweight file format for OpenGL
 </div>
 
-<script type="module">
-	import * as THREE from '../build/three.module.js';
+<!-- Import maps polyfill -->
+<!-- Remove this when import maps will be widely supported -->
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
-	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
+<script type="importmap">
+	{
+		"imports": {
+			"three": "../build/three.module.js",
+			"three/addons/": "./jsm/"
+		}
+	}
+</script>
+
+<script type="module">
+	import * as THREE from 'three';
+
+	import { KTXLoader } from 'three/addons/loaders/KTXLoader.js';
 
 	/*
 	This is how compressed textures are supposed to be used:
@@ -69,12 +82,14 @@
 			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_PVR2bpp.ktx' )
 			} );
+			material1.map.colorSpace = THREE.SRGBColorSpace;
 			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_PVR4bpp.ktx' ),
 				depthTest: false,
 				transparent: true,
 				side: THREE.DoubleSide
 			} );
+			material2.map.colorSpace = THREE.SRGBColorSpace;
 
 			meshes.push( new THREE.Mesh( geometry, material1 ) );
 			meshes.push( new THREE.Mesh( geometry, material2 ) );
@@ -86,12 +101,14 @@
 			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_BC1.ktx' )
 			} );
+			material1.map.colorSpace = THREE.SRGBColorSpace;
 			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_BC3.ktx' ),
 				depthTest: false,
 				transparent: true,
 				side: THREE.DoubleSide
 			} );
+			material2.map.colorSpace = THREE.SRGBColorSpace;
 
 			meshes.push( new THREE.Mesh( geometry, material1 ) );
 			meshes.push( new THREE.Mesh( geometry, material2 ) );
@@ -113,12 +130,14 @@
 			material1 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/disturb_ASTC4x4.ktx' )
 			} );
+			material1.map.colorSpace = THREE.SRGBColorSpace;
 			material2 = new THREE.MeshBasicMaterial( {
 				map: loader.load( 'textures/compressed/lensflare_ASTC8x8.ktx' ),
 				depthTest: false,
 				transparent: true,
 				side: THREE.DoubleSide
 			} );
+			material2.map.colorSpace = THREE.SRGBColorSpace;
 
 			meshes.push( new THREE.Mesh( geometry, material1 ) );
 			meshes.push( new THREE.Mesh( geometry, material2 ) );

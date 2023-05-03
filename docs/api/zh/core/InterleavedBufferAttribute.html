@@ -38,6 +38,11 @@
 			所缓存的矢量的个数。如果缓存的矢量是一个三元组（例如，位置、法向量或颜色），则该值计算上述三元组的个数。
 		</p>
 
+		<h3>[property:Boolean isInterleavedBufferAttribute]</h3>
+		<p>
+			Read-only flag to check if a given object is of type [name].
+		</p>
+
 		<h3>[property:Integer itemSize]</h3>
 		<p>
 			队列中每个矢量有多少个元素构成。
@@ -86,25 +91,25 @@
 		<h3>[method:Number getW]( [param:Integer index] ) </h3>
 		<p>返回给定索引矢量的第四个元素 （W 值）。</p>
 
-		<h3>[method:null setX]( [param:Integer index], [param:Float x] ) </h3>
+		<h3>[method:this setX]( [param:Integer index], [param:Float x] ) </h3>
 		<p>通过给定参数，设置指定索引矢量的第一个元素 （X 值）。</p>
 
-		<h3>[method:null setY]( [param:Integer index], [param:Float y] ) </h3>
+		<h3>[method:this setY]( [param:Integer index], [param:Float y] ) </h3>
 		<p>通过给定参数，设置指定索引矢量的第二个元素 （Y 值）。</p>
 
-		<h3>[method:null setZ]( [param:Integer index], [param:Float z] ) </h3>
+		<h3>[method:this setZ]( [param:Integer index], [param:Float z] ) </h3>
 		<p>通过给定参数，设置指定索引矢量的第三个元素 （Z 值）。</p>
 
-		<h3>[method:null setW]( [param:Integer index], [param:Float w] ) </h3>
+		<h3>[method:this setW]( [param:Integer index], [param:Float w] ) </h3>
 		<p>通过给定参数，设置指定索引矢量的第四个元素 （W 值）。</p>
 
-		<h3>[method:null setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
+		<h3>[method:this setXY]( [param:Integer index], [param:Float x], [param:Float y] ) </h3>
 		<p>通过给定参数，设置指定索引矢量的第一、二个元素 （X 和 Y 值）。</p>
 
-		<h3>[method:null setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
+		<h3>[method:this setXYZ]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z] ) </h3>
 		<p>通过给定参数，设置指定索引矢量的第一、二、三个元素 （X Y 和 Z 值）。</p>
 
-		<h3>[method:null setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
+		<h3>[method:this setXYZW]( [param:Integer index], [param:Float x], [param:Float y], [param:Float z], [param:Float w] ) </h3>
 		<p>通过给定参数，设置指定索引矢量的第一、二、三、四个元素 （X Y Z 和 W 值）。</p>
 
 		<h2>源代码</h2>

@@ -1,35 +1,93 @@
 /* global QUnit */
 
-import { PointLightHelper } from '../../../../src/helpers/PointLightHelper';
+import { PointLightHelper } from '../../../../src/helpers/PointLightHelper.js';
+
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { PointLight } from '../../../../src/lights/PointLight.js';
 
 export default QUnit.module( 'Helpers', () => {
 
 	QUnit.module( 'PointLightHelper', () => {
 
-		// INHERITANCE
-		QUnit.todo( "Extending", ( assert ) => {
+		const parameters = {
+			sphereSize: 1,
+			color: 0xaaaaaa,
+			intensity: 0.5,
+			distance: 100,
+			decay: 2
+		};
 
-			assert.ok( false, "everything's gonna be alright" );
+		// INHERITANCE
+		QUnit.test( 'Extending', ( assert ) => {
+
+			const light = new PointLight( parameters.color );
+			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			assert.strictEqual(
+				object instanceof Mesh, true,
+				'PointLightHelper extends from Mesh'
+			);
 
 		} );
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		// PUBLIC STUFF
-		QUnit.todo( "dispose", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			const light = new PointLight( parameters.color );
+			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			assert.ok( object, 'Can instantiate a PointLightHelper.' );
 
 		} );
 
-		QUnit.todo( "update", ( assert ) => {
+		// PROPERTIES
+		QUnit.test( 'type', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const light = new PointLight( parameters.color );
+			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			assert.ok(
+				object.type === 'PointLightHelper',
+				'PointLightHelper.type should be PointLightHelper'
+			);
+
+		} );
+
+		QUnit.todo( 'light', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'color', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'matrix', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.test( 'dispose', ( assert ) => {
+
+			assert.expect( 0 );
+
+			const light = new PointLight( parameters.color );
+			const object = new PointLightHelper( light, parameters.sphereSize, parameters.color );
+			object.dispose();
+
+		} );
+
+		QUnit.todo( 'update', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 

@@ -54,7 +54,13 @@ class DodecahedronGeometry extends PolyhedronGeometry {
 
 	}
 
+	static fromJSON( data ) {
+
+		return new DodecahedronGeometry( data.radius, data.detail );
+
+	}
+
 }
 
 
-export { DodecahedronGeometry, DodecahedronGeometry as DodecahedronBufferGeometry };
+export { DodecahedronGeometry };

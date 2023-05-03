@@ -14,14 +14,28 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - curve modifier - instanced
 		</div>
 
-		<script type="module">
-			import * as THREE from "../build/three.module.js";
-			import { TransformControls } from "./jsm/controls/TransformControls.js";
-			import Stats from "./jsm/libs/stats.module.js";
-			import { InstancedFlow } from "./jsm/modifiers/CurveModifier.js";
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
 
-			const ACTION_SELECT = 1,
-				ACTION_NONE = 0;
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import * as THREE from 'three';
+			import { TransformControls } from 'three/addons/controls/TransformControls.js';
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { InstancedFlow } from 'three/addons/modifiers/CurveModifier.js';
+			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+
+			const ACTION_SELECT = 1, ACTION_NONE = 0;
 			const curveHandles = [];
 			const mouse = new THREE.Vector2();
 
@@ -77,7 +91,7 @@
 					} );
 
 					const curve = new THREE.CatmullRomCurve3( curveVertices );
-					curve.curveType = "centripetal";
+					curve.curveType = 'centripetal';
 					curve.closed = true;
 
 					const points = curve.getPoints( 50 );
@@ -109,13 +123,10 @@
 
 				//
 
-				const loader = new THREE.FontLoader();
+				const loader = new FontLoader();
+				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-				loader.load( "fonts/helvetiker_regular.typeface.json", function (
-					font
-				) {
-
-					const geometry = new THREE.TextGeometry( "Hello three.js!", {
+					const geometry = new TextGeometry( 'Hello three.js!', {
 						font: font,
 						size: 0.2,
 						height: 0.05,
@@ -165,7 +176,7 @@
 
 				rayCaster = new THREE.Raycaster();
 				control = new TransformControls( camera, renderer.domElement );
-				control.addEventListener( "dragging-changed", function ( event ) {
+				control.addEventListener( 'dragging-changed', function ( event ) {
 
 					if ( ! event.value ) {
 
@@ -184,7 +195,7 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				window.addEventListener( "resize", onWindowResize, false );
+				window.addEventListener( 'resize', onWindowResize );
 
 			}
 
@@ -213,7 +224,7 @@
 
 					rayCaster.setFromCamera( mouse, camera );
 					action = ACTION_NONE;
-					const intersects = rayCaster.intersectObjects( curveHandles );
+					const intersects = rayCaster.intersectObjects( curveHandles, false );
 					if ( intersects.length ) {
 
 						const target = intersects[ 0 ].object;

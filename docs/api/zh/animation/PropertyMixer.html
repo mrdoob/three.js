@@ -65,24 +65,24 @@
 		<h2>方法</h2>
 
 
-		<h3>[method:null accumulate]( [param:Number accuIndex], [param:Number weight] )</h3>
+		<h3>[method:undefined accumulate]( [param:Number accuIndex], [param:Number weight] )</h3>
 		<p>
 			将[page:PropertyMixer.buffer buffer][accuIndex]中'incoming'区的数据累加到'accu[i]'区中。<br />
 
 			如果权值为0，则什么都不做。
 		</p>
 
-		<h3>[method:null apply]( [param:Number accuIndex] )</h3>
+		<h3>[method:undefined apply]( [param:Number accuIndex] )</h3>
 		<p>
 			当累加值不同时，将[page:PropertyMixer.buffer buffer] 'accu[i]区的状态应用于绑定.
 		</p>
 
-		<h3>[method:null saveOriginalState]( )</h3>
+		<h3>[method:undefined saveOriginalState]( )</h3>
 		<p>
 			记住绑定属性的状态并复制到两个'accu'区中.
 		</p>
 
-		<h3>[method:null restoreOriginalState](  )</h3>
+		<h3>[method:undefined restoreOriginalState](  )</h3>
 		<p>
 			将预先通过'saveOriginalState'方法取得的状态应用于绑定。
 		</p>

@@ -49,5 +49,10 @@ visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_f
 			在正常情况下，渲染时会将背面进行剔除。要查看这是不是你所遇到的问题，请将material的side更改为THREE.DoubleSide。
 			<code>material.side = THREE.DoubleSide</code>
 		</p>
+
+		<h2>为什么有时候无效的输入会让three.js返回奇怪的结果？</h2>
+		<p>
+			出于性能考虑，大多数情况下 three.js 不验证输入。确保所有输入均有效是你的应用的责任。
+		</p>
 	</body>
 </html>

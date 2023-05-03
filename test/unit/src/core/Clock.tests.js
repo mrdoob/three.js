@@ -1,6 +1,6 @@
 /* global QUnit */
 
-import { Clock } from '../../../../src/core/Clock';
+import { Clock } from '../../../../src/core/Clock.js';
 
 export default QUnit.module( 'Core', () => {
 
@@ -8,7 +8,9 @@ export default QUnit.module( 'Core', () => {
 
 		function mockPerformance() {
 
-			self.performance = {
+			const reference = ( typeof global !== 'undefined' ) ? global : self;
+
+			reference.performance = {
 				deltaTime: 0,
 
 				next: function ( delta ) {
@@ -28,39 +30,76 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.todo( "Instancing", ( assert ) => {
+		QUnit.test( 'Instancing', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			// no params
+			const object = new Clock();
+			assert.ok( object, 'Can instantiate a Clock.' );
 
-		} );
-
-		// PUBLIC STUFF
-		QUnit.todo( "start", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "stop", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			// autostart
+			const object_all = new Clock( false );
+			assert.ok( object_all, 'Can instantiate a Clock with autostart.' );
 
 		} );
 
-		QUnit.todo( "getElapsedTime", ( assert ) => {
+		// PROPERTIES
+		QUnit.todo( 'autoStart', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( "getDelta", ( assert ) => {
+		QUnit.todo( 'startTime', ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'oldTime', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'elapsedTime', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'running', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		// PUBLIC
+		QUnit.todo( 'start', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'stop', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getElapsedTime', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getDelta', ( assert ) => {
+
+			assert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( "clock with performance", ( assert ) => {
+		QUnit.test( 'clock with performance', ( assert ) => {
 
 			if ( typeof performance === 'undefined' ) {
 
@@ -71,20 +110,20 @@ export default QUnit.module( 'Core', () => {
 
 			mockPerformance();
 
-			var clock = new Clock( false );
+			const clock = new Clock( false );
 
 			clock.start();
 
-			self.performance.next( 123 );
-			assert.numEqual( clock.getElapsedTime(), 0.123, "okay" );
+			performance.next( 123 );
+			assert.numEqual( clock.getElapsedTime(), 0.123, 'okay' );
 
-			self.performance.next( 100 );
-			assert.numEqual( clock.getElapsedTime(), 0.223, "okay" );
+			performance.next( 100 );
+			assert.numEqual( clock.getElapsedTime(), 0.223, 'okay' );
 
 			clock.stop();
 
-			self.performance.next( 1000 );
-			assert.numEqual( clock.getElapsedTime(), 0.223, "don't update time if the clock was stopped" );
+			performance.next( 1000 );
+			assert.numEqual( clock.getElapsedTime(), 0.223, 'don\'t update time if the clock was stopped' );
 
 		} );
 

@@ -17,7 +17,7 @@
 
 			#container {
 				position: absolute;
-				top: 80px;
+				top: 70px;
 				width: 100%;
 				bottom: 0px;
 			}
@@ -28,20 +28,35 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - postprocessing - FXAA<br />
-			Left scene processed with FXAA, right scene is rendered without anti-aliasing.
+			Left: No FXAA, Right: FXAA
 		</div>
 		<div id="container">
 		</div>
 
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
 		<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+			import * as THREE from 'three';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-			import { CopyShader } from './jsm/shaders/CopyShader.js';
-			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
+			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { CopyShader } from 'three/addons/shaders/CopyShader.js';
+			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+
+			THREE.ColorManagement.enabled = false; // TODO: Consider enabling color management.
 
 			let camera, scene, renderer, clock, group, container;
 
@@ -54,12 +69,10 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xcccccc, 100, 1500 );
 
 				clock = new THREE.Clock();
 
@@ -111,27 +124,29 @@
 				//
 
 				const renderPass = new RenderPass( scene, camera );
+				renderPass.clearColor = new THREE.Color( 0, 0, 0 );
+				renderPass.clearAlpha = 0;
 
 				//
 
 				fxaaPass = new ShaderPass( FXAAShader );
+
+				const copyPass = new ShaderPass( CopyShader );
+
+				composer1 = new EffectComposer( renderer );
+				composer1.addPass( renderPass );
+				composer1.addPass( copyPass );
+
+				//
 
 				const pixelRatio = renderer.getPixelRatio();
 
 				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
 				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
-				composer1 = new EffectComposer( renderer );
-				composer1.addPass( renderPass );
-				composer1.addPass( fxaaPass );
-
-				//
-
-				const copyPass = new ShaderPass( CopyShader );
-
 				composer2 = new EffectComposer( renderer );
 				composer2.addPass( renderPass );
-				composer2.addPass( copyPass );
+				composer2.addPass( fxaaPass );
 
 				//
 
@@ -141,7 +156,7 @@
 
 			function onWindowResize() {
 
-				camera.aspect = ( container.offsetWidth * 0.5 ) / container.offsetHeight;
+				camera.aspect = container.offsetWidth / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
@@ -163,13 +178,15 @@
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
-				renderer.setViewport( 0, 0, halfWidth, container.offsetHeight );
+				renderer.setScissorTest( true );
 
+				renderer.setScissor( 0, 0, halfWidth - 1, container.offsetHeight );
 				composer1.render();
 
-				renderer.setViewport( halfWidth, 0, halfWidth, container.offsetHeight );
-
+				renderer.setScissor( halfWidth, 0, halfWidth, container.offsetHeight );
 				composer2.render();
+
+				renderer.setScissorTest( false );
 
 			}
 
