@@ -57,15 +57,20 @@ const exceptionList = [
 
 	// Windows-Linux text rendering differences
 	// TODO: Fix these by setting a font in Puppeteer -- this can also fix a bunch of 0.1%-0.2% examples
-	'css3d_periodictable',
+	/*'css3d_periodictable',
 	'misc_controls_pointerlock',
 	'misc_uv_tests',
 	'webgl_camera_logarithmicdepthbuffer',
 	'webgl_effects_ascii',
+	'webgl_geometry_extrude_shapes',
+	'webgl_interactive_lines',
+	'webgl_loader_collada_kinematics',
+	'webgl_loader_ldraw',
 	'webgl_loader_pdb',
+	'webgl_modifier_simplifier',
 	'webgl_multiple_canvases_circle',
 	'webgl_multiple_elements_text',
-	'webgl_shaders_tonemapping',
+	'webgl_shaders_tonemapping',*/
 
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
@@ -97,7 +102,7 @@ const exceptionList = [
 
 const chromiumRevision = '1108766'; // Chromium 112.0.5614.0, Puppeteer 19.8.0, https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-core-v19.8.0
 
-const port = 8234;
+const port = 1234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
@@ -119,7 +124,7 @@ console.red = msg => console.log( chalk.red( msg ) );
 console.yellow = msg => console.log( chalk.yellow( msg ) );
 console.green = msg => console.log( chalk.green( msg ) );
 
-let browser;
+let browser, platform;
 
 /* Launch server */
 
@@ -260,6 +265,8 @@ async function downloadLatestChromium() {
 
 	const browserFetcher = new BrowserFetcher( { path: 'test/e2e/chromium' } );
 
+	platform = browserFetcher.platform();
+
 	let revisionInfo = browserFetcher.revisionInfo( chromiumRevision );
 	if ( revisionInfo.local === true ) {
 
@@ -272,7 +279,7 @@ async function downloadLatestChromium() {
 		console.log( 'Downloaded.' );
 
 	}
-	console.log( `Using Chromium r${ chromiumRevision } (${ revisionInfo.url }), stable channel on ${ browserFetcher.platform() }` );
+	console.log( `Using Chromium r${ chromiumRevision } (${ revisionInfo.url }), stable channel on ${ platform }` );
 	return revisionInfo;
 
 }
@@ -509,7 +516,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
@@ -528,8 +535,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
+				await expected.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-expected.jpg` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -544,9 +551,9 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} else {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
-				await diff.writeAsync( `test/e2e/output-screenshots/${ file }-diff.jpg` );
+				await screenshot.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-actual.jpg` );
+				await expected.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-expected.jpg` );
+				await diff.writeAsync( `test/e2e/output-screenshots/${ platform }-${ file }-diff.jpg` );
 				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 
 			}
