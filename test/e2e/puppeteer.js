@@ -190,7 +190,7 @@ async function main() {
 
 	browser = await puppeteer.launch( {
 		executablePath,
-		headless: ! process.env.VISIBLE,
+		headless: process.env.VISIBLE ? false : 'new',
 		args: flags,
 		defaultViewport: viewport,
 		handleSIGINT: false,
