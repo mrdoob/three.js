@@ -1023,6 +1023,7 @@ class WebGLRenderer {
 			if ( this.info.autoReset === true ) this.info.reset();
 
 			//
+			this.info.render.frame ++;
 
 			background.render( currentRenderList, scene );
 
