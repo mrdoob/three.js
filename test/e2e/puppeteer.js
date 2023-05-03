@@ -42,8 +42,9 @@ const parseTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
 
-	// video tag not deterministic enough
+	// video tag isn't deterministic enough
 	'css3d_youtube',
+	'webgl_materials_video',
 	'webgl_video_kinect',
 	'webgl_video_panorama_equirectangular',
 	'webxr_vr_video',
@@ -96,7 +97,7 @@ const exceptionList = [
 
 const chromiumRevision = '1108766'; // Chromium 112.0.5614.0, Puppeteer 19.8.0, https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-core-v19.8.0
 
-const port = 1234;
+const port = 8234;
 const pixelThreshold = 0.1; // threshold error in one pixel
 const maxDifferentPixels = 0.3; // at most 0.3% different pixels
 
