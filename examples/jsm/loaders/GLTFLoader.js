@@ -2255,8 +2255,9 @@ function updateMorphTargets( mesh, meshDef ) {
 
 function createPrimitiveKey( primitiveDef ) {
 
-	const dracoExtension = primitiveDef.extensions && primitiveDef.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ];
 	let geometryKey;
+
+	const dracoExtension = primitiveDef.extensions && primitiveDef.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ];
 
 	if ( dracoExtension ) {
 
@@ -2267,6 +2268,16 @@ function createPrimitiveKey( primitiveDef ) {
 	} else {
 
 		geometryKey = primitiveDef.indices + ':' + createAttributesKey( primitiveDef.attributes ) + ':' + primitiveDef.mode;
+
+	}
+
+	if ( primitiveDef.targets !== undefined ) {
+
+		for ( let i = 0, il = primitiveDef.targets.length; i < il; i ++ ) {
+
+			geometryKey += ':' + createAttributesKey( primitiveDef.targets[ i ] );
+
+		}
 
 	}
 
