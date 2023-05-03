@@ -1168,10 +1168,19 @@ class WebGLRenderer {
 
 						if ( sortObjects ) {
 
-							if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+							if ( object.boundingSphere !== undefined ) {
+
+								if ( object.boundingSphere === null ) object.computeBoundingSphere();
+								_vector3.copy( object.boundingSphere.center );
+
+							} else {
+
+								if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+								_vector3.copy( geometry.boundingSphere.center );
+
+							}
 
 							_vector3
-								.copy( geometry.boundingSphere.center )
 								.applyMatrix4( object.matrixWorld )
 								.applyMatrix4( _projScreenMatrix );
 
