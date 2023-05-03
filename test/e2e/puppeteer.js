@@ -55,30 +55,15 @@ const exceptionList = [
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
-	// Windows-Linux text rendering differences
-	// TODO: Fix these by setting a font in Puppeteer -- this can also fix a bunch of 0.1%-0.2% examples
-	/*'css3d_periodictable',
-	'misc_controls_pointerlock',
-	'misc_uv_tests',
-	'webgl_camera_logarithmicdepthbuffer',
-	'webgl_effects_ascii',
-	'webgl_interactive_lines',
-	'webgl_loader_collada_kinematics',
-	'webgl_loader_ldraw',
-	'webgl_loader_pdb',
-	'webgl_modifier_simplifier',
-	'webgl_multiple_canvases_circle',
-	'webgl_multiple_elements_text',
-	'webgl_shaders_tonemapping',*/
-
 	// Unknown
-	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	// TODO: some of these can be fixed just by increasing idleTime and parseTime
 	'webgl_animation_skinning_blending',
 	'webgl_buffergeometry_glbufferattribute',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
 	'webgl_lines_sphere',
 	'webgl_lights_spotlights',
+	'webgl_loader_collada_kinematics',
 	'webgl_loader_imagebitmap',
 	'webgl_loader_texture_lottie',
 	'webgl_loader_texture_pvrtc',
