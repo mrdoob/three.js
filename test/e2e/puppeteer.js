@@ -62,7 +62,6 @@ const exceptionList = [
 	'misc_uv_tests',
 	'webgl_camera_logarithmicdepthbuffer',
 	'webgl_effects_ascii',
-	'webgl_geometry_extrude_shapes',
 	'webgl_interactive_lines',
 	'webgl_loader_collada_kinematics',
 	'webgl_loader_ldraw',
