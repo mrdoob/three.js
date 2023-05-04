@@ -69,6 +69,20 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
 
+				scene.add( new THREE.AmbientLight( 0x555555 ) );
+
+				const light = new THREE.SpotLight( 0xffffff, 1.5 );
+				light.position.set( 0, 500, 2000 );
+				scene.add( light );
+
+				const defaultMaterial = new THREE.MeshPhongMaterial( {
+					color: 0xffffff,
+					flatShading: true,
+					vertexColors: true,
+					shininess: 0
+				} );
+
+				// set up the picking texture to use a 32 bit integer so we can write and read integer ids from it
 				pickingScene = new THREE.Scene();
 				pickingTexture = new THREE.WebGLRenderTarget( 1, 1, {
 
@@ -77,14 +91,6 @@
 					internalFormat: 'R32I',
 
 				} );
-
-				scene.add( new THREE.AmbientLight( 0x555555 ) );
-
-				const light = new THREE.SpotLight( 0xffffff, 1.5 );
-				light.position.set( 0, 500, 2000 );
-				scene.add( light );
-
-				const defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: true, shininess: 0	} );
 				const pickingMaterial = new THREE.ShaderMaterial( {
 
 					glslVersion: THREE.GLSL3,
@@ -101,16 +107,14 @@
 					`,
 
 					fragmentShader: /* glsl */`
-
 						layout(location = 0) out int out_id;
 						flat varying int vid;
 
 						void main() {
 
-							out_id = int( vid );
+							out_id = vid;
 
 						}
-
 					`,
 
 				} );
@@ -170,8 +174,8 @@
 
 					geometry.applyMatrix4( matrix );
 
-					// give the geometry's vertices a random color, to be displayed
-
+					// give the geometry's vertices a random color to be displayed and an integer
+					// identifier as a vertex attribute so boxes can be identified after being merged.
 					applyVertexColors( geometry, color.setHex( Math.random() * 0xffffff ) );
 					applyId( geometry, i );
 
@@ -238,41 +242,40 @@
 
 			function pick() {
 
-				//render the picking scene off-screen
-
+				// render the picking scene off-screen
 				// set the view offset to represent just a single pixel under the mouse
-
-				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, pointer.x * window.devicePixelRatio | 0, pointer.y * window.devicePixelRatio | 0, 1, 1 );
+				const dpr = window.devicePixelRatio;
+				camera.setViewOffset(
+					renderer.domElement.width, renderer.domElement.height,
+					Math.floor( pointer.x * dpr ), Math.floor( pointer.y * dpr ),
+					1, 1
+				);
 
 				// render the scene
-				clearColor.setRGB( - 1, - 1, - 1 );
-				renderer.autoClear = false;
 				renderer.setRenderTarget( pickingTexture );
+
+				// clear the background to - 1 meaning no item was hit
+				clearColor.setRGB( - 1, - 1, - 1 );
 				renderer.setClearColor( clearColor );
 				renderer.clear();
-				renderer.render( pickingScene, camera );
 
+				renderer.autoClear = false;
+				renderer.render( pickingScene, camera );
 				renderer.autoClear = true;
 
 				// clear the view offset so rendering returns to normal
-
 				camera.clearViewOffset();
 
-				//create buffer for reading single pixel
-
+				// create buffer for reading single pixel
 				const pixelBuffer = new Int32Array( 1 );
 
-				//read the pixel
-
+				// read the pixel
 				renderer.readRenderTargetPixels( pickingTexture, 0, 0, 1, 1, pixelBuffer );
 
-				//interpret the pixel as an ID
 				const id = pixelBuffer[ 0 ];
-
 				if ( id !== - 1 ) {
 
-					//move our highlightBox so that it surrounds the picked object
-
+					// move our highlightBox so that it surrounds the picked object
 					const data = pickingData[ id ];
 					highlightBox.position.copy( data.position );
 					highlightBox.rotation.copy( data.rotation );
