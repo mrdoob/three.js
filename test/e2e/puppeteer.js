@@ -55,9 +55,22 @@ const exceptionList = [
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
-	// Mac-only fails
+	// Windows-Linux text rendering differences
+	// TODO: Fix these by e.g. disabling text rendering altogether -- this can also fix a bunch of 0.1%-0.2% examples
 	'css3d_periodictable',
+	'misc_controls_pointerlock',
 	'misc_uv_tests',
+	'webgl_camera_logarithmicdepthbuffer',
+	'webgl_effects_ascii',
+	'webgl_geometry_extrude_shapes',
+	'webgl_interactive_lines',
+	'webgl_loader_collada_kinematics',
+	'webgl_loader_ldraw',
+	'webgl_loader_pdb',
+	'webgl_modifier_simplifier',
+	'webgl_multiple_canvases_circle',
+	'webgl_multiple_elements_text',
+	'webgl_shaders_tonemapping',
 
 	// Unknown
 	// TODO: some of these can be fixed just by increasing idleTime and parseTime
