@@ -3620,8 +3620,6 @@ class GLTFParser {
 
 				if ( primitive.extensions ) addUnknownExtensionsToUserData( extensions, mesh, primitive );
 
-				if ( meshDef.extensions ) addUnknownExtensionsToUserData( extensions, mesh, meshDef );
-
 				parser.assignFinalMaterial( mesh );
 
 				meshes.push( mesh );
@@ -3639,11 +3637,15 @@ class GLTFParser {
 
 			if ( meshes.length === 1 ) {
 
+				if ( meshDef.extensions ) addUnknownExtensionsToUserData( extensions, meshes[ 0 ], meshDef );
+
 				return meshes[ 0 ];
 
 			}
 
 			const group = new Group();
+
+			if ( meshDef.extensions ) addUnknownExtensionsToUserData( extensions, group, meshDef );
 
 			parser.associations.set( group, { meshes: meshIndex } );
 
