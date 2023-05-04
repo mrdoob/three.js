@@ -301,6 +301,8 @@ class WebGPURenderer {
 
 		if ( this._info.autoReset === true ) this._info.reset();
 
+		this._info.render.frame ++;
+
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix );
 
