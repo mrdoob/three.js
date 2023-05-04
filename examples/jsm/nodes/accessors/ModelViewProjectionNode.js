@@ -6,22 +6,17 @@ import { nodeProxy } from '../shadernode/ShaderNode.js';
 
 class ModelViewProjectionNode extends Node {
 
-	constructor( position = positionLocal ) {
+	constructor( positionNode = positionLocal ) {
 
 		super( 'vec4' );
 
-		this.position = position;
+		this.positionNode = positionNode;
 
 	}
 
-	generate( builder ) {
+	construct() {
 
-		const position = this.position;
-
-		const mvpMatrix = cameraProjectionMatrix.mul( modelViewMatrix );
-		const mvpNode = mvpMatrix.mul( position );
-
-		return mvpNode.build( builder );
+		return cameraProjectionMatrix.mul( modelViewMatrix ).mul( this.positionNode );
 
 	}
 
