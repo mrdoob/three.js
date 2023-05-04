@@ -382,6 +382,16 @@ class Int8BufferAttribute extends BufferAttribute {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.integer = source.integer;
+
+		return this;
+
+	}
+
 }
 
 class Uint8BufferAttribute extends BufferAttribute {
@@ -391,6 +401,16 @@ class Uint8BufferAttribute extends BufferAttribute {
 		super( new Uint8Array( array ), itemSize, normalized );
 
 		this.integer = false;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.integer = source.integer;
+
+		return this;
 
 	}
 
@@ -416,6 +436,16 @@ class Int16BufferAttribute extends BufferAttribute {
 
 	}
 
+	copy( source ) {
+
+		super.copy( source );
+
+		this.integer = source.integer;
+
+		return this;
+
+	}
+
 }
 
 class Uint16BufferAttribute extends BufferAttribute {
@@ -425,6 +455,16 @@ class Uint16BufferAttribute extends BufferAttribute {
 		super( new Uint16Array( array ), itemSize, normalized );
 
 		this.integer = false;
+
+	}
+
+	copy( source ) {
+
+		super.copy( source );
+
+		this.integer = source.integer;
+
+		return this;
 
 	}
 
