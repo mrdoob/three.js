@@ -2,6 +2,7 @@ import { EventDispatcher } from '../core/EventDispatcher.js';
 import { Texture } from '../textures/Texture.js';
 import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
+import { platform } from '../platform.js';
 
 /*
  In options, we can specify:
@@ -35,6 +36,13 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
+
+		/**
+		 * ios16.4.1 gl.DEPTH_COMPONENT16 does not work well in rendertarget
+		 * it only works in depthBuffer true & stencilBuffer false & depthTexture null
+		 * see WebGlTextures.setupRenderBufferStorage
+		 * */
+		this.useDEPTH_COMPONENT24 = platform.properties?.rendertargetUseDEPTH_COMPONENT24;
 
 	}
 

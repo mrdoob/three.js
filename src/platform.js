@@ -15,6 +15,12 @@ const platform = {
 		};
 		this.devicePixelRatio = params.devicePixelRatio;
 
+	},
+
+	setProperties( properties ) {
+
+		this.properties = Object.assign( this.properties ?? {}, properties );
+
 	}
 
 };

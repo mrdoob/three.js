@@ -1126,7 +1126,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
 
-			let glInternalFormat = _gl.DEPTH_COMPONENT16;
+			let glInternalFormat = renderTarget.useDEPTH_COMPONENT24 ? _gl.DEPTH_COMPONENT24 : _gl.DEPTH_COMPONENT16;
 
 			if ( isMultisample || renderTarget.useRenderToTexture ) {
 
