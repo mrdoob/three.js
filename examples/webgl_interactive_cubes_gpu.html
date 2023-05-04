@@ -257,11 +257,7 @@
 				// clear the background to - 1 meaning no item was hit
 				clearColor.setRGB( - 1, - 1, - 1 );
 				renderer.setClearColor( clearColor );
-				renderer.clear();
-
-				renderer.autoClear = false;
 				renderer.render( pickingScene, camera );
-				renderer.autoClear = true;
 
 				// clear the view offset so rendering returns to normal
 				camera.clearViewOffset();
